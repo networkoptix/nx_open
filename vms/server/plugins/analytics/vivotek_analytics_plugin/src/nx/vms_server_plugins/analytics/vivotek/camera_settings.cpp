@@ -208,6 +208,7 @@ struct VcaParserFromCamera
         parse(&rule->minPersonCount, jsonRule["PeopleNumber"]);
         parse(&rule->minSpeed, jsonRule["SpeedLevel"]);
         parse(&rule->minDuration, jsonRule["MinActivityDuration"]);
+        parse(&rule->maxMergeInterval, jsonRule["ActivityMergeInterval"]);
     }
 
     template <typename Detection>
@@ -308,15 +309,7 @@ void fetchFromCamera(CameraSettings* settings, const Url& cameraUrl)
     fetchFromCamera(&settings->vca, moduleInfos["VCA"], cameraUrl);
 }
 
-
-
-
-
-
-
-
-
-
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 struct VcaSerializerToCamera
 {
@@ -576,6 +569,7 @@ struct VcaSerializerToCamera
         serialize(jsonRule, "PeopleNumber", &rule->minPersonCount);
         serialize(jsonRule, "SpeedLevel", &rule->minSpeed);
         serialize(jsonRule, "MinActivityDuration", &rule->minDuration);
+        serialize(jsonRule, "ActivityMergeInterval", &rule->maxMergeInterval);
     }
 
     template <typename Detection>
@@ -709,14 +703,7 @@ void storeToCamera(const Url& cameraUrl, CameraSettings* settings)
     storeToCamera(cameraUrl, &settings->vca, moduleInfos["VCA"]);
 }
 
-
-
-
-
-
-
-
-
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 const int kMaxExcludedRegionCount = 50; // Arbitrary big value.
 const int kMaxDetectionRuleCount = 5; // Defined in user manual.
@@ -755,7 +742,8 @@ const QString kVcaMissingObjectDetectionRequiresHumanInvolvement =
 const QString kVcaUnattendedObjectDetectionRegion = "Vca.UnattendedObjectDetection#.Region";
 const QString kVcaUnattendedObjectDetectionSizeConstraints =
     "Vca.UnattendedObjectDetection#.SizeConstraints";
-const QString kVcaUnattendedObjectDetectionMinDuration = "Vca.UnattendedObjectDetection#.MinDuration";
+const QString kVcaUnattendedObjectDetectionMinDuration =
+    "Vca.UnattendedObjectDetection#.MinDuration";
 const QString kVcaUnattendedObjectDetectionRequiresHumanInvolvement =
     "Vca.UnattendedObjectDetection#.RequiresHumanInvolvement";
 
@@ -765,6 +753,7 @@ const QString kVcaRunningDetectionName = "Vca.RunningDetection#.Name";
 const QString kVcaRunningDetectionMinPersonCount = "Vca.RunningDetection#.MinPersonCount";
 const QString kVcaRunningDetectionMinSpeed = "Vca.RunningDetection#.MinSpeed";
 const QString kVcaRunningDetectionMinDuration = "Vca.RunningDetection#.MinDuration";
+const QString kVcaRunningDetectionMaxMergeInterval = "Vca.RunningDetection#.MaxMergeInterval";
 
 QString replicateName(QString name, std::size_t i)
 {
@@ -772,13 +761,7 @@ QString replicateName(QString name, std::size_t i)
     return name.arg(i + 1);
 }
 
-
-
-
-
-
-
-
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 struct ParserFromServer
 {
@@ -1081,6 +1064,7 @@ struct ParserFromServer
             parse(&rule.minPersonCount, replicateName(kVcaRunningDetectionMinPersonCount, i));
             parse(&rule.minSpeed, replicateName(kVcaRunningDetectionMinSpeed, i));
             parse(&rule.minDuration, replicateName(kVcaRunningDetectionMinDuration, i));
+            parse(&rule.maxMergeInterval, replicateName(kVcaRunningDetectionMaxMergeInterval, i));
 
             if (rule.name.value && rule.name.value->isEmpty())
                 rule.name.value = std::nullopt;
@@ -1128,17 +1112,7 @@ void parseFromServer(CameraSettings* settings, const IStringMap& values)
     ParserFromServer{values}.parse(settings);
 }
 
-
-
-
-
-
-
-
-
-
-
-
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 struct SerializerToServer
 {
@@ -1411,6 +1385,7 @@ struct SerializerToServer
             serialize(replicateName(kVcaRunningDetectionMinPersonCount, i), rule.minPersonCount);
             serialize(replicateName(kVcaRunningDetectionMinSpeed, i), rule.minSpeed);
             serialize(replicateName(kVcaRunningDetectionMinDuration, i), rule.minDuration);
+            serialize(replicateName(kVcaRunningDetectionMaxMergeInterval, i), rule.maxMergeInterval);
         }
     }
 
@@ -1456,6 +1431,7 @@ void serializeToServer(SettingsResponse* response, const CameraSettings& setting
     response->setErrors(std::move(errors));
 }
 
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 QJsonObject serializeModel(const CameraSettings::Vca::Installation& installation)
 {
@@ -1864,6 +1840,17 @@ QJsonObject serializeModel(const CameraSettings::Vca::RunningDetection& detectio
                             {"caption", "Minimum duration (s)"},
                             {"description", "The event is only generated if people are running"
                                             " run for at least this long"},
+                        },
+                        QJsonObject{
+                            {"name", kVcaRunningDetectionMaxMergeInterval},
+                            {"type", "SpinBox"},
+                            {"minValue", 0},
+                            {"maxValue", 999},
+                            {"defaultValue", 1},
+                            {"caption", "Max merge interval (s)"},
+                            {"description", "Two consecutive running events are merged into one"
+                                            " if the time between the end of the first one and"
+                                            " the start of the second one is less than this"},
                         },
                     }},
                 }},

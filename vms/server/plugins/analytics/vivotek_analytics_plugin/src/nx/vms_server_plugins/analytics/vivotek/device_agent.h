@@ -20,7 +20,6 @@
 #include "engine.h"
 #include "camera_settings.h"
 #include "native_metadata_source.h"
-#include "event_prolonger.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
@@ -72,7 +71,6 @@ private:
     NativeMetadataTypes m_streamedMetadataTypes = NoNativeMetadataTypes;
     std::optional<NativeMetadataSource> m_nativeMetadataSource;
     std::optional<nx::network::aio::Timer> m_timer;
-    std::optional<EventProlonger> m_eventProlonger;
 };
 
 } // namespace nx::vms_server_plugins::analytics::vivotek

@@ -173,6 +173,7 @@ public:
                 Entry<int> minPersonCount;
                 Entry<int> minSpeed;
                 Entry<int> minDuration;
+                Entry<int> maxMergeInterval;
             };
             std::vector<Rule> rules;
 

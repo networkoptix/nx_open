@@ -14,15 +14,15 @@ using namespace nx::sdk::analytics;
 
 namespace {
 
-std::optional<QString> parseTypeId(const QString& native)
+const EventType* findEventType(const QString& native)
 {
     for (const auto& type: kEventTypes)
     {
         if (type.nativeId == native)
-            return type.id;
+            return &type;
     }
 
-    return std::nullopt;
+    return nullptr;
 }
 
 Ptr<IEventMetadataPacket> parsePacket(const JsonObject& behaviorAlarmInfo)
@@ -33,9 +33,16 @@ Ptr<IEventMetadataPacket> parsePacket(const JsonObject& behaviorAlarmInfo)
 
     auto metadata = makePtr<EventMetadata>();
 
-    if (auto typeId = parseTypeId(behaviorAlarmInfo["RuleType"].to<QString>()))
-        metadata->setTypeId(typeId->toStdString());
-    else
+    const auto* type = findEventType(behaviorAlarmInfo["RuleType"].to<QString>());
+    if (!type)
+        return nullptr;
+
+    metadata->setTypeId(type->id.toStdString());
+
+    const auto edgeEvent = behaviorAlarmInfo["EdgeEvent"].to<QString>();
+    if (type->isProlonged)
+        metadata->setIsActive(edgeEvent != "Falling");
+    else if (edgeEvent != "Rising")
         return nullptr;
 
     metadata->setDescription(behaviorAlarmInfo["RuleName"].to<QString>().toStdString());

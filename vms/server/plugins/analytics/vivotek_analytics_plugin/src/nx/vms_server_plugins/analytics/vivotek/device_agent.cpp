@@ -269,9 +269,6 @@ void DeviceAgent::startMetadataStreaming()
             [this](auto&&) {
                 streamMetadataPackets();
 
-                m_eventProlonger.emplace();
-                streamProlongedEventMetadataPackets();
-
                 return cf::unit();
             })
         .catch_(ignoreCancellation)
@@ -294,14 +291,6 @@ void DeviceAgent::startMetadataStreaming()
 
 void DeviceAgent::stopMetadataStreaming()
 {
-    if (m_eventProlonger)
-    {
-        m_eventProlonger->flush();
-        while (auto packet = m_eventProlonger->readSync())
-            m_handler->handleMetadata(packet.releasePtr());
-    }
-
-    m_eventProlonger.reset();
     m_timer.reset();
     m_nativeMetadataSource.reset();
 }
@@ -315,7 +304,7 @@ void DeviceAgent::streamMetadataPackets()
                 if (auto packet = parseObjectMetadataPacket(nativePacket))
                     m_handler->handleMetadata(packet.releasePtr());
                 for (auto& packet: parseEventMetadataPackets(nativePacket))
-                    m_eventProlonger->write(packet);
+                    m_handler->handleMetadata(packet.releasePtr());
 
                 streamMetadataPackets();
 
@@ -327,31 +316,6 @@ void DeviceAgent::streamMetadataPackets()
             {
                 emitDiagnostic(IPluginDiagnosticEvent::Level::warning,
                     "Metadata streaming failed", exception.what());
-
-                startMetadataStreaming();
-
-                return cf::unit();
-            });
-}
-
-void DeviceAgent::streamProlongedEventMetadataPackets()
-{
-    m_eventProlonger->read()
-        .then_unwrap(
-            [this](auto packet)
-            {
-                m_handler->handleMetadata(packet.get());
-
-                streamProlongedEventMetadataPackets();
-
-                return cf::unit();
-            })
-        .catch_(ignoreCancellation)
-        .catch_(
-            [this](const std::exception& exception)
-            {
-                emitDiagnostic(IPluginDiagnosticEvent::Level::warning,
-                    "Prolonged event metadata streaming failed", exception.what());
 
                 startMetadataStreaming();
 
