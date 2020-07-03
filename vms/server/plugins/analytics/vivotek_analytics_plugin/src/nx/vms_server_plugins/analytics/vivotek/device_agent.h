@@ -18,7 +18,6 @@
 #include <QtCore/QString>
 
 #include "engine.h"
-#include "camera_features.h"
 #include "camera_settings.h"
 #include "native_metadata_source.h"
 #include "event_prolonger.h"
