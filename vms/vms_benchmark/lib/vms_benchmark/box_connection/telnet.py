@@ -96,7 +96,7 @@ class BoxConnectionTelnet(BoxConnection):
         return self._remove_service_data_from_command_output(reply.decode('ascii'), tearline)
 
     def sh(self, command, timeout_s=None,
-            su=False, throw_timeout_exception=False, stdout=sys.stdout, stderr=None, stdin=None,
+            su=False, throw_exception_on_error=False, stdout=sys.stdout, stderr=None, stdin=None,
             verbose=False):
         command_wrapped = command if self.is_root or not su else f'sudo -n {command}'
         actual_timeout_s = timeout_s or box_connection.ini_box_command_timeout_s
@@ -114,7 +114,7 @@ class BoxConnectionTelnet(BoxConnection):
                     "on port specified in boxTelnetPort .conf setting "
                     "(23 by default).")
         except (EOFError, SocketTimeoutError):
-            if throw_timeout_exception:
+            if throw_exception_on_error:
                 raise exceptions.BoxCommandError(
                     "Connection timed out, "
                         "check boxHostnameOrIp configuration setting and "

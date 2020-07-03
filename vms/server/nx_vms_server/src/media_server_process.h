@@ -253,7 +253,7 @@ private:
     std::map<QString, QVariant> confParamsFromSettings() const;
     void writeMutableSettingsData();
     void createTcpListener();
-    void loadResourcesFromDatabase();
+    bool loadResourcesFromDatabase();
     void updateRootPassword();
     void createResourceProcessor();
     void setRuntimeFlag(nx::vms::api::RuntimeFlag flag, bool isSet);

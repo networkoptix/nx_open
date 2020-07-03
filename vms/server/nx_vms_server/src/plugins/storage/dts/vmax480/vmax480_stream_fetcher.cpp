@@ -18,7 +18,7 @@ static const qint64 EMPTY_PACKET_REPEAT_INTERVAL = 1000ll * 400;
 static const qint64 RECONNECT_TIMEOUT_USEC = 4000 * 1000;
 
 QnMutex VMaxStreamFetcher::m_instMutex;
-QMap<QByteArray, VMaxStreamFetcher*> VMaxStreamFetcher::m_instances;
+QMap<QByteArray, std::weak_ptr<VMaxStreamFetcher>> VMaxStreamFetcher::m_instances;
 
 void VMaxStreamFetcher::initPacketTime()
 {
@@ -35,7 +35,6 @@ VMaxStreamFetcher::VMaxStreamFetcher(
     m_vMaxProxy(0),
     m_vmaxConnection(0),
     m_isLive(isLive),
-    m_usageCount(0),
     m_sequence(0),
     m_lastMediaTime(AV_NOPTS_VALUE),
     m_streamPaused(false),
@@ -474,17 +473,7 @@ QByteArray getInstanceKey(const QByteArray& clientGroupID, const QByteArray& vma
     return clientGroupID + QByteArray("-") + vmaxIP + QByteArray("-") + (isLive ? QByteArray("1") : QByteArray("0"));
 };
 
-void VMaxStreamFetcher::inUse()
-{
-    m_usageCount++;
-}
-
-void VMaxStreamFetcher::notInUse()
-{
-    m_usageCount--;
-}
-
-VMaxStreamFetcher* VMaxStreamFetcher::getInstance(
+std::shared_ptr<VMaxStreamFetcher> VMaxStreamFetcher::getInstance(
     const QByteArray& clientGroupID,
     QnPlVmax480Resource* vmaxResource,
     bool isLive)
@@ -493,44 +482,27 @@ VMaxStreamFetcher* VMaxStreamFetcher::getInstance(
     const QByteArray key = getInstanceKey(clientGroupID, vmaxIP, isLive);
 
     QnMutexLocker lock( &m_instMutex );
-    VMaxStreamFetcher* result = m_instances.value(key);
-    if (result == 0)
+    auto& weakRef = m_instances[key];
+    auto strongRef = weakRef.lock();
+    if (!strongRef)
     {
-        result = new VMaxStreamFetcher(
+        strongRef = std::make_shared<VMaxStreamFetcher>(
             vmaxResource->serverModule(),
             vmaxResource->getGroupId(),
             isLive);
-        m_instances.insert(key, result);
+        weakRef = strongRef;
     }
-    result->inUse();
-    return result;
-}
 
-void VMaxStreamFetcher::freeInstance(
-    const QByteArray& clientGroupID,
-    QnPlVmax480Resource* vmaxResource,
-    bool isLive)
-{
-    QByteArray vmaxIP = QUrl(vmaxResource->getUrl()).host().toUtf8();
-    const QByteArray key = getInstanceKey(clientGroupID, vmaxIP, isLive);
-
-    VMaxStreamFetcher* result = 0;
+    // Cleanup weak refs.
+    for (auto itr = m_instances.begin(); itr != m_instances.end();)
     {
-        QnMutexLocker lock( &m_instMutex );
-        result = m_instances.value(key);
-        if (result) {
-            result->notInUse();
-            if (result->usageCount() == 0) {
-                m_instances.remove(key);
-            }
-            else {
-                result = 0;
-            }
-        }
+        if (!itr.value().lock())
+            itr = m_instances.erase(itr);
+        else
+            ++itr;
     }
 
-    if (result)
-        delete result;
+    return strongRef;
 }
 
 bool VMaxStreamFetcher::safeOpen()
@@ -597,9 +569,12 @@ void VMaxStreamFetcher::pleaseStop()
 
 void VMaxStreamFetcher::pleaseStopAll()
 {
-    QnMutexLocker lock( &m_instMutex );
-    for(VMaxStreamFetcher* fetcher: m_instances.values())
-        fetcher->pleaseStop();
+    QnMutexLocker lock(&m_instMutex);
+    for(auto& weakRef: m_instances.values())
+    {
+        if (auto& strongRef = weakRef.lock())
+            strongRef->pleaseStop();
+    }
 }
 
 #endif // #ifdef ENABLE_VMAX

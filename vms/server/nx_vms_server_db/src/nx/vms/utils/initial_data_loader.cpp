@@ -24,7 +24,7 @@ static const std::chrono::milliseconds kAppServerRequestErrorTimeout(5500);
 
 struct InitialDataLoaderFunctionsTag{};
 
-void loadResourcesFromEcs(
+bool loadResourcesFromEcs(
     QnCommonModule* commonModule,
     ec2::AbstractECConnectionPtr ec2Connection,
     QnCommonMessageProcessor* messageProcessor,
@@ -41,7 +41,7 @@ void loadResourcesFromEcs(
             NX_ERROR(typeid(InitialDataLoaderFunctionsTag), lit("Can't get servers."));
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
-                return;
+                return false;
         }
 
         api::DiscoveryDataList discoveryDataList;
@@ -51,7 +51,7 @@ void loadResourcesFromEcs(
             NX_ERROR(typeid(InitialDataLoaderFunctionsTag), lit("Can't get discovery data."));
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
-                return;
+                return false;
         }
 
         QMultiHash<QnUuid, nx::utils::Url> additionalAddressesById;
@@ -90,7 +90,7 @@ void loadResourcesFromEcs(
             do
             {
                 if (needToStop())
-                    return;
+                    return false;;
             } while (ec2Connection->getResourceManager(Qn::kSystemAccess)
                 ->setResourceStatusSync(mediaServer->getId(), Qn::Online) != ec2::ErrorCode::ok);
         }
@@ -106,7 +106,7 @@ void loadResourcesFromEcs(
                 ec2::toString(rez));
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
-                return;
+                return false;;
         }
         messageProcessor->resetStatusList(statusList);
 
@@ -119,7 +119,7 @@ void loadResourcesFromEcs(
                 "Can't get server user attributes list. Reason: %1", ec2::toString(rez));
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
-                return;
+                return false;
         }
         messageProcessor->resetServerUserAttributesList(mediaServerUserAttributesList);
     }
@@ -134,7 +134,7 @@ void loadResourcesFromEcs(
                 "Can't get cameras. Reason: %1", ec2::toString(rez));
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
-                return;
+                return false;
         }
 
         // read camera attributes
@@ -146,7 +146,7 @@ void loadResourcesFromEcs(
                 "Can't get camera user attributes list. Reason: %1", ec2::toString(rez));
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
-                return;
+                return false;
         }
         messageProcessor->resetCameraUserAttributesList(cameraUserAttributesList);
 
@@ -159,7 +159,7 @@ void loadResourcesFromEcs(
                 "Can't get properties dictionary. Reason: %1", ec2::toString(rez));
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
-                return;
+                return false;
         }
         messageProcessor->resetPropertyList(kvPairs);
 
@@ -199,7 +199,7 @@ void loadResourcesFromEcs(
             qDebug() << "Can't get cameras history. Reason: " << ec2::toString(rez);
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
-                return;
+                return false;
         }
         commonModule->cameraHistoryPool()->resetServerFootageData(serverFootageData);
         commonModule->cameraHistoryPool()->setHistoryCheckDelay(1000);
@@ -214,7 +214,7 @@ void loadResourcesFromEcs(
             qDebug() << "Can't get users. Reason: " << ec2::toString(rez);
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
-                return;
+                return false;
         }
 
         for (const auto &user : users)
@@ -230,7 +230,7 @@ void loadResourcesFromEcs(
             qDebug() << "Can't get videowalls. Reason: " << ec2::toString(rez);
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
-                return;
+                return false;
         }
 
         for (const auto& videowall: videowalls)
@@ -246,7 +246,7 @@ void loadResourcesFromEcs(
             qDebug() << "Can't get layouts. Reason: " << ec2::toString(rez);
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
-                return;
+                return false;
         }
 
         for (const auto &layout : layouts)
@@ -262,7 +262,7 @@ void loadResourcesFromEcs(
             qDebug() << "Can't get webpages. Reason: " << ec2::toString(rez);
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
-                return;
+                return false;
         }
 
         for (const auto &webpage : webpages)
@@ -278,7 +278,7 @@ void loadResourcesFromEcs(
             qDebug() << "Can't get accessRights. Reason: " << ec2::toString(rez);
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
-                return;
+                return false;
         }
         messageProcessor->resetAccessRights(accessRights);
     }
@@ -292,7 +292,7 @@ void loadResourcesFromEcs(
             qDebug() << "Can't get roles. Reason: " << ec2::toString(rez);
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
-                return;
+                return false;
         }
         messageProcessor->resetUserRoles(userRoles);
     }
@@ -306,7 +306,7 @@ void loadResourcesFromEcs(
             qDebug() << "Can't get event rules. Reason: " << ec2::toString(rez);
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
-                return;
+                return false;
         }
         messageProcessor->resetEventRules(rules);
     }
@@ -320,7 +320,7 @@ void loadResourcesFromEcs(
             qDebug() << "Can't get license list. Reason: " << ec2::toString(rez);
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
-                return;
+                return false;
         }
 
         for (const QnLicensePtr &license : licenses)
@@ -337,7 +337,7 @@ void loadResourcesFromEcs(
             qDebug() << "Can't get analytics plugin resource list. Reason: " << ec2::toString(rez);
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
-                return;
+                return false;
         }
 
         for (const auto &plugin: pluginList)
@@ -349,7 +349,7 @@ void loadResourcesFromEcs(
             qDebug() << "Can't get analytics engine resource list. Reason: " << ec2::toString(rez);
             std::this_thread::sleep_for(kAppServerRequestErrorTimeout);
             if (needToStop())
-                return;
+                return false;
         }
 
         for (const auto &engine: engineList)
@@ -357,6 +357,7 @@ void loadResourcesFromEcs(
 
     }
 
+    return true;
 }
 
 } // namespace utils

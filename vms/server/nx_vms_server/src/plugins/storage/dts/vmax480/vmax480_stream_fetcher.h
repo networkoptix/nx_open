@@ -43,17 +43,17 @@ public:
     bool registerConsumer(QnVmax480DataConsumer* consumer, int* count = 0, bool keepAllChannels = false, bool checkPlaybackMask = false);
     void unregisterConsumer(QnVmax480DataConsumer* consumer);
 
-    static VMaxStreamFetcher* getInstance(
-        const QByteArray& clientGroupID,
-        QnPlVmax480Resource* res,
-        bool isLive);
-
-    static void freeInstance(
+    static std::shared_ptr<VMaxStreamFetcher> getInstance(
         const QByteArray& clientGroupID,
         QnPlVmax480Resource* res,
         bool isLive);
 
     QnAbstractDataPacketPtr getNextData(QnVmax480DataConsumer* consumer);
+
+    /*
+     * Stop all stream fetcher. This call is an optional and used for optimization
+     * to reduce media server stopping time.
+    */
     static void pleaseStopAll();
 
 public:
@@ -67,9 +67,6 @@ public:
     void onConnectionEstablished(QnVMax480ConnectionProcessor* conection);
     void onGotData(QnAbstractMediaDataPtr mediaData);
 
-    void inUse();
-    void notInUse();
-    int usageCount() const { return m_usageCount; }
     bool isEOF() const;
 public:
     bool vmaxArchivePlay(QnVmax480DataConsumer* consumer, qint64 timeUsec, int speed);
@@ -108,10 +105,9 @@ private:
     QnVMax480ConnectionProcessor* m_vmaxConnection;
     ConsumersMap m_dataConsumers;
     bool m_isLive;
-    int m_usageCount;
 
     static QnMutex m_instMutex;
-    static QMap<QByteArray, VMaxStreamFetcher*> m_instances;
+    static QMap<QByteArray, std::weak_ptr<VMaxStreamFetcher>> m_instances;
     quint8 m_sequence;
     qint64 m_lastChannelTime[256];
     qint64 m_lastMediaTime;

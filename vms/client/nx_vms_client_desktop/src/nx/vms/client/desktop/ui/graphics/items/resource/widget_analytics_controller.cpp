@@ -324,7 +324,7 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
             objectInfo.futureRectangleTimestamp,
             timestamp);
 
-        if (!areaInfo.rectangle.isValid())
+        if (!areaInfo.rectangle.isValid() && !areaInfo.isPoint())
         {
             NX_VERBOSE(this, "Object info has invalid rectangle data: %1", objectInfo);
             areaHighlightWidget->removeArea(objectInfo.trackId);
@@ -365,9 +365,14 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
             areaInfo.rectangle = Geometry::toSubRect(mediaResourceWidget->zoomRect(),
                 areaInfo.rectangle);
 
-            // Remove areas that are not fit into current zoom window.
-            areaInfo.rectangle = Geometry::intersection(areaInfo.rectangle, kWidgetBounds);
-            if (areaInfo.rectangle.isEmpty())
+            if (!areaInfo.isPoint())
+                areaInfo.rectangle = Geometry::intersection(areaInfo.rectangle, kWidgetBounds);
+
+            const bool fitsInZoomWindow = areaInfo.isPoint()
+                ? Geometry::contains(kWidgetBounds, areaInfo.rectangle.topLeft())
+                : areaInfo.rectangle.isValid();
+
+            if (!fitsInZoomWindow)
             {
                 areaHighlightWidget->removeArea(areaInfo.id);
                 continue;

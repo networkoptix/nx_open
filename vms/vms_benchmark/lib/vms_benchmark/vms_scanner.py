@@ -41,7 +41,7 @@ class VmsScanner:
                         f'systemctl {command} {self.service_script}',
                         timeout_s=ini_box_service_command_timeout_s,
                         su=True,
-                        throw_timeout_exception=True,
+                        throw_exception_on_error=True,
                         stderr=None,
                         stdout=None
                     )
@@ -50,7 +50,7 @@ class VmsScanner:
                         f'/etc/init.d/{self.service_script} {command}',
                         timeout_s=ini_box_service_command_timeout_s,
                         su=True,
-                        throw_timeout_exception=True,
+                        throw_exception_on_error=True,
                         stderr=None,
                         stdout=None
                     )
@@ -92,19 +92,19 @@ class VmsScanner:
                 if not storages:
                     raise BoxCommandError('Unable to get box Storages.')
                 if len([v for k, v in storages.items() if v['point'] == self.ini_dir]) != 0:
-                    self.device.sh(f'umount "{self.ini_dir}"', throw_timeout_exception=True, su=True)
+                    self.device.sh(f'umount "{self.ini_dir}"', throw_exception_on_error=True, su=True)
                 self.device.sh(
                     'rm -rf '
                     f'"$(dirname "$(mktemp --dry-run)")"/tmp.*"{self._tmp_dir_suffix}" '
                     f'"{self.ini_dir}"',
-                    throw_timeout_exception=True, su=True)
+                    throw_exception_on_error=True, su=True)
             except Exception:
                 logging.exception("Exception while dismounting ini dirs:")
 
         def override_ini_config(self, features):
             self.device.sh(
                 f'install -m 755 -o {self.uid} -d "{self.ini_dir}"',
-                throw_timeout_exception=True, su=True)
+                throw_exception_on_error=True, su=True)
 
             tmp_dir = self.device.eval(f'mktemp -d --suffix {self._tmp_dir_suffix}')
 
@@ -114,21 +114,21 @@ class VmsScanner:
             self.device.eval(f'chmod 777 {tmp_dir}', su=True)
 
             if self.uid != 0:
-                self.device.sh(f'chown {self.uid} "{tmp_dir}"', throw_timeout_exception=True, su=True)
+                self.device.sh(f'chown {self.uid} "{tmp_dir}"', throw_exception_on_error=True, su=True)
 
             for ininame, opts in features.items():
                 full_ini_path = f'{tmp_dir}/{ininame}.ini'
                 file_content = '\n'.join([f"{str(k)}={str(v)}" for k, v in opts.items()]) + '\n'
 
                 self.device.sh(
-                    f'cat > "{full_ini_path}"', stdin=file_content, throw_timeout_exception=True,
+                    f'cat > "{full_ini_path}"', stdin=file_content, throw_exception_on_error=True,
                     su=True)
                 if self.uid != 0:
                     self.device.sh(
-                        f'chown {self.uid} "{full_ini_path}"', throw_timeout_exception=True, su=True)
+                        f'chown {self.uid} "{full_ini_path}"', throw_exception_on_error=True, su=True)
 
             self.device.sh(
-                f'mount -o bind "{tmp_dir}" "{self.ini_dir}"', throw_timeout_exception=True, su=True)
+                f'mount -o bind "{tmp_dir}" "{self.ini_dir}"', throw_exception_on_error=True, su=True)
 
         @staticmethod
         def server_bin(linux_distribution):

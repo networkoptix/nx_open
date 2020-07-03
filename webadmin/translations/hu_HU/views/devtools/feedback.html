@@ -1,11 +1,11 @@
 <uib-alert ng-if="developersFeedbackForm && !session.hideDevelopersFeedbackForm"
        type="success" close="session.hideDevelopersFeedbackForm=true">
-    <p><b>Fejlesztő vagy?</b></p>
+    <p><b>Ön fejlesztő?</b></p>
     <p>Fejlesztő csapatunk folyamatosan várja a visszajelzéseket a SDK és API alkalmazásaink használatát követően az integrációt végző fejlesztőktől.
-        If you have any suggestions on how to improve the developer experience - or just want to say hi to the team -
-        please join our developer forum! Or you can check out our online knowledge base to find more information,
-        best practices, and tips&tricks
+        Ha bármilyen javaslata van arról, hogyan lehetne javítani a fejlesztői élményt, vagy csak azt szeretné mondani, hogy üdvözlöm a csapatot -
+        kérjük, csatlakozzon a fejlesztői fórumhoz! Vagy megnézheti online tudásbázisunkat, hogy további információkat,
+        legjobb gyakorlatot, valamint tippeket és trükköket találjon
     </p>
-    <p class="text-right"><a ng-href="{{developersFeedbackForm}}" target="_blank">Developer forum</a></p>
-    <p class="text-right" ng-if="developersKnowledgeBase"><a ng-href="{{developersKnowledgeBase}}" target="_blank">Development knowledge base</a></p>
+    <p class="text-right"><a ng-href="{{developersFeedbackForm}}" target="_blank">Fejlesztői fórum</a></p>
+    <p class="text-right" ng-if="developersKnowledgeBase"><a ng-href="{{developersKnowledgeBase}}" target="_blank">Fejlesztési tudásbázis</a></p>
 </uib-alert>

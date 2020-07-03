@@ -4,6 +4,7 @@ from io import StringIO
 
 from vms_benchmark.exceptions import SshHostKeyObtainingFailed, BoxCommandError
 
+ini_plink_connection_timeout_s: int
 
 # plink (used on Windows) does not have an option to disable ssh host key checking. Instead, the
 # only solution is to pass the key explicitly. Thus, on Windows we should preliminarily obtain the
@@ -16,7 +17,15 @@ class SshHostKeyObtainer:
     def call(self):
         stderr = StringIO()
 
-        res = self.dev.sh(command='true', stderr=stderr, verbose=True)
+        # Process timeout should be bigger than plink connection timeout, otherwise we can't
+        # distinguish between the two different cases: "command execution on the Box took too long"
+        # and "connection attempt to the Box timed out".
+        res = self.dev.sh(
+            command='true',
+            stderr=stderr,
+            verbose=True,
+            timeout_s=ini_plink_connection_timeout_s + 1)
+
         error_messages = tuple(
             filter(
                 None,

@@ -139,6 +139,7 @@ ini_definition = {
     "getStoragesMaxAttempts": {"type": "int", "default": 10},
     "getStoragesAttemptIntervalSeconds": {"type": "int", "default": 3},
     "boxTelnetConnectionWarningThresholdMs": {"type": "int", "default": 1000},
+    "plinkConnectionTimeoutS": {"type": "int", "default": 21},
 }
 
 
@@ -209,6 +210,8 @@ def load_configs(conf_file, ini_file):
     box_connection.ini_box_get_file_content_timeout_s = ini['boxGetFileContentTimeoutS']
     vms_scanner.ini_box_service_command_timeout_s = ini['boxServiceCommandTimeoutS']
     box_platform.ini_box_get_proc_meminfo_timeout_s = ini['boxGetProcMeminfoTimeoutS']
+    service_objects.ssh_host_key_obtainer.ini_plink_connection_timeout_s = (
+        ini['plinkConnectionTimeoutS'])
 
     if ini.OPTIONS_FROM_FILE is not None:
         report(f"\nOverriding default options via {ini.filepath!r}:")
@@ -1089,7 +1092,7 @@ def _obtain_running_vms(box, linux_distribution):
         raise exceptions.BoxStateError("More than one Server installation found at the box.")
     vms = vmses[0]
     if not vms.is_up():
-        raise exceptions.BoxStateError("Server is not running currently at the box.")
+        raise exceptions.BoxStateError("Server is not currently running at the box.")
     return vms
 
 
@@ -1158,7 +1161,7 @@ def _connect_to_box(conf, ini):
 
     try:
         start_time_s = time.time()
-        box.sh('true', throw_timeout_exception=True)
+        box.sh('true', throw_exception_on_error=True)
         command_execution_duration_ms = int((time.time() - start_time_s) * 1000)
         if connection_type == BoxConnection.ConnectionType.TELNET:
             if command_execution_duration_ms > ini['boxTelnetConnectionWarningThresholdMs']:
@@ -1304,7 +1307,7 @@ def _clear_storages(box, storages: List[Storage], conf):
             f"'{storage.url}/hi_quality' "
             f"'{storage.url}/low_quality' "
             f"'{storage.url}/'*_media.nxdb",
-            timeout_s=conf['archiveDeletingTimeoutSeconds'], su=True, throw_timeout_exception=True)
+            timeout_s=conf['archiveDeletingTimeoutSeconds'], su=True, throw_exception_on_error=True)
     report('Server video archives deleted.')
 
 

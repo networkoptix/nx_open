@@ -33,6 +33,12 @@
 #include "vms_server_plugins_ini.h"
 #include "plugin_loading_context.h"
 
+// Compiler feature-detection.
+// clang.llvm.org/docs/LanguageExtensions.html#has-feature-and-has-extension
+#ifndef __has_feature
+    #define __has_feature(x) 0
+#endif
+
 using namespace nx::sdk;
 using nx::vms::server::sdk_support::RefCountableRegistry;
 using nx::vms::api::PluginInfo;
@@ -528,7 +534,9 @@ void PluginManager::loadPlugin(
     // Flag DeepBindHint forces plugin (the loaded side) to use its functions instead of the same
     // named functions of the Server (the loading side). In Linux it is not so by default.
     QLibrary::LoadHints hints = lib->loadHints();
-    hints |= QLibrary::DeepBindHint;
+    #if !(defined(__SANITIZE_ADDRESS__) || __has_feature(address_sanitizer))
+        hints |= QLibrary::DeepBindHint;
+    #endif
     lib->setLoadHints(hints);
 
     if (!lib->load())

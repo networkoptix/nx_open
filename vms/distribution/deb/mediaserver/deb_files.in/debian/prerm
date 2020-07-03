@@ -13,7 +13,6 @@ BASE_DIR="/opt/$COMPANY_NAME/mediaserver"
 ETC_DIR="$BASE_DIR/etc"
 BIN_DIR="$BASE_DIR/bin"
 VAR_DIR="$BASE_DIR/var"
-HOME_DIR="$BASE_DIR/home"
 
 CONFIG_FILE="$ETC_DIR/mediaserver.conf"
 CFG_HELPER_SCRIPT="$BIN_DIR/config_helper.sh"
@@ -89,6 +88,8 @@ then
             -a ! -name "ecs_static.sqlite*" \
             |xargs rm -f
     fi
+
+    HOME_DIR=$(getent passwd "$SYSTEM_USER" | cut -d : -f 6)
 
     rm -rf "$HOME_DIR"
 fi

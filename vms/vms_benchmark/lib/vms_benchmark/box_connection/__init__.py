@@ -79,7 +79,7 @@ class BoxConnection:
         self.eth_speed = eth_speed.strip() if eth_speed else None
 
     def sh(self, command, timeout_s=None,
-            su=False, throw_timeout_exception=False, stdout=sys.stdout, stderr=None, stdin=None,
+            su=False, throw_exception_on_error=False, stdout=sys.stdout, stderr=None, stdin=None,
             verbose=False):
         """ Should be overridden in subclass """
         raise NotImplementedError('You have to define "sh" method!')
