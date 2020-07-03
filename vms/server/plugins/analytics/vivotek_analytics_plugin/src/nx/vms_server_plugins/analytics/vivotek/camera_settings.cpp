@@ -41,10 +41,7 @@ struct VcaParserFromCamera
         const auto subField = json.to<JsonArray>();
         value->resize(subField.count());
         for (int i = 0; i < subField.count(); ++i)
-        {
-            (*value)[i] = CameraVcaParameterApi::parsePoint(
-                subField[i], subField.path);
-        }
+            (*value)[i] = CameraVcaParameterApi::parsePoint(subField[i]);
     }
 
     void parse(Polygon* value, const JsonValue& json) const
@@ -84,17 +81,12 @@ struct VcaParserFromCamera
         }
     }
 
-    float parseCoordinate(const JsonValue& json) const
-    {
-        return CameraVcaParameterApi::parseCoordinate(json, json.path);
-    }
-
     void parse(Rect* value, const JsonValue& json) const
     {
-        value->x = parseCoordinate(json["x"]);
-        value->y = parseCoordinate(json["y"]);
-        value->width = parseCoordinate(json["w"]);
-        value->height = parseCoordinate(json["h"]);
+        value->x = CameraVcaParameterApi::parseCoordinate(json["x"]);
+        value->y = CameraVcaParameterApi::parseCoordinate(json["y"]);
+        value->width = CameraVcaParameterApi::parseCoordinate(json["w"]);
+        value->height = CameraVcaParameterApi::parseCoordinate(json["h"]);
     }
 
     void parse(SizeConstraints* value, const JsonValue& json) const

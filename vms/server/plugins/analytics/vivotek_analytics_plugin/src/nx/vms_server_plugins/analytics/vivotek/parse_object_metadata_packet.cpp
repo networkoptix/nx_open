@@ -12,7 +12,6 @@
 
 #include "camera_vca_parameter_api.h"
 #include "object_types.h"
-#include "json_utils.h"
 #include "exception.h"
 #include "utils.h"
 
@@ -41,17 +40,16 @@ Uuid parseTrackId(int id)
     return uuid;
 }
 
-Rect parseBoundingBox(const QString& path, const QJsonArray& pos2d)
+Rect parseBoundingBox(const JsonArray& pos2d)
 {
     if (pos2d.isEmpty())
-        throw Exception("%1 array is empty", path);
+        throw Exception("%1 array is empty", pos2d.path);
 
     Point min = {1, 1};
     Point max = {0, 0};
     for (int i = 0; i < pos2d.count(); ++i)
     {
-        const auto point = CameraVcaParameterApi::parsePoint(
-            get<QJsonObject>(path, pos2d, i), extendJsonPath(path, i));
+        const auto point = CameraVcaParameterApi::parsePoint(pos2d[i].to<JsonObject>());
 
         min.x = std::min(min.x, point.x);
         min.y = std::min(min.y, point.y);
@@ -68,46 +66,40 @@ Rect parseBoundingBox(const QString& path, const QJsonArray& pos2d)
     return rect;
 }
 
-Ptr<IObjectMetadata> parseMetadata(const QString& path, const QJsonObject& object)
+Ptr<IObjectMetadata> parseMetadata(const JsonObject& object)
 {
     auto metadata = makePtr<ObjectMetadata>();
 
-    if (auto typeId = parseTypeId(get<QString>(path, object, "Type")))
+    if (auto typeId = parseTypeId(object["Type"].to<QString>()))
         metadata->setTypeId(typeId->toStdString());
     else
         return nullptr;
 
-    metadata->setTrackId(parseTrackId(get<int>(path, object, "Id")));
-
-    metadata->setBoundingBox(parseBoundingBox(
-        NX_FMT("%1.Pos2D", path), get<QJsonArray>(path, object, "Pos2D")));
+    metadata->setTrackId(parseTrackId(object["Id"].to<int>()));
+    metadata->setBoundingBox(parseBoundingBox(object["Pos2D"].to<JsonArray>()));
 
     return metadata;
 }
 
 } // namespace
 
-Ptr<IObjectMetadataPacket> parseObjectMetadataPacket(const QJsonValue& native)
+Ptr<IObjectMetadataPacket> parseObjectMetadataPacket(const JsonValue& native)
 {
-    if (get<QString>(native, "Tag") != "MetaData")
+    if (native["Tag"].to<QString>() != "MetaData")
         return nullptr;
 
-    if (!get<QJsonObject>(native, "Frame").contains("Objects"))
+    if (!native["Frame"].to<JsonObject>().contains("Objects"))
         return nullptr;
 
     auto packet = makePtr<ObjectMetadataPacket>();
 
-    packet->setTimestampUs(parseIsoTimestamp(get<QString>(native, "Frame", "UtcTime")));
+    packet->setTimestampUs(parseIsoTimestamp(native["Frame"]["UtcTime"].to<QString>()));
 
-    const auto objects = get<QJsonArray>(native, "Frame", "Objects");
+    const auto objects = native["Frame"]["Objects"].to<JsonArray>();
     for (int i = 0; i < objects.count(); ++i)
     {
-        static const QString path = "$.Frame.Objects";
-        if (const auto metadata = parseMetadata(
-            NX_FMT("%1[%2]", path, i), get<QJsonObject>(path, objects, i)))
-        {
+        if (const auto metadata = parseMetadata(objects[i].to<JsonObject>()))
             packet->addItem(metadata.get());
-        }
     }
 
     return packet;

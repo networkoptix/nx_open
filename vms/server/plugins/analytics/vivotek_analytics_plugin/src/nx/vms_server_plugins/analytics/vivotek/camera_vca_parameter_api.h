@@ -5,7 +5,6 @@
 #include <nx/utils/url.h>
 
 #include <QtCore/QString>
-#include <QtCore/QJsonValue>
 
 #include "http_client.h"
 #include "json_utils.h"
@@ -18,14 +17,14 @@ public:
     explicit CameraVcaParameterApi(nx::utils::Url url);
 
     cf::future<JsonValue> fetch(const QString& scope);
-    cf::future<cf::unit> store(const QString& scope, const QJsonValue& parameters);
+    cf::future<cf::unit> store(const QString& scope, const JsonValue& parameters);
     cf::future<cf::unit> reloadConfig();
 
-    static float parseCoordinate(const QJsonValue& json, const QString& path = "$");
-    static QJsonValue serializeCoordinate(float value);
+    static float parseCoordinate(const JsonValue& json);
+    static JsonValue serializeCoordinate(float value);
 
-    static nx::sdk::analytics::Point parsePoint(const QJsonValue& json, const QString& path = "$");
-    static QJsonObject serialize(const nx::sdk::analytics::Point& point);
+    static nx::sdk::analytics::Point parsePoint(const JsonValue& json);
+    static JsonObject serialize(const nx::sdk::analytics::Point& point);
 
 private:
     nx::utils::Url m_url;

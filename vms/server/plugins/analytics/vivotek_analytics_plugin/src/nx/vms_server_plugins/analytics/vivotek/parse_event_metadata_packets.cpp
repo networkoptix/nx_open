@@ -4,7 +4,6 @@
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 
 #include "event_types.h"
-#include "json_utils.h"
 #include "utils.h"
 #include "exception.h"
 
@@ -26,20 +25,20 @@ std::optional<QString> parseTypeId(const QString& native)
     return std::nullopt;
 }
 
-Ptr<IEventMetadataPacket> parsePacket(const QString& path, const QJsonObject& behaviorAlarmInfo)
+Ptr<IEventMetadataPacket> parsePacket(const JsonObject& behaviorAlarmInfo)
 {
     auto packet = makePtr<EventMetadataPacket>();
 
-    packet->setTimestampUs(parseIsoTimestamp(get<QString>(path, behaviorAlarmInfo, "Time")));
+    packet->setTimestampUs(parseIsoTimestamp(behaviorAlarmInfo["Time"].to<QString>()));
 
     auto metadata = makePtr<EventMetadata>();
 
-    if (auto typeId = parseTypeId(get<QString>(path, behaviorAlarmInfo, "RuleType")))
+    if (auto typeId = parseTypeId(behaviorAlarmInfo["RuleType"].to<QString>()))
         metadata->setTypeId(typeId->toStdString());
     else
         return nullptr;
 
-    metadata->setDescription(get<QString>(path, behaviorAlarmInfo, "RuleName").toStdString());
+    metadata->setDescription(behaviorAlarmInfo["RuleName"].to<QString>().toStdString());
 
     packet->addItem(metadata.get());
 
@@ -48,26 +47,21 @@ Ptr<IEventMetadataPacket> parsePacket(const QString& path, const QJsonObject& be
 
 } // namespace
 
-std::vector<Ptr<IEventMetadataPacket>> parseEventMetadataPackets(const QJsonValue& native)
+std::vector<Ptr<IEventMetadataPacket>> parseEventMetadataPackets(const JsonValue& native)
 {
     std::vector<Ptr<IEventMetadataPacket>> packets;
 
-    if (get<QString>(native, "Tag") != "Event")
+    if (native["Tag"].to<QString>() != "Event")
         return packets;
 
-    const auto data = get<QJsonArray>(native, "Data");
+    const auto data = native["Data"].to<JsonArray>();
     for (int i = 0; i < data.size(); ++i)
     {
-        const QString path = NX_FMT("$.Data[%1]", i);
-        const auto behaviorAlarmInfo = get<QJsonArray>(path, data[i], "BehaviorAlarmInfo");
+        const auto behaviorAlarmInfo = data[i]["BehaviorAlarmInfo"].to<JsonArray>();
         for (int j = 0; j < behaviorAlarmInfo.size(); ++j)
         {
-            const QString subPath = NX_FMT("%1.BehaviorAlarmInfo", path);
-            if (auto packet = parsePacket(
-                NX_FMT("%1[%2]", subPath, j), get<QJsonObject>(subPath, behaviorAlarmInfo, j)))
-            {
+            if (auto packet = parsePacket(behaviorAlarmInfo[j].to<JsonObject>()))
                 packets.push_back(std::move(packet));
-            }
         }
     }
 

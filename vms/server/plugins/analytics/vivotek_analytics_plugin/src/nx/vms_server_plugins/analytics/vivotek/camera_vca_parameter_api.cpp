@@ -5,7 +5,6 @@
 #include <nx/utils/general_macros.h>
 #include <nx/utils/log/log_message.h>
 
-#include "json_utils.h"
 #include "exception.h"
 #include "utils.h"
 
@@ -37,7 +36,7 @@ cf::future<JsonValue> CameraVcaParameterApi::fetch(const QString& scope)
 }
 
 cf::future<cf::unit> CameraVcaParameterApi::store(
-    const QString& scope, const QJsonValue& parameters)
+    const QString& scope, const JsonValue& parameters)
 {
     auto url = m_url;
     url.setPath(NX_FMT("/VCA/%1", scope));
@@ -57,36 +56,28 @@ cf::future<cf::unit> CameraVcaParameterApi::reloadConfig()
             "Failed to reload VCA config on %1", withoutUserInfo(m_url)));
 }
 
-float CameraVcaParameterApi::parseCoordinate(const QJsonValue& json, const QString& path)
+float CameraVcaParameterApi::parseCoordinate(const JsonValue& json)
 {
-    const auto value = get<double>(path, json);
+    const auto value = json.to<double>();
     if (value < 0 || value > kCoordinateDomain)
-        throw Exception("%1 = %2 is outside of expected range of [0; 10000]", path, value);
+        throw Exception("%1 = %2 is outside of expected range of [0; 10000]", json.path, value);
 
     return value / kCoordinateDomain;
 }
 
-QJsonValue CameraVcaParameterApi::serializeCoordinate(float value)
+JsonValue CameraVcaParameterApi::serializeCoordinate(float value)
 {
     return (int) std::round(value * kCoordinateDomain);
 }
 
-Point CameraVcaParameterApi::parsePoint(const QJsonValue& json, const QString& path)
+Point CameraVcaParameterApi::parsePoint(const JsonValue& json)
 {
-    const auto parseCoordinate =
-        [&](const QString& key)
-        {
-            return CameraVcaParameterApi::parseCoordinate(
-                get<QJsonValue>(path, json, key),
-                extendJsonPath(path, key));
-        };
-
-    return Point(parseCoordinate("x"), parseCoordinate("y"));
+    return Point{parseCoordinate(json["x"]), parseCoordinate(json["y"])};
 }
 
-QJsonObject CameraVcaParameterApi::serialize(const Point& point)
+JsonObject CameraVcaParameterApi::serialize(const Point& point)
 {
-    return QJsonObject{
+    return JsonObject{
         {"x", serializeCoordinate(point.x)},
         {"y", serializeCoordinate(point.y)},
     };
