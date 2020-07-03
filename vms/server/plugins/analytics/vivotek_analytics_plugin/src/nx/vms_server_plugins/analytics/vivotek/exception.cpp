@@ -8,11 +8,6 @@ using namespace nx::sdk;
 
 namespace {
 
-std::string prependMessageContext(const std::string& context, const std::string& message)
-{
-    return context + "\ncaused by\n" + message;
-}
-
 ErrorCode toSdk(std::error_code errorCode)
 {
     if (!errorCode)
@@ -24,7 +19,8 @@ ErrorCode toSdk(std::error_code errorCode)
         || errorCode == std::errc::host_unreachable
         || errorCode == std::errc::network_down
         || errorCode == std::errc::network_reset
-        || errorCode == std::errc::network_unreachable)
+        || errorCode == std::errc::network_unreachable
+        || errorCode == std::errc::timed_out)
     {
         return ErrorCode::networkError;
     }
@@ -40,31 +36,9 @@ ErrorCode toSdk(std::error_code errorCode)
 
 } // namespace
 
-Exception::Exception(nx::sdk::ErrorCode errorCode, const QString& message):
-    m_errorCode(errorCode),
-    m_message(message.toStdString())
+Exception::Exception(std::error_code errorCode):
+    Exception(toSdk(errorCode), errorCode.message())
 {
-}
-
-Exception::Exception(std::error_code errorCode, const QString& context):
-    m_errorCode(toSdk(errorCode)),
-    m_message(prependMessageContext(context.toStdString(), errorCode.message()))
-{
-}
-
-Exception::Exception(const QString& message):
-    Exception(nx::sdk::ErrorCode::otherError, message)
-{
-}
-
-void Exception::addContext(const QString& context)
-{
-    m_message = prependMessageContext(context.toStdString(), m_message);
-}
-
-const char* Exception::what() const noexcept
-{
-    return m_message.data();
 }
 
 nx::sdk::Error Exception::toSdkError() const
@@ -73,7 +47,7 @@ nx::sdk::Error Exception::toSdkError() const
     if (errorCode == ErrorCode::noError)
         errorCode = ErrorCode::otherError;
 
-    return error(errorCode, m_message);
+    return error(errorCode, what());
 }
 
 } // namespace nx::vms_server_plugins::analytics::vivotek

@@ -4,57 +4,38 @@
 #include <exception>
 
 #include <nx/sdk/result.h>
-#include <nx/utils/general_macros.h>
+#include <nx/utils/exception.h>
 #include <nx/utils/log/log_message.h>
 
 #include <QtCore/QString>
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
-class Exception: public std::exception
+class Exception: public nx::utils::Exception
 {
 public:
-    explicit Exception(nx::sdk::ErrorCode errorCode, const QString& context);
-    explicit Exception(std::error_code errorCode, const QString& context);
-    explicit Exception(const QString& message);
+    using nx::utils::Exception::Exception;
 
     template <typename... Args>
-    explicit Exception(nx::sdk::ErrorCode errorCode,
-        const QString& messageFormat, const Args&... args)
-    :
-        Exception(errorCode, nx::format(messageFormat, args...))
+    explicit Exception(nx::sdk::ErrorCode errorCode, Args&&... args):
+        nx::utils::Exception(std::forward<Args>(args)...),
+        m_errorCode(errorCode)
     {
     }
 
-    template <typename... Args>
-    explicit Exception(std::error_code errorCode,
-        const QString& contextFormat, const Args&... args)
-    :
-        Exception(errorCode, nx::format(contextFormat, args...))
-    {
-    }
+    explicit Exception(std::error_code errorCode);
 
     template <typename... Args>
-    explicit Exception(const QString& messageFormat, const Args&... args):
-        Exception(nx::format(messageFormat, args...))
+    explicit Exception(std::error_code errorCode, const Args&... args):
+        nx::utils::Exception(errorCode)
     {
+        addContext(args...);
     }
-
-    void addContext(const QString& context);
-
-    template <typename... Args>
-    void addContext(const QString& contextFormat, const Args&... args)
-    {
-        addContext(nx::format(contextFormat, args...));
-    }
-
-    virtual const char* what() const noexcept override;
 
     nx::sdk::Error toSdkError() const;
 
 private:
-    nx::sdk::ErrorCode m_errorCode;
-    std::string m_message;
+    nx::sdk::ErrorCode m_errorCode = nx::sdk::ErrorCode::otherError;
 };
 
 template <typename... Args>
