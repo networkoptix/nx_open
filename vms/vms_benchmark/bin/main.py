@@ -1053,6 +1053,11 @@ def _obtain_box_platform(box, linux_distribution):
         f"    File systems: \n{file_systems_info}\n"
     )
 
+    if box_platform.have_storages_list_problems:
+        report(
+            "WARNING: File system info can be incomplete. "
+            f"See details in {log_file_ref}")
+
     return box_platform
 
 

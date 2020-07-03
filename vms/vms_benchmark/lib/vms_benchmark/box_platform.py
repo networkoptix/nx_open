@@ -38,7 +38,15 @@ class BoxPlatform:
             raise UnableToFetchDataFromBox(
                 f"Incorrect value of param {param!r} in /proc/meminfo at the box: {value_str!r}.")
 
-    def __init__(self, device, linux_distribution, ram_bytes, arch, cpu_count, cpu_features, storages_list):
+    def __init__(self,
+            device,
+            linux_distribution,
+            ram_bytes,
+            arch,
+            cpu_count,
+            cpu_features,
+            storages_list,
+            have_storages_list_problems):
         self.device = device
         self.ram_bytes = ram_bytes
         self.arch = arch
@@ -46,6 +54,7 @@ class BoxPlatform:
         self.cpu_features = cpu_features
         self.storages_list = storages_list
         self.linux_distribution = linux_distribution
+        self.have_storages_list_problems = have_storages_list_problems
 
     def obtain_ram_free_bytes(self):
         meminfo = BoxPlatform._parse_proc_meminfo(self.device)
@@ -88,6 +97,8 @@ class BoxPlatform:
                 "flags": dict(flag.split('=') if '=' in flag else [flag, True] for flag in components[3].split(',')),
                 "dump": True if components[4] == '1' else False,
                 "check_priority": int(components[5]),
+                "space_total": 0,  # Default value to prevent an exception if the `df` output is bad.
+                "space_free": 0,  # Default value to prevent an exception if the `df` output is bad.
             }
 
         def build_storages(storages, storage):
@@ -159,10 +170,12 @@ class BoxPlatform:
             if storage_is_writable(v) and v['fs'] in fs_filters
         )
 
-        df_data = device.eval('df -B1')
+        df_data = device.eval('df -B1 -P')  # "-P" flag for using POSIX output format.
 
         if not df_data:
             raise UnableToFetchDataFromBox("Unable to get storage free space at the box.")
+
+        have_storages_list_problems = False
 
         def construct_df_description(line):
             components = line.split()
@@ -176,7 +189,12 @@ class BoxPlatform:
                     "space_free": human_readable_size.df_size_to_bytes(components[3])
                 }
             except (TypeError, LookupError):
-                raise UnableToFetchDataFromBox(f"Can't parse storage volume info string: {line!r}.")
+                nonlocal have_storages_list_problems
+                have_storages_list_problems = True
+                logging.warning(
+                    f"Unable to parse the storage volume info string: {line!r}. "
+                    "This can result in incomplete filesystem info.")
+                return
 
             for (_point, storage) in storages_map_filtered.items():
                 if storage['device'] != volume['device']:
@@ -198,5 +216,6 @@ class BoxPlatform:
             cpu_count=len([line for line in cpuinfo.splitlines() if line.startswith('processor')]),
             cpu_features=cpu_features,
             storages_list=storages_map_filtered,
+            have_storages_list_problems=have_storages_list_problems,
             linux_distribution=linux_distribution
         )
