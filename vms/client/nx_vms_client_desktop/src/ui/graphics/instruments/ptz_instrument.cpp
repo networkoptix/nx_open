@@ -48,7 +48,7 @@ using namespace nx::vms::client::desktop;
 
 namespace {
 
-static const QVector3D kKeyboardPtzSensitivity(/*pan*/ 0.1, /*tilt*/ 0.1, /*zoom*/ 1.0);
+static const QVector3D kKeyboardPtzSensitivity(/*pan*/ 0.5, /*tilt*/ 0.5, /*zoom*/ 1.0);
 
 const qreal instantSpeedUpdateThreshold = 0.1;
 const qreal speedUpdateThreshold = 0.001;
@@ -745,6 +745,9 @@ void PtzInstrument::ptzMove(QnMediaResourceWidget* widget, const nx::core::ptz::
 
     if (instant)
     {
+        NX_VERBOSE(this, "PTZ continuous move: %1, %2, %3", data.requestedSpeed.pan,
+            data.requestedSpeed.tilt, data.requestedSpeed.zoom);
+
         widget->ptzController()->continuousMove(data.requestedSpeed);
         updateActionText(widget);
         data.currentSpeed = data.requestedSpeed;
@@ -759,6 +762,8 @@ void PtzInstrument::ptzMove(QnMediaResourceWidget* widget, const nx::core::ptz::
 
 void PtzInstrument::focusMove(QnMediaResourceWidget* widget, qreal speed)
 {
+    NX_VERBOSE(this, "PTZ continuous focus: %1", speed);
+
     widget->ptzController()->continuousFocus(speed);
 
     if (qFuzzyIsNull(speed))
