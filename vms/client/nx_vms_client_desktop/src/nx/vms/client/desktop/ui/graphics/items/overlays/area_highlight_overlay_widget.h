@@ -19,6 +19,12 @@ public:
         QColor color;
         QString text;
         QString hoverText;
+
+        /**
+         * API allows to send only text info, assigned to a certain point. This is implemented by
+         * sending a null rectangle, which top left pos is used as a point coordinates.
+         */
+        bool isPoint() { return rectangle.isNull(); }
     };
 
     AreaHighlightOverlayWidget(QGraphicsWidget* parent);
