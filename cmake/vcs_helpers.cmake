@@ -55,6 +55,13 @@ function(_git_changeset dir var)
         OUTPUT_VARIABLE changeset
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
+    execute_process(
+        COMMAND git -C "${dir}" diff-index --quiet HEAD
+        RESULT_VARIABLE is_dirty
+    )
+    if(is_dirty STREQUAL "1")
+        string(APPEND changeset "+")
+    endif()
     set(${var} "${changeset}" PARENT_SCOPE)
 endfunction()
 
