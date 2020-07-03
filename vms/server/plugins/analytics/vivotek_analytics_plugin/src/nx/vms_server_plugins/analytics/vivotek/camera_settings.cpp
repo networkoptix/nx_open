@@ -3297,6 +3297,14 @@ struct VcaParserFromCamera
         parse(&rule->requiresHumanInvolvement, jsonRule["HumanFactor"]);
     }
 
+    void parse(Vca::UnattendedObjectDetection::Rule* rule, const JsonValue& jsonRule) const
+    {
+        parse(&rule->region, jsonRule["Field"][0]);
+        parse(&rule->sizeConstraints, jsonRule["AreaLimitation"]);
+        parse(&rule->minDuration, jsonRule["Duration"]);
+        parse(&rule->requiresHumanInvolvement, jsonRule["HumanFactor"]);
+    }
+
     template <typename Detection>
     void parseDetection(Detection* detection, const QString& functionName) const
     {
@@ -3350,6 +3358,7 @@ struct VcaParserFromCamera
         parseDetection(&vca->intrusionDetection, "IntrusionDetection");
         parseDetection(&vca->lineCrossingDetection, "LineCrossingDetection");
         parseDetection(&vca->missingObjectDetection, "MissingObjectDetection");
+        parseDetection(&vca->unattendedObjectDetection, "UnattendedObjectDetection");
     }
 };
 
@@ -3642,6 +3651,19 @@ struct VcaSerializerToCamera
         return true;
     }
 
+    bool serialize(JsonObject* jsonRule, Vca::UnattendedObjectDetection::Rule* rule)
+    {
+        if (!rule->region.value)
+            return false;
+
+        serializeField(jsonRule, &rule->region);
+        serialize(jsonRule, "AreaLimitation", &rule->sizeConstraints);
+        serialize(jsonRule, "Duration", &rule->minDuration);
+        serialize(jsonRule, "HumanFactor", &rule->requiresHumanInvolvement);
+        
+        return true;
+    }
+
     template <typename Detection>
     void serializeDetection(Detection* detection, const QString& functionName)
     {
@@ -3711,6 +3733,7 @@ struct VcaSerializerToCamera
         serializeDetection(&vca->intrusionDetection, "IntrusionDetection");
         serializeDetection(&vca->lineCrossingDetection, "LineCrossingDetection");
         serializeDetection(&vca->missingObjectDetection, "MissingObjectDetection");
+        serializeDetection(&vca->unattendedObjectDetection, "UnattendedObjectDetection");
     }
 };
 
@@ -3809,6 +3832,13 @@ const QString kVcaMissingObjectDetectionSizeConstraints =
 const QString kVcaMissingObjectDetectionMinDuration = "Vca.MissingObjectDetection#.MinDuration";
 const QString kVcaMissingObjectDetectionRequiresHumanInvolvement =
     "Vca.MissingObjectDetection#.RequiresHumanInvolvement";
+
+const QString kVcaUnattendedObjectDetectionRegion = "Vca.UnattendedObjectDetection#.Region";
+const QString kVcaUnattendedObjectDetectionSizeConstraints =
+    "Vca.UnattendedObjectDetection#.SizeConstraints";
+const QString kVcaUnattendedObjectDetectionMinDuration = "Vca.UnattendedObjectDetection#.MinDuration";
+const QString kVcaUnattendedObjectDetectionRequiresHumanInvolvement =
+    "Vca.UnattendedObjectDetection#.RequiresHumanInvolvement";
 
 QString replicateName(QString name, std::size_t i)
 {
@@ -4076,6 +4106,26 @@ struct ParserFromServer
         }
     }
 
+    void parse(CameraSettings::Vca::UnattendedObjectDetection* detection)
+    {
+        auto& rules = detection->rules;
+        for (std::size_t i = 0; i < rules.size(); ++i)
+        {
+            auto& rule = rules[i];
+
+            parse(&rule.region,
+                replicateName(kVcaUnattendedObjectDetectionRegion, i), &rule.name);
+            parse(&rule.sizeConstraints,
+                replicateName(kVcaUnattendedObjectDetectionSizeConstraints, i));
+            parse(&rule.minDuration,
+                replicateName(kVcaUnattendedObjectDetectionMinDuration, i));
+            parse(&rule.requiresHumanInvolvement,
+                replicateName(kVcaUnattendedObjectDetectionRequiresHumanInvolvement, i));
+
+            noteName(rule.name, &rule.region);
+        }
+    }
+
     void parse(CameraSettings::Vca* vca)
     {
         parse(&vca->enabled, kVcaEnabled);
@@ -4089,6 +4139,7 @@ struct ParserFromServer
         parse(&vca->intrusionDetection.emplace());
         parse(&vca->lineCrossingDetection.emplace());
         parse(&vca->missingObjectDetection.emplace());
+        parse(&vca->unattendedObjectDetection.emplace());
 
         for (auto& [name, errorSetters]: errorSetterGroups)
         {
@@ -4346,6 +4397,24 @@ struct SerializerToServer
         }
     }
 
+    void serialize(const CameraSettings::Vca::UnattendedObjectDetection& detection) const
+    {
+        const auto& rules = detection.rules;
+        for (std::size_t i = 0; i < rules.size(); ++i)
+        {
+            const auto& rule = rules[i];
+
+            serialize(replicateName(kVcaUnattendedObjectDetectionRegion, i),
+                rule.region, rule.name);
+            serialize(replicateName(kVcaUnattendedObjectDetectionSizeConstraints, i),
+                rule.sizeConstraints);
+            serialize(replicateName(kVcaUnattendedObjectDetectionMinDuration, i),
+                rule.minDuration);
+            serialize(replicateName(kVcaUnattendedObjectDetectionRequiresHumanInvolvement, i),
+                rule.requiresHumanInvolvement);
+        }
+    }
+
     void serialize(const CameraSettings::Vca& vca) const
     {
         serialize(kVcaEnabled, vca.enabled);
@@ -4361,6 +4430,8 @@ struct SerializerToServer
         if (const auto& detection = vca.lineCrossingDetection)
             serialize(*detection);
         if (const auto& detection = vca.missingObjectDetection)
+            serialize(*detection);
+        if (const auto& detection = vca.unattendedObjectDetection)
             serialize(*detection);
     }
 
@@ -4654,6 +4725,57 @@ QJsonObject serializeModel(const CameraSettings::Vca::MissingObjectDetection& de
     };
 }
 
+QJsonObject serializeModel(const CameraSettings::Vca::UnattendedObjectDetection& detection)
+{
+    return QJsonObject{
+        {"name", "Vca.UnattendedObjectDetection"},
+        {"type", "Section"},
+        {"caption", "Unattended Object Detection"},
+        {"items", QJsonArray{
+            QJsonObject{
+                {"type", "Repeater"},
+                {"startIndex", 1},
+                {"count", (int) detection.rules.size()},
+                {"template", QJsonObject{
+                    {"type", "GroupBox"},
+                    {"caption", "#"},
+                    {"filledCheckItems", QJsonArray{kVcaUnattendedObjectDetectionRegion}},
+                    {"items", QJsonArray{
+                        QJsonObject{
+                            {"name", kVcaUnattendedObjectDetectionRegion},
+                            {"type", "PolygonFigure"},
+                            {"minPoints", kMinRegionVertices},
+                            {"maxPoints", kMaxRegionVertices},
+                        },
+                        QJsonObject{
+                            {"name", kVcaUnattendedObjectDetectionSizeConstraints},
+                            {"type", "ObjectSizeConstraints"},
+                            {"caption", "Size constraints"},
+                        },
+                        QJsonObject{
+                            {"name", kVcaUnattendedObjectDetectionMinDuration},
+                            {"type", "SpinBox"},
+                            {"minValue", 0},
+                            {"maxValue", 999},
+                            {"defaultValue", 300},
+                            {"caption", "Minimum duration (s)"},
+                            {"description", "The event is only generated if an object is unattended"
+                                            " for at least this long"},
+                        },
+                        QJsonObject{
+                            {"name", kVcaUnattendedObjectDetectionRequiresHumanInvolvement},
+                            {"type", "CheckBox"},
+                            {"caption", "Human involvement"},
+                            {"description", "Whether a human is required to walk by an object"
+                                            " prior to it going unattended"},
+                        },
+                    }},
+                }},
+            },
+        }},
+    };
+}
+
 QJsonObject serializeModel(const CameraSettings::Vca& vca)
 {
     return QJsonObject{
@@ -4702,6 +4824,8 @@ QJsonObject serializeModel(const CameraSettings::Vca& vca)
                 if (const auto& detection = vca.lineCrossingDetection)
                     sections.push_back(serializeModel(*detection));
                 if (const auto& detection = vca.missingObjectDetection)
+                    sections.push_back(serializeModel(*detection));
+                if (const auto& detection = vca.unattendedObjectDetection)
                     sections.push_back(serializeModel(*detection));
 
                 return sections;
@@ -4761,6 +4885,11 @@ CameraSettings::Vca::LineCrossingDetection::LineCrossingDetection():
 }
 
 CameraSettings::Vca::MissingObjectDetection::MissingObjectDetection():
+    rules(kMaxDetectionRuleCount)
+{
+}
+
+CameraSettings::Vca::UnattendedObjectDetection::UnattendedObjectDetection():
     rules(kMaxDetectionRuleCount)
 {
 }

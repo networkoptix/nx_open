@@ -135,28 +135,22 @@ public:
         };
         std::optional<MissingObjectDetection> missingObjectDetection;
 
-        //struct UnattendedObjectDetection
-        //{
-        //    struct Rule
-        //    {
-        //        NX_CAMERA_SETTINGS_ENTRY(Vca.UnattendedObjectDetection.Rule#, Region,
-        //            NamedPolygon) region;
+        struct UnattendedObjectDetection
+        {
+            struct Rule
+            {
+                QString name;
+                Entry<Polygon> region;
 
-        //        NX_CAMERA_SETTINGS_ENTRY(Vca.UnattendedObjectDetection.Rule#, MinSize,
-        //            nx::sdk::analytics::Rect) minSize;
+                Entry<SizeConstraints> sizeConstraints;
+                Entry<int> minDuration;
+                Entry<bool> requiresHumanInvolvement;
+            };
+            std::vector<Rule> rules;
 
-        //        NX_CAMERA_SETTINGS_ENTRY(Vca.UnattendedObjectDetection.Rule#, MaxSize,
-        //            nx::sdk::analytics::Rect) maxSize;
-
-        //        NX_CAMERA_SETTINGS_ENTRY(Vca.UnattendedObjectDetection.Rule#, Delay, int) delay;
-
-        //        NX_CAMERA_SETTINGS_ENTRY(
-        //            Vca.UnattendedObjectDetection.Rule#, RequiresHumanInvolvement,
-        //            bool) requiresHumanInvolvement;
-        //    };
-        //    std::vector<Rule> rules;
-        //};
-        //std::optional<UnattendedObjectDetection> unattendedObjectDetection;
+            UnattendedObjectDetection();
+        };
+        std::optional<UnattendedObjectDetection> unattendedObjectDetection;
 
         //struct FaceDetection
         //{
