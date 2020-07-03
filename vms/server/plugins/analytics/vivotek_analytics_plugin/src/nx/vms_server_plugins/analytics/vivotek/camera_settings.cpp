@@ -3305,6 +3305,11 @@ struct VcaParserFromCamera
         parse(&rule->requiresHumanInvolvement, jsonRule["HumanFactor"]);
     }
 
+    void parse(Vca::FaceDetection::Rule* rule, const JsonValue& jsonRule) const
+    {
+        parse(&rule->region, jsonRule["Field"][0]);
+    }
+
     template <typename Detection>
     void parseDetection(Detection* detection, const QString& functionName) const
     {
@@ -3359,6 +3364,7 @@ struct VcaParserFromCamera
         parseDetection(&vca->lineCrossingDetection, "LineCrossingDetection");
         parseDetection(&vca->missingObjectDetection, "MissingObjectDetection");
         parseDetection(&vca->unattendedObjectDetection, "UnattendedObjectDetection");
+        parseDetection(&vca->faceDetection, "FaceDetection");
     }
 };
 
@@ -3664,6 +3670,16 @@ struct VcaSerializerToCamera
         return true;
     }
 
+    bool serialize(JsonObject* jsonRule, Vca::FaceDetection::Rule* rule)
+    {
+        if (!rule->region.value)
+            return false;
+
+        serializeField(jsonRule, &rule->region);
+        
+        return true;
+    }
+
     template <typename Detection>
     void serializeDetection(Detection* detection, const QString& functionName)
     {
@@ -3734,6 +3750,7 @@ struct VcaSerializerToCamera
         serializeDetection(&vca->lineCrossingDetection, "LineCrossingDetection");
         serializeDetection(&vca->missingObjectDetection, "MissingObjectDetection");
         serializeDetection(&vca->unattendedObjectDetection, "UnattendedObjectDetection");
+        serializeDetection(&vca->faceDetection, "FaceDetection");
     }
 };
 
@@ -3839,6 +3856,8 @@ const QString kVcaUnattendedObjectDetectionSizeConstraints =
 const QString kVcaUnattendedObjectDetectionMinDuration = "Vca.UnattendedObjectDetection#.MinDuration";
 const QString kVcaUnattendedObjectDetectionRequiresHumanInvolvement =
     "Vca.UnattendedObjectDetection#.RequiresHumanInvolvement";
+
+const QString kVcaFaceDetectionRegion = "Vca.FaceDetection#.Region";
 
 QString replicateName(QString name, std::size_t i)
 {
@@ -4126,6 +4145,19 @@ struct ParserFromServer
         }
     }
 
+    void parse(CameraSettings::Vca::FaceDetection* detection)
+    {
+        auto& rules = detection->rules;
+        for (std::size_t i = 0; i < rules.size(); ++i)
+        {
+            auto& rule = rules[i];
+
+            parse(&rule.region, replicateName(kVcaFaceDetectionRegion, i), &rule.name);
+
+            noteName(rule.name, &rule.region);
+        }
+    }
+
     void parse(CameraSettings::Vca* vca)
     {
         parse(&vca->enabled, kVcaEnabled);
@@ -4140,6 +4172,7 @@ struct ParserFromServer
         parse(&vca->lineCrossingDetection.emplace());
         parse(&vca->missingObjectDetection.emplace());
         parse(&vca->unattendedObjectDetection.emplace());
+        parse(&vca->faceDetection.emplace());
 
         for (auto& [name, errorSetters]: errorSetterGroups)
         {
@@ -4415,6 +4448,17 @@ struct SerializerToServer
         }
     }
 
+    void serialize(const CameraSettings::Vca::FaceDetection& detection) const
+    {
+        const auto& rules = detection.rules;
+        for (std::size_t i = 0; i < rules.size(); ++i)
+        {
+            const auto& rule = rules[i];
+
+            serialize(replicateName(kVcaFaceDetectionRegion, i), rule.region, rule.name);
+        }
+    }
+
     void serialize(const CameraSettings::Vca& vca) const
     {
         serialize(kVcaEnabled, vca.enabled);
@@ -4432,6 +4476,8 @@ struct SerializerToServer
         if (const auto& detection = vca.missingObjectDetection)
             serialize(*detection);
         if (const auto& detection = vca.unattendedObjectDetection)
+            serialize(*detection);
+        if (const auto& detection = vca.faceDetection)
             serialize(*detection);
     }
 
@@ -4776,6 +4822,35 @@ QJsonObject serializeModel(const CameraSettings::Vca::UnattendedObjectDetection&
     };
 }
 
+QJsonObject serializeModel(const CameraSettings::Vca::FaceDetection& detection)
+{
+    return QJsonObject{
+        {"name", "Vca.FaceDetection"},
+        {"type", "Section"},
+        {"caption", "Face Detection"},
+        {"items", QJsonArray{
+            QJsonObject{
+                {"type", "Repeater"},
+                {"startIndex", 1},
+                {"count", (int) detection.rules.size()},
+                {"template", QJsonObject{
+                    {"type", "GroupBox"},
+                    {"caption", "#"},
+                    {"filledCheckItems", QJsonArray{kVcaFaceDetectionRegion}},
+                    {"items", QJsonArray{
+                        QJsonObject{
+                            {"name", kVcaFaceDetectionRegion},
+                            {"type", "PolygonFigure"},
+                            {"minPoints", kMinRegionVertices},
+                            {"maxPoints", kMaxRegionVertices},
+                        },
+                    }},
+                }},
+            },
+        }},
+    };
+}
+
 QJsonObject serializeModel(const CameraSettings::Vca& vca)
 {
     return QJsonObject{
@@ -4826,6 +4901,8 @@ QJsonObject serializeModel(const CameraSettings::Vca& vca)
                 if (const auto& detection = vca.missingObjectDetection)
                     sections.push_back(serializeModel(*detection));
                 if (const auto& detection = vca.unattendedObjectDetection)
+                    sections.push_back(serializeModel(*detection));
+                if (const auto& detection = vca.faceDetection)
                     sections.push_back(serializeModel(*detection));
 
                 return sections;
@@ -4890,6 +4967,11 @@ CameraSettings::Vca::MissingObjectDetection::MissingObjectDetection():
 }
 
 CameraSettings::Vca::UnattendedObjectDetection::UnattendedObjectDetection():
+    rules(kMaxDetectionRuleCount)
+{
+}
+
+CameraSettings::Vca::FaceDetection::FaceDetection():
     rules(kMaxDetectionRuleCount)
 {
 }

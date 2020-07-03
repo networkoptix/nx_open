@@ -76,18 +76,18 @@ const std::vector<EventType> kEventTypes =
                     return vca && vca->unattendedObjectDetection;
                 };
         }
-        //{
-        //    auto& type = types.emplace_back();
-        //    type.nativeId = "FaceDetection";
-        //    type.id = "nx.vivotek.Face";
-        //    type.prettyName = "Face";
-        //    type.isProlonged = true;
-        //    type.isAvailable =
-        //        [](const auto& settings) {
-        //            const auto& vca = settings.vca;
-        //            return vca && vca->faceDetection;
-        //        };
-        //}
+        {
+            auto& type = types.emplace_back();
+            type.nativeId = "FaceDetection";
+            type.id = "nx.vivotek.Face";
+            type.prettyName = "Face";
+            type.isProlonged = true;
+            type.isAvailable =
+                [](const auto& settings) {
+                    const auto& vca = settings.vca;
+                    return vca && vca->faceDetection;
+                };
+        }
         //{
         //    auto& type = types.emplace_back();
         //    type.nativeId = "RunningDetection";

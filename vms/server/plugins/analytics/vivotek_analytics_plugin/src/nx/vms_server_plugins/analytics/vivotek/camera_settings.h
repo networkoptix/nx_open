@@ -152,15 +152,18 @@ public:
         };
         std::optional<UnattendedObjectDetection> unattendedObjectDetection;
 
-        //struct FaceDetection
-        //{
-        //    struct Rule
-        //    {
-        //        NX_CAMERA_SETTINGS_ENTRY(Vca.FaceDetection.Rule#, Region, NamedPolygon) region;
-        //    };
-        //    std::vector<Rule> rules;
-        //};
-        //std::optional<FaceDetection> faceDetection;
+        struct FaceDetection
+        {
+            struct Rule
+            {
+                QString name;
+                Entry<Polygon> region;
+            };
+            std::vector<Rule> rules;
+
+            FaceDetection();
+        };
+        std::optional<FaceDetection> faceDetection;
 
         //struct RunningDetection
         //{
