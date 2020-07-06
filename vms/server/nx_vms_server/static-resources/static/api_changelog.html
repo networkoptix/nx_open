@@ -34,8 +34,8 @@ Paragraph describing a particular API change.
 <!--============================================================================================-->
 <p>
 Here the <strong>changes</strong> of Rest <strong>API</strong> from VMS version to version are
-documented, which can potentially <strong>break compatibility</strong>. In particular, methods and
-params can be <strong>renamed</strong>, though often <strong>deprecated names</strong> are
+documented, which can potentially <strong>break compatibility</strong>. In particular, functions
+and params can be <strong>renamed</strong>, though often <strong>deprecated names</strong> are
 supported for a while, when noted below.
 </p>
 <!--============================================================================================-->
@@ -43,20 +43,20 @@ supported for a while, when noted below.
 <!--............................................................................................-->
 <h3>Breaking compatibility</h3>
 <p>
-In method <strong><code>GET /media</code></strong>, added
+In function <strong><code>GET /media</code></strong>, added
 the <strong><code><b>signature</b></code></strong> parameter which adds a signature to the
 exported multimedia data. Previously, the signature had been added unconditionally, but now it is
 not added if the new parameter is not specified.
 </p>
 <p>
-In method <strong><code>GET /ec2/analyticsLookupObjectTracks</code></strong>, parameter
+In function <strong><code>GET /ec2/analyticsLookupObjectTracks</code></strong>, parameter
 <strong><code><i>maxObjectTrackSize</i></code></strong> changed to
 <strong><code><b>needFullTrack</b></code></strong>. Previously this parameter was used to limit the
 number of object track metadata items (each item is related to a video frame). The new parameter is
 just a flag showing whether to select all of them or not.
 </p>
 <p>
-In method <strong><code>POST /ec2/deviceAnalyticsSettings</code></strong> parameters
+In function <strong><code>POST /ec2/deviceAnalyticsSettings</code></strong> parameters
 <strong><code>deviceId</code></strong> and <strong><code>analyticsEngineId</code></strong> have to
 be passed not as URL query parameters but as keys of a JSON request in the request body. Optional
 parameter <strong><code>analyzedStreamIndex</code></strong> has been added to the JSON request.
@@ -68,15 +68,15 @@ respectively. Parameter <strong><code>analyzedStreamIndex</code></strong> has be
 JSON response.
 </p>
 <p>
-In method <strong><code>GET /ec2/deviceAnalyticsSettings</code></strong> parameters
+In function <strong><code>GET /ec2/deviceAnalyticsSettings</code></strong> parameters
 <strong><code>values</code></strong> and <strong><code>model</code></strong> of the JSON response
 have been renamed to <strong><code>settingsValues</code></strong> and
 <strong><code>settingsModel</code></strong> respectively. Parameter
 <strong><code>analyzedStreamIndex</code></strong> has been added to the JSON response.
 </p>
 <p>
-In method <strong><code>/ec2/cameraThumbnail</code></strong> the
-<strong><code>sameAsAnalytics</code></strong> option has been removed from possible values of the 
+In function <strong><code>/ec2/cameraThumbnail</code></strong> the
+<strong><code>sameAsAnalytics</code></strong> option has been removed from possible values of the
 <strong><code>streamSelectionMode</code></strong> URL parameter.
 <strong><code>forcedPrimary</code></strong> and <strong><code>forcedSecondary</code></strong>
 values have to be used for retrieving thumbnails of Objects detected by Analytics Plugins.
@@ -89,8 +89,8 @@ used by a particular Engine on a particular Device can be retrieved via the
 </p>
 <h3>Retaining compatibility until expired</h3>
 <p>
-Method <strong><code>/api/pluginInfo</code></strong> is deprecated in favor of the new System-wide
-method <strong><code>/ec2/pluginInfo</code></strong>.
+Function <strong><code>/api/pluginInfo</code></strong> is deprecated in favor of the new System-wide
+function <strong><code>/ec2/pluginInfo</code></strong>.
 </p>
 <!--============================================================================================-->
 <hr/><h2>VMS <b>4.0</b> relative to <i>3.2</i></h2>
@@ -102,7 +102,7 @@ In case of <strong><code>InvalidParameter</code></strong> or
 <strong><code><i>200 OK</i></code></strong> to
 <strong><code><b>422 Unprocessable Entity</b></code></strong>; in case of timeout, the status code
 has been changed from <strong><code><i>200 OK</i></code></strong> to
-<strong><code><b>408 Request Timeout</b></code></strong> in methods:
+<strong><code><b>408 Request Timeout</b></code></strong> in functions:
 <pre>
     /api/getCameraParam
     /api/setCameraParam
@@ -110,7 +110,7 @@ has been changed from <strong><code><i>200 OK</i></code></strong> to
 </p>
 <p>
 Output parameter value list can contain not only parameters specified by the user,
-but also additional parameter values affected by the set operation in the method:
+but also additional parameter values affected by the set operation in the function:
 <pre>
     /api/setCameraParam
 </pre>
@@ -120,7 +120,7 @@ but also additional parameter values affected by the set operation in the method
 Params <strong><code>scheduleTask.<i>beforeThreshold</i></code></strong> and <strong><code>
 scheduleTask.<i>afterThreshold</i></code></strong> were removed in favor of the new
 <strong><code><b>recordBeforeMotionSec</b></code></strong> and
-<strong><code><b>recordAfterMotionSec</b></code></strong> params in methods:
+<strong><code><b>recordAfterMotionSec</b></code></strong> params in functions:
 <pre>
     /ec2/saveCameraUserAttributesList
     /ec2/saveCameraUserAttributes
@@ -131,7 +131,7 @@ scheduleTask.<i>afterThreshold</i></code></strong> were removed in favor of the 
 
 <p>
 Added optional param <strong><code><b>currentPassword</b></code></strong>, which is required if new
-<strong><code>password</code></strong> is provided in methods:
+<strong><code>password</code></strong> is provided in functions:
 <pre>
     /api/configure
     /api/detachFromCloud
@@ -139,13 +139,13 @@ Added optional param <strong><code><b>currentPassword</b></code></strong>, which
 </p>
 
 <p>
-Added required param <strong><code><b>currentPassword</b></code></strong> in method
+Added required param <strong><code><b>currentPassword</b></code></strong> in function
 <strong><code>/api/restoreState</code></strong>.
 </p>
 
 <p>
 Expanded <strong><code>dewarpingParams</code></strong> and <strong><code>contrastParams</code>
-</strong> fields in the layout items description in methods:
+</strong> fields in the layout items description in functions:
 <pre>
     /ec2/getLayouts
     /ec2/saveLayout
@@ -156,7 +156,7 @@ Expanded <strong><code>dewarpingParams</code></strong> and <strong><code>contras
 <p>
 Parameters <strong><code>layout.<i>horizontalSpacing</i></code></strong> and <strong><code>
 layout.<i>verticalSpacing</i></code></strong> were removed in favor of the new
-<strong><code><b>cellSpacing</b></code></strong> parameter in methods:
+<strong><code><b>cellSpacing</b></code></strong> parameter in functions:
 <pre>
     /ec2/getLayouts
     /ec2/saveLayout
@@ -168,11 +168,11 @@ layout.<i>verticalSpacing</i></code></strong> were removed in favor of the new
 <h3>Retaining compatibility until expired</h3>
 
 <p>
-Method <strong><code>/api/get<i>t</i>ime</code></strong> deprecated in favor of the new
-method <strong><code>/api/get<b>T</b>ime</code></strong> (deprecated method support expires
+Function <strong><code>/api/get<i>t</i>ime</code></strong> deprecated in favor of the new
+function <strong><code>/api/get<b>T</b>ime</code></strong> (deprecated function support expires
 after 4.0).
 <br/>
-Result structure of the new method differs from the old one:
+Result structure of the new function differs from the old one:
 <pre>
     <strong>timeZoneOffset</strong> - is now in milliseconds instead of seconds
     <strong>time<i>z</i>oneId</strong> -> <strong>time<b>Z</b>oneId</strong>
@@ -181,24 +181,24 @@ Result structure of the new method differs from the old one:
 </pre>
 </p>
 <p>
-Made <strong><i>GET</i></strong> deprecated in favor of the newly implemented
-<strong><b>POST</b></strong> in method <strong><code>/api/setCameraParam</code></strong>
-(deprecated method support expires after 4.0).
+Made <strong><i>GET</i></strong> method deprecated in favor of the newly implemented
+<strong><b>POST</b></strong> in function <strong><code>/api/setCameraParam</code></strong>
+(deprecated function support expires after 4.0).
 <br/>
-<em>NOTE: In API documentation, this method was previously incorrectly stated as POST, but now
+<em>NOTE: In API documentation, this function was previously incorrectly stated as POST, but now
 this statement becomes true.</em>
 </p>
 <p>
-Made <strong><i>GET</i></strong> deprecated in favor of the newly implemented
-<strong><b>POST</b></strong> in method <strong><code>/api/restart</code></strong>
-(deprecated method support expires after 4.0).
+Made <strong><i>GET</i></strong> method deprecated in favor of the newly implemented
+<strong><b>POST</b></strong> in function <strong><code>/api/restart</code></strong>
+(deprecated function support expires after 4.0).
 </p>
 
 <!--............................................................................................-->
 <h3>Retaining compatibility</h3>
 <p>
 Removed param <strong><code>scheduleTask.<i>recordAudio</i></code></strong>
-(was not used) in methods:
+(was not used) in functions:
 <pre>
     /ec2/saveCameraUserAttributesList
     /ec2/saveCameraUserAttributes
@@ -207,25 +207,25 @@ Removed param <strong><code>scheduleTask.<i>recordAudio</i></code></strong>
 </pre>
 </p>
 <!--<p>
-<em>[proprietary]</em> Made <strong><i>GET</i></strong> deprecated in favor of
-<strong><b>POST</b></strong> in method <strong><code>/api/activateLicense</code></strong>
-(deprecated method support expires after 4.0).
+<em>[proprietary]</em> Made <strong><i>GET</i></strong> method deprecated in favor of
+<strong><b>POST</b></strong> in function <strong><code>/api/activateLicense</code></strong>
+(deprecated function support expires after 4.0).
 </p>-->
 <!--============================================================================================-->
 <hr/><h2>VMS <b>3.2</b> relative to <i>3.1</i></h2>
 <!--............................................................................................-->
 <h3>Breaking compatibility</h3>
 <p>
-Deleted deprecated method <strong><code><i>/api/image</i></code></strong>.
+Deleted deprecated function <strong><code><i>/api/image</i></code></strong>.
 </p>
 <!--............................................................................................-->
 <h3>Retaining compatibility until expired</h3>
 <p>
-Made <strong><i>GET</i></strong> deprecated in favor of <strong><b>POST</b></strong> in method
-<strong><code>/api/detachFromCloud</code></strong> (deprecated method support expires after 3.2).
+Made <strong><i>GET</i></strong> method deprecated in favor of <strong><b>POST</b></strong> in function
+<strong><code>/api/detachFromCloud</code></strong> (deprecated function support expires after 3.2).
 </p>
 <p>
-Renamed certain param values in method <strong><code>/ec2/cameraThumbnail</code></strong>
+Renamed certain param values in function <strong><code>/ec2/cameraThumbnail</code></strong>
 (deprecated values support expires after 3.2):
 <pre>
     Param <strong><code>imageFormat</code></strong> values:
@@ -239,7 +239,7 @@ Renamed certain param values in method <strong><code>/ec2/cameraThumbnail</code>
 <!--............................................................................................-->
 <h3>Errata fixed in the API documentation (not changing API behavior)</h3>
 <p>
-Fixed param and value names in method <strong><code>/ec2/cameraThumbnail</code></strong>:
+Fixed param and value names in function <strong><code>/ec2/cameraThumbnail</code></strong>:
 <pre>
     Param <strong><code>imageFormat</code></strong> values:
         <i>PngFormat</i> -> <b>png</b>
@@ -247,14 +247,14 @@ Fixed param and value names in method <strong><code>/ec2/cameraThumbnail</code><
         <i>TiffFormat</i> -> <b>tif</b>
         <i>RawFormat</i> -> <b>raw</b>
 
-    Param <strong><code><i>method</i> -> <b>roundMethod</b></code></strong> values:
+    Param <strong><code><i>function</i> -> <b>roundMethod</b></code></strong> values:
         <i>KeyFrameBeforeMethod</i> -> <b>before</b>
         <i>PreciseMethod</i> -> <b>precise</b>
         <i>KeyFrameAfterMethod</i> -> <b>after</b>
 </pre>
 </p>
 <p>
-Fixed method URL prefix:
+Fixed function URL prefix:
 <strong><code><i>/api</i>/execAction -> <b>/ec2</b>/execAction</code></strong>.
 </p>
 <!--============================================================================================-->
@@ -262,16 +262,16 @@ Fixed method URL prefix:
 <!--............................................................................................-->
 <h3>Retaining compatibility until expired</h3>
 <p>
-Changed <strong><i>GET</i> -> <b>POST</b></strong> in method
+Changed <strong><i>GET</i> -> <b>POST</b></strong> in function
 <strong><code>/api/mergeSystems</code></strong>
-(deprecated method support expires after 3.2). Check changed params in the API documentation.
+(deprecated function support expires after 3.2). Check changed params in the API documentation.
 </p>
 <!--============================================================================================-->
 <hr/><h2>VMS <b>3.0</b> relative to <i>2.6</i></h2>
 <!--............................................................................................-->
 <h3>Breaking compatibility</h3>
 <p>
-Renamed methods:
+Renamed functions:
 <pre>
     /ec2/getServerUserAttributes -> /ec2/get<b>Media</b>ServerUserAttributes<b>List</b>
     /ec2/saveServerUserAttributes -> /ec2/save<b>Media</b>ServerUserAttributes
@@ -279,7 +279,7 @@ Renamed methods:
     /ec2/getCameraUserAttributes -> /ec2/getCameraUserAttributes<b>List</b>
     /api/<i>business</i>Events -> /api/<b>get</b>Events
     /ec2/get<i>Business</i>Rules -> /ec2/get<b>Event</b>Rules
-<!-- Proprietary methods commented out:
+<!-- Proprietary functions commented out:
     <em>[proprietary]</em> /ec2/getClientInfo<i>s</i> -> /ec2/getClientInfo<b>List</b>
     <em>[proprietary]</em> /ec2/save<i>Business</i>Rule -> /ec2/save<b>Event</b>Rule
     <em>[proprietary]</em> /ec2/remove<i>Business</i>Rule -> /ec2/remove<b>Event</b>Rule
@@ -289,7 +289,7 @@ Renamed methods:
 --></pre>
 </p>
 <p>
-Changed <strong>reply</strong> format <strong><i>XML</i> -> <b>JSON</b></strong> in methods:
+Changed <strong>reply</strong> format <strong><i>XML</i> -> <b>JSON</b></strong> in functions:
 <pre>
     /api/manualCamera/search
     /api/manualCamera/status
@@ -302,13 +302,13 @@ Changed <strong>reply</strong> format <strong><i>XML</i> -> <b>JSON</b></strong>
 <!--............................................................................................-->
 <h3>Retaining compatibility until expired</h3>
 <p>
-Replaced method <strong><code><i>/api/image</i> -> <b>/ec2/cameraThumbnail</b></code></strong>
-(deprecated method support expires after 3.1). The new method can get thumbnails from cameras
+Replaced function <strong><code><i>/api/image</i> -> <b>/ec2/cameraThumbnail</b></code></strong>
+(deprecated function support expires after 3.1). The new function can get thumbnails from cameras
 located on other servers (the old one can not).
 </p>
 <p>
 Renamed param <strong><code>cameraI<i>D</i> -> cameraI<b>d</b></code></strong>
-(deprecated name support expires after 3.2) in methods:
+(deprecated name support expires after 3.2) in functions:
 <pre>
     /ec2/getCamerasEx
     /ec2/getCameraUserAttributesList
@@ -318,7 +318,7 @@ Renamed param <strong><code>cameraI<i>D</i> -> cameraI<b>d</b></code></strong>
 </p>
 <p>
 Renamed param <strong><code>serverI<i>D</i> -> serverI<b>d</b></code></strong>
-(deprecated name support expires after 3.2) in methods:
+(deprecated name support expires after 3.2) in functions:
 <pre>
     /ec2/getMediaServerUserAttributesList
     /ec2/saveMediaServerUserAttributesList
@@ -327,7 +327,7 @@ Renamed param <strong><code>serverI<i>D</i> -> serverI<b>d</b></code></strong>
 </p>
 <p>
 Renamed param <strong><code>ph<i>i</i>sicalMemory -> ph<b>y</b>sicalMemory</code></strong>
-(deprecated name support expires after 3.2) in methods:
+(deprecated name support expires after 3.2) in functions:
 <pre>
     /ec2/saveClientInfo
     /ec2/getClientInfoList
@@ -335,7 +335,7 @@ Renamed param <strong><code>ph<i>i</i>sicalMemory -> ph<b>y</b>sicalMemory</code
 </p>
 <p>
 Renamed param <strong><code>prefe<i>r</i>edServerId -> prefe<b>rr</b>edServerId</code></strong>
-(deprecated name support expires after 3.2) in methods:
+(deprecated name support expires after 3.2) in functions:
 <pre>
     /ec2/saveCameraUserAttributesList
     /ec2/saveCameraUserAttributes
@@ -345,7 +345,7 @@ Renamed param <strong><code>prefe<i>r</i>edServerId -> prefe<b>rr</b>edServerId<
 </p>
 <p>
 Renamed param <strong><code><i>res_id </i>-> <b>cameraId</b></code></strong>
-(deprecated name support expires after 3.2) in methods:
+(deprecated name support expires after 3.2) in functions:
 <pre>
     /api/doCameraDiagnosticsStep
     /api/setCameraParam
@@ -354,7 +354,7 @@ Renamed param <strong><code><i>res_id </i>-> <b>cameraId</b></code></strong>
 </p>
 <p>
 Renamed param <strong><code><i>resource</i>Id -> <b>camera</b>Id</code></strong>
-(deprecated name support expires after 3.2) in methods:
+(deprecated name support expires after 3.2) in functions:
 <pre>
     /api/ptz
 </pre>
@@ -362,12 +362,12 @@ Renamed param <strong><code><i>resource</i>Id -> <b>camera</b>Id</code></strong>
 <p>
 Renamed and merged together params
 <strong><code><i>mac</i> + <i>physicalId</i> -> <b>cameraId</b></code></strong>
-in method <strong><code>/ec2/bookmarks</code></strong>
+in function <strong><code>/ec2/bookmarks</code></strong>
 (deprecated names support expires after 3.2).
 <p/>
 <p>
 Renamed param <strong><code><i>physical</i>Id -> <b>camera</b>Id</code></strong>
-(deprecated name support expires after 3.2) in methods:
+(deprecated name support expires after 3.2) in functions:
 <pre>
     /api/image
     /api/getEvents
@@ -375,14 +375,14 @@ Renamed param <strong><code><i>physical</i>Id -> <b>camera</b>Id</code></strong>
 </pre>
 </p>
 <p>
-Changed <strong><i>GET</i> -> <b>POST</b></strong> in method
+Changed <strong><i>GET</i> -> <b>POST</b></strong> in function
 <strong><code>/api/manualCamera/add</code></strong>
-(deprecated method support expires after 3.2). Check changed params in the API documentation.
+(deprecated function support expires after 3.2). Check changed params in the API documentation.
 </p>
 <p>
 Renamed param
 <strong><code><i>timeSinseEpochMs</i> -> <b>timeSinceEpochMs</b></code></strong>
-in method <strong><code>/ec2/getTimeOfServers</code></strong>.
+in function <strong><code>/ec2/getTimeOfServers</code></strong>.
 </p>
 Remove global setting <strong><code><i>synchronizeTimeWithInternet</i></code></strong>
 It implicitly turned on if settings 'primaryTimeServer' is not defined and 'timeSynchronizationEnabled' is true.
