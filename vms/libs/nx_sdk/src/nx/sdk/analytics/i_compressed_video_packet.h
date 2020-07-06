@@ -37,6 +37,7 @@ class ICompressedVideoPacket: public Interface<ICompressedVideoPacket, ICompress
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::ICompressedVideoPacket0"); }
 
+    /** Called by metadataList() */
     protected: virtual IList<IMetadataPacket>* getMetadataList() const = 0;
     public: Ptr<IList<IMetadataPacket>> metadataList() const
     {

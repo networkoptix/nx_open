@@ -20,20 +20,23 @@ public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IObjectTrackBestShotPacket"); }
 
     /**
-     * Timestamp of the frame (in microseconds) the best shot belongs to. Should be a non-negative
-     * number.
+     * @return Timestamp of the frame (in microseconds) the best shot belongs to. Should be a
+     *     non-negative number.
      */
     virtual int64_t timestampUs() const override = 0;
 
-    /** Id of the track the best shot belongs to. */
+    /** Called by trackId() */
     protected: virtual void getTrackId(Uuid* outValue) const = 0;
+    /** @return Id of the track the best shot belongs to. */
     public: Uuid trackId() const { Uuid value; getTrackId(&value); return value; }
 
-    /**
-     * Bounding box of the best shot. If the rectangle returned by this method is invalid then
-     * a bounding box from the frame with the timestamp equal to the timestampUs() will be used.
-     */
+    /** Called by boundingBox() */
     protected: virtual void getBoundingBox(Rect* outValue) const = 0;
+    /**
+     * @return Bounding box of the best shot. If this rectangle returned by this method is invalid,
+     *     then a bounding box from the frame with the timestamp equal to the timestampUs() will be
+     *     used.
+     */
     public: Rect boundingBox() const { Rect value; getBoundingBox(&value); return value; }
 };
 

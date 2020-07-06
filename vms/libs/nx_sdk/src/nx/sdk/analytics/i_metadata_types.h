@@ -17,9 +17,11 @@ public:
 
     virtual ~IMetadataTypes() = default;
 
+    /** Called by eventTypeIds() */
     protected: virtual const IStringList* getEventTypeIds() const = 0;
     public: Ptr<const IStringList> eventTypeIds() const { return toPtr(getEventTypeIds()); }
 
+    /** Called by objectTypeIds() */
     protected: virtual const IStringList* getObjectTypeIds() const = 0;
     public: Ptr<const IStringList> objectTypeIds() const { return toPtr(getObjectTypeIds()); }
 

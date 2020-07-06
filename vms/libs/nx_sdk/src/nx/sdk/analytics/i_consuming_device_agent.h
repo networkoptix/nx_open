@@ -19,12 +19,13 @@ class IConsumingDeviceAgent: public Interface<IConsumingDeviceAgent, IDeviceAgen
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IConsumingDeviceAgent"); }
 
+    /** Called by pushDataPacket() */
+    protected: virtual void doPushDataPacket(Result<void>* outResult, IDataPacket* dataPacket) = 0;
     /**
      * Supplies data to the Engine. Called from a worker thread.
      *
      * @param dataPacket Never null. Has a valid timestamp >= 0.
      */
-    protected: virtual void doPushDataPacket(Result<void>* outResult, IDataPacket* dataPacket) = 0;
     public: Result<void> pushDataPacket(IDataPacket* dataPacket)
     {
         Result<void> result;

@@ -29,10 +29,11 @@ public:
     /** @return Number of elements in the packet. */
     virtual int count() const = 0;
 
+    /** Called by at() */
+    protected: virtual const IMetadata* getAt(int index) const = 0;
     /**
      * @return Element at the zero-based index, or null if the index is invalid.
      */
-    protected: virtual const IMetadata* getAt(int index) const = 0;
     public: Ptr<const IMetadata> at(int index) const { return toPtr(getAt(index)); }
 };
 

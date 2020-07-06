@@ -30,10 +30,11 @@ public:
      */
     virtual int64_t vmsSystemTimeSinceEpochMs() const = 0;
 
+    /** Called by homeDir() */
+    protected: virtual const IString* getHomeDir() const = 0;
     /**
      * @return Absolute path to the plugin's home directory, or an empty string if it is absent.
      */
-    protected: virtual const IString* getHomeDir() const = 0;
     public: std::string homeDir() const { return toPtr(getHomeDir())->str(); }
 };
 
