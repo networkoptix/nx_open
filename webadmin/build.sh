@@ -94,13 +94,11 @@ popd
 echo "Create version.txt" >&2
 
 REP_ROOT_DIR="$SOURCE_DIR/.."
-if [ -d "$REP_ROOT_DIR/.hg" ]; then
-    hg log -r . --repository "$REP_ROOT_DIR" > static/version.txt
-elif [ -d "$REP_ROOT_DIR/.git" ]; then
+if [ -d "$REP_ROOT_DIR/.git" ]; then
     format="changeset: %H%nrefs: %D%nparents: %P%nauthor: %aN <%aE>%ndate: %ad%nsummary: %s"
     git -C "$REP_ROOT_DIR" show -s --format="$format" > static/version.txt
 else
-    echo "Neither git nor hg has been detected in $REP_ROOT_DIR" && exit 1
+    echo "VCS has not been detected in $REP_ROOT_DIR" && exit 1
 fi
 
 cat static/version.txt >&2

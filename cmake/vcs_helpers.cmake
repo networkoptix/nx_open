@@ -2,9 +2,7 @@ function(nx_vcs_changeset dir var)
     set(_changeset "")
     set(_reason "")
 
-    if(EXISTS ${dir}/.hg/)
-        _hg_changeset(${dir} _changeset)
-    elseif(EXISTS ${dir}/.git)
+    if(EXISTS ${dir}/.git)
         _git_changeset(${dir} _changeset)
     else()
         set(_reason "VCS not detected")
@@ -34,12 +32,10 @@ function(nx_vcs_changeset dir var)
 endfunction()
 
 function(nx_vcs_branch dir var)
-    if(EXISTS ${dir}/.hg/)
-        _hg_branch(${dir} _branch)
-    elseif(EXISTS ${dir}/.git)
+    if(EXISTS ${dir}/.git)
         _git_branch(${dir} _branch)
     else()
-        message(WARNING "Can't get current branch: not found any VCS: ${dir}")
+        message(WARNING "Can't get current branch: VCS not detected: ${dir}")
     endif()
     set(${var} "${_branch}" PARENT_SCOPE)
 endfunction()
@@ -48,31 +44,9 @@ function(nx_vcs_current_refs dir var)
     if(EXISTS ${dir}/.git)
         _git_current_refs(${dir} _current_refs)
     else()
-        message(WARNING "Can't get current refs: not found any VCS: ${dir}")
+        message(WARNING "Can't get current refs: VCS not detected: ${dir}")
     endif()
     set(${var} "${_current_refs}" PARENT_SCOPE)
-endfunction()
-
-function(_hg_changeset dir var)
-    execute_process(
-        COMMAND hg --repository "${dir}" log --rev . --template "{node|short}"
-        OUTPUT_VARIABLE changeset
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    if(changeset STREQUAL "000000000000")
-        # hg yields such changeset if .hg dir exists but hg does not detect a repo there.
-        set(changeset "")
-    endif()
-    set(${var} "${changeset}" PARENT_SCOPE)
-endfunction()
-
-function(_hg_branch dir var)
-    execute_process(
-        COMMAND hg --repository "${dir}" branch
-        OUTPUT_VARIABLE branch
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    set(${var} "${branch}" PARENT_SCOPE)
 endfunction()
 
 function(_git_changeset dir var)
