@@ -86,7 +86,9 @@ conf_definition = {
     "boxLogin": {"type": "str", "default": ""},
     "boxPassword": {"type": "str", "default": ""},
     "boxSshPort": {"type": "int", "range": [1, 65535], "default": 22},
+    "boxTelnetPort": {"type": "int", "range": [1, 65535], "default": 23},
     "boxSshKey": {"type": "str", "default": ""},
+    "boxConnectByTelnet": {"type": "bool", "default": False},
     "vmsUser": {"type": "str"},
     "vmsPassword": {"type": "str"},
     "archiveDeletingTimeoutSeconds": {"type": "int", "range": [0, None], "default": 60},
@@ -98,9 +100,9 @@ ini_definition = {
     "archiveStreamsPerCameraRatio": {"type": "float", "range": [0.0, 999.0], "default": 0.2},
     "streamingTestDurationMinutes": {"type": "int", "range": [1, None], "default": 4 * 60},
     "cameraDiscoveryTimeoutSeconds": {"type": "int", "range": [0, None], "default": 3 * 60},
-    "testcameraBin": {"type": "str", "default": "./testcamera/testcamera"},
-    "rtspPerfBin": {"type": "str", "default": "./testcamera/rtsp_perf"},
-    "plinkBin": {"type": "str", "default": "./plink"},
+    "testcameraBin": {"type": "str", "default": "./tools/bin/testcamera"},
+    "rtspPerfBin": {"type": "str", "default": "./tools/bin/rtsp_perf"},
+    "plinkBin": {"type": "str", "default": "./tools/bin/plink"},
     "testFileHighResolution": {"type": "str", "default": "./high.ts"},
     "testFileHighPeriodUs": {"type": "int", "range": [1, None], "default": 10033334},
     "testFileLowResolution": {"type": "str", "default": "./low.ts"},
@@ -121,10 +123,10 @@ ini_definition = {
     "sleepBeforeCheckingArchiveSeconds": {"type": "int", "range": [0, None], "default": 100},
     "maxAllowedFrameDrops": {"type": "int", "range": [0, None], "default": 0},
     "ramPerCameraMegabytes": {"type": "int", "range": [1, None], "default": 40},
-    "sshCommandTimeoutS": {"type": "int", "range": [1, None], "default": 15},
-    "sshServiceCommandTimeoutS": {"type": "int", "range": [1, None], "default": 30},
-    "sshGetFileContentTimeoutS": {"type": "int", "range": [1, None], "default": 30},
-    "sshGetProcMeminfoTimeoutS": {"type": "int", "range": [1, None], "default": 10},
+    "boxCommandTimeoutS": {"type": "int", "range": [1, None], "default": 15},
+    "boxServiceCommandTimeoutS": {"type": "int", "range": [1, None], "default": 30},
+    "boxGetFileContentTimeoutS": {"type": "int", "range": [1, None], "default": 30},
+    "boxGetProcMeminfoTimeoutS": {"type": "int", "range": [1, None], "default": 10},
     "rtspPerfLinesOutputFile": {"type": "str", "default": ""},
     "rtspPerfStderrFile": {"type": "str", "default": ""},
     "archiveReadingPosS": {"type": "int", "range": [0, None], "default": 15},
@@ -136,6 +138,8 @@ ini_definition = {
     "addCamerasManually": {"type": "bool", "default": False},
     "getStoragesMaxAttempts": {"type": "int", "default": 10},
     "getStoragesAttemptIntervalSeconds": {"type": "int", "default": 3},
+    "boxTelnetConnectionWarningThresholdMs": {"type": "int", "default": 1000},
+    "plinkConnectionTimeoutS": {"type": "int", "default": 21},
 }
 
 
@@ -202,10 +206,12 @@ def load_configs(conf_file, ini_file):
     stream_reader_runner.ini_rtsp_perf_bin = path_from_config(ini['rtspPerfBin'])
     stream_reader_runner.ini_rtsp_perf_stderr_file = ini['rtspPerfStderrFile']
     box_connection.ini_plink_bin = path_from_config(ini['plinkBin'])
-    box_connection.ini_ssh_command_timeout_s = ini['sshCommandTimeoutS']
-    box_connection.ini_ssh_get_file_content_timeout_s = ini['sshGetFileContentTimeoutS']
-    vms_scanner.ini_ssh_service_command_timeout_s = ini['sshServiceCommandTimeoutS']
-    box_platform.ini_ssh_get_proc_meminfo_timeout_s = ini['sshGetProcMeminfoTimeoutS']
+    box_connection.ini_box_command_timeout_s = ini['boxCommandTimeoutS']
+    box_connection.ini_box_get_file_content_timeout_s = ini['boxGetFileContentTimeoutS']
+    vms_scanner.ini_box_service_command_timeout_s = ini['boxServiceCommandTimeoutS']
+    box_platform.ini_box_get_proc_meminfo_timeout_s = ini['boxGetProcMeminfoTimeoutS']
+    service_objects.ssh_host_key_obtainer.ini_plink_connection_timeout_s = (
+        ini['plinkConnectionTimeoutS'])
 
     if ini.OPTIONS_FROM_FILE is not None:
         report(f"\nOverriding default options via {ini.filepath!r}:")
@@ -510,7 +516,7 @@ class _StreamTypeStats:
         if self._min_lag_us > 0:
             logging.warning(f"INTERNAL ERROR: _min_lag_us > 0: {self._min_lag_us}")
             self._min_lag_us = 0
-  
+
         # If _min_lag_us < 0, it means that the latency of the first frame is not less than
         # abs(_min_lag_us), and thus we can consider the actual maximum lag to be greater than
         # _max_lag_us by that value.
@@ -1035,7 +1041,7 @@ def _obtain_box_platform(box, linux_distribution):
         f"    IP address: {box.ip}\n"
         f"    Network adapter name: {box.eth_name}\n"
         f"    Network adapter bandwidth: {(box.eth_speed + ' Mbps') if box.eth_speed else 'Unknown'}\n"
-        f"    SSH user is{'' if box.is_root else ' not'} root.\n"
+        f"    {box.connection_type_name} user is{'' if box.is_root else ' not'} root.\n"
         f"    Linux distribution name: {linux_distribution.name}\n"
         f"    Linux distribution version: {linux_distribution.version}\n"
         f"    Linux kernel version: {'.'.join(str(c) for c in linux_distribution.kernel_version)}\n"
@@ -1047,6 +1053,11 @@ def _obtain_box_platform(box, linux_distribution):
         f"    File systems: \n{file_systems_info}\n"
     )
 
+    if box_platform.have_storages_list_problems:
+        report(
+            "WARNING: File system info can be incomplete. "
+            f"See details in {log_file_ref}")
+
     return box_platform
 
 
@@ -1054,8 +1065,12 @@ def _check_time_diff(box, ini):
     box_time_output = box.eval('date +%s.%N')
     if not box_time_output:
         raise exceptions.BoxCommandError('Unable to get current box time using the `date` command.')
+
+    # Busybox doesn't support "%N" format specifier in the `date` command, so in this case we have
+    # trailing ".%N" in the command output. Strip it and leave seconds-precision value.
+    box_time_string = re.sub(r'\.%N$', '', box_time_output.strip())
     try:
-        box_time = float(box_time_output.strip())
+        box_time = float(box_time_string)
     except ValueError:
         raise exceptions.BoxStateError("Cannot parse output of the `date` command.")
     host_time = time.time()
@@ -1082,7 +1097,7 @@ def _obtain_running_vms(box, linux_distribution):
         raise exceptions.BoxStateError("More than one Server installation found at the box.")
     vms = vmses[0]
     if not vms.is_up():
-        raise exceptions.BoxStateError("Server is not running currently at the box.")
+        raise exceptions.BoxStateError("Server is not currently running at the box.")
     return vms
 
 
@@ -1114,9 +1129,14 @@ def _override_ini_config(vms, ini):
     })
 
 
-def _connect_to_box(conf):
+def _connect_to_box(conf, ini):
+    if conf['boxConnectByTelnet']:
+        connection_type, connection_port = BoxConnection.ConnectionType.TELNET, conf['boxTelnetPort']
+    else:
+        connection_type, connection_port = BoxConnection.ConnectionType.SSH, conf['boxSshPort']
+
     password = conf.get('boxPassword', None)
-    if password and platform.system() == 'Linux':
+    if connection_type == BoxConnection.ConnectionType.SSH and password and platform.system() == 'Linux':
         res = host_tests.SshPassInstalled.call()
 
         if not res.success:
@@ -1125,14 +1145,16 @@ def _connect_to_box(conf):
                 " (check if it is installed; to install on Ubuntu: `sudo apt install sshpass`)."
                 f"Details for the error: {res.formatted_message()}"
             )
-    box = BoxConnection(
+
+    box = BoxConnection.create_box_connection_object(
+        connection_type = connection_type,
         host=conf['boxHostnameOrIp'],
         login=conf['boxLogin'],
         password=password,
         ssh_key=conf['boxSshKey'],
-        port=conf['boxSshPort'],
+        port=connection_port,
     )
-    if platform.system() == 'Windows':
+    if connection_type == BoxConnection.ConnectionType.SSH and platform.system() == 'Windows':
         try:
             host_key = service_objects.SshHostKeyObtainer(box, conf).call()
         except exceptions.SshHostKeyObtainingFailed as exception:
@@ -1143,12 +1165,21 @@ def _connect_to_box(conf):
         box.supply_host_key(host_key)
 
     try:
-        box.sh('true', exc=True)
+        start_time_s = time.time()
+        box.sh('true', throw_exception_on_error=True)
+        command_execution_duration_ms = int((time.time() - start_time_s) * 1000)
+        if connection_type == BoxConnection.ConnectionType.TELNET:
+            if command_execution_duration_ms > ini['boxTelnetConnectionWarningThresholdMs']:
+                report('')
+                report(
+                    'WARNING: Telnet connection is very slow, it can affect test results. '
+                    'Consider fixing Box system settings (see readme.md for more info).')
+
     except exceptions.BoxCommandError as e:
-        raise exceptions.SshConnectionError(
+        raise exceptions.BoxConnectionError(
             (
-                "Can't connect to the box via SSH: " +
-                "check SSH configuration settings (host, login, password and so on)."
+                "Can't connect to the box: " +
+                "check box configuration settings (host, login, password and so on)."
             ),
             original_exception=e,
         )
@@ -1221,7 +1252,7 @@ def main(conf_file, ini_file, log_file):
         raise InvalidBoxLoginConfigOptionValue(
             f"Config option boxLogin should be set and not empty on Windows.")
 
-    box = _connect_to_box(conf)
+    box = _connect_to_box(conf, ini)
     linux_distribution = LinuxDistributionDetector.detect(box)
     box_platform = _obtain_box_platform(box, linux_distribution)
     _check_time_diff(box, ini)
@@ -1281,7 +1312,7 @@ def _clear_storages(box, storages: List[Storage], conf):
             f"'{storage.url}/hi_quality' "
             f"'{storage.url}/low_quality' "
             f"'{storage.url}/'*_media.nxdb",
-            timeout_s=conf['archiveDeletingTimeoutSeconds'], su=True, exc=True)
+            timeout_s=conf['archiveDeletingTimeoutSeconds'], su=True, throw_exception_on_error=True)
     report('Server video archives deleted.')
 
 

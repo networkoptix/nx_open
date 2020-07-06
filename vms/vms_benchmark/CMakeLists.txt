@@ -75,3 +75,4 @@ add_custom_command(
 )
 
 add_custom_target(vms_benchmark ALL DEPENDS ${CMAKE_BINARY_DIR}/bin/vms_benchmark${exe_extension})
+set_target_properties(vms_benchmark PROPERTIES FOLDER utils)

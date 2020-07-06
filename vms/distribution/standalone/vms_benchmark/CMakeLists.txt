@@ -3,8 +3,24 @@ set(build_dir ${CMAKE_CURRENT_BINARY_DIR}/build)
 set(zip_file ${distribution_output_dir}/${vms_benchmark_distribution_name}.zip)
 set(zip_log ${logs_dir}/vms_benchmark_zip.log)
 
+# Generated commands for add_custom_command() which creates subdirectories - platform-dependent.
+set(create_subdirectories_commands)
+
 # Generated commands for add_custom_command() which copies the files - platform-dependent.
 set(copy_dependencies_commands)
+
+function(add_dependencies_to_copy_command dependencies destination_dir)
+    # Assuming dependencies do not contain spaces.
+    list(JOIN dependencies " " dependencies_args)
+
+    list(APPEND copy_dependencies_commands
+        # Call `cp` via bash to resolve `*` used for .so symlinks.
+        COMMAND bash -c
+            "cp -r ${dependencies_args} vms_benchmark/tools/${destination_dir}"
+    )
+
+    set(copy_dependencies_commands ${copy_dependencies_commands} PARENT_SCOPE)
+endfunction()
 
 if(targetDevice STREQUAL "windows-x64")
     set(executable_extension .exe)
@@ -82,29 +98,30 @@ if(targetDevice STREQUAL "windows-x64")
         ${CMAKE_BINARY_DIR}/bin/udt.dll
         ${CMAKE_BINARY_DIR}/bin/rtsp_perf.exe
         ${CMAKE_BINARY_DIR}/bin/testcamera.exe
+        ${vms_benchmark_dev_dir}/files/plink.exe
+    )
+
+    list(APPEND create_subdirectories_commands
+        COMMAND ${CMAKE_COMMAND} -E make_directory vms_benchmark/tools/bin
     )
 
     # Make one "copy" command for each file to avoid reaching the command line length limit.
     foreach(dependency ${dependencies})
         list(APPEND copy_dependencies_commands
-            COMMAND ${CMAKE_COMMAND} -E copy ${dependency} vms_benchmark/testcamera/
+            COMMAND
+                ${CMAKE_COMMAND} -E copy ${dependency} vms_benchmark/tools/bin/
         )
     endforeach()
-
-    list(APPEND copy_dependencies_commands
-        COMMAND ${CMAKE_COMMAND} -E copy ${vms_benchmark_dev_dir}/files/plink.exe vms_benchmark/
-    )
 else()
     set(benchmark_python_version 3.6)
 
-    set(dependencies
+    set(lib_dependencies
         ${CMAKE_BINARY_DIR}/lib/libQt5Concurrent.so*
         ${CMAKE_BINARY_DIR}/lib/libQt5Core.so*
         ${CMAKE_BINARY_DIR}/lib/libQt5Gui.so*
         ${CMAKE_BINARY_DIR}/lib/libQt5Network.so*
         ${CMAKE_BINARY_DIR}/lib/libQt5Sql.so*
         ${CMAKE_BINARY_DIR}/lib/libQt5Xml.so*
-        ${CMAKE_BINARY_DIR}/lib/libQt5XmlPatterns.so*
         ${CMAKE_BINARY_DIR}/lib/libavcodec.so*
         ${CMAKE_BINARY_DIR}/lib/libavformat.so*
         ${CMAKE_BINARY_DIR}/lib/libavutil.so*
@@ -122,18 +139,20 @@ else()
         ${CMAKE_BINARY_DIR}/lib/libswresample.so*
         ${CMAKE_BINARY_DIR}/lib/libswscale.so*
         ${CMAKE_BINARY_DIR}/lib/libudt.so
+    )
+
+    set(bin_dependencies
         ${CMAKE_BINARY_DIR}/bin/rtsp_perf
         ${CMAKE_BINARY_DIR}/bin/testcamera
     )
 
-    list(JOIN dependencies " " dependencies_args) #< Assuming dependencies do not contain spaces.
-    list(APPEND copy_dependencies_commands
-        # Call via bash to resolve `*` used for .so symlinks.
-        COMMAND bash -c "cp -r ${dependencies_args} vms_benchmark/testcamera/"
-
-        # Needed because all executables have RPATH=../lib
-        COMMAND ln -s testcamera vms_benchmark/lib
+    list(APPEND create_subdirectories_commands
+        COMMAND ${CMAKE_COMMAND} -E make_directory vms_benchmark/tools/bin
+        COMMAND ${CMAKE_COMMAND} -E make_directory vms_benchmark/tools/lib
     )
+
+    add_dependencies_to_copy_command("${lib_dependencies}" lib)
+    add_dependencies_to_copy_command("${bin_dependencies}" bin)
 
     set(system_dependencies
         ${cpp_runtime_libs}
@@ -142,9 +161,10 @@ else()
 
     list(APPEND copy_dependencies_commands
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/build_utils/linux/copy_system_library.py
-            --compiler ${CMAKE_CXX_COMPILER}
-            --link-flags "${CMAKE_SHARED_LINKER_FLAGS}"
-            --dest-dir vms_benchmark/testcamera
+            --compiler=${CMAKE_CXX_COMPILER}
+            --flags=${CMAKE_CXX_FLAGS}
+            --link-flags=${CMAKE_SHARED_LINKER_FLAGS}
+            --dest-dir=vms_benchmark/tools/lib
             ${system_dependencies}
     )
 endif()
@@ -154,7 +174,7 @@ add_custom_command(OUTPUT ${zip_file}
 
     COMMAND ${CMAKE_COMMAND} -E make_directory ${logs_dir}
     COMMAND ${CMAKE_COMMAND} -E remove_directory vms_benchmark
-    COMMAND ${CMAKE_COMMAND} -E make_directory vms_benchmark/testcamera
+    COMMAND ${CMAKE_COMMAND} -E make_directory vms_benchmark
 
     COMMAND ${CMAKE_COMMAND} -E copy
         ${vms_benchmark_dev_all_platforms_dir}/files/high.ts
@@ -165,6 +185,7 @@ add_custom_command(OUTPUT ${zip_file}
         ${CMAKE_CURRENT_SOURCE_DIR}/files/readme.md
         vms_benchmark/
 
+    ${create_subdirectories_commands}
     ${copy_dependencies_commands}
 
     COMMAND ${CMAKE_COMMAND} -E echo "  Zipping VMS Benchmark - see ${zip_log}"
