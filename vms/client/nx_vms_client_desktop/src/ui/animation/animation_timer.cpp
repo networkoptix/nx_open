@@ -97,34 +97,29 @@ void AnimationTimer::updateCurrentTime(qint64 time)
     if (m_lastTickTime == -1)
         m_lastTickTime = time;
 
+    const int deltaTime = static_cast<int>(time - m_lastTickTime);
     if (isActive())
     {
-        const int deltaTime = static_cast<int>(time - m_lastTickTime);
-        if (deltaTime > 0)
+        bool hasNullListeners = false;
+
+        // Listeners may be added to the list or deleted as objects in the process, this is why we
+        // have to iterate by index. Note: listeners cannot be removed from the list meanwhile.
+        for (int i = 0; i < m_listeners.size(); i++)
         {
-            bool hasNullListeners = false;
-
-            // Listeners may be added/removed in the process, this is why we have to iterate by index.
-            for (int i = 0; i < m_listeners.size(); i++)
-            {
-                AnimationTimerListener* listener = m_listeners[i];
-                if (!listener)
-                {
-                    hasNullListeners = true;
-                }
-                else if (listener->isListening())
-                {
-                    listener->tick(deltaTime);
-                }
-            }
-
-            if (hasNullListeners)
-                m_listeners.removeAll(nullptr);
+            AnimationTimerListener* listener = m_listeners[i];
+            if (!listener)
+                hasNullListeners = true;
+            else if (deltaTime > 0 && listener->isListening())
+                listener->tick(deltaTime);
         }
+
+        if (hasNullListeners)
+            m_listeners.removeAll(nullptr);
     }
 
-    NX_ASSERT(m_listeners.indexOf(nullptr) < 0, "Null listeners while delta %1, isActive %2",
-        static_cast<int>(time - m_lastTickTime),
+    NX_ASSERT(m_listeners.indexOf(nullptr) < 0,
+        "Null listeners while delta %1, isActive %2",
+        deltaTime,
         isActive());
 
     m_lastTickTime = time;
