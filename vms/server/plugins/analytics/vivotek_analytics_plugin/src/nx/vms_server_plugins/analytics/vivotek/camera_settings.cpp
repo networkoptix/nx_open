@@ -749,6 +749,7 @@ const QString kVcaUnattendedObjectDetectionRequiresHumanInvolvement =
 
 const QString kVcaFaceDetectionRegion = "Vca.FaceDetection#.Region";
 
+const QString kVcaRunningDetectionEnabled = "Vca.RunningDetection#.Enabled";
 const QString kVcaRunningDetectionName = "Vca.RunningDetection#.Name";
 const QString kVcaRunningDetectionMinPersonCount = "Vca.RunningDetection#.MinPersonCount";
 const QString kVcaRunningDetectionMinSpeed = "Vca.RunningDetection#.MinSpeed";
@@ -763,25 +764,99 @@ QString replicateName(QString name, std::size_t i)
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+class UniqueRuleRenamer
+{
+public:
+    void reset()
+    {
+        m_names.clear();
+    }
+
+    void add(QString* name)
+    {
+        m_names.push_back(name);
+    }
+
+    void rename()
+    {
+        std::vector<ParsedName> parsedNames; 
+        for (auto* name: m_names)
+        {
+            if (name->isEmpty())
+                *name = "Rule-1";
+
+            parsedNames.push_back(parseName(name));
+        }
+
+        std::map<QString, std::map<int, QString*>> occupiedIndices;
+        for (const auto& [name, stem, index]: parsedNames)
+            occupiedIndices[stem].emplace(index, name);
+
+        for (auto& [name, stem, index]: parsedNames)
+        {
+            auto& occupied = occupiedIndices[stem];
+
+            if (const auto it = occupied.find(index); it != occupied.end())
+            {
+                if (it->second == name)
+                    continue;
+
+                index = 1;
+            }
+
+            while (occupied.count(index))
+                ++index;
+
+            occupied.emplace(index, name);
+        }
+
+        for (const auto& parsedName: parsedNames)
+            serialize(parsedName);
+    }
+
+private:
+    struct ParsedName
+    {
+        QString* name;
+        QString stem;
+        int index = -1;
+    };
+
+private:
+    static ParsedName parseName(QString* name)
+    {
+        int dashIndex = name->lastIndexOf("-");
+        if (dashIndex == -1)
+            return ParsedName{name, *name};
+
+        const auto indexString = name->midRef(dashIndex + 1);
+        if (indexString.isEmpty())
+            return ParsedName{name, *name};
+
+        int index;
+        if (bool ok; (index = indexString.toInt(&ok)), !ok)
+            return ParsedName{name, *name};
+
+        return ParsedName{name, name->left(dashIndex), index};
+    }
+
+    static void serialize(const ParsedName& parsedName)
+    {
+        if (parsedName.index == -1)
+            *parsedName.name = parsedName.stem;
+        else
+            *parsedName.name = NX_FMT("%1-%2", parsedName.stem, parsedName.index);
+    }
+
+private:
+    std::vector<QString*> m_names;
+};
+
 struct ParserFromServer
 {
     const IStringMap& values;
 
-    std::map<QString, std::vector<std::function<void(const QString&)>>> errorSetterGroups{};
-
-    template <typename Value>
-    void noteName(const QString& name, CameraSettings::Entry<Value> *entry)
-    {
-        if (!entry->value)
-            return;
-
-        errorSetterGroups[name].push_back(
-            [entry](const QString& error)
-            {
-                entry->value = std::nullopt;
-                entry->error = error;
-            });
-    }
+    UniqueRuleRenamer renamer{};
 
     void parse(bool* value, const QString& serializedValue)
     {
@@ -853,11 +928,7 @@ struct ParserFromServer
             parsePoints(&value->emplace(), figure["points"].to<JsonArray>());
 
             if (label)
-            {
                 json["label"].to(label);
-                if (label->isEmpty())
-                    throw Exception("Empty name");
-            }
         }
     }
 
@@ -873,8 +944,6 @@ struct ParserFromServer
             parsePoints(&value->emplace(), figure["points"].to<JsonArray>());
 
             json["label"].to(label);
-            if (label->isEmpty())
-                throw Exception("Empty name");
 
             try
             {
@@ -956,7 +1025,8 @@ struct ParserFromServer
             parse(&rule.entranceDelay, replicateName(kVcaCrowdDetectionEntranceDelay, i));
             parse(&rule.exitDelay, replicateName(kVcaCrowdDetectionExitDelay, i));
 
-            noteName(rule.name, &rule.region);
+            if (rule.region.value)
+                renamer.add(&rule.name);
         }
     }
 
@@ -970,7 +1040,8 @@ struct ParserFromServer
             parse(&rule.region, replicateName(kVcaLoiteringDetectionRegion, i), &rule.name);
             parse(&rule.minDuration, replicateName(kVcaLoiteringDetectionMinDuration, i));
 
-            noteName(rule.name, &rule.region);
+            if (rule.region.value)
+                renamer.add(&rule.name);
         }
     }
 
@@ -984,7 +1055,8 @@ struct ParserFromServer
             parse(&rule.region, replicateName(kVcaIntrusionDetectionRegion, i), &rule.name);
             parse(&rule.direction, replicateName(kVcaIntrusionDetectionDirection, i));
 
-            noteName(rule.name, &rule.region);
+            if (rule.region.value)
+                renamer.add(&rule.name);
         }
     }
 
@@ -998,7 +1070,8 @@ struct ParserFromServer
             parse(&rule.line, replicateName(kVcaLineCrossingDetectionLine, i),
                 &rule.name, &rule.direction);
 
-            noteName(rule.name, &rule.line);
+            if (rule.line.value)
+                renamer.add(&rule.name);
         }
     }
 
@@ -1016,7 +1089,8 @@ struct ParserFromServer
             parse(&rule.requiresHumanInvolvement,
                 replicateName(kVcaMissingObjectDetectionRequiresHumanInvolvement, i));
 
-            noteName(rule.name, &rule.region);
+            if (rule.region.value)
+                renamer.add(&rule.name);
         }
     }
 
@@ -1036,7 +1110,8 @@ struct ParserFromServer
             parse(&rule.requiresHumanInvolvement,
                 replicateName(kVcaUnattendedObjectDetectionRequiresHumanInvolvement, i));
 
-            noteName(rule.name, &rule.region);
+            if (rule.region.value)
+                renamer.add(&rule.name);
         }
     }
 
@@ -1049,7 +1124,8 @@ struct ParserFromServer
 
             parse(&rule.region, replicateName(kVcaFaceDetectionRegion, i), &rule.name);
 
-            noteName(rule.name, &rule.region);
+            if (rule.region.value)
+                renamer.add(&rule.name);
         }
     }
 
@@ -1060,16 +1136,23 @@ struct ParserFromServer
         {
             auto& rule = rules[i];
 
+            CameraSettings::Entry<bool> enabled;
+
+            parse(&enabled, replicateName(kVcaRunningDetectionEnabled, i));
             parse(&rule.name, replicateName(kVcaRunningDetectionName, i));
             parse(&rule.minPersonCount, replicateName(kVcaRunningDetectionMinPersonCount, i));
             parse(&rule.minSpeed, replicateName(kVcaRunningDetectionMinSpeed, i));
             parse(&rule.minDuration, replicateName(kVcaRunningDetectionMinDuration, i));
             parse(&rule.maxMergeInterval, replicateName(kVcaRunningDetectionMaxMergeInterval, i));
 
-            if (rule.name.value && rule.name.value->isEmpty())
+            if (enabled.value.value_or(false))
+            {
+                if (!rule.name.value)
+                    rule.name.value = "";
+                renamer.add(&*rule.name.value);
+            }
+            else
                 rule.name.value = std::nullopt;
-
-            noteName(rule.name.value.value_or(""), &rule.name);
         }
     }
 
@@ -1079,7 +1162,7 @@ struct ParserFromServer
         parse(&vca->sensitivity, kVcaSensitivity);
         parse(&vca->installation);
 
-        errorSetterGroups.clear();
+        renamer.reset();
 
         parse(&vca->crowdDetection.emplace());
         parse(&vca->loiteringDetection.emplace());
@@ -1090,15 +1173,7 @@ struct ParserFromServer
         parse(&vca->faceDetection.emplace());
         parse(&vca->runningDetection.emplace());
 
-        for (auto& [name, errorSetters]: errorSetterGroups)
-        {
-            if (errorSetters.size() == 1)
-                continue;
-
-            const QString error = NX_FMT("Duplicate name: %1", name);
-            for (const auto setError: errorSetters)
-                setError(error);
-        }
+        renamer.rename();
     }
 
     void parse(CameraSettings* settings)
@@ -1381,6 +1456,10 @@ struct SerializerToServer
             if (!name.value)
                 name.value = "";
 
+            CameraSettings::Entry<bool> enabled;
+            enabled.value = name.value != "";
+
+            serialize(replicateName(kVcaRunningDetectionEnabled, i), enabled);
             serialize(replicateName(kVcaRunningDetectionName, i), name);
             serialize(replicateName(kVcaRunningDetectionMinPersonCount, i), rule.minPersonCount);
             serialize(replicateName(kVcaRunningDetectionMinSpeed, i), rule.minSpeed);
@@ -1807,6 +1886,11 @@ QJsonObject serializeModel(const CameraSettings::Vca::RunningDetection& detectio
                     {"caption", "Rule #"},
                     {"filledCheckItems", QJsonArray{kVcaRunningDetectionName}},
                     {"items", QJsonArray{
+                        QJsonObject{
+                            {"name", kVcaRunningDetectionEnabled},
+                            {"type", "CheckBox"},
+                            {"caption", "Enabled"},
+                        },
                         QJsonObject{
                             {"name", kVcaRunningDetectionName},
                             {"type", "TextField"},
