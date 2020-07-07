@@ -110,6 +110,8 @@ public:
      * Manifest must not depend on the setting values, because it will not be re-requested on
      * settings change afterwards.
      *
+     * See the manifest specification in @ref md_src_nx_sdk_analytics_manifests.
+     *
      * @return JSON string in UTF-8.
      */
     public: Result<const IString*> manifest() const

@@ -103,6 +103,8 @@ public:
     /**
      * Provides DeviceAgent Manifest in JSON format.
      *
+     * See the manifest specification in @ref md_src_nx_sdk_analytics_manifests.
+     *
      * @return JSON string in UTF-8.
      */
     public: Result<const IString*> manifest() const
