@@ -25,7 +25,7 @@ public:
     /** Called by manifest() */
     protected: virtual void getManifest(Result<const IString*>* outResult) const = 0;
     /**
-     * Provides plugin manifest in JSON format.
+     * Provides Plugin Manifest in JSON format.
      * @return JSON string in UTF-8.
      */
     public: Result<const IString*> manifest() const

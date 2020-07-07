@@ -20,11 +20,12 @@ public:
 
     /**
      * Motion metadata is represented as a grid with a certain number of rows and columns. The grid
-     *     coordinate system starts at the top left corner, the row index grows down and the column
-     *     index grows right. This grid is represented as a contiguous array, each bit of which
-     *     corresponds to the state of a particular cell of the grid (1 if motion has been detected
-     *     in this cell, 0 otherwise). The bit index for a cell with coordinates (column, row) can
-     *     be calculated within the following formula: bitNumber = gridHeight * column + row.
+     * coordinate system starts at the top left corner, the row index grows down and the column
+     * index grows right. This grid is represented as a contiguous array, each bit of which
+     * corresponds to the state of a particular cell of the grid (1 if motion has been detected
+     * in this cell, 0 otherwise). The bit index for a cell with coordinates (column, row) can be
+     * calculated within the following formula: bitNumber = gridHeight * column + row.
+     *
      * @return Pointer to the grid buffer.
      */
     virtual const uint8_t* motionData() const = 0;
