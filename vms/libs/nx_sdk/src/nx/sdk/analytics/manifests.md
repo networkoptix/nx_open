@@ -1,28 +1,401 @@
-## Manifests
+# Analytics Plugin Manifests
 
-### Plugin manifest
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-Plugin manifest.
+This document describes the schemas of JSON Manifests that are returned by various Analytics
+entities - nx::sdk::analytics::IPlugin, IEngine, and IDeviceAgent.
 
-* unordered list item 1
-* unordered list item 2
+Each Manifest is a JSON object containing fields which can be of the following semantic types:
+- String.
+- Integer (Number).
+- Float (Number) - a floating-point number.
+- Boolean.
+- Array<Type> - a JSON array in `[]`, containing comma-separated items of the specified Type.
+- Object - A JSON Object in `{}`, containing the described fields.
+- Id (String) - technically a string, representing a human-readable identifier, described in the
+    respective section of this document.
+- Flag set (String) - technically a string, containing the named flags listed via `|`.
+- Enumeration (String) - technically a string, containing one of the fixed values.
+- SettingsModel (Object) - technically a JSON object of its own schema, described in
+    [settings_model.md](#md_src_nx_sdk_settings_model).
 
-1. ordered list item 1
-2. ordered list item 2
+Because a Manifest is a JSON document, it inherits certain generic JSON features and traditions:
+- Missing object fields are treated as having a default value. Default values are described
+    in this document.
+- Unknown object fields are ignored. Thus, if a field name has a typo, it will be ignored and
+    the field will be treated as missing. It also gives the possibility to comment-out a field
+    by renaming it to start with an underscore (just a JSON tradition).
 
+Examples of Manifests can be found in Plugin samples included with the SDK: a minimalistic example
+can be found in Sample Analytics Plugin, and the most comprehensive example covering all possible
+features can be found in Stub Analytics Plugin.
 
-    some code
-    some more code
+---------------------------------------------------------------------------------------------------
+## Identifiers
 
+Various entities declared in the Manifests make use of identifiers, including the Plugin itself and
+the types of Events and Objects that the Plugin can produce.
 
-*This is italic*
+Such identifiers, represented in JSON as strings, are intended to be human-readable, English-based,
+and formed according to the rules similar to that of Java package names - hierarchical domain-based
+chain of dot-separated camelCase components, starting with the organization name (the `java.` part
+is obviously not needed, and the organization type part like `com.` or `org.` is not recommended).
 
-**This is bold**
+The identifiers are intended to be context-local, thus, must be unique only among all identifiers
+used to denote entities of the same kind. It means that, for example, there is no need to include
+the word `event` in an identifier of certain Event type.
 
-### Device agent manifest
+For example, for a company called "My Company", an identifier for an Analytics Event type of a Line
+Crossing event may look like `"myCompany.lineCrossing"`.
 
-DeviceAgent manifest
+Identifiers starting with `nx.` must not be used for the entities introduced in the Plugins
+developed by other parties. This prefix may be used in identifiers which are intended to be shared
+by different Plugins, thus, forming a kind of common library.
 
-### Engine manifest
+There are special, reserved, parts of the identifier name. Identifiers starting with `nx.sys.` are
+used for the VMS internal purposes and as a temporary solution to access certain experimental
+features. Identifiers with `.sys.` in the middle are recognized by VMS to have some special
+behavour, e.g. Object Attributes with identifiers ending with `.sys.hidden` do not appear on video.
 
-Engine manifest
+---------------------------------------------------------------------------------------------------
+## Plugin Manifest
+
+Plugin Manifest is a JSON Object containing the following fields:
+
+- `"id"`: Id (String)
+
+    A human-readable identifier of the plugin. According to the basic identifier rules described in
+    the corresponding section of this document, it should not include the words `plugin` or the
+    like. E.g. for a face recognition plugin developed by "My Company", it may look like
+    `"myCompany.faceRecognition"`.
+
+    Mandatory.
+
+- `"name"`: String
+
+    Full name of a plugin as a product, in English, capitalized, using spaces. E.g. for a face
+    recognition plugin, it may look like `"Face recognition plugin"`. This name is shown to the user
+    in the VMS configuration GUI.
+
+    Mandatory.
+
+- `"description"`: String
+
+    A short text in English describing the purpose of the plugin, typically a single sentense.
+
+    Mandatory.
+
+- `"version"`: String
+
+    An arbitrary string shown to the user, which may be helpful to identify the particular version
+    of the plugin. A scheme like `"1.0.2"` can be recommended, but may vary according to the plugin
+    vendor needs.
+
+    Optional.
+
+- `"vendor"`: String
+
+    The full name of the organization which is the author of the plugin. May look like e.g.
+    `"My Company, Inc."`.
+
+    Mandatory.
+
+- `"engineSettingsModel"`: SettingsModel (Object)
+
+    Describes the names, types, and default values of the settings that an Engine of this plugin
+    may have.
+
+    Optional. If omitted or empty, means there are no settings.
+
+---------------------------------------------------------------------------------------------------
+## Engine Manifest
+
+Engine Manifest is a JSON Object containing the following fields:
+
+- `"capabilities"`: Flag set (String)
+
+    A combination of zero or more of the following flags, separated with `|`:
+
+    - Flags defining the format of video frames that the Server supplies to the Plugin. No more
+        than one of the following flags can be specified. If none are specified, the Plugin will be
+        supplied the compressed video frames: IConsumingDeviceAgent::doPushDataPacket() will
+        receive instances of ICompressedVideoPacket. Otherwise,
+        IConsumingDeviceAgent::doPushDataPacket() will receive instances of
+        IUncompressedVideoFrame.
+
+        - `needUncompressedVideoFrames_yuv420` - This is the most effective video format, because
+            it is used internally by the Server, and thus no video frame decoding is needed.
+        - `needUncompressedVideoFrames_argb`
+        - `needUncompressedVideoFrames_abgr`
+        - `needUncompressedVideoFrames_rgba`
+        - `needUncompressedVideoFrames_bgra`
+        - `needUncompressedVideoFrames_rgb`
+        - `needUncompressedVideoFrames_bgr`
+
+    - `deviceDependent` - If set, influences the certain aspects of handling of the Plugin. It is
+        intended for Plugins which "work on a device", that is, are wrappers for the video
+        analytics running inside the camera. For example, such plugins are compatible with a
+        certain camera family, and do not consume video stream from the Server. The opposite plugin
+        type, not having this flag, is called "device-independent" - for example, such plugins may
+        analyze video from any camera using either their own code, or via a backend (a server or
+        an analytics device).
+
+    - `keepObjectBoundingBoxRotation` - If a camera for which the plugin is working has frame
+        rotation option set to 90, 180 or 270 degrees, this flag makes all metadata Objects
+        generated by the plugin rotate accordingly. Note that the plugin always receives video
+        frames in their native rotation, not honoring the rotation setting made by the VMS user.
+
+    Optional; default value is empty.
+
+- `"streamTypeFilter"`: Flag set (String)
+
+    A combination of zero or more of the following flags, separated with `|`, defining which kind
+    of streaming data will the plugin receive from the Server in
+    IConsumingDeviceAgent::doPushDataPacket():
+
+    - `compressedVideo` - Compressed video packets, as ICompressedVideoPacket.
+    - `uncompressedVideo` - Uncompressed video frames, as IUncompressedVideoFrame.
+    - `metadata` - Metadata that comes in the RTSP stream, as ICustomMetadataPacket.
+    - `motion` - Motion metadata retrieved by the Server's Motion Engine, as IMotionMetadataPacket.
+
+    Optional; default value is empty.
+
+- `"preferredStream"`: Enumeration (String)
+
+    For plugins consuming a video stream, declares which of the video streams from a camera is
+    preferred by the plugin: a low-resolution one, or a high-resolution one.
+
+    - `"undefined"` - VMS choses the stream automatically.
+    - `"primary"` - High-resolution stream.
+    - `"secondary"` - Low-resolution stream.
+
+    Optional; default value is `"undefined"`.
+
+- `"eventTypes"`: Array<Object>
+
+    Types of Events that can potentially be produced by any DeviceAgent of this Engine. To enable
+    these Event types, a particular DeviceAgent must whitelist them in its Manifest.
+
+    The structure of these JSON objects is described in the corresponding section of this document.
+
+- `"objectTypes"`: Array<Object>
+
+    Types of Objects that can potentially be produced by any DeviceAgent of this Engine. To enable
+    these Object types, a particular DeviceAgent must whitelist them in its Manifest.
+
+    The structure of these JSON objects is described in the corresponding section of this document.
+
+- `"groups"`: Array<Object>
+
+    Groups that are used to group Object and Event types declared by this Manifest.
+
+    The structure of these JSON objects is described in the corresponding section of this document.
+
+- `"objectActions"`: Array<Object>
+
+    A possibly empty list of Objects, each being a declaration of an Engine ObjectAction - the user
+    may select an Analytics Object (e.g. as a context action for the object rectangle on a video
+    frame or in the notification panel), and choose an ObjectAction to trigger from the list of all
+    compatible ObjectActions from all Engines.
+
+    When the user triggers an Action, the IEngine::executeAction() is called and supplied the data
+    for the Action in the form of IAction.
+
+    This JSON object has the following fields:
+
+    - `"id"`: Id (String)
+
+        Id of the action type, like `"vendor.pluginName.actionName"`.
+
+    - `"name"`: String
+
+        Action name to be shown to the user.
+
+    - `"supportedObjectTypeIds"`: Array<String>
+
+        List of ObjectType ids that are compatible with this Action. An empty list means that the
+        Action supports any type of Objects.
+
+    - `"parametersModel"`: SettingsModel (Object)
+
+        Describes the names, types, and default values of the parameters that the user must supply
+        before executing the Action.
+
+    - `"requirements"`: Object
+
+        Information about the Action that the Server needs to know. A JSON object with the
+        following fields:
+
+        - `"capabilities"`: Flag set (String)
+
+            A combination of zero or more of the following flags, separated with `|`:
+
+            - `needBestShotVideoFrame` - Whether the Action requires the Server to provide it with
+                the Best Shot video frame via IAction::getObjectTrackInfo(). If this capability is
+                not set, then IObjectTrackInfo::bestShotVideoFrame() will return null to the
+                plugin.
+
+            - `needBestShotObjectMetadata` - Whether the Action requires the Server to provide it
+                with the Best Shot rectangle via IAction::getObjectTrackInfo(). If this capability
+                is not set, then IObjectTrackInfo::bestShotObjectMetadata() will return null to the
+                plugin.
+
+            - `needFullTrack` - Whether the Action requires the Server to provide it with the full
+                Object track via IAction::getObjectTrackInfo(). If this capability is not set,
+                then IObjectTrackInfo::track() will return null to the plugin, but the
+                Server performance on executing the action will be much better, because there will
+                be no need to retrieve all Object Metadata (rectangles) for the given Track Id from
+                the database.
+
+            Optional; default value is empty.
+
+        - `"bestShotVideoFramePixelFormat"`: Enumeration (String)
+
+            If the `"capabilities"` field includes `needBestShotVideoFrame`, this field must be
+            present and have one of the following:
+            - `"yuv420"`
+            - `"argb"`
+            - `"abgr"`
+            - `"rgba"`
+            - `"bgra"`
+            - `"rgb"`
+            - `"bgr"`
+
+- `"deviceAgentSettingsModel"`: SettingsModel (Object)
+
+    Describes the names, types, and default values of the settings that a DeviceAgent of this
+    plugin may have.
+
+    Optional. If omitted or empty, means there are no settings.
+
+---------------------------------------------------------------------------------------------------
+## DeviceAgent Manifest
+
+DeviceAgent Manifest is a JSON Object containing the following fields:
+
+- `"capabilities"`: Flag set (String)
+
+    A combination of zero or more of the following flags, separated with `|`:
+
+    - `disableStreamSelection` - If set, the user will not be offered to choose between the Primary
+        (high-quality) and Secondary (low-quality) streams when activating this plugin for a
+        camera.
+
+    Optional; default value is empty.
+
+- `"supportedEventTypeIds"`: Array<String>
+
+    Whitelist (filter) of Event type ids for types declared in the owner Engine manifest.
+
+- `"supportedObjectTypeIds"`: Array<String>
+
+    Whitelist (filter) of Object type ids for types declared in the owner Engine manifest.
+
+- `"eventTypes"`: Array<Object>
+
+    Types of Events that can be generated by this particular DeviceAgent instance, in addition to
+    the types declared in the Engine manifest that are whitelisted by `"supportedEventTypeIds"`.
+
+    The structure of these JSON objects is described in the corresponding section of this document.
+
+- `"objectTypes"`: Array<Object>
+
+    Types of Objects that can be generated by this particular DeviceAgent instance, in addition to
+    the types declared in the Engine manifest that are whitelisted by `"supportedObjectTypeIds"`.
+
+    The structure of these JSON objects is described in the corresponding section of this document.
+
+- `"groups"`: Array<Object>
+
+    Groups that are used to group Object and Event types declared by this Manifest.
+
+    The structure of these JSON objects is described in the corresponding section of this document.
+
+---------------------------------------------------------------------------------------------------
+## Object types and Event types
+
+### Event types
+
+This JSON object describes an Event type. It has the following fields:
+
+- `"id"`: Id (String)
+
+    Identifier for the Event type. May look like `"myCompany.faceDetection.loitering"`.
+
+    Mandatory.
+
+- `"name"`: String
+
+    Full name of the Event type, in English. Will be shown to the user. May look like
+    `"Loitering"`.
+
+    Mandatory.
+
+- `"flags"`: Flag set (String)
+
+    A combination of zero or more of the following flags, separated with `|`:
+
+    - `stateDependent` - Prolonged event with active and non-active states.
+    - `regionDependent` - Event has reference to a region on a video frame.
+    - `hidden` - Event type is hidden in the Client.
+
+    Optional; default value is empty.
+
+- `"groupId"`: Id (String)
+
+    Identifier of a Group that the Event type belongs to.
+
+    Optional; default value is empty, which means that the Event type does not belong to a Group.
+
+- `"provider"`: String
+
+    Describes the source of the Event type when necessary. For example, if the analysis is
+    performed inside a camera, and there are various apps installed on the camera, the name of the
+    app which produces such Events may go here.
+
+    Optional; default value is empty.
+
+### Object types
+
+This JSON object describes an Event type. It has the following fields:
+
+- `"id"`: Id (String)
+
+    Identifier for the Object type. May look like `"myCompany.faceDetection.face"`.
+
+    Mandatory.
+
+- `"name"`: String
+
+    Full name of the Object type, in English. Will be shown to the user. May look like
+    `"Human face"`.
+
+    Mandatory.
+
+- `"provider"`: String
+
+    Describes the source of the Object type when necessary. For example, if the analysis is
+    performed inside a camera, and there are various apps installed on the camera, the name of the
+    app which produces such Objects may go here.
+
+    Optional; default value is empty.
+
+### Groups
+
+This JSON object describes a group for types that have a `"groupId"` field. It has the following
+fields:
+
+- `"id"`: Id (String)
+
+    Identifier for the group. May look like `"myCompany.faceDetection.loitering"`. There is no
+    problem if such identifier coincides with an identifier of some other entity, e.g. an Event
+    type.
+
+    Mandatory.
+
+- `"name"`: String
+
+    Full name of the group, in English. Will be shown to the user. May look like
+    `"Loitering-related events"`.
+
+    Mandatory.

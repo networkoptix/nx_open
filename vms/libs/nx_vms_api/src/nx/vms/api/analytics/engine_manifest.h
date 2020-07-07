@@ -17,14 +17,11 @@ namespace nx::vms::api::analytics {
 /**
  * The JSON-serializable data structure that is given by each Analytics Plugin's Engine to the
  * Server after the Engine has been created by the Plugin.
+ *
+ * See the description of the fields in manifests.md.
  */
 struct NX_VMS_API EngineManifest
 {
-    /**
-     * Declaration of an Engine ObjectAction - the user may select an analytics Object (e.g.
-     * as a context action for the object rectangle on a video frame), and choose an ObjectAction
-     * to trigger from the list of all compatible ObjectActions from all Engines.
-     */
     struct ObjectAction
     {
         enum Capability
@@ -39,15 +36,18 @@ struct NX_VMS_API EngineManifest
         struct Requirements
         {
             Capabilities capabilities;
+
+            // TODO: Investigate what happens if the Manifest is missing the value for this field -
+            // it seems it will remain PixelFormat::undefined and an assertion will fail in
+            // apiToAvPixelFormat().
             PixelFormat bestShotVideoFramePixelFormat;
         };
         #define nx_vms_api_analytics_Engine_ObjectAction_Requirements_Fields \
             (capabilities)(bestShotVideoFramePixelFormat)
 
-        QString id; /**< Id of the action type, like "vendor.pluginName.actionName". */
-        QString name; /**< Action name to be shown to the user. */
+        QString id;
+        QString name;
 
-        // Empty list means that the Action supports any type of objects.
         QList<QString> supportedObjectTypeIds;
         QJsonObject parametersModel;
         Requirements requirements;
@@ -67,27 +67,17 @@ struct NX_VMS_API EngineManifest
         needUncompressedVideoFrames_rgb = 1 << 5,
         needUncompressedVideoFrames_bgr = 1 << 6,
         deviceDependent = 1 << 7,
-        keepObjectBoundingBoxRotation = 1 << 8,        
+        keepObjectBoundingBoxRotation = 1 << 8,
     };
     Q_DECLARE_FLAGS(Capabilities, Capability)
 
     Capabilities capabilities;
-
     StreamTypes streamTypeFilter;
-
     StreamIndex preferredStream = StreamIndex::undefined;
-
-    /** Types of Events that can potentially be produced by any DeviceAgent of this Engine. */
     QList<EventType> eventTypes;
-
-    /** Types of Objects that can potentially be produced by any DeviceAgent of this Engine. */
     QList<ObjectType> objectTypes;
-
-    /** Groups that are used to group Object and Event types declared by this manifest. */
     QList<Group> groups;
-
-    QList<ObjectAction> objectActions;    
-
+    QList<ObjectAction> objectActions;
     QJsonObject deviceAgentSettingsModel;
 };
 #define EngineManifest_Fields \

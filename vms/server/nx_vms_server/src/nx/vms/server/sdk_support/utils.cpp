@@ -228,7 +228,7 @@ nx::sdk::Ptr<IUncompressedVideoFrame> createUncompressedVideoFrame(
     nx::vms::server::analytics::DataConverter dataConverter(rotationAngle);
     nx::vms::server::analytics::StreamRequirements streamRequirements;
 
-    streamRequirements.uncompressedFramePixelFormat =  apiToAvPixelFormat(pixelFormat);
+    streamRequirements.uncompressedFramePixelFormat = apiToAvPixelFormat(pixelFormat);
     streamRequirements.requiredStreamTypes |=
         nx::vms::api::analytics::StreamType::uncompressedVideo;
 

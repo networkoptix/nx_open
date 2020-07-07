@@ -5,12 +5,13 @@
 
 namespace nx::vms::api::analytics {
 
+/** See the documentation in manifests.md. */
 enum EventTypeFlag
 {
     noFlags = 0,
-    stateDependent = 1 << 0, //< Prolonged event with active and non-active states.
-    regionDependent = 1 << 1, //< Event has reference to a region on a video frame.
-    hidden = 1 << 2, //< Event type is hidden in the client.
+    stateDependent = 1 << 0,
+    regionDependent = 1 << 1,
+    hidden = 1 << 2,
 };
 Q_DECLARE_FLAGS(EventTypeFlags, EventTypeFlag)
 
@@ -22,20 +23,21 @@ struct NamedItem
 #define NamedItem_Fields (id)(name)
 
 /**
- * Description of the analytics event.
+ * Description of the Analytics Event type.
  */
 struct EventType: NamedItem
 {
     EventTypeFlags flags = EventTypeFlag::noFlags;
     QString groupId;
     QString provider;
+
     bool isStateful() const noexcept { return flags.testFlag(EventTypeFlag::stateDependent); }
 };
 #define EventType_Fields NamedItem_Fields (flags)(groupId)(provider)
 uint NX_VMS_API qHash(const EventType& eventType);
 
 /**
- * Description of the analytics object.
+ * Description of the Analytics Object Type.
  */
 struct ObjectType: NamedItem
 {

@@ -24,7 +24,7 @@ std::string Plugin::manifestString() const
 {
     "id": "nx.stub",
     "name": "Stub analytics plugin",
-    "description": "A plugin for testing and debugging purposes",
+    "description": "A plugin for testing and debugging purposes.",
     "version": "1.0.0",
     "vendor": "Plugin vendor",
     "engineSettingsModel": {
