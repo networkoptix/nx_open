@@ -45,7 +45,7 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>Szerver leválasztása a rendszerről</h3>
-                        <p>This action will detach server from the System keeping database, local users and configuration.
+                        <p>Ez a művelet leválasztja a szervert a rendszertől, amely megőrzi az adatbázist, a helyi felhasználókat és a konfigurációt.
                             A videóarchívum sértetlen marad. <b>felhő felhasználók törlésre kerülnek</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Leválasztás a rendszerről</button></p>
                     </div>
@@ -96,7 +96,7 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
                         <h3>{{Config.cloud.productName}}</h3>
 
                         <div ng-if="cloudSystemID">
-                            <p>This System is linked to {{Config.cloud.productName}}, System owner: <b>{{cloudAccountName}}</b></p>
+                            <p>Ez a rendszer {{Config.cloud.productName}}kapcsolódik, a rendszer tulajdonosa: <b>{{cloudAccountName}}</b></p>
                             <p ng-if="canConnectToCloud"><button class="btn btn-default" ng-click="disconnectFromCloud()">{{Config.cloud.productName}} leválasztása</button></p>
                             <p><a ng-if="!mode.liteClient"
                                   ng-href="{{Config.cloud.portalUrl}}{{Config.cloud.portalSystemUrl.replace('{systemId}',cloudSystemID) + Config.cloud.webadminContext}}"
@@ -104,10 +104,10 @@ Kérjük csatlakozzon a hálózatra, vagy állítsa be a helyes IP-címet.
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <uib-alert type="warning">This System is not linked to {{Config.cloud.productName}}
+                            <uib-alert type="warning">Ez a rendszer nem kapcsolódik a {{Config.cloud.productName}}
                                 <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
-                                   target="_blank">Learn more</a></uib-alert>
+                                   target="_blank"> -hoz </a></uib-alert>
                             <uib-alert type="danger" ng-if="!hasInternetOnServer">{{Config.cloud.productName}} beállításainak elvégzéséhez csatlakozzon az Internetre</uib-alert>
                             <uib-alert type="danger" ng-if="hasInternetOnServer && !hasInternetOnClient">Internet kapcsolat szükséges {{Config.cloud.productName}} felhőhöz való csatlakozáshoz</uib-alert>
                             <p ng-if="canConnectToCloud"><button
