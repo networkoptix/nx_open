@@ -34,7 +34,7 @@ public:
 class ISettingsResponse: public Interface<ISettingsResponse, ISettingsResponse0>
 {
 public:
-    static auto interfaceId() { return makeId("nx::sdk::ISettingsResponse0"); }
+    static auto interfaceId() { return makeId("nx::sdk::ISettingsResponse1"); }
 
     /** Called by model() */
     protected: virtual IString* getModel() const = 0;

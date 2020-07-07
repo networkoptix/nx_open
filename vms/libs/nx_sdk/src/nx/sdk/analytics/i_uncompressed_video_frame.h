@@ -72,7 +72,7 @@ public:
 class IUncompressedVideoFrame: public Interface<IUncompressedVideoFrame, IUncompressedVideoFrame0>
 {
 public:
-    static auto interfaceId() { return makeId("nx::sdk::analytics::IUncompressedVideoFrame0"); }
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IUncompressedVideoFrame1"); }
 
     /** Called by metadataList() */
     protected: virtual IList<IMetadataPacket>* getMetadataList() const = 0;
