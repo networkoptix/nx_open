@@ -2327,7 +2327,8 @@ bool QnPlOnvifResource::trustMaxFPS()
 
 bool QnPlOnvifResource::getVideoEncoder1Tokens(BaseSoapWrapper& soapWrapper,
     const std::vector<onvifXsd__VideoEncoderConfiguration*>& configurations,
-    QStringList* tokenList)
+    QStringList* outTokenList,
+    QString* outErrorText)
 {
     int confRangeStart = 0;
     int confRangeEnd = (int)configurations.size();
@@ -2339,9 +2340,9 @@ bool QnPlOnvifResource::getVideoEncoder1Tokens(BaseSoapWrapper& soapWrapper,
 
         if (confRangeEnd > (int) configurations.size())
         {
-            const QString errorMessage =
-                makeFailMessage("Current channel number is %1, that is more then number "
-                "of configurations").arg(QString::number(getChannel()));
+            *outErrorText = nx::utils::log::makeMessage(
+                "Current channel number is %1, that is more then number of video encoder configurations %2",
+                getChannel() + 1, configurations.size());
 
             NX_DEBUG(this, makeSoapSmallRangeMessage(
                 soapWrapper, "configurations", (int) configurations.size(), confRangeEnd, __func__,
@@ -2354,7 +2355,7 @@ bool QnPlOnvifResource::getVideoEncoder1Tokens(BaseSoapWrapper& soapWrapper,
     {
         const onvifXsd__VideoEncoderConfiguration* configuration = configurations[i];
         if (configuration)
-            tokenList->push_back(QString::fromStdString(configuration->token));
+            outTokenList->push_back(QString::fromStdString(configuration->token));
     }
 
     return true;
@@ -2362,7 +2363,7 @@ bool QnPlOnvifResource::getVideoEncoder1Tokens(BaseSoapWrapper& soapWrapper,
 
 bool QnPlOnvifResource::getVideoEncoder2Tokens(BaseSoapWrapper& soapWrapper,
     const std::vector<onvifXsd__VideoEncoder2Configuration*>& configurations,
-    QStringList* tokenList)
+    QStringList* outTokenList)
 {
     int confRangeStart = 0;
     int confRangeEnd = (int)configurations.size();
@@ -2374,10 +2375,6 @@ bool QnPlOnvifResource::getVideoEncoder2Tokens(BaseSoapWrapper& soapWrapper,
 
         if (confRangeEnd > (int)configurations.size())
         {
-            const QString errorMessage =
-                makeFailMessage("Current channel number is %1, that is more then number "
-                    "of configurations").arg(QString::number(getChannel()));
-
             NX_DEBUG(this, makeSoapSmallRangeMessage(
                 soapWrapper, "configurations", (int)configurations.size(), confRangeEnd, __func__,
                 "GetVideoEncoderConfiguration"));
@@ -2389,7 +2386,7 @@ bool QnPlOnvifResource::getVideoEncoder2Tokens(BaseSoapWrapper& soapWrapper,
     {
         const onvifXsd__VideoEncoder2Configuration* configuration = configurations[i];
         if (configuration)
-            tokenList->push_back(QString::fromStdString(configuration->token));
+            outTokenList->push_back(QString::fromStdString(configuration->token));
     }
 
     return true;
@@ -2614,10 +2611,11 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
                 return videoEncoder1Configurations.requestFailedResult();
             }
 
+            QString errorText;
             auto result = getVideoEncoder1Tokens(videoEncoder1Configurations.innerWrapper(),
-                videoEncoder1Configurations.get()->Configurations, &videoEncodersTokenList);
+                videoEncoder1Configurations.get()->Configurations, &videoEncodersTokenList, &errorText);
             if (!result)
-                return videoEncoder1Configurations.requestFailedResult();
+                return videoEncoder1Configurations.requestFailedResult(errorText);
         }
     }
 
