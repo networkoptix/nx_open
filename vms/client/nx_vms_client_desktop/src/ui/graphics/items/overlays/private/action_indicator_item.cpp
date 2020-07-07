@@ -66,6 +66,11 @@ QnActionIndicatorItem::QnActionIndicatorItem(QGraphicsWidget* parent):
     setOpacity(0.0);
 }
 
+QnActionIndicatorItem::~QnActionIndicatorItem()
+{
+    // Required here for forward-declared scoped pointer destruction.
+}
+
 QString QnActionIndicatorItem::text() const
 {
     return d->text;

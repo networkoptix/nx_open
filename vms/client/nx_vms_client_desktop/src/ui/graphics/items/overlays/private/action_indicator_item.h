@@ -15,7 +15,7 @@ class QnActionIndicatorItem: public Customized<QGraphicsWidget>
 
 public:
     explicit QnActionIndicatorItem(QGraphicsWidget* parent = nullptr);
-    virtual ~QnActionIndicatorItem() override = default;
+    virtual ~QnActionIndicatorItem() override;
 
     QString text() const;
     void setText(const QString& value);
