@@ -1,7 +1,7 @@
 # External APIs
 
-WARNING: This is an API Preposition. Current version of this document may not be relevant to the
-actual state of things in the server.
+WARNING: This is an API Proposal. Current version of this document may not be relevant to the
+actual state of things in the Server.
 
 NOTE: Due to current `nx_fussion` limitations optional fields can not be skipped in the output.
 Thus empty values (e.g. `""`, `[]`, `{}`, `null`) must be treated as non-present.
