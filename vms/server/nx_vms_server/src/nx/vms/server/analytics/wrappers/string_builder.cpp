@@ -1,5 +1,7 @@
 #include "string_builder.h"
 
+#include <nx/utils/switch.h>
+
 #include <nx/vms/server/sdk_support/to_string.h>
 #include <nx/fusion/model_functions.h>
 
@@ -15,9 +17,9 @@ static QString toString(SdkMethod sdkMethod)
     return QnLexical::serialized(sdkMethod) + "()";
 }
 
-static QString toString(ViolationType violation)
+static QString toString(ViolationType violationType)
 {
-    switch (violation)
+    switch (violationType)
     {
         case ViolationType::nullManifest:
             return "Manifest is null";
@@ -28,8 +30,8 @@ static QString toString(ViolationType violation)
         case ViolationType::invalidJson:
             return "Manifest deserialization error - manifest is not a valid JSON";
         case ViolationType::invalidJsonStructure:
-            return "Manifest deserialization error - unable to deserialize provided JSON to the "
-                "Manifest structure";
+            return "Manifest deserialization error - "
+                "unable to deserialize the provided JSON to the Manifest structure";
         case ViolationType::manifestLogicalError:
             return "Manifest contains logical errors";
         case ViolationType::nullEngine:
@@ -40,10 +42,42 @@ static QString toString(ViolationType violation)
             return "Action result contains invalid URL";
         case ViolationType::methodExecutionTookTooLong:
             return "Method execution took too long";
-        default:
-            NX_ASSERT(false);
-            return "Unknown violation";
+
+        case ViolationType::undefined:
+            NX_ASSERT(false, "ViolationType must not be undefined.");
+            return "Undefined violation";
     }
+    NX_ASSERT(false, "Unknown ViolationType %1.", (int) violationType);
+    return "Unknown violation";
+}
+
+/**
+ * @return User-understandable description of the action performed by the given method. Does not
+ *     have to be precise - it only must give the user the idea of what is going wrong; the exact
+ *     details for technical support must be provided alongside.
+ */
+static QString methodDescription(SdkMethod sdkMethod)
+{
+    switch (sdkMethod)
+    {
+        case SdkMethod::manifest: return "produce Manifest";
+        case SdkMethod::setSettings: return "accept Settings";
+        case SdkMethod::pluginSideSettings: return "provide Settings";
+        case SdkMethod::setHandler: return "initialize";
+        case SdkMethod::createEngine: return "start";
+        case SdkMethod::setEngineInfo: return "accept info";
+        case SdkMethod::isCompatible: return "inform about Camera/Device compatibility";
+        case SdkMethod::obtainDeviceAgent: return "start working with Camera/Device";
+        case SdkMethod::executeAction: return "execute Action";
+        case SdkMethod::setNeededMetadataTypes: return "accept Metadata types";
+        case SdkMethod::pushDataPacket: return "accept audio/video/metadata";
+
+        case SdkMethod::undefined:
+            NX_ASSERT(false, "SdkMethod must not be undefined.");
+            return "perform an undefined action";
+    }
+    NX_ASSERT(false, "Unknown SdkMethod %1.", (int) sdkMethod);
+    return "perform an unknown action";
 }
 
 StringBuilder::StringBuilder(
@@ -55,6 +89,7 @@ StringBuilder::StringBuilder(
     m_sdkObjectDescription(std::move(sdkObjectDescription)),
     m_error(std::move(error))
 {
+    NX_ASSERT(!m_error.isOk());
 }
 
 StringBuilder::StringBuilder(
@@ -66,86 +101,47 @@ StringBuilder::StringBuilder(
     m_sdkObjectDescription(std::move(sdkObjectDescription)),
     m_violation(violation)
 {
+    NX_ASSERT(m_violation.type != ViolationType::undefined);
 }
 
 QString StringBuilder::buildLogString() const
 {
-    if (m_violation.type != ViolationType::undefined)
-        return buildViolationFullString();
-
-    return buildErrorFullString();
+    return buildPluginDiagnosticEventDescription();
 }
 
 QString StringBuilder::buildPluginInfoString() const
 {
-    if (m_violation.type != ViolationType::undefined)
-        return buildViolationPluginInfoString();
-
-    return buildErrorPluginInfoString();
-}
-
-QString StringBuilder::buildViolationPluginInfoString() const
-{
-    return lm("Method %1::%2 violated its contract: %3%4").args(
+    const QString methodCaption = NX_FMT("Method %1::%2 of %3",
         m_sdkObjectDescription.sdkObjectType(),
         m_sdkMethod,
-        m_violation.type,
-        m_violation.details.isEmpty()
-            ? ""
-            : lm(", details: %1").args(m_violation.details));
-}
+        m_sdkObjectDescription.descriptionString());
 
-QString StringBuilder::buildErrorPluginInfoString() const
-{
-    return lm("Method %1::%2 returned an error: %3").args(
-        m_sdkObjectDescription.sdkObjectType(), m_sdkMethod, m_error);
+    if (m_violation.type != ViolationType::undefined)
+    {
+        return NX_FMT("%1 violated its contract: %2%3",
+            methodCaption,
+            m_violation.type,
+            m_violation.details.isEmpty() ? "" : (", details: " + m_violation.details));
+    }
+
+    return NX_FMT("%1 returned an error: %2", methodCaption, m_error);
 }
 
 QString StringBuilder::buildPluginDiagnosticEventCaption() const
 {
     if (m_violation.type != ViolationType::undefined)
-        return buildViolationShortString();
+        return "Issue with Analytics Plugin detected";
 
-    return buildErrorShortString();
+    return "Error in Analytics Plugin detected";
 }
 
 QString StringBuilder::buildPluginDiagnosticEventDescription() const
 {
-    if (m_violation.type != ViolationType::undefined)
-        return buildViolationFullString();
+    const QString prefix = (m_sdkMethod == SdkMethod::undefined)
+        ? ""
+        : NX_FMT("Plugin cannot %1. ", methodDescription(m_sdkMethod));
 
-    return buildErrorFullString();
-}
-
-QString StringBuilder::buildViolationFullString() const
-{
-    return lm("Technical details: Method %1::%2 of [%3] violated its contract: %4%5").args(
-        m_sdkObjectDescription.sdkObjectType(),
-        m_sdkMethod,
-        m_sdkObjectDescription.descriptionString(),
-        m_violation.type,
-        m_violation.details.isEmpty()
-            ? ""
-            : lm(", details: %1").args(m_violation.details));
-}
-
-QString StringBuilder::buildViolationShortString() const
-{
-    return "Issue with the plugin detected";
-}
-
-QString StringBuilder::buildErrorFullString() const
-{
-    return lm("Method %1::%2 of [%3] returned an error: %4").args(
-        m_sdkObjectDescription.sdkObjectType(),
-        m_sdkMethod,
-        m_sdkObjectDescription.descriptionString(),
-        m_error);
-}
-
-QString StringBuilder::buildErrorShortString() const
-{
-    return lm("Error in [%1]").args(m_sdkObjectDescription.descriptionString());
+    return prefix + "Technical details: " + buildPluginInfoString();
 }
 
 } // namespace nx::vms::server::analytics::wrappers

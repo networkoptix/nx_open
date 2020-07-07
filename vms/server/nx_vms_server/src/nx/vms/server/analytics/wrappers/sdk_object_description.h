@@ -24,10 +24,11 @@ public:
     resource::CameraPtr device() const;
 
     SdkObjectType sdkObjectType() const;
-
     QString descriptionString() const;
-
     QString baseInputOutputFilename() const;
+
+private:
+    QString engineCaption() const;
 
 private:
     const resource::AnalyticsPluginResourcePtr m_plugin;

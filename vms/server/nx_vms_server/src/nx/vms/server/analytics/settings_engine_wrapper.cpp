@@ -4,6 +4,8 @@
 #include <nx/vms/server/event/event_connector.h>
 #include <nx/vms/server/resource/camera.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
+#include <nx/vms/server/resource/analytics_plugin_resource.h>
+#include <nx/vms/server/analytics/wrappers/sdk_object_description.h>
 
 namespace nx::vms::server::analytics {
 
@@ -18,7 +20,8 @@ static QString buildIssuesDescription(const QList<Issue>& issues, Issue::Type is
         if (issue.type != issueType)
             continue;
 
-        result += NX_FMT("[%1]: %2; ", issue.code, issue.message);
+        // Concatenate all issues via a space.
+        result += NX_FMT("[%1] %2 ", issue.code, issue.message);
     }
 
     if (!result.isEmpty())
@@ -44,20 +47,20 @@ SettingsEngineWrapper::SettingsEngineWrapper(
 bool SettingsEngineWrapper::loadModelFromJsonObject(const QJsonObject& json)
 {
     const bool result = m_settingsEngine.loadModelFromJsonObject(json);
-    reportIssues("loading settings model", m_settingsEngine.issues());
+    reportIssues("load Settings Model", m_settingsEngine.issues());
     return result;
 }
 
 void SettingsEngineWrapper::applyValues(const QJsonObject& values)
 {
     m_settingsEngine.applyValues(values);
-    reportIssues("applying settings values", m_settingsEngine.issues());
+    reportIssues("apply Settings", m_settingsEngine.issues());
 }
 
 void SettingsEngineWrapper::applyStringValues(const QJsonObject& values)
 {
     m_settingsEngine.applyStringValues(values);
-    reportIssues("applying settings values", m_settingsEngine.issues());
+    reportIssues("apply Settings from the Plugin", m_settingsEngine.issues());
 }
 
 QJsonObject SettingsEngineWrapper::values() const
@@ -74,13 +77,15 @@ void SettingsEngineWrapper::reportIssues(
     const QString& operationDescription,
     const QList<nx::vms::server::interactive_settings::Issue>& issues)
 {
-    QString caption = NX_FMT("Issues detected while %1, Engine: %2",
-        operationDescription,
-        (m_engine ? m_engine->getName() : "<null>"));
+    const QString issueSource = wrappers::SdkObjectDescription(
+        m_engine->plugin().dynamicCast<nx::vms::server::resource::AnalyticsPluginResource>(),
+        m_engine,
+        m_device
+    ).descriptionString();
 
-    if (m_device)
-        caption += NX_FMT(" %1", m_device->getUserDefinedName());
-
+    const QString caption = "Issue(s) with Analytics Plugin settings detected";
+    const QString descriptionPrefix = lm("Server cannot %1. Technical details: %2: ").args(
+        operationDescription, issueSource);
     const QString warningDescription = buildIssuesDescription(issues, Issue::Type::warning);
     const QString errorDescription = buildIssuesDescription(issues, Issue::Type::error);
 
@@ -93,7 +98,7 @@ void SettingsEngineWrapper::reportIssues(
                 currentTimeUs,
                 m_engine ? m_engine->getId() : QnUuid(),
                 caption,
-                warningDescription,
+                descriptionPrefix + warningDescription,
                 nx::vms::api::EventLevel::WarningEventLevel,
                 m_device));
 
@@ -107,7 +112,7 @@ void SettingsEngineWrapper::reportIssues(
                 currentTimeUs,
                 m_engine ? m_engine->getId() : QnUuid(),
                 caption,
-                errorDescription,
+                descriptionPrefix + errorDescription,
                 nx::vms::api::EventLevel::ErrorEventLevel,
                 m_device));
 
