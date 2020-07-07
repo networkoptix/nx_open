@@ -73,8 +73,9 @@ by a plugin:
     itself, and plugin samples).
 
 The recommended way to start developing a plugin is the following: inherit your classes from
-`nx::sdk::analytics::Plugin`, `nx::sdk::analytics::Engine` and `nx::sdk::analytics::DeviceAgent`
-according to the Doxygen comments in those classes and interfaces they implement.
+`nx::sdk::analytics::Plugin`, `nx::sdk::analytics::Engine` and
+`nx::sdk::analytics::ConsumingDeviceAgent` according to the Doxygen comments in those classes and
+interfaces they implement.
 
 ---------------------------------------------------------------------------------------------------
 ## Samples: building and installing
