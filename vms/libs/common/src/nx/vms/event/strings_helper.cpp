@@ -378,10 +378,19 @@ QStringList StringsHelper::eventDetails(const EventParameters& params) const
         case EventType::analyticsSdkEvent:
         case EventType::userDefinedEvent:
         case EventType::pluginDiagnosticEvent:
+        {
+            QString message;
+            if (!params.caption.isEmpty())
+                message = params.caption;
             if (!params.description.isEmpty())
-                result << params.description;
+            {
+                if (!message.isEmpty())
+                    message += ": ";
+                message + params.description;
+            }
+            result << message;
             break;
-
+        }
         case EventType::softwareTriggerEvent:
             result << tr("Trigger: %1").arg(getSoftwareTriggerName(params));
             break;
