@@ -18,15 +18,17 @@ public:
     /** Called by values() */
     protected: virtual IStringMap* getValues() const = 0;
     /**
-     * @return Map of setting values, indexed by setting ids.
+     * @return Map of setting values, indexed by setting ids. Can be null or empty if there are no
+     *     setting values to return.
      */
     public: Ptr<IStringMap> values() const { return toPtr(getValues()); }
 
     /** Called by errors() */
     protected: virtual IStringMap* getErrors() const = 0;
     /**
-     * @return Map of errors that happened while obtaining setting values, indexed by setting
-     *     ids. Each value must be a human-readable error message in English.
+     * @return Map of errors that happened while processing (applying or obtaining) setting values,
+     *     indexed by setting ids. Each value must be a human-readable error message in English.
+     *     Can be null or empty if there are no errors.
      */
     public: Ptr<IStringMap> errors() const { return toPtr(getErrors()); }
 };
@@ -38,6 +40,11 @@ public:
 
     /** Called by model() */
     protected: virtual IString* getModel() const = 0;
+    /**
+     * @return New Settings Model, overriding the one from the parent object's Manifest, in case
+     *     the Model has been changed e.g. because its parts depend on some setting values. Can be
+     *     null if the Model has not been changed.
+     */
     public: Ptr<IString> model() const { return toPtr(getModel()); }
 };
 

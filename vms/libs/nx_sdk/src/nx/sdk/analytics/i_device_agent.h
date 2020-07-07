@@ -58,18 +58,17 @@ public:
         Result<const ISettingsResponse*>* outResult, const IStringMap* settings) = 0;
 
     /**
-     * Called before other methods. Server provides the set of settings stored in its database,
-     * combined with the values received from the plugin via pluginSideSettings() (if any), for
-     * the combination of a device instance and an Engine instance.
+     * Receives the values of settings stored in the Server database for the combination of a
+     * device instance and an Engine instance.
      *
-     * @param settings Values of settings declared in the manifest. Never null.
-     * @return Result containing a map of errors that occurred while applying each setting - the
-     *     keys are the setting ids, and the values are human readable error strings in English.
-     *     Even if some settings can't be applied or an error happens while applying them, this
-     *     method must return a successful result with a corresponding map of errors. A faulty
-     *     result containing error information instead of the map should be returned only in case
-     *     of some general failure that affected the procedure of applying the settings. The result
-     *     should contain null if no errors occurred.
+     * After creating the new IDeviceAgent instance, this method is called after manifest().
+     *
+     * @param settings Values of settings conforming to the Settings Model. Never null.
+     *
+     * @return An error code with a message in case of some general failure that affected the
+     *     procedure of applying the settings, or a combination of optional individual setting
+     *     errors, optional new setting values in case they were changed during the applying, and
+     *     an optional new Settings Model.
      */
     public: Result<const ISettingsResponse*> setSettings(const IStringMap* settings)
     {
@@ -88,11 +87,9 @@ public:
      * Settings Model, but every time the Server offers the user to edit the values, it calls this
      * method and merges the received values with the ones in its database.
      *
-     * @return Result containing (in case of success) information about settings that are stored on
-     *     the plugin side. Errors corresponding to the particular settings should be placed in the
-     *     ISettingsResponse object. A faulty result must be returned only in case of a general
-     *     failure that affects the settings retrieval procedure. The result should contain null if
-     *     the Engine has no plugin-side settings.
+     * @return An error code with a message in case of some general failure, or a combination of
+     *     optional individual setting errors, optional setting values, and an optional new
+     *     Settings Model.
      */
     public: Result<const ISettingsResponse*> pluginSideSettings() const
     {
@@ -104,7 +101,7 @@ public:
     /** Called by manifest() */
     protected: virtual void getManifest(Result<const IString*>* outResult) const = 0;
     /**
-     * Provides DeviceAgent manifest in JSON format.
+     * Provides DeviceAgent Manifest in JSON format.
      *
      * @return JSON string in UTF-8.
      */
