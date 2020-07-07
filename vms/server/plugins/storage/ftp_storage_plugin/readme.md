@@ -1,6 +1,6 @@
-// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
-
 # FTP Storage Plugin
+
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 This is a dynamic library that implements remote storage functionality with an FTP server as a
 backend, as a Storage Plugin for the VMS Server, built using Storage SDK.

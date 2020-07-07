@@ -1,6 +1,6 @@
-// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
-
 # Nx Meta VMP Open Source Components
+
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 ---------------------------------------------------------------------------------------------------
 ## Introduction
