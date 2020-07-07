@@ -180,16 +180,16 @@ SdkSettingsResponse toSdkSettingsResponse(
     if (!value)
         return result;
 
-    if (const auto sdkResponse = value->queryInterface<nx::sdk::ISettingsResponse>())
+    if (const auto settingsResponse = value->queryInterface<nx::sdk::ISettingsResponse>())
     {
         result.values = SettingsValues();
-        if (const sdk::Ptr<const IStringMap> settingsValues = sdkResponse->values())
+        if (const sdk::Ptr<const IStringMap> settingsValues = settingsResponse->values())
             result.values = fromSdkStringMap<SettingsValues>(settingsValues);
 
-        if (const sdk::Ptr<const IStringMap> settingsErrors = sdkResponse->errors())
+        if (const sdk::Ptr<const IStringMap> settingsErrors = settingsResponse->errors())
             result.errors = fromSdkStringMap<SettingsErrors>(settingsErrors);
 
-        if (const sdk::Ptr<const IString> settingsModel = sdkResponse->model())
+        if (const sdk::Ptr<const IString> settingsModel = settingsResponse->model())
         {
             const auto modelString = fromSdkString<QString>(settingsModel);
             QJsonDocument doc = QJsonDocument::fromJson(modelString.toUtf8());
@@ -197,20 +197,21 @@ SdkSettingsResponse toSdkSettingsResponse(
                 result.model = doc.object();
         }
     }
-    else if (const auto sdkResponse = value->queryInterface<nx::sdk::ISettingsResponse0>())
+    else if (const auto settingsResponse0 = value->queryInterface<nx::sdk::ISettingsResponse0>())
     {
-        // This type of response may return "pluginSideSettings" of 4.0 plugins.
+        // This type of response may be returned by pluginSideSettings() of 4.0 plugins.
+
         result.values = SettingsValues();
-        if (const sdk::Ptr<const IStringMap> settingsValues = sdkResponse->values())
+        if (const sdk::Ptr<const IStringMap> settingsValues = settingsResponse0->values())
             result.values = fromSdkStringMap<sdk_support::SettingsValues>(settingsValues);
 
-        if (const sdk::Ptr<const IStringMap> settingsErrors = sdkResponse->errors())
+        if (const sdk::Ptr<const IStringMap> settingsErrors = settingsResponse0->errors())
             result.errors = fromSdkStringMap<sdk_support::SettingsErrors>(settingsErrors);
     }
-    else if (const auto sdkResponse = value->queryInterface<nx::sdk::IStringMap>())
+    else if (const auto stringMap = value->queryInterface<nx::sdk::IStringMap>())
     {
-        // This type of response may return "setSettings" of 4.0 plugins.
-        result.errors = fromSdkStringMap<sdk_support::SettingsErrors>(sdkResponse);
+        // This type of response may be returned by setSettings() of 4.0 plugins.
+        result.errors = fromSdkStringMap<sdk_support::SettingsErrors>(stringMap);
     }
 
     return result;
