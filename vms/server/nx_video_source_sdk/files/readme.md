@@ -1,6 +1,6 @@
-// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
-
 # Video Source SDK (aka Camera Integration SDK)
+
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 ---------------------------------------------------------------------------------------------------
 ## License
@@ -100,7 +100,7 @@ build_samples.bat --no-qt-samples
 # or
 ./build_samples.sh --no-qt-samples
 ```
-        
+
 On Windows, after CMake generation phase, Visual Studio GUI can be used to compile a sample:
 open `..\video_source_sdk-build\<sample_name>\<sample_name>.sln` and build the `ALL_BUILD` project.
 Make sure that the platform combo-box is set to "x64".
