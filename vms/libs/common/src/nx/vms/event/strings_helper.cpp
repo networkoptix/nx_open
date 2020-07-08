@@ -386,7 +386,7 @@ QStringList StringsHelper::eventDetails(const EventParameters& params) const
             {
                 if (!message.isEmpty())
                     message += ": ";
-                message + params.description;
+                message += params.description;
             }
             result << message;
             break;
