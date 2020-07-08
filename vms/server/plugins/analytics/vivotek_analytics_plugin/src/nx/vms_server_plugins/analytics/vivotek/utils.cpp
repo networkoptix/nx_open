@@ -7,24 +7,6 @@ namespace nx::vms_server_plugins::analytics::vivotek {
 using namespace std::literals;
 using namespace nx::utils;
 
-double toDouble(const QString& string)
-{
-    bool ok;
-    int value = string.toDouble(&ok);
-    if (!ok)
-        throw Exception("Failed to parse double: %1", string);
-    return value;
-}
-
-int toInt(const QString& string)
-{
-    bool ok;
-    int value = string.toInt(&ok);
-    if (!ok)
-        throw Exception("Failed to parse integer: %1", string);
-    return value;
-}
-
 Url withoutUserInfo(Url url)
 {
     url.setUserInfo("");

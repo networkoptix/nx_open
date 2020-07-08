@@ -273,8 +273,8 @@ struct VcaParserFromCamera
 void fetchFromCamera(CameraSettings::Vca* vca,
     const CameraModuleApi::ModuleInfo& moduleInfo, const Url& cameraUrl)
 {
-    vca->enabled.value = moduleInfo.enabled;
-    if (!moduleInfo.enabled)
+    vca->isEnabled.value = moduleInfo.isEnabled;
+    if (!moduleInfo.isEnabled)
         return;
 
     CameraVcaParameterApi api(cameraUrl);
@@ -653,18 +653,18 @@ struct VcaSerializerToCamera
 void storeToCamera(const Url& cameraUrl,
     CameraSettings::Vca* vca, const CameraModuleApi::ModuleInfo& moduleInfo)
 {
-    if (auto& enabled = vca->enabled; enabled.value)
+    if (auto& isEnabled = vca->isEnabled; isEnabled.value)
     {
         try
         {
-            CameraModuleApi(cameraUrl).enable("VCA", *enabled.value);
-            if (!*enabled.value || (!moduleInfo.enabled && *enabled.value))
+            CameraModuleApi(cameraUrl).enable("VCA", *isEnabled.value);
+            if (!*isEnabled.value || (!moduleInfo.isEnabled && *isEnabled.value))
                 return;
         }
         catch (const std::exception& exception)
         {
-            if (!enabled.error)
-                enabled.error = exception.what();
+            if (!isEnabled.error)
+                isEnabled.error = exception.what();
             return;
         }
     }
@@ -711,7 +711,7 @@ const int kMaxDetectionRuleCount = 5; // Defined in user manual.
 const int kMinRegionVertices = 3;
 const int kMaxRegionVertices = 20; // Defined in user manual.
 
-const QString kVcaEnabled = "Vca.Enabled";
+const QString kVcaIsEnabled = "Vca.IsEnabled";
 const QString kVcaSensitivity = "Vca.Sensitivity";
 
 const QString kVcaInstallationHeight = "Vca.Installation.Height";
@@ -749,7 +749,7 @@ const QString kVcaUnattendedObjectDetectionRequiresHumanInvolvement =
 
 const QString kVcaFaceDetectionRegion = "Vca.FaceDetection#.Region";
 
-const QString kVcaRunningDetectionEnabled = "Vca.RunningDetection#.Enabled";
+const QString kVcaRunningDetectionIsEnabled = "Vca.RunningDetection#.IsEnabled";
 const QString kVcaRunningDetectionName = "Vca.RunningDetection#.Name";
 const QString kVcaRunningDetectionMinPersonCount = "Vca.RunningDetection#.MinPersonCount";
 const QString kVcaRunningDetectionMinSpeed = "Vca.RunningDetection#.MinSpeed";
@@ -870,7 +870,7 @@ struct ParserFromServer
 
     void parse(int* value, const QString& serializedValue)
     {
-        *value = toInt(serializedValue);
+        *value = parseInt(serializedValue);
     }
 
     void parse(QString* value, const QString& serializedValue)
@@ -1136,16 +1136,16 @@ struct ParserFromServer
         {
             auto& rule = rules[i];
 
-            CameraSettings::Entry<bool> enabled;
+            CameraSettings::Entry<bool> isEnabled;
 
-            parse(&enabled, replicateName(kVcaRunningDetectionEnabled, i));
+            parse(&isEnabled, replicateName(kVcaRunningDetectionIsEnabled, i));
             parse(&rule.name, replicateName(kVcaRunningDetectionName, i));
             parse(&rule.minPersonCount, replicateName(kVcaRunningDetectionMinPersonCount, i));
             parse(&rule.minSpeed, replicateName(kVcaRunningDetectionMinSpeed, i));
             parse(&rule.minDuration, replicateName(kVcaRunningDetectionMinDuration, i));
             parse(&rule.maxMergeInterval, replicateName(kVcaRunningDetectionMaxMergeInterval, i));
 
-            if (enabled.value.value_or(false))
+            if (isEnabled.value.value_or(false))
             {
                 if (!rule.name.value)
                     rule.name.value = "";
@@ -1158,7 +1158,7 @@ struct ParserFromServer
 
     void parse(CameraSettings::Vca* vca)
     {
-        parse(&vca->enabled, kVcaEnabled);
+        parse(&vca->isEnabled, kVcaIsEnabled);
         parse(&vca->sensitivity, kVcaSensitivity);
         parse(&vca->installation);
 
@@ -1456,10 +1456,10 @@ struct SerializerToServer
             if (!name.value)
                 name.value = "";
 
-            CameraSettings::Entry<bool> enabled;
-            enabled.value = name.value != "";
+            CameraSettings::Entry<bool> isEnabled;
+            isEnabled.value = name.value != "";
 
-            serialize(replicateName(kVcaRunningDetectionEnabled, i), enabled);
+            serialize(replicateName(kVcaRunningDetectionIsEnabled, i), isEnabled);
             serialize(replicateName(kVcaRunningDetectionName, i), name);
             serialize(replicateName(kVcaRunningDetectionMinPersonCount, i), rule.minPersonCount);
             serialize(replicateName(kVcaRunningDetectionMinSpeed, i), rule.minSpeed);
@@ -1470,7 +1470,7 @@ struct SerializerToServer
 
     void serialize(const CameraSettings::Vca& vca) const
     {
-        serialize(kVcaEnabled, vca.enabled);
+        serialize(kVcaIsEnabled, vca.isEnabled);
         serialize(kVcaSensitivity, vca.sensitivity);
         serialize(vca.installation);
 
@@ -1887,7 +1887,7 @@ QJsonObject serializeModel(const CameraSettings::Vca::RunningDetection& detectio
                     {"filledCheckItems", QJsonArray{kVcaRunningDetectionName}},
                     {"items", QJsonArray{
                         QJsonObject{
-                            {"name", kVcaRunningDetectionEnabled},
+                            {"name", kVcaRunningDetectionIsEnabled},
                             {"type", "CheckBox"},
                             {"caption", "Enabled"},
                         },
@@ -1955,11 +1955,11 @@ QJsonObject serializeModel(const CameraSettings::Vca& vca)
                 QJsonArray items;
 
                 items.push_back(QJsonObject{
-                    {"name", kVcaEnabled},
+                    {"name", kVcaIsEnabled},
                     {"type", "SwitchButton"},
                     {"caption", "Enabled"},
                 });
-                if (vca.enabled.value.value_or(false))
+                if (vca.isEnabled.value.value_or(false))
                 {
                     items.push_back(QJsonObject{
                         {"name", kVcaSensitivity},

@@ -13,7 +13,8 @@ const std::vector<EventType> kEventTypes =
             type.prettyName = "Crowd";
             type.isProlonged = true;
             type.isAvailable =
-                [](const auto& settings) {
+                [](const auto& settings)
+                {
                     const auto& vca = settings.vca;
                     return vca && vca->crowdDetection;
                 };
@@ -25,7 +26,8 @@ const std::vector<EventType> kEventTypes =
             type.prettyName = "Loitering";
             type.isProlonged = true;
             type.isAvailable =
-                [](const auto& settings) {
+                [](const auto& settings)
+                {
                     const auto& vca = settings.vca;
                     return vca && vca->loiteringDetection;
                 };
@@ -36,7 +38,8 @@ const std::vector<EventType> kEventTypes =
             type.id = "nx.vivotek.Intrusion";
             type.prettyName = "Intrusion";
             type.isAvailable =
-                [](const auto& settings) {
+                [](const auto& settings)
+                {
                     const auto& vca = settings.vca;
                     return vca && vca->intrusionDetection;
                 };
@@ -47,7 +50,8 @@ const std::vector<EventType> kEventTypes =
             type.id = "nx.vivotek.LineCrossing";
             type.prettyName = "Line Crossing";
             type.isAvailable =
-                [](const auto& settings) {
+                [](const auto& settings)
+                {
                     const auto& vca = settings.vca;
                     return vca && vca->lineCrossingDetection;
                 };
@@ -59,7 +63,8 @@ const std::vector<EventType> kEventTypes =
             type.prettyName = "Missing Object";
             type.isProlonged = true;
             type.isAvailable =
-                [](const auto& settings) {
+                [](const auto& settings)
+                {
                     const auto& vca = settings.vca;
                     return vca && vca->missingObjectDetection;
                 };
@@ -71,7 +76,8 @@ const std::vector<EventType> kEventTypes =
             type.prettyName = "Unattended Object";
             type.isProlonged = true;
             type.isAvailable =
-                [](const auto& settings) {
+                [](const auto& settings)
+                {
                     const auto& vca = settings.vca;
                     return vca && vca->unattendedObjectDetection;
                 };
@@ -83,7 +89,8 @@ const std::vector<EventType> kEventTypes =
             type.prettyName = "Face";
             type.isProlonged = true;
             type.isAvailable =
-                [](const auto& settings) {
+                [](const auto& settings)
+                {
                     const auto& vca = settings.vca;
                     return vca && vca->faceDetection;
                 };
@@ -95,7 +102,8 @@ const std::vector<EventType> kEventTypes =
             type.prettyName = "Running";
             type.isProlonged = true;
             type.isAvailable =
-                [](const auto& settings) {
+                [](const auto& settings)
+                {
                     const auto& vca = settings.vca;
                     return vca && vca->runningDetection;
                 };

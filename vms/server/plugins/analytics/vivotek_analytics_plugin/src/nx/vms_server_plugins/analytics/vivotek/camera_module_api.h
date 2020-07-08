@@ -16,7 +16,7 @@ public:
     struct ModuleInfo
     {
         int index = -1;
-        bool enabled = false;
+        bool isEnabled = false;
     };
 
 public:
@@ -24,7 +24,7 @@ public:
 
     std::map<QString, ModuleInfo> fetchModuleInfos();
 
-    void enable(const QString& name, bool enabled = true);
+    void enable(const QString& name, bool isEnabled = true);
 
 private:
     nx::utils::Url m_url;

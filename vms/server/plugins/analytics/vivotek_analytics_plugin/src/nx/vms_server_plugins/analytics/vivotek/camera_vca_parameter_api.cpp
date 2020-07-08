@@ -60,7 +60,10 @@ float CameraVcaParameterApi::parseCoordinate(const JsonValue& json)
 {
     const auto value = json.to<double>();
     if (value < 0 || value > kCoordinateDomain)
-        throw Exception("%1 = %2 is outside of expected range of [0; 10000]", json.path, value);
+    {
+        throw Exception("%1 = %2 is outside of expected range of [0; %3]",
+            json.path, value, kCoordinateDomain);
+    }
 
     return value / kCoordinateDomain;
 }

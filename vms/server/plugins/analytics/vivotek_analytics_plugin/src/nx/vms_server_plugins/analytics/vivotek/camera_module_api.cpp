@@ -60,12 +60,12 @@ std::map<QString, CameraModuleApi::ModuleInfo> CameraModuleApi::fetchModuleInfos
 
         const auto parameters = CameraParameterApi(m_url).fetch({"vadp_module"});
 
-        const auto count = toInt(at(parameters, "vadp_module_number"));
+        const auto count = parseInt(at(parameters, "vadp_module_number"));
         for (int i = 0; i < count; ++i)
         {
             auto& moduleInfo = moduleInfos[at(parameters, NX_FMT("vadp_module_i%1_name", i))];
             moduleInfo.index = 1;
-            moduleInfo.enabled = parseStatus(at(parameters, NX_FMT("vadp_module_i%1_status", i)));
+            moduleInfo.isEnabled = parseStatus(at(parameters, NX_FMT("vadp_module_i%1_status", i)));
         }
 
         return moduleInfos;
@@ -77,19 +77,19 @@ std::map<QString, CameraModuleApi::ModuleInfo> CameraModuleApi::fetchModuleInfos
     }
 }
 
-void CameraModuleApi::enable(const QString& name, bool enabled)
+void CameraModuleApi::enable(const QString& name, bool isEnabled)
 {
     try
     {
         const auto moduleInfo = fetchModuleInfos()[name];
         if (moduleInfo.index == -1)
             throw Exception("Not installed");
-        if (moduleInfo.enabled == enabled)
+        if (moduleInfo.isEnabled == isEnabled)
             return;
 
         QUrlQuery query;
         query.addQueryItem("idx", QString::number(moduleInfo.index));
-        query.addQueryItem("cmd", enabled ? "start" : "stop");
+        query.addQueryItem("cmd", isEnabled ? "start" : "stop");
 
         auto url = m_url;
         url.setPath("/cgi-bin/admin/vadpctrl.cgi");
@@ -117,7 +117,8 @@ void CameraModuleApi::enable(const QString& name, bool enabled)
                 " update it to at least version %2", currentVersion, firstFixedVersion);
         }
 
-        const auto successPattern = NX_FMT("'VCA is %1ed'", enabled ? "start" : "stopp").toUtf8();
+        const auto successPattern =
+            NX_FMT("'VCA is %1ed'", isEnabled ? "start" : "stopp").toUtf8();
         if (!responseBody.contains(successPattern))
         {
             throw Exception(
@@ -126,7 +127,8 @@ void CameraModuleApi::enable(const QString& name, bool enabled)
     }
     catch (Exception& exception)
     {
-        exception.addContext("Failed to %1able VADP module %1", enabled ? "en" : "dis", name);
+        exception.addContext("Failed to %1a VADP module %1",
+            isEnabled ? "enable" : "disable", name);
         throw;
     }
 }

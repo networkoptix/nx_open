@@ -1,6 +1,5 @@
 #include "device_agent.h"
 
-#include <mutex>
 #include <system_error>
 
 #define NX_PRINT_PREFIX (m_logUtils.printPrefix)
@@ -11,6 +10,7 @@
 #include <nx/sdk/helpers/settings_response.h>
 #include <nx/sdk/helpers/plugin_diagnostic_event.h>
 #include <nx/utils/url.h>
+#include <nx/network/url/url_builder.h>
 
 #include "ini.h"
 #include "object_types.h"
@@ -59,15 +59,11 @@ DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo):
     m_basicPollable(std::make_unique<aio::BasicPollable>()),
     m_logUtils(NX_DEBUG_ENABLE_OUTPUT,
         NX_FMT("[%1_device_%2]", libContext().name(), deviceInfo->id()).toStdString()),
-    m_url(
-        [&]
-        {
-            Url url = deviceInfo->url();
-            url.setUserName(deviceInfo->login());
-            url.setPassword(deviceInfo->password());
-            url.setPath("");
-            return url;
-        }())
+    m_url(network::url::Builder(deviceInfo->url())
+        .setUserName(deviceInfo->login())
+        .setPassword(deviceInfo->password())
+        .setPath("")
+        .toUrl())
 {
 }
 
@@ -96,11 +92,6 @@ void DeviceAgent::doSetSettings(Result<const ISettingsResponse*>* outResult, con
 
 void DeviceAgent::getPluginSideSettings(Result<const ISettingsResponse*>* outResult) const
 {
-    // This is a temporary workaround until server is fixed to not call this method concurrently.
-    static std::mutex mutex;
-    std::lock_guard lockGuard(mutex);
-    // ---
-
     try
     {
         CameraSettings settings;
@@ -129,7 +120,8 @@ void DeviceAgent::getManifest(Result<const IString*>* outResult) const
     {
         auto manifest = QJsonObject{
             {"objectTypes",
-                [&]{
+                [&]()
+                {
                     QJsonArray types;
 
                     for (const auto& objectType: kObjectTypes)
@@ -144,7 +136,8 @@ void DeviceAgent::getManifest(Result<const IString*>* outResult) const
                 }(),
             },
             {"eventTypes",
-                [&]{
+                [&]()
+                {
                     QJsonArray types;
 
                     for (const auto& eventType: kEventTypes)
@@ -181,7 +174,8 @@ void DeviceAgent::setHandler(IHandler* handler)
     try
     {
         m_basicPollable->executeInAioThreadSync(
-            [&]{
+            [&]()
+            {
                 handler->addRef();
                 m_handler = toPtr(handler);
             });

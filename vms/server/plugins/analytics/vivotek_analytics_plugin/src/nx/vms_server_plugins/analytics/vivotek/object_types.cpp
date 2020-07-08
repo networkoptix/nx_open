@@ -3,7 +3,8 @@
 namespace nx::vms_server_plugins::analytics::vivotek {
 
 const std::vector<ObjectType> kObjectTypes =
-    [](){
+    []()
+    {
         std::vector<ObjectType> types;
         {
             auto& type = types.emplace_back();
@@ -11,9 +12,10 @@ const std::vector<ObjectType> kObjectTypes =
             type.id = "nx.vivotek.Human";
             type.prettyName = "Human";
             type.isAvailable =
-                [](const auto& settings) {
+                [](const auto& settings)
+                {
                     const auto& vca = settings.vca;
-                    return vca && vca->enabled.value.value_or(false);
+                    return vca && vca->isEnabled.value.value_or(false);
                 };
         }
         return types;

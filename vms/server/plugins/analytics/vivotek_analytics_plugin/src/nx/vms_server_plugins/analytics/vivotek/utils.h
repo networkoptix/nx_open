@@ -23,9 +23,6 @@ decltype(auto) at(Container&& container, const Key& key)
     }
 }
 
-double toDouble(const QString& string);
-int toInt(const QString& string);
-
 nx::utils::Url withoutUserInfo(nx::utils::Url url);
 
 std::int64_t parseIsoTimestamp(const QString& isoTimestamp);

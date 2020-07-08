@@ -29,7 +29,7 @@ public:
 
     struct Vca
     {
-        Entry<bool> enabled;
+        Entry<bool> isEnabled;
 
         Entry<int> sensitivity;
 

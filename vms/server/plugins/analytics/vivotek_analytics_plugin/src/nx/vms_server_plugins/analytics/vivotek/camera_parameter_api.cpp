@@ -22,7 +22,7 @@ std::map<QString, QString> parse(const QString& responseBody)
     {
         const auto equalsIndex = line.indexOf('=');
         if (equalsIndex == -1)
-            throw Exception("No '=' between parameter name and value");
+            throw Exception("No '=' between parameter name and value: %1", line);
 
         const auto name = line.left(equalsIndex).trimmed();
         if (name.isEmpty())

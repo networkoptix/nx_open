@@ -10,6 +10,7 @@
 #include <nx/utils/datetime.h>
 #include <nx/utils/random.h>
 #include <nx/utils/std/optional.h>
+#include <nx/utils/exception.h>
 
 namespace nx::utils {
 
@@ -77,6 +78,27 @@ qint64 parseDateTimeMsec(const QString& dateTimeStr)
         return usecSinceEpoch;  //special values are returned "as is"
 
     return usecSinceEpoch / kUsecPerMs;
+}
+
+int parseInt(const QString& string, int base)
+{
+    int value;
+    if (bool ok; (value = string.toInt(&ok, base)), !ok)
+    {
+        if (base == 10)
+            throw Exception("Failed to parse int: %1", string);
+        else
+            throw Exception("Failed to parse base-%1 int: %2", base, string);
+    }
+    return value;
+}
+
+double parseDouble(const QString& string)
+{
+    int value;
+    if (bool ok; (value = string.toDouble(&ok)), !ok)
+        throw Exception("Failed to parse double: %1", string);
+    return value;
 }
 
 QString xorEncrypt(const QString &plaintext, const QString &key)
