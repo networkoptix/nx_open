@@ -8,27 +8,27 @@ entities - nx::sdk::analytics::IPlugin, IEngine, and IDeviceAgent.
 Each Manifest is a JSON object containing fields which can be of the following semantic types:
 - String.
 - Integer (Number).
-- Float (Number) - a floating-point number.
+- Float (Number) - Floating-point number.
 - Boolean.
-- Array<Type> - a JSON array in `[]`, containing comma-separated items of the specified Type.
-- Object - A JSON Object in `{}`, containing the described fields.
-- Id (String) - technically a string, representing a human-readable identifier, described in the
-    respective section of this document.
-- Flag set (String) - technically a string, containing the named flags listed via `|`.
-- Enumeration (String) - technically a string, containing one of the fixed values.
-- SettingsModel (Object) - technically a JSON object of its own schema, described in
+- Array<Type> - JSON array in `[]`, containing comma-separated items of the specified Type.
+- Object - JSON Object in `{}`, containing the described fields.
+- Id (String) - String representing a human-readable identifier, described in the respective
+    section of this document.
+- Flag set (String) - String containing the named flags listed via `|`.
+- Enumeration (String) - String containing one of the fixed values.
+- SettingsModel (Object) - JSON object of its own schema, described in
     [settings_model.md](#md_src_nx_sdk_settings_model).
 
-Because a Manifest is a JSON document, it inherits certain generic JSON features and traditions:
-- Missing object fields are treated as having a default value. Default values are described
-    in this document.
+The following rules apply to the Manifest as a JSON document:
+- Missing object fields are treated as having a default value. Default values are described in this
+    document.
 - Unknown object fields are ignored. Thus, if a field name has a typo, it will be ignored and
-    the field will be treated as missing. It also gives the possibility to comment-out a field
-    by renaming it to start with an underscore (just a JSON tradition).
+    the field will be treated as missing, thus, having a default value. It also gives the
+    possibility to comment-out a field by renaming it, e.g. prepending with an underscore.
 
-Examples of Manifests can be found in Plugin samples included with the SDK: a minimalistic example
-can be found in Sample Analytics Plugin, and the most comprehensive example covering all possible
-features can be found in Stub Analytics Plugin.
+Examples of Manifests can be found in the Plugin samples included with the SDK: a minimalistic
+example can be found in Sample Analytics Plugin, and the most comprehensive example covering all
+possible features can be found in Stub Analytics Plugin.
 
 ---------------------------------------------------------------------------------------------------
 ## Identifiers
@@ -55,7 +55,7 @@ by different Plugins, thus, forming a kind of common library.
 There are special, reserved, parts of the identifier name. Identifiers starting with `nx.sys.` are
 used for the VMS internal purposes and as a temporary solution to access certain experimental
 features. Identifiers with `.sys.` in the middle are recognized by VMS to have some special
-behavour, e.g. Object Attributes with identifiers ending with `.sys.hidden` do not appear on video.
+behavior, e.g. Object Attributes with identifiers ending with `.sys.hidden` do not appear on video.
 
 ---------------------------------------------------------------------------------------------------
 ## Plugin Manifest
@@ -134,17 +134,26 @@ Engine Manifest is a JSON Object containing the following fields:
 
     - `deviceDependent` - If set, influences the certain aspects of handling of the Plugin. It is
         intended for Plugins which "work on a device", that is, are wrappers for the video
-        analytics running inside the camera. For example, such plugins are compatible with a
-        certain camera family, and do not consume video stream from the Server. The opposite plugin
-        type, not having this flag, is called "device-independent" - for example, such plugins may
-        analyze video from any camera using either their own code, or via a backend (a server or
-        an analytics device).
+        analytics running inside the camera. For example, such Plugins are compatible with a
+        certain camera family, and typically do not consume the video stream from the Server. Also,
+        Device Agents of such Plugins do not have the "Enable/Disable" switch for the user - they
+        are always enabled, thus, start working every time a compatible device appears on the
+        Server. The opposite Plugin type, not having this flag, is called "device-independent" -
+        for example, such Plugins may analyze video from any camera using either their own code, or
+        via some backend (a server or an analytics device).
 
-    - `keepObjectBoundingBoxRotation` - If a camera for which the plugin is working has frame
-        rotation option set to 90, 180 or 270 degrees, this flag makes all metadata Objects
-        generated by the plugin rotate accordingly. Note that the plugin always receives video
-        frames in their native rotation, not honoring the rotation setting made by the VMS user.
-
+    - `keepObjectBoundingBoxRotation` - When a camera for which the Plugin is working has frame
+        rotation option set to 90, 180 or 270 degrees, the Plugin which requests uncompressed video
+        frames receives them rotated accordingly. Regardless of whether the plugin requests
+        compressed or uncompressed video, the Object Metadata rectangles produced by the Plugin are
+        rotated in the reverse direction, because the Server database requires them in the
+        coordinate space of a physical (non-rotated) frame. But in the case the analysis is
+        performed inside a camera, or the Plugin requests compressed frames (thus, receives them
+        not being rotated), it is more convenient for the Plugin to produce Object Metadata in the
+        coordinate space of a physical (non-rotated) frame. This flag makes it possible - if set,
+        the Server will not perform reverse rotation of the Object Metadata even if the frame
+        rotation option on a camera is set.
+        
     Optional; default value is empty.
 
 - `"streamTypeFilter"`: Flag set (String)
@@ -155,7 +164,8 @@ Engine Manifest is a JSON Object containing the following fields:
 
     - `compressedVideo` - Compressed video packets, as ICompressedVideoPacket.
     - `uncompressedVideo` - Uncompressed video frames, as IUncompressedVideoFrame.
-    - `metadata` - Metadata that comes in the RTSP stream, as ICustomMetadataPacket.
+    - `metadata` - Metadata that comes in the stream (e.g. RTSP) that goes from the Device to the
+        Server, as ICustomMetadataPacket.
     - `motion` - Motion metadata retrieved by the Server's Motion Engine, as IMotionMetadataPacket.
 
     Optional; default value is empty.
