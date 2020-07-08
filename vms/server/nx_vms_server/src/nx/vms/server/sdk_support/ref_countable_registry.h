@@ -17,13 +17,12 @@ namespace nx::vms::server::sdk_support {
  * An assertion will fail if any discrepancy is detected.
  *
  * The Server and each Plugin have their own instance of such registry, tracking objects
- * created/destroyed in the respective module. Such instances are created as global variables by
- * value, thus, are never physically destroyed. Their destructors (called on static
+ * created/destroyed in the respective module. Such instances are owned by the respective
+ * LibContext instances. Their destructors (called from LibContext destructors on static
  * deinitialization phase) attempt to detect and log objects which were not deleted, failing an
  * assertion if there were any such objects.
  *
- * Type of logging (Server log vs stderr) and type of assertions (NX_KIT_ASSERT vs NX_ASSERT) are
- * determined by vms_server_plugins.ini, as well as the logging verbosity.
+ * These registries must be enabled by vms_server_plugins.ini; there are also options for logging.
  */
 class RefCountableRegistry: public nx::sdk::IRefCountableRegistry
 {
