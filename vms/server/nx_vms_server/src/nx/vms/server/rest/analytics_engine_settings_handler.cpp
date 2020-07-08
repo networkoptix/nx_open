@@ -20,10 +20,15 @@ namespace nx::vms::server::rest {
 
 using namespace nx::network;
 
+using SettingsResponse = analytics::SettingsResponse;
+
 namespace {
 
-JsonRestResponse makeSettingsResponse(const analytics::SettingsResponse& settingsResponse)
+JsonRestResponse makeSettingsResponse(const SettingsResponse& settingsResponse)
 {
+    if (settingsResponse.error.code == SettingsResponse::Error::Code::wrongSettingsModel)
+        return makeResponse(QnRestResult::Error::BadRequest, "Wrong settings model id");
+
     nx::vms::api::analytics::EngineSettingsResponse response;
 
     response.settingsValues = settingsResponse.values;

@@ -239,6 +239,9 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::makeApiResponse(
     const SettingsResponse& settingsResponse,
     const CommonRequestEntities& commonRequestEntities) const
 {
+    if (settingsResponse.error.code == SettingsResponse::Error::Code::wrongSettingsModel)
+        return makeResponse(QnRestResult::Error::BadRequest, "Wrong settings model id");
+
     JsonRestResponse result(http::StatusCode::ok);
     nx::vms::api::analytics::DeviceAnalyticsSettingsResponse response;
 
