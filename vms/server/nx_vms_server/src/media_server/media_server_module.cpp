@@ -337,6 +337,8 @@ QnMediaServerModule::QnMediaServerModule(
 
     m_fileDeletor = store(new QnFileDeletor(this));
 
+    m_analyticsThreadPool = store(new QThreadPool(this));
+
     m_pluginManager = store(new PluginManager(this));
 
 
@@ -483,6 +485,7 @@ void QnMediaServerModule::stop()
     m_streamingChunkTranscoder->stop();
     m_eventConnector->stop();
     m_statisticsReporter.reset();
+    m_analyticsThreadPool->clear();
 }
 
 void QnMediaServerModule::stopLongRunnables()
@@ -836,4 +839,9 @@ nx::analytics::db::AbstractIframeSearchHelper* QnMediaServerModule::iFrameSearch
 nx::vms::server::statistics::Reporter* QnMediaServerModule::statisticsReporter() const
 {
     return m_statisticsReporter.get();
+}
+
+QThreadPool* QnMediaServerModule::analyticsThreadPool() const
+{
+    return m_analyticsThreadPool;
 }

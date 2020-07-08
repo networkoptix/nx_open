@@ -25,6 +25,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::server::analytics::wrappers, 
         "setNeededMetadataTypes"
     )
     (nx::vms::server::analytics::wrappers::SdkMethod::pushDataPacket, "pushDataPacket")
+    (nx::vms::server::analytics::wrappers::SdkMethod::pushManifest, "pushManifest")
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::server::analytics::wrappers, ViolationType,

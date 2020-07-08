@@ -71,6 +71,7 @@ static QString methodDescription(SdkMethod sdkMethod)
         case SdkMethod::executeAction: return "execute Action";
         case SdkMethod::setNeededMetadataTypes: return "accept Metadata types";
         case SdkMethod::pushDataPacket: return "accept audio/video/metadata";
+        case SdkMethod::pushManifest: return "produce updated Manifest";
 
         case SdkMethod::undefined:
             NX_ASSERT(false, "SdkMethod must not be undefined.");

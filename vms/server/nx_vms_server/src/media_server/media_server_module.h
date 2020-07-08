@@ -21,6 +21,7 @@ class MSSettings;
 class PluginManager;
 class CommonPluginContainer;
 class QThread;
+class QThreadPool;
 class AbstractArchiveIntegrityWatcher;
 class QnDataProviderFactory;
 class QnResourceCommandProcessor;
@@ -54,8 +55,8 @@ namespace nx::vms::server { class CmdLineArguments; }
 namespace nx::vms::server::analytics {
     class SdkObjectFactory;
 } // namespace nx::vms::server::analytics
-namespace nx::analytics::db { 
-    class AbstractIframeSearchHelper; 
+namespace nx::analytics::db {
+    class AbstractIframeSearchHelper;
     class AbstractObjectTypeDictionary;
 }
 
@@ -182,6 +183,9 @@ public:
 
     nx::analytics::db::AbstractIframeSearchHelper* iFrameSearchHelper() const;
     nx::vms::server::statistics::Reporter* statisticsReporter() const;
+
+    QThreadPool* analyticsThreadPool() const;
+
 private:
     void registerResourceDataProviders();
     /**
@@ -247,6 +251,8 @@ private:
     nx::analytics::db::AbstractObjectTypeDictionary* m_objectTypeDictionary = nullptr;
     std::unique_ptr<nx::vms::server::event::ServerRuntimeEventManager> m_serverRuntimeEventManager;
     std::unique_ptr<nx::vms::server::statistics::Reporter> m_statisticsReporter;
+
+    QThreadPool* m_analyticsThreadPool = nullptr;
 
     // When server stops, QnResourcePropertyDictionary is destroyed before QnResource objects
     // (at least some of them) because of unknown reasons. So QnResource can not make soap requests

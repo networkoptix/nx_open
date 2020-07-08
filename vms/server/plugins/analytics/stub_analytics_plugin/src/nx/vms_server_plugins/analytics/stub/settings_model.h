@@ -22,6 +22,8 @@ const std::string kCounterBoundingBoxSideSizeSetting{"counterBoundingBoxSideSize
 const std::string kCounterXOffsetSetting{"counterXOffset"};
 const std::string kCounterYOffsetSetting{"counterYOffset"};
 
+const std::string kDeclareAdditionalEventTypesSetting{"declareAdditionalEventTypesSetting"};
+
 const std::string kBlinkingObjectPeriodMsSetting{"blinkingObjectPeriodMs"};
 const std::string kBlinkingObjectInDedicatedPacketSetting{"blinkingObjectInDedicatedPacket"};
 
@@ -181,6 +183,12 @@ static const std::string kRegularSettingsModelPart1 = /*suppress newline*/ 1 + R
                             "defaultValue": 0.0,
                             "minValue": 0.0,
                             "maxValue": 1.0
+                        },
+                        {
+                            "type": "CheckBox",
+                            "caption": "Declare additional event types",
+                            "name": ")json" + kDeclareAdditionalEventTypesSetting + R"json(",
+                            "defaultValue": false
                         },
                         {
                             "type": "SpinBox",

@@ -177,6 +177,16 @@ std::string DeviceAgent::manifestString() const
         ]
     })json";
 
+    static const std::string kAdditionalEventTypes = R"json(,
+        {
+            "id": "nx.stub.additionalEvent1",
+            "name": "Additional event 1"
+        },
+        {
+             "id": "nx.stub.additionalEvent2",
+             "name": "Additional event 2"
+        })json";
+
     return /*suppress newline*/ 1 + (const char*) R"json(
 {
     "capabilities": ")json" + capabilities() + R"json(",
@@ -203,7 +213,9 @@ std::string DeviceAgent::manifestString() const
             "id": ")json" + kGunshotEventType + R"json(",
             "name": "Gunshot",
             "groupId": ")json" + kSoundRelatedEventGroup + R"json("
-        }
+        })json"
+        + (m_deviceAgentSettings.declareAdditionalEventTypes ? kAdditionalEventTypes : "")
+    + R"json(
     ],
     "objectTypes": [
         {
@@ -255,6 +267,7 @@ Result<const ISettingsResponse*> DeviceAgent::settingsReceived()
     parseSettings();
     updateObjectGenerationParameters();
     updateEventGenerationParameters();
+    updateManifest();
 
     return settingsResponse;
 }
@@ -965,6 +978,8 @@ void DeviceAgent::parseSettings()
     m_deviceAgentSettings.generateStones = toBool(settingValue(kGenerateStonesSetting));
     m_deviceAgentSettings.generateFixedObject = toBool(settingValue(kGenerateFixedObjectSetting));
     m_deviceAgentSettings.generateCounter = toBool(settingValue(kGenerateCounterSetting));
+    m_deviceAgentSettings.declareAdditionalEventTypes =
+        toBool(settingValue(kDeclareAdditionalEventTypesSetting));
 
     assignNumericSetting(kBlinkingObjectPeriodMsSetting,
         &m_deviceAgentSettings.blinkingObjectPeriodMs);
@@ -1035,6 +1050,11 @@ void DeviceAgent::updateEventGenerationParameters()
         m_needToThrowPluginDiagnosticEvents = false;
         m_pluginDiagnosticEventGenerationLoopCondition.notify_all();
     }
+}
+
+void DeviceAgent::updateManifest()
+{
+    pushManifest(manifestString());
 }
 
 } // namespace stub

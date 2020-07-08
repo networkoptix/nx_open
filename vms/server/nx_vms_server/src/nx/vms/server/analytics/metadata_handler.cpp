@@ -33,7 +33,7 @@ using namespace nx::vms_server_plugins::utils;
 
 MetadataHandler::MetadataHandler(
     QnMediaServerModule* serverModule,
-    QnVirtualCameraResourcePtr device,
+    resource::CameraPtr device,
     QnUuid engineId)
     :
     ServerModuleAware(serverModule),
@@ -204,7 +204,7 @@ void MetadataHandler::handleObjectTrackBestShotPacket(
     bestShotPacket.durationUs = 0;
     bestShotPacket.deviceId = m_resource->getId();
 
-    // This is not very precise, but is ok, since stream index isn't changed very often.    
+    // This is not very precise, but is ok, since stream index isn't changed very often.
     bestShotPacket.streamIndex = m_resource->analyzedStreamIndex(m_engineId);
 
     nx::common::metadata::ObjectMetadata bestShot;

@@ -12,6 +12,7 @@
 #include <nx/vms/server/sdk_support/conversion_utils.h>
 #include <nx/vms/server/analytics/wrappers/sdk_object_description.h>
 #include <nx/vms/server/analytics/wrappers/types.h>
+#include <nx/vms/server/analytics/wrappers/manifest_converter.h>
 #include <plugins/vms_server_plugins_ini.h>
 
 #include <nx/vms/server/resource/analytics_engine_resource.h>
@@ -35,6 +36,7 @@ public:
         SdkErrorHandler errorHandler,
         InternalErrorHandler internalErrorHandler)
         :
+        m_manifestConverter(sdkObjectDescription, violationHandler),
         m_debugSettings(std::move(debugSettings)),
         m_sdkObjectDescription(std::move(sdkObjectDescription)),
         m_violationHandler(std::move(violationHandler)),
@@ -57,7 +59,7 @@ public:
             manifestString = loadManifestStringFromSdkObject(sdkObject);
 
         dumpManifestStringToFile(manifestString);
-        return processManifest(manifestString);
+        return m_manifestConverter.convert(manifestString);
     }
 
 private:
@@ -125,111 +127,11 @@ private:
         }
     }
 
-    std::optional<Manifest> processManifest(
-        const sdk::Ptr<const sdk::IString> manifestString) const
-    {
-        if (!manifestString)
-        {
-            m_violationHandler({ViolationType::nullManifest, /*violationDetails*/ ""});
-            return std::nullopt;
-        }
-
-        const char* const manifestCString = manifestString->str();
-        if (!manifestCString)
-        {
-            m_violationHandler({ViolationType::nullManifestString, /*violationDetails*/ ""});
-            return std::nullopt;
-        }
-
-        if (*manifestCString == '\0')
-        {
-            m_violationHandler({ViolationType::emptyManifestString, /*violationDetails*/ ""});
-            return std::nullopt;
-        }
-
-        const std::optional<Manifest> deserializedManifest = deserializeManifest(manifestCString);
-
-        if (!deserializedManifest)
-            return std::nullopt;
-
-        if (!validateManifest(*deserializedManifest))
-            return std::nullopt;
-
-        return deserializedManifest;
-    }
-
-    std::optional<Manifest> deserializeManifest(const QString& manifestString) const
-    {
-        Manifest result;
-
-        QJsonValue jsonValue;
-        if (!QJsonDetail::deserialize_json(manifestString.toUtf8(), &jsonValue))
-        {
-            m_violationHandler({ViolationType::invalidJson, /*violationDetails*/ ""});
-            return std::nullopt;
-        }
-
-        QnJsonContext ctx;
-        if (!QJson::deserialize(&ctx, jsonValue, &result))
-        {
-            m_violationHandler({ViolationType::invalidJsonStructure, /*violationDetails*/ ""});
-            return std::nullopt;
-        }
-
-        return result;
-    }
-
-    bool validateManifest(const Manifest& manifest) const
-    {
-        const auto errorList = validate(manifest);
-
-        if (!errorList.empty())
-        {
-            m_violationHandler({
-                ViolationType::manifestLogicalError,
-                buildManifestValidationDetails(errorList)});
-        }
-
-        return std::none_of(errorList.cbegin(), errorList.cend(),
-            [](const auto& manifestError) { return isCriticalManifestError(manifestError); });
-    }
-
-    static QString buildManifestValidationDetails(
-        const std::vector<api::analytics::ManifestError>& manifestErrors)
-    {
-        QString result;
-        for (decltype (manifestErrors.size()) i = 0; i < manifestErrors.size(); ++i)
-        {
-            const auto& error = manifestErrors[i];
-            result += lm("error: %1").args(error.errorType);
-            if (!error.additionalInfo.isEmpty())
-                result += lm(", details: %1").args(error.additionalInfo);
-
-            if (i < manifestErrors.size() - 1)
-                result += ";\n";
-        }
-
-        return result;
-    }
-
-    static bool isCriticalManifestError(
-        const api::analytics::ManifestError& manifestError)
-    {
-        if (manifestError.errorType == api::analytics::ManifestErrorType::noError)
-            return false;
-
-        if (pluginsIni().enableStrictManifestValidationMode)
-            return true;
-
-        if (manifestError.errorType == api::analytics::ManifestErrorType::emptyPluginId)
-            return true;
-
-        return false;
-    }
-
 private:
     static constexpr const char* kNullSdkObjectErrorMessage =
         "SDK object to retrieve manifest from is null.";
+
+    ManifestConverter<Manifest> m_manifestConverter;
 
     const DebugSettings m_debugSettings;
     const SdkObjectDescription m_sdkObjectDescription;

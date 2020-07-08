@@ -35,19 +35,28 @@ class IDeviceAgent: public Interface<IDeviceAgent>
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IDeviceAgent"); }
 
-    class IHandler: public Interface<IHandler>
+    class IHandler0: public Interface<IHandler0>
     {
     public:
         static auto interfaceId() { return makeId("nx::sdk::analytics::IDeviceAgent::IHandler"); }
 
-        virtual ~IHandler() = default;
+        virtual ~IHandler0() = default;
         virtual void handleMetadata(IMetadataPacket* metadataPacket) = 0;
         virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) = 0;
+    };
+
+    class IHandler: public Interface<IHandler, IHandler0>
+    {
+    public:
+        static auto interfaceId() { return makeId("nx::sdk::analytics::IDeviceAgent::IHandler1"); }
+
+        virtual void pushManifest(const IString* manifest) = 0;
     };
 
     /** Called by setSettings() */
     protected: virtual void doSetSettings(
         Result<const ISettingsResponse*>* outResult, const IStringMap* settings) = 0;
+
     /**
      * Called before other methods. Server provides the set of settings stored in its database,
      * combined with the values received from the plugin via pluginSideSettings() (if any), for

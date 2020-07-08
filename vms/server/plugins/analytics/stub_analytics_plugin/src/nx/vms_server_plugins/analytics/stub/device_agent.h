@@ -123,6 +123,8 @@ private:
 
     void updateEventGenerationParameters();
 
+    void updateManifest();
+
     void processFrameMotion(
         nx::sdk::Ptr<nx::sdk::IList<nx::sdk::analytics::IMetadataPacket>> metadataPacketList);
 
@@ -200,6 +202,8 @@ private:
         std::atomic<float> counterBoundingBoxSideSize{0};
         std::atomic<float> counterBoundingBoxXOffset{0};
         std::atomic<float> counterBoundingBoxYOffset{0};
+
+        std::atomic<bool> declareAdditionalEventTypes{false};
     };
 
     DeviceAgentSettings m_deviceAgentSettings;

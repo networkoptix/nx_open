@@ -13,17 +13,22 @@
 
 #include <utils/common/synctime.h>
 
+#include <nx/vms/server/analytics/wrappers/manifest_converter.h>
+#include <nx/vms/server/analytics/wrappers/string_builder.h>
+
 namespace nx::vms::server::analytics {
 
 DeviceAgentHandler::DeviceAgentHandler(
     QnMediaServerModule* serverModule,
-    QnUuid engineResourceId,
-    QnVirtualCameraResourcePtr device)
+    resource::AnalyticsEngineResourcePtr engine,
+    resource::CameraPtr device,
+    DeviceAgentManifestHandler manifestHandler)
     :
     ServerModuleAware(serverModule),
-    m_engineResourceId(std::move(engineResourceId)),
+    m_engine(std::move(engine)),
     m_device(std::move(device)),
-    m_metadataHandler(serverModule, m_device, m_engineResourceId)
+    m_metadataHandler(serverModule, m_device, m_engine->getId()),
+    m_manifestHandler(std::move(manifestHandler))
 {
     connect(this, &DeviceAgentHandler::pluginDiagnosticEventTriggered,
         serverModule->eventConnector(), &event::EventConnector::at_pluginDiagnosticEvent,
@@ -41,7 +46,7 @@ void DeviceAgentHandler::handlePluginDiagnosticEvent(
     nx::vms::event::PluginDiagnosticEventPtr pluginDiagnosticEvent(
         new nx::vms::event::PluginDiagnosticEvent(
             qnSyncTime->currentUSecsSinceEpoch(),
-            m_engineResourceId,
+            m_engine->getId(),
             sdkPluginDiagnosticEvent->caption(),
             sdkPluginDiagnosticEvent->description(),
             nx::vms::server::sdk_support::fromPluginDiagnosticEventLevel(
@@ -54,6 +59,44 @@ void DeviceAgentHandler::handlePluginDiagnosticEvent(
 void DeviceAgentHandler::setMetadataSinks(MetadataSinkSet metadataSinks)
 {
     m_metadataHandler.setMetadataSinks(std::move(metadataSinks));
+}
+
+void DeviceAgentHandler::pushManifest(const nx::sdk::IString* manifestString)
+{
+    const wrappers::SdkObjectDescription sdkObjectDescription(
+        m_engine->plugin().dynamicCast<resource::AnalyticsPluginResource>(), m_engine, m_device);
+
+    wrappers::ManifestConverter<DeviceAgentManifest> manifestConverter(
+        sdkObjectDescription,
+        [this, &sdkObjectDescription](wrappers::Violation violation)
+        {
+            const wrappers::StringBuilder stringBuilder(
+                wrappers::SdkMethod::pushManifest,
+                sdkObjectDescription,
+                violation);
+
+            NX_DEBUG(this, stringBuilder.buildLogString());
+
+            nx::vms::event::PluginDiagnosticEventPtr pluginDiagnosticEvent(
+                new nx::vms::event::PluginDiagnosticEvent(
+                    qnSyncTime->currentUSecsSinceEpoch(),
+                    m_engine->getId(),
+                    stringBuilder.buildPluginDiagnosticEventCaption(),
+                    stringBuilder.buildPluginDiagnosticEventDescription(),
+                    nx::vms::api::EventLevel::ErrorEventLevel,
+                    m_device));
+
+            emit pluginDiagnosticEventTriggered(pluginDiagnosticEvent);
+        });
+
+    const sdk::Ptr<const sdk::IString> manifestStringPtr =
+        manifestString->queryInterface<nx::sdk::IString>();
+
+    const std::optional<DeviceAgentManifest> manifest =
+        manifestConverter.convert(manifestStringPtr);
+
+    if (manifest && m_manifestHandler)
+        m_manifestHandler(*manifest);
 }
 
 } // namespace nx::vms::server::analytics
