@@ -37,10 +37,11 @@ public:
      */
     virtual int dataSize() const = 0;
 
+    /** Called by context() */
+    protected: virtual const IMediaContext* getContext() const = 0;
     /**
      * @return Pointer to the codec context, or null if not available.
      */
-    protected: virtual const IMediaContext* getContext() const = 0;
     public: Ptr<const IMediaContext> context() const { return toPtr(getContext()); }
 
     enum class MediaFlags: uint32_t

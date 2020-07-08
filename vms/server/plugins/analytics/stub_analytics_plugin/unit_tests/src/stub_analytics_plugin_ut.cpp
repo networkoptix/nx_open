@@ -324,6 +324,8 @@ public:
             << "caption " << nx::kit::utils::toString(event->caption()) << ", "
             << "description " << nx::kit::utils::toString(event->description());
     }
+
+    virtual void pushManifest(const IString* manifest) override {}
 };
 
 class EngineHandler: public nx::sdk::RefCountable<IEngine::IHandler>
@@ -383,6 +385,8 @@ public:
     {
         ASSERT_TRUE(event);
     }
+
+    virtual void pushManifest(const IString* manifest) override {}
 };
 
 TEST(stub_analytics_plugin, test)

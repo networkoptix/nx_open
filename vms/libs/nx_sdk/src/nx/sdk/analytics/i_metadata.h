@@ -28,13 +28,14 @@ public:
      */
     virtual float confidence() const = 0;
 
+    /** Called by attribute() */
+    protected: virtual const IAttribute* getAttribute(int index) const = 0;
     /**
      * Provides values of so-called Metadata Attributes - typically, some object or event
      * properties (e.g. age or color), represented as a name-value map.
      * @param index 0-based index of the attribute.
      * @return Item of an attribute array, or null if index is out of range.
      */
-    protected: virtual const IAttribute* getAttribute(int index) const = 0;
     public: Ptr<const IAttribute> attribute(int index) const { return toPtr(getAttribute(index)); }
 
     /**

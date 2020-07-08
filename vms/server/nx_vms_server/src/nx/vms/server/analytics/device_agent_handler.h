@@ -6,6 +6,7 @@
 
 #include <core/resource/resource_fwd.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
+#include <nx/vms/api/analytics/device_agent_manifest.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 #include <nx/vms/server/server_module_aware.h>
 
@@ -21,15 +22,21 @@ class DeviceAgentHandler:
 {
     Q_OBJECT
 
+    using DeviceAgentManifest = nx::vms::api::analytics::DeviceAgentManifest;
+    using DeviceAgentManifestHandler = std::function<void(const DeviceAgentManifest&)>;
+
 public:
     DeviceAgentHandler(
         QnMediaServerModule* serverModule,
-        QnUuid engineResourceId,
-        QnVirtualCameraResourcePtr device);
+        resource::AnalyticsEngineResourcePtr engine,
+        resource::CameraPtr device,
+        DeviceAgentManifestHandler manifestHandler);
 
     virtual void handleMetadata(nx::sdk::analytics::IMetadataPacket* metadataPacket) override;
     virtual void handlePluginDiagnosticEvent(
         nx::sdk::IPluginDiagnosticEvent* sdkPluginDiagnosticEvent) override;
+
+    virtual void pushManifest(const nx::sdk::IString* manifest) override;
 
     void setMetadataSinks(MetadataSinkSet metadataSinks);
 
@@ -38,9 +45,10 @@ signals:
         const nx::vms::event::PluginDiagnosticEventPtr& pluginDiagnosticEvent);
 
 private:
-    QnUuid m_engineResourceId;
-    QnVirtualCameraResourcePtr m_device;
+    resource::AnalyticsEngineResourcePtr m_engine;
+    resource::CameraPtr m_device;
     nx::vms::server::analytics::MetadataHandler m_metadataHandler;
+    DeviceAgentManifestHandler m_manifestHandler;
 };
 
 } // namespace nx::vms::server::analytics

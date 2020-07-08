@@ -63,6 +63,8 @@ struct SettingGroup
     const char* value(const nx::sdk::IStringMap* sourceMap, E keyIndexE);
 
     void replenishErrorMap(nx::sdk::StringMap* errorMap, const std::string& reason) const;
+    void replenishValueMap(
+        nx::sdk::StringMap* valueMap, const nx::sdk::IStringMap* sourceMap) const;
 
     int nativeIndex() const { return m_nativeIndex; }
     int serverIndex() const { return m_serverIndex; }
@@ -111,7 +113,9 @@ struct SettingGroup
      * to the agent's device, using `sendingFunction`.
      */
     template<class SettingGroupT, class SendingFunctor>
-    static void transferFromServerToDevice(nx::sdk::StringMap* errorMap,
+    static void transferFromServerToDevice(
+        nx::sdk::StringMap* errorMap,
+        nx::sdk::StringMap* valueMap,
         const nx::sdk::IStringMap* sourceMap,
         SettingGroupT& previousState,
         SendingFunctor sendingFunctor,
@@ -134,9 +138,17 @@ struct SettingGroup
 
         const std::string error = sendingFunctor(settingQuery);
         if (!error.empty())
+        {
             settingGroup.replenishErrorMap(errorMap, error);
+        }
         else
+        {
+            #if 0
+                // While plugin manager is under construction its not clear if it is needed.
+                settingGroup.replenishValueMap(valueMap, sourceMap);
+            #endif
             previousState = settingGroup;
+        }
     }
 
 protected:
@@ -437,7 +449,6 @@ struct FogDetection: public SettingGroup
 
     void readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
     std::string buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
-
 };
 //-------------------------------------------------------------------------------------------------
 struct ObjectDetectionGeneral: public SettingGroup

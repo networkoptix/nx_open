@@ -40,6 +40,13 @@ bool QnLinuxShortcuts::shortcutExists(const QString& /*destinationPath*/,
     return false;
 }
 
+QnPlatformShortcuts::ShortcutInfo QnLinuxShortcuts::getShortcutInfo(
+    const QString& destinationPath,
+    const QString& name) const
+{
+    return {};
+}
+
 bool QnLinuxShortcuts::supported() const {
     return false;
 }

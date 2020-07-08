@@ -402,7 +402,9 @@ void SettingsProcessor::transferAndHoldSettingsFromDeviceToServer(
 //-------------------------------------------------------------------------------------------------
 
 void SettingsProcessor::transferAndHoldSettingsFromServerToDevice(
-    nx::sdk::StringMap* errorMap, const nx::sdk::IStringMap* sourceMap)
+    nx::sdk::StringMap* errorMap,
+    nx::sdk::StringMap* valueMap,
+    const nx::sdk::IStringMap* sourceMap)
 {
     const auto sender = [this](const std::string& request)
     {
@@ -414,24 +416,24 @@ void SettingsProcessor::transferAndHoldSettingsFromServerToDevice(
 #if 0
         // Hanwha analyticsMode detection selection is currently removed from the Clients interface
         // desired analytics mode if selected implicitly now.
-        SettingGroup::transferFromServerToDevice(errorMap, sourceMap,
+        SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
             m_settings.analyticsMode, sender, m_frameSize, m_cameraChannelNumber);
 #endif
 #if 0
         // Hanwha Motion detection support is currently removed from the Clients interface
-        SettingGroup::transferFromServerToDevice(errorMap, sourceMap,
+        SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
             m_settings.motionDetectionObjectSize, sender, m_frameSize, m_cameraChannelNumber);
 
         for (int i = 0; i < Settings::kMultiplicity; ++i)
         {
-            SettingGroup::transferFromServerToDevice(errorMap, sourceMap,
+            SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
                 m_settings.motionDetectionIncludeArea[i], sender,
                 m_frameSize, m_cameraChannelNumber, i);
         }
 
         for (int i = 0; i < Settings::kMultiplicity; ++i)
         {
-            SettingGroup::transferFromServerToDevice(errorMap, sourceMap,
+            SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
                 m_settings.motionDetectionExcludeArea[i], sender,
                 m_frameSize, m_cameraChannelNumber, i);
         }
@@ -440,19 +442,19 @@ void SettingsProcessor::transferAndHoldSettingsFromServerToDevice(
 
     if (m_settings.analyticsCategories[shockDetection])
     {
-        SettingGroup::transferFromServerToDevice(errorMap, sourceMap,
+        SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
             m_settings.shockDetection, sender, m_frameSize, m_cameraChannelNumber);
     }
 
     if (m_settings.analyticsCategories[tamperingDetection])
     {
-        SettingGroup::transferFromServerToDevice(errorMap, sourceMap,
+        SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
             m_settings.tamperingDetection, sender, m_frameSize, m_cameraChannelNumber);
     }
 
     if (m_settings.analyticsCategories[defocusDetection])
     {
-        SettingGroup::transferFromServerToDevice(errorMap, sourceMap,
+        SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
             m_settings.defocusDetection, sender, m_frameSize, m_cameraChannelNumber);
     }
 
@@ -460,31 +462,31 @@ void SettingsProcessor::transferAndHoldSettingsFromServerToDevice(
     // Fog detection is broken in Hanwha firmware <= 1.41.
     if (m_settings.analyticsCategories[fogDetection])
     {
-        SettingGroup::transferFromServerToDevice(errorMap, sourceMap,
+        SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
             m_settings.fogDetection, sender, m_frameSize, m_cameraChannelNumber);
     }
 #endif
 
     if (m_settings.analyticsCategories[videoAnalytics])
     {
-        SettingGroup::transferFromServerToDevice(errorMap, sourceMap,
+        SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
             m_settings.ivaObjectSize, sender, m_frameSize, m_cameraChannelNumber);
 
         for (int i = 0; i < Settings::kMultiplicity; ++i)
         {
-            SettingGroup::transferFromServerToDevice(errorMap, sourceMap,
+            SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
                 m_settings.ivaLines[i], sender, m_frameSize, m_cameraChannelNumber, i);
         }
 
         for (int i = 0; i < Settings::kMultiplicity; ++i)
         {
-            SettingGroup::transferFromServerToDevice(errorMap, sourceMap,
+            SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
                 m_settings.ivaAreas[i], sender, m_frameSize, m_cameraChannelNumber, i);
         }
 
         for (int i = 0; i < Settings::kMultiplicity; ++i)
         {
-            SettingGroup::transferFromServerToDevice(errorMap, sourceMap,
+            SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
                 m_settings.ivaExcludeAreas[i], sender, m_frameSize, m_cameraChannelNumber, i);
         }
 
@@ -493,22 +495,22 @@ void SettingsProcessor::transferAndHoldSettingsFromServerToDevice(
 
     if (m_settings.analyticsCategories[objectDetection])
     {
-        SettingGroup::transferFromServerToDevice(errorMap, sourceMap,
+        SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
             m_settings.objectDetectionGeneral, sender, m_frameSize, m_cameraChannelNumber);
 
-        SettingGroup::transferFromServerToDevice(errorMap, sourceMap,
+        SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
             m_settings.objectDetectionBestShot, sender, m_frameSize, m_cameraChannelNumber);
     }
 
     if (m_settings.analyticsCategories[audioDetection])
     {
-        SettingGroup::transferFromServerToDevice(errorMap, sourceMap,
+        SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
             m_settings.audioDetection, sender, m_frameSize, m_cameraChannelNumber);
     }
 
     if (m_settings.analyticsCategories[audioAnalytics])
     {
-        SettingGroup::transferFromServerToDevice(errorMap, sourceMap,
+        SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
             m_settings.soundClassification, sender, m_frameSize, m_cameraChannelNumber);
     }
 

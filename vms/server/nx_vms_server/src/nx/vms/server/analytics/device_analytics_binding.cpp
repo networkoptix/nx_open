@@ -7,6 +7,7 @@
 #include <media_server/media_server_module.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/concurrent.h>
 
 #include <nx/vms/api/analytics/descriptors.h>
 
@@ -649,7 +650,26 @@ nx::sdk::Ptr<DeviceAgentHandler> DeviceAnalyticsBinding::createHandlerUnsafe()
         return nullptr;
 
     auto handler = nx::sdk::makePtr<DeviceAgentHandler>(
-        serverModule(), m_engine->getId(), m_device);
+        serverModule(),
+        m_engine,
+        m_device,
+        [this](const DeviceAgentManifest& manifest)
+        {
+            nx::utils::concurrent::run(
+                serverModule()->analyticsThreadPool(),
+                [this, manifest, bindingWeakRef = weak_from_this()]()
+                {
+                    const auto bindingStrongRef = bindingWeakRef.lock();
+                    if (!bindingStrongRef)
+                        return;
+
+                    NX_MUTEX_LOCKER lock(&m_mutex);
+
+                    updateDescriptorsWithManifest(manifest);
+                    updateDeviceWithManifest(manifest);
+                });
+        });
+
     handler->setMetadataSinks(m_metadataSinks);
 
     return handler;

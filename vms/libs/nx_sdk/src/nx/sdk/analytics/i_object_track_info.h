@@ -18,29 +18,32 @@ class IObjectTrackInfo: public Interface<IObjectTrackInfo>
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IObjectTrackInfo"); }
 
-    /** @return List of metadata that share the same trackId. */
+    /** Called by track() */
     protected: virtual IList<ITimestampedObjectMetadata>* getTrack() const = 0;
+    /** @return List of metadata that share the same trackId. */
     public: Ptr<IList<ITimestampedObjectMetadata>> track() const { return toPtr(getTrack()); }
 
+    /** Called by bestShotVideoFrame() */
+    protected: virtual IUncompressedVideoFrame* getBestShotVideoFrame() const = 0;
     /**
      * @return Frame defined to be the best shot in the object track by the DeviceAgent that
      *     generated this track, or, if such information is not available, the first frame of the
      *     object track. Returns null if the required frame is not available, or obtaining such a
      *     frame was not requested by the Engine manifest.
      */
-    protected: virtual IUncompressedVideoFrame* getBestShotVideoFrame() const = 0;
     public: Ptr<IUncompressedVideoFrame> bestShotVideoFrame() const
     {
         return toPtr(getBestShotVideoFrame());
     }
 
+    /** Called by bestShotObjectMetadata() */
+    protected: virtual ITimestampedObjectMetadata* getBestShotObjectMetadata() const = 0;
     /**
      * @return Metadata for the position in the object track defined to be the best shot by the
      *     DeviceAgent that generated this track, or, if such information is not available, the
      *     first metadata of the object track. Returns null if the required metadata is not
      *     available, or obtaining such a metadata was not requested by the Engine manifest.
      */
-    protected: virtual ITimestampedObjectMetadata* getBestShotObjectMetadata() const = 0;
     public: Ptr<ITimestampedObjectMetadata> bestShotObjectMetadata() const
     {
         return toPtr(getBestShotObjectMetadata());

@@ -64,7 +64,7 @@ DeviceAgent::~DeviceAgent()
 
 //-------------------------------------------------------------------------------------------------
 
-void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
+/*virtual*/ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler) /*override*/
 {
     handler->addRef();
     m_handler.reset(handler);
@@ -72,8 +72,8 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 
 //-------------------------------------------------------------------------------------------------
 
-void DeviceAgent::doSetNeededMetadataTypes(
-    Result<void>* outResult, const IMetadataTypes* neededMetadataTypes)
+/*virtual*/ void DeviceAgent::doSetNeededMetadataTypes(
+    Result<void>* outResult, const IMetadataTypes* neededMetadataTypes) /*override*/
 {
     const auto eventTypeIds = neededMetadataTypes->eventTypeIds();
     if (const char* const kMessage = "Event type id list is null";
@@ -97,7 +97,8 @@ void DeviceAgent::doSetNeededMetadataTypes(
  * the information about objects. Then it creates `objectMetadataPacket, attaches `objectMetadata`
  * (with object information) to it and sends to server using `m_handler`.
 */
-void DeviceAgent::doPushDataPacket(Result<void>* /*outResult*/, IDataPacket* dataPacket)
+/*virtual*/ void DeviceAgent::doPushDataPacket(
+    Result<void>* /*outResult*/, IDataPacket* dataPacket) /*override*/
 {
     const auto incomingPacket = dataPacket->queryInterface<ICustomMetadataPacket>();
     QByteArray xmlData(incomingPacket->data(), incomingPacket->dataSize());
@@ -190,10 +191,17 @@ void DeviceAgent::setSupportedEventCategoties()
         settingsCount));
 
     auto errorMap = makePtr<nx::sdk::StringMap>();
-    m_settingsProcessor.transferAndHoldSettingsFromServerToDevice(errorMap.get(), sourceMap);
+    auto valueMap = makePtr<nx::sdk::StringMap>();
+    m_settingsProcessor.transferAndHoldSettingsFromServerToDevice(
+        errorMap.get(), valueMap.get(), sourceMap);
 
     auto settingsResponse = makePtr<nx::sdk::SettingsResponse>();
     settingsResponse->setErrors(std::move(errorMap));
+
+    #if 0
+        // While plugin manager is under construction its not clear if it is needed.
+        settingsResponse->setValues(std::move(valueMap));
+    #endif
 
     *outResult = settingsResponse.releasePtr();
 }
@@ -295,7 +303,7 @@ void DeviceAgent::stopFetchingMetadata()
 
 //-------------------------------------------------------------------------------------------------
 
-void DeviceAgent::getManifest(Result<const IString*>* outResult) const
+/*virtual*/ void DeviceAgent::getManifest(Result<const IString*>* outResult) const /*override*/
 {
     *outResult = new nx::sdk::String(QJson::serialized(m_manifest));
 }

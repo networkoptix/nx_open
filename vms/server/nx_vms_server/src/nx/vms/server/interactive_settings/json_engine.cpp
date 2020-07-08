@@ -10,6 +10,7 @@
 #include <QtCore/QMetaObject>
 #include <QtCore/QMetaProperty>
 
+#include <nx/kit/utils.h>
 #include <nx/utils/log/log.h>
 
 #include "components/value_item.h"
@@ -184,22 +185,30 @@ QJsonValue processItemTemplate(const QJsonValue& value, const int index, const i
 }
 
 std::unique_ptr<Item> createItem(
-    JsonEngine* engine, Item* parent, const QJsonObject& object, int repeaterDepth)
+    JsonEngine* engine, Item* parent, const QJsonObject& itemObject, int repeaterDepth)
 {
-    const auto type = object["type"].toString();
+    QString type = itemObject["type"].toString();
     if (type.isEmpty())
     {
-        engine->addIssue(Issue(Issue::Type::error, Issue::Code::parseError,
-            lm("Object does not have type: %1").arg(
-                QString::fromUtf8(QJsonDocument(object).toJson(QJsonDocument::Compact)))));
-        return {};
+        if (!parent)
+        {
+            // For the top-level Item of a Settings model, the field "type" is optional.
+            type = "Settings";
+        }
+        else
+        {
+            engine->addIssue(Issue(Issue::Type::error, Issue::Code::parseError,
+                lm("Item field \"type\" is missing or empty in the Item defined by JSON %1").arg(
+                    QString::fromUtf8(QJsonDocument(itemObject).toJson(QJsonDocument::Compact)))));
+            return {};
+        }
     }
 
     std::unique_ptr<Item> item(Factory::createItem(type, parent));
     if (!item)
     {
         engine->addIssue(Issue(Issue::Type::error, Issue::Code::parseError,
-            lm("Unknown item type: %1").arg(type)));
+            lm("Item field \"type\" has unknown value: %1").arg(nx::kit::utils::toString(type))));
         return {};
     }
 
@@ -239,7 +248,7 @@ std::unique_ptr<Item> createItem(
                 NX_WARNING(NX_SCOPE_TAG, "Cannot write value %1 to property %2", value, key);
         };
 
-    for (auto it = object.begin(); it != object.end(); ++it)
+    for (auto it = itemObject.begin(); it != itemObject.end(); ++it)
     {
         const QString& key = it.key();
 
@@ -271,7 +280,7 @@ std::unique_ptr<Item> createItem(
     {
         auto itemsProperty = group->items();
 
-        for (const QJsonValue itemValue: object["items"].toArray())
+        for (const QJsonValue itemValue: itemObject["items"].toArray())
         {
             const QJsonObject itemObject = itemValue.toObject();
             auto childItem = createItem(engine, item.get(), itemObject, repeaterDepth);
@@ -287,7 +296,7 @@ std::unique_ptr<Item> createItem(
     {
         auto sectionsProperty = sectionContainer->sections();
 
-        for (const QJsonValue sectionValue: object["sections"].toArray())
+        for (const QJsonValue sectionValue: itemObject["sections"].toArray())
         {
             auto childItem = createItem(
                 engine, item.get(), sectionValue.toObject(), repeaterDepth);
@@ -341,7 +350,7 @@ JsonEngine::JsonEngine()
 bool JsonEngine::loadModelFromJsonObject(const QJsonObject& json)
 {
     startUpdatingValues();
-    auto item = createItem(this, nullptr, json, 1);
+    auto item = createItem(this, /*parent*/ nullptr, json, 1);
     stopUpdatingValues();
 
     if (!item)

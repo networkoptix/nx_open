@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <memory>
 
 #include <QtCore/QJsonObject>
 
@@ -32,6 +33,7 @@
 namespace nx::vms::server::analytics {
 
 class DeviceAnalyticsBinding:
+    public std::enable_shared_from_this<DeviceAnalyticsBinding>,
     public QnAbstractDataConsumer,
     public /*mixin*/ nx::vms::server::ServerModuleAware
 {
@@ -124,7 +126,7 @@ private:
         mutable SettingsContext settingsContext;
     };
 
-    mutable QnMutex m_mutex;
+    mutable nx::Mutex m_mutex;
     nx::vms::server::resource::CameraPtr m_device;
     nx::vms::server::resource::AnalyticsEngineResourcePtr m_engine;
     DeviceAgentContext m_deviceAgentContext;

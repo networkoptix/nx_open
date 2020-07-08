@@ -54,6 +54,7 @@ enum class SdkMethod
     // DeviceAgent.
     setNeededMetadataTypes,
     pushDataPacket,
+    pushManifest,
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SdkMethod);

@@ -115,6 +115,8 @@ protected:
      */
     std::string settingValue(const std::string& paramName);
 
+    void pushManifest(const std::string& pushManifest);
+
 public:
     virtual ~ConsumingDeviceAgent() override;
 

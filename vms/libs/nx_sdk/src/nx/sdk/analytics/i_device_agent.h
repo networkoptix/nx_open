@@ -35,15 +35,27 @@ class IDeviceAgent: public Interface<IDeviceAgent>
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IDeviceAgent"); }
 
-    class IHandler: public Interface<IHandler>
+    class IHandler0: public Interface<IHandler0>
     {
     public:
         static auto interfaceId() { return makeId("nx::sdk::analytics::IDeviceAgent::IHandler"); }
 
-        virtual ~IHandler() = default;
+        virtual ~IHandler0() = default;
         virtual void handleMetadata(IMetadataPacket* metadataPacket) = 0;
         virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) = 0;
     };
+
+    class IHandler: public Interface<IHandler, IHandler0>
+    {
+    public:
+        static auto interfaceId() { return makeId("nx::sdk::analytics::IDeviceAgent::IHandler1"); }
+
+        virtual void pushManifest(const IString* manifest) = 0;
+    };
+
+    /** Called by setSettings() */
+    protected: virtual void doSetSettings(
+        Result<const ISettingsResponse*>* outResult, const IStringMap* settings) = 0;
 
     /**
      * Called before other methods. Server provides the set of settings stored in its database,
@@ -59,8 +71,6 @@ public:
      *     of some general failure that affected the procedure of applying the settings. The result
      *     should contain null if no errors occurred.
      */
-    protected: virtual void doSetSettings(
-        Result<const ISettingsResponse*>* outResult, const IStringMap* settings) = 0;
     public: Result<const ISettingsResponse*> setSettings(const IStringMap* settings)
     {
         Result<const ISettingsResponse*> result;
@@ -68,6 +78,9 @@ public:
         return result;
     }
 
+    /** Called by pluginSideSettings() */
+    protected: virtual void getPluginSideSettings(
+        Result<const ISettingsResponse*>* outResult) const = 0;
     /**
      * In addition to the settings stored in a Server database, a DeviceAgent can have some
      * settings which are stored somewhere "under the hood" of the DeviceAgent, e.g. on a device
@@ -81,8 +94,6 @@ public:
      *     failure that affects the settings retrieval procedure. The result should contain null if
      *     the Engine has no plugin-side settings.
      */
-    protected: virtual void getPluginSideSettings(
-        Result<const ISettingsResponse*>* outResult) const = 0;
     public: Result<const ISettingsResponse*> pluginSideSettings() const
     {
         Result<const ISettingsResponse*> result;
@@ -90,12 +101,13 @@ public:
         return result;
     }
 
+    /** Called by manifest() */
+    protected: virtual void getManifest(Result<const IString*>* outResult) const = 0;
     /**
      * Provides DeviceAgent manifest in JSON format.
      *
      * @return JSON string in UTF-8.
      */
-    protected: virtual void getManifest(Result<const IString*>* outResult) const = 0;
     public: Result<const IString*> manifest() const
     {
         Result<const IString*> result;
@@ -111,14 +123,15 @@ public:
      */
     virtual void setHandler(IHandler* handler) = 0;
 
+    /** Called by setNeededMetadataTypes() */
+    protected: virtual void doSetNeededMetadataTypes(
+        Result<void>* outResult, const IMetadataTypes* neededMetadataTypes) = 0;
     /**
      * Sets a list of metadata types that are needed by the Server. Empty list means that the
      * Server does not need any metadata from this DeviceAgent.
      *
      * @param neededMetadataTypes Lists of type ids of events and objects.
      */
-    protected: virtual void doSetNeededMetadataTypes(
-        Result<void>* outResult, const IMetadataTypes* neededMetadataTypes) = 0;
     public: Result<void> setNeededMetadataTypes(const IMetadataTypes* neededMetadataTypes)
     {
         Result<void> result;

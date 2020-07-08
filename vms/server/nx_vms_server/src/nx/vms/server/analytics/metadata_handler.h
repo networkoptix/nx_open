@@ -22,6 +22,7 @@
 
 #include <nx/debugging/abstract_visual_metadata_debugger.h>
 #include <nx/vms/server/server_module_aware.h>
+#include <nx/vms/server/resource/camera.h>
 
 #include <nx/vms/server/analytics/types.h>
 #include <nx/vms/server/analytics/object_coordinates_translator.h>
@@ -43,7 +44,7 @@ public:
 
     MetadataHandler(
         QnMediaServerModule* serverModule,
-        QnVirtualCameraResourcePtr device,
+        resource::CameraPtr device,
         QnUuid engineId);
 
     void handleMetadata(nx::sdk::analytics::IMetadataPacket* metadataPacket);
@@ -78,7 +79,7 @@ private:
 
 private:
     nx::Mutex m_mutex;
-    QnVirtualCameraResourcePtr m_resource;
+    resource::CameraPtr m_resource;
     QnUuid m_engineId;
     mutable std::optional<nx::analytics::EventTypeDescriptorMap> m_eventTypeDescriptors;
     QMap<QString, nx::vms::api::EventState> m_eventStateMap;

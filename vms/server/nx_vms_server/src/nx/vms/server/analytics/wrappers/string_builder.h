@@ -21,22 +21,9 @@ public:
         Violation violation);
 
     QString buildLogString() const;
-
     QString buildPluginInfoString() const;
-
     QString buildPluginDiagnosticEventCaption() const;
-
     QString buildPluginDiagnosticEventDescription() const;
-
-private:
-    QString buildViolationShortString() const;
-    QString buildViolationFullString() const;
-
-    QString buildErrorShortString() const;
-    QString buildErrorFullString() const;
-
-    QString buildViolationPluginInfoString() const;
-    QString buildErrorPluginInfoString() const;
 
 private:
     const SdkMethod m_sdkMethod = SdkMethod::undefined;

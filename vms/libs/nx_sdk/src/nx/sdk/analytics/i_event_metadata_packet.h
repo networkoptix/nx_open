@@ -19,6 +19,7 @@ class IEventMetadataPacket: public Interface<IEventMetadataPacket, ICompoundMeta
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IEventMetadataPacket"); }
 
+    /** Called by at() */
     protected: virtual const IEventMetadata* getAt(int index) const override = 0;
     public: Ptr<const IEventMetadata> at(int index) const { return toPtr(getAt(index)); }
 };

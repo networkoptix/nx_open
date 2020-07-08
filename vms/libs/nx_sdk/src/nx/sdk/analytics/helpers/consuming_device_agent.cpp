@@ -221,6 +221,12 @@ std::string ConsumingDeviceAgent::settingValue(const std::string& paramName)
     return m_settings[paramName];
 }
 
+void ConsumingDeviceAgent::pushManifest(const std::string& manifest)
+{
+    const auto manifestSdkString = nx::sdk::makePtr<nx::sdk::String>(manifest);
+    m_handler->pushManifest(manifestSdkString.get());
+}
+
 void ConsumingDeviceAgent::logMetadataPacketIfNeeded(
     const IMetadataPacket* metadataPacket,
     const std::string& packetIndexName) const

@@ -45,10 +45,11 @@ public:
      */
     virtual int height() const = 0;
 
+    /** Called by pixelAspectRatio() */
+    protected: virtual void getPixelAspectRatio(PixelAspectRatio* outValue) const = 0;
     /**
      * @return Aspect ratio of a frame pixel.
      */
-    protected: virtual void getPixelAspectRatio(PixelAspectRatio* outValue) const = 0;
     public: PixelAspectRatio pixelAspectRatio() const
     {
         PixelAspectRatio value;
@@ -73,6 +74,7 @@ class IUncompressedVideoFrame: public Interface<IUncompressedVideoFrame, IUncomp
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IUncompressedVideoFrame0"); }
 
+    /** Called by metadataList() */
     protected: virtual IList<IMetadataPacket>* getMetadataList() const = 0;
     public: Ptr<IList<IMetadataPacket>> metadataList() const
     {

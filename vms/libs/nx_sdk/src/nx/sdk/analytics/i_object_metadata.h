@@ -20,12 +20,13 @@ class IObjectMetadata: public Interface<IObjectMetadata, IMetadata>
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IObjectMetadata"); }
 
+    /** Called by trackId() */
+    protected: virtual void getTrackId(Uuid* outValue) const = 0;
     /**
      * @return Id of the object track. Object track is a sequence of object detections from its
      *     first appearance on the scene till its disappearance. The same object can have multiple
      *     tracks (e.g. the same person entered and exited a room several times).
      */
-    protected: virtual void getTrackId(Uuid* outValue) const = 0;
     public: Uuid trackId() const { Uuid value; getTrackId(&value); return value; }
 
     /**
@@ -33,10 +34,11 @@ public:
      */
     virtual const char* subtype() const = 0;
 
+    /** Called by boundingBox() */
+    protected: virtual void getBoundingBox(Rect* outValue) const = 0;
     /**
      * @return Bounding box of an object detected in a video frame.
      */
-    protected: virtual void getBoundingBox(Rect* outValue) const = 0;
     public: Rect boundingBox() const { Rect value; getBoundingBox(&value); return value; }
 
 };

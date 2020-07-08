@@ -9134,12 +9134,12 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Unknown device</source>
-      <translation type="unfinished">Unknown device</translation>
+      <translation>Ismeretlen eszköz</translation>
     </message>
     <message>
       <source>Unknown device %1</source>
       <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation type="unfinished">Unknown device %1</translation>
+      <translation>Ismeretlen eszköz probléma</translation>
     </message>
   </context>
   <context>
@@ -9158,24 +9158,24 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message>
       <source>The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">The system is not connected to %1. Mobile notifications work only when the system is connected to %1.</translation>
+      <translation>A rendszer nincs csatlakoztatva %1. A mobil értesítések csak akkor működnek, ha a rendszer csatlakoztatva van az %1.</translation>
     </message>
     <message>
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation type="unfinished">%1 Settings</translation>
+      <translation>%1 Beállítások</translation>
     </message>
     <message numerus="yes">
       <source>%n symbols over</source>
       <translation type="unfinished">
-        <numerusform>%n symbols over</numerusform>
+        <numerusform>%n szimbólum felett</numerusform>
         <numerusform>%n symbols over</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n symbols left</source>
       <translation type="unfinished">
-        <numerusform>%n symbols left</numerusform>
+        <numerusform>%n szimbólum maradt</numerusform>
         <numerusform>%n symbols left</numerusform>
       </translation>
     </message>
@@ -9312,7 +9312,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Only client-server video traffic can be encrypted</source>
-      <translation type="unfinished">Only client-server video traffic can be encrypted</translation>
+      <translation>Csak kliens-szerver video forgalom titkosítható</translation>
     </message>
   </context>
   <context>
@@ -9326,7 +9326,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>There are no compatible servers</source>
-      <translation type="unfinished">There are no compatible servers</translation>
+      <translation>Nincsenek kompatibilis szerverek</translation>
     </message>
   </context>
   <context>
@@ -9756,7 +9756,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation type="unfinished">Transcoding is required. Export session restarted.</translation>
+      <translation>Átkódolás szükséges. Az export munkamenet újraindult.</translation>
     </message>
   </context>
   <context>
@@ -9963,12 +9963,12 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation type="unfinished">Please complete the following for license deactivation</translation>
+      <translation>Kérjük, töltse ki a következőket a licenc deaktiválásához</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
       <translation type="unfinished">
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+        <numerusform>Vegye figyelembe, hogy az egyes licenckulcsokat legfeljebb %n alkalommal lehet deaktiválni.</numerusform>
         <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
       </translation>
     </message>

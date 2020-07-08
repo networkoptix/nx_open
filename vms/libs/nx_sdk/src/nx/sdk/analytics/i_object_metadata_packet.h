@@ -19,6 +19,7 @@ class IObjectMetadataPacket: public Interface<IObjectMetadataPacket, ICompoundMe
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IObjectMetadataPacket"); }
 
+    /** Called by at() */
     protected: virtual const IObjectMetadata* getAt(int index) const override = 0;
     public: Ptr<const IObjectMetadata> at(int index) const { return toPtr(getAt(index)); }
 };
