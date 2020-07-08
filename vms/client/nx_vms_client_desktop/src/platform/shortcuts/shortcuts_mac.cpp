@@ -31,13 +31,13 @@ valueForKey:@"NSApplicationProcessSerialNumberLow"] intValue];
     }
     if (!fFFound)
         return false;
-    // Now the event fun begins. 
+    // Now the event fun begins.
     OSErr err = noErr;
     AliasHandle hSrcAlias = 0;
     AliasHandle hDstAlias = 0;
     do
     {
-        // Create a descriptor which contains the target psn. 
+        // Create a descriptor which contains the target psn.
         NSAppleEventDescriptor *finderPSNDesc = [NSAppleEventDescriptor
 descriptorWithDescriptorType:typeProcessSerialNumber
 bytes:&psn
@@ -53,7 +53,7 @@ returnID:kAutoGenerateReturnID
 transactionID:kAnyTransactionID];
         if (!finderEventDesc)
             break;
-        // Create and add an event type descriptor: Alias 
+        // Create and add an event type descriptor: Alias
         NSAppleEventDescriptor *osTypeDesc = [NSAppleEventDescriptor descriptorWithTypeCode:typeAlias];
         if (!osTypeDesc)
             break;
@@ -105,7 +105,7 @@ forKeyword:keyAEName];
             0,
             nil);
     } while(0);
-    // Cleanup 
+    // Cleanup
     if (hSrcAlias)
         DisposeHandle((Handle)hSrcAlias);
     if (hDstAlias)
@@ -122,9 +122,16 @@ bool QnMacShortcuts::deleteShortcut(const QString &destinationPath, const QStrin
     return true;
 }
 
-bool QnMacShortcuts::shortcutExists(const QString &destinationPath, const QString &name) const 
+bool QnMacShortcuts::shortcutExists(const QString &destinationPath, const QString &name) const
 {
     return false;
+}
+
+QnPlatformShortcuts::ShortcutInfo QnMacShortcuts::getShortcutInfo(
+    const QString& destinationPath,
+    const QString& name) const
+{
+    return {};
 }
 
 bool QnMacShortcuts::supported() const {

@@ -63,6 +63,7 @@ private:
 
     bool updateMinilauncherInDir(const QDir& installRoot, const QString& sourceMinilauncherPath);
     bool updateApplauncherDesktopIcon();
+    bool updateMinilauncherDesktopIcon();
 
 
 private:

@@ -23,6 +23,9 @@
 #include <utils/common/app_info.h>
 #include <utils/applauncher_utils.h>
 
+#include <platform/platform_abstraction.h>
+#include <platform/shortcuts/platform_shortcuts.h>
+
 namespace nx {
 namespace vms {
 namespace client {
@@ -381,6 +384,9 @@ bool SelfUpdater::updateMinilauncher()
     bool success = true;
     for (const QString& installRoot: QnClientInstallationsManager::clientInstallRoots())
         success &= updateMinilauncherInDir(installRoot, sourceMinilauncherPath);
+
+    success &= updateMinilauncherDesktopIcon();
+
     return success;
 }
 
@@ -650,6 +656,63 @@ bool SelfUpdater::updateApplauncherDesktopIcon()
     #endif // defined(Q_OS_LINUX)
 
     return true;
+}
+
+bool SelfUpdater::updateMinilauncherDesktopIcon()
+{
+    bool success = true;
+
+    #if defined(Q_OS_WIN)
+        // WIX installer creates a shortcut with icon placed in "%SystemRoot%\Installer\{GUID}\".
+        // Instead of that we want to use an icon from our minilauncher binary, so it will be updated.
+
+        const QStringList shortcutDirs = {
+            QStandardPaths::writableLocation(QStandardPaths::DesktopLocation),
+            QDir::fromNativeSeparators(QString::fromLocal8Bit(qgetenv("public"))) + "/Desktop"};
+
+        const QStringList prefixes = QnClientInstallationsManager::clientInstallRoots();
+        const QString suffix = QnClientAppInfo::minilauncherBinaryName();
+
+        for (const auto& dirPath: shortcutDirs)
+        {
+            // Iterate over existing shortcuts.
+            const QDir dir(dirPath);
+            for (const auto& entry: dir.entryInfoList({"*.lnk"}, QDir::Files))
+            {
+                // Acquire shortcut data.
+                auto info = qnPlatform->shortcuts()->getShortcutInfo(
+                    entry.absolutePath(),
+                    entry.completeBaseName());
+
+                // Check if the shortcut points to some minilauncher binary.
+                const bool shortcutToLauncher = std::any_of(prefixes.begin(), prefixes.end(),
+                    [filePath = info.sourceFile](auto& prefix)
+                    {
+                        return filePath.startsWith(prefix, Qt::CaseInsensitive);
+                    })
+                    && info.sourceFile.endsWith(suffix, Qt::CaseInsensitive);
+
+                // Additional check. We don't want to change VideoWall icons or user-chosen icons.
+                if (shortcutToLauncher
+                    && (info.iconPath.contains("/Windows/Installer/", Qt::CaseInsensitive)
+                        || info.iconPath.contains("%SystemRoot%/Installer/", Qt::CaseInsensitive)))
+                {
+                    NX_INFO(this, "Updating icon for shortcut", entry.absoluteFilePath());
+                    NX_INFO(this, "Previous icon location:", info.iconPath);
+
+                    // Overwrite the shortcut.
+                    // This call clears shortcut icon, so the target binary icon will be used.
+                    success &= qnPlatform->shortcuts()->createShortcut(
+                        info.sourceFile,
+                        entry.absolutePath(),
+                        entry.completeBaseName(),
+                        info.arguments);
+                }
+            }
+        }
+    #endif // defined(Q_OS_WIN)
+
+    return success;
 }
 
 } // namespace client

@@ -8,6 +8,16 @@
  */
 class QnPlatformShortcuts: public QObject {
     Q_OBJECT
+
+public:
+    struct ShortcutInfo
+    {
+        QString sourceFile;
+        QStringList arguments;
+        QString iconPath;
+        int iconId = 0;
+    };
+
 public:
     QnPlatformShortcuts(QObject *parent = NULL): QObject(parent) {}
     virtual ~QnPlatformShortcuts() {}
@@ -41,6 +51,15 @@ public:
      * \returns                         True if the shortcut exists, false otherwise.
      */
     virtual bool shortcutExists(const QString &destinationPath, const QString &name) const = 0;
+
+    /**
+     * This function collects some information about existing shortcut and returns it as a struct.
+     *
+     * @param destinationPath Path to the shortcut (without filename).
+     * @param name Name of the shortcut.
+     * @return Struct with parameters of the shortcut.
+     */
+    virtual ShortcutInfo getShortcutInfo(const QString& destinationPath, const QString& name) const = 0;
 
     virtual bool supported() const = 0;
 

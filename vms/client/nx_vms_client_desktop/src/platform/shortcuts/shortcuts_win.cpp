@@ -15,6 +15,8 @@
 
 namespace {
 
+    const int kMaxStringLength = 2048;
+
     class QnComInitializer {
     public:
         QnComInitializer():
@@ -102,6 +104,45 @@ namespace {
         return hres;
     }
 
+    HRESULT GetLinkInfo(
+        LPCWSTR lpszPathLink,
+        LPWSTR lpszPathObj,
+        LPWSTR lpszArgs,
+        LPWSTR lpszIconLocation,
+        int* iconIndex)
+    {
+        HRESULT hres;
+        IShellLink* pShellLink;
+
+        // Get a pointer to the IShellLink interface. It is assumed that CoInitialize
+        // has already been called.
+        hres = CoCreateInstance(
+            CLSID_ShellLink, NULL, CLSCTX_INPROC_SERVER, IID_IShellLink,(LPVOID*)&pShellLink);
+        if (!SUCCEEDED(hres))
+            return hres;
+
+        IPersistFile* pPersistFile;
+
+        hres = pShellLink->QueryInterface(IID_IPersistFile, (LPVOID*)&pPersistFile);
+        if (!SUCCEEDED(hres))
+        {
+            pShellLink->Release();
+            return hres;
+        }
+
+        hres = pPersistFile->Load(lpszPathLink, STGM_READ);
+        if (SUCCEEDED(hres))
+        {
+            pShellLink->GetPath(lpszPathObj, kMaxStringLength, NULL, 0);
+            pShellLink->GetArguments(lpszArgs, kMaxStringLength);
+            pShellLink->GetIconLocation(lpszIconLocation, kMaxStringLength, iconIndex);
+        }
+
+        pPersistFile->Release();
+        pShellLink->Release();
+
+        return hres;
+    }
 
 }
 
@@ -163,6 +204,48 @@ bool QnWindowsShortcuts::deleteShortcut(const QString &destinationPath, const QS
 bool QnWindowsShortcuts::shortcutExists(const QString &destinationPath, const QString &name) const {
     QString fullPath = QDir::toNativeSeparators(destinationPath) + lit("\\") + name + lit(".lnk");
     return QFileInfo::exists(fullPath);
+}
+
+QnPlatformShortcuts::ShortcutInfo QnWindowsShortcuts::getShortcutInfo(
+    const QString& destinationPath,
+    const QString& name) const
+{
+    QnComInitializer comInit;
+    if (!comInit.success())
+        return {};
+
+    QString fullPath = QDir::toNativeSeparators(destinationPath) + lit("\\") + name + lit(".lnk");
+    wchar_t* lpszPathLink = qnStringToPWChar(fullPath);
+
+    LPWSTR lpszPathObj = new wchar_t[kMaxStringLength];
+    LPWSTR lpszArgs = new wchar_t[kMaxStringLength];
+    LPWSTR lpszIconLocation = new wchar_t[kMaxStringLength];
+    int iconIndex = 0;
+
+    HRESULT rc = GetLinkInfo(lpszPathLink, lpszPathObj, lpszArgs, lpszIconLocation, &iconIndex);
+
+    ShortcutInfo result;
+    if (SUCCEEDED(rc))
+    {
+        result.sourceFile = QDir::fromNativeSeparators(
+            QString::fromWCharArray(lpszPathObj, kMaxStringLength));
+
+        result.arguments = QDir::fromNativeSeparators(
+            QString::fromWCharArray(lpszArgs, kMaxStringLength))
+                .split(L' ', QString::SkipEmptyParts);
+
+        result.iconPath = QDir::fromNativeSeparators(
+            QString::fromWCharArray(lpszIconLocation, kMaxStringLength));
+
+        result.iconId = iconIndex;
+    }
+
+    delete[] lpszPathLink;
+    delete[] lpszPathObj;
+    delete[] lpszArgs;
+    delete[] lpszIconLocation;
+
+    return result;
 }
 
 bool QnWindowsShortcuts::supported() const {
