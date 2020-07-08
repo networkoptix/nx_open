@@ -182,10 +182,11 @@ public:
     int auditTrailPeriodDays() const;
     int eventLogPeriodDays() const;
 
-    bool isTrafficEncriptionForced() const;
-    void setTrafficEncriptionForced(bool value);
+    bool isTrafficEncryptionForced() const;
+    bool isTrafficEncryptionForcedExplicitlyDefined() const;
+    void setTrafficEncryptionForced(bool value);
 
-    bool isVideoTrafficEncriptionForced() const;
+    bool isVideoTrafficEncryptionForced() const;
     void setVideoTrafficEncryptionForced(bool value);
 
     bool isAutoDiscoveryEnabled() const;
@@ -476,7 +477,7 @@ private:
     QnResourcePropertyAdaptor<bool>* m_auditTrailEnabledAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_auditTrailPeriodDaysAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_eventLogPeriodDaysAdaptor = nullptr;
-    QnResourcePropertyAdaptor<bool>* m_trafficEncryptionForcedAdaptor = nullptr;
+    QnResourcePropertyAdaptor<QnOptionalBool>* m_trafficEncryptionForcedAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_videoTrafficEncryptionForcedAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<QString>* m_disabledVendorsAdaptor = nullptr;

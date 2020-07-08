@@ -331,7 +331,7 @@ QString QnMediaServerResource::getUrl() const
 
 QString QnMediaServerResource::rtspUrl() const
 {
-    const auto isSecure = commonModule()->globalSettings()->isVideoTrafficEncriptionForced();
+    const auto isSecure = commonModule()->globalSettings()->isVideoTrafficEncryptionForced();
     nx::network::url::Builder urlBuilder(getUrl());
     urlBuilder.setScheme(nx::network::rtsp::urlSheme(isSecure));
     return urlBuilder.toString();
@@ -360,7 +360,7 @@ bool QnMediaServerResource::isSslAllowed() const
 {
     QnMutexLocker lock(&m_mutex);
     return nx::utils::Url(m_url).scheme() != nx::network::http::urlSheme(false)
-        || commonModule()->globalSettings()->isTrafficEncriptionForced();
+        || commonModule()->globalSettings()->isTrafficEncryptionForced();
 }
 
 void QnMediaServerResource::setSslAllowed(bool sslAllowed)

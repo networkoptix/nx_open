@@ -248,15 +248,15 @@ bool QnUniversalRequestProcessor::hasSecurityIssue()
 
         if (protocol == "HTTP")
         {
-            if (settings->isTrafficEncriptionForced())
+            if (settings->isTrafficEncryptionForced())
                 return redirectToScheme(nx::network::http::kSecureUrlSchemeName);
         }
         else if (protocol == "RTSP")
         {
-            if (settings->isVideoTrafficEncriptionForced())
+            if (settings->isVideoTrafficEncryptionForced())
                 return redirectToScheme(nx::network::rtsp::kSecureUrlSchemeName);
         }
-        else if (settings->isTrafficEncriptionForced())
+        else if (settings->isTrafficEncryptionForced())
         {
             NX_ASSERT(false, lm("Unable to redirect protocol to secure version: %1").arg(protocol));
             sendErrorResponse(nx::network::http::StatusCode::forbidden);

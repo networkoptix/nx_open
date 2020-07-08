@@ -554,9 +554,9 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         kEventLogPeriodDaysDefault,
         this);
 
-    m_trafficEncryptionForcedAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
+    m_trafficEncryptionForcedAdaptor = new QnLexicalResourcePropertyAdaptor<QnOptionalBool>(
         kNameTrafficEncryptionForced,
-        false,
+        QnOptionalBool(),
         this);
 
     m_videoTrafficEncryptionForcedAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
@@ -1101,17 +1101,23 @@ int QnGlobalSettings::eventLogPeriodDays() const
     return m_eventLogPeriodDaysAdaptor->value();
 }
 
-bool QnGlobalSettings::isTrafficEncriptionForced() const
+bool QnGlobalSettings::isTrafficEncryptionForced() const
 {
-    return m_trafficEncryptionForcedAdaptor->value();
+    const auto setting = m_trafficEncryptionForcedAdaptor->value();
+    return setting.isDefined() && setting.value();
 }
 
-void QnGlobalSettings::setTrafficEncriptionForced(bool value)
+bool QnGlobalSettings::isTrafficEncryptionForcedExplicitlyDefined() const
 {
-    m_trafficEncryptionForcedAdaptor->setValue(value);
+    return m_trafficEncryptionForcedAdaptor->value().isDefined();
 }
 
-bool QnGlobalSettings::isVideoTrafficEncriptionForced() const
+void QnGlobalSettings::setTrafficEncryptionForced(bool value)
+{
+    m_trafficEncryptionForcedAdaptor->setValue(QnOptionalBool(value));
+}
+
+bool QnGlobalSettings::isVideoTrafficEncryptionForced() const
 {
     return m_videoTrafficEncryptionForcedAdaptor->value();
 }
@@ -1273,41 +1279,17 @@ bool QnGlobalSettings::synchronizeNowSync()
 bool QnGlobalSettings::takeFromSettings(QSettings* settings, const QnResourcePtr& mediaServer)
 {
     bool changed = false;
+    for (const auto adapter: m_allAdaptors)
+        changed |= adapter->takeFromSettings(settings, "system.");
 
-    changed |= m_statisticsReportTimeCycleAdaptor->takeFromSettings(settings);
-    changed |= m_statisticsReportUpdateDelayAdaptor->takeFromSettings(settings);
-    changed |= m_statisticsReportServerApiAdaptor->takeFromSettings(settings);
-    changed |= m_clientStatisticsSettingsUrlAdaptor->takeFromSettings(settings);
-
-    changed |= m_cloudSystemIdAdaptor->takeFromSettings(settings);
-    changed |= m_cloudAuthKeyAdaptor->takeFromSettings(settings);
-
-    /**
-     * Fix statistics allowed flag by value, set in the installer.
-     * Note that installer value will override the existing one.
-     */
-    if (m_statisticsAllowedAdaptor->takeFromSettings(settings))
-    {
-        changed = true;
-    }
-    else
-    {
-        static const QString kStatisticsReportAllowed = "statisticsReportAllowed";
-        // If user didn't make the decision in the current version, check if he made it in the
-        // previous version.
-        if (!isStatisticsAllowedDefined() && mediaServer &&
-            !mediaServer->getProperty(kStatisticsReportAllowed).isEmpty())
-        {
-            bool value;
-            if (QnLexical::deserialize(mediaServer->getProperty(kStatisticsReportAllowed), &value))
-            {
-                changed = true;
-                m_statisticsAllowedAdaptor->setValue(QnOptionalBool(value));
-            }
-            mediaServer->setProperty(kStatisticsReportAllowed, QString());
-            mediaServer->saveProperties();
-        }
-    }
+    // TODO: These are probably deprecated and should be removed at some point in the future.
+    changed |= m_statisticsAllowedAdaptor->takeFromSettings(settings, "");
+    changed |= m_statisticsReportTimeCycleAdaptor->takeFromSettings(settings, "");
+    changed |= m_statisticsReportUpdateDelayAdaptor->takeFromSettings(settings, "");
+    changed |= m_statisticsReportServerApiAdaptor->takeFromSettings(settings, "");
+    changed |= m_clientStatisticsSettingsUrlAdaptor->takeFromSettings(settings, "");
+    changed |= m_cloudSystemIdAdaptor->takeFromSettings(settings, "");
+    changed |= m_cloudAuthKeyAdaptor->takeFromSettings(settings, "");
 
     return changed ? synchronizeNowSync() : false;
 }

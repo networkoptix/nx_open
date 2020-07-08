@@ -81,7 +81,7 @@ bool QnProxyAudioTransmitter::processAudioData(const QnConstCompressedAudioDataP
         httpClient.addAdditionalHeader("Connection", "Keep-Alive");
 
         auto urlScheme = nx::network::http::urlSheme(
-            commonModule()->globalSettings()->isTrafficEncriptionForced());
+            commonModule()->globalSettings()->isTrafficEncryptionForced());
         nx::utils::Url url;
         url.setScheme(urlScheme);
         url.setHost(route.addr.address.toString());

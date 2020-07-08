@@ -138,11 +138,11 @@ void SecuritySettingsWidget::loadDataToUi()
 {
     ui->auditTrailCheckBox->setChecked(qnGlobalSettings->isAuditTrailEnabled());
 
-    ui->forceTrafficEncryptionCheckBox->setChecked(qnGlobalSettings->isTrafficEncriptionForced());
+    ui->forceTrafficEncryptionCheckBox->setChecked(qnGlobalSettings->isTrafficEncryptionForced());
     ui->forceVideoTrafficEncryptionCheckBox->setChecked(
-        qnGlobalSettings->isVideoTrafficEncriptionForced());
+        qnGlobalSettings->isVideoTrafficEncryptionForced());
     ui->forceVideoTrafficEncryptionWidget->setEnabled(
-        qnGlobalSettings->isTrafficEncriptionForced());
+        qnGlobalSettings->isTrafficEncryptionForced());
 
     m_watermarkSettings = qnGlobalSettings->watermarkSettings();
     ui->displayWatermarkCheckBox->setChecked(m_watermarkSettings.useWatermark);
@@ -171,7 +171,7 @@ void SecuritySettingsWidget::applyChanges()
         return;
 
     qnGlobalSettings->setAuditTrailEnabled(ui->auditTrailCheckBox->isChecked());
-    qnGlobalSettings->setTrafficEncriptionForced(ui->forceTrafficEncryptionCheckBox->isChecked());
+    qnGlobalSettings->setTrafficEncryptionForced(ui->forceTrafficEncryptionCheckBox->isChecked());
     qnGlobalSettings->setVideoTrafficEncryptionForced(
         ui->forceVideoTrafficEncryptionCheckBox->isChecked());
 
@@ -188,9 +188,9 @@ bool SecuritySettingsWidget::hasChanges() const
 
     return (ui->auditTrailCheckBox->isChecked() != qnGlobalSettings->isAuditTrailEnabled())
         || (ui->forceTrafficEncryptionCheckBox->isChecked()
-            != qnGlobalSettings->isTrafficEncriptionForced())
+            != qnGlobalSettings->isTrafficEncryptionForced())
         || (ui->forceVideoTrafficEncryptionCheckBox->isChecked()
-            != qnGlobalSettings->isVideoTrafficEncriptionForced())
+            != qnGlobalSettings->isVideoTrafficEncryptionForced())
         || (m_watermarkSettings != qnGlobalSettings->watermarkSettings())
         || (calculateSessionTimeout() != qnGlobalSettings->sessionTimeoutLimit());
 }

@@ -121,7 +121,7 @@ public:
     virtual void setSerializedValue(const QVariant& value);
 
     void saveToResource();
-    bool takeFromSettings(QSettings* settings);
+    bool takeFromSettings(QSettings* settings, const QString& preffix);
 
 signals:
     void valueChanged();

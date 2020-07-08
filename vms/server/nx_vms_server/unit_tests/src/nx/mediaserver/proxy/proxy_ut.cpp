@@ -61,7 +61,7 @@ public:
                 m_peers.size(), peer->commonModule()->moduleGUID(), peer->endpoint());
 
             auto settings = peer->serverModule()->globalSettings();
-            settings->setTrafficEncriptionForced(sslMode != SslMode::noSsl);
+            settings->setTrafficEncryptionForced(sslMode != SslMode::noSsl);
             settings->synchronizeNowSync();
 
             m_peers.push_back(std::move(peer));

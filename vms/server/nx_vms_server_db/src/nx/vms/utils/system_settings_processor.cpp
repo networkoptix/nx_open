@@ -50,7 +50,7 @@ nx::network::http::StatusCode::Value SystemSettingsProcessor::updateSettings(
     QnSystemSettingsReply reply;
 
     bool dirty = false;
-    const auto& settings = commonModule()->globalSettings()->allSettings();
+    const auto& settings = commonModule()->globalSettings();
 
     QnRequestParams filteredParams(params);
     filteredParams.remove(lit("auth"));
@@ -59,7 +59,7 @@ nx::network::http::StatusCode::Value SystemSettingsProcessor::updateSettings(
 
     namespace ahlp = ec2::access_helpers;
 
-    for (QnAbstractResourcePropertyAdaptor* setting: settings)
+    for (QnAbstractResourcePropertyAdaptor* setting: settings->allSettings())
     {
         bool writeAllowed = ec2::access_helpers::kvSystemOnlyFilter(
             ahlp::Mode::write,
@@ -96,14 +96,14 @@ nx::network::http::StatusCode::Value SystemSettingsProcessor::updateSettings(
             reply.settings.insert(setting->key(), setting->serializedValue());
     }
 
-    if (setRecommendedSettings)
+    if (setRecommendedSettings && !settings->isTrafficEncryptionForcedExplicitlyDefined())
     {
-        commonModule()->globalSettings()->setTrafficEncriptionForced(true);
+        settings->setTrafficEncryptionForced(true);
         dirty = true;
     }
 
     if (dirty)
-        commonModule()->globalSettings()->synchronizeNow();
+        settings->synchronizeNow();
 
     result->setReply(std::move(reply));
     return nx::network::http::StatusCode::ok;

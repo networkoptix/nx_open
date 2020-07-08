@@ -543,12 +543,12 @@ void ProxyConnectionProcessor::fixServerUrlSchemeSecurity(utils::Url &dstUrl, Qn
         dstUrl.setScheme(d->protocol);
 
     auto settings = commonModule()->globalSettings();
-    if (dstUrl.scheme() == http::kUrlSchemeName && (settings->isTrafficEncriptionForced()
+    if (dstUrl.scheme() == http::kUrlSchemeName && (settings->isTrafficEncryptionForced()
         || doesNextHopServerUsesSSL(dstRoute, commonModule())))
     {
         dstUrl.setScheme(http::kSecureUrlSchemeName);
     }
-    else if (settings->isVideoTrafficEncriptionForced() && dstUrl.scheme() == rtsp::kUrlSchemeName)
+    else if (settings->isVideoTrafficEncryptionForced() && dstUrl.scheme() == rtsp::kUrlSchemeName)
     {
         dstUrl.setScheme(rtsp::kSecureUrlSchemeName);
     }

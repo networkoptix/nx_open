@@ -203,9 +203,9 @@ void QnAbstractResourcePropertyAdaptor::saveToResource()
     processSaveRequests();
 }
 
-bool QnAbstractResourcePropertyAdaptor::takeFromSettings(QSettings* settings)
+bool QnAbstractResourcePropertyAdaptor::takeFromSettings(QSettings* settings, const QString& preffix)
 {
-    const auto value = settings->value(m_key);
+    const auto value = settings->value(preffix + m_key);
     if (value.isNull())
         return false;
 

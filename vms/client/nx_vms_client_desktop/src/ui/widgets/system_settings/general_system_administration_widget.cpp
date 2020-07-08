@@ -196,7 +196,7 @@ void QnGeneralSystemAdministrationWidget::loadDataToUi()
     ui->systemSettingsWidget->loadDataToUi();
     ui->securitySettingsWidget->loadDataToUi();
     ui->backupGroupBox->setVisible(isDatabaseBackupAvailable());
-    if(!qnGlobalSettings->isVideoTrafficEncriptionForced())
+    if(!qnGlobalSettings->isVideoTrafficEncryptionForced())
         ui->forceVideoEncryptionWarning->hide();
 }
 
