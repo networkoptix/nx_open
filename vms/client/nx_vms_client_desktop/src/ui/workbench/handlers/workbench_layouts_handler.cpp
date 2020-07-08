@@ -172,7 +172,7 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
             if (qnClientMessageProcessor->connectionStatus()->state() == QnConnectionState::Ready
                 && workbench()->layouts().empty())
             {
-                action(action::OpenNewTabAction)->trigger();
+                menu()->trigger(action::OpenNewTabAction);
             }
         });
 
@@ -199,7 +199,7 @@ LayoutsHandler::LayoutsHandler(QObject *parent):
             if (qnClientMessageProcessor->connectionStatus()->state() == QnConnectionState::Ready
                 && workbench()->layouts().empty())
             {
-                action(action::OpenNewTabAction)->trigger();
+                menu()->trigger(action::OpenNewTabAction);
             }
         });
 
