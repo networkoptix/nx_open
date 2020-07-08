@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.283",
+    "version": "1.0.1.285",
     "data": [
         {
             "keys": [
@@ -1298,7 +1298,8 @@
                 "AXIS|AXISP8221",
                 "AXIS|AXISC3003E",
                 "AXIS|AXISA9161",
-                "AXIS|AXISC1004E"
+                "AXIS|AXISC1004E",
+                "AXIS|AXISC1310*"
             ],
             "noVideoSupport": true
         },
