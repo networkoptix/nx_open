@@ -2353,7 +2353,7 @@ bool QnPlOnvifResource::getVideoEncoder1Tokens(BaseSoapWrapper& soapWrapper,
 
         if (confRangeEnd > (int) configurations.size())
         {
-            *outErrorText = nx::utils::log::makeMessage(
+            *outErrorText = NX_FMT(
                 "Current channel number is %1, that is more then number of video encoder configurations %2",
                 getChannel() + 1, configurations.size());
 
