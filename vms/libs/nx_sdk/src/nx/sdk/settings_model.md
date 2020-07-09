@@ -30,7 +30,7 @@ top-level Setting Models for individual Settings, and those Settings that suppor
             ...
         ]
     }
-    
+
 Here are the descriptions of all available Setting types, with examples of their definition in the
 Settings Model, and examples of their value strings.
 
@@ -38,6 +38,13 @@ Settings Model, and examples of their value strings.
 ## TextField
 
 Text data field. Supports regex validation for the entered value.
+
+[proprietary]
+
+![](doc/images/text-field1.png)
+![](doc/images/text-field2.png)
+
+[/proprietary]
 
 ### Setting Model
 
@@ -61,6 +68,12 @@ Text data field. Supports regex validation for the entered value.
 
 Integer number data field. Supports minimum and maximum value limitations.
 
+[proprietary]
+
+![](doc/images/spin-box.png)
+
+[/proprietary]
+
 ### Setting Model
 
     {
@@ -82,6 +95,12 @@ Integer number data field. Supports minimum and maximum value limitations.
 
 Floating point number data field. Supports minimum and maximum value limitations.
 
+[proprietary]
+
+![](doc/images/double-spin-box.png)
+
+[/proprietary]
+
 ### Setting Model
 
     {
@@ -102,6 +121,13 @@ Floating point number data field. Supports minimum and maximum value limitations
 ## ComboBox
 
 Text choice data field. Items in `itemCaptions` are optional, as well as `itemCaptions` itself.
+
+[proprietary]
+
+![](doc/images/combo-box1.png)
+![](doc/images/combo-box2.png)
+
+[/proprietary]
 
 ### Setting Model
 
@@ -129,6 +155,12 @@ Text choice data field. Items in `itemCaptions` are optional, as well as `itemCa
 Alternative text choice data field. Items in `itemCaptions` are optional, as well as `itemCaptions`
 itself.
 
+[proprietary]
+
+![](doc/images/radio-button-group.png)
+
+[/proprietary]
+
 ### Setting Model
 
     {
@@ -155,6 +187,13 @@ itself.
 
 Boolean data field.
 
+[proprietary]
+
+![](doc/images/check-box1.png)
+![](doc/images/check-box2.png)
+
+[/proprietary]
+
 ### Setting Model
 
     {
@@ -174,6 +213,12 @@ Boolean data field.
 
 One or several boolean options choice data field. Items in `itemCaptions` are optional, as well as
 `itemCaptions` itself.
+
+[proprietary]
+
+![](doc/images/check-box-group.png)
+
+[/proprietary]
 
 ### Setting Model
 
@@ -201,6 +246,12 @@ One or several boolean options choice data field. Items in `itemCaptions` are op
 
 Boolean data field, alternative visual representation.
 
+[proprietary]
+
+![](doc/images/switch-button.png)
+
+[/proprietary]
+
 ### Setting Model
 
     {
@@ -219,6 +270,13 @@ Boolean data field, alternative visual representation.
 ## PolygonFigure
 
 Polygon figure field. Supports maximum points limitation.
+
+[proprietary]
+
+![](doc/images/polygon-figure1.png)
+![](doc/images/polygon-figure2.png)
+
+[/proprietary]
 
 ### Setting Model
 
@@ -251,6 +309,12 @@ Polygon figure field. Supports maximum points limitation.
 
 Box figure field.
 
+[proprietary]
+
+![](doc/images/box-figure.png)
+
+[/proprietary]
+
 ### Setting Model
 
     {
@@ -280,6 +344,12 @@ Box figure field.
 Line or polyline figure field. Supports minimum and maximum points limitation (default value: 2 for
 both min and max). Can have single crossing direction or not have any (equivalent to having both
 directions).
+
+[proprietary]
+
+![](doc/images/line-figure.png)
+
+[/proprietary]
 
 ### Setting Model
 
@@ -324,6 +394,14 @@ than that of the maximum box, the figure is considered invalid.
 
 Has neither label nor display on camera options. Therefore may have no color.
 
+[proprietary]
+
+[VMS-17379](https://networkoptix.atlassian.net/browse/VMS-17379)
+
+![](doc/images/object-size-constraints.png)
+
+[/proprietary]
+
 ### Setting Model
 
     {
@@ -350,6 +428,34 @@ Has neither label nor display on camera options. Therefore may have no color.
 
 The `"positions"` field is a hint for the client where to position min/max boxes, and is optional.
 
+[proprietary]
+
+---------------------------------------------------------------------------------------------------
+## Button
+
+**NOT IMPLEMENTED**
+
+![](doc/images/button.png)
+
+Action button
+
+[VMS-15786](https://networkoptix.atlassian.net/browse/VMS-15786)
+
+### Setting Model
+
+    {
+        "type": "Button",
+        "name": "button1",
+        "caption": "Button 1",
+        "description": "Action 1"
+    }
+
+### Setting Value
+
+**NOT IMPLEMENTED**
+
+[/proprietary]
+
 ---------------------------------------------------------------------------------------------------
 ## Structure
 
@@ -364,6 +470,12 @@ Here are the descriptions of all available structure components.
 
 System root element. Must be present only once as the root, containing all other elements and all
 sections.
+
+[proprietary]
+
+![](doc/images/settings.png)
+
+[/proprietary]
 
 ### Setting Model
 
@@ -390,6 +502,12 @@ Grouping tree-like element. Can contain both items and sub-sections.
 
 Property "name" must be unique, will be used as a caption if caption is not specified.
 
+[proprietary]
+
+![](doc/images/section.png)
+
+[/proprietary]
+
 ### Setting Model
 
     {
@@ -410,6 +528,12 @@ Property "name" must be unique, will be used as a caption if caption is not spec
 ## GroupBox
 
 Grouping panel with a caption. Top-level groupboxes visually distinguished from the nested.
+
+[proprietary]
+
+![](doc/images/group-box.png)
+
+[/proprietary]
 
 ### Setting Model
 
@@ -443,6 +567,12 @@ Grouping panel with a caption. Top-level groupboxes visually distinguished from 
 
 Horizontal separator line.
 
+[proprietary]
+
+![](doc/images/separator.png)
+
+[/proprietary]
+
 ### Setting Model
 
     {
@@ -453,6 +583,14 @@ Horizontal separator line.
 ## Repeater
 
 Grouping element which generates N items from the given template and displaying them when needed.
+
+[proprietary]
+
+[VMS-17299](https://networkoptix.atlassian.net/browse/VMS-17299)
+
+![](doc/images/repeater.png)
+
+[/proprietary]
 
 Repeater expands ‘#N’ (or short form ‘#') string in its template to an item number. Nested
 repeaters distinguish their numbering by N number in ‘#N’. To escape ‘#’ sign, it must be doubled:
@@ -498,3 +636,60 @@ a list of items which should be considered to decide whether the group is filled
             ]
         }
     }
+
+[proprietary]
+
+---------------------------------------------------------------------------------------------------
+## Row
+
+**INTERNAL**
+
+Re-ordering element to place items horizontally in a single row. Can lead to strange visual
+effects, so keeping it for internal usage.
+
+![](doc/images/row.png)
+
+### Setting Model
+
+    {
+        "type": "Row",
+        "items": [
+            {
+                "type": "Button",
+                "name": "button1",
+                "caption": "Button 1"
+            },
+            {
+                "type": "Button",
+                "name": "button2",
+                "caption": "Button 2"
+            }
+        ]
+    }
+
+---------------------------------------------------------------------------------------------------
+## Column
+
+Acts like `GroupBox` but does not have any frame.
+
+![](doc/images/column.png)
+
+## Settings Model
+
+    {
+        "type": "Column",
+        "items": [
+            {
+                "type": "Button",
+                "name": "button1",
+                "caption": "Button 1"
+            },
+            {
+                "type": "Button",
+                "name": "button2",
+                "caption": "Button 2"
+            }
+        ]
+    }
+
+[/proprietary]
