@@ -673,6 +673,8 @@ bool SelfUpdater::updateMinilauncherDesktopIcon()
         const QStringList prefixes = QnClientInstallationsManager::clientInstallRoots();
         const QString suffix = QnClientAppInfo::minilauncherBinaryName();
 
+        bool updated = false;
+
         for (const auto& dirPath: shortcutDirs)
         {
             // Iterate over existing shortcuts.
@@ -707,8 +709,25 @@ bool SelfUpdater::updateMinilauncherDesktopIcon()
                         entry.absolutePath(),
                         entry.completeBaseName(),
                         info.arguments);
+
+                    updated = true;
                 }
             }
+        }
+
+        if (updated)
+        {
+            // Explorer caches program icons, so it doesn't need to parse binaries repeatedly.
+            // Unfortunatelly, it doesn't make an icon obsolete when the original file is updated.
+            // There are two ways to clear this cache: either delete iconcache database,
+            // which may be located in at least three different locations (Win 7 / 8 / 10)
+            // and may be inaccessible for writing while the Explorer is running,
+            // or execute the "Internet Explorer Per-User Initialization Utility", which is not
+            // well documented and whose arguments differs from version to version, but at least
+            // which does not require Explorer restart to work.
+
+            QProcess::startDetached("ie4uinit", {"-show"}); // Windows 10.
+            QProcess::startDetached("ie4uinit", {"-ClearIconCache"}); // Other versions.
         }
     #endif // defined(Q_OS_WIN)
 
