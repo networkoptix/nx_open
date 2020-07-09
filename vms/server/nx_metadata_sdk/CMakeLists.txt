@@ -46,8 +46,7 @@ nx_subtract_lists(copied_nx_sdk_src_nx_files nx_sdk_documentation_image_files)
 set(copied_nx_sdk_settings_model_origin ${CMAKE_CURRENT_BINARY_DIR})
 set(copied_nx_sdk_settings_model_file
     ${copied_nx_sdk_settings_model_origin}/settings_model.md)
-execute_process(COMMAND ${PYTHON_EXECUTABLE} ${build_utils_dir}/remove_proprietary_docs.py
-    ${nx_sdk_src_settings_model_file} ${copied_nx_sdk_settings_model_file})
+nx_remove_proprietary_docs(${nx_sdk_src_settings_model_file} ${copied_nx_sdk_settings_model_file})
 
 set(copied_samples_dir ${CMAKE_SOURCE_DIR}/vms/server/plugins/analytics)
 

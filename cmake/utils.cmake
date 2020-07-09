@@ -368,3 +368,10 @@ function(nx_subtract_lists minuend subtrahend)
     endforeach()
     nx_expose_to_parent_scope(${minuend})
 endfunction()
+
+function(nx_remove_proprietary_docs input output)
+    execute_process(COMMAND ${PYTHON_EXECUTABLE} ${build_utils_dir}/remove_proprietary_docs.py
+        ${input} ${output})
+
+    nx_store_known_file(${output})
+endfunction()
