@@ -33,7 +33,17 @@ cf::future<std::size_t> futurizeIo(Func func, AbstractAsyncChannel* channel, con
                 auto [errorCode, transferredSize] = result;
 
                 if (errorCode)
-                    throw std::system_error(errorCode, std::system_category());
+                {
+                    throw std::system_error(errorCode,
+                        // TODO: Remove special case when we upgrade gcc.
+                        // See: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=60555
+                        #ifdef __linux__
+                            std::generic_category()
+                        #else
+                            std::system_category()
+                        #endif
+                    );
+                }
 
                 return transferredSize;
             });

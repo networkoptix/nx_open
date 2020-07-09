@@ -58,9 +58,7 @@ TEST_F(FuturesHttpClient, get_ok)
     ASSERT_EQ(response.messageBody, kExpectedBody);
 }
 
-// Disabled due to https://gcc.gnu.org/bugzilla/show_bug.cgi?id=60555
-// TODO: enable after we upgrade gcc
-TEST_F(FuturesHttpClient, DISABLED_get_throws_system_error)
+TEST_F(FuturesHttpClient, get_throws_system_error)
 {
     whenGettable(kFooPath, kExpectedBody);
 

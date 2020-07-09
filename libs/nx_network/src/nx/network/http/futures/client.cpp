@@ -27,7 +27,17 @@ cf::future<Response> futurize(Func func, Client* client, Args&&... args)
             [client](auto&&)
             {
                 if (client->failed())
-                    throw std::system_error(client->lastSysErrorCode(), std::system_category());
+                {
+                    throw std::system_error(client->lastSysErrorCode(),
+                        // TODO: Remove special case when we upgrade gcc.
+                        // See: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=60555
+                        #ifdef __linux__
+                            std::generic_category()
+                        #else
+                            std::system_category()
+                        #endif
+                    );
+                }
 
                 auto response = *client->response();
                 response.messageBody = client->fetchMessageBodyBuffer();
