@@ -428,6 +428,7 @@
         <resource name = "AXISP3935" public = "AXISP8535"/>
         <resource name = "AXISD201-S" public = "AXISQ1775"/>
         <resource name = "AXISD101-A" public = "AXISP8535"/>
+        <resource name = "AXISC1310" public = "AXISC3003E"/>
         <resource name = "AXISC8033" public = "AXIS_COMMON">
             <params>
                 <param name = "forcedAudioStream" default_value ="1"/>

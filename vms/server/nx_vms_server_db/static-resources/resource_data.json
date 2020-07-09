@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.3.428",
+    "version": "4.1.3.429",
     "data": [
         {
             "keys": [
@@ -1320,7 +1320,8 @@
                 "AXIS|AXISC3003E",
                 "AXIS|AXISA9161",
                 "AXIS|AXISC1004E",
-                "AXIS|AXISC8033"
+                "AXIS|AXISC8033",
+		"AXIS|AXISC1310*"
             ],
             "noVideoSupport": true
         },
@@ -1537,7 +1538,8 @@
                 "HIKVISION|DS-2TD1217*",
                 "HIKVISION|DFI6256A",
                 "hikvision|DS-2CD2955FWD*",
-                "HIKVISION|DS-2CD2135FWD*"
+                "HIKVISION|DS-2CD2135FWD*",
+                "HIKVISION|DS-2CD2555FWD*"
             ],
             "pullInputEventsAsOdm": true
         },
@@ -1568,7 +1570,8 @@
                 "HIKVISION|DS-2TD1217*",
                 "HIKVISION|DFI6256A",
                 "hikvision|DS-2CD2955FWD*",
-                "HIKVISION|DS-2CD2135FWD*"
+                "HIKVISION|DS-2CD2135FWD*",
+                "HIKVISION|DS-2CD2555FWD*"
             ],
             "parseOnvifNotificationsWithHttpReader": true
         },
