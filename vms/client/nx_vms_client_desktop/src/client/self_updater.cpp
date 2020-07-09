@@ -697,8 +697,8 @@ bool SelfUpdater::updateMinilauncherDesktopIcon()
                     && (info.iconPath.contains("/Windows/Installer/", Qt::CaseInsensitive)
                         || info.iconPath.contains("%SystemRoot%/Installer/", Qt::CaseInsensitive)))
                 {
-                    NX_INFO(this, "Updating icon for shortcut", entry.absoluteFilePath());
-                    NX_INFO(this, "Previous icon location:", info.iconPath);
+                    NX_INFO(this, "Updating icon for shortcut at %1", entry.absoluteFilePath());
+                    NX_INFO(this, "Previous icon location: %1", info.iconPath);
 
                     // Overwrite the shortcut.
                     // This call clears shortcut icon, so the target binary icon will be used.
