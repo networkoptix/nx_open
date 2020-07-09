@@ -62,6 +62,7 @@ cf::future<nx::Buffer> WebSocket::read()
             m_buffer.clear();
             return m_nested->readSome(&m_buffer);
         })
+        .then(translateSystemError)
         .then_unwrap([this](auto&&) { return std::move(m_buffer); })
         .then(addExceptionContextAndRethrow("Failed to read from websocket"));
 }

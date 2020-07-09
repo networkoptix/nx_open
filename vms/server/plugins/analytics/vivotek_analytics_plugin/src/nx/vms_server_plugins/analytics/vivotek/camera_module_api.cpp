@@ -38,7 +38,7 @@ QString getFirmwareVersion(const Url& cameraUrl)
 
         return versionParts[2];
     }
-    catch (Exception& exception)
+    catch (nx::utils::Exception& exception)
     {
         exception.addContext("Failed to fetch firmware version");
         throw;
@@ -70,7 +70,7 @@ std::map<QString, CameraModuleApi::ModuleInfo> CameraModuleApi::fetchModuleInfos
 
         return moduleInfos;
     }
-    catch (Exception& exception)
+    catch (nx::utils::Exception& exception)
     {
         exception.addContext("Failed to fetch VADP module list");
         throw;
@@ -100,11 +100,11 @@ void CameraModuleApi::enable(const QString& name, bool isEnabled)
         {
             responseBody = HttpClient().get(url).get();
         }
-        catch (const std::system_error& exception)
+        catch (const Exception& exception)
         {
             // Firmware versions before 0121 return malformed HTTP response. From here it looks as
             // if it resets the connection before the response could be parsed.
-            if (exception.code() != std::errc::connection_reset)
+            if (exception.errorCode() != std::errc::connection_reset)
                 throw;
 
             static const QString firstFixedVersion = "0121";
@@ -125,7 +125,7 @@ void CameraModuleApi::enable(const QString& name, bool isEnabled)
                 "HTTP response body doesn't contain expected pattern indicating success");
         }
     }
-    catch (Exception& exception)
+    catch (nx::utils::Exception& exception)
     {
         exception.addContext("Failed to %1a VADP module %1",
             isEnabled ? "enable" : "disable", name);

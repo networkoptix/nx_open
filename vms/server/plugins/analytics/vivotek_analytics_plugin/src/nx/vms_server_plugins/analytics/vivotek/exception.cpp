@@ -36,14 +36,34 @@ ErrorCode toSdk(std::error_code errorCode)
 
 } // namespace
 
-Exception::Exception(std::error_code errorCode):
-    Exception(toSdk(errorCode), errorCode.message())
+Exception::Exception(const std::system_error& systemError):
+    nx::utils::Exception(systemError.what()),
+    m_errorCode(systemError.code())
 {
+}
+
+Exception::Exception(std::error_code errorCode):
+    nx::utils::Exception(errorCode.message()),
+    m_errorCode(errorCode)
+{
+}
+
+std::error_code Exception::errorCode() const
+{
+    if (std::holds_alternative<nx::sdk::ErrorCode>(m_errorCode))
+        return {};
+
+    return std::get<std::error_code>(m_errorCode);
 }
 
 nx::sdk::Error Exception::toSdkError() const
 {
-    auto errorCode = m_errorCode;
+    nx::sdk::ErrorCode errorCode;
+    if (std::holds_alternative<nx::sdk::ErrorCode>(m_errorCode))
+        errorCode = std::get<nx::sdk::ErrorCode>(m_errorCode);
+    else
+        errorCode = toSdk(std::get<std::error_code>(m_errorCode));
+
     if (errorCode == ErrorCode::noError)
         errorCode = ErrorCode::otherError;
 

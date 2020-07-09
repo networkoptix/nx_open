@@ -25,6 +25,7 @@ HttpClient::HttpClient()
 cf::future<http::BufferType> HttpClient::get(const Url& url)
 {
     return Client::get(url)
+        .then(translateSystemError)
         .then_unwrap([this](auto&& response) { return processResponse(std::move(response)); })
         .then(addExceptionContextAndRethrow("HTTP GET %1 failed", url));
 }
@@ -33,6 +34,7 @@ cf::future<http::BufferType> HttpClient::post(const Url& url,
     http::StringType contentType, http::BufferType requestBody)
 {
     return Client::post(url, std::move(contentType), std::move(requestBody))
+        .then(translateSystemError)
         .then_unwrap([this](auto&& response) { return processResponse(std::move(response)); })
         .then(addExceptionContextAndRethrow("HTTP POST %1 failed", url));
 }
