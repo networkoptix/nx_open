@@ -62,7 +62,6 @@ struct QnPeerRuntimeInfo;
 struct BeforeRestoreDbData;
 class TimeBasedNonceProvider;
 class CloudIntegrationManager;
-class TcpLogReceiver;
 class QnServerMessageProcessor;
 
 namespace ec2 {
@@ -316,7 +315,6 @@ private:
 
     std::unique_ptr<MediaServerStatusWatcher> m_mediaServerStatusWatcher;
     std::unique_ptr<QnAudioStreamerPool> m_audioStreamerPool;
-    std::shared_ptr<TcpLogReceiver> m_logReceiver;
     std::unique_ptr<RaidEventLogReader> m_raidEventLogReader;
     std::unique_ptr<nx::network::upnp::PortMapper> m_upnpPortMapper;
     std::function<void(QnMediaServerModule*)> m_setupModuleCallback;

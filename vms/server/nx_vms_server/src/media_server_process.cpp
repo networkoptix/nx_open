@@ -4084,31 +4084,6 @@ private:
     QFile m_file;
 };
 
-class TcpLogReceiver : public QnTcpListener
-{
-public:
-    TcpLogReceiver(
-        const QString& dataDir,
-        QnCommonModule* commonModule,
-        const QHostAddress& address,
-        int port)
-        :
-        QnTcpListener(commonModule, address, port),
-        m_dataDir(dataDir)
-    {
-    }
-    virtual ~TcpLogReceiver() override { stop(); }
-
-protected:
-    virtual QnTCPConnectionProcessor* createRequestProcessor(
-        std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket) override
-    {
-        return new TcpLogReceiverConnection(m_dataDir, std::move(clientSocket), this);
-    }
-private:
-    QString m_dataDir;
-};
-
 void MediaServerProcess::initStaticCommonModule()
 {
     m_staticCommonModule = std::make_unique<QnStaticCommonModule>(
@@ -4855,19 +4830,6 @@ bool MediaServerProcess::initializeAnalyticsEvents()
     return true;
 }
 
-void MediaServerProcess::setUpTcpLogReceiver()
-{
-    // Start plain TCP listener and write data to a separate log file.
-    const int tcpLogPort = serverModule()->settings().tcpLogPort();
-    if (tcpLogPort)
-    {
-        m_logReceiver = std::make_shared<TcpLogReceiver>(
-            serverModule()->settings().dataDir(),
-            commonModule(), QHostAddress::Any, tcpLogPort);
-        m_logReceiver->start();
-    }
-}
-
 void MediaServerProcess::initNewSystemStateIfNeeded(
     bool foundOwnServerInDb,
     const nx::mserver_aux::SettingsProxyPtr& settingsProxy)
@@ -5192,7 +5154,6 @@ void MediaServerProcess::run()
 
     updateAllowedInterfaces();
 
-    setUpTcpLogReceiver();
     migrateDataFromOldDir();
     QnFileStorageResource::removeOldDirs(serverModule.get()); //< Cleanup temp folders.
     initCrashDump();
