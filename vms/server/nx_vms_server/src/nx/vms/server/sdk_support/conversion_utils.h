@@ -134,10 +134,4 @@ std::optional<nx::sdk::analytics::IUncompressedVideoFrame::PixelFormat> avPixelF
 
 AVPixelFormat apiToAvPixelFormat(nx::vms::api::analytics::PixelFormat pixelFormat);
 
-//-------------------------------------------------------------------------------------------------
-// Settings utils
-
-sdk_support::SdkSettingsResponse toSdkSettingsResponse(
-    const ResultHolder<const sdk::ISettingsResponse*>& settingsRepsonse);
-
 } // namespace nx::vms::server::sdk_support

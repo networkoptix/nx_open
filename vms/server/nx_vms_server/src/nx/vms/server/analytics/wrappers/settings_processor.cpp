@@ -20,13 +20,82 @@ static QString buildSettingsErrorString(
     return result;
 }
 
+static sdk_support::SdkSettingsResponse toSdkSettingsResponse(
+    const sdk_support::ResultHolder<const sdk::ISettingsResponse*>& settingsResponse,
+    Violation *outViolation)
+{
+    using namespace nx::vms::server::sdk_support;
+
+    SdkSettingsResponse result;
+
+    result.sdkError = Error::fromResultHolder(settingsResponse);
+
+    const sdk::Ptr<const sdk::IRefCountable> value = settingsResponse.value();
+    if (!value)
+        return result;
+
+    if (const auto settingsResponse = value->queryInterface<sdk::ISettingsResponse>())
+    {
+        result.values = SettingsValues();
+        if (const sdk::Ptr<const sdk::IStringMap> settingsValues = settingsResponse->values())
+            result.values = fromSdkStringMap<SettingsValues>(settingsValues);
+
+        if (const sdk::Ptr<const sdk::IStringMap> settingsErrors = settingsResponse->errors())
+            result.errors = fromSdkStringMap<SettingsErrors>(settingsErrors);
+
+        if (const sdk::Ptr<const sdk::IString> settingsModel = settingsResponse->model())
+        {
+            const auto modelString = fromSdkString<QString>(settingsModel);
+            QJsonParseError jsonParseError;
+            QJsonDocument doc = QJsonDocument::fromJson(modelString.toUtf8(), &jsonParseError);
+            if (jsonParseError.error != QJsonParseError::ParseError::NoError)
+            {
+                *outViolation = {ViolationType::invalidJson, jsonParseError.errorString()};
+            }
+            else if (!doc.isObject())
+            {
+                *outViolation = {
+                    ViolationType::invalidJsonStructure,
+                    "Settings Model is not a JSON object"};
+            }
+            else
+            {
+                result.model = doc.object();
+            }
+        }
+    }
+    else if (const auto settingsResponse0 = value->queryInterface<sdk::ISettingsResponse0>())
+    {
+        // This type of response may be returned by pluginSideSettings() of 4.0 plugins.
+
+        result.values = SettingsValues();
+        if (const sdk::Ptr<const sdk::IStringMap> settingsValues = settingsResponse0->values())
+            result.values = fromSdkStringMap<SettingsValues>(settingsValues);
+
+        if (const sdk::Ptr<const sdk::IStringMap> settingsErrors = settingsResponse0->errors())
+            result.errors = fromSdkStringMap<SettingsErrors>(settingsErrors);
+    }
+    else if (const auto stringMap = value->queryInterface<nx::sdk::IStringMap>())
+    {
+        // This type of response may be returned by setSettings() of 4.0 plugins.
+        result.errors = fromSdkStringMap<SettingsErrors>(stringMap);
+    }
+
+    return result;
+}
+
 sdk_support::SdkSettingsResponse SettingsProcessor::handleSettingsResponse(
     SettingsResponseFetcher responseFetcher) const
 {
     const SettingsResponseHolder sdkSettingsResponseHolder = responseFetcher();
 
+    Violation violation;
+
     sdk_support::SdkSettingsResponse result =
-        sdk_support::toSdkSettingsResponse(sdkSettingsResponseHolder);
+        toSdkSettingsResponse(sdkSettingsResponseHolder, &violation);
+
+    if (violation.type != ViolationType::undefined)
+        m_violationHandler(violation);
 
     if (!result.sdkError.isOk())
         m_errorHandler(result.sdkError);

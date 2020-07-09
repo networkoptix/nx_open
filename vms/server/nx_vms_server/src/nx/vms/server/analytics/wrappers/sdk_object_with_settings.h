@@ -42,6 +42,10 @@ public:
             [this](const sdk_support::Error& error)
             {
                 this->handleError(SdkMethod::setSettings, error, /*returnValue*/ nullptr);
+            },
+            [this](const Violation& violation)
+            {
+                this->handleViolation(SdkMethod::setSettings, violation, /*returnValue*/ nullptr);
             });
 
         return settingsProcessor.setSettings(this->sdkObject(), settings);
@@ -59,6 +63,11 @@ public:
             [this](const sdk_support::Error& error)
             {
                 this->handleError(SdkMethod::pluginSideSettings, error, /*returnValue*/ nullptr);
+            },
+            [this](const Violation& violation)
+            {
+                this->handleViolation(
+                    SdkMethod::pluginSideSettings, violation, /*returnValue*/ nullptr);
             });
 
         return settingsProcessor.pluginSideSettings(this->sdkObject());

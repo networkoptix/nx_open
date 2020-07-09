@@ -29,15 +29,18 @@ class SettingsProcessor
 
 public:
     using SdkErrorHandler = std::function<void(const sdk_support::Error&)>;
+    using ViolationHandler = std::function<void(const Violation& violation)>;
 
     SettingsProcessor(
         DebugSettings debugSettings,
         SdkObjectDescription sdkObjectDescription,
-        SdkErrorHandler sdkErrorHandler)
+        SdkErrorHandler sdkErrorHandler,
+        ViolationHandler violationHandler)
         :
         m_debugSettings(std::move(debugSettings)),
         m_sdkObjectDescription(std::move(sdkObjectDescription)),
-        m_errorHandler(std::move(sdkErrorHandler))
+        m_errorHandler(std::move(sdkErrorHandler)),
+        m_violationHandler(std::move(violationHandler))
     {
     }
 
@@ -105,6 +108,7 @@ private:
     DebugSettings m_debugSettings;
     SdkObjectDescription m_sdkObjectDescription;
     SdkErrorHandler m_errorHandler;
+    ViolationHandler m_violationHandler;
 };
 
 } // namespace nx::vms::server::analytics::wrappers
