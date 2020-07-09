@@ -227,16 +227,13 @@ QnPlatformShortcuts::ShortcutInfo QnWindowsShortcuts::getShortcutInfo(
     ShortcutInfo result;
     if (SUCCEEDED(rc))
     {
-        result.sourceFile = QDir::fromNativeSeparators(
-            QString::fromWCharArray(lpszPathObj, kMaxStringLength));
+        // IShellLink calls used in GetLinkInfo truncate returned strings if necessary, so they are
+        // always null-terminated (though it's explicitly stated in documentation for GetPath only).
+        result.sourceFile = QDir::fromNativeSeparators(QString::fromWCharArray(lpszPathObj));
+        result.arguments = QDir::fromNativeSeparators(QString::fromWCharArray(lpszArgs))
+            .split(L' ', QString::SkipEmptyParts);
 
-        result.arguments = QDir::fromNativeSeparators(
-            QString::fromWCharArray(lpszArgs, kMaxStringLength))
-                .split(L' ', QString::SkipEmptyParts);
-
-        result.iconPath = QDir::fromNativeSeparators(
-            QString::fromWCharArray(lpszIconLocation, kMaxStringLength));
-
+        result.iconPath = QDir::fromNativeSeparators(QString::fromWCharArray(lpszIconLocation));
         result.iconId = iconIndex;
     }
 
