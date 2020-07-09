@@ -48,11 +48,7 @@ struct Ini: public nx::kit::IniConfig
         "If set, Engine will declare the corresponding capability in the manifest.");
 };
 
-inline Ini& ini()
-{
-    static Ini ini;
-    return ini;
-}
+Ini& ini();
 
 } // namespace stub
 } // namespace analytics
