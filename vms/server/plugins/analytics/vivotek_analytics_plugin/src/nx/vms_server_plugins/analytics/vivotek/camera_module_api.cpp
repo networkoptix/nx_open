@@ -127,7 +127,7 @@ void CameraModuleApi::enable(const QString& name, bool isEnabled)
     }
     catch (nx::utils::Exception& exception)
     {
-        exception.addContext("Failed to %1a VADP module %1",
+        exception.addContext("Failed to %1 VADP module %2",
             isEnabled ? "enable" : "disable", name);
         throw;
     }
