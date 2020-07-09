@@ -233,7 +233,10 @@ public:
     Option<bool> ffmpegRealTimeOptimization{this, "ffmpegRealTimeOptimization", true, ""};
     Option<int> redundancyTimeout{this, "redundancyTimeout", 3, ""};
     Option<QString> logDir{this, "logDir", "",
-        "Directory to store logs in."
+        "Directory to store the logs in. NOTE: Another setting \"logFile\", which may be observed "
+        "among the settings, cannot be used to set the Server main log file location - it is "
+        "intended for internal use, contains a generated value with the actual main log file "
+        "location, and thus is not documented here."
     };
     Option<QString> logLevel{this, "logLevel", "", ""};
     Option<QString> httpLogLevel{this, "http-log-level", "",
