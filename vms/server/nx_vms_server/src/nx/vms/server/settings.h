@@ -370,8 +370,8 @@ public:
     };
     Option<QString> dataDir{this, "dataDir",
         "",
-        "/var (on Linux), "
-        "C:\\Users\\{username}\\AppData\\Local\\{vendor}}\\{product}\\ (on Windows).",
+        "/opt/{vendor}/mediaserver/var (on Linux), "
+        "C:\\Users\\{username}\\AppData\\Local\\{vendor}\\{product} (on Windows).",
         [this](const QString& value)
         {
             if (!value.isEmpty())
@@ -383,7 +383,7 @@ public:
     Option<QString> backupDir{this, "backupDir",
         "",
         "/opt/{vendor}/mediaserver/var/backup (on Linux), "
-        "C:\\Users\\{username}\\AppData\\Local\\{vendor}}\\{server-product}\\backup (on Windows).",
+        "C:\\Users\\{username}\\AppData\\Local\\{vendor}\\{server-product}\\backup (on Windows).",
         [this](const QString& value)
         {
             if (!value.isEmpty())
