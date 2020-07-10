@@ -37,7 +37,10 @@ cf::future<std::size_t> futurizeIo(Func func, AbstractAsyncChannel* channel, con
                     throw std::system_error(errorCode,
                         // TODO: Remove special case when we upgrade gcc.
                         // See: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=60555
-                        #ifdef __linux__
+                        #if defined(__linux__) && defined(__GNUC__) && ( \
+                            __GNUC__ < 8 \
+                            || __GNUC__ == 8 && __GNUC_MINOR__ < 3 \
+                            || __GNUC__ == 9 && __GNUC_MINOR__ < 1) 
                             std::generic_category()
                         #else
                             std::system_category()
