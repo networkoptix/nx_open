@@ -111,6 +111,8 @@ class QnPlOnvifResource:
     using base_type = nx::vms::server::resource::Camera;
 
 public:
+    static const std::set<QString> kSupportedMetadataCodecs;
+
     using GSoapAsyncPullMessagesCallWrapper = GSoapAsyncCallWrapper<
         PullPointSubscriptionWrapper,
         _onvifEvents__PullMessages, _onvifEvents__PullMessagesResponse>;
@@ -736,8 +738,8 @@ protected:
 
     //* SOAP request failed - static analogue for makeSoapFailMessage. */
     static QString makeStaticSoapFailMessage(BaseSoapWrapper& soapWrapper,
-        const QString& requestCommand, int soapError, 
-        const QString& text = QString(), 
+        const QString& requestCommand, int soapError,
+        const QString& text = QString(),
         std::optional<std::chrono::milliseconds> timeout = std::optional<std::chrono::milliseconds>());
 
     //** SOAP response is incomplete - static analogue for makeSoapNoParameterMessage. */

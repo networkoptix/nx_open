@@ -33,10 +33,11 @@
 
 #include <nx/utils/app_info.h>
 
+#include <nx/streaming/rtp/parsers/base_metadata_rtp_parser_factory.h>
+
 #include "onvif/soapMediaBindingProxy.h"
 #include "onvif_resource.h"
 #include "profile_helper.h"
-#include "onvif_metadata_rtp_parser_factory.h"
 
 using namespace nx::vms::server::plugins::onvif;
 
@@ -343,7 +344,9 @@ QnOnvifStreamReader::QnOnvifStreamReader(const QnPlOnvifResourcePtr& res):
     m_multiCodec(res, res->getTimeOffset()),
     m_onvifRes(res)
 {
-    m_multiCodec.setCustomTrackParserFactory(std::make_unique<OnvifMetadataRtpParserFactory>());
+    m_multiCodec.setCustomTrackParserFactory(
+        std::make_unique<nx::streaming::rtp::BaseMetadataRtpParserFactory>(
+            QnPlOnvifResource::kSupportedMetadataCodecs));
 }
 
 QnOnvifStreamReader::~QnOnvifStreamReader()

@@ -17,7 +17,7 @@
 #include <utils/common/synctime.h>
 #include <nx/fusion/serialization/lexical.h>
 
-#include <plugins/resource/onvif/onvif_metadata_rtp_parser_factory.h>
+#include <nx/streaming/rtp/parsers/base_metadata_rtp_parser_factory.h>
 
 namespace nx {
 namespace vms::server {
@@ -76,7 +76,9 @@ HanwhaStreamReader::HanwhaStreamReader(
     QnRtpStreamReader(res),
     m_hanwhaResource(res)
 {
-    m_rtpReader.setCustomTrackParserFactory(std::make_unique<OnvifMetadataRtpParserFactory>());
+    m_rtpReader.setCustomTrackParserFactory(
+        std::make_unique<nx::streaming::rtp::BaseMetadataRtpParserFactory>(
+            QnPlOnvifResource::kSupportedMetadataCodecs));
 }
 
 HanwhaStreamReader::~HanwhaStreamReader()

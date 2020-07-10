@@ -142,6 +142,13 @@ const int QnPlOnvifResource::MAX_AUDIO_SAMPLERATE = 32; //kHz
 const int QnPlOnvifResource::ADVANCED_SETTINGS_VALID_TIME = 60; //60s
 static const unsigned int DEFAULT_NOTIFICATION_CONSUMER_REGISTRATION_TIMEOUT = 30;
 
+const std::set<QString> QnPlOnvifResource::kSupportedMetadataCodecs = {
+   "vnd.onvif.metadata", //< Uncompressed.
+   "vnd.onvif.metadata.gzip", //< GZIP compression.
+   "vnd.onvif.metadata.exi.onvif", //< For EXI using ONVIF default compression parameters.
+   "vnd.onvif.metadata.exi.ext", //< For EXI using compression parameters that are sent inband.
+};
+
 //-------------------------------------------------------------------------------------------------
 // QnOnvifServiceUrls
 
@@ -814,7 +821,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeCameraDriver()
         return CameraDiagnostics::ServerTerminatedResult();
 
     // 'updateFirmware' is an optional request. Check for unauthorized status only.
-    auto result = updateFirmware(); 
+    auto result = updateFirmware();
     if (result.errorCode == CameraDiagnostics::ErrorCode::notAuthorised)
     {
         setStatus(Qn::Unauthorized);
@@ -2326,7 +2333,7 @@ bool QnPlOnvifResource::checkResultAndSetStatus(const CameraDiagnostics::Result&
 
 bool QnPlOnvifResource::trustMaxFPS(int currentlyDetectedMaxFps) const
 {
-    const auto previouslyDetectedMaxFps = 
+    const auto previouslyDetectedMaxFps =
         cameraMediaCapability().streamCapabilities.value(StreamIndex::primary).maxFps;
     if (previouslyDetectedMaxFps > 0)
         return true; //< The value is already detected.
@@ -2703,7 +2710,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
 
     const auto maxFps = optionsList[0].frameRateMax;
     const bool trustMaxFps = this->trustMaxFPS(maxFps); //< Call it before saving a new maxFps value.
-    
+
     if (maxFps > 0)
         setMaxFps(maxFps);
     fillStreamCapabilityLists(optionsList);
@@ -4871,12 +4878,12 @@ CameraDiagnostics::Result QnPlOnvifResource::updateFirmware()
         return CameraDiagnostics::RequestFailedResult(
             "getDeviceInformation", soapWrapper.getLastErrorDescription());
     }
-    
+
     QString firmware = QString::fromStdString(response.FirmwareVersion);
     NX_DEBUG(this, "Successfully read firmware for camera %1. firmware=%2", getUrl(), firmware);
     if (!firmware.isEmpty())
         setFirmware(firmware);
-    
+
     return CameraDiagnostics::NoErrorResult();
 }
 

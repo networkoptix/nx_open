@@ -1,20 +1,13 @@
-#include "onvif_metadata_rtp_parser.h"
+#include "base_metadata_rtp_parser.h"
 
 #include <nx/utils/log/log.h>
 
 #include <nx/streaming/in_stream_compressed_metadata.h>
 #include <nx/streaming/rtp/rtp.h>
 
-using namespace nx::streaming::rtp;
+namespace nx::streaming::rtp {
 
-const std::set<QString> OnvifMetadataRtpParser::kSupportedCodecs = {
-    "vnd.onvif.metadata", //< Uncompressed.
-    "vnd.onvif.metadata.gzip", //< GZIP compression.
-    "vnd.onvif.metadata.exi.onvif", //< For EXI using ONVIF default compression parameters.
-    "vnd.onvif.metadata.exi.ext", //< For EXI using compression parameters that are sent inband.
-};
-
-void OnvifMetadataRtpParser::setSdpInfo(const nx::streaming::Sdp::Media& sdp)
+void BaseMetadataRtpParser::setSdpInfo(const Sdp::Media& sdp)
 {
     NX_DEBUG(this, "Got SDP information about the media track: %1", sdp);
     if (sdp.rtpmap.clockRate > 0)
@@ -23,7 +16,7 @@ void OnvifMetadataRtpParser::setSdpInfo(const nx::streaming::Sdp::Media& sdp)
     m_sdp = sdp;
 }
 
-QnAbstractMediaDataPtr OnvifMetadataRtpParser::nextData()
+QnAbstractMediaDataPtr BaseMetadataRtpParser::nextData()
 {
     NX_VERBOSE(this, "Next data has been requested");
     QnAbstractMediaDataPtr result;
@@ -37,7 +30,7 @@ QnAbstractMediaDataPtr OnvifMetadataRtpParser::nextData()
     return result;
 }
 
-StreamParser::Result OnvifMetadataRtpParser::processData(
+StreamParser::Result BaseMetadataRtpParser::processData(
     quint8* rtpBufferBase,
     int bufferOffset,
     int bytesRead,
@@ -53,22 +46,22 @@ StreamParser::Result OnvifMetadataRtpParser::processData(
     if (!fullRtpHeaderSize)
     {
         cleanUpOnError();
-        return {false, "Unable to calculate header size"};
+        return { false, "Unable to calculate header size" };
     }
 
     if (bytesRead < fullRtpHeaderSize)
     {
         cleanUpOnError();
-        return {false, NX_FMT(
+        return { false, NX_FMT(
             "Provided buffer size (%1 bytes) is less than calculated RTP header size (%2 bytes)",
-            bytesRead, fullRtpHeaderSize)};
+            bytesRead, fullRtpHeaderSize) };
     }
 
     const auto* const rtpHeader = (RtpHeader*)(currentRtpPacketBuffer);
     m_currentDataChunkTimestamp = rtpHeader->timestamp;
 
     m_buffer.append(
-        (const char*) (currentRtpPacketBuffer + *fullRtpHeaderSize),
+        (const char*)(currentRtpPacketBuffer + *fullRtpHeaderSize),
         bytesRead - *fullRtpHeaderSize);
 
     if (rtpHeader->marker)
@@ -79,17 +72,17 @@ StreamParser::Result OnvifMetadataRtpParser::processData(
             gotData = true;
     }
 
-    return {true};
+    return { true };
 }
 
-void OnvifMetadataRtpParser::cleanUpOnError()
+void BaseMetadataRtpParser::cleanUpOnError()
 {
     m_buffer.clear();
 }
 
-QnCompressedMetadataPtr OnvifMetadataRtpParser::makeCompressedMetadata()
+QnCompressedMetadataPtr BaseMetadataRtpParser::makeCompressedMetadata()
 {
-    const auto metadataPacket = std::make_shared<nx::streaming::InStreamCompressedMetadata>(
+    const auto metadataPacket = std::make_shared<InStreamCompressedMetadata>(
         m_sdp.rtpmap.codecName,
         std::move(m_buffer));
 
@@ -99,3 +92,5 @@ QnCompressedMetadataPtr OnvifMetadataRtpParser::makeCompressedMetadata()
 
     return metadataPacket;
 }
+
+} // namespace nx::streaming::rtp

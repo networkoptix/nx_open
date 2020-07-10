@@ -11,10 +11,13 @@
 #include <plugins/resource/hikvision/hikvision_resource.h>
 #include <utils/media/av_codec_helper.h>
 #include <nx/utils/log/log.h>
+#include <nx/streaming/rtp/parsers/base_metadata_rtp_parser_factory.h>
 
 namespace nx {
 namespace vms::server {
 namespace plugins {
+
+static const std::set<QString> kSupportedMetadataCodecs = { "isapi.metadata" };
 
 using namespace nx::vms::server::plugins::hikvision;
 
@@ -22,6 +25,9 @@ HikvisionHevcStreamReader::HikvisionHevcStreamReader(const HikvisionResourcePtr&
     QnRtpStreamReader(resource),
     m_hikvisionResource(resource)
 {
+    m_rtpReader.setCustomTrackParserFactory(
+        std::make_unique<nx::streaming::rtp::BaseMetadataRtpParserFactory>(
+            kSupportedMetadataCodecs));
 }
 
 CameraDiagnostics::Result HikvisionHevcStreamReader::openStreamInternal(
