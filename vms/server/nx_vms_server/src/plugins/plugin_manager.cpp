@@ -531,12 +531,19 @@ void PluginManager::loadPlugin(
     // NOTE: QLibrary does not unload the dynamic library in its destructor.
     auto lib = std::make_unique<QLibrary>(pluginInfo->libraryFilename);
 
+    QLibrary::LoadHints hints = lib->loadHints();
     // Flag DeepBindHint forces plugin (the loaded side) to use its functions instead of the same
     // named functions of the Server (the loading side). In Linux it is not so by default.
-    QLibrary::LoadHints hints = lib->loadHints();
     #if !(defined(__SANITIZE_ADDRESS__) || __has_feature(address_sanitizer))
         hints |= QLibrary::DeepBindHint;
     #endif
+
+    // Flag ResolveAllSymbolsHint forces the Server (the loading side) to resolve all symbols used
+    // in the plugin (the loaded side) during the loading process. If this flag is set, then if
+    // there are any unresolved symbols, load() returns an error. Otherwise (if the flag is not
+    // set), load() silently loads the plugin, creating a possibility for the crash if one of such
+    // symbols is accessed later in runtime.
+    hints |= QLibrary::ResolveAllSymbolsHint;
     lib->setLoadHints(hints);
 
     if (!lib->load())
