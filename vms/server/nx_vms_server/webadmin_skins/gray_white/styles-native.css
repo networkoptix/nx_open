@@ -36,3 +36,26 @@ fieldset[disabled] .btn-primary.active {
     background-color: #f0f0f0;
     border-color: #ffffff;
     opacity: 0.65; }
+
+
+.glyphicon.glyphicon-arrow-right {
+    display: inline-block;
+    background-size: 352px 224px;
+    background-image: url('../images/icons/web_wizard_sprite.png') !important;
+    width: 20px;
+    height: 12px !important;
+
+    background-position: 0 -175px !important;
+    -webkit-transform: scaleX(-1);
+    transform: scaleX(-1);
+}
+
+.glyphicon.glyphicon-arrow-right:before{
+    content:none;
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio: 2) {
+    .glyphicon.glyphicon-arrow-right {
+        background-image: url('../images/icons/web_wizard_sprite@2x.png') !important;
+    }
+}
