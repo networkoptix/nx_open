@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <memory>
+#include <deque>
 
 #include <QtCore/QUrl>
 
@@ -68,7 +69,7 @@ private:
     nxcip::UsecUTCTimestamp m_curTimestamp;
     std::shared_ptr<nx::network::http::HttpClient> m_httpClient;
     std::unique_ptr<nx::network::http::MultipartContentParser> m_multipartContentParser;
-    std::unique_ptr<ILPVideoPacket> m_videoPacket;
+    std::deque<std::unique_ptr<ILPVideoPacket>> m_videoPackets;
     StreamType m_streamType;
     qint64 m_prevFrameClock;
     qint64 m_frameDurationMSec;

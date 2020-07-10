@@ -151,15 +151,14 @@ int MediaEncoder::setBitrate( int bitrateKbps, int* selectedBitrateKbps )
 
 nxcip::StreamReader* MediaEncoder::getLiveStreamReader()
 {
-    if( !m_streamReader.get() )
-        m_streamReader.reset( new StreamReader(
-            &m_refManager,
-            m_timeProvider,
-            m_cameraManager->info().defaultLogin,
-            m_cameraManager->info().defaultPassword,
-            getMediaUrlInternal(),
-            m_currentFps,
-            m_encoderNumber ) );
+    m_streamReader.reset( new StreamReader(
+        &m_refManager,
+        m_timeProvider,
+        m_cameraManager->info().defaultLogin,
+        m_cameraManager->info().defaultPassword,
+        getMediaUrlInternal(),
+        m_currentFps,
+        m_encoderNumber ) );
 
     m_streamReader->addRef();
     return m_streamReader.get();

@@ -65,8 +65,8 @@ StreamReader::StreamReader(
 
 StreamReader::~StreamReader()
 {
+    interrupt();
     NX_ASSERT(m_isInGetNextData == 0);
-    m_videoPacket.reset();
 }
 
 void* StreamReader::queryInterface(const nxpl::NX_GUID& interfaceID)
@@ -109,6 +109,8 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
         QnMutexLocker lk(&m_mutex);
         if (!m_httpClient)
         {
+            if (m_terminated)
+                return nxcip::NX_INTERRUPTED;
             m_httpClient = std::make_shared<nx::network::http::HttpClient>();
             m_httpClient->setMessageBodyReadTimeout(
                 std::chrono::milliseconds(MAX_FRAME_DURATION_MS));
@@ -176,11 +178,7 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
                 {
                     QnMutexLocker lk(&m_mutex);
                     if (m_terminated)
-                    {
-                        NX_DEBUG(this, "Terminated");
-                        m_terminated = false;
                         return nxcip::NX_INTERRUPTED;
-                    }
                 }
                 if (localHttpClientPtr->eof())
                 {
@@ -199,18 +197,14 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
 
         case mjpg:
             // Reading mjpg picture.
-            while (!m_videoPacket.get() && !localHttpClientPtr->eof())
+            while (m_videoPackets.empty() && !localHttpClientPtr->eof())
             {
                 m_multipartContentParser->processData(
                     localHttpClientPtr->fetchMessageBodyBuffer());
                 {
                     QnMutexLocker lk(&m_mutex);
                     if (m_terminated)
-                    {
-                        NX_DEBUG(this, "Terminated");
-                        m_terminated = false;
                         return nxcip::NX_INTERRUPTED;
-                    }
                 }
             }
             break;
@@ -219,16 +213,17 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
             break;
     }
 
-    if (m_videoPacket.get())
+    if (!m_videoPackets.empty())
     {
-        *lpPacket = m_videoPacket.release();
+        *lpPacket = m_videoPackets.front().release();
+        m_videoPackets.pop_front();
         const auto plugin = HttpLinkPlugin::instance();
         if (!plugin)
         {
             NX_DEBUG(this, "No plugin");
             return nxcip::NX_OTHER_ERROR;
         }
-
+        NX_VERBOSE(this, "New packet, timestamp: %1", (*lpPacket)->timestamp());
         plugin->setStreamState(m_url, /*isStreamRunning*/ true);
         return nxcip::NX_NO_ERROR;
     }
@@ -332,14 +327,15 @@ int StreamReader::doRequest(nx::network::http::HttpClient* const httpClient)
 void StreamReader::gotJpegFrame(const nx::network::http::ConstBufferRefType& jpgFrame)
 {
     // Creating video packet.
-    m_videoPacket.reset(new ILPVideoPacket(
+    m_videoPackets.emplace_back(new ILPVideoPacket(
         0,
         m_timeProvider->millisSinceEpoch() * USEC_IN_MS,
         nxcip::MediaDataPacket::fKeyPacket,
         0));
-    m_videoPacket->resizeBuffer(jpgFrame.size());
-    if (m_videoPacket->data())
-        memcpy(m_videoPacket->data(), jpgFrame.constData(), jpgFrame.size());
+    m_videoPackets.back()->resizeBuffer(jpgFrame.size());
+    if (m_videoPackets.back()->data())
+        memcpy(m_videoPackets.back()->data(), jpgFrame.constData(), jpgFrame.size());
+    NX_VERBOSE(this, "Got packet, timestamp: %1", m_videoPackets.back()->timestamp());
 }
 
 bool StreamReader::waitForNextFrameTime()
@@ -363,11 +359,7 @@ bool StreamReader::waitForNextFrameTime()
                 msElapsed = monotonicTimer.elapsed();
             }
             if (m_terminated)
-            {
-                // The call has been interrupted.
-                m_terminated = false;
                 return false;
-            }
         }
     }
     m_prevFrameClock = m_timeProvider->millisSinceEpoch();

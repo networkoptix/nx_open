@@ -64,18 +64,43 @@ int CameraManager::getEncoderCount( int* encoderCount ) const
     return nxcip::NX_NO_ERROR;
 }
 
+bool CameraManager::isCameraOnline() const
+{
+    nx::network::http::HttpClient httpClient;
+    nx::utils::Url url(m_info.url);
+    if (!httpClient.doGet(url))
+    {
+        NX_DEBUG(this, "Request %1 has failed", url);
+        return false;
+    }
+    return true;
+}
+
 //!Implementation of nxcip::BaseCameraManager::getEncoder
 int CameraManager::getEncoder( int index, nxcip::CameraMediaEncoder** encoderPtr )
 {
-    if (index != 0 && index != 1)
+    if (index < 0 || index >= kEncoderCount)
         return nxcip::NX_INVALID_ENCODER_NUMBER;
 
+    if (!isCameraOnline())
+        return nxcip::NX_NETWORK_ERROR;
+
+    QnMutexLocker lock(&m_mutex);
     if( !m_encoder[index].get() )
         m_encoder[index].reset( new MediaEncoder(this, m_timeProvider, index) );
     m_encoder[index]->addRef();
     *encoderPtr = m_encoder[index].get();
 
     return nxcip::NX_NO_ERROR;
+}
+
+MediaEncoder* CameraManager::getEncoderIfExist(int index)
+{
+    if (index < 0 || index >= kEncoderCount)
+        return nullptr;
+
+    QnMutexLocker lock(&m_mutex);
+    return m_encoder[index].get();
 }
 
 //!Implementation of nxcip::BaseCameraManager::getCameraInfo
@@ -99,8 +124,8 @@ void CameraManager::setCredentials( const char* username, const char* password )
     strncpy( m_info.defaultPassword, password, sizeof(m_info.defaultPassword)-1 );
     for (int i = 0; i < kEncoderCount; ++i)
     {
-        if (m_encoder[i])
-            m_encoder[i]->updateCredentials(QString::fromUtf8(username), QString::fromUtf8(password));
+        if (auto encoder = getEncoderIfExist(i))
+            encoder->updateCredentials(QString::fromUtf8(username), QString::fromUtf8(password));
     }
 }
 

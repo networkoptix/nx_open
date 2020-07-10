@@ -57,6 +57,9 @@ public:
     nxpt::CommonRefManager* refManager();
 
 private:
+    bool isCameraOnline() const;
+    MediaEncoder* getEncoderIfExist(int index);
+private:
     nxpt::CommonRefManager m_refManager;
     /*!
         Holding reference to \a AxisCameraPlugin, but not \a AxisCameraDiscoveryManager,
@@ -68,6 +71,7 @@ private:
     nxpl::TimeProvider *const m_timeProvider;
     static const int kEncoderCount = 2;
     std::unique_ptr<MediaEncoder> m_encoder[kEncoderCount];
+    mutable QnMutex m_mutex;
 };
 
 } // namespace nx::vms_server_plugins::mjpeg_link
