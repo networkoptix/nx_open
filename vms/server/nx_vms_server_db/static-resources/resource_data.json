@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "1.0.1.287",
+    "version": "1.0.1.288",
     "data": [
         {
             "keys": [
@@ -1116,7 +1116,8 @@
                 "dw-enhd16|vc",
                 "general|dr-tw2516a",
                 "network digital video|b1210dm",
-                "acti|v31"
+                "acti|v31",
+                "*|UL-DVR302-16Z"
             ],
             "analogEncoder": true
         },
