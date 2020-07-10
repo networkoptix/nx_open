@@ -3904,7 +3904,7 @@ to %1</source>
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
       <translation>
-        <numerusform>%1는(가)  현재 사용 중 입니다</numerusform>
+        <numerusform>%1는(가) 현재 사용 중 입니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7593,7 +7593,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Camera Rules</source>
-      <translation>카메라 설정</translation>
+      <translation>이벤트 규칙</translation>
     </message>
     <message>
       <source>I/O Module Rules</source>

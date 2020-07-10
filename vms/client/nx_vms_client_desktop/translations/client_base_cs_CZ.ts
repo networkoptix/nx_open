@@ -5918,7 +5918,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Server is unavailable.</source>
-      <translation>Server  není k dispozici.</translation>
+      <translation>Server není k dispozici.</translation>
     </message>
     <message>
       <source>now</source>
@@ -10555,7 +10555,7 @@ kartě &quot;Správa úložiště&quot; v dialogovém okně Nastavení serveru m
     </message>
     <message>
       <source>Failed to save file</source>
-      <translation>Uložení souboru se nezdařilo: </translation>
+      <translation>Uložení souboru se nezdařilo:</translation>
     </message>
     <message>
       <source>%1 folder is blocked for writing.</source>

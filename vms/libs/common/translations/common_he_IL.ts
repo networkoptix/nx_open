@@ -1928,7 +1928,7 @@
     </message>
     <message>
       <source>PoE over Budget</source>
-      <translation>קיבולת PoE </translation>
+      <translation>קיבולת PoE</translation>
     </message>
     <message>
       <source>Fan Error</source>
@@ -1936,7 +1936,7 @@
     </message>
     <message>
       <source>PoE over budget at %1</source>
-      <translation>קיבולת PoE על 1%</translation>
+      <translation>קיבולת PoE על %1</translation>
     </message>
     <message>
       <source>Fan error at %1</source>

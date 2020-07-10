@@ -1816,7 +1816,7 @@
     </message>
     <message>
       <source>PoE over budget at %1</source>
-      <translation>Poe güç yetersizliği</translation>
+      <translation>Poe güç yetersizliği %1</translation>
     </message>
     <message>
       <source>Fan error at %1</source>

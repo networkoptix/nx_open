@@ -4003,7 +4003,7 @@ to %1</source>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation>Kérjük, küldje el a mellékelt licenckulcsot és hardver-azonosítót a regionális / licenc támogatáshoz, hogy megkapja az Aktiváló kulcs fájlt.</translation>
+      <translation>Kérjük, küldje el a mellékelt licenckulcsot és hardver-azonosítót a regionális / licenc támogatáshoz (%1), hogy megkapja az Aktiváló kulcs fájlt.</translation>
     </message>
   </context>
   <context>
@@ -9139,7 +9139,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message>
       <source>Unknown device %1</source>
       <comment>In meaning &apos;Unknown device&apos;, %1 is system info</comment>
-      <translation>Ismeretlen eszköz probléma</translation>
+      <translation>Ismeretlen eszköz %1</translation>
     </message>
   </context>
   <context>

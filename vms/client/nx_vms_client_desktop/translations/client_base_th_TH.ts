@@ -1389,7 +1389,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
-      <translation>หากพบปัญหาโปรดติดต่อฝ่ายบริการลูกค้า</translation>
+      <translation>หากพบปัญหาโปรดติดต่อฝ่ายบริการลูกค้า %1</translation>
     </message>
     <message>
       <source>Please contact %1.</source>
@@ -3911,7 +3911,7 @@ to %1</source>
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
       <translation>
-        <numerusform>จำเป็นต้องกรอกอย่างน้อยหนึ่งหน่วย</numerusform>
+        <numerusform>จำเป็นต้องกรอกอย่างน้อยหนึ่งหน่วย %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -3950,7 +3950,7 @@ to %1</source>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation>โปรดส่งรหัสสิทธิ์ใช้งานและรหัสฮาร์ดแวร์ไปยังฝ่ายสนับสนุนภูมิภาค / สิทธิ์ใช้งานของคุณเพื่อรับไฟล์รหัสเปิดใช้งาน</translation>
+      <translation>โปรดส่งรหัสสิทธิ์ใช้งานและรหัสฮาร์ดแวร์ไปยังฝ่ายสนับสนุนภูมิภาค / สิทธิ์ใช้งานของคุณเพื่อรับไฟล์รหัสเปิดใช้งาน (%1)</translation>
     </message>
   </context>
   <context>
@@ -10125,7 +10125,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation>บันทึกไฟล์เป็น </translation>
+      <translation>บันทึกไฟล์เป็น</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
