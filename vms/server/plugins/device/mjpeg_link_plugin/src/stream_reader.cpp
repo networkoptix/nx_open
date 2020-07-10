@@ -65,6 +65,7 @@ StreamReader::StreamReader(
 
 StreamReader::~StreamReader()
 {
+    interrupt();
     NX_ASSERT(m_isInGetNextData == 0);
 }
 
@@ -108,6 +109,8 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
         QnMutexLocker lk(&m_mutex);
         if (!m_httpClient)
         {
+            if (m_terminated)
+                return nxcip::NX_INTERRUPTED;
             m_httpClient = std::make_shared<nx::network::http::HttpClient>();
             m_httpClient->setMessageBodyReadTimeout(
                 std::chrono::milliseconds(MAX_FRAME_DURATION_MS));
@@ -175,11 +178,7 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
                 {
                     QnMutexLocker lk(&m_mutex);
                     if (m_terminated)
-                    {
-                        NX_DEBUG(this, "Terminated");
-                        m_terminated = false;
                         return nxcip::NX_INTERRUPTED;
-                    }
                 }
                 if (localHttpClientPtr->eof())
                 {
@@ -205,11 +204,7 @@ int StreamReader::getNextData(nxcip::MediaDataPacket** lpPacket)
                 {
                     QnMutexLocker lk(&m_mutex);
                     if (m_terminated)
-                    {
-                        NX_DEBUG(this, "Terminated");
-                        m_terminated = false;
                         return nxcip::NX_INTERRUPTED;
-                    }
                 }
             }
             break;
@@ -364,11 +359,7 @@ bool StreamReader::waitForNextFrameTime()
                 msElapsed = monotonicTimer.elapsed();
             }
             if (m_terminated)
-            {
-                // The call has been interrupted.
-                m_terminated = false;
                 return false;
-            }
         }
     }
     m_prevFrameClock = m_timeProvider->millisSinceEpoch();

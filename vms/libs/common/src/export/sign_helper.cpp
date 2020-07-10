@@ -146,12 +146,12 @@ void QnSignHelper::doUpdateDigest(AVCodecID codecId, const quint8* extradata, in
         {
             while (curNal < dataEnd - reqUnitSize)
             {
-                int curSize = 0;
+                uint32_t curSize = 0;
                 for (int i = 0; i < reqUnitSize; ++i)
                     curSize = (curSize << 8) + curNal[i];
                 curNal += reqUnitSize;
-                curSize = qMin(curSize, (int)(dataEnd - curNal));
-                ctx.addData((const char*)curNal, curSize);
+                curSize = qMin(curSize, (uint32_t) (dataEnd - curNal));
+                ctx.addData((const char*) curNal, (int) curSize);
 
                 curNal += curSize;
             }

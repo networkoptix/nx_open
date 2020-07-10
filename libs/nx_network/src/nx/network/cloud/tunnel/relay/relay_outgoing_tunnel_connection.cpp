@@ -98,8 +98,16 @@ void OutgoingTunnelConnection::establishNewConnection(
                 // the connection error itself.
                 m_activeRequests.back()->timer.start(
                     timeout * 2,
-                    std::bind(&OutgoingTunnelConnection::onConnectionOpened, this,
-                        nx::cloud::relay::api::ResultCode::timedOut, nullptr, requestIter));
+                    [this, requestIter, timeout]()
+                    {
+                        NX_VERBOSE(this, "Relay session %1. Relay client failed to respond in %2",
+                            m_relaySessionId, timeout * 2);
+
+                        onConnectionOpened(
+                            nx::cloud::relay::api::ResultCode::timedOut,
+                            nullptr,
+                            requestIter);
+                    });
             }
 
             m_activeRequests.back()->relayClient = std::move(relayClient);
