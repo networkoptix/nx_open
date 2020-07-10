@@ -111,9 +111,15 @@ SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
             osCheck(Operation::UpdateMinilauncher, updateMinilauncher());
     }
 
-    /* If we are already in self-update mode, just exit in any case. */
+
     if (startupParams.selfUpdateMode)
+    {
+        // Let's try to update desktop shortcut only when we have required priviledges.
+        updateMinilauncherDesktopIcon();
+
+        // If we are already in self-update mode, just exit in any case.
         return;
+    }
 
     if (std::any_of(results.cbegin(), results.cend(), [](Result value) { return value == Result::AdminRequired; } ))
         launchWithAdminPermissions();
@@ -384,8 +390,6 @@ bool SelfUpdater::updateMinilauncher()
     bool success = true;
     for (const QString& installRoot: QnClientInstallationsManager::clientInstallRoots())
         success &= updateMinilauncherInDir(installRoot, sourceMinilauncherPath);
-
-    success &= updateMinilauncherDesktopIcon();
 
     return success;
 }
@@ -660,11 +664,11 @@ bool SelfUpdater::updateApplauncherDesktopIcon()
 
 bool SelfUpdater::updateMinilauncherDesktopIcon()
 {
-    bool success = true;
-
     #if defined(Q_OS_WIN)
         // WIX installer creates a shortcut with icon placed in "%SystemRoot%\Installer\{GUID}\".
         // Instead of that we want to use an icon from our minilauncher binary, so it will be updated.
+
+        NX_INFO(this, "Updating desktop shortcuts");
 
         const QStringList shortcutDirs = {
             QStandardPaths::writableLocation(QStandardPaths::DesktopLocation),
@@ -702,13 +706,26 @@ bool SelfUpdater::updateMinilauncherDesktopIcon()
                     NX_INFO(this, "Updating icon for shortcut at %1", entry.absoluteFilePath());
                     NX_INFO(this, "Previous icon location: %1", info.iconPath);
 
-                    // Overwrite the shortcut.
-                    // This call clears shortcut icon, so the target binary icon will be used.
-                    success &= qnPlatform->shortcuts()->createShortcut(
+                    bool success = true;
+
+                    // Delete existing shortcut.
+                    // Environment variable is checked for testing/debugging purposes.
+                    if (qgetenv("nx_dont_delete_shortcut_on_update").isEmpty())
+                    {
+                        success = qnPlatform->shortcuts()->deleteShortcut(
+                            entry.absolutePath(), entry.completeBaseName());
+
+                        NX_INFO(this, "Deleting shortcut. Success: %1", success);
+                    }
+
+                    // Create/overwrite shortcut. The target binary icon is used.
+                    success = qnPlatform->shortcuts()->createShortcut(
                         info.sourceFile,
                         entry.absolutePath(),
                         entry.completeBaseName(),
                         info.arguments);
+
+                    NX_INFO(this, "Creating shortcut. Success: %1", success);
 
                     updated = true;
                 }
@@ -731,7 +748,7 @@ bool SelfUpdater::updateMinilauncherDesktopIcon()
         }
     #endif // defined(Q_OS_WIN)
 
-    return success;
+    return true;
 }
 
 } // namespace client
