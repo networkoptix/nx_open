@@ -814,7 +814,7 @@ CameraDiagnostics::Result QnPlOnvifResource::initializeCameraDriver()
         return CameraDiagnostics::ServerTerminatedResult();
 
     // 'updateFirmware' is an optional request. Check for unauthorized status only.
-    auto result = updateFirmware(); 
+    auto result = updateFirmware();
     if (result.errorCode == CameraDiagnostics::ErrorCode::notAuthorised)
     {
         setStatus(Qn::Unauthorized);
@@ -2326,7 +2326,7 @@ bool QnPlOnvifResource::checkResultAndSetStatus(const CameraDiagnostics::Result&
 
 bool QnPlOnvifResource::trustMaxFPS(int currentlyDetectedMaxFps) const
 {
-    const auto previouslyDetectedMaxFps = 
+    const auto previouslyDetectedMaxFps =
         cameraMediaCapability().streamCapabilities.value(StreamIndex::primary).maxFps;
     if (previouslyDetectedMaxFps > 0)
         return true; //< The value is already detected.
@@ -2701,7 +2701,7 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoEncoderOptions()
 
     const auto maxFps = optionsList[0].frameRateMax;
     const bool trustMaxFps = this->trustMaxFPS(maxFps); //< Call it before saving a new maxFps value.
-    
+
     if (maxFps > 0)
         setMaxFps(maxFps);
     fillStreamCapabilityLists(optionsList);
@@ -3177,6 +3177,78 @@ QRect QnPlOnvifResource::getVideoSourceMaxSize(std::string token)
     return result;
 }
 
+using VideoSourceConfigurationList = std::vector<onvifXsd__VideoSourceConfiguration*>;
+
+static std::optional<VideoSourceConfigurationList> fetchVideoSourceConfigurationsDirectly(
+    MediaSoapWrapper* soapWrapper)
+{
+    if (!NX_ASSERT(soapWrapper))
+        return std::nullopt;
+
+    VideoSrcConfigsReq request;
+    VideoSrcConfigsResp response;
+
+    int soapRes = soapWrapper->getVideoSourceConfigurations(request, response);
+    if (soapRes != SOAP_OK)
+        return std::nullopt;
+
+    return response.Configurations;
+}
+
+/*
+ * Some devices (e.g. Hikvision|DS-9664NI-I16 return a broken GetVideoSourceConfigurationsResponse,
+ * so we mimic ODM and fetch information about video source configurations from
+ * GetProfilesResponse.
+ */
+static std::optional<VideoSourceConfigurationList> fetchVideoSourceConfigurationsViaProfiles(
+    MediaSoapWrapper* soapWrapper)
+{
+    if (!NX_ASSERT(soapWrapper))
+        return std::nullopt;
+
+    ProfilesReq request;
+    ProfilesResp response;
+    const int soapRes = soapWrapper->getProfiles(request, response);
+
+    if (soapRes != SOAP_OK)
+        return std::nullopt;
+
+    std::set<std::string> configurationTokens;
+    VideoSourceConfigurationList result;
+    for (const onvifXsd__Profile* profile: response.Profiles)
+    {
+        if (!profile)
+            continue;
+
+        onvifXsd__VideoSourceConfiguration* configuration = profile->VideoSourceConfiguration;
+        if (!configuration)
+            continue;
+
+        if (configurationTokens.find(configuration->token) != configurationTokens.cend())
+            continue;
+
+        configurationTokens.insert(configuration->token);
+        result.push_back(configuration);
+    }
+
+    return result;
+}
+
+static std::optional<VideoSourceConfigurationList> fetchVideoSourceConfigurations(
+    const QnPlOnvifResourcePtr& device,
+    MediaSoapWrapper* soapWrapper)
+{
+    auto resourceData = device->resourceData();
+    const bool useProfileRequestToFetchVideoSourceConfigurations = resourceData.value<bool>(
+        "fetchVideoSourceConfigurationsViaProfiles",
+        false);
+
+    if (useProfileRequestToFetchVideoSourceConfigurations)
+        return fetchVideoSourceConfigurationsViaProfiles(soapWrapper);
+
+    return fetchVideoSourceConfigurationsDirectly(soapWrapper);
+}
+
 CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
 {
     CameraDiagnostics::Result result = fetchChannelCount();
@@ -3191,30 +3263,28 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchAndSetVideoSource()
         return CameraDiagnostics::ServerTerminatedResult();
 
     MediaSoapWrapper soapWrapper(this);
-    VideoSrcConfigsReq request;
-    VideoSrcConfigsResp response;
 
-    int soapRes = soapWrapper.getVideoSourceConfigurations(request, response);
-    if (soapRes != SOAP_OK)
+    const std::optional<VideoSourceConfigurationList> configurations =
+        fetchVideoSourceConfigurations(toSharedPointer(this), &soapWrapper);
+
+    if (!configurations)
     {
-        NX_DEBUG(this, makeSoapFailMessage(
-            soapWrapper, __func__, "GetVideoSourceConfigurations", soapRes));
+        NX_DEBUG(this, "[%1], Device: %3, Error: %2",
+            "getVideoSourceConfigurations",
+            toSharedPointer(this),
+            soapWrapper.getLastErrorDescription());
 
         return CameraDiagnostics::RequestFailedResult(
-            QLatin1String("getVideoSourceConfigurations"), soapWrapper.getLastErrorDescription());
-    }
-    else
-    {
-        NX_VERBOSE(this, makeSoapSuccessMessage(soapWrapper, __func__, "GetVideoSourceConfigurations"));
+            "getVideoSourceConfigurations", soapWrapper.getLastErrorDescription());
     }
 
     if (commonModule()->isNeedToStop())
         return CameraDiagnostics::ServerTerminatedResult();
 
     std::string srcToken = videoSourceToken();
-    for (uint i = 0; i < response.Configurations.size(); ++i)
+    for (uint i = 0; i < configurations->size(); ++i)
     {
-        onvifXsd__VideoSourceConfiguration* conf = response.Configurations[i];
+        onvifXsd__VideoSourceConfiguration* conf = (*configurations)[i];
         if (!conf || conf->SourceToken != srcToken || !(conf->Bounds))
             continue;
 
@@ -4869,12 +4939,12 @@ CameraDiagnostics::Result QnPlOnvifResource::updateFirmware()
         return CameraDiagnostics::RequestFailedResult(
             "getDeviceInformation", soapWrapper.getLastErrorDescription());
     }
-    
+
     QString firmware = QString::fromStdString(response.FirmwareVersion);
     NX_DEBUG(this, "Successfully read firmware for camera %1. firmware=%2", getUrl(), firmware);
     if (!firmware.isEmpty())
         setFirmware(firmware);
-    
+
     return CameraDiagnostics::NoErrorResult();
 }
 
