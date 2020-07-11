@@ -913,7 +913,7 @@
     </message>
     <message>
       <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>Video eller ljudkodek är inkompatibel med behållare %1.</translation>
+      <translation>Video eller ljudkodek är inkompatibel med behållare</translation>
     </message>
     <message>
       <source>File write error. Not enough free space.</source>

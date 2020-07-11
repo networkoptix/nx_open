@@ -10328,7 +10328,7 @@ kartě &quot;Správa úložiště&quot; v dialogovém okně Nastavení serveru m
     </message>
     <message>
       <source>Failed to save file</source>
-      <translation>Uložení souboru se nezdařilo: </translation>
+      <translation>Uložení souboru se nezdařilo:</translation>
     </message>
     <message>
       <source>%1 folder is blocked for writing.</source>

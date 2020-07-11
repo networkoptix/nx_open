@@ -624,7 +624,7 @@
       <comment>%n will be replaced by the total count</comment>
       <translation>
         <numerusform>%n/%1 Végponti licencek</numerusform>
-        <numerusform>%n Végponti licencek</numerusform>
+        <numerusform>%n/%1 Végponti licencek</numerusform>
       </translation>
     </message>
     <message numerus="yes">

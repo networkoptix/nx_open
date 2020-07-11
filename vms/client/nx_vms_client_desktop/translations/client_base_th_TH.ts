@@ -9922,7 +9922,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation>บันทึกไฟล์เป็น </translation>
+      <translation>บันทึกไฟล์เป็น</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
