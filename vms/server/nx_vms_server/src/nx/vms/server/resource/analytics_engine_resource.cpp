@@ -177,7 +177,6 @@ api::analytics::SettingsValues AnalyticsEngineResource::prepareSettings(
         "Engine %4",
         settingsValues, settingsContext.values, settingsContext.model, toSharedPointer(this));
 
-    // TODO: handle settings engine errors.
     analytics::SettingsEngineWrapper settingsEngine(
         serverModule()->eventConnector(), toSharedPointer(this));
     settingsEngine.loadModelFromJsonObject(settingsContext.model);
@@ -353,6 +352,13 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
     m_handler = nx::sdk::makePtr<analytics::EngineHandler>(serverModule(), getId());
     m_sdkEngine->setHandler(m_handler);
 
+    auto parentPlugin = plugin().dynamicCast<resource::AnalyticsPluginResource>();
+    if (!parentPlugin)
+        return CameraDiagnostics::PluginErrorResult("Can't find parent Plugin");
+
+    const auto pluginManifest = parentPlugin->manifest();
+    setSettingsModel(pluginManifest.engineSettingsModel);
+
     SetSettingsRequest initialSettingsRequest;
     initialSettingsRequest.values = storedSettingsValues();
 
@@ -365,14 +371,6 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
     const auto manifest = m_sdkEngine->manifest();
     if (!manifest)
         return CameraDiagnostics::PluginErrorResult("Can't obtain Engine Manifest");
-
-    // Send engine settings.
-
-    auto parentPlugin = plugin().dynamicCast<resource::AnalyticsPluginResource>();
-    if (!parentPlugin)
-        return CameraDiagnostics::PluginErrorResult("Can't find parent Plugin");
-
-    const auto pluginManifest = parentPlugin->manifest();
 
     nx::analytics::DescriptorManager descriptorManager(commonModule());
     descriptorManager.updateFromEngineManifest(pluginManifest.id, getId(), getName(), *manifest);

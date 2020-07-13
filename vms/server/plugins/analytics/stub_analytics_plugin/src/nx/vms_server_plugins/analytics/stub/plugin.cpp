@@ -37,16 +37,14 @@ std::string Plugin::manifestString() const
                         "type": "CheckBox",
                         "name": ")json" + kThrowPluginDiagnosticEventsFromEngineSetting + R"json(",
                         "caption": "Produce Plugin Diagnostic Events from the Engine",
-                        "defaultValue": false,
-                        "value": false
+                        "defaultValue": false
                     },
                     {
                         "type": "CheckBox",
                         "name": ")json" + kDisableStreamSelectionSetting + R"json(",
                         "caption": "Disable stream selection",
                         "description": "If true, the stream selection control will be hidden for newly created DeviceAgents",
-                        "defaultValue": false,
-                        "value": false
+                        "defaultValue": false
                     },
                     {
                         "type": "CheckBox",
@@ -95,8 +93,7 @@ std::string Plugin::manifestString() const
                         "type": "CheckBox",
                         "name": "testCheckBox",
                         "caption": "Check Box",
-                        "defaultValue": true,
-                        "value": true
+                        "defaultValue": true
                     }
                 ]
             }
