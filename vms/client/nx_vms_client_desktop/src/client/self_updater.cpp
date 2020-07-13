@@ -112,7 +112,7 @@ SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
     }
 
     // Update shortcuts for the current user / all users depending on the given access rights.
-    updateMinilauncherDesktopIcon(startupParams.selfUpdateMode);
+    updateMinilauncherIcons(startupParams.selfUpdateMode);
 
     // If we are already in self-update mode, just exit in any case.
     if (startupParams.selfUpdateMode)
@@ -659,7 +659,7 @@ bool SelfUpdater::updateApplauncherDesktopIcon()
     return true;
 }
 
-void SelfUpdater::updateMinilauncherDesktopIcon(bool hasAdminRights)
+void SelfUpdater::updateMinilauncherIcons(bool hasAdminRights)
 {
     #if defined(Q_OS_WIN)
         // WIX installer creates a shortcut with icon placed in "%SystemRoot%\Installer\{GUID}\".
@@ -720,6 +720,56 @@ void SelfUpdater::updateMinilauncherDesktopIcon(bool hasAdminRights)
             {
                 NX_VERBOSE(this, "Shortcut should not be updated");
             }
+        }
+
+        if (hasAdminRights)
+        {
+            // Start menu shortcut is created by our installer as Advertised (or Windows Installer)
+            // shortcut, which points to an icon somewhere in /Windows/Installer/ folder instead of
+            // our launcher binary. As result, we can find the shortcut only by its own path.
+
+            const QString shortcutName = nx::utils::AppInfo::vmsName();
+            const QString shortcutPath = nx::format(
+                "%1/Microsoft/Windows/Start Menu/Programs/%2",
+                QDir::fromNativeSeparators(QString::fromLocal8Bit(qgetenv("programdata"))),
+                nx::utils::AppInfo::organizationName());
+
+            const QString shortcutFilePath = shortcutPath + "/" + shortcutName + ".lnk";
+            if (QFile::exists(shortcutFilePath))
+            {
+                NX_VERBOSE(this, "Start menu shortcut is found at %1", shortcutFilePath);
+
+                // Acquire shortcut data.
+                const auto info = qnPlatform->shortcuts()->getShortcutInfo(shortcutPath, shortcutName);
+                const auto target = QnClientInstallationsManager::miniLauncher().absoluteFilePath();
+
+                if (info.iconPath.contains("/Windows/Installer/", Qt::CaseInsensitive)
+                    || info.iconPath.contains("%SystemRoot%/Installer/", Qt::CaseInsensitive))
+                {
+                    NX_INFO(this, "Updating menu shortcut at %1", shortcutFilePath);
+                    NX_INFO(this, "Redirecting shortcut to %1", target);
+                    bool success = qnPlatform->shortcuts()->createShortcut(
+                        target,
+                        shortcutPath,
+                        shortcutName,
+                        info.arguments);
+                    NX_INFO(this, "Success: %1", success);
+
+                    updated = true;
+                }
+                else
+                {
+                    NX_VERBOSE(this, "Shortcut is updated already");
+                }
+            }
+            else
+            {
+                NX_VERBOSE(this, "Start menu shortcut is not found at %1", shortcutFilePath);
+            }
+        }
+        else
+        {
+            NX_VERBOSE(this, "Start menu shortcut wouldn't be updated without admin rights");
         }
 
         if (updated)

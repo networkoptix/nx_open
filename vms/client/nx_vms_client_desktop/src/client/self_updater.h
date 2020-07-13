@@ -63,8 +63,8 @@ private:
 
     bool updateMinilauncherInDir(const QDir& installRoot, const QString& sourceMinilauncherPath);
     bool updateApplauncherDesktopIcon();
-    void updateMinilauncherDesktopIcon(bool hasAdminRights);
 
+    void updateMinilauncherIcons(bool hasAdminRights);
 
 private:
     nx::utils::SoftwareVersion m_clientVersion;
