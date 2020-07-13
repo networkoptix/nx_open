@@ -261,7 +261,7 @@ void IOSVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& fr
     codecContext->get_format = get_format;
     if (codecContext->extradata_size == 0 && frame->compressionType == AV_CODEC_ID_H264)
     {
-        std::vector<uint8_t> extradata = nx::media_utils::buildExtraData(
+        std::vector<uint8_t> extradata = nx::media::h264::buildExtraData(
             (const uint8_t*)frame->data(), frame->dataSize());
         if (extradata.empty())
         {

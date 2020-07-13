@@ -172,5 +172,4 @@ std::vector<uint8_t> buildExtraData(const uint8_t* data, int32_t size)
     return extradata;
 }
 
-} // namespace h264
-} // namespace nx::media_utils
+} // namespace nx::media::h264

@@ -552,7 +552,7 @@ struct NalUnitInfo
 
 std::vector<NalUnitInfo> findNalUnitsAnnexB(const uint8_t* data, int32_t size);
 
-std::vector<uint8_t> convertStartCodesToSizes(const uint8_t* data, int32_t size);
+std::vector<uint8_t> convertStartCodesToSizes(const uint8_t* data, int32_t size, int32_t padding = 0);
 
 } // namespace nx::media::nal
 
