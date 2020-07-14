@@ -2009,20 +2009,39 @@ void ActionHandler::at_pingAction_triggered()
     if (nx::network::SocketGlobals::addressResolver().isCloudHostName(host))
         return;
 
-#ifdef Q_OS_WIN
-    nx::startProcessDetached("cmd", {"/C", "ping", host, "-t"});
-#endif
-#ifdef Q_OS_LINUX
-    QString cmd = lit("xterm -e ping %1").arg(host);
-    QProcess::startDetached(cmd);
-#endif
-#ifdef Q_OS_MACX
-    QnPingDialog *dialog = new QnPingDialog(NULL, Qt::Dialog | Qt::WindowStaysOnTopHint);
-    dialog->setHostAddress(host);
-    dialog->show();
-    dialog->startPings();
-#endif
+    if (nx::utils::AppInfo::isWindows())
+    {
+        nx::startProcessDetached("cmd", {"/C", "ping", host, "-t"});
+    }
+    else if (nx::utils::AppInfo::isLinux())
+    {
+        const QStringList terminals{
+            "x-terminal-emulator", //< Debian/Ubuntu system-wide alias for default terminal.
+            "gnome-terminal", //< Gnome variant.
+            "konsole", //< KDE variant.
+            "xterm" //< Fallback.
+        };
+        for (const auto& terminal: terminals)
+        {
+            const SystemError::ErrorCode result =
+                nx::startProcessDetached(terminal, {"-e", "ping", host});
+            if (result == SystemError::noError)
+            {
+                NX_DEBUG(this, "Ping %1 started in %2", host, terminal);
+                return;
+            }
 
+            NX_VERBOSE(this, "Cannot run %1. Error code: %2", terminal, result);
+        }
+        NX_ERROR(this, "Cannot run `ping` in any of known terminal emulators");
+    }
+    else if (nx::utils::AppInfo::isMacOsX())
+    {
+        auto dialog = new QnPingDialog(nullptr, Qt::Dialog | Qt::WindowStaysOnTopHint);
+        dialog->setHostAddress(host);
+        dialog->show();
+        dialog->startPings();
+    }
 }
 
 void ActionHandler::at_openInFolderAction_triggered() {
