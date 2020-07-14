@@ -236,6 +236,8 @@ public:
     std::chrono::milliseconds calendarDuration() const;
     qint64 recordingBitrateBps(std::chrono::milliseconds bitratePeriod) const;
     bool hasArchiveRotated() const;
+
+    virtual MotionStreamIndex motionStreamIndex() const override;
 signals:
     /** Emit on camera or IO module input change. */
     void inputPortStateChanged(

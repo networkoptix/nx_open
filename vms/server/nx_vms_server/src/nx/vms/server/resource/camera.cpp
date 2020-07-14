@@ -983,6 +983,16 @@ qint64 Camera::recordingBitrateBps(std::chrono::milliseconds bitratePeriod) cons
     return result;
 }
 
+QnSecurityCamResource::MotionStreamIndex Camera::motionStreamIndex() const
+{
+    if (getRole() == Role::subchannel)
+    {
+        if (auto camera = getParentResource().dynamicCast<Camera>())
+            return camera->motionStreamIndex();
+    }
+    return base_type::motionStreamIndex();
+}
+
 } // namespace resource
 } // namespace vms::server
 } // namespace nx

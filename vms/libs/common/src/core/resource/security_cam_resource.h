@@ -79,7 +79,7 @@ public:
     QRegion getMotionMask(int channel) const;
 
     /** Returns which stream should be used for motion detection and is it forced. */
-    MotionStreamIndex motionStreamIndex() const;
+    virtual MotionStreamIndex motionStreamIndex() const;
 
     /**
      * Enable forced motion detection on a selected stream or switch to automatic mode.
