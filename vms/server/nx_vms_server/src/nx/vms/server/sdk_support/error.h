@@ -1,6 +1,7 @@
 #pragma once
 
 #include <nx/vms/server/sdk_support/result_holder.h>
+#include <nx/vms/api/types/event_rule_types.h>
 
 namespace nx::vms::server::sdk_support {
 
@@ -23,5 +24,7 @@ struct Error
 
     bool isOk() const { return errorCode == nx::sdk::ErrorCode::noError; }
 };
+
+nx::vms::api::EventLevel pluginDiagnosticEventLevel(const Error& error);
 
 } // namespace nx::vms::server::sdk_support

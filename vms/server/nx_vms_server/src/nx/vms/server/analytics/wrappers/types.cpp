@@ -54,3 +54,18 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::server::analytics::wrappers, 
     (nx::vms::server::analytics::wrappers::ViolationType::invalidActionResultUrl,
         "invalidActionResultUrl")
 )
+
+namespace nx::vms::server::analytics::wrappers {
+
+nx::vms::api::EventLevel pluginDiagnosticEventLevel(const Violation& violation)
+{
+    if (!NX_ASSERT(violation.type != ViolationType::undefined))
+        return nx::vms::api::EventLevel::UndefinedEventLevel;
+
+    if (violation.type == ViolationType::methodExecutionTookTooLong)
+        return nx::vms::api::EventLevel::WarningEventLevel;
+
+    return nx::vms::api::EventLevel::ErrorEventLevel;
+}
+
+} // namespace nx::vms::server::analytics::wrappers

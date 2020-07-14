@@ -80,7 +80,7 @@ public:
                     + sdkObjectDescription().descriptionString() + "]";
                 const QString description =
                     errorMessage + " Additional details may be available in the Server log.";
-                throwPluginEvent(caption, description);
+                throwPluginEvent(nx::vms::api::EventLevel::ErrorEventLevel, caption, description);
             });
 
         std::optional<ManifestType> sdkObjectManifest =
@@ -142,6 +142,7 @@ protected:
 
 private:
     void throwPluginEvent(
+        nx::vms::api::EventLevel eventLevel,
         const QString& caption,
         const QString& description) const
     {
@@ -156,7 +157,7 @@ private:
             engineId,
             caption,
             description,
-            nx::vms::api::EventLevel::ErrorEventLevel,
+            eventLevel,
             sdkObjectDescription.device()));
 
         // TODO: better introduce a helper class and use a real connection instead of
@@ -183,6 +184,7 @@ private:
             NX_DEBUG(this, stringBuilder.buildLogString());
 
         throwPluginEvent(
+            pluginDiagnosticEventLevel(error),
             stringBuilder.buildPluginDiagnosticEventCaption(),
             stringBuilder.buildPluginDiagnosticEventDescription());
 
