@@ -2,56 +2,108 @@
 
 #pragma once
 
+#include <optional>
+
+#include <QtCore/QString>
+#include <QtNetwork/QAuthenticator>
+
+#include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/helpers/string_map.h>
+#include <nx/sdk/analytics/i_device_agent.h>
+#include <nx/sdk/analytics/helpers/object_metadata_packet.h>
+#include <nx/sdk/analytics/helpers/consuming_device_agent.h>
+#include <nx/vms/api/analytics/device_agent_manifest.h>
+
 #include <nx/sdk/analytics/helpers/consuming_device_agent.h>
 #include <nx/sdk/helpers/uuid_helper.h>
 
+#include <nx/sdk/analytics/helpers/event_metadata.h>
+#include <nx/sdk/analytics/helpers/object_metadata.h>
+
+#include <nx/sdk/analytics/helpers/event_metadata_packet.h>
+#include <nx/sdk/analytics/helpers/object_metadata_packet.h>
+#include <nx/sdk/analytics/helpers/consuming_device_agent.h>
+
+#include <nx/network/http/http_client.h>
+
 #include "engine.h"
+#include "metadata_xml_parser.h"
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace bosch {
+namespace nx::vms_server_plugins::analytics::bosch {
 
-class DeviceAgent: public nx::sdk::analytics::ConsumingDeviceAgent
+using nx::sdk::analytics::IDataPacket;
+using nx::sdk::analytics::IMetadataPacket;
+using nx::sdk::analytics::ICustomMetadataPacket;
+
+using nx::sdk::Result;
+using nx::sdk::IDeviceInfo;
+using nx::sdk::ISettingsResponse;
+using nx::sdk::IString;
+using nx::sdk::IStringMap;
+
+using nx::sdk::Ptr;
+using nx::sdk::makePtr;
+
+//using nx::sdk::analytics::Rect;
+using nx::sdk::analytics::EventMetadata;
+using nx::sdk::analytics::EventMetadataPacket;
+using nx::sdk::analytics::ObjectMetadata;
+using nx::sdk::analytics::ObjectMetadataPacket;
+
+struct DeviceInfo
+{
+    nx::utils::Url url;
+    QString model;
+    QString firmware;
+    QAuthenticator auth;
+    QString uniqueId;
+    QString sharedId;
+    int channelNumber = 0;
+
+    void init(const IDeviceInfo* deviceInfo);
+};
+
+class DeviceAgent: public nx::sdk::RefCountable<nx::sdk::analytics::IConsumingDeviceAgent>
 {
 public:
-    DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo);
+    DeviceAgent(Engine* engine, const IDeviceInfo* deviceInfo);
+
     virtual ~DeviceAgent() override;
 
 protected:
-    virtual std::string manifestString() const override;
+    virtual void doSetSettings(
+        Result<const ISettingsResponse*>* outResult, const IStringMap* settings) override;
 
-    virtual bool pushUncompressedVideoFrame(
-        const nx::sdk::analytics::IUncompressedVideoFrame* videoFrame) override;
+    virtual void getPluginSideSettings(
+        Result<const ISettingsResponse*>* outResult) const override;
 
-    virtual bool pullMetadataPackets(
-        std::vector<nx::sdk::analytics::IMetadataPacket*>* metadataPackets) override;
+    virtual void getManifest(Result<const IString*>* outResult) const override;
+
+    virtual void setHandler(
+        nx::sdk::analytics::IDeviceAgent::IHandler* IHandler) override;
 
     virtual void doSetNeededMetadataTypes(
-        nx::sdk::Result<void>* outValue,
+        Result<void>* outValue,
         const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
 
-private:
-    nx::sdk::Ptr<nx::sdk::analytics::IMetadataPacket> generateEventMetadataPacket();
-    nx::sdk::Ptr<nx::sdk::analytics::IMetadataPacket> generateObjectMetadataPacket();
+    virtual void doPushDataPacket(
+        Result<void>* outResult, IDataPacket* dataPacket) override;
 
 private:
-    const std::string kHelloWorldObjectType = "nx.sample.helloWorld";
-    const std::string kNewTrackEventType = "nx.sample.newTrack";
+    Ptr<EventMetadataPacket> buildEventPacket(
+        const ParsedMetadata& parsedMetadata, int64_t ts) const;
 
-    /** Lenght of the the track (in frames). The value was chosen arbitrarily. */
-    static constexpr int kTrackFrameCount = 256;
+    Ptr<ObjectMetadataPacket> buildObjectPacket(
+        const ParsedMetadata& parsedMetadata, int64_t ts) const;
 
 private:
-    nx::sdk::Uuid m_trackId = nx::sdk::UuidHelper::randomUuid();
-    int m_frameIndex = 0; /**< Used for generating the detection in the right place. */
-    int m_trackIndex = 0; /**< Used in the description of the events. */
+    nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
 
-    /** Used for binding object and event metadata to the particular video frame. */
-    int64_t m_lastVideoFrameTimestampUs = 0;
+    Engine* const m_engine;
+
+    Bosch::DeviceAgentManifest m_manifest;
+
+    DeviceInfo m_deviceInfo;
 };
 
-} // namespace bosch
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // namespace nx::vms_server_plugins::analytics::bosch

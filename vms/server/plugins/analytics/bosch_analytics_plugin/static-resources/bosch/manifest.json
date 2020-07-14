@@ -4,248 +4,107 @@
     "objectTypes":
     [
         {
-            "id": "nx.bosch.ObjectDetection.Person",
-            "name": "Person tracking",
-            "internalName": "Human"
-        },
-        {
-            "id": "nx.bosch.ObjectDetection.Face",
-            "name": "Face tracking",
-            "internalName": "Face"
-        },
-        {
-            "id": "nx.bosch.ObjectDetection.Vehicle",
-            "name": "Vehicle tracking",
-            "internalName": "Vehicle"
-        },
-        {
-            "id": "nx.bosch.ObjectDetection.LicensePlate",
-            "name": "LicensePlate tracking",
-            "internalName": "LicensePlate"
+            "id": "nx.bosch.ObjectDetection.AnyObject",
+            "name": "Some object tracking",
+            "internalName": "AnyObject",
+            "_comment": "Bosch does not send object type information"
         }
     ],
     "eventTypes":
     [
         {
-            "id": "nx.bosch.FaceDetection",
-            "name": "Face detection",
+            "id": "nx.bosch.GlobalChange",
+            "name": "Scene change",
             "_": "The following fields belong to the private plugin implementation.",
-            "internalName": "FaceDetection",
-            "description": "Face %1",
-            "positiveState": "has been detected",
-            "negativeState": "is not detected",
+            "internalName": "GlobalChange",
+            "description": "Global scene change %1",
+            "positiveState": "started",
+            "negativeState": "stopped",
             "flags": "stateDependent"
         },
         {
-            "id": "nx.bosch.FogDetection",
-            "name": "Fog detection",
-            "internalName": "FogDetection",
-            "description": "Fog %1",
-            "positiveState": "has been detected",
-            "negativeState": "is not detected",
+            "id": "nx.bosch.SignalTooBright",
+            "name": "Excessive brightness",
+            "internalName": "SignalTooBright",
+            "description": "Excessive brightness %1",
+            "positiveState": "started",
+            "negativeState": "stopped",
             "flags": "stateDependent"
         },
         {
-            "id": "nx.bosch.VideoAnalytics.Passing",
-            "name": "Virtual line crossing",
-            "internalName": "VideoAnalytics.Passing",
-            "description": "Virtual line %1 was crossed",
-            "flags": "regionDependent",
-            "regionDescription": "#%1"
-        },
-        {
-            "id": "nx.bosch.VideoAnalytics.Entering",
-            "name": "Entering the area",
-            "internalName": "VideoAnalytics.Entering",
-            "description": "Object has entered %1",
-            "flags": "regionDependent",
-            "regionDescription": "the region #%1"
-        },
-        {
-            "id": "nx.bosch.VideoAnalytics.Exiting",
-            "name": "Exiting the area",
-            "internalName": "VideoAnalytics.Exiting",
-            "description": "Object has exited %1",
-            "flags": "regionDependent",
-            "regionDescription": "the region #%1"
-        },
-        {
-            "id": "nx.bosch.VideoAnalytics.AppearDisappear",
-            "name": "Appearing in the area",
-            "internalName": "VideoAnalytics.AppearDisappear,VideoAnalytics.Appearing",
-            "description": "Object appeared %1",
-            "flags": "regionDependent",
-            "regionDescription": "in the region #%1"
-        },
-        {
-            "id": "nx.bosch.VideoAnalytics.Intrusion",
-            "name": "Intrusion",
-            "internalName": "VideoAnalytics.Intrusion",
-            "description": "Intrusion has been detected"
-        },
-        {
-            "id": "nx.bosch.ShockDetection",
-            "name": "Shock detection",
-            "internalName": "ShockDetection",
-            "description": "Shock has been detected"
-        },
-        {
-            "id": "nx.bosch.TemperatureChangeDetection",
-            "name": "Temperature change detection",
-            "internalName": "TemperatureChangeDetection",
-            "description": "Temperature change %1",
-            "positiveState": "has been detected",
-            "negativeState": "is not detected",
+            "id": "nx.bosch.SignalTooDark",
+            "name": "Insufficient brightness",
+            "internalName": "SignalTooDark",
+            "description": "Insufficient brightness %1",
+            "positiveState": "started",
+            "negativeState": "stopped",
             "flags": "stateDependent"
         },
         {
-            "id": "nx.bosch.AudioDetection",
-            "name": "Audio detection",
-            "internalName": "AudioDetection",
-            "description": "The audio volume level is %1 the threshold",
-            "positiveState": "above",
-            "negativeState": "below",
+            "id": "nx.bosch.SignalTooBlurry",
+            "name": "Blurry signal ???",
+            "internalName": "SignalTooBlurry",
+            "description": "Blurry signal %1",
+            "positiveState": "started",
+            "negativeState": "stopped",
             "flags": "stateDependent"
         },
         {
-            "id": "nx.bosch.Tampering",
-            "name": "Tampering detection",
-            "internalName": "Tampering",
-            "description": "Tampering has been detected"
-        },
-        {
-            "id": "nx.bosch.DefocusDetection",
-            "name": "Defocusing detection",
-            "internalName": "DefocusDetection",
-            "description": "Defocusing %1",
-            "positiveState": "has been detected",
-            "negativeState": "has ended",
+            "id": "nx.bosch.SignalLoss",
+            "name": "Signal loss",
+            "internalName": "SignalLoss",
+            "description": "Signal loss %1",
+            "positiveState": "started",
+            "negativeState": "stopped",
             "flags": "stateDependent"
         },
         {
-            "id": "nx.bosch.AlarmInput",
-            "name": "Dry contact input",
-            "internalName": "AlarmInput,NetworkAlarmInput",
-            "description": "Dry contact input has been %1",
-            "positiveState": "activated",
-            "negativeState": "deactivated",
-            "flags": "stateDependent|hidden"
+            "id": "nx.bosch.FlameDetected",
+            "name": "Flame detection",
+            "internalName": "FlameDetected",
+            "description": "Flame detection %1",
+            "positiveState": "started",
+            "negativeState": "stopped",
+            "flags": "stateDependent"
         },
         {
-            "id": "nx.bosch.MotionDetection",
+            "id": "nx.bosch.SmokeDetected",
+            "name": "Smoke detection",
+            "internalName": "SmokeDetected",
+            "description": "Smoke detection %1",
+            "positiveState": "started",
+            "negativeState": "stopped",
+            "flags": "stateDependent"
+        },
+        {
+            "id": "nx.bosch.MotionAlarm",
             "name": "Motion detection",
-            "internalName": "MotionDetection",
-            "description": "Motion %1%2",
-            "positiveState": "has been detected",
-            "negativeState": "has ended",
-            "flags": "stateDependent | regionDependent",
-            "regionDescription": "  in the region #%1"
-        },
-        {
-            "id": "nx.bosch.AudioAnalytics.Scream",
-            "name": "Sound - Scream",
-            "internalName": "AudioAnalytics.Scream",
-            "description": "Scream %1",
-            "positiveState": "has been detected",
-            "negativeState": "has ended",
+            "internalName": "MotionAlarm",
+            "description": "Motion detection %1",
+            "positiveState": "started",
+            "negativeState": "stopped",
             "flags": "stateDependent"
         },
         {
-            "id": "nx.bosch.AudioAnalytics.Gunshot",
-            "name": "Sound - Gunshot",
-            "internalName": "AudioAnalytics.Gunshot",
-            "description": "Gunshot has been detected"
-        },
-        {
-            "id": "nx.bosch.AudioAnalytics.Explosion",
-            "name": "Sound - Explosion",
-            "internalName": "AudioAnalytics.Explosion",
-            "description": "Explosion has been detected"
-        },
-        {
-            "id": "nx.bosch.AudioAnalytics.GlassBreak",
-            "name": "Sound - Glass break",
-            "internalName": "AudioAnalytics.GlassBreak",
-            "description": "Glass break has been detected"
-        },
-        {
-            "id": "nx.bosch.VideoAnalytics.Loitering",
-            "name": "Loitering",
-            "internalName": "VideoAnalytics.Loitering",
-            "description": "Loitering has been detected %1",
-            "flags": "regionDependent",
-            "regionDescription": "in the region #%1"
-        },
-        {
-            "id": "nx.bosch.Queue.1.Level.High",
-            "name": "Queue 1 high level",
-            "internalName": "Queue.1.Level.High",
-            "description": "Queue 1 level %1",
-            "positiveState": "is high",
-            "negativeState": "has decreased to medium",
-            "flags": "stateDependent",
-            "groupId": "nx.bosch.Queue"
-        },
-        {
-            "id": "nx.bosch.Queue.1.Level.Medium",
-            "name": "Queue 1 medium level",
-            "internalName": "Queue.1.Level.Medium",
-            "description": "Queue 1 level %1",
-            "positiveState": "is medium",
-            "negativeState": "has decreased to low",
-            "flags": "stateDependent",
-            "groupId": "nx.bosch.Queue"
-        },
-        {
-            "id": "nx.bosch.Queue.2.Level.High",
-            "name": "Queue 2 high level",
-            "internalName": "Queue.2.Level.High",
-            "description": "Queue 2 level %1",
-            "positiveState": "is high",
-            "negativeState": "has decreased to medium",
-            "flags": "stateDependent",
-            "groupId": "nx.bosch.Queue"
-        },
-        {
-            "id": "nx.bosch.Queue.2.Level.Medium",
-            "name": "Queue 2 medium level",
-            "internalName": "Queue.2.Level.Medium",
-            "description": "Queue 2 level %1",
-            "positiveState": "is medium",
-            "negativeState": "has decreased to low",
-            "flags": "stateDependent",
-            "groupId": "nx.bosch.Queue"
-        },
-        {
-            "id": "nx.bosch.Queue.3.Level.High",
-            "name": "Queue 3 high level",
-            "internalName": "Queue.3.Level.High",
-            "description": "Queue 3 level %1",
-            "positiveState": "is high",
-            "negativeState": "has decreased to medium",
-            "flags": "stateDependent",
-            "groupId": "nx.bosch.Queue"
-        },
-        {
-            "id": "nx.bosch.Queue.3.Level.Medium",
-            "name": "Queue 3 medium level",
-            "internalName": "Queue.3.Level.Medium",
-            "description": "Queue 3 level %1",
-            "positiveState": "is medium",
-            "negativeState": "has decreased to low",
-            "flags": "stateDependent",
-            "groupId": "nx.bosch.Queue"
-        },
-        {
-            "id": "nx.bosch.ObjectTracking.Start",
-            "name": "Object tracking - Start"
+            "id": "nx.bosch.Detect_any_object",
+            "name": "Object detection",
+            "internalName": "Detect_any_object",
+            "description": "New object detection %1",
+            "positiveState": "started",
+            "negativeState": "stopped",
+            "flags": "stateDependent"
         }
     ],
-    "groups":
+    "unusedEventTypes":
     [
         {
-            "id": "nx.bosch.Queue",
-            "name": "Queue"
+            "id": "nx.bosch.SignalLoss",
+            "name": "Signal loss",
+            "internalName": "SignalLoss",
+            "description": "Signal loss %1",
+            "positiveState": "started",
+            "negativeState": "stopped",
+            "flags": "stateDependent"
         }
     ]
 }

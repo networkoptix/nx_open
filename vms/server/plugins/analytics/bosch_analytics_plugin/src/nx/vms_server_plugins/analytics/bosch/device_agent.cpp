@@ -2,169 +2,272 @@
 
 #include "device_agent.h"
 
+#include <QtCore/QByteArray>
+
 #include <chrono>
+#include <iostream>
 
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 
-namespace nx {
-namespace vms_server_plugins {
-namespace analytics {
-namespace bosch {
+#include <nx/sdk/helpers/string.h>
+#include <nx/sdk/uuid.h>
 
-using namespace nx::sdk;
-using namespace nx::sdk::analytics;
+#include <nx/utils/log/assert.h>
+
+#include "metadata_xml_parser.h"
+//#include "xml_examples_ut.h"
+
+namespace nx::vms_server_plugins::analytics::bosch {
+
+namespace {
+
+[[nodiscard]] QString ExtractEventTypeNameFromTopic(const QString& oasisTopic)
+{
+    QString qualifiedEventName = oasisTopic.split('/').back();
+    return qualifiedEventName.split(':').back();
+}
+
+template<class T>
+nx::sdk::Uuid deviceObjectNumberToUuid(T deviceObjectNumber)
+{
+    nx::sdk::Uuid serverObjectNumber;
+    memcpy(&serverObjectNumber, &deviceObjectNumber,
+        std::min(sizeof(serverObjectNumber), sizeof(deviceObjectNumber)));
+    return serverObjectNumber;
+}
+
+Ptr<EventMetadata> parsedEventToEventMetadata(
+    const ParsedEvent& event, const Bosch::EngineManifest& manifest)
+{
+    const QString internalName = ExtractEventTypeNameFromTopic(event.topic);
+    const Bosch::EventType* eventType =
+        manifest.eventTypeByInternalName(internalName);
+    if (!eventType)
+        return {};
+
+    Ptr<EventMetadata> eventMetadata = nx::sdk::makePtr<EventMetadata>();
+    eventMetadata->setTypeId(eventType->id.toStdString());
+    eventMetadata->setCaption(eventType->name.toStdString());
+
+    eventMetadata->setDescription(eventType->fullDescription().toStdString());
+    eventMetadata->setIsActive(event.isActive);
+    eventMetadata->setConfidence(1.0);
+    return eventMetadata;
+}
+
+nx::sdk::analytics::Rect parsedRectToObjectMetadataRect(Rect parsedRect)
+{
+    // parsedRect coordinates: [-1, 1]
+    // objectMatadata coordinated: [0, 1]
+
+    nx::sdk::analytics::Rect result;
+    result.x = (parsedRect.left + 1.0) / 2;
+    result.y = (parsedRect.top + 1.0) / 2;
+    result.width = (parsedRect.right - parsedRect.left) / 2;
+    result.height = (parsedRect.top - parsedRect.bottom) / 2;
+    return result;
+}
+
+Ptr<ObjectMetadata> parsedObjectToObjectMetadata(
+    const ParsedObject& object, const Bosch::EngineManifest& /*manifest*/)
+{
+    Ptr<ObjectMetadata> objectMetadata = nx::sdk::makePtr<ObjectMetadata>();
+    objectMetadata->setTypeId("nx.bosch.ObjectDetection.AnyObject");
+
+    objectMetadata->setTrackId(deviceObjectNumberToUuid(object.id));
+
+    objectMetadata->setBoundingBox(parsedRectToObjectMetadataRect(object.shape.boundingBox));
+    objectMetadata->addAttribute(makePtr<nx::sdk::Attribute>(
+        nx::sdk::IAttribute::Type::string,
+        "velocity",
+        std::to_string(object.velocity)));
+
+    objectMetadata->setConfidence(1.0);
+    return objectMetadata;
+}
+
+} // namespace
+
+//-------------------------------------------------------------------------------------------------
+
+void DeviceInfo::init(const IDeviceInfo* deviceInfo)
+{
+    url = deviceInfo->url();
+    model = deviceInfo->model();
+    firmware = deviceInfo->firmware();
+    auth.setUser(deviceInfo->login());
+    auth.setPassword(deviceInfo->password());
+    uniqueId = deviceInfo->id();
+    sharedId = deviceInfo->sharedId();
+    channelNumber = deviceInfo->channelNumber();
+}
 
 /**
  * @param deviceInfo Various information about the related device, such as its id, vendor, model,
  *     etc.
  */
-DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo):
-    // Call the DeviceAgent helper class constructor telling it to verbosely report to stderr.
-    ConsumingDeviceAgent(deviceInfo, /*enableOutput*/ true)
+DeviceAgent::DeviceAgent(Engine* engine, const IDeviceInfo* deviceInfo): m_engine(engine)
 {
+    this->m_deviceInfo.init(deviceInfo);
+
+    m_manifest.capabilities.setFlag(
+        nx::vms::api::analytics::DeviceAgentManifest::disableStreamSelection);
+
+    m_manifest.supportedEventTypeIds
+        << "nx.bosch.GlobalChange"
+        << "nx.bosch.SignalTooBright"
+        << "nx.bosch.SignalTooDark"
+        << "nx.bosch.SignalTooBlurry"
+        << "nx.bosch.SignalLoss"
+        << "nx.bosch.FlameDetected"
+        << "nx.bosch.SmokeDetected"
+        << "nx.bosch.MotionAlarm"
+        << "nx.bosch.Detect_any_object"
+        ;
+
+    m_manifest.supportedObjectTypeIds << "nx.bosch.ObjectDetection.AnyObject";
 }
 
 DeviceAgent::~DeviceAgent()
 {
 }
 
+//-------------------------------------------------------------------------------------------------
 /**
- *  @return JSON with the particular structure. Note that it is possible to fill in the values
- * that are not known at compile time, but should not depend on the DeviceAgent settings.
+ * Called before other methods. Server provides the set of settings stored in its database,
+ * combined with the values received from the plugin via pluginSideSettings() (if any), for
+ * the combination of a device instance and an Engine instance.
  */
-std::string DeviceAgent::manifestString() const
+/*virtual*/ void DeviceAgent::doSetSettings(
+    Result<const ISettingsResponse*>* outResult, const IStringMap* settings) /*override*/
 {
-    // Tell the Server that the plugin can generate the events and objects of certain types.
-    // Id values are strings and should be unique. Format of ids:
-    // `{vendor_id}.{plugin_id}.{event_type_id/object_type_id}`.
-    //
-    // See the plugin manifest for the explanation of vendor_id and plugin_id.
-    return /*suppress newline*/ 1 + (const char*) R"json(
-{
-    "eventTypes": [
-        {
-            "id": ")json" + kNewTrackEventType + R"json(",
-            "name": "New track started"
-        }
-    ],
-    "objectTypes": [
-        {
-            "id": ")json" + kHelloWorldObjectType + R"json(",
-            "name": "Hello, World!"
-        }
-    ]
-}
-)json";
+
 }
 
 /**
- * Called when the Server sends a new uncompressed frame from a camera.
+ * In addition to the settings stored in a Server database, a DeviceAgent can have some
+ * settings which are stored somewhere "under the hood" of the DeviceAgent, e.g. on a device
+ * acting as a DeviceAgent's backend. Such settings do not need to be explicitly marked in the
+ * Settings Model, but every time the Server offers the user to edit the values, it calls this
+ * method and merges the received values with the ones in its database.
  */
-bool DeviceAgent::pushUncompressedVideoFrame(const IUncompressedVideoFrame* videoFrame)
+/*virtual*/ void DeviceAgent::getPluginSideSettings(
+    Result<const ISettingsResponse*>* outResult) const /*override*/
 {
-    ++m_frameIndex;
-    m_lastVideoFrameTimestampUs = videoFrame->timestampUs();
 
-    auto eventMetadataPacket = generateEventMetadataPacket();
-    if (eventMetadataPacket)
+}
+
+/** Provides DeviceAgent manifest in JSON format. */
+/*virtual*/ void DeviceAgent::getManifest(Result<const IString*>* outResult) const /*override*/
+{
+    *outResult = new nx::sdk::String(QJson::serialized(m_manifest));
+}
+
+/**
+ * @param handler Processes event metadata and object metadata fetched by DeviceAgent.
+ *     DeviceAgent should fetch events metadata after setNeededMetadataTypes() call.
+ *     Generic device related events (errors, warning, info messages) might also be reported
+ *     via this handler.
+ */
+/*virtual*/ void DeviceAgent::setHandler(
+    nx::sdk::analytics::IDeviceAgent::IHandler* handler) /*override*/
+{
+    handler->addRef();
+    m_handler.reset(handler);
+}
+
+/**
+ * Sets a list of metadata types that are needed by the Server. Empty list means that the
+ * Server does not need any metadata from this DeviceAgent.
+ */
+/*virtual*/ void DeviceAgent::doSetNeededMetadataTypes(
+    Result<void>* /*outValue*/,
+    const nx::sdk::analytics::IMetadataTypes* /*neededMetadataTypes*/) /*override*/
+{
+}
+
+Ptr<EventMetadataPacket> DeviceAgent::buildEventPacket(const ParsedMetadata& parsedMetadata, int64_t ts) const
+{
+    using namespace std::chrono;
+
+    Ptr<EventMetadataPacket> packet;
+    if (parsedMetadata.events.isEmpty())
+        return packet;
+
+    packet = nx::sdk::makePtr<EventMetadataPacket>();
+    for (const ParsedEvent& event: parsedMetadata.events)
     {
-        // Send generated metadata packet to the Server.
-        pushMetadataPacket(eventMetadataPacket.releasePtr());
+        Ptr<EventMetadata> eventMetadata = parsedEventToEventMetadata(event, m_engine->manifest());
+        if (eventMetadata)
+            packet->addItem(eventMetadata.get());
+    }
+    if (packet->count() == 0)
+    {
+        packet.reset();
+        return packet;
     }
 
-    return true; //< There were no errors while processing the video frame.
+    packet->setTimestampUs(
+        duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
+    packet->setDurationUs(-1);
+    return packet;
 }
 
-/**
- * Serves the similar purpose as pushMetadataPacket(). The differences are:
- * - pushMetadataPacket() is called by the plugin, while pullMetadataPackets() is called by Server.
- * - pushMetadataPacket() expects one metadata packet, while pullMetadataPacket expects the
- *     std::vector of them.
- *
- * There are no strict rules for deciding which method is "better". A rule of thumb is to use
- * pushMetadataPacket() when you generate one metadata packet and do not want to store it in the
- * class field, and use pullMetadataPackets otherwise.
- */
-bool DeviceAgent::pullMetadataPackets(std::vector<IMetadataPacket*>* metadataPackets)
+Ptr<ObjectMetadataPacket> DeviceAgent::buildObjectPacket(const ParsedMetadata& parsedMetadata, int64_t ts) const
 {
-    metadataPackets->push_back(generateObjectMetadataPacket().releasePtr());
+    using namespace std::chrono;
 
-    return true; //< There were no errors while filling metadataPackets.
+    Ptr<ObjectMetadataPacket> packet;
+    if (parsedMetadata.objects.isEmpty())
+        return packet;
+
+    packet = nx::sdk::makePtr<ObjectMetadataPacket>();
+    for (const ParsedObject& object: parsedMetadata.objects)
+    {
+        Ptr<ObjectMetadata> objectMetadata = parsedObjectToObjectMetadata(object, m_engine->manifest());
+        if (objectMetadata)
+            packet->addItem(objectMetadata.get());
+    }
+    if (packet->count() == 0)
+    {
+        packet.reset();
+        return packet;
+    }
+
+    packet->setTimestampUs(
+        duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
+    packet->setDurationUs(-1);
+    return packet;
 }
 
-void DeviceAgent::doSetNeededMetadataTypes(
-    nx::sdk::Result<void>* /*outValue*/,
-    const nx::sdk::analytics::IMetadataTypes* /*neededMetadataTypes*/)
+/*virtual*/ void DeviceAgent::doPushDataPacket(
+    Result<void>* /*outResult*/, IDataPacket* dataPacket) /*override*/
 {
+    const auto incomingPacket = dataPacket->queryInterface<ICustomMetadataPacket>();
+    QByteArray xmlData(incomingPacket->data(), incomingPacket->dataSize());
+    MetadataXmlParser parser(/*test::*/xmlData);
+    const ParsedMetadata parsedMetadata = parser.parse();
+
+    Ptr<EventMetadataPacket> packet = buildEventPacket(parsedMetadata, dataPacket->timestampUs());
+
+    if (packet && NX_ASSERT(m_handler))
+        m_handler->handleMetadata(packet.get());
+
+    Ptr<ObjectMetadataPacket> packet2 = buildObjectPacket(parsedMetadata, dataPacket->timestampUs());
+    if (packet2 && NX_ASSERT(m_handler))
+        m_handler->handleMetadata(packet.get());
+
+    thread_local int i = 0;
+    std::cout << std::endl
+        << "====================================================================================="
+        << ++i << std::endl
+        << /*test::*/xmlData.constData() << std::endl;
+
 }
 
 //-------------------------------------------------------------------------------------------------
-// private
 
-Ptr<IMetadataPacket> DeviceAgent::generateEventMetadataPacket()
-{
-    // Generate event every kTrackFrameCount'th frame.
-    if (m_frameIndex % kTrackFrameCount != 0)
-        return nullptr;
-
-    // EventMetadataPacket contains arbitrary number of EventMetadata.
-    const auto eventMetadataPacket = makePtr<EventMetadataPacket>();
-    // Bind event metadata packet to the last video frame using a timestamp.
-    eventMetadataPacket->setTimestampUs(m_lastVideoFrameTimestampUs);
-    // Zero duration means that the event is not sustained, but momental.
-    eventMetadataPacket->setDurationUs(0);
-
-    // EventMetadata contains an information about event.
-    const auto eventMetadata = makePtr<EventMetadata>();
-    // Set all required fields.
-    eventMetadata->setTypeId(kNewTrackEventType);
-    eventMetadata->setIsActive(true);
-    eventMetadata->setCaption("New sample plugin track started");
-    eventMetadata->setDescription("New track #" + std::to_string(m_trackIndex) + " started");
-
-    eventMetadataPacket->addItem(eventMetadata.get());
-
-    // Generate index and track id for the next track.
-    ++m_trackIndex;
-    m_trackId = nx::sdk::UuidHelper::randomUuid();
-
-    return eventMetadataPacket;
-}
-
-Ptr<IMetadataPacket> DeviceAgent::generateObjectMetadataPacket()
-{
-    // ObjectMetadataPacket contains arbitrary number of ObjectMetadata.
-    const auto objectMetadataPacket = makePtr<ObjectMetadataPacket>();
-
-    // Bind the object metadata to the last video frame using a timestamp.
-    objectMetadataPacket->setTimestampUs(m_lastVideoFrameTimestampUs);
-    objectMetadataPacket->setDurationUs(0);
-
-    // ObjectMetadata contains information about an object on the frame.
-    const auto objectMetadata = makePtr<ObjectMetadata>();
-    // Set all required fields.
-    objectMetadata->setTypeId(kHelloWorldObjectType);
-    objectMetadata->setTrackId(m_trackId);
-
-    // Calculate bounding box coordinates each frame so that it moves from the top left corner
-    // to the bottom right corner during kTrackFrameCount frames.
-    static constexpr float d = 0.5F / kTrackFrameCount;
-    static constexpr float width = 0.5F;
-    static constexpr float height = 0.5F;
-    const int frameIndexInsideTrack = m_frameIndex % kTrackFrameCount;
-    const float x = d * frameIndexInsideTrack;
-    const float y = d * frameIndexInsideTrack;
-    objectMetadata->setBoundingBox(Rect(x, y, width, height));
-
-    objectMetadataPacket->addItem(objectMetadata.get());
-
-    return objectMetadataPacket;
-}
-
-} // namespace bosch
-} // namespace analytics
-} // namespace vms_server_plugins
-} // namespace nx
+} // namespace nx::vms_server_plugins::analytics::bosch
