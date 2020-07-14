@@ -18,7 +18,7 @@
 #include <utils/common/warnings.h>
 #include <nx/utils/counter.h>
 #include <utils/common/util.h>
-
+#include <client/client_settings.h>
 
 QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *parent):
     base_type(parent),
@@ -53,6 +53,8 @@ QnResourceDisplay::QnResourceDisplay(const QnResourcePtr &resource, QObject *par
 
             connect(m_counter, &nx::utils::CounterWithSignal::reachedZero, m_counter, &QObject::deleteLater);
             connect(m_counter, &nx::utils::CounterWithSignal::reachedZero, m_camera, &QObject::deleteLater);
+
+            m_camera->getCamDisplay()->playAudio(qnSettings->playAudioForAllItems());
         }
         else
         {

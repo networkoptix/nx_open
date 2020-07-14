@@ -420,6 +420,8 @@ protected slots:
     void showSplashOnResource(const QnResourcePtr &resource, const nx::vms::event::AbstractActionPtr &businessAction);
 
     bool canShowLayoutBackground() const;
+
+    void at_settingsValueChanged(int id);
 private:
     /* Directly visible state */
 

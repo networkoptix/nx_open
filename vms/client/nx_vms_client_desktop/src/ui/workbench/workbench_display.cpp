@@ -343,11 +343,28 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
 
     connect(context()->instance<QnWorkbenchNotificationsHandler>(), &QnWorkbenchNotificationsHandler::notificationAdded,
         this, &QnWorkbenchDisplay::at_notificationsHandler_businessActionAdded);
+
+    connect(qnSettings, &QnClientSettings::valueChanged, this, &QnWorkbenchDisplay::at_settingsValueChanged);
 }
 
 QnWorkbenchDisplay::~QnWorkbenchDisplay()
 {
     setScene(NULL);
+}
+
+void QnWorkbenchDisplay::at_settingsValueChanged(int id)
+{
+    if (id != QnClientSettings::PLAY_AUDIO_FOR_ALL_ITEMS)
+        return;
+
+    const auto centralWidget = m_widgetByRole[Qn::CentralRole];
+    for (auto& w: m_widgets)
+    {
+        auto widget = qobject_cast<QnMediaResourceWidget*>(w);
+        auto camDisplay = widget ? widget->display()->camDisplay() : nullptr;
+        if (camDisplay)
+            camDisplay->playAudio(qnSettings->playAudioForAllItems() || w == centralWidget);
+    }
 }
 
 Qn::LightModeFlags QnWorkbenchDisplay::lightMode() const
@@ -958,7 +975,7 @@ void QnWorkbenchDisplay::setWidget(Qn::ItemRole role, QnResourceWidget *widget)
             {
                 QnCamDisplay *oldCamDisplay = oldMediaWidget ? oldMediaWidget->display()->camDisplay() : nullptr;
                 if (oldCamDisplay)
-                    oldCamDisplay->playAudio(false);
+                    oldCamDisplay->playAudio(qnSettings->playAudioForAllItems());
             }
 
             if (QnMediaResourceWidget *newMediaWidget = dynamic_cast<QnMediaResourceWidget *>(newWidget))

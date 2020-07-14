@@ -64,6 +64,8 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(
         &QnAbstractPreferencesWidget::hasChangesChanged);
     connect(ui->secondaryAudioDeviceComboBox, QnComboboxCurrentIndexChanged, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
+    connect(ui->playAudioForAllCamerasCheckbox, &QCheckBox::toggled, this,
+        &QnAbstractPreferencesWidget::hasChangesChanged);
 }
 
 QnGeneralPreferencesWidget::~QnGeneralPreferencesWidget()
@@ -81,6 +83,7 @@ void QnGeneralPreferencesWidget::applyChanges()
     qnSettings->setExtraMediaFolders(allMediaFolders);
     qnSettings->setUserIdleTimeoutMSecs(userIdleTimeoutMs());
     qnSettings->setAutoStart(autoStart());
+    qnSettings->setPlayAudioForAllItems(ui->playAudioForAllCamerasCheckbox->isChecked());
 
     bool recorderSettingsChanged = false;
     if (m_recorderSettings->primaryAudioDeviceName() != primaryAudioDeviceName())
@@ -111,10 +114,14 @@ void QnGeneralPreferencesWidget::loadDataToUi()
     setPrimaryAudioDeviceName(m_recorderSettings->primaryAudioDeviceName());
     setSecondaryAudioDeviceName(m_recorderSettings->secondaryAudioDeviceName());
     setAutoStart(qnSettings->autoStart());
+    ui->playAudioForAllCamerasCheckbox->setChecked(qnSettings->playAudioForAllItems());
 }
 
 bool QnGeneralPreferencesWidget::hasChanges() const
 {
+    if (ui->playAudioForAllCamerasCheckbox->isChecked() != qnSettings->playAudioForAllItems())
+        return true;
+
     QStringList allMediaFolders;
     allMediaFolders << qnSettings->mediaFolder();
     allMediaFolders << qnSettings->extraMediaFolders();

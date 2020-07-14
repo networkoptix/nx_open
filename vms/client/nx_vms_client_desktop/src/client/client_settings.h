@@ -167,6 +167,9 @@ public:
         AUTO_FPS_LIMIT,
 
         SHOW_FISHEYE_CALIBRATION_GRID,
+        
+        // Play audio for all items at the same time if true.
+        PLAY_AUDIO_FOR_ALL_ITEMS,
 
         /** Whether hardware video decoding is used, if available. */
         HARDWARE_DECODING_ENABLED,
@@ -289,6 +292,9 @@ private:
 
         QN_DECLARE_RW_PROPERTY(bool, isAutoFpsLimit, setAutoFpsLimit, AUTO_FPS_LIMIT, false)
         QN_DECLARE_RW_PROPERTY(bool, isFisheyeCalibrationGridShown, setFisheyeCalibrationGridShown, SHOW_FISHEYE_CALIBRATION_GRID, false)
+        
+        QN_DECLARE_RW_PROPERTY(bool, playAudioForAllItems, setPlayAudioForAllItems, PLAY_AUDIO_FOR_ALL_ITEMS, false)        
+        
         QN_DECLARE_RW_PROPERTY(bool, isHardwareDecodingEnabled, setHardwareDecodingEnabled, HARDWARE_DECODING_ENABLED, false)
         QN_DECLARE_RW_PROPERTY(bool, isPtzAimOverlayEnabled, setPtzAimOverlatyEnabled, PTZ_AIM_OVERLAY_ENABLED, true)
 
