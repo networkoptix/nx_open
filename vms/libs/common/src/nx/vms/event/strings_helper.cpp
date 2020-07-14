@@ -375,8 +375,11 @@ QStringList StringsHelper::eventDetails(const EventParameters& params) const
         case EventType::serverStartEvent:
             break;
 
-        case EventType::analyticsSdkEvent:
         case EventType::userDefinedEvent:
+            if (!params.description.isEmpty())
+                result << params.description;
+            break;
+        case EventType::analyticsSdkEvent:
         case EventType::pluginDiagnosticEvent:
         {
             QString message;
