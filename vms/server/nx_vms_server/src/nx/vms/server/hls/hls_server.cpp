@@ -45,6 +45,7 @@
 #include <network/universal_tcp_listener.h>
 #include <plugins/resource/server_archive/server_archive_delegate.h>
 #include <nx/metrics/metrics_storage.h>
+#include <api/global_settings.h>
 
 using namespace nx::network::http;
 
@@ -192,6 +193,8 @@ void HttpLiveStreamingProcessor::run()
     metrics->tcpConnections().hls()++;
     auto metricsGuard = nx::utils::makeScopeGuard(
         [metrics]() { metrics->tcpConnections().hls()--; });
+
+    d->socket->setSendBufferSize(commonModule()->globalSettings()->mediaBufferSizeKb() * 1024);
 
     while (!needToStop())
     {

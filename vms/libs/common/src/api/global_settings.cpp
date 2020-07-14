@@ -766,9 +766,9 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
             kKeepHanwhaIoPortStateIntactOnInitializationDefault,
             this);
 
-    m_rtspBufferSizeKbAdaptor =
+    m_mediaBufferSizeKbAdaptor =
         new QnLexicalResourcePropertyAdaptor<int>(
-            "rtspBufferSizeKb",
+            "mediaBufferSizeKb",
             256, //< Default value.
             this);
 
@@ -1009,7 +1009,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_pushNotificationsLanguageAdaptor
         << m_additionalLocalFsTypesAdaptor
         << m_keepHanwhaIoPortStateIntactOnInitializationAdaptor
-        << m_rtspBufferSizeKbAdaptor
+        << m_mediaBufferSizeKbAdaptor
         << m_forceAnalyticsDbStoragePermissionsAdaptor
     ;
 
@@ -1881,14 +1881,14 @@ void QnGlobalSettings::setKeepHanwhaIoPortStateIntactOnInitialization(bool value
     m_keepHanwhaIoPortStateIntactOnInitializationAdaptor->setValue(value);
 }
 
-int QnGlobalSettings::rtspBufferSizeKb() const
+int QnGlobalSettings::mediaBufferSizeKb() const
 {
-    return m_rtspBufferSizeKbAdaptor->value();
+    return m_mediaBufferSizeKbAdaptor->value();
 }
 
-void QnGlobalSettings::setRtspBufferSizeKb(int value)
+void QnGlobalSettings::setMediaBufferSizeKb(int value)
 {
-    m_rtspBufferSizeKbAdaptor->setValue(value);
+    m_mediaBufferSizeKbAdaptor->setValue(value);
 }
 
 bool QnGlobalSettings::forceAnalyticsDbStoragePermissions() const

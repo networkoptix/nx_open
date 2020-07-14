@@ -424,6 +424,9 @@ void ProgressiveDownloadingServer::run()
         sendResponse(nx::network::http::StatusCode::internalServerError, "plain/text");
         return;
     }
+
+    d->socket->setSendBufferSize(globalSettings()->mediaBufferSizeKb() * 1024);
+
     QSize videoSize;
     QByteArray resolutionStr = decodedUrlQuery.queryItemValue("resolution").toLatin1().toLower();
     if (!resolutionStr.isEmpty())
