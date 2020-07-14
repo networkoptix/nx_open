@@ -255,8 +255,10 @@ static std::unique_ptr<Item> createItem(
 
         if (key == QStringLiteral("value"))
         {
-            engine->addIssue(Issue(Issue::Type::warning, Issue::Code::parseError,
-                "Settings model should not contain values."));
+            // In VMS v4.0 Analytics Plugin, the "value" field was sometimes present in the
+            // Settings Models in Manifests, thus, for compatibility with such plugins, no Issue
+            // is raised here, just a warning is logged.
+            NX_WARNING(kLogTag, "Settings Model contains a \"value\" field; ignored.");
             continue;
         }
 
