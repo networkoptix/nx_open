@@ -765,7 +765,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>No space left on device</source>
-      <translation>장치에 공간이 부족함</translation>
+      <translation>장치에 공간이 부족합니다.</translation>
     </message>
     <message>
       <source>Unknown error</source>
@@ -959,7 +959,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Restore Defaults</source>
-      <translation>기본값 복원</translation>
+      <translation>초기값 복구</translation>
     </message>
   </context>
   <context>

@@ -623,12 +623,12 @@
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation>2 차 스트림</translation>
+      <translation>보조 스트림</translation>
     </message>
     <message>
       <location/>
       <source>Disable secondary stream</source>
-      <translation>보조 스트림 활성화</translation>
+      <translation>보조 스트림 비활성화</translation>
     </message>
     <message>
       <location/>
@@ -879,7 +879,7 @@
     <message>
       <location/>
       <source>Copy Schedule to...</source>
-      <translation>... 에 일정 복사</translation>
+      <translation>일정 복사 대상</translation>
     </message>
   </context>
   <context>
@@ -1233,7 +1233,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation>설정 내보내기</translation>
+      <translation>내보내기 설정</translation>
     </message>
     <message>
       <location/>
@@ -1246,7 +1246,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation>설정 내보내기</translation>
+      <translation>내보내기 설정</translation>
     </message>
     <message>
       <location/>
@@ -1256,7 +1256,7 @@
     <message>
       <location/>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation>회전, Dewarping, 이미지 향상 등</translation>
+      <translation>회전, 디워핑, 이미지 향상 등</translation>
     </message>
     <message>
       <location/>
@@ -1292,7 +1292,7 @@
     <message>
       <location/>
       <source>Export Settings</source>
-      <translation>설정 내보내기</translation>
+      <translation>내보내기 설정</translation>
     </message>
     <message>
       <location/>
@@ -1603,7 +1603,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
       <source>Locked</source>
-      <translation>잠김</translation>
+      <translation>레이아웃 잠금</translation>
     </message>
     <message>
       <location/>
@@ -1633,7 +1633,7 @@
     <message>
       <location/>
       <source>Minimum Grid Size</source>
-      <translation>최소 눈금 크기</translation>
+      <translation>최소 화면 그리드 크기</translation>
     </message>
   </context>
   <context>

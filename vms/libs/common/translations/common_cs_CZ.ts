@@ -816,7 +816,7 @@
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 bezplatných licencí</numerusform>
+        <numerusform>%n/%1 bezplatná licence</numerusform>
         <numerusform>%n/%1 bezplatných licencí</numerusform>
         <numerusform>%n/%1 bezplatných licencí</numerusform>
         <numerusform>%n/%1 bezplatných licencí</numerusform>
