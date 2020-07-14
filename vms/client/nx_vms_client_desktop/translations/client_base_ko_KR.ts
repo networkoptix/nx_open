@@ -908,7 +908,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Show Thumbnails</source>
-      <translation>미리보기 사용</translation>
+      <translation>썸네일뷰 보기</translation>
     </message>
     <message>
       <source>Hide Thumbnails</source>
@@ -1069,7 +1069,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation>모든 카메라 문제</translation>
+      <translation>카메라 이슈</translation>
     </message>
     <message>
       <source>Any server event</source>
@@ -3065,7 +3065,7 @@ to %1</source>
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
       <translation>
-        <numerusform>의 이벤트 로그 %1 - %n 이벤트 발견</numerusform>
+        <numerusform>%1 의 이벤트 로그 - %n 개의 이벤트가 발견되었습니다.</numerusform>
       </translation>
     </message>
   </context>
@@ -3627,7 +3627,7 @@ to %1</source>
     </message>
     <message>
       <source>Channels</source>
-      <translation>개의 채널</translation>
+      <translation>채널 수</translation>
     </message>
   </context>
   <context>
@@ -3853,7 +3853,7 @@ to %1</source>
     </message>
     <message>
       <source>Please send email with License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
-      <translation>활성화 키 파일을 얻으려면 라이센스 키와 %1에 제공된 하드웨어 ID를 이메일로 보내주십시오.</translation>
+      <translation>인증키 파일을 얻으려면 제공된 인증키 16자리와 하드웨어 ID를 %1 로 이메일 보내주십시오.</translation>
     </message>
     <message>
       <source>Please send License Key and Hardware ID provided to %1 to obtain an Activation Key file.</source>
@@ -4684,7 +4684,7 @@ to %1</source>
     </message>
     <message>
       <source>Current Bitrate</source>
-      <translation>현재 비트 레이트</translation>
+      <translation>전송률</translation>
     </message>
     <message>
       <source>no data for forecast</source>
@@ -4792,7 +4792,7 @@ to %1</source>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation>카메라 및 리소스</translation>
+      <translation>카메라 &amp; 장치</translation>
     </message>
   </context>
   <context>
@@ -4865,7 +4865,7 @@ to %1</source>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation>카메라 및 리소스</translation>
+      <translation>카메라 &amp; 장치</translation>
     </message>
     <message>
       <source>Videowalls</source>
@@ -4937,7 +4937,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation>북마크 내보내기</translation>
+      <translation>즐겨찾기 내보내기</translation>
     </message>
   </context>
   <context>
@@ -6332,12 +6332,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 belong to this system only and are fully managed by system administrators.</source>
       <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
-      <translation>%1 은이 시스템에만 속하며 시스템 관리자가 전적으로 관리합니다.</translation>
+      <translation>%1 은(는) 시스템에만 속하며 시스템 관리자가 전적으로 관리합니다.</translation>
     </message>
     <message>
       <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
       <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
-      <translation>%1 은 여러 시스템에 액세스 할 수 있습니다. 관리자는 자신의 권한 만 관리 할 수 ​​있습니다.</translation>
+      <translation>%1 은(는) 여러 시스템에 접속 할 수 있습니다. 관리자는 자신의 권한만 관리 할 수 ​​있습니다.</translation>
     </message>
   </context>
   <context>
@@ -7317,7 +7317,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Any time</source>
-      <translation>아무때나</translation>
+      <translation>모든 시간</translation>
     </message>
     <message>
       <source>none</source>
@@ -7508,11 +7508,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraInfoWidget</name>
     <message>
       <source>Device Rules</source>
-      <translation>장치 설정</translation>
+      <translation>장치 규칙</translation>
     </message>
     <message>
       <source>Camera Rules</source>
-      <translation>이벤트 규칙</translation>
+      <translation>카메라 규칙</translation>
     </message>
     <message>
       <source>I/O Module Rules</source>
@@ -7631,11 +7631,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion</source>
-      <translation>움직임</translation>
+      <translation>모션</translation>
     </message>
     <message>
       <source>Fisheye</source>
-      <translation>Fisheye</translation>
+      <translation>어안카메라</translation>
     </message>
     <message>
       <source>Advanced</source>
@@ -7714,7 +7714,7 @@ If you intended to move analytics data to another storage location, please conta
       <source>%1 are used</source>
       <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
       <translation>
-        <numerusform>%1 이 사용됩니다</numerusform>
+        <numerusform>%1 이(가) 사용됩니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7961,7 +7961,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Motion</source>
       <comment>Motion tab title</comment>
-      <translation>움직임</translation>
+      <translation>모션</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -8074,15 +8074,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Export Settings</source>
-      <translation>설정 내보내기</translation>
+      <translation>내보내기 설정</translation>
     </message>
     <message>
       <source>Add Timestamp</source>
-      <translation>시간표시 추가</translation>
+      <translation>타임스탬프 추가</translation>
     </message>
     <message>
       <source>Delete Timestamp</source>
-      <translation>시간표시 삭제</translation>
+      <translation>타임스탬프 제거</translation>
     </message>
     <message>
       <source>Timestamp</source>
@@ -8090,11 +8090,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Add Image</source>
-      <translation>그림 추가</translation>
+      <translation>이미지 추가</translation>
     </message>
     <message>
       <source>Delete Image</source>
-      <translation>그림 삭제</translation>
+      <translation>이미지 삭제</translation>
     </message>
     <message>
       <source>Image</source>
@@ -8118,15 +8118,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Add Bookmark Info</source>
-      <translation>책갈피 정보 추가</translation>
+      <translation>즐겨찾기 정보 추가</translation>
     </message>
     <message>
       <source>Delete Bookmark Info</source>
-      <translation>책갈피 정보 삭제</translation>
+      <translation>즐겨찾기 정보 삭제</translation>
     </message>
     <message>
       <source>Bookmark Info</source>
-      <translation>책갈피 정보</translation>
+      <translation>즐겨찾기 정보</translation>
     </message>
     <message>
       <source>exported</source>
@@ -8384,7 +8384,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::MotionSearchListModel::Private</name>
     <message>
       <source>Motion</source>
-      <translation>움직임</translation>
+      <translation>모션</translation>
     </message>
     <message>
       <source>deleted camera</source>
@@ -8690,7 +8690,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Browse for Update File</source>
-      <translation>업데이트 파일에 대 한 탐색</translation>
+      <translation>업데이트 파일 찾아보기</translation>
     </message>
     <message>
       <source>Update from mediaservers</source>
@@ -8962,7 +8962,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ScheduleSettingsWidget</name>
     <message>
       <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
-      <translation>품질 설정은 압축률 만 판단하며 해상도에는 영향을 미치지 않습니다. 낮음, 중간, 높음 및 최상은 사전 설정된 비트 전송률 값입니다.</translation>
+      <translation>품질 설정은 압축률만 결정하며 해상도에는 영향을 미치지 않습니다. 낮음, 중간, 높음, 최상은 사전 설정된 비트 전송률 값입니다.</translation>
     </message>
     <message>
       <source>Mbit/s</source>
@@ -8970,11 +8970,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Less Settings</source>
-      <translation>적은 설정</translation>
+      <translation>설정 더보기 접기</translation>
     </message>
     <message>
       <source>More Settings</source>
-      <translation>더 많은 설정</translation>
+      <translation>설정 더보기</translation>
     </message>
     <message>
       <source>Motion detection is disabled or not supported</source>
@@ -9151,7 +9151,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::SimpleMotionSearchListModel</name>
     <message>
       <source>Motion</source>
-      <translation>움직임</translation>
+      <translation>모션</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -9272,7 +9272,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
-      <translation>긴</translation>
+      <translation>자세한 날짜</translation>
     </message>
     <message>
       <source>Short</source>

@@ -56,8 +56,8 @@
     },
     "settingsConfig": {
         "arecontRtspEnabled": "Arecont RTSP 활성화",
-        "auditTrailEnabled": "감사 추적 사용",
-        "auditTrailPeriodDays": "감사 추적 일정",
+        "auditTrailEnabled": "시스템 감사 사용",
+        "auditTrailPeriodDays": "시스템 감사 일정",
         "autoDiscoveryEnabled": "장치 자동 검색 활성화",
         "autoUpdateThumbnails": "자동업데이트 미리보기",
         "backupNewCamerasByDefault": "기본적으로 새 카메라 녹화 시작",

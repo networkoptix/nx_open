@@ -952,15 +952,15 @@
     </message>
     <message>
       <source>Can manage all cameras and bookmarks.</source>
-      <translation>모든 카메라와 책갈피를 관리할 수 있습니다.</translation>
+      <translation>모든 카메라와 즐겨찾기를 관리할 수 있습니다.</translation>
     </message>
     <message>
       <source>Can view all cameras and export video.</source>
-      <translation>모든 카메라를 볼 하 고 비디오를 내보낼 수 있습니다.</translation>
+      <translation>모든 카메라를 볼 수 있고 영상 내보내기를 할 수 있습니다.</translation>
     </message>
     <message>
       <source>Can view live video from all cameras.</source>
-      <translation>모든 카메라에서에서 실시간 영상을 볼 수 있습니다.</translation>
+      <translation>모든 카메라에서 실시간 영상을 볼 수 있습니다.</translation>
     </message>
     <message>
       <source>Custom user role.</source>
@@ -976,7 +976,7 @@
     </message>
     <message>
       <source>Has access to whole System and can manage it. Can create users.</source>
-      <translation>전체 시스템에 액세스할 수 있으며 그것을 관리할 수 있습니다. 사용자를 만들 수 있습니다.</translation>
+      <translation>전체 시스템에 접근하여 시스템을 관리할 수 있습니다. 신규 사용자를 생성할 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -1029,7 +1029,7 @@
     </message>
     <message>
       <source>Panic recording</source>
-      <translation>긴급 저장</translation>
+      <translation>패닉 저장</translation>
     </message>
     <message>
       <source>Write to log</source>
@@ -1095,7 +1095,7 @@
     </message>
     <message>
       <source>Network Issue</source>
-      <translation>네트워크 문제</translation>
+      <translation>네트워크 이슈</translation>
     </message>
     <message>
       <source>Server Failure</source>
@@ -1107,7 +1107,7 @@
     </message>
     <message>
       <source>Server Started</source>
-      <translation>서버 시작 됨</translation>
+      <translation>서버 시작</translation>
     </message>
     <message>
       <source>License Issue</source>
@@ -1119,7 +1119,7 @@
     </message>
     <message>
       <source>Any Server Issue</source>
-      <translation>모든 서버 이슈</translation>
+      <translation>서버 이슈</translation>
     </message>
     <message>
       <source>Any Event</source>
@@ -1146,7 +1146,7 @@
     <message numerus="yes">
       <source>Cameras Disconnected</source>
       <translation>
-        <numerusform>카메라 연결이 끊어졌습니다.</numerusform>
+        <numerusform>카메라 연결 해제</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1167,7 +1167,7 @@
     </message>
     <message>
       <source>Any Camera Issue</source>
-      <translation>모든 카메라 문제</translation>
+      <translation>카메라 이슈</translation>
     </message>
     <message>
       <source>Undefined event has occurred on %1</source>
@@ -1490,7 +1490,7 @@
     </message>
     <message>
       <source>Open layout</source>
-      <translation>레이아웃 열기...</translation>
+      <translation>레이아웃 열기</translation>
     </message>
     <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
