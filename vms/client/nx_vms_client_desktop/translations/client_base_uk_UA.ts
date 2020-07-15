@@ -2907,11 +2907,11 @@ to %1</source>
     <message numerus="yes">
       <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
       <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+      <translation>
+        <numerusform>%n з %1 обраних користувачів не %2 користувачів, і не зможуть отримати мобільні сповіщення.</numerusform>
+        <numerusform>%n з %1 обраних користувачів не %2 користувачів, і не зможуть отримати мобільні сповіщення.</numerusform>
+        <numerusform>%n з %1 обраних користувачів не %2 користувачів, і не зможуть отримати мобільні сповіщення.</numerusform>
+        <numerusform>%n з %1 обраних користувачів не %2 користувачів, і не зможуть отримати мобільні сповіщення.</numerusform>
       </translation>
     </message>
   </context>
