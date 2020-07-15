@@ -25,7 +25,7 @@ Ptr<IMetadataPacket> MetadataParser::parsePacket(QByteArray bytes)
 {
     evictStaleCacheEntries();
 
-    // XXX: Strip garbage off both ends. It's presence is possibly a server bug.
+    // XXX: Strip garbage off both ends. Its presence is possibly a server bug.
     int begin = std::max(0, bytes.indexOf('<'));
     int end = bytes.lastIndexOf('>') + 1;
     bytes = bytes.mid(begin, std::max(0, end - begin));
@@ -157,6 +157,9 @@ std::optional<Point> MetadataParser::parsePoint(const QDomElement& point) const
 
 std::optional<Rect> MetadataParser::parseBoundingBox(const QDomElement& regionList) const
 {
+    if (regionList.isNull())
+        return std::nullopt;
+
     Point min = {1, 1};
     Point max = {0, 0};
 
@@ -191,6 +194,38 @@ std::optional<Rect> MetadataParser::parseBoundingBox(const QDomElement& regionLi
     return rect;
 }
 
+std::optional<std::vector<Ptr<Attribute>>> MetadataParser::parseAttributes(
+    const QDomElement& propertyList) const
+{
+    if (propertyList.isNull())
+        return std::nullopt;
+
+    std::vector<Ptr<Attribute>> attributes;
+    for (auto property = propertyList.firstChildElement("Property"); !property.isNull();
+        property = property.nextSiblingElement("Property"))
+    {
+        const auto description = property.firstChildElement("description");
+        if (description.isNull())
+        {
+            NX_WARNING(NX_SCOPE_TAG, "No 'description' in 'Property'");
+            continue;
+        }
+
+        const auto value = property.firstChildElement("value");
+        if (value.isNull())
+        {
+            NX_WARNING(NX_SCOPE_TAG, "No 'value' in 'Property'");
+            continue;
+        }
+
+        attributes.push_back(makePtr<Attribute>(
+            IAttribute::Type::string,
+            description.text().toStdString(),
+            value.text().toStdString()));
+    }
+    return attributes;
+}
+
 Ptr<IObjectMetadata> MetadataParser::parse(const QDomElement& target)
 {
     const auto targetId = target.firstChildElement("targetID");
@@ -212,10 +247,7 @@ Ptr<IObjectMetadata> MetadataParser::parse(const QDomElement& target)
         return nullptr;
     metadata->setTypeId(parseTypeId(recognition.text()).toStdString());
 
-    const auto regionList = target.firstChildElement("RegionList");
-    if (regionList.isNull())
-        return nullptr;
-    if (const auto boundingBox = parseBoundingBox(regionList))
+    if (const auto boundingBox = parseBoundingBox(target.firstChildElement("RegionList")))
     {
         metadata->setBoundingBox(*boundingBox);
 
@@ -232,6 +264,26 @@ Ptr<IObjectMetadata> MetadataParser::parse(const QDomElement& target)
     else
     {
         NX_WARNING(NX_SCOPE_TAG, "Failed to parse 'RegionList'");
+        return nullptr;
+    }
+
+    if (auto attributes = parseAttributes(target.firstChildElement("PropertyList")))
+    {
+        metadata->addAttributes(*attributes);
+
+        auto& entry = m_cache[metadata->trackId()];
+        entry.attributes = std::move(*attributes);
+        entry.lastUpdate = std::chrono::steady_clock::now();
+    }
+    else if (const auto it = m_cache.find(metadata->trackId()); it != m_cache.end())
+    {
+        auto& entry = it->second;;
+
+        metadata->addAttributes(entry.attributes);
+    }
+    else
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Failed to parse 'PropertyList'");
         return nullptr;
     }
 
