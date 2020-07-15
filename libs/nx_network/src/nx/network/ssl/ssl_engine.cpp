@@ -60,19 +60,31 @@ static bool isSelfSigned(X509* x509, const Engine::CertDetails& ownDetails)
         && !ownDetails.commonName.isEmpty() && details.contains("CN=" + ownDetails.commonName);
 }
 
+static QString toString(ASN1_TIME* time)
+{
+    const auto bio = nx::utils::wrapUnique(BIO_new(BIO_s_mem()), &BIO_free);
+    ASN1_TIME_print(bio.get(), time);
+
+    char buffer[255];
+    buffer[BIO_read(bio.get(), buffer, sizeof(buffer) - 1)] = 0;
+    return buffer;
+}
+
 static bool isExpired(X509* x509)
 {
     const auto notBefore = X509_get_notBefore(x509);
-    if (!notBefore && X509_cmp_time(notBefore, NULL) < 0)
+    if (notBefore && X509_cmp_time(notBefore, NULL) > 0)
     {
-        NX_DEBUG(typeid(Engine), "Certifificate is from the future: %1", rawDetails(x509));
+        NX_DEBUG(typeid(Engine), "Certifificate is from the future %1: %2",
+            toString(notBefore), rawDetails(x509));
         return true;
     }
 
     const auto notAfter = X509_get_notAfter(x509);
-    if (!notAfter && X509_cmp_time(notAfter, NULL) > 0)
+    if (notAfter && X509_cmp_time(notAfter, NULL) < 0)
     {
-        NX_DEBUG(typeid(Engine), "Certifificate is expired: %1", rawDetails(x509));
+        NX_DEBUG(typeid(Engine), "Certifificate is expired %1: %2",
+            toString(notAfter), rawDetails(x509));
         return true;
     }
 
@@ -91,8 +103,8 @@ static bool isExpired(X509* x509)
         return true;
     }
 
-    NX_DEBUG(typeid(Engine), "Valid certificicate duration %1d %2s: %3",
-        durationD, durationS, rawDetails(x509));
+    NX_DEBUG(typeid(Engine), "Valid certificicate duration %1d %2s (not before %3, not after %4): %5",
+        durationD, durationS, toString(notBefore), toString(notAfter), rawDetails(x509));
     return false;
 }
 
