@@ -141,7 +141,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event Log...</source>
-      <translation>이벤트정보...</translation>
+      <translation>이벤트 로그...</translation>
     </message>
     <message>
       <source>Cameras to Backup...</source>
@@ -161,7 +161,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Fit in View</source>
-      <translation>화면 체우기</translation>
+      <translation>화면 맞추기</translation>
     </message>
     <message>
       <source>Main Menu</source>
@@ -173,7 +173,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation>서버와의 연결이 끊겼습니다</translation>
+      <translation>서버 연결 종료</translation>
     </message>
     <message>
       <source>Browse Local Files</source>
@@ -233,7 +233,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Open Layout...</source>
-      <translation>레이아웃 열기...</translation>
+      <translation>레이아웃 목록 열기</translation>
     </message>
     <message>
       <source>Open...</source>
@@ -277,7 +277,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Go to Fullscreen</source>
-      <translation>전체화면으로 이동</translation>
+      <translation>최대화</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
@@ -332,7 +332,7 @@ to view more bookmarks</source>
     <message>
       <source>Open %1 Portal...</source>
       <comment>Open Nx Cloud Portal</comment>
-      <translation>오픈 %1 포털...</translation>
+      <translation>%1 포털 열기</translation>
     </message>
     <message>
       <source>Account Settings...</source>

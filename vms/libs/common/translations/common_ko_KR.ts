@@ -1239,7 +1239,7 @@
     <name>nx::vms::event::StringsHelper</name>
     <message>
       <source>Bookmark</source>
-      <translation>북마크(책갈피)</translation>
+      <translation>즐겨찾기</translation>
     </message>
     <message>
       <source>Panic recording</source>
