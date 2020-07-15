@@ -204,36 +204,36 @@ static void findFunctionScope(
     {
         switch (demangledType.at(p))
         {
-        case '(':
-            if (anglesNestingLevel == 0)
-                return;
-            break;
-        case ' ':
-            if (anglesNestingLevel == 0
-                // Ignore spaces immediately followed by '(' - found on MSVC in 'operator ()'.
-                && demangledType.substr(p + 1, 1) != "(")
-            {
-                *outScopeStartPos = p + 1;
-                // Ignore all "::" which may have appeared before we found the space.
-                *outScopeAfterEndPos = -1;
-            }
-            break;
-        case ':':
-            if (anglesNestingLevel == 0 && p > 0 && demangledType.at(p - 1) == ':')
-            {
-                if (demangledType.substr(p + 1, 1) == "<") //< MSVC: "::<lambda_...>"
+            case '(':
+                if (anglesNestingLevel == 0)
                     return;
-                *outScopeAfterEndPos = p - 1; //< Store the position of "::".
+                break;
+            case ' ':
+                if (anglesNestingLevel == 0
+                    // Ignore spaces immediately followed by '(' - found on MSVC in 'operator ()'.
+                    && demangledType.substr(p + 1, 1) != "(")
+                {
+                    *outScopeStartPos = p + 1;
+                    // Ignore all "::" which may have appeared before we found the space.
+                    *outScopeAfterEndPos = -1;
+                }
+                break;
+            case ':':
+                if (anglesNestingLevel == 0 && p > 0 && demangledType.at(p - 1) == ':')
+                {
+                    if (demangledType.substr(p + 1, 1) == "<") //< MSVC: "::<lambda_...>"
+                        return;
+                    *outScopeAfterEndPos = p - 1; //< Store the position of "::".
+                }
+                break;
+            case '<':
+            {
+                ++anglesNestingLevel;
+                break;
             }
-            break;
-        case '<':
-        {
-            ++anglesNestingLevel;
-            break;
-        }
-        case '>':
-            --anglesNestingLevel;
-            break;
+            case '>':
+                --anglesNestingLevel;
+                break;
         }
     }
 }
@@ -263,8 +263,13 @@ std::string scopeOfFunction(
             demangledType = scopeTagTypeInfo.name();
             boost::replace_all(demangledType, "* __ptr64", "*");
         }
+
+        // Remove unnamed namespaces from the scope.
+        boost::replace_all(demangledType, "`anonymous namespace'::", "");
     #else
         demangledType = boost::core::demangle(scopeTagTypeInfo.name());
+        // Remove unnamed namespaces from the scope.
+        boost::replace_all(demangledType, "(anonymous namespace)::", "");
     #endif
 
     int scopeAfterEndPos = -1; //< Used to trim the function name, keeping the scope.
