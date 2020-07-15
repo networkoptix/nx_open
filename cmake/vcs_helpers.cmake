@@ -1,58 +1,61 @@
-function(nx_vcs_changeset dir var)
+include(CMakeParseArguments)
+
+function(nx_vcs_get_info)
+    cmake_parse_arguments(GIT "" "CHANGESET;BRANCH;CURRENT_REFS" "" ${ARGN})
+
     set(_changeset "")
-    set(_reason "")
+    set(_branch "")
+    set(_current_refs "")
 
-    if(EXISTS ${dir}/.git)
-        _git_changeset(${dir} _changeset)
-    else()
-        set(_reason "VCS not detected")
+    if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/git_info.txt)
+        message("ATTENTION: Using git information from ${CMAKE_CURRENT_LIST_DIR}/git_info.txt.")
+        _read_git_info(CHANGESET _changeset BRANCH _branch CURRENT_REFS _current_refs)
+    elseif(EXISTS ${CMAKE_CURRENT_LIST_DIR}/.git)
+        _extract_git_info(CHANGESET _changeset BRANCH _branch CURRENT_REFS _current_refs)
     endif()
 
-    if(_changeset STREQUAL "")
-        set(_reason "Failed quering repository")
-
-        set(_changeset_file ${dir}/changeset.txt)
-        if(_changeset STREQUAL "" AND EXISTS ${_changeset_file})
-            set(${var} "")
-            file(READ ${_changeset_file} _changeset) #< On error, _changeset remains empty.
-            string(STRIP ${_changeset} _changeset)
-            if(_changeset STREQUAL "")
-                set(_reason "Failed to read ${_changeset_file}")
-            else()
-                message(STATUS "ATTENTION: Using changeset from ${_changeset_file}: ${_changeset}")
-            endif()
-        endif()
-    endif()
-
-    if(_changeset STREQUAL "")
-        message(WARNING "Can't get changeset: ${_reason}; settings ${var} to an empty string.")
-    endif()
-
-    set(${var} ${_changeset} PARENT_SCOPE)
+    set(${GIT_CHANGESET} ${_changeset} PARENT_SCOPE)
+    set(${GIT_BRANCH} ${_branch} PARENT_SCOPE)
+    set(${GIT_CURRENT_REFS} ${_current_refs} PARENT_SCOPE)
 endfunction()
 
-function(nx_vcs_branch dir var)
-    if(EXISTS ${dir}/.git)
-        _git_branch(${dir} _branch)
-    else()
-        message(WARNING "Can't get current branch: VCS not detected: ${dir}")
+# Git info file inherits the format from build_info.txt, but contains only info obtained from git,
+# i.e. parameters `changeSet=`, `branch=`, and `currentRefs=`, in this particular order. It is
+# expected to be generated externally when building without the git repo available (e.g. on a
+# remote host).
+function(_read_git_info)
+    cmake_parse_arguments(GIT "" "CHANGESET;BRANCH;CURRENT_REFS" "" ${ARGN})
+
+    set(file ${CMAKE_CURRENT_LIST_DIR}/git_info.txt)
+    set(_git_info "")
+
+    file(STRINGS ${file} _git_info) #< On error, _git_info remains empty.
+
+    list(GET _git_info 0 _changeset_line)
+    if(_changeset_line MATCHES "^changeSet=(.+)$")
+        set(${GIT_CHANGESET} ${CMAKE_MATCH_1} PARENT_SCOPE)
     endif()
-    set(${var} "${_branch}" PARENT_SCOPE)
+
+    list(GET _git_info 1 _branch_line)
+    if(_branch_line MATCHES "^branch=(.+)$")
+        set(${GIT_BRANCH} ${CMAKE_MATCH_1} PARENT_SCOPE)
+    endif()
+
+    list(GET _git_info 2 _current_refs_line)
+    if(_current_refs_line MATCHES "^currentRefs=(.+)$")
+        set(${GIT_CURRENT_REFS} ${CMAKE_MATCH_1} PARENT_SCOPE)
+    endif()
 endfunction()
 
-function(nx_vcs_current_refs dir var)
-    if(EXISTS ${dir}/.git)
-        _git_current_refs(${dir} _current_refs)
-    else()
-        message(WARNING "Can't get current refs: VCS not detected: ${dir}")
-    endif()
-    set(${var} "${_current_refs}" PARENT_SCOPE)
-endfunction()
+function(_extract_git_info)
+    cmake_parse_arguments(GIT "" "CHANGESET;BRANCH;CURRENT_REFS" "" ${ARGN})
 
-function(_git_changeset dir var)
+    set(dir ${CMAKE_CURRENT_LIST_DIR}/.git)
+
+    set(_changeset "")
     execute_process(
         COMMAND git -C "${dir}" rev-parse --short=12 HEAD
-        OUTPUT_VARIABLE changeset
+        OUTPUT_VARIABLE _changeset
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
     execute_process(
@@ -60,29 +63,28 @@ function(_git_changeset dir var)
         RESULT_VARIABLE is_dirty
     )
     if(is_dirty STREQUAL "1")
-        string(APPEND changeset "+")
+        string(APPEND _changeset "+")
     endif()
-    set(${var} "${changeset}" PARENT_SCOPE)
-endfunction()
+    set(${GIT_CHANGESET} "${_changeset}" PARENT_SCOPE)
 
-function(_git_branch dir var)
+    set(_branch "")
     execute_process(
         COMMAND git -C "${dir}" symbolic-ref --short HEAD
-        OUTPUT_VARIABLE branch
+        OUTPUT_VARIABLE _branch
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    if(NOT branch)
-        set(branch "DETACHED_HEAD")
+    if(NOT _branch)
+        set(_branch "DETACHED_HEAD")
     endif()
-    set(${var} "${branch}" PARENT_SCOPE)
-endfunction()
+    set(${GIT_BRANCH} "${_branch}" PARENT_SCOPE)
 
-function(_git_current_refs dir var)
+    set(_current_refs_output "")
     execute_process(
         COMMAND git -C "${dir}" log --decorate -n1 --format=format:"%D"
-        OUTPUT_VARIABLE current_refs_output
+        OUTPUT_VARIABLE _current_refs_output
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
-    string(REGEX REPLACE "HEAD, |HEAD -> " "" current_refs "${current_refs_output}")
-    set(${var} "${current_refs}" PARENT_SCOPE)
+    # if _current_refs_output is empty, _current_refs will be empty too.
+    string(REGEX REPLACE "HEAD, |HEAD -> " "" _current_refs "${_current_refs_output}")
+    set(${GIT_CURRENT_REFS} "${_current_refs}" PARENT_SCOPE)
 endfunction()

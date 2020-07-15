@@ -60,13 +60,10 @@ include(cmake/rdep.cmake)
 nx_rdep_configure()
 
 include(cmake/vcs_helpers.cmake)
-nx_vcs_changeset(${CMAKE_CURRENT_LIST_DIR} changeSet)
-if(NOT changeSet AND NOT developerBuild)
-    message(FATAL_ERROR "VCS changeset cannot be calculated.")
+nx_vcs_get_info(CHANGESET changeSet BRANCH branch CURRENT_REFS currentRefs)
+if(NOT developerBuild AND (NOT changeSet OR NOT branch OR NOT currentRefs))
+    message(FATAL_ERROR "VCS info cannot be read.")
 endif()
-
-nx_vcs_branch(${CMAKE_CURRENT_LIST_DIR} branch)
-nx_vcs_current_refs(${CMAKE_CURRENT_LIST_DIR} currentRefs)
 
 include(cmake/dependencies.cmake)
 # Load generated dependencies.cmake, containing packages path variables.
