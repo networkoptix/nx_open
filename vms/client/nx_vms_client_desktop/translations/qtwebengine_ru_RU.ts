@@ -389,11 +389,11 @@
     <name>UIDelegatesManager</name>
     <message>
       <source>Connect to proxy &quot;%1&quot; using:</source>
-      <translation>Подключение к прокси «%1» с использованием:</translation>
+      <translation>Подключение к прокси &quot;%1&quot; с использованием:</translation>
     </message>
     <message>
       <source>Enter username and password for &quot;%1&quot; at %2://%3</source>
-      <translation>Введите имя пользователя и пароль для «%1» в %2://%3</translation>
+      <translation>Введите имя пользователя и пароль для &quot;%1&quot; в %2://%3</translation>
     </message>
     <message>
       <source>Javascript Alert - %1</source>

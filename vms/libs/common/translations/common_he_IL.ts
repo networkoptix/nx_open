@@ -62,20 +62,20 @@
       <source>Kilobyte(s)</source>
       <comment>Full suffix for displaying kilobytes</comment>
       <translation>
-        <numerusform>קילובייט</numerusform>
         <numerusform>קילובייטים</numerusform>
         <numerusform>קילובייטים</numerusform>
-        <numerusform>Kilobyte(s)</numerusform>
+        <numerusform>קילובייטים</numerusform>
+        <numerusform>קילובייטים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Megabyte(s)</source>
       <comment>Full suffix for displaying megabytes</comment>
       <translation>
-        <numerusform>Megabyte</numerusform>
-        <numerusform>Megabytes</numerusform>
-        <numerusform>Megabytes</numerusform>
-        <numerusform>Megabytes</numerusform>
+        <numerusform>מגהבייטים</numerusform>
+        <numerusform>מגהבייטים</numerusform>
+        <numerusform>מגהבייטים</numerusform>
+        <numerusform>מגהבייטים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -83,9 +83,9 @@
       <comment>Full suffix for displaying gigabytes</comment>
       <translation>
         <numerusform>ג'יגה-בייט</numerusform>
-        <numerusform>ג'יגה-בייט</numerusform>
-        <numerusform>ג'יגה-בייט</numerusform>
-        <numerusform>ג'יגה-בייט</numerusform>
+        <numerusform>ג'יגה-בייטים</numerusform>
+        <numerusform>ג'יגה-בייטים</numerusform>
+        <numerusform>ג'יגה-בייטים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -93,9 +93,9 @@
       <comment>Full suffix for displaying terabytes</comment>
       <translation>
         <numerusform>טרה-בייט</numerusform>
-        <numerusform>טרה-בייט</numerusform>
-        <numerusform>טרה-בייט</numerusform>
-        <numerusform>טרה-בייט</numerusform>
+        <numerusform>טרה-בייטים</numerusform>
+        <numerusform>טרה-בייטים</numerusform>
+        <numerusform>טרה-בייטים</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -103,9 +103,9 @@
       <comment>Full suffix for displaying petabytes</comment>
       <translation>
         <numerusform>פטאבייט</numerusform>
-        <numerusform>פטאבייט</numerusform>
-        <numerusform>פטאבייט</numerusform>
-        <numerusform>פטאבייט</numerusform>
+        <numerusform>פטאבייטים</numerusform>
+        <numerusform>פטאבייטים</numerusform>
+        <numerusform>פטאבייטים</numerusform>
       </translation>
     </message>
   </context>

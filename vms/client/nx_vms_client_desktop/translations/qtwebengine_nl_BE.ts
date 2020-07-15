@@ -389,7 +389,7 @@
     <name>UIDelegatesManager</name>
     <message>
       <source>Connect to proxy &quot;%1&quot; using:</source>
-      <translation>Connect to proxy &quot;%1&quot; using:</translation>
+      <translation>Verbind met de proxy &quot;%1&quot; via:</translation>
     </message>
     <message>
       <source>Enter username and password for &quot;%1&quot; at %2://%3</source>

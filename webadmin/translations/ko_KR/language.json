@@ -117,7 +117,7 @@
         "primaryTimeServer": "기본 시간 동기화 서버",
         "osTimeChangeCheckPeriodMs": "OS 시간 변경 확인 기간",
         "syncTimeExchangePeriod": "네트워크 요청에 대한 시간 동기화 간격 동기화",
-        "syncTimeEpsilon": "엡실론 시간 동기화.  시간 델타가 엡실론보다 작 으면 새로운 값이 적용되지 않습니다",
+        "syncTimeEpsilon": "엡실론 시간 동기화. 시간 델타가 엡실론보다 작 으면 새로운 값이 적용되지 않습니다",
         "maxWearableArchiveSynchronizationThreads": "최대 웨어러블 카메라 아카이브 동기화 스레드",
         "updateNotificationsEnabled": "업데이트 알림 활성화",
         "upnpPortMappingEnabled": "UPNP 포트 매핑 사용",

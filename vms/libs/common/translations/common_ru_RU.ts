@@ -21,7 +21,7 @@
     <message>
       <source>B</source>
       <comment>Suffix for displaying bytes</comment>
-      <translation>б</translation>
+      <translation>Б</translation>
     </message>
     <message>
       <source>KB</source>

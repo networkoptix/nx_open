@@ -82,7 +82,7 @@
     </message>
     <message>
       <source>Vendor</source>
-      <translation>Gyártó:</translation>
+      <translation>Gyártó</translation>
     </message>
     <message>
       <source>Camera stream</source>

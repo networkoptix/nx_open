@@ -2305,7 +2305,7 @@
     <message>
       <location/>
       <source>Body</source>
-      <translation>gövde</translation>
+      <translation>Gövde</translation>
     </message>
     <message>
       <location/>

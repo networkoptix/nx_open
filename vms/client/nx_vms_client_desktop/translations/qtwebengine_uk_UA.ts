@@ -393,7 +393,7 @@
     </message>
     <message>
       <source>Enter username and password for &quot;%1&quot; at %2://%3</source>
-      <translation>Введіть ім&apos;я користувача та пароль для &quot;%1&quot; на %2://%3</translation>
+      <translation>Введіть ім'я користувача та пароль для &quot;%1&quot; на %2://%3</translation>
     </message>
     <message>
       <source>Javascript Alert - %1</source>

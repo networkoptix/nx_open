@@ -175,12 +175,12 @@
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Ambos os sistemas estão conectados a %1. Não é permitido o &quot;merge&quot;.</translation>
+      <translation>Ambos os sistemas estão conectados a %1. Não é permitido o "merge".</translation>
     </message>
     <message>
       <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Estes sistemas estão construídos com URLs %1 diferentes. Não é permitido o &quot;merge&quot;.</translation>
+      <translation>Estes sistemas estão construídos com URLs %1 diferentes. Não é permitido o "merge".</translation>
     </message>
     <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
@@ -977,7 +977,7 @@
     <name>QnStreamRecorder</name>
     <message>
       <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>Não foi encontrado o &apos;container&apos; correspondente na biblioteca FFMPEG.</translation>
+      <translation>Não foi encontrado o 'container' correspondente na biblioteca FFMPEG.</translation>
     </message>
     <message>
       <source>Could not create output file for video recording.</source>
@@ -1748,11 +1748,11 @@
     </message>
     <message>
       <source>Set to fullscreen</source>
-      <translation>Definir para modo &quot;FullScreen&quot;</translation>
+      <translation>Definir para modo "FullScreen"</translation>
     </message>
     <message>
       <source>Exit fullscreen</source>
-      <translation>Sair do &quot;Full Screen&quot;</translation>
+      <translation>Sair do "FullScreen"</translation>
     </message>
     <message>
       <source>Open layout</source>

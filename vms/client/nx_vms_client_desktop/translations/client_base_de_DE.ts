@@ -5857,7 +5857,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>ram</source>
-      <translation>RAM</translation>
+      <translation>ram</translation>
     </message>
     <message>
       <source>optical</source>
@@ -5869,7 +5869,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>network</source>
-      <translation>Netzwerk</translation>
+      <translation>netzwerk</translation>
     </message>
     <message>
       <source>usb</source>

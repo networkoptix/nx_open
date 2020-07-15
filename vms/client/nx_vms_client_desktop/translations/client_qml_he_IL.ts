@@ -105,7 +105,7 @@
     <name>LabeledItem</name>
     <message>
       <source>Default value:</source>
-      <translation>ברירת מחדל</translation>
+      <translation>ברירת מחדל:</translation>
     </message>
   </context>
   <context>

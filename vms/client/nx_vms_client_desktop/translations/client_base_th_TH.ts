@@ -3917,7 +3917,7 @@ to %1</source>
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
       <translation>
-        <numerusform>การยกเลิกการทำงานที่เหลืออยู่</numerusform>
+        <numerusform>%n การยกเลิกการทำงานที่เหลืออยู่</numerusform>
       </translation>
     </message>
   </context>
@@ -8329,7 +8329,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::GraphicsWebEngineView</name>
     <message>
       <source>The proxy %1 requires a username and password.</source>
-      <translation>%1$s ต้องการใช้ชื่อผู้ใช้และรหัสผ่าน</translation>
+      <translation>%1 ต้องการใช้ชื่อผู้ใช้และรหัสผ่าน</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
@@ -9039,7 +9039,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>การตั้งค่าของ %1$s</translation>
+      <translation>การตั้งค่าของ %1</translation>
     </message>
     <message numerus="yes">
       <source>%n symbols over</source>

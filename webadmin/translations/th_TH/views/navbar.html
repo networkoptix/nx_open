@@ -56,14 +56,12 @@
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/view')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/view/">ดู</a></li>
                 <li ng-hide="!settings.liteClient" ng-class="{active:isActive('/client')}">
-                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/client/">ไคลเอ็นต์ Lite
-</a></li>
+                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/client/">ไคลเอ็นต์ Lite</a></li>
                 <li ng-hide="!user.hasAllResources" ng-class="{active:isActive('/info')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/info/">การเฝ้าดู</a>
                 </li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/developers')}">
-                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/developers/">สำหรับนักพัฒนา
-</a></li>
+                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/developers/">สำหรับนักพัฒนา</a></li>
                 <li ng-if="user.isOwner || user.isAdmin" ng-class="{active:isActive('/health')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse"
                        ng-href="#/health/">ข้อมูล</a></li>

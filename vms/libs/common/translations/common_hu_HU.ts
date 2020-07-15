@@ -1808,8 +1808,7 @@
     </message>
     <message>
       <source>PoE over Budget</source>
-      <translation>PoE a "Budget" felett
-</translation>
+      <translation>PoE a "Budget" felett</translation>
     </message>
     <message>
       <source>Fan Error</source>
