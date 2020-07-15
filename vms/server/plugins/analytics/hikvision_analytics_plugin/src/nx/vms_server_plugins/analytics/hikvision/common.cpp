@@ -62,6 +62,8 @@ const Hikvision::EventType& Hikvision::EngineManifest::eventTypeByInternalName(
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Hikvision::EventType, (json), \
     HikvisionEventType_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Hikvision::ObjectType, (json), \
+    HikvisionObjectType_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Hikvision::EngineManifest, (json), \
     HikvisionEngineManifest_Fields)
 

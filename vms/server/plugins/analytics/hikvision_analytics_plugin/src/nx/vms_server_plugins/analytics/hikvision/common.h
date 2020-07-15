@@ -36,9 +36,17 @@ public:
         (regionDescription) \
         (dependedEvent)
 
+    struct ObjectType: public nx::vms::api::analytics::ObjectType
+    {
+        QSet<QString> sourceCapabilities;
+    };
+    #define HikvisionObjectType_Fields ObjectType_Fields \
+        (sourceCapabilities)
+
     struct EngineManifest: nx::vms_server_plugins::utils::analytics::EngineManifestBase
     {
         QList<EventType> eventTypes;
+        QList<ObjectType> objectTypes;
 
         QString eventTypeIdByInternalName(const QString& internalEventName) const;
         const Hikvision::EventType& eventTypeById(const QString& id) const;
@@ -50,7 +58,9 @@ public:
         static QMap<QString, EventType> m_eventTypeById;
 
     };
-    #define HikvisionEngineManifest_Fields EngineManifestBase_Fields (eventTypes)
+    #define HikvisionEngineManifest_Fields EngineManifestBase_Fields \
+        (eventTypes) \
+        (objectTypes)
 };
 
 struct HikvisionEvent
@@ -76,6 +86,7 @@ using HikvisionEventList = std::vector<HikvisionEvent>;
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Hikvision::EventType)
+    (Hikvision::ObjectType)
     (Hikvision::EngineManifest),
     (json)
 )

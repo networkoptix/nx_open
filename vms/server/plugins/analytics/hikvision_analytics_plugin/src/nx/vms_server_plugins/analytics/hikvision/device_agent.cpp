@@ -5,6 +5,8 @@
 #include <chrono>
 
 #include <nx/sdk/helpers/plugin_diagnostic_event.h>
+#include <nx/sdk/analytics/i_compressed_video_packet.h>
+#include <nx/sdk/analytics/i_custom_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 #include <nx/sdk/helpers/error.h>
@@ -64,6 +66,15 @@ void DeviceAgent::doSetNeededMetadataTypes(
 
     if (eventTypeIds->count() != 0)
         *outResult = startFetchingMetadata(neededMetadataTypes);
+}
+
+void DeviceAgent::doPushDataPacket(Result<void>* /*outResult*/, IDataPacket* dataPacket)
+{
+    const auto metadataPacket = dataPacket->queryInterface<ICustomMetadataPacket>();
+    QByteArray metadataBytes(metadataPacket->data(), metadataPacket->dataSize());
+
+    if (const auto packet = m_metadataParser.parsePacket(metadataBytes))
+        m_handler->handleMetadata(packet.get());
 }
 
 Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)

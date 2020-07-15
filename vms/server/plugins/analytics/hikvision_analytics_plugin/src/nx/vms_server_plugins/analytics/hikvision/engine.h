@@ -50,9 +50,20 @@ protected:
         const nx::sdk::analytics::IAction* action) override;
 
 private:
-    std::optional<QList<QString>> fetchSupportedEventTypeIds(
-        const nx::sdk::IDeviceInfo* deviceInfo);
+    struct DeviceData
+    {
+        nx::utils::ElapsedTimer timeout;
+
+        QList<QString> supportedEventTypeIds;
+        QList<QString> supportedObjectTypeIds;
+    };
+
+private:
+    bool fetchSupportedEventTypeIds(DeviceData* deviceData, const nx::sdk::IDeviceInfo* deviceInfo);
     QList<QString> parseSupportedEvents(const QByteArray& data);
+    bool fetchSupportedObjectTypeIds(DeviceData* deviceData, const nx::sdk::IDeviceInfo* deviceInfo);
+    QList<QString> parseSupportedObjects(const QByteArray& data);
+    DeviceData& getCachedDeviceData(const nx::sdk::IDeviceInfo* deviceInfo);
 
 private:
     nx::sdk::analytics::Plugin* const m_plugin;
@@ -60,14 +71,6 @@ private:
     mutable QnMutex m_mutex;
     QByteArray m_manifest;
     Hikvision::EngineManifest m_engineManifest;
-
-    struct DeviceData
-    {
-        bool hasExpired() const;
-
-        QList<QString> supportedEventTypeIds;
-        nx::utils::ElapsedTimer timeout;
-    };
 
     QMap<QString, DeviceData> m_cachedDeviceData;
 };

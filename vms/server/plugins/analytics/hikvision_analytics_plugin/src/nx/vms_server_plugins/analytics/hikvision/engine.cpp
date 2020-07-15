@@ -11,6 +11,7 @@
 #include <QtCore/QUrlQuery>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
+#include <QtXml/QDomElement>
 
 #include <nx/network/http/http_client.h>
 #include <nx/network/deprecated/asynchttpclient.h>
@@ -32,11 +33,6 @@ static const std::chrono::seconds kCacheTimeout{60};
 static const std::chrono::seconds kRequestTimeout{10};
 
 } // namespace
-
-bool Engine::DeviceData::hasExpired() const
-{
-    return !timeout.isValid() || timeout.hasExpired(kCacheTimeout);
-}
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
@@ -82,16 +78,25 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
     if (!isCompatible(deviceInfo))
         return;
 
-    auto supportedEventTypeIds = fetchSupportedEventTypeIds(deviceInfo);
-    if (!supportedEventTypeIds)
+    nx::vms::api::analytics::DeviceAgentManifest deviceAgentManifest;
+
+    auto& deviceData = getCachedDeviceData(deviceInfo);
+    if (!deviceData.timeout.isValid())
+        return;
+
+    deviceAgentManifest.supportedEventTypeIds = deviceData.supportedEventTypeIds;
+    if (deviceAgentManifest.supportedEventTypeIds.isEmpty())
     {
         NX_DEBUG(this, "Supported Event Type list is empty for the Device %1 (%2)",
             deviceInfo->name(), deviceInfo->id());
-        return;
     }
 
-    nx::vms::api::analytics::DeviceAgentManifest deviceAgentManifest;
-    deviceAgentManifest.supportedEventTypeIds = *supportedEventTypeIds;
+    deviceAgentManifest.supportedObjectTypeIds = deviceData.supportedObjectTypeIds;
+    if (deviceAgentManifest.supportedObjectTypeIds.isEmpty())
+    {
+        NX_DEBUG(this, "Supported Object Type list is empty for the Device %1 (%2)",
+            deviceInfo->name(), deviceInfo->id());
+    }
 
     const auto deviceAgent = new DeviceAgent(this);
     deviceAgent->setDeviceInfo(deviceInfo);
@@ -134,13 +139,8 @@ QList<QString> Engine::parseSupportedEvents(const QByteArray& data)
     return result;
 }
 
-std::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
-    const IDeviceInfo* deviceInfo)
+bool Engine::fetchSupportedEventTypeIds(DeviceData* deviceData, const IDeviceInfo* deviceInfo)
 {
-    auto& data = m_cachedDeviceData[deviceInfo->sharedId()];
-    if (!data.hasExpired())
-        return data.supportedEventTypeIds;
-
     using namespace std::chrono;
 
     nx::utils::Url url(deviceInfo->url());
@@ -161,8 +161,7 @@ std::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
         NX_WARNING(
             this,
             lm("No response for supported events request %1.").args(deviceInfo->url()));
-        data.timeout.invalidate();
-        return std::optional<QList<QString>>();
+        return false;
     }
 
     const auto statusCode = response->statusLine.statusCode;
@@ -173,16 +172,134 @@ std::optional<QList<QString>> Engine::fetchSupportedEventTypeIds(
             this,
             lm("Unable to fetch supported events for device %1. HTTP status code: %2")
                 .args(deviceInfo->url(), statusCode));
-        data.timeout.invalidate();
-        return std::optional<QList<QString>>();
+        return false;
     }
 
     NX_DEBUG(this, lm("Device url %1. RAW list of supported analytics events: %2").
         args(deviceInfo->url(), buffer));
 
-    data.supportedEventTypeIds = parseSupportedEvents(*buffer);
-    data.timeout.restart();
-    return data.supportedEventTypeIds;
+    deviceData->supportedEventTypeIds = parseSupportedEvents(*buffer);
+
+    return true;
+}
+
+QList<QString> Engine::parseSupportedObjects(const QByteArray& data)
+{
+    QDomDocument document;
+    {
+        QString errorDescription;
+        int errorLine, errorColumn;
+        if (document.setContent(data, false, &errorDescription, &errorLine, &errorColumn))
+        {
+            NX_WARNING(NX_SCOPE_TAG, "Failed to parse XML at %1:%2: %3 [[[%4]]]",
+                errorLine, errorColumn, errorDescription, data);
+            return {};
+        }
+    }
+
+    const auto metadataCfg = document.documentElement();
+    if (metadataCfg.tagName() != "MetadataCfg")
+    {
+        NX_WARNING(NX_SCOPE_TAG, "XML root is not 'MetadataCfg'");
+        return {};
+    }
+
+    const auto metadataList = metadataCfg.firstChildElement("MetadataList");
+    if (metadataList.isNull())
+    {
+        NX_WARNING(NX_SCOPE_TAG, "No 'MetadataList' in 'MetadataCfg'");
+        return {};
+    }
+
+    QSet<QString> capabilities;
+    for (auto metadata = metadataList.firstChildElement("Metadata"); !metadata.isNull();
+        metadata = metadata.nextSiblingElement("Metadata"))
+    {
+        const auto enable = metadata.firstChildElement("enable");
+        if (enable.isNull())
+        {
+            NX_WARNING(NX_SCOPE_TAG, "No 'enable' in 'Metadata'");
+            continue;
+        }
+        if (enable.text() != "true")
+            continue;
+
+        const auto type = metadata.firstChildElement("type");
+        if (type.isNull())
+        {
+            NX_WARNING(NX_SCOPE_TAG, "No 'type' in 'Metadata'");
+            continue;
+        }
+        capabilities.insert(type.text());
+    }
+
+    QList<QString> typeIds;
+    for (const auto& objectType: m_engineManifest.objectTypes)
+    {
+        if (objectType.sourceCapabilities.intersects(capabilities))
+            typeIds.push_back(objectType.id);
+    }
+    return typeIds;
+}
+
+bool Engine::fetchSupportedObjectTypeIds(DeviceData* deviceData, const IDeviceInfo* deviceInfo)
+{
+    nx::utils::Url url(deviceInfo->url());
+    url.setPath(NX_FMT("/ISAPI/Streaming/channels/%1/metadata/capabilities",
+        1 + deviceInfo->channelNumber()));
+
+    nx::network::http::HttpClient httpClient;
+    httpClient.setResponseReadTimeout(kRequestTimeout);
+    httpClient.setSendTimeout(kRequestTimeout);
+    httpClient.setMessageBodyReadTimeout(kRequestTimeout);
+    httpClient.setUserName(deviceInfo->login());
+    httpClient.setUserPassword(deviceInfo->password());
+
+    const auto result = httpClient.doGet(url);
+    const auto response = httpClient.response();
+
+    if (!result || !response)
+    {
+        NX_WARNING(
+            this,
+            lm("No response for supported objects request %1.").args(deviceInfo->url()));
+        return false;
+    }
+
+    const auto statusCode = response->statusLine.statusCode;
+    const auto buffer = httpClient.fetchEntireMessageBody();
+    if (!nx::network::http::StatusCode::isSuccessCode(statusCode) || !buffer)
+    {
+        NX_WARNING(
+            this,
+            lm("Unable to fetch supported objects for device %1. HTTP status code: %2")
+                .args(deviceInfo->url(), statusCode));
+        return false;
+    }
+
+    NX_DEBUG(this, lm("Device url %1. RAW list of supported objects: %2").
+        args(deviceInfo->url(), buffer));
+
+    deviceData->supportedObjectTypeIds = parseSupportedObjects(*buffer);
+
+    return true;
+}
+
+Engine::DeviceData& Engine::getCachedDeviceData(const IDeviceInfo* deviceInfo)
+{
+    auto& data = m_cachedDeviceData[deviceInfo->sharedId()];
+    auto& timeout = data.timeout;
+    if (!timeout.isValid() || timeout.hasExpired(kCacheTimeout))
+    {
+        timeout.invalidate();
+
+        if (fetchSupportedEventTypeIds(&data, deviceInfo)
+            && fetchSupportedObjectTypeIds(&data, deviceInfo))
+        {
+            timeout.restart();
+        }
+    }
+    return data;
 }
 
 const Hikvision::EngineManifest& Engine::engineManifest() const
