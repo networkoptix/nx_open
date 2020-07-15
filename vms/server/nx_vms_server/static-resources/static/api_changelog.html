@@ -61,18 +61,44 @@ In function <strong><code>POST /ec2/deviceAnalyticsSettings</code></strong> para
 be passed not as URL query parameters but as keys of a JSON request in the request body. Optional
 parameter <strong><code>analyzedStreamIndex</code></strong> has been added to the JSON request.
 Parameter <strong><code>settings</code></strong> of the JSON request has been renamed to
-<strong><code>settingsValues</code></strong>. Parameters <strong><code>values</code></strong> and
-<strong><code>model</code></strong> of the JSON response have been renamed to
-<strong><code>settingsValues</code></strong> and <strong><code>settingsModel</code></strong>
-respectively. Parameter <strong><code>analyzedStreamIndex</code></strong> has been added to the
-JSON response.
+<strong><code>settingsValues</code></strong>. Request now must contain the
+<strong><code>settingsModelId</code></strong> field, value of which may be retrieved via the
+corresponding <strong><code>GET</strong></code> request. Parameters
+<i><strong><code>values</code></strong></i> and <i><strong><code>model</code></strong></i>
+of the JSON response have been renamed to <b><strong><code>settingsValues</code></strong></b> and
+<b><strong><code>settingsModel</code></strong></b> respectively. Parameters
+<b><strong><code>analyzedStreamIndex</code></strong></b>,
+<b><strong><code>settingsErrors</code></strong></b> and
+<b><strong><code>settingsModelId</code></strong></b> have been added to the JSON response.
 </p>
 <p>
 In function <strong><code>GET /ec2/deviceAnalyticsSettings</code></strong> parameters
-<strong><code>values</code></strong> and <strong><code>model</code></strong> of the JSON response
-have been renamed to <strong><code>settingsValues</code></strong> and
-<strong><code>settingsModel</code></strong> respectively. Parameter
-<strong><code>analyzedStreamIndex</code></strong> has been added to the JSON response.
+<i><strong><code>values</code></strong></i> and <i><strong><code>model</code></strong></i>
+of the JSON response have been renamed to <b><strong><code>settingsValues</code></strong></b> and
+<b><strong><code>settingsModel</code></strong></b> respectively. Parameters
+<b><strong><code>analyzedStreamIndex</code></strong></b> and
+<b><strong><code>settingsModelId</code></strong></b> have been added to the JSON response.
+</p>
+<p>
+In function <strong><code>GET /ec2/analyticsEngineSettings</code></strong> parameters
+<i><strong><code>values</code></strong></i> and <i><strong><code>model</code></strong></i>
+of the JSON response have been renamed to <b><strong><code>settingsValues</code></strong></b> and
+<b><strong><code>settingsModel</code></strong></b> respectively. Parameter
+<b><strong><code>settingsErrors</code></strong></b> has been added to the JSON response.
+</p>
+<p>
+Function <strong><code>POST /ec2/analyticsEngineSettings</code></strong> expects in its body
+a JSON object with the following fields: <b><strong><code>settingsValues</code></strong></b>
+(previously this was the root object of the request),
+<b><strong><code>analyticsEngineId</code></strong></b> (previously was passed as a URL parameter).
+The URL parameter <i><strong><code>analyticsEngineId</code></strong></i> is deprectated.
+</p>
+<p>
+Response of the function <strong><code>GET /ec2/analyticsEngineSettings</code></strong> now contains
+the following fields <b><strong><code>settingsValues</code></strong></b>,
+<b><strong><code>settingsModel</code></strong></b>,
+<b><strong><code>settingsErrors</code></strong></b>, and
+<b><strong><code>settingsModelId</code></strong></b>
 </p>
 <p>
 In function <strong><code>/ec2/cameraThumbnail</code></strong> the

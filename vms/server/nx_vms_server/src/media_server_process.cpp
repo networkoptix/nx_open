@@ -3246,23 +3246,17 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
      *     %param:object reply Object with Engine settings model and values.
-     *         %param:object reply.model Settings model, as in Engine manifest.
-     *         %param:object reply.values Name-value map with setting values, using JSON types
-     *             corresponding to each setting type.
+     *         %struct EngineSettingsResponse
      *
      **%apidoc POST /ec2/analyticsEngineSettings
-     * Applies passed settings values to correspondent Analytics Engine.
-     * %param:string engineId Id of an Analytics Engine.
-     * %param:object settings Name-value map with setting values, using JSON types corresponding to
-     *     each setting type.
+     * Applies passed settings values to the specified Analytics Engine.
+     * %struct EngineSettingsRequest
      * %return:object JSON object with an error code, error string, and the reply on success.
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
      *     %param:object reply Object with Engine settings model and values that the Engine returns
      *         after the values have been supplied.
-     *         %param:object reply.model Settings model, as in Engine manifest.
-     *         %param:object reply.values Name-value map with setting values, using JSON types
-     *             corresponding to each setting type.
+     *         %struct EngineSettingsResponse
      */
     reg("ec2/analyticsEngineSettings",
         new nx::vms::server::rest::AnalyticsEngineSettingsHandler(serverModule()));

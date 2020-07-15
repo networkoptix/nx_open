@@ -1078,13 +1078,16 @@ Handle ServerConnection::setEngineAnalyticsSettings(
     Result<nx::vms::api::analytics::EngineSettingsResponse>::type&& callback,
     QThread* targetThread)
 {
+    nx::vms::api::analytics::EngineSettingsRequest request;
+    request.settingsValues = settings;
+    request.analyticsEngineId = engine->getId();
+    // TODO: Fill settingsModelId when it is supported by the Client.
+
     return executePost<QnJsonRestResult>(
         QString("/ec2/analyticsEngineSettings"),
-        QnRequestParamList{
-            {"analyticsEngineId", engine->getId().toString()}
-        },
+        QnRequestParamList(),
         Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
-        QJson::serialized(settings),
+        QJson::serialized(request),
         [callback = std::move(callback)](
             bool success, Handle requestId, const QnJsonRestResult& result)
         {

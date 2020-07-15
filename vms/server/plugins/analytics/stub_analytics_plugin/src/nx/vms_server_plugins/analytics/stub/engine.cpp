@@ -9,6 +9,7 @@
 #include <nx/sdk/helpers/uuid_helper.h>
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/error.h>
+#include <nx/sdk/helpers/settings_response.h>
 
 #include "utils.h"
 #include "device_agent.h"
@@ -28,6 +29,8 @@ using namespace nx::sdk::analytics;
 
 using namespace std::chrono;
 using namespace std::literals::chrono_literals;
+
+static const std::string kEnginePluginSideSettingValue{"42"};
 
 Engine::Engine(Plugin* plugin):
     nx::sdk::analytics::Engine(NX_DEBUG_ENABLE_OUTPUT),
@@ -57,9 +60,6 @@ std::string Engine::capabilities() const
 
     if (m_disableStreamSelection)
         result += "|disableStreamSelection";
-
-    if (m_usePluginAsSettingsOriginForDeviceAgents)
-        result += "|usePluginAsSettingsOrigin";
 
     if (result.size() > 1)
         result = result.substr(1, result.size() - 1);
@@ -287,9 +287,6 @@ Result<const ISettingsResponse*> Engine::settingsReceived()
 {
     m_disableStreamSelection = toBool(settingValue(kDisableStreamSelectionSetting));
 
-    m_usePluginAsSettingsOriginForDeviceAgents =
-        toBool(settingValue(kUsePluginAsSettingsOriginForDeviceAgents));
-
     m_needToThrowPluginDiagnosticEvents = toBool(
         settingValue(kThrowPluginDiagnosticEventsFromEngineSetting));
 
@@ -305,7 +302,10 @@ Result<const ISettingsResponse*> Engine::settingsReceived()
         m_pluginDiagnosticEventGenerationLoopCondition.notify_all();
     }
 
-    return nullptr;
+    auto settingsResponse = new SettingsResponse();
+    settingsResponse->setValue(kEnginePluginSideSetting, kEnginePluginSideSettingValue);
+
+    return settingsResponse;
 }
 
 static std::string timestampedObjectMetadataToString(
@@ -417,6 +417,14 @@ Result<IAction::Result> Engine::executeAction(
     }
 
     return IAction::Result{makePtr<String>(actionUrl), makePtr<String>(messageToUser)};
+}
+
+void Engine::getPluginSideSettings(Result<const ISettingsResponse*>* outResult) const
+{
+    auto settingsResponse = new SettingsResponse();
+    settingsResponse->setValue(kEnginePluginSideSetting, kEnginePluginSideSettingValue);
+
+    *outResult = settingsResponse;
 }
 
 } // namespace stub

@@ -45,13 +45,6 @@ std::string Plugin::manifestString() const
                         "caption": "Disable stream selection",
                         "description": "If true, the stream selection control will be hidden for newly created DeviceAgents",
                         "defaultValue": false
-                    },
-                    {
-                        "type": "CheckBox",
-                        "name": ")json" + kUsePluginAsSettingsOriginForDeviceAgents + R"json(",
-                        "caption": "Use Plugin as settings origin for DeviceAgents",
-                        "description": "If set, newly created Device Agents will declare the \"usePluginSettingsAsOrigin\" capability in its manifest",
-                        "defaultValue": false
                     }
                 ]
             },
@@ -70,6 +63,14 @@ std::string Plugin::manifestString() const
                         "type": "SpinBox",
                         "name": "testSpinBox",
                         "caption": "Spin Box",
+                        "defaultValue": 42,
+                        "minValue": 0,
+                        "maxValue": 100
+                    },
+                    {
+                        "type": "SpinBox",
+                        "name": ")json" + kEnginePluginSideSetting + R"json(",
+                        "caption": "Spin Box (plugin side)",
                         "defaultValue": 42,
                         "minValue": 0,
                         "maxValue": 100

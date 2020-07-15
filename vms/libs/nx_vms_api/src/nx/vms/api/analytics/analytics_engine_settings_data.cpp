@@ -1,4 +1,4 @@
-#include "settings_response.h"
+#include "analytics_engine_settings_data.h"
 
 #include <nx/fusion/model_functions.h>
 
@@ -8,6 +8,12 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     EngineSettingsResponse,
     (json)(eq),
     nx_vms_api_analytics_EngineSettingsResponse_Fields,
+    (brief, true))
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    EngineSettingsRequest,
+    (json)(eq),
+    nx_vms_api_analytics_EngineSettingsRequest_Fields,
     (brief, true))
 
 } // namespace nx::vms::api::analytics

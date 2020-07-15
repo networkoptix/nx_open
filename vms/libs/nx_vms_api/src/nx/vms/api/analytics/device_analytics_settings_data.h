@@ -32,6 +32,9 @@ struct NX_VMS_API DeviceAnalyticsSettingsRequest
      */
     QJsonObject settingsValues;
 
+    /**%apidoc
+     * Id of the Settings Model the values supposed to be applied to.
+     */
     QnUuid settingsModelId;
 };
 #define nx_vms_api_analytics_DeviceAnalyticsSettingsRequest_Fields \
@@ -67,8 +70,14 @@ struct NX_VMS_API DeviceAnalyticsSettingsResponse
      */
     QJsonObject settingsModel;
 
+    /**%apidoc
+     * Name-value map with errors that occurred while performing the current settings operation.
+     */
     QJsonObject settingsErrors;
 
+    /**%apidoc
+     * Current id of the Settings Model. Such ids are used to check that values match the Model.
+     */
     QnUuid settingsModelId;
 };
 #define nx_vms_api_analytics_DeviceAnalyticsSettingsResponse_Fields \
