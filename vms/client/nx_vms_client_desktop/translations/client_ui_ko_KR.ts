@@ -16,7 +16,7 @@
     <message>
       <location/>
       <source>Credits</source>
-      <translation>생성</translation>
+      <translation>저작권</translation>
     </message>
     <message>
       <location/>
@@ -143,7 +143,7 @@
     <message>
       <location/>
       <source>Instant</source>
-      <translation>긴급</translation>
+      <translation>즉시</translation>
     </message>
   </context>
   <context>
@@ -207,7 +207,7 @@
     <message>
       <location/>
       <source>Watching archive</source>
-      <translation>저장데이터 보기</translation>
+      <translation>아카이브 보기</translation>
     </message>
     <message>
       <location/>
@@ -217,7 +217,7 @@
     <message>
       <location/>
       <source>Watching live</source>
-      <translation>실시간 감시</translation>
+      <translation>라이브 보기</translation>
     </message>
     <message>
       <location/>
@@ -227,7 +227,7 @@
     <message>
       <location/>
       <source>Event rules</source>
-      <translation>이벤트 설정</translation>
+      <translation>이벤트 규칙</translation>
     </message>
     <message>
       <location/>
@@ -455,7 +455,7 @@
     <message>
       <location/>
       <source>Bookmark Log</source>
-      <translation>북마크 로그</translation>
+      <translation>즐겨찾기 로그</translation>
     </message>
     <message>
       <location/>
@@ -753,7 +753,7 @@
     <message>
       <location/>
       <source>MAC Address</source>
-      <translation>MAC 정보:</translation>
+      <translation>MAC 주소</translation>
     </message>
     <message>
       <location/>
@@ -1049,12 +1049,12 @@
     <message>
       <location/>
       <source>End IP</source>
-      <translation>IP 끝</translation>
+      <translation>종료 IP</translation>
     </message>
     <message>
       <location/>
       <source>Start IP</source>
-      <translation>IP 시작</translation>
+      <translation>시작 IP</translation>
     </message>
     <message>
       <location/>
@@ -1305,12 +1305,12 @@
     <message>
       <location/>
       <source>Floor/Table Mount</source>
-      <translation>바닥또는 테이블위에 설치시</translation>
+      <translation>바닥/테이블 설치시</translation>
     </message>
     <message>
       <location/>
       <source>Fisheye Dewarping</source>
-      <translation>Fisheye Dewarping</translation>
+      <translation>어안카메라 디워핑</translation>
     </message>
     <message>
       <location/>
@@ -1381,7 +1381,7 @@
     <message>
       <location/>
       <source>Minutes of Inactivity</source>
-      <translation>비활성 시간(분)</translation>
+      <translation>(분) 경과 시</translation>
     </message>
     <message>
       <location/>
@@ -2264,7 +2264,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation>북마크</translation>
+      <translation>즐겨찾기</translation>
     </message>
   </context>
   <context>
@@ -2316,7 +2316,7 @@
     <message>
       <location filename="../src/ui/dialogs/merge_systems_dialog.ui"/>
       <source>Merge Systems...</source>
-      <translation>시스템 조정...</translation>
+      <translation>시스템 병합</translation>
     </message>
     <message>
       <location/>
@@ -2341,7 +2341,7 @@
     <message>
       <location/>
       <source>The new System will have password and name from System:</source>
-      <translation>새 시스템은 시스템에서 암호와 이름을 갖게 됨:</translation>
+      <translation>병합된 새 시스템은 아래 선택한 시스템명과 암호로 설정됩니다.</translation>
     </message>
   </context>
   <context>
@@ -2446,7 +2446,7 @@
     <message>
       <location/>
       <source>Disable</source>
-      <translation>해제</translation>
+      <translation>비활성화</translation>
     </message>
     <message>
       <location/>
@@ -2996,7 +2996,7 @@
     <message>
       <location/>
       <source>Forecast for Full Storage Usage</source>
-      <translation>전체 스토리지 사용에 대 한 예측</translation>
+      <translation>예측 사용량</translation>
     </message>
     <message>
       <location/>
@@ -3359,7 +3359,7 @@
     <message>
       <location/>
       <source>Schedule</source>
-      <translation>녹화 설정</translation>
+      <translation>일정</translation>
     </message>
     <message>
       <location/>

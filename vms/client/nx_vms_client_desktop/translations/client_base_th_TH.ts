@@ -3829,7 +3829,7 @@ to %1</source>
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
       <translation>
-        <numerusform>จำเป็นต้องกรอกอย่างน้อยหนึ่งหน่วย</numerusform>
+        <numerusform>อย่างน้อย %1 ที่ต้องการ</numerusform>
       </translation>
     </message>
   </context>

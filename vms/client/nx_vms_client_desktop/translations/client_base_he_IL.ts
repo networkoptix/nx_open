@@ -10335,7 +10335,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation>מוריד קובץ …</translation>
+      <translation>מוריד קובץ...</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>

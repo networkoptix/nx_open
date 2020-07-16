@@ -2851,15 +2851,15 @@ a %1</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation>O evento será accionado apenas se houver correspondências no campo &quot;source&quot; com qualquer uma das palavras-chave inseridas.</translation>
+      <translation>O evento será accionado apenas se houver correspondências no campo "source" com qualquer uma das palavras-chave inseridas.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>O evento será accionado apenas se houver correspondências no campo &quot;caption&quot; com qualquer uma das palavras-chave inseridas.</translation>
+      <translation>O evento será accionado apenas se houver correspondências no campo "caption" com qualquer uma das palavras-chave inseridas.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation>O evento será accionado apenas se houver correspondências no campo &quot;descrição&quot; com qualquer uma das palavras-chave inseridas.</translation>
+      <translation>O evento será accionado apenas se houver correspondências no campo "descrição" com qualquer uma das palavras-chave inseridas.</translation>
     </message>
     <message>
       <source>Server API</source>
@@ -5236,7 +5236,7 @@ a %1</translation>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation>Servidores com failover activado irão automaticamente &quot;capturar&quot; câmaras de servidores que estejam offline.</translation>
+      <translation>Servidores com failover activado irão automaticamente "capturar" câmaras de servidores que estejam offline.</translation>
     </message>
   </context>
   <context>
@@ -6606,7 +6606,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <message>
       <source>%1 Systems cannot be merged</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>Não pode ser feito o &quot;merge&quot; dos Sistemas %1</translation>
+      <translation>Não pode ser feito o "merge" dos Sistemas %1</translation>
     </message>
     <message>
       <source>%1 has been successfully configured.</source>
@@ -7461,7 +7461,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation>Mostrar somente com &quot;Objetos&quot; aba</translation>
+      <translation>Mostrar somente com &quot;Objects&quot; aba</translation>
     </message>
     <message>
       <source>Show</source>
@@ -7817,7 +7817,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation>O Dual streaming está desativado, todos os registros de agenda &quot;Motion + Lo-Res&quot; serão alterados para &quot;Sempre&quot;</translation>
+      <translation>O Dual streaming está desativado, todos os registros de agenda &quot;Movimento + Lo-Res&quot; serão alterados para &quot;Sempre&quot;</translation>
     </message>
   </context>
   <context>
@@ -9136,7 +9136,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation>Marcas d&apos;água serão exibidas em vídeos ao vivo, arquivados e exportados apenas para usuários não administradores. Você e outros administradores não os verão.</translation>
+      <translation>Marcas d'água serão exibidas em vídeos ao vivo, arquivados e exportados apenas para usuários não administradores. Você e outros administradores não os verão.</translation>
     </message>
   </context>
   <context>
@@ -9621,7 +9621,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>O evento será accionado apenas se houver correspondências no campo &quot;caption&quot; com qualquer uma das palavras-chave inseridas.</translation>
+      <translation>O evento será accionado apenas se houver correspondências no campo "caption" com qualquer uma das palavras-chave inseridas.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>

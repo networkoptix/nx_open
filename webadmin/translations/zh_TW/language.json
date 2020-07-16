@@ -88,7 +88,7 @@
         "maxRecordQueueSizeBytes": "最大錄影佇列(bytes)",
         "maxRecordQueueSizeElements": "最大錄影序列大小 (元件)",
         "maxRemoteArchiveSynchronizationThreads": "最大遠程歸檔同步執行緒",
-        "maxRtspConnectDurationSeconds": "RTSP 持續連線秒數上限",
+        "maxRtspConnectDurationSeconds": "Rtsp 持續連線秒數上限",
         "maxSceneItems": "最大場景項目 (預設為0)",
         "proxyConnectTimeoutSec": "代理連接逾時 (秒)",
         "rtpTimeoutMs": "RTP 超時時間 (毫秒)",
