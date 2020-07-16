@@ -253,6 +253,7 @@ SettingsResponse DeviceAnalyticsBinding::getSettings() const
         return SettingsResponse(SettingsResponse::Error::Code::unableToObtainSettingsResponse);
     }
 
+    NX_MUTEX_LOCKER lock(&m_mutex);
     const SettingsContext settingsContext = updateSettingsContext(
         api::analytics::SettingsValues(),
         *sdkSettingsResponse);
