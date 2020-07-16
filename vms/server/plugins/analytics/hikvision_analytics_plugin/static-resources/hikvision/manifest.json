@@ -317,6 +317,10 @@
             "sourceCapabilities": [
                 "shipsDetection"
             ]
+        },
+        {
+            "id": "nx.hikvision.event",
+            "name": "Event occurred"
         }
     ]
 }

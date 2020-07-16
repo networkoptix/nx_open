@@ -1,5 +1,6 @@
 #include "metadata_parser.h"
 
+#include <chrono>
 #include <utility>
 
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
@@ -75,6 +76,8 @@ Ptr<IMetadataPacket> MetadataParser::parsePacket(QByteArray bytes)
         return nullptr;
     }
     packet->setTimestampUs(dateTime.toMSecsSinceEpoch() * 1000);
+    packet->setDurationUs(
+        std::chrono::duration_cast<std::chrono::microseconds>(kCacheEntryLifetime).count());
 
     const auto targetDetection = root.firstChildElement("TargetDetection");
     if (targetDetection.isNull())
@@ -228,7 +231,9 @@ std::optional<std::vector<Ptr<Attribute>>> MetadataParser::parseAttributes(
 
 Ptr<IObjectMetadata> MetadataParser::parse(const QDomElement& target)
 {
-    const auto targetId = target.firstChildElement("targetID");
+    auto targetId = target.firstChildElement("targetID");
+    if (targetId.isNull())
+        targetId = target.firstChildElement("ruleID");
     if (targetId.isNull())
         return nullptr;
 
@@ -243,9 +248,10 @@ Ptr<IObjectMetadata> MetadataParser::parse(const QDomElement& target)
     }
 
     const auto recognition = target.firstChildElement("recognition");
-    if (recognition.isNull())
-        return nullptr;
-    metadata->setTypeId(parseTypeId(recognition.text()).toStdString());
+    if (!recognition.isNull())
+        metadata->setTypeId(parseTypeId(recognition.text()).toStdString());
+    else
+        metadata->setTypeId("nx.hikvision.event");
 
     if (const auto boundingBox = parseBoundingBox(target.firstChildElement("RegionList")))
     {
