@@ -1,4 +1,3 @@
-
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "plugin.h"
@@ -24,7 +23,7 @@ std::string Plugin::manifestString() const
 {
     "id": "nx.stub",
     "name": "Stub analytics plugin",
-    "description": "A plugin for testing and debugging purposes",
+    "description": "A plugin for testing and debugging purposes.",
     "version": "1.0.0",
     "vendor": "Plugin vendor",
     "engineSettingsModel": {
@@ -38,22 +37,13 @@ std::string Plugin::manifestString() const
                         "type": "CheckBox",
                         "name": ")json" + kThrowPluginDiagnosticEventsFromEngineSetting + R"json(",
                         "caption": "Produce Plugin Diagnostic Events from the Engine",
-                        "defaultValue": false,
-                        "value": false
+                        "defaultValue": false
                     },
                     {
                         "type": "CheckBox",
                         "name": ")json" + kDisableStreamSelectionSetting + R"json(",
                         "caption": "Disable stream selection",
                         "description": "If true, the stream selection control will be hidden for newly created DeviceAgents",
-                        "defaultValue": false,
-                        "value": false
-                    },
-                    {
-                        "type": "CheckBox",
-                        "name": ")json" + kUsePluginAsSettingsOriginForDeviceAgents + R"json(",
-                        "caption": "Use Plugin as settings origin for DeviceAgents",
-                        "description": "If set, newly created Device Agents will declare the \"usePluginSettingsAsOrigin\" capability in its manifest",
                         "defaultValue": false
                     }
                 ]
@@ -78,6 +68,14 @@ std::string Plugin::manifestString() const
                         "maxValue": 100
                     },
                     {
+                        "type": "SpinBox",
+                        "name": ")json" + kEnginePluginSideSetting + R"json(",
+                        "caption": "Spin Box (plugin side)",
+                        "defaultValue": 42,
+                        "minValue": 0,
+                        "maxValue": 100
+                    },
+                    {
                         "type": "DoubleSpinBox",
                         "name": "testDoubleSpinBox",
                         "caption": "Double Spin Box",
@@ -96,8 +94,7 @@ std::string Plugin::manifestString() const
                         "type": "CheckBox",
                         "name": "testCheckBox",
                         "caption": "Check Box",
-                        "defaultValue": true,
-                        "value": true
+                        "defaultValue": true
                     }
                 ]
             }

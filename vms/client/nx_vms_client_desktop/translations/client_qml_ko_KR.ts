@@ -27,8 +27,7 @@
     </message>
     <message>
       <source>Check your network connection or press &quot;Connect to Server&quot; button to enter known server address</source>
-      <translation>Text for Translation
-네트워크 연결 확인 또는 &quot;서버 연결 버튼을 눌러 설정된 서버를 선택하세요&quot;</translation>
+      <translation>네트워크 연결 확인 또는 &quot;서버 연결 버튼을 눌러 설정된 서버를 선택하세요&quot;</translation>
     </message>
   </context>
   <context>

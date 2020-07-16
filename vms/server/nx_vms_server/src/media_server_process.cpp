@@ -3270,23 +3270,17 @@ void MediaServerProcess::registerRestHandlers(
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
      *     %param:object reply Object with Engine settings model and values.
-     *         %param:object reply.model Settings model, as in Engine manifest.
-     *         %param:object reply.values Name-value map with setting values, using JSON types
-     *             corresponding to each setting type.
+     *         %struct EngineSettingsResponse
      *
      **%apidoc POST /ec2/analyticsEngineSettings
-     * Applies passed settings values to correspondent Analytics Engine.
-     * %param:string engineId Id of an Analytics Engine.
-     * %param:object settings Name-value map with setting values, using JSON types corresponding to
-     *     each setting type.
+     * Applies passed settings values to the specified Analytics Engine.
+     * %struct EngineSettingsRequest
      * %return:object JSON object with an error code, error string, and the reply on success.
      *     %param:string error Error code, "0" means no error.
      *     %param:string errorString Error message in English, or an empty string.
      *     %param:object reply Object with Engine settings model and values that the Engine returns
      *         after the values have been supplied.
-     *         %param:object reply.model Settings model, as in Engine manifest.
-     *         %param:object reply.values Name-value map with setting values, using JSON types
-     *             corresponding to each setting type.
+     *         %struct EngineSettingsResponse
      */
     reg("ec2/analyticsEngineSettings",
         new nx::vms::server::rest::AnalyticsEngineSettingsHandler(serverModule()));
@@ -4108,31 +4102,6 @@ private:
     QFile m_file;
 };
 
-class TcpLogReceiver : public QnTcpListener
-{
-public:
-    TcpLogReceiver(
-        const QString& dataDir,
-        QnCommonModule* commonModule,
-        const QHostAddress& address,
-        int port)
-        :
-        QnTcpListener(commonModule, address, port),
-        m_dataDir(dataDir)
-    {
-    }
-    virtual ~TcpLogReceiver() override { stop(); }
-
-protected:
-    virtual QnTCPConnectionProcessor* createRequestProcessor(
-        std::unique_ptr<nx::network::AbstractStreamSocket> clientSocket) override
-    {
-        return new TcpLogReceiverConnection(m_dataDir, std::move(clientSocket), this);
-    }
-private:
-    QString m_dataDir;
-};
-
 void MediaServerProcess::initStaticCommonModule()
 {
     m_staticCommonModule = std::make_unique<QnStaticCommonModule>(
@@ -4885,19 +4854,6 @@ bool MediaServerProcess::initializeAnalyticsEvents()
     return true;
 }
 
-void MediaServerProcess::setUpTcpLogReceiver()
-{
-    // Start plain TCP listener and write data to a separate log file.
-    const int tcpLogPort = serverModule()->settings().tcpLogPort();
-    if (tcpLogPort)
-    {
-        m_logReceiver = std::make_shared<TcpLogReceiver>(
-            serverModule()->settings().dataDir(),
-            commonModule(), QHostAddress::Any, tcpLogPort);
-        m_logReceiver->start();
-    }
-}
-
 void MediaServerProcess::initNewSystemStateIfNeeded(
     bool foundOwnServerInDb,
     const nx::mserver_aux::SettingsProxyPtr& settingsProxy)
@@ -5222,7 +5178,6 @@ void MediaServerProcess::run()
 
     updateAllowedInterfaces();
 
-    setUpTcpLogReceiver();
     migrateDataFromOldDir();
     QnFileStorageResource::removeOldDirs(serverModule.get()); //< Cleanup temp folders.
     initCrashDump();

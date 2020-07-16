@@ -4196,7 +4196,7 @@ to %1</translation>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation>للحصول على ملف مفتاح التنشيط ، يرجى إرسال مفتاح الترخيص ومعرّف الجهاز ID إلى%1</translation>
+      <translation>للحصول على ملف مفتاح التنشيط ، يرجى إرسال مفتاح الترخيص ومعرّف الجهاز ID إلى%1.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>

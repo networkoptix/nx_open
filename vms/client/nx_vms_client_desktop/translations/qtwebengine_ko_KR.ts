@@ -389,7 +389,7 @@
     <name>UIDelegatesManager</name>
     <message>
       <source>Connect to proxy &quot;%1&quot; using:</source>
-      <translation>다음을 사용하여 프록시 &quot;%1&quot;에 연결:</translation>
+      <translation>다음을 사용하여 프록시 &quot;%1&quot; 에 연결:</translation>
     </message>
     <message>
       <source>Enter username and password for &quot;%1&quot; at %2://%3</source>

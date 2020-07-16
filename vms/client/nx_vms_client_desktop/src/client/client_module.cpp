@@ -420,6 +420,9 @@ void QnClientModule::initSingletons()
 
     initRuntimeParams(m_startupParameters);
 
+    // Used in self-update to modify desktop shortcuts.
+    commonModule->store(new QnPlatformAbstraction());
+
     // Shortened initialization if run in self-update mode.
     if (m_startupParameters.selfUpdateMode)
         return;
@@ -442,8 +445,6 @@ void QnClientModule::initSingletons()
     commonModule->store(new QnGlobals());
 
     m_radassController = commonModule->store(new RadassController());
-
-    commonModule->store(new QnPlatformAbstraction());
 
     auto messageProcessor = commonModule->createMessageProcessor<QnDesktopClientMessageProcessor>();
     commonModule->store(new QnClientResourceFactory());

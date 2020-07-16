@@ -5918,7 +5918,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>Server is unavailable.</source>
-      <translation>Server  není k dispozici.</translation>
+      <translation>Server není k dispozici.</translation>
     </message>
     <message>
       <source>now</source>
@@ -5997,7 +5997,7 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
     <message>
       <source>swap</source>
-      <translation>Prohodit</translation>
+      <translation>prohodit</translation>
     </message>
     <message>
       <source>network</source>
@@ -10547,7 +10547,7 @@ kartě &quot;Správa úložiště&quot; v dialogovém okně Nastavení serveru m
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation>Uložit soubor jako ...</translation>
+      <translation>Uložit soubor jako...</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
@@ -10555,7 +10555,7 @@ kartě &quot;Správa úložiště&quot; v dialogovém okně Nastavení serveru m
     </message>
     <message>
       <source>Failed to save file</source>
-      <translation>Uložení souboru se nezdařilo: </translation>
+      <translation>Uložení souboru se nezdařilo</translation>
     </message>
     <message>
       <source>%1 folder is blocked for writing.</source>
@@ -10563,7 +10563,7 @@ kartě &quot;Správa úložiště&quot; v dialogovém okně Nastavení serveru m
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation>Stahování souborů</translation>
+      <translation>Stahování souborů...</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>

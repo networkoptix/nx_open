@@ -1,6 +1,23 @@
 # Markdown Dialect  {#markdown}
 
-Unfortunately, Markdown exist in many flavors. VMS documentation should support Markdown features of at least Doxygen and possibly Upsource.
+Unfortunately, Markdown exist in many flavors. VMS documentation should support Markdown features
+of at least Doxygen and possibly Upsource.
+
+Also there is an additional convention allowing to generate two versions from one Markdown file -
+the one for internal use, and the one for public distribution, e.g. in the SDK. Any part of the
+documentation that is enclosed between the special lines `[proprietary]` and `[/proprietary]` is
+excluded from the "public" version of the documentation:
+~~~
+[proprietary]
+
+Some non-public information.
+
+[/proprietary]
+~~~
+
+Excessive empty lines (if any) will be deleted together with the proprierary block. Nesting of
+proprierary blocks is not supported.
+
 
 ## Tutorials and referencies
 
@@ -8,7 +25,7 @@ Markdown tutorial: https://www.markdowntutorial.com/
 
 Markdown basics on GitHub: https://help.github.com/articles/basic-writing-and-formatting-syntax/
 
-Complete Markdown reference for Doxygen: http://doxygen.nl/manual/markdown.html 
+Complete Markdown reference for Doxygen: http://doxygen.nl/manual/markdown.html
 
 ## Basic recommended Syntax
 
@@ -28,10 +45,10 @@ Examples:
 
 **double asterisks**
 ~~~
- 
+
  To indicate a span of code, you should wrap it in backticks (`). Unlike code blocks, code spans appear inline in a paragraph. An example:
 
-~~~ 
+~~~
 Use the `printf()` function.
 ~~~
 
@@ -99,7 +116,7 @@ Preformatted verbatim blocks can be created by indenting each line in a block of
 This a normal paragraph
 
     This is a code block
-~~~    
+~~~
 
 We continue with a normal paragraph again.
 
@@ -127,14 +144,14 @@ For an inline link the link text is followed by a URL and an optional link title
 ~~~
 [The link text](http://example.net/)
 [The link text](http://example.net/ "Link title")
-[The link text](/relative/path/to/index.html "Link title") 
-[The link text](somefile.html) 
+[The link text](/relative/path/to/index.html "Link title")
+[The link text](somefile.html)
 ~~~
 
 In addition doxygen provides a similar way to link a documented entity:
 
 ~~~
-[The link text](@ref MyClass) 
+[The link text](@ref MyClass)
 ~~~
 
 ##### Reference Links
@@ -227,15 +244,15 @@ A table consists of a header line, a separator line, and at least one row line. 
 ~~~
 First Header  | Second Header
 ------------- | -------------
-Content Cell  | Content Cell 
-Content Cell  | Content Cell 
+Content Cell  | Content Cell
+Content Cell  | Content Cell
 ~~~
 will produce the following table:
 
 First Header  | Second Header
 ------------- | -------------
-Content Cell  | Content Cell 
-Content Cell  | Content Cell 
+Content Cell  | Content Cell
+Content Cell  | Content Cell
 
 Column alignment can be controlled via one or two colons at the header separator line:
 

@@ -2310,7 +2310,7 @@
     <message>
       <location/>
       <source>Default text will be used if this field is empty</source>
-      <translation>如不填寫,  將使用預設內容 </translation>
+      <translation>如不填寫, 將使用預設內容</translation>
     </message>
     <message>
       <location/>

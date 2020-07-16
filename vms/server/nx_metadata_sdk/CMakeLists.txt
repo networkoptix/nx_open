@@ -36,6 +36,18 @@ file(GLOB_RECURSE copied_nx_sdk_src_nx_files ${copied_nx_sdk_src_nx_origin}/*)
 set(copied_nx_sdk_unit_tests_origin ${CMAKE_SOURCE_DIR}/vms/libs/nx_sdk/unit_tests)
 file(GLOB_RECURSE copied_nx_sdk_unit_tests_files ${copied_nx_sdk_unit_tests_origin}/*)
 
+# Exclude documentation files from SDK source files.
+set(nx_sdk_src_settings_model_file ${copied_nx_sdk_src_nx_origin}/sdk/settings_model.md)
+list(REMOVE_ITEM copied_nx_sdk_src_nx_files ${nx_sdk_src_settings_model_file})
+file(GLOB_RECURSE nx_sdk_documentation_image_files ${copied_nx_sdk_src_nx_origin}/sdk/doc/*)
+nx_subtract_lists(copied_nx_sdk_src_nx_files nx_sdk_documentation_image_files)
+
+# Generate public version of "settings_model.md"
+set(copied_nx_sdk_settings_model_origin ${CMAKE_CURRENT_BINARY_DIR})
+set(copied_nx_sdk_settings_model_file
+    ${copied_nx_sdk_settings_model_origin}/settings_model.md)
+nx_remove_proprietary_docs(${nx_sdk_src_settings_model_file} ${copied_nx_sdk_settings_model_file})
+
 set(copied_samples_dir ${CMAKE_SOURCE_DIR}/vms/server/plugins/analytics)
 
 # Collect source files for the sample 1 - Sample Analytics Plugin.

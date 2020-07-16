@@ -66,14 +66,16 @@ by a plugin:
         Plugin.
     - `pixel_format.h`: Utilities for `enum IUncompressedFrame::PixelFormat`.
 
-- Pure C++ library `nx_kit` (which itself is an independent project with its own documentation)
-    that offers convenient debug output (logging) and support for .ini files with options for
-    experimenting (e.g. switching alternative implementations, or parameterizing the code), and a
-    rudimentary framework for simple unit tests (used by the SDK itself, and plugin samples).
+- Pure C++ library `nx_kit` (which itself is an independent project with its own
+    [documentation](nx_kit/readme.md)) that offers convenient debug output (logging) and support
+    for .ini files with options for experimenting (e.g. switching alternative implementations, or
+    parameterizing the code), and a rudimentary framework for simple unit tests (used by the SDK
+    itself, and plugin samples).
 
 The recommended way to start developing a plugin is the following: inherit your classes from
-`nx::sdk::analytics::Plugin`, `nx::sdk::analytics::Engine` and `nx::sdk::analytics::DeviceAgent`
-according to the Doxygen comments in those classes and interfaces they implement.
+`nx::sdk::analytics::Plugin`, `nx::sdk::analytics::Engine` and
+`nx::sdk::analytics::ConsumingDeviceAgent` according to the Doxygen comments in those classes and
+interfaces they implement.
 
 ---------------------------------------------------------------------------------------------------
 ## Samples: building and installing

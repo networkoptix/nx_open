@@ -71,13 +71,12 @@ private:
     QString m_str;
 };
 
-inline
-Formatter format() { return Formatter{}; }
+inline Formatter format() { return Formatter{}; }
 
 template<typename Format>
 Formatter format(const Format& format) { return Formatter(::toString(format)); }
 
-/** Usage: `return NX_FMS("%1 = %2", name, value);`. */
+/** Use when the format string is not a literal: `return format(formatString, name, value);` */
 template<typename Format, typename ... Args>
 Formatter format(Format format, const Args& ... args)
 {
@@ -96,7 +95,8 @@ void staticAssertLiteral(const char (&)[N]) {}
 #define NX_DETAIL_FORMAT(FORMAT, ...) ::nx::format(NX_DETAIL_LITERAL(FORMAT), __VA_ARGS__)
 
 /**
- * Universal optimized string formatter.
+ * Universal optimized string formatter. To be used when the format is a string literal.
+ *
  * Usage:
  * ```
  *     QString name = NX_FMT("propertyName");

@@ -1,3 +1,5 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
 #pragma once
 
 #include <string>
@@ -6,6 +8,8 @@ namespace nx {
 namespace vms_server_plugins {
 namespace analytics {
 namespace stub {
+
+const std::string kEnginePluginSideSetting{"testPluginSideSpinBox"};
 
 const std::string kGenerateEventsSetting{"generateEvents"};
 const std::string kMotionVisualizationObjectType{"nx.stub.motionVisualization"};
@@ -40,8 +44,6 @@ const std::string kDisableStreamSelectionSetting{"disableStreamSelection"};
 const std::string kLeakFramesSetting{"leakFrames"};
 const std::string kAdditionalFrameProcessingDelayMsSetting{"additionalFrameProcessingDelayMs"};
 const std::string kOverallMetadataDelayMsSetting{"overallMetadataDelayMs"};
-const std::string kUsePluginAsSettingsOriginForDeviceAgents{
-    "usePluginAsSettingsOriginForDeviceAgents"};
 
 static const std::string kRegularSettingsModelOption = "regular";
 static const std::string kAlternativeSettingsModelOption = "alternative";

@@ -592,7 +592,7 @@ bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& med
     if (!isMotionContinue && m_endDateTimeUs != (qint64)AV_NOPTS_VALUE)
     {
         NX_VERBOSE(this,
-            "%1(): Closing the recorder because of lack of motion; ",
+            "%1(): Closing the recorder because of lack of motion; "
             "catalog %2, resource %3 (%4) %5",
             __func__, m_catalog, m_resource->getName(), m_resource->getId(), m_resource->getUrl());
         if (media->timestamp - m_endDateTimeUs < MAX_FRAME_DURATION_MS*1000)

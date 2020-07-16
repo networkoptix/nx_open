@@ -15,7 +15,7 @@
 #include <nx/vms/server/interactive_settings/json_engine.h>
 #include <nx/vms/server/resource/camera.h>
 
-#include <nx/vms/api/analytics/settings_response.h>
+#include <nx/vms/api/analytics/analytics_engine_settings_data.h>
 #include <nx/vms/api/analytics/device_analytics_settings_data.h>
 
 namespace nx::vms::server::rest {
@@ -239,6 +239,9 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::makeApiResponse(
     const SettingsResponse& settingsResponse,
     const CommonRequestEntities& commonRequestEntities) const
 {
+    if (settingsResponse.error.code == SettingsResponse::Error::Code::wrongSettingsModel)
+        return makeResponse(QnRestResult::Error::BadRequest, "Wrong settings model id");
+
     JsonRestResponse result(http::StatusCode::ok);
     nx::vms::api::analytics::DeviceAnalyticsSettingsResponse response;
 

@@ -1425,7 +1425,7 @@ bool PeerStateTracker::updateServerData(QnMediaServerResourcePtr server, UpdateI
     auto moduleInfo = server->getModuleInformation();
     if (moduleInfo.protoVersion != item->protocol)
     {
-        NX_INFO(this, "updateServerData() - peer %1 has changed protocol version %1 to %2",
+        NX_INFO(this, "updateServerData() - peer %1 has changed protocol version %2 to %3",
             item->id, item->protocol, moduleInfo.protoVersion);
         item->protocol = moduleInfo.protoVersion;
         changed = true;

@@ -51,49 +51,49 @@
     <message numerus="yes">
       <source>Byte(s)</source>
       <comment>Full suffix for displaying bytes</comment>
-      <translation type="unfinished">
-        <numerusform> Bájt</numerusform>
-        <numerusform>Byte(s)</numerusform>
+      <translation>
+        <numerusform>Bájt</numerusform>
+        <numerusform>Bájt</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Kilobyte(s)</source>
       <comment>Full suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kilobájt</numerusform>
-        <numerusform>Kilobyte(s)</numerusform>
+        <numerusform>Kilobájt</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Megabyte(s)</source>
       <comment>Full suffix for displaying megabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Megabájt</numerusform>
-        <numerusform>Megabyte(s)</numerusform>
+        <numerusform>Megabájt</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Gigabyte(s)</source>
       <comment>Full suffix for displaying gigabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Gigabájt</numerusform>
-        <numerusform>Gigabyte(s)</numerusform>
+        <numerusform>Gigabájt</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Terabyte(s)</source>
       <comment>Full suffix for displaying terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Terabájt</numerusform>
-        <numerusform>Terabyte(s)</numerusform>
+        <numerusform>Terabájt</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Petabyte(s)</source>
       <comment>Full suffix for displaying petabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Petabájt</numerusform>
-        <numerusform>Petabyte(s)</numerusform>
+        <numerusform>Petabájt</numerusform>
       </translation>
     </message>
   </context>
@@ -715,7 +715,7 @@
       <comment>%n will be replaced by the total count</comment>
       <translation>
         <numerusform>%n/%1 Végponti licencek</numerusform>
-        <numerusform>%n Végponti licencek</numerusform>
+        <numerusform>%n/%1 Végponti licencek</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1808,8 +1808,7 @@
     </message>
     <message>
       <source>PoE over Budget</source>
-      <translation>PoE a "Budget" felett
-</translation>
+      <translation>PoE a "Budget" felett</translation>
     </message>
     <message>
       <source>Fan Error</source>

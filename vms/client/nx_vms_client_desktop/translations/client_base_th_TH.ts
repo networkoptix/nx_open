@@ -1389,7 +1389,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
-      <translation>หากพบปัญหาโปรดติดต่อฝ่ายบริการลูกค้า</translation>
+      <translation>หากพบปัญหาโปรดติดต่อฝ่ายบริการลูกค้า %1</translation>
     </message>
     <message>
       <source>Please contact %1.</source>
@@ -3911,13 +3911,13 @@ to %1</source>
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
       <translation>
-        <numerusform>จำเป็นต้องกรอกอย่างน้อยหนึ่งหน่วย</numerusform>
+        <numerusform>จำเป็นต้องกรอกอย่างน้อยหนึ่งหน่วย %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
       <translation>
-        <numerusform>การยกเลิกการทำงานที่เหลืออยู่</numerusform>
+        <numerusform>%n การยกเลิกการทำงานที่เหลืออยู่</numerusform>
       </translation>
     </message>
   </context>
@@ -3950,7 +3950,7 @@ to %1</source>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation>โปรดส่งรหัสสิทธิ์ใช้งานและรหัสฮาร์ดแวร์ไปยังฝ่ายสนับสนุนภูมิภาค / สิทธิ์ใช้งานของคุณเพื่อรับไฟล์รหัสเปิดใช้งาน</translation>
+      <translation>โปรดส่งรหัสสิทธิ์ใช้งานและรหัสฮาร์ดแวร์ไปยังฝ่ายสนับสนุนภูมิภาค / สิทธิ์ใช้งานของคุณเพื่อรับไฟล์รหัสเปิดใช้งาน (%1)</translation>
     </message>
   </context>
   <context>
@@ -8329,7 +8329,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::GraphicsWebEngineView</name>
     <message>
       <source>The proxy %1 requires a username and password.</source>
-      <translation>%1$s ต้องการใช้ชื่อผู้ใช้และรหัสผ่าน</translation>
+      <translation>%1 ต้องการใช้ชื่อผู้ใช้และรหัสผ่าน</translation>
     </message>
     <message>
       <source>Select folder to upload</source>
@@ -9039,7 +9039,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 Settings</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>การตั้งค่าของ %1$s</translation>
+      <translation>การตั้งค่าของ %1</translation>
     </message>
     <message numerus="yes">
       <source>%n symbols over</source>
@@ -10125,7 +10125,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     <name>nx::vms::client::desktop::utils::WebDownloader</name>
     <message>
       <source>Save File As...</source>
-      <translation>บันทึกไฟล์เป็น </translation>
+      <translation>บันทึกไฟล์เป็น</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>

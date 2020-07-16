@@ -1368,7 +1368,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Please try again later.</source>
-      <translation>נא לנסות שוב מאוחר יותר</translation>
+      <translation>נא לנסות שוב מאוחר יותר.</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
@@ -10562,7 +10562,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Downloading file...</source>
-      <translation>מוריד קובץ …</translation>
+      <translation>מוריד קובץ...</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>

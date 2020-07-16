@@ -82,7 +82,7 @@
     </message>
     <message>
       <source>Vendor</source>
-      <translation>Fabricante:</translation>
+      <translation>Fabricante</translation>
     </message>
     <message>
       <source>Camera stream</source>

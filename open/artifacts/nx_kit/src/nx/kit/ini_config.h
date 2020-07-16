@@ -51,7 +51,14 @@ namespace kit {
  *         NX_INI_DOUBLE(1.0, myDouble, "Here 1.0 is the default value.");
  *     };
  *
- *     inline Ini& ini()
+ *     Ini& ini();
+ *
+ * </code></pre>
+ *
+ * Usage example, .cpp file:
+ * <pre><code>
+ *
+ *     Ini& ini()
  *     {
  *         static Ini ini;
  *         return ini;
@@ -62,10 +69,11 @@ namespace kit {
  * In the code, use ini().<param-name> to access the values. Call ini().reload() when needed, e.g.
  * when certain activity starts or at regular intervals.
  *
- * ATTENTION: Inline functions with static variables are safe to use only when the header is local
- * to a single dynamic library or executable. Otherwise (if the header is included into more than
- * one dynamic library or executable), due to compiler/linker limitations, such variables may have
- * duplicate instances, thus, the function definition must be moved to a .cpp.
+ * NOTE: The function that owns an IniConfig instance can be placed in the header file as 'inline',
+ * but it is safe only when the header is local to a single dynamic library or executable.
+ * Otherwise (if the header is included into more than one dynamic library or executable), due to
+ * compiler/linker limitations, such variables may have duplicate instances, thus, the function
+ * definition must be moved to a .cpp.
  */
 class NX_KIT_API IniConfig
 {

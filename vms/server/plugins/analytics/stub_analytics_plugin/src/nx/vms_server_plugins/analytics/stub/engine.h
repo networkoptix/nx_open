@@ -52,6 +52,9 @@ protected:
         nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackInfo> objectTrackInfo,
         const std::map<std::string, std::string>& params) override;
 
+    virtual void getPluginSideSettings(
+        nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult) const override;
+
 private:
     void obtainPluginHomeDir();
     void initCapabilities();
@@ -66,7 +69,6 @@ private:
     std::atomic<bool> m_terminated{false};
     std::atomic<bool> m_needToThrowPluginDiagnosticEvents{false};
     std::atomic<bool> m_disableStreamSelection{false};
-    std::atomic<bool> m_usePluginAsSettingsOriginForDeviceAgents{false};
 
     std::string m_pluginHomeDir; /**< Can be empty. */
     std::string m_capabilities;

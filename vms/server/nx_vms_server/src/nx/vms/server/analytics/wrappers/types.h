@@ -84,6 +84,8 @@ struct Violation
     QString details;
 };
 
+nx::vms::api::EventLevel pluginDiagnosticEventLevel(const Violation& violation);
+
 } // namespace nx::vms::server::analytics::wrappers
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(

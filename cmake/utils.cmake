@@ -123,11 +123,11 @@ function(nx_configure_file input output)
     endif()
 
     file(TIMESTAMP "${output}" orig_ts)
-    
+
     # TODO: Add `NEWLINE_STYLE UNIX`, because on Windows configure_file() produces CRLF by default.
     # Then make sure all generated files work correctly, especially MSVC files, .xml and .wxi.
     configure_file(${input} ${output} ${ARGN})
-    
+
     file(TIMESTAMP "${output}" new_ts)
 
     nx_store_known_file(${output})
@@ -292,7 +292,7 @@ function(nx_json_to_cmake json cmake prefix)
     endif()
 endfunction()
 
-# Intended for debug. Enquotes and escapes the string (C style) to the best of CMake feasibility. 
+# Intended for debug. Enquotes and escapes the string (C style) to the best of CMake feasibility.
 function(nx_c_escape_string value out_var)
     set(${out_var} "${value}")
     string(REPLACE "\\" "\\\\" value "${value}")
@@ -301,7 +301,7 @@ function(nx_c_escape_string value out_var)
     string(REPLACE "\r" "\\r" value "${value}")
     string(REPLACE "\n" "\\n" value "${value}")
     # There seems to be no way in CMake to escape other control chars, thus leaving them as is.
-    
+
     set(${out_var} "\"${value}\"" PARENT_SCOPE)
 endfunction()
 
@@ -317,7 +317,7 @@ function(nx_print_args)
         endforeach()
     endif()
     string(APPEND output "}")
-    
+
     message("${output}")
 endfunction()
 
@@ -332,7 +332,7 @@ function(nx_print_var some_var)
     if(NOT DEFINED list_length OR NOT "${list_length}" MATCHES "^[0-9]+$")
         message(FATAL_ERROR "INTERNAL ERROR: list(LENGTH) failed for ${some_var}.")
     endif()
-    
+
     string(LENGTH "${${some_var}}" string_length)
     if(NOT DEFINED string_length OR NOT "${string_length}" MATCHES "^[0-9]+$")
         message(FATAL_ERROR "INTERNAL ERROR: string(LENGTH) failed for ${some_var}.")
@@ -358,6 +358,20 @@ function(nx_print_var some_var)
         endforeach()
     endif()
     string(APPEND output "    }\n")
-    
+
     message("${output}")
+endfunction()
+
+function(nx_subtract_lists minuend subtrahend)
+    foreach(item ${${subtrahend}})
+        list(REMOVE_ITEM ${minuend} ${item})
+    endforeach()
+    nx_expose_to_parent_scope(${minuend})
+endfunction()
+
+function(nx_remove_proprietary_docs input output)
+    execute_process(COMMAND ${PYTHON_EXECUTABLE} ${build_utils_dir}/remove_proprietary_docs.py
+        ${input} ${output})
+
+    nx_store_known_file(${output})
 endfunction()

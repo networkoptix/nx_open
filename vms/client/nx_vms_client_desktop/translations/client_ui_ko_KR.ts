@@ -16,7 +16,7 @@
     <message>
       <location/>
       <source>Credits</source>
-      <translation>생성</translation>
+      <translation>저작권</translation>
     </message>
     <message>
       <location/>
@@ -143,7 +143,7 @@
     <message>
       <location/>
       <source>Instant</source>
-      <translation>긴급</translation>
+      <translation>즉시</translation>
     </message>
   </context>
   <context>
@@ -207,7 +207,7 @@
     <message>
       <location/>
       <source>Watching archive</source>
-      <translation>저장데이터 보기</translation>
+      <translation>아카이브 보기</translation>
     </message>
     <message>
       <location/>
@@ -217,7 +217,7 @@
     <message>
       <location/>
       <source>Watching live</source>
-      <translation>실시간 감시</translation>
+      <translation>라이브 보기</translation>
     </message>
     <message>
       <location/>
@@ -227,7 +227,7 @@
     <message>
       <location/>
       <source>Event rules</source>
-      <translation>이벤트 설정</translation>
+      <translation>이벤트 규칙</translation>
     </message>
     <message>
       <location/>
@@ -455,7 +455,7 @@
     <message>
       <location/>
       <source>Bookmark Log</source>
-      <translation>북마크 로그</translation>
+      <translation>즐겨찾기 로그</translation>
     </message>
     <message>
       <location/>
@@ -623,12 +623,12 @@
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation>2 차 스트림</translation>
+      <translation>보조 스트림</translation>
     </message>
     <message>
       <location/>
       <source>Disable secondary stream</source>
-      <translation>보조 스트림 활성화</translation>
+      <translation>보조 스트림 비활성화</translation>
     </message>
     <message>
       <location/>
@@ -771,7 +771,7 @@
     <message>
       <location/>
       <source>MAC Address</source>
-      <translation>MAC 정보:</translation>
+      <translation>MAC 주소</translation>
     </message>
     <message>
       <location/>
@@ -879,7 +879,7 @@
     <message>
       <location/>
       <source>Copy Schedule to...</source>
-      <translation>... 에 일정 복사</translation>
+      <translation>일정 복사 대상</translation>
     </message>
   </context>
   <context>
@@ -1075,12 +1075,12 @@
     <message>
       <location/>
       <source>End IP</source>
-      <translation>IP 끝</translation>
+      <translation>종료 IP</translation>
     </message>
     <message>
       <location/>
       <source>Start IP</source>
-      <translation>IP 시작</translation>
+      <translation>시작 IP</translation>
     </message>
     <message>
       <location/>
@@ -1233,7 +1233,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation>설정 내보내기</translation>
+      <translation>내보내기 설정</translation>
     </message>
     <message>
       <location/>
@@ -1246,7 +1246,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation>설정 내보내기</translation>
+      <translation>내보내기 설정</translation>
     </message>
     <message>
       <location/>
@@ -1256,7 +1256,7 @@
     <message>
       <location/>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation>회전, Dewarping, 이미지 향상 등</translation>
+      <translation>회전, 디워핑, 이미지 향상 등</translation>
     </message>
     <message>
       <location/>
@@ -1292,7 +1292,7 @@
     <message>
       <location/>
       <source>Export Settings</source>
-      <translation>설정 내보내기</translation>
+      <translation>내보내기 설정</translation>
     </message>
     <message>
       <location/>
@@ -1331,12 +1331,12 @@
     <message>
       <location/>
       <source>Floor/Table Mount</source>
-      <translation>바닥또는 테이블위에 설치시</translation>
+      <translation>바닥/테이블 설치시</translation>
     </message>
     <message>
       <location/>
       <source>Fisheye Dewarping</source>
-      <translation>Fisheye Dewarping</translation>
+      <translation>어안카메라 디워핑</translation>
     </message>
     <message>
       <location/>
@@ -1407,7 +1407,7 @@
     <message>
       <location/>
       <source>Minutes of Inactivity</source>
-      <translation>비활성 시간(분)</translation>
+      <translation>(분) 경과 시</translation>
     </message>
     <message>
       <location/>
@@ -1603,7 +1603,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
       <source>Locked</source>
-      <translation>잠김</translation>
+      <translation>레이아웃 잠금</translation>
     </message>
     <message>
       <location/>
@@ -1633,7 +1633,7 @@
     <message>
       <location/>
       <source>Minimum Grid Size</source>
-      <translation>최소 눈금 크기</translation>
+      <translation>최소 화면 그리드 크기</translation>
     </message>
   </context>
   <context>
@@ -2344,7 +2344,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation>북마크</translation>
+      <translation>즐겨찾기</translation>
     </message>
   </context>
   <context>
@@ -2378,7 +2378,7 @@
     <message>
       <location filename="../src/ui/dialogs/merge_systems_dialog.ui"/>
       <source>Merge Systems...</source>
-      <translation>시스템 조정...</translation>
+      <translation>시스템 병합</translation>
     </message>
     <message>
       <location/>
@@ -2403,7 +2403,7 @@
     <message>
       <location/>
       <source>The new System will have password and name from System:</source>
-      <translation>새 시스템은 시스템에서 암호와 이름을 갖게 됨:</translation>
+      <translation>병합된 새 시스템은 아래 선택한 시스템명과 암호로 설정됩니다.</translation>
     </message>
   </context>
   <context>
@@ -2508,7 +2508,7 @@
     <message>
       <location/>
       <source>Disable</source>
-      <translation>해제</translation>
+      <translation>비활성화</translation>
     </message>
     <message>
       <location/>
@@ -3066,7 +3066,7 @@
     <message>
       <location/>
       <source>Forecast for Full Storage Usage</source>
-      <translation>전체 스토리지 사용에 대 한 예측</translation>
+      <translation>예측 사용량</translation>
     </message>
     <message>
       <location/>
@@ -3452,7 +3452,7 @@
     <message>
       <location/>
       <source>Schedule</source>
-      <translation>녹화 설정</translation>
+      <translation>일정</translation>
     </message>
     <message>
       <location/>

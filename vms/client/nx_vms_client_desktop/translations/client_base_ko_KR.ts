@@ -141,7 +141,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Event Log...</source>
-      <translation>이벤트정보...</translation>
+      <translation>이벤트 로그...</translation>
     </message>
     <message>
       <source>Cameras to Backup...</source>
@@ -161,7 +161,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Fit in View</source>
-      <translation>화면 체우기</translation>
+      <translation>화면 맞추기</translation>
     </message>
     <message>
       <source>Main Menu</source>
@@ -173,7 +173,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation>서버와의 연결이 끊겼습니다</translation>
+      <translation>서버 연결 종료</translation>
     </message>
     <message>
       <source>Browse Local Files</source>
@@ -233,7 +233,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Open Layout...</source>
-      <translation>레이아웃 열기...</translation>
+      <translation>레이아웃 목록 열기</translation>
     </message>
     <message>
       <source>Open...</source>
@@ -277,7 +277,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Go to Fullscreen</source>
-      <translation>전체화면으로 이동</translation>
+      <translation>최대화</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
@@ -332,7 +332,7 @@ to view more bookmarks</source>
     <message>
       <source>Open %1 Portal...</source>
       <comment>Open Nx Cloud Portal</comment>
-      <translation>오픈 %1 포털...</translation>
+      <translation>%1 포털 열기</translation>
     </message>
     <message>
       <source>Account Settings...</source>
@@ -356,7 +356,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Merge Systems...</source>
-      <translation>시스템 조정...</translation>
+      <translation>시스템 병합</translation>
     </message>
     <message>
       <source>About...</source>
@@ -376,7 +376,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Clear Selection</source>
-      <translation>선택항목 초기화</translation>
+      <translation>선택영역 초기화</translation>
     </message>
     <message>
       <source>Zoom to Selection</source>
@@ -384,7 +384,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Add Bookmark...</source>
-      <translation>북마크 추가</translation>
+      <translation>즐겨찾기 추가</translation>
     </message>
     <message>
       <source>Edit Bookmark...</source>
@@ -396,11 +396,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Remove Bookmarks...</source>
-      <translation>북마크 삭제</translation>
+      <translation>즐겨찾기 삭제</translation>
     </message>
     <message>
       <source>Preview Search...</source>
-      <translation>미리보기 검색...</translation>
+      <translation>검색 미리보기...</translation>
     </message>
     <message>
       <source>Server...</source>
@@ -416,7 +416,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Open in New Tab</source>
-      <translation>새탭 열기</translation>
+      <translation>새 탭 열기</translation>
     </message>
     <message>
       <source>Monitor in New Tab</source>
@@ -428,7 +428,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Open in New Window</source>
-      <translation>새 윈도우 열기</translation>
+      <translation>새 창 열기</translation>
     </message>
     <message>
       <source>Monitor in New Window</source>
@@ -448,7 +448,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation>비디오 월에 배속...</translation>
+      <translation>비디오 월 배치</translation>
     </message>
     <message>
       <source>Switch to Video Wall mode...</source>
@@ -492,7 +492,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Restore Item</source>
-      <translation>복원</translation>
+      <translation>원래대로</translation>
     </message>
     <message>
       <source>Show Info</source>
@@ -500,7 +500,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Hide Info</source>
-      <translation>정보 숨김</translation>
+      <translation>정보 숨기기</translation>
     </message>
     <message>
       <source>PTZ...</source>
@@ -536,7 +536,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Check File Watermark</source>
-      <translation>파일 변조 확인</translation>
+      <translation>워터마크 확인</translation>
     </message>
     <message>
       <source>Image Enhancement...</source>
@@ -632,7 +632,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Camera Rules...</source>
-      <translation>카메라 설정...</translation>
+      <translation>카메라 규칙</translation>
     </message>
     <message>
       <source>Cameras Rules...</source>
@@ -720,7 +720,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Small</source>
-      <translation>작게</translation>
+      <translation>좁게</translation>
     </message>
     <message>
       <source>Medium</source>
@@ -728,7 +728,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Large</source>
-      <translation>크게</translation>
+      <translation>넓게</translation>
     </message>
     <message>
       <source>Settings</source>
@@ -780,7 +780,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Jump to Live</source>
-      <translation>라이브 점프</translation>
+      <translation>라이브로 이동</translation>
     </message>
     <message>
       <source>Synchronize Streams</source>
@@ -788,7 +788,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Disable Stream Synchronization</source>
-      <translation>스트림 동기화 사용안함</translation>
+      <translation>스트림 동기화 해제</translation>
     </message>
     <message>
       <source>Show Bookmarks</source>
@@ -820,7 +820,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Unpin Tree</source>
-      <translation>트리 비고정</translation>
+      <translation>트리 고정 해제</translation>
     </message>
     <message>
       <source>Show Timeline</source>
@@ -832,23 +832,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Bookmark Log...</source>
-      <translation>북마크 로그...</translation>
+      <translation>즐겨찾기 로그...</translation>
     </message>
     <message>
       <source>Showreel...</source>
-      <translation>Showreel...</translation>
+      <translation>쇼릴</translation>
     </message>
     <message>
       <source>New Showreel...</source>
-      <translation>새 Showreel...</translation>
+      <translation>신규 쇼 릴...</translation>
     </message>
     <message>
       <source>Remove from Showreel</source>
-      <translation>Showreel에서 제거</translation>
+      <translation>쇼릴에서 제거</translation>
     </message>
     <message>
       <source>Make Showreel</source>
-      <translation>Showreel 만들기</translation>
+      <translation>쇼릴 만들기</translation>
     </message>
     <message>
       <source>Upload File...</source>
@@ -908,7 +908,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Show Thumbnails</source>
-      <translation>미리보기 사용</translation>
+      <translation>썸네일뷰 보기</translation>
     </message>
     <message>
       <source>Hide Thumbnails</source>
@@ -1077,7 +1077,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation>모든 카메라 문제</translation>
+      <translation>카메라 이슈</translation>
     </message>
     <message>
       <source>Any server event</source>
@@ -1240,7 +1240,7 @@ to view more bookmarks</source>
     <name>LayoutTourTextFactory</name>
     <message>
       <source>Start Showreel</source>
-      <translation>Showreel 시작</translation>
+      <translation>쇼릴 시작</translation>
     </message>
   </context>
   <context>
@@ -1442,11 +1442,11 @@ to view more bookmarks</source>
     <name>PasswordInformation</name>
     <message>
       <source>Good</source>
-      <translation>좋은</translation>
+      <translation>좋음</translation>
     </message>
     <message>
       <source>Fair</source>
-      <translation>Fair</translation>
+      <translation>보통</translation>
     </message>
     <message>
       <source>Weak</source>
@@ -1464,7 +1464,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Short</source>
-      <translation>짧은</translation>
+      <translation>짧음</translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
@@ -1504,7 +1504,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Incorrect</source>
-      <translation>올바르지 않은 값이 입력됨</translation>
+      <translation>사용불가</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
@@ -1512,7 +1512,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
-      <translation>오직 라틴 문자, 숫자 및 키보드 기호 사용할 수 있습니다.</translation>
+      <translation>숫자, 영문자, 키보드 특수문자만 입력할 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -1596,7 +1596,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Change Dewarping Mode</source>
-      <translation>디와핑 모드 변경</translation>
+      <translation>디워핑 모드 변경</translation>
     </message>
   </context>
   <context>
@@ -1656,7 +1656,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Built for %1-%2 with %3.</source>
-      <translation>%1-%2 %3 위해 만들어진.</translation>
+      <translation>%3과 함께 %1-%2 용으로 제작됨.</translation>
     </message>
     <message>
       <source>Regional / License support</source>
@@ -1683,7 +1683,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>...and %n more</source>
       <translation>
-        <numerusform>... 그리고 %n 더 많은</numerusform>
+        <numerusform>... 이외 %n 건 더 있음</numerusform>
       </translation>
     </message>
   </context>
@@ -1691,7 +1691,7 @@ to view more bookmarks</source>
     <name>QnAccessibleResourcesWidget</name>
     <message>
       <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
-      <translation>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</translation>
+      <translation>일부 레이아웃에 대한 접근 권한을 부여하면 해당 레이아웃의 모든 카메라에 접근할 수 있습니다. 또한 사용자는 이러한 레이아웃의 모든 새로운 카메라에 접근할 수 있습니다.</translation>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
@@ -1779,7 +1779,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Camera actions</source>
-      <translation>카메라 액션</translation>
+      <translation>카메라 동작</translation>
     </message>
     <message>
       <source>No sessions</source>
@@ -1833,7 +1833,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Audit trail replay</source>
-      <translation>Audit Trail 재생</translation>
+      <translation>시스템 감사 재생</translation>
     </message>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
@@ -1874,11 +1874,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Watching archive</source>
-      <translation>저장데이터 보기</translation>
+      <translation>아카이브 보기</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>비디오 백업</translation>
+      <translation>영상 내보내기</translation>
     </message>
     <message>
       <source>System name changed</source>
@@ -2203,7 +2203,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Every %1</source>
-      <translation>모든 %1</translation>
+      <translation>매 %1</translation>
     </message>
     <message>
       <source>System</source>
@@ -2594,7 +2594,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>MAC address</source>
-      <translation>MAC 정보</translation>
+      <translation>MAC 주소</translation>
     </message>
     <message>
       <source>Server</source>
@@ -2716,7 +2716,7 @@ devices</source>
     <message>
       <source>Open %1 Portal</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>오픈 %1 포털</translation>
+      <translation>%1 포털 열기</translation>
     </message>
     <message>
       <source>Create %1 Account</source>
@@ -2909,7 +2909,7 @@ to %1</source>
     </message>
     <message>
       <source>Please check access credentials and try again.</source>
-      <translation>액세스 자격 증명을 확인 하 고 다시 시도 하십시오.</translation>
+      <translation>접속 정보를 확인하고 다시 시도하십시오.</translation>
     </message>
     <message>
       <source>Incompatible Server</source>
@@ -3286,7 +3286,7 @@ to %1</source>
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
       <translation>
-        <numerusform>의 이벤트 로그 %1 - %n 이벤트 발견</numerusform>
+        <numerusform>%1 의 이벤트 로그 - %n 개의 이벤트가 발견되었습니다.</numerusform>
       </translation>
     </message>
     <message>
@@ -3519,7 +3519,7 @@ to %1</source>
     </message>
     <message>
       <source>Audit Trail</source>
-      <translation>감사 추적</translation>
+      <translation>시스템 감사</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -3535,11 +3535,11 @@ to %1</source>
     </message>
     <message>
       <source>Open Event Rules Management</source>
-      <translation>알람 이벤트 롤 관리 열기</translation>
+      <translation>이벤트 규칙 관리 열기</translation>
     </message>
     <message>
       <source>Open Audit Trail Log</source>
-      <translation>오픈 감사 추적 로그</translation>
+      <translation>시스템 감사 로그 열기</translation>
     </message>
     <message>
       <source>Open Device List</source>
@@ -3855,7 +3855,7 @@ to %1</source>
     </message>
     <message>
       <source>Channels</source>
-      <translation>개의 채널</translation>
+      <translation>채널 수</translation>
     </message>
   </context>
   <context>
@@ -3904,7 +3904,7 @@ to %1</source>
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
       <translation>
-        <numerusform>%1는(가)  현재 사용 중 입니다</numerusform>
+        <numerusform>%1는(가) 현재 사용 중 입니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -3973,7 +3973,7 @@ to %1</source>
     </message>
     <message>
       <source>Screen Recording</source>
-      <translation>화면 저장 중</translation>
+      <translation>화면 녹화</translation>
     </message>
     <message>
       <source>Notifications</source>
@@ -4020,15 +4020,15 @@ to %1</source>
     </message>
     <message>
       <source>Saved Sessions</source>
-      <translation>세션 저장</translation>
+      <translation>저장된 세션</translation>
     </message>
     <message>
       <source>Auto-Discovered Servers</source>
-      <translation>서버 자동 검색</translation>
+      <translation>자동 검색된 서버</translation>
     </message>
     <message>
       <source>* Last used connection *</source>
-      <translation>*마지막 사용 서버 연결*</translation>
+      <translation>*마지막으로 사용한 연결*</translation>
     </message>
     <message>
       <source>%1 at %2</source>
@@ -4155,7 +4155,7 @@ to %1</source>
     </message>
     <message>
       <source>Dewarping</source>
-      <translation>디와핑</translation>
+      <translation>디워핑</translation>
     </message>
     <message>
       <source>Create Zoom Window</source>
@@ -4229,7 +4229,7 @@ to %1</source>
     </message>
     <message>
       <source>Testing...</source>
-      <translation>시험...</translation>
+      <translation>확인 중...</translation>
     </message>
     <message>
       <source>Merging Systems...</source>
@@ -4253,7 +4253,7 @@ to %1</source>
     </message>
     <message>
       <source>You are about to merge the current System %1 with System</source>
-      <translation>현재 시스템 %1 시스템으로 병합 하려고 합니다.</translation>
+      <translation>현재 시스템인 %1 시스템에 아래 시스템을 병합하려고 합니다.</translation>
     </message>
     <message>
       <source>This is the current System URL.</source>
@@ -4303,7 +4303,7 @@ to %1</source>
     <name>QnNavigationItem</name>
     <message>
       <source>Speed Down</source>
-      <translation>속도 감소</translation>
+      <translation>재생 속도 감소</translation>
     </message>
     <message>
       <source>Previous Frame</source>
@@ -4311,7 +4311,7 @@ to %1</source>
     </message>
     <message>
       <source>Speed Up</source>
-      <translation>속도 증가</translation>
+      <translation>재생 속도 증가</translation>
     </message>
     <message>
       <source>Next Frame</source>
@@ -4460,15 +4460,15 @@ to %1</source>
     <name>QnPermissionsWidget</name>
     <message>
       <source>Edit camera settings</source>
-      <translation>카메라 설정 변경</translation>
+      <translation>카메라 설정 편집</translation>
     </message>
     <message>
       <source>This is also required to create/edit PTZ presets and tours.</source>
-      <translation>PTZ preset/ 투어 설정및 변경 이 필요합니다.</translation>
+      <translation>PTZ 사전 설정과 투어를 생성/편집하려면 이 기능을 활성화 하십시오.</translation>
     </message>
     <message>
       <source>Control video walls</source>
-      <translation>비디오 월 조정</translation>
+      <translation>비디오 월 제어</translation>
     </message>
     <message>
       <source>View event log</source>
@@ -4476,19 +4476,19 @@ to %1</source>
     </message>
     <message>
       <source>View archive</source>
-      <translation>백업 보기</translation>
+      <translation>아카이브 보기</translation>
     </message>
     <message>
       <source>Export archive</source>
-      <translation>백업 내보내기</translation>
+      <translation>아카이브 내보내기</translation>
     </message>
     <message>
       <source>View bookmarks</source>
-      <translation>북마크보기</translation>
+      <translation>즐겨찾기 보기</translation>
     </message>
     <message>
       <source>Modify bookmarks</source>
-      <translation>북마크 수정</translation>
+      <translation>즐겨찾기 수정</translation>
     </message>
     <message>
       <source>User Input</source>
@@ -4720,7 +4720,7 @@ to %1</source>
     <name>QnRecordingStats</name>
     <message>
       <source>Cameras from other servers and removed cameras</source>
-      <translation>Cameras from other servers and removed cameras</translation>
+      <translation>타서버 카메라 및 제거된 카메라 사용량</translation>
     </message>
     <message numerus="yes">
       <source>Total %1 %n devices</source>
@@ -4748,11 +4748,11 @@ to %1</source>
     <name>QnRecordingStatsModel</name>
     <message>
       <source>Space</source>
-      <translation>여유공간</translation>
+      <translation>사용량</translation>
     </message>
     <message>
       <source>Calendar Days</source>
-      <translation>달력일수</translation>
+      <translation>저장기간</translation>
     </message>
     <message>
       <source>%1 Mbps</source>
@@ -4776,7 +4776,7 @@ to %1</source>
     </message>
     <message>
       <source>Current Bitrate</source>
-      <translation>현재 비트 레이트</translation>
+      <translation>전송률</translation>
     </message>
   </context>
   <context>
@@ -4856,7 +4856,7 @@ to %1</source>
     </message>
     <message>
       <source>Showreels</source>
-      <translation>Showreels</translation>
+      <translation>쇼릴</translation>
     </message>
     <message>
       <source>Video Walls</source>
@@ -4864,7 +4864,7 @@ to %1</source>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation>웹페이지:</translation>
+      <translation>웹페이지</translation>
     </message>
     <message>
       <source>Users</source>
@@ -4880,7 +4880,7 @@ to %1</source>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation>카메라 및 리소스</translation>
+      <translation>카메라 &amp; 장치</translation>
     </message>
   </context>
   <context>
@@ -4917,7 +4917,7 @@ to %1</source>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation>웹페이지:</translation>
+      <translation>웹페이지</translation>
     </message>
     <message>
       <source>Cameras &amp; Resources</source>
@@ -4945,15 +4945,15 @@ to %1</source>
     </message>
     <message>
       <source>Showreels</source>
-      <translation>Showreels</translation>
+      <translation>쇼릴</translation>
     </message>
     <message>
       <source>Showreel</source>
-      <translation>Showreel</translation>
+      <translation>쇼릴</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation>카메라 및 리소스</translation>
+      <translation>카메라 &amp; 장치</translation>
     </message>
     <message>
       <source>Videowalls</source>
@@ -5013,7 +5013,7 @@ to %1</source>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>Export Bookmark...</source>
-      <translation>북마크 내보내기</translation>
+      <translation>즐겨찾기 내보내기</translation>
     </message>
     <message>
       <source>No bookmarks</source>
@@ -5025,7 +5025,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation>북마크 내보내기</translation>
+      <translation>즐겨찾기 내보내기</translation>
     </message>
   </context>
   <context>
@@ -5299,11 +5299,11 @@ to %1</source>
     </message>
     <message>
       <source>Watermark Not Found</source>
-      <translation>영상 변조를 찾을 수 없습니다</translation>
+      <translation>워터마크를 찾을 수 없습니다.</translation>
     </message>
     <message>
       <source>Watermark Matched</source>
-      <translation>변조되지 않은 데이터</translation>
+      <translation>워터마크가 확인되었습니다.</translation>
     </message>
   </context>
   <context>
@@ -5342,7 +5342,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter a short System description here.</source>
-      <translation>여기에 짧게 시스템 설명을 입력 하세요</translation>
+      <translation>여기에 간단한 시스템 설명을 입력하십시오.</translation>
     </message>
   </context>
   <context>
@@ -5377,7 +5377,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter a short System description here.</source>
-      <translation>여기에 짧게 시스템 설명을 입력 하세요</translation>
+      <translation>여기에 간단한 시스템 설명을 입력하십시오.</translation>
     </message>
   </context>
   <context>
@@ -6205,7 +6205,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Export video</source>
-      <translation>영상 백업</translation>
+      <translation>영상 내보내기</translation>
     </message>
     <message>
       <source>Adjust device settings</source>
@@ -6217,7 +6217,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Control Video Walls</source>
-      <translation>비디오 월 조정</translation>
+      <translation>비디오 월 제어</translation>
     </message>
   </context>
   <context>
@@ -6432,12 +6432,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 belong to this system only and are fully managed by system administrators.</source>
       <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
-      <translation>%1 은이 시스템에만 속하며 시스템 관리자가 전적으로 관리합니다.</translation>
+      <translation>%1 은(는) 시스템에만 속하며 시스템 관리자가 전적으로 관리합니다.</translation>
     </message>
     <message>
       <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
       <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
-      <translation>%1 은 여러 시스템에 액세스 할 수 있습니다. 관리자는 자신의 권한 만 관리 할 수 ​​있습니다.</translation>
+      <translation>%1 은(는) 여러 시스템에 접속 할 수 있습니다. 관리자는 자신의 권한만 관리 할 수 ​​있습니다.</translation>
     </message>
   </context>
   <context>
@@ -6548,11 +6548,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchBookmarksHandler</name>
     <message>
       <source>Bookmark</source>
-      <translation>북마크</translation>
+      <translation>즐겨찾기</translation>
     </message>
     <message>
       <source>Bookmarks can only be added to an online server.</source>
-      <translation>북마크는 활성화된 서버에만 추가 됩니다.</translation>
+      <translation>즐겨찾기는 활성화된 서버에만 추가 됩니다.</translation>
     </message>
     <message>
       <source>Server offline</source>
@@ -6849,7 +6849,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Activate License...</source>
-      <translation>라이센스 활성화...</translation>
+      <translation>인증키 활성화...</translation>
     </message>
   </context>
   <context>
@@ -7171,16 +7171,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Overwrite existing showreel?</source>
-      <translation>기존 showreel을 덮어 쓰시겠습니까?</translation>
+      <translation>기존 쇼릴을 덮어 쓰시겠습니까?</translation>
     </message>
     <message>
       <source>There is another showreel with the same name.</source>
-      <translation>같은 이름을 가진 다른 showreel이 있다.</translation>
+      <translation>같은 이름을 가진 다른 쇼릴이 있다.</translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
       <translation>
-        <numerusform>Showreel에서 %n 아이템을 삭제 하시겠습니까?</numerusform>
+        <numerusform>쇼릴에서 %n 아이템을 삭제 하시겠습니까?</numerusform>
       </translation>
     </message>
     <message>
@@ -7249,7 +7249,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Medium</source>
-      <translation>일반화</translation>
+      <translation>중간</translation>
     </message>
     <message>
       <source>High</source>
@@ -7257,7 +7257,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Best</source>
-      <translation>최고</translation>
+      <translation>최상</translation>
     </message>
     <message>
       <source>Preset</source>
@@ -7389,7 +7389,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Any time</source>
-      <translation>아무때나</translation>
+      <translation>모든 시간</translation>
     </message>
     <message>
       <source>none</source>
@@ -7589,11 +7589,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraInfoWidget</name>
     <message>
       <source>Device Rules</source>
-      <translation>장치 설정</translation>
+      <translation>장치 규칙</translation>
     </message>
     <message>
       <source>Camera Rules</source>
-      <translation>카메라 설정</translation>
+      <translation>카메라 규칙</translation>
     </message>
     <message>
       <source>I/O Module Rules</source>
@@ -7712,11 +7712,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion</source>
-      <translation>움직임</translation>
+      <translation>모션</translation>
     </message>
     <message>
       <source>Fisheye</source>
-      <translation>Fisheye</translation>
+      <translation>어안카메라</translation>
     </message>
     <message>
       <source>Advanced</source>
@@ -7795,7 +7795,7 @@ If you intended to move analytics data to another storage location, please conta
       <source>%1 are used</source>
       <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
       <translation>
-        <numerusform>%1 이 사용됩니다</numerusform>
+        <numerusform>%1 이(가) 사용됩니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8042,7 +8042,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Motion</source>
       <comment>Motion tab title</comment>
-      <translation>움직임</translation>
+      <translation>모션</translation>
     </message>
     <message>
       <source>Bookmarks</source>
@@ -8159,15 +8159,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Export Settings</source>
-      <translation>설정 내보내기</translation>
+      <translation>내보내기 설정</translation>
     </message>
     <message>
       <source>Add Timestamp</source>
-      <translation>시간표시 추가</translation>
+      <translation>타임스탬프 추가</translation>
     </message>
     <message>
       <source>Delete Timestamp</source>
-      <translation>시간표시 삭제</translation>
+      <translation>타임스탬프 제거</translation>
     </message>
     <message>
       <source>Timestamp</source>
@@ -8175,11 +8175,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Add Image</source>
-      <translation>그림 추가</translation>
+      <translation>이미지 추가</translation>
     </message>
     <message>
       <source>Delete Image</source>
-      <translation>그림 삭제</translation>
+      <translation>이미지 삭제</translation>
     </message>
     <message>
       <source>Image</source>
@@ -8203,15 +8203,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Add Bookmark Info</source>
-      <translation>책갈피 정보 추가</translation>
+      <translation>즐겨찾기 정보 추가</translation>
     </message>
     <message>
       <source>Delete Bookmark Info</source>
-      <translation>책갈피 정보 삭제</translation>
+      <translation>즐겨찾기 정보 삭제</translation>
     </message>
     <message>
       <source>Bookmark Info</source>
-      <translation>책갈피 정보</translation>
+      <translation>즐겨찾기 정보</translation>
     </message>
     <message>
       <source>exported</source>
@@ -8484,7 +8484,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::MotionSearchListModel::Private</name>
     <message>
       <source>Motion</source>
-      <translation>움직임</translation>
+      <translation>모션</translation>
     </message>
     <message>
       <source>deleted camera</source>
@@ -8786,7 +8786,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Browse for Update File</source>
-      <translation>업데이트 파일에 대 한 탐색</translation>
+      <translation>업데이트 파일 찾아보기</translation>
     </message>
     <message>
       <source>Update from mediaservers</source>
@@ -9131,7 +9131,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ScheduleSettingsWidget</name>
     <message>
       <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
-      <translation>품질 설정은 압축률 만 판단하며 해상도에는 영향을 미치지 않습니다. 낮음, 중간, 높음 및 최상은 사전 설정된 비트 전송률 값입니다.</translation>
+      <translation>품질 설정은 압축률만 결정하며 해상도에는 영향을 미치지 않습니다. 낮음, 중간, 높음, 최상은 사전 설정된 비트 전송률 값입니다.</translation>
     </message>
     <message>
       <source>Mbit/s</source>
@@ -9139,11 +9139,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Less Settings</source>
-      <translation>적은 설정</translation>
+      <translation>설정 더보기 접기</translation>
     </message>
     <message>
       <source>More Settings</source>
-      <translation>더 많은 설정</translation>
+      <translation>설정 더보기</translation>
     </message>
     <message>
       <source>Motion detection is disabled or not supported</source>
@@ -9337,7 +9337,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::SimpleMotionSearchListModel</name>
     <message>
       <source>Motion</source>
-      <translation>움직임</translation>
+      <translation>모션</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -9458,11 +9458,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
-      <translation>긴</translation>
+      <translation>자세한 날짜</translation>
     </message>
     <message>
       <source>Short</source>
-      <translation>짧은</translation>
+      <translation>간단한 날짜</translation>
     </message>
   </context>
   <context>
@@ -9554,7 +9554,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Exporting video</source>
-      <translation>비디오 백업</translation>
+      <translation>영상 내보내기</translation>
     </message>
     <message>
       <source>Stop Export</source>
@@ -9694,7 +9694,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ui::LayoutTourDropPlaceholder</name>
     <message>
       <source>Drag layout or camera here to add it to the showreel</source>
-      <translation>레이아웃 또는 카메라를 여기로 드래그하여 쇼 릴에 추가하십시오.</translation>
+      <translation>레이아웃 또는 카메라를 여기로 드래그하여 쇼릴에 추가하십시오.</translation>
     </message>
   </context>
   <context>
@@ -9762,7 +9762,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Stop Showreel</source>
-      <translation>Showreel 중지</translation>
+      <translation>쇼릴 중지</translation>
     </message>
     <message>
       <source>Start Tour</source>
@@ -9770,7 +9770,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Start Showreel</source>
-      <translation>Showreel 시작</translation>
+      <translation>쇼릴 시작</translation>
     </message>
   </context>
   <context>
@@ -10058,7 +10058,7 @@ Server Settings (서버 설정) 대화 상자의 &quot;Storage Management (스�
     <name>nx::vms::client::desktop::ui::workbench::LayoutTourExecutor</name>
     <message>
       <source>Use keyboard arrows to switch layouts. To exit the showreel press Esc.</source>
-      <translation>키보드 화살표를 사용하여 레이아웃을 전환하십시오. showreel을 종료하려면 Esc 키를 누릅니다.</translation>
+      <translation>키보드 화살표를 사용하여 레이아웃을 전환하십시오. 쇼릴을 종료하려면 Esc 키를 누릅니다.</translation>
     </message>
     <message>
       <source>Press any key to stop the tour.</source>
@@ -10087,15 +10087,15 @@ Server Settings (서버 설정) 대화 상자의 &quot;Storage Management (스�
     <name>nx::vms::client::desktop::ui::workbench::LayoutToursHandler</name>
     <message>
       <source>Showreel</source>
-      <translation>Showreel</translation>
+      <translation>쇼릴</translation>
     </message>
     <message>
       <source>Showreel %1</source>
-      <translation>Showreel %1</translation>
+      <translation>쇼릴 %1</translation>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation>Delete Showreel %1?</translation>
+      <translation>Delete 쇼릴%1?</translation>
     </message>
   </context>
   <context>

@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.3.428",
+    "version": "4.1.3.501",
     "data": [
         {
             "keys": [
@@ -1136,7 +1136,8 @@
                 "dw-enhd16|vc",
                 "general|dr-tw2516a",
                 "network digital video|b1210dm",
-                "acti|v31"
+                "acti|v31",
+                "*|UL-DVR302-16Z"
             ],
             "analogEncoder": true
         },
@@ -1320,7 +1321,8 @@
                 "AXIS|AXISC3003E",
                 "AXIS|AXISA9161",
                 "AXIS|AXISC1004E",
-                "AXIS|AXISC8033"
+                "AXIS|AXISC8033",
+		"AXIS|AXISC1310*"
             ],
             "noVideoSupport": true
         },
@@ -1537,7 +1539,8 @@
                 "HIKVISION|DS-2TD1217*",
                 "HIKVISION|DFI6256A",
                 "hikvision|DS-2CD2955FWD*",
-                "HIKVISION|DS-2CD2135FWD*"
+                "HIKVISION|DS-2CD2135FWD*",
+                "HIKVISION|DS-2CD2555FWD*"
             ],
             "pullInputEventsAsOdm": true
         },
@@ -1568,7 +1571,8 @@
                 "HIKVISION|DS-2TD1217*",
                 "HIKVISION|DFI6256A",
                 "hikvision|DS-2CD2955FWD*",
-                "HIKVISION|DS-2CD2135FWD*"
+                "HIKVISION|DS-2CD2135FWD*",
+                "HIKVISION|DS-2CD2555FWD*"
             ],
             "parseOnvifNotificationsWithHttpReader": true
         },
@@ -4319,6 +4323,12 @@
             }
         },
         {
+            "keys": [
+                "Hikvision|DS-9664NI-I16"
+            ],
+            "fetchVideoSourceConfigurationsViaProfiles": true
+        },
+        {
             "_comment1": "Mapped for V5.2.2 build 171214",
             "keys": [
                 "HIKVISION|DS-MH6171I*"
@@ -4449,6 +4459,34 @@
                          "space": "35MmEquiv"
                      }
                  }
+            }
+        },
+	{
+            "_comment1": "Mapping for firmware: 41.7.0.73",
+            "keys": [
+                "Milesight*|MS-C2961-REPB"
+            ],
+            "useOnvifPtz": true,
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [ 0, 360 ]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [-45, 30]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0.083, 0.200, 1.00],
+                        "logical": [1.00 , 2.253, 12.1],
+                        "logicalMultiplier": 37,
+                        "space": "35MmEquiv"
+                    }
+                }
             }
         }
     ]

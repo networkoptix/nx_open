@@ -13,7 +13,6 @@
 #include <nx/kit/utils.h>
 #include <nx/utils/log/log.h>
 
-#include "components/value_item.h"
 #include "components/group.h"
 #include "components/section.h"
 #include "components/repeater.h"
@@ -25,7 +24,9 @@ namespace {
 
 using namespace components;
 
-QString processItemTemplateString(QString str, const int index, const int depth)
+static const nx::utils::log::Tag kLogTag{typeid(JsonEngine)};
+
+static QString processItemTemplateString(QString str, const int index, const int depth)
 {
     QString result;
 
@@ -147,7 +148,7 @@ QString processItemTemplateString(QString str, const int index, const int depth)
     return result;
 }
 
-QJsonValue processItemTemplate(const QJsonValue& value, const int index, const int depth)
+static QJsonValue processItemTemplate(const QJsonValue& value, const int index, const int depth)
 {
     switch (value.type())
     {
@@ -184,7 +185,7 @@ QJsonValue processItemTemplate(const QJsonValue& value, const int index, const i
     return value;
 }
 
-std::unique_ptr<Item> createItem(
+static std::unique_ptr<Item> createItem(
     JsonEngine* engine, Item* parent, const QJsonObject& itemObject, int repeaterDepth)
 {
     QString type = itemObject["type"].toString();
@@ -192,7 +193,7 @@ std::unique_ptr<Item> createItem(
     {
         if (!parent)
         {
-            // For the top-level Item of a Settings model, the field "type" is optional.
+            // For the top-level Item of a Settings Model, the field "type" is optional.
             type = "Settings";
         }
         else
@@ -245,7 +246,7 @@ std::unique_ptr<Item> createItem(
             }
 
             if (!property.write(item, value.toVariant()))
-                NX_WARNING(NX_SCOPE_TAG, "Cannot write value %1 to property %2", value, key);
+                NX_WARNING(kLogTag, "Cannot write value %1 to property \"%2\".", value, key);
         };
 
     for (auto it = itemObject.begin(); it != itemObject.end(); ++it)
@@ -254,8 +255,10 @@ std::unique_ptr<Item> createItem(
 
         if (key == QStringLiteral("value"))
         {
-            engine->addIssue(Issue(Issue::Type::warning, Issue::Code::parseError,
-                "Settings model should not contain values."));
+            // In VMS v4.0 Analytics Plugin, the "value" field was sometimes present in the
+            // Settings Models in Manifests, thus, for compatibility with such plugins, no Issue
+            // is raised here, just a warning is logged.
+            NX_WARNING(kLogTag, "Settings Model contains a \"value\" field; ignored.");
             continue;
         }
 
@@ -269,7 +272,7 @@ std::unique_ptr<Item> createItem(
         if (repeater && key == QStringLiteral("items"))
         {
             engine->addIssue(Issue(Issue::Type::error, Issue::Code::parseError,
-                "Repeater cannot have \"items\". Use \"template\" instead."));
+                "Repeater cannot have \"items\"; use \"template\" instead."));
             return {};
         }
 

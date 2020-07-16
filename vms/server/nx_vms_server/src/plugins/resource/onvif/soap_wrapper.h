@@ -545,10 +545,11 @@ public:
     {
         return SoapErrorHelper::fetchDescription(m_wrapper.soap()->fault);
     }
-    CameraDiagnostics::RequestFailedResult requestFailedResult() const
+    CameraDiagnostics::RequestFailedResult requestFailedResult(const QString& errorText = "") const
     {
         return CameraDiagnostics::RequestFailedResult(
-            QString(requestFunctionName()), soapErrorAsString());
+            QString(requestFunctionName()),
+            errorText.isEmpty() ? soapErrorAsString() : errorText);
     }
 
     operator bool() const noexcept { return soapError() == SOAP_OK; }

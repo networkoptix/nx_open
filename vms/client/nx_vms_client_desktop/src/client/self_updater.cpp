@@ -111,7 +111,10 @@ SelfUpdater::SelfUpdater(const QnStartupParameters& startupParams) :
             osCheck(Operation::UpdateMinilauncher, updateMinilauncher());
     }
 
-    /* If we are already in self-update mode, just exit in any case. */
+    // Update shortcuts for the current user / all users depending on the given access rights.
+    updateMinilauncherIcons(startupParams.selfUpdateMode);
+
+    // If we are already in self-update mode, just exit in any case.
     if (startupParams.selfUpdateMode)
         return;
 
@@ -385,8 +388,6 @@ bool SelfUpdater::updateMinilauncher()
     for (const QString& installRoot: QnClientInstallationsManager::clientInstallRoots())
         success &= updateMinilauncherInDir(installRoot, sourceMinilauncherPath);
 
-    success &= updateMinilauncherDesktopIcon();
-
     return success;
 }
 
@@ -658,61 +659,136 @@ bool SelfUpdater::updateApplauncherDesktopIcon()
     return true;
 }
 
-bool SelfUpdater::updateMinilauncherDesktopIcon()
+void SelfUpdater::updateMinilauncherIcons(bool hasAdminRights)
 {
-    bool success = true;
-
     #if defined(Q_OS_WIN)
         // WIX installer creates a shortcut with icon placed in "%SystemRoot%\Installer\{GUID}\".
         // Instead of that we want to use an icon from our minilauncher binary, so it will be updated.
 
-        const QStringList shortcutDirs = {
-            QStandardPaths::writableLocation(QStandardPaths::DesktopLocation),
-            QDir::fromNativeSeparators(QString::fromLocal8Bit(qgetenv("public"))) + "/Desktop"};
+        NX_VERBOSE(this, "Updating desktop shortcuts");
+
+        const QString shortcutDir = hasAdminRights
+            ? QDir::fromNativeSeparators(QString::fromLocal8Bit(qgetenv("public"))) + "/Desktop"
+            : QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+
+        NX_VERBOSE(this, "Desktop path: %1", shortcutDir);
 
         const QStringList prefixes = QnClientInstallationsManager::clientInstallRoots();
         const QString suffix = QnClientAppInfo::minilauncherBinaryName();
 
-        for (const auto& dirPath: shortcutDirs)
+        bool updated = false;
+
+        const QDir dir(shortcutDir);
+        for (const auto& entry: dir.entryInfoList({"*.lnk"}, QDir::Files))
         {
-            // Iterate over existing shortcuts.
-            const QDir dir(dirPath);
-            for (const auto& entry: dir.entryInfoList({"*.lnk"}, QDir::Files))
-            {
-                // Acquire shortcut data.
-                auto info = qnPlatform->shortcuts()->getShortcutInfo(
-                    entry.absolutePath(),
-                    entry.completeBaseName());
+            NX_VERBOSE(this, "Shortcut found: %1. Acquiring shortcut parameters.",
+                entry.absoluteFilePath());
 
-                // Check if the shortcut points to some minilauncher binary.
-                const bool shortcutToLauncher = std::any_of(prefixes.begin(), prefixes.end(),
-                    [filePath = info.sourceFile](auto& prefix)
-                    {
-                        return filePath.startsWith(prefix, Qt::CaseInsensitive);
-                    })
-                    && info.sourceFile.endsWith(suffix, Qt::CaseInsensitive);
+            // Acquire shortcut data.
+            auto info = qnPlatform->shortcuts()->getShortcutInfo(
+                entry.absolutePath(),
+                entry.completeBaseName());
 
-                // Additional check. We don't want to change VideoWall icons or user-chosen icons.
-                if (shortcutToLauncher
-                    && (info.iconPath.contains("/Windows/Installer/", Qt::CaseInsensitive)
-                        || info.iconPath.contains("%SystemRoot%/Installer/", Qt::CaseInsensitive)))
+            // Check if the shortcut points to some minilauncher binary.
+            const bool shortcutToLauncher = std::any_of(prefixes.begin(), prefixes.end(),
+                [filePath = info.sourceFile](auto& prefix)
                 {
-                    NX_INFO(this, "Updating icon for shortcut", entry.absoluteFilePath());
-                    NX_INFO(this, "Previous icon location:", info.iconPath);
+                    return filePath.startsWith(prefix, Qt::CaseInsensitive);
+                })
+                && info.sourceFile.endsWith(suffix, Qt::CaseInsensitive);
 
-                    // Overwrite the shortcut.
-                    // This call clears shortcut icon, so the target binary icon will be used.
-                    success &= qnPlatform->shortcuts()->createShortcut(
-                        info.sourceFile,
-                        entry.absolutePath(),
-                        entry.completeBaseName(),
-                        info.arguments);
-                }
+            // Additional check. We don't want to change VideoWall icons or user-chosen icons.
+            if (shortcutToLauncher
+                && (info.iconPath.contains("/Windows/Installer/", Qt::CaseInsensitive)
+                    || info.iconPath.contains("%SystemRoot%/Installer/", Qt::CaseInsensitive)))
+            {
+                NX_INFO(this, "Updating icon for shortcut at %1", entry.absoluteFilePath());
+                NX_INFO(this, "Previous icon location: %1", info.iconPath);
+
+                // Overwrite the shortcut.
+                // This call clears shortcut icon, so the target binary icon will be used.
+                bool success = qnPlatform->shortcuts()->createShortcut(
+                    info.sourceFile,
+                    entry.absolutePath(),
+                    entry.completeBaseName(),
+                    info.arguments);
+                NX_INFO(this, "Success: %1", success);
+
+                updated = true;
+            }
+            else
+            {
+                NX_VERBOSE(this, "Shortcut should not be updated");
             }
         }
-    #endif // defined(Q_OS_WIN)
 
-    return success;
+        if (hasAdminRights)
+        {
+            // Start menu shortcut is created by our installer as Advertised (or Windows Installer)
+            // shortcut, which points to an icon somewhere in /Windows/Installer/ folder instead of
+            // our launcher binary. As result, we can find the shortcut only by its own path.
+
+            const QString shortcutName = nx::utils::AppInfo::vmsName();
+            const QString shortcutPath = nx::format(
+                "%1/Microsoft/Windows/Start Menu/Programs/%2",
+                QDir::fromNativeSeparators(QString::fromLocal8Bit(qgetenv("programdata"))),
+                nx::utils::AppInfo::organizationName());
+
+            const QString shortcutFilePath = shortcutPath + "/" + shortcutName + ".lnk";
+            if (QFile::exists(shortcutFilePath))
+            {
+                NX_VERBOSE(this, "Start menu shortcut is found at %1", shortcutFilePath);
+
+                // Acquire shortcut data.
+                const auto info = qnPlatform->shortcuts()->getShortcutInfo(shortcutPath, shortcutName);
+                const auto target = QnClientInstallationsManager::miniLauncher().absoluteFilePath();
+
+                if (info.iconPath.contains("/Windows/Installer/", Qt::CaseInsensitive)
+                    || info.iconPath.contains("%SystemRoot%/Installer/", Qt::CaseInsensitive))
+                {
+                    NX_INFO(this, "Updating menu shortcut at %1", shortcutFilePath);
+                    NX_INFO(this, "Redirecting shortcut to %1", target);
+                    bool success = qnPlatform->shortcuts()->createShortcut(
+                        target,
+                        shortcutPath,
+                        shortcutName,
+                        info.arguments);
+                    NX_INFO(this, "Success: %1", success);
+
+                    updated = true;
+                }
+                else
+                {
+                    NX_VERBOSE(this, "Shortcut is updated already");
+                }
+            }
+            else
+            {
+                NX_VERBOSE(this, "Start menu shortcut is not found at %1", shortcutFilePath);
+            }
+        }
+        else
+        {
+            NX_VERBOSE(this, "Start menu shortcut wouldn't be updated without admin rights");
+        }
+
+        if (updated)
+        {
+            // Explorer caches program icons, so it doesn't need to parse binaries repeatedly.
+            // Unfortunatelly, it doesn't make an icon obsolete when the original file is updated.
+            // There are two ways to clear this cache: either delete iconcache database,
+            // which may be located in at least three different locations (Win 7 / 8 / 10)
+            // and may be inaccessible for writing while the Explorer is running,
+            // or execute the "Internet Explorer Per-User Initialization Utility", which is not
+            // well documented and whose arguments differs from version to version, but at least
+            // which does not require Explorer restart to work.
+
+            QProcess::startDetached("ie4uinit", {"-show"}); // Windows 10.
+            QProcess::startDetached("ie4uinit", {"-ClearIconCache"}); // Other versions.
+        }
+
+        NX_VERBOSE(this, "Shortcut update finished");
+    #endif // defined(Q_OS_WIN)
 }
 
 } // namespace client

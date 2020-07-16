@@ -4,7 +4,6 @@
 
 #include <nx/sdk/interface.h>
 #include <nx/sdk/i_string.h>
-#include <nx/sdk/i_plugin.h>
 
 namespace nx {
 namespace sdk {

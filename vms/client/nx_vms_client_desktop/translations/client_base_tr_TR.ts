@@ -1305,7 +1305,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation>Lisans Anahtarını manuel olarak etkinleştirmek için lütfen %1iletişime geçin %1.</translation>
+      <translation>Lisans Anahtarını manuel olarak etkinleştirmek için lütfen %1 iletişime geçin.</translation>
     </message>
     <message>
       <source>Network error</source>

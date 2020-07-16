@@ -82,7 +82,7 @@
     </message>
     <message>
       <source>Vendor</source>
-      <translation>Gyártó:</translation>
+      <translation>Gyártó</translation>
     </message>
     <message>
       <source>Camera stream</source>
@@ -127,9 +127,9 @@
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Elérte a maximális pontszámot (%n pont).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+        <numerusform>Elérte a maximális pontot (%n pont).</numerusform>
       </translation>
     </message>
     <message>
@@ -211,9 +211,9 @@
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Elérte a maximális pontot (%n pont).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+        <numerusform>Elérte a maximális pontszámot (%n pont).</numerusform>
       </translation>
     </message>
   </context>

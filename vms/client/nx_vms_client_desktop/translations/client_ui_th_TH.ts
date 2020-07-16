@@ -952,7 +952,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/dialogs/connecting_to_server_dialog.ui"/>
       <source>Connecting...</source>
-      <translation>กำลังเชื่อมต่อ ...</translation>
+      <translation>กำลังเชื่อมต่อ...</translation>
     </message>
   </context>
   <context>

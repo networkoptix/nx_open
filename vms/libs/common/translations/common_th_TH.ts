@@ -87,7 +87,7 @@
       <source>Petabyte(s)</source>
       <comment>Full suffix for displaying petabytes</comment>
       <translation>
-        <numerusform>petabyte (s)</numerusform>
+        <numerusform>Petabyte (s)</numerusform>
       </translation>
     </message>
   </context>

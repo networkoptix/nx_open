@@ -14,16 +14,21 @@
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/rest/utils.h>
 
-#include <nx/vms/api/analytics/settings_response.h>
+#include <nx/vms/api/analytics/analytics_engine_settings_data.h>
 
 namespace nx::vms::server::rest {
 
 using namespace nx::network;
 
+using SettingsResponse = analytics::SettingsResponse;
+
 namespace {
 
-JsonRestResponse makeSettingsResponse(const analytics::SettingsResponse& settingsResponse)
+JsonRestResponse makeSettingsResponse(const SettingsResponse& settingsResponse)
 {
+    if (settingsResponse.error.code == SettingsResponse::Error::Code::wrongSettingsModel)
+        return makeResponse(QnRestResult::Error::BadRequest, "Wrong settings model id");
+
     nx::vms::api::analytics::EngineSettingsResponse response;
 
     response.settingsValues = settingsResponse.values;
@@ -70,14 +75,6 @@ JsonRestResponse AnalyticsEngineSettingsHandler::executePost(
     const JsonRestRequest& request,
     const QByteArray& body)
 {
-    if (!request.params.contains(kAnalyticsEngineIdParameter))
-    {
-        NX_WARNING(this, "Missing required parameter 'analyticsEngineId'");
-        return makeResponse(
-            QnRestResult::Error::MissingParameter,
-            QStringList{kAnalyticsEngineIdParameter});
-    }
-
     bool success = false;
     const auto& settingsRequest = QJson::deserialized(body, QJsonObject(), &success);
     if (!success)
@@ -87,7 +84,21 @@ JsonRestResponse AnalyticsEngineSettingsHandler::executePost(
         return makeResponse(QnRestResult::Error::BadRequest, message);
     }
 
-    const auto engineId = request.params[kAnalyticsEngineIdParameter];
+    QString engineId;
+    if (request.params.contains(kAnalyticsEngineIdParameter))
+        engineId = request.params[kAnalyticsEngineIdParameter];
+
+    if (settingsRequest.contains(kAnalyticsEngineIdParameter))
+        engineId = settingsRequest[kAnalyticsEngineIdParameter].toString();
+
+    if (engineId.isEmpty())
+    {
+        NX_WARNING(this, "Missing required parameter 'analyticsEngineId'");
+        return makeResponse(
+            QnRestResult::Error::MissingParameter,
+            QStringList{kAnalyticsEngineIdParameter});
+    }
+
     auto engine = sdk_support::find<resource::AnalyticsEngineResource>(serverModule(), engineId);
     if (!engine)
     {

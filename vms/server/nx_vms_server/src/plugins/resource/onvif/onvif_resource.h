@@ -693,10 +693,11 @@ private:
 
     bool getVideoEncoder1Tokens(BaseSoapWrapper& soapWrapper,
         const std::vector<onvifXsd__VideoEncoderConfiguration*>& configurations,
-        QStringList* tokenList);
+        QStringList* outTokenList,
+        QString* outErrorText);
     bool getVideoEncoder2Tokens(BaseSoapWrapper& soapWrapper,
         const std::vector<onvifXsd__VideoEncoder2Configuration*>& configurations,
-        QStringList* tokenList);
+        QStringList* outTokenList);
 
     QString getInputPortNumberFromString(const QString& portName);
     QnAudioTransmitterPtr initializeTwoWayAudioByResourceData();

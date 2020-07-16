@@ -144,39 +144,6 @@ DeviceAgent::~DeviceAgent()
  */
 std::string DeviceAgent::manifestString() const
 {
-    static const std::string kOverriddenDeviceAgentSettingsModel = R"json(,
-    "deviceAgentSettingsModel": {
-        "type": "Settings",
-        "items": [
-            {
-                "type": "GroupBox",
-                "caption": "Overridden DeviceAgent settings",
-                "items": [
-                    {
-                        "type": "CheckBox",
-                        "name": "overridenCheckBox",
-                        "caption": "Checkbox from overridden settings model",
-                        "defaultValue": true
-                    },
-                    {
-                        "type": "TextField",
-                        "name": "overridenTextField",
-                        "caption": "Text field from overridden settings model",
-                        "defaultValue": "Overridden text field"
-                    },
-                    {
-                        "type": "SpinBox",
-                        "name": "overridenSpinBox",
-                        "caption": "Spinbox from overridden settings model",
-                        "defaultValue": 50,
-                        "minValue": 0,
-                        "maxValue": 100
-                    }
-                ]
-            }
-        ]
-    })json";
-
     static const std::string kAdditionalEventTypes = R"json(,
         {
             "id": "nx.stub.additionalEvent1",
@@ -238,9 +205,7 @@ std::string DeviceAgent::manifestString() const
           "id": ")json" + kCounterObjectType + R"json(",
           "name": "Counter"
         }
-    ])json"
-        + (ini().overrideSettingsModelInDeviceAgent ? kOverriddenDeviceAgentSettingsModel : "")
-        + R"json(
+    ]
 })json";
 }
 

@@ -335,14 +335,14 @@ bool PluginManager::processPluginEntryPointForNewSdk(
     NX_ASSERT(!pluginInfo->libName.isEmpty());
     if (const auto analyticsPlugin = plugin->queryInterface<nx::sdk::analytics::IPlugin>())
     {
-        const auto plugin = std::make_shared<wrappers::Plugin>(
+        const auto pluginWrapper = std::make_shared<wrappers::Plugin>(
             serverModule(),
             analyticsPlugin,
             pluginInfo->libName);
 
         std::unique_ptr<wrappers::StringBuilder> stringBuilder;
         pluginInfo->mainInterface = MainInterface::nx_sdk_analytics_IPlugin;
-        if (const auto manifest = plugin->manifest(&stringBuilder))
+        if (const auto manifest = pluginWrapper->manifest(&stringBuilder))
         {
             pluginInfo->name = manifest->name;
             pluginInfo->description = manifest->description;
@@ -351,7 +351,7 @@ bool PluginManager::processPluginEntryPointForNewSdk(
         }
         else
         {
-            QString errorDescription = stringBuilder
+            const QString errorDescription = stringBuilder
                 ? lm(": %1").args(stringBuilder->buildPluginInfoString()).toQString()
                 : QString();
 

@@ -78,7 +78,7 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
 {
     m_timer.start();
     m_keepAliveTimer.restart();
-    m_needKeyData.fill(false);
+    m_needKeyData.fill(true);
 }
 
 void QnRtspDataConsumer::setResource(const QnResourcePtr& resource)
