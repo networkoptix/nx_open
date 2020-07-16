@@ -66,16 +66,6 @@ getRuntimeType() # outputVariableName
 
 getRuntimeType RUNTIME
 
-isRpi()
-{
-    if [[ $TARGET_DEVICE == "linux_arm32" ]]
-    then
-        grep '^Hardware.*:.*BCM2835[[:space:]]*$' /proc/cpuinfo &>/dev/null
-    else
-        false
-    fi
-}
-
 isLocalAddr()
 {
     local -r hostname="$1"
@@ -168,6 +158,42 @@ displayCompleteSetupHintIfNeeded()
         db_fset @customization.companyId@-mediaserver/complete-setup-hint seen false
         db_input critical @customization.companyId@-mediaserver/complete-setup-hint || true
         db_go
+    fi
+}
+
+isRpi()
+{
+    grep '^Hardware.*:.*BCM2835[[:space:]]*$' /proc/cpuinfo &>/dev/null
+}
+
+addFfmpegLibLinkIfNeeded()
+{
+    # Clean up ffmpeg lib symlink, if it exists. Do it for all platforms to remove a possible
+    # leftover from a previous installation. After upgrade from old installations containing this
+    # unneeded symlink (up to and including v4.0) is no longer supported, move this line inside the
+    # platfrom-checking `if`.
+    if [[ -L "${BASE_DIR}/lib/ffmpeg" ]]
+    then
+        rm "${BASE_DIR}/lib/ffmpeg"
+    fi
+
+    # Only need the special version of ffmpeg if the platform is linux_arm32.
+    if [[ $TARGET_DEVICE != "linux_arm32" ]]
+    then
+        return
+    fi
+
+    if isRpi
+    then
+        # RPi requires specially compiled ffmpeg with mmal support - for RPi camera.
+        ( cd "${BASE_DIR}/lib"; ln -s ffmpeg-rpi ffmpeg )
+
+        bash "${BASE_DIR}/var/scripts/rpi/cam_setup.sh"
+
+        # Plan a reboot after the package installation. This mark will be processed in install.sh.
+        touch "/var/run/reboot-required"
+    else
+        ( cd "${BASE_DIR}/lib"; ln -s ffmpeg-arm32 ffmpeg )
     fi
 }
 
@@ -295,20 +321,7 @@ systemctl disable apport &>/dev/null || true
 
 systemctl stop apport &>/dev/null || true
 
-[[ -L "${BASE_DIR}/lib/ffmpeg" ]] && unlink "${BASE_DIR}/lib/ffmpeg"
-
-if isRpi
-then
-    # RPi requires specially compiled ffmpeg with mmal support - for RPi camera.
-    ( cd "${BASE_DIR}/lib"; ln -s ffmpeg-rpi ffmpeg )
-
-    bash "${BASE_DIR}/var/scripts/rpi/cam_setup.sh"
-
-    # Plan a reboot after the package installation. This mark will be processed in install.sh.
-    touch "/var/run/reboot-required"
-else
-    ( cd "${BASE_DIR}/lib"; ln -s ffmpeg-arm32 ffmpeg )
-fi
+addFfmpegLibLinkIfNeeded
 
 installModificationSpecificConfig
 
