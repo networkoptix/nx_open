@@ -2588,7 +2588,7 @@ int HanwhaResource::streamFrameRate(Qn::ConnectionRole role, int desiredFps) con
     return closestFrameRate(role, userDefinedFps ? userDefinedFps : desiredFps);
 }
 
-int HanwhaResource::streamGovLength(Qn::ConnectionRole role) const
+int HanwhaResource::streamGovLength(Qn::ConnectionRole role, const QSize& streamResolution) const
 {
     const auto propertyName = role == Qn::ConnectionRole::CR_LiveVideo
         ? kPrimaryStreamGovLengthParamName
@@ -2596,7 +2596,7 @@ int HanwhaResource::streamGovLength(Qn::ConnectionRole role) const
 
     QString govLengthString = getProperty(propertyName);
     if (govLengthString.isEmpty())
-        return defaultGovLengthForStream(role);
+        return defaultGovLengthForStream(streamResolution, mediaCapabilityForRole(role).maxFps);
 
     bool success = false;
     const auto result = fromHanwhaString<int>(govLengthString, &success);
@@ -2721,11 +2721,6 @@ QSize HanwhaResource::defaultResolutionForStream(Qn::ConnectionRole role) const
     return bestSecondaryResolution(resolutions[0], resolutions);
 }
 
-int HanwhaResource::defaultGovLengthForStream(Qn::ConnectionRole role) const
-{
-    return mediaCapabilityForRole(role).maxFps;
-}
-
 Qn::BitrateControl HanwhaResource::defaultBitrateControlForStream(
     Qn::ConnectionRole /*role*/) const
 {
@@ -2807,17 +2802,30 @@ int HanwhaResource::defaultFrameRateForStream(Qn::ConnectionRole role) const
 QString HanwhaResource::defaultValue(const QString& parameter, Qn::ConnectionRole role) const
 {
     if (parameter.endsWith(kEncodingTypeProperty))
+    {
         return toHanwhaString(defaultCodecForStream(role));
+    }
     else if (parameter.endsWith(kResolutionProperty))
+    {
         return toHanwhaString(defaultResolutionForStream(role));
+    }
     else if (parameter.endsWith(kBitrateControlTypeProperty))
+    {
         return toHanwhaString(defaultBitrateControlForStream(role));
+    }
     else if (parameter.endsWith(kGovLengthProperty))
-        return QString::number(defaultGovLengthForStream(role));
+    {
+        return QString::number(defaultGovLengthForStream(
+            defaultResolutionForStream(role), mediaCapabilityForRole(role).maxFps));
+    }
     else if (parameter.endsWith(kCodecProfileProperty))
+    {
         return defaultCodecProfileForStream(role);
+    }
     else if (parameter.endsWith(kEntropyCodingProperty))
+    {
         return toHanwhaString(defaultEntropyCodingForStream(role));
+    }
     else if (parameter.endsWith(kBitrateProperty))
     {
         auto camera = serverModule()->videoCameraPool()->getVideoCamera(toSharedPointer());
@@ -3960,7 +3968,7 @@ HanwhaProfileParameters HanwhaResource::makeProfileParameters(
     const auto codecProfile = streamCodecProfile(codec, role);
     const auto resolution = streamResolution(role);
     const auto frameRate = streamFrameRate(role, parameters.fps);
-    const auto govLength = streamGovLength(role);
+    const auto govLength = streamGovLength(role, parameters.resolution);
     const auto bitrateControl = streamBitrateControl(role); //< cbr/vbr
     const auto bitrate = streamBitrate(role, parameters);
 

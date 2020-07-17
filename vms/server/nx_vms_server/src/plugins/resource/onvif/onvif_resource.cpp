@@ -135,7 +135,6 @@ void addSubscriptionIdElement(const std::string& id, std::vector<struct soap_dom
 const QString QnPlOnvifResource::MANUFACTURE(lit("OnvifDevice"));
 const char* QnPlOnvifResource::ONVIF_PROTOCOL_PREFIX = "http://";
 const char* QnPlOnvifResource::ONVIF_URL_SUFFIX = ":80/onvif/device_service";
-const int QnPlOnvifResource::DEFAULT_IFRAME_DISTANCE = 20;
 const float QnPlOnvifResource::QUALITY_COEF = 0.2f;
 const int QnPlOnvifResource::MAX_AUDIO_BITRATE = 64; //kbps
 const int QnPlOnvifResource::MAX_AUDIO_SAMPLERATE = 32; //kHz
@@ -5401,7 +5400,8 @@ void QnPlOnvifResource::updateVideoEncoder1(
         if (encoder.H264 == 0)
             encoder.H264 = m_tmpH264Conf.get();
 
-        encoder.H264->GovLength = qBound(capabilities.govMin, DEFAULT_IFRAME_DISTANCE, capabilities.govMax);
+        const int govLength = defaultGovLengthForStream(streamParams.resolution, getMaxFps(streamIndex));
+        encoder.H264->GovLength = qBound(capabilities.govMin, govLength, capabilities.govMax);
         auto h264Profile = getH264StreamProfile(capabilities);
         if (h264Profile.is_initialized())
             encoder.H264->H264Profile = *h264Profile;
@@ -5489,7 +5489,9 @@ void QnPlOnvifResource::updateVideoEncoder2(
             m_govLength.reset(new int);
         encoder.GovLength = m_govLength.get();
     }
-    *encoder.GovLength = qBound(capabilities.govMin, DEFAULT_IFRAME_DISTANCE, capabilities.govMax);
+
+    const int govLength = defaultGovLengthForStream(streamParams.resolution, getMaxFps(streamIndex));
+    *encoder.GovLength = qBound(capabilities.govMin, govLength, capabilities.govMax);
 
     if (codec == SupportedVideoEncoding::H264)
     {

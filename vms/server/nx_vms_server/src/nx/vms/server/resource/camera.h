@@ -252,6 +252,9 @@ signals:
         qint64 timestamp);
 
 protected:
+
+    int defaultGovLengthForStream(const QSize& resolution, int maxFps) const;
+
     virtual int getMaxChannelsFromDriver() const { return 1; }
 
     virtual CameraDiagnostics::Result initInternal() override;

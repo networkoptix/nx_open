@@ -983,6 +983,15 @@ qint64 Camera::recordingBitrateBps(std::chrono::milliseconds bitratePeriod) cons
     return result;
 }
 
+int Camera::defaultGovLengthForStream(const QSize& resolution, int maxFps) const
+{
+    static const int kMinResolutionForShortGov = 7'000'000;
+    static const int kShortGovLength = 10;
+    if (resolution.width() * resolution.height() > kMinResolutionForShortGov)
+        return kShortGovLength;
+    return maxFps;
+}
+
 } // namespace resource
 } // namespace vms::server
 } // namespace nx
