@@ -1,13 +1,8 @@
 #include "metadata_parser.h"
 
-#include <chrono>
 #include <utility>
 
-#include <nx/sdk/analytics/helpers/object_metadata_packet.h>
-#include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/utils/log/log_main.h>
-
-#include <QtXml/QDomDocument>
 
 namespace nx::vms_server_plugins::analytics::hikvision {
 
@@ -22,7 +17,7 @@ constexpr auto kCacheEntryLifetime = 1s;
 
 } // namespace
 
-Ptr<IMetadataPacket> MetadataParser::parsePacket(QByteArray bytes)
+Ptr<ObjectMetadataPacket> MetadataParser::parsePacket(QByteArray bytes)
 {
     evictStaleCacheEntries();
 
@@ -31,163 +26,214 @@ Ptr<IMetadataPacket> MetadataParser::parsePacket(QByteArray bytes)
     int end = bytes.lastIndexOf('>') + 1;
     bytes = bytes.mid(begin, std::max(0, end - begin));
 
-    QDomDocument xml;
-    {
-        QString errorDescription;
-        int errorLine, errorColumn;
-        if (!xml.setContent(bytes, false, &errorDescription, &errorLine, &errorColumn))
-        {
-            NX_WARNING(NX_SCOPE_TAG, "Failed to parse XML: %1 at %2:%3: [[[[%4]]]]",
-                errorDescription, errorLine, errorColumn, bytes);
-            return nullptr;
-        }
-    }
+    m_xml.clear();
+    m_xml.addData(bytes);
 
     //std::cerr << "-----\n" << xml.toString(2).toStdString() << "-----\n" << std::endl;
+    
+    Ptr<ObjectMetadataPacket> packet;
 
-    const auto root = xml.documentElement();
-    if (root.tagName() != "Metadata")
+    if (m_xml.readNextStartElement())
     {
-        NX_WARNING(NX_SCOPE_TAG, "Root is not 'Metadata'");
-        return nullptr;
+        if (m_xml.name() == "Metadata")
+        {
+            packet = parseMetadataElement();
+        }
+        else
+        {
+            NX_DEBUG(NX_SCOPE_TAG, "Metadata XML root element is not 'Metadata'");
+            m_xml.skipCurrentElement();
+        }
     }
-
-    const auto type = root.firstChildElement("type");
-    if (type.isNull())
+    if (m_xml.hasError())
     {
-        NX_WARNING(NX_SCOPE_TAG, "No 'type' in 'Metadata'");
-        return nullptr;
+        NX_DEBUG(NX_SCOPE_TAG, "Failed to parse metadata XML at %1:%2: %3 [[[%4]]]",
+            m_xml.lineNumber(), m_xml.columnNumber(), m_xml.errorString(), bytes);
     }
-    if (type.text() != "activityTarget")
-        return nullptr;
-
-    auto packet = makePtr<ObjectMetadataPacket>();
-
-    const auto time = root.firstChildElement("time");
-    if (time.isNull())
-    {
-        NX_WARNING(NX_SCOPE_TAG, "No 'time' in 'Metadata'");
-        return nullptr;
-    }
-    const auto dateTime = QDateTime::fromString(time.text(), Qt::ISODateWithMs);
-    if (!dateTime.isValid())
-    {
-        NX_WARNING(NX_SCOPE_TAG, "Failed to parse ISO timestamp: %1", time.text());
-        return nullptr;
-    }
-    packet->setTimestampUs(dateTime.toMSecsSinceEpoch() * 1000);
-    packet->setDurationUs(
-        std::chrono::duration_cast<std::chrono::microseconds>(kCacheEntryLifetime).count());
-
-    const auto targetDetection = root.firstChildElement("TargetDetection");
-    if (targetDetection.isNull())
-        return nullptr;
-
-    const auto targetList = targetDetection.firstChildElement("TargetList");
-    if (targetList.isNull())
-    {
-        NX_WARNING(NX_SCOPE_TAG, "No 'TargetList' in 'TargetDetection'");
-        return nullptr;
-    }
-
-    auto target = targetList.firstChildElement("Target");
-    if (target.isNull())
-    {
-        NX_WARNING(NX_SCOPE_TAG, "No 'Target' in 'TargetList'");
-        return nullptr;
-    }
-    do
-    {
-        if (auto metadata = parse(target))
-            packet->addItem(metadata.get());
-
-        target = target.nextSiblingElement("Target");
-    }
-    while (!target.isNull());
-    if (packet->count() == 0)
-        return nullptr;
 
     return packet;
 }
 
-std::optional<Uuid> MetadataParser::parseTrackId(const QString& stringId) const
+std::optional<QString> MetadataParser::parseStringElement()
 {
-    unsigned int uIntId;
-    if (bool ok; uIntId = stringId.toUInt(&ok), !ok)
+    QString string = m_xml.readElementText();
+    if (m_xml.hasError())
+        return std::nullopt;
+
+    return string;
+}
+
+std::optional<std::int64_t> MetadataParser::parseTimeElement()
+{
+    const auto string = parseStringElement();
+    if (!string)
+        return std::nullopt;
+
+    const auto value = QDateTime::fromString(*string, Qt::ISODateWithMs);
+    if (!value.isValid())
     {
-        NX_WARNING(NX_SCOPE_TAG, "Failed to parse unsigned int: %1", stringId);
+        NX_DEBUG(NX_SCOPE_TAG, "Failed to parse ISO timestamp: %1", string);
         return std::nullopt;
     }
 
+    return value.toMSecsSinceEpoch() * 1000;
+}
+
+std::optional<int> MetadataParser::parseIntElement()
+{
+    const auto string = parseStringElement();
+    if (!string)
+        return std::nullopt;
+
+    bool ok = false;
+    int value = string->toInt(&ok);
+    if (!ok)
+    {
+        NX_WARNING(NX_SCOPE_TAG, "Failed to parse int: %1", *string);
+        return std::nullopt;
+    }
+
+    return value;
+}
+
+std::optional<Uuid> MetadataParser::parseTargetIdElement()
+{
+    const auto value = parseIntElement();
+    if (!value)
+        return std::nullopt;
+
     Uuid uuid;
-    std::memcpy(uuid.data(), &uIntId, std::min(sizeof(uIntId), (std::size_t) uuid.size()));
+    std::memcpy(uuid.data(), &*value, std::min((int) sizeof(*value), uuid.size()));
     return uuid;
 }
 
-QString MetadataParser::parseTypeId(const QString& recognition) const
+std::optional<std::string> MetadataParser::parseRecognitionElement()
 {
-    return NX_FMT("nx.hikvision.%1", recognition);
-}
-
-std::optional<Point> MetadataParser::parsePoint(const QDomElement& point) const
-{
-    double x;
-    double y;
-
-    for (const auto [name, ptr]: {
-        std::pair{"x", &x},
-        std::pair{"y", &y},
-    })
-    {
-        const auto coord = point.firstChildElement(name);
-        if (coord.isNull())
-        {
-            NX_WARNING(NX_SCOPE_TAG, "No '%1' in 'Point'", name);
-            return std::nullopt;
-        }
-
-        if (bool ok; *ptr = coord.text().toDouble(&ok), !ok)
-        {
-            NX_WARNING(NX_SCOPE_TAG, "Failed to parse double: %1", coord.text());
-            return std::nullopt;
-        }
-
-        *ptr /= kCoordinateDomain;
-    }
-
-    return Point(x, y);
-}
-
-std::optional<Rect> MetadataParser::parseBoundingBox(const QDomElement& regionList) const
-{
-    if (regionList.isNull())
+    const auto value = parseStringElement();
+    if (!value)
         return std::nullopt;
 
+    return NX_FMT("nx.hikvision.%1", *value).toStdString();
+}
+
+std::optional<float> MetadataParser::parseCoordinateElement()
+{
+    const auto value = parseIntElement();
+    if (!value)
+        return std::nullopt;
+
+    return *value / kCoordinateDomain;
+}
+
+std::optional<Point> MetadataParser::parsePointElement()
+{
+    std::optional<float> x;
+    std::optional<float> y;
+
+    bool seenX = false;
+    bool seenY = false;
+
+    while (m_xml.readNextStartElement())
+    {
+        if (m_xml.name() == "x")
+        {
+            seenX = true;
+            x = parseCoordinateElement();
+        }
+        else if (m_xml.name() == "y")
+        {
+            seenY = true;
+            y = parseCoordinateElement();
+        }
+        else
+        {
+            m_xml.skipCurrentElement();
+        }
+    }
+    if (m_xml.hasError())
+        return std::nullopt;
+
+    if (!seenX)
+        NX_DEBUG(NX_SCOPE_TAG, "No 'x' element in 'Point' element");
+    if (!seenY)
+        NX_DEBUG(NX_SCOPE_TAG, "No 'y' element in 'Point' element");
+
+    if (!x || !y)
+        return std::nullopt;
+
+    return Point{*x, *y};
+}
+
+std::optional<MetadataParser::MinMaxRect> MetadataParser::parseRegionElement()
+{
     Point min = {1, 1};
     Point max = {0, 0};
 
-    for (auto region = regionList.firstChildElement("Region"); !region.isNull();
-        region = region.nextSiblingElement("Region"))
-    {
-        for (auto point = region.firstChildElement("Point"); !point.isNull();
-            point = point.nextSiblingElement("Point"))
-        {
-            if (const auto p = parsePoint(point))
-            {
-                min.x = std::min(min.x, p->x);
-                min.y = std::min(min.y, p->y);
+    bool seenPoint = false;
 
-                max.x = std::max(max.x, p->x);
-                max.y = std::max(max.y, p->y);
+    while (m_xml.readNextStartElement())
+    {
+        if (m_xml.name() == "Point")
+        {
+            seenPoint = true;
+            if (const auto point = parsePointElement())
+            {
+                min.x = std::min(min.x, point->x);
+                min.y = std::min(min.y, point->y);
+
+                max.x = std::max(max.x, point->x);
+                max.y = std::max(max.y, point->y);
             }
         }
+        else
+        {
+            m_xml.skipCurrentElement();
+        }
     }
-
-    if (min.x > max.x || min.y > max.y)
-    {
-        NX_WARNING(NX_SCOPE_TAG, "'RegionList' is empty");
+    if (m_xml.hasError())
         return std::nullopt;
+
+    if (!seenPoint)
+        NX_DEBUG(NX_SCOPE_TAG, "No 'Point' elements in 'Region' element");
+    if (min.x > max.x || min.y > max.y)
+        return std::nullopt;
+
+    return MinMaxRect{min, max};
+}
+
+std::optional<Rect> MetadataParser::parseRegionListElement()
+{
+    Point min = {1, 1};
+    Point max = {0, 0};
+
+    bool seenRegion = false;
+
+    while (m_xml.readNextStartElement())
+    {
+        if (m_xml.name() == "Region")
+        {
+            seenRegion = true;
+            if (const auto rect = parseRegionElement())
+            {
+                min.x = std::min(min.x, rect->min.x);
+                min.y = std::min(min.y, rect->min.y);
+
+                max.x = std::max(max.x, rect->max.x);
+                max.y = std::max(max.y, rect->max.y);
+            }
+        }
+        else
+        {
+            m_xml.skipCurrentElement();
+        }
     }
+    if (m_xml.hasError())
+        return std::nullopt;
+
+    if (!seenRegion)
+        NX_DEBUG(NX_SCOPE_TAG, "No 'Region' elements in 'RegionList' element");
+    if (min.x > max.x || min.y > max.y)
+        return std::nullopt;
 
     Rect rect;
     rect.x = min.x;
@@ -197,103 +243,269 @@ std::optional<Rect> MetadataParser::parseBoundingBox(const QDomElement& regionLi
     return rect;
 }
 
-std::optional<std::vector<Ptr<Attribute>>> MetadataParser::parseAttributes(
-    const QDomElement& propertyList) const
+Ptr<Attribute> MetadataParser::parsePropertyElement()
 {
-    if (propertyList.isNull())
-        return std::nullopt;
+    std::optional<QString> description;
+    std::optional<QString> value;
 
-    std::vector<Ptr<Attribute>> attributes;
-    for (auto property = propertyList.firstChildElement("Property"); !property.isNull();
-        property = property.nextSiblingElement("Property"))
+    while (m_xml.readNextStartElement())
     {
-        const auto description = property.firstChildElement("description");
-        if (description.isNull())
-        {
-            NX_WARNING(NX_SCOPE_TAG, "No 'description' in 'Property'");
-            continue;
-        }
-
-        const auto value = property.firstChildElement("value");
-        if (value.isNull())
-        {
-            NX_WARNING(NX_SCOPE_TAG, "No 'value' in 'Property'");
-            continue;
-        }
-
-        attributes.push_back(makePtr<Attribute>(
-            IAttribute::Type::string,
-            description.text().toStdString(),
-            value.text().toStdString()));
+        if (m_xml.name() == "description")
+            description = parseStringElement();
+        else if (m_xml.name() == "value")
+            value = parseStringElement();
+        else
+            m_xml.skipCurrentElement();
     }
+    if (m_xml.hasError())
+        return nullptr;
+
+    if (!description || !value)
+        return nullptr;
+
+    return makePtr<Attribute>(
+        IAttribute::Type::string,
+        description->toStdString(),
+        value->toStdString());
+}
+
+std::vector<Ptr<Attribute>> MetadataParser::parsePropertyListElement()
+{
+    std::vector<Ptr<Attribute>> attributes;
+
+    while (m_xml.readNextStartElement())
+    {
+        if (m_xml.name() == "Property")
+        {
+            if (auto attribute = parsePropertyElement())
+                attributes.push_back(std::move(attribute));
+        }
+        else
+        {
+            m_xml.skipCurrentElement();
+        }
+    }
+
     return attributes;
 }
 
-Ptr<IObjectMetadata> MetadataParser::parse(const QDomElement& target)
+Ptr<ObjectMetadata> MetadataParser::parseTargetElement()
 {
-    auto targetId = target.firstChildElement("targetID");
-    if (targetId.isNull())
-        targetId = target.firstChildElement("ruleID");
-    if (targetId.isNull())
+    std::optional<Uuid> trackId;
+    std::optional<std::string> typeId;
+    std::optional<Rect> boundingBox;
+    std::vector<Ptr<Attribute>> attributes;
+
+    bool seenTargetId = false;
+    bool seenRecognition = false;
+    bool seenRegionList = false;
+    bool seenPropertyList = false;
+
+    while (m_xml.readNextStartElement())
+    {
+        if (m_xml.name() == "targetID" || m_xml.name() == "ruleID")
+        {
+            // Treat rule activations as objects.
+            if (m_xml.name() == "ruleID" && seenTargetId)
+                continue;
+
+            seenTargetId = true;
+            trackId = parseTargetIdElement();
+        }
+        else if (m_xml.name() == "recognition")
+        {
+            seenRecognition = true;
+            typeId = parseRecognitionElement();
+        }
+        else if (m_xml.name() == "RegionList")
+        {
+            seenRegionList = true;
+            boundingBox = parseRegionListElement();
+        }
+        else if (m_xml.name() == "PropertyList")
+        {
+            seenPropertyList = true;
+            attributes = parsePropertyListElement();
+        }
+        else
+        {
+            m_xml.skipCurrentElement();
+        }
+    }
+    if (m_xml.hasError())
         return nullptr;
+
+    if (!seenTargetId)
+        NX_DEBUG(NX_SCOPE_TAG, "No 'targetID' or 'ruleID' element in 'Target' element");
+    if (!trackId)
+        return nullptr;
+
+    if (!seenRecognition)
+        typeId = "nx.hikvision.event"; // Treat rule activations as objects.
+
+    if (boundingBox)
+    {
+        auto& entry = m_cache[*trackId];
+        entry.lastUpdate = std::chrono::steady_clock::now();
+        entry.boundingBox = *boundingBox;
+    }
+    else if (const auto* entry = findInCache(*trackId); entry && entry->boundingBox)
+    {
+        boundingBox = *entry->boundingBox;
+    }
+    else if (!seenRegionList)
+    {
+        NX_DEBUG(NX_SCOPE_TAG, "No 'RegionList' element in 'Target' element");
+    }
+    if (!boundingBox)
+        return nullptr;
+
+    if (seenPropertyList)
+    {
+        auto& entry = m_cache[*trackId];
+        entry.lastUpdate = std::chrono::steady_clock::now();
+        entry.attributes = attributes;
+    }
+    else if (const auto* entry = findInCache(*trackId))
+    {
+        attributes = entry->attributes;
+    }
 
     auto metadata = makePtr<ObjectMetadata>();
 
-    if (const auto trackId = parseTrackId(targetId.text()))
-        metadata->setTrackId(*trackId);
-    else
-    {
-        NX_WARNING(NX_SCOPE_TAG, "Failed to parse 'targetID': %1", targetId.text());
-        return nullptr;
-    }
+    metadata->setTrackId(*trackId);
 
-    const auto recognition = target.firstChildElement("recognition");
-    if (!recognition.isNull())
-        metadata->setTypeId(parseTypeId(recognition.text()).toStdString());
-    else
-        metadata->setTypeId("nx.hikvision.event");
+    if (typeId)
+        metadata->setTypeId(*typeId);
 
-    if (const auto boundingBox = parseBoundingBox(target.firstChildElement("RegionList")))
-    {
-        metadata->setBoundingBox(*boundingBox);
-
-        auto& entry = m_cache[metadata->trackId()];
-        entry.boundingBox = *boundingBox;
-        entry.lastUpdate = std::chrono::steady_clock::now();
-    }
-    else if (const auto it = m_cache.find(metadata->trackId()); it != m_cache.end())
-    {
-        auto& entry = it->second;;
-
-        metadata->setBoundingBox(entry.boundingBox);
-    }
-    else
-    {
-        NX_WARNING(NX_SCOPE_TAG, "Failed to parse 'RegionList'");
-        return nullptr;
-    }
-
-    if (auto attributes = parseAttributes(target.firstChildElement("PropertyList")))
-    {
-        metadata->addAttributes(*attributes);
-
-        auto& entry = m_cache[metadata->trackId()];
-        entry.attributes = std::move(*attributes);
-        entry.lastUpdate = std::chrono::steady_clock::now();
-    }
-    else if (const auto it = m_cache.find(metadata->trackId()); it != m_cache.end())
-    {
-        auto& entry = it->second;;
-
-        metadata->addAttributes(entry.attributes);
-    }
-    else
-    {
-        NX_WARNING(NX_SCOPE_TAG, "Failed to parse 'PropertyList'");
-        return nullptr;
-    }
+    metadata->setBoundingBox(*boundingBox);
+    metadata->addAttributes(std::move(attributes));
 
     return metadata;
+}
+
+std::vector<Ptr<ObjectMetadata>> MetadataParser::parseTargetListElement()
+{
+    std::vector<Ptr<ObjectMetadata>> metadatas;
+
+    bool seenTarget = false;
+
+    while (m_xml.readNextStartElement())
+    {
+        if (m_xml.name() == "Target")
+        {
+            seenTarget = true;
+            if (auto metadata = parseTargetElement())
+                metadatas.push_back(std::move(metadata));
+        }
+        else
+        {
+            m_xml.skipCurrentElement();
+        }
+    }
+    if (m_xml.hasError())
+        return metadatas;
+
+    if (!seenTarget)
+        NX_DEBUG(NX_SCOPE_TAG, "No 'Target' elements in 'TargetList' element");
+
+    return metadatas;
+}
+
+std::vector<Ptr<ObjectMetadata>> MetadataParser::parseTargetDetectionElement()
+{
+    std::vector<Ptr<ObjectMetadata>> metadatas;
+
+    bool seenTargetList = false;
+
+    while (m_xml.readNextStartElement())
+    {
+        if (m_xml.name() == "TargetList")
+        {
+            seenTargetList = true;
+            metadatas = parseTargetListElement();
+        }
+        else
+        {
+            m_xml.skipCurrentElement();
+        }
+    }
+    if (m_xml.hasError())
+        return metadatas;
+
+    if (!seenTargetList)
+        NX_DEBUG(NX_SCOPE_TAG, "No 'TargetList' element in 'TargetDetection' element");
+
+    return metadatas;
+}
+
+Ptr<ObjectMetadataPacket> MetadataParser::parseMetadataElement()
+{
+    bool seenType = false;
+    bool seenTime = false;
+    bool seenTargetDetection = false;
+
+    std::optional<QString> type;
+    std::optional<std::int64_t> timestampUs;
+    std::vector<Ptr<ObjectMetadata>> metadatas;
+
+    while (m_xml.readNextStartElement())
+    {
+        if (m_xml.name() == "type")
+        {
+            seenType = true;
+            type = parseStringElement();
+        }
+        else if (m_xml.name() == "time")
+        {
+            seenTime = true;
+            timestampUs = parseTimeElement();
+        }
+        else if (m_xml.name() == "TargetDetection")
+        {
+            seenTargetDetection = true;
+            metadatas = parseTargetDetectionElement();
+        }
+        else
+        {
+            m_xml.skipCurrentElement();
+        }
+    }
+    if (m_xml.hasError())
+        return nullptr;
+
+    if (!seenType)
+        NX_DEBUG(NX_SCOPE_TAG, "No 'type' element in 'Metadata' element");
+    if (!seenTime)
+        NX_DEBUG(NX_SCOPE_TAG, "No 'time' element in 'Metadata' element");
+    if (!seenTargetDetection)
+        NX_DEBUG(NX_SCOPE_TAG, "No 'TargetDetection' element in 'Metadata' element");
+
+    if (!type || !timestampUs || metadatas.empty())
+        return nullptr;
+
+    if (*type != "activityTarget")
+        return nullptr;
+
+    auto packet = makePtr<ObjectMetadataPacket>();
+
+    packet->setTimestampUs(*timestampUs);
+    packet->setDurationUs(
+        std::chrono::duration_cast<std::chrono::microseconds>(kCacheEntryLifetime).count());
+
+    for (auto metadata: metadatas)
+        packet->addItem(metadata.get());
+
+    return packet;
+}
+
+MetadataParser::CacheEntry* MetadataParser::findInCache(nx::sdk::Uuid trackId)
+{
+    const auto it = m_cache.find(trackId);
+    if (it != m_cache.end())
+        return nullptr;
+
+    return &it->second;
 }
 
 void MetadataParser::evictStaleCacheEntries()
