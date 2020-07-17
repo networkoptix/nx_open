@@ -65,7 +65,7 @@ StreamParser::Result OnvifMetadataRtpParser::processData(
     }
 
     const auto* const rtpHeader = (RtpHeader*)(currentRtpPacketBuffer);
-    m_currentDataChunkTimestamp = rtpHeader->timestamp;
+    m_currentDataChunkTimestamp = ntohl(rtpHeader->timestamp);
 
     m_buffer.append(
         (const char*) (currentRtpPacketBuffer + *fullRtpHeaderSize),
