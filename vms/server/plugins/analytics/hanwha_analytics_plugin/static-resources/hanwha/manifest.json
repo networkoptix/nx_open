@@ -32,7 +32,7 @@
             {
                 "type": "Section",
                 "caption": "Shock Detection",
-                "requiredForEventTypeIds": [ "nx.hanwha.ShockDetection" ],
+                "_requiredForEventTypeIds": [ "nx.hanwha.ShockDetection" ],
                 "items":
                 [
                     {
@@ -69,7 +69,7 @@
             {
                 "type": "Section",
                 "caption": "Tampering Detection",
-                "requiredForEventTypeIds": [ "nx.hanwha.Tampering" ],
+                "_requiredForEventTypeIds": [ "nx.hanwha.Tampering" ],
                 "items":
                 [
                     {
@@ -121,7 +121,7 @@
             {
                 "type": "Section",
                 "caption": "Defocus Detection",
-                "requiredForEventTypeIds": [ "nx.hanwha.DefocusDetection" ],
+                "_requiredForEventTypeIds": [ "nx.hanwha.DefocusDetection" ],
                 "items":
                 [
                     {
@@ -166,7 +166,7 @@
             {
                 "type": "Section",
                 "caption": "Fog detection",
-                "requiredForEventTypeIds": [ "nx.hanwha.FogDetection" ],
+                "_requiredForEventTypeIds": [ "nx.hanwha.FogDetection" ],
                 "items":
                 [
                     {
@@ -211,8 +211,8 @@
             {
                 "type": "Section",
                 "caption": "[AI] Objects & IVA",
-                "requiredForObjectDetection": true,
-                "requiredForEventTypeIds":
+                "_requiredForObjectDetection": true,
+                "_requiredForEventTypeIds":
                 [
                     "nx.hanwha.VideoAnalytics.Passing",
                     "nx.hanwha.VideoAnalytics.Entering",
@@ -238,8 +238,8 @@
                                     "minimum": [ 0.1, 0.1 ],
                                     "maximum": [ 0.9, 0.9 ]
                                 },
-                                "requiredForObjectDetection": true,
-                                "requiredForEventTypeIds":
+                                "_requiredForObjectDetection": true,
+                                "_requiredForEventTypeIds":
                                 [
                                     "nx.hanwha.VideoAnalytics.Passing",
                                     "nx.hanwha.VideoAnalytics.Entering",
@@ -257,7 +257,7 @@
                     {
                         "type": "Section",
                         "caption": "IVA Lines",
-                        "requiredForEventTypeIds": [ "nx.hanwha.VideoAnalytics.Passing" ],
+                        "_requiredForEventTypeIds": [ "nx.hanwha.VideoAnalytics.Passing" ],
                         "items":
                         [
                             {
@@ -316,7 +316,7 @@
                     {
                         "type": "Section",
                         "caption": "IVA Areas",
-                        "requiredForEventTypeIds":
+                        "_requiredForEventTypeIds":
                         [
                             "nx.hanwha.VideoAnalytics.Entering",
                             "nx.hanwha.VideoAnalytics.Exiting",
@@ -439,7 +439,7 @@
                     {
                         "type": "Section",
                         "caption": "Objects Tracking",
-                        "requiredForObjectDetection": true,
+                        "_requiredForObjectDetection": true,
                         "items":
                         [
                             {
@@ -546,8 +546,8 @@
                     {
                         "type": "Section",
                         "caption": "Exclude Areas",
-                        "requiredForObjectDetection": true,
-                        "requiredForEventTypeIds":
+                        "_requiredForObjectDetection": true,
+                        "_requiredForEventTypeIds":
                         [
                             "nx.hanwha.VideoAnalytics.Passing",
                             "nx.hanwha.VideoAnalytics.Entering",
@@ -585,7 +585,7 @@
             {
                 "type": "Section",
                 "caption": "Audio Detection",
-                "requiredForEventTypeIds": [ "nx.hanwha.AudioDetection" ],
+                "_requiredForEventTypeIds": [ "nx.hanwha.AudioDetection" ],
                 "items":
                 [
                     {
@@ -614,7 +614,7 @@
             {
                 "type": "Section",
                 "caption": "Sound Classification",
-                "requiredForEventTypeIds":
+                "_requiredForEventTypeIds":
                 [
                     "nx.hanwha.AudioAnalytics.Scream",
                     "nx.hanwha.AudioAnalytics.Gunshot",

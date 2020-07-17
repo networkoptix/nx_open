@@ -192,7 +192,7 @@ std::string pluginPointsToServerString(
     const Direction* direction = nullptr)
 {
     if (points.empty())
-        return "null"s;
+        return "{}"s;
 
     nx::kit::Json::array jsonPoints;
     jsonPoints.reserve(points.size());

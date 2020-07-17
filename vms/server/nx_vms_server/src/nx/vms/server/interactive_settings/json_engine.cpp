@@ -253,6 +253,9 @@ static std::unique_ptr<Item> createItem(
     {
         const QString& key = it.key();
 
+        if (key.startsWith("_"))
+            continue; //< Ignore JSON comments and private fields.
+
         if (key == QStringLiteral("value"))
         {
             // In VMS v4.0 Analytics Plugin, the "value" field was sometimes present in the
