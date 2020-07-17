@@ -41,7 +41,6 @@ private:
 
 private:
     std::optional<QString> parseStringElement();
-    std::optional<std::int64_t> parseTimeElement();
     std::optional<int> parseIntElement();
     std::optional<nx::sdk::Uuid> parseTargetIdElement();
     std::optional<std::string> parseRecognitionElement();

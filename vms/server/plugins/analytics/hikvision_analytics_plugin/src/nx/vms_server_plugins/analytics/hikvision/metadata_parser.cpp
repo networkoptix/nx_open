@@ -63,22 +63,6 @@ std::optional<QString> MetadataParser::parseStringElement()
     return string;
 }
 
-std::optional<std::int64_t> MetadataParser::parseTimeElement()
-{
-    const auto string = parseStringElement();
-    if (!string)
-        return std::nullopt;
-
-    const auto value = QDateTime::fromString(*string, Qt::ISODateWithMs);
-    if (!value.isValid())
-    {
-        NX_DEBUG(NX_SCOPE_TAG, "Failed to parse ISO timestamp: %1", string);
-        return std::nullopt;
-    }
-
-    return value.toMSecsSinceEpoch() * 1000;
-}
-
 std::optional<int> MetadataParser::parseIntElement()
 {
     const auto string = parseStringElement();
@@ -442,11 +426,9 @@ std::vector<Ptr<ObjectMetadata>> MetadataParser::parseTargetDetectionElement()
 Ptr<ObjectMetadataPacket> MetadataParser::parseMetadataElement()
 {
     bool seenType = false;
-    bool seenTime = false;
     bool seenTargetDetection = false;
 
     std::optional<QString> type;
-    std::optional<std::int64_t> timestampUs;
     std::vector<Ptr<ObjectMetadata>> metadatas;
 
     while (m_xml.readNextStartElement())
@@ -455,11 +437,6 @@ Ptr<ObjectMetadataPacket> MetadataParser::parseMetadataElement()
         {
             seenType = true;
             type = parseStringElement();
-        }
-        else if (m_xml.name() == "time")
-        {
-            seenTime = true;
-            timestampUs = parseTimeElement();
         }
         else if (m_xml.name() == "TargetDetection")
         {
@@ -476,12 +453,10 @@ Ptr<ObjectMetadataPacket> MetadataParser::parseMetadataElement()
 
     if (!seenType)
         NX_DEBUG(NX_SCOPE_TAG, "No 'type' element in 'Metadata' element");
-    if (!seenTime)
-        NX_DEBUG(NX_SCOPE_TAG, "No 'time' element in 'Metadata' element");
     if (!seenTargetDetection)
         NX_DEBUG(NX_SCOPE_TAG, "No 'TargetDetection' element in 'Metadata' element");
 
-    if (!type || !timestampUs || metadatas.empty())
+    if (!type || metadatas.empty())
         return nullptr;
 
     if (*type != "activityTarget")
@@ -489,7 +464,6 @@ Ptr<ObjectMetadataPacket> MetadataParser::parseMetadataElement()
 
     auto packet = makePtr<ObjectMetadataPacket>();
 
-    packet->setTimestampUs(*timestampUs);
     packet->setDurationUs(
         std::chrono::duration_cast<std::chrono::microseconds>(kCacheEntryLifetime).count());
 

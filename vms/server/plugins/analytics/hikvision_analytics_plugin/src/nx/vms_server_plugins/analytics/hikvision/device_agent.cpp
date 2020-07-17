@@ -74,7 +74,10 @@ void DeviceAgent::doPushDataPacket(Result<void>* /*outResult*/, IDataPacket* dat
     QByteArray metadataBytes(metadataPacket->data(), metadataPacket->dataSize());
 
     if (const auto packet = m_metadataParser.parsePacket(metadataBytes))
+    {
+        packet->setTimestampUs(dataPacket->timestampUs());
         m_handler->handleMetadata(packet.get());
+    }
 }
 
 Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
