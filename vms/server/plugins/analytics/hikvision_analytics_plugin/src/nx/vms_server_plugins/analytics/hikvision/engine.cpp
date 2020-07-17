@@ -189,7 +189,7 @@ QList<QString> Engine::parseSupportedObjects(const QByteArray& data)
     {
         QString errorDescription;
         int errorLine, errorColumn;
-        if (document.setContent(data, false, &errorDescription, &errorLine, &errorColumn))
+        if (!document.setContent(data, false, &errorDescription, &errorLine, &errorColumn))
         {
             NX_WARNING(NX_SCOPE_TAG, "Failed to parse XML at %1:%2: %3 [[[%4]]]",
                 errorLine, errorColumn, errorDescription, data);
