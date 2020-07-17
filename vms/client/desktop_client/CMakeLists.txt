@@ -12,7 +12,7 @@ if(LINUX)
 endif()
 
 if(LINUX)
-    set(binary_name client-bin)
+    set(binary_name ${client.binary.name})
 else()
     string(REPLACE ".exe" "" binary_name ${client.binary.name})
 endif()

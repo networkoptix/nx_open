@@ -13,7 +13,7 @@ namespace utils {
     This happens for every compatibility version which lives in
     "$HOME/.local/share/Network Optix/client/..."
     The simplest workaroud which is fouind so far is to avoid such substrings when starting
-    the app. This can be achieved by starting the app as ./client-bin with the corresponding
+    the app. This can be achieved by starting the app as ./nxwitness-client with the corresponding
     working directory. This class has startDetached function which does this for linux platform.
  */
 

@@ -13,4 +13,4 @@ else
     echo "Using system libstdc++."
 fi
 
-"$DIR/client-bin" "$@"
+"$DIR/@client.binary.name@" "$@"

@@ -25,9 +25,11 @@ copyBins()
 
     mkdir -p "$STAGE_BIN"
 
-    install -m 755 "$BUILD_DIR/bin/client-bin" "$STAGE_BIN/"
+    install -m 755 "$BUILD_DIR/bin/$CLIENT_BINARY_NAME" "$STAGE_BIN/"
     install -m 755 "$BUILD_DIR/bin/$APPLAUNCHER_BINARY_NAME" "$STAGE_BIN/"
-    install -m 755 "bin/client" "$STAGE_BIN/$CLIENT_BINARY_NAME"
+    install -m 755 "bin/client" "$STAGE_BIN/client"
+    # Create a symlink for backwards compatibility to old applaunchers.
+    ln -s "client" "$STAGE_BIN/client-bin"
     install -m 755 "$SOURCE_DIR/build_utils/linux/choose_newer_stdcpp.sh" "$STAGE_BIN/"
     install -m 644 "$BUILD_DIR/bin/$LAUNCHER_VERSION_FILE" "$STAGE_BIN/"
     install -m 755 "bin/applauncher" "$STAGE_BIN/"
@@ -368,7 +370,7 @@ buildDistribution()
     find "$STAGE" -type f -print0 |xargs -0 chmod 644
 
     # Restore permissions for executables.
-    chmod 755 "$STAGE_BIN"/{applauncher*,client*,*.sh}
+    chmod 755 "$STAGE_BIN"/{applauncher*,*client*,*.sh}
     chmod 755 "$STAGE_LIBEXEC/QtWebEngineProcess"
 
     createDebianDir

@@ -100,7 +100,13 @@ DeviceAgent::~DeviceAgent()
 /*virtual*/ void DeviceAgent::doPushDataPacket(
     Result<void>* /*outResult*/, IDataPacket* dataPacket) /*override*/
 {
+    if (!NX_ASSERT(dataPacket))
+        return;
+
     const auto incomingPacket = dataPacket->queryInterface<ICustomMetadataPacket>();
+    if (!NX_ASSERT(incomingPacket))
+        return;
+
     QByteArray xmlData(incomingPacket->data(), incomingPacket->dataSize());
 
     const auto ts = incomingPacket->timestampUs();

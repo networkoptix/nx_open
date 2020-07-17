@@ -311,14 +311,14 @@ std::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
                 bool keepByDefault = true;
 
                 bool keepForObjectTracking = false;
-                if (const auto required = node["requiredForObjectDetection"]; required.toBool())
+                if (const auto required = node["_requiredForObjectDetection"]; required.toBool())
                 {
                     keepByDefault = false;
                     keepForObjectTracking = supportsObjectTracking;
                 }
 
                 bool keepForEvents = false;
-                if (const auto eventTypeIds = node["requiredForEventTypeIds"].toArray();
+                if (const auto eventTypeIds = node["_requiredForEventTypeIds"].toArray();
                     !eventTypeIds.empty())
                 {
                     keepByDefault = false;

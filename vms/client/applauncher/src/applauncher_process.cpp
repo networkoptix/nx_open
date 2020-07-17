@@ -16,15 +16,18 @@
 
 namespace {
 
-/*! Since 3.0 client-bin uses relative rpath to specify its libs location.
-    Thus we don't have to put it into LD_LIBRARY_PATH. */
+/**
+ * Since 3.0 Client uses relative rpath to specify its libs location. Thus we don't have to put it
+ * into LD_LIBRARY_PATH.
+ */
 const nx::utils::SoftwareVersion kRpathIncludedVersion(3, 0);
 
-/*! Since 3.0 client uses correct window class name depending on its customization.
-    Previous versions use executable name as WM class (client-bin) which won't work properly
-    for startup notification protocol (which is used in many Linux distros launchers).
-    For these versions we pass -name <wmclass> parameter which sets the correct WM class
-    to windows. */
+/**
+ * Since 3.0 client uses correct window class name depending on its customization. Previous
+ * versions use executable name as WM class (client-bin) which won't work properly for startup
+ * notification protocol (which is used in many Linux distros launchers). For these versions we
+ * pass -name <wmclass> parameter which sets the correct WM class to windows.
+ */
 const nx::utils::SoftwareVersion kWindowClassFixedVersion(3, 0);
 
 /**
