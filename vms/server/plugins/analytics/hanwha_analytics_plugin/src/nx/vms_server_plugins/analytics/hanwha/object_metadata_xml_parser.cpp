@@ -319,8 +319,8 @@ Ptr<ObjectMetadata> ObjectMetadataXmlParser::extractObjectMetadata(const QDomEle
     if (!rect || !classInfo)
         return result;
 
-    std::string objectTypeId = m_engineManifest.objectTypeIdByInternalName(
-        QString::fromStdString(classInfo->internalClassName)).toStdString();
+    const QString objectTypeName = QString::fromStdString(classInfo->internalClassName).trimmed();
+    std::string objectTypeId = m_engineManifest.objectTypeIdByInternalName(objectTypeName).toStdString();
     if (objectTypeId.empty())
         return result;
 
