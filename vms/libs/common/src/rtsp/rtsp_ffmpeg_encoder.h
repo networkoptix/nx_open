@@ -19,6 +19,7 @@ public:
     virtual void setDataPacket(QnConstAbstractMediaDataPtr media) override;
     virtual bool getNextPacket(QnByteArray& sendBuffer) override;
     virtual void init() override;
+    virtual bool isEof() const override { return false; }
 
     void setDstResolution(const QSize& dstVideoSize, AVCodecID dstCodec);
 

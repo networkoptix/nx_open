@@ -88,9 +88,6 @@ public:
     QnConstCompressedVideoDataPtr getLastVideoFrame(int channel) const;
     QnConstCompressedAudioDataPtr getLastAudioFrame() const;
 
-    QnConstCompressedVideoDataPtr getLastVideoFrameRtsp(int channel) const;
-    QnConstCompressedAudioDataPtr getLastAudioFrameRtsp() const;
-
     void updateCameraActivity();
     virtual bool needConfigureProvider() const override { return false; }
     void clearVideoData();
@@ -111,11 +108,6 @@ private:
     QnConstCompressedAudioDataPtr m_lastAudioData;
     QnConstCompressedVideoDataPtr m_lastKeyFrame[CL_MAX_CHANNELS];
     std::deque<QnConstCompressedVideoDataPtr> m_lastKeyFrames[CL_MAX_CHANNELS];
-
-    // Workaround, should be fixed in 4.1, keep key frame to generate SDP for external
-    // RTSP clients(should not be cleared).
-    QnConstCompressedVideoDataPtr m_lastKeyFrameRtsp[CL_MAX_CHANNELS];
-    QnConstCompressedAudioDataPtr m_lastAudioDataRtsp;
 
     int m_gotIFramesMask;
     int m_allChannelsMask;
@@ -183,7 +175,6 @@ void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData
             m_gotIFramesMask |= 1 << video->channelNumber;
             int ch = video->channelNumber;
             m_lastKeyFrame[ch] = video;
-            m_lastKeyFrameRtsp[ch] = video;
             const qint64 removeThreshold = video->timestamp - KEEP_IFRAMES_INTERVAL;
 
             if (m_lastKeyFrames[ch].empty()
@@ -215,7 +206,6 @@ void QnVideoCameraGopKeeper::putData(const QnAbstractDataPacketPtr& nonConstData
     {
         NX_VERBOSE(this, "%1(%2 us, audio)", __func__, nonConstData->timestamp);
         m_lastAudioData = std::move(audio);
-        m_lastAudioDataRtsp = m_lastAudioData;
     }
     else
     {
@@ -438,23 +428,6 @@ QnConstCompressedAudioDataPtr QnVideoCameraGopKeeper::getLastAudioFrame() const
 {
     QnMutexLocker lock( &m_queueMtx );
     return m_lastAudioData;
-}
-
-QnConstCompressedVideoDataPtr QnVideoCameraGopKeeper::getLastVideoFrameRtsp(int channel) const
-{
-    if (channel >= CL_MAX_CHANNELS)
-    {
-        NX_WARNING(this, "Channel number out of range: %1", channel);
-        return nullptr;
-    }
-    QnMutexLocker lock(&m_queueMtx);
-    return m_lastKeyFrameRtsp[channel];
-}
-
-QnConstCompressedAudioDataPtr QnVideoCameraGopKeeper::getLastAudioFrameRtsp() const
-{
-    QnMutexLocker lock(&m_queueMtx);
-    return m_lastAudioDataRtsp;
 }
 
 void QnVideoCameraGopKeeper::updateCameraActivity()
@@ -914,21 +887,6 @@ QnConstCompressedAudioDataPtr QnVideoCamera::getLastAudioFrame(StreamIndex strea
 {
     if (const auto gopKeeper = getGopKeeper(streamIndex))
         return gopKeeper->getLastAudioFrame();
-    return nullptr;
-}
-
-QnConstCompressedVideoDataPtr QnVideoCamera::getLastVideoFrameRtsp(
-    StreamIndex streamIndex, int channel) const
-{
-    if (const auto gopKeeper = getGopKeeper(streamIndex))
-        return gopKeeper->getLastVideoFrameRtsp(channel);
-    return nullptr;
-}
-
-QnConstCompressedAudioDataPtr QnVideoCamera::getLastAudioFrameRtsp(StreamIndex streamIndex) const
-{
-    if (const auto gopKeeper = getGopKeeper(streamIndex))
-        return gopKeeper->getLastAudioFrameRtsp();
     return nullptr;
 }
 

@@ -268,11 +268,12 @@ bool QnUniversalRtpEncoder::open(
     if (!media)
         return false;
 
-    bool transcodingEnabled = dstCodec != AV_CODEC_ID_NONE;
+    m_transcodingEnabled = dstCodec != AV_CODEC_ID_NONE;
     m_isVideo = media->dataType == QnAbstractMediaData::VIDEO;
-    m_codec = transcodingEnabled ? dstCodec : media->compressionType;
+    m_sourceCodec = media->compressionType;
+    m_codec = m_transcodingEnabled ? dstCodec : media->compressionType;
     m_payloadType = getPayloadType(m_codec, m_isVideo);
-    QnTranscoder::TranscodeMethod method = transcodingEnabled
+    QnTranscoder::TranscodeMethod method = m_transcodingEnabled
         ? QnTranscoder::TM_FfmpegTranscode
         : QnTranscoder::TM_DirectStreamCopy;
 
@@ -313,7 +314,7 @@ bool QnUniversalRtpEncoder::open(
     if (status != 0)
         return false;
 
-    buildSdp(mediaHigh, mediaLow, transcodingEnabled, requiredQuality);
+    buildSdp(mediaHigh, mediaLow, m_transcodingEnabled, requiredQuality);
     return true;
 }
 
@@ -334,6 +335,16 @@ QString QnUniversalRtpEncoder::getSdpMedia(bool isVideo, int trackId)
 
 void QnUniversalRtpEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
 {
+    // Do not continue rtsp stream if codec changed.
+    if (!m_transcodingEnabled && media && m_sourceCodec != media->compressionType)
+    {
+        NX_DEBUG(this, "Codec changed from %1 to %2, close rtsp session",
+            m_sourceCodec, media->compressionType);
+        m_eof = true;
+    }
+    if (m_eof)
+        return;
+
     m_outputBuffer.clear();
     m_outputPos = 0;
     m_packetIndex = 0;
@@ -344,6 +355,9 @@ void QnUniversalRtpEncoder::setDataPacket(QnConstAbstractMediaDataPtr media)
 
 bool QnUniversalRtpEncoder::getNextPacket(QnByteArray& sendBuffer)
 {
+    if (m_eof)
+        return false;
+
     const QVector<int> packets = m_transcoder.getPacketsSize();
     if (m_outputPos >= (int) m_outputBuffer.size() - nx::streaming::rtp::RtpHeader::kSize ||
         m_packetIndex >= packets.size())
@@ -394,5 +408,10 @@ bool QnUniversalRtpEncoder::getNextPacket(QnByteArray& sendBuffer)
 
 void QnUniversalRtpEncoder::init()
 {
+}
+
+bool QnUniversalRtpEncoder::isEof() const
+{
+    return m_eof;
 }
 

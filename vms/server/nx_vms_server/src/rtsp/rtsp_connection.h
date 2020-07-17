@@ -93,6 +93,7 @@ public:
     RtspServerTrackInfo* getTrackInfo(int trackNum) const;
     int getTracksCount() const;
     QnMediaServerModule* serverModule() const;
+
 private:
     virtual void run();
     void addResponseRangeHeader();

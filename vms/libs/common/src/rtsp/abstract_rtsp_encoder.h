@@ -29,6 +29,7 @@ public:
     virtual bool getNextPacket(QnByteArray& sendBuffer) = 0;
 
     virtual void init() = 0;
+    virtual bool isEof() const = 0;
 };
 
 using AbstractRtspEncoderPtr = std::shared_ptr<AbstractRtspEncoder>;

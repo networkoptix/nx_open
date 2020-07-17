@@ -760,6 +760,13 @@ void QnRtspDataConsumer::processMediaData(const QnAbstractMediaDataPtr& media)
     }
 
     codecEncoder->setDataPacket(media);
+    if (codecEncoder->isEof())
+    {
+        NX_DEBUG(this, "End of stream, close rtsp session");
+        m_owner->pleaseStop();
+        return;
+    }
+
     if (trackInfo->firstRtpTime == -1)
         trackInfo->firstRtpTime = media->timestamp;
     m_owner->notifyMediaRangeUsed(media->timestamp);

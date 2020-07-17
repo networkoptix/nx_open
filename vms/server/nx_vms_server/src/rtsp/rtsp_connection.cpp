@@ -647,9 +647,9 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getKeyFrame(
         : nx::vms::api::StreamIndex::secondary;
 
     if (dataType == QnAbstractMediaData::VIDEO)
-        return videoCamera->getLastVideoFrameRtsp(streamIndex, /*channel*/ 0);
+        return videoCamera->getLastVideoFrame(streamIndex, /*channel*/ 0);
     else
-        return videoCamera->getLastAudioFrameRtsp(streamIndex);
+        return videoCamera->getLastAudioFrame(streamIndex);
 }
 
 QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::waitForKeyFrame(

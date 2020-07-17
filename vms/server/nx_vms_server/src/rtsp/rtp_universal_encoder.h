@@ -38,6 +38,7 @@ public:
     virtual void setDataPacket(QnConstAbstractMediaDataPtr media) override;
     virtual bool getNextPacket(QnByteArray& sendBuffer) override;
     virtual void init() override;
+    virtual bool isEof() const override;
 
 private:
     QSize getTargetSize(QnConstAbstractMediaDataPtr media, QSize targetSize);
@@ -53,11 +54,14 @@ private:
     Config m_config;
     bool m_isCurrentPacketSecondaryStream = false;
     bool m_useSecondaryPayloadType = false;
+    bool m_eof = false;
+    bool m_transcodingEnabled = false;
     MediaQuality m_requiredQuality = MEDIA_Quality_None;
     int m_outputPos = 0;
     int m_packetIndex = 0;
     QnFfmpegTranscoder m_transcoder;
     AVCodecID m_codec = AV_CODEC_ID_NONE;
+    AVCodecID m_sourceCodec = AV_CODEC_ID_NONE;
     bool m_isVideo = false;
     int m_payloadType = 0;
     nx::streaming::rtp::RtcpSenderReporter m_rtcpReporter;
