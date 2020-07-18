@@ -389,11 +389,11 @@
     <name>UIDelegatesManager</name>
     <message>
       <source>Connect to proxy &quot;%1&quot; using:</source>
-      <translation type="unfinished">Connect to proxy &quot;%1&quot; using:</translation>
+      <translation>Proxy &quot;%1&quot; kullanarak bağlan:</translation>
     </message>
     <message>
       <source>Enter username and password for &quot;%1&quot; at %2://%3</source>
-      <translation type="unfinished">Enter username and password for &quot;%1&quot; at %2://%3</translation>
+      <translation>&quot;%1&quot; için %2: //%3için kullanıcı adı ve şifre girin</translation>
     </message>
     <message>
       <source>Javascript Alert - %1</source>
