@@ -21,15 +21,14 @@ Ptr<ObjectMetadataPacket> MetadataParser::parsePacket(QByteArray bytes)
 {
     evictStaleCacheEntries();
 
-    // XXX: Strip garbage off both ends. Its presence is possibly a server bug.
+    // Strip garbage off both ends. Its presence is possibly a server bug.
+    // TODO: Remove if fixed.
     int begin = std::max(0, bytes.indexOf('<'));
     int end = bytes.lastIndexOf('>') + 1;
     bytes = bytes.mid(begin, std::max(0, end - begin));
 
     m_xml.clear();
     m_xml.addData(bytes);
-
-    //std::cerr << "-----\n" << xml.toString(2).toStdString() << "-----\n" << std::endl;
     
     Ptr<ObjectMetadataPacket> packet;
 
@@ -216,7 +215,7 @@ std::optional<Rect> MetadataParser::parseRegionListElement()
 
     if (!seenRegion)
         NX_DEBUG(NX_SCOPE_TAG, "No 'Region' elements in 'RegionList' element");
-    if (min.x > max.x || min.y > max.y)
+    if (min.x >= max.x || min.y >= max.y)
         return std::nullopt;
 
     Rect rect;

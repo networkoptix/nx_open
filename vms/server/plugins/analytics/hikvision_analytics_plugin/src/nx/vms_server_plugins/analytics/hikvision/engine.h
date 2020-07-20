@@ -1,11 +1,7 @@
 #pragma once
 
-#include "common.h"
-#include "metadata_monitor.h"
-
 #include <vector>
 #include <chrono>
-
 #include <optional>
 
 #include <QtCore/QByteArray>
@@ -16,6 +12,9 @@
 #include <nx/sdk/analytics/i_engine.h>
 #include <nx/utils/elapsed_timer.h>
 #include <nx/sdk/analytics/helpers/plugin.h>
+
+#include "common.h"
+#include "metadata_monitor.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -62,7 +61,8 @@ private:
     bool fetchSupportedEventTypeIds(DeviceData* deviceData, const nx::sdk::IDeviceInfo* deviceInfo);
     QList<QString> parseSupportedEvents(const QByteArray& data);
     bool fetchSupportedObjectTypeIds(DeviceData* deviceData, const nx::sdk::IDeviceInfo* deviceInfo);
-    QList<QString> parseSupportedObjects(const QByteArray& data);
+    std::optional<QList<QString>> parseSupportedObjects(const QByteArray& data);
+    
     DeviceData& getCachedDeviceData(const nx::sdk::IDeviceInfo* deviceInfo);
 
 private:

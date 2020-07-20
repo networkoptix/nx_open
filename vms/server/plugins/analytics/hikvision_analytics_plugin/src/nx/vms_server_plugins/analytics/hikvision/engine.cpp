@@ -183,7 +183,7 @@ bool Engine::fetchSupportedEventTypeIds(DeviceData* deviceData, const IDeviceInf
     return true;
 }
 
-QList<QString> Engine::parseSupportedObjects(const QByteArray& data)
+std::optional<QList<QString>> Engine::parseSupportedObjects(const QByteArray& data)
 {
     QDomDocument document;
     {
@@ -191,24 +191,24 @@ QList<QString> Engine::parseSupportedObjects(const QByteArray& data)
         int errorLine, errorColumn;
         if (!document.setContent(data, false, &errorDescription, &errorLine, &errorColumn))
         {
-            NX_WARNING(NX_SCOPE_TAG, "Failed to parse XML at %1:%2: %3 [[[%4]]]",
-                errorLine, errorColumn, errorDescription, data);
-            return {};
+            NX_DEBUG(NX_SCOPE_TAG, "Failed to parse XML at %1:%2: %3",
+                errorLine, errorColumn, errorDescription);
+            return std::nullopt;
         }
     }
 
     const auto metadataCfg = document.documentElement();
     if (metadataCfg.tagName() != "MetadataCfg")
     {
-        NX_WARNING(NX_SCOPE_TAG, "XML root is not 'MetadataCfg'");
-        return {};
+        NX_DEBUG(NX_SCOPE_TAG, "XML root element is not 'MetadataCfg'");
+        return std::nullopt;
     }
 
     const auto metadataList = metadataCfg.firstChildElement("MetadataList");
     if (metadataList.isNull())
     {
-        NX_WARNING(NX_SCOPE_TAG, "No 'MetadataList' in 'MetadataCfg'");
-        return {};
+        NX_DEBUG(NX_SCOPE_TAG, "No 'MetadataList' XML element in 'MetadataCfg' element");
+        return std::nullopt;
     }
 
     QSet<QString> capabilities;
@@ -218,7 +218,7 @@ QList<QString> Engine::parseSupportedObjects(const QByteArray& data)
         const auto enable = metadata.firstChildElement("enable");
         if (enable.isNull())
         {
-            NX_WARNING(NX_SCOPE_TAG, "No 'enable' in 'Metadata'");
+            NX_DEBUG(NX_SCOPE_TAG, "No 'enable' XML element in 'Metadata' element");
             continue;
         }
         if (enable.text() != "true")
@@ -227,7 +227,7 @@ QList<QString> Engine::parseSupportedObjects(const QByteArray& data)
         const auto type = metadata.firstChildElement("type");
         if (type.isNull())
         {
-            NX_WARNING(NX_SCOPE_TAG, "No 'type' in 'Metadata'");
+            NX_DEBUG(NX_SCOPE_TAG, "No 'type' XML element in 'Metadata' element");
             continue;
         }
         capabilities.insert(type.text());
@@ -255,32 +255,33 @@ bool Engine::fetchSupportedObjectTypeIds(DeviceData* deviceData, const IDeviceIn
     httpClient.setUserName(deviceInfo->login());
     httpClient.setUserPassword(deviceInfo->password());
 
-    const auto result = httpClient.doGet(url);
-    const auto response = httpClient.response();
-
-    if (!result || !response)
+    httpClient.doGet(url);
+    if (!httpClient.hasRequestSucceeded())
     {
-        NX_WARNING(
-            this,
-            lm("No response for supported objects request %1.").args(deviceInfo->url()));
+        NX_DEBUG(this, "No response for supported objects request %1", deviceInfo->url());
         return false;
     }
 
+    const auto response = httpClient.response();
     const auto statusCode = response->statusLine.statusCode;
     const auto buffer = httpClient.fetchEntireMessageBody();
     if (!nx::network::http::StatusCode::isSuccessCode(statusCode) || !buffer)
     {
-        NX_WARNING(
-            this,
-            lm("Unable to fetch supported objects for device %1. HTTP status code: %2")
-                .args(deviceInfo->url(), statusCode));
+        NX_DEBUG(this, "Unable to fetch supported objects for device %1. HTTP status code: %2",
+            deviceInfo->url(), statusCode);
         return false;
     }
 
-    NX_DEBUG(this, lm("Device url %1. RAW list of supported objects: %2").
-        args(deviceInfo->url(), buffer));
-
-    deviceData->supportedObjectTypeIds = parseSupportedObjects(*buffer);
+    if (auto typeIds = parseSupportedObjects(*buffer))
+    {
+        deviceData->supportedObjectTypeIds = std::move(*typeIds);
+    }
+    else
+    {
+        NX_DEBUG(this, "Failed to parse list of objects supported by device %1. Raw XML: %2",
+            deviceInfo->url(), *buffer);
+        return false;
+    }
 
     return true;
 }
