@@ -32,6 +32,7 @@
 #include <nx/vms/text/human_readable.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/client/desktop/analytics/analytics_attributes.h>
+#include <nx/vms/client/desktop/analytics/object_type_dictionary.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
 #include <nx/utils/datetime.h>
@@ -43,7 +44,7 @@
 
 namespace nx::vms::client::desktop {
 
-using namespace analytics::db;
+using namespace nx::analytics::db;
 
 namespace {
 
@@ -324,7 +325,7 @@ rest::Handle AnalyticsSearchListModel::Private::requestPrefetch(const QnTimePeri
                 return;
 
             QnTimePeriod actuallyFetched;
-            m_prefetch = analytics::db::LookupResult();
+            m_prefetch = LookupResult();
 
             if (success)
             {
@@ -635,6 +636,9 @@ void AnalyticsSearchListModel::Private::processMetadata()
     if (!m_selectedObjectType.isEmpty())
         filter.objectTypeId.push_back(m_selectedObjectType);
 
+    const analytics::ObjectTypeDictionary objectTypeDictionary(
+        q->commonModule()->analyticsObjectTypeDescriptorManager());
+
     for (const auto& packets: packetsBySource)
     {
         for (const auto& metadata: packets)
@@ -678,9 +682,6 @@ void AnalyticsSearchListModel::Private::processMetadata()
                     continue;
                 }
 
-                if (!filter.acceptsMetadata(item))
-                    continue;
-
                 ObjectTrack newTrack;
                 newTrack.id = item.trackId;
                 newTrack.deviceId = objectMetadata->deviceId;
@@ -691,6 +692,10 @@ void AnalyticsSearchListModel::Private::processMetadata()
                 newTrack.bestShot.streamIndex = objectMetadata->streamIndex;
                 newTrack.firstAppearanceTimeUs = objectMetadata->timestampUs;
                 newTrack.lastAppearanceTimeUs = objectMetadata->timestampUs;
+                newTrack.objectPosition.add(item.boundingBox);
+
+                if (!filter.acceptsTrack(newTrack, objectTypeDictionary))
+                    continue;
 
                 newObjectIndices[item.trackId] = int(newTracks.size());
                 newTracks.push_back(newTrack);
@@ -865,7 +870,7 @@ QList<QPair<QString, QString>> AnalyticsSearchListModel::Private::attributes(
 }
 
 QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
-    const analytics::db::ObjectTrack& track) const
+    const ObjectTrack& track) const
 {
     using nx::vms::api::analytics::ActionTypeDescriptor;
     const auto camera = this->camera(track);
@@ -901,7 +906,7 @@ QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
 }
 
 AnalyticsSearchListModel::Private::PreviewParams AnalyticsSearchListModel::Private::previewParams(
-    const analytics::db::ObjectTrack& track)
+    const ObjectTrack& track)
 {
     if (track.bestShot.initialized())
         return {microseconds(track.bestShot.timestampUs), track.bestShot.rect};
@@ -911,7 +916,7 @@ AnalyticsSearchListModel::Private::PreviewParams AnalyticsSearchListModel::Priva
 }
 
 QnVirtualCameraResourcePtr AnalyticsSearchListModel::Private::camera(
-    const analytics::db::ObjectTrack& track) const
+    const ObjectTrack& track) const
 {
     const auto& deviceId = track.deviceId;
     if (NX_ASSERT(!deviceId.isNull()))

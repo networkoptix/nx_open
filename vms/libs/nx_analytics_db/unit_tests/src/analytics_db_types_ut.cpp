@@ -121,7 +121,8 @@ TEST_P(FilterByUserInputTest, metadata)
 {
     Filter filter;
     filter.freeText = QString::fromStdString(userInput());
-    ASSERT_EQ(filter.acceptsMetadata(sampleMetadata()), expectedResult());
+    ASSERT_EQ(filter.acceptsMetadata(QnUuid(), sampleMetadata(), m_objectTypeDictionary),
+        expectedResult());
 }
 
 TEST_P(FilterByUserInputTest, track)
@@ -151,6 +152,7 @@ static std::vector<FreeTextAndExpectedResult> kUserInputAndExpectedResults{
     {"\"Wheel Size\":15", true},
     {"\"Wheel Size\":17", false},
     {"Type:", true},
+    {ObjectTypeDictionary().idToName("nx.Car")->toStdString(), true},
 };
 
 INSTANTIATE_TEST_CASE_P(AnalyticsDbFilter,

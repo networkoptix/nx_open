@@ -22,6 +22,7 @@
 #include <nx/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/area_highlight_overlay_widget.h>
 #include <nx/vms/client/desktop/analytics/object_display_settings.h>
+#include <nx/vms/client/desktop/analytics/object_type_dictionary.h>
 
 #include <utils/math/linear_combination.h>
 
@@ -221,6 +222,8 @@ public:
     Filter filter;
     microseconds lastTimestamp{};
     QSet<QnUuid> relevantCameraIds;
+
+    analytics::ObjectTypeDictionary objectTypeDictionary;
 };
 
 AreaHighlightOverlayWidget::AreaInformation WidgetAnalyticsController::Private::areaInfoFromObject(
@@ -242,7 +245,8 @@ QString WidgetAnalyticsController::Private::ObjectInfo::toString() const
 }
 
 WidgetAnalyticsController::Private::Private(WidgetAnalyticsController* parent):
-    QnCommonModuleAware(parent)
+    QnCommonModuleAware(parent),
+    objectTypeDictionary(commonModule()->analyticsObjectTypeDescriptorManager())
 {
 }
 
@@ -306,10 +310,11 @@ void WidgetAnalyticsController::Private::updateObjectAreas(microseconds timestam
 {
     for (const auto& objectInfo: objectInfoByTrackId)
     {
-        const bool relevantCamera = relevantCameraIds.empty()
-            || relevantCameraIds.contains(mediaResourceWidget->resource()->toResourcePtr()->getId());
+        const auto deviceId = mediaResourceWidget->resource()->toResourcePtr()->getId();
+        const bool checkBounds = relevantCameraIds.empty()
+            || relevantCameraIds.contains(deviceId);
 
-        if (!filter.acceptsMetadata(objectInfo.rawData, /*checkBoundingBox*/ relevantCamera))
+        if (!filter.acceptsMetadata(deviceId, objectInfo.rawData, objectTypeDictionary,checkBounds))
         {
             NX_VERBOSE(this, "Object %1 filtered out", objectInfo);
             areaHighlightWidget->removeArea(objectInfo.trackId);

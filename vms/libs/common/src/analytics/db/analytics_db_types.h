@@ -112,6 +112,7 @@ struct Filter
     {
         none = 0x0,
         ignoreTextFilter = 0x1,
+        ignoreBoundingBox = 0x2,
     };
 
     Q_DECLARE_FLAGS(Options, Option)
@@ -149,10 +150,10 @@ struct Filter
 
     bool empty() const;
 
-    bool acceptsObjectType(const QString& typeId) const;
-    bool acceptsBoundingBox(const QRectF& boundingBox) const;
-    bool acceptsAttributes(const nx::common::metadata::Attributes& attributes) const;
-    bool acceptsMetadata(const nx::common::metadata::ObjectMetadata& metadata,
+    bool acceptsMetadata(
+        const QnUuid& deviceId,
+        const nx::common::metadata::ObjectMetadata& metadata,
+        const AbstractObjectTypeDictionary& objectTypeDictionary,
         bool checkBoundingBox = true) const;
 
     bool acceptsTrack(

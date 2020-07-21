@@ -125,32 +125,25 @@ bool Filter::empty() const
     return *this == Filter();
 }
 
-bool Filter::acceptsObjectType(const QString& typeId) const
+bool Filter::acceptsMetadata(
+    const QnUuid& deviceId,
+    const nx::common::metadata::ObjectMetadata& metadata,
+    const AbstractObjectTypeDictionary& objectTypeDictionary,
+    bool checkBoundingBox) const
 {
-    return objectTypeId.empty()
-        || std::find(objectTypeId.cbegin(), objectTypeId.cend(), typeId) != objectTypeId.cend();
-}
+    if (checkBoundingBox
+        && boundingBox
+        && !rectsIntersectToSearchPrecision(*boundingBox, metadata.boundingBox))
+    {
+        return false;
+    }
 
-bool Filter::acceptsBoundingBox(const QRectF& boundingBox) const
-{
-    return !this->boundingBox ||
-        rectsIntersectToSearchPrecision(*(this->boundingBox), boundingBox);
-}
-
-bool Filter::acceptsAttributes(const Attributes& attributes) const
-{
-    TextMatcher textMatcher;
-    textMatcher.parse(freeText);
-
-    textMatcher.matchAttributes(attributes);
-    return textMatcher.matched();
-}
-
-bool Filter::acceptsMetadata(const ObjectMetadata& metadata, bool checkBoundingBox) const
-{
-    return acceptsObjectType(metadata.typeId)
-        && (!checkBoundingBox || acceptsBoundingBox(metadata.boundingBox))
-        && acceptsAttributes(metadata.attributes);
+    ObjectTrack track;
+    track.id = metadata.trackId;
+    track.deviceId = deviceId;
+    track.objectTypeId = metadata.typeId;
+    track.attributes = metadata.attributes;
+    return acceptsTrack(track, objectTypeDictionary, Option::ignoreBoundingBox);
 }
 
 bool Filter::acceptsTrack(
@@ -229,8 +222,11 @@ bool Filter::acceptsTrackInternal(
     }
 
     // Checking the track.
-    if (boundingBox && !track.objectPosition.intersect(*boundingBox))
-        return false;
+    if (!options.testFlag(Option::ignoreBoundingBox))
+    {
+        if (boundingBox && !track.objectPosition.intersect(*boundingBox))
+            return false;
+    }
 
     return true;
 }

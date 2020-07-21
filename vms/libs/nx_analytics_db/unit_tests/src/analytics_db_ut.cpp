@@ -555,7 +555,6 @@ private:
         return filteredObjectTracks;
     }
 
-
     bool satisfiesFilter(
         const Filter& filter,
         const common::metadata::ObjectMetadataPacket& data)
@@ -572,7 +571,7 @@ private:
         for (const auto& objectMetadata: data.objectMetadataList)
         {
             // Checks object type id, bounding box and attributes.
-            if (!filter.acceptsMetadata(objectMetadata))
+            if (!filter.acceptsMetadata(data.deviceId, objectMetadata, objectTypeDictionary()))
                 return false;
         }
 
