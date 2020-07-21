@@ -362,6 +362,18 @@ CameraDiagnostics::Result AnalyticsEngineResource::initInternal()
     SetSettingsRequest initialSettingsRequest;
     initialSettingsRequest.values = storedSettingsValues();
 
+    if (initialSettingsRequest.values.isEmpty())
+    {
+        // If there are no Settings in the database we use default Settings from the Model.
+        // Otherwise we pass the Settings from the database without pulling them through the Model.
+        SettingsEngineWrapper settingsEngine(
+            serverModule()->eventConnector(),
+            toSharedPointer(this));
+
+        settingsEngine.loadModelFromJsonObject(storedSettingsModel());
+        initialSettingsRequest.values = settingsEngine.values();
+    }
+
     const analytics::SettingsResponse settingsResponse =
         setSettingsInternal(initialSettingsRequest, /*isInitialSettings*/ true);
 

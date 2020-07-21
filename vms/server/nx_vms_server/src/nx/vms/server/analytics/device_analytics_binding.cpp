@@ -459,10 +459,19 @@ void DeviceAnalyticsBinding::initializeSettingsContext() const
         ? *modelFromManifests
         : api::analytics::SettingsModel();
 
+    QJsonObject storedSettings = m_device->deviceAgentSettingsValues(m_engine->getId());
+    if (storedSettings.isEmpty())
+    {
+        // If there are no Settings in the database we use default Settings from the Model.
+        // Otherwise we pass the Settings from the database without pulling them through the Model.
+        SettingsEngineWrapper settingsEngine(serverModule()->eventConnector(), m_engine, m_device);
+        settingsEngine.loadModelFromJsonObject(m_deviceAgentContext.settingsContext.model);
+        storedSettings = settingsEngine.values();
+    }
+
     m_deviceAgentContext.settingsContext.modelId =
         calculateModelId(m_deviceAgentContext.settingsContext.model);
-    m_deviceAgentContext.settingsContext.values =
-        m_device->deviceAgentSettingsValues(m_engine->getId());
+    m_deviceAgentContext.settingsContext.values = storedSettings;
 
     const std::optional<DeviceAgentManifest> deviceAgentManifest =
         m_device->deviceAgentManifest(m_engine->getId());
