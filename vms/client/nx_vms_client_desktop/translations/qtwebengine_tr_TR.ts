@@ -393,7 +393,7 @@
     </message>
     <message>
       <source>Enter username and password for &quot;%1&quot; at %2://%3</source>
-      <translation>&quot;%1&quot; için %2: //%3için kullanıcı adı ve şifre girin</translation>
+      <translation>&quot;%1&quot; için %2://%3 için kullanıcı adı ve şifre girin</translation>
     </message>
     <message>
       <source>Javascript Alert - %1</source>
