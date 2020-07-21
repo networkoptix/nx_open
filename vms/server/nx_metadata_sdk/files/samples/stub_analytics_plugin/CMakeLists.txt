@@ -27,8 +27,10 @@ set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 set(CMAKE_INSTALL_RPATH "$ORIGIN")
 
 if(WIN32)
-    #string(APPEND CMAKE_CXX_FLAGS " /MP") #< Use all CPU cores by MSVC.
-endif()    
+    string(APPEND CMAKE_CXX_FLAGS " /MP") #< Use all CPU cores by MSVC.
+    # Do not create separate .pdb files for object files (workaround for mspdbsrv.exe bug).
+    add_compile_options("/Z7")
+endif()
 
 if(WIN32)
     set(API_IMPORT_MACRO "__declspec(dllimport)")
