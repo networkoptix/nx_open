@@ -18,7 +18,7 @@ void assertToString(const T& value, const char* string)
     EXPECT_EQ(QString::fromUtf8(string), toString(value));
 }
 
-TEST(ToString, BuildIn)
+TEST(ToString, BuiltIn)
 {
     assertToString((int) 1, "1");
     assertToString((uint) 77777, "77777");
@@ -31,6 +31,8 @@ TEST(ToString, BuildIn)
 
     assertToString((const char*) "hello", "hello");
     assertToString((const char*) "hello world", "hello world");
+
+    assertToString((const char*) nullptr, "");
 }
 
 TEST(ToString, Std)
