@@ -212,7 +212,7 @@
     <message>
       <location/>
       <source>Exporting video</source>
-      <translation>비디오 백업</translation>
+      <translation>영상 내보내기</translation>
     </message>
     <message>
       <location/>
@@ -1376,7 +1376,7 @@
     <message>
       <location/>
       <source>after</source>
-      <translation>후</translation>
+      <translation>비활성 시간</translation>
     </message>
     <message>
       <location/>
@@ -2538,7 +2538,7 @@
     <message>
       <location filename="../src/ui/widgets/business/recording_business_action_widget.ui"/>
       <source>Quality:</source>
-      <translation>화질:</translation>
+      <translation>품질:</translation>
     </message>
     <message>
       <location/>
@@ -2591,7 +2591,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>최상 화질및 해상도를 위해서는 강력한 PC 시용를 권합니다.</translation>
+      <translation>&quot;최상&quot; 품질 및 해상도는 고성능 PC 사용 시에만 설정하기를 권장 합니다.</translation>
     </message>
     <message>
       <location/>
@@ -2718,7 +2718,7 @@
     <message>
       <location/>
       <source>Quality</source>
-      <translation>화질</translation>
+      <translation>품질</translation>
     </message>
     <message>
       <location/>
