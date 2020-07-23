@@ -124,7 +124,10 @@ ini_definition = {
     "maxAllowedFrameDrops": {"type": "int", "range": [0, None], "default": 0},
     "ramPerCameraMegabytes": {"type": "int", "range": [1, None], "default": 40},
     "boxCommandTimeoutS": {"type": "int", "range": [1, None], "default": 15},
-    "boxServiceCommandTimeoutS": {"type": "int", "range": [1, None], "default": 30},
+    "boxServiceStartCommandTimeoutS": {"type": "int", "range": [1, None], "default": 30},
+    # In some cases "stop service" command can take up to 120 seconds, so set the default timeout
+    # as <maximum stop service command time> + <default command timeout> = 120 + 15 = 135 seconds.
+    "boxServiceStopCommandTimeoutS": {"type": "int", "range": [1, None], "default": 135},
     "boxGetFileContentTimeoutS": {"type": "int", "range": [1, None], "default": 30},
     "boxGetProcMeminfoTimeoutS": {"type": "int", "range": [1, None], "default": 10},
     "rtspPerfLinesOutputFile": {"type": "str", "default": ""},
@@ -208,7 +211,8 @@ def load_configs(conf_file, ini_file):
     box_connection.ini_plink_bin = path_from_config(ini['plinkBin'])
     box_connection.ini_box_command_timeout_s = ini['boxCommandTimeoutS']
     box_connection.ini_box_get_file_content_timeout_s = ini['boxGetFileContentTimeoutS']
-    vms_scanner.ini_box_service_command_timeout_s = ini['boxServiceCommandTimeoutS']
+    vms_scanner.ini_box_service_start_command_timeout_s = ini['boxServiceStartCommandTimeoutS']
+    vms_scanner.ini_box_service_stop_command_timeout_s = ini['boxServiceStopCommandTimeoutS']
     box_platform.ini_box_get_proc_meminfo_timeout_s = ini['boxGetProcMeminfoTimeoutS']
     service_objects.ssh_host_key_obtainer.ini_plink_connection_timeout_s = (
         ini['plinkConnectionTimeoutS'])

@@ -8,7 +8,8 @@ from vms_benchmark.box_platform import BoxPlatform
 from vms_benchmark.config import ConfigParser
 from vms_benchmark.exceptions import BoxCommandError, BoxStateError, HostOperationError
 
-ini_box_service_command_timeout_s: int
+ini_box_service_start_command_timeout_s: int
+ini_box_service_stop_command_timeout_s: int
 
 
 class VmsScanner:
@@ -35,11 +36,17 @@ class VmsScanner:
             return self.pid in [int(pid) for pid in pids_raw.strip().split()]
 
         def execute_service_command(self, command, exc=False):
+            timeout_s = None  # Default timeout if the command is neither "start" nor "stop".
+            if command == "start":
+                timeout_s = ini_box_service_start_command_timeout_s
+            elif command == "stop":
+                timeout_s = ini_box_service_stop_command_timeout_s
+
             try:
                 if self.linux_distribution.with_systemd:
                     self.device.sh(
                         f'systemctl {command} {self.service_script}',
-                        timeout_s=ini_box_service_command_timeout_s,
+                        timeout_s=timeout_s,
                         su=True,
                         throw_exception_on_error=True,
                         stderr=None,
@@ -48,7 +55,7 @@ class VmsScanner:
                 else:
                     self.device.sh(
                         f'/etc/init.d/{self.service_script} {command}',
-                        timeout_s=ini_box_service_command_timeout_s,
+                        timeout_s=timeout_s,
                         su=True,
                         throw_exception_on_error=True,
                         stderr=None,

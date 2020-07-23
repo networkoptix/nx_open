@@ -5,9 +5,9 @@ QString QnApplauncherAppInfo::applicationName()
     return QStringLiteral("${applauncher.name}");
 }
 
-QString QnApplauncherAppInfo::clientBinaryName()
+QString QnApplauncherAppInfo::clientLauncherName()
 {
-    return QStringLiteral("${client.binary.name}");
+    return QStringLiteral("${client_launcher_name}");
 }
 
 QString QnApplauncherAppInfo::installationRoot()

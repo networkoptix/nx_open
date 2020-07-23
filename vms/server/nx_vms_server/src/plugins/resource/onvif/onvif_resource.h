@@ -592,7 +592,6 @@ private:
 
     static const char* ONVIF_PROTOCOL_PREFIX;
     static const char* ONVIF_URL_SUFFIX;
-    static const int DEFAULT_IFRAME_DISTANCE;
 
     QMap<int, QRect> m_motionWindows;
     QMap<int, QRect> m_motionMask;

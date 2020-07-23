@@ -72,7 +72,7 @@ QnClientInstallationPtr QnClientInstallation::installationForPath(const QString&
     QnClientInstallationPtr installation(new QnClientInstallation());
     installation->m_rootPath = rootPath;
 
-    const QString binary = targetBinaryPath(QnApplauncherAppInfo::clientBinaryName());
+    const QString binary = targetBinaryPath(QnApplauncherAppInfo::clientLauncherName());
     if (!rootDir.exists(binary))
         return QnClientInstallationPtr();
 

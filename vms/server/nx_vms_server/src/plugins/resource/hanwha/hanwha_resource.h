@@ -92,7 +92,7 @@ public:
     QString streamCodecProfile(AVCodecID codec, Qn::ConnectionRole role) const;
     QSize streamResolution(Qn::ConnectionRole role) const;
     int streamFrameRate(Qn::ConnectionRole role, int desiredFps) const;
-    int streamGovLength(Qn::ConnectionRole role) const;
+    int streamGovLength(Qn::ConnectionRole role, const QSize& streamResolution) const;
     Qn::BitrateControl streamBitrateControl(Qn::ConnectionRole role) const;
     int streamBitrate(Qn::ConnectionRole role, const QnLiveStreamParams& streamParams) const;
 
@@ -214,7 +214,6 @@ private:
 
     AVCodecID defaultCodecForStream(Qn::ConnectionRole role) const;
     QSize defaultResolutionForStream(Qn::ConnectionRole role) const;
-    int defaultGovLengthForStream(Qn::ConnectionRole role) const;
     Qn::BitrateControl defaultBitrateControlForStream(Qn::ConnectionRole role) const;
     int defaultBitrateForStream(Qn::ConnectionRole role) const;
     Qn::EntropyCoding defaultEntropyCodingForStream(Qn::ConnectionRole role) const;

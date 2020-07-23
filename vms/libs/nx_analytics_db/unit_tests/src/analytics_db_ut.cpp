@@ -457,6 +457,7 @@ private:
         std::vector<ObjectTrack> tracksFound;
     };
 
+    ObjectTypeDictionary m_objectTypeDictionary;
     std::unique_ptr<AbstractEventsStorage> m_eventsStorage;
     Settings m_settings;
     std::vector<common::metadata::ObjectMetadataPacketPtr> m_analyticsDataPackets;
@@ -469,7 +470,6 @@ private:
     std::pair<std::chrono::system_clock::time_point, std::chrono::system_clock::time_point>
         m_allowedTimeRange;
     AttributeDictionary m_attributeDictionary;
-    ObjectTypeDictionary m_objectTypeDictionary;
 
     EventsStorage::InitResult initializeStorage()
     {

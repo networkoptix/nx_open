@@ -5,7 +5,7 @@
 struct QnApplauncherAppInfo
 {
     static QString applicationName();
-    static QString clientBinaryName();
+    static QString clientLauncherName();
 
     /** Directory where all software is installed by default. */
     static QString installationRoot();

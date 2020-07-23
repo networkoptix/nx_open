@@ -808,7 +808,7 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param[opt]:boolean showDesktopCameras Whether desktop cameras should be listed. False by
      *     default.
      * %return List of camera information objects in the requested format.
-     *     %// From struct ApiResourceData:
+     *     %// From struct ResourceData:
      *     %param id Camera unique id.
      *     %param parentId Unique id of the server hosting the camera.
      *     %param name Camera name.
@@ -833,10 +833,10 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         is causing a lot of network issues.
      *     %param vendor Camera manufacturer.
      *
-     *     %// From struct ApiCameraAttributesData:
-     *     %param cameraId Camera unique id. If such object exists, omitted fields will not be
-     *           changed.
-     *     %param cameraName Camera name.
+     *     %// From struct CameraAttributesData:
+     *     %// NOTE: Fields cameraName and cameraId do not appear here because they are excluded
+     *     %// from serialization of CameraDataEx by not including them in the field enumerating
+     *     %// macro CameraAttributesData_Fields_Short.
      *     %param userDefinedGroupName Name of the user-defined camera group.
      *     %param scheduleEnabled Whether recording to the archive is enabled for the camera.
      *         %value false
