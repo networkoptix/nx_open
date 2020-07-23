@@ -43,6 +43,7 @@
             <?if $(var.enable_hanwha) = "true"?>
                 <Component><File Name="hanwha_analytics_plugin.dll" KeyPath="yes"/></Component>
             <?endif?>
+            <Component><File Name="vivotek_analytics_plugin.dll" KeyPath="yes"/></Component>
         </ComponentGroup>
 
         <ComponentGroup Id="server_plugins_optional"
