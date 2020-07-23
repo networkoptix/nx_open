@@ -159,7 +159,8 @@ bool Data::s_destructorCalled = false;
 
 TEST(RefCountable, interfaceId)
 {
-    ASSERT_STREQ(reinterpret_cast<const char*>(IData::interfaceId()), IData::interfaceId()->value);
+    ASSERT_STREQ("nx::sdk::test::IData", static_cast<const char*>(IData::interfaceId()->value));
+    ASSERT_EQ(IData::interfaceId()->value, reinterpret_cast<const char*>(IData::interfaceId()));
 }
 
 TEST(RefCountable, refCountableBasics)
@@ -231,7 +232,8 @@ public:
 
 TEST(RefCountable, makeIdForTemplate)
 {
-    ASSERT_STREQ("test::ITemplate<test::ISomeItem>", ITemplate<ISomeItem>::interfaceId()->value);
+    ASSERT_STREQ("test::ITemplate<test::ISomeItem>",
+        static_cast<const char*>(ITemplate<ISomeItem>::interfaceId()->value));
 }
 
 //-------------------------------------------------------------------------------------------------
