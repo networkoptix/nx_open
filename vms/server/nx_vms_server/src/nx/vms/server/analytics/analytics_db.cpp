@@ -101,26 +101,32 @@ bool AnalyticsDb::makeWritable(const std::vector<PathAndMode>& pathAndModeList)
 
         if (!rootFs->isPathExists(path))
         {
-            NX_DEBUG(this,
-                "Requested to change owner for a path %1, but it doesn't exist. Skipping.", path);
+            NX_DEBUG(this, "Requested to change owner for a path %1, but it doesn't exist. Skipping.", path);
             continue;
         }
 
-        if (mode == ChownMode::mountPoint
-            && globalSettings()->forceAnalyticsDbStoragePermissions()
-            && !rootFs->makeReadable(path))
+        if (mode == ChownMode::mountPoint)
         {
-            NX_WARNING(this, "Failed to make readable. Mode: %1. Path: %2", mode, path);
-            continue;
-        }
+            // On linux write access on any location under the mount point requires read access on
+            // the mount point itself.
+            if (!rootFs->makeReadable(path))
+            {
+                NX_WARNING(this, "Unable to give read access to the mount point: %1", path);
+                continue;
+            }
 
-        if (!rootFs->changeOwner(path, mode == ChownMode::recursive))
+            NX_DEBUG(this, "Read access is given to the mount point: %1", path);
+        }
+        else
         {
-            NX_WARNING(this, "Failed to change access rights. Mode: %1. Path: %2", mode, path);
-            return false;
-        }
+            if (!rootFs->changeOwner(path, mode == ChownMode::recursive))
+            {
+                NX_WARNING(this, "Failed to change access rights. Mode: %1. Path: %2", mode, path);
+                return false;
+            }
 
-        NX_DEBUG(this, "Succeed to change access rights. Mode: %1. Path: %2", mode, path);
+            NX_DEBUG(this, "Succeed to change access rights. Mode: %1. Path: %2", mode, path);
+        }
     }
 
     return true;

@@ -21,6 +21,7 @@
 #include "serializers.h"
 #include "time_period_fetcher.h"
 
+#include <api/global_settings.h>
 #include <common/common_module.h>
 #include <utils/common/util.h>
 
@@ -100,7 +101,7 @@ bool EventsStorage::makeWritable(
 
 QnGlobalSettings* EventsStorage::globalSettings() const
 {
-    return m_commonModule->globalSettings();
+    return m_commonModule ? m_commonModule->globalSettings() : nullptr;
 }
 
 std::vector<EventsStorage::PathAndMode> EventsStorage::enumerateSqlFiles(const QString& dbFileName)
@@ -143,8 +144,11 @@ EventsStorage::InitResult EventsStorage::initialize(const Settings& settings)
 
     // Security huck: we have to set chmod 755, otherwise SQLite will not be able to manage DB on
     // this disk drive due to QT SQLite driver limitations.
-    const auto diskMountPoint = QDir(settings.path).absoluteFilePath("..");
-    if (!makeWritable({{diskMountPoint, ChownMode::mountPoint}})
+    QString diskMountPoint;
+    if (const auto s = globalSettings(); s && s->forceAnalyticsDbStoragePermissions())
+        diskMountPoint = QDir(settings.path).absoluteFilePath("..");
+
+    if ((!diskMountPoint.isEmpty() && !makeWritable({{diskMountPoint, ChownMode::mountPoint}}))
         || !makePath(archivePath)
         || !makeWritable({
             {settings.path, ChownMode::nonRecursive},
@@ -164,14 +168,9 @@ EventsStorage::InitResult EventsStorage::initialize(const Settings& settings)
     {
         m_dbController.reset();
 
-        auto error = QFileDevice::OpenError;
-        if (QFile file(settings.path); !file.open(QIODevice::ReadWrite))
-            error = file.error();
-
-        NX_WARNING(this, "Failed to open Analytics DB (%1) at %2", error, settings.path);
-        return error == QFileDevice::PermissionsError
-            ? InitResult::permissionError
-            : InitResult::otherError;
+        const auto isRw = QFileInfo(settings.path).isWritable();
+        NX_WARNING(this, "Failed to open Analytics DB (RW: %1) at %2", isRw, settings.path);
+        return !isRw ? InitResult::permissionError : InitResult::otherError;
     }
 
     NX_DEBUG(this, "Initializing archive directory at %1", archivePath);

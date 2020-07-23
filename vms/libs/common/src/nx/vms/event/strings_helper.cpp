@@ -579,7 +579,7 @@ QString StringsHelper::eventReason(const EventParameters& params) const
         case EventReason::metadataStoragePermissionDenied:
         {
             QString storageUrl = reasonParamsEncoded;
-            result = tr("Analytics storage \"%1\" DB error: File system permissions denied.")
+            result = tr("Analytics storage \"%1\" DB error: Insufficient permissions on the mount point.")
                 .arg(storageUrl);
             break;
         }
