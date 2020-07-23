@@ -58,7 +58,7 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_lastRtTime(0),
     m_lastMediaTime(0),
     m_waitSCeq(-1),
-    m_liveMode(false),
+    m_liveMode(true),
     m_pauseNetwork(false),
     m_singleShotMode(false),
     m_packetSent(false),
