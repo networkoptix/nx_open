@@ -212,7 +212,8 @@ inline std::string toString(wchar_t* w) { return toString(const_cast<const wchar
 NX_KIT_API std::string toString(const std::string& s);
 NX_KIT_API std::string toString(const std::wstring& w);
 
-// For unknown types, use their operator<<().
+
+/** For unknown types, use their operator<<(). */
 template<typename T>
 std::string toString(T value)
 {
