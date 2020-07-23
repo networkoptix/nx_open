@@ -19,7 +19,13 @@ cf::future<Response> futurize(Func func, Client* client, Args&&... args)
     auto future = promise.get_future();
 
     func(*client, std::forward<Args>(args)...,
-        [promise = std::move(promise)]() mutable { promise.set_value(cf::unit()); });
+        [client, promise = std::move(promise)]() mutable {
+            client->post(
+                [promise = std::move(promise)]() mutable
+                {
+                    promise.set_value(cf::unit());
+                });
+        });
 
     return future
         .then(cf::translate_broken_promise_to_operation_canceled)

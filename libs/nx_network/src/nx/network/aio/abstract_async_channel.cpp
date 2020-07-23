@@ -20,9 +20,13 @@ cf::future<std::size_t> futurizeIo(Func func, AbstractAsyncChannel* channel, con
     auto future = promise.get_future();
 
     func(*channel, buffer,
-        [promise = std::move(promise)](auto errorCode, auto transferredSize) mutable
+        [channel, promise = std::move(promise)](auto errorCode, auto transferredSize) mutable
         {
-            promise.set_value(std::make_pair(errorCode, transferredSize));
+            channel->post(
+                [promise = std::move(promise), errorCode, transferredSize]() mutable
+                {
+                    promise.set_value(std::make_pair(errorCode, transferredSize));
+                });
         });
 
     return future
