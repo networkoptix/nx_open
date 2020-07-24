@@ -344,7 +344,6 @@ PtzOverlayWidget* PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget* widg
     if (data.overlayWidget)
         return data.overlayWidget;
 
-    bool isFisheye = data.hasCapabilities(Ptz::VirtualPtzCapability);
     bool isFisheyeEnabled = widget->dewarpingParams().enabled;
 
     PtzOverlayWidget *overlay = new PtzOverlayWidget();
@@ -356,7 +355,7 @@ PtzOverlayWidget* PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget* widg
     overlay->focusOutButton()->setTarget(widget);
     overlay->focusAutoButton()->setTarget(widget);
     overlay->modeButton()->setTarget(widget);
-    overlay->modeButton()->setVisible(isFisheye && isFisheyeEnabled);
+    overlay->modeButton()->setVisible(data.isFisheye() && isFisheyeEnabled);
 
     overlay->setMarkersMode(ini().oldPtzAimOverlay
         ? capabilitiesToMode(data.capabilities)
@@ -606,7 +605,6 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
 
         const PtzData& data = m_dataByWidget[widget];
 
-        const bool isFisheye = data.hasCapabilities(Ptz::VirtualPtzCapability);
         const bool isFisheyeEnabled = widget->dewarpingParams().enabled;
 
         const bool canMove = data.hasCapabilities(Ptz::ContinuousPanCapability)
@@ -615,7 +613,7 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
         const bool hasFocus = data.hasCapabilities(Ptz::ContinuousFocusCapability);
         const bool hasAutoFocus = data.traits.contains(Ptz::ManualAutoFocusPtzTrait);
         const bool hasViewportMode = data.hasCapabilities(Ptz::ViewportPtzCapability);
-        const bool showManipulator = canMove && (ini().oldPtzAimOverlay || isFisheye);
+        const bool showManipulator = canMove && (ini().oldPtzAimOverlay || data.isFisheye());
 
         overlayWidget->manipulatorWidget()->setVisible(showManipulator);
         overlayWidget->zoomInButton()->setVisible(hasZoom);
@@ -623,7 +621,7 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
         overlayWidget->focusInButton()->setVisible(hasFocus);
         overlayWidget->focusOutButton()->setVisible(hasFocus);
 
-        if (hasViewportMode && !isFisheye)
+        if (hasViewportMode && !data.isFisheye())
             overlayWidget->setCursor(Qt::CrossCursor);
         else if (canMove && !showManipulator )
             overlayWidget->setCursor(Qt::SizeAllCursor);
@@ -633,7 +631,7 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
         const bool autoFocusWasVisible = overlayWidget->focusAutoButton()->isVisible();
         overlayWidget->focusAutoButton()->setVisible(hasAutoFocus);
 
-        if (isFisheye)
+        if (data.isFisheye())
         {
             int panoAngle = widget->item()
                 ? 90 * widget->item()->dewarpingParams().panoFactor
@@ -641,7 +639,7 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
             overlayWidget->modeButton()->setText(QString::number(panoAngle));
         }
 
-        overlayWidget->modeButton()->setVisible(isFisheye && isFisheyeEnabled);
+        overlayWidget->modeButton()->setVisible(data.isFisheye() && isFisheyeEnabled);
         overlayWidget->setMarkersMode(ini().oldPtzAimOverlay
             ? capabilitiesToMode(data.capabilities)
             : Qt::Orientations());
@@ -749,7 +747,10 @@ void PtzInstrument::ptzMove(QnMediaResourceWidget* widget, const nx::core::ptz::
             data.requestedSpeed.tilt, data.requestedSpeed.zoom);
 
         widget->ptzController()->continuousMove(data.requestedSpeed);
-        updateActionText(widget);
+
+        if (!data.isFisheye())
+            updateActionText(widget);
+
         data.currentSpeed = data.requestedSpeed;
         m_movementTimer.stop();
     }
@@ -1025,8 +1026,7 @@ void PtzInstrument::startDrag(DragInfo* info)
 
             ensureElementsWidget();
 
-            if (ini().oldPtzAimOverlay ||
-                m_dataByWidget.value(target()).hasCapabilities(Ptz::VirtualPtzCapability))
+            if (ini().oldPtzAimOverlay || m_dataByWidget.value(target()).isFisheye())
             {
                 opacityAnimator(elementsWidget()->arrowItem())->animateTo(1.0);
             }
@@ -1093,8 +1093,7 @@ void PtzInstrument::dragMove(DragInfo* info)
 
             ensureElementsWidget();
 
-            if (ini().oldPtzAimOverlay
-                || m_dataByWidget.value(target()).hasCapabilities(Ptz::VirtualPtzCapability))
+            if (ini().oldPtzAimOverlay || m_dataByWidget.value(target()).isFisheye())
             {
                 auto arrowItem = elementsWidget()->arrowItem();
                 arrowItem->moveTo(elementsWidget()->mapFromItem(target(), target()->rect().center()),
@@ -1338,6 +1337,11 @@ bool PtzInstrument::PtzData::hasCapabilities(Ptz::Capabilities value) const
     return (capabilities & value) == value;
 }
 
+bool PtzInstrument::PtzData::isFisheye() const
+{
+    return hasCapabilities(Ptz::VirtualPtzCapability);
+}
+
 void PtzInstrument::toggleContinuousPtz(DirectionFlag direction, bool on)
 {
     if (dragProcessor()->isRunning())
@@ -1430,7 +1434,7 @@ QnResourceWidget* PtzInstrument::findPtzWidget(const QPointF& scenePos) const
 bool PtzInstrument::wheelEvent(QGraphicsScene* /*scene*/, QGraphicsSceneWheelEvent* event)
 {
     const auto widget = qobject_cast<QnMediaResourceWidget*>(findPtzWidget(event->scenePos()));
-    if (!widget)
+    if (!widget || m_dataByWidget.value(widget).isFisheye())
         return false;
 
     widget->selectThisWidget();

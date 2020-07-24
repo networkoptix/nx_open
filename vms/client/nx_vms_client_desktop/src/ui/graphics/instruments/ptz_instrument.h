@@ -163,6 +163,7 @@ private:
     struct PtzData
     {
         bool hasCapabilities(Ptz::Capabilities value) const;
+        bool isFisheye() const;
 
         Ptz::Capabilities capabilities = Ptz::NoPtzCapabilities;
         QnPtzAuxiliaryTraitList traits;
