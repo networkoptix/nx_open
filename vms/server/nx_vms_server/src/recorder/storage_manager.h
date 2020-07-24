@@ -67,7 +67,6 @@ class QnStorageManager: public QObject, public /*mixin*/ nx::vms::server::Server
 {
     Q_OBJECT
     friend class TestHelper;
-    friend class nx::caminfo::ServerWriterHandler;
 
 public:
     typedef QMap<int, nx::vms::server::StorageResourcePtr> StorageMap;
@@ -148,7 +147,7 @@ public:
     /*
      * Return writable storages with checkBox 'usedForWriting'
      */
-    QSet<StorageResourcePtr> getUsedWritableStorages() const;
+    StorageResourceList getUsedWritableStorages() const;
     QSet<StorageResourcePtr> getClearableStorages() const;
 
     /*
@@ -292,7 +291,8 @@ private:
     bool getMinTimes(QMap<QString, qint64>& lastTime);
     void processCatalogForMinTime(QMap<QString, qint64>& lastTime, const FileCatalogMap& catalogMap);
 
-    QStringList getAllCameraIdsUnderLock(QnServer::ChunksCatalog catalog) const;
+    QStringList getCameraIds(QnServer::ChunksCatalog catalog) const;
+    QStringList getAllCameraIds() const;
     void writeCameraInfoFiles();
     static bool renameFileWithDuration(
         const QString               &oldName,
@@ -367,7 +367,6 @@ private:
     std::atomic<bool> m_firstStoragesTestDone;
 
     bool m_isRenameDisabled;
-    nx::caminfo::ServerWriterHandler m_camInfoWriterHandler;
     nx::caminfo::Writer m_camInfoWriter;
 
     nx::utils::TimerManager m_auxTasksTimerManager;

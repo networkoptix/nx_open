@@ -1,103 +1,47 @@
 #pragma once
 
-#include <functional>
-#include <chrono>
-#include <memory>
-#include <QtCore>
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/hashes.h>
 #include <core/resource/resource_fwd.h>
-#include <core/resource/abstract_storage_resource.h>
+#include <nx/vms/server/resource/storage_resource.h>
 #include <server/server_globals.h>
 #include <nx/vms/api/data/camera_data.h>
 
+#include <QtCore>
+
+#include <unordered_map>
+#include <unordered_set>
+#include <functional>
+#include <chrono>
+#include <memory>
+
 class QnStorageManager;
+class QnMediaServerModule;
 
 namespace nx {
 namespace caminfo {
 
-class ComposerHandler
-{
-public:
-    virtual ~ComposerHandler() {}
-    virtual QString name() const = 0;
-    virtual QString model() const = 0;
-    virtual QString groupId() const = 0;
-    virtual QString groupName() const = 0;
-    virtual QString url() const = 0;
-    virtual QList<QPair<QString, QString>> properties() const = 0;
-};
-
-class Composer
-{
-public:
-    QByteArray make(ComposerHandler* composerHandler);
-
-private:
-    QString formatString(const QString& source) const;
-    void printKeyValue(const QString& key, const QString& value);
-    void printProperties();
-
-private:
-    std::unique_ptr<QTextStream> m_stream;
-    ComposerHandler* m_handler;
-};
-
-class WriterHandler
-{
-public:
-    virtual ~WriterHandler() {}
-    virtual QStringList storagesUrls() const = 0;
-    virtual QStringList camerasIds(QnServer::ChunksCatalog) const = 0;
-    virtual bool needStop() const = 0;
-    virtual bool handleFileData(const QString& path, const QByteArray& data) = 0;
-    virtual ComposerHandler* composerHandler(const QString& cameraId) = 0;
-};
+using IdToInfo = std::unordered_map<QString, QByteArray>;
 
 class Writer
 {
 public:
-    Writer(WriterHandler* writeHandler);
-    void writeAll();
-    void writeFile(const QString& cameraUniqueId, QnServer::ChunksCatalog quality);
+    Writer(const QnMediaServerModule* serverModule);
+    void writeAll(
+        const nx::vms::server::StorageResourceList& storages,
+        const QStringList& cameraIds);
+
+    void write(
+        const nx::vms::server::StorageResourceList& storages,
+        const QString& cameraId,
+        QnServer::ChunksCatalog quality);
 
 private:
-    void writeInfoIfNeeded(const QString& infoFilePath, const QByteArray& infoFileData);
-    bool isWriteNeeded(const QString& infoFilePath, const QByteArray& infoFileData) const;
-    static QString makeFullPath(
-        const QString& storageUrl,
-        QnServer::ChunksCatalog catalog,
-        const QString& cameraId);
+    const QnMediaServerModule* m_serverModule;
+    IdToInfo m_idToInfo;
+    std::unordered_set<QString> m_paths;
 
-private:
-    WriterHandler* m_handler;
-    QMap<QString, QByteArray> m_infoPathToCameraInfo;
-    Composer m_composer;
-};
-
-class ServerWriterHandler:
-    public WriterHandler,
-    public ComposerHandler
-{
-public: // WriterHandler
-    ServerWriterHandler(QnStorageManager* storageManager, QnResourcePool* resPool);
-    virtual QStringList storagesUrls() const override;
-    virtual QStringList camerasIds(QnServer::ChunksCatalog) const override;
-    virtual bool needStop() const override;
-    virtual bool handleFileData(const QString& path, const QByteArray& data) override;
-    virtual ComposerHandler* composerHandler(const QString& cameraId) override;
-
-public: // ComposerHandler
-    virtual QString name() const override;
-    virtual QString model() const override;
-    virtual QString groupId() const override;
-    virtual QString groupName() const override;
-    virtual QString url() const override;
-    virtual QList<QPair<QString, QString>> properties() const override;
-
-private:
-    QnStorageManager* m_storageManager;
-    QnResourcePool* m_resPool;
-    QnSecurityCamResourcePtr m_camera;
+    QnVirtualCameraResourceList getCameras(const QStringList& cameraIds) const;
 };
 
 struct ArchiveCameraData
@@ -124,24 +68,10 @@ public:
     virtual void handleError(const ReaderErrorInfo& errorInfo) const = 0;
 };
 
+class ParseResult;
+
 class Reader
 {
-    class ParseResult
-    {
-    public:
-        ParseResult(const QString& key, const QString& value):
-            m_key(key),
-            m_value(value)
-        {}
-
-        QString key() const { return m_key; }
-        QString value() const { return m_value; }
-
-    private:
-        QString m_key;
-        QString m_value;
-    };
-
 public:
     Reader(ReaderHandler* readerHandler,
            const QnAbstractStorageResource::FileInfo& fileInfo,
@@ -154,7 +84,6 @@ private:
     bool cameraAlreadyExists(const ArchiveCameraDataList* camerasList) const;
     bool readFileData();
     bool parseData();
-    boost::optional<ParseResult> parseLine(const QString& line) const;
     QString infoFilePath() const;
     void addProperty(const ParseResult& result);
 

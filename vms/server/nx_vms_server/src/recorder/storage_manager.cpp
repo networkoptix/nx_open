@@ -695,8 +695,7 @@ QnStorageManager::QnStorageManager(
     m_isWritableStorageAvail(false),
     m_firstStoragesTestDone(false),
     m_isRenameDisabled(serverModule->settings().disableRename()),
-    m_camInfoWriterHandler(this, serverModule->resourcePool()),
-    m_camInfoWriter(&m_camInfoWriterHandler),
+    m_camInfoWriter(serverModule),
     m_auxTasksTimerManager(
         threadName
         ? (std::string(threadName) + std::string("::auxTasksTimerManager")).c_str()
@@ -742,7 +741,7 @@ QnStorageManager::QnStorageManager(
             m_auxTasksTimerManager.addTimer(
                 [this, cameraUniqueId, quality](nx::utils::TimerId)
                 {
-                    m_camInfoWriter.writeFile(cameraUniqueId, quality);
+                    m_camInfoWriter.write(getUsedWritableStorages(), cameraUniqueId, quality);
                 },
                 std::chrono::milliseconds(0));
         });
@@ -758,7 +757,7 @@ void QnStorageManager::emptyCatalogsForNotExistingFolders(const QnStorageResourc
 {
     for (const auto quality: {QnServer::LowQualityCatalog, QnServer::HiQualityCatalog})
     {
-        const auto cameraIds = getAllCameraIdsUnderLock(quality);
+        const auto cameraIds = getCameraIds(quality);
         const auto qualityPath =
             closeDirPath(closeDirPath(storage->getUrl()) + DeviceFileCatalog::prefixByCatalog(quality));
 
@@ -1299,7 +1298,7 @@ void QnStorageManager::setRebuildInfo(const QnStorageScanData& data)
     *m_scanData.lock() = data;
 }
 
-QStringList QnStorageManager::getAllCameraIdsUnderLock(QnServer::ChunksCatalog catalog) const
+QStringList QnStorageManager::getCameraIds(QnServer::ChunksCatalog catalog) const
 {
     QStringList result;
     QnMutexLocker lock(&m_mutexCatalog);
@@ -1307,6 +1306,18 @@ QStringList QnStorageManager::getAllCameraIdsUnderLock(QnServer::ChunksCatalog c
         result.push_back(it.key());
 
     return result;
+}
+
+QStringList QnStorageManager::getAllCameraIds() const
+{
+    QSet<QString> result;
+    for (const auto& id: getCameraIds(QnServer::LowQualityCatalog))
+        result.insert(id);
+
+    for (const auto& id: getCameraIds(QnServer::HiQualityCatalog))
+        result.insert(id);
+
+    return result.toList();
 }
 
 QString QnStorageManager::toCanonicalPath(const QString& path)
@@ -2365,13 +2376,13 @@ bool QnStorageManager::isWritableStoragesAvailable() const
     return m_isWritableStorageAvail;
 }
 
-QSet<StorageResourcePtr> QnStorageManager::getUsedWritableStorages() const
+StorageResourceList QnStorageManager::getUsedWritableStorages() const
 {
     auto allWritableStorages = getAllWritableStorages();
-    QSet<StorageResourcePtr> result;
+    StorageResourceList result;
     for (const auto& storage : allWritableStorages)
         if (storage->isUsedForWriting())
-            result.insert(storage);
+            result.push_back(storage);
 
     if (!result.empty())
         m_isWritableStorageAvail = true;
@@ -2505,9 +2516,10 @@ void QnStorageManager::startAuxTimerTasks()
             kCheckMetadataStorageSpace);
     }
 
-    static const std::chrono::minutes kCameraInfoUpdateInterval(5);
+    static const std::chrono::seconds kCameraInfoUpdateInterval(30);
     m_auxTasksTimerManager.addNonStopTimer(
-        [this](nx::utils::TimerId) { m_camInfoWriter.writeAll(); },
+        [this](nx::utils::TimerId)
+        { m_camInfoWriter.writeAll(getUsedWritableStorages(), getAllCameraIds()); },
         kCameraInfoUpdateInterval, kCameraInfoUpdateInterval);
 
     m_auxTasksTimerManager.addNonStopTimer(
@@ -2598,7 +2610,7 @@ QnStorageResourcePtr QnStorageManager::getStorageByIndex(int index) const
 QnStorageResourcePtr QnStorageManager::getOptimalStorageRoot()
 {
     return nx::vms::server::WritableStoragesHelper(this).optimalStorageForRecording(
-        getUsedWritableStorages().toList());
+        getUsedWritableStorages());
 }
 
 QString QnStorageManager::getFileName(

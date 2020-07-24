@@ -1,12 +1,14 @@
+#include "camera_info.h"
+
 #include <utils/common/util.h>
 #include <utils/common/id.h>
+#include <utils/crypt/symmetrical.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/security_cam_resource.h>
 #include <plugins/resource/archive_camera/archive_camera.h>
 #include <recorder/device_file_catalog.h>
 #include <recorder/storage_manager.h>
-#include "camera_info.h"
 
 namespace nx {
 namespace caminfo {
@@ -17,212 +19,172 @@ const char* const kArchiveCameraModelKey = "cameraModel";
 const char* const kArchiveCameraGroupIdKey = "groupId";
 const char* const kArchiveCameraGroupNameKey = "groupName";
 
+static std::map<QString, QString> gatherProps(const QnSecurityCamResourcePtr& camera)
+{
+    std::map<QString, QString> result;
+    result.insert({kArchiveCameraNameKey, camera->getUserDefinedName()});
+    result.insert({kArchiveCameraModelKey, camera->getModel()});
+    result.insert({kArchiveCameraGroupIdKey, camera->getGroupId()});
+    result.insert({kArchiveCameraGroupNameKey, camera->getUserDefinedGroupName()});
+    result.insert({kArchiveCameraUrlKey, camera->getUrl()});
 
-QByteArray Composer::make(ComposerHandler* composerHandler)
+    for (const auto& prop: camera->getAllProperties())
+        result.insert({prop.name, prop.value});
+
+    return result;
+}
+
+QByteArray infoFrom(const QnSecurityCamResourcePtr& camera)
 {
     QByteArray result;
-    if (!composerHandler)
-        return result;
-
-    m_stream.reset(new QTextStream(&result));
-    m_handler = composerHandler;
-
-    printKeyValue(kArchiveCameraNameKey, m_handler->name());
-    printKeyValue(kArchiveCameraModelKey, m_handler->model());
-    printKeyValue(kArchiveCameraGroupIdKey, m_handler->groupId());
-    printKeyValue(kArchiveCameraGroupNameKey, m_handler->groupName());
-    printKeyValue(kArchiveCameraUrlKey, m_handler->url());
-
-    printProperties();
+    QTextStream stream(&result);
+    stream.setCodec(QTextCodec::codecForName("UTF-8"));
+    stream << "VERSION 1.1" << endl;
+    for (const auto& p: gatherProps(camera))
+    {
+        const auto key = nx::utils::encodeHexStringFromStringAES128CBC(p.first);
+        const auto value = nx::utils::encodeHexStringFromStringAES128CBC(p.second);
+        stream << key << "=" << value << endl;
+    }
 
     return result;
 }
 
-QString Composer::formatString(const QString& source) const
+static IdToInfo fromCameras(const QnVirtualCameraResourceList& cameras)
 {
-    QString sourceCopy = source;
-    QRegExp symbolsToRemove("\\n|\\r");
-    sourceCopy.replace(symbolsToRemove, QString());
-    return lit("\"") + sourceCopy + lit("\"");
+    IdToInfo result;
+    for (const auto& camera: cameras)
+        result.insert({camera->getUniqueId(), infoFrom(camera)});
+
+    return result;
 }
 
-void Composer::printKeyValue(const QString& key, const QString& value)
+static std::vector<std::pair<QString, StorageResourcePtr>> genPathsForQuality(
+    const StorageResourceList& storages,
+    QnServer::ChunksCatalog quality)
 {
-    *m_stream << formatString(key) << "=" << formatString(value) << endl;
-}
-
-void Composer::printProperties()
-{
-    for (const QPair<QString, QString> prop: m_handler->properties())
-        printKeyValue(prop.first, prop.second);
-}
-
-
-Writer::Writer(WriterHandler* writeHandler):
-    m_handler(writeHandler)
-{}
-
-void Writer::writeAll()
-{
-    NX_VERBOSE(this, lit("[CamInfo] writing camera info files starting..."));
-
-    for (auto& storageUrl: m_handler->storagesUrls())
+    std::vector<std::pair<QString, StorageResourcePtr>> result;
+    for (const auto& storage: storages)
     {
-        for (int i = 0; i < static_cast<int>(QnServer::ChunksCatalogCount); ++i)
+        const auto qualityPostfix = DeviceFileCatalog::prefixByCatalog(quality);
+        result.push_back({closeDirPath(storage->getUrl()) + qualityPostfix, storage});
+    }
+
+    return result;
+}
+
+static std::vector<std::pair<QString, StorageResourcePtr>> genPaths(
+    const StorageResourceList& storages)
+{
+    auto hiQualityPaths = genPathsForQuality(storages, QnServer::HiQualityCatalog);
+    const auto lowQualityPaths = genPathsForQuality(storages, QnServer::LowQualityCatalog);
+    std::vector<std::pair<QString, StorageResourcePtr>> result;
+
+    result.reserve(hiQualityPaths.size() + lowQualityPaths.size());
+    for (auto& p: hiQualityPaths)
+        result.emplace_back(std::move(p));
+
+    for (auto& p: lowQualityPaths)
+        result.emplace_back(std::move(p));
+
+    return result;
+}
+
+static void writeFile(
+    const std::pair<QString, QByteArray>& idToInfo,
+    const std::vector<std::pair<QString, StorageResourcePtr>>& pathsWithStorages)
+{
+    for (const auto& pathWithStorage: pathsWithStorages)
+    {
+        const auto filePath = closeDirPath(pathWithStorage.first) + idToInfo.first + "/info.txt";
+        auto file = std::unique_ptr<QIODevice>(pathWithStorage.second->open(
+           filePath,
+           QIODevice::WriteOnly | QIODevice::Truncate));
+
+        if (!file)
         {
-            for (auto& cameraId: m_handler->camerasIds(static_cast<QnServer::ChunksCatalog>(i)))
-            {
-                if (m_handler->needStop())
-                    return;
-                writeInfoIfNeeded(
-                    makeFullPath(storageUrl, static_cast<QnServer::ChunksCatalog>(i), cameraId),
-                    m_composer.make(m_handler->composerHandler(cameraId)));
-            }
+            NX_DEBUG(typeid(Writer), "Failed to open file '%1'", filePath);
+            continue;
         }
-    }
 
-    NX_VERBOSE(this, lit("[CamInfo] writing camera info files DONE"));
+        if (file->write(idToInfo.second))
+            NX_DEBUG(typeid(Writer), "Successfully written file '%1'", filePath);
+        else
+            NX_DEBUG(typeid(Writer), "Failed to write file '%1'", filePath);
+    }
 }
 
-void Writer::writeFile(const QString& cameraUniqueId, QnServer::ChunksCatalog quality)
+static std::unordered_set<QString> toUniquePaths(
+    const std::vector<std::pair<QString, StorageResourcePtr>>& pathStoragePairs)
 {
-    for (auto& storageUrl: m_handler->storagesUrls())
+    std::unordered_set<QString> result;
+    for (const auto& p: pathStoragePairs)
+        result.insert(p.first);
+
+    return result;
+}
+
+Writer::Writer(const QnMediaServerModule* serverModule): m_serverModule(serverModule)
+{
+}
+
+QnVirtualCameraResourceList Writer::getCameras(const QStringList& cameraIds) const
+{
+    const auto resPool = m_serverModule->resourcePool();
+    QnVirtualCameraResourceList result;
+    for (const auto& cameraId: cameraIds)
     {
-        writeInfoIfNeeded(
-            makeFullPath(storageUrl, quality, cameraUniqueId),
-            m_composer.make(m_handler->composerHandler(cameraUniqueId)));
+        const auto camera = resPool->getResourceByUniqueId(cameraId).dynamicCast<QnVirtualCameraResource>();
+        if (camera)
+            result.push_back(camera);
     }
 
-    NX_DEBUG(
-        this, "[CamInfo] updated camera information file for the camera %1, %2 catalog",
-        cameraUniqueId, quality);
+    return result;
 }
 
-bool Writer::isWriteNeeded(const QString& infoFilePath, const QByteArray& infoFileData) const
+void Writer::writeAll(const StorageResourceList& storages, const QStringList& cameraIds)
 {
-    bool isDataAndPathValid = !infoFilePath.isEmpty() && !infoFileData.isEmpty();
-    bool isDataChanged = !m_infoPathToCameraInfo.contains(infoFilePath) ||
-                          m_infoPathToCameraInfo[infoFilePath] != infoFileData;
+    const auto idToInfo = fromCameras(getCameras(cameraIds));
+    const auto pathStoragePairs = genPaths(storages);
+    const auto uniquePaths = toUniquePaths(pathStoragePairs);
+    const bool storagePathsChanged = uniquePaths != m_paths;
 
-    return isDataAndPathValid && isDataChanged;
-}
-
-void Writer::writeInfoIfNeeded(const QString& infoFilePath, const QByteArray& infoFileData)
-{
-    NX_VERBOSE(this, "%1: write camera info to %2. Data changed: %3",
-            __func__,
-            nx::utils::url::hidePassword(infoFilePath),
-            isWriteNeeded(infoFilePath, infoFileData));
-
-    if (isWriteNeeded(infoFilePath, infoFileData))
+    for (const auto& p: idToInfo)
     {
-        if (m_handler->handleFileData(infoFilePath, infoFileData))
-            m_infoPathToCameraInfo[infoFilePath] = infoFileData;
+        const auto existingIt = m_idToInfo.find(p.first);
+        if (existingIt == m_idToInfo.cend() || existingIt->second != p.second || storagePathsChanged)
+            writeFile(p, pathStoragePairs);
+
+        if (m_serverModule->commonModule()->isNeedToStop())
+            break;
     }
+
+    m_idToInfo = idToInfo;
+    if (storagePathsChanged)
+        m_paths = uniquePaths;
 }
 
-QString Writer::makeFullPath(
-    const QString& storageUrl, QnServer::ChunksCatalog catalog, const QString& cameraId)
+void Writer::write(
+    const nx::vms::server::StorageResourceList& storages,
+    const QString& cameraId,
+    QnServer::ChunksCatalog quality)
 {
-    auto separator = getPathSeparator(storageUrl);
-    auto basePath =
-        closeDirPath(storageUrl) + DeviceFileCatalog::prefixByCatalog(catalog) + separator;
-    return basePath + cameraId + separator + lit("info.txt");
+    const auto camera =
+        m_serverModule->resourcePool()->getResourceByUniqueId(cameraId).dynamicCast<QnVirtualCameraResource>();
+    if (!camera)
+    {
+        NX_DEBUG(this, "Camera with unique id '%1' not found", cameraId);
+        return;
+    }
+
+    writeFile({cameraId, infoFrom(camera)}, genPathsForQuality(storages, quality));
 }
 
-ServerWriterHandler::ServerWriterHandler(
-    QnStorageManager* storageManager,
-    QnResourcePool* resPool)
+Reader::Reader(
+    ReaderHandler* readerHandler,
+    const QnAbstractStorageResource::FileInfo& fileInfo,
+    std::function<QByteArray(const QString&)> getFileDataFunc)
     :
-    m_storageManager(storageManager),
-    m_resPool(resPool)
-{
-}
-
-QStringList ServerWriterHandler::storagesUrls() const
-{
-    QStringList result;
-    for (const auto& storage: m_storageManager->getUsedWritableStorages())
-        result.append(storage->getUrl());
-    return result;
-}
-
-QStringList ServerWriterHandler::camerasIds(QnServer::ChunksCatalog catalog) const
-{
-    return m_storageManager->getAllCameraIdsUnderLock(catalog);
-}
-
-bool ServerWriterHandler::needStop() const
-{
-    return m_resPool->commonModule()->isNeedToStop();
-}
-
-bool ServerWriterHandler::handleFileData(const QString& path, const QByteArray& data)
-{
-    auto storage = m_storageManager->getStorageByUrlInternal(path);
-    NX_ASSERT(storage);
-    if (!storage)
-        return false;
-
-    auto outFile = std::unique_ptr<QIODevice>(storage->open(path, QIODevice::WriteOnly | QIODevice::Truncate));
-    if (!outFile)
-    {
-        NX_DEBUG(this, lit("%1. Create file failed for this path: %2")
-                .arg(Q_FUNC_INFO)
-                .arg(path));
-        return false;
-    }
-    outFile->write(data);
-    return true;
-}
-
-QString ServerWriterHandler::name() const
-{
-    return m_camera->getUserDefinedName();
-}
-
-QString ServerWriterHandler::model() const
-{
-    return m_camera->getModel();
-}
-
-QString ServerWriterHandler::groupId() const
-{
-    return m_camera->getGroupId();
-}
-
-QString ServerWriterHandler::groupName() const
-{
-    return m_camera->getUserDefinedGroupName();
-}
-
-QString ServerWriterHandler::url() const
-{
-    return m_camera->getUrl();
-}
-
-QList<QPair<QString, QString>> ServerWriterHandler::properties() const
-{
-    QList<QPair<QString, QString>> result;
-
-    for (const auto& prop: m_camera->getAllProperties())
-        result.append(QPair<QString, QString>(prop.name, prop.value));
-
-    return result;
-}
-
-ComposerHandler* ServerWriterHandler::composerHandler(const QString& cameraId)
-{
-    m_camera = m_resPool->getResourceByUniqueId<QnSecurityCamResource>(cameraId);
-    if (!static_cast<bool>(m_camera))
-        return nullptr;
-    return this;
-}
-
-
-Reader::Reader(ReaderHandler* readerHandler,
-               const QnAbstractStorageResource::FileInfo& fileInfo,
-               std::function<QByteArray(const QString&)> getFileDataFunc):
     m_handler(readerHandler),
     m_fileInfo(&fileInfo),
     m_getDataFunc(getFileDataFunc)
@@ -239,6 +201,7 @@ void Reader::operator()(ArchiveCameraDataList* outArchiveCameraList)
         return;
     }
 
+    NX_DEBUG(this, "Successfully read CamInfo data from %1", m_fileInfo->absoluteFilePath());
     outArchiveCameraList->push_back(m_archiveCamData);
 }
 
@@ -325,18 +288,34 @@ bool Reader::readFileData()
     return true;
 }
 
-bool Reader::parseData()
+static QString getVersion(QTextStream& stream)
 {
-    QTextStream fileDataStream(&m_fileData);
-    while (!fileDataStream.atEnd())
-    {
-        const auto result = parseLine(fileDataStream.readLine());
-        if (result)
-            addProperty(*result);
-    }
+    QString line;
+    if (!stream.readLineInto(&line))
+        return QString();
 
-    return true;
+    const auto splits = line.split(" ");
+    if (splits.size() != 2 || splits[0] != "VERSION")
+        return QString();
+
+    return splits[1];
 }
+
+class ParseResult
+{
+public:
+    ParseResult(const QString& key, const QString& value):
+        m_key(key),
+        m_value(value)
+    {}
+
+    QString key() const { return m_key; }
+    QString value() const { return m_value; }
+
+private:
+    QString m_key;
+    QString m_value;
+};
 
 static int findMatchedDelimeter(const QString& src, char startBrace, char endBrace, bool include)
 {
@@ -365,7 +344,8 @@ static int findMatchedDelimeter(const QString& src, char startBrace, char endBra
     return -1;
 }
 
-static bool readInnerData(const QString& src, char startBrace, char endBrace, QString* dst, bool include)
+static bool readInnerData(
+    const QString& src, char startBrace, char endBrace, QString* dst, bool include)
 {
     const int endPos = findMatchedDelimeter(src, startBrace, endBrace, include);
     if (endPos == -1)
@@ -385,7 +365,7 @@ static bool readValue(const QString& src, QString* dst)
     return readInnerData(src, '"', '"', dst, false);
 }
 
-boost::optional<Reader::ParseResult> Reader::parseLine(const QString& line) const
+boost::optional<ParseResult> parseUnEncrypted(const QString& line)
 {
     if (line.isEmpty())
         return boost::none;
@@ -447,8 +427,45 @@ boost::optional<Reader::ParseResult> Reader::parseLine(const QString& line) cons
             break;
     }
 
-    using ParseResult = Reader::ParseResult;
+    using ParseResult = ParseResult;
     return state == done ? boost::optional<ParseResult>(ParseResult(key, value)) : boost::none;
+}
+
+static boost::optional<ParseResult> parseEncrypted(const QString& line)
+{
+    const auto splits = line.split("=");
+    if (splits.size() != 2)
+        return boost::none;
+
+    return ParseResult(
+        nx::utils::decodeStringFromHexStringAES128CBC(splits[0]),
+        nx::utils::decodeStringFromHexStringAES128CBC(splits[1]));
+}
+
+static boost::optional<ParseResult> parseLine(const QString& line, bool decrypt)
+{
+    if (decrypt)
+        return parseEncrypted(line);
+
+    return parseUnEncrypted(line);
+}
+
+bool Reader::parseData()
+{
+    QTextStream fileDataStream(&m_fileData);
+    const auto version = getVersion(fileDataStream);
+    if (version.isNull())
+        fileDataStream.seek(0);
+
+    QString line;
+    while (fileDataStream.readLineInto(&line))
+    {
+        const auto result = parseLine(line, version >= "1.0");
+        if (result)
+            addProperty(*result);
+    }
+
+    return true;
 }
 
 void Reader::addProperty(const ParseResult& result)
@@ -502,7 +519,6 @@ void ServerReaderHandler::handleError(const ReaderErrorInfo& errorInfo) const
 {
     NX_UTILS_LOG(errorInfo.severity, this, errorInfo.message);
 }
-
 
 } //namespace caminfo
 } //namespace nx
