@@ -180,26 +180,54 @@ void assertEq(
     }
 }
 
-// The overloads below are needed to support null `char*`, as well as std::string with '\0' inside.
+/**
+ * Immutable string with distinct null and empty states, and capable of containing '\0' inside.
+ * Fully supported by nx::kit::utils::toString() and nx/kit/test.h ASSERT_STREQ().
+ */
+struct UniversalString
+{
+    const std::string s;
+    const bool isNull;
+
+    UniversalString(const UniversalString& u, std::false_type): s(u.s), isNull(u.isNull) {}
+
+    /** Creates from a string literal with possible '\0' inside. */
+    template<size_t len>
+    UniversalString(const char (&a)[len], std::true_type): s(a, len - 1), isNull(false) {}
+
+    /** Creates from a string literal with possible '\0' inside. */
+    template<size_t len>
+    UniversalString(char (&a)[len], std::true_type): s(a, len - 1), isNull(false) {}
+
+    UniversalString(const char* p, std::false_type): s(p ? p : ""), isNull(!p) {}
+    UniversalString(std::string s, std::false_type): s(std::move(s)), isNull(false) {}
+
+    /** Required for proper overloading resolution, to prefer array versions over char*. */
+    template<typename T>
+    UniversalString(T&& arg): UniversalString(
+        std::forward<T>(arg), std::is_array<typename std::remove_reference<T>::type>())
+    {
+    }
+
+    bool operator==(const UniversalString& u) const { return isNull == u.isNull && s == u.s; }
+    bool operator!=(const UniversalString& u) const { return !(*this == u); }
+
+    std::string toString() const
+    {
+        if (isNull)
+            return "null";
+        return nx::kit::utils::toString(s);
+    }
+};
+
+inline std::ostream& operator<<(std::ostream& stream, const UniversalString& str)
+{
+    return stream << str.toString();
+}
 
 NX_KIT_API void assertStrEq(
-    const std::string& expectedValue, const char* expectedExpr,
-    const std::string& actualValue, const char* actualExpr,
-    const char* file, int line, int actualLine = -1);
-
-NX_KIT_API void assertStrEq(
-    const char* expectedValue, const char* expectedExpr,
-    const char* actualValue, const char* actualExpr,
-    const char* file, int line, int actualLine = -1);
-
-NX_KIT_API void assertStrEq(
-    const char* expectedValue, const char* expectedExpr,
-    const std::string& actualValue, const char* actualExpr,
-    const char* file, int line, int actualLine = -1);
-
-NX_KIT_API void assertStrEq(
-    const std::string& expectedValue, const char* expectedExpr,
-    const char* actualValue, const char* actualExpr,
+    const UniversalString& expectedValue, const char* expectedExpr,
+    const UniversalString& actualValue, const char* actualExpr,
     const char* file, int line, int actualLine = -1);
 
 } // namespace detail

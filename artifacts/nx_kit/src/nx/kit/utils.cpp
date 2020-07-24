@@ -6,6 +6,7 @@
 #include <climits>
 #include <cerrno>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <type_traits>
 #include <vector>
@@ -442,37 +443,32 @@ bool fromString(const std::string& s, int* value)
     return true;
 }
 
-bool fromString(const std::string& s, double* value)
+template<typename Value>
+bool fromStringViaStringStream(const std::string& s, Value* outValue)
 {
-    if (!value || s.empty())
+    if (!outValue || s.empty())
         return false;
 
-    // NOTE: std::stod() is missing on Android, thus, using std::strtod().
-    char* pEnd = nullptr;
-    errno = 0; //< Required before std::strtod().
-    const double v = std::strtod(s.c_str(), &pEnd);
+    Value result{};
+    std::istringstream stream(s);
+    stream.imbue(std::locale("C"));
+    stream >> result;
 
-    if (errno == ERANGE || *pEnd != '\0')
-        return false;
+    const bool success = stream.eof() && !stream.bad();
+    if (success)
+        *outValue = result;
 
-    *value = v;
-    return true;
+    return success;
 }
 
-bool fromString(const std::string& s, float* value)
+bool fromString(const std::string& s, double* outValue)
 {
-    if (!value || s.empty())
-        return false;
+    return fromStringViaStringStream(s, outValue);
+}
 
-    // NOTE: std::stof() and std::strtof() are missing on Android, thus, using std::strtod().
-    char* pEnd = nullptr;
-    errno = 0; //< Required before std::strtod().
-    const float v = (float) std::strtod(s.c_str(), &pEnd);
-    if (errno == ERANGE || *pEnd != '\0')
-        return false;
-
-    *value = (float) v;
-    return true;
+bool fromString(const std::string& s, float* outValue)
+{
+    return fromStringViaStringStream(s, outValue);
 }
 
 bool fromString(const std::string& s, bool* value)

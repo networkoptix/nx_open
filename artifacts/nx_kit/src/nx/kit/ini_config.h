@@ -69,9 +69,11 @@ namespace kit {
  * In the code, use ini().<param-name> to access the values. Call ini().reload() when needed, e.g.
  * when certain activity starts or at regular intervals.
  *
- * Note that static function-local variable must not be in a header file as Windows dynamic linker
- * does not perform vague linkage correctly that leads to duplicates of such variables defined in a
- * header file used in more than one shared library.
+ * NOTE: The function that owns an IniConfig instance can be placed in the header file as 'inline',
+ * but it is safe only when the header is local to a single dynamic library or executable.
+ * Otherwise (if the header is included into more than one dynamic library or executable), due to
+ * compiler/linker limitations, such variables may have duplicate instances, thus, the function
+ * definition must be moved to a .cpp.
  */
 class NX_KIT_API IniConfig
 {
