@@ -140,6 +140,27 @@ bool tourIsRunning(QnWorkbenchContext* context)
     return context->action(action::ToggleLayoutTourModeAction)->isChecked();
 }
 
+Ptz::Capability requiredCapability(PtzInstrument::DirectionFlag direction)
+{
+    switch (direction)
+    {
+        case PtzInstrument::DirectionFlag::panLeft:
+        case PtzInstrument::DirectionFlag::panRight:
+            return Ptz::ContinuousPanCapability;
+
+        case PtzInstrument::DirectionFlag::tiltUp:
+        case PtzInstrument::DirectionFlag::tiltDown:
+            return Ptz::ContinuousTiltCapability;
+
+        case PtzInstrument::DirectionFlag::zoomIn:
+        case PtzInstrument::DirectionFlag::zoomOut:
+            return Ptz::ContinuousZoomCapability;
+    }
+
+    NX_ASSERT(false);
+    return Ptz::NoPtzCapabilities;
+}
+
 } // namespace
 
 QnWorkbenchController::QnWorkbenchController(QObject *parent):
@@ -646,6 +667,10 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
                 display()->widget(Qn::CentralRole));
 
             if (!widget || !widget->canControlPtz())
+                return false;
+
+            const auto caps = widget->ptzController()->getCapabilities();
+            if (!caps.testFlag(requiredCapability(direction)))
                 return false;
 
             m_ptzInstrument->toggleContinuousPtz(direction, true);
