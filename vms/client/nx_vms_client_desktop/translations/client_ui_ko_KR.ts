@@ -138,7 +138,7 @@
     <message>
       <location/>
       <source>No more than once per</source>
-      <translation>한번에 값이상은 동작 안됨</translation>
+      <translation>이벤트 한 번 동작되는 간격</translation>
     </message>
     <message>
       <location/>
@@ -2470,7 +2470,7 @@
     <message>
       <location filename="../src/ui/dialogs/system_administration_dialog.ui"/>
       <source>System Administration</source>
-      <translation>관리자</translation>
+      <translation>시스템 관리</translation>
     </message>
   </context>
   <context>

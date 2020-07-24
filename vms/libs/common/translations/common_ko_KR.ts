@@ -169,7 +169,7 @@
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>두 시스템은 %1에 연결 됩니다. 병합 허용 되지 않습니다.</translation>
+      <translation>두 시스템 모두 %1에 연결되어 있습니다. 시스템 병합은 허용되지 않습니다.</translation>
     </message>
     <message>
       <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
@@ -183,7 +183,7 @@
     <message>
       <source>Cloud systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>클라우드 시스템에는 다른 소유자가 있습니다. 머지가 허용되지 않습니다.</translation>
+      <translation>VIVEex-Link 시스템에는 다른 소유자가 있습니다. 시스템 병합이 허용되지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -914,7 +914,7 @@
     </message>
     <message>
       <source>FREE License</source>
-      <translation>무료 라이센스</translation>
+      <translation>무료 라이선스</translation>
     </message>
     <message>
       <source>Licensed To: %1</source>
@@ -1748,7 +1748,7 @@
     </message>
     <message>
       <source>PoE over Budget</source>
-      <translation>PoE 예산 초과</translation>
+      <translation>PoE 용량 초과</translation>
     </message>
     <message>
       <source>Fan Error</source>
@@ -1756,7 +1756,7 @@
     </message>
     <message>
       <source>PoE over budget at %1</source>
-      <translation>%1에 PoE 예산 초과</translation>
+      <translation>%1 PoE 용량 초과</translation>
     </message>
     <message>
       <source>Fan error at %1</source>
