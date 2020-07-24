@@ -32,7 +32,8 @@ bool CLPing::ping(
     [[maybe_unused]] int packetSize)
 {
 #if defined(Q_OS_WIN)
-    QString cmd = QLatin1String("cmd /C ping %1 -n %2 -l %3");
+    // Use the full path to ping.exe to prevent using the wrong one (e.g. `ping` from cygwin).
+    QString cmd = QLatin1String("cmd /C \"%SystemRoot%\\System32\\ping.exe\" %1 -n %2 -l %3");
     QProcess process;
     process.start(cmd.arg(ip).arg(retry).arg(packetSize));
     process.waitForFinished();

@@ -92,8 +92,6 @@ NX_NETWORK_API QList<HostAddress> allLocalAddresses(AddressFilters filter);
  */
 NX_NETWORK_API void setInterfaceListFilter(const QList<QHostAddress>& ifList);
 
-NX_NETWORK_API void removeARPrecord(const QHostAddress& ip);
-
 NX_NETWORK_API utils::MacAddress getMacByIP(const QString& host, bool net = true);
 
 NX_NETWORK_API utils::MacAddress getMacByIP(const QHostAddress& ip, bool net = true);

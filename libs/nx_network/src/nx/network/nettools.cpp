@@ -64,8 +64,6 @@ static const std::chrono::milliseconds kCacheTimeout(5000);
 namespace nx {
 namespace network {
 
-static constexpr int kPingTimeoutMillis = 300;
-
 void setInterfaceListFilter(const QList<QHostAddress>& ifList)
 {
     allowedAddresses = ifList;
@@ -290,69 +288,8 @@ std::set<HostAddress> getLocalIpV4HostAddressList()
     return localIpList;
 }
 
-bool isInIPV4Subnet(QHostAddress addr, const QList<QNetworkAddressEntry>& ipv4_enty_list)
-{
-    for (int i = 0; i < ipv4_enty_list.size(); ++i)
-    {
-        const QNetworkAddressEntry& entr = ipv4_enty_list.at(i);
-        if (entr.ip().isInSubnet(addr, entr.prefixLength()))
-            return true;
-
-    }
-
-    return false;
-}
-
-struct PinagableT
-{
-    quint32 addr = 0;
-    bool online = false;
-
-    void f()
-    {
-        online = false;
-        CLPing ping;
-        if (ping.ping(QHostAddress(addr).toString(), 2, kPingTimeoutMillis))
-            online = true;
-    }
-};
-
 //{ windows
 #if defined(Q_OS_WIN)
-
-void removeARPrecord(const QHostAddress& ip)
-{
-    unsigned long ulSize = 0;
-    GetIpNetTable(0, &ulSize, false);
-
-    MIB_IPNETTABLE *mtb = new MIB_IPNETTABLE[ulSize / sizeof(MIB_IPNETTABLE) + 1];
-
-    if (GetIpNetTable(mtb, &ulSize, false) == NO_ERROR)
-    {
-        //GetIpNetTable(mtb, &ulSize, TRUE);
-
-        in_addr addr;
-        for (uint i = 0; i < mtb->dwNumEntries; ++i)
-        {
-            addr.S_un.S_addr = mtb->table[i].dwAddr;
-
-            QString wip = QString::fromLatin1(inet_ntoa(addr)); // ### NLS support?
-            if (wip == ip.toString() && DeleteIpNetEntry(&mtb->table[i]) == NO_ERROR)
-            {
-                int old_size = mtb->dwNumEntries;
-
-                GetIpNetTable(mtb, &ulSize, FALSE);
-
-                if (mtb->dwNumEntries == old_size)
-                    break;
-
-                i = 0;
-            }
-        }
-    }
-
-    delete[] mtb;
-}
 
 // this is only works in local networks
 //if net == true it returns the mac of the first device responded on ARP request; in case if net = true it might take time...
@@ -409,8 +346,6 @@ utils::MacAddress getMacByIP(const QHostAddress& ip, bool net)
 }
 
 #elif defined(Q_OS_MAC)
-void removeARPrecord(const QHostAddress& /*ip*/) {}
-
 #if defined(Q_OS_IOS)
 utils::MacAddress getMacByIP(const QHostAddress& /*ip*/, bool /*net*/)
 {
@@ -480,8 +415,6 @@ utils::MacAddress getMacByIP(const QHostAddress& ip, bool /*net*/)
 #endif
 
 #else // Linux
-void removeARPrecord(const QHostAddress& /*ip*/) {}
-
 utils::MacAddress getMacByIP(const QHostAddress& /*ip*/, bool /*net*/)
 {
     return utils::MacAddress();
