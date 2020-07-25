@@ -113,6 +113,7 @@ struct Filter
         none = 0x0,
         ignoreTextFilter = 0x1,
         ignoreBoundingBox = 0x2,
+        ignoreTimePeriod = 0x4,
     };
 
     Q_DECLARE_FLAGS(Options, Option)

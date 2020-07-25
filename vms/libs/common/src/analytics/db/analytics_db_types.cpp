@@ -143,7 +143,10 @@ bool Filter::acceptsMetadata(
     track.deviceId = deviceId;
     track.objectTypeId = metadata.typeId;
     track.attributes = metadata.attributes;
-    return acceptsTrack(track, objectTypeDictionary, Option::ignoreBoundingBox);
+    return acceptsTrackInternal(
+        track,
+        objectTypeDictionary,
+        Options(Option::ignoreBoundingBox | Option::ignoreTimePeriod));
 }
 
 bool Filter::acceptsTrack(
@@ -173,11 +176,14 @@ bool Filter::acceptsTrackInternal(
     if (!objectTrackId.isNull() && track.id != objectTrackId)
         return false;
 
-    if (!(microseconds(track.lastAppearanceTimeUs) >= timePeriod.startTime() &&
-          (timePeriod.isInfinite() ||
-              microseconds(track.firstAppearanceTimeUs) < timePeriod.endTime())))
+    if (!options.testFlag(Option::ignoreTimePeriod))
     {
-        return false;
+        if (!(microseconds(track.lastAppearanceTimeUs) >= timePeriod.startTime() &&
+              (timePeriod.isInfinite() ||
+                  microseconds(track.firstAppearanceTimeUs) < timePeriod.endTime())))
+        {
+            return false;
+        }
     }
 
     // Matching every device if device list is empty.
