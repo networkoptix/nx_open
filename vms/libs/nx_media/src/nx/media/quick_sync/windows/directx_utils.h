@@ -13,7 +13,7 @@ extern "C" {
 
 } // extern "C"
 
-#include "simpleDX9Device.h"
+#include "device_handle.h"
 
 class MFXFrameAllocator;
 
@@ -26,7 +26,7 @@ struct Device
     bool initialize(MFXVideoSession& session);
     std::shared_ptr<MFXFrameAllocator> getAllocator();
 
-    SimpleDXDevice device;
+    windows::DeviceHandle device;
     std::shared_ptr<MFXFrameAllocator> m_allocator;
 };
 

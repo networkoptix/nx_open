@@ -9,24 +9,12 @@
 #include <array>
 
 #include <nx/utils/log/log.h>
-#include "device_handle.h"
 #include "d3d_allocator.h"
 #include "../quick_sync_surface.h"
 #include "../quick_sync_video_decoder_impl.h"
 
-#define WGL_ACCESS_READ_ONLY_NV 0x0000
-#define WGL_ACCESS_READ_WRITE_NV 0x0001
-#define WGL_ACCESS_WRITE_DISCARD_NV 0x0002
-
-namespace nx::media::quick_sync {
-
 namespace {
-/*
-typedef HANDLE (WINAPI * WGL_DX_OPEN_DEVICE_NV) (void* dxDevice);
-typedef HANDLE (WINAPI * WGL_DX_REGISTER_OBJECT_NV) (HANDLE hDevice, void* dxObject, GLuint name, GLenum type, GLenum access);
-typedef BOOL (WINAPI * WGL_DX_SET_RESOURCE_SHARE_HANDLE_NV) (void* dxObject, HANDLE shareHandle);
-typedef BOOL (WINAPI * WGL_SWAP_INTERVAL_EXT) (int interval);
-*/
+
 int getIntelDeviceAdapter(MFXVideoSession& session)
 {
     static const std::array<mfxIMPL, 4> impls = {
@@ -47,13 +35,15 @@ int getIntelDeviceAdapter(MFXVideoSession& session)
 
 } // namespace
 
+namespace nx::media::quick_sync {
+
 bool Device::initialize(MFXVideoSession& session)
 {
     auto adapter = getIntelDeviceAdapter(session);
     if (adapter < 0)
         return false;
 
-    auto hr = device.CreateDevice(640, 640, adapter); // TODO size
+    auto hr = device.createDevice(2992, 2992, adapter); // TODO size
     if (FAILED(hr))
     {
         NX_ERROR(NX_SCOPE_TAG, "Failed to get DirectX handle");
@@ -61,7 +51,7 @@ bool Device::initialize(MFXVideoSession& session)
     }
 
     auto status = session.SetHandle(MFX_HANDLE_DIRECT3D_DEVICE_MANAGER9,
-        device.GetDeviceManager9());
+        device.getDeviceManager());
 
     if (status < MFX_ERR_NONE)
     {
@@ -71,7 +61,7 @@ bool Device::initialize(MFXVideoSession& session)
 
     m_allocator = std::make_shared<windows::D3DFrameAllocator>();
     windows::D3DAllocatorParams d3dAllocParams;
-    d3dAllocParams.pManager = device.GetDeviceManager9();
+    d3dAllocParams.pManager = device.getDeviceManager();
     status = m_allocator->Init(&d3dAllocParams);
     if (status < MFX_ERR_NONE)
     {

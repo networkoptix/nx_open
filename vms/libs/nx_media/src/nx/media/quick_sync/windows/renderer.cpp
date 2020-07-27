@@ -5,13 +5,16 @@
 #include "GL/wglew.h"
 #include "GL/gl.h"
 
+#include <QtGui/QOffscreenSurface>
+#include <QtGui/QOpenGLContext>
+#include <QtPlatformHeaders/QWGLNativeContext>
+
+
 #include "renderer.h"
 
 #include <nx/utils/log/log.h>
 
 namespace nx::media::quick_sync::windows {
-
-namespace {
 
 bool convertToRgb(
     IDirect3DDevice9Ex *pDevice, mfxFrameSurface1* mfxSurface, IDirect3DSurface9* pSharedSurface)
@@ -46,20 +49,12 @@ bool convertToRgb(
     return true;
 }
 
-}
-
 Renderer::~Renderer()
 {
-    if (m_sharedSurface)
-        m_sharedSurface->Release();
-
-    if (m_renderTargetSurface)
-        m_renderTargetSurface->Release();
-
      // TODO close all
 }
 
-bool Renderer::initRenderSurface()
+bool Renderer::initRenderSurface(IDirect3D9Ex* d3d)
 {
     auto hr = m_device->GetRenderTarget(0, &m_renderTargetSurface);
     if (FAILED(hr))
@@ -84,7 +79,7 @@ bool Renderer::initRenderSurface()
             std::system_category().message(hr));
         return false;
     }
-    hr = m_d3d->CheckDeviceFormatConversion(
+    hr = d3d->CheckDeviceFormatConversion(
         D3DADAPTER_DEFAULT,
         D3DDEVTYPE_HAL,
         (D3DFORMAT) MAKEFOURCC('N', 'V', '1', '2'),
@@ -114,21 +109,13 @@ bool Renderer::initRenderSurface()
     return true;
 }
 
-bool Renderer::init(HWND window, IDirect3DDevice9Ex* device, IDirect3D9Ex* d3d, int width, int height)
+bool Renderer::init(
+    HWND window, IDirect3DDevice9Ex* device, IDirect3D9Ex* d3d, int width, int height)
 {
-//  auto wglSwapIntervalEXT = (WGL_SWAP_INTERVAL_EXT)wglGetProcAddress("wglSwapIntervalEXT");
-//  auto wglDXOpenDeviceNV = (WGL_DX_OPEN_DEVICE_NV)wglGetProcAddress("wglDXOpenDeviceNV");
-//  auto wglDXRegisterObjectNV = (WGL_DX_REGISTER_OBJECT_NV)wglGetProcAddress("wglDXRegisterObjectNV");
-//  auto wglDXSetResourceShareHandleNV =
-//      (WGL_DX_SET_RESOURCE_SHARE_HANDLE_NV)wglGetProcAddress("wglDXSetResourceShareHandleNV");
-
     m_device = device;
     m_window = window;
-    m_d3d = d3d;
-    m_width = width;
-    m_height = height;
 
-    if (!initRenderSurface())
+    if (!initRenderSurface(d3d))
         return false;
 
     static PIXELFORMATDESCRIPTOR pfd =
@@ -140,10 +127,12 @@ bool Renderer::init(HWND window, IDirect3DDevice9Ex* device, IDirect3D9Ex* d3d, 
         PFD_MAIN_PLANE,
         0, 0, 0, 0
     };
+
     m_dc = ::GetDC(m_window);
     GLuint PixelFormat = ChoosePixelFormat(m_dc, &pfd);
     SetPixelFormat(m_dc, PixelFormat, &pfd);
     m_rc = wglCreateContext(m_dc);
+
     wglMakeCurrent(m_dc, m_rc);
 
     GLenum err = glewInit();
@@ -154,15 +143,15 @@ bool Renderer::init(HWND window, IDirect3DDevice9Ex* device, IDirect3D9Ex* d3d, 
     }
     wglSwapIntervalEXT(0);
 
-    glGenTextures(1, &m_texture);
-    glBindTexture(GL_TEXTURE_2D, m_texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0,  GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    wglMakeCurrent(nullptr, nullptr);
+    return true;
+}
 
+bool Renderer::registerTexture(GLuint textureId, QOpenGLContext* context)
+{
+    HGLRC guiGlrc = context->nativeHandle().value<QWGLNativeContext>().context();
+    wglShareLists(guiGlrc, m_rc);
+    wglMakeCurrent(m_dc, m_rc);
 
     // Acquire a handle to the D3D device for use in OGL
     m_renderDeviceHandle = wglDXOpenDeviceNV(m_device);
@@ -175,7 +164,7 @@ bool Renderer::init(HWND window, IDirect3DDevice9Ex* device, IDirect3D9Ex* d3d, 
     BOOL success = wglDXSetResourceShareHandleNV(m_sharedSurface, m_sharedSurfaceHandle);
 
     m_textureHandle = wglDXRegisterObjectNV(
-        m_renderDeviceHandle, m_sharedSurface, m_texture, GL_TEXTURE_2D, WGL_ACCESS_READ_ONLY_NV);
+        m_renderDeviceHandle, m_sharedSurface, textureId, GL_TEXTURE_2D, WGL_ACCESS_READ_ONLY_NV);
     if (m_textureHandle == NULL)
     {
         NX_ERROR(this, "Failed to register object NV, error code: %1", GetLastError());
@@ -185,8 +174,14 @@ bool Renderer::init(HWND window, IDirect3DDevice9Ex* device, IDirect3D9Ex* d3d, 
     return true;
 }
 
-bool Renderer::render(mfxFrameSurface1* mfxSurface, bool isNewTexture, GLuint textureId)
+bool Renderer::render(
+    mfxFrameSurface1* mfxSurface, bool isNewTexture, GLuint textureId, QOpenGLContext* context)
 {
+    if (isNewTexture)
+    {
+        if (!registerTexture(textureId, context))
+            return false;
+    }
     if (!convertToRgb(m_device, mfxSurface, m_sharedSurface))
         return false;
 
@@ -201,3 +196,4 @@ bool Renderer::render(mfxFrameSurface1* mfxSurface, bool isNewTexture, GLuint te
 } // namespace nx::media::quick_sync::windows
 
 #endif // _WIN32
+

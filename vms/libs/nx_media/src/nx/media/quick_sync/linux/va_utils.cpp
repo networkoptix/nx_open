@@ -64,7 +64,7 @@ std::shared_ptr<MFXFrameAllocator> Device::getAllocator()
     return m_allocator;
 }
 
-bool renderToRgb(const QVideoFrame& frame, bool isNewTexture, GLuint textureId)
+bool renderToRgb(const QVideoFrame& frame, bool isNewTexture, GLuint textureId, QOpenGLContext* /*context*/)
 {
     auto surfaceInfo = frame.handle().value<QuickSyncSurface>();
     linux::vaapiMemId* surfaceData = (linux::vaapiMemId*)surfaceInfo.surface->Data.MemId;

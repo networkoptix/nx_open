@@ -7,28 +7,27 @@
 #include <atlbase.h>
 #include <dxva2api.h>
 
+#include "renderer.h"
+
 namespace nx::media::quick_sync::windows {
 
 class DeviceHandle
 {
 public:
-    DeviceHandle(MFXVideoSession& session);
-    IDirect3DDeviceManager9* getHandle()
-    {
-       return deviceManager9;
-    }
+    bool createDevice(int width, int height, mfxU32 adapterNumber);
+
+    IDirect3DDeviceManager9* getDeviceManager() { return m_deviceManager; }
+    Renderer& getRenderer() { return m_renderer; }
 
 private:
-    bool createDeviceManager(int adapter);
+    CComPtr<IDirect3DDeviceManager9> m_deviceManager;
+    CComPtr<IDirect3D9Ex> m_d3d;
+    CComPtr<IDirect3DDevice9Ex> m_device;
 
-private:
-    CComPtr<IDirect3DDeviceManager9> deviceManager9;
-    CComPtr<IDirect3DDevice9Ex> D3DD9;
-    CComPtr<IDirect3D9Ex> D3D9;
+    HWND m_hWnd = 0;
+    Renderer m_renderer;
 };
 
 } // namespace nx::media::quick_sync::windows
 
 #endif // _WIN32
-
-
