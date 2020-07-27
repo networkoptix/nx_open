@@ -69,11 +69,11 @@ cf::future<nx::Buffer> WebSocket::read()
 
 void WebSocket::close()
 {
-    m_buffer.clear();
-    m_buffer.shrink_to_fit();
-
     m_httpClient.reset();
     m_nested.reset();
+
+    m_buffer.clear();
+    m_buffer.shrink_to_fit();
 }
 
 } // namespace nx::vms_server_plugins::analytics::vivotek

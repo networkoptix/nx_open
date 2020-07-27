@@ -42,10 +42,10 @@ void emitDiagnostic(IDeviceAgent::IHandler* handler,
 }
 
 const auto ignoreCancellation =
-    [](const std::system_error& exception)
+    [](const Exception& exception)
     {
-        if (exception.code() != std::errc::operation_canceled &&
-            exception.code() != std::errc::connection_aborted)
+        if (exception.errorCode() != std::errc::operation_canceled &&
+            exception.errorCode() != std::errc::connection_aborted)
         {
             throw;
         }
