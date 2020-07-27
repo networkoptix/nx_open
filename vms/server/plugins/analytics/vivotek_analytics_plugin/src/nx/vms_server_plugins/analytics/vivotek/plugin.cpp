@@ -23,10 +23,10 @@ std::string Plugin::manifestString() const
 {
     return serializeJson(QJsonObject{
         {"id", "nx.vivotek"},
-        {"name", "Vivotek analytics plugin"},
-        {"description", "Supports analytics on Vivotek cameras."},
-        {"version", "0.0.0"},
-        {"vendor", "Network Optix"},
+        {"name", "VIVOTEK analytics plugin"},
+        {"description", "Supports analytics on VIVOTEK cameras."},
+        {"version", "1.0.0"},
+        {"vendor", "VIVOTEK"},
     }).toStdString();
 }
 
