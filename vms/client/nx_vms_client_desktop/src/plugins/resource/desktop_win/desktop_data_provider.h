@@ -16,6 +16,7 @@
 
 class CaptureAudioStream;
 class QnAbstractDataConsumer;
+namespace nx::vms::client::desktop { class AudioDeviceChangeNotifier; }
 
 class QnDesktopDataProvider: public QnDesktopDataProviderBase
 {
@@ -135,6 +136,7 @@ private:
     AVFrame* m_inputAudioFrame = nullptr;
     AVPacket* m_outPacket = nullptr;
     std::unique_ptr<QElapsedTimer> m_timer;
+    std::unique_ptr<nx::vms::client::desktop::AudioDeviceChangeNotifier> m_audioDeviceChangeNotifier;
 
     friend void QT_WIN_CALLBACK waveInProc(HWAVEIN hWaveIn, UINT uMsg, DWORD_PTR dwInstance,
         DWORD_PTR dwParam1, DWORD_PTR dwParam2);

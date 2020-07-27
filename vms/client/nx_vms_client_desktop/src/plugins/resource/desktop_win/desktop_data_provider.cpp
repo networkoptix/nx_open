@@ -29,6 +29,7 @@ extern "C" {
 #include <nx/streaming/abstract_data_consumer.h>
 #include <nx/streaming/config.h>
 #include <plugins/resource/desktop_win/win_audio_device_info.h>
+#include <plugins/resource/desktop_win/audio_device_change_notifier.h>
 #include <decoders/audio/ffmpeg_audio_decoder.h>
 #include <utils/common/synctime.h>
 #include <nx/utils/log/log.h>
@@ -291,7 +292,8 @@ QnDesktopDataProvider::QnDesktopDataProvider(
     m_widget(glWidget),
     m_logo(logo),
     m_inputAudioFrame(av_frame_alloc()),
-    m_outPacket(av_packet_alloc())
+    m_outPacket(av_packet_alloc()),
+    m_audioDeviceChangeNotifier(new nx::vms::client::desktop::AudioDeviceChangeNotifier())
 {
     if (audioDevice || audioDevice2)
     {
@@ -304,6 +306,21 @@ QnDesktopDataProvider::QnDesktopDataProvider(
         m_audioInfo << new EncodedAudioInfo(this); // second channel
         m_audioInfo[1]->m_audioDevice = *audioDevice2;
     }
+
+    using AudioDeviceChangeNotifier = nx::vms::client::desktop::AudioDeviceChangeNotifier;
+    connect(m_audioDeviceChangeNotifier.get(), &AudioDeviceChangeNotifier::deviceUnplugged, this,
+        [this](const QString& deviceName)
+        {
+            const bool deviceInUse = std::any_of(std::cbegin(m_audioInfo), std::cend(m_audioInfo),
+                [&deviceName](const auto& audioInfo)
+                {
+                    return audioInfo->m_audioDevice.name() == deviceName;}
+                );
+
+            if (deviceInUse)
+                pleaseStop();
+        },
+        Qt::DirectConnection);
 
     m_needStop = false;
     m_timer = std::make_unique<QElapsedTimer>();
