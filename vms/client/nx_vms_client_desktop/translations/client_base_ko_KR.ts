@@ -9234,7 +9234,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>VMS Time</source>
-      <translation>VIVEex 기준 시간</translation>
+      <translation>VMS 시간</translation>
     </message>
   </context>
   <context>
