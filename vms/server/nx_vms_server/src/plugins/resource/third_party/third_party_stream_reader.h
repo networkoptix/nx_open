@@ -58,6 +58,7 @@ protected:
 private:
     //virtual bool needMetaData() const override;
     virtual QnMetaDataV1Ptr getCameraMetadata() override;
+    QnAbstractMediaDataPtr getNextPacket();
     nx::utils::TimeHelper* timeHelper(const QnAbstractMediaDataPtr& data);
     void updateSourceUrl(const QString& urlString);
     void setLastOpenedUrl(const QString& value);
@@ -71,6 +72,7 @@ private:
     nx::sdk::Ptr<nxcip::StreamReader> m_liveStreamReader;
     QnAbstractMediaDataPtr m_savedMediaPacket;
     QSize m_videoResolution;
+    bool m_audioEnabled = false;
     QnConstMediaContextPtr m_audioContext;
     nx::sdk::Ptr<nxcip::CameraMediaEncoder2> m_mediaEncoder2;
     QnResourceCustomAudioLayoutPtr m_audioLayout;

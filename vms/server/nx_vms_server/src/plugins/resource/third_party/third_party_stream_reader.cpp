@@ -175,6 +175,7 @@ CameraDiagnostics::Result ThirdPartyStreamReader::openStreamInternal(
         requestedUrl.setScheme(QLatin1String("http"));
         return CameraDiagnostics::NoMediaTrackResult(requestedUrl);
     }
+    m_audioEnabled = m_thirdPartyRes->isAudioEnabled();
     nxcip_qt::CameraMediaEncoder cameraEncoder( intf );
 
     if (auto camera = m_resource.dynamicCast<QnVirtualCameraResource>())
@@ -433,17 +434,31 @@ void ThirdPartyStreamReader::afterRun()
 QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
 {
     if( !isStreamOpened() )
-        return QnAbstractMediaDataPtr(0);
+        return nullptr;
 
     if (!m_isMediaUrlValid.test_and_set())
     {
         closeStream();
-        return QnAbstractMediaDataPtr(); //< Reopen stream.
+        return nullptr; //< Reopen stream.
     }
 
     if( !(m_cameraCapabilities & nxcip::BaseCameraManager::hardwareMotionCapability) && needMetadata() )
         return getMetadata();
 
+    // Drop audio data if it disabled, but still streamed, because camera control disabled
+    while (!needToStop())
+    {
+        auto packet = getNextPacket();
+        if (!m_audioEnabled && packet->dataType == QnAbstractMediaData::AUDIO)
+            continue;
+
+        return packet;
+    }
+    return nullptr;
+}
+
+QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextPacket()
+{
     QnAbstractMediaDataPtr rez;
     if( m_liveStreamReader )
     {
