@@ -445,94 +445,71 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
         return getMetadata();
 
     QnAbstractMediaDataPtr rez;
-    static const int MAX_TRIES_TO_READ_MEDIA_PACKET = 10;
-    for( int i = 0; i < MAX_TRIES_TO_READ_MEDIA_PACKET; ++i )
+    if( m_liveStreamReader )
     {
-        if( m_liveStreamReader )
+        if( m_savedMediaPacket )
         {
-            if( m_savedMediaPacket )
+            rez = std::move(m_savedMediaPacket);
+            m_savedMediaPacket.reset(); //calling clear since QSharePointer move operator implementation leaves some questions...
+        }
+        else
+        {
+            int errorCode = 0;
+            Extras extras;
+            rez = readStreamReader( m_liveStreamReader.get(), &errorCode, &extras);
+            if( rez )
             {
-                rez = std::move(m_savedMediaPacket);
-                m_savedMediaPacket.reset(); //calling clear since QSharePointer move operator implementation leaves some questions...
+                if( m_cameraCapabilities & nxcip::BaseCameraManager::needIFrameDetectionCapability )
+                {
+                    if( isIFrame(rez) )
+                        rez->flags |= QnAbstractMediaData::MediaFlags_AVKey;
+                }
+
+                rez->flags |= QnAbstractMediaData::MediaFlags_LIVE;
+                QnCompressedVideoData* videoData = dynamic_cast<QnCompressedVideoData*>(rez.get());
+                if (videoData)
+                {
+                    if (videoData->flags & QnAbstractMediaData::MediaFlags_AVKey)
+                    {
+                        QSize streamResolution = nx::media::getFrameSize(
+                            std::dynamic_pointer_cast<QnCompressedVideoData>(rez));
+                        if (streamResolution.isValid())
+                            m_videoResolution = streamResolution;
+                    }
+                    videoData->width = m_videoResolution.width();
+                    videoData->height = m_videoResolution.height();
+                }
+                if( videoData && !videoData->metadata.isEmpty() )
+                {
+                    m_savedMediaPacket = rez;
+                    rez = videoData->metadata.first();
+                    videoData->metadata.pop_front();
+                }
+                else if( rez->dataType == QnAbstractMediaData::AUDIO )
+                {
+                    if( !m_audioContext || (extras.extradataBlob.size() > 0 && m_audioContext->getExtradataSize() == 0))
+                    {
+                        nxcip::AudioFormat audioFormat;
+                        if( m_mediaEncoder2->getAudioFormat( &audioFormat ) == nxcip::NX_NO_ERROR )
+                            initializeAudioContext( audioFormat, extras );
+                    }
+                    static_cast<QnCompressedAudioData*>(rez.get())->context = m_audioContext;
+                }
             }
             else
             {
-                int errorCode = 0;
-                Extras extras;
-                rez = readStreamReader( m_liveStreamReader.get(), &errorCode, &extras);
-                if( rez )
-                {
-                    if( m_cameraCapabilities & nxcip::BaseCameraManager::needIFrameDetectionCapability )
-                    {
-                        if( isIFrame(rez) )
-                            rez->flags |= QnAbstractMediaData::MediaFlags_AVKey;
-                    }
-
-                    rez->flags |= QnAbstractMediaData::MediaFlags_LIVE;
-                    QnCompressedVideoData* videoData = dynamic_cast<QnCompressedVideoData*>(rez.get());
-                    if (videoData)
-                    {
-                        if (videoData->flags & QnAbstractMediaData::MediaFlags_AVKey)
-                        {
-                            QSize streamResolution = nx::media::getFrameSize(
-                                std::dynamic_pointer_cast<QnCompressedVideoData>(rez));
-                            if (streamResolution.isValid())
-                                m_videoResolution = streamResolution;
-                        }
-                        videoData->width = m_videoResolution.width();
-                        videoData->height = m_videoResolution.height();
-                    }
-                    if( videoData && !videoData->metadata.isEmpty() )
-                    {
-                        m_savedMediaPacket = rez;
-                        rez = videoData->metadata.first();
-                        videoData->metadata.pop_front();
-                    }
-                    else if( rez->dataType == QnAbstractMediaData::AUDIO )
-                    {
-                        if( !m_audioContext || (extras.extradataBlob.size() > 0 && m_audioContext->getExtradataSize() == 0))
-                        {
-                            nxcip::AudioFormat audioFormat;
-                            if( m_mediaEncoder2->getAudioFormat( &audioFormat ) == nxcip::NX_NO_ERROR )
-                                initializeAudioContext( audioFormat, extras );
-                        }
-                        static_cast<QnCompressedAudioData*>(rez.get())->context = m_audioContext;
-                    }
-                }
-                else
-                {
-                    if( errorCode == nxcip::NX_NOT_AUTHORIZED )
-                        m_thirdPartyRes->setStatus( Qn::Unauthorized );
-                }
+                if( errorCode == nxcip::NX_NOT_AUTHORIZED )
+                    m_thirdPartyRes->setStatus( Qn::Unauthorized );
             }
-        }
-        else if( m_builtinStreamReader.get() )
-        {
-            rez = m_builtinStreamReader->getNextData();
-        }
-
-        if( rez )
-        {
-            if( rez->dataType == QnAbstractMediaData::VIDEO )
-            {
-                //QnCompressedVideoDataPtr videoData = qSharedPointerDynamicCast<QnCompressedVideoData>(rez);
-                //parseMotionInfo(videoData);
-                break;
-            }
-            else if (rez->dataType == QnAbstractMediaData::AUDIO)
-            {
-                break;
-            }
-            else if (rez->dataType == QnAbstractMediaData::META_V1)
-            {
-                break;
-            }
-        }
-        else {
-            closeStream();
-            break;
         }
     }
+    else if( m_builtinStreamReader.get() )
+    {
+        rez = m_builtinStreamReader->getNextData();
+    }
+
+    if (!rez)
+        closeStream();
 
     if (m_needCorrectTime && rez)
     {
@@ -738,15 +715,9 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::readStreamReader(
     else
     {
         if( packet->flags() & nxcip::MediaDataPacket::fReverseStream )
-        {
-            mediaPacket->flags |= QnAbstractMediaData::MediaFlags_Reverse;
-            mediaPacket->flags |= QnAbstractMediaData::MediaFlags_ReverseReordered;
             mediaPacket->timestamp = 0;
-        }
         else
-        {
             mediaPacket->timestamp = DATETIME_NOW;
-        }
     }
     if( packet->flags() & nxcip::MediaDataPacket::fKeyPacket )
     {

@@ -54,6 +54,7 @@ private:
     bool initLayout();
     bool preprocessPacket(
         const AVPacket& packet,
+        AVCodecID codec,
         uint8_t** data,
         int* dataSize,
         Extras* outExtras);
@@ -65,14 +66,14 @@ private:
         int* dataSize,
         Extras* outExtras);
 
-    bool isPacketOk(const AVPacket& packet) const;
-    bool isPacketStreamOk(const AVPacket& packet) const;
-    bool isPacketDataTypeOk(const AVPacket& packet) const;
-    bool isPacketTimestampOk(const AVPacket& packet) const;
 
-    nxcip::UsecUTCTimestamp packetTimestamp(const AVPacket& packet) const;
-    unsigned int packetFlags(const AVPacket& packet) const;
-    nxcip::DataPacketType packetDataType(const AVPacket& packet) const;
+    AVStream* getPacketStream(const AVPacket& packet) const;
+
+    bool isPacketOk(const AVPacket& packet, AVMediaType mediaType) const;
+
+    nxcip::UsecUTCTimestamp packetTimestamp(const AVPacket& packet, AVRational timeBase) const;
+    unsigned int packetFlags(const AVPacket& packet, AVMediaType mediaType) const;
+    nxcip::DataPacketType packetDataType(AVMediaType mediaType) const;
 
     int64_t currentTimeSinceEpochUs() const;
 

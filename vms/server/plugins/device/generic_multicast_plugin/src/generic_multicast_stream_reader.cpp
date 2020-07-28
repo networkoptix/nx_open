@@ -117,7 +117,6 @@ int GenericMulticastStreamReader::getNextData(nxcip::MediaDataPacket** outPacket
     if (m_interrupted)
         return nxcip::NX_INTERRUPTED;
 
-    AVStream* stream = nullptr;
     AVPacket packet;
 
     while (true)
@@ -128,7 +127,16 @@ int GenericMulticastStreamReader::getNextData(nxcip::MediaDataPacket** outPacket
         if (av_read_frame(m_formatContext, &packet) < 0)
             return nxcip::NX_IO_ERROR;
 
-        if (!isPacketOk(packet))
+        AVStream* stream = getPacketStream(packet);
+        if (!stream)
+        {
+            NX_VERBOSE(this, lm("Invalid stream, skipping packet %1").args(packet.pts));
+            av_packet_unref(&packet);
+            continue;
+        }
+
+        AVMediaType mediaType = stream->codecpar->codec_type;
+        if (!isPacketOk(packet, mediaType))
         {
             NX_VERBOSE(this, lm("Skipping invalid packet %1").args(packet.pts));
             av_packet_unref(&packet);
@@ -139,20 +147,18 @@ int GenericMulticastStreamReader::getNextData(nxcip::MediaDataPacket** outPacket
         int dataSize = packet.size;
 
         Extras extras;
-        if (!preprocessPacket(packet, &dataPointer, &dataSize, &extras))
+        if (!preprocessPacket(packet, stream->codecpar->codec_id, &dataPointer, &dataSize, &extras))
         {
             av_packet_unref(&packet);
             continue;
         }
 
-        stream = m_formatContext->streams[packet.stream_index];
         auto mediaPacket = std::make_unique<GenericMulticastMediaPacket>();
         mediaPacket->setCodecType(stream->codecpar->codec_id);
-        mediaPacket->setTimestamp(packetTimestamp(packet));
-        mediaPacket->setChannelNumber(
-            packetDataType(packet) == nxcip::DataPacketType::dptAudio ? 1 : 0);
-        mediaPacket->setFlags(packetFlags(packet));
-        mediaPacket->setType(packetDataType(packet));
+        mediaPacket->setTimestamp(packetTimestamp(packet, stream->time_base));
+        mediaPacket->setChannelNumber(mediaType == AVMEDIA_TYPE_AUDIO ? 1 : 0);
+        mediaPacket->setFlags(packetFlags(packet, mediaType));
+        mediaPacket->setType(packetDataType(mediaType));
         mediaPacket->setData(dataPointer, dataSize);
         mediaPacket->setExtradata(extras.extradata);
 
@@ -202,103 +208,68 @@ bool GenericMulticastStreamReader::initLayout()
     return true;
 }
 
-bool GenericMulticastStreamReader::isPacketOk(const AVPacket& packet) const
+bool GenericMulticastStreamReader::isPacketOk(const AVPacket& packet, AVMediaType mediaType) const
 {
     if (packet.size <= 0)
         return false;
 
-    if (!isPacketDataTypeOk(packet))
+    if (mediaType != AVMEDIA_TYPE_AUDIO && mediaType != AVMEDIA_TYPE_VIDEO)
         return false;
 
-    if (!isPacketTimestampOk(packet))
+    if (mediaType == AVMEDIA_TYPE_AUDIO && !m_audioEnabled)
         return false;
 
+    if (packet.dts == AV_NOPTS_VALUE && packet.pts == AV_NOPTS_VALUE)
+        return false;
 
     return true;
 }
 
-bool GenericMulticastStreamReader::isPacketStreamOk(const AVPacket& packet) const
+AVStream* GenericMulticastStreamReader::getPacketStream(const AVPacket& packet) const
 {
     if (packet.stream_index < 0)
-        return false;
+        return nullptr;
 
     unsigned int streamIndex = packet.stream_index;
 
-
     NX_ASSERT(m_formatContext, lm("No AVFormatContext exists for provided AVPacket"));
     if (!m_formatContext)
-        return false;
+        return nullptr;
 
     if (m_formatContext->nb_streams <= streamIndex)
-        return false;
+        return nullptr;
 
-    if (!m_formatContext->streams[streamIndex])
-        return false;
-
-    return true;
+    return m_formatContext->streams[streamIndex];
 }
 
-bool GenericMulticastStreamReader::isPacketDataTypeOk(const AVPacket& packet) const
+nxcip::UsecUTCTimestamp GenericMulticastStreamReader::packetTimestamp(
+    const AVPacket& packet, AVRational timeBase) const
 {
-    if (!isPacketStreamOk(packet))
-        return false;
-
-    auto stream = m_formatContext->streams[packet.stream_index];
-
-    return (stream->codecpar->codec_type == AVMEDIA_TYPE_AUDIO && m_audioEnabled)
-        || stream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO;
-}
-
-
-bool GenericMulticastStreamReader::isPacketTimestampOk(const AVPacket& packet) const
-{
-    if(!isPacketStreamOk(packet))
-        return false;
-    return packet.dts != AV_NOPTS_VALUE || packet.pts != AV_NOPTS_VALUE;
-}
-
-nxcip::UsecUTCTimestamp GenericMulticastStreamReader::packetTimestamp(const AVPacket& packet) const
-{
-    if (!isPacketStreamOk(packet))
-        return nxcip::INVALID_TIMESTAMP_VALUE;
-
-    const auto stream = m_formatContext->streams[packet.stream_index];
     const auto packetTime = packet.dts != AV_NOPTS_VALUE ? packet.dts : packet.pts;
     static const AVRational dstRate = {1, 1000000};
-    return av_rescale_q(packetTime, stream->time_base, dstRate);
+    return av_rescale_q(packetTime, timeBase, dstRate);
 }
 
-unsigned int GenericMulticastStreamReader::packetFlags(const AVPacket& packet) const
+unsigned int GenericMulticastStreamReader::packetFlags(
+    const AVPacket& packet, AVMediaType mediaType) const
 {
-    if (!isPacketStreamOk(packet))
-        return 0;
-
     unsigned int flags = 0;
-
-    auto stream = m_formatContext->streams[packet.stream_index];
-
-    if (packet.flags & AV_PKT_FLAG_KEY && stream->codecpar->codec_type != AVMEDIA_TYPE_AUDIO)
+    if (packet.flags & AV_PKT_FLAG_KEY && mediaType != AVMEDIA_TYPE_AUDIO)
         flags |= nxcip::MediaDataPacket::Flags::fKeyPacket;
 
     return flags;
 }
 
-nxcip::DataPacketType GenericMulticastStreamReader::packetDataType(const AVPacket& packet) const
+nxcip::DataPacketType GenericMulticastStreamReader::packetDataType(AVMediaType mediaType) const
 {
-    if (!isPacketStreamOk(packet))
-        return nxcip::DataPacketType::dptEmpty; //< TODO: #dmishin handle this error properly
-
-    auto stream = m_formatContext->streams[packet.stream_index];
-    auto type = stream->codecpar->codec_type;
-
-    switch (type)
+    switch (mediaType)
     {
         case AVMEDIA_TYPE_AUDIO:
             return nxcip::DataPacketType::dptAudio;
         case AVMEDIA_TYPE_VIDEO:
             return nxcip::DataPacketType::dptVideo;
         default:
-            return nxcip::DataPacketType::dptEmpty; //< And also this
+            return nxcip::DataPacketType::dptEmpty;
     }
 }
 
@@ -314,16 +285,12 @@ void GenericMulticastStreamReader::resetAudioFormat()
 
 bool GenericMulticastStreamReader::preprocessPacket(
     const AVPacket& packet,
+    AVCodecID codec,
     uint8_t** data,
     int* dataSize,
     Extras* outExtras)
 {
-    if (!isPacketStreamOk(packet))
-        return false;
-
-    auto stream = m_formatContext->streams[packet.stream_index];
-
-    if (stream->codecpar->codec_id == AV_CODEC_ID_AAC && hasAdtsHeader(packet))
+    if (codec == AV_CODEC_ID_AAC && hasAdtsHeader(packet))
         removeAdtsHeaderAndFillExtradata(packet, data, dataSize, outExtras);
 
     return true;
@@ -343,9 +310,6 @@ bool GenericMulticastStreamReader::removeAdtsHeaderAndFillExtradata(
     int* dataSize,
     Extras* outExtras)
 {
-    if (!isPacketStreamOk(packet))
-        return false;
-
     AdtsHeader header;
     if (!header.decodeFromFrame(packet.data, packet.size))
         return false;
