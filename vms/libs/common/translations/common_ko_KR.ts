@@ -183,7 +183,7 @@
     <message>
       <source>Cloud systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>VIVEex-Link 시스템에는 다른 소유자가 있습니다. 시스템 병합이 허용되지 않습니다.</translation>
+      <translation>클라우드 시스템에는 다른 소유자가 있습니다. 머지가 허용되지 않습니다.</translation>
     </message>
   </context>
   <context>
