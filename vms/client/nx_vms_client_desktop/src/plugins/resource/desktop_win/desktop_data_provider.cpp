@@ -308,7 +308,7 @@ QnDesktopDataProvider::QnDesktopDataProvider(
     }
 
     using AudioDeviceChangeNotifier = nx::vms::client::desktop::AudioDeviceChangeNotifier;
-    connect(m_audioDeviceChangeNotifier.get(), &AudioDeviceChangeNotifier::deviceUnplugged, this,
+    const auto stopOnDeviceDisappeared =
         [this](const QString& deviceName)
         {
             const bool deviceInUse = std::any_of(std::cbegin(m_audioInfo), std::cend(m_audioInfo),
@@ -319,8 +319,13 @@ QnDesktopDataProvider::QnDesktopDataProvider(
 
             if (deviceInUse)
                 pleaseStop();
-        },
-        Qt::DirectConnection);
+        };
+
+    connect(m_audioDeviceChangeNotifier.get(), &AudioDeviceChangeNotifier::deviceUnplugged,
+        this, stopOnDeviceDisappeared, Qt::DirectConnection);
+
+    connect(m_audioDeviceChangeNotifier.get(), &AudioDeviceChangeNotifier::deviceNotPresent,
+        this, stopOnDeviceDisappeared, Qt::DirectConnection);
 
     m_needStop = false;
     m_timer = std::make_unique<QElapsedTimer>();

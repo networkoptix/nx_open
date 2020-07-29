@@ -50,8 +50,12 @@ class AudioDeviceChangeNotifier::DeviceChangeListener: public IMMNotificationCli
 public:
     using DeviceChangeHandler = std::function<void(LPCWSTR deviceId)>;
 
-    DeviceChangeListener(DeviceChangeHandler deviceUnpluggedHandler):
-        m_deviceUnpluggedHandler(deviceUnpluggedHandler)
+    DeviceChangeListener(
+        DeviceChangeHandler deviceUnpluggedHandler,
+        DeviceChangeHandler deviceNotPresentHandler)
+        :
+        m_deviceUnpluggedHandler(deviceUnpluggedHandler),
+        m_deviceNotPresentHandler(deviceNotPresentHandler)
     {
     }
 
@@ -103,7 +107,16 @@ public:
     virtual HRESULT OnDeviceStateChanged(LPCWSTR pwstrDeviceId, DWORD dwNewState) override
     {
         if ((dwNewState & DEVICE_STATE_UNPLUGGED) != 0)
+        {
             m_deviceUnpluggedHandler(pwstrDeviceId);
+            return S_OK;
+        }
+
+        if ((dwNewState & DEVICE_STATE_NOTPRESENT) != 0)
+        {
+            m_deviceNotPresentHandler(pwstrDeviceId);
+            return S_OK;
+        }
 
         return S_OK;
     }
@@ -115,6 +128,7 @@ public:
 
 private:
     DeviceChangeHandler m_deviceUnpluggedHandler;
+    DeviceChangeHandler m_deviceNotPresentHandler;
 };
 
 AudioDeviceChangeNotifier::AudioDeviceChangeNotifier():
@@ -136,7 +150,12 @@ AudioDeviceChangeNotifier::AudioDeviceChangeNotifier():
     auto deviceUnpluggedHandler =
         [this](auto deviceId) { emit deviceUnplugged(deviceName(m_deviceEnumerator, deviceId)); };
 
-    m_deviceChangeListener = std::make_unique<DeviceChangeListener>(deviceUnpluggedHandler);
+    auto deviceNotPresentHandler =
+        [this](auto deviceId) { emit deviceNotPresent(deviceName(m_deviceEnumerator, deviceId)); };
+
+    m_deviceChangeListener = std::make_unique<DeviceChangeListener>(
+        deviceUnpluggedHandler,
+        deviceNotPresentHandler);
     hres = m_deviceEnumerator->RegisterEndpointNotificationCallback(m_deviceChangeListener.get());
 
     if (hres != S_OK)

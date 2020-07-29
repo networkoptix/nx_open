@@ -35,6 +35,15 @@ signals:
      */
     void deviceUnplugged(const QString& deviceName);
 
+    /**
+     * Emitted when audio peripherals with digital interfaces such as USB headsets or USB web cams
+     *    with mic or even USB audio interfaces disconnect from the system.
+     * @param deviceName Device name which used to particular device identification.
+     * @todo Using device name as ID is unreliable, should be changed to the true device ID here
+     *     and everywhere in 4.2.
+     */
+    void deviceNotPresent(const QString& deviceName);
+
 private:
     IMMDeviceEnumerator* m_deviceEnumerator = nullptr;
 
