@@ -135,17 +135,21 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
     m_dataReceptorMultiplexer = std::make_shared<DataCopier>();
     m_dataReceptorMultiplexer->add(m_metadataReceptor);
 
-    connect(this, &QThread::finished,  this,
+    connect(this, &QThread::finished, this,
         [this]()
         {
-            QnMutexLocker lock(&m_startMutex);
-            NX_DEBUG(this,
-                "Provider thread is about to stop, Device: %1, role: %2, restart is requested: %3",
-                m_cameraRes, getRole(), m_restartRequested);
+            m_restartThreadSheduler.post(
+            [this]()
+            {
+                QnMutexLocker lock(&m_startMutex);
+                NX_DEBUG(this,
+                    "Provider thread is about to stop, Device: %1, role: %2, restart is requested: %3",
+                    m_cameraRes, getRole(), m_restartRequested);
 
-            if (m_restartRequested)
-                startUnsafe();
-        }, Qt::QueuedConnection);
+                if (m_restartRequested)
+                    startUnsafe();
+            });
+        }, Qt::DirectConnection);
 }
 
 QnLiveStreamProvider::~QnLiveStreamProvider()
@@ -157,6 +161,7 @@ QnLiveStreamProvider::~QnLiveStreamProvider()
         QnMutexLocker lock(&m_startMutex);
         m_restartRequested = false;
     }
+    m_restartThreadSheduler.pleaseStopSync();
     stop();
 
     directDisconnectAll();
