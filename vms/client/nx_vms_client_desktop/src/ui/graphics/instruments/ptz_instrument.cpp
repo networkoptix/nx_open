@@ -689,6 +689,9 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget* widget, const QRectF& rect)
     const QRectF viewport = Geometry::cwiseDiv(rect, widget->size());
     widget->ptzController()->viewportMove(aspectRatio, viewport, 1.0);
 
+    if (m_dataByWidget.value(widget).isFisheye())
+        return;
+
     widget->setActionText(tr("Moving..."));
     widget->clearActionText(2s);
 }
@@ -767,6 +770,9 @@ void PtzInstrument::focusMove(QnMediaResourceWidget* widget, qreal speed)
 
     widget->ptzController()->continuousFocus(speed);
 
+    if (m_dataByWidget.value(widget).isFisheye())
+        return;
+
     if (qFuzzyIsNull(speed))
         updateActionText(widget);
     else
@@ -778,6 +784,9 @@ void PtzInstrument::focusAuto(QnMediaResourceWidget* widget)
     widget->ptzController()->runAuxiliaryCommand(
         Ptz::ManualAutoFocusPtzTrait,
         QString());
+
+    if (m_dataByWidget.value(widget).isFisheye())
+        return;
 
     widget->setActionText(tr("Focusing..."));
     widget->clearActionText(2s);
