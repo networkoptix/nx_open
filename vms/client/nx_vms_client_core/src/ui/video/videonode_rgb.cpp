@@ -41,7 +41,7 @@
 #include <nx/utils/log/log.h>
 
 #include <nx/media/quick_sync/quick_sync_surface.h>
-#include <nx/media/quick_sync/utils.h>
+#include <nx/media/quick_sync/quick_sync_video_decoder_impl.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -195,10 +195,14 @@ public:
             functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         }
 
-        if (!nx::media::quick_sync::renderToRgb(m_frame, isNewTexture, m_textureId, nullptr /*TODO*/))
-        {
+        auto surfaceInfo = m_frame.handle().value<QuickSyncSurface>();
+        auto decoderLock = surfaceInfo.decoder.lock();
+        if (!decoderLock)
+            return;
+
+        if (!decoderLock->getDevice().renderToRgb(surfaceInfo, isNewTexture, m_textureId, nullptr /*TODO support windows*/))
             NX_WARNING(this, "rendering surface failed");
-        }
+
         m_textureDirty = false;
         functions->glActiveTexture(GL_TEXTURE0);
         functions->glBindTexture(GL_TEXTURE_2D, m_textureId);

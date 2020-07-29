@@ -11,7 +11,6 @@
 #include <nx/utils/log/log.h>
 #include "d3d_allocator.h"
 #include "../quick_sync_surface.h"
-#include "../quick_sync_video_decoder_impl.h"
 
 namespace {
 
@@ -37,13 +36,21 @@ int getIntelDeviceAdapter(MFXVideoSession& session)
 
 namespace nx::media::quick_sync {
 
-bool Device::initialize(MFXVideoSession& session)
+bool isCompatible(AVCodecID codec)
+{
+    if (codec == AV_CODEC_ID_H264 || codec == AV_CODEC_ID_H265)
+        return true;
+
+    return false;
+}
+
+bool DeviceContext::initialize(MFXVideoSession& session)
 {
     auto adapter = getIntelDeviceAdapter(session);
     if (adapter < 0)
         return false;
 
-    auto hr = device.createDevice(2992, 2992, adapter); // TODO size
+    auto hr = m_device.createDevice(2992, 2992, adapter); // TODO size
     if (FAILED(hr))
     {
         NX_ERROR(NX_SCOPE_TAG, "Failed to get DirectX handle");
@@ -51,7 +58,7 @@ bool Device::initialize(MFXVideoSession& session)
     }
 
     auto status = session.SetHandle(MFX_HANDLE_DIRECT3D_DEVICE_MANAGER9,
-        device.getDeviceManager());
+        m_device.getDeviceManager());
 
     if (status < MFX_ERR_NONE)
     {
@@ -61,7 +68,7 @@ bool Device::initialize(MFXVideoSession& session)
 
     m_allocator = std::make_shared<windows::D3DFrameAllocator>();
     windows::D3DAllocatorParams d3dAllocParams;
-    d3dAllocParams.pManager = device.getDeviceManager();
+    d3dAllocParams.pManager = m_device.getDeviceManager();
     status = m_allocator->Init(&d3dAllocParams);
     if (status < MFX_ERR_NONE)
     {
@@ -72,32 +79,18 @@ bool Device::initialize(MFXVideoSession& session)
     return true;
 }
 
-std::shared_ptr<MFXFrameAllocator> Device::getAllocator()
+std::shared_ptr<MFXFrameAllocator> DeviceContext::getAllocator()
 {
     return m_allocator;
 }
 
-bool isCompatible(AVCodecID codec)
+bool DeviceContext::renderToRgb(
+    const QuickSyncSurface& surfaceInfo,
+    bool isNewTexture,
+    GLuint textureId,
+    QOpenGLContext* context)
 {
-    if (codec == AV_CODEC_ID_H264 || codec == AV_CODEC_ID_H265)
-        return true;
-
-    return false;
-}
-
-bool renderToRgb(const QVideoFrame& frame, bool isNewTexture, GLuint textureId, QOpenGLContext* context)
-{
-    auto surfaceInfo = frame.handle().value<QuickSyncSurface>();
-    auto decoderLock = surfaceInfo.decoder.lock();
-    if (!decoderLock)
-        return false;
-
-    if (!decoderLock->getDevice().device.getRenderer().render(surfaceInfo.surface, isNewTexture, textureId, context))
-    {
-        return false;
-    }
-
-    return true;
+    return m_device.getRenderer().render(surfaceInfo.surface, isNewTexture, textureId, context);
 }
 
 } // namespace nx::media::quick_sync

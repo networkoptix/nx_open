@@ -15,27 +15,30 @@ extern "C" {
 } // extern "C"
 
 class MFXFrameAllocator;
+class QuickSyncSurface;
 
 namespace nx::media::quick_sync {
 
-class Device
+class DeviceContext
 {
 public:
-    ~Device();
+    ~DeviceContext();
     bool initialize(MFXVideoSession& session);
+    bool renderToRgb(
+        const QuickSyncSurface& surfaceInfo,
+        bool isNewTexture,
+        GLuint textureId,
+        QOpenGLContext* /*context*/);
+
     std::shared_ptr<MFXFrameAllocator> getAllocator();
 
-    void* renderingSurface = nullptr;
-    VADisplay display = nullptr;
-
 private:
+    void* m_renderingSurface = nullptr;
+    VADisplay m_display = nullptr;
     std::shared_ptr<MFXFrameAllocator> m_allocator;
 };
 
-class QuickSyncVideoDecoderImpl;
-
 bool isCompatible(AVCodecID codec);
-bool renderToRgb(const QVideoFrame& frame, bool isNewTexture, GLuint textureId, QOpenGLContext* /*context*/);
 
 } // nx::media::quick_sync
 

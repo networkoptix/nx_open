@@ -21,7 +21,7 @@ public:
     void lockSurface(const mfxFrameSurface1* surface);
     void releaseSurface(const mfxFrameSurface1* surface);
 
-    Device& getDevice() { return m_device; }
+    DeviceContext& getDevice() { return m_device; }
     static bool isCompatible(AVCodecID codec);
 
 private:
@@ -53,7 +53,7 @@ private:
     std::shared_ptr<MFXFrameAllocator> m_allocator;
     mfxFrameAllocResponse m_response;
 
-    Device m_device;
+    DeviceContext m_device;
 };
 
 } // namespace nx::media::quick_sync

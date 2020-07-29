@@ -24,22 +24,22 @@ bool isCompatible(AVCodecID codec)
     return false;
 }
 
-Device::~Device()
+DeviceContext::~DeviceContext()
 {
-    if (renderingSurface)
-        vaDestroySurfaceGLX(linux::VaDisplay::getDisplay(), renderingSurface);
+    if (m_renderingSurface)
+        vaDestroySurfaceGLX(linux::VaDisplay::getDisplay(), m_renderingSurface);
 }
 
-bool Device::initialize(MFXVideoSession& session)
+bool DeviceContext::initialize(MFXVideoSession& session)
 {
-    display = linux::VaDisplay::getDisplay();
-    if (!display)
+    m_display = linux::VaDisplay::getDisplay();
+    if (!m_display)
     {
         NX_ERROR(NX_SCOPE_TAG, "Failed to get VA display");
         return false;
     }
 
-    auto status = session.SetHandle(MFX_HANDLE_VA_DISPLAY, display);
+    auto status = session.SetHandle(MFX_HANDLE_VA_DISPLAY, m_display);
     if (status < MFX_ERR_NONE)
     {
         NX_ERROR(NX_SCOPE_TAG, "Failed to set VA handle to MFX session, error: %1", status);
@@ -48,7 +48,7 @@ bool Device::initialize(MFXVideoSession& session)
 
     m_allocator = std::make_shared<linux::VaapiFrameAllocator>();
     linux::vaapiAllocatorParams vaapiAllocParams;
-    vaapiAllocParams.m_dpy = display;
+    vaapiAllocParams.m_dpy = m_display;
     status = m_allocator->Init(&vaapiAllocParams);
     if (status < MFX_ERR_NONE)
     {
@@ -59,49 +59,47 @@ bool Device::initialize(MFXVideoSession& session)
     return true;
 }
 
-std::shared_ptr<MFXFrameAllocator> Device::getAllocator()
+std::shared_ptr<MFXFrameAllocator> DeviceContext::getAllocator()
 {
     return m_allocator;
 }
 
-bool renderToRgb(const QVideoFrame& frame, bool isNewTexture, GLuint textureId, QOpenGLContext* /*context*/)
+bool DeviceContext::renderToRgb(
+    const QuickSyncSurface& surfaceInfo,
+    bool isNewTexture,
+    GLuint textureId,
+    QOpenGLContext* /*context*/)
 {
-    auto surfaceInfo = frame.handle().value<QuickSyncSurface>();
     linux::vaapiMemId* surfaceData = (linux::vaapiMemId*)surfaceInfo.surface->Data.MemId;
     VASurfaceID surfaceId = *(surfaceData->m_surface);
 
-    auto decoderLock = surfaceInfo.decoder.lock();
-    if (!decoderLock)
-        return false;
-
     auto start =  std::chrono::high_resolution_clock::now();
-    Device& device = decoderLock->getDevice();
     VAStatus status;
-    if (isNewTexture || !device.renderingSurface)
+    if (isNewTexture || !m_renderingSurface)
     {
-        if (device.renderingSurface)
-            vaDestroySurfaceGLX(device.display, device.renderingSurface);
+        if (m_renderingSurface)
+            vaDestroySurfaceGLX(m_display, m_renderingSurface);
 
         status = vaCreateSurfaceGLX_nx(
-            device.display,
+            m_display,
             GL_TEXTURE_2D,
             textureId,
             surfaceInfo.surface->Info.Width, surfaceInfo.surface->Info.Height,
-            &device.renderingSurface);
+            &m_renderingSurface);
         if (status != VA_STATUS_SUCCESS)
         {
             NX_DEBUG(NX_SCOPE_TAG, "vaCreateSurfaceGLX failed: %1", status);
             return false;
         }
     }
-    status = vaCopySurfaceGLX_nx(device.display, device.renderingSurface, surfaceId, 0);
+    status = vaCopySurfaceGLX_nx(m_display, m_renderingSurface, surfaceId, 0);
     if (status != VA_STATUS_SUCCESS)
     {
         NX_DEBUG(NX_SCOPE_TAG, "vaCopySurfaceGLX failed: %1", status);
         return false;
     }
 
-    status = vaSyncSurface(device.display, surfaceId);
+    status = vaSyncSurface(m_display, surfaceId);
     if (status != VA_STATUS_SUCCESS)
     {
         NX_DEBUG(NX_SCOPE_TAG, "vaSyncSurface failed: %1", status);

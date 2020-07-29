@@ -1,6 +1,8 @@
 #include "quick_sync_video_frame.h"
 
 #include <nx/media/quick_sync/utils.h>
+#include <nx/media/quick_sync/quick_sync_surface.h>
+#include <nx/media/quick_sync/quick_sync_video_decoder_impl.h>
 
 QuickSyncVideoFrame::QuickSyncVideoFrame(const std::shared_ptr<QVideoFrame>& frame)
 {
@@ -9,5 +11,10 @@ QuickSyncVideoFrame::QuickSyncVideoFrame(const std::shared_ptr<QVideoFrame>& fra
 
 bool QuickSyncVideoFrame::renderToRgb(bool isNewTexture, GLuint textureId, QOpenGLContext* context)
 {
-    return nx::media::quick_sync::renderToRgb(*m_frame, isNewTexture, textureId, context);
+    auto surfaceInfo = m_frame->handle().value<QuickSyncSurface>();
+    auto decoderLock = surfaceInfo.decoder.lock();
+    if (!decoderLock)
+        return false;
+
+    return decoderLock->getDevice().renderToRgb(surfaceInfo, isNewTexture, textureId, context);
 }
