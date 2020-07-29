@@ -22,5 +22,7 @@ if(doxygen_directory)
     )
 
     set_target_properties(documentation documentation_zip
-        PROPERTIES FOLDER sdk)
+        PROPERTIES
+            FOLDER sdk
+            EXCLUDE_FROM_DEFAULT_BUILD TRUE)
 endif()
