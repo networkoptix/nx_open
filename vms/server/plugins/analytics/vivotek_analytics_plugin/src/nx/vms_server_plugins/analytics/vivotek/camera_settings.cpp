@@ -1306,7 +1306,7 @@ struct SerializerToServer
 
     template <typename Value, typename... ExtraArgs>
     std::optional<QString> serialize(
-        const std::optional<Value>& value, ExtraArgs&&... extraArgs) const
+        const std::optional<Value>& value, const ExtraArgs&... extraArgs) const
     {
         if (!value)
             return std::nullopt;
@@ -1316,16 +1316,13 @@ struct SerializerToServer
 
     template <typename Value, typename... ExtraArgs>
     void serialize(const QString& name, const CameraSettings::Entry<Value>& entry,
-        ExtraArgs&&... extraArgs) const
+        const ExtraArgs&... extraArgs) const
     {
         std::optional<QString> error;
         try
         {
-            if (const auto serializedValue =
-                serialize(entry.value, std::forward<ExtraArgs>(extraArgs)...))
-            {
+            if (const auto serializedValue = serialize(entry.value, extraArgs...))
                 values.setItem(name.toStdString(), serializedValue->toStdString());
-            }
         }
         catch (const std::exception& exception)
         {
@@ -1347,7 +1344,12 @@ struct SerializerToServer
 
         const auto& excludedRegions = installation.excludedRegions;
         for (std::size_t i = 0; i < excludedRegions.size(); ++i)
-            serialize(replicateName(kVcaInstallationExcludedRegion, i), excludedRegions[i], "");
+        {
+            serialize(
+                replicateName(kVcaInstallationExcludedRegion, i),
+                excludedRegions[i],
+                QString(""));
+        }
     }
 
     void serialize(const CameraSettings::Vca::CrowdDetection& detection) const
