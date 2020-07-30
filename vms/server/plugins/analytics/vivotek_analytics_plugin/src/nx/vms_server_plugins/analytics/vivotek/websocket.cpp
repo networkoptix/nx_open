@@ -9,8 +9,15 @@
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
+using namespace std::literals;
 using namespace nx::utils;
 using namespace nx::network;
+
+namespace {
+
+constexpr auto kAliveTimeout = 30s;
+
+} // namespace
 
 cf::future<cf::unit> WebSocket::open(const Url& url)
 {
@@ -43,6 +50,7 @@ cf::future<cf::unit> WebSocket::open(const Url& url)
 
                 m_httpClient.reset();
 
+                m_nested->setAliveTimeout(kAliveTimeout);
                 m_nested->start();
 
                 return cf::unit();
