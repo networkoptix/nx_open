@@ -37,13 +37,13 @@ ErrorCode toSdk(std::error_code errorCode)
 } // namespace
 
 Exception::Exception(const std::system_error& systemError):
-    nx::utils::Exception(systemError.what()),
+    nx::utils::Exception(QString::fromLocal8Bit(systemError.what())),
     m_errorCode(systemError.code())
 {
 }
 
 Exception::Exception(std::error_code errorCode):
-    nx::utils::Exception(errorCode.message()),
+    nx::utils::Exception(QString::fromLocal8Bit(errorCode.message().data())),
     m_errorCode(errorCode)
 {
 }
