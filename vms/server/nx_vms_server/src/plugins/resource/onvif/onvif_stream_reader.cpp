@@ -1065,7 +1065,7 @@ ConfigurationSet QnOnvifStreamReader::calculateConfigurationsToUpdate(
     ConfigurationSet result;
     result.profileToken = desiredParameters.profileToken;
 
-    if (actualParameters.videoSourceToken != desiredParameters.videoSourceToken);
+    if (actualParameters.videoSourceToken != desiredParameters.videoSourceToken)
     {
         result.configurations.emplace(
             ConfigurationType::videoSource,
