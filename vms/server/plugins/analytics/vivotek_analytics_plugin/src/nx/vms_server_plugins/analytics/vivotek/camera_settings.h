@@ -29,8 +29,6 @@ public:
 
     struct Vca
     {
-        Entry<bool> isEnabled;
-
         Entry<int> sensitivity;
 
         struct Installation

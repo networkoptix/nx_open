@@ -118,6 +118,9 @@ void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 {
     try
     {
+        CameraSettings settings;
+        settings.fetchFrom(m_url);
+
         auto manifest = QJsonObject{
             {"objectTypes",
                 [&]()
@@ -126,6 +129,9 @@ void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 
                     for (const auto& objectType: kObjectTypes)
                     {
+                        if (!objectType.isAvailable(settings))
+                            continue;
+
                         types.push_back(QJsonObject{
                             {"id", objectType.id},
                             {"name", objectType.prettyName},
@@ -142,6 +148,9 @@ void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 
                     for (const auto& eventType: kEventTypes)
                     {
+                        if (!eventType.isAvailable(settings))
+                            continue;
+
                         QJsonObject type = {
                             {"id", eventType.id},
                             {"name", eventType.prettyName},

@@ -14,8 +14,7 @@ const std::vector<ObjectType> kObjectTypes =
             type.isAvailable =
                 [](const auto& settings)
                 {
-                    const auto& vca = settings.vca;
-                    return vca && vca->isEnabled.value.value_or(false);
+                    return !!settings.vca;
                 };
         }
         return types;

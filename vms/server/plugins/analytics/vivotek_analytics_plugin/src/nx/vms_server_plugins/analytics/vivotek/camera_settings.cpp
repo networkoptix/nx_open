@@ -273,9 +273,8 @@ struct VcaParserFromCamera
 void fetchFromCamera(CameraSettings::Vca* vca,
     const CameraModuleApi::ModuleInfo& moduleInfo, const Url& cameraUrl)
 {
-    vca->isEnabled.value = moduleInfo.isEnabled;
     if (!moduleInfo.isEnabled)
-        return;
+        CameraModuleApi(cameraUrl).enable("VCA");
 
     CameraVcaParameterApi api(cameraUrl);
 
@@ -653,23 +652,8 @@ struct VcaSerializerToCamera
 void storeToCamera(const Url& cameraUrl,
     CameraSettings::Vca* vca, const CameraModuleApi::ModuleInfo& moduleInfo)
 {
-    if (auto& isEnabled = vca->isEnabled; isEnabled.value)
-    {
-        try
-        {
-            CameraModuleApi(cameraUrl).enable("VCA", *isEnabled.value);
-            if (!*isEnabled.value || (!moduleInfo.isEnabled && *isEnabled.value))
-                return;
-        }
-        catch (const std::exception& exception)
-        {
-            if (!isEnabled.error)
-                isEnabled.error = exception.what();
-            return;
-        }
-    }
-    else
-        return;
+    if (!moduleInfo.isEnabled)
+        CameraModuleApi(cameraUrl).enable("VCA");
 
     CameraVcaParameterApi api(cameraUrl);
 
@@ -711,7 +695,6 @@ const int kMaxDetectionRuleCount = 5; // Defined in user manual.
 const int kMinRegionVertices = 3;
 const int kMaxRegionVertices = 20; // Defined in user manual.
 
-const QString kVcaIsEnabled = "Vca.IsEnabled";
 const QString kVcaSensitivity = "Vca.Sensitivity";
 
 const QString kVcaInstallationHeight = "Vca.Installation.Height";
@@ -1158,7 +1141,6 @@ struct ParserFromServer
 
     void parse(CameraSettings::Vca* vca)
     {
-        parse(&vca->isEnabled, kVcaIsEnabled);
         parse(&vca->sensitivity, kVcaSensitivity);
         parse(&vca->installation);
 
@@ -1472,7 +1454,6 @@ struct SerializerToServer
 
     void serialize(const CameraSettings::Vca& vca) const
     {
-        serialize(kVcaIsEnabled, vca.isEnabled);
         serialize(kVcaSensitivity, vca.sensitivity);
         serialize(vca.installation);
 
@@ -1957,24 +1938,16 @@ QJsonObject serializeModel(const CameraSettings::Vca& vca)
                 QJsonArray items;
 
                 items.push_back(QJsonObject{
-                    {"name", kVcaIsEnabled},
-                    {"type", "SwitchButton"},
-                    {"caption", "Enabled"},
+                    {"name", kVcaSensitivity},
+                    {"type", "SpinBox"}, 
+                    {"minValue", 0}, 
+                    {"maxValue", 10}, 
+                    {"defaultValue", 5}, 
+                    {"caption", "Sensitivity"},
+                    {"description", "Higher values correspond to greater likelihood of an"
+                                    " object being detected as human"},
                 });
-                if (vca.isEnabled.value.value_or(false))
-                {
-                    items.push_back(QJsonObject{
-                        {"name", kVcaSensitivity},
-                        {"type", "SpinBox"}, 
-                        {"minValue", 0}, 
-                        {"maxValue", 10}, 
-                        {"defaultValue", 5}, 
-                        {"caption", "Sensitivity"},
-                        {"description", "Higher values correspond to greater likelihood of an"
-                                        " object being detected as human"},
-                    });
-                    items.push_back(serializeModel(vca.installation));
-                }
+                items.push_back(serializeModel(vca.installation));
 
                 return items;
             }(),
