@@ -249,13 +249,27 @@ void CameraScheduleWidget::loadAlerts(const CameraSettingsDialogState& state)
             if (!state.recordingAlert)
                 return QString();
 
-            NX_ASSERT(*state.recordingAlert ==
-                CameraSettingsDialogState::RecordingAlert::highArchiveLength);
+            switch (*state.recordingAlert)
+            {
+                case CameraSettingsDialogState::RecordingAlert::highArchiveLength:
+                {
+                    return QnCameraDeviceStringSet(
+                        tr("High minimum value can lead to archive length "
+                                "decrease on other devices."),
+                        tr("High minimum value can lead to archive length "
+                                "decrease on other cameras."))
+                            .getString(state.deviceType);
+                }
 
-            return QnCameraDeviceStringSet(
-                tr("High minimum value can lead to archive length decrease on other devices."),
-                tr("High minimum value can lead to archive length decrease on other cameras."))
-                .getString(state.deviceType);
+                case CameraSettingsDialogState::RecordingAlert::highPreRecordingValue:
+                {
+                    return tr("High pre-recording time will increase RAM utilization "
+                        "on the server");
+                }
+            }
+
+            NX_ASSERT(false);
+            return QString();
         }());
 }
 

@@ -31,6 +31,8 @@ using RecordingThresholds = State::RecordingSettings::Thresholds;
 using Camera = QnVirtualCameraResourcePtr;
 using Cameras = QnVirtualCameraResourceList;
 
+using namespace std::chrono;
+
 namespace {
 
 static constexpr int kMinFps = 1;
@@ -39,6 +41,7 @@ static constexpr auto kMinQuality = Qn::StreamQuality::low;
 static constexpr auto kMaxQuality = Qn::StreamQuality::highest;
 
 static constexpr int kMinArchiveDaysAlertThreshold = 5;
+static constexpr auto kPreRecoringAlertThreshold = 30s;
 
 template<class Data>
 void fetchFromCameras(
@@ -455,7 +458,23 @@ std::optional<State::RecordingAlert> updateArchiveLengthAlert(const State& state
     if (warning)
         return State::RecordingAlert::highArchiveLength;
 
+    // If this alert shouldn't be shown but it is shown, clear it.
     if (state.recordingAlert && *state.recordingAlert == State::RecordingAlert::highArchiveLength)
+        return {};
+
+    return state.recordingAlert;
+}
+
+std::optional<State::RecordingAlert> updateHighPreRecordingAlert(const State& state)
+{
+    const bool warning =
+        seconds(state.recording.thresholds.beforeSec()) > kPreRecoringAlertThreshold;
+
+    if (warning)
+        return State::RecordingAlert::highPreRecordingValue;
+
+    // If this alert shouldn't be shown but it is shown, clear it.
+    if (state.recordingAlert && *state.recordingAlert == State::RecordingAlert::highPreRecordingValue)
         return {};
 
     return state.recordingAlert;
@@ -1112,6 +1131,7 @@ State CameraSettingsDialogStateReducer::setRecordingBeforeThresholdSec(State sta
     NX_ASSERT(state.isMotionDetectionEnabled());
     state.hasChanges = true;
     state.recording.thresholds.beforeSec.setUser(value);
+    state.recordingAlert = updateHighPreRecordingAlert(state);
     return state;
 }
 

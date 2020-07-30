@@ -41,13 +41,16 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         emptySchedule,
 
         // Schedule was changed but recording is not enabled.
-        recordingIsNotEnabled
+        recordingIsNotEnabled,
     };
 
     enum class RecordingAlert
     {
         // High minimal archive length value selected.
-        highArchiveLength
+        highArchiveLength,
+
+        // High pre-recording value selected, resulting in increased RAM usage on the server.
+        highPreRecordingValue,
     };
 
     enum class MotionAlert
@@ -59,7 +62,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         motionDetectionTooManyMaskRectangles,
 
         // Selection attempt produced too many motion sensitivity rectangles.
-        motionDetectionTooManySensitivityRectangles
+        motionDetectionTooManySensitivityRectangles,
     };
 
     enum class ScheduleAlert
