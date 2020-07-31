@@ -8,6 +8,8 @@ public:
     QuickSyncVideoFrame(const std::shared_ptr<QVideoFrame>& frame);
 
     virtual bool renderToRgb(bool isNewTexture, GLuint textureId, QOpenGLContext* context) override;
+    virtual AVFrame lockFrame() override;
+    virtual void unlockFrame() override;
 
 private:
     // Contain video surface

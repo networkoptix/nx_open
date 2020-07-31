@@ -245,7 +245,6 @@ mfxFrameSurface1* QuickSyncVideoDecoderImpl::getFreeSurface()
 int QuickSyncVideoDecoderImpl::decode(
     const QnConstCompressedVideoDataPtr& frame, nx::QVideoFramePtr* result)
 {
-    NX_INFO(this, "Decode");
     mfxBitstream bitstream;
     memset(&bitstream, 0, sizeof(bitstream));
     if (frame)
@@ -346,7 +345,6 @@ int QuickSyncVideoDecoderImpl::decode(
     if (!buildQVideoFrame(outSurface, result))
         return -1;
 
-    NX_INFO(this, "New frame");
     return m_frameNumber++;
 }
 

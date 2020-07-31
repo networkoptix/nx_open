@@ -53,6 +53,11 @@ CLVideoDecoderOutput::~CLVideoDecoderOutput()
     clean();
 }
 
+bool CLVideoDecoderOutput::isEmpty()
+{
+    return (m_memoryType == MemoryType::SystemMemory && !data[0]) || !width;
+}
+
 static bool convertImageFormat(
     int width,
     int height,
@@ -103,7 +108,42 @@ void CLVideoDecoderOutput::clean()
 
 void CLVideoDecoderOutput::copyFrom(const CLVideoDecoderOutput* src)
 {
-    copyDataOnlyFrom(src);
+    if (src->memoryType() == MemoryType::VideoMemory)
+    {
+        if (!src->getVideoSurface())
+        {
+            NX_WARNING(this, "Invalid video frame");
+            return;
+        }
+        AVFrame lockedFrame = src->getVideoSurface()->lockFrame();
+        if (!lockedFrame.data[0])
+        {
+            NX_WARNING(this, "Failed to lock video memory to copy data");
+            return;
+        }
+        reallocate(lockedFrame.width, lockedFrame.height, AV_PIX_FMT_YUV420P);
+        bool status = convertImageFormat(
+            lockedFrame.width,
+            lockedFrame.height,
+            lockedFrame.data,
+            lockedFrame.linesize,
+            AVPixelFormat(lockedFrame.format),
+            data,
+            linesize,
+            AV_PIX_FMT_YUV420P,
+            /*logTag*/ this);
+        src->getVideoSurface()->unlockFrame();
+        if (!status)
+        {
+            NX_WARNING(this, "Failed to convert video memory color space to YUV420");
+            return;
+        }
+    }
+    else
+    {
+        copyDataOnlyFrom(src);
+    }
+
     assignMiscData(src);
 }
 

@@ -1004,7 +1004,7 @@ QImage QnVideoStreamDisplay::getGrayscaleScreenshot()
 CLVideoDecoderOutputPtr QnVideoStreamDisplay::getScreenshot(bool anyQuality)
 {
     QnMutexLocker mutex(&m_mtx);
-    if (!m_lastDisplayedFrame || !m_lastDisplayedFrame->data[0] || !m_lastDisplayedFrame->width)
+    if (!m_lastDisplayedFrame || m_lastDisplayedFrame->isEmpty())
         return CLVideoDecoderOutputPtr();
 
     // feature #2563
@@ -1013,7 +1013,7 @@ CLVideoDecoderOutputPtr QnVideoStreamDisplay::getScreenshot(bool anyQuality)
 
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
     outFrame->copyFrom(m_lastDisplayedFrame.data());
-    NX_VERBOSE(this, "Got screenshot with resolution: %1", outFrame->size());
+    NX_DEBUG(this, "Got screenshot with resolution: %1", outFrame->size());
     return outFrame;
 }
 

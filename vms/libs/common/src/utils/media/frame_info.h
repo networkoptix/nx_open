@@ -41,6 +41,8 @@ class AbstractVideoSurface
 public:
     virtual ~AbstractVideoSurface() {}
     virtual bool renderToRgb(bool isNewTexture, GLuint textureId, QOpenGLContext* context) = 0;
+    virtual AVFrame lockFrame() = 0;
+    virtual void unlockFrame() = 0;
 };
 
 /**
@@ -60,8 +62,9 @@ public:
     ~CLVideoDecoderOutput();
 
     MemoryType memoryType() const { return m_memoryType; }
+    bool isEmpty();
     void attachVideoSurface(std::unique_ptr<AbstractVideoSurface> surface);
-    AbstractVideoSurface* getVideoSurface() { return m_surface.get(); }
+    AbstractVideoSurface* getVideoSurface() const { return m_surface.get(); }
 
     QImage toImage() const;
 
