@@ -831,6 +831,9 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
             const auto existing = processExistingStorages();
             const auto newStorages = createStorages();
             saveStorages(newStorages);
+            NX_DEBUG(
+                this, "New storages have been saved to DB. Waiting for them to appear in the "
+                "resource pool");
             storageManagerWatcher.waitForPopulate(newStorages + existing);
             initializeMetaDataStorage();
             m_storageInitializationDone = true;

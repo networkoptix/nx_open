@@ -825,7 +825,11 @@ public:
         auto amendedTran = amendTranIfNeeded(tran);
         const auto descriptor = getTransactionDescriptorByTransaction(amendedTran);
         if (!descriptor)
+        {
+            NX_DEBUG(this, "processUpdateSync: No descriptor found for %1", tran.command);
             return ErrorCode::forbidden;
+        }
+
         amendedTran.transactionType = descriptor
             ->getTransactionTypeFunc(
                 m_db.db()->commonModule(),
@@ -833,13 +837,17 @@ public:
                 &persistentDb);
 
         if (amendedTran.transactionType == TransactionType::Unknown)
+        {
+            NX_DEBUG(this, "processUpdateSync: Unknown transaction type %1", tran.command);
             return ErrorCode::forbidden;
+        }
 
         m_db.db()->transactionLog()->fillPersistentInfo(amendedTran);
         QByteArray serializedTran = m_owner->messageBus()->ubjsonTranSerializer()
             ->serializedTransaction(amendedTran);
 
         ErrorCode errorCode = m_db.executeTransactionNoLock(amendedTran, serializedTran);
+        NX_VERBOSE(this, "processUpdateSync: Execute %1 --> %2", tran.command, errorCode);
         NX_ASSERT(errorCode != ErrorCode::containsBecauseSequence
             && errorCode != ErrorCode::containsBecauseTimestamp);
         if (errorCode != ErrorCode::ok)

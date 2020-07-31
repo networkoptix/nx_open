@@ -1111,6 +1111,10 @@ void QnCommonMessageProcessor::updateResource(
 void QnCommonMessageProcessor::updateResource(
     const StorageData& storage, ec2::NotificationSource source)
 {
+    NX_VERBOSE(
+        this,"updateResource: Updating/creating resource %1",
+        nx::utils::url::hidePassword(storage.url));
+
     QnStorageResourcePtr qnStorage = getResourceFactory()->createResource(
         StorageData::kResourceTypeId, QnResourceParams(storage.id, storage.url, QString()))
             .dynamicCast<QnStorageResource>();

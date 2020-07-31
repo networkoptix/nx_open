@@ -54,7 +54,12 @@ void QnMediaServerNotificationManager::triggerNotification(
     NotificationSource source)
 {
     for (const auto& storage: tran.params)
-    emit storageChanged(storage, source);
+    {
+        NX_VERBOSE(
+            this, "Emitting storageChanged signal for %1",
+            nx::utils::url::hidePassword(storage.url));
+        emit storageChanged(storage, source);
+    }
 }
 
 void QnMediaServerNotificationManager::triggerNotification(
