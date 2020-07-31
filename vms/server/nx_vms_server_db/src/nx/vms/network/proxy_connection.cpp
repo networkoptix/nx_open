@@ -358,7 +358,7 @@ bool ProxyConnectionProcessor::updateClientRequest(nx::utils::Url& dstUrl, QnRou
     {
         nx::utils::Url url = d->request.requestLine.url;
         QString host = url.host();
-        QString urlPath = QString('/') + QnTcpListener::normalizedPath(url.path());
+        QString urlPath = QString('/') + d->owner->normalizedPath(url.path());
 
         // todo: this code is deprecated and isn't compatible with WEB client
         // It never used for WEB client purpose

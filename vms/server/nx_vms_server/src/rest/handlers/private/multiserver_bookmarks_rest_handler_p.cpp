@@ -43,7 +43,7 @@ namespace
 
     nx::utils::Url getApiUrl(const QnMediaServerResourcePtr &server, QnBookmarkOperation operation) {
         nx::utils::Url apiUrl(server->getApiUrl());
-        apiUrl.setPath(L'/' + QnMultiserverBookmarksRestHandlerPrivate::urlPath + L'/' + operations[static_cast<int>(operation)]);
+        apiUrl.setPath("/ec2/bookmarks/" + operations[static_cast<int>(operation)]);
         return apiUrl;
     }
 
@@ -192,8 +192,6 @@ namespace
         sendAsyncRequest(serverModule->commonModule(), server, apiUrl, ctx);
     }
 }
-
-QString QnMultiserverBookmarksRestHandlerPrivate::urlPath;
 
 QnBookmarkOperation QnMultiserverBookmarksRestHandlerPrivate::getOperation(const QString &path) {
     auto iter = std::find(operations.cbegin(), operations.cend(), path);

@@ -37,8 +37,6 @@ std::array<QByteArray, 2> extraImageHeaders =
     Qn::FRAME_ENCODED_BY_PLUGIN
 };
 
-static QString urlPath;
-
 using namespace nx::api;
 
 static QByteArray toMimeSubtype(ImageRequest::ThumbnailFormat format, AVPixelFormat pixelFormat)
@@ -53,12 +51,14 @@ static QByteArray toMimeSubtype(ImageRequest::ThumbnailFormat format, AVPixelFor
 
 } // namespace
 
+const QString QnMultiserverThumbnailRestHandler::kDefaultPath = "ec2/analyticsTrackBestShot";
+
 QnMultiserverThumbnailRestHandler::QnMultiserverThumbnailRestHandler(
-    QnMediaServerModule* serverModule, const QString& path):
-    nx::vms::server::ServerModuleAware(serverModule)
+    QnMediaServerModule* serverModule, const QString& path)
+    :
+    nx::vms::server::ServerModuleAware(serverModule),
+    m_path(path)
 {
-    if (!path.isEmpty())
-        urlPath = path;
 }
 
 int QnMultiserverThumbnailRestHandler::executeGet(
@@ -348,6 +348,7 @@ struct DownloadResult
 static DownloadResult downloadImage(
     const QnMediaServerResourcePtr& server,
     const QnThumbnailRequestData& request,
+    const QString& urlPath,
     int ownerPort)
 {
     NX_ASSERT(!request.isLocal, "Local request must be processed before");
@@ -401,7 +402,7 @@ int QnMultiserverThumbnailRestHandler::getThumbnailRemote(
     int ownerPort,
     nx::network::http::HttpHeaders* outExtraHeaders) const
 {
-    const auto response = downloadImage(server, request, ownerPort);
+    const auto response = downloadImage(server, request, m_path, ownerPort);
     if (response.osStatus != SystemError::noError)
     {
         return makeError(nx::network::http::StatusCode::internalServerError,

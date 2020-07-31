@@ -183,13 +183,13 @@ void LocalConnectionFactory::registerTransactionListener(
         for (const auto& path: deprecatedUrls)
         {
             httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
-                "HTTP", QnTcpListener::normalizedPath(path));
+                "HTTP", httpConnectionListener->normalizedPath(path));
         }
 
         httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
-            "HTTP", QnTcpListener::normalizedPath(nx::p2p::ConnectionBase::kWebsocketUrlPath));
+            "HTTP", httpConnectionListener->normalizedPath(nx::p2p::ConnectionBase::kWebsocketUrlPath));
         httpConnectionListener->addHandler<nx::p2p::ConnectionProcessor>(
-            "HTTP", QnTcpListener::normalizedPath(nx::p2p::ConnectionBase::kHttpUrlPath));
+            "HTTP", httpConnectionListener->normalizedPath(nx::p2p::ConnectionBase::kHttpUrlPath));
     }
 
     m_sslEnabled = httpConnectionListener->isSslEnabled();

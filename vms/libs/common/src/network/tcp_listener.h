@@ -63,16 +63,15 @@ public:
 
     SystemError::ErrorCode lastError() const;
 
-    static void setDefaultPage(const QByteArray& path);
-    static QByteArray defaultPage();
-
     /**
     * All handler will be matched as usual if request path starts with addition prefix
     */
-    static void setPathIgnorePrefix(const QString& path);
+    void setPathIgnorePrefix(const QString& path);
 
-    /** Normalize url path. cut off web prefix and '/' chars */
-    static QString normalizedPath(const QString& path);
+    /**
+     * Normalize url path, cut off web prefix and '/' chars.
+     */
+    QString normalizedPath(const QString& path);
 
     virtual void applyModToRequest(nx::network::http::Request* /*request*/) {}
     virtual void stop() override;

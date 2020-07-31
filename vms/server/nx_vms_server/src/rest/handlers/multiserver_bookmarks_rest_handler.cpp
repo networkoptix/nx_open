@@ -189,7 +189,6 @@ QnMultiserverBookmarksRestHandler::QnMultiserverBookmarksRestHandler(
     QnFusionRestHandler(),
     nx::vms::server::ServerModuleAware(serverModule)
 {
-    QnMultiserverBookmarksRestHandlerPrivate::urlPath = path;
 }
 
 int QnMultiserverBookmarksRestHandler::executeGet(

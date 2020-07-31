@@ -21,6 +21,9 @@ NX_NETWORK_API std::string normalizePath(const std::string&);
 NX_NETWORK_API QString normalizePath(const QString&);
 NX_NETWORK_API std::string normalizePath(const char*);
 
+NX_NETWORK_API QString normalizedPath(
+    const QString& path, const QString& pathIgnorePrefix = QString());
+
 NX_NETWORK_API std::string joinPath(const std::string& left, const std::string& right);
 
 } // namespace url

@@ -34,16 +34,8 @@ public:
 
     bool operator==(const OsInfo& other) const;
 
-    static QString currentPlatform();
-    static QString currentVariant();
-    static QString currentVariantVersion();
-
     static OsInfo current();
-
-    // These variable allow to override values returned by currentVariant() and
-    // currentVariantVersion() for test reasons.
-    static QString currentVariantOverride;
-    static QString currentVariantVersionOverride;
+    static void override(const QString& variant, const QString& variantVersion);
 };
 #define OsInfo_Fields (platform)(variant)(variantVersion)
 

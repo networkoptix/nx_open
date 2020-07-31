@@ -14,9 +14,11 @@ class QnMultiserverThumbnailRestHandler:
     public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
+    static const QString kDefaultPath;
+
     QnMultiserverThumbnailRestHandler(
-        QnMediaServerModule* serverModule,
-        const QString& path = QString());
+        QnMediaServerModule* serverModule, const QString& path = kDefaultPath);
+
     virtual int executeGet(
         const QString& path,
         const QnRequestParamList& params,
@@ -64,4 +66,6 @@ private:
         QByteArray& contentType,
         nx::network::http::HttpHeaders* outExtraHeaders) const;
 
+private:
+    const QString m_path;
 };

@@ -177,7 +177,7 @@ void QnFileConnectionProcessor::run()
     d->response.messageBody.clear();
 
     nx::utils::Url url = getDecodedUrl();
-    QString path = QString('/') + QnTcpListener::normalizedPath(url.path());
+    QString path = QString('/') + d->owner->normalizedPath(url.path());
     const QString fileFormat = QFileInfo(path).suffix().toLower();
     QByteArray contentType = contentTypes.value(fileFormat, kDefaultContentType);
 

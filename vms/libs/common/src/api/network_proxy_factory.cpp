@@ -9,9 +9,9 @@
 #include <core/resource/security_cam_resource.h>
 #include <network/router.h>
 #include <nx/network/http/custom_headers.h>
+#include <nx/network/url/url_parse_helper.h>
 #include "utils/common/synctime.h"
 #include "network/authutil.h"
-#include <network/tcp_listener.h>
 #include <common/common_module.h>
 
 
@@ -76,9 +76,7 @@ nx::utils::Url QnNetworkProxyFactory::urlToResource(
 
 QList<QNetworkProxy> QnNetworkProxyFactory::queryProxy(const QNetworkProxyQuery &query)
 {
-    QString urlPath = QnTcpListener::normalizedPath(query.url().path());
-
-    if ( urlPath == QLatin1String("api/ping") )
+    if (nx::network::url::normalizedPath(query.url().path()) == QString("api/ping"))
         return QList<QNetworkProxy>() << QNetworkProxy(QNetworkProxy::NoProxy);
 
     QUrlQuery urlQuery(query.url());

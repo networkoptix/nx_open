@@ -5,12 +5,15 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 
+#include <nx/utils/thread/mutex.h>
+
 #include "app_info.h"
 
 namespace nx::utils {
 
-QString OsInfo::currentVariantOverride;
-QString OsInfo::currentVariantVersionOverride;
+static nx::ReadWriteLock mutex;
+static QString currentVariantOverride;
+static QString currentVariantVersionOverride;
 
 QJsonObject OsInfo::toJson() const
 {
@@ -50,34 +53,32 @@ bool OsInfo::operator==(const OsInfo& other) const
         && variantVersion == other.variantVersion;
 }
 
-QString OsInfo::currentPlatform()
+void OsInfo::override(const QString& variant, const QString& variantVersion)
 {
-    return AppInfo::applicationPlatformNew();
-}
-
-QString OsInfo::currentVariant()
-{
-    if (!currentVariantOverride.isEmpty())
-        return currentVariantOverride;
-
-    if (currentPlatform().startsWith(QStringLiteral("linux")))
-        return QSysInfo::productType();
-    return {};
-}
-
-QString OsInfo::currentVariantVersion()
-{
-    if (!currentVariantVersionOverride.isEmpty())
-        return currentVariantVersionOverride;
-
-    if (AppInfo::isWindows())
-        return QSysInfo::kernelVersion();
-    return QSysInfo::productVersion();
+    NX_WRITE_LOCKER lock(&mutex);
+    currentVariantOverride = variant;
+    currentVariantVersionOverride = variantVersion;
 }
 
 OsInfo OsInfo::current()
 {
-    return OsInfo(currentPlatform(), currentVariant(), currentVariantVersion());
+    OsInfo result(AppInfo::applicationPlatformNew());
+    {
+        NX_READ_LOCKER lock(&mutex);
+        result.variant = currentVariantOverride;
+        result.variantVersion = currentVariantVersionOverride;
+    }
+    if (result.variant.isEmpty())
+    {
+        if (result.platform.startsWith(QStringLiteral("linux")))
+            result.variant = QSysInfo::productType();
+    }
+    if (result.variantVersion.isEmpty())
+    {
+        result.variantVersion =
+            AppInfo::isWindows() ? QSysInfo::kernelVersion() : QSysInfo::productVersion();
+    }
+    return result;
 }
 
 QString toString(const OsInfo& info)

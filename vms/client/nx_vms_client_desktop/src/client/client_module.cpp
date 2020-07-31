@@ -383,8 +383,8 @@ void QnClientModule::initSingletons()
     const auto customization = ini().developerMode ? QString() : AppInfo::customizationName();
 
     // This must be done before QnCommonModule instantiation.
-    nx::utils::OsInfo::currentVariantOverride = ini().currentOsVariantOverride;
-    nx::utils::OsInfo::currentVariantVersionOverride = ini().currentOsVariantVersionOverride;
+    nx::utils::OsInfo::override(
+        ini().currentOsVariantOverride, ini().currentOsVariantVersionOverride);
 
     if (m_startupParameters.vmsProtocolVersion > 0)
     {

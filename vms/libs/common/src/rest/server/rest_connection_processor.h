@@ -33,7 +33,7 @@ public:
 
     QnRestRequestHandlerPtr findHandler(
         const nx::network::http::Method::ValueType& httpMethod,
-        const QString& path) const;
+        const QString& normalizedPath) const;
 
     void registerRedirectRule(const QString& path, const QString& newPath);
     boost::optional<QString> getRedirectRule(const QString& path);
@@ -41,11 +41,11 @@ public:
 private:
     QnRestRequestHandlerPtr findHandlerForSpecificMethod(
         const nx::network::http::Method::ValueType& httpMethod,
-        const QString& path) const;
+        const QString& normalizedPath) const;
 
     QnRestRequestHandlerPtr findHandlerByPath(
         const HandlersByPath& handlersByPath,
-        const QString& path) const;
+        const QString& normalizedPath) const;
 
 private:
     /**

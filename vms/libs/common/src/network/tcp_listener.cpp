@@ -8,6 +8,7 @@
 
 #include <nx/network/socket.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/metrics/metrics_storage.h>
 #include <common/common_module.h>
 
@@ -37,13 +38,8 @@ public:
     SystemError::ErrorCode lastError = SystemError::noError;
     bool isStopped = false;
 
-    static QByteArray defaultPage;
-    static QString pathIgnorePrefix;
+    QString pathIgnorePrefix;
 };
-
-QByteArray QnTcpListenerPrivate::defaultPage;
-QString QnTcpListenerPrivate::pathIgnorePrefix;
-
 
 //-------------------------------------------------------------------------------------------------
 // QnTcpListener
@@ -435,32 +431,14 @@ nx::network::SocketAddress QnTcpListener::getLocalEndpoint() const
     return d->localEndpoint;
 }
 
-void QnTcpListener::setDefaultPage(const QByteArray& path)
-{
-    QnTcpListenerPrivate::defaultPage = path;
-}
-
-QByteArray QnTcpListener::defaultPage()
-{
-    return QnTcpListenerPrivate::defaultPage;
-}
-
 void QnTcpListener::setPathIgnorePrefix(const QString& path)
 {
-    QnTcpListenerPrivate::pathIgnorePrefix = path;
+    Q_D(QnTcpListener);
+    d->pathIgnorePrefix = path;
 }
 
 QString QnTcpListener::normalizedPath(const QString& path)
 {
-    int startIndex = 0;
-    while (startIndex < path.length() && path[startIndex] == L'/')
-        ++startIndex;
-
-    int endIndex = path.size(); // [startIndex..endIndex)
-    while (endIndex > 0 && path[endIndex-1] == L'/')
-        --endIndex;
-
-    if (path.mid(startIndex).startsWith(QnTcpListenerPrivate::pathIgnorePrefix))
-        startIndex += QnTcpListenerPrivate::pathIgnorePrefix.length();
-    return path.mid(startIndex, endIndex - startIndex);
+    Q_D(const QnTcpListener);
+    return nx::network::url::normalizedPath(path, d->pathIgnorePrefix);
 }

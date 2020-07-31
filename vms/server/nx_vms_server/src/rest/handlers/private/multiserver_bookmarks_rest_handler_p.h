@@ -28,7 +28,6 @@ typedef QnMultiserverRequestContext<QnDeleteBookmarkRequestData> QnDeleteBookmar
 class QnMultiserverBookmarksRestHandlerPrivate
 {
 public:
-    static QString urlPath;
     static QnCameraBookmarkList getBookmarks(QnMediaServerModule* serverModule, QnGetBookmarksRequestContext& context);
     static QnCameraBookmarkTagList getBookmarkTags(QnMediaServerModule* serverModule, QnGetBookmarkTagsRequestContext& context);
     static bool addBookmark(

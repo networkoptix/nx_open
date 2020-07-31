@@ -55,11 +55,11 @@ void QnRestProcessorPool::registerHandler(
 
 QnRestRequestHandlerPtr QnRestProcessorPool::findHandler(
     const nx::network::http::Method::ValueType& httpMethod,
-    const QString& path) const
+    const QString& normalizedPath) const
 {
-    if (auto handler = findHandlerForSpecificMethod(httpMethod, path))
+    if (auto handler = findHandlerForSpecificMethod(httpMethod, normalizedPath))
         return handler;
-    return findHandlerForSpecificMethod(kAnyHttpMethod, path);
+    return findHandlerForSpecificMethod(kAnyHttpMethod, normalizedPath);
 }
 
 void QnRestProcessorPool::registerRedirectRule(const QString& path, const QString& newPath)
@@ -78,21 +78,19 @@ boost::optional<QString> QnRestProcessorPool::getRedirectRule(const QString& pat
 
 QnRestRequestHandlerPtr QnRestProcessorPool::findHandlerForSpecificMethod(
     const nx::network::http::Method::ValueType& httpMethod,
-    const QString& path) const
+    const QString& normalizedPath) const
 {
     const auto it = m_handlers.find(httpMethod);
     if (it == m_handlers.end())
         return nullptr;
 
-    return findHandlerByPath(it->second, path);
+    return findHandlerByPath(it->second, normalizedPath);
 }
 
 QnRestRequestHandlerPtr QnRestProcessorPool::findHandlerByPath(
     const HandlersByPath& handlersByPath,
-    const QString& path) const
+    const QString& normalizedPath) const
 {
-    const auto normalizedPath = QnTcpListener::normalizedPath(path);
-
     auto it = handlersByPath.upperBound(normalizedPath);
     if (it == handlersByPath.begin())
         return normalizedPath.startsWith(it.key()) ? it.value() : nullptr;
@@ -147,8 +145,9 @@ void QnRestConnectionProcessor::run()
         &d->request};
     RestResponse response;
 
-    QnRestRequestHandlerPtr handler = static_cast<QnHttpConnectionListener*>(d->owner)
-        ->processorPool()->findHandler(d->request.requestLine.method, request.path);
+    QnRestRequestHandlerPtr handler =
+        static_cast<QnHttpConnectionListener*>(d->owner)->processorPool()->findHandler(
+            d->request.requestLine.method, d->owner->normalizedPath(request.path));
     if (handler)
     {
         commonModule()->metrics()->apiCalls()++;

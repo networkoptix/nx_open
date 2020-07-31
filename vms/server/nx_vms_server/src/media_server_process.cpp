@@ -3017,7 +3017,7 @@ void MediaServerProcess::registerRestHandlers(
      * Get the best shot for analytics track
      * %param:string objectTrackId analytics object track id
      */
-    reg("ec2/analyticsTrackBestShot", new QnMultiserverThumbnailRestHandler(serverModule(), "ec2/analyticsTrackBestShot"));
+    reg("ec2/analyticsTrackBestShot", new QnMultiserverThumbnailRestHandler(serverModule()));
 
     /**%apidoc[proprietary] TODO /ec2/statistics
      * %// TODO: Write apidoc comment.
@@ -3491,8 +3491,6 @@ bool MediaServerProcess::initTcpListener(
         NX_ERROR(this) << "Failed to bind to local port; terminating";
         return false;
     }
-
-    m_universalTcpListener->setDefaultPage("/static/index.html");
 
     // Server returns code 403 (forbidden) instead of 401 if the user isn't authorized for requests
     // starting with "web" path.
@@ -5174,10 +5172,9 @@ void MediaServerProcess::run()
         initializeLogging(serverSettings.get());
 
     // This must be done before QnCommonModule instantiation.
-    nx::utils::OsInfo::currentVariantOverride =
-        serverSettings->settings().currentOsVariantOverride();
-    nx::utils::OsInfo::currentVariantVersionOverride =
-        serverSettings->settings().currentOsVariantVersionOverride();
+    nx::utils::OsInfo::override(
+        serverSettings->settings().currentOsVariantOverride(),
+        serverSettings->settings().currentOsVariantVersionOverride());
 
     if (m_cmdLineArguments.vmsProtocolVersion > 0)
     {

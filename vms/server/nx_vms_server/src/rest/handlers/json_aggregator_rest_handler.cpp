@@ -23,7 +23,7 @@ bool QnJsonAggregatorRestHandler::executeCommad(
     std::chrono::milliseconds timeout)
 {
     int port = owner->owner()->getPort();
-    nx::utils::Url url(lit("https://localhost:%1/%2").arg(port).arg(QnTcpListener::normalizedPath(command)));
+    nx::utils::Url url(lit("https://localhost:%1/%2").arg(port).arg(owner->owner()->normalizedPath(command)));
     QUrlQuery urlQuery;
     for (auto itr = params.begin(); itr != params.end(); ++itr)
         urlQuery.addQueryItem(itr.key(), itr.value());

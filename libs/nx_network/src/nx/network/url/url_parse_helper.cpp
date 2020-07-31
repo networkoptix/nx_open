@@ -56,6 +56,21 @@ std::string normalizePath(const char* path)
     return normalizePath(std::string(path));
 }
 
+QString normalizedPath(const QString& path, const QString& pathIgnorePrefix)
+{
+    int startIndex = 0;
+    while (startIndex < path.length() && path[startIndex] == L'/')
+        ++startIndex;
+
+    int endIndex = path.size(); // [startIndex..endIndex)
+    while (endIndex > 0 && path[endIndex-1] == L'/')
+        --endIndex;
+
+    if (path.mid(startIndex).startsWith(pathIgnorePrefix))
+        startIndex += pathIgnorePrefix.length();
+    return path.mid(startIndex, endIndex - startIndex);
+}
+
 std::string joinPath(const std::string& left, const std::string& right)
 {
     return normalizePath(left + "/" + right);
