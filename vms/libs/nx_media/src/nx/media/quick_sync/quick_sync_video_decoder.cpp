@@ -31,7 +31,6 @@ int QuickSyncVideoDecoder::decode(
     return m_impl->decode(frame, result);
 }
 
-
 AbstractVideoDecoder::Capabilities QuickSyncVideoDecoder::capabilities() const
 {
     return Capability::hardwareAccelerated;

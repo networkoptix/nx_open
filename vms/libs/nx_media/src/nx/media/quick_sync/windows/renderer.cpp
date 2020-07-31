@@ -51,7 +51,8 @@ bool convertToRgb(
 
 Renderer::~Renderer()
 {
-     // TODO close all
+    if (m_rc)
+        wglDeleteContext(m_rc);
 }
 
 bool Renderer::initRenderSurface(IDirect3D9Ex* d3d)
@@ -110,7 +111,7 @@ bool Renderer::initRenderSurface(IDirect3D9Ex* d3d)
 }
 
 bool Renderer::init(
-    HWND window, IDirect3DDevice9Ex* device, IDirect3D9Ex* d3d, int width, int height)
+    HWND window, IDirect3DDevice9Ex* device, IDirect3D9Ex* d3d)
 {
     m_device = device;
     m_window = window;
@@ -147,6 +148,21 @@ bool Renderer::init(
     return true;
 }
 
+void Renderer::unregisterTexture()
+{
+    if (m_textureHandle)
+    {
+        wglDXUnregisterObjectNV(m_device, m_textureHandle);
+        m_textureHandle = 0;
+    }
+
+    if (m_renderDeviceHandle)
+    {
+        wglDXCloseDeviceNV(m_renderDeviceHandle);
+        m_renderDeviceHandle = 0;
+    }
+}
+
 bool Renderer::registerTexture(GLuint textureId, QOpenGLContext* context)
 {
     HGLRC guiGlrc = context->nativeHandle().value<QWGLNativeContext>().context();
@@ -179,6 +195,7 @@ bool Renderer::render(
 {
     if (isNewTexture)
     {
+        unregisterTexture();
         if (!registerTexture(textureId, context))
             return false;
     }

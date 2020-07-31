@@ -44,13 +44,13 @@ bool isCompatible(AVCodecID codec)
     return false;
 }
 
-bool DeviceContext::initialize(MFXVideoSession& session)
+bool DeviceContext::initialize(MFXVideoSession& session, int width, int height)
 {
     auto adapter = getIntelDeviceAdapter(session);
     if (adapter < 0)
         return false;
 
-    auto hr = m_device.createDevice(2992, 2992, adapter); // TODO size
+    auto hr = m_device.createDevice(width, height, adapter);
     if (FAILED(hr))
     {
         NX_ERROR(NX_SCOPE_TAG, "Failed to get DirectX handle");

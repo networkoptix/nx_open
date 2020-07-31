@@ -20,13 +20,14 @@ class Renderer
 public:
     ~Renderer();
 
-    bool init(HWND window, IDirect3DDevice9Ex* device, IDirect3D9Ex* d3d, int width, int height);
+    bool init(HWND window, IDirect3DDevice9Ex* device, IDirect3D9Ex* d3d);
     bool render(
         mfxFrameSurface1* mfxSurface, bool isNewTexture, GLuint textureId, QOpenGLContext* context);
 
 private:
     bool registerTexture(GLuint textureId, QOpenGLContext* context);
     bool initRenderSurface(IDirect3D9Ex* d3d);
+    void unregisterTexture();
 
 private:
     IDirect3DDevice9Ex* m_device = nullptr;

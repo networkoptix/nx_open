@@ -7,6 +7,7 @@
 #include <QtMultimedia/QVideoFrame>
 
 #include <utils/media/nalUnits.h>
+#include <utils/media/utils.h>
 #include <nx/utils/log/log.h>
 
 #include "allocators/sysmem_allocator.h"
@@ -41,7 +42,7 @@ QuickSyncVideoDecoderImpl::~QuickSyncVideoDecoderImpl()
         m_allocator->FreeFrames(&m_response);
 }
 
-bool QuickSyncVideoDecoderImpl::initSession()
+bool QuickSyncVideoDecoderImpl::initSession(int width, int height)
 {
     mfxIMPL impl = MFX_IMPL_AUTO_ANY;
     mfxVersion version = { {0, 1} };
@@ -53,7 +54,7 @@ bool QuickSyncVideoDecoderImpl::initSession()
     }
     NX_DEBUG(this, "MFX version %1.%2", version.Major, version.Minor);
 
-    if (!m_device.initialize(m_mfxSession))
+    if (!m_device.initialize(m_mfxSession, width, height))
     {
         NX_ERROR(this, "Failed to set handle to MFX session");
         return false;
@@ -139,7 +140,8 @@ bool QuickSyncVideoDecoderImpl::allocSurfaces(mfxFrameAllocRequest& request)
     return true;
 }
 
-bool QuickSyncVideoDecoderImpl::init(mfxBitstream& bitstream, AVCodecID codec)
+bool QuickSyncVideoDecoderImpl::init(
+    mfxBitstream& bitstream, AVCodecID codec, int width, int height)
 {
     memset(&m_mfxDecParams, 0, sizeof(m_mfxDecParams));
     m_mfxDecParams.AsyncDepth = 4;
@@ -162,7 +164,7 @@ bool QuickSyncVideoDecoderImpl::init(mfxBitstream& bitstream, AVCodecID codec)
         return false;
     }
 
-    if (!initSession())
+    if (!initSession(width, height))
         return false;
 
     mfxStatus status = MFXVideoDECODE_DecodeHeader(m_mfxSession, &bitstream, &m_mfxDecParams);
@@ -216,9 +218,8 @@ bool QuickSyncVideoDecoderImpl::buildQVideoFrame(
 {
     QAbstractVideoBuffer* buffer = nullptr;
     if (m_config.useVideoMemory)
-    {
         buffer = new QtVideoBuffer(QuickSyncSurface{surface, weak_from_this()});
-    }
+
     else
         buffer = new MfxQtVideoBuffer(surface, m_allocator);
 
@@ -278,7 +279,14 @@ int QuickSyncVideoDecoderImpl::decode(
             return 0;
         }
 
-        if (!init(bitstream, frame->compressionType))
+        QSize size = getFrameSize(frame);
+        if (!size.isValid())
+        {
+            NX_ERROR(this, "Failed to init quick sync video decoder, frame size unknown");
+            return -1;
+        }
+
+        if (!init(bitstream, frame->compressionType, size.width(), size.height()))
         {
             NX_ERROR(this, "Failed to init quick sync video decoder");
             m_mfxSession.Close();

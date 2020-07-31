@@ -25,7 +25,7 @@ class QuickSyncVideoDecoderImpl;
 class DeviceContext
 {
 public:
-    bool initialize(MFXVideoSession& session);
+    bool initialize(MFXVideoSession& session, int width, int height);
     bool renderToRgb(
         const QuickSyncSurface& surfaceInfo,
         bool isNewTexture,

@@ -1,6 +1,7 @@
 #include "thread.h"
 
 #include <nx/utils/crash_dump/systemexcept.h>
+#include <nx/utils/app_info.h>
 
 #include "thread_util.h"
 
@@ -13,14 +14,16 @@ Thread::Thread()
     connect(this, &QThread::finished, this, &Thread::at_finished, Qt::DirectConnection);
 
 #if !defined(Q_OS_ANDROID) //< Not supported on Android.
-    // Thread stack size reduced (from default 8MB on Linux) to save memory on edge devices.
-    // If this is not enough consider using heap.
+    if (AppInfo::isEdgeServer())
+    {
+        // Thread stack size reduced (from default 8MB on Linux) to save memory on edge devices.
+        // If this is not enough consider using heap.
 
-    // This value is not platform-dependent to be able to catch stack overflow error on every
-    // platform.
-
-    //constexpr size_t kDefaultThreadStackSize = 128 * 1024;
-    //setStackSize(kDefaultThreadStackSize);
+        // This value is not platform-dependent to be able to catch stack overflow error on every
+        // platform.
+        constexpr size_t kDefaultThreadStackSize = 128 * 1024;
+        setStackSize(kDefaultThreadStackSize);
+    }
 #endif
 }
 

@@ -204,9 +204,7 @@ Qn::RenderStatus QnGLRenderer::prepareBlurBuffers()
 
     if (!m_blurBufferA || m_blurBufferA->size() != result)
     {
-        qWarning() << "QQQQQQQQQQQQQQQQQQ";
         m_blurBufferA.reset(new QOpenGLFramebufferObject(result));
-        qWarning() << "AAAAAAAAAAAAAAAAA";
         m_blurBufferB.reset(new QOpenGLFramebufferObject(result));
         return Qn::NewFrameRendered;
     }

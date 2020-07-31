@@ -30,7 +30,7 @@ DeviceContext::~DeviceContext()
         vaDestroySurfaceGLX(linux::VaDisplay::getDisplay(), m_renderingSurface);
 }
 
-bool DeviceContext::initialize(MFXVideoSession& session)
+bool DeviceContext::initialize(MFXVideoSession& session, int /*width*/, int /*height*/)
 {
     m_display = linux::VaDisplay::getDisplay();
     if (!m_display)

@@ -32,8 +32,8 @@ private:
     };
 
 private:
-    bool init(mfxBitstream& bitstream, AVCodecID codec);
-    bool initSession();
+    bool init(mfxBitstream& bitstream, AVCodecID codec, int width, int height);
+    bool initSession(int width, int height);
     bool allocFrames();
     mfxFrameSurface1* getFreeSurface();
 

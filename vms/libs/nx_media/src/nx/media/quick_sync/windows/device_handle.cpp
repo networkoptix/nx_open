@@ -167,7 +167,7 @@ bool DeviceHandle::createDevice(int width, int height, mfxU32 adapterNumber)
         return false;
     }
 
-    if (!m_renderer.init(m_hWnd, m_device, m_d3d, width, height))
+    if (!m_renderer.init(m_hWnd, m_device, m_d3d))
         return false;
 
     return true;
