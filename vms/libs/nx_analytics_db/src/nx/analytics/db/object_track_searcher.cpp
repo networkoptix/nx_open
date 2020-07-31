@@ -9,6 +9,7 @@
 
 #include "analytics_archive_directory.h"
 #include "attributes_dao.h"
+#include "object_track_cache.h"
 #include "serializers.h"
 
 namespace nx::analytics::db {
@@ -19,6 +20,7 @@ ObjectTrackSearcher::ObjectTrackSearcher(
     const DeviceDao& deviceDao,
     const ObjectTypeDao& objectTypeDao,
     const AbstractObjectTypeDictionary& objectTypeDictionary,
+    const ObjectTrackCache& objectTrackCache,
     AttributesDao* attributesDao,
     AnalyticsArchiveDirectory* analyticsArchive,
     Filter filter)
@@ -26,6 +28,7 @@ ObjectTrackSearcher::ObjectTrackSearcher(
     m_deviceDao(deviceDao),
     m_objectTypeDao(objectTypeDao),
     m_objectTypeDictionary(objectTypeDictionary),
+    m_objectTrackCache(objectTrackCache),
     m_attributesDao(attributesDao),
     m_analyticsArchive(analyticsArchive),
     m_filter(std::move(filter))
@@ -36,19 +39,16 @@ ObjectTrackSearcher::ObjectTrackSearcher(
 
 std::vector<ObjectTrackEx> ObjectTrackSearcher::lookup(nx::sql::QueryContext* queryContext)
 {
-    if (!m_filter.objectTrackId.isNull())
+    auto cacheLookupResult = lookupInCache();
+    if (m_filter.maxObjectTracksToSelect > 0 &&
+        cacheLookupResult.size() >= m_filter.maxObjectTracksToSelect)
     {
-        auto track = fetchTrackById(queryContext, m_filter.objectTrackId);
-        if (!track)
-            return {};
+        // Lookup has been satisfied by the cache lookup. No need to go to the DB.
+        return cacheLookupResult;
+    }
 
-        NX_ASSERT_HEAVY_CONDITION(m_filter.acceptsTrack(*track, m_objectTypeDictionary));
-        return {std::move(*track)};
-    }
-    else
-    {
-        return lookupTracksUsingArchive(queryContext);
-    }
+    auto dbLookupResult = lookupInDb(queryContext);
+    return mergeResults(std::move(cacheLookupResult), std::move(dbLookupResult));
 }
 
 void ObjectTrackSearcher::prepareCursorQuery(nx::sql::SqlQuery* query)
@@ -110,6 +110,61 @@ template void ObjectTrackSearcher::addTimePeriodToFilter<std::chrono::seconds>(
     const QnTimePeriod& timePeriod,
     const TimeRangeFields& timeRangeFields,
     nx::sql::Filter* sqlFilter);
+
+std::vector<ObjectTrackEx> ObjectTrackSearcher::lookupInDb(nx::sql::QueryContext* queryContext)
+{
+    if (!m_filter.objectTrackId.isNull())
+    {
+        auto track = fetchTrackById(queryContext, m_filter.objectTrackId);
+        if (!track)
+            return {};
+
+        NX_ASSERT_HEAVY_CONDITION(m_filter.acceptsTrack(*track, m_objectTypeDictionary));
+        return { std::move(*track) };
+    }
+    else
+    {
+        return lookupTracksUsingArchive(queryContext);
+    }
+}
+
+std::vector<ObjectTrackEx> ObjectTrackSearcher::lookupInCache()
+{
+    return m_objectTrackCache.lookup(m_filter, m_objectTypeDictionary);
+}
+
+std::vector<ObjectTrackEx> ObjectTrackSearcher::mergeResults(
+    std::vector<ObjectTrackEx> one,
+    std::vector<ObjectTrackEx> two)
+{
+    std::vector<ObjectTrackEx> result;
+    result.reserve(one.size() + two.size());
+
+    std::map<QnUuid /*trackId*/, std::size_t /*pos in vector*/> oneTracksById;
+    for (std::size_t i = 0; i < one.size(); ++i)
+        oneTracksById.emplace(one[i].id, i);
+
+    for (auto& track: two)
+    {
+        if (oneTracksById.count(track.id) > 0)
+            // TODO: Merge same objects.
+            continue;
+
+        one.push_back(std::exchange(track, {}));
+    }
+
+    auto comparator =
+        [this](auto& left, auto& right)
+        {
+            return m_filter.sortOrder == Qt::SortOrder::AscendingOrder
+                ? left.firstAppearanceTimeUs < right.firstAppearanceTimeUs
+                : left.firstAppearanceTimeUs > right.firstAppearanceTimeUs;
+        };
+
+    std::sort(one.begin(), one.end(), comparator);
+
+    return one;
+}
 
 std::optional<ObjectTrack> ObjectTrackSearcher::fetchTrackById(
     nx::sql::QueryContext* queryContext,

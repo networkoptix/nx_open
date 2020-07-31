@@ -15,6 +15,7 @@ namespace nx::analytics::db {
 class DeviceDao;
 class ObjectTypeDao;
 class AbstractObjectTypeDictionary;
+class ObjectTrackCache;
 class AttributesDao;
 class AnalyticsArchiveDirectory;
 
@@ -25,6 +26,7 @@ public:
         const DeviceDao& deviceDao,
         const ObjectTypeDao& objectTypeDao,
         const AbstractObjectTypeDictionary& objectTypeDictionary,
+        const ObjectTrackCache& objectTrackCache,
         AttributesDao* attributesDao,
         AnalyticsArchiveDirectory* analyticsArchive);
 
@@ -38,6 +40,7 @@ private:
     const DeviceDao& m_deviceDao;
     const ObjectTypeDao& m_objectTypeDao;
     const AbstractObjectTypeDictionary& m_objectTypeDictionary;
+    const ObjectTrackCache& m_objectTrackCache;
     AttributesDao* m_attributesDao = nullptr;
     AnalyticsArchiveDirectory* m_analyticsArchive = nullptr;
 

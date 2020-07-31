@@ -97,6 +97,10 @@ public:
      */
     void removeExpiredData();
 
+    std::vector<ObjectTrackEx> lookup(
+        const Filter& filter,
+        const AbstractObjectTypeDictionary& objectTypeDictionary) const;
+
 private:
     struct ObjectTrackContext
     {

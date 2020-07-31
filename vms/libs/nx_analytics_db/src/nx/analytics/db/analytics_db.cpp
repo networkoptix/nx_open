@@ -262,6 +262,7 @@ void EventsStorage::lookup(
                 m_deviceDao,
                 m_objectTypeDao,
                 m_objectTypeDictionary,
+                *m_objectTrackCache,
                 &m_attributesDao,
                 m_analyticsArchiveDirectory.get(),
                 std::move(filter));
@@ -301,6 +302,7 @@ void EventsStorage::lookupTimePeriods(
                 m_deviceDao,
                 m_objectTypeDao,
                 m_objectTypeDictionary,
+                *m_objectTrackCache,
                 &m_attributesDao,
                 m_analyticsArchiveDirectory.get());
             return timePeriodFetcher.selectTimePeriods(

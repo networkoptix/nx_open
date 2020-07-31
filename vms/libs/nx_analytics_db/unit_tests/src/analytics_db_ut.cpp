@@ -324,7 +324,8 @@ protected:
     }
 
     void saveAnalyticsDataPackets(
-        std::vector<common::metadata::ObjectMetadataPacketPtr> analyticsDataPackets)
+        std::vector<common::metadata::ObjectMetadataPacketPtr> analyticsDataPackets,
+        bool flush = true)
     {
         std::copy(
             analyticsDataPackets.begin(), analyticsDataPackets.end(),
@@ -333,7 +334,8 @@ protected:
         std::for_each(analyticsDataPackets.begin(), analyticsDataPackets.end(),
             [this](const auto& packet) { whenIssueSavePacket(packet); });
 
-        flushData();
+        if (flush)
+            flushData();
     }
 
     AbstractEventsStorage& eventsStorage()
@@ -1136,7 +1138,7 @@ protected:
         return m_filter;
     }
 
-    void generateVariousEvents()
+    void generateVariousEvents(bool flush = true)
     {
         std::vector<QnUuid> deviceIds;
         for (int i = 0; i < 3; ++i)
@@ -1147,7 +1149,7 @@ protected:
             std::chrono::system_clock::now() - std::chrono::hours(24),
             std::chrono::system_clock::now());
 
-        saveAnalyticsDataPackets(generateEventsByCriteria());
+        saveAnalyticsDataPackets(generateEventsByCriteria(), flush);
     }
 
 private:
@@ -1200,6 +1202,8 @@ private:
         return analyticsDataPackets;
     }
 };
+
+//-------------------------------------------------------------------------------------------------
 
 class AnalyticsDbLookup:
     public AnalyticsDbLookupBase
@@ -1347,6 +1351,28 @@ TEST_F(AnalyticsDbLookup, quering_data_from_multiple_cameras)
 {
     givenRandomFilterWithMultipleDeviceIds();
     whenLookupObjectTracks();
+    thenResultMatchesExpectations();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class AnalyticsDbLookupInCache:
+    public AnalyticsDbLookupBase
+{
+    using base_type = AnalyticsDbLookupBase;
+
+protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        generateVariousEvents(false /*do not flush data*/);
+    }
+};
+
+TEST_F(AnalyticsDbLookupInCache, cached_data_is_available_for_lookup)
+{
+    whenLookupByEmptyFilter();
     thenResultMatchesExpectations();
 }
 

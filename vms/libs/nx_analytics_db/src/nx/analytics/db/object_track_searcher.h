@@ -18,6 +18,7 @@ namespace nx::analytics::db {
 class AttributesDao;
 class AnalyticsArchiveDirectory;
 class AbstractObjectTypeDictionary;
+class ObjectTrackCache;
 
 struct TimeRangeFields
 {
@@ -42,6 +43,7 @@ public:
         const DeviceDao& deviceDao,
         const ObjectTypeDao& objectTypeDao,
         const AbstractObjectTypeDictionary& objectTypeDictionary,
+        const ObjectTrackCache& objectTrackCache,
         AttributesDao* attributesDao,
         AnalyticsArchiveDirectory* analyticsArchive,
         Filter filter);
@@ -79,9 +81,17 @@ private:
     const DeviceDao& m_deviceDao;
     const ObjectTypeDao& m_objectTypeDao;
     const AbstractObjectTypeDictionary& m_objectTypeDictionary;
+    const ObjectTrackCache& m_objectTrackCache;
     AttributesDao* m_attributesDao = nullptr;
     AnalyticsArchiveDirectory* m_analyticsArchive = nullptr;
     Filter m_filter;
+
+    std::vector<ObjectTrackEx> lookupInCache();
+    std::vector<ObjectTrackEx> lookupInDb(nx::sql::QueryContext* queryContext);
+
+    std::vector<ObjectTrackEx> mergeResults(
+        std::vector<ObjectTrackEx> one,
+        std::vector<ObjectTrackEx> two);
 
     std::optional<ObjectTrack> fetchTrackById(
         nx::sql::QueryContext* queryContext,

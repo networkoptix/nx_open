@@ -16,12 +16,14 @@ TimePeriodFetcher::TimePeriodFetcher(
     const DeviceDao& deviceDao,
     const ObjectTypeDao& objectTypeDao,
     const AbstractObjectTypeDictionary& objectTypeDictionary,
+    const ObjectTrackCache& objectTrackCache,
     AttributesDao* attributesDao,
     AnalyticsArchiveDirectory* analyticsArchive)
     :
     m_deviceDao(deviceDao),
     m_objectTypeDao(objectTypeDao),
     m_objectTypeDictionary(objectTypeDictionary),
+    m_objectTrackCache(objectTrackCache),
     m_attributesDao(attributesDao),
     m_analyticsArchive(analyticsArchive)
 {
@@ -52,6 +54,7 @@ QnTimePeriodList TimePeriodFetcher::selectTimePeriodsByObject(
         m_deviceDao,
         m_objectTypeDao,
         m_objectTypeDictionary,
+        m_objectTrackCache,
         m_attributesDao,
         m_analyticsArchive,
         filter);
