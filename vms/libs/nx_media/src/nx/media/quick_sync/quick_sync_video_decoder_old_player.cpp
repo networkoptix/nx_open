@@ -68,12 +68,6 @@ bool QuickSyncVideoDecoderOldPlayer::decode(
     return true;
 }
 
-const AVFrame* QuickSyncVideoDecoderOldPlayer::lastFrame() const
-{
-    // TODO
-    return nullptr;
-}
-
 void QuickSyncVideoDecoderOldPlayer::resetDecoder(const QnConstCompressedVideoDataPtr& /*data*/)
 {
     NX_DEBUG(this, "Reset decoder");

@@ -936,8 +936,5 @@ inline void dumpVideoParamStruct(std::ostream& sstr,const std::string& sectionNa
 
     SERIALIZE_INFO(Protected);
     SERIALIZE_INFO(IOPattern);
-    for(int i=0; i < info.NumExtParam; i++) {
-        sstr << "QQQQQQQQQQQQQQQQQQQ";
-    }
     SERIALIZE_INFO(reserved2);
 }

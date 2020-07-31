@@ -59,7 +59,6 @@ public:
     double getSampleAspectRatio() const;
     virtual AVPixelFormat getFormat() const { return m_context->pix_fmt; }
     virtual void flush();
-    virtual const AVFrame* lastFrame() const override { return m_frame; }
     void determineOptimalThreadType(const QnConstCompressedVideoDataPtr& data);
     void setMultiThreadDecodePolicy(MultiThreadDecodePolicy mtDecodingPolicy);
     virtual void resetDecoder(const QnConstCompressedVideoDataPtr& data) override;

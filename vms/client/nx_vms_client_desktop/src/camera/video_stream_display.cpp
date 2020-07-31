@@ -383,7 +383,8 @@ QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
     return decoder;
 }
 
-QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompressedVideoDataPtr data, bool draw, QnFrameScaler::DownscaleFactor force_factor)
+QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
+    QnCompressedVideoDataPtr data, bool draw, QnFrameScaler::DownscaleFactor force_factor)
 {
     updateRenderList();
 
@@ -575,6 +576,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         else
             return Status_Skipped;
     }
+    m_lastDisplayedFrame = decodeToFrame;
     m_mtx.unlock();
     m_rawDataSize = QSize(decodeToFrame->width,decodeToFrame->height);
     if (decodeToFrame->width) {
@@ -592,14 +594,6 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
             m_imageSize = imageSize;
         }
     }
-
-    /*
-    if (qAbs(decodeToFrame->pkt_dts-data->timestamp) > 500*1000) {
-        // prevent large difference after seek or EOF
-        outFrame->pkt_dts = data->timestamp;
-    }
-    */
-
 
     if (m_flushedBeforeReverseStart) {
         data->flags |= AV_REVERSE_BLOCK_START;
@@ -657,6 +651,11 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(QnCompres
         outFrame = m_reverseQueue.dequeue();
         if (outFrame->data[0])
             m_reverseSizeInBytes -= av_image_get_buffer_size((AVPixelFormat)outFrame->format, outFrame->width, outFrame->height, /*align*/ 1);
+
+        // TODO In reverse mode we use downscaled frames to get frame that currently rendered?
+        // Or we need to keep original frames in queue.
+        QnMutexLocker lock(&m_mtx);
+        m_lastDisplayedFrame = outFrame;
     }
 
     calcSampleAR(outFrame, dec);
@@ -792,8 +791,6 @@ bool QnVideoStreamDisplay::processDecodedFrame(
         for (const auto render: m_renderList)
             render->waitForFrameDisplayed(outFrame->channel);
     }
-    m_lastDisplayedFrame = outFrame;
-
     return true;
 }
 
@@ -990,47 +987,33 @@ QImage QnVideoStreamDisplay::getGrayscaleScreenshot()
 {
     QnMutexLocker mutex( &m_mtx );
 
-    if (!m_decoderData.decoder)
+    const AVFrame* frame = m_lastDisplayedFrame.data();
+    if (!frame || !frame->width || !frame->data[0])
         return QImage();
 
-    const AVFrame* lastFrame = m_decoderData.decoder->lastFrame();
-    if (m_reverseMode && m_lastDisplayedFrame && m_lastDisplayedFrame->data[0])
-        lastFrame = m_lastDisplayedFrame.data();
-
-    if (!lastFrame || !lastFrame->width || !lastFrame->data[0])
-        return QImage();
-
-    QImage tmp(lastFrame->data[0], lastFrame->width, lastFrame->height, lastFrame->linesize[0], QImage::Format_Indexed8);
-    QImage rez( lastFrame->width, lastFrame->height, QImage::Format_Indexed8);
-    rez = tmp.copy(0,0, lastFrame->width, lastFrame->height);
+    QImage tmp(frame->data[0],
+        frame->width,
+        frame->height,
+        frame->linesize[0],
+        QImage::Format_Indexed8);
+    QImage rez(frame->width, frame->height, QImage::Format_Indexed8);
+    rez = tmp.copy(0,0, frame->width, frame->height);
     return rez;
 }
 
-
 CLVideoDecoderOutputPtr QnVideoStreamDisplay::getScreenshot(bool anyQuality)
 {
-    QnMutexLocker mutex( &m_mtx );
-
+    QnMutexLocker mutex(&m_mtx);
     if (!m_lastDisplayedFrame || !m_lastDisplayedFrame->data[0] || !m_lastDisplayedFrame->width)
         return CLVideoDecoderOutputPtr();
 
     // feature #2563
     if (!anyQuality && (m_lastDisplayedFrame->flags & QnAbstractMediaData::MediaFlags_LowQuality))
-        return CLVideoDecoderOutputPtr();    //screenshot will be received from the server
-
-#if 0
-    /* Do not take local screenshot if displayed frame has different size.
-       Checking only height because width can be modified by forced AR. */
-    if (!anyQuality && m_lastDisplayedFrame->height != m_imageSize.height())
-        return CLVideoDecoderOutputPtr();    //screenshot will be received from the server
-#endif
+        return CLVideoDecoderOutputPtr(); //screenshot will be received from the server
 
     CLVideoDecoderOutputPtr outFrame(new CLVideoDecoderOutput());
-    if (m_decoderData.decoder)
-        getLastDecodedFrame(m_decoderData.decoder.get(), &outFrame);
-    else
-        outFrame->copyFrom(m_lastDisplayedFrame.data());
-    outFrame->channel = m_lastDisplayedFrame->channel;
+    outFrame->copyFrom(m_lastDisplayedFrame.data());
+    NX_VERBOSE(this, "Got screenshot with resolution: %1", outFrame->size());
     return outFrame;
 }
 
@@ -1049,56 +1032,6 @@ QSize QnVideoStreamDisplay::getImageSize() const
 {
     QnMutexLocker lock( &m_imageSizeMtx );
     return m_imageSize;
-}
-
-bool QnVideoStreamDisplay::getLastDecodedFrame( QnAbstractVideoDecoder* dec, QSharedPointer<CLVideoDecoderOutput>* const outFrame )
-{
-    const AVFrame* lastFrame = dec->lastFrame();
-    if (!lastFrame || !lastFrame->data[0] || dec->GetPixelFormat() == -1 || dec->getWidth() == 0)
-        return false;
-
-    (*outFrame)->setUseExternalData( false );
-    (*outFrame)->reallocate( dec->getWidth(), dec->getHeight(), dec->GetPixelFormat(), lastFrame->linesize[0] );
-
-    //TODO/IMPL it is possible to avoid copying in this method and simply return shared pointer to lastFrame, but this will require
-        //QnAbstractVideoDecoder::lastFrame() to return QSharedPointer<CLVideoDecoderOutput> and
-        //tracking of frame usage in decoder
-
-#if 0
-    // todo: ffmpeg-test. deinterlace
-    if( lastFrame->interlaced_frame && dec->isMultiThreadedDecoding() )
-    {
-        avpicture_deinterlace( (AVPicture*) outFrame->data(), (AVPicture*) lastFrame, dec->GetPixelFormat(), dec->getWidth(), dec->getHeight() );
-        (*outFrame)->pkt_dts = lastFrame->pkt_dts;
-    }
-    else
-#endif
-    {
-        if( (*outFrame)->format == AV_PIX_FMT_YUV420P )
-        {
-            // optimization
-            for (int i = 0; i < 3 && lastFrame->data[i]; ++i)
-            {
-                int h = lastFrame->height >> (i > 0 ? 1 : 0);
-                memcpy( (*outFrame)->data[i], lastFrame->data[i], lastFrame->linesize[i]* h );
-            }
-        }
-        else
-        {
-            av_image_copy(
-                outFrame->data()->data,
-                outFrame->data()->linesize,
-                (const uint8_t **)lastFrame->data,
-                lastFrame->linesize,
-                dec->GetPixelFormat(),
-                dec->getWidth(),
-                dec->getHeight());
-        }
-        (*outFrame)->pkt_dts = lastFrame->pkt_dts;
-    }
-
-    (*outFrame)->format = dec->GetPixelFormat();
-    return true;
 }
 
 QSize QnVideoStreamDisplay::getMaxScreenSizeUnsafe() const

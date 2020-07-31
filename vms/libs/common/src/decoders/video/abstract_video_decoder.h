@@ -69,7 +69,6 @@ public:
     //!Returns output picture height in pixels (after scaling if it is present)
     virtual int getHeight() const { return 0; }
     virtual double getSampleAspectRatio() const { return 1; };
-    virtual const AVFrame* lastFrame() const { return NULL; }
     //!Reset decoder state (e.g. to reposition source stream)
     /*!
         \param data First encoded frame of new stream. It is recommended that this frame be IDR and contain sequence header

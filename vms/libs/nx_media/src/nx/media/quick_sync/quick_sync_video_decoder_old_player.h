@@ -12,7 +12,6 @@ class QuickSyncVideoDecoderOldPlayer: public QnAbstractVideoDecoder
 public:
     virtual bool decode(const QnConstCompressedVideoDataPtr& data, CLVideoDecoderOutputPtr* const outFrame) override;
 
-    virtual const AVFrame* lastFrame() const override;
     virtual void resetDecoder(const QnConstCompressedVideoDataPtr& data) override;
 
     virtual int getWidth() const override;

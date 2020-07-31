@@ -176,11 +176,6 @@ private:
     bool processDecodedFrame(QnAbstractVideoDecoder* dec, const QSharedPointer<CLVideoDecoderOutput>& outFrame, bool enableFrameQueue, bool reverseMode);
     void checkQueueOverflow(QnAbstractVideoDecoder* dec);
     void clearReverseQueue();
-    /*!
-        \param outFrame MUST contain initialized \a CLVideoDecoderOutput object, but method is allowed to return just reference
-            to another frame and not copy data to this object (TODO)
-    */
-    bool getLastDecodedFrame( QnAbstractVideoDecoder* dec, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
 
     void calcSampleAR(QSharedPointer<CLVideoDecoderOutput> outFrame, QnAbstractVideoDecoder* dec);
 
