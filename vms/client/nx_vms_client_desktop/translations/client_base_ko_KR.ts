@@ -301,7 +301,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>System Administration...</source>
-      <translation>관리자...</translation>
+      <translation>시스템 관리...</translation>
     </message>
     <message>
       <source>System Update...</source>
@@ -1283,7 +1283,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select a valid activation key file to continue.</source>
-      <translation>계속 하려면 유효한 활성화 키 파일을 선택 합니다.</translation>
+      <translation>계속 하려면 유효한 활성 인증키 파일을 선택하십시오.</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1</source>
@@ -4104,7 +4104,7 @@ to %1</source>
     </message>
     <message>
       <source>Stretch</source>
-      <translation>펼처보기</translation>
+      <translation>채우기</translation>
     </message>
     <message>
       <source>Fit</source>
@@ -4503,7 +4503,7 @@ to %1</source>
     <name>QnPoeOverBudgetPolicy</name>
     <message>
       <source>Servers that support PoE monitoring</source>
-      <translation>PoE 모니터링을 지원하는 서버</translation>
+      <translation>PoE 모니터링 지원 서버</translation>
     </message>
   </context>
   <context>
@@ -8341,7 +8341,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click to read more</source>
-      <translation>클릭하여 더 자세히 알아보십시오</translation>
+      <translation>클릭하여 더 자세히 알아보기</translation>
     </message>
   </context>
   <context>
@@ -8718,7 +8718,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update to Specific Build</source>
-      <translation>특정 빌드를 업데이트</translation>
+      <translation>특정 빌드 업데이트</translation>
     </message>
     <message>
       <source>Uploading updates...</source>
@@ -9427,7 +9427,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation>시간은 공통적이고 모든 서버간에 동기화 됩니다. 어느 서버에서건 OS 시간과 다를 수 있습니다.</translation>
+      <translation>모든 서버 간의 시간은 공통적으로 동기화 됩니다. 특정 서버의 OS 시간과 다를 수 있습니다.</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>

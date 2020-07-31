@@ -5,58 +5,58 @@
     <name>AnalyticsSearchWidget::Private</name>
     <message>
       <source>Any type</source>
-      <translation type="unfinished">Any type</translation>
+      <translation>Qualsevol tipus</translation>
     </message>
     <message>
       <source>Select area</source>
-      <translation type="unfinished">Select area</translation>
+      <translation>Seleccionar àrea</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation type="unfinished">Select some area on the video...</translation>
+      <translation>Seleccionar alguna àrea en el vídeo...</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>A la zona seleccionada</translation>
     </message>
     <message>
       <source>Failed to execute plugin action</source>
-      <translation type="unfinished">Failed to execute plugin action</translation>
+      <translation>No s'ha pogut executar l'acció del complement</translation>
     </message>
     <message>
       <source>Enter parameters</source>
-      <translation type="unfinished">Enter parameters</translation>
+      <translation>Introduïu els paràmetres</translation>
     </message>
     <message>
       <source>Action requires some parameters to be filled.</source>
-      <translation type="unfinished">Action requires some parameters to be filled.</translation>
+      <translation>L’acció requereix omplir alguns paràmetres.</translation>
     </message>
   </context>
   <context>
     <name>BackupCamerasDialogDelegate</name>
     <message>
       <source>Backup newly added devices</source>
-      <translation type="unfinished">Backup newly added devices</translation>
+      <translation>Còpia de seguretat dels dispositius recentment afegits</translation>
     </message>
     <message>
       <source>Backup newly added cameras</source>
-      <translation type="unfinished">Backup newly added cameras</translation>
+      <translation>Còpia de seguretat de les càmeres recentment afegides</translation>
     </message>
     <message>
       <source>Cannot add new devices while backup process is running.</source>
-      <translation type="unfinished">Cannot add new devices while backup process is running.</translation>
+      <translation>No es poden afegir nous dispositius mentre s'executa el procés de còpia de seguretat.</translation>
     </message>
     <message>
       <source>Cannot add new cameras while backup process is running.</source>
-      <translation type="unfinished">Cannot add new cameras while backup process is running.</translation>
+      <translation>No es poden afegir càmeres noves mentre s’executa el procés de còpia de seguretat.</translation>
     </message>
     <message>
       <source>Cannot add new devices because they store archive on external storage.</source>
-      <translation type="unfinished">Cannot add new devices because they store archive on external storage.</translation>
+      <translation>No es poden afegir nous dispositius perquè enregistren arxius en emmagatzematge extern.</translation>
     </message>
     <message>
       <source>Cannot add new cameras because they store archive on external storage.</source>
-      <translation type="unfinished">Cannot add new cameras because they store archive on external storage.</translation>
+      <translation>No es poden afegir noves càmeres perquè enregistren arxius en emmagatzematge extern.</translation>
     </message>
   </context>
   <context>
@@ -65,49 +65,49 @@
       <source>Zoom timeline
 to view more bookmarks</source>
       <comment>It is highly recommended to split message in two lines</comment>
-      <translation type="unfinished">Zoom timeline
-to view more bookmarks</translation>
+      <translation>Amplia la línia de temps
+per veure més marcadors</translation>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>
-      <translation type="unfinished">Play bookmark from the beginning</translation>
+      <translation>Reproduir el marcador des del principi</translation>
     </message>
     <message>
       <source>Edit bookmark</source>
-      <translation type="unfinished">Edit bookmark</translation>
+      <translation>Editar el marcador</translation>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation type="unfinished">Delete bookmark</translation>
+      <translation>Esborrar el marcador</translation>
     </message>
     <message>
       <source>Export bookmark</source>
-      <translation type="unfinished">Export bookmark</translation>
+      <translation>Exportar marcador</translation>
     </message>
   </context>
   <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
       <source>No connection to Server %1.</source>
-      <translation type="unfinished">No connection to Server %1.</translation>
+      <translation>No hi ha connexió amb el servidor %1.</translation>
     </message>
   </context>
   <context>
     <name>ComboBoxUtils</name>
     <message>
       <source>multiple values</source>
-      <translation type="unfinished">multiple values</translation>
+      <translation>valors múltiples</translation>
     </message>
   </context>
   <context>
     <name>CompatibilityVersionInstallationDialog</name>
     <message>
       <source>Installing version %1</source>
-      <translation type="unfinished">Installing version %1</translation>
+      <translation>Instal·lant la versió %1</translation>
     </message>
     <message>
       <source>Installation failed</source>
-      <translation type="unfinished">Installation failed</translation>
+      <translation>La instal·lació ha fallat</translation>
     </message>
     <message>
       <source>Installation completed</source>

@@ -118,15 +118,15 @@
     </message>
     <message>
       <source>Shows the menu</source>
-      <translation>메뉴를 표시함</translation>
+      <translation>메뉴 보이기</translation>
     </message>
     <message>
       <source>Sets the focus</source>
-      <translation>초점을 맞춤</translation>
+      <translation>초점 맞추기</translation>
     </message>
     <message>
       <source>Toggles the state</source>
-      <translation>상태를 전환함</translation>
+      <translation>상태 전환하기</translation>
     </message>
     <message>
       <source>Scrolls to the left</source>
@@ -146,7 +146,7 @@
     </message>
     <message>
       <source>Goes back a page</source>
-      <translation>한 페이지 뒤로 이동</translation>
+      <translation>이전 페이지로 이동</translation>
     </message>
     <message>
       <source>Goes to the next page</source>
@@ -208,7 +208,7 @@
     </message>
     <message>
       <source>Exit</source>
-      <translation>끝내기</translation>
+      <translation>종료</translation>
     </message>
     <message>
       <source>Cut</source>
