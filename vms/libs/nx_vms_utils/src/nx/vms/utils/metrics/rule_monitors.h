@@ -5,15 +5,18 @@
 namespace nx::vms::utils::metrics {
 
 // General rules file parsing error.
-class RuleSyntaxError: public BaseError { using BaseError::BaseError; };
-class UnknownValueId: public RuleSyntaxError { using RuleSyntaxError::RuleSyntaxError; };
+class NX_VMS_UTILS_API RuleSyntaxError: 
+    public BaseError { using BaseError::BaseError; };
+
+class NX_VMS_UTILS_API UnknownValueId: 
+    public RuleSyntaxError { using RuleSyntaxError::RuleSyntaxError; };
 
 // General formula calculation error in ExtraValueMonitor.
-class FormulaCalculationError: public BaseError { using BaseError::BaseError; };
-class NullValueError: public FormulaCalculationError
-{
-    using FormulaCalculationError::FormulaCalculationError;
-};
+class NX_VMS_UTILS_API FormulaCalculationError: 
+    public BaseError { using BaseError::BaseError; };
+
+class NX_VMS_UTILS_API NullValueError: 
+    public FormulaCalculationError { using FormulaCalculationError::FormulaCalculationError; };
 
 // NOTE: Generators are allowed to throw exceptions!
 using TextGenerator = std::function<QString()>;

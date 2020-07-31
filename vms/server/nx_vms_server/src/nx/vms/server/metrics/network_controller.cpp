@@ -96,17 +96,22 @@ public:
     enum class Rate { in, out };
     api::metrics::Value load(Rate rate) const
     {
-        if (!isUp())
+        #ifdef Q_OS_OSX
+            // TODO: Remove this plug when platform monitor supports network interfaces on OSX.
             return {};
+        #else
+            if (!isUp())
+                return {};
 
-        // NOTE: Using MAC because windows has some mess with interfaces names (VMS-16182).
-        const auto mac = hardwareAddress();
-        const auto load = NX_METRICS_EXPECTED_ERROR(
-            serverModule()->platform()->monitor()->networkInterfaceLoadOrThrow(mac),
-            std::invalid_argument, "Error getting NIC load");
-        return api::metrics::Value(nx::utils::switch_(rate,
-            Rate::in, [&]{ return load.bytesPerSecIn; },
-            Rate::out, [&]{ return load.bytesPerSecOut; }));
+            // NOTE: Using MAC because windows has some mess with interfaces names (VMS-16182).
+            const auto mac = hardwareAddress();
+            const auto load = NX_METRICS_EXPECTED_ERROR(
+                serverModule()->platform()->monitor()->networkInterfaceLoadOrThrow(mac),
+                std::invalid_argument, "Error getting NIC load");
+            return api::metrics::Value(nx::utils::switch_(rate,
+                Rate::in, [&]{ return load.bytesPerSecIn; },
+                Rate::out, [&]{ return load.bytesPerSecOut; }));
+        #endif
     }
 
     QnCommonModule* commonModule() const { return serverModule()->commonModule(); }
