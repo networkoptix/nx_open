@@ -65,49 +65,49 @@
       <source>Zoom timeline
 to view more bookmarks</source>
       <comment>It is highly recommended to split message in two lines</comment>
-      <translation type="unfinished">Zoom timeline
-to view more bookmarks</translation>
+      <translation>Amplia la línia de temps
+per veure més marcadors</translation>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>
-      <translation type="unfinished">Play bookmark from the beginning</translation>
+      <translation>Reproduir el marcador des del principi</translation>
     </message>
     <message>
       <source>Edit bookmark</source>
-      <translation type="unfinished">Edit bookmark</translation>
+      <translation>Editar el marcador</translation>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation type="unfinished">Delete bookmark</translation>
+      <translation>Esborrar el marcador</translation>
     </message>
     <message>
       <source>Export bookmark</source>
-      <translation type="unfinished">Export bookmark</translation>
+      <translation>Exportar marcador</translation>
     </message>
   </context>
   <context>
     <name>CameraDiagnostics::DiagnoseTool</name>
     <message>
       <source>No connection to Server %1.</source>
-      <translation type="unfinished">No connection to Server %1.</translation>
+      <translation>No hi ha connexió amb el servidor %1.</translation>
     </message>
   </context>
   <context>
     <name>ComboBoxUtils</name>
     <message>
       <source>multiple values</source>
-      <translation type="unfinished">multiple values</translation>
+      <translation>valors múltiples</translation>
     </message>
   </context>
   <context>
     <name>CompatibilityVersionInstallationDialog</name>
     <message>
       <source>Installing version %1</source>
-      <translation type="unfinished">Installing version %1</translation>
+      <translation>Instal·lant la versió %1</translation>
     </message>
     <message>
       <source>Installation failed</source>
-      <translation type="unfinished">Installation failed</translation>
+      <translation>La instal·lació ha fallat</translation>
     </message>
     <message>
       <source>Installation completed</source>
