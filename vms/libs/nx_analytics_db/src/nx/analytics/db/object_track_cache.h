@@ -97,9 +97,20 @@ public:
      */
     void removeExpiredData();
 
+    /**
+     * NOTE: Ignores Filter::maxObjectTracksToSelect.
+     */
     std::vector<ObjectTrackEx> lookup(
         const Filter& filter,
         const AbstractObjectTypeDictionary& objectTypeDictionary) const;
+
+    /**
+     * Removes all tracks with specified deviceId and
+     * first appearance timestamp < oldestDataToKeepTimestamp.
+     */
+    void erase(
+        QnUuid deviceId,
+        std::chrono::milliseconds oldestDataToKeepTimestamp);
 
 private:
     struct ObjectTrackContext

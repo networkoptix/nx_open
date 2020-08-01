@@ -39,16 +39,42 @@ ObjectTrackSearcher::ObjectTrackSearcher(
 
 std::vector<ObjectTrackEx> ObjectTrackSearcher::lookup(nx::sql::QueryContext* queryContext)
 {
-    auto cacheLookupResult = lookupInCache();
-    if (m_filter.maxObjectTracksToSelect > 0 &&
-        cacheLookupResult.size() >= m_filter.maxObjectTracksToSelect)
+    auto result = lookupInCache();
+
+    // DB stores the following fields with millisecond precision. Doing the same here.
+    for (auto& track: result)
     {
-        // Lookup has been satisfied by the cache lookup. No need to go to the DB.
-        return cacheLookupResult;
+        track.firstAppearanceTimeUs = (track.firstAppearanceTimeUs / 1000) * 1000;
+        track.lastAppearanceTimeUs = (track.lastAppearanceTimeUs / 1000) * 1000;
+        track.bestShot.timestampUs = (track.bestShot.timestampUs / 1000) * 1000;
     }
 
-    auto dbLookupResult = lookupInDb(queryContext);
-    return mergeResults(std::move(cacheLookupResult), std::move(dbLookupResult));
+    if (m_filter.maxObjectTracksToSelect == 0 ||
+        result.size() < m_filter.maxObjectTracksToSelect)
+    {
+        auto dbLookupResult = lookupInDb(queryContext);
+        result = mergeResults(std::move(result), std::move(dbLookupResult));
+    }
+
+    auto comparator =
+        [this](auto& left, auto& right)
+        {
+            return m_filter.sortOrder == Qt::SortOrder::AscendingOrder
+                ? left.firstAppearanceTimeUs < right.firstAppearanceTimeUs
+                : left.firstAppearanceTimeUs > right.firstAppearanceTimeUs;
+        };
+
+    std::sort(result.begin(), result.end(), comparator);
+
+    // NOTE: Satisfying maxObjectTracksToSelect in the very end to ensure we select the most recent
+    // tracks in the case when tracks from both DB and cache are present in the result.
+    if (m_filter.maxObjectTracksToSelect > 0 &&
+        result.size() > m_filter.maxObjectTracksToSelect)
+    {
+        result.erase(result.begin() + m_filter.maxObjectTracksToSelect, result.end());
+    }
+
+    return result;
 }
 
 void ObjectTrackSearcher::prepareCursorQuery(nx::sql::SqlQuery* query)
@@ -152,16 +178,6 @@ std::vector<ObjectTrackEx> ObjectTrackSearcher::mergeResults(
 
         one.push_back(std::exchange(track, {}));
     }
-
-    auto comparator =
-        [this](auto& left, auto& right)
-        {
-            return m_filter.sortOrder == Qt::SortOrder::AscendingOrder
-                ? left.firstAppearanceTimeUs < right.firstAppearanceTimeUs
-                : left.firstAppearanceTimeUs > right.firstAppearanceTimeUs;
-        };
-
-    std::sort(one.begin(), one.end(), comparator);
 
     return one;
 }

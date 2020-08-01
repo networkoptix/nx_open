@@ -19,7 +19,7 @@ inline bool operator==(const ObjectPosition& left, const ObjectPosition& right)
 
 inline bool operator==(const ObjectTrack& left, const ObjectTrack& right)
 {
-    return left.id == right.id
+    const auto result = left.id == right.id
         && left.objectTypeId == right.objectTypeId
         // See note above.
         //&& left.attributes == right.attributes
@@ -27,6 +27,7 @@ inline bool operator==(const ObjectTrack& left, const ObjectTrack& right)
         && left.lastAppearanceTimeUs == right.lastAppearanceTimeUs
         && left.objectPosition == right.objectPosition
         && left.bestShot == right.bestShot;
+    return result;
 }
 
 } // nx::analytics::db

@@ -195,37 +195,70 @@ std::vector<ObjectTrackEx> ObjectTrackCache::lookup(
     const Filter& filter,
     const AbstractObjectTypeDictionary& objectTypeDictionary) const
 {
+    std::vector<ObjectTrackEx> result;
+
+    auto addTrackToOutput = [&result](const ObjectTrackContext& ctx)
+    {
+        ObjectTrackEx trackEx = ctx.track;
+        trackEx.objectPosition = std::accumulate(
+            ctx.allPositionSequence.begin(), ctx.allPositionSequence.end(),
+            ObjectRegion(),
+            [](ObjectRegion& result, const ObjectPosition& pos)
+            {
+                result.add(pos.boundingBox);
+                return result;
+            });
+        trackEx.objectPositionSequence = ctx.allPositionSequence;
+        result.push_back(std::move(trackEx));
+    };
+
     QnMutexLocker lock(&m_mutex);
 
     if (!filter.objectTrackId.isNull())
     {
         auto it = m_tracksById.find(filter.objectTrackId);
-        if (it == m_tracksById.end())
+        if (it == m_tracksById.end() ||
+            !filter.acceptsTrack(it->second.track, objectTypeDictionary))
+        {
             return {};
+        }
 
-        ObjectTrackEx trackEx = it->second.track;
-        trackEx.objectPositionSequence = it->second.allPositionSequence;
-        return {{std::move(trackEx)}};
+        addTrackToOutput(it->second);
+        return result;
     }
 
-    std::vector<ObjectTrackEx> result;
     for (const auto& [trackId, ctx]: m_tracksById)
     {
         if (!filter.acceptsTrack(ctx.track, objectTypeDictionary))
             continue;
 
-        ObjectTrackEx trackEx = ctx.track;
-        trackEx.objectPositionSequence = ctx.allPositionSequence;
-        result.push_back(std::move(trackEx));
-
-        if (filter.maxObjectTracksToSelect > 0 &&
-            result.size() >= filter.maxObjectTracksToSelect)
-        {
-            return result;
-        }
+        addTrackToOutput(ctx);
     }
 
     return result;
+}
+
+void ObjectTrackCache::erase(
+    QnUuid deviceId,
+    std::chrono::milliseconds oldestDataToKeepTimestamp)
+{
+    using namespace std::chrono;
+
+    QnMutexLocker lock(&m_mutex);
+
+    for (auto it = m_tracksById.begin(); it != m_tracksById.end(); )
+    {
+        if (it->second.track.deviceId == deviceId &&
+            it->second.track.firstAppearanceTimeUs <
+                duration_cast<microseconds>(oldestDataToKeepTimestamp).count())
+        {
+            it = m_tracksById.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
 }
 
 void ObjectTrackCache::updateObject(

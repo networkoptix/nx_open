@@ -327,6 +327,8 @@ void EventsStorage::markDataAsDeprecated(
         deviceId, oldestDataToKeepTimestamp.count());
 
     QnMutexLocker lock(&m_mutex);
+
+    m_objectTrackCache->erase(deviceId, oldestDataToKeepTimestamp);
     scheduleDataCleanup(lock, deviceId, oldestDataToKeepTimestamp);
 }
 
