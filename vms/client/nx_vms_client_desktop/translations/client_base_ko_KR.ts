@@ -488,7 +488,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Maximize Item</source>
-      <translation>최대화</translation>
+      <translation>크게 보기</translation>
     </message>
     <message>
       <source>Restore Item</source>
@@ -724,7 +724,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Medium</source>
-      <translation>일반화</translation>
+      <translation>중간</translation>
     </message>
     <message>
       <source>Large</source>
@@ -1019,7 +1019,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>License is trial.</source>
-      <translation>라이센스는 trial 입니다,</translation>
+      <translation>라이선스가 체험용 라이선스 입니다.</translation>
     </message>
     <message>
       <source>License is in pending deactivation state, but has not been deactivated yet.</source>
@@ -1496,7 +1496,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Common</source>
-      <translation>공용</translation>
+      <translation>위험</translation>
     </message>
     <message>
       <source>This password is in list of the most popular passwords.</source>
@@ -1527,7 +1527,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>All</source>
-      <translation>모든</translation>
+      <translation>전체</translation>
     </message>
     <message>
       <source>Permissions</source>
@@ -2183,7 +2183,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Instant</source>
-      <translation>긴급</translation>
+      <translation>즉시</translation>
     </message>
     <message>
       <source>Stops</source>
@@ -3866,7 +3866,7 @@ to %1</source>
     </message>
     <message>
       <source>Please activate your commercial or trial license.</source>
-      <translation>정식판 또는 평가판의 인증키를 입력하여 주세요.</translation>
+      <translation>상용 라이선스 또는 체험용 라이선스를 인증하여 주십시오.</translation>
     </message>
     <message>
       <source>Please activate your commercial license.</source>
@@ -3925,7 +3925,7 @@ to %1</source>
     <name>QnLicenseWidget</name>
     <message>
       <source>Activate Trial License</source>
-      <translation>임시 키 인증</translation>
+      <translation>체험용 라이선스 인증</translation>
     </message>
     <message>
       <source>Activate Free License</source>
@@ -4662,7 +4662,7 @@ to %1</source>
     </message>
     <message>
       <source>Instant</source>
-      <translation>긴급</translation>
+      <translation>즉시</translation>
     </message>
     <message>
       <source>Position</source>
@@ -6432,12 +6432,12 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>%1 belong to this system only and are fully managed by system administrators.</source>
       <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
-      <translation>%1 은(는) 시스템에만 속하며 시스템 관리자가 전적으로 관리합니다.</translation>
+      <translation>%1는 이 시스템에만 속하며 시스템 관리자가 전적으로 관리합니다.</translation>
     </message>
     <message>
       <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
       <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
-      <translation>%1 은(는) 여러 시스템에 접속 할 수 있습니다. 관리자는 자신의 권한만 관리 할 수 ​​있습니다.</translation>
+      <translation>%1는 많은 시스템에 접속 할 수 있습니다. 관리자는 자신의 권한 만 관리 할 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -7175,7 +7175,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>There is another showreel with the same name.</source>
-      <translation>같은 이름을 가진 다른 쇼릴이 있다.</translation>
+      <translation>같은 이름을 가진 다른 쇼릴이 존재합니다.</translation>
     </message>
     <message numerus="yes">
       <source>Remove %n items from showreel?</source>
@@ -7280,7 +7280,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Me</source>
       <extracomment>Short for &apos;Medium&apos;</extracomment>
-      <translation>일반</translation>
+      <translation>중간</translation>
     </message>
     <message>
       <source>Hi</source>
@@ -7290,7 +7290,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>최적</translation>
+      <translation>최상</translation>
     </message>
     <message>
       <source>Ps</source>
@@ -7453,7 +7453,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation>삭제 된 카메라</translation>
+      <translation>삭제된 카메라</translation>
     </message>
     <message>
       <source>Unknown track</source>
@@ -7488,7 +7488,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::BookmarkSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
-      <translation>삭제 된 카메라</translation>
+      <translation>삭제된 카메라</translation>
     </message>
   </context>
   <context>
@@ -7795,7 +7795,7 @@ If you intended to move analytics data to another storage location, please conta
       <source>%1 are used</source>
       <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
       <translation>
-        <numerusform>%1 이(가) 사용됩니다</numerusform>
+        <numerusform>%1가 사용됩니다</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -8082,7 +8082,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>...and %n more</source>
       <translation>
-        <numerusform>... 그리고 %n 더 많은</numerusform>
+        <numerusform>... 이 외 %n 건 더 있음</numerusform>
       </translation>
     </message>
   </context>
@@ -8179,7 +8179,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Delete Image</source>
-      <translation>이미지 삭제</translation>
+      <translation>이미지 제거</translation>
     </message>
     <message>
       <source>Image</source>
@@ -8191,7 +8191,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Delete Text</source>
-      <translation>문자 삭제</translation>
+      <translation>텍스트 제거</translation>
     </message>
     <message>
       <source>Text</source>
@@ -8488,7 +8488,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>deleted camera</source>
-      <translation>삭제 된 카메라</translation>
+      <translation>삭제된 카메라</translation>
     </message>
     <message>
       <source>Bookmark it...</source>
@@ -8778,7 +8778,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Latest Available Update</source>
-      <translation>최신 사용할 수 있는 업데이트</translation>
+      <translation>사용할 수 있는 최신 업데이트</translation>
     </message>
     <message>
       <source>Specific Build</source>
@@ -9124,7 +9124,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ScheduleGridWidget</name>
     <message>
       <source>All</source>
-      <translation>모든</translation>
+      <translation>전체</translation>
     </message>
   </context>
   <context>
@@ -10091,11 +10091,11 @@ Server Settings (서버 설정) 대화 상자의 &quot;Storage Management (스�
     </message>
     <message>
       <source>Showreel %1</source>
-      <translation>쇼릴 %1</translation>
+      <translation> %1 쇼릴</translation>
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation>Delete 쇼릴%1?</translation>
+      <translation>%1 쇼릴을 삭제 하시겠습니까?</translation>
     </message>
   </context>
   <context>
