@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>User Roles</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,1">
+  <layout class="QGridLayout" name="gridLayout">
    <property name="spacing">
     <number>0</number>
    </property>
@@ -107,6 +107,12 @@
    </item>
    <item row="0" column="0">
     <widget class="nx::vms::client::desktop::Panel" name="userRolesPanel" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
        <width>200</width>
