@@ -12,7 +12,7 @@ GroupBox
     bottomPadding: 20
 
     font.pixelSize: 15
-    font.weight: Font.DemiBold
+    font.weight: Font.Bold
 
     background: Rectangle
     {

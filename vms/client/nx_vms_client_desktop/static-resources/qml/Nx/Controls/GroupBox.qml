@@ -13,6 +13,7 @@ GroupBox
     bottomPadding: 16
 
     font.pixelSize: 13
+    font.weight: Font.Normal
 
     background: Item
     {
