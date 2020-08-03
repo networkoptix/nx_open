@@ -1538,6 +1538,7 @@ QJsonObject serializeModel(const CameraSettings::Vca::Installation& installation
                             {"type", "PolygonFigure"},
                             {"minPoints", kMinRegionVertices},
                             {"maxPoints", kMaxRegionVertices},
+                            {"useLabelField", false},
                             {"caption", "#"},
                         }},
                     },

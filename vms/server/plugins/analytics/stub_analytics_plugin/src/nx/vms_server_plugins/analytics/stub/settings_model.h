@@ -536,6 +536,13 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                     "caption": "Polygons",
                     "items": [
                         {
+                            "type": "PolygonFigure",
+                            "name": "excludedArea.figure",
+                            "caption": "Excluded area",
+                            "useLabelField": false,
+                            "maxPoints": 8
+                        },
+                        {
                             "type": "Repeater",
                             "count": 5,
                             "template": {

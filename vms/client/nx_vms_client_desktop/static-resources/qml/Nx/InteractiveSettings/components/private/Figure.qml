@@ -14,6 +14,7 @@ LabeledItem
     property string figureType: ""
     property var figureSettings
     property var figure
+    property bool useLabelField: true
 
     isGroup: true
 
@@ -31,6 +32,7 @@ LabeledItem
         {
             id: figureNameEdit
             width: parent.width
+            visible: useLabelField
             onTextChanged: valueChanged()
         }
 

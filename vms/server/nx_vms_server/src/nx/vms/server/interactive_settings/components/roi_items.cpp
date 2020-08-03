@@ -20,11 +20,21 @@ void PolyFigure::setMaxPoints(int maxPoints)
     emit maxPointsChanged();
 }
 
+void PolyFigure::setUseLabelField(bool useLabelField)
+{
+    if (m_useLabelField == useLabelField)
+        return;
+
+    m_useLabelField = useLabelField;
+    emit useLabelFieldChanged();
+}
+
 QJsonObject PolyFigure::serializeModel() const
 {
     auto result = ObjectValueItem::serializeModel();
     result[QStringLiteral("minPoints")] = minPoints();
     result[QStringLiteral("maxPoints")] = maxPoints();
+    result[QStringLiteral("useLabelField")] = useLabelField();
     return result;
 }
 
