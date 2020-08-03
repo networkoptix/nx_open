@@ -50,7 +50,7 @@ std::vector<ObjectTrackEx> ObjectTrackSearcher::lookup(nx::sql::QueryContext* qu
     }
 
     if (m_filter.maxObjectTracksToSelect == 0 ||
-        result.size() < m_filter.maxObjectTracksToSelect)
+        (int) result.size() < m_filter.maxObjectTracksToSelect)
     {
         auto dbLookupResult = lookupInDb(queryContext);
         result = mergeResults(std::move(result), std::move(dbLookupResult));
@@ -69,7 +69,7 @@ std::vector<ObjectTrackEx> ObjectTrackSearcher::lookup(nx::sql::QueryContext* qu
     // NOTE: Satisfying maxObjectTracksToSelect in the very end to ensure we select the most recent
     // tracks in the case when tracks from both DB and cache are present in the result.
     if (m_filter.maxObjectTracksToSelect > 0 &&
-        result.size() > m_filter.maxObjectTracksToSelect)
+        (int) result.size() > m_filter.maxObjectTracksToSelect)
     {
         result.erase(result.begin() + m_filter.maxObjectTracksToSelect, result.end());
     }
