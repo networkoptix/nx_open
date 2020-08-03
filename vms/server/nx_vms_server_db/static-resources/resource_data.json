@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.3.504",
+    "version": "4.1.3.506",
     "data": [
         {
             "keys": [
@@ -1089,7 +1089,6 @@
                 "private|dhi-nvr5216-4ks2",
                 "general|dvr08cvi-4k",
                 "private|dh-nvr4832-4k",
-                "axis|axisp8221*",
                 "dahua|nvr5432*",
                 "siqura|s-64 e v2-xt",
                 "hitron|ngh-72m3",
@@ -1110,7 +1109,6 @@
                 "dw-enhd16|compresso",
                 "dw-enhd16|dw-encoder2",
                 "dw-enhd16|dw-encoder1",
-                "axis|axisp8221",
                 "dahua|nvr5432-4ks2",
                 "dhi-xvr5216a|264+",
                 "siqura|s-64 e v2-xt",
@@ -1323,7 +1321,7 @@
                 "AXIS|AXISA9161",
                 "AXIS|AXISC1004E",
                 "AXIS|AXISC8033",
-		"AXIS|AXISC1310*"
+                "AXIS|AXISC1310*"
             ],
             "noVideoSupport": true
         },
