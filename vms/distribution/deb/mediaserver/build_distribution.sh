@@ -52,7 +52,6 @@ copyLibs()
         'libQt5*'
         'libEnginio.so*'
         'libqgsttools_p.*'
-        'libtegra_video.*'
         'libnx_vms_client*'
         'libcloud_db.*'
         'libnx_cassandra*'
@@ -135,25 +134,6 @@ copyFiles()
     then
        cp -r "$FILES_DIR/$TARGET_DEVICE/"* "$STAGE_MODULE/"
     fi
-}
-
-# [in] STAGE_LIB
-# [in] STAGE_MODULE
-# [in] SOURCE_DIR
-copyTegraSpecificFiles()
-{
-    echo ""
-    echo "Copying Tegra-specific files"
-
-    mkdir -p "$STAGE_LIB"
-
-    local -r TEGRA_VIDEO_SOURCE_DIR="$SOURCE_DIR/artifacts/tx1/tegra_multimedia_api"
-    # Demo neural networks.
-    local -r NVIDIA_MODELS_SOURCE_DIR="$TEGRA_VIDEO_SOURCE_DIR/data/model"
-    local -r NVIDIA_MODELS_INSTALL_PATH="$STAGE_MODULE/nvidia_models"
-
-    mkdir -p "$NVIDIA_MODELS_INSTALL_PATH"
-    cp -f $NVIDIA_MODELS_SOURCE_DIR/* "$NVIDIA_MODELS_INSTALL_PATH"
 }
 
 # [in] STAGE_LIB
@@ -337,11 +317,6 @@ buildDistribution()
     copyMediaserverPlugins
     copyFestivalVox
     copyFiles
-
-    if [[ $TARGET_DEVICE == 'linux_arm64' ]]
-    then
-        copyTegraSpecificFiles
-    fi
 
     echo "Setting permissions"
     find "$STAGE" -type d -print0 |xargs -0 chmod 755

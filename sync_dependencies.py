@@ -43,7 +43,6 @@ def determine_package_versions(
         "doxygen": "1.8.14",
         "gstreamer": "1.0",
         "icu": "60.2",
-        "deepstream": "0.2",
         "android-sdk": "28",
         "android-ndk": "r17",
         "help": customization + "-4.1",
@@ -165,11 +164,6 @@ def sync_dependencies(syncher, platform, arch, box, release_version, options={})
 
     if platform == "linux":
         sync("sysroot", path_variable="sysroot_directory")
-
-    if (platform, arch) == ("linux", "arm64"):
-        sync("tegra_video", path_variable="tegra_video_directory")
-        sync("jetpack", path_variable="jetpack_directory")
-        sync("deepstream")
 
     if platform in ("android", "windows") or box == "bpi":
         sync("openal")

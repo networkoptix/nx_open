@@ -15,7 +15,6 @@ set(GRAPHVIZ_IGNORE_TARGETS
     ".*_analytics_plugin"
     ".*_EXCLUDED"
     "generic.*plugin"
-    "tegra_video"
     "mjpeg_link_plugin"
     "cassandra"
     "image_library_plugin"
