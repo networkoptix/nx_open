@@ -566,6 +566,21 @@ public:
         rest::JsonResultCallback&& callback,
         QThread* targetThread = nullptr);
 
+    enum class DebugFlag
+    {
+        none = 0,
+        disableThumbnailRequests = 0x01
+    };
+    Q_DECLARE_FLAGS(DebugFlags, DebugFlag);
+
+    /**
+     * Flags altering functionality for debugging purposes.
+     * Affect all ServerConnection instances.
+     * These functions are not thread-safe.
+     */
+    static DebugFlags debugFlags();
+    static void setDebugFlag(DebugFlag flag, bool on);
+
 private slots:
     void onHttpClientDone(int requestId, nx::network::http::AsyncHttpClientPtr httpClient);
 
@@ -631,6 +646,8 @@ private:
     nx::utils::Url m_directUrl;
     nx::utils::log::Tag m_logTag;
 
+    static DebugFlags m_debugFlags;
+
     /**
      * Generic requests, for the types, that should not be exposed to common library.
      */
@@ -662,5 +679,7 @@ private:
         Callback<ResultType> callback,
         QThread* targetThread);
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(ServerConnection::DebugFlags);
 
 } // namespace rest

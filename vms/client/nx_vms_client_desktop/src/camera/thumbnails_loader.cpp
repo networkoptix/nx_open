@@ -35,6 +35,8 @@ extern "C" {
 #include <recording/time_period.h>
 #include "core/resource/media_server_resource.h"
 
+#include <nx/vms/client/desktop/ini.h>
+
 using nx::vms::client::core::Geometry;
 
 namespace {
@@ -417,7 +419,7 @@ void QnThumbnailsLoader::process() {
     QnVirtualCameraResourcePtr camera = qSharedPointerDynamicCast<QnVirtualCameraResource>(m_resource);
     QnAviResourcePtr aviFile = qSharedPointerDynamicCast<QnAviResource>(m_resource);
 
-    if (camera) {
+    if (camera && !nx::vms::client::desktop::ini().debugDisableCameraThumbnails) {
         QnMediaServerResourceList servers = cameraHistoryPool()->getCameraFootageData(camera, period);
         for(const QnMediaServerResourcePtr &server: servers)
         {

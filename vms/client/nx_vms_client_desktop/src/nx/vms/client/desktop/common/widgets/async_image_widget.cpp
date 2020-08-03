@@ -16,6 +16,7 @@
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
 #include <nx/vms/client/desktop/image_providers/image_provider.h>
+#include <nx/vms/client/desktop/ini.h>
 
 namespace nx::vms::client::desktop {
 
@@ -357,7 +358,7 @@ int AsyncImageWidget::heightForWidth(int width) const
 
 void AsyncImageWidget::retranslateUi()
 {
-    m_placeholder->setText(tr("NO DATA"));
+    m_placeholder->setText(ini().debugDisableCameraThumbnails ? tr("DISABLED") : tr("NO DATA"));
 }
 
 void AsyncImageWidget::invalidateGeometry()

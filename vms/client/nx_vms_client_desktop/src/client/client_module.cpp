@@ -15,6 +15,7 @@
 #include <api/global_settings.h>
 #include <api/network_proxy_factory.h>
 #include <api/runtime_info_manager.h>
+#include <api/server_rest_connection.h>
 #include <api/session_manager.h>
 
 #include <common/common_module.h>
@@ -504,6 +505,9 @@ void QnClientModule::initSingletons()
 
     registerResourceDataProviders();
     integrations::initialize(this);
+
+    rest::ServerConnection::setDebugFlag(rest::ServerConnection::DebugFlag::disableThumbnailRequests,
+        ini().debugDisableCameraThumbnails);
 }
 
 void QnClientModule::initRuntimeParams(const QnStartupParameters& startupParams)

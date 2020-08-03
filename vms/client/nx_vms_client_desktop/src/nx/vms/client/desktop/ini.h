@@ -150,6 +150,9 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(1, allowMultipleClientInstances,
         "[Design] Whether client allowed to run in multiple instances (e.g. by desktop shortcut).");
 
+    NX_INI_FLAG(0, oldPtzAimOverlay,
+        "[Design] Use old-style circular aim overlay to operate PTZ pan and tilt.");
+
     // ---------------------------------------------------------------------------------------------
     // Features section
     // Flags here can be removed when QA approves the feature to be definitely present in the
@@ -219,6 +222,14 @@ struct Ini: nx::kit::IniConfig
         "If exceeded, then the connection is dropped to avoid infinite UI \"Loading...\" state.\n"
         "Value in milliseconds, 0 means infinite timeout.");
 
+    NX_INI_FLAG(0, delayRightPanelLiveAnalytics,
+        "[Support] Prohibits showing right panel live analytics before corresponding frame appears on\n"
+        "the camera if the camera is playing live");
+
+    NX_INI_FLAG(0, debugDisableCameraThumbnails,
+        "[Support] Disable camera thumbnail server requests for debugging and profiling purposes.\n"
+        "Also disables Timeline Thumbnail Pane and Preview Search.");
+
     // ---------------------------------------------------------------------------------------------
     // CI section.
     // Flags here are used for the client functional unit tests.
@@ -258,13 +269,6 @@ struct Ini: nx::kit::IniConfig
         "When disabled, the aspect ratio of the zoom window is the same as the aspect ratio of\n"
         "the main camera window. If enabled, allows the user to specify the aspect ratio of the\n"
         "zoom window.");
-
-    NX_INI_FLAG(0, delayRightPanelLiveAnalytics,
-        "Prohibits showing right panel live analytics before corresponding frame appears on\n"
-        "the camera if the camera is playing live");
-
-    NX_INI_FLAG(0, oldPtzAimOverlay,
-        "Use old-style circular aim overlay to operate PTZ pan and tilt.");
 };
 
 inline Ini& ini()

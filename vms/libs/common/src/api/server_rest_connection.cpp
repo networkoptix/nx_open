@@ -60,6 +60,8 @@ void trace(const QString& serverId, rest::Handle handle, const QString& message)
 namespace rest
 {
 
+ServerConnection::DebugFlags ServerConnection::m_debugFlags = ServerConnection::DebugFlag::none;
+
 ServerConnection::ServerConnection(
     QnCommonModule* commonModule,
     const QnUuid& serverId,
@@ -106,6 +108,9 @@ rest::Handle ServerConnection::cameraThumbnailAsync(const nx::api::CameraImageRe
     Result<QByteArray>::type callback,
     QThread* targetThread)
 {
+    if (debugFlags().testFlag(DebugFlag::disableThumbnailRequests))
+        return {};
+
     QnThumbnailRequestData data;
     data.request = request;
     data.format = Qn::UbjsonFormat;
@@ -1699,5 +1704,15 @@ void ServerConnection::onHttpClientDone(
         callback(requestId, systemError, statusCode, contentType, messageBody, headers);
     }
 };
+
+ServerConnection::DebugFlags ServerConnection::debugFlags()
+{
+    return m_debugFlags;
+}
+
+void ServerConnection::setDebugFlag(DebugFlag flag, bool on)
+{
+    m_debugFlags.setFlag(flag, on);
+}
 
 } // namespace rest

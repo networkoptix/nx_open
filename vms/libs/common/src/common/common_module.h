@@ -338,6 +338,7 @@ public:
 
     void setMediaStatisticsMaxDurationInFrames(int value);
     int mediaStatisticsMaxDurationInFrames() const;
+
 signals:
     void readOnlyChanged(bool readOnly);
     void moduleInformationChanged();

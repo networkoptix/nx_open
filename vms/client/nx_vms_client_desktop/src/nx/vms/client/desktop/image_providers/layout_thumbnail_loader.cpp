@@ -9,20 +9,18 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource_management/resource_pool.h>
-
-#include <nx/vms/client/desktop/image_providers/layout_background_image_provider.h>
-#include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
-#include <nx/vms/client/desktop/image_providers/watermark_proxy_provider.h>
-
-#include <nx/client/core/utils/geometry.h>
 #include <ui/common/palette.h>
 #include <ui/style/globals.h>
 #include <ui/style/helper.h>
-#include <nx/vms/client/desktop/common/widgets/autoscaled_plain_text.h>
 #include <ui/workaround/sharp_pixmap_painting.h>
 
-#include <nx/utils/log/log.h>
+#include <nx/client/core/utils/geometry.h>
 #include <nx/fusion/serialization/lexical.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/common/widgets/autoscaled_plain_text.h>
+#include <nx/vms/client/desktop/image_providers/layout_background_image_provider.h>
+#include <nx/vms/client/desktop/image_providers/resource_thumbnail_provider.h>
+#include <nx/vms/client/desktop/image_providers/watermark_proxy_provider.h>
 #include <nx/vms/client/desktop/ini.h>
 
 using nx::vms::client::core::Geometry;
@@ -93,7 +91,7 @@ struct LayoutThumbnailLoader::Private
         noDataWidget(new AutoscaledPlainText()),
         nonCameraWidget(new AutoscaledPlainText())
     {
-        noDataWidget->setText(tr("NO DATA"));
+        noDataWidget->setText(ini().debugDisableCameraThumbnails ? tr("DISABLED") : tr("NO DATA"));
         noDataWidget->setProperty(style::Properties::kDontPolishFontProperty, true);
         noDataWidget->setAlignment(Qt::AlignCenter);
         noDataWidget->setContentsMargins(kMinIndicationMargins);
