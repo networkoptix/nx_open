@@ -207,6 +207,10 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
                     if (!guard)
                         return;
 
+                    NX_DEBUG(this, lm("Cloud system <%1>: ping request reply:\nSucces:%2\n%3\n%4"),
+                        cloudSystemId, !failed, reply->response() ? reply->response()->toString() : "none",
+                        data);
+
                     const QnMutexLocker lock(&m_mutex);
                     m_runningRequests.removeOne(reply);
 
@@ -231,11 +235,19 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
 
                     QnJsonRestResult jsonReply;
                     if (!QJson::deserialize(data, &jsonReply))
+                    {
+                        NX_DEBUG(this, lm("Cloud system <%1>: failed to deserialize json reply:\n%2"),
+                            cloudSystemId, data);
                         return;
+                    }
 
                     nx::vms::api::ModuleInformation moduleInformation;
                     if (!QJson::deserialize(jsonReply.reply, &moduleInformation))
+                    {
+                        NX_DEBUG(this, lm("Cloud system <%1>: failed to deserialize module information:\n%2"),
+                            cloudSystemId, data);
                         return;
+                    }
 
                     // To prevent hanging on of fake online cloud servers
                     // It is almost not hack.
@@ -265,11 +277,14 @@ void QnCloudSystemsFinder::pingCloudSystem(const QString& cloudSystemId)
                     url.setHost(moduleInformation.cloudId());
                     url.setScheme(nx::network::http::urlSheme(moduleInformation.sslAllowed));
                     systemDescription->setServerHost(serverId, url);
+                    NX_DEBUG(this, lm("Cloud system <%1>: set server <%2> url to %3"),
+                        cloudSystemId, serverId.toString(), url.toString(QUrl::RemovePassword));
                 }); //< executeInThread
             reply->pleaseStopSync();
 
         };
 
+    NX_DEBUG(this, lm("Cloud system <%1>: send moduleInformation request"), cloudSystemId);
     client->doGet(makeCloudModuleInformationUrl(cloudSystemId), handleReply);
 
     // This method is always called under mutex.
