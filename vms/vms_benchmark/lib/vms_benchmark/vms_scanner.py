@@ -29,7 +29,7 @@ class VmsScanner:
             self.ini_dir = ini_dir
 
         def is_up(self):
-            pids_raw = self.device.eval(f'pidof {self.server_bin(self.linux_distribution)}', stderr=None)
+            pids_raw = self.device.eval("pidof mediaserver mediaserver-bin", stderr=None)
             if not pids_raw:
                 return False
 
@@ -137,10 +137,6 @@ class VmsScanner:
             self.device.sh(
                 f'mount -o bind "{tmp_dir}" "{self.ini_dir}"', throw_exception_on_error=True, su=True)
 
-        @staticmethod
-        def server_bin(linux_distribution):
-            return 'mediaserver-bin' if linux_distribution.with_systemd else 'mediaserver'
-
     def __init__(self, vmses):
         self.vmses = vmses
 
@@ -222,12 +218,11 @@ class VmsScanner:
             vms['host'] = device.host
 
         def obtain_vms_pid(vms_description):
-            server_bin = VmsScanner.Vms.server_bin(linux_distribution)
-            pids_raw = device.eval(f"pidof {server_bin}")
+            pids_raw = device.eval("pidof mediaserver mediaserver-bin")
             from os import environ
             if environ.get('DEBUG', '0') == '1':
                 import sys
-                print(f"`pidof {server_bin}: {pids_raw}`", file=sys.stderr)
+                print(f"`pidof mediaserver mediaserver-bin: {pids_raw}`", file=sys.stderr)
             if not pids_raw:
                 return None
 
