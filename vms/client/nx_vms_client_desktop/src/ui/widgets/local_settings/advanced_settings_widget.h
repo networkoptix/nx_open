@@ -43,6 +43,9 @@ private:
     bool isBlurEnabled() const;
     void setBlurEnabled(bool value);
 
+    bool isHardwareDecodingEnabled() const;
+    void setHardwareDecodingEnabled(bool value);
+
     int  maximumLiveBufferMs() const;
     void setMaximumLiveBufferMs(int value);
 

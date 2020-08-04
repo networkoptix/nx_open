@@ -82,6 +82,9 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
     connect(ui->disableBlurCheckbox, &QCheckBox::toggled, this,
         &QnAbstractPreferencesWidget::hasChangesChanged);
 
+    connect(ui->useHardwareDecodingCheckbox, &QCheckBox::toggled, this,
+        &QnAbstractPreferencesWidget::hasChangesChanged);
+
     /* Live buffer lengths slider/spin logic: */
     connect(ui->maximumLiveBufferLengthSlider, &QSlider::valueChanged, this,
         [this](int value)
@@ -109,6 +112,7 @@ void QnAdvancedSettingsWidget::applyChanges()
     qnSettings->setAutoFpsLimit(isAutoFpsLimitEnabled());
     qnSettings->setMaximumLiveBufferMs(maximumLiveBufferMs());
     qnSettings->setGlBlurEnabled(isBlurEnabled());
+    qnSettings->setHardwareDecodingEnabled(isHardwareDecodingEnabled());
 }
 
 void QnAdvancedSettingsWidget::loadDataToUi()
@@ -118,6 +122,7 @@ void QnAdvancedSettingsWidget::loadDataToUi()
     setAutoFpsLimitEnabled(qnSettings->isAutoFpsLimit());
     setMaximumLiveBufferMs(qnSettings->maximumLiveBufferMs());
     setBlurEnabled(qnSettings->isGlBlurEnabled());
+    setHardwareDecodingEnabled(qnSettings->isHardwareDecodingEnabled());
 }
 
 bool QnAdvancedSettingsWidget::hasChanges() const
@@ -126,7 +131,8 @@ bool QnAdvancedSettingsWidget::hasChanges() const
         || qnSettings->isGlDoubleBuffer() != isDoubleBufferingEnabled()
         || qnSettings->isAutoFpsLimit() != isAutoFpsLimitEnabled()
         || qnSettings->maximumLiveBufferMs() != maximumLiveBufferMs()
-        || qnSettings->isGlBlurEnabled() != isBlurEnabled();
+        || qnSettings->isGlBlurEnabled() != isBlurEnabled()
+        || qnSettings->isHardwareDecodingEnabled() != isHardwareDecodingEnabled();
 }
 
 bool QnAdvancedSettingsWidget::isRestartRequired() const
@@ -225,6 +231,16 @@ bool QnAdvancedSettingsWidget::isBlurEnabled() const
 void QnAdvancedSettingsWidget::setBlurEnabled(bool value)
 {
     ui->disableBlurCheckbox->setChecked(!value);
+}
+
+bool QnAdvancedSettingsWidget::isHardwareDecodingEnabled() const
+{
+    return ui->useHardwareDecodingCheckbox->isChecked();
+}
+
+void QnAdvancedSettingsWidget::setHardwareDecodingEnabled(bool value)
+{
+    ui->useHardwareDecodingCheckbox->setChecked(value);
 }
 
 int QnAdvancedSettingsWidget::maximumLiveBufferMs() const

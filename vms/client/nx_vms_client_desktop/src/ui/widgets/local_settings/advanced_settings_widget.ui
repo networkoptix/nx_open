@@ -63,6 +63,13 @@
     </layout>
    </item>
    <item>
+    <widget class="QCheckBox" name="useHardwareDecodingCheckbox">
+     <property name="text">
+      <string>Use Hardware Video Decoding</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0,1">
      <property name="spacing">
       <number>4</number>
@@ -254,8 +261,16 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>downmixAudioCheckBox</tabstop>
+  <tabstop>disableBlurCheckbox</tabstop>
+  <tabstop>doubleBufferCheckbox</tabstop>
+  <tabstop>useHardwareDecodingCheckbox</tabstop>
+  <tabstop>autoFpsLimitCheckbox</tabstop>
+  <tabstop>maximumLiveBufferLengthSpinBox</tabstop>
+  <tabstop>maximumLiveBufferLengthSlider</tabstop>
   <tabstop>browseLogsButton</tabstop>
   <tabstop>clearCacheButton</tabstop>
+  <tabstop>resetAllWarningsButton</tabstop>
  </tabstops>
  <resources/>
  <connections/>
