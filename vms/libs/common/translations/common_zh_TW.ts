@@ -578,7 +578,7 @@
     </message>
     <message>
       <source>Time</source>
-      <translation>時間</translation>
+      <translation>時效性</translation>
     </message>
     <message>
       <source>Time Licenses</source>

@@ -111,769 +111,769 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Installation completed</source>
-      <translation type="unfinished">Installation completed</translation>
+      <translation>Instal·lació finalitzada</translation>
     </message>
     <message>
       <source>Getting update information from the server</source>
-      <translation type="unfinished">Getting update information from the server</translation>
+      <translation>Obtenint informació d'actualització del servidor</translation>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation type="unfinished">Downloading update package</translation>
+      <translation>Descarregant el paquet d’actualització</translation>
     </message>
     <message>
       <source>Installing</source>
-      <translation type="unfinished">Installing</translation>
+      <translation>Instal. lant</translation>
     </message>
   </context>
   <context>
     <name>ContextMenu</name>
     <message>
       <source>Filter...</source>
-      <translation type="unfinished">Filter...</translation>
+      <translation>Filtrar...</translation>
     </message>
     <message>
       <source>Connect to System</source>
-      <translation type="unfinished">Connect to System</translation>
+      <translation>Connectar-se al sistema</translation>
     </message>
     <message>
       <source>Help</source>
-      <translation type="unfinished">Help</translation>
+      <translation>Ajuda</translation>
     </message>
     <message>
       <source>Event Log...</source>
-      <translation type="unfinished">Event Log...</translation>
+      <translation>Registre d'esdeveniments...</translation>
     </message>
     <message>
       <source>Cameras to Backup...</source>
-      <translation type="unfinished">Cameras to Backup...</translation>
+      <translation>Copia de Seguretat de les Càmeres...</translation>
     </message>
     <message>
       <source>Control Video Wall</source>
-      <translation type="unfinished">Control Video Wall</translation>
+      <translation>Control de Video Wall</translation>
     </message>
     <message>
       <source>Push my screen</source>
-      <translation type="unfinished">Push my screen</translation>
+      <translation>Prem la meva pantalla</translation>
     </message>
     <message>
       <source>Select Time Server</source>
-      <translation type="unfinished">Select Time Server</translation>
+      <translation>Seleccioneu el servidor de temps</translation>
     </message>
     <message>
       <source>Fit in View</source>
-      <translation type="unfinished">Fit in View</translation>
+      <translation>Ajustar a la vista</translation>
     </message>
     <message>
       <source>Main Menu</source>
-      <translation type="unfinished">Main Menu</translation>
+      <translation>Menú principal</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Connectar-se al servidor...</translation>
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation type="unfinished">Disconnect from Server</translation>
+      <translation>Desconnectar del Servidor</translation>
     </message>
     <message>
       <source>Browse Local Files</source>
-      <translation type="unfinished">Browse Local Files</translation>
+      <translation>Explora fitxers locals</translation>
     </message>
     <message>
       <source>Show Welcome Screen</source>
-      <translation type="unfinished">Show Welcome Screen</translation>
+      <translation>Mostrar la pantalla de benvinguda</translation>
     </message>
     <message>
       <source>New...</source>
-      <translation type="unfinished">New...</translation>
+      <translation>Nou...</translation>
     </message>
     <message>
       <source>Tab</source>
-      <translation type="unfinished">Tab</translation>
+      <translation>Pestanya</translation>
     </message>
     <message>
       <source>New Tab</source>
-      <translation type="unfinished">New Tab</translation>
+      <translation>Nova pestanya</translation>
     </message>
     <message>
       <source>Window</source>
-      <translation type="unfinished">Window</translation>
+      <translation>Finestra</translation>
     </message>
     <message>
       <source>New Window</source>
-      <translation type="unfinished">New Window</translation>
+      <translation>Nova finestra</translation>
     </message>
     <message>
       <source>User...</source>
-      <translation type="unfinished">User...</translation>
+      <translation>Usuari...</translation>
     </message>
     <message>
       <source>New User...</source>
-      <translation type="unfinished">New User...</translation>
+      <translation>Nou usuari...</translation>
     </message>
     <message>
       <source>Video Wall...</source>
-      <translation type="unfinished">Video Wall...</translation>
+      <translation>Video Wall...</translation>
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation type="unfinished">New Video Wall...</translation>
+      <translation>Nou video Wall...</translation>
     </message>
     <message>
       <source>Web Page...</source>
-      <translation type="unfinished">Web Page...</translation>
+      <translation>Pàgina web...</translation>
     </message>
     <message>
       <source>New Web Page...</source>
-      <translation type="unfinished">New Web Page...</translation>
+      <translation>Nova pàgina web...</translation>
     </message>
     <message>
       <source>New Layout...</source>
-      <translation type="unfinished">New Layout...</translation>
+      <translation>Nou Disseny...</translation>
     </message>
     <message>
       <source>Open Layout...</source>
-      <translation type="unfinished">Open Layout...</translation>
+      <translation>Disseny obert...</translation>
     </message>
     <message>
       <source>Open...</source>
-      <translation type="unfinished">Open...</translation>
+      <translation>Obrir...</translation>
     </message>
     <message>
       <source>Folder...</source>
-      <translation type="unfinished">Folder...</translation>
+      <translation>Carpeta...</translation>
     </message>
     <message>
       <source>Web Client...</source>
-      <translation type="unfinished">Web Client...</translation>
+      <translation>Client Web...</translation>
     </message>
     <message>
       <source>Open Web Client...</source>
-      <translation type="unfinished">Open Web Client...</translation>
+      <translation>Obre el client web...</translation>
     </message>
     <message>
       <source>Save Current Layout</source>
-      <translation type="unfinished">Save Current Layout</translation>
+      <translation>Desar el Disseny actual</translation>
     </message>
     <message>
       <source>Save Current Layout As...</source>
-      <translation type="unfinished">Save Current Layout As...</translation>
+      <translation>Desa el disseny actual com...</translation>
     </message>
     <message>
       <source>Save Video Wall View</source>
-      <translation type="unfinished">Save Video Wall View</translation>
+      <translation>Desar la vista del Video Wall</translation>
     </message>
     <message>
       <source>Start Screen Recording</source>
-      <translation type="unfinished">Start Screen Recording</translation>
+      <translation>Inicia la gravació de la pantalla</translation>
     </message>
     <message>
       <source>Stop Screen Recording</source>
-      <translation type="unfinished">Stop Screen Recording</translation>
+      <translation>Atura la gravació de la pantalla</translation>
     </message>
     <message>
       <source>Stop current action</source>
-      <translation type="unfinished">Stop current action</translation>
+      <translation>Aturar l’acció actual</translation>
     </message>
     <message>
       <source>Go to Fullscreen</source>
-      <translation type="unfinished">Go to Fullscreen</translation>
+      <translation>Anar a pantalla completa</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
-      <translation type="unfinished">Exit Fullscreen</translation>
+      <translation>Surtir de pantalla completa</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation type="unfinished">Minimize</translation>
+      <translation>Minimitzar</translation>
     </message>
     <message>
       <source>Maximize</source>
-      <translation type="unfinished">Maximize</translation>
+      <translation>Maximitzar</translation>
     </message>
     <message>
       <source>Restore Down</source>
-      <translation type="unfinished">Restore Down</translation>
+      <translation>Reduir</translation>
     </message>
     <message>
       <source>Open in Browser...</source>
-      <translation type="unfinished">Open in Browser...</translation>
+      <translation>Obrir al navegador...</translation>
     </message>
     <message>
       <source>System Administration...</source>
-      <translation type="unfinished">System Administration...</translation>
+      <translation>Administració del sistema...</translation>
     </message>
     <message>
       <source>System Update...</source>
-      <translation type="unfinished">System Update...</translation>
+      <translation>Actualització del sistema...</translation>
     </message>
     <message>
       <source>User Management...</source>
-      <translation type="unfinished">User Management...</translation>
+      <translation>Gestió d'Usuari...</translation>
     </message>
     <message>
       <source>Local Settings...</source>
-      <translation type="unfinished">Local Settings...</translation>
+      <translation>Configuració local...</translation>
     </message>
     <message>
       <source>Audit Trail...</source>
-      <translation type="unfinished">Audit Trail...</translation>
+      <translation>Pista d'auditoria...</translation>
     </message>
     <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
-      <translation type="unfinished">Log in to %1...</translation>
+      <translation>Iniciar sessió a %1...</translation>
     </message>
     <message>
       <source>Log out from %1</source>
       <comment>Log out from Nx Cloud</comment>
-      <translation type="unfinished">Log out from %1</translation>
+      <translation>Sortir de %1</translation>
     </message>
     <message>
       <source>Open %1 Portal...</source>
       <comment>Open Nx Cloud Portal</comment>
-      <translation type="unfinished">Open %1 Portal...</translation>
+      <translation>Obrir %1 Portal...</translation>
     </message>
     <message>
       <source>Account Settings...</source>
-      <translation type="unfinished">Account Settings...</translation>
+      <translation>Configuració del compte...</translation>
     </message>
     <message>
       <source>Create Account...</source>
-      <translation type="unfinished">Create Account...</translation>
+      <translation>Crear un compte...</translation>
     </message>
     <message>
       <source>Event Rules...</source>
-      <translation type="unfinished">Event Rules...</translation>
+      <translation>Regles dels esdeveniments...</translation>
     </message>
     <message>
       <source>Devices List</source>
-      <translation type="unfinished">Devices List</translation>
+      <translation>Llista de dispositius</translation>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation type="unfinished">Cameras List</translation>
+      <translation>Llista de càmeres</translation>
     </message>
     <message>
       <source>Merge Systems...</source>
-      <translation type="unfinished">Merge Systems...</translation>
+      <translation>Combinar sistemes...</translation>
     </message>
     <message>
       <source>About...</source>
-      <translation type="unfinished">About...</translation>
+      <translation>Sobre...</translation>
     </message>
     <message>
       <source>Exit</source>
-      <translation type="unfinished">Exit</translation>
+      <translation>Sortir</translation>
     </message>
     <message>
       <source>Mark Selection Start</source>
-      <translation type="unfinished">Mark Selection Start</translation>
+      <translation>Marca l'inici de la selecció</translation>
     </message>
     <message>
       <source>Mark Selection End</source>
-      <translation type="unfinished">Mark Selection End</translation>
+      <translation>Marca el final de la selecció</translation>
     </message>
     <message>
       <source>Clear Selection</source>
-      <translation type="unfinished">Clear Selection</translation>
+      <translation>Neteja la selecció</translation>
     </message>
     <message>
       <source>Zoom to Selection</source>
-      <translation type="unfinished">Zoom to Selection</translation>
+      <translation>Zoom a la selecció</translation>
     </message>
     <message>
       <source>Add Bookmark...</source>
-      <translation type="unfinished">Add Bookmark...</translation>
+      <translation>Afegir marcador...</translation>
     </message>
     <message>
       <source>Edit Bookmark...</source>
-      <translation type="unfinished">Edit Bookmark...</translation>
+      <translation>Editar el marcador...</translation>
     </message>
     <message>
       <source>Remove Bookmark...</source>
-      <translation type="unfinished">Remove Bookmark...</translation>
+      <translation>Eliminar el marcador...</translation>
     </message>
     <message>
       <source>Remove Bookmarks...</source>
-      <translation type="unfinished">Remove Bookmarks...</translation>
+      <translation>Eliminar els marcadors...</translation>
     </message>
     <message>
       <source>Preview Search...</source>
-      <translation type="unfinished">Preview Search...</translation>
+      <translation>Cerca de previsualització...</translation>
     </message>
     <message>
       <source>Server...</source>
-      <translation type="unfinished">Server...</translation>
+      <translation>Servidor...</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Obrir</translation>
     </message>
     <message>
       <source>Monitor</source>
-      <translation type="unfinished">Monitor</translation>
+      <translation>Monitor</translation>
     </message>
     <message>
       <source>Open in New Tab</source>
-      <translation type="unfinished">Open in New Tab</translation>
+      <translation>Obrir en una nova pestanya</translation>
     </message>
     <message>
       <source>Monitor in New Tab</source>
-      <translation type="unfinished">Monitor in New Tab</translation>
+      <translation>Monitor en una pestanya nova</translation>
     </message>
     <message>
       <source>Open in Alarm Layout</source>
-      <translation type="unfinished">Open in Alarm Layout</translation>
+      <translation>Obrir en Disseny d'alarma</translation>
     </message>
     <message>
       <source>Open in New Window</source>
-      <translation type="unfinished">Open in New Window</translation>
+      <translation>Obrir en una nova finestra</translation>
     </message>
     <message>
       <source>Monitor in New Window</source>
-      <translation type="unfinished">Monitor in New Window</translation>
+      <translation>Monitor en una finestra nova</translation>
     </message>
     <message>
       <source>Open Video Wall</source>
-      <translation type="unfinished">Open Video Wall</translation>
+      <translation>Obrir el Video Wall</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>Obrir la carpeta contenidora</translation>
     </message>
     <message>
       <source>Identify</source>
-      <translation type="unfinished">Identify</translation>
+      <translation>Identificar</translation>
     </message>
     <message>
       <source>Attach to Video Wall...</source>
-      <translation type="unfinished">Attach to Video Wall...</translation>
+      <translation>Adjunta al Video Wall...</translation>
     </message>
     <message>
       <source>Switch to Video Wall mode...</source>
-      <translation type="unfinished">Switch to Video Wall mode...</translation>
+      <translation>Canviar a mode Video Wall...</translation>
     </message>
     <message>
       <source>Save Video Wall</source>
-      <translation type="unfinished">Save Video Wall</translation>
+      <translation>Desar el Video Wall</translation>
     </message>
     <message>
       <source>Save Current Matrix</source>
-      <translation type="unfinished">Save Current Matrix</translation>
+      <translation>Desa la matriu actual</translation>
     </message>
     <message>
       <source>Load Matrix</source>
-      <translation type="unfinished">Load Matrix</translation>
+      <translation>Carregar matriu</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Eliminar</translation>
     </message>
     <message>
       <source>Stop Video Wall</source>
-      <translation type="unfinished">Stop Video Wall</translation>
+      <translation>Aturar el Video Wall</translation>
     </message>
     <message>
       <source>Clear Screen</source>
-      <translation type="unfinished">Clear Screen</translation>
+      <translation>Esborra la pantalla</translation>
     </message>
     <message>
       <source>Save Layout</source>
-      <translation type="unfinished">Save Layout</translation>
+      <translation>Desar el Disseny</translation>
     </message>
     <message>
       <source>Save Layout As...</source>
-      <translation type="unfinished">Save Layout As...</translation>
+      <translation>Desar el Disseny com a...</translation>
     </message>
     <message>
       <source>Maximize Item</source>
-      <translation type="unfinished">Maximize Item</translation>
+      <translation>Maximitzar l'element</translation>
     </message>
     <message>
       <source>Restore Item</source>
-      <translation type="unfinished">Restore Item</translation>
+      <translation>Restaurar l'element</translation>
     </message>
     <message>
       <source>Show Info</source>
-      <translation type="unfinished">Show Info</translation>
+      <translation>Mostrar la informació</translation>
     </message>
     <message>
       <source>Hide Info</source>
-      <translation type="unfinished">Hide Info</translation>
+      <translation>Amagar la informació</translation>
     </message>
     <message>
       <source>PTZ...</source>
-      <translation type="unfinished">PTZ...</translation>
+      <translation>PTZ...</translation>
     </message>
     <message>
       <source>Save Current Position...</source>
-      <translation type="unfinished">Save Current Position...</translation>
+      <translation>Desar la posició actual...</translation>
     </message>
     <message>
       <source>Manage...</source>
-      <translation type="unfinished">Manage...</translation>
+      <translation>Gestionar...</translation>
     </message>
     <message>
       <source>Show Motion/Smart Search</source>
-      <translation type="unfinished">Show Motion/Smart Search</translation>
+      <translation>Mostra el moviment / cerca intel·ligent</translation>
     </message>
     <message>
       <source>Show Motion</source>
-      <translation type="unfinished">Show Motion</translation>
+      <translation>Mostra el moviment</translation>
     </message>
     <message>
       <source>Hide Motion/Smart Search</source>
-      <translation type="unfinished">Hide Motion/Smart Search</translation>
+      <translation>Amagar la cerca de moviment / intel·ligent</translation>
     </message>
     <message>
       <source>Hide Motion</source>
-      <translation type="unfinished">Hide Motion</translation>
+      <translation>Amaga el Moviment</translation>
     </message>
     <message>
       <source>Clear Motion Selection</source>
-      <translation type="unfinished">Clear Motion Selection</translation>
+      <translation>Esborra la selecció de moviment</translation>
     </message>
     <message>
       <source>Check File Watermark</source>
-      <translation type="unfinished">Check File Watermark</translation>
+      <translation>Comprovar la marca d'aigua del fitxer</translation>
     </message>
     <message>
       <source>Image Enhancement...</source>
-      <translation type="unfinished">Image Enhancement...</translation>
+      <translation>Millora de la imatge...</translation>
     </message>
     <message>
       <source>Rotate to...</source>
-      <translation type="unfinished">Rotate to...</translation>
+      <translation>Girar a...</translation>
     </message>
     <message>
       <source>0 degrees</source>
-      <translation type="unfinished">0 degrees</translation>
+      <translation>0 graus</translation>
     </message>
     <message>
       <source>90 degrees</source>
-      <translation type="unfinished">90 degrees</translation>
+      <translation>90 graus</translation>
     </message>
     <message>
       <source>180 degrees</source>
-      <translation type="unfinished">180 degrees</translation>
+      <translation>180 graus</translation>
     </message>
     <message>
       <source>270 degrees</source>
-      <translation type="unfinished">270 degrees</translation>
+      <translation>270 graus</translation>
     </message>
     <message>
       <source>Remove from Layout</source>
-      <translation type="unfinished">Remove from Layout</translation>
+      <translation>Eliminar del disseny</translation>
     </message>
     <message>
       <source>Stop Sharing Layout</source>
-      <translation type="unfinished">Stop Sharing Layout</translation>
+      <translation>Deixar de compartir el Disseny</translation>
     </message>
     <message>
       <source>Edit...</source>
-      <translation type="unfinished">Edit...</translation>
+      <translation>Editar...</translation>
     </message>
     <message>
       <source>Rename</source>
-      <translation type="unfinished">Rename</translation>
+      <translation>Reanomenar</translation>
     </message>
     <message>
       <source>Delete from Disk</source>
-      <translation type="unfinished">Delete from Disk</translation>
+      <translation>Eliminar del disc</translation>
     </message>
     <message>
       <source>Set as Layout Background</source>
-      <translation type="unfinished">Set as Layout Background</translation>
+      <translation>Estableix com a fons del Disseny</translation>
     </message>
     <message>
       <source>User Settings...</source>
-      <translation type="unfinished">User Settings...</translation>
+      <translation>Configuració d'usuari...</translation>
     </message>
     <message>
       <source>User Roles...</source>
-      <translation type="unfinished">User Roles...</translation>
+      <translation>Funcions d'usuari...</translation>
     </message>
     <message>
       <source>Role Settings...</source>
-      <translation type="unfinished">Role Settings...</translation>
+      <translation>Configuració del les funcions...</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
-      <translation type="unfinished">Check Device Issues...</translation>
+      <translation>Comprovar els problemes del dispositiu...</translation>
     </message>
     <message>
       <source>Check Devices Issues...</source>
-      <translation type="unfinished">Check Devices Issues...</translation>
+      <translation>Comprovar els problemes del dispositiu...</translation>
     </message>
     <message>
       <source>Check Camera Issues...</source>
-      <translation type="unfinished">Check Camera Issues...</translation>
+      <translation>Comprovar els problemes de la càmera...</translation>
     </message>
     <message>
       <source>Check Cameras Issues...</source>
-      <translation type="unfinished">Check Cameras Issues...</translation>
+      <translation>Comprovar els problemes de les càmeres...</translation>
     </message>
     <message>
       <source>Check I/O Module Issues...</source>
-      <translation type="unfinished">Check I/O Module Issues...</translation>
+      <translation>Comprovar els problemes del mòdul de I/O...</translation>
     </message>
     <message>
       <source>Check I/O Modules Issues...</source>
-      <translation type="unfinished">Check I/O Modules Issues...</translation>
+      <translation>Comprovar els problemes dels mòduls de I/O...</translation>
     </message>
     <message>
       <source>Device Rules...</source>
-      <translation type="unfinished">Device Rules...</translation>
+      <translation>Regles del dispositiu...</translation>
     </message>
     <message>
       <source>Devices Rules...</source>
-      <translation type="unfinished">Devices Rules...</translation>
+      <translation>Regles del dispositius...</translation>
     </message>
     <message>
       <source>Camera Rules...</source>
-      <translation type="unfinished">Camera Rules...</translation>
+      <translation>Regles de les càmeres...</translation>
     </message>
     <message>
       <source>Cameras Rules...</source>
-      <translation type="unfinished">Cameras Rules...</translation>
+      <translation>Regles de les càmeres...</translation>
     </message>
     <message>
       <source>I/O Module Rules...</source>
-      <translation type="unfinished">I/O Module Rules...</translation>
+      <translation>Regles del mòdul de I/O...</translation>
     </message>
     <message>
       <source>I/O Modules Rules...</source>
-      <translation type="unfinished">I/O Modules Rules...</translation>
+      <translation>Regles dels mòduls de I/O...</translation>
     </message>
     <message>
       <source>Device Settings...</source>
-      <translation type="unfinished">Device Settings...</translation>
+      <translation>Configuració del dispositiu...</translation>
     </message>
     <message>
       <source>Devices Settings...</source>
-      <translation type="unfinished">Devices Settings...</translation>
+      <translation>Configuració dels dispositius...</translation>
     </message>
     <message>
       <source>Camera Settings...</source>
-      <translation type="unfinished">Camera Settings...</translation>
+      <translation>Configuració de la càmera...</translation>
     </message>
     <message>
       <source>Cameras Settings...</source>
-      <translation type="unfinished">Cameras Settings...</translation>
+      <translation>Configuració de les càmeres...</translation>
     </message>
     <message>
       <source>I/O Module Settings...</source>
-      <translation type="unfinished">I/O Module Settings...</translation>
+      <translation>Configuració del mòdul de I/O...</translation>
     </message>
     <message>
       <source>I/O Modules Settings...</source>
-      <translation type="unfinished">I/O Modules Settings...</translation>
+      <translation>Configuració dels mòduls de I/O...</translation>
     </message>
     <message>
       <source>File Settings...</source>
-      <translation type="unfinished">File Settings...</translation>
+      <translation>Configuració del fitxer...</translation>
     </message>
     <message>
       <source>Layout Settings...</source>
-      <translation type="unfinished">Layout Settings...</translation>
+      <translation>Configuració del disseny...</translation>
     </message>
     <message>
       <source>Video Wall Settings...</source>
-      <translation type="unfinished">Video Wall Settings...</translation>
+      <translation>Configuració del Video Wall...</translation>
     </message>
     <message>
       <source>Add Device...</source>
-      <translation type="unfinished">Add Device...</translation>
+      <translation>Afegir un dispositiu...</translation>
     </message>
     <message>
       <source>Devices List by Server...</source>
-      <translation type="unfinished">Devices List by Server...</translation>
+      <translation>Llista de dispositius per servidor...</translation>
     </message>
     <message>
       <source>Cameras List by Server...</source>
-      <translation type="unfinished">Cameras List by Server...</translation>
+      <translation>Llista de càmeres per servidor...</translation>
     </message>
     <message>
       <source>Server Logs...</source>
-      <translation type="unfinished">Server Logs...</translation>
+      <translation>Registres del servidor...</translation>
     </message>
     <message>
       <source>Server Diagnostics...</source>
-      <translation type="unfinished">Server Diagnostics...</translation>
+      <translation>Diagnòstic del servidor...</translation>
     </message>
     <message>
       <source>Server Web Page...</source>
-      <translation type="unfinished">Server Web Page...</translation>
+      <translation>Pàgina web del servidor...</translation>
     </message>
     <message>
       <source>Server Settings...</source>
-      <translation type="unfinished">Server Settings...</translation>
+      <translation>Configuració del servidor...</translation>
     </message>
     <message>
       <source>Merge to Currently Connected System...</source>
-      <translation type="unfinished">Merge to Currently Connected System...</translation>
+      <translation>Combinar amb el sistema actualment connectat...</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Cap</translation>
     </message>
     <message>
       <source>Small</source>
-      <translation type="unfinished">Small</translation>
+      <translation>Petit</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Mitja</translation>
     </message>
     <message>
       <source>Large</source>
-      <translation type="unfinished">Large</translation>
+      <translation>Gran</translation>
     </message>
     <message>
       <source>Settings</source>
-      <translation type="unfinished">Settings</translation>
+      <translation>Configuració</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Tancar</translation>
     </message>
     <message>
       <source>Close All But This</source>
-      <translation type="unfinished">Close All But This</translation>
+      <translation>Tancar tot menys això</translation>
     </message>
     <message>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>Reproduir</translation>
     </message>
     <message>
       <source>Pause</source>
-      <translation type="unfinished">Pause</translation>
+      <translation>Pausar</translation>
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation type="unfinished">Previous Frame</translation>
+      <translation>Fotograma anterior</translation>
     </message>
     <message>
       <source>Next Frame</source>
-      <translation type="unfinished">Next Frame</translation>
+      <translation>Fotograma següent</translation>
     </message>
     <message>
       <source>To Start</source>
-      <translation type="unfinished">To Start</translation>
+      <translation>Al Inici</translation>
     </message>
     <message>
       <source>To End</source>
-      <translation type="unfinished">To End</translation>
+      <translation>Al Final</translation>
     </message>
     <message>
       <source>Volume Down</source>
-      <translation type="unfinished">Volume Down</translation>
+      <translation>Abaixar el volum</translation>
     </message>
     <message>
       <source>Volume Up</source>
-      <translation type="unfinished">Volume Up</translation>
+      <translation>Apujar el volum</translation>
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Activar el silenci</translation>
     </message>
     <message>
       <source>Jump to Live</source>
-      <translation type="unfinished">Jump to Live</translation>
+      <translation>Saltar al Directe</translation>
     </message>
     <message>
       <source>Synchronize Streams</source>
-      <translation type="unfinished">Synchronize Streams</translation>
+      <translation>Sincronitzar els fluxos de vídeo</translation>
     </message>
     <message>
       <source>Disable Stream Synchronization</source>
-      <translation type="unfinished">Disable Stream Synchronization</translation>
+      <translation>Desactivar la sincronització de fluxes de Vídeo</translation>
     </message>
     <message>
       <source>Show Bookmarks</source>
-      <translation type="unfinished">Show Bookmarks</translation>
+      <translation>Mostrar els marcadors</translation>
     </message>
     <message>
       <source>Hide Bookmarks</source>
-      <translation type="unfinished">Hide Bookmarks</translation>
+      <translation>Amagar els Marcadors</translation>
     </message>
     <message>
       <source>Show Calendar</source>
-      <translation type="unfinished">Show Calendar</translation>
+      <translation>Mostrar el calendari</translation>
     </message>
     <message>
       <source>Hide Calendar</source>
-      <translation type="unfinished">Hide Calendar</translation>
+      <translation>Amagar el calendari</translation>
     </message>
     <message>
       <source>Show Title Bar</source>
-      <translation type="unfinished">Show Title Bar</translation>
+      <translation>Mostrar la barra de títols</translation>
     </message>
     <message>
       <source>Hide Title Bar</source>
-      <translation type="unfinished">Hide Title Bar</translation>
+      <translation>Amagar la barra de títols</translation>
     </message>
     <message>
       <source>Pin Tree</source>
-      <translation type="unfinished">Pin Tree</translation>
+      <translation>Ancorar l'arbre</translation>
     </message>
     <message>
       <source>Unpin Tree</source>
-      <translation type="unfinished">Unpin Tree</translation>
+      <translation>Desancorar l'arbre</translation>
     </message>
     <message>
       <source>Show Timeline</source>
-      <translation type="unfinished">Show Timeline</translation>
+      <translation>Mostrar a la cronologia</translation>
     </message>
     <message>
       <source>Hide Timeline</source>
-      <translation type="unfinished">Hide Timeline</translation>
+      <translation>Amagar la línia de temps</translation>
     </message>
     <message>
       <source>Bookmark Log...</source>
-      <translation type="unfinished">Bookmark Log...</translation>
+      <translation>Registre del marcador...</translation>
     </message>
     <message>
       <source>Showreel...</source>
-      <translation type="unfinished">Showreel...</translation>
+      <translation>Showreel...</translation>
     </message>
     <message>
       <source>New Showreel...</source>
-      <translation type="unfinished">New Showreel...</translation>
+      <translation>Showreel nou...</translation>
     </message>
     <message>
       <source>Remove from Showreel</source>
-      <translation type="unfinished">Remove from Showreel</translation>
+      <translation>Elimina del Showreel</translation>
     </message>
     <message>
       <source>Make Showreel</source>
-      <translation type="unfinished">Make Showreel</translation>
+      <translation>Fer un Showreel</translation>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Carregar un fitxer...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Carregar una carpeta...</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation type="unfinished">Some cameras require passwords to be set</translation>
+      <translation>Algunes càmeres necessiten que es defineixin contrasenyes</translation>
     </message>
     <message>
       <source>Export Video...</source>
-      <translation type="unfinished">Export Video...</translation>
+      <translation>Exportar vídeo...</translation>
     </message>
     <message>
       <source>Export Bookmark...</source>
-      <translation type="unfinished">Export Bookmark...</translation>
+      <translation>Exportar marcador...</translation>
     </message>
     <message>
       <source>Resolution...</source>
-      <translation type="unfinished">Resolution...</translation>
+      <translation>Resolució...</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio...</source>
@@ -1012,96 +1012,96 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>License is inactive.</source>
-      <translation type="unfinished">License is inactive.</translation>
+      <translation>La llicència està inactiva.</translation>
     </message>
     <message>
       <source>Invalid license.</source>
-      <translation type="unfinished">Invalid license.</translation>
+      <translation>Llicència invalida.</translation>
     </message>
     <message>
       <source>License is trial.</source>
-      <translation type="unfinished">License is trial.</translation>
+      <translation>La llicència és de prova.</translation>
     </message>
     <message>
       <source>License is in pending deactivation state, but has not been deactivated yet.</source>
-      <translation type="unfinished">License is in pending deactivation state, but has not been deactivated yet.</translation>
+      <translation>La llicència està en estat pendent de desactivació, però encara no s'ha desactivat.</translation>
     </message>
     <message>
       <source>Number of deactivations exceeded limit for this license.</source>
-      <translation type="unfinished">Number of deactivations exceeded limit for this license.</translation>
+      <translation>El nombre de desactivacions ha superat el límit d'aquesta llicència.</translation>
     </message>
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
-      <translation type="unfinished">Hardware ID of Server with this license does not match Hardware ID on which license was activated.</translation>
+      <translation>L'ID del Hardware del servidor amb aquesta llicència no coincideix amb l'ID del hardware en el qual es va activar la llicència.</translation>
     </message>
   </context>
   <context>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation type="unfinished">Please enter a valid password</translation>
+      <translation>Si us plau, introduïu una contrasenya valida</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
-      <translation type="unfinished">The password is not valid.</translation>
+      <translation>La contrasenya no és vàlida.</translation>
     </message>
     <message>
       <source>Encrypted layout</source>
-      <translation type="unfinished">Encrypted layout</translation>
+      <translation>Disseny xifrat</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation type="unfinished">The file %1 is encrypted. Please enter the password:</translation>
+      <translation>El fitxer %1 està xifrat. Si us plau, introduïu la contrasenya:</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
-      <translation type="unfinished">Please re-enter password for layout %1:</translation>
+      <translation>Torneu a introduir la contrasenya per al disseny %1:</translation>
     </message>
   </context>
   <context>
     <name>EventSearchWidget::Private</name>
     <message>
       <source>Server events</source>
-      <translation type="unfinished">Server events</translation>
+      <translation>Esdeveniments del servidor</translation>
     </message>
     <message>
       <source>Analytics events</source>
-      <translation type="unfinished">Analytics events</translation>
+      <translation>Esdeveniments d'analítica</translation>
     </message>
     <message>
       <source>Any event</source>
-      <translation type="unfinished">Any event</translation>
+      <translation>Qualsevol esdeveniment</translation>
     </message>
     <message>
       <source>Any device issue</source>
-      <translation type="unfinished">Any device issue</translation>
+      <translation>Qualsevol problema del dispositiu</translation>
     </message>
     <message>
       <source>Any camera issue</source>
-      <translation type="unfinished">Any camera issue</translation>
+      <translation>Qualsevol problema de la càmera</translation>
     </message>
     <message>
       <source>Any server event</source>
-      <translation type="unfinished">Any server event</translation>
+      <translation>Qualsevol esdeveniment del servidor</translation>
     </message>
     <message>
       <source>Device issues</source>
-      <translation type="unfinished">Device issues</translation>
+      <translation>Problemes del dispositiu</translation>
     </message>
     <message>
       <source>Camera issues</source>
-      <translation type="unfinished">Camera issues</translation>
+      <translation>Problemes de la càmera</translation>
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation type="unfinished">Any analytics event</translation>
+      <translation>Qualsevol Esdeveniment d'analítica</translation>
     </message>
   </context>
   <context>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Seleccionar disseny...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
@@ -1115,61 +1115,61 @@ per veure més marcadors</translation>
     <name>FileExtensions</name>
     <message>
       <source>Pictures</source>
-      <translation type="unfinished">Pictures</translation>
+      <translation>Imatges</translation>
     </message>
     <message>
       <source>Video</source>
-      <translation type="unfinished">Video</translation>
+      <translation>Vídeo</translation>
     </message>
     <message>
       <source>All Files</source>
-      <translation type="unfinished">All Files</translation>
+      <translation>Tots els arxius</translation>
     </message>
   </context>
   <context>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation type="unfinished">Audio Video Interleave</translation>
+      <translation>Entrellaçar Audio i Video</translation>
     </message>
     <message>
       <source>Matroska</source>
-      <translation type="unfinished">Matroska</translation>
+      <translation>Matroska</translation>
     </message>
     <message>
       <source>MPEG-4 Part 14</source>
-      <translation type="unfinished">MPEG-4 Part 14</translation>
+      <translation>MPEG-4 Part 14</translation>
     </message>
     <message>
       <source>%1 Media File</source>
-      <translation type="unfinished">%1 Media File</translation>
+      <translation>%1 Fitxer multimèdia</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x64)</source>
-      <translation type="unfinished">Executable %1 Media File (x64)</translation>
+      <translation>Fitxer multimèdia %1 executable (x64)</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x86)</source>
-      <translation type="unfinished">Executable %1 Media File (x86)</translation>
+      <translation>Fitxer multimèdia %1 executable (x86)</translation>
     </message>
   </context>
   <context>
     <name>FullscreenActionHelper</name>
     <message>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>Càmera d'origen</translation>
     </message>
     <message>
       <source>Select device...</source>
-      <translation type="unfinished">Select device...</translation>
+      <translation>Selecionar un dispositiu...</translation>
     </message>
     <message>
       <source>Select camera...</source>
-      <translation type="unfinished">Select camera...</translation>
+      <translation>Seleccionar una càmera...</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Seleccionar un Disseny...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
@@ -1181,62 +1181,62 @@ per veure més marcadors</translation>
     <message>
       <source>%1 on %2</source>
       <comment>Camera %1 on layout %2</comment>
-      <translation type="unfinished">%1 on %2</translation>
+      <translation>%1 sobre %2</translation>
     </message>
   </context>
   <context>
     <name>GraphicsScrollBar</name>
     <message>
       <source>Scroll Here</source>
-      <translation type="unfinished">Scroll Here</translation>
+      <translation>Desplaça't aquí</translation>
     </message>
     <message>
       <source>Left Edge</source>
-      <translation type="unfinished">Left Edge</translation>
+      <translation>Vora esquerra</translation>
     </message>
     <message>
       <source>Top</source>
-      <translation type="unfinished">Top</translation>
+      <translation>Part superior</translation>
     </message>
     <message>
       <source>Right Edge</source>
-      <translation type="unfinished">Right Edge</translation>
+      <translation>Vora dreta</translation>
     </message>
     <message>
       <source>Bottom</source>
-      <translation type="unfinished">Bottom</translation>
+      <translation>Part inferior</translation>
     </message>
     <message>
       <source>Page Left</source>
-      <translation type="unfinished">Page Left</translation>
+      <translation>Pàgina esquerra</translation>
     </message>
     <message>
       <source>Page Up</source>
-      <translation type="unfinished">Page Up</translation>
+      <translation>Pàgina amunt</translation>
     </message>
     <message>
       <source>Page Right</source>
-      <translation type="unfinished">Page Right</translation>
+      <translation>Pàgina dreta</translation>
     </message>
     <message>
       <source>Page Down</source>
-      <translation type="unfinished">Page Down</translation>
+      <translation>Pàgina avall</translation>
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation type="unfinished">Scroll Left</translation>
+      <translation>Desplaçar cap a l’esquerra</translation>
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation type="unfinished">Scroll Up</translation>
+      <translation>Desplaçar cap amunt</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation type="unfinished">Scroll Right</translation>
+      <translation>Desplaçar cap a la dreta</translation>
     </message>
     <message>
       <source>Scroll Down</source>
-      <translation type="unfinished">Scroll Down</translation>
+      <translation>Desplaçar cap avall</translation>
     </message>
   </context>
   <context>
@@ -1667,11 +1667,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>%1 version %2 (%3).</source>
-      <translation type="unfinished">%1 version %2 (%3).</translation>
+      <translation>%1 versió %2 (%3).</translation>
     </message>
     <message>
       <source>Built for %1-%2 with %3.</source>
-      <translation type="unfinished">Built for %1-%2 with %3.</translation>
+      <translation>Construït per %1%2 amb %3.</translation>
     </message>
     <message>
       <source>Regional / License support</source>
@@ -1682,18 +1682,18 @@ per veure més marcadors</translation>
     <name>QnAbstractPtzDialog</name>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Carregant...</translation>
     </message>
     <message>
       <source>Saving...</source>
-      <translation type="unfinished">Saving...</translation>
+      <translation>Desant...</translation>
     </message>
   </context>
   <context>
     <name>QnAccessibleResourcesModel</name>
     <message>
       <source>Access granted by:</source>
-      <translation type="unfinished">Access granted by:</translation>
+      <translation>Accés concedit per:</translation>
     </message>
     <message numerus="yes">
       <source>...and %n more</source>
@@ -1707,37 +1707,37 @@ per veure més marcadors</translation>
     <name>QnAccessibleResourcesWidget</name>
     <message>
       <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
-      <translation type="unfinished">Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</translation>
+      <translation>En donar accés a alguns dissenys, li dóna accés a totes les cámeres en ells. A més, l'usuari tindrà accés a totes les càmeres noves en aquests dissenys.</translation>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation type="unfinished">All Cameras &amp; Resources</translation>
+      <translation>Totes les càmeres i recursos</translation>
     </message>
   </context>
   <context>
     <name>QnAdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
-      <translation type="unfinished">Image Enhancement</translation>
+      <translation>Millora de la imatge</translation>
     </message>
     <message>
       <source>Image Enhancement - %1</source>
-      <translation type="unfinished">Image Enhancement - %1</translation>
+      <translation>Millora de la imatge - %1</translation>
     </message>
   </context>
   <context>
     <name>QnAdvancedSettingsWidget</name>
     <message>
       <source>Folder not found</source>
-      <translation type="unfinished">Folder not found</translation>
+      <translation>No s'ha trobat la carpeta</translation>
     </message>
     <message>
       <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
-      <translation type="unfinished">Helps avoid problems with OpenGL drawing which result in 100% CPU load.</translation>
+      <translation>Ajuda a evitar problemes amb el dibuix de OpenGL que resulten en un 100% de càrrega de CPU.</translation>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation type="unfinished">Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</translation>
+      <translation>Ajustar al valor més petit que no degrada la vista en viu. Un búfer més gran fa que la reproducció sigui més fluida però augmenta el retard entre el temps real i la visualització en viu; un búfer més petit disminueix el retard però pot causar quequejos.</translation>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
@@ -1748,128 +1748,128 @@ per veure més marcadors</translation>
     <name>QnAuditItemDelegate</name>
     <message>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>Reproduir</translation>
     </message>
     <message>
       <source>User settings...</source>
-      <translation type="unfinished">User settings...</translation>
+      <translation>Configuració d'usuari...</translation>
     </message>
     <message>
       <source>Server settings...</source>
-      <translation type="unfinished">Server settings...</translation>
+      <translation>Configuració del servidor...</translation>
     </message>
     <message>
       <source>Camera settings...</source>
-      <translation type="unfinished">Camera settings...</translation>
+      <translation>Configuració de la càmera...</translation>
     </message>
   </context>
   <context>
     <name>QnAuditLogDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Copiar la selecció al porta-retalls</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation type="unfinished">Export Selection to File...</translation>
+      <translation>Exportar la selecció al fitxer...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Seleccionar-ho tot</translation>
     </message>
     <message>
       <source>Export selected records to a file</source>
-      <translation type="unfinished">Export selected records to a file</translation>
+      <translation>Exportar els registres seleccionats a un fitxer</translation>
     </message>
     <message>
       <source>Devices</source>
-      <translation type="unfinished">Devices</translation>
+      <translation>Dispositius</translation>
     </message>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Càmeres</translation>
     </message>
     <message>
       <source>Device actions</source>
-      <translation type="unfinished">Device actions</translation>
+      <translation>Accions del dispositiu</translation>
     </message>
     <message>
       <source>Camera actions</source>
-      <translation type="unfinished">Camera actions</translation>
+      <translation>Accions de la càmera</translation>
     </message>
     <message>
       <source>No sessions</source>
-      <translation type="unfinished">No sessions</translation>
+      <translation>No hi ha sessions</translation>
     </message>
     <message>
       <source>No cameras</source>
-      <translation type="unfinished">No cameras</translation>
+      <translation>Sense càmeres</translation>
     </message>
     <message>
       <source>Select sessions to see their details</source>
-      <translation type="unfinished">Select sessions to see their details</translation>
+      <translation>Seleccioneu sessions per veure els seus detalls</translation>
     </message>
     <message>
       <source>Select cameras to see their details</source>
-      <translation type="unfinished">Select cameras to see their details</translation>
+      <translation>Seleccioneu càmeres per veure els seus detalls</translation>
     </message>
     <message>
       <source>No archive for this position</source>
-      <translation type="unfinished">No archive for this position</translation>
+      <translation>No hi ha arxiu per a aquesta posició</translation>
     </message>
     <message numerus="yes">
       <source>These devices are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These devices are removed from System</numerusform>
-        <numerusform>These devices are removed from System</numerusform>
+      <translation>
+        <numerusform>Aquests dispositius son eliminats del sistema</numerusform>
+        <numerusform>Aquests dispositius s'eliminen del sistema</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These cameras are removed from System</numerusform>
-        <numerusform>These cameras are removed from System</numerusform>
+      <translation>
+        <numerusform>Aquestes càmeres s'eliminen del sistema</numerusform>
+        <numerusform>Aquestes càmeres s'eliminen del sistema</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These servers are removed from System</numerusform>
-        <numerusform>These servers are removed from System</numerusform>
+      <translation>
+        <numerusform>Aquests servidors s'eliminen del sistema</numerusform>
+        <numerusform>Aquests servidors s'eliminen del sistema</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These users are removed from System</numerusform>
-        <numerusform>These users are removed from System</numerusform>
+      <translation>
+        <numerusform>Aquests usuaris s'eliminen del sistema</numerusform>
+        <numerusform>Aquests usuaris s'eliminen del sistema</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from System</source>
-      <translation type="unfinished">
-        <numerusform>These resources are removed from System</numerusform>
-        <numerusform>These resources are removed from System</numerusform>
+      <translation>
+        <numerusform>Aquests recursos s'eliminen del sistema</numerusform>
+        <numerusform>Aquests recursos s'eliminen del sistema</numerusform>
       </translation>
     </message>
     <message>
       <source>Audit trail replay</source>
-      <translation type="unfinished">Audit trail replay</translation>
+      <translation>Reproducció de pistes d'auditoria</translation>
     </message>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n sessions of %1</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
+      <translation>
+        <numerusform>Detalls per a %n sessions de %1</numerusform>
+        <numerusform>Detalls per a %n sessions de %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Details for %n cameras of %1</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>Detalls per a %n càmeres de %1</numerusform>
+        <numerusform>Detalls per a %n càmeres de %1</numerusform>
       </translation>
     </message>
   </context>
@@ -1877,51 +1877,51 @@ per veure més marcadors</translation>
     <name>QnAuditLogModel</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Desconegut</translation>
     </message>
     <message>
       <source>Unsuccessful login</source>
-      <translation type="unfinished">Unsuccessful login</translation>
+      <translation>Inici de sessió fallit</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Iniciar sessió</translation>
     </message>
     <message>
       <source>User updated</source>
-      <translation type="unfinished">User updated</translation>
+      <translation>S'ha actualitzat l'usuari</translation>
     </message>
     <message>
       <source>Watching live</source>
-      <translation type="unfinished">Watching live</translation>
+      <translation>Veient el directe</translation>
     </message>
     <message>
       <source>Watching archive</source>
-      <translation type="unfinished">Watching archive</translation>
+      <translation>Arxiu de visualització</translation>
     </message>
     <message>
       <source>Exporting video</source>
-      <translation type="unfinished">Exporting video</translation>
+      <translation>S'està exportant el vídeo</translation>
     </message>
     <message>
       <source>System name changed</source>
-      <translation type="unfinished">System name changed</translation>
+      <translation>El nom del sistema ha canviat</translation>
     </message>
     <message>
       <source>System merge</source>
-      <translation type="unfinished">System merge</translation>
+      <translation>Combinació del sistema</translation>
     </message>
     <message>
       <source>General settings updated</source>
-      <translation type="unfinished">General settings updated</translation>
+      <translation>S'ha actualitzat la configuració general</translation>
     </message>
     <message>
       <source>Server updated</source>
-      <translation type="unfinished">Server updated</translation>
+      <translation>Servidor actualitzat</translation>
     </message>
     <message>
       <source>Server removed</source>
-      <translation type="unfinished">Server removed</translation>
+      <translation>Servidor eliminat</translation>
     </message>
     <message>
       <source>User removed</source>
