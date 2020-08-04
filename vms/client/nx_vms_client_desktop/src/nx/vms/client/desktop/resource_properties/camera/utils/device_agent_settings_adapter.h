@@ -25,6 +25,11 @@ public:
     void applySettings();
 
     /**
+     * Refresh all analytics settings for the selected camera in case they were changed externally.
+     */
+    void refreshSettings();
+
+    /**
      * Actual data for the currently selected camera.
      */
     std::unordered_map<QnUuid, DeviceAgentData> dataByEngineId() const;

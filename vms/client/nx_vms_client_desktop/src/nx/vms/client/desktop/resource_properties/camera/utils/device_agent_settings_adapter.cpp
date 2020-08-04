@@ -95,6 +95,20 @@ void DeviceAgentSettingsAdapter::applySettings()
     d->settingsManager->applyChanges(valuesToSet);
 }
 
+void DeviceAgentSettingsAdapter::refreshSettings()
+{
+    if (!d->settingsManager)
+        return;
+
+    if (!d->camera)
+        return;
+
+    const QnUuid& cameraId = d->camera->getId();
+    QSet<QnUuid> enabledEngines = d->store->state().analytics.enabledEngines.get();
+    for (const QnUuid& engineId: enabledEngines)
+        d->settingsManager->refreshSettings(DeviceAgentId{cameraId, engineId});
+}
+
 std::unordered_map<QnUuid, DeviceAgentData> DeviceAgentSettingsAdapter::dataByEngineId() const
 {
     std::unordered_map<QnUuid, DeviceAgentData> result;

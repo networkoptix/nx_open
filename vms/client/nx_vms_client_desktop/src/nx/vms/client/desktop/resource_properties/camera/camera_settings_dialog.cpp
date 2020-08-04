@@ -80,7 +80,7 @@ struct CameraSettingsDialog::Private: public QObject
     QPointer<QnCamLicenseUsageHelper> licenseUsageHelper;
     QSharedPointer<CameraThumbnailManager> previewManager;
     QPointer<CameraAdvancedSettingsWidget> advancedSettingsWidget;
-    QPointer<DeviceAgentSettingsAdapter> deviceAgentSettingsAdaptor;
+    QPointer<DeviceAgentSettingsAdapter> deviceAgentSettingsAdapter;
     QPointer<FisheyePreviewController> fisheyePreviewController;
 
     Private(CameraSettingsDialog* q): q(q)
@@ -166,7 +166,7 @@ struct CameraSettingsDialog::Private: public QObject
             }
         }
 
-        deviceAgentSettingsAdaptor->applySettings();
+        deviceAgentSettingsAdapter->applySettings();
 
         const auto& state = store->state();
 
@@ -201,7 +201,7 @@ struct CameraSettingsDialog::Private: public QObject
 
         store->loadCameras(
             cameras,
-            deviceAgentSettingsAdaptor,
+            deviceAgentSettingsAdapter,
             analyticsEnginesWatcher);
 
         handleCamerasChanged();
@@ -307,7 +307,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
     d->previewManager->setThumbnailSize(QSize(0, 0));
     d->previewManager->setAutoRefresh(false);
 
-    d->deviceAgentSettingsAdaptor = new DeviceAgentSettingsAdapter(d->store, this);
+    d->deviceAgentSettingsAdapter = new DeviceAgentSettingsAdapter(d->store, this);
 
     d->fisheyePreviewController = new FisheyePreviewController(this);
 
@@ -498,7 +498,7 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     // All correctly implemented watchers are going before 'resetChanges' as their 'setCamera'
     // method is clean and does not send anything to the store.
     d->analyticsEnginesWatcher->setCamera(singleCamera);
-    d->deviceAgentSettingsAdaptor->setCamera(singleCamera);
+    d->deviceAgentSettingsAdapter->setCamera(singleCamera);
     d->resetChanges();
 
     // These watchers can modify store during 'setCamera' call.
@@ -529,6 +529,7 @@ void CameraSettingsDialog::showEvent(QShowEvent* event)
 {
     // Load state into tabs in case the state was changed outside current client process.
     d->resetChanges();
+    d->deviceAgentSettingsAdapter->refreshSettings();
 
     base_type::showEvent(event);
     d->previewManager->refreshSelectedCamera();
