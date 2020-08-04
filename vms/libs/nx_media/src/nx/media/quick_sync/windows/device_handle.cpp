@@ -74,6 +74,7 @@ namespace nx::media::quick_sync::windows {
 
 bool DeviceHandle::createDevice(int width, int height, mfxU32 adapterNumber)
 {
+    NX_DEBUG(this, "Create directx device, resolution: %1x%2", width, height);
     m_hWnd = CreateDxWindow(width, height);
 
     D3DPRESENT_PARAMETERS d3dpp;

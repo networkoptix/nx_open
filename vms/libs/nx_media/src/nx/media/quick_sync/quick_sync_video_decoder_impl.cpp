@@ -278,7 +278,7 @@ int QuickSyncVideoDecoderImpl::decode(
             return 0;
         }
 
-        QSize size = getFrameSize(frame);
+        QSize size = getFrameSize(frame, true);
         if (!size.isValid())
         {
             NX_ERROR(this, "Failed to init quick sync video decoder, frame size unknown");

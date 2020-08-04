@@ -193,8 +193,9 @@ bool Renderer::registerTexture(GLuint textureId, QOpenGLContext* context)
 bool Renderer::render(
     mfxFrameSurface1* mfxSurface, bool isNewTexture, GLuint textureId, QOpenGLContext* context)
 {
-    if (isNewTexture)
+    if (isNewTexture || !m_textureHandle)
     {
+        NX_DEBUG(this, "Register new texture: %1", textureId);
         unregisterTexture();
         if (!registerTexture(textureId, context))
             return false;

@@ -9,9 +9,9 @@
 namespace nx {
 namespace media {
 
-QSize getFrameSize(const QnConstCompressedVideoDataPtr& frame)
+QSize getFrameSize(const QnConstCompressedVideoDataPtr& frame, bool ignoreFrameInfo)
 {
-    if (frame->width > 0 && frame->height > 0)
+    if (!ignoreFrameInfo && frame->width > 0 && frame->height > 0)
         return QSize(frame->width, frame->height);
 
     switch (frame->compressionType)
