@@ -13,7 +13,7 @@ class QnLayoutManager: public AbstractLayoutManager
 public:
     QnLayoutManager(
         QueryProcessorType* const queryProcessor,
-        const Qn::UserAccessData& userAccessData);
+        const Qn::UserSession& userSession);
 
     virtual int getLayouts(impl::GetLayoutsHandlerPtr handler) override;
     virtual int save(
@@ -23,15 +23,16 @@ public:
 
 private:
     QueryProcessorType* const m_queryProcessor;
-    Qn::UserAccessData m_userAccessData;
+    Qn::UserSession m_userSession;
 };
 
 template<typename QueryProcessorType>
 QnLayoutManager<QueryProcessorType>::QnLayoutManager(
     QueryProcessorType* const queryProcessor,
-    const Qn::UserAccessData& userAccessData)
-    : m_queryProcessor(queryProcessor),
-    m_userAccessData(userAccessData)
+    const Qn::UserSession& userSession)
+    :
+    m_queryProcessor(queryProcessor),
+    m_userSession(userSession)
 {
 }
 
@@ -46,7 +47,7 @@ int QnLayoutManager<QueryProcessorType>::getLayouts(impl::GetLayoutsHandlerPtr h
         {
             handler->done(reqID, errorCode, layouts);
         };
-    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<const QnUuid&,
+    m_queryProcessor->getAccess(m_userSession).template processQueryAsync<const QnUuid&,
         nx::vms::api::LayoutDataList, decltype(queryDoneHandler)>(
         ApiCommand::getLayouts,
         QnUuid(),
@@ -60,7 +61,7 @@ int QnLayoutManager<QueryProcessorType>::save(
     impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::saveLayout,
         layout,
         [handler, reqID](ec2::ErrorCode errorCode)
@@ -74,7 +75,7 @@ template<class QueryProcessorType>
 int QnLayoutManager<QueryProcessorType>::remove(const QnUuid& id, impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::removeLayout,
         nx::vms::api::IdData(id),
         [handler, reqID](ec2::ErrorCode errorCode)

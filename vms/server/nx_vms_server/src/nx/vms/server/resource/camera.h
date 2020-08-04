@@ -238,6 +238,18 @@ public:
     bool hasArchiveRotated() const;
 
     virtual MotionStreamIndex motionStreamIndex() const override;
+
+    /*
+     * Set a custom camera manager to save/modify resource.
+     */
+    using CameraManagerFactory = nx::utils::MoveOnlyFunc<ec2::AbstractCameraManagerPtr(const QnSecurityCamResource*)>;
+    void setCameraManagerFactory(CameraManagerFactory factory);
+
+    /*
+     * @return custom camera manager if it is set, or default camera manger with system access level by default.
+    */
+    ec2::AbstractCameraManagerPtr cameraManager();
+
 signals:
     /** Emit on camera or IO module input change. */
     void inputPortStateChanged(
@@ -318,6 +330,7 @@ private:
     std::map<QString, QnIOStateData> m_ioPortStatesCache;
     Role m_role = Role::regular;
     std::shared_ptr<Metrics> m_metrics;
+    CameraManagerFactory m_cameraManagerfactory;
 };
 
 } // namespace nx::vms::server::resource

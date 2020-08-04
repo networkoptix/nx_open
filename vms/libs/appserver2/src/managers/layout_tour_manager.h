@@ -12,7 +12,7 @@ template<class QueryProcessorType>
 class QnLayoutTourManager: public AbstractLayoutTourManager
 {
 public:
-    QnLayoutTourManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData);
+    QnLayoutTourManager(QueryProcessorType* const queryProcessor, const Qn::UserSession& userSession);
 
     virtual int getLayoutTours(impl::GetLayoutToursHandlerPtr handler) override;
     virtual int save(
@@ -22,16 +22,16 @@ public:
 
 private:
     QueryProcessorType* const m_queryProcessor;
-    Qn::UserAccessData m_userAccessData;
+    Qn::UserSession m_userSession;
 };
 
 template<typename QueryProcessorType>
 QnLayoutTourManager<QueryProcessorType>::QnLayoutTourManager(
     QueryProcessorType* const queryProcessor,
-    const Qn::UserAccessData &userAccessData)
+    const Qn::UserSession& userSession)
     :
     m_queryProcessor(queryProcessor),
-    m_userAccessData(userAccessData)
+    m_userSession(userSession)
 {
 }
 
@@ -44,7 +44,7 @@ int QnLayoutTourManager<QueryProcessorType>::getLayoutTours(impl::GetLayoutTours
         {
             handler->done(reqID, errorCode, tours);
         };
-    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync
+    m_queryProcessor->getAccess(m_userSession).template processQueryAsync
         <const QnUuid&, nx::vms::api::LayoutTourDataList, decltype(queryDoneHandler)>
         (ApiCommand::getLayoutTours, QnUuid(), queryDoneHandler);
     return reqID;
@@ -56,7 +56,7 @@ int QnLayoutTourManager<QueryProcessorType>::save(
     impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::saveLayoutTour,
         tour,
         [handler, reqID](ec2::ErrorCode errorCode)
@@ -70,7 +70,7 @@ template<class QueryProcessorType>
 int QnLayoutTourManager<QueryProcessorType>::remove(const QnUuid& id, impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::removeLayoutTour, nx::vms::api::IdData(id),
         [handler, reqID](ec2::ErrorCode errorCode)
         {

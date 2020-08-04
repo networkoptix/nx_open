@@ -4,6 +4,7 @@
 #include <core/resource/resource_fwd.h>
 
 #include <nx/utils/literal.h>
+#include <api/model/audit/auth_session.h>
 
 namespace Qn {
 
@@ -28,6 +29,21 @@ struct UserAccessData
     bool isNull() const { return userId.isNull(); }
 
     QString toString() const;
+};
+
+struct UserSession
+{
+    UserSession(
+        const UserAccessData& access = UserAccessData(),
+        const QnAuthSession& session = QnAuthSession())
+        :
+        access(access),
+        session(session)
+    {
+    }
+
+    UserAccessData access;
+    QnAuthSession session;
 };
 
 QString toString(UserAccessData::Access access);

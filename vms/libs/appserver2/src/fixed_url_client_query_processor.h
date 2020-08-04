@@ -19,7 +19,7 @@ namespace ec2
     class FixedUrlClientQueryProcessor
     {
     public:
-        FixedUrlClientQueryProcessor &getAccess(const Qn::UserAccessData &) { return *this; }
+        FixedUrlClientQueryProcessor& getAccess(const Qn::UserSession&) { return *this; }
 
         FixedUrlClientQueryProcessor( ClientQueryProcessor* clientProcessor, const nx::utils::Url& ecURL )
         :

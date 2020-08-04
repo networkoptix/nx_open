@@ -164,7 +164,7 @@ public:
     }
 
     MockConnection* queryProcessor() { return this; }
-    MockConnection& getAccess(const Qn::UserAccessData& /*accessRights*/) { return *this; }
+    MockConnection& getAccess(const Qn::UserSession&) { return *this; }
     MockConnection* auditManager() { return this; }
     void setAuditData(const MockConnection* /*auditManager*/, const QnAuthSession& /*authSession*/)
     {

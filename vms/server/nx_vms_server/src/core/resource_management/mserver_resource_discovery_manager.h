@@ -27,6 +27,7 @@ public:
 
     static bool hasIpConflict(const QSet<QnNetworkResourcePtr>& cameras);
 
+    static QnResourceList CheckHostAddrAsync(const QnManualCameraInfo& input);
 signals:
     void cameraDisconnected(const QnResourcePtr& camera, qint64 timestamp);
 
@@ -40,6 +41,7 @@ protected:
     virtual nx::vms::common::AnalyticsEngineResourcePtr
         createAnalyticsEngineResource(const QnResourceParams& params) override;
     virtual void stop() override;
+    virtual void appendManualDiscoveredResources(QnResourceList& resources) override;
 private:
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_resourceDeleted(const QnResourcePtr& resource);

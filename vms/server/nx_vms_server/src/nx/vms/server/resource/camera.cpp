@@ -1002,6 +1002,18 @@ QnSecurityCamResource::MotionStreamIndex Camera::motionStreamIndex() const
     return base_type::motionStreamIndex();
 }
 
+void Camera::setCameraManagerFactory(CameraManagerFactory factory)
+{
+    m_cameraManagerfactory = std::move(factory);
+}
+
+ec2::AbstractCameraManagerPtr Camera::cameraManager()
+{
+    if (m_cameraManagerfactory)
+        return m_cameraManagerfactory(this);
+    return commonModule()->ec2Connection()->getCameraManager(Qn::kSystemAccess);
+}
+
 } // namespace resource
 } // namespace vms::server
 } // namespace nx

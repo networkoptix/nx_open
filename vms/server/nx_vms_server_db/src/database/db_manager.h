@@ -911,7 +911,7 @@ namespace detail
 class QnDbManagerAccess
 {
 public:
-    QnDbManagerAccess(detail::QnDbManager* dbManager, const Qn::UserAccessData &userAccessData);
+    QnDbManagerAccess(detail::QnDbManager* dbManager, const Qn::UserAccessData& userAccessData);
 
     Qn::UserAccessData userAccessData() const { return m_userAccessData; }
     void setUserAccessData(Qn::UserAccessData value) { m_userAccessData = value; }

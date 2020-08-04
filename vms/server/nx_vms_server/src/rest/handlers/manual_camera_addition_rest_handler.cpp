@@ -294,7 +294,8 @@ int QnManualCameraAdditionRestHandler::addCameras(
         cameraList.push_back(info);
     }
 
-    auto registered = owner->commonModule()->resourceDiscoveryManager()->registerManualCameras(cameraList);
+    auto registered = owner->commonModule()->resourceDiscoveryManager()->registerManualCameras(
+        cameraList, Qn::UserSession(owner->accessRights(), owner->authSession()));
     auto resPool = owner->commonModule()->resourcePool();
     for (const auto& id: registered)
     {
@@ -304,17 +305,6 @@ int QnManualCameraAdditionRestHandler::addCameras(
             camera->saveProperties();
         }
 
-    }
-    if (!registered.isEmpty())
-    {
-        QnAuditRecord auditRecord =
-            auditManager()->prepareRecord(owner->authSession(), Qn::AR_CameraInsert);
-        for (const QnManualCameraInfo& info: cameraList)
-        {
-            if (!info.uniqueId.isEmpty())
-                auditRecord.resources.push_back(QnNetworkResource::physicalIdToId(info.uniqueId));
-        }
-        owner->commonModule()->auditManager()->addAuditRecord(auditRecord);
     }
 
     if (registered.size() > 0)

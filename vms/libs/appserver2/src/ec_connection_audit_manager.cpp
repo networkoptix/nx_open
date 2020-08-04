@@ -57,6 +57,18 @@ QnCommonModule* ECConnectionAuditManager::commonModule() const
 
 void ECConnectionAuditManager::addAuditRecord(
     ApiCommand::Value /*command*/,
+    const CameraData& params,
+    const QnAuthSession& authInfo)
+{
+    if (commonModule()->resourcePool()->getResourceById(params.id))
+        return; //< Don't log if resource already exists.
+    QnAuditRecord auditRecord = commonModule()->auditManager()->prepareRecord(authInfo, Qn::AR_CameraInsert);
+    auditRecord.resources.push_back(params.id);
+    commonModule()->auditManager()->addAuditRecord(auditRecord);
+}
+
+void ECConnectionAuditManager::addAuditRecord(
+    ApiCommand::Value /*command*/,
     const CameraAttributesDataList& params,
     const QnAuthSession& authInfo)
 {

@@ -5,6 +5,7 @@
 #include <transaction/transaction.h>
 
 #include <nx_ec/managers/abstract_camera_manager.h>
+#include <api/model/audit/auth_session.h>
 
 namespace ec2 {
 
@@ -14,7 +15,7 @@ class QnCameraManager: public AbstractCameraManager
 public:
     QnCameraManager(
         QueryProcessorType* const queryProcessor,
-        const Qn::UserAccessData& userAccessData);
+        const Qn::UserSession& userSession);
 
     //!Implementation of AbstractCameraManager::getCameras
     virtual int getCameras(impl::GetCamerasHandlerPtr handler) override;
@@ -23,6 +24,7 @@ public:
     virtual int addCamera(
         const nx::vms::api::CameraData&,
         impl::SimpleHandlerPtr handler) override;
+
     //!Implementation of AbstractCameraManager::save
     virtual int save(
         const nx::vms::api::CameraDataList& cameras,
@@ -46,16 +48,16 @@ public:
 
 private:
     QueryProcessorType* const m_queryProcessor;
-    Qn::UserAccessData m_userAccessData;
+    Qn::UserSession m_userSession;
 };
 
 template<class QueryProcessorType>
 QnCameraManager<QueryProcessorType>::QnCameraManager(
     QueryProcessorType* const queryProcessor,
-    const Qn::UserAccessData& userAccessData)
+    const Qn::UserSession& userSession)
     :
     m_queryProcessor(queryProcessor),
-    m_userAccessData(userAccessData)
+    m_userSession(userSession)
 {
 }
 
@@ -70,7 +72,7 @@ int QnCameraManager<QueryProcessorType>::getCameras(impl::GetCamerasHandlerPtr h
         {
             handler->done(reqID, errorCode, cameras);
         };
-    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid,
+    m_queryProcessor->getAccess(m_userSession).template processQueryAsync<QnUuid,
         nx::vms::api::CameraDataList, decltype(queryDoneHandler)>(
         ApiCommand::getCameras,
         QnUuid(),
@@ -89,7 +91,7 @@ int QnCameraManager<QueryProcessorType>::getCamerasEx(impl::GetCamerasExHandlerP
         {
             handler->done(reqID, errorCode, cameras);
         };
-    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnCameraDataExQuery,
+    m_queryProcessor->getAccess(m_userSession).template processQueryAsync<QnCameraDataExQuery,
         nx::vms::api::CameraDataExList, decltype(queryDoneHandler)>(
         ApiCommand::getCamerasEx,
         QnCameraDataExQuery(),
@@ -103,7 +105,7 @@ int QnCameraManager<QueryProcessorType>::addCamera(
     impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::saveCamera,
         camera,
         [handler, reqID](ec2::ErrorCode errorCode)
@@ -128,7 +130,7 @@ int QnCameraManager<QueryProcessorType>::save(
     }
 
     const int reqID = generateRequestID();
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::saveCameras,
         cameras,
         [handler, reqID](ec2::ErrorCode errorCode)
@@ -142,7 +144,7 @@ template<class QueryProcessorType>
 int QnCameraManager<QueryProcessorType>::remove(const QnUuid& id, impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::removeCamera,
         nx::vms::api::IdData(id),
         [handler, reqID](ec2::ErrorCode errorCode)
@@ -160,7 +162,7 @@ int QnCameraManager<QueryProcessorType>::setServerFootageData(
 {
     nx::vms::api::ServerFootageData data(serverGuid, cameras);
     const int reqID = generateRequestID();
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::addCameraHistoryItem,
         data,
         [handler, reqID](ec2::ErrorCode errorCode)
@@ -182,7 +184,7 @@ int QnCameraManager<QueryProcessorType>::getServerFootageData(
         {
             handler->done(reqID, errorCode, cameraHistory);
         };
-    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t,
+    m_queryProcessor->getAccess(m_userSession).template processQueryAsync<std::nullptr_t,
         nx::vms::api::ServerFootageDataList, decltype(queryDoneHandler)>(
         ApiCommand::getCameraHistoryItems,
         nullptr,
@@ -196,7 +198,7 @@ int QnCameraManager<QueryProcessorType>::saveUserAttributes(
     impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::saveCameraUserAttributesList,
         cameraAttributes,
         [handler, reqID](ec2::ErrorCode errorCode)
@@ -218,7 +220,7 @@ int QnCameraManager<QueryProcessorType>::getUserAttributes(
         {
             handler->done(reqID, errorCode, cameraUserAttributesList);
         };
-    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid,
+    m_queryProcessor->getAccess(m_userSession).template processQueryAsync<QnUuid,
         nx::vms::api::CameraAttributesDataList, decltype(queryDoneHandler)>(
         ApiCommand::getCameraUserAttributesList,
         QnUuid(),

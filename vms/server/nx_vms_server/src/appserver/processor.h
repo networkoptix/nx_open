@@ -1,5 +1,4 @@
-#ifndef _server_appserver_processor_h_
-#define _server_appserver_processor_h_
+#pragma once
 
 #include <nx_ec/ec_api.h>
 
@@ -10,6 +9,7 @@
 #include "mutex/distributed_mutex.h"
 #include <common/common_module_aware.h>
 #include <nx/vms/server/server_module_aware.h>
+#include <core/resource_management/resource_discovery_manager.h>
 
 namespace ec2 {
     class QnMutexCameraDataHandler;
@@ -37,9 +37,8 @@ public:
     static ec2::ErrorCode addAndPropagateCamResource(
         QnCommonModule* commonModule,
         const nx::vms::api::CameraData& apiCameraData,
-        const nx::vms::api::ResourceParamDataList& properties
-    );
-
+        const nx::vms::api::ResourceParamDataList& properties,
+        ec2::AbstractCameraManagerPtr cameraManager = ec2::AbstractCameraManagerPtr());
 private:
     ec2::AbstractECConnectionPtr m_ec2Connection;
     QnUuid m_serverId;
@@ -70,5 +69,3 @@ private:
     QnCameraUserAttributesPtr m_defaultUserAttrs;
     ec2::QnDistributedMutexManager* m_distributedMutexManager;
 };
-
-#endif //_server_appserver_processor_h_

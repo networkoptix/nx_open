@@ -30,72 +30,72 @@ void OldEcConnection::updateConnectionUrl(const nx::utils::Url & /*url*/)
     NX_ASSERT(false, "Should never get here");
 }
 
-AbstractResourceManagerPtr OldEcConnection::getResourceManager(const Qn::UserAccessData &)
+AbstractResourceManagerPtr OldEcConnection::getResourceManager(const Qn::UserSession&)
 {
     return AbstractResourceManagerPtr();
 }
 
-AbstractMediaServerManagerPtr OldEcConnection::getMediaServerManager(const Qn::UserAccessData &)
+AbstractMediaServerManagerPtr OldEcConnection::getMediaServerManager(const Qn::UserSession&)
 {
     return AbstractMediaServerManagerPtr();
 }
 
-AbstractCameraManagerPtr OldEcConnection::getCameraManager(const Qn::UserAccessData &)
+AbstractCameraManagerPtr OldEcConnection::getCameraManager(const Qn::UserSession&)
 {
     return AbstractCameraManagerPtr();
 }
 
-AbstractLicenseManagerPtr OldEcConnection::getLicenseManager(const Qn::UserAccessData &)
+AbstractLicenseManagerPtr OldEcConnection::getLicenseManager(const Qn::UserSession&)
 {
     return AbstractLicenseManagerPtr();
 }
 
-AbstractEventRulesManagerPtr OldEcConnection::getEventRulesManager(const Qn::UserAccessData &)
+AbstractEventRulesManagerPtr OldEcConnection::getEventRulesManager(const Qn::UserSession&)
 {
     return {};
 }
 
-AbstractUserManagerPtr OldEcConnection::getUserManager(const Qn::UserAccessData &)
+AbstractUserManagerPtr OldEcConnection::getUserManager(const Qn::UserSession&)
 {
     return AbstractUserManagerPtr();
 }
 
-AbstractLayoutManagerPtr OldEcConnection::getLayoutManager(const Qn::UserAccessData &)
+AbstractLayoutManagerPtr OldEcConnection::getLayoutManager(const Qn::UserSession&)
 {
     return AbstractLayoutManagerPtr();
 }
 
-AbstractLayoutTourManagerPtr OldEcConnection::getLayoutTourManager(const Qn::UserAccessData&)
+AbstractLayoutTourManagerPtr OldEcConnection::getLayoutTourManager(const Qn::UserSession&)
 {
     return AbstractLayoutTourManagerPtr();
 }
 
-AbstractVideowallManagerPtr OldEcConnection::getVideowallManager(const Qn::UserAccessData &)
+AbstractVideowallManagerPtr OldEcConnection::getVideowallManager(const Qn::UserSession&)
 {
     return AbstractVideowallManagerPtr();
 }
 
-AbstractWebPageManagerPtr OldEcConnection::getWebPageManager(const Qn::UserAccessData &)
+AbstractWebPageManagerPtr OldEcConnection::getWebPageManager(const Qn::UserSession&)
 {
     return AbstractWebPageManagerPtr();
 }
 
-AbstractStoredFileManagerPtr OldEcConnection::getStoredFileManager(const Qn::UserAccessData &)
+AbstractStoredFileManagerPtr OldEcConnection::getStoredFileManager(const Qn::UserSession&)
 {
     return AbstractStoredFileManagerPtr();
 }
 
-AbstractMiscManagerPtr OldEcConnection::getMiscManager(const Qn::UserAccessData &)
+AbstractMiscManagerPtr OldEcConnection::getMiscManager(const Qn::UserSession&)
 {
     return AbstractMiscManagerPtr();
 }
 
-AbstractDiscoveryManagerPtr OldEcConnection::getDiscoveryManager(const Qn::UserAccessData &)
+AbstractDiscoveryManagerPtr OldEcConnection::getDiscoveryManager(const Qn::UserSession&)
 {
     return AbstractDiscoveryManagerPtr();
 }
 
-AbstractAnalyticsManagerPtr OldEcConnection::getAnalyticsManager(const Qn::UserAccessData&)
+AbstractAnalyticsManagerPtr OldEcConnection::getAnalyticsManager(const Qn::UserSession&)
 {
     return AbstractAnalyticsManagerPtr();
 }
@@ -238,6 +238,11 @@ int OldEcConnection::restoreDatabaseAsync(
     QnUuid OldEcConnection::routeToPeerVia(const QnUuid& /*uuid*/, int*, nx::network::SocketAddress*) const
     {
         return QnUuid();
+    }
+
+    ECConnectionAuditManager* OldEcConnection::auditManager()
+    {
+        return nullptr;
     }
 
 }

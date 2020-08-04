@@ -24,6 +24,7 @@
 #include <core/ptz/ptz_preset.h>
 #include "resource_data.h"
 #include "camera_user_attribute_pool.h"
+#include <core/resource_management/resource_discovery_manager.h>
 
 class QnAbstractArchiveDelegate;
 
@@ -389,6 +390,7 @@ public:
 
     virtual void setCommonModule(QnCommonModule* commonModule) override;
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() = 0;
+
 public slots:
     virtual void recordingEventAttached();
     virtual void recordingEventDetached();
@@ -440,7 +442,7 @@ protected:
     virtual Qn::LicenseType calculateLicenseType() const;
 
     virtual QnCameraUserAttributePool::ScopedLock userAttributies() const;
-	
+
     nx::core::resource::DeviceType enforcedDeviceType() const;
 
 private:
@@ -467,7 +469,6 @@ private:
     nx::utils::CachedValue<nx::core::resource::DeviceType> m_cachedExplicitDeviceType;
     nx::utils::CachedValue<bool> m_cachedHasVideo;
     nx::utils::CachedValue<MotionStreamIndex> m_cachedMotionStreamIndex;
-
 protected slots:
     virtual void resetCachedValues();
 };

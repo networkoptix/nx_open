@@ -24,6 +24,7 @@
 #include <transaction/amend_transaction_data.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/network/app_info.h>
+#include <core/resource_access/user_access_data.h>
 
 namespace ec2 {
 
@@ -96,7 +97,7 @@ struct ServerQueryProcessorAccess
         Ec2ThreadPool::instance()->waitForDone();
     }
 
-    detail::ServerQueryProcessor getAccess(const Qn::UserAccessData userAccessData);
+    detail::ServerQueryProcessor getAccess(const Qn::UserSession& userSession);
 
     detail::QnDbManager* getDb() const { return m_db; }
     TransactionMessageBusAdapter* messageBus() { return m_messageBus; }
@@ -117,19 +118,16 @@ struct AuditData
 {
     ECConnectionAuditManager* auditManager;
     ECConnectionNotificationManager* notificationManager;
-    QnAuthSession authSession;
-    Qn::UserAccessData userAccessData;
+    Qn::UserSession userSession;
 
     AuditData(
         ECConnectionAuditManager* auditManager,
         ECConnectionNotificationManager* notificationManager,
-        const QnAuthSession& authSession,
-        const Qn::UserAccessData& userAccessData)
+        const Qn::UserSession& userSession)
         :
         auditManager(auditManager),
         notificationManager(notificationManager),
-        authSession(authSession),
-        userAccessData(userAccessData)
+        userSession(userSession)
     {}
 };
 
@@ -140,12 +138,12 @@ void triggerNotification(
 {
     // Add audit record before notification to ensure removed resource is still alive.
     if (auditData.auditManager &&
-        auditData.userAccessData != Qn::kSystemAccess) //< don't add to audit log if it's server side update
+        auditData.userSession.access != Qn::kSystemAccess) //< don't add to audit log if it's server side update
     {
         auditData.auditManager->addAuditRecord(
             tran.command,
             tran.params,
-            auditData.authSession);
+            auditData.userSession.session);
     }
 
     // Notification manager is null means startReceivingNotification isn't called yet
@@ -292,14 +290,9 @@ class ServerQueryProcessor
 public:
      virtual ~ServerQueryProcessor() {}
 
-    ServerQueryProcessor(
-        ServerQueryProcessorAccess* owner,
-        const Qn::UserAccessData &userAccessData)
-        :
-        m_owner(owner),
-        m_db(owner->getDb(), userAccessData)
-    {
-    }
+     ServerQueryProcessor(
+         ServerQueryProcessorAccess* owner,
+         const Qn::UserSession& userSession);
 
     template<class InputData, class HandlerType>
     void processUpdateAsync(
@@ -520,8 +513,6 @@ public:
             });
     }
 
-    void setAuditData(ECConnectionAuditManager* auditManager, const QnAuthSession& authSession);
-
 private:
     aux::AuditData createAuditDataCopy()
     {
@@ -529,8 +520,7 @@ private:
         return aux::AuditData(
             m_auditManager,
             ec2Connection ? ec2Connection->notificationManager() : nullptr,
-            m_authSession,
-            m_db.userAccessData());
+            m_userSession);
     }
 
     /**
@@ -1000,7 +990,7 @@ private:
     ServerQueryProcessorAccess* m_owner = nullptr;
     QnDbManagerAccess m_db;
     ECConnectionAuditManager* m_auditManager = nullptr;
-    QnAuthSession m_authSession;
+    Qn::UserSession m_userSession;
 };
 
 template<class T>

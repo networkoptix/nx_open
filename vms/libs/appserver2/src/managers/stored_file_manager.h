@@ -11,7 +11,7 @@ namespace ec2
     class QnStoredFileManager : public AbstractStoredFileManager
     {
     public:
-        QnStoredFileManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData);
+        QnStoredFileManager(QueryProcessorType* const queryProcessor, const Qn::UserSession& userSession);
 
         virtual int getStoredFile( const QString& filename, impl::GetStoredFileHandlerPtr handler ) override;
         virtual int addStoredFile( const QString& filename, const QByteArray& data, impl::SimpleHandlerPtr handler ) override;
@@ -20,14 +20,16 @@ namespace ec2
 
     private:
         QueryProcessorType* const m_queryProcessor;
-        Qn::UserAccessData m_userAccessData;
+        Qn::UserSession m_userSession;
     };
 
     template<class QueryProcessorType>
-    QnStoredFileManager<QueryProcessorType>::QnStoredFileManager(QueryProcessorType* const queryProcessor, const Qn::UserAccessData &userAccessData)
-    :
-      m_queryProcessor( queryProcessor ),
-      m_userAccessData(userAccessData)
+    QnStoredFileManager<QueryProcessorType>::QnStoredFileManager(
+        QueryProcessorType* const queryProcessor,
+        const Qn::UserSession& userSession)
+        :
+        m_queryProcessor(queryProcessor),
+        m_userSession(userSession)
     {
     }
 
@@ -44,7 +46,7 @@ int QnStoredFileManager<QueryProcessorType>::getStoredFile(
         {
             handler->done(reqID, errorCode, fileData.data);
         };
-    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<
+    m_queryProcessor->getAccess(m_userSession).template processQueryAsync<
         nx::vms::api::StoredFilePath,
         nx::vms::api::StoredFileData,
         decltype(queryDoneHandler)>(
@@ -63,7 +65,7 @@ int QnStoredFileManager<QueryProcessorType>::getStoredFile(
         params.data = data;
 
         using namespace std::placeholders;
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
             ApiCommand::addStoredFile, params,
             std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
 
@@ -76,7 +78,7 @@ int QnStoredFileManager<QueryProcessorType>::getStoredFile(
         const int reqID = generateRequestID();
 
         using namespace std::placeholders;
-        m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+        m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
             ApiCommand::removeStoredFile, nx::vms::api::StoredFilePath(filename),
             std::bind( &impl::SimpleHandler::done, handler, reqID, _1 ) );
 
@@ -102,7 +104,7 @@ int QnStoredFileManager<QueryProcessorType>::listDirectory(
             [](const nx::vms::api::StoredFilePath& path) { return path.path; });
         handler->done(reqID, errorCode, outputFolderContents);
     };
-    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<
+    m_queryProcessor->getAccess(m_userSession).template processQueryAsync<
         nx::vms::api::StoredFilePath,
         nx::vms::api::StoredFilePathList, decltype(queryDoneHandler)>(
             ApiCommand::listDirectory,

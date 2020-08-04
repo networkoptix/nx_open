@@ -121,8 +121,12 @@ int QnWearableCameraRestHandler::executeAdd(
     // Note that physical id is in path, not in host.
     apiCamera.url = lit("wearable:///") + apiCamera.physicalId;
 
-    ec2::ErrorCode code = owner->commonModule()->ec2Connection()
-        ->getCameraManager(Qn::kSystemAccess)->addCameraSync(apiCamera);
+
+    auto connection = owner->commonModule()->ec2Connection();
+
+    Qn::UserSession userSession(owner->accessRights(), owner->authSession());
+    auto cameraManager = connection->getCameraManager(userSession);
+    ec2::ErrorCode code = cameraManager->addCameraSync(apiCamera);
     if (code != ec2::ErrorCode::ok)
     {
         result.setError(QnJsonRestResult::CantProcessRequest,

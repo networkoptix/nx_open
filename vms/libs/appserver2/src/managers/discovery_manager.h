@@ -16,7 +16,7 @@ class QnDiscoveryManager: public AbstractDiscoveryManager
 public:
     QnDiscoveryManager(
         QueryProcessorType* const queryProcessor,
-        const Qn::UserAccessData &userAccessData);
+        const Qn::UserSession& userSession);
     virtual ~QnDiscoveryManager();
 
 protected:
@@ -26,16 +26,16 @@ protected:
     virtual int getDiscoveryData(impl::GetDiscoveryDataHandlerPtr handler) override;
 private:
     QueryProcessorType* const m_queryProcessor;
-    Qn::UserAccessData m_userAccessData;
+    Qn::UserSession m_userSession;
 };
 
 template<class QueryProcessorType>
 QnDiscoveryManager<QueryProcessorType>::QnDiscoveryManager(
     QueryProcessorType * const queryProcessor,
-    const Qn::UserAccessData &userAccessData)
+    const Qn::UserSession& userSession)
     :
     m_queryProcessor(queryProcessor),
-    m_userAccessData(userAccessData)
+    m_userSession(userSession)
 {
 }
 
@@ -54,7 +54,7 @@ int QnDiscoveryManager<QueryProcessorType>::discoverPeer(
     params.url = url.toString();
 
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::discoverPeer,
         params,
         [handler, reqId](ErrorCode errorCode)
@@ -76,7 +76,7 @@ int QnDiscoveryManager<QueryProcessorType>::addDiscoveryInformation(
     NX_ASSERT(!url.host().isEmpty());
     const int reqId = generateRequestID();
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::addDiscoveryInformation,
         toApiDiscoveryData(id, url, ignore),
         [handler, reqId](ErrorCode errorCode)
@@ -97,7 +97,7 @@ int QnDiscoveryManager<QueryProcessorType>::removeDiscoveryInformation(
 {
     const int reqId = generateRequestID();
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::removeDiscoveryInformation,
         toApiDiscoveryData(id, url, ignore),
         [handler, reqId](ErrorCode errorCode)
@@ -123,7 +123,7 @@ int QnDiscoveryManager<QueryProcessorType>::getDiscoveryData(impl::GetDiscoveryD
             handler->done(reqID, errorCode, outData);
         };
 
-    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<
+    m_queryProcessor->getAccess(m_userSession).template processQueryAsync<
             QnUuid, nx::vms::api::DiscoveryDataList, decltype(queryDoneHandler)>(
                 ApiCommand::getDiscoveryData, QnUuid(), queryDoneHandler);
 

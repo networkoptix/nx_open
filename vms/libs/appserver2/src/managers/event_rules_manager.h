@@ -18,7 +18,7 @@ public:
     EventRulesManager(
         TransactionMessageBusAdapter* messageBus,
         QueryProcessorType* const queryProcessor,
-        const Qn::UserAccessData& userAccessData);
+        const Qn::UserSession& userSession);
 
     virtual int getEventRules(impl::GetEventRulesHandlerPtr handler) override;
 
@@ -34,18 +34,18 @@ public:
 private:
     TransactionMessageBusAdapter* m_messageBus;
     QueryProcessorType* const m_queryProcessor;
-    Qn::UserAccessData m_userAccessData;
+    Qn::UserSession m_userSession;
 };
 
 template<class QueryProcessorType>
 EventRulesManager<QueryProcessorType>::EventRulesManager(
     TransactionMessageBusAdapter* messageBus,
     QueryProcessorType* const queryProcessor,
-    const Qn::UserAccessData& userAccessData)
+    const Qn::UserSession& userSession)
     :
     m_messageBus(messageBus),
     m_queryProcessor(queryProcessor),
-    m_userAccessData(userAccessData)
+    m_userSession(userSession)
 {
 }
 
@@ -60,7 +60,7 @@ int EventRulesManager<T>::getEventRules(impl::GetEventRulesHandlerPtr handler)
         {
             handler->done(reqID, errorCode, rules);
         };
-    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<
+    m_queryProcessor->getAccess(m_userSession).template processQueryAsync<
         QnUuid,
         nx::vms::api::EventRuleDataList,
         decltype(queryDoneHandler)>(ApiCommand::getEventRules, QnUuid(), queryDoneHandler);
@@ -73,7 +73,7 @@ int EventRulesManager<T>::save(
     impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::saveEventRule,
         rule,
         [handler, reqID](ec2::ErrorCode errorCode){ handler->done(reqID, errorCode); });
@@ -85,7 +85,7 @@ template<class T>
 int EventRulesManager<T>::deleteRule(QnUuid ruleId, impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::removeEventRule,
         nx::vms::api::IdData(ruleId),
         [handler, reqID](ec2::ErrorCode errorCode)
@@ -102,7 +102,7 @@ int EventRulesManager<T>::broadcastEventAction(
 {
     const int reqID = generateRequestID();
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::broadcastAction,
         actionData,
         [handler, reqID](ec2::ErrorCode errorCode)
@@ -119,7 +119,7 @@ int EventRulesManager<T>::resetBusinessRules(impl::SimpleHandlerPtr handler)
     nx::vms::api::ResetEventRulesData params;
     // providing event rules set from the client side is rather incorrect way of reset.
 
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::resetEventRules,
         params,
         [handler, reqID](ec2::ErrorCode errorCode)

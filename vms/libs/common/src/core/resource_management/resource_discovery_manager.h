@@ -24,13 +24,15 @@
 #include <nx/utils/log/log.h>
 #include <common/common_module_aware.h>
 #include "resource_searcher.h"
+#include <core/resource_access/user_access_data.h>
+#include <api/model/audit/auth_session.h>
 
 class QnAbstractResourceSearcher;
 
 struct QnManualCameraInfo
 {
+    QnManualCameraInfo() = default;
     QnManualCameraInfo(const nx::utils::Url& url, const QAuthenticator& auth, const QString& resType, const QString& uniqueId);
-    QList<QnResourcePtr> checkHostAddr() const;
 
     nx::utils::Url url;
     QnResourceTypePtr resType;
@@ -38,6 +40,7 @@ struct QnManualCameraInfo
     QnAbstractResourceSearcher* searcher;
     QString uniqueId;
     bool isUpdated = false;
+    Qn::UserSession userSession;
 };
 
 class QnAbstractResourceSearcher;
@@ -103,7 +106,9 @@ public:
     void setReady(bool ready);
 
     /** Returns number of cameras that were successfully added. */
-    QSet<QString> registerManualCameras(const std::vector<QnManualCameraInfo>& cameras);
+    QSet<QString> registerManualCameras(
+        const std::vector<QnManualCameraInfo>& cameras,
+        Qn::UserSession userSession = Qn::UserSession());
     bool isManuallyAdded(const QnSecurityCamResourcePtr& camera) const;
     QnManualCameraInfo manualCameraInfo(const QnSecurityCamResourcePtr& camera) const;
 
@@ -158,7 +163,7 @@ protected:
     // Run search of local files.
     void doInitialSearch();
 
-    void appendManualDiscoveredResources(QnResourceList& resources);
+    virtual void appendManualDiscoveredResources(QnResourceList&) {}
 
     void updateSearcherUsageUnsafe(QnAbstractResourceSearcher *searcher, bool usePartialEnable);
     void updateSearchersUsage();

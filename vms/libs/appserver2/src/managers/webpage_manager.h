@@ -12,7 +12,7 @@ class QnWebPageManager: public AbstractWebPageManager
 public:
     QnWebPageManager(
         QueryProcessorType* const queryProcessor,
-        const Qn::UserAccessData& userAccessData);
+        const Qn::UserSession& userSession);
 
 protected:
     virtual int getWebPages(impl::GetWebPagesHandlerPtr handler) override;
@@ -23,15 +23,16 @@ protected:
 
 private:
     QueryProcessorType* const m_queryProcessor;
-    Qn::UserAccessData m_userAccessData;
+    Qn::UserSession m_userSession;
 };
 
 template<class QueryProcessorType>
 QnWebPageManager<QueryProcessorType>::QnWebPageManager(
     QueryProcessorType* const queryProcessor,
-    const Qn::UserAccessData& userAccessData)
-    : m_queryProcessor(queryProcessor),
-    m_userAccessData(userAccessData)
+    const Qn::UserSession& userSession)
+    :
+    m_queryProcessor(queryProcessor),
+    m_userSession(userSession)
 {
 }
 
@@ -45,7 +46,7 @@ int QnWebPageManager<QueryProcessorType>::getWebPages(impl::GetWebPagesHandlerPt
         {
             handler->done(reqID, errorCode, webpages);
         };
-    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid,
+    m_queryProcessor->getAccess(m_userSession).template processQueryAsync<QnUuid,
         nx::vms::api::WebPageDataList, decltype(queryDoneHandler)>(
         ApiCommand::getWebPages,
         QnUuid(),
@@ -59,7 +60,7 @@ int QnWebPageManager<QueryProcessorType>::save(
     impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::saveWebPage,
         webpage,
         [handler, reqID](ec2::ErrorCode errorCode)
@@ -73,7 +74,7 @@ template<class QueryProcessorType>
 int QnWebPageManager<QueryProcessorType>::remove(const QnUuid& id, impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::removeWebPage,
         nx::vms::api::IdData(id),
         [handler, reqID](ec2::ErrorCode errorCode)

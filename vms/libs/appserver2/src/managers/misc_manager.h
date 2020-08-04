@@ -14,7 +14,7 @@ class QnMiscManager: public AbstractMiscManager
 {
 public:
     QnMiscManager(QueryProcessorType* const queryProcessor,
-        const Qn::UserAccessData& userAccessData);
+        const Qn::UserSession& userSession);
     virtual ~QnMiscManager();
 
     virtual int markLicenseOverflow(
@@ -42,14 +42,16 @@ protected:
 
 private:
     QueryProcessorType* const m_queryProcessor;
-    Qn::UserAccessData m_userAccessData;
+    Qn::UserSession m_userSession;
 };
 
 template<class QueryProcessorType>
-QnMiscManager<QueryProcessorType>::QnMiscManager(QueryProcessorType * const queryProcessor,
-                                                 const Qn::UserAccessData &userAccessData) :
+QnMiscManager<QueryProcessorType>::QnMiscManager(
+    QueryProcessorType * const queryProcessor,
+    const Qn::UserSession& userSession)
+    :
     m_queryProcessor(queryProcessor),
-    m_userAccessData(userAccessData)
+    m_userSession(userSession)
 {
 }
 
@@ -71,7 +73,7 @@ int QnMiscManager<QueryProcessorType>::changeSystemId(
     params.tranLogTime = tranLogTime;
 
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::changeSystemId, params,
         [handler, reqId](ErrorCode errorCode)
         {
@@ -94,7 +96,7 @@ int QnMiscManager<QueryProcessorType>::markLicenseOverflow(
     params.time = time;
 
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::markLicenseOverflow, params,
         [handler, reqId, params](ErrorCode errorCode)
         {
@@ -117,7 +119,7 @@ int QnMiscManager<QueryProcessorType>::markVideoWallLicenseOverflow(
     params.time = time;
 
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::markVideoWallLicenseOverflow, params,
         [handler, reqId, params](ErrorCode errorCode)
         {
@@ -140,7 +142,7 @@ int QnMiscManager<QueryProcessorType>::cleanupDatabase(
     data.cleanupTransactionLog = cleanupTransactionLog;
 
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::cleanupDatabase,
         data,
         [handler, reqId](ErrorCode errorCode)
@@ -156,7 +158,7 @@ int QnMiscManager<T>::saveMiscParam(
     const nx::vms::api::MiscData& param, impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::saveMiscParam, param,
         [handler, reqID](ec2::ErrorCode errorCode)
     {
@@ -170,7 +172,7 @@ int QnMiscManager<T>::saveRuntimeInfo(const nx::vms::api::RuntimeData& data,
     impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::runtimeInfoChanged, data,
         [handler, reqID](ec2::ErrorCode errorCode)
     {
@@ -193,7 +195,7 @@ int QnMiscManager<T>::getMiscParam(
             handler->done(reqID, errorCode, outData);
         };
 
-    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<
+    m_queryProcessor->getAccess(m_userSession).template processQueryAsync<
             QByteArray, nx::vms::api::MiscData, decltype(queryDoneHandler)>
         (ApiCommand::getMiscParam, paramName, queryDoneHandler);
 
@@ -206,7 +208,7 @@ int QnMiscManager<T>::saveSystemMergeHistoryRecord(
     impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::saveSystemMergeHistoryRecord,
         data,
         [handler, reqID](ec2::ErrorCode errorCode)
@@ -233,7 +235,7 @@ int QnMiscManager<T>::getSystemMergeHistory(
                 handler->done(reqID, errorCode, nx::vms::api::SystemMergeHistoryRecordList());
         };
 
-    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t /*dummy*/,
+    m_queryProcessor->getAccess(m_userSession).template processQueryAsync<std::nullptr_t /*dummy*/,
             nx::vms::api::SystemMergeHistoryRecordList, decltype(queryDoneHandler)>
         (ApiCommand::getSystemMergeHistory, nullptr, queryDoneHandler);
 

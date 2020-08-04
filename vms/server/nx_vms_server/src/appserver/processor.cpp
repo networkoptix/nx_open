@@ -29,6 +29,7 @@
 #include <core/resource_management/resource_data_pool.h>
 #include <common/common_module.h>
 #include <media_server/media_server_module.h>
+#include <nx/vms/server/resource/camera.h>
 
 QnAppserverResourceProcessor::QnAppserverResourceProcessor(
     QnMediaServerModule* serverModule,
@@ -160,7 +161,8 @@ void QnAppserverResourceProcessor::readDefaultUserAttrs()
 ec2::ErrorCode QnAppserverResourceProcessor::addAndPropagateCamResource(
     QnCommonModule* commonModule,
     const nx::vms::api::CameraData& apiCameraData,
-    const nx::vms::api::ResourceParamDataList& properties)
+    const nx::vms::api::ResourceParamDataList& properties,
+    ec2::AbstractCameraManagerPtr cameraManager)
 {
     QnResourcePtr existCamRes = commonModule->resourcePool()->getResourceById(apiCameraData.id);
     if (existCamRes && existCamRes->getTypeId() != apiCameraData.typeId)
@@ -180,9 +182,10 @@ ec2::ErrorCode QnAppserverResourceProcessor::addAndPropagateCamResource(
         return errorCode;
     }
 
-    errorCode = commonModule->ec2Connection()
-        ->getCameraManager(Qn::kSystemAccess)
-        ->addCameraSync(apiCameraData);
+    if (!cameraManager)
+        cameraManager = commonModule->ec2Connection()->getCameraManager(Qn::kSystemAccess); //< Default value
+
+    errorCode = cameraManager->addCameraSync(apiCameraData);
     if (errorCode != ec2::ErrorCode::ok)
         NX_WARNING(typeid(QnAppserverResourceProcessor), QString::fromLatin1("Can't add camera to database. DB error code %1").arg(ec2::toString(errorCode)));
 
@@ -203,10 +206,16 @@ void QnAppserverResourceProcessor::addNewCameraInternal(const QnVirtualCameraRes
     ec2::fromResourceToApi(cameraResource, apiCameraData);
     apiCameraData.id = cameraResource->physicalIdToId(uniqueId);
 
+
+    ec2::AbstractCameraManagerPtr cameraManager;
+    if (auto serverCamera = cameraResource.dynamicCast<nx::vms::server::resource::Camera>())
+        cameraManager = serverCamera->cameraManager();
+
     ec2::ErrorCode errCode = addAndPropagateCamResource(
         serverModule()->commonModule(),
         apiCameraData,
-        cameraResource->getRuntimeProperties());
+        cameraResource->getRuntimeProperties(),
+        cameraManager);
     if (errCode != ec2::ErrorCode::ok)
         return;
 

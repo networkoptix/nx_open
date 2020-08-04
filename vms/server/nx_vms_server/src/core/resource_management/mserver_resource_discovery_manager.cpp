@@ -1,5 +1,6 @@
 #include "mserver_resource_discovery_manager.h"
 
+#include <QtConcurrent/QtConcurrent>
 #include <QtConcurrent/QtConcurrentMap>
 #include <QtCore/QThreadPool>
 
@@ -89,6 +90,53 @@ QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(
 QnMServerResourceDiscoveryManager::~QnMServerResourceDiscoveryManager()
 {
     stop();
+}
+
+QnResourceList QnMServerResourceDiscoveryManager::CheckHostAddrAsync(const QnManualCameraInfo& input)
+{
+    try
+    {
+        QnAbstractNetworkResourceSearcher* ns = dynamic_cast<QnAbstractNetworkResourceSearcher*>(input.searcher);
+        QString urlStr = input.url.toString();
+        if (!ns)
+            return QList<QnResourcePtr>();
+        auto result = ns->checkHostAddr(input.url, input.auth, false);
+        for (const auto& resource : result)
+        {
+            const auto connection = ns->commonModule()->ec2Connection();
+            if (auto camera = resource.dynamicCast<nx::vms::server::resource::Camera>())
+            {
+                camera->setCameraManagerFactory(
+                    [userSession = input.userSession]
+                    (const QnSecurityCamResource* camera)
+                    {
+                        return camera->commonModule()->ec2Connection()
+                            ->getCameraManager(userSession);
+                    });
+            }
+        }
+        return result;
+    }
+    catch (const std::exception& e)
+    {
+        const auto resType = input.resType ? input.resType->getName() : lit("Unknown");
+        qWarning()
+            << "CheckHostAddrAsync exception (" << e.what() << ") caught\n"
+            << "\t\tresource type:" << resType << "\n"
+            << "\t\tresource url:" << input.url.toString() << "\n";
+
+        return QnResourceList();
+    }
+    catch (...)
+    {
+        const auto resType = input.resType ? input.resType->getName() : lit("Unknown");
+        qWarning()
+            << "CheckHostAddrAsync exception caught\n"
+            << "\t\tresource type:" << resType << "\n"
+            << "\t\tresource url:" << input.url.toString() << "\n";
+
+        return QnResourceList();
+    }
 }
 
 void QnMServerResourceDiscoveryManager::stop()
@@ -625,3 +673,82 @@ void QnMServerResourceDiscoveryManager::pingResources(const QnResourcePtr& res)
         }
     }
 }
+
+void QnMServerResourceDiscoveryManager::appendManualDiscoveredResources(QnResourceList& resources)
+{
+    decltype(m_manualCameraByUniqueId) manualCameraByUniqueId;
+    bool manualCameraListChanged = false;
+    {
+        QnMutexLocker lock(&m_searchersListMutex);
+        if (m_manualCameraByUniqueId.empty())
+            return;
+
+        manualCameraByUniqueId = m_manualCameraByUniqueId;
+        manualCameraListChanged = m_manualCameraListChanged;
+        m_manualCameraListChanged = false;
+    }
+
+    std::set<QString> updatedManualCameraIds;
+    std::vector<QFuture<QnResourceList>> searchFutures;
+    for (const auto& manualCamera : manualCameraByUniqueId)
+    {
+        const auto camera = commonModule()->resourcePool()->getResourceByUniqueId(manualCamera.uniqueId)
+            .dynamicCast<QnSecurityCamResource>();
+
+        if (camera && (camera->hasFlags(Qn::foreigner) && !canTakeForeignCamera(camera, 0)))
+        {
+            NX_VERBOSE(this, lm("Skip foreigh camera %1 on %2").args(
+                manualCamera.uniqueId, manualCamera.url));
+            continue;
+        }
+
+        // There is a little problem: if camera goes offline on manual addition we will still try to
+        // ping it until it's found even if discovery mode is disabled.
+        // TODO: Refactor so samera is not pinged on manual addition. The resource from manual
+        // search handler should be used instead!
+        const bool ignoreManualCameraInfo =
+            !manualCamera.searcher
+            || (camera
+                && manualCamera.searcher->discoveryMode() == DiscoveryMode::disabled
+                && !manualCamera.isUpdated
+                && !manualCameraListChanged);
+
+        if (ignoreManualCameraInfo)
+        {
+            NX_VERBOSE(this, lm("Skip disabled searcher for camera %1 on %2").args(
+                manualCamera.uniqueId, manualCamera.url));
+            continue;
+        }
+
+        if (manualCamera.isUpdated)
+            updatedManualCameraIds.insert(manualCamera.uniqueId);
+
+        NX_VERBOSE(this, "Check %1 on %2", manualCamera.uniqueId, manualCamera.url);
+        searchFutures.push_back(QtConcurrent::run(&CheckHostAddrAsync, manualCamera));
+    }
+
+    for (auto& future : searchFutures)
+    {
+        future.waitForFinished();
+        const auto foundResources = future.result();
+        for (auto& resource : foundResources)
+        {
+            if (auto camera = resource.dynamicCast<QnSecurityCamResource>())
+                camera->setManuallyAdded(true);
+
+            NX_VERBOSE(this, lm("Manual camera %1 is found on %2")
+                .args(resource->getUniqueId(), resource->getUrl()));
+
+            resource->setCommonModule(commonModule());
+            resources << std::move(resource);
+        }
+    }
+
+    QnMutexLocker lock(&m_searchersListMutex);
+    for (const auto& id : updatedManualCameraIds)
+    {
+        if (auto it = m_manualCameraByUniqueId.find(id); it != m_manualCameraByUniqueId.cend())
+            it->isUpdated = false;
+    }
+}
+

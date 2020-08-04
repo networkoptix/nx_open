@@ -5,12 +5,17 @@
 
 namespace ec2
 {
-void detail::ServerQueryProcessor::setAuditData(
-    ECConnectionAuditManager* auditManager,
-    const QnAuthSession& authSession)
+
+detail::ServerQueryProcessor::ServerQueryProcessor(
+    ServerQueryProcessorAccess* owner,
+    const Qn::UserSession& userSession)
+    :
+    m_owner(owner),
+    m_db(owner->getDb(), userSession.access),
+    m_userSession(userSession)
 {
-    m_auditManager = auditManager;
-    m_authSession = authSession;
+    if (const auto& ec2Connection = m_owner->commonModule()->ec2Connection())
+        m_auditManager = ec2Connection->auditManager();
 }
 
 ErrorCode detail::ServerQueryProcessor::removeHelper(
@@ -71,9 +76,9 @@ ErrorCode detail::ServerQueryProcessor::removeResourceStatusHelper(
 }
 
 detail::ServerQueryProcessor ServerQueryProcessorAccess::getAccess(
-    const Qn::UserAccessData userAccessData)
+    const Qn::UserSession& userSession)
 {
-    return detail::ServerQueryProcessor(this, userAccessData);
+    return detail::ServerQueryProcessor(this, userSession);
 }
 
 namespace detail {

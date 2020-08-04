@@ -15,7 +15,7 @@ class QnLicenseManager: public AbstractLicenseManager
 {
 public:
     QnLicenseManager(
-        QueryProcessorType* const queryProcessor, const Qn::UserAccessData& userAccessData);
+        QueryProcessorType* const queryProcessor, const Qn::UserSession& userSession);
 
     virtual int getLicenses(impl::GetLicensesHandlerPtr handler) override;
     virtual int addLicenses(const QnLicenseList& licenses, impl::SimpleHandlerPtr handler) override;
@@ -23,7 +23,7 @@ public:
 
 private:
     QueryProcessorType* const m_queryProcessor;
-    Qn::UserAccessData m_userAccessData;
+    Qn::UserSession m_userSession;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -32,10 +32,10 @@ private:
 template<class T>
 QnLicenseManager<T>::QnLicenseManager(
     T* const queryProcessor,
-    const Qn::UserAccessData &userAccessData)
+    const Qn::UserSession& userSession)
     :
     m_queryProcessor(queryProcessor),
-    m_userAccessData(userAccessData)
+    m_userSession(userSession)
 {
 }
 
@@ -53,7 +53,7 @@ int QnLicenseManager<T>::getLicenses(impl::GetLicensesHandlerPtr handler)
             handler->done(reqID, errorCode, outData);
         };
 
-    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<
+    m_queryProcessor->getAccess(m_userSession).template processQueryAsync<
         std::nullptr_t, nx::vms::api::LicenseDataList, decltype(queryDoneHandler)>(
             ApiCommand::getLicenses, nullptr, queryDoneHandler);
 
@@ -69,7 +69,7 @@ int QnLicenseManager<T>::addLicenses(
     fromResourceListToApi(licenses, params);
 
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::addLicenses, params,
         std::bind(&impl::SimpleHandler::done, handler, reqID, _1));
 
@@ -85,7 +85,7 @@ int QnLicenseManager<T>::removeLicense(
     fromResourceToApi(license, params);
 
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::removeLicense, params,
         std::bind(&impl::SimpleHandler::done, handler, reqID, _1));
 

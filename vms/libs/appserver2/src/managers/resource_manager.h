@@ -15,7 +15,7 @@ class QnResourceManager: public AbstractResourceManager
 public:
     QnResourceManager(
         QueryProcessorType* const queryProcessor,
-        const Qn::UserAccessData& userAccessData);
+        const Qn::UserSession& userSession);
 
     //!Implementation of AbstractResourceManager::getResourceTypes
     virtual int getResourceTypes(impl::GetResourceTypesHandlerPtr handler) override;
@@ -43,16 +43,16 @@ public:
 
 private:
     QueryProcessorType* const m_queryProcessor;
-    Qn::UserAccessData m_userAccessData;
+    Qn::UserSession m_userSession;
 };
 
 template<class T>
 QnResourceManager<T>::QnResourceManager(
     T* const queryProcessor,
-    const Qn::UserAccessData& userAccessData)
+    const Qn::UserSession& userSession)
     :
     m_queryProcessor(queryProcessor),
-    m_userAccessData(userAccessData)
+    m_userSession(userSession)
 {
 }
 
@@ -71,7 +71,7 @@ int QnResourceManager<T>::getResourceTypes(impl::GetResourceTypesHandlerPtr hand
                 fromApiToResourceList(resTypeList, outResTypeList);
             handler->done(reqID, errorCode, outResTypeList);
         };
-    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<std::nullptr_t,
+    m_queryProcessor->getAccess(m_userSession).template processQueryAsync<std::nullptr_t,
         nx::vms::api::ResourceTypeDataList, decltype(queryDoneHandler)>(
         ApiCommand::getResourceTypes,
         nullptr,
@@ -91,7 +91,7 @@ int QnResourceManager<T>::setResourceStatus(
     params.status = static_cast<nx::vms::api::ResourceStatus>(status);
 
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::setResourceStatus,
         params,
         std::bind(
@@ -118,7 +118,7 @@ int QnResourceManager<T>::getKvPairs(const QnUuid& resourceId, impl::GetKvPairsH
                 outData = params;
             handler->done(reqID, errorCode, outData);
         };
-    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid,
+    m_queryProcessor->getAccess(m_userSession).template processQueryAsync<QnUuid,
         nx::vms::api::ResourceParamWithRefDataList, decltype(queryDoneHandler)>(
         ApiCommand::getResourceParams,
         resourceId,
@@ -143,7 +143,7 @@ int QnResourceManager<T>::getStatusList(
                 outData = params;
             handler->done(reqID, errorCode, outData);
         };
-    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid,
+    m_queryProcessor->getAccess(m_userSession).template processQueryAsync<QnUuid,
         nx::vms::api::ResourceStatusDataList, decltype(queryDoneHandler)>(
         ApiCommand::getStatusList,
         resourceId,
@@ -158,7 +158,7 @@ int QnResourceManager<T>::save(
 {
     const int reqID = generateRequestID();
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::setResourceParams,
         kvPairs,
         std::bind(std::mem_fn(&impl::SimpleHandler::done), handler, reqID, _1));
@@ -172,7 +172,7 @@ int QnResourceManager<T>::remove(const QnUuid& id, impl::SimpleHandlerPtr handle
     const int reqID = generateRequestID();
     using namespace std::placeholders;
 
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::removeResource,
         nx::vms::api::IdData(id),
         std::bind(std::mem_fn(&impl::SimpleHandler::done), handler, reqID, _1));
@@ -187,7 +187,7 @@ int QnResourceManager<T>::remove(const QVector<QnUuid>& idList, impl::SimpleHand
     for (const QnUuid& id: idList)
         params.push_back(id);
     using namespace std::placeholders;
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::removeResources,
         params,
         std::bind(std::mem_fn(&impl::SimpleHandler::done), handler, reqID, _1));

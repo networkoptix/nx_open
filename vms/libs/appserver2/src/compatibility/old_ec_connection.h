@@ -13,20 +13,20 @@ public:
     virtual QnConnectionInfo connectionInfo() const override;
     virtual void updateConnectionUrl(const nx::utils::Url& url) override;
 
-    virtual AbstractResourceManagerPtr getResourceManager(const Qn::UserAccessData &) override;
-    virtual AbstractMediaServerManagerPtr getMediaServerManager(const Qn::UserAccessData &) override;
-    virtual AbstractCameraManagerPtr getCameraManager(const Qn::UserAccessData &) override;
-    virtual AbstractLicenseManagerPtr getLicenseManager(const Qn::UserAccessData &) override;
-    virtual AbstractEventRulesManagerPtr getEventRulesManager(const Qn::UserAccessData &) override;
-    virtual AbstractUserManagerPtr getUserManager(const Qn::UserAccessData &) override;
-    virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserAccessData &) override;
-    virtual AbstractLayoutTourManagerPtr getLayoutTourManager(const Qn::UserAccessData& userAccessData) override;
-    virtual AbstractVideowallManagerPtr getVideowallManager(const Qn::UserAccessData &) override;
-    virtual AbstractWebPageManagerPtr getWebPageManager(const Qn::UserAccessData &) override;
-    virtual AbstractStoredFileManagerPtr getStoredFileManager(const Qn::UserAccessData &) override;
-    virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserAccessData &) override;
-    virtual AbstractDiscoveryManagerPtr getDiscoveryManager(const Qn::UserAccessData &) override;
-    virtual AbstractAnalyticsManagerPtr getAnalyticsManager(const Qn::UserAccessData&) override;
+    virtual AbstractResourceManagerPtr getResourceManager(const Qn::UserSession& ) override;
+    virtual AbstractMediaServerManagerPtr getMediaServerManager(const Qn::UserSession&) override;
+    virtual AbstractCameraManagerPtr getCameraManager(const Qn::UserSession&) override;
+    virtual AbstractLicenseManagerPtr getLicenseManager(const Qn::UserSession&) override;
+    virtual AbstractEventRulesManagerPtr getEventRulesManager(const Qn::UserSession&) override;
+    virtual AbstractUserManagerPtr getUserManager(const Qn::UserSession&) override;
+    virtual AbstractLayoutManagerPtr getLayoutManager(const Qn::UserSession&) override;
+    virtual AbstractLayoutTourManagerPtr getLayoutTourManager(const Qn::UserSession&) override;
+    virtual AbstractVideowallManagerPtr getVideowallManager(const Qn::UserSession&) override;
+    virtual AbstractWebPageManagerPtr getWebPageManager(const Qn::UserSession&) override;
+    virtual AbstractStoredFileManagerPtr getStoredFileManager(const Qn::UserSession&) override;
+    virtual AbstractMiscManagerPtr getMiscManager(const Qn::UserSession&) override;
+    virtual AbstractDiscoveryManagerPtr getDiscoveryManager(const Qn::UserSession&) override;
+    virtual AbstractAnalyticsManagerPtr getAnalyticsManager(const Qn::UserSession&) override;
 
     virtual AbstractLicenseNotificationManagerPtr licenseNotificationManager() override;
     virtual AbstractTimeNotificationManagerPtr timeNotificationManager() override;
@@ -43,6 +43,7 @@ public:
     virtual AbstractStoredFileNotificationManagerPtr storedFileNotificationManager() override;
     virtual AbstractVideowallNotificationManagerPtr videowallNotificationManager() override;
     virtual AbstractAnalyticsNotificationManagerPtr analyticsNotificationManager() override;
+    virtual ECConnectionAuditManager* auditManager() override;
 
     virtual void addRemotePeer(
         const QnUuid& id,

@@ -442,8 +442,7 @@ private:
             this, "Received transaction %1 via ec2 http request. Data: %2",
             command, nx::vms::utils::toString(requestData));
 
-        auto processor = m_connection->queryProcessor()->getAccess(owner->accessRights());
-        processor.setAuditData(m_connection->auditManager(), owner->authSession()); //< audit trail
+        auto processor = m_connection->queryProcessor()->getAccess({owner->accessRights(), owner->authSession()});
         processor.processUpdateAsync(command, requestData, queryDoneHandler);
 
         {

@@ -46,6 +46,7 @@
 #include <nx_ec/impl/regular_completion_handler.h>
 
 #include "ec_api_fwd.h"
+#include <api/model/audit/auth_session.h>
 
 class QnRestProcessorPool;
 class QnHttpConnectionListener;
@@ -68,6 +69,7 @@ class ECConnectionNotificationManager;
 class TransactionMessageBusAdapter;
 class P2pMessageBus;
 class QnAbstractTransactionTransport;
+class ECConnectionAuditManager;
 
 struct QnPeerTimeInfo
 {
@@ -962,33 +964,33 @@ public:
     virtual void setTransactionLogTime(nx::vms::api::Timestamp value) = 0;
 
     virtual AbstractResourceManagerPtr getResourceManager(
-        const Qn::UserAccessData& userAccessData) = 0;
+        const Qn::UserSession& userSession) = 0;
     virtual AbstractMediaServerManagerPtr getMediaServerManager(
-        const Qn::UserAccessData& userAccessData) = 0;
+        const Qn::UserSession& userSession) = 0;
     virtual AbstractCameraManagerPtr getCameraManager(
-        const Qn::UserAccessData& userAccessData) = 0;
+        const Qn::UserSession& userSession) = 0;
     virtual AbstractLicenseManagerPtr getLicenseManager(
-        const Qn::UserAccessData& userAccessData) = 0;
+        const Qn::UserSession& userSession) = 0;
     virtual AbstractEventRulesManagerPtr getEventRulesManager(
-        const Qn::UserAccessData& userAccessData) = 0;
+        const Qn::UserSession& userSession) = 0;
     virtual AbstractUserManagerPtr getUserManager(
-        const Qn::UserAccessData& userAccessData) = 0;
+        const Qn::UserSession& userSession) = 0;
     virtual AbstractLayoutManagerPtr getLayoutManager(
-        const Qn::UserAccessData& userAccessData) = 0;
+        const Qn::UserSession& userSession) = 0;
     virtual AbstractLayoutTourManagerPtr getLayoutTourManager(
-        const Qn::UserAccessData& userAccessData) = 0;
+        const Qn::UserSession& userSession) = 0;
     virtual AbstractVideowallManagerPtr getVideowallManager(
-        const Qn::UserAccessData& userAccessData) = 0;
+        const Qn::UserSession& userSession) = 0;
     virtual AbstractStoredFileManagerPtr getStoredFileManager(
-        const Qn::UserAccessData& userAccessData) = 0;
+        const Qn::UserSession& userSession) = 0;
     virtual AbstractMiscManagerPtr getMiscManager(
-        const Qn::UserAccessData& userAccessData) = 0;
+        const Qn::UserSession& userSession) = 0;
     virtual AbstractDiscoveryManagerPtr getDiscoveryManager(
-        const Qn::UserAccessData& userAccessData) = 0;
+        const Qn::UserSession& userSession) = 0;
     virtual AbstractWebPageManagerPtr getWebPageManager(
-        const Qn::UserAccessData& userAccessData) = 0;
+        const Qn::UserSession& userSession) = 0;
     virtual AbstractAnalyticsManagerPtr getAnalyticsManager(
-        const Qn::UserAccessData& userAccessData) = 0;
+        const Qn::UserSession& userSession) = 0;
 
     virtual AbstractResourceNotificationManagerPtr resourceNotificationManager() = 0;
     virtual AbstractMediaServerNotificationManagerPtr mediaServerNotificationManager() = 0;
@@ -1005,6 +1007,7 @@ public:
     virtual AbstractTimeNotificationManagerPtr timeNotificationManager() = 0;
     virtual AbstractBusinessEventNotificationManagerPtr businessEventNotificationManager() = 0;
     virtual AbstractUserNotificationManagerPtr userNotificationManager() = 0;
+    virtual ECConnectionAuditManager* auditManager() = 0;
 
     virtual QnCommonModule* commonModule() const = 0;
 

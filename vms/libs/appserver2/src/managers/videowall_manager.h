@@ -13,7 +13,7 @@ class QnVideowallManager: public AbstractVideowallManager
 public:
     QnVideowallManager(
         QueryProcessorType* const queryProcessor,
-        const Qn::UserAccessData& userAccessData);
+        const Qn::UserSession& userSession);
 
 protected:
     virtual int getVideowalls(impl::GetVideowallsHandlerPtr handler) override;
@@ -28,16 +28,16 @@ protected:
 
 private:
     QueryProcessorType* const m_queryProcessor;
-    Qn::UserAccessData m_userAccessData;
+    Qn::UserSession m_userSession;
 };
 
 template<class QueryProcessorType>
 QnVideowallManager<QueryProcessorType>::QnVideowallManager(
     QueryProcessorType* const queryProcessor,
-    const Qn::UserAccessData& userAccessData)
+    const Qn::UserSession& userSession)
     :
     m_queryProcessor(queryProcessor),
-    m_userAccessData(userAccessData)
+    m_userSession(userSession)
 {
 }
 
@@ -51,7 +51,7 @@ int QnVideowallManager<QueryProcessorType>::getVideowalls(impl::GetVideowallsHan
     {
         handler->done(reqID, errorCode, videowalls);
     };
-    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid,
+    m_queryProcessor->getAccess(m_userSession).template processQueryAsync<QnUuid,
         nx::vms::api::VideowallDataList, decltype(queryDoneHandler)>(
         ApiCommand::getVideowalls,
         QnUuid(),
@@ -65,7 +65,7 @@ int QnVideowallManager<T>::save(
     impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::saveVideowall,
         videowall,
         [handler, reqID](ec2::ErrorCode errorCode)
@@ -79,7 +79,7 @@ template<class T>
 int QnVideowallManager<T>::remove(const QnUuid& id, impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::removeVideowall,
         nx::vms::api::IdData(id),
         [handler, reqID](ec2::ErrorCode errorCode)
@@ -95,7 +95,7 @@ int QnVideowallManager<T>::sendControlMessage(
     impl::SimpleHandlerPtr handler)
 {
     const int reqID = generateRequestID();
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::videowallControl,
         message,
         [handler, reqID](ec2::ErrorCode errorCode)

@@ -13,7 +13,7 @@ class AnalyticsManager: public AbstractAnalyticsManager
 public:
     AnalyticsManager(
         QueryProcessor* queryProcessor,
-        const Qn::UserAccessData& userAccessData);
+        const Qn::UserSession& userSession);
 
 protected:
     virtual int getAnalyticsPlugins(impl::GetAnalyticsPluginsHandlerPtr handler) override;
@@ -37,17 +37,17 @@ protected:
 
 private:
     QueryProcessor* m_queryProcessor;
-    Qn::UserAccessData m_userAccessData;
+    Qn::UserSession m_userSession;
 
 };
 
 template<typename QueryProcessor>
 AnalyticsManager<QueryProcessor>::AnalyticsManager(
     QueryProcessor* queryProcessor,
-    const Qn::UserAccessData& userAccessData)
+    const Qn::UserSession& userSession)
     :
     m_queryProcessor(queryProcessor),
-    m_userAccessData(userAccessData)
+    m_userSession(userSession)
 {
 }
 
@@ -64,7 +64,7 @@ int AnalyticsManager<QueryProcessor>::getAnalyticsPlugins(
             handler->done(requestId, errorCode, analyticsPlugins);
         };
 
-    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid,
+    m_queryProcessor->getAccess(m_userSession).template processQueryAsync<QnUuid,
         nx::vms::api::AnalyticsPluginDataList, decltype(queryDoneHandler)>(
             ApiCommand::getAnalyticsPlugins,
             QnUuid(),
@@ -86,7 +86,7 @@ int AnalyticsManager<QueryProcessor>::getAnalyticsEngines(
             handler->done(requestId, errorCode, analyticsEngines);
         };
 
-    m_queryProcessor->getAccess(m_userAccessData).template processQueryAsync<QnUuid,
+    m_queryProcessor->getAccess(m_userSession).template processQueryAsync<QnUuid,
         nx::vms::api::AnalyticsEngineDataList, decltype(queryDoneHandler)>(
             ApiCommand::getAnalyticsEngines,
             QnUuid(),
@@ -101,7 +101,7 @@ int AnalyticsManager<QueryProcessor>::save(
     impl::SimpleHandlerPtr handler)
 {
     const int requestId = generateRequestID();
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::saveAnalyticsPlugin,
         analyticsPlugin,
         [handler, requestId](ec2::ErrorCode errorCode)
@@ -117,7 +117,7 @@ int AnalyticsManager<QueryProcessor>::save(
     impl::SimpleHandlerPtr handler)
 {
     const int requestId = generateRequestID();
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::saveAnalyticsEngine,
         analyticsEngine,
         [handler, requestId](ec2::ErrorCode errorCode)
@@ -133,7 +133,7 @@ int AnalyticsManager<QueryProcessor>::removeAnalyticsPlugin(
     impl::SimpleHandlerPtr handler)
 {
     const int requestId = generateRequestID();
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::removeAnalyticsPlugin,
         nx::vms::api::IdData(id),
         [handler, requestId](ec2::ErrorCode errorCode)
@@ -149,7 +149,7 @@ int AnalyticsManager<QueryProcessor>::removeAnalyticsEngine(
     impl::SimpleHandlerPtr handler)
 {
     const int requestId = generateRequestID();
-    m_queryProcessor->getAccess(m_userAccessData).processUpdateAsync(
+    m_queryProcessor->getAccess(m_userSession).processUpdateAsync(
         ApiCommand::removeAnalyticsEngine,
         nx::vms::api::IdData(id),
         [handler, requestId](ec2::ErrorCode errorCode)
