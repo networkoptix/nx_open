@@ -75,7 +75,7 @@ Ptr<ObjectMetadata> parsedObjectToObjectMetadata(
     const ParsedObject& object, const Bosch::EngineManifest& /*manifest*/)
 {
     Ptr<ObjectMetadata> objectMetadata = nx::sdk::makePtr<ObjectMetadata>();
-    objectMetadata->setTypeId("nx.bosch.ObjectDetection.AnyObject");
+    objectMetadata->setTypeId(DeviceAgent::kObjectDetectionObjectTypeId.toStdString());
 
     objectMetadata->setTrackId(deviceObjectNumberToUuid(object.id));
 
@@ -112,23 +112,6 @@ void DeviceInfo::init(const IDeviceInfo* deviceInfo)
 DeviceAgent::DeviceAgent(Engine* engine, const IDeviceInfo* deviceInfo): m_engine(engine)
 {
     this->m_deviceInfo.init(deviceInfo);
-
-    //m_manifest.capabilities.setFlag(
-    //    nx::vms::api::analytics::DeviceAgentManifest::disableStreamSelection);
-
-    //m_manifest.supportedEventTypeIds
-    //    << "nx.bosch.GlobalChange"
-    //    << "nx.bosch.SignalTooBright"
-    //    << "nx.bosch.SignalTooDark"
-    //    << "nx.bosch.SignalTooBlurry"
-    //    << "nx.bosch.SignalLoss"
-    //    << "nx.bosch.FlameDetected"
-    //    << "nx.bosch.SmokeDetected"
-    //    << "nx.bosch.MotionAlarm"
-    //    << "nx.bosch.Detect_any_object"
-    //    ;
-
-    //m_manifest.supportedObjectTypeIds << "nx.bosch.ObjectDetection.AnyObject";
 }
 
 DeviceAgent::~DeviceAgent()
@@ -163,33 +146,31 @@ DeviceAgent::~DeviceAgent()
 /** Provides DeviceAgent manifest in JSON format. */
 /*virtual*/ void DeviceAgent::getManifest(Result<const IString*>* outResult) const /*override*/
 {
-    // Initially we do not know which event types are supported, we'll get them in the first
-    // metadata packet. So 'agentManifest.supportedEventTypeIds' is empty.
-    // Nevertheless the manifest should be provided here, or metadata packets will no arrive to
-    // the plugin.
-
     Bosch::DeviceAgentManifest agentManifest;
     agentManifest.capabilities.setFlag(
         nx::vms::api::analytics::DeviceAgentManifest::disableStreamSelection);
 
-    // For debug purposes uncomment the following code to add all potentially possible event types.
-#if 0
+#if 1
+    // Initially we do not know which event types are supported, we'll get them in the first
+    // metadata packet (and possibly later).
+    // We should implicitly add at least one element, because no elements means all elements.
+    agentManifest.supportedEventTypeIds << kObjectDetectionEventTypeId;
+#else
+    // For debug purposes uncomment this code to add all potentially possible event types.
     agentManifest.supportedEventTypeIds
-    << "nx.bosch.GlobalChange"
-    << "nx.bosch.SignalTooBright"
-    << "nx.bosch.SignalTooDark"
-    << "nx.bosch.SignalTooBlurry"
-    << "nx.bosch.SignalLoss"
-    << "nx.bosch.FlameDetected"
-    << "nx.bosch.SmokeDetected"
-    << "nx.bosch.MotionAlarm"
-    << "nx.bosch.Detect_any_object"
-    ;
+        << "nx.bosch.GlobalChange"
+        << "nx.bosch.SignalTooBright"
+        << "nx.bosch.SignalTooDark"
+        << "nx.bosch.SignalTooBlurry"
+        << "nx.bosch.SignalLoss"
+        << "nx.bosch.FlameDetected"
+        << "nx.bosch.SmokeDetected"
+        << "nx.bosch.MotionAlarm"
+        ;
 #endif
 
-    agentManifest.supportedObjectTypeIds << "nx.bosch.ObjectDetection.AnyObject";
+    agentManifest.supportedObjectTypeIds << kObjectDetectionObjectTypeId;
     *outResult = new nx::sdk::String(QJson::serialized(agentManifest));
-
 }
 
 /**
@@ -215,7 +196,8 @@ DeviceAgent::~DeviceAgent()
 {
 }
 
-Ptr<EventMetadataPacket> DeviceAgent::buildEventPacket(const ParsedMetadata& parsedMetadata, int64_t ts) const
+Ptr<EventMetadataPacket> DeviceAgent::buildEventPacket(
+    const ParsedMetadata& parsedMetadata, int64_t ts) const
 {
     using namespace std::chrono;
 
@@ -236,13 +218,46 @@ Ptr<EventMetadataPacket> DeviceAgent::buildEventPacket(const ParsedMetadata& par
         return packet;
     }
 
-    packet->setTimestampUs(
-        duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
-    packet->setDurationUs(-1);
+    packet->setTimestampUs(ts);
+    packet->setDurationUs(1'000'000);
     return packet;
 }
 
-Ptr<ObjectMetadataPacket> DeviceAgent::buildObjectPacket(const ParsedMetadata& parsedMetadata, int64_t ts) const
+Ptr<EventMetadataPacket> DeviceAgent::buildObjectDetectionEventPacket(int64_t ts) const
+{
+    using namespace std::chrono;
+
+    Ptr<EventMetadataPacket> packet = nx::sdk::makePtr<EventMetadataPacket>();
+
+    const Bosch::EventType* eventType =
+        m_engine->manifest().eventTypeByInternalName(kObjectDetectionEventTypeId.split('.').back());
+    if (!eventType)
+        return {};
+
+    Ptr<EventMetadata> eventMetadata = nx::sdk::makePtr<EventMetadata>();
+    eventMetadata->setTypeId(kObjectDetectionEventTypeId.toStdString());
+    eventMetadata->setCaption(eventType->name.toStdString());
+
+    eventMetadata->setDescription(eventType->fullDescription().toStdString());
+    eventMetadata->setIsActive(true);
+    eventMetadata->setConfidence(1.0);
+
+    if (eventMetadata)
+        packet->addItem(eventMetadata.get());
+
+   if (packet->count() == 0)
+    {
+        packet.reset();
+        return packet;
+    }
+
+    packet->setTimestampUs(ts);
+    packet->setDurationUs(1'000'000);
+    return packet;
+}
+
+Ptr<ObjectMetadataPacket> DeviceAgent::buildObjectPacket(
+    const ParsedMetadata& parsedMetadata, int64_t ts) const
 {
     using namespace std::chrono;
 
@@ -253,7 +268,9 @@ Ptr<ObjectMetadataPacket> DeviceAgent::buildObjectPacket(const ParsedMetadata& p
     packet = nx::sdk::makePtr<ObjectMetadataPacket>();
     for (const ParsedObject& object: parsedMetadata.objects)
     {
-        Ptr<ObjectMetadata> objectMetadata = parsedObjectToObjectMetadata(object, m_engine->manifest());
+        Ptr<ObjectMetadata> objectMetadata = parsedObjectToObjectMetadata(
+            object, m_engine->manifest());
+
         if (objectMetadata)
             packet->addItem(objectMetadata.get());
     }
@@ -263,9 +280,8 @@ Ptr<ObjectMetadataPacket> DeviceAgent::buildObjectPacket(const ParsedMetadata& p
         return packet;
     }
 
-    packet->setTimestampUs(
-        duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
-    packet->setDurationUs(-1);
+    packet->setTimestampUs(ts);
+    packet->setDurationUs(1'000'000);
     return packet;
 }
 
@@ -289,7 +305,9 @@ void DeviceAgent::updateAgentManifest()
     for (const QString& topic: m_wsntTopics)
         agentManifest.supportedEventTypeIds << kBoschPrefix + ExtractEventTypeNameFromTopic(topic);
 
-    agentManifest.supportedObjectTypeIds << "nx.bosch.ObjectDetection.AnyObject";
+    agentManifest.supportedEventTypeIds << kObjectDetectionEventTypeId;
+
+    agentManifest.supportedObjectTypeIds << kObjectDetectionObjectTypeId;
 
     m_handler->pushManifest(new nx::sdk::String(QJson::serialized(agentManifest)));
 }
@@ -298,8 +316,8 @@ void DeviceAgent::updateAgentManifest()
     Result<void>* /*outResult*/, IDataPacket* dataPacket) /*override*/
 {
     const auto incomingPacket = dataPacket->queryInterface<ICustomMetadataPacket>();
-    QByteArray xmlData(incomingPacket->data(), incomingPacket->dataSize());
-    MetadataXmlParser parser(/*test::*/xmlData);
+    const QByteArray xmlData(incomingPacket->data(), incomingPacket->dataSize());
+    MetadataXmlParser parser(xmlData);
     const ParsedMetadata parsedMetadata = parser.parse();
     if (replanishSupportedEventTypeIds(parsedMetadata))
         updateAgentManifest();
@@ -311,14 +329,18 @@ void DeviceAgent::updateAgentManifest()
 
     Ptr<ObjectMetadataPacket> packet2 = buildObjectPacket(parsedMetadata, dataPacket->timestampUs());
     if (packet2 && NX_ASSERT(m_handler))
-        m_handler->handleMetadata(packet.get());
+    {
+        m_handler->handleMetadata(packet2.get());
+        Ptr<EventMetadataPacket> packet3 = buildObjectDetectionEventPacket(dataPacket->timestampUs());
+        if (packet3)
+            m_handler->handleMetadata(packet3.get());
+    }
 
-    thread_local int i = 0;
-    std::cout << std::endl
-        << "====================================================================================="
-        << ++i << std::endl
-        << /*test::*/xmlData.constData() << std::endl;
-
+    //thread_local int i = 0;
+    //std::cout << std::endl
+    //    << "====================================================================================="
+    //    << ++i << std::endl
+    //    << xmlData.constData() << std::endl;
 }
 
 //-------------------------------------------------------------------------------------------------

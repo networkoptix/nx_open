@@ -89,10 +89,7 @@
             "id": "nx.bosch.Detect_any_object",
             "name": "Object detection",
             "internalName": "Detect_any_object",
-            "description": "New object detection %1",
-            "positiveState": "started",
-            "negativeState": "stopped",
-            "flags": "stateDependent"
+            "description": "New object(s) detected"
         }
     ],
     "unusedEventTypes":

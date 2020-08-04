@@ -97,20 +97,23 @@ private:
     Ptr<EventMetadataPacket> buildEventPacket(
         const ParsedMetadata& parsedMetadata, int64_t ts) const;
 
+    Ptr<EventMetadataPacket> buildObjectDetectionEventPacket(int64_t ts) const;
+
     Ptr<ObjectMetadataPacket> buildObjectPacket(
         const ParsedMetadata& parsedMetadata, int64_t ts) const;
 
 private:
-    nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
-
     Engine* const m_engine;
+    nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
+    DeviceInfo m_deviceInfo;
 
     /** Initially empty, may be replenished after each incoming metadata (doPushDataPacket call). */
     QSet<QString> m_wsntTopics;
 
-//    Bosch::DeviceAgentManifest m_manifest;
-
-    DeviceInfo m_deviceInfo;
+public:
+    /** This event type corresponds to no wsnt topic, it is added explicitly manually. */
+    static const inline QString kObjectDetectionEventTypeId = "nx.bosch.Detect_any_object";
+    static const inline QString kObjectDetectionObjectTypeId = "nx.bosch.ObjectDetection.AnyObject";
 };
 
 } // namespace nx::vms_server_plugins::analytics::bosch
