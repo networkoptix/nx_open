@@ -35,7 +35,7 @@ public:
     QString name() const;
 
     bool optional() const;
-    void setOptional(bool isOptional);
+    virtual void setOptional(bool isOptional);
 
     Scope scope() const;
     void setScope(Scope scope);
@@ -109,6 +109,7 @@ public:
 
     void forEach(Duration maxAge, const ValueIterator& iterator, Border border) const override;
 
+    virtual void setOptional(bool isOptional);
     virtual api::metrics::Value valueOrThrow() const override;
 
 private:
@@ -117,6 +118,10 @@ private:
 private:
     nx::utils::ValueHistory<api::metrics::Value> m_history;
     nx::utils::SharedGuardPtr m_watchGuard;
+
+    // NOTE: This variable is used to assert on suspicious situations in `setOptional` method when
+    // this monitor is initially set to optional and then is switched to not optional.
+    bool m_setOptionalFirstTime = true;
 };
 
 // -----------------------------------------------------------------------------------------------
@@ -161,7 +166,7 @@ ValueHistoryMonitor<ResourceType>::ValueHistoryMonitor(
 {
     // NOTE: Required to override default value, because updateValue() is called here before real
     // optionality mark was set.
-    this->setOptional(true);
+    ValueMonitor::setOptional(true);
     updateValue();
 }
 
@@ -176,6 +181,24 @@ template<typename ResourceType>
 api::metrics::Value ValueHistoryMonitor<ResourceType>::valueOrThrow() const
 {
     return m_history.current();
+}
+
+template<typename ResourceType>
+void ValueHistoryMonitor<ResourceType>::setOptional(bool isOptional)
+{
+    // NOTE: Next code is written to assert on suspicious situations when this monitor is initially
+    // set to optional and then is switched to not optional.
+    if (m_setOptionalFirstTime)
+    {
+        m_setOptionalFirstTime = false;
+    }
+    else
+    {
+        NX_ASSERT(!this->optional() || isOptional,
+            "%1 is switched to not optional, probably by mistake",
+            this);
+    }
+    ValueMonitor::setOptional(isOptional);
 }
 
 template<typename ResourceType>
