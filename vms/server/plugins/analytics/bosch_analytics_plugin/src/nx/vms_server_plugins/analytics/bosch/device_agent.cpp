@@ -113,22 +113,22 @@ DeviceAgent::DeviceAgent(Engine* engine, const IDeviceInfo* deviceInfo): m_engin
 {
     this->m_deviceInfo.init(deviceInfo);
 
-    m_manifest.capabilities.setFlag(
-        nx::vms::api::analytics::DeviceAgentManifest::disableStreamSelection);
+    //m_manifest.capabilities.setFlag(
+    //    nx::vms::api::analytics::DeviceAgentManifest::disableStreamSelection);
 
-    m_manifest.supportedEventTypeIds
-        << "nx.bosch.GlobalChange"
-        << "nx.bosch.SignalTooBright"
-        << "nx.bosch.SignalTooDark"
-        << "nx.bosch.SignalTooBlurry"
-        << "nx.bosch.SignalLoss"
-        << "nx.bosch.FlameDetected"
-        << "nx.bosch.SmokeDetected"
-        << "nx.bosch.MotionAlarm"
-        << "nx.bosch.Detect_any_object"
-        ;
+    //m_manifest.supportedEventTypeIds
+    //    << "nx.bosch.GlobalChange"
+    //    << "nx.bosch.SignalTooBright"
+    //    << "nx.bosch.SignalTooDark"
+    //    << "nx.bosch.SignalTooBlurry"
+    //    << "nx.bosch.SignalLoss"
+    //    << "nx.bosch.FlameDetected"
+    //    << "nx.bosch.SmokeDetected"
+    //    << "nx.bosch.MotionAlarm"
+    //    << "nx.bosch.Detect_any_object"
+    //    ;
 
-    m_manifest.supportedObjectTypeIds << "nx.bosch.ObjectDetection.AnyObject";
+    //m_manifest.supportedObjectTypeIds << "nx.bosch.ObjectDetection.AnyObject";
 }
 
 DeviceAgent::~DeviceAgent()
@@ -163,7 +163,33 @@ DeviceAgent::~DeviceAgent()
 /** Provides DeviceAgent manifest in JSON format. */
 /*virtual*/ void DeviceAgent::getManifest(Result<const IString*>* outResult) const /*override*/
 {
-    *outResult = new nx::sdk::String(QJson::serialized(m_manifest));
+    // Initially we do not know which event types are supported, we'll get them in the first
+    // metadata packet. So 'agentManifest.supportedEventTypeIds' is empty.
+    // Nevertheless the manifest should be provided here, or metadata packets will no arrive to
+    // the plugin.
+
+    Bosch::DeviceAgentManifest agentManifest;
+    agentManifest.capabilities.setFlag(
+        nx::vms::api::analytics::DeviceAgentManifest::disableStreamSelection);
+
+    // For debug purposes uncomment the following code to add all potentially possible event types.
+#if 0
+    agentManifest.supportedEventTypeIds
+    << "nx.bosch.GlobalChange"
+    << "nx.bosch.SignalTooBright"
+    << "nx.bosch.SignalTooDark"
+    << "nx.bosch.SignalTooBlurry"
+    << "nx.bosch.SignalLoss"
+    << "nx.bosch.FlameDetected"
+    << "nx.bosch.SmokeDetected"
+    << "nx.bosch.MotionAlarm"
+    << "nx.bosch.Detect_any_object"
+    ;
+#endif
+
+    agentManifest.supportedObjectTypeIds << "nx.bosch.ObjectDetection.AnyObject";
+    *outResult = new nx::sdk::String(QJson::serialized(agentManifest));
+
 }
 
 /**
@@ -243,6 +269,31 @@ Ptr<ObjectMetadataPacket> DeviceAgent::buildObjectPacket(const ParsedMetadata& p
     return packet;
 }
 
+bool DeviceAgent::replanishSupportedEventTypeIds(const ParsedMetadata& parsedMetadata)
+{
+    int oldSize = m_wsntTopics.size();
+    for (const ParsedEvent& id: parsedMetadata.events)
+        m_wsntTopics.insert(id.topic);
+
+    return oldSize < m_wsntTopics.size();
+}
+
+void DeviceAgent::updateAgentManifest()
+{
+    Bosch::DeviceAgentManifest agentManifest;
+
+    agentManifest.capabilities.setFlag(
+        nx::vms::api::analytics::DeviceAgentManifest::disableStreamSelection);
+
+    static const QString kBoschPrefix("nx.bosch.");
+    for (const QString& topic: m_wsntTopics)
+        agentManifest.supportedEventTypeIds << kBoschPrefix + ExtractEventTypeNameFromTopic(topic);
+
+    agentManifest.supportedObjectTypeIds << "nx.bosch.ObjectDetection.AnyObject";
+
+    m_handler->pushManifest(new nx::sdk::String(QJson::serialized(agentManifest)));
+}
+
 /*virtual*/ void DeviceAgent::doPushDataPacket(
     Result<void>* /*outResult*/, IDataPacket* dataPacket) /*override*/
 {
@@ -250,6 +301,8 @@ Ptr<ObjectMetadataPacket> DeviceAgent::buildObjectPacket(const ParsedMetadata& p
     QByteArray xmlData(incomingPacket->data(), incomingPacket->dataSize());
     MetadataXmlParser parser(/*test::*/xmlData);
     const ParsedMetadata parsedMetadata = parser.parse();
+    if (replanishSupportedEventTypeIds(parsedMetadata))
+        updateAgentManifest();
 
     Ptr<EventMetadataPacket> packet = buildEventPacket(parsedMetadata, dataPacket->timestampUs());
 

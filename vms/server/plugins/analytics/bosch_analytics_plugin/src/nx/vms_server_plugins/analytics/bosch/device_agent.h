@@ -90,6 +90,10 @@ protected:
         Result<void>* outResult, IDataPacket* dataPacket) override;
 
 private:
+    bool replanishSupportedEventTypeIds(const ParsedMetadata& parsedMetadata);
+
+    void updateAgentManifest();
+
     Ptr<EventMetadataPacket> buildEventPacket(
         const ParsedMetadata& parsedMetadata, int64_t ts) const;
 
@@ -101,7 +105,10 @@ private:
 
     Engine* const m_engine;
 
-    Bosch::DeviceAgentManifest m_manifest;
+    /** Initially empty, may be replenished after each incoming metadata (doPushDataPacket call). */
+    QSet<QString> m_wsntTopics;
+
+//    Bosch::DeviceAgentManifest m_manifest;
 
     DeviceInfo m_deviceInfo;
 };
