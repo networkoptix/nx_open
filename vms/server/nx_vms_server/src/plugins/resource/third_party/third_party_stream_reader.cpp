@@ -449,7 +449,7 @@ QnAbstractMediaDataPtr ThirdPartyStreamReader::getNextData()
     while (!needToStop())
     {
         auto packet = getNextPacket();
-        if (!m_audioEnabled && packet->dataType == QnAbstractMediaData::AUDIO)
+        if (!m_audioEnabled && packet && packet->dataType == QnAbstractMediaData::AUDIO)
             continue;
 
         return packet;
