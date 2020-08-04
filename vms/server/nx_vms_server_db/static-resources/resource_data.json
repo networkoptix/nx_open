@@ -1136,7 +1136,8 @@
                 "network digital video|b1210dm",
                 "acti|v31",
                 "*|UL-DVR302-16Z",
-                "Hangzhou Hikvision Digital Technology*|ds-7216*"
+                "Hangzhou Hikvision Digital Technology*|ds-7216*",
+                "Dahua|XVR5104*"
             ],
             "analogEncoder": true
         },
