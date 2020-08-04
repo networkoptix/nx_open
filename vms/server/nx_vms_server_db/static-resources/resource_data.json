@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.3.506",
+    "version": "4.1.3.513",
     "data": [
         {
             "keys": [
@@ -4510,6 +4510,33 @@
                         "device":  [0, 0.6, 0.7, 1    ],
                         "logical": [1, 20 , 21 , 26.3 ],
                         "logicalMultiplier": 51,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "_comment1": "Mapping for Panasonic_WV-S6130 on firmware: 4.22",
+            "keys": [
+                "Panasonic|WV-S6130"
+            ],
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [ 0, 0.972],
+                        "logical": [ -180, 180 ]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 0],
+                        "logical": [-90, 30]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0.00, 0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09],
+                        "logical": [1.00 , 3.42, 6.33, 10.02, 13.69, 17.36, 21.10, 24.87, 28.32, 31.0],
+                        "logicalMultiplier": 24,
                         "space": "35MmEquiv"
                     }
                 }
