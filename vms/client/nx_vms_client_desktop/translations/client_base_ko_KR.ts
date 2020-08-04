@@ -360,7 +360,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>About...</source>
-      <translation>상세...</translation>
+      <translation>정보...</translation>
     </message>
     <message>
       <source>Exit</source>
@@ -9563,7 +9563,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Switch on Timer</source>
-      <translation>타이머에 있는 스위치</translation>
+      <translation>타이머 스위치</translation>
     </message>
   </context>
   <context>
@@ -9867,12 +9867,12 @@ Server Settings (서버 설정) 대화 상자의 &quot;Storage Management (스�
     <message>
       <source>Switch by</source>
       <comment>Arrows will follow</comment>
-      <translation>로 전환</translation>
+      <translation>단축키로 전환</translation>
     </message>
     <message>
       <source>Display for</source>
       <comment>Time selector will follow</comment>
-      <translation>디스플레이 대 한</translation>
+      <translation>표시 시간</translation>
     </message>
     <message>
       <source>Display selected for</source>
