@@ -1512,7 +1512,6 @@ void MediaServerProcess::at_storageManager_noStoragesAvailable()
 {
     if (isStopping())
         return;
-    serverModule()->eventConnector()->at_noStorages(m_mediaServer);
     setRuntimeFlag(nx::vms::api::RuntimeFlag::noStorages, true);
 }
 

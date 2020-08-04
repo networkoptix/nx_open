@@ -2,10 +2,12 @@
 
 #include <array>
 
+#include <QtCore/QSet>
 #include <QtWidgets/QAction>
 
 #include <api/global_settings.h>
 #include <api/common_message_processor.h>
+#include <api/runtime_info_manager.h>
 #include <client/client_show_once_settings.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
@@ -51,10 +53,15 @@ private:
     UserEmailsWatcher* userEmailsWatcher() const;
     bool isAdmin() const;
 
+    void updateCamerasWithDefaultPassword();
+    void updateUsersWithInvalidEmail();
+    void updateServersWithoutStorages();
+
 private:
     std::array<bool, SystemHealthIndex::Count> m_state;
     QnUserResourceList m_usersWithInvalidEmail; //< Only editable; current user excluded.
     QnVirtualCameraResourceList m_camerasWithDefaultPassword;
+    QSet<QnUuid> m_serversWithoutStorages;
 };
 
 SystemHealthState::Private::Private(SystemHealthState* q) :
@@ -107,21 +114,12 @@ SystemHealthState::Private::Private(SystemHealthState* q) :
 
     NX_ASSERT(defaultPasswordWatcher(), "Default password cameras watcher is not initialized");
 
-    const auto updateCamerasWithDefaultPassword =
-        [this]()
-        {
-            // Cache cameras with default password as a list.
-            m_camerasWithDefaultPassword =
-                defaultPasswordWatcher()->camerasWithDefaultPassword().toList();
+    connect(defaultPasswordWatcher(), &DefaultPasswordCamerasWatcher::cameraSetChanged, q,
+        [this]() { updateCamerasWithDefaultPassword(); });
 
-            if (!update(DefaultCameraPasswords)())
-                emit this->q->dataChanged(SystemHealthIndex::DefaultCameraPasswords, {});
-        };
+    connect(q->context(), &QnWorkbenchContext::userChanged, q,
+        [this]() { updateCamerasWithDefaultPassword(); });
 
-    connect(defaultPasswordWatcher(), &DefaultPasswordCamerasWatcher::cameraSetChanged,
-        q, updateCamerasWithDefaultPassword);
-
-    connect(q->context(), &QnWorkbenchContext::userChanged, q, updateCamerasWithDefaultPassword);
     updateCamerasWithDefaultPassword();
 
     // EmailIsEmpty.
@@ -134,31 +132,29 @@ SystemHealthState::Private::Private(SystemHealthState* q) :
 
     // UsersEmailIsEmpty.
 
-    const auto updateUsersWithInvalidEmail =
-        [this]()
-        {
-            // Cache filtered users with invalid emails as a list.
-            const auto usersWithInvalidEmail = QnUserResourceList(
-                userEmailsWatcher()->usersWithInvalidEmail().toList()).filtered(
-                    [this](const QnUserResourcePtr& user)
-                    {
-                        return user && user != this->q->context()->user()
-                            && this->q->accessController()->hasPermissions(user,
-                                Qn::WriteEmailPermission);
-                    });
+    connect(userEmailsWatcher(), &UserEmailsWatcher::userSetChanged, q,
+        [this]() { updateUsersWithInvalidEmail(); });
 
-            if (m_usersWithInvalidEmail == usersWithInvalidEmail)
-                return;
+    connect(q->context(), &QnWorkbenchContext::userChanged, q,
+        [this]() { updateUsersWithInvalidEmail(); });
 
-            m_usersWithInvalidEmail = usersWithInvalidEmail;
-
-            if (!update(UsersEmailIsEmpty)())
-                emit this->q->dataChanged(SystemHealthIndex::UsersEmailIsEmpty, {});
-    };
-
-    connect(userEmailsWatcher(), &UserEmailsWatcher::userSetChanged, q, updateUsersWithInvalidEmail);
-    connect(q->context(), &QnWorkbenchContext::userChanged, q, updateUsersWithInvalidEmail);
     updateUsersWithInvalidEmail();
+
+    // StoragesNotConfigured.
+
+    const auto runtimeInfoManager = q->context()->runtimeInfoManager();
+    NX_ASSERT(runtimeInfoManager);
+
+    connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoAdded, q,
+        [this]() { updateServersWithoutStorages(); });
+
+    connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoRemoved, q,
+        [this]() { updateServersWithoutStorages(); });
+
+    connect(runtimeInfoManager, &QnRuntimeInfoManager::runtimeInfoChanged, q,
+        [this]() { updateServersWithoutStorages(); });
+
+    updateServersWithoutStorages();
 
     // CloudPromo.
 
@@ -173,6 +169,61 @@ SystemHealthState::Private::Private(SystemHealthState* q) :
     update(CloudPromo)();
 
 #undef update
+}
+
+void SystemHealthState::Private::updateCamerasWithDefaultPassword()
+{
+    // Cache cameras with default password as a list.
+    m_camerasWithDefaultPassword =
+        defaultPasswordWatcher()->camerasWithDefaultPassword().toList();
+
+    if (!update(SystemHealthIndex::DefaultCameraPasswords))
+        emit q->dataChanged(SystemHealthIndex::DefaultCameraPasswords, {});
+}
+
+void SystemHealthState::Private::updateUsersWithInvalidEmail()
+{
+    // Cache filtered users with invalid emails as a list.
+    const auto usersWithInvalidEmail = QnUserResourceList(
+        userEmailsWatcher()->usersWithInvalidEmail().toList()).filtered(
+            [this](const QnUserResourcePtr& user)
+            {
+                return user && user != q->context()->user()
+                    && q->accessController()->hasPermissions(user,
+                        Qn::WriteEmailPermission);
+            });
+
+    if (m_usersWithInvalidEmail == usersWithInvalidEmail)
+        return;
+
+    m_usersWithInvalidEmail = usersWithInvalidEmail;
+
+    if (!update(SystemHealthIndex::UsersEmailIsEmpty))
+        emit q->dataChanged(SystemHealthIndex::UsersEmailIsEmpty, {});
+}
+
+void SystemHealthState::Private::updateServersWithoutStorages()
+{
+    const auto runtimeInfoManager = q->context()->runtimeInfoManager();
+    if (!NX_ASSERT(runtimeInfoManager))
+        return;
+
+    QSet<QnUuid> serversWithoutStorages;
+
+    const auto items = runtimeInfoManager->items()->getItems();
+    for (const auto item: items)
+    {
+        if (item.data.flags.testFlag(nx::vms::api::RuntimeFlag::noStorages))
+            serversWithoutStorages.insert(item.uuid);
+    }
+
+    if (serversWithoutStorages == m_serversWithoutStorages)
+        return;
+
+    m_serversWithoutStorages = serversWithoutStorages;
+
+    if (!update(SystemHealthIndex::StoragesNotConfigured))
+        emit q->dataChanged(SystemHealthIndex::StoragesNotConfigured, {});
 }
 
 bool SystemHealthState::Private::state(SystemHealthIndex index) const
@@ -232,6 +283,9 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
                 && q->globalSettings()->cloudSystemId().isNull()
                 && !qnClientShowOnce->testFlag(kCloudPromoShowOnceKey);
 
+        case SystemHealthIndex::StoragesNotConfigured:
+            return !m_serversWithoutStorages.empty();
+
         default:
             NX_ASSERT(false, "This system health index is not handled by SystemHealthState");
             return false;
@@ -250,6 +304,9 @@ QVariant SystemHealthState::Private::data(SystemHealthIndex index) const
 
         case SystemHealthIndex::UsersEmailIsEmpty:
             return QVariant::fromValue(m_usersWithInvalidEmail);
+
+        case SystemHealthIndex::StoragesNotConfigured:
+            return QVariant::fromValue(m_serversWithoutStorages);
 
         default:
             return {};

@@ -109,8 +109,6 @@ public slots:
     void at_serverConflict(const QnResourcePtr& resource, qint64 timeStamp,
         const nx::vms::api::ModuleInformation& conflictModule, const QUrl &url);
 
-    void at_noStorages(const QnResourcePtr& resource);
-
     void at_archiveRebuildFinished(const QnResourcePtr& resource,
         QnSystemHealth::MessageType msgType);
 

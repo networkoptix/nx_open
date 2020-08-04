@@ -24,7 +24,7 @@ enum MessageType
     // These messages are sent from server.
 
     EmailSendError = 7,
-    StoragesNotConfigured = 8,
+    StoragesNotConfigured = 8, //< Generated on the client side since 4.1 hotfix.
     /* StoragesAreFull = 9 */
     ArchiveRebuildFinished = 10,
     ArchiveRebuildCanceled = 11,

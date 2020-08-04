@@ -307,13 +307,6 @@ void EventConnector::at_archiveBackupFinished(
     serverModule()->eventRuleProcessor()->processEvent(event);
 }
 
-void EventConnector::at_noStorages(const QnResourcePtr& resource)
-{
-    vms::event::SystemHealthActionPtr action(new vms::event::SystemHealthAction(
-        QnSystemHealth::StoragesNotConfigured, resource->getId()));
-    serverModule()->eventRuleProcessor()->broadcastAction(action);
-}
-
 void EventConnector::at_remoteArchiveSyncStarted(const QnResourcePtr& resource)
 {
     const auto secRes = resource.dynamicCast<QnSecurityCamResource>();
