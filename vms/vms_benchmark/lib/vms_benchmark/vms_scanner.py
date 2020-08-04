@@ -225,7 +225,7 @@ class VmsScanner:
             from os import environ
             if environ.get('DEBUG', '0') == '1':
                 import sys
-                print(f"`pidof  {VmsScanner.Vms.MEDIASERVER_NAMES_STRING}: {pids_raw}`",
+                print(f"`pidof {VmsScanner.Vms.MEDIASERVER_NAMES_STRING}: {pids_raw}`",
                     file=sys.stderr)
             if not pids_raw:
                 return None
