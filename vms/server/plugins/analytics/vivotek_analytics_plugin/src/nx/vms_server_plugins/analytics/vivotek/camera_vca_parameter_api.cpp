@@ -58,14 +58,7 @@ cf::future<cf::unit> CameraVcaParameterApi::reloadConfig()
 
 float CameraVcaParameterApi::parseCoordinate(const JsonValue& json)
 {
-    const auto value = json.to<double>();
-    if (value < 0 || value > kCoordinateDomain)
-    {
-        throw Exception("%1 = %2 is outside of expected range of [0; %3]",
-            json.path, value, kCoordinateDomain);
-    }
-
-    return value / kCoordinateDomain;
+    return std::clamp(json.to<double>() / kCoordinateDomain, 0.0, 1.0);
 }
 
 JsonValue CameraVcaParameterApi::serializeCoordinate(float value)

@@ -17,6 +17,18 @@ const std::vector<ObjectType> kObjectTypes =
                     return !!settings.vca;
                 };
         }
+        {
+            auto& type = types.emplace_back();
+            type.nativeId = "Face";
+            type.id = "nx.vivotek.Face";
+            type.prettyName = "Face";
+            type.isAvailable =
+                [](const auto& settings)
+                {
+                    auto& vca = settings.vca;
+                    return vca && vca->faceDetection;
+                };
+        }
         return types;
     }();
 

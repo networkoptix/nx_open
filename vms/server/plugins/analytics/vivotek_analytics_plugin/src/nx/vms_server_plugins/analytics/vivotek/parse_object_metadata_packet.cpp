@@ -22,6 +22,35 @@ using namespace nx::sdk::analytics;
 
 namespace {
 
+void expand(Rect* rect, const Point& point)
+{
+    Point min = {
+        rect->x,
+        rect->y,
+    };
+    Point max = {
+        rect->x + rect->width,
+        rect->y + rect->height,
+    };
+
+    min.x = std::min(min.x, point.x);
+    min.y = std::min(min.y, point.y);
+
+    max.x = std::max(max.x, point.x);
+    max.y = std::max(max.y, point.y);
+
+    rect->x = min.x;
+    rect->y = min.y;
+    rect->width = max.x - min.x;
+    rect->height = max.y - min.y;
+}
+
+void expand(Rect* dest, const Rect& src)
+{
+    expand(dest, Point{src.x, src.y});
+    expand(dest, Point{src.x + src.width, src.y + src.height});
+}
+
 std::optional<QString> parseTypeId(const QString& native)
 {
     for (const auto& type: kObjectTypes)
@@ -40,43 +69,51 @@ Uuid parseTrackId(int id)
     return uuid;
 }
 
-Rect parseBoundingBox(const JsonArray& pos2d)
+Rect parsePolygonBoundingBox(const JsonArray& pos2d)
 {
     if (pos2d.isEmpty())
         throw Exception("%1 array is empty", pos2d.path);
 
-    Point min = {1, 1};
-    Point max = {0, 0};
-    for (int i = 0; i < pos2d.count(); ++i)
-    {
-        const auto point = CameraVcaParameterApi::parsePoint(pos2d[i].to<JsonObject>());
-
-        min.x = std::min(min.x, point.x);
-        min.y = std::min(min.y, point.y);
-
-        max.x = std::max(max.x, point.x);
-        max.y = std::max(max.y, point.y);
-    }
-
     Rect rect;
-    rect.x = min.x;
-    rect.y = min.y;
-    rect.width = max.x - min.x;
-    rect.height = max.y - min.y;
+    rect.x = 1;
+    rect.y = 1;
+    for (int i = 0; i < pos2d.count(); ++i)
+        expand(&rect, CameraVcaParameterApi::parsePoint(pos2d[i].to<JsonObject>()));
+
     return rect;
+}
+
+Rect parseRectangleBoundingBox(const JsonObject& rectangle)
+{
+    return {
+        CameraVcaParameterApi::parseCoordinate(rectangle["x"]),
+        CameraVcaParameterApi::parseCoordinate(rectangle["y"]),
+        CameraVcaParameterApi::parseCoordinate(rectangle["w"]),
+        CameraVcaParameterApi::parseCoordinate(rectangle["h"]),
+    };
 }
 
 Ptr<IObjectMetadata> parseMetadata(const JsonObject& object)
 {
     auto metadata = makePtr<ObjectMetadata>();
 
-    if (auto typeId = parseTypeId(object["Type"].to<QString>()))
+    if (const auto typeId = parseTypeId(object["Type"].to<QString>()))
         metadata->setTypeId(typeId->toStdString());
     else
         return nullptr;
 
     metadata->setTrackId(parseTrackId(object["Id"].to<int>()));
-    metadata->setBoundingBox(parseBoundingBox(object["Pos2D"].to<JsonArray>()));
+
+    Rect rect;
+    rect.x = 1;
+    rect.y = 1;
+    if (const auto pos2d = object["Pos2D"]; pos2d.isArray())
+        expand(&rect, parsePolygonBoundingBox(pos2d.to<JsonArray>()));
+    if (const auto face = object["Face"]; face.isObject())
+        expand(&rect, parseRectangleBoundingBox(face["Rectangle"].to<JsonObject>()));
+    if (rect.width < 0 && rect.height < 0)
+        return nullptr;
+    metadata->setBoundingBox(rect);
 
     return metadata;
 }
