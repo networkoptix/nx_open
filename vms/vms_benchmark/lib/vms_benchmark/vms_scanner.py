@@ -16,6 +16,8 @@ class VmsScanner:
     class Vms:
         _tmp_dir_suffix = '-nx_ini'
 
+        MEDIASERVER_NAMES_STRING = ' '.join(['mediaserver', 'mediaserver-bin'])
+
         def __init__(self, device, linux_distribution, pid, customization, service_script, dir, host, port, uid, ini_dir):
             self.customization = customization
             self.service_script = service_script
@@ -29,7 +31,8 @@ class VmsScanner:
             self.ini_dir = ini_dir
 
         def is_up(self):
-            pids_raw = self.device.eval("pidof mediaserver mediaserver-bin", stderr=None)
+            pids_raw = self.device.eval(
+                f"pidof {self.MEDIASERVER_NAMES_STRING}", stderr=None)
             if not pids_raw:
                 return False
 
@@ -218,11 +221,12 @@ class VmsScanner:
             vms['host'] = device.host
 
         def obtain_vms_pid(vms_description):
-            pids_raw = device.eval("pidof mediaserver mediaserver-bin")
+            pids_raw = device.eval(f"pidof {VmsScanner.Vms.MEDIASERVER_NAMES_STRING}")
             from os import environ
             if environ.get('DEBUG', '0') == '1':
                 import sys
-                print(f"`pidof mediaserver mediaserver-bin: {pids_raw}`", file=sys.stderr)
+                print(f"`pidof  {VmsScanner.Vms.MEDIASERVER_NAMES_STRING}: {pids_raw}`",
+                    file=sys.stderr)
             if not pids_raw:
                 return None
 
