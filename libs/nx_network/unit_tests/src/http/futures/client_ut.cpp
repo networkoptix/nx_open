@@ -24,14 +24,6 @@ public:
     std::optional<TestHttpServer> server{std::in_place};
     std::optional<Client> client{std::in_place};
 
-    ~FuturesHttpClient()
-    {
-        if (client)
-            client->executeInAioThreadSync([&]{ client = std::nullopt; });
-        if (server)
-            server->server().executeInAioThreadSync([&]{ server = std::nullopt; });
-    }
-
     Url expandUrl(const QString& path)
     {
         return url::Builder()
