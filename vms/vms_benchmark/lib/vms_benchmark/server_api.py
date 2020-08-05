@@ -7,6 +7,7 @@ from collections import namedtuple
 from typing import List
 from urllib.error import URLError
 from urllib.parse import urlencode
+import ssl
 
 from vms_benchmark import exceptions
 from vms_benchmark.camera import Camera
@@ -30,21 +31,25 @@ class ServerApi:
         self.user = user
         self.password = password
 
-    @staticmethod
-    def get_request(url_or_request):
+        # Turn off certificate check.
+        ssl_context = ssl.create_default_context()
+        ssl_context.check_hostname = False
+        ssl_context.verify_mode = ssl.CERT_NONE
+        self.ssl_context = ssl_context
+
+    def get_request(self, url_or_request):
         if isinstance(url_or_request, urllib.request.Request):
             url = url_or_request.full_url
         else:
             url = url_or_request
         logging.info(f"Sending HTTP request GET to Server:\n    {url}")
-        response = urllib.request.urlopen(url_or_request)
+        response = urllib.request.urlopen(url_or_request, context=self.ssl_context)
         return ServerApi._read_response(response)
 
-    @staticmethod
-    def post_request(request, data):
+    def post_request(self, request, data):
         logging.info(f"Sending HTTP POST request to Server:\n    {request.full_url}\n"
             f"    with data\n    {data}")
-        response = urllib.request.urlopen(request, data=data)
+        response = urllib.request.urlopen(request, data=data, context=self.ssl_context)
         return ServerApi._read_response(response)
 
     @staticmethod
@@ -55,7 +60,7 @@ class ServerApi:
 
     def ping(self):
         try:
-            response = self.get_request(f"http://{self.ip}:{self.port}/api/ping")
+            response = self.get_request(f"https://{self.ip}:{self.port}/api/ping")
             result = self.Response(response.code)
 
             if 200 <= response.code < 300:
@@ -66,7 +71,8 @@ class ServerApi:
 
     @catch_http_errors
     def get_module_information(self):
-        request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/moduleInformationAuthenticated")
+        request = urllib.request.Request(
+            f"https://{self.ip}:{self.port}/api/moduleInformationAuthenticated")
         credentials = f"{self.user}:{self.password}"
         encoded_credentials = base64.b64encode(credentials.encode('ascii'))
         request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
@@ -95,7 +101,8 @@ class ServerApi:
 
     @catch_http_errors
     def check_authentication(self):
-        request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/moduleInformationAuthenticated")
+        request = urllib.request.Request(
+            f"https://{self.ip}:{self.port}/api/moduleInformationAuthenticated")
         credentials = f"{self.user}:{self.password}"
         encoded_credentials = base64.b64encode(credentials.encode('ascii'))
         request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
@@ -103,7 +110,7 @@ class ServerApi:
 
     @catch_http_errors
     def get_test_cameras_all(self):
-        request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/getCamerasEx")
+        request = urllib.request.Request(f"https://{self.ip}:{self.port}/ec2/getCamerasEx")
         credentials = f"{self.user}:{self.password}"
         encoded_credentials = base64.b64encode(credentials.encode('ascii'))
         request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
@@ -130,7 +137,7 @@ class ServerApi:
 
     @catch_http_errors
     def get_test_cameras(self) -> List[Camera]:
-        request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/getCamerasEx")
+        request = urllib.request.Request(f"https://{self.ip}:{self.port}/ec2/getCamerasEx")
         credentials = f"{self.user}:{self.password}"
         encoded_credentials = base64.b64encode(credentials.encode('ascii'))
         request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
@@ -157,7 +164,7 @@ class ServerApi:
 
     @catch_http_errors
     def get_licenses(self):
-        request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/getLicenses")
+        request = urllib.request.Request(f"https://{self.ip}:{self.port}/ec2/getLicenses")
         credentials = f"{self.user}:{self.password}"
         encoded_credentials = base64.b64encode(credentials.encode('ascii'))
         request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
@@ -176,7 +183,7 @@ class ServerApi:
 
     @catch_http_errors
     def get_storage_spaces(self):
-        request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/storageSpace")
+        request = urllib.request.Request(f"https://{self.ip}:{self.port}/api/storageSpace")
         credentials = f"{self.user}:{self.password}"
         encoded_credentials = base64.b64encode(credentials.encode('ascii'))
         request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
@@ -198,7 +205,7 @@ class ServerApi:
 
     @catch_http_errors
     def get_events(self, ts_from):
-        request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/getEvents?from={ts_from}")
+        request = urllib.request.Request(f"https://{self.ip}:{self.port}/api/getEvents?from={ts_from}")
         credentials = f"{self.user}:{self.password}"
         encoded_credentials = base64.b64encode(credentials.encode('ascii'))
         request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
@@ -216,7 +223,7 @@ class ServerApi:
 
     @catch_http_errors
     def get_statistics(self):
-        request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/statistics")
+        request = urllib.request.Request(f"https://{self.ip}:{self.port}/api/statistics")
         credentials = f"{self.user}:{self.password}"
         encoded_credentials = base64.b64encode(credentials.encode('ascii'))
         request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
@@ -234,7 +241,7 @@ class ServerApi:
 
     @catch_http_errors
     def get_time(self):
-        request = urllib.request.Request(f"http://{self.ip}:{self.port}/api/getTime")
+        request = urllib.request.Request(f"https://{self.ip}:{self.port}/api/getTime")
         credentials = f"{self.user}:{self.password}"
         encoded_credentials = base64.b64encode(credentials.encode('ascii'))
         request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
@@ -255,7 +262,7 @@ class ServerApi:
         from pprint import pformat
         cameras = []
         for i in range(count):
-            request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/saveCamera")
+            request = urllib.request.Request(f"https://{self.ip}:{self.port}/ec2/saveCamera")
             credentials = f"{self.user}:{self.password}"
             encoded_credentials = base64.b64encode(credentials.encode('ascii'))
             request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
@@ -288,7 +295,7 @@ class ServerApi:
 
     @catch_http_errors
     def remove_camera(self, camera_id):
-        request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/removeResource")
+        request = urllib.request.Request(f"https://{self.ip}:{self.port}/ec2/removeResource")
         credentials = f"{self.user}:{self.password}"
         encoded_credentials = base64.b64encode(credentials.encode('ascii'))
         request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
@@ -305,7 +312,7 @@ class ServerApi:
 
     @catch_http_errors
     def activate_license(self, license):
-        request = urllib.request.Request(f"http://{self.ip}:{self.port}/ec2/addLicense")
+        request = urllib.request.Request(f"https://{self.ip}:{self.port}/ec2/addLicense")
         credentials = f"{self.user}:{self.password}"
         encoded_credentials = base64.b64encode(credentials.encode('ascii'))
         request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
@@ -324,7 +331,7 @@ class ServerApi:
     @catch_http_errors
     def get_archive_start_time_ms(self, camera_id: str) -> int:
         request = urllib.request.Request(
-            f"http://{self.ip}:{self.port}"
+            f"https://{self.ip}:{self.port}"
             f"/ec2/recordedTimePeriods?cameraId={camera_id}"
         )
         credentials = f"{self.user}:{self.password}"

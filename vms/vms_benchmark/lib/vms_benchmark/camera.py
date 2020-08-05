@@ -15,7 +15,8 @@ class Camera:
 
     @catch_http_errors
     def enable_recording(self, highStreamFps, enable=True):
-        request = urllib.request.Request(f"http://{self.api.ip}:{self.api.port}/ec2/saveCameraUserAttributes")
+        request = urllib.request.Request(
+            f"https://{self.api.ip}:{self.api.port}/ec2/saveCameraUserAttributes")
         credentials = f"{self.api.user}:{self.api.password}"
         encoded_credentials = base64.b64encode(credentials.encode('ascii'))
         request.add_header('Authorization', 'Basic %s' % encoded_credentials.decode("ascii"))
