@@ -794,13 +794,13 @@
     <message numerus="yes">
       <source>%n Cameras</source>
       <translation>
-        <numerusform>%n 카메라들</numerusform>
+        <numerusform>카메라 %n 대</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras</source>
       <translation>
-        <numerusform>%n 카메라들</numerusform>
+        <numerusform>카메라 %n 대</numerusform>
       </translation>
     </message>
     <message numerus="yes">
