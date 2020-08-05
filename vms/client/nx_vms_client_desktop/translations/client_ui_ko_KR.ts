@@ -389,7 +389,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
       <source>Bookmark Info</source>
-      <translation>북마크 정보</translation>
+      <translation>즐겨찾기 정보</translation>
     </message>
     <message>
       <location/>

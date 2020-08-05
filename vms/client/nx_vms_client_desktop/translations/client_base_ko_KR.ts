@@ -65,23 +65,23 @@
       <source>Zoom timeline
 to view more bookmarks</source>
       <comment>It is highly recommended to split message in two lines</comment>
-      <translation>더 많은 북마크를 보려면 타임 라인을 확대 또는 축소 하세요.</translation>
+      <translation>더 많은 즐겨찾기를 보려면 타임라인을 확대/축소 하세요.</translation>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>
-      <translation>북마크 재생</translation>
+      <translation>즐겨찾기 처음부터 재생</translation>
     </message>
     <message>
       <source>Edit bookmark</source>
-      <translation>북마크 편집</translation>
+      <translation>즐겨찾기 편집</translation>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation>북마크 삭제</translation>
+      <translation>즐겨찾기 삭제</translation>
     </message>
     <message>
       <source>Export bookmark</source>
-      <translation>북마크 내보내기</translation>
+      <translation>즐겨찾기 내보내기</translation>
     </message>
   </context>
   <context>
@@ -165,7 +165,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Main Menu</source>
-      <translation>주 메뉴</translation>
+      <translation>메인 메뉴</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
@@ -281,7 +281,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Exit Fullscreen</source>
-      <translation>전체화면 나가기</translation>
+      <translation>이전 크기로 복원</translation>
     </message>
     <message>
       <source>Minimize</source>
@@ -388,11 +388,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Edit Bookmark...</source>
-      <translation>북마크 조정...</translation>
+      <translation>즐겨찾기 편집...</translation>
     </message>
     <message>
       <source>Remove Bookmark...</source>
-      <translation>북마크 삭제...</translation>
+      <translation>즐겨찾기 삭제...</translation>
     </message>
     <message>
       <source>Remove Bookmarks...</source>
@@ -792,11 +792,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Show Bookmarks</source>
-      <translation>북마크보기</translation>
+      <translation>즐겨찾기 보기</translation>
     </message>
     <message>
       <source>Hide Bookmarks</source>
-      <translation>북마크 숨기기</translation>
+      <translation>즐겨찾기 숨기기</translation>
     </message>
     <message>
       <source>Show Calendar</source>
@@ -868,7 +868,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export Bookmark...</source>
-      <translation>북마크 내보내기</translation>
+      <translation>즐겨찾기 내보내기</translation>
     </message>
     <message>
       <source>Resolution...</source>
@@ -888,7 +888,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation>북마크 내보내기</translation>
+      <translation>즐겨찾기 내보내기</translation>
     </message>
     <message>
       <source>Forget password</source>
@@ -960,7 +960,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation>북마크 탭으로 전환</translation>
+      <translation>즐겨찾기 탭으로 전환</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
@@ -1846,7 +1846,7 @@ to view more bookmarks</source>
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
       <translation>
-        <numerusform>%1의 %n 카메라들에 대 한 세부 정보</numerusform>
+        <numerusform>%1의 %n대 카메라에 대한 세부 정보</numerusform>
       </translation>
     </message>
   </context>
@@ -2172,7 +2172,7 @@ to view more bookmarks</source>
     <name>QnBusinessRuleItemDelegate</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation>북마크 관리하기</translation>
+      <translation>즐겨찾기 관리</translation>
     </message>
   </context>
   <context>
@@ -2319,7 +2319,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Restore All Rules to Default</source>
-      <translation>모든 규칙을 초기화</translation>
+      <translation>모든 규칙 초기화</translation>
     </message>
     <message>
       <source>No event rules</source>
@@ -3507,7 +3507,7 @@ to %1</source>
     </message>
     <message>
       <source>Open Bookmarks List</source>
-      <translation>북마크리스트 열기</translation>
+      <translation>즐겨찾기 목록 열기</translation>
     </message>
     <message>
       <source>Event Rules</source>
@@ -4510,7 +4510,7 @@ to %1</source>
     <name>QnPopupBusinessActionWidget</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation>북마크 관리</translation>
+      <translation>즐겨찾기 관리</translation>
     </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
@@ -7499,12 +7499,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select some period on timeline and click with right mouse button on it to create a bookmark.</source>
-      <translation>타임 라인에서 일부 기간을 선택하고 마우스 오른쪽 버튼으로 클릭하여 북마크를 지정합니다.</translation>
+      <translation>타임 라인에서 일부 기간을 선택하고 마우스 오른쪽 버튼으로 클릭하여 즐겨찾기를 지정합니다.</translation>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
       <translation>
-        <numerusform>북마크 %n</numerusform>
+        <numerusform>즐겨찾기 %n</numerusform>
       </translation>
     </message>
   </context>
@@ -7688,7 +7688,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n cameras</source>
       <translation>
-        <numerusform>%n 카메라들</numerusform>
+        <numerusform>카메라 %n 대</numerusform>
       </translation>
     </message>
     <message>
@@ -8492,7 +8492,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Bookmark it...</source>
-      <translation>북마크함...</translation>
+      <translation>즐겨찾기...</translation>
     </message>
   </context>
   <context>
@@ -9193,7 +9193,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n cameras</source>
       <translation>
-        <numerusform>%n 카메라들</numerusform>
+        <numerusform>카메라 %n 대</numerusform>
       </translation>
     </message>
     <message>
@@ -9341,7 +9341,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Bookmark it...</source>
-      <translation>북마크함...</translation>
+      <translation>즐겨찾기...</translation>
     </message>
   </context>
   <context>
@@ -9549,7 +9549,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n bookmarks</source>
       <translation>
-        <numerusform>북마크 %n</numerusform>
+        <numerusform>즐겨찾기 %n</numerusform>
       </translation>
     </message>
     <message>
@@ -9587,7 +9587,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
-      <translation>여러 북마크들은 레이아웃으로 만 내보낼 수 있습니다.</translation>
+      <translation>여러 즐겨찾기들은 레이아웃으로만 내보낼 수 있습니다.</translation>
     </message>
     <message>
       <source>Local files not allowed for Multi-Video export</source>
