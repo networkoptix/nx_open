@@ -275,7 +275,7 @@ bool QnUniversalRequestProcessor::redirectToScheme(const char* scheme)
     const auto listener = dynamic_cast<QnHttpConnectionListener*>(d->owner);
     if (listener && d->request.headers.count("Via"))
     {
-        NX_ASSERT(false, lm("Unable to redirect scheme %1 for proxy").arg(schemeString));
+        NX_DEBUG(this, "Unable to redirect insecure scheme %1 for proxy", schemeString);
         sendErrorResponse(nx::network::http::StatusCode::forbidden);
         return true;
     }
@@ -283,7 +283,7 @@ bool QnUniversalRequestProcessor::redirectToScheme(const char* scheme)
     nx::utils::Url url(d->request.requestLine.url);
     if (url.scheme() == schemeString)
     {
-        NX_ASSERT(false, lm("Unable to insecure connection on sheme: %1").arg(schemeString));
+        NX_DEBUG(this, "Unable to redirect unknown insecure scheme %1", schemeString);
         sendErrorResponse(nx::network::http::StatusCode::forbidden);
         return true;
     }
