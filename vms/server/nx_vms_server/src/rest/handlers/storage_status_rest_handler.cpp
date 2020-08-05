@@ -83,7 +83,7 @@ int QnStorageStatusRestHandler::executeGet(
 {
     QString storageUrl;
 
-    if(!requireParameter(params, lit("path"), result, &storageUrl))
+    if(!requireParameter(params, lit("path"), result, &storageUrl) || storageUrl.isEmpty())
         return nx::network::http::StatusCode::unprocessableEntity;
 
     auto storage = getOrCreateStorage(storageUrl);
