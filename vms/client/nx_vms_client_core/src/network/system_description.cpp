@@ -113,16 +113,22 @@ QnSystemDescription::ServersList QnSystemDescription::servers() const
 void QnSystemDescription::addServer(const nx::vms::api::ModuleInformation& serverInfo,
     int priority, bool online)
 {
+    NX_DEBUG(this, lm("Cloud system <%1>, server <%2>(%3): adding server information"),
+        id(), serverInfo.id, online ? "online" : "offline");
+
     const bool containsServer = m_servers.contains(serverInfo.id);
     NX_ASSERT(!containsServer, "System contains specified server");
 
     if (containsServer)
     {
+        NX_DEBUG(this,
+            lm("Cloud system <%1>, server <%2>: server information exists already, updating it"),
+            id(), serverInfo.id);
         updateServer(serverInfo);
         return;
     }
 
-    if (online)
+    if (online && !isReachableServer(serverInfo.id))
         handleReachableServerAdded(serverInfo.id);
 
     m_prioritized.insertMulti(priority, serverInfo.id);
@@ -144,8 +150,13 @@ nx::vms::api::ModuleInformation QnSystemDescription::getServer(const QnUuid& ser
     return m_servers.value(serverId);
 }
 
-QnServerFields QnSystemDescription::updateServer(const nx::vms::api::ModuleInformation& serverInfo)
+QnServerFields QnSystemDescription::updateServer(
+    const nx::vms::api::ModuleInformation& serverInfo,
+    bool online)
 {
+    NX_DEBUG(this, lm("Cloud system <%1>, server <%2>(%3): updating server information"),
+        id(), serverInfo.id, online ? "online" : "offline");
+
     const auto it = m_servers.find(serverInfo.id);
     const bool containsServer = (it != m_servers.end());
     NX_ASSERT(containsServer,
@@ -153,9 +164,15 @@ QnServerFields QnSystemDescription::updateServer(const nx::vms::api::ModuleInfor
 
     if (!containsServer)
     {
-        addServer(serverInfo, kDefaultPriority);
+        NX_DEBUG(this,
+            lm("Cloud system <%1>, server <%2>: can't find server info, adding a new one"),
+            id(), serverInfo.id);
+        addServer(serverInfo, kDefaultPriority, online);
         return QnServerField::NoField;
     }
+
+    if (online && !isReachableServer(serverInfo.id))
+        handleReachableServerAdded(serverInfo.id);
 
     auto& current = it.value();
     const auto changes = getChanges(current, serverInfo);
@@ -181,23 +198,45 @@ bool QnSystemDescription::isConnectable() const
 
 void QnSystemDescription::handleReachableServerAdded(const QnUuid& serverId)
 {
-    const bool wasReachable = isReachable();
-
     const bool containsAlready = m_reachableServers.contains(serverId);
     NX_ASSERT(!containsAlready, "Server is supposed as reachable already");
     if (containsAlready)
+    {
+        NX_DEBUG(this,lm("Cloud system <%1>, server <%2>: server is reachable already"), id(),
+            serverId);
         return;
+    }
 
+    const bool wasReachable = isReachable();
     m_reachableServers.insert(serverId);
-    if (wasReachable != isReachable())
-        emit reachableStateChanged();
+    if (wasReachable == isReachable())
+    {
+        NX_DEBUG(this, lm("Cloud system <%1>, server <%2>: system is reachable already"), id(),
+            serverId);
+        return;
+    }
+
+    NX_DEBUG(this, lm("Cloud system <%1>, server <%2>: system is reachable now"), id(), serverId);
+    emit reachableStateChanged();
 }
 
 void QnSystemDescription::handleServerRemoved(const QnUuid& serverId)
 {
     const bool wasReachable = isReachable();
+    NX_DEBUG(this, lm("Cloud system <%1>, server <%2>: removing from reachable list"), id(),
+        serverId);
+
     if (m_reachableServers.remove(serverId) && (wasReachable != isReachable()))
+    {
+        NX_DEBUG(this, lm("Cloud system <%1>, server <%2>: system is unreachable now"),
+            id(), serverId);
         emit reachableStateChanged();
+    }
+    else
+    {
+        NX_DEBUG(this, lm("Cloud system <%1>, server <%2>: system reachable state is not changed"),
+            id(), serverId);
+    }
 }
 
 void QnSystemDescription::removeServer(const QnUuid& serverId)

@@ -55,7 +55,9 @@ public:
     void addServer(const nx::vms::api::ModuleInformation& serverInfo,
         int priority, bool online = true);
 
-    QnServerFields updateServer(const nx::vms::api::ModuleInformation& serverInfo);
+    QnServerFields updateServer(
+        const nx::vms::api::ModuleInformation& serverInfo,
+        bool online = true);
 
     void removeServer(const QnUuid& serverId);
 
