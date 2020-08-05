@@ -53,6 +53,9 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_INT(1800, systemUsageDumpTimeoutS, "How often print to log CPU/RAM usage. The value in seconds.");
 
     NX_INI_FLAG(1, enableVmsMetrics, "Enable metrics subsystem and /{api/ec2}/metrics/ handlers");
+
+    NX_INI_INT(60000, checkLicenseIntervalMs, "How often to check wheter a license is expired. "
+        "The default value is the maximum allowed value.");
 };
 
 inline Ini& ini()

@@ -38,6 +38,7 @@
 #include <nx_ec/data/api_conversion_functions.h>
 #include <media_server/media_server_module.h>
 #include <motion/motion_helper.h>
+#include <nx_vms_server_ini.h>
 
 static const QString LICENSE_OVERFLOW_LOCK_NAME(lit("__LICENSE_OVERFLOW__"));
 
@@ -94,7 +95,8 @@ void QnRecordingManager::updateRuntimeInfoAfterLicenseOverflowTransaction(qint64
 void QnRecordingManager::start()
 {
     m_scheduleWatchingTimer.start(1000);
-    m_licenseTimer.start(1000 * 60);
+    const auto intervalMs = std::min(60 * 1000, ini().checkLicenseIntervalMs);
+    m_licenseTimer.start(intervalMs);
     QThread::start();
 }
 
