@@ -6,6 +6,7 @@
 
 #include <nx/vms/common/p2p/downloader/downloader.h>
 #include <nx/vms/common/p2p/downloader/private/abstract_peer_manager.h>
+#include <nx/vms/common/utils/file_signature.h>
 #include <nx/vms/api/data/software_version.h>
 #include <nx/update/update_information.h>
 #include <utils/common/connective.h>
@@ -41,6 +42,8 @@ public:
     ClientUpdateTool(QObject* parent = nullptr);
     virtual ~ClientUpdateTool() override;
 
+    using Error = std::variant<nx::update::Status::ErrorCode, QString>;
+
     enum State
     {
         /** Tool starts at this state. */
@@ -51,6 +54,8 @@ public:
         readyDownload,
         /** Downloading client package. */
         downloading,
+        /** Verifying client package. */
+        verifying,
         /** Ready to install client package. */
         readyInstall,
         /** Installing update using applauncher. */
@@ -63,8 +68,6 @@ public:
         exiting,
         /** Got some critical error and can not continue installation. */
         error,
-        /** Got an error during installation. */
-        applauncherError,
     };
 
     /**
@@ -158,22 +161,19 @@ public:
 
     static QString toString(State state);
 
-    /**
-     * Get readable error text.
-     */
-    QString getErrorText() const;
+    Error getError() const { return m_error; }
+    static QString errorString(const Error& error);
 
     void checkInternalState();
 
 signals:
     /**
-     * This event is emitted every time update state changes,
-     * or its internal state is updated.
-     * @param state - current state, corresponds to enum ClientUpdateTool::State;
-     * @param percentComplete - progress for this state.
-     * @param message - contains printable error message.
+     * Emitted every time update state changes, or its internal state is updated.
+     * @param state Current state, corresponds to enum ClientUpdateTool::State.
+     * @param percentComplete Progress for this state.
+     * @param error Error code or printable error message.
      */
-    void updateStateChanged(int state, int percentComplete, const QString& message);
+    void updateStateChanged(int state, int percentComplete, const Error& error);
 
 protected:
     // Callbacks
@@ -183,12 +183,13 @@ protected:
     void atDownloadFailed(const QString& fileName);
     void atDownloadStallChanged(const QString& fileName, bool stalled);
     void atExtractFilesFinished(int code);
+    void atVerificationFinished();
 
 private:
     void setState(State newState);
-    void setError(const QString& error);
-    void setApplauncherError(const QString& error);
+    void setError(const Error& error);
     void clearDownloadFolder();
+    void verifyUpdateFile();
     /**
      * Converts applauncher::api::ResultType to a readable string.
      */
@@ -214,11 +215,12 @@ private:
     rest::QnConnectionPtr m_serverConnection;
     /** Full path to update package. */
     QString m_updateFile;
-    QString m_lastError;
+    Error m_error;
 
     QnMutex m_mutex;
 
     std::future<nx::vms::applauncher::api::ResultType> m_applauncherTask;
+    std::future<nx::vms::common::FileSignature::Result> m_verificationResult;
 
     mutable std::future<std::set<nx::utils::SoftwareVersion>> m_installedVersionsFuture;
     mutable std::set<nx::utils::SoftwareVersion> m_installedVersions;

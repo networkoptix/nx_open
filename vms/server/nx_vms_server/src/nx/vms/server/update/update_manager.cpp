@@ -134,8 +134,8 @@ void UpdateManager::retry(bool forceRedownload)
         case ErrorCode::osVersionNotSupported:
         case ErrorCode::internalError:
         case ErrorCode::unknownError:
-        case ErrorCode::applauncherError:
         case ErrorCode::invalidUpdateContents:
+        case ErrorCode::verificationError:
         case ErrorCode::installationError:
             // We can do nothing with these cases.
             break;
@@ -339,7 +339,7 @@ void UpdateManager::extract()
 
     NX_INFO(this, "Extracting update package...");
 
-    m_installer.prepareAsync(downloader()->filePath(package.file));
+    m_installer.prepareAsync(downloader()->filePath(package.file), package.signature);
     detectStartedInstallation();
 }
 
@@ -558,6 +558,13 @@ bool UpdateManager::installerState(update::Status* outUpdateStatus, const QnUuid
             update::Status::Code::error,
             update::Status::ErrorCode::extractionError);
             outUpdateStatus->message = "Installer is busy";
+        return true;
+    case UpdateInstaller::State::verificationFailed:
+        *outUpdateStatus = update::Status(
+            peerId,
+            update::Status::Code::error,
+            update::Status::ErrorCode::verificationError);
+        outUpdateStatus->message = "Update verification failed";
         return true;
     case UpdateInstaller::State::installationFailed:
         *outUpdateStatus = update::Status(

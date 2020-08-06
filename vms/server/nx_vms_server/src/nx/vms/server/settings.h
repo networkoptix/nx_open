@@ -590,6 +590,11 @@ public:
         "Overrides the detected OS variant version value (e.g. \"16.04\")."
     };
 
+    Option<QString> additionalUpdateVerificationKeysDir{this,
+        "additionalUpdateVerificationKeysDir", "",
+        "Path to a directory where additional keys for update files verification are located."
+    };
+
     #if defined(__arm__)
         static constexpr qint64 kDefaultMinStorageSpace = 100 * 1024 * 1024; //< 100MB
         static constexpr unsigned int kDefaultHlsMaxChunkBufferSize = 2 * 1024 * 1024;

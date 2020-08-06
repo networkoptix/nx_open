@@ -19,6 +19,7 @@
 #include <nx/vms/client/desktop/ini.h>
 
 #include "update_verification.h"
+#include "peer_state_tracker.h"
 
 namespace nx::vms::client::desktop {
 
@@ -122,27 +123,54 @@ void ClientUpdateTool::setState(State newState)
 
     m_state = newState;
     m_stateChanged = true;
-    m_lastError = QString();
+    m_error = update::Status::ErrorCode::noError;
     emit updateStateChanged((int)m_state, 0, {});
 }
 
-void ClientUpdateTool::setError(const QString& error)
+void ClientUpdateTool::setError(const Error& error)
 {
     m_state = State::error;
-    m_lastError = error;
-    emit updateStateChanged((int)m_state, 0, error);
+    m_error = error;
+    emit updateStateChanged((int) m_state, 0, error);
 }
 
-void ClientUpdateTool::setApplauncherError(const QString& error)
+void ClientUpdateTool::verifyUpdateFile()
 {
-    m_state = State::applauncherError;
-    m_lastError = error;
-    emit updateStateChanged((int)m_state, 0, error);
-}
+    if (m_verificationResult.valid())
+        return;
 
-QString ClientUpdateTool::getErrorText() const
-{
-    return m_lastError;
+    NX_VERBOSE(this, "Start verifying the update file %1", m_updateFile);
+
+    setState(State::verifying);
+
+    m_verificationResult = std::async(std::launch::async,
+        [this]()
+        {
+            if (ini().skipUpdateFilesVerification)
+                return common::FileSignature::Result::ok;
+
+            common::FileSignature::Result result = common::FileSignature::Result::failed;
+
+            const QDir keysDir(":/update_verification_keys");
+            for (const QString& file: keysDir.entryList({"*.pem"}, QDir::Files, QDir::Name))
+            {
+                const QString& fileName = keysDir.absoluteFilePath(file);
+                const QByteArray& key = common::FileSignature::readKey(fileName);
+                if (key.isEmpty())
+                    NX_WARNING(this, "Cannot load key from %1", fileName);
+
+                result = common::FileSignature::verify(
+                    m_updateFile, key, m_clientPackage.signature);
+
+                if (result == common::FileSignature::Result::ok)
+                    break;
+            }
+
+            QMetaObject::invokeMethod(
+                this, &ClientUpdateTool::atVerificationFinished, Qt::QueuedConnection);
+
+            return result;
+        });
 }
 
 std::future<nx::update::UpdateContents> ClientUpdateTool::requestInstalledUpdateInfo()
@@ -253,6 +281,14 @@ std::set<nx::utils::SoftwareVersion> ClientUpdateTool::getInstalledClientVersion
     return result;
 }
 
+QString ClientUpdateTool::errorString(const ClientUpdateTool::Error& error)
+{
+    if (const auto code = std::get_if<nx::update::Status::ErrorCode>(&error))
+        return PeerStateTracker::errorString(*code);
+    else
+        return std::get<QString>(error);
+}
+
 bool ClientUpdateTool::isVersionInstalled(const nx::utils::SoftwareVersion& version) const
 {
     auto versions = getInstalledClientVersions(/*includeCurrentVersion=*/true);
@@ -310,15 +346,14 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
         QString path = contents.storageDir.filePath(m_clientPackage.localFile);
         if (!QFileInfo::exists(path))
         {
-            NX_ERROR(this)
-                << "setUpdateTarget(" << contents.info.version << ") the file"
-                << path << "does not exist!";
-            setError(QString("File %1 does not exist").arg(path));
+            NX_ERROR(this, "setUpdateTarget(%1) file does not exist: %2",
+                contents.info.version, path);
+            setError(tr("File %1 does not exist").arg(path));
         }
         else
         {
             m_updateFile = path;
-            setState(State::readyInstall);
+            verifyUpdateFile();
         }
     }
     else
@@ -333,7 +368,7 @@ void ClientUpdateTool::setUpdateTarget(const UpdateContents& contents)
 
         if (!info.isValid())
         {
-            setError("There is no valid client package to download");
+            setError(tr("There is no valid client package to download"));
             return;
         }
 
@@ -374,7 +409,7 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
     switch (fileInformation.status)
     {
         case FileInformation::Status::notFound:
-            setError(tr("Update file is not found"));
+            setError(update::Status::ErrorCode::updatePackageNotFound);
             break;
         case FileInformation::Status::uploading:
             break;
@@ -382,7 +417,7 @@ void ClientUpdateTool::atDownloaderStatusChanged(const FileInformation& fileInfo
             atDownloadFinished(fileInformation.name);
             break;
         case FileInformation::Status::corrupted:
-            setError(tr("Update package is corrupted"));
+            setError(update::Status::ErrorCode::corruptedArchive);
             break;
         case FileInformation::Status::downloading:
             emit updateStateChanged(int(State::downloading),
@@ -403,7 +438,8 @@ void ClientUpdateTool::atDownloadFinished(const QString& fileName)
 
     NX_VERBOSE(this, "atDownloadFinished(%1) - finally downloaded file to %2",
         fileName, m_updateFile);
-    setState(State::readyInstall);
+
+    verifyUpdateFile();
 }
 
 void ClientUpdateTool::atChunkDownloadFailed(const QString& /*fileName*/)
@@ -417,7 +453,7 @@ void ClientUpdateTool::atDownloadFailed(const QString& fileName)
     if (m_state == State::downloading)
     {
         NX_ERROR(this, "atDownloadFailed() failed to download file %1", fileName);
-        setError(tr("Failed to download update package: %1").arg(fileName));
+        setError(update::Status::ErrorCode::downloadFailed);
     }
 }
 
@@ -426,7 +462,7 @@ void ClientUpdateTool::atDownloadStallChanged(const QString& fileName, bool stal
     if (m_state == State::downloading && stalled)
     {
         NX_ERROR(this, "atDownloadFailed() download of %1 has stalled", fileName);
-        setError(tr("Failed to download update package: %1").arg(fileName));
+        setError(update::Status::ErrorCode::downloadFailed);
     }
 }
 
@@ -434,14 +470,28 @@ void ClientUpdateTool::atExtractFilesFinished(int code)
 {
     if (code != QnZipExtractor::Ok)
     {
-        QString error = QnZipExtractor::errorToString((QnZipExtractor::Error)code);
+        QString error = QnZipExtractor::errorToString((QnZipExtractor::Error) code);
         NX_ERROR(this, "atExtractFilesFinished() err=%1",  error);
-        setError(tr("Update package is corrupted: %1").arg(error));
+        setError(update::Status::ErrorCode::corruptedArchive);
         return;
     }
 
     NX_VERBOSE(this, "at_extractFilesFinished() done unpacking file");
-    setState(State::readyInstall);
+
+    verifyUpdateFile();
+}
+
+void ClientUpdateTool::atVerificationFinished()
+{
+    m_verificationResult.wait();
+    const common::FileSignature::Result result = m_verificationResult.get();
+
+    NX_VERBOSE(this, "Update file verification finished (%1). Result: %2", m_updateFile, result);
+
+    if (result == common::FileSignature::Result::ok)
+        setState(State::readyInstall);
+    else
+        setError(update::Status::ErrorCode::verificationError);
 }
 
 bool ClientUpdateTool::isDownloadComplete() const
@@ -482,7 +532,7 @@ void ClientUpdateTool::checkInternalState()
             {
                 QString error = applauncherErrorToString(result);
                 NX_ERROR(this) << "Failed check installation:" << error;
-                setApplauncherError(error);
+                setError(error);
                 break;
             }
             default:
@@ -498,9 +548,8 @@ bool ClientUpdateTool::installUpdateAsync()
     // Try to run applauncher if it is not running.
     if (!applauncher::api::checkOnline())
     {
-        NX_VERBOSE(this) << "installUpdate can not install update - applauncher is offline" << error;
-        auto errorText = applauncherErrorToString(ResultType::otherError);
-        setApplauncherError(errorText);
+        NX_VERBOSE(this, "installUpdate cannot install update: applauncher is offline");
+        setError(applauncherErrorToString(ResultType::otherError));
         return false;
     }
 
@@ -605,6 +654,7 @@ bool ClientUpdateTool::isInstallComplete() const
         case State::readyDownload:
         case State::readyInstall:
         case State::downloading:
+        case State::verifying:
             return false;
         case State::installing:
             // We need to check applauncher to get a proper result
@@ -615,7 +665,6 @@ bool ClientUpdateTool::isInstallComplete() const
         case State::exiting:
         // Though actual install is not successful, no further progress is possible.
         case State::error:
-        case State::applauncherError:
             return true;
     }
 
@@ -637,7 +686,6 @@ bool ClientUpdateTool::isInstallComplete() const
         {
             QString error = applauncherErrorToString(result);
             NX_ERROR(this) << "Failed to check installation:" << error;
-            //setApplauncherError(error);
             return false;
         }
         default:
@@ -695,7 +743,7 @@ void ClientUpdateTool::resetState()
     }
 
     m_state = State::initial;
-    m_lastError = "";
+    m_error = update::Status::ErrorCode::noError;
     m_updateFile = "";
     m_updateVersion = nx::utils::SoftwareVersion();
     m_clientPackage = nx::update::Package();
@@ -718,7 +766,6 @@ bool ClientUpdateTool::hasUpdate() const
 {
     return m_state != State::initial
         && m_state != State::error
-        && m_state != State::applauncherError
         && m_state != State::complete;
 }
 
@@ -734,6 +781,8 @@ QString ClientUpdateTool::toString(State state)
             return "ReadyDownload";
         case State::downloading:
             return "Downloading";
+        case State::verifying:
+            return "Verifying";
         case State::readyInstall:
             return "ReadyInstall";
         case State::installing:
@@ -746,8 +795,6 @@ QString ClientUpdateTool::toString(State state)
             return "Exiting";
         case State::error:
             return "Error";
-        case State::applauncherError:
-            return "applauncherError";
     }
     return QString();
 }

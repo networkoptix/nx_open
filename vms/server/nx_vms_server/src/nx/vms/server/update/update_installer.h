@@ -23,6 +23,7 @@ public:
         noFreeSpace,
         noFreeSpaceToInstall,
         brokenZip,
+        verificationFailed,
         wrongDir,
         cantOpenFile,
         otherError,
@@ -38,7 +39,7 @@ public:
     UpdateInstaller(QnMediaServerModule* serverModule);
     ~UpdateInstaller();
 
-    void prepareAsync(const QString& path);
+    void prepareAsync(const QString& path, const QByteArray& signature);
     void install(const QnAuthSession& authInfo);
     void installDelayed();
     void stopSync(bool clearAndReset);

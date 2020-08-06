@@ -1,3 +1,19 @@
+function(nx_set_qrc_source_files_properties)
+    cmake_parse_arguments(RESOURCE "" "BASE_DIR;ALIAS_PREFIX" "" ${ARGN})
+
+    set(properties)
+
+    if(RESOURCE_BASE_DIR)
+        list(APPEND properties RESOURCE_BASE_DIR ${RESOURCE_BASE_DIR})
+    endif()
+
+    if(RESOURCE_ALIAS_PREFIX)
+        list(APPEND properties RESOURCE_ALIAS_PREFIX ${RESOURCE_ALIAS_PREFIX})
+    endif()
+
+    set_source_files_properties(${RESOURCE_UNPARSED_ARGUMENTS} PROPERTIES ${properties})
+endfunction()
+
 function(nx_generate_qrc qrc_file)
     cmake_parse_arguments(QRC "" "" "USED_FILES_VARIABLE" ${ARGN})
 

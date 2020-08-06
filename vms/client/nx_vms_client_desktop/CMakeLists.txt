@@ -38,6 +38,9 @@ if(WINDOWS)
     set(library_type LIBRARY_TYPE SHARED)
 endif()
 
+nx_set_qrc_source_files_properties(
+    ${update_verification_keys_dir}/keys ALIAS_PREFIX update_verification_keys/)
+
 nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/client_app_info_impl.cpp"
@@ -48,6 +51,7 @@ nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
         "${customization_dir}/nx_client_desktop/resources"
         "${customization_dir}/icons/all/logo.png"
         "${customization_dir}/license.html"
+        "${update_verification_keys_dir}/keys"
         "${nov_file_launcher_executable}"
         "${client_font_roboto_regular}"
     ADDITIONAL_MOCABLES

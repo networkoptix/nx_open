@@ -7,6 +7,7 @@
 
 #include <nx/utils/software_version.h>
 #include <nx/vms/api/data/software_version.h>
+#include <nx/vms/client/desktop/system_update/client_update_tool.h>
 
 class QnMediaServerUpdateTool;
 struct QnConnectionInfo;
@@ -36,6 +37,7 @@ public:
     {
         initial,
         downloading,
+        verifying,
         installing,
         complete,
         failedInstall,
@@ -57,7 +59,8 @@ protected:
 protected:
     // Event handlers
     void atUpdateCurrentState();
-    void atUpdateStateChanged(int state, int progress, const QString& message);
+    void atUpdateStateChanged(
+        int state, int progress, const nx::vms::client::desktop::ClientUpdateTool::Error& error);
     void atAutoRestartChanged(int state);
 
 protected:

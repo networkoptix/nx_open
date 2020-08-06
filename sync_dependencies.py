@@ -229,6 +229,7 @@ def sync_dependencies(target, syncher, platform, arch, box, release_version, opt
 
     if have_mediaserver or have_desktop_client:
         sync("%s/doxygen" % platform, path_variable="doxygen_directory")
+        sync("any/update_verification_keys", path_variable="update_verification_keys_dir")
 
     sync("any/root-certificates", path_variable="root_certificates_path")
     sync("any/customization_pack", path_variable="customization_package_directory")

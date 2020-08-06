@@ -16,6 +16,7 @@
 #include <common/common_module.h>
 #include <media_server/media_server_module.h>
 #include <media_server/settings.h>
+#include <nx/vms/common/utils/file_signature.h>
 #include <nx/vms/server/root_fs.h>
 #include <nx_vms_server_ini.h>
 
@@ -46,6 +47,44 @@ update::PackageInformation updateInformation(const QString& path)
     return result;
 }
 
+common::FileSignature::Result verifyFile(
+    const QString& fileName, const QByteArray& signature, const QString& additionalKeysDir)
+{
+    if (ini().skipUpdateFilesVerification)
+        return common::FileSignature::Result::ok;
+
+    const QString kCertificatesDir = ":/update_verification_keys";
+
+    QList<QByteArray> keys;
+
+    const auto loadKeys =
+        [&keys](const QDir& dir)
+        {
+            for (const QString& file: dir.entryList({"*.pem"}, QDir::Files, QDir::Name))
+            {
+                const QString& fileName = dir.absoluteFilePath(file);
+                const QByteArray& key = common::FileSignature::readKey(fileName);
+                if (key.isEmpty())
+                    NX_WARNING(typeid(UpdateInstaller), "Cannot load key from %1", fileName);
+                keys.append(key);
+            }
+        };
+
+    if (!additionalKeysDir.isEmpty())
+        loadKeys(additionalKeysDir);
+
+    loadKeys(kCertificatesDir);
+
+    for (const auto& key: keys)
+    {
+        const auto verificationResult = common::FileSignature::verify(fileName, key, signature);
+        if (verificationResult == common::FileSignature::Result::ok)
+            return verificationResult;
+    }
+
+    return common::FileSignature::Result::failed;
+}
+
 } // namespace
 
 static QString toString(UpdateInstaller::State state)
@@ -60,6 +99,7 @@ static QString toString(UpdateInstaller::State state)
         case State::noFreeSpace: return "noFreeSpace";
         case State::noFreeSpaceToInstall: return "noFreeSpaceToInstall";
         case State::brokenZip: return "brokenZip";
+        case State::verificationFailed: return "verificationFailed";
         case State::wrongDir: return "wrongDir";
         case State::cantOpenFile: return "cantOpenFile";
         case State::otherError: return "otherError";
@@ -104,12 +144,35 @@ UpdateInstaller::~UpdateInstaller()
 {
 }
 
-void UpdateInstaller::prepareAsync(const QString& path)
+void UpdateInstaller::prepareAsync(const QString& path, const QByteArray& signature)
 {
     if (!serverModule()->rootFileSystem()->changeOwner(workDir()))
         NX_WARNING(this, "Unable to chown %1", workDir());
 
     NX_DEBUG(this, "Preparing to update installation...");
+
+    const auto verificationResult = verifyFile(
+        path, signature, serverModule()->settings().additionalUpdateVerificationKeysDir());
+    NX_DEBUG(this, "Update file verification result for %1: %2", path, verificationResult);
+
+    switch (verificationResult)
+    {
+        case nx::vms::common::FileSignature::Result::ok:
+            break;
+
+        case nx::vms::common::FileSignature::Result::failed:
+            NX_ERROR(this, "Update file verification failed: %1", path);
+            setState(State::verificationFailed);
+            return;
+
+        case nx::vms::common::FileSignature::Result::ioError:
+            setState(State::cantOpenFile);
+            return;
+
+        default:
+            setState(State::otherError);
+            return;
+    }
 
     {
         NX_MUTEX_LOCKER lock(&m_mutex);

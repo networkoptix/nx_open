@@ -10,7 +10,6 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/api/protocol_version.h>
 #include <ui/workbench/workbench_context.h>
-#include "client_update_tool.h"
 
 namespace {
 
@@ -1110,12 +1109,12 @@ QString PeerStateTracker::errorString(nx::update::Status::ErrorCode code)
             return tr("Update archive is corrupted.");
         case Code::extractionError:
             return tr("Update files cannot be extracted.");
+        case Code::verificationError:
+            return tr("Update file verification failed.");
         case Code::internalDownloaderError:
             return tr("Internal downloader error.");
         case Code::internalError:
             return tr("Internal server error.");
-        case Code::applauncherError:
-            return tr("Internal client error.");
         case Code::installationError:
             return tr("Update installation failed.");
         case Code::unknownError:
@@ -1205,7 +1204,8 @@ void PeerStateTracker::atResourceChanged(const QnResourcePtr& resource)
         emit itemChanged(item);
 }
 
-void PeerStateTracker::atClientUpdateStateChanged(int state, int percentComplete, const QString& message)
+void PeerStateTracker::atClientUpdateStateChanged(
+    int state, int percentComplete, const ClientUpdateTool::Error& error)
 {
     using State = ClientUpdateTool::State;
     if (!m_clientItem)
@@ -1237,6 +1237,11 @@ void PeerStateTracker::atClientUpdateStateChanged(int state, int percentComplete
             m_clientItem->progress = percentComplete;
             m_clientItem->statusMessage = tr("Downloading update");
             break;
+        case State::verifying:
+            m_clientItem->state = StatusCode::preparing;
+            m_clientItem->progress = percentComplete;
+            m_clientItem->statusMessage = tr("Verifying update");
+            break;
         case State::readyInstall:
             m_clientItem->state = StatusCode::readyToInstall;
             m_clientItem->progress = 100;
@@ -1266,12 +1271,7 @@ void PeerStateTracker::atClientUpdateStateChanged(int state, int percentComplete
             break;
         case State::error:
             m_clientItem->state = StatusCode::error;
-            m_clientItem->statusMessage = tr("Failed to download update");
-            break;
-        case State::applauncherError:
-            m_clientItem->state = StatusCode::error;
-            m_clientItem->errorCode = nx::update::Status::ErrorCode::applauncherError;
-            m_clientItem->statusMessage = message;
+            m_clientItem->statusMessage = ClientUpdateTool::errorString(error);
             break;
         default:
             break;

@@ -6,7 +6,6 @@
 #include <QtWidgets/QPushButton>
 
 #include <nx/update/update_check.h>
-#include <nx/vms/client/desktop/system_update/client_update_tool.h>
 #include <nx/vms/client/desktop/system_update/server_update_tool.h>
 #include <client/client_settings.h>
 #include <nx/utils/log/log.h>
@@ -17,7 +16,9 @@
 #include "update_verification.h"
 
 using namespace std::chrono_literals;
-using ClientUpdateTool = nx::vms::client::desktop::ClientUpdateTool;
+
+using namespace nx::vms::client::desktop;
+
 using Clock = std::chrono::steady_clock;
 using TimePoint = std::chrono::time_point<Clock>;
 using Dialog = CompatibilityVersionInstallationDialog;
@@ -130,7 +131,7 @@ void CompatibilityVersionInstallationDialog::processUpdateContents(
 }
 
 void CompatibilityVersionInstallationDialog::atUpdateStateChanged(
-    int state, int progress, const QString& message)
+    int state, int progress, const ClientUpdateTool::Error& error)
 {
     NX_DEBUG(this, "CompatibilityVersionInstallationDialog::atUpdateStateChanged(%1, %2)",
         ClientUpdateTool::toString(ClientUpdateTool::State(state)), progress);
@@ -156,7 +157,12 @@ void CompatibilityVersionInstallationDialog::atUpdateStateChanged(
         case ClientUpdateTool::State::downloading:
             m_installationResult = InstallResult::downloading;
             setMessage(tr("Downloading update package"));
-            finalProgress = 20 + 70 * progress / 100;
+            finalProgress = 20 + 65 * progress / 100;
+            break;
+        case ClientUpdateTool::State::verifying:
+            m_installationResult = InstallResult::verifying;
+            setMessage(tr("Verifying update package"));
+            finalProgress = 85;
             break;
         case ClientUpdateTool::State::readyInstall:
             finalProgress = 90;
@@ -186,14 +192,7 @@ void CompatibilityVersionInstallationDialog::atUpdateStateChanged(
             else
                 m_installationResult = InstallResult::failedDownload;
             setMessage(tr("Installation failed"));
-            m_errorMessage = message;
-            finalProgress = 100;
-            done(QDialogButtonBox::StandardButton::Ok);
-            break;
-        case ClientUpdateTool::State::applauncherError:
-            m_installationResult = InstallResult::failedInstall;
-            setMessage(tr("Installation failed"));
-            m_errorMessage = message;
+            m_errorMessage = ClientUpdateTool::errorString(error);
             finalProgress = 100;
             done(QDialogButtonBox::StandardButton::Ok);
             break;

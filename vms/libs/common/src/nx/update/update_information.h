@@ -34,6 +34,7 @@ struct Package
     QString url;
     QString md5;
     qint64 size = 0;
+    QByteArray signature;
 
     // Internal fields for use by Clients and Servers (should not occur on update servers).
 
@@ -57,7 +58,7 @@ struct Package
     bool isNewerThan(const QString& variant, const Package& other) const;
 };
 
-#define Package_Fields (component)(platform)(variants)(file)(url)(size)(md5)
+#define Package_Fields (component)(platform)(variants)(file)(url)(size)(md5)(signature)
 QN_FUSION_DECLARE_FUNCTIONS(Package, (ubjson)(json)(eq))
 
 struct Information
@@ -181,10 +182,10 @@ public:
         invalidUpdateContents,
         corruptedArchive,
         extractionError,
+        verificationError,
         internalDownloaderError,
         internalError,
         unknownError,
-        applauncherError,
         installationError,
     };
     Q_ENUM(ErrorCode)

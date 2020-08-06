@@ -78,6 +78,9 @@ set_property(SOURCE ${favicon} PROPERTY RESOURCE_ALIAS_PREFIX static/customizati
 set_property(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/webadmin_skins/${customization.skin}
     PROPERTY RESOURCE_ALIAS_PREFIX static/skin/)
 
+nx_set_qrc_source_files_properties(
+    ${update_verification_keys_dir}/keys ALIAS_PREFIX update_verification_keys/)
+
 nx_add_target(nx_vms_server LIBRARY
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/mediaserver_core_app_info_impl.cpp"
@@ -87,6 +90,7 @@ nx_add_target(nx_vms_server LIBRARY
         ${customization_dir}/mediaserver_core/resources
         ${CMAKE_CURRENT_SOURCE_DIR}/webadmin_skins/${customization.skin}
         ${favicon}
+        ${update_verification_keys_dir}/keys
         ${static_resources}
     PUBLIC_LIBS
         nx_kit #< This dependency should come first to satisfy OutputRedirector.

@@ -10,6 +10,8 @@
 #include <nx/update/update_information.h>
 #include <common/common_module.h>
 
+#include "client_update_tool.h"
+
 struct QnUpdateFreeSpaceReply;
 
 namespace nx::vms::client::desktop {
@@ -238,7 +240,10 @@ public:
      * We connect it to ClientUpdateTool::updateStateChanged and turn it to a proper
      * peer state inside our task sets.
      */
-    void atClientUpdateStateChanged(int state, int percentComplete, const QString& message);
+    void atClientUpdateStateChanged(
+        int state,
+        int percentComplete,
+        const ClientUpdateTool::Error& error);
 
 signals:
     /**
