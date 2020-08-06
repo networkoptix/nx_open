@@ -5596,7 +5596,14 @@ SoapTimeouts QnPlOnvifResource::onvifTimeouts() const
     if (commonModule()->isNeedToStop())
         return SoapTimeouts::minivalValue();
     else
-        return SoapTimeouts(serverModule()->settings().onvifTimeouts());
+    {
+        SoapTimeouts result = serverModule()->settings().onvifTimeouts();
+        const auto timeout = this->resourceData().value<int>(
+            ResourceDataKey::kOnvifSendRecvTimeoutSeconds, 0);
+        if (timeout != 0)
+            result.recvTimeout = result.sendTimeout = std::chrono::seconds(timeout);
+        return result;
+    }
 }
 
 CameraDiagnostics::Result QnPlOnvifResource::ensureMulticastIsEnabled(

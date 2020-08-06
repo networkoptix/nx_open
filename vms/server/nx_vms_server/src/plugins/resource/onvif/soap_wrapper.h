@@ -471,8 +471,8 @@ public:
 
     // Resource should be QnPlOnvifResource class, template is used to eliminate dependency
     // between soap_wrapper and onvif_resource. Usually "this" will be passed as a parameter.
-    template<class Resource>
-    explicit RequestWrapper(const Resource& resource):
+    template<class ResourcePtr>
+    explicit RequestWrapper(const ResourcePtr& resource):
         RequestWrapper(resource->makeSoapParams(kOnvifWebService))
     {
     }
@@ -748,8 +748,8 @@ public:
     {
     }
 
-    template<class Resource>
-    explicit MediaSoapWrapper(const Resource& resource, bool tcpKeepAlive = false):
+    template<class ResourcePtr>
+    explicit MediaSoapWrapper(const ResourcePtr& resource, bool tcpKeepAlive = false):
         SoapWrapper<MediaBindingProxy>(resource->makeSoapParams(OnvifWebService::Media, tcpKeepAlive))
     {
     }
@@ -800,8 +800,8 @@ public:
     {
     }
 
-    template<class Resource>
-    explicit PtzSoapWrapper(const Resource& resource, bool tcpKeepAlive = false):
+    template<class ResourcePtr>
+    explicit PtzSoapWrapper(const ResourcePtr& resource, bool tcpKeepAlive = false):
         SoapWrapper<PTZBindingProxy>(resource->makeSoapParams(OnvifWebService::Ptz, tcpKeepAlive))
     {
     }
@@ -833,8 +833,8 @@ public:
         bool tcpKeepAlive = false);
     ImagingSoapWrapper(SoapParams soapParams);
 
-    template<class Resource>
-    explicit ImagingSoapWrapper(const Resource& resource):
+    template<class ResourcePtr>
+    explicit ImagingSoapWrapper(const ResourcePtr& resource):
         ImagingSoapWrapper(resource->makeSoapParams())
     {
     }
@@ -865,8 +865,8 @@ public:
         bool tcpKeepAlive = false);
     NotificationProducerSoapWrapper(SoapParams soapParams);
 
-    template<class Resource>
-    explicit NotificationProducerSoapWrapper(const Resource& resource) :
+    template<class ResourcePtr>
+    explicit NotificationProducerSoapWrapper(const ResourcePtr& resource) :
         NotificationProducerSoapWrapper(resource->makeSoapParams())
     {
     }
@@ -885,8 +885,8 @@ public:
     {
     }
 
-    template<class Resource>
-    explicit SubscriptionManagerSoapWrapper(const Resource& resource,
+    template<class ResourcePtr>
+    explicit SubscriptionManagerSoapWrapper(const ResourcePtr& resource,
         std::string endpoint, bool tcpKeepAlive = false)
         :
         SoapWrapper<SubscriptionManagerBindingProxy>(
@@ -914,8 +914,8 @@ public:
     {
     }
 
-    template<class Resource>
-    explicit CreatePullPointSoapWrapper(const Resource& resource):
+    template<class ResourcePtr>
+    explicit CreatePullPointSoapWrapper(const ResourcePtr& resource):
         CreatePullPointSoapWrapper(resource->makeSoapParams())
     {
     }
@@ -940,8 +940,8 @@ public:
     {
     }
 
-    template<class Resource>
-    explicit EventSoapWrapper(const Resource& resource,
+    template<class ResourcePtr>
+    explicit EventSoapWrapper(const ResourcePtr& resource,
         std::string endpoint, bool tcpKeepAlive = false)
         :
         SoapWrapper<EventBindingProxy>(
@@ -964,8 +964,8 @@ public:
         const std::string& endpoint, const QString &login, const QString &passwd, int timeDrift, bool tcpKeepAlive = false);
     PullPointSubscriptionWrapper(SoapParams soapParams);
 
-    template<class Resource>
-    explicit PullPointSubscriptionWrapper(const Resource& resource):
+    template<class ResourcePtr>
+    explicit PullPointSubscriptionWrapper(const ResourcePtr& resource):
         PullPointSubscriptionWrapper(resource->makeSoapParams())
     {
     }

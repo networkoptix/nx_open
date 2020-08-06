@@ -213,6 +213,7 @@ namespace ResourceDataKey
 
     static const QString kUseMedia2ToFetchProfiles("useMedia2ToFetchProfiles");
 
+    static const QString kOnvifSendRecvTimeoutSeconds("onvifSendRecvTimeoutSeconds");
 } // namespace ResourceDataKey
 
 //-------------------------------------------------------------------------------------------------

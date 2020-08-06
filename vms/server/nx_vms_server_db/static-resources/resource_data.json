@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.3.521",
+    "version": "4.1.3.522",
     "data": [
         {
             "keys": [
@@ -4467,7 +4467,7 @@
                  }
             }
         },
-    {
+        {
             "_comment1": "Mapping for firmware: 41.7.0.73",
             "keys": [
                 "Milesight*|MS-C2961-REPB"
@@ -4551,7 +4551,8 @@
         },
         {
             "keys": [
-                "Hanwha|*", "Mit Professional|*"
+                "Hanwha|*",
+                "Mit Professional|*"
             ],
             "allowRtspVideoLayout": false
         },
@@ -4581,6 +4582,10 @@
                     }
                 }
             }
+		},
+		{
+            "keys": [ "QWL|AU2" ],
+            "onvifSendRecvTimeoutSeconds": 40
         }
     ]
 }
