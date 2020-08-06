@@ -199,7 +199,7 @@ addFfmpegLibLinkIfNeeded()
 
 installModificationSpecificConfig()
 {
-    local -r config_file_path="${BASE_DIR}/share/configs/mediaserver.conf.$TARGET_DEVICE.template"
+    local -r config_file_path="${BASE_DIR}/share/configs/mediaserver.conf"
 
     if [[ -f ${config_file_path} ]] && [[ ! -f "${BASE_DIR}/etc/mediaserver.conf" ]]
     then

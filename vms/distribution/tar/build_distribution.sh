@@ -304,14 +304,10 @@ copyMediaserverPlugins()
 # [in] STAGE_VMS
 copyConf()
 {
-    if [ "$BOX" = "edge1" ]
-    then
-        local -r FILE="mediaserver.conf"
-    else
-        local -r FILE="mediaserver.conf.template"
-    fi
+    local -r FILE="mediaserver.conf"
 
     mkdir -p "$STAGE_VMS/mediaserver/etc"
+
     echo "Copying $FILE"
     cp "$CURRENT_BUILD_DIR/opt/networkoptix/mediaserver/etc/$FILE" "$STAGE_VMS/mediaserver/etc/"
 }
