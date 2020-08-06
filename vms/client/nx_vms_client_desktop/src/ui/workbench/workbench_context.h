@@ -37,6 +37,8 @@ class QnWorkbenchContext: public QObject, public QnInstanceStorage, public QnCon
 {
     Q_OBJECT
     using base_type = QObject;
+    Q_PROPERTY(QString userId READ userId NOTIFY userIdChanged)
+
 public:
     QnWorkbenchContext(QnWorkbenchAccessController* accessController, QObject *parent = NULL);
 
@@ -64,6 +66,9 @@ public:
     QnUserResourcePtr user() const;
     void setUserName(const QString &userName);
 
+    /** User ID as QString for QML usage. */
+    QString userId() const;
+
     /** Check if application is closing down. Replaces QApplication::closingDown(). */
     bool closingDown() const;
     void setClosingDown(bool value);
@@ -83,6 +88,9 @@ signals:
      * \param user                      New user that was logged in. May be null.
      */
     void userChanged(const QnUserResourcePtr &user); // TODO: #Elric remove user parameter
+
+    /** Property change notification signal, emitted together with userChanged(). */
+    void userIdChanged();
 
     /**
      * This signal is emitted when this workbench context is about to be destroyed,

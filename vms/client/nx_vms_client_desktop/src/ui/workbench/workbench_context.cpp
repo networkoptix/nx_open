@@ -81,6 +81,7 @@ QnWorkbenchContext::QnWorkbenchContext(QnWorkbenchAccessController* accessContro
             if (m_accessController)
                 m_accessController->setUser(user);
             emit userChanged(user);
+            emit userIdChanged();
         });
 
     /* Create dependent objects. */
@@ -231,6 +232,12 @@ QnUserResourcePtr QnWorkbenchContext::user() const {
     } else {
         return QnUserResourcePtr();
     }
+}
+
+QString QnWorkbenchContext::userId() const
+{
+    const auto userPtr = user();
+    return userPtr ? userPtr->getId().toString() : ""; 
 }
 
 void QnWorkbenchContext::setUserName(const QString &userName) {

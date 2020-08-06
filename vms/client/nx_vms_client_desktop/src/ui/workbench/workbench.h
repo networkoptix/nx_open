@@ -41,6 +41,7 @@ class QnWorkbench: public QObject, public QnWorkbenchContextAware
     Q_OBJECT
     Q_PROPERTY(QnWorkbenchLayout* currentLayout
         READ currentLayout WRITE setCurrentLayout NOTIFY currentLayoutChanged)
+    Q_PROPERTY(QnWorkbenchContext* context READ context CONSTANT)
 
 public:
     /**
