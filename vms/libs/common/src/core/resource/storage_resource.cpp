@@ -130,6 +130,11 @@ QString QnStorageResource::urlToPath(const QString& url)
         return QUrl(url).path();
 }
 
+QString QnStorageResource::urlWithoutCredentials() const
+{
+    return urlWithoutCredentials(getUrl());
+}
+
 QString QnStorageResource::urlWithoutCredentials(const QString& url)
 {
     if (!url.contains(lit("://")))

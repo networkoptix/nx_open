@@ -55,6 +55,7 @@
 #include <ui/workbench/extensions/workbench_stream_synchronizer.h>
 
 #include <ui/workaround/hidpi_workarounds.h>
+#include <nx/utils/std/algorithm.h>
 
 using namespace nx::vms::client::desktop;
 using namespace ui;
@@ -561,7 +562,7 @@ void QnAuditLogDialog::at_updateCheckboxes()
     setupFilterCheckbox(ui->checkBoxExport,     colors.exportVideo,     Qn::AR_ExportVideo);
     setupFilterCheckbox(ui->checkBoxCameras,    colors.updCamera,       Qn::AR_CameraUpdate | Qn::AR_CameraRemove | Qn::AR_CameraInsert);
     setupFilterCheckbox(ui->checkBoxSystem,     colors.systemActions,   Qn::AR_SystemNameChanged | Qn::AR_SystemmMerge | Qn::AR_SettingsChange | Qn::AR_DatabaseRestore | Qn::AR_UpdateInstall);
-    setupFilterCheckbox(ui->checkBoxServers,    colors.updServer,       Qn::AR_ServerUpdate | Qn::AR_ServerRemove);
+    setupFilterCheckbox(ui->checkBoxServers,    colors.updServer,       Qn::AR_ServerUpdate | Qn::AR_ServerRemove | Qn::AR_StorageInsert | Qn::AR_StorageUpdate | Qn::AR_StorageRemove);
     setupFilterCheckbox(ui->checkBoxBRules,     colors.eventRules,      Qn::AR_BEventUpdate | Qn::AR_BEventRemove | Qn::AR_BEventReset);
     setupFilterCheckbox(ui->checkBoxEmail,      colors.emailSettings,   Qn::AR_EmailSettings);
 };
@@ -714,7 +715,14 @@ void QnAuditLogDialog::processPlaybackAction(const QnAuditRecord* record)
 void QnAuditLogDialog::triggerAction(const QnAuditRecord* record, action::IDType actionId,
     int selectedPage)
 {
-    const QnResourceList resList = resourcePool()->getResourcesByIds(record->resources);
+    QnResourceList resList = resourcePool()->getResourcesByIds(record->resources);
+    if (record->eventType == Qn::AR_StorageInsert || record->eventType == Qn::AR_StorageUpdate)
+    {
+        for (int i = 0; i < resList.size(); ++i)
+            resList[i] = resList[i]->getParentResource();
+    }
+    nx::utils::remove_if(resList, [](const QnResourcePtr& res) { return !res; });
+
     if (resList.isEmpty())
     {
         const auto count = static_cast<int>(record->resources.size());
@@ -767,6 +775,10 @@ void QnAuditLogDialog::at_itemButtonClicked(const QModelIndex& index)
         triggerAction(record,
             action::ServerSettingsAction,
             QnServerSettingsDialog::SettingsPage);
+    else if (record->eventType == Qn::AR_StorageUpdate || record->eventType == Qn::AR_StorageInsert)
+        triggerAction(record,
+            action::ServerSettingsAction,
+            QnServerSettingsDialog::StorageManagmentPage);
     else if (record->eventType == Qn::AR_CameraUpdate || record->eventType == Qn::AR_CameraInsert)
         triggerAction(record,
             action::CameraSettingsAction,

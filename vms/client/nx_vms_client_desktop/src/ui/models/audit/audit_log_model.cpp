@@ -351,6 +351,10 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
             return tr("General settings updated");
         case Qn::AR_ServerUpdate:
             return tr("Server updated");
+        case Qn::AR_StorageInsert:
+            return tr("Storage added");
+        case Qn::AR_StorageUpdate:
+            return tr("Storage updated");
         case Qn::AR_BEventUpdate:
             return tr("Event rule changed");
         case Qn::AR_EmailSettings:
@@ -361,6 +365,8 @@ QString QnAuditLogModel::eventTypeToString(Qn::AuditRecordType eventType)
                 tr("Device removed"),
                 tr("Camera removed")
                 );
+        case Qn::AR_StorageRemove:
+            return tr("Storage removed");
         case Qn::AR_ServerRemove:
             return tr("Server removed");
         case Qn::AR_BEventRemove:
@@ -410,6 +416,9 @@ QString QnAuditLogModel::eventDescriptionText(const QnAuditRecord* data) const
     switch (data->eventType)
     {
         case Qn::AR_CameraRemove:
+        case Qn::AR_StorageRemove:
+            result = QString::fromUtf8(data->extractParam("description"));
+            break;
         case Qn::AR_ServerRemove:
         case Qn::AR_BEventRemove:
         case Qn::AR_BEventUpdate:
@@ -783,6 +792,9 @@ QVariant QnAuditLogModel::colorForType(Qn::AuditRecordType actionType) const
     case Qn::AR_DatabaseRestore:
     case Qn::AR_UpdateInstall:
         return m_colors.systemActions;
+    case Qn::AR_StorageInsert:
+    case Qn::AR_StorageUpdate:
+    case Qn::AR_StorageRemove:
     case Qn::AR_ServerUpdate:
     case Qn::AR_ServerRemove:
         return m_colors.updServer;
@@ -904,6 +916,8 @@ QVariant QnAuditLogModel::data(const QModelIndex &index, int role) const
             case Qn::AR_UserUpdate:
                 return qnSkin->icon("tree/user.png");
 
+            case Qn::AR_StorageInsert:
+            case Qn::AR_StorageUpdate:
             case Qn::AR_ServerUpdate:
                 return qnSkin->icon("tree/server.png");
 

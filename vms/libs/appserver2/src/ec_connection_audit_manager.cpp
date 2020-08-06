@@ -15,6 +15,7 @@
 #include <common/common_module.h>
 #include <nx_ec/ec_api.h>
 #include <nx/vms/api/data/event_rule_data.h>
+#include <core/resource/storage_resource.h>
 
 namespace ec2 {
 
@@ -114,8 +115,10 @@ void ECConnectionAuditManager::addAuditRecord(
     const StorageData& params,
     const QnAuthSession& authInfo)
 {
-    QnAuditRecord auditRecord = commonModule()->auditManager()->prepareRecord(authInfo, Qn::AR_ServerUpdate);
-    auditRecord.resources.push_back(params.parentId);
+    auto command = commonModule()->resourcePool()->getResourceById(params.id)
+        ? Qn::AR_StorageUpdate : Qn::AR_StorageInsert;
+    QnAuditRecord auditRecord = commonModule()->auditManager()->prepareRecord(authInfo, command);
+    auditRecord.resources.push_back(params.id);
     commonModule()->auditManager()->addAuditRecord(auditRecord);
 }
 
@@ -124,9 +127,9 @@ void ECConnectionAuditManager::addAuditRecord(
     const StorageDataList& params,
     const QnAuthSession& authInfo)
 {
-    QnAuditRecord auditRecord = commonModule()->auditManager()->prepareRecord(authInfo, Qn::AR_ServerUpdate);
+    QnAuditRecord auditRecord = commonModule()->auditManager()->prepareRecord(authInfo, Qn::AR_StorageUpdate);
     for (const auto& value: params)
-        auditRecord.resources.push_back(value.parentId);
+        auditRecord.resources.push_back(value.id);
     commonModule()->auditManager()->addAuditRecord(auditRecord);
 }
 
@@ -207,12 +210,6 @@ void ECConnectionAuditManager::addAuditRecord(
     switch(command)
     {
         case ApiCommand::removeStorage:
-            if (QnResourcePtr res = resPool->getResourceById(params.id))
-            {
-                eventType = Qn::AR_ServerUpdate;
-                resourceId = res->getParentId();
-            }
-            break;
         case ApiCommand::removeResource:
         case ApiCommand::removeResources:
         case ApiCommand::removeCamera:
@@ -236,6 +233,11 @@ void ECConnectionAuditManager::addAuditRecord(
                 }
                 else if (res.dynamicCast<QnMediaServerResource>())
                     eventType = Qn::AR_ServerRemove;
+                else if (auto storage = res.dynamicCast<QnStorageResource>())
+                {
+                    eventType = Qn::AR_StorageRemove;
+                    description = storage->urlWithoutCredentials();
+                }
             }
             break;
         }

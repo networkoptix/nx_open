@@ -345,7 +345,10 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         AR_BEventReset       = 0x20000,
         AR_DatabaseRestore   = 0x40000,
         AR_CameraInsert      = 0x80000,
-        AR_UpdateInstall     = 0x100000
+        AR_UpdateInstall     = 0x100000,
+        AR_StorageInsert     = 0x200000,
+        AR_StorageUpdate     = 0x400000,
+        AR_StorageRemove     = 0x800000,
     };
 
     Q_DECLARE_FLAGS(AuditRecordTypes, AuditRecordType)

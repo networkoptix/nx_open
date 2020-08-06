@@ -63,6 +63,9 @@ namespace
                 return QnAuditItemDelegate::tr("User settings...");
 
             case Qn::AR_ServerUpdate:
+            case Qn::AR_StorageUpdate:
+            case Qn::AR_StorageInsert:
+            case Qn::AR_StorageRemove:
                 return QnAuditItemDelegate::tr("Server settings...");
 
             case Qn::AR_CameraUpdate:

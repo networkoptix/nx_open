@@ -45,6 +45,7 @@ public:
     virtual QString getPath() const;
     static QString urlToPath(const QString &url);
     static QString urlWithoutCredentials(const QString& url);
+    QString urlWithoutCredentials() const;
 
     void fillID();
     static QnUuid fillID(const QnUuid& mserverId, const QString& url);
