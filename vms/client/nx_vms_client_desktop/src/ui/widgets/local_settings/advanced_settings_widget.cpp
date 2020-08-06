@@ -1,6 +1,7 @@
 #include "advanced_settings_widget.h"
 #include "ui_advanced_settings_widget.h"
 
+#include <thread>
 #include <QtCore/QDir>
 #include <QtCore/QStandardPaths>
 #include <QtGui/QDesktopServices>
@@ -165,6 +166,19 @@ void QnAdvancedSettingsWidget::at_clearCacheButton_clicked()
     else
     {
         nx::vms::client::desktop::ServerFileCache::clearLocalCache();
+    }
+    // Remove all Qt WebEngine profile directories.
+    const QString dataLocation = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+    static constexpr auto kWebEngineDirName = "QtWebEngine";
+    auto webEngineData = QDir(QDir(dataLocation).filePath(kWebEngineDirName));
+    if (webEngineData.exists())
+    {
+        std::thread([](QDir dir)
+            {
+                if (dir.removeRecursively())
+                    return;
+                NX_ERROR(typeid(QnAdvancedSettingsWidget), "Unable to fully remove %1", dir);
+            }, webEngineData).detach();
     }
 }
 
