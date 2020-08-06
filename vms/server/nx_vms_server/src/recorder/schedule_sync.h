@@ -19,9 +19,11 @@
 #include <nx/utils/std/future.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/vms/api/types/days_of_week.h>
+#include <nx/utils/timer_manager.h>
 
 class QnScheduleSync:
-    public QnLongRunnable, public /*mixin*/ nx::vms::server::ServerModuleAware
+    public QObject,
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
 private:
@@ -51,8 +53,8 @@ private:
         {}
     };
 
-    typedef std::vector<ChunkKey>         ChunkKeyVector;
-    typedef std::map<ChunkKey, SyncData>  SyncDataMap;
+    typedef std::vector<ChunkKey> ChunkKeyVector;
+    typedef std::map<ChunkKey, SyncData> SyncDataMap;
 
 public:
     enum code {
@@ -66,24 +68,17 @@ public:
 public:
     QnScheduleSync(QnMediaServerModule* serverModule);
     ~QnScheduleSync();
-signals:
-    void backupFinished(
-        qint64                      timestampMs,
-        nx::vms::api::EventReason     status
-    );
-
-public:
     int forceStart();
-    virtual void stop() override;
-    int interrupt();
-
     void updateLastSyncChunk();
     QnBackupStatusData getStatus() const;
-    virtual void run() override;
-    virtual void pleaseStop() override;
-private:
-    nx::vms::server::Chunk findLastSyncChunkUnsafe() const;
+    void interrupt();
+    void start();
+    void stop();
 
+signals:
+    void backupFinished(qint64 timestampMs, nx::vms::api::EventReason status);
+
+private:
 #define COPY_ERROR_LIST(APPLY) \
     APPLY(GetCatalogError) \
     APPLY(NoBackupStorageError) \
@@ -96,14 +91,17 @@ private:
 
 #define ENUM_APPLY(value) value,
 
-    enum class CopyError {
+    enum class CopyError
+    {
         COPY_ERROR_LIST(ENUM_APPLY)
     };
 
 #define TO_STRING_APPLY(value) case CopyError::value: return lit(#value);
 
-    QString copyErrorString(CopyError error) {
-        switch (error) {
+    QString copyErrorString(CopyError error)
+    {
+        switch (error)
+        {
             COPY_ERROR_LIST(TO_STRING_APPLY)
         }
         return QString();
@@ -113,7 +111,8 @@ private:
 #undef ENUM_APPLY
 #undef COPY_ERROR_LIST
 
-    enum class SyncCode {
+    enum class SyncCode
+    {
         interrupted,
         wrongTime,
         wrongBackupType,
@@ -121,13 +120,11 @@ private:
         ok,
     };
 
-private:
     template<typename NeedMoveOnCB>
     nx::vms::api::EventReason synchronize(NeedMoveOnCB needMoveOn);
-
+    nx::vms::server::Chunk findLastSyncChunkUnsafe() const;
     void renewSchedule();
     CopyError copyChunk(const ChunkKey &chunkKey);
-
     int state() const;
     void initSyncData();
     void addSyncDataKey( QnServer::ChunksCatalog quality, const QString &cameraId);
@@ -136,13 +133,14 @@ private:
         const QString &cameraId, QnServer::ChunksCatalog catalog, qint64 fromTimeMs,
         SyncData* syncData = nullptr) const;
 
+    void runCycle();
+
     static QString toString(SyncCode code);
 
 private:
-    std::atomic<bool> m_backupSyncOn;
     std::atomic<bool> m_syncing;
     std::atomic<bool> m_forced;
-    // Interrupted by user OR current backup session is over
+    // Interrupted by user OR current backup session is over.
     std::atomic<bool> m_interrupted;
     bool m_failReported;
     nx::vms::api::DayOfWeek m_curDow;
@@ -155,7 +153,7 @@ private:
     SyncDataMap m_syncData;
     mutable QnMutex m_syncDataMutex;
     CopyError m_lastError;
-    nx::utils::promise<void> m_stopPromise;
+    nx::utils::TimerManager m_timerManager;
 };
 
 #endif

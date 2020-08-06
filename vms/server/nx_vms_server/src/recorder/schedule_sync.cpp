@@ -34,7 +34,6 @@ QnScheduleSync::QnScheduleSync(QnMediaServerModule* serverModule):
 
 QnScheduleSync::~QnScheduleSync()
 {
-    stop();
 }
 
 void QnScheduleSync::updateLastSyncChunk()
@@ -274,7 +273,7 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
             qint64 dataProcessed = 0;
             while (dataProcessed < fileSize)
             {
-                if (m_interrupted || m_needStop)
+                if (m_interrupted || serverModule()->isStopping())
                     return CopyError::Interrupted;
 
                 auto data = fromFile->read(CHUNK_SIZE);
@@ -299,7 +298,7 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
         fromFile.reset();
         toFile.reset();
 
-        if (m_interrupted || m_needStop) {
+        if (m_interrupted || serverModule()->isStopping()) {
             return CopyError::Interrupted;
         }
         // add chunk to catalog
@@ -432,54 +431,46 @@ vms::api::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
     return vms::api::EventReason::backupDone;
 }
 
-void QnScheduleSync::stop()
-{
-    pleaseStop();
-    m_forced        = false;
-    m_syncing       = false;
-    m_interrupted   = true;
-
-    wait();
-}
-
-void QnScheduleSync::pleaseStop()
-{
-    if (isRunning())
-    {
-        QnLongRunnable::pleaseStop();
-        m_stopPromise.set_value();
-    }
-}
-
 int QnScheduleSync::state() const
 {
-    int result = 0;
-    result |= m_needStop ? Idle : Started;
+    int result = Started;
     result |= m_syncing ? Syncing : 0;
     result |= m_forced ? Forced : 0;
     return result;
 }
 
-int QnScheduleSync::interrupt()
+void QnScheduleSync::interrupt()
 {
-    if (m_needStop)
-        return Idle;
     m_syncing = false;
     m_forced = false;
     m_interrupted = true;
-    return Ok;
+}
+
+void QnScheduleSync::start()
+{
+    NX_ASSERT(!m_timerManager.hasPendingTasks(), "This method is supposed to be called only once");
+    constexpr auto kBackupCheckPeriod = std::chrono::seconds(5);
+    m_timerManager.addNonStopTimer(
+        [this](auto /*timerId*/) { runCycle(); }, kBackupCheckPeriod, kBackupCheckPeriod);
+}
+
+void QnScheduleSync::stop()
+{
+    m_timerManager.stop();
 }
 
 int QnScheduleSync::forceStart()
 {
     NX_DEBUG(this, "Start forced");
-    if (m_needStop)
+    if (serverModule()->isStopping())
         return Idle;
+
     if (m_forced)
         return Forced;
 
     m_forced = true;
     m_interrupted = false;
+
     return Ok;
 }
 
@@ -488,32 +479,24 @@ QnBackupStatusData QnScheduleSync::getStatus() const
     QnMutexLocker lk(&m_syncDataMutex);
 
     QnBackupStatusData ret;
-    ret.state = m_syncing || m_forced ? Qn::BackupState_InProgress :
-                                        Qn::BackupState_None;
+    ret.state = m_syncing || m_forced ? Qn::BackupState_InProgress : Qn::BackupState_None;
     NX_VERBOSE(
         this, "getStatus: state: %1",
         (ret.state == Qn::BackupState_InProgress ? "'in progress'" : "'none'"));
+
     ret.backupTimeMs = m_syncEndTimePoint;
     int totalChunks = std::accumulate(
-        m_syncData.cbegin(),
-        m_syncData.cend(),
-        0,
-        [](int ac, const SyncDataMap::value_type &p)
-        {
-            return ac + p.second.totalChunks;
-        }
-    );
+        m_syncData.cbegin(), m_syncData.cend(), 0,
+        [](int ac, const SyncDataMap::value_type &p) { return ac + p.second.totalChunks; });
+
     int processedChunks = std::accumulate(
-        m_syncData.cbegin(),
-        m_syncData.cend(),
-        0,
+        m_syncData.cbegin(), m_syncData.cend(), 0,
         [](int ac, const SyncDataMap::value_type &p)
         {
             return ac + p.second.currentIndex - p.second.startIndex;
-        }
-    );
-    ret.progress = (double) processedChunks /
-                    (double) (totalChunks == 0 ? 1 : totalChunks);
+        });
+
+    ret.progress = (double) processedChunks / (double) (totalChunks == 0 ? 1 : totalChunks);
     return ret;
 }
 
@@ -523,14 +506,11 @@ void QnScheduleSync::renewSchedule()
     NX_ASSERT(server);
 
     auto oldSchedule = m_schedule;
-    if (server) {
+    if (server)
         m_schedule = server->getBackupSchedule();
-    }
-    if (m_interrupted) {
-        if (oldSchedule != m_schedule) {
-            m_interrupted = false; // schedule changed, starting from a scratch
-        }
-    }
+
+    if (m_interrupted && oldSchedule != m_schedule)
+        m_interrupted = false; //< Schedule changed, starting from a scratch.
 }
 
 QString QnScheduleSync::toString(SyncCode code)
@@ -543,30 +523,28 @@ QString QnScheduleSync::toString(SyncCode code)
         case SyncCode::wrongBackupType: return "wrong backup type";
         case SyncCode::reindexInProgress: return "reindex in progress";
     }
+
     return "";
 }
 
-void QnScheduleSync::run()
+void QnScheduleSync::runCycle()
 {
-    auto stopFuture = m_stopPromise.get_future();
-    while (!m_needStop)
-    {
-        stopFuture.wait_for(std::chrono::seconds(5));
-        if (m_needStop)
-            return;
+    renewSchedule();
+    if (m_schedule.backupType == vms::api::BackupType::realtime)
+        updateLastSyncChunk();
 
-        renewSchedule();
-        if (m_schedule.backupType == vms::api::BackupType::realtime)
-            updateLastSyncChunk();
-
-        auto isItTimeForSync = [this] ()
+    auto isItTimeForSync =
+        [this] ()
         {
-            if (m_needStop)
+            if (serverModule()->isStopping())
                 return SyncCode::interrupted;
+
             if (m_forced)
                 return SyncCode::ok;
+
             if (m_schedule.backupType != vms::api::BackupType::scheduled)
                 return SyncCode::wrongBackupType;
+
             if (m_schedule.backupDaysOfTheWeek == 0)
                 return SyncCode::wrongBackupType;
 
@@ -588,52 +566,51 @@ void QnScheduleSync::run()
 
             if (m_schedule.dateTimeFits(now))
                 return SyncCode::ok;
+
             if (m_syncing && m_schedule.isDateTimeBeforeDayPeriodEnd(now))
                 return SyncCode::ok;
 
             return SyncCode::wrongTime;
         };
 
-        const auto shouldStartCode = isItTimeForSync();
-        NX_VERBOSE(
-            this, "Checking if rebuild might be started. Result is: '%1'",
-            toString(shouldStartCode));
+    const auto shouldStartCode = isItTimeForSync();
+    NX_VERBOSE(
+        this, "Checking if rebuild might be started. Result is: '%1'",
+        toString(shouldStartCode));
 
-        if (shouldStartCode == SyncCode::ok)
+    if (shouldStartCode == SyncCode::ok)
+    {
+         if (m_forced)
+            m_failReported = false;
+
+        auto result = synchronize(isItTimeForSync);
+        qint64 syncEndTimePointLocal = 0;
         {
-             if (m_forced)
-                m_failReported = false;
+            QnMutexLocker lk(&m_syncDataMutex);
+            m_syncData.clear();
+            syncEndTimePointLocal = m_syncEndTimePoint;
+        }
+        m_forced = false;
+        m_syncing = false;
 
-            auto result = synchronize(isItTimeForSync);
-            qint64 syncEndTimePointLocal = 0;
-            {
-                QnMutexLocker lk(&m_syncDataMutex);
-                m_syncData.clear();
-                syncEndTimePointLocal = m_syncEndTimePoint;
-            }
-            m_forced = false;
-            m_syncing = false;
+        bool backupFailed = result != vms::api::EventReason::backupDone
+            && result != vms::api::EventReason::backupCancelled
+            && result != vms::api::EventReason::backupEndOfPeriod;
 
-            bool backupFailed = result != vms::api::EventReason::backupDone &&
-                                result != vms::api::EventReason::backupCancelled &&
-                                result != vms::api::EventReason::backupEndOfPeriod;
-
-            if (backupFailed && !m_failReported) {
-                emit backupFinished(syncEndTimePointLocal, result);
-                m_failReported = true;
-            }
-            else if (!backupFailed) {
-                emit backupFinished(syncEndTimePointLocal, result);
-                m_failReported = false;
-            }
+        if (backupFailed && !m_failReported)
+        {
+            emit backupFinished(syncEndTimePointLocal, result);
+            m_failReported = true;
+        }
+        else if (!backupFailed)
+        {
+            emit backupFinished(syncEndTimePointLocal, result);
+            m_failReported = false;
         }
     }
 }
 
-bool operator < (
-    const QnScheduleSync::ChunkKey &key1,
-    const QnScheduleSync::ChunkKey &key2
-)
+bool operator<(const QnScheduleSync::ChunkKey &key1, const QnScheduleSync::ChunkKey &key2)
 {
     return key1.cameraId < key2.cameraId ?
            true : key1.cameraId > key2.cameraId ?
