@@ -1506,6 +1506,7 @@ QJsonObject serializeModel(const CameraSettings::Vca::Installation& installation
                 {"type", "SpinBox"},
                 {"minValue", 0},
                 {"maxValue", 2000},
+                {"defaultValue", 400},
                 {"caption", "Height (cm)"},
                 {"description", "Distance between camera and floor"},
             },
