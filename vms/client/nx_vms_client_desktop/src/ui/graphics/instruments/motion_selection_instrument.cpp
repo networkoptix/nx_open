@@ -17,6 +17,8 @@
 #include <ui/graphics/items/generic/image_button_widget.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 
+#include <nx/vms/client/desktop/ui/common/custom_cursors.h>
+
 #include "selection_item.h"
 
 namespace {
@@ -57,6 +59,7 @@ static constexpr int kStartDragDistance = 5;
 
 } // namespace
 
+using namespace nx::vms::client::desktop;
 
 MotionSelectionInstrument::MotionSelectionInstrument(QObject *parent):
     base_type(Viewport,
@@ -185,7 +188,7 @@ void MotionSelectionInstrument::updateCursor()
     if (m_widget && motionSelectionEnabled(m_widget) &&
         (dragProcessor()->isRunning() || !m_buttonUnderMouse))
     {
-        m_itemUnderMouse->setCursor(Qt::CrossCursor);
+        m_itemUnderMouse->setCursor(CustomCursors::cross);
         return;
     }
 

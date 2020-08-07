@@ -2,6 +2,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QVariant>
+#include <QtGui/QCursor>
 #include <QtQuick/QQuickItem>
 
 #include <nx/utils/uuid.h>
@@ -22,6 +23,8 @@ public:
     Q_INVOKABLE nx::utils::Url url(const QString& url) const;
     Q_INVOKABLE nx::utils::Url url(const QUrl& url) const;
     Q_INVOKABLE nx::vms::api::SoftwareVersion softwareVersion(const QString& version) const;
+
+    Q_INVOKABLE QCursor cursor(Qt::CursorShape shape) const;
 
     Q_INVOKABLE void ensureFlickableChildVisible(QQuickItem* item);
 

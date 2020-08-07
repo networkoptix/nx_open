@@ -116,4 +116,9 @@ QLocale NxGlobalsObject::numericInputLocale(const QString& basedOn) const
     return locale;
 }
 
+QCursor NxGlobalsObject::cursor(Qt::CursorShape shape) const
+{
+    return QCursor(shape);
+}
+
 } // namespace nx::vms::client::core

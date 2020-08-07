@@ -113,6 +113,7 @@
 #include <nx/vms/client/desktop/analytics/analytics_settings_manager.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_manager_factory.h>
 #include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
+#include <nx/vms/client/desktop/ui/common/custom_cursors.h>
 
 #include <statistics/statistics_manager.h>
 #include <statistics/storage/statistics_file_storage.h>
@@ -265,7 +266,6 @@ QnClientModule::~QnClientModule()
         m_resourceDirectoryBrowser->stop();
 
     m_clientCoreModule->commonModule()->resourcePool()->threadPool()->waitForDone();
-
 
     QApplication::setOrganizationName(QString());
     QApplication::setApplicationName(QString());
@@ -688,6 +688,7 @@ void QnClientModule::initSkin()
     commonModule->store(skin.take());
     commonModule->store(customizer.take());
     commonModule->store(new ColorTheme());
+    commonModule->store(new CustomCursors(QnSkin::instance()));
 }
 
 void QnClientModule::initWebEngine()

@@ -39,6 +39,7 @@
 #include <ui/workbench/workbench_layout.h>
 
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/ui/common/custom_cursors.h>
 
 using nx::vms::client::core::Geometry;
 
@@ -348,7 +349,7 @@ PtzOverlayWidget* PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget* widg
 
     PtzOverlayWidget *overlay = new PtzOverlayWidget();
     overlay->setOpacity(0.0);
-    overlay->manipulatorWidget()->setCursor(Qt::SizeAllCursor);
+    overlay->manipulatorWidget()->setCursor(CustomCursors::sizeAll);
     overlay->zoomInButton()->setTarget(widget);
     overlay->zoomOutButton()->setTarget(widget);
     overlay->focusInButton()->setTarget(widget);
@@ -622,9 +623,9 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
         overlayWidget->focusOutButton()->setVisible(hasFocus);
 
         if (hasViewportMode && !data.isFisheye())
-            overlayWidget->setCursor(Qt::CrossCursor);
+            overlayWidget->setCursor(CustomCursors::cross);
         else if (canMove && !showManipulator )
-            overlayWidget->setCursor(Qt::SizeAllCursor);
+            overlayWidget->setCursor(CustomCursors::sizeAll);
         else
             overlayWidget->unsetCursor();
 
@@ -1171,7 +1172,7 @@ void PtzInstrument::finishDrag(DragInfo* /*info*/)
         {
             case ContinuousMovement:
             case VirtualMovement:
-                targetManipulator()->setCursor(Qt::SizeAllCursor);
+                targetManipulator()->setCursor(CustomCursors::sizeAll);
                 target()->unsetCursor();
                 ensureElementsWidget();
                 opacityAnimator(elementsWidget()->newArrowItem())->animateTo(0.0);

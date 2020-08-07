@@ -34,7 +34,7 @@ private:
 private:
     QnCommonModule* m_commonModule;
     std::unique_ptr<ec2::RemoteConnectionFactory> m_connectionFactory;
-    QQmlEngine* m_qmlEngine = nullptr;
+    std::unique_ptr<QQmlEngine> m_qmlEngine;
     QScopedPointer<QnDataProviderFactory> m_resourceDataProviderFactory;
 };
 

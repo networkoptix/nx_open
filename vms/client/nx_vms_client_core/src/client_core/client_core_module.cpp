@@ -57,7 +57,7 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
 
     m_resourceDataProviderFactory.reset(new QnDataProviderFactory());
 
-    m_qmlEngine = new QQmlEngine(this);
+    m_qmlEngine.reset(new QQmlEngine(this));
     m_qmlEngine->setOutputWarningsToStandardError(true);
 
     const auto thumbnailProvider = new ThumbnailImageProvider();
@@ -69,7 +69,6 @@ QnClientCoreModule::QnClientCoreModule(QObject* parent):
 
 QnClientCoreModule::~QnClientCoreModule()
 {
-
 }
 
 QnCommonModule* QnClientCoreModule::commonModule() const
@@ -97,9 +96,9 @@ QnDataProviderFactory* QnClientCoreModule::dataProviderFactory() const
     return m_resourceDataProviderFactory.data();
 }
 
-QQmlEngine*QnClientCoreModule::mainQmlEngine()
+QQmlEngine* QnClientCoreModule::mainQmlEngine()
 {
-    return m_qmlEngine;
+    return m_qmlEngine.get();
 }
 
 void QnClientCoreModule::registerResourceDataProviders()

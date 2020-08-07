@@ -43,6 +43,8 @@
 
 #include <nx/vms/client/desktop/resource_properties/camera/widgets/motion_regions_item.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/desktop/ui/common/custom_cursor.h>
+#include <nx/vms/client/desktop/ui/common/custom_cursors.h>
 #include <nx/vms/client/desktop/ui/common/recording_status_helper.h>
 #include <nx/vms/client/desktop/ui/common/focus_frame_item.h>
 #include <nx/vms/client/desktop/ui/common/global_tool_tip.h>
@@ -206,6 +208,8 @@ void QnClientMetaTypes::registerQmlTypes()
 
     ui::scene::Instrument::registerQmlType();
     CursorManager::registerQmlType();
+    CustomCursor::registerQmlType();
+    CustomCursors::registerQmlType();
     RecordingStatusHelper::registerQmlType();
     FocusFrameItem::registerQmlType();
     MotionRegionsItem::registerQmlType();

@@ -7,9 +7,12 @@ import Nx.Common 1.0
 import Nx.Media 1.0
 import Nx.Items 1.0
 import Nx.Motion 1.0
+
 import com.networkoptix.qml 1.0
+
 import nx.client.core 1.0
 import nx.client.desktop 1.0
+import nx.vms.client.desktop 1.0
 
 Rectangle
 {
@@ -74,7 +77,8 @@ Rectangle
                 id: mouseArea
                 anchors.fill: parent
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
-                cursorShape: Qt.CrossCursor
+
+                CustomCursor.cursor: CustomCursors.cross
 
                 readonly property rect selectionRect: Qt.rect(
                     Math.min(x1, x2), Math.min(y1, y2), Math.abs(x2 - x1), Math.abs(y2 - y1))

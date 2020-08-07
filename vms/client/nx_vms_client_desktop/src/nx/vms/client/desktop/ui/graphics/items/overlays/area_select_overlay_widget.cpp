@@ -10,6 +10,7 @@
 #include <nx/client/core/utils/geometry.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
+#include <nx/vms/client/desktop/ui/common/custom_cursors.h>
 
 namespace nx::vms::client::desktop {
 
@@ -126,7 +127,7 @@ void AreaSelectOverlayWidget::setActive(bool value)
     setAcceptedMouseButtons(d->active ? Qt::LeftButton : Qt::NoButton);
 
     if (d->active)
-        setCursor(Qt::CrossCursor);
+        setCursor(CustomCursors::cross);
     else
         unsetCursor();
 }

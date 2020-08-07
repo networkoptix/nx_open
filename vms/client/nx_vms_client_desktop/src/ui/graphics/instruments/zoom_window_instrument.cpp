@@ -28,11 +28,13 @@
 
 #include <core/resource_management/resource_runtime_data.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/ui/common/custom_cursors.h>
 
 #include "instrument_manager.h"
 #include "resizing_instrument.h"
 #include "selection_item.h"
 
+using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 using nx::vms::client::core::Geometry;
 
@@ -933,7 +935,7 @@ bool ZoomWindowInstrument::mousePressEvent(QGraphicsItem* item, QGraphicsSceneMo
         return false;
 
     m_target = target;
-    m_target->setCursor(Qt::CrossCursor);
+    m_target->setCursor(CustomCursors::cross);
 
     return base_type::mousePressEvent(item, event);
 }
@@ -959,7 +961,7 @@ bool ZoomWindowInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* event)
     if (!m_target)
         m_target = target;
 
-    m_target->setCursor(Qt::CrossCursor);
+    m_target->setCursor(CustomCursors::cross);
 
     event->accept();
     return false;
