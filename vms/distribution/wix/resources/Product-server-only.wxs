@@ -104,8 +104,6 @@
         <!-- Custom actions -->
         <CustomAction Id="SetPreviousServerInstalled" BinaryKey="CustomActions.dll" DllEntry="SetPreviousServerInstalled" Execute="immediate" Return="check"/>
 
-        <SetProperty Action="SetStatisticsReportAllowed1" Id="ALLOW_CAMERA_CHANGES" Value="1" After="SetPreviousServerInstalled" Sequence="ui">$(var.VmsInstalling)</SetProperty>
-        <SetProperty Action="SetAllowCameraOptimization1" Id="STATISTICS_REPORT_ALLOWED" Value="1" After="AppSearch">$(var.VmsInstalling)</SetProperty>
 
         <CustomAction Id="ResetPreselected" Property="Preselected" Value="" />
         <CustomAction Id="GenerateGuidsForServers" BinaryKey="CustomActions.dll" DllEntry="GenerateGuidsForServers"/>

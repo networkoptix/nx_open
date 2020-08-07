@@ -314,12 +314,6 @@ system_restore () {
     fi
 }
 
-check_statistics_warning() {
-    CONF_FILE="/opt/$CUSTOMIZATION/mediaserver/etc/mediaserver.conf"
-    grep -q "statisticsReportAllowed=true" $CONF_FILE \
-        && echo "statisticsReportAllowed=true" >> $CONF_FILE
-}
-
 save_ipconfig() {
 # saves IP configuration and sets the flag to restore it after reboot (if reboot happened during restore process)
     echo `date` "SAVING IP CONFIG..."
@@ -416,11 +410,11 @@ upgrade_sd() {
 
 move_crashdump() {
     CRASHDUMPDIR="$MNTDATAHDDPART/crashdumps"
-    if [ ! -d "$CRASHDUMPDIR" ]; then 
+    if [ ! -d "$CRASHDUMPDIR" ]; then
         mkdir -p "$CRASHDUMPDIR"
     else
         rm -Rf $CRASHDUMPDIR/*
-    fi    
+    fi
     find "/opt/$CUSTOMIZATION/mediaserver/bin" -name "core*" -exec mv {} "$CRASHDUMPDIR" \;
 }
 
@@ -434,7 +428,6 @@ default_sequence () {
     echo `date` "BOOTED FROM "$BOOTDEVICE""
     ethtweak
     tweak_charger
-    check_statistics_warning
     if [ "$BOOTDEVICE" = "mmc" ]; then
         if [ -z $DISK ]; then
             echo `date` "NO HDD FOUND"

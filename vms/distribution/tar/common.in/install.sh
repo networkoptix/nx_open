@@ -95,13 +95,6 @@ copyToDataPartition()
     # Copy backed-up license db from HDD to SD card.
     mkdir -p "$MNT/$MEDIASERVER_PATH/var" || return $?
     cp -f "$TOOLS_DIR/ecs_static.sqlite" "$MNT/$MEDIASERVER_PATH/var/" || true
-
-    local CONF_FILE="$MNT/$MEDIASERVER_PATH/etc/mediaserver.conf"
-    local CONF_CONTENT="statisticsReportAllowed=true"
-    if grep -q "^$CONF_CONTENT$" "$CONF_FILE"
-    then
-        echo "$CONF_CONTENT" >>"$CONF_FILE" || return $?
-    fi
 }
 
 # Install all deb packages from /opt/deb/<package>/, but do nothing if the directory is missing, or

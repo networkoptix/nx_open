@@ -31,10 +31,6 @@ Template: @customization.companyId@-mediaserver/cameraSettingsOptimization
 Type: boolean
 Description: Allow system to optimize cameras settings (Recommended)
 
-Template: @customization.companyId@-mediaserver/statisticsReportAllowed
-Type: boolean
-Description: Send usage and crash statistics to software developers
-
 Template: @customization.companyId@-mediaserver/present-mediaserver-eula
 Type: note
 Description: @license.text@
