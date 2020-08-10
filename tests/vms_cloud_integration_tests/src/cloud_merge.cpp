@@ -15,6 +15,8 @@
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/test_support/test_options.h>
 #include <nx/utils/test_support/test_with_temporary_directory.h>
+#include <common/common_module.h>
+#include <api/global_settings.h>
 
 namespace test {
 
@@ -59,6 +61,15 @@ protected:
     void givenNonCloudSystem()
     {
         ASSERT_TRUE(m_systemMergeFixture.initializeSingleServerSystems(1));
+    }
+
+    void turnOffWebSockets()
+    {
+        for (int i = 0; i < m_systemMergeFixture.peerCount(); ++i)
+        {
+            auto& instance = m_systemMergeFixture.peer(i).process().moduleInstance();
+            instance->commonModule()->globalSettings()->setWebSocketEnabled(false);
+        }
     }
 
     void givenTwoCloudSystemsWithTheSameOwner()
@@ -585,6 +596,19 @@ TEST_F(CloudMerge, merging_non_cloud_system_to_a_cloud_one_does_not_affect_data_
 {
     givenCloudSystem();
     givenNonCloudSystem();
+
+    whenMergeSystems();
+
+    thenMergeFullyCompleted();
+    waitUntilVmsTransactionLogMatchesCloudOne();
+}
+
+TEST_F(CloudMerge, merging_non_cloud_system_to_a_cloud_one_does_not_affect_data_in_cloud_via_http)
+{
+    givenCloudSystem();
+    givenNonCloudSystem();
+
+    turnOffWebSockets();
 
     whenMergeSystems();
 

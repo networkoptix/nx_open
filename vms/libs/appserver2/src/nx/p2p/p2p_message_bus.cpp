@@ -184,14 +184,16 @@ void MessageBus::addOutgoingConnectionToPeer(
     deleteRemoveUrlById(peer);
 
     nx::utils::Url url(_url);
+    const auto patch = commonModule()->globalSettings()->isWebSocketEnabled()
+        ? ConnectionBase::kWebsocketUrlPath : ConnectionBase::kHttpUrlPath;
     if (peerType == nx::vms::api::PeerType::cloudServer)
     {
         url.setPath(nx::network::url::joinPath(
-            kCloudPathPrefix.toStdString(), ConnectionBase::kWebsocketUrlPath.toStdString()).c_str());
+            kCloudPathPrefix.toStdString(), patch.toStdString()).c_str());
     }
     else
     {
-        url.setPath(ConnectionBase::kWebsocketUrlPath);
+        url.setPath(patch);
     }
 
     int pos = nx::utils::random::number((int) 0, (int) m_remoteUrls.size());

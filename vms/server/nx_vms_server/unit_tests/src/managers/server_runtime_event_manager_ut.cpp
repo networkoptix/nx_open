@@ -19,6 +19,7 @@
 #include <nx/fusion/model_functions.h>
 
 #include <nx/vms/server/event/server_runtime_event_manager.h>
+#include <api/global_settings.h>
 
 // TODO: #rvasilenko investigate why receiving a `remotePeerFound` signal doesn't guarantee that
 // non-persistent transaction will be received by another peer (just change the value of this macro
@@ -36,6 +37,23 @@ using namespace std::literals::chrono_literals;
 class ServerRuntimeEventManagerTest: public ::testing::Test
 {
 protected:
+
+    void givenNotConnectedServers(int serverCount)
+    {
+        makeServers(serverCount);
+    }
+
+    void disableWebSocketForServer(int index)
+    {
+        m_servers[index]->commonModule()->globalSettings()->setWebSocketEnabled(false);
+    }
+
+    void connectFirstServerToTheSecond()
+    {
+        m_servers[0]->connectTo(m_servers[1].get());
+        waitUntilConnectionEstablished();
+    }
+
     void givenMultipleServers(int serverCount)
     {
         makeServers(serverCount);
@@ -193,6 +211,26 @@ private:
 TEST_F(ServerRuntimeEventManagerTest, serverRuntimeEventDeliveredToAnotherServer)
 {
     givenMultipleServers(2);
+    afterSendingDeviceSettingsMaybeChangedEventFromServer(0);
+    makeSureEventHasBeenDeliveredToServer(1);
+}
+
+TEST_F(ServerRuntimeEventManagerTest, serverRuntimeEventDeliveredToAnotherServer_via_http1)
+{
+    givenNotConnectedServers(2);
+    disableWebSocketForServer(0);
+    connectFirstServerToTheSecond();
+
+    afterSendingDeviceSettingsMaybeChangedEventFromServer(0);
+    makeSureEventHasBeenDeliveredToServer(1);
+}
+
+TEST_F(ServerRuntimeEventManagerTest, serverRuntimeEventDeliveredToAnotherServer_via_http2)
+{
+    givenNotConnectedServers(2);
+    disableWebSocketForServer(1);
+    connectFirstServerToTheSecond();
+
     afterSendingDeviceSettingsMaybeChangedEventFromServer(0);
     makeSureEventHasBeenDeliveredToServer(1);
 }
