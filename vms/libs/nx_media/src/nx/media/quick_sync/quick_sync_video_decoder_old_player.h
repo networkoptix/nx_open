@@ -22,11 +22,13 @@ public:
 
     virtual void setLightCpuMode(DecodeMode val) override;
     virtual void setMultiThreadDecodePolicy(MultiThreadDecodePolicy mtDecodingPolicy) override;
+    virtual int getLastDecodeResult() const override { return m_lastStatus; };
 
     static bool isSupported(const QnConstCompressedVideoDataPtr& data);
 
 private:
     std::shared_ptr<nx::media::quick_sync::QuickSyncVideoDecoderImpl> m_impl;
     QSize m_resolution;
+    int m_lastStatus = 0;
     AVCodecID m_codecId = AV_CODEC_ID_NONE;
 };

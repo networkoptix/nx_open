@@ -14,6 +14,7 @@
 #include "mfx_sys_qt_video_buffer.h"
 #include "qt_video_buffer.h"
 #include "mfx_status_string.h"
+#include "compatibility_cache.h"
 
 #define MSDK_ALIGN16(value) (((value + 15) >> 4) << 4) // round up to a multiple of 16
 
@@ -22,9 +23,9 @@ namespace nx::media::quick_sync {
 constexpr int kSyncWaitMsec = 5000;
 constexpr int kMaxBitstreamSizeBytes = 1024 * 1024 * 10;
 
-bool QuickSyncVideoDecoderImpl::isCompatible(AVCodecID codec)
+bool QuickSyncVideoDecoderImpl::isCompatible(AVCodecID codec, int width, int height)
 {
-    return nx::media::quick_sync::isCompatible(codec);
+    return CompatibilityCache::isCompatible(codec, width, height);
 }
 
 QuickSyncVideoDecoderImpl::QuickSyncVideoDecoderImpl()
@@ -285,7 +286,7 @@ int QuickSyncVideoDecoderImpl::decode(
             return -1;
         }
 
-        if (!init(bitstream, frame->compressionType, size.width(), size.height()))
+        if (!init(bitstream, frame->compressionType, MSDK_ALIGN16(size.width()), MSDK_ALIGN16(size.height())))
         {
             NX_ERROR(this, "Failed to init quick sync video decoder");
             m_mfxSession.Close();

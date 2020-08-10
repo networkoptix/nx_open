@@ -8,12 +8,14 @@
 #include <dxva2api.h>
 
 #include "renderer.h"
+#include "window_cache.h"
 
 namespace nx::media::quick_sync::windows {
 
 class DeviceHandle
 {
 public:
+    ~DeviceHandle();
     bool createDevice(int width, int height, mfxU32 adapterNumber);
 
     IDirect3DDeviceManager9* getDeviceManager() { return m_deviceManager; }
@@ -26,6 +28,7 @@ private:
 
     HWND m_hWnd = 0;
     Renderer m_renderer;
+    static WindowCache m_windowCache;
 };
 
 } // namespace nx::media::quick_sync::windows

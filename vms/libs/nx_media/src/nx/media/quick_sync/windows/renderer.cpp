@@ -51,6 +51,7 @@ bool convertToRgb(
 
 Renderer::~Renderer()
 {
+    unregisterTexture();
     if (m_rc)
         wglDeleteContext(m_rc);
 }
@@ -152,7 +153,7 @@ void Renderer::unregisterTexture()
 {
     if (m_textureHandle)
     {
-        wglDXUnregisterObjectNV(m_device, m_textureHandle);
+        wglDXUnregisterObjectNV(m_renderDeviceHandle, m_textureHandle);
         m_textureHandle = 0;
     }
 
@@ -199,6 +200,7 @@ bool Renderer::render(
         unregisterTexture();
         if (!registerTexture(textureId, context))
             return false;
+        NX_DEBUG(this, "Register new texture: %1 end", textureId);
     }
     if (!convertToRgb(m_device, mfxSurface, m_sharedSurface))
         return false;
@@ -207,7 +209,6 @@ bool Renderer::render(
     wglDXLockObjectsNV(m_renderDeviceHandle, 1, &m_textureHandle);
     wglDXUnlockObjectsNV(m_renderDeviceHandle, 1, &m_textureHandle);
     wglMakeCurrent(NULL, NULL);
-
     return true;
 }
 

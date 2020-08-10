@@ -36,14 +36,6 @@ int getIntelDeviceAdapter(MFXVideoSession& session)
 
 namespace nx::media::quick_sync {
 
-bool isCompatible(AVCodecID codec)
-{
-    if (codec == AV_CODEC_ID_H264 || codec == AV_CODEC_ID_H265)
-        return true;
-
-    return false;
-}
-
 bool DeviceContext::initialize(MFXVideoSession& session, int width, int height)
 {
     auto adapter = getIntelDeviceAdapter(session);

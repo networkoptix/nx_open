@@ -368,8 +368,13 @@ MultiThreadDecodePolicy QnVideoStreamDisplay::toEncoderPolicy(bool useMtDecoding
 QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
     QnCompressedVideoDataPtr data, bool mtDecoding) const
 {
+    for (int i = 0; i < kMaxFrameQueueSize; ++i)
+        m_frameQueue[i]->clean();
+
     QnAbstractVideoDecoder* decoder;
-    if (!m_reverseMode && QuickSyncVideoDecoderOldPlayer::isSupported(data))
+    if (qnSettings->isHardwareDecodingEnabled()
+        && !m_reverseMode
+        && QuickSyncVideoDecoderOldPlayer::isSupported(data))
     {
         decoder = new QuickSyncVideoDecoderOldPlayer();
     }
@@ -551,7 +556,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
 
     QSharedPointer<CLVideoDecoderOutput> decodeToFrame = useTmpFrame ? m_tmpFrame : outFrame;
     decodeToFrame->flags = 0;
-    if (!dec || !dec->decode(data, &decodeToFrame))
+    if (!dec->decode(data, &decodeToFrame))
     {
         m_mtx.unlock();
         if (m_decodeMode == QnAbstractVideoDecoder::DecodeMode_Fastest)
@@ -569,12 +574,12 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
                 return Status_Buffered;
         }
         if (m_bufferedFrameDisplayer)
-        {
-            dec->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full); // do not skip more 1 frame in a row
-            return Status_Buffered;
-        }
-        else
+            dec->setLightCpuMode(QnAbstractVideoDecoder::DecodeMode_Full);
+
+        if (dec->getLastDecodeResult() < 0)
             return Status_Skipped;
+        else
+            return Status_Buffered;
     }
     m_lastDisplayedFrame = decodeToFrame;
     m_mtx.unlock();

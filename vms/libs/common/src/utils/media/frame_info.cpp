@@ -104,6 +104,8 @@ void CLVideoDecoderOutput::clean()
     data[0] = data[1] = data[2] = 0;
     linesize[0] = linesize[1] = linesize[2] = 0;
     width = height = 0;
+    m_memoryType = MemoryType::SystemMemory;
+    m_surface.reset();
 }
 
 void CLVideoDecoderOutput::copyFrom(const CLVideoDecoderOutput* src)

@@ -39,8 +39,6 @@ private:
     std::shared_ptr<MFXFrameAllocator> m_allocator;
 };
 
-bool isCompatible(AVCodecID codec);
-
 } // nx::media::quick_sync
 
 #endif // _WIN32

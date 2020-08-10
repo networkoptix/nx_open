@@ -8,8 +8,18 @@
 
 bool QuickSyncVideoDecoderOldPlayer::isSupported(const QnConstCompressedVideoDataPtr& data)
 {
-    if (!nx::media::quick_sync::QuickSyncVideoDecoderImpl::isCompatible(data->compressionType))
+    QSize size = nx::media::getFrameSize(data, true);
+    if (!size.isValid())
+    {
+        NX_ERROR(NX_SCOPE_TAG, "Failed to check compatibility, frame size unknown");
         return false;
+    }
+
+    if (!nx::media::quick_sync::QuickSyncVideoDecoderImpl::isCompatible(
+        data->compressionType, size.width(), size.height()))
+    {
+        return false;
+    }
 
     if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
     {
@@ -17,9 +27,8 @@ bool QuickSyncVideoDecoderOldPlayer::isSupported(const QnConstCompressedVideoDat
             "Failed to check QuickSync compatibility, input frame is not a key frame");
         return false;
     }
-    nx::QVideoFramePtr result;
-    auto decoder = std::make_unique<nx::media::quick_sync::QuickSyncVideoDecoderImpl>();
-    return decoder->decode(data, &result) >= 0;
+
+    return true;
 }
 
 bool QuickSyncVideoDecoderOldPlayer::decode(
@@ -53,8 +62,10 @@ bool QuickSyncVideoDecoderOldPlayer::decode(
     {
         NX_ERROR(this, "Failed to decode frame");
         m_impl.reset();
+        m_lastStatus = -1;
         return false;
     }
+    m_lastStatus = 0;
     if (!result)
         return false;
 

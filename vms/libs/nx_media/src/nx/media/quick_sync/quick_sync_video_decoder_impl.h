@@ -22,7 +22,7 @@ public:
     void releaseSurface(const mfxFrameSurface1* surface);
 
     DeviceContext& getDevice() { return m_device; }
-    static bool isCompatible(AVCodecID codec);
+    static bool isCompatible(AVCodecID codec, int width, int height);
 
 private:
     struct SurfaceInfo

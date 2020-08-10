@@ -5,14 +5,14 @@
 namespace nx::media::quick_sync {
 
 bool QuickSyncVideoDecoder::isCompatible(
-    const AVCodecID codec, const QSize& /*resolution*/, bool /*allowOverlay*/)
+    const AVCodecID codec, const QSize& resolution, bool /*allowOverlay*/)
 {
-    return QuickSyncVideoDecoderImpl::isCompatible(codec);
+    return QuickSyncVideoDecoderImpl::isCompatible(codec, resolution.width(), resolution.height());
 }
 
 QSize QuickSyncVideoDecoder::maxResolution(const AVCodecID /*codec*/)
 {
-    return QSize(10000, 10000);
+    return QSize(8192, 8192);
 }
 
 QuickSyncVideoDecoder::QuickSyncVideoDecoder(

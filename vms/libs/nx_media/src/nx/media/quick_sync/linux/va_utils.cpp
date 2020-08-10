@@ -13,17 +13,6 @@
 
 namespace nx::media::quick_sync {
 
-bool isCompatible(AVCodecID codec)
-{
-    if (linux::VaDisplay::getDisplay() == nullptr)
-        return false;
-
-    if (codec == AV_CODEC_ID_H264 || codec == AV_CODEC_ID_H265)
-        return true;
-
-    return false;
-}
-
 DeviceContext::~DeviceContext()
 {
     if (m_renderingSurface)
