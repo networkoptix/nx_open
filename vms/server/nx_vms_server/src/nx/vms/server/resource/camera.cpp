@@ -1014,6 +1014,11 @@ ec2::AbstractCameraManagerPtr Camera::cameraManager()
     return commonModule()->ec2Connection()->getCameraManager(Qn::kSystemAccess);
 }
 
+bool Camera::allowRtspVideoLayout() const
+{
+    return resourceData().value<bool>("allowRtspVideoLayout", true);
+}
+
 } // namespace resource
 } // namespace vms::server
 } // namespace nx
