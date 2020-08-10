@@ -297,8 +297,12 @@ Engine::DeviceData& Engine::getCachedDeviceData(const IDeviceInfo* deviceInfo)
         if (fetchSupportedEventTypeIds(&data, deviceInfo)
             || fetchSupportedObjectTypeIds(&data, deviceInfo))
         {
-            if (!data.supportedEventTypeIds.isEmpty())
+            const QString eventObjectTypeId = "nx.hikvision.event";
+            if (!data.supportedEventTypeIds.isEmpty()
+                && !data.supportedObjectTypeIds.contains(eventObjectTypeId))
+            {
                 data.supportedObjectTypeIds.push_back("nx.hikvision.event");
+            }
 
             timeout.restart();
         }
