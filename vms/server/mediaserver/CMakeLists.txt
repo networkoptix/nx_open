@@ -21,3 +21,7 @@ if(LINUX)
     # Security requirement (see hardening-check).
     string(APPEND CMAKE_EXE_LINKER_FLAGS " -pie")
 endif()
+
+if(LINUX)
+    add_dependencies(mediaserver libgl_stub)
+endif()
