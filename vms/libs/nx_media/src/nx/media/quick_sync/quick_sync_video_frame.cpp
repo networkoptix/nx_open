@@ -38,7 +38,7 @@ AVFrame QuickSyncVideoFrame::lockFrame()
         surface->Data.MemId, &surface->Data);
     if (MFX_ERR_NONE != status)
     {
-        NX_ERROR(this, "Failed to lock video memory frame, error status: %1", toString(status));
+        NX_ERROR(this, "Failed to lock video memory frame, error: %1", status);
         return result;
     }
     result.width = m_frame->width();
