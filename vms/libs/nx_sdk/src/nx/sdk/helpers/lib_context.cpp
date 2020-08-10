@@ -12,6 +12,9 @@ void LibContext::setName(const char* name)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
+    if (name == m_name)
+        return;
+
     if (!NX_KIT_ASSERT(m_name == kDefaultName,
         nx::kit::utils::format("Attempt to change LibContext name from %s to %s.",
             nx::kit::utils::toString(m_name).c_str(), nx::kit::utils::toString(name).c_str())))
