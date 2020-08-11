@@ -22,7 +22,7 @@ or https://software.intel.com/en-us/media-client-solutions-support.
 
 #include <stdlib.h>
 #include "base_allocator.h"
-#include <vector>
+#include <set>
 
 #define MSDK_ALIGN32(X) (((mfxU32)((X)+31)) & (~ (mfxU32)31))
 
@@ -67,7 +67,7 @@ protected:
     MFXBufferAllocator *m_pBufferAllocator;
     bool m_bOwnBufferAllocator;
 
-    std::vector<mfxFrameAllocResponse *> m_vResp;
+    std::set<mfxFrameAllocResponse *> m_vResp;
 
     mfxMemId *GetMidHolder(mfxMemId mid);
 };

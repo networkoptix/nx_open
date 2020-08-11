@@ -7,8 +7,6 @@
 
 #include <QtCore/QAtomicInt>
 #include <QtGui/QImage>
-#include <QtMultimedia/QVideoFrame>
-#include <QtGui/QOpenGLFunctions>
 
 extern "C" {
 
@@ -36,11 +34,12 @@ class QuickSyncVideoDecoderImpl;
 
 };
 
+class QOpenGLContext;
+
 class AbstractVideoSurface
 {
 public:
     virtual ~AbstractVideoSurface() {}
-    virtual bool renderToRgb(bool isNewTexture, GLuint textureId, QOpenGLContext* context) = 0;
     virtual AVFrame lockFrame() = 0;
     virtual void unlockFrame() = 0;
 };

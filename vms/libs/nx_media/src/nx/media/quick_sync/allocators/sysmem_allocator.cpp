@@ -19,7 +19,6 @@ or https://software.intel.com/en-us/media-client-solutions-support.
 
 #include "sysmem_allocator.h"
 
-
 #define ID_BUFFER MFX_MAKEFOURCC('B','U','F','F')
 #define ID_FRAME  MFX_MAKEFOURCC('F','R','M','E')
 
@@ -411,7 +410,7 @@ mfxStatus SysMemFrameAllocator::AllocImpl(mfxFrameAllocRequest *request, mfxFram
     response->NumFrameActual = (mfxU16) numAllocated;
     response->mids = mids.release();
 
-    m_vResp.push_back(response);
+    m_vResp.insert(response);
     return MFX_ERR_NONE;
 }
 
@@ -437,8 +436,7 @@ mfxStatus SysMemFrameAllocator::ReleaseResponse(mfxFrameAllocResponse *response)
             }
         }
     }
-
-    m_vResp.erase(std::remove(m_vResp.begin(), m_vResp.end(), response), m_vResp.end());
+    m_vResp.erase(response);
     delete [] response->mids;
     response->mids = 0;
 

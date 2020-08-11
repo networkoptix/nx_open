@@ -27,7 +27,11 @@ extern "C" {
 #include <decoders/video/ffmpeg_video_decoder.h>
 #include <client/client_module.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
+
+#include <nx/media/quick_sync/qsv_supported.h>
+#ifdef __QSV_SUPPORTED__
 #include <nx/media/quick_sync/quick_sync_video_decoder_old_player.h>
+#endif // __QSV_SUPPORTED__
 
 
 using namespace std::chrono;
@@ -372,6 +376,8 @@ QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
         m_frameQueue[i]->clean();
 
     QnAbstractVideoDecoder* decoder;
+
+#ifdef __QSV_SUPPORTED__
     if (qnSettings->isHardwareDecodingEnabled()
         && !m_reverseMode
         && QuickSyncVideoDecoderOldPlayer::isSupported(data))
@@ -379,6 +385,7 @@ QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
         decoder = new QuickSyncVideoDecoderOldPlayer();
     }
     else
+#endif // __QSV_SUPPORTED__
     {
         DecoderConfig config;
         config.mtDecodePolicy = toEncoderPolicy(mtDecoding);

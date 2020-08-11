@@ -10,7 +10,13 @@
 #include "android_video_decoder.h"
 #include "android_audio_decoder.h"
 #include "ios_video_decoder.h"
+
+#include <nx/media/quick_sync/qsv_supported.h>
+#ifdef __QSV_SUPPORTED__
 #include "quick_sync/quick_sync_video_decoder.h"
+#endif // __QSV_SUPPORTED__
+
+
 
 #include "jpeg_decoder.h"
 
@@ -55,7 +61,9 @@ void DecoderRegistrar::registerDecoders(
     {
         FfmpegVideoDecoder::setMaxResolutions(maxFfmpegResolutions);
 
+#ifdef __QSV_SUPPORTED__
         VideoDecoderRegistry::instance()->addPlugin<quick_sync::QuickSyncVideoDecoder>();
+#endif // __QSV_SUPPORTED__
         VideoDecoderRegistry::instance()->addPlugin<FfmpegVideoDecoder>();
         AudioDecoderRegistry::instance()->addPlugin<FfmpegAudioDecoder>();
     }

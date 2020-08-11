@@ -33,7 +33,11 @@
 #include "frame_metadata.h"
 #include "video_decoder_registry.h"
 #include "audio_output.h"
-#include "quick_sync/quick_sync_surface.h"
+
+#include <nx/media/quick_sync/qsv_supported.h>
+#ifdef __QSV_SUPPORTED__
+#include <nx/media/quick_sync/quick_sync_surface.h>
+#endif // __QSV_SUPPORTED__
 
 #include "media_player_quality_chooser.h"
 
@@ -517,9 +521,11 @@ QVideoFramePtr PlayerPrivate::scaleFrame(const QVideoFramePtr& videoFrame)
     if (videoFrame->width() <= maxTextureSize && videoFrame->height() <= maxTextureSize)
         return videoFrame; //< Scale is not required.
 
+#ifdef __QSV_SUPPORTED__
     // if video frame contains video memory surface then skip scaling
     if (videoFrame->handleType() == kHandleTypeQsvSurface)
         return videoFrame;
+#endif
 
     QImage::Format imageFormat = QVideoFrame::imageFormatFromPixelFormat(
         videoFrame->pixelFormat());

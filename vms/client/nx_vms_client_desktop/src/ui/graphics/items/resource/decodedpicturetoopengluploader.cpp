@@ -29,6 +29,11 @@ extern "C"
 #include <nx/streaming/config.h>
 #include <nx/vms/client/core/graphics/shader_helper.h>
 
+#include <nx/media/quick_sync/qsv_supported.h>
+#ifdef __QSV_SUPPORTED__
+#include <nx/media/quick_sync/quick_sync_video_frame.h>
+#endif //__QSV_SUPPORTED__
+
 namespace
 {
     const int ROUND_COEFF = 8;
@@ -1203,6 +1208,7 @@ bool DecodedPictureToOpenGLUploader::renderVideoMemory(
     DecodedPictureToOpenGLUploader::UploadedPicture* const emptyPictureBuf,
     const QSharedPointer<CLVideoDecoderOutput>& frame)
 {
+#ifdef __QSV_SUPPORTED__
     emptyPictureBuf->texturePack()->setPictureFormat((AVPixelFormat)frame->format);
     emptyPictureBuf->setColorFormat(AV_PIX_FMT_RGBA);
     QnGlRendererTexture* texture = emptyPictureBuf->texture(0);
@@ -1214,7 +1220,8 @@ bool DecodedPictureToOpenGLUploader::renderVideoMemory(
 
     bool isNewTExture = texture->ensureInitialized(
             displaySize.width(), displaySize.height(), displaySize.width(), 1, GL_RGBA, 1, -1);
-    if (!frame->getVideoSurface()->renderToRgb(isNewTExture, texture->m_id, m_initializedContext))
+
+    if (!renderToRgb(frame->getVideoSurface(), isNewTExture, texture->m_id, m_initializedContext))
     {
         NX_ERROR(this, "Failed to render video memory to OpenGL texture");
         return false;
@@ -1222,6 +1229,9 @@ bool DecodedPictureToOpenGLUploader::renderVideoMemory(
     d->functions->glWidget()->makeCurrent();
     d->glBindTexture(GL_TEXTURE_2D, texture->id());
     return true;
+#else //__QSV_SUPPORTED__
+    return false;
+#endif //__QSV_SUPPORTED__
 }
 
 bool DecodedPictureToOpenGLUploader::uploadDataToGl(

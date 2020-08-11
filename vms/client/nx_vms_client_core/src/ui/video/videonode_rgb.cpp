@@ -40,8 +40,11 @@
 
 #include <nx/utils/log/log.h>
 
+#include <nx/media/quick_sync/qsv_supported.h>
+#ifdef __QSV_SUPPORTED__
 #include <nx/media/quick_sync/quick_sync_surface.h>
 #include <nx/media/quick_sync/quick_sync_video_decoder_impl.h>
+#endif //__QSV_SUPPORTED__
 
 QT_BEGIN_NAMESPACE
 
@@ -58,8 +61,10 @@ QList<QVideoFrame::PixelFormat> QSGVideoNodeFactory_RGB::supportedPixelFormats(
         pixelFormats.append(QVideoFrame::Format_RGB565);
     } else if (handleType == QAbstractVideoBuffer::GLTextureHandle) {
         pixelFormats.append(QVideoFrame::Format_NV12);
+#ifdef __QSV_SUPPORTED__
     } else if (handleType == kHandleTypeQsvSurface) {
         pixelFormats.append(QVideoFrame::Format_NV12);
+#endif //__QSV_SUPPORTED__
     }
 
     return pixelFormats;
@@ -170,7 +175,7 @@ public:
         m_frame = frame;
         m_textureDirty = true;
     }
-
+#ifdef __QSV_SUPPORTED__
     void renderQsvSurface()
     {
         QOpenGLFunctions *functions = QOpenGLContext::currentContext()->functions();
@@ -207,6 +212,7 @@ public:
         functions->glActiveTexture(GL_TEXTURE0);
         functions->glBindTexture(GL_TEXTURE_2D, m_textureId);
     }
+#endif //__QSV_SUPPORTED__
 
     void renderSysMemory()
     {
@@ -267,6 +273,7 @@ public:
         QOpenGLFunctions *functions = QOpenGLContext::currentContext()->functions();
 
         QMutexLocker lock(&m_frameMutex);
+#ifdef __QSV_SUPPORTED__
         if (!m_frame.isValid() || (!m_textureDirty && m_frame.handleType() == kHandleTypeQsvSurface))
         {
             functions->glActiveTexture(GL_TEXTURE0);
@@ -277,6 +284,7 @@ public:
         if (m_frame.handleType() == kHandleTypeQsvSurface)
             renderQsvSurface();
         else
+#endif // __QSV_SUPPORTED__
             renderSysMemory();
     }
 
