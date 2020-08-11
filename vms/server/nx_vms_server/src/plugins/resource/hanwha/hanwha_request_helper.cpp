@@ -157,7 +157,7 @@ utils::Url HanwhaRequestHelper::buildRequestUrl(
     query.addQueryItem(kAction, action);
 
     for (const auto& parameter : parameters)
-        query.addQueryItem(parameter.first, parameter.second);
+        query.addQueryItem(parameter.first, QUrl::toPercentEncoding(parameter.second));
 
     deviceUrl.setQuery(query);
     return deviceUrl;
