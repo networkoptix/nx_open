@@ -1106,7 +1106,7 @@ per veure més marcadors</translation>
     <message numerus="yes">
       <source>%n layouts</source>
       <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
+        <numerusform>%n dissenys</numerusform>
         <numerusform>%n layouts</numerusform>
       </translation>
     </message>
@@ -1174,7 +1174,7 @@ per veure més marcadors</translation>
     <message numerus="yes">
       <source>%n layouts</source>
       <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
+        <numerusform>%n dissenys</numerusform>
         <numerusform>%n layouts</numerusform>
       </translation>
     </message>
@@ -1698,7 +1698,7 @@ per veure més marcadors</translation>
     <message numerus="yes">
       <source>...and %n more</source>
       <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
+        <numerusform>... i %n més</numerusform>
         <numerusform>...and %n more</numerusform>
       </translation>
     </message>

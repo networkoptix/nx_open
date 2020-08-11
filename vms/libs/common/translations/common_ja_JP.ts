@@ -164,7 +164,7 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 システムはクラウドに接続されていない-%1 システムとのみ結合できます　システム名とパスワードは %1 システムから取得されます。</translation>
+      <translation>%1 システムはクラウドに接続されていない-%1 システムとのみ統合できます. システム名とパスワードは %1 システムから取得されます.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
@@ -178,12 +178,12 @@
     </message>
     <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
-      <translation>同じIDを持つサーバーが少なくとも1つあるため、システムを統合できません。このサーバーを削除してやり直してください。</translation>
+      <translation>同じIDを持つサーバーが少なくとも1つあるため、システムを統合できません. このサーバーを削除してやり直してください.</translation>
     </message>
     <message>
       <source>Cloud systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>クラウドシステムのオーナーが異なります。統合は許可されていません</translation>
+      <translation>クラウドシステムのオーナーが異なります. 統合は許可されていません.</translation>
     </message>
   </context>
   <context>
@@ -1197,19 +1197,19 @@
     <name>QnZipExtractor</name>
     <message>
       <source>Zip file is corrupted.</source>
-      <translation>Zip ファイルが壊れています</translation>
+      <translation>Zipファイルが壊れています.</translation>
     </message>
     <message>
       <source>Could not find target dir.</source>
-      <translation>ターゲットディレクトリが見つかりませんでした</translation>
+      <translation>ターゲットディレクトリが見つかりませんでした.</translation>
     </message>
     <message>
       <source>Could not open file for writing.</source>
-      <translation>書き込み用にファイルを開けませんでした</translation>
+      <translation>書き込み用にファイルを開けませんでした.</translation>
     </message>
     <message>
       <source>There is no free space on the disk.</source>
-      <translation>ディスクに空き容量がありません</translation>
+      <translation>ディスクに空き容量がありません.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -1217,18 +1217,18 @@
     </message>
     <message>
       <source>Extraction was cancelled.</source>
-      <translation>抽出は取り消されました</translation>
+      <translation>抽出はキャンセルされました.</translation>
     </message>
     <message>
       <source>Extractor is busy.</source>
-      <translation>抽出が忙しい</translation>
+      <translation>抽出はビジーです.</translation>
     </message>
   </context>
   <context>
     <name>nx::utils::CryptedFileStream</name>
     <message>
       <source>Wrong crypted stream size.</source>
-      <translation>暗号化されたストリームサイズが正しくありません</translation>
+      <translation>暗号化されたストリームサイズが正しくありません.</translation>
     </message>
     <message>
       <source>Damaged crypted stream header.</source>

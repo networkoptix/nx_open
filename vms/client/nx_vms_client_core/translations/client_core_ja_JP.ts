@@ -34,7 +34,7 @@
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation>試行回数が多すぎます。しばらくしてからもう一度お試しください</translation>
+      <translation>試行回数が多すぎます。しばらくしてからもう一度お試しください。</translation>
     </message>
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>

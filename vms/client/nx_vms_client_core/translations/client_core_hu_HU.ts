@@ -34,7 +34,7 @@
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation>Túl sok próbálkozás. Próbálja újra később.</translation>
+      <translation>Túl sok próbálkozás. Próbálkozzon újra egy perc múlva.</translation>
     </message>
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
@@ -43,7 +43,7 @@
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
-      <translation>Hálózati hiba: Ellenőrizze a kapcsolatot és próbálkozzon újra.</translation>
+      <translation>Hálózati hiba: Ellenőrizze az internet kapcsolatot és próbálkozzon újra.</translation>
     </message>
   </context>
   <context>

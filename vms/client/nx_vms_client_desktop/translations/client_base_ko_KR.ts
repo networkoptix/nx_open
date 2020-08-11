@@ -4303,7 +4303,7 @@ to %1</source>
     <name>QnNavigationItem</name>
     <message>
       <source>Speed Down</source>
-      <translation>재생 속도 감소</translation>
+      <translation>역방향 재생 속도</translation>
     </message>
     <message>
       <source>Previous Frame</source>
@@ -4311,7 +4311,7 @@ to %1</source>
     </message>
     <message>
       <source>Speed Up</source>
-      <translation>재생 속도 증가</translation>
+      <translation>순방향 재생 속도</translation>
     </message>
     <message>
       <source>Next Frame</source>
