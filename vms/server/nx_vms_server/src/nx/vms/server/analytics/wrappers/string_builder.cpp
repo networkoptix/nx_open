@@ -43,6 +43,9 @@ static QString toString(ViolationType violationType)
         case ViolationType::methodExecutionTookTooLong:
             return "Method execution took too long";
 
+        case ViolationType::invalidMetadataTimestamp:
+            return "Metadata timestamp must be positive";
+
         case ViolationType::undefined:
             NX_ASSERT(false, "ViolationType must not be undefined.");
             return "Undefined violation";
@@ -54,7 +57,8 @@ static QString toString(ViolationType violationType)
 /**
  * @return User-understandable description of the action performed by the given method. Does not
  *     have to be precise - it only must give the user the idea of what is going wrong; the exact
- *     details for technical support must be provided alongside.
+ *     details for technical support must be provided alongside. Must finish the phrase "The plugin
+ *     failed to...".
  */
 static QString methodDescription(SdkMethod sdkMethod)
 {
@@ -71,7 +75,8 @@ static QString methodDescription(SdkMethod sdkMethod)
         case SdkMethod::executeAction: return "execute Action";
         case SdkMethod::setNeededMetadataTypes: return "accept Metadata types";
         case SdkMethod::pushDataPacket: return "accept audio/video/metadata";
-        case SdkMethod::pushManifest: return "produce updated Manifest";
+        case SdkMethod::iHandler_pushManifest: return "produce updated Manifest";
+        case SdkMethod::iHandler_handleMetadata: return "produce valid metadata";
 
         case SdkMethod::undefined:
             NX_ASSERT(false, "SdkMethod must not be undefined.");
@@ -119,8 +124,13 @@ QString StringBuilder::buildPluginInfoString() const
 
     if (m_violation.type != ViolationType::undefined)
     {
-        return NX_FMT("%1 violated its contract: %2%3",
+        const QString violationDescription = isSdkMethodCallback(m_sdkMethod)
+            ? "called by the Plugin incorrectly"
+            : "implemented in the Plugin incorrectly";
+
+        return NX_FMT("%1 %2: %3%4",
             methodCaption,
+            violationDescription,
             m_violation.type,
             m_violation.details.isEmpty() ? "" : (", details: " + m_violation.details));
     }
@@ -140,7 +150,7 @@ QString StringBuilder::buildPluginDiagnosticEventDescription() const
 {
     const QString prefix = (m_sdkMethod == SdkMethod::undefined)
         ? ""
-        : NX_FMT("Plugin cannot %1. ", methodDescription(m_sdkMethod));
+        : NX_FMT("Plugin failed to %1. ", methodDescription(m_sdkMethod));
 
     return prefix + "Technical details: " + buildPluginInfoString();
 }

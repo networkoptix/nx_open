@@ -72,7 +72,7 @@ protected:
     {
         nx::common::metadata::ObjectMetadata sample;
         sample.trackId = QnUuid::createUuid();
-        sample.bestShot = false;
+        sample.objectMetadataType = nx::common::metadata::ObjectMetadataType::regular;
         sample.boundingBox = QRectF(0, 0, 1, 1);
         sample.typeId = "nx.Car";
         addAttributes(&sample.attributes);

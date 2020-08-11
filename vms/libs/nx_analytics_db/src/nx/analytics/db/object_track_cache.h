@@ -10,7 +10,7 @@
 #include <analytics/common/object_metadata.h>
 #include <analytics/db/analytics_db_types.h>
 
-#include "abstract_iframe_search_helper.h"
+#include "abstract_object_track_best_shot_cache.h"
 
 namespace nx::analytics::db {
 
@@ -52,7 +52,7 @@ public:
     ObjectTrackCache(
         std::chrono::milliseconds aggregationPeriod,
         std::chrono::milliseconds maxObjectLifetime,
-        AbstractIframeSearchHelper* helper);
+        AbstractObjectTrackBestShotCache* imageCache);
 
     void add(const common::metadata::ConstObjectMetadataPacketPtr& packet);
 
@@ -127,7 +127,6 @@ private:
 
         std::set<std::pair<QString, QString>> allAttributes;
         std::vector<ObjectPosition> allPositionSequence;
-        bool roughBestShot = false;
     };
 
     const std::chrono::milliseconds m_aggregationPeriod;
@@ -135,7 +134,7 @@ private:
     mutable QnMutex m_mutex;
     std::map<QnUuid, ObjectTrackContext> m_tracksById;
     nx::utils::ElapsedTimerPool<QnUuid> m_timerPool;
-    AbstractIframeSearchHelper* m_iframeHelper = nullptr;
+    AbstractObjectTrackBestShotCache* m_imageCache = nullptr;
 
     void updateObject(
         const nx::common::metadata::ObjectMetadata& objectMetadata,

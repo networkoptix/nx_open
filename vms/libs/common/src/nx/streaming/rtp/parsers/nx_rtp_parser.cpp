@@ -12,15 +12,11 @@
 #include <nx/streaming/config.h>
 #include <nx/streaming/nx_streaming_ini.h>
 
-#include <nx/debugging/visual_metadata_debugger_factory.h>
-
 #include <nx/analytics/analytics_logging_ini.h>
 
 #include <utils/common/synctime.h>
 #include <motion/motion_detection.h>
 #include <nx/utils/log/log_main.h>
-
-using namespace nx::debugging;
 
 namespace nx::streaming::rtp {
 
@@ -34,7 +30,6 @@ QnNxRtpParser::QnNxRtpParser(QnUuid deviceId):
     m_nextDataPacketBuffer(nullptr),
     m_position(AV_NOPTS_VALUE),
     m_isAudioEnabled(true),
-    m_visualDebugger(VisualMetadataDebuggerFactory::makeDebugger(DebuggerType::nxRtpParser)),
     m_primaryLogger(
         lm("rtp_parser_@%1_").arg(nx::kit::utils::toString(this)),
         m_deviceId,
@@ -247,18 +242,6 @@ StreamParser::Result QnNxRtpParser::processData(quint8* rtpBufferBase, int buffe
                 m_mediaData = m_nextDataPacket;
                 logMediaData(m_mediaData);
                 gotData = true;
-
-                if (m_nextDataPacket->dataType == QnAbstractMediaData::DataType::VIDEO)
-                {
-                    m_visualDebugger->push(
-                        std::dynamic_pointer_cast<QnCompressedVideoData>(m_nextDataPacket));
-                }
-
-                if (m_nextDataPacket->dataType == QnAbstractMediaData::DataType::GENERIC_METADATA)
-                {
-                    m_visualDebugger->push(
-                        std::dynamic_pointer_cast<QnCompressedMetadata>(m_nextDataPacket));
-                }
             }
             m_nextDataPacket.reset(); // EOF video frame reached
             m_nextDataPacketBuffer = nullptr;

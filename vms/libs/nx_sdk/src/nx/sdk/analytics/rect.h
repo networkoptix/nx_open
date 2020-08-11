@@ -10,6 +10,7 @@ namespace analytics {
 
 struct Rect
 {
+    /** Creates an invalid rectangle. */
     Rect() = default;
 
     Rect(float x, float y, float width, float height): x(x), y(y), width(width), height(height) {}
@@ -49,6 +50,12 @@ struct Rect
      * @return Point with both coordinates in the range [0..1].
      */
     Point center() const { return Point(x + width / 2, y + height / 2); }
+
+    bool isValid() const
+    {
+        return x >= 0 && y >= 0 && width >= 0 && height >= 0
+            && x + width <= 1 && y + height <= 1;
+    }
 };
 
 } // namespace analytics

@@ -34,10 +34,13 @@ public:
 
     virtual bool tryLoad() override;
 
+    static const QString kFrameTimestampKey;
+    static const QString kFrameFromPluginKey;
+
 signals:
     /** Internal signal to implement thread-safety. */
     void imageDataLoadedInternal(const QByteArray &data, Qn::ThumbnailStatus nextStatus,
-        qint64 timestampMs);
+        qint64 timestampMs, bool frameFromPlugin);
 
 protected:
     virtual void doLoadAsync() override;

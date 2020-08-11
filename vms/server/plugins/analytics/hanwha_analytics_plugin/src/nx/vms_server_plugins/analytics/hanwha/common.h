@@ -61,6 +61,7 @@ public:
 
         QString eventTypeIdByName(const QString& eventName) const;
         const Hanwha::EventType& eventTypeDescriptorById(const QString& id) const;
+        const Hanwha::ObjectType& objectTypeDescriptorById(const QString& id) const;
 
         void InitializeObjectTypeMap();
         QString objectTypeIdByInternalName(const QString& eventName) const;
@@ -68,6 +69,7 @@ public:
     private:
         mutable QMap<QString, QString> m_eventTypeIdByInternalName;
         mutable QMap<QString, EventType> m_eventTypeDescriptorById;
+        mutable QMap<QString, ObjectType> m_objectTypeDescriptorById;
 
         QMap<QString, QString> m_objectTypeIdByInternalName;
     };

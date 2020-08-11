@@ -81,6 +81,8 @@ static const int kMaximumThumbnailWidth = ini().rightPanelMaxThumbnailWidth;
 
 static constexpr int kNumAnimatedTilesAtInsertion = 3;
 
+static const auto kBypassVideoCachePropertyName = "__qn_bypassVideoCache";
+
 QSize minimumWidgetSize(QWidget* widget)
 {
     return widget->minimumSizeHint()
@@ -364,6 +366,8 @@ void EventRibbon::Private::updateTilePreview(int index)
     const bool precisePreview = !previewCropRect.isEmpty()
         || modelIndex.data(Qn::ForcePrecisePreviewRole).toBool();
 
+    const auto objectTrackId = modelIndex.data(Qn::ObjectTrackIdRole).value<QnUuid>();
+
     nx::api::ResourceImageRequest request;
     request.resource = previewResource;
     request.usecSinceEpoch =
@@ -375,6 +379,7 @@ void EventRibbon::Private::updateTilePreview(int index)
     request.roundMethod = precisePreview
         ? nx::api::ImageRequest::RoundMethod::precise
         : nx::api::ImageRequest::RoundMethod::iFrameAfter;
+    request.objectTrackId = objectTrackId;
 
     bool forceUpdate = true;
     const auto streamSelectionMode = modelIndex.data(Qn::PreviewStreamSelectionRole)
@@ -394,6 +399,8 @@ void EventRibbon::Private::updateTilePreview(int index)
     }
 
     previewProvider->setStreamSelectionMode(streamSelectionMode);
+    previewProvider->setProperty(kBypassVideoCachePropertyName,
+        modelIndex.data(Qn::HasExternalBestShotRole).toBool());
 
     widget->setPreview(previewProvider.get(), forceUpdate);
     widget->setPreviewCropRect(previewCropRect);
@@ -1580,16 +1587,27 @@ void EventRibbon::Private::loadNextPreview()
         if (!tile->widget || !tile->widget->isPreviewLoadNeeded() || !NX_ASSERT(tile->preview))
             continue;
 
+        if (!tile->preview->property(kBypassVideoCachePropertyName).toBool())
         {
             QScopedValueRollback<ResourceThumbnailProvider*> loadingFromCacheGuard(
                 m_providerLoadingFromCache, tile->preview.get());
 
             if (tile->preview->tryLoad())
+            {
+                NX_VERBOSE(this, "Loaded preview from videocache (timestamp=%1, objectTrackId=%2",
+                    tile->preview->requestData().usecSinceEpoch,
+                    tile->preview->requestData().objectTrackId);
+
                 continue;
+            }
         }
 
         if (isNextPreviewLoadAllowed(tile->preview.get()))
         {
+            NX_VERBOSE(this, "Requesting preview from server (timestamp=%1, objectTrackId=%2",
+                tile->preview->requestData().usecSinceEpoch,
+                tile->preview->requestData().objectTrackId);
+
             tile->preview->loadAsync();
             m_sinceLastPreviewRequest.restart();
         }

@@ -22,6 +22,7 @@ public:
         QString caption,
         QString description,
         std::map<QString, QString> attributes,
+        QnUuid objectTrackId,
         qint64 timeStampUsec);
 
     QnUuid engineId() const;
@@ -42,6 +43,7 @@ private:
     const QString m_caption;
     const QString m_description;
     const std::map<QString, QString> m_attributes;
+    const QnUuid m_objectTrackId;
 };
 
 } // namespace event

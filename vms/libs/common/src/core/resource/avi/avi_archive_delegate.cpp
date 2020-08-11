@@ -29,6 +29,9 @@
 #include <utils/media/nalUnits.h>
 #include <common/common_module.h>
 
+#include <analytics/common/object_metadata.h>
+#include <analytics/common/object_metadata_v0.h>
+
 extern "C" {
 
 #include <libavformat/avformat.h>
@@ -208,6 +211,42 @@ QnConstMediaContextPtr QnAviArchiveDelegate::getCodecContext(AVStream* stream)
     return m_contexts[stream->index];
 }
 
+void convertMetadataFromOldFormat(QnCompressedMetadata* packet, int version)
+{
+    if (version != 0)
+        return; //< nothing to convert.
+
+    auto buffer = QByteArray::fromRawData(packet->data(), int(packet->dataSize()));
+    bool success = false;
+    using namespace nx::common::metadata;
+    auto oldPacket = QnUbjson::deserialized<ObjectMetadataPacketV0>(buffer, ObjectMetadataPacketV0(), &success);
+    if (!success)
+        return; //< Don't try to convert;
+
+    ObjectMetadataPacket newPacket;
+    newPacket.deviceId = oldPacket.deviceId;
+    newPacket.timestampUs = oldPacket.timestampUs;
+    newPacket.durationUs = oldPacket.durationUs;
+    for (const auto& oldMetadata: oldPacket.objectMetadataList)
+    {
+        ObjectMetadata newMetadata;
+        newMetadata.typeId = oldMetadata.typeId;
+        newMetadata.trackId = oldMetadata.trackId;
+        newMetadata.boundingBox = oldMetadata.boundingBox;
+        newMetadata.attributes = oldMetadata.attributes;
+        newMetadata.objectMetadataType = oldMetadata.bestShot
+            ? ObjectMetadataType::bestShot
+            : ObjectMetadataType::regular;
+
+        newMetadata.analyticsEngineId = oldMetadata.analyticsEngineId;
+        newPacket.objectMetadataList.push_back(newMetadata);
+    }
+    newPacket.streamIndex = oldPacket.streamIndex;
+
+
+    packet->setData(QnUbjson::serialized(newPacket));
+}
+
 QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
 {
     if (!findStreams() || m_eofReached)
@@ -282,6 +321,8 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                         new QnCompressedMetadata(MetadataType::ObjectDetection, packet.size);
                     metadata->timestamp = packetTimestamp(packet);
                     metadata->m_data.write((const char*)packet.data, packet.size);
+                    convertMetadataFromOldFormat(metadata, m_metadata.metadataStreamVersion);
+
                     data = QnAbstractMediaDataPtr(metadata);
                     break;
                 }

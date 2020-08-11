@@ -116,6 +116,15 @@ struct PluginsIniConfig: public nx::kit::IniConfig
 
     NX_INI_INT(5, pushDataPacketSdkMethodTimeoutS,
         "Maximum duration of the `IDeviceAgent::pushDataPacket` method execution in seconds.");
+
+    NX_INI_INT(1, autoGenerateBestShotDelayS,
+        "Delay in seconds since the arrival of the first frame of a track after which an\n"
+        "automatic best shot packet is generated for the track if no explicit best shot is\n"
+        "provided by the plugin.");
+
+    NX_INI_INT(60, trackExpirationDelayS,
+        "Amount of time after which an Object Track is considered expired if no new data has\n"
+        "arrived.");
 };
 
 inline PluginsIniConfig& pluginsIni()

@@ -86,6 +86,9 @@ QVariant EventListModel::data(const QModelIndex& index, int role) const
         case Qn::TimeoutRole:
             return event.removable ? QVariant::fromValue(event.lifetime) : QVariant();
 
+        case Qn::ObjectTrackIdRole:
+            return QVariant::fromValue(event.objectTrackId);
+
         default:
             return base_type::data(index, role);
     }

@@ -3001,6 +3001,12 @@ void MediaServerProcess::registerRestHandlers(
      */
     reg("ec2/cameraThumbnail", new QnMultiserverThumbnailRestHandler(serverModule(), "ec2/cameraThumbnail"));
 
+    /**%apidoc GET /ec2/analyticsTrackBestShot
+     * Get the best shot for analytics track
+     * %param:string objectTrackId analytics object track id
+     */
+    reg("ec2/analyticsTrackBestShot", new QnMultiserverThumbnailRestHandler(serverModule(), "ec2/analyticsTrackBestShot"));
+
     /**%apidoc[proprietary] TODO /ec2/statistics
      * %// TODO: Write apidoc comment.
      */
@@ -3048,6 +3054,7 @@ void MediaServerProcess::registerRestHandlers(
      * %param[opt]::enum sortOrder Sort order of Object Tracks by a Track start timestamp.
      *     %value asc Ascending order.
      *     %value desc Descending order.
+     * %param[opt] withBestShotOnly If "true" then return tracks with best shot only.
      * %param[opt] isLocal If "false" then request is forwarded to every other online Server and
      *     results are merged. Otherwise, request is processed on receiving Server only.
      * %return JSON data.

@@ -44,6 +44,7 @@ public:
         ui::action::Parameters actionParameters;
         CommandActionPtr extraAction;
         QVariant extraData;
+        QnUuid objectTrackId;
     };
 
 public:

@@ -98,6 +98,8 @@ struct EventParameters
     QString analyticsPluginId; //< #spanasenko: It's unused (?!).
     QnUuid analyticsEngineId;
 
+    QnUuid objectTrackId;
+
     // TODO: #GDM #vkutin #rvasilenko Consider implementing via std::variant or similar.
     QString getAnalyticsEventTypeId() const;
     void setAnalyticsEventTypeId(const QString& id);
@@ -110,7 +112,8 @@ struct EventParameters
 
 #define EventParameters_Fields \
     (eventType)(eventTimestampUsec)(eventResourceId)(resourceName)(sourceServerId) \
-    (reasonCode)(inputPortId)(caption)(description)(metadata)(omitDbLogging)(analyticsPluginId)(analyticsEngineId)
+    (reasonCode)(inputPortId)(caption)(description)(metadata)(omitDbLogging)(analyticsPluginId) \
+    (analyticsEngineId)(objectTrackId)
 QN_FUSION_DECLARE_FUNCTIONS(EventParameters, (ubjson)(json)(eq)(xml)(csv_record));
 
 bool checkForKeywords(const QString& value, const QString& keywords);

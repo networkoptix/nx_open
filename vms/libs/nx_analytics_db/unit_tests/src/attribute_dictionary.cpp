@@ -139,6 +139,8 @@ common::metadata::ObjectMetadataPacketPtr generateRandomPacket(
         objectMetadata.boundingBox = generateRandomRectf();
         objectMetadata.attributes.resize(nx::utils::random::number<int>(
             minAttributeCount, maxAttributeCount));
+        objectMetadata.objectMetadataType = common::metadata::ObjectMetadataType::regular;
+
         for (auto& attribute: objectMetadata.attributes)
         {
             attribute = attributeDictionary

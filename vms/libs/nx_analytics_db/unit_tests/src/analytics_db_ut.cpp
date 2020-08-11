@@ -72,6 +72,27 @@ protected:
         flushData();
     }
 
+    void whenSaveMultipleEventsConcurrentlyWithBestShots()
+    {
+        constexpr int packetCount = 40;
+        auto packets = generateRandomPackets(packetCount);
+
+        for (int i = 0; i < (int) packets.size(); ++i)
+        {
+            if (i % 2 == 0)
+            {
+                packets[i]->objectMetadataList.push_back(packets[i]->objectMetadataList[0]);
+                packets[i]->objectMetadataList.back().objectMetadataType =
+                    nx::common::metadata::ObjectMetadataType::bestShot;
+            }
+        }
+
+        for (const auto& packet: m_analyticsDataPackets)
+            whenIssueSavePacket(packet);
+
+        flushData();
+    }
+
     void whenSaveObjectTrackContainingBestShot()
     {
         std::vector<nx::common::metadata::ObjectMetadataPacketPtr> packets;
@@ -80,7 +101,8 @@ protected:
         packets.push_back(std::make_shared<nx::common::metadata::ObjectMetadataPacket>(
             *packets.back()));
 
-        packets.back()->objectMetadataList.front().bestShot = true;
+        packets.back()->objectMetadataList.front().objectMetadataType =
+            nx::common::metadata::ObjectMetadataType::bestShot;
 
         saveAnalyticsDataPackets(std::move(packets));
     }
@@ -114,6 +136,17 @@ protected:
     void thenAllEventsCanBeRead()
     {
         auto filter = buildEmptyFilter();
+
+        whenLookupObjectTracks(filter);
+
+        thenLookupSucceded();
+        andLookupResultMatches(filter, m_analyticsDataPackets);
+    }
+
+    void thenAllEventsWithBestShotCanBeRead()
+    {
+        auto filter = buildEmptyFilter();
+        filter.withBestShotOnly = true;
 
         whenLookupObjectTracks(filter);
 
@@ -495,19 +528,6 @@ private:
         const Filter& filter,
         const std::vector<common::metadata::ObjectMetadataPacketPtr>& packets)
     {
-        auto firstRect =
-            [&packets](const QnUuid& id)
-            {
-                for (const auto& packet: packets)
-                {
-                    if (packet->objectMetadataList.empty())
-                        continue;;
-                    if (packet->objectMetadataList[0].trackId == id)
-                        return packet->objectMetadataList[0].boundingBox;
-                }
-                return QRectF();
-            };
-
         auto objectTracks = toObjectTracks(packets);
         objectTracks = filterObjectTracksAndApplySortOrder(
             filter, std::move(objectTracks));
@@ -515,12 +535,7 @@ private:
         {
             packet.firstAppearanceTimeUs -= packet.firstAppearanceTimeUs % 1000;
             packet.lastAppearanceTimeUs -= packet.lastAppearanceTimeUs % 1000;
-            if (!packet.bestShot.initialized())
-            {
-                packet.bestShot.timestampUs = packet.firstAppearanceTimeUs;
-                packet.bestShot.rect = firstRect(packet.id);
-                packet.bestShot.streamIndex = nx::vms::api::StreamIndex::primary;
-            }
+            packet.bestShot.timestampUs -= packet.bestShot.timestampUs % 1000;
         }
 
         std::vector<nx::analytics::db::ObjectTrack> result;
@@ -617,7 +632,7 @@ private:
                 objectPosition.boundingBox = objectMetadata.boundingBox;
                 objectPosition.attributes = objectMetadata.attributes;
 
-                if (objectMetadata.bestShot)
+                if (objectMetadata.isBestShot())
                 {
                     track.bestShot.timestampUs = packet->timestampUs;
                     track.bestShot.rect = objectMetadata.boundingBox;
@@ -691,6 +706,12 @@ TEST_F(AnalyticsDb, event_saved_can_be_read_later)
     whenRestartStorage();
 
     thenAllEventsCanBeRead();
+}
+
+TEST_F(AnalyticsDb, read_events_with_best_shotOnly)
+{
+    whenSaveMultipleEventsConcurrentlyWithBestShots();
+    thenAllEventsWithBestShotCanBeRead();
 }
 
 TEST_F(AnalyticsDb, storing_multiple_events_concurrently)

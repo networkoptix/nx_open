@@ -77,6 +77,33 @@ std::vector<ObjectTrackEx> ObjectTrackSearcher::lookup(nx::sql::QueryContext* qu
     return result;
 }
 
+BestShotEx ObjectTrackSearcher::lookupBestShot(nx::sql::QueryContext* queryContext)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->setForwardOnly(true);
+    query->prepare(R"sql(
+        SELECT image_data, data_format, best_shot_timestamp_ms, best_shot_rect, stream_index, device_id
+        FROM track
+        LEFT JOIN best_shot_image on best_shot_image.track_id = track.id
+        WHERE guid = ?
+    )sql");
+    query->addBindValue(QnSql::serialized_field(m_filter.objectTrackId));
+    query->exec();
+
+    BestShotEx result;
+    if (!query->next())
+        return result;
+    result.image.imageData = query->value("image_data").toByteArray();
+    result.image.imageDataFormat = query->value("data_format").toByteArray();
+    result.timestampUs = query->value("best_shot_timestamp_ms").toLongLong() * 1000L;
+    result.rect =TrackSerializer::deserialized<QRectF>(
+        query->value("best_shot_rect").toByteArray());
+    result.streamIndex = (nx::vms::api::StreamIndex) query->value("stream_index").toInt();
+    result.deviceId = m_deviceDao.deviceGuidFromId(query->value("device_id").toLongLong());
+
+    return result;
+}
+
 void ObjectTrackSearcher::prepareCursorQuery(nx::sql::SqlQuery* query)
 {
     prepareCursorQueryImpl(query);
@@ -141,7 +168,11 @@ std::vector<ObjectTrackEx> ObjectTrackSearcher::lookupInDb(nx::sql::QueryContext
 {
     if (!m_filter.objectTrackId.isNull())
     {
-        auto track = fetchTrackById(queryContext, m_filter.objectTrackId);
+        auto track = fetchTrackById(
+            queryContext,
+            m_filter.objectTrackId,
+            m_filter.withBestShotOnly);
+
         if (!track)
             return {};
 
@@ -159,41 +190,56 @@ std::vector<ObjectTrackEx> ObjectTrackSearcher::lookupInCache()
     return m_objectTrackCache.lookup(m_filter, m_objectTypeDictionary);
 }
 
-std::vector<ObjectTrackEx> ObjectTrackSearcher::mergeResults(
-    std::vector<ObjectTrackEx> one,
-    std::vector<ObjectTrackEx> two)
+static void mergeObjectTracks(ObjectTrackEx* inOutNewTrack, ObjectTrackEx oldTrack)
 {
-    std::vector<ObjectTrackEx> result;
-    result.reserve(one.size() + two.size());
+    if (!inOutNewTrack->bestShot.initialized() && oldTrack.bestShot.initialized())
+        inOutNewTrack->bestShot = oldTrack.bestShot;
 
-    std::map<QnUuid /*trackId*/, std::size_t /*pos in vector*/> oneTracksById;
-    for (std::size_t i = 0; i < one.size(); ++i)
-        oneTracksById.emplace(one[i].id, i);
+    oldTrack.objectPositionSequence.insert(
+        oldTrack.objectPositionSequence.end(),
+        inOutNewTrack->objectPositionSequence.begin(),
+        inOutNewTrack->objectPositionSequence.end());
 
-    for (auto& track: two)
+    inOutNewTrack->objectPositionSequence = std::move(oldTrack.objectPositionSequence);
+}
+
+std::vector<ObjectTrackEx> ObjectTrackSearcher::mergeResults(
+    std::vector<ObjectTrackEx> newerTracks,
+    std::vector<ObjectTrackEx> olderTracks)
+{
+    std::map<QnUuid /*trackId*/, std::size_t /*pos in vector*/> newerTracksById;
+    for (std::size_t i = 0; i < newerTracks.size(); ++i)
+        newerTracksById.emplace(newerTracks[i].id, i);
+
+    for (auto& oldTrack: olderTracks)
     {
-        if (oneTracksById.count(track.id) > 0)
-            // TODO: Merge same objects.
-            continue;
-
-        one.push_back(std::exchange(track, {}));
+        if (const auto it = newerTracksById.find(oldTrack.id); it != newerTracksById.cend())
+            mergeObjectTracks(&newerTracks[it->second], std::move(oldTrack));
+        else
+            newerTracks.push_back(std::exchange(oldTrack, {}));
     }
 
-    return one;
+    return newerTracks;
 }
 
 std::optional<ObjectTrack> ObjectTrackSearcher::fetchTrackById(
     nx::sql::QueryContext* queryContext,
-    const QnUuid& trackGuid)
+    const QnUuid& trackGuid,
+    bool withBestShotOnly)
 {
     auto query = queryContext->connection()->createQuery();
     query->setForwardOnly(true);
-    query->prepare(R"sql(
+
+    QString request = R"sql(
         SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail,
             ua.content AS content, best_shot_timestamp_ms, best_shot_rect, stream_index
         FROM track t, unique_attributes ua
         WHERE t.attributes_id=ua.id AND guid=?
-    )sql");
+    )sql";
+    if (withBestShotOnly)
+        request += " AND best_shot_timestamp_ms > 0";
+
+    query->prepare(request);
     query->addBindValue(QnSql::serialized_field(trackGuid));
 
     query->exec();
@@ -287,13 +333,18 @@ void ObjectTrackSearcher::fetchTracksFromDb(
 
     auto query = queryContext->connection()->createQuery();
     query->setForwardOnly(true);
+
+    auto filterExpr = objectGroupFilter.toString();
+    if (m_filter.withBestShotOnly)
+        filterExpr += " AND best_shot_timestamp_ms > 0";
+
     query->prepare(lm(R"sql(
         SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail,
             ua.content AS content, best_shot_timestamp_ms, best_shot_rect, stream_index
         FROM track t, unique_attributes ua, track_group tg
         WHERE t.attributes_id=ua.id AND t.id=tg.track_id AND %1
         ORDER BY track_start_ms DESC
-    )sql").args(objectGroupFilter.toString()));
+    )sql").args(filterExpr));
     objectGroupFilter.bindFields(&query->impl());
 
     query->exec();
@@ -334,6 +385,8 @@ void ObjectTrackSearcher::prepareCursorQueryImpl(nx::sql::AbstractSqlQuery* quer
     auto filterExpr = sqlFilter.toString();
     if (!filterExpr.empty())
         filterExpr = " AND " + filterExpr;
+    if (m_filter.withBestShotOnly)
+        filterExpr += " AND best_shot_timestamp_ms > 0";
 
     std::string limitExpr;
     if (m_filter.maxObjectTracksToSelect > 0)

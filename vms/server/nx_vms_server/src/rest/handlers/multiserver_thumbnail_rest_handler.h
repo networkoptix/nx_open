@@ -34,13 +34,34 @@ public:
         qint64* frameTimestamsUsec = nullptr);
 
 private:
+    int getScreenshot(
+        QnCommonModule* commonModule,
+        const QnThumbnailRequestData& request,
+        QByteArray& result,
+        QByteArray& contentType,
+        int ownerPort,
+        nx::network::http::HttpHeaders* outExtraHeaders);
+
     /** Calculate server where the request should be executed. */
     QnMediaServerResourcePtr targetServer(QnCommonModule* commonModule,
         const QnThumbnailRequestData &request) const;
 
     int getThumbnailLocal(const QnThumbnailRequestData &request, QByteArray& result,
-        QByteArray& contentType, qint64* frameTimestamsUsec) const;
+        QByteArray& contentType, nx::network::http::HttpHeaders* outExtraHeaders) const;
     int getThumbnailRemote(const QnMediaServerResourcePtr &server,
         const QnThumbnailRequestData &request, QByteArray& result, QByteArray& contentType,
-        int ownerPort, qint64* frameTimestamsUsec) const;
+        int ownerPort, nx::network::http::HttpHeaders* outExtraHeaders) const;
+
+    int getThumbnailFromArchive(
+        const QnThumbnailRequestData& request,
+        QByteArray& result,
+        QByteArray& contentType,
+        nx::network::http::HttpHeaders* outExtraHeaders) const;
+
+    int getThumbnailForAnalyticsTrack(
+        const QnThumbnailRequestData& request,
+        QByteArray& result,
+        QByteArray& contentType,
+        nx::network::http::HttpHeaders* outExtraHeaders) const;
+
 };

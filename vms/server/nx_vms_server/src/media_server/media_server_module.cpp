@@ -21,6 +21,7 @@
 
 #include <translation/translation_manager.h>
 
+#include <nx/utils/time/time_provider.h>
 #include <utils/common/buffered_file.h>
 #include <utils/common/writer_pool.h>
 
@@ -63,6 +64,7 @@
 
 #include <nx/vms/server/analytics/analytics_db.h>
 #include <nx/vms/server/analytics/sdk_object_factory.h>
+#include <nx/vms/server/analytics/object_track_best_shot_cache.h>
 
 #include <media_server/serverutil.h>
 #include <nx/core/access/access_types.h>
@@ -102,7 +104,7 @@
 #include <plugins/storage/dts/vmax480/vmax480_resource.h>
 #include <nx_vms_server_ini.h>
 #include <nx/metrics/metrics_storage.h>
-#include <nx/vms/server/analytics/iframe_search_helper.h>
+#include <nx/vms/server/archive/iframe_search_helper.h>
 #include <nx/vms/server/statistics/reporter.h>
 #include <nx/analytics/db/movable_analytics_db.h>
 #include <nx/vms/server/analytics/object_type_dictionary.h>
@@ -183,6 +185,8 @@ QnMediaServerModule::QnMediaServerModule(
     std::unique_ptr<MSSettings> serverSettings,
     QObject* /*parent*/)
 {
+    m_timeProvider = std::make_unique<nx::utils::time::TimeProvider>();
+
     std::unique_ptr<CmdLineArguments> defaultArguments;
     if (!arguments)
     {
@@ -298,17 +302,25 @@ QnMediaServerModule::QnMediaServerModule(
     m_context.reset(new UniquePtrContext());
 
     m_analyticsIframeSearchHelper = store(
-        new nx::vms::server::analytics::IframeSearchHelper(
+        new nx::vms::server::archive::IframeSearchHelper(
             commonModule()->resourcePool(), m_videoCameraPool));
+
+    m_objectTrackBestShotCache = store(
+        new nx::vms::server::analytics::ObjectTrackBestShotCache(
+            std::chrono::seconds(ini().objectTrackBestShotCacheImageLifetimeS),
+            m_timeProvider.get()));
+
     m_objectTypeDictionary = store(
         new nx::vms::server::analytics::ObjectTypeDictionary(
             commonModule()->analyticsObjectTypeDescriptorManager()));
 
     auto analyticsDb = new nx::analytics::db::MovableAnalyticsDb(
-        [this, helper = m_analyticsIframeSearchHelper, typeDictionary = m_objectTypeDictionary]()
+        [this,
+            imageCache = m_objectTrackBestShotCache,
+            typeDictionary = m_objectTypeDictionary]()
         {
             return std::make_unique<nx::vms::server::analytics::AnalyticsDb>(
-                this, helper, typeDictionary);
+                this, imageCache, typeDictionary);
         });
     m_analyticsEventsStorage = store(analyticsDb);
 
@@ -389,6 +401,7 @@ QnMediaServerModule::QnMediaServerModule(
     m_resourceSearchers.reset(new QnMediaServerResourceSearchers(this));
     m_serverConnector = store(new QnServerConnector(commonModule()));
     m_statusWatcher = store(new QnResourceStatusWatcher(commonModule()));
+
     m_sdkObjectFactory = store(new nx::vms::server::analytics::SdkObjectFactory(this));
 
     m_hlsSessionPool = store(new nx::vms::server::hls::SessionPool(
@@ -831,7 +844,8 @@ QString QnMediaServerModule::metadataDatabaseDir() const
 
 using namespace nx::vms::server::analytics;
 
-nx::analytics::db::AbstractIframeSearchHelper* QnMediaServerModule::iFrameSearchHelper() const
+nx::vms::server::archive::AbstractIframeSearchHelper*
+    QnMediaServerModule::iFrameSearchHelper() const
 {
     return m_analyticsIframeSearchHelper;
 }
@@ -844,4 +858,15 @@ nx::vms::server::statistics::Reporter* QnMediaServerModule::statisticsReporter()
 QThreadPool* QnMediaServerModule::analyticsThreadPool() const
 {
     return m_analyticsThreadPool;
+}
+
+nx::analytics::db::AbstractObjectTrackBestShotCache*
+    QnMediaServerModule::objectTrackBestShotCache() const
+{
+    return m_objectTrackBestShotCache;
+}
+
+nx::utils::time::AbstractTimeProvider* QnMediaServerModule::timeProvider() const
+{
+    return m_timeProvider.get();
 }

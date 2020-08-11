@@ -16,6 +16,7 @@
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/sdk/analytics/i_consuming_device_agent.h>
 #include <nx/sdk/analytics/i_plugin.h>
+#include <nx/sdk/analytics/i_custom_metadata_packet.h>
 #include <nx/sdk/helpers/to_string.h>
 
 #include <nx/sdk/analytics/helpers/metadata_types.h>
@@ -63,7 +64,11 @@ DeviceAnalyticsBinding::DeviceAnalyticsBinding(
     nx::vms::server::ServerModuleAware(serverModule),
     m_device(std::move(device)),
     m_engine(std::move(engine)),
-    m_incomingFrameLogger("incoming_frame_", m_device->getId(), m_engine->getId())
+    m_incomingFrameLogger("incoming_frame_", m_device->getId(), m_engine->getId()),
+    m_incomingInbandMetadataLogger(
+        "incoming_inband_metadata_",
+        m_device->getId(),
+        m_engine->getId())
 {
     const std::chrono::milliseconds kMaxPipelineDelay(500);
     setMaxQueueDuration(AbstractDataReorderer::kMaxQueueDuration - kMaxPipelineDelay);
@@ -326,12 +331,15 @@ SettingsResponse DeviceAnalyticsBinding::setSettingsInternal(
     return prepareSettingsResponse(m_deviceAgentContext.settingsContext, *sdkSettingsResponse);
 }
 
-void DeviceAnalyticsBinding::logIncomingFrame(Ptr<IDataPacket> frame)
+void DeviceAnalyticsBinding::logIncomingDataPacket(Ptr<IDataPacket> frame)
 {
     if (!nx::analytics::loggingIni().isLoggingEnabled())
         return;
 
     m_incomingFrameLogger.pushFrameInfo({std::chrono::microseconds(frame->timestampUs())});
+
+    if (const auto customMetadata = frame->queryInterface<ICustomMetadataPacket>())
+        m_incomingInbandMetadataLogger.pushCustomMetadata(customMetadata);
 }
 
 bool DeviceAnalyticsBinding::updatePluginInfo() const
@@ -826,7 +834,7 @@ bool DeviceAnalyticsBinding::processData(const QnAbstractDataPacketPtr& data)
     if (!NX_ASSERT(packetAdapter))
         return true;
 
-    logIncomingFrame(packetAdapter->packet());
+    logIncomingDataPacket(packetAdapter->packet());
     deviceAgentContext.deviceAgent->pushDataPacket(packetAdapter->packet());
     return true;
 }

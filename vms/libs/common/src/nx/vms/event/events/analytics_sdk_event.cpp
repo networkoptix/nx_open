@@ -35,6 +35,7 @@ AnalyticsSdkEvent::AnalyticsSdkEvent(
     QString caption,
     QString description,
     std::map<QString, QString> attributes,
+    QnUuid objectTrackId,
     qint64 timeStampUsec)
     :
     base_type(EventType::analyticsSdkEvent, resource, toggleState, timeStampUsec),
@@ -42,7 +43,8 @@ AnalyticsSdkEvent::AnalyticsSdkEvent(
     m_eventTypeId(std::move(eventTypeId)),
     m_caption(std::move(caption)),
     m_description(std::move(description)),
-    m_attributes(std::move(attributes))
+    m_attributes(std::move(attributes)),
+    m_objectTrackId(objectTrackId)
 {
 }
 
@@ -61,6 +63,7 @@ EventParameters AnalyticsSdkEvent::getRuntimeParams() const
     EventParameters params = base_type::getRuntimeParams();
     params.setAnalyticsEngineId(m_engineId);
     params.setAnalyticsEventTypeId(m_eventTypeId);
+    params.objectTrackId = m_objectTrackId;
     return params;
 }
 

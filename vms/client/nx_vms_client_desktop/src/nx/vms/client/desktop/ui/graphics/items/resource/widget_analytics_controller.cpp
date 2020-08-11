@@ -414,7 +414,7 @@ std::vector<Track> WidgetAnalyticsController::Private::fetchTracks(
         // Each track will start from the actual object and be sorted by timestamps.
         for (const auto& objectMetadata: objectPacket->objectMetadataList)
         {
-            if (objectMetadata.bestShot)
+            if (objectMetadata.isBestShot())
                 continue; //< Skip specialized best shot records.
 
             Track& track = objectTrackByTrackId[objectMetadata.trackId];

@@ -204,6 +204,10 @@ private:
         std::atomic<float> counterBoundingBoxYOffset{0};
 
         std::atomic<bool> declareAdditionalEventTypes{false};
+
+        std::vector<char> previewImage;
+        std::string previewImageFormat;
+        std::string previewImageUrl;
     };
 
     DeviceAgentSettings m_deviceAgentSettings;

@@ -46,11 +46,11 @@ QString toString(ChownMode mode)
 
 EventsStorage::EventsStorage(
     QnCommonModule* commonModule,
-    AbstractIframeSearchHelper* iframeSearchHelper,
+    AbstractObjectTrackBestShotCache* imageCache,
     AbstractObjectTypeDictionary* objectTypeDictionary)
     :
     m_commonModule(commonModule),
-    m_iframeSearchHelper(iframeSearchHelper),
+    m_imageCache(imageCache),
     m_objectTypeDictionary(*objectTypeDictionary),
     m_attributesDao(*objectTypeDictionary),
     m_trackAggregator(
@@ -133,7 +133,7 @@ EventsStorage::InitResult EventsStorage::initialize(const Settings& settings)
     m_objectTrackCache = std::make_unique<ObjectTrackCache>(
         kTrackAggregationPeriod,
         settings.maxCachedObjectLifeTime,
-        m_iframeSearchHelper);
+        m_imageCache);
 
     auto dbConnectionOptions = settings.dbConnectionOptions;
     dbConnectionOptions.dbName = closeDirPath(settings.path) + dbConnectionOptions.dbName;
@@ -270,7 +270,9 @@ void EventsStorage::lookup(
             if (filter.needFullTrack && !filter.objectTrackId.isNull())
             {
                 for (auto& track: *result)
+                {
                     track.objectPositionSequence = lookupTrackDetailsSync(track);
+                }
             }
             return nx::sql::DBResult::ok;
         },
@@ -278,6 +280,40 @@ void EventsStorage::lookup(
             sql::DBResult resultCode)
         {
             NX_DEBUG(this, "%1 objects selected. Result code %2", result->size(), resultCode);
+
+            completionHandler(
+                dbResultToResultCode(resultCode),
+                std::move(*result));
+        });
+}
+
+void EventsStorage::lookupBestShot(
+    const QnUuid& trackId,
+    BestShotLookupCompletionHandler completionHandler)
+{
+    NX_DEBUG(this, "Selecting track image for track with id %1", trackId);
+
+    auto result = std::make_shared<BestShotEx>();
+    m_dbController->queryExecutor().executeSelect(
+        [this, trackId, result](nx::sql::QueryContext* queryContext)
+        {
+            Filter filter;
+            filter.objectTrackId = trackId;
+            ObjectTrackSearcher objectSearcher(
+                m_deviceDao,
+                m_objectTypeDao,
+                m_objectTypeDictionary,
+                *m_objectTrackCache,
+                &m_attributesDao,
+                m_analyticsArchiveDirectory.get(),
+                filter);
+            *result = objectSearcher.lookupBestShot(queryContext);
+            return nx::sql::DBResult::ok;
+        },
+        [this, result, completionHandler = std::move(completionHandler)](
+            sql::DBResult resultCode)
+        {
+            NX_DEBUG(this, "Select image result %1. Result code %2", result->initialized(), resultCode);
 
             completionHandler(
                 dbResultToResultCode(resultCode),

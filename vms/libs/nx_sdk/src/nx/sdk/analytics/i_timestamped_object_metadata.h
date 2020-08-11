@@ -13,6 +13,7 @@ class ITimestampedObjectMetadata: public Interface<ITimestampedObjectMetadata, I
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::ITimestampedObjectMetadata"); }
 
+    /** @return A positive value. */
     virtual int64_t timestampUs() const = 0;
 };
 

@@ -21,6 +21,9 @@ using StoreCompletionHandler =
 using LookupCompletionHandler =
     nx::utils::MoveOnlyFunc<void(ResultCode /*resultCode*/, LookupResult)>;
 
+using BestShotLookupCompletionHandler =
+    nx::utils::MoveOnlyFunc<void(ResultCode /*resultCode*/, BestShotEx)>;
+
 using TimePeriodsLookupCompletionHandler =
     nx::utils::MoveOnlyFunc<void(ResultCode /*resultCode*/, QnTimePeriodList)>;
 
@@ -69,11 +72,19 @@ public:
 
     /**
      * Selects all objects with non-empty track that satisfy to the filter.
-     * Output is sorted by timestamp with order defined by filter.sortOrder.
+     * The output is sorted by the timestamp with the order defined by filter.sortOrder.
      */
     virtual void lookup(
         Filter filter,
         LookupCompletionHandler completionHandler) = 0;
+
+    /**
+     * Selects an image data only by the track.
+     * The output is sorted by the timestamp with the order defined by filter.sortOrder.
+     */
+    virtual void lookupBestShot(
+        const QnUuid& trackId,
+        BestShotLookupCompletionHandler completionHandler) = 0;
 
     /**
      * Select periods of time which contain any data suitable for filter. If some periods in the

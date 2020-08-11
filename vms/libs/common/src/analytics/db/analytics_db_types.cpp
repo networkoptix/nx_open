@@ -99,16 +99,8 @@ bool ObjectRegion::operator==(const ObjectRegion& right) const
         right.boundingBoxGrid.data(), boundingBoxGrid.size()) == 0;
 }
 
-bool BestShot::operator==(const BestShot& right) const
-{
-    return timestampUs == right.timestampUs
-        && equalWithPrecision(rect, right.rect, kCoordinateDecimalDigits)
-        && streamIndex == right.streamIndex;
-}
-
-
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    (BestShot)(ObjectTrack)(ObjectTrackEx)(ObjectRegion)(ObjectPosition),
+    (Image)(BestShot)(BestShotEx)(ObjectTrack)(ObjectTrackEx)(ObjectRegion)(ObjectPosition),
     (json)(ubjson),
     _analytics_storage_Fields)
 
@@ -234,6 +226,9 @@ bool Filter::acceptsTrackInternal(
             return false;
     }
 
+    if (withBestShotOnly && !track.bestShot.initialized())
+        return false;
+
     return true;
 }
 
@@ -267,7 +262,8 @@ bool Filter::operator==(const Filter& right) const
         && timePeriod == right.timePeriod
         && freeText == right.freeText
         && sortOrder == right.sortOrder
-        && deviceIds == right.deviceIds;
+        && deviceIds == right.deviceIds
+        && withBestShotOnly == right.withBestShotOnly;
 }
 
 bool Filter::operator!=(const Filter& right) const
@@ -311,6 +307,8 @@ void serializeToParams(const Filter& filter, QnRequestParamList* params)
 
     if (filter.needFullTrack)
         params->insert(lit("needFullTrack"), "true");
+    if (filter.withBestShotOnly)
+        params->insert(lit("withBestShotOnly"), "true");
 
     params->insert(lit("sortOrder"), QnLexical::serialized(filter.sortOrder));
 }
@@ -375,6 +373,7 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter,
         filter->maxObjectTracksToSelect = params.value(lit("maxObjectsToSelect")).toInt();
 
     static const QString kNeedFullTrack = "needFullTrack";
+    static const QString kWithBestShotOnly = "withBestShotOnly";
     if (params.contains(kNeedFullTrack))
     {
         bool success = false;
@@ -386,6 +385,9 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter,
             return false;
         }
     }
+
+    if (params.contains(kWithBestShotOnly))
+        filter->withBestShotOnly = QnLexical::deserialized<bool>(params.value(kWithBestShotOnly), true);
 
     return true;
 }
@@ -413,6 +415,7 @@ bool deserializeFromParams(const QnRequestParamList& params, Filter* filter,
 
     os << "maxObjectsToSelect " << filter.maxObjectTracksToSelect << "; ";
     os << "needFullTrack " << filter.needFullTrack << "; ";
+    os << "withBestShotOnly " << filter.withBestShotOnly << "; ";
     os << "sortOrder " <<
         (filter.sortOrder == Qt::SortOrder::DescendingOrder ? "DESC" : "ASC");
 

@@ -19,15 +19,15 @@ inline bool operator==(const ObjectPosition& left, const ObjectPosition& right)
 
 inline bool operator==(const ObjectTrack& left, const ObjectTrack& right)
 {
-    const auto result = left.id == right.id
+    return left.id == right.id
         && left.objectTypeId == right.objectTypeId
         // See note above.
         //&& left.attributes == right.attributes
         && left.firstAppearanceTimeUs == right.firstAppearanceTimeUs
         && left.lastAppearanceTimeUs == right.lastAppearanceTimeUs
         && left.objectPosition == right.objectPosition
-        && left.bestShot == right.bestShot;
-    return result;
+        && left.bestShot.timestampUs == right.bestShot.timestampUs
+        && equalWithPrecision(left.bestShot.rect, right.bestShot.rect, kCoordinateDecimalDigits);
 }
 
 } // nx::analytics::db

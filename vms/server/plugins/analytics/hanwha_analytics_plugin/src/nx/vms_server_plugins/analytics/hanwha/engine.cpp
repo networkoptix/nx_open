@@ -293,7 +293,7 @@ std::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
     }
     if (supportsObjectTracking)
     {
-        supportedEventTypeIds->insert("nx.hanwha.ObjectTracking.Start");
+        supportedEventTypeIds->insert("nx.hanwha.ObjectTracking.BestShot");
     }
 
     deviceAgentManifest.supportedEventTypeIds = QList<QString>::fromSet(*supportedEventTypeIds);

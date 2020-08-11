@@ -14,8 +14,8 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::analytics::EngineManifes
     (nx::vms::api::analytics::EngineManifest::Capability::needUncompressedVideoFrames_rgb, "needUncompressedVideoFrames_rgb")
     (nx::vms::api::analytics::EngineManifest::Capability::needUncompressedVideoFrames_bgr, "needUncompressedVideoFrames_bgr")
     (nx::vms::api::analytics::EngineManifest::Capability::deviceDependent, "deviceDependent")
-    (nx::vms::api::analytics::EngineManifest::Capability::keepObjectBoundingBoxRotation,
-        "keepObjectBoundingBoxRotation")
+    (nx::vms::api::analytics::EngineManifest::Capability::keepObjectBoundingBoxRotation, "keepObjectBoundingBoxRotation")
+    (nx::vms::api::analytics::EngineManifest::Capability::noAutoBestShots, "noAutoBestShots")
 )
 QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::analytics::EngineManifest::Capability, (numeric)(debug))
 
@@ -29,8 +29,8 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::analytics::EngineManifes
     (nx::vms::api::analytics::EngineManifest::Capability::needUncompressedVideoFrames_rgb, "needUncompressedVideoFrames_rgb")
     (nx::vms::api::analytics::EngineManifest::Capability::needUncompressedVideoFrames_bgr, "needUncompressedVideoFrames_bgr")
     (nx::vms::api::analytics::EngineManifest::Capability::deviceDependent, "deviceDependent")
-    (nx::vms::api::analytics::EngineManifest::Capability::keepObjectBoundingBoxRotation,
-        "keepObjectBoundingBoxRotation")
+    (nx::vms::api::analytics::EngineManifest::Capability::keepObjectBoundingBoxRotation, "keepObjectBoundingBoxRotation")
+    (nx::vms::api::analytics::EngineManifest::Capability::noAutoBestShots, "noAutoBestShots")
 )
 QN_FUSION_DEFINE_FUNCTIONS(nx::vms::api::analytics::EngineManifest::Capabilities, (numeric)(debug))
 
@@ -45,6 +45,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
     (nx::vms::api::analytics::EngineManifest::ObjectAction::Capability::needBestShotObjectMetadata,
         "needBestShotObjectMetadata")
     (nx::vms::api::analytics::EngineManifest::ObjectAction::Capability::needFullTrack, "needFullTrack")
+    (nx::vms::api::analytics::EngineManifest::ObjectAction::Capability::needBestShotImage, "needBestShotImage")
 )
 QN_FUSION_DEFINE_FUNCTIONS(
     nx::vms::api::analytics::EngineManifest::ObjectAction::Capability, (numeric)(debug))
@@ -58,6 +59,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(
     (nx::vms::api::analytics::EngineManifest::ObjectAction::Capability::needBestShotObjectMetadata,
         "needBestShotObjectMetadata")
     (nx::vms::api::analytics::EngineManifest::ObjectAction::Capability::needFullTrack, "needFullTrack")
+    (nx::vms::api::analytics::EngineManifest::ObjectAction::Capability::needBestShotImage, "needBestShotImage")
 )
 QN_FUSION_DEFINE_FUNCTIONS(
     nx::vms::api::analytics::EngineManifest::ObjectAction::Capabilities, (numeric)(debug))

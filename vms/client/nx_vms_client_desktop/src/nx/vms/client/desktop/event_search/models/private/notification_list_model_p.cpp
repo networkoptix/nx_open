@@ -226,6 +226,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     eventData.removable = true;
     eventData.extraData = qVariantFromValue(ExtraData(action->getRuleId(), resource));
     eventData.source = resource;
+    eventData.objectTrackId = params.objectTrackId;
 
     if (actionType == ActionType::playSoundAction)
     {

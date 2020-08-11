@@ -3,6 +3,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 namespace nx {
 namespace vms_server_plugins {
@@ -22,6 +23,12 @@ T clamp(const T& value, const T& lowerBound, const T& upperBound)
 
     return value;
 }
+
+std::vector<char> loadFile(const std::string& path);
+
+std::string imageFormatFromPath(const std::string& path);
+
+bool isHttpOrHttpsUrl(const std::string& path);
 
 } // namespace stub
 } // namespace analytics

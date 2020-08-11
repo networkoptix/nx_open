@@ -88,6 +88,8 @@ private:
 
     void setLiveReceptionActive(bool value);
 
+    void handleItemRemoved(const analytics::db::ObjectTrack& track);
+
     struct PreviewParams
     {
         std::chrono::microseconds timestamp = std::chrono::microseconds(0);
@@ -117,6 +119,9 @@ private:
 
     LiveTimestampGetter m_liveTimestampGetter;
     QHash<QnVirtualCameraResourcePtr, QList<QnAbstractCompressedMetadataPtr>> m_deferredMetadata;
+
+    std::deque<analytics::db::ObjectTrack> m_noBestShotTracks;
+    QSet<QnUuid> m_externalBestShotTracks;
 };
 
 } // namespace nx::vms::client::desktop

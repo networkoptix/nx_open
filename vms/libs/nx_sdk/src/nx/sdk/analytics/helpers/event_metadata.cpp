@@ -102,6 +102,19 @@ void EventMetadata::addAttributes(const std::vector<nx::sdk::Ptr<Attribute>>& va
         addAttribute(newAttribute);
 }
 
+void EventMetadata::setTrackId(Uuid trackId)
+{
+    m_trackId = trackId;
+}
+
+void EventMetadata::getTrackId(Uuid* outValue) const
+{
+    if (!NX_KIT_ASSERT(outValue))
+        return;
+
+    *outValue = m_trackId;
+}
+
 } // namespace analytics
 } // namespace sdk
 } // namespace nx

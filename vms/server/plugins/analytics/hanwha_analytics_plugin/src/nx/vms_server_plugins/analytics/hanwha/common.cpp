@@ -91,6 +91,25 @@ const Hanwha::EventType& Hanwha::EngineManifest::eventTypeDescriptorById(
     return defaultEventTypeDescriptor;
 }
 
+const Hanwha::ObjectType& Hanwha::EngineManifest::objectTypeDescriptorById(const QString& id) const
+{
+    static const Hanwha::ObjectType defaultObjectTypeDescriptor{};
+
+    auto it = m_objectTypeDescriptorById.find(id);
+    if (it != m_objectTypeDescriptorById.end())
+        return it.value();
+    for (const auto& objectTypeDescriptor: objectTypes)
+    {
+        if (objectTypeDescriptor.id == id)
+        {
+            it = m_objectTypeDescriptorById.insert(id, objectTypeDescriptor);
+            return it.value();
+        }
+    }
+
+    return defaultObjectTypeDescriptor;
+}
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     nx::vms_server_plugins::analytics::hanwha::Hanwha::EventType,
     (json), HanwhaEventType_Fields)

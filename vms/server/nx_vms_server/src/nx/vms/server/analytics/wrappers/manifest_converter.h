@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include <nx/vms/server/analytics/wrappers/sdk_object_description.h>
 
 namespace nx::vms::server::analytics::wrappers {

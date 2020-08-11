@@ -44,7 +44,7 @@ class NX_ANALYTICS_DB_API EventsStorage:
 public:
     EventsStorage(
         QnCommonModule* commonModule,
-        AbstractIframeSearchHelper* iframeSearchHelper,
+        AbstractObjectTrackBestShotCache* imageCache,
         AbstractObjectTypeDictionary* objectTypeDictionary);
     virtual ~EventsStorage();
 
@@ -66,6 +66,10 @@ public:
     virtual void lookup(
         Filter filter,
         LookupCompletionHandler completionHandler) override;
+
+    virtual void lookupBestShot(
+        const QnUuid& trackId,
+        BestShotLookupCompletionHandler completionHandler) override;
 
     virtual void lookupTimePeriods(
         Filter filter,
@@ -101,7 +105,7 @@ protected:
 
 private:
     QnCommonModule* m_commonModule = nullptr;
-    AbstractIframeSearchHelper* m_iframeSearchHelper = nullptr;
+    AbstractObjectTrackBestShotCache* m_imageCache = nullptr;
     const AbstractObjectTypeDictionary& m_objectTypeDictionary;
     std::unique_ptr<DbController> m_dbController;
     std::list<AbstractCursor*> m_openedCursors;

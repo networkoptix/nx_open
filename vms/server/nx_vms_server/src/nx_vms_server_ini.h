@@ -36,6 +36,10 @@ struct Ini: public nx::kit::IniConfig
 
     #undef NX_VMS_SERVER_INI_LIVE_STREAM_CACHE_HELP
 
+    NX_INI_INT(60, objectTrackBestShotCacheImageLifetimeS,
+        "After this amount of time (in seconds) since a best shot has been put in the cache\n"
+        "the best shot is deleted and is no more available in the cache.");
+
     NX_INI_INT(60000, autoUpdateInstallationDelayMs,
         "After this delay server will start update installation automatically if detects that\n"
         "it was supposed to install the update.");

@@ -93,7 +93,7 @@ private:
         const SetSettingsRequest& settingsRequest,
         bool isInitialSettings);
 
-    void logIncomingFrame(sdk::Ptr<sdk::analytics::IDataPacket> frame);
+    void logIncomingDataPacket(sdk::Ptr<sdk::analytics::IDataPacket> frame);
 
     bool updatePluginInfo() const;
 
@@ -134,6 +134,7 @@ private:
     MetadataSinkSet m_metadataSinks;
     std::atomic<bool> m_started{false};
     nx::analytics::MetadataLogger m_incomingFrameLogger;
+    nx::analytics::MetadataLogger m_incomingInbandMetadataLogger;
     std::optional<sdk_support::MetadataTypes> m_lastNeededMetadataTypes;
     std::optional<StreamRequirements> m_cachedStreamRequirements;
     std::chrono::microseconds m_maxQueueDuration{};

@@ -24,6 +24,9 @@ static constexpr microseconds kAllowedTimeDeviation = 35ms;
 
 } // namespace
 
+const QString CameraThumbnailProvider::kFrameTimestampKey = "FrameTimestampUs";
+const QString CameraThumbnailProvider::kFrameFromPluginKey = "FrameFromPlugin";
+
 CameraThumbnailProvider::CameraThumbnailProvider(
     const nx::api::CameraImageRequest& request,
     QObject* parent)
@@ -44,7 +47,8 @@ CameraThumbnailProvider::CameraThumbnailProvider(
 
     /* Making connection through event loop to handle data from another thread. */
     connect(this, &CameraThumbnailProvider::imageDataLoadedInternal, this,
-        [this](const QByteArray &data, Qn::ThumbnailStatus nextStatus, qint64 timestampUs)
+        [this](const QByteArray &data, Qn::ThumbnailStatus nextStatus, qint64 timestampUs,
+            bool frameFromPlugin)
         {
             if (!data.isEmpty())
             {
@@ -61,6 +65,9 @@ CameraThumbnailProvider::CameraThumbnailProvider(
             }
 
             m_timestampUs = timestampUs;
+
+            m_image.setText(kFrameTimestampKey, QString::number(timestampUs));
+            m_image.setText(kFrameFromPluginKey, frameFromPlugin ? "1" : "0");
 
             emit imageChanged(m_image);
             emit sizeHintChanged(sizeHint());
@@ -150,7 +157,7 @@ void CameraThumbnailProvider::doLoadAsync()
     {
         NX_VERBOSE(this, "doLoadAsync(%1) - no server is available. Returning early",
             m_request.camera->getName());
-        emit imageDataLoadedInternal(QByteArray(), Qn::ThumbnailStatus::NoData, 0);
+        emit imageDataLoadedInternal(QByteArray(), Qn::ThumbnailStatus::NoData, 0, false);
         return;
     }
 
@@ -172,6 +179,7 @@ void CameraThumbnailProvider::doLoadAsync()
                 success ? Qn::ThumbnailStatus::Loaded : Qn::ThumbnailStatus::NoData;
 
             qint64 timestampUs = 0;
+            bool frameFromPlugin = false;
 
             if (imageData.isEmpty())
             {
@@ -181,9 +189,12 @@ void CameraThumbnailProvider::doLoadAsync()
             {
                 timestampUs = nx::network::http::getHeaderValue(
                     headers, Qn::FRAME_TIMESTAMP_US_HEADER_NAME).toLongLong();
+
+                frameFromPlugin = QnLexical::deserialized<bool>(nx::network::http::getHeaderValue(
+                    headers, Qn::FRAME_ENCODED_BY_PLUGIN));
             }
 
-            emit imageDataLoadedInternal(imageData, nextStatus, timestampUs);
+            emit imageDataLoadedInternal(imageData, nextStatus, timestampUs, frameFromPlugin);
         });
 
     auto handle = commonModule()->currentServer()->restConnection()->cameraThumbnailAsync(
@@ -192,7 +203,11 @@ void CameraThumbnailProvider::doLoadAsync()
     if (handle <= 0)
     {
         // It will change to status NoData as well
-        emit imageDataLoadedInternal(QByteArray(), Qn::ThumbnailStatus::NoData, 0);
+        emit imageDataLoadedInternal(
+            /*data*/ QByteArray(),
+            Qn::ThumbnailStatus::NoData,
+            /*timestampUs*/ 0,
+            /*frameFromPlugin*/ false);
     }
 }
 

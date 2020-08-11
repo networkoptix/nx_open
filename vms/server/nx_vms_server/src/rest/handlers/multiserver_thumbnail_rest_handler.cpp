@@ -31,6 +31,12 @@
 
 namespace {
 
+std::array<QByteArray, 2> extraImageHeaders =
+{
+    Qn::FRAME_TIMESTAMP_US_HEADER_NAME,
+    Qn::FRAME_ENCODED_BY_PLUGIN
+};
+
 static QString urlPath;
 
 using namespace nx::api;
@@ -94,17 +100,40 @@ int QnMultiserverThumbnailRestHandler::executeGet(
     }
 
     const auto ownerPort = processor->owner()->getPort();
-    qint64 frameTimestampUsec = 0;
+    nx::network::http::HttpHeaders extraHeaders;
     const auto httpResult = getScreenshot(processor->commonModule(), request, result, contentType,
-        ownerPort, &frameTimestampUsec);
+        ownerPort, &extraHeaders);
 
     if (httpResult == nx::network::http::StatusCode::ok)
     {
         auto& headers = processor->response()->headers;
-        nx::network::http::insertHeader(&headers, nx::network::http::HttpHeader(
-            Qn::FRAME_TIMESTAMP_US_HEADER_NAME, QByteArray::number(frameTimestampUsec)));
+        for (const auto& newHeader: extraHeaders)
+        {
+            nx::network::http::insertHeader(&headers, nx::network::http::HttpHeader(
+                newHeader.first, newHeader.second));
+        }
     }
     return httpResult;
+}
+
+int QnMultiserverThumbnailRestHandler::getScreenshot(
+    QnCommonModule* commonModule,
+    const QnThumbnailRequestData& request,
+    QByteArray& result,
+    QByteArray& contentType,
+    int ownerPort,
+    qint64* frameTimestamsUsec)
+{
+    nx::network::http::HttpHeaders extraHeaders;
+    int statusCode =
+        getScreenshot(commonModule, request, result, contentType, ownerPort, &extraHeaders);
+    if (frameTimestamsUsec)
+    {
+        const auto it = extraHeaders.find(Qn::FRAME_TIMESTAMP_US_HEADER_NAME);
+        if (it != extraHeaders.end())
+            *frameTimestamsUsec = it->second.toLongLong(); //< 0 if conversion fails.
+    }
+    return statusCode;
 }
 
 int QnMultiserverThumbnailRestHandler::getScreenshot(
@@ -113,7 +142,7 @@ int QnMultiserverThumbnailRestHandler::getScreenshot(
     QByteArray& result,
     QByteArray& contentType,
     int ownerPort,
-    qint64* frameTimestamsUsec)
+    nx::network::http::HttpHeaders* outExtraHeaders)
 {
     const auto& imageRequest = request.request;
 
@@ -144,8 +173,8 @@ int QnMultiserverThumbnailRestHandler::getScreenshot(
         || server->getStatus() != Qn::Online;
 
     return (loadLocal)
-        ? getThumbnailLocal(request, result, contentType, frameTimestamsUsec)
-        : getThumbnailRemote(server, request, result, contentType, ownerPort, frameTimestamsUsec);
+        ? getThumbnailLocal(request, result, contentType, outExtraHeaders)
+        : getThumbnailRemote(server, request, result, contentType, ownerPort, outExtraHeaders);
 }
 
 QnMediaServerResourcePtr QnMultiserverThumbnailRestHandler::targetServer(
@@ -168,10 +197,85 @@ QnMediaServerResourcePtr QnMultiserverThumbnailRestHandler::targetServer(
 }
 
 int QnMultiserverThumbnailRestHandler::getThumbnailLocal(
+    const QnThumbnailRequestData& request,
+    QByteArray& result,
+    QByteArray& contentType,
+    nx::network::http::HttpHeaders* outExtraHeaders) const
+{
+    if (!request.request.objectTrackId.isNull())
+        return getThumbnailForAnalyticsTrack(request, result, contentType, outExtraHeaders);
+    return getThumbnailFromArchive(request, result, contentType, outExtraHeaders);
+}
+
+int QnMultiserverThumbnailRestHandler::getThumbnailForAnalyticsTrack(
+    const QnThumbnailRequestData& request,
+    QByteArray& result,
+    QByteArray& contentType,
+    nx::network::http::HttpHeaders* outExtraHeaders) const
+{
+    result = QByteArray();
+    contentType = QByteArray();
+
+    QnGetImageHelper helper(serverModule());
+    auto bestShot = helper.getTrackBestShot(request.request);
+    if (!bestShot)
+    {
+        NX_VERBOSE(this, "Best shot for the track with id %1 is not found",
+            request.request.objectTrackId);
+        // There is no best shot in the DB for such a track, so we're trying to use other
+        // parameters to fetch it directly from the archive.
+        return getThumbnailFromArchive(request, result, contentType, outExtraHeaders);
+    }
+
+    if (outExtraHeaders)
+    {
+        nx::network::http::insertHeader(outExtraHeaders, nx::network::http::HttpHeader(
+            Qn::FRAME_TIMESTAMP_US_HEADER_NAME, QByteArray::number(bestShot->timestampUs)));
+    }
+
+    if (!bestShot->image.isEmpty())
+    {
+        if (outExtraHeaders)
+        {
+            nx::network::http::insertHeader(outExtraHeaders, nx::network::http::HttpHeader(
+                Qn::FRAME_ENCODED_BY_PLUGIN, QnLexical::serialized(true).toLatin1()));
+        }
+
+        NX_VERBOSE(this, "Found frame in analytics cache for track %1", request.request.objectTrackId);
+        result = bestShot->image.imageData;
+        contentType = bestShot->image.imageDataFormat;
+        return nx::network::http::StatusCode::ok;
+    }
+
+    NX_VERBOSE(this, "Best shot found without image data for track %1", request.request.objectTrackId);
+
+    QnThumbnailRequestData newRequest;
+    newRequest.format = request.format;
+    auto camera = serverModule()->resourcePool()->getResourceById<QnVirtualCameraResource>(bestShot->deviceId);
+    if (!camera)
+    {
+        NX_VERBOSE(this, "Best shot for track %1 is not found. Camera %2 is not fould",
+            request.request.objectTrackId,
+            bestShot->deviceId);
+        return nx::network::http::StatusCode::noContent;
+    }
+    newRequest.request.camera = camera;
+    newRequest.request.crop = bestShot->rect;
+    newRequest.request.streamSelectionMode =
+        (bestShot->streamIndex == nx::vms::api::StreamIndex::primary)
+            ? CameraImageRequest::StreamSelectionMode::forcedPrimary
+            : CameraImageRequest::StreamSelectionMode::forcedSecondary;
+    newRequest.request.usecSinceEpoch = bestShot->timestampUs;
+    newRequest.request.roundMethod = ImageRequest::RoundMethod::precise;
+
+    return getThumbnailFromArchive(newRequest, result, contentType, outExtraHeaders);
+}
+
+int QnMultiserverThumbnailRestHandler::getThumbnailFromArchive(
     const QnThumbnailRequestData &request,
     QByteArray& result,
     QByteArray& contentType,
-    qint64* frameTimestampUsec) const
+    nx::network::http::HttpHeaders* outExtraHeaders) const
 {
     QnGetImageHelper helper(serverModule());
     CLVideoDecoderOutputPtr outFrame = helper.getImage(request.request);
@@ -182,15 +286,22 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal(
         contentType = QByteArray();
         return nx::network::http::StatusCode::noContent;
     }
-    if(frameTimestampUsec)
-        *frameTimestampUsec = static_cast<qint64>(outFrame.data()->pkt_dts);
+
+    if (outExtraHeaders)
+    {
+        nx::network::http::insertHeader(
+            outExtraHeaders,
+            nx::network::http::HttpHeader(
+                Qn::FRAME_TIMESTAMP_US_HEADER_NAME,
+                QByteArray::number((qint64) outFrame.data()->pkt_dts)));
+    }
 
     const QByteArray mimeSubtype =
         toMimeSubtype(request.request.imageFormat, (AVPixelFormat) outFrame->format);
 
+    serverModule()->commonModule()->metrics()->thumbnails()++;
     if (request.request.imageFormat == nx::api::CameraImageRequest::ThumbnailFormat::jpg)
     {
-        serverModule()->commonModule()->metrics()->thumbnails()++;
         QByteArray encodedData = helper.encodeImage(outFrame, mimeSubtype);
         result.append(encodedData);
     }
@@ -288,7 +399,7 @@ int QnMultiserverThumbnailRestHandler::getThumbnailRemote(
     QByteArray& result,
     QByteArray& contentType,
     int ownerPort,
-    qint64* frameTimestamsUsec) const
+    nx::network::http::HttpHeaders* outExtraHeaders) const
 {
     const auto response = downloadImage(server, request, ownerPort);
     if (response.osStatus != SystemError::noError)
@@ -311,12 +422,16 @@ int QnMultiserverThumbnailRestHandler::getThumbnailRemote(
         contentType = (response.httpStatus == nx::network::http::StatusCode::ok)
             ? QByteArray("image/") + QnLexical::serialized(request.request.imageFormat).toUtf8()
             : QByteArray("application/json"); //< TODO: Provide content type from response.
-        if (frameTimestamsUsec)
+        if (outExtraHeaders)
         {
-            const auto it = response.httpHeaders.find(Qn::FRAME_TIMESTAMP_US_HEADER_NAME);
-            if (it != response.httpHeaders.end())
+            for (const auto& headerName: extraImageHeaders)
             {
-                *frameTimestamsUsec = it->second.toLongLong(); //< 0 if conversion fails.
+                const auto it = response.httpHeaders.find(headerName);
+                if (it != response.httpHeaders.end())
+                {
+                    nx::network::http::insertHeader(outExtraHeaders, nx::network::http::HttpHeader(
+                        it->first, it->second));
+                }
             }
         }
     }

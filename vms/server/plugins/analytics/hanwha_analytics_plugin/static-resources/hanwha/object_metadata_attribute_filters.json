@@ -5,8 +5,7 @@
         "VehicleInfo"
     ],
     "discard": [
-        "HumanBody.Clothing.*.Color.ColorCluster.Color.@*",
-        "HumanBody.Clothing.*.Color.ColorCluster[*].Color.@*"
+        "*Color.@*"
     ],
     "rename": [
         {
@@ -88,6 +87,14 @@
         {
             "ifMatches": "HumanBody.Belonging.Bag.Category",
             "replaceWith": "BagCategory"
+        },
+        {
+            "ifMatches": "*.Color.ColorCluster.ColorString",
+            "replaceWith": "Color"
+        },
+        {
+            "ifMatches": "*.Type",
+            "replaceWith": "Type"
         }
     ]
 }

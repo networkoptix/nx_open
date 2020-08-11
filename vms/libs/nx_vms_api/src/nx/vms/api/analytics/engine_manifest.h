@@ -30,6 +30,7 @@ struct NX_VMS_API EngineManifest
             needBestShotVideoFrame = 1 << 0,
             needBestShotObjectMetadata = 1 << 1,
             needFullTrack = 1 << 2,
+            needBestShotImage = 1 << 3,
         };
         Q_DECLARE_FLAGS(Capabilities, Capability);
 
@@ -68,6 +69,7 @@ struct NX_VMS_API EngineManifest
         needUncompressedVideoFrames_bgr = 1 << 6,
         deviceDependent = 1 << 7,
         keepObjectBoundingBoxRotation = 1 << 8,
+        noAutoBestShots = 1 << 9,
     };
     Q_DECLARE_FLAGS(Capabilities, Capability)
 

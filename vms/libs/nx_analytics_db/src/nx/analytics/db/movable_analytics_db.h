@@ -6,7 +6,7 @@ class QnCommonModule;
 
 namespace nx::analytics::db {
 
-class AbstractIframeSearchHelper;
+class AbstractObjectTrackBestShotCache;
 
 class NX_ANALYTICS_DB_API MovableAnalyticsDb:
     public AbstractEventsStorage
@@ -28,6 +28,10 @@ public:
     virtual void lookup(
         Filter filter,
         LookupCompletionHandler completionHandler) override;
+
+    virtual void lookupBestShot(
+        const QnUuid& trackId,
+        BestShotLookupCompletionHandler completionHandler) override;
 
     virtual void lookupTimePeriods(
         Filter filter,

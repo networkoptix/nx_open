@@ -11,6 +11,7 @@
 #include <nx/network/upnp/upnp_device_searcher.h>
 #include <nx/vms/server/analytics/event_rule_watcher.h>
 #include <nx/vms/server/analytics/manager.h>
+#include <nx/analytics/db/abstract_object_track_best_shot_cache.h>
 
 class QnCommonModule;
 class StreamingChunkCache;
@@ -55,10 +56,9 @@ namespace nx::vms::server { class CmdLineArguments; }
 namespace nx::vms::server::analytics {
     class SdkObjectFactory;
 } // namespace nx::vms::server::analytics
-namespace nx::analytics::db {
-    class AbstractIframeSearchHelper;
-    class AbstractObjectTypeDictionary;
-}
+namespace nx::analytics::db { class AbstractObjectTypeDictionary; }
+
+namespace nx::vms::server::archive { class AbstractIframeSearchHelper; }
 
 namespace nx::vms::server::network { class MulticastAddressRegistry;  }
 
@@ -87,6 +87,8 @@ namespace nx::vms::server::statistics { class Reporter; }
 
 namespace nx::vms::server::resource { class SharedContextPool; }
 namespace nx::vms::server::camera { class ErrorProcessor; }
+
+namespace nx::utils::time { class AbstractTimeProvider; }
 
 class QnMediaServerModule : public QObject, public /*mixin*/ QnInstanceStorage
 {
@@ -181,10 +183,14 @@ public:
     bool isStopping() const { return m_isStopping.load(); }
     void initOutgoingSocketCounter();
 
-    nx::analytics::db::AbstractIframeSearchHelper* iFrameSearchHelper() const;
+    nx::vms::server::archive::AbstractIframeSearchHelper* iFrameSearchHelper() const;
     nx::vms::server::statistics::Reporter* statisticsReporter() const;
 
     QThreadPool* analyticsThreadPool() const;
+
+    nx::analytics::db::AbstractObjectTrackBestShotCache* objectTrackBestShotCache() const;
+
+    nx::utils::time::AbstractTimeProvider* timeProvider() const;
 
 private:
     void registerResourceDataProviders();
@@ -247,13 +253,15 @@ private:
     nx::vms::server::network::MulticastAddressRegistry* m_multicastAddressRegistry = nullptr;
     std::unique_ptr<nx::vms::server::nvr::IService> m_nvrService;
     StreamingChunkTranscoder* m_streamingChunkTranscoder = nullptr;
-    nx::analytics::db::AbstractIframeSearchHelper* m_analyticsIframeSearchHelper = nullptr;
+    nx::vms::server::archive::AbstractIframeSearchHelper* m_analyticsIframeSearchHelper = nullptr;
+    nx::analytics::db::AbstractObjectTrackBestShotCache* m_objectTrackBestShotCache = nullptr;
     nx::analytics::db::AbstractObjectTypeDictionary* m_objectTypeDictionary = nullptr;
     std::unique_ptr<nx::vms::server::event::ServerRuntimeEventManager> m_serverRuntimeEventManager;
     std::unique_ptr<nx::vms::server::statistics::Reporter> m_statisticsReporter;
 
     QThreadPool* m_analyticsThreadPool = nullptr;
 
+    std::unique_ptr<nx::utils::time::AbstractTimeProvider> m_timeProvider;
     // When server stops, QnResourcePropertyDictionary is destroyed before QnResource objects
     // (at least some of them) because of unknown reasons. So QnResource can not make soap requests
     // in its destructor. To prevent them the special flag is added.

@@ -85,6 +85,9 @@ private:
 
     void insertObjects(nx::sql::QueryContext* queryContext);
 
+    void saveImage(nx::sql::QueryContext* queryContext,
+        int64_t trackDbId, const Image& image);
+
     void resolveUnknownTrackIdsThroughDb(nx::sql::QueryContext* queryContext);
 
     void makeSureTrackIdIsResolved(

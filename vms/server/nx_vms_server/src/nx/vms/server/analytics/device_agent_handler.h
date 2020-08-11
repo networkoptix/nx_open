@@ -11,11 +11,11 @@
 #include <nx/vms/server/server_module_aware.h>
 
 #include <nx/vms/server/analytics/types.h>
+#include <nx/vms/server/analytics/wrappers/types.h>
 #include <nx/vms/server/analytics/metadata_handler.h>
 
 namespace nx::vms::server::analytics {
-
-class DeviceAgentHandler:
+    class DeviceAgentHandler:
     public QObject,
     public /*mixin*/ nx::vms::server::ServerModuleAware,
     public nx::sdk::RefCountable<nx::sdk::analytics::IDeviceAgent::IHandler>
@@ -32,6 +32,8 @@ public:
         resource::CameraPtr device,
         DeviceAgentManifestHandler manifestHandler);
 
+    virtual ~DeviceAgentHandler();
+
     virtual void handleMetadata(nx::sdk::analytics::IMetadataPacket* metadataPacket) override;
     virtual void handlePluginDiagnosticEvent(
         nx::sdk::IPluginDiagnosticEvent* sdkPluginDiagnosticEvent) override;
@@ -43,6 +45,9 @@ public:
 signals:
     void pluginDiagnosticEventTriggered(
         const nx::vms::event::PluginDiagnosticEventPtr& pluginDiagnosticEvent);
+
+private:
+    void handleMetadataViolation(const wrappers::Violation& violation);
 
 private:
     resource::AnalyticsEngineResourcePtr m_engine;

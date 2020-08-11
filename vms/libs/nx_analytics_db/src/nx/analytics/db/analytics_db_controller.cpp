@@ -40,6 +40,7 @@ DbController::DbController(
     dbStructureUpdater().addUpdateScript(kRenameObjectToTrack);
     dbStructureUpdater().addUpdateScript(kDropOldTrackDetail);
     dbStructureUpdater().addUpdateScript(kAddTrackStreamIndex);
+    dbStructureUpdater().addUpdateScript(kAddBestShotImageTable);
 }
 
 } // namespace nx::analytics::db

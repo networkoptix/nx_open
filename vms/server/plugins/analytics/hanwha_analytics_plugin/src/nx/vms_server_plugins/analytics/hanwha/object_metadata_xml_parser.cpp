@@ -9,6 +9,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/match/wildcard.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
+#include <nx/sdk/helpers/uuid_helper.h>
 
 namespace nx::vms_server_plugins::analytics::hanwha {
 
@@ -17,6 +18,7 @@ using namespace std::chrono_literals;
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
+using namespace nx::utils;
 
 namespace {
 //-------------------------------------------------------------------------------------------------
@@ -31,17 +33,6 @@ struct ClassInfo
 
 //-------------------------------------------------------------------------------------------------
 
-/** reinterpret some type T (actually int) as Uuid*/
-template<class T>
-Uuid deviceObjectNumberToUuid(T deviceObjectNumber)
-{
-    Uuid serverObjectNumber;
-    memcpy(&serverObjectNumber, &deviceObjectNumber,
-        std::min(sizeof(serverObjectNumber), sizeof(deviceObjectNumber)));
-    return serverObjectNumber;
-}
-
-//-------------------------------------------------------------------------------------------------
 
 /**
  * Find first sub-element with tag `childElement`, where `childElement` doesn't contain  namespace.
@@ -115,54 +106,90 @@ void forEachChildElement(const QDomElement& element, const QString& tagName, F f
 //-------------------------------------------------------------------------------------------------
 
 ObjectMetadataXmlParser::ObjectMetadataXmlParser(
+        Url baseUrl,
         const Hanwha::EngineManifest& engineManifest,
         const Hanwha::ObjectMetadataAttributeFilters& objectAttributeFilters):
+    m_baseUrl(std::move(baseUrl)),
     m_engineManifest(engineManifest),
     m_objectAttributeFilters(objectAttributeFilters)
 {
 }
 
-ObjectMetadataXmlParser::Result ObjectMetadataXmlParser::parse(const QByteArray& data)
+ObjectMetadataXmlParser::Result ObjectMetadataXmlParser::parse(
+    const QByteArray& data, int64_t timestampUs)
 {
     collectGarbage();
-
-    Result result;
 
     QDomDocument dom;
     dom.setContent(data, true);
 
     const QDomElement root = dom.documentElement();
     if (root.tagName() != QStringLiteral("MetadataStream"))
-        return result;
+        return {};
 
     const QDomElement videoAnalytics = getChildElement(root, "VideoAnalytics");
     if (videoAnalytics.isNull())
-        return result; // We ignore event metadata.
+        return {}; // We ignore event metadata.
 
     const QDomElement frame = getChildElement(videoAnalytics, "Frame");
     if (frame.isNull())
-        return result;
+        return {};
 
     const QDomElement transformation = getChildElement(frame, "Transformation");
     if (transformation.isNull())
-        return result;
+        return {};
 
     if (!extractFrameScale(transformation))
-        return result;
+        return {};
 
-    result.eventMetadataPacket = makePtr<EventMetadataPacket>();
-    result.objectMetadataPacket = makePtr<ObjectMetadataPacket>();
+    auto eventPacket = makePtr<EventMetadataPacket>();
+    auto objectPacket = makePtr<ObjectMetadataPacket>();
+    std::vector<Ptr<ObjectTrackBestShotPacket>> bestShotPackets;
 
     for (auto object = frame.firstChildElement("Object");
          !object.isNull(); object = object.nextSiblingElement("Object"))
     {
-        if (Ptr<EventMetadata> eventMetadata = extractEventMetadata(object))
-            result.eventMetadataPacket->addItem(eventMetadata.releasePtr());
-        if (Ptr<ObjectMetadata> objectMetadata = extractObjectMetadata(object))
-            result.objectMetadataPacket->addItem(objectMetadata.releasePtr());
+        auto [objectMetadata, bestShotPacket, objectTypeId, objectId] =
+            extractObjectMetadata(object, timestampUs);
+
+        if (objectMetadata)
+            objectPacket->addItem(objectMetadata.releasePtr());
+        if (bestShotPacket)
+        {
+            auto eventData = makePtr<EventMetadata>();
+            eventData->setTypeId("nx.hanwha.ObjectTracking.BestShot");
+            const auto& descriptor = m_engineManifest.objectTypeDescriptorById(QString::fromStdString(objectTypeId));
+            eventData->setDescription(descriptor.name.toStdString());
+            eventData->setConfidence(1.0);
+            eventData->setTrackId(bestShotPacket->trackId());
+            eventPacket->addItem(eventData.releasePtr());
+
+            auto& trackData = m_objectTrackCache[objectId];
+            if (trackData.trackStartTimeUs)
+                eventPacket->setTimestampUs(*trackData.trackStartTimeUs);
+
+            bestShotPackets.push_back(std::move(bestShotPacket));
+        }
     }
 
-    return result;
+    if (eventPacket->count() == 0)
+        eventPacket = nullptr;
+
+    if (objectPacket->count() == 0)
+    {
+        objectPacket = nullptr;
+    }
+    else
+    {
+        objectPacket->setTimestampUs(timestampUs);
+        objectPacket->setDurationUs(1'000'000);
+    }
+
+    return {
+        std::move(eventPacket),
+        std::move(objectPacket),
+        std::move(bestShotPackets),
+    };
 }
 
 bool ObjectMetadataXmlParser::extractFrameScale(const QDomElement& transformation)
@@ -222,10 +249,8 @@ std::optional<QString> ObjectMetadataXmlParser::filterAttribute(const QString& n
 }
 
 std::vector<Ptr<Attribute>> ObjectMetadataXmlParser::extractAttributes(
-    ObjectId objectId, const QDomElement& appearance)
+    TrackData& trackData, const QDomElement& appearance)
 {
-    auto& attributes = m_objectAttributes[objectId];
-
     const auto walk =
         [&](auto walk, const QString& key, const QDomElement& element)
         {
@@ -235,7 +260,7 @@ std::vector<Ptr<Attribute>> ObjectMetadataXmlParser::extractAttributes(
                 const auto domAttr = domAttrs.item(i);
                 const auto name = domAttr.nodeName();
                 const auto value = domAttr.nodeValue();
-                attributes[(key + ".@" + name).toStdString()] = value.toStdString();
+                trackData.attributes[(key + ".@" + name).toStdString()] = value.toStdString();
             }
 
             std::unordered_map<std::string, int> counts;
@@ -249,7 +274,7 @@ std::vector<Ptr<Attribute>> ObjectMetadataXmlParser::extractAttributes(
                 if (const auto child = element.firstChild(); child.isText())
                 {
                     const QString value = child.toText().data();
-                    attributes[key.toStdString()] = value.toStdString();
+                    trackData.attributes[key.toStdString()] = value.toStdString();
                 }
             }
 
@@ -271,19 +296,19 @@ std::vector<Ptr<Attribute>> ObjectMetadataXmlParser::extractAttributes(
             [&](const auto& element) {
                 // Since it appears that single object cannot have multiple
                 // root tags, we can just clear all the attributes.
-                attributes.clear();
+                trackData.attributes.clear();
 
                 walk(walk, rootTag, element);
             });
 
-    attributes.timeStamp = std::chrono::steady_clock::now();
 
     std::vector<Ptr<Attribute>> result;
-    result.reserve(attributes.size());
-    for (const auto& [name, value]: attributes)
+    result.reserve(trackData.attributes.size());
+    for (const auto& [name, value]: trackData.attributes)
     {
         auto newName = filterAttribute(QString::fromStdString(name));
-        if (newName) {
+        if (newName)
+        {
             auto attribute = makePtr<Attribute>(Attribute::Type::string, newName->toStdString(), value);
             result.push_back(std::move(attribute));
         }
@@ -297,73 +322,86 @@ std::vector<Ptr<Attribute>> ObjectMetadataXmlParser::extractAttributes(
     return result;
 }
 
-Ptr<ObjectMetadata> ObjectMetadataXmlParser::extractObjectMetadata(const QDomElement& object)
+ObjectMetadataXmlParser::ObjectResult ObjectMetadataXmlParser::extractObjectMetadata(
+    const QDomElement& object, std::int64_t timestampUs)
 {
-    Ptr<ObjectMetadata> result;
-    const int objectId = object.attribute("ObjectId").toInt();
+    const ObjectId objectId = object.attribute("ObjectId").toInt();
 
     const QDomElement appearance = getChildElement(object, "Appearance");
     if (appearance.isNull())
-        return result;
+        return {};
 
     const QDomElement shape = getChildElement(appearance, "Shape");
     if (shape.isNull())
-        return result;
+        return {};
 
     const QDomElement class_ = getChildElement(appearance, "Class");
     if (class_.isNull())
-        return result;
+        return {};
 
-    const auto rect = extractRect(shape);
     const auto classInfo = extractClassInfo(class_);
-    if (!rect || !classInfo)
-        return result;
+    if (!classInfo)
+        return {};
 
     const QString objectTypeName = QString::fromStdString(classInfo->internalClassName).trimmed();
     std::string objectTypeId = m_engineManifest.objectTypeIdByInternalName(objectTypeName).toStdString();
     if (objectTypeId.empty())
-        return result;
-
-    result = makePtr<ObjectMetadata>();
-
-    const nx::sdk::Uuid trackId = deviceObjectNumberToUuid(objectId);
-    result->setTrackId(trackId);
-
-    result->setTypeId(objectTypeId);
-
-    const Rect relativeRect = applyFrameScale(*rect);
-    result->setBoundingBox(relativeRect);
-
-    result->addAttributes(extractAttributes(objectId, appearance));
-
-    return result;
-}
-
-Ptr<EventMetadata> ObjectMetadataXmlParser::extractEventMetadata(const QDomElement& object)
-{
-    const ObjectId objectId = object.attribute("ObjectId").toInt();
-    if (m_objectAttributes.count(objectId))
         return {};
-    m_objectAttributes[objectId].timeStamp = std::chrono::steady_clock::now();
 
-    auto result = makePtr<EventMetadata>();
+    auto& trackData = m_objectTrackCache[objectId];
+    trackData.lastUpdateTime = std::chrono::steady_clock::now();
+    if (!trackData.trackStartTimeUs)
+        trackData.trackStartTimeUs = timestampUs;
+    if (trackData.trackId.isNull())
+        trackData.trackId = nx::sdk::UuidHelper::randomUuid();
 
-    result->setTypeId("nx.hanwha.ObjectTracking.Start");
-    result->setDescription("Started tracking object #"s  + std::to_string(objectId));
-    result->setConfidence(1.0);
+    const QDomElement imageRef = getChildElement(appearance, "ImageRef");
 
-    return result;
+    Ptr<ObjectTrackBestShotPacket> bestShotPacket;
+    Ptr<ObjectMetadata> metadata;
+
+    const auto rect = extractRect(shape);
+    Rect relativeRect;
+    if (rect)
+        relativeRect = applyFrameScale(*rect);
+
+    if (!imageRef.isNull())
+    {
+        // For best shots it is allowed to have a null bounding box.
+        Url url = imageRef.text();
+        if (url.isRelative())
+        {
+            url = m_baseUrl;
+            url.setPath(imageRef.text());
+        }
+
+        bestShotPacket = makePtr<ObjectTrackBestShotPacket>(trackData.trackId, timestampUs, relativeRect);
+        bestShotPacket->setImageUrl(url.toStdString());
+    }
+
+    if (rect)
+    {
+        metadata = makePtr<ObjectMetadata>();
+        metadata->setTrackId(trackData.trackId);
+        metadata->setTypeId(objectTypeId);
+        metadata->setBoundingBox(relativeRect);
+        metadata->addAttributes(extractAttributes(trackData, appearance));
+    }
+
+
+    return {std::move(metadata), std::move(bestShotPacket), objectTypeId, objectId};
 }
 
 void ObjectMetadataXmlParser::collectGarbage()
 {
-    static const auto timeout = 5min;
+    static const auto timeout = 1min;
 
     const auto now = std::chrono::steady_clock::now();
-    for (auto it = m_objectAttributes.begin(); it != m_objectAttributes.end(); ) {
-        auto [objectId, attributes] = *it;
-        if (now - attributes.timeStamp > timeout)
-            it = m_objectAttributes.erase(it);
+    for (auto it = m_objectTrackCache.begin(); it != m_objectTrackCache.end(); )
+    {
+        auto [objectId, trackData] = *it;
+        if (now - trackData.lastUpdateTime > timeout)
+            it = m_objectTrackCache.erase(it);
         else
             ++it;
     }

@@ -191,6 +191,7 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
 
             return kMaxTimestamp;
         });
+    m_filter.withBestShotOnly = true;
 }
 
 bool AnalyticsSearchSynchronizer::calculateMediaResourceWidgetAnalyticsEnabled(

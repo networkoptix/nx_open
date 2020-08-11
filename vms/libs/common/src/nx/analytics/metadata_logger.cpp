@@ -16,6 +16,8 @@ using namespace nx::common::metadata;
 
 namespace {
 
+static const QString kIndent = "    ";
+
 /** @return Empty string on error, having logged the error message. */
 QString makeLogFileName(
     const QString& analyticsLoggingPath,
@@ -64,8 +66,6 @@ static QString makeRectLogLinesIfNeeded(
     if (!loggingIni().logObjectMetadataDetails || objectMetadataList.empty())
         return "";
 
-    static const QString kIndent = "    ";
-
     QString result;
     for (int i = 0; i < (int) objectMetadataList.size(); ++i)
     {
@@ -89,7 +89,7 @@ static QString makeBestShotDescriptionLines(const std::vector<ObjectMetadata>& o
 
     for (const auto& objectMetadata: objectMetadataList)
     {
-        auto& packetList = objectMetadata.bestShot
+        auto& packetList = objectMetadata.isBestShot()
             ? bestShotMetadataList
             : nonBestShotObjectMetadataList;
 
@@ -188,6 +188,8 @@ void MetadataLogger::pushData(
     const QnConstAbstractMediaDataPtr& abstractMediaData,
     const QString& additionalInfo)
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
     if (!abstractMediaData || (!m_isAlwaysEnabled && !loggingIni().isLoggingEnabled()))
         return;
 
@@ -211,6 +213,8 @@ void MetadataLogger::pushFrameInfo(
     const FrameInfo& frameInfo,
     const QString& additionalInfo)
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
     if (!m_isAlwaysEnabled && !loggingIni().isLoggingEnabled())
         return;
 
@@ -222,7 +226,25 @@ void MetadataLogger::pushObjectMetadata(
     const ObjectMetadataPacket& metadataPacket,
     const QString& additionalInfo)
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
     doPushObjectMetadata(__func__, metadataPacket, additionalInfo);
+}
+
+void MetadataLogger::pushCustomMetadata(
+    const nx::sdk::Ptr<nx::sdk::analytics::ICustomMetadataPacket>& customMetadata)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    if (!m_isAlwaysEnabled && !loggingIni().isLoggingEnabled())
+        return;
+
+    if (!NX_ASSERT(customMetadata))
+        return;
+
+    logLine(buildCustomMetadataLogString(customMetadata));
+
+    m_prevCustomMetadataTimestamp = microseconds(customMetadata->timestampUs());
 }
 
 void MetadataLogger::doPushObjectMetadata(
@@ -236,7 +258,7 @@ void MetadataLogger::doPushObjectMetadata(
     m_isLoggingBestShot = false;
     if (metadataPacket.objectMetadataList.size() == 1)
     {
-        if (metadataPacket.objectMetadataList[0].bestShot)
+        if (metadataPacket.objectMetadataList[0].isBestShot())
             m_isLoggingBestShot = true;
     }
 
@@ -258,6 +280,24 @@ QString MetadataLogger::buildFrameLogString(
         + "diffFromPrevMs " + toMsString(frameInfo.timestamp - m_prevFrameTimestamp) + ", "
         + "diffFromCurrentTimeMs " + toMsString(frameInfo.timestamp - vmsSystemTime)
         + additionalInfoStr;
+}
+
+QString MetadataLogger::buildCustomMetadataLogString(
+    const nx::sdk::Ptr<nx::sdk::analytics::ICustomMetadataPacket>& customMetadata)
+{
+    const microseconds vmsSystemTime = vmsSystemTimeNow();
+    const microseconds customMetadataTimestamp(customMetadata->timestampUs());
+
+    const std::string content(customMetadata->data(), customMetadata->dataSize());
+
+    return "customMetadataTimestampMs " + toMsString(customMetadataTimestamp) + ", "
+        + "currentTimeMs " + toMsString(vmsSystemTime) + ", "
+        + "diffFromPrevMs " + toMsString(customMetadataTimestamp - m_prevCustomMetadataTimestamp)
+        + ", "
+        + "diffFromCurrentTimeMs " + toMsString(customMetadataTimestamp - vmsSystemTime) + ", "
+        + "customMetadataCodec " + customMetadata->codec()
+        + "; content:\n"
+        + kIndent + QString::fromStdString(nx::kit::utils::toString(content));
 }
 
 QString MetadataLogger::buildObjectMetadataLogString(

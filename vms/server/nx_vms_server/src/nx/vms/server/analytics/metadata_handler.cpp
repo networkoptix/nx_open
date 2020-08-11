@@ -13,9 +13,11 @@
 #include <core/resource/security_cam_resource.h>
 #include <nx/vms/server/event/event_connector.h>
 #include <nx/vms/server/sdk_support/utils.h>
+#include <nx/vms/server/analytics/object_track_best_shot_cache.h>
 #include <analytics/common/object_metadata.h>
 #include <core/dataconsumer/abstract_data_receptor.h>
 #include <media_server/media_server_module.h>
+#include <plugins/vms_server_plugins_ini.h>
 
 #include <core/resource/camera_resource.h>
 
@@ -31,16 +33,51 @@ using namespace nx::sdk::analytics;
 using namespace nx::vms::api::analytics;
 using namespace nx::vms_server_plugins::utils;
 
+using ObjectMetadataType = nx::common::metadata::ObjectMetadataType;
+
+template<typename SdkEntityWithAttributes>
+void fetchAttributes(
+    const Ptr<SdkEntityWithAttributes>& sdkEntity,
+    nx::common::metadata::ObjectMetadata* inOutObjectMetadata)
+{
+    if (!NX_ASSERT(inOutObjectMetadata))
+        return;
+
+    for (int i = 0; i < sdkEntity->attributeCount(); ++i)
+    {
+        nx::common::metadata::Attribute attribute;
+        const Ptr<const IAttribute> sdkAttribute = sdkEntity->attribute(i);
+
+        if (!sdkAttribute)
+            continue; //< TODO: logging.
+
+        attribute.name = QString::fromStdString(sdkAttribute->name());
+        attribute.value = QString::fromStdString(sdkAttribute->value());
+
+        inOutObjectMetadata->attributes.push_back(attribute);
+    }
+}
+
 MetadataHandler::MetadataHandler(
     QnMediaServerModule* serverModule,
     resource::CameraPtr device,
-    QnUuid engineId)
+    QnUuid engineId,
+    ViolationHandler violationHandler)
     :
     ServerModuleAware(serverModule),
     m_resource(device),
     m_engineId(engineId),
+    m_violationHandler(std::move(violationHandler)),
     m_metadataLogger("outgoing_metadata_", m_resource->getId(), m_engineId),
-    m_objectCoordinatesTranslator(device)
+    m_objectCoordinatesTranslator(device),
+    m_objectTrackBestShotProxy(
+        serverModule->iFrameSearchHelper(),
+        [this](nx::common::metadata::ObjectMetadataPacketPtr objectMetadataPacket)
+        {
+            pushObjectMetadataToSinks(std::move(objectMetadataPacket));
+        },
+        std::chrono::seconds(pluginsIni().autoGenerateBestShotDelayS),
+        std::chrono::seconds(pluginsIni().trackExpirationDelayS))
 {
     const auto engineResource =
         resourcePool()->getResourceById<resource::AnalyticsEngineResource>(m_engineId);
@@ -52,11 +89,19 @@ MetadataHandler::MetadataHandler(
     m_translateObjectBoundingBoxes = !engineManifest.capabilities.testFlag(
         EngineManifest::Capability::keepObjectBoundingBoxRotation);
 
+    m_needToAutoGenerateBestShots = !engineManifest.capabilities.testFlag(
+        EngineManifest::Capability::noAutoBestShots);
+
     connect(this,
         &MetadataHandler::sdkEventTriggered,
         serverModule->eventConnector(),
         &event::EventConnector::at_analyticsSdkEvent,
         Qt::QueuedConnection);
+}
+
+MetadataHandler::~MetadataHandler()
+{
+    m_objectTrackBestShotResolver.stop();
 }
 
 std::optional<EventTypeDescriptor> MetadataHandler::eventTypeDescriptor(
@@ -84,7 +129,7 @@ void MetadataHandler::handleMetadata(IMetadataPacket* metadataPacket)
 
     if (!metadataPacket)
     {
-        NX_VERBOSE(this, "%1(): Received null metadata packet; ignoring", __func__);
+        NX_VERBOSE(this, "%1(): Received null metadata packet; ignoring.", __func__);
         return;
     }
 
@@ -102,7 +147,7 @@ void MetadataHandler::handleMetadata(IMetadataPacket* metadataPacket)
     }
 
     if (const auto objectTrackBestShotPacket =
-        metadataPacket->queryInterface<IObjectTrackBestShotPacket>())
+        metadataPacket->queryInterface<IObjectTrackBestShotPacket0>())
     {
         handleObjectTrackBestShotPacket(objectTrackBestShotPacket);
         handled = true;
@@ -111,7 +156,7 @@ void MetadataHandler::handleMetadata(IMetadataPacket* metadataPacket)
     if (!handled)
     {
         NX_VERBOSE(this,
-            "WARNING: Received unsupported metadata packet with timestampUs %1; ignoring",
+            "%1(): Received unsupported metadata packet with timestampUs %2; ignoring.", __func__,
             metadataPacket->timestampUs());
     }
 }
@@ -121,23 +166,30 @@ void MetadataHandler::handleEventMetadataPacket(
 {
     if (eventMetadataPacket->count() <= 0)
     {
-        NX_VERBOSE(this, "WARNING: Received empty event packet; ignoring");
+        NX_VERBOSE(this, "%1(): Received empty event packet; ignoring.", __func__);
         return;
     }
 
     for (int i = 0; i < eventMetadataPacket->count(); ++i)
     {
-        if (const auto eventMetadata = eventMetadataPacket->at(i))
-            handleEventMetadata(eventMetadata, eventMetadataPacket->timestampUs());
-        else
+        const Ptr<const IEventMetadata> eventMetadata = eventMetadataPacket->at(i);
+        if (!eventMetadata)
             break;
+
+        const Ptr<const IEventMetadata0> eventMetadataV0 =
+            eventMetadata->queryInterface<IEventMetadata0>();
+
+        if (!eventMetadataV0)
+            break;
+
+        handleEventMetadata(eventMetadataV0, eventMetadataPacket->timestampUs());
     }
 }
 
 void MetadataHandler::handleObjectMetadataPacket(
     const Ptr<IObjectMetadataPacket>& objectMetadataPacket)
 {
-    nx::common::metadata::ObjectMetadataPacket data;
+    auto data = std::make_shared<nx::common::metadata::ObjectMetadataPacket>() ;
     for (int i = 0; i < objectMetadataPacket->count(); ++i)
     {
         const auto item = objectMetadataPacket->at(i);
@@ -145,6 +197,7 @@ void MetadataHandler::handleObjectMetadataPacket(
             break;
 
         nx::common::metadata::ObjectMetadata objectMetadata;
+        objectMetadata.analyticsEngineId = m_engineId;
         objectMetadata.typeId = item->typeId();
         objectMetadata.trackId = fromSdkUuidToQnUuid(item->trackId());
         const auto box = item->boundingBox();
@@ -159,71 +212,121 @@ void MetadataHandler::handleObjectMetadataPacket(
             __func__, box.x, box.y, box.width, box.height,
             objectMetadata.typeId, objectMetadata.trackId);
 
-        for (int j = 0; j < item->attributeCount(); ++j)
-        {
-            nx::common::metadata::Attribute attribute;
-            attribute.name = QString::fromStdString(item->attribute(j)->name());
-            attribute.value = QString::fromStdString(item->attribute(j)->value());
-            objectMetadata.attributes.push_back(attribute);
-
-            NX_VERBOSE(this, "%1(): Attribute: %2 %3", __func__, attribute.name, attribute.value);
-        }
-        data.objectMetadataList.push_back(std::move(objectMetadata));
+        fetchAttributes(item, &objectMetadata);
+        data->objectMetadataList.push_back(std::move(objectMetadata));
     }
 
-    if (data.objectMetadataList.empty())
-        NX_VERBOSE(this, "%1(): WARNING: ObjectsMetadataPacket is empty", __func__);
+    if (data->objectMetadataList.empty())
+        NX_VERBOSE(this, "%1(): Received empty ObjectsMetadataPacket.", __func__);
 
-    data.timestampUs = objectMetadataPacket->timestampUs();
-    data.durationUs = objectMetadataPacket->durationUs();
-    data.deviceId = m_resource->getId();
+    data->timestampUs = objectMetadataPacket->timestampUs();
+    data->durationUs = objectMetadataPacket->durationUs();
+    data->deviceId = m_resource->getId();
 
     // This is not very precise, but is ok, since stream index isn't changed very often.
-    data.streamIndex = m_resource->analyzedStreamIndex(m_engineId);
+    data->streamIndex = m_resource->analyzedStreamIndex(m_engineId);
 
-    if (data.timestampUs <= 0)
-        NX_DEBUG(this, "Invalid ObjectsMetadataPacket timestamp: %1", data.timestampUs);
+    if (data->timestampUs <= 0)
+    {
+        NX_DEBUG(this, "Received ObjectsMetadataPacket with invalid timestamp: %1",
+            data->timestampUs);
+    }
 
-    pushObjectMetadataToSinks(data);
+    postprocessObjectMetadataPacket(data, ObjectMetadataType::regular);
 }
 
 void MetadataHandler::handleObjectTrackBestShotPacket(
-    const nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackBestShotPacket>& objectTrackBestShotPacket)
+    const nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackBestShotPacket0>& objectTrackBestShotPacket)
 {
-    nx::common::metadata::ObjectMetadataPacket bestShotPacket;
-    bestShotPacket.timestampUs = objectTrackBestShotPacket->timestampUs();
-    if (bestShotPacket.timestampUs < 0)
+    auto bestShotPacket = std::make_shared<nx::common::metadata::ObjectMetadataPacket>();
+    bestShotPacket->timestampUs = objectTrackBestShotPacket->timestampUs();
+    if (bestShotPacket->timestampUs <= 0)
     {
         NX_DEBUG(this,
-            "Invalid ObjectTrackBestShotPacket timestamp: %1, ignoring packet",
-            bestShotPacket.timestampUs);
+            "Received ObjectTrackBestShotPacket with invalid timestamp %1; ignoring the packet.",
+            bestShotPacket->timestampUs);
+
+        m_violationHandler(
+            {wrappers::ViolationType::invalidMetadataTimestamp, /*violationDetails*/ ""});
 
         return;
     }
 
-    bestShotPacket.durationUs = 0;
-    bestShotPacket.deviceId = m_resource->getId();
+    bestShotPacket->durationUs = 0;
+    bestShotPacket->deviceId = m_resource->getId();
 
     // This is not very precise, but is ok, since stream index isn't changed very often.
-    bestShotPacket.streamIndex = m_resource->analyzedStreamIndex(m_engineId);
+    bestShotPacket->streamIndex = m_resource->analyzedStreamIndex(m_engineId);
 
     nx::common::metadata::ObjectMetadata bestShot;
+    bestShot.analyticsEngineId = m_engineId;
     bestShot.trackId =
         nx::vms_server_plugins::utils::fromSdkUuidToQnUuid(objectTrackBestShotPacket->trackId());
-    bestShot.bestShot = true;
+
     const auto box = objectTrackBestShotPacket->boundingBox();
-    bestShot.boundingBox = QRectF(box.x, box.y, box.width, box.height);
+    if (box.x < 0 || box.y < 0 || box.width < 0 || box.height < 0)
+    {
+        // The rect is "invalid" - to be treated as unknown.
+        bestShot.boundingBox = QRectF(-1, -1, -1, -1); //< Such QRectF value means "unknown".
+    }
+    else
+    {
+        bestShot.boundingBox = QRectF(box.x, box.y, box.width, box.height);
+        if (m_translateObjectBoundingBoxes)
+            bestShot.boundingBox = m_objectCoordinatesTranslator.translate(bestShot.boundingBox);
+    }
 
-    if (m_translateObjectBoundingBoxes)
-        bestShot.boundingBox = m_objectCoordinatesTranslator.translate(bestShot.boundingBox);
+    const auto sdkBestShotPacketWithImageAndAttributes =
+        objectTrackBestShotPacket->queryInterface<
+            nx::sdk::analytics::IObjectTrackBestShotPacket>();
 
-    bestShotPacket.objectMetadataList.push_back(std::move(bestShot));
+    if (sdkBestShotPacketWithImageAndAttributes)
+        fetchAttributes(sdkBestShotPacketWithImageAndAttributes, &bestShot);
 
-    pushObjectMetadataToSinks(bestShotPacket);
+    bestShotPacket->objectMetadataList.push_back(std::move(bestShot));
+
+    if (sdkBestShotPacketWithImageAndAttributes)
+    {
+        handleObjectTrackBestShotPacketWithImage(
+            bestShot.trackId, bestShotPacket, sdkBestShotPacketWithImageAndAttributes);
+    }
+    else
+    {
+        postprocessObjectMetadataPacket(bestShotPacket, ObjectMetadataType::bestShot);
+    }
+}
+
+void MetadataHandler::handleObjectTrackBestShotPacketWithImage(
+    QnUuid trackId,
+    const nx::common::metadata::ObjectMetadataPacketPtr& bestShotPacket,
+    const Ptr<nx::sdk::analytics::IObjectTrackBestShotPacket>& sdkBestShotPacketWithImage)
+{
+    m_objectTrackBestShotResolver.resolve(
+        sdkBestShotPacketWithImage,
+        [this, bestShotPacket, trackId](
+            std::optional<nx::analytics::db::Image> bestShotImage,
+            ObjectMetadataType bestShotType)
+        {
+            const bool incorrectBestShot =
+                (!bestShotImage && bestShotType == ObjectMetadataType::externalBestShot)
+                || bestShotType == ObjectMetadataType::undefined;
+
+            if (incorrectBestShot)
+            {
+                NX_VERBOSE(this, "Unable to fetch Bestshot for Track %1, Device %2, Engine Id %3",
+                    trackId, m_resource, m_engineId);
+                return;
+            }
+
+            if (bestShotImage)
+                serverModule()->objectTrackBestShotCache()->insert(trackId, *bestShotImage);
+
+            postprocessObjectMetadataPacket(bestShotPacket, bestShotType);
+        });
 }
 
 void MetadataHandler::handleEventMetadata(
-    const Ptr<const IEventMetadata>& eventMetadata, qint64 timestampUsec)
+    const Ptr<const IEventMetadata0>& eventMetadata, qint64 timestampUsec)
 {
     auto eventState = nx::vms::api::EventState::undefined;
 
@@ -259,6 +362,13 @@ void MetadataHandler::handleEventMetadata(
 
     setLastEventState(eventTypeId, eventState);
 
+    const Ptr<const IEventMetadata> eventMetadataWithObjectTrackId =
+        eventMetadata->queryInterface<IEventMetadata>();
+
+    QnUuid objectTrackId;
+    if (eventMetadataWithObjectTrackId)
+        objectTrackId = fromSdkUuidToQnUuid(eventMetadataWithObjectTrackId->trackId());
+
     const auto sdkEvent = nx::vms::event::AnalyticsSdkEventPtr::create(
         m_resource,
         m_engineId,
@@ -267,6 +377,7 @@ void MetadataHandler::handleEventMetadata(
         eventMetadata->caption(),
         eventMetadata->description(),
         nx::vms::server::sdk_support::attributesMap(eventMetadata),
+        objectTrackId,
         timestampUsec);
 
     if (m_resource->captureEvent(sdkEvent))
@@ -278,11 +389,31 @@ void MetadataHandler::handleEventMetadata(
     emit sdkEventTriggered(sdkEvent);
 }
 
+void MetadataHandler::postprocessObjectMetadataPacket(
+    const nx::common::metadata::ObjectMetadataPacketPtr& packet,
+    nx::common::metadata::ObjectMetadataType objectMetadataType)
+{
+    for (nx::common::metadata::ObjectMetadata& objectMetadata: packet->objectMetadataList)
+        objectMetadata.objectMetadataType = objectMetadataType;
+
+    if (m_needToAutoGenerateBestShots)
+    {
+        if (objectMetadataType == nx::common::metadata::ObjectMetadataType::regular)
+            pushObjectMetadataToSinks(packet);
+
+        m_objectTrackBestShotProxy.processObjectMetadataPacket(packet);
+    }
+    else
+    {
+        pushObjectMetadataToSinks(packet);
+    }
+}
+
 void MetadataHandler::pushObjectMetadataToSinks(
-    const nx::common::metadata::ObjectMetadataPacket& packet)
+    const nx::common::metadata::ObjectMetadataPacketPtr& packet)
 {
     if (nx::analytics::loggingIni().isLoggingEnabled())
-        m_metadataLogger.pushObjectMetadata(packet);
+        m_metadataLogger.pushObjectMetadata(*packet);
 
     if (m_metadataSinks.empty())
     {
@@ -291,13 +422,13 @@ void MetadataHandler::pushObjectMetadataToSinks(
         return;
     }
 
-    if (packet.timestampUs < 0) //< Allow packets with 0 timestmap.
+    if (packet->timestampUs < 0) //< Allow packets with 0 timestmap.
         return;
 
     const QnCompressedMetadataPtr compressedMetadata =
-        nx::common::metadata::toCompressedMetadataPacket(packet);
+        nx::common::metadata::toCompressedMetadataPacket(*packet);
 
-    if (packet.streamIndex == nx::vms::api::StreamIndex::secondary)
+    if (packet->streamIndex == nx::vms::api::StreamIndex::secondary)
         compressedMetadata->flags |= QnAbstractMediaData::MediaFlags_LowQuality;
 
     if (!NX_ASSERT(compressedMetadata))

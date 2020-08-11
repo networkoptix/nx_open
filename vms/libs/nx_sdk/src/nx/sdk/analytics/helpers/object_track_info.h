@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <vector>
 #include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/ref_countable.h>
 
@@ -17,6 +18,15 @@ public:
     void setTrack(IList<ITimestampedObjectMetadata>* track);
     void setBestShotVideoFrame(IUncompressedVideoFrame* bestShotVideoFrame);
     void setBestShotObjectMetadata(ITimestampedObjectMetadata* bestShotObjectMetadata);
+    void setBestShotImageData(std::vector<char> bestShotImageData);
+    void setBestShotImageDataFormat(std::string bestShotImageDataFormat);
+    void setBestShotImage(
+        std::vector<char> bestShotImageData,
+        std::string bestShotImageDataFormat);
+
+    virtual const char* bestShotImageData() const override;
+    virtual int bestShotImageDataSize() const override;
+    virtual const char* bestShotImageDataFormat() const override;
 
 protected:
     virtual IList<ITimestampedObjectMetadata>* getTrack() const override;
@@ -26,6 +36,9 @@ private:
     Ptr<IList<ITimestampedObjectMetadata>> m_track;
     Ptr<IUncompressedVideoFrame> m_bestShotVideoFrame;
     Ptr<ITimestampedObjectMetadata> m_bestShotObjectMetadata;
+
+    std::vector<char> m_bestShotImageData;
+    std::string m_bestShotImageDataFormat;
 };
 
 } // namespace analytics

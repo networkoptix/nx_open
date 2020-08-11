@@ -79,6 +79,15 @@ Ptr<IObjectTrackInfo> makeObjectTrackInfo(
         objectTrackInfo->setBestShotVideoFrame(bestShotVideoFrame.get());
     }
 
+    if (!actionData.bestShotImageData.isEmpty() && !actionData.bestShotImageDataFormat.isEmpty())
+    {
+        objectTrackInfo->setBestShotImage(
+            std::vector<char>(
+                actionData.bestShotImageData.begin(),
+                actionData.bestShotImageData.end()),
+            actionData.bestShotImageDataFormat.toStdString());
+    }
+
     return objectTrackInfo;
 }
 
@@ -127,6 +136,9 @@ private:
 
     const Ptr<IObjectTrackInfo> m_objectTrackInfo;
     const Ptr<const IStringMap> m_params;
+
+    const std::vector<char> m_imageData;
+    const std::string m_imageDataFormat;
 };
 
 } // namespace
@@ -339,6 +351,9 @@ std::optional<ExtendedAnalyticsActionData>
     const bool needBestShotObjectPosition = capabilities.testFlag(
         EngineManifest::ObjectAction::Capability::needBestShotObjectMetadata);
 
+    const bool needBestShotImage = capabilities.testFlag(
+        EngineManifest::ObjectAction::Capability::needBestShotImage);
+
     const auto objectTrack = fetchObjectTrack(trackId, needFullTrack);
     if (!objectTrack)
     {
@@ -355,10 +370,10 @@ std::optional<ExtendedAnalyticsActionData>
     if (needFullTrack)
         extendedAnalyticsActionData.objectTrack = objectTrack;
 
-    if (!needBestShotObjectPosition && !needBestShotVideoFrame)
+    if (!needBestShotObjectPosition && !needBestShotVideoFrame && !needBestShotImage)
         return extendedAnalyticsActionData;
 
-    if (!NX_ASSERT(objectTrack->bestShot.initialized(), "Best shot must be initialized"))
+    if (!NX_ASSERT(objectTrack->bestShot.initialized()))
         return std::nullopt;
 
     const BestShot& bestShot = objectTrack->bestShot;
@@ -382,6 +397,12 @@ std::optional<ExtendedAnalyticsActionData>
             action.deviceId,
             bestShot.timestampUs,
             objectTrack->bestShot.streamIndex);
+    }
+
+    if (needBestShotImage)
+    {
+        extendedAnalyticsActionData.bestShotImageData = bestShot.image.imageData;
+        extendedAnalyticsActionData.bestShotImageDataFormat = bestShot.image.imageDataFormat;
     }
 
     return extendedAnalyticsActionData;

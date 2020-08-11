@@ -22,6 +22,9 @@ struct ExtendedAnalyticsActionData
     std::optional<nx::analytics::db::ObjectTrackEx> objectTrack;
     std::optional<nx::analytics::db::ObjectPosition> bestShotObjectPosition;
     CLVideoDecoderOutputPtr bestShotVideoFrame;
+
+    QByteArray bestShotImageData;
+    QString bestShotImageDataFormat;
 };
 
 class QnExecuteAnalyticsActionRestHandler:

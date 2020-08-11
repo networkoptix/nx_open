@@ -482,6 +482,7 @@ void QnServerStreamRecorder::updateContainerMetadata(QnAviArchiveMetadata* metad
     metadata->version = QnAviArchiveMetadata::kIntegrityCheckVersion;
     metadata->integrityHash =
         IntegrityHashHelper::generateIntegrityHash(QByteArray::number(m_startDateTimeUs / 1000));
+    metadata->metadataStreamVersion = QnAviArchiveMetadata::kMetadataStreamVersion;
 }
 
 bool QnServerStreamRecorder::needSaveData(const QnConstAbstractMediaDataPtr& media)

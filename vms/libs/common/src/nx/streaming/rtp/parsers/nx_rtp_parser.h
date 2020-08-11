@@ -5,7 +5,6 @@
 #include <QtCore/QFile>
 
 #include <nx/streaming/rtp/parsers/rtp_stream_parser.h>
-#include <nx/debugging/abstract_visual_metadata_debugger.h>
 #include <nx/analytics/metadata_logger.h>
 
 namespace nx::streaming::rtp {
@@ -38,7 +37,6 @@ private:
     qint64 m_position;
     bool m_isAudioEnabled;
     qint64 m_lastFramePtsUs; //< Intended for debug.
-    nx::debugging::VisualMetadataDebuggerPtr m_visualDebugger;
     nx::analytics::MetadataLogger m_primaryLogger;
     nx::analytics::MetadataLogger m_secondaryLogger;
 };

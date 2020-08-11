@@ -22,6 +22,7 @@
 #include <nx/sdk/analytics/i_custom_metadata_packet.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/vms/server/analytics/predefined_attributes.h>
 
 #include <nx/sdk/helpers/string_map.h>
@@ -35,6 +36,7 @@ namespace nx::vms_server_plugins::analytics::hanwha {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
+using namespace nx::network;
 
 //-------------------------------------------------------------------------------------------------
 
@@ -49,7 +51,13 @@ DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo,
         deviceInfo->channelNumber(),
         isNvr,
         m_frameSize),
-    m_objectMetadataXmlParser(m_engine->manifest(), m_engine->objectMetadataAttributeFilters())
+    m_objectMetadataXmlParser(
+        url::Builder(deviceInfo->url())
+            .setUserName(deviceInfo->login())
+            .setPassword(deviceInfo->password())
+            .toUrl(),
+        m_engine->manifest(),
+        m_engine->objectMetadataAttributeFilters())
 {
     this->setDeviceInfo(deviceInfo);
 }
@@ -100,6 +108,9 @@ DeviceAgent::~DeviceAgent()
 /*virtual*/ void DeviceAgent::doPushDataPacket(
     Result<void>* /*outResult*/, IDataPacket* dataPacket) /*override*/
 {
+    if (!NX_ASSERT(m_handler))
+        return;
+
     if (!NX_ASSERT(dataPacket))
         return;
 
@@ -109,27 +120,15 @@ DeviceAgent::~DeviceAgent()
 
     QByteArray xmlData(incomingPacket->data(), incomingPacket->dataSize());
 
-    const auto ts = incomingPacket->timestampUs();
+    auto [outEventPacket, outObjectPacket, outBestShotPackets] =
+        m_objectMetadataXmlParser.parse(xmlData, incomingPacket->timestampUs());
 
-    auto [outEventPacket, outObjectPacket] = m_objectMetadataXmlParser.parse(xmlData);
-
-    if (outEventPacket && outEventPacket->count())
-    {
-        outEventPacket->setTimestampUs(ts);
-        outEventPacket->setDurationUs(-1);
-
-        if (NX_ASSERT(m_handler))
-            m_handler->handleMetadata(outEventPacket.get());
-    }
-
-    if (outObjectPacket && outObjectPacket->count())
-    {
-        outObjectPacket->setTimestampUs(ts);
-        outObjectPacket->setDurationUs(1'000'000); //< 1 second
-
-        if (NX_ASSERT(m_handler))
-            m_handler->handleMetadata(outObjectPacket.get());
-    }
+    if (outEventPacket)
+        m_handler->handleMetadata(outEventPacket.get());
+    if (outObjectPacket)
+        m_handler->handleMetadata(outObjectPacket.get());
+    for (auto bestShotPacket: outBestShotPackets)
+        m_handler->handleMetadata(bestShotPacket.get());
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -350,4 +350,16 @@ R"sql(
     ALTER TABLE track ADD COLUMN stream_index INTEGER DEFAULT 0;
 )sql";
 
+static constexpr char kAddBestShotImageTable[] =
+R"sql(
+    CREATE TABLE best_shot_image
+        (track_id integer not null primary key,
+        image_data blob,
+        data_format text,
+        CONSTRAINT fk_track
+        FOREIGN KEY(track_id)
+        REFERENCES track(id)
+        ON DELETE CASCADE);
+)sql";
+
 } // namespace nx::analytics::db

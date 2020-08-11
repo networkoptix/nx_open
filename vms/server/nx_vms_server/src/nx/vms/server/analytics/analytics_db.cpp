@@ -11,10 +11,11 @@ namespace nx::vms::server::analytics {
 
 AnalyticsDb::AnalyticsDb(
     QnMediaServerModule* mediaServerModule,
-    nx::analytics::db::AbstractIframeSearchHelper* iframeSearchHelper,
+    nx::analytics::db::AbstractObjectTrackBestShotCache* imageCache,
     nx::analytics::db::AbstractObjectTypeDictionary* objectTypeDictionary)
     :
-    base_type(mediaServerModule->commonModule(), iframeSearchHelper, objectTypeDictionary),
+    base_type(
+        mediaServerModule->commonModule(), imageCache, objectTypeDictionary),
     m_mediaServerModule(mediaServerModule)
 {
 }

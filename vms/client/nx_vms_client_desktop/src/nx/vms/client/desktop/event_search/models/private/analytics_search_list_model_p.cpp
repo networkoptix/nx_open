@@ -31,6 +31,7 @@
 #include <nx/api/mediaserver/image_request.h>
 #include <nx/vms/text/human_readable.h>
 #include <nx/vms/api/analytics/descriptors.h>
+#include <nx/vms/api/analytics/manifest_items.h>
 #include <nx/vms/client/desktop/analytics/analytics_attributes.h>
 #include <nx/vms/client/desktop/analytics/object_type_dictionary.h>
 #include <nx/vms/client/desktop/ini.h>
@@ -45,6 +46,7 @@
 namespace nx::vms::client::desktop {
 
 using namespace nx::analytics::db;
+using namespace nx::vms::api::analytics;
 
 namespace {
 
@@ -57,6 +59,8 @@ using StreamSelectionMode = nx::api::CameraImageRequest::StreamSelectionMode;
 static constexpr milliseconds kMetadataTimerInterval = 1000ms;
 static constexpr milliseconds kDataChangedInterval = 500ms;
 static constexpr milliseconds kUpdateWorkbenchFilterDelay = 100ms;
+
+static constexpr int kMaxumumNoBestShotTrackCount = 10000;
 
 milliseconds startTime(const ObjectTrack& track)
 {
@@ -170,6 +174,9 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
                 : objectTypeDescriptor->name;
         }
 
+        case Qn::HasExternalBestShotRole:
+            return m_externalBestShotTracks.contains(track.id);
+
         case Qt::DecorationRole:
             return QVariant::fromValue(qnSkin->pixmap("analytics/analytics.svg"));
 
@@ -191,13 +198,16 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
                 && (track.bestShot.streamIndex == StreamIndex::primary
                     || track.bestShot.streamIndex == StreamIndex::secondary);
 
-            if (!NX_ASSERT(isBestShotCorrect))
+            if (!isBestShotCorrect)
                 return QVariant::fromValue(StreamSelectionMode::forcedPrimary);
 
             return QVariant::fromValue(track.bestShot.streamIndex == StreamIndex::primary
                 ? StreamSelectionMode::forcedPrimary
                 : StreamSelectionMode::forcedSecondary);
         }
+        case Qn::ObjectTrackIdRole:
+            return QVariant::fromValue(track.id);
+
         case Qn::DurationRole:
             return QVariant::fromValue(objectDuration(track));
 
@@ -280,29 +290,26 @@ void AnalyticsSearchListModel::Private::clearData()
     m_data.clear();
     m_prefetch.clear();
     m_objectTrackIdToTimestamp.clear();
+    m_noBestShotTracks.clear();
+    m_externalBestShotTracks.clear();
 }
 
 void AnalyticsSearchListModel::Private::truncateToMaximumCount()
 {
-    const auto itemCleanup =
-        [this](const ObjectTrack& track)
-        {
-            m_objectTrackIdToTimestamp.remove(track.id);
-        };
-
-    q->truncateDataToMaximumCount(m_data, &startTime, itemCleanup);
+    q->truncateDataToMaximumCount(m_data, &startTime,
+        [this](const ObjectTrack& track) { handleItemRemoved(track); });
 }
 
 void AnalyticsSearchListModel::Private::truncateToRelevantTimePeriod()
 {
-    const auto itemCleanup =
-        [this](const ObjectTrack& track)
-        {
-            m_objectTrackIdToTimestamp.remove(track.id);
-        };
+    q->truncateDataToTimePeriod(m_data, &startTime, q->relevantTimePeriod(),
+        [this](const ObjectTrack& track) { handleItemRemoved(track); });
+}
 
-    q->truncateDataToTimePeriod(
-        m_data, &startTime, q->relevantTimePeriod(), itemCleanup);
+void AnalyticsSearchListModel::Private::handleItemRemoved(const ObjectTrack& track)
+{
+    m_objectTrackIdToTimestamp.remove(track.id);
+    m_externalBestShotTracks.remove(track.id);
 }
 
 bool AnalyticsSearchListModel::Private::isCameraApplicable(
@@ -430,6 +437,7 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
     request.timePeriod = period;
     request.maxObjectTracksToSelect = limit;
     request.freeText = m_filterText;
+    request.withBestShotOnly = true;
 
     if (!m_selectedObjectType.isEmpty())
         request.objectTypeId = {m_selectedObjectType};
@@ -442,13 +450,15 @@ rest::Handle AnalyticsSearchListModel::Private::getObjects(const QnTimePeriod& p
         : Qt::AscendingOrder;
 
     NX_VERBOSE(q, "Requesting analytics:\n    from: %1\n    to: %2\n"
-        "    box: %3\n    text filter: %4\n    sort: %5\n    limit: %6",
+        "    box: %3\n    text filter: %4\n    sort: %5\n    limit: %6\n"
+        "    withBestShotOnly: %7",
         nx::utils::timestampToDebugString(period.startTimeMs),
         nx::utils::timestampToDebugString(period.endTimeMs()),
         request.boundingBox,
         request.freeText,
         QVariant::fromValue(request.sortOrder).toString(),
-        request.maxObjectTracksToSelect);
+        request.maxObjectTracksToSelect,
+        request.withBestShotOnly);
 
     return server->restConnection()->lookupObjectTracks(
         request, false /*isLocal*/, nx::utils::guarded(this, callback), thread());
@@ -609,10 +619,19 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
     QHash<QnUuid, int> newObjectIndices;
 
+    enum class TrackType
+    {
+        none,
+        loaded,
+        beingAdded,
+        noBestShot
+    };
+
     struct FoundObjectTrack
     {
-        ObjectTrack* const track = nullptr;
-        const bool isNew = false;
+        ObjectTrack* track = nullptr;
+        int index = -1;
+        TrackType type;
     };
 
     const auto findObject =
@@ -620,17 +639,24 @@ void AnalyticsSearchListModel::Private::processMetadata()
         {
             auto index = newObjectIndices.value(trackId, -1);
             if (index >= 0)
-                return {&newTracks[index], true};
+                return {&newTracks[index], index, TrackType::beingAdded};
 
             index = indexOf(trackId);
             if (index >= 0)
-                return {&m_data[index], false};
+                return {&m_data[index], index, TrackType::loaded};
+
+            const auto it = std::find_if(m_noBestShotTracks.begin(), m_noBestShotTracks.end(),
+                [trackId](const ObjectTrack& track) { return track.id == trackId; });
+
+            if (it != m_noBestShotTracks.end())
+                return {&*it, (int) (it - m_noBestShotTracks.begin()), TrackType::noBestShot};
 
             return {};
         };
 
     nx::analytics::db::Filter filter;
     filter.freeText = m_filterText;
+    filter.withBestShotOnly = false;
     if (m_filterRect.isValid())
         filter.boundingBox = m_filterRect;
     if (!m_selectedObjectType.isEmpty())
@@ -653,19 +679,40 @@ void AnalyticsSearchListModel::Private::processMetadata()
             for (const auto& item: objectMetadata->objectMetadataList)
             {
                 const auto found = findObject(item.trackId);
-                if (item.bestShot)
+                if (item.isBestShot())
                 {
                     if (!found.track)
                         continue; //< A valid situation - an track can be filtered out.
 
+                    if (item.objectMetadataType
+                        == nx::common::metadata::ObjectMetadataType::externalBestShot)
+                    {
+                        m_externalBestShotTracks.insert(item.trackId);
+                    }
+
                     found.track->bestShot.timestampUs = objectMetadata->timestampUs;
                     found.track->bestShot.rect = item.boundingBox;
+                    found.track->bestShot.streamIndex  = objectMetadata->streamIndex;
 
-                    if (found.isNew)
-                        continue;
+                    switch (found.type)
+                    {
+                        case TrackType::beingAdded:
+                            break;
 
-                    m_dataChangedTrackIds.insert(found.track->id);
-                    m_emitDataChanged->requestOperation();
+                        case TrackType::loaded:
+                            m_dataChangedTrackIds.insert(found.track->id);
+                            m_emitDataChanged->requestOperation();
+                            break;
+
+                        case TrackType::noBestShot:
+                        {
+                            newObjectIndices[found.track->id] = int(newTracks.size());
+                            newTracks.push_back(*found.track);
+                            m_noBestShotTracks.erase(m_noBestShotTracks.begin() + found.index);
+                            break;
+                        }
+                    }
+
                     continue;
                 }
 
@@ -678,7 +725,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
                 if (found.track)
                 {
                     pos.attributes = item.attributes;
-                    advanceTrack(*found.track, std::move(pos), !found.isNew);
+                    advanceTrack(*found.track, std::move(pos), found.type == TrackType::loaded);
                     continue;
                 }
 
@@ -687,9 +734,6 @@ void AnalyticsSearchListModel::Private::processMetadata()
                 newTrack.deviceId = objectMetadata->deviceId;
                 newTrack.objectTypeId = item.typeId;
                 newTrack.attributes = item.attributes;
-                newTrack.bestShot.rect = item.boundingBox;
-                newTrack.bestShot.timestampUs = objectMetadata->timestampUs;
-                newTrack.bestShot.streamIndex = objectMetadata->streamIndex;
                 newTrack.firstAppearanceTimeUs = objectMetadata->timestampUs;
                 newTrack.lastAppearanceTimeUs = objectMetadata->timestampUs;
                 newTrack.objectPosition.add(item.boundingBox);
@@ -703,29 +747,82 @@ void AnalyticsSearchListModel::Private::processMetadata()
         }
     }
 
+    // Move new tracks without best shot to a dedicated queue.
+    for (int i = 0; i < (int) newTracks.size(); ++i)
+    {
+        if (newTracks[i].bestShot.initialized())
+            continue;
+
+        m_noBestShotTracks.push_back(newTracks[i]);
+        newTracks.erase(newTracks.begin() + i);
+        --i;
+    }
+
+    // Limit the size of the no-best-shot track queue.
+    const int noBestShotTrackCount = int(m_noBestShotTracks.size());
+    if (noBestShotTrackCount > kMaxumumNoBestShotTrackCount)
+    {
+        m_noBestShotTracks.erase(m_noBestShotTracks.begin(),
+            m_noBestShotTracks.begin() + (noBestShotTrackCount - kMaxumumNoBestShotTrackCount));
+    }
+
     if (newTracks.empty())
         return;
 
     NX_VERBOSE(q, "Detected %1 new object tracks", newTracks.size());
 
-    if (packetsBySource.size() > 1)
-    {
-        std::sort(newTracks.begin(), newTracks.end(),
-            [](const ObjectTrack& left, const ObjectTrack& right)
-            {
-                return left.firstAppearanceTimeUs < right.firstAppearanceTimeUs;
-            });
-    }
-
-    auto periodToCommit = QnTimePeriod::fromInterval(
-        startTime(newTracks.front()), startTime(newTracks.back()));
+    std::sort(newTracks.begin(), newTracks.end(),
+        [](const ObjectTrack& left, const ObjectTrack& right)
+        {
+            return left.firstAppearanceTimeUs < right.firstAppearanceTimeUs;
+        });
 
     ScopedLiveCommit liveCommit(q);
+    int middleCount = 0;
 
-    q->addToFetchedTimeWindow(periodToCommit);
+    // Handle insertions in the middle.
+    auto it = newTracks.begin();
+    if (!m_data.empty())
+    {
+        const auto latestTime = startTime(m_data.front());
+        for (; it != newTracks.cend(); ++it)
+        {
+            const auto timestamp = startTime(*it);
+            if (timestamp >= latestTime)
+                break;
 
-    NX_VERBOSE(q, "Live update commit");
-    commitInternal(periodToCommit, newTracks.rbegin(), newTracks.rend(), 0, true);
+            if (timestamp <= q->fetchedTimeWindow().startTime())
+                continue;
+
+            const auto position = std::lower_bound(m_data.cbegin(), m_data.cend(), timestamp,
+                lowerBoundPredicate) - m_data.begin();
+
+            ScopedInsertRows insertRows(q, position, position);
+            NX_ASSERT(!m_objectTrackIdToTimestamp.contains(it->id));
+            m_objectTrackIdToTimestamp[it->id] = startTime(*it);
+
+            m_data.insert(m_data.begin() + position, std::move(*it));
+            ++middleCount;
+        }
+    }
+
+    // Handle insertion at the top.
+    const int topCount = (int) (newTracks.end() - it);
+    if (it != newTracks.end())
+    {
+        auto periodToCommit = QnTimePeriod::fromInterval(
+            startTime(*it), startTime(newTracks.back()));
+
+        q->addToFetchedTimeWindow(periodToCommit);
+
+        NX_VERBOSE(q, "Live update commit");
+        commitInternal(periodToCommit,
+            std::make_reverse_iterator(newTracks.end()), std::make_reverse_iterator(it),
+            /*position*/ 0, /*handleOverlaps*/ false);
+    }
+
+    NX_VERBOSE(q, "%1 new object tracks inserted in the middle, %2 at the top, %3 skipped as too old",
+        middleCount, topCount, ((int) newTracks.size()) - (middleCount + topCount));
 
     if (count() > q->maximumCount())
     {
@@ -872,7 +969,6 @@ QList<QPair<QString, QString>> AnalyticsSearchListModel::Private::attributes(
 QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(
     const ObjectTrack& track) const
 {
-    using nx::vms::api::analytics::ActionTypeDescriptor;
     const auto camera = this->camera(track);
     if (!camera)
         return {};

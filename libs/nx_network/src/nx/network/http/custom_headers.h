@@ -62,5 +62,6 @@ static const QByteArray URL_QUERY_AUTH_KEY_NAME = "auth";
 static const QByteArray PHYSICAL_ID_URL_QUERY_ITEM = "cameraId";
 
 static const QByteArray FRAME_TIMESTAMP_US_HEADER_NAME = "Frame-Timestamp";
+static const QByteArray FRAME_ENCODED_BY_PLUGIN = "Frame-From-Plugin";
 
 } // namespace Qn

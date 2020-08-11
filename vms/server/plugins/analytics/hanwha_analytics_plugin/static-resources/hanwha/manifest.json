@@ -1,6 +1,6 @@
 {
     "streamTypeFilter": "metadata",
-    "capabilities": "deviceDependent|keepObjectBoundingBoxRotation",
+    "capabilities": "deviceDependent|keepObjectBoundingBoxRotation|noAutoBestShots",
     "objectTypes":
     [
         {
@@ -902,8 +902,9 @@
             "groupId": "nx.hanwha.Queue"
         },
         {
-            "id": "nx.hanwha.ObjectTracking.Start",
-            "name": "Object tracking - Start"
+            "id": "nx.hanwha.ObjectTracking.BestShot",
+            "name": "Object tracking",
+            "flags": "useTrackBestShotAsPreview"
         }
     ],
     "groups":

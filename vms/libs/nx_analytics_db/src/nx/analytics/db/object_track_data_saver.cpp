@@ -98,6 +98,21 @@ void ObjectTrackDataSaver::resolveTrackIds()
     }
 }
 
+void ObjectTrackDataSaver::saveImage(
+    nx::sql::QueryContext* queryContext,
+    int64_t trackDbId, const Image& image)
+{
+    auto query = queryContext->connection()->createQuery();
+    query->prepare(R"sql(
+        INSERT OR REPLACE INTO best_shot_image (track_id, image_data,  data_format)
+        VALUES (?, ?, ?)
+    )sql");
+    query->addBindValue((qint64) trackDbId);
+    query->addBindValue(image.imageData);
+    query->addBindValue(image.imageDataFormat);
+    query->exec();
+}
+
 void ObjectTrackDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
 {
     auto query = queryContext->connection()->createQuery();
@@ -143,6 +158,9 @@ void ObjectTrackDataSaver::insertObjects(nx::sql::QueryContext* queryContext)
 
         m_objectTrackCache->saveTrackIdToAttributesId(
             track.id, attributesId);
+
+        if (!track.bestShot.image.isEmpty())
+            saveImage(queryContext, trackDbId, track.bestShot.image);
     }
 }
 
@@ -263,14 +281,14 @@ void ObjectTrackDataSaver::updateObjects(nx::sql::QueryContext* queryContext)
             updateObjectQuery->addBindValue(QVariant());
         }
 
-        NX_ASSERT(trackUpdate.bestShot.streamIndex == nx::vms::api::StreamIndex::primary
-            || trackUpdate.bestShot.streamIndex == nx::vms::api::StreamIndex::secondary);
-
         updateObjectQuery->addBindValue((int) trackUpdate.bestShot.streamIndex);
         updateObjectQuery->addBindValue(dbId);
 
         updateObjectQuery->exec();
         m_objectTrackCache->saveTrackIdToAttributesId(trackUpdate.trackId, newAttributesId);
+
+        if (!trackUpdate.bestShot.image.isEmpty())
+            saveImage(queryContext, dbId, trackUpdate.bestShot.image);
     }
 }
 

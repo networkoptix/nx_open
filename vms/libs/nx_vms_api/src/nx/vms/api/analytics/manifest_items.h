@@ -6,12 +6,13 @@
 namespace nx::vms::api::analytics {
 
 /** See the documentation in manifests.md. */
-enum EventTypeFlag
+enum class EventTypeFlag
 {
     noFlags = 0,
     stateDependent = 1 << 0,
     regionDependent = 1 << 1,
     hidden = 1 << 2,
+    useTrackBestShotAsPreview = 1 << 3,
 };
 Q_DECLARE_FLAGS(EventTypeFlags, EventTypeFlag)
 

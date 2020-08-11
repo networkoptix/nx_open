@@ -19,6 +19,8 @@
 #include "plugins/resource/server_archive/server_archive_delegate.h"
 #include "media_server/media_server_module.h"
 #include <decoders/video/ffmpeg_video_decoder.h>
+#include <nx/analytics/db/abstract_storage.h>
+#include <nx/fusion/serialization/lexical.h>
 
 using StreamIndex = nx::vms::api::StreamIndex;
 
@@ -373,6 +375,43 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameFromLiveCache(
     return nullptr;
 }
 
+std::optional<nx::analytics::db::BestShotEx> QnGetImageHelper::getTrackBestShot(
+    const nx::api::CameraImageRequest& request) const
+{
+    if (auto image = serverModule()->objectTrackBestShotCache()->fetch(request.objectTrackId))
+    {
+        nx::analytics::db::BestShotEx result;
+        result.image = *image;
+        return result;
+    }
+
+    using namespace nx::analytics::db;
+
+    nx::utils::promise<std::tuple<ResultCode, BestShotEx>> localLookupCompleted;
+    serverModule()->analyticsEventsStorage()->lookupBestShot(
+        request.objectTrackId,
+        [&localLookupCompleted](
+            ResultCode resultCode,
+            BestShotEx bestShot)
+        {
+            localLookupCompleted.set_value(
+                std::make_tuple(resultCode, std::move(bestShot)));
+        });
+
+    const auto localLookupResult = localLookupCompleted.get_future().get();
+    const auto localLookupResultCode = std::get<0>(localLookupResult);
+    if (localLookupResultCode != ResultCode::ok)
+    {
+        NX_DEBUG(this, "Lookup with filter (%1) failed with error code %2",
+            request.objectTrackId, QnLexical::serialized(localLookupResultCode));
+        return std::nullopt;
+    }
+    const auto bestShot = std::get<1>(localLookupResult);
+    if (!bestShot.initialized())
+        return std::nullopt;
+    return bestShot;
+}
+
 CLVideoDecoderOutputPtr QnGetImageHelper::getImage(const nx::api::CameraImageRequest& request) const
 {
     NX_VERBOSE(this, "%1(%2 us, roundMethod: %3, size: %4) BEGIN",
@@ -501,7 +540,7 @@ QByteArray QnGetImageHelper::encodeImage(const CLVideoDecoderOutputPtr& frame, c
         (format == "jpg" || format == "jpeg") ? "mjpeg" : format.constData());
     if (!codec)
     {
-        NX_WARNING(this, 
+        NX_WARNING(this,
             "Can't initialize ffmpeg encoder to encode image. Unknown format %1", format);
         return QByteArray();
     }

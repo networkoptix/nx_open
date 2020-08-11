@@ -249,6 +249,8 @@ namespace Qn
         ContextMenuRole,                            /**< Role for context menu (QSharedPointer<QMenu>). */
         ForcePrecisePreviewRole,                    /**< Role for forcing precise preview frame (bool). */
         PreviewStreamSelectionRole,                 /**< Role for camera preview stream (CameraImageRequest::StreamSelectionMode). */
+        ObjectTrackIdRole,                          /**< Role for camera preview stream (CameraImageRequest::objectTrackId). */
+        HasExternalBestShotRole,                    /**< Whether object detection track has an external best shot image (bool). */
 
         SelectOnOpeningRole,                        /**< Role for single-selecting an item (or first of multiple items) added to current layout (bool). */
 

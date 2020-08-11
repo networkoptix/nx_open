@@ -151,6 +151,8 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
             [[fallthrough]];
         case Qn::TimestampRole:
             return QVariant::fromValue(microseconds(eventParams.eventTimestampUsec));
+        case Qn::ObjectTrackIdRole:
+            return QVariant::fromValue(eventParams.objectTrackId);
 
         case Qn::DisplayedResourceListRole:
         {

@@ -53,6 +53,8 @@ public:
      */
     std::vector<ObjectTrackEx> lookup(nx::sql::QueryContext* queryContext);
 
+    BestShotEx lookupBestShot(nx::sql::QueryContext* queryContext);
+
     void prepareCursorQuery(nx::sql::SqlQuery* query);
 
     void loadCurrentRecord(nx::sql::SqlQuery*, ObjectTrack*);
@@ -90,12 +92,13 @@ private:
     std::vector<ObjectTrackEx> lookupInDb(nx::sql::QueryContext* queryContext);
 
     std::vector<ObjectTrackEx> mergeResults(
-        std::vector<ObjectTrackEx> one,
-        std::vector<ObjectTrackEx> two);
+        std::vector<ObjectTrackEx> newerTracks,
+        std::vector<ObjectTrackEx> olderTracks);
 
     std::optional<ObjectTrack> fetchTrackById(
         nx::sql::QueryContext* queryContext,
-        const QnUuid& trackGuid);
+        const QnUuid& trackGuid,
+        bool withBestShotOnly);
 
     std::vector<ObjectTrackEx> lookupTracksUsingArchive(nx::sql::QueryContext* queryContext);
 

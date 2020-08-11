@@ -7,7 +7,6 @@
 #include <nx/analytics/db/object_track_cache.h>
 
 #include "attribute_dictionary.h"
-#include <nx/analytics/db/abstract_iframe_search_helper.h>
 
 class QnResourcePool;
 class QnVideoCameraPool;
@@ -19,25 +18,6 @@ static const qint64 kAutoAlignBestShotTime = 2;
 
 using StreamIndex = nx::vms::api::StreamIndex;
 
-class MocIFrameSearchHelper:
-    public nx::analytics::db::AbstractIframeSearchHelper
-{
-public:
-    MocIFrameSearchHelper(
-        const QnResourcePool* /*resourcePool*/,
-        const QnVideoCameraPool* /*cameraPool*/)
-    {
-    }
-
-    virtual qint64 findAfter(
-        const QnUuid& /*deviceId*/,
-        nx::vms::api::StreamIndex /*streamIndex*/,
-        qint64 /*timestampUs*/) const override
-    {
-        return kAutoAlignBestShotTime;
-    }
-};
-
 class AnalyticsDbObjectTrackCache:
     public ::testing::Test
 {
@@ -45,8 +25,7 @@ public:
     AnalyticsDbObjectTrackCache():
         m_aggregationPeriod(std::chrono::hours(1)),
         m_maxObjectLifeTime(std::chrono::hours(10)),
-        m_iframeHelper(new MocIFrameSearchHelper(nullptr, nullptr)),
-        m_objectTrackCache(m_aggregationPeriod, m_maxObjectLifeTime, m_iframeHelper.get()),
+        m_objectTrackCache(m_aggregationPeriod, m_maxObjectLifeTime, nullptr /*imageCache*/),
         m_timeShift(nx::utils::test::ClockType::steady)
     {
     }
@@ -156,15 +135,10 @@ protected:
         }
 
         packet->timestampUs = kUserDefinedBestShotTime;
-        packet->objectMetadataList.at(0).bestShot = true;
+        packet->objectMetadataList.at(0).objectMetadataType =
+            nx::common::metadata::ObjectMetadataType::bestShot;
         m_analyticsDataPackets.push_back(std::move(packet));
         m_objectTrackCache.add(m_analyticsDataPackets.back());
-    }
-
-    void thenBestShotAlignedToIFrame()
-    {
-        ASSERT_EQ(1, m_objectsToInsert.size());
-        ASSERT_EQ(kAutoAlignBestShotTime, m_objectsToInsert[0].bestShot.timestampUs);
     }
 
     void thenTrackBestShotStreamIndexEqualToIframeStreamIndex(StreamIndex streamIndexToCheck)
@@ -246,7 +220,6 @@ private:
 
     const std::chrono::seconds m_aggregationPeriod;
     const std::chrono::seconds m_maxObjectLifeTime;
-    std::unique_ptr<MocIFrameSearchHelper> m_iframeHelper;
     db::ObjectTrackCache m_objectTrackCache;
     nx::utils::test::ScopedTimeShift m_timeShift;
     std::vector<ObjectTrackUpdate> m_objectUpdates;
@@ -385,16 +358,6 @@ TEST_F(AnalyticsDbObjectTrackCache, the_object_is_removed_after_maxObjectLifetim
     thenNoObjectUpdateIsReported();
 }
 
-TEST_F(AnalyticsDbObjectTrackCache, auto_assign_best_shot)
-{
-    givenSequentialAnalyticsData();
-
-    whenWaitForAggregationPeriod();
-    whenFetchObjectsToInsert();
-
-    thenBestShotAlignedToIFrame();
-}
-
 TEST_F(AnalyticsDbObjectTrackCache, custom_best_shot_time)
 {
     givenUserDefinedBestShot();
@@ -404,32 +367,6 @@ TEST_F(AnalyticsDbObjectTrackCache, custom_best_shot_time)
     whenFetchObjectsToInsert();
 
     thenBestShotMatchToUserDefinedValue();
-}
-
-TEST_F(AnalyticsDbObjectTrackCache,
-    track_best_shot_stream_index_equal_to_stream_index_of_the_closest_iframe_1)
-{
-    givenSequentialAnalyticsData(10, StreamIndex::primary); //< Ends after I-frame.
-    givenSequentialAnalyticsData(100, StreamIndex::secondary);
-
-    whenWaitForAggregationPeriod();
-    whenFetchObjectsToInsert();
-
-    thenBestShotAlignedToIFrame();
-    thenTrackBestShotStreamIndexEqualToIframeStreamIndex(StreamIndex::primary);
-}
-
-TEST_F(AnalyticsDbObjectTrackCache,
-    track_best_shot_stream_index_equal_to_stream_index_of_the_closest_iframe_2)
-{
-    givenSequentialAnalyticsData(1, StreamIndex::primary); //< Ends before I-frame.
-    givenSequentialAnalyticsData(100, StreamIndex::secondary);
-
-    whenWaitForAggregationPeriod();
-    whenFetchObjectsToInsert();
-
-    thenBestShotAlignedToIFrame();
-    thenTrackBestShotStreamIndexEqualToIframeStreamIndex(StreamIndex::secondary);
 }
 
 TEST_F(AnalyticsDbObjectTrackCache,

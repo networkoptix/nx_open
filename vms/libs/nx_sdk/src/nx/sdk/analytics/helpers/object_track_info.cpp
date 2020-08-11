@@ -35,6 +35,24 @@ ITimestampedObjectMetadata* ObjectTrackInfo::getBestShotObjectMetadata() const
     return m_bestShotObjectMetadata.get();
 }
 
+const char* ObjectTrackInfo::bestShotImageData() const
+{
+    if (m_bestShotImageData.empty())
+        return nullptr;
+
+    return m_bestShotImageData.data();
+}
+
+int ObjectTrackInfo::bestShotImageDataSize() const
+{
+    return m_bestShotImageData.size();
+}
+
+const char* ObjectTrackInfo::bestShotImageDataFormat() const
+{
+    return m_bestShotImageDataFormat.c_str();
+}
+
 void ObjectTrackInfo::setTrack(IList<ITimestampedObjectMetadata>* track)
 {
     if (!NX_KIT_ASSERT(track))
@@ -60,6 +78,24 @@ void ObjectTrackInfo::setBestShotObjectMetadata(ITimestampedObjectMetadata* best
 
     bestShotObjectMetadata->addRef();
     m_bestShotObjectMetadata = nx::sdk::toPtr(bestShotObjectMetadata);
+}
+
+void ObjectTrackInfo::setBestShotImageData(std::vector<char> bestShotImageData)
+{
+    m_bestShotImageData = std::move(bestShotImageData);
+}
+
+void ObjectTrackInfo::setBestShotImageDataFormat(std::string bestShotImageDataFormat)
+{
+    m_bestShotImageDataFormat = std::move(bestShotImageDataFormat);
+}
+
+void ObjectTrackInfo::setBestShotImage(
+    std::vector<char> bestShotImageData,
+    std::string bestShotImageDataFormat)
+{
+    setBestShotImageData(std::move(bestShotImageData));
+    setBestShotImageDataFormat(std::move(bestShotImageDataFormat));
 }
 
 } // namespace analytics

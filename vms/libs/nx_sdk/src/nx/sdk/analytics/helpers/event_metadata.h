@@ -32,9 +32,11 @@ public:
     void setIsActive(bool isActive);
     void addAttribute(nx::sdk::Ptr<Attribute> attribute);
     void addAttributes(const std::vector<nx::sdk::Ptr<Attribute>>& value);
+    void setTrackId(Uuid trackId);
 
 protected:
     virtual const IAttribute* getAttribute(int index) const override;
+    virtual void getTrackId(Uuid* outValue) const override;
 
 private:
     std::string m_typeId;
@@ -43,6 +45,7 @@ private:
     std::string m_description;
     bool m_isActive = false;
     std::vector<nx::sdk::Ptr<Attribute>> m_attributes;
+    Uuid m_trackId;
 };
 
 } // namespace nx

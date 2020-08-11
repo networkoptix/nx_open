@@ -2,6 +2,10 @@
 
 #include "object_track_best_shot_packet.h"
 
+#include <algorithm>
+
+#include <nx/kit/debug.h>
+
 namespace nx {
 namespace sdk {
 namespace analytics {
@@ -30,6 +34,89 @@ int64_t ObjectTrackBestShotPacket::timestampUs() const
 void ObjectTrackBestShotPacket::getBoundingBox(Rect* outValue) const
 {
     *outValue = m_boundingBox;
+}
+
+const char* ObjectTrackBestShotPacket::imageUrl() const
+{
+    return m_imageUrl.c_str();
+}
+
+const char* ObjectTrackBestShotPacket::imageData() const
+{
+    return m_imageData.data();
+}
+
+int ObjectTrackBestShotPacket::imageDataSize() const
+{
+    return m_imageData.size();
+}
+
+const char* ObjectTrackBestShotPacket::imageDataFormat() const
+{
+    return m_imageDataFormat.c_str();
+}
+
+void ObjectTrackBestShotPacket::setImageUrl(std::string imageUrl)
+{
+    m_imageUrl = std::move(imageUrl);
+}
+
+void ObjectTrackBestShotPacket::setImageDataFormat(std::string imageDataFormat)
+{
+    m_imageDataFormat = std::move(imageDataFormat);
+}
+
+void ObjectTrackBestShotPacket::setImageData(std::vector<char> imageData)
+{
+    m_imageData = std::move(imageData);
+}
+
+void ObjectTrackBestShotPacket::setImage(std::string imageDataFormat, std::vector<char> imageData)
+{
+    setImageDataFormat(std::move(imageDataFormat));
+    setImageData(std::move(imageData));
+}
+
+const IAttribute* ObjectTrackBestShotPacket::getAttribute(int index) const
+{
+    if (index >= (int) m_attributes.size() || index < 0)
+        return nullptr;
+
+    m_attributes[index]->addRef();
+    return  m_attributes[index].get();
+}
+
+int ObjectTrackBestShotPacket::attributeCount() const
+{
+    return (int) m_attributes.size();
+}
+
+void ObjectTrackBestShotPacket::addAttribute(Ptr<Attribute> attribute)
+{
+    if (!NX_KIT_ASSERT(attribute))
+        return;
+
+    const auto existingAttribute = std::find_if(m_attributes.begin(), m_attributes.end(),
+        [attributeName = attribute->name()](const nx::sdk::Ptr<Attribute>& attribute)
+        {
+            return strcmp(attribute->name(), attributeName) == 0;
+        });
+
+    if (existingAttribute != m_attributes.end())
+    {
+        NX_KIT_ASSERT((*existingAttribute)->type() == attribute->type());
+        (*existingAttribute)->setValue(attribute->value());
+    }
+    else
+    {
+        m_attributes.push_back(std::move(attribute));
+    }
+}
+
+void ObjectTrackBestShotPacket::addAttributes(const std::vector<Ptr<Attribute>>& value)
+{
+    for (const auto& newAttribute: value)
+        addAttribute(newAttribute);
 }
 
 } // namespace analytics

@@ -763,10 +763,24 @@ std::vector<IMetadataPacket*> DeviceAgent::cookSomeObjects()
         {
             const auto position = object->position();
             const auto size = object->size();
-            result.push_back(new ObjectTrackBestShotPacket(
+            auto bestShotPacket = new ObjectTrackBestShotPacket(
                 object->id(),
                 metadataTimestampUs,
-                Rect(position.x, position.y, size.width, size.height)));
+                Rect(position.x, position.y, size.width, size.height));
+
+            if (!m_deviceAgentSettings.previewImageUrl.empty())
+            {
+                bestShotPacket->setImageUrl(m_deviceAgentSettings.previewImageUrl);
+            }
+            else if (!m_deviceAgentSettings.previewImage.empty()
+                && !m_deviceAgentSettings.previewImageFormat.empty())
+            {
+                bestShotPacket->setImage(
+                    m_deviceAgentSettings.previewImageFormat,
+                    m_deviceAgentSettings.previewImage);
+            }
+
+            result.push_back(bestShotPacket);
             context.isPreviewGenerated = true;
         }
 
@@ -989,6 +1003,26 @@ void DeviceAgent::parseSettings()
     assignNumericSetting(
         kCounterYOffsetSetting,
         &m_deviceAgentSettings.counterBoundingBoxYOffset);
+
+    std::unique_lock<std::mutex> lock(m_objectGenerationMutex);
+
+    const std::string previewPath = settingValue(kPreviewImageFileSetting);
+    m_deviceAgentSettings.previewImageUrl = std::string();
+
+    if (isHttpOrHttpsUrl(previewPath))
+    {
+        m_deviceAgentSettings.previewImageUrl = previewPath;
+    }
+    else
+    {
+        m_deviceAgentSettings.previewImageFormat = imageFormatFromPath(previewPath);
+        m_deviceAgentSettings.previewImage = m_deviceAgentSettings.previewImageFormat.empty()
+            ? std::vector<char>()
+            : loadFile(previewPath);
+
+        if (m_deviceAgentSettings.previewImage.empty())
+            m_deviceAgentSettings.previewImageFormat = std::string();
+    }
 }
 
 void DeviceAgent::updateObjectGenerationParameters()

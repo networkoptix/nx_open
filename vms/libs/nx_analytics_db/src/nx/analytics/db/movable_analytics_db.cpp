@@ -82,6 +82,22 @@ void MovableAnalyticsDb::lookup(
         std::move(completionHandler));
 }
 
+void MovableAnalyticsDb::lookupBestShot(
+    const QnUuid& trackId,
+    BestShotLookupCompletionHandler completionHandler)
+{
+    auto db = getDb();
+    if (!db)
+    {
+        NX_DEBUG(this, "Attempt to look up an image in a non-initialized Analytics DB");
+        return completionHandler(ResultCode::ok, BestShotEx());
+    }
+
+    return db->lookupBestShot(
+        trackId,
+        std::move(completionHandler));
+}
+
 void MovableAnalyticsDb::lookupTimePeriods(
     Filter filter,
     TimePeriodsLookupOptions options,

@@ -128,6 +128,8 @@ private:
     Qn::ThumbnailStatus m_previousStatus = Qn::ThumbnailStatus::Invalid;
     // Show "NO DATA" no matter what.
     bool m_noDataMode = false;
+    // Force no crop and no highlight for frames potentially pre-cropped by analytics plugin.
+    bool m_forceNoCrop = false;
 };
 
 } // namespace nx::vms::client::desktop

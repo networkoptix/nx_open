@@ -157,7 +157,7 @@ bool hasToggleState(
         if (!descriptor)
             return false;
 
-        return descriptor->flags.testFlag(nx::vms::api::analytics::stateDependent);
+        return descriptor->flags.testFlag(nx::vms::api::analytics::EventTypeFlag::stateDependent);
     }
     default:
         return false;

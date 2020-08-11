@@ -3,13 +3,13 @@
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/types_fwd.h>
 
-namespace nx::analytics::db {
+namespace nx::vms::server::archive {
 
 /**
  * Allows to find the nearest I-frame next to the specified time. It is used in analytics,
  * to round default bestShot timestamp to the nearest I-frame.
  */
-class NX_ANALYTICS_DB_API AbstractIframeSearchHelper
+class AbstractIframeSearchHelper
 {
 public:
     virtual ~AbstractIframeSearchHelper() = default;
@@ -28,4 +28,4 @@ public:
         qint64 timestampUs) const = 0;
 };
 
-} // namespace nx::analytics::db
+} // namespace nx::vms

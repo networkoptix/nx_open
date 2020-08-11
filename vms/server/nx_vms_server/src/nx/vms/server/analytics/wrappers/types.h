@@ -29,7 +29,6 @@ enum class SdkObjectType
     engine,
     deviceAgent,
 };
-
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SdkObjectType)
 
 enum class SdkMethod
@@ -54,10 +53,22 @@ enum class SdkMethod
     // DeviceAgent.
     setNeededMetadataTypes,
     pushDataPacket,
-    pushManifest,
+    iHandler_pushManifest,
+    iHandler_handleMetadata,
 };
-
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(SdkMethod);
+
+inline bool isSdkMethodCallback(SdkMethod method)
+{
+    switch (method)
+    {
+        case SdkMethod::iHandler_pushManifest:
+        case SdkMethod::iHandler_handleMetadata:
+            return true;
+        default:
+            return false;
+    }
+}
 
 enum class ViolationType
 {
@@ -74,8 +85,9 @@ enum class ViolationType
     inconsistentActionResult,
     invalidActionResultUrl,
     methodExecutionTookTooLong,
-};
 
+    invalidMetadataTimestamp,
+};
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ViolationType);
 
 struct Violation

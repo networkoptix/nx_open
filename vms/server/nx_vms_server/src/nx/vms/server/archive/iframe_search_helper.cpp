@@ -7,7 +7,7 @@
 
 using namespace nx::vms::api;
 
-namespace nx::vms::server::analytics {
+namespace nx::vms::server::archive {
 
 IframeSearchHelper::IframeSearchHelper(
     const QnResourcePool* resourcePool,
@@ -23,7 +23,7 @@ qint64 IframeSearchHelper::findAfter(
     nx::vms::api::StreamIndex streamIndex,
     qint64 timestampUs) const
 {
-    const auto resource = 
+    const auto resource =
         m_resourcePool->getResourceById(deviceId).dynamicCast<QnSecurityCamResource>();
     if (!resource)
         return -1;
@@ -43,4 +43,4 @@ qint64 IframeSearchHelper::findAfter(
     return iFrame->timestamp;
 }
 
-} // namespace nx::vms::server::analytics
+} // namespace nx::vms::server::archive

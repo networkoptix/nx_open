@@ -40,6 +40,16 @@ using Attributes = std::vector<Attribute>;
 //-------------------------------------------------------------------------------------------------
 static constexpr int kCoordinateDecimalDigits = 4;
 
+enum class ObjectMetadataType
+{
+    undefined,
+    regular,
+    bestShot,
+    externalBestShot, //< Best shot provided as a blob.
+};
+
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ObjectMetadataType)
+
 // TODO: #rvasilenko: This struct should NOT be used bot best shots, because it was originally
 // designed to match IObjectMetadata, and best shots are yielded by a plugin as
 // IObjectTrackBestShotPacket which has no relation to IObjectMetadata.
@@ -52,9 +62,23 @@ struct ObjectMetadata
      */
     QRectF boundingBox;
     Attributes attributes;
-    bool bestShot = false;
+    ObjectMetadataType objectMetadataType;
+    QnUuid analyticsEngineId;
+
+    bool isBestShot() const
+    {
+        return objectMetadataType == ObjectMetadataType::bestShot
+            || objectMetadataType == ObjectMetadataType::externalBestShot;
+    }
 };
-#define ObjectMetadata_Fields (typeId)(trackId)(boundingBox)(attributes)(bestShot)
+#define ObjectMetadata_Fields \
+    (typeId) \
+    (trackId) \
+    (boundingBox) \
+    (attributes) \
+    (objectMetadataType) \
+    (analyticsEngineId)
+
 QN_FUSION_DECLARE_FUNCTIONS(ObjectMetadata, (json)(ubjson));
 
 bool operator==(const ObjectMetadata& left, const ObjectMetadata& right);
@@ -75,7 +99,7 @@ struct ObjectMetadataPacket
         return std::any_of(
             objectMetadataList.cbegin(),
             objectMetadataList.cend(),
-            [](const ObjectMetadata& objectMetadata) { return objectMetadata.bestShot; });
+            [](const ObjectMetadata& objectMetadata) { return objectMetadata.isBestShot(); });
     }
 };
 
@@ -109,3 +133,5 @@ ObjectMetadataPacketPtr fromCompressedMetadataPacket(const QnConstCompressedMeta
 } // namespace metadata
 } // namespace common
 } // namespace nx
+
+QN_FUSION_DECLARE_FUNCTIONS(nx::common::metadata::ObjectMetadataType, (numeric))

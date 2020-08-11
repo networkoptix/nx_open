@@ -34,6 +34,7 @@ const std::string kBlinkingObjectInDedicatedPacketSetting{"blinkingObjectInDedic
 const std::string kGenerateObjectsEveryNFramesSetting{"generateObjectsEveryNFrames"};
 const std::string kNumberOfObjectsToGenerateSetting{"numberOfObjectsToGenerate"};
 const std::string kGeneratePreviewPacketSetting{"generatePreviewPacket"};
+const std::string kPreviewImageFileSetting{"previewImageFile"};
 const std::string kGeneratePreviewAfterNFramesSetting("generatePreviewAfterNFrames");
 const std::string kThrowPluginDiagnosticEventsFromDeviceAgentSetting{
     "throwPluginDiagnosticEventsFromDeviceAgent"};
@@ -227,6 +228,12 @@ static const std::string kRegularSettingsModelPart1 = /*suppress newline*/ 1 + R
                             "name": ")json" + kGeneratePreviewPacketSetting + R"json(",
                             "caption": "Generate preview packet",
                             "defaultValue": true
+                        },
+                        {
+                            "type": "TextArea",
+                            "name": ")json" + kPreviewImageFileSetting + R"json(",
+                            "caption": "Preview image file",
+                            "description": "Path to an image which should be used as a preview for tracks"
                         },
                         {
                             "type": "SpinBox",

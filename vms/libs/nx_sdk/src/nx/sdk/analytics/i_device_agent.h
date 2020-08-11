@@ -45,11 +45,16 @@ public:
         virtual void handlePluginDiagnosticEvent(IPluginDiagnosticEvent* event) = 0;
     };
 
+    /**
+     * Callback methods which allow to pass data from the Plugin to the Server. The methods can be
+     * called from any thread at any moment.
+     */
     class IHandler: public Interface<IHandler, IHandler0>
     {
     public:
         static auto interfaceId() { return makeId("nx::sdk::analytics::IDeviceAgent::IHandler1"); }
 
+        /** Must be called when the Plugin needs to change the data in the DeviceAgent manifest. */
         virtual void pushManifest(const IString* manifest) = 0;
     };
 

@@ -55,7 +55,7 @@ QString toString(const ObjectMetadata& objectMetadata)
         + ", height " + QString::number(objectMetadata.boundingBox.height())
         + ", trackId " + objectMetadata.trackId.toString();
 
-    if (objectMetadata.bestShot)
+    if (objectMetadata.isBestShot())
         return s;
 
     s += ", typeId " + objectMetadata.typeId + ", attributes {";

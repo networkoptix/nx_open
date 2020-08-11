@@ -82,6 +82,9 @@ struct ImageRequest
 
     /** Crop image. Values in range [0..1] */
     QRectF crop;
+
+    /** Analytics object track id. */
+    QnUuid objectTrackId;
 };
 
 struct ResourceImageRequest: ImageRequest

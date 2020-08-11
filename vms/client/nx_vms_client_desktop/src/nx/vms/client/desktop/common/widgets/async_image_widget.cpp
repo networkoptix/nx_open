@@ -11,10 +11,12 @@
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <nx/client/core/utils/geometry.h>
+#include <nx/fusion/model_functions.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/common/widgets/autoscaled_plain_text.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator.h>
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
+#include <nx/vms/client/desktop/image_providers/camera_thumbnail_provider.h>
 #include <nx/vms/client/desktop/image_providers/image_provider.h>
 #include <nx/vms/client/desktop/ini.h>
 
@@ -180,7 +182,7 @@ void AsyncImageWidget::setCropMode(CropMode value)
 
 bool AsyncImageWidget::cropRequired() const
 {
-    if (m_highlightRect.isEmpty())
+    if (m_forceNoCrop || m_highlightRect.isEmpty())
         return false;
 
     switch (m_cropMode)
@@ -288,7 +290,7 @@ void AsyncImageWidget::paintEvent(QPaintEvent* /*event*/)
     }
 
     // Draw highlight
-    if (!targetHighlightRect.isEmpty() && !croppedMode)
+    if (!targetHighlightRect.isEmpty() && !croppedMode && !m_forceNoCrop)
     {
         // Dim everything around highlighted area.
         if (targetImageRect != targetHighlightRect)
@@ -444,6 +446,9 @@ void AsyncImageWidget::updateCache()
     const QImage image = m_imageProvider ? m_imageProvider->image() : QImage();
     if (!image.isNull())
         m_preview = QPixmap::fromImage(image);
+
+    m_forceNoCrop = QnLexical::deserialized<bool>(
+        image.text(CameraThumbnailProvider::kFrameFromPluginKey));
 
     // Update geometry if we got new sizeHint value (probably due to new image).
     const QSize oldSizeHint = m_cachedSizeHint;

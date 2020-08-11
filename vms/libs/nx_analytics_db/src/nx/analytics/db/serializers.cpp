@@ -39,6 +39,12 @@ void TrackSerializer::deserialize(QnByteArrayConstRef* buf, QRect* rect)
 
 void TrackSerializer::serialize(const QRectF& rect, QByteArray* buf)
 {
+    if (rect.width() < 0 && rect.height() < 0)
+    {
+        serialize(QRect(-1, -1, -1, -1), buf);
+        return;
+    }
+
     serialize(
         translate(rect, kResolution),
         buf);
@@ -48,7 +54,10 @@ void TrackSerializer::deserialize(QnByteArrayConstRef* buf, QRectF* rect)
 {
     QRect translated;
     deserialize(buf, &translated);
-    *rect = translate(translated, kResolution);
+    if (translated.width() < 0 && translated.height() < 0)
+        *rect = QRectF(-1, -1, -1, -1);
+    else
+        *rect = translate(translated, kResolution);
 }
 
 void TrackSerializer::serialize(const ObjectRegion& data, QByteArray* buf)

@@ -7,12 +7,12 @@ namespace nx::analytics::db {
 ObjectTrackCache::ObjectTrackCache(
     std::chrono::milliseconds aggregationPeriod,
     std::chrono::milliseconds maxObjectLifetime,
-    AbstractIframeSearchHelper* helper)
+    AbstractObjectTrackBestShotCache* imageCache)
     :
     m_aggregationPeriod(aggregationPeriod),
     m_maxObjectLifetime(maxObjectLifetime),
     m_timerPool([this](const QnUuid& trackId) { removeTrack(trackId); }),
-    m_iframeHelper(helper)
+    m_imageCache(imageCache)
 {
 }
 
@@ -92,7 +92,7 @@ std::vector<ObjectTrackUpdate> ObjectTrackCache::getTracksToUpdate(bool flush)
     {
         if ((!flush && currentClock - ctx.lastReportTime < m_aggregationPeriod) ||
             !ctx.insertionReported ||
-            ctx.track.objectPosition.isEmpty())
+            (ctx.track.objectPosition.isEmpty() && !ctx.track.bestShot.initialized()))
         {
             continue;
         }
@@ -111,8 +111,7 @@ std::vector<ObjectTrackUpdate> ObjectTrackCache::getTracksToUpdate(bool flush)
         trackUpdate.lastAppearanceTimeUs = ctx.track.lastAppearanceTimeUs;
         trackUpdate.appendedAttributes = std::exchange(ctx.newAttributesSinceLastUpdate, {});
         trackUpdate.allAttributes = ctx.track.attributes;
-        if (ctx.track.bestShot.initialized())
-            trackUpdate.bestShot = ctx.track.bestShot;
+        trackUpdate.bestShot = std::exchange(ctx.track.bestShot, {});
 
         result.push_back(std::move(trackUpdate));
     }
@@ -290,39 +289,23 @@ void ObjectTrackCache::updateObject(
         std::max(trackContext.track.lastAppearanceTimeUs, packet.timestampUs);
 
     auto assignBestShotFromPacket =
-        [](ObjectTrack* outTrack, const auto& packet, const auto& boundingBox)
+        [this](ObjectTrack* outTrack, const auto& packet, const auto& boundingBox)
         {
             outTrack->bestShot.timestampUs = packet.timestampUs;
             outTrack->bestShot.rect = boundingBox;
             outTrack->bestShot.streamIndex = packet.streamIndex;
+            if (m_imageCache)
+            {
+                if (auto image = m_imageCache->fetch(outTrack->id))
+                    outTrack->bestShot.image = *image;
+            }
         };
 
-    if (objectMetadata.bestShot)
+    if (objectMetadata.isBestShot())
     {
-        assignBestShotFromPacket(&trackContext.track, packet, objectMetadata.boundingBox);
-        trackContext.roughBestShot = false; //< Do not auto reassign anymore.
         // "Best shot" packet contains only information about the best shot, not a real object movement.
-        return;
-    }
-
-    if (!trackContext.track.bestShot.initialized())
-    {
         assignBestShotFromPacket(&trackContext.track, packet, objectMetadata.boundingBox);
-        trackContext.roughBestShot = true; //< Auto-assign the first frame.
-    }
-
-    // Update best shot to the first I-frame of the track in case of it not being defined by driver.
-    if (trackContext.roughBestShot && m_iframeHelper)
-    {
-        using namespace nx::vms::api;
-        // TODO: Get stream index from the packet.
-        const auto timeUs = m_iframeHelper->findAfter(
-            trackContext.track.deviceId, packet.streamIndex, trackContext.track.bestShot.timestampUs);
-        if (timeUs >= trackContext.track.bestShot.timestampUs && timeUs <= packet.timestampUs)
-        {
-            assignBestShotFromPacket(&trackContext.track, packet, objectMetadata.boundingBox);
-            trackContext.roughBestShot = false; //< Do not auto-reassign anymore.
-        }
+        return;
     }
 
     addNewAttributes(objectMetadata.attributes, &trackContext);

@@ -16,6 +16,7 @@
 #include "camera_fwd.h"
 #include "nx/streaming/media_data_packet.h"
 #include <nx/vms/server/server_module_aware.h>
+#include <analytics/db/analytics_db_types.h>
 
 class CLVideoDecoderOutput;
 typedef CLVideoDecoderOutputPtr CLVideoDecoderOutputPtr;
@@ -32,6 +33,10 @@ class QnGetImageHelper: public /*mixin*/ nx::vms::server::ServerModuleAware
 public:
     QnGetImageHelper(QnMediaServerModule* serverModule);
 
+
+    std::optional<nx::analytics::db::BestShotEx> getTrackBestShot(
+        const nx::api::CameraImageRequest& request) const;
+
     CLVideoDecoderOutputPtr getImage(const nx::api::CameraImageRequest& request) const;
 
     QByteArray encodeImage(
@@ -40,6 +45,7 @@ public:
     nx::vms::api::StreamIndex determineStreamIndex(
         const nx::api::CameraImageRequest& request) const;
 
+    CLVideoDecoderOutputPtr getImageFromAnalyticsCache(nx::api::CameraImageRequest& request) const;
 private:
     CLVideoDecoderOutputPtr readFrame(
         const nx::api::CameraImageRequest& request,

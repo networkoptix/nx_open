@@ -23,7 +23,6 @@
 #include <nx/vms/server/sdk_support/utils.h>
 
 #include <nx/streaming/abstract_media_stream_data_provider.h>
-#include <nx/debugging/visual_metadata_debugger_factory.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/analytics/descriptor_manager.h>
 
@@ -36,7 +35,6 @@ namespace nx::vms::server::analytics {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
-using namespace nx::debugging;
 using nx::vms::server::resource::AnalyticsEngineResource;
 using namespace nx::vms::server::metrics;
 
@@ -280,7 +278,7 @@ void Manager::at_deviceStatusChanged(const QnResourcePtr& deviceResource)
 }
 
 void Manager::handleDeviceArrivalToServer(const resource::CameraPtr& device)
-{    
+{
     if (!NX_ASSERT(device))
         return;
 

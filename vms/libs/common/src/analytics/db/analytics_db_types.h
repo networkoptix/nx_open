@@ -17,6 +17,7 @@
 
 #include "abstract_object_type_dictionary.h"
 #include "text_search_utils.h"
+#include <nx/utils/latin1_array.h>
 
 class QnResourcePool;
 
@@ -57,21 +58,37 @@ struct ObjectRegion
 #define ObjectRegion_analytics_storage_Fields (boundingBoxGrid)
 QN_FUSION_DECLARE_FUNCTIONS(ObjectRegion, (json)(ubjson));
 
+struct Image
+{
+    QnLatin1Array imageDataFormat;
+    QByteArray imageData;
+
+    bool isEmpty() const { return imageData.isEmpty();  }
+};
+#define Image_analytics_storage_Fields (imageDataFormat)(imageData)
+QN_FUSION_DECLARE_FUNCTIONS(Image, (json)(ubjson));
+
 struct BestShot
 {
     qint64 timestampUs = 0;
-    QRectF rect;
+    QRectF rect = QRectF{-1, -1, -1, -1};
     nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::undefined;
+    Image image;
 
     bool initialized() const { return timestampUs > 0; }
-
-    bool operator==(const BestShot& right) const;
 };
 
 #define BestShot_analytics_storage_Fields \
-    (timestampUs)(rect)(streamIndex)
+    (timestampUs)(rect)(streamIndex)(image)
 
 QN_FUSION_DECLARE_FUNCTIONS(BestShot, (json)(ubjson));
+
+struct BestShotEx: public BestShot
+{
+    QnUuid deviceId;
+};
+#define BestShotEx_analytics_storage_Fields BestShot_analytics_storage_Fields(deviceId)
+QN_FUSION_DECLARE_FUNCTIONS(BestShotEx, (json)(ubjson));
 
 struct ObjectTrack
 {
@@ -147,6 +164,9 @@ struct Filter
     /** Found tracks are sorted by the minimum track time using this order. */
     Qt::SortOrder sortOrder = Qt::SortOrder::DescendingOrder;
 
+    /** If true, track with best shots only will be selected. */
+    bool withBestShotOnly = false;
+
     Filter();
 
     bool empty() const;
@@ -192,7 +212,7 @@ QString toString(const Filter& filter);
 
 #define Filter_analytics_storage_Fields \
     (deviceIds)(objectTypeId)(objectTrackId)(timePeriod)(boundingBox)(freeText)\
-    (maxObjectTracksToSelect)(needFullTrack)(sortOrder)
+    (maxObjectTracksToSelect)(needFullTrack)(sortOrder)(withBestShotOnly)
 QN_FUSION_DECLARE_FUNCTIONS(Filter, (json));
 
 //-------------------------------------------------------------------------------------------------
