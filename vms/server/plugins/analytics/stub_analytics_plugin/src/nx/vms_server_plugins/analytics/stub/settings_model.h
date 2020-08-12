@@ -40,7 +40,7 @@ const std::string kThrowPluginDiagnosticEventsFromDeviceAgentSetting{
     "throwPluginDiagnosticEventsFromDeviceAgent"};
 
 const std::string kThrowPluginDiagnosticEventsFromEngineSetting{
-    "throwPluginDiagnosticEventsFromDeviceAgent"};
+    "throwPluginDiagnosticEventsFromEngine"};
 const std::string kDisableStreamSelectionSetting{"disableStreamSelection"};
 const std::string kLeakFramesSetting{"leakFrames"};
 const std::string kAdditionalFrameProcessingDelayMsSetting{"additionalFrameProcessingDelayMs"};
