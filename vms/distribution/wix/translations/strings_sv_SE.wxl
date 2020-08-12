@@ -3,14 +3,14 @@
   <String Id="Caption">[WixBundleName] Inställning - [WixBundleVersion]</String>
   <String Id="Title">[WixBundleName] - [WixBundleVersion]</String>
   <String Id="Components">[InstallerTitle]</String>
-  <String Id="HelpText">/install | /repair | /uninstall | /layout [directory] - installs, repairs, uninstalls or
-   creates a complete local copy of the bundle in directory. Install is the default.
+  <String Id="HelpText">/ installera | / reparation | / avinstallera | / layout [directory] - installerar, reparerar, avinstallerar eller
+   skapar en komplett lokal kopia av paketet i katalogen. Installationen är standard.
 
-/passive | /quiet -  displays minimal UI with no prompts or displays no UI and
-   no prompts. By default UI and all prompts are displayed.
+/ passiv | / tyst - visar minimal UI utan anvisningar eller visar ingen UI och
+   inga anvisningar. Som standard visas UI och alla instruktioner.
 
-/norestart   - suppress any attempts to restart. By default UI will prompt before restart.
-/log log.txt - logs to a specific file. By default a log file is created in %TEMP%.</String>
+/ norestart - undertrycka alla försök att starta om. Som standard kommer UI att fråga innan omstart.
+/ log log.txt - loggar till en specifik fil. Som standard skapas en loggfil i %TEMP%.</String>
   <String Id="ConfirmCancelMessage">Är du säker på att du vill avbryta?</String>
   <String Id="ClientAndServer">Klient och Server</String>
   <String Id="ClientOnly">Endast klient</String>

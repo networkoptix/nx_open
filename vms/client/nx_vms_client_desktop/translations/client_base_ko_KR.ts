@@ -177,7 +177,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Browse Local Files</source>
-      <translation>현재 파일 찾아보기</translation>
+      <translation>로컬 파일 찾아보기</translation>
     </message>
     <message>
       <source>Show Welcome Screen</source>
@@ -4824,7 +4824,7 @@ to %1</source>
     </message>
     <message>
       <source>No local files</source>
-      <translation>로컬 파일이 아닌</translation>
+      <translation>로컬 파일 없음</translation>
     </message>
     <message>
       <source>Nothing found</source>
@@ -7285,7 +7285,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>높은</translation>
+      <translation>높음</translation>
     </message>
     <message>
       <source>Bst</source>
