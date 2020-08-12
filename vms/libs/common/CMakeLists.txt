@@ -32,6 +32,10 @@ nx_add_target(common LIBRARY
         cloud_db_client
 )
 
+if(LINUX)
+    add_dependencies(common libgl_stub)
+endif()
+
 if(NOT ANDROID AND NOT IOS)
     target_link_libraries(common PUBLIC quazip)
 endif()
