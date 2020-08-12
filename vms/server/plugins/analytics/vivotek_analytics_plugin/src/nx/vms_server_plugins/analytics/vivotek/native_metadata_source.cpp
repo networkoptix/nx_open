@@ -49,14 +49,15 @@ cf::future<cf::unit> NativeMetadataSource::enableDetailMetadata(Url url)
     m_vcaParameterApi.emplace(std::move(url));
     return m_vcaParameterApi->fetch("Config/AE")
         .then_unwrap(
-            [this](auto parameters)
+            [this](const JsonValue& parametersValue)
             {
-                auto webSocket = parameters["WebSocket"];
+                auto parameters = parametersValue.to<JsonObject>();
+                auto webSocket = parameters["WebSocket"].to<JsonObject>();
 
-                if (webSocket["DetailMetadata"].template to<bool>())
+                if (webSocket["DetailMetadata"].to<bool>())
                     return cf::make_ready_future(cf::unit());
 
-                webSocket["DetailMetadata"] = JsonValue(true);
+                webSocket["DetailMetadata"] = true;
                 parameters["WebSocket"] = webSocket;
 
                 return m_vcaParameterApi->store("Config/AE", parameters)
