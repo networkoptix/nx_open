@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.3.517",
+    "version": "4.1.3.518",
     "data": [
         {
             "keys": [
@@ -3850,9 +3850,10 @@
             }
         },
         {
-            "_comment1": "Mapped for 2.623.0000000.1.R, Build Date 2018-06-27",
+            "_comment1": "Mapped for 2.623.0000000.1.R, Build Date 2018-06-27, verified against 2.800.0000000.5.R, Build Date 2019-08-27",
             "keys": [
-                "Dahua|DH-SD59430U-HNI"
+                "Dahua|DH-SD59430U-HNI",
+                "Dahua|SD59430U-HNI"
             ],
             "forceONVIF": true,
             "ptzMapper": {
