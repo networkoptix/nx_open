@@ -92,8 +92,8 @@ private:
     std::vector<ObjectTrackEx> lookupInDb(nx::sql::QueryContext* queryContext);
 
     std::vector<ObjectTrackEx> mergeResults(
-        std::vector<ObjectTrackEx> newerTracks,
-        std::vector<ObjectTrackEx> olderTracks);
+        std::vector<ObjectTrackEx> dbTracks,
+        std::vector<ObjectTrackEx> cachedTracks);
 
     std::optional<ObjectTrack> fetchTrackById(
         nx::sql::QueryContext* queryContext,

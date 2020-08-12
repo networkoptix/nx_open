@@ -39,22 +39,27 @@ ObjectTrackSearcher::ObjectTrackSearcher(
 
 std::vector<ObjectTrackEx> ObjectTrackSearcher::lookup(nx::sql::QueryContext* queryContext)
 {
-    auto result = lookupInCache();
+    auto dbLookupResult = lookupInDb(queryContext);
+    auto cacheLookupResult = lookupInCache();
+
+    if (cacheLookupResult.empty())
+        return dbLookupResult;
+
+    if (m_filter.maxObjectTracksToSelect > 0 &&
+        (int)cacheLookupResult.size() > m_filter.maxObjectTracksToSelect)
+    {
+        cacheLookupResult.erase(cacheLookupResult.begin() + m_filter.maxObjectTracksToSelect, cacheLookupResult.end());
+    }
 
     // DB stores the following fields with millisecond precision. Doing the same here.
-    for (auto& track: result)
+    for (auto& track: cacheLookupResult)
     {
         track.firstAppearanceTimeUs = (track.firstAppearanceTimeUs / 1000) * 1000;
         track.lastAppearanceTimeUs = (track.lastAppearanceTimeUs / 1000) * 1000;
         track.bestShot.timestampUs = (track.bestShot.timestampUs / 1000) * 1000;
     }
 
-    if (m_filter.maxObjectTracksToSelect == 0 ||
-        (int) result.size() < m_filter.maxObjectTracksToSelect)
-    {
-        auto dbLookupResult = lookupInDb(queryContext);
-        result = mergeResults(std::move(result), std::move(dbLookupResult));
-    }
+    auto result = mergeResults(std::move(dbLookupResult), std::move(cacheLookupResult));
 
     auto comparator =
         [this](auto& left, auto& right)
@@ -190,36 +195,36 @@ std::vector<ObjectTrackEx> ObjectTrackSearcher::lookupInCache()
     return m_objectTrackCache.lookup(m_filter, m_objectTypeDictionary);
 }
 
-static void mergeObjectTracks(ObjectTrackEx* inOutNewTrack, ObjectTrackEx oldTrack)
+static void mergeObjectTracks(ObjectTrackEx* inOuDbTrack, ObjectTrackEx cachedTrack)
 {
-    if (!inOutNewTrack->bestShot.initialized() && oldTrack.bestShot.initialized())
-        inOutNewTrack->bestShot = oldTrack.bestShot;
+    if (cachedTrack.bestShot.initialized())
+        inOuDbTrack->bestShot = cachedTrack.bestShot;
+    inOuDbTrack->lastAppearanceTimeUs =
+        std::max(inOuDbTrack->lastAppearanceTimeUs, cachedTrack.lastAppearanceTimeUs);
 
-    oldTrack.objectPositionSequence.insert(
-        oldTrack.objectPositionSequence.end(),
-        inOutNewTrack->objectPositionSequence.begin(),
-        inOutNewTrack->objectPositionSequence.end());
-
-    inOutNewTrack->objectPositionSequence = std::move(oldTrack.objectPositionSequence);
+    std::move(
+        cachedTrack.objectPositionSequence.begin(),
+        cachedTrack.objectPositionSequence.end(),
+        std::back_inserter(inOuDbTrack->objectPositionSequence));
 }
 
 std::vector<ObjectTrackEx> ObjectTrackSearcher::mergeResults(
-    std::vector<ObjectTrackEx> newerTracks,
-    std::vector<ObjectTrackEx> olderTracks)
+    std::vector<ObjectTrackEx> dbTracks,
+    std::vector<ObjectTrackEx> cachedTracks)
 {
-    std::map<QnUuid /*trackId*/, std::size_t /*pos in vector*/> newerTracksById;
-    for (std::size_t i = 0; i < newerTracks.size(); ++i)
-        newerTracksById.emplace(newerTracks[i].id, i);
+    std::map<QnUuid /*trackId*/, std::size_t /*pos in vector*/> dbTracksById;
+    for (std::size_t i = 0; i < dbTracks.size(); ++i)
+        dbTracksById.emplace(dbTracks[i].id, i);
 
-    for (auto& oldTrack: olderTracks)
+    for (auto& cachedTrack: cachedTracks)
     {
-        if (const auto it = newerTracksById.find(oldTrack.id); it != newerTracksById.cend())
-            mergeObjectTracks(&newerTracks[it->second], std::move(oldTrack));
+        if (const auto it = dbTracksById.find(cachedTrack.id); it != dbTracksById.cend())
+            mergeObjectTracks(&dbTracks[it->second], std::move(cachedTrack));
         else
-            newerTracks.push_back(std::exchange(oldTrack, {}));
+            dbTracks.push_back(std::move(cachedTrack));
     }
 
-    return newerTracks;
+    return dbTracks;
 }
 
 std::optional<ObjectTrack> ObjectTrackSearcher::fetchTrackById(

@@ -234,6 +234,15 @@ std::vector<ObjectTrackEx> ObjectTrackCache::lookup(
         addTrackToOutput(ctx);
     }
 
+    // First, sorting tracks in descending order, because we always filtering the most recent
+    // tracks and filter.sortOrder is applied AFTER filtering.
+    std::sort(
+        result.begin(), result.end(),
+        [](const ObjectTrack& left, const ObjectTrack& right)
+        {
+            return left.firstAppearanceTimeUs > right.firstAppearanceTimeUs;
+        });
+
     return result;
 }
 
