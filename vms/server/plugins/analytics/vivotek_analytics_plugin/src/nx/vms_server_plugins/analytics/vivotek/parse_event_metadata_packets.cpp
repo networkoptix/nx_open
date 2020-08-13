@@ -1,7 +1,6 @@
 #include "parse_event_metadata_packets.h"
 
 #include <nx/sdk/analytics/helpers/event_metadata.h>
-#include <nx/sdk/analytics/helpers/event_metadata_packet.h>
 
 #include "event_types.h"
 #include "utils.h"
@@ -25,7 +24,7 @@ const EventType* findEventType(const QString& native)
     return nullptr;
 }
 
-Ptr<IEventMetadataPacket> parsePacket(const JsonObject& behaviorAlarmInfo)
+Ptr<EventMetadataPacket> parsePacket(const JsonObject& behaviorAlarmInfo)
 {
     auto packet = makePtr<EventMetadataPacket>();
 
@@ -54,9 +53,9 @@ Ptr<IEventMetadataPacket> parsePacket(const JsonObject& behaviorAlarmInfo)
 
 } // namespace
 
-std::vector<Ptr<IEventMetadataPacket>> parseEventMetadataPackets(const JsonValue& native)
+std::vector<Ptr<EventMetadataPacket>> parseEventMetadataPackets(const JsonValue& native)
 {
-    std::vector<Ptr<IEventMetadataPacket>> packets;
+    std::vector<Ptr<EventMetadataPacket>> packets;
 
     if (native["Tag"].to<QString>() != "Event")
         return packets;

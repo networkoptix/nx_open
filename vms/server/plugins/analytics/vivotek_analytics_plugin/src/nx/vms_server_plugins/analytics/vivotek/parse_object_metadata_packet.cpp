@@ -7,7 +7,6 @@
 #include <nx/sdk/analytics/point.h>
 #include <nx/sdk/analytics/rect.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
-#include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/utils/log/log_message.h>
 
 #include "camera_vca_parameter_api.h"
@@ -120,7 +119,7 @@ Ptr<IObjectMetadata> parseMetadata(const JsonObject& object)
 
 } // namespace
 
-Ptr<IObjectMetadataPacket> parseObjectMetadataPacket(const JsonValue& native)
+Ptr<ObjectMetadataPacket> parseObjectMetadataPacket(const JsonValue& native)
 {
     if (native["Tag"].to<QString>() != "MetaData")
         return nullptr;
@@ -131,6 +130,7 @@ Ptr<IObjectMetadataPacket> parseObjectMetadataPacket(const JsonValue& native)
     auto packet = makePtr<ObjectMetadataPacket>();
 
     packet->setTimestampUs(parseIsoTimestamp(native["Frame"]["UtcTime"].to<QString>()));
+    packet->setDurationUs(1'000'000);
 
     const auto objects = native["Frame"]["Objects"].to<JsonArray>();
     for (int i = 0; i < objects.count(); ++i)

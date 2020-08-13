@@ -13,10 +13,19 @@ class NX_UTILS_API TimeHelper
 public:
     using GetCurrentTimeFunc = std::function<std::chrono::microseconds()>;
 
+    /*!
+     * \param getCurrentTimeFunc Getter for reference clock
+     */
     TimeHelper(const QString& resourceId, GetCurrentTimeFunc getCurrentTimeFunc);
+
     virtual ~TimeHelper();
 
+    /*!
+     * \param cameraTimeUs Camera clock timestamp
+     * \returns Reference clock timestamp corresponding to `cameraTimeUs`
+     */
     qint64 getCurrentTimeUs(qint64 cameraTimeUs);
+
     QString getResourceId() const { return m_resourceId; }
 
 protected:

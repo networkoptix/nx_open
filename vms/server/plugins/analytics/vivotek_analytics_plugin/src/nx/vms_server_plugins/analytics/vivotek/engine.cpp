@@ -2,6 +2,7 @@
 
 #include <string_view>
 #include <exception>
+#include <utility>
 
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>
@@ -22,8 +23,9 @@ using namespace nx::kit;
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine():
-    nx::sdk::analytics::Engine(NX_DEBUG_ENABLE_OUTPUT)
+Engine::Engine(Ptr<IUtilityProvider> utilityProvider):
+    nx::sdk::analytics::Engine(NX_DEBUG_ENABLE_OUTPUT),
+    m_utilityProvider(std::move(utilityProvider))
 {
 }
 
@@ -41,7 +43,7 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
 {
     try
     {
-        *outResult = new DeviceAgent(deviceInfo);
+        *outResult = new DeviceAgent(deviceInfo, m_utilityProvider);
     }
     catch (const Exception& exception)
     {

@@ -12,6 +12,7 @@
 #include <nx/sdk/analytics/i_object_metadata_packet.h>
 #include <nx/sdk/analytics/i_event_metadata_packet.h>
 #include <nx/utils/thread/cf/cfuture.h>
+#include <nx/utils/time_helper.h>
 #include <nx/network/aio/basic_pollable.h>
 #include <nx/network/aio/timer.h>
 
@@ -27,7 +28,9 @@ class DeviceAgent:
     public nx::sdk::RefCountable<nx::sdk::analytics::IDeviceAgent>
 {
 public:
-    explicit DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo);
+    explicit DeviceAgent(
+        const nx::sdk::IDeviceInfo* deviceInfo,
+        nx::sdk::Ptr<nx::sdk::IUtilityProvider> utilityProvider);
 
 protected:
     virtual void doSetSettings(
@@ -63,6 +66,8 @@ private:
     const std::unique_ptr<nx::network::aio::BasicPollable> m_basicPollable;
     const nx::sdk::LogUtils m_logUtils;
     const nx::utils::Url m_url; //< `http://username:password@host:port` only
+
+    nx::utils::TimeHelper m_timestampAdjuster;
 
     nx::sdk::Ptr<IHandler> m_handler;
 

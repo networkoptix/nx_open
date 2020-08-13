@@ -55,7 +55,9 @@ const auto ignoreCancellation =
 
 } // namespace
 
-DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo):
+DeviceAgent::DeviceAgent(
+    const nx::sdk::IDeviceInfo* deviceInfo, Ptr<IUtilityProvider> utilityProvider)
+:
     m_basicPollable(std::make_unique<aio::BasicPollable>()),
     m_logUtils(NX_DEBUG_ENABLE_OUTPUT,
         NX_FMT("[%1_device_%2]", libContext().name(), deviceInfo->id()).toStdString()),
@@ -63,7 +65,12 @@ DeviceAgent::DeviceAgent(const nx::sdk::IDeviceInfo* deviceInfo):
         .setUserName(deviceInfo->login())
         .setPassword(deviceInfo->password())
         .setPath("")
-        .toUrl())
+        .toUrl()),
+    m_timestampAdjuster("",
+        [utilityProvider = std::move(utilityProvider)]()
+        {
+            return std::chrono::milliseconds(utilityProvider->vmsSystemTimeSinceEpochMs());
+        })
 {
 }
 
@@ -305,9 +312,15 @@ void DeviceAgent::streamMetadataPackets()
             [this](const auto& nativePacket)
             {
                 if (auto packet = parseObjectMetadataPacket(nativePacket))
+                {
+                    packet->setTimestampUs(m_timestampAdjuster.getCurrentTimeUs(packet->timestampUs()));
                     m_handler->handleMetadata(packet.releasePtr());
+                }
                 for (auto& packet: parseEventMetadataPackets(nativePacket))
+                {
+                    packet->setTimestampUs(m_timestampAdjuster.getCurrentTimeUs(packet->timestampUs()));
                     m_handler->handleMetadata(packet.releasePtr());
+                }
 
                 streamMetadataPackets();
 
