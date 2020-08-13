@@ -195,17 +195,17 @@ std::vector<ObjectTrackEx> ObjectTrackSearcher::lookupInCache()
     return m_objectTrackCache.lookup(m_filter, m_objectTypeDictionary);
 }
 
-static void mergeObjectTracks(ObjectTrackEx* inOuDbTrack, ObjectTrackEx cachedTrack)
+static void mergeObjectTracks(ObjectTrackEx* inOutDbTrack, ObjectTrackEx cachedTrack)
 {
     if (cachedTrack.bestShot.initialized())
-        inOuDbTrack->bestShot = cachedTrack.bestShot;
-    inOuDbTrack->lastAppearanceTimeUs =
-        std::max(inOuDbTrack->lastAppearanceTimeUs, cachedTrack.lastAppearanceTimeUs);
+        inOutDbTrack->bestShot = cachedTrack.bestShot;
+    inOutDbTrack->lastAppearanceTimeUs =
+        std::max(inOutDbTrack->lastAppearanceTimeUs, cachedTrack.lastAppearanceTimeUs);
 
     std::move(
         cachedTrack.objectPositionSequence.begin(),
         cachedTrack.objectPositionSequence.end(),
-        std::back_inserter(inOuDbTrack->objectPositionSequence));
+        std::back_inserter(inOutDbTrack->objectPositionSequence));
 }
 
 std::vector<ObjectTrackEx> ObjectTrackSearcher::mergeResults(
