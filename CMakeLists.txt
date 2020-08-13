@@ -5,7 +5,7 @@ include(cmake/option.cmake)
 include(cmake/default_target.cmake)
 
 set(customization "default" CACHE STRING "Product customization")
-nx_option(beta "Whether this build is a beta build" ON)
+set(publicationType "local" CACHE STRING "Product publication type")
 set(buildNumber "0" CACHE STRING "Build number")
 set(eulaVersionOverride "" CACHE STRING "Overriden EULA version")
 
@@ -36,12 +36,6 @@ set(box "none")
 
 if(targetDevice STREQUAL "none")
     set(targetDevice "")
-endif()
-
-if(beta)
-    set(beta_bool "true")
-else()
-    set(beta_bool "false")
 endif()
 
 if(NOT CMAKE_TOOLCHAIN_FILE AND targetDevice)

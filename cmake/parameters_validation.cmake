@@ -42,3 +42,21 @@ if(hardwareSigning AND NOT hardware_signing IN_LIST skipConfigurationChecks)
             PRINT_VARIABLES hardwareSigning customization)
     endif()
 endif()
+
+set(_allowedPublicationTypes "local" "private" "private_patch" "patch" "beta" "rc" "release")
+if(NOT ${publicationType} IN_LIST _allowedPublicationTypes)
+    string(JOIN ", " _allowedPublicationTypesList ${_allowedPublicationTypes})
+    nx_fail_configuration_check(publication_type
+        DESCRIPTION "publicationType must be one of the following values: ${_allowedPublicationTypesList}"
+        PRINT_VARIABLES publicationType)
+    unset(_allowedPublicationTypesList)
+endif()
+unset(_allowedPublicationTypes)
+
+set(_allowedPublicationTypesWithCustomCloud "local" "private")
+if(NOT ${publicationType} IN_LIST _allowedPublicationTypesWithCustomCloud AND NOT ${cloudGroup} STREQUAL "prod")
+    nx_fail_configuration_check(publication_type_cloud
+        DESCRIPTION "Only private and local builds can have custom cloud group"
+        PRINT_VARIABLES publicationType cloudGroup)
+endif()
+unset(_allowedPublicationTypesWithCustomCloud)

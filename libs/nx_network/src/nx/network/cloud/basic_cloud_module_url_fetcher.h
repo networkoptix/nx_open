@@ -42,7 +42,6 @@ public:
         vmsVersionBugfix,
         vmsVersionBuild,
         vmsVersionFull,
-        vmsBeta,
         vmsCustomization,
         cdbUrl,
         hpmUrl,
@@ -272,9 +271,6 @@ private:
         inputData.put(
             CloudInstanceSelectionAttributeNameset::vmsVersionFull,
             nx::utils::AppInfo::applicationVersion());
-        inputData.put(
-            CloudInstanceSelectionAttributeNameset::vmsBeta,
-            QString::fromLatin1(nx::utils::AppInfo::beta() ? "true" : "false"));
         inputData.put(
             CloudInstanceSelectionAttributeNameset::vmsCustomization,
             nx::utils::AppInfo::customizationName());

@@ -19,7 +19,6 @@ CloudInstanceSelectionAttributeNameset::CloudInstanceSelectionAttributeNameset()
     registerResource(vmsVersionBugfix, "vms.version.bugfix", QVariant::Int);
     registerResource(vmsVersionBuild, "vms.version.build", QVariant::Int);
     registerResource(vmsVersionFull, "vms.version.full", QVariant::String);
-    registerResource(vmsBeta, "vms.beta", QVariant::String);
     registerResource(vmsCustomization, "vms.customization", QVariant::String);
     registerResource(cdbUrl, kCloudDbModuleName, QVariant::String);
 

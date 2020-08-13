@@ -1,4 +1,6 @@
 version=@parsedVersion.majorVersion@.@parsedVersion.minorVersion@.@parsedVersion.incrementalVersion@.@buildNumber@
+fullVersion=@releaseVersion@.@buildNumber@-@changeSet@-@customization@@publication_type_suffix@
+publicationType=@publicationType@
 customization=@customization@
 cloudHost=@cloudHost@
 cloudGroup=@cloudGroup@
@@ -8,7 +10,6 @@ platformModification=@modification@
 changeSet=@changeSet@
 branch=@branch@
 currentRefs=@currentRefs@
-beta=@beta_bool@
 brand=@customization.brand@
 protoVersion=@vmsProtocolVersion@
 metaVersion=@metaVersion@

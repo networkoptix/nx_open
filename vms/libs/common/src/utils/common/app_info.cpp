@@ -33,11 +33,6 @@ QString QnAppInfo::armBox()
     return nx::utils::AppInfo::armBox();
 }
 
-bool QnAppInfo::beta()
-{
-    return nx::utils::AppInfo::beta();
-}
-
 QString QnAppInfo::customizationName()
 {
     return nx::utils::AppInfo::customizationName();

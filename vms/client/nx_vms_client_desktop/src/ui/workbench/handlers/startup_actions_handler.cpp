@@ -278,8 +278,13 @@ void StartupActionsHandler::handleStartupParameters()
 
     submitDelayedDrops();
 
+    // Show beta version for all publication types except releases and montly patches.
+    const bool nonPublicVersion =
+        nx::utils::AppInfo::publicationType() != nx::utils::PublicationType::patch
+        && nx::utils::AppInfo::publicationType() != nx::utils::PublicationType::release;
+
     // Show beta version warning message for the main instance only.
-    const bool showBetaWarning = nx::utils::AppInfo::beta()
+    const bool showBetaWarning = nonPublicVersion
         && !startupParameters.allowMultipleClientInstances
         && !ini().developerMode;
 

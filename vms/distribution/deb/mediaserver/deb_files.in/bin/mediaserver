@@ -9,8 +9,7 @@ EXE="$VMS_DIR/bin/mediaserver-bin"
 ARGS="-e"
 
 source "$VMS_DIR/build_info.txt"
-FULL_VERSION="$version-$changeSet-$customization"
-[ ! -z "$beta" ] && FULL_VERSION+="-beta"
+FULL_VERSION="$fullVersion"
 
 detect_HW_PLATFORM()
 {
