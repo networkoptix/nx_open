@@ -66,7 +66,7 @@ DeviceAgent::DeviceAgent(
         .setPassword(deviceInfo->password())
         .setPath("")
         .toUrl()),
-    m_timestampAdjuster("",
+    m_timestampAdjuster(deviceInfo->url(),
         [utilityProvider = std::move(utilityProvider)]()
         {
             return std::chrono::milliseconds(utilityProvider->vmsSystemTimeSinceEpochMs());
