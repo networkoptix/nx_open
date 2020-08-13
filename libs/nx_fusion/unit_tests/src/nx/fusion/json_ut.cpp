@@ -91,6 +91,27 @@ struct BriefMockDataWithQList
 };
 #define BriefMockDataWithQList_Fields (items)
 
+struct BriefMockWithDefaults
+{
+    bool boolean = true;
+    int integer = 42;
+    QString string = "string";
+    nx::TestFlag flag = nx::Flag1;
+    std::vector<QString> vector = {"v0"};
+
+    bool operator==(const BriefMockWithDefaults& other) const
+    {
+        return boolean == other.boolean
+            && integer == other.integer
+            && string == other.string
+            && flag == other.flag
+            && vector == other.vector;
+    }
+
+    bool operator!=(const BriefMockWithDefaults& other) const { return !(*this == other); }
+};
+#define BriefMockWithDefaults_Fields (boolean)(integer)(string)(flag)(vector)
+
 struct MapKey
 {
     QnUuid uuidField;
@@ -188,6 +209,7 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (BriefMockData)
     (BriefMockDataWithVector)
     (BriefMockDataWithQList)
+    (BriefMockWithDefaults)
     (MapKey),
     (json), _Fields, (brief, true))
 
@@ -460,6 +482,34 @@ TEST_F(QnJsonTextFixture, serializeEmptyQListBrief)
     const QByteArray jsonStr = QString(R"json({})json").toUtf8();
     ASSERT_EQ(jsonStr, QJson::serialized(data));
     ASSERT_EQ(data, QJson::deserialized<BriefMockDataWithQList>(jsonStr));
+}
+
+TEST_F(QnJsonTextFixture, briefWithDefaultsSimetry)
+{
+    BriefMockWithDefaults data;
+    const QByteArray jsonStr =
+        R"json({"boolean":true,"flag":"Flag1","integer":42,"string":"string","vector":["v0"]})json";
+    EXPECT_EQ(jsonStr, QJson::serialized(data));
+    EXPECT_EQ(data, QJson::deserialized<BriefMockWithDefaults>(jsonStr));
+}
+
+TEST_F(QnJsonTextFixture, DISABLED_briefWithDefaultsNullsSimetry)
+{
+    BriefMockWithDefaults data{false, 0, "", nx::Flag0, {}};
+    const QByteArray jsonStr = R"json({"boolean":false,"flag":"Flag0","integer":0})json";
+    EXPECT_EQ(jsonStr, QJson::serialized(data));
+
+    // Test fails here due ot string and vector defaults.
+    EXPECT_EQ(data, QJson::deserialized<BriefMockWithDefaults>(jsonStr));
+}
+
+TEST_F(QnJsonTextFixture, briefWithDefaultsNotNullsSimetry)
+{
+    BriefMockWithDefaults data{true, 777, "not-null", nx::Flag2, {"v8"}};
+    const QByteArray jsonStr =
+        R"json({"boolean":true,"flag":"Flag2","integer":777,"string":"not-null","vector":["v8"]})json";
+    EXPECT_EQ(jsonStr, QJson::serialized(data));
+    EXPECT_EQ(data, QJson::deserialized<BriefMockWithDefaults>(jsonStr));
 }
 
 TEST_F(QnJsonTextFixture, serializeMapToObjects)
