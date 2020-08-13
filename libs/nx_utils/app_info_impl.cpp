@@ -5,7 +5,38 @@
 
 #include "nx/utils/app_info.h"
 
+#include <QtCore/QMap>
+
 namespace nx::utils {
+
+namespace {
+
+static const QMap<QString, PublicationType> kPublicationTypeNames{
+    {"local", PublicationType::local},
+    {"private", PublicationType::private_build},
+    {"private_patch", PublicationType::private_patch},
+    {"patch", PublicationType::patch},
+    {"beta", PublicationType::beta},
+    {"rc", PublicationType::rc},
+    {"release", PublicationType::release},
+};
+
+} // namespace
+
+QString AppInfo::toString(PublicationType publicationType)
+{
+    return kPublicationTypeNames.key(publicationType);
+}
+
+QString AppInfo::publicationTypeSuffix()
+{
+    return "${publication_type_suffix}";
+}
+
+PublicationType AppInfo::publicationType()
+{
+    return kPublicationTypeNames.value("${publicationType}", PublicationType::local);
+}
 
 QString AppInfo::vmsName()
 {
@@ -15,11 +46,6 @@ QString AppInfo::vmsName()
 QString AppInfo::brand()
 {
     return "${customization.brand}";
-}
-
-bool AppInfo::beta()
-{
-    return ${beta};
 }
 
 QString AppInfo::applicationVersion()
@@ -43,12 +69,11 @@ QString AppInfo::customizationName()
 
 QString AppInfo::applicationFullVersion()
 {
-    static const QString kBeta = beta() ? "-beta" : QString();
     static const QString kFullVersion = QString("%1-%2-%3%4")
         .arg(applicationVersion())
         .arg(applicationRevision())
         .arg(customizationName().replace(L' ', L'_'))
-        .arg(kBeta);
+        .arg(publicationTypeSuffix());
 
     return kFullVersion;
 }

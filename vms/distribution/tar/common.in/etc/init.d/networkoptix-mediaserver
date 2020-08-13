@@ -37,8 +37,7 @@ export SASL_PATH="$LIBS_DIR/sasl2"
 RUN_ARGS="-e"
 
 source "$INSTALL_DIR/build_info.txt"
-FULL_VERSION="$version-$changeSet-$customization"
-[ ! -z "$beta" ] && FULL_VERSION+="-beta"
+FULL_VERSION="$fullVersion"
 
 #--------------------------------------------------------------------------------------------------
 

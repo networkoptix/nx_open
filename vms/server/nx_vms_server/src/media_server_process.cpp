@@ -1315,7 +1315,7 @@ void MediaServerProcess::saveServerInfo(const QnMediaServerResourcePtr& server)
     server->setProperty(Server::kPhysicalMemory, QString::number(hwInfo.physicalMemory));
     server->setProperty(Server::kBrand, AppInfo::brand());
     server->setProperty(Server::kFullVersion, AppInfo::applicationFullVersion());
-    server->setProperty(Server::kBeta, QString::number(AppInfo::beta() ? 1 : 0));
+    server->setProperty(Server::kPublicationType, AppInfo::toString(AppInfo::publicationType()));
     server->setProperty(Server::kPublicIp, m_ipDiscovery->publicIP().toString());
     server->setProperty(Server::kSystemRuntime,
         nx::vms::api::SystemInformation::currentSystemRuntime());

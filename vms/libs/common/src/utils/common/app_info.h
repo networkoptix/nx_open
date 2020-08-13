@@ -28,7 +28,6 @@ public:
     static Q_INVOKABLE QString sigarVersion();
     static Q_INVOKABLE QString boostVersion();
     static Q_INVOKABLE QString armBox();
-    static Q_INVOKABLE bool    beta();
 
     static Q_INVOKABLE QString customizationName();
 

@@ -4,9 +4,39 @@
 
 namespace nx::utils {
 
+enum class PublicationType
+{
+    /** Local developer build. */
+    local,
+
+    /** Private build for QA team. */
+    private_build,
+
+    /** Private patch for a single setup. */
+    private_patch,
+
+    /** Regular monthy patch. */
+    patch,
+
+    /** Public beta version. */
+    beta,
+
+    /** Public release candidate. */
+    rc,
+
+    /** Public release. */
+    release,
+};
+
 class NX_UTILS_API AppInfo
 {
 public:
+    static QString toString(PublicationType publicationType);
+
+    /** Publication type in form of suffix - empty for release, starts with defis for other types. */
+    static QString publicationTypeSuffix();
+
+    static PublicationType publicationType();
 
     /**
      * Customization VMS name. Used for the display purposes.
@@ -19,7 +49,6 @@ public:
     static QString brand();
 
     static QString applicationFullVersion();
-    static bool beta();
     static QString applicationVersion();
     static QString applicationRevision();
     static QString customizationName();

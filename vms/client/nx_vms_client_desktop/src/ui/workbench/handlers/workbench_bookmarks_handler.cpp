@@ -196,23 +196,6 @@ void QnWorkbenchBookmarksHandler::at_addCameraBookmarkAction_triggered()
 
     QnTimePeriod period = parameters.argument<QnTimePeriod>(Qn::TimePeriodRole);
 
-    /*
-     * This check can be safely omitted in release - it is better to add bookmark on another server than do not
-     * add bookmark at all.
-     * // TODO: #GDM #bookmarks remember this when we will implement bookmarks timeout locking
-     */
-    if (QnAppInfo::beta())
-    {
-        QnMediaServerResourcePtr server = cameraHistoryPool()->getMediaServerOnTime(camera, period.startTimeMs);
-        if (!server || server->getStatus() != Qn::Online)
-        {
-            QnMessageBox::warning(mainWindowWidget(),
-                tr("Server offline"),
-                tr("Bookmarks can only be added to an online server."));
-            return;
-        }
-    }
-
     QnCameraBookmark bookmark;
     // This should be assigned before loading data to the dialog.
     bookmark.guid = QnUuid::createUuid();

@@ -104,7 +104,7 @@ namespace ResourcePropertyKey
         // TODO: #rvasilenko can we change the property text safely?
         static const QString kBrand("productNameShort");
         static const QString kFullVersion("fullVersion");
-        static const QString kBeta("beta");
+        static const QString kPublicationType("publicationType");
         static const QString kPublicIp("publicIp");
         static const QString kSystemRuntime("systemRuntime");
         static const QString kNetworkInterfaces("networkInterfaces");
