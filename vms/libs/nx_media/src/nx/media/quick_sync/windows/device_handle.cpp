@@ -6,10 +6,6 @@
 #include <stdio.h>
 #include <system_error>
 
-#include "GL/glew.h"
-#include "GL/wglew.h"
-#include "GL/gl.h"
-
 #include "device_handle.h"
 
 #include <nx/utils/log/log.h>

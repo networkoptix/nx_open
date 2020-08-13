@@ -172,6 +172,13 @@ copyLibs()
             libgstpbutils-0.10.so.0 \
             libgstvideo-0.10.so.0
     fi
+
+    if ["$ARCH" != "arm64" && "$ARCH" != "arm"]
+    then
+        distrib_copySystemLibs "$STAGE_LIB" \
+            libva.so.2.600.0 \
+            libva-x11.so.2.600.0
+    fi
 }
 
 # [in] STAGE_MODULE

@@ -1,9 +1,5 @@
 #ifdef _WIN32
 
-#include "GL/glew.h"
-#include "GL/wglew.h"
-#include "GL/gl.h"
-
 #include "directx_utils.h"
 
 #include <array>
