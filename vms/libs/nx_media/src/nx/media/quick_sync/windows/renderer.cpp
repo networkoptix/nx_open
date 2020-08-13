@@ -1,9 +1,4 @@
-
 #ifdef _WIN32
-
-#include "GL/glew.h"
-#include "GL/wglew.h"
-#include "GL/gl.h"
 
 #include <QtGui/QOffscreenSurface>
 #include <QtGui/QOpenGLContext>
@@ -14,7 +9,20 @@
 
 #include <nx/utils/log/log.h>
 
+#define WGL_ACCESS_READ_ONLY_NV 0x0000
+
 namespace nx::media::quick_sync::windows {
+
+typedef BOOL (WINAPI * PFNWGLSWAPINTERVALEXTPROC) (int interval);
+typedef BOOL (WINAPI * PFNWGLDXCLOSEDEVICENVPROC) (HANDLE hDevice);
+typedef BOOL (WINAPI * PFNWGLDXLOCKOBJECTSNVPROC) (HANDLE hDevice, GLint count, HANDLE* hObjects);
+typedef HANDLE (WINAPI * PFNWGLDXOPENDEVICENVPROC) (void* dxDevice);
+typedef HANDLE (WINAPI * PFNWGLDXREGISTEROBJECTNVPROC) (HANDLE hDevice, void* dxObject, GLuint name, GLenum type, GLenum access);
+typedef BOOL (WINAPI * PFNWGLDXSETRESOURCESHAREHANDLENVPROC) (void* dxObject, HANDLE shareHandle);
+typedef BOOL (WINAPI * PFNWGLDXUNLOCKOBJECTSNVPROC) (HANDLE hDevice, GLint count, HANDLE* hObjects);
+typedef BOOL (WINAPI * PFNWGLDXUNREGISTEROBJECTNVPROC) (HANDLE hDevice, HANDLE hObject);
+
+typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShareContext, const int* attribList);
 
 bool convertToRgb(
     IDirect3DDevice9Ex *pDevice, mfxFrameSurface1* mfxSurface, IDirect3DSurface9* pSharedSurface)
@@ -134,23 +142,15 @@ bool Renderer::init(
     GLuint PixelFormat = ChoosePixelFormat(m_dc, &pfd);
     SetPixelFormat(m_dc, PixelFormat, &pfd);
     m_rc = wglCreateContext(m_dc);
-
-    wglMakeCurrent(m_dc, m_rc);
-
-    GLenum err = glewInit();
-    if (GLEW_OK != err)
-    {
-        NX_DEBUG(this, "Failed init glew: %1", glewGetErrorString(err));
-        return false;
-    }
-    wglSwapIntervalEXT(0);
-
-    wglMakeCurrent(nullptr, nullptr);
     return true;
 }
 
 void Renderer::unregisterTexture()
 {
+    wglMakeCurrent(m_dc, m_rc);
+    auto wglDXUnregisterObjectNV = (PFNWGLDXUNREGISTEROBJECTNVPROC)wglGetProcAddress("wglDXUnregisterObjectNV");
+    auto wglDXCloseDeviceNV = (PFNWGLDXCLOSEDEVICENVPROC)wglGetProcAddress("wglDXCloseDeviceNV");
+
     if (m_textureHandle)
     {
         wglDXUnregisterObjectNV(m_renderDeviceHandle, m_textureHandle);
@@ -162,6 +162,7 @@ void Renderer::unregisterTexture()
         wglDXCloseDeviceNV(m_renderDeviceHandle);
         m_renderDeviceHandle = 0;
     }
+    wglMakeCurrent(NULL, NULL);
 }
 
 bool Renderer::registerTexture(GLuint textureId, QOpenGLContext* context)
@@ -169,6 +170,10 @@ bool Renderer::registerTexture(GLuint textureId, QOpenGLContext* context)
     HGLRC guiGlrc = context->nativeHandle().value<QWGLNativeContext>().context();
     wglShareLists(guiGlrc, m_rc);
     wglMakeCurrent(m_dc, m_rc);
+
+    auto wglDXOpenDeviceNV = (PFNWGLDXOPENDEVICENVPROC)wglGetProcAddress("wglDXOpenDeviceNV");
+    auto wglDXRegisterObjectNV = (PFNWGLDXREGISTEROBJECTNVPROC)wglGetProcAddress("wglDXRegisterObjectNV");
+    auto wglDXSetResourceShareHandleNV = (PFNWGLDXSETRESOURCESHAREHANDLENVPROC)wglGetProcAddress("wglDXSetResourceShareHandleNV");
 
     // Acquire a handle to the D3D device for use in OGL
     m_renderDeviceHandle = wglDXOpenDeviceNV(m_device);
@@ -206,6 +211,8 @@ bool Renderer::render(
         return false;
 
     wglMakeCurrent(m_dc, m_rc);
+    auto wglDXLockObjectsNV = (PFNWGLDXLOCKOBJECTSNVPROC)wglGetProcAddress("wglDXLockObjectsNV");
+    auto wglDXUnlockObjectsNV = (PFNWGLDXUNLOCKOBJECTSNVPROC)wglGetProcAddress("wglDXUnlockObjectsNV");
     wglDXLockObjectsNV(m_renderDeviceHandle, 1, &m_textureHandle);
     wglDXUnlockObjectsNV(m_renderDeviceHandle, 1, &m_textureHandle);
     wglMakeCurrent(NULL, NULL);
@@ -215,4 +222,3 @@ bool Renderer::render(
 } // namespace nx::media::quick_sync::windows
 
 #endif // _WIN32
-

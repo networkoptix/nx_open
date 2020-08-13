@@ -1218,10 +1218,10 @@ bool DecodedPictureToOpenGLUploader::renderVideoMemory(
    // else
         displaySize = QSize(frame->width, frame->height);
 
-    bool isNewTExture = texture->ensureInitialized(
+    bool isNewTexture = texture->ensureInitialized(
             displaySize.width(), displaySize.height(), displaySize.width(), 1, GL_RGBA, 1, -1);
 
-    if (!renderToRgb(frame->getVideoSurface(), isNewTExture, texture->m_id, m_initializedContext))
+    if (!renderToRgb(frame->getVideoSurface(), isNewTexture, texture->m_id, m_initializedContext))
     {
         NX_ERROR(this, "Failed to render video memory to OpenGL texture");
         return false;

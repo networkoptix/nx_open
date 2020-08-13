@@ -19,8 +19,7 @@ else()
     endif()
 
     if(WINDOWS)
-        add_definitions(-DGLEW_STATIC)
-        target_link_libraries(nx_media PUBLIC opengl32 dxva2 d3d9 glew)
+        target_link_libraries(nx_media PUBLIC opengl32 dxva2 d3d9)
     endif()
 endif()
 
