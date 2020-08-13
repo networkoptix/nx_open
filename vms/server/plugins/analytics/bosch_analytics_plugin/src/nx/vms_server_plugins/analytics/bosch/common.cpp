@@ -6,7 +6,7 @@ namespace nx::vms_server_plugins::analytics::bosch {
 
 QString Bosch::EventType::fullDescription(bool isActive) const
 {
-    if (!flags.testFlag(nx::vms::api::analytics::stateDependent))
+    if (!flags.testFlag(nx::vms::api::analytics::EventTypeFlag::stateDependent))
         return description;
 
     return description.arg(isActive ? positiveState : negativeState);
