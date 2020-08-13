@@ -10,17 +10,7 @@
 namespace nx::vms::server::sdk_support {
 
 /**
- * Debugging mechanism that tracks ref-countable objects to detect leaks and double-frees.
- *
- * The registry works automatically for any classes inherited from nx::sdk::RefCountable.
- *
- * An assertion will fail if any discrepancy is detected.
- *
- * The Server and each Plugin have their own instance of such registry, tracking objects
- * created/destroyed in the respective module. Such instances are owned by the respective
- * LibContext instances. Their destructors (called from LibContext destructors on static
- * deinitialization phase) attempt to detect and log objects which were not deleted, failing an
- * assertion if there were any such objects.
+ * Implementation of all instances of nx::sdk::IRefCountableRegistry.
  *
  * These registries must be enabled by vms_server_plugins.ini; there are also options for logging.
  */
