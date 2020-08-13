@@ -90,7 +90,7 @@ protected:
         Result<void>* outResult, IDataPacket* dataPacket) override;
 
 private:
-    bool replanishSupportedEventTypeIds(const ParsedMetadata& parsedMetadata);
+    bool replenishSupportedEventTypeIds(const ParsedMetadata& parsedMetadata);
 
     void updateAgentManifest();
 

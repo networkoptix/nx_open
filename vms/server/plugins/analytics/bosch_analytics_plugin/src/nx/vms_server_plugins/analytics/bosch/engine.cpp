@@ -163,10 +163,9 @@ NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return new nx::sdk::analytics::Plugin(
         kPluginManifest,
-        [](nx::sdk::analytics::IPlugin* plugin)
+        [](nx::sdk::analytics::Plugin* plugin)
         {
-            return new nx::vms_server_plugins::analytics::bosch::Engine(
-                dynamic_cast<nx::sdk::analytics::Plugin*>(plugin));
+            return new nx::vms_server_plugins::analytics::bosch::Engine(plugin);
         });
 }
 

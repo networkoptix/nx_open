@@ -70,25 +70,6 @@ struct ParsedMetadata
     QList<ParsedObject> objects;
 };
 
-//template<int N>
-//class KnownTags
-//{
-////    bool data[N];
-//    const char* tags[N];
-//    constexpr index(const char*)
-//    {
-//        auto it = std::find(std::cbegin(data), std::cend(data), [](const char*) {strcmp});
-//        if (it == std::cend(data))
-//        {
-//            skip();
-//            return -1;
-//        }
-//        else
-//            return it - std::cbegin(data);
-//
-//    }
-//};
-
 class BaseMetadataXmlParser
 {
 public:
@@ -100,7 +81,7 @@ public:
     bool isOnTag(const char* tag) const;
 
     template<class ...T>
-    constexpr int knownTagIndex(T... t)
+    int knownTagIndex(T... t)
     {
         bool data[]{ isOnTag(t)... }; //< transform parameter list to array
         auto tagIterator = std::find(std::cbegin(data), std::cend(data), true);

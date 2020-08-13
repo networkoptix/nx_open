@@ -60,12 +60,12 @@ Ptr<EventMetadata> parsedEventToEventMetadata(
 
 nx::sdk::analytics::Rect parsedRectToObjectMetadataRect(Rect parsedRect)
 {
-    // parsedRect coordinates: [-1, 1]
-    // objectMatadata coordinated: [0, 1]
+    // parsedRect coordinates: [-1, 1] (y axis goes up)
+    // objectMatadata coordinated: [0, 1] (y axis goes down)
 
     nx::sdk::analytics::Rect result;
     result.x = (parsedRect.left + 1.0) / 2;
-    result.y = (parsedRect.top + 1.0) / 2;
+    result.y = 1.0 - (parsedRect.top + 1.0) / 2;
     result.width = (parsedRect.right - parsedRect.left) / 2;
     result.height = (parsedRect.top - parsedRect.bottom) / 2;
     return result;
@@ -285,7 +285,7 @@ Ptr<ObjectMetadataPacket> DeviceAgent::buildObjectPacket(
     return packet;
 }
 
-bool DeviceAgent::replanishSupportedEventTypeIds(const ParsedMetadata& parsedMetadata)
+bool DeviceAgent::replenishSupportedEventTypeIds(const ParsedMetadata& parsedMetadata)
 {
     int oldSize = m_wsntTopics.size();
     for (const ParsedEvent& id: parsedMetadata.events)
@@ -319,7 +319,7 @@ void DeviceAgent::updateAgentManifest()
     const QByteArray xmlData(incomingPacket->data(), incomingPacket->dataSize());
     MetadataXmlParser parser(xmlData);
     const ParsedMetadata parsedMetadata = parser.parse();
-    if (replanishSupportedEventTypeIds(parsedMetadata))
+    if (replenishSupportedEventTypeIds(parsedMetadata))
         updateAgentManifest();
 
     Ptr<EventMetadataPacket> packet = buildEventPacket(parsedMetadata, dataPacket->timestampUs());

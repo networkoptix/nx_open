@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <QtCore/QByteArray.h>
+#include <QtCore/QByteArray>
 
 #include <nx/sdk/analytics/helpers/plugin.h>
 #include <nx/sdk/analytics/helpers/engine.h>

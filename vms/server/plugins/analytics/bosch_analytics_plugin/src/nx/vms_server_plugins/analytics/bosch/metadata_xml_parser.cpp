@@ -60,18 +60,17 @@ ParsedMetadata MetadataXmlParser::parse()
     ParsedMetadata result;
     if (!start("MetadataStream"))
         return result;
+
+    while (next())
     {
-        while (next())
+        switch (knownTagIndex("VideoAnalytics", "Event"))
         {
-            switch (knownTagIndex("VideoAnalytics", "Event"))
-            {
-                case 1:
-                    result.objects = parseVideoAnalyticsElement();
-                    break;
-                case 2:
-                    result.events = parseEventElement();
-                    break;
-            }
+            case 1:
+                result.objects = parseVideoAnalyticsElement();
+                break;
+            case 2:
+                result.events = parseEventElement();
+                break;
         }
     }
 
@@ -168,7 +167,6 @@ ParsedEvent MetadataXmlParser::parseNotificationMessageElement()
     ParsedEvent result;
     while (next())
     {
-//        const QString topic = tag();
         switch (knownTagIndex("Topic", "Message"))
         {
             case 1:
