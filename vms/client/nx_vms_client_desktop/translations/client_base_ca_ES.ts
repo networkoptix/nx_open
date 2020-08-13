@@ -1314,15 +1314,15 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>License activated</source>
-      <translation type="unfinished">License activated</translation>
+      <translation>Llicència activada</translation>
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
-      <translation type="unfinished">To report the issue please contact your Regional / License support:</translation>
+      <translation>Si us plau, per informar del problema, contacteu amb el servei d'assistència regional o de llicència:</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation type="unfinished">To activate License Key manually please contact your Regional / License support:</translation>
+      <translation>Per activar manualment la clau de llicència, contacteu amb el servei d'assistència regional o de llicència:</translation>
     </message>
   </context>
   <context>
