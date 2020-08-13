@@ -22,14 +22,25 @@ void Settings::attach(const std::shared_ptr<QSettings>& settings)
     QStringList keys = settings->allKeys();
     for (const auto& key: keys)
     {
-        auto optionIt = m_options.find(key);
+        // "_" in the beginning of the key means that the option is commented out.
+        bool isOptionCommentedOut = key.startsWith('_');
+        QString optionName = isOptionCommentedOut ? key.mid(1) : key;
+
+        auto optionIt = m_options.find(optionName);
         if (optionIt == m_options.end())
         {
-            NX_WARNING(this, lit("Unknown option: %1").arg(key));
+            NX_WARNING(this, lit("Unknown option: %1").arg(optionName));
             continue;
         }
-        if (!optionIt->second->load(settings->value(key)))
-            NX_ERROR(this, lit("Failed to load option: %1").arg(key));
+
+        if (isOptionCommentedOut)
+        {
+            NX_INFO(this, lit("Option is commented out: %1").arg(optionName));
+            continue;
+        }
+
+        if (!optionIt->second->load(settings->value(optionName)))
+            NX_ERROR(this, lit("Failed to load option: %1").arg(optionName));
     }
     m_loaded = true;
 }
