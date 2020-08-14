@@ -26,7 +26,7 @@ struct Ini: nx::kit::IniConfig
 {
     Ini();
 
-    NX_INI_FLAG(0, disableFirmwareVersionCheck, "Do not check firmware version");
+    NX_INI_FLAG(0, disableFirmwareVersionCheck, "Do not check firmware version or AI cameras");
 };
 
 Ini& ini();
