@@ -52,6 +52,9 @@ QString specialEventName(const QString& eventName)
 
 static bool isFirmwareActual(const std::string& firmwareVersion)
 {
+    if (ini().disableFirmwareVersionCheck)
+        return true;
+
     // Firmware version has a format like this: 1.40.03_20190919_R32
     if (firmwareVersion.empty())
         return false;
@@ -126,6 +129,17 @@ QJsonValue filterOutItemsAndSections(QJsonValue value)
 }
 
 } // namespace
+
+Ini::Ini(): IniConfig("nx_hanwha_plugin.ini")
+{
+    reload();
+}
+
+Ini& ini()
+{
+    static Ini ini;
+    return ini;
+}
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;

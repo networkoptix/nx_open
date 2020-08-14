@@ -15,10 +15,21 @@
 #include <plugins/resource/hanwha/hanwha_response.h>
 #include <plugins/resource/hanwha/hanwha_shared_resource_context.h>
 
+#include <nx/kit/ini_config.h>
+
 #include "common.h"
 #include "metadata_monitor.h"
 
 namespace nx::vms_server_plugins::analytics::hanwha {
+
+struct Ini: nx::kit::IniConfig
+{
+    Ini();
+
+    NX_INI_FLAG(0, disableFirmwareVersionCheck, "Do not check firmware version");
+};
+
+Ini& ini();
 
 class Engine: public nx::sdk::RefCountable<nx::sdk::analytics::IEngine>
 {
