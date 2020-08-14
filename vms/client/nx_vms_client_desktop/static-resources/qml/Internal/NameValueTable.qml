@@ -38,7 +38,7 @@ Item
                 font: control.font
                 text: modelData
                 textFormat: Text.StyledText
-                maximumLineCount: 2
+                maximumLineCount: 3
                 wrapMode: Text.Wrap
                 elide: Text.ElideRight
 

@@ -62,6 +62,8 @@ static constexpr milliseconds kUpdateWorkbenchFilterDelay = 100ms;
 
 static constexpr int kMaxumumNoBestShotTrackCount = 10000;
 
+static constexpr int kMaxDisplayedAttributeValues = 2; //< Before "(+n values)".
+
 milliseconds startTime(const ObjectTrack& track)
 {
     return duration_cast<milliseconds>(microseconds(track.firstAppearanceTimeUs));
@@ -935,15 +937,23 @@ QList<QPair<QString, QString>> AnalyticsSearchListModel::Private::attributes(
 
     const QString darkerColor = QPalette().color(QPalette::WindowText).name();
 
-    const auto value =
-        [darkerColor](const QString& source, int count)
+    const auto valuesText =
+        [darkerColor](const auto beginIter, const auto endIter) -> QString
         {
-            if (count < 2)
-                return source;
+            const auto count = (int) std::distance(beginIter, endIter);
+            const auto effectiveEnd = beginIter + qMin(count, kMaxDisplayedAttributeValues);
 
-            return lm("%1 <font color=\"%3\">(%2)</font>").args(source,
-                AnalyticsSearchListModel::tr("+%n values", "", count - 1),
-                darkerColor).toQString();
+            QString displayedAttributes = beginIter->value;
+
+            for (auto iter = beginIter + 1; iter != effectiveEnd; ++iter)
+                displayedAttributes += ", " + iter->value;
+
+            if (count <= kMaxDisplayedAttributeValues)
+                return displayedAttributes;
+
+            return nx::format("%1 <font color=\"%3\">(%2)</font>", displayedAttributes,
+                AnalyticsSearchListModel::tr("+%n values", "", count - kMaxDisplayedAttributeValues),
+                darkerColor);
         };
 
     QList<QPair<QString, QString>> result;
@@ -959,7 +969,7 @@ QList<QPair<QString, QString>> AnalyticsSearchListModel::Private::attributes(
         while (end != track.attributes.cend() && end->name == begin->name)
             ++end;
 
-        result.push_back({begin->name, value(begin->value, end - begin)});
+        result.push_back({begin->name, valuesText(begin, end)});
         begin = end;
     }
 
