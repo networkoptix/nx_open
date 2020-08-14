@@ -18,6 +18,14 @@ Attribute::Attribute(
 {
 }
 
+Attribute::Attribute(const nx::sdk::Ptr<const IAttribute>& data):
+    m_type(data->type()),
+    m_name(data->name()),
+    m_value(data->value()),
+    m_confidence(data->confidence())
+{
+}
+
 IAttribute::Type Attribute::type() const
 {
     return m_type;

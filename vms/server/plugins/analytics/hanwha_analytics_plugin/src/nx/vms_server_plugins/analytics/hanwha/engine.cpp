@@ -307,7 +307,10 @@ std::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
     }
     if (supportsObjectTracking)
     {
-        supportedEventTypeIds->insert("nx.hanwha.ObjectTracking.BestShot");
+        supportedEventTypeIds->insert("nx.hanwha.trackingEvent.Person");
+        supportedEventTypeIds->insert("nx.hanwha.trackingEvent.Face");
+        supportedEventTypeIds->insert("nx.hanwha.trackingEvent.Vehicle");
+        supportedEventTypeIds->insert("nx.hanwha.trackingEvent.LicensePlate");
     }
 
     deviceAgentManifest.supportedEventTypeIds = QList<QString>::fromSet(*supportedEventTypeIds);

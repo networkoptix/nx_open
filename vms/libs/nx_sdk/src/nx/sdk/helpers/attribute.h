@@ -19,6 +19,8 @@ public:
         std::string value,
         float confidence = 1.0);
 
+    Attribute(const nx::sdk::Ptr<const IAttribute>& attribute);
+
     virtual Type type() const override;
     virtual const char* name() const override;
     virtual const char* value() const override;

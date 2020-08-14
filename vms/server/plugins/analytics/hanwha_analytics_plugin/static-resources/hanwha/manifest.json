@@ -904,13 +904,43 @@
             "positiveState": "started",
             "negativeState": "finished",
             "flags": "stateDependent"
+        },
+
+        {
+            "id": "nx.hanwha.trackingEvent.Person",
+            "name": "Person tracking",
+            "internalName": "nx.hanwha.ObjectDetection.Person",
+            "groupId": "nx.hanwha.ObjectDetection"
+        },
+        {
+            "id": "nx.hanwha.trackingEvent.Face",
+            "name": "Face tracking",
+            "internalName": "nx.hanwha.ObjectDetection.Face",
+            "groupId": "nx.hanwha.ObjectDetection"
+        },
+        {
+            "id": "nx.hanwha.trackingEvent.Vehicle",
+            "name": "Vehicle tracking",
+            "internalName": "nx.hanwha.ObjectDetection.Vehicle",
+            "groupId": "nx.hanwha.ObjectDetection"
+        },
+        {
+            "id": "nx.hanwha.trackingEvent.LicensePlate",
+            "name": "LicensePlate tracking",
+            "internalName": "nx.hanwha.ObjectDetection.LicensePlate",
+            "groupId": "nx.hanwha.ObjectDetection"
         }
+
     ],
     "groups":
     [
         {
             "id": "nx.hanwha.Queue",
             "name": "Queue"
+        },
+        {
+            "id": "nx.hanwha.ObjectDetection",
+            "name": "Object tracking"
         }
     ]
 }

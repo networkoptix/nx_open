@@ -157,8 +157,19 @@ ObjectMetadataXmlParser::Result ObjectMetadataXmlParser::parse(
         if (bestShotPacket)
         {
             auto eventData = makePtr<EventMetadata>();
-            eventData->setTypeId("nx.hanwha.ObjectTracking.BestShot");
             const auto& descriptor = m_engineManifest.objectTypeDescriptorById(QString::fromStdString(objectTypeId));
+            auto eventTypeId = descriptor.id;
+            eventTypeId.replace(QLatin1String("ObjectDetection."), QLatin1String("trackingEvent."));
+            eventData->setTypeId(eventTypeId.toStdString());
+            if (objectMetadata)
+            {
+                for (int i = 0; i < objectMetadata->attributeCount(); ++i)
+                {
+                    auto attribute = nx::sdk::makePtr<Attribute>(objectMetadata->attribute(i));
+                    eventData->addAttribute(attribute);
+                }
+            }
+            eventData->setDescription(descriptor.name.toStdString());
             eventData->setDescription(descriptor.name.toStdString());
             eventData->setConfidence(1.0);
             eventData->setTrackId(bestShotPacket->trackId());
