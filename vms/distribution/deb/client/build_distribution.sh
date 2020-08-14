@@ -173,11 +173,13 @@ copyLibs()
             libgstvideo-0.10.so.0
     fi
 
-    if ["$ARCH" != "arm64" && "$ARCH" != "arm"]
+    if [ "$ARCH" != "arm64" ] && [ "$ARCH" != "arm" ];
     then
         distrib_copySystemLibs "$STAGE_LIB" \
-            libva.so.2.600.0 \
-            libva-x11.so.2.600.0
+            libva.so.2 \
+            libva-x11.so.2 \
+            libmfxhw64.so.1 \
+            libmfx.so.1
     fi
 }
 
