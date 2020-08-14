@@ -30,10 +30,11 @@ function(set_distribution_names)
 
     # Release distributions must not have "-release" suffix.
     if(${publicationType} STREQUAL "release")
-        set(publication_type_suffix "" PARENT_SCOPE)
+        set(publication_type_suffix "")
     else()
-        set(publication_type_suffix "-${publicationType}" PARENT_SCOPE)
+        set(publication_type_suffix "-${publicationType}")
     endif()
+    nx_expose_to_parent_scope(publication_type_suffix)
 
     # Only private builds must have cloud group suffix.
     if(${publicationType} STREQUAL "private")
