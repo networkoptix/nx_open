@@ -27,14 +27,12 @@
     "deviceAgentSettingsModel":
     {
         "type": "Settings",
-        "sections":
-        [
+        "sections": [
             {
                 "type": "Section",
                 "caption": "Shock Detection",
                 "_requiredForEventTypeIds": [ "nx.hanwha.ShockDetection" ],
-                "items":
-                [
+                "items": [
                     {
                         "type": "SwitchButton",
                         "name": "ShockDetection.Enable",
@@ -44,8 +42,7 @@
                     {
                         "type": "GroupBox",
                         "caption": "Shock Detection",
-                        "items":
-                        [
+                        "items": [
                             {
                                 "type": "SpinBox",
                                 "name": "ShockDetection.ThresholdLevel",
@@ -70,8 +67,7 @@
                 "type": "Section",
                 "caption": "Tampering Detection",
                 "_requiredForEventTypeIds": [ "nx.hanwha.Tampering" ],
-                "items":
-                [
+                "items": [
                     {
                         "type": "SwitchButton",
                         "name": "TamperingDetection.Enable",
@@ -81,8 +77,7 @@
                     {
                         "type": "GroupBox",
                         "caption": "Tampering Detection",
-                        "items":
-                        [
+                        "items": [
                             {
                                 "type": "SpinBox",
                                 "name": "TamperingDetection.ThresholdLevel",
@@ -122,8 +117,7 @@
                 "type": "Section",
                 "caption": "Defocus Detection",
                 "_requiredForEventTypeIds": [ "nx.hanwha.DefocusDetection" ],
-                "items":
-                [
+                "items": [
                     {
                         "type": "SwitchButton",
                         "name": "DefocusDetection.Enable",
@@ -133,8 +127,7 @@
                     {
                         "type": "GroupBox",
                         "caption": "Defocus Detection",
-                        "items":
-                        [
+                        "items": [
                             {
                                 "type": "SpinBox",
                                 "name": "DefocusDetection.ThresholdLevel",
@@ -167,8 +160,7 @@
                 "type": "Section",
                 "caption": "Fog detection",
                 "_requiredForEventTypeIds": [ "nx.hanwha.FogDetection" ],
-                "items":
-                [
+                "items": [
                     {
                         "type": "SwitchButton",
                         "name": "FogDetection.Enable",
@@ -178,8 +170,7 @@
                     {
                         "type": "GroupBox",
                         "caption": "Fog Detection",
-                        "items":
-                        [
+                        "items": [
                             {
                                 "type": "SpinBox",
                                 "name": "FogDetection.ThresholdLevel",
@@ -212,8 +203,7 @@
                 "type": "Section",
                 "caption": "[AI] Objects & IVA",
                 "_requiredForObjectDetection": true,
-                "_requiredForEventTypeIds":
-                [
+                "_requiredForEventTypeIds": [
                     "nx.hanwha.VideoAnalytics.Passing",
                     "nx.hanwha.VideoAnalytics.Entering",
                     "nx.hanwha.VideoAnalytics.Exiting",
@@ -221,26 +211,22 @@
                     "nx.hanwha.VideoAnalytics.Intrusion",
                     "nx.hanwha.VideoAnalytics.Loitering"
                 ],
-                "items":
-                [
+                "items": [
                     {
                         "type": "GroupBox",
                         "caption": "[AI] Object Detection and IVA",
-                        "items":
-                        [
+                        "items": [
                             {
                                 "type": "ObjectSizeConstraints",
                                 "caption": "Object Size Limits",
                                 "description": "Select the minimum and maximum object size (width and height) to be analyzed by the plugin",
                                 "name": "IVA.ObjectSize.Constraints",
-                                "defaultValue":
-                                {
+                                "defaultValue": {
                                     "minimum": [ 0.1, 0.1 ],
                                     "maximum": [ 0.9, 0.9 ]
                                 },
                                 "_requiredForObjectDetection": true,
-                                "_requiredForEventTypeIds":
-                                [
+                                "_requiredForEventTypeIds": [
                                     "nx.hanwha.VideoAnalytics.Passing",
                                     "nx.hanwha.VideoAnalytics.Entering",
                                     "nx.hanwha.VideoAnalytics.Exiting",
@@ -252,30 +238,25 @@
                         ]
                     }
                 ],
-                "sections":
-                [
+                "sections": [
                     {
                         "type": "Section",
                         "caption": "IVA Lines",
                         "_requiredForEventTypeIds": [ "nx.hanwha.VideoAnalytics.Passing" ],
-                        "items":
-                        [
+                        "items": [
                             {
                                 "type": "GroupBox",
                                 "caption": "[AI] IVA Lines",
-                                "items":
-                                [
+                                "items": [
                                     {
                                         "type": "Repeater",
                                         "count": 4,
                                         "startIndex": 1,
-                                        "template":
-                                        {
+                                        "template": {
                                             "type": "GroupBox",
                                             "caption": "IVA Line #",
-                                            "filledCheckItems": ["IVA.Line#.Points"],
-                                            "items":
-                                            [
+                                            "filledCheckItems": [ "IVA.Line#.Points" ],
+                                            "items": [
                                                 {
                                                     "type": "CheckBox",
                                                     "name": "IVA.Line#.Crossing",
@@ -290,8 +271,7 @@
                                                 {
                                                     "type": "GroupBox",
                                                     "caption": "Type",
-                                                    "items":
-                                                    [
+                                                    "items": [
                                                         {
                                                             "type": "CheckBox",
                                                             "name": "IVA.Line#.Person",
@@ -316,32 +296,27 @@
                     {
                         "type": "Section",
                         "caption": "IVA Areas",
-                        "_requiredForEventTypeIds":
-                        [
+                        "_requiredForEventTypeIds": [
                             "nx.hanwha.VideoAnalytics.Entering",
                             "nx.hanwha.VideoAnalytics.Exiting",
                             "nx.hanwha.VideoAnalytics.AppearDisappear",
                             "nx.hanwha.VideoAnalytics.Intrusion",
                             "nx.hanwha.VideoAnalytics.Loitering"
                         ],
-                        "items":
-                        [
+                        "items": [
                             {
                                 "type": "GroupBox",
                                 "caption": "[AI] IVA Areas",
-                                "items":
-                                [
+                                "items": [
                                     {
                                         "type": "Repeater",
                                         "count": 4,
                                         "startIndex": 1,
-                                        "template":
-                                        {
+                                        "template": {
                                             "type": "GroupBox",
                                             "caption": "IVA Area #",
-                                            "filledCheckItems": ["IVA.IncludeArea#.Points"],
-                                            "items":
-                                            [
+                                            "filledCheckItems": [ "IVA.IncludeArea#.Points" ],
+                                            "items": [
                                                 {
                                                     "type": "PolygonFigure",
                                                     "name": "IVA.IncludeArea#.Points",
@@ -352,8 +327,7 @@
                                                 {
                                                     "type": "GroupBox",
                                                     "caption": "Type",
-                                                    "items":
-                                                    [
+                                                    "items": [
                                                         {
                                                             "type": "CheckBox",
                                                             "name": "IVA.IncludeArea#.Person",
@@ -371,8 +345,7 @@
                                                 {
                                                     "type": "GroupBox",
                                                     "caption": "Category",
-                                                    "items":
-                                                    [
+                                                    "items": [
                                                         {
                                                             "type": "CheckBox",
                                                             "name": "IVA.IncludeArea#.Intrusion",
@@ -440,8 +413,7 @@
                         "type": "Section",
                         "caption": "Objects Tracking",
                         "_requiredForObjectDetection": true,
-                        "items":
-                        [
+                        "items": [
                             {
                                 "type": "SwitchButton",
                                 "name": "ObjectDetection.Enable",
@@ -451,13 +423,11 @@
                             {
                                 "type": "GroupBox",
                                 "caption": "Objects",
-                                "items":
-                                [
+                                "items": [
                                     {
                                         "type": "GroupBox",
                                         "caption": "Type",
-                                        "items":
-                                        [
+                                        "items": [
                                             {
                                                 "type": "CheckBox",
                                                 "name": "ObjectDetection.Person",
@@ -501,13 +471,11 @@
                             {
                                 "type": "GroupBox",
                                 "caption": "Extended Object Information (Best Shot)",
-                                "items":
-                                [
+                                "items": [
                                     {
                                         "type": "GroupBox",
                                         "caption": "Type",
-                                        "items":
-                                        [
+                                        "items": [
                                             {
                                                 "type": "CheckBox",
                                                 "name": "ObjectDetection.BestShot.Person",
@@ -547,8 +515,7 @@
                         "type": "Section",
                         "caption": "Exclude Areas",
                         "_requiredForObjectDetection": true,
-                        "_requiredForEventTypeIds":
-                        [
+                        "_requiredForEventTypeIds": [
                             "nx.hanwha.VideoAnalytics.Passing",
                             "nx.hanwha.VideoAnalytics.Entering",
                             "nx.hanwha.VideoAnalytics.Exiting",
@@ -556,19 +523,16 @@
                             "nx.hanwha.VideoAnalytics.Intrusion",
                             "nx.hanwha.VideoAnalytics.Loitering"
                         ],
-                        "items":
-                        [
+                        "items": [
                             {
                                 "type": "GroupBox",
                                 "caption": "Objects & IVA Exclude Areas",
-                                "items":
-                                [
+                                "items": [
                                     {
                                         "type": "Repeater",
                                         "count": 4,
                                         "startIndex": 1,
-                                        "template":
-                                        {
+                                        "template": {
                                             "type": "PolygonFigure",
                                             "minPoints": 4,
                                             "maxPoints": 8,
@@ -586,8 +550,7 @@
                 "type": "Section",
                 "caption": "Audio Detection",
                 "_requiredForEventTypeIds": [ "nx.hanwha.AudioDetection" ],
-                "items":
-                [
+                "items": [
                     {
                         "type": "SwitchButton",
                         "name": "AudioDetection.Enable",
@@ -597,8 +560,7 @@
                     {
                         "type": "GroupBox",
                         "caption": "Audio Detection",
-                        "items":
-                        [
+                        "items": [
                             {
                                 "type": "SpinBox",
                                 "name": "AudioDetection.ThresholdLevel",
@@ -614,15 +576,13 @@
             {
                 "type": "Section",
                 "caption": "Sound Classification",
-                "_requiredForEventTypeIds":
-                [
+                "_requiredForEventTypeIds": [
                     "nx.hanwha.AudioAnalytics.Scream",
                     "nx.hanwha.AudioAnalytics.Gunshot",
                     "nx.hanwha.AudioAnalytics.Explosion",
                     "nx.hanwha.AudioAnalytics.GlassBreak"
                 ],
-                "items":
-                [
+                "items": [
                     {
                         "type": "SwitchButton",
                         "name": "SoundClassification.Enable",
@@ -632,8 +592,7 @@
                     {
                         "type": "GroupBox",
                         "caption": "Sound Classification",
-                        "items":
-                        [
+                        "items": [
                             {
                                 "type": "CheckBox",
                                 "name": "SoundClassification.NoiseReduction",
@@ -651,8 +610,7 @@
                             {
                                 "type": "GroupBox",
                                 "caption": "Categories",
-                                "items":
-                                [
+                                "items": [
                                     {
                                         "type": "CheckBox",
                                         "name": "SoundClassification.Scream",
@@ -682,6 +640,38 @@
                                         "value": false
                                     }
                                 ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "type": "Section",
+                "caption": "Face Mask Detection",
+                "_requiredForEventTypeIds": [ "nx.hanwha.FaceMaskDetection" ],
+                "items": [
+                    {
+                        "type": "SwitchButton",
+                        "name": "FaceMaskDetection.Enable",
+                        "caption": "Enable",
+                        "defaultValue": false
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "Face Mask Detection",
+                        "items": [
+                            {
+                                "type": "RadioButtonGroup",
+                                "name": "FaceMaskDetection.DetectionMode",
+                                "caption": "Detection Mode",
+                                "range": [
+                                    "MASK",
+                                    "NO_MASK"
+                                ],
+                                "itemCaptions": {
+                                    "MASK": "Mask",
+                                    "NO_MASK": "No Mask"
+                                }
                             }
                         ]
                     }
@@ -905,6 +895,15 @@
             "id": "nx.hanwha.ObjectTracking.BestShot",
             "name": "Object tracking",
             "flags": "useTrackBestShotAsPreview"
+        },
+        {
+            "id": "nx.hanwha.FaceMaskDetection",
+            "name": "Face Mask Detection",
+            "internalName": "MaskDetection",
+            "description": "Mask detection: %1",
+            "positiveState": "started",
+            "negativeState": "finished",
+            "flags": "stateDependent"
         }
     ],
     "groups":

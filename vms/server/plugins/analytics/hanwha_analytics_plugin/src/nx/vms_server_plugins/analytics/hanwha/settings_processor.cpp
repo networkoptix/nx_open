@@ -330,6 +330,13 @@ void SettingsProcessor::loadAndHoldSettingsFromDevice()
         SettingGroup::readFromDeviceReply(
             sunapiReply, &m_settings.soundClassification, m_frameSize, channelNumber);
     }
+
+    if (m_settings.analyticsCategories[faceMaskDetection])
+    {
+        sunapiReply = makeEventTypeReadingRequest("maskdetection");
+        SettingGroup::readFromDeviceReply(
+            sunapiReply, &m_settings.faceMaskDetection, m_frameSize, channelNumber);
+    }
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -396,6 +403,9 @@ void SettingsProcessor::transferAndHoldSettingsFromDeviceToServer(
 
     if (m_settings.analyticsCategories[audioAnalytics])
         m_settings.soundClassification.writeToServer(response);
+
+    if (m_settings.analyticsCategories[faceMaskDetection])
+        m_settings.faceMaskDetection.writeToServer(response);
 
 }
 
@@ -514,6 +524,11 @@ void SettingsProcessor::transferAndHoldSettingsFromServerToDevice(
             m_settings.soundClassification, sender, m_frameSize, m_cameraChannelNumber);
     }
 
+    if (m_settings.analyticsCategories[faceMaskDetection])
+    {
+        SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
+            m_settings.faceMaskDetection, sender, m_frameSize, m_cameraChannelNumber);
+    }
 }
 
 //-------------------------------------------------------------------------------------------------

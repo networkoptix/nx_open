@@ -15,6 +15,7 @@ enum AnalyticsCategory
     objectDetection, //< includes Person, Vehicle, Face, LicensePlate
     audioDetection,
     audioAnalytics, //< includes Scream, Gunshot, Explosion, GlassBreak
+    faceMaskDetection,
     count //< number event of categories
 };
 
@@ -47,6 +48,7 @@ struct Settings
     IvaExcludeArea ivaExcludeAreas[kMultiplicity];
     AudioDetection audioDetection;
     SoundClassification soundClassification;
+    FaceMaskDetection faceMaskDetection;
 
     AnalyticsCategories analyticsCategories = {false};
 

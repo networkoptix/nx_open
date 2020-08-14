@@ -1344,4 +1344,85 @@ std::string SoundClassification::buildDeviceWritingQuery(FrameSize /*frameSize*/
 
 //-------------------------------------------------------------------------------------------------
 
+bool FaceMaskDetection::operator==(const FaceMaskDetection& rhs) const
+{
+    return initialized == rhs.initialized
+        && enabled == rhs.enabled
+        && detectionMode == rhs.detectionMode;
+}
+
+/*static*/
+void FaceMaskDetection::deserializeDetectionModeOrThrow(
+    const char* serializedDetectionMode, DetectionMode* outDetectionMode)
+{
+    using namespace SettingPrimitivesServerIo;
+
+    if (strcmp(serializedDetectionMode, kMaskDetectionMode) == 0)
+    {
+        *outDetectionMode = DetectionMode::mask;
+        return;
+    }
+
+    if (strcmp(serializedDetectionMode, kNoMaskDetectionMode) == 0)
+    {
+        *outDetectionMode = DetectionMode::noMask;
+        return;
+    }
+
+    throw DeserializationError();
+}
+
+void FaceMaskDetection::readFromServerOrThrow(
+    const nx::sdk::IStringMap* settings, int /*roiIndex*/)
+{
+    using namespace SettingPrimitivesServerIo;
+    deserializeOrThrow(value(settings, KeyIndex::enabled), &enabled);
+    deserializeDetectionModeOrThrow(value(settings, KeyIndex::detectionMode), &detectionMode);
+    initialized = true;
+}
+
+void FaceMaskDetection::writeToServer(
+    nx::sdk::SettingsResponse* settingsDestination, int /*roiIndex*/) const
+{
+    using namespace SettingPrimitivesServerIo;
+    settingsDestination->setValue(key(KeyIndex::enabled), serialize(enabled));
+    settingsDestination->setValue(key(KeyIndex::detectionMode), buildDetectionMode());
+}
+
+void FaceMaskDetection::readFromDeviceReplyOrThrow(
+    const nx::kit::Json& channelInfo, FrameSize frameSize)
+{
+    using namespace SettingPrimitivesDeviceIo;
+    deserializeOrThrow(channelInfo, "Enable", frameSize, &enabled);
+
+    std::string detectionModeString;
+    deserializeOrThrow(channelInfo, "DetectionMode", frameSize, &detectionModeString);
+    deserializeDetectionModeOrThrow(detectionModeString.c_str(), &detectionMode);
+    initialized = true;
+}
+
+std::string FaceMaskDetection::buildDeviceWritingQuery(
+    FrameSize /*frameSize*/, int channelNumber) const
+{
+    std::ostringstream query;
+    if (initialized)
+    {
+        using namespace SettingPrimitivesDeviceIo;
+        query
+            << "msubmenu=" << kSunapiEventName
+            << "&action=" << "set"
+            << "&Channel=" << channelNumber
+            << "&Enable=" << serialize(enabled)
+            << "&DetectionMode=" << buildDetectionMode();
+    }
+    return query.str();
+}
+
+std::string FaceMaskDetection::buildDetectionMode() const
+{
+    return detectionMode == DetectionMode::mask
+        ? kMaskDetectionMode
+        : kNoMaskDetectionMode;
+}
+
 } // namespace nx::vms_server_plugins::analytics::hanwha

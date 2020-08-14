@@ -795,6 +795,50 @@ private:
     std::string buildSoundType() const;
 };
 
+struct FaceMaskDetection: public SettingGroup
+{
+    enum class DetectionMode
+    {
+        noMask,
+        mask,
+    };
+
+    bool enabled = false;
+    DetectionMode detectionMode = DetectionMode::noMask;
+
+    enum class KeyIndex {
+        enabled,
+        detectionMode,
+    };
+    static constexpr const char* kKeys[] = {
+        "FaceMaskDetection.Enable",
+        "FaceMaskDetection.DetectionMode",
+    };
+    static constexpr const char* kJsonEventName = "MaskDetection";
+    static constexpr const char* kSunapiEventName = "maskdetection";
+
+    FaceMaskDetection(int /*roiIndex*/ = -1): SettingGroup(kKeys) {}
+    bool operator==(const FaceMaskDetection& rhs) const;
+    bool operator!=(const FaceMaskDetection& rhs) const { return !(*this == rhs); }
+
+    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
+    void writeToServer(nx::sdk::SettingsResponse* settingsDestination, int /*roiIndex*/ = -1) const;
+
+    void readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize);
+    std::string buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const;
+
+private:
+    static constexpr const char* kMaskDetectionMode = "MASK";
+    static constexpr const char* kNoMaskDetectionMode = "NO_MASK";
+
+private:
+    std::string buildDetectionMode() const;
+
+    static void deserializeDetectionModeOrThrow(
+        const char* serializedDetectionMode,
+        DetectionMode* outDetectionMode);
+};
+
 //-------------------------------------------------------------------------------------------------
 
 } // namespace nx::vms_server_plugins::analytics::hanwha

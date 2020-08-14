@@ -171,6 +171,9 @@ void DeviceAgent::setSupportedEventCategoties()
         || m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.Gunshot")
         || m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.Explosion")
         || m_manifest.supportedEventTypeIds.contains("nx.hanwha.AudioAnalytics.GlassBreak");
+
+    m_settings.analyticsCategories[faceMaskDetection] =
+        m_manifest.supportedEventTypeIds.contains("nx.hanwha.FaceMaskDetection");
 }
 
 //-------------------------------------------------------------------------------------------------
