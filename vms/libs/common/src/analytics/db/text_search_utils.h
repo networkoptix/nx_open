@@ -11,6 +11,12 @@
 
 namespace nx::analytics::db {
 
+inline bool isKeyValueDelimiter(QChar ch) { return ch == ':' || ch == '='; }
+inline bool isKeyValueDelimiter(const QStringView& value)
+{
+    return value.size() == 1 && isKeyValueDelimiter(value[0]);
+}
+
 enum class ConditionType
 {
     attributePresenceCheck,
@@ -192,11 +198,11 @@ void UserTextSearchExpressionParser::parse(const QString& userText, Handler hand
                 if (quoted)
                     continue;
 
-                if (ch.isSpace() || ch == ':')
+                if (ch.isSpace() || isKeyValueDelimiter(ch))
                 {
                     saveToken(text.midRef(tokenStart, i - tokenStart));
-                    if (ch == ':')
-                        saveToken(text.midRef(i, 1)); //< Adding ':' as a separate token.
+                    if (isKeyValueDelimiter(ch ))
+                        saveToken(text.midRef(i, 1)); //< Adding key/value delimiter as a separate token.
                     state = State::waitingTokenStart;
                 }
                 break;
@@ -228,10 +234,10 @@ void UserTextSearchExpressionParser::processTokens(Handler& handler)
         {
             handler(AttributePresenceCheck(unescape(token.mid(1))));
         }
-        else if (token == ':')
+        else if (isKeyValueDelimiter(token))
         {
             if (!previousToken)
-                continue; //< Ignoring misplaced ':'.
+                continue; //< Ignoring misplaced key/value delimiter.
 
             if (!nextToken)
             {
@@ -244,7 +250,7 @@ void UserTextSearchExpressionParser::processTokens(Handler& handler)
             // We have already consumed the next token.
             ++i;
         }
-        else if (nextToken && nextToken == ':')
+        else if (nextToken && isKeyValueDelimiter(*nextToken))
         {
             // Skipping token: it will be processed on the next iteration.
             lastProcessedTokenIndexUpdater.disarm();

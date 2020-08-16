@@ -91,6 +91,11 @@ TEST_F(TextSearchExpressionParser, attribute_presence_check)
     ASSERT_EQ(
         std::vector<TextSearchCondition>({
             AttributePresenceCheck("foo") }),
+            parse("foo="));
+
+    ASSERT_EQ(
+        std::vector<TextSearchCondition>({
+            AttributePresenceCheck("foo") }),
             parse("foo :  "));
 
     // Just ignoring misplaced :.
@@ -105,6 +110,13 @@ TEST_F(TextSearchExpressionParser, attribute_presence_check)
             TextMatch("Aston Martin"),
             TextMatch("text")}),
         parse(": foo:  car.brand.model : \"Aston Martin\"  text"));
+
+    ASSERT_EQ(
+        std::vector<TextSearchCondition>({
+            AttributeValueMatch("foo", "car.brand.model"),
+            TextMatch("Aston Martin"),
+            TextMatch("text") }),
+            parse(": foo:  car.brand.model = \"Aston Martin\"  text"));
 }
 
 TEST_F(TextSearchExpressionParser, unescaping)
@@ -128,6 +140,11 @@ TEST_F(TextSearchExpressionParser, unescaping)
         std::vector<TextSearchCondition>({
             TextMatch("color:red") }),
             parse("color\\:red"));
+
+    ASSERT_EQ(
+        std::vector<TextSearchCondition>({
+            TextMatch("color=red") }),
+            parse("color\\=red"));
 
     ASSERT_EQ(
         std::vector<TextSearchCondition>({

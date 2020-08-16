@@ -5,6 +5,7 @@
 
 #include <nx/analytics/event_type_descriptor_manager.h>
 #include <nx/vms/api/analytics/descriptors.h>
+#include <analytics/db/text_search_utils.h>
 
 namespace nx {
 namespace vms {
@@ -64,6 +65,7 @@ EventParameters AnalyticsSdkEvent::getRuntimeParams() const
     params.setAnalyticsEngineId(m_engineId);
     params.setAnalyticsEventTypeId(m_eventTypeId);
     params.objectTrackId = m_objectTrackId;
+    params.attributes = m_attributes;
     return params;
 }
 
@@ -90,10 +92,20 @@ bool AnalyticsSdkEvent::checkEventParams(const EventParameters& params) const
     const bool isEventTypeMatched =
         m_eventTypeId == params.getAnalyticsEventTypeId()
         || belongsToGroup(*descriptor, params.getAnalyticsEventTypeId());
+    if (!isEventTypeMatched || !checkForKeywords(m_caption, params.caption))
+        return false;
 
-    return isEventTypeMatched
-        && checkForKeywords(m_caption, params.caption)
-        && checkForKeywords(m_description, params.description);
+    if (checkForKeywords(m_description, params.description))
+        return true;
+
+    nx::analytics::db::TextMatcher textMatcher;
+    textMatcher.parse(params.description);
+    nx::common::metadata::Attributes attributes;
+    for (const auto& [name, value]: m_attributes)
+        attributes.push_back({name, value});
+
+    textMatcher.matchAttributes(attributes);
+    return textMatcher.matched();
 }
 
 const std::map<QString, QString>& AnalyticsSdkEvent::attributes() const

@@ -99,6 +99,7 @@ struct EventParameters
     QnUuid analyticsEngineId;
 
     QnUuid objectTrackId;
+    std::map<QString, QString> attributes;
 
     // TODO: #GDM #vkutin #rvasilenko Consider implementing via std::variant or similar.
     QString getAnalyticsEventTypeId() const;
@@ -113,7 +114,7 @@ struct EventParameters
 #define EventParameters_Fields \
     (eventType)(eventTimestampUsec)(eventResourceId)(resourceName)(sourceServerId) \
     (reasonCode)(inputPortId)(caption)(description)(metadata)(omitDbLogging)(analyticsPluginId) \
-    (analyticsEngineId)(objectTrackId)
+    (analyticsEngineId)(objectTrackId)(attributes)
 QN_FUSION_DECLARE_FUNCTIONS(EventParameters, (ubjson)(json)(eq)(xml)(csv_record));
 
 bool checkForKeywords(const QString& value, const QString& keywords);

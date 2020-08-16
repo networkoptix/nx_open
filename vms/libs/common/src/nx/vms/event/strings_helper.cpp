@@ -44,6 +44,18 @@ namespace nx {
 namespace vms {
 namespace event {
 
+QString serializeAttributes(const std::map<QString, QString>& attributes, const QString& kDelimiter)
+{
+    QString result;
+    for (const auto& [name, value] : attributes)
+    {
+        if (!result.isEmpty())
+            result += kDelimiter;
+        result += NX_FMT("%1: %2", name, value);
+    }
+    return result;
+}
+
 StringsHelper::StringsHelper(QnCommonModule* commonModule):
     QObject(),
     QnCommonModuleAware(commonModule)
@@ -292,6 +304,8 @@ QStringList StringsHelper::eventDescription(const AbstractActionPtr& action,
     {
         if (!params.caption.isEmpty() && !params.description.startsWith(params.caption))
             result << tr("Caption: %1").arg(params.caption);
+        if (!params.attributes.empty())
+            result << tr("Attributes: %1").arg(serializeAttributes(params.attributes, ", "));
     }
 
     if (eventType == EventType::poeOverBudgetEvent)
@@ -383,6 +397,7 @@ QStringList StringsHelper::eventDetails(const EventParameters& params) const
         case EventType::pluginDiagnosticEvent:
         {
             QString message;
+
             if (!params.caption.isEmpty())
                 message = params.caption;
             if (!params.description.isEmpty())
@@ -391,6 +406,14 @@ QStringList StringsHelper::eventDetails(const EventParameters& params) const
                     message += ": ";
                 message += params.description;
             }
+
+            if (!params.attributes.empty())
+            {
+                if (!message.isEmpty())
+                    message += ". ";
+                message += serializeAttributes(params.attributes, ", ");
+            }
+
             result << message;
             break;
         }
@@ -928,10 +951,19 @@ QString StringsHelper::notificationCaption(
                 : parameters.caption;
 
         case EventType::analyticsSdkEvent:
-            return parameters.caption.isEmpty()
+        {
+            auto result = parameters.caption.isEmpty()
                 ? getAnalyticsSdkEventName(parameters)
                 : parameters.caption;
-
+            if (!parameters.attributes.empty())
+            {
+                const QString kDelimiter = '\n';
+                if (!result.isEmpty())
+                    result += kDelimiter;
+                result += serializeAttributes(parameters.attributes, kDelimiter);
+            }
+            return result;
+        }
         case EventType::cameraDisconnectEvent:
             return QnDeviceDependentStrings::getNameFromSet(resourcePool(),
                 QnCameraDeviceStringSet(

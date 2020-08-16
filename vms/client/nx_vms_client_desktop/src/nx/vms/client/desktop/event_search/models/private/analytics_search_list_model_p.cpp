@@ -714,8 +714,6 @@ void AnalyticsSearchListModel::Private::processMetadata()
                             break;
                         }
                     }
-
-                    continue;
                 }
 
                 ObjectPosition pos;

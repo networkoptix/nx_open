@@ -310,14 +310,14 @@ void ObjectTrackCache::updateObject(
             }
         };
 
+    addNewAttributes(objectMetadata.attributes, &trackContext);
+
     if (objectMetadata.isBestShot())
     {
         // "Best shot" packet contains only information about the best shot, not a real object movement.
         assignBestShotFromPacket(&trackContext.track, packet, objectMetadata.boundingBox);
         return;
     }
-
-    addNewAttributes(objectMetadata.attributes, &trackContext);
 
     trackContext.track.objectPosition.add(objectMetadata.boundingBox);
 

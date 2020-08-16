@@ -161,16 +161,11 @@ ObjectMetadataXmlParser::Result ObjectMetadataXmlParser::parse(
             auto eventTypeId = descriptor.id;
             eventTypeId.replace(QLatin1String("ObjectDetection."), QLatin1String("trackingEvent."));
             eventData->setTypeId(eventTypeId.toStdString());
-            if (objectMetadata)
+            for (int i = 0; i < bestShotPacket->attributeCount(); ++i)
             {
-                for (int i = 0; i < objectMetadata->attributeCount(); ++i)
-                {
-                    auto attribute = nx::sdk::makePtr<Attribute>(objectMetadata->attribute(i));
-                    eventData->addAttribute(attribute);
-                }
+                auto attribute = nx::sdk::makePtr<Attribute>(bestShotPacket->attribute(i));
+                eventData->addAttribute(attribute);
             }
-            eventData->setDescription(descriptor.name.toStdString());
-            eventData->setDescription(descriptor.name.toStdString());
             eventData->setConfidence(1.0);
             eventData->setTrackId(bestShotPacket->trackId());
             eventPacket->addItem(eventData.releasePtr());
@@ -376,6 +371,8 @@ ObjectMetadataXmlParser::ObjectResult ObjectMetadataXmlParser::extractObjectMeta
     if (rect)
         relativeRect = applyFrameScale(*rect);
 
+    const auto attributes = extractAttributes(trackData, appearance);
+
     if (!imageRef.isNull())
     {
         // For best shots it is allowed to have a null bounding box.
@@ -388,6 +385,7 @@ ObjectMetadataXmlParser::ObjectResult ObjectMetadataXmlParser::extractObjectMeta
 
         bestShotPacket = makePtr<ObjectTrackBestShotPacket>(trackData.trackId, timestampUs, relativeRect);
         bestShotPacket->setImageUrl(url.toStdString());
+        bestShotPacket->addAttributes(attributes);
     }
 
     if (rect)
@@ -396,7 +394,7 @@ ObjectMetadataXmlParser::ObjectResult ObjectMetadataXmlParser::extractObjectMeta
         metadata->setTrackId(trackData.trackId);
         metadata->setTypeId(objectTypeId);
         metadata->setBoundingBox(relativeRect);
-        metadata->addAttributes(extractAttributes(trackData, appearance));
+        metadata->addAttributes(attributes);
     }
 
 
