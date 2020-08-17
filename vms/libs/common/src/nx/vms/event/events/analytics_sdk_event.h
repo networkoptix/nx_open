@@ -21,7 +21,7 @@ public:
         EventState toggleState,
         QString caption,
         QString description,
-        std::map<QString, QString> attributes,
+        nx::common::metadata::Attributes attributes,
         QnUuid objectTrackId,
         qint64 timeStampUsec);
 
@@ -34,7 +34,7 @@ public:
 
     virtual bool checkEventParams(const EventParameters &params) const override;
 
-    const std::map<QString, QString>& attributes() const;
+    const nx::common::metadata::Attributes& attributes() const;
     const std::optional<QString> attribute(const QString& attributeName) const;
 
 private:
@@ -42,7 +42,7 @@ private:
     const QString m_eventTypeId;
     const QString m_caption;
     const QString m_description;
-    const std::map<QString, QString> m_attributes;
+    const nx::common::metadata::Attributes m_attributes;
     const QnUuid m_objectTrackId;
 };
 

@@ -6,6 +6,7 @@
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/uuid.h>
+#include <analytics/common/object_metadata.h>
 
 namespace nx {
 namespace vms {
@@ -99,7 +100,7 @@ struct EventParameters
     QnUuid analyticsEngineId;
 
     QnUuid objectTrackId;
-    std::map<QString, QString> attributes;
+    nx::common::metadata::Attributes attributes;
 
     // TODO: #GDM #vkutin #rvasilenko Consider implementing via std::variant or similar.
     QString getAnalyticsEventTypeId() const;

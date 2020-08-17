@@ -15,8 +15,14 @@ namespace common {
 namespace metadata {
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
-    QN_OBJECT_DETECTION_TYPES,
+    (ObjectMetadata)(ObjectMetadataPacket),
     (json)(ubjson),
+    _Fields,
+    (brief, true))
+
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
+    (Attribute),
+    (json)(ubjson)(xml)(csv_record),
     _Fields,
     (brief, true))
 
@@ -156,6 +162,42 @@ bool operator==(const ObjectMetadataPacket& left, const ObjectMetadataPacket& ri
 bool operator<(const ObjectMetadataPacket& first, std::chrono::microseconds second)
 {
     return first.timestampUs < second.count();
+}
+
+std::vector<AttributeGroup> groupAttributes(const Attributes& attributes, int maxValuesInGroup)
+{
+    const auto valuesList =
+        [maxValuesInGroup](const auto beginIter, const auto endIter) -> AttributeGroup
+    {
+        AttributeGroup result;
+        result.name = beginIter->name;
+        result.totalValues = (int)std::distance(beginIter, endIter);
+        const auto effectiveEnd = beginIter + qMin(result.totalValues, maxValuesInGroup);
+
+        for (auto iter = beginIter; iter != effectiveEnd; ++iter)
+            result.values.push_back(iter->value);
+
+        return result;
+    };
+
+    std::vector<AttributeGroup> result;
+    for (auto begin = attributes.cbegin(); begin != attributes.cend(); )
+    {
+        if (begin->name.isEmpty())
+        {
+            ++begin;
+            continue;
+        }
+
+        auto end = begin + 1;
+        while (end != attributes.cend() && end->name == begin->name)
+            ++end;
+
+        result.push_back(valuesList(begin, end));
+        begin = end;
+    }
+
+    return result;
 }
 
 } // namespace metadata

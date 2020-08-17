@@ -201,7 +201,7 @@ void UserTextSearchExpressionParser::parse(const QString& userText, Handler hand
                 if (ch.isSpace() || isKeyValueDelimiter(ch))
                 {
                     saveToken(text.midRef(tokenStart, i - tokenStart));
-                    if (isKeyValueDelimiter(ch ))
+                    if (isKeyValueDelimiter(ch))
                         saveToken(text.midRef(i, 1)); //< Adding key/value delimiter as a separate token.
                     state = State::waitingTokenStart;
                 }

@@ -588,7 +588,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
                 eventState,
                 params.caption,
                 params.description,
-                /*attributes*/ std::map<QString, QString>(),
+                nx::common::metadata::Attributes(),
                 params.objectTrackId,
                 params.eventTimestampUsec));
 

@@ -28,7 +28,7 @@ struct Attribute
     };
 };
 #define Attribute_Fields (name)(value)
-QN_FUSION_DECLARE_FUNCTIONS(Attribute, (json)(ubjson));
+QN_FUSION_DECLARE_FUNCTIONS(Attribute, (json)(ubjson)(xml)(csv_record));
 
 bool operator<(const Attribute& f, const Attribute& s);
 bool operator==(const Attribute& left, const Attribute& right);
@@ -36,6 +36,15 @@ bool operator==(const Attribute& left, const Attribute& right);
 QString toString(const Attribute&);
 
 using Attributes = std::vector<Attribute>;
+
+struct AttributeGroup
+{
+    QString name;
+    QStringList values;
+    int totalValues = 0;
+};
+
+std::vector<AttributeGroup> groupAttributes(const Attributes& attributes, int maxValuesInGroup);
 
 //-------------------------------------------------------------------------------------------------
 static constexpr int kCoordinateDecimalDigits = 4;
@@ -112,11 +121,6 @@ struct ObjectMetadataPacket
 QN_FUSION_DECLARE_FUNCTIONS(ObjectMetadataPacket, (json)(ubjson));
 
 bool operator==(const ObjectMetadataPacket& left, const ObjectMetadataPacket& right);
-
-#define QN_OBJECT_DETECTION_TYPES \
-    (Attribute)\
-    (ObjectMetadata)\
-    (ObjectMetadataPacket)
 
 using ObjectMetadataPacketPtr = std::shared_ptr<ObjectMetadataPacket>;
 using ConstObjectMetadataPacketPtr = std::shared_ptr<const ObjectMetadataPacket>;

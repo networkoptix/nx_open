@@ -369,6 +369,13 @@ void MetadataHandler::handleEventMetadata(
     if (eventMetadataWithObjectTrackId)
         objectTrackId = fromSdkUuidToQnUuid(eventMetadataWithObjectTrackId->trackId());
 
+    nx::common::metadata::Attributes attributes;
+    for (int i = 0; i < eventMetadata->attributeCount(); ++i)
+    {
+        const auto attribute = eventMetadata->attribute(i);
+        attributes.push_back({attribute->name(), attribute->value()});
+    }
+
     const auto sdkEvent = nx::vms::event::AnalyticsSdkEventPtr::create(
         m_resource,
         m_engineId,
@@ -376,7 +383,7 @@ void MetadataHandler::handleEventMetadata(
         eventState,
         eventMetadata->caption(),
         eventMetadata->description(),
-        nx::vms::server::sdk_support::attributesMap(eventMetadata),
+        attributes,
         objectTrackId,
         timestampUsec);
 

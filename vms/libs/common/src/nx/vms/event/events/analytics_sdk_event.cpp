@@ -35,7 +35,7 @@ AnalyticsSdkEvent::AnalyticsSdkEvent(
     EventState toggleState,
     QString caption,
     QString description,
-    std::map<QString, QString> attributes,
+    nx::common::metadata::Attributes attributes,
     QnUuid objectTrackId,
     qint64 timeStampUsec)
     :
@@ -100,23 +100,22 @@ bool AnalyticsSdkEvent::checkEventParams(const EventParameters& params) const
 
     nx::analytics::db::TextMatcher textMatcher;
     textMatcher.parse(params.description);
-    nx::common::metadata::Attributes attributes;
-    for (const auto& [name, value]: m_attributes)
-        attributes.push_back({name, value});
-
-    textMatcher.matchAttributes(attributes);
+    textMatcher.matchAttributes(m_attributes);
     return textMatcher.matched();
 }
 
-const std::map<QString, QString>& AnalyticsSdkEvent::attributes() const
+const nx::common::metadata::Attributes& AnalyticsSdkEvent::attributes() const
 {
     return m_attributes;
 }
 
 const std::optional<QString> AnalyticsSdkEvent::attribute(const QString& attributeName) const
 {
-    if (auto it = m_attributes.find(attributeName); it != m_attributes.cend())
-        return it->second;
+    for (const auto& attribute: m_attributes)
+    {
+        if (attribute.name == attributeName)
+            return attribute.value;
+    }
 
     return std::nullopt;
 }

@@ -30,6 +30,7 @@
 
 #include <nx/analytics/descriptor_manager.h>
 #include <nx/fusion/model_functions.h>
+#include <analytics/common/object_metadata.h>
 
 namespace {
 
@@ -44,14 +45,26 @@ namespace nx {
 namespace vms {
 namespace event {
 
-QString serializeAttributes(const std::map<QString, QString>& attributes, const QString& kDelimiter)
+QString serializeAttributes(const nx::common::metadata::Attributes& attributes, const QString& kDelimiter)
 {
     QString result;
-    for (const auto& [name, value] : attributes)
+    for (const auto& attribute: attributes)
     {
         if (!result.isEmpty())
             result += kDelimiter;
-        result += NX_FMT("%1: %2", name, value);
+        result += NX_FMT("%1: %2", attribute.name, attribute.value);
+    }
+    return result;
+}
+
+QString serializeAttributes(const std::vector<nx::common::metadata::AttributeGroup>& attributes, const QString& kDelimiter)
+{
+    QString result;
+    for (const auto& group: attributes)
+    {
+        if (!result.isEmpty())
+            result += kDelimiter;
+        result += NX_FMT("%1: %2", group.name, group.values.join(", "));
     }
     return result;
 }
@@ -957,10 +970,13 @@ QString StringsHelper::notificationCaption(
                 : parameters.caption;
             if (!parameters.attributes.empty())
             {
+                static const int kMaxValuesInGroup = 2;
+                using namespace nx::common::metadata;
+                auto attrGroups = groupAttributes(parameters.attributes, kMaxValuesInGroup);
                 const QString kDelimiter = '\n';
                 if (!result.isEmpty())
                     result += kDelimiter;
-                result += serializeAttributes(parameters.attributes, kDelimiter);
+                result += serializeAttributes(attrGroups, kDelimiter);
             }
             return result;
         }
