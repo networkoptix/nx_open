@@ -680,7 +680,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
             for (const auto& item: objectMetadata->objectMetadataList)
             {
-                const auto found = findObject(item.trackId);
+                auto found = findObject(item.trackId);
                 if (item.isBestShot())
                 {
                     if (!found.track)
@@ -710,6 +710,7 @@ void AnalyticsSearchListModel::Private::processMetadata()
                         {
                             newObjectIndices[found.track->id] = int(newTracks.size());
                             newTracks.push_back(*found.track);
+                            found.track = &newTracks.back();
                             m_noBestShotTracks.erase(m_noBestShotTracks.begin() + found.index);
                             break;
                         }
@@ -936,39 +937,26 @@ QList<QPair<QString, QString>> AnalyticsSearchListModel::Private::attributes(
     const QString darkerColor = QPalette().color(QPalette::WindowText).name();
 
     const auto valuesText =
-        [darkerColor](const auto beginIter, const auto endIter) -> QString
+        [darkerColor](const QStringList& firstValues, int totalCount) -> QString
         {
-            const auto count = (int) std::distance(beginIter, endIter);
-            const auto effectiveEnd = beginIter + qMin(count, kMaxDisplayedAttributeValues);
-
-            QString displayedAttributes = beginIter->value;
-
-            for (auto iter = beginIter + 1; iter != effectiveEnd; ++iter)
-                displayedAttributes += ", " + iter->value;
-
-            if (count <= kMaxDisplayedAttributeValues)
+            const QString displayedAttributes = firstValues.join(", ");
+            const int remainder = totalCount - kMaxDisplayedAttributeValues;
+            if (remainder <= 0)
                 return displayedAttributes;
 
             return nx::format("%1 <font color=\"%3\">(%2)</font>", displayedAttributes,
-                AnalyticsSearchListModel::tr("+%n values", "", count - kMaxDisplayedAttributeValues),
+                AnalyticsSearchListModel::tr("+%n values", "", remainder),
                 darkerColor);
         };
 
+    const auto groupedAttributes = nx::common::metadata::groupAttributes(
+        track.attributes, kMaxDisplayedAttributeValues);
+
     QList<QPair<QString, QString>> result;
-    for (auto begin = track.attributes.cbegin(); begin != track.attributes.cend(); )
+    for (const auto& attribute: groupedAttributes)
     {
-        if (begin->name.isEmpty() || isAnalyticsAttributeHidden(begin->name))
-        {
-            ++begin;
-            continue;
-        }
-
-        auto end = begin + 1;
-        while (end != track.attributes.cend() && end->name == begin->name)
-            ++end;
-
-        result.push_back({begin->name, valuesText(begin, end)});
-        begin = end;
+        if (!isAnalyticsAttributeHidden(attribute.name))
+            result.push_back({attribute.name, valuesText(attribute.values, attribute.totalValues)});
     }
 
     return result;

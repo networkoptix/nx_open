@@ -166,35 +166,21 @@ bool operator<(const ObjectMetadataPacket& first, std::chrono::microseconds seco
 
 std::vector<AttributeGroup> groupAttributes(const Attributes& attributes, int maxValuesInGroup)
 {
-    const auto valuesList =
-        [maxValuesInGroup](const auto beginIter, const auto endIter) -> AttributeGroup
-    {
-        AttributeGroup result;
-        result.name = beginIter->name;
-        result.totalValues = (int)std::distance(beginIter, endIter);
-        const auto effectiveEnd = beginIter + qMin(result.totalValues, maxValuesInGroup);
-
-        for (auto iter = beginIter; iter != effectiveEnd; ++iter)
-            result.values.push_back(iter->value);
-
-        return result;
-    };
-
+    std::map<QString, int> tmp;
     std::vector<AttributeGroup> result;
-    for (auto begin = attributes.cbegin(); begin != attributes.cend(); )
+    for (const auto& attribute: attributes)
     {
-        if (begin->name.isEmpty())
+        auto itr = tmp.find(attribute.name);
+        if (itr == tmp.end())
         {
-            ++begin;
-            continue;
+            itr = tmp.emplace(attribute.name, result.size()).first;
+            result.push_back(AttributeGroup());
         }
-
-        auto end = begin + 1;
-        while (end != attributes.cend() && end->name == begin->name)
-            ++end;
-
-        result.push_back(valuesList(begin, end));
-        begin = end;
+        auto& group = result[itr->second];
+        group.name = attribute.name;
+        if (group.values.size() < maxValuesInGroup)
+            group.values.push_back(attribute.value);
+        group.totalValues++;
     }
 
     return result;
