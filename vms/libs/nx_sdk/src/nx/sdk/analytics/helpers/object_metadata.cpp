@@ -74,21 +74,7 @@ void ObjectMetadata::addAttribute(nx::sdk::Ptr<Attribute> attribute)
     if (!NX_KIT_ASSERT(attribute))
         return;
 
-    const auto existingAttribute = std::find_if(m_attributes.begin(), m_attributes.end(),
-        [attributeName = attribute->name()](const nx::sdk::Ptr<Attribute>& attribute)
-        {
-            return strcmp(attribute->name(), attributeName) == 0;
-        });
-
-    if (existingAttribute != m_attributes.end())
-    {
-        NX_KIT_ASSERT((*existingAttribute)->type() == attribute->type());
-        (*existingAttribute)->setValue(attribute->value());
-    }
-    else
-    {
-        m_attributes.push_back(std::move(attribute));
-    }
+    m_attributes.push_back(std::move(attribute));
 }
 
 void ObjectMetadata::addAttributes(const std::vector<nx::sdk::Ptr<Attribute>>& value)
