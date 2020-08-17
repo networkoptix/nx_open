@@ -468,7 +468,7 @@ std::optional<State::RecordingAlert> updateArchiveLengthAlert(const State& state
 std::optional<State::RecordingAlert> updateHighPreRecordingAlert(const State& state)
 {
     const bool warning =
-        seconds(state.recording.thresholds.beforeSec()) > kPreRecoringAlertThreshold;
+        seconds(state.recording.thresholds.beforeSec()) >= kPreRecoringAlertThreshold;
 
     if (warning)
         return State::RecordingAlert::highPreRecordingValue;
