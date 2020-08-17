@@ -41,11 +41,11 @@ private:
     nx::vms::api::StatisticsCameraData fullDeviceStatistics(
         nx::vms::api::CameraDataEx&& deviceInfo);
 
-private:    
+private:
     nx::network::http::AsyncHttpClientPtr m_httpClient;
     bool m_firstTime = true;
     boost::optional<QDateTime> m_plannedReportTime;
-    uint m_timerCycle;
+    std::chrono::milliseconds m_timerCycle;
 
     QnMutex m_mutex;
     bool m_timerDisabled = false;

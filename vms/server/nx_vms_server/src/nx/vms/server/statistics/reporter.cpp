@@ -42,11 +42,11 @@ static const std::chrono::hours kSendAfterUpdateTime(3);
 
 static const uint kMinDelayRatio = 30; // 30% is about 9 days.
 static const uint kRandomDelayRatio = 50; //< 50% is about 15 days.
-static const uint kMaxdelayRation = kMinDelayRatio + kRandomDelayRatio;
+static const uint kMaxDelayRatio = kMinDelayRatio + kRandomDelayRatio;
 
-static const uint kInitialTimerCycle = 60 * 1000; //< MSecs, update state every minute.
-static const uint kGrowTimerCycleRatio = 2; //< Make cycle longer in case of failure.
-static const uint kMaxTimerCycle = 24 * 60 * 60 * 1000; //< MSecs, once a day at least.
+static const std::chrono::seconds kInitialTimerCycle(10);
+static const std::chrono::milliseconds::rep kGrowTimerCycleRatio = 2; //< Make cycle longer in case of failure.
+static const std::chrono::hours kMaxTimerCycle(24);
 
 static const QString kServerReportApi = lit("statserver/api/report");
 
@@ -55,11 +55,11 @@ using namespace nx::vms::api;
 namespace nx::vms::server::statistics {
 
 Reporter::Reporter(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule),    
-    m_timerCycle(kInitialTimerCycle),        
+    QnCommonModuleAware(commonModule),
+    m_timerCycle(kInitialTimerCycle),
     m_timerManager(commonModule->timerManager())
 {
-    NX_CRITICAL(kMaxdelayRation <= 100);
+    NX_CRITICAL(kMaxDelayRatio <= 100);
     setupTimer();
 }
 
@@ -183,11 +183,8 @@ void Reporter::setupTimer()
     QnMutexLocker lk(&m_mutex);
     if (!m_timerDisabled)
     {
-        m_timerId = m_timerManager->addTimer(
-            std::bind(&Reporter::timerEvent, this),
-            std::chrono::milliseconds(m_timerCycle));
-
-        NX_DEBUG(this, lm("Timer is set with delay %1").arg(m_timerCycle));
+        m_timerId = m_timerManager->addTimer([this](auto) { timerEvent(); }, m_timerCycle);
+        NX_VERBOSE(this, "Timer is set with delay %1", m_timerCycle);
     }
 }
 
@@ -217,15 +214,16 @@ void Reporter::timerEvent()
     const auto& settings = commonModule()->globalSettings();
     if (!settings->isInitialized())
     {
-        /* Try again. */
+        NX_VERBOSE(this, "Settings are not initialized yet");
+
+        // Try again later.
         setupTimer();
         return;
     }
 
-    if (!settings->isStatisticsAllowed()
-        || settings->isNewSystem())
+    if (!settings->isStatisticsAllowed() || settings->isNewSystem())
     {
-        NX_DEBUG(this, lm("Automatic report system is disabled"));
+        NX_DEBUG(this, "Automatic report system is disabled");
 
         // Better luck next time (if report system will be enabled by another mediaserver)
         setupTimer();
@@ -233,10 +231,14 @@ void Reporter::timerEvent()
     }
 
     const QDateTime now = qnSyncTime->currentDateTime().toUTC();
-    if (plannedReportTime(now) <= now)
+    if (const auto plannedTime = plannedReportTime(now); plannedTime <= now)
     {
         if (initiateReport() == ec2::ErrorCode::ok)
             return;
+    }
+    else
+    {
+        NX_VERBOSE(this, "Planned time %1 has not come yet", plannedTime.toString(Qt::ISODate));
     }
 
     // let's retry a little later
@@ -263,31 +265,31 @@ QDateTime Reporter::plannedReportTime(const QDateTime& now)
         collator.setNumericMode(true);
         if (collator.compare(currentVersion, reportedVersion) > 0)
         {
-            const uint timeCycle = convertToSeconds(nx::utils::parseTimerDuration(
-                settings->statisticsReportTimeCycle(), kSendAfterUpdateTime));
+            const auto timeCycle = nx::utils::parseTimerDuration(
+                settings->statisticsReportUpdateDelay(), kSendAfterUpdateTime);
+            NX_VERBOSE(this, "Base update delay %1", timeCycle);
 
             m_plannedReportTime = now.addSecs(nx::utils::random::number(
-                  timeCycle * kMinDelayRatio / 100,
-                  timeCycle * kMaxdelayRation / 100));
-
-            NX_DEBUG(this, lm("Last reported version is '%1' while running '%2', plan early report for %3")
-                .arg(reportedVersion).arg(currentVersion)
-                .arg(m_plannedReportTime->toString(Qt::ISODate)));
+                  convertToSeconds(timeCycle) * kMinDelayRatio / 100,
+                  convertToSeconds(timeCycle) * kMaxDelayRatio / 100));
+            NX_DEBUG(this, "Last reported version is '%1' while running '%2', plan early report for %3",
+                reportedVersion, currentVersion, m_plannedReportTime->toString(Qt::ISODate));
 
             return *m_plannedReportTime;
         }
     }
 
-    const uint timeCycle = convertToSeconds(nx::utils::parseTimerDuration(
-        settings->statisticsReportTimeCycle(), kDefaultSendCycleTime));
-
-    const uint minDelay = timeCycle * kMinDelayRatio / 100;
-    const uint maxDelay = timeCycle * kMaxdelayRation / 100;
-    if (!m_plannedReportTime || *m_plannedReportTime > now.addSecs(maxDelay))
+    const auto timeCycle = nx::utils::parseTimerDuration(
+        settings->statisticsReportTimeCycle(), kDefaultSendCycleTime);
+    if (!m_plannedReportTime || *m_plannedReportTime > now.addSecs(convertToSeconds(timeCycle)))
     {
+        NX_VERBOSE(this, "Base cycle delay %1", timeCycle);
+
         const QDateTime lastTime = settings->statisticsReportLastTime();
         m_plannedReportTime = (lastTime.isValid() ? lastTime : now).addSecs(
-            nx::utils::random::number<uint>(minDelay, maxDelay));
+            nx::utils::random::number<uint>(
+                convertToSeconds(timeCycle) * kMinDelayRatio / 100,
+                convertToSeconds(timeCycle) * kMaxDelayRatio / 100));
 
         NX_INFO(this, lm("Last report was at %1, the next planned for %2")
            .arg(lastTime.isValid() ? lastTime.toString(Qt::ISODate) : lit("NEWER"))
@@ -346,8 +348,7 @@ void Reporter::finishReport(nx::network::http::AsyncHttpClientPtr httpClient)
     if (httpClient->hasRequestSucceeded())
     {
         m_timerCycle = kInitialTimerCycle;
-        NX_INFO(this, lm("Statistics report successfully sent to %1")
-            .arg(httpClient->url()));
+        NX_INFO(this, "Statistics report successfully sent to %1", httpClient->url());
 
         const auto now = qnSyncTime->currentDateTime().toUTC();
         m_plannedReportTime = boost::none;
@@ -360,11 +361,15 @@ void Reporter::finishReport(nx::network::http::AsyncHttpClientPtr httpClient)
     }
     else
     {
-        if ((m_timerCycle *= 2) > kMaxTimerCycle)
+        if ((m_timerCycle *= kGrowTimerCycleRatio) > kMaxTimerCycle)
             m_timerCycle = kMaxTimerCycle;
 
-        NX_WARNING(this, lm("doPost to %1 has failed, update timer cycle to %2")
-            .arg(httpClient->url()).arg(m_timerCycle));
+        NX_WARNING(this, "POST to %1 has failed (%2), update timer cycle to %3",
+            httpClient->url(),
+            httpClient->response()
+                ? httpClient->response()->statusLine.toString().trimmed()
+                : SystemError::toString(httpClient->lastSysErrorCode()),
+            m_timerCycle);
     }
 
     setupTimer();
