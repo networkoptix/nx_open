@@ -628,7 +628,7 @@ bool QnRtspClient::sendSetup()
     const QString localAddress = m_tcpSock->getLocalAddress().address.toString();
 
     using namespace nx::streaming;
-	
+
     if (m_sdpTracks.empty())
     {
         NX_WARNING(this, "Failed to start rtsp session, empty SDP");
@@ -780,7 +780,7 @@ void QnRtspClient::parseSetupResponse(const QString& response, SDPTrackInfo* tra
         }
         else if (key == "interleaved")
         {
-            track->interleaved = {part1.toInt(), 
+            track->interleaved = {part1.toInt(),
                 part2.isEmpty() ? part1.toInt() + 1 : part2.toInt()};
             registerRTPChannel(track->interleaved.first, track->interleaved.second, trackIndex);
         }
@@ -1420,7 +1420,9 @@ CameraDiagnostics::Result QnRtspClient::sendRequestAndReceiveResponse(
 {
     nx::network::rtsp::StatusCodeValue prevStatusCode = nx::network::http::StatusCode::ok;
     addAuth( &request );
-    addAdditionAttrs( &request );
+
+    if (request.requestLine.method != kOptionsCommand)
+        addAdditionAttrs(&request);
 
     NX_VERBOSE(this, "Send: %1", request.requestLine.toString());
     const int port = m_url.port(DEFAULT_RTP_PORT);
