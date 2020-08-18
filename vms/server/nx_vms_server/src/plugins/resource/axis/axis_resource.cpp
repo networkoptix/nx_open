@@ -574,7 +574,7 @@ CameraDiagnostics::Result QnPlAxisResource::initializeCameraDriver()
         auto status = readAxisParameter(httpClient.get(), AXIS_FIRMWARE_VERSION_PARAM_NAME, &firmware);
         if (status == nx::network::http::StatusCode::ok)
         {
-            NX_VERBOSE(this, 
+            NX_VERBOSE(this,
                 "Update firmware version to %1 for camera %2", firmware, httpClient->url());
             setFirmware(firmware);
         }
@@ -1609,6 +1609,21 @@ bool QnPlAxisResource::loadAdvancedParametersTemplateFromFile(QnCameraAdvancedPa
 #ifdef _DEBUG
     NX_ASSERT(result, lm("Error while parsing xml: %1").arg(templateFilename));
 #endif
+
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_advancedParameterIdsToReopenStreams.clear();
+    for (const QString& parameterId: params.allParameterIds())
+    {
+        const QnCameraAdvancedParameter parameter = params.getParameterById(parameterId);
+        if (!parameter.isValid())
+            continue;
+
+        static const QString kReopenStreamsMixin = "reopenStreams";
+        if (parameter.aux == kReopenStreamsMixin)
+            m_advancedParameterIdsToReopenStreams.insert(parameterId);
+
+    }
+
     return result;
 }
 
@@ -1668,7 +1683,7 @@ bool QnPlAxisResource::isMaintenanceParam(const QnCameraAdvancedParameter& param
 }
 
 QMap<QString, QString> QnPlAxisResource::executeParamsQueries(const QSet<QString>& queries,
-    bool& isSuccessful) const
+    bool& isSuccessful)
 {
     QMap<QString, QString> result;
     isSuccessful = true;
@@ -1717,7 +1732,7 @@ QMap<QString, QString> QnPlAxisResource::executeParamsQueries(const QSet<QString
 
 QMap<QString, QString>  QnPlAxisResource::executeParamsQueries(
     const QString &query,
-    bool &isSuccessful) const
+    bool &isSuccessful)
 {
     QSet<QString> queries;
     queries.insert(query);
@@ -1835,6 +1850,21 @@ QSet<QString> QnPlAxisResource::setApiParameters(const QnCameraAdvancedParamValu
 
     if (!maintenanceQuery.isEmpty())
         executeParamsQueries(maintenanceQuery, success);
+
+    bool needToReopenStreams = false;
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        needToReopenStreams = std::any_of(
+            m_advancedParameterIdsToReopenStreams.begin(),
+            m_advancedParameterIdsToReopenStreams.end(),
+            [&values](const QString& parameterId) { return values.contains(parameterId); });
+    }
+
+    if (needToReopenStreams)
+    {
+        reopenStream(nx::vms::api::StreamIndex::primary);
+        reopenStream(nx::vms::api::StreamIndex::secondary);
+    }
 
     return success ? values.ids() : QSet<QString>();
 }

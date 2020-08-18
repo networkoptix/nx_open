@@ -243,8 +243,8 @@ private:
     QString buildSetParamsQuery(const QnCameraAdvancedParamValueList& params) const;
     QString buildMaintenanceQuery(const QnCameraAdvancedParamValueList& params) const;
 
-    QMap<QString, QString> executeParamsQueries(const QSet<QString>& queries, bool& isSuccessful) const;
-    QMap<QString, QString> executeParamsQueries(const QString& query, bool& isSuccessful) const;
+    QMap<QString, QString> executeParamsQueries(const QSet<QString>& queries, bool& isSuccessful);
+    QMap<QString, QString> executeParamsQueries(const QString& query, bool& isSuccessful);
     QnCameraAdvancedParamValueList parseParamsQueriesResult(
         const QMap<QString, QString>& queriesResult,
         const QList<QnCameraAdvancedParameter>& params) const;
@@ -254,6 +254,9 @@ private:
 
     friend class QnAxisPtzController;
     friend class AxisIOMessageBodyParser;
+
+private:
+    std::set<QString> m_advancedParameterIdsToReopenStreams;
 };
 
 #endif // #ifdef ENABLE_AXIS
