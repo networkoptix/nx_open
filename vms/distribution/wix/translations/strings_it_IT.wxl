@@ -3,14 +3,14 @@
   <String Id="Caption">[WixBundleName] Impostazione - [WixBundleVersion]</String>
   <String Id="Title">[WixBundleName] - [WixBundleVersion]</String>
   <String Id="Components">[InstallerTitle]</String>
-  <String Id="HelpText">/install | /repair | /uninstall | /layout [directory] - installs, repairs, uninstalls or
-   creates a complete local copy of the bundle in directory. Install is the default.
+  <String Id="HelpText">/ installazione | / riparazione | / disinstalla | / layout [directory] - installa, ripara, disinstalla o
+   crea una copia locale completa del bundle nella cartella. L\'installazione è l\'impostazione predefinita.
 
-/passive | /quiet -  displays minimal UI with no prompts or displays no UI and
-   no prompts. By default UI and all prompts are displayed.
+/ passivo | / silenzioso: visualizza l\'interfaccia utente minima senza prompt o non mostra l\'interfaccia utente e
+   senza prompt. Per impostazione predefinita vengono visualizzati l\'interfaccia utente e tutti i prompt.
 
-/norestart   - suppress any attempts to restart. By default UI will prompt before restart.
-/log log.txt - logs to a specific file. By default a log file is created in %TEMP%.</String>
+/ norestart - sopprime qualsiasi tentativo di riavvio. Per impostazione predefinita, l\'interfaccia utente richiederà prima del riavvio.
+/ log log.txt - registra in un file specifico. Per impostazione predefinita, viene creato un file di registro in %TEMP%.</String>
   <String Id="ConfirmCancelMessage">Sei sicuro di voler annullare?</String>
   <String Id="ClientAndServer">Client e Server</String>
   <String Id="ClientOnly">Solo cliente</String>

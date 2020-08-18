@@ -19,10 +19,10 @@
                     <th>Server</th>
                     <th>Stato</th>
                     <th ng-repeat="(key, description) in statisticsColumns">
-                        {{description}}
+                        {{descrizione}}
                     </th>
                     <th ng-repeat="(key, description) in metricsColumns">
-                        {{description}}
+                        {{descrizione}}
                     </th>
                 </tr>
             </thead>
@@ -73,8 +73,7 @@
                         {{camera.status}}
                     </td>
                     <td ng-class="{'text-danger':camerasProvider.getServer(camera.parentId).status!='Online'}">
-                        {{camerasProvider.getServer(camera.parentId).name}}
-                        ({{camerasProvider.getServer(camera.parentId).status}})
+                        {{camerasProvider.getServer(camera.parentId).name}}        ({{camerasProvider.getServer(camera.parentId).status}})
                     </td>
 
                     <td>
