@@ -230,6 +230,9 @@ struct Ini: nx::kit::IniConfig
         "[Support] Disable camera thumbnail server requests for debugging and profiling purposes.\n"
         "Also disables Timeline Thumbnail Pane and Preview Search.");
 
+    NX_INI_FLAG(0, showCameraCrosshair,
+        "[Support] Show crosshair over the camera center for PTZ debugging purposes.");
+
     // ---------------------------------------------------------------------------------------------
     // CI section.
     // Flags here are used for the client functional unit tests.

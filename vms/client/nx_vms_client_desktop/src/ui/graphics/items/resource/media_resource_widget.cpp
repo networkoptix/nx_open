@@ -228,6 +228,30 @@ bool tourIsRunning(QnWorkbenchContext* context)
     return context->action(action::ToggleLayoutTourModeAction)->isChecked();
 }
 
+void drawCrosshair(QPainter* painter, const QRectF& rect)
+{
+    const PainterTransformScaleStripper scaleStripper(painter);
+    const QRectF fullRect = scaleStripper.mapRect(rect);
+    const qreal crosshairRadius = std::min(fullRect.width(), fullRect.height()) / 10;
+    const QPointF center = fullRect.center();
+    const QBrush color = Qt::red;
+
+    {
+        QnScopedPainterPenRollback penRollback(painter, QPen(color, 2));
+        painter->drawEllipse(center, crosshairRadius, crosshairRadius);
+    }
+
+    {
+        QnScopedPainterPenRollback penRollback(painter, QPen(color, 1));
+        painter->drawLine(
+            center.x(), center.y() - crosshairRadius,
+            center.x(), center.y() + crosshairRadius);
+        painter->drawLine(
+            center.x() - crosshairRadius, center.y(),
+            center.x() + crosshairRadius, center.y());
+    }
+}
+
 } // namespace
 
 QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWorkbenchItem* item, QGraphicsItem* parent):
@@ -1637,6 +1661,9 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
         const PainterTransformScaleStripper scaleStripper(painter);
         painter->fillRect(scaleStripper.mapRect(rect), overlayColor);
     }
+
+    if (ini().showCameraCrosshair && hasVideo())
+        drawCrosshair(painter, rect);
 }
 
 void QnMediaResourceWidget::paintMotionGrid(QPainter *painter, int channel, const QRectF &rect, const QnMetaDataV1Ptr &motion)
