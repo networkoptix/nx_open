@@ -60,12 +60,16 @@ std::map<QString, CameraModuleApi::ModuleInfo> CameraModuleApi::fetchModuleInfos
 
         const auto parameters = CameraParameterApi(m_url).fetch({"vadp_module"});
 
-        const auto count = parseInt(at(parameters, "vadp_module_number"));
-        for (int i = 0; i < count; ++i)
+        if (const auto it = parameters.find("vadp_module_number"); it != parameters.end())
         {
-            auto& moduleInfo = moduleInfos[at(parameters, NX_FMT("vadp_module_i%1_name", i))];
-            moduleInfo.index = 1;
-            moduleInfo.isEnabled = parseStatus(at(parameters, NX_FMT("vadp_module_i%1_status", i)));
+            const auto count = parseInt(it->second);
+            for (int i = 0; i < count; ++i)
+            {
+                auto& moduleInfo = moduleInfos[at(parameters, NX_FMT("vadp_module_i%1_name", i))];
+                moduleInfo.index = i;
+                moduleInfo.isEnabled = parseStatus(
+                    at(parameters, NX_FMT("vadp_module_i%1_status", i)));
+            }
         }
 
         return moduleInfos;
