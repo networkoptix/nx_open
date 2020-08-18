@@ -21,6 +21,7 @@ public:
 
     const QString& inputPortID() const;
 
+    virtual QString getExternalUniqueKey() const override;
     virtual bool checkEventParams(const EventParameters &params) const override;
     virtual EventParameters getRuntimeParams() const override;
 

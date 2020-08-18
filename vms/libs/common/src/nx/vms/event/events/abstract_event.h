@@ -115,6 +115,12 @@ public:
     virtual EventParameters getRuntimeParamsEx(
         const EventParameters& ruleEventParams) const;
 
+    /**
+     * @return external event key. It is used in case of several prolonged events are running on
+     * the same event rule. It is needed for correct calculation of event start/stop signals.
+     * It could be a camera input port id, analytics object type e.t.c.
+     */
+    virtual QString getExternalUniqueKey() const;
 private:
     /**
      * @brief m_eventType       Type of event. See EventType.

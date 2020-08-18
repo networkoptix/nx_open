@@ -25,6 +25,11 @@ const QString& CameraInputEvent::inputPortID() const
     return m_inputPortID;
 }
 
+QString CameraInputEvent::getExternalUniqueKey() const
+{
+    return m_inputPortID;
+}
+
 bool CameraInputEvent::checkEventParams(const EventParameters& params) const
 {
     QString inputPort = params.inputPortId;

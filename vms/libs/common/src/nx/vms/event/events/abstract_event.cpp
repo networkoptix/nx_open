@@ -13,6 +13,7 @@
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/analytics/descriptor_manager.h>
+#include <nx/utils/std/algorithm.h>
 
 namespace nx {
 namespace vms {
@@ -132,6 +133,25 @@ bool isResourceRequired(EventType eventType)
         || requiresServerResource(eventType);
 }
 
+bool isEventGroupContainsOnlyProlongedEvents(QnCommonModule* commonModule, const QString& groupId)
+{
+    const auto& descriptors = commonModule->analyticsEventTypeDescriptorManager()->descriptors();
+    if (descriptors.empty())
+        return false;
+    for (const auto& [eventTypeId, descriptor]: descriptors)
+    {
+        for (const auto& scope: descriptor.scopes)
+        {
+            if (scope.groupId == groupId)
+            {
+                if (!descriptor.flags.testFlag(nx::vms::api::analytics::EventTypeFlag::stateDependent))
+                    return false;
+            }
+        }
+    }
+    return true;
+}
+
 bool hasToggleState(
     EventType eventType,
     const EventParameters& runtimeParams,
@@ -153,11 +173,9 @@ bool hasToggleState(
 
         const auto descriptor = commonModule->analyticsEventTypeDescriptorManager()->descriptor(
             runtimeParams.getAnalyticsEventTypeId());
-
-        if (!descriptor)
-            return false;
-
-        return descriptor->flags.testFlag(nx::vms::api::analytics::EventTypeFlag::stateDependent);
+        if (descriptor)
+            return descriptor->flags.testFlag(nx::vms::api::analytics::EventTypeFlag::stateDependent);
+        return isEventGroupContainsOnlyProlongedEvents(commonModule, runtimeParams.getAnalyticsEventTypeId());
     }
     default:
         return false;
@@ -313,6 +331,11 @@ EventParameters AbstractEvent::getRuntimeParamsEx(
 bool AbstractEvent::checkEventParams(const EventParameters& /*params*/) const
 {
     return true;
+}
+
+QString AbstractEvent::getExternalUniqueKey() const
+{
+    return QString();
 }
 
 } // namespace event

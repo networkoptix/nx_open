@@ -34,6 +34,8 @@ public:
 
     virtual bool checkEventParams(const EventParameters &params) const override;
 
+    virtual QString getExternalUniqueKey() const override;
+
     const nx::common::metadata::Attributes& attributes() const;
     const std::optional<QString> attribute(const QString& attributeName) const;
 

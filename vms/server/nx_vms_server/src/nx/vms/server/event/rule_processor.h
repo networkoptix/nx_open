@@ -206,7 +206,16 @@ private:
         QSet<QnUuid> isActionRunning; // actions that has been started by resource. Continues action starts only onces for all event resources.
     };
 
-    using RunningRuleMap = QMap<QString, RunningRuleInfo>;
+    struct EventRuleKey
+    {
+        EventRuleKey(const QString& ruleId, const QString& eventKey);
+        bool operator<(const EventRuleKey& right) const;
+
+        QString ruleId;
+        QString eventKey;
+    };
+
+    using RunningRuleMap = std::map<EventRuleKey, RunningRuleInfo>;
 
     /**
      * @brief m_eventsInProgress Events that are toggled and state is On

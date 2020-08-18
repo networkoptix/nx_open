@@ -78,6 +78,11 @@ EventParameters AnalyticsSdkEvent::getRuntimeParamsEx(
     return params;
 }
 
+QString AnalyticsSdkEvent::getExternalUniqueKey() const
+{
+    return m_eventTypeId;
+}
+
 bool AnalyticsSdkEvent::checkEventParams(const EventParameters& params) const
 {
     if (!getResource() || m_engineId != params.getAnalyticsEngineId())
