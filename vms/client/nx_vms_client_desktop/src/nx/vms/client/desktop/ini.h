@@ -55,16 +55,16 @@ struct Ini: nx::kit::IniConfig
     );
 
     NX_INI_STRING("", debugAnalyticsVideoOverlayFromLogFile,
-        "[Dev] Display analytics debug overlay, based on the log file parsing.\n"
-        "Full path to the log file must be used here.");
+        "[Dev] Display analytics debug overlay, based on the log file parsing. The absolute path\n"
+        "to an Analytics Log file recorded via analytics_logging.ini must be specified here.");
 
     NX_INI_FLAG(0, showDebugTimeInformationInRibbon,
-        "[Dev] Whether to show extra timestamp information in event ribbon.");
+        "[Dev] Whether to show extra timestamp information in the event ribbon.");
 
     NX_INI_FLAG(0, showPreciseItemTimestamps,
-        "[Dev] Whether to show precise timestamps in camera window.\n"
-        "If enabled, current time in a camera window is shown in microseconds since epoch\n"
-        "together with the default human-readable date-time representation.");
+        "[Dev] Whether to show precise timestamps in the camera window. If enabled, the current\n"
+        "time in the camera window is shown in microseconds since epoch together with the\n"
+        "default human-readable date-time representation.");
 
     NX_INI_STRING("", updateFeedUrl,
         "[Dev] Overrides URL update server. Leave empty value to use built-in path.");
@@ -139,8 +139,8 @@ struct Ini: nx::kit::IniConfig
         "Panel tile click or double click.");
 
     NX_INI_FLAG(0, enableSyncedChunksForExtraContent,
-        "[Design] Whether to show merged bookmarks and analytics chunks in the synced area of the\n"
-        "timeline.");
+        "[Design] Whether to show merged bookmarks and analytics chunks in the synced area of\n"
+        "the timeline.");
 
     // DESIGN-750
     NX_INI_FLAG(1, enableAnalyticsPlaybackMask,
@@ -148,7 +148,8 @@ struct Ini: nx::kit::IniConfig
 
     // VMS-18865, VMS-18866
     NX_INI_FLAG(1, allowMultipleClientInstances,
-        "[Design] Whether client allowed to run in multiple instances (e.g. by desktop shortcut).");
+        "[Design] Whether the Client is allowed to run in multiple instances (e.g. by a desktop\n"
+        "shortcut).");
 
     NX_INI_FLAG(0, oldPtzAimOverlay,
         "[Design] Use old-style circular aim overlay to operate PTZ pan and tilt.");
@@ -223,8 +224,8 @@ struct Ini: nx::kit::IniConfig
         "Value in milliseconds, 0 means infinite timeout.");
 
     NX_INI_FLAG(0, delayRightPanelLiveAnalytics,
-        "[Support] Prohibits showing right panel live analytics before corresponding frame appears on\n"
-        "the camera if the camera is playing live");
+        "[Support] Prohibits showing right panel live analytics before the corresponding frame\n"
+        "appears on the camera if the camera is playing live");
 
     NX_INI_FLAG(0, debugDisableCameraThumbnails,
         "[Support] Disable camera thumbnail server requests for debugging and profiling purposes.\n"

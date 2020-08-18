@@ -34,7 +34,7 @@ struct PluginsIniConfig: public nx::kit::IniConfig
         "same as of manifests generated in analyticsManifestOutputPath.");
 
     NX_INI_STRING("", analyticsManifestOutputPath,
-        "Path (absolute or relative to .ini dir) to existing dir for saving analytics plugin\n"
+        "Path (absolute or relative to .ini dir) to the existing dir for saving analytics plugin\n"
         "manifests.");
 
     NX_INI_STRING("", analyticsSettingsSubstitutePath,
@@ -51,8 +51,8 @@ struct PluginsIniConfig: public nx::kit::IniConfig
         "Here {plugin_name} is the library name without extension and \"lib\" prefix.");
 
     NX_INI_STRING("", analyticsSettingsOutputPath,
-        "Path (absolute or relative to .ini dir) to existing dir for saving settings that the\n"
-        "Server sends to an analytics plugin.");
+        "Path (absolute or relative to .ini dir) to the existing dir for saving settings that\n"
+        "the Server sends to an analytics plugin.");
 
     NX_INI_FLAG(0, tryAllLibsInPluginDir,
         "Attempt to load each dynamic library from each plugin directory instead of only the one\n"
