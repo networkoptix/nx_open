@@ -15,6 +15,17 @@ static const QString kHelloWorld("hello world");
 class QnLexicalTextFixture: public QnFusionTestFixture
 {};
 
+TEST_F(QnLexicalTextFixture, boolTypes)
+{
+    EXPECT_EQ("true", QnLexical::serialized(true).toStdString());
+    EXPECT_EQ(true, QnLexical::deserialized<bool>("true"));
+    EXPECT_EQ(true, QnLexical::deserialized<bool>("1"));
+
+    EXPECT_EQ("false", QnLexical::serialized(false).toStdString());
+    EXPECT_EQ(false, QnLexical::deserialized<bool>("false"));
+    EXPECT_EQ(false, QnLexical::deserialized<bool>("0"));
+}
+
 TEST_F(QnLexicalTextFixture, integralTypes)
 {
     ASSERT_EQ("5", QnLexical::serialized(5));

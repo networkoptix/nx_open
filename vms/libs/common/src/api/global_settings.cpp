@@ -1291,7 +1291,14 @@ bool QnGlobalSettings::takeFromSettings(QSettings* settings, const QnResourcePtr
     changed |= m_cloudSystemIdAdaptor->takeFromSettings(settings, "");
     changed |= m_cloudAuthKeyAdaptor->takeFromSettings(settings, "");
 
-    return changed ? synchronizeNowSync() : false;
+    if (!changed)
+        return false;
+
+    if (!synchronizeNowSync())
+        return false;
+
+    settings->sync();
+    return true;
 }
 
 bool QnGlobalSettings::isUpdateNotificationsEnabled() const

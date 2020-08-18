@@ -205,12 +205,14 @@ void QnAbstractResourcePropertyAdaptor::saveToResource()
 
 bool QnAbstractResourcePropertyAdaptor::takeFromSettings(QSettings* settings, const QString& preffix)
 {
-    const auto value = settings->value(preffix + m_key);
+    const auto key = preffix + m_key;
+    const auto value = settings->value(key);
     if (value.isNull())
         return false;
 
-    setValueInternal(value);
-    settings->remove(m_key);
+    NX_VERBOSE(this, "Take value %1 = '%2' from %3", key, value, settings);
+    setSerializedValue(value);
+    settings->remove(key);
     return true;
 }
 
