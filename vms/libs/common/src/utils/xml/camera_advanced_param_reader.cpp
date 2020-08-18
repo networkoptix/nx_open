@@ -2,9 +2,6 @@
 
 #include <QtXml/QDomElement>
 
-#include <core/resource/resource.h>
-#include <core/resource/param.h>
-
 #include <nx/utils/log/log.h>
 #include <nx/fusion/model_functions.h>
 
@@ -52,73 +49,6 @@ namespace
         }
         return result;
     }
-}
-
-QnCameraAdvancedParams QnCameraAdvancedParamsReader::paramsFromResource(const QnResourcePtr &resource) {
-    NX_ASSERT(resource);
-    QByteArray serialized = encodedParamsFromResource(resource).toUtf8();
-    if (serialized.isEmpty())
-        return QnCameraAdvancedParams();
-    return QJson::deserialized<QnCameraAdvancedParams>(serialized);
-}
-
-void QnCameraAdvancedParamsReader::setParamsToResource(
-    const QnResourcePtr &resource,
-    const QnCameraAdvancedParams &params)
-{
-    NX_ASSERT(resource);
-    const auto oldParameters = paramsFromResource(resource);
-    if (oldParameters == params)
-        return;
-
-    QByteArray serialized = QJson::serialized(params);
-    setEncodedParamsToResource(resource, QString::fromUtf8(serialized));
-}
-
-QString QnCameraAdvancedParamsReader::encodedParamsFromResource(const QnResourcePtr &resource)
-{
-    NX_ASSERT(resource);
-    return resource->getProperty(ResourcePropertyKey::kCameraAdvancedParams);
-}
-
-void QnCameraAdvancedParamsReader::setEncodedParamsToResource(const QnResourcePtr &resource, const QString &params)
-{
-    NX_ASSERT(resource);
-    resource->setProperty(ResourcePropertyKey::kCameraAdvancedParams, params);
-}
-
-QnCachingCameraAdvancedParamsReader::QnCachingCameraAdvancedParamsReader(QObject* parent):
-    base_type(parent)
-{}
-
-QnCameraAdvancedParams QnCachingCameraAdvancedParamsReader::params(const QnResourcePtr &resource) const {
-    NX_ASSERT(resource);
-    QnUuid id = resource->getId();
-
-    /* Check if we have already read parameters for this camera. */
-    if (!m_paramsByCameraId.contains(id)) {
-        QnCameraAdvancedParams result = paramsFromResource(resource);
-        m_paramsByCameraId[id] = result;
-
-        connect(resource, &QnResource::propertyChanged, this, [this](const QnResourcePtr &res, const QString &key) {
-            if (key != ResourcePropertyKey::kCameraAdvancedParams)
-                return;
-            m_paramsByCameraId.remove(res->getId());
-        });
-
-    }
-    return m_paramsByCameraId[id];
-}
-
-void QnCachingCameraAdvancedParamsReader::setParams(const QnResourcePtr &resource, const QnCameraAdvancedParams &params) const {
-    setParamsToResource(resource, params);
-    m_paramsByCameraId[resource->getId()] = params;
-}
-
-void QnCachingCameraAdvancedParamsReader::clearResourceParams(const QnResourcePtr& resource)
-{
-    NX_ASSERT(resource);
-    m_paramsByCameraId.remove(resource->getId());
 }
 
 bool QnCameraAdvacedParamsXmlParser::validateXml(QIODevice *xmlSource)

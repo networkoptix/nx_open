@@ -2,7 +2,6 @@
 
 #include <nx/fusion/serialization/json.h>
 #include <nx/vms/server/resource/camera_advanced_parameters_providers.h>
-#include <utils/xml/camera_advanced_param_reader.h>
 
 #include "camera_mock.h"
 
@@ -177,7 +176,7 @@ TEST_F(CameraAdvancedParametersProviders, ApiProviders)
         expectedDescriptions.name = lit("makeParameterDescriptions, makeParameterDescriptions");
         expectedDescriptions.version = lit("1.0, 1.0");
         expectedDescriptions.unique_id = lit("X, X");
-        expectEq(expectedDescriptions, QnCameraAdvancedParamsReader::paramsFromResource(camera));
+        expectEq(expectedDescriptions, camera->getAdvancedParametersManifest());
     }
 
     // Get/Set.
@@ -215,7 +214,7 @@ TEST_F(CameraAdvancedParametersProviders, StreamCapabilities)
     NX_ASSERT(camera);
 
     // Advanced parameters descriptions.
-    const auto descriptions = QnCameraAdvancedParamsReader::paramsFromResource(camera);
+    const auto descriptions = camera->getAdvancedParametersManifest();
     EXPECT_EQ(descriptions.name,
         QLatin1String("primaryStreamConfiguration, secondaryStreamConfiguration"));
     ASSERT_EQ(descriptions.groups.size(), 1);
@@ -286,7 +285,7 @@ TEST_F(CameraAdvancedParametersProviders, MixedUpParameters)
         });
     NX_ASSERT(camera);
 
-    const auto parameters = QnCameraAdvancedParamsReader::paramsFromResource(camera);
+    const auto parameters = camera->getAdvancedParametersManifest();
     EXPECT_EQ(parameters.name, QLatin1String(
         "primaryStreamConfiguration, secondaryStreamConfiguration, makeParameterDescriptions, makeParameterDescriptions"));
     ASSERT_EQ(parameters.groups.size(), 3);
@@ -349,7 +348,7 @@ TEST_F(CameraAdvancedParametersProviders, SameAspectRatioRestrictions)
     NX_ASSERT(camera);
 
     // Advanced parameters descriptions.
-    const auto descriptions = QnCameraAdvancedParamsReader::paramsFromResource(camera);
+    const auto descriptions = camera->getAdvancedParametersManifest();
     auto resolutionParameter = descriptions.getParameterById("secondaryStream.resolution");
 
     ASSERT_TRUE(resolutionParameter.isValid());
@@ -394,29 +393,10 @@ TEST_F(CameraAdvancedParametersProviders, SameAspectRatioRestrictions)
 
 // TODO: #dmishin add more test cases for aspect ratio dependent resolutions.
 
-TEST_F(CameraAdvancedParametersProviders, AdvancedParametersEquality)
+TEST_F(CameraAdvancedParametersProviders, InitiallyEmptyManifest)
 {
     auto camera = newCamera([](CameraMock* /*camera*/) {});
-    auto parameters = QnCameraAdvancedParamsReader::paramsFromResource(camera);
-    ASSERT_EQ(parameters, QnCameraAdvancedParams());
-
-    QnCameraAdvancedParamsReader::setParamsToResource(camera, QnCameraAdvancedParams());
-    parameters = QnCameraAdvancedParamsReader::paramsFromResource(camera);
-    ASSERT_EQ(parameters, QnCameraAdvancedParams());
-
-    QnCameraAdvancedParams testParameters;
-    testParameters.name = lit("Some name");
-    testParameters.version = lit("0");
-    testParameters.unique_id = lit("Some id");
-    testParameters.packet_mode = false;
-
-    QnCameraAdvancedParamsReader::setParamsToResource(camera, testParameters);
-    parameters = QnCameraAdvancedParamsReader::paramsFromResource(camera);
-    ASSERT_EQ(parameters, testParameters);
-
-    QnCameraAdvancedParamsReader::setParamsToResource(camera, QnCameraAdvancedParams());
-    parameters = QnCameraAdvancedParamsReader::paramsFromResource(camera);
-    ASSERT_EQ(parameters, QnCameraAdvancedParams());
+    ASSERT_EQ(camera->getAdvancedParametersManifest(), QnCameraAdvancedParams());
 }
 
 } // namespace test

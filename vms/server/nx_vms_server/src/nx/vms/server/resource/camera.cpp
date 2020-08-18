@@ -12,7 +12,6 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/cpp14.h>
-#include <utils/xml/camera_advanced_param_reader.h>
 #include <nx/fusion/fusion/fusion.h>
 #include <nx/fusion/serialization/json.h>
 
@@ -142,16 +141,17 @@ void Camera::setUrl(const QString &urlStr)
 
 QnCameraAdvancedParamValueMap Camera::getAdvancedParameters(const QSet<QString>& ids)
 {
-    QnReadLocker lock(&m_cameraAdvancedProviderLock);
-
+    QnCameraAdvancedParamValueMap result;
     if (!isInitialized())
-        return {};
+        return result;
+
+    QnReadLocker lock(&m_cameraAdvancedProviderLock);
 
     if (m_defaultAdvancedParametersProvider == nullptr
         && m_advancedParametersProvidersByParameterId.empty())
     {
         NX_ASSERT(false, "Get advanced parameters from camera with no providers");
-        return {};
+        return result;
     }
 
     std::map<AdvancedParametersProvider*, QSet<QString>> idsByProvider;
@@ -173,7 +173,6 @@ QnCameraAdvancedParamValueMap Camera::getAdvancedParameters(const QSet<QString>&
         }
     }
 
-    QnCameraAdvancedParamValueMap result;
     for (auto& providerIds: idsByProvider)
     {
         const auto provider = providerIds.first;
@@ -507,67 +506,69 @@ void Camera::reopenStream(nx::vms::api::StreamIndex streamIndex)
 
 CameraDiagnostics::Result Camera::initializeAdvancedParametersProviders()
 {
-    QnWriteLocker lock(&m_cameraAdvancedProviderLock);
-
-    m_streamCapabilityAdvancedProviders.clear();
-    m_defaultAdvancedParametersProvider = nullptr;
-    m_advancedParametersProvidersByParameterId.clear();
-
-    std::vector<Camera::AdvancedParametersProvider*> allProviders;
-    boost::optional<QSize> baseResolution;
-    const StreamCapabilityMaps streamCapabilityMaps = {
-        {StreamIndex::primary, getStreamCapabilityMap(StreamIndex::primary)},
-        {StreamIndex::secondary, getStreamCapabilityMap(StreamIndex::secondary)}
-    };
-
-    const auto traits = mediaTraits();
-    for (const auto streamType: {StreamIndex::primary, StreamIndex::secondary})
-    {
-        //auto streamCapabilities = getStreamCapabilityMap(streamType);
-        if (!streamCapabilityMaps[streamType].isEmpty())
-        {
-            auto provider = std::make_unique<StreamCapabilityAdvancedParametersProvider>(
-                this,
-                streamCapabilityMaps,
-                traits,
-                streamType,
-                baseResolution ? *baseResolution : QSize());
-
-            if (!baseResolution)
-                baseResolution = provider->getParameters().resolution;
-
-            // TODO: It might make sense to insert these before driver specific providers.
-            allProviders.push_back(provider.get());
-            m_streamCapabilityAdvancedProviders.emplace(streamType, std::move(provider));
-        }
-    }
-
-    auto driverProviders = advancedParametersProviders();
-    if (!driverProviders.empty())
-        m_defaultAdvancedParametersProvider = driverProviders.front();
-
-    allProviders.insert(allProviders.end(), driverProviders.begin(), driverProviders.end());
     QnCameraAdvancedParams advancedParameters;
-    for (const auto& provider: allProviders)
     {
-        auto providerParameters = provider->descriptions();
-        for (const auto& id: providerParameters.allParameterIds())
-            m_advancedParametersProvidersByParameterId.emplace(id, provider);
+        QnWriteLocker lock(&m_cameraAdvancedProviderLock);
 
-        if (advancedParameters.groups.empty())
-            advancedParameters = std::move(providerParameters);
-        else
-            advancedParameters.merge(providerParameters);
+        m_streamCapabilityAdvancedProviders.clear();
+        m_defaultAdvancedParametersProvider = nullptr;
+        m_advancedParametersProvidersByParameterId.clear();
+
+        std::vector<Camera::AdvancedParametersProvider*> allProviders;
+        boost::optional<QSize> baseResolution;
+        const StreamCapabilityMaps streamCapabilityMaps = {
+            {StreamIndex::primary, getStreamCapabilityMap(StreamIndex::primary)},
+            {StreamIndex::secondary, getStreamCapabilityMap(StreamIndex::secondary)}
+        };
+
+        const auto traits = mediaTraits();
+        for (const auto streamType: {StreamIndex::primary, StreamIndex::secondary})
+        {
+            //auto streamCapabilities = getStreamCapabilityMap(streamType);
+            if (!streamCapabilityMaps[streamType].isEmpty())
+            {
+                auto provider = std::make_unique<StreamCapabilityAdvancedParametersProvider>(
+                    this,
+                    streamCapabilityMaps,
+                    traits,
+                    streamType,
+                    baseResolution ? *baseResolution : QSize());
+
+                if (!baseResolution)
+                    baseResolution = provider->getParameters().resolution;
+
+                // TODO: It might make sense to insert these before driver specific providers.
+                allProviders.push_back(provider.get());
+                m_streamCapabilityAdvancedProviders.emplace(streamType, std::move(provider));
+            }
+        }
+
+        auto driverProviders = advancedParametersProviders();
+        if (!driverProviders.empty())
+            m_defaultAdvancedParametersProvider = driverProviders.front();
+
+        allProviders.insert(allProviders.end(), driverProviders.begin(), driverProviders.end());
+        for (const auto& provider: allProviders)
+        {
+            auto providerParameters = provider->descriptions();
+            for (const auto& id: providerParameters.allParameterIds())
+                m_advancedParametersProvidersByParameterId.emplace(id, provider);
+
+            if (advancedParameters.groups.empty())
+                advancedParameters = std::move(providerParameters);
+            else
+                advancedParameters.merge(providerParameters);
+        }
+
+        NX_VERBOSE(this, "Default advanced parameters provider %1, providers by params: %2",
+            m_defaultAdvancedParametersProvider,
+            containerString(m_advancedParametersProvidersByParameterId));
     }
-
-    NX_VERBOSE(this, "Default advanced parameters provider %1, providers by params: %2",
-        m_defaultAdvancedParametersProvider,
-        containerString(m_advancedParametersProvidersByParameterId));
 
     advancedParameters.packet_mode = resourceData()
         .value<bool>(ResourceDataKey::kNeedToReloadAllAdvancedParametersAfterApply, false);
 
-    QnCameraAdvancedParamsReader::setParamsToResource(this->toSharedPointer(), advancedParameters);
+    setAdvancedParametersManifest(std::move(advancedParameters));
     return CameraDiagnostics::NoErrorResult();
 }
 
@@ -1017,6 +1018,18 @@ ec2::AbstractCameraManagerPtr Camera::cameraManager()
 bool Camera::allowRtspVideoLayout() const
 {
     return resourceData().value<bool>("allowRtspVideoLayout", true);
+}
+
+QnCameraAdvancedParams Camera::getAdvancedParametersManifest() const
+{
+    NX_READ_LOCKER locker(&m_advancedParametersManifestLock);
+    return m_advancedParametersManifest;
+}
+
+void Camera::setAdvancedParametersManifest(QnCameraAdvancedParams manifest)
+{
+    NX_WRITE_LOCKER locker(&m_advancedParametersManifestLock);
+    m_advancedParametersManifest = std::move(manifest);
 }
 
 } // namespace resource

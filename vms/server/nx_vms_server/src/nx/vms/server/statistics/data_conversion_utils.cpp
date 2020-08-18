@@ -30,7 +30,6 @@ StatisticsCameraData toStatisticsData(CameraDataEx&& data)
     {
         ResourcePropertyKey::kCredentials,
         ResourcePropertyKey::kDefaultCredentials,
-        ResourcePropertyKey::kCameraAdvancedParams,
         ResourcePropertyKey::kOnvifIgnoreMedia2,
         ResourcePropertyKey::Onvif::kDeviceID,
         ResourcePropertyKey::Onvif::kDeviceUrl,

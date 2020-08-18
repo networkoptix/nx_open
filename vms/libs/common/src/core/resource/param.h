@@ -66,9 +66,6 @@ namespace ResourcePropertyKey
 
     static const QString kCanConfigureRemoteRecording("canConfigureRemoteRecording");
 
-    // Contains QnCameraAdvancedParams in ubjson-serialized state.
-    static const QString kCameraAdvancedParams("cameraAdvancedParams");
-
     static const QString kFirmware("firmware");
     static const QString kDeviceType("deviceType");
     static const QString kIoConfigCapability("ioConfigCapability");

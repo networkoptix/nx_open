@@ -24,7 +24,6 @@ public:
     CameraAdvancedSettingsWidget(QWidget* parent = nullptr);
     virtual ~CameraAdvancedSettingsWidget() override;
 
-    QnVirtualCameraResourcePtr camera() const;
     void setCamera(const QnVirtualCameraResourcePtr& camera);
 
     void reloadData();
@@ -41,7 +40,6 @@ signals:
 
 private:
     QScopedPointer<Ui::CameraAdvancedSettingsWidget> ui;
-    QnVirtualCameraResourcePtr m_camera;
 };
 
 } // namespace nx::vms::client::desktop

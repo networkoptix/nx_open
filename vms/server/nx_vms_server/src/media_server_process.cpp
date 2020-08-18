@@ -111,6 +111,7 @@
 #include <rest/handlers/multiserver_events_rest_handler.h>
 #include <rest/handlers/get_system_name_rest_handler.h>
 #include <rest/handlers/camera_diagnostics_rest_handler.h>
+#include <rest/handlers/camera_manifest_rest_handler.h>
 #include <rest/handlers/camera_settings_rest_handler.h>
 #include <rest/handlers/debug_handler.h>
 #include <rest/handlers/ini_config_handler.h>
@@ -1643,6 +1644,18 @@ void MediaServerProcess::registerRestHandlers(
      * %return:object JSON data with statistics.
      */
     reg("api/statistics", new QnStatisticsRestHandler(serverModule()));
+
+    /**%apidoc GET /api/getCameraParamManifest
+     * Read camera advanced parameter manifest.
+     * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx),
+     *     or MAC address (not supported for certain cameras), or "Logical Id".
+     * %return:object JSON object with an error code, error string, and the reply on success.
+     *     %param:string error Error code, "0" means no error.
+     *     %param:string errorString Error message in English, or an empty string.
+     *     %param[opt]:object reply On success, contains the manifest object.
+     *         %struct QnCameraAdvancedParams
+     */
+    reg("api/getCameraParamManifest", new QnCameraManifestRestHandler());
 
     /**%apidoc GET /api/getCameraParam
      * Read camera parameters. For instance: brightness, contrast e.t.c. Parameters to read should

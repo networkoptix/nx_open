@@ -17,7 +17,6 @@
 #include <network/tcp_connection_priv.h>
 #include <rest/server/rest_connection_processor.h>
 
-#include <utils/xml/camera_advanced_param_reader.h>
 #include <nx/network/http/custom_headers.h>
 #include <api/helpers/camera_id_helper.h>
 #include <nx/utils/std/future.h>
@@ -31,17 +30,7 @@ static const QString kDeprecatedResIdParam = "res_id";
 static const std::chrono::seconds kMaxWaitTimeout(20);
 
 using StatusCode = nx::network::http::StatusCode::Value;
-using PostBody = QnCameraSettingsRestHandlerPostBody;
-
-struct QnCameraSettingsRestHandlerPostBody
-{
-    QString cameraId;
-    QMap<QString, QString> paramValues;
-};
-#define QnCameraSettingsRestHandlerPostBody_Fields (cameraId)(paramValues)
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(QnCameraSettingsRestHandlerPostBody, (json),
-    QnCameraSettingsRestHandlerPostBody_Fields);
+using PostBody = QnCameraAdvancedParamsPostBody;
 
 namespace {
 
@@ -121,7 +110,6 @@ private:
 
 QnCameraSettingsRestHandler::QnCameraSettingsRestHandler(QnResourceCommandProcessor* commandProcessor):
     base_type(),
-    m_paramsReader(new QnCachingCameraAdvancedParamsReader()),
     m_commandProcessor(commandProcessor)
 {
 }
@@ -197,7 +185,7 @@ StatusCode QnCameraSettingsRestHandler::obtainCameraParamValuesFromRequestParams
     cameraParams.remove(kDeprecatedResIdParam);
 
     // Filter allowed parameters.
-    const auto allowedParams = m_paramsReader->params(camera).allParameterIds();
+    const auto allowedParams = camera->getAdvancedParametersManifest().allParameterIds();
     for (auto it = cameraParams.begin(); it != cameraParams.end(); ++it)
     {
         if (allowedParams.contains(it.key()))
@@ -221,7 +209,7 @@ StatusCode QnCameraSettingsRestHandler::obtainCameraParamValuesFromPostBody(
     QnCameraAdvancedParamValueMap* outValues) const
 {
     // Filter allowed parameters.
-    const auto allowedParams = m_paramsReader->params(camera).allParameterIds();
+    const auto allowedParams = camera->getAdvancedParametersManifest().allParameterIds();
     for (auto it = postBody.paramValues.begin(); it != postBody.paramValues.end(); ++it)
     {
         if (allowedParams.contains(it.key()))
@@ -380,7 +368,7 @@ StatusCode QnCameraSettingsRestHandler::handleGetParamsRequest(
 
 StatusCode QnCameraSettingsRestHandler::handleSetParamsRequest(
     const QnRestConnectionProcessor* owner,
-    const QnVirtualCameraResourcePtr& camera,
+    const nx::vms::server::resource::CameraPtr& camera,
     const QnCameraAdvancedParamValueMap& parametersToSet,
     QnCameraAdvancedParamValueMap* outParameterMap)
 {
@@ -425,8 +413,7 @@ StatusCode QnCameraSettingsRestHandler::handleSetParamsRequest(
 
     if (needToReloadAllParameters)
     {
-        const auto allParameterIds = QnCameraAdvancedParamsReader::paramsFromResource(camera)
-            .allParameterIds();
+        const auto allParameterIds = camera->getAdvancedParametersManifest().allParameterIds();
 
         outParameterMap->clear();
         return handleGetParamsRequest(owner, camera, allParameterIds, outParameterMap);

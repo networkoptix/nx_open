@@ -27,6 +27,7 @@
 #include <database/migrations/ptz_rotation_migration.h>
 #include <database/migrations/camera_user_attributes_migration.h>
 #include <database/migrations/convert_supported_port_types_in_io_settings.h>
+#include <database/migrations/remove_camera_advanced_params_transactions.h>
 #include <network/system_helpers.h>
 #include <utils/common/app_info.h>
 #include <utils/common/synctime.h>
@@ -2211,6 +2212,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
             return resyncIfNeeded(ResyncResourceProperties);
         return true;
     }
+
+    if (updateName.endsWith(lit("/99_20200814_remove_camera_advanced_params.sql")))
+        return ec2::db::removeCameraAdvancedParamsTransactions(m_sdb);
 
     NX_DEBUG(this, lit("SQL update %1 does not require post-actions.").arg(updateName));
     return true;

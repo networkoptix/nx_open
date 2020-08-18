@@ -77,6 +77,8 @@ public:
 
     QnAbstractPtzController* createPtzController() const;
 
+    QnCameraAdvancedParams getAdvancedParametersManifest() const;
+
     /** Returns id-value pairs. */
     QnCameraAdvancedParamValueMap getAdvancedParameters(const QSet<QString>& ids);
     boost::optional<QString> getAdvancedParameter(const QString& id);
@@ -300,6 +302,7 @@ protected:
     virtual void startInputPortStatesMonitoring();
     virtual void stopInputPortStatesMonitoring();
 private:
+    void setAdvancedParametersManifest(QnCameraAdvancedParams manifest);
     CameraDiagnostics::Result initializeAdvancedParametersProviders();
     void fixInputPortMonitoring();
     QSharedPointer<QnLiveStreamProvider> findReader(nx::vms::api::StreamIndex streamIndex);
@@ -331,6 +334,9 @@ private:
     Role m_role = Role::regular;
     std::shared_ptr<Metrics> m_metrics;
     CameraManagerFactory m_cameraManagerfactory;
+
+    mutable nx::ReadWriteLock m_advancedParametersManifestLock;
+    QnCameraAdvancedParams m_advancedParametersManifest;
 };
 
 } // namespace nx::vms::server::resource

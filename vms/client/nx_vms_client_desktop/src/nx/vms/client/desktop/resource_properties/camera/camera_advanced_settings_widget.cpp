@@ -9,7 +9,6 @@
 #include <core/resource/resource_data.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_data_pool.h>
-#include <utils/xml/camera_advanced_param_reader.h>
 
 namespace nx::vms::client::desktop {
 
@@ -23,39 +22,18 @@ CameraAdvancedSettingsWidget::CameraAdvancedSettingsWidget(QWidget* parent /* = 
         &CameraAdvancedParamsWidget::hasChangesChanged,
         this,
         &CameraAdvancedSettingsWidget::hasChangesChanged);
+
+    connect(ui->cameraAdvancedParamsWidget,
+        &CameraAdvancedParamsWidget::visibilityUpdateRequested,
+        this,
+        &CameraAdvancedSettingsWidget::visibilityUpdateRequested);
 }
 
 CameraAdvancedSettingsWidget::~CameraAdvancedSettingsWidget() = default;
 
-QnVirtualCameraResourcePtr CameraAdvancedSettingsWidget::camera() const
-{
-    return m_camera;
-}
-
 void CameraAdvancedSettingsWidget::setCamera(const QnVirtualCameraResourcePtr &camera)
 {
-    if (m_camera == camera)
-        return;
-
-    if (m_camera)
-        m_camera->disconnect(this);
-
-    m_camera = camera;
-
-    if (m_camera)
-    {
-        connect(m_camera, &QnResource::statusChanged, this,
-            &CameraAdvancedSettingsWidget::visibilityUpdateRequested);
-
-        connect(m_camera, &QnResource::propertyChanged, this,
-            [this](const QnResourcePtr& resource, const QString& key)
-            {
-                if (key == ResourcePropertyKey::kCameraAdvancedParams)
-                    emit visibilityUpdateRequested();
-            });
-    }
-
-    ui->cameraAdvancedParamsWidget->setCamera(m_camera);
+    ui->cameraAdvancedParamsWidget->setCamera(camera);
 }
 
 void CameraAdvancedSettingsWidget::reloadData()
@@ -77,14 +55,7 @@ void CameraAdvancedSettingsWidget::submitToResource()
 
 bool CameraAdvancedSettingsWidget::shouldBeVisible() const
 {
-    if (!m_camera)
-        return false;
-
-    const QnCameraAdvancedParams params = QnCameraAdvancedParamsReader::paramsFromResource(m_camera);
-    if (params.groups.empty())
-        return false;
-
-    return m_camera->isOnline() || ui->cameraAdvancedParamsWidget->hasItemsAvailableInOffline();
+    return ui->cameraAdvancedParamsWidget->shouldBeVisible();
 }
 
 } // namespace nx::vms::client::desktop

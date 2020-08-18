@@ -32,9 +32,7 @@
 #include <rest/server/json_rest_handler.h>
 #include <utils/common/connective.h>
 
-class QnCachingCameraAdvancedParamsReader;
-
-struct QnCameraSettingsRestHandlerPostBody; //< Private - made public for Fusion.
+struct QnCameraAdvancedParamsPostBody;
 
 class QnCameraSettingsRestHandler: public Connective<QnJsonRestHandler>
 {
@@ -60,7 +58,7 @@ public:
 
 private:
     using StatusCode = nx::network::http::StatusCode::Value;
-    using PostBody = QnCameraSettingsRestHandlerPostBody;
+    using PostBody = QnCameraAdvancedParamsPostBody;
 
     StatusCode obtainCameraFromRequestParams(
         const QnRequestParams& requestParams,
@@ -94,11 +92,10 @@ private:
 
     StatusCode handleSetParamsRequest(
         const QnRestConnectionProcessor* owner,
-        const QnVirtualCameraResourcePtr& camera,
+        const nx::vms::server::resource::CameraPtr& camera,
         const QnCameraAdvancedParamValueMap& parametersToSet,
         QnCameraAdvancedParamValueMap* outParameterMap);
 
 private:
-    QScopedPointer<QnCachingCameraAdvancedParamsReader> m_paramsReader;
     QnResourceCommandProcessor* m_commandProcessor = nullptr;
 };
