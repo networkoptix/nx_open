@@ -973,7 +973,7 @@ QString StringsHelper::notificationCaption(
                 static const int kMaxValuesInGroup = 2;
                 using namespace nx::common::metadata;
                 auto attrGroups = groupAttributes(parameters.attributes, kMaxValuesInGroup);
-                const QString kDelimiter = '\n';
+                const QString kDelimiter = "\n";
                 if (!result.isEmpty())
                     result += kDelimiter;
                 result += serializeAttributes(attrGroups, kDelimiter);
