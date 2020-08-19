@@ -125,6 +125,22 @@ public:
 
     class Tweaks;
 
+    enum class ParamType
+    {
+        boolean, /**< bool */
+        string, /**< const char* */
+        integer, /**< int */
+        float_, /**< float */
+        double_ /**< double */
+    };
+
+    /**
+     * Get parameter type and value by its name.
+     * @return True on success, false if the parameter with the specified name isn't found.
+     */
+    bool getParamTypeAndValue(
+        const char* paramName, ParamType* outType, const void** outData) const;
+
 protected:
     #define NX_INI_FLAG(DEFAULT, PARAM, DESCRIPTION) \
         const bool PARAM = regBoolParam(&PARAM, DEFAULT, #PARAM, DESCRIPTION)
