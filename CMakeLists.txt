@@ -100,7 +100,7 @@ include(strip_target)
 include(vms_protocol_version)
 include(customization_package)
 
-set(metaVersion R9)
+set(metaVersion H1)
 if(customization.advanced.useMetaVersion)
     # Set meta-version to be shown in MetaVMS builds - in the Client, etc.
     set(usedMetaVersion ${metaVersion})
