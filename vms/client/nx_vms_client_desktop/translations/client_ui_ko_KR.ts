@@ -80,7 +80,7 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/advanced_settings_widget.ui"/>
       <source>Downmix Audio from 5.1 to 2.1</source>
-      <translation>오디오 채널 5.1채널에서 2.1채널:</translation>
+      <translation>오디오를 5.1채널에서 2.1채널까지 다운 믹스</translation>
     </message>
     <message>
       <location/>
@@ -100,12 +100,12 @@
     <message>
       <location/>
       <source>Clear Local Cache</source>
-      <translation>캐쉬 초기화</translation>
+      <translation>로컬 캐쉬 삭제</translation>
     </message>
     <message>
       <location/>
       <source>Reset All Warnings</source>
-      <translation>모든 경고를 다시 설정</translation>
+      <translation>모든 경고 초기화</translation>
     </message>
     <message>
       <location/>
@@ -115,7 +115,7 @@
     <message>
       <location/>
       <source>Disable blur</source>
-      <translation>흐림 효과 사용 안 함</translation>
+      <translation>흐림 효과 비활성화</translation>
     </message>
     <message>
       <location/>
@@ -1948,7 +1948,7 @@
     <message>
       <location/>
       <source>Show additional info in tree</source>
-      <translation>트리에 추가 정보 보기</translation>
+      <translation>트리에 추가 정보 표시</translation>
     </message>
     <message>
       <location/>
@@ -2648,7 +2648,7 @@
     <message>
       <location/>
       <source>Capture Cursor</source>
-      <translation>캡쳐 커서</translation>
+      <translation>커서 캡처</translation>
     </message>
     <message>
       <location/>

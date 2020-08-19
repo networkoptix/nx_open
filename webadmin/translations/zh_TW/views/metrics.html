@@ -38,7 +38,7 @@
                         <div ng-repeat="(name, value) in serversStatistics[server.id][key]"
                             ng-class="{'text-danger': value>=Config.metrics.percentValues.danger,
                                        'text-warning': value>=Config.metrics.percentValues.warning && value<Config.metrics.percentValues.danger}">
-                            {{name}}: {{value}}%
+                            {{name}}:{{value}}%
                         </div>
                     </td>
                     <td ng-repeat="(key, description) in metricsColumns">

@@ -1717,11 +1717,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
-      <translation>100 % CPU 부하를 유발하는 OpenGL 그리기의 문제점을 피할 수 있습니다.</translation>
+      <translation>CPU 부하 100%를 유발하는 OpenGL 드로잉에 문제가 발생하지 않도록 도와줍니다.</translation>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation>라이브 뷰를 저하시키지 않는 최소값으로 조정하십시오. 버퍼가 클수록 재생이 원활 해지지 만 실시간 및 라이브 뷰 사이의 지연이 증가합니다. 버퍼가 작 으면 지연은 줄어들지 만 더듬 거리는 원인이 될 수 있습니다.</translation>
+      <translation>라이브 뷰를 저하시키지 않는 최소값으로 조정하십시오. 버퍼가 클수록 재생이 부드러워지지만 실시간 뷰와 라이브 뷰 사이의 지연이 증가합니다. 버퍼가 작을수록 지연은 감소하지만 끊김 현상이 발생할 수 있습니다.</translation>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
@@ -4128,7 +4128,7 @@ to %1</source>
     </message>
     <message>
       <source>Sets the time to use in the client (timeline, timestamps, etc.) when client and server machines are in different time zones.</source>
-      <translation>클라이언트와 서버 시스템이 다른 시간대에있을 때 클라이언트에서 사용할 시간 (시간대, 시간 소인 등) 을 설정합니다.</translation>
+      <translation>클라이언트와 서버 시스템이 다른 시간대에 있을 때 클라이언트에서 사용할 시간 (타임라인, 타임스탬프 등)을 설정합니다.</translation>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers and roles for users.</source>
@@ -4136,7 +4136,7 @@ to %1</source>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
-      <translation>둘러보기를 시작하면 레이아웃의 각 카메라가 표시되는 시간입니다.</translation>
+      <translation>투어 시작 시 레이아웃에 있는 각 카메라가 표시되는 시간입니다.</translation>
     </message>
   </context>
   <context>
@@ -5980,7 +5980,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
-      <translation>일부 사용자는 이메일 주소를 설정하지 않았습니다.</translation>
+      <translation>일부 사용자 이메일 주소 미 설정</translation>
     </message>
     <message>
       <source>You cannot receive System notifications by email.</source>
@@ -5988,7 +5988,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some users have not set their email addresses.</source>
-      <translation>일부 사용자는 이메일 주소를 설정하지 않았습니다.</translation>
+      <translation>일부 사용자 이메일 주소 미 설정</translation>
     </message>
     <message>
       <source>They cannot receive System notifications by email.</source>
@@ -5996,31 +5996,31 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Error while sending email</source>
-      <translation>메시지 보내는 중 오류 발생</translation>
+      <translation>이메일 발송 중 오류 발생</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been started</source>
-      <translation>원격 보관 동기화가 시작되었습니다.</translation>
+      <translation>원격 아카이브 동기화가 시작되었습니다.</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been finished</source>
-      <translation>원격 보관 동기화가 완료되었습니다.</translation>
+      <translation>원격 아카이브 동기화가 완료되었습니다.</translation>
     </message>
     <message>
       <source>Remote archive synchronization is in progress</source>
-      <translation>원격 보관 파일 동기화가 진행 중입니다.</translation>
+      <translation>원격 아카이브 동기화가 진행 중입니다.</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been started for the following device:</source>
-      <translation>다음 장치에 대 한 원격 보관 파일 동기화 시작 되었습니다.</translation>
+      <translation>다음 장치에 대한 원격 아카이브 동기화가 시작 되었습니다.</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
-      <translation>다음 장치에 대한 원격 보관 동기화가 완료되었습니다.</translation>
+      <translation>다음 장치에 대한 원격 아카이브 동기화가 완료되었습니다.</translation>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation>Remote archive synchronization</translation>
+      <translation>원격 아카이브 동기화</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
@@ -8389,7 +8389,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No picture</source>
-      <translation>사진 없음</translation>
+      <translation>이미지 없음</translation>
     </message>
     <message>
       <source>Error while loading picture</source>
@@ -10118,7 +10118,7 @@ Server Settings (서버 설정) 대화 상자의 &quot;Storage Management (스�
     </message>
     <message>
       <source>New Layout %1</source>
-      <translation>%1 새 레이아웃</translation>
+      <translation>새 레이아웃 %1</translation>
     </message>
   </context>
   <context>
