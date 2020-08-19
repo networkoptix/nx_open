@@ -21,24 +21,24 @@ static constexpr char kIniFile[] = "test.ini";
 namespace nx {
 namespace kit {
 
-std::ostream& operator<<(std::ostream& s, IniConfig::Type value)
+std::ostream& operator<<(std::ostream& s, IniConfig::ParamType value)
 {
     switch (value)
     {
-        case IniConfig::Type::Boolean:
-            return s << "Boolean";
+        case IniConfig::ParamType::boolean:
+            return s << "boolean";
 
-        case IniConfig::Type::Integer:
-            return s << "Integer";
+        case IniConfig::ParamType::integer:
+            return s << "integer";
 
-        case IniConfig::Type::Float:
-            return s << "Float";
+        case IniConfig::ParamType::float_:
+            return s << "float";
 
-        case IniConfig::Type::Double:
-            return s << "Double";
+        case IniConfig::ParamType::double_:
+            return s << "double";
 
-        case IniConfig::Type::String:
-            return s << "String";
+        case IniConfig::ParamType::string:
+            return s << "string";
     }
 
     return s << "Unknown type: " << (int) value;
@@ -310,7 +310,7 @@ test.ini ERROR: The name part (before "=") is empty. Line 4, file {iniFilePath}
 )");
 }
 
-TEST(iniConfig, testGetValue)
+TEST(iniConfig, testGetParamTypeAndValue)
 {
     if (!IniConfig::isEnabled())
     {
@@ -321,31 +321,31 @@ TEST(iniConfig, testGetValue)
     TestIni ini;
 
     const void* data{nullptr};
-    IniConfig::Type type{};
+    IniConfig::ParamType type{};
 
-    ASSERT_TRUE(ini.getValue("enableOutput", &type, &data));
-    ASSERT_EQ(IniConfig::Type::Boolean, type);
+    ASSERT_TRUE(ini.getParamTypeAndValue("enableOutput", &type, &data));
+    ASSERT_EQ(IniConfig::ParamType::boolean, type);
     ASSERT_EQ(false, *static_cast<const bool*>(data));
 
-    ASSERT_TRUE(ini.getValue("enableTime", &type, &data));
-    ASSERT_EQ(IniConfig::Type::Boolean, type);
+    ASSERT_TRUE(ini.getParamTypeAndValue("enableTime", &type, &data));
+    ASSERT_EQ(IniConfig::ParamType::boolean, type);
     ASSERT_EQ(true, *static_cast<const bool*>(data));
 
-    ASSERT_TRUE(ini.getValue("intNumber", &type, &data));
-    ASSERT_EQ(IniConfig::Type::Integer, type);
+    ASSERT_TRUE(ini.getParamTypeAndValue("intNumber", &type, &data));
+    ASSERT_EQ(IniConfig::ParamType::integer, type);
     ASSERT_EQ(113, *static_cast<const int*>(data));
 
-    ASSERT_TRUE(ini.getValue("floatNumber", &type, &data));
-    ASSERT_EQ(IniConfig::Type::Float, type);
+    ASSERT_TRUE(ini.getParamTypeAndValue("floatNumber", &type, &data));
+    ASSERT_EQ(IniConfig::ParamType::float_, type);
     ASSERT_EQ(310.55f, *static_cast<const float*>(data));
 
-    ASSERT_TRUE(ini.getValue("doubleNumber", &type, &data));
-    ASSERT_EQ(IniConfig::Type::Double, type);
+    ASSERT_TRUE(ini.getParamTypeAndValue("doubleNumber", &type, &data));
+    ASSERT_EQ(IniConfig::ParamType::double_, type);
     ASSERT_EQ(-0.45, *static_cast<const double*>(data));
 
-    ASSERT_TRUE(ini.getValue("str5", &type, &data));
-    ASSERT_EQ(IniConfig::Type::String, type);
+    ASSERT_TRUE(ini.getParamTypeAndValue("str5", &type, &data));
+    ASSERT_EQ(IniConfig::ParamType::string, type);
     ASSERT_STREQ("plain string", *static_cast<const char* const*>(data));
 
-    ASSERT_FALSE(ini.getValue("nonExistentParameter", &type, &data));
+    ASSERT_FALSE(ini.getParamTypeAndValue("nonExistentParameter", &type, &data));
 }
