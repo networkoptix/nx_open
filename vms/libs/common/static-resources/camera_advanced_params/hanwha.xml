@@ -736,6 +736,7 @@
                         name="WDR Level"
                         dataType="Enumeration"
                         range="Low,Middle,High"
+                        internalRange="Low,Medium,High"
                         aux="group=whitebalance;groupInclude=WDR">
                     <dependencies>
                         <dependencies-show>
