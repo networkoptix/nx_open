@@ -9,8 +9,9 @@
 #include <memory>
 #include <sstream>
 #include <string>
-#include <unordered_set>
+#include <unordered_map>
 
+#include "debug.h"
 #include "utils.h"
 
 namespace nx {
@@ -41,7 +42,12 @@ static void skipWhitespace(const char** const pp)
         ++(*pp);
 }
 
-namespace {
+template<typename Value> struct TypeId {};
+template<> struct TypeId<bool> { static constexpr auto value = IniConfig::ParamType::boolean; };
+template<> struct TypeId<int> { static constexpr auto value = IniConfig::ParamType::integer; };
+template<> struct TypeId<float> { static constexpr auto value = IniConfig::ParamType::float_; };
+template<> struct TypeId<double> { static constexpr auto value = IniConfig::ParamType::double_; };
+template<> struct TypeId<const char*> { static constexpr auto value = IniConfig::ParamType::string; };
 
 struct ParsedNameValue
 {
@@ -49,8 +55,6 @@ struct ParsedNameValue
     std::string value;
     std::string error; //< Empty on success.
 };
-
-} // namespace
 
 static ParsedNameValue parseNameValue(const std::string& lineStr)
 {
@@ -163,9 +167,10 @@ struct AbstractParam
 {
     const std::string name;
     const std::string description;
+    const IniConfig::ParamType type;
 
-    AbstractParam(const char* name, const char* description):
-        name(name), description(description)
+    AbstractParam(const char* name, const char* description, IniConfig::ParamType type):
+        name(name), description(description), type(type)
     {
     }
 
@@ -175,6 +180,8 @@ struct AbstractParam
     virtual bool reload(const std::string* value, std::ostream* output) = 0;
 
     virtual std::string defaultValueStr() const = 0;
+
+    virtual const void* data() const = 0;
 
     template<typename Value>
     void printValueLine(
@@ -205,7 +212,7 @@ struct Param: AbstractParam
     Param(const char* name, const char* description,
         Value* pValue, Value defaultValue)
         :
-        AbstractParam(name, description),
+        AbstractParam(name, description, TypeId<Value>::value),
         pValue(pValue),
         defaultValue(defaultValue)
     {
@@ -217,6 +224,11 @@ struct Param: AbstractParam
     virtual std::string defaultValueStr() const override
     {
         return nx::kit::utils::toString(defaultValue);
+    }
+
+    virtual const void* data() const override
+    {
+        return pValue;
     }
 
     /**
@@ -367,6 +379,9 @@ public:
 
     void reload();
 
+    bool getParamTypeAndValue(
+        const char* paramName, ParamType* outType, const void** outData) const;
+
 public:
     const std::string iniFile;
 
@@ -389,7 +404,7 @@ private:
     bool m_iniFileEverExisted = false;
     std::map<std::string, std::string> m_iniMap;
     std::vector<std::unique_ptr<AbstractParam>> m_params;
-    std::unordered_set<std::string> m_paramNames;
+    std::unordered_map<std::string, int> m_paramNameToIndex;
     std::string m_cachedIniFilePath; //< Initialized on first call to iniFilePath().
 };
 
@@ -401,9 +416,9 @@ Value IniConfig::Impl::regParam(
         Param<Value>::validateDefaultValue(defaultValue, output(), paramName, iniFile.c_str());
     if (isEnabled())
     {
-        m_paramNames.insert(paramName);
-        m_params.push_back(std::unique_ptr<Param<Value>>(new Param<Value>(
-            paramName, description, const_cast<Value*>(pValue), validatedDefaultValue)));
+        m_paramNameToIndex[paramName] = (int) m_params.size();
+        m_params.emplace_back(new Param<Value>(paramName, description, const_cast<Value*>(pValue),
+            validatedDefaultValue));
     }
     return validatedDefaultValue;
 }
@@ -520,7 +535,7 @@ void IniConfig::Impl::reloadParams(std::ostream* output, bool* outputIsNeeded) c
 
     for (const auto& entry: m_iniMap)
     {
-        if (m_paramNames.count(entry.first) == 0 && output)
+        if (m_paramNameToIndex.count(entry.first) == 0 && output)
             *output << "  ! " << entry.first << " [unexpected param in file]" << std::endl;
     }
 }
@@ -572,6 +587,21 @@ void IniConfig::Impl::reload()
 
     if (m_firstTimeReload)
         m_firstTimeReload = false;
+}
+
+bool IniConfig::Impl::getParamTypeAndValue(
+    const char* paramName, ParamType* outType, const void** outData) const
+{
+    const auto it = m_paramNameToIndex.find(paramName);
+    if (it == m_paramNameToIndex.cend())
+        return false;
+
+    const auto& param = m_params[it->second];
+    if (NX_KIT_ASSERT(outType))
+        *outType = param->type;
+    if (NX_KIT_ASSERT(outData))
+        *outData = param->data();
+    return true;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -661,6 +691,12 @@ const char* IniConfig::iniFilePath() const
 void IniConfig::reload()
 {
     return d->reload();
+}
+
+bool IniConfig::getParamTypeAndValue(
+    const char* paramName, ParamType* outType, const void** outData) const
+{
+    return d->getParamTypeAndValue(paramName, outType, outData);
 }
 
 //-------------------------------------------------------------------------------------------------
