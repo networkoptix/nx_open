@@ -371,6 +371,11 @@ class UtilityProvider: public RefCountable<IUtilityProvider>
 public:
     virtual int64_t vmsSystemTimeSinceEpochMs() const override { return 0; }
     virtual const nx::sdk::IString* getHomeDir() const override { return new nx::sdk::String(); }
+
+    virtual const nx::sdk::IString* getServerSdkVersion() const override
+    {
+        return new nx::sdk::String();
+    }
 };
 
 class Handler: public nx::sdk::RefCountable<nx::sdk::analytics::IDeviceAgent::IHandler>

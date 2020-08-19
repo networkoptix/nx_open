@@ -2,6 +2,7 @@
 
 #include <nx/sdk/uuid.h>
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/helpers/lib_context.h>
 #include <nx/utils/log/assert.h>
 #include <plugins/plugin_container_api.h> //< for IID_TimeProvider
 #include <utils/common/synctime.h>
@@ -30,6 +31,11 @@ int64_t UtilityProvider::vmsSystemTimeSinceEpochMs() const
 const nx::sdk::IString* UtilityProvider::getHomeDir() const
 {
     return new nx::sdk::String(m_pluginManager->pluginInfo(m_plugin)->homeDir.toStdString());
+}
+
+const nx::sdk::IString* UtilityProvider::getServerSdkVersion() const
+{
+    return new nx::sdk::String(nx::sdk::sdkVersion());
 }
 
 } // namespace nx::vms::server::plugins

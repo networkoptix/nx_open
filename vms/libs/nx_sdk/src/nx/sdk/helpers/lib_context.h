@@ -66,6 +66,12 @@ private:
  */
 LibContext& libContext();
 
+/**
+ * Holds SDK version string in a static variable. Should be called to access the version of the
+ * SDK used by the current dynamic library.
+ */
+const char* sdkVersion();
+
 #if !defined(NX_SDK_API)
     #if !defined(NX_PLUGIN_API)
         #error "Either NX_SDK_API or NX_PLUGIN_API macro should be defined to export a function."

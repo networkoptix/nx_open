@@ -18,6 +18,7 @@ public:
 protected:
     virtual IRefCountable* queryInterface(const InterfaceId* id) override;
     virtual const nx::sdk::IString* getHomeDir() const override;
+    virtual const nx::sdk::IString* getServerSdkVersion() const override;
 
 private:
     PluginManager* const m_pluginManager; /**< Never null (asserted in the constructor). */

@@ -54,14 +54,23 @@ LibContext& libContext()
     return &libContext();
 }
 
-/*extern "C"*/ const char* nxSdkVersion()
+const char* sdkVersion()
 {
+    // The value placed in nx_sdk_version.inc reflects the version of the VMS, in format
+    // "<major>.<minor>.<patch> <meta-version>". Note that the build number is intentionally left
+    // out, because various VMS builds (e.g. different customizations) must yield identical SDK
+    // packages, thus, nx-sdk-version must be the same.
     static constexpr char str[] =
         #include <nx_sdk_version.inc>
     ;
 
     static_assert(sizeof(str) > 1, "nx_sdk_version.inc must contain a non-empty string literal.");
     return str;
+}
+
+/*extern "C"*/ const char* nxSdkVersion()
+{
+    return sdkVersion();
 }
 
 } // namespace sdk

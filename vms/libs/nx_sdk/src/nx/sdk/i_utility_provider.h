@@ -18,7 +18,7 @@ namespace sdk {
  *
  * NOTE: Is binary-compatible with the old SDK's nxpl::TimeProvider and supports its interface id.
  */
-class IUtilityProvider: public Interface<IUtilityProvider>
+class IUtilityProvider0: public Interface<IUtilityProvider0>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider"); }
@@ -35,6 +35,19 @@ public:
      * @return Absolute path to the plugin's home directory, or an empty string if it is absent.
      */
     public: std::string homeDir() const { return toPtr(getHomeDir())->str(); }
+};
+
+class IUtilityProvider: public Interface<IUtilityProvider, IUtilityProvider0>
+{
+public:
+    static auto interfaceId() { return makeId("nx::sdk::IUtilityProvider1"); }
+
+    /** Called by serverSdkVersion() */
+    protected: virtual const IString* getServerSdkVersion() const = 0;
+    /**
+     * @return The version of the Server's built-in SDK.
+     */
+    public: std::string serverSdkVersion() const { return toPtr(getServerSdkVersion())->str(); }
 };
 
 } // namespace sdk
