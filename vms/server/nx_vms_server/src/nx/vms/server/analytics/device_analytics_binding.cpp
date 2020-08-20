@@ -42,6 +42,7 @@
 #include <nx/analytics/analytics_logging_ini.h>
 #include <nx/analytics/frame_info.h>
 #include <nx/vms/server/put_in_order_data_provider.h>
+#include <nx/utils/std/algorithm.h>
 
 namespace nx::vms::server::analytics {
 
@@ -745,13 +746,30 @@ sdk_support::MetadataTypes DeviceAnalyticsBinding::neededMetadataTypes() const
     NX_DEBUG(this, "Needed event types for the Device %1 (%2) from RuleWatcher: %3",
         m_device->getUserDefinedName(), m_device->getId(), containerString(neededEventTypes));
 
+    const auto manager = serverModule()->commonModule()->analyticsEventTypeDescriptorManager();
+    auto isEventTypeUsed =
+        [&manager, &neededEventTypes](const QString& eventTypeId)
+        {
+            if (neededEventTypes.count(eventTypeId) > 0)
+                return true;
+            const auto& descriptor = manager->descriptor(eventTypeId);
+            if (!descriptor)
+                return false;
+            return std::any_of(descriptor->scopes.begin(), descriptor->scopes.end(),
+                [&neededEventTypes](const auto& scope)
+                {
+                    return neededEventTypes.count(scope.groupId) > 0;
+                });
+        };
+
     for (auto it = result.eventTypeIds.begin(); it != result.eventTypeIds.end();)
     {
-        if (neededEventTypes.find(*it) == neededEventTypes.cend())
-            it = result.eventTypeIds.erase(it);
-        else
+        if (isEventTypeUsed(*it))
             ++it;
+        else
+            it = result.eventTypeIds.erase(it);
     }
+
 
     // TODO: #dmishin write a normal container toString method.
     const auto containerToString =
