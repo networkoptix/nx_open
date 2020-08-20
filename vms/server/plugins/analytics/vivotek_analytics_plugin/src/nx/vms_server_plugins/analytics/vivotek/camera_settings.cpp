@@ -1554,7 +1554,7 @@ QJsonObject serializeModel(const CameraSettings::Vca::CrowdDetection& detection)
     return QJsonObject{
         {"name", "Vca.CrowdDetection"},
         {"type", "Section"},
-        {"caption", "Crowd Detection"},
+        {"caption", "Crowd detection"},
         {"items", QJsonArray{
             QJsonObject{
                 {"type", "Repeater"},
@@ -1612,7 +1612,7 @@ QJsonObject serializeModel(const CameraSettings::Vca::LoiteringDetection& detect
     return QJsonObject{
         {"name", "Vca.LoiteringDetection"},
         {"type", "Section"},
-        {"caption", "Loitering Detection"},
+        {"caption", "Loitering detection"},
         {"items", QJsonArray{
             QJsonObject{
                 {"type", "Repeater"},
@@ -1652,7 +1652,7 @@ QJsonObject serializeModel(const CameraSettings::Vca::IntrusionDetection& detect
     return QJsonObject{
         {"name", "Vca.IntrusionDetection"},
         {"type", "Section"},
-        {"caption", "Intrusion Detection"},
+        {"caption", "Intrusion detection"},
         {"items", QJsonArray{
             QJsonObject{
                 {"type", "Repeater"},
@@ -1696,7 +1696,7 @@ QJsonObject serializeModel(const CameraSettings::Vca::LineCrossingDetection& det
     return QJsonObject{
         {"name", "Vca.LineCrossingDetection"},
         {"type", "Section"},
-        {"caption", "Line Crossing Detection"},
+        {"caption", "Line crossing"},
         {"items", QJsonArray{
             QJsonObject{
                 {"type", "Repeater"},
@@ -1726,7 +1726,7 @@ QJsonObject serializeModel(const CameraSettings::Vca::MissingObjectDetection& de
     return QJsonObject{
         {"name", "Vca.MissingObjectDetection"},
         {"type", "Section"},
-        {"caption", "Missing Object Detection"},
+        {"caption", "Missing object"},
         {"items", QJsonArray{
             QJsonObject{
                 {"type", "Repeater"},
@@ -1778,7 +1778,7 @@ QJsonObject serializeModel(const CameraSettings::Vca::UnattendedObjectDetection&
     return QJsonObject{
         {"name", "Vca.UnattendedObjectDetection"},
         {"type", "Section"},
-        {"caption", "Unattended Object Detection"},
+        {"caption", "Unattended object"},
         {"items", QJsonArray{
             QJsonObject{
                 {"type", "Repeater"},
@@ -1830,7 +1830,7 @@ QJsonObject serializeModel(const CameraSettings::Vca::FaceDetection& detection)
     return QJsonObject{
         {"name", "Vca.FaceDetection"},
         {"type", "Section"},
-        {"caption", "Face Detection"},
+        {"caption", "Face detection"},
         {"items", QJsonArray{
             QJsonObject{
                 {"type", "Repeater"},
@@ -1860,7 +1860,7 @@ QJsonObject serializeModel(const CameraSettings::Vca::RunningDetection& detectio
     return QJsonObject{
         {"name", "Vca.RunningDetection"},
         {"type", "Section"},
-        {"caption", "Running Detection"},
+        {"caption", "Running detection"},
         {"items", QJsonArray{
             QJsonObject{
                 {"type", "Repeater"},

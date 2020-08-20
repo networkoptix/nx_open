@@ -10,7 +10,7 @@ const std::vector<EventType> kEventTypes =
             auto& type = types.emplace_back();
             type.nativeId = "CrowdDetection";
             type.id = "nx.vivotek.Crowd";
-            type.prettyName = "Crowd";
+            type.prettyName = "Crowd detection";
             type.isProlonged = true;
             type.isAvailable =
                 [](const auto& settings)
@@ -23,7 +23,7 @@ const std::vector<EventType> kEventTypes =
             auto& type = types.emplace_back();
             type.nativeId = "LoiteringDetection";
             type.id = "nx.vivotek.Loitering";
-            type.prettyName = "Loitering";
+            type.prettyName = "Loitering detection";
             type.isProlonged = true;
             type.isAvailable =
                 [](const auto& settings)
@@ -36,7 +36,7 @@ const std::vector<EventType> kEventTypes =
             auto& type = types.emplace_back();
             type.nativeId = "IntrusionDetection";
             type.id = "nx.vivotek.Intrusion";
-            type.prettyName = "Intrusion";
+            type.prettyName = "Intrusion detection";
             type.isAvailable =
                 [](const auto& settings)
                 {
@@ -48,7 +48,7 @@ const std::vector<EventType> kEventTypes =
             auto& type = types.emplace_back();
             type.nativeId = "LineCrossingDetection";
             type.id = "nx.vivotek.LineCrossing";
-            type.prettyName = "Line Crossing";
+            type.prettyName = "Line crossing";
             type.isAvailable =
                 [](const auto& settings)
                 {
@@ -60,7 +60,7 @@ const std::vector<EventType> kEventTypes =
             auto& type = types.emplace_back();
             type.nativeId = "MissingObjectDetection";
             type.id = "nx.vivotek.MissingObject";
-            type.prettyName = "Missing Object";
+            type.prettyName = "Missing object";
             type.isProlonged = true;
             type.isAvailable =
                 [](const auto& settings)
@@ -73,7 +73,7 @@ const std::vector<EventType> kEventTypes =
             auto& type = types.emplace_back();
             type.nativeId = "UnattendedObjectDetection";
             type.id = "nx.vivotek.UnattendedObject";
-            type.prettyName = "Unattended Object";
+            type.prettyName = "Unattended object";
             type.isProlonged = true;
             type.isAvailable =
                 [](const auto& settings)
@@ -86,7 +86,7 @@ const std::vector<EventType> kEventTypes =
             auto& type = types.emplace_back();
             type.nativeId = "FaceDetection";
             type.id = "nx.vivotek.Face";
-            type.prettyName = "Face";
+            type.prettyName = "Face detection";
             type.isProlonged = true;
             type.isAvailable =
                 [](const auto& settings)
@@ -99,7 +99,7 @@ const std::vector<EventType> kEventTypes =
             auto& type = types.emplace_back();
             type.nativeId = "RunningDetection";
             type.id = "nx.vivotek.Running";
-            type.prettyName = "Running";
+            type.prettyName = "Running detection";
             type.isProlonged = true;
             type.isAvailable =
                 [](const auto& settings)
