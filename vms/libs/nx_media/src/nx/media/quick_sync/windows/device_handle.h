@@ -28,7 +28,7 @@ private:
 
     HWND m_hWnd = 0;
     Renderer m_renderer;
-    static WindowCache m_windowCache;
+    static thread_local WindowCache m_windowCache;
 };
 
 } // namespace nx::media::quick_sync::windows

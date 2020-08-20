@@ -75,7 +75,7 @@ HWND createDxWindow(int width, int height)
 
 namespace nx::media::quick_sync::windows {
 
-constexpr int kWindowCacheSize = 100;
+constexpr int kWindowCacheSize = 4;
 
 WindowCache::~WindowCache()
 {
@@ -107,6 +107,7 @@ HWND WindowCache::getWindow(int width, int height)
     Window window;
     window.width = width;
     window.height = height;
+    window.locked = true;
     window.handle = createDxWindow(width, height);
     m_windows.push_back(window);
     return window.handle;

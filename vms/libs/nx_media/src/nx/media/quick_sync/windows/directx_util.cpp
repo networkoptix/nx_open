@@ -38,8 +38,7 @@ bool DeviceContext::initialize(MFXVideoSession& session, int width, int height)
     if (adapter < 0)
         return false;
 
-    auto hr = m_device.createDevice(width, height, adapter);
-    if (FAILED(hr))
+    if (!m_device.createDevice(width, height, adapter))
     {
         NX_ERROR(NX_SCOPE_TAG, "Failed to get DirectX handle");
         return false;

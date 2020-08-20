@@ -12,7 +12,7 @@
 
 namespace nx::media::quick_sync::windows {
 
-WindowCache DeviceHandle::m_windowCache;
+thread_local WindowCache DeviceHandle::m_windowCache;
 
 DeviceHandle::~DeviceHandle()
 {
