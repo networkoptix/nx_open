@@ -686,6 +686,7 @@ nx::sdk::Ptr<DeviceAgentHandler> DeviceAnalyticsBinding::createHandlerUnsafe()
 
                     updateDescriptorsWithManifest(manifest);
                     updateDeviceWithManifest(manifest);
+                    m_device->saveProperties();
                 });
         });
 

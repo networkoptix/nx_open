@@ -149,6 +149,8 @@ struct CameraInfoParams
     std::string audioEncoderConfigurationToken;
     std::string audioSourceConfigurationToken;
 
+    std::string metadataConfigurationToken;
+
     std::string ptzConfigurationToken;
 
     std::string videoSourceToken;
@@ -175,6 +177,7 @@ struct CameraInfoParams
             ProfileHelper::audioEncoderConfigurationToken(profile);
 
         result.ptzConfigurationToken = ProfileHelper::ptzConfigurationToken(profile);
+        result.metadataConfigurationToken = ProfileHelper::metadataConfigurationToken(profile);
 
         return result;
     }
@@ -1043,6 +1046,13 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(
     if (getRole() == Qn::CR_LiveVideo)
         m_onvifRes->setPtzProfileToken(info.profileToken);
 
+
+    const bool metadataConfigurationIsNeeded =
+        m_onvifRes->resourceData().value<bool>("addOnvifMetadataConfiguration", false);
+
+    if (metadataConfigurationIsNeeded)
+        fetchDesiredMetadataConfiguration(info.profileToken, &info.metadataConfigurationToken);
+
     if (!isCameraControlRequired)
     {
         NX_DEBUG(this,
@@ -1058,12 +1068,44 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(
     }
 }
 
+CameraDiagnostics::Result QnOnvifStreamReader::fetchDesiredMetadataConfiguration(
+    const std::string& profileToken,
+    std::string* outMetadataConfigurationToken) const
+{
+    Media::CompatibleMetadataConfigurations compatibleMetadataConfigurations(m_onvifRes);
+    Media::CompatibleMetadataConfigurations::Request request;
+    request.ProfileToken = profileToken;
+
+    if (!compatibleMetadataConfigurations.receiveBySoap(request))
+        return compatibleMetadataConfigurations.requestFailedResult();
+
+    const auto& configurations = compatibleMetadataConfigurations.get()->Configurations;
+    for (const onvifXsd__MetadataConfiguration* configuration: configurations)
+    {
+        if (configuration)
+        {
+            *outMetadataConfigurationToken = configuration->token;
+            break;
+        }
+    }
+
+    return CameraDiagnostics::NoErrorResult();
+}
+
 ConfigurationSet QnOnvifStreamReader::calculateConfigurationsToUpdate(
     const CameraInfoParams& desiredParameters,
     const CameraInfoParams& actualParameters) const
 {
     ConfigurationSet result;
     result.profileToken = desiredParameters.profileToken;
+
+    if (actualParameters.metadataConfigurationToken.empty()
+        && !desiredParameters.metadataConfigurationToken.empty())
+    {
+        result.configurations.emplace(
+            ConfigurationType::metadata,
+            desiredParameters.metadataConfigurationToken);
+    }
 
     if (actualParameters.videoSourceToken != desiredParameters.videoSourceToken)
     {

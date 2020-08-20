@@ -96,9 +96,11 @@ CameraDiagnostics::Result ProfileHelper::addMediaConfigurations(
                 device, configurationType, configurationSet.profileToken, configurationToken,
                 result.toString(device->commonModule()->resourcePool()));
 
-            if (configurationType != ConfigurationType::audioEncoder //< Ignore audio errors.
-                && configurationType != ConfigurationType::audioSource)
+            if (configurationType != ConfigurationType::audioEncoder
+                && configurationType != ConfigurationType::audioSource
+                && configurationType != ConfigurationType::metadata)
             {
+                // Ignore audio and metadata errors.
                 return result;
             }
         }

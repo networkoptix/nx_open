@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.3.529",
+    "version": "4.1.3.600",
     "data": [
         {
             "keys": [
@@ -1451,6 +1451,10 @@
                     "VideoEncoderConfigurationA04,VideoEncoderConfigurationA08"
                 ]
             }
+        },
+        {
+            "keys": ["BOSCH|*"],
+            "addOnvifMetadataConfiguration": true
         },
         {
             "keys": [

@@ -146,6 +146,14 @@ DeviceAgent::~DeviceAgent()
 /** Provides DeviceAgent manifest in JSON format. */
 /*virtual*/ void DeviceAgent::getManifest(Result<const IString*>* outResult) const /*override*/
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    if (m_manifest)
+    {
+        *outResult = new nx::sdk::String(QJson::serialized(*m_manifest));
+        return;
+    }
+
     Bosch::DeviceAgentManifest agentManifest;
     agentManifest.capabilities.setFlag(
         nx::vms::api::analytics::DeviceAgentManifest::disableStreamSelection);
@@ -170,7 +178,9 @@ DeviceAgent::~DeviceAgent()
 #endif
 
     agentManifest.supportedObjectTypeIds << kObjectDetectionObjectTypeId;
-    *outResult = new nx::sdk::String(QJson::serialized(agentManifest));
+    m_manifest = std::move(agentManifest);
+
+    *outResult = new nx::sdk::String(QJson::serialized(*m_manifest));
 }
 
 /**
@@ -309,7 +319,10 @@ void DeviceAgent::updateAgentManifest()
 
     agentManifest.supportedObjectTypeIds << kObjectDetectionObjectTypeId;
 
-    m_handler->pushManifest(new nx::sdk::String(QJson::serialized(agentManifest)));
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    m_manifest = std::move(agentManifest);
+    m_handler->pushManifest(new nx::sdk::String(QJson::serialized(*m_manifest)));
 }
 
 /*virtual*/ void DeviceAgent::doPushDataPacket(

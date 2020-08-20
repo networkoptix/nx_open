@@ -103,6 +103,9 @@ private:
         const ParsedMetadata& parsedMetadata, int64_t ts) const;
 
 private:
+    mutable nx::Mutex m_mutex;
+    mutable std::optional<Bosch::DeviceAgentManifest> m_manifest;
+
     Engine* const m_engine;
     nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
     DeviceInfo m_deviceInfo;

@@ -375,6 +375,7 @@ NX_DECLARE_RESPONSE_TRAITS(Media, AddAudioDecoderConfiguration)
 NX_DECLARE_RESPONSE_TRAITS(Media, AddMetadataConfiguration)
 NX_DECLARE_RESPONSE_TRAITS(Media, AddVideoAnalyticsConfiguration)
 NX_DECLARE_RESPONSE_TRAITS(Media, AddPTZConfiguration)
+NX_DECLARE_RESPONSE_TRAITS(Media, GetCompatibleMetadataConfigurations)
 
 NX_DECLARE_RESPONSE_TRAITS(Media, GetProfiles)
 NX_DECLARE_RESPONSE_TRAITS(Media, CreateProfile)
@@ -607,6 +608,10 @@ namespace Media
     using AudioEncoderConfigurations = RequestWrapper<
         _onvifMedia__GetAudioEncoderConfigurations,
         _onvifMedia__GetAudioEncoderConfigurationsResponse>;
+
+    using CompatibleMetadataConfigurations = RequestWrapper<
+        _onvifMedia__GetCompatibleMetadataConfigurations,
+        _onvifMedia__GetCompatibleMetadataConfigurationsResponse>;
 
     using AudioEncoderConfigurationSetter = RequestWrapper<
         _onvifMedia__SetAudioEncoderConfiguration,

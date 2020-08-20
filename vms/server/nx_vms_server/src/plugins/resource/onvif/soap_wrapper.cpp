@@ -136,6 +136,7 @@ NX_DEFINE_RESPONSE_TRAITS(Media, AddAudioDecoderConfiguration)
 NX_DEFINE_RESPONSE_TRAITS(Media, AddMetadataConfiguration)
 NX_DEFINE_RESPONSE_TRAITS(Media, AddVideoAnalyticsConfiguration)
 NX_DEFINE_RESPONSE_TRAITS(Media, AddPTZConfiguration)
+NX_DEFINE_RESPONSE_TRAITS(Media, GetCompatibleMetadataConfigurations)
 
 NX_DEFINE_RESPONSE_TRAITS(Media, GetProfiles)
 NX_DEFINE_RESPONSE_TRAITS(Media, CreateProfile)

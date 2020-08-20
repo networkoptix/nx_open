@@ -190,6 +190,26 @@ public:
         return std::string();
     }
 
+    template<typename Profile>
+    static std::string metadataConfigurationToken(const Profile* profile)
+    {
+        if (!NX_ASSERT(profile))
+            return std::string();
+
+        if constexpr (std::is_same_v<Profile, onvifMedia2__MediaProfile>)
+        {
+            if (profile->Configurations && profile->Configurations->Metadata)
+                return profile->Configurations->Metadata->token;
+        }
+        else
+        {
+            if (profile->MetadataConfiguration)
+                return profile->MetadataConfiguration->token;
+        }
+
+        return std::string();
+    }
+
     static CameraDiagnostics::Result addMediaConfigurations(
         const QnPlOnvifResourcePtr& device,
         const ConfigurationSet& configurationSet);

@@ -101,6 +101,9 @@ private:
 
     bool executePreConfigurationRequests();
     CameraDiagnostics::Result bindTwoWayAudioToProfile(const std::string& profileToken) const;
+
+    CameraDiagnostics::Result fetchDesiredMetadataConfiguration(
+        const std::string& profileToken, std::string* outMetadataConfigurationToken) const;
 private:
     QnMetaDataV1Ptr m_lastMetadata;
     QnMulticodecRtpReader m_multiCodec;
