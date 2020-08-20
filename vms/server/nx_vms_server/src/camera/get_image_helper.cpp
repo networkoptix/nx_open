@@ -306,7 +306,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::readFrame(
         bool precise = request.roundMethod == nx::api::ImageRequest::RoundMethod::precise;
         for (int i = 0; i < kMaxGopLen && !gotFrame && video; ++i)
         {
-            gotFrame = decoder.decode(video, &outFrame) && (!precise || video->timestamp >= timestampUs);
+            gotFrame = decoder.decode(video, &outFrame) && (!precise || outFrame->pkt_dts >= timestampUs);
             if (gotFrame)
                 break;
             video = getNextArchiveVideoPacket(archiveDelegate, AV_NOPTS_VALUE);
@@ -728,13 +728,8 @@ CLVideoDecoderOutputPtr QnGetImageHelper::decodeFrameSequence(
         NX_VERBOSE(this,
             "%1(): Decoded: gotFrame: %2, frame->timestamp: %3, timestampUs: %4, flags: %5, size: %6",
             __func__, gotFrame, frame->timestamp, timestampUs, frame->flags, frame->dataSize());
-        if (frame->timestamp >= (qint64) timestampUs)
+        if (outFrame->pkt_dts >= (qint64) timestampUs)
             break;
-    }
-    while (decoder.decode(QnConstCompressedVideoDataPtr(), &outFrame))
-    {
-        NX_VERBOSE(this, "%1(): Flushed: outFrame->pkt_dts: %2", __func__, outFrame->pkt_dts);
-        gotFrame = true; //< flush decoder buffer
     }
     if (gotFrame)
         outFrame->channel = firstFrame->channelNumber;
