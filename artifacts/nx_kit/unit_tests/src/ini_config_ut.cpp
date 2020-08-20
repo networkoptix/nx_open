@@ -26,19 +26,19 @@ std::ostream& operator<<(std::ostream& s, IniConfig::ParamType value)
     switch (value)
     {
         case IniConfig::ParamType::boolean:
-            return s << "Boolean";
+            return s << "boolean";
 
         case IniConfig::ParamType::integer:
-            return s << "Integer";
+            return s << "integer";
 
         case IniConfig::ParamType::float_:
-            return s << "Float";
+            return s << "float";
 
         case IniConfig::ParamType::double_:
-            return s << "Double";
+            return s << "double";
 
         case IniConfig::ParamType::string:
-            return s << "String";
+            return s << "string";
     }
 
     return s << "Unknown type: " << (int) value;
@@ -310,7 +310,7 @@ test.ini ERROR: The name part (before "=") is empty. Line 4, file {iniFilePath}
 )");
 }
 
-TEST(iniConfig, testGetValue)
+TEST(iniConfig, testGetParamTypeAndValue)
 {
     if (!IniConfig::isEnabled())
     {

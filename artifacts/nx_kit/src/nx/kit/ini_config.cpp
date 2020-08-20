@@ -11,7 +11,6 @@
 #include <string>
 #include <unordered_map>
 
-#include "debug.h"
 #include "utils.h"
 
 namespace nx {
@@ -597,10 +596,26 @@ bool IniConfig::Impl::getParamTypeAndValue(
         return false;
 
     const auto& param = m_params[it->second];
-    if (NX_KIT_ASSERT(outType))
+    if (outType)
+    {
         *outType = param->type;
-    if (NX_KIT_ASSERT(outData))
+    }
+    else
+    {
+        *output() << "INTERNAL ERROR: Null pointer passed as outType parameter to "
+            << __func__ << "() for " << iniFile << "." << std::endl;
+    }
+
+    if (outData)
+    {
         *outData = param->data();
+    }
+    else
+    {
+        *output() << "INTERNAL ERROR: Null pointer passed as outData parameter to "
+            << __func__ << "() for " << iniFile << "." << std::endl;
+    }
+
     return true;
 }
 
