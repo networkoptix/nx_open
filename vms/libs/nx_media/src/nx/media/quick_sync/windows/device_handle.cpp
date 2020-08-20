@@ -16,6 +16,7 @@ thread_local WindowCache DeviceHandle::m_windowCache;
 
 DeviceHandle::~DeviceHandle()
 {
+    m_renderer.close();
     if (m_hWnd)
         m_windowCache.releaseWindow(m_hWnd);
 }

@@ -59,6 +59,11 @@ bool convertToRgb(
 
 Renderer::~Renderer()
 {
+    close();
+}
+
+void Renderer::close()
+{
     unregisterTexture();
     if (m_rc)
         wglDeleteContext(m_rc);

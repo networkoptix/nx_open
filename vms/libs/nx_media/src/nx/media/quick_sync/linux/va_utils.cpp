@@ -62,7 +62,6 @@ bool DeviceContext::renderToRgb(
     linux::vaapiMemId* surfaceData = (linux::vaapiMemId*)surfaceInfo.surface->Data.MemId;
     VASurfaceID surfaceId = *(surfaceData->m_surface);
 
-    auto start =  std::chrono::high_resolution_clock::now();
     VAStatus status;
     if (isNewTexture || !m_renderingSurface)
     {
@@ -94,8 +93,6 @@ bool DeviceContext::renderToRgb(
         NX_DEBUG(NX_SCOPE_TAG, "vaSyncSurface failed: %1", status);
         return false;
     }
-    auto end =  std::chrono::high_resolution_clock::now();
-    NX_DEBUG(NX_SCOPE_TAG, "render time: %1", std::chrono::duration_cast<std::chrono::milliseconds>(end - start));
     return true;
 }
 

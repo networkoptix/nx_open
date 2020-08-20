@@ -205,7 +205,7 @@ public:
         if (!decoderLock)
             return;
 
-        if (!decoderLock->getDevice().renderToRgb(surfaceInfo, isNewTexture, m_textureId, nullptr /*TODO support windows*/))
+        if (!decoderLock->getDevice().renderToRgb(surfaceInfo, isNewTexture, m_textureId, QOpenGLContext::currentContext()))
             NX_WARNING(this, "rendering surface failed");
 
         m_textureDirty = false;

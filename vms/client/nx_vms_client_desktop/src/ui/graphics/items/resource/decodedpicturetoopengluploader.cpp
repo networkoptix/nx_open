@@ -1219,7 +1219,7 @@ bool DecodedPictureToOpenGLUploader::renderVideoMemory(
         displaySize = QSize(frame->width, frame->height);
 
     bool isNewTexture = texture->ensureInitialized(
-            displaySize.width(), displaySize.height(), displaySize.width(), 1, GL_RGBA, 1, -1);
+        displaySize.width(), displaySize.height(), displaySize.width(), 1, GL_RGBA, 1, -1);
 
     if (!renderToRgb(frame->getVideoSurface(), isNewTexture, texture->m_id, m_initializedContext))
     {

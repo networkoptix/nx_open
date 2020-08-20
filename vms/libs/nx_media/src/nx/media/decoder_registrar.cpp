@@ -62,7 +62,7 @@ void DecoderRegistrar::registerDecoders(
         FfmpegVideoDecoder::setMaxResolutions(maxFfmpegResolutions);
 
 #ifdef __QSV_SUPPORTED__
-        VideoDecoderRegistry::instance()->addPlugin<quick_sync::QuickSyncVideoDecoder>();
+        //VideoDecoderRegistry::instance()->addPlugin<quick_sync::QuickSyncVideoDecoder>();
 #endif // __QSV_SUPPORTED__
         VideoDecoderRegistry::instance()->addPlugin<FfmpegVideoDecoder>();
         AudioDecoderRegistry::instance()->addPlugin<FfmpegAudioDecoder>();

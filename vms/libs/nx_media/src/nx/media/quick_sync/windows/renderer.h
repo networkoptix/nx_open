@@ -23,6 +23,7 @@ public:
     bool init(HWND window, IDirect3DDevice9Ex* device, IDirect3D9Ex* d3d);
     bool render(
         mfxFrameSurface1* mfxSurface, bool isNewTexture, GLuint textureId, QOpenGLContext* context);
+    void close();
 
 private:
     bool registerTexture(GLuint textureId, QOpenGLContext* context);
