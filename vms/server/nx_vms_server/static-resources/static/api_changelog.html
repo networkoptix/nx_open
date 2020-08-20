@@ -47,6 +47,13 @@ supported for a while, when noted below.
 Global setting <strong><code><i>rtspBufferSizeKb</i></code></strong> is renamed to
 <strong><code><b>mediaBufferSizeKb</b></code></strong> and now affects any media transport.
 </p>
+<p>
+The <strong><code><i>cameraAdvancedParams</i></code></strong> value is removed from the
+<strong><code>addParams</code></strong> field of the
+<strong><code>GET /ec2/getCamerasEx</code></strong> result.
+The new function <strong><code><b>GET /api/getCameraParamManifest</b></code></strong> is added to
+get this information.
+</p>
 
 <hr/><h2>VMS <b>4.1</b> relative to <i>4.0</i></h2>
 <!--............................................................................................-->

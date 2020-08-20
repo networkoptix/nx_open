@@ -9,3 +9,4 @@ layoutApiVersion=1
 merge_history=1
 vms_metrics=1
 merge_systems=1
+get_camera_param_manifest=1
