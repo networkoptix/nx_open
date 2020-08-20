@@ -70,7 +70,7 @@ The following prerequisites must be assured before running the Tool:
         - To add the user `<username>` to sudoers: `sudo usermod -aG sudo <username>`
             - To check, run a command like `sudo ls`, it will ask for the user's password.
         - To allow `sudo` to work without password: `sudo visudo`, then add the following line to
-            the end of the file, save it and exit the editor: `<username> ALL=(ALL) NOPASSWD:ALL`
+            the end of the file, save it and exit the editor: `<username> ALL=(ALL:ALL) NOPASSWD:ALL`
             - To check: run a command like `sudo ls`, it will work without asking for the password.
 - The Box must be connected to an isolated network together with the host, and this network
     must have the full bandwidth that the Box is planned to work with, e.g. 100 Mbps or 1 Gbps.
