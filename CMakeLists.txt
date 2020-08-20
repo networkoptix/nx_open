@@ -55,7 +55,7 @@ nx_rdep_configure()
 
 include(cmake/vcs_helpers.cmake)
 nx_vcs_get_info(CHANGESET changeSet BRANCH branch CURRENT_REFS currentRefs)
-if(NOT developerBuild AND (NOT changeSet OR NOT branch OR NOT currentRefs))
+if(NOT changeSet OR NOT branch OR NOT currentRefs)
     message(FATAL_ERROR "VCS info cannot be read.")
 endif()
 
