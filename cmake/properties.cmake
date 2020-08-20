@@ -134,6 +134,7 @@ set(nx_copyright "Copyright (c) 2011-${current_year} Network Optix")
 
 if(customization.advanced.disableCodeSigning)
     set(codeSigning OFF)
+    message(STATUS "Code signing forcefully disabled for the current customization")
 endif()
 
 if(targetDevice MATCHES "bpi")

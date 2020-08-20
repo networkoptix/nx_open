@@ -86,10 +86,7 @@ list(APPEND CMAKE_MODULE_PATH
 include(CMakeParseArguments)
 include(CMakeDependentOption)
 include(ExternalProject)
-
-nx_option(codeSigning "Enable code signing" OFF)
-nx_option(notarization "Enable notarization" OFF)
-
+include(code_signing)
 include(target_detection)
 nx_init_known_files_list()
 include(find_sources)
@@ -124,11 +121,6 @@ include(vms_parts)
 include(compiler_options)
 include(output_directories)
 include(distribution_names)
-
-if(WINDOWS)
-    include(windows_signing)
-endif()
-
 include(parameters_validation)
 
 if(WINDOWS OR ANDROID OR IOS)

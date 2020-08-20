@@ -8,8 +8,7 @@ set(customization "default" CACHE STRING "Product customization")
 set(dotNetFramework "v4.6.2" CACHE STRING "Target .NET Framework version. Allowed: v4.0, v4.6.2")
 set(CMAKE_BUILD_TYPE "Release" CACHE STRING "One of [Debug Release RelWithDebInfo MinSizeRel].")
 set(buildNumber "0" CACHE STRING "Build number")
-option(codeSigning "Enable code signing" OFF)
-
+set(publicationType "local" CACHE STRING "Product publication type")
 set(signKey "${CMAKE_CURRENT_SOURCE_DIR}/src/Sign.snk")
 set(repositoryRootDir ${PROJECT_SOURCE_DIR}/..)
 set(releaseVersion.full ${releaseVersion}.${buildNumber})
@@ -47,6 +46,7 @@ execute_process(
 include(${depenencies_cmake_file})
 
 include(utils)
+include(code_signing)
 include(target_detection)
 include(customization_package)
 
@@ -54,7 +54,6 @@ include(cloud_host)
 include(output_directories)
 include(distribution_names)
 include(option)
-include(windows_signing)
 include(properties)
 
 set(paxtonDriverOutputName "${customization.paxton.libraryName}.OemDvrMiniDriver")

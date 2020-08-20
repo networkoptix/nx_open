@@ -4,6 +4,8 @@ mark_as_advanced(enablePrecompiledHeaders)
 set(nx_enable_werror OFF)
 set(nx_werror_condition CMAKE_COMPILER_IS_GNUCXX)
 
+include(windows_signing)
+
 # build_source_groups(<source root path> <list of source files with absolute paths> <name of root group>)
 function(build_source_groups _src_root_path _source_list _root_group_name)
     foreach(_source IN ITEMS ${_source_list})

@@ -1,15 +1,30 @@
-include(CMakeDependentOption)
+include_guard(GLOBAL)
+
+if(NOT customization.id)
+    # Customization may forecefully disable the code signing.
+    message(FATAL_ERROR "Code signing must be initialized after customization is loaded")
+endif()
+
+if(NOT WINDOWS OR NOT codeSigning)
+    return()
+endif()
 
 set(signingServer "http://localhost:8080" CACHE STRING "Signing server address")
 
-cmake_dependent_option(trustedTimestamping
-    "Sign windows binaries with trusted timestamp"
-    ON "NOT developerBuild"
-    OFF
-)
+# Enable trusted timestamping for all publication types intended for end users. Do not sign
+# local developer builds as well as private QA builds.
+set(trustedTimestamping ON)
+set(_disableTrustedTimestampingPublicationTypes "local" "private")
+if(publicationType IN_LIST _disableTrustedTimestampingPublicationTypes)
+    set(trustedTimestamping OFF)
+endif()
+unset(_disableTrustedTimestampingPublicationTypes)
+message(STATUS
+    "Trusted timestaping is ${trustedTimestamping} for the ${publicationType} publication type")
 
 if(NOT build_utils_dir)
     set(build_utils_dir "${CMAKE_SOURCE_DIR}/build_utils")
+    message(STATUS "Build utils directory ${build_utils_dir}")
 endif()
 
 set(trusted_timestamping_parameters "")

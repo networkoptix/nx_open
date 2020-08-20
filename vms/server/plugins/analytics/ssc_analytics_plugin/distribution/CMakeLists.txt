@@ -91,6 +91,7 @@ add_custom_target(ssc_installer ALL
 )
 
 if(codeSigning)
+    include(windows_signing)
     set(engineExeFile "${CMAKE_CURRENT_BINARY_DIR}/engine.exe")
     set(installerExeFile "${distribution_output_dir}/${ssc_analytics_plugin_distribution_name}.exe")
 

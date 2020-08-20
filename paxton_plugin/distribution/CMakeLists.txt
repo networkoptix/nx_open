@@ -81,6 +81,7 @@ add_custom_target(paxton_plugin_installer ALL
 )
 
 if(codeSigning)
+    include(windows_signing)
     set(engineExeFile "${CMAKE_CURRENT_BINARY_DIR}/engine.exe")
     set(installerExeFile "${distribution_output_dir}/${paxton_plugin_distribution_name}.exe")
 

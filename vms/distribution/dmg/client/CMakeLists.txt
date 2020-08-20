@@ -1,3 +1,5 @@
+include(macosx_notarization)
+
 set(dmg_file_name ${client_distribution_name}.dmg)
 set(update_file_name ${client_update_distribution_name}.zip)
 
