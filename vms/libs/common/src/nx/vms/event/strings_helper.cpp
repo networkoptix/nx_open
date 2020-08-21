@@ -31,6 +31,7 @@
 #include <nx/analytics/descriptor_manager.h>
 #include <nx/fusion/model_functions.h>
 #include <analytics/common/object_metadata.h>
+#include <nx/analytics/analytics_attributes.h>
 
 namespace {
 
@@ -50,6 +51,8 @@ QString serializeAttributes(const nx::common::metadata::Attributes& attributes, 
     QString result;
     for (const auto& attribute: attributes)
     {
+        if (nx::analytics::isAnalyticsAttributeHidden(attribute.name))
+            continue;
         if (!result.isEmpty())
             result += kDelimiter;
         result += NX_FMT("%1: %2", attribute.name, attribute.value);

@@ -266,10 +266,13 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadata
                 eventMetadata->setDescription(hanwhaEvent.description.toStdString());
                 eventMetadata->setIsActive(hanwhaEvent.isActive);
                 eventMetadata->setConfidence(1.0);
-                eventMetadata->addAttribute(makePtr<Attribute>(
-                    IAttribute::Type::string,
-                    nx::vms::server::analytics::kInputPortIdAttribute,
-                    hanwhaEvent.fullEventName.toStdString()));
+                if (hanwhaEvent.typeId == "nx.hanwha.AlarmInput")
+                {
+                    eventMetadata->addAttribute(makePtr<Attribute>(
+                        IAttribute::Type::string,
+                        nx::vms::server::analytics::kInputPortIdAttribute,
+                        hanwhaEvent.fullEventName.toStdString()));
+                }
 
                 eventMetadataPacket->setTimestampUs(
                     duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
