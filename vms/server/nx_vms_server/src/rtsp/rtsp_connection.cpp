@@ -353,6 +353,7 @@ bool QnRtspConnectionProcessor::parseRequestParams()
     if (!nx::network::http::getHeaderValue(d->request.headers, Qn::EC2_INTERNAL_RTP_FORMAT).isNull())
     {
         d->useProprietaryFormat = true;
+        d->sessionTimeout = 0;
     }
     else
     {
