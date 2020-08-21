@@ -36,7 +36,11 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 
 std::string Engine::manifestString() const
 {
-    return serializeJson(QJsonObject{}).toStdString();
+    const auto manifest = QJsonObject{
+        {"capabilities", "deviceDependent"},
+    };
+
+    return serializeJson(manifest).toStdString();
 }
 
 void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDeviceInfo* deviceInfo)
