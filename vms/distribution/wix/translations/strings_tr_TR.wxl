@@ -3,14 +3,14 @@
   <String Id="Caption">[WixBundleName] Yükle-[WixBundleVersion]</String>
   <String Id="Title">[WixBundleName] - [WixBundleVersion]</String>
   <String Id="Components">[InstallerTitle]</String>
-  <String Id="HelpText">/install | /repair | /uninstall | /layout [directory] - installs, repairs, uninstalls or
-   creates a complete local copy of the bundle in directory. Install is the default.
+  <String Id="HelpText">/ install | / onarım | / uninstall | / layout [directory] - kurar, onarır, kaldırır veya
+   dizinde paketin tam bir yerel kopyasını oluşturur. Varsayılan kurulumdur.
 
-/passive | /quiet -  displays minimal UI with no prompts or displays no UI and
-   no prompts. By default UI and all prompts are displayed.
+/ pasif | / quiet - hiçbir istem olmadan minimum kullanıcı arayüzünü görüntüler veya kullanıcı arayüzü göstermez ve
+   komut isteminde bulunmaz. Varsayılan olarak kullanıcı arayüzü ve tüm istemler görüntülenir.
 
-/norestart   - suppress any attempts to restart. By default UI will prompt before restart.
-/log log.txt - logs to a specific file. By default a log file is created in %TEMP%.</String>
+/ norestart - yeniden başlatma girişimlerini bastırın. Varsayılan olarak, UI yeniden başlatmadan önce sorulacaktır.
+/ log log.txt - belirli bir dosyaya günlükler. Varsayılan olarak %TEMP%bir günlük dosyası oluşturulur.</String>
   <String Id="ConfirmCancelMessage">İptal etmek istediğinizden emin misiniz?</String>
   <String Id="ClientAndServer">İstemci ve sunucu</String>
   <String Id="ClientOnly">Yalnızca istemci</String>

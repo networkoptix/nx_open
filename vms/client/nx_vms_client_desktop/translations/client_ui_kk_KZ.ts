@@ -1,37 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ko" sourcelanguage="en">
+<TS version="2.1" language="kk" sourcelanguage="en">
   <context>
     <name>AboutDialog</name>
     <message>
       <location filename="../src/ui/dialogs/about_dialog.ui"/>
       <source>About</source>
-      <translation>정보</translation>
+      <translation type="unfinished">About</translation>
     </message>
     <message>
       <location/>
       <source>Information</source>
-      <translation>정보</translation>
+      <translation type="unfinished">Information</translation>
     </message>
     <message>
       <location/>
       <source>Credits</source>
-      <translation>저작권</translation>
+      <translation type="unfinished">Credits</translation>
     </message>
     <message>
       <location/>
       <source>GPU Information</source>
-      <translation>GPU 정보</translation>
+      <translation type="unfinished">GPU Information</translation>
     </message>
     <message>
       <location/>
       <source>Support</source>
-      <translation>지원</translation>
+      <translation type="unfinished">Support</translation>
     </message>
     <message>
       <location/>
       <source>System Servers</source>
-      <translation>시스템 서버</translation>
+      <translation type="unfinished">System Servers</translation>
     </message>
   </context>
   <context>
@@ -39,7 +39,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/accessible_resources_widget.ui"/>
       <source>Filter</source>
-      <translation>필터</translation>
+      <translation type="unfinished">Filter</translation>
     </message>
   </context>
   <context>
@@ -47,32 +47,32 @@
     <message>
       <location filename="../src/ui/dialogs/adjust_video_dialog.ui"/>
       <source>Image Enhancement</source>
-      <translation>이미지 향상</translation>
+      <translation type="unfinished">Image Enhancement</translation>
     </message>
     <message>
       <location/>
       <source>Enable image enhancement</source>
-      <translation>이미지 향상 활성화</translation>
+      <translation type="unfinished">Enable image enhancement</translation>
     </message>
     <message>
       <location/>
       <source>Gamma</source>
-      <translation>감마</translation>
+      <translation type="unfinished">Gamma</translation>
     </message>
     <message>
       <location/>
       <source>Auto</source>
-      <translation>자동</translation>
+      <translation type="unfinished">Auto</translation>
     </message>
     <message>
       <location/>
       <source>Black level</source>
-      <translation>블랙 레벨</translation>
+      <translation type="unfinished">Black level</translation>
     </message>
     <message>
       <location/>
       <source>White level</source>
-      <translation>화이트 레벨</translation>
+      <translation type="unfinished">White level</translation>
     </message>
   </context>
   <context>
@@ -80,47 +80,47 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/advanced_settings_widget.ui"/>
       <source>Downmix Audio from 5.1 to 2.1</source>
-      <translation>오디오를 5.1채널에서 2.1채널까지 다운 믹스</translation>
+      <translation type="unfinished">Downmix Audio from 5.1 to 2.1</translation>
     </message>
     <message>
       <location/>
       <source>Double Buffering</source>
-      <translation>이중 버퍼링</translation>
+      <translation type="unfinished">Double Buffering</translation>
     </message>
     <message>
       <location/>
       <source>Maximum Live Buffer Length</source>
-      <translation>최대 라이브 버퍼 길이</translation>
+      <translation type="unfinished">Maximum Live Buffer Length</translation>
     </message>
     <message>
       <location/>
       <source>Browse Logs</source>
-      <translation>찾기 로그</translation>
+      <translation type="unfinished">Browse Logs</translation>
     </message>
     <message>
       <location/>
       <source>Clear Local Cache</source>
-      <translation>로컬 캐쉬 삭제</translation>
+      <translation type="unfinished">Clear Local Cache</translation>
     </message>
     <message>
       <location/>
       <source>Reset All Warnings</source>
-      <translation>모든 경고 초기화</translation>
+      <translation type="unfinished">Reset All Warnings</translation>
     </message>
     <message>
       <location/>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation>흐림 효과가 설정된 경우 Intel HD 그래픽 디스플레이에 문제가 발생할 수 있습니다. 옵션을 그대로 두는 것을 권합니다.</translation>
+      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
     </message>
     <message>
       <location/>
       <source>Disable blur</source>
-      <translation>흐림 효과 비활성화</translation>
+      <translation type="unfinished">Disable blur</translation>
     </message>
     <message>
       <location/>
       <source>Limit Frame Rate to save CPU</source>
-      <translation>CPU 사용량을 줄이기 위해 프레임 속도 제한</translation>
+      <translation type="unfinished">Limit Frame Rate to save CPU</translation>
     </message>
   </context>
   <context>
@@ -128,22 +128,22 @@
     <message>
       <location filename="../src/ui/widgets/business/aggregation_widget.ui"/>
       <source>Check to set aggregation period</source>
-      <translation>집계 기간을 설정하세요</translation>
+      <translation type="unfinished">Check to set aggregation period</translation>
     </message>
     <message>
       <location/>
       <source>Interval of action :</source>
-      <translation>동작 간격:</translation>
+      <translation type="unfinished">Interval of action :</translation>
     </message>
     <message>
       <location/>
       <source>No more than once per</source>
-      <translation>이벤트 한 번 동작되는 간격</translation>
+      <translation type="unfinished">No more than once per</translation>
     </message>
     <message>
       <location/>
       <source>Instant</source>
-      <translation>즉시</translation>
+      <translation type="unfinished">Instant</translation>
     </message>
   </context>
   <context>
@@ -151,22 +151,22 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/analytics_sdk_event_widget.ui"/>
       <source>Keywords separated by space</source>
-      <translation>공간으로 단어 구분됨</translation>
+      <translation type="unfinished">Keywords separated by space</translation>
     </message>
     <message>
       <location/>
       <source>Caption contains:</source>
-      <translation>주석 포함</translation>
+      <translation type="unfinished">Caption contains:</translation>
     </message>
     <message>
       <location/>
       <source>Description contains:</source>
-      <translation>상세 포함</translation>
+      <translation type="unfinished">Description contains:</translation>
     </message>
     <message>
       <location/>
       <source>Event Type:</source>
-      <translation>이벤트 유형:</translation>
+      <translation type="unfinished">Event Type:</translation>
     </message>
   </context>
   <context>
@@ -174,22 +174,22 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/archive_length_widget.ui"/>
       <source>Fixed Archive Length</source>
-      <translation>녹화 범위 설정</translation>
+      <translation type="unfinished">Fixed Archive Length</translation>
     </message>
     <message>
       <location/>
       <source>Auto</source>
-      <translation>자동</translation>
+      <translation type="unfinished">Auto</translation>
     </message>
     <message>
       <location/>
       <source>Max. days</source>
-      <translation>최대 일:</translation>
+      <translation type="unfinished">Max. days</translation>
     </message>
     <message>
       <location/>
       <source>Min. days</source>
-      <translation>최소 일</translation>
+      <translation type="unfinished">Min. days</translation>
     </message>
   </context>
   <context>
@@ -197,82 +197,82 @@
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
       <source>Refresh</source>
-      <translation>새로고침</translation>
+      <translation type="unfinished">Refresh</translation>
     </message>
     <message>
       <location/>
       <source>User actions</source>
-      <translation>사용자 행동</translation>
+      <translation type="unfinished">User actions</translation>
     </message>
     <message>
       <location/>
       <source>Watching archive</source>
-      <translation>아카이브 보기</translation>
+      <translation type="unfinished">Watching archive</translation>
     </message>
     <message>
       <location/>
       <source>Exporting video</source>
-      <translation>영상 내보내기</translation>
+      <translation type="unfinished">Exporting video</translation>
     </message>
     <message>
       <location/>
       <source>Watching live</source>
-      <translation>라이브 보기</translation>
+      <translation type="unfinished">Watching live</translation>
     </message>
     <message>
       <location/>
       <source>Login/logout</source>
-      <translation>로그인/ 아웃</translation>
+      <translation type="unfinished">Login/logout</translation>
     </message>
     <message>
       <location/>
       <source>Event rules</source>
-      <translation>이벤트 규칙</translation>
+      <translation type="unfinished">Event rules</translation>
     </message>
     <message>
       <location/>
       <source>Server actions</source>
-      <translation>서버 동작</translation>
+      <translation type="unfinished">Server actions</translation>
     </message>
     <message>
       <location/>
       <source>System actions</source>
-      <translation>시스템 동작</translation>
+      <translation type="unfinished">System actions</translation>
     </message>
     <message>
       <location/>
       <source>Select all</source>
-      <translation>전체 선택</translation>
+      <translation type="unfinished">Select all</translation>
     </message>
     <message>
       <location/>
       <source>Sessions</source>
-      <translation>세션</translation>
+      <translation type="unfinished">Sessions</translation>
     </message>
     <message>
       <location/>
       <source>Details</source>
-      <translation>상세</translation>
+      <translation type="unfinished">Details</translation>
     </message>
     <message>
       <location/>
       <source>Audit Trail</source>
-      <translation>시스템 감사</translation>
+      <translation type="unfinished">Audit Trail</translation>
     </message>
     <message>
       <location/>
       <source>Clear Filter</source>
-      <translation>필터 초기화</translation>
+      <translation type="unfinished">Clear Filter</translation>
     </message>
     <message>
       <location/>
       <source>Email settings</source>
-      <translation>이메일 설정</translation>
+      <translation type="unfinished">Email settings</translation>
     </message>
     <message>
       <location/>
       <source>All servers are offline. Audit data is not available.</source>
-      <translation>모든 서버는 오프 라인입니다. 감사 데이터는 사용할 수 없습니다.</translation>
+      <translation type="unfinished">All servers are offline. Audit data is not available.</translation>
     </message>
   </context>
   <context>
@@ -280,42 +280,42 @@
     <message>
       <location filename="../src/ui/dialogs/backup_schedule_dialog.ui"/>
       <source>Backup Schedule...</source>
-      <translation>백업 스케쥴</translation>
+      <translation type="unfinished">Backup Schedule...</translation>
     </message>
     <message>
       <location/>
       <source>Execute backup on the following days:</source>
-      <translation>아래 날짜에 대한 백업 진행</translation>
+      <translation type="unfinished">Execute backup on the following days:</translation>
     </message>
     <message>
       <location/>
       <source>Limit Bandwidth to:</source>
-      <translation>네트워크 사이즈 제한</translation>
+      <translation type="unfinished">Limit Bandwidth to:</translation>
     </message>
     <message>
       <location/>
       <source>Mbit/s</source>
-      <translation>Mbit/s</translation>
+      <translation type="unfinished">Mbit/s</translation>
     </message>
     <message>
       <location/>
       <source>Bitrate limitation could lead to backup failure.</source>
-      <translation>비트 전송률 제한은 백업 오류를 발생시킬수 있습니다.</translation>
+      <translation type="unfinished">Bitrate limitation could lead to backup failure.</translation>
     </message>
     <message>
       <location/>
       <source>Finish</source>
-      <translation>마침</translation>
+      <translation type="unfinished">Finish</translation>
     </message>
     <message>
       <location/>
       <source>Start</source>
-      <translation>시작:</translation>
+      <translation type="unfinished">Start</translation>
     </message>
     <message>
       <location/>
       <source>on the next day</source>
-      <translation>다음날에</translation>
+      <translation type="unfinished">on the next day</translation>
     </message>
   </context>
   <context>
@@ -323,37 +323,37 @@
     <message>
       <location filename="../src/ui/dialogs/backup_settings_dialog.ui"/>
       <source>Backup Settings</source>
-      <translation>백업 설정</translation>
+      <translation type="unfinished">Backup Settings</translation>
     </message>
     <message>
       <location/>
       <source>Server Settings</source>
-      <translation>서버 설정</translation>
+      <translation type="unfinished">Server Settings</translation>
     </message>
     <message>
       <location/>
       <source>Set Schedule...</source>
-      <translation>스케쥴 설정</translation>
+      <translation type="unfinished">Set Schedule...</translation>
     </message>
     <message>
       <location/>
       <source>Only further recording will be backed up. Backup process will ignore existing footage.</source>
-      <translation>이후 데이터만 백업이 되면 기존 녹화 상태는 무시됩니다.</translation>
+      <translation type="unfinished">Only further recording will be backed up. Backup process will ignore existing footage.</translation>
     </message>
     <message>
       <location/>
       <source>Execute Backup</source>
-      <translation>백업 진행</translation>
+      <translation type="unfinished">Execute Backup</translation>
     </message>
     <message>
       <location/>
       <source>Backup Archive From</source>
-      <translation>백업 아카이브</translation>
+      <translation type="unfinished">Backup Archive From</translation>
     </message>
     <message>
       <location/>
       <source>Backup Quality</source>
-      <translation>백업 품질</translation>
+      <translation type="unfinished">Backup Quality</translation>
     </message>
   </context>
   <context>
@@ -361,27 +361,27 @@
     <message>
       <location filename="../src/ui/widgets/business/bookmark_business_action_widget.ui"/>
       <source>Fixed duration:</source>
-      <translation>기간 고정</translation>
+      <translation type="unfinished">Fixed duration:</translation>
     </message>
     <message>
       <location/>
       <source>seconds</source>
-      <translation>초</translation>
+      <translation type="unfinished">seconds</translation>
     </message>
     <message>
       <location/>
       <source>Tags:</source>
-      <translation>태그</translation>
+      <translation type="unfinished">Tags:</translation>
     </message>
     <message>
       <location/>
       <source>Pre-recording:</source>
-      <translation>알람 전</translation>
+      <translation type="unfinished">Pre-recording:</translation>
     </message>
     <message>
       <location/>
       <source>Post-recording:</source>
-      <translation>알람 후</translation>
+      <translation type="unfinished">Post-recording:</translation>
     </message>
   </context>
   <context>
@@ -389,27 +389,27 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
       <source>Bookmark Info</source>
-      <translation>즐겨찾기 정보</translation>
+      <translation type="unfinished">Bookmark Info</translation>
     </message>
     <message>
       <location/>
       <source>Delete</source>
-      <translation>삭제</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <location/>
       <source>Area Width</source>
-      <translation>영역 넓이</translation>
+      <translation type="unfinished">Area Width</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation>글꼴 크기</translation>
+      <translation type="unfinished">Font Size</translation>
     </message>
     <message>
       <location/>
       <source>Include description</source>
-      <translation>설명 포함</translation>
+      <translation type="unfinished">Include description</translation>
     </message>
   </context>
   <context>
@@ -417,32 +417,32 @@
     <message>
       <location filename="../src/ui/widgets/bookmark_widget.ui"/>
       <source>Popular tags</source>
-      <translation>자주사용하는 태그</translation>
+      <translation type="unfinished">Popular tags</translation>
     </message>
     <message>
       <location/>
       <source>Name</source>
-      <translation>이름</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <location/>
       <source>Description</source>
-      <translation>설명</translation>
+      <translation type="unfinished">Description</translation>
     </message>
     <message>
       <location/>
       <source>Timeout</source>
-      <translation>시간제한</translation>
+      <translation type="unfinished">Timeout</translation>
     </message>
     <message>
       <location/>
       <source>Tags</source>
-      <translation>태그</translation>
+      <translation type="unfinished">Tags</translation>
     </message>
     <message>
       <location/>
       <source>List of tags divided by commas</source>
-      <translation>쉼표로 구분 하는 태그의 목록</translation>
+      <translation type="unfinished">List of tags divided by commas</translation>
     </message>
   </context>
   <context>
@@ -450,17 +450,17 @@
     <message>
       <location filename="../src/ui/dialogs/private/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
-      <translation>새로고침</translation>
+      <translation type="unfinished">Refresh</translation>
     </message>
     <message>
       <location/>
       <source>Bookmark Log</source>
-      <translation>즐겨찾기 로그</translation>
+      <translation type="unfinished">Bookmark Log</translation>
     </message>
     <message>
       <location/>
       <source>Clear Filter</source>
-      <translation>필터 초기화</translation>
+      <translation type="unfinished">Clear Filter</translation>
     </message>
   </context>
   <context>
@@ -468,42 +468,42 @@
     <message>
       <location filename="../src/ui/widgets/business/business_rule_widget.ui"/>
       <source>Event</source>
-      <translation>이벤트</translation>
+      <translation type="unfinished">Event</translation>
     </message>
     <message>
       <location/>
       <source>Schedule...</source>
-      <translation>일정...</translation>
+      <translation type="unfinished">Schedule...</translation>
     </message>
     <message>
       <location/>
       <source>Action</source>
-      <translation>동작</translation>
+      <translation type="unfinished">Action</translation>
     </message>
     <message>
       <location/>
       <source>Comments:</source>
-      <translation>비고:</translation>
+      <translation type="unfinished">Comments:</translation>
     </message>
     <message>
       <location/>
       <source>When</source>
-      <translation>시점</translation>
+      <translation type="unfinished">When</translation>
     </message>
     <message>
       <location/>
       <source>Do</source>
-      <translation>실행</translation>
+      <translation type="unfinished">Do</translation>
     </message>
     <message>
       <location/>
       <source>At</source>
-      <translation>At</translation>
+      <translation type="unfinished">At</translation>
     </message>
     <message>
       <location/>
       <source>Use event source server</source>
-      <translation>이벤트 소스 서버 사용</translation>
+      <translation type="unfinished">Use event source server</translation>
     </message>
   </context>
   <context>
@@ -511,27 +511,27 @@
     <message>
       <location filename="../src/ui/dialogs/business_rules_dialog.ui"/>
       <source>Add</source>
-      <translation>추가</translation>
+      <translation type="unfinished">Add</translation>
     </message>
     <message>
       <location/>
       <source>Delete</source>
-      <translation>삭제</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <location/>
       <source>Event Rules</source>
-      <translation>이벤트 규칙</translation>
+      <translation type="unfinished">Event Rules</translation>
     </message>
     <message>
       <location/>
       <source>Event Log...</source>
-      <translation>이벤트 로그...</translation>
+      <translation type="unfinished">Event Log...</translation>
     </message>
     <message>
       <location/>
       <source>Test</source>
-      <translation>테스트</translation>
+      <translation type="unfinished">Test</translation>
     </message>
   </context>
   <context>
@@ -539,12 +539,12 @@
     <message>
       <location filename="../src/ui/widgets/business/buzzer_business_action_widget.ui"/>
       <source>Fixed duration:</source>
-      <translation>기간 고정</translation>
+      <translation type="unfinished">Fixed duration:</translation>
     </message>
     <message>
       <location/>
       <source>seconds</source>
-      <translation>초</translation>
+      <translation type="unfinished">seconds</translation>
     </message>
   </context>
   <context>
@@ -552,12 +552,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/camera_advanced_params_widget.ui"/>
       <source>Category</source>
-      <translation>카테고리</translation>
+      <translation type="unfinished">Category</translation>
     </message>
     <message>
       <location/>
       <source>Refresh</source>
-      <translation>새로고침</translation>
+      <translation type="unfinished">Refresh</translation>
     </message>
   </context>
   <context>
@@ -565,7 +565,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/dialogs/camera_credentials_dialog.ui"/>
       <source>Authentication credentials</source>
-      <translation>인증 증명</translation>
+      <translation type="unfinished">Authentication credentials</translation>
     </message>
   </context>
   <context>
@@ -573,152 +573,152 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_expert_settings_widget.ui"/>
       <source>Do not archive primary stream</source>
-      <translation>주 스트림을 저장하지 않음</translation>
+      <translation type="unfinished">Do not archive primary stream</translation>
     </message>
     <message>
       <location/>
       <source>Do not archive secondary stream</source>
-      <translation>보조 스트림을 저장하지 않음</translation>
+      <translation type="unfinished">Do not archive secondary stream</translation>
     </message>
     <message>
       <location/>
       <source>Auto</source>
-      <translation>자동</translation>
+      <translation type="unfinished">Auto</translation>
     </message>
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation>초기값 복구</translation>
+      <translation type="unfinished">Restore Defaults</translation>
     </message>
     <message>
       <location/>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>시스템 성능에 잠재적으로 영향을 미칠 수 있다는 확신이 들지 않으면이 설정을 변경하지 마십시오.</translation>
+      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</translation>
     </message>
     <message>
       <location/>
       <source>Camera Settings</source>
-      <translation>카메라 설정</translation>
+      <translation type="unfinished">Camera Settings</translation>
     </message>
     <message>
       <location/>
       <source>Keep camera stream and profile settings</source>
-      <translation>카메라 스트림 및 프로필 설정 유지</translation>
+      <translation type="unfinished">Keep camera stream and profile settings</translation>
     </message>
     <message>
       <location/>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation>녹화 일정의 화질 및 프레임 속도 (FPS) 설정은 관련성이 없어집니다.</translation>
+      <translation type="unfinished">Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</translation>
     </message>
     <message>
       <location/>
       <source>Calculate bitrate per GOP instead of bitrate per second</source>
-      <translation>초당 비트 레이트 대신 GOP 당 비트 레이트를 계산</translation>
+      <translation type="unfinished">Calculate bitrate per GOP instead of bitrate per second</translation>
     </message>
     <message>
       <location/>
       <source>It will increase bitrate for camera.</source>
-      <translation>카메라의 비트율을 증가합니다.</translation>
+      <translation type="unfinished">It will increase bitrate for camera.</translation>
     </message>
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation>보조 스트림</translation>
+      <translation type="unfinished">Secondary Stream</translation>
     </message>
     <message>
       <location/>
       <source>Disable secondary stream</source>
-      <translation>보조 스트림 비활성화</translation>
+      <translation type="unfinished">Disable secondary stream</translation>
     </message>
     <message>
       <location/>
       <source>Motion Detection</source>
-      <translation>움직임 감지:</translation>
+      <translation type="unfinished">Motion Detection</translation>
     </message>
     <message>
       <location/>
       <source>Archive</source>
-      <translation>보관하기</translation>
+      <translation type="unfinished">Archive</translation>
     </message>
     <message>
       <location/>
       <source>Media Streaming</source>
-      <translation>미디어 스트리밍</translation>
+      <translation type="unfinished">Media Streaming</translation>
     </message>
     <message>
       <location/>
       <source>PTZ</source>
-      <translation>PTZ</translation>
+      <translation type="unfinished">PTZ</translation>
     </message>
     <message>
       <location/>
       <source>Generate</source>
-      <translation>생성</translation>
+      <translation type="unfinished">Generate</translation>
     </message>
     <message>
       <location/>
       <source>Reset</source>
-      <translation>초기화</translation>
+      <translation type="unfinished">Reset</translation>
     </message>
     <message>
       <location/>
       <source>Logical ID</source>
-      <translation>논리 ID</translation>
+      <translation type="unfinished">Logical ID</translation>
     </message>
     <message>
       <location/>
       <source>Force motion detection for stream</source>
-      <translation>스트림에 대 한 강제 모션 감지</translation>
+      <translation type="unfinished">Force motion detection for stream</translation>
     </message>
     <message>
       <location/>
       <source>RTP transport</source>
-      <translation>RTP 전송</translation>
+      <translation type="unfinished">RTP transport</translation>
     </message>
     <message>
       <location/>
       <source>Custom Media Port</source>
-      <translation>사용자 지정 미디어 포트</translation>
+      <translation type="unfinished">Custom Media Port</translation>
     </message>
     <message>
       <location/>
       <source>Trust camera timestamp</source>
-      <translation>트러스트 카메라 타임 스탬프</translation>
+      <translation type="unfinished">Trust camera timestamp</translation>
     </message>
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation>선호하는 PTZ 사전 설정 유형:</translation>
+      <translation type="unfinished">Preferred PTZ preset type:</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation>시스템</translation>
+      <translation type="unfinished">System</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation>기본</translation>
+      <translation type="unfinished">Native</translation>
     </message>
     <message>
       <location/>
       <source>Native camera presets will not be avaliable.</source>
-      <translation>카메라 자체 사전 설정은 사용할 수 없습니다.</translation>
+      <translation type="unfinished">Native camera presets will not be avaliable.</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation>이 카메라는 팬 과 틸트를 지원합니다.</translation>
+      <translation type="unfinished">This camera supports pan and tilt</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation>이 카메라는 줌 기능을 지원합니다.</translation>
+      <translation type="unfinished">This camera supports zoom</translation>
     </message>
     <message>
       <location/>
       <source>Detect motion during archive import</source>
-      <translation>아카이브 가져 오기 중 모션 감지</translation>
+      <translation type="unfinished">Detect motion during archive import</translation>
     </message>
   </context>
   <context>
@@ -726,72 +726,72 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_info_widget.ui"/>
       <source>Model</source>
-      <translation>모델</translation>
+      <translation type="unfinished">Model</translation>
     </message>
     <message>
       <location/>
       <source>Vendor</source>
-      <translation>제조사:</translation>
+      <translation type="unfinished">Vendor</translation>
     </message>
     <message>
       <location/>
       <source>IP Address</source>
-      <translation>IP 주소:</translation>
+      <translation type="unfinished">IP Address</translation>
     </message>
     <message>
       <location/>
       <source>Ping</source>
-      <translation>핑</translation>
+      <translation type="unfinished">Ping</translation>
     </message>
     <message>
       <location/>
       <source>Firmware</source>
-      <translation>펌웨어:</translation>
+      <translation type="unfinished">Firmware</translation>
     </message>
     <message>
       <location/>
       <source>Camera ID</source>
-      <translation>카메라 ID</translation>
+      <translation type="unfinished">Camera ID</translation>
     </message>
     <message>
       <location/>
       <source>Web Page</source>
-      <translation>웹페이지:</translation>
+      <translation type="unfinished">Web Page</translation>
     </message>
     <message>
       <location/>
       <source>Primary Stream</source>
-      <translation>기본 스트림</translation>
+      <translation type="unfinished">Primary Stream</translation>
     </message>
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation>2 차 스트림</translation>
+      <translation type="unfinished">Secondary Stream</translation>
     </message>
     <message>
       <location/>
       <source>MAC Address</source>
-      <translation>MAC 주소</translation>
+      <translation type="unfinished">MAC Address</translation>
     </message>
     <message>
       <location/>
       <source>Show on layout</source>
-      <translation>레이아웃에 표시</translation>
+      <translation type="unfinished">Show on layout</translation>
     </message>
     <message>
       <location/>
       <source>Event Log</source>
-      <translation>이벤트 로그</translation>
+      <translation type="unfinished">Event Log</translation>
     </message>
     <message>
       <location/>
       <source>Camera rules</source>
-      <translation>카메라 규칙</translation>
+      <translation type="unfinished">Camera rules</translation>
     </message>
     <message>
       <location/>
       <source>Logical ID</source>
-      <translation>논리 ID</translation>
+      <translation type="unfinished">Logical ID</translation>
     </message>
   </context>
   <context>
@@ -799,7 +799,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input ID</source>
-      <translation>입력 ID</translation>
+      <translation type="unfinished">Input ID</translation>
     </message>
   </context>
   <context>
@@ -807,7 +807,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_license_panel_widget.ui"/>
       <source>Activate License...</source>
-      <translation>라이센스 활성화...</translation>
+      <translation type="unfinished">Activate License...</translation>
     </message>
   </context>
   <context>
@@ -815,7 +815,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
       <source>Add Device...</source>
-      <translation>장치 추가...</translation>
+      <translation type="unfinished">Add Device...</translation>
     </message>
   </context>
   <context>
@@ -823,17 +823,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_motion_settings_widget.ui"/>
       <source>Motion Detection</source>
-      <translation>움직임 감지:</translation>
+      <translation type="unfinished">Motion Detection</translation>
     </message>
     <message>
       <location/>
       <source>Sensitivity</source>
-      <translation>민감도:</translation>
+      <translation type="unfinished">Sensitivity</translation>
     </message>
     <message>
       <location/>
       <source>Reset</source>
-      <translation>초기화</translation>
+      <translation type="unfinished">Reset</translation>
     </message>
   </context>
   <context>
@@ -841,12 +841,12 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
       <source>Fixed duration:</source>
-      <translation>기간 고정</translation>
+      <translation type="unfinished">Fixed duration:</translation>
     </message>
     <message>
       <location/>
       <source>Output ID:</source>
-      <translation>출력 ID:</translation>
+      <translation type="unfinished">Output ID:</translation>
     </message>
   </context>
   <context>
@@ -854,32 +854,32 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_schedule_widget.ui"/>
       <source>Motion Recording</source>
-      <translation>움직임 녹화</translation>
+      <translation type="unfinished">Motion Recording</translation>
     </message>
     <message>
       <location/>
       <source>Recording</source>
-      <translation>저장</translation>
+      <translation type="unfinished">Recording</translation>
     </message>
     <message>
       <location/>
       <source>Activate License...</source>
-      <translation>라이센스 활성화...</translation>
+      <translation type="unfinished">Activate License...</translation>
     </message>
     <message>
       <location/>
       <source>Copying Schedule</source>
-      <translation>일정 복사</translation>
+      <translation type="unfinished">Copying Schedule</translation>
     </message>
     <message>
       <location/>
       <source>Apply changes before copying schedule.</source>
-      <translation>일정 복사 전 변경된 사항을 적용하세요</translation>
+      <translation type="unfinished">Apply changes before copying schedule.</translation>
     </message>
     <message>
       <location/>
       <source>Copy Schedule to...</source>
-      <translation>일정 복사 대상</translation>
+      <translation type="unfinished">Copy Schedule to...</translation>
     </message>
   </context>
   <context>
@@ -887,12 +887,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.ui"/>
       <source>All Cameras</source>
-      <translation>전체 카메라</translation>
+      <translation type="unfinished">All Cameras</translation>
     </message>
     <message>
       <location/>
       <source>Select Cameras</source>
-      <translation>카메라 선택</translation>
+      <translation type="unfinished">Select Cameras</translation>
     </message>
   </context>
   <context>
@@ -900,27 +900,27 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_settings_general_tab_widget.ui"/>
       <source>Authentication</source>
-      <translation>인증</translation>
+      <translation type="unfinished">Authentication</translation>
     </message>
     <message>
       <location/>
       <source>Edit Credentials</source>
-      <translation>인증 수정</translation>
+      <translation type="unfinished">Edit Credentials</translation>
     </message>
     <message>
       <location/>
       <source>Audio</source>
-      <translation>오디오</translation>
+      <translation type="unfinished">Audio</translation>
     </message>
     <message>
       <location/>
       <source>Enable audio</source>
-      <translation>오디오 활성화</translation>
+      <translation type="unfinished">Enable audio</translation>
     </message>
     <message>
       <location/>
       <source>Edit Streams...</source>
-      <translation>스트림 편집...</translation>
+      <translation type="unfinished">Edit Streams...</translation>
     </message>
   </context>
   <context>
@@ -928,7 +928,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.ui"/>
       <source>Streams Addresses</source>
-      <translation>스트림 주소</translation>
+      <translation type="unfinished">Streams Addresses</translation>
     </message>
   </context>
   <context>
@@ -936,7 +936,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation>암호 변경</translation>
+      <translation type="unfinished">Change password</translation>
     </message>
   </context>
   <context>
@@ -944,7 +944,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
-      <translation>로그인 상태 유지</translation>
+      <translation type="unfinished">Stay logged in</translation>
     </message>
   </context>
   <context>
@@ -952,7 +952,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/dialogs/connecting_to_server_dialog.ui"/>
       <source>Connecting...</source>
-      <translation>연결중...</translation>
+      <translation type="unfinished">Connecting...</translation>
     </message>
   </context>
   <context>
@@ -960,17 +960,17 @@
     <message>
       <location filename="../src/ui/dialogs/connection_name_dialog.ui"/>
       <source>Save connection as...</source>
-      <translation>연결 저장...</translation>
+      <translation type="unfinished">Save connection as...</translation>
     </message>
     <message>
       <location/>
       <source>Enter name:</source>
-      <translation>이름 입력:</translation>
+      <translation type="unfinished">Enter name:</translation>
     </message>
     <message>
       <location/>
       <source>Save password</source>
-      <translation>비밀번호 저장</translation>
+      <translation type="unfinished">Save password</translation>
     </message>
   </context>
   <context>
@@ -978,12 +978,12 @@
     <message>
       <location filename="../src/ui/dialogs/connection_testing_dialog.ui"/>
       <source>Connection Test</source>
-      <translation>연결 테스트</translation>
+      <translation type="unfinished">Connection Test</translation>
     </message>
     <message>
       <location/>
       <source>Testing connection...</source>
-      <translation>연결 테스트...</translation>
+      <translation type="unfinished">Testing connection...</translation>
     </message>
   </context>
   <context>
@@ -991,27 +991,27 @@
     <message>
       <location filename="../src/ui/widgets/business/custom_business_event_widget.ui"/>
       <source>Source contains:</source>
-      <translation>소스포함</translation>
+      <translation type="unfinished">Source contains:</translation>
     </message>
     <message>
       <location/>
       <source>Keywords separated by space</source>
-      <translation>공간으로 단어 구분됨</translation>
+      <translation type="unfinished">Keywords separated by space</translation>
     </message>
     <message>
       <location/>
       <source>Caption contains:</source>
-      <translation>주석 포함</translation>
+      <translation type="unfinished">Caption contains:</translation>
     </message>
     <message>
       <location/>
       <source>Description contains:</source>
-      <translation>상세 포함</translation>
+      <translation type="unfinished">Description contains:</translation>
     </message>
     <message>
       <location/>
       <source>Omit Logging</source>
-      <translation>로깅 생략</translation>
+      <translation type="unfinished">Omit Logging</translation>
     </message>
   </context>
   <context>
@@ -1019,7 +1019,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
       <source>Category</source>
-      <translation>카테고리</translation>
+      <translation type="unfinished">Category</translation>
     </message>
   </context>
   <context>
@@ -1027,12 +1027,12 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/database_management_widget.ui"/>
       <source>Create Backup...</source>
-      <translation>백업 파일 만들기...</translation>
+      <translation type="unfinished">Create Backup...</translation>
     </message>
     <message>
       <location/>
       <source>Restore from Backup...</source>
-      <translation>백업파일 복구...</translation>
+      <translation type="unfinished">Restore from Backup...</translation>
     </message>
   </context>
   <context>
@@ -1040,82 +1040,82 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/manual_device_addition/dialog/device_addition_dialog.ui"/>
       <source>to</source>
-      <translation>로</translation>
+      <translation type="unfinished">to</translation>
     </message>
     <message>
       <location/>
       <source>SELECT SERVER</source>
-      <translation>서버 선택</translation>
+      <translation type="unfinished">SELECT SERVER</translation>
     </message>
     <message>
       <location/>
       <source>Known Address</source>
-      <translation>알려진 주소</translation>
+      <translation type="unfinished">Known Address</translation>
     </message>
     <message>
       <location/>
       <source>Subnet Scan</source>
-      <translation>서브넷 검색</translation>
+      <translation type="unfinished">Subnet Scan</translation>
     </message>
     <message>
       <location/>
       <source>Address</source>
-      <translation>주소</translation>
+      <translation type="unfinished">Address</translation>
     </message>
     <message>
       <location/>
       <source>Hint</source>
-      <translation>힌트</translation>
+      <translation type="unfinished">Hint</translation>
     </message>
     <message>
       <location/>
       <source>Port</source>
-      <translation>포트:</translation>
+      <translation type="unfinished">Port</translation>
     </message>
     <message>
       <location/>
       <source>End IP</source>
-      <translation>종료 IP</translation>
+      <translation type="unfinished">End IP</translation>
     </message>
     <message>
       <location/>
       <source>Start IP</source>
-      <translation>시작 IP</translation>
+      <translation type="unfinished">Start IP</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation>로그인</translation>
+      <translation type="unfinished">Login</translation>
     </message>
     <message>
       <location/>
       <source>Search</source>
-      <translation>검색</translation>
+      <translation type="unfinished">Search</translation>
     </message>
     <message>
       <location/>
       <source>Stop</source>
-      <translation>정지</translation>
+      <translation type="unfinished">Stop</translation>
     </message>
     <message>
       <location/>
       <source>Add all Devices</source>
-      <translation>모든 장치 추가</translation>
+      <translation type="unfinished">Add all Devices</translation>
     </message>
     <message>
       <location/>
       <source>Add Devices</source>
-      <translation>장치 추가</translation>
+      <translation type="unfinished">Add Devices</translation>
     </message>
     <message>
       <location/>
       <source>Default</source>
-      <translation>기본</translation>
+      <translation type="unfinished">Default</translation>
     </message>
   </context>
   <context>
@@ -1123,17 +1123,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/dialogs/eula_dialog.ui"/>
       <source>Copy to Clipboard</source>
-      <translation>클립보드 복사</translation>
+      <translation type="unfinished">Copy to Clipboard</translation>
     </message>
     <message>
       <location/>
       <source>I Do Not Agree</source>
-      <translation>동의하지 않음</translation>
+      <translation type="unfinished">I Do Not Agree</translation>
     </message>
     <message>
       <location/>
       <source>I Agree</source>
-      <translation>동의함</translation>
+      <translation type="unfinished">I Agree</translation>
     </message>
   </context>
   <context>
@@ -1141,27 +1141,27 @@
     <message>
       <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
       <source>Event Log</source>
-      <translation>이벤트 로그</translation>
+      <translation type="unfinished">Event Log</translation>
     </message>
     <message>
       <location/>
       <source>Clear Filter</source>
-      <translation>필터 초기화</translation>
+      <translation type="unfinished">Clear Filter</translation>
     </message>
     <message>
       <location/>
       <source>Refresh</source>
-      <translation>새로고침</translation>
+      <translation type="unfinished">Refresh</translation>
     </message>
     <message>
       <location/>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation>모든 서버가 오프라인 상태입니다. 로그를 사용할 수 없습니다.</translation>
+      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
     </message>
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation>이벤트 규칙...</translation>
+      <translation type="unfinished">Event Rules...</translation>
     </message>
   </context>
   <context>
@@ -1169,47 +1169,47 @@
     <message>
       <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
       <source>HTTP content</source>
-      <translation>HTTP 콘텐츠</translation>
+      <translation type="unfinished">HTTP content</translation>
     </message>
     <message>
       <location/>
       <source>Login to authenticate (optional)</source>
-      <translation>사용자 로그인(옵션)</translation>
+      <translation type="unfinished">Login to authenticate (optional)</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation>로그인</translation>
+      <translation type="unfinished">Login</translation>
     </message>
     <message>
       <location/>
       <source>Password to authenticate (optional)</source>
-      <translation>인증을위한 비밀번호(옵션)</translation>
+      <translation type="unfinished">Password to authenticate (optional)</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <location/>
       <source>Content type</source>
-      <translation>콘텐츠 형식</translation>
+      <translation type="unfinished">Content type</translation>
     </message>
     <message>
       <location/>
       <source>HTTP URL</source>
-      <translation>HTTP URL</translation>
+      <translation type="unfinished">HTTP URL</translation>
     </message>
     <message>
       <location/>
       <source>Authentication type</source>
-      <translation>인증 유형</translation>
+      <translation type="unfinished">Authentication type</translation>
     </message>
     <message>
       <location/>
       <source>Request type</source>
-      <translation>요청 유형</translation>
+      <translation type="unfinished">Request type</translation>
     </message>
   </context>
   <context>
@@ -1217,7 +1217,7 @@
     <message>
       <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
       <source>PTZ preset:</source>
-      <translation>&amp;PTZ 프리셋</translation>
+      <translation type="unfinished">PTZ preset:</translation>
     </message>
   </context>
   <context>
@@ -1225,7 +1225,7 @@
     <message>
       <location filename="../src/ui/widgets/business/exit_fullscreen_action_widget.ui"/>
       <source>On layout</source>
-      <translation>레이아웃에</translation>
+      <translation type="unfinished">On layout</translation>
     </message>
   </context>
   <context>
@@ -1233,12 +1233,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation>내보내기 설정</translation>
+      <translation type="unfinished">Export Settings</translation>
     </message>
     <message>
       <location/>
       <source>Make read-only</source>
-      <translation>읽기 전용으로 설정</translation>
+      <translation type="unfinished">Make read-only</translation>
     </message>
   </context>
   <context>
@@ -1246,22 +1246,22 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation>내보내기 설정</translation>
+      <translation type="unfinished">Export Settings</translation>
     </message>
     <message>
       <location/>
       <source>Apply Filters</source>
-      <translation>필터 적용</translation>
+      <translation type="unfinished">Apply Filters</translation>
     </message>
     <message>
       <location/>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation>회전, 디워핑, 이미지 향상 등</translation>
+      <translation type="unfinished">Rotation, Dewarping, Image Enhancement etc.</translation>
     </message>
     <message>
       <location/>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
-      <translation>필터를 적용하고 오버레이를 추가하면 트랜스 코딩이 필요하므로 CPU 사용량이 늘어나고 상당한 시간이 걸릴 수 있습니다.</translation>
+      <translation type="unfinished">Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</translation>
     </message>
   </context>
   <context>
@@ -1269,12 +1269,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_password_widget.ui"/>
       <source>Protect with password</source>
-      <translation>패스워드로 보호</translation>
+      <translation type="unfinished">Protect with password</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation type="unfinished">Password</translation>
     </message>
   </context>
   <context>
@@ -1282,22 +1282,22 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/dialogs/export_settings_dialog.ui"/>
       <source>Export Video</source>
-      <translation>영상 백업</translation>
+      <translation type="unfinished">Export Video</translation>
     </message>
     <message>
       <location/>
       <source>Single Camera</source>
-      <translation>단일 카메라</translation>
+      <translation type="unfinished">Single Camera</translation>
     </message>
     <message>
       <location/>
       <source>Export Settings</source>
-      <translation>내보내기 설정</translation>
+      <translation type="unfinished">Export Settings</translation>
     </message>
     <message>
       <location/>
       <source>Multi Video</source>
-      <translation>멀티 비디오</translation>
+      <translation type="unfinished">Multi Video</translation>
     </message>
   </context>
   <context>
@@ -1305,7 +1305,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/common/widgets/filename_panel.ui"/>
       <source>Browse...</source>
-      <translation>찾기...</translation>
+      <translation type="unfinished">Browse...</translation>
     </message>
   </context>
   <context>
@@ -1313,7 +1313,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/details/filtered_resource_selection_widget.ui"/>
       <source>Nothing matches your search</source>
-      <translation>검색과 일치하는 것이 없습니다,</translation>
+      <translation type="unfinished">Nothing matches your search</translation>
     </message>
   </context>
   <context>
@@ -1321,52 +1321,52 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/fisheye/fisheye_settings_widget.ui"/>
       <source>Ceiling Mount</source>
-      <translation>천장 설치시</translation>
+      <translation type="unfinished">Ceiling Mount</translation>
     </message>
     <message>
       <location/>
       <source>Wall Mount</source>
-      <translation>벽 설치시</translation>
+      <translation type="unfinished">Wall Mount</translation>
     </message>
     <message>
       <location/>
       <source>Floor/Table Mount</source>
-      <translation>바닥/테이블 설치시</translation>
+      <translation type="unfinished">Floor/Table Mount</translation>
     </message>
     <message>
       <location/>
       <source>Fisheye Dewarping</source>
-      <translation>어안카메라 디워핑</translation>
+      <translation type="unfinished">Fisheye Dewarping</translation>
     </message>
     <message>
       <location/>
       <source>Auto Calibration</source>
-      <translation>자동 측정</translation>
+      <translation type="unfinished">Auto Calibration</translation>
     </message>
     <message>
       <location/>
       <source>Mount Angle Correction:</source>
-      <translation>마운트 각도 보정:</translation>
+      <translation type="unfinished">Mount Angle Correction:</translation>
     </message>
     <message>
       <location/>
       <source>Y Offset</source>
-      <translation>Y 오프셋</translation>
+      <translation type="unfinished">Y Offset</translation>
     </message>
     <message>
       <location/>
       <source>X Offset</source>
-      <translation>오프셋 X</translation>
+      <translation type="unfinished">X Offset</translation>
     </message>
     <message>
       <location/>
       <source>Size</source>
-      <translation>크기</translation>
+      <translation type="unfinished">Size</translation>
     </message>
     <message>
       <location/>
       <source>Ellipticity</source>
-      <translation>타원</translation>
+      <translation type="unfinished">Ellipticity</translation>
     </message>
   </context>
   <context>
@@ -1374,17 +1374,17 @@
     <message>
       <location filename="../src/ui/widgets/business/fullscreen_camera_action_widget.ui"/>
       <source>On layout</source>
-      <translation>레이아웃에</translation>
+      <translation type="unfinished">On layout</translation>
     </message>
     <message>
       <location/>
       <source>Camera</source>
-      <translation>카메라</translation>
+      <translation type="unfinished">Camera</translation>
     </message>
     <message>
       <location/>
       <source>Source camera</source>
-      <translation>선택된 카메라</translation>
+      <translation type="unfinished">Source camera</translation>
     </message>
   </context>
   <context>
@@ -1392,57 +1392,57 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/general_preferences_widget.ui"/>
       <source>Misc</source>
-      <translation>기타</translation>
+      <translation type="unfinished">Misc</translation>
     </message>
     <message>
       <location/>
       <source>Auto Pause Video</source>
-      <translation>자동 정지 설정:</translation>
+      <translation type="unfinished">Auto Pause Video</translation>
     </message>
     <message>
       <location/>
       <source>after</source>
-      <translation>비활성 시간</translation>
+      <translation type="unfinished">after</translation>
     </message>
     <message>
       <location/>
       <source>Minutes of Inactivity</source>
-      <translation>(분) 경과 시</translation>
+      <translation type="unfinished">Minutes of Inactivity</translation>
     </message>
     <message>
       <location/>
       <source>Add...</source>
-      <translation>추가...</translation>
+      <translation type="unfinished">Add...</translation>
     </message>
     <message>
       <location/>
       <source>Remove</source>
-      <translation>제거</translation>
+      <translation type="unfinished">Remove</translation>
     </message>
     <message>
       <location/>
       <source>Local Media Folders</source>
-      <translation>로컬 미디어 폴더</translation>
+      <translation type="unfinished">Local Media Folders</translation>
     </message>
     <message>
       <location/>
       <source>Audio Input</source>
-      <translation>오디오 입력</translation>
+      <translation type="unfinished">Audio Input</translation>
     </message>
     <message>
       <location/>
       <source>First Source</source>
-      <translation>첫 번째 소스</translation>
+      <translation type="unfinished">First Source</translation>
     </message>
     <message>
       <location/>
       <source>Second Source</source>
-      <translation>두 번째 소스</translation>
+      <translation type="unfinished">Second Source</translation>
     </message>
     <message>
       <location/>
       <source>Run Application when PC Boots up</source>
-      <translation>PC를 부팅 될 때 응용 프로그램을 실행</translation>
+      <translation type="unfinished">Run Application when PC Boots up</translation>
     </message>
   </context>
   <context>
@@ -1450,22 +1450,22 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/general_system_administration_widget.ui"/>
       <source>System Settings</source>
-      <translation>시스템설정</translation>
+      <translation type="unfinished">System Settings</translation>
     </message>
     <message>
       <location/>
       <source>Backup and Restore</source>
-      <translation>백업 및 복원</translation>
+      <translation type="unfinished">Backup and Restore</translation>
     </message>
     <message>
       <location/>
       <source>Security</source>
-      <translation>보안</translation>
+      <translation type="unfinished">Security</translation>
     </message>
     <message>
       <location/>
       <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>비디오 트래픽을 암호화하면 CPU 사용량이 크게 증가합니다.</translation>
+      <translation type="unfinished">Encrypting video traffic will significantly increase CPU usage.</translation>
     </message>
   </context>
   <context>
@@ -1473,17 +1473,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/image_control_widget.ui"/>
       <source>Image Control</source>
-      <translation>이미지 제어</translation>
+      <translation type="unfinished">Image Control</translation>
     </message>
     <message>
       <location/>
       <source>Aspect ratio</source>
-      <translation>가로세로 비율</translation>
+      <translation type="unfinished">Aspect ratio</translation>
     </message>
     <message>
       <location/>
       <source>Default rotation</source>
-      <translation>기본 회전</translation>
+      <translation type="unfinished">Default rotation</translation>
     </message>
   </context>
   <context>
@@ -1491,32 +1491,32 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/image_overlay_settings_widget.ui"/>
       <source>Image</source>
-      <translation>이미지:</translation>
+      <translation type="unfinished">Image</translation>
     </message>
     <message>
       <location/>
       <source>Delete</source>
-      <translation>삭제</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <location/>
       <source>Size</source>
-      <translation>크기</translation>
+      <translation type="unfinished">Size</translation>
     </message>
     <message>
       <location/>
       <source>Opacity</source>
-      <translation>투명도</translation>
+      <translation type="unfinished">Opacity</translation>
     </message>
     <message>
       <location/>
       <source>Default</source>
-      <translation>기본</translation>
+      <translation type="unfinished">Default</translation>
     </message>
     <message>
       <location/>
       <source>Browse...</source>
-      <translation>찾기...</translation>
+      <translation type="unfinished">Browse...</translation>
     </message>
   </context>
   <context>
@@ -1524,17 +1524,17 @@
     <message>
       <location filename="../src/ui/dialogs/image_preview_dialog.ui"/>
       <source>Image View</source>
-      <translation>이미지 보기</translation>
+      <translation type="unfinished">Image View</translation>
     </message>
     <message>
       <location/>
       <source>Loading Image...Please Wait.</source>
-      <translation>이미지 로딩중...기다려주세요.</translation>
+      <translation type="unfinished">Loading Image...Please Wait.</translation>
     </message>
     <message>
       <location/>
       <source>No image</source>
-      <translation>이미지 없음</translation>
+      <translation type="unfinished">No image</translation>
     </message>
   </context>
   <context>
@@ -1542,12 +1542,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/io_module_settings_widget.ui"/>
       <source>Form</source>
-      <translation>틀</translation>
+      <translation type="unfinished">Form</translation>
     </message>
     <message>
       <location/>
       <source>Enable tile interface</source>
-      <translation>타일 인터페이스 사용</translation>
+      <translation type="unfinished">Enable tile interface</translation>
     </message>
   </context>
   <context>
@@ -1555,47 +1555,47 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/layout/widgets/layout_background_settings_widget.ui"/>
       <source>Processing Image...Please Wait.</source>
-      <translation>이미지 처리중...기다려주세요.</translation>
+      <translation type="unfinished">Processing Image...Please Wait.</translation>
     </message>
     <message>
       <location/>
       <source>Browse...</source>
-      <translation>찾기...</translation>
+      <translation type="unfinished">Browse...</translation>
     </message>
     <message>
       <location/>
       <source>Clear</source>
-      <translation>초기화</translation>
+      <translation type="unfinished">Clear</translation>
     </message>
     <message>
       <location/>
       <source>View...</source>
-      <translation>보기...</translation>
+      <translation type="unfinished">View...</translation>
     </message>
     <message>
       <location/>
       <source>Width:</source>
-      <translation>너비:</translation>
+      <translation type="unfinished">Width:</translation>
     </message>
     <message>
       <location/>
       <source>Keep Aspect Ratio</source>
-      <translation>비율 유지</translation>
+      <translation type="unfinished">Keep Aspect Ratio</translation>
     </message>
     <message>
       <location/>
       <source>Opacity:</source>
-      <translation>투명도:</translation>
+      <translation type="unfinished">Opacity:</translation>
     </message>
     <message>
       <location/>
       <source>Height:</source>
-      <translation>높이:</translation>
+      <translation type="unfinished">Height:</translation>
     </message>
     <message>
       <location/>
       <source>Crop to monitor aspect ratio</source>
-      <translation>모니터에 맞춰 비율 조정</translation>
+      <translation type="unfinished">Crop to monitor aspect ratio</translation>
     </message>
   </context>
   <context>
@@ -1603,37 +1603,37 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
       <source>Locked</source>
-      <translation>레이아웃 잠금</translation>
+      <translation type="unfinished">Locked</translation>
     </message>
     <message>
       <location/>
       <source>Width</source>
-      <translation>너비</translation>
+      <translation type="unfinished">Width</translation>
     </message>
     <message>
       <location/>
       <source>Height</source>
-      <translation>높이</translation>
+      <translation type="unfinished">Height</translation>
     </message>
     <message>
       <location/>
       <source>Logical ID</source>
-      <translation>논리 ID</translation>
+      <translation type="unfinished">Logical ID</translation>
     </message>
     <message>
       <location/>
       <source>Generate</source>
-      <translation>생성</translation>
+      <translation type="unfinished">Generate</translation>
     </message>
     <message>
       <location/>
       <source>Reset</source>
-      <translation>초기화</translation>
+      <translation type="unfinished">Reset</translation>
     </message>
     <message>
       <location/>
       <source>Minimum Grid Size</source>
-      <translation>최소 화면 그리드 크기</translation>
+      <translation type="unfinished">Minimum Grid Size</translation>
     </message>
   </context>
   <context>
@@ -1641,17 +1641,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/event_rules/layout_selection_dialog.ui"/>
       <source>Select layout</source>
-      <translation>레이아웃 선택</translation>
+      <translation type="unfinished">Select layout</translation>
     </message>
     <message>
       <location/>
       <source>Shared layouts</source>
-      <translation>공유된 레이아웃</translation>
+      <translation type="unfinished">Shared layouts</translation>
     </message>
     <message>
       <location/>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>자신의 로컬 레이아웃을 보여지게 하려면 &quot;Show to&quot;에서 한 사용자를 선택</translation>
+      <translation type="unfinished">Select some single user in &quot;Show to&quot; line to display his local layouts in this list</translation>
     </message>
   </context>
   <context>
@@ -1659,47 +1659,47 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_settings_dialog.ui"/>
       <source>Optional</source>
-      <translation>추가 조건</translation>
+      <translation type="unfinished">Optional</translation>
     </message>
     <message>
       <location/>
       <source>Testing...</source>
-      <translation>검사중</translation>
+      <translation type="unfinished">Testing...</translation>
     </message>
     <message>
       <location/>
       <source>LDAP Settings</source>
-      <translation>LDAP 설정</translation>
+      <translation type="unfinished">LDAP Settings</translation>
     </message>
     <message>
       <location/>
       <source>Server URL</source>
-      <translation>서버 URL</translation>
+      <translation type="unfinished">Server URL</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <location/>
       <source>Search Base</source>
-      <translation>검색 기준</translation>
+      <translation type="unfinished">Search Base</translation>
     </message>
     <message>
       <location/>
       <source>Search Filter</source>
-      <translation>검색 필터</translation>
+      <translation type="unfinished">Search Filter</translation>
     </message>
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation>검색 제한 시간</translation>
+      <translation type="unfinished">Search Timeout (s)</translation>
     </message>
     <message>
       <location/>
       <source>Admin DN or CN</source>
-      <translation>도메인 DN 또는 CN</translation>
+      <translation type="unfinished">Admin DN or CN</translation>
     </message>
   </context>
   <context>
@@ -1707,27 +1707,27 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation>LDAP으로 부터 사용자 정보 일기</translation>
+      <translation type="unfinished">Fetch Users from LDAP...</translation>
     </message>
     <message>
       <location/>
       <source>Loading...</source>
-      <translation>읽는 중...</translation>
+      <translation type="unfinished">Loading...</translation>
     </message>
     <message>
       <location/>
       <source>Connection error</source>
-      <translation>접속 에러</translation>
+      <translation type="unfinished">Connection error</translation>
     </message>
     <message>
       <location/>
       <source>Role to assign to imported users</source>
-      <translation>가져온된 사용자에 게 할당할 역할</translation>
+      <translation type="unfinished">Role to assign to imported users</translation>
     </message>
     <message>
       <location/>
       <source>Disable imported users</source>
-      <translation>가져온 사용자정보를 사용 안 함</translation>
+      <translation type="unfinished">Disable imported users</translation>
     </message>
   </context>
   <context>
@@ -1735,17 +1735,17 @@
     <message>
       <location filename="../src/ui/dialogs/license_details_dialog.ui"/>
       <source>License Details</source>
-      <translation>인증키 정보</translation>
+      <translation type="unfinished">License Details</translation>
     </message>
     <message>
       <location/>
       <source>Generic</source>
-      <translation>일반</translation>
+      <translation type="unfinished">Generic</translation>
     </message>
     <message>
       <location/>
       <source>Features</source>
-      <translation>기능</translation>
+      <translation type="unfinished">Features</translation>
     </message>
   </context>
   <context>
@@ -1753,27 +1753,27 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/license_manager_widget.ui"/>
       <source>Active Licenses</source>
-      <translation>제품키 인증</translation>
+      <translation type="unfinished">Active Licenses</translation>
     </message>
     <message>
       <location/>
       <source>Remove</source>
-      <translation>제거</translation>
+      <translation type="unfinished">Remove</translation>
     </message>
     <message>
       <location/>
       <source>New License</source>
-      <translation>신규 제품키</translation>
+      <translation type="unfinished">New License</translation>
     </message>
     <message>
       <location/>
       <source>Details...</source>
-      <translation>세부사항</translation>
+      <translation type="unfinished">Details...</translation>
     </message>
     <message>
       <location/>
       <source>The software is licensed to</source>
-      <translation>소프트웨어를 라이센스</translation>
+      <translation type="unfinished">The software is licensed to</translation>
     </message>
   </context>
   <context>
@@ -1781,12 +1781,12 @@
     <message>
       <location filename="../src/ui/dialogs/license_notification_dialog.ui"/>
       <source>Warning</source>
-      <translation>주의</translation>
+      <translation type="unfinished">Warning</translation>
     </message>
     <message>
       <location/>
       <source>License issues:</source>
-      <translation>라이센스 문제:</translation>
+      <translation type="unfinished">License issues:</translation>
     </message>
   </context>
   <context>
@@ -1794,57 +1794,57 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/license_widget.ui"/>
       <source>Manual Activation</source>
-      <translation>수동 인증</translation>
+      <translation type="unfinished">Manual Activation</translation>
     </message>
     <message>
       <location/>
       <source>Select License File...</source>
-      <translation>인증 파일 선택...</translation>
+      <translation type="unfinished">Select License File...</translation>
     </message>
     <message>
       <location/>
       <source>Browse...</source>
-      <translation>찾기...</translation>
+      <translation type="unfinished">Browse...</translation>
     </message>
     <message>
       <location/>
       <source>License will be bound to the current server</source>
-      <translation>인증키는 현재 서버에 사용됩니다</translation>
+      <translation type="unfinished">License will be bound to the current server</translation>
     </message>
     <message>
       <location/>
       <source>Activate Free License</source>
-      <translation>데모 제품키 인증</translation>
+      <translation type="unfinished">Activate Free License</translation>
     </message>
     <message>
       <location/>
       <source>Activate License</source>
-      <translation>제품키 인증</translation>
+      <translation type="unfinished">Activate License</translation>
     </message>
     <message>
       <location/>
       <source>Internet Activation</source>
-      <translation>인터넷 활성화</translation>
+      <translation type="unfinished">Internet Activation</translation>
     </message>
     <message>
       <location/>
       <source>License Key</source>
-      <translation>인증키:</translation>
+      <translation type="unfinished">License Key</translation>
     </message>
     <message>
       <location/>
       <source>Invalid License Key</source>
-      <translation>잘못 된 라이센스 키</translation>
+      <translation type="unfinished">Invalid License Key</translation>
     </message>
     <message>
       <location/>
       <source>Activation Key File</source>
-      <translation>인증키 파일:</translation>
+      <translation type="unfinished">Activation Key File</translation>
     </message>
     <message>
       <location/>
       <source>Hardware ID</source>
-      <translation>하드웨어 ID:</translation>
+      <translation type="unfinished">Hardware ID</translation>
     </message>
   </context>
   <context>
@@ -1852,7 +1852,7 @@
     <message>
       <location filename="../src/ui/dialogs/local_settings_dialog.ui"/>
       <source>Local Settings</source>
-      <translation>내부 설정</translation>
+      <translation type="unfinished">Local Settings</translation>
     </message>
   </context>
   <context>
@@ -1860,47 +1860,47 @@
     <message>
       <location filename="../src/ui/dialogs/login_dialog.ui"/>
       <source>Save...</source>
-      <translation>저장...</translation>
+      <translation type="unfinished">Save...</translation>
     </message>
     <message>
       <location/>
       <source>Delete</source>
-      <translation>삭제</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <location/>
       <source>Connection Options:</source>
-      <translation>접속 옵션:</translation>
+      <translation type="unfinished">Connection Options:</translation>
     </message>
     <message>
       <location/>
       <source>Host</source>
-      <translation>호스트</translation>
+      <translation type="unfinished">Host</translation>
     </message>
     <message>
       <location/>
       <source>Port</source>
-      <translation>포트:</translation>
+      <translation type="unfinished">Port</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation>로그인</translation>
+      <translation type="unfinished">Login</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <location/>
       <source>Test</source>
-      <translation>테스트</translation>
+      <translation type="unfinished">Test</translation>
     </message>
     <message>
       <location/>
       <source>Auto-Login</source>
-      <translation>자동 로그인</translation>
+      <translation type="unfinished">Auto-Login</translation>
     </message>
   </context>
   <context>
@@ -1908,62 +1908,62 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/look_and_feel_preferences_widget.ui"/>
       <source>Look and Feel</source>
-      <translation>화면 설정</translation>
+      <translation type="unfinished">Look and Feel</translation>
     </message>
     <message>
       <location/>
       <source>Background Image</source>
-      <translation>배경 이미지</translation>
+      <translation type="unfinished">Background Image</translation>
     </message>
     <message>
       <location/>
       <source>Browse...</source>
-      <translation>찾기...</translation>
+      <translation type="unfinished">Browse...</translation>
     </message>
     <message>
       <location/>
       <source>Language</source>
-      <translation>언어</translation>
+      <translation type="unfinished">Language</translation>
     </message>
     <message>
       <location/>
       <source>Time Mode</source>
-      <translation>시간 모드</translation>
+      <translation type="unfinished">Time Mode</translation>
     </message>
     <message>
       <location/>
       <source>Image</source>
-      <translation>이미지:</translation>
+      <translation type="unfinished">Image</translation>
     </message>
     <message>
       <location/>
       <source>Mode</source>
-      <translation>모드</translation>
+      <translation type="unfinished">Mode</translation>
     </message>
     <message>
       <location/>
       <source>Intensity</source>
-      <translation>강도:</translation>
+      <translation type="unfinished">Intensity</translation>
     </message>
     <message>
       <location/>
       <source>Show additional info in tree</source>
-      <translation>트리에 추가 정보 표시</translation>
+      <translation type="unfinished">Show additional info in tree</translation>
     </message>
     <message>
       <location/>
       <source>seconds</source>
-      <translation>초</translation>
+      <translation type="unfinished">seconds</translation>
     </message>
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation>Tour cycle</translation>
+      <translation type="unfinished">Tour cycle</translation>
     </message>
     <message>
       <location/>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
-      <translation>카메라들의 IP 주소들, 서버들, 사용자들의 그룹 등</translation>
+      <translation type="unfinished">IP addresses for cameras, and servers, groups for users, etc.</translation>
     </message>
   </context>
   <context>
@@ -1971,7 +1971,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/media_file/media_file_settings_dialog.ui"/>
       <source>File Settings</source>
-      <translation>파일설정</translation>
+      <translation type="unfinished">File Settings</translation>
     </message>
   </context>
   <context>
@@ -1979,57 +1979,57 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/system_update/multi_server_updates_widget.ui"/>
       <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation>금요일에 시스템 업데이트를 적용 하는 것은 권장 하지 않습니다.</translation>
+      <translation type="unfinished">Applying System updates at the end of the week is not recommended.</translation>
     </message>
     <message>
       <location/>
       <source>Check for update</source>
-      <translation>업데이트 확인</translation>
+      <translation type="unfinished">Check for update</translation>
     </message>
     <message>
       <location/>
       <source>Updating to...</source>
-      <translation>업데이트...</translation>
+      <translation type="unfinished">Updating to...</translation>
     </message>
     <message>
       <location/>
       <source>You have the latest version installed</source>
-      <translation>최신버전 입니다</translation>
+      <translation type="unfinished">You have the latest version installed</translation>
     </message>
     <message>
       <location/>
       <source>Download</source>
-      <translation>다운로드</translation>
+      <translation type="unfinished">Download</translation>
     </message>
     <message>
       <location/>
       <source>Browse</source>
-      <translation>Browse</translation>
+      <translation type="unfinished">Browse</translation>
     </message>
     <message>
       <location/>
       <source>Download &amp;&amp; Install</source>
-      <translation>다운로드 및 설치</translation>
+      <translation type="unfinished">Download &amp;&amp; Install</translation>
     </message>
     <message>
       <location/>
       <source>Cancel</source>
-      <translation>취소</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <location/>
       <source>Link copied</source>
-      <translation>링크 복사</translation>
+      <translation type="unfinished">Link copied</translation>
     </message>
     <message>
       <location/>
       <source>Advanced Update Settings</source>
-      <translation>고급 업데이트 설정</translation>
+      <translation type="unfinished">Advanced Update Settings</translation>
     </message>
     <message>
       <location/>
       <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-      <translation>업데이트 진행에 다소 시간이 소요될 수 있습니다. 잠시만 기다려 주세요.</translation>
+      <translation type="unfinished">It looks like the update process is taking more time than usual. Please keep waiting.</translation>
     </message>
   </context>
   <context>
@@ -2037,12 +2037,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.ui"/>
       <source>Show all layouts</source>
-      <translation>모든 레이아웃 표시</translation>
+      <translation type="unfinished">Show all layouts</translation>
     </message>
     <message>
       <location/>
       <source>Select Layouts</source>
-      <translation>레이아웃 선택</translation>
+      <translation type="unfinished">Select Layouts</translation>
     </message>
   </context>
   <context>
@@ -2050,12 +2050,12 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>To server</source>
-      <translation>서버</translation>
+      <translation type="unfinished">To server</translation>
     </message>
     <message>
       <location/>
       <source>New Virtual Camera...</source>
-      <translation>새로운 가상 카메라...</translation>
+      <translation type="unfinished">New Virtual Camera...</translation>
     </message>
   </context>
   <context>
@@ -2063,17 +2063,17 @@
     <message>
       <location filename="../src/ui/widgets/business/open_layout_action_widget.ui"/>
       <source>Layout</source>
-      <translation>레이아웃</translation>
+      <translation type="unfinished">Layout</translation>
     </message>
     <message>
       <location/>
       <source>Show to</source>
-      <translation>에 보이기</translation>
+      <translation type="unfinished">Show to</translation>
     </message>
     <message>
       <location/>
       <source>Select layout...</source>
-      <translation>레이아웃 선택...</translation>
+      <translation type="unfinished">Select layout...</translation>
     </message>
   </context>
   <context>
@@ -2081,17 +2081,17 @@
     <message>
       <location filename="../src/ui/dialogs/common/password_dialog.ui"/>
       <source>Sign in</source>
-      <translation>로그인</translation>
+      <translation type="unfinished">Sign in</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation>비밀번호</translation>
+      <translation type="unfinished">Password</translation>
     </message>
     <message>
       <location/>
       <source>Username</source>
-      <translation>사용자이름</translation>
+      <translation type="unfinished">Username</translation>
     </message>
   </context>
   <context>
@@ -2099,22 +2099,22 @@
     <message>
       <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui"/>
       <source>Manage...</source>
-      <translation>저장...</translation>
+      <translation type="unfinished">Manage...</translation>
     </message>
     <message>
       <location/>
       <source>Volume:</source>
-      <translation>음량:</translation>
+      <translation type="unfinished">Volume:</translation>
     </message>
     <message>
       <location/>
       <source>Test...</source>
-      <translation>테스트...</translation>
+      <translation type="unfinished">Test...</translation>
     </message>
     <message>
       <location/>
       <source>Play to users</source>
-      <translation>사용자에게 재생</translation>
+      <translation type="unfinished">Play to users</translation>
     </message>
   </context>
   <context>
@@ -2122,42 +2122,42 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.ui"/>
       <source>Source:</source>
-      <translation>출처:</translation>
+      <translation type="unfinished">Source:</translation>
     </message>
     <message>
       <location/>
       <source>Caption contains:</source>
-      <translation>캡션에 포함:</translation>
+      <translation type="unfinished">Caption contains:</translation>
     </message>
     <message>
       <location/>
       <source>Keywords separated by space</source>
-      <translation>스페이스로 구분 된 키워드</translation>
+      <translation type="unfinished">Keywords separated by space</translation>
     </message>
     <message>
       <location/>
       <source>Description contains:</source>
-      <translation>내용 포함:</translation>
+      <translation type="unfinished">Description contains:</translation>
     </message>
     <message>
       <location/>
       <source>Level:</source>
-      <translation>단계</translation>
+      <translation type="unfinished">Level:</translation>
     </message>
     <message>
       <location/>
       <source>ERROR</source>
-      <translation>오류</translation>
+      <translation type="unfinished">ERROR</translation>
     </message>
     <message>
       <location/>
       <source>WARNING</source>
-      <translation>경고</translation>
+      <translation type="unfinished">WARNING</translation>
     </message>
     <message>
       <location/>
       <source>INFO</source>
-      <translation>정보</translation>
+      <translation type="unfinished">INFO</translation>
     </message>
   </context>
   <context>
@@ -2165,7 +2165,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/server/poe/poe_settings_widget.ui"/>
       <source>Attention! Power limit exceeded</source>
-      <translation>주의! 전력 한도 초과</translation>
+      <translation type="unfinished">Attention! Power limit exceeded</translation>
     </message>
   </context>
   <context>
@@ -2173,17 +2173,17 @@
     <message>
       <location filename="../src/ui/widgets/business/popup_business_action_widget.ui"/>
       <source>Force Acknowledgment</source>
-      <translation>강제 승인</translation>
+      <translation type="unfinished">Force Acknowledgment</translation>
     </message>
     <message>
       <location/>
       <source>Use custom text:</source>
-      <translation>사용자 임의 내용 추가</translation>
+      <translation type="unfinished">Use custom text:</translation>
     </message>
     <message>
       <location/>
       <source>to</source>
-      <translation>로</translation>
+      <translation type="unfinished">to</translation>
     </message>
   </context>
   <context>
@@ -2191,17 +2191,17 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/popup_settings_widget.ui"/>
       <source>Show all notifications</source>
-      <translation>모든 알림 보기</translation>
+      <translation type="unfinished">Show all notifications</translation>
     </message>
     <message>
       <location/>
       <source>System Notifications</source>
-      <translation>시스템 알림</translation>
+      <translation type="unfinished">System Notifications</translation>
     </message>
     <message>
       <location/>
       <source>Events</source>
-      <translation>이벤트</translation>
+      <translation type="unfinished">Events</translation>
     </message>
   </context>
   <context>
@@ -2209,52 +2209,52 @@
     <message>
       <location filename="../src/ui/dialogs/ptz_manage_dialog.ui"/>
       <source>Save Current Position</source>
-      <translation>현재 위치 저장</translation>
+      <translation type="unfinished">Save Current Position</translation>
     </message>
     <message>
       <location/>
       <source>Go To Position</source>
-      <translation>위치로 이동</translation>
+      <translation type="unfinished">Go To Position</translation>
     </message>
     <message>
       <location/>
       <source>Create Tour</source>
-      <translation>투어 생성</translation>
+      <translation type="unfinished">Create Tour</translation>
     </message>
     <message>
       <location/>
       <source>Start Tour</source>
-      <translation>투어 시작</translation>
+      <translation type="unfinished">Start Tour</translation>
     </message>
     <message>
       <location/>
       <source>Delete</source>
-      <translation>삭제</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <location/>
       <source>Details</source>
-      <translation>상세</translation>
+      <translation type="unfinished">Details</translation>
     </message>
     <message>
       <location/>
       <source>No Tour Selected</source>
-      <translation>투어 선택 안됨</translation>
+      <translation type="unfinished">No Tour Selected</translation>
     </message>
     <message>
       <location/>
       <source>Preview</source>
-      <translation>미리보기</translation>
+      <translation type="unfinished">Preview</translation>
     </message>
     <message>
       <location/>
       <source>No preview available</source>
-      <translation>가능한 미리보기 없음</translation>
+      <translation type="unfinished">No preview available</translation>
     </message>
     <message>
       <location/>
       <source>Get Preview</source>
-      <translation>미리보기 얻어오기</translation>
+      <translation type="unfinished">Get Preview</translation>
     </message>
   </context>
   <context>
@@ -2262,17 +2262,17 @@
     <message>
       <location filename="../src/ui/dialogs/ptz_preset_dialog.ui"/>
       <source>Save Position</source>
-      <translation>위치 저장</translation>
+      <translation type="unfinished">Save Position</translation>
     </message>
     <message>
       <location/>
       <source>Name:</source>
-      <translation>이름:</translation>
+      <translation type="unfinished">Name:</translation>
     </message>
     <message>
       <location/>
       <source>Hotkey:</source>
-      <translation>단축키:</translation>
+      <translation type="unfinished">Hotkey:</translation>
     </message>
   </context>
   <context>
@@ -2280,42 +2280,42 @@
     <message>
       <location filename="../src/ui/widgets/business/push_notification_business_action_widget.ui"/>
       <source>To</source>
-      <translation>에게</translation>
+      <translation type="unfinished">To</translation>
     </message>
     <message>
       <location/>
       <source>Language Settings</source>
-      <translation>언어 설정</translation>
+      <translation type="unfinished">Language Settings</translation>
     </message>
     <message>
       <location/>
       <source>Custom notification content</source>
-      <translation>사용자 지정 알림 내용</translation>
+      <translation type="unfinished">Custom notification content</translation>
     </message>
     <message>
       <location/>
       <source>Header</source>
-      <translation>머리글</translation>
+      <translation type="unfinished">Header</translation>
     </message>
     <message>
       <location/>
       <source>Default notification title will be used if left empty</source>
-      <translation>비워두면 기본 알림 제목이 사용됩니다.</translation>
+      <translation type="unfinished">Default notification title will be used if left empty</translation>
     </message>
     <message>
       <location/>
       <source>Body</source>
-      <translation>본문</translation>
+      <translation type="unfinished">Body</translation>
     </message>
     <message>
       <location/>
       <source>Default text will be used if this field is empty</source>
-      <translation>이 필드가 비어 있으면 기본 텍스트가 사용됩니다</translation>
+      <translation type="unfinished">Default text will be used if this field is empty</translation>
     </message>
     <message>
       <location/>
       <source>Add source device name in body</source>
-      <translation>본문에 소스 장치 이름 추가</translation>
+      <translation type="unfinished">Add source device name in body</translation>
     </message>
   </context>
   <context>
@@ -2323,12 +2323,12 @@
     <message>
       <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui"/>
       <source>Attach to Video Wall...</source>
-      <translation>비디오 월 첨부...</translation>
+      <translation type="unfinished">Attach to Video Wall...</translation>
     </message>
     <message>
       <location/>
       <source>Preview</source>
-      <translation>미리보기</translation>
+      <translation type="unfinished">Preview</translation>
     </message>
   </context>
   <context>
@@ -2336,7 +2336,7 @@
     <message>
       <location filename="../src/ui/dialogs/build_number_dialog.ui"/>
       <source>Choose a specific build</source>
-      <translation>특정 빌드를 선택 하십시오</translation>
+      <translation type="unfinished">Choose a specific build</translation>
     </message>
   </context>
   <context>
@@ -2344,7 +2344,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation>즐겨찾기</translation>
+      <translation type="unfinished">Bookmark</translation>
     </message>
   </context>
   <context>
@@ -2352,12 +2352,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/system_update/compatibility_version_installation_dialog.ui"/>
       <source>Installing Compatibility Version...</source>
-      <translation>호환성 버전 설치합니다....</translation>
+      <translation type="unfinished">Installing Compatibility Version...</translation>
     </message>
     <message>
       <location/>
       <source>Restart to the updated version when ready</source>
-      <translation>준비가되면 업데이트 된 버전으로 다시 시작하십시오.</translation>
+      <translation type="unfinished">Restart to the updated version when ready</translation>
     </message>
   </context>
   <context>
@@ -2365,12 +2365,12 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/login_to_cloud_dialog.ui"/>
       <source>Log in</source>
-      <translation>로그인</translation>
+      <translation type="unfinished">Log in</translation>
     </message>
     <message>
       <location/>
       <source>Stay logged in</source>
-      <translation>로그인 상태 유지</translation>
+      <translation type="unfinished">Stay logged in</translation>
     </message>
   </context>
   <context>
@@ -2378,32 +2378,32 @@
     <message>
       <location filename="../src/ui/dialogs/merge_systems_dialog.ui"/>
       <source>Merge Systems...</source>
-      <translation>시스템 병합</translation>
+      <translation type="unfinished">Merge Systems...</translation>
     </message>
     <message>
       <location/>
       <source>Server URL:</source>
-      <translation>서버 URL:</translation>
+      <translation type="unfinished">Server URL:</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation>비밀번호:</translation>
+      <translation type="unfinished">Password:</translation>
     </message>
     <message>
       <location/>
       <source>Check</source>
-      <translation>확인</translation>
+      <translation type="unfinished">Check</translation>
     </message>
     <message>
       <location/>
       <source>Login:</source>
-      <translation>로그인:</translation>
+      <translation type="unfinished">Login:</translation>
     </message>
     <message>
       <location/>
       <source>The new System will have password and name from System:</source>
-      <translation>병합된 새 시스템은 아래 선택한 시스템명과 암호로 설정됩니다.</translation>
+      <translation type="unfinished">The new System will have password and name from System:</translation>
     </message>
   </context>
   <context>
@@ -2411,7 +2411,7 @@
     <message>
       <location filename="../src/ui/dialogs/common/message_box.ui"/>
       <source>Do not show this message again</source>
-      <translation>이 메시지를 다시 표시하지 않음</translation>
+      <translation type="unfinished">Do not show this message again</translation>
     </message>
   </context>
   <context>
@@ -2419,27 +2419,27 @@
     <message>
       <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui"/>
       <source>Notification Sounds</source>
-      <translation>알림 음원</translation>
+      <translation type="unfinished">Notification Sounds</translation>
     </message>
     <message>
       <location/>
       <source>Play</source>
-      <translation>재생</translation>
+      <translation type="unfinished">Play</translation>
     </message>
     <message>
       <location/>
       <source>Add...</source>
-      <translation>추가...</translation>
+      <translation type="unfinished">Add...</translation>
     </message>
     <message>
       <location/>
       <source>Rename...</source>
-      <translation>이름 변경...</translation>
+      <translation type="unfinished">Rename...</translation>
     </message>
     <message>
       <location/>
       <source>Delete...</source>
-      <translation>삭제...</translation>
+      <translation type="unfinished">Delete...</translation>
     </message>
   </context>
   <context>
@@ -2447,22 +2447,22 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/routing_management_widget.ui"/>
       <source>Add URL</source>
-      <translation>URL 추가</translation>
+      <translation type="unfinished">Add URL</translation>
     </message>
     <message>
       <location/>
       <source>Remove</source>
-      <translation>제거</translation>
+      <translation type="unfinished">Remove</translation>
     </message>
     <message>
       <location/>
       <source>Add</source>
-      <translation>추가</translation>
+      <translation type="unfinished">Add</translation>
     </message>
     <message>
       <location/>
       <source>Removing this connection option could lead to System malfunction.</source>
-      <translation>이 연결 옵션을 제거 시스템 고장이 발생할 수 있습니다.</translation>
+      <translation type="unfinished">Removing this connection option could lead to System malfunction.</translation>
     </message>
   </context>
   <context>
@@ -2470,7 +2470,7 @@
     <message>
       <location filename="../src/ui/dialogs/system_administration_dialog.ui"/>
       <source>System Administration</source>
-      <translation>시스템 관리</translation>
+      <translation type="unfinished">System Administration</translation>
     </message>
   </context>
   <context>
@@ -2478,47 +2478,47 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/user_management_widget.ui"/>
       <source>LDAP Settings...</source>
-      <translation>LDAP 설정</translation>
+      <translation type="unfinished">LDAP Settings...</translation>
     </message>
     <message>
       <location/>
       <source>New User...</source>
-      <translation>신규 사용자...</translation>
+      <translation type="unfinished">New User...</translation>
     </message>
     <message>
       <location/>
       <source>Fetch Users from LDAP...</source>
-      <translation>LDAP으로 부터 사용자 정보 가져오기</translation>
+      <translation type="unfinished">Fetch Users from LDAP...</translation>
     </message>
     <message>
       <location/>
       <source>Clear Selection</source>
-      <translation>선택항목 초기화</translation>
+      <translation type="unfinished">Clear Selection</translation>
     </message>
     <message>
       <location/>
       <source>Search users</source>
-      <translation>사용자 검색</translation>
+      <translation type="unfinished">Search users</translation>
     </message>
     <message>
       <location/>
       <source>Enable</source>
-      <translation>사용</translation>
+      <translation type="unfinished">Enable</translation>
     </message>
     <message>
       <location/>
       <source>Disable</source>
-      <translation>비활성화</translation>
+      <translation type="unfinished">Disable</translation>
     </message>
     <message>
       <location/>
       <source>Delete...</source>
-      <translation>삭제...</translation>
+      <translation type="unfinished">Delete...</translation>
     </message>
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation>역할 편집...</translation>
+      <translation type="unfinished">Edit Roles...</translation>
     </message>
   </context>
   <context>
@@ -2526,22 +2526,22 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/videowall_settings_dialog.ui"/>
       <source>Video Wall Settings</source>
-      <translation>비디오 월 설정</translation>
+      <translation type="unfinished">Video Wall Settings</translation>
     </message>
     <message>
       <location/>
       <source>Launch video wall when Windows starts.</source>
-      <translation>윈도우 시작 시 비디오 월 실행</translation>
+      <translation type="unfinished">Launch video wall when Windows starts.</translation>
     </message>
     <message>
       <location/>
       <source>Place shortcut on desktop.</source>
-      <translation>바탕화면에 바로가기 만들기</translation>
+      <translation type="unfinished">Place shortcut on desktop.</translation>
     </message>
     <message>
       <location/>
       <source>Enable timeline on video wall</source>
-      <translation>비디오 월에 타임 라인 사용</translation>
+      <translation type="unfinished">Enable timeline on video wall</translation>
     </message>
   </context>
   <context>
@@ -2549,32 +2549,32 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
       <source>Rapid Review</source>
-      <translation>빠른 검토</translation>
+      <translation type="unfinished">Rapid Review</translation>
     </message>
     <message>
       <location/>
       <source>Initial video length</source>
-      <translation>초기 영상길이</translation>
+      <translation type="unfinished">Initial video length</translation>
     </message>
     <message>
       <location/>
       <source>Exported video length</source>
-      <translation>추출된 영상 길이</translation>
+      <translation type="unfinished">Exported video length</translation>
     </message>
     <message>
       <location/>
       <source>Speed</source>
-      <translation>속도</translation>
+      <translation type="unfinished">Speed</translation>
     </message>
     <message>
       <location/>
       <source>Frames interval</source>
-      <translation>프레임 간격</translation>
+      <translation type="unfinished">Frames interval</translation>
     </message>
     <message>
       <location/>
       <source>Reset Speed</source>
-      <translation>속도 초기화</translation>
+      <translation type="unfinished">Reset Speed</translation>
     </message>
   </context>
   <context>
@@ -2582,17 +2582,17 @@
     <message>
       <location filename="../src/ui/dialogs/reconnect_info_dialog.ui"/>
       <source>Reconnecting...</source>
-      <translation>재 접속 중...</translation>
+      <translation type="unfinished">Reconnecting...</translation>
     </message>
     <message>
       <location/>
       <source>Please wait while the connection is being restored...</source>
-      <translation>재 연결시 까지 기다려 주세요</translation>
+      <translation type="unfinished">Please wait while the connection is being restored...</translation>
     </message>
     <message>
       <location/>
       <source>Server name</source>
-      <translation>서버 이름</translation>
+      <translation type="unfinished">Server name</translation>
     </message>
   </context>
   <context>
@@ -2600,32 +2600,32 @@
     <message>
       <location filename="../src/ui/widgets/business/recording_business_action_widget.ui"/>
       <source>Quality:</source>
-      <translation>품질:</translation>
+      <translation type="unfinished">Quality:</translation>
     </message>
     <message>
       <location/>
       <source>FPS</source>
-      <translation>프레임</translation>
+      <translation type="unfinished">FPS</translation>
     </message>
     <message>
       <location/>
       <source>s</source>
-      <translation>초</translation>
+      <translation type="unfinished">s</translation>
     </message>
     <message>
       <location/>
       <source>Pre-Recording:</source>
-      <translation>사전녹화:</translation>
+      <translation type="unfinished">Pre-Recording:</translation>
     </message>
     <message>
       <location/>
       <source>Post-Recording:</source>
-      <translation>사후 녹화:</translation>
+      <translation type="unfinished">Post-Recording:</translation>
     </message>
     <message>
       <location/>
       <source>Fixed duration:</source>
-      <translation>기간 고정</translation>
+      <translation type="unfinished">Fixed duration:</translation>
     </message>
   </context>
   <context>
@@ -2633,52 +2633,52 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/recording_settings_widget.ui"/>
       <source>Temporary Folder</source>
-      <translation>임시 폴더</translation>
+      <translation type="unfinished">Temporary Folder</translation>
     </message>
     <message>
       <location/>
       <source>Additional Options</source>
-      <translation>추가옵션</translation>
+      <translation type="unfinished">Additional Options</translation>
     </message>
     <message>
       <location/>
       <source>Disable Aero</source>
-      <translation>Aero 비활성화</translation>
+      <translation type="unfinished">Disable Aero</translation>
     </message>
     <message>
       <location/>
       <source>Capture Cursor</source>
-      <translation>커서 캡처</translation>
+      <translation type="unfinished">Capture Cursor</translation>
     </message>
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>&quot;최상&quot; 품질 및 해상도는 고성능 PC 사용 시에만 설정하기를 권장 합니다.</translation>
+      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
     </message>
     <message>
       <location/>
       <source>Browse...</source>
-      <translation>찾기...</translation>
+      <translation type="unfinished">Browse...</translation>
     </message>
     <message>
       <location/>
       <source>Resolution</source>
-      <translation>해상도:</translation>
+      <translation type="unfinished">Resolution</translation>
     </message>
     <message>
       <location/>
       <source>Recording Quality</source>
-      <translation>저장 화질:</translation>
+      <translation type="unfinished">Recording Quality</translation>
     </message>
     <message>
       <location/>
       <source>Source</source>
-      <translation>소스</translation>
+      <translation type="unfinished">Source</translation>
     </message>
     <message>
       <location/>
       <source>Screen</source>
-      <translation>화면</translation>
+      <translation type="unfinished">Screen</translation>
     </message>
   </context>
   <context>
@@ -2686,12 +2686,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/recording_threshold_widget.ui"/>
       <source>Pre-Recording</source>
-      <translation>사전녹화</translation>
+      <translation type="unfinished">Pre-Recording</translation>
     </message>
     <message>
       <location/>
       <source>Post-Recording</source>
-      <translation>사후녹화</translation>
+      <translation type="unfinished">Post-Recording</translation>
     </message>
   </context>
   <context>
@@ -2699,17 +2699,17 @@
     <message>
       <location filename="../src/ui/widgets/resource_browser_widget.ui"/>
       <source>Resources</source>
-      <translation>리소스</translation>
+      <translation type="unfinished">Resources</translation>
     </message>
     <message>
       <location/>
       <source>Nothing found</source>
-      <translation>결과 없음</translation>
+      <translation type="unfinished">Nothing found</translation>
     </message>
     <message>
       <location/>
       <source>Drag any image or video file to the application window to play them</source>
-      <translation>이미지 또는 비디오 파일을 응용 프로그램 창으로 드래그하여 재생하십시오.</translation>
+      <translation type="unfinished">Drag any image or video file to the application window to play them</translation>
     </message>
   </context>
   <context>
@@ -2717,27 +2717,27 @@
     <message>
       <location filename="../src/ui/widgets/business/say_text_business_action_widget.ui"/>
       <source>Speak the following:</source>
-      <translation>출력할 문구:</translation>
+      <translation type="unfinished">Speak the following:</translation>
     </message>
     <message>
       <location/>
       <source>Type any text here</source>
-      <translation>여기에 텍스트 입력</translation>
+      <translation type="unfinished">Type any text here</translation>
     </message>
     <message>
       <location/>
       <source>Volume:</source>
-      <translation>음량:</translation>
+      <translation type="unfinished">Volume:</translation>
     </message>
     <message>
       <location/>
       <source>Test...</source>
-      <translation>테스트...</translation>
+      <translation type="unfinished">Test...</translation>
     </message>
     <message>
       <location/>
       <source>Speak to users</source>
-      <translation>사용자와 대화하기</translation>
+      <translation type="unfinished">Speak to users</translation>
     </message>
   </context>
   <context>
@@ -2745,52 +2745,52 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/schedule_settings_widget.ui"/>
       <source>Schedule Settings</source>
-      <translation>일정 설정</translation>
+      <translation type="unfinished">Schedule Settings</translation>
     </message>
     <message>
       <location/>
       <source>Record Always</source>
-      <translation>상시 녹화</translation>
+      <translation type="unfinished">Record Always</translation>
     </message>
     <message>
       <location/>
       <source>Motion Only</source>
-      <translation>움직임 녹화</translation>
+      <translation type="unfinished">Motion Only</translation>
     </message>
     <message>
       <location/>
       <source>Motion + Lo-Res</source>
-      <translation>움직임 + 저해상도</translation>
+      <translation type="unfinished">Motion + Lo-Res</translation>
     </message>
     <message>
       <location/>
       <source>Do Not Record</source>
-      <translation>녹화안함</translation>
+      <translation type="unfinished">Do Not Record</translation>
     </message>
     <message>
       <location/>
       <source>Bitrate</source>
-      <translation>비트 전송률</translation>
+      <translation type="unfinished">Bitrate</translation>
     </message>
     <message>
       <location/>
       <source>FPS</source>
-      <translation>프레임</translation>
+      <translation type="unfinished">FPS</translation>
     </message>
     <message>
       <location/>
       <source>Quality</source>
-      <translation>품질</translation>
+      <translation type="unfinished">Quality</translation>
     </message>
     <message>
       <location/>
       <source>Show Quality</source>
-      <translation>품질 표시</translation>
+      <translation type="unfinished">Show Quality</translation>
     </message>
     <message>
       <location/>
       <source>Show FPS</source>
-      <translation>프레임 표시</translation>
+      <translation type="unfinished">Show FPS</translation>
     </message>
   </context>
   <context>
@@ -2798,37 +2798,37 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/system_administration/widgets/security_settings_widget.ui"/>
       <source>Enable audit trail</source>
-      <translation>검사 보고 설정</translation>
+      <translation type="unfinished">Enable audit trail</translation>
     </message>
     <message>
       <location/>
       <source>Allow only secure connections</source>
-      <translation>보안 연결 만 허용</translation>
+      <translation type="unfinished">Allow only secure connections</translation>
     </message>
     <message>
       <location/>
       <source>Encrypt video traffic</source>
-      <translation>비디오 트래픽 암호화</translation>
+      <translation type="unfinished">Encrypt video traffic</translation>
     </message>
     <message>
       <location/>
       <source>Display watermark with username over video</source>
-      <translation>비디오에 사용자 이름을 워터마크로 표시</translation>
+      <translation type="unfinished">Display watermark with username over video</translation>
     </message>
     <message>
       <location/>
       <source>Watermark Preview</source>
-      <translation>워터 마크 미리보기</translation>
+      <translation type="unfinished">Watermark Preview</translation>
     </message>
     <message>
       <location/>
       <source>to</source>
-      <translation>로</translation>
+      <translation type="unfinished">to</translation>
     </message>
     <message>
       <location/>
       <source>Limit session duration</source>
-      <translation>세션 기간 제한</translation>
+      <translation type="unfinished">Limit session duration</translation>
     </message>
   </context>
   <context>
@@ -2836,12 +2836,12 @@
     <message>
       <location filename="../src/ui/widgets/business/sendmail_business_action_widget.ui"/>
       <source>Additional Recipients:</source>
-      <translation>함께 받는사람:</translation>
+      <translation type="unfinished">Additional Recipients:</translation>
     </message>
     <message>
       <location/>
       <source>Global Email Settings...</source>
-      <translation>이메일 설정...</translation>
+      <translation type="unfinished">Global Email Settings...</translation>
     </message>
   </context>
   <context>
@@ -2849,7 +2849,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/server_selection_dialog.ui"/>
       <source>Select Servers</source>
-      <translation>서버 선택</translation>
+      <translation type="unfinished">Select Servers</translation>
     </message>
   </context>
   <context>
@@ -2857,32 +2857,32 @@
     <message>
       <location filename="../src/ui/widgets/properties/server_settings_widget.ui"/>
       <source>Ping</source>
-      <translation>핑</translation>
+      <translation type="unfinished">Ping</translation>
     </message>
     <message>
       <location/>
       <source>Failover</source>
-      <translation>장애 조치(이중화)</translation>
+      <translation type="unfinished">Failover</translation>
     </message>
     <message>
       <location/>
       <source>Failover Priority...</source>
-      <translation>이중화 우선순위</translation>
+      <translation type="unfinished">Failover Priority...</translation>
     </message>
     <message>
       <location/>
       <source>Name</source>
-      <translation>이름</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <location/>
       <source>IP Address</source>
-      <translation>IP 주소:</translation>
+      <translation type="unfinished">IP Address</translation>
     </message>
     <message>
       <location/>
       <source>Port</source>
-      <translation>포트:</translation>
+      <translation type="unfinished">Port</translation>
     </message>
   </context>
   <context>
@@ -2890,17 +2890,17 @@
     <message>
       <location filename="../src/ui/widgets/business/show_on_alarm_layout_action_widget.ui"/>
       <source>for</source>
-      <translation>for</translation>
+      <translation type="unfinished">for</translation>
     </message>
     <message>
       <location/>
       <source>Force Alarm Layout opening</source>
-      <translation>알람레이아웃 갈제로 열기</translation>
+      <translation type="unfinished">Force Alarm Layout opening</translation>
     </message>
     <message>
       <location/>
       <source>Also show source camera</source>
-      <translation>이벤트 발생 카메라 보여주기</translation>
+      <translation type="unfinished">Also show source camera</translation>
     </message>
   </context>
   <context>
@@ -2908,27 +2908,27 @@
     <message>
       <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
       <source>seconds</source>
-      <translation>초</translation>
+      <translation type="unfinished">seconds</translation>
     </message>
     <message>
       <location/>
       <source>Display text for:</source>
-      <translation>테스트 유지 시간</translation>
+      <translation type="unfinished">Display text for:</translation>
     </message>
     <message>
       <location/>
       <source>Use custom text:</source>
-      <translation>사용자 임의 내용 추가</translation>
+      <translation type="unfinished">Use custom text:</translation>
     </message>
     <message>
       <location/>
       <source>Rule will work only for prolonged events</source>
-      <translation>지속되는 이벤트에서만 설정 적용됩니다.</translation>
+      <translation type="unfinished">Rule will work only for prolonged events</translation>
     </message>
     <message>
       <location/>
       <source>Also show on source camera</source>
-      <translation>이벤트 발생카메라 보이기</translation>
+      <translation type="unfinished">Also show on source camera</translation>
     </message>
   </context>
   <context>
@@ -2936,17 +2936,17 @@
     <message>
       <location filename="../src/ui/dialogs/sign_dialog.ui"/>
       <source>Watermark Check</source>
-      <translation>변조 확인</translation>
+      <translation type="unfinished">Watermark Check</translation>
     </message>
     <message>
       <location/>
       <source>Checked File:</source>
-      <translation>확인 파일:</translation>
+      <translation type="unfinished">Checked File:</translation>
     </message>
     <message>
       <location/>
       <source>Check Result:</source>
-      <translation>확인 결과:</translation>
+      <translation type="unfinished">Check Result:</translation>
     </message>
   </context>
   <context>
@@ -2954,27 +2954,27 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/smtp/smtp_advanced_settings_widget.ui"/>
       <source>Unsecure Connection</source>
-      <translation>신뢰할 수 없는 연결</translation>
+      <translation type="unfinished">Unsecure Connection</translation>
     </message>
     <message>
       <location/>
       <source>(recommended)</source>
-      <translation>(추천)</translation>
+      <translation type="unfinished">(recommended)</translation>
     </message>
     <message>
       <location/>
       <source>Secure connection using TLS.</source>
-      <translation>TLS를 이용한 보안 연결</translation>
+      <translation type="unfinished">Secure connection using TLS.</translation>
     </message>
     <message>
       <location/>
       <source>Secure connection using SSL.</source>
-      <translation>SSL을 이용한 보안 연결</translation>
+      <translation type="unfinished">Secure connection using SSL.</translation>
     </message>
     <message>
       <location/>
       <source>Port:</source>
-      <translation>포트:</translation>
+      <translation type="unfinished">Port:</translation>
     </message>
   </context>
   <context>
@@ -2982,17 +2982,17 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/smtp/smtp_settings_widget.ui"/>
       <source>Outgoing Email Settings</source>
-      <translation>발송 이메일 설정</translation>
+      <translation type="unfinished">Outgoing Email Settings</translation>
     </message>
     <message>
       <location/>
       <source>Advanced settings...</source>
-      <translation>고급 설정...</translation>
+      <translation type="unfinished">Advanced settings...</translation>
     </message>
     <message>
       <location/>
       <source>Test</source>
-      <translation>테스트</translation>
+      <translation type="unfinished">Test</translation>
     </message>
   </context>
   <context>
@@ -3000,42 +3000,42 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/smtp/smtp_test_connection_widget.ui"/>
       <source>Server:</source>
-      <translation>서버:</translation>
+      <translation type="unfinished">Server:</translation>
     </message>
     <message>
       <location/>
       <source>Port:</source>
-      <translation>포트:</translation>
+      <translation type="unfinished">Port:</translation>
     </message>
     <message>
       <location/>
       <source>User:</source>
-      <translation>사용자:</translation>
+      <translation type="unfinished">User:</translation>
     </message>
     <message>
       <location/>
       <source>Security:</source>
-      <translation>보안:</translation>
+      <translation type="unfinished">Security:</translation>
     </message>
     <message>
       <location/>
       <source>Progress:</source>
-      <translation>진행:</translation>
+      <translation type="unfinished">Progress:</translation>
     </message>
     <message>
       <location/>
       <source>Result:</source>
-      <translation>결과:</translation>
+      <translation type="unfinished">Result:</translation>
     </message>
     <message>
       <location/>
       <source>OK</source>
-      <translation>확인</translation>
+      <translation type="unfinished">OK</translation>
     </message>
     <message>
       <location/>
       <source>Cancel</source>
-      <translation>취소</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -3043,17 +3043,17 @@
     <message>
       <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
       <source>Available to</source>
-      <translation>사용할 수 있는</translation>
+      <translation type="unfinished">Available to</translation>
     </message>
     <message>
       <location/>
       <source>Name</source>
-      <translation>이름</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <location/>
       <source>Icon</source>
-      <translation>아이콘</translation>
+      <translation type="unfinished">Icon</translation>
     </message>
   </context>
   <context>
@@ -3061,27 +3061,27 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_analytics_widget.ui"/>
       <source>Current Statistics</source>
-      <translation>현재 통계</translation>
+      <translation type="unfinished">Current Statistics</translation>
     </message>
     <message>
       <location/>
       <source>Forecast for Full Storage Usage</source>
-      <translation>예측 사용량</translation>
+      <translation type="unfinished">Forecast for Full Storage Usage</translation>
     </message>
     <message>
       <location/>
       <source>Server is offline. Statistics are not available.</source>
-      <translation>서버는 오프 라인입니다. 통계를 사용할 수 없습니다.</translation>
+      <translation type="unfinished">Server is offline. Statistics are not available.</translation>
     </message>
     <message>
       <location/>
       <source>Additional storage</source>
-      <translation>추가 정장장치</translation>
+      <translation type="unfinished">Additional storage</translation>
     </message>
     <message>
       <location/>
       <source>Base forecast on data recorded during</source>
-      <translation>기록 된 데이터에 대한 기본 예측</translation>
+      <translation type="unfinished">Base forecast on data recorded during</translation>
     </message>
   </context>
   <context>
@@ -3089,62 +3089,62 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
       <source>Cancel</source>
-      <translation>취소</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <location/>
       <source>Start Backup Now</source>
-      <translation>백업 지금 진핸</translation>
+      <translation type="unfinished">Start Backup Now</translation>
     </message>
     <message>
       <location/>
       <source>Add External Storage...</source>
-      <translation>외부 장치 추가...</translation>
+      <translation type="unfinished">Add External Storage...</translation>
     </message>
     <message>
       <location/>
       <source>Storage Locations</source>
-      <translation>저장 위치</translation>
+      <translation type="unfinished">Storage Locations</translation>
     </message>
     <message>
       <location/>
       <source>Reindex Archive</source>
-      <translation>재생 데이터 재 인덱싱</translation>
+      <translation type="unfinished">Reindex Archive</translation>
     </message>
     <message>
       <location/>
       <source>Reindex Backup</source>
-      <translation>인덱스 재구성 백업</translation>
+      <translation type="unfinished">Reindex Backup</translation>
     </message>
     <message>
       <location/>
       <source>Backup Archive</source>
-      <translation>백업 아카이브</translation>
+      <translation type="unfinished">Backup Archive</translation>
     </message>
     <message>
       <location/>
       <source>Backup Settings...</source>
-      <translation>백업 설정</translation>
+      <translation type="unfinished">Backup Settings...</translation>
     </message>
     <message>
       <location/>
       <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation>분석 데이터는 계속 비활성화 된 스토리지에 저장됩니다.</translation>
+      <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
     </message>
     <message>
       <location/>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>비활성화 된 저장 장치에 녹화는 중지됩니다. 그러나 오래된 영상을 삭제하는 것은 계속합니다.</translation>
+      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
     </message>
     <message>
       <location/>
       <source>Recording was enabled on the USB storage</source>
-      <translation>USB 저장소에서 저장이 활성화되었습니다.</translation>
+      <translation type="unfinished">Recording was enabled on the USB storage</translation>
     </message>
     <message>
       <location/>
       <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
-      <translation>웹 로그 분석 데이터는 많은 양의 공간을 차지합니다. 시스템 파티션 대신 다른 위치를 선택하는 것이 권장합니다.</translation>
+      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</translation>
     </message>
   </context>
   <context>
@@ -3152,7 +3152,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_rebuild_widget.ui"/>
       <source>Cancel</source>
-      <translation>취소</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
   </context>
   <context>
@@ -3160,27 +3160,27 @@
     <message>
       <location filename="../src/ui/dialogs/storage_url_dialog.ui"/>
       <source>Add External Storage...</source>
-      <translation>외부 장치 추가...</translation>
+      <translation type="unfinished">Add External Storage...</translation>
     </message>
     <message>
       <location/>
       <source>Protocol:</source>
-      <translation>프로토콜:</translation>
+      <translation type="unfinished">Protocol:</translation>
     </message>
     <message>
       <location/>
       <source>URL:</source>
-      <translation>URL:</translation>
+      <translation type="unfinished">URL:</translation>
     </message>
     <message>
       <location/>
       <source>Login:</source>
-      <translation>로그인:</translation>
+      <translation type="unfinished">Login:</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation>비밀번호:</translation>
+      <translation type="unfinished">Password:</translation>
     </message>
   </context>
   <context>
@@ -3188,22 +3188,22 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation>역할들:</translation>
+      <translation type="unfinished">Roles</translation>
     </message>
     <message>
       <location/>
       <source>Show all users</source>
-      <translation>모든 사용자 표시</translation>
+      <translation type="unfinished">Show all users</translation>
     </message>
     <message>
       <location/>
       <source>Select Users</source>
-      <translation>사용자 선택</translation>
+      <translation type="unfinished">Select Users</translation>
     </message>
     <message>
       <location/>
       <source>Nothing matches your search.</source>
-      <translation>검색과 일치하는 것이 없습니다,</translation>
+      <translation type="unfinished">Nothing matches your search.</translation>
     </message>
   </context>
   <context>
@@ -3211,22 +3211,22 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/system_settings_widget.ui"/>
       <source>(recommended)</source>
-      <translation>(추천)</translation>
+      <translation type="unfinished">(recommended)</translation>
     </message>
     <message>
       <location/>
       <source>Send anonymous usage and crash statistics to software developers</source>
-      <translation>개발자에게 장애 문제 자동 보고</translation>
+      <translation type="unfinished">Send anonymous usage and crash statistics to software developers</translation>
     </message>
     <message>
       <location/>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-      <translation>주위: 이 옵션 활성화 시 기 설정된 녹화 설정 값과 다르게 동작할 수 있습니다.</translation>
+      <translation type="unfinished">Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</translation>
     </message>
     <message>
       <location/>
       <source>Custom language for mobile notifications</source>
-      <translation>모바일 알림을위한 사용자 지정 언어</translation>
+      <translation type="unfinished">Custom language for mobile notifications</translation>
     </message>
   </context>
   <context>
@@ -3234,27 +3234,27 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
       <source>Text</source>
-      <translation>문자</translation>
+      <translation type="unfinished">Text</translation>
     </message>
     <message>
       <location/>
       <source>Delete</source>
-      <translation>삭제</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation>글꼴 크기</translation>
+      <translation type="unfinished">Font Size</translation>
     </message>
     <message>
       <location/>
       <source>Enter plain text or HTML</source>
-      <translation>일반 텍스트 또는 HTML을 입력</translation>
+      <translation type="unfinished">Enter plain text or HTML</translation>
     </message>
     <message>
       <location/>
       <source>Area Width</source>
-      <translation>영역 넓이</translation>
+      <translation type="unfinished">Area Width</translation>
     </message>
   </context>
   <context>
@@ -3262,17 +3262,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.ui"/>
       <source>Sync Time with the Internet</source>
-      <translation>인터넷과 시간 동기화</translation>
+      <translation type="unfinished">Sync Time with the Internet</translation>
     </message>
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation>VMS 시간</translation>
+      <translation type="unfinished">VMS Time</translation>
     </message>
     <message>
       <location/>
       <source>Do not sync time among servers</source>
-      <translation>서버간에 시간을 동기화하지 마십시오</translation>
+      <translation type="unfinished">Do not sync time among servers</translation>
     </message>
   </context>
   <context>
@@ -3280,22 +3280,22 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
       <source>Timestamp</source>
-      <translation>타임스템프</translation>
+      <translation type="unfinished">Timestamp</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation>글꼴 크기</translation>
+      <translation type="unfinished">Font Size</translation>
     </message>
     <message>
       <location/>
       <source>Format</source>
-      <translation>포맷</translation>
+      <translation type="unfinished">Format</translation>
     </message>
     <message>
       <location/>
       <source>Delete</source>
-      <translation>삭제</translation>
+      <translation type="unfinished">Delete</translation>
     </message>
   </context>
   <context>
@@ -3303,7 +3303,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_profile_widget.ui"/>
       <source>Change Password...</source>
-      <translation>암호 변경...</translation>
+      <translation type="unfinished">Change Password...</translation>
     </message>
   </context>
   <context>
@@ -3311,17 +3311,17 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_role_settings_widget.ui"/>
       <source>Name</source>
-      <translation>이름</translation>
+      <translation type="unfinished">Name</translation>
     </message>
     <message>
       <location/>
       <source>Users</source>
-      <translation>사용자</translation>
+      <translation type="unfinished">Users</translation>
     </message>
     <message>
       <location/>
       <source>Delete Role</source>
-      <translation>역할 삭제</translation>
+      <translation type="unfinished">Delete Role</translation>
     </message>
   </context>
   <context>
@@ -3329,22 +3329,22 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/user_roles_dialog.ui"/>
       <source>User Roles</source>
-      <translation>사용자 역할</translation>
+      <translation type="unfinished">User Roles</translation>
     </message>
     <message>
       <location/>
       <source>New role</source>
-      <translation>새로운 역할</translation>
+      <translation type="unfinished">New role</translation>
     </message>
     <message>
       <location/>
       <source>There are no custom user roles yet.</source>
-      <translation>지정된 사용자 역할은 아직 없습니다.</translation>
+      <translation type="unfinished">There are no custom user roles yet.</translation>
     </message>
     <message>
       <location/>
       <source>Click &quot;New role&quot; button to create one.</source>
-      <translation>&quot;새 역할&quot; 버튼을 클릭하여 만듭니다.</translation>
+      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
     </message>
   </context>
   <context>
@@ -3352,17 +3352,17 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
       <source>User Type</source>
-      <translation>사용자 유형</translation>
+      <translation type="unfinished">User Type</translation>
     </message>
     <message>
       <location/>
       <source>Role</source>
-      <translation>역할</translation>
+      <translation type="unfinished">Role</translation>
     </message>
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation>역할 편집...</translation>
+      <translation type="unfinished">Edit Roles...</translation>
     </message>
   </context>
   <context>
@@ -3370,17 +3370,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/wearable_camera_motion_widget.ui"/>
       <source>Motion Detection</source>
-      <translation>움직임 감지:</translation>
+      <translation type="unfinished">Motion Detection</translation>
     </message>
     <message>
       <location/>
       <source>Sensitivity</source>
-      <translation>민감도:</translation>
+      <translation type="unfinished">Sensitivity</translation>
     </message>
     <message>
       <location/>
       <source>Detect motion</source>
-      <translation>움직임 감지</translation>
+      <translation type="unfinished">Detect motion</translation>
     </message>
   </context>
   <context>
@@ -3388,17 +3388,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/wearable_camera_time_zone_widget.ui"/>
       <source>Form</source>
-      <translation>틀</translation>
+      <translation type="unfinished">Form</translation>
     </message>
     <message>
       <location/>
       <source>Time</source>
-      <translation>시간</translation>
+      <translation type="unfinished">Time</translation>
     </message>
     <message>
       <location/>
       <source>Ignore timezone in uploaded files</source>
-      <translation>업로드 된 파일에서 시간대 무시</translation>
+      <translation type="unfinished">Ignore timezone in uploaded files</translation>
     </message>
   </context>
   <context>
@@ -3406,22 +3406,22 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/wearable_camera_upload_widget.ui"/>
       <source>Cancel</source>
-      <translation>취소</translation>
+      <translation type="unfinished">Cancel</translation>
     </message>
     <message>
       <location/>
       <source>Upload Footage</source>
-      <translation>영상 업로드</translation>
+      <translation type="unfinished">Upload Footage</translation>
     </message>
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation>파일 업로드...</translation>
+      <translation type="unfinished">Upload File...</translation>
     </message>
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation>폴더 업로드...</translation>
+      <translation type="unfinished">Upload Folder...</translation>
     </message>
   </context>
   <context>
@@ -3429,7 +3429,7 @@
     <message>
       <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
       <source>This web page is for C2P integration</source>
-      <translation>이 웹 페이지는 C2P 연동 용입니다.</translation>
+      <translation type="unfinished">This web page is for C2P integration</translation>
     </message>
   </context>
   <context>
@@ -3437,27 +3437,27 @@
     <message>
       <location filename="../src/ui/dialogs/week_time_schedule_dialog.ui"/>
       <source>Schedule Settings</source>
-      <translation>일정 설정</translation>
+      <translation type="unfinished">Schedule Settings</translation>
     </message>
     <message>
       <location/>
       <source>On</source>
-      <translation>켬</translation>
+      <translation type="unfinished">On</translation>
     </message>
     <message>
       <location/>
       <source>Off</source>
-      <translation>끔</translation>
+      <translation type="unfinished">Off</translation>
     </message>
     <message>
       <location/>
       <source>Schedule</source>
-      <translation>일정</translation>
+      <translation type="unfinished">Schedule</translation>
     </message>
     <message>
       <location/>
       <source>Note: Schedule is based on server time.</source>
-      <translation>참고: 일정 설정은 서버시간을 기준으로 함</translation>
+      <translation type="unfinished">Note: Schedule is based on server time.</translation>
     </message>
   </context>
   <context>
@@ -3465,17 +3465,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
       <source>Watermark preview</source>
-      <translation>워터 마크 미리보기</translation>
+      <translation type="unfinished">Watermark preview</translation>
     </message>
     <message>
       <location/>
       <source>Opacity</source>
-      <translation>투명도</translation>
+      <translation type="unfinished">Opacity</translation>
     </message>
     <message>
       <location/>
       <source>Frequency</source>
-      <translation>주파수</translation>
+      <translation type="unfinished">Frequency</translation>
     </message>
   </context>
 </TS>
