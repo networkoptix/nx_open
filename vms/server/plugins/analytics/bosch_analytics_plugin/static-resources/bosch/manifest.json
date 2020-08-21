@@ -42,7 +42,7 @@
         },
         {
             "id": "nx.bosch.SignalTooBlurry",
-            "name": "Blurry signal ???",
+            "name": "Blurry signal",
             "internalName": "SignalTooBlurry",
             "description": "Blurry signal %1",
             "positiveState": "started",
