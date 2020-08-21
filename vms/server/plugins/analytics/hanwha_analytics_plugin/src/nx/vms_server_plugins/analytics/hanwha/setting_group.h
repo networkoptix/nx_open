@@ -137,6 +137,11 @@ struct SettingGroup
             settingGroup.buildDeviceWritingQuery(frameSize, channelNumber);
 
         const std::string error = sendingFunctor(settingQuery);
+
+        NX_DEBUG(typeid(SettingGroupT), NX_FMT(
+            "Hanwha plugin sent a settings request to Hanwha camera: request = %1, resulting error = %2",
+            settingQuery, error));
+
         if (!error.empty())
         {
             settingGroup.replenishErrorMap(errorMap, error);

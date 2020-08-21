@@ -203,13 +203,29 @@ void DeviceAgent::setSupportedEventCategoties()
     m_settingsProcessor.transferAndHoldSettingsFromServerToDevice(
         errorMap.get(), valueMap.get(), sourceMap);
 
-    auto settingsResponse = makePtr<nx::sdk::SettingsResponse>();
-    settingsResponse->setErrors(std::move(errorMap));
+    const int errorCount = errorMap->count();
+    if (errorCount)
+    {
+        NX_DEBUG(this, NX_FMT("While sending setting to Hanwha camera from plugin %1 error(s) occurred",
+            errorCount));
+        for (int i = 0; i < errorCount; ++i)
+        {
+            NX_DEBUG(this, NX_FMT("Error %1: key = %2, value = %3", i,
+                errorMap->key(i), errorMap->value(i)));
+        }
+    }
+    else
+    {
+        NX_DEBUG(this, "While sending setting to Hanwha camera from plugin no errors occurred");
+    }
 
     #if 0
         // While plugin manager is under construction its not clear if it is needed.
         settingsResponse->setValues(std::move(valueMap));
     #endif
+
+    auto settingsResponse = makePtr<nx::sdk::SettingsResponse>();
+    settingsResponse->setErrors(std::move(errorMap));
 
     *outResult = settingsResponse.releasePtr();
 }
