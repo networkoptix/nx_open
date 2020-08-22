@@ -231,16 +231,16 @@
         "voiceCommands": {
             "play": "oynat",
             "pause": "duraklat",
-            "live": "go to live | show me live",
+            "live": "canlı yayına git | bana canlı göster",
             "view": "görüntüle + [kamera adı]",
-            "search": "find + [text for searchbar]",
+            "search": "bul + [arama çubuğu metni]",
             "clear search": "aramayı temizle",
-            "expand server": "expand server + [server name]",
-            "collapse server": "collapse server + [server name]",
+            "expand server": "sunucuyu genişlet + [sunucu adı]",
+            "collapse server": "sunucuyu daralt + [sunucu adı]",
             "expand all servers": "tüm sunucuları genişlet",
             "collapse all servers": "tüm sunucuları daralt",
             "stop listening": "dinlemeyi durdur",
-            "help": "help | show commands"
+            "help": "yardım | komutları göster"
         }
     }
 }
