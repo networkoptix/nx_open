@@ -32,7 +32,6 @@
 #include <nx/vms/text/human_readable.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/analytics/manifest_items.h>
-#include <nx/vms/client/desktop/analytics/analytics_attributes.h>
 #include <nx/vms/client/desktop/analytics/object_type_dictionary.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/utils/managed_camera_set.h>
@@ -42,6 +41,7 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/log/log.h>
+#include <nx/analytics/analytics_attributes.h>
 
 namespace nx::vms::client::desktop {
 
@@ -955,7 +955,7 @@ QList<QPair<QString, QString>> AnalyticsSearchListModel::Private::attributes(
     QList<QPair<QString, QString>> result;
     for (const auto& attribute: groupedAttributes)
     {
-        if (!isAnalyticsAttributeHidden(attribute.name))
+        if (!nx::analytics::isAnalyticsAttributeHidden(attribute.name))
             result.push_back({attribute.name, valuesText(attribute.values, attribute.totalValues)});
     }
 
