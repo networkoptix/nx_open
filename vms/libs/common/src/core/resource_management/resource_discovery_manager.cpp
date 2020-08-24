@@ -34,6 +34,8 @@
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 
+#include "resource_management_ini.h"
+
 #ifdef __arm__
     static const int kThreadCount = 8;
 #else
@@ -209,7 +211,6 @@ void QnResourceDiscoveryManager::run()
 }
 
 static const int GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS = 1000;
-static const int MIN_DISCOVERY_SEARCH_MS = 1000 * 15;
 
 void QnResourceDiscoveryManager::doInitialSearch()
 {
@@ -257,7 +258,7 @@ void QnResourceDiscoveryManager::doResourceDiscoverIteration()
 
             ++m_runNumber;
             delayForNextSearch = qMax(GLOBAL_DELAY_BETWEEN_CAMERA_SEARCH_MS,
-                int(MIN_DISCOVERY_SEARCH_MS - discoveryTime.elapsed()));
+                int(resourceManagementIni().cameraDiscoveryIntervalMs - discoveryTime.elapsed()));
             break;
     }
 
