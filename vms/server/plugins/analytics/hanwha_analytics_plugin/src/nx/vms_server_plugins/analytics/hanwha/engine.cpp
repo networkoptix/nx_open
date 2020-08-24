@@ -650,7 +650,7 @@ static const std::string kPluginManifest = /*suppress newline*/ 1 + (const char*
 {
     "id": "nx.hanwha",
     "name": "Hanwha analytics",
-    "description": "Access control solution designed to make it easier than ever to manage and monitoring facility access.",
+    "description": "Supports built-in analytics on Hanwha cameras",
     "version": "1.0.1",
     "vendor": "Hanwha"
 }
