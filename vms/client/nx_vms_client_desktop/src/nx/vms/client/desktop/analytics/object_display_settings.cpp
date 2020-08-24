@@ -4,9 +4,9 @@
 
 #include <nx/utils/random.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/vms/client/desktop/analytics/analytics_attributes.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <client/client_settings.h>
+#include <nx/analytics/analytics_attributes.h>
 
 namespace nx::vms::client::desktop {
 
@@ -87,7 +87,7 @@ std::vector<nx::common::metadata::Attribute> ObjectDisplaySettings::briefAttribu
 
     for (const auto& attribute: object.attributes)
     {
-        if (!isAnalyticsAttributeHidden(attribute.name)
+        if (!nx::analytics::isAnalyticsAttributeHidden(attribute.name)
             && settings.attributeVisibility.value(attribute.name)
                 == ObjectDisplaySettingsItem::AttributeVisibilityPolicy::always)
         {
@@ -107,7 +107,7 @@ std::vector<nx::common::metadata::Attribute> ObjectDisplaySettings::visibleAttri
 
     for (const auto& attribute: object.attributes)
     {
-        if (!isAnalyticsAttributeHidden(attribute.name)
+        if (!nx::analytics::isAnalyticsAttributeHidden(attribute.name)
             && settings.attributeVisibility.value(attribute.name)
                 != ObjectDisplaySettingsItem::AttributeVisibilityPolicy::never)
         {
