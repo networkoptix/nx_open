@@ -320,7 +320,7 @@
         },
         {
             "id": "nx.hikvision.event",
-            "name": "Event occurred"
+            "name": "Temperature tracking"
         }
     ]
 }

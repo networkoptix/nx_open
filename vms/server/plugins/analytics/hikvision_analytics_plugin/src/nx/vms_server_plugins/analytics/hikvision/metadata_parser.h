@@ -16,6 +16,7 @@
 #include <QtCore/QString>
 #include <QtCore/QByteArray>
 #include <QtCore/QXmlStreamReader>
+#include <nx/utils/elapsed_timer.h>
 
 namespace nx::vms_server_plugins::analytics::hikvision {
 
@@ -33,16 +34,22 @@ private:
 
     struct CacheEntry
     {
-        std::chrono::steady_clock::time_point lastUpdate;
+        CacheEntry()
+        {
+            lifetime.restart();
+        }
 
         std::optional<nx::sdk::analytics::Rect> boundingBox;
         std::vector<nx::sdk::Ptr<nx::sdk::Attribute>> attributes;
+        nx::sdk::Uuid trackId;
+        nx::utils::ElapsedTimer lastUpdate;
+        nx::utils::ElapsedTimer lifetime;
     };
 
 private:
     std::optional<QString> parseStringElement();
     std::optional<int> parseIntElement();
-    std::optional<nx::sdk::Uuid> parseTargetIdElement();
+    std::optional<int> parseTargetIdElement();
     std::optional<std::string> parseRecognitionElement();
     std::optional<float> parseCoordinateElement();
     std::optional<nx::sdk::analytics::Point> parsePointElement();
@@ -55,13 +62,11 @@ private:
     std::vector<nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadata>> parseTargetDetectionElement();
     nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadataPacket> parseMetadataElement();
 
-    CacheEntry* findInCache(nx::sdk::Uuid trackId);
-
     void evictStaleCacheEntries();
 
 private:
     QXmlStreamReader m_xml;
-    std::map<nx::sdk::Uuid, CacheEntry> m_cache;
+    std::map<int, CacheEntry> m_cache;
 };
 
 } // namespace nx::vms_server_plugins::analytics::hikvision

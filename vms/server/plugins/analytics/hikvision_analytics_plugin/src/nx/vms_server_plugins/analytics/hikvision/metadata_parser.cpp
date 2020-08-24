@@ -3,6 +3,7 @@
 #include <utility>
 
 #include <nx/utils/log/log_main.h>
+#include <nx/sdk/helpers/uuid_helper.h>
 
 namespace nx::vms_server_plugins::analytics::hikvision {
 
@@ -13,7 +14,8 @@ using namespace nx::sdk::analytics;
 namespace {
 
 constexpr double kCoordinateDomain = 1000;
-constexpr auto kCacheEntryLifetime = 1s;
+constexpr auto kCacheEntryInactivityLifetime = 3s;
+constexpr auto kCacheEntryMaximumLifetime = 30s;
 
 } // namespace
 
@@ -29,7 +31,7 @@ Ptr<ObjectMetadataPacket> MetadataParser::parsePacket(QByteArray bytes)
 
     m_xml.clear();
     m_xml.addData(bytes);
-    
+
     Ptr<ObjectMetadataPacket> packet;
 
     if (m_xml.readNextStartElement())
@@ -79,15 +81,13 @@ std::optional<int> MetadataParser::parseIntElement()
     return value;
 }
 
-std::optional<Uuid> MetadataParser::parseTargetIdElement()
+std::optional<int> MetadataParser::parseTargetIdElement()
 {
     const auto value = parseIntElement();
     if (!value)
         return std::nullopt;
 
-    Uuid uuid;
-    std::memcpy(uuid.data(), &*value, std::min((int) sizeof(*value), uuid.size()));
-    return uuid;
+    return value;
 }
 
 std::optional<std::string> MetadataParser::parseRecognitionElement()
@@ -274,40 +274,38 @@ std::vector<Ptr<Attribute>> MetadataParser::parsePropertyListElement()
 
 Ptr<ObjectMetadata> MetadataParser::parseTargetElement()
 {
-    std::optional<Uuid> trackId;
+    std::optional<int> trackId;
     std::optional<std::string> typeId;
     std::optional<Rect> boundingBox;
     std::vector<Ptr<Attribute>> attributes;
 
-    bool seenTargetId = false;
-    bool seenRecognition = false;
-    bool seenRegionList = false;
-    bool seenPropertyList = false;
-
     while (m_xml.readNextStartElement())
     {
-        if (m_xml.name() == "targetID" || m_xml.name() == "ruleID")
+        if (m_xml.name() == "targetID")
+        {
+            trackId = parseTargetIdElement();
+        }
+        else if (m_xml.name() == "ruleID")
         {
             // Treat rule activations as objects.
-            if (m_xml.name() == "ruleID" && seenTargetId)
-                continue;
-
-            seenTargetId = true;
-            trackId = parseTargetIdElement();
+            if (!trackId)
+            {
+                if (trackId = parseTargetIdElement(); trackId != 0)
+                    trackId = -(*trackId);
+            }
         }
         else if (m_xml.name() == "recognition")
         {
-            seenRecognition = true;
             typeId = parseRecognitionElement();
+            if (!typeId)
+                return nullptr;
         }
         else if (m_xml.name() == "RegionList")
         {
-            seenRegionList = true;
             boundingBox = parseRegionListElement();
         }
         else if (m_xml.name() == "PropertyList")
         {
-            seenPropertyList = true;
             attributes = parsePropertyListElement();
         }
         else
@@ -318,51 +316,38 @@ Ptr<ObjectMetadata> MetadataParser::parseTargetElement()
     if (m_xml.hasError())
         return nullptr;
 
-    if (!seenTargetId)
-        NX_DEBUG(NX_SCOPE_TAG, "No 'targetID' or 'ruleID' element in 'Target' element");
     if (!trackId)
+    {
+        NX_DEBUG(NX_SCOPE_TAG, "No 'targetID' or 'ruleID' element in 'Target' element");
         return nullptr;
+    }
 
-    if (!seenRecognition)
+    if (!typeId)
         typeId = "nx.hikvision.event"; // Treat rule activations as objects.
 
+    auto& entry = m_cache[*trackId];
+    if (boundingBox || !attributes.empty() || entry.trackId.isNull())
+        entry.lastUpdate.restart();
+    if (entry.trackId.isNull())
+        entry.trackId = nx::sdk::UuidHelper::randomUuid();
+
     if (boundingBox)
-    {
-        auto& entry = m_cache[*trackId];
-        entry.lastUpdate = std::chrono::steady_clock::now();
         entry.boundingBox = *boundingBox;
-    }
-    else if (const auto* entry = findInCache(*trackId); entry && entry->boundingBox)
-    {
-        boundingBox = *entry->boundingBox;
-    }
-    else if (!seenRegionList)
+    if (!attributes.empty())
+        entry.attributes = attributes;
+
+
+    if (!entry.boundingBox)
     {
         NX_DEBUG(NX_SCOPE_TAG, "No 'RegionList' element in 'Target' element");
-    }
-    if (!boundingBox)
         return nullptr;
-
-    if (seenPropertyList)
-    {
-        auto& entry = m_cache[*trackId];
-        entry.lastUpdate = std::chrono::steady_clock::now();
-        entry.attributes = attributes;
-    }
-    else if (const auto* entry = findInCache(*trackId))
-    {
-        attributes = entry->attributes;
     }
 
     auto metadata = makePtr<ObjectMetadata>();
-
-    metadata->setTrackId(*trackId);
-
-    if (typeId)
-        metadata->setTypeId(*typeId);
-
-    metadata->setBoundingBox(*boundingBox);
-    metadata->addAttributes(std::move(attributes));
+    metadata->setTrackId(entry.trackId);
+    metadata->setTypeId(*typeId);
+    metadata->setBoundingBox(*entry.boundingBox);
+    metadata->addAttributes(entry.attributes);
 
     return metadata;
 }
@@ -464,7 +449,7 @@ Ptr<ObjectMetadataPacket> MetadataParser::parseMetadataElement()
     auto packet = makePtr<ObjectMetadataPacket>();
 
     packet->setDurationUs(
-        std::chrono::duration_cast<std::chrono::microseconds>(kCacheEntryLifetime).count());
+        std::chrono::duration_cast<std::chrono::microseconds>(kCacheEntryInactivityLifetime).count());
 
     for (auto metadata: metadatas)
         packet->addItem(metadata.get());
@@ -472,25 +457,20 @@ Ptr<ObjectMetadataPacket> MetadataParser::parseMetadataElement()
     return packet;
 }
 
-MetadataParser::CacheEntry* MetadataParser::findInCache(nx::sdk::Uuid trackId)
-{
-    const auto it = m_cache.find(trackId);
-    if (it != m_cache.end())
-        return nullptr;
-
-    return &it->second;
-}
-
 void MetadataParser::evictStaleCacheEntries()
 {
-    const auto now = std::chrono::steady_clock::now();
-    for (auto it = m_cache.begin(); it != m_cache.end(); )
+    for (auto it = m_cache.begin(); it != m_cache.end();)
     {
         auto& entry = it->second;
-        if (now - entry.lastUpdate > kCacheEntryLifetime)
+        if (entry.lastUpdate.hasExpired(kCacheEntryInactivityLifetime)
+            || entry.lifetime.hasExpired(kCacheEntryMaximumLifetime))
+        {
             it = m_cache.erase(it);
+        }
         else
+        {
             ++it;
+        }
     }
 }
 
