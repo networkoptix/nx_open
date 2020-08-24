@@ -5,7 +5,7 @@ if(NOT customization.id)
     message(FATAL_ERROR "Code signing must be initialized after customization is loaded")
 endif()
 
-if(NOT WINDOWS OR NOT codeSigning)
+if(NOT WINDOWS)
     return()
 endif()
 
@@ -13,10 +13,10 @@ set(signingServer "http://localhost:8080" CACHE STRING "Signing server address")
 
 # Enable trusted timestamping for all publication types intended for end users. Do not sign
 # local developer builds as well as private QA builds.
-set(trustedTimestamping ON)
+set(trustedTimestamping true)
 set(_disableTrustedTimestampingPublicationTypes "local" "private")
 if(publicationType IN_LIST _disableTrustedTimestampingPublicationTypes)
-    set(trustedTimestamping OFF)
+    set(trustedTimestamping false)
 endif()
 unset(_disableTrustedTimestampingPublicationTypes)
 message(STATUS

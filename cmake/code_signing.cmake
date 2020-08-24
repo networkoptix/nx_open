@@ -4,8 +4,8 @@ if(customization.id)
 endif()
 
 # Enable code signing for all publication types except local (developer one).
-set(codeSigning ON)
+set(codeSigning true)
 if(publicationType STREQUAL "local")
-    set(codeSigning OFF)
+    set(codeSigning false)
 endif()
 message(STATUS "Code signing is ${codeSigning} for the ${publicationType} publication type")
