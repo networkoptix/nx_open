@@ -4464,7 +4464,7 @@ to %1</source>
     </message>
     <message>
       <source>This is also required to create/edit PTZ presets and tours.</source>
-      <translation>PTZ 사전 설정과 투어를 생성/편집하려면 이 기능을 활성화 하십시오.</translation>
+      <translation>(PTZ 프리셋, 투어 생성/편집)</translation>
     </message>
     <message>
       <source>Control video walls</source>
@@ -4496,7 +4496,7 @@ to %1</source>
     </message>
     <message>
       <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
-      <translation>PTZ, 장치 출력, 양방향 오디오, 소프트 트리거.</translation>
+      <translation>(PTZ, 장치 출력, 양방향 오디오, 소프트 트리거)</translation>
     </message>
   </context>
   <context>
@@ -4514,7 +4514,7 @@ to %1</source>
     </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation>알림을 볼 사용자 중 한 명이 이벤트 설명과 함께 북마크를 만들 때까지 표시됩니다.</translation>
+      <translation>알림을 보는 사용자 중 한 명이 이벤트 설명과 함께 즐겨찾기를 만들 때까지 표시됩니다.</translation>
     </message>
   </context>
   <context>
@@ -5242,7 +5242,7 @@ to %1</source>
     </message>
     <message>
       <source>This server already has more than max devices</source>
-      <translation>현재 서버 최대치 임</translation>
+      <translation>현재 서버에 등록된 카메라 수보다 적습니다.</translation>
     </message>
     <message>
       <source>This server already has more than max cameras</source>
@@ -8658,7 +8658,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 will be restarted to the updated version.</source>
-      <translation>%1 업데이트 버전을 다시 시작 됩니다.</translation>
+      <translation>%1 업데이트 버전으로 재 시작 됩니다.</translation>
     </message>
     <message>
       <source>OK</source>

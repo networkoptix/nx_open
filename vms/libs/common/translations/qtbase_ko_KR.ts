@@ -192,7 +192,7 @@
     </message>
     <message>
       <source>Options</source>
-      <translation>옵션:</translation>
+      <translation>옵션</translation>
     </message>
     <message>
       <source>Setting</source>

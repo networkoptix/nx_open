@@ -668,7 +668,7 @@
     <message>
       <location/>
       <source>Force motion detection for stream</source>
-      <translation>스트림에 대 한 강제 모션 감지</translation>
+      <translation>스트림에 대한 강제 모션 감지</translation>
     </message>
     <message>
       <location/>
