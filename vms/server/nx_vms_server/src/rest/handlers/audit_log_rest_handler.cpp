@@ -4,6 +4,7 @@
 #include <nx/network/http/http_types.h>
 #include "api/model/audit/audit_record.h"
 #include <database/server_db.h>
+#include <audit/audit_manager.h>
 #include "recording/time_period.h"
 #include "rest/server/json_rest_result.h"
 #include "core/resource_management/resource_pool.h"
@@ -42,6 +43,7 @@ int QnAuditLogRestHandler::executeGet(
             period.durationMs = endTimeMs - period.startTimeMs;
     }
 
+    serverModule()->auditManager()->flushAuditRecords();
     QnAuditRecordList outputData = serverModule()->serverDb()->getAuditData(period, sessionId);
     for(QnAuditRecord& record: outputData)
     {

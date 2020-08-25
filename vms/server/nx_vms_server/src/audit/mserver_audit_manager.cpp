@@ -67,8 +67,7 @@ QnMServerAuditManager::QnMServerAuditManager(QnMediaServerModule* serverModule)
 QnMServerAuditManager::~QnMServerAuditManager()
 {
     m_timer.stop();
-    processRecords();
-    flushRecords();
+    flushAuditRecords();
     serverModule()->serverDb()->closeUnclosedAuditRecords((int) (qnSyncTime->currentMSecsSinceEpoch() / 1000));
 }
 
@@ -274,14 +273,11 @@ void QnMServerAuditManager::setEnabled(bool value)
 
 void QnMServerAuditManager::at_timer()
 {
-    processRecords();
-    flushRecords();
+    flushAuditRecords();
 }
 
 void QnMServerAuditManager::processRecords()
 {
-    QnMutexLocker lock(&m_mutex);
-
     for (auto itr = m_alivePlaybackInfo.begin(); itr != m_alivePlaybackInfo.end();)
     {
         detail::CameraPlaybackInfo& pbInfo = itr.value();
@@ -344,11 +340,14 @@ int QnMServerAuditManager::updateAuditRecordInternal(int internalId, const QnAud
     return internalId;
 }
 
-void QnMServerAuditManager::flushRecords()
+void QnMServerAuditManager::flushAuditRecords()
 {
     decltype(m_recordsToAdd) records;
     {
         QnMutexLocker lock(&m_mutex);
+
+        processRecords();
+
         if (m_recordsToAdd.empty())
             return;
 

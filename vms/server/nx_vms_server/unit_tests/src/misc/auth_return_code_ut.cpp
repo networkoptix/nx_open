@@ -301,7 +301,7 @@ public:
                 // Server send "Unauthorized" response before it write data to the auditLog.
                 do
                 {
-                    static_cast<QnMServerAuditManager*>(server->commonModule()->auditManager())->flushRecords();
+                    server->commonModule()->auditManager()->flushAuditRecords();
                     outputData = server->serverModule()->serverDb()->getAuditData(period, QnUuid());
                     if (outputData.isEmpty())
                         std::this_thread::sleep_for(std::chrono::milliseconds(1));

@@ -87,7 +87,7 @@ public:
     QnMServerAuditManager(QnMediaServerModule* serverModule);
     ~QnMServerAuditManager();
 
-    void flushRecords();
+    virtual void flushAuditRecords() override;
     virtual AuditHandle notifyPlaybackStarted(const QnAuthSession& session,
         const QnUuid& id, qint64 timestampUsec, bool isExport = false) override;
     virtual void notifyPlaybackInProgress(const AuditHandle& handle, qint64 timestampUsec)  override;

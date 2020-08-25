@@ -23,6 +23,7 @@ public:
     /* return internal id of inserted record. Returns <= 0 if error */
     virtual int addAuditRecord(const QnAuditRecord& record) override;
     virtual int updateAuditRecord(int internalId, const QnAuditRecord& record) override;
+    virtual void flushAuditRecords() override {}
     virtual QnTimePeriod playbackRange(const AuditHandle& handle) const override { return QnTimePeriod(); }
 
     virtual void at_connectionOpened(const QnAuthSession& session) override {}
