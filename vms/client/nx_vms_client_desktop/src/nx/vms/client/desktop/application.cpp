@@ -231,7 +231,9 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
         qunsetenv("RESOURCE_NAME");
     #endif
 
-    nx::media::DecoderRegistrar::registerDecoders({}, true, true);
+    nx::media::DecoderRegistrar::Config config;
+    config.enableHardwareDecoder = qnSettings->isHardwareDecodingEnabled();
+    nx::media::DecoderRegistrar::registerDecoders(config);
 
     const auto desktop = qApp->desktop();
     bool customScreen = startupParams.screen != QnStartupParameters::kInvalidScreen

@@ -12,6 +12,7 @@
 #include "ios_video_decoder.h"
 
 #include <nx/media/quick_sync/qsv_supported.h>
+
 #ifdef __QSV_SUPPORTED__
 #include "quick_sync/quick_sync_video_decoder.h"
 #endif // __QSV_SUPPORTED__
@@ -25,12 +26,9 @@
 namespace nx {
 namespace media {
 
-void DecoderRegistrar::registerDecoders(
-    const QMap<int, QSize>& maxFfmpegResolutions,
-    bool isTranscodingEnabled,
-    bool enableHardwareDecoderOnIPhone)
+void DecoderRegistrar::registerDecoders(const Config config)
 {
-    VideoDecoderRegistry::instance()->setTranscodingEnabled(isTranscodingEnabled);
+    VideoDecoderRegistry::instance()->setTranscodingEnabled(config.isTranscodingEnabled);
 
     // ATTENTION: Order of registration defines the priority of choosing: first comes first.
 
@@ -44,7 +42,7 @@ void DecoderRegistrar::registerDecoders(
     #endif
 
     #if defined(Q_OS_IOS)
-    if (enableHardwareDecoderOnIPhone)
+    if (config.enableHardwareDecoder)
     {
         static const int kHardwareDecodersCount = 1;
         VideoDecoderRegistry::instance()->addPlugin<IOSVideoDecoder>(kHardwareDecodersCount);
@@ -59,10 +57,11 @@ void DecoderRegistrar::registerDecoders(
     #endif
 
     {
-        FfmpegVideoDecoder::setMaxResolutions(maxFfmpegResolutions);
+        FfmpegVideoDecoder::setMaxResolutions(config.maxFfmpegResolutions);
 
-#ifdef __QSV_SUPPORTED__
-        //VideoDecoderRegistry::instance()->addPlugin<quick_sync::QuickSyncVideoDecoder>();
+#if defined(__QSV_SUPPORTED__)
+        if (config.enableHardwareDecoder)
+            //VideoDecoderRegistry::instance()->addPlugin<quick_sync::QuickSyncVideoDecoder>();
 #endif // __QSV_SUPPORTED__
         VideoDecoderRegistry::instance()->addPlugin<FfmpegVideoDecoder>();
         AudioDecoderRegistry::instance()->addPlugin<FfmpegAudioDecoder>();

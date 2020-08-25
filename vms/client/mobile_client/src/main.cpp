@@ -208,14 +208,12 @@ int runUi(QtSingleGuiApplication* application)
         }
     }
 
-    QMap<int, QSize> maxFfmpegResolutions;
-    maxFfmpegResolutions[(int) AV_CODEC_ID_NONE] = maxFfmpegResolution;
-    maxFfmpegResolutions[(int) AV_CODEC_ID_H265] = maxFfmpegHevcResolution;
-
-    nx::media::DecoderRegistrar::registerDecoders(
-        maxFfmpegResolutions,
-        /*isTranscodingEnabled*/ !context->liteMode(),
-        !forceSoftwareOnlyDecoderForIPhone);
+    nx::media::DecoderRegistrar::Config config;
+    config.enableHardwareDecoder = !forceSoftwareOnlyDecoderForIPhone;
+    config.maxFfmpegResolutions[(int) AV_CODEC_ID_NONE] = maxFfmpegResolution;
+    config.maxFfmpegResolutions[(int) AV_CODEC_ID_H265] = maxFfmpegHevcResolution;
+    config.isTranscodingEnabled = !context->liteMode();
+    nx::media::DecoderRegistrar::registerDecoders(config);
 
     #if defined(Q_OS_ANDROID)
         QUrl initialIntentData = getInitialIntentData();
