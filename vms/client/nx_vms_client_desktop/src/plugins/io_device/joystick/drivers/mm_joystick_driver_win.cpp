@@ -2,6 +2,8 @@
 
 #if defined(Q_OS_WIN)
 
+#include <chrono>
+
 #include <plugins/io_device/joystick/joystick_manager.h>
 
 #include <plugins/io_device/joystick/generic_joystick.h>
@@ -22,6 +24,7 @@ static const QString kStickObjectType = lit("stick");
 static constexpr int kDefaultStickLogicalRangeMin = -100;
 static constexpr int kDefaultStickLogicalRangeMax = 100;
 static constexpr int kUpdateConfigurationDelayMs = 100;
+static constexpr std::chrono::milliseconds kDefaultPollPeriod(50);
 
 } // namespace
 
@@ -32,7 +35,7 @@ namespace io_device {
 namespace joystick {
 namespace driver {
 
-MmWinDriver::MmWinDriver(HWND windowId) :
+MmWinDriver::MmWinDriver(HWND windowId):
     m_windowId(windowId),
     m_updateConfiguration(new utils::PendingOperation())
 {
@@ -44,6 +47,41 @@ MmWinDriver::MmWinDriver(HWND windowId) :
             if (auto manager = Manager::instance())
                 manager->notifyHardwareConfigurationChanged();
         });
+
+    // Windows has a bug with joystick notifications:
+    // If we call waveInGetNumDevs anywere (for example, in QAudioDeviceInfo::availableDevices(QAudio::AudioInput)),
+    // Windows can stop to send MM_JOY1MOVE etc messages, until we call joySetCapture second time.
+    // In order to avoid this, we poll joystick ourselves.
+
+    pollTimer.setInterval(kDefaultPollPeriod);
+    QObject::connect(&pollTimer, &QTimer::timeout,
+        [this]()
+        {
+            for (auto joystickIndex: m_capturedJoysticks)
+            {
+                JOYINFOEX joystickInfo;
+                joystickInfo.dwSize = sizeof(joystickInfo);
+                joystickInfo.dwFlags = JOY_RETURNALL;
+
+                auto status = JOYERR_BASE;
+
+                {
+                    QnMutexLocker lock(&m_mutex);
+                    status = safeJoyGetPosEx(joystickIndex, joystickInfo);
+                }
+
+                switch (status)
+                {
+                    case JOYERR_NOERROR:
+                        notifyJoystickStateChanged(joystickInfo, joystickIndex);
+                        break;
+                    case JOYERR_NOCANDO:
+                        notifyHardwareConfigurationChanged();
+                        return;
+                }
+            }
+        });
+    pollTimer.start();
 }
 
 MmWinDriver::~MmWinDriver()
@@ -62,6 +100,19 @@ MMRESULT MmWinDriver::safeJoyGetPos(uint joystickIndex, JOYINFO& info) const
     __except(EXCEPTION_EXECUTE_HANDLER)
     {
         logWarning("OS exception at joyGetPos");
+        return JOYERR_NOCANDO;
+    }
+}
+
+MMRESULT MmWinDriver::safeJoyGetPosEx(uint joystickIndex, JOYINFOEX& info) const
+{
+    __try
+    {
+        return joyGetPosEx(joystickIndex, &info);
+    }
+    __except(EXCEPTION_EXECUTE_HANDLER)
+    {
+        logWarning("OS exception at joyGetPosEx");
         return JOYERR_NOCANDO;
     }
 }
@@ -165,11 +216,10 @@ bool MmWinDriver::captureJoystick(JoystickPtr& joystickToCapture)
     if (!joystickIndex)
         return false;
 
-    const uint kDefaultPeriodMs = 50;
     if (m_capturedJoysticks.find(joystickIndex.get()) != m_capturedJoysticks.end())
         return true;
 
-    auto result = safeJoySetCapture(m_windowId, joystickIndex.get(), kDefaultPeriodMs, false);
+    auto result = safeJoySetCapture(m_windowId, joystickIndex.get(), 0, true);
 
     auto hwnd = m_windowId;
     auto jIndex = joystickIndex.get();
@@ -208,18 +258,6 @@ bool MmWinDriver::setControlState(
 {
     // No way to set control state via Windows Joystick API, so just ignore these calls.
     return true;
-}
-
-void MmWinDriver::notifyJoystickStateChanged(const JOYINFOEX& info, uint joystickIndex)
-{
-    QnMutexLocker lock(&m_mutex);
-    auto joy = getJoystickByIndexUnsafe(joystickIndex);
-
-    if (!joy)
-        return;
-
-    notifyJoystickButtonsStateChanged(joy, info.dwButtons);
-    notifyJoystickSticksStateChanged(joy, info);
 }
 
 void MmWinDriver::notifyHardwareConfigurationChanged()
@@ -309,6 +347,18 @@ JoystickPtr MmWinDriver::createJoystick(
     joy->setDriver(this);
 
     return joy;
+}
+
+void MmWinDriver::notifyJoystickStateChanged(const JOYINFOEX& info, uint joystickIndex)
+{
+    QnMutexLocker lock(&m_mutex);
+    auto joy = getJoystickByIndexUnsafe(joystickIndex);
+
+    if (!joy)
+        return;
+
+    notifyJoystickButtonsStateChanged(joy, info.dwButtons);
+    notifyJoystickSticksStateChanged(joy, info);
 }
 
 void MmWinDriver::notifyJoystickButtonsStateChanged(JoystickPtr& joy, DWORD buttonStates)

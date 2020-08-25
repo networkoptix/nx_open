@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore/QtGlobal>
+#include <QtCore/QTimer>
 
 #if defined(Q_OS_WIN)
 
@@ -43,7 +44,6 @@ public:
         const QString& controlId,
         const State& state) override;
 
-    void notifyJoystickStateChanged(const JOYINFOEX& info, uint joystickIndex);
     void notifyHardwareConfigurationChanged();
 
 private:
@@ -55,12 +55,14 @@ private:
         JOYCAPS joystickCapabitlities,
         int joystickIndex);
 
+    void notifyJoystickStateChanged(const JOYINFOEX& info, uint joystickIndex);
     void notifyJoystickButtonsStateChanged(JoystickPtr& joy, DWORD buttonStates);
     void notifyJoystickSticksStateChanged(JoystickPtr& joy, const JOYINFOEX& info);
 
     QString makeId(const QString& objectType, uint objectIndex);
 
     MMRESULT safeJoyGetPos(uint joystickIndex, JOYINFO& info) const;
+    MMRESULT safeJoyGetPosEx(uint joystickIndex, JOYINFOEX& info) const;
     MMRESULT safeJoyGetDevCaps(uint joystickIndex, JOYCAPS& caps) const;
     MMRESULT safeJoySetCapture(HWND hWnd, uint joystickIndex, UINT periodMs, bool changed) const;
     MMRESULT safeJoyReleaseCapture(uint joystickIndex) const;
@@ -73,6 +75,8 @@ private:
     std::vector<JoystickPtr> m_joysticks;
     std::unique_ptr<utils::PendingOperation> m_updateConfiguration;
     mutable QnMutex m_mutex;
+
+    QTimer pollTimer;
 };
 
 } // namespace driver

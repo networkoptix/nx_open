@@ -65,14 +65,6 @@ void Manager::loadDrivers(WId winId)
     m_drivers.emplace_back(new driver::MmWinDriver(hwndId));
 
     QApplication::instance()->installNativeEventFilter(new driver::JoystickEventFilter(hwndId));
-
-    // Workaroud for the bug:
-    // Windows doesn't send messages MM_JOY1MOVE, <...> after we call
-    // QAudioDeviceInfo::availableDevices(QAudio::AudioInput) in our code.
-    // More precisely, it happens after waveInGetNumDevs() inside it.
-    // But if the call below added to the current place, the messages are sent.
-    // TODO: Remove it, after joystick logic rebuild.
-    waveInGetNumDevs();
 #endif
 }
 

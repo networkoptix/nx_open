@@ -20,62 +20,15 @@ JoystickEventFilter::JoystickEventFilter(HWND windowId):
 
 JoystickEventFilter::~JoystickEventFilter()
 {
-
 }
 
-bool JoystickEventFilter::nativeEventFilter(const QByteArray &eventType, void* message, long* result)
+bool JoystickEventFilter::nativeEventFilter(const QByteArray& eventType, void* message, long* result)
 {
     auto winMessage = reinterpret_cast<MSG*>(message);
-
-    auto winMessageType = winMessage->message;
-    int joystickIndex = -1;
-
     auto mmDriver = MmWinDriver::instance();
-
-    if (isJoystickInteractionMessage(winMessage, &joystickIndex))
-    {
-        if (joystickIndex < 0)
-            return false;
-
-        JOYINFOEX info;
-        info.dwSize = sizeof(JOYINFOEX);
-        info.dwFlags = JOY_RETURNALL;
-
-        auto result  = joyGetPosEx(0, &info);
-
-        if (result != JOYERR_NOERROR)
-            return false;
-
-        mmDriver->notifyJoystickStateChanged(info, joystickIndex);
-    }
 
     if (isJoystickConnectivityMessage(winMessage))
         mmDriver->notifyHardwareConfigurationChanged();
-
-    return false;
-}
-
-bool JoystickEventFilter::isJoystickInteractionMessage(MSG* message, int* outJoystickNum)
-{
-    *outJoystickNum = -1;
-
-    auto messageType = message->message;
-
-    if (messageType == MM_JOY1MOVE
-        || messageType == MM_JOY1BUTTONDOWN
-        || messageType == MM_JOY1BUTTONUP)
-    {
-        *outJoystickNum = 0;
-        return true;
-    }
-
-    if (messageType == MM_JOY2MOVE
-        || messageType == MM_JOY2BUTTONDOWN
-        || messageType == MM_JOY2BUTTONUP)
-    {
-        *outJoystickNum = 1;
-        return true;
-    }
 
     return false;
 }

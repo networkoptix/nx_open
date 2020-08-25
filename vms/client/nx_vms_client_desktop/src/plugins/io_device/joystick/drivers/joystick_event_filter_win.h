@@ -19,10 +19,9 @@ class JoystickEventFilter: public QAbstractNativeEventFilter
 public:
     JoystickEventFilter(HWND windowId);
     virtual ~JoystickEventFilter();
-    virtual bool nativeEventFilter(const QByteArray &eventType, void* message, long* result) override;
+    virtual bool nativeEventFilter(const QByteArray& eventType, void* message, long* result) override;
 
 private:
-    bool isJoystickInteractionMessage(MSG* message, int* outJoystickNum);
     bool isJoystickConnectivityMessage(MSG* message);
 
 private:
