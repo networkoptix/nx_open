@@ -35,7 +35,7 @@ std::variant<QByteArray, FileSignature::Result> FileSignature::sign(
 }
 
 std::variant<QByteArray, FileSignature::Result> FileSignature::sign(
-    QinputDevice& inputDevice, const QByteArray& privateKey)
+    QIODevice& inputDevice, const QByteArray& privateKey)
 {
     if (privateKey.isEmpty())
         return FileSignature::Result::failed;
@@ -93,7 +93,7 @@ FileSignature::Result FileSignature::verify(
 }
 
 FileSignature::Result FileSignature::verify(
-    QinputDevice& inputDevice, const QByteArray& publicKey, const QByteArray& signature)
+    QIODevice& inputDevice, const QByteArray& publicKey, const QByteArray& signature)
 {
     if (signature.isEmpty() || publicKey.isEmpty())
         return FileSignature::Result::failed;
