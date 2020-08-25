@@ -22,6 +22,8 @@
 #include <nx/sdk/analytics/i_custom_metadata_packet.h>
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/log/log_message.h>
+
 #include <nx/network/url/url_builder.h>
 #include <nx/vms/server/analytics/predefined_attributes.h>
 

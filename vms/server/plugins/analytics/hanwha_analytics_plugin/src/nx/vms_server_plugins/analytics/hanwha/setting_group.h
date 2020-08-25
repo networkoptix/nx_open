@@ -10,6 +10,9 @@
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/settings_response.h>
 
+#include <nx/utils/log/log.h>
+#include <nx/utils/log/log_message.h>
+
 #include "setting_primitives.h"
 #include "setting_primitives_io.h"
 #include "device_response_json_parser.h" //< low level parsing
