@@ -34,54 +34,18 @@
             "ifMatches": "HumanBody.Clothing.Hat.Wear",
             "replaceWith": "WearsHat"
         },
-
         {
-            "ifMatches": "HumanBody.Clothing.Bottoms.Color.ColorCluster.ColorString",
+            "ifMatches": "HumanBody.Clothing.Bottoms.Color.ColorCluster*",
             "replaceWith": "BottomClothingColor"
         },
-        {
-            "ifMatches": "HumanBody.Clothing.Bottoms.Color.ColorCluster[1].ColorString",
-            "replaceWith": "BottomClothingColor"
-        },
-        {
-            "ifMatches": "HumanBody.Clothing.Bottoms.Color.ColorCluster[2].ColorString",
-            "replaceWith": "BottomClothingColor"
-        },
-        {
-            "ifMatches": "HumanBody.Clothing.Bottoms.Color.ColorCluster[3].ColorString",
-            "replaceWith": "BottomClothingColor"
-        },
-        {
-            "ifMatches": "HumanBody.Clothing.Bottoms.Color.ColorCluster[4].ColorString",
-            "replaceWith": "BottomClothingColor"
-        },
-
         {
             "ifMatches": "HumanBody.Clothing.Bottoms.Length",
             "replaceWith": "BottomClothingLength"
         },
-
         {
-            "ifMatches": "HumanBody.Clothing.Tops.Color.ColorCluster.ColorString",
+            "ifMatches": "HumanBody.Clothing.Tops.Color.ColorCluster*",
             "replaceWith": "TopClothingColor"
         },
-        {
-            "ifMatches": "HumanBody.Clothing.Tops.Color.ColorCluster[1].ColorString",
-            "replaceWith": "TopClothingColor"
-        },
-        {
-            "ifMatches": "HumanBody.Clothing.Tops.Color.ColorCluster[2].ColorString",
-            "replaceWith": "TopClothingColor"
-        },
-        {
-            "ifMatches": "HumanBody.Clothing.Tops.Color.ColorCluster[3].ColorString",
-            "replaceWith": "TopClothingColor"
-        },
-        {
-            "ifMatches": "HumanBody.Clothing.Tops.Color.ColorCluster[4].ColorString",
-            "replaceWith": "TopClothingColor"
-        },
-
         {
             "ifMatches": "HumanBody.Clothing.Tops.Length",
             "replaceWith": "TopClothingLength"
@@ -92,7 +56,7 @@
             "replaceWith": "CarryBag"
         },
         {
-            "ifMatches": "*.Color.ColorCluster.ColorString",
+            "ifMatches": "*.Color.ColorCluster*",
             "replaceWith": "Color"
         },
         {
