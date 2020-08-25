@@ -338,7 +338,6 @@ const QString YES = "yes";
 const QString NO = "no";
 const QString MEDIATOR_ADDRESS_UPDATE = "mediatorAddressUpdate";
 
-static const int kPublicIpUpdateTimeoutMs = 60 * 2 * 1000;
 static nx::utils::log::Tag kLogTag(typeid(MediaServerProcess));
 
 static const int kMinimalGlobalThreadPoolSize = 4;
@@ -3767,7 +3766,7 @@ void MediaServerProcess::startPublicIpDiscovery()
     connect(m_ipDiscovery.get(), &nx::network::PublicIPDiscovery::found,
         this, &MediaServerProcess::at_updatePublicAddress);
 
-    m_updatePiblicIpTimer->start(kPublicIpUpdateTimeoutMs);
+    m_updatePiblicIpTimer->start(ini().publicIpDiscoveryIntervalMs);
 }
 
 void MediaServerProcess::resetSystemState(

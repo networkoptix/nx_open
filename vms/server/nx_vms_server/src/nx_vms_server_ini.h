@@ -62,6 +62,9 @@ struct Ini: public nx::kit::IniConfig
 
     NX_INI_INT(60000, checkLicenseIntervalMs, "How often to check wheter a license is expired. "
         "The default value is the maximum allowed value.");
+
+    NX_INI_INT(120000, publicIpDiscoveryIntervalMs,
+        "How often to perform the server's public IP address discovery");
 };
 
 inline Ini& ini()
