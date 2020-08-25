@@ -3114,29 +3114,45 @@ CameraDiagnostics::Result QnPlOnvifResource::fetchChannelCount(bool limitedByEnc
 
     if (limitedByEncoders && m_maxChannels > 1)
     {
-        VideoConfigsReq confRequest;
-        VideoConfigsResp confResponse;
-        // Get encoder list.
-        soapRes = soapWrapper.getVideoEncoderConfigurations(confRequest, confResponse);
-        if (soapRes != SOAP_OK)
+        bool isMedia2Supported = !m_serviceUrls.media2ServiceUrl.isEmpty();
+
+        int encoderCount = 0;
+        if (isMedia2Supported)
         {
-            NX_DEBUG(this, makeSoapFailMessage(
-                soapWrapper, __func__, "GetVideoEncoderConfigurations", soapRes));
-
-            return CameraDiagnostics::RequestFailedResult(
-                "getVideoEncoderConfigurations", soapWrapper.getLastErrorDescription());
+            Media2::VideoEncoderConfigurations videoEncoder2Configurations(this);
+            if (videoEncoder2Configurations.receiveBySoap())
+            {
+                encoderCount = (int) videoEncoder2Configurations.get()->Configurations.size();
+                NX_VERBOSE(this, makeSoapSuccessMessage(
+                    soapWrapper, __func__, "Media2::GetVideoEncoderConfigurations"));
+            }
+            else
+            {
+                NX_DEBUG(this, makeSoapFailMessage(
+                    videoEncoder2Configurations.innerWrapper(), __func__,
+                    "Media2::GetVideoEncoderConfigurations", videoEncoder2Configurations.soapError()));
+            }
         }
-        else
+
+        if (encoderCount == 0)
         {
-            NX_VERBOSE(this, makeSoapSuccessMessage(
-                soapWrapper, __func__, "getVideoEncoderConfigurations"));
+            // Try via media 1
+            Media::VideoEncoderConfigurations videoEncoder1Configurations(this);
+            if (videoEncoder1Configurations.receiveBySoap())
+            {
+                encoderCount = (int)videoEncoder1Configurations.get()->Configurations.size();
+                NX_VERBOSE(this, makeSoapSuccessMessage(
+                    soapWrapper, __func__, "Media1::GetVideoEncoderConfigurations"));
+            }
+            else
+            {
+                NX_DEBUG(this, makeSoapFailMessage(
+                    videoEncoder1Configurations.innerWrapper(), __func__,
+                    "Media1::GetVideoEncoderConfigurations", videoEncoder1Configurations.soapError()));
+                return CameraDiagnostics::RequestFailedResult(
+                    "getVideoEncoderConfigurations", videoEncoder1Configurations.soapErrorAsString());
+            }
         }
-
-        int encoderCount = (int)confResponse.Configurations.size();
-
-        //######################
-        // we should also get encoder count via media2
-        //######################
 
         if (encoderCount < m_maxChannels)
             m_maxChannels = encoderCount;
