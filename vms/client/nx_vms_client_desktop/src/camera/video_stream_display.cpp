@@ -476,17 +476,20 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
     }
 
 
-    m_mtx.lock();
-    auto dec = m_decoderData.decoder.get();
-    if (!dec || m_decoderData.compressionType != data->compressionType)
+    QnAbstractVideoDecoder* dec = nullptr;
     {
-        if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
-            return Status_Skipped;
-        dec = createVideoDecoder(data, enableFrameQueue);
-        m_decoderData.decoder.reset(dec);
-        m_decoderData.compressionType = data->compressionType;
+        QnMutexLocker lock(&m_mtx);
+        dec = m_decoderData.decoder.get();
+        if (!dec || m_decoderData.compressionType != data->compressionType)
+        {
+            if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
+                return Status_Skipped;
+
+            dec = createVideoDecoder(data, enableFrameQueue);
+            m_decoderData.decoder.reset(dec);
+            m_decoderData.compressionType = data->compressionType;
+        }
     }
-    m_mtx.unlock();
 
     QnFrameScaler::DownscaleFactor scaleFactor = QnFrameScaler::factor_unknown;
     if (dec->getWidth() > 0)
