@@ -77,10 +77,17 @@ void ObjectTrackBestShotProxy::processObjectMetadataPacket(
 
 void ObjectTrackBestShotProxy::stop()
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
     m_stopped = true;
+    std::promise<void> promise;
+    m_timer.post(
+        [this, &promise]()
+        {
+            m_timer.pleaseStopSync();
+            promise.set_value();
+        });
+    promise.get_future().wait();
+    NX_MUTEX_LOCKER lock(&m_mutex);
     cleanUpOldTracks();
-    m_timer.cancelSync();
 }
 
 void ObjectTrackBestShotProxy::assignBestShotFromPacket(

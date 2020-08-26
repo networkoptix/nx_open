@@ -68,7 +68,7 @@ private:
     nx::network::aio::Timer m_timer;
     std::map<QnUuid, TrackContext> m_trackContexts;
 
-    bool m_stopped = false;
+    std::atomic<bool> m_stopped = false;
 };
 
 } // namespace nx::vms::server::analytics
