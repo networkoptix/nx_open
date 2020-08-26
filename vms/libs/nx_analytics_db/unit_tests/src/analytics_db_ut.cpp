@@ -311,11 +311,10 @@ protected:
         return m_attributeDictionary;
     }
 
-    std::vector<common::metadata::ObjectMetadataPacketPtr> generateEventsByCriteria()
+    std::vector<common::metadata::ObjectMetadataPacketPtr> generateEventsByCriteria(
+        int eventsPerDevice = 11)
     {
         using namespace std::chrono;
-
-        const int eventsPerDevice = 11;
 
         std::vector<common::metadata::ObjectMetadataPacketPtr> analyticsDataPackets;
         for (const auto& deviceId: m_allowedDeviceIds)
@@ -1238,11 +1237,32 @@ protected:
 
         generateVariousEvents();
     }
+
+    void generateALotOfTracks()
+    {
+        setAllowedTimeRange(
+            std::chrono::system_clock::now() - std::chrono::hours(24) * 365,
+            std::chrono::system_clock::now());
+
+        saveAnalyticsDataPackets(generateEventsByCriteria(1234), flush);
+    }
 };
 
 TEST_F(AnalyticsDbLookup, empty_filter_matches_all_tracks)
 {
     whenLookupByEmptyFilter();
+    thenResultMatchesExpectations();
+}
+
+TEST_F(AnalyticsDbLookup, looking_up_a_lot_of_tracks)
+{
+    generateALotOfTracks();
+
+    givenEmptyFilter();
+    filter().maxObjectTracksToSelect = kMaxObjectLookupResultSet;
+
+    whenLookupObjectTracks();
+
     thenResultMatchesExpectations();
 }
 
