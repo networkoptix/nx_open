@@ -80,7 +80,7 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/advanced_settings_widget.ui"/>
       <source>Downmix Audio from 5.1 to 2.1</source>
-      <translation>오디오를 5.1채널에서 2.1채널까지 다운 믹스</translation>
+      <translation>5.1채널 사운드를 스테레오로 다운 믹스</translation>
     </message>
     <message>
       <location/>
