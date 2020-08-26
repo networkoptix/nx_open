@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.3.600",
+    "version": "4.1.3.700",
     "data": [
         {
             "keys": [
@@ -4334,7 +4334,8 @@
         },
         {
             "keys": [
-                "Hikvision|DS-9664NI-I16"
+                "Hikvision|DS-9664NI-I16",
+                "Hikvision|DS-9632NI-I8"
             ],
             "fetchVideoSourceConfigurationsViaProfiles": true
         },
@@ -4587,8 +4588,8 @@
                     }
                 }
             }
-		},
-		{
+                },
+                {
             "_comment": "Used to change (usually increase) timeouts for SoapWrapper onvif requests",
             "__comment": "Format: four comma separated values for send, recv, connect, accept timeouts OR one value - the same for all four timeouts",
             "keys": [ "QWL|AU2" ],
