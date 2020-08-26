@@ -13,6 +13,7 @@
 #define NX_PRINT_PREFIX (this->logUtils.printPrefix)
 #include <nx/kit/debug.h>
 #include <nx/kit/utils.h>
+#include <nx/kit/json.h>
 
 #include <nx/sdk/analytics/i_motion_metadata_packet.h>
 
@@ -489,26 +490,19 @@ void DeviceAgent::getPluginSideSettings(
 {
     const auto response = new SettingsResponse();
     response->setValue("pluginSideTestSpinBox", "100");
-    response->setValue("testPolygon", R"json(
-        {
-            "figure": {
-                "points": [
-                    [
-                        0.138,
-                        0.551
-                    ],
-                    [
-                        0.775,
-                        0.429
-                    ],
-                    [
-                        0.748,
-                        0.844
-                    ]
-                ]
-            }
-        })json");
 
+    nx::kit::Json::array jsonPoints{
+        nx::kit::Json::array{0.138, 0.551},
+        nx::kit::Json::array{0.775, 0.429},
+        nx::kit::Json::array{0.748, 0.844}};
+
+    nx::kit::Json::object jsonFigure;
+    jsonFigure.insert(std::make_pair("points", jsonPoints));
+
+    nx::kit::Json::object jsonResult;
+    jsonResult.insert(std::make_pair("figure", jsonFigure));
+
+    response->setValue("testPolygon", nx::kit::Json(jsonResult).dump());
     *outResult = response;
 }
 
