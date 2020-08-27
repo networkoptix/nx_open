@@ -146,24 +146,28 @@ void ClientUpdateTool::verifyUpdateFile()
     m_verificationResult = std::async(std::launch::async,
         [this]()
         {
+            auto result = common::FileSignature::Result::failed;
+
             if (ini().skipUpdateFilesVerification)
-                return common::FileSignature::Result::ok;
-
-            common::FileSignature::Result result = common::FileSignature::Result::failed;
-
-            const QDir keysDir(":/update_verification_keys");
-            for (const QString& file: keysDir.entryList({"*.pem"}, QDir::Files, QDir::Name))
             {
-                const QString& fileName = keysDir.absoluteFilePath(file);
-                const QByteArray& key = common::FileSignature::readKey(fileName);
-                if (key.isEmpty())
-                    NX_WARNING(this, "Cannot load key from %1", fileName);
+                result = common::FileSignature::Result::ok;
+            }
+            else
+            {
+                const QDir keysDir(":/update_verification_keys");
+                for (const QString& file: keysDir.entryList({"*.pem"}, QDir::Files, QDir::Name))
+                {
+                    const QString& fileName = keysDir.absoluteFilePath(file);
+                    const QByteArray& key = common::FileSignature::readKey(fileName);
+                    if (key.isEmpty())
+                        NX_WARNING(this, "Cannot load key from %1", fileName);
 
-                result = common::FileSignature::verify(
-                    m_updateFile, key, m_clientPackage.signature);
+                    result = common::FileSignature::verify(
+                        m_updateFile, key, m_clientPackage.signature);
 
-                if (result == common::FileSignature::Result::ok)
-                    break;
+                    if (result == common::FileSignature::Result::ok)
+                        break;
+                }
             }
 
             QMetaObject::invokeMethod(
