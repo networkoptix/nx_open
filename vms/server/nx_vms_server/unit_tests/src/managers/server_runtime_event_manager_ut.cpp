@@ -71,7 +71,8 @@ protected:
 
         serverRuntimeEventManager->triggerDeviceAgentSettingsMaybeChangedEvent(
             kDeviceId,
-            kEngineId);
+            kEngineId,
+            SettingsData{});
     }
 
     void makeSureEventHasBeenDeliveredToServer(int serverIndex)
