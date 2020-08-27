@@ -29,6 +29,32 @@ const std::vector<ObjectType> kObjectTypes =
                     return vca && vca->faceDetection;
                 };
         }
+        {
+            auto& type = types.emplace_back();
+            type.nativeId = "Other";
+            type.nativeBehavior = "Missing";
+            type.id = "nx.vivotek.MissingObject";
+            type.prettyName = "Missing object";
+            type.isAvailable =
+                [](const auto& settings)
+                {
+                    auto& vca = settings.vca;
+                    return vca && vca->missingObjectDetection;
+                };
+        }
+        {
+            auto& type = types.emplace_back();
+            type.nativeId = "Other";
+            type.nativeBehavior = "Unattended";
+            type.id = "nx.vivotek.UnattendedObject";
+            type.prettyName = "Unattended object";
+            type.isAvailable =
+                [](const auto& settings)
+                {
+                    auto& vca = settings.vca;
+                    return vca && vca->missingObjectDetection;
+                };
+        }
         return types;
     }();
 

@@ -12,6 +12,7 @@ namespace nx::vms_server_plugins::analytics::vivotek {
 struct ObjectType
 {
     QString nativeId;
+    std::optional<QString> nativeBehavior;
     QString id;
     QString prettyName;
     std::function<bool(const CameraSettings& settings)> isAvailable =
