@@ -80,12 +80,16 @@ void DeviceAgent::doSetSettings(Result<const ISettingsResponse*>* outResult, con
     {
         CameraSettings settings;
 
-        settings.parseFromServer(*values);
+        if (!m_isFirstDoSetSettingsCall)
+        {
+            settings.parseFromServer(*values);
+            settings.storeTo(m_url);
+        }
 
-        settings.storeTo(m_url);
         settings.fetchFrom(m_url);
-
         *outResult = settings.serializeToServer().releasePtr();
+
+        m_isFirstDoSetSettingsCall = false;
     }
     catch (const Exception& exception)
     {

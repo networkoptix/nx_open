@@ -67,6 +67,8 @@ private:
     const nx::sdk::LogUtils m_logUtils;
     const nx::utils::Url m_url; //< `http://username:password@host:port` only
 
+    bool m_isFirstDoSetSettingsCall = true;
+
     nx::utils::TimeHelper m_timestampAdjuster;
 
     nx::sdk::Ptr<IHandler> m_handler;
