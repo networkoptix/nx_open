@@ -68,6 +68,14 @@ public:
      *
      * After creating the new IDeviceAgent instance, this method is called after manifest().
      *
+     * ATTENTION: If the DeviceAgent has some plugin-side settings (see pluginSideSettings()) which
+     * are hosted in the backend (e.g. on the Device) and potentially can be changed by the user
+     * directly on that backend, their values must be ignored in this function when it is called
+     * for the first time after the creation of the DeviceAgent. Otherwise, these values, which
+     * technically are the values last known to the Server, may override the values stored in the
+     * backend and potentially changed by the user directly during the period when the DeviceAgent
+     * did not exist (i.e., Analytics has been turned off for this Device).
+     *
      * @param settings Values of settings conforming to the Settings Model. Never null.
      *
      * @return An error code with a message in case of some general failure that affected the
