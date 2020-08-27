@@ -1184,7 +1184,10 @@
                 "hn-6616|focushns",
                 "dw-enhd16|flats1040-encoder",
                 "tve-820|truvision encoder",
-                "ds-9632ni-i8|network video recorder"
+                "ds-9632ni-i8|network video recorder",
+                "geovision|gv-vs2420",
+                "geovision|gv-vs21600",
+                "bosch|vip_x16_xf_e"
             ],
             "analogEncoder": true
         },
@@ -3608,7 +3611,15 @@
             "onvif|vx-8s-180-awd",
             "avigilon|24c-h4a-3mh-270",
             "hikvision|DS-2PT5326*",
-            "hikvision|DS-2PT3122*"
+            "hikvision|DS-2PT3122*",
+            "invid-1|par-p8panmulti",
+            "m16a|mobotix m16a",
+            "arecontvision|*",
+            "hikvision|ds-2cd6d82g0-ihs",
+            "dahua|dh-ipc-pdbw8800n-a180",
+            "avigilon|15c-h4a-3mh-270",
+            "ms9321-ehv|vivotek ms9321-ehv",
+            "univiewtec|ipbp4k180"
             ],
             "canShareLicenseGroup": true
         },
