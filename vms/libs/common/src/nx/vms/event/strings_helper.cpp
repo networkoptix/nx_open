@@ -40,25 +40,13 @@ QString poeConsumptionValue(double value)
     return QString::number(value, 'f', 1);
 }
 
+static const int kMaxValuesInGroup = 2;
+
 } // namespace
 
 namespace nx {
 namespace vms {
 namespace event {
-
-QString serializeAttributes(const nx::common::metadata::Attributes& attributes, const QString& kDelimiter)
-{
-    QString result;
-    for (const auto& attribute: attributes)
-    {
-        if (nx::analytics::isAnalyticsAttributeHidden(attribute.name))
-            continue;
-        if (!result.isEmpty())
-            result += kDelimiter;
-        result += NX_FMT("%1: %2", attribute.name, attribute.value);
-    }
-    return result;
-}
 
 QString serializeAttributes(const std::vector<nx::common::metadata::AttributeGroup>& attributes, const QString& kDelimiter)
 {
@@ -320,8 +308,6 @@ QStringList StringsHelper::eventDescription(const AbstractActionPtr& action,
     {
         if (!params.caption.isEmpty() && !params.description.startsWith(params.caption))
             result << tr("Caption: %1").arg(params.caption);
-        if (!params.attributes.empty())
-            result << tr("Attributes: %1").arg(serializeAttributes(params.attributes, ", "));
     }
 
     if (eventType == EventType::poeOverBudgetEvent)
@@ -427,7 +413,9 @@ QStringList StringsHelper::eventDetails(const EventParameters& params) const
             {
                 if (!message.isEmpty())
                     message += ". ";
-                message += serializeAttributes(params.attributes, ", ");
+                message += serializeAttributes(
+                    nx::common::metadata::groupAttributes(params.attributes, kMaxValuesInGroup),
+                    "; ");
             }
 
             result << message;
@@ -973,7 +961,6 @@ QString StringsHelper::notificationCaption(
                 : parameters.caption;
             if (!parameters.attributes.empty())
             {
-                static const int kMaxValuesInGroup = 2;
                 using namespace nx::common::metadata;
                 auto attrGroups = groupAttributes(parameters.attributes, kMaxValuesInGroup);
                 const QString kDelimiter = "\n";
