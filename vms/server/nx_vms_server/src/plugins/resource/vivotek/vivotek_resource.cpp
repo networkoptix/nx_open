@@ -26,9 +26,9 @@ const QString kSetParameterPath = lit("/cgi-bin/admin/setparam.cgi");
 const QString kInvalid = lit("ERR_INVALID");
 const QString kHevcCodecString = lit("h265");
 
-const QString kGeneralCodecCapability = lit("capability_videoin_codec");
+const QString kGeneralCodecCapability = lit("codec");
 // codec capability per stream
-const QString kStreamCodecCapabilities = lit("capability_videoin_streamcodec");
+const QString kStreamCodecCapabilities = lit("streamcodec");
 
 const std::chrono::milliseconds kHttpTimeout(5000);
 
@@ -227,7 +227,7 @@ bool VivotekResource::doVivotekRequest(
 boost::optional<QString> VivotekResource::getVivotekParameter(const QString& param) const
 {
     auto url = nx::utils::Url(getUrl());
-    auto query = QUrlQuery(param);
+    auto query = QUrlQuery(QString("capability_videoin_") + param);
     url.setPath(kGetParameterPath);
     url.setQuery(query);
 
@@ -259,7 +259,7 @@ CameraDiagnostics::Result VivotekResource::setVivotekParameter(
     if (!doVivotekRequest(url, &dummyParameterName, &dummyParameterValue))
     {
         return CameraDiagnostics::RequestFailedResult(
-            NX_FMT("Can't configure parameter %1 for stream %2", 
+            NX_FMT("Can't configure parameter %1 for stream %2",
                 parameterName,
                 isPrimary ? "primary" : "secondary"),
             "Request failed.");

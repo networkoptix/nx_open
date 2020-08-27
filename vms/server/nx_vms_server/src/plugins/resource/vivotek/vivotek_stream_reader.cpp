@@ -26,6 +26,19 @@ CameraDiagnostics::Result VivotekStreamReader::fetchUpdateVideoEncoder(
 
     // Setup fps and bitrate for H.265 codec via native API.
 
+    const auto paramName = NX_FMT("c%1_dintraperiod_support", vivotekResource->getChannel());
+    auto paramValue = vivotekResource->getVivotekParameter(paramName);
+    if (paramValue && paramValue->toInt() > 0)
+    {
+        auto result = vivotekResource->setVivotekParameter("h264_dintraperiod_enable", "0", isPrimary);
+        if (!result)
+            return result;
+
+        result = vivotekResource->setVivotekParameter("h265_dintraperiod_enable", "0", isPrimary);
+        if (!result)
+            return result;
+    }
+
     if (!qFuzzyIsNull(params.bitrateKbps))
     {
         const auto result = vivotekResource->setVivotekParameter(

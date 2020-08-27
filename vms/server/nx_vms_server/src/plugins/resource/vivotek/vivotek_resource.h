@@ -43,6 +43,7 @@ public:
 
     CameraDiagnostics::Result setVivotekParameter(
         const QString& parameterName, const QString& parameterValue, bool isPrimary) const;
+    boost::optional<QString> getVivotekParameter(const QString& param) const;
 protected:
     virtual nx::vms::server::resource::StreamCapabilityMap getStreamCapabilityMapFromDriver(
         StreamIndex streamIndex) override;
@@ -67,7 +68,6 @@ private:
         QString* outValue) const;
 
     bool doVivotekRequest(const nx::utils::Url& url, QString* outParameterName, QString* outParameterValue) const;
-    boost::optional<QString> getVivotekParameter(const QString& param) const;
 
 private:
     boost::optional<bool> m_hasHevcSupport;

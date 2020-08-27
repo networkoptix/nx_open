@@ -26,7 +26,7 @@ using StreamIndex = nx::vms::api::StreamIndex;
 
 namespace {
 
-static constexpr int kMaxGopLen = 250;
+static constexpr int kMaxGopLen = 300;
 static constexpr int kRoundFactor = 4;
 static constexpr int kGetFrameExtraTriesPerChannel = 10;
 
