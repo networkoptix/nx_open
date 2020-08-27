@@ -732,8 +732,7 @@ StorageResourceList MediaServerProcess::processExistingStorages()
 class StorageManagerWatcher
 {
 public:
-    StorageManagerWatcher(QnMediaServerModule* serverModule):
-        m_serverModule(serverModule)
+    StorageManagerWatcher(QnMediaServerModule* serverModule): m_serverModule(serverModule)
     {
         m_normalManagerConnection = QObject::connect(
             serverModule->normalStorageManager(),
@@ -774,8 +773,8 @@ public:
 
         QObject::disconnect(m_normalManagerConnection);
         QObject::disconnect(m_backupManagerConnection);
-        m_serverModule->normalStorageManager()->initDone();
-        m_serverModule->backupStorageManager()->initDone();
+        m_serverModule->normalStorageManager()->forceStorageTest();
+        m_serverModule->backupStorageManager()->forceStorageTest();
     }
 
 private:

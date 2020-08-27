@@ -606,79 +606,6 @@ private:
     }
 };
 
-class TestStorageThread: public QnLongRunnable
-{
-public:
-    TestStorageThread(
-        QnStorageManager* owner,
-        const nx::vms::server::Settings* settings,
-        const char* threadName = nullptr)
-        :
-        m_owner(owner),
-        m_settings(settings)
-    {
-        if (threadName)
-            setObjectName(threadName);
-    }
-    virtual void run() override
-    {
-        NX_DEBUG(this, "Starting to test storages");
-        for (const auto& storage : storagesToTest())
-        {
-            NX_DEBUG(this, "Testing storage %1", nx::utils::url::hidePassword(storage->getUrl()));
-            if (needToStop())
-                return;
-
-            Qn::ResourceStatus status =
-                storage->initOrUpdate() == Qn::StorageInit_Ok ? Qn::Online : Qn::Offline;
-            if (storage->getStatus() != status)
-                m_owner->changeStorageStatus(storage, status);
-
-            if (status == Qn::Online)
-            {
-                const auto space = QString::number(storage->getTotalSpace());
-                if (storage->setProperty(ResourceDataKey::kSpace, space))
-                    m_owner->resourcePropertyDictionary()->saveParams(storage->getId());
-            }
-
-            NX_DEBUG(this, "Testing storage %1 done", nx::utils::url::hidePassword(storage->getUrl()));
-        }
-
-        m_owner->testStoragesDone();
-    }
-
-private:
-    QnStorageManager* m_owner = nullptr;
-    const nx::vms::server::Settings* m_settings = nullptr;
-
-    StorageResourceList storagesToTest()
-    {
-        StorageResourceList result = m_owner->getStorages();
-        std::sort(
-            result.begin(),
-            result.end(),
-            [this](const QnStorageResourcePtr& lhs, const QnStorageResourcePtr& rhs)
-            {
-                return isLocal(lhs) && !isLocal(rhs);
-            });
-
-        return result;
-    }
-
-    static bool isLocal(const QnStorageResourcePtr& storage)
-    {
-        QnFileStorageResourcePtr fileStorage = storage.dynamicCast<QnFileStorageResource>();
-        if (fileStorage)
-            return fileStorage->isLocal();
-
-        const auto localDiskType = QnLexical::serialized(nx::vms::server::PlatformMonitor::LocalDiskPartition);
-        const auto removableDiskType = QnLexical::serialized(nx::vms::server::PlatformMonitor::RemovableDiskPartition);
-        const auto storageType = storage->getStorageType();
-
-        return storageType == localDiskType || storageType == removableDiskType;
-    }
-};
-
 // -------------------- QnStorageManager --------------------
 
 QnStorageManager::QnStorageManager(
@@ -703,13 +630,6 @@ QnStorageManager::QnStorageManager(
 {
     NX_ASSERT(m_role == QnServer::StoragePool::Normal || m_role == QnServer::StoragePool::Backup);
     m_storageWarnTimer.restart();
-    m_testStorageThread = new TestStorageThread(
-        this,
-        &serverModule->settings(),
-        threadName
-        ? (std::string(threadName) + std::string("::TestStorageThread")).c_str()
-        : nullptr);
-
     m_oldStorageIndexes = deserializeStorageFile();
 
     connect(this->serverModule()->resourcePool(), &QnResourcePool::resourceAdded,
@@ -978,11 +898,6 @@ void QnStorageManager::scanMediaCatalog(
     replaceChunks(filter.scanPeriod, storage, std::move(newCatalog), cameraUuid, quality);
     if (auto ownCatalog = getFileCatalogInternal(cameraUuid, quality))
         ownCatalog->setHasArchiveRotated(false); //< Reset flag after rebuild archive.
-}
-
-void QnStorageManager::initDone()
-{
-    QTimer::singleShot(0, this, SLOT(testOfflineStorages()));
 }
 
 QMap<QString, QSet<int>> QnStorageManager::deserializeStorageFile()
@@ -1345,14 +1260,17 @@ void QnStorageManager::addStorage(const QnStorageResourcePtr& abstractStorage)
             this, "Storage. '%1' added to the pool",
             nx::utils::url::hidePassword(storage->getUrl()));
     }
+
     connect(
         storage.data(), SIGNAL(archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)),
         this, SLOT(at_archiveRangeChanged(const QnStorageResourcePtr &, qint64, qint64)),
         Qt::DirectConnection);
+
     connect(
         storage.data(), &QnStorageResource::isBackupChanged,
         this, &QnStorageManager::at_storageRoleChanged);
 
+    forceStorageTest();
     emit storageAdded(abstractStorage);
 }
 
@@ -1413,30 +1331,35 @@ void QnStorageManager::removeStorage(const QnStorageResourcePtr &storage)
         // remove existing storage record if exists
         for (StorageMap::iterator itr = m_storageRoots.begin(); itr != m_storageRoots.end();)
         {
-            if (itr.value()->getId() == storage->getId()) {
+            if (itr.value()->getId() == storage->getId())
+            {
                 storageIndex = itr.key();
-                NX_DEBUG(this, "%1 Removing storage %2 from %3 StorageManager",
+                NX_DEBUG(
+                    this, "%1 Removing storage %2 from %3 StorageManager",
                     Q_FUNC_INFO,
                     nx::utils::url::hidePassword(storage->getUrl()),
                     m_role == QnServer::StoragePool::Normal ? "Main" : "Backup");
+
                 itr = m_storageRoots.erase(itr);
                 break;
             }
-            else {
+            else
+            {
                 ++itr;
             }
         }
     }
+
     if (storageIndex != -1)
     {
+        QnMutexLocker lock(&m_mutexCatalog);
+        for (int i = 0; i < QnServer::ChunksCatalogCount; ++i)
         {
-            QnMutexLocker lock(&m_mutexCatalog);
-            for (int i = 0; i < QnServer::ChunksCatalogCount; ++i) {
-                for (const auto catalog: m_devFileCatalog[i].values())
-                    catalog->removeChunks(storageIndex);
-            }
+            for (const auto catalog: m_devFileCatalog[i].values())
+                catalog->removeChunks(storageIndex);
         }
     }
+
     disconnect(storage.data(), nullptr, this, nullptr);
 }
 
@@ -1488,12 +1411,6 @@ void QnStorageManager::removeAbsentStorages(const QnStorageResourceList &newStor
 QnStorageManager::~QnStorageManager()
 {
     this->disconnect();
-    // These threads below should've been stopped and destroyed manually by this moment.
-    {
-        QnMutexLocker lock(&m_testStorageThreadMutex);
-        NX_ASSERT(!m_testStorageThread);
-    }
-
     stopAsyncTasks();
 }
 
@@ -2568,35 +2485,67 @@ void QnStorageManager::startAuxTimerTasks()
         kRemoveEmptyDirsInterval);
 
     static const std::chrono::seconds kTestStorageInterval(40);
-    m_auxTasksTimerManager.addNonStopTimer(
-        [this](nx::utils::TimerId)
-        {
-            if (m_firstStoragesTestDone)
-                testOfflineStorages();
-        },
-        kTestStorageInterval,
-        kTestStorageInterval);
+    m_storageCheckRunner.start([this]() { testStorages(); }, kTestStorageInterval);
+
 }
 
-void QnStorageManager::testOfflineStorages()
+void QnStorageManager::testStorages()
 {
-    QnMutexLocker lock( &m_testStorageThreadMutex );
-    if (m_testStorageThread && !m_testStorageThread->isRunning())
-        m_testStorageThread->start();
+    const auto isLocal =
+        [](const auto& storage)
+        {
+            using namespace nx::vms::server;
+            QnFileStorageResourcePtr fileStorage = storage.dynamicCast<QnFileStorageResource>();
+            if (fileStorage)
+                return fileStorage->isLocal();
+
+            const auto localDiskType = QnLexical::serialized(PlatformMonitor::LocalDiskPartition);
+            const auto removableDiskType =
+                QnLexical::serialized(PlatformMonitor::RemovableDiskPartition);
+            const auto storageType = storage->getStorageType();
+
+            return storageType == localDiskType || storageType == removableDiskType;
+        };
+
+    auto allStorages = getStorages();
+    std::sort(
+        allStorages.begin(), allStorages.end(),
+        [&isLocal](const auto& s1, const auto& s2) { return isLocal(s1) && !isLocal(s2); });
+
+
+    NX_DEBUG(this, "Starting to test storages");
+    for (const auto& storage : allStorages)
+    {
+        NX_DEBUG(this, "Testing storage %1", nx::utils::url::hidePassword(storage->getUrl()));
+        if (serverModule()->isStopping())
+            return;
+
+        Qn::ResourceStatus status =
+            storage->initOrUpdate() == Qn::StorageInit_Ok ? Qn::Online : Qn::Offline;
+        if (storage->getStatus() != status)
+           changeStorageStatus(storage, status);
+
+        if (status == Qn::Online)
+        {
+            const auto space = QString::number(storage->getTotalSpace());
+            if (storage->setProperty(ResourceDataKey::kSpace, space))
+                resourcePropertyDictionary()->saveParams(storage->getId());
+        }
+
+        NX_DEBUG(this, "Testing storage %1 done", nx::utils::url::hidePassword(storage->getUrl()));
+    }
+
+    testStoragesDone();
+}
+
+void QnStorageManager::forceStorageTest()
+{
+    m_storageCheckRunner.forceCheck();
 }
 
 void QnStorageManager::stopAsyncTasks()
 {
-    {
-        QnMutexLocker lock( &m_testStorageThreadMutex );
-        if (m_testStorageThread)
-        {
-            m_testStorageThread->stop();
-            delete m_testStorageThread;
-            m_testStorageThread = 0;
-        }
-    }
-
+    m_storageCheckRunner.stop();
     m_archiveIndexer->stop();
     m_auxTasksTimerManager.stop();
 }
