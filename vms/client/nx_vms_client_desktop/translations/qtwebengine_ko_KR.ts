@@ -112,7 +112,7 @@
     </message>
     <message>
       <source>Open link in this window</source>
-      <translation>새 창에서 링크 열기</translation>
+      <translation>새 창으로 링크 열기</translation>
     </message>
     <message>
       <source>Toggle Play/Pause</source>
@@ -207,11 +207,11 @@
     </message>
     <message>
       <source>Open link in this window</source>
-      <translation>새 창에서 링크 열기</translation>
+      <translation>새 창으로 링크 열기</translation>
     </message>
     <message>
       <source>Open link in new background tab</source>
-      <translation>새로운 백그라운드 탭에서 열기</translation>
+      <translation>새 배경 탭으로 링크 열기</translation>
     </message>
     <message>
       <source>&amp;Bold</source>
@@ -326,11 +326,11 @@
     </message>
     <message>
       <source>Open link in new window</source>
-      <translation>새 창에서 링크 열기</translation>
+      <translation>새 창으로 링크 열기</translation>
     </message>
     <message>
       <source>Open link in new tab</source>
-      <translation>새 탭에서 링크 열기</translation>
+      <translation>새 탭으로 링크 열기</translation>
     </message>
     <message>
       <source>Copy link address</source>

@@ -123,11 +123,11 @@
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
-      <translation>Starter 라이센스를 이용하여 병합하려고 합니다.</translation>
+      <translation>스타터 라이선스를 이용하여 병합하려고 합니다.</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
-      <translation>오직 한개의 starter라이센스만 허용됩니다. 두번째 라이센스는 비활성화 됩니다.</translation>
+      <translation>오직 한개의 스타터 라이선스만 허용됩니다. 두번째 라이선스는 비활성화 됩니다.</translation>
     </message>
     <message>
       <source>Merge anyway?</source>
@@ -558,11 +558,11 @@
     </message>
     <message>
       <source>I/O Module Licenses</source>
-      <translation>IO장치 라이센스</translation>
+      <translation>I/O장치 라이선스</translation>
     </message>
     <message>
       <source>Start Licenses</source>
-      <translation>라이센스 시작</translation>
+      <translation>라이선스 시작</translation>
     </message>
     <message>
       <source>Invalid</source>
@@ -570,7 +570,7 @@
     </message>
     <message>
       <source>Invalid Licenses</source>
-      <translation>유효하지 않은 라이센스</translation>
+      <translation>유효하지 않은 라이선스</translation>
     </message>
     <message>
       <source>Free</source>
@@ -590,7 +590,7 @@
     </message>
     <message>
       <source>Bridge Licenses</source>
-      <translation>브릿지 라이센스</translation>
+      <translation>연결 인증</translation>
     </message>
     <message numerus="yes">
       <source>%n Time Licenses</source>
@@ -601,7 +601,7 @@
     <message numerus="yes">
       <source>%n Analog Licenses</source>
       <translation>
-        <numerusform>아날로그 라이센스 %n</numerusform>
+        <numerusform>아날로그 라이선스 %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -619,31 +619,31 @@
     <message numerus="yes">
       <source>%n Vmax Licenses</source>
       <translation>
-        <numerusform>%n Vmax 라이센스</numerusform>
+        <numerusform>%n Vmax 라이선스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Encoder Licenses</source>
       <translation>
-        <numerusform>%n 아날로그 인코더 라이센스</numerusform>
+        <numerusform>%n 아날로그 인코더 라이선스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Video Wall Licenses</source>
       <translation>
-        <numerusform>%n 비디오 월 라이센스</numerusform>
+        <numerusform>%n 비디오 월 라이선스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Module Licenses</source>
       <translation>
-        <numerusform>%n I / O 모듈 라이센스</numerusform>
+        <numerusform>%n I / O 모듈 라이선스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Start Licenses</source>
       <translation>
-        <numerusform>%n Start 라이센스</numerusform>
+        <numerusform>%n 스타트 라이선스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -655,17 +655,17 @@
     <message numerus="yes">
       <source>%n Invalid Licenses</source>
       <translation>
-        <numerusform>%n 유효하지 않은 라이센스</numerusform>
+        <numerusform>%n 유효하지 않은 라이선스</numerusform>
       </translation>
     </message>
     <message>
       <source>Free Licenses</source>
-      <translation>무료 라이센스</translation>
+      <translation>체험용 라이선스</translation>
     </message>
     <message numerus="yes">
       <source>%n Free Licenses</source>
       <translation>
-        <numerusform>%n 무료 라이센스</numerusform>
+        <numerusform>%n 체험용 라이선스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -686,21 +686,21 @@
       <source>%n/%1 Professional Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 프로페셔널 라이센스</numerusform>
+        <numerusform>%n/%1 Professional 라이선스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Edge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 에지 라이센스</numerusform>
+        <numerusform>%n/%1 Edge 라이선스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Vmax Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 Vmax 라이센스</numerusform>
+        <numerusform>%n/%1 Vmax 라이선스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -728,28 +728,28 @@
       <source>%n/%1 Start Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 시작 라이센스</numerusform>
+        <numerusform>%n/%1 스타트 라이선스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 무료 라이센스</numerusform>
+        <numerusform>%n/%1 체험용 라이선스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Bridge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 브리지 라이센스</numerusform>
+        <numerusform>%n/%1 브리지 라이선스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Invalid Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 유효하지 않은 라이센스</numerusform>
+        <numerusform>%n/%1 유효하지 않은 라이선스</numerusform>
       </translation>
     </message>
   </context>
@@ -792,7 +792,7 @@
     </message>
     <message>
       <source>License is expired</source>
-      <translation>라이센스 만료</translation>
+      <translation>라이선스 만료</translation>
     </message>
     <message>
       <source>Invalid type</source>
@@ -812,11 +812,11 @@
     </message>
     <message>
       <source>Only one starter license is allowed per System.</source>
-      <translation>시스템 당 하나의 스타터 라이센스 만 허용됩니다.</translation>
+      <translation>시스템 당 하나의 스타터 라이선스만 허용됩니다.</translation>
     </message>
     <message>
       <source>You already have one active starter license.</source>
-      <translation>이미 하나의 활성 스타터 라이센스가 있습니다.</translation>
+      <translation>이미 스타터 라이선스가 활성 되었습니다.</translation>
     </message>
   </context>
   <context>
@@ -1427,7 +1427,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
-      <translation>서버 &quot;%1&quot; 에 라이센스 문제가 있습니다.</translation>
+      <translation>서버 &quot;%1&quot; 에 라이선스 문제가 있습니다.</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has finished an archive backup</source>
@@ -1591,15 +1591,15 @@
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>라이센스가 충분하지 않습니다. 다음 장치에서 녹화 비활성화 되었습니다.</translation>
+      <translation>라이선스가 모두 사용 중 입니다. 다음 장치에서 녹화가 비활성화 되었습니다.</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>라이센스가 충분하지 않습니다. 다음 장치에서 녹화 비활성화 되었습니다.</translation>
+      <translation>라이선스가 모두 사용 중 입니다. 다음 장치에서 녹화가 비활성화 되었습니다.</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>라이센스가 충분하지 않습니다. 다음 장치에서 녹화 비활성화 되었습니다.</translation>
+      <translation>라이선스가 모두 사용 중 입니다. 다음 장치에서 녹화가 비활성화 되었습니다.</translation>
     </message>
     <message>
       <source>start</source>

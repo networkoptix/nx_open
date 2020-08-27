@@ -807,7 +807,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_license_panel_widget.ui"/>
       <source>Activate License...</source>
-      <translation>라이센스 활성화...</translation>
+      <translation>라이선스 활성화...</translation>
     </message>
   </context>
   <context>
@@ -864,7 +864,7 @@
     <message>
       <location/>
       <source>Activate License...</source>
-      <translation>라이센스 활성화...</translation>
+      <translation>라이선스 활성화...</translation>
     </message>
     <message>
       <location/>
@@ -1735,7 +1735,7 @@
     <message>
       <location filename="../src/ui/dialogs/license_details_dialog.ui"/>
       <source>License Details</source>
-      <translation>인증키 정보</translation>
+      <translation>라이선스 정보</translation>
     </message>
     <message>
       <location/>
@@ -1753,7 +1753,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/license_manager_widget.ui"/>
       <source>Active Licenses</source>
-      <translation>제품키 인증</translation>
+      <translation>라이선스 키 인증</translation>
     </message>
     <message>
       <location/>
@@ -1773,7 +1773,7 @@
     <message>
       <location/>
       <source>The software is licensed to</source>
-      <translation>소프트웨어를 라이센스</translation>
+      <translation>소프트웨어 라이선스</translation>
     </message>
   </context>
   <context>
@@ -1786,7 +1786,7 @@
     <message>
       <location/>
       <source>License issues:</source>
-      <translation>라이센스 문제:</translation>
+      <translation>라이선스 이슈:</translation>
     </message>
   </context>
   <context>
@@ -1794,12 +1794,12 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/license_widget.ui"/>
       <source>Manual Activation</source>
-      <translation>수동 인증</translation>
+      <translation>수동 활성화</translation>
     </message>
     <message>
       <location/>
       <source>Select License File...</source>
-      <translation>인증 파일 선택...</translation>
+      <translation>인증키 파일 선택...</translation>
     </message>
     <message>
       <location/>
@@ -1809,17 +1809,17 @@
     <message>
       <location/>
       <source>License will be bound to the current server</source>
-      <translation>인증키는 현재 서버에 사용됩니다</translation>
+      <translation>라이선스는 현재 서버에 귀속됩니다.</translation>
     </message>
     <message>
       <location/>
       <source>Activate Free License</source>
-      <translation>데모 제품키 인증</translation>
+      <translation>체험용 라이선스 활성화</translation>
     </message>
     <message>
       <location/>
       <source>Activate License</source>
-      <translation>제품키 인증</translation>
+      <translation>라이선스 활성화</translation>
     </message>
     <message>
       <location/>
@@ -1834,7 +1834,7 @@
     <message>
       <location/>
       <source>Invalid License Key</source>
-      <translation>잘못 된 라이센스 키</translation>
+      <translation>유효하지 않은 라이선스 키</translation>
     </message>
     <message>
       <location/>

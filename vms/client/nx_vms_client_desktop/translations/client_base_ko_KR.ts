@@ -412,15 +412,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Monitor</source>
-      <translation>모니터</translation>
+      <translation>서버 모니터링</translation>
     </message>
     <message>
       <source>Open in New Tab</source>
-      <translation>새 탭 열기</translation>
+      <translation>새 탭으로 열기</translation>
     </message>
     <message>
       <source>Monitor in New Tab</source>
-      <translation>새탭에서 화면 열기</translation>
+      <translation>새 탭으로 모니터링</translation>
     </message>
     <message>
       <source>Open in Alarm Layout</source>
@@ -428,11 +428,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Open in New Window</source>
-      <translation>새 창 열기</translation>
+      <translation>새 창으로 열기</translation>
     </message>
     <message>
       <source>Monitor in New Window</source>
-      <translation>새 윈도우에서 화면 열기</translation>
+      <translation>새 창으로 모니터링</translation>
     </message>
     <message>
       <source>Open Video Wall</source>
@@ -1003,19 +1003,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>License does not exist.</source>
-      <translation>라이센스는 존재 하지 않습니다.</translation>
+      <translation>존재하지 않는 라이선스 입니다.</translation>
     </message>
     <message>
       <source>License is disabled.</source>
-      <translation>라이센스가 비활성화되었습니다.</translation>
+      <translation>라이선스가 비활성화되었습니다.</translation>
     </message>
     <message>
       <source>License is inactive.</source>
-      <translation>라이센스가 비활성 상태입니다.</translation>
+      <translation>라이선스가 비활성 상태입니다.</translation>
     </message>
     <message>
       <source>Invalid license.</source>
-      <translation>유효하지 않은 라이센스</translation>
+      <translation>유효하지 않은 라이선스</translation>
     </message>
     <message>
       <source>License is trial.</source>
@@ -1023,15 +1023,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>License is in pending deactivation state, but has not been deactivated yet.</source>
-      <translation>라이센스가 비활성화 상태가 보류 중이지만 아직 비활성화되지 않았습니다.</translation>
+      <translation>라이선스가 비활성화 대기 상태로, 아직 비활성화 되지 않았습니다.</translation>
     </message>
     <message>
       <source>Number of deactivations exceeded limit for this license.</source>
-      <translation>라이센스의 비활성화 횟수가 한도를 초과했습니다.</translation>
+      <translation>라이선스의 비활성화 가능 횟수가 한도를 초과했습니다.</translation>
     </message>
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
-      <translation>이 라이센스가있는 서버의 하드웨어 ID가 라이센스가 활성화 된 하드웨어 ID와 일치하지 않습니다.</translation>
+      <translation>이 라이선스의 서버 하드웨어 ID가 라이선스가 활성화된 하드웨어 ID와 일치하지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -1259,7 +1259,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Failed to activate license</source>
-      <translation>라이센스를 활성화 하지 못했습니다.</translation>
+      <translation>라이선스를 활성화 하지 못했습니다.</translation>
     </message>
     <message>
       <source>Invalid data received.</source>
@@ -1271,7 +1271,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Invalid License Key</source>
-      <translation>잘못 된 라이센스 키</translation>
+      <translation>유효하지 않은 라이선스 키</translation>
     </message>
     <message>
       <source>Please make sure it is entered correctly.</source>
@@ -1287,23 +1287,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation>이 라이센스는 이미 활성화되어 있으며 하드웨어 ID %1에 연결되어 있습니다.</translation>
+      <translation>이 라이선스는 이미 활성화되어 있으며, 하드웨어 ID %1에 연결되어 있습니다.</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation>이 라이센스 %2 의 하드웨어 ID %1에서 활성화 되었습니다.</translation>
+      <translation>이 라이선스는 이미 %2 의 하드웨어 ID %1에서 활성화되어 있습니다.</translation>
     </message>
     <message>
       <source>License already activated on another server</source>
-      <translation>이미 다른 서버에서 활성화 된 라이센스 입니다</translation>
+      <translation>이미 다른 서버에서 활성화된 라이선스 입니다.</translation>
     </message>
     <message>
       <source>You already activated this license</source>
-      <translation>당신은 이미 라이센스를 활성화했습니다.</translation>
+      <translation>이 라이선스를 이미 활성화했습니다.</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation>라이센스 키를 수동으로 활성화하려면 %1에 연락하십시오.</translation>
+      <translation>라이선스 키를 수동으로 활성화하려면 %1에 연락하십시오.</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -1311,15 +1311,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>License activated</source>
-      <translation>라이센스 활성화</translation>
+      <translation>라이선스 활성화</translation>
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
-      <translation>문제를보고하려면 지역 / 라이센스 지원 부서에 연락하십시오.</translation>
+      <translation>문제를보고하려면 지역 / 라이선스 지원 부서에 연락하십시오.</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation>라이센스 키를 수동으로 활성화하려면 지역 / 라이센스 지원 부서에 연락하십시오.</translation>
+      <translation>라이선스 키를 수동으로 활성화하려면 지역 / 라이선스 지원 부서에 연락하십시오.</translation>
     </message>
   </context>
   <context>
@@ -1327,7 +1327,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
       <translation>
-        <numerusform>%n 라이센스를 비활성화 하지 못했습니다.</numerusform>
+        <numerusform>%n 개 라이선스를 비활성화 하지 못했습니다.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1362,16 +1362,16 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>License Server error</source>
-      <translation>라이센스 서버 오류</translation>
+      <translation>라이선스 서버 오류</translation>
     </message>
     <message>
       <source>Failed to remove license from Server</source>
-      <translation>서버에서 라이센스를 제거할 수 없습니다.</translation>
+      <translation>서버에서 라이선스를 제거할 수 없습니다.</translation>
     </message>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
       <translation>
-        <numerusform>%n 라이센스가 비활성화되었습니다.</numerusform>
+        <numerusform>%n 라이선스가 비활성화 되었습니다.</numerusform>
       </translation>
     </message>
   </context>
@@ -1385,7 +1385,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation>유효한 라이센스 키를 얻으려면 %1에 연락하십시오.</translation>
+      <translation>유효한 라이선스 키를 얻으려면 %1에 연락하십시오.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
@@ -1397,15 +1397,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation>유효한 라이센스 키를 얻으려면 지역 / 라이센스 지원에 연락십시오.</translation>
+      <translation>유효한 라이선스 키를 얻으려면 지역 / 라이선스 지원에 연락십시오.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
-      <translation>문제를보고하려면 지역 / 라이센스 지원 부서에 연락하십시오.</translation>
+      <translation>문제를보고하려면 지역 / 라이선스 지원 부서에 연락하십시오.</translation>
     </message>
     <message>
       <source>Please contact your Regional / License support:</source>
-      <translation>지역 / 라이센스 지원에 연락하십시오:</translation>
+      <translation>지역 / 라이선스 지원에 연락하십시오:</translation>
     </message>
   </context>
   <context>
@@ -1660,7 +1660,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Regional / License support</source>
-      <translation>지역 / 라이센스 지원</translation>
+      <translation>지역 / 라이선스 지원</translation>
     </message>
   </context>
   <context>
@@ -2105,11 +2105,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Name cannot be empty.</source>
-      <translation>이름을 반드시 입력해주세요</translation>
+      <translation>이름은 필수 정보 입니다.</translation>
     </message>
     <message>
       <source>Description cannot be empty</source>
-      <translation>설명은 비워 둘 수 없습니다.</translation>
+      <translation>설명은 필수 정보입니다.</translation>
     </message>
   </context>
   <context>
@@ -3750,11 +3750,11 @@ to %1</source>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>License Type</source>
-      <translation>인증키 방식</translation>
+      <translation>라이선스 유형</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation>인증키</translation>
+      <translation>라이선스 키</translation>
     </message>
     <message>
       <source>Locked to Hardware ID</source>
@@ -3793,7 +3793,7 @@ to %1</source>
     </message>
     <message>
       <source>License Key</source>
-      <translation>인증키</translation>
+      <translation>라이선스 키</translation>
     </message>
     <message>
       <source>Status</source>
@@ -3809,7 +3809,7 @@ to %1</source>
     </message>
     <message>
       <source>Expired</source>
-      <translation>만료됨</translation>
+      <translation>만료</translation>
     </message>
     <message>
       <source>OK</source>
@@ -3829,11 +3829,11 @@ to %1</source>
     </message>
     <message>
       <source>License is active</source>
-      <translation>라이센스 활성화 되었음</translation>
+      <translation>라이선스가 활성화 되었습니다.</translation>
     </message>
     <message>
       <source>License is expired</source>
-      <translation>라이센스 만료</translation>
+      <translation>라이선스 만료</translation>
     </message>
     <message>
       <source>Expires soon</source>
@@ -3850,7 +3850,7 @@ to %1</source>
     <message numerus="yes">
       <source>License expires in %n days</source>
       <translation>
-        <numerusform>%n 일에 라이센스 만료</numerusform>
+        <numerusform>%n 일 후에 라이선스가 만료됩니다.</numerusform>
       </translation>
     </message>
     <message>
@@ -3862,7 +3862,7 @@ to %1</source>
     <name>QnLicenseManagerWidget</name>
     <message>
       <source>You do not have a valid license installed.</source>
-      <translation>유효한 인증키가 설치 되어있지 않습니다.</translation>
+      <translation>유효한 라이선스 키가 설치 되어있지 않습니다.</translation>
     </message>
     <message>
       <source>Please activate your commercial or trial license.</source>
@@ -3878,12 +3878,12 @@ to %1</source>
     </message>
     <message>
       <source>Export licenses to a file</source>
-      <translation>라이센스 파일로 내보내기</translation>
+      <translation>라이선스 파일로 내보내기</translation>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
       <translation>
-        <numerusform>라이센스를 비활성화 하시겠습니까?</numerusform>
+        <numerusform>라이선스를 비활성화 하시겠습니까?</numerusform>
       </translation>
     </message>
     <message>
@@ -3929,7 +3929,7 @@ to %1</source>
     </message>
     <message>
       <source>Activate Free License</source>
-      <translation>무료 키 인증</translation>
+      <translation>체험용 라이선스 키 활성화</translation>
     </message>
     <message>
       <source>Open License File</source>
@@ -3941,16 +3941,16 @@ to %1</source>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation>활성화 키 파일을 얻으려면 제공된 라이센스 키와 하드웨어 ID를 %1에 보내십시오.</translation>
+      <translation>인증키 파일을 얻으려면 제공된 라이선스 키와 하드웨어 ID를 %1에 보내십시오.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation>활성화 키 파일을 얻으려면 제공된 라이센스 키 및 하드웨어 ID를 지역 / 라이센스 지원 부서로 보내십시오.</translation>
+      <translation>인증키 파일을 얻으려면 제공된 라이선스 키와 하드웨어 ID를 지역 / 라이센스 지원 부서로 보내십시오.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation>활성화 키 파일을 얻으려면 제공된 라이센스 키와 하드웨어 ID를 지역 / 라이센스 지원 부서(%1) 로 보내십시오.</translation>
+      <translation>인증키 파일을 얻으려면 제공된 라이선스 키와 하드웨어 ID를 지역 / 라이센스 지원 부서(%1) 로 보내십시오.</translation>
     </message>
   </context>
   <context>
@@ -4237,7 +4237,7 @@ to %1</source>
     </message>
     <message>
       <source>The login cannot be empty.</source>
-      <translation>로그인 정보는 비울 수 없습니다.</translation>
+      <translation>로그인은 필수 정보입니다.</translation>
     </message>
     <message>
       <source>New Server</source>
@@ -4361,7 +4361,7 @@ to %1</source>
     </message>
     <message>
       <source>Name cannot be empty</source>
-      <translation>이름을 비워둘 수 없습니다</translation>
+      <translation>이름은 필수 정보입니다.</translation>
     </message>
     <message>
       <source>Virtual Camera</source>
@@ -4887,7 +4887,7 @@ to %1</source>
     <name>QnResourceItemDelegate</name>
     <message>
       <source>Health Monitor</source>
-      <translation>상태 모니터</translation>
+      <translation>상태 모니터링</translation>
     </message>
   </context>
   <context>
@@ -5322,7 +5322,7 @@ to %1</source>
     </message>
     <message>
       <source>Server cannot be empty.</source>
-      <translation>서버는 비워둘 수 없습니다.</translation>
+      <translation>서버는 필수 정보입니다.</translation>
     </message>
     <message>
       <source>User</source>
@@ -5361,7 +5361,7 @@ to %1</source>
     </message>
     <message>
       <source>Password cannot be empty.</source>
-      <translation>비밀번호는 비울 수 없습니다.</translation>
+      <translation>비밀번호는 필수 정보입니다.</translation>
     </message>
     <message>
       <source>System Signature</source>
@@ -5501,7 +5501,7 @@ to %1</source>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>정식 키 인증</translation>
+      <translation>라이선스 활성화</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
@@ -5881,7 +5881,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Licenses</source>
-      <translation>인증키</translation>
+      <translation>라이선스</translation>
     </message>
     <message>
       <source>Email</source>
@@ -5916,7 +5916,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No licenses</source>
-      <translation>라이센스 없음</translation>
+      <translation>라이선스 없음</translation>
     </message>
     <message>
       <source>Email server is not set</source>
@@ -5948,11 +5948,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Any configuration changes except license activation are impossible.</source>
-      <translation>라이센스 활성화 외에 모든 설정 불가</translation>
+      <translation>라이선스 활성화를 제외한 모든 구성 변경은 불가능합니다.</translation>
     </message>
     <message>
       <source>You have no licenses.</source>
-      <translation>라이센스 없음</translation>
+      <translation>라이선스 없음</translation>
     </message>
     <message>
       <source>You cannot record video from cameras.</source>
@@ -6254,7 +6254,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnUserRoleSettingsWidget</name>
     <message>
       <source>Role name cannot be empty.</source>
-      <translation>이름은 비워둘 수 없습니다.</translation>
+      <translation>이름은 필수 정보입니다.</translation>
     </message>
     <message>
       <source>Role with same name already exists.</source>
@@ -6381,7 +6381,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Login cannot be empty.</source>
-      <translation>로그인 정보는 비울 수 없습니다.</translation>
+      <translation>로그인은 필수 정보입니다.</translation>
     </message>
     <message>
       <source>User with specified login already exists.</source>
@@ -6401,7 +6401,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Email cannot be empty.</source>
-      <translation>이메일은 비워둘 수 없습니다.</translation>
+      <translation>이메일은 필수 정보입니다.</translation>
     </message>
     <message>
       <source>Password</source>
@@ -6444,7 +6444,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnValidatorStrings</name>
     <message>
       <source>Email cannot be empty.</source>
-      <translation>이메일은 비워둘 수 없습니다.</translation>
+      <translation>이메일은 필수 정보입니다.</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -6452,7 +6452,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Password cannot be empty.</source>
-      <translation>비밀번호는 비울 수 없습니다.</translation>
+      <translation>비밀번호는 필수 정보입니다.</translation>
     </message>
     <message>
       <source>Avoid leading and trailing spaces.</source>
@@ -6526,7 +6526,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>URL cannot be empty.</source>
-      <translation>URL은 비어 있으면 안 됩니다</translation>
+      <translation>URL은 필수 정보입니다.</translation>
     </message>
     <message>
       <source>Wrong URL format.</source>
@@ -6608,7 +6608,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Total amount of licenses will decrease</source>
-      <translation>총 라이센스 수량은 줄어듭니다.</translation>
+      <translation>총 라이선스 수가 감소합니다.</translation>
     </message>
     <message>
       <source>Connecting to the current System...</source>
@@ -6681,7 +6681,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>System is in Safe Mode. It is not allowed to make any changes except license activation.</source>
-      <translation>안전 모드 상태입니다.. 라이센스 활성화를 제외 하 고 변경할 수 없습니다.</translation>
+      <translation>시스템 안전 모드 입니다. 라이선스 활성화 외에는 변경할 수 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -6793,7 +6793,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To enable this feature, please activate a Video Wall license.</source>
-      <translation>이 기능을 사용 하려면 비디오 월 라이센스를 활성화 하십시오.</translation>
+      <translation>이 기능을 사용 하려면 비디오 월 라이선스를 활성화 하십시오.</translation>
     </message>
     <message>
       <source>Failed to apply changes</source>
@@ -6825,7 +6825,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>More Video Wall licenses required</source>
-      <translation>추가 비디오 월 라이센스 필요</translation>
+      <translation>추가 비디오 월 라이선스가 필요합니다.</translation>
     </message>
     <message>
       <source>Control session cannot be started.</source>
@@ -6833,7 +6833,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cannot save empty matrix</source>
-      <translation>빈 매트릭스를 저장할 수 없습니다.</translation>
+      <translation>빈 매트릭스는 저장할 수 없습니다.</translation>
     </message>
     <message>
       <source>Screen is being controlled by another user</source>
@@ -6849,7 +6849,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Activate License...</source>
-      <translation>인증키 활성화...</translation>
+      <translation>라이선스 활성화 ...</translation>
     </message>
   </context>
   <context>
@@ -7613,7 +7613,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Use License</source>
       <translation>
-        <numerusform>라이센스 사용</numerusform>
+        <numerusform>라이선스 사용</numerusform>
       </translation>
     </message>
   </context>
@@ -7652,7 +7652,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
     <message>
       <source>License limit exceeded, recording will not be enabled.</source>
-      <translation>라이센스 제한 초과, 녹화 설정을 할 수 없습니다.</translation>
+      <translation>라이선스 제한을 초과하여, 녹화가 활성화되지 않습니다.</translation>
     </message>
     <message>
       <source>Recording Schedule</source>
@@ -8018,7 +8018,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Address field cannot be empty</source>
-      <translation>주소 칸은 비워 둘 수 없습니다</translation>
+      <translation>주소는 필수 정보입니다.</translation>
     </message>
   </context>
   <context>
@@ -8029,7 +8029,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To use the software you must agree with the end user license agreement</source>
-      <translation>소프트웨어를 사용하려면 사용자 라이센스 계약에 동의해야합니다</translation>
+      <translation>소프트웨어를 사용하려면 사용자 라이선스 계약에 동의해야합니다</translation>
     </message>
   </context>
   <context>
@@ -8258,7 +8258,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Name cannot be empty.</source>
-      <translation>이름을 반드시 입력해주세요</translation>
+      <translation>이름은 필수 정보입니다.</translation>
     </message>
     <message>
       <source>Select folder...</source>
@@ -9822,7 +9822,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>I accidentally assigned the license to a wrong machine</source>
-      <translation>실수로 잘못된 시스템에 라이센스를 할당했습니다.</translation>
+      <translation>실수로 잘못된 시스템에 라이선스를 할당했습니다.</translation>
     </message>
     <message>
       <source>Other Reason</source>
@@ -9830,12 +9830,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation>라이센스 비활성화를 위해 다음을 완료하십시오</translation>
+      <translation>라이선스 비활성화를 위해 다음을 완료하십시오</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
       <translation>
-        <numerusform>각 라이센스 키는 최대 %n 번 비활성화 할 수 있음을 유의하십시요.</numerusform>
+        <numerusform>각 라이선스 키는 최대 %n 번 비활성화 할 수 있음을 유의하십시요.</numerusform>
       </translation>
     </message>
   </context>
