@@ -1763,7 +1763,7 @@
     <message>
       <location/>
       <source>New License</source>
-      <translation>신규 제품키</translation>
+      <translation>신규 라이선스 키</translation>
     </message>
     <message>
       <location/>
@@ -1979,7 +1979,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/system_update/multi_server_updates_widget.ui"/>
       <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation>금요일에 시스템 업데이트를 적용 하는 것은 권장 하지 않습니다.</translation>
+      <translation>금요일에는 시스템 업데이트를 권장 하지 않습니다.</translation>
     </message>
     <message>
       <location/>
@@ -2336,7 +2336,7 @@
     <message>
       <location filename="../src/ui/dialogs/build_number_dialog.ui"/>
       <source>Choose a specific build</source>
-      <translation>특정 빌드를 선택 하십시오</translation>
+      <translation>특정 빌드 선택</translation>
     </message>
   </context>
   <context>

@@ -12,7 +12,7 @@
     <name>ContextHintButton</name>
     <message>
       <source>Click to read more</source>
-      <translation>클릭해서 더 보기</translation>
+      <translation>자세한 내용을 보려면 클릭하세요.</translation>
     </message>
   </context>
   <context>

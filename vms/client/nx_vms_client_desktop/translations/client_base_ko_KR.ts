@@ -2128,7 +2128,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select Build</source>
-      <translation>빌드를 선택 합니다</translation>
+      <translation>빌드 선택</translation>
     </message>
   </context>
   <context>
@@ -2706,7 +2706,7 @@ to view more bookmarks</source>
       <source>Connect to your Systems
 from anywhere with any
 devices</source>
-      <translation>어디서나 어떤 장비에서 시스템을 접속합니다.</translation>
+      <translation>모든 장치들로 언제, 어디서든 시스템에 접속할 수 있습니다.</translation>
     </message>
     <message>
       <source>Disconnect System from %1</source>
@@ -2743,7 +2743,7 @@ to %1</source>
     <message>
       <source>Learn more about %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1에 대 한 자세한 내용은</translation>
+      <translation>%1에 대해 자세히 알아보기</translation>
     </message>
   </context>
   <context>
@@ -3866,11 +3866,11 @@ to %1</source>
     </message>
     <message>
       <source>Please activate your commercial or trial license.</source>
-      <translation>상용 라이선스 또는 체험용 라이선스를 인증하여 주십시오.</translation>
+      <translation>정식 라이선스 또는 체험용 라이선스를 인증하여 주십시오.</translation>
     </message>
     <message>
       <source>Please activate your commercial license.</source>
-      <translation>정식판의 인증키를 입력하여 주십시오.</translation>
+      <translation>정식 라이선스 키를 입력하여 주십시오.</translation>
     </message>
     <message>
       <source>Export</source>
@@ -6265,7 +6265,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnUserRoleSettingsWidgetPrivate</name>
     <message>
       <source>No users have this role</source>
-      <translation>이 역할의 사용자 없음</translation>
+      <translation>이 역할을 가진 사용자가 없습니다.</translation>
     </message>
     <message>
       <source>Custom with no permissions</source>
@@ -8341,7 +8341,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click to read more</source>
-      <translation>클릭하여 더 자세히 알아보기</translation>
+      <translation>자세한 내용을 보려면 클릭하세요.</translation>
     </message>
   </context>
   <context>
@@ -8503,7 +8503,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Checking for updates automatically</source>
-      <translation>자동으로 업데이트 확인중</translation>
+      <translation>자동으로 업데이트 확인</translation>
     </message>
     <message>
       <source>Check for updates</source>
@@ -8576,7 +8576,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select Update File...</source>
-      <translation>업데이트 파일 선택...</translation>
+      <translation>업데이트 파일 선택</translation>
     </message>
     <message>
       <source>Update Files</source>
@@ -9431,19 +9431,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Synchronized with the Internet</source>
-      <translation>인터넷과 동기화 됨</translation>
+      <translation>인터넷 시간과 동일</translation>
     </message>
     <message>
       <source>Synchronized with the local time at the selected server</source>
-      <translation>선택한 서버에서 현지 시간과 동기화</translation>
+      <translation>선택한 서버의 로컬 시간과 동기화</translation>
     </message>
     <message>
       <source>Not synchronized. Each server uses its own local time.</source>
-      <translation>동기화되지 않았습니다. 각 서버는 자체 현지 시간을 사용합니다.</translation>
+      <translation>동기화 되지 않았습니다. 각 서버별 로컬 시간을 사용합니다.</translation>
     </message>
     <message>
       <source>Equal to the server local time</source>
-      <translation>서버 현지 시간과 동일</translation>
+      <translation>서버 로컬 시간과 동일</translation>
     </message>
     <message>
       <source>No Internet connection. Time is not being synchronized.</source>
