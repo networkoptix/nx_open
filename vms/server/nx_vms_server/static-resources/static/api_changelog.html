@@ -54,6 +54,31 @@ The <strong><code><i>cameraAdvancedParams</i></code></strong> value is removed f
 The new function <strong><code><b>GET /api/getCameraParamManifest</b></code></strong> is added to
 get this information.
 </p>
+<h3>Retaining compatibility until expired</h3>
+<p>
+Parameter <strong><code><i>startTime</i></code></strong> is deprecated in favor of
+<strong><code><b>startTimeMs</b></code></strong> in functions:
+<pre>
+    /ec2/bookmarks
+    /ec2/bookmarks/add
+    /ec2/bookmarks/update
+</pre>
+</p>
+<p>
+Parameter <strong><code><i>endTime</i></code></strong> is deprecated in favor of
+<strong><code><b>endTimeMs</b></code></strong> in function:
+<pre>
+    /ec2/bookmarks
+</pre>
+</p>
+<p>
+Parameter <strong><code><i>duration</i></code></strong> is deprecated in favor of
+<strong><code><b>durationMs</b></code></strong> in functions:
+<pre>
+    /ec2/bookmarks/add
+    /ec2/bookmarks/update
+</pre>
+</p>
 
 <hr/><h2>VMS <b>4.1</b> relative to <i>4.0</i></h2>
 <!--............................................................................................-->

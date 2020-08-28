@@ -19,7 +19,9 @@ using std::chrono::milliseconds;
 namespace {
 
 static const QString kStartTimeParam = lit("startTime");
+static const QString kStartTimeMsParam = lit("startTimeMs");
 static const QString kEndTimeParam = lit("endTime");
+static const QString kEndTimeMsParam = lit("endTimeMs");
 static const QString kSortColumnParam = lit("sortBy");
 static const QString kSortOrderParam = lit("sortOrder");
 static const QString kUseSparsingParam = lit("sparse");
@@ -34,6 +36,7 @@ static const QString kNameParam = lit("name");
 static const QString kDescriptionParam = lit("description");
 static const QString kTimeoutParam = lit("timeout");
 static const QString kDurationParam = lit("duration");
+static const QString kDurationMsParam = lit("durationMs");
 static const QString kTagParam = lit("tag");
 static const QString kEventRuleIdParam = lit("rule_id");
 
@@ -48,7 +51,9 @@ QnRequestParamList bookmarksToParam(const QnCameraBookmark& bookmark)
     result.insert(kDescriptionParam, bookmark.description);
     result.insert(kTimeoutParam, QnLexical::serialized(bookmark.timeout));
     result.insert(kStartTimeParam, QnLexical::serialized(bookmark.startTimeMs));
+    result.insert(kStartTimeMsParam, QnLexical::serialized(bookmark.startTimeMs));
     result.insert(kDurationParam, QnLexical::serialized(bookmark.durationMs));
+    result.insert(kDurationMsParam, QnLexical::serialized(bookmark.durationMs));
     result.insert(kCameraIdParam, bookmark.cameraId.toString());
 
     for (const QString& tag: bookmark.tags)
@@ -64,8 +69,8 @@ QnCameraBookmark bookmarkFromParams(const QnRequestParamList& params, QnResource
     bookmark.name = params.value(kNameParam);
     bookmark.description = params.value(kDescriptionParam);
     bookmark.timeout = QnLexical::deserialized<milliseconds>(params.value(kTimeoutParam));
-    bookmark.startTimeMs = QnLexical::deserialized<milliseconds>(params.value(kStartTimeParam));
-    bookmark.durationMs = QnLexical::deserialized<milliseconds>(params.value(kDurationParam));
+    bookmark.startTimeMs = QnLexical::deserialized<milliseconds>(params.value(kStartTimeMsParam, params.value(kStartTimeParam)));
+    bookmark.durationMs = QnLexical::deserialized<milliseconds>(params.value(kDurationMsParam, params.value(kDurationParam)));
 
     QnSecurityCamResourcePtr camera = nx::camera_id_helper::findCameraByFlexibleIds(
         resourcePool,
@@ -97,13 +102,17 @@ void QnGetBookmarksRequestData::loadFromParams(QnResourcePool* resourcePool, con
 {
     QnMultiserverRequestData::loadFromParams(resourcePool, params);
 
-    if (params.contains(kStartTimeParam))
-        filter.startTimeMs =
-            milliseconds(nx::utils::parseDateTime(params.value(kStartTimeParam)) / kUsPerMs);
+    if (params.contains(kStartTimeMsParam) || params.contains(kStartTimeParam))
+    {
+        filter.startTimeMs = milliseconds(nx::utils::parseDateTime(
+            params.value(kStartTimeMsParam, params.value(kStartTimeParam)))) / kUsPerMs;
+    }
 
-    if (params.contains(kEndTimeParam))
-        filter.endTimeMs =
-            milliseconds(nx::utils::parseDateTime(params.value(kEndTimeParam)))  / kUsPerMs;
+    if (params.contains(kEndTimeMsParam) || params.contains(kEndTimeParam))
+    {
+        filter.endTimeMs = milliseconds(nx::utils::parseDateTime(
+            params.value(kEndTimeMsParam, params.value(kEndTimeParam)))) / kUsPerMs;
+    }
 
     QnLexical::deserialize(params.value(kSortColumnParam), &filter.orderBy.column);
     QnLexical::deserialize(params.value(kSortOrderParam), &filter.orderBy.order);
@@ -126,7 +135,9 @@ QnRequestParamList QnGetBookmarksRequestData::toParams() const
     QnRequestParamList result = QnMultiserverRequestData::toParams();
 
     result.insert(kStartTimeParam, QnLexical::serialized(filter.startTimeMs));
+    result.insert(kStartTimeMsParam, QnLexical::serialized(filter.startTimeMs));
     result.insert(kEndTimeParam, QnLexical::serialized(filter.endTimeMs));
+    result.insert(kEndTimeMsParam, QnLexical::serialized(filter.endTimeMs));
     result.insert(kFilterParam, QnLexical::serialized(filter.text));
     result.insert(kLimitParam, QnLexical::serialized(filter.limit));
 
