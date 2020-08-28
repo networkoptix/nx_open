@@ -92,6 +92,12 @@ QnVideoStreamDisplay::~QnVideoStreamDisplay()
     freeScaleContext();
 }
 
+void QnVideoStreamDisplay::endOfRun()
+{
+    QnMutexLocker lock(&m_mtx);
+    m_decoderData.decoder.reset();
+}
+
 void QnVideoStreamDisplay::pleaseStop()
 {
     //foreach(QnAbstractRenderer* render, m_renderList)

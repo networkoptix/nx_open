@@ -73,6 +73,8 @@ public:
 
     QnAspectRatio overridenAspectRatio() const;
     void setOverridenAspectRatio(QnAspectRatio aspectRatio);
+    void endOfRun();
+
 private:
     friend class QnCamDisplay;
 

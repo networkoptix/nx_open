@@ -67,6 +67,8 @@ void Renderer::close()
     unregisterTexture();
     if (m_rc)
         wglDeleteContext(m_rc);
+    if (m_dc)
+        ::ReleaseDC(m_window, m_dc);
 }
 
 bool Renderer::initRenderSurface(IDirect3D9Ex* d3d)
@@ -136,7 +138,7 @@ bool Renderer::init(
     static PIXELFORMATDESCRIPTOR pfd =
     {
         sizeof(PIXELFORMATDESCRIPTOR),  1,
-        PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
+        PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL,
         PFD_TYPE_RGBA,
         32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16, 0, 0,
         PFD_MAIN_PLANE,
@@ -145,8 +147,20 @@ bool Renderer::init(
 
     m_dc = ::GetDC(m_window);
     GLuint PixelFormat = ChoosePixelFormat(m_dc, &pfd);
-    SetPixelFormat(m_dc, PixelFormat, &pfd);
+    if (!SetPixelFormat(m_dc, PixelFormat, &pfd))
+    {
+        NX_ERROR(this, "Failed to set pixel format for window %1, error: %2",
+            m_window, GetLastError());
+        return false;
+    }
+
     m_rc = wglCreateContext(m_dc);
+    if (!m_rc)
+    {
+        NX_ERROR(this, "Failed to create OpenGL context for window %1, error: %2",
+            m_window, GetLastError());
+        return false;
+    }
     return true;
 }
 

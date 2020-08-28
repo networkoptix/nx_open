@@ -52,6 +52,7 @@ private:
   */
 class QnCamDisplay : public QnAbstractDataConsumer, public QnlTimeSource
 {
+    using base_type = QnAbstractDataConsumer;
     Q_OBJECT
 public:
     QnCamDisplay(QnMediaResourcePtr resource, QnArchiveStreamReader* reader);
@@ -91,6 +92,8 @@ public:
     virtual qint64 getDisplayedTime() const override;
     virtual qint64 getExternalTime() const override;
     virtual qint64 getNextTime() const override;
+
+    virtual void endOfRun() override;
 
     void setMTDecoding(bool value);
 

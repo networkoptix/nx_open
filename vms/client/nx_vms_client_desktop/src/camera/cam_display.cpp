@@ -1314,6 +1314,16 @@ void QnCamDisplay::processMetadata(const QnAbstractCompressedMetadataPtr& metada
         (int) metadata->metadataType, consumersCount);
 }
 
+void QnCamDisplay::endOfRun()
+{
+    base_type::endOfRun();
+    for (auto& display: m_display)
+    {
+        if (display)
+            display->endOfRun();
+    }
+}
+
 bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 {
 

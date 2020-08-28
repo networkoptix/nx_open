@@ -46,5 +46,3 @@ private:
 } // namespace nx::media::quick_sync::windows
 
 #endif // _WIN32
-
-
