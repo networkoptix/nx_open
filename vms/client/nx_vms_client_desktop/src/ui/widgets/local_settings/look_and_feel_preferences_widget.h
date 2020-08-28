@@ -44,6 +44,8 @@ private:
     Qn::ResourceInfoLevel selectedInfoLevel() const;
     int selectedTourCycleTimeMs() const;
     Qn::ImageBehaviour selectedImageMode() const;
+    bool isPtzAimOverlayEnabled() const;
+
 private:
     QScopedPointer<Ui::LookAndFeelPreferencesWidget> ui;
     bool m_updating = false;

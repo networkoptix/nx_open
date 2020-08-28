@@ -171,6 +171,9 @@ public:
         /** Whether hardware video decoding is used, if available. */
         HARDWARE_DECODING_ENABLED,
 
+        /** Whether old-style PTZ aim overlay is enabled. */
+        PTZ_AIM_OVERLAY_ENABLED,
+
         VARIABLE_COUNT
     };
 
@@ -281,6 +284,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool, isAutoFpsLimit, setAutoFpsLimit, AUTO_FPS_LIMIT, false)
         QN_DECLARE_RW_PROPERTY(bool, isFisheyeCalibrationGridShown, setFisheyeCalibrationGridShown, SHOW_FISHEYE_CALIBRATION_GRID, false)
         QN_DECLARE_RW_PROPERTY(bool, isHardwareDecodingEnabled, setHardwareDecodingEnabled, HARDWARE_DECODING_ENABLED, false)
+        QN_DECLARE_RW_PROPERTY(bool, isPtzAimOverlayEnabled, setPtzAimOverlatyEnabled, PTZ_AIM_OVERLAY_ENABLED, true)
 
     QN_END_PROPERTY_STORAGE()
 

@@ -20,6 +20,44 @@
       <bool>true</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout" columnstretch="0,1">
+      <item row="1" column="0">
+       <widget class="nx::vms::client::desktop::LabelWithHint" name="timeModeLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Time Mode</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="buddy">
+         <cstring>timeModeComboBox</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="nx::vms::client::desktop::LabelWithHint" name="tourCycleTimeLabel">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Tour cycle</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="buddy">
+         <cstring>tourCycleTimeSpinBox</cstring>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="languageLabel">
         <property name="text">
@@ -99,7 +137,7 @@
         </item>
        </layout>
       </item>
-      <item row="4" column="1">
+      <item row="5" column="1">
        <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1">
         <item>
          <widget class="QSpinBox" name="tourCycleTimeSpinBox">
@@ -123,41 +161,16 @@
         </item>
        </layout>
       </item>
-      <item row="1" column="0">
-       <widget class="nx::vms::client::desktop::LabelWithHint" name="timeModeLabel">
+      <item row="4" column="1">
+       <widget class="QCheckBox" name="usePtzAimOverlayCheckBox">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Time Mode</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-        <property name="buddy">
-         <cstring>timeModeComboBox</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="nx::vms::client::desktop::LabelWithHint" name="tourCycleTimeLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Tour cycle</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-        <property name="buddy">
-         <cstring>tourCycleTimeSpinBox</cstring>
+         <string>Show aim overlay for PTZ cameras</string>
         </property>
        </widget>
       </item>
@@ -309,7 +322,9 @@
   <tabstop>languageComboBox</tabstop>
   <tabstop>timeModeComboBox</tabstop>
   <tabstop>showIpInTreeCheckBox</tabstop>
+  <tabstop>usePtzAimOverlayCheckBox</tabstop>
   <tabstop>tourCycleTimeSpinBox</tabstop>
+  <tabstop>imageGroupBox</tabstop>
   <tabstop>imageNameLineEdit</tabstop>
   <tabstop>imageSelectButton</tabstop>
   <tabstop>imageModeComboBox</tabstop>
