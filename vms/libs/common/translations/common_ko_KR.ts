@@ -506,7 +506,7 @@
     </message>
     <message>
       <source>Professional</source>
-      <translation>정식</translation>
+      <translation>Professional</translation>
     </message>
     <message>
       <source>Edge</source>
@@ -538,7 +538,7 @@
     </message>
     <message>
       <source>Professional Licenses</source>
-      <translation>정식 인증키</translation>
+      <translation>정식 라이선스</translation>
     </message>
     <message>
       <source>Edge Licenses</source>
@@ -554,7 +554,7 @@
     </message>
     <message>
       <source>Video Wall Licenses</source>
-      <translation>비디오 월 인증키</translation>
+      <translation>비디오 월 라이선스</translation>
     </message>
     <message>
       <source>I/O Module Licenses</source>
@@ -607,7 +607,7 @@
     <message numerus="yes">
       <source>%n Professional Licenses</source>
       <translation>
-        <numerusform>프로 라이선스 %n</numerusform>
+        <numerusform>Professional 라이선스 %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -631,7 +631,7 @@
     <message numerus="yes">
       <source>%n Video Wall Licenses</source>
       <translation>
-        <numerusform>%n 비디오 월 라이선스</numerusform>
+        <numerusform>%n Video Wall 라이선스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -714,7 +714,7 @@
       <source>%n/%1 Video Wall Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 비디오 월 라이센스</numerusform>
+        <numerusform>%n/%1 비디오 월 라이선스</numerusform>
       </translation>
     </message>
     <message numerus="yes">

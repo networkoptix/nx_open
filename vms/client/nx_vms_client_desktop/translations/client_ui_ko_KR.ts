@@ -3226,7 +3226,7 @@
     <message>
       <location/>
       <source>Custom language for mobile notifications</source>
-      <translation>모바일 알림을위한 사용자 지정 언어</translation>
+      <translation>모바일 알림에 대한 사용자 지정 언어</translation>
     </message>
   </context>
   <context>

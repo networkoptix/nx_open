@@ -3758,7 +3758,7 @@ to %1</source>
     </message>
     <message>
       <source>Locked to Hardware ID</source>
-      <translation>하드웨어 ID에 잠김</translation>
+      <translation>귀속된 하드웨어 ID</translation>
     </message>
     <message>
       <source>Generic</source>
@@ -3770,7 +3770,7 @@ to %1</source>
     </message>
     <message>
       <source>Screens Allowed</source>
-      <translation>허용 된 화면</translation>
+      <translation>허용 화면</translation>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
@@ -3778,11 +3778,11 @@ to %1</source>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation>저장 스트림 허용</translation>
+      <translation>허용 아카이브 스트림</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
-      <translation>남아있는 비활성화</translation>
+      <translation>잔여 라이선스 수</translation>
     </message>
   </context>
   <context>
@@ -4957,7 +4957,7 @@ to %1</source>
     </message>
     <message>
       <source>Videowalls</source>
-      <translation>비디오월</translation>
+      <translation>비디오 월</translation>
     </message>
     <message>
       <source>Analytics Engines</source>
@@ -6073,7 +6073,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Allow System to optimize camera settings</source>
-      <translation>카메라 설정을 최적화 하는 시스템을 허용</translation>
+      <translation>시스템이 카메라 설정을 최적화하도록 허용</translation>
     </message>
     <message>
       <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
@@ -6589,7 +6589,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
-      <translation>비디오월이 서버에서 제거되어 종료합니다.</translation>
+      <translation>비디오 월이 서버에서 제거되어 종료합니다.</translation>
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
