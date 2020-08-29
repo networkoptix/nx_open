@@ -27,9 +27,10 @@ H264Mp4ToAnnexB::H264Mp4ToAnnexB()
 {
 }
 
-QnAbstractDataPacketPtr H264Mp4ToAnnexB::processData(const QnAbstractDataPacketPtr& data )
+QnConstAbstractDataPacketPtr H264Mp4ToAnnexB::processData(const QnConstAbstractDataPacketPtr& data )
 {
-    QnCompressedVideoData* srcVideoPacket = dynamic_cast<QnCompressedVideoData*>(data.get());
+    const QnCompressedVideoData* srcVideoPacket =
+        dynamic_cast<const QnCompressedVideoData*>(data.get());
     if( !srcVideoPacket || srcVideoPacket->compressionType != AV_CODEC_ID_H264 )
         return data;
     if(srcVideoPacket->dataSize() >= sizeof(START_CODE) && isStartCode(srcVideoPacket->data()))

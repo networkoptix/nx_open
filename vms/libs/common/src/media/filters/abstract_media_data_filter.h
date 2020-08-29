@@ -14,7 +14,7 @@ public:
      * @param data Source data.
      * @return Modified data.
     */
-    virtual QnAbstractDataPacketPtr processData(const QnAbstractDataPacketPtr& data) = 0;
+    virtual QnConstAbstractDataPacketPtr processData(const QnConstAbstractDataPacketPtr& data) = 0;
 };
 using AbstractMediaDataFilterPtr = std::shared_ptr<AbstractMediaDataFilter>;
 

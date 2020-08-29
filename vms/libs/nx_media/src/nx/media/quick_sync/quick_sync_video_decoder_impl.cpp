@@ -15,6 +15,7 @@
 #include "qt_video_buffer.h"
 #include "mfx_status_string.h"
 #include "compatibility_cache.h"
+#include <media/filters/h264_mp4_to_annexb.h>
 
 #define MSDK_ALIGN16(value) (((value + 15) >> 4) << 4) // round up to a multiple of 16
 
@@ -240,6 +241,12 @@ mfxFrameSurface1* QuickSyncVideoDecoderImpl::getFreeSurface()
     return nullptr;
 }
 
+void QuickSyncVideoDecoderImpl::clearData()
+{
+    m_bitstreamData.clear();
+    m_dtsQueue.clear();
+}
+
 int QuickSyncVideoDecoderImpl::decode(
     const QnConstCompressedVideoDataPtr& frame, nx::QVideoFramePtr* result)
 {
@@ -252,15 +259,22 @@ int QuickSyncVideoDecoderImpl::decode(
     if (m_bitstreamData.size() + frame->dataSize() > kMaxBitstreamSizeBytes)
     {
         NX_DEBUG(this, "Bitstream size too big: %1, clear ...", m_bitstreamData.size());
-        m_bitstreamData.clear();
+        clearData();
     }
-    m_bitstreamData.insert(
-        m_bitstreamData.end(), frame->data(), frame->data() + frame->dataSize());
+
+    // The filter keeps same frame in case of filtering is not required or
+    // it is not the H264 codec.
+    H264Mp4ToAnnexB filter;
+    auto filteredFrame = std::dynamic_pointer_cast<const QnCompressedVideoData>(
+        filter.processData(frame));
+    if (!NX_ASSERT(filteredFrame))
+        return 0;
+    m_bitstreamData.insert(m_bitstreamData.end(), filteredFrame->data(),
+        filteredFrame->data() + filteredFrame->dataSize());
 
     bitstream.Data = (mfxU8*)m_bitstreamData.data();
     bitstream.DataLength = m_bitstreamData.size();
     bitstream.MaxLength = m_bitstreamData.size();
-    bitstream.TimeStamp = frame->timestamp;
 
     if (!m_mfxSession)
     {
@@ -272,7 +286,7 @@ int QuickSyncVideoDecoderImpl::decode(
 
         if (!frame->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
         {
-            m_bitstreamData.clear();
+            clearData();
             return 0;
         }
 
@@ -303,6 +317,10 @@ int QuickSyncVideoDecoderImpl::decode(
     mfxSyncPoint syncp;
     mfxFrameSurface1* outSurface = nullptr;
 
+    m_dtsQueue.push_back(frame->timestamp);
+    bitstream.TimeStamp = m_dtsQueue.front();
+
+    bool isWarning = false;
     do
     {
         status = MFXVideoDECODE_DecodeFrameAsync(
@@ -311,10 +329,14 @@ int QuickSyncVideoDecoderImpl::decode(
         if (MFX_WRN_DEVICE_BUSY == status)
             std::this_thread::sleep_for(std::chrono::milliseconds(1)); // Wait if device is busy
 
-    } while (MFX_WRN_DEVICE_BUSY == status);
+        isWarning = (status > MFX_ERR_NONE) && !syncp;
+    } while (MFX_WRN_DEVICE_BUSY == status || isWarning);
 
-    if (pBitstream)
+    if (pBitstream && pBitstream->DataOffset > 0)
     {
+        // QS decoder could keep frame in our buffer due to b-frames
+        m_dtsQueue.pop_front();
+
         memmove(m_bitstreamData.data(),
                 m_bitstreamData.data() + pBitstream->DataOffset, pBitstream->DataLength);
         pBitstream->DataOffset = 0;

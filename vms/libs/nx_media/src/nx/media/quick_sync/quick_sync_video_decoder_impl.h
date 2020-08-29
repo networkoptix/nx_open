@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <memory>
+#include <deque>
 
 #include "quick_sync_video_decoder.h"
 
@@ -38,7 +39,7 @@ private:
     mfxFrameSurface1* getFreeSurface();
 
     bool buildQVideoFrame(mfxFrameSurface1* surface, nx::QVideoFramePtr* result);
-
+    void clearData();
 private:
     QuickSyncVideoDecoder::Config m_config;
     mfxVideoParam m_mfxDecParams;
@@ -54,6 +55,7 @@ private:
     mfxFrameAllocResponse m_response;
 
     DeviceContext m_device;
+    std::deque<int64_t> m_dtsQueue;
 };
 
 } // namespace nx::media::quick_sync

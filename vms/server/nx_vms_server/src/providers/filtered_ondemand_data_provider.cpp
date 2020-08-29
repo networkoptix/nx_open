@@ -27,7 +27,7 @@ bool FilteredOnDemandDataProvider::tryRead(QnAbstractDataPacketPtr* const data)
         return false;
     if (!data)
         return true;
-    *data = m_filter->processData(*data);
+    *data = std::const_pointer_cast<QnAbstractDataPacket>(m_filter->processData(*data));
     return true;
 }
 

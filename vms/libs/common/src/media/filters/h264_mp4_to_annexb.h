@@ -23,9 +23,9 @@ class H264Mp4ToAnnexB: public AbstractMediaDataFilter
 public:
     H264Mp4ToAnnexB();
 
-protected:
+public:
     //!Implementation of AbstractMediaDataFilter::processData
-    virtual QnAbstractDataPacketPtr processData(const QnAbstractDataPacketPtr& data ) override;
+    virtual QnConstAbstractDataPacketPtr processData(const QnConstAbstractDataPacketPtr& data ) override;
 
 private:
     QnConstMediaContextPtr m_newContext;
