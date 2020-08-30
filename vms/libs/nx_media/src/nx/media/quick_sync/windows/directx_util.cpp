@@ -38,6 +38,11 @@ bool DeviceContext::initialize(MFXVideoSession& session, int width, int height)
     if (adapter < 0)
         return false;
 
+    // The decoder shares openGL texture between QS and mainWindows GL context.
+    // Currently it is able to obtain QS data for default adapter only.
+    if (adapter != 0)
+        return false;
+
     if (!m_device.createDevice(width, height, adapter))
     {
         NX_ERROR(NX_SCOPE_TAG, "Failed to get DirectX handle");
