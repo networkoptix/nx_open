@@ -1213,9 +1213,9 @@ bool DecodedPictureToOpenGLUploader::renderVideoMemory(
     emptyPictureBuf->setColorFormat(AV_PIX_FMT_RGBA);
     QnGlRendererTexture* texture = emptyPictureBuf->texture(0);
     QSize displaySize = emptyPictureBuf->displaySize();
-   // if (!displaySize.isEmpty())
-   //     displaySize = displaySize.boundedTo(frame->size());
-   // else
+    if (!displaySize.isEmpty())
+        displaySize = displaySize.boundedTo(frame->size());
+    else
         displaySize = QSize(frame->width, frame->height);
 
     bool isNewTexture = texture->ensureInitialized(
