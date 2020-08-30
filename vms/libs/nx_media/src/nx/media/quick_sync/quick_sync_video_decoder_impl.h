@@ -33,12 +33,13 @@ private:
     };
 
 private:
-    bool init(mfxBitstream& bitstream, AVCodecID codec, int width, int height);
+    bool init(mfxBitstream& bitstream, const QnConstCompressedVideoDataPtr& frame);
     bool initSession(int width, int height);
     bool allocFrames();
     mfxFrameSurface1* getFreeSurface();
 
     bool buildQVideoFrame(mfxFrameSurface1* surface, nx::QVideoFramePtr* result);
+    std::unique_ptr<mfxBitstream> updateBitStream(const QnConstCompressedVideoDataPtr& frame);
     void clearData();
 private:
     QuickSyncVideoDecoder::Config m_config;
