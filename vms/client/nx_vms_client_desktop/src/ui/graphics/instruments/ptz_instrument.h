@@ -23,6 +23,7 @@ class PtzManipulatorWidget;
 class QnSplashItem;
 class QnMediaResourceWidget;
 class QnResourceWidget;
+class QnGraphicsMessageBox;
 
 class PtzInstrument: public DragProcessingInstrument, public QnWorkbenchContextAware
 {
@@ -109,6 +110,7 @@ private slots:
     void updateOverlayWidget();
     void updateWidgetPtzController(QnMediaResourceWidget* widget);
     void updateOverlayWidgetInternal(QnMediaResourceWidget* widget);
+    void updateOverlayCursor(QnMediaResourceWidget* widget);
     void updateCapabilities(QnMediaResourceWidget* widget);
     void updateTraits(QnMediaResourceWidget* widget);
 
@@ -164,12 +166,15 @@ private:
     {
         bool hasCapabilities(Ptz::Capabilities value) const;
         bool isFisheye() const;
+        bool hasContinuousPanOrTilt() const;
+        bool hasAdvancedPtz() const;
 
         Ptz::Capabilities capabilities = Ptz::NoPtzCapabilities;
         QnPtzAuxiliaryTraitList traits;
         nx::core::ptz::Vector currentSpeed;
         nx::core::ptz::Vector requestedSpeed;
         PtzOverlayWidget* overlayWidget = nullptr;
+        QGraphicsWidget* cursorOverlay = nullptr;
         QMetaObject::Connection capabilitiesConnection;
     };
 
@@ -236,4 +241,6 @@ private:
     int m_wheelZoomDirection = 0;
     QTimer* const m_wheelZoomTimer;
     QHash<QnMediaResourceWidget*, QTimer*> m_hideActionTextTimers;
+
+    QPointer<QnGraphicsMessageBox> m_noAdvancedPtzWarning;
 };

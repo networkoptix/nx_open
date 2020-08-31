@@ -45,6 +45,7 @@
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
 #include <nx/vms/client/desktop/workbench/handlers/layout_tours_handler.h>
 #include <nx/vms/client/desktop/workbench/extensions/workbench_progress_manager.h>
+#include <nx/vms/client/desktop/workbench/watchers/keyboard_modifiers_watcher.h>
 #include <nx/client/core/watchers/server_time_watcher.h>
 
 #include <ui/workbench/workbench_welcome_screen.h>
@@ -287,6 +288,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     /* Set up watchers. */
     context->instance<QnWorkbenchUserInactivityWatcher>()->setMainWindow(this);
     context->instance<WorkbenchProgressManager>();
+    context->instance<KeyboardModifiersWatcher>();
 
     const auto timeWatcher = context->instance<nx::vms::client::core::ServerTimeWatcher>();
     const auto timeModeNotifier = qnSettings->notifier(QnClientSettings::TIME_MODE);

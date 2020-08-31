@@ -1,8 +1,4 @@
-#ifndef QN_PTZ_INSTRUMENT_P_H
-#define QN_PTZ_INSTRUMENT_P_H
-
-#include <utils/common/scoped_painter_rollback.h>
-#include <nx/client/core/utils/geometry.h>
+#pragma once
 
 #include <client/client_settings.h>
 #include <ui/customization/customized.h>
@@ -14,8 +10,11 @@
 #include <ui/graphics/items/generic/splash_item.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/style/skin.h>
+#include <utils/common/scoped_painter_rollback.h>
 
+#include <nx/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/ui/common/custom_cursors.h>
 
 #include "selection_item.h"
 
@@ -261,7 +260,7 @@ public:
     }
 
     void showCursor() {
-        manipulatorWidget()->setCursor(Qt::SizeAllCursor);
+        manipulatorWidget()->setCursor(nx::vms::client::desktop::CustomCursors::sizeAll);
         zoomInButton()->setCursor(Qt::ArrowCursor);
         zoomOutButton()->setCursor(Qt::ArrowCursor);
         focusInButton()->setCursor(Qt::ArrowCursor);
@@ -561,6 +560,3 @@ public:
         setBrush(QColor(128, 196, 255, 64).lighter(120));
     }
 };
-
-
-#endif // QN_PTZ_INSTRUMENT_P_H

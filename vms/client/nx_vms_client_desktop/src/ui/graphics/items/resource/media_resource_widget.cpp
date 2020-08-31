@@ -1953,7 +1953,10 @@ void QnMediaResourceWidget::channelScreenSizeChangedNotify()
 
 void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
 {
-    if (changedFlags.testFlag(DisplayMotion))
+    const bool motionSearchChanged = changedFlags.testFlag(DisplayMotion);
+    const bool ptzChanged = changedFlags.testFlag(ControlPtz);
+
+    if (motionSearchChanged)
     {
         const bool motionSearchEnabled = options().testFlag(DisplayMotion);
         d->setMotionEnabled(motionSearchEnabled);
@@ -1976,22 +1979,25 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
 
         setOption(WindowResizingForbidden, motionSearchEnabled);
 
-        if (motionSearchEnabled)
-            setProperty(Qn::MotionSelectionModifiers, 0);
-        else
-            setProperty(Qn::MotionSelectionModifiers, QVariant()); //< Use defaults.
-
         emit motionSearchModeEnabled(motionSearchEnabled);
     }
 
-    if (changedFlags.testFlag(ControlPtz))
+    if (ptzChanged && options().testFlag(ControlPtz))
     {
-        const bool switchedToPtzMode = options().testFlag(ControlPtz);
-        if (switchedToPtzMode)
-        {
-            titleBar()->rightButtonsBar()->setButtonsChecked(
-	        Qn::MotionSearchButton | Qn::ZoomWindowButton, false);
-        }
+        titleBar()->rightButtonsBar()->setButtonsChecked(
+	    Qn::MotionSearchButton | Qn::ZoomWindowButton, false);
+    }
+
+    if (motionSearchChanged || ptzChanged)
+    {
+        static constexpr int kInvalidKeyboardModifier = 1;
+
+        if (options().testFlag(ControlPtz))
+            setProperty(Qn::MotionSelectionModifiers, kInvalidKeyboardModifier); //< Disable.
+        else if (options().testFlag(DisplayMotion))
+            setProperty(Qn::MotionSelectionModifiers, 0); //< Enable with no modifier.
+        else
+            setProperty(Qn::MotionSelectionModifiers, QVariant()); //< Enable with default modifier.
     }
 
     base_type::optionsChangedNotify(changedFlags);
