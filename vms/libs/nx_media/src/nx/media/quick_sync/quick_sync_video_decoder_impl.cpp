@@ -319,12 +319,6 @@ int QuickSyncVideoDecoderImpl::decode(
     }
 
     mfxStatus status = MFX_ERR_NONE;
-    mfxFrameSurface1* surface = getFreeSurface();
-    if (!surface)
-    {
-        NX_WARNING(this, "Failed to decode frame, no free surfaces!");
-        return -1;
-    }
     mfxSyncPoint syncp;
     mfxFrameSurface1* outSurface = nullptr;
 
@@ -335,9 +329,20 @@ int QuickSyncVideoDecoderImpl::decode(
         bitstream->TimeStamp = m_dtsQueue.front();
     }
 
+    mfxFrameSurface1* surface = nullptr;
     bool isWarning = false;
     do
     {
+        if (!surface)
+        {
+            surface = getFreeSurface();
+            if (!surface)
+            {
+                NX_WARNING(this, "Failed to decode frame, no free surfaces!");
+                return -1;
+            }
+        }
+
         status = MFXVideoDECODE_DecodeFrameAsync(
             m_mfxSession, bitstream.get(), surface, &outSurface, &syncp);
 
@@ -345,6 +350,11 @@ int QuickSyncVideoDecoderImpl::decode(
             std::this_thread::sleep_for(std::chrono::milliseconds(1)); // Wait if device is busy
 
         isWarning = (status > MFX_ERR_NONE) && !syncp;
+        if (status == MFX_ERR_MORE_SURFACE)
+        {
+            surface = nullptr;
+            isWarning = true;
+        }
     } while (MFX_WRN_DEVICE_BUSY == status || isWarning);
 
     if (bitstream && bitstream->DataOffset > 0)
