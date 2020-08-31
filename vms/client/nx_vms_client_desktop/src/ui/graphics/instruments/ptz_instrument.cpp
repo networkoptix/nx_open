@@ -757,7 +757,7 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget* widget, const QPointF& pos)
     ptzMoveTo(widget, QRectF(pos - Geometry::toPoint(widget->size() / 2), widget->size()));
 }
 
-void PtzInstrument::ptzMoveTo(QnMediaResourceWidget* widget, const QRectF& rect)
+void PtzInstrument::ptzMoveTo(QnMediaResourceWidget* widget, const QRectF& rect, bool unzooming)
 {
     handlePtzRedirect(widget);
     const qreal aspectRatio = Geometry::aspectRatio(widget->size());
@@ -767,14 +767,15 @@ void PtzInstrument::ptzMoveTo(QnMediaResourceWidget* widget, const QRectF& rect)
     if (m_dataByWidget.value(widget).isFisheye())
         return;
 
-    widget->setActionText(tr("Moving..."));
+    widget->setActionText(unzooming ? tr("Zooming out..."): tr("Moving..."));
     widget->clearActionText(2s);
 }
 
 void PtzInstrument::ptzUnzoom(QnMediaResourceWidget* widget)
 {
     QSizeF size = widget->size() * 100;
-    ptzMoveTo(widget, QRectF(widget->rect().center() - Geometry::toPoint(size) / 2, size));
+    ptzMoveTo(widget, QRectF(widget->rect().center() - Geometry::toPoint(size) / 2, size),
+        /*unzooming*/ true);
 }
 
 QString PtzInstrument::actionText(QnMediaResourceWidget* widget) const

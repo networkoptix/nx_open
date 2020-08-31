@@ -141,7 +141,7 @@ private:
     bool processMousePress(QGraphicsItem* item, QGraphicsSceneMouseEvent* event);
 
     void ptzMoveTo(QnMediaResourceWidget* widget, const QPointF& pos);
-    void ptzMoveTo(QnMediaResourceWidget* widget, const QRectF& rect);
+    void ptzMoveTo(QnMediaResourceWidget* widget, const QRectF& rect, bool unzooming = false);
     void ptzUnzoom(QnMediaResourceWidget* widget);
     void ptzMove(
         QnMediaResourceWidget* widget,
