@@ -346,6 +346,12 @@ bool Instrument::dispatchEvent(T *watched, QEvent *event) {
         return mouseReleaseEvent(watched, static_cast<QMouseEvent *>(event));
     case QEvent::MouseButtonDblClick:
         return mouseDoubleClickEvent(watched, static_cast<QMouseEvent *>(event));
+    case QEvent::HoverEnter:
+        return hoverEnterEvent(watched, static_cast<QHoverEvent *>(event));
+    case QEvent::HoverLeave:
+        return hoverLeaveEvent(watched, static_cast<QHoverEvent *>(event));
+    case QEvent::HoverMove:
+        return hoverMoveEvent(watched, static_cast<QHoverEvent *>(event));
     case QEvent::Wheel:
         return wheelEvent(watched, static_cast<QWheelEvent *>(event));
     case QEvent::TabletMove:
@@ -429,6 +435,12 @@ bool Instrument::dispatchEvent(T *watched, QEvent *event) {
         return mouseReleaseEvent(watched, static_cast<QGraphicsSceneMouseEvent *>(event));
     case QEvent::GraphicsSceneMouseDoubleClick:
         return mouseDoubleClickEvent(watched, static_cast<QGraphicsSceneMouseEvent *>(event));
+    case QEvent::GraphicsSceneHoverEnter:
+        return hoverEnterEvent(watched, static_cast<QGraphicsSceneHoverEvent *>(event));
+    case QEvent::GraphicsSceneHoverLeave:
+        return hoverLeaveEvent(watched, static_cast<QGraphicsSceneHoverEvent *>(event));
+    case QEvent::GraphicsSceneHoverMove:
+        return hoverMoveEvent(watched, static_cast<QGraphicsSceneHoverEvent *>(event));
     case QEvent::GraphicsSceneWheel:
         return wheelEvent(watched, static_cast<QGraphicsSceneWheelEvent *>(event));
     case QEvent::GraphicsSceneHelp:

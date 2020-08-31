@@ -639,6 +639,9 @@ protected:
     virtual bool mousePressEvent(QWidget *, QMouseEvent *) { return false; }
     virtual bool mouseReleaseEvent(QWidget *, QMouseEvent *) { return false; }
     virtual bool mouseDoubleClickEvent(QWidget *, QMouseEvent *) { return false; }
+    virtual bool hoverEnterEvent(QWidget *, QHoverEvent *) { return false; }
+    virtual bool hoverLeaveEvent(QWidget *, QHoverEvent *) { return false; }
+    virtual bool hoverMoveEvent(QWidget *, QHoverEvent *) { return false; }
     virtual bool wheelEvent(QWidget *, QWheelEvent *) { return false; }
     virtual bool tabletEvent(QWidget *, QTabletEvent *) { return false; }
     virtual bool keyPressEvent(QWidget *, QKeyEvent *) { return false; }
@@ -670,6 +673,9 @@ protected:
     virtual bool mousePressEvent(QWidget *, QGraphicsSceneMouseEvent *) { return false; }
     virtual bool mouseReleaseEvent(QWidget *, QGraphicsSceneMouseEvent *) { return false; }
     virtual bool mouseDoubleClickEvent(QWidget *, QGraphicsSceneMouseEvent *) { return false; }
+    virtual bool hoverEnterEvent(QWidget *, QGraphicsSceneHoverEvent *) { return false; }
+    virtual bool hoverLeaveEvent(QWidget *, QGraphicsSceneHoverEvent *) { return false; }
+    virtual bool hoverMoveEvent(QWidget *, QGraphicsSceneHoverEvent *) { return false; }
     virtual bool wheelEvent(QWidget *, QGraphicsSceneWheelEvent *) { return false; }
     virtual bool helpEvent(QWidget *, QGraphicsSceneHelpEvent *) { return false; }
 
@@ -682,6 +688,9 @@ protected:
     virtual bool mousePressEvent(QGraphicsView *, QMouseEvent *) { return false; }
     virtual bool mouseReleaseEvent(QGraphicsView *, QMouseEvent *) { return false; }
     virtual bool mouseDoubleClickEvent(QGraphicsView *, QMouseEvent *) { return false; }
+    virtual bool hoverEnterEvent(QGraphicsView *, QHoverEvent *) { return false; }
+    virtual bool hoverLeaveEvent(QGraphicsView *, QHoverEvent *) { return false; }
+    virtual bool hoverMoveEvent(QGraphicsView *, QHoverEvent *) { return false; }
     virtual bool wheelEvent(QGraphicsView *, QWheelEvent *) { return false; }
     virtual bool tabletEvent(QGraphicsView *, QTabletEvent *) { return false; }
     virtual bool keyPressEvent(QGraphicsView *, QKeyEvent *) { return false; }
@@ -713,6 +722,9 @@ protected:
     virtual bool mousePressEvent(QGraphicsView *, QGraphicsSceneMouseEvent *) { return false; }
     virtual bool mouseReleaseEvent(QGraphicsView *, QGraphicsSceneMouseEvent *) { return false; }
     virtual bool mouseDoubleClickEvent(QGraphicsView *, QGraphicsSceneMouseEvent *) { return false; }
+    virtual bool hoverEnterEvent(QGraphicsView *, QGraphicsSceneHoverEvent *) { return false; }
+    virtual bool hoverLeaveEvent(QGraphicsView *, QGraphicsSceneHoverEvent *) { return false; }
+    virtual bool hoverMoveEvent(QGraphicsView *, QGraphicsSceneHoverEvent *) { return false; }
     virtual bool wheelEvent(QGraphicsView *, QGraphicsSceneWheelEvent *) { return false; }
     virtual bool helpEvent(QGraphicsView *, QGraphicsSceneHelpEvent *) { return false; }
 
@@ -722,6 +734,9 @@ protected:
     virtual bool mousePressEvent(QGraphicsScene *, QMouseEvent *) { return false; }
     virtual bool mouseReleaseEvent(QGraphicsScene *, QMouseEvent *) { return false; }
     virtual bool mouseDoubleClickEvent(QGraphicsScene *, QMouseEvent *) { return false; }
+    virtual bool hoverEnterEvent(QGraphicsScene *, QHoverEvent *) { return false; }
+    virtual bool hoverLeaveEvent(QGraphicsScene *, QHoverEvent *) { return false; }
+    virtual bool hoverMoveEvent(QGraphicsScene *, QHoverEvent *) { return false; }
     virtual bool wheelEvent(QGraphicsScene *, QWheelEvent *) { return false; }
     virtual bool tabletEvent(QGraphicsScene *, QTabletEvent *) { return false; }
     virtual bool keyPressEvent(QGraphicsScene *, QKeyEvent *) { return false; }
@@ -753,6 +768,9 @@ protected:
     virtual bool mousePressEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *) { return false; }
     virtual bool mouseReleaseEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *) { return false; }
     virtual bool mouseDoubleClickEvent(QGraphicsScene *, QGraphicsSceneMouseEvent *) { return false; }
+    virtual bool hoverEnterEvent(QGraphicsScene *, QGraphicsSceneHoverEvent *) { return false; }
+    virtual bool hoverLeaveEvent(QGraphicsScene *, QGraphicsSceneHoverEvent *) { return false; }
+    virtual bool hoverMoveEvent(QGraphicsScene *, QGraphicsSceneHoverEvent *) { return false; }
     virtual bool wheelEvent(QGraphicsScene *, QGraphicsSceneWheelEvent *) { return false; }
     virtual bool helpEvent(QGraphicsScene *, QGraphicsSceneHelpEvent *) { return false; }
 

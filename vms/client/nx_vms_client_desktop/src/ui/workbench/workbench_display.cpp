@@ -580,6 +580,7 @@ void QnWorkbenchDisplay::initSceneView()
 
         const auto viewport = new QOpenGLWidget(m_view);
         viewport->makeCurrent();
+        viewport->setAttribute(Qt::WA_Hover);
         m_view->setViewport(viewport);
 
         /* Turn on antialiasing at QPainter level. */
