@@ -1,11 +1,9 @@
-#include "parse_object_metadata_packet.h"
+#include "object_metadata_packet_parser.h"
 
+#include <chrono>
 #include <algorithm>
-#include <optional>
-#include <cstring>
 
 #include <nx/sdk/analytics/point.h>
-#include <nx/sdk/analytics/rect.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/utils/log/log_message.h>
 
@@ -16,10 +14,13 @@
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
+using namespace std::literals;
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
 namespace {
+
+constexpr auto kCacheEntryLifetime = 2min;
 
 void expand(Rect* rect, const Point& point)
 {
@@ -50,7 +51,47 @@ void expand(Rect* dest, const Rect& src)
     expand(dest, Point{src.x + src.width, src.y + src.height});
 }
 
-std::optional<QString> parseTypeId(const QString& nativeId, const JsonArray& nativeBehaviors)
+} // namespace
+
+Ptr<ObjectMetadataPacket> ObjectMetadataPacketParser::parse(const JsonValue& native)
+{
+    cleanupOldCacheEntries();
+
+    if (native["Tag"].to<QString>() != "MetaData")
+        return nullptr;
+
+    if (!native["Frame"].to<JsonObject>().contains("Objects"))
+        return nullptr;
+
+    auto packet = makePtr<ObjectMetadataPacket>();
+
+    packet->setTimestampUs(parseIsoTimestamp(native["Frame"]["UtcTime"].to<QString>()));
+    packet->setDurationUs(1'000'000);
+
+    const auto objects = native["Frame"]["Objects"].to<JsonArray>();
+    for (int i = 0; i < objects.count(); ++i)
+    {
+        if (const auto metadata = parseMetadata(objects[i].to<JsonObject>()))
+            packet->addItem(metadata.get());
+    }
+
+    return packet;
+}
+
+void ObjectMetadataPacketParser::cleanupOldCacheEntries()
+{
+    for (auto it = m_cache.begin(); it != m_cache.end(); )
+    {
+        const auto& entry = it->second;
+        if (entry.timer.hasExpired(kCacheEntryLifetime))
+            it = m_cache.erase(it);
+        else
+            ++it;
+    }
+}
+
+std::optional<QString> ObjectMetadataPacketParser::parseTypeId(
+    const QString& nativeId, const JsonArray& nativeBehaviors)
 {
     for (const auto& type: kObjectTypes)
     {
@@ -66,14 +107,16 @@ std::optional<QString> parseTypeId(const QString& nativeId, const JsonArray& nat
     return std::nullopt;
 }
 
-Uuid parseTrackId(int id)
+Uuid ObjectMetadataPacketParser::parseTrackId(int nativeId)
 {
-    Uuid uuid;
-    std::memcpy(uuid.data(), &id, std::min(std::size_t(uuid.size()), sizeof(id)));
-    return uuid;
+    auto& entry = m_cache[nativeId];
+
+    entry.timer.restart();
+
+    return entry.trackId;
 }
 
-Rect parsePolygonBoundingBox(const JsonArray& pos2d)
+Rect ObjectMetadataPacketParser::parsePolygonBoundingBox(const JsonArray& pos2d)
 {
     if (pos2d.isEmpty())
         throw Exception("%1 array is empty", pos2d.path);
@@ -87,7 +130,7 @@ Rect parsePolygonBoundingBox(const JsonArray& pos2d)
     return rect;
 }
 
-Rect parseRectangleBoundingBox(const JsonObject& rectangle)
+Rect ObjectMetadataPacketParser::parseRectangleBoundingBox(const JsonObject& rectangle)
 {
     return {
         CameraVcaParameterApi::parseCoordinate(rectangle["x"]),
@@ -97,7 +140,7 @@ Rect parseRectangleBoundingBox(const JsonObject& rectangle)
     };
 }
 
-Ptr<IObjectMetadata> parseMetadata(const JsonObject& object)
+Ptr<IObjectMetadata> ObjectMetadataPacketParser::parseMetadata(const JsonObject& object)
 {
     auto metadata = makePtr<ObjectMetadata>();
 
@@ -125,31 +168,6 @@ Ptr<IObjectMetadata> parseMetadata(const JsonObject& object)
     metadata->setBoundingBox(rect);
 
     return metadata;
-}
-
-} // namespace
-
-Ptr<ObjectMetadataPacket> parseObjectMetadataPacket(const JsonValue& native)
-{
-    if (native["Tag"].to<QString>() != "MetaData")
-        return nullptr;
-
-    if (!native["Frame"].to<JsonObject>().contains("Objects"))
-        return nullptr;
-
-    auto packet = makePtr<ObjectMetadataPacket>();
-
-    packet->setTimestampUs(parseIsoTimestamp(native["Frame"]["UtcTime"].to<QString>()));
-    packet->setDurationUs(1'000'000);
-
-    const auto objects = native["Frame"]["Objects"].to<JsonArray>();
-    for (int i = 0; i < objects.count(); ++i)
-    {
-        if (const auto metadata = parseMetadata(objects[i].to<JsonObject>()))
-            packet->addItem(metadata.get());
-    }
-
-    return packet;
 }
 
 } // namespace nx::vms_server_plugins::analytics::vivotek
