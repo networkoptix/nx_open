@@ -77,12 +77,12 @@ std::shared_ptr<MFXFrameAllocator> DeviceContext::getAllocator()
 }
 
 bool DeviceContext::renderToRgb(
-    const QuickSyncSurface& surfaceInfo,
+    const mfxFrameSurface1* surface,
     bool isNewTexture,
     GLuint textureId,
     QOpenGLContext* context)
 {
-    return m_device.getRenderer().render(surfaceInfo.surface, isNewTexture, textureId, context);
+    return m_device.getRenderer().render(surface, isNewTexture, textureId, context);
 }
 
 } // namespace nx::media::quick_sync

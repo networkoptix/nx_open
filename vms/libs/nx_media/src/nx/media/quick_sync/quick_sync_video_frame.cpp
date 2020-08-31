@@ -11,14 +11,30 @@ QuickSyncVideoFrame::QuickSyncVideoFrame(const std::shared_ptr<QVideoFrame>& fra
     m_frame = frame;
 }
 
-bool QuickSyncVideoFrame::renderToRgb(bool isNewTexture, GLuint textureId, QOpenGLContext* context)
+bool QuickSyncVideoFrame::renderToRgb(
+    bool isNewTexture, GLuint textureId, QOpenGLContext* context, int scaleFactor)
 {
     auto surfaceInfo = m_frame->handle().value<QuickSyncSurface>();
     auto decoderLock = surfaceInfo.decoder.lock();
     if (!decoderLock)
         return false;
 
-    return decoderLock->getDevice().renderToRgb(surfaceInfo, isNewTexture, textureId, context);
+    mfxFrameSurface1* scaledSurface = surfaceInfo.surface;
+
+#ifndef Q_OS_LINUX // Linux version is faster with downscale in vaCopySurfaceGLX_nx call
+    if (scaleFactor != 1)
+    {
+        QSize sourceSize(surfaceInfo.surface->Info.Width, surfaceInfo.surface->Info.Height);
+        QSize targetSize = sourceSize / scaleFactor;
+
+        if (!decoderLock->scaleFrame(surfaceInfo.surface, &scaledSurface, targetSize))
+        {
+            NX_WARNING(this, "Failed to scale video surface");
+            return false;
+        }
+    }
+#endif
+    return decoderLock->getDevice().renderToRgb(scaledSurface, isNewTexture, textureId, context);
 }
 
 AVFrame QuickSyncVideoFrame::lockFrame()

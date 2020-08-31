@@ -54,17 +54,19 @@ std::shared_ptr<MFXFrameAllocator> DeviceContext::getAllocator()
 }
 
 bool DeviceContext::renderToRgb(
-    const QuickSyncSurface& surfaceInfo,
+    const mfxFrameSurface1* surface,
     bool isNewTexture,
     GLuint textureId,
     QOpenGLContext* /*context*/)
 {
-    linux::vaapiMemId* surfaceData = (linux::vaapiMemId*)surfaceInfo.surface->Data.MemId;
+    linux::vaapiMemId* surfaceData = (linux::vaapiMemId*)surface->Data.MemId;
     VASurfaceID surfaceId = *(surfaceData->m_surface);
 
     VAStatus status;
-    if (isNewTexture || !m_renderingSurface)
+    QSize sourceSize(surface->Info.Width, surface->Info.Height);
+    if (isNewTexture || !m_renderingSurface || m_renderingSurfaceSize != sourceSize)
     {
+        NX_DEBUG(NX_SCOPE_TAG, "CreateSurfaceGLX size %1", sourceSize);
         if (m_renderingSurface)
             vaDestroySurfaceGLX(m_display, m_renderingSurface);
 
@@ -72,25 +74,26 @@ bool DeviceContext::renderToRgb(
             m_display,
             GL_TEXTURE_2D,
             textureId,
-            surfaceInfo.surface->Info.Width, surfaceInfo.surface->Info.Height,
+            surface->Info.Width, surface->Info.Height,
             &m_renderingSurface);
         if (status != VA_STATUS_SUCCESS)
         {
-            NX_DEBUG(NX_SCOPE_TAG, "vaCreateSurfaceGLX failed: %1", status);
+            NX_WARNING(NX_SCOPE_TAG, "vaCreateSurfaceGLX failed: %1", status);
             return false;
         }
+        m_renderingSurfaceSize = sourceSize;
     }
     status = vaCopySurfaceGLX_nx(m_display, m_renderingSurface, surfaceId, 0);
     if (status != VA_STATUS_SUCCESS)
     {
-        NX_DEBUG(NX_SCOPE_TAG, "vaCopySurfaceGLX failed: %1", status);
+        NX_WARNING(NX_SCOPE_TAG, "vaCopySurfaceGLX failed: %1", status);
         return false;
     }
 
     status = vaSyncSurface(m_display, surfaceId);
     if (status != VA_STATUS_SUCCESS)
     {
-        NX_DEBUG(NX_SCOPE_TAG, "vaSyncSurface failed: %1", status);
+        NX_WARNING(NX_SCOPE_TAG, "vaSyncSurface failed: %1", status);
         return false;
     }
     return true;

@@ -25,7 +25,7 @@ typedef BOOL (WINAPI * PFNWGLDXUNREGISTEROBJECTNVPROC) (HANDLE hDevice, HANDLE h
 typedef HGLRC (WINAPI * PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShareContext, const int* attribList);
 
 bool convertToRgb(
-    IDirect3DDevice9Ex *pDevice, mfxFrameSurface1* mfxSurface, IDirect3DSurface9* pSharedSurface)
+    IDirect3DDevice9Ex *pDevice, const mfxFrameSurface1* mfxSurface, IDirect3DSurface9* pSharedSurface)
 {
     mfxHDLPair* pair = (mfxHDLPair*)mfxSurface->Data.MemId;
     IDirect3DSurface9* decodedSurface = (IDirect3DSurface9*)pair->first;
@@ -84,18 +84,6 @@ bool Renderer::initRenderSurface(IDirect3D9Ex* d3d)
     D3DSURFACE_DESC rtDesc;
     m_renderTargetSurface->GetDesc(&rtDesc);
 
-    hr = m_device->CreateOffscreenPlainSurface(rtDesc.Width,
-        rtDesc.Height,
-        rtDesc.Format,
-        D3DPOOL_DEFAULT,
-        &m_sharedSurface,
-        &m_sharedSurfaceHandle);
-    if (FAILED(hr))
-    {
-        NX_WARNING(this, "Failed to create offscreen plain surface, error code: %1",
-            std::system_category().message(hr));
-        return false;
-    }
     hr = d3d->CheckDeviceFormatConversion(
         D3DADAPTER_DEFAULT,
         D3DDEVTYPE_HAL,
@@ -215,11 +203,42 @@ bool Renderer::registerTexture(GLuint textureId, QOpenGLContext* context)
     return true;
 }
 
-bool Renderer::render(
-    mfxFrameSurface1* mfxSurface, bool isNewTexture, GLuint textureId, QOpenGLContext* context)
+bool Renderer::createSharedSurface(QSize size)
 {
-    if (isNewTexture || !m_textureHandle)
+    D3DSURFACE_DESC rtDesc;
+    m_renderTargetSurface->GetDesc(&rtDesc);
+
+    m_sharedSurface.Release();
+    m_sharedSurfaceHandle = 0;
+    auto hr = m_device->CreateOffscreenPlainSurface(
+        size.width(),
+        size.height(),
+        rtDesc.Format,
+        D3DPOOL_DEFAULT,
+        &m_sharedSurface,
+        &m_sharedSurfaceHandle);
+    if (FAILED(hr))
     {
+        NX_WARNING(this, "Failed to create offscreen plain surface, error code: %1",
+            std::system_category().message(hr));
+        return false;
+    }
+    return true;
+}
+
+bool Renderer::render(
+    const mfxFrameSurface1* mfxSurface, bool isNewTexture, GLuint textureId, QOpenGLContext* context)
+{
+    QSize inputSurfaceSize(mfxSurface->Info.Width, mfxSurface->Info.Height);
+    if (isNewTexture || !m_textureHandle || m_sharedSurfaceSize != inputSurfaceSize)
+    {
+        if (m_sharedSurfaceSize != inputSurfaceSize)
+        {
+            if (!createSharedSurface(inputSurfaceSize))
+                return false;
+            m_sharedSurfaceSize = inputSurfaceSize;
+        }
+
         NX_DEBUG(this, "Register new texture: %1", textureId);
         unregisterTexture();
         if (!registerTexture(textureId, context))

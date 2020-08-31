@@ -117,6 +117,11 @@ public:
     int channel = 0;
     FrameMetadata metadata; // addition data associated with video frame
 
+    /* Needed to downscale video memory surface on rendering stage.
+     * Using scale factor instead of output texture size help to reduce VPP reinitialization
+     */
+    int scaleFactor = 1;
+
 private:
     bool m_useExternalData = false; // pointers only copied to this frame
     std::unique_ptr<AbstractVideoSurface> m_surface;

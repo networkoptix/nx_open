@@ -27,7 +27,7 @@ class DeviceContext
 public:
     bool initialize(MFXVideoSession& session, int width, int height);
     bool renderToRgb(
-        const QuickSyncSurface& surfaceInfo,
+        const mfxFrameSurface1* surface,
         bool isNewTexture,
         GLuint textureId,
         QOpenGLContext* context);

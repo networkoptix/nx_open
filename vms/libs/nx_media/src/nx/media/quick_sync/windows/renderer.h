@@ -22,11 +22,12 @@ public:
 
     bool init(HWND window, IDirect3DDevice9Ex* device, IDirect3D9Ex* d3d);
     bool render(
-        mfxFrameSurface1* mfxSurface, bool isNewTexture, GLuint textureId, QOpenGLContext* context);
+        const mfxFrameSurface1* mfxSurface, bool isNewTexture, GLuint textureId, QOpenGLContext* context);
     void close();
 
 private:
     bool registerTexture(GLuint textureId, QOpenGLContext* context);
+    bool createSharedSurface(QSize size);
     bool initRenderSurface(IDirect3D9Ex* d3d);
     void unregisterTexture();
 
@@ -41,6 +42,8 @@ private:
     HWND m_window = 0;
     HDC m_dc = 0;
     HGLRC m_rc = 0;
+
+    QSize m_sharedSurfaceSize;
 };
 
 } // namespace nx::media::quick_sync::windows

@@ -205,8 +205,11 @@ public:
         if (!decoderLock)
             return;
 
-        if (!decoderLock->getDevice().renderToRgb(surfaceInfo, isNewTexture, m_textureId, QOpenGLContext::currentContext()))
+        if (!decoderLock->getDevice().renderToRgb(
+            surfaceInfo.surface, isNewTexture, m_textureId, QOpenGLContext::currentContext()))
+        {
             NX_WARNING(this, "rendering surface failed");
+        }
 
         m_textureDirty = false;
         functions->glActiveTexture(GL_TEXTURE0);

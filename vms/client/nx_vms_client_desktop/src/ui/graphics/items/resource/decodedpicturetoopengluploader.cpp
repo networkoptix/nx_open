@@ -633,6 +633,7 @@ public:
 
         if (m_src->memoryType() != MemoryType::VideoMemory)
         {
+            // TODO ???
             nx::vms::api::ImageCorrectionData imCor = m_uploader->getImageCorrection();
             m_dest->processImage(m_src->data[0], m_src->width, m_src->height, m_src->linesize[0], imCor);
         }
@@ -1221,13 +1222,16 @@ bool DecodedPictureToOpenGLUploader::renderVideoMemory(
     bool isNewTexture = texture->ensureInitialized(
         displaySize.width(), displaySize.height(), displaySize.width(), 1, GL_RGBA, 1, -1);
 
-    if (!renderToRgb(frame->getVideoSurface(), isNewTexture, texture->m_id, m_initializedContext))
+    if (!renderToRgb(
+        frame->getVideoSurface(),
+        isNewTexture,
+        texture->m_id,
+        m_initializedContext,
+        frame->scaleFactor))
     {
         NX_ERROR(this, "Failed to render video memory to OpenGL texture");
         return false;
     }
-    d->functions->glWidget()->makeCurrent();
-    d->glBindTexture(GL_TEXTURE_2D, texture->id());
     return true;
 #else //__QSV_SUPPORTED__
     return false;

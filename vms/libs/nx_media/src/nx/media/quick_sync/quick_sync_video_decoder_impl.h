@@ -8,6 +8,7 @@
 
 #include <mfx/mfxvideo++.h>
 #include "allocators/base_allocator.h"
+#include "vpp_scaler.h"
 #include "utils.h"
 
 namespace nx::media::quick_sync {
@@ -24,6 +25,10 @@ public:
 
     DeviceContext& getDevice() { return m_device; }
     static bool isCompatible(AVCodecID codec, int width, int height);
+
+    bool scaleFrame(
+        mfxFrameSurface1* inputSurface, mfxFrameSurface1** outSurface, const QSize& targetSize);
+
     void resetDecoder();
 private:
     struct SurfaceInfo
@@ -41,6 +46,7 @@ private:
     bool buildQVideoFrame(mfxFrameSurface1* surface, nx::QVideoFramePtr* result);
     std::unique_ptr<mfxBitstream> updateBitStream(const QnConstCompressedVideoDataPtr& frame);
     void clearData();
+
 private:
     QuickSyncVideoDecoder::Config m_config;
     mfxVideoParam m_mfxDecParams;
@@ -57,6 +63,8 @@ private:
 
     DeviceContext m_device;
     std::deque<int64_t> m_dtsQueue;
+
+    std::unique_ptr<VppScaler> m_scaler;
     bool m_decoderInitialized = false;
 };
 

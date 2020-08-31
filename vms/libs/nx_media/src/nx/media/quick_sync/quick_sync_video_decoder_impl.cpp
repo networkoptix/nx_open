@@ -38,10 +38,17 @@ QuickSyncVideoDecoderImpl::~QuickSyncVideoDecoderImpl()
 {
     NX_DEBUG(this, "Close quick sync video decoder");
 
+    m_scaler.reset();
     m_mfxSession.Close();
 
     if (m_allocator)
         m_allocator->FreeFrames(&m_response);
+}
+
+bool QuickSyncVideoDecoderImpl::scaleFrame(
+        mfxFrameSurface1* inputSurface, mfxFrameSurface1** outSurface, const QSize& targetSize)
+{
+    return m_scaler->scaleFrame(inputSurface, outSurface, targetSize);
 }
 
 bool QuickSyncVideoDecoderImpl::initSession(int width, int height)
@@ -203,7 +210,11 @@ bool QuickSyncVideoDecoderImpl::init(
         NX_WARNING(this, "Failed to init decoder, error: %1", status);
         return false;
     }
-    return true;
+
+    m_scaler = std::make_unique<VppScaler>(m_mfxSession, m_allocator);
+    // Initialize the scaler to reserve the maximum size, since VPP does not support reset the
+    // target size up
+    return m_scaler->init(size, size);
 }
 
 void QuickSyncVideoDecoderImpl::lockSurface(const mfxFrameSurface1* surface)

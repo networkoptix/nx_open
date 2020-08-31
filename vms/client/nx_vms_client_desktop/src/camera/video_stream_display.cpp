@@ -586,6 +586,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
 
             calcSampleAR(outFrame, dec);
 
+            outFrame->scaleFactor = scaleFactor;
             if (processDecodedFrame(dec, outFrame, enableFrameQueue, reverseMode))
                 return Status_Displayed;
             else
@@ -682,7 +683,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
     }
 
     calcSampleAR(outFrame, dec);
-
+    outFrame->scaleFactor = scaleFactor;
     if (processDecodedFrame(dec, outFrame, enableFrameQueue, reverseMode))
         return Status_Displayed;
     else
@@ -753,6 +754,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(int ch
 
     calcSampleAR(outFrame, dec);
 
+    outFrame->scaleFactor = scaleFactor;
     if (processDecodedFrame(dec, outFrame, false, false))
         return Status_Displayed;
     else
@@ -765,7 +767,7 @@ bool QnVideoStreamDisplay::processDecodedFrame(
     bool enableFrameQueue,
     bool /*reverseMode*/)
 {
-    if (!outFrame->data[0] && outFrame->memoryType() != MemoryType::VideoMemory)
+    if (outFrame->isEmpty())
         return false;
 
     qnClientModule->videoCache()->add(m_resource->toResource()->getId(), outFrame);
