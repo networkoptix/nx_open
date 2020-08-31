@@ -280,7 +280,7 @@ private:
 
         QN_DECLARE_RW_PROPERTY(bool, isAutoFpsLimit, setAutoFpsLimit, AUTO_FPS_LIMIT, false)
         QN_DECLARE_RW_PROPERTY(bool, isFisheyeCalibrationGridShown, setFisheyeCalibrationGridShown, SHOW_FISHEYE_CALIBRATION_GRID, false)
-        QN_DECLARE_RW_PROPERTY(bool, isHardwareDecodingEnabled, setHardwareDecodingEnabled, HARDWARE_DECODING_ENABLED, true)
+        QN_DECLARE_RW_PROPERTY(bool, isHardwareDecodingEnabled, setHardwareDecodingEnabled, HARDWARE_DECODING_ENABLED, false)
 
     QN_END_PROPERTY_STORAGE()
 
