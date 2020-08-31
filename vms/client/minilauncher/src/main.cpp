@@ -1,3 +1,4 @@
+#include <array>
 #include <string>
 #include <vector>
 #include <locale>
@@ -120,13 +121,51 @@ bool launchInDir(const std::wstring& currentDirectory, int argc, LPWSTR* argv)
     }
 }
 
+using Version = std::array<int, 4>;
+
+const static Version kMinilauncherVersion = {
+    QN_APP_VERSION_MAJOR,
+    QN_APP_VERSION_MINOR,
+    QN_APP_VERSION_INCREMENTAL,
+    QN_APP_VERSION_BUILD_NUMBER};
+
+Version getSharedApplauncherVersion()
+{
+    Version result = {0, 0, 0, 0};
+
+    const auto applauncherPath = getFullFileName(
+        getSharedApplauncherDir(),
+        QN_APPLAUNCHER_VERSION_FILE);
+
+    auto versionFile = _wfopen(applauncherPath.c_str(), L"r");
+    if (versionFile)
+    {
+        fscanf(versionFile, "%d.%d.%d.%d", &result[0], &result[1], &result[2], &result[3]);
+        fclose(versionFile);
+    }
+
+    return result;
+}
+
 int launchFile(int argc, LPWSTR* argv)
 {
-    if (launchInDir(getSharedApplauncherDir(), argc, argv))
-        return 0;
-
-    if (launchInDir(getInstalledApplauncherDir(), argc, argv))
-        return 0;
+    // In some rare cases existing applauncher may fail to launch the just installed client binary
+    // (e.g. when client installation path was changed during rebranding).
+    // We should use local applauncher to make client execution possible. Shared applauncher and
+    // existing minilauncher copies will be updated by the executed client, so after the first
+    // client launch shared applauncher and all minilaunchers will have the same (new) version.
+    if (getSharedApplauncherVersion() < kMinilauncherVersion)
+    {
+        // The shared applauncher is outdated or does not exist.
+        if (launchInDir(getInstalledApplauncherDir(), argc, argv))
+            return 0;
+    }
+    else
+    {
+        // Shared applauncher has been updated already.
+        if (launchInDir(getSharedApplauncherDir(), argc, argv))
+            return 0;
+    }
 
     return 1;
 }
