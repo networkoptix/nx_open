@@ -662,7 +662,7 @@ nx::vms::api::SettingsData DeviceAnalyticsBinding::makeSettingsData() const
 {
     nx::vms::api::SettingsData result;
     result.sessionId = m_deviceAgentContext.additionalSettingsData.sessionId;
-    result.sequnceNumber = m_deviceAgentContext.additionalSettingsData.sequenceId;
+    result.sequenceNumber = m_deviceAgentContext.additionalSettingsData.sequenceId;
     result.modelId = m_deviceAgentContext.settingsContext.modelId;
     result.model = m_deviceAgentContext.settingsContext.model;
     result.values = m_deviceAgentContext.settingsContext.values;

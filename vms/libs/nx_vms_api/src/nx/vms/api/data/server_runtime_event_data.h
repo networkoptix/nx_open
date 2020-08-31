@@ -35,15 +35,25 @@ QN_FUSION_DECLARE_FUNCTIONS(ServerRuntimeEventData, (eq)(json)(ubjson), NX_VMS_A
 
 struct NX_VMS_API SettingsData
 {
+    /**
+     * Defines the scope for sequenceNumber: when the Client receives the instance with the new
+     * sessionId (different to the previous one), it must reset its stored sequenceNumber.     
+     */
     QnUuid sessionId;
-    int64_t sequnceNumber = 0;
+    
+    /**
+     * Used to prevent older transactions from overwriting the newer ones: when the Client receives
+     * the instance with sequenceNumber less that the one of the previosly received instance with
+     * the same sessionId, it must discard the instance.
+     */
+    int64_t sequenceNumber = 0;
 
     QnUuid modelId;
     analytics::SettingsModel model;
     analytics::SettingsValues values;
 };
 
-#define nx_vms_api_SettingsData_Fields (sessionId)(sequnceNumber)(modelId)(model)(values)
+#define nx_vms_api_SettingsData_Fields (sessionId)(sequenceNumber)(modelId)(model)(values)
 
 QN_FUSION_DECLARE_FUNCTIONS(SettingsData, (json), NX_VMS_API)
 
