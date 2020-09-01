@@ -82,6 +82,7 @@ private:
     QSet<QnSystemHealth::MessageType> m_popupSystemHealthFilter;
     QnUserResourceList m_usersWithInvalidEmail;
     QnVirtualCameraResourceList m_camerasWithDefaultPassword;
+    QnMediaServerResourceList m_serversWithoutStorages;
 };
 
 } // namespace nx::vms::client::desktop

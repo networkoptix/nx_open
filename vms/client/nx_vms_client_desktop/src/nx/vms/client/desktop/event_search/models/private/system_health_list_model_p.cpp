@@ -6,6 +6,7 @@
 #include <client/client_settings.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_changes_listener.h>
 #include <core/resource_management/resource_pool.h>
 #include <health/system_health_helper.h>
@@ -180,6 +181,9 @@ QnResourceList SystemHealthListModel::Private::displayedResourceList(int index) 
         case QnSystemHealth::UsersEmailIsEmpty:
             return m_usersWithInvalidEmail;
 
+        case QnSystemHealth::StoragesNotConfigured:
+            return m_serversWithoutStorages;
+
         default:
             return {};
     }
@@ -305,6 +309,14 @@ action::Parameters SystemHealthListModel::Private::parameters(int index) const
                     int(QnSystemAdministrationDialog::TimeServerSelection));
 
         case QnSystemHealth::StoragesNotConfigured:
+        {
+            if (!NX_ASSERT(!m_serversWithoutStorages.empty()))
+                return {};
+
+            return action::Parameters(m_serversWithoutStorages.front())
+                .withArgument(Qn::FocusTabRole, QnServerSettingsDialog::StorageManagmentPage);
+        }
+
         case QnSystemHealth::ArchiveRebuildFinished:
         case QnSystemHealth::ArchiveRebuildCanceled:
             return action::Parameters(m_items[index].resource)
@@ -411,6 +423,13 @@ void SystemHealthListModel::Private::updateItem(QnSystemHealth::MessageType mess
 
 void SystemHealthListModel::Private::updateCachedData(QnSystemHealth::MessageType message)
 {
+    const auto lessResourceByName =
+        [](const QnResourcePtr& left, const QnResourcePtr& right)
+        {
+            return nx::utils::naturalStringCompare(
+                left->getName(), right->getName(), Qt::CaseInsensitive) < 0;
+        };
+
     const auto systemHealthState = context()->instance<SystemHealthState>();
     switch (message)
     {
@@ -418,14 +437,8 @@ void SystemHealthListModel::Private::updateCachedData(QnSystemHealth::MessageTyp
         {
             m_usersWithInvalidEmail = systemHealthState->data(
                 QnSystemHealth::MessageType::UsersEmailIsEmpty).value<QnUserResourceList>();
-
             std::sort(m_usersWithInvalidEmail.begin(), m_usersWithInvalidEmail.end(),
-                [](const QnUserResourcePtr& left, const QnUserResourcePtr& right)
-                {
-                    return nx::utils::naturalStringCompare(
-                        left->getName(), right->getName(), Qt::CaseInsensitive) < 0;
-                });
-
+                lessResourceByName);
             break;
         }
 
@@ -434,6 +447,16 @@ void SystemHealthListModel::Private::updateCachedData(QnSystemHealth::MessageTyp
             m_camerasWithDefaultPassword =
                 systemHealthState->data(QnSystemHealth::MessageType::DefaultCameraPasswords)
                     .value<QnVirtualCameraResourceList>();
+            break;
+        }
+
+        case QnSystemHealth::MessageType::StoragesNotConfigured:
+        {
+            m_serversWithoutStorages =
+                systemHealthState->data(QnSystemHealth::MessageType::StoragesNotConfigured)
+                    .value<QnMediaServerResourceList>();
+            std::sort(m_serversWithoutStorages.begin(), m_serversWithoutStorages.end(),
+                lessResourceByName);
             break;
         }
 
