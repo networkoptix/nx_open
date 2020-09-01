@@ -117,6 +117,8 @@ protected:
 
     void pushManifest(const std::string& pushManifest);
 
+    virtual void finalize() override;
+
 public:
     virtual ~ConsumingDeviceAgent() override;
 

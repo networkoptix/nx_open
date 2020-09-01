@@ -37,6 +37,8 @@ public:
         sdk::Ptr<sdk::analytics::IDeviceAgent> sdkDeviceAgent,
         QString libraryName);
 
+    virtual ~DeviceAgent() override;
+
     void setHandler(sdk::Ptr<sdk::analytics::IDeviceAgent::IHandler> handler);
     bool setNeededMetadataTypes(const sdk_support::MetadataTypes& metadataTypes);
     bool pushDataPacket(sdk::Ptr<sdk::analytics::IDataPacket> data);

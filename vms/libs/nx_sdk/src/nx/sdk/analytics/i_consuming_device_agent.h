@@ -14,7 +14,7 @@ namespace analytics {
 /**
  * Interface for a DeviceAgent that requires input (e.g. audio or video stream) from the Device.
  */
-class IConsumingDeviceAgent: public Interface<IConsumingDeviceAgent, IDeviceAgent>
+class IConsumingDeviceAgent0: public Interface<IConsumingDeviceAgent0, IDeviceAgent>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IConsumingDeviceAgent"); }
@@ -33,6 +33,18 @@ public:
         return result;
     }
 };
+
+class IConsumingDeviceAgent: public IConsumingDeviceAgent0
+{
+public:
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IConsumingDeviceAgent1"); }
+
+    /**
+     * Called by the Server when this DeviceAgent is no longer needed, before releasing the ref.
+     */
+    virtual void finalize() = 0;
+};
+using IConsumingDeviceAgent1 = IConsumingDeviceAgent;
 
 } // namespace analytics
 } // namespace sdk

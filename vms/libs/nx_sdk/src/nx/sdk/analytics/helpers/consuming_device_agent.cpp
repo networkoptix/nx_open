@@ -183,6 +183,11 @@ void ConsumingDeviceAgent::getPluginSideSettings(
 {
 }
 
+void ConsumingDeviceAgent::finalize()
+{
+    NX_OUTPUT << __func__ << "()";
+}
+
 //-------------------------------------------------------------------------------------------------
 // Tools for the derived class.
 

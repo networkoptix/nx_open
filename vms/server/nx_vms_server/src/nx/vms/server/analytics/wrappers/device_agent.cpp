@@ -37,6 +37,21 @@ DeviceAgent::DeviceAgent(
 {
 }
 
+DeviceAgent::~DeviceAgent()
+{
+    Ptr<IDeviceAgent> sdkDeviceAgent = sdkObject();
+    if (!NX_ASSERT(sdkDeviceAgent))
+        return;
+
+    // Support plugins built with an old SDK: IConsumingDeviceAgent before 4.1 Hotfix (i.e. up to
+    // 4.1 Release) did not have finalize().
+    if (const auto finalizeCapableDeviceAgent =
+        sdkDeviceAgent->queryInterface<IConsumingDeviceAgent1>())
+    {
+        finalizeCapableDeviceAgent->finalize();
+    }
+}
+
 DebugSettings DeviceAgent::makeManifestProcessorDebugSettings() const
 {
     DebugSettings settings;
