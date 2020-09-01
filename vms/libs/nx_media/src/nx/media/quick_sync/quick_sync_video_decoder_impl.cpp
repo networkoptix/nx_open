@@ -17,7 +17,7 @@
 #include "compatibility_cache.h"
 #include <media/filters/h264_mp4_to_annexb.h>
 
-#define ALIGN16(value) (((value + 15) >> 4) << 4) // round up to a multiple of 16
+#define ALIGN32(value) (((value + 31) >> 5) << 5) // round up to a multiple of 32
 
 namespace nx::media::quick_sync {
 
@@ -181,7 +181,7 @@ bool QuickSyncVideoDecoderImpl::init(
         return false;
     }
 
-    if (!initSession(ALIGN16(size.width()), ALIGN16(size.height())))
+    if (!initSession(ALIGN32(size.width()), ALIGN32(size.height())))
         return false;
 
     mfxStatus status = MFXVideoDECODE_DecodeHeader(m_mfxSession, &bitstream, &m_mfxDecParams);
