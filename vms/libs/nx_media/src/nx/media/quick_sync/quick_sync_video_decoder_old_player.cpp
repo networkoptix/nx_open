@@ -31,6 +31,23 @@ bool QuickSyncVideoDecoderOldPlayer::isSupported(const QnConstCompressedVideoDat
     return true;
 }
 
+int QuickSyncVideoDecoderOldPlayer::m_instanceCount = 0;
+
+int QuickSyncVideoDecoderOldPlayer::instanceCount()
+{
+    return m_instanceCount;
+}
+
+QuickSyncVideoDecoderOldPlayer::QuickSyncVideoDecoderOldPlayer()
+{
+    m_instanceCount++;
+}
+
+QuickSyncVideoDecoderOldPlayer::~QuickSyncVideoDecoderOldPlayer()
+{
+    m_instanceCount--;
+}
+
 bool QuickSyncVideoDecoderOldPlayer::decode(
     const QnConstCompressedVideoDataPtr& data, CLVideoDecoderOutputPtr* const outFramePtr)
 {

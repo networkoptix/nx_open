@@ -386,6 +386,7 @@ QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
 #ifdef __QSV_SUPPORTED__
     if (qnSettings->isHardwareDecodingEnabled()
         && !m_reverseMode
+        && QuickSyncVideoDecoderOldPlayer::instanceCount() < qnSettings->maxHardwareDecoders()
         && QuickSyncVideoDecoderOldPlayer::isSupported(data))
     {
         decoder = new QuickSyncVideoDecoderOldPlayer();

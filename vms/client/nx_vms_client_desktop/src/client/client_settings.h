@@ -171,6 +171,9 @@ public:
         /** Whether hardware video decoding is used, if available. */
         HARDWARE_DECODING_ENABLED,
 
+        /** Maximux size for hardware decoders. */
+        MAX_HARDWARE_DECODERS,
+
         VARIABLE_COUNT
     };
 
@@ -281,6 +284,7 @@ private:
         QN_DECLARE_RW_PROPERTY(bool, isAutoFpsLimit, setAutoFpsLimit, AUTO_FPS_LIMIT, false)
         QN_DECLARE_RW_PROPERTY(bool, isFisheyeCalibrationGridShown, setFisheyeCalibrationGridShown, SHOW_FISHEYE_CALIBRATION_GRID, false)
         QN_DECLARE_RW_PROPERTY(bool, isHardwareDecodingEnabled, setHardwareDecodingEnabled, HARDWARE_DECODING_ENABLED, false)
+        QN_DECLARE_RW_PROPERTY(int, maxHardwareDecoders, setMaxHardwareDecoders, MAX_HARDWARE_DECODERS, 8)
 
     QN_END_PROPERTY_STORAGE()
 

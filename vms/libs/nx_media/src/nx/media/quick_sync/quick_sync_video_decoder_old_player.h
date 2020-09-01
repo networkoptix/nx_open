@@ -10,6 +10,9 @@ namespace nx::media::quick_sync {
 class QuickSyncVideoDecoderOldPlayer: public QnAbstractVideoDecoder
 {
 public:
+    QuickSyncVideoDecoderOldPlayer();
+    virtual ~QuickSyncVideoDecoderOldPlayer();
+
     virtual bool decode(const QnConstCompressedVideoDataPtr& data, CLVideoDecoderOutputPtr* const outFrame) override;
 
     virtual void resetDecoder(const QnConstCompressedVideoDataPtr& data) override;
@@ -26,9 +29,11 @@ public:
 
     static bool isSupported(const QnConstCompressedVideoDataPtr& data);
 
+    static int instanceCount();
 private:
     std::shared_ptr<nx::media::quick_sync::QuickSyncVideoDecoderImpl> m_impl;
     QSize m_resolution;
     int m_lastStatus = 0;
+    static int m_instanceCount;
     AVCodecID m_codecId = AV_CODEC_ID_NONE;
 };
