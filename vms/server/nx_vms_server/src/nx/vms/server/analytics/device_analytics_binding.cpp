@@ -97,7 +97,6 @@ bool DeviceAnalyticsBinding::restartAnalytics()
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     stopAnalyticsUnsafe();
-    m_deviceAgentContext = DeviceAgentContext();
     return startAnalyticsUnsafe();
 }
 
@@ -227,6 +226,7 @@ void DeviceAnalyticsBinding::stopAnalyticsUnsafe()
 
     m_lastNeededMetadataTypes.reset();
     m_deviceAgentContext.deviceAgent->setNeededMetadataTypes(sdk_support::MetadataTypes());
+    m_deviceAgentContext = DeviceAgentContext();
 }
 
 SettingsResponse DeviceAnalyticsBinding::getSettings() const
