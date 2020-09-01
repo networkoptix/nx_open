@@ -3,6 +3,8 @@
 #include <chrono>
 #include <limits>
 
+#include <QtCore/QCollator>
+
 #include <client/client_settings.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/camera_resource.h>
@@ -423,11 +425,14 @@ void SystemHealthListModel::Private::updateItem(QnSystemHealth::MessageType mess
 
 void SystemHealthListModel::Private::updateCachedData(QnSystemHealth::MessageType message)
 {
+    QCollator collator;
+    collator.setNumericMode(true);
+    collator.setCaseSensitivity(Qt::CaseInsensitive);
+
     const auto lessResourceByName =
-        [](const QnResourcePtr& left, const QnResourcePtr& right)
+        [&collator](const QnResourcePtr& left, const QnResourcePtr& right)
         {
-            return nx::utils::naturalStringCompare(
-                left->getName(), right->getName(), Qt::CaseInsensitive) < 0;
+            return collator.compare(left->getName(), right->getName()) < 0;
         };
 
     const auto systemHealthState = context()->instance<SystemHealthState>();
