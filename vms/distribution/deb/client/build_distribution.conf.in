@@ -29,3 +29,6 @@ CLIENT_HELP_PATH="@help_directory@/bin/help"
 DISTRIBUTION_NAME="@client_distribution_name@"
 UPDATE_ZIP="@client_update_distribution_name@.zip"
 ARCHITECTURE="@os.arch@"
+
+DEB_COMPRESSION_LEVEL=@deb_compression_level@
+ZIP_COMPRESSION_LEVEL=@zip_compression_level@

@@ -160,3 +160,14 @@ set(product.liteDeviceName "nx1")
 
 # Compatibility layer
 set(installerLanguage "${customization.defaultLanguage}")
+
+# Packages (.deb, .zip and .tar.gz) compression levels.
+if(publicationType STREQUAL "local" OR publicationType STREQUAL "private")
+    set(deb_compression_level 0)
+    set(zip_compression_level 1)
+    set(gzip_compression_level 1)
+else()
+    set(deb_compression_level 6)
+    set(zip_compression_level 6)
+    set(gzip_compression_level 6)
+endif()

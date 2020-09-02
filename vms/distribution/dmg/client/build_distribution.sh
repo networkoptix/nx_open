@@ -112,7 +112,7 @@ buildDistribution()
     cp package.json "$SRC/"
 
     (cd "$SRC"
-        zip -y -r "../$UPDATE_ZIP" *.app update.json package.json
+        zip -y -r -$ZIP_COMPRESSION_LEVEL "../$UPDATE_ZIP" *.app update.json package.json
     )
 }
 

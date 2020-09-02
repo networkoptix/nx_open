@@ -283,15 +283,18 @@ createUpdateZip() # file.deb
         "package.json" >"$ZIP_DIR/package.json"
 
     cp -r "update/update.json" "$ZIP_DIR/update.json"
-    distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP" "$ZIP_DIR" zip -r
+    distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP" "$ZIP_DIR" \
+        zip -r `# Never compress .deb file #`-0
     rm "$ZIP_DIR/package.json" #< Legacy RPI/Bananapi packages does not need this file.
 
     if [[ $TARGET_DEVICE == "linux_arm32" ]]
     then
         cp -r "update/update.rpi.json" "$ZIP_DIR/update.json"
-        distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP_RPI" "$ZIP_DIR" zip -r
+        distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP_RPI" "$ZIP_DIR" \
+            zip -r `# Never compress .deb file #`-0
         cp -r "update/update.bananapi.json" "$ZIP_DIR/update.json"
-        distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP_BANANAPI" "$ZIP_DIR" zip -r
+        distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP_BANANAPI" "$ZIP_DIR" \
+            zip -r `# Never compress .deb file #`-0
     fi
 }
 
@@ -331,7 +334,7 @@ buildDistribution()
     local -r DEB="$DISTRIBUTION_OUTPUT_DIR/$DISTRIBUTION_NAME.deb"
 
     echo "Creating $DEB"
-    fakeroot dpkg-deb -b "$STAGE" "$DEB"
+    fakeroot dpkg-deb -z $DEB_COMPRESSION_LEVEL -b "$STAGE" "$DEB"
 
     createUpdateZip "$DEB"
 
