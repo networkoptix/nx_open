@@ -174,6 +174,9 @@ public:
         /** Whether old-style PTZ aim overlay is enabled. */
         PTZ_AIM_OVERLAY_ENABLED,
 
+        /** [Support] Whether "Browse Logs" button is visible on Advanced page of Local Settings. */
+        BROWSE_LOGS_VISIBLE,
+
         VARIABLE_COUNT
     };
 
@@ -285,6 +288,8 @@ private:
         QN_DECLARE_RW_PROPERTY(bool, isFisheyeCalibrationGridShown, setFisheyeCalibrationGridShown, SHOW_FISHEYE_CALIBRATION_GRID, false)
         QN_DECLARE_RW_PROPERTY(bool, isHardwareDecodingEnabled, setHardwareDecodingEnabled, HARDWARE_DECODING_ENABLED, false)
         QN_DECLARE_RW_PROPERTY(bool, isPtzAimOverlayEnabled, setPtzAimOverlatyEnabled, PTZ_AIM_OVERLAY_ENABLED, true)
+
+        QN_DECLARE_R_PROPERTY(bool, isBrowseLogsVisible, BROWSE_LOGS_VISIBLE, true)
 
     QN_END_PROPERTY_STORAGE()
 
