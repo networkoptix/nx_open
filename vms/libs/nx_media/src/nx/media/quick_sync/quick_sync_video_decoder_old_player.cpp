@@ -56,11 +56,17 @@ bool QuickSyncVideoDecoderOldPlayer::decode(
             m_resolution = frameResolution;
     }
 
+    if (!m_impl)
+    {
+        NX_DEBUG(this, "There is no decoder to flush frames");
+        return false;
+    }
+
     CLVideoDecoderOutputPtr outFrame = *outFramePtr;
     nx::QVideoFramePtr result;
     if (m_impl->decode(data, &result) < 0)
     {
-        NX_ERROR(this, "Failed to decode frame");
+        NX_WARNING(this, "Failed to decode frame");
         m_impl.reset();
         m_lastStatus = -1;
         return false;
