@@ -291,6 +291,13 @@ std::unique_ptr<mfxBitstream> QuickSyncVideoDecoderImpl::updateBitStream(
     return bitstream;
 }
 
+void QuickSyncVideoDecoderImpl::resetDecoder()
+{
+    if (m_decoderInitialized)
+        MFXVideoDECODE_Reset(m_mfxSession, &m_mfxDecParams);
+    clearData();
+}
+
 int QuickSyncVideoDecoderImpl::decode(
     const QnConstCompressedVideoDataPtr& frame, nx::QVideoFramePtr* result)
 {
@@ -317,6 +324,7 @@ int QuickSyncVideoDecoderImpl::decode(
         clearData();
         return -1;
     }
+    m_decoderInitialized = true;
 
     mfxStatus status = MFX_ERR_NONE;
     mfxSyncPoint syncp;

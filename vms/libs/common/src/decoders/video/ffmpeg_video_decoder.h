@@ -41,6 +41,8 @@ public:
     ~QnFfmpegVideoDecoder();
     bool decode( const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFrame );
 
+    virtual void resetDecoder() override;
+
     void showMotion(bool show);
 
     virtual void setLightCpuMode(DecodeMode val);

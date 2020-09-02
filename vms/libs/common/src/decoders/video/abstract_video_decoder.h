@@ -77,6 +77,9 @@ public:
 
     // return status of last decode call. Success - 0, Error - other value.
     virtual int getLastDecodeResult() const = 0;
+
+    // Flush decoder buffer. It called in case of seek operation.
+    virtual void resetDecoder() = 0;
 };
 
 #endif // ENABLE_DATA_PROVIDERS

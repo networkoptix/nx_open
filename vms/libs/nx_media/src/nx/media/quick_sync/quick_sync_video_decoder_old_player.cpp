@@ -91,6 +91,12 @@ void QuickSyncVideoDecoderOldPlayer::resetDecoder(const QnConstCompressedVideoDa
     m_impl.reset();
 }
 
+void QuickSyncVideoDecoderOldPlayer::resetDecoder()
+{
+    NX_DEBUG(this, "Reset decoder");
+    m_impl->resetDecoder();
+}
+
 int QuickSyncVideoDecoderOldPlayer::getWidth() const
 {
     return m_resolution.width();

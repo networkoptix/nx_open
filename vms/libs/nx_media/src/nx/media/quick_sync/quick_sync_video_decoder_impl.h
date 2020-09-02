@@ -24,7 +24,7 @@ public:
 
     DeviceContext& getDevice() { return m_device; }
     static bool isCompatible(AVCodecID codec, int width, int height);
-
+    void resetDecoder();
 private:
     struct SurfaceInfo
     {
@@ -57,6 +57,7 @@ private:
 
     DeviceContext m_device;
     std::deque<int64_t> m_dtsQueue;
+    bool m_decoderInitialized = false;
 };
 
 } // namespace nx::media::quick_sync
