@@ -388,7 +388,8 @@ void ObjectTrackSearcher::fetchTracksFromDb(
             result->tracks.insert(pos, std::move(track));
         }
 
-        if (m_filter.maxObjectTracksToSelect > 0 && result->tracks.size() >= m_filter.maxObjectTracksToSelect)
+        if (m_filter.maxObjectTracksToSelect > 0 &&
+            (int) result->tracks.size() >= m_filter.maxObjectTracksToSelect)
         {
             result->tracks.resize(m_filter.maxObjectTracksToSelect);
             break;

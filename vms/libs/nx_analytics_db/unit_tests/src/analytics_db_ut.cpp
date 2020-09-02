@@ -1244,7 +1244,7 @@ protected:
             std::chrono::system_clock::now() - std::chrono::hours(24) * 365,
             std::chrono::system_clock::now());
 
-        saveAnalyticsDataPackets(generateEventsByCriteria(1234), flush);
+        saveAnalyticsDataPackets(generateEventsByCriteria(1234));
     }
 };
 
