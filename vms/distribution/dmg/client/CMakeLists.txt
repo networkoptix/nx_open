@@ -1,4 +1,5 @@
 include(macosx_notarization)
+include(openssl_signing)
 
 set(dmg_file_name ${client_distribution_name}.dmg)
 set(update_file_name ${client_update_distribution_name}.zip)
@@ -97,6 +98,7 @@ add_custom_target(distribution_dmg_client ALL
     COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_BINARY_DIR}/${update_file_name} ${distribution_output_dir}
 )
+nx_create_openssl_signature(distribution_dmg_client ${distribution_output_dir}/${update_file_name})
 
 if(codeSigning)
     prepare_mac_keychain(distribution_dmg_client)
