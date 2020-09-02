@@ -3,7 +3,20 @@
 angular.module('webadminApp')
     .controller('AdvancedCtrl', ['$scope', '$uibModal', '$log', 'mediaserver', '$location', 'dialogs', 'systemAPI',
     function ($scope, $uibModal, $log, mediaserver,$location, dialogs, systemAPI) {
+        var isBooleanRegex = new RegExp(/enable|use(?!r)/i);
 
+        function castBool(x) {
+            return isInt(x) ? parseInt(x) > 0 : (x.toLowerCase() === 'true');
+        }
+
+        function isSettingsBool(settingValue, settingName) {
+            settingValue = settingValue.toLowerCase();
+            return isBooleanRegex.test(settingName) || settingValue === 'true' || settingValue === 'false';
+        }
+
+        function isInt(x) {
+            return !isNaN(parseInt(x));
+        }
 
         mediaserver.getUser().then(function(user){
             if(!user.isAdmin){
@@ -22,29 +35,26 @@ angular.module('webadminApp')
         mediaserver.systemSettings({ignore:'installedUpdateInformation,targetUpdateInformation'}).then(function(r){
             $scope.systemSettings = r.data.reply.settings;
 
-            for(var settingName in $scope.systemSettings){
-                if(!$scope.Config.settingsConfig[settingName]){
+            for (var settingName in $scope.systemSettings) {
+                var settingValue = $scope.systemSettings[settingName];
+                if (!(settingName in $scope.Config.settingsConfig)) {
                     var type = 'text';
-                    if( $scope.systemSettings[settingName] === true ||
-                        $scope.systemSettings[settingName] === false ||
-                        $scope.systemSettings[settingName] === 'true' ||
-                        $scope.systemSettings[settingName] === 'false' ){
+                    if ( isSettingsBool(settingValue, settingName)) {
                         type = 'checkbox';
+                    } else if (isInt(settingValue)) {
+                        type = 'number';
                     }
-                    $scope.Config.settingsConfig[settingName] = {label:settingName,type:type};
+                    $scope.Config.settingsConfig[settingName] = {label: settingName, type: type};
                 }
 
-                if($scope.Config.settingsConfig[settingName].type === 'number'){
-                    $scope.systemSettings[settingName] = parseInt($scope.systemSettings[settingName]);
-                }
-                if($scope.systemSettings[settingName] === 'true'){
-                    $scope.systemSettings[settingName] = true;
-                }
-                if($scope.systemSettings[settingName] === 'false'){
-                    $scope.systemSettings[settingName] = false;
+                if ($scope.Config.settingsConfig[settingName].type === 'number') {
+                    settingValue = parseInt(settingValue);
+                } else if ($scope.Config.settingsConfig[settingName].type === 'checkbox') {
+                    settingValue = castBool(settingValue);
                 }
 
-                $scope.Config.settingsConfig[settingName].oldValue =  $scope.systemSettings[settingName];
+                $scope.systemSettings[settingName] = settingValue;
+                $scope.Config.settingsConfig[settingName].oldValue =  settingValue;
             }
         });
 
