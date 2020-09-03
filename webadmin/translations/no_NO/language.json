@@ -231,16 +231,16 @@
         "voiceCommands": {
             "play": "spill av",
             "pause": "pause",
-            "live": "go to live | show me live",
+            "live": "gå til live | vis meg live",
             "view": "se + [kamera navn]",
-            "search": "find + [text for searchbar]",
+            "search": "finn + [tekst for søkefelt]",
             "clear search": "nullstill søk",
             "expand server": "utvider server + [servernavn]",
-            "collapse server": "collapse server + [server name]",
+            "collapse server": "utvider server + [servernavn]",
             "expand all servers": "utvide alle servere",
             "collapse all servers": "kollapse alle servere",
             "stop listening": "slutt å lytte",
-            "help": "help | show commands"
+            "help": "hjelp | vis kommandoer"
         }
     }
 }
