@@ -98,9 +98,3 @@ void QuickSyncVideoFrame::unlockFrame()
         surface->Data.MemId, &surface->Data);
 }
 
-QSize QuickSyncVideoFrame::size()
-{
-    auto surfaceInfo = m_frame->handle().value<QuickSyncSurface>();
-    mfxFrameSurface1* surface = surfaceInfo.surface;
-    return QSize(surface->Info.Width, surface->Info.Height);
-}

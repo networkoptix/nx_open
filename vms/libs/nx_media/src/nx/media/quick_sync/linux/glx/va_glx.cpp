@@ -25,7 +25,6 @@
 #ifdef __linux__
 
 #include <stdlib.h>
-#include <stdio.h>
 #include "va_glx_private.h"
 #include "va_glx_impl.h"
 
@@ -151,10 +150,7 @@ VAStatus vaUpdateSurfaceGLX_nx(
     if (!glIsTexture(texture))
         return VA_STATUS_ERROR_INVALID_PARAMETER;
 
-    printf("init... \n");
     INIT_CONTEXT(ctx, dpy);
-
-    printf("init success\n");
 
     vaUpdateSurfaceGLX_impl_libva(ctx, target, texture, gl_surface);
     return status;

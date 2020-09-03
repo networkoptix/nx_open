@@ -42,7 +42,6 @@ public:
     virtual ~AbstractVideoSurface() {}
     virtual AVFrame lockFrame() = 0;
     virtual void unlockFrame() = 0;
-    virtual QSize size() = 0;
 };
 
 /**

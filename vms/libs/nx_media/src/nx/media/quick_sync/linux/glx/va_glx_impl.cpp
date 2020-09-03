@@ -909,7 +909,7 @@ static inline int check_surface(VASurfaceGLXP pSurfaceGLX)
 }
 
 
-// Create VA/GLX surface
+// Update output texture for VA/GLX surface
 static VASurfaceGLXP
 update_surface(VADriverContextP ctx, VASurfaceGLXP pSurfaceGLX, GLenum target, GLuint texture)
 {
@@ -917,11 +917,6 @@ update_surface(VADriverContextP ctx, VASurfaceGLXP pSurfaceGLX, GLenum target, G
     int is_error = 1;
 
     pSurfaceGLX->texture        = texture;
-//     pSurfaceGLX->surface        = VA_INVALID_SURFACE;
-//     pSurfaceGLX->is_bound       = 0;
-//     pSurfaceGLX->pixmap         = None;
-//     pSurfaceGLX->pix_texture    = 0;
-//     pSurfaceGLX->glx_pixmap     = None;
     pSurfaceGLX->fbo            = 0;
 
     glEnable(target);
@@ -939,7 +934,6 @@ update_surface(VADriverContextP ctx, VASurfaceGLXP pSurfaceGLX, GLenum target, G
     if (!gl_get_texture_param(GL_TEXTURE_HEIGHT, &height))
         goto end;
 
-    printf("texture size %ix%i\n", width, height);
     width  -= 2 * border_width;
     height -= 2 * border_width;
     if (width == 0 || height == 0)
@@ -976,10 +970,6 @@ VAStatus vaUpdateSurfaceGLX_impl_libva(
         goto error;
 
     update_surface(ctx, pSurfaceGLX, target, texture);
-
-
-    //pSurfaceGLX->src_width = src_width;
-    //pSurfaceGLX->src_height = src_height;
 
     gl_set_current_context(&old_cs, NULL);
     return VA_STATUS_SUCCESS;

@@ -19,7 +19,6 @@ public:
         float* cropHeight);
     virtual AVFrame lockFrame() override;
     virtual void unlockFrame() override;
-    virtual QSize size() override;
 
 private:
     // Contain video surface

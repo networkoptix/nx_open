@@ -9,22 +9,89 @@
 #include "device_handle.h"
 
 #include <nx/utils/log/log.h>
+namespace {
+
+LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
+    {
+        // Allow the window to be larger than the screen
+        case WM_GETMINMAXINFO:
+        {
+            MINMAXINFO *minmax = (MINMAXINFO *) lParam;
+            minmax->ptMaxSize.x = 8192;
+            minmax->ptMaxSize.y = 8192;
+            minmax->ptMaxTrackSize.x = 8192;
+            minmax->ptMaxTrackSize.y = 8192;
+            return 0;
+        }
+        case WM_DESTROY:
+        {
+            PostQuitMessage(0);
+            return 0;
+        }
+    }
+    return DefWindowProc (hWnd, message, wParam, lParam);
+}
+
+class RegisterWindowClass
+{
+public:
+    RegisterWindowClass()
+    {
+        WNDCLASSEX wc;
+        ZeroMemory(&wc, sizeof(WNDCLASSEX));
+
+        wc.cbSize = sizeof(WNDCLASSEX);
+        wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+        wc.lpfnWndProc = WindowProc;
+        wc.hInstance = (HINSTANCE)GetModuleHandle(NULL);
+        wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+        wc.lpszClassName = L"WindowClass";
+
+        RegisterClassEx(&wc);
+    }
+    ~RegisterWindowClass()
+    {
+        UnregisterClass(L"WindowClass", (HINSTANCE)GetModuleHandle(NULL));
+    }
+};
+
+HWND createDxWindow(int width, int height)
+{
+    static RegisterWindowClass windowClass;
+
+    HWND hWnd = CreateWindowEx(NULL, L"WindowClass", L"Shared Resource - DX",
+        WS_OVERLAPPEDWINDOW, 0, 0, width, height,
+        NULL, NULL, (HINSTANCE)GetModuleHandle(NULL), NULL);
+
+    if (IsWindow(hWnd))
+    {
+        RECT rc = { 0, 0, width, height};
+
+        DWORD dwStyle = GetWindowLongPtr(hWnd, GWL_STYLE);
+        DWORD dwExStyle = GetWindowLongPtr(hWnd, GWL_EXSTYLE);
+        AdjustWindowRectEx(&rc, dwStyle, FALSE, dwExStyle);
+        SetWindowPos(hWnd, NULL, 0, 0, rc.right - rc.left, rc.bottom - rc.top, SWP_NOZORDER | SWP_NOMOVE);
+    }
+    return hWnd;
+}
+
+} // namespace
 
 namespace nx::media::quick_sync::windows {
-
-thread_local WindowCache DeviceHandle::m_windowCache;
 
 DeviceHandle::~DeviceHandle()
 {
     m_renderer.close();
     if (m_hWnd)
-        m_windowCache.releaseWindow(m_hWnd);
+        DestroyWindow(m_hWnd);
 }
 
 bool DeviceHandle::createDevice(int width, int height, mfxU32 adapterNumber)
 {
     NX_DEBUG(this, "Create directx device, resolution: %1x%2", width, height);
-    m_hWnd = m_windowCache.getWindow(width, height);
+    m_hWnd = createDxWindow(width, height);
 
     D3DPRESENT_PARAMETERS d3dpp;
     ZeroMemory(&d3dpp, sizeof(d3dpp));
