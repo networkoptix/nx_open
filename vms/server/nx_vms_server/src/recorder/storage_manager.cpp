@@ -2495,7 +2495,8 @@ void QnStorageManager::testStorages()
         [](const auto& storage)
         {
             using namespace nx::vms::server;
-            QnFileStorageResourcePtr fileStorage = storage.dynamicCast<QnFileStorageResource>();
+            QnFileStorageResourcePtr fileStorage =
+                storage.template dynamicCast<QnFileStorageResource>();
             if (fileStorage)
                 return fileStorage->isLocal();
 
