@@ -81,7 +81,9 @@ signals:
 
 protected:
     virtual bool mousePressEvent(QWidget* viewport, QMouseEvent* event) override;
-    virtual bool mouseMoveEvent(QWidget* viewport, QMouseEvent* event) override;
+    virtual bool hoverEnterEvent(QWidget* viewport, QHoverEvent* event) override;
+    virtual bool hoverLeaveEvent(QWidget* viewport, QHoverEvent* event) override;
+    virtual bool hoverMoveEvent(QWidget* viewport, QHoverEvent* event) override;
 
     virtual void startDragProcess(DragInfo* info) override;
     virtual void startDrag(DragInfo* info) override;
@@ -90,6 +92,8 @@ protected:
     virtual void finishDragProcess(DragInfo* info) override;
 
 private:
+    void updateCursor(QWidget* viewport, const QPoint& viewportPos);
+
     void getWidgetAndFrameSection(
         QWidget* viewport,
         const QPoint& pos,
@@ -124,6 +128,5 @@ private:
     QGraphicsWidgetPtr m_widget;
     ConstrainedGeometrically* m_constrained;
 
-    /** List of widgets, for which we have changed cursor. */
-    QList<QGraphicsWidgetPtr> m_affectedWidgets;
+    bool m_cursorOverridden = false;
 };

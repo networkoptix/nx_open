@@ -7,7 +7,7 @@ if(POLICY CMP0068)
     cmake_policy(SET CMP0068 NEW)
 endif()
 
-project(nx_kit_test)
+project(nx_kit)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_EXTENSIONS OFF)

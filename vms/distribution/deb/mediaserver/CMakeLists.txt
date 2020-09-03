@@ -1,3 +1,5 @@
+include(openssl_signing)
+
 set(depends
     mediaserver
     server_plugins
@@ -51,13 +53,19 @@ list(APPEND configured_files ${CMAKE_CURRENT_BINARY_DIR}/build_distribution.conf
 
 nx_create_qt_conf(${CMAKE_CURRENT_BINARY_DIR}/qt.conf)
 
-set(zip_files ${distribution_output_dir}/${server_update_distribution_name}.zip)
+set(server_update_file ${distribution_output_dir}/${server_update_distribution_name}.zip)
+set(zip_files ${server_update_file})
 set(deb_file ${distribution_output_dir}/${server_distribution_name}.deb)
 
 if(targetDevice STREQUAL "linux_arm32")
+    set(server_update_file_rpi
+        ${distribution_output_dir}/${server_update_distribution_name_rpi}.zip)
+    set(server_update_file_bananapi
+        ${distribution_output_dir}/${server_update_distribution_name_bananapi}.zip)
+
     list(APPEND zip_files
-        ${distribution_output_dir}/${server_update_distribution_name_rpi}.zip
-        ${distribution_output_dir}/${server_update_distribution_name_bananapi}.zip
+        ${server_update_file_rpi}
+        ${server_update_file_bananapi}
     )
 endif()
 
@@ -73,3 +81,9 @@ add_custom_command(
 add_custom_target(distribution_deb_mediaserver ALL
     DEPENDS ${installer_output_list}
 )
+nx_create_openssl_signature(distribution_deb_mediaserver ${server_update_file})
+
+if(targetDevice STREQUAL "linux_arm32")
+    nx_create_openssl_signature(distribution_deb_mediaserver ${server_update_file_rpi})
+    nx_create_openssl_signature(distribution_deb_mediaserver ${server_update_file_bananapi})
+endif()

@@ -39,6 +39,7 @@
 #include <vector>
 #include <functional>
 #include "storage_db_pool.h"
+#include "storage_check_runner.h"
 #include "health/system_health.h"
 #include "nx/vms/server/server_module_aware.h"
 #include <media_server/media_server_module.h>
@@ -52,7 +53,6 @@ extern "C" {
 } // extern "C"
 
 class QnAbstractMediaStreamDataProvider;
-class TestStorageThread;
 class RebuildAsyncTask;
 class ArchiveIndexer;
 class AuxiliaryTask;
@@ -184,8 +184,6 @@ public:
     QnStorageScanData rebuildInfo() const;
     bool needToStopMediaScan() const;
     void startAuxTimerTasks();
-
-    void initDone();
     QnStorageResourcePtr findStorageByOldIndex(int oldIndex);
 
     void migrateSqliteDatabase(const QnStorageResourcePtr & storage) const;
@@ -206,6 +204,7 @@ public:
     qint64 recordingBitrateBps(
         const QnVirtualCameraResourcePtr& camera, std::chrono::milliseconds bitratePeriod) const;
     QnServer::StoragePool getRole() const;
+    void forceStorageTest();
 
 signals:
     void storagesAvailable();
@@ -222,14 +221,11 @@ public slots:
     void onNewResource(const QnResourcePtr &resource);
     void onDelResource(const QnResourcePtr &resource);
     void at_storageRoleChanged(const QnResourcePtr &storage);
-    void testOfflineStorages();
 
 protected:
     void testStoragesDone();
 
 private:
-    friend class TestStorageThread;
-
     void createArchiveCameras(const nx::caminfo::ArchiveCameraDataList& archiveCameras);
     void getRecordedPeriodsInternal(
         std::vector<QnTimePeriodList>& periods,
@@ -326,6 +322,8 @@ private:
         const CleanupInfo& cleanupInfo,
         const std::chrono::steady_clock::time_point startPoint) const;
 
+    void testStorages();
+
 private:
     nx::analytics::db::AbstractEventsStorage* m_analyticsEventsStorage;
     const QnServer::StoragePool m_role;
@@ -335,7 +333,6 @@ private:
     mutable QnMutex m_mutexStorages;
     mutable QnMutex m_mutexCatalog;
     mutable QnMutex m_localPatches;
-    mutable QnMutex m_testStorageThreadMutex;
     QnMutex m_clearSpaceMutex;
 
     QTimer m_timer;
@@ -343,7 +340,6 @@ private:
     mutable nx::utils::Lockable<QnStorageScanData> m_scanData;
     mutable bool m_isWritableStorageAvail;
     QElapsedTimer m_storageWarnTimer;
-    TestStorageThread* m_testStorageThread;
     /**
      * Storage id --> 'corresponding storage has too much data not managed by VMS' flag map.
      */
@@ -371,6 +367,7 @@ private:
 
     nx::utils::TimerManager m_auxTasksTimerManager;
     std::optional<bool> m_hasWritableStorages;
+    nx::vms::server::StorageCheckRunner m_storageCheckRunner;
 
 protected:
     virtual std::chrono::milliseconds checkSystemFreeSpaceInterval() const;

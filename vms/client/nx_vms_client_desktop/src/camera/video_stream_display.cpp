@@ -477,7 +477,8 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
     {
         clearReverseQueue();
         QnMutexLocker lock( &m_mtx );
-        m_decoderData.decoder.reset();
+        if (m_decoderData.decoder)
+            m_decoderData.decoder->resetDecoder();
         m_prevReverseMode = reverseMode;
         m_needResetDecoder = false;
     }

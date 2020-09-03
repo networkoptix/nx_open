@@ -39,12 +39,20 @@ Ptr<EventMetadataPacket> parsePacket(const JsonObject& behaviorAlarmInfo)
     metadata->setTypeId(type->id.toStdString());
 
     const auto edgeEvent = behaviorAlarmInfo["EdgeEvent"].to<QString>();
-    if (type->isProlonged)
-        metadata->setIsActive(edgeEvent != "Falling");
-    else if (edgeEvent != "Rising")
+    if (!type->isProlonged && edgeEvent != "Rising")
         return nullptr;
 
-    metadata->setDescription(behaviorAlarmInfo["RuleName"].to<QString>().toStdString());
+    metadata->setIsActive(edgeEvent != "Falling");
+
+    auto description = behaviorAlarmInfo["RuleName"].to<QString>();
+    if (type->isProlonged)
+    {
+        if (edgeEvent == "Rising")
+            description += " has started";
+        else if (edgeEvent == "Falling")
+            description += " has ended";
+    }
+    metadata->setDescription(description.toStdString());
 
     packet->addItem(metadata.get());
 

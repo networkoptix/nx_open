@@ -17,7 +17,7 @@
 #include "compatibility_cache.h"
 #include <media/filters/h264_mp4_to_annexb.h>
 
-#define MSDK_ALIGN16(value) (((value + 15) >> 4) << 4) // round up to a multiple of 16
+#define ALIGN32(value) (((value + 31) >> 5) << 5) // round up to a multiple of 32
 
 namespace nx::media::quick_sync {
 
@@ -51,14 +51,14 @@ bool QuickSyncVideoDecoderImpl::initSession(int width, int height)
     mfxStatus status = m_mfxSession.Init(impl, &version);
     if (status < MFX_ERR_NONE)
     {
-        NX_ERROR(this, "Failed to init MFX session, error: %1", status);
+        NX_WARNING(this, "Failed to init MFX session, error: %1", status);
         return false;
     }
     NX_DEBUG(this, "MFX version %1.%2", version.Major, version.Minor);
 
     if (!m_device.initialize(m_mfxSession, width, height))
     {
-        NX_ERROR(this, "Failed to set handle to MFX session");
+        NX_WARNING(this, "Failed to set handle to MFX session");
         return false;
     }
 
@@ -73,7 +73,7 @@ bool QuickSyncVideoDecoderImpl::initSession(int width, int height)
         status = allocator->Init(nullptr);
         if (status < MFX_ERR_NONE)
         {
-            NX_ERROR(this, "Failed to init allocator, error code: %1", status);
+            NX_WARNING(this, "Failed to init allocator, error code: %1", status);
             return false;
         }
         m_allocator = std::move(allocator);
@@ -87,7 +87,7 @@ bool QuickSyncVideoDecoderImpl::allocFrames()
     mfxStatus status = MFXVideoDECODE_Query(m_mfxSession, &m_mfxDecParams, &m_mfxDecParams);
     if (status < MFX_ERR_NONE)
     {
-        NX_ERROR(this, "Query failed, error: %1", status);
+        NX_WARNING(this, "Query failed, error: %1", status);
         return false;
     }
 
@@ -96,7 +96,7 @@ bool QuickSyncVideoDecoderImpl::allocFrames()
     status = MFXVideoDECODE_QueryIOSurf(m_mfxSession, &m_mfxDecParams, &request);
     if (status < MFX_ERR_NONE)
     {
-        NX_ERROR(this, "QueryIOSurf failed, error: %1", status);
+        NX_WARNING(this, "QueryIOSurf failed, error: %1", status);
         return false;
     }
 
@@ -106,7 +106,7 @@ bool QuickSyncVideoDecoderImpl::allocFrames()
 
     if (request.NumFrameSuggested < m_mfxDecParams.AsyncDepth)
     {
-        NX_ERROR(this, "NumFrameSuggested(%1) less then AsyncDepth(%2)",
+        NX_WARNING(this, "NumFrameSuggested(%1) less then AsyncDepth(%2)",
             request.NumFrameSuggested, m_mfxDecParams.AsyncDepth);
         return false;
     }
@@ -124,7 +124,7 @@ bool QuickSyncVideoDecoderImpl::allocSurfaces(mfxFrameAllocRequest& request)
     mfxStatus status = m_allocator->Alloc(m_allocator->pthis, &request, &m_response);
     if (status < MFX_ERR_NONE)
     {
-        NX_ERROR(this, "Alloc failed, status: %1", status);
+        NX_WARNING(this, "Alloc failed, status: %1", status);
         return false;
     }
 
@@ -143,8 +143,23 @@ bool QuickSyncVideoDecoderImpl::allocSurfaces(mfxFrameAllocRequest& request)
 }
 
 bool QuickSyncVideoDecoderImpl::init(
-    mfxBitstream& bitstream, AVCodecID codec, int width, int height)
+    mfxBitstream& bitstream, const QnConstCompressedVideoDataPtr& frame)
 {
+    if (!frame)
+    {
+        NX_WARNING(this, "Failed to initialize decoder, empty frame");
+        return false;
+    }
+
+    if (!frame->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
+        return false;
+
+    QSize size = getFrameSize(frame, true);
+    if (!size.isValid() || size.isNull())
+    {
+        NX_WARNING(this, "Failed to init quick sync video decoder, frame size unknown");
+        return false;
+    }
     memset(&m_mfxDecParams, 0, sizeof(m_mfxDecParams));
     m_mfxDecParams.AsyncDepth = 4;
     if (m_config.useVideoMemory)
@@ -152,40 +167,40 @@ bool QuickSyncVideoDecoderImpl::init(
     else
         m_mfxDecParams.IOPattern = MFX_IOPATTERN_OUT_SYSTEM_MEMORY;
 
-    if (codec == AV_CODEC_ID_H264)
+    if (frame->compressionType == AV_CODEC_ID_H264)
     {
        m_mfxDecParams.mfx.CodecId = MFX_CODEC_AVC;
     }
-    else if (codec == AV_CODEC_ID_H265)
+    else if (frame->compressionType == AV_CODEC_ID_H265)
     {
        m_mfxDecParams.mfx.CodecId = MFX_CODEC_HEVC;
     }
     else
     {
-        NX_DEBUG(this, "Failed to init decoder, codec not supported: %1", codec);
+        NX_DEBUG(this, "Failed to init decoder, codec not supported: %1", frame->compressionType);
         return false;
     }
 
-    if (!initSession(width, height))
+    if (!initSession(ALIGN32(size.width()), ALIGN32(size.height())))
         return false;
 
     mfxStatus status = MFXVideoDECODE_DecodeHeader(m_mfxSession, &bitstream, &m_mfxDecParams);
     if (status < MFX_ERR_NONE)
     {
-        NX_ERROR(this, "Failed to decode video header, error: %1", status);
+        NX_WARNING(this, "Failed to decode video header, error: %1", status);
         return false;
     }
 
     if (!allocFrames())
     {
-        NX_ERROR(this, "Failed to alloc frames, error");
+        NX_WARNING(this, "Failed to alloc frames, error");
         return false;
     }
     status = MFXVideoDECODE_Init(m_mfxSession, &m_mfxDecParams);
     if (MFX_WRN_PARTIAL_ACCELERATION == status) {
         NX_DEBUG(this, "Quick Sync partial acceleration!");
     } else if (status < MFX_ERR_NONE) {
-        NX_ERROR(this, "Failed to init decoder, error: %1", status);
+        NX_WARNING(this, "Failed to init decoder, error: %1", status);
         return false;
     }
     return true;
@@ -247,100 +262,118 @@ void QuickSyncVideoDecoderImpl::clearData()
     m_dtsQueue.clear();
 }
 
-int QuickSyncVideoDecoderImpl::decode(
-    const QnConstCompressedVideoDataPtr& frame, nx::QVideoFramePtr* result)
+
+std::unique_ptr<mfxBitstream> QuickSyncVideoDecoderImpl::updateBitStream(
+    const QnConstCompressedVideoDataPtr& frame)
 {
-    if (!frame)
-        return 0; // TODO flush decoder
-
-    mfxBitstream bitstream;
-    memset(&bitstream, 0, sizeof(bitstream));
-
-    if (m_bitstreamData.size() + frame->dataSize() > kMaxBitstreamSizeBytes)
+    std::unique_ptr<mfxBitstream> bitstream;
+    if (frame)
     {
-        NX_DEBUG(this, "Bitstream size too big: %1, clear ...", m_bitstreamData.size());
+        if (m_bitstreamData.size() + frame->dataSize() > kMaxBitstreamSizeBytes)
+        {
+            NX_DEBUG(this, "Bitstream size too big: %1, clear ...", m_bitstreamData.size());
+            clearData();
+        }
+        m_bitstreamData.insert(m_bitstreamData.end(), frame->data(),
+            frame->data() + frame->dataSize());
+
+        bitstream = std::make_unique<mfxBitstream>();
+        memset(bitstream.get(), 0, sizeof(mfxBitstream));
+        bitstream->Data = (mfxU8*)m_bitstreamData.data();
+        bitstream->DataLength = m_bitstreamData.size();
+        bitstream->MaxLength = m_bitstreamData.size();
+    }
+    else
+    {
         clearData();
     }
 
-    // The filter keeps same frame in case of filtering is not required or
-    // it is not the H264 codec.
-    H264Mp4ToAnnexB filter;
-    auto filteredFrame = std::dynamic_pointer_cast<const QnCompressedVideoData>(
-        filter.processData(frame));
-    if (!NX_ASSERT(filteredFrame))
-        return 0;
-    m_bitstreamData.insert(m_bitstreamData.end(), filteredFrame->data(),
-        filteredFrame->data() + filteredFrame->dataSize());
+    return bitstream;
+}
 
-    bitstream.Data = (mfxU8*)m_bitstreamData.data();
-    bitstream.DataLength = m_bitstreamData.size();
-    bitstream.MaxLength = m_bitstreamData.size();
+void QuickSyncVideoDecoderImpl::resetDecoder()
+{
+    if (m_decoderInitialized)
+        MFXVideoDECODE_Reset(m_mfxSession, &m_mfxDecParams);
+    clearData();
+}
 
-    if (!m_mfxSession)
+int QuickSyncVideoDecoderImpl::decode(
+    const QnConstCompressedVideoDataPtr& frame, nx::QVideoFramePtr* result)
+{
+    QnConstCompressedVideoDataPtr frameAnnexB;
+    if (frame)
     {
-        if (!frame)
+        // The filter keeps same frame in case of filtering is not required or
+        // it is not the H264 codec.
+        H264Mp4ToAnnexB filter; // TODO Support H265
+        frameAnnexB = std::dynamic_pointer_cast<const QnCompressedVideoData>(
+            filter.processData(frame));
+        if (!frameAnnexB)
         {
-            NX_ERROR(this, "Fatal: failed to initialize decoder, empty frame");
-            return -1;
-        }
-
-        if (!frame->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
-        {
-            clearData();
+            NX_WARNING(this, "Failed to convert h264 video to Annex B format");
             return 0;
         }
-
-        QSize size = getFrameSize(frame, true);
-        if (!size.isValid())
-        {
-            NX_ERROR(this, "Failed to init quick sync video decoder, frame size unknown");
-            return -1;
-        }
-
-        if (!init(bitstream, frame->compressionType, MSDK_ALIGN16(size.width()), MSDK_ALIGN16(size.height())))
-        {
-            NX_ERROR(this, "Failed to init quick sync video decoder");
-            m_mfxSession.Close();
-            return -1;
-        }
     }
 
-    mfxBitstream* pBitstream = frame ? &bitstream : nullptr;
-    mfxStatus status = MFX_ERR_NONE;
-
-    mfxFrameSurface1* surface = getFreeSurface();
-    if (!surface)
+    std::unique_ptr<mfxBitstream> bitstream = updateBitStream(frameAnnexB);
+    if (!m_mfxSession && !init(*bitstream, frameAnnexB))
     {
-        NX_ERROR(this, "Failed to decode frame, no free surfaces!");
+        NX_WARNING(this, "Failed to init quick sync video decoder");
+        m_mfxSession.Close();
+        clearData();
         return -1;
     }
+    m_decoderInitialized = true;
+
+    mfxStatus status = MFX_ERR_NONE;
     mfxSyncPoint syncp;
     mfxFrameSurface1* outSurface = nullptr;
 
-    m_dtsQueue.push_back(frame->timestamp);
-    bitstream.TimeStamp = m_dtsQueue.front();
+    // QS decoder could keep frame in our buffer due to b-frames
+    if (frame)
+    {
+        m_dtsQueue.push_back(frame->timestamp);
+        bitstream->TimeStamp = m_dtsQueue.front();
+    }
 
+    mfxFrameSurface1* surface = nullptr;
     bool isWarning = false;
     do
     {
+        if (!surface)
+        {
+            surface = getFreeSurface();
+            if (!surface)
+            {
+                NX_WARNING(this, "Failed to decode frame, no free surfaces!");
+                return -1;
+            }
+        }
+
         status = MFXVideoDECODE_DecodeFrameAsync(
-            m_mfxSession, pBitstream, surface, &outSurface, &syncp);
+            m_mfxSession, bitstream.get(), surface, &outSurface, &syncp);
 
         if (MFX_WRN_DEVICE_BUSY == status)
             std::this_thread::sleep_for(std::chrono::milliseconds(1)); // Wait if device is busy
 
         isWarning = (status > MFX_ERR_NONE) && !syncp;
+        if (status == MFX_ERR_MORE_SURFACE)
+        {
+            surface = nullptr;
+            isWarning = true;
+        }
     } while (MFX_WRN_DEVICE_BUSY == status || isWarning);
 
-    if (pBitstream && pBitstream->DataOffset > 0)
+    if (bitstream && bitstream->DataOffset > 0)
     {
-        // QS decoder could keep frame in our buffer due to b-frames
-        m_dtsQueue.pop_front();
+        if (!m_dtsQueue.empty())
+            m_dtsQueue.pop_front();
 
         memmove(m_bitstreamData.data(),
-                m_bitstreamData.data() + pBitstream->DataOffset, pBitstream->DataLength);
-        pBitstream->DataOffset = 0;
-        m_bitstreamData.resize(pBitstream->DataLength);
+                m_bitstreamData.data() + bitstream->DataOffset, bitstream->DataLength);
+        bitstream->DataOffset = 0;
+        m_bitstreamData.resize(bitstream->DataLength);
     }
 
     // Ignore warnings if output is available (see intel media sdk samples)
@@ -350,7 +383,7 @@ int QuickSyncVideoDecoderImpl::decode(
     if (MFX_ERR_NONE != status)
     {
         if (status < MFX_ERR_NONE && status != MFX_ERR_MORE_DATA)
-            NX_ERROR(this, "DecodeFrameAsync failed, error: %1", status);
+            NX_WARNING(this, "DecodeFrameAsync failed, error: %1", status);
         return m_frameNumber;
     }
 
@@ -359,7 +392,7 @@ int QuickSyncVideoDecoderImpl::decode(
 
     if (MFX_ERR_NONE != status)
     {
-        NX_ERROR(this, "Failed to sync surface, error: %1", status);
+        NX_WARNING(this, "Failed to sync surface, error: %1", status);
         return -1;
     }
     if (!buildQVideoFrame(outSurface, result))

@@ -93,8 +93,8 @@ void QnLookAndFeelPreferencesWidget::applyChanges()
     qnSettings->setTourCycleTime(selectedTourCycleTimeMs());
     qnSettings->setExtraInfoInTree(selectedInfoLevel());
     qnSettings->setTimeMode(selectedTimeMode());
-
     qnSettings->setLocale(selectedTranslation());
+    qnSettings->setPtzAimOverlatyEnabled(isPtzAimOverlayEnabled());
 
     /* Background changes are applied instantly. */
     if (backgroundAllowed())
@@ -109,6 +109,8 @@ void QnLookAndFeelPreferencesWidget::loadDataToUi()
     ui->showIpInTreeCheckBox->setChecked(qnSettings->extraInfoInTree() != Qn::RI_NameOnly);
 
     ui->timeModeComboBox->setCurrentIndex(ui->timeModeComboBox->findData(qnSettings->timeMode()));
+
+    ui->usePtzAimOverlayCheckBox->setChecked(qnSettings->isPtzAimOverlayEnabled());
 
     int defaultLanguageIndex = -1;
     int currentLanguage = -1;
@@ -160,7 +162,8 @@ bool QnLookAndFeelPreferencesWidget::hasChanges() const
     return qnSettings->locale() != selectedTranslation()
         || qnSettings->timeMode() != selectedTimeMode()
         || qnSettings->extraInfoInTree() != selectedInfoLevel()
-        || qnSettings->tourCycleTime() != selectedTourCycleTimeMs();
+        || qnSettings->tourCycleTime() != selectedTourCycleTimeMs()
+        || qnSettings->isPtzAimOverlayEnabled() != isPtzAimOverlayEnabled();
 }
 
 
@@ -262,6 +265,11 @@ Qn::ResourceInfoLevel QnLookAndFeelPreferencesWidget::selectedInfoLevel() const
     return ui->showIpInTreeCheckBox->isChecked()
         ? Qn::RI_FullInfo
         : Qn::RI_NameOnly;
+}
+
+bool QnLookAndFeelPreferencesWidget::isPtzAimOverlayEnabled() const
+{
+    return ui->usePtzAimOverlayCheckBox->isChecked();
 }
 
 int QnLookAndFeelPreferencesWidget::selectedTourCycleTimeMs() const

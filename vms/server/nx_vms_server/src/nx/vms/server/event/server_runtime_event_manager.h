@@ -8,10 +8,14 @@ namespace nx::vms::server::event {
 
 class ServerRuntimeEventManager: public ServerModuleAware
 {
+
 public:
     ServerRuntimeEventManager(QnMediaServerModule* serverModule);
 
-    void triggerDeviceAgentSettingsMaybeChangedEvent(QnUuid deviceId, QnUuid engineId);
+    void triggerDeviceAgentSettingsMaybeChangedEvent(
+        QnUuid deviceId,
+        QnUuid engineId,
+        nx::vms::api::SettingsData settingsData);
 
     void triggerDeviceFootageChangedEvent(std::vector<QnUuid> deviceIds);
 

@@ -732,8 +732,7 @@ StorageResourceList MediaServerProcess::processExistingStorages()
 class StorageManagerWatcher
 {
 public:
-    StorageManagerWatcher(QnMediaServerModule* serverModule):
-        m_serverModule(serverModule)
+    StorageManagerWatcher(QnMediaServerModule* serverModule): m_serverModule(serverModule)
     {
         m_normalManagerConnection = QObject::connect(
             serverModule->normalStorageManager(),
@@ -774,8 +773,8 @@ public:
 
         QObject::disconnect(m_normalManagerConnection);
         QObject::disconnect(m_backupManagerConnection);
-        m_serverModule->normalStorageManager()->initDone();
-        m_serverModule->backupStorageManager()->initDone();
+        m_serverModule->normalStorageManager()->forceStorageTest();
+        m_serverModule->backupStorageManager()->forceStorageTest();
     }
 
 private:
@@ -2819,10 +2818,10 @@ void MediaServerProcess::registerRestHandlers(
      * Read bookmarks using the specified parameters.
      * %param:string cameraId Camera id (can be obtained from "id" field via /ec2/getCamerasEx)
      *     or MAC address (not supported for certain cameras).
-     * %param[opt]:string startTime Start time of the interval with bookmarks (in milliseconds
-     *     since epoch). Default value is 0. Should be less than endTime.
-     * %param[opt]:string endTime End time of the interval with bookmarks (in milliseconds since
-     *     epoch). Default value is the current time. Should be greater than startTime.
+     * %param[opt]:string startTimeMs Start time of the interval with bookmarks (in milliseconds
+     *     since epoch). Default value is 0. Should be less than endTimeMs.
+     * %param[opt]:string endTimeMs End time of the interval with bookmarks (in milliseconds since
+     *     epoch). Default value is the current time. Should be greater than startTimeMs.
      * %param[opt]:enum sortBy Field to sort the results by. Default value is "startTime".
      *     %value name Sort bookmarks by name.
      *     %value startTime Sort bookmarks by start time.
@@ -2848,8 +2847,8 @@ void MediaServerProcess::registerRestHandlers(
      * %param[opt]:string description Details of the bookmark.
      * %param[proprietary]:integer timeout Time during which the recorded period should be preserved
      *     (in milliseconds).
-     * %param:integer startTime Start time of the bookmark (in milliseconds since epoch).
-     * %param:integer duration Length of the bookmark (in milliseconds).
+     * %param:integer startTimeMs Start time of the bookmark (in milliseconds since epoch).
+     * %param:integer durationMs Length of the bookmark (in milliseconds).
      * %param[opt]:string tag Applied tag. Several "tag" parameters can be specified to set
      *     multiple tags.
      * %param[proprietary]:option local If present, the request should not be redirected to another
@@ -2885,8 +2884,8 @@ void MediaServerProcess::registerRestHandlers(
      * %param[opt]:string  description Details of the bookmark.
      * %param[proprietary]:integer timeout Time during which the recorded period should be preserved
      *     (in milliseconds).
-     * %param:integer startTime Start time of the bookmark (in milliseconds since epoch).
-     * %param:integer duration Length of the bookmark (in milliseconds).
+     * %param:integer startTimeMs Start time of the bookmark (in milliseconds since epoch).
+     * %param:integer durationMs Length of the bookmark (in milliseconds).
      * %param[opt]:string tag Applied tag. Several "tag" parameters can be specified to set
      *     multiple tags.
      * %param[proprietary]:option local If present, the request should not be redirected to another

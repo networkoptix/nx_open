@@ -1,3 +1,5 @@
+include(openssl_signing)
+
 set(depends
     desktop_client
     applauncher
@@ -98,3 +100,4 @@ add_custom_command(
 add_custom_target(distribution_deb_client ALL
     DEPENDS ${installer_output_list}
 )
+nx_create_openssl_signature(distribution_deb_client ${zip_file})

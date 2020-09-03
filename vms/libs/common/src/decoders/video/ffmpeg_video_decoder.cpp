@@ -362,6 +362,11 @@ int QnFfmpegVideoDecoder::decodeVideo(
     return m_lastDecodeResult;
 }
 
+void QnFfmpegVideoDecoder::resetDecoder()
+{
+    m_needRecreate = true;
+}
+
 //The input buffer must be FF_INPUT_BUFFER_PADDING_SIZE larger than the actual read bytes because some optimized bitstream readers read 32 or 64 bits at once and could read over the end.
 //The end of the input buffer buf should be set to 0 to ensure that no overreading happens for damaged MPEG streams.
 bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSharedPointer<CLVideoDecoderOutput>* const outFramePtr)

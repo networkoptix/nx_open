@@ -3,14 +3,24 @@ import zipfile
 
 
 class Archiver():
-    def __init__(self, file_name):
+    def __init__(self, file_name, conf=None):
         self._file_name = file_name
 
         if file_name.endswith(".zip"):
-            self._file = zipfile.ZipFile(file_name, mode="w", compression=zipfile.ZIP_DEFLATED)
+            compresslevel = None if conf is None else conf.ZIP_COMPRESSION_LEVEL
+            self._file = zipfile.ZipFile(
+                file_name,
+                mode="w",
+                compression=zipfile.ZIP_DEFLATED,
+                compresslevel=compresslevel)
             self.add = self._add_to_zip
         elif file_name.endswith(".tar.gz"):
-            self._file = tarfile.open(file_name, mode="w:gz", encoding="utf-8")
+            compresslevel = None if conf is None else conf.GZIP_COMPRESSION_LEVEL
+            self._file = tarfile.open(
+                file_name,
+                mode="w:gz",
+                encoding="utf-8",
+                compresslevel=compresslevel)
             self.add = self._add_to_tar
         else:
             raise Exception("Unsupported archive format: %s" % file_name)

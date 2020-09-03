@@ -24,7 +24,7 @@ public:
 
     DeviceContext& getDevice() { return m_device; }
     static bool isCompatible(AVCodecID codec, int width, int height);
-
+    void resetDecoder();
 private:
     struct SurfaceInfo
     {
@@ -33,12 +33,13 @@ private:
     };
 
 private:
-    bool init(mfxBitstream& bitstream, AVCodecID codec, int width, int height);
+    bool init(mfxBitstream& bitstream, const QnConstCompressedVideoDataPtr& frame);
     bool initSession(int width, int height);
     bool allocFrames();
     mfxFrameSurface1* getFreeSurface();
 
     bool buildQVideoFrame(mfxFrameSurface1* surface, nx::QVideoFramePtr* result);
+    std::unique_ptr<mfxBitstream> updateBitStream(const QnConstCompressedVideoDataPtr& frame);
     void clearData();
 private:
     QuickSyncVideoDecoder::Config m_config;
@@ -56,6 +57,7 @@ private:
 
     DeviceContext m_device;
     std::deque<int64_t> m_dtsQueue;
+    bool m_decoderInitialized = false;
 };
 
 } // namespace nx::media::quick_sync

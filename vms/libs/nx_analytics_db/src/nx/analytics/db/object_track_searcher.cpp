@@ -327,50 +327,77 @@ void ObjectTrackSearcher::fetchTracksFromDb(
     const std::set<std::int64_t>& objectTrackGroups,
     TrackQueryResult* result)
 {
-    nx::sql::SqlFilterFieldAnyOf objectGroupFilter(
-        "tg.group_id",
-        ":groupId",
-        std::vector<long long>(objectTrackGroups.begin(), objectTrackGroups.end()));
+    static constexpr std::size_t maxGroupsToQuery = 999;
 
-    std::string limitExpr;
-    if (m_filter.maxObjectTracksToSelect > 0)
-        limitExpr = "LIMIT " + std::to_string(m_filter.maxObjectTracksToSelect);
+    std::vector<long long> allGroups(objectTrackGroups.begin(), objectTrackGroups.end());
 
-    auto query = queryContext->connection()->createQuery();
-    query->setForwardOnly(true);
+    for (std::size_t start = 0; start < allGroups.size();)
+    {
+        const auto end = std::min(start + maxGroupsToQuery, allGroups.size());
 
-    auto filterExpr = objectGroupFilter.toString();
-    if (m_filter.withBestShotOnly)
-        filterExpr += " AND best_shot_timestamp_ms > 0";
+        nx::sql::SqlFilterFieldAnyOf objectGroupFilter(
+            "tg.group_id",
+            ":groupId",
+            std::vector<long long>(allGroups.begin() + start, allGroups.begin() + end));
 
-    query->prepare(lm(R"sql(
-        SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail,
-            ua.content AS content, best_shot_timestamp_ms, best_shot_rect, stream_index
-        FROM track t, unique_attributes ua, track_group tg
-        WHERE t.attributes_id=ua.id AND t.id=tg.track_id AND %1
-        ORDER BY track_start_ms DESC
-    )sql").args(filterExpr));
-    objectGroupFilter.bindFields(&query->impl());
+        start = end;
 
-    query->exec();
+        std::string limitExpr;
+        if (m_filter.maxObjectTracksToSelect > 0)
+            limitExpr = "LIMIT " + std::to_string(m_filter.maxObjectTracksToSelect);
 
-    auto tracks = loadTracks(
-        query.get(),
-        m_filter.maxObjectTracksToSelect);
+        auto query = queryContext->connection()->createQuery();
+        query->setForwardOnly(true);
+
+        auto filterExpr = objectGroupFilter.toString();
+        if (m_filter.withBestShotOnly)
+            filterExpr += " AND best_shot_timestamp_ms > 0";
+
+        query->prepare(lm(R"sql(
+            SELECT device_id, object_type_id, guid, track_start_ms, track_end_ms, track_detail,
+                ua.content AS content, best_shot_timestamp_ms, best_shot_rect, stream_index
+            FROM track t, unique_attributes ua, track_group tg
+            WHERE t.attributes_id=ua.id AND t.id=tg.track_id AND %1
+            ORDER BY track_start_ms DESC
+        )sql").args(filterExpr));
+        objectGroupFilter.bindFields(&query->impl());
+
+        query->exec();
+
+        auto tracks = loadTracks(
+            query.get(),
+            m_filter.maxObjectTracksToSelect);
+
+        for (auto& track: tracks)
+        {
+            if (result->ids.count(track.id) > 0)
+                continue;
+
+            // Filter does not accept track here cause of bounding box limitations.
+            // NX_ASSERT_HEAVY_CONDITION(m_filter.acceptsTrack(track));
+            result->ids.insert(track.id);
+
+            // Searching for a position to insert to keep result vector sorted.
+            const auto pos = std::upper_bound(
+                result->tracks.begin(), result->tracks.end(),
+                track,
+                [](const auto& left, const auto& right)
+                {
+                    return left.firstAppearanceTimeUs > right.firstAppearanceTimeUs;
+                });
+            result->tracks.insert(pos, std::move(track));
+        }
+
+        if (m_filter.maxObjectTracksToSelect > 0 &&
+            (int) result->tracks.size() >= m_filter.maxObjectTracksToSelect)
+        {
+            result->tracks.resize(m_filter.maxObjectTracksToSelect);
+            break;
+        }
+    }
 
     if (m_filter.sortOrder == Qt::AscendingOrder)
-        std::reverse(tracks.begin(), tracks.end());
-
-    for (auto& track: tracks)
-    {
-        if (result->ids.count(track.id) > 0)
-            continue;
-
-        // Filter does not accept track here cause of bounding box limitations.
-        // NX_ASSERT_HEAVY_CONDITION(m_filter.acceptsTrack(track));
-        result->ids.insert(track.id);
-        result->tracks.push_back(std::move(track));
-    }
+        std::reverse(result->tracks.begin(), result->tracks.end());
 }
 
 void ObjectTrackSearcher::prepareCursorQueryImpl(nx::sql::AbstractSqlQuery* query)

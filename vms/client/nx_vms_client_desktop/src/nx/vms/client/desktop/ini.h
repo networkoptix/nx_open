@@ -153,9 +153,6 @@ struct Ini: nx::kit::IniConfig
         "[Design] Whether the Client is allowed to run in multiple instances (e.g. by a desktop\n"
         "shortcut).");
 
-    NX_INI_FLAG(0, oldPtzAimOverlay,
-        "[Design] Use old-style circular aim overlay to operate PTZ pan and tilt.");
-
     // ---------------------------------------------------------------------------------------------
     // Features section
     // Flags here can be removed when QA approves the feature to be definitely present in the

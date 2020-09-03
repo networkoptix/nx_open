@@ -66,13 +66,7 @@ class BoxPlatform:
         return self._get_proc_meminfo_value(meminfo, 'MemFree');
 
     def _ram_available_bytes(self, meminfo: Dict):
-        if (
-            self.linux_distribution.kernel_version[0] < 3 or
-            (
-                self.linux_distribution.kernel_version[0] == 3 and
-                self.linux_distribution.kernel_version[1] < 14
-            )
-        ):
+        if not self.linux_distribution.supports_mem_available():
             return None
 
         try:

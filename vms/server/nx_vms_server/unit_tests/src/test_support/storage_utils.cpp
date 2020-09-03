@@ -93,7 +93,7 @@ QnStorageResourcePtr addStorage(
     waitForStorageWithPred(
         storageManager, [&path](const auto& storage) { return storage->getUrl() == path; });
 
-    storageManager->initDone();
+    storageManager->forceStorageTest();
     waitForStorageWithPred(
         storageManager,
         [&path](const auto& storage)

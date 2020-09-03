@@ -92,7 +92,7 @@ def main():
         "Darwin": ["*.dylib"]
     }[conf.CMAKE_SYSTEM_NAME]
 
-    with archiver.Archiver(conf.PACKAGE_FILE) as a:
+    with archiver.Archiver(conf.PACKAGE_FILE, conf=conf) as a:
         src_bin_dir = join(conf.BUILD_DIR, bin_dir)
         logging.info("Archiving unit test executables")
         archiveFiles(a, bin_dir, src_bin_dir, get_unit_tests_list())

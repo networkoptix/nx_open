@@ -351,7 +351,7 @@ createUpdateZip()
         "package.json" >"$STAGE_MODULE/package.json"
 
     distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP" "$STAGE_MODULE" \
-        zip -r `# Preserve symlinks #`-y
+        zip -r `# Preserve symlinks #`-y -$ZIP_COMPRESSION_LEVEL
 }
 
 buildDistribution()
@@ -387,7 +387,7 @@ buildDistribution()
     local -r DEB="$DISTRIBUTION_OUTPUT_DIR/$DISTRIBUTION_NAME.deb"
 
     echo "Creating $DEB"
-    fakeroot dpkg-deb -b "$STAGE" "$DEB"
+    fakeroot dpkg-deb -z $DEB_COMPRESSION_LEVEL -b "$STAGE" "$DEB"
 
     createUpdateZip
 

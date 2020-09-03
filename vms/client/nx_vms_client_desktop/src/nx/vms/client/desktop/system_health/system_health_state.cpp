@@ -11,7 +11,9 @@
 #include <client/client_show_once_settings.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/email/email.h>
@@ -61,7 +63,7 @@ private:
     std::array<bool, SystemHealthIndex::Count> m_state;
     QnUserResourceList m_usersWithInvalidEmail; //< Only editable; current user excluded.
     QnVirtualCameraResourceList m_camerasWithDefaultPassword;
-    QSet<QnUuid> m_serversWithoutStorages;
+    QnMediaServerResourceList m_serversWithoutStorages;
 };
 
 SystemHealthState::Private::Private(SystemHealthState* q) :
@@ -102,8 +104,12 @@ SystemHealthState::Private::Private(SystemHealthState* q) :
         q, update(NoInternetForTimeSync));
 
     const auto messageProcessor = q->commonModule()->messageProcessor();
-    connect(messageProcessor, &QnCommonMessageProcessor::initialResourcesReceived,
-        q, update(NoInternetForTimeSync));
+    connect(messageProcessor, &QnCommonMessageProcessor::initialResourcesReceived, q,
+        [this]()
+        {
+            update(NoInternetForTimeSync);
+            updateServersWithoutStorages();
+        });
 
     connect(messageProcessor, &QnCommonMessageProcessor::connectionClosed,
         q, update(NoInternetForTimeSync));
@@ -204,19 +210,27 @@ void SystemHealthState::Private::updateUsersWithInvalidEmail()
 
 void SystemHealthState::Private::updateServersWithoutStorages()
 {
-    const auto runtimeInfoManager = q->context()->runtimeInfoManager();
-    if (!NX_ASSERT(runtimeInfoManager))
-        return;
+    const auto calculateServersWithoutStorages =
+        [this]() -> QnMediaServerResourceList
+        {
+            const auto runtimeInfoManager = q->context()->runtimeInfoManager();
+            if (!NX_ASSERT(runtimeInfoManager))
+                return {};
 
-    QSet<QnUuid> serversWithoutStorages;
+            QSet<QnUuid> serversWithoutStorages;
 
-    const auto items = runtimeInfoManager->items()->getItems();
-    for (const auto item: items)
-    {
-        if (item.data.flags.testFlag(nx::vms::api::RuntimeFlag::noStorages))
-            serversWithoutStorages.insert(item.uuid);
-    }
+            const auto items = runtimeInfoManager->items()->getItems();
+            for (const auto item: items)
+            {
+                if (item.data.flags.testFlag(nx::vms::api::RuntimeFlag::noStorages))
+                    serversWithoutStorages.insert(item.uuid);
+            }
 
+            return q->commonModule()->resourcePool()->getResourcesByIds<QnMediaServerResource>(
+                serversWithoutStorages);
+        };
+
+    const auto serversWithoutStorages = calculateServersWithoutStorages();
     if (serversWithoutStorages == m_serversWithoutStorages)
         return;
 

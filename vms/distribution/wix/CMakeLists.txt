@@ -2,6 +2,8 @@ option(addQtPdb
     "Whether add Qt PDB files to debug libs"
     OFF)
 
+include(openssl_signing)
+
 # These variables must be defined first as they are going to config file.
 set(project.build.directory "${CMAKE_CURRENT_BINARY_DIR}")
 set(ClientHelpSourceDir "${help_directory}/bin/help")
@@ -99,17 +101,23 @@ if(withDesktopClient)
         )
     add_dependencies(distribution_wix collect_qml_dependencies applauncher minilauncher)
 
-    add_custom_target(generate_client_update_package ALL
-    COMMENT "Preparing client update package..."
-    DEPENDS
-        collect_qml_dependencies
-        applauncher
-        minilauncher
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
-    COMMAND ${PYTHON_EXECUTABLE} generate_client_update_package.py
-        "--config" ${config_file}
-        "--output" ${distribution_output_dir}
+    set(client_update_file "${distribution_output_dir}/${client_update_distribution_name}.zip")
+    add_custom_command(
+        COMMENT "Preparing client update package..."
+        DEPENDS
+            applauncher
+            minilauncher
+            collect_qml_dependencies
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
+        COMMAND ${PYTHON_EXECUTABLE} generate_client_update_package.py
+            "--config" ${config_file}
+            "--output_file" ${client_update_file}
+        OUTPUT ${client_update_file}
     )
+
+    add_custom_target(generate_client_update_package ALL
+        DEPENDS ${client_update_file})
+    nx_create_openssl_signature(generate_client_update_package ${client_update_file})
 
     add_custom_target(generate_client_debug_package ALL
         COMMENT "Preparing client debug package..."
@@ -138,15 +146,20 @@ if(withMediaServer)
         add_dependencies(distribution_wix traytool)
     endif()
 
-    add_custom_target(generate_server_update_package ALL
+    set(server_update_file "${distribution_output_dir}/${server_update_distribution_name}.zip")
+    add_custom_command(
         COMMENT "Preparing mediaserver update package..."
         DEPENDS
             distribution_wix
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
         COMMAND ${PYTHON_EXECUTABLE} generate_server_update_package.py
             "--config" ${config_file}
-            "--output" ${distribution_output_dir}
+            "--output_file" ${server_update_file}
+        OUTPUT ${server_update_file}
     )
+    add_custom_target(generate_server_update_package ALL
+        DEPENDS ${server_update_file})
+    nx_create_openssl_signature(generate_server_update_package ${server_update_file})
 
     set_target_properties(
         generate_server_update_package

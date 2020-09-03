@@ -21,6 +21,7 @@
 #include "engine.h"
 #include "camera_settings.h"
 #include "native_metadata_source.h"
+#include "object_metadata_packet_parser.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
@@ -78,6 +79,8 @@ private:
     NativeMetadataTypes m_streamedMetadataTypes = NoNativeMetadataTypes;
     std::optional<NativeMetadataSource> m_nativeMetadataSource;
     std::optional<nx::network::aio::Timer> m_timer;
+
+    ObjectMetadataPacketParser m_objectMetadataPacketParser;
 };
 
 } // namespace nx::vms_server_plugins::analytics::vivotek

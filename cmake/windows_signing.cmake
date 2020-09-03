@@ -9,7 +9,7 @@ if(NOT WINDOWS)
     return()
 endif()
 
-set(signingServer "http://localhost:8080" CACHE STRING "Signing server address")
+include(code_signing)
 
 # Enable trusted timestamping for all publication types intended for end users. Do not sign
 # local developer builds as well as private QA builds.
@@ -21,11 +21,6 @@ endif()
 unset(_disableTrustedTimestampingPublicationTypes)
 message(STATUS
     "Trusted timestaping is ${trustedTimestamping} for the ${publicationType} publication type")
-
-if(NOT build_utils_dir)
-    set(build_utils_dir "${CMAKE_SOURCE_DIR}/build_utils")
-    message(STATUS "Build utils directory ${build_utils_dir}")
-endif()
 
 set(trusted_timestamping_parameters "")
 if(trustedTimestamping)

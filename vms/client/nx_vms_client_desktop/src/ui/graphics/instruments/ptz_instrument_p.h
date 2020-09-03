@@ -1,9 +1,6 @@
-#ifndef QN_PTZ_INSTRUMENT_P_H
-#define QN_PTZ_INSTRUMENT_P_H
+#pragma once
 
-#include <utils/common/scoped_painter_rollback.h>
-#include <nx/client/core/utils/geometry.h>
-
+#include <client/client_settings.h>
 #include <ui/customization/customized.h>
 #include <ui/graphics/items/standard/graphics_path_item.h>
 #include <ui/graphics/items/generic/image_button_widget.h>
@@ -13,8 +10,11 @@
 #include <ui/graphics/items/generic/splash_item.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
 #include <ui/style/skin.h>
+#include <utils/common/scoped_painter_rollback.h>
 
+#include <nx/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/ui/common/custom_cursors.h>
 
 #include "selection_item.h"
 
@@ -260,7 +260,7 @@ public:
     }
 
     void showCursor() {
-        manipulatorWidget()->setCursor(Qt::SizeAllCursor);
+        manipulatorWidget()->setCursor(nx::vms::client::desktop::CustomCursors::sizeAll);
         zoomInButton()->setCursor(Qt::ArrowCursor);
         zoomOutButton()->setCursor(Qt::ArrowCursor);
         focusInButton()->setCursor(Qt::ArrowCursor);
@@ -376,7 +376,7 @@ private:
         m_manipulatorWidget->setGeometry(QRectF(center - xStep - yStep, center + xStep + yStep));
         m_modeButton->setGeometry(QRectF(left + xStep - yStep * 1.5, 3.0 * size));
 
-        if (nx::vms::client::desktop::ini().oldPtzAimOverlay || m_modeButton->isVisibleTo(this))
+        if (qnSettings->isPtzAimOverlayEnabled() || m_modeButton->isVisibleTo(this))
         {
 
             m_zoomInButton->setGeometry(QRectF(center - xStep * 3 - yStep * 2.5, 1.5 * size));
@@ -560,6 +560,3 @@ public:
         setBrush(QColor(128, 196, 255, 64).lighter(120));
     }
 };
-
-
-#endif // QN_PTZ_INSTRUMENT_P_H

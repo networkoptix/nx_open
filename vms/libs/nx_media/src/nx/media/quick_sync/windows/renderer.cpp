@@ -34,7 +34,7 @@ bool convertToRgb(
     HRESULT hr = pDevice->BeginScene();
     if (FAILED(hr))
     {
-        NX_DEBUG(NX_SCOPE_TAG, "Failed to convert to RGB, begin scene, error code: %1",
+        NX_WARNING(NX_SCOPE_TAG, "Failed to convert to RGB, begin scene, error code: %1",
             std::system_category().message(hr));
         return false;
     }
@@ -42,15 +42,15 @@ bool convertToRgb(
     hr = pDevice->StretchRect(decodedSurface, &rc, pSharedSurface, &rc, D3DTEXF_NONE);
     if (FAILED(hr))
     {
-        NX_DEBUG(NX_SCOPE_TAG, "Failed to convert to RGB, stretch rect, error code: %1",
-                 std::system_category().message(hr));
+        NX_WARNING(NX_SCOPE_TAG, "Failed to convert to RGB, stretch rect, error code: %1",
+            std::system_category().message(hr));
         return false;
     }
 
     hr = pDevice->EndScene();
     if (FAILED(hr))
     {
-        NX_DEBUG(NX_SCOPE_TAG, "Failed to convert to RGB, end scene, error code: %1",
+        NX_WARNING(NX_SCOPE_TAG, "Failed to convert to RGB, end scene, error code: %1",
             std::system_category().message(hr));
         return false;
     }
@@ -76,7 +76,7 @@ bool Renderer::initRenderSurface(IDirect3D9Ex* d3d)
     auto hr = m_device->GetRenderTarget(0, &m_renderTargetSurface);
     if (FAILED(hr))
     {
-        NX_DEBUG(this, "Failed to get render target, error code: %1",
+        NX_WARNING(this, "Failed to get render target, error code: %1",
             std::system_category().message(hr));
         return false;
     }
@@ -92,7 +92,7 @@ bool Renderer::initRenderSurface(IDirect3D9Ex* d3d)
         &m_sharedSurfaceHandle);
     if (FAILED(hr))
     {
-        NX_DEBUG(this, "Failed to create offscreen plain surface, error code: %1",
+        NX_WARNING(this, "Failed to create offscreen plain surface, error code: %1",
             std::system_category().message(hr));
         return false;
     }
@@ -103,7 +103,7 @@ bool Renderer::initRenderSurface(IDirect3D9Ex* d3d)
         D3DFMT_X8R8G8B8);
     if (FAILED(hr))
     {
-        NX_DEBUG(this, "Failed to CheckDeviceFormatConversion, error code: %1",
+        NX_WARNING(this, "Failed to CheckDeviceFormatConversion, error code: %1",
             std::system_category().message(hr));
         return false;
     }
@@ -111,7 +111,7 @@ bool Renderer::initRenderSurface(IDirect3D9Ex* d3d)
     hr = m_device->SetRenderState(D3DRS_LIGHTING, FALSE);
     if (FAILED(hr))
     {
-        NX_DEBUG(this, "Failed to SetRenderState, error code: %1",
+        NX_WARNING(this, "Failed to SetRenderState, error code: %1",
             std::system_category().message(hr));
         return false;
     }
@@ -119,7 +119,7 @@ bool Renderer::initRenderSurface(IDirect3D9Ex* d3d)
     hr = m_device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
     if (FAILED(hr))
     {
-        NX_DEBUG(this, "Failed to SetRenderState, error code: %1",
+        NX_WARNING(this, "Failed to SetRenderState, error code: %1",
             std::system_category().message(hr));
         return false;
     }
@@ -149,7 +149,7 @@ bool Renderer::init(
     GLuint PixelFormat = ChoosePixelFormat(m_dc, &pfd);
     if (!SetPixelFormat(m_dc, PixelFormat, &pfd))
     {
-        NX_ERROR(this, "Failed to set pixel format for window %1, error: %2",
+        NX_WARNING(this, "Failed to set pixel format for window %1, error: %2",
             m_window, GetLastError());
         return false;
     }
@@ -157,7 +157,7 @@ bool Renderer::init(
     m_rc = wglCreateContext(m_dc);
     if (!m_rc)
     {
-        NX_ERROR(this, "Failed to create OpenGL context for window %1, error: %2",
+        NX_WARNING(this, "Failed to create OpenGL context for window %1, error: %2",
             m_window, GetLastError());
         return false;
     }
@@ -198,7 +198,7 @@ bool Renderer::registerTexture(GLuint textureId, QOpenGLContext* context)
     m_renderDeviceHandle = wglDXOpenDeviceNV(m_device);
     if (!m_renderDeviceHandle)
     {
-        NX_ERROR(this, "Failed open device NV");
+        NX_WARNING(this, "Failed open device NV");
         return false;
     }
     // This registers a resource that was created as shared in DX with its shared handle
@@ -208,7 +208,7 @@ bool Renderer::registerTexture(GLuint textureId, QOpenGLContext* context)
         m_renderDeviceHandle, m_sharedSurface, textureId, GL_TEXTURE_2D, WGL_ACCESS_READ_ONLY_NV);
     if (m_textureHandle == NULL)
     {
-        NX_ERROR(this, "Failed to register object NV, error code: %1", GetLastError());
+        NX_WARNING(this, "Failed to register object NV, error code: %1", GetLastError());
         return false;
     }
     wglMakeCurrent(NULL, NULL);
@@ -224,7 +224,6 @@ bool Renderer::render(
         unregisterTexture();
         if (!registerTexture(textureId, context))
             return false;
-        NX_DEBUG(this, "Register new texture: %1 end", textureId);
     }
     if (!convertToRgb(m_device, mfxSurface, m_sharedSurface))
         return false;

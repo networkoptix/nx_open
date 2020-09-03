@@ -28,7 +28,7 @@ public:
     virtual int getLastDecodeResult() const override { return m_lastStatus; };
 
     static bool isSupported(const QnConstCompressedVideoDataPtr& data);
-
+    virtual void resetDecoder() override;
     static int instanceCount();
 private:
     std::shared_ptr<nx::media::quick_sync::QuickSyncVideoDecoderImpl> m_impl;

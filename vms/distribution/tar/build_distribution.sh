@@ -518,7 +518,8 @@ createDistributionArchive()
         mkdir -p "$STAGE/$(dirname "$SYMLINK_INSTALL_PATH")"
         ln -s "/$VMS_INSTALL_PATH" "$STAGE/$SYMLINK_INSTALL_PATH"
     fi
-    distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$DISTRIBUTION_TAR_GZ" "$STAGE" tar czf
+    GZIP=-$GZIP_COMPRESSION_LEVEL distrib_createArchive \
+        "$DISTRIBUTION_OUTPUT_DIR/$DISTRIBUTION_TAR_GZ" "$STAGE" tar czf
 }
 
 # [in] WORK_DIR
@@ -542,7 +543,8 @@ createUpdateZip() # file.tar.gz
         cp -r "$CURRENT_BUILD_DIR/nx_rpi_cam_setup.sh" "$ZIP_DIR/"
     fi
 
-    distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP" "$ZIP_DIR" zip
+    distrib_createArchive "$DISTRIBUTION_OUTPUT_DIR/$UPDATE_ZIP" "$ZIP_DIR" \
+        zip `# Never compress .tar.gz file #`-0
 }
 
 # [in] WORK_DIR
@@ -574,7 +576,7 @@ createDebugSymbolsArchive()
     then
         echo "  No .debug files found"
     else
-        distrib_createArchive \
+        GZIP=-$GZIP_COMPRESSION_LEVEL distrib_createArchive \
             "$DISTRIBUTION_OUTPUT_DIR/$DISTRIBUTION_TAR_GZ-debug-symbols.tar.gz" "$TAR_GZ_DIR" \
             tar czf
     fi

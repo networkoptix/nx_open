@@ -24,19 +24,17 @@ def generate_server_update_package(
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', help="Config file", required=True)
-    parser.add_argument('--output', help="Output directory", required=True)
+    parser.add_argument('--output_file', help="Output file", required=True)
     args = parser.parse_args()
 
     with open(args.config, 'r') as f:
         config = yaml.load(f, Loader=yaml.SafeLoader)
 
-    output_filename = os.path.join(
-        args.output, config['server_update_distribution_name']) + '.zip'
     generate_server_update_package(
         distribution_output_dir=config['distribution_output_dir'],
         server_distribution_name=config['server_distribution_name'],
         server_update_files_directory=config['server_update_files_directory'],
-        output_filename=output_filename)
+        output_filename=args.output_file)
 
 
 if __name__ == '__main__':

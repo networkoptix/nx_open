@@ -59,10 +59,10 @@ void DecoderRegistrar::registerDecoders(const Config config)
     {
         FfmpegVideoDecoder::setMaxResolutions(config.maxFfmpegResolutions);
 
-#if defined(__QSV_SUPPORTED__)
-        if (config.enableHardwareDecoder)
-            //VideoDecoderRegistry::instance()->addPlugin<quick_sync::QuickSyncVideoDecoder>();
-#endif // __QSV_SUPPORTED__
+//#if defined(__QSV_SUPPORTED__)
+//        if (config.enableHardwareDecoder)
+//            VideoDecoderRegistry::instance()->addPlugin<quick_sync::QuickSyncVideoDecoder>();
+//#endif // __QSV_SUPPORTED__
         VideoDecoderRegistry::instance()->addPlugin<FfmpegVideoDecoder>();
         AudioDecoderRegistry::instance()->addPlugin<FfmpegAudioDecoder>();
     }

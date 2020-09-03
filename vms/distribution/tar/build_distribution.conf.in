@@ -24,3 +24,6 @@ LDFLAGS="@CMAKE_EXE_LINKER_FLAGS@"
 ENABLE_HANWHA="@enable_hanwha@"
 SERVER_PLUGINS=(@server_plugins_list@)
 SERVER_PLUGINS_OPTIONAL=(@server_plugins_optional_list@)
+
+GZIP_COMPRESSION_LEVEL=@gzip_compression_level@
+ZIP_COMPRESSION_LEVEL=@zip_compression_level@

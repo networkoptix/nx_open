@@ -21,3 +21,5 @@ NOTARIZATION="@notarization@"
 NOTARIZATION_USER="@notarizationUser@"
 NOTARIZATION_PASSWORD="@notarizationPassword@"
 KEYCHAIN_NOTARIZATION_USER="noptixbiz@gmail.com"
+
+ZIP_COMPRESSION_LEVEL=@zip_compression_level@

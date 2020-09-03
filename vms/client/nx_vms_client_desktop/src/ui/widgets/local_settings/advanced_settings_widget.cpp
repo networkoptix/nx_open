@@ -54,6 +54,8 @@ QnAdvancedSettingsWidget::QnAdvancedSettingsWidget(QWidget *parent) :
     //setWarningStyle(ui->doubleBufferWarningLabel);
     //ui->doubleBufferWarningLabel->setVisible(false);
 
+    ui->browseLogsButton->setVisible(qnSettings->isBrowseLogsVisible());
+
     connect(ui->browseLogsButton, &QPushButton::clicked, this,
         &QnAdvancedSettingsWidget::at_browseLogsButton_clicked);
     connect(ui->clearCacheButton, &QPushButton::clicked, this,

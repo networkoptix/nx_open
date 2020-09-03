@@ -15,7 +15,6 @@
 #include "ini.h"
 #include "object_types.h"
 #include "event_types.h"
-#include "parse_object_metadata_packet.h"
 #include "parse_event_metadata_packets.h"
 #include "exception.h"
 #include "json_utils.h"
@@ -315,7 +314,7 @@ void DeviceAgent::streamMetadataPackets()
         .then_unwrap(
             [this](const auto& nativePacket)
             {
-                if (auto packet = parseObjectMetadataPacket(nativePacket))
+                if (auto packet = m_objectMetadataPacketParser.parse(nativePacket))
                 {
                     packet->setTimestampUs(m_timestampAdjuster.getCurrentTimeUs(packet->timestampUs()));
                     m_handler->handleMetadata(packet.releasePtr());

@@ -1,7 +1,8 @@
 #include "resizing_instrument.h"
 
-#include <QtWidgets/QGraphicsWidget>
 #include <QtCore/QtMath>
+#include <QtGui/QGuiApplication>
+#include <QtWidgets/QGraphicsWidget>
 
 #include <ui/common/constrained_resizable.h>
 #include <ui/common/frame_section_queryable.h>
@@ -54,12 +55,6 @@ GraphicsWidget* open(QGraphicsWidget* widget)
     return static_cast<GraphicsWidget*>(widget);
 }
 
-void safeUnsetCursor(QGraphicsWidgetPtr widget)
-{
-    if (widget)
-        widget->unsetCursor();
-}
-
 WidgetsList subtractWidgets(const WidgetsList& first, const WidgetsList& second)
 {
     return first.toSet().subtract(second.toSet()).toList();
@@ -103,8 +98,10 @@ ResizingInstrument::ResizingInstrument(QObject* parent):
         Viewport,
         makeSet(
             QEvent::MouseButtonPress,
-            QEvent::MouseMove,
             QEvent::MouseButtonRelease,
+            QEvent::HoverEnter,
+            QEvent::HoverLeave,
+            QEvent::HoverMove,
             QEvent::Paint),
         parent),
     m_innerEffectRadius(0.0),
@@ -187,61 +184,66 @@ bool ResizingInstrument::mousePressEvent(QWidget* viewport, QMouseEvent* event)
     return false;
 }
 
-bool ResizingInstrument::mouseMoveEvent(QWidget* viewport, QMouseEvent* event)
+bool ResizingInstrument::hoverEnterEvent(QWidget* viewport, QHoverEvent* event)
+{
+    updateCursor(viewport, event->pos());
+    return false;
+}
+
+bool ResizingInstrument::hoverLeaveEvent(QWidget* /*viewport*/, QHoverEvent* event)
+{
+    if (!m_cursorOverridden)
+        return false;
+
+    qApp->restoreOverrideCursor();
+    m_cursorOverridden = false;
+    return false;
+}
+
+bool ResizingInstrument::hoverMoveEvent(QWidget* viewport, QHoverEvent* event)
+{
+    updateCursor(viewport, event->pos());
+    return false;
+}
+
+void ResizingInstrument::updateCursor(QWidget* viewport, const QPoint& viewportPos)
 {
     QGraphicsWidget* widget = nullptr;
     auto section = Qt::NoSection;
 
     QPoint correctedPos;
-    getWidgetAndFrameSection(viewport, event->pos(), section, widget, correctedPos);
+    getWidgetAndFrameSection(viewport, viewportPos, section, widget, correctedPos);
 
-    auto oldTargetWidget = m_affectedWidgets.isEmpty()
-        ? QGraphicsWidgetPtr()
-        : m_affectedWidgets.last();
-
-    bool needUnsetCursor = !widget || oldTargetWidget != widget || section == Qt::NoSection;
-    if (needUnsetCursor)
+    if (widget && section != Qt::NoSection)
     {
-        for (const auto& w: m_affectedWidgets)
-            safeUnsetCursor(w);
-        m_affectedWidgets.clear();
+        // Note that rotation is estimated using a very simple method here.
+        // A better way would be to calculate local rotation at cursor position,
+        // but currently there is not need for such precision.
+        const auto rect = widget->rect();
+        auto rotation = qRadiansToDegrees(Geometry::atan2(
+            widget->mapToScene(rect.topRight()) - widget->mapToScene(rect.topLeft())));
+
+        if (section == Qt::TitleBarArea)
+            rotation = 0; //< We don't want rotated Arrow cursor.
+
+        const auto cursor =
+            QnCursorCache::instance()->cursorForWindowSection(section, rotation, 5.0);
+
+        if (m_cursorOverridden)
+            qApp->changeOverrideCursor(cursor);
+        else
+            qApp->setOverrideCursor(cursor);
+
+        m_cursorOverridden = true;
     }
-
-    if (!widget || section == Qt::NoSection)
-        return false;
-
-    if (widget->cursor().shape() == Qn::calculateHoverCursorShape(section))
-        return false;
-
-    /* Note that rotation is estimated using a very simple method here.
-     * A better way would be to calculate local rotation at cursor position,
-     * but currently there is not need for such precision. */
-    const auto rect = widget->rect();
-    auto rotation = qRadiansToDegrees(Geometry::atan2(
-        widget->mapToScene(rect.topRight()) - widget->mapToScene(rect.topLeft())));
-    if (section == Qt::TitleBarArea)
+    else
     {
-        // We don't want rotated Arrow cursor.
-        rotation = 0;
+        if (!m_cursorOverridden)
+            return;
+
+        qApp->restoreOverrideCursor();
+        m_cursorOverridden = false;
     }
-    const auto cursor = QnCursorCache::instance()->cursorForWindowSection(section, rotation, 5.0);
-
-    const auto newAffected = getAffectedWidgets(viewport, correctedPos);
-    const auto lostWidgets = subtractWidgets(m_affectedWidgets, newAffected);
-    for (const auto& lost: lostWidgets)
-        safeUnsetCursor(lost);
-
-    m_affectedWidgets = newAffected;
-    NX_ASSERT(m_affectedWidgets.last() == widget);
-    for (auto w : m_affectedWidgets)
-    {
-        NX_ASSERT(w);
-        if (w)
-            w->setCursor(cursor);
-    }
-
-    event->accept();
-    return false;
 }
 
 void ResizingInstrument::startDragProcess(DragInfo* info)

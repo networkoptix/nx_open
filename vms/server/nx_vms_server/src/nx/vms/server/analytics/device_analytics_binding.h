@@ -101,13 +101,14 @@ private:
 
     bool isStreamConsumerUnsafe() const;
 
-    void notifySettingsMaybeChanged() const;
+    void notifySettingsHaveBeenChanged() const;
 
     void initializeSettingsContext() const;
 
     SettingsContext updateSettingsContext(
         const api::analytics::SettingsValues& requestValues,
-        const sdk_support::SdkSettingsResponse& sdkSettingsResponse) const;
+        const sdk_support::SdkSettingsResponse& sdkSettingsResponse,
+        bool* outSettingsHaveBeenChanged) const;
 
     api::analytics::SettingsValues prepareSettings(
         const SettingsContext& settingsContext,
@@ -117,13 +118,22 @@ private:
         const SettingsContext& settingsContext,
         const sdk_support::SdkSettingsResponse& sdkSettingsResponse) const;
 
+    nx::vms::api::SettingsData makeSettingsData() const;
+
 private:
+    struct AdditionalSettingsData
+    {
+        QnUuid sessionId;
+        int64_t sequenceId = 0;
+    };
+
     struct DeviceAgentContext
     {
         nx::sdk::Ptr<nx::vms::server::analytics::DeviceAgentHandler> handler;
         wrappers::DeviceAgentPtr deviceAgent;
 
         mutable SettingsContext settingsContext;
+        mutable AdditionalSettingsData additionalSettingsData;
     };
 
     mutable nx::Mutex m_mutex;

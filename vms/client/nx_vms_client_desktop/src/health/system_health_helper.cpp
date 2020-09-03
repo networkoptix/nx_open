@@ -124,6 +124,9 @@ QString QnSystemHealthStringsHelper::messageTooltip(QnSystemHealth::MessageType 
         case QnSystemHealth::DefaultCameraPasswords:
             return QString(); //< TODO: #vkutin #gdm Some tooltip would be nice.
 
+        case QnSystemHealth::StoragesNotConfigured:
+            return QString(); //< Server list is displayed separately.
+
         case QnSystemHealth::NoInternetForTimeSync:
             return tr("No online server in the System has internet access for time synchronization.");
 
@@ -138,9 +141,6 @@ QString QnSystemHealthStringsHelper::messageTooltip(QnSystemHealth::MessageType 
             break;
         case QnSystemHealth::SystemIsReadOnly:
             messageParts << tr("The System is running in safe mode.") << tr("Any configuration changes except license activation are impossible.");
-            break;
-        case QnSystemHealth::StoragesNotConfigured:
-            messageParts << tr("Storage is not configured on the following Server:") << resourceName;
             break;
         case QnSystemHealth::ArchiveIntegrityFailed:
             messageParts << resourceName;
