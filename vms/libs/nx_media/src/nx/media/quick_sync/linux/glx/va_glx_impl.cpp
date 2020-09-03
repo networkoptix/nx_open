@@ -843,6 +843,7 @@ end:
 }
 
 
+
 /* ========================================================================= */
 /* === VA/GLX implementation from the driver (fordward calls)            === */
 /* ========================================================================= */
@@ -905,6 +906,86 @@ vaCopySurfaceGLX_impl_driver(
 static inline int check_surface(VASurfaceGLXP pSurfaceGLX)
 {
     return pSurfaceGLX && pSurfaceGLX->magic == VA_SURFACE_GLX_MAGIC;
+}
+
+
+// Create VA/GLX surface
+static VASurfaceGLXP
+update_surface(VADriverContextP ctx, VASurfaceGLXP pSurfaceGLX, GLenum target, GLuint texture)
+{
+    unsigned int internal_format, border_width, width, height;
+    int is_error = 1;
+
+    pSurfaceGLX->texture        = texture;
+//     pSurfaceGLX->surface        = VA_INVALID_SURFACE;
+//     pSurfaceGLX->is_bound       = 0;
+//     pSurfaceGLX->pixmap         = None;
+//     pSurfaceGLX->pix_texture    = 0;
+//     pSurfaceGLX->glx_pixmap     = None;
+    pSurfaceGLX->fbo            = 0;
+
+    glEnable(target);
+    glBindTexture(target, texture);
+    if (!gl_get_texture_param(GL_TEXTURE_INTERNAL_FORMAT, &internal_format))
+        goto end;
+    if (!is_supported_internal_format(internal_format))
+        goto end;
+
+    /* Check texture dimensions */
+    if (!gl_get_texture_param(GL_TEXTURE_BORDER, &border_width))
+        goto end;
+    if (!gl_get_texture_param(GL_TEXTURE_WIDTH, &width))
+        goto end;
+    if (!gl_get_texture_param(GL_TEXTURE_HEIGHT, &height))
+        goto end;
+
+    printf("texture size %ix%i\n", width, height);
+    width  -= 2 * border_width;
+    height -= 2 * border_width;
+    if (width == 0 || height == 0)
+        goto end;
+
+    pSurfaceGLX->width  = width;
+    pSurfaceGLX->height = height;
+
+    /* Create FBO objects */
+    destroy_fbo_surface(ctx, pSurfaceGLX);
+    if (!create_fbo_surface(ctx, pSurfaceGLX))
+        goto end;
+
+    is_error = 0;
+end:
+    if (is_error && pSurfaceGLX) {
+        destroy_surface(ctx, pSurfaceGLX);
+        pSurfaceGLX = NULL;
+    }
+    return pSurfaceGLX;
+}
+
+VAStatus vaUpdateSurfaceGLX_impl_libva(
+    VADriverContextP    ctx,
+    GLenum    target,
+    GLuint    texture,
+    void     *gl_surface)
+{
+    VASurfaceGLXP pSurfaceGLX = (VASurfaceGLXP)gl_surface;
+    struct OpenGLContextState old_cs;
+
+    gl_get_current_context(&old_cs);
+    if (!gl_set_current_context(pSurfaceGLX->gl_context, NULL))
+        goto error;
+
+    update_surface(ctx, pSurfaceGLX, target, texture);
+
+
+    //pSurfaceGLX->src_width = src_width;
+    //pSurfaceGLX->src_height = src_height;
+
+    gl_set_current_context(&old_cs, NULL);
+    return VA_STATUS_SUCCESS;
+
+error:
+    return VA_STATUS_ERROR_ALLOCATION_FAILED;
 }
 
 static VAStatus

@@ -66,20 +66,34 @@ bool DeviceContext::renderToRgb(
     QSize sourceSize(surface->Info.Width, surface->Info.Height);
     if (isNewTexture || !m_renderingSurface || m_renderingSurfaceSize != sourceSize)
     {
-        NX_DEBUG(NX_SCOPE_TAG, "CreateSurfaceGLX size %1", sourceSize);
-        if (m_renderingSurface)
-            vaDestroySurfaceGLX(m_display, m_renderingSurface);
-
-        status = vaCreateSurfaceGLX_nx(
-            m_display,
-            GL_TEXTURE_2D,
-            textureId,
-            surface->Info.Width, surface->Info.Height,
-            &m_renderingSurface);
-        if (status != VA_STATUS_SUCCESS)
+        if (!m_renderingSurface)
         {
-            NX_WARNING(NX_SCOPE_TAG, "vaCreateSurfaceGLX failed: %1", status);
-            return false;
+            NX_DEBUG(NX_SCOPE_TAG, "CreateSurfaceGLX size %1", sourceSize);
+            status = vaCreateSurfaceGLX_nx(
+                m_display,
+                GL_TEXTURE_2D,
+                textureId,
+                surface->Info.Width, surface->Info.Height,
+                &m_renderingSurface);
+            if (status != VA_STATUS_SUCCESS)
+            {
+                NX_WARNING(NX_SCOPE_TAG, "vaCreateSurfaceGLX failed: %1", status);
+                return false;
+            }
+        }
+        else
+        {
+            NX_DEBUG(NX_SCOPE_TAG, "UpdateSurfaceGLX size %1", sourceSize);
+            status = vaUpdateSurfaceGLX_nx(
+                m_display,
+                GL_TEXTURE_2D,
+                textureId,
+                m_renderingSurface);
+            if (status != VA_STATUS_SUCCESS)
+            {
+                NX_WARNING(NX_SCOPE_TAG, "vaUpdateSurfaceGLX failed: %1", status);
+                return false;
+            }
         }
         m_renderingSurfaceSize = sourceSize;
     }

@@ -39,7 +39,8 @@ private:
 
 private:
     bool init(mfxBitstream& bitstream, const QnConstCompressedVideoDataPtr& frame);
-    bool initSession(int width, int height);
+    bool initSession();
+    bool initDevice(int width, int height);
     bool allocFrames();
     mfxFrameSurface1* getFreeSurface();
 

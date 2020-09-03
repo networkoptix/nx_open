@@ -1214,24 +1214,31 @@ bool DecodedPictureToOpenGLUploader::renderVideoMemory(
     emptyPictureBuf->setColorFormat(AV_PIX_FMT_RGBA);
     QnGlRendererTexture* texture = emptyPictureBuf->texture(0);
     QSize displaySize = emptyPictureBuf->displaySize();
+    QSize frameSize = frame->size();
     if (!displaySize.isEmpty())
-        displaySize = displaySize.boundedTo(frame->size());
+        displaySize = displaySize.boundedTo(frameSize);
     else
-        displaySize = QSize(frame->width, frame->height);
+        displaySize = frameSize;
 
     bool isNewTexture = texture->ensureInitialized(
         displaySize.width(), displaySize.height(), displaySize.width(), 1, GL_RGBA, 1, -1);
 
+    float cropWidth = 1;
+    float cropHeight = 1;
     if (!renderToRgb(
         frame->getVideoSurface(),
         isNewTexture,
         texture->m_id,
         m_initializedContext,
-        frame->scaleFactor))
+        frame->scaleFactor,
+        &cropWidth,
+        &cropHeight))
     {
         NX_ERROR(this, "Failed to render video memory to OpenGL texture");
         return false;
     }
+    texture->m_texCoords = QVector2D(cropWidth, cropHeight);
+    d->functions->glWidget()->makeCurrent();
     return true;
 #else //__QSV_SUPPORTED__
     return false;

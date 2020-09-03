@@ -25,6 +25,7 @@
 #ifdef __linux__
 
 #include <stdlib.h>
+#include <stdio.h>
 #include "va_glx_private.h"
 #include "va_glx_impl.h"
 
@@ -134,6 +135,28 @@ VAStatus vaCreateSurfaceGLX_nx(
     INIT_CONTEXT(ctx, dpy);
 
     INVOKE(ctx, CreateSurface, (ctx, target, texture, src_width, src_height, gl_surface));
+    return status;
+}
+
+VAStatus vaUpdateSurfaceGLX_nx(
+    VADisplay dpy,
+    GLenum    target,
+    GLuint    texture,
+    void     *gl_surface)
+{
+    VADriverContextP ctx;
+    VAStatus status = VA_STATUS_SUCCESS;
+
+    /* Make sure it is a valid GL texture object */
+    if (!glIsTexture(texture))
+        return VA_STATUS_ERROR_INVALID_PARAMETER;
+
+    printf("init... \n");
+    INIT_CONTEXT(ctx, dpy);
+
+    printf("init success\n");
+
+    vaUpdateSurfaceGLX_impl_libva(ctx, target, texture, gl_surface);
     return status;
 }
 

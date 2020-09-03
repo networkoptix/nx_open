@@ -65,6 +65,16 @@ VAStatus vaCreateSurfaceGLX_nx(
     void    **gl_surface
 );
 
+
+
+VAStatus vaUpdateSurfaceGLX_nx(
+    VADisplay dpy,
+    GLenum    target,
+    GLuint    texture,
+    void     *gl_surface
+);
+
+
 /**
  * Destroy a VA/GLX surface
  *

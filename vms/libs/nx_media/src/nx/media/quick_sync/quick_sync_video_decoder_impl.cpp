@@ -7,7 +7,6 @@
 #include <QtMultimedia/QVideoFrame>
 
 #include <utils/media/nalUnits.h>
-#include <utils/media/utils.h>
 #include <nx/utils/log/log.h>
 
 #include "allocators/sysmem_allocator.h"
@@ -16,8 +15,6 @@
 #include "mfx_status_string.h"
 #include "compatibility_cache.h"
 #include <media/filters/h264_mp4_to_annexb.h>
-
-#define ALIGN32(value) (((value + 31) >> 5) << 5) // round up to a multiple of 32
 
 namespace nx::media::quick_sync {
 
@@ -51,7 +48,7 @@ bool QuickSyncVideoDecoderImpl::scaleFrame(
     return m_scaler->scaleFrame(inputSurface, outSurface, targetSize);
 }
 
-bool QuickSyncVideoDecoderImpl::initSession(int width, int height)
+bool QuickSyncVideoDecoderImpl::initSession()
 {
     mfxIMPL impl = MFX_IMPL_AUTO_ANY;
     mfxVersion version = { {0, 1} };
@@ -62,7 +59,11 @@ bool QuickSyncVideoDecoderImpl::initSession(int width, int height)
         return false;
     }
     NX_DEBUG(this, "MFX version %1.%2", version.Major, version.Minor);
+    return true;
+}
 
+bool QuickSyncVideoDecoderImpl::initDevice(int width, int height)
+{
     if (!m_device.initialize(m_mfxSession, width, height))
     {
         NX_WARNING(this, "Failed to set handle to MFX session");
@@ -77,7 +78,7 @@ bool QuickSyncVideoDecoderImpl::initSession(int width, int height)
     else
     {
         auto allocator = std::make_shared<SysMemFrameAllocator>();
-        status = allocator->Init(nullptr);
+        auto status = allocator->Init(nullptr);
         if (status < MFX_ERR_NONE)
         {
             NX_WARNING(this, "Failed to init allocator, error code: %1", status);
@@ -161,12 +162,6 @@ bool QuickSyncVideoDecoderImpl::init(
     if (!frame->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
         return false;
 
-    QSize size = getFrameSize(frame, true);
-    if (!size.isValid() || size.isNull())
-    {
-        NX_WARNING(this, "Failed to init quick sync video decoder, frame size unknown");
-        return false;
-    }
     memset(&m_mfxDecParams, 0, sizeof(m_mfxDecParams));
     m_mfxDecParams.AsyncDepth = 4;
     if (m_config.useVideoMemory)
@@ -188,7 +183,7 @@ bool QuickSyncVideoDecoderImpl::init(
         return false;
     }
 
-    if (!initSession(ALIGN32(size.width()), ALIGN32(size.height())))
+    if (!initSession())
         return false;
 
     mfxStatus status = MFXVideoDECODE_DecodeHeader(m_mfxSession, &bitstream, &m_mfxDecParams);
@@ -197,6 +192,8 @@ bool QuickSyncVideoDecoderImpl::init(
         NX_WARNING(this, "Failed to decode video header, error: %1", status);
         return false;
     }
+    if (!initDevice(m_mfxDecParams.mfx.FrameInfo.Width, m_mfxDecParams.mfx.FrameInfo.Height))
+        return false;
 
     if (!allocFrames())
     {
@@ -214,7 +211,8 @@ bool QuickSyncVideoDecoderImpl::init(
     m_scaler = std::make_unique<VppScaler>(m_mfxSession, m_allocator);
     // Initialize the scaler to reserve the maximum size, since VPP does not support reset the
     // target size up
-    return m_scaler->init(size, size);
+    QSize frameSize(m_mfxDecParams.mfx.FrameInfo.Width, m_mfxDecParams.mfx.FrameInfo.Height);
+    return m_scaler->init(frameSize, frameSize);
 }
 
 void QuickSyncVideoDecoderImpl::lockSurface(const mfxFrameSurface1* surface)
@@ -251,7 +249,7 @@ bool QuickSyncVideoDecoderImpl::buildQVideoFrame(
     else
         buffer = new MfxQtVideoBuffer(surface, m_allocator);
 
-    QSize frameSize(surface->Info.Width, surface->Info.Height);
+    QSize frameSize(surface->Info.CropW, surface->Info.CropH);
     result->reset(new QVideoFrame(buffer, frameSize, QVideoFrame::Format_NV12));
     result->get()->setStartTime(surface->Data.TimeStamp);
     return true;

@@ -42,4 +42,10 @@
 DLL_HIDDEN
 VAStatus va_glx_init_context(VADriverContextP ctx);
 
+VAStatus vaUpdateSurfaceGLX_impl_libva(
+    VADriverContextP    ctx,
+    GLenum    target,
+    GLuint    texture,
+    void     *gl_surface);
+
 #endif // __linux__

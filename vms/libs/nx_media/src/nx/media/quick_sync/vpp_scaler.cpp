@@ -158,6 +158,8 @@ bool VppScaler::init(const QSize& sourceSize, const QSize& targetSize)
         NX_WARNING(this, "Failed to init VPP session, error: %1", status);
         return false;
     }
+    m_targetSize = targetSize;
+    m_sourceSize = sourceSize;
     return true;
 }
 
@@ -173,8 +175,6 @@ bool VppScaler::scaleFrame(
                 sourceSize, targetSize);
             return false;
         }
-        m_targetSize = targetSize;
-        m_sourceSize = sourceSize;
     }
 
     if (!m_vpp)

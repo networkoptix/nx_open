@@ -10,9 +10,16 @@ class QuickSyncVideoFrame: public AbstractVideoSurface
 public:
     QuickSyncVideoFrame(const std::shared_ptr<QVideoFrame>& frame);
 
-    bool renderToRgb(bool isNewTexture, GLuint textureId, QOpenGLContext* context, int scaleFactor);
+    bool renderToRgb(
+        bool isNewTexture,
+        GLuint textureId,
+        QOpenGLContext* context,
+        int scaleFactor,
+        float* cropWidth,
+        float* cropHeight);
     virtual AVFrame lockFrame() override;
     virtual void unlockFrame() override;
+    virtual QSize size() override;
 
 private:
     // Contain video surface
@@ -24,11 +31,13 @@ inline bool renderToRgb(
     bool isNewTexture,
     GLuint textureId,
     QOpenGLContext* context,
-    int scaleFactor)
+    int scaleFactor,
+    float* cropWidth,
+    float* cropHeight)
 {
     QuickSyncVideoFrame* qsvFrame = dynamic_cast<QuickSyncVideoFrame*>(frame);
     if (!qsvFrame)
         return false;
 
-    return qsvFrame->renderToRgb(isNewTexture, textureId, context, scaleFactor);
+    return qsvFrame->renderToRgb(isNewTexture, textureId, context, scaleFactor, cropWidth, cropHeight);
 }

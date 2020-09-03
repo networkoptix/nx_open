@@ -12,7 +12,12 @@ QuickSyncVideoFrame::QuickSyncVideoFrame(const std::shared_ptr<QVideoFrame>& fra
 }
 
 bool QuickSyncVideoFrame::renderToRgb(
-    bool isNewTexture, GLuint textureId, QOpenGLContext* context, int scaleFactor)
+    bool isNewTexture,
+    GLuint textureId,
+    QOpenGLContext* context,
+    int scaleFactor,
+    float* cropWidth,
+    float* cropHeight)
 {
     auto surfaceInfo = m_frame->handle().value<QuickSyncSurface>();
     auto decoderLock = surfaceInfo.decoder.lock();
@@ -34,6 +39,11 @@ bool QuickSyncVideoFrame::renderToRgb(
         }
     }
 #endif
+    mfxFrameInfo info = scaledSurface->Info;
+    if (cropWidth)
+        *cropWidth = info.CropW / (float) info.Width;
+    if (cropHeight)
+        *cropHeight = info.CropH / (float) info.Height;
     return decoderLock->getDevice().renderToRgb(scaledSurface, isNewTexture, textureId, context);
 }
 
@@ -86,4 +96,11 @@ void QuickSyncVideoFrame::unlockFrame()
     mfxFrameSurface1* surface = surfaceInfo.surface;
     auto status = decoderLock->getDevice().getAllocator()->UnlockFrame(
         surface->Data.MemId, &surface->Data);
+}
+
+QSize QuickSyncVideoFrame::size()
+{
+    auto surfaceInfo = m_frame->handle().value<QuickSyncSurface>();
+    mfxFrameSurface1* surface = surfaceInfo.surface;
+    return QSize(surface->Info.Width, surface->Info.Height);
 }
