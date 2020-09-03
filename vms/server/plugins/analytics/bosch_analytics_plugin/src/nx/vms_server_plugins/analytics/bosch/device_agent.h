@@ -89,6 +89,8 @@ protected:
     virtual void doPushDataPacket(
         Result<void>* outResult, IDataPacket* dataPacket) override;
 
+    virtual void finalize() override {}
+
 private:
     bool replenishSupportedEventTypeIds(const ParsedMetadata& parsedMetadata);
 

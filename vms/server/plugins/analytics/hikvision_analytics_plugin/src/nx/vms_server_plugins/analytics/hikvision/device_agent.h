@@ -55,6 +55,8 @@ protected:
         nx::sdk::Result<void>* outResult,
         nx::sdk::analytics::IDataPacket* dataPacket) override;
 
+    virtual void finalize() override {}
+
 private:
     nx::sdk::Result<void> startFetchingMetadata(
         const nx::sdk::analytics::IMetadataTypes* metadataTypes);

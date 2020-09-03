@@ -34,7 +34,7 @@ public:
     }
 };
 
-class IConsumingDeviceAgent: public IConsumingDeviceAgent0
+class IConsumingDeviceAgent: public Interface<IConsumingDeviceAgent, IConsumingDeviceAgent0>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IConsumingDeviceAgent1"); }
