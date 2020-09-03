@@ -1048,7 +1048,7 @@ def _obtain_box_platform(box, linux_distribution):
         f"    {box.connection_type_name} user is{'' if box.is_root else ' not'} root.\n"
         f"    Linux distribution name: {linux_distribution.name}\n"
         f"    Linux distribution version: {linux_distribution.version}\n"
-        f"    Linux kernel version: {'.'.join(str(c) for c in linux_distribution.kernel_version)}\n"
+        f"    Linux kernel version: {linux_distribution.get_kernel_version()}\n"
         f"    Arch: {box_platform.arch}\n"
         f"    Number of CPUs: {box_platform.cpu_count}\n"
         f"    CPU features: {', '.join(box_platform.cpu_features) if len(box_platform.cpu_features) > 0 else 'None'}\n"
@@ -1057,9 +1057,12 @@ def _obtain_box_platform(box, linux_distribution):
         f"    File systems: \n{file_systems_info}\n"
     )
 
+    if not linux_distribution.is_kernel_version_detected():
+        report("WARNING: Can't determine OS kernel version. "
+            f'Check "uname -r" command output in {log_file_ref}')
+
     if box_platform.have_storages_list_problems:
-        report(
-            "WARNING: File system info can be incomplete. "
+        report("WARNING: File system info can be incomplete. "
             f"See details in {log_file_ref}")
 
     return box_platform
