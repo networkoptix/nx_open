@@ -77,8 +77,16 @@ private:
     static_assert(std::is_base_of<IRefCountable, BaseInterface>::value,
         "Template parameter BaseInterface should be derived from IRefCountable");
 
-    // Statically assure that DerivedInterface is inherited from this class.
-    Interface() = default;
+    /**
+     * A private constructor is needed to statically assure that only DerivedInterface (which is
+     * made the only friend) can inherit from this class.
+     */
+    Interface()
+    {
+        // Assure that DerivedInterface has interfaceId().
+        (void) &DerivedInterface::interfaceId;
+    }
+
     friend DerivedInterface;
 
     IRefCountable* doQueryInterface(const IRefCountable::InterfaceId* id)

@@ -10,6 +10,8 @@ namespace sdk {
 class IStringList: public Interface<IStringList>
 {
 public:
+    static auto interfaceId() { return makeId("nx::sdk::IStringList"); }
+
     virtual int count() const = 0;
 
     /** @return Null if the index is invalid. */
