@@ -752,6 +752,7 @@
                         name="BLC Level"
                         dataType="Enumeration"
                         range="Low,Middle,High"
+                        internalRange="Low,Medium,High"
                         aux="group=whitebalance;groupInclude=BLC">
                     <dependencies>
                         <dependencies-show>
