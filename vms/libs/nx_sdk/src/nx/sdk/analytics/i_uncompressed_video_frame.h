@@ -12,7 +12,8 @@ namespace nx {
 namespace sdk {
 namespace analytics {
 
-class IUncompressedVideoFrame0: public Interface<IUncompressedVideoFrame0, IUncompressedMediaFrame>
+class IUncompressedVideoFrame0:
+    public Interface<IUncompressedVideoFrame0, IUncompressedMediaFrame0>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IUncompressedVideoFrame"); }
@@ -81,6 +82,7 @@ public:
         return toPtr(getMetadataList());
     }
 };
+using IUncompressedVideoFrame1 = IUncompressedVideoFrame;
 
 } // namespace analytics
 } // namespace sdk

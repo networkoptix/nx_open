@@ -13,7 +13,7 @@ namespace analytics {
 /**
  * Decoded media frame, e.g. video or audio.
  */
-class IUncompressedMediaFrame: public Interface<IUncompressedMediaFrame, IDataPacket>
+class IUncompressedMediaFrame: public Interface<IUncompressedMediaFrame, IDataPacket0>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IUncompressedMediaFrame"); }
@@ -35,6 +35,7 @@ public:
      */
     virtual const char* data(int plane) const = 0;
 };
+using IUncompressedMediaFrame0 = IUncompressedMediaFrame;
 
 } // namespace analytics
 } // namespace sdk

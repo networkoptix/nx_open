@@ -47,6 +47,7 @@ public:
      */
     public: Ptr<IString> model() const { return toPtr(getModel()); }
 };
+using ISettingsResponse1 = ISettingsResponse;
 
 } // namespace sdk
 } // namespace nx

@@ -16,7 +16,7 @@ namespace analytics {
 /**
  * Packet containing metadata (e.g. events, object detections).
  */
-class ICompoundMetadataPacket: public Interface<ICompoundMetadataPacket, IMetadataPacket>
+class ICompoundMetadataPacket: public Interface<ICompoundMetadataPacket, IMetadataPacket0>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::ICompoundMetadataPacket"); }
@@ -36,6 +36,7 @@ public:
      */
     public: Ptr<const IMetadata> at(int index) const { return toPtr(getAt(index)); }
 };
+using ICompoundMetadataPacket0 = ICompoundMetadataPacket;
 
 } // namespace analytics
 } // namespace sdk

@@ -21,6 +21,8 @@ public:
     /** @return Element at the zero-based index, or null if the index is invalid. */
     public: Ptr<IItem> at(int index) const { return toPtr(getAt(index)); }
 };
+template<typename IItem>
+using IList0 = IList<IItem>;
 
 } // namespace sdk
 } // namespace nx

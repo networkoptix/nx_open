@@ -13,7 +13,7 @@ namespace analytics {
 /**
  * Arbitrary metadata represented as a byte array.
  */
-class ICustomMetadataPacket: public Interface<ICustomMetadataPacket, IMetadataPacket>
+class ICustomMetadataPacket: public Interface<ICustomMetadataPacket, IMetadataPacket0>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::ICustomMetadataPacket"); }
@@ -45,6 +45,7 @@ public:
      */
     virtual int contextDataSize() const = 0;
 };
+using ICustomMetadataPacket0 = ICustomMetadataPacket;
 
 } // namespace analytics
 } // namespace sdk

@@ -27,6 +27,7 @@ public:
     virtual const char* caption() const = 0;
     virtual const char* description() const = 0;
 };
+using IPluginDiagnosticEvent0 = IPluginDiagnosticEvent;
 
 } // namespace sdk
 } // namespace nx

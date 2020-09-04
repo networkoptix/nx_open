@@ -75,6 +75,7 @@ public:
      */
     virtual const char* bestShotImageDataFormat() const = 0;
 };
+using IObjectTrackInfo1 = IObjectTrackInfo;
 
 } // namespace analytics
 } // namespace sdk

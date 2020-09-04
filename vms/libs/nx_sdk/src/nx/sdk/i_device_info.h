@@ -57,6 +57,7 @@ public:
      */
     virtual int channelNumber() const = 0;
 };
+using IDeviceInfo0 = IDeviceInfo;
 
 } // namespace sdk
 } // namespace nx

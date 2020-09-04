@@ -151,6 +151,7 @@ public:
         return result;
     }
 };
+using IDeviceAgent0 = IDeviceAgent;
 
 } // namespace analytics
 } // namespace sdk

@@ -20,6 +20,7 @@ public:
     /** @return Name assigned to this Engine by the Server or by the user. */
     virtual const char* name() const = 0;
 };
+using IEngineInfo0 = IEngineInfo;
 
 } // namespace analytics
 } // namespace sdk

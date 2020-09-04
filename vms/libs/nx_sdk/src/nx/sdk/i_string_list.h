@@ -17,6 +17,7 @@ public:
     /** @return Null if the index is invalid. */
     virtual const char* at(int index) const = 0;
 };
+using IStringList0 = IStringList;
 
 } // namespace sdk
 } // namespace nx

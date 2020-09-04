@@ -169,6 +169,7 @@ public:
      */
     virtual void setHandler(IHandler* handler) = 0;
 };
+using IEngine0 = IEngine;
 
 } // namespace analytics
 } // namespace sdk

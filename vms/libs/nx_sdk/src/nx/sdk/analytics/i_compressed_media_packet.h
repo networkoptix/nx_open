@@ -16,7 +16,7 @@ namespace analytics {
 /**
  * Packet containing compressed media data (audio or video).
  */
-class ICompressedMediaPacket: public Interface<ICompressedMediaPacket, IDataPacket>
+class ICompressedMediaPacket: public Interface<ICompressedMediaPacket, IDataPacket0>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::ICompressedMediaPacket"); }
@@ -56,6 +56,7 @@ public:
      */
     virtual MediaFlags flags() const = 0;
 };
+using ICompressedMediaPacket0 = ICompressedMediaPacket;
 
 } // namespace analytics
 } // namespace sdk

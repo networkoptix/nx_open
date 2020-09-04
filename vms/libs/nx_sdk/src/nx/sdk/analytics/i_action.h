@@ -64,6 +64,7 @@ public:
         Ptr<IString> messageToUser;
     };
 };
+using IAction0 = IAction;
 
 } // namespace analytics
 } // namespace sdk

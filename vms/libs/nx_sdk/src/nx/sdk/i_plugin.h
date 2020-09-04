@@ -40,6 +40,7 @@ public:
      */
     virtual void setUtilityProvider(IUtilityProvider* utilityProvider) = 0;
 };
+using IPlugin0 = IPlugin;
 
 } // namespace sdk
 } // namespace nx

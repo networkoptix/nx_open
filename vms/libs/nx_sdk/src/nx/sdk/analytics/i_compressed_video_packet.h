@@ -12,7 +12,7 @@ namespace nx {
 namespace sdk {
 namespace analytics {
 
-class ICompressedVideoPacket0: public Interface<ICompressedVideoPacket0, ICompressedMediaPacket>
+class ICompressedVideoPacket0: public Interface<ICompressedVideoPacket0, ICompressedMediaPacket0>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::ICompressedVideoPacket"); }
@@ -27,7 +27,6 @@ public:
      */
     virtual int height() const = 0;
 };
-
 
 /**
  * Represents a single video frame.
@@ -44,6 +43,7 @@ public:
         return toPtr(getMetadataList());
     }
 };
+using ICompressedVideoPacket1 = ICompressedVideoPacket;
 
 } // namespace analytics
 } // namespace sdk

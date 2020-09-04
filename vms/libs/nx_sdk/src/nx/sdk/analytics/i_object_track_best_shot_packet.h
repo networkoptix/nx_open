@@ -15,7 +15,7 @@ namespace analytics {
 /**
  * Packet containing information about object track best shot.
  */
-class IObjectTrackBestShotPacket0: public Interface<IObjectTrackBestShotPacket0, IMetadataPacket>
+class IObjectTrackBestShotPacket0: public Interface<IObjectTrackBestShotPacket0, IMetadataPacket0>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IObjectTrackBestShotPacket"); }
@@ -89,6 +89,7 @@ public:
      */
     virtual int attributeCount() const = 0;
 };
+using IObjectTrackBestShotPacket1 = IObjectTrackBestShotPacket;
 
 } // namespace analytics
 } // namespace sdk

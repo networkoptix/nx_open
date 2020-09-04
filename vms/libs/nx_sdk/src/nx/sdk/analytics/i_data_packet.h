@@ -23,6 +23,7 @@ public:
      */
     virtual int64_t timestampUs() const = 0;
 };
+using IDataPacket0 = IDataPacket;
 
 } // namespace analytics
 } // namespace sdk

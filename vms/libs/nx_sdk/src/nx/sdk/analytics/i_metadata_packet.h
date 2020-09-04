@@ -13,11 +13,12 @@ namespace analytics {
 /**
  * Packet containing metadata (e.g. events, object detections).
  */
-class IMetadataPacket: public Interface<IMetadataPacket, IDataPacket>
+class IMetadataPacket: public Interface<IMetadataPacket, IDataPacket0>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IMetadataPacket"); }
 };
+using IMetadataPacket0 = IMetadataPacket;
 
 } // namespace analytics
 } // namespace sdk

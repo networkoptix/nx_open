@@ -27,6 +27,7 @@ public:
 
     virtual bool isEmpty() const = 0;
 };
+using IMetadataTypes0 = IMetadataTypes;
 
 } // namespace analytics
 } // namespace sdk

@@ -14,7 +14,7 @@ namespace analytics {
 /**
  * Metadata packet that contains data about objects detected on the scene.
  */
-class IObjectMetadataPacket: public Interface<IObjectMetadataPacket, ICompoundMetadataPacket>
+class IObjectMetadataPacket: public Interface<IObjectMetadataPacket, ICompoundMetadataPacket0>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IObjectMetadataPacket"); }
@@ -23,6 +23,7 @@ public:
     protected: virtual const IObjectMetadata* getAt(int index) const override = 0;
     public: Ptr<const IObjectMetadata> at(int index) const { return toPtr(getAt(index)); }
 };
+using IObjectMetadataPacket0 = IObjectMetadataPacket;
 
 } // namespace analytics
 } // namespace sdk

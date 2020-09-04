@@ -14,7 +14,7 @@ namespace analytics {
 /**
  * Metadata packet containing information about some event which occurred on the scene.
  */
-class IEventMetadataPacket: public Interface<IEventMetadataPacket, ICompoundMetadataPacket>
+class IEventMetadataPacket: public Interface<IEventMetadataPacket, ICompoundMetadataPacket0>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IEventMetadataPacket"); }
@@ -23,6 +23,7 @@ public:
     protected: virtual const IEventMetadata* getAt(int index) const override = 0;
     public: Ptr<const IEventMetadata> at(int index) const { return toPtr(getAt(index)); }
 };
+using IEventMetadataPacket0 = IEventMetadataPacket;
 
 } // namespace analytics
 } // namespace sdk

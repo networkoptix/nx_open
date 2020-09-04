@@ -15,7 +15,7 @@ namespace analytics {
 /**
  * A single object detected on the scene on a particular video frame, defined as a bounding box.
  */
-class IObjectMetadata: public Interface<IObjectMetadata, IMetadata>
+class IObjectMetadata: public Interface<IObjectMetadata, IMetadata0>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IObjectMetadata"); }
@@ -42,6 +42,7 @@ public:
     public: Rect boundingBox() const { Rect value; getBoundingBox(&value); return value; }
 
 };
+using IObjectMetadata0 = IObjectMetadata;
 
 } // namespace analytics
 } // namespace sdk

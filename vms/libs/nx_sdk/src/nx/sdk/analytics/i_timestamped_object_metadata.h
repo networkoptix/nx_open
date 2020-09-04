@@ -8,7 +8,7 @@ namespace nx {
 namespace sdk {
 namespace analytics {
 
-class ITimestampedObjectMetadata: public Interface<ITimestampedObjectMetadata, IObjectMetadata>
+class ITimestampedObjectMetadata: public Interface<ITimestampedObjectMetadata, IObjectMetadata0>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::ITimestampedObjectMetadata"); }
@@ -16,6 +16,7 @@ public:
     /** @return A positive value. */
     virtual int64_t timestampUs() const = 0;
 };
+using ITimestampedObjectMetadata0 = ITimestampedObjectMetadata;
 
 } // namespace analytics
 } // namespace sdk

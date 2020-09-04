@@ -23,6 +23,7 @@ public:
     /** @return Null if not found or the key is null. */
     virtual const char* value(const char* key) const = 0;
 };
+using IStringMap0 = IStringMap;
 
 } // namespace sdk
 } // namespace nx

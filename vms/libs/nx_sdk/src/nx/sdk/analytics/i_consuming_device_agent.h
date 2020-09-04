@@ -14,7 +14,7 @@ namespace analytics {
 /**
  * Interface for a DeviceAgent that requires input (e.g. audio or video stream) from the Device.
  */
-class IConsumingDeviceAgent0: public Interface<IConsumingDeviceAgent0, IDeviceAgent>
+class IConsumingDeviceAgent0: public Interface<IConsumingDeviceAgent0, IDeviceAgent0>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IConsumingDeviceAgent"); }

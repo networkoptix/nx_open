@@ -43,6 +43,7 @@ public:
      */
     virtual int attributeCount() const = 0;
 };
+using IMetadata0 = IMetadata;
 
 } // namespace analytics
 } // namespace sdk

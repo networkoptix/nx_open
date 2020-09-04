@@ -26,6 +26,7 @@ public:
     virtual const char* value() const = 0;
     virtual float confidence() const = 0;
 };
+using IAttribute0 = IAttribute;
 
 } // namespace sdk
 } // namespace nx

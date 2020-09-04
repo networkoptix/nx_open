@@ -15,6 +15,7 @@ public:
     /** Never null. */
     virtual const char* str() const = 0;
 };
+using IString0 = IString;
 
 } // namespace sdk
 } // namespace nx

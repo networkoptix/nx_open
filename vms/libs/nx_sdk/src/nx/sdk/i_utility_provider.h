@@ -49,6 +49,7 @@ public:
      */
     public: std::string serverSdkVersion() const { return toPtr(getServerSdkVersion())->str(); }
 };
+using IUtilityProvider1 = IUtilityProvider;
 
 } // namespace sdk
 } // namespace nx

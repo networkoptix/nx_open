@@ -27,6 +27,7 @@ public:
      */
     virtual int extradataSize() const = 0;
 };
+using IMediaContext0 = IMediaContext;
 
 } // namespace analytics
 } // namespace sdk

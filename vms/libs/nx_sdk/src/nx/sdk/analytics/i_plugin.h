@@ -17,7 +17,7 @@ namespace analytics {
 /**
  * The main interface for an Analytics Plugin instance.
  */
-class IPlugin: public Interface<IPlugin, nx::sdk::IPlugin>
+class IPlugin: public Interface<IPlugin, nx::sdk::IPlugin0>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IPlugin"); }
@@ -51,6 +51,7 @@ public:
         return result;
     }
 };
+using IPlugin0 = IPlugin;
 
 } // namespace analytics
 } // namespace sdk

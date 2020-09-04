@@ -13,7 +13,7 @@ namespace analytics {
 /**
  * Metadata packet containing information about motion on the scene.
  */
-class IMotionMetadataPacket: public Interface<IMotionMetadataPacket, IMetadataPacket>
+class IMotionMetadataPacket: public Interface<IMotionMetadataPacket, IMetadataPacket0>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IMotionMetadataPacket"); }
@@ -57,6 +57,7 @@ public:
      */
     virtual bool isMotionAt(int columnIndex, int rowIndex) const = 0;
 };
+using IMotionMetadataPacket0 = IMotionMetadataPacket;
 
 } // namespace analytics
 } // namespace sdk

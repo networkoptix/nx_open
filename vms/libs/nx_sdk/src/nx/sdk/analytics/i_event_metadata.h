@@ -10,7 +10,7 @@ namespace nx {
 namespace sdk {
 namespace analytics {
 
-class IEventMetadata0: public Interface<IEventMetadata0, IMetadata>
+class IEventMetadata0: public Interface<IEventMetadata0, IMetadata0>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IEventMetadata"); }
@@ -45,6 +45,7 @@ public:
      */
     public: Uuid trackId() const { Uuid value; getTrackId(&value); return value; }
 };
+using IEventMetadata1 = IEventMetadata;
 
 } // namespace analytics
 } // namespace sdk
