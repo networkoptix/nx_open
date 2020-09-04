@@ -12,10 +12,6 @@ struct Config
 {
     /** Temporary working directory for all tests. */
     QString tmpDir;
-    /** Ftp storage url. */
-    QString ftpUrl;
-    /** Samba storage url. */
-    QString smbUrl;
     bool enableDiscovery = false;
 };
 

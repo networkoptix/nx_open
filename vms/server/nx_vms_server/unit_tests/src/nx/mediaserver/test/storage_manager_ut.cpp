@@ -266,7 +266,7 @@ protected:
                     [this, manager]()
                     {
                         saveStorages(manager->getStorages());
-                        assertStoragesInitialized();
+                        waitForStoragesInitialized();
                         m_clearSpaceCalled = true;
                         m_afterClearSpaceFunc();
                     });
@@ -388,24 +388,27 @@ private:
         catalog->addChunks(chunks);
     }
 
-    void assertStoragesInitialized()
+    void waitForStoragesInitialized()
     {
         ASSERT_EQ(storageCount, m_storages.size())
             << "No storages have been created by the time when "
             << "QnStorageManager::clearSpace has been called";
 
-        const bool allInitialized = std::all_of(
-            m_storages.cbegin(), m_storages.cend(),
-            [](const auto& s)
-            {
-                NX_GTEST_ASSERT_TRUE((bool) s);
-                NX_GTEST_ASSERT_GT(s->getSpaceLimit(), 0);
-                return s->initFinished.load();
-            });
+        while (true)
+        {
+            std::this_thread::sleep_for(50ms);
+            const bool allInitialized = std::all_of(
+                m_storages.cbegin(), m_storages.cend(),
+                [](const auto& s)
+                {
+                    NX_GTEST_ASSERT_TRUE((bool)s);
+                    NX_GTEST_ASSERT_GT(s->getSpaceLimit(), 0);
+                    return s->initFinished.load();
+                });
 
-        ASSERT_TRUE(allInitialized)
-            << "Not all storages have been initialized when "
-            << "clearSpace has been called";
+            if (allInitialized)
+                break;
+        }
     }
 
     void saveStorages(const StorageResourceList& storages)

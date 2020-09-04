@@ -68,6 +68,7 @@ TEST(GetStorages, saveAndMerge)
     storage.parentId = launcher.commonModule()->moduleGUID();
     storage.spaceLimit = 113326;
     storage.storageType = "local";
+    storage.url = "/some/url";
 
     NX_TEST_API_POST(&launcher, lit("/ec2/saveStorage"), storage, removeJsonFields({"id"}));
 
