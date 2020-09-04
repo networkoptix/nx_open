@@ -260,7 +260,7 @@ int QnMultiserverThumbnailRestHandler::getThumbnailForAnalyticsTrack(
         return nx::network::http::StatusCode::noContent;
     }
     newRequest.request.camera = camera;
-    newRequest.request.crop = bestShot->rect;
+    newRequest.request.crop = request.request.crop.isEmpty() ? bestShot->rect : request.request.crop;
     newRequest.request.streamSelectionMode =
         (bestShot->streamIndex == nx::vms::api::StreamIndex::primary)
             ? CameraImageRequest::StreamSelectionMode::forcedPrimary
