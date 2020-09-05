@@ -64,11 +64,15 @@ Renderer::~Renderer()
 
 void Renderer::close()
 {
+    wglMakeCurrent(m_dc, m_rc);
     unregisterTexture();
+    wglMakeCurrent(0, 0);
+
     if (m_rc)
         wglDeleteContext(m_rc);
     if (m_dc)
         ::ReleaseDC(m_window, m_dc);
+
 }
 
 bool Renderer::initRenderSurface(IDirect3D9Ex* d3d)
@@ -154,7 +158,6 @@ bool Renderer::init(
 
 void Renderer::unregisterTexture()
 {
-    wglMakeCurrent(m_dc, m_rc);
     auto wglDXUnregisterObjectNV = (PFNWGLDXUNREGISTEROBJECTNVPROC)wglGetProcAddress("wglDXUnregisterObjectNV");
     auto wglDXCloseDeviceNV = (PFNWGLDXCLOSEDEVICENVPROC)wglGetProcAddress("wglDXCloseDeviceNV");
 
@@ -169,14 +172,12 @@ void Renderer::unregisterTexture()
         wglDXCloseDeviceNV(m_renderDeviceHandle);
         m_renderDeviceHandle = 0;
     }
-    wglMakeCurrent(NULL, NULL);
 }
 
 bool Renderer::registerTexture(GLuint textureId, QOpenGLContext* context)
 {
     HGLRC guiGlrc = context->nativeHandle().value<QWGLNativeContext>().context();
     wglShareLists(guiGlrc, m_rc);
-    wglMakeCurrent(m_dc, m_rc);
 
     auto wglDXOpenDeviceNV = (PFNWGLDXOPENDEVICENVPROC)wglGetProcAddress("wglDXOpenDeviceNV");
     auto wglDXRegisterObjectNV = (PFNWGLDXREGISTEROBJECTNVPROC)wglGetProcAddress("wglDXRegisterObjectNV");
@@ -199,7 +200,6 @@ bool Renderer::registerTexture(GLuint textureId, QOpenGLContext* context)
         NX_WARNING(this, "Failed to register object NV, error code: %1", GetLastError());
         return false;
     }
-    wglMakeCurrent(NULL, NULL);
     return true;
 }
 
@@ -229,6 +229,10 @@ bool Renderer::createSharedSurface(QSize size)
 bool Renderer::render(
     const mfxFrameSurface1* mfxSurface, bool isNewTexture, GLuint textureId, QOpenGLContext* context)
 {
+    auto prevContext = wglGetCurrentContext();
+    auto prevDc = wglGetCurrentDC();
+    wglMakeCurrent(m_dc, m_rc);
+
     QSize inputSurfaceSize(mfxSurface->Info.Width, mfxSurface->Info.Height);
     if (isNewTexture || !m_textureHandle || m_sharedSurfaceSize != inputSurfaceSize)
     {
@@ -247,12 +251,12 @@ bool Renderer::render(
     if (!convertToRgb(m_device, mfxSurface, m_sharedSurface))
         return false;
 
-    wglMakeCurrent(m_dc, m_rc);
     auto wglDXLockObjectsNV = (PFNWGLDXLOCKOBJECTSNVPROC)wglGetProcAddress("wglDXLockObjectsNV");
     auto wglDXUnlockObjectsNV = (PFNWGLDXUNLOCKOBJECTSNVPROC)wglGetProcAddress("wglDXUnlockObjectsNV");
     wglDXLockObjectsNV(m_renderDeviceHandle, 1, &m_textureHandle);
     wglDXUnlockObjectsNV(m_renderDeviceHandle, 1, &m_textureHandle);
-    wglMakeCurrent(NULL, NULL);
+
+    wglMakeCurrent(prevDc, prevContext);
     return true;
 }
 

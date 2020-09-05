@@ -1238,7 +1238,6 @@ bool DecodedPictureToOpenGLUploader::renderVideoMemory(
         return false;
     }
     texture->m_texCoords = QVector2D(cropWidth, cropHeight);
-    d->functions->glWidget()->makeCurrent();
     return true;
 #else //__QSV_SUPPORTED__
     return false;
