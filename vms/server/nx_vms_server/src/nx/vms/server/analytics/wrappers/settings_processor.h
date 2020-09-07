@@ -51,7 +51,8 @@ public:
         if (!NX_ASSERT(sdkObject))
             return std::nullopt;
 
-        return handleSettingsResponse([&sdkObject]() { return sdkObject->pluginSideSettings(); });
+        return handleSettingsResponse("_plugin_side",
+            [&sdkObject]() { return sdkObject->pluginSideSettings(); });
     }
 
     template<typename SdkObject>
@@ -68,6 +69,7 @@ public:
 
         sdk_support::SdkSettingsResponse setSettingsResult =
             handleSettingsResponse(
+                "_set_settings",
                 [&sdkObject, sdkSettings]()
                 {
                     return sdkObject->setSettings(sdkSettings.get());
@@ -77,6 +79,7 @@ public:
         {
             sdk_support::SdkSettingsResponse pluginSideSettingsResult =
                 handleSettingsResponse(
+                    "_plugin_side",
                     [&sdkObject]()
                     {
                         return sdkObject->pluginSideSettings();
@@ -90,7 +93,7 @@ public:
 
 private:
     sdk_support::SdkSettingsResponse handleSettingsResponse(
-        SettingsResponseFetcher responseFetcher) const;
+        const char* fileNameSuffix, SettingsResponseFetcher responseFetcher) const;
 
     sdk::Ptr<const sdk::IStringMap> prepareSettings(
         const sdk_support::SettingsValues& settings) const;
@@ -98,6 +101,13 @@ private:
     std::optional<sdk_support::SettingsValues> loadSettingsFromFile() const;
 
     std::optional<sdk_support::SettingsValues> loadSettingsFromSpecificFile(
+        sdk_support::FilenameGenerationOptions filenameGenerationOptions) const;
+
+    std::optional<sdk_support::SdkSettingsResponse> loadPluginSideSettingsResponseFromFile(
+        const char* fileNameSuffix) const;
+
+    std::optional<sdk_support::SdkSettingsResponse> loadPluginSideSettingsResponseFromSpecificFile(
+        const char* fileNameSuffix,
         sdk_support::FilenameGenerationOptions filenameGenerationOptions) const;
 
     static sdk_support::SdkSettingsResponse mergeLegacySettingsResponses(

@@ -2,6 +2,7 @@
 
 #include <nx/vms/server/sdk_support/result_holder.h>
 #include <nx/vms/api/types/event_rule_types.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 namespace nx::vms::server::sdk_support {
 
@@ -25,6 +26,11 @@ struct Error
     bool isOk() const { return errorCode == nx::sdk::ErrorCode::noError; }
 };
 
+QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::sdk::ErrorCode)
+QN_FUSION_DECLARE_FUNCTIONS(Error, (json))
+
 nx::vms::api::EventLevel pluginDiagnosticEventLevel(const Error& error);
 
 } // namespace nx::vms::server::sdk_support
+
+Q_DECLARE_METATYPE(nx::vms::server::sdk_support::Error)

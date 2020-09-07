@@ -7,6 +7,7 @@
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/interactive_settings/json_engine.h>
+#include <nx/utils/string.h>
 
 namespace nx::vms::server::analytics::wrappers {
 
@@ -85,27 +86,115 @@ static sdk_support::SdkSettingsResponse toSdkSettingsResponse(
 }
 
 sdk_support::SdkSettingsResponse SettingsProcessor::handleSettingsResponse(
-    SettingsResponseFetcher responseFetcher) const
+    const char* fileNameSuffix, SettingsResponseFetcher responseFetcher) const
 {
     const SettingsResponseHolder sdkSettingsResponseHolder = responseFetcher();
 
     Violation violation;
 
-    sdk_support::SdkSettingsResponse result =
+    sdk_support::SdkSettingsResponse pluginSideSettingsResponseFromPlugin =
         toSdkSettingsResponse(sdkSettingsResponseHolder, &violation);
 
     if (violation.type != ViolationType::undefined)
         m_violationHandler(violation);
 
-    if (!result.sdkError.isOk())
-        m_errorHandler(result.sdkError);
+    if (!m_debugSettings.outputPath.isEmpty())
+    {
+        const auto baseFilename = m_sdkObjectDescription.baseInputOutputFilename();
+        const auto absoluteFilename = sdk_support::debugFileAbsolutePath(
+            m_debugSettings.outputPath,
+            baseFilename + "_actual_settings_response" + fileNameSuffix + ".json");
 
-    if (!result.errors.isEmpty())
+        // Always dump original settings response (i.e. the one received from plugin, not the one
+        // loaded from the file).
+        sdk_support::dumpStringToFile(
+            m_debugSettings.logTag,
+            absoluteFilename,
+            nx::utils::formatJsonString(QJson::serialized(pluginSideSettingsResponseFromPlugin)));
+    }
+
+    sdk_support::SdkSettingsResponse pluginSideSettingsResponse =
+        pluginSideSettingsResponseFromPlugin;
+    if (const std::optional<sdk_support::SdkSettingsResponse> pluginSideSettingsResponseFromFile =
+        loadPluginSideSettingsResponseFromFile(fileNameSuffix))
+    {
+        pluginSideSettingsResponse = *pluginSideSettingsResponseFromFile;
+    }
+
+    if (!pluginSideSettingsResponse.sdkError.isOk())
+        m_errorHandler(pluginSideSettingsResponse.sdkError);
+
+    if (!pluginSideSettingsResponse.errors.isEmpty())
     {
         m_errorHandler({
             sdk::ErrorCode::otherError,
             buildSettingsErrorString(
-                result.errors, "Errors occurred while applying settings:\n")});
+                pluginSideSettingsResponse.errors, "Errors occurred while applying settings:\n")});
+    }
+
+    return pluginSideSettingsResponse;
+}
+
+std::optional<sdk_support::SdkSettingsResponse>
+SettingsProcessor::loadPluginSideSettingsResponseFromFile(const char* fileNameSuffix) const
+{
+    using namespace nx::vms::server::sdk_support;
+
+    std::optional<sdk_support::SdkSettingsResponse> result =
+        loadPluginSideSettingsResponseFromSpecificFile(
+        fileNameSuffix,
+        FilenameGenerationOption::engineSpecific | FilenameGenerationOption::deviceSpecific);
+
+    if (result)
+        return result;
+
+    result = loadPluginSideSettingsResponseFromSpecificFile(
+        fileNameSuffix, FilenameGenerationOption::deviceSpecific);
+    if (result)
+        return result;
+
+    result = loadPluginSideSettingsResponseFromSpecificFile(
+        fileNameSuffix, FilenameGenerationOption::engineSpecific);
+    if (result)
+        return result;
+
+    return loadPluginSideSettingsResponseFromSpecificFile(fileNameSuffix,
+        FilenameGenerationOptions());
+}
+
+std::optional<sdk_support::SdkSettingsResponse>
+SettingsProcessor::loadPluginSideSettingsResponseFromSpecificFile(
+    const char* fileNameSuffix,
+    sdk_support::FilenameGenerationOptions filenameGenerationOptions) const
+{
+    if (pluginsIni().analyticsSettingsSubstitutePath[0] == 0)
+        return std::nullopt;
+
+    const QString settingsFilename = sdk_support::debugFileAbsolutePath(
+        pluginsIni().analyticsSettingsSubstitutePath,
+        sdk_support::baseNameOfFileToDumpOrLoadData(
+            m_sdkObjectDescription.plugin(),
+            m_sdkObjectDescription.engine(),
+            m_sdkObjectDescription.device(),
+            filenameGenerationOptions)) + "_settings_response" + fileNameSuffix + ".json";
+
+    std::optional<QString> settingsString = sdk_support::loadStringFromFile(
+        nx::utils::log::Tag(this),
+        settingsFilename);
+
+    if (!settingsString)
+        return std::nullopt;
+
+    bool isValid = false;
+    const auto& result = QJson::deserialized<sdk_support::SdkSettingsResponse>(
+        settingsString->toUtf8(), /*defaultValue*/ {}, &isValid);
+
+    if (!isValid)
+    {
+        NX_WARNING(this,
+            "Unable to parse data from file %1: loaded JSON string is malformed",
+            settingsFilename);
+        return std::nullopt;
     }
 
     return result;
@@ -147,7 +236,7 @@ std::optional<QJsonObject> SettingsProcessor::loadSettingsFromSpecificFile(
             filenameGenerationOptions)) + "_settings.json";
 
     std::optional<QString> settingsString = sdk_support::loadStringFromFile(
-        nx::utils::log::Tag(typeid(this)),
+        nx::utils::log::Tag(this),
         settingsFilename);
 
     if (!settingsString)

@@ -8,6 +8,7 @@
 
 #include <nx/utils/uuid.h>
 #include <nx/vms/server/sdk_support/error.h>
+#include <nx/fusion/model_functions_fwd.h>
 
 namespace nx::vms::server::sdk_support {
 
@@ -24,6 +25,8 @@ struct SdkSettingsResponse
     Error sdkError;
 };
 
+QN_FUSION_DECLARE_FUNCTIONS(SdkSettingsResponse, (json))
+
 struct MetadataTypes
 {
     std::set<QString> eventTypeIds;
@@ -36,3 +39,5 @@ inline bool operator==(const MetadataTypes& lhs, const MetadataTypes& rhs)
 }
 
 } // namespace nx::vms::server::sdk_support
+
+Q_DECLARE_METATYPE(nx::vms::server::sdk_support::SdkSettingsResponse)
