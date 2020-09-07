@@ -44,10 +44,31 @@ Item
 
                 Layout.alignment: Qt.AlignLeft | Qt.AlignBaseline
                 Layout.fillWidth: !isLabel
-                Layout.maximumWidth: isLabel
-                    ? (grid.width - grid.columnSpacing) / 2
-                    : -1
+
+                Layout.maximumWidth:
+                {
+                    if (!isLabel)
+                        return -1
+
+                    return Math.max(
+                        (grid.width - grid.columnSpacing) / 2,
+                        grid.width - grid.columnSpacing - grid.rightColumnContentWidth)
+                }
             }
+        }
+
+        readonly property real rightColumnContentWidth:
+        {
+            var result = 0.0
+
+            for (var i = 0; i < children.length; ++i)
+            {
+                var child = children[i]
+                if (child.hasOwnProperty("isLabel") && !child.isLabel)
+                    result = Math.max(result, child.contentWidth)
+            }
+
+            return result
         }
     }
 }
