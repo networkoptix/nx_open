@@ -38,7 +38,7 @@ CustomSettingsWidget::~CustomSettingsWidget()
 
 void CustomSettingsWidget::loadManifest(const QnCameraAdvancedParams& manifest)
 {
-    d->manager->displayParams(manifest);
+    d->manager->resetManifest(manifest);
 }
 
 } // namespace nx::vms::client::desktop

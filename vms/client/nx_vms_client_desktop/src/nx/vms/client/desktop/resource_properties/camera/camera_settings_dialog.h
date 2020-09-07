@@ -37,7 +37,7 @@ protected:
 private:
     QDialogButtonBox::StandardButton showConfirmationDialog();
 
-    void updateState(const CameraSettingsDialogState& state);
+    void loadState(const CameraSettingsDialogState& state);
 
     void updateButtonsAvailability();
     void updateScheduleAlert();

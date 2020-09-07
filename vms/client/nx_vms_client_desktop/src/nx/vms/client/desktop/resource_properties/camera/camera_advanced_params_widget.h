@@ -6,58 +6,49 @@
 #include <core/resource/camera_advanced_param.h>
 #include <api/server_rest_connection_fwd.h>
 
-#include <utils/common/connective.h>
+#include <nx/utils/impl_ptr.h>
 #include <nx/utils/uuid.h>
 
-
-namespace Ui {
-class CameraAdvancedParamsWidget;
-}
+namespace Ui { class CameraAdvancedParamsWidget; }
 
 class QnRemotePtzController;
 
 namespace nx::vms::client::desktop {
 
 class CameraAdvancedParamWidgetsManager;
+class CameraSettingsDialogStore;
+struct CameraSettingsDialogState;
 
-class CameraAdvancedParamsWidget: public Connective<QWidget>
+class CameraAdvancedParamsWidget: public QWidget
 {
     Q_OBJECT
-        typedef Connective<QWidget> base_type;
+    using base_type = QWidget;
+
 public:
-    CameraAdvancedParamsWidget(QWidget* parent = NULL);
+    CameraAdvancedParamsWidget(CameraSettingsDialogStore* store, QWidget* parent = nullptr);
     virtual ~CameraAdvancedParamsWidget();
 
-    QnVirtualCameraResourcePtr camera() const;
-    void setCamera(const QnVirtualCameraResourcePtr &camera);
+    void loadState(const CameraSettingsDialogState& state);
 
-    void loadValues();
+    void setConnectionInterface(rest::QnConnectionPtr connection);
+    void setPtzInterface(std::unique_ptr<QnRemotePtzController> controller);
+
     void saveValues();
 
     bool hasChanges() const;
 
-    bool shouldBeVisible() const;
-
 signals:
     void hasChangesChanged();
-    void visibilityUpdateRequested();
 
 private:
-    void initSplitter();
-
-    void initialize();
-    void displayParams();
+    void refreshValues();
 
     void saveSingleValue(const QnCameraAdvancedParameter& parameter, const QString& value);
     void sendCustomParameterCommand(
         const QnCameraAdvancedParameter& parameter, const QString& value);
 
-    bool isCameraAvailable() const;
-    void updateCameraAvailability();
     void updateButtonsState();
     void updateParametersVisibility();
-
-    rest::QnConnectionPtr getServerConnection();
 
     // Returns current values of all parameters that belong to the given group set.
     QnCameraAdvancedParamValueMap groupParameters(const QSet<QString>& groups) const;
@@ -67,10 +58,7 @@ private:
     /** Sends getCameraParam request to mediaserver. */
     bool sendGetCameraParams(const QStringList& keys);
 
-    bool sendGetCameraParamManifest();
-
 private:
-    void at_manifestLoaded(bool success, int handle, const QnCameraAdvancedParams& manifest);
     void at_advancedParamChanged(const QString &id, const QString &value);
     void at_advancedSettingsLoaded(bool success, int handle, const QnCameraAdvancedParamValueList &params);
     void at_advancedParam_saved(bool success, int handle, const QnCameraAdvancedParamValueList &params);
@@ -86,13 +74,12 @@ private:
     void setState(State newState);
 
 private:
-    QScopedPointer<Ui::CameraAdvancedParamsWidget> ui;
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
+    nx::utils::ImplPtr<Ui::CameraAdvancedParamsWidget> ui;
+
     QScopedPointer<CameraAdvancedParamWidgetsManager> m_advancedParamWidgetsManager;
-    QScopedPointer<QnRemotePtzController> m_ptzController;
-    QnVirtualCameraResourcePtr m_camera;
-    QnCameraAdvancedParams m_manifest;
-    bool m_cameraAvailable = false;
-    int m_manifestRequestHandle = 0;
+
     int m_paramRequestHandle = 0;
     State m_state = State::Init;
     QnCameraAdvancedParamValueMap m_loadedValues;

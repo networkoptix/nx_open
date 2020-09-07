@@ -2,15 +2,18 @@
 #include "ui_camera_settings_dialog.h"
 
 #include <chrono>
+#include <memory>
 
 #include <QtCore/QSharedPointer>
 #include <QtWidgets/QPushButton>
 
+#include <core/ptz/remote_ptz_controller.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
+
 #include <ui/dialogs/common/message_box.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
@@ -31,6 +34,7 @@
 #include "utils/camera_settings_dialog_state_conversion_functions.h"
 #include "utils/license_usage_provider.h"
 #include "utils/device_agent_settings_adapter.h"
+#include "watchers/camera_settings_advanced_manifest_watcher.h"
 #include "watchers/camera_settings_license_watcher.h"
 #include "watchers/camera_settings_readonly_watcher.h"
 #include "watchers/camera_settings_analytics_engines_watcher.h"
@@ -47,7 +51,8 @@
 #include "widgets/camera_analytics_settings_widget.h"
 #include "widgets/camera_web_page_widget.h"
 #include "widgets/io_module_settings_widget.h"
-#include "camera_advanced_settings_widget.h"
+#include "camera_advanced_params_widget.h"
+#include "camera_advanced_parameters_manifest_manager.h"
 #include "../fisheye/fisheye_preview_controller.h"
 
 #include <nx/vms/client/desktop/image_providers/camera_thumbnail_manager.h>
@@ -78,9 +83,11 @@ struct CameraSettingsDialog::Private: public QObject
     QnVirtualCameraResourceList cameras;
     QPointer<QnCamLicenseUsageHelper> licenseUsageHelper;
     QSharedPointer<CameraThumbnailManager> previewManager;
-    QPointer<CameraAdvancedSettingsWidget> advancedSettingsWidget;
+    QPointer<CameraAdvancedParamsWidget> advancedSettingsWidget;
     QPointer<DeviceAgentSettingsAdapter> deviceAgentSettingsAdapter;
     QPointer<FisheyePreviewController> fisheyePreviewController;
+    std::unique_ptr<CameraAdvancedParametersManifestManager> advancedParametersManifestManager;
+    std::unique_ptr<CameraSettingsAdvancedManifestWatcher> advancedParametersManifestWatcher;
 
     Private(CameraSettingsDialog* q): q(q)
     {
@@ -89,46 +96,16 @@ struct CameraSettingsDialog::Private: public QObject
         timer->start(kPreviewReloadInterval);
     }
 
-    void tryReloadAdvancedSettings()
-    {
-        if (q->currentPage() == int(CameraSettingsTab::advanced))
-            advancedSettingsWidget->reloadData();
-    }
-
-    void updateAdvancedSettingsVisibility()
-    {
-        q->setPageVisible(int(CameraSettingsTab::advanced),
-            store->state().isSingleCamera() && advancedSettingsWidget->shouldBeVisible());
-    }
-
     void initializeAdvancedSettingsWidget()
     {
-        advancedSettingsWidget = new CameraAdvancedSettingsWidget(q->ui->tabWidget);
-        connect(advancedSettingsWidget, &CameraAdvancedSettingsWidget::hasChangesChanged,
+        advancedParametersManifestManager.reset(new CameraAdvancedParametersManifestManager());
+        advancedParametersManifestWatcher.reset(new CameraSettingsAdvancedManifestWatcher(
+            advancedParametersManifestManager.get(),
+            store));
+
+        advancedSettingsWidget = new CameraAdvancedParamsWidget(store, q->ui->tabWidget);
+        connect(advancedSettingsWidget, &CameraAdvancedParamsWidget::hasChangesChanged,
             q, &CameraSettingsDialog::updateButtonsAvailability);
-
-        connect(advancedSettingsWidget, &CameraAdvancedSettingsWidget::visibilityUpdateRequested,
-            this, &Private::updateAdvancedSettingsVisibility);
-
-        connect(q->ui->tabWidget, &QTabWidget::currentChanged,
-            this, &Private::tryReloadAdvancedSettings);
-
-        const auto updateReadOnlyState =
-            [this]() { ::setReadOnly(advancedSettingsWidget, readOnlyWatcher->isReadOnly()); };
-        updateReadOnlyState();
-        connect(readOnlyWatcher, &CameraSettingsReadOnlyWatcher::readOnlyChanged,
-            this, updateReadOnlyState);
-    }
-
-    void handleCamerasChanged()
-    {
-        const bool advancedSettingsArePotentiallyAllowed = cameras.size() == 1;
-        if (advancedSettingsArePotentiallyAllowed)
-        {
-            advancedSettingsWidget->setCamera(cameras.first());
-            updateAdvancedSettingsVisibility();
-            tryReloadAdvancedSettings();
-        }
     }
 
     bool hasChanges() const
@@ -174,7 +151,7 @@ struct CameraSettingsDialog::Private: public QObject
             {
                 CameraSettingsDialogStateConversionFunctions::applyStateToCameras(state, cameras);
                 if (advancedSettingsWidget->hasChanges())
-                    advancedSettingsWidget->submitToResource();
+                    advancedSettingsWidget->saveValues();
 
                 for (const auto& camera: cameras)
                     camera->updatePreferredServerId();
@@ -201,9 +178,8 @@ struct CameraSettingsDialog::Private: public QObject
         store->loadCameras(
             cameras,
             deviceAgentSettingsAdapter,
-            analyticsEnginesWatcher);
-
-        handleCamerasChanged();
+            analyticsEnginesWatcher,
+            advancedParametersManifestManager.get());
     }
 
     void handleAction(ui::action::IDType action)
@@ -423,7 +399,7 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
 
     // Make sure we will not handle stateChanged, triggered when creating watchers.
     connect(d->store, &CameraSettingsDialogStore::stateChanged,
-        this, &CameraSettingsDialog::updateState);
+        this, &CameraSettingsDialog::loadState);
 
     connect(d->store,
         &CameraSettingsDialogStore::stateChanged,
@@ -437,6 +413,12 @@ CameraSettingsDialog::CameraSettingsDialog(QWidget* parent):
             d->fisheyePreviewController->preview(
                 singleCamera,
                 state.singleCameraSettings.fisheyeDewarping());
+        });
+
+    connect(ui->tabWidget, &QTabWidget::currentChanged, this,
+        [this]
+        {
+            d->store->setSelectedTab((CameraSettingsTab)currentPage());
         });
 
     connect(ui->tabWidget, &QTabWidget::currentChanged, d, &Private::updatePreviewIfNeeded);
@@ -498,6 +480,18 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     // method is clean and does not send anything to the store.
     d->analyticsEnginesWatcher->setCamera(singleCamera);
     d->deviceAgentSettingsAdapter->setCamera(singleCamera);
+    d->advancedParametersManifestWatcher->selectCamera(singleCamera);
+
+    d->advancedSettingsWidget->setConnectionInterface({});
+    d->advancedSettingsWidget->setPtzInterface({});
+    if (singleCamera)
+    {
+        if (const auto server = singleCamera->getParentServer())
+            d->advancedSettingsWidget->setConnectionInterface(server->restConnection());
+        d->advancedSettingsWidget->setPtzInterface(
+            std::make_unique<QnRemotePtzController>(singleCamera));
+    }
+
     d->resetChanges();
 
     // These watchers can modify store during 'setCamera' call.
@@ -513,7 +507,6 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
     d->previewManager->refreshSelectedCamera();
 
     d->handleCamerasWithDefaultPasswordChanged();
-    d->handleCamerasChanged();
 
     return true;
 }
@@ -620,7 +613,7 @@ void CameraSettingsDialog::updateScheduleAlert()
     }
 }
 
-void CameraSettingsDialog::updateState(const CameraSettingsDialogState& state)
+void CameraSettingsDialog::loadState(const CameraSettingsDialogState& state)
 {
     static const QString kWindowTitlePattern = lit("%1 - %2");
 
@@ -642,35 +635,12 @@ void CameraSettingsDialog::updateState(const CameraSettingsDialogState& state)
     updateButtonsAvailability();
     updateScheduleAlert();
 
-    // TODO: #vkutin #gdm Ensure correct visibility/enabled state.
-    // Legacy code has more complicated conditions.
+    static const int kLastTabKey = (int)CameraSettingsTab::expert;
 
-    setPageVisible(int(CameraSettingsTab::motion),
-        state.isSingleCamera()
-            && state.devicesDescription.isWearable == CombinedValue::None
-            && state.devicesDescription.isDtsBased == CombinedValue::None
-            && state.devicesDescription.supportsVideo == CombinedValue::All
-            && state.devicesDescription.hasMotion == CombinedValue::All);
+    for (int key = 0; key <= kLastTabKey; ++key)
+        setPageVisible(key, state.isPageVisible((CameraSettingsTab)key));
 
-    setPageVisible(int(CameraSettingsTab::recording), state.supportsSchedule());
-
-    setPageVisible(int(CameraSettingsTab::fisheye),
-        state.isSingleCamera()
-            && state.singleCameraProperties.hasVideo);
-
-    setPageVisible(int(CameraSettingsTab::io),
-        state.isSingleCamera()
-            && state.devicesDescription.isWearable == CombinedValue::None
-            && state.devicesDescription.isIoModule == CombinedValue::All);
-
-    setPageVisible(int(CameraSettingsTab::web), state.canShowWebPage());
-
-    setPageVisible(int(CameraSettingsTab::analytics),
-        state.isSingleCamera() && !state.analytics.engines.empty());
-
-    // Always displaying for single camera as it contains Logical Id setup.
-    setPageVisible(int(CameraSettingsTab::expert),
-        state.supportsVideoStreamControl() || state.isSingleCamera());
+    setCurrentPage((int)state.selectedTab);
 }
 
 } // namespace nx::vms::client::desktop

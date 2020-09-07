@@ -60,7 +60,8 @@ const State& CameraSettingsDialogStore::state() const
 void CameraSettingsDialogStore::loadCameras(
     const QnVirtualCameraResourceList& cameras,
     DeviceAgentSettingsAdapter* deviceAgentSettingsAdapter,
-    CameraSettingsAnalyticsEnginesWatcher* analyticsEnginesWatcher)
+    CameraSettingsAnalyticsEnginesWatcher* analyticsEnginesWatcher,
+    CameraAdvancedParametersManifestManager* advancedParametersManifestManager)
 {
     d->executeAction(
         [&](State state)
@@ -69,7 +70,8 @@ void CameraSettingsDialogStore::loadCameras(
                 std::move(state),
                 cameras,
                 deviceAgentSettingsAdapter,
-                analyticsEnginesWatcher);
+                analyticsEnginesWatcher,
+                advancedParametersManifestManager);
         });
 }
 
@@ -77,6 +79,11 @@ void CameraSettingsDialogStore::updatePtzSettings(const QnVirtualCameraResourceL
 {
     d->executeAction(
         [&](State state) { return Reducer::updatePtzSettings(std::move(state), cameras); });
+}
+
+void CameraSettingsDialogStore::setSelectedTab(CameraSettingsTab value)
+{
+    d->executeAction([&](State state) { return Reducer::setSelectedTab(std::move(state), value); });
 }
 
 void CameraSettingsDialogStore::setReadOnly(bool value)
@@ -109,6 +116,12 @@ void CameraSettingsDialogStore::setSingleCameraUserName(const QString& text)
 {
     d->executeAction(
         [&](State state) { return Reducer::setSingleCameraUserName(std::move(state), text); });
+}
+
+void CameraSettingsDialogStore::setSingleCameraIsOnline(bool isOnline)
+{
+    d->executeAction(
+        [&](State state) { return Reducer::setSingleCameraIsOnline(std::move(state), isOnline); });
 }
 
 void CameraSettingsDialogStore::setScheduleBrush(const ScheduleCellParams& brush)
@@ -546,6 +559,15 @@ void CameraSettingsDialogStore::setStreamUrls(
         [&](State state)
         {
             return Reducer::setStreamUrls(std::move(state), primary, secondary, source);
+        });
+}
+
+void CameraSettingsDialogStore::setAdvancedSettingsManifest(const QnCameraAdvancedParams& manifest)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            return Reducer::setAdvancedSettingsManifest(std::move(state), manifest);
         });
 }
 

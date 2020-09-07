@@ -12,7 +12,7 @@
 
 #include <ui/style/helper.h>
 
-#include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/range_adapters.h>
 
 #include "camera_advanced_param_widget_factory.h"
@@ -58,11 +58,13 @@ void CameraAdvancedParamWidgetsManager::clear()
 }
 
 
-void CameraAdvancedParamWidgetsManager::displayParams(const QnCameraAdvancedParams& params)
+void CameraAdvancedParamWidgetsManager::resetManifest(const QnCameraAdvancedParams& manifest)
 {
+    NX_VERBOSE(this, "Reset manifest; %1 groups", manifest.groups.size());
+
     clear();
 
-    for (const QnCameraAdvancedParamGroup &group : params.groups)
+    for (const QnCameraAdvancedParamGroup& group: manifest.groups)
         createGroupWidgets(group);
 
     const auto currentItemChanged =
@@ -84,6 +86,8 @@ void CameraAdvancedParamWidgetsManager::loadValues(
     const QnCameraAdvancedParamValueList& params,
     bool packetMode)
 {
+    NX_VERBOSE(this, "Load values, packet mode %1", packetMode);
+
     if (packetMode)
     {
         // Disable all parameter widgets, we'll enable only those that are on the list.
@@ -200,11 +204,6 @@ void CameraAdvancedParamWidgetsManager::updateParametersVisibility(ParameterVisi
         updateItemVisibility(m_groupWidget->topLevelItem(i), updateItemVisibility);
 
     runAllHandlerChains();
-}
-
-bool CameraAdvancedParamWidgetsManager::hasItemsAvailableInOffline() const
-{
-    return !m_itemsAvailableInOffline.isEmpty();
 }
 
 bool CameraAdvancedParamWidgetsManager::hasValidValues(

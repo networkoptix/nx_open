@@ -23,7 +23,7 @@ public:
         QStackedWidget* contentsWidget,
         QObject* parent = nullptr);
 
-    void displayParams(const QnCameraAdvancedParams &params);
+    void resetManifest(const QnCameraAdvancedParams& manifest);
 
     /**
      * @param params List of new parameter values.
@@ -55,7 +55,6 @@ public:
     };
 
     void updateParametersVisibility(ParameterVisibility visibility);
-    bool hasItemsAvailableInOffline() const;
 
     void clear();
 

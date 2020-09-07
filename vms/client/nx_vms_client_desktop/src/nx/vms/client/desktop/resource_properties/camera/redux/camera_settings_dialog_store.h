@@ -14,10 +14,12 @@
 #include <nx/vms/client/desktop/common/redux/redux_types.h>
 
 class QnAspectRatio;
+struct QnCameraAdvancedParams;
 struct QnMediaDewarpingParams;
 
 namespace nx::vms::client::desktop {
 
+enum class CameraSettingsTab;
 class Rotation;
 struct WearableState;
 struct ScheduleCellParams;
@@ -26,6 +28,7 @@ struct AnalyticsEngineInfo;
 struct DeviceAgentData;
 class DeviceAgentSettingsAdapter;
 class CameraSettingsAnalyticsEnginesWatcher;
+class CameraAdvancedParametersManifestManager;
 
 class CameraSettingsDialogStore: public QObject
 {
@@ -42,14 +45,17 @@ public:
     void loadCameras(
         const QnVirtualCameraResourceList& cameras,
         DeviceAgentSettingsAdapter* deviceAgentSettingsAdapter,
-        CameraSettingsAnalyticsEnginesWatcher* analyticsEnginesWatcher);
+        CameraSettingsAnalyticsEnginesWatcher* analyticsEnginesWatcher,
+        CameraAdvancedParametersManifestManager* advancedParametersManifestManager);
 
     void updatePtzSettings(const QnVirtualCameraResourceList& cameras);
     void setReadOnly(bool value);
+    void setSelectedTab(CameraSettingsTab value);
     void setSettingsOptimizationEnabled(bool value);
     void setGlobalPermissions(GlobalPermissions value);
     void setSingleWearableState(const WearableState& value);
     void setSingleCameraUserName(const QString& text);
+    void setSingleCameraIsOnline(bool isOnline);
     void setScheduleBrush(const ScheduleCellParams& brush);
     void setScheduleBrushRecordingType(Qn::RecordingType value);
     void setScheduleBrushFps(int value);
@@ -125,6 +131,8 @@ public:
     void setStreamUrls(const QString& primary,
         const QString& secondary,
         ModificationSource source = ModificationSource::local);
+
+    void setAdvancedSettingsManifest(const QnCameraAdvancedParams& manifest);
 
 signals:
     void stateChanged(const CameraSettingsDialogState& state);

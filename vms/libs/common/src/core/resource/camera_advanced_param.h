@@ -158,11 +158,15 @@ struct QnCameraAdvancedParameter
 
     bool isCustomControl() const;
 
+    /** Parameter datatype should have a value. */
+    bool hasValue() const;
+
+    /** Has not value, should be sent immediately. */
+    bool isInstant() const;
+
     static QString dataTypeToString(DataType value);
     static DataType stringToDataType(const QString &value);
     static bool dataTypeHasValue(DataType value);
-    // Returns true if specified DataType is instant value and should be sent immediately
-    static bool dataTypeIsInstant(DataType value);
 };
 
 QN_FUSION_DECLARE_FUNCTIONS(QnCameraAdvancedParameter::DataType, (lexical))
@@ -233,6 +237,9 @@ struct QnCameraAdvancedParams
     void applyOverloads(const std::vector<QnCameraAdvancedParameterOverload>& overloads);
 
     void merge(QnCameraAdvancedParams params);
+
+    /** Check if at least one item is available when camera is offline. */
+    bool hasItemsAvailableInOffline() const;
 };
 #define QnCameraAdvancedParams_Fields (name)(version)(unique_id)(packet_mode)(groups)
 

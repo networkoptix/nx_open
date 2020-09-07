@@ -22,6 +22,7 @@
 
 #include "../utils/device_agent_settings_adapter.h"
 #include "../watchers/camera_settings_analytics_engines_watcher.h"
+#include "../camera_advanced_parameters_manifest_manager.h"
 
 namespace nx::vms::client::desktop {
 
@@ -506,6 +507,12 @@ bool analyticsEngineIsPresentInList(const QnUuid& id, const State& state)
 
 } // namespace
 
+State CameraSettingsDialogStateReducer::setSelectedTab(State state, CameraSettingsTab value)
+{
+    state.selectedTab = value;
+    return state;
+}
+
 State CameraSettingsDialogStateReducer::setReadOnly(State state, bool value)
 {
     state.readOnly = value;
@@ -592,7 +599,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
     State state,
     const Cameras& cameras,
     DeviceAgentSettingsAdapter* deviceAgentSettingsAdapter,
-    CameraSettingsAnalyticsEnginesWatcher* analyticsEnginesWatcher)
+    CameraSettingsAnalyticsEnginesWatcher* analyticsEnginesWatcher,
+    CameraAdvancedParametersManifestManager* advancedParametersManifestManager)
 {
     const auto firstCamera = cameras.empty()
         ? Camera()
@@ -682,8 +690,9 @@ State CameraSettingsDialogStateReducer::loadCameras(
     if (firstCamera)
     {
         auto& singleProperties = state.singleCameraProperties;
-        singleProperties.name.setBase(firstCamera->getName());
         singleProperties.id = firstCamera->getId().toSimpleString();
+        singleProperties.name.setBase(firstCamera->getName());
+        singleProperties.isOnline = firstCamera->isOnline();
         singleProperties.firmware = firstCamera->getFirmware();
         singleProperties.model = firstCamera->getModel();
         singleProperties.vendor = firstCamera->getVendor();
@@ -703,6 +712,12 @@ State CameraSettingsDialogStateReducer::loadCameras(
             singleProperties.motionConstraints->maxMaskRects = firstCamera->motionMaskWindowCount();
             singleProperties.motionConstraints->maxSensitiveRects
                 = firstCamera->motionSensWindowCount();
+        }
+
+        if (advancedParametersManifestManager)
+        {
+            singleProperties.advancedSettingsManifest =
+                advancedParametersManifestManager->manifest(firstCamera);
         }
 
         const auto fisheyeParams = firstCamera->getDewarpingParams();
@@ -909,6 +924,9 @@ State CameraSettingsDialogStateReducer::loadCameras(
             });
     }
 
+    if (!state.isPageVisible(state.selectedTab))
+        state.selectedTab = CameraSettingsTab::general;
+
     state.recording.brush.recordingType = fixupRecordingType(state);
     state.scheduleAlert = calculateScheduleAlert(state);
     return state;
@@ -919,6 +937,18 @@ State CameraSettingsDialogStateReducer::setSingleCameraUserName(State state, con
     state.hasChanges = true;
     state.singleCameraProperties.name.setUser(text);
     return state;
+}
+
+std::pair<bool, State> CameraSettingsDialogStateReducer::setSingleCameraIsOnline(
+    State state,
+    bool isOnline)
+{
+    NX_ASSERT(state.isSingleCamera());
+    if (state.singleCameraProperties.isOnline == isOnline)
+        return {false, std::move(state)};
+
+    state.singleCameraProperties.isOnline = isOnline;
+    return {true, std::move(state)};
 }
 
 State CameraSettingsDialogStateReducer::setScheduleBrush(
@@ -1661,5 +1691,15 @@ State CameraSettingsDialogStateReducer::setStreamUrls(
 
     return state;
 }
+
+State CameraSettingsDialogStateReducer::setAdvancedSettingsManifest(
+    State state,
+    const QnCameraAdvancedParams& manifest)
+{
+    NX_ASSERT(state.isSingleCamera());
+    state.singleCameraProperties.advancedSettingsManifest = manifest;
+    return state;
+}
+
 
 } // namespace nx::vms::client::desktop

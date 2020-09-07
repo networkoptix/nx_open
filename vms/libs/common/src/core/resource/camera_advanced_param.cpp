@@ -211,6 +211,16 @@ QnCameraAdvancedParameter::DataType QnCameraAdvancedParameter::stringToDataType(
     return DataType::None;
 }
 
+bool QnCameraAdvancedParameter::hasValue() const
+{
+    return isValid() && dataTypeHasValue(dataType);
+}
+
+bool QnCameraAdvancedParameter::isInstant() const
+{
+    return isValid() && !dataTypeHasValue(dataType);
+}
+
 bool QnCameraAdvancedParameter::dataTypeHasValue(DataType value)
 {
     switch (value)
@@ -506,6 +516,36 @@ void QnCameraAdvancedParams::merge(QnCameraAdvancedParams params)
     packet_mode |= params.packet_mode;
 
     mergeGroups(&groups, &params.groups);
+}
+
+bool QnCameraAdvancedParams::hasItemsAvailableInOffline() const
+{
+    std::function<bool(const QnCameraAdvancedParamGroup&)> hasItemsAvailableInOfflineInGroup;
+    hasItemsAvailableInOfflineInGroup =
+        [&](const QnCameraAdvancedParamGroup& group)
+        {
+            for (const QnCameraAdvancedParameter& param: group.params)
+            {
+                if (param.availableInOffline)
+                    return true;
+            }
+
+            for (const QnCameraAdvancedParamGroup& subgroup: group.groups)
+            {
+                if (hasItemsAvailableInOfflineInGroup(subgroup))
+                    return true;
+            }
+
+            return false;
+        };
+
+    for (const QnCameraAdvancedParamGroup& group: groups)
+    {
+        if (hasItemsAvailableInOfflineInGroup(group))
+            return true;
+    }
+
+    return false;
 }
 
 QnCameraAdvancedParameterCondition::QnCameraAdvancedParameterCondition(

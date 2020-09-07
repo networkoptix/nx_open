@@ -8,6 +8,7 @@
 #include <common/common_globals.h>
 #include <core/ptz/media_dewarping_params.h>
 #include <core/ptz/ptz_preset.h>
+#include <core/resource/camera_advanced_param.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_stream_capability.h>
 #include <core/resource/motion_window.h>
@@ -18,13 +19,15 @@
 #include <nx/vms/client/desktop/common/data/rotation.h>
 #include <nx/vms/client/desktop/common/redux/abstract_redux_state.h>
 #include <nx/vms/client/desktop/common/redux/redux_types.h>
-#include <nx/vms/client/desktop/resource_properties/camera/data/recording_days.h>
-#include <nx/vms/client/desktop/resource_properties/camera/data/schedule_cell_params.h>
-#include <nx/vms/client/desktop/resource_properties/camera/data/analytics_engine_info.h>
 #include <nx/vms/client/desktop/utils/wearable_state.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/types_fwd.h>
+
+#include "../data/recording_days.h"
+#include "../data/schedule_cell_params.h"
+#include "../data/analytics_engine_info.h"
+#include "../camera_settings_tab.h"
 
 namespace nx::vms::client::desktop {
 
@@ -78,6 +81,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
     bool readOnly = true;
     bool settingsOptimizationEnabled = false;
     GlobalPermissions globalPermissions;
+    CameraSettingsTab selectedTab = CameraSettingsTab::general;
 
     // Generic cameras info.
 
@@ -104,6 +108,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         QString settingsUrlPath;
         int overrideXmlHttpRequestTimeout = 0;
         QString overrideHttpUserAgent;
+        bool isOnline = false;
         bool fixupRequestUrls = false;
         bool hasVideo = true;
         bool editableStreamUrls = false;
@@ -113,6 +118,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         int maxFpsWithoutMotion = 0;
 
         std::optional<MotionConstraints> motionConstraints;
+        std::optional<QnCameraAdvancedParams> advancedSettingsManifest;
     };
     SingleCameraProperties singleCameraProperties;
 
@@ -383,6 +389,64 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
             && !singleCameraProperties.networkLink
             && !singleCameraProperties.usbDevice
             && devicesDescription.isWearable == CombinedValue::None;
+    }
+
+    /**
+     * Advanced settings should be displayed for a single camera when manifest is already loaded and
+     * it is not empty. Most properties are avalailable only when camera is online, but some cameras
+     * may have 'Advanced' page when offline also (e.g. with 'Reboot' button).
+     */
+    bool canShowAdvancedPage() const
+    {
+        const auto& manifest = singleCameraProperties.advancedSettingsManifest;
+        return isSingleCamera()
+            && manifest
+            && !manifest->groups.empty()
+            && (singleCameraProperties.isOnline || manifest->hasItemsAvailableInOffline());
+    }
+
+    bool isPageVisible(CameraSettingsTab page) const
+    {
+        switch (page)
+        {
+            case CameraSettingsTab::general:
+                return true;
+
+            case CameraSettingsTab::recording:
+                return supportsSchedule();
+
+            case CameraSettingsTab::io:
+                return isSingleCamera()
+                    && devicesDescription.isWearable == CombinedValue::None
+                    && devicesDescription.isIoModule == CombinedValue::All;
+
+            case CameraSettingsTab::motion:
+                return isSingleCamera()
+                    && devicesDescription.isWearable == CombinedValue::None
+                    && devicesDescription.isDtsBased == CombinedValue::None
+                    && devicesDescription.supportsVideo == CombinedValue::All
+                    && devicesDescription.hasMotion == CombinedValue::All;
+
+            case CameraSettingsTab::fisheye:
+                return isSingleCamera() && singleCameraProperties.hasVideo;
+
+            case CameraSettingsTab::advanced:
+                return canShowAdvancedPage();
+
+            case CameraSettingsTab::web:
+                return canShowWebPage();
+
+            case CameraSettingsTab::analytics:
+                return isSingleCamera() && !analytics.engines.empty();
+
+            // Always displaying for single camera as it contains Logical Id setup.
+            case CameraSettingsTab::expert:
+                return supportsVideoStreamControl() || isSingleCamera();
+
+            default:
+                NX_ASSERT(false, "Should never be here");
+                return true;
+        }
     }
 };
 

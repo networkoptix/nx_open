@@ -8,6 +8,7 @@ namespace nx::vms::client::desktop {
 
 class DeviceAgentSettingsAdapter;
 class CameraSettingsAnalyticsEnginesWatcher;
+class CameraAdvancedParametersManifestManager;
 
 class NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogStateReducer
 {
@@ -19,14 +20,17 @@ public:
         State state,
         const QnVirtualCameraResourceList& cameras,
         DeviceAgentSettingsAdapter* deviceAgentSettingsAdapter = nullptr,
-        CameraSettingsAnalyticsEnginesWatcher* analyticsEnginesWatcher = nullptr);
+        CameraSettingsAnalyticsEnginesWatcher* analyticsEnginesWatcher = nullptr,
+        CameraAdvancedParametersManifestManager* advancedParametersManifestManager = nullptr);
 
     static State updatePtzSettings(State state, const QnVirtualCameraResourceList& cameras);
+    static State setSelectedTab(State state, CameraSettingsTab value);
     static State setReadOnly(State state, bool value);
     static State setSettingsOptimizationEnabled(State state, bool value);
     static State setGlobalPermissions(State state, GlobalPermissions value);
     static State setSingleWearableState(State state, const WearableState& value);
     static State setSingleCameraUserName(State state, const QString& text);
+    static std::pair<bool, State> setSingleCameraIsOnline(State state, bool isOnline);
     static State setScheduleBrush(State state, const ScheduleCellParams& brush);
     static State setScheduleBrushRecordingType(State state, Qn::RecordingType value);
     static State setScheduleBrushFps(State state, int value);
@@ -91,6 +95,8 @@ public:
         State state, const std::optional<QString>& login, const std::optional<QString>& password);
     static State setStreamUrls(
         State state, const QString& primary, const QString& secondary, ModificationSource source);
+
+    static State setAdvancedSettingsManifest(State state, const QnCameraAdvancedParams& manifest);
 };
 
 } // namespace nx::vms::client::desktop

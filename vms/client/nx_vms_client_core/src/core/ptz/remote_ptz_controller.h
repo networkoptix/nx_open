@@ -3,11 +3,13 @@
 #include <QtCore/QAtomicInt>
 
 #include <core/ptz/abstract_ptz_controller.h>
-
+#include <api/server_rest_connection_fwd.h>
 #include <nx/utils/uuid.h>
 #include <nx/utils/thread/mutex.h>
+#include <utils/common/request_param.h>
 
-class QnRemotePtzController: public QnAbstractPtzController {
+class QnRemotePtzController: public QnAbstractPtzController
+{
     Q_OBJECT
     typedef QnAbstractPtzController base_type;
 
@@ -95,41 +97,40 @@ public:
         QnPtzData* data,
         const nx::core::ptz::Options& options) const override;
 
-private slots:
-    void at_replyReceived(int status, const QVariant& reply, int handle);
+    using PtzServerCallback = std::function<
+        void (bool success, rest::Handle handle, const QnJsonRestResult& data)>;
+
+    using PtzDeserializationHelper = std::function<QVariant (const QnJsonRestResult& data)>;
+
+    /**
+     * Helper method to send request and get a proper response.
+     * @param command - PTZ command.
+     * @param params - all ptz parameters are stored there.
+     * @param body - request body
+     * @param options - additional options.
+     * @param responseHelper - lambda to help deserialize QJsonValue to desired datatype.
+     * @return true if request was sent.
+     *
+     * PtzController will "emit finish(command, response)" signal when server responds.
+     */
+    bool sendRequest(Qn::PtzCommand command, const QnRequestParamList& params, const nx::Buffer& body,
+        const nx::core::ptz::Options& options,
+        PtzDeserializationHelper responseHelper = {}) const;
 
 private:
     bool isPointless(
         Qn::PtzCommand command,
-        const nx::core::ptz::Options& options);
+        const nx::core::ptz::Options& options) const;
 
     int nextSequenceNumber();
     QnMediaServerResourcePtr getMediaServer() const;
+    rest::QnConnectionPtr getConnection() const;
 
 private:
-    // TODO: #ynikitenkov move to private
-    struct PtzCommandData
-    {
-        PtzCommandData():
-            command(Qn::InvalidPtzCommand)
-        {
-        }
-
-        PtzCommandData(Qn::PtzCommand command, const QVariant& value):
-            command(command),
-            value(value)
-        {
-        }
-
-        Qn::PtzCommand command;
-        QVariant value;
-    };
-
     QnVirtualCameraResourcePtr m_camera;
     QnUuid m_sequenceId;
     QAtomicInt m_sequenceNumber;
 
     mutable QnMutex m_mutex;
-    QHash<int, PtzCommandData> m_dataByHandle;
 };
 

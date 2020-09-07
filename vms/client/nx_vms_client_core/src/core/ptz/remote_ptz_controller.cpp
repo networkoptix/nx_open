@@ -2,12 +2,17 @@
 
 #include <QtCore/QEventLoop>
 
-#include <boost/preprocessor/tuple/enum.hpp>
-
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
+#include <utils/common/request_param.h>
+#include <api/server_rest_connection.h>
+#include <nx/utils/guarded_callback.h>
 
 using namespace nx::core;
+
+namespace {
+    static constexpr nx::core::ptz::Options kDefaultOptions = {nx::core::ptz::Type::operational};
+} // namespace
 
 QnRemotePtzController::QnRemotePtzController(const QnVirtualCameraResourcePtr& camera):
     base_type(camera),
@@ -38,12 +43,16 @@ Ptz::Capabilities QnRemotePtzController::getCapabilities(
 
 QnMediaServerResourcePtr QnRemotePtzController::getMediaServer() const
 {
-    return m_camera->getParentServer();
+    auto server = m_camera->getParentServer();
+    if (!NX_ASSERT(server))
+        return {};
+
+    return server;
 }
 
 bool QnRemotePtzController::isPointless(
     Qn::PtzCommand command,
-    const nx::core::ptz::Options& options)
+    const nx::core::ptz::Options& options) const
 {
     if (!getMediaServer())
         return true;
@@ -51,6 +60,10 @@ bool QnRemotePtzController::isPointless(
     const Qn::ResourceStatus status = m_camera->getStatus();
     if (status == Qn::Unauthorized || status == Qn::Offline)
         return true;
+
+    // Skip check until `configurationalPtzCapabilities ` property is set on the server side.
+    if (options.type == nx::core::ptz::Type::configurational)
+        return false;
 
     return !base_type::supports(command, options);
 }
@@ -60,56 +73,107 @@ int QnRemotePtzController::nextSequenceNumber()
     return m_sequenceNumber.fetchAndAddOrdered(1);
 }
 
-// TODO: #Elric get rid of this macro hell
-#define RUN_COMMAND(COMMAND, RETURN_VALUE, FUNCTION, OPTIONS, ... /* PARAMS */) \
-    {                                                                           \
-        const auto nonConstThis = const_cast<QnRemotePtzController*>(this);     \
-        const Qn::PtzCommand command = COMMAND;                                 \
-        const nx::core::ptz::Options internalOptions = OPTIONS;                 \
-        if (nonConstThis->isPointless(command, internalOptions))                \
-            return false;                                                       \
-                                                                                \
-        auto server = getMediaServer();                                         \
-        if (!server)                                                            \
-            return false;                                                       \
-                                                                                \
-        int handle = server->apiConnection()->FUNCTION(                         \
-            m_camera, ##__VA_ARGS__, nonConstThis,                            \
-                SLOT(at_replyReceived(int, const QVariant &, int)));            \
-                                                                                \
-        const QnMutexLocker locker(&m_mutex);                                   \
-        nonConstThis->m_dataByHandle[handle] =                                  \
-            PtzCommandData(command, QVariant::fromValue(RETURN_VALUE));         \
-        return true;                                                            \
-    }
+// Current PTZ API returns a pair of {Qn::PtzCommand command, QVariant data} for each request.
+// This function helps to generate a proper "QVariant data" value.
+template<class T>
+QnRemotePtzController::PtzDeserializationHelper makeDeserializationHelper()
+{
+    return [](const QnJsonRestResult& data) -> QVariant
+        {
+            T value = data.deserialized<T>();
+            return QVariant::fromValue(value);
+        };
+}
 
+// Some PTZ functions embed request arguments to a response. This function helps to store this
+// input argument and return it instead of server response.
+template<class T>
+QnRemotePtzController::PtzDeserializationHelper makeInputHelper(const T& data)
+{
+    auto response = QVariant::fromValue<T>(data);
+    return [response](const QnJsonRestResult& /*data*/) -> QVariant
+        {
+            return response;
+        };
+}
+
+nx::network::http::HttpHeaders makeDefaultHeaders()
+{
+    nx::network::http::HttpHeaders headers;
+    headers.emplace(nx::network::http::header::kContentType, "application/json");
+
+    return headers;
+}
+
+bool QnRemotePtzController::sendRequest(
+    Qn::PtzCommand command,
+    const QnRequestParamList& baseParams,
+    const nx::Buffer& body,
+    const nx::core::ptz::Options& options,
+    PtzDeserializationHelper helper) const
+{
+    auto server = getMediaServer();
+    if (!server)
+        return false;
+
+    if (isPointless(command, options))
+        return false;
+
+    if (auto connection = server->restConnection())
+    {
+        QnRequestParamList params = baseParams;
+        if (server->getVersion() < nx::utils::SoftwareVersion(3, 0))
+            params.insert("resourceId", QnLexical::serialized(m_camera->getUniqueId()));
+
+        params.insert("command", QnLexical::serialized(command));
+        params.insert("cameraId", m_camera->getId().toString());
+
+        if (!helper)
+        {
+            helper = [](const QnJsonRestResult& /*data*/)
+                {
+                    return QVariant();
+                };
+        }
+
+        PtzServerCallback callback = nx::utils::guarded(this,
+            [this, command, deserializer=std::move(helper)](
+                bool success, rest::Handle /*handle*/, const QnJsonRestResult& data)
+            {
+                Q_UNUSED(success);
+                QVariant value = deserializer(data);
+                auto notConstThis = const_cast<QnRemotePtzController*>(this);
+                emit notConstThis->finished(command, value);
+            });
+
+        connection->postJsonResult("/api/ptz", params, body, std::move(callback));
+    }
+    return true;
+}
 
 bool QnRemotePtzController::continuousMove(
     const nx::core::ptz::Vector& speed,
     const nx::core::ptz::Options& options)
 {
-    RUN_COMMAND(
-        Qn::ContinuousMovePtzCommand,
-        speed,
-        ptzContinuousMoveAsync,
-        options,
-        speed,
-        options,
-        m_sequenceId,
-        nextSequenceNumber());
+    QnRequestParamList params;
+    params.insert("xSpeed", QnLexical::serialized(speed.pan));
+    params.insert("ySpeed", QnLexical::serialized(speed.tilt));
+    params.insert("zSpeed", QnLexical::serialized(speed.zoom));
+    params.insert("rotationSpeed", QnLexical::serialized(speed.rotation));
+    params.insert("type", QnLexical::serialized(options.type));
+    params.insert("sequenceId", m_sequenceId.toString());
+    params.insert("sequenceNumber", QString::number(nextSequenceNumber()));
+    return sendRequest(Qn::ContinuousMovePtzCommand, params, nx::Buffer(), options);
 }
 
 bool QnRemotePtzController::continuousFocus(
     qreal speed,
     const nx::core::ptz::Options& options)
 {
-    RUN_COMMAND(
-        Qn::ContinuousFocusPtzCommand,
-        speed,
-        ptzContinuousFocusAsync,
-        options,
-        speed,
-        options);
+    QnRequestParamList params;
+    params.insert("speed", QnLexical::serialized(speed));
+    params.insert("type", QnLexical::serialized(options.type));
+    return sendRequest(Qn::ContinuousFocusPtzCommand, params, nx::Buffer(), options);
 }
 
 bool QnRemotePtzController::absoluteMove(
@@ -118,17 +182,17 @@ bool QnRemotePtzController::absoluteMove(
     qreal speed,
     const nx::core::ptz::Options& options)
 {
-    RUN_COMMAND(
-        spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space),
-        position,
-        ptzAbsoluteMoveAsync,
-        options,
-        space,
-        position,
-        speed,
-        options,
-        m_sequenceId,
-        nextSequenceNumber());
+    QnRequestParamList params;
+    params.insert("xPos", QnLexical::serialized(position.pan));
+    params.insert("yPos", QnLexical::serialized(position.tilt));
+    params.insert("zPos", QnLexical::serialized(position.zoom));
+    params.insert("rotaion", QnLexical::serialized(position.rotation));
+    params.insert("speed", QnLexical::serialized(speed));
+    params.insert("type", QnLexical::serialized(options.type));
+    params.insert("sequenceId", m_sequenceId.toString());
+    params.insert("sequenceNumber", QString::number(nextSequenceNumber()));
+    return sendRequest(spaceCommand(Qn::AbsoluteDeviceMovePtzCommand, space), params,
+        nx::Buffer(), options);
 }
 
 bool QnRemotePtzController::viewportMove(
@@ -137,43 +201,40 @@ bool QnRemotePtzController::viewportMove(
     qreal speed,
     const nx::core::ptz::Options& options)
 {
-    RUN_COMMAND(
-        Qn::ViewportMovePtzCommand,
-        viewport,
-        ptzViewportMoveAsync,
-        options,
-        aspectRatio,
-        viewport,
-        speed,
-        options,
-        m_sequenceId,
-        nextSequenceNumber());
+    QnRequestParamList params;
+    params.insert("aspectRatio", QnLexical::serialized(aspectRatio));
+    params.insert("viewportTop", QnLexical::serialized(viewport.top()));
+    params.insert("viewportLeft", QnLexical::serialized(viewport.left()));
+    params.insert("viewportBottom", QnLexical::serialized(viewport.bottom()));
+    params.insert("viewportRight", QnLexical::serialized(viewport.right()));
+    params.insert("speed", QnLexical::serialized(speed));
+    params.insert("type", QnLexical::serialized(options.type));
+    params.insert("sequenceId", m_sequenceId.toString());
+    params.insert("sequenceNumber", QString::number(nextSequenceNumber()));
+    return sendRequest(Qn::ViewportMovePtzCommand, params, nx::Buffer(), options);
 }
 
 bool QnRemotePtzController::relativeMove(
     const ptz::Vector& direction,
     const ptz::Options& options)
 {
-    RUN_COMMAND(
-        Qn::RelativeMovePtzCommand,
-        direction,
-        ptzRelativeMoveAsync,
-        options,
-        direction,
-        options,
-        m_sequenceId,
-        nextSequenceNumber());
+    QnRequestParamList params;
+    params.insert("pan", QnLexical::serialized(direction.pan));
+    params.insert("tilt", QnLexical::serialized(direction.tilt));
+    params.insert("rotation", QnLexical::serialized(direction.rotation));
+    params.insert("zoom", QnLexical::serialized(direction.zoom));
+    params.insert("type", QnLexical::serialized(options.type));
+    params.insert("sequenceId", m_sequenceId.toString());
+    params.insert("sequenceNumber", QString::number(nextSequenceNumber()));
+    return sendRequest(Qn::RelativeMovePtzCommand, params, nx::Buffer(), options);
 }
 
 bool QnRemotePtzController::relativeFocus(qreal direction, const ptz::Options& options)
 {
-    RUN_COMMAND(
-        Qn::RelativeFocusPtzCommand,
-        direction,
-        ptzRelativeFocusAsync,
-        options,
-        direction,
-        options);
+    QnRequestParamList params;
+    params.insert("focus", QnLexical::serialized(direction));
+    params.insert("type", QnLexical::serialized(options.type));
+    return sendRequest(Qn::RelativeFocusPtzCommand, params, nx::Buffer(), options);
 }
 
 bool QnRemotePtzController::getPosition(
@@ -181,158 +242,137 @@ bool QnRemotePtzController::getPosition(
     nx::core::ptz::Vector* /*position*/,
     const nx::core::ptz::Options& options) const
 {
-    RUN_COMMAND(
-        spaceCommand(Qn::GetDevicePositionPtzCommand, space),
-        QVariant(),
-        ptzGetPositionAsync,
-        options,
-        space,
-        options);
+    QnRequestParamList params;
+    params.insert("type", QnLexical::serialized(options.type));
+
+    auto helper = makeDeserializationHelper<QVector3D>();
+    auto command = spaceCommand(Qn::GetDevicePositionPtzCommand, space);
+    return sendRequest(command, params, nx::Buffer(), options, helper);
 }
 
 bool QnRemotePtzController::getLimits(
     Qn::PtzCoordinateSpace,
     QnPtzLimits* /*limits*/,
-    const nx::core::ptz::Options& options) const
+    const nx::core::ptz::Options& /*options*/) const
 {
     return false;
 }
 
 bool QnRemotePtzController::getFlip(
     Qt::Orientations* /*flip*/,
-    const nx::core::ptz::Options& options) const
+    const nx::core::ptz::Options& /*options*/) const
 {
     return false;
 }
 
 bool QnRemotePtzController::createPreset(const QnPtzPreset& preset)
 {
-    RUN_COMMAND(
-        Qn::CreatePresetPtzCommand,
-        preset,
-        ptzCreatePresetAsync,
-        {nx::core::ptz::Type::operational},
-        preset);
+    QnRequestParamList params;
+    params.insert("presetName", preset.name);
+    params.insert("presetId", preset.id);
+    return sendRequest(Qn::CreatePresetPtzCommand, params, nx::Buffer(), kDefaultOptions);
 }
 
 bool QnRemotePtzController::updatePreset(const QnPtzPreset& preset)
 {
-    RUN_COMMAND(
-        Qn::UpdatePresetPtzCommand,
-        preset,
-        ptzUpdatePresetAsync,
-        {nx::core::ptz::Type::operational},
-        preset);
+    QnRequestParamList params;
+    params.insert("presetName", preset.name);
+    params.insert("presetId", preset.id);
+    auto helper = makeInputHelper(preset);
+    return sendRequest(Qn::UpdatePresetPtzCommand, params, nx::Buffer(), kDefaultOptions, helper);
 }
 
 bool QnRemotePtzController::removePreset(const QString& presetId)
 {
-    RUN_COMMAND(
-        Qn::RemovePresetPtzCommand,
-        presetId,
-        ptzRemovePresetAsync,
-        {nx::core::ptz::Type::operational},
-        presetId);
+    QnRequestParamList params;
+    params.insert("presetId", presetId);
+    auto helper = makeInputHelper(presetId);
+    return sendRequest(Qn::RemovePresetPtzCommand, params, nx::Buffer(), kDefaultOptions, helper);
 }
 
 bool QnRemotePtzController::activatePreset(const QString& presetId, qreal speed)
 {
-    RUN_COMMAND(
-        Qn::ActivatePresetPtzCommand,
-        presetId,
-        ptzActivatePresetAsync,
-        {nx::core::ptz::Type::operational},
-        presetId,
-        speed);
+    QnRequestParamList params;
+    params.insert("presetId", presetId);
+    params.insert("speed", QnLexical::serialized(speed));
+    auto helper = makeInputHelper(presetId);
+    return sendRequest(Qn::ActivatePresetPtzCommand, params, nx::Buffer(), kDefaultOptions,
+        helper);
 }
 
 bool QnRemotePtzController::getPresets(QnPtzPresetList* /*presets*/) const
 {
-    RUN_COMMAND(
-        Qn::GetPresetsPtzCommand,
-        QVariant(),
-        ptzGetPresetsAsync,
-        {nx::core::ptz::Type::operational});
+    QnRequestParamList params;
+    auto helper = makeDeserializationHelper<QnPtzPresetList>();
+    return sendRequest(Qn::GetPresetsPtzCommand, params, nx::Buffer(), kDefaultOptions, helper);
 }
 
 bool QnRemotePtzController::createTour(
     const QnPtzTour& tour)
 {
-    RUN_COMMAND(
-        Qn::CreateTourPtzCommand,
-        tour,
-        ptzCreateTourAsync,
-        {nx::core::ptz::Type::operational},
-        tour);
+    QnRequestParamList params;
+    auto helper = makeInputHelper(tour);
+    return sendRequest(Qn::CreateTourPtzCommand, params, QJson::serialized(tour), kDefaultOptions,
+        helper);
 }
 
 bool QnRemotePtzController::removeTour(const QString& tourId)
 {
-    RUN_COMMAND(
-        Qn::RemoveTourPtzCommand,
-        tourId,
-        ptzRemoveTourAsync,
-        {nx::core::ptz::Type::operational},
-        tourId);
+    QnRequestParamList params;
+    params.insert("tourId", tourId);
+    auto helper = makeInputHelper(tourId);
+    return sendRequest(Qn::RemoveTourPtzCommand, params, nx::Buffer(), kDefaultOptions, helper);
 }
 
 bool QnRemotePtzController::activateTour(const QString& tourId)
 {
-    RUN_COMMAND(
-        Qn::ActivateTourPtzCommand,
-        tourId,
-        ptzActivateTourAsync,
-        {nx::core::ptz::Type::operational},
-        tourId);
+    QnRequestParamList params;
+    params.insert("tourId", tourId);
+    auto helper = makeInputHelper(tourId);
+    return sendRequest(Qn::ActivateTourPtzCommand, params, nx::Buffer(), kDefaultOptions, helper);
 }
 
 bool QnRemotePtzController::getTours(QnPtzTourList* /*tours*/) const
 {
-    RUN_COMMAND(
-        Qn::GetToursPtzCommand,
-        QVariant(),
-        ptzGetToursAsync,
-        {nx::core::ptz::Type::operational});
+    QnRequestParamList params;
+    auto helper = makeDeserializationHelper<QnPtzTourList>();
+    return sendRequest(Qn::GetToursPtzCommand, params, nx::Buffer(), kDefaultOptions);
 }
 
 bool QnRemotePtzController::getActiveObject(QnPtzObject* /*object*/) const
 {
-    RUN_COMMAND(
-        Qn::GetActiveObjectPtzCommand,
-        QVariant(),
-        ptzGetActiveObjectAsync,
-        {nx::core::ptz::Type::operational});
+    QnRequestParamList params;
+    auto helper = makeDeserializationHelper<QnPtzObject>();
+    return sendRequest(Qn::GetActiveObjectPtzCommand, params, nx::Buffer(), kDefaultOptions,
+        helper);
 }
 
 bool QnRemotePtzController::updateHomeObject(const QnPtzObject& homePosition)
 {
-    RUN_COMMAND(
-        Qn::UpdateHomeObjectPtzCommand,
-        homePosition,
-        ptzUpdateHomeObjectAsync,
-        {nx::core::ptz::Type::operational},
-        homePosition);
+    QnRequestParamList params;
+    params.insert("objectType", QnLexical::serialized(homePosition.type));
+    params.insert("objectId", homePosition.id);
+    auto helper = makeInputHelper(homePosition);
+    return sendRequest(Qn::UpdateHomeObjectPtzCommand, params, nx::Buffer(), kDefaultOptions,
+        helper);
 }
 
 bool QnRemotePtzController::getHomeObject(QnPtzObject* /*object*/) const
 {
-    RUN_COMMAND(
-        Qn::GetHomeObjectPtzCommand,
-        QVariant(),
-        ptzGetHomeObjectAsync,
-        {nx::core::ptz::Type::operational});
+    QnRequestParamList params;
+    auto helper = makeDeserializationHelper<QnPtzObject>();
+    return sendRequest(Qn::GetHomeObjectPtzCommand, params, nx::Buffer(), kDefaultOptions,
+        helper);
 }
 
 bool QnRemotePtzController::getAuxiliaryTraits(
     QnPtzAuxiliaryTraitList* /*auxiliaryTraits*/,
     const nx::core::ptz::Options& options) const
 {
-    RUN_COMMAND(
-        Qn::GetAuxiliaryTraitsPtzCommand,
-        QVariant(),
-        ptzGetAuxiliaryTraitsAsync,
-        options,
-        options);
+    QnRequestParamList params;
+    params.insert("type", QnLexical::serialized(options.type));
+    auto helper = makeDeserializationHelper<QnPtzAuxiliaryTraitList>();
+    return sendRequest(Qn::GetAuxiliaryTraitsPtzCommand, params, nx::Buffer(), options, helper);
 }
 
 bool QnRemotePtzController::runAuxiliaryCommand(
@@ -340,14 +380,12 @@ bool QnRemotePtzController::runAuxiliaryCommand(
     const QString& data,
     const nx::core::ptz::Options& options)
 {
-    RUN_COMMAND(
-        Qn::RunAuxiliaryCommandPtzCommand,
-        trait,
-        ptzRunAuxiliaryCommandAsync,
-        options,
-        trait,
-        data,
-        options);
+    QnRequestParamList params;
+    params.insert("trait", QnLexical::serialized(trait));
+    params.insert("data", data);
+    params.insert("type", QnLexical::serialized(options.type));
+    auto helper = makeInputHelper(trait);
+    return sendRequest(Qn::RunAuxiliaryCommandPtzCommand, params, nx::Buffer(), options, helper);
 }
 
 bool QnRemotePtzController::getData(
@@ -355,33 +393,9 @@ bool QnRemotePtzController::getData(
     QnPtzData* /*data*/,
     const nx::core::ptz::Options& options) const
 {
-    RUN_COMMAND(
-        Qn::GetDataPtzCommand,
-        QVariant(),
-        ptzGetDataAsync,
-        options,
-        query,
-        options);
-}
-
-void QnRemotePtzController::at_replyReceived(int status, const QVariant& reply, int handle)
-{
-    PtzCommandData data;
-    {
-        const QnMutexLocker locker(&m_mutex);
-
-        const auto pos = m_dataByHandle.find(handle);
-        if (pos == m_dataByHandle.end())
-            return; /* This really should never happen. */
-
-        data = *pos;
-        m_dataByHandle.erase(pos);
-    }
-
-    if (status != 0)
-        data.value = QVariant();
-    else if (!data.value.isValid())
-        data.value = reply;
-
-    emit finished(data.command, data.value);
+    QnRequestParamList params;
+    params.insert("query", QnLexical::serialized(query));
+    params.insert("type", QnLexical::serialized(options.type));
+    auto helper = makeDeserializationHelper<QnPtzData>();
+    return sendRequest(Qn::GetDataPtzCommand, params, nx::Buffer(), options);
 }
