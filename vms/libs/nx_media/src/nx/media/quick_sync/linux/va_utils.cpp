@@ -24,14 +24,14 @@ bool DeviceContext::initialize(MFXVideoSession& session, int /*width*/, int /*he
     m_display = linux::VaDisplay::getDisplay();
     if (!m_display)
     {
-        NX_ERROR(NX_SCOPE_TAG, "Failed to get VA display");
+        NX_WARNING(NX_SCOPE_TAG, "Failed to get VA display");
         return false;
     }
 
     auto status = session.SetHandle(MFX_HANDLE_VA_DISPLAY, m_display);
     if (status < MFX_ERR_NONE)
     {
-        NX_ERROR(NX_SCOPE_TAG, "Failed to set VA handle to MFX session, error: %1", status);
+        NX_WARNING(NX_SCOPE_TAG, "Failed to set VA handle to MFX session, error: %1", status);
         return false;
     }
 
@@ -41,7 +41,7 @@ bool DeviceContext::initialize(MFXVideoSession& session, int /*width*/, int /*he
     status = m_allocator->Init(&vaapiAllocParams);
     if (status < MFX_ERR_NONE)
     {
-        NX_ERROR(this, "Failed to init VA allocator, error: %1", status);
+        NX_WARNING(this, "Failed to init VA allocator, error: %1", status);
         m_allocator.reset();
         return false;
     }

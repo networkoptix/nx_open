@@ -9,9 +9,12 @@
 namespace nx {
 namespace media {
 
-QSize getFrameSize(const QnConstCompressedVideoDataPtr& frame, bool ignoreFrameInfo)
+QSize getFrameSize(const QnConstCompressedVideoDataPtr& frame)
 {
-    if (!ignoreFrameInfo && frame->width > 0 && frame->height > 0)
+    // If we use fast method to find stream info, ffmpeg can get 8x8 resolution.
+    constexpr int kInvalidFrameSize = 8;
+
+    if (frame->width > kInvalidFrameSize && frame->height > kInvalidFrameSize)
         return QSize(frame->width, frame->height);
 
     switch (frame->compressionType)

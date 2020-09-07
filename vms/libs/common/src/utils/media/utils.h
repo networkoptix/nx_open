@@ -8,7 +8,7 @@
 namespace nx {
 namespace media {
 
-QSize getFrameSize(const QnConstCompressedVideoDataPtr& frame, bool ignoreFrameInfo = false);
+QSize getFrameSize(const QnConstCompressedVideoDataPtr& frame);
 double getDefaultSampleAspectRatio(const QSize& srcSize);
 
 } // namespace media

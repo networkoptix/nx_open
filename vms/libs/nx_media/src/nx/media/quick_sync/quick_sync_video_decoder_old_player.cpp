@@ -8,7 +8,7 @@
 
 bool QuickSyncVideoDecoderOldPlayer::isSupported(const QnConstCompressedVideoDataPtr& data)
 {
-    QSize size = nx::media::getFrameSize(data, true);
+    QSize size = nx::media::getFrameSize(data);
     if (!size.isValid())
     {
         NX_ERROR(NX_SCOPE_TAG, "Failed to check compatibility, frame size unknown");
