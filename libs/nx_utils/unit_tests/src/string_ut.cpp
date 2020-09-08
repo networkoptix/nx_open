@@ -2,6 +2,14 @@
 
 #include <gtest/gtest.h>
 
+#include <array>
+#include <list>
+#include <array>
+#include <set>
+
+#include <QtCore/QList>
+#include <QtCore/QVector>
+
 #include <nx/utils/string.h>
 
 namespace nx::utils {
@@ -146,6 +154,34 @@ TEST(String, trimAndUnquote)
     ASSERT_EQ("", nx::utils::trimAndUnquote(QString()));
     ASSERT_EQ("", nx::utils::trimAndUnquote(QString("\"\"")));
     ASSERT_EQ("", nx::utils::trimAndUnquote(QString("\"")));
+}
+
+//-------------------------------------------------------------------------------------------------
+
+TEST(String, join)
+{
+    std::vector<QString> source1{"s1", "s2", "s3"};
+    ASSERT_EQ(nx::utils::join(source1, ", "), QString("s1, s2, s3"));
+    ASSERT_EQ(nx::utils::join(source1.begin() + 1, source1.end(), ", "), QString("s2, s3"));
+
+    std::list<QByteArray>source2{"s1", "s2", "s3"};
+    ASSERT_EQ(nx::utils::join(source2, QByteArray()), QByteArray("s1s2s3"));
+
+    std::set<std::string> source3{"s2", "s3", "s1"};
+    ASSERT_EQ(nx::utils::join(source3, "   "), std::string("s1   s2   s3"));
+    ASSERT_EQ(nx::utils::join(source3.rbegin(), source3.rend(), " "), std::string("s3 s2 s1"));
+
+    std::array<QString, 3> source4{"s1", "s2", "s3"};
+    ASSERT_EQ(nx::utils::join(source4, QString("-")), QString("s1-s2-s3"));
+
+    QVector<QString> source5{"s1"};
+    ASSERT_EQ(nx::utils::join(source5, ' '), QString("s1"));
+
+    std::vector<std::string> source6{"s1", "", "s2", "", ""};
+    ASSERT_EQ(nx::utils::join(source6, std::string(",")), std::string("s1,,s2,,"));
+
+    QList<std::string> source7;
+    ASSERT_EQ(nx::utils::join(source7, std::string()), std::string());
 }
 
 } // namespace test

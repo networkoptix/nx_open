@@ -501,15 +501,15 @@ void EventTile::setFooterText(const QString& value)
     ui->footerLabel->setHidden(!d->footerEnabled || value.isEmpty());
 }
 
-EventTile::AttributeList EventTile::attributeList() const
+EventTile::GroupedAttributes EventTile::attributeList() const
 {
     return ui->attributeTable->content();
 }
 
-void EventTile::setAttributeList(const AttributeList& value)
+void EventTile::setAttributeList(const GroupedAttributes& value)
 {
     ui->attributeTable->setContent(value);
-    ui->attributeTable->setHidden(!d->footerEnabled || value.isEmpty());
+    ui->attributeTable->setHidden(!d->footerEnabled || value.empty());
 }
 
 QString EventTile::timestamp() const
@@ -814,7 +814,7 @@ bool EventTile::footerEnabled() const
 void EventTile::setFooterEnabled(bool value)
 {
     d->footerEnabled = value;
-    ui->attributeTable->setHidden(!d->footerEnabled || ui->attributeTable->content().isEmpty());
+    ui->attributeTable->setHidden(!d->footerEnabled || ui->attributeTable->content().empty());
     ui->footerLabel->setHidden(!d->footerEnabled || ui->footerLabel->text().isEmpty());
 }
 

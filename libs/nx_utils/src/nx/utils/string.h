@@ -362,4 +362,64 @@ NX_UTILS_API QByteArray formatJsonString(const QByteArray& data);
 
 NX_UTILS_API int stricmp(const std::string& left, const std::string& right);
 
+/**
+* Concatenate all strings from a specified container, inserting specified separator between them.
+*/
+template<
+    typename StringContainerType,
+    typename SeparatorType,
+    typename StringType = typename StringContainerType::value_type>
+StringType join(const StringContainerType& strings, const SeparatorType& separator)
+{
+    if (strings.size() == 0)
+        return StringType();
+
+    StringType result;
+    const StringType separatorStr(separator);
+
+    using SizeType = decltype(result.size());
+
+    const auto accumulatedSize = separatorStr.size() * (strings.size() - 1)
+        + std::accumulate(strings.begin(), strings.end(), SizeType(0),
+            [](SizeType value, const StringType& string) { return value + string.size(); });
+
+    result.reserve(accumulatedSize);
+
+    auto it = strings.begin();
+    result += *it;
+
+    for (++it; it != strings.end(); ++it)
+    {
+        result += separatorStr;
+        result += *it;
+    }
+
+    return result;
+}
+
+/**
+* Concatenate all strings from a specified range, inserting specified separator between them.
+*/
+template<
+    typename BeginType,
+    typename EndType,
+    typename SeparatorType,
+    typename StringType = std::remove_cv_t<std::remove_reference_t<decltype(**((BeginType*)0))>>>
+StringType join(BeginType begin, EndType end, const SeparatorType& separator)
+{
+    StringType result;
+    const StringType separatorStr(separator);
+
+    auto it = begin;
+    result += *it;
+
+    for (++it; it != end; ++it)
+    {
+        result += separatorStr;
+        result += *it;
+    }
+
+    return result;
+}
+
 } // namespace nx::utils

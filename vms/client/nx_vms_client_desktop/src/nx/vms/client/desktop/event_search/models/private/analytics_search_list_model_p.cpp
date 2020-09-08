@@ -41,7 +41,6 @@
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/utils/log/log.h>
-#include <nx/analytics/analytics_attributes.h>
 
 namespace nx::vms::client::desktop {
 
@@ -61,8 +60,6 @@ static constexpr milliseconds kDataChangedInterval = 500ms;
 static constexpr milliseconds kUpdateWorkbenchFilterDelay = 100ms;
 
 static constexpr int kMaxumumNoBestShotTrackCount = 10000;
-
-static constexpr int kMaxDisplayedAttributeValues = 2; //< Before "(+n values)".
 
 milliseconds startTime(const ObjectTrack& track)
 {
@@ -185,8 +182,8 @@ QVariant AnalyticsSearchListModel::Private::data(const QModelIndex& index, int r
         case Qn::DescriptionTextRole:
             return description(track);
 
-        case Qn::AttributeTableRole:
-            return QVariant::fromValue(attributes(track));
+        case Qn::GroupedAttributesRole:
+            return QVariant::fromValue(nx::common::metadata::groupAttributes(track.attributes));
 
         case Qn::TimestampRole:
             return QVariant::fromValue(std::chrono::microseconds(track.firstAppearanceTimeUs));
@@ -926,40 +923,6 @@ QString AnalyticsSearchListModel::Private::description(
         start.toString(Qt::RFC2822Date),
         duration.count(),
         text::HumanReadable::timeSpan(duration_cast<milliseconds>(duration)));
-}
-
-QList<QPair<QString, QString>> AnalyticsSearchListModel::Private::attributes(
-    const ObjectTrack& track) const
-{
-    if (track.attributes.empty())
-        return {};
-
-    const QString darkerColor = QPalette().color(QPalette::WindowText).name();
-
-    const auto valuesText =
-        [darkerColor](const QStringList& firstValues, int totalCount) -> QString
-        {
-            const QString displayedAttributes = firstValues.join(", ");
-            const int remainder = totalCount - kMaxDisplayedAttributeValues;
-            if (remainder <= 0)
-                return displayedAttributes;
-
-            return nx::format("%1 <font color=\"%3\">(%2)</font>", displayedAttributes,
-                AnalyticsSearchListModel::tr("+%n values", "", remainder),
-                darkerColor);
-        };
-
-    const auto groupedAttributes = nx::common::metadata::groupAttributes(
-        track.attributes, kMaxDisplayedAttributeValues);
-
-    QList<QPair<QString, QString>> result;
-    for (const auto& attribute: groupedAttributes)
-    {
-        if (!nx::analytics::isAnalyticsAttributeHidden(attribute.name))
-            result.push_back({attribute.name, valuesText(attribute.values, attribute.totalValues)});
-    }
-
-    return result;
 }
 
 QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(

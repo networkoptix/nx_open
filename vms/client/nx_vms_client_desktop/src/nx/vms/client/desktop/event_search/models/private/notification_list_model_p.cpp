@@ -1,5 +1,6 @@
 #include "notification_list_model_p.h"
 
+#include <analytics/common/object_metadata.h>
 #include <business/business_resource_validation.h>
 #include <client/client_settings.h>
 #include <core/resource_management/resource_pool.h>
@@ -227,6 +228,7 @@ void NotificationListModel::Private::addNotification(const vms::event::AbstractA
     eventData.extraData = qVariantFromValue(ExtraData(action->getRuleId(), resource));
     eventData.source = resource;
     eventData.objectTrackId = params.objectTrackId;
+    eventData.attributes = nx::common::metadata::groupAttributes(params.attributes);
 
     if (actionType == ActionType::playSoundAction)
     {

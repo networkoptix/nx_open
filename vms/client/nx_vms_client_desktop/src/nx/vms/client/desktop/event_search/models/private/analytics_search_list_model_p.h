@@ -81,7 +81,6 @@ private:
     rest::Handle getObjects(const QnTimePeriod& period, GetCallback callback, int limit) const;
 
     QString description(const analytics::db::ObjectTrack& track) const;
-    QList<QPair<QString, QString>> attributes(const analytics::db::ObjectTrack& track) const;
     QSharedPointer<QMenu> contextMenu(const analytics::db::ObjectTrack& track) const;
 
     QnVirtualCameraResourcePtr camera(const analytics::db::ObjectTrack& track) const;

@@ -234,7 +234,7 @@ namespace Qn
         TimestampTextRole,                          /**< Role for timestamp text (QString). */
         DescriptionTextRole,                        /**< Role for generic description text (QString). */
         AdditionalTextRole,                         /**< Role for additional description text (QString). */
-        AttributeTableRole,                         /**< Role for attribute table (QList<QPair<QString, QString>>). */
+        GroupedAttributesRole,                      /**< Role for grouped attribute lists (nx::common::metadata::GroupedAttributes). */
         RemovableRole,                              /**< An item is removable (bool). */
         CommandActionRole,                          /**< Command action (QSharedPointer<QAction>). */
         ResourceListRole,                           /**< Resource list (QnResourceList). */

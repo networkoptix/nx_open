@@ -52,7 +52,8 @@ public:
     QStringList eventDetailsWithTimestamp(const EventParameters &params,
         int aggregationCount) const;
 
-    QStringList eventDetails(const EventParameters &params) const;
+    QStringList eventDetails(
+        const EventParameters& params, bool withAnalyticsAttributes = true) const;
 
     // TODO: #rvasilenko isPublic field is not used, why?
     QString urlForCamera(const QnUuid& id, qint64 timestampUsec, bool isPublic) const;

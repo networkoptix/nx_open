@@ -3,6 +3,7 @@
 #include <QtGui/QPalette>
 #include <QtGui/QPixmap>
 
+#include <analytics/common/object_metadata.h>
 #include <api/server_rest_connection.h>
 #include <api/helpers/event_log_multiserver_request_data.h>
 #include <common/common_module.h>
@@ -139,6 +140,10 @@ QVariant EventSearchListModel::Private::data(const QModelIndex& index, int role,
 
         case Qn::DescriptionTextRole:
             return description(eventParams);
+
+        case Qn::GroupedAttributesRole:
+            return QVariant::fromValue(
+                nx::common::metadata::groupAttributes(eventParams.attributes));
 
         case Qn::ForcePrecisePreviewRole:
             return hasPreview(eventParams.eventType)
@@ -410,7 +415,7 @@ QString EventSearchListModel::Private::title(const vms::event::EventParameters& 
 QString EventSearchListModel::Private::description(
     const vms::event::EventParameters& parameters) const
 {
-    return m_helper->eventDetails(parameters).join("<br>");
+    return m_helper->eventDetails(parameters, /*withAnalyticsAttributes*/ false).join("<br>");
 }
 
 QPixmap EventSearchListModel::Private::pixmap(const vms::event::EventParameters& parameters)

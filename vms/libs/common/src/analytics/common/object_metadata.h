@@ -6,6 +6,7 @@
 #include <ostream>
 
 #include <QtCore/QRect>
+#include <QtCore/QVector>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/streaming/media_data_packet_fwd.h>
@@ -41,10 +42,13 @@ struct AttributeGroup
 {
     QString name;
     QStringList values;
-    int totalValues = 0;
 };
 
-std::vector<AttributeGroup> groupAttributes(const Attributes& attributes, int maxValuesInGroup);
+bool operator==(const AttributeGroup& left, const AttributeGroup& right);
+
+using GroupedAttributes = QVector<AttributeGroup>; //< QVector for implicit sharing in the UI.
+
+GroupedAttributes groupAttributes(const Attributes& attributes, bool filterOutHidden = true);
 
 //-------------------------------------------------------------------------------------------------
 static constexpr int kCoordinateDecimalDigits = 4;
@@ -139,3 +143,5 @@ ObjectMetadataPacketPtr fromCompressedMetadataPacket(const QnConstCompressedMeta
 } // namespace nx
 
 QN_FUSION_DECLARE_FUNCTIONS(nx::common::metadata::ObjectMetadataType, (numeric))
+
+Q_DECLARE_METATYPE(nx::common::metadata::GroupedAttributes)

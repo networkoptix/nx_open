@@ -4,6 +4,7 @@
 
 #include <nx/kit/debug.h>
 
+#include <nx/analytics/analytics_attributes.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/utils/log/log_message.h>
@@ -35,6 +36,12 @@ bool operator==(const Attribute& left, const Attribute& right)
 {
     return left.name == right.name
         && left.value == right.value;
+}
+
+bool operator==(const AttributeGroup& left, const AttributeGroup& right)
+{
+    return left.name == right.name
+        && left.values == right.values;
 }
 
 QString toString(const Attribute& attribute)
@@ -164,23 +171,22 @@ bool operator<(const ObjectMetadataPacket& first, std::chrono::microseconds seco
     return first.timestampUs < second.count();
 }
 
-std::vector<AttributeGroup> groupAttributes(const Attributes& attributes, int maxValuesInGroup)
+GroupedAttributes groupAttributes(const Attributes& attributes, bool filterOutHidden)
 {
-    std::map<QString, int> tmp;
-    std::vector<AttributeGroup> result;
+    std::map<QString, GroupedAttributes::size_type> nameToIndex;
+    GroupedAttributes result;
+
     for (const auto& attribute: attributes)
     {
-        auto itr = tmp.find(attribute.name);
-        if (itr == tmp.end())
-        {
-            itr = tmp.emplace(attribute.name, result.size()).first;
-            result.push_back(AttributeGroup());
-        }
-        auto& group = result[itr->second];
-        group.name = attribute.name;
-        if (group.values.size() < maxValuesInGroup)
-            group.values.push_back(attribute.value);
-        group.totalValues++;
+        if (filterOutHidden && nx::analytics::isAnalyticsAttributeHidden(attribute.name))
+            continue;
+
+        const auto [it, inserted] = nameToIndex.emplace(attribute.name, result.size());
+        if (inserted)
+            result.push_back(AttributeGroup{attribute.name});
+
+        auto& group = result[it->second];
+        group.values.push_back(attribute.value);
     }
 
     return result;

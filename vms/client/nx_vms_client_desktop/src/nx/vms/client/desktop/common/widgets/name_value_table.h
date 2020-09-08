@@ -4,6 +4,8 @@
 #include <QtCore/QString>
 #include <QtWidgets/QWidget>
 
+#include <analytics/common/object_metadata.h>
+
 #include <nx/utils/impl_ptr.h>
 
 namespace nx::vms::client::desktop {
@@ -12,18 +14,17 @@ class NameValueTable: public QWidget
 {
     Q_OBJECT
     using base_type = QWidget;
+    using GroupedValues = nx::common::metadata::GroupedAttributes;
 
 public:
     NameValueTable(QWidget* parent = nullptr);
     virtual ~NameValueTable() override;
 
-    using NameValueList = QList<QPair<QString, QString>>;
-
-    NameValueList content() const;
+    GroupedValues content() const;
 
     // Warning! Calling setContent during update of a backing store of some OpenGL-backed window
     // must be avoided as OpenGL context switching at that moment can cause bugs at some systems.
-    void setContent(const NameValueList& value);
+    void setContent(const GroupedValues& value);
 
     virtual QSize sizeHint() const override;
     virtual QSize minimumSizeHint() const override;

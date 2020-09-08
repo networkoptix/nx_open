@@ -308,8 +308,8 @@ void EventRibbon::Private::updateTile(int index)
     widget->setTimestamp(modelIndex.data(Qn::TimestampTextRole).toString());
     widget->setDescription(modelIndex.data(Qn::DescriptionTextRole).toString());
     widget->setFooterText(modelIndex.data(Qn::AdditionalTextRole).toString());
-    widget->setAttributeList(
-        modelIndex.data(Qn::AttributeTableRole).value<QList<QPair<QString, QString>>>());
+    widget->setAttributeList(modelIndex.data(Qn::GroupedAttributesRole)
+        .value<nx::common::metadata::GroupedAttributes>());
     widget->setToolTip(modelIndex.data(Qt::ToolTipRole).toString());
     widget->setCloseable(modelIndex.data(Qn::RemovableRole).toBool());
     widget->setAction(modelIndex.data(Qn::CommandActionRole).value<CommandActionPtr>());

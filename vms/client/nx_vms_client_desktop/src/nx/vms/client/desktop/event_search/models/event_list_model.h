@@ -6,6 +6,7 @@
 
 #include <QtGui/QPixmap>
 
+#include <analytics/common/object_metadata.h>
 #include <core/resource/resource_fwd.h>
 #include <ui/common/notification_levels.h>
 
@@ -45,6 +46,7 @@ public:
         CommandActionPtr extraAction;
         QVariant extraData;
         QnUuid objectTrackId;
+        nx::common::metadata::GroupedAttributes attributes;
     };
 
 public:

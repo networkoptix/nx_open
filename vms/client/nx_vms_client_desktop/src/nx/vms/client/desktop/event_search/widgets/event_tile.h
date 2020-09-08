@@ -5,6 +5,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QWidget>
 
+#include <analytics/common/object_metadata.h>
 #include <core/resource/resource_fwd.h>
 #include <ui/customization/customized.h>
 
@@ -28,6 +29,7 @@ class EventTile: public Customized<QWidget>
 {
     Q_OBJECT
     using base_type = Customized<QWidget>;
+    using GroupedAttributes = nx::common::metadata::GroupedAttributes;
 
 public:
     explicit EventTile(QWidget* parent = nullptr);
@@ -55,9 +57,8 @@ public:
     QString footerText() const;
     void setFooterText(const QString& value);
 
-    using AttributeList = QList<QPair<QString, QString>>;
-    AttributeList attributeList() const;
-    void setAttributeList(const AttributeList& value);
+    GroupedAttributes attributeList() const;
+    void setAttributeList(const GroupedAttributes& value);
 
     QString timestamp() const;
     void setTimestamp(const QString& value);

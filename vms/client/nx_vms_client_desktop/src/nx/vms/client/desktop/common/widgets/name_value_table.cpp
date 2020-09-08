@@ -17,10 +17,13 @@
 
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/pending_operation.h>
+#include <nx/utils/string.h>
 
 namespace nx::vms::client::desktop {
 
 namespace {
+
+static constexpr int kMaxDisplayedGroupValues = 2; //< Before "(+n values)".
 
 class RenderControl: public QQuickRenderControl
 {
@@ -111,8 +114,11 @@ struct SharedRenderer
 struct NameValueTable::Private
 {
     NameValueTable* const q;
-    NameValueList content;
+    GroupedValues content;
     QSize size;
+
+    using NameValueList = std::vector<std::pair<QString, QString>>;
+    NameValueList nameValueList;
 
     QScopedPointer<QOpenGLFramebufferObject> fbo;
 
@@ -133,12 +139,43 @@ struct NameValueTable::Private
         fbo.reset();
     }
 
-    void setContent(const NameValueList& value)
+    void setContent(const GroupedValues& value)
     {
         if (content == value)
             return;
 
         content = value;
+        updateList();
+    }
+
+    QString valuesText(const QStringList& values) const
+    {
+        const int totalCount = values.size();
+        const QString displayedValues = nx::utils::join(values.cbegin(),
+            values.cbegin() + std::min(totalCount, kMaxDisplayedGroupValues),
+            ", ");
+
+        const int remainder = totalCount - kMaxDisplayedGroupValues;
+        if (remainder <= 0)
+            return displayedValues;
+
+        return nx::format("%1 <font color=\"%3\">(%2)</font>", displayedValues,
+            tr("+%n values", "", remainder),
+            q->palette().color(QPalette::WindowText).name());
+    }
+
+    void updateList()
+    {
+        NameValueList newNameValueList;
+        newNameValueList.reserve(content.size());
+
+        for (const auto& group: content)
+            newNameValueList.push_back({group.name, valuesText(group.values)});
+
+        if (nameValueList == newNameValueList)
+            return;
+
+        nameValueList = std::move(newNameValueList);
         updateImage();
     }
 
@@ -153,7 +190,7 @@ struct NameValueTable::Private
 
     void updateImage()
     {
-        if (content.isEmpty())
+        if (nameValueList.empty())
         {
             size = QSize();
             pixmap = QPixmap();
@@ -163,7 +200,7 @@ struct NameValueTable::Private
         auto& r = SharedRenderer::instance();
 
         QStringList items;
-        for (const auto& [name, value]: content)
+        for (const auto& [name, value]: nameValueList)
             items << name << value;
 
         r.rootItem->setWidth(q->width());
@@ -209,12 +246,12 @@ NameValueTable::~NameValueTable()
     // Required here for forward-declared scoped pointer destruction.
 }
 
-NameValueTable::NameValueList NameValueTable::content() const
+NameValueTable::GroupedValues NameValueTable::content() const
 {
     return d->content;
 }
 
-void NameValueTable::setContent(const NameValueList& value)
+void NameValueTable::setContent(const GroupedValues& value)
 {
     d->setContent(value);
 }

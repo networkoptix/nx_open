@@ -1,5 +1,6 @@
 #include "strings_helper.h"
 
+#include <analytics/common/object_metadata.h>
 #include <api/app_server_connection.h>
 #include <common/common_module.h>
 #include <translation/datetime_formatter.h>
@@ -19,19 +20,15 @@
 #include <utils/common/id.h>
 #include <utils/common/html.h>
 
+#include <nx/analytics/descriptor_manager.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/utils/log/assert.h>
+#include <nx/utils/string.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/descriptors.h>
-
 #include <nx/vms/event/aggregation_info.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/events/events.h>
-
-#include <nx/utils/log/assert.h>
-
-#include <nx/analytics/descriptor_manager.h>
-#include <nx/fusion/model_functions.h>
-#include <analytics/common/object_metadata.h>
-#include <nx/analytics/analytics_attributes.h>
 
 namespace {
 
@@ -48,15 +45,21 @@ namespace nx {
 namespace vms {
 namespace event {
 
-QString serializeAttributes(const std::vector<nx::common::metadata::AttributeGroup>& attributes, const QString& kDelimiter)
+QString serializeAttributes(
+    const nx::common::metadata::GroupedAttributes& attributes, const QString& kDelimiter)
 {
     QString result;
     for (const auto& group: attributes)
     {
         if (!result.isEmpty())
             result += kDelimiter;
-        result += NX_FMT("%1: %2", group.name, group.values.join(", "));
+
+        const int count = std::min(group.values.size(), kMaxValuesInGroup);
+        result += NX_FMT("%1: %2",
+            group.name,
+            nx::utils::join(group.values.cbegin(), group.values.cbegin() + count, ", "));
     }
+
     return result;
 }
 
@@ -331,7 +334,8 @@ QStringList StringsHelper::eventDetailsWithTimestamp(
         << eventDetails(params);
 }
 
-QStringList StringsHelper::eventDetails(const EventParameters& params) const
+QStringList StringsHelper::eventDetails(
+    const EventParameters& params, bool withAnalyticsAttributes) const
 {
     QStringList result;
     switch (params.eventType)
@@ -409,12 +413,12 @@ QStringList StringsHelper::eventDetails(const EventParameters& params) const
                 message += params.description;
             }
 
-            if (!params.attributes.empty())
+            if (withAnalyticsAttributes && !params.attributes.empty())
             {
                 if (!message.isEmpty())
                     message += ". ";
                 message += serializeAttributes(
-                    nx::common::metadata::groupAttributes(params.attributes, kMaxValuesInGroup),
+                    nx::common::metadata::groupAttributes(params.attributes),
                     "; ");
             }
 
@@ -955,21 +959,10 @@ QString StringsHelper::notificationCaption(
                 : parameters.caption;
 
         case EventType::analyticsSdkEvent:
-        {
-            auto result = parameters.caption.isEmpty()
+            return parameters.caption.isEmpty()
                 ? getAnalyticsSdkEventName(parameters)
                 : parameters.caption;
-            if (!parameters.attributes.empty())
-            {
-                using namespace nx::common::metadata;
-                auto attrGroups = groupAttributes(parameters.attributes, kMaxValuesInGroup);
-                const QString kDelimiter = "\n";
-                if (!result.isEmpty())
-                    result += kDelimiter;
-                result += serializeAttributes(attrGroups, kDelimiter);
-            }
-            return result;
-        }
+
         case EventType::cameraDisconnectEvent:
             return QnDeviceDependentStrings::getNameFromSet(resourcePool(),
                 QnCameraDeviceStringSet(
