@@ -78,10 +78,14 @@ QnLookAndFeelPreferencesWidget::QnLookAndFeelPreferencesWidget(QWidget *parent) 
     setupTimeModeUi();
     setupBackgroundUi();
 
-    connect(ui->tourCycleTimeSpinBox, QnSpinboxIntValueChanged, this,
-        &QnAbstractPreferencesWidget::hasChangesChanged);
-    connect(ui->showIpInTreeCheckBox, &QCheckBox::clicked, this,
-        &QnAbstractPreferencesWidget::hasChangesChanged);
+    connect(ui->tourCycleTimeSpinBox, QnSpinboxIntValueChanged,
+        this, &QnAbstractPreferencesWidget::hasChangesChanged);
+
+    connect(ui->showIpInTreeCheckBox, &QCheckBox::clicked,
+        this, &QnAbstractPreferencesWidget::hasChangesChanged);
+
+    connect(ui->usePtzAimOverlayCheckBox, &QCheckBox::clicked,
+        this, &QnAbstractPreferencesWidget::hasChangesChanged);
 }
 
 QnLookAndFeelPreferencesWidget::~QnLookAndFeelPreferencesWidget()
