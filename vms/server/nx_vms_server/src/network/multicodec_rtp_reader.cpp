@@ -22,6 +22,7 @@
 #include <nx/streaming/rtp/parsers/hevc_rtp_parser.h>
 #include <nx/streaming/rtp/parsers/aac_rtp_parser.h>
 #include <nx/streaming/rtp/parsers/simpleaudio_rtp_parser.h>
+#include <nx/streaming/rtp/parsers/mpeg12_audio_rtp_parser.h>
 #include <nx/streaming/rtp/parsers/mjpeg_rtp_parser.h>
 
 #include <nx/streaming/rtp/parsers/i_rtp_parser_factory.h>
@@ -430,7 +431,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataTCP()
             const int length = bytesRead - kInterleavedRtpOverTcpPrefixLength;
             uint8_t* rtpPacketData = (uint8_t*)m_demuxedData[rtpChannelNum]->data();
             updateOnvifTime(rtpPacketData + offset, length, track);
-            m_lastRtpParseResult = 
+            m_lastRtpParseResult =
                 track.parser->processData(rtpPacketData, offset, length, m_gotData);
             if (!m_lastRtpParseResult.success)
             {
@@ -534,7 +535,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataUDP()
                     NX_DEBUG(this, "%1: %2", m_logName, m_lastRtpParseResult.errorMessage);
                     clearKeyData(track.logicalChannelNum);
                     m_demuxedData[rtpChannelNum]->clear();
-                    if (++errorRetryCount > m_maxRtpRetryCount) 
+                    if (++errorRetryCount > m_maxRtpRetryCount)
                     {
                         NX_WARNING(this, "%1: Too many RTP errors. Report a network issue", m_logName);
                         return QnAbstractMediaDataPtr(0);
@@ -611,6 +612,10 @@ nx::streaming::rtp::StreamParser* QnMulticodecRtpReader::createParser(const QStr
         audioParser->setCodecId(AV_CODEC_ID_PCM_S16BE);
         audioParser->setSampleFormat(AV_SAMPLE_FMT_S16);
         result = audioParser;
+    }
+    else if (codecName == QLatin1String("MPA"))
+    {
+        result = new nx::streaming::rtp::Mpeg12AudioParser();
     }
     else if (m_customTrackParserFactory)
     {
