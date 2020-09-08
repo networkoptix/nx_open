@@ -15,10 +15,29 @@ IsapiPtzController::IsapiPtzController(const QnResourcePtr& resource, QAuthentic
     m_client(resource->getUrl(), authenticator),
     m_presetMappings(resource, "isapiPtzPresetMappings")
 {
+    static const std::map<QString, Ptz::Capabilities> kCapabiltiesToRemove = {
+        {"panSupport", Ptz::AbsolutePanCapability | Ptz::ContinuousPanCapability},
+        {"tiltSupport", Ptz::AbsoluteTiltCapability | Ptz::ContinuousTiltCapability},
+        {"zoomSupport", Ptz::AbsoluteZoomCapability | Ptz::ContinuousZoomCapability}
+    };
+
+    Ptz::Capabilities capabilitiesToRemove = Ptz::NoPtzCapabilities;
+
     if (const auto channels = m_client.get(url()))
     {
-        if (const auto channel = channels->child("PTZChannel"))
+        const auto channel = channels->child("PTZChannel");
+
+        if (channel)
+        {
             m_channel = channel->integer("id");
+
+            for (const auto& [propertyName, ptzCapabilities]: kCapabiltiesToRemove)
+            {
+                const std::optional<bool> property = channel->boolean(propertyName);
+                if (property.has_value() && !property.value())
+                    capabilitiesToRemove |= ptzCapabilities;
+            }
+        }
     }
 
     if (!m_channel)
@@ -29,6 +48,8 @@ IsapiPtzController::IsapiPtzController(const QnResourcePtr& resource, QAuthentic
 
     if (const auto capabilities = m_client.get(url("capabilities")))
         loadCapabilities(*capabilities);
+
+    m_capabilities &= ~capabilitiesToRemove;
 
     if (m_capabilities & Ptz::AbsolutePtrzCapabilities)
         m_capabilities |= Ptz::DevicePositioningPtzCapability;
