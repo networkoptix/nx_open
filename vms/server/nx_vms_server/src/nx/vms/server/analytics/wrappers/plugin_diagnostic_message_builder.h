@@ -20,6 +20,11 @@ public:
         SdkObjectDescription sdkObjectDescription,
         Violation violation);
 
+    PluginDiagnosticMessageBuilder(
+        SdkObjectDescription sdkObjectDescription,
+        QString suspicionCaption,
+        QString suspicionDetails);
+
     QString buildLogString() const;
     QString buildTechnicalDetails() const;
     QString buildPluginDiagnosticEventCaption() const;
@@ -30,6 +35,8 @@ private:
     const SdkObjectDescription m_sdkObjectDescription;
     const sdk_support::Error m_error;
     const Violation m_violation;
+    const QString m_suspicionCaption;
+    const QString m_suspicionDetails;
 };
 
 } // namespace nx::vms::server::analytics::wrappers

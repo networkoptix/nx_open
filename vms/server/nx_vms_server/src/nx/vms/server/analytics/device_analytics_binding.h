@@ -49,6 +49,9 @@ public:
 
     virtual ~DeviceAnalyticsBinding() override;
 
+    nx::vms::server::resource::CameraPtr device() const { return m_device; }
+    nx::vms::server::resource::AnalyticsEngineResourcePtr engine() const { return m_engine; }
+
     bool canAcceptData() const override;
 
     void setMaxQueueDuration(std::chrono::microseconds value);

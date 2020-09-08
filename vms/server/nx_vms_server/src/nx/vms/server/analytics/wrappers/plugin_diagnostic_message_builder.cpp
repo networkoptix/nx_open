@@ -6,17 +6,12 @@
 
 namespace nx::vms::server::analytics::wrappers {
 
-static QString toString(SdkObjectType sdkObjectType)
+static QString sdkObjectTypeName(SdkObjectType sdkObjectType)
 {
     return QnLexical::serialized(sdkObjectType);
 }
 
-static QString toString(SdkMethod sdkMethod)
-{
-    return QnLexical::serialized(sdkMethod) + "()";
-}
-
-static QString toString(ViolationType violationType)
+static QString violationTypeDescription(ViolationType violationType)
 {
     switch (violationType)
     {
@@ -53,13 +48,21 @@ static QString toString(ViolationType violationType)
     return "Unknown violation";
 }
 
+static QString sdkMethodName(SdkMethod sdkMethod)
+{
+    if (!NX_ASSERT(sdkMethod != SdkMethod::undefined))
+        return "<undefined>"; //< Should clearly differ from any real method.
+
+    return QnLexical::serialized(sdkMethod) + "()";
+}
+
 /**
  * @return User-understandable description of the action performed by the given method. Does not
  *     have to be precise - it only must give the user the idea of what is going wrong; the exact
  *     details for technical support must be provided alongside. Must finish the phrase "The plugin
  *     failed to...".
  */
-static QString methodDescription(SdkMethod sdkMethod)
+static QString sdkMethodDescription(SdkMethod sdkMethod)
 {
     switch (sdkMethod)
     {
@@ -94,6 +97,7 @@ PluginDiagnosticMessageBuilder::PluginDiagnosticMessageBuilder(
     m_sdkObjectDescription(std::move(sdkObjectDescription)),
     m_error(std::move(error))
 {
+    NX_ASSERT(m_sdkMethod != SdkMethod::undefined);
     NX_ASSERT(!m_error.isOk());
 }
 
@@ -106,7 +110,27 @@ PluginDiagnosticMessageBuilder::PluginDiagnosticMessageBuilder(
     m_sdkObjectDescription(std::move(sdkObjectDescription)),
     m_violation(violation)
 {
+    NX_ASSERT(m_sdkMethod != SdkMethod::undefined);
     NX_ASSERT(m_violation.type != ViolationType::undefined);
+
+    NX_ASSERT(m_error.isOk());
+    NX_ASSERT(m_suspicionCaption.isEmpty());
+}
+
+PluginDiagnosticMessageBuilder::PluginDiagnosticMessageBuilder(
+    SdkObjectDescription sdkObjectDescription,
+    QString suspicionCaption,
+    QString suspicionDetails)
+    :
+    m_sdkObjectDescription(std::move(sdkObjectDescription)),
+    m_suspicionCaption(std::move(suspicionCaption)),
+    m_suspicionDetails(std::move(suspicionDetails))
+{
+    NX_ASSERT(!suspicionCaption.isEmpty());
+
+    NX_ASSERT(m_error.isOk());
+    NX_ASSERT(m_sdkMethod == SdkMethod::undefined);
+    NX_ASSERT(m_violation.type == ViolationType::undefined);
 }
 
 QString PluginDiagnosticMessageBuilder::buildLogString() const
@@ -116,30 +140,35 @@ QString PluginDiagnosticMessageBuilder::buildLogString() const
 
 QString PluginDiagnosticMessageBuilder::buildTechnicalDetails() const
 {
-    const QString methodCaption = NX_FMT("Method %1::%2 of %3",
-        m_sdkObjectDescription.sdkObjectType(),
-        m_sdkMethod,
+    if (!m_suspicionCaption.isEmpty())
+        return NX_FMT("%1: %2", m_sdkObjectDescription.descriptionString(), m_suspicionDetails);
+
+    NX_ASSERT(m_sdkMethod != SdkMethod::undefined);
+
+    const QString sdkMethodCaption = NX_FMT("Method %1::%2 of %3",
+        sdkObjectTypeName(m_sdkObjectDescription.sdkObjectType()),
+        sdkMethodName(m_sdkMethod),
         m_sdkObjectDescription.descriptionString());
 
-    if (m_violation.type != ViolationType::undefined)
-    {
-        const QString violationDescription = isSdkMethodCallback(m_sdkMethod)
-            ? "called by the Plugin incorrectly"
-            : "implemented in the Plugin incorrectly";
+    if (!m_error.isOk())
+        return NX_FMT("%1 returned an error: %2", sdkMethodCaption, m_error);
 
-        return NX_FMT("%1 %2: %3%4",
-            methodCaption,
-            violationDescription,
-            m_violation.type,
-            m_violation.details.isEmpty() ? "" : (", details: " + m_violation.details));
-    }
+    NX_ASSERT(m_violation.type != ViolationType::undefined);
 
-    return NX_FMT("%1 returned an error: %2", methodCaption, m_error);
+    const QString violationDescription = isSdkMethodCallback(m_sdkMethod)
+        ? "called by the Plugin incorrectly"
+        : "implemented in the Plugin incorrectly";
+
+    return NX_FMT("%1 %2: %3%4",
+        sdkMethodCaption,
+        violationDescription,
+        violationTypeDescription(m_violation.type),
+        m_violation.details.isEmpty() ? "" : (", details: " + m_violation.details));
 }
 
 QString PluginDiagnosticMessageBuilder::buildPluginDiagnosticEventCaption() const
 {
-    if (m_violation.type != ViolationType::undefined)
+    if (m_violation.type != ViolationType::undefined || !m_suspicionCaption.isEmpty())
         return "Issue with Analytics Plugin detected";
 
     return "Error in Analytics Plugin detected";
@@ -147,11 +176,14 @@ QString PluginDiagnosticMessageBuilder::buildPluginDiagnosticEventCaption() cons
 
 QString PluginDiagnosticMessageBuilder::buildPluginDiagnosticEventDescription() const
 {
-    const QString prefix = (m_sdkMethod == SdkMethod::undefined)
-        ? ""
-        : NX_FMT("Plugin failed to %1. ", methodDescription(m_sdkMethod));
+    QString prefix;
 
-    return prefix + "Technical details: " + buildTechnicalDetails();
+    if (m_sdkMethod != SdkMethod::undefined)
+        prefix = NX_FMT("Plugin failed to %1. ", sdkMethodDescription(m_sdkMethod));
+    else if (!m_suspicionCaption.isEmpty())
+        prefix = m_suspicionCaption + " ";
+
+    return NX_FMT("%1Technical details: %2", prefix, buildTechnicalDetails());
 }
 
 } // namespace nx::vms::server::analytics::wrappers

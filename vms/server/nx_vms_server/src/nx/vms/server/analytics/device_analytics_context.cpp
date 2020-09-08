@@ -17,11 +17,14 @@
 #include <nx/vms/server/analytics/data_converter.h>
 #include <nx/vms/server/analytics/event_rule_watcher.h>
 #include <nx/vms/server/analytics/stream_converter.h>
+#include <nx/vms/server/analytics/wrappers/sdk_object_description.h>
 
 #include <nx/vms/server/sdk_support/conversion_utils.h>
 #include <nx/vms/server/sdk_support/utils.h>
 
 #include <nx/vms/server/event/event_connector.h>
+
+#include <nx/vms/server/analytics/wrappers/plugin_diagnostic_message_builder.h>
 
 namespace nx::vms::server::analytics {
 
@@ -303,30 +306,36 @@ void DeviceAnalyticsContext::registerStream(nx::vms::api::StreamIndex streamInde
 
 void DeviceAnalyticsContext::reportSkippedFrames(int framesSkipped, QnUuid engineId) const
 {
-    const QString caption = lm("Analytics: skipped %1 video frame%2").args(
-        framesSkipped,
-        framesSkipped > 1 ? "s" : "");
+    const std::shared_ptr<DeviceAnalyticsBinding> binding =
+        analyticsBindingUnsafe(engineId);
 
-    const QString description =
-        lm("Skipped %1 video frame%2 for %3 from Device %4 %5: queue overflow. "
-            "Probably the Plugin is working too slow").args(
-            framesSkipped,
-            framesSkipped > 1 ? "s" : "",
-            getEngineLogLabel(serverModule(), engineId),
-            m_device->getUserDefinedName(),
-            m_device->getId());
+    if (!NX_ASSERT(binding,
+        "Unable to report %1 skipped frames for Device %2 %3: Binding not found.",
+        framesSkipped, m_device->getUserDefinedName(), m_device->getId()))
+    {
+        return;
+    }
+
+    const wrappers::PluginDiagnosticMessageBuilder messageBuilder(
+        wrappers::SdkObjectDescription(
+            binding->engine()->plugin().dynamicCast<resource::AnalyticsPluginResource>(),
+            binding->engine(),
+            m_device),
+        "Plugin is processing incoming frames too slowly.",
+        NX_FMT("Frame queue overflow, skipped %1 frame(s)", framesSkipped));
+
+    NX_INFO(this, messageBuilder.buildLogString());
 
     const nx::vms::event::PluginDiagnosticEventPtr pluginDiagnosticEvent(
         new nx::vms::event::PluginDiagnosticEvent(
             qnSyncTime->currentUSecsSinceEpoch(),
             engineId,
-            caption,
-            description,
+            messageBuilder.buildPluginDiagnosticEventCaption(),
+            messageBuilder.buildPluginDiagnosticEventDescription(),
             nx::vms::api::EventLevel::WarningEventLevel,
             m_device));
 
     emit pluginDiagnosticEventTriggered(pluginDiagnosticEvent);
-    NX_INFO(this, description);
 }
 
 void DeviceAnalyticsContext::at_deviceStatusChanged(const QnResourcePtr& resource)
