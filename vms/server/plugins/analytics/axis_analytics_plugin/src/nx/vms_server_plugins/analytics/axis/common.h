@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <QtCore/QString>
 
 #include <nx/fusion/model_functions_fwd.h>
@@ -13,6 +15,7 @@ struct EventType: nx::vms::api::analytics::EventType
 {
     QString topic;
     QString caption;
+    std::optional<int> fenceGuardProfileIndex;
 
     EventType() = default; //< Fusion needs default constructor.
     EventType(const nx::axis::SupportedEventType& supportedEventType);

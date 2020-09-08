@@ -9,9 +9,7 @@ namespace nx::vms_server_plugins::analytics::axis {
 
 namespace {
 
-using namespace nx::vms_server_plugins::analytics::axis;
-
-static QString withoutNamespace(const QString& tag)
+QString withoutNamespace(const QString& tag)
 {
     // "ns:tag" -> "tag"
     // "tag" -> "tag"
@@ -19,7 +17,7 @@ static QString withoutNamespace(const QString& tag)
     return parts.back();
 }
 
-static QString withoutNamespaces(const QString& tags)
+QString withoutNamespaces(const QString& tags)
 {
     // "ns1:tag1/ns2:tag2.tag3" -> "tag1/tag2/tag3"
     // "tag1/ns2:tag2" -> "tag1/tag2"
@@ -30,6 +28,36 @@ static QString withoutNamespaces(const QString& tags)
         shortParts << withoutNamespace(part);
     }
     return shortParts.join('/');
+}
+
+std::optional<int> parseFenceGuardProfileIndex(QString topic, QString caption)
+{
+    topic = withoutNamespaces(topic);
+    if (topic != "CameraApplicationPlatform")
+        return std::nullopt;
+    
+    static const QString kCaptionPrefix = "FenceGuard/Camera";
+    caption = withoutNamespaces(caption);
+    if (!caption.startsWith(kCaptionPrefix))
+        return std::nullopt;
+
+    const auto splitCaption = caption.mid(kCaptionPrefix.length()).split("Profile");
+    if (splitCaption.size() != 2)
+        return std::nullopt;
+
+    bool ok = false;
+    splitCaption[0].toUInt(&ok);
+    if (!ok)
+        return std::nullopt;
+
+    if (splitCaption[1] == "ANY")
+        return -1;
+
+    int index = splitCaption[1].toUInt(&ok);
+    if (ok)
+        return index;
+
+    return std::nullopt;
 }
 
 } // namespace
@@ -54,6 +82,8 @@ EventType::EventType(const nx::axis::SupportedEventType& supportedEventType)
 
     topic = supportedEventType.topic.c_str();
     caption = supportedEventType.name.c_str();
+
+    fenceGuardProfileIndex = parseFenceGuardProfileIndex(topic, caption);
 }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventType, (json),

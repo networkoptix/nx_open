@@ -8,16 +8,95 @@
 #include <nx/fusion/serialization/json.h>
 
 #include <nx/sdk/helpers/string.h>
+#include <nx/sdk/analytics/helpers/metadata_types.h>
 #include <nx/sdk/helpers/plugin_diagnostic_event.h>
 #include <nx/sdk/helpers/error.h>
 
 #define NX_PRINT_PREFIX "[axis::DeviceAgent] "
 #include <nx/kit/debug.h>
 
+#include "common.h"
+
 namespace nx::vms_server_plugins::analytics::axis {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
+
+namespace {
+
+/* 
+ * Fence Guard event types are a special case. Their descriptions as reported by camera
+ * contain arbitrary user-provided profile names. If we treat these generically, when
+ * multiple cameras are attached that have differently named profiles in corresponding
+ * profile slots, only one of this names ends up used by the VMS, which confuses users.
+ *
+ * Moreover, cameras report profiles in different slots as different event types, though
+ * logically they are the same kind of event. There is also a special any-profile
+ * event type, that is sent whenever ony of the other profiles is sent.
+ *
+ * Thus we threat Fence Guard events specially:
+ * 1) Any-profile event type is removed.
+ * 2) All profile-specific event types together are translated to a single event type with
+ * id nx.axis.FenceGuard, whose name no longer include any profile-specific information.
+ * 3) If the user still wishes to disambiguate between different profiles, the profile
+ * name remains a part of the event's description. 
+ */
+EngineManifest mergeFenceGuardEventTypes(EngineManifest manifest)
+{
+    auto& eventTypes = manifest.eventTypes;
+    for (auto it = eventTypes.begin(); it != eventTypes.end(); )
+    {
+        if (it->fenceGuardProfileIndex)
+        {
+            if (*it->fenceGuardProfileIndex == -1)
+            {
+                it->id = "nx.axis.FenceGuard";
+                it->name = "Fence Guard";
+                it->caption = "FenceGuard";
+            }
+            else
+            {
+                it = eventTypes.erase(it);
+                continue;
+            }
+        }
+
+        ++it;
+    }
+
+    return manifest;
+}
+
+Ptr<MetadataTypes> splitFenceGuardEvents(
+    const IMetadataTypes& mergedMetadataTypes, const QList<EventType> eventTypes)
+{
+    auto metadataTypes = makePtr<MetadataTypes>();
+
+    const auto objectTypeIds = mergedMetadataTypes.objectTypeIds();
+    for (int i = 0; i < objectTypeIds->count(); ++i)
+        metadataTypes->addObjectTypeId(objectTypeIds->at(i));
+
+    const auto eventTypeIds = mergedMetadataTypes.eventTypeIds();
+    for (int i = 0; i < eventTypeIds->count(); ++i)
+    {
+        QString id = eventTypeIds->at(i);
+        if (id != "nx.axis.FenceGuard")
+        {
+            metadataTypes->addEventTypeId(id.toStdString());
+            continue;
+        }
+
+        for (const auto& type: eventTypes)
+        {
+            if (type.fenceGuardProfileIndex)
+                metadataTypes->addEventTypeId(type.id.toStdString());
+        }
+    }
+
+    return metadataTypes;
+}
+
+} // namespace
 
 DeviceAgent::DeviceAgent(
     Engine* engine,
@@ -26,7 +105,7 @@ DeviceAgent::DeviceAgent(
     :
     m_engine(engine),
     m_parsedManifest(typedManifest),
-    m_jsonManifest(QJson::serialized(typedManifest)),
+    m_jsonManifest(QJson::serialized(mergeFenceGuardEventTypes(typedManifest))),
     m_url(deviceInfo->url())
 {
     m_auth.setUser(deviceInfo->login());
@@ -50,6 +129,10 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 void DeviceAgent::doSetNeededMetadataTypes(
     Result<void>* outResult, const IMetadataTypes* neededMetadataTypes)
 {
+    const auto neededMetadataTypesPtr = splitFenceGuardEvents(
+        *neededMetadataTypes, m_parsedManifest.eventTypes);
+    neededMetadataTypes = neededMetadataTypesPtr.get();
+
     const auto eventTypeIds = neededMetadataTypes->eventTypeIds();
     if (const char* const kMessage = "Event type id list is null";
         !NX_ASSERT(eventTypeIds, kMessage))

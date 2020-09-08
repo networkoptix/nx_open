@@ -31,10 +31,23 @@ Ptr<EventMetadata> createCommonEvent(
     const EventType& eventType, bool active)
 {
     const auto eventMetadata = makePtr<EventMetadata>();
-    eventMetadata->setTypeId(eventType.id.toStdString());
+
+    if (eventType.fenceGuardProfileIndex)
+    {
+        if (*eventType.fenceGuardProfileIndex == -1)
+            return nullptr;
+
+        eventMetadata->setTypeId("nx.axis.FenceGuard");
+    }
+    else
+    {
+        eventMetadata->setTypeId(eventType.id.toStdString());
+    }
+
     eventMetadata->setDescription(eventType.name.toStdString());
     eventMetadata->setIsActive(active);
     eventMetadata->setConfidence(1.0);
+
     return eventMetadata;
 }
 
@@ -43,6 +56,9 @@ Ptr<EventMetadataPacket> createCommonEventsMetadataPacket(
 {
     using namespace std::chrono;
     const auto commonEvent = createCommonEvent(event, active);
+    if (!commonEvent)
+        return nullptr;
+
     const auto packet = makePtr<EventMetadataPacket>();
     packet->addItem(commonEvent.get());
     packet->setTimestampUs(
@@ -283,6 +299,9 @@ std::chrono::milliseconds Monitor::timeTillCheck() const
 void Monitor::sendEventStartedPacket(const EventType& event) const
 {
     const auto packet = createCommonEventsMetadataPacket(event, /*active*/ true);
+    if (!packet)
+        return;
+
     m_handler->handleMetadata(packet.get());
     NX_PRINT
         << (event.isStateful() ? "Event [start] " : "Event [pulse] ")
@@ -292,6 +311,9 @@ void Monitor::sendEventStartedPacket(const EventType& event) const
 void Monitor::sendEventStoppedPacket(const EventType& event) const
 {
     const auto packet = createCommonEventsMetadataPacket(event, /*active*/ false);
+    if (!packet)
+        return;
+
     m_handler->handleMetadata(packet.get());
     NX_PRINT << "Event [stop] " << event.fullName().toUtf8().constData()
         << " sent to server";

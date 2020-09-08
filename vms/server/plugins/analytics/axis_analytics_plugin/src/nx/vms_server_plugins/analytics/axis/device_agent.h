@@ -8,6 +8,7 @@
 #include <QtNetwork/QAuthenticator>
 
 #include <nx/utils/thread/mutex.h>
+#include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/sdk/i_plugin_diagnostic_event.h>
