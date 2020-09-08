@@ -430,9 +430,9 @@ StreamParser::Result H264Parser::processData(
                 return {false, NX_FMT("Failed to parse RTP packet, invalid FU_A_PACKET")};
             }
             nalUnitType = *curPtr & 0x1f;
-            updateNalFlags(curPtr, bufferEnd - curPtr);
             if (*curPtr & 0x80) // FU_A first packet
             {
+                updateNalFlags(curPtr, bufferEnd - curPtr);
                 m_firstSeqNum = sequenceNum;
                 m_packetPerNal = 0;
                 nalUnitType |= nalRefIDC;
