@@ -2,6 +2,7 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/fusion/model_functions.h>
+#include <nx/sdk/helpers/to_string.h>
 
 namespace nx::vms::server::sdk_support {
 
@@ -13,6 +14,13 @@ nx::vms::api::EventLevel pluginDiagnosticEventLevel(const Error& error)
         return nx::vms::api::EventLevel::UndefinedEventLevel;
 
     return nx::vms::api::EventLevel::ErrorEventLevel;
+}
+
+QString Error::toString() const
+{
+    return NX_FMT("[%1]: %2",
+        errorCode,
+        errorMessage.isEmpty() ? "no error message" : errorMessage);
 }
 
 } // namespace nx::vms::server::sdk_support

@@ -14,7 +14,7 @@
 #include <utils/common/synctime.h>
 
 #include <nx/vms/server/analytics/wrappers/manifest_converter.h>
-#include <nx/vms/server/analytics/wrappers/string_builder.h>
+#include <nx/vms/server/analytics/wrappers/plugin_diagnostic_message_builder.h>
 
 namespace nx::vms::server::analytics {
 
@@ -43,7 +43,7 @@ DeviceAgentHandler::~DeviceAgentHandler()
 /** Called by MetadataHandler when the Plugin pushes bad data; produces PluginDiagnosticEvent. */
 void DeviceAgentHandler::handleMetadataViolation(const wrappers::Violation& violation)
 {
-    const wrappers::StringBuilder stringBuilder(
+    const wrappers::PluginDiagnosticMessageBuilder messageBuilder(
         wrappers::SdkMethod::iHandler_handleMetadata,
         wrappers::SdkObjectDescription(
             m_engine->plugin().dynamicCast<resource::AnalyticsPluginResource>(),
@@ -51,14 +51,14 @@ void DeviceAgentHandler::handleMetadataViolation(const wrappers::Violation& viol
             m_device),
         violation);
 
-    NX_DEBUG(this, stringBuilder.buildLogString());
+    NX_DEBUG(this, messageBuilder.buildLogString());
 
     const nx::vms::event::PluginDiagnosticEventPtr pluginDiagnosticEvent(
         new nx::vms::event::PluginDiagnosticEvent(
             qnSyncTime->currentUSecsSinceEpoch(),
             m_engine->getId(),
-            stringBuilder.buildPluginDiagnosticEventCaption(),
-            stringBuilder.buildPluginDiagnosticEventDescription(),
+            messageBuilder.buildPluginDiagnosticEventCaption(),
+            messageBuilder.buildPluginDiagnosticEventDescription(),
             nx::vms::api::EventLevel::ErrorEventLevel,
             m_device));
 
@@ -100,19 +100,19 @@ void DeviceAgentHandler::pushManifest(const nx::sdk::IString* manifestString)
         sdkObjectDescription,
         [this, &sdkObjectDescription](wrappers::Violation violation)
         {
-            const wrappers::StringBuilder stringBuilder(
+            const wrappers::PluginDiagnosticMessageBuilder messageBuilder(
                 wrappers::SdkMethod::iHandler_pushManifest,
                 sdkObjectDescription,
                 violation);
 
-            NX_DEBUG(this, stringBuilder.buildLogString());
+            NX_DEBUG(this, messageBuilder.buildLogString());
 
             const nx::vms::event::PluginDiagnosticEventPtr pluginDiagnosticEvent(
                 new nx::vms::event::PluginDiagnosticEvent(
                     qnSyncTime->currentUSecsSinceEpoch(),
                     m_engine->getId(),
-                    stringBuilder.buildPluginDiagnosticEventCaption(),
-                    stringBuilder.buildPluginDiagnosticEventDescription(),
+                    messageBuilder.buildPluginDiagnosticEventCaption(),
+                    messageBuilder.buildPluginDiagnosticEventDescription(),
                     nx::vms::api::EventLevel::ErrorEventLevel,
                     m_device));
 

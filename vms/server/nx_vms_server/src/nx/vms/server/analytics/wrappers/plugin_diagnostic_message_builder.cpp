@@ -1,8 +1,7 @@
-#include "string_builder.h"
+#include "plugin_diagnostic_message_builder.h"
 
 #include <nx/utils/switch.h>
 
-#include <nx/vms/server/sdk_support/to_string.h>
 #include <nx/fusion/model_functions.h>
 
 namespace nx::vms::server::analytics::wrappers {
@@ -86,7 +85,7 @@ static QString methodDescription(SdkMethod sdkMethod)
     return "perform an unknown action";
 }
 
-StringBuilder::StringBuilder(
+PluginDiagnosticMessageBuilder::PluginDiagnosticMessageBuilder(
     SdkMethod sdkMethod,
     SdkObjectDescription sdkObjectDescription,
     sdk_support::Error error)
@@ -98,7 +97,7 @@ StringBuilder::StringBuilder(
     NX_ASSERT(!m_error.isOk());
 }
 
-StringBuilder::StringBuilder(
+PluginDiagnosticMessageBuilder::PluginDiagnosticMessageBuilder(
     SdkMethod sdkMethod,
     SdkObjectDescription sdkObjectDescription,
     Violation violation)
@@ -110,12 +109,12 @@ StringBuilder::StringBuilder(
     NX_ASSERT(m_violation.type != ViolationType::undefined);
 }
 
-QString StringBuilder::buildLogString() const
+QString PluginDiagnosticMessageBuilder::buildLogString() const
 {
     return buildPluginDiagnosticEventDescription();
 }
 
-QString StringBuilder::buildPluginInfoString() const
+QString PluginDiagnosticMessageBuilder::buildTechnicalDetails() const
 {
     const QString methodCaption = NX_FMT("Method %1::%2 of %3",
         m_sdkObjectDescription.sdkObjectType(),
@@ -138,7 +137,7 @@ QString StringBuilder::buildPluginInfoString() const
     return NX_FMT("%1 returned an error: %2", methodCaption, m_error);
 }
 
-QString StringBuilder::buildPluginDiagnosticEventCaption() const
+QString PluginDiagnosticMessageBuilder::buildPluginDiagnosticEventCaption() const
 {
     if (m_violation.type != ViolationType::undefined)
         return "Issue with Analytics Plugin detected";
@@ -146,13 +145,13 @@ QString StringBuilder::buildPluginDiagnosticEventCaption() const
     return "Error in Analytics Plugin detected";
 }
 
-QString StringBuilder::buildPluginDiagnosticEventDescription() const
+QString PluginDiagnosticMessageBuilder::buildPluginDiagnosticEventDescription() const
 {
     const QString prefix = (m_sdkMethod == SdkMethod::undefined)
         ? ""
         : NX_FMT("Plugin failed to %1. ", methodDescription(m_sdkMethod));
 
-    return prefix + "Technical details: " + buildPluginInfoString();
+    return prefix + "Technical details: " + buildTechnicalDetails();
 }
 
 } // namespace nx::vms::server::analytics::wrappers

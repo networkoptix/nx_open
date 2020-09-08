@@ -7,21 +7,21 @@
 
 namespace nx::vms::server::analytics::wrappers {
 
-class StringBuilder
+class PluginDiagnosticMessageBuilder
 {
 public:
-    StringBuilder(
+    PluginDiagnosticMessageBuilder(
         SdkMethod sdkMethod,
         SdkObjectDescription sdkObjectDescription,
         sdk_support::Error error);
 
-    StringBuilder(
+    PluginDiagnosticMessageBuilder(
         SdkMethod sdkMethod,
         SdkObjectDescription sdkObjectDescription,
         Violation violation);
 
     QString buildLogString() const;
-    QString buildPluginInfoString() const;
+    QString buildTechnicalDetails() const;
     QString buildPluginDiagnosticEventCaption() const;
     QString buildPluginDiagnosticEventDescription() const;
 

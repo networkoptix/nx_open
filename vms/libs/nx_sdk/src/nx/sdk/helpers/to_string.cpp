@@ -5,8 +5,6 @@
 #include <nx/kit/debug.h>
 #include <nx/kit/utils.h>
 
-#include <nx/sdk/ptr.h>
-
 namespace nx {
 namespace sdk {
 

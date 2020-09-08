@@ -67,7 +67,7 @@ private:
     template<typename Error>
     QString makeErrorString(SdkMethod sdkMethod, Error error)  const
     {
-        return StringBuilder(sdkMethod, sdkObjectDescription(), std::move(error))
+        return PluginDiagnosticMessageBuilder(sdkMethod, sdkObjectDescription(), std::move(error))
             .buildPluginDiagnosticEventDescription();
     }
 

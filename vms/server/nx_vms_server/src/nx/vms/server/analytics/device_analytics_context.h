@@ -107,6 +107,7 @@ private:
     bool isEngineAlreadyBoundUnsafe(const QnUuid& engineId) const;
 
     QJsonObject prepareSettings(const QnUuid& engineId, const QJsonObject& settings);
+
     std::optional<QJsonObject> loadSettingsFromFile(
         const resource::AnalyticsEngineResourcePtr& engine) const;
 
@@ -125,7 +126,7 @@ private:
     StreamProviderRequirementsMap m_cachedStreamProviderRequirements;
 
     std::atomic<Qn::ResourceStatus> m_previousDeviceStatus{Qn::ResourceStatus::NotDefined};
-    nx::utils::FrequencyRestrictedCall<void, int, QnUuid> m_throwPluginEvent;
+    nx::utils::FrequencyRestrictedCall<void, int, QnUuid> m_reportSkippedFrames;
     std::map<QnUuid, int> m_skippedPacketCountByEngine;
     std::unique_ptr<StreamConverter> m_streamConverter;
     std::set<nx::vms::api::StreamIndex> m_registeredStreamIndexes;

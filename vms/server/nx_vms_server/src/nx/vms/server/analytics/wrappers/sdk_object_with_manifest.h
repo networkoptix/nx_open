@@ -16,7 +16,7 @@
 #include <nx/vms/server/sdk_support/error.h>
 #include <nx/vms/server/sdk_support/timed_guard.h>
 #include <nx/vms/server/event/event_connector.h>
-#include <nx/vms/server/analytics/wrappers/string_builder.h>
+#include <nx/vms/server/analytics/wrappers/plugin_diagnostic_message_builder.h>
 #include <nx/vms/server/analytics/wrappers/manifest_processor.h>
 #include <nx/vms/server/analytics/wrappers/method_timeouts.h>
 
@@ -44,7 +44,7 @@ public:
 
 public:
     std::optional<ManifestType> manifest(
-        std::unique_ptr<StringBuilder>* outStringBuilder = nullptr) const
+        std::unique_ptr<PluginDiagnosticMessageBuilder>* outStringBuilder = nullptr) const
     {
         NX_MUTEX_LOCKER lock(&m_mutex);
 
@@ -60,7 +60,7 @@ public:
             {
                 if (outStringBuilder)
                 {
-                    *outStringBuilder = std::make_unique<StringBuilder>(
+                    *outStringBuilder = std::make_unique<PluginDiagnosticMessageBuilder>(
                         SdkMethod::manifest, sdkObjectDescription(), violation);
                 }
                 handleViolation(SdkMethod::manifest, violation, /*returnValue*/ nullptr);
@@ -69,7 +69,7 @@ public:
             {
                 if (outStringBuilder)
                 {
-                    *outStringBuilder = std::make_unique<StringBuilder>(
+                    *outStringBuilder = std::make_unique<PluginDiagnosticMessageBuilder>(
                         SdkMethod::manifest, sdkObjectDescription(), error);
                 }
                 handleError(SdkMethod::manifest, error, /*returnValue*/ nullptr);
@@ -176,17 +176,17 @@ private:
         ReturnType returnValue,
         bool mustFailAssertion = false) const
     {
-        const StringBuilder stringBuilder(sdkMethod, sdkObjectDescription(), error);
+        const PluginDiagnosticMessageBuilder messageBuilder(sdkMethod, sdkObjectDescription(), error);
 
         if (mustFailAssertion)
-            NX_ASSERT(false, stringBuilder.buildLogString());
+            NX_ASSERT(false, messageBuilder.buildLogString());
         else
-            NX_DEBUG(this, stringBuilder.buildLogString());
+            NX_DEBUG(this, messageBuilder.buildLogString());
 
         throwPluginEvent(
             pluginDiagnosticEventLevel(error),
-            stringBuilder.buildPluginDiagnosticEventCaption(),
-            stringBuilder.buildPluginDiagnosticEventDescription());
+            messageBuilder.buildPluginDiagnosticEventCaption(),
+            messageBuilder.buildPluginDiagnosticEventDescription());
 
         return returnValue;
     }

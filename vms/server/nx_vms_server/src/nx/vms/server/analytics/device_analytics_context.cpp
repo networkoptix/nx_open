@@ -15,14 +15,12 @@
 
 #include <nx/vms/server/analytics/device_analytics_binding.h>
 #include <nx/vms/server/analytics/data_converter.h>
-#include <nx/vms/server/analytics/data_packet_adapter.h>
 #include <nx/vms/server/analytics/event_rule_watcher.h>
 #include <nx/vms/server/analytics/stream_converter.h>
 
 #include <nx/vms/server/sdk_support/conversion_utils.h>
 #include <nx/vms/server/sdk_support/utils.h>
 
-#include <nx/vms/server/interactive_settings/json_engine.h>
 #include <nx/vms/server/event/event_connector.h>
 
 namespace nx::vms::server::analytics {
@@ -46,7 +44,7 @@ DeviceAnalyticsContext::DeviceAnalyticsContext(
     :
     base_type(serverModule),
     m_device(device),
-    m_throwPluginEvent(
+    m_reportSkippedFrames(
         [this](int framesSkipped, QnUuid engineId)
         {
             reportSkippedFrames(framesSkipped, engineId);
@@ -122,7 +120,7 @@ void DeviceAnalyticsContext::removeEngine(const resource::AnalyticsEngineResourc
 }
 
 void DeviceAnalyticsContext::setMetadataSinks(MetadataSinkSet metadataSinks)
-{    
+{
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_metadataSinks = std::move(metadataSinks);
 
@@ -231,7 +229,7 @@ void DeviceAnalyticsContext::putData(const QnAbstractDataPacketPtr& data)
             if (m_skippedPacketCountByEngine[engineId] > 0)
             {
                 // Report skipped frames.
-                if (m_throwPluginEvent(m_skippedPacketCountByEngine[engineId], engineId))
+                if (m_reportSkippedFrames(m_skippedPacketCountByEngine[engineId], engineId))
                     m_skippedPacketCountByEngine[engineId] = 0;
             }
 

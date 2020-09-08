@@ -10,7 +10,7 @@
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/sdk_support/error.h>
 #include <nx/vms/server/event/event_connector.h>
-#include <nx/vms/server/analytics/wrappers/string_builder.h>
+#include <nx/vms/server/analytics/wrappers/plugin_diagnostic_message_builder.h>
 #include <nx/vms/server/analytics/wrappers/settings_processor.h>
 
 namespace nx::vms::server::analytics::wrappers {

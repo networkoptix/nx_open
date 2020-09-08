@@ -21,7 +21,6 @@
 #include <nx/vms/server/plugins/utility_provider.h>
 #include <nx/vms/server/sdk_support/utils.h>
 #include <nx/vms/server/sdk_support/error.h>
-#include <nx/vms/server/sdk_support/to_string.h>
 #include <nx/vms/server/analytics/wrappers/plugin.h>
 #include <nx/vms/server/discovery/discovery_common.h>
 #include <nx/vms/api/analytics/plugin_manifest.h>
@@ -340,9 +339,9 @@ bool PluginManager::processPluginEntryPointForNewSdk(
             analyticsPlugin,
             pluginInfo->libName);
 
-        std::unique_ptr<wrappers::StringBuilder> stringBuilder;
+        std::unique_ptr<wrappers::PluginDiagnosticMessageBuilder> messageBuilder;
         pluginInfo->mainInterface = MainInterface::nx_sdk_analytics_IPlugin;
-        if (const auto manifest = pluginWrapper->manifest(&stringBuilder))
+        if (const auto manifest = pluginWrapper->manifest(&messageBuilder))
         {
             pluginInfo->name = manifest->name;
             pluginInfo->description = manifest->description;
@@ -351,8 +350,8 @@ bool PluginManager::processPluginEntryPointForNewSdk(
         }
         else
         {
-            const QString errorDescription = stringBuilder
-                ? lm(": %1").args(stringBuilder->buildPluginInfoString()).toQString()
+            const QString errorDescription = messageBuilder
+                ? lm(": %1").args(messageBuilder->buildTechnicalDetails()).toQString()
                 : QString();
 
             return storeNotLoadedPluginInfo(pluginInfo, Status::notLoadedBecauseOfError,

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QString>
+
 #include <nx/vms/server/sdk_support/result_holder.h>
 #include <nx/vms/api/types/event_rule_types.h>
 #include <nx/fusion/model_functions_fwd.h>
@@ -24,6 +26,8 @@ struct Error
     }
 
     bool isOk() const { return errorCode == nx::sdk::ErrorCode::noError; }
+
+    QString toString() const;
 };
 
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(nx::sdk::ErrorCode)
