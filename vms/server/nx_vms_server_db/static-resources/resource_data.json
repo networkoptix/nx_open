@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.3.704",
+    "version": "4.1.3.705",
     "data": [
         {
             "keys": [
@@ -217,7 +217,9 @@
                 "Arecont Vision|AV20476*",
                 "Arecont Vision|AV16856*",
                 "Arecont Vision|AV4856*",
-                "Arecont Vision|AV5756*"
+                "Arecont Vision|AV5756*",
+                "Arecont Vision|AV2756*",
+                "Arecont Vision|AV12CPD*"
             ],
             "forceONVIF": true
         },
@@ -1175,7 +1177,24 @@
                 "ds-9632ni-i8|network video recorder",
                 "geovision|gv-vs2420",
                 "geovision|gv-vs21600",
-                "bosch|vip_x16_xf_e"
+                "bosch|vip_x16_xf_e",
+                "v424_6|nir a222f",
+                "ds-2cd2e20f|hikvision ds-2cd2e20f",
+                "none|nvr202-08ep",
+                "none|nvr308-32r",
+                "none|nvr301-04l-p4",
+                "none|nvr304-16ep",
+                "hangzhou hikvision digital technology co., ltd|ds-7608*",
+                "hik/ds-7108hgh-f1/n/-af-dvr--a/8-1|embedded net xvr",
+                "general|xs-xvr3108m-h1",
+                "dw-enhd16|encoder",
+                "ds-7208huhi-k2/p|kurenpolder sr2",
+                "ds-7716ni-i4(b)|keu network video recorder",
+                "onvif|dfn6732",
+                "kps|xst08",
+                "dhi-nvr4416-16p-4k|private",
+                "dw-enhd16|jhdc_dw-enhd16",
+                "dahua|x51a3e"
             ],
             "analogEncoder": true
         },
@@ -3607,7 +3626,8 @@
             "dahua|dh-ipc-pdbw8800n-a180",
             "avigilon|15c-h4a-3mh-270",
             "ms9321-ehv|vivotek ms9321-ehv",
-            "univiewtec|ipbp4k180"
+            "univiewtec|ipbp4k180",
+            "axis|axis p3719*"
             ],
             "canShareLicenseGroup": true
         },
