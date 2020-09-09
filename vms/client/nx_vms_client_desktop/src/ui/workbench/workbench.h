@@ -165,11 +165,6 @@ public:
     void setItem(Qn::ItemRole role, QnWorkbenchItem *item);
 
     /**
-     * Requests downloading of QQuickWebEngineDownloadItem.
-     */
-    Q_INVOKABLE void requestDownload(QObject* item);
-
-    /**
      * Requests showing an alert, a confirmation, or a prompt dialog from within JavaScript
      * to the user.
      */

@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtWebEngine 1.7
 import QtWebChannel 1.0
+import nx.vms.client.desktop.utils 1.0
 
 WebEngineView
 {
@@ -48,7 +49,10 @@ WebEngineView
     onFileDialogRequested: workbench.requestFileDialog(request)
     onColorDialogRequested: workbench.requestColorDialog(request)
 
-    profile: WebEngineUserProfile
+    Component.onCompleted:
+    {
+        profile = WebEngineProfileManager.getProfile(workbench ? workbench.context.userId : "")
+    }
 
     onContextMenuRequested: function(request) { request.accepted = true }
     onNewViewRequested: function(request) { url = request.requestedUrl }

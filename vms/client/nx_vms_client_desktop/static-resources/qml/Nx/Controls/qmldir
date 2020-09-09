@@ -31,4 +31,3 @@ TextField 1.0 TextField.qml
 TextFieldWithWarning 1.0 TextFieldWithWarning.qml
 ToolTip 1.0 ToolTip.qml
 WebEngineView 1.0 WebEngineView.qml
-singleton WebEngineUserProfile 1.0 WebEngineUserProfile.qml

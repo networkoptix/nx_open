@@ -31,6 +31,8 @@
 #include <common/common_module.h>
 #include <nx/vms/client/desktop/resources/layout_password_management.h>
 
+#include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
+
 #include <nx/utils/math/fuzzy.h>
 
 #include "workbench_layout_synchronizer.h"
@@ -85,6 +87,16 @@ QnWorkbench::QnWorkbench(QObject *parent):
     m_mapper = new QnWorkbenchGridMapper(this);
     m_dummyLayout = factory->create(this);
     setCurrentLayout(m_dummyLayout);
+
+    using WebEngineProfileManager = nx::vms::client::desktop::utils::WebEngineProfileManager;
+    connect(
+        WebEngineProfileManager::instance(),
+        &WebEngineProfileManager::downloadRequested,
+        this,
+        [this](QObject* item)
+        {
+            utils::WebDownloader::download(item, context());
+        });
 }
 
 QnWorkbench::~QnWorkbench() {
@@ -530,11 +542,6 @@ void QnWorkbench::at_layout_cellSpacingChanged() {
 bool QnWorkbench::isInLayoutChangeProcess() const
 {
     return m_inLayoutChangeProcess;
-}
-
-void QnWorkbench::requestDownload(QObject* item)
-{
-    utils::WebDownloader::download(item, context());
 }
 
 void QnWorkbench::requestJavaScriptDialog(QObject* request)

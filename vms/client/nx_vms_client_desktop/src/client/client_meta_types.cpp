@@ -52,6 +52,7 @@
 #include <nx/vms/client/desktop/ui/scene/instruments/instrument.h>
 #include <nx/vms/client/desktop/utils/cursor_manager.h>
 #include <network/system_description.h>
+#include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
 
 QN_DEFINE_ENUM_STREAM_OPERATORS(Qn::TimeMode)
 
@@ -214,5 +215,6 @@ void QnClientMetaTypes::registerQmlTypes()
     FocusFrameItem::registerQmlType();
     MotionRegionsItem::registerQmlType();
     GlobalToolTip::registerQmlType();
+    nx::vms::client::desktop::utils::WebEngineProfileManager::registerQmlType();
 }
 
