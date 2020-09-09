@@ -104,14 +104,14 @@ bool QuickSyncVideoDecoderOldPlayer::decode(
 
 void QuickSyncVideoDecoderOldPlayer::resetDecoder(const QnConstCompressedVideoDataPtr& /*data*/)
 {
-    NX_DEBUG(this, "Reset decoder");
-    m_impl.reset();
+    resetDecoder();
 }
 
 void QuickSyncVideoDecoderOldPlayer::resetDecoder()
 {
     NX_DEBUG(this, "Reset decoder");
-    m_impl->resetDecoder();
+    if (m_impl)
+        m_impl->resetDecoder();
 }
 
 int QuickSyncVideoDecoderOldPlayer::getWidth() const
