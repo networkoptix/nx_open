@@ -63,7 +63,7 @@ private:
     QWeakPointer<resource::AnalyticsEngineResource> m_engineResource;
     QWeakPointer<resource::Camera> m_device;
 
-    sdk::Ptr<sdk::analytics::IConsumingDeviceAgent> m_consumingDeviceAgent;
+    sdk::Ptr<sdk::analytics::IConsumingDeviceAgent0> m_consumingDeviceAgent;
 };
 
 } // namespace nx::vms::server::analytics::wrappers
