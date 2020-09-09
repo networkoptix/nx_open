@@ -17,6 +17,7 @@
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/vms/server/put_in_order_data_provider.h>
 #include "server_stream_recorder.h"
+#include <nx/utils/queued_connection_with_counter.h>
 
 class QnServerStreamRecorder;
 class QnVideoCamera;
@@ -95,6 +96,7 @@ protected: // 'protected' -> enable access for ut
 
 class QnRecordingManager:
     public QThread,
+    public nx::utils::QueuedConnectionWithCounter,
     public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT

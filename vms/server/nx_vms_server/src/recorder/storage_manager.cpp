@@ -632,10 +632,19 @@ QnStorageManager::QnStorageManager(
     m_storageWarnTimer.restart();
     m_oldStorageIndexes = deserializeStorageFile();
 
-    connect(this->serverModule()->resourcePool(), &QnResourcePool::resourceAdded,
-        this, &QnStorageManager::onNewResource, Qt::QueuedConnection);
-    connect(this->serverModule()->resourcePool(), &QnResourcePool::resourceRemoved,
-        this, &QnStorageManager::onDelResource, Qt::QueuedConnection);
+    queuedConnect(this->serverModule()->resourcePool(), &QnResourcePool::resourceAdded,
+        this,
+        [this](const QnResourcePtr& resource)
+        {
+            onNewResource(resource);
+        });
+
+    queuedConnect(this->serverModule()->resourcePool(), &QnResourcePool::resourceRemoved,
+        this,
+        [this](const QnResourcePtr& resource)
+        {
+            onDelResource(resource);
+        });
 
     if (m_role == QnServer::StoragePool::Backup)
     {

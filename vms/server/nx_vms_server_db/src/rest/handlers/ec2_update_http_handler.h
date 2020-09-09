@@ -47,6 +47,12 @@ public:
     {
     }
 
+    void setCustomAction(CustomActionFunc customAction)
+    {
+        NX_ASSERT(m_customAction == nullptr);
+        m_customAction = std::move(customAction);
+    }
+
     virtual int executeGet(
         const QString& /*path*/,
         const QnRequestParamList& /*params*/,

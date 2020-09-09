@@ -71,8 +71,10 @@ QnRecordingManager::QnRecordingManager(
     m_recordingStopTimeMs = serverModule->settings().forceStopRecordingTime();
     m_recordingStopTimeMs *= 1000;
 
-    connect(resourcePool(), &QnResourcePool::resourceAdded, this, &QnRecordingManager::onNewResource, Qt::QueuedConnection);
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this, &QnRecordingManager::onRemoveResource, Qt::QueuedConnection);
+    queuedConnect(resourcePool(), &QnResourcePool::resourceAdded,
+        this, [this](const QnResourcePtr& resource) { return onNewResource(resource); } );
+    queuedConnect(resourcePool(), &QnResourcePool::resourceRemoved,
+        this, [this](const QnResourcePtr& resource) { return onRemoveResource(resource); } );
     connect(&m_scheduleWatchingTimer, &QTimer::timeout, this, &QnRecordingManager::onTimer);
     connect(&m_licenseTimer, &QTimer::timeout, this, &QnRecordingManager::at_checkLicenses);
 }

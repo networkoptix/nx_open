@@ -62,7 +62,7 @@ public:
         auto resourcePool = launcher->serverModule()->resourcePool();
         // Some tests here add camera to VideoCameraPool manually.
         // Recording manager do the same but async. Block it.
-        resourcePool->disconnect(launcher->serverModule()->recordingManager());
+        launcher->serverModule()->recordingManager()->queuedDisconnectAll();
 
         m_camera = launcher->addCamera(2);
         m_camera->blockInitialization();

@@ -45,6 +45,7 @@
 #include <media_server/media_server_module.h>
 #include <api/helpers/chunks_request_data.h>
 #include <nx/vms/server/resource/storage_resource.h>
+#include <nx/utils/queued_connection_with_counter.h>
 
 extern "C" {
 
@@ -63,7 +64,10 @@ struct CleanupInfo;
 namespace nx { namespace analytics { namespace storage { class AbstractEventsStorage; }}}
 namespace nx::vms::server { class WritableStoragesHelper; }
 
-class QnStorageManager: public QObject, public /*mixin*/ nx::vms::server::ServerModuleAware
+class QnStorageManager:
+    public QObject,
+    public nx::utils::QueuedConnectionWithCounter,
+    public /*mixin*/ nx::vms::server::ServerModuleAware
 {
     Q_OBJECT
     friend class TestHelper;
@@ -205,7 +209,6 @@ public:
         const QnVirtualCameraResourcePtr& camera, std::chrono::milliseconds bitratePeriod) const;
     QnServer::StoragePool getRole() const;
     void forceStorageTest();
-
 signals:
     void storagesAvailable();
     void noStoragesAvailable();
@@ -323,7 +326,6 @@ private:
         const std::chrono::steady_clock::time_point startPoint) const;
 
     void testStorages();
-
 private:
     nx::analytics::db::AbstractEventsStorage* m_analyticsEventsStorage;
     const QnServer::StoragePool m_role;

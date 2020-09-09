@@ -156,6 +156,7 @@ private slots:
     void at_serverPropertyChanged(const QnResourcePtr& resource, const QString& key);
 
 private:
+    std::vector<QnStorageManager*> storageManagers() const;
     void stopObjects();
     void updateDisabledVendorsIfNeeded();
     void updateAllowCameraChangesIfNeeded();
@@ -270,6 +271,9 @@ private:
     ec2::AbstractMediaServerManagerPtr serverManager() const;
     void initializeMetaDataStorage();
 
+    void registerApiCallsPostProc();
+    template <typename DataType, typename PostProcFunc>
+    void setupPostProcForApi(ec2::ApiCommand::Value apiCommand, PostProcFunc postProcFunc);
 private:
     int m_argc = 0;
     char** m_argv = nullptr;

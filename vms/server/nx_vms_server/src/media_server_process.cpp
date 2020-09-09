@@ -314,6 +314,7 @@
 #include <nx/vms/server/metrics/server_controller.h>
 #include <nx/vms/server/metrics/storage_controller.h>
 #include <nx/vms/server/metrics/system_controller.h>
+#include <rest/handlers/ec2_update_http_handler.h>
 
 using namespace nx::vms::server;
 
@@ -728,79 +729,6 @@ StorageResourceList MediaServerProcess::processExistingStorages()
     return subtractLists(existing, tooSmall);
 }
 
-class StorageManagerWatcher
-{
-public:
-    StorageManagerWatcher(QnMediaServerModule* serverModule): m_serverModule(serverModule)
-    {
-        m_normalManagerConnection = QObject::connect(
-            serverModule->normalStorageManager(),
-            &QnStorageManager::storageAdded,
-            [this](const QnStorageResourcePtr& storage) { onAdded(storage); });
-
-        m_backupManagerConnection = QObject::connect(
-            serverModule->backupStorageManager(),
-            &QnStorageManager::storageAdded,
-            [this](const QnStorageResourcePtr& storage) { onAdded(storage); });
-    }
-
-    void waitForPopulate(const StorageResourceList& expected) const
-    {
-        using namespace std::chrono;
-        const auto expectedUrls = toUrlSet(expected);
-        const auto startTime = steady_clock::now();
-        while (true)
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            NX_MUTEX_LOCKER lock(&m_mutex);
-            if (toUrlSet(m_storages).contains(expectedUrls))
-            {
-                NX_DEBUG(
-                    typeid(MediaServerProcess),
-                    "[Storages init] All storages have been added to storage manager");
-                break;
-            }
-
-            if (steady_clock::now() - startTime > 1min)
-            {
-                NX_ERROR(
-                    typeid(MediaServerProcess),
-                    "[Storages init] Failed to add all storages to storage manager");
-                break;
-            }
-        }
-
-        QObject::disconnect(m_normalManagerConnection);
-        QObject::disconnect(m_backupManagerConnection);
-        m_serverModule->normalStorageManager()->forceStorageTest();
-        m_serverModule->backupStorageManager()->forceStorageTest();
-    }
-
-private:
-    QnMediaServerModule* m_serverModule = nullptr;
-    mutable QnMutex m_mutex;
-    StorageResourceList m_storages;
-    QMetaObject::Connection m_normalManagerConnection;
-    QMetaObject::Connection m_backupManagerConnection;
-
-    void onAdded(const QnStorageResourcePtr& storage)
-    {
-        NX_MUTEX_LOCKER lock(&m_mutex);
-        const auto storageResource = storage.dynamicCast<StorageResource>();
-        NX_ASSERT(storageResource);
-        if (!m_storages.contains(storageResource))
-            m_storages.append(storageResource);
-    }
-
-    static QSet<QString> toUrlSet(const StorageResourceList& storages)
-    {
-        QSet<QString> result;
-        for (const auto& s: storages)
-            result.insert(s->getUrl());
-        return result;
-    }
-};
-
 void MediaServerProcess::initializeMetaDataStorage()
 {
     connect(m_mediaServer.get(), &QnMediaServerResource::propertyChanged, this,
@@ -826,14 +754,17 @@ void MediaServerProcess::initStoragesAsync(QnCommonMessageProcessor* messageProc
                     m_initStoragesAsyncPromise->set_value();
                 });
 
-            const auto storageManagerWatcher = StorageManagerWatcher(serverModule());
             const auto existing = processExistingStorages();
             const auto newStorages = createStorages();
             saveStorages(newStorages);
             NX_DEBUG(
                 this, "New storages have been saved to DB. Waiting for them to appear in the "
                 "resource pool");
-            storageManagerWatcher.waitForPopulate(newStorages + existing);
+            for (const auto& manager: storageManagers())
+            {
+                manager->waitForPendingSlotsToBeFinished();
+                manager->forceStorageTest();
+            }
             initializeMetaDataStorage();
             m_storageInitializationDone = true;
         });
@@ -5156,6 +5087,45 @@ void MediaServerProcess::createResourceProcessor()
     commonModule()->resourceDiscoveryManager()->setResourceProcessor(m_serverResourceProcessor.get());
 }
 
+std::vector<QnStorageManager*> MediaServerProcess::storageManagers() const
+{
+    return {serverModule()->normalStorageManager(), serverModule()->backupStorageManager() };
+}
+
+template <typename DataType, typename PostProcFunc>
+void MediaServerProcess::setupPostProcForApi(ec2::ApiCommand::Value apiCommand, PostProcFunc postProcFunc)
+{
+    auto handlers = m_universalTcpListener->processorPool();
+    QnRestRequestHandlerPtr handler = handlers->findHandler(
+        "POST", NX_FMT("ec2/%1", QnLexical::serialized(apiCommand)));
+    auto httpHandler = handler.dynamicCast<ec2::UpdateHttpHandler<DataType>>();
+    if (NX_ASSERT(httpHandler))
+        httpHandler->setCustomAction(postProcFunc);
+};
+
+void MediaServerProcess::registerApiCallsPostProc()
+{
+    auto waitForStorageRemoval =
+        [this](const auto& /*data*/)
+        {
+            for (const auto& manager: storageManagers())
+                manager->waitForPendingSlotsToBeFinished();
+        };
+
+    auto waitForCameraUpdated =
+        [this](const auto& /*data*/)
+        {
+            serverModule()->recordingManager()->waitForPendingSlotsToBeFinished();
+        };
+
+    using namespace nx::vms::api;
+    setupPostProcForApi<IdData>(ec2::ApiCommand::removeStorage, waitForStorageRemoval);
+    setupPostProcForApi<IdDataList>(ec2::ApiCommand::removeStorages, waitForStorageRemoval);
+
+    setupPostProcForApi<CameraData>(ec2::ApiCommand::saveCamera, waitForCameraUpdated);
+    setupPostProcForApi<CameraDataList>(ec2::ApiCommand::saveCameras, waitForCameraUpdated);
+}
+
 void MediaServerProcess::run()
 {
     // All managers use QnConcurent with blocking tasks, this hack is required to avoid delays.
@@ -5283,6 +5253,7 @@ void MediaServerProcess::run()
     }
 
     m_ec2ConnectionFactory->registerRestHandlers(m_universalTcpListener->processorPool());
+    registerApiCallsPostProc();
 
     m_multicastHttp = std::make_unique<QnMulticast::HttpServer>(
         commonModule()->moduleGUID().toQUuid(), m_universalTcpListener.get());
