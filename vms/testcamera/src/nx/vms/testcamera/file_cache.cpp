@@ -70,6 +70,13 @@ bool FileCache::loadVideoFrames(
         ++frameIndex;
     }
 
+    if (frameIndex == 0)
+    {
+        NX_LOGGER_ERROR(m_logger, "No video frames found in the file.");
+        return false;
+    }
+
+    NX_ASSERT(!channelNumbers->empty());
     return true;
 }
 
