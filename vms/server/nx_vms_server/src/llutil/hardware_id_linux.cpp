@@ -81,8 +81,8 @@ void findMacAddresses(QnMacAndDeviceClassList& devices) {
         if (!addressFile.open(QFile::ReadOnly))
             continue;
 
-        QString mac = QString(addressFile.readAll()).trimmed().toUpper();
-        if (mac.remove(QRegularExpression("[:0]+")).isEmpty())
+        const QString mac = QString(addressFile.readAll()).trimmed().toUpper();
+        if (QString copy = mac; copy.remove(QRegularExpression("[:0]+")).isEmpty())
             continue;
 
         QFileInfo subsystemFileInfo(interfacesDir, interface + "/device/subsystem");
