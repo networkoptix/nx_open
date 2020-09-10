@@ -37,10 +37,10 @@ struct NX_VMS_API SettingsData
 {
     /**
      * Defines the scope for sequenceNumber: when the Client receives the instance with the new
-     * sessionId (different to the previous one), it must reset its stored sequenceNumber.     
+     * sessionId (different to the previous one), it must reset its stored sequenceNumber.
      */
     QnUuid sessionId;
-    
+
     /**
      * Used to prevent older transactions from overwriting the newer ones: when the Client receives
      * the instance with sequenceNumber less that the one of the previosly received instance with
