@@ -16,7 +16,7 @@ static const QByteArray kCameraAttributesData = /*suppress newline*/ 1 + (const 
     "dewarpingParams": "",
     "disableDualStreaming": false,
     "failoverPriority": "Medium",
-    "licenseUsed": true,
+    "licenseUsed": false,
     "logicalId": "1",
     "maxArchiveDays": -30,
     "minArchiveDays": -1,
