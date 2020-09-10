@@ -5167,7 +5167,10 @@ void MediaServerProcess::run()
         cmdLineArguments().rwConfigFilePath);
 
     if (m_serviceMode)
+    {
         initializeLogging(serverSettings.get());
+        NX_INFO(this, "IniConfig iniFilesDir: %1",  nx::kit::IniConfig::iniFilesDir());
+    }
 
     // This must be done before QnCommonModule instantiation.
     nx::utils::OsInfo::override(
