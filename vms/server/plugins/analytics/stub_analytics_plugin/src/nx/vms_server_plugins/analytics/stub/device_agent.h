@@ -262,6 +262,7 @@ const std::string kSoundRelatedEventGroup = "nx.stub.soundRelated";
 const std::string kBlinkingObjectType = "nx.stub.blinkingObject";
 const std::string kFixedObjectType = "nx.stub.fixedObject";
 const std::string kCounterObjectType = "nx.stub.counter";
+const std::string kAdditionalEventType = "nx.stub.additionalEvent1";
 
 } // namespace stub
 } // namespace analytics

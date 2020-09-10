@@ -5,6 +5,7 @@
 
 #include <QtCore/QMap>
 
+#include <utils/common/connective.h>
 #include <core/resource/resource_fwd.h>
 
 #include <nx/analytics/types.h>
@@ -36,7 +37,7 @@ class QnAbstractDataReceptor;
 namespace nx::vms::server::analytics {
 
 class MetadataHandler:
-    public QObject,
+    public Connective<QObject>,
     public ServerModuleAware
 {
     Q_OBJECT
@@ -93,6 +94,8 @@ private:
 
     void pushObjectMetadataToSinks(
         const nx::common::metadata::ObjectMetadataPacketPtr& packet);
+
+    void at_compatibleEventTypesMaybeChanged(const QnVirtualCameraResourcePtr& device);
 
 private:
     nx::Mutex m_mutex;

@@ -101,6 +101,12 @@ static const std::vector<EventDescriptor> kEventsToFire = {
         "Gunshot - group impulse event (caption)",
         "Gunshot - group impulse event (description)",
         EventContinuityType::impulse
+    },
+    {
+        kAdditionalEventType,
+        "Caption: Additional Event",
+        "Description: Additional Event",
+        EventContinuityType::impulse
     }
 };
 
@@ -147,7 +153,7 @@ std::string DeviceAgent::manifestString() const
 {
     static const std::string kAdditionalEventTypes = R"json(,
         {
-            "id": "nx.stub.additionalEvent1",
+            "id": ")json" + kAdditionalEventType + R"json(",
             "name": "Additional event 1"
         },
         {

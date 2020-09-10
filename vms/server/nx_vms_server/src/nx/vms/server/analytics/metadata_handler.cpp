@@ -92,6 +92,10 @@ MetadataHandler::MetadataHandler(
     m_needToAutoGenerateBestShots = !engineManifest.capabilities.testFlag(
         EngineManifest::Capability::noAutoBestShots);
 
+    connect(
+        m_resource.get(), &QnVirtualCameraResource::compatibleEventTypesMaybeChanged,
+        this, &MetadataHandler::at_compatibleEventTypesMaybeChanged);
+
     connect(this,
         &MetadataHandler::sdkEventTriggered,
         serverModule->eventConnector(),
@@ -101,6 +105,7 @@ MetadataHandler::MetadataHandler(
 
 MetadataHandler::~MetadataHandler()
 {
+    disconnect(this);
     m_objectTrackBestShotResolver.stop();
 }
 
@@ -471,6 +476,13 @@ void MetadataHandler::setLastEventState(
     const QString& eventTypeId, nx::vms::api::EventState eventState)
 {
     m_eventStateMap[eventTypeId] = eventState;
+}
+
+void MetadataHandler::at_compatibleEventTypesMaybeChanged(
+    const QnVirtualCameraResourcePtr& /*device*/)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_eventTypeDescriptors.reset();
 }
 
 } // namespace analytics
