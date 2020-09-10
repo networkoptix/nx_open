@@ -152,7 +152,8 @@ void Monitor::addRules(
 {
     removeRules();
 
-    nx::axis::CameraController cameraController(m_url.host().toLatin1(),
+    nx::axis::CameraController cameraController(
+        NX_FMT("%1:%2", m_url.host(), m_url.port(80)).toQString().toLatin1(),
         m_auth.user().toLatin1(), m_auth.password().toLatin1());
 
     std::string fullPath =
@@ -204,7 +205,8 @@ void Monitor::addRules(
 
 void Monitor::removeRules()
 {
-    nx::axis::CameraController cameraController(m_url.host().toLatin1(),
+    nx::axis::CameraController cameraController(
+        NX_FMT("%1:%2", m_url.host(), m_url.port(80)).toQString().toLatin1(),
         m_auth.user().toLatin1(), m_auth.password().toLatin1());
 
     int rulesRemoved = cameraController.removeAllActiveRules(kRuleNamePrefix.c_str());
