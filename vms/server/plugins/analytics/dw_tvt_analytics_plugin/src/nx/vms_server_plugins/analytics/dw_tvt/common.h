@@ -22,6 +22,7 @@ struct EventType: nx::vms::api::analytics::EventType
 
 struct EngineManifest: nx::vms_server_plugins::utils::analytics::EngineManifestBase
 {
+    QList<QString> supportedCameraVendors; //< Proprietary. Camera vendors supported by this plugin.
     QList<QString> supportedCameraModels; //< Proprietary. Camera models supported by this plugin.
     QList<QString> partlySupportedCameraModels; //< Proprietary. Camera models supported by this plugin.
     QList<EventType> eventTypes;
@@ -32,7 +33,7 @@ struct EngineManifest: nx::vms_server_plugins::utils::analytics::EngineManifestB
     QList<QString> eventTypeIdListForModel(const QString& model) const noexcept;
 };
 #define DwTvtEngineManifest_Fields EngineManifestBase_Fields \
-    (supportedCameraModels)(partlySupportedCameraModels)(eventTypes)
+    (supportedCameraVendors)(supportedCameraModels)(partlySupportedCameraModels)(eventTypes)
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES((EventType)(EngineManifest), (json))
 

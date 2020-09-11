@@ -15,7 +15,7 @@ namespace nx::vms_server_plugins::analytics::dw_tvt {
 class Engine: public nx::sdk::RefCountable<nx::sdk::analytics::IEngine>
 {
 public:
-    Engine(nx::sdk::analytics::Plugin* plugin);
+    Engine(nx::sdk::analytics::Plugin* plugin, const std::string& manifestNameSuffix = "manifest");
 
     virtual void setEngineInfo(const nx::sdk::analytics::IEngineInfo* engineInfo) override;
 

@@ -1,0 +1,75 @@
+{
+    "_comment": "This manifest contains unused event types that may be used in future with some vendors",
+    "capabilities": "deviceDependent",
+    "supportedCameraVendors": [],
+    "supportedCameraModels": [],
+    "ignoredEventTypes": [
+        {
+            "id": "nx.dw_tvt.SENSOR",
+            "name": "Sensor Alarm",
+            "flags": "stateDependent",
+            "internalName": "SENSOR",
+            "alarmName": "sensorAlarmIn",
+            "_comment": "Notification from camera external sensor"
+        },
+        {
+            "id": "nx.dw_tvt.VFD",
+            "name": "Video Face Detection [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "VFD",
+            "alarmName": "vfdAlarm",
+            "_comment": "There is also VFD_MATCH event and it is also should be ignored",
+            "group": 1
+        },
+        {
+            "id": "nx.dw_tvt.CDD",
+            "name": "Crowd Density [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "CDD",
+            "alarmName": "cddAlarm",
+            "group": 1
+        },
+        {
+            "id": "nx.dw_tvt.CPC",
+            "name": "Cross-line People Counting [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "CPC",
+            "alarmName": "cpcAlarm",
+            "group": 1
+        },
+        {
+            "id": "nx.dw_tvt.IPD",
+            "name": "Intruding People Detection [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "IPD",
+            "alarmName": "ipdAlarm",
+            "group": 1
+        },
+        {
+            "id": "nx.dw_tvt.OSC",
+            "name": "Object Status Changed [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "OSC",
+            "alarmName": "oscAlarm",
+            "group": 1
+        },
+        {
+            "id": "nx.dw_tvt.VEHICE",
+            "name": "_Vehicle information [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "VEHICE",
+            "alarmName": "vehicleAlarm",
+            "_comment": "alarmName will be probably changed",
+            "group": 1
+        },
+        {
+            "id": "nx.dw_tvt.TRAFFIC",
+            "name": "_Traffic information [exclusive]",
+            "flags": "stateDependent",
+            "internalName": "TRAFFIC",
+            "alarmName": "trafficAlarm",
+            "_comment": "alarmName will be probably changed",
+            "group": 1
+        }
+    ]
+}

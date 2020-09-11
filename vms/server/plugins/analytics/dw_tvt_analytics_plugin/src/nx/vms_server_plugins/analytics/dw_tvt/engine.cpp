@@ -17,17 +17,6 @@ namespace nx::vms_server_plugins::analytics::dw_tvt {
 
 namespace {
 
-static const QStringList kDwTvtVendors{
-    "tvt", // vendor name received with manual discovery
-    "ipc", // vendor name received with auto discovery
-    "customer", // temporary enabled vendor name for pre-release devices
-    "digitalwatchdog"
-};
-
-// Just for information:
-// DW VCA camera's vendor string is "cap",
-// DW TVT camera's vendor string is "tvt" or "ipc" or (temporarily?) "customer"
-
 QString toLowerSpaceless(const QString& name)
 {
     QString result = name.toLower().simplified();
@@ -40,15 +29,15 @@ QString toLowerSpaceless(const QString& name)
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(Plugin* plugin): m_plugin(plugin)
+Engine::Engine(Plugin* plugin, const std::string& manifestName): m_plugin(plugin)
 {
-    static const char* const kResourceName=":/dw_tvt/manifest.json";
-    static const char* const kFileName = "plugins/dw_tvt/manifest.json";
-    QFile f(kResourceName);
+    static const QString kResourceNamePattern=":/dw_tvt/%1.json";
+    static const QString kFileNamePattern = "plugins/dw_tvt/%1.json";
+    QFile f(kResourceNamePattern.arg(QString::fromStdString(manifestName)));
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
     {
-        QFile file(kFileName);
+        QFile file(kFileNamePattern.arg(QString::fromStdString(manifestName)));
         if (file.open(QFile::ReadOnly))
         {
             NX_PRINT << "Switch to external manifest file "
@@ -110,7 +99,8 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
     const auto vendor = toLowerSpaceless(QString(deviceInfo->vendor()));
     const auto model = toLowerSpaceless(QString(deviceInfo->model()));
 
-    if (std::none_of(kDwTvtVendors.begin(), kDwTvtVendors.end(),
+    if (std::none_of(m_typedManifest.supportedCameraVendors.begin(),
+        m_typedManifest.supportedCameraVendors.end(),
         [&vendor](const QString& v) { return vendor.startsWith(v); }))
     {
         NX_PRINT << "Unsupported camera vendor: "
@@ -131,28 +121,61 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 
 namespace {
 
-static const std::string kPluginManifest = /*suppress newline*/ 1 + (const char*) R"json(
+static const std::string kTvtPluginManifest = /*suppress newline*/ 1 + (const char*) R"json(
 {
     "id": "nx.dw_tvt",
     "name": "DW TVT analytics plugin",
     "description": "Supports built-in analytics on Digital Watchdog TVT cameras (TD-9xxxE3 series and DWC-Mx94Wixxx series)",
-    "version": "1.0.0"
+    "version": "1.0.1"
 }
 )json";
+
+static const std::string kProvisionPluginManifest = /*suppress newline*/ 1 + (const char*)R"json(
+{
+    "id": "nx.provision_isr",
+    "name": "Provision ISR analytics plugin",
+    "description": "Supports built-in analytics on Provision ISR cameras (340IPE / 341IPE series)",
+    "version": "1.0.1"
+}
+)json";
+
+static const std::string kTvtManifestName = "manifest_tvt";
+static const std::string kProvisionManifestName = "manifest_provision";
+
+enum VendorIndex: int {tvtVendor = 0, provisionVendor = 1};
 
 } // namespace
 
 extern "C" {
 
+NX_PLUGIN_API nx::sdk::IPlugin* createNxPluginByIndex(int index)
+{
+    switch (index)
+    {
+        case tvtVendor:
+            return new nx::sdk::analytics::Plugin(
+                kTvtPluginManifest,
+                [](nx::sdk::analytics::Plugin* plugin)
+                {
+                    return new nx::vms_server_plugins::analytics::dw_tvt::Engine(
+                        plugin, kTvtManifestName);
+                });
+        case provisionVendor:
+            return new nx::sdk::analytics::Plugin(
+                kProvisionPluginManifest,
+                [](nx::sdk::analytics::Plugin* plugin)
+                {
+                    return new nx::vms_server_plugins::analytics::dw_tvt::Engine(
+                        plugin, kProvisionManifestName);
+                });
+        default:
+            return nullptr;
+    }
+}
+
 NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
-    return new nx::sdk::analytics::Plugin(
-        kPluginManifest,
-        [](nx::sdk::analytics::IPlugin* plugin)
-        {
-            return new nx::vms_server_plugins::analytics::dw_tvt::Engine(
-                dynamic_cast<nx::sdk::analytics::Plugin*>(plugin));
-        });
+    return createNxPluginByIndex(0);
 }
 
 } // extern "C"
