@@ -36,6 +36,7 @@ Engine::Engine(Plugin* plugin):
     nx::sdk::analytics::Engine(NX_DEBUG_ENABLE_OUTPUT),
     m_plugin(plugin)
 {
+    obtainServerSdkVersion();
     obtainPluginHomeDir();
     initCapabilities();
 
@@ -107,10 +108,21 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
     *outResult = new DeviceAgent(this, deviceInfo);
 }
 
+void Engine::obtainServerSdkVersion()
+{
+    const auto utilityProvider = m_plugin->utilityProvider();
+    if (!NX_KIT_ASSERT(utilityProvider))
+        return;
+
+    auto serverSdkVersion = utilityProvider->serverSdkVersion();
+    NX_PRINT << "SDK version built into the Server: " << nx::kit::utils::toString(serverSdkVersion);
+}
+
 void Engine::obtainPluginHomeDir()
 {
     const auto utilityProvider = m_plugin->utilityProvider();
-    NX_KIT_ASSERT(utilityProvider);
+    if (!NX_KIT_ASSERT(utilityProvider))
+        return;
 
     m_pluginHomeDir = utilityProvider->homeDir();
 

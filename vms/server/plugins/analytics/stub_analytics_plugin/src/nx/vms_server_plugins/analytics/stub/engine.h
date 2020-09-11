@@ -56,6 +56,7 @@ protected:
         nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult) const override;
 
 private:
+    void obtainServerSdkVersion();
     void obtainPluginHomeDir();
     void initCapabilities();
     void generatePluginDiagnosticEvents();
