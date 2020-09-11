@@ -517,7 +517,7 @@ static PlatformMonitor::PartitionType getPartitionType(const QString& driveName)
 {
     switch (GetDriveType(reinterpret_cast<LPCWSTR>(driveName.constData())))
     {
-        case DRIVE_NO_ROOT_DIR: throw std::runtime_error("Failed to determine drive type");
+        case DRIVE_NO_ROOT_DIR: return PlatformMonitor::UnknownPartition;
         case DRIVE_REMOVABLE: return PlatformMonitor::RemovableDiskPartition;
         case DRIVE_FIXED: return PlatformMonitor::LocalDiskPartition;
         case DRIVE_REMOTE: return PlatformMonitor::NetworkPartition;
@@ -538,7 +538,7 @@ static std::tuple<int64_t, int64_t> getSpaceInfo(const QString& driveName)
     if (!GetDiskFreeSpaceEx(
         (LPCWSTR) driveName.constData(), &bytesAvailable, &bytesTotal, &bytesFree))
     {
-        throw std::runtime_error("Failed to get space information");
+        return std::make_tuple(-1, -1);
     }
 
     return std::make_tuple(bytesTotal.QuadPart, bytesFree.QuadPart);
@@ -546,25 +546,13 @@ static std::tuple<int64_t, int64_t> getSpaceInfo(const QString& driveName)
 
 static std::optional<PlatformMonitor::PartitionSpace> getPartitionInfo(const QString& driveName)
 {
-    try
-    {
-        PlatformMonitor::PartitionSpace result;
-        result.path = driveName;
-        result.devName = driveName;
-        result.type = getPartitionType(driveName);
-        std::tie(result.sizeBytes, result.freeBytes) = getSpaceInfo(driveName);
+    PlatformMonitor::PartitionSpace result;
+    result.path = driveName;
+    result.devName = driveName;
+    result.type = getPartitionType(driveName);
+    std::tie(result.sizeBytes, result.freeBytes) = getSpaceInfo(driveName);
 
-        return result;
-    }
-    catch (const std::exception& e)
-    {
-        NX_WARNING(
-            typeid(QnWindowsMonitor),
-            "Error '%1' while fetching volume information for '%2'",
-            e.what(), driveName);
-
-        return std::nullopt;
-    }
+    return result;
 }
 
 } // <anonymous>
