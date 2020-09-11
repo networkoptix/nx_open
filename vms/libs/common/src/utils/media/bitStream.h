@@ -62,6 +62,7 @@ public:
     void skipBits(uint32_t num);
     void skipBytes(uint32_t num);
     void skipBit();
+    void readData(uint8_t* data, int size);
     inline uint32_t getBitsCount() const  {return (uint32_t)(m_buffer - m_initBuffer) * INT_BIT + INT_BIT - m_bitLeft;}
     inline int bitsLeft() const { return m_totalBits; }
 

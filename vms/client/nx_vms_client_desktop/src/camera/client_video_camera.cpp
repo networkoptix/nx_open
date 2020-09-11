@@ -173,7 +173,7 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
         {
             archiveReader->setQuality(MEDIA_Quality_ForceHigh, true); // for 'mkv' and 'avi' files
             // Additing filtering is required in case of.AVI export.
-            archiveReader->addMediaFilter(std::make_shared<H264Mp4ToAnnexB>());
+            archiveReader->addMediaFilter(std::make_shared<H2645Mp4ToAnnexB>());
             archiveReader->setPlaybackMask(playbackMask);
         }
 

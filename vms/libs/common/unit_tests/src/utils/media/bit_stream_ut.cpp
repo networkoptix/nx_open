@@ -39,6 +39,61 @@ TEST(BitStream, bufferOverflow)
     }
 }
 
+TEST(BitStream, readBytes)
+{
+    {
+        uint8_t data[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07};
+        BitStreamReader reader(data, data + sizeof(data));
+
+        uint8_t readData[4] = {0};
+        reader.readData(readData, sizeof(readData));
+        ASSERT_EQ(readData[0], 0x00);
+        ASSERT_EQ(readData[1], 0x01);
+        ASSERT_EQ(readData[2], 0x02);
+        ASSERT_EQ(readData[3], 0x03);
+        ASSERT_EQ(reader.getBits(4), 0x00);
+        ASSERT_EQ(reader.getBits(4), 0x04);
+    }
+
+    {
+        uint8_t data[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07};
+        BitStreamReader reader(data, data + sizeof(data));
+
+        reader.getBits(8);
+        uint8_t readData[2] = {0};
+        reader.readData(readData, sizeof(readData));
+        ASSERT_EQ(readData[0], 0x01);
+        ASSERT_EQ(readData[1], 0x02);
+        ASSERT_EQ(reader.getBits(4), 0x00);
+        ASSERT_EQ(reader.getBits(4), 0x03);
+    }
+    {
+        uint8_t data[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07};
+        BitStreamReader reader(data, data + sizeof(data));
+
+        reader.getBits(16);
+        uint8_t readData[2] = {0};
+        reader.readData(readData, sizeof(readData));
+        ASSERT_EQ(readData[0], 0x02);
+        ASSERT_EQ(readData[1], 0x03);
+        ASSERT_EQ(reader.getBits(4), 0x00);
+        ASSERT_EQ(reader.getBits(4), 0x04);
+    }
+    {
+        uint8_t data[] = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07};
+        BitStreamReader reader(data, data + sizeof(data));
+
+        reader.getBits(16);
+        uint8_t readData[4] = {0};
+        reader.readData(readData, sizeof(readData));
+        ASSERT_EQ(readData[0], 0x02);
+        ASSERT_EQ(readData[1], 0x03);
+        ASSERT_EQ(readData[2], 0x04);
+        ASSERT_EQ(readData[3], 0x05);
+        ASSERT_EQ(reader.getBits(4), 0x00);
+        ASSERT_EQ(reader.getBits(4), 0x06);
+    }
+}
 
 TEST(BitStream, write)
 {

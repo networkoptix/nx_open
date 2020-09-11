@@ -29,6 +29,7 @@ public:
     virtual Capabilities capabilities() const override;
 
 private:
+    // Should be shared due to output frames keep reference to decoder.
     std::shared_ptr<QuickSyncVideoDecoderImpl> m_impl;
 };
 

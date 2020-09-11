@@ -271,7 +271,6 @@ void QuickSyncVideoDecoderImpl::clearData()
     m_dtsQueue.clear();
 }
 
-
 std::unique_ptr<mfxBitstream> QuickSyncVideoDecoderImpl::updateBitStream(
     const QnConstCompressedVideoDataPtr& frame)
 {
@@ -315,7 +314,7 @@ int QuickSyncVideoDecoderImpl::decode(
     {
         // The filter keeps same frame in case of filtering is not required or
         // it is not the H264 codec.
-        H264Mp4ToAnnexB filter; // TODO Support H265
+        H2645Mp4ToAnnexB filter;
         frameAnnexB = std::dynamic_pointer_cast<const QnCompressedVideoData>(
             filter.processData(frame));
         if (!frameAnnexB)

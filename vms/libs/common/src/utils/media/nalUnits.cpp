@@ -449,7 +449,7 @@ int PPSUnit::deserializeID(quint8* buffer, quint8* end)
     try {
         pic_parameter_set_id = extractUEGolombCode();
     }
-    catch(BitStreamException) {
+    catch (BitStreamException&) {
         return NOT_ENOUGHT_BUFFER;
     }
 }
@@ -544,7 +544,7 @@ int PPSUnit::deserialize()
 
         m_ready = true;
         return 0;
-    } catch (BitStreamException) {
+    } catch (BitStreamException&) {
         return NOT_ENOUGHT_BUFFER;
     }
 }
@@ -686,7 +686,7 @@ int SPSUnit::deserialize()
         //m_pulldown = ((abs(getFPS() - 23.97) < FRAME_RATE_EPS) || (abs(getFPS() - 59.94) < FRAME_RATE_EPS)) && pic_struct_present_flag;
 
         return 0;
-    } catch (BitStreamException) {
+    } catch (BitStreamException& ) {
         return NOT_ENOUGHT_BUFFER;
     }
 }
@@ -1246,7 +1246,7 @@ int SliceUnit::deserializeSliceHeader(const SPSUnit* sps, const PPSUnit* pps)
 
 #endif
         return 0;
-    } catch(BitStreamException) {
+    } catch (BitStreamException&) {
         return NOT_ENOUGHT_BUFFER;
     }
 }
@@ -1560,7 +1560,7 @@ int SliceUnit::serializeSliceHeader(BitStreamWriter& bitWriter, const QMap<quint
         }
 
         return 0;
-    } catch(BitStreamException& e) {
+    } catch (BitStreamException& e) {
         return NOT_ENOUGHT_BUFFER;
     }
 }
@@ -1682,7 +1682,7 @@ void SEIUnit::deserialize(SPSUnit& sps, int orig_hrd_parameters_present_flag)
             m_processedMessages.insert(payloadType);
             curBuff += payloadSize;
         }
-    } catch (BitStreamException) {
+    } catch (BitStreamException& ) {
         qWarning() << "Bad SEI detected. SEI too short";
     }
     return;

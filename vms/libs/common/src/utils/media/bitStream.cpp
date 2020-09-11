@@ -104,6 +104,20 @@ void BitStreamReader::setBuffer(const uint8_t* buffer, const uint8_t* end)
     m_bitLeft = INT_BIT;
 }
 
+void BitStreamReader::readData(uint8_t* data, int size)
+{
+    NX_ASSERT(m_bitLeft % 8 == 0);
+
+    uint32_t numBits = size * 8;
+    if (m_totalBits < numBits)
+        THROW_BITSTREAM_ERR;
+
+    int bytesUsed = (INT_BIT - m_bitLeft) / 8;
+    uint8_t* buffer = (uint8_t*)m_buffer + bytesUsed;
+    memcpy(data, buffer, size);
+    skipBytes(size);
+}
+
 uint32_t BitStreamReader::getBits(uint32_t num)
 {
     if (num > INT_BIT)

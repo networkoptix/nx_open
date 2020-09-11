@@ -230,7 +230,7 @@ DataSourceContextPtr StreamingChunkTranscoder::prepareDataSourceContext(
             return nullptr;
 
         dataSourceCtx->mediaDataProvider = AbstractOnDemandDataProviderPtr(
-            new FilteredOnDemandDataProvider(mediaDataProvider, std::make_shared<H264Mp4ToAnnexB>()));
+            new FilteredOnDemandDataProvider(mediaDataProvider, std::make_shared<H2645Mp4ToAnnexB>()));
     }
 
     if (!dataSourceCtx->transcoder)
