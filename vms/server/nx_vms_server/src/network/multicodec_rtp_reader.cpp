@@ -344,6 +344,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextDataInternal()
                 processCameraTimeHelperEvent(event);
             }
         ).count();
+        track.onvifExtensionTimestamp.reset();
         result->channelNumber = track.logicalChannelNum;
         if (result->dataType == QnAbstractMediaData::VIDEO)
         {
