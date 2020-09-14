@@ -397,5 +397,5 @@ bool QnRemotePtzController::getData(
     params.insert("query", QnLexical::serialized(query));
     params.insert("type", QnLexical::serialized(options.type));
     auto helper = makeDeserializationHelper<QnPtzData>();
-    return sendRequest(Qn::GetDataPtzCommand, params, nx::Buffer(), options);
+    return sendRequest(Qn::GetDataPtzCommand, params, nx::Buffer(), options, helper);
 }
