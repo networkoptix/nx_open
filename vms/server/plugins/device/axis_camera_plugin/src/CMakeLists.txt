@@ -19,7 +19,11 @@ target_link_libraries(axis_camera_plugin PRIVATE
 target_include_directories(axis_camera_plugin PRIVATE ../../../src) #< SDK headers.
 
 if(WIN32)
-#    string(APPEND CMAKE_CXX_FLAGS " /MP") #< Use all CPU cores by MSVC.
+    # Use all CPU cores by MSVC.
+    string(APPEND CMAKE_CXX_FLAGS " /MP")
+    # Do not create separate .pdb files for object files (workaround for mspdbsrv.exe bug, needed
+    # for using "/MP" flag).
+    add_compile_options("/Z7")
     target_compile_definitions(axis_camera_plugin PRIVATE _CRT_SECURE_NO_WARNINGS)
 endif()
 
