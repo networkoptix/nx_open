@@ -421,7 +421,7 @@ private:
     }
 };
 
-TEST_F(FtClearSpace, ClearSpaceWontCalledUntilAllStoragesAddedToStorageManager)
+TEST_F(FtClearSpace, DISABLED_ClearSpaceWontCalledUntilAllStoragesAddedToStorageManager)
 {
     initDelay = 10s;
     storageCount = 1;
