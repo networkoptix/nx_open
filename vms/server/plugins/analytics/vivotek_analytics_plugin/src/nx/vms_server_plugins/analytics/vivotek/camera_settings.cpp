@@ -28,6 +28,13 @@ using namespace nx::network;
 
 namespace {
 
+const int kMaxExcludedRegionCount = 50; // Arbitrary big value.
+const int kMaxDetectionRuleCount = 5; // Defined in user manual.
+
+const int kMinRegionVertices = 3;
+const int kMaxRegionVertices = 20; // Defined in user manual.
+const int kLineVertices = 3;
+
 struct VcaParserFromCamera
 {
     using Vca = CameraSettings::Vca;
@@ -36,7 +43,7 @@ struct VcaParserFromCamera
     JsonObject analyticEngineConfig;
     JsonObject ruleEngineConfig;
 
-    void parse(std::vector<Point>* value, const JsonValue& json) const
+    static void parse(std::vector<Point>* value, const JsonValue& json)
     {
         const auto subField = json.to<JsonArray>();
         value->resize(subField.count());
@@ -44,12 +51,12 @@ struct VcaParserFromCamera
             (*value)[i] = CameraVcaParameterApi::parsePoint(subField[i]);
     }
 
-    void parse(Polygon* value, const JsonValue& json) const
+    static void parse(Polygon* value, const JsonValue& json)
     {
         parse(static_cast<std::vector<Point>*>(value), json);
     }
 
-    void parse(Line* value, const JsonValue& json) const
+    static void parse(Line* value, const JsonValue& json)
     {
         parse(static_cast<std::vector<Point>*>(value), json);
     }
@@ -318,6 +325,8 @@ struct VcaSerializerToCamera
     JsonObject analyticEngineConfig;
     JsonObject ruleEngineConfig;
 
+    Polygon boundary;
+
     template <typename Json, typename Key>
     void serializeValue(Json* json, const Key& key, const std::vector<Point>& value)
     {
@@ -332,13 +341,22 @@ struct VcaSerializerToCamera
     template <typename Json, typename Key>
     void serializeValue(Json* json, const Key& key, const Polygon& value)
     {
-        serializeValue(json, key, static_cast<const std::vector<Point>&>(value));
+        const auto clippedValue = value.clipped(boundary).simplified(kMaxRegionVertices);
+        if (clippedValue.empty())
+            throw Exception("Specified rule region is entirely outside of people detection area");
+
+        serializeValue(json, key, static_cast<const std::vector<Point>&>(clippedValue));
     }
 
     template <typename Json, typename Key>
     void serializeValue(Json* json, const Key& key, const Line& value)
     {
-        serializeValue(json, key, static_cast<const std::vector<Point>&>(value));
+        auto clippedValue = value.clipped(boundary).simplified(kLineVertices);
+        if (clippedValue.empty())
+            throw Exception("Specified rule line is entirely outside of people detection area");
+
+        clippedValue = clippedValue.subdivided(kLineVertices);
+        serializeValue(json, key, static_cast<const std::vector<Point>&>(clippedValue));
     }
 
     template <typename Json, typename Key>
@@ -663,6 +681,8 @@ void storeToCamera(const Url& cameraUrl,
     api.fetch("Config/AE").get().to(&serializer.analyticEngineConfig);
     api.fetch("Config/RE").get().to(&serializer.ruleEngineConfig);
 
+    VcaParserFromCamera::parse(&serializer.boundary, api.fetch("Camera/Fov").get()["Fov"]);
+
     serializer.serialize(vca);
 
     api.store("Config/AE", serializer.analyticEngineConfig).get();
@@ -688,12 +708,6 @@ void storeToCamera(const Url& cameraUrl, CameraSettings* settings)
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
-const int kMaxExcludedRegionCount = 50; // Arbitrary big value.
-const int kMaxDetectionRuleCount = 5; // Defined in user manual.
-
-const int kMinRegionVertices = 3;
-const int kMaxRegionVertices = 20; // Defined in user manual.
 
 const QString kVcaSensitivity = "Vca.Sensitivity";
 
@@ -1711,8 +1725,8 @@ QJsonObject serializeModel(const CameraSettings::Vca::LineCrossingDetection& det
                             {"name", kVcaLineCrossingDetectionLine},
                             {"type", "LineFigure"},
                             {"caption", "Name"},
-                            {"minPoints", 3},
-                            {"maxPoints", 3},
+                            {"minPoints", kLineVertices},
+                            {"maxPoints", kLineVertices},
                         },
                     }},
                 }},
