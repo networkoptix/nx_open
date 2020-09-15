@@ -13,7 +13,7 @@ target_include_directories(test_storage_plugin PRIVATE ${CMAKE_CURRENT_SOURCE_DI
 
 if(WIN32)
     # Use all CPU cores by MSVC.
-    string(APPEND CMAKE_CXX_FLAGS " /MP")
+    # string(APPEND CMAKE_CXX_FLAGS " /MP")
     # Do not create separate .pdb files for object files (workaround for mspdbsrv.exe bug, needed
     # for using "/MP" flag).
     add_compile_options("/Z7")

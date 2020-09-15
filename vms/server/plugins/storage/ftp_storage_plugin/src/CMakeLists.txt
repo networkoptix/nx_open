@@ -16,7 +16,7 @@ target_compile_definitions(ftp_storage_plugin PRIVATE
 
 if(WIN32)
     # Use all CPU cores by MSVC.
-    string(APPEND CMAKE_CXX_FLAGS " /MP")
+    # string(APPEND CMAKE_CXX_FLAGS " /MP")
     # Do not create separate .pdb files for object files (workaround for mspdbsrv.exe bug, needed
     # for using "/MP" flag).
     add_compile_options("/Z7")
