@@ -1,7 +1,9 @@
 #include "name_value_table.h"
 
+#include <QtCore/QHash>
 #include <QtCore/QPointer>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QSharedPointer>
 #include <QtGui/QGuiApplication>
 #include <QtGui/QOffscreenSurface>
 #include <QtGui/QOpenGLContext>
@@ -25,6 +27,8 @@ namespace {
 
 static constexpr int kMaxDisplayedGroupValues = 2; //< Before "(+n values)".
 
+static const char* kSharedRendererPropertyName = "__nameValueTable_sharedRenderer";
+
 class RenderControl: public QQuickRenderControl
 {
 public:
@@ -47,19 +51,11 @@ private:
 };
 
 /**
- * This structure is a singleton. It is created when instance() is called for the first time.
- * It is destroyed when all NameValueTable instances are destroyed or
- * when QApplication::aboutToQuit is sent, whatever happens last.
+ * This is a singleton. It is created when instance() is called for the first time.
+ * It is destroyed when QApplication::aboutToQuit is sent.
  */
-struct SharedOffscreenRenderer
+class SharedOffscreenRenderer: public QObject
 {
-    const QScopedPointer<QOffscreenSurface> surface;
-    const QScopedPointer<QOpenGLContext> context;
-    QScopedPointer<RenderControl> renderControl;
-    const QScopedPointer<QQuickWindow> quickWindow;
-    const QScopedPointer<QQmlComponent> rootComponent;
-    const QScopedPointer<QQuickItem> rootItem;
-
     const auto bindContext()
     {
         const QPointer<QOpenGLContext> previousContext = QOpenGLContext::currentContext();
@@ -76,16 +72,57 @@ struct SharedOffscreenRenderer
             });
     }
 
-    static std::shared_ptr<SharedOffscreenRenderer> instance()
+public:
+    static SharedOffscreenRenderer* instance()
     {
-        return staticInstancePtr();
+        if (!NX_ASSERT(qApp))
+            return {};
+
+        const QVariant propValue = qApp->property(kSharedRendererPropertyName);
+        if (propValue.isValid())
+            return propValue.value<QSharedPointer<SharedOffscreenRenderer>>().get();
+
+        const QSharedPointer<SharedOffscreenRenderer> renderer(new SharedOffscreenRenderer());
+        qApp->setProperty(kSharedRendererPropertyName, QVariant::fromValue(renderer));
+        return renderer.get();
     }
 
-    ~SharedOffscreenRenderer()
+    virtual ~SharedOffscreenRenderer() override
     {
         // Ther's a comment in the Qt sources: "the standard pattern is to destroy
         // the rendercontrol before the QQuickWindow", so lets do it this way.
         renderControl.reset();
+
+        const auto contextGuard = bindContext();
+        QOpenGLFramebufferObject::bindDefault();
+        framebuffers.clear();
+    }
+
+    void render(
+        NameValueTable* widget, const QStringList& items, QSize& outSize, QPixmap& outPixmap)
+    {
+        rootItem->setWidth(widget->width());
+        rootItem->setProperty("items", items);
+        rootItem->setProperty("font", widget->font());
+        rootItem->setProperty("nameColor", widget->palette().color(QPalette::WindowText));
+        rootItem->setProperty("valueColor", widget->palette().color(QPalette::Light));
+
+        outSize = QSize(rootItem->width(), rootItem->height());
+        if (outSize.isEmpty())
+        {
+            outPixmap = QPixmap();
+            return;
+        }
+
+        const auto contextGuard = bindContext();
+        quickWindow->setGeometry(QRect({}, outSize));
+        renderControl->setWidget(widget); //< For screen & devicePixelRatio detection.
+
+        const QSize deviceSize = outSize * quickWindow->effectiveDevicePixelRatio();
+        quickWindow->setRenderTarget(ensureFramebuffer(widget, deviceSize));
+        outPixmap = QPixmap::fromImage(renderControl->grab());
+        quickWindow->setRenderTarget(nullptr);
+        QOpenGLFramebufferObject::bindDefault();
     }
 
 private:
@@ -101,7 +138,11 @@ private:
     {
         NX_CRITICAL(qApp && !qApp->closingDown());
         QObject::connect(qApp, &QCoreApplication::aboutToQuit,
-            []() { staticInstancePtr().reset(); });
+            []()
+            {
+                qApp->setProperty(kSharedRendererPropertyName,
+                    QVariant::fromValue(QSharedPointer<SharedOffscreenRenderer>()));
+            });
 
         NX_CRITICAL(rootItem);
         QQmlEngine::setObjectOwnership(rootItem.get(), QQmlEngine::CppOwnership);
@@ -124,11 +165,40 @@ private:
         renderControl->initialize(QOpenGLContext::currentContext());
     }
 
-    static std::shared_ptr<SharedOffscreenRenderer>& staticInstancePtr()
+    QOpenGLFramebufferObject* ensureFramebuffer(NameValueTable* widget, const QSize& size)
     {
-        static std::shared_ptr<SharedOffscreenRenderer> renderer(new SharedOffscreenRenderer());
-        return renderer;
+        const auto contextGuard = bindContext();
+        QSharedPointer<QOpenGLFramebufferObject>& fbo = framebuffers[widget];
+
+        if (!fbo || fbo->size() != size)
+        {
+            QOpenGLFramebufferObject::bindDefault();
+            fbo.reset(new QOpenGLFramebufferObject(size,
+                QOpenGLFramebufferObject::Attachment::CombinedDepthStencil));
+
+            connect(widget, &QObject::destroyed,
+                this, &SharedOffscreenRenderer::releaseFramebuffer,
+                Qt::UniqueConnection);
+        }
+
+        return fbo.get();
     }
+
+    void releaseFramebuffer(QObject* id)
+    {
+        const auto contextGuard = bindContext();
+        QOpenGLFramebufferObject::bindDefault();
+        framebuffers.remove(id);
+    }
+
+private:
+    const QScopedPointer<QOffscreenSurface> surface;
+    const QScopedPointer<QOpenGLContext> context;
+    QScopedPointer<RenderControl> renderControl;
+    const QScopedPointer<QQuickWindow> quickWindow;
+    const QScopedPointer<QQmlComponent> rootComponent;
+    const QScopedPointer<QQuickItem> rootItem;
+    QHash<QObject*, QSharedPointer<QOpenGLFramebufferObject>> framebuffers;
 };
 
 } // namespace
@@ -136,15 +206,13 @@ private:
 struct NameValueTable::Private
 {
     NameValueTable* const q;
-    const std::shared_ptr<SharedOffscreenRenderer> renderer = SharedOffscreenRenderer::instance();
+    const QPointer<SharedOffscreenRenderer> renderer = SharedOffscreenRenderer::instance();
 
     GroupedValues content;
     QSize size;
 
     using NameValueList = std::vector<std::pair<QString, QString>>;
     NameValueList nameValueList;
-
-    QScopedPointer<QOpenGLFramebufferObject> fbo;
 
     QPixmap pixmap;
     nx::utils::PendingOperation updateOp;
@@ -155,15 +223,6 @@ struct NameValueTable::Private
         updateOp.setIntervalMs(1);
         updateOp.setCallback([this]() { updateImage(); });
         updateOp.setFlags(nx::utils::PendingOperation::FireOnlyWhenIdle);
-    }
-
-    virtual ~Private()
-    {
-        if (!NX_ASSERT(renderer))
-            return;
-
-        const auto contextGuard = renderer->bindContext();
-        fbo.reset();
     }
 
     void setContent(const GroupedValues& value)
@@ -206,18 +265,9 @@ struct NameValueTable::Private
         updateImage();
     }
 
-    void setSize(const QSize& value)
-    {
-        if (size == value)
-            return;
-
-        size = value;
-        q->updateGeometry();
-    }
-
     void updateImage()
     {
-        if (nameValueList.empty() || !NX_ASSERT(renderer))
+        if (nameValueList.empty() || !renderer)
         {
             size = QSize();
             pixmap = QPixmap();
@@ -228,35 +278,10 @@ struct NameValueTable::Private
         for (const auto& [name, value]: nameValueList)
             items << name << value;
 
-        renderer->rootItem->setWidth(q->width());
-        renderer->rootItem->setProperty("items", items);
-        renderer->rootItem->setProperty("font", q->font());
-        renderer->rootItem->setProperty("nameColor", q->palette().color(QPalette::WindowText));
-        renderer->rootItem->setProperty("valueColor", q->palette().color(QPalette::Light));
-
-        setSize(QSize(renderer->rootItem->width(), renderer->rootItem->height()));
-        if (size.isEmpty())
-        {
-            pixmap = QPixmap();
-            return;
-        }
-
-        const auto contextGuard = renderer->bindContext();
-        renderer->quickWindow->setGeometry(QRect({}, size));
-        renderer->renderControl->setWidget(q); //< For screen & devicePixelRatio detection.
-
-        const QSize deviceSize = size * renderer->quickWindow->effectiveDevicePixelRatio();
-        if (!fbo || fbo->size() != deviceSize)
-        {
-            QOpenGLFramebufferObject::bindDefault();
-            fbo.reset(new QOpenGLFramebufferObject(deviceSize,
-                QOpenGLFramebufferObject::Attachment::CombinedDepthStencil));
-        }
-
-        renderer->quickWindow->setRenderTarget(fbo.get());
-        pixmap = QPixmap::fromImage(renderer->renderControl->grab());
-        renderer->quickWindow->setRenderTarget(nullptr);
-        QOpenGLFramebufferObject::bindDefault();
+        const auto oldSize = size;
+        renderer->render(q, items, size, pixmap);
+        if (size != oldSize)
+            q->updateGeometry();
     }
 };
 
