@@ -350,7 +350,6 @@ protected:
     }
 
 private:
-    std::unique_ptr<MediaServerLauncher> m_server;
     QThread m_thread;
     std::atomic<bool> m_clearSpaceCalled = false;
     QList<QSharedPointer<test_support::StorageStub>> m_storages;
@@ -358,6 +357,7 @@ private:
     const int m_firstStorageChunks = 1;
     const int m_secondStorageChunks = 100;
     const QString m_cameraName = "cam1";
+    std::unique_ptr<MediaServerLauncher> m_server;
 
     std::deque<Chunk> createChunks(
         int count,
@@ -415,13 +415,14 @@ private:
     {
         using namespace nx::vms::server;
         using namespace nx::vms::server::test::test_support;
+        m_storages.clear();
         std::transform(
             storages.cbegin(), storages.cend(), std::back_inserter(m_storages),
             [](const StorageResourcePtr& s) { return s.dynamicCast<StorageStub>(); });
     }
 };
 
-TEST_F(FtClearSpace, DISABLED_ClearSpaceWontCalledUntilAllStoragesAddedToStorageManager)
+TEST_F(FtClearSpace, ClearSpaceWontCalledUntilAllStoragesAddedToStorageManager)
 {
     initDelay = 10s;
     storageCount = 1;
