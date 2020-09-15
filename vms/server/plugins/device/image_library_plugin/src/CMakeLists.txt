@@ -18,10 +18,10 @@ target_include_directories(image_library_plugin PRIVATE ../../../src) #< SDK hea
 
 if(WIN32)
     # Use all CPU cores by MSVC.
-    # string(APPEND CMAKE_CXX_FLAGS " /MP")
+    string(APPEND CMAKE_CXX_FLAGS " /MP")
     # Do not create separate .pdb files for object files (workaround for mspdbsrv.exe bug, needed
     # for using "/MP" flag).
-    add_compile_options("/Z7")
+    target_compile_options(image_library_plugin BEFORE PRIVATE /Z7)
     target_compile_definitions(image_library_plugin PRIVATE _CRT_SECURE_NO_WARNINGS)
 else()
     target_compile_options(image_library_plugin PRIVATE -Wno-deprecated-declarations)
