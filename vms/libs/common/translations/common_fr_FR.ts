@@ -690,24 +690,24 @@
       <source>%n/%1 Time Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n%1 Licences Temps</numerusform>
-        <numerusform>%n%1 Licences Temps</numerusform>
+        <numerusform>%n/%1 Licences Temps</numerusform>
+        <numerusform>%n/%1 Licences Temps</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n%1 Licences Analogue</numerusform>
-        <numerusform>%n%1 Licences Analogue</numerusform>
+        <numerusform>%n/%1 Licences Analogue</numerusform>
+        <numerusform>%n/%1 Licences Analogue</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Professional Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n%1 Licences Professionnel</numerusform>
-        <numerusform>%n%1 Licences Professionnel</numerusform>
+        <numerusform>%n/%1 Licences Professionnel</numerusform>
+        <numerusform>%n/%1 Licences Professionnel</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -715,47 +715,47 @@
       <comment>%n will be replaced by the total count</comment>
       <translation>
         <numerusform>%n%1 Licences Edge</numerusform>
-        <numerusform>%n%1 Licences Edge</numerusform>
+        <numerusform>%n/%1 Licences Edge</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Vmax Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n%1 Licences Vmax</numerusform>
-        <numerusform>%n%1 Licences Vmax</numerusform>
+        <numerusform>%n/%1 Licences Vmax</numerusform>
+        <numerusform>%n/%1 Licences Vmax</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Encoder Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n%1 Licenses d'encodeur analogue</numerusform>
-        <numerusform>%n%1 Licenses d'encodeur analogue</numerusform>
+        <numerusform>%n/%1 Licenses d'encodeur analogue</numerusform>
+        <numerusform>%n/%1 Licenses d'encodeur analogue</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Video Wall Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n%1 Licences de mur vidéo</numerusform>
-        <numerusform>%n%1 Licences de mur vidéo</numerusform>
+        <numerusform>%n/%1 Licences de mur vidéo</numerusform>
+        <numerusform>%n/%1 Licences de mur vidéo</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 I/O Module Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n%1 Licences Module I/O</numerusform>
-        <numerusform>%n%1 Licences Module I/O</numerusform>
+        <numerusform>%n/%1 Licences Module I/O</numerusform>
+        <numerusform>%n/%1 Licences Module I/O</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Start Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n%1 Démarrer Licences</numerusform>
-        <numerusform>%n%1 Démarrer Licences</numerusform>
+        <numerusform>%n/%1 Démarrer Licences</numerusform>
+        <numerusform>%n/%1 Démarrer Licences</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -770,16 +770,16 @@
       <source>%n/%1 Bridge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n%1 Licenses Pont</numerusform>
-        <numerusform>%n%1 Licenses Pont</numerusform>
+        <numerusform>%n/%1 Licenses Pont</numerusform>
+        <numerusform>%n/%1 Licenses Pont</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Invalid Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n%1 Licences Invalide</numerusform>
-        <numerusform>%n%1 Licences Invalide</numerusform>
+        <numerusform>%n/%1 Licences Invalide</numerusform>
+        <numerusform>%n/%1 Licences Invalide</numerusform>
       </translation>
     </message>
   </context>
