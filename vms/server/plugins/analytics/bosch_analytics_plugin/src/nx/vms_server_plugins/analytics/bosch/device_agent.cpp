@@ -30,15 +30,6 @@ namespace {
     return qualifiedEventName.split(':').back();
 }
 
-template<class T>
-nx::sdk::Uuid deviceObjectNumberToUuid(T deviceObjectNumber)
-{
-    nx::sdk::Uuid serverObjectNumber;
-    memcpy(&serverObjectNumber, &deviceObjectNumber,
-        std::min(sizeof(serverObjectNumber), sizeof(deviceObjectNumber)));
-    return serverObjectNumber;
-}
-
 Ptr<EventMetadata> parsedEventToEventMetadata(
     const ParsedEvent& event, const Bosch::EngineManifest& manifest)
 {
@@ -72,12 +63,12 @@ nx::sdk::analytics::Rect parsedRectToObjectMetadataRect(Rect parsedRect)
 }
 
 Ptr<ObjectMetadata> parsedObjectToObjectMetadata(
-    const ParsedObject& object, const Bosch::EngineManifest& /*manifest*/)
+    const ParsedObject& object, const Bosch::EngineManifest& /*manifest*/, UuidCache* uuidCache)
 {
     Ptr<ObjectMetadata> objectMetadata = nx::sdk::makePtr<ObjectMetadata>();
     objectMetadata->setTypeId(DeviceAgent::kObjectDetectionObjectTypeId.toStdString());
 
-    objectMetadata->setTrackId(deviceObjectNumberToUuid(object.id));
+    objectMetadata->setTrackId(uuidCache->makeUuid(object.id));
 
     objectMetadata->setBoundingBox(parsedRectToObjectMetadataRect(object.shape.boundingBox));
     objectMetadata->addAttribute(makePtr<nx::sdk::Attribute>(
@@ -111,7 +102,8 @@ void DeviceInfo::init(const IDeviceInfo* deviceInfo)
  */
 DeviceAgent::DeviceAgent(Engine* engine, const IDeviceInfo* deviceInfo): m_engine(engine)
 {
-    this->m_deviceInfo.init(deviceInfo);
+    m_deviceInfo.init(deviceInfo);
+    buildInitialManifest();
 }
 
 DeviceAgent::~DeviceAgent()
@@ -147,40 +139,7 @@ DeviceAgent::~DeviceAgent()
 /*virtual*/ void DeviceAgent::getManifest(Result<const IString*>* outResult) const /*override*/
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
-
-    if (m_manifest)
-    {
-        *outResult = new nx::sdk::String(QJson::serialized(*m_manifest));
-        return;
-    }
-
-    Bosch::DeviceAgentManifest agentManifest;
-    agentManifest.capabilities.setFlag(
-        nx::vms::api::analytics::DeviceAgentManifest::disableStreamSelection);
-
-#if 1
-    // Initially we do not know which event types are supported, we'll get them in the first
-    // metadata packet (and possibly later).
-    // We should implicitly add at least one element, because no elements means all elements.
-    agentManifest.supportedEventTypeIds << kObjectDetectionEventTypeId;
-#else
-    // For debug purposes uncomment this code to add all potentially possible event types.
-    agentManifest.supportedEventTypeIds
-        << "nx.bosch.GlobalChange"
-        << "nx.bosch.SignalTooBright"
-        << "nx.bosch.SignalTooDark"
-        << "nx.bosch.SignalTooBlurry"
-        << "nx.bosch.SignalLoss"
-        << "nx.bosch.FlameDetected"
-        << "nx.bosch.SmokeDetected"
-        << "nx.bosch.MotionAlarm"
-        ;
-#endif
-
-    agentManifest.supportedObjectTypeIds << kObjectDetectionObjectTypeId;
-    m_manifest = std::move(agentManifest);
-
-    *outResult = new nx::sdk::String(QJson::serialized(*m_manifest));
+    *outResult = new nx::sdk::String(QJson::serialized(m_manifest));
 }
 
 /**
@@ -279,7 +238,7 @@ Ptr<ObjectMetadataPacket> DeviceAgent::buildObjectPacket(
     for (const ParsedObject& object: parsedMetadata.objects)
     {
         Ptr<ObjectMetadata> objectMetadata = parsedObjectToObjectMetadata(
-            object, m_engine->manifest());
+            object, m_engine->manifest(), &m_uuidCache);
 
         if (objectMetadata)
             packet->addItem(objectMetadata.get());
@@ -295,34 +254,66 @@ Ptr<ObjectMetadataPacket> DeviceAgent::buildObjectPacket(
     return packet;
 }
 
-bool DeviceAgent::replenishSupportedEventTypeIds(const ParsedMetadata& parsedMetadata)
+int DeviceAgent::buildInitialManifest()
 {
-    int oldSize = m_wsntTopics.size();
-    for (const ParsedEvent& id: parsedMetadata.events)
-        m_wsntTopics.insert(id.topic);
+    m_manifest = {};
+    m_wsntTopics.clear();
 
-    return oldSize < m_wsntTopics.size();
-}
-
-void DeviceAgent::updateAgentManifest()
-{
-    Bosch::DeviceAgentManifest agentManifest;
-
-    agentManifest.capabilities.setFlag(
+    m_manifest.capabilities.setFlag(
         nx::vms::api::analytics::DeviceAgentManifest::disableStreamSelection);
 
-    static const QString kBoschPrefix("nx.bosch.");
-    for (const QString& topic: m_wsntTopics)
-        agentManifest.supportedEventTypeIds << kBoschPrefix + ExtractEventTypeNameFromTopic(topic);
+    const auto& engineEventTypes = m_engine->manifest().eventTypes;
 
-    agentManifest.supportedEventTypeIds << kObjectDetectionEventTypeId;
+    // Add all event types that can not be autodetected.
+    for (const auto& eventType: engineEventTypes)
+    {
+        if (!eventType.autodetect)
+        {
+            m_manifest.supportedEventTypeIds << eventType.id;
+            m_wsntTopics.insert(eventType.internalName);
+        }
+    }
+    m_manifest.supportedEventTypeIds.sort(); //< for convenient view in debugger
 
-    agentManifest.supportedObjectTypeIds << kObjectDetectionObjectTypeId;
+    // Add the only object type Bosch cameras understand.
+    m_manifest.supportedObjectTypeIds << kObjectDetectionObjectTypeId;
 
-    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_manifest.supportedEventTypeIds.size();
+}
 
-    m_manifest = std::move(agentManifest);
-    m_handler->pushManifest(new nx::sdk::String(QJson::serialized(*m_manifest)));
+void DeviceAgent::updateAgentManifest(const ParsedMetadata& parsedMetadata)
+{
+    // Currently for Bosch cameras there's no mechanism to detect when an eventType is deactivated
+    // on a camera, we can only detect when new eventTypes appears, so this function only adds
+    // eventTypes.
+
+    const auto& engineEventTypes = m_engine->manifest().eventTypes;
+    bool manifestUpdated = false;
+    for (const ParsedEvent& parsedEvent: parsedMetadata.events)
+    {
+        const QString topic = ExtractEventTypeNameFromTopic(parsedEvent.topic);
+        if (!m_wsntTopics.contains(topic))
+        {
+            m_wsntTopics.insert(topic);
+            auto it = engineEventTypes.find(topic);
+            if (it == engineEventTypes.end())
+            {
+                NX_DEBUG(this,
+                    "Unknown wsnt topic (event type internal name) received in notification xml: %1",
+                    parsedEvent.topic);
+            }
+            else
+            {
+                m_manifest.supportedEventTypeIds << it->id;
+                NX_DEBUG(this,
+                    "New wsnt topic (event type internal name) added: %1",
+                    parsedEvent.topic);
+                manifestUpdated = true;
+            }
+        }
+    }
+    if (manifestUpdated)
+        m_handler->pushManifest(new nx::sdk::String(QJson::serialized(m_manifest)));
 }
 
 /*virtual*/ void DeviceAgent::doPushDataPacket(
@@ -332,28 +323,54 @@ void DeviceAgent::updateAgentManifest()
     const QByteArray xmlData(incomingPacket->data(), incomingPacket->dataSize());
     MetadataXmlParser parser(xmlData);
     const ParsedMetadata parsedMetadata = parser.parse();
-    if (replenishSupportedEventTypeIds(parsedMetadata))
-        updateAgentManifest();
+    updateAgentManifest(parsedMetadata);
 
-    Ptr<EventMetadataPacket> packet = buildEventPacket(parsedMetadata, dataPacket->timestampUs());
-
-    if (packet && NX_ASSERT(m_handler))
-        m_handler->handleMetadata(packet.get());
-
-    Ptr<ObjectMetadataPacket> packet2 = buildObjectPacket(parsedMetadata, dataPacket->timestampUs());
-    if (packet2 && NX_ASSERT(m_handler))
+    Ptr<EventMetadataPacket> eventPacket =
+        buildEventPacket(parsedMetadata, dataPacket->timestampUs());
+    if (static int i = 0; eventPacket && NX_ASSERT(m_handler))
     {
-        m_handler->handleMetadata(packet2.get());
-        Ptr<EventMetadataPacket> packet3 = buildObjectDetectionEventPacket(dataPacket->timestampUs());
-        if (packet3)
-            m_handler->handleMetadata(packet3.get());
+        std::cout << std::endl
+            << i
+            << "  ===EVENTS======================================================================="
+            << std::endl;
+        for (const auto& event : parsedMetadata.events)
+            std::cout << event.topic.toStdString() << " isActive = " << event.isActive << std::endl;
+
+        m_handler->handleMetadata(eventPacket.get());
+
+        ++i;
     }
 
-    //thread_local int i = 0;
-    //std::cout << std::endl
-    //    << "====================================================================================="
-    //    << ++i << std::endl
-    //    << xmlData.constData() << std::endl;
+    Ptr<ObjectMetadataPacket> objectPacket =
+        buildObjectPacket(parsedMetadata, dataPacket->timestampUs());
+    if (static int i = 0; objectPacket && NX_ASSERT(m_handler))
+    {
+        std::cout << std::endl
+            << i
+            << "  ---OBJECTS----------------------------------------------------------------------"
+            << std::endl;
+
+        for (const auto& object: parsedMetadata.objects)
+            std::cout << "Id = " << object.id << std::endl;
+
+        m_handler->handleMetadata(objectPacket.get());
+
+        for (const auto& object : parsedMetadata.objects)
+        {
+            if (!m_idCache.alreadyContains(object.id))
+            {
+                Ptr<EventMetadataPacket> auxEventPacket =
+                    buildObjectDetectionEventPacket(dataPacket->timestampUs());
+                if (auxEventPacket)
+                {
+                    m_handler->handleMetadata(auxEventPacket.get());
+                    std::cout << "event sent for id = " << object.id << std::endl;
+                }
+            }
+        }
+        ++i;
+    }
+
 }
 
 //-------------------------------------------------------------------------------------------------

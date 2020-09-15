@@ -17,6 +17,7 @@ struct Bosch //< Used as a namespace; struct is required for Qt serialization of
 public:
     struct EventType: public nx::vms::api::analytics::EventType
     {
+        bool autodetect = false;
         QString internalName;
         QString description;
         QString positiveState;
@@ -29,6 +30,7 @@ public:
         using KeyType = QString;
     };
     #define BoschEventType_Fields EventType_Fields \
+        (autodetect) \
         (internalName) \
         (description) \
         (positiveState) \

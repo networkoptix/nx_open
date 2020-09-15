@@ -27,6 +27,7 @@
 #include <nx/network/http/http_client.h>
 
 #include "engine.h"
+#include "id_cache.h"
 #include "metadata_xml_parser.h"
 
 namespace nx::vms_server_plugins::analytics::bosch {
@@ -92,9 +93,10 @@ protected:
     virtual void finalize() override {}
 
 private:
-    bool replenishSupportedEventTypeIds(const ParsedMetadata& parsedMetadata);
 
-    void updateAgentManifest();
+    int buildInitialManifest();
+
+    void updateAgentManifest(const ParsedMetadata& parsedMetadata);
 
     Ptr<EventMetadataPacket> buildEventPacket(
         const ParsedMetadata& parsedMetadata, int64_t ts) const;
@@ -106,7 +108,7 @@ private:
 
 private:
     mutable nx::Mutex m_mutex;
-    mutable std::optional<Bosch::DeviceAgentManifest> m_manifest;
+    Bosch::DeviceAgentManifest m_manifest;
 
     Engine* const m_engine;
     nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
@@ -114,6 +116,9 @@ private:
 
     /** Initially empty, may be replenished after each incoming metadata (doPushDataPacket call). */
     QSet<QString> m_wsntTopics;
+
+    IdCache m_idCache;
+    mutable UuidCache m_uuidCache;
 
 public:
     /** This event type corresponds to no wsnt topic, it is added explicitly manually. */

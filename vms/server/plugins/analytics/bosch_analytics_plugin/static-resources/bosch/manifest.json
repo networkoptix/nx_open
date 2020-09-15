@@ -10,12 +10,12 @@
             "_comment": "Bosch does not send object type information"
         }
     ],
-    "eventTypes":
-    [
+    "eventTypes": [
         {
             "id": "nx.bosch.GlobalChange",
             "name": "Scene change",
             "_": "The following fields belong to the private plugin implementation.",
+            "autodetect": true,
             "internalName": "GlobalChange",
             "description": "Global scene change %1",
             "positiveState": "started",
@@ -25,6 +25,7 @@
         {
             "id": "nx.bosch.SignalTooBright",
             "name": "Excessive brightness",
+            "autodetect": true,
             "internalName": "SignalTooBright",
             "description": "Excessive brightness %1",
             "positiveState": "started",
@@ -34,6 +35,7 @@
         {
             "id": "nx.bosch.SignalTooDark",
             "name": "Insufficient brightness",
+            "autodetect": true,
             "internalName": "SignalTooDark",
             "description": "Insufficient brightness %1",
             "positiveState": "started",
@@ -43,6 +45,7 @@
         {
             "id": "nx.bosch.SignalTooBlurry",
             "name": "Blurry signal",
+            "autodetect": true,
             "internalName": "SignalTooBlurry",
             "description": "Blurry signal %1",
             "positiveState": "started",
@@ -50,17 +53,9 @@
             "flags": "stateDependent"
         },
         {
-            "id": "nx.bosch.SignalLoss",
-            "name": "Signal loss",
-            "internalName": "SignalLoss",
-            "description": "Signal loss %1",
-            "positiveState": "started",
-            "negativeState": "stopped",
-            "flags": "stateDependent"
-        },
-        {
             "id": "nx.bosch.FlameDetected",
             "name": "Flame detection",
+            "autodetect": true,
             "internalName": "FlameDetected",
             "description": "Flame detection %1",
             "positiveState": "started",
@@ -70,6 +65,7 @@
         {
             "id": "nx.bosch.SmokeDetected",
             "name": "Smoke detection",
+            "autodetect": true,
             "internalName": "SmokeDetected",
             "description": "Smoke detection %1",
             "positiveState": "started",
@@ -79,29 +75,136 @@
         {
             "id": "nx.bosch.MotionAlarm",
             "name": "Motion detection",
+            "autodetect": true,
             "internalName": "MotionAlarm",
             "description": "Motion detection %1",
             "positiveState": "started",
             "negativeState": "stopped",
             "flags": "stateDependent"
         },
+
         {
             "id": "nx.bosch.Detect_any_object",
+            "_comment": "event generated manually when object tracking occurs",
             "name": "Object detection",
+            "autodetect": false,
             "internalName": "Detect_any_object",
             "description": "New object(s) detected"
+        },
+
+        {
+            "id": "nx.bosch.Detect_any_motion",
+            "name": "IVA: Detect any motion",
+            "autodetect": false,
+            "internalName": "Detect_any_motion",
+            "description": "IVA motion detected"
+        },
+
+        {
+            "id": "nx.bosch.IVA.Intrusion.Objekt_in_Field_1",
+            "name": "IVA: Intrusion. Object in field",
+            "autodetect": false,
+            "internalName": "Objekt_in_Field_1",
+            "description": "IVA Object intrusion %1",
+            "positiveState": "started",
+            "negativeState": "stopped",
+            "flags": "stateDependent"
+        },
+
+        {
+            "id": "nx.bosch.IVA.Intrusion.Left_to_right",
+            "name": "IVA: Intrusion. Left to right",
+            "autodetect": false,
+            "internalName": "Left_to_right",
+            "description": "IVA Object moving from left field to right field %1",
+            "positiveState": "started",
+            "negativeState": "stopped",
+            "flags": "stateDependent"
+        },
+        {
+            "id": "nx.bosch.IVA.Intrusion.Right_to_left",
+            "name": "IVA: Intrusion. Right to left",
+            "autodetect": false,
+            "internalName": "Right_to_left",
+            "description": "IVA Object moving from right field to left field %1",
+            "positiveState": "started",
+            "negativeState": "stopped",
+            "flags": "stateDependent"
+        },
+        {
+            "id": "nx.bosch.IVA.TrafficIncidents.Wrong_way",
+            "name": "IVA: TrafficIncidents. Wrong way",
+            "autodetect": false,
+            "internalName": "Wrong_way",
+            "description": "IVA Traffic Incident 'Wrong way' %1",
+            "positiveState": "started",
+            "negativeState": "stopped",
+            "flags": "stateDependent"
+        },
+        {
+            "id": "nx.bosch.IVA.TrafficIncidents.Pedestrian",
+            "name": "IVA: TrafficIncidents. Pedestrian",
+            "autodetect": false,
+            "internalName": "Pedestrian",
+            "description": "IVA Traffic Incident 'Pedestrian' %1",
+            "positiveState": "started",
+            "negativeState": "stopped",
+            "flags": "stateDependent"
+        },
+        {
+            "id": "nx.bosch.IVA.TrafficIncidents.Slow_vehicle",
+            "name": "IVA: TrafficIncidents. Slow vehicle",
+            "autodetect": false,
+            "internalName": "Slow_vehicle",
+            "description": "IVA Traffic Incident 'Slow vehicle' %1",
+            "positiveState": "started",
+            "negativeState": "stopped",
+            "flags": "stateDependent"
+        },
+        {
+            "id": "nx.bosch.IVA.TrafficIncidents.Stopped_vehicle",
+            "name": "IVA: TrafficIncidents. Stopped vehicle",
+            "autodetect": false,
+            "internalName": "Stopped_vehicle",
+            "description": "IVA Traffic Incident 'Stopped vehicle' %1",
+            "positiveState": "started",
+            "negativeState": "stopped",
+            "flags": "stateDependent"
+        },
+        {
+            "id": "nx.bosch.IVA.TrafficIncidents.Dropped_object",
+            "name": "IVA: TrafficIncidents. Dropped object",
+            "autodetect": false,
+            "internalName": "Dropped_object",
+            "description": "IVA Traffic Incident 'Dropped object' %1",
+            "positiveState": "started",
+            "negativeState": "stopped",
+            "flags": "stateDependent"
         }
+
     ],
-    "unusedEventTypes":
-    [
+    "unusedEventTypes": [
         {
             "id": "nx.bosch.SignalLoss",
             "name": "Signal loss",
+            "autodetect": true,
             "internalName": "SignalLoss",
             "description": "Signal loss %1",
             "positiveState": "started",
             "negativeState": "stopped",
             "flags": "stateDependent"
+        },
+        {
+            "comment": "This the duplicate to 'nx.bosch.IVA.TrafficIncidents.Wrong_way'",
+            "id": "nx.bosch.IVA.Wrong_way",
+            "name": "IVA: Wrong way",
+            "autodetect": false,
+            "internalName": "Wrong_way",
+            "description": "IVA Traffic wrong way %1",
+            "positiveState": "started",
+            "negativeState": "stopped",
+            "flags": "stateDependent"
         }
+
     ]
 }
