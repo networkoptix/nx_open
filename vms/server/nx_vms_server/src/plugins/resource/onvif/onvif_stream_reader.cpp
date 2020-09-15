@@ -47,12 +47,19 @@ struct DefaultProfileInfo
 {
     QString primaryProfileName;
     QString secondaryProfileName;
+
+    // Old style profile names.
+    QString alternativePrimaryProfileName;
+    QString alternativeSecondaryProfileName;
+
     QString primaryProfileToken;
     QString secondaryProfileToken;
 };
 
 DefaultProfileInfo nxDefaultProfileInfo(const QnPlOnvifResourcePtr& device)
 {
+    static const int kProfileNameMaxLength = 12;
+
     DefaultProfileInfo info;
 
     const auto brand = nx::utils::AppInfo::brand();
@@ -88,8 +95,12 @@ DefaultProfileInfo nxDefaultProfileInfo(const QnPlOnvifResourcePtr& device)
     }
     else
     {
-        info.primaryProfileName = NX_FMT("%1 Primary", brand);
-        info.secondaryProfileName = NX_FMT("%1 Secondary", brand);
+        const QString brandPrefix = brand.left(kProfileNameMaxLength - 1);
+        info.primaryProfileName = NX_FMT("%1P", brandPrefix);
+        info.secondaryProfileName = NX_FMT("%1S", brandPrefix);
+
+        info.alternativePrimaryProfileName = NX_FMT("%1 Primary", brand);
+        info.alternativeSecondaryProfileName = NX_FMT("%1 Secondary", brand);
     }
 
     info.primaryProfileToken = NX_FMT("%1P", brand);
@@ -262,21 +273,34 @@ Profile* selectExistingProfile(
     const DefaultProfileInfo& defaultProfileInfo)
 {
     QStringList availableProfileTokens;
-    const QString noProfileName = isPrimary
-        ? defaultProfileInfo.primaryProfileName
-        : defaultProfileInfo.secondaryProfileName;
+    const auto noProfileName = isPrimary
+        ? std::set<QString>{
+            defaultProfileInfo.primaryProfileName,
+            defaultProfileInfo.alternativePrimaryProfileName}
+        : std::set<QString>{
+            defaultProfileInfo.secondaryProfileName,
+            defaultProfileInfo.alternativeSecondaryProfileName};
 
-    const QString filteredProfileName = isPrimary
-        ? defaultProfileInfo.secondaryProfileName
-        : defaultProfileInfo.primaryProfileName;
+    const auto filteredProfileName = isPrimary
+        ? std::set<QString>{
+            defaultProfileInfo.secondaryProfileName,
+            defaultProfileInfo.alternativeSecondaryProfileName}
+        : std::set<QString>{
+            defaultProfileInfo.primaryProfileName,
+            defaultProfileInfo.alternativePrimaryProfileName};
 
     for (const auto& profile: profiles)
     {
+        if (!profile)
+            continue;
+
+        const QString existingProfileName = QString::fromStdString(profile->Name);
+
         if (profile->token.empty())
             continue;
-        else if (profile->Name == noProfileName.toStdString())
+        else if (noProfileName.find(existingProfileName) != noProfileName.cend())
             return profile;
-        else if (profile->Name == filteredProfileName.toStdString())
+        else if (filteredProfileName.find(existingProfileName) != filteredProfileName.cend())
             continue;
 
         if (!info.videoSourceToken.empty())
