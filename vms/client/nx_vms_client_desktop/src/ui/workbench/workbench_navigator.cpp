@@ -115,6 +115,12 @@ enum { kMinimalSymbolsCount = 3, kDelayMs = 750 };
 
 QAtomicInt qn_threadedMergeHandle(1);
 
+bool isLivePosition(const QPointer<QnResourceWidget> widget)
+{
+    const auto time = widget->item()->data(Qn::ItemTimeRole, -1);
+    return time == -1 || time == DATETIME_NOW;
+}
+
 }
 
 QnWorkbenchNavigator::QnWorkbenchNavigator(QObject *parent):
@@ -1603,7 +1609,8 @@ void QnWorkbenchNavigator::updateSliderFromReader(UpdateSliderMode mode)
 
     if (!m_currentWidgetLoaded && widgetLoaded && !isSearch
         && display()->widgets().size() == 1
-        && m_currentWidget->resource()->hasFlags(Qn::wearable_camera))
+        && m_currentWidget->resource()->hasFlags(Qn::wearable_camera)
+        && isLivePosition(m_currentWidget))
     {
         setPosition(startTimeMSec * 1000);
     }
