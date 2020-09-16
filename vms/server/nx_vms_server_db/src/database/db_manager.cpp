@@ -570,14 +570,15 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
 
         QSqlQuery queryAdminUser(m_sdb);
         queryAdminUser.setForwardOnly(true);
-        queryAdminUser.prepare("SELECT r.guid, r.id FROM vms_resource r JOIN auth_user u on u.id = r.id and r.name = 'admin'"); // TODO: #GDM check owner permission instead
+        queryAdminUser.prepare("SELECT r.guid, r.id FROM vms_resource r WHERE r.name = 'admin'");
         execSQLQuery(&queryAdminUser, Q_FUNC_INFO);
         if (queryAdminUser.next())
         {
             m_adminUserID = QnUuid::fromRfc4122(queryAdminUser.value(0).toByteArray());
             m_adminUserInternalID = queryAdminUser.value(1).toInt();
         }
-        NX_CRITICAL(!m_adminUserID.isNull());
+        if (!NX_ASSERT(!m_adminUserID.isNull(), "No 'admin' user in the database"))
+            return false;
 
         if (!setMediaServersStatus(Qn::Offline))
             return false;
@@ -902,11 +903,8 @@ bool QnDbManager::init(const nx::utils::Url& dbUrl)
         queryCameras.bindValue(0, Qn::Offline);
         if (!m_isBackupRestore)
             queryCameras.bindValue(1, commonModule()->moduleGUID().toRfc4122());
-        if (!queryCameras.exec()) {
-            qWarning() << Q_FUNC_INFO << __LINE__ << queryCameras.lastError();
-            NX_ASSERT(0);
+        if (!NX_ASSERT(queryCameras.exec(), queryCameras.lastError()))
             return false;
-        }
         while (queryCameras.next())
         {
             QnTransaction<ResourceStatusData> tran(
