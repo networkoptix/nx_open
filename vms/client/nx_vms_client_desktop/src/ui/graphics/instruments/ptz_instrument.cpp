@@ -1123,7 +1123,7 @@ void PtzInstrument::startDrag(DragInfo* info)
                 elementsWidget()->newArrowItem()->setPos(elementsWidget()->mapFromItem(target(),
                     info->mouseItemPos()));
 
-                opacityAnimator(elementsWidget()->newArrowItem())->animateTo(1.0);
+                opacityAnimator(elementsWidget()->newArrowItem(), 2.0)->animateTo(1.0);
             }
 
             break;

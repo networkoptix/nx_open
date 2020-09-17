@@ -472,7 +472,7 @@ public:
         if (m_direction.isNull())
             return;
 
-        static constexpr qreal kBigRadius = 8.5;
+        static constexpr qreal kBigRadius = 9.5;
         static constexpr qreal kSmallRadius = 2.5;
         static constexpr qreal kMinimumLength = 10.0;
 
