@@ -838,6 +838,8 @@
                 <param id="image/camera/HLCLevel"
                     name="HLC Level"
                     dataType="Enumeration"
+                    range="Low,Middle,High"
+                    internalRange="Low,Medium,High"
                     aux="group=whitebalance;groupInclude=HLC">
                     <dependencies>
                         <dependencies-show>
