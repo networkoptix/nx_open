@@ -49,8 +49,6 @@ endif()
 add_custom_command(
     OUTPUT
         ${CMAKE_BINARY_DIR}/bin/vms_benchmark${exe_extension}
-        ${CMAKE_BINARY_DIR}/bin/vms_benchmark.conf
-        ${CMAKE_BINARY_DIR}/bin/vms_benchmark.ini
     
     COMMAND ${CMAKE_COMMAND} -E echo "  Building VMS Benchmark executable"
 
@@ -60,19 +58,28 @@ add_custom_command(
 
     COMMAND ${CMAKE_COMMAND} -E copy
         ${build_dir}/distrib/vms_benchmark${exe_extension}
+        ${CMAKE_BINARY_DIR}/bin/
+
+    DEPENDS ${benchmark_sources}
+)
+
+add_custom_target(vms_benchmark ALL DEPENDS ${CMAKE_BINARY_DIR}/bin/vms_benchmark${exe_extension})
+set_target_properties(vms_benchmark PROPERTIES FOLDER utils)
+
+add_custom_target(vms_benchmark_local_test)
+add_dependencies(vms_benchmark_local_test vms_benchmark testcamera rtsp_perf)
+add_custom_command(
+    TARGET vms_benchmark_local_test
+
+    COMMAND ${CMAKE_COMMAND} -E echo "  Preparing VMS Benchmark to run from VMS build directory"
+
+    COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_SOURCE_DIR}/vms_benchmark.conf
         ${CMAKE_BINARY_DIR}/bin/
 
     COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_SOURCE_DIR}/vms_benchmark.builddir.ini
-        ${CMAKE_BINARY_DIR}/bin/vms_benchmark.ini
-
-    DEPENDS
-        testcamera
-        rtsp_perf
-        ${benchmark_sources}
-        ${CMAKE_CURRENT_SOURCE_DIR}/vms_benchmark.builddir.ini
+        ${CMAKE_BINARY_DIR}/bin/vms_benchmark.ini 
 )
 
-add_custom_target(vms_benchmark ALL DEPENDS ${CMAKE_BINARY_DIR}/bin/vms_benchmark${exe_extension})
-set_target_properties(vms_benchmark PROPERTIES FOLDER utils)
+set_target_properties(vms_benchmark_local_test PROPERTIES FOLDER utils)

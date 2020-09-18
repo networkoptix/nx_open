@@ -192,7 +192,10 @@ add_custom_command(OUTPUT ${zip_file}
     COMMAND ${CMAKE_COMMAND} -E echo "  Zipping VMS Benchmark - see ${zip_log}"
     COMMAND ${CMAKE_COMMAND} -E tar cvf ${zip_file} --format=zip vms_benchmark >${zip_log}
 
-    DEPENDS vms_benchmark
+    DEPENDS
+        vms_benchmark
+        testcamera
+        rtsp_perf
 )
 
 add_custom_target(distribution_vms_benchmark ALL DEPENDS ${zip_file})
