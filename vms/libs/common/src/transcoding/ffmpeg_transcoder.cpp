@@ -343,6 +343,12 @@ int QnFfmpegTranscoder::muxPacket(const QnConstAbstractMediaDataPtr& mediaPacket
     if (m_videoCodec != AV_CODEC_ID_NONE && mediaPacket->dataType == QnAbstractMediaData::AUDIO)
        streamIndex = 1;
 
+    if (streamIndex >= (int)m_formatCtx->nb_streams)
+    {
+        NX_DEBUG(this, "Invalid packet media type: %1, skip it", mediaPacket->dataType);
+        return 0;
+    }
+
     AVStream* stream = m_formatCtx->streams[streamIndex];
     AVRational srcRate = {1, 1000000};
     QnFfmpegAvPacket packet;
