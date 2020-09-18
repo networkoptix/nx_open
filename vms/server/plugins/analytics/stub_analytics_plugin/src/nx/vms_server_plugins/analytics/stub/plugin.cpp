@@ -1,8 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+#include <nx/kit/debug.h>
+#include <nx/kit/utils.h>
+
 #include "plugin.h"
 #include "engine.h"
 #include "settings_model.h"
+#include "stub_analytics_plugin_ini.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -19,10 +23,20 @@ Result<IEngine*> Plugin::doObtainEngine()
 
 std::string Plugin::manifestString() const
 {
+    const std::string instanceIdSuffixForMultiPluginMode =
+        (ini().multiPluginInstanceCount <= 0)
+            ? ""
+            : nx::kit::utils::format(".%d", m_instanceIndexForMultiPluginMode);
+
+    const std::string instanceNameSuffixForMultiPluginMode =
+        (ini().multiPluginInstanceCount <= 0)
+            ? ""
+            : nx::kit::utils::format(" #%d", m_instanceIndexForMultiPluginMode);
+
     return /*suppress newline*/ 1 + (const char*) R"json(
 {
-    "id": "nx.stub",
-    "name": "Stub analytics plugin",
+    "id": "nx.stub)json" + instanceIdSuffixForMultiPluginMode + R"json(",
+    "name": "Stub analytics plugin)json" + instanceNameSuffixForMultiPluginMode + R"json(",
     "description": "A plugin for testing and debugging purposes.",
     "version": "1.0.0",
     "vendor": "Plugin vendor",
@@ -106,7 +120,24 @@ std::string Plugin::manifestString() const
 
 extern "C" NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
-    return new Plugin();
+    if (ini().multiPluginInstanceCount <= 0)
+        return new Plugin();
+
+    return nullptr;
+}
+
+extern "C" NX_PLUGIN_API nx::sdk::IPlugin* createNxPluginByIndex(int instanceIndex)
+{
+    if (ini().multiPluginInstanceCount <= 0)
+        return nullptr;
+
+    if (!NX_KIT_ASSERT(instanceIndex >= 0))
+        return nullptr;
+
+    if (instanceIndex >= ini().multiPluginInstanceCount)
+        return nullptr;
+
+    return new Plugin(instanceIndex);
 }
 
 } // namespace stub

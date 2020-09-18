@@ -142,7 +142,11 @@ static const std::string kProvisionPluginManifest = /*suppress newline*/ 1 + (co
 static const std::string kTvtManifestName = "manifest_tvt";
 static const std::string kProvisionManifestName = "manifest_provision";
 
-enum VendorIndex: int {tvtVendor = 0, provisionVendor = 1};
+enum VendorIndex: int
+{
+    tvtVendorIndex = 0,
+    provisionVendorIndex,
+};
 
 } // namespace
 
@@ -150,9 +154,9 @@ extern "C" {
 
 NX_PLUGIN_API nx::sdk::IPlugin* createNxPluginByIndex(int index)
 {
-    switch (index)
+    switch ((VendorIndex) index)
     {
-        case tvtVendor:
+        case tvtVendorIndex:
             return new nx::sdk::analytics::Plugin(
                 kTvtPluginManifest,
                 [](nx::sdk::analytics::Plugin* plugin)
@@ -160,7 +164,8 @@ NX_PLUGIN_API nx::sdk::IPlugin* createNxPluginByIndex(int index)
                     return new nx::vms_server_plugins::analytics::dw_tvt::Engine(
                         plugin, kTvtManifestName);
                 });
-        case provisionVendor:
+
+        case provisionVendorIndex:
             return new nx::sdk::analytics::Plugin(
                 kProvisionPluginManifest,
                 [](nx::sdk::analytics::Plugin* plugin)
@@ -168,11 +173,13 @@ NX_PLUGIN_API nx::sdk::IPlugin* createNxPluginByIndex(int index)
                     return new nx::vms_server_plugins::analytics::dw_tvt::Engine(
                         plugin, kProvisionManifestName);
                 });
+
         default:
             return nullptr;
     }
 }
 
+/* For compatibility with Servers which do not support multi-IPlugin plugins. */
 NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()
 {
     return createNxPluginByIndex(0);

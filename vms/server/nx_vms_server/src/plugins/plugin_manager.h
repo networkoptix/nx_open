@@ -128,9 +128,7 @@ private:
     bool storeLoadedPluginInfo(
         PluginInfoPtr pluginInfo, nx::sdk::Ptr<nx::sdk::IRefCountable> plugin);
 
-    bool processPluginEntryPointForNewSdk(
-        nx::sdk::IPlugin::EntryPointFunc entryPointFunc,
-        PluginInfoPtr pluginInfo);
+    bool processNewSdkPlugin(nx::sdk::Ptr<nx::sdk::IPlugin> plugin, PluginInfoPtr pluginInfo);
 
     bool processPluginEntryPointForOldSdk(
         nxpl::Plugin::EntryPointFunc entryPointFunc,
@@ -140,6 +138,8 @@ private:
     bool processLibContext(QLibrary* lib, PluginInfoPtr pluginInfo);
 
     bool processSdkVersion(QLibrary* lib, PluginInfoPtr pluginInfo);
+
+    bool processNewSdkPluginLib(QLibrary* lib, PluginInfoPtr pluginInfo);
 
     bool processPluginLib(
         QLibrary* lib, const SettingsHolder& settingsHolder, PluginInfoPtr pluginInfo);

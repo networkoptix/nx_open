@@ -217,6 +217,17 @@ static QString additionalStatusMessage(
         nx::kit::utils::toString(nxSdkVersion));
 }
 
+static QString pluginDesignationForStatusMessage(std::shared_ptr<PluginInfo> pluginInfo)
+{
+    return NX_FMT("%1Server Plugin [%2]%3 (%4)",
+        pluginInfo->optionality == PluginInfo::Optionality::optional ? "optional " : "",
+        pluginInfo->libraryFilename,
+        (pluginInfo->instanceIndex < 0)
+            ? ""
+            : NX_FMT(", instance index %1", pluginInfo->instanceIndex),
+        additionalStatusMessage(pluginInfo->mainInterface, pluginInfo->nxSdkVersion));
+}
+
 void PluginManager::storeInternalErrorPluginInfo(
     PluginInfoPtr pluginInfo, Ptr<IRefCountable> plugin, const QString& errorMessage)
 {
@@ -257,19 +268,17 @@ bool PluginManager::storeNotLoadedPluginInfo(
     )
     {
         storeInternalErrorPluginInfo(pluginInfo, /*plugin*/ nullptr,
-            "Server Plugin was not loaded and an assertion has failed - see the Server log");
+            "Server Plugin was not loaded and an assertion has failed - see the Server log.");
         return false;
     }
 
     pluginInfo->status = status;
     pluginInfo->errorCode = errorCode;
 
-    pluginInfo->statusMessage = lm("%1%2 Server Plugin [%3] (%4): %5").args(
+    pluginInfo->statusMessage = NX_FMT("%1 %2: %3",
         isOk ? "Skipped loading" : "Failed loading",
-        pluginInfo->optionality == Optionality::optional ? " optional" : "",
-        pluginInfo->libraryFilename,
-        additionalStatusMessage(pluginInfo->mainInterface, pluginInfo->nxSdkVersion),
-        isOk ? reason : QString(lm("[%1]: %2").args(errorCode, reason)));
+        pluginDesignationForStatusMessage(pluginInfo),
+        isOk ? reason : QString(NX_FMT("[%1]: %2", errorCode, reason)));
 
     if (isOk)
         NX_INFO(this, pluginInfo->statusMessage);
@@ -294,14 +303,11 @@ bool PluginManager::storeLoadedPluginInfo(
     )
     {
         storeInternalErrorPluginInfo(pluginInfo, plugin,
-            "Server Plugin was loaded but an assertion has failed - see the Server log");
+            "Server Plugin was loaded but an assertion has failed - see the Server log.");
         return true;
     }
 
-    pluginInfo->statusMessage = lm("Loaded%1 Server plugin [%2] (%3)").args(
-        pluginInfo->optionality == Optionality::optional ? " optional" : "",
-        pluginInfo->libraryFilename,
-        additionalStatusMessage(pluginInfo->mainInterface, pluginInfo->nxSdkVersion));
+    pluginInfo->statusMessage = NX_FMT("Loaded %1", pluginDesignationForStatusMessage(pluginInfo));
 
     NX_INFO(this, pluginInfo->statusMessage);
 
@@ -309,8 +315,7 @@ bool PluginManager::storeLoadedPluginInfo(
     return true;
 }
 
-bool PluginManager::processPluginEntryPointForNewSdk(
-    IPlugin::EntryPointFunc entryPointFunc, PluginInfoPtr pluginInfo)
+bool PluginManager::processNewSdkPlugin(Ptr<IPlugin> plugin, PluginInfoPtr pluginInfo)
 {
     const auto error = //< Returns false to enable usage `return error(...)`.
         [this, &pluginInfo](const QString& errorMessage)
@@ -319,7 +324,6 @@ bool PluginManager::processPluginEntryPointForNewSdk(
                 Error::libraryFailure, errorMessage);
         };
 
-    const auto plugin = toPtr(entryPointFunc());
     if (!plugin)
     {
         return error(
@@ -485,6 +489,21 @@ bool PluginManager::processSdkVersion(QLibrary* lib, PluginInfoPtr pluginInfo)
     return true;
 }
 
+bool PluginManager::processNewSdkPluginLib(QLibrary* lib, PluginInfoPtr pluginInfo)
+{
+    // NOTE: We do not look for these exported functions in old-SDK plugins, because such
+    // plugins do not export these function but may be linked to nx_vms_server library which
+    // exports these functions, and thus QLibrary::resolve() will find them.
+
+    if (!processLibContext(lib, pluginInfo))
+        return false;
+
+    if (!processSdkVersion(lib, pluginInfo))
+        return false;
+
+    return true;
+}
+
 bool PluginManager::processPluginLib(
     QLibrary* lib, const SettingsHolder& settingsHolder, PluginInfoPtr pluginInfo)
 {
@@ -496,27 +515,56 @@ bool PluginManager::processPluginLib(
             oldEntryPointFunc, settingsHolder, pluginInfo);
     }
 
+    if (const auto multiEntryPointFunc = reinterpret_cast<IPlugin::MultiEntryPointFunc>(
+        lib->resolve(IPlugin::kMultiEntryPointFuncName)))
+    {
+        // New entry point of multi-IPlugin plugin found: currently, this is an Analytics plugin.
+        processNewSdkPluginLib(lib, pluginInfo);
+
+        int instanceIndex = 0;
+        while (const auto plugin = toPtr(multiEntryPointFunc(instanceIndex)))
+        {
+            const auto currentPluginInfo = std::make_shared<PluginInfo>();
+            *currentPluginInfo = *pluginInfo; //< Deep-copy pluginInfo for each IPlugin.
+            currentPluginInfo->instanceIndex = instanceIndex;
+            if (!processNewSdkPlugin(std::move(plugin), currentPluginInfo))
+                return false;
+            ++instanceIndex;
+        }
+        if (instanceIndex == 0)
+        {
+            // The multi-IPlugin entry point function generated no IPlugins - try to call the
+            // single-IPlugin entry point function.
+            if (const auto entryPointFunc = reinterpret_cast<IPlugin::EntryPointFunc>(
+                lib->resolve(IPlugin::kEntryPointFuncName)))
+            {
+                const auto plugin = toPtr(entryPointFunc());
+                return processNewSdkPlugin(plugin, pluginInfo);
+            }
+            return storeNotLoadedPluginInfo(pluginInfo, Status::notLoadedBecauseOfError,
+                Error::invalidLibrary,
+                lm("Entry point function %1(0) returned null, and %2() was not found").args(
+                    IPlugin::kMultiEntryPointFuncName, IPlugin::kEntryPointFuncName));
+        }
+        return true;
+    }
+
     if (const auto entryPointFunc = reinterpret_cast<IPlugin::EntryPointFunc>(
         lib->resolve(IPlugin::kEntryPointFuncName)))
     {
-        // New entry point found: currently, this is an Analytics plugin.
+        // New entry point of single-IPlugin plugin found: currently, this is an Analytics plugin.
+        processNewSdkPluginLib(lib, pluginInfo);
 
-        // NOTE: We do not look for these exported functions in old-SDK plugins, because such
-        // plugins do not export these function but may be linked to nx_vms_server library which
-        // exports these functions, and thus QLibrary::resolve() will find them.
-
-        if (!processLibContext(lib, pluginInfo))
-            return false;
-
-        if (!processSdkVersion(lib, pluginInfo))
-            return false;
-
-        return processPluginEntryPointForNewSdk(entryPointFunc, pluginInfo);
+        const auto plugin = toPtr(entryPointFunc());
+        return processNewSdkPlugin(plugin, pluginInfo);
     }
 
     return storeNotLoadedPluginInfo(pluginInfo, Status::notLoadedBecauseOfError,
-        Error::invalidLibrary, lm("No entry point function %1() or old SDK %2()").args(
-            IPlugin::kEntryPointFuncName, nxpl::Plugin::kEntryPointFuncName));
+        Error::invalidLibrary,
+        NX_FMT("No entry point functions found; expected %1(), %2() or old SDK %3()",
+            IPlugin::kEntryPointFuncName,
+            IPlugin::kMultiEntryPointFuncName,
+            nxpl::Plugin::kEntryPointFuncName));
 }
 
 void PluginManager::loadPlugin(
@@ -569,7 +617,7 @@ void PluginManager::loadPluginsFromDir(
 {
     for (const auto& fileInfo: pluginFileInfoList(dirToSearch))
     {
-        const PluginInfoPtr pluginInfo = std::make_shared<PluginInfo>();
+        const auto pluginInfo = std::make_shared<PluginInfo>();
         pluginInfo->libName = libNameFromFileInfo(fileInfo);
         pluginInfo->libraryFilename = fileInfo.absoluteFilePath();
 

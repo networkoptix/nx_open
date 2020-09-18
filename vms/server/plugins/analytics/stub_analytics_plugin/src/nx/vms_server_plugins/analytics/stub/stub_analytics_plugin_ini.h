@@ -46,6 +46,10 @@ struct Ini: public nx::kit::IniConfig
 
     NX_INI_FLAG(0, usePluginAsSettingsOrigin,
         "If set, Engine will declare the corresponding capability in the manifest.");
+
+    NX_INI_INT(0, multiPluginInstanceCount,
+        "If >= 1, the multi-IPlugin entry point function will produce the specified number\n"
+        "of IPlugin instances, and the single-IPlugin entry point function will return null.");
 };
 
 Ini& ini();

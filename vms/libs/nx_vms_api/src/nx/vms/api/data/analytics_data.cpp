@@ -59,6 +59,7 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::PluginInfo, Error,
     (nx::vms::api::PluginInfo::Error::libraryFailure, "libraryFailure")
     (nx::vms::api::PluginInfo::Error::badManifest, "badManifest")
     (nx::vms::api::PluginInfo::Error::unsupportedVersion, "unsupportedVersion")
+    (nx::vms::api::PluginInfo::Error::internalError, "internalError")
 )
 
 QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::api::PluginInfo, MainInterface,

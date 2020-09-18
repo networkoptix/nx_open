@@ -26,11 +26,31 @@ class IPlugin: public Interface<IPlugin>
 public:
     static auto interfaceId() { return makeId("nx::sdk::IPlugin"); }
 
-    /** Name of a plugin entry point function. */
+    /**
+     * Prototype of a plugin entry point function for single-IPlugin Plugins.
+     *
+     * The Server calls this function only when the Plugin library does not export the
+     * multi-IPlugin entry point function.
+     */
+    typedef IPlugin* (*EntryPointFunc)();
+
+    /** Name of a plugin entry point function for single-IPlugin plugins. */
     static constexpr const char* kEntryPointFuncName = "createNxPlugin";
 
-    /** Prototype of a plugin entry point function. */
-    typedef IPlugin* (*EntryPointFunc)();
+    /**
+     * Prototype of a plugin entry point function for multi-IPlugin Plugins.
+     *
+     * The Server calls this function multiple times, passing sequential values starting from 0,
+     * until the function returns null. Each non-null result is processed the same way as the
+     * result of the single-IPlugin entry point function.
+     *
+     * If this function is exported from the Plugin library and returns at least one Plugin
+     * instance, the single-IPlugin entry point function will not be called.
+     */
+    typedef IPlugin* (*MultiEntryPointFunc)(int instanceIndex);
+
+    /** Name of a Plugin entry point function for multi-IPlugin Plugins. */
+    static constexpr const char* kMultiEntryPointFuncName = "createNxPluginByIndex";
 
     /**
      * Provides an object which the plugin can use for calling back to access some data and

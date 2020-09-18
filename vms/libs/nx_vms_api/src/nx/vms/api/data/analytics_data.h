@@ -26,7 +26,12 @@ struct NX_VMS_API AnalyticsEngineData: ResourceData
 
 #define AnalyticsEngineData_Fields ResourceData_Fields
 
-/**%apidoc Information about a Server plugin library.*/
+/**%apidoc
+ * Information about a Server Plugin and its dynamic library. If the Plugin object was not created
+ * because of issues with the dynamic library, PluginInfo keeps information about these issues. If
+ * there is more than one Plugin object created by the same dynamic library, each will have its own
+ * instance of PluginInfo.
+ */
 struct NX_VMS_API PluginInfo: Data
 {
     enum class Optionality
@@ -170,6 +175,12 @@ struct NX_VMS_API PluginInfo: Data
      * plugin fails to report the SDK version, this value is set to the description of the reason.
      */
     QString nxSdkVersion;
+
+    /**%apidoc
+     * For Plugins created via multi-IPlugin entry point function, a 0-based index of the IPlugin
+     * instance corresponding to this PluginInfo instance. Otherwise, -1.
+     */
+    int instanceIndex = -1;
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::Optionality)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::Status)
@@ -188,7 +199,8 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(PluginInfo::MainInterface)
     (errorCode) \
     (mainInterface) \
     (isActive) \
-    (nxSdkVersion)
+    (nxSdkVersion) \
+    (instanceIndex)
 
 NX_VMS_API QString toString(PluginInfo::Optionality value);
 NX_VMS_API QString toString(PluginInfo::Status value);
@@ -234,7 +246,7 @@ struct NX_VMS_API PluginResourceBindingInfo
     (boundResourceCount) \
     (onlineBoundResourceCount)
 
-/**%apidoc Extended information about a Server plugin library.*/
+/**%apidoc Extended information about a Server Plugin. */
 struct NX_VMS_API PluginInfoEx: public PluginInfo
 {
     PluginInfoEx() = default;
