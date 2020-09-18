@@ -124,6 +124,10 @@ to view more bookmarks</source>
       <source>Installing</source>
       <translation>Installeren</translation>
     </message>
+    <message>
+      <source>Verifying update package</source>
+      <translation type="unfinished">Verifying update package</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>
@@ -1585,6 +1589,26 @@ to view more bookmarks</source>
       <source>Layout is locked</source>
       <translation>Layout is vergrendeld</translation>
     </message>
+    <message>
+      <source>This camera does not support advanced PTZ</source>
+      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
+    </message>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Focusing...</source>
+      <translation type="unfinished">Focusing...</translation>
+    </message>
   </context>
   <context>
     <name>PtzOverlayWidget</name>
@@ -2032,6 +2056,18 @@ to view more bookmarks</source>
     <message>
       <source>Event rules reset to default</source>
       <translation>Event regels gereset naar standaard</translation>
+    </message>
+    <message>
+      <source>Storage added</source>
+      <translation type="unfinished">Storage added</translation>
+    </message>
+    <message>
+      <source>Storage updated</source>
+      <translation type="unfinished">Storage updated</translation>
+    </message>
+    <message>
+      <source>Storage removed</source>
+      <translation type="unfinished">Storage removed</translation>
     </message>
   </context>
   <context>
@@ -6032,10 +6068,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <translation>De archiefindex herbouwen wordt door de gebruiker op de volgende server geannuleerd:</translation>
     </message>
     <message>
-      <source>Storage is not configured on the following Server:</source>
-      <translation>Opslag is niet geconfigureerd op de volgende server:</translation>
-    </message>
-    <message>
       <source>Learn more</source>
       <translation>Meer informatie</translation>
     </message>
@@ -6618,10 +6650,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <translation>Bladwijzer</translation>
     </message>
     <message>
-      <source>Bookmarks can only be added to an online server.</source>
-      <translation>Bladwijzers kunnen alleen worden toegevoegd aan een online server.</translation>
-    </message>
-    <message>
       <source>Server offline</source>
       <translation>Server offline</translation>
     </message>
@@ -6662,6 +6690,13 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Failed to connect to the selected server</source>
       <translation>Kan geen verbinding maken met de gekozen server</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchController</name>
+    <message>
+      <source>To switch between cameras press Shift + Arrow</source>
+      <translation type="unfinished">To switch between cameras press Shift + Arrow</translation>
     </message>
   </context>
   <context>
@@ -6713,6 +6748,21 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
       <translation>Het is niet mogelijk een evenement te bevestigen op een verwijderde camera.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchPtzHandler</name>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
     </message>
   </context>
   <context>
@@ -7542,16 +7592,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
-    <message numerus="yes">
-      <source>+%n values</source>
-      <translation>
-        <numerusform>+%n waarden</numerusform>
-        <numerusform>+%n waarden</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
@@ -7585,6 +7625,10 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>NO DATA</source>
       <translation>GEEN GEGEVENS</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -7788,6 +7832,10 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>Hoge minimumwaarde kan ertoe leiden dat archieflengte afneemt op andere apparaten.</translation>
     </message>
+    <message>
+      <source>High pre-recording time will increase RAM utilization on the server</source>
+      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
@@ -7935,22 +7983,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
   <context>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
-      <source>Update file is not found</source>
-      <translation>Update bestand kan niet gevonden worden</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted</source>
-      <translation>Updatepakket is beschadigd</translation>
-    </message>
-    <message>
-      <source>Failed to download update package: %1</source>
-      <translation>Downloaden van updatepakket mislukt: %1</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted: %1</source>
-      <translation>Updatepakket is beschadigd: %1</translation>
-    </message>
-    <message>
       <source>This update is already installed.</source>
       <translation>Deze update is al geïnstalleerd.</translation>
     </message>
@@ -7977,6 +8009,14 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Installation package has been lost.</source>
       <translation>Installatiepakket is verloren gegaan.</translation>
+    </message>
+    <message>
+      <source>File %1 does not exist</source>
+      <translation type="unfinished">File %1 does not exist</translation>
+    </message>
+    <message>
+      <source>There is no valid client package to download</source>
+      <translation type="unfinished">There is no valid client package to download</translation>
     </message>
   </context>
   <context>
@@ -8415,6 +8455,30 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
       <translation>Gebruik deze instelling om vervorming te compenseren als de camera niet exact verticaal of horizontaal is gemonteerd.</translation>
     </message>
+    <message>
+      <source>Equidistant</source>
+      <translation type="unfinished">Equidistant</translation>
+    </message>
+    <message>
+      <source>Stereographic</source>
+      <translation type="unfinished">Stereographic</translation>
+    </message>
+    <message>
+      <source>Equisolid</source>
+      <translation type="unfinished">Equisolid</translation>
+    </message>
+    <message>
+      <source>Ceiling</source>
+      <translation type="unfinished">Ceiling</translation>
+    </message>
+    <message>
+      <source>Wall</source>
+      <translation type="unfinished">Wall</translation>
+    </message>
+    <message>
+      <source>Floor/Table</source>
+      <translation type="unfinished">Floor/Table</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
@@ -8570,6 +8634,10 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>NOT A CAMERA</source>
       <translation>GEEN CAMERA</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -8932,6 +9000,16 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::NameValueTable</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation>
+        <numerusform>+%n waarden</numerusform>
+        <numerusform>+%n waarden</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
       <source>Alarm: %1</source>
@@ -9014,10 +9092,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <translation>Geïnstalleerd</translation>
     </message>
     <message>
-      <source>Failed to download update</source>
-      <translation>Update downloaden mislukt</translation>
-    </message>
-    <message>
       <source>Waiting for peer data</source>
       <translation>Wachten op peer data</translation>
     </message>
@@ -9050,10 +9124,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <translation>Interne downloader fout.</translation>
     </message>
     <message>
-      <source>Internal client error.</source>
-      <translation>Interne client fout.</translation>
-    </message>
-    <message>
       <source>Unknown error.</source>
       <translation>Onbekende fout.</translation>
     </message>
@@ -9084,6 +9154,14 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Update installation failed.</source>
       <translation>Installatie bijwerken mislukt.</translation>
+    </message>
+    <message>
+      <source>Update file verification failed.</source>
+      <translation type="unfinished">Update file verification failed.</translation>
+    </message>
+    <message>
+      <source>Verifying update</source>
+      <translation type="unfinished">Verifying update</translation>
     </message>
   </context>
   <context>

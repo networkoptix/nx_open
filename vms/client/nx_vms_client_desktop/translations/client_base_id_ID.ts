@@ -125,6 +125,10 @@ to view more bookmarks</translation>
       <source>Installing</source>
       <translation type="unfinished">Installing</translation>
     </message>
+    <message>
+      <source>Verifying update package</source>
+      <translation type="unfinished">Verifying update package</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>
@@ -1572,6 +1576,26 @@ to view more bookmarks</translation>
       <source>Layout is locked</source>
       <translation type="unfinished">Layout is locked</translation>
     </message>
+    <message>
+      <source>This camera does not support advanced PTZ</source>
+      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
+    </message>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Focusing...</source>
+      <translation type="unfinished">Focusing...</translation>
+    </message>
   </context>
   <context>
     <name>PtzOverlayWidget</name>
@@ -2010,6 +2034,18 @@ to view more bookmarks</translation>
     <message>
       <source>Event rules reset to default</source>
       <translation type="unfinished">Event rules reset to default</translation>
+    </message>
+    <message>
+      <source>Storage added</source>
+      <translation type="unfinished">Storage added</translation>
+    </message>
+    <message>
+      <source>Storage updated</source>
+      <translation type="unfinished">Storage updated</translation>
+    </message>
+    <message>
+      <source>Storage removed</source>
+      <translation type="unfinished">Storage removed</translation>
     </message>
   </context>
   <context>
@@ -5972,10 +6008,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Rebuilding archive index is canceled by user on the following Server:</translation>
     </message>
     <message>
-      <source>Storage is not configured on the following Server:</source>
-      <translation>Storage is not configured on the following Server:</translation>
-    </message>
-    <message>
       <source>Learn more</source>
       <translation>Learn more</translation>
     </message>
@@ -6556,10 +6588,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Bookmark</translation>
     </message>
     <message>
-      <source>Bookmarks can only be added to an online server.</source>
-      <translation>Bookmarks can only be added to an online server.</translation>
-    </message>
-    <message>
       <source>Server offline</source>
       <translation>Server offline</translation>
     </message>
@@ -6599,6 +6627,13 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Failed to connect to the selected server</source>
       <translation type="unfinished">Failed to connect to the selected server</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchController</name>
+    <message>
+      <source>To switch between cameras press Shift + Arrow</source>
+      <translation type="unfinished">To switch between cameras press Shift + Arrow</translation>
     </message>
   </context>
   <context>
@@ -6650,6 +6685,21 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
       <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchPtzHandler</name>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
     </message>
   </context>
   <context>
@@ -7446,15 +7496,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
-    <message numerus="yes">
-      <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
@@ -7487,6 +7528,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>NO DATA</source>
       <translation>NO DATA</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -7687,6 +7732,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation type="unfinished">High minimum value can lead to archive length decrease on other cameras.</translation>
     </message>
+    <message>
+      <source>High pre-recording time will increase RAM utilization on the server</source>
+      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
@@ -7828,22 +7877,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
-      <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted</source>
-      <translation type="unfinished">Update package is corrupted</translation>
-    </message>
-    <message>
-      <source>Failed to download update package: %1</source>
-      <translation type="unfinished">Failed to download update package: %1</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted: %1</source>
-      <translation type="unfinished">Update package is corrupted: %1</translation>
-    </message>
-    <message>
       <source>This update is already installed.</source>
       <translation type="unfinished">This update is already installed.</translation>
     </message>
@@ -7870,6 +7903,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Installation package has been lost.</source>
       <translation type="unfinished">Installation package has been lost.</translation>
+    </message>
+    <message>
+      <source>File %1 does not exist</source>
+      <translation type="unfinished">File %1 does not exist</translation>
+    </message>
+    <message>
+      <source>There is no valid client package to download</source>
+      <translation type="unfinished">There is no valid client package to download</translation>
     </message>
   </context>
   <context>
@@ -8303,6 +8344,30 @@ If you intended to move analytics data to another storage location, please conta
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
       <translation type="unfinished">Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</translation>
     </message>
+    <message>
+      <source>Equidistant</source>
+      <translation type="unfinished">Equidistant</translation>
+    </message>
+    <message>
+      <source>Stereographic</source>
+      <translation type="unfinished">Stereographic</translation>
+    </message>
+    <message>
+      <source>Equisolid</source>
+      <translation type="unfinished">Equisolid</translation>
+    </message>
+    <message>
+      <source>Ceiling</source>
+      <translation type="unfinished">Ceiling</translation>
+    </message>
+    <message>
+      <source>Wall</source>
+      <translation type="unfinished">Wall</translation>
+    </message>
+    <message>
+      <source>Floor/Table</source>
+      <translation type="unfinished">Floor/Table</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
@@ -8456,6 +8521,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>NOT A CAMERA</source>
       <translation type="unfinished">NOT A CAMERA</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -8816,6 +8885,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::NameValueTable</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation type="unfinished">
+        <numerusform>+%n values</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
       <source>Alarm: %1</source>
@@ -8898,10 +8976,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Installed</translation>
     </message>
     <message>
-      <source>Failed to download update</source>
-      <translation type="unfinished">Failed to download update</translation>
-    </message>
-    <message>
       <source>Waiting for peer data</source>
       <translation type="unfinished">Waiting for peer data</translation>
     </message>
@@ -8934,10 +9008,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Internal downloader error.</translation>
     </message>
     <message>
-      <source>Internal client error.</source>
-      <translation type="unfinished">Internal client error.</translation>
-    </message>
-    <message>
       <source>Unknown error.</source>
       <translation>Unknown error.</translation>
     </message>
@@ -8968,6 +9038,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update installation failed.</source>
       <translation type="unfinished">Update installation failed.</translation>
+    </message>
+    <message>
+      <source>Update file verification failed.</source>
+      <translation type="unfinished">Update file verification failed.</translation>
+    </message>
+    <message>
+      <source>Verifying update</source>
+      <translation type="unfinished">Verifying update</translation>
     </message>
   </context>
   <context>

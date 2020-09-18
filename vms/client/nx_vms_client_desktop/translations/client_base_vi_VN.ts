@@ -124,6 +124,10 @@ to view more bookmarks</source>
       <source>Installing</source>
       <translation>Đang cài đặt</translation>
     </message>
+    <message>
+      <source>Verifying update package</source>
+      <translation type="unfinished">Verifying update package</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>
@@ -1571,6 +1575,26 @@ to view more bookmarks</source>
       <source>Layout is locked</source>
       <translation>Bố cục bị khóa</translation>
     </message>
+    <message>
+      <source>This camera does not support advanced PTZ</source>
+      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
+    </message>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Focusing...</source>
+      <translation type="unfinished">Focusing...</translation>
+    </message>
   </context>
   <context>
     <name>PtzOverlayWidget</name>
@@ -2009,6 +2033,18 @@ to view more bookmarks</source>
     <message>
       <source>Event rules reset to default</source>
       <translation>Quy tắc sự kiện đặt lại về mặc định</translation>
+    </message>
+    <message>
+      <source>Storage added</source>
+      <translation type="unfinished">Storage added</translation>
+    </message>
+    <message>
+      <source>Storage updated</source>
+      <translation type="unfinished">Storage updated</translation>
+    </message>
+    <message>
+      <source>Storage removed</source>
+      <translation type="unfinished">Storage removed</translation>
     </message>
   </context>
   <context>
@@ -5966,10 +6002,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Xây dựng lại chỉ lưu trữ been hoàn thành trên máy chủ sau đây:</translation>
     </message>
     <message>
-      <source>Storage is not configured on the following Server:</source>
-      <translation>Lưu trữ không được cấu hình trên máy chủ sau đây:</translation>
-    </message>
-    <message>
       <source>Learn more</source>
       <translation>Tìm hiểu thêm</translation>
     </message>
@@ -6550,10 +6582,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Bookmark</translation>
     </message>
     <message>
-      <source>Bookmarks can only be added to an online server.</source>
-      <translation>Bookmark chỉ có thể được thêm vào một máy chủ trực tuyến.</translation>
-    </message>
-    <message>
       <source>Server offline</source>
       <translation>Tổ ẩn</translation>
     </message>
@@ -6593,6 +6621,13 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Failed to connect to the selected server</source>
       <translation>Không thể kết nối với máy chủ được chọn</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchController</name>
+    <message>
+      <source>To switch between cameras press Shift + Arrow</source>
+      <translation type="unfinished">To switch between cameras press Shift + Arrow</translation>
     </message>
   </context>
   <context>
@@ -6644,6 +6679,21 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
       <translation>Không thể xác nhận sự kiện trên máy ảnh bị xóa.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchPtzHandler</name>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
     </message>
   </context>
   <context>
@@ -7440,15 +7490,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
-    <message numerus="yes">
-      <source>+%n values</source>
-      <translation>
-        <numerusform>+%n giá trị</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
@@ -7481,6 +7522,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>NO DATA</source>
       <translation>Không có sẵn</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -7681,6 +7726,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>Giá trị nhỏ nhất có thể dẫn đến giảm độ dài lưu trữ trên camera.</translation>
     </message>
+    <message>
+      <source>High pre-recording time will increase RAM utilization on the server</source>
+      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
@@ -7822,22 +7871,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
   <context>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
-      <source>Update file is not found</source>
-      <translation>Không tìm thấy tập tin cập nhật</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted</source>
-      <translation>Gói cập nhật bị hỏng</translation>
-    </message>
-    <message>
-      <source>Failed to download update package: %1</source>
-      <translation>Không thể tải xuống gói cập nhật: %1</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted: %1</source>
-      <translation>Gói cập nhật bị hỏng: %1</translation>
-    </message>
-    <message>
       <source>This update is already installed.</source>
       <translation>Bản cập nhật này đã được cài đặt.</translation>
     </message>
@@ -7864,6 +7897,14 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Installation package has been lost.</source>
       <translation>Gói cài đặt đã bị mất.</translation>
+    </message>
+    <message>
+      <source>File %1 does not exist</source>
+      <translation type="unfinished">File %1 does not exist</translation>
+    </message>
+    <message>
+      <source>There is no valid client package to download</source>
+      <translation type="unfinished">There is no valid client package to download</translation>
     </message>
   </context>
   <context>
@@ -8297,6 +8338,30 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
       <translation>Sử dụng cài đặt này để bù cho sự biến dạng nếu máy ảnh không được lắp chính xác theo chiều dọc hoặc chiều ngang.</translation>
     </message>
+    <message>
+      <source>Equidistant</source>
+      <translation type="unfinished">Equidistant</translation>
+    </message>
+    <message>
+      <source>Stereographic</source>
+      <translation type="unfinished">Stereographic</translation>
+    </message>
+    <message>
+      <source>Equisolid</source>
+      <translation type="unfinished">Equisolid</translation>
+    </message>
+    <message>
+      <source>Ceiling</source>
+      <translation type="unfinished">Ceiling</translation>
+    </message>
+    <message>
+      <source>Wall</source>
+      <translation type="unfinished">Wall</translation>
+    </message>
+    <message>
+      <source>Floor/Table</source>
+      <translation type="unfinished">Floor/Table</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
@@ -8450,6 +8515,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>NOT A CAMERA</source>
       <translation>KHÔNG PHẢI LÀ CAMERA</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -8810,6 +8879,15 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::NameValueTable</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation>
+        <numerusform>+%n giá trị</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
       <source>Alarm: %1</source>
@@ -8892,10 +8970,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Đã cài đặt</translation>
     </message>
     <message>
-      <source>Failed to download update</source>
-      <translation>Không thể tải xuống bản cập nhật</translation>
-    </message>
-    <message>
       <source>Waiting for peer data</source>
       <translation>Chờ dữ liệu ngang hàng</translation>
     </message>
@@ -8928,10 +9002,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Lỗi tải xuống nội bộ.</translation>
     </message>
     <message>
-      <source>Internal client error.</source>
-      <translation>Lỗi máy khách nội bộ.</translation>
-    </message>
-    <message>
       <source>Unknown error.</source>
       <translation>Lỗi không xác định.</translation>
     </message>
@@ -8962,6 +9032,14 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Update installation failed.</source>
       <translation>Cập nhật cài đặt thất bại.</translation>
+    </message>
+    <message>
+      <source>Update file verification failed.</source>
+      <translation type="unfinished">Update file verification failed.</translation>
+    </message>
+    <message>
+      <source>Verifying update</source>
+      <translation type="unfinished">Verifying update</translation>
     </message>
   </context>
   <context>

@@ -122,6 +122,11 @@
       <source>Limit Frame Rate to save CPU</source>
       <translation>הגבל את קצב הפריימים ליעול המעבד</translation>
     </message>
+    <message>
+      <location/>
+      <source>Use Hardware Video Decoding</source>
+      <translation type="unfinished">Use Hardware Video Decoding</translation>
+    </message>
   </context>
   <context>
     <name>AggregationWidget</name>
@@ -1320,21 +1325,6 @@
     <name>FisheyeSettingsWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/fisheye/fisheye_settings_widget.ui"/>
-      <source>Ceiling Mount</source>
-      <translation>התקן גג</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Wall Mount</source>
-      <translation>התקן קיר</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Floor/Table Mount</source>
-      <translation>התקן רצפה/שולחן</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fisheye Dewarping</source>
       <translation>פריסת מצלמת עין הדג</translation>
     </message>
@@ -1342,11 +1332,6 @@
       <location/>
       <source>Auto Calibration</source>
       <translation>כיול אוטומטי</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Mount Angle Correction:</source>
-      <translation>תיקון זווית התקנה:</translation>
     </message>
     <message>
       <location/>
@@ -1367,6 +1352,26 @@
       <location/>
       <source>Ellipticity</source>
       <translation>אליפטיות</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Show grid</source>
+      <translation type="unfinished">Show grid</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Mount</source>
+      <translation type="unfinished">Mount</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Angle</source>
+      <translation type="unfinished">Angle</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Lens projection</source>
+      <translation type="unfinished">Lens projection</translation>
     </message>
   </context>
   <context>
@@ -1443,6 +1448,11 @@
       <location/>
       <source>Run Application when PC Boots up</source>
       <translation>הפעל את היישום בעליית המחשב</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Play audio from all cameras on layout</source>
+      <translation type="unfinished">Play audio from all cameras on layout</translation>
     </message>
   </context>
   <context>
@@ -1964,6 +1974,11 @@
       <location/>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
       <translation>כתובות IP עבור מצלמות, שרתים, קבוצות משתמשים וכו '.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Show aim overlay for PTZ cameras</source>
+      <translation type="unfinished">Show aim overlay for PTZ cameras</translation>
     </message>
   </context>
   <context>

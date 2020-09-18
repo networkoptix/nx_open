@@ -124,6 +124,10 @@ to view more bookmarks</source>
       <source>Installing</source>
       <translation>설치 중...</translation>
     </message>
+    <message>
+      <source>Verifying update package</source>
+      <translation type="unfinished">Verifying update package</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>
@@ -1571,6 +1575,26 @@ to view more bookmarks</source>
       <source>Layout is locked</source>
       <translation>레이아웃이 잠겨 있습니다</translation>
     </message>
+    <message>
+      <source>This camera does not support advanced PTZ</source>
+      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
+    </message>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Focusing...</source>
+      <translation type="unfinished">Focusing...</translation>
+    </message>
   </context>
   <context>
     <name>PtzOverlayWidget</name>
@@ -2009,6 +2033,18 @@ to view more bookmarks</source>
     <message>
       <source>Event rules reset to default</source>
       <translation>이벤트 규칙이 기본값으로 재설정</translation>
+    </message>
+    <message>
+      <source>Storage added</source>
+      <translation type="unfinished">Storage added</translation>
+    </message>
+    <message>
+      <source>Storage updated</source>
+      <translation type="unfinished">Storage updated</translation>
+    </message>
+    <message>
+      <source>Storage removed</source>
+      <translation type="unfinished">Storage removed</translation>
     </message>
   </context>
   <context>
@@ -5967,10 +6003,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>아래 서버의 녹화 DB 재 정렬이 사용자에 의해 취소됨</translation>
     </message>
     <message>
-      <source>Storage is not configured on the following Server:</source>
-      <translation>아래 서버에 대해 녹화 장치 설정 되지 않음</translation>
-    </message>
-    <message>
       <source>Learn more</source>
       <translation>자세히 알아보기</translation>
     </message>
@@ -6551,10 +6583,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>즐겨찾기</translation>
     </message>
     <message>
-      <source>Bookmarks can only be added to an online server.</source>
-      <translation>즐겨찾기는 활성화된 서버에만 추가 됩니다.</translation>
-    </message>
-    <message>
       <source>Server offline</source>
       <translation>서버 오프라인</translation>
     </message>
@@ -6594,6 +6622,13 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Failed to connect to the selected server</source>
       <translation>선택한 서버에 연결이 실패했습니다</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchController</name>
+    <message>
+      <source>To switch between cameras press Shift + Arrow</source>
+      <translation type="unfinished">To switch between cameras press Shift + Arrow</translation>
     </message>
   </context>
   <context>
@@ -6645,6 +6680,21 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
       <translation>제거 된 카메라에서 이벤트를 승인 할 수 없습니다.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchPtzHandler</name>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
     </message>
   </context>
   <context>
@@ -7441,15 +7491,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
-    <message numerus="yes">
-      <source>+%n values</source>
-      <translation>
-        <numerusform>+%n 값</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
@@ -7482,6 +7523,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>NO DATA</source>
       <translation>데이터 없음</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -7682,6 +7727,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>High minimum value can lead to archive length decrease on other cameras.</translation>
     </message>
+    <message>
+      <source>High pre-recording time will increase RAM utilization on the server</source>
+      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
@@ -7823,22 +7872,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
-      <source>Update file is not found</source>
-      <translation>업데이트 파일을 찾을 수 없습니다</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted</source>
-      <translation>업데이트 패키지가 손상되었습니다</translation>
-    </message>
-    <message>
-      <source>Failed to download update package: %1</source>
-      <translation>업데이트 패키지를 다운로드하지 못했습니다: %1</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted: %1</source>
-      <translation>업데이트 패키지가 손상되었습니다: %1</translation>
-    </message>
-    <message>
       <source>This update is already installed.</source>
       <translation>이 업데이트는 이미 설치되어 있습니다.</translation>
     </message>
@@ -7865,6 +7898,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Installation package has been lost.</source>
       <translation>설치 패키지가 손실되었습니다.</translation>
+    </message>
+    <message>
+      <source>File %1 does not exist</source>
+      <translation type="unfinished">File %1 does not exist</translation>
+    </message>
+    <message>
+      <source>There is no valid client package to download</source>
+      <translation type="unfinished">There is no valid client package to download</translation>
     </message>
   </context>
   <context>
@@ -8298,6 +8339,30 @@ If you intended to move analytics data to another storage location, please conta
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
       <translation>카메라가 정확히 수직 또는 수평으로 장착되지 않은 경우 왜곡을 보정하려면이 설정을 사용하십시오.</translation>
     </message>
+    <message>
+      <source>Equidistant</source>
+      <translation type="unfinished">Equidistant</translation>
+    </message>
+    <message>
+      <source>Stereographic</source>
+      <translation type="unfinished">Stereographic</translation>
+    </message>
+    <message>
+      <source>Equisolid</source>
+      <translation type="unfinished">Equisolid</translation>
+    </message>
+    <message>
+      <source>Ceiling</source>
+      <translation type="unfinished">Ceiling</translation>
+    </message>
+    <message>
+      <source>Wall</source>
+      <translation type="unfinished">Wall</translation>
+    </message>
+    <message>
+      <source>Floor/Table</source>
+      <translation type="unfinished">Floor/Table</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
@@ -8451,6 +8516,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>NOT A CAMERA</source>
       <translation>카메라가 아닙니다</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -8811,6 +8880,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::NameValueTable</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation>
+        <numerusform>+%n 값</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
       <source>Alarm: %1</source>
@@ -8893,10 +8971,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>설치됨</translation>
     </message>
     <message>
-      <source>Failed to download update</source>
-      <translation>업데이트 다운로드 실패</translation>
-    </message>
-    <message>
       <source>Waiting for peer data</source>
       <translation>피어 데이터 대기</translation>
     </message>
@@ -8929,10 +9003,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>내부 다운로더 오류.</translation>
     </message>
     <message>
-      <source>Internal client error.</source>
-      <translation>내부 클라이언트 오류</translation>
-    </message>
-    <message>
       <source>Unknown error.</source>
       <translation>알수없는 오류</translation>
     </message>
@@ -8963,6 +9033,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update installation failed.</source>
       <translation>업데이트 설치에 실패했습니다.</translation>
+    </message>
+    <message>
+      <source>Update file verification failed.</source>
+      <translation type="unfinished">Update file verification failed.</translation>
+    </message>
+    <message>
+      <source>Verifying update</source>
+      <translation type="unfinished">Verifying update</translation>
     </message>
   </context>
   <context>

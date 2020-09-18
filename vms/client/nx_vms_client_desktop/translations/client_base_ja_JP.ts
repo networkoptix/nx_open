@@ -124,6 +124,10 @@ to view more bookmarks</source>
       <source>Installing</source>
       <translation>インストール中</translation>
     </message>
+    <message>
+      <source>Verifying update package</source>
+      <translation type="unfinished">Verifying update package</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>
@@ -1571,6 +1575,26 @@ to view more bookmarks</source>
       <source>Layout is locked</source>
       <translation>レイアウトはロックされています</translation>
     </message>
+    <message>
+      <source>This camera does not support advanced PTZ</source>
+      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
+    </message>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Focusing...</source>
+      <translation type="unfinished">Focusing...</translation>
+    </message>
   </context>
   <context>
     <name>PtzOverlayWidget</name>
@@ -2009,6 +2033,18 @@ to view more bookmarks</source>
     <message>
       <source>Event rules reset to default</source>
       <translation>イベントルールをデフォルトにリセット</translation>
+    </message>
+    <message>
+      <source>Storage added</source>
+      <translation type="unfinished">Storage added</translation>
+    </message>
+    <message>
+      <source>Storage updated</source>
+      <translation type="unfinished">Storage updated</translation>
+    </message>
+    <message>
+      <source>Storage removed</source>
+      <translation type="unfinished">Storage removed</translation>
     </message>
   </context>
   <context>
@@ -5967,10 +6003,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>アーカイブインデックスのリビルドキャンセル　サーバー:</translation>
     </message>
     <message>
-      <source>Storage is not configured on the following Server:</source>
-      <translation>ストレージが設定されていないサーバー:</translation>
-    </message>
-    <message>
       <source>Learn more</source>
       <translation>詳細</translation>
     </message>
@@ -6551,10 +6583,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>ブックマーク</translation>
     </message>
     <message>
-      <source>Bookmarks can only be added to an online server.</source>
-      <translation>ブックマークはオンラインサーバーのみ追加可能</translation>
-    </message>
-    <message>
       <source>Server offline</source>
       <translation>サーバーオフライン</translation>
     </message>
@@ -6594,6 +6622,13 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Failed to connect to the selected server</source>
       <translation>選択したサーバーに接続できませんでした</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchController</name>
+    <message>
+      <source>To switch between cameras press Shift + Arrow</source>
+      <translation type="unfinished">To switch between cameras press Shift + Arrow</translation>
     </message>
   </context>
   <context>
@@ -6645,6 +6680,21 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
       <translation>削除されたカメラでイベントを確認できません。</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchPtzHandler</name>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
     </message>
   </context>
   <context>
@@ -7441,15 +7491,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
-    <message numerus="yes">
-      <source>+%n values</source>
-      <translation>
-        <numerusform>+%n 値</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
@@ -7482,6 +7523,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>NO DATA</source>
       <translation>データがありません</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -7682,6 +7727,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>高い最小値は、他のカメラのアーカイブ期間を減少させる可能性があります</translation>
     </message>
+    <message>
+      <source>High pre-recording time will increase RAM utilization on the server</source>
+      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
@@ -7823,22 +7872,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
-      <source>Update file is not found</source>
-      <translation>更新ファイルが見つかりません</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted</source>
-      <translation>更新パッケージが破損しています</translation>
-    </message>
-    <message>
-      <source>Failed to download update package: %1</source>
-      <translation>アップデートパッケージのダウンロードに失敗しました： %1</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted: %1</source>
-      <translation>アップデートパッケージが破損しています： %1</translation>
-    </message>
-    <message>
       <source>This update is already installed.</source>
       <translation>この更新プログラムは既にインストールされています。</translation>
     </message>
@@ -7865,6 +7898,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Installation package has been lost.</source>
       <translation>インストールパッケージが失われました。</translation>
+    </message>
+    <message>
+      <source>File %1 does not exist</source>
+      <translation type="unfinished">File %1 does not exist</translation>
+    </message>
+    <message>
+      <source>There is no valid client package to download</source>
+      <translation type="unfinished">There is no valid client package to download</translation>
     </message>
   </context>
   <context>
@@ -8298,6 +8339,30 @@ If you intended to move analytics data to another storage location, please conta
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
       <translation>カメラが垂直または水平に正確に取り付けられていない場合は、この設定を使用して歪みを補正します。</translation>
     </message>
+    <message>
+      <source>Equidistant</source>
+      <translation type="unfinished">Equidistant</translation>
+    </message>
+    <message>
+      <source>Stereographic</source>
+      <translation type="unfinished">Stereographic</translation>
+    </message>
+    <message>
+      <source>Equisolid</source>
+      <translation type="unfinished">Equisolid</translation>
+    </message>
+    <message>
+      <source>Ceiling</source>
+      <translation type="unfinished">Ceiling</translation>
+    </message>
+    <message>
+      <source>Wall</source>
+      <translation type="unfinished">Wall</translation>
+    </message>
+    <message>
+      <source>Floor/Table</source>
+      <translation type="unfinished">Floor/Table</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
@@ -8451,6 +8516,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>NOT A CAMERA</source>
       <translation>カメラではありません</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -8811,6 +8880,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::NameValueTable</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation>
+        <numerusform>+%n 値</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
       <source>Alarm: %1</source>
@@ -8893,10 +8971,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>インストール済み</translation>
     </message>
     <message>
-      <source>Failed to download update</source>
-      <translation>更新プログラムをダウンロードできませんでした</translation>
-    </message>
-    <message>
       <source>Waiting for peer data</source>
       <translation>ピアデータを待っています</translation>
     </message>
@@ -8929,10 +9003,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>内部ダウンローダーエラー</translation>
     </message>
     <message>
-      <source>Internal client error.</source>
-      <translation>内部クライアントエラー</translation>
-    </message>
-    <message>
       <source>Unknown error.</source>
       <translation>不明なエラー</translation>
     </message>
@@ -8963,6 +9033,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update installation failed.</source>
       <translation>更新のインストールに失敗しました。</translation>
+    </message>
+    <message>
+      <source>Update file verification failed.</source>
+      <translation type="unfinished">Update file verification failed.</translation>
+    </message>
+    <message>
+      <source>Verifying update</source>
+      <translation type="unfinished">Verifying update</translation>
     </message>
   </context>
   <context>

@@ -131,7 +131,7 @@
         "maxEventLogRecords": "Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.",
         "forceLiveCacheForPrimaryStream": "Whether to cache some frames for the primary stream. Values: \"yes\" - always enabled (may use a lot of RAM), \"no\" - always disabled except when required by the playback (e.g. HLS), \"auto\" - similar to \"no\", but turned on when improves the user experience (e.g. when some Analytics plugin is working on the camera).",
         "additionalLocalFsTypes": "Additional file system types to consider while deciding if a given partition is suitable to be a server storage. Comma separated list of file system names as they listed in /proc/mounts is expected.",
-        "rtspBufferSizeKb": "Server side RTSP buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value but slow down auto quality switching and reaction to RTSP seek operation."
+        "mediaBufferSizeKb": "Server-side media buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value, but slows down the auto quality switching and reaction to media seek operations."
     },
     "info": {
         "tabs": {
@@ -235,12 +235,12 @@
             "view": "view + [camera name]",
             "search": "find + [text for searchbar]",
             "clear search": "مسح البحث",
-            "expand server": "expand server + [server name]",
-            "collapse server": "collapse server + [server name]",
+            "expand server": "توسيع الخادم + [اسم الخادم]",
+            "collapse server": "طي الخادم + [اسم الخادم]",
             "expand all servers": "توسيع جميع الخوادم",
             "collapse all servers": "طي جميع الخوادم",
             "stop listening": "stop listening",
-            "help": "help | show commands"
+            "help": "مساعدة | عرض الأوامر"
         }
     }
 }

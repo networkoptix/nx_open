@@ -26,7 +26,7 @@
     <message>
       <location/>
       <source>Support</source>
-      <translation type="unfinished">Support</translation>
+      <translation>Suport</translation>
     </message>
     <message>
       <location/>
@@ -47,7 +47,7 @@
     <message>
       <location filename="../src/ui/dialogs/adjust_video_dialog.ui"/>
       <source>Image Enhancement</source>
-      <translation type="unfinished">Image Enhancement</translation>
+      <translation>Millora de la imatge</translation>
     </message>
     <message>
       <location/>
@@ -121,6 +121,11 @@
       <location/>
       <source>Limit Frame Rate to save CPU</source>
       <translation type="unfinished">Limit Frame Rate to save CPU</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Use Hardware Video Decoding</source>
+      <translation type="unfinished">Use Hardware Video Decoding</translation>
     </message>
   </context>
   <context>
@@ -207,17 +212,17 @@
     <message>
       <location/>
       <source>Watching archive</source>
-      <translation type="unfinished">Watching archive</translation>
+      <translation>Arxiu de visualització</translation>
     </message>
     <message>
       <location/>
       <source>Exporting video</source>
-      <translation type="unfinished">Exporting video</translation>
+      <translation>S'està exportant el vídeo</translation>
     </message>
     <message>
       <location/>
       <source>Watching live</source>
-      <translation type="unfinished">Watching live</translation>
+      <translation>Veient el directe</translation>
     </message>
     <message>
       <location/>
@@ -394,7 +399,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Eliminar</translation>
     </message>
     <message>
       <location/>
@@ -427,7 +432,7 @@
     <message>
       <location/>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Descripció</translation>
     </message>
     <message>
       <location/>
@@ -516,7 +521,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Eliminar</translation>
     </message>
     <message>
       <location/>
@@ -526,7 +531,7 @@
     <message>
       <location/>
       <source>Event Log...</source>
-      <translation type="unfinished">Event Log...</translation>
+      <translation>Registre d'esdeveniments...</translation>
     </message>
     <message>
       <location/>
@@ -633,7 +638,7 @@
     <message>
       <location/>
       <source>Motion Detection</source>
-      <translation type="unfinished">Motion Detection</translation>
+      <translation>Detecció de moviment</translation>
     </message>
     <message>
       <location/>
@@ -648,7 +653,7 @@
     <message>
       <location/>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <location/>
@@ -815,7 +820,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
       <source>Add Device...</source>
-      <translation type="unfinished">Add Device...</translation>
+      <translation>Afegir un dispositiu...</translation>
     </message>
   </context>
   <context>
@@ -823,7 +828,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_motion_settings_widget.ui"/>
       <source>Motion Detection</source>
-      <translation type="unfinished">Motion Detection</translation>
+      <translation>Detecció de moviment</translation>
     </message>
     <message>
       <location/>
@@ -910,7 +915,7 @@
     <message>
       <location/>
       <source>Audio</source>
-      <translation type="unfinished">Audio</translation>
+      <translation>Àudio</translation>
     </message>
     <message>
       <location/>
@@ -1040,7 +1045,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/manual_device_addition/dialog/device_addition_dialog.ui"/>
       <source>to</source>
-      <translation type="unfinished">to</translation>
+      <translation>a</translation>
     </message>
     <message>
       <location/>
@@ -1085,12 +1090,12 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasenya</translation>
     </message>
     <message>
       <location/>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Iniciar sessió</translation>
     </message>
     <message>
       <location/>
@@ -1161,7 +1166,7 @@
     <message>
       <location/>
       <source>Event Rules...</source>
-      <translation type="unfinished">Event Rules...</translation>
+      <translation>Regles dels esdeveniments...</translation>
     </message>
   </context>
   <context>
@@ -1179,7 +1184,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Iniciar sessió</translation>
     </message>
     <message>
       <location/>
@@ -1189,7 +1194,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasenya</translation>
     </message>
     <message>
       <location/>
@@ -1274,7 +1279,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasenya</translation>
     </message>
   </context>
   <context>
@@ -1320,21 +1325,6 @@
     <name>FisheyeSettingsWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/fisheye/fisheye_settings_widget.ui"/>
-      <source>Ceiling Mount</source>
-      <translation type="unfinished">Ceiling Mount</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Wall Mount</source>
-      <translation type="unfinished">Wall Mount</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Floor/Table Mount</source>
-      <translation type="unfinished">Floor/Table Mount</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fisheye Dewarping</source>
       <translation type="unfinished">Fisheye Dewarping</translation>
     </message>
@@ -1342,11 +1332,6 @@
       <location/>
       <source>Auto Calibration</source>
       <translation type="unfinished">Auto Calibration</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Mount Angle Correction:</source>
-      <translation type="unfinished">Mount Angle Correction:</translation>
     </message>
     <message>
       <location/>
@@ -1368,6 +1353,26 @@
       <source>Ellipticity</source>
       <translation type="unfinished">Ellipticity</translation>
     </message>
+    <message>
+      <location/>
+      <source>Show grid</source>
+      <translation type="unfinished">Show grid</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Mount</source>
+      <translation type="unfinished">Mount</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Angle</source>
+      <translation type="unfinished">Angle</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Lens projection</source>
+      <translation type="unfinished">Lens projection</translation>
+    </message>
   </context>
   <context>
     <name>FullscreenCameraActionWidget</name>
@@ -1384,7 +1389,7 @@
     <message>
       <location/>
       <source>Source camera</source>
-      <translation type="unfinished">Source camera</translation>
+      <translation>Càmera d'origen</translation>
     </message>
   </context>
   <context>
@@ -1444,6 +1449,11 @@
       <source>Run Application when PC Boots up</source>
       <translation type="unfinished">Run Application when PC Boots up</translation>
     </message>
+    <message>
+      <location/>
+      <source>Play audio from all cameras on layout</source>
+      <translation type="unfinished">Play audio from all cameras on layout</translation>
+    </message>
   </context>
   <context>
     <name>GeneralSystemAdministrationWidget</name>
@@ -1496,7 +1506,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Eliminar</translation>
     </message>
     <message>
       <location/>
@@ -1565,7 +1575,7 @@
     <message>
       <location/>
       <source>Clear</source>
-      <translation type="unfinished">Clear</translation>
+      <translation>Elimina</translation>
     </message>
     <message>
       <location/>
@@ -1679,7 +1689,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasenya</translation>
     </message>
     <message>
       <location/>
@@ -1712,7 +1722,7 @@
     <message>
       <location/>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Carregant...</translation>
     </message>
     <message>
       <location/>
@@ -1834,7 +1844,7 @@
     <message>
       <location/>
       <source>Invalid License Key</source>
-      <translation type="unfinished">Invalid License Key</translation>
+      <translation>Clau de llicència no vàlida</translation>
     </message>
     <message>
       <location/>
@@ -1865,7 +1875,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Eliminar</translation>
     </message>
     <message>
       <location/>
@@ -1885,12 +1895,12 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Iniciar sessió</translation>
     </message>
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasenya</translation>
     </message>
     <message>
       <location/>
@@ -1965,6 +1975,11 @@
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
       <translation type="unfinished">IP addresses for cameras, and servers, groups for users, etc.</translation>
     </message>
+    <message>
+      <location/>
+      <source>Show aim overlay for PTZ cameras</source>
+      <translation type="unfinished">Show aim overlay for PTZ cameras</translation>
+    </message>
   </context>
   <context>
     <name>MediaFileSettingsDialog</name>
@@ -1999,7 +2014,7 @@
     <message>
       <location/>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Descarregar</translation>
     </message>
     <message>
       <location/>
@@ -2014,7 +2029,7 @@
     <message>
       <location/>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancel·lar</translation>
     </message>
     <message>
       <location/>
@@ -2055,7 +2070,7 @@
     <message>
       <location/>
       <source>New Virtual Camera...</source>
-      <translation type="unfinished">New Virtual Camera...</translation>
+      <translation>Nova Càmera Virtual...</translation>
     </message>
   </context>
   <context>
@@ -2073,7 +2088,7 @@
     <message>
       <location/>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Seleccionar disseny...</translation>
     </message>
   </context>
   <context>
@@ -2086,7 +2101,7 @@
     <message>
       <location/>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasenya</translation>
     </message>
     <message>
       <location/>
@@ -2099,7 +2114,7 @@
     <message>
       <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui"/>
       <source>Manage...</source>
-      <translation type="unfinished">Manage...</translation>
+      <translation>Gestionar...</translation>
     </message>
     <message>
       <location/>
@@ -2183,7 +2198,7 @@
     <message>
       <location/>
       <source>to</source>
-      <translation type="unfinished">to</translation>
+      <translation>a</translation>
     </message>
   </context>
   <context>
@@ -2229,7 +2244,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Eliminar</translation>
     </message>
     <message>
       <location/>
@@ -2323,7 +2338,7 @@
     <message>
       <location filename="../src/ui/dialogs/attach_to_videowall_dialog.ui"/>
       <source>Attach to Video Wall...</source>
-      <translation type="unfinished">Attach to Video Wall...</translation>
+      <translation>Adjunta al Video Wall...</translation>
     </message>
     <message>
       <location/>
@@ -2378,7 +2393,7 @@
     <message>
       <location filename="../src/ui/dialogs/merge_systems_dialog.ui"/>
       <source>Merge Systems...</source>
-      <translation type="unfinished">Merge Systems...</translation>
+      <translation>Combinar sistemes...</translation>
     </message>
     <message>
       <location/>
@@ -2388,7 +2403,7 @@
     <message>
       <location/>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Contrasenya:</translation>
     </message>
     <message>
       <location/>
@@ -2398,7 +2413,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation type="unfinished">Login:</translation>
+      <translation>Iniciar sessió:</translation>
     </message>
     <message>
       <location/>
@@ -2424,7 +2439,7 @@
     <message>
       <location/>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>Reproduir</translation>
     </message>
     <message>
       <location/>
@@ -2483,7 +2498,7 @@
     <message>
       <location/>
       <source>New User...</source>
-      <translation type="unfinished">New User...</translation>
+      <translation>Nou usuari...</translation>
     </message>
     <message>
       <location/>
@@ -2493,7 +2508,7 @@
     <message>
       <location/>
       <source>Clear Selection</source>
-      <translation type="unfinished">Clear Selection</translation>
+      <translation>Neteja la selecció</translation>
     </message>
     <message>
       <location/>
@@ -2803,7 +2818,7 @@
     <message>
       <location/>
       <source>Allow only secure connections</source>
-      <translation type="unfinished">Allow only secure connections</translation>
+      <translation>Només permetre connexions segures</translation>
     </message>
     <message>
       <location/>
@@ -2823,7 +2838,7 @@
     <message>
       <location/>
       <source>to</source>
-      <translation type="unfinished">to</translation>
+      <translation>a</translation>
     </message>
     <message>
       <location/>
@@ -3010,7 +3025,7 @@
     <message>
       <location/>
       <source>User:</source>
-      <translation type="unfinished">User:</translation>
+      <translation>Usuari:</translation>
     </message>
     <message>
       <location/>
@@ -3030,12 +3045,12 @@
     <message>
       <location/>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <location/>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancel·lar</translation>
     </message>
   </context>
   <context>
@@ -3089,7 +3104,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancel·lar</translation>
     </message>
     <message>
       <location/>
@@ -3152,7 +3167,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_rebuild_widget.ui"/>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancel·lar</translation>
     </message>
   </context>
   <context>
@@ -3175,12 +3190,12 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation type="unfinished">Login:</translation>
+      <translation>Iniciar sessió:</translation>
     </message>
     <message>
       <location/>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Contrasenya:</translation>
     </message>
   </context>
   <context>
@@ -3239,7 +3254,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Eliminar</translation>
     </message>
     <message>
       <location/>
@@ -3295,7 +3310,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Eliminar</translation>
     </message>
   </context>
   <context>
@@ -3370,7 +3385,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/wearable_camera_motion_widget.ui"/>
       <source>Motion Detection</source>
-      <translation type="unfinished">Motion Detection</translation>
+      <translation>Detecció de moviment</translation>
     </message>
     <message>
       <location/>
@@ -3393,7 +3408,7 @@
     <message>
       <location/>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Hora</translation>
     </message>
     <message>
       <location/>
@@ -3406,7 +3421,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/wearable_camera_upload_widget.ui"/>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancel·lar</translation>
     </message>
     <message>
       <location/>
@@ -3416,12 +3431,12 @@
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation type="unfinished">Upload File...</translation>
+      <translation>Carregar un fitxer...</translation>
     </message>
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation type="unfinished">Upload Folder...</translation>
+      <translation>Carregar una carpeta...</translation>
     </message>
   </context>
   <context>

@@ -10,7 +10,7 @@
         <form class="master-controls" name="forms.localForm" novalidate disable-autocomplete>
             <div class="form-group" validate-field>
                 <input ng-model="settings.localLogin" name="localLogin" class="form-control"
-                       type="text" placeholder="Login" required readonly>
+                       type="text" placeholder="Iniciar sessió" required readonly>
             </div>
             <password-input ng-model="settings.localPassword"></password-input>
             <div class="form-group" validate-field ng-class="{'has-error':forms.localForm.passwordInput.$valid &&
@@ -45,7 +45,7 @@
         <form class="form" name="oldPasswordForm" novalidate>
             <label for="oldSystemPassword" class="control-label">Enter the current password to continue.</label>
             <input id="oldSystemPassword" type="password" ng-model="settings.oldPassword"
-                   class="form-control" placeholder="password" required auto-focus>
+                   class="form-control" placeholder="contrasenya" required auto-focus>
         </form>
     </div>
 </div>

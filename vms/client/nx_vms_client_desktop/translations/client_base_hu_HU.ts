@@ -125,6 +125,10 @@ több könyvjelző megjelenítéséhez</translation>
       <source>Installing</source>
       <translation>Telepítés</translation>
     </message>
+    <message>
+      <source>Verifying update package</source>
+      <translation type="unfinished">Verifying update package</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>
@@ -1586,6 +1590,26 @@ több könyvjelző megjelenítéséhez</translation>
       <source>Layout is locked</source>
       <translation>Az elrendezés zárolva van</translation>
     </message>
+    <message>
+      <source>This camera does not support advanced PTZ</source>
+      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
+    </message>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Focusing...</source>
+      <translation type="unfinished">Focusing...</translation>
+    </message>
   </context>
   <context>
     <name>PtzOverlayWidget</name>
@@ -1859,17 +1883,17 @@ több könyvjelző megjelenítéséhez</translation>
     <message numerus="yes">
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 / %n folyamat részletei</numerusform>
-        <numerusform>Details for %n sessions of %1</numerusform>
+        <numerusform>%1 / %n folyamat részletei</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Details for %n cameras of %1</source>
       <comment>Total number will be substituted as %1</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 / %n kamera részletei</numerusform>
-        <numerusform>Details for %n cameras of %1</numerusform>
+        <numerusform>%1 / %n kamera részletei</numerusform>
       </translation>
     </message>
   </context>
@@ -2033,6 +2057,18 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
       <source>Event rules reset to default</source>
       <translation>Az esemény szabályai visszaálltak alapértelmezettre</translation>
+    </message>
+    <message>
+      <source>Storage added</source>
+      <translation type="unfinished">Storage added</translation>
+    </message>
+    <message>
+      <source>Storage updated</source>
+      <translation type="unfinished">Storage updated</translation>
+    </message>
+    <message>
+      <source>Storage removed</source>
+      <translation type="unfinished">Storage removed</translation>
     </message>
   </context>
   <context>
@@ -3317,17 +3353,17 @@ to %1</source>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Esemény naplóban %1 és %2 között - %n eseménytalálat</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+        <numerusform>Esemény naplóban %1 és %2 között - %n eseménytalálat</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Eseménynapló %1- %n eseménytalálat</numerusform>
-        <numerusform>Event log for %1 - %n events found</numerusform>
+        <numerusform>Eseménynapló %1- %n eseménytalálat</numerusform>
       </translation>
     </message>
     <message>
@@ -3409,9 +3445,9 @@ to %1</source>
     <message numerus="yes">
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%1 (%n kamera)</numerusform>
-        <numerusform>%1 (%n cameras)</numerusform>
+        <numerusform>%1 (%n kamera)</numerusform>
       </translation>
     </message>
   </context>
@@ -4659,9 +4695,9 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>about %n minutes</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>nagyjából %n perc</numerusform>
-        <numerusform>about %n minutes</numerusform>
+        <numerusform>nagyjából %n perc</numerusform>
       </translation>
     </message>
   </context>
@@ -6035,10 +6071,6 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <translation>Az archív indexek újraépítését a felhasználó megszakította a következő szerveren:</translation>
     </message>
     <message>
-      <source>Storage is not configured on the following Server:</source>
-      <translation>Nincs tároló bállítva a következő szerveren:</translation>
-    </message>
-    <message>
       <source>Learn more</source>
       <translation>További info</translation>
     </message>
@@ -6621,10 +6653,6 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <translation>Könyvjelző</translation>
     </message>
     <message>
-      <source>Bookmarks can only be added to an online server.</source>
-      <translation>Könyvjelzőt csak online szerverhez lehet adni.</translation>
-    </message>
-    <message>
       <source>Server offline</source>
       <translation>Szerver offline</translation>
     </message>
@@ -6665,6 +6693,13 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message>
       <source>Failed to connect to the selected server</source>
       <translation>Nem sikerült kapcsolódni a szerverhez</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchController</name>
+    <message>
+      <source>To switch between cameras press Shift + Arrow</source>
+      <translation type="unfinished">To switch between cameras press Shift + Arrow</translation>
     </message>
   </context>
   <context>
@@ -6716,6 +6751,21 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
       <translation>Nem sikerült nyugtázni az eseményt az eltávolított kamerán.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchPtzHandler</name>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
     </message>
   </context>
   <context>
@@ -7067,9 +7117,9 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Feltöltheti ezeket a fájlokat egy virtuális kamera másik példányára.</numerusform>
-        <numerusform>You can upload these files to a different instance of a Virtual Camera.</numerusform>
+        <numerusform>Feltöltheti ezeket a fájlokat egy virtuális kamera másik példányára.</numerusform>
       </translation>
     </message>
     <message>
@@ -7296,9 +7346,9 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Néhány videofájlok még mindig töltődnek a %n virtuális kamerára:</numerusform>
-        <numerusform>Some video files are still being uploaded to %n virtual cameras:</numerusform>
+        <numerusform>Néhány videofájlok még mindig töltődnek a %n virtuális kamerára:</numerusform>
       </translation>
     </message>
   </context>
@@ -7545,16 +7595,6 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
-    <message numerus="yes">
-      <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n értékek</numerusform>
-        <numerusform>+%n values</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
@@ -7577,9 +7617,9 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
     <message numerus="yes">
       <source>%n objects</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n objektumok</numerusform>
-        <numerusform>%n objects</numerusform>
+        <numerusform>%n objektumok</numerusform>
       </translation>
     </message>
   </context>
@@ -7588,6 +7628,10 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message>
       <source>NO DATA</source>
       <translation>NINCS ADAT</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -7791,6 +7835,10 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>Túl magasra állított minimális érték archív hossz csökkenéshez vezethet más kamerákon.</translation>
     </message>
+    <message>
+      <source>High pre-recording time will increase RAM utilization on the server</source>
+      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
@@ -7938,22 +7986,6 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
   <context>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
-      <source>Update file is not found</source>
-      <translation>A frissítési fájl nem található</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted</source>
-      <translation>A frissítési csomag sérült</translation>
-    </message>
-    <message>
-      <source>Failed to download update package: %1</source>
-      <translation>Nem sikerült letölteni a frissítési csomagot: %1</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted: %1</source>
-      <translation>A frissítési csomag sérült: %1</translation>
-    </message>
-    <message>
       <source>This update is already installed.</source>
       <translation>Ez a frissítés már telepítve van.</translation>
     </message>
@@ -7980,6 +8012,14 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message>
       <source>Installation package has been lost.</source>
       <translation>A telepítési csomag elveszett.</translation>
+    </message>
+    <message>
+      <source>File %1 does not exist</source>
+      <translation type="unfinished">File %1 does not exist</translation>
+    </message>
+    <message>
+      <source>There is no valid client package to download</source>
+      <translation type="unfinished">There is no valid client package to download</translation>
     </message>
   </context>
   <context>
@@ -8418,6 +8458,30 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
       <translation>Használja ezt a beállítást a torzítás kompenzálásához, ha a kamera nem pontosan függőlegesen vagy vízszintesen van felszerelve.</translation>
     </message>
+    <message>
+      <source>Equidistant</source>
+      <translation type="unfinished">Equidistant</translation>
+    </message>
+    <message>
+      <source>Stereographic</source>
+      <translation type="unfinished">Stereographic</translation>
+    </message>
+    <message>
+      <source>Equisolid</source>
+      <translation type="unfinished">Equisolid</translation>
+    </message>
+    <message>
+      <source>Ceiling</source>
+      <translation type="unfinished">Ceiling</translation>
+    </message>
+    <message>
+      <source>Wall</source>
+      <translation type="unfinished">Wall</translation>
+    </message>
+    <message>
+      <source>Floor/Table</source>
+      <translation type="unfinished">Floor/Table</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
@@ -8573,6 +8637,10 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message>
       <source>NOT A CAMERA</source>
       <translation>NEM KAMERA</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -8935,6 +9003,16 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::NameValueTable</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation type="unfinished">
+        <numerusform>+%n values</numerusform>
+        <numerusform>+%n values</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
       <source>Alarm: %1</source>
@@ -9017,10 +9095,6 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <translation>Telepítve</translation>
     </message>
     <message>
-      <source>Failed to download update</source>
-      <translation>Nem sikerült a frissítés letöltése</translation>
-    </message>
-    <message>
       <source>Waiting for peer data</source>
       <translation>Várakozás a társadatokra</translation>
     </message>
@@ -9053,10 +9127,6 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <translation>Belső letöltő hiba.</translation>
     </message>
     <message>
-      <source>Internal client error.</source>
-      <translation>Belső kliens hiba.</translation>
-    </message>
-    <message>
       <source>Unknown error.</source>
       <translation>Ismeretlen hiba.</translation>
     </message>
@@ -9087,6 +9157,14 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message>
       <source>Update installation failed.</source>
       <translation>A frissítés telepítése sikertelen.</translation>
+    </message>
+    <message>
+      <source>Update file verification failed.</source>
+      <translation type="unfinished">Update file verification failed.</translation>
+    </message>
+    <message>
+      <source>Verifying update</source>
+      <translation type="unfinished">Verifying update</translation>
     </message>
   </context>
   <context>

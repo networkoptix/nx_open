@@ -122,6 +122,11 @@
       <source>Limit Frame Rate to save CPU</source>
       <translation>Giới hạn tốc độ khung hình để tiết kiệm CPU</translation>
     </message>
+    <message>
+      <location/>
+      <source>Use Hardware Video Decoding</source>
+      <translation type="unfinished">Use Hardware Video Decoding</translation>
+    </message>
   </context>
   <context>
     <name>AggregationWidget</name>
@@ -1320,21 +1325,6 @@
     <name>FisheyeSettingsWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/fisheye/fisheye_settings_widget.ui"/>
-      <source>Ceiling Mount</source>
-      <translation>Giá treo máy chiếu</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Wall Mount</source>
-      <translation>Tường núi</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Floor/Table Mount</source>
-      <translation>Tầng / Bảng Núi</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fisheye Dewarping</source>
       <translation>Chế độ xem hình rộng camera 360</translation>
     </message>
@@ -1342,11 +1332,6 @@
       <location/>
       <source>Auto Calibration</source>
       <translation>Tự động điều chỉnh</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Mount Angle Correction:</source>
-      <translation>Chân đế chỉnh góc:</translation>
     </message>
     <message>
       <location/>
@@ -1367,6 +1352,26 @@
       <location/>
       <source>Ellipticity</source>
       <translation>Xem kiểu elip</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Show grid</source>
+      <translation type="unfinished">Show grid</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Mount</source>
+      <translation type="unfinished">Mount</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Angle</source>
+      <translation type="unfinished">Angle</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Lens projection</source>
+      <translation type="unfinished">Lens projection</translation>
     </message>
   </context>
   <context>
@@ -1443,6 +1448,11 @@
       <location/>
       <source>Run Application when PC Boots up</source>
       <translation>Chạy ứng dụng khi máy tính khởi động lại</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Play audio from all cameras on layout</source>
+      <translation type="unfinished">Play audio from all cameras on layout</translation>
     </message>
   </context>
   <context>
@@ -1964,6 +1974,11 @@
       <location/>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
       <translation>Địa chỉ IP cho các camera và máy chủ, nhóm người sử dụng, vv.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Show aim overlay for PTZ cameras</source>
+      <translation type="unfinished">Show aim overlay for PTZ cameras</translation>
     </message>
   </context>
   <context>

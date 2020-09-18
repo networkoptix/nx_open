@@ -1799,6 +1799,10 @@
       <source>RTP error in secondary stream (%1)</source>
       <translation>보조 스트림의 RTP 오류 (%1)</translation>
     </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
+      <translation type="unfinished">Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</translation>
+    </message>
   </context>
   <context>
     <name>utils::QnCameraNamesWatcher</name>

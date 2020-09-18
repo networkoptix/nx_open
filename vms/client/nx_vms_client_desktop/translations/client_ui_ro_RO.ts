@@ -122,6 +122,11 @@
       <source>Limit Frame Rate to save CPU</source>
       <translation type="unfinished">Limit Frame Rate to save CPU</translation>
     </message>
+    <message>
+      <location/>
+      <source>Use Hardware Video Decoding</source>
+      <translation type="unfinished">Use Hardware Video Decoding</translation>
+    </message>
   </context>
   <context>
     <name>AggregationWidget</name>
@@ -1320,21 +1325,6 @@
     <name>FisheyeSettingsWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/fisheye/fisheye_settings_widget.ui"/>
-      <source>Ceiling Mount</source>
-      <translation type="unfinished">Ceiling Mount</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Wall Mount</source>
-      <translation type="unfinished">Wall Mount</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Floor/Table Mount</source>
-      <translation type="unfinished">Floor/Table Mount</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fisheye Dewarping</source>
       <translation type="unfinished">Fisheye Dewarping</translation>
     </message>
@@ -1342,11 +1332,6 @@
       <location/>
       <source>Auto Calibration</source>
       <translation type="unfinished">Auto Calibration</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Mount Angle Correction:</source>
-      <translation type="unfinished">Mount Angle Correction:</translation>
     </message>
     <message>
       <location/>
@@ -1367,6 +1352,26 @@
       <location/>
       <source>Ellipticity</source>
       <translation type="unfinished">Ellipticity</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Show grid</source>
+      <translation type="unfinished">Show grid</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Mount</source>
+      <translation type="unfinished">Mount</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Angle</source>
+      <translation type="unfinished">Angle</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Lens projection</source>
+      <translation type="unfinished">Lens projection</translation>
     </message>
   </context>
   <context>
@@ -1443,6 +1448,11 @@
       <location/>
       <source>Run Application when PC Boots up</source>
       <translation type="unfinished">Run Application when PC Boots up</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Play audio from all cameras on layout</source>
+      <translation type="unfinished">Play audio from all cameras on layout</translation>
     </message>
   </context>
   <context>
@@ -1964,6 +1974,11 @@
       <location/>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
       <translation type="unfinished">IP addresses for cameras, and servers, groups for users, etc.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Show aim overlay for PTZ cameras</source>
+      <translation type="unfinished">Show aim overlay for PTZ cameras</translation>
     </message>
   </context>
   <context>

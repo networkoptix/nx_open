@@ -124,6 +124,10 @@ to view more bookmarks</source>
       <source>Installing</source>
       <translation>การติดตั้ง</translation>
     </message>
+    <message>
+      <source>Verifying update package</source>
+      <translation type="unfinished">Verifying update package</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>
@@ -1571,6 +1575,26 @@ to view more bookmarks</source>
       <source>Layout is locked</source>
       <translation>เลย์เอาต์ถูกล็อค</translation>
     </message>
+    <message>
+      <source>This camera does not support advanced PTZ</source>
+      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
+    </message>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Focusing...</source>
+      <translation type="unfinished">Focusing...</translation>
+    </message>
   </context>
   <context>
     <name>PtzOverlayWidget</name>
@@ -2009,6 +2033,18 @@ to view more bookmarks</source>
     <message>
       <source>Event rules reset to default</source>
       <translation>กฎกิจกรรมถูกรีเซ็ตเป็นค่าเริ่มต้น</translation>
+    </message>
+    <message>
+      <source>Storage added</source>
+      <translation type="unfinished">Storage added</translation>
+    </message>
+    <message>
+      <source>Storage updated</source>
+      <translation type="unfinished">Storage updated</translation>
+    </message>
+    <message>
+      <source>Storage removed</source>
+      <translation type="unfinished">Storage removed</translation>
     </message>
   </context>
   <context>
@@ -5966,10 +6002,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>ดัชนีเก็บสร้างใหม่จะถูกยกเลิกโดยผู้ใช้บนเซิร์ฟเวอร์ต่อไปนี้:</translation>
     </message>
     <message>
-      <source>Storage is not configured on the following Server:</source>
-      <translation>การจัดเก็บข้อมูลไม่ได้กำหนดค่าบนเซิร์ฟเวอร์ต่อไปต่อไปนี้:</translation>
-    </message>
-    <message>
       <source>Learn more</source>
       <translation>เรียนรู้เพิ่มเติม</translation>
     </message>
@@ -6550,10 +6582,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>บุ๊คมาร์ค</translation>
     </message>
     <message>
-      <source>Bookmarks can only be added to an online server.</source>
-      <translation>บุ๊คมาร์ค สามารถเพิ่มไปยังเซิร์ฟเวอร์ออนไลน์.</translation>
-    </message>
-    <message>
       <source>Server offline</source>
       <translation>เซิร์ฟเวอร์ออฟไลน์</translation>
     </message>
@@ -6593,6 +6621,13 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Failed to connect to the selected server</source>
       <translation>ไม่สามารถเชื่อมต่อไปยังเซิร์ฟเวอร์</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchController</name>
+    <message>
+      <source>To switch between cameras press Shift + Arrow</source>
+      <translation type="unfinished">To switch between cameras press Shift + Arrow</translation>
     </message>
   </context>
   <context>
@@ -6644,6 +6679,21 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
       <translation>ไม่สามารถรับทราบเหตุการณ์ในกล้องที่นำออก</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchPtzHandler</name>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
     </message>
   </context>
   <context>
@@ -7440,15 +7490,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
-    <message numerus="yes">
-      <source>+%n values</source>
-      <translation>
-        <numerusform>+%n ค่า</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
@@ -7481,6 +7522,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>NO DATA</source>
       <translation>ไม่มมีข้อมูล</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -7681,6 +7726,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>ค่าต่ำสุดที่สูงสามารถนำไปสู่เก็บลดลงบนกล้องอื่น ๆ</translation>
     </message>
+    <message>
+      <source>High pre-recording time will increase RAM utilization on the server</source>
+      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
@@ -7822,22 +7871,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
-      <source>Update file is not found</source>
-      <translation>ไม่พบไฟล์อัพเดท</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted</source>
-      <translation>แพ็คเกจการอัพเดทเสียหาย</translation>
-    </message>
-    <message>
-      <source>Failed to download update package: %1</source>
-      <translation>ไม่สามารถดาวน์โหลดแพ็คเกจการอัพเดท: %1</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted: %1</source>
-      <translation>แพ็คเกจการอัพเดทเสียหาย: %1</translation>
-    </message>
-    <message>
       <source>This update is already installed.</source>
       <translation>โมดูลนี้ถูกติดตั้งไว้อยู่แล้ว:</translation>
     </message>
@@ -7864,6 +7897,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Installation package has been lost.</source>
       <translation>แพ็คเกจการติดตั้งสูญหาย</translation>
+    </message>
+    <message>
+      <source>File %1 does not exist</source>
+      <translation type="unfinished">File %1 does not exist</translation>
+    </message>
+    <message>
+      <source>There is no valid client package to download</source>
+      <translation type="unfinished">There is no valid client package to download</translation>
     </message>
   </context>
   <context>
@@ -8297,6 +8338,30 @@ If you intended to move analytics data to another storage location, please conta
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
       <translation>ใช้การตั้งค่านี้เพื่อชดเชยความผิดเพี้ยนถ้ากล้องจะติดตั้งตรงในแนวตั้ง หรือแนวนอน</translation>
     </message>
+    <message>
+      <source>Equidistant</source>
+      <translation type="unfinished">Equidistant</translation>
+    </message>
+    <message>
+      <source>Stereographic</source>
+      <translation type="unfinished">Stereographic</translation>
+    </message>
+    <message>
+      <source>Equisolid</source>
+      <translation type="unfinished">Equisolid</translation>
+    </message>
+    <message>
+      <source>Ceiling</source>
+      <translation type="unfinished">Ceiling</translation>
+    </message>
+    <message>
+      <source>Wall</source>
+      <translation type="unfinished">Wall</translation>
+    </message>
+    <message>
+      <source>Floor/Table</source>
+      <translation type="unfinished">Floor/Table</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
@@ -8450,6 +8515,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>NOT A CAMERA</source>
       <translation>กล้องไม่ได้</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -8810,6 +8879,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::NameValueTable</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation>
+        <numerusform>+%n ค่า</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
       <source>Alarm: %1</source>
@@ -8893,10 +8971,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>การติดตั้ง</translation>
     </message>
     <message>
-      <source>Failed to download update</source>
-      <translation>ดาวน์โหลดการอัปเดตล้มเหลว</translation>
-    </message>
-    <message>
       <source>Waiting for peer data</source>
       <translation>กำลังรอข้อมูลเพียร์</translation>
     </message>
@@ -8929,10 +9003,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>ข้อผิดพลาดของตัวดาวน์โหลดภายใน</translation>
     </message>
     <message>
-      <source>Internal client error.</source>
-      <translation>ข้อผิดพลาดภายในไคลเอ็นต์</translation>
-    </message>
-    <message>
       <source>Unknown error.</source>
       <translation>ข้อผิดพลาดที่ไม่รู้จัก</translation>
     </message>
@@ -8963,6 +9033,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update installation failed.</source>
       <translation>การติดตั้งการอัปเดตล้มเหลว</translation>
+    </message>
+    <message>
+      <source>Update file verification failed.</source>
+      <translation type="unfinished">Update file verification failed.</translation>
+    </message>
+    <message>
+      <source>Verifying update</source>
+      <translation type="unfinished">Verifying update</translation>
     </message>
   </context>
   <context>

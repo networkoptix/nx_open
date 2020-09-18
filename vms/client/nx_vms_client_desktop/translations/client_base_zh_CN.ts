@@ -125,6 +125,10 @@ to view more bookmarks</source>
       <source>Installing</source>
       <translation>安装中</translation>
     </message>
+    <message>
+      <source>Verifying update package</source>
+      <translation type="unfinished">Verifying update package</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>
@@ -1572,6 +1576,26 @@ to view more bookmarks</source>
       <source>Layout is locked</source>
       <translation>布局已锁定</translation>
     </message>
+    <message>
+      <source>This camera does not support advanced PTZ</source>
+      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
+    </message>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Focusing...</source>
+      <translation type="unfinished">Focusing...</translation>
+    </message>
   </context>
   <context>
     <name>PtzOverlayWidget</name>
@@ -2010,6 +2034,18 @@ to view more bookmarks</source>
     <message>
       <source>Event rules reset to default</source>
       <translation>事件规则重置为默认值</translation>
+    </message>
+    <message>
+      <source>Storage added</source>
+      <translation type="unfinished">Storage added</translation>
+    </message>
+    <message>
+      <source>Storage updated</source>
+      <translation type="unfinished">Storage updated</translation>
+    </message>
+    <message>
+      <source>Storage removed</source>
+      <translation type="unfinished">Storage removed</translation>
     </message>
   </context>
   <context>
@@ -5968,10 +6004,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>以下服务器已取消录像索引重建:</translation>
     </message>
     <message>
-      <source>Storage is not configured on the following Server:</source>
-      <translation>以下服务器录像未进行配置:</translation>
-    </message>
-    <message>
       <source>Learn more</source>
       <translation>进一步了解</translation>
     </message>
@@ -6552,10 +6584,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>书签</translation>
     </message>
     <message>
-      <source>Bookmarks can only be added to an online server.</source>
-      <translation>书签只能在线服务器上添加。</translation>
-    </message>
-    <message>
       <source>Server offline</source>
       <translation>服务器离线</translation>
     </message>
@@ -6595,6 +6623,13 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Failed to connect to the selected server</source>
       <translation>无法连接到指定的服务器。</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchController</name>
+    <message>
+      <source>To switch between cameras press Shift + Arrow</source>
+      <translation type="unfinished">To switch between cameras press Shift + Arrow</translation>
     </message>
   </context>
   <context>
@@ -6646,6 +6681,21 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
       <translation>无法确认已刪除摄像机上的事件。</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchPtzHandler</name>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
     </message>
   </context>
   <context>
@@ -7442,15 +7492,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
-    <message numerus="yes">
-      <source>+%n values</source>
-      <translation>
-        <numerusform>+%n 值</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
@@ -7483,6 +7524,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>NO DATA</source>
       <translation>没有数据</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -7683,6 +7728,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>最小值可能会导致其他摄像机上的录像长度减小。</translation>
     </message>
+    <message>
+      <source>High pre-recording time will increase RAM utilization on the server</source>
+      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
@@ -7824,22 +7873,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
-      <source>Update file is not found</source>
-      <translation>未找到更新文件。</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted</source>
-      <translation>更新文件已损坏</translation>
-    </message>
-    <message>
-      <source>Failed to download update package: %1</source>
-      <translation>无法下载更新包： %1</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted: %1</source>
-      <translation>更新包已损坏: %1</translation>
-    </message>
-    <message>
       <source>This update is already installed.</source>
       <translation>更新已安装。</translation>
     </message>
@@ -7866,6 +7899,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Installation package has been lost.</source>
       <translation>安装包丢失。</translation>
+    </message>
+    <message>
+      <source>File %1 does not exist</source>
+      <translation type="unfinished">File %1 does not exist</translation>
+    </message>
+    <message>
+      <source>There is no valid client package to download</source>
+      <translation type="unfinished">There is no valid client package to download</translation>
     </message>
   </context>
   <context>
@@ -8299,6 +8340,30 @@ If you intended to move analytics data to another storage location, please conta
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
       <translation>当客户端和服务器电脑处于不同时区时, 设定依循客户端使用的时间 (时间表、时间戳记等)。</translation>
     </message>
+    <message>
+      <source>Equidistant</source>
+      <translation type="unfinished">Equidistant</translation>
+    </message>
+    <message>
+      <source>Stereographic</source>
+      <translation type="unfinished">Stereographic</translation>
+    </message>
+    <message>
+      <source>Equisolid</source>
+      <translation type="unfinished">Equisolid</translation>
+    </message>
+    <message>
+      <source>Ceiling</source>
+      <translation type="unfinished">Ceiling</translation>
+    </message>
+    <message>
+      <source>Wall</source>
+      <translation type="unfinished">Wall</translation>
+    </message>
+    <message>
+      <source>Floor/Table</source>
+      <translation type="unfinished">Floor/Table</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
@@ -8452,6 +8517,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>NOT A CAMERA</source>
       <translation>不是相机</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -8812,6 +8881,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::NameValueTable</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation>
+        <numerusform>+%n 值</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
       <source>Alarm: %1</source>
@@ -8894,10 +8972,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>已安装</translation>
     </message>
     <message>
-      <source>Failed to download update</source>
-      <translation>无法下载更新</translation>
-    </message>
-    <message>
       <source>Waiting for peer data</source>
       <translation>等待同等数据中</translation>
     </message>
@@ -8930,10 +9004,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>内部下载程序错误。</translation>
     </message>
     <message>
-      <source>Internal client error.</source>
-      <translation>内部客户端错误。</translation>
-    </message>
-    <message>
       <source>Unknown error.</source>
       <translation>出现未知的错误。</translation>
     </message>
@@ -8964,6 +9034,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update installation failed.</source>
       <translation>更新失败。</translation>
+    </message>
+    <message>
+      <source>Update file verification failed.</source>
+      <translation type="unfinished">Update file verification failed.</translation>
+    </message>
+    <message>
+      <source>Verifying update</source>
+      <translation type="unfinished">Verifying update</translation>
     </message>
   </context>
   <context>

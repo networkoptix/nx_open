@@ -125,6 +125,10 @@ para ver mais favoritos</translation>
       <source>Installing</source>
       <translation>Instalando</translation>
     </message>
+    <message>
+      <source>Verifying update package</source>
+      <translation type="unfinished">Verifying update package</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>
@@ -1586,6 +1590,26 @@ para ver mais favoritos</translation>
       <source>Layout is locked</source>
       <translation>Layout bloqueado</translation>
     </message>
+    <message>
+      <source>This camera does not support advanced PTZ</source>
+      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
+    </message>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Focusing...</source>
+      <translation type="unfinished">Focusing...</translation>
+    </message>
   </context>
   <context>
     <name>PtzOverlayWidget</name>
@@ -2033,6 +2057,18 @@ para ver mais favoritos</translation>
     <message>
       <source>Event rules reset to default</source>
       <translation>Regras do evento redefinidas para o padrão</translation>
+    </message>
+    <message>
+      <source>Storage added</source>
+      <translation type="unfinished">Storage added</translation>
+    </message>
+    <message>
+      <source>Storage updated</source>
+      <translation type="unfinished">Storage updated</translation>
+    </message>
+    <message>
+      <source>Storage removed</source>
+      <translation type="unfinished">Storage removed</translation>
     </message>
   </context>
   <context>
@@ -6037,10 +6073,6 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <translation>A reconstrução do índice de arquivos foi cancelada pelo utilizador no seguinte Servidor:</translation>
     </message>
     <message>
-      <source>Storage is not configured on the following Server:</source>
-      <translation>O armazenamento não está configurado no seguinte Servidor:</translation>
-    </message>
-    <message>
       <source>Learn more</source>
       <translation>Saiba mais</translation>
     </message>
@@ -6623,10 +6655,6 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <translation>Marcador</translation>
     </message>
     <message>
-      <source>Bookmarks can only be added to an online server.</source>
-      <translation>Os Bookmarks só podem ser adicionados a um servidor que esteja Online.</translation>
-    </message>
-    <message>
       <source>Server offline</source>
       <translation>Servidor offline</translation>
     </message>
@@ -6667,6 +6695,13 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <message>
       <source>Failed to connect to the selected server</source>
       <translation>Falha ao conectar ao servidor selecionado</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchController</name>
+    <message>
+      <source>To switch between cameras press Shift + Arrow</source>
+      <translation type="unfinished">To switch between cameras press Shift + Arrow</translation>
     </message>
   </context>
   <context>
@@ -6718,6 +6753,21 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
       <translation>Não é possível reconhecer o evento na câmera removida.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchPtzHandler</name>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
     </message>
   </context>
   <context>
@@ -7547,16 +7597,6 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
-    <message numerus="yes">
-      <source>+%n values</source>
-      <translation>
-        <numerusform>+%n valores</numerusform>
-        <numerusform>+%n valores</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
@@ -7590,6 +7630,10 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <message>
       <source>NO DATA</source>
       <translation>SEM DADOS</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -7793,6 +7837,10 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>Um valor mínimo elevado pode levar à diminuição do tamanho do arquivo em outras câmaras.</translation>
     </message>
+    <message>
+      <source>High pre-recording time will increase RAM utilization on the server</source>
+      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
@@ -7940,22 +7988,6 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
   <context>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
-      <source>Update file is not found</source>
-      <translation>Arquivo de atualização não encontrado</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted</source>
-      <translation>Pacote de atualização está corrompido</translation>
-    </message>
-    <message>
-      <source>Failed to download update package: %1</source>
-      <translation>Falha ao baixar o pacote de atualização: %1</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted: %1</source>
-      <translation>Pacote de atualização está corrompido: %1</translation>
-    </message>
-    <message>
       <source>This update is already installed.</source>
       <translation>Esta atualização já está instalada.</translation>
     </message>
@@ -7982,6 +8014,14 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <message>
       <source>Installation package has been lost.</source>
       <translation>Pacote de instalação foi perdido.</translation>
+    </message>
+    <message>
+      <source>File %1 does not exist</source>
+      <translation type="unfinished">File %1 does not exist</translation>
+    </message>
+    <message>
+      <source>There is no valid client package to download</source>
+      <translation type="unfinished">There is no valid client package to download</translation>
     </message>
   </context>
   <context>
@@ -8420,6 +8460,30 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
       <translation>Use esta definição para compensar a distorção se a câmara não estiver montada exactamente na vertical ou na horizontal.</translation>
     </message>
+    <message>
+      <source>Equidistant</source>
+      <translation type="unfinished">Equidistant</translation>
+    </message>
+    <message>
+      <source>Stereographic</source>
+      <translation type="unfinished">Stereographic</translation>
+    </message>
+    <message>
+      <source>Equisolid</source>
+      <translation type="unfinished">Equisolid</translation>
+    </message>
+    <message>
+      <source>Ceiling</source>
+      <translation type="unfinished">Ceiling</translation>
+    </message>
+    <message>
+      <source>Wall</source>
+      <translation type="unfinished">Wall</translation>
+    </message>
+    <message>
+      <source>Floor/Table</source>
+      <translation type="unfinished">Floor/Table</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
@@ -8575,6 +8639,10 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <message>
       <source>NOT A CAMERA</source>
       <translation>NÃO É UMA CÂMARA</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -8937,6 +9005,16 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::NameValueTable</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation>
+        <numerusform>+%n valores</numerusform>
+        <numerusform>+%n valores</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
       <source>Alarm: %1</source>
@@ -9019,10 +9097,6 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <translation>Instalado</translation>
     </message>
     <message>
-      <source>Failed to download update</source>
-      <translation>Falha ao baixar a atualização</translation>
-    </message>
-    <message>
       <source>Waiting for peer data</source>
       <translation>Esperando por dados de pares</translation>
     </message>
@@ -9055,10 +9129,6 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <translation>Erro de download interno.</translation>
     </message>
     <message>
-      <source>Internal client error.</source>
-      <translation>Erro interno do cliente.</translation>
-    </message>
-    <message>
       <source>Unknown error.</source>
       <translation>Erro desconhecido.</translation>
     </message>
@@ -9089,6 +9159,14 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <message>
       <source>Update installation failed.</source>
       <translation>A instalação da atualização falhou.</translation>
+    </message>
+    <message>
+      <source>Update file verification failed.</source>
+      <translation type="unfinished">Update file verification failed.</translation>
+    </message>
+    <message>
+      <source>Verifying update</source>
+      <translation type="unfinished">Verifying update</translation>
     </message>
   </context>
   <context>

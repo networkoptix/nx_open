@@ -6,7 +6,7 @@
         "openLinkWithTitle": "To {{title}} visit this link"
     },
     "setup": {
-        "createAccount": "create account",
+        "createAccount": "crear un compte",
         "errorNoHDD": "This device is intended to work with hard disk drive installed.<br>Please turn off the device and install a hard disk drive.",
         "errorNoNetwork": "This device needs network connection to work.<br>Please connect it to the local network or Internet"
     },
@@ -29,7 +29,7 @@
         "confirmRestoreDefaultTitle": "Restore factory defaults",
         "unexpectedError": "Failed: unexpected error has happened",
         "connnetionError": "Connection error",
-        "wrongPassword": "Wrong password.",
+        "wrongPassword": "Contrasenya incorrecta.",
         "error": "Error: ",
         "restartNeeded": "Changes saved. Restart server to apply new settings?",
         "settingsSaved": "Settings saved",
@@ -40,7 +40,7 @@
         "unsafePortConfirm": "It is not safe to use port number less than 1025. Server might be not accessible. Continue anyway?",
         "confirmDisconnectFromCloud": "Disconnect System from {{CLOUD_NAME}}",
         "confirmDisconnectFromCloudTitle": "<span class='warning-label'>All cloud users will be deleted.</span><br><br>System will be accessible through local network with local administrator account.",
-        "confirmDisconnectFromCloudAction": "Disconnect",
+        "confirmDisconnectFromCloudAction": "Desconnectar",
         "disconnectedFromCloudSuccess": "System was disconnected from {{CLOUD_NAME}} successfully",
         "disconnectedFromCloudError": "Cannot disconnect the System",
         "confirmDisconnectFromSystem": "Detach server from current System",
@@ -131,7 +131,7 @@
         "maxEventLogRecords": "Maximum event log records to keep into the database. Real amount of undeleted records may be up to 20% higher than the specified value.",
         "forceLiveCacheForPrimaryStream": "Whether to cache some frames for the primary stream. Values: \"yes\" - always enabled (may use a lot of RAM), \"no\" - always disabled except when required by the playback (e.g. HLS), \"auto\" - similar to \"no\", but turned on when improves the user experience (e.g. when some Analytics plugin is working on the camera).",
         "additionalLocalFsTypes": "Additional file system types to consider while deciding if a given partition is suitable to be a server storage. Comma separated list of file system names as they listed in /proc/mounts is expected.",
-        "rtspBufferSizeKb": "Server side RTSP buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value but slow down auto quality switching and reaction to RTSP seek operation."
+        "mediaBufferSizeKb": "Server-side media buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value, but slows down the auto quality switching and reaction to media seek operations."
     },
     "info": {
         "tabs": {
@@ -155,7 +155,7 @@
         "licenceError": "Warning! You are about to merge Systems with Starter licenses. Only one Starter license is allowed per System, so the second license will be deactivated. Merge anyway?",
         "duplicateServersError": "Cannot merge Systems, because they have at least 1 server with the same ID. Please remove this server and try again.",
         "connectionFailed": "Connection failed: ",
-        "unknownError": "Unknown error",
+        "unknownError": "Error desconegut",
         "mergeFailed": "Merge failed",
         "mergeSucceed": "Merge succeed.",
         "newSystemDisplayName": "New System",
@@ -198,15 +198,15 @@
     },
     "common": {
         "cameraLinks": {
-            "highStream": "High stream",
-            "lowStream": "Low stream",
-            "transcoding": "Transcoding",
-            "unknown": "Unknown",
-            "copyToClipboard": "copy to clipboard",
-            "copyDefaultText": "copy",
-            "copyActiveText": "copied to clipboard"
+            "highStream": "Flux de vídeo alt",
+            "lowStream": "Flux de vídeo baix",
+            "transcoding": "Transcodificació",
+            "unknown": "Desconegut",
+            "copyToClipboard": "copiar al portapapers",
+            "copyDefaultText": "còpia",
+            "copyActiveText": "copiat al portapapers"
         },
-        "systemOffline": "System Offline",
+        "systemOffline": "Sistema fora de línia",
         "cameraStates": {
             "offline": "Offline",
             "error": "Error",
@@ -229,8 +229,8 @@
         },
         "chromeCastWarning": "Chromecast is resource intensive and may cause issues on your server.",
         "voiceCommands": {
-            "play": "play",
-            "pause": "pause",
+            "play": "reproduir",
+            "pause": "pausar",
             "live": "go to live | show me live",
             "view": "view + [camera name]",
             "search": "find + [text for searchbar]",

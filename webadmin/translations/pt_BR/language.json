@@ -131,7 +131,7 @@
         "maxEventLogRecords": "Registro máximo de registros de eventos para manter no banco de dados. A quantidade real de registros não gravados pode ser até 20% superior ao valor especificado.",
         "forceLiveCacheForPrimaryStream": "Se deseja armazenar alguns quadros para o fluxo principal. Valores: \"sim\" - sempre habilitado (pode usar muito de RAM), \"não\" - sempre desativado, exceto quando necessário pela reprodução (ex.: HLS), \"auto\" - similar a \"não\", mas ativado quando melhorar a experiência do usuário (por exemplo, quando alguns plugins Analytics estão trabalhando na câmera).",
         "additionalLocalFsTypes": "Tipos de sistema de arquivos adicionais a serem considerados ao decidir se uma determinada partição é adequada para ser um armazenamento do servidor. É esperada uma lista separada por vírgula de nomes de sistemas de arquivos, conforme listados em / proc / mounts.",
-        "rtspBufferSizeKb": "Tamanho do buffer RTSP do servidor em KB. Um valor maior permite utilizar uma Internet mais eficiente, com alto valor de atraso de ida e volta, mas diminui a comutação automática da qualidade e a reação à operação de busca do RTSP."
+        "mediaBufferSizeKb": "Server-side media buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value, but slows down the auto quality switching and reaction to media seek operations."
     },
     "info": {
         "tabs": {

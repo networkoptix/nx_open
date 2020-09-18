@@ -124,6 +124,10 @@ to view more bookmarks</source>
       <source>Installing</source>
       <translation>מתקין</translation>
     </message>
+    <message>
+      <source>Verifying update package</source>
+      <translation type="unfinished">Verifying update package</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>
@@ -1613,6 +1617,26 @@ to view more bookmarks</source>
       <source>Layout is locked</source>
       <translation>הפריסה נעולה</translation>
     </message>
+    <message>
+      <source>This camera does not support advanced PTZ</source>
+      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
+    </message>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Focusing...</source>
+      <translation type="unfinished">Focusing...</translation>
+    </message>
   </context>
   <context>
     <name>PtzOverlayWidget</name>
@@ -2078,6 +2102,18 @@ to view more bookmarks</source>
     <message>
       <source>Event rules reset to default</source>
       <translation>כללי האירוע מתאפסים לברירת המחדל</translation>
+    </message>
+    <message>
+      <source>Storage added</source>
+      <translation type="unfinished">Storage added</translation>
+    </message>
+    <message>
+      <source>Storage updated</source>
+      <translation type="unfinished">Storage updated</translation>
+    </message>
+    <message>
+      <source>Storage removed</source>
+      <translation type="unfinished">Storage removed</translation>
     </message>
   </context>
   <context>
@@ -6163,10 +6199,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>בניית אינדקס הארכיון בוטלה על ידי משתמש בשרתים הבאים:</translation>
     </message>
     <message>
-      <source>Storage is not configured on the following Server:</source>
-      <translation>האיחסון אינו מוגדר בשרת הבא:</translation>
-    </message>
-    <message>
       <source>Learn more</source>
       <translation>למד עוד</translation>
     </message>
@@ -6753,10 +6785,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>סימניה</translation>
     </message>
     <message>
-      <source>Bookmarks can only be added to an online server.</source>
-      <translation>ניתן להוסיף סימניות לשרת מקוון בלבד.</translation>
-    </message>
-    <message>
       <source>Server offline</source>
       <translation>השרת אינו זמין</translation>
     </message>
@@ -6799,6 +6827,13 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Failed to connect to the selected server</source>
       <translation>התחברות לשרת שנבחר נכשלה</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchController</name>
+    <message>
+      <source>To switch between cameras press Shift + Arrow</source>
+      <translation type="unfinished">To switch between cameras press Shift + Arrow</translation>
     </message>
   </context>
   <context>
@@ -6850,6 +6885,21 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
       <translation>לא ניתן לאשר אירוע במצלמה שהוסרה.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchPtzHandler</name>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
     </message>
   </context>
   <context>
@@ -7745,18 +7795,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
-    <message numerus="yes">
-      <source>+%n values</source>
-      <translation>
-        <numerusform>+%n ערכים</numerusform>
-        <numerusform>+%n ערכים</numerusform>
-        <numerusform>+%n ערכים</numerusform>
-        <numerusform>+%n ערכים</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
@@ -7792,6 +7830,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>NO DATA</source>
       <translation>אין נתונים</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -8001,6 +8043,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>ערך מינימום גבוה יכול להוביל לירידה בשמירה של מצלמות אחרות.</translation>
     </message>
+    <message>
+      <source>High pre-recording time will increase RAM utilization on the server</source>
+      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
@@ -8160,22 +8206,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
-      <source>Update file is not found</source>
-      <translation>קובץ העדכון לא נמצא</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted</source>
-      <translation>חבילת העדכון פגומה</translation>
-    </message>
-    <message>
-      <source>Failed to download update package: %1</source>
-      <translation>הורדת חבילת העדכון נכשלה: %1</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted: %1</source>
-      <translation>חבילת העדכון פגומה: %1</translation>
-    </message>
-    <message>
       <source>This update is already installed.</source>
       <translation>עדכון זה כבר מותקן.</translation>
     </message>
@@ -8202,6 +8232,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Installation package has been lost.</source>
       <translation>קבצי ההתקנה לא נמצאו.</translation>
+    </message>
+    <message>
+      <source>File %1 does not exist</source>
+      <translation type="unfinished">File %1 does not exist</translation>
+    </message>
+    <message>
+      <source>There is no valid client package to download</source>
+      <translation type="unfinished">There is no valid client package to download</translation>
     </message>
   </context>
   <context>
@@ -8650,6 +8688,30 @@ If you intended to move analytics data to another storage location, please conta
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
       <translation>השתמש בהגדרה זו כדי לפצות על עיוות אם המצלמה לא נטענה בדיוק אנכית או אופקית.</translation>
     </message>
+    <message>
+      <source>Equidistant</source>
+      <translation type="unfinished">Equidistant</translation>
+    </message>
+    <message>
+      <source>Stereographic</source>
+      <translation type="unfinished">Stereographic</translation>
+    </message>
+    <message>
+      <source>Equisolid</source>
+      <translation type="unfinished">Equisolid</translation>
+    </message>
+    <message>
+      <source>Ceiling</source>
+      <translation type="unfinished">Ceiling</translation>
+    </message>
+    <message>
+      <source>Wall</source>
+      <translation type="unfinished">Wall</translation>
+    </message>
+    <message>
+      <source>Floor/Table</source>
+      <translation type="unfinished">Floor/Table</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
@@ -8809,6 +8871,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>NOT A CAMERA</source>
       <translation>לא מצלמה</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -9175,6 +9241,18 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::NameValueTable</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation>
+        <numerusform>+%n ערכים</numerusform>
+        <numerusform>+%n ערכים</numerusform>
+        <numerusform>+%n ערכים</numerusform>
+        <numerusform>+%n ערכים</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
       <source>Alarm: %1</source>
@@ -9257,10 +9335,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>מותקן</translation>
     </message>
     <message>
-      <source>Failed to download update</source>
-      <translation>הורדת העדכון נכשלה</translation>
-    </message>
-    <message>
       <source>Waiting for peer data</source>
       <translation>ממתין לנתונים</translation>
     </message>
@@ -9293,10 +9367,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>שגיאה פנימית בהורדה.</translation>
     </message>
     <message>
-      <source>Internal client error.</source>
-      <translation>שגיאת קליינט פנימית.</translation>
-    </message>
-    <message>
       <source>Unknown error.</source>
       <translation>שגיאה לא ידועה.</translation>
     </message>
@@ -9327,6 +9397,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update installation failed.</source>
       <translation>התקנת העדכון נכשלה.</translation>
+    </message>
+    <message>
+      <source>Update file verification failed.</source>
+      <translation type="unfinished">Update file verification failed.</translation>
+    </message>
+    <message>
+      <source>Verifying update</source>
+      <translation type="unfinished">Verifying update</translation>
     </message>
   </context>
   <context>

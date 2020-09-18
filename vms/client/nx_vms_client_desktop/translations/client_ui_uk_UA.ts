@@ -122,6 +122,11 @@
       <source>Limit Frame Rate to save CPU</source>
       <translation>Обмежити частоту кадрів для збереження ЦП</translation>
     </message>
+    <message>
+      <location/>
+      <source>Use Hardware Video Decoding</source>
+      <translation type="unfinished">Use Hardware Video Decoding</translation>
+    </message>
   </context>
   <context>
     <name>AggregationWidget</name>
@@ -1320,21 +1325,6 @@
     <name>FisheyeSettingsWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/fisheye/fisheye_settings_widget.ui"/>
-      <source>Ceiling Mount</source>
-      <translation>Стельове Кріплення</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Wall Mount</source>
-      <translation>Настінне Кріплення</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Floor/Table Mount</source>
-      <translation>Кріплення на підлогу / Настільне</translation>
-    </message>
-    <message>
-      <location/>
       <source>Fisheye Dewarping</source>
       <translation>Розгортка камер Fisheye</translation>
     </message>
@@ -1342,11 +1332,6 @@
       <location/>
       <source>Auto Calibration</source>
       <translation>Авто Калібровка</translation>
-    </message>
-    <message>
-      <location/>
-      <source>Mount Angle Correction:</source>
-      <translation>Корекція Кута Нахилу:</translation>
     </message>
     <message>
       <location/>
@@ -1367,6 +1352,26 @@
       <location/>
       <source>Ellipticity</source>
       <translation>Еліптичність</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Show grid</source>
+      <translation type="unfinished">Show grid</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Mount</source>
+      <translation type="unfinished">Mount</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Angle</source>
+      <translation type="unfinished">Angle</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Lens projection</source>
+      <translation type="unfinished">Lens projection</translation>
     </message>
   </context>
   <context>
@@ -1443,6 +1448,11 @@
       <location/>
       <source>Run Application when PC Boots up</source>
       <translation>Запустити додаток під час завантаження комп'ютера</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Play audio from all cameras on layout</source>
+      <translation type="unfinished">Play audio from all cameras on layout</translation>
     </message>
   </context>
   <context>
@@ -1964,6 +1974,11 @@
       <location/>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
       <translation>IP-адреси для камер і серверів, групи для користувачів і т. Д.</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Show aim overlay for PTZ cameras</source>
+      <translation type="unfinished">Show aim overlay for PTZ cameras</translation>
     </message>
   </context>
   <context>

@@ -125,6 +125,10 @@ per veure més marcadors</translation>
       <source>Installing</source>
       <translation>Instal. lant</translation>
     </message>
+    <message>
+      <source>Verifying update package</source>
+      <translation type="unfinished">Verifying update package</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>
@@ -1105,9 +1109,9 @@ per veure més marcadors</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n dissenys</numerusform>
-        <numerusform>%n layouts</numerusform>
+        <numerusform>%n dissenys</numerusform>
       </translation>
     </message>
   </context>
@@ -1173,9 +1177,9 @@ per veure més marcadors</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n dissenys</numerusform>
-        <numerusform>%n layouts</numerusform>
+        <numerusform>%n dissenys</numerusform>
       </translation>
     </message>
     <message>
@@ -1586,6 +1590,26 @@ per veure més marcadors</translation>
       <source>Layout is locked</source>
       <translation>El disseny està bloquejat</translation>
     </message>
+    <message>
+      <source>This camera does not support advanced PTZ</source>
+      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
+    </message>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Focusing...</source>
+      <translation type="unfinished">Focusing...</translation>
+    </message>
   </context>
   <context>
     <name>PtzOverlayWidget</name>
@@ -1697,9 +1721,9 @@ per veure més marcadors</translation>
     </message>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>... i %n més</numerusform>
-        <numerusform>...and %n more</numerusform>
+        <numerusform>... i %n més</numerusform>
       </translation>
     </message>
   </context>
@@ -2034,6 +2058,18 @@ per veure més marcadors</translation>
       <source>Event rules reset to default</source>
       <translation>Les regles de l'esdeveniment es restableixen als valors predeterminats</translation>
     </message>
+    <message>
+      <source>Storage added</source>
+      <translation type="unfinished">Storage added</translation>
+    </message>
+    <message>
+      <source>Storage updated</source>
+      <translation type="unfinished">Storage updated</translation>
+    </message>
+    <message>
+      <source>Storage removed</source>
+      <translation type="unfinished">Storage removed</translation>
+    </message>
   </context>
   <context>
     <name>QnBackupCamerasDialog</name>
@@ -2141,11 +2177,11 @@ per veure més marcadors</translation>
     <name>QnBuildNumberDialog</name>
     <message>
       <source>Build Number</source>
-      <translation type="unfinished">Build Number</translation>
+      <translation>Numero de compilació</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasenya</translation>
     </message>
     <message>
       <source>The password is incorrect.</source>
@@ -2174,11 +2210,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Select at least one device</source>
-      <translation type="unfinished">Select at least one device</translation>
+      <translation>Seleccioneu almenys un dispositiu</translation>
     </message>
     <message>
       <source>Select at least one camera</source>
-      <translation type="unfinished">Select at least one camera</translation>
+      <translation>Seleccioneu almenys una càmera</translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
@@ -2193,7 +2229,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation type="unfinished">Any Camera</translation>
+      <translation>Qualsevol càmera</translation>
     </message>
   </context>
   <context>
@@ -2247,7 +2283,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation type="unfinished">Any Camera</translation>
+      <translation>Qualsevol càmera</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
@@ -2258,7 +2294,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>User</source>
-      <translation type="unfinished">User</translation>
+      <translation>Usuari</translation>
     </message>
     <message>
       <source>Source Server</source>
@@ -2337,11 +2373,11 @@ per veure més marcadors</translation>
     <name>QnBusinessRulesDialog</name>
     <message>
       <source>&amp;New...</source>
-      <translation type="unfinished">&amp;New...</translation>
+      <translation>&amp;Nou...</translation>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation type="unfinished">&amp;Delete</translation>
+      <translation>&amp;Eliminar</translation>
     </message>
     <message>
       <source>&amp;Schedule...</source>
@@ -2451,7 +2487,7 @@ per veure més marcadors</translation>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>FAILED: %1</source>
@@ -2539,23 +2575,23 @@ per veure més marcadors</translation>
     <name>QnCameraListDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Copiar la selecció al porta-retalls</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation type="unfinished">Export Selection to File...</translation>
+      <translation>Exportar la selecció al fitxer...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Seleccionar-ho tot</translation>
     </message>
     <message>
       <source>Devices List</source>
-      <translation type="unfinished">Devices List</translation>
+      <translation>Llista de dispositius</translation>
     </message>
     <message>
       <source>Cameras List</source>
-      <translation type="unfinished">Cameras List</translation>
+      <translation>Llista de càmeres</translation>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
@@ -2588,7 +2624,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>No cameras</source>
-      <translation type="unfinished">No cameras</translation>
+      <translation>Sense càmeres</translation>
     </message>
     <message>
       <source>Devices List for %1</source>
@@ -2672,7 +2708,7 @@ per veure més marcadors</translation>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
       <source>New Password</source>
-      <translation type="unfinished">New Password</translation>
+      <translation>Nova contrasenya</translation>
     </message>
     <message>
       <source>Repeat Password</source>
@@ -2702,7 +2738,7 @@ per veure més marcadors</translation>
     <name>QnChangeUserPasswordDialog</name>
     <message>
       <source>New Password</source>
-      <translation type="unfinished">New Password</translation>
+      <translation>Nova contrasenya</translation>
     </message>
     <message>
       <source>Confirm Password</source>
@@ -2714,7 +2750,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Current Password</source>
-      <translation type="unfinished">Current Password</translation>
+      <translation>Contrasenya actual</translation>
     </message>
     <message>
       <source>To modify your password please enter the existing one.</source>
@@ -2754,7 +2790,7 @@ devices</translation>
     <message>
       <source>Open %1 Portal</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Open %1 Portal</translation>
+      <translation>Obrir %1 Portal</translation>
     </message>
     <message>
       <source>Create %1 Account</source>
@@ -2790,7 +2826,7 @@ to %1</translation>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>Compte no trobat</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
@@ -2818,7 +2854,7 @@ to %1</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Connectar-se al servidor...</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
@@ -2830,7 +2866,7 @@ to %1</translation>
     <name>QnCloudUserPanelWidget</name>
     <message>
       <source>Account Settings</source>
-      <translation type="unfinished">Account Settings</translation>
+      <translation>Configuració del compte</translation>
     </message>
   </context>
   <context>
@@ -2852,11 +2888,11 @@ to %1</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasenya</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation type="unfinished">Create account</translation>
+      <translation>Crear un compte</translation>
     </message>
     <message>
       <source>Forgot password?</source>
@@ -3220,11 +3256,11 @@ to %1</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Iniciar sessió</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasenya</translation>
     </message>
     <message>
       <source>Internal Error</source>
@@ -3244,7 +3280,7 @@ to %1</translation>
     </message>
     <message>
       <source>Disconnect</source>
-      <translation type="unfinished">Disconnect</translation>
+      <translation>Desconnectar</translation>
     </message>
     <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
@@ -3290,15 +3326,15 @@ to %1</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Copiar la selecció al porta-retalls</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation type="unfinished">Export Selection to File...</translation>
+      <translation>Exportar la selecció al fitxer...</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Seleccionar-ho tot</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -3334,7 +3370,7 @@ to %1</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Descripció</translation>
     </message>
   </context>
   <context>
@@ -3365,7 +3401,7 @@ to %1</translation>
     </message>
     <message>
       <source>Description</source>
-      <translation type="unfinished">Description</translation>
+      <translation>Descripció</translation>
     </message>
     <message>
       <source>All users</source>
@@ -3458,7 +3494,7 @@ to %1</translation>
     <message>
       <source>Medium</source>
       <comment>Failover priority</comment>
-      <translation type="unfinished">Medium</translation>
+      <translation>Mitja</translation>
     </message>
     <message>
       <source>High</source>
@@ -3540,7 +3576,7 @@ to %1</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Cap</translation>
     </message>
     <message>
       <source>Auto (%1)</source>
@@ -3630,7 +3666,7 @@ to %1</translation>
     <message>
       <source>Unknown</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Desconegut</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -3668,7 +3704,7 @@ to %1</translation>
     </message>
     <message>
       <source>Duration</source>
-      <translation type="unfinished">Duration</translation>
+      <translation>Durada</translation>
     </message>
     <message>
       <source>Open circuit</source>
@@ -3749,7 +3785,7 @@ to %1</translation>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Iniciar sessió</translation>
     </message>
     <message>
       <source>Email</source>
@@ -3862,7 +3898,7 @@ to %1</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Error</source>
@@ -4067,7 +4103,7 @@ to %1</translation>
     <name>QnLoginDialog</name>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Connectar-se al servidor...</translation>
     </message>
     <message>
       <source>Version %1</source>
@@ -4103,7 +4139,7 @@ to %1</translation>
     </message>
     <message>
       <source>none</source>
-      <translation type="unfinished">none</translation>
+      <translation>cap</translation>
     </message>
   </context>
   <context>
@@ -4114,11 +4150,11 @@ to %1</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasenya</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation type="unfinished">Create account</translation>
+      <translation>Crear un compte</translation>
     </message>
     <message>
       <source>Forgot password?</source>
@@ -4131,7 +4167,7 @@ to %1</translation>
     <message>
       <source>Log in to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Log in to %1</translation>
+      <translation>Iniciar sessió a %1</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
@@ -4206,7 +4242,7 @@ to %1</translation>
     </message>
     <message>
       <source>PTZ</source>
-      <translation type="unfinished">PTZ</translation>
+      <translation>PTZ</translation>
     </message>
     <message>
       <source>Dewarping</source>
@@ -4218,7 +4254,7 @@ to %1</translation>
     </message>
     <message>
       <source>Image Enhancement</source>
-      <translation type="unfinished">Image Enhancement</translation>
+      <translation>Millora de la imatge</translation>
     </message>
     <message>
       <source>Hi-Res</source>
@@ -4336,7 +4372,7 @@ to %1</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Eliminar</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -4348,7 +4384,7 @@ to %1</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Tancar</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -4363,7 +4399,7 @@ to %1</translation>
     </message>
     <message>
       <source>Previous Frame</source>
-      <translation type="unfinished">Previous Frame</translation>
+      <translation>Fotograma anterior</translation>
     </message>
     <message>
       <source>Speed Up</source>
@@ -4371,11 +4407,11 @@ to %1</translation>
     </message>
     <message>
       <source>Next Frame</source>
-      <translation type="unfinished">Next Frame</translation>
+      <translation>Fotograma següent</translation>
     </message>
     <message>
       <source>To Start</source>
-      <translation type="unfinished">To Start</translation>
+      <translation>Al Inici</translation>
     </message>
     <message>
       <source>Next Chunk</source>
@@ -4383,7 +4419,7 @@ to %1</translation>
     </message>
     <message>
       <source>To End</source>
-      <translation type="unfinished">To End</translation>
+      <translation>Al Final</translation>
     </message>
     <message>
       <source>Previous Chunk</source>
@@ -4577,7 +4613,7 @@ to %1</translation>
     <name>QnProgressDialog</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancel·lar</translation>
     </message>
   </context>
   <context>
@@ -4619,7 +4655,7 @@ to %1</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Cap</translation>
     </message>
     <message numerus="yes">
       <source>This preset will be activated after %n minutes of inactivity</source>
@@ -4675,14 +4711,14 @@ to %1</translation>
     </message>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Cap</translation>
     </message>
   </context>
   <context>
     <name>QnPtzPresetHotkeyItemDelegate</name>
     <message>
       <source>None</source>
-      <translation type="unfinished">None</translation>
+      <translation>Cap</translation>
     </message>
     <message>
       <source>Reassign</source>
@@ -4993,7 +5029,7 @@ to %1</translation>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
-      <translation type="unfinished">All Cameras &amp; Resources</translation>
+      <translation>Totes les càmeres i recursos</translation>
     </message>
     <message>
       <source>All Shared Layouts</source>
@@ -5039,7 +5075,7 @@ to %1</translation>
     <name>QnResourceWidget</name>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Tancar</translation>
     </message>
     <message>
       <source>Information</source>
@@ -5077,7 +5113,7 @@ to %1</translation>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>Export Bookmark...</source>
-      <translation type="unfinished">Export Bookmark...</translation>
+      <translation>Exportar marcador...</translation>
     </message>
     <message>
       <source>No bookmarks</source>
@@ -5089,7 +5125,7 @@ to %1</translation>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation type="unfinished">Export Bookmarks...</translation>
+      <translation>Exportar marcadors...</translation>
     </message>
   </context>
   <context>
@@ -5131,7 +5167,7 @@ to %1</translation>
     </message>
     <message>
       <source>Any Camera</source>
-      <translation type="unfinished">Any Camera</translation>
+      <translation>Qualsevol càmera</translation>
     </message>
     <message>
       <source>All Devices</source>
@@ -5395,11 +5431,11 @@ to %1</translation>
     </message>
     <message>
       <source>User</source>
-      <translation type="unfinished">User</translation>
+      <translation>Usuari</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasenya</translation>
     </message>
     <message>
       <source>System Signature</source>
@@ -5426,7 +5462,7 @@ to %1</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasenya</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
@@ -5489,7 +5525,7 @@ to %1</translation>
     </message>
     <message>
       <source>Network error</source>
-      <translation type="unfinished">Network error</translation>
+      <translation>Error de xarxa</translation>
     </message>
     <message>
       <source>Invalid parameters</source>
@@ -5605,15 +5641,15 @@ to %1</translation>
     <name>QnStorageAnalyticsWidget</name>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Seleccionar-ho tot</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation type="unfinished">Export Selection to File...</translation>
+      <translation>Exportar la selecció al fitxer...</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation type="unfinished">Copy Selection to Clipboard</translation>
+      <translation>Copiar la selecció al porta-retalls</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -5773,7 +5809,7 @@ to %1</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Eliminar</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -5781,7 +5817,7 @@ to %1</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancel·lar</translation>
     </message>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
@@ -5826,7 +5862,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Loading...</source>
-      <translation type="unfinished">Loading...</translation>
+      <translation>Carregant...</translation>
     </message>
     <message>
       <source>Backup</source>
@@ -6037,10 +6073,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Rebuilding archive index is canceled by user on the following Server:</translation>
     </message>
     <message>
-      <source>Storage is not configured on the following Server:</source>
-      <translation type="unfinished">Storage is not configured on the following Server:</translation>
-    </message>
-    <message>
       <source>Learn more</source>
       <translation type="unfinished">Learn more</translation>
     </message>
@@ -6108,7 +6140,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation type="unfinished">Some cameras require passwords to be set</translation>
+      <translation>Algunes càmeres necessiten que es defineixin contrasenyes</translation>
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
@@ -6208,7 +6240,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Network error</source>
-      <translation type="unfinished">Network error</translation>
+      <translation>Error de xarxa</translation>
     </message>
     <message>
       <source>Hold to Speak</source>
@@ -6239,7 +6271,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Iniciar sessió</translation>
     </message>
     <message>
       <source>Role</source>
@@ -6255,7 +6287,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnUserListModelPrivate</name>
     <message>
       <source>Owner</source>
-      <translation type="unfinished">Owner</translation>
+      <translation>Propietari</translation>
     </message>
     <message>
       <source>Administrator</source>
@@ -6305,7 +6337,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Iniciar sessió</translation>
     </message>
     <message>
       <source>Name</source>
@@ -6412,7 +6444,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>New User...</source>
-      <translation type="unfinished">New User...</translation>
+      <translation>Nou usuari...</translation>
     </message>
     <message>
       <source>User Settings - %1 (readonly)</source>
@@ -6448,7 +6480,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Iniciar sessió</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -6476,7 +6508,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasenya</translation>
     </message>
     <message>
       <source>Confirm Password</source>
@@ -6623,10 +6655,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Bookmark</translation>
     </message>
     <message>
-      <source>Bookmarks can only be added to an online server.</source>
-      <translation type="unfinished">Bookmarks can only be added to an online server.</translation>
-    </message>
-    <message>
       <source>Server offline</source>
       <translation type="unfinished">Server offline</translation>
     </message>
@@ -6636,7 +6664,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Delete bookmark?</source>
-      <translation type="unfinished">Delete bookmark?</translation>
+      <translation>Esborrar el marcador?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
@@ -6654,7 +6682,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Connectar-se al servidor...</translation>
     </message>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
@@ -6667,6 +6695,13 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Failed to connect to the selected server</source>
       <translation type="unfinished">Failed to connect to the selected server</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchController</name>
+    <message>
+      <source>To switch between cameras press Shift + Arrow</source>
+      <translation type="unfinished">To switch between cameras press Shift + Arrow</translation>
     </message>
   </context>
   <context>
@@ -6718,6 +6753,21 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
       <translation type="unfinished">Unable to acknowledge event on removed camera.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchPtzHandler</name>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
     </message>
   </context>
   <context>
@@ -6861,7 +6911,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation type="unfinished">New Video Wall...</translation>
+      <translation>Nou video Wall...</translation>
     </message>
     <message>
       <source>New Matrix %1</source>
@@ -6884,7 +6934,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Stop Video Wall?</source>
-      <translation type="unfinished">Stop Video Wall?</translation>
+      <translation>Aturar el Video Wall?</translation>
     </message>
     <message>
       <source>To start it again, you should have physical access to its computer.</source>
@@ -7323,7 +7373,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>In selected area</source>
-      <translation type="unfinished">In selected area</translation>
+      <translation>A la zona seleccionada</translation>
     </message>
     <message>
       <source>Selected camera</source>
@@ -7340,7 +7390,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>cap</translation>
     </message>
   </context>
   <context>
@@ -7355,7 +7405,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Mitja</translation>
     </message>
     <message>
       <source>High</source>
@@ -7444,7 +7494,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Tancar</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -7500,7 +7550,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>none</source>
       <comment>No currently selected camera</comment>
-      <translation type="unfinished">none</translation>
+      <translation>cap</translation>
     </message>
     <message>
       <source>Devices on layout</source>
@@ -7547,16 +7597,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
-    <message numerus="yes">
-      <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
@@ -7590,6 +7630,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>NO DATA</source>
       <translation type="unfinished">NO DATA</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -7632,11 +7676,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>
-      <translation type="unfinished">Login</translation>
+      <translation>Iniciar sessió</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Contrasenya</translation>
     </message>
   </context>
   <context>
@@ -7793,6 +7837,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation type="unfinished">High minimum value can lead to archive length decrease on other cameras.</translation>
     </message>
+    <message>
+      <source>High pre-recording time will increase RAM utilization on the server</source>
+      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
@@ -7940,22 +7988,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
-      <source>Update file is not found</source>
-      <translation type="unfinished">Update file is not found</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted</source>
-      <translation type="unfinished">Update package is corrupted</translation>
-    </message>
-    <message>
-      <source>Failed to download update package: %1</source>
-      <translation type="unfinished">Failed to download update package: %1</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted: %1</source>
-      <translation type="unfinished">Update package is corrupted: %1</translation>
-    </message>
-    <message>
       <source>This update is already installed.</source>
       <translation type="unfinished">This update is already installed.</translation>
     </message>
@@ -7982,6 +8014,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Installation package has been lost.</source>
       <translation type="unfinished">Installation package has been lost.</translation>
+    </message>
+    <message>
+      <source>File %1 does not exist</source>
+      <translation type="unfinished">File %1 does not exist</translation>
+    </message>
+    <message>
+      <source>There is no valid client package to download</source>
+      <translation type="unfinished">There is no valid client package to download</translation>
     </message>
   </context>
   <context>
@@ -8202,9 +8242,9 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::EventTile</name>
     <message numerus="yes">
       <source>...and %n more</source>
-      <translation type="unfinished">
-        <numerusform>...and %n more</numerusform>
-        <numerusform>...and %n more</numerusform>
+      <translation>
+        <numerusform>... i %n més</numerusform>
+        <numerusform>... i %n més</numerusform>
       </translation>
     </message>
   </context>
@@ -8420,6 +8460,30 @@ If you intended to move analytics data to another storage location, please conta
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
       <translation type="unfinished">Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</translation>
     </message>
+    <message>
+      <source>Equidistant</source>
+      <translation type="unfinished">Equidistant</translation>
+    </message>
+    <message>
+      <source>Stereographic</source>
+      <translation type="unfinished">Stereographic</translation>
+    </message>
+    <message>
+      <source>Equisolid</source>
+      <translation type="unfinished">Equisolid</translation>
+    </message>
+    <message>
+      <source>Ceiling</source>
+      <translation type="unfinished">Ceiling</translation>
+    </message>
+    <message>
+      <source>Wall</source>
+      <translation type="unfinished">Wall</translation>
+    </message>
+    <message>
+      <source>Floor/Table</source>
+      <translation type="unfinished">Floor/Table</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
@@ -8575,6 +8639,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>NOT A CAMERA</source>
       <translation type="unfinished">NOT A CAMERA</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -8787,7 +8855,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>There was an error while installing updates:</source>
@@ -8803,7 +8871,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancel·lar</translation>
     </message>
     <message>
       <source>The latest version is already installed</source>
@@ -8827,7 +8895,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Descarregar</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
@@ -8926,14 +8994,24 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::MultipleLayoutSelectionDialog</name>
     <message numerus="yes">
       <source>%n layouts</source>
-      <translation type="unfinished">
-        <numerusform>%n layouts</numerusform>
-        <numerusform>%n layouts</numerusform>
+      <translation>
+        <numerusform>%n dissenys</numerusform>
+        <numerusform>%n dissenys</numerusform>
       </translation>
     </message>
     <message>
       <source>You do not have any layouts</source>
       <translation type="unfinished">You do not have any layouts</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::NameValueTable</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation type="unfinished">
+        <numerusform>+%n values</numerusform>
+        <numerusform>+%n values</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -8962,7 +9040,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select layout...</source>
-      <translation type="unfinished">Select layout...</translation>
+      <translation>Seleccionar disseny...</translation>
     </message>
     <message>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
@@ -9019,10 +9097,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Installed</translation>
     </message>
     <message>
-      <source>Failed to download update</source>
-      <translation type="unfinished">Failed to download update</translation>
-    </message>
-    <message>
       <source>Waiting for peer data</source>
       <translation type="unfinished">Waiting for peer data</translation>
     </message>
@@ -9055,12 +9129,8 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Internal downloader error.</translation>
     </message>
     <message>
-      <source>Internal client error.</source>
-      <translation type="unfinished">Internal client error.</translation>
-    </message>
-    <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Error desconegut.</translation>
     </message>
     <message>
       <source>Unexpected error code.</source>
@@ -9089,6 +9159,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Update installation failed.</source>
       <translation type="unfinished">Update installation failed.</translation>
+    </message>
+    <message>
+      <source>Update file verification failed.</source>
+      <translation type="unfinished">Update file verification failed.</translation>
+    </message>
+    <message>
+      <source>Verifying update</source>
+      <translation type="unfinished">Verifying update</translation>
     </message>
   </context>
   <context>
@@ -9314,7 +9392,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Only client-server video traffic can be encrypted</source>
-      <translation type="unfinished">Only client-server video traffic can be encrypted</translation>
+      <translation>Només es pot xifrar el trànsit de vídeo client-servidor</translation>
     </message>
   </context>
   <context>
@@ -9371,7 +9449,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>unknown error</source>
-      <translation type="unfinished">unknown error</translation>
+      <translation>error desconegut</translation>
     </message>
     <message>
       <source>Not loaded</source>
@@ -9429,7 +9507,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Network error.</source>
-      <translation type="unfinished">Network error.</translation>
+      <translation>Error de xarxa.</translation>
     </message>
     <message>
       <source>Server error.</source>
@@ -9444,7 +9522,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Message</source>
-      <translation type="unfinished">Message</translation>
+      <translation>Missatge</translation>
     </message>
     <message>
       <source>Store Update Files</source>
@@ -9546,7 +9624,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Date</source>
-      <translation type="unfinished">Date</translation>
+      <translation>Data</translation>
     </message>
     <message>
       <source>Server OS Time</source>
@@ -9689,7 +9767,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Exporting video</source>
-      <translation type="unfinished">Exporting video</translation>
+      <translation>S'està exportant el vídeo</translation>
     </message>
     <message>
       <source>Stop Export</source>
@@ -9697,7 +9775,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Minimize</source>
-      <translation type="unfinished">Minimize</translation>
+      <translation>Minimitzar</translation>
     </message>
     <message>
       <source>Cannot write file</source>
@@ -9788,7 +9866,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::detail::BaseInputField</name>
     <message>
       <source>multiple values</source>
-      <translation type="unfinished">multiple values</translation>
+      <translation>valors múltiples</translation>
     </message>
   </context>
   <context>
@@ -9905,7 +9983,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Start Showreel</source>
-      <translation type="unfinished">Start Showreel</translation>
+      <translation>Inicia Showreel</translation>
     </message>
   </context>
   <context>
@@ -10094,7 +10172,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Rename</source>
-      <translation type="unfinished">Rename</translation>
+      <translation>Reanomenar</translation>
     </message>
     <message>
       <source>Enter new name for the selected item:</source>
@@ -10178,7 +10256,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
@@ -10290,7 +10368,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation type="unfinished">Open Containing Folder</translation>
+      <translation>Obrir la carpeta contenidora</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>

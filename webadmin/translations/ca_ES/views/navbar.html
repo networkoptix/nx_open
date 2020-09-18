@@ -21,7 +21,7 @@
             <ul class="nav navbar-nav">
                 <li ng-hide="!user.isAdmin || hasProxy" ng-class="{active:isActive('/settings')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse"
-                       ng-click="nav.show = !nav.show" ng-href="#/settings/">Settings</a></li>
+                       ng-click="nav.show = !nav.show" ng-href="#/settings/">Configuració</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/view')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse"
                        ng-click="nav.show = !nav.show" ng-href="#/view/">View</a></li>
@@ -39,11 +39,11 @@
                        ng-click="nav.show = !nav.show" ng-href="#/health/">Information</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/help')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse"
-                       ng-click="nav.show = !nav.show" ng-href="#/help/">Help</a></li>
+                       ng-click="nav.show = !nav.show" ng-href="#/help/">Ajuda</a></li>
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                <li ng-if="user" ng-hide="settings.liteClient"><a ng-click="logout()" title="Logout">Log Out</a></li>
+                <li ng-if="user" ng-hide="settings.liteClient"><a ng-click="logout()" title="Logout">Tancar la sessió</a></li>
                 <li language-select uib-dropdown></li>
             </ul>
         </nav>
@@ -51,7 +51,7 @@
         <nav ng-if="!noPanel" class="hidden-xs" id="navbar-non-collapse" role="navigation">
             <ul class="nav navbar-nav">
                 <li ng-hide="!user.isAdmin || hasProxy" ng-class="{active:isActive('/settings')}">
-                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/settings/">Settings</a>
+                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/settings/">Configuració</a>
                 </li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/view')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/view/">View</a></li>
@@ -68,11 +68,11 @@
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse"
                        ng-href="#/health/">Information</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/help')}">
-                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/help/">Help</a></li>
+                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/help/">Ajuda</a></li>
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                <li ng-if="user" ng-hide="settings.liteClient"><a ng-click="logout()" title="Logout">Log Out</a></li>
+                <li ng-if="user" ng-hide="settings.liteClient"><a ng-click="logout()" title="Logout">Tancar la sessió</a></li>
                 <li language-select uib-dropdown></li>
             </ul>
         </nav>

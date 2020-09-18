@@ -131,7 +131,7 @@
         "maxEventLogRecords": "Maximální záznamy protokolu událostí, které lze uložit do databáze. Skutečné množství nevymazaných záznamů může být až o 20% vyšší než zadaná hodnota.",
         "forceLiveCacheForPrimaryStream": "Určuje, zda ukládat některé snímky pro primární stream. Hodnoty: \"ano\" - vždy povoleno (může využít hodně RAM), \"ne\" - vždy vypnuto, kromě případů, kdy to vyžaduje přehrávání (např.. HLS), \"auto\" - podobné \"ne\", ale pokud je zapnuto, zlepšuje uživatelský zážitek (např. když nějaký plugin Analytický pracuje na kamerě).",
         "additionalLocalFsTypes": "Další typy systémů souborů, které je třeba zvážit při rozhodování, zda je daný oddíl vhodný jako úložiště serveru. Nahrajte jako seznam názvů souborů oddělených čárkami, jak jsou uvedeny v / proc / mounts.",
-        "rtspBufferSizeKb": "Velikost vyrovnávací paměti RTSP na straně serveru v kB. Vyšší hodnota umožňuje využívat efektivnější internet s vysokou hodnotou při zpoždění, ale zpomaluje přepínání automatické kvality a reakci na provoz RTSP."
+        "mediaBufferSizeKb": "Server-side media buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value, but slows down the auto quality switching and reaction to media seek operations."
     },
     "info": {
         "tabs": {

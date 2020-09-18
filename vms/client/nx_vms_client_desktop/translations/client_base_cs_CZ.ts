@@ -124,6 +124,10 @@ to view more bookmarks</source>
       <source>Installing</source>
       <translation>Probíhá instalace</translation>
     </message>
+    <message>
+      <source>Verifying update package</source>
+      <translation type="unfinished">Verifying update package</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>
@@ -1613,6 +1617,26 @@ to view more bookmarks</source>
       <source>Layout is locked</source>
       <translation>Rozložení je uzamčeno</translation>
     </message>
+    <message>
+      <source>This camera does not support advanced PTZ</source>
+      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
+    </message>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Focusing...</source>
+      <translation type="unfinished">Focusing...</translation>
+    </message>
   </context>
   <context>
     <name>PtzOverlayWidget</name>
@@ -2078,6 +2102,18 @@ to view more bookmarks</source>
     <message>
       <source>Event rules reset to default</source>
       <translation>Pravidla události byla obnovena do výchozího nastavení</translation>
+    </message>
+    <message>
+      <source>Storage added</source>
+      <translation type="unfinished">Storage added</translation>
+    </message>
+    <message>
+      <source>Storage updated</source>
+      <translation type="unfinished">Storage updated</translation>
+    </message>
+    <message>
+      <source>Storage removed</source>
+      <translation type="unfinished">Storage removed</translation>
     </message>
   </context>
   <context>
@@ -6164,10 +6200,6 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <translation>Oprava indexu archivu je zrušena uživatelem na následujícím serveru:</translation>
     </message>
     <message>
-      <source>Storage is not configured on the following Server:</source>
-      <translation>Úložiště není nastaveno pro následující server:</translation>
-    </message>
-    <message>
       <source>Learn more</source>
       <translation>Zjistit více</translation>
     </message>
@@ -6754,10 +6786,6 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <translation>Záložka</translation>
     </message>
     <message>
-      <source>Bookmarks can only be added to an online server.</source>
-      <translation>Záložky lze přidat pouze online serveru.</translation>
-    </message>
-    <message>
       <source>Server offline</source>
       <translation>Server je offline</translation>
     </message>
@@ -6800,6 +6828,13 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message>
       <source>Failed to connect to the selected server</source>
       <translation>Nelze se připojit k zadanému serveru</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchController</name>
+    <message>
+      <source>To switch between cameras press Shift + Arrow</source>
+      <translation type="unfinished">To switch between cameras press Shift + Arrow</translation>
     </message>
   </context>
   <context>
@@ -6851,6 +6886,21 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
       <translation>Na odebrané kameře nelze událost potvrdit.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchPtzHandler</name>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
     </message>
   </context>
   <context>
@@ -7746,18 +7796,6 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
-    <message numerus="yes">
-      <source>+%n values</source>
-      <translation>
-        <numerusform>+%n hodnot</numerusform>
-        <numerusform>+%n hodnot</numerusform>
-        <numerusform>+%n hodnot</numerusform>
-        <numerusform>+%n hodnot</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
@@ -7793,6 +7831,10 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message>
       <source>NO DATA</source>
       <translation>ŽÁDNÁ DATA</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -8002,6 +8044,10 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>Vysoká minimální hodnota může vést k poklesu délky archivu u ostatních kamer.</translation>
     </message>
+    <message>
+      <source>High pre-recording time will increase RAM utilization on the server</source>
+      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
@@ -8161,22 +8207,6 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
   <context>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
-      <source>Update file is not found</source>
-      <translation>Aktualizační soubor nebyl nalezen</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted</source>
-      <translation>Aktualizační soubor je poškozen</translation>
-    </message>
-    <message>
-      <source>Failed to download update package: %1</source>
-      <translation>Nepodařilo se stáhnout balíčky aktualizací: %1</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted: %1</source>
-      <translation>Aktualizační balíček je poškozen: %1</translation>
-    </message>
-    <message>
       <source>This update is already installed.</source>
       <translation>Tato aktualizace je již nainstalována.</translation>
     </message>
@@ -8203,6 +8233,14 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message>
       <source>Installation package has been lost.</source>
       <translation>Instalační balíček byl ztracen.</translation>
+    </message>
+    <message>
+      <source>File %1 does not exist</source>
+      <translation type="unfinished">File %1 does not exist</translation>
+    </message>
+    <message>
+      <source>There is no valid client package to download</source>
+      <translation type="unfinished">There is no valid client package to download</translation>
     </message>
   </context>
   <context>
@@ -8651,6 +8689,30 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
       <translation>Použijte toto nastavení k vyrovnání zkreslení, pokud kamera není namontován přesně svisle nebo vodorovně.</translation>
     </message>
+    <message>
+      <source>Equidistant</source>
+      <translation type="unfinished">Equidistant</translation>
+    </message>
+    <message>
+      <source>Stereographic</source>
+      <translation type="unfinished">Stereographic</translation>
+    </message>
+    <message>
+      <source>Equisolid</source>
+      <translation type="unfinished">Equisolid</translation>
+    </message>
+    <message>
+      <source>Ceiling</source>
+      <translation type="unfinished">Ceiling</translation>
+    </message>
+    <message>
+      <source>Wall</source>
+      <translation type="unfinished">Wall</translation>
+    </message>
+    <message>
+      <source>Floor/Table</source>
+      <translation type="unfinished">Floor/Table</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
@@ -8810,6 +8872,10 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message>
       <source>NOT A CAMERA</source>
       <translation>ŽÁDNÁ KAMERA</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -9176,6 +9242,18 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::NameValueTable</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation>
+        <numerusform>+%n hodnot</numerusform>
+        <numerusform>+%n hodnot</numerusform>
+        <numerusform>+%n hodnot</numerusform>
+        <numerusform>+%n hodnot</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
       <source>Alarm: %1</source>
@@ -9258,10 +9336,6 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <translation>Nainstalováno</translation>
     </message>
     <message>
-      <source>Failed to download update</source>
-      <translation>Aktualizace se nepodařilo stáhnout</translation>
-    </message>
-    <message>
       <source>Waiting for peer data</source>
       <translation>Čekání na peer data</translation>
     </message>
@@ -9294,10 +9368,6 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <translation>Interní chyba stahování.</translation>
     </message>
     <message>
-      <source>Internal client error.</source>
-      <translation>Interní chyba klienta.</translation>
-    </message>
-    <message>
       <source>Unknown error.</source>
       <translation>Neznámá chyba.</translation>
     </message>
@@ -9328,6 +9398,14 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message>
       <source>Update installation failed.</source>
       <translation>Instalace aktualizace se nezdařila.</translation>
+    </message>
+    <message>
+      <source>Update file verification failed.</source>
+      <translation type="unfinished">Update file verification failed.</translation>
+    </message>
+    <message>
+      <source>Verifying update</source>
+      <translation type="unfinished">Verifying update</translation>
     </message>
   </context>
   <context>

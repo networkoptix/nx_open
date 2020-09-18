@@ -1,7 +1,7 @@
 <form class="form" role="form" novalidate name="form" id="mergeDialog">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h3 class="modal-title">Merge Systems</h3>
+        <h3 class="modal-title">Fusionar sistemes</h3>
     </div>
 
     <div class="modal-body">
@@ -33,7 +33,7 @@
                 <label for="otherSystemLogin" class="control-label">Other System Login</label>
                 <div class="">
                     <input ng-model="settings.login" name="otherSystemLogin" id="otherSystemLogin" class="form-control" type="text"
-                           placeholder="Login" required>
+                           placeholder="Iniciar sessió" required>
                 </div>
             </div>
 
@@ -42,7 +42,7 @@
                 <div class="">
                     <input type="password" ng-model="settings.password"  class="form-control" id="otherSystemPassword"
                            autocomplete="new-password"
-                           placeholder="Password"/>
+                           placeholder="Contrasenya"/>
                 </div>
             </div>
         </ng-form>
@@ -50,7 +50,7 @@
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
             <label for="currentSystemPassword" class="control-label">Current Password (for this System)</label>
             <div class="">
-                <input type="password" ng-model="settings.currentPassword"  class="form-control" id="currentSystemPassword" placeholder="Password" required />
+                <input type="password" ng-model="settings.currentPassword"  class="form-control" id="currentSystemPassword" placeholder="Contrasenya" required />
             </div>
         </div>
 

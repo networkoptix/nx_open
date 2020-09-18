@@ -124,6 +124,10 @@ to view more bookmarks</source>
       <source>Installing</source>
       <translation>Installazione</translation>
     </message>
+    <message>
+      <source>Verifying update package</source>
+      <translation type="unfinished">Verifying update package</translation>
+    </message>
   </context>
   <context>
     <name>ContextMenu</name>
@@ -1585,6 +1589,26 @@ to view more bookmarks</source>
       <source>Layout is locked</source>
       <translation>Il layout è bloccato</translation>
     </message>
+    <message>
+      <source>This camera does not support advanced PTZ</source>
+      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
+    </message>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Focusing...</source>
+      <translation type="unfinished">Focusing...</translation>
+    </message>
   </context>
   <context>
     <name>PtzOverlayWidget</name>
@@ -2032,6 +2056,18 @@ to view more bookmarks</source>
     <message>
       <source>Event rules reset to default</source>
       <translation>Regole eventi ripristinate a default</translation>
+    </message>
+    <message>
+      <source>Storage added</source>
+      <translation type="unfinished">Storage added</translation>
+    </message>
+    <message>
+      <source>Storage updated</source>
+      <translation type="unfinished">Storage updated</translation>
+    </message>
+    <message>
+      <source>Storage removed</source>
+      <translation type="unfinished">Storage removed</translation>
     </message>
   </context>
   <context>
@@ -6033,10 +6069,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <translation>La ricostruzione dell'indice di archivio viene annullata dall'utente sul seguente server:</translation>
     </message>
     <message>
-      <source>Storage is not configured on the following Server:</source>
-      <translation>L'archiviazione non è configurata sul seguente server:</translation>
-    </message>
-    <message>
       <source>Learn more</source>
       <translation>Per saperne di più</translation>
     </message>
@@ -6619,10 +6651,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <translation>Segnalibro</translation>
     </message>
     <message>
-      <source>Bookmarks can only be added to an online server.</source>
-      <translation>I segnalibri possono essere aggiunti solo a un server online.</translation>
-    </message>
-    <message>
       <source>Server offline</source>
       <translation>Server offline</translation>
     </message>
@@ -6663,6 +6691,13 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>Failed to connect to the selected server</source>
       <translation>Impossibile connettersi al server selezionato</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchController</name>
+    <message>
+      <source>To switch between cameras press Shift + Arrow</source>
+      <translation type="unfinished">To switch between cameras press Shift + Arrow</translation>
     </message>
   </context>
   <context>
@@ -6714,6 +6749,21 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
       <translation>Impossibile riconoscere l'evento sulla telecamera rimossa.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnWorkbenchPtzHandler</name>
+    <message>
+      <source>Zooming in...</source>
+      <translation type="unfinished">Zooming in...</translation>
+    </message>
+    <message>
+      <source>Zooming out...</source>
+      <translation type="unfinished">Zooming out...</translation>
+    </message>
+    <message>
+      <source>Moving...</source>
+      <translation type="unfinished">Moving...</translation>
     </message>
   </context>
   <context>
@@ -7543,16 +7593,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
-    <message numerus="yes">
-      <source>+%n values</source>
-      <translation>
-        <numerusform>+%n valori</numerusform>
-        <numerusform>+%n valori</numerusform>
-      </translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
       <source>deleted camera</source>
@@ -7586,6 +7626,10 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>NO DATA</source>
       <translation>NESSUN DATO</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -7789,6 +7833,10 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>Un valore minimo elevato può comportare una riduzione della lunghezza dell'archivio su altri dispositivi.</translation>
     </message>
+    <message>
+      <source>High pre-recording time will increase RAM utilization on the server</source>
+      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
@@ -7936,22 +7984,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
   <context>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
-      <source>Update file is not found</source>
-      <translation>Il file di aggiornamento non è stato trovato</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted</source>
-      <translation>Il pacchetto di aggiornamento è danneggiato</translation>
-    </message>
-    <message>
-      <source>Failed to download update package: %1</source>
-      <translation>Impossibile scaricare il pacchetto di aggiornamento: %1</translation>
-    </message>
-    <message>
-      <source>Update package is corrupted: %1</source>
-      <translation>Il pacchetto di aggiornamento è danneggiato: %1</translation>
-    </message>
-    <message>
       <source>This update is already installed.</source>
       <translation>Questo modulo è già installato.</translation>
     </message>
@@ -7978,6 +8010,14 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>Installation package has been lost.</source>
       <translation>Il pacchetto di installazione è stato perso.</translation>
+    </message>
+    <message>
+      <source>File %1 does not exist</source>
+      <translation type="unfinished">File %1 does not exist</translation>
+    </message>
+    <message>
+      <source>There is no valid client package to download</source>
+      <translation type="unfinished">There is no valid client package to download</translation>
     </message>
   </context>
   <context>
@@ -8416,6 +8456,30 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
       <translation>Utilizzare questa impostazione per compensare la distorsione se la telecamera non è montata esattamente in modo verticale o in orizzontale.</translation>
     </message>
+    <message>
+      <source>Equidistant</source>
+      <translation type="unfinished">Equidistant</translation>
+    </message>
+    <message>
+      <source>Stereographic</source>
+      <translation type="unfinished">Stereographic</translation>
+    </message>
+    <message>
+      <source>Equisolid</source>
+      <translation type="unfinished">Equisolid</translation>
+    </message>
+    <message>
+      <source>Ceiling</source>
+      <translation type="unfinished">Ceiling</translation>
+    </message>
+    <message>
+      <source>Wall</source>
+      <translation type="unfinished">Wall</translation>
+    </message>
+    <message>
+      <source>Floor/Table</source>
+      <translation type="unfinished">Floor/Table</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
@@ -8571,6 +8635,10 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>NOT A CAMERA</source>
       <translation>NON UNA TELECAMERA</translation>
+    </message>
+    <message>
+      <source>DISABLED</source>
+      <translation type="unfinished">DISABLED</translation>
     </message>
   </context>
   <context>
@@ -8933,6 +9001,16 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::NameValueTable</name>
+    <message numerus="yes">
+      <source>+%n values</source>
+      <translation>
+        <numerusform>+%n valori</numerusform>
+        <numerusform>+%n valori</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
       <source>Alarm: %1</source>
@@ -9015,10 +9093,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <translation>Installato</translation>
     </message>
     <message>
-      <source>Failed to download update</source>
-      <translation>Impossibile scaricare il pacchetto di aggiornamento</translation>
-    </message>
-    <message>
       <source>Waiting for peer data</source>
       <translation>In attesa di dati peer</translation>
     </message>
@@ -9051,10 +9125,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <translation>Errore di download interno.</translation>
     </message>
     <message>
-      <source>Internal client error.</source>
-      <translation>Errore interno del client.</translation>
-    </message>
-    <message>
       <source>Unknown error.</source>
       <translation>Errore sconosciuto.</translation>
     </message>
@@ -9085,6 +9155,14 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>Update installation failed.</source>
       <translation>Installazione dell'aggiornamento non riuscita.</translation>
+    </message>
+    <message>
+      <source>Update file verification failed.</source>
+      <translation type="unfinished">Update file verification failed.</translation>
+    </message>
+    <message>
+      <source>Verifying update</source>
+      <translation type="unfinished">Verifying update</translation>
     </message>
   </context>
   <context>

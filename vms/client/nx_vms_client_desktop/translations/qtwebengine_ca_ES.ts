@@ -120,7 +120,7 @@
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Activar el silenci</translation>
     </message>
     <message>
       <source>Close Page</source>
@@ -195,7 +195,7 @@
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Activar el silenci</translation>
     </message>
     <message>
       <source>Close Page</source>
@@ -263,7 +263,7 @@
     </message>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation type="unfinished">Are you sure you want to leave this page? Changes that you made may not be saved.</translation>
+      <translation>Esteu segur que voleu deixar aquesta pàgina? És possible que no es desinin els canvis que heu realitzat.</translation>
     </message>
     <message>
       <source>&amp;Back</source>

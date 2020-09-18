@@ -131,7 +131,7 @@
         "maxEventLogRecords": "要保留最多笔在资料库中的事件日志记录。实际未删除记录的数量可能比指定值高出20％。",
         "forceLiveCacheForPrimaryStream": "是否为主串流缓存一些帧数。数值：“是” - 一直启用（可能占用大量RAM），“否” - 一直停用，除非回放需要（例如HLS），“自动” - 类似于“否”，但会在开启时改进使用者体验（例如: 当某些分析插件在摄像机上作用时）。",
         "additionalLocalFsTypes": "在确定给定分区是否适用作服务器存储时, 需考虑附加的文件系统类型。应在列出的文件系统名称列表中使用逗号分隔/ proc / mounts。",
-        "rtspBufferSizeKb": "服务器端RTSP缓冲区容量以KB为单位。较大的值允许使用具有高往返延迟值的更高速的网路，但会减慢自动质量切换和对RTSP搜索操作的反应。"
+        "mediaBufferSizeKb": "Server-side media buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value, but slows down the auto quality switching and reaction to media seek operations."
     },
     "info": {
         "tabs": {
