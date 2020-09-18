@@ -2,6 +2,7 @@
 
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/analytics/settings.h>
+#include <nx/vms/api/analytics/device_agent_settings_response.h>
 
 namespace nx::vms::server::analytics {
 
@@ -50,6 +51,7 @@ struct SettingsResponse
     api::analytics::SettingsModel model;
     api::analytics::SettingsValues values;
     api::analytics::SettingsErrors errors;
+    api::analytics::DeviceAgentSettingsSession session;
 };
 
 struct SettingsContext

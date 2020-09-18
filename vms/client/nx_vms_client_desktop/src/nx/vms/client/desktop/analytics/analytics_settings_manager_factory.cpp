@@ -94,7 +94,9 @@ AnalyticsSettingsManagerFactory::createAnalyticsSettingsManager(
                     QJson::deserialized<DeviceAgentSettingsMaybeChangedData>(
                         eventData.eventData);
 
-                managerPtr->refreshSettings({payload.deviceId, payload.engineId});
+                managerPtr->storeSettings(
+                    {payload.deviceId, payload.engineId},
+                    payload.settingsData);
             }
         });
 

@@ -14,13 +14,13 @@
 
 #include "analytics_settings_types.h"
 
-namespace nx::vms::api::analytics { struct DeviceAnalyticsSettingsResponse; }
+namespace nx::vms::api::analytics { struct DeviceAgentSettingsResponse; }
 
 namespace nx::vms::client::desktop {
 
 class AnalyticsSettingsManager;
 using AnalyticsSettingsCallback =
-    rest::Callback<nx::vms::api::analytics::DeviceAnalyticsSettingsResponse>;
+    rest::Callback<nx::vms::api::analytics::DeviceAgentSettingsResponse>;
 
 class NX_VMS_CLIENT_DESKTOP_API AnalyticsSettingsServerInterface
 {
@@ -92,6 +92,13 @@ public:
     void setServerInterface(AnalyticsSettingsServerInterfacePtr serverInterface);
 
     void refreshSettings(const DeviceAgentId& agentId);
+
+    /**
+     * Update stored Settings Model and values with the provided data.
+     */
+    void storeSettings(
+        const DeviceAgentId& agentId,
+        const nx::vms::api::analytics::DeviceAgentSettingsResponse& data);
 
     AnalyticsSettingsListenerPtr getListener(const DeviceAgentId& agentId);
 

@@ -269,7 +269,10 @@ SettingsResponse DeviceAnalyticsBinding::getSettings() const
     if (settingsHaveBeenChanged)
         notifySettingsHaveBeenChanged();
 
-    return prepareSettingsResponse(settingsContext, *sdkSettingsResponse);
+    return prepareSettingsResponse(
+        settingsContext,
+        deviceAgentContext.settingsSession,
+        *sdkSettingsResponse);
 }
 
 SettingsResponse DeviceAnalyticsBinding::setSettings(
@@ -336,7 +339,10 @@ SettingsResponse DeviceAnalyticsBinding::setSettingsInternal(
     if (settingsHaveBeenChanged)
         notifySettingsHaveBeenChanged();
 
-    return prepareSettingsResponse(m_deviceAgentContext.settingsContext, *sdkSettingsResponse);
+    return prepareSettingsResponse(
+        m_deviceAgentContext.settingsContext,
+        m_deviceAgentContext.settingsSession,
+        *sdkSettingsResponse);
 }
 
 void DeviceAnalyticsBinding::logIncomingDataPacket(Ptr<IDataPacket> frame)
@@ -459,7 +465,7 @@ void DeviceAnalyticsBinding::notifySettingsHaveBeenChanged() const
     serverModule()->serverRuntimeEventManager()->triggerDeviceAgentSettingsMaybeChangedEvent(
         m_device->getId(),
         m_engine->getId(),
-        makeSettingsData());
+        makeDeviceAgentSettingsResponse());
 }
 
 void DeviceAnalyticsBinding::initializeSettingsContext() const
@@ -500,8 +506,8 @@ void DeviceAnalyticsBinding::initializeSettingsContext() const
         !deviceAgentManifest->capabilities.testFlag(
             DeviceAgentManifest::Capability::doNotSaveSettingsValuesToProperty);
 
-    m_deviceAgentContext.additionalSettingsData.sequenceId = 0;
-    m_deviceAgentContext.additionalSettingsData.sessionId = QnUuid::createUuid();
+    m_deviceAgentContext.settingsSession.id = QnUuid::createUuid();
+    m_deviceAgentContext.settingsSession.sequenceNumber = 0;
 
     NX_DEBUG(this,
         "Settings context has been initialized, model: %1, model id: %2, values: %3,"
@@ -582,7 +588,7 @@ SettingsContext DeviceAnalyticsBinding::updateSettingsContext(
         m_deviceAgentContext.settingsContext.values, m_device, m_engine);
 
     if (*outSettingsHaveBeenChanged)
-        ++m_deviceAgentContext.additionalSettingsData.sequenceId;
+        ++m_deviceAgentContext.settingsSession.sequenceNumber;
 
     if (m_deviceAgentContext.settingsContext.saveSettingsValuesToProperty)
     {
@@ -623,6 +629,7 @@ api::analytics::SettingsValues DeviceAnalyticsBinding::prepareSettings(
 
 SettingsResponse DeviceAnalyticsBinding::prepareSettingsResponse(
     const SettingsContext& settingsContext,
+    const DeviceAgentSettingsSession& settingsSession,
     const sdk_support::SdkSettingsResponse& sdkSettingsResponse) const
 {
     SettingsResponse result;
@@ -634,6 +641,7 @@ SettingsResponse DeviceAnalyticsBinding::prepareSettingsResponse(
     result.modelId = settingsContext.modelId;
     result.values = settingsContext.values;
     result.errors = sdkSettingsResponse.errors;
+    result.session = settingsSession;
 
     if (!sdkSettingsResponse.sdkError.isOk())
     {
@@ -651,20 +659,34 @@ SettingsResponse DeviceAnalyticsBinding::prepareSettingsResponse(
 
     NX_DEBUG(this,
         "Resulting settings response, settings model: %1, settings model id: %2, "
-        "settings values: %3, settings errors: %4, Device: %5, Engine: %6",
-        result.model, result.modelId, result.values, result.errors, m_device, m_engine);
+        "settings values: %3, settings errors: %4, session id: %5, sequence number: %6, "
+        "Device: %7, Engine: %8",
+        result.model, result.modelId, result.values, result.errors,
+        result.session.id, result.session.sequenceNumber, m_device, m_engine);
 
     return result;
 }
 
-nx::vms::api::SettingsData DeviceAnalyticsBinding::makeSettingsData() const
+DeviceAgentSettingsResponse DeviceAnalyticsBinding::makeDeviceAgentSettingsResponse() const
 {
-    nx::vms::api::SettingsData result;
-    result.sessionId = m_deviceAgentContext.additionalSettingsData.sessionId;
-    result.sequenceNumber = m_deviceAgentContext.additionalSettingsData.sequenceId;
-    result.modelId = m_deviceAgentContext.settingsContext.modelId;
-    result.model = m_deviceAgentContext.settingsContext.model;
-    result.values = m_deviceAgentContext.settingsContext.values;
+    DeviceAgentSettingsResponse result;
+    result.session = m_deviceAgentContext.settingsSession;
+    result.settingsModelId = m_deviceAgentContext.settingsContext.modelId;
+    result.settingsModel = m_deviceAgentContext.settingsContext.model;
+    result.settingsValues = m_deviceAgentContext.settingsContext.values;
+
+    const QnUuid engineId = m_engine->getId();
+    const std::optional<DeviceAgentManifest> deviceAgentManifest =
+        m_device->deviceAgentManifest(engineId);
+
+    if (NX_ASSERT(deviceAgentManifest))
+    {
+        result.disableStreamSelection =
+            deviceAgentManifest->capabilities.testFlag(
+                DeviceAgentManifest::Capability::disableStreamSelection);
+    }
+
+    result.analyzedStreamIndex = m_device->analyzedStreamIndex(m_engine->getId());
 
     return result;
 }

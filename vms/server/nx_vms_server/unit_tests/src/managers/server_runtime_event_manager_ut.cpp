@@ -72,7 +72,7 @@ protected:
         serverRuntimeEventManager->triggerDeviceAgentSettingsMaybeChangedEvent(
             kDeviceId,
             kEngineId,
-            SettingsData{});
+            nx::vms::api::analytics::DeviceAgentSettingsResponse());
     }
 
     void makeSureEventHasBeenDeliveredToServer(int serverIndex)

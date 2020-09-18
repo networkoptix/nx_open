@@ -5,6 +5,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/vms/client/desktop/analytics/analytics_settings_manager.h>
+#include <nx/vms/api/analytics/device_agent_settings_response.h>
 
 #include <test_support/resource/camera_resource_stub.h>
 
@@ -41,7 +42,7 @@ public:
 
     void sendReply(
         const DeviceAgentId& agentId,
-        const nx::vms::api::analytics::DeviceAnalyticsSettingsResponse& response,
+        nx::vms::api::analytics::DeviceAgentSettingsResponse response,
         bool success = true);
 
 private:
@@ -51,6 +52,8 @@ private:
         const nx::vms::common::AnalyticsEngineResourcePtr& engine,
         AnalyticsSettingsCallback callback);
 
+    QnUuid sessionId;
+    nx::vms::api::analytics::DeviceAgentSettingsSession m_session;
     rest::Handle m_lastHandle = 0;
     std::deque<RequestInfo> m_requests;
 };

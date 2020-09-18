@@ -17,6 +17,7 @@
 
 #include <nx/analytics/metadata_logger.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
+#include <nx/vms/api/analytics/device_agent_settings_response.h>
 
 #include <nx/vms/server/sdk_support/types.h>
 #include <nx/vms/server/resource/resource_fwd.h>
@@ -40,6 +41,8 @@ class DeviceAnalyticsBinding:
     using base_type = QnAbstractDataConsumer;
     using Engine = nx::sdk::analytics::IEngine;
     using DeviceAgent = nx::sdk::analytics::IDeviceAgent;
+    using DeviceAgentSettingsResponse = nx::vms::api::analytics::DeviceAgentSettingsResponse;
+    using DeviceAgentSettingsSession = nx::vms::api::analytics::DeviceAgentSettingsSession;
 
 public:
     DeviceAnalyticsBinding(
@@ -119,24 +122,19 @@ private:
 
     SettingsResponse prepareSettingsResponse(
         const SettingsContext& settingsContext,
+        const DeviceAgentSettingsSession& settingsSession,
         const sdk_support::SdkSettingsResponse& sdkSettingsResponse) const;
 
-    nx::vms::api::SettingsData makeSettingsData() const;
+    DeviceAgentSettingsResponse makeDeviceAgentSettingsResponse() const;
 
 private:
-    struct AdditionalSettingsData
-    {
-        QnUuid sessionId;
-        int64_t sequenceId = 0;
-    };
-
     struct DeviceAgentContext
     {
         nx::sdk::Ptr<nx::vms::server::analytics::DeviceAgentHandler> handler;
         wrappers::DeviceAgentPtr deviceAgent;
 
         mutable SettingsContext settingsContext;
-        mutable AdditionalSettingsData additionalSettingsData;
+        mutable DeviceAgentSettingsSession settingsSession;
     };
 
     mutable nx::Mutex m_mutex;

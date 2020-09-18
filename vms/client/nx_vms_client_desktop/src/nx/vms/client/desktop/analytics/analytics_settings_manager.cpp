@@ -5,7 +5,7 @@
 #include <core/resource/camera_resource.h>
 #include <client_core/connection_context_aware.h>
 
-#include <nx/vms/api/analytics/device_analytics_settings_data.h>
+#include <nx/vms/api/analytics/device_agent_settings_response.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 
 namespace nx::vms::client::desktop {
@@ -56,7 +56,7 @@ public:
     void loadResponseData(
         const DeviceAgentId& id,
         bool success,
-        const DeviceAnalyticsSettingsResponse& response);
+        const DeviceAgentSettingsResponse& response);
 
     auto toResources(const DeviceAgentId& agentId)
     {
@@ -84,7 +84,9 @@ public:
     struct SettingsData: DeviceAgentData
     {
         std::weak_ptr<AnalyticsSettingsListener> listener;
+        DeviceAgentSettingsSession session;
     };
+
     struct Subscription
     {
         QHash<QnUuid, SettingsData> settingsByEngineId;
@@ -152,7 +154,7 @@ void AnalyticsSettingsManager::Private::refreshSettings(const DeviceAgentId& age
         [this, agentId](
             bool success,
             rest::Handle requestId,
-            const DeviceAnalyticsSettingsResponse& result)
+            const DeviceAgentSettingsResponse& result)
         {
             NX_VERBOSE(this, "Received reply %1 (success: %2)", requestId, success);
             if (!pendingRefreshRequests.removeOne(requestId))
@@ -227,12 +229,26 @@ void AnalyticsSettingsManager::Private::updateStatusAndSettings(
 void AnalyticsSettingsManager::Private::loadResponseData(
     const DeviceAgentId& id,
     bool success,
-    const DeviceAnalyticsSettingsResponse& response)
+    const DeviceAgentSettingsResponse& response)
 {
     auto& data = dataByAgentIdRef(id);
 
-    const bool modelChanged =
-        (data.model != response.settingsModel || data.modelId != response.settingsModelId);
+    // Data can be received as an API request reply or directly in the transaction. We need to
+    // determine which source is more actual. Session id will be changed when camera jumps onto
+    // another server. Sequence number grows on the server side.
+    if (data.session.id == response.session.id
+        && data.session.sequenceNumber >= response.session.sequenceNumber)
+    {
+        return;
+    }
+
+    data.session = response.session;
+
+    // When model is changed on the server side, it's id is re-generated, so we may quickly compare
+    // model id first.
+    const bool modelChanged = data.modelId != response.settingsModelId
+        || data.model != response.settingsModel;
+
     if (modelChanged)
     {
         data.model = response.settingsModel;
@@ -295,6 +311,15 @@ void AnalyticsSettingsManager::refreshSettings(const DeviceAgentId& agentId)
         d->refreshSettings(agentId);
 }
 
+void AnalyticsSettingsManager::storeSettings(
+    const DeviceAgentId& agentId,
+    const nx::vms::api::analytics::DeviceAgentSettingsResponse& data)
+{
+    NX_VERBOSE(this, "Settings update received for %1", d->toString(agentId));
+    if (d->hasSubscription(agentId))
+        d->loadResponseData(agentId, /*success*/ true, data);
+}
+
 AnalyticsSettingsListenerPtr AnalyticsSettingsManager::getListener(const DeviceAgentId& agentId)
 {
     NX_VERBOSE(this, "Listener requested for %1", d->toString(agentId));
@@ -343,7 +368,7 @@ AnalyticsSettingsManager::Error AnalyticsSettingsManager::applyChanges(
             [this, agentId](
                 bool success,
                 rest::Handle requestId,
-                const DeviceAnalyticsSettingsResponse& result)
+                const DeviceAgentSettingsResponse& result)
             {
                 if (!d->pendingApplyRequests.removeOne(requestId))
                     return;

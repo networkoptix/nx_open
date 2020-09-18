@@ -8,45 +8,31 @@
 
 #include <nx/vms/api/types/motion_types.h>
 
+#include "settings.h"
+
 namespace nx::vms::api::analytics {
 
-struct NX_VMS_API DeviceAnalyticsSettingsRequest
+/**%apidoc
+ * Session purpose is to determine the source of truth when the Client receives Model changes by two
+ * means: using API requests and in the transactions.
+ */
+struct NX_VMS_API DeviceAgentSettingsSession
 {
     /**%apidoc
-     * Id of Device.
+     * Session id is generated every time when the Device is assigned to a Server.
      */
-    QString deviceId;
+    QnUuid id;
 
     /**%apidoc
-     * Unique id of an Analytics Engine.
+     * The sequence number is stored on the Server and increased on each values or Model change.
      */
-    QnUuid analyticsEngineId;
-
-    /**%apidoc
-     * Index of the stream that should be used for analytics purposes.
-     */
-    nx::vms::api::StreamIndex analyzedStreamIndex = nx::vms::api::StreamIndex::undefined;
-
-    /**%apidoc
-     * Name-value map with setting values, using JSON types corresponding to each setting type.
-     */
-    QJsonObject settingsValues;
-
-    /**%apidoc
-     * Id of the Settings Model the values supposed to be applied to.
-     */
-    QnUuid settingsModelId;
+    uint64_t sequenceNumber = 0;
 };
-#define nx_vms_api_analytics_DeviceAnalyticsSettingsRequest_Fields \
-    (deviceId) \
-    (analyticsEngineId) \
-    (analyzedStreamIndex) \
-    (settingsValues) \
-    (settingsModelId)
+#define nx_vms_api_analytics_DeviceAgentSettingsSession_Fields (id)(sequenceNumber)
 
-QN_FUSION_DECLARE_FUNCTIONS(DeviceAnalyticsSettingsRequest, (json)(eq), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentSettingsSession, (json), NX_VMS_API)
 
-struct NX_VMS_API DeviceAnalyticsSettingsResponse
+struct NX_VMS_API DeviceAgentSettingsResponse
 {
     /**%apidoc
      * Index of the stream that should be used for analytics purposes.
@@ -63,12 +49,12 @@ struct NX_VMS_API DeviceAnalyticsSettingsResponse
     /**%apidoc
      * Name-value map with setting values, using JSON types corresponding to each setting type.
      */
-    QJsonObject settingsValues;
+    SettingsValues settingsValues;
 
     /**%apidoc
      * Model of settings containing setting names, types and value restrictions.
      */
-    QJsonObject settingsModel;
+    SettingsModel settingsModel;
 
     /**%apidoc
      * Name-value map with errors that occurred while performing the current settings operation.
@@ -79,15 +65,18 @@ struct NX_VMS_API DeviceAnalyticsSettingsResponse
      * Current id of the Settings Model. Such ids are used to check that values match the Model.
      */
     QnUuid settingsModelId;
+
+    DeviceAgentSettingsSession session;
 };
-#define nx_vms_api_analytics_DeviceAnalyticsSettingsResponse_Fields \
+#define nx_vms_api_analytics_DeviceAgentSettingsResponse_Fields \
     (analyzedStreamIndex) \
     (disableStreamSelection) \
     (settingsValues) \
     (settingsModel) \
     (settingsErrors) \
-    (settingsModelId)
+    (settingsModelId) \
+    (session)
 
-QN_FUSION_DECLARE_FUNCTIONS(DeviceAnalyticsSettingsResponse, (json)(eq), NX_VMS_API)
+QN_FUSION_DECLARE_FUNCTIONS(DeviceAgentSettingsResponse, (json), NX_VMS_API)
 
 } // namespace nx::vms::api::analytics

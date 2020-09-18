@@ -16,14 +16,14 @@
 #include <nx/vms/server/resource/camera.h>
 
 #include <nx/vms/api/analytics/analytics_engine_settings_data.h>
-#include <nx/vms/api/analytics/device_analytics_settings_data.h>
+#include <nx/vms/api/analytics/device_agent_settings_request.h>
+#include <nx/vms/api/analytics/device_agent_settings_response.h>
 
 namespace nx::vms::server::rest {
 
 using namespace nx::network;
-using DeviceAnalyticsSettingsRequest = nx::vms::api::analytics::DeviceAnalyticsSettingsRequest;
-using DeviceAnalyticsSettingsResponse = nx::vms::api::analytics::DeviceAnalyticsSettingsResponse;
-using DeviceAgentManfiest = nx::vms::api::analytics::DeviceAgentManifest;
+using namespace nx::vms::api::analytics;
+
 using SettingsResponse = nx::vms::server::analytics::SettingsResponse;
 using SetSettingsRequest = nx::vms::server::analytics::SetSettingsRequest;
 
@@ -38,7 +38,7 @@ CommonRequestParametersOrError extractCommonRequestParametersFromBody(
 {
     bool success = false;
     if (const auto settingsRequest =
-        QJson::deserialized(body, DeviceAnalyticsSettingsRequest(), &success);
+        QJson::deserialized(body, DeviceAgentSettingsRequest(), &success);
         success)
     {
         ParameterMap result;
@@ -124,7 +124,7 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::executePost(
 
     bool success = false;
     const auto& settingsRequest =
-        QJson::deserialized(body, DeviceAnalyticsSettingsRequest(), &success);
+        QJson::deserialized(body, DeviceAgentSettingsRequest(), &success);
 
     if (!success)
     {
@@ -243,18 +243,18 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::makeApiResponse(
         return makeResponse(QnRestResult::Error::BadRequest, "Wrong settings model id");
 
     JsonRestResponse result(http::StatusCode::ok);
-    nx::vms::api::analytics::DeviceAnalyticsSettingsResponse response;
+    DeviceAgentSettingsResponse response;
 
     const QnUuid engineId = commonRequestEntities.engine->getId();
 
-    const std::optional<DeviceAgentManfiest> deviceAgentManifest =
+    const std::optional<DeviceAgentManifest> deviceAgentManifest =
         commonRequestEntities.device->deviceAgentManifest(engineId);
 
     if (deviceAgentManifest)
     {
         response.disableStreamSelection =
             deviceAgentManifest->capabilities.testFlag(
-                DeviceAgentManfiest::Capability::disableStreamSelection);
+                DeviceAgentManifest::Capability::disableStreamSelection);
     }
 
     response.analyzedStreamIndex =
@@ -264,6 +264,7 @@ JsonRestResponse DeviceAnalyticsSettingsHandler::makeApiResponse(
     response.settingsModelId = settingsResponse.modelId;
     response.settingsValues = settingsResponse.values;
     response.settingsErrors = analytics::toJsonObject(settingsResponse.errors);
+    response.session = settingsResponse.session;
 
     result.json.setReply(response);
 

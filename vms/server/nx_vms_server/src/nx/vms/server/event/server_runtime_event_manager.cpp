@@ -28,12 +28,12 @@ ServerRuntimeEventManager::ServerRuntimeEventManager(QnMediaServerModule* server
 void ServerRuntimeEventManager::triggerDeviceAgentSettingsMaybeChangedEvent(
     QnUuid deviceId,
     QnUuid engineId,
-    nx::vms::api::SettingsData settingsData)
+    nx::vms::api::analytics::DeviceAgentSettingsResponse deviceAgentSettingsResponse)
 {
     const DeviceAgentSettingsMaybeChangedData eventData{
         deviceId,
         engineId,
-        std::move(settingsData)};
+        std::move(deviceAgentSettingsResponse)};
 
     sendEvent(makeEvent(ServerRuntimeEventType::deviceAgentSettingsMaybeChanged, eventData));
 }

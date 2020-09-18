@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QtCore/QJsonObject>
+#include <nx/vms/api/analytics/settings.h>
 
 #include <nx/utils/uuid.h>
 
@@ -32,8 +32,8 @@ struct NX_VMS_CLIENT_DESKTOP_API DeviceAgentData
         ok,
         failure,
     };
-    QJsonObject model;
-    QJsonObject values;
+    nx::vms::api::analytics::SettingsModel model;
+    nx::vms::api::analytics::SettingsValues values;
     QnUuid modelId;
     Status status = Status::initial;
 };

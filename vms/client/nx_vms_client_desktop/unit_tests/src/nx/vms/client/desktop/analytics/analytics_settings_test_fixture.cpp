@@ -7,8 +7,6 @@
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/core/access/access_types.h>
 
-#include <nx/vms/api/analytics/device_analytics_settings_data.h>
-
 namespace nx::vms::client::desktop {
 namespace test {
 
@@ -18,6 +16,7 @@ using namespace nx::vms::common;
 
 AnalyticsSettingsMockApiInterface::AnalyticsSettingsMockApiInterface()
 {
+    m_session.id = QnUuid::createUuid();
 }
 
 rest::Handle AnalyticsSettingsMockApiInterface::getSettings(
@@ -46,12 +45,16 @@ bool AnalyticsSettingsMockApiInterface::requestWasSent(const DeviceAgentId& agen
 
 void AnalyticsSettingsMockApiInterface::sendReply(
     const DeviceAgentId& agentId,
-    const DeviceAnalyticsSettingsResponse& response,
+    DeviceAgentSettingsResponse response,
     bool success)
 {
+    ++m_session.sequenceNumber;
+    response.session = m_session;
+
     auto request = std::find_if(m_requests.begin(), m_requests.end(),
         [&agentId](const auto& info) { return info.agentId == agentId; });
     NX_ASSERT(request != m_requests.end());
+
     request->callback(success, request->handle, response);
     m_requests.erase(request);
 }
@@ -83,9 +86,6 @@ ListenerNotifier::ListenerNotifier(const AnalyticsSettingsListenerPtr& listener)
         });
 }
 
-
-// virtual void SetUp() will be called before each test is run.
-
 struct AnalyticsSettingsTestFixture::Environment
 {
     Environment():
@@ -116,8 +116,6 @@ void AnalyticsSettingsTestFixture::SetUp()
     m_manager->setResourcePool(resourcePool());
     m_manager->setServerInterface(m_serverInterfaceMock);
 }
-
-// virtual void TearDown() will be called after each test is run.
 
 void AnalyticsSettingsTestFixture::TearDown()
 {

@@ -21,12 +21,6 @@ QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     (optional, true))
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    SettingsData,
-    (json),
-    nx_vms_api_SettingsData_Fields,
-    (optional, true))
-
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     DeviceAgentSettingsMaybeChangedData,
     (json),
     nx_vms_api_DeviceAgentSettingsMaybeChangedData_Fields,

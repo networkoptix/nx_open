@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <nx/vms/common/resource/analytics_engine_resource.h>
-#include <nx/vms/api/analytics/device_analytics_settings_data.h>
+#include <nx/vms/api/analytics/device_agent_settings_response.h>
 
 #include <nx/fusion/model_functions.h>
 
@@ -13,7 +13,7 @@ namespace test {
 using namespace nx::vms::api::analytics; //< TODO: Remove lexical reduplication.
 using namespace nx::vms::common;
 
-static const auto kEmptyReply = QJson::deserialized<DeviceAnalyticsSettingsResponse>(R"json(
+static const auto kEmptyReply = QJson::deserialized<DeviceAgentSettingsResponse>(R"json(
     {
         "analyzedStreamIndex": "primary",
         "settingsModel": {},
@@ -21,7 +21,7 @@ static const auto kEmptyReply = QJson::deserialized<DeviceAnalyticsSettingsRespo
     }
 )json");
 
-static const auto kData1Reply = QJson::deserialized<DeviceAnalyticsSettingsResponse>(R"json(
+static const auto kData1Reply = QJson::deserialized<DeviceAgentSettingsResponse>(R"json(
     {
         "analyzedStreamIndex": "primary",
         "settingsModel": {
@@ -32,7 +32,7 @@ static const auto kData1Reply = QJson::deserialized<DeviceAnalyticsSettingsRespo
     }
 )json");
 
-static const auto kData2Reply= QJson::deserialized<DeviceAnalyticsSettingsResponse>(R"json(
+static const auto kData2Reply= QJson::deserialized<DeviceAgentSettingsResponse>(R"json(
     {
         "analyzedStreamIndex": "primary",
         "settingsModel": {
@@ -85,7 +85,7 @@ protected:
         m_notifier.reset(new ListenerNotifier(listener()));
     }
 
-    void whenDataReceived(const DeviceAnalyticsSettingsResponse& data)
+    void whenDataReceived(const DeviceAgentSettingsResponse& data)
     {
         m_serverInterfaceMock->sendReply(deviceAgentId(), data);
     }

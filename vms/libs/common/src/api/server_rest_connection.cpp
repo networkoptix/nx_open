@@ -36,6 +36,7 @@
 
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/api/analytics/device_agent_settings_request.h>
 #include <nx/vms/api/data/peer_data.h>
 #include <common/static_common_module.h>
 
@@ -1107,7 +1108,7 @@ Handle ServerConnection::setEngineAnalyticsSettings(
 Handle ServerConnection::getDeviceAnalyticsSettings(
     const QnVirtualCameraResourcePtr& device,
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
-    Result<nx::vms::api::analytics::DeviceAnalyticsSettingsResponse>::type&& callback,
+    Result<nx::vms::api::analytics::DeviceAgentSettingsResponse>::type&& callback,
     QThread* targetThread)
 {
     return executeGet(
@@ -1124,7 +1125,7 @@ Handle ServerConnection::getDeviceAnalyticsSettings(
                     success,
                     requestId,
                     result.deserialized<
-                        nx::vms::api::analytics::DeviceAnalyticsSettingsResponse>());
+                        nx::vms::api::analytics::DeviceAgentSettingsResponse>());
             }),
         targetThread);
 }
@@ -1134,10 +1135,10 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
     const nx::vms::common::AnalyticsEngineResourcePtr& engine,
     const QJsonObject& settings,
     const QnUuid& settingsModelId,
-    Result<nx::vms::api::analytics::DeviceAnalyticsSettingsResponse>::type&& callback,
+    Result<nx::vms::api::analytics::DeviceAgentSettingsResponse>::type&& callback,
     QThread* targetThread)
 {
-    nx::vms::api::analytics::DeviceAnalyticsSettingsRequest request;
+    nx::vms::api::analytics::DeviceAgentSettingsRequest request;
     request.settingsValues = settings;
     request.settingsModelId = settingsModelId;
     request.analyticsEngineId = engine->getId();
@@ -1154,7 +1155,7 @@ Handle ServerConnection::setDeviceAnalyticsSettings(
             callback(
                 success,
                 requestId,
-                result.deserialized<nx::vms::api::analytics::DeviceAnalyticsSettingsResponse>());
+                result.deserialized<nx::vms::api::analytics::DeviceAgentSettingsResponse>());
         },
         targetThread);
 }

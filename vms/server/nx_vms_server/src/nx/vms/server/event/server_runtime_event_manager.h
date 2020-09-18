@@ -15,7 +15,7 @@ public:
     void triggerDeviceAgentSettingsMaybeChangedEvent(
         QnUuid deviceId,
         QnUuid engineId,
-        nx::vms::api::SettingsData settingsData);
+        nx::vms::api::analytics::DeviceAgentSettingsResponse deviceAgentSettingsResponse);
 
     void triggerDeviceFootageChangedEvent(std::vector<QnUuid> deviceIds);
 
