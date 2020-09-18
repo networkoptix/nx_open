@@ -2600,7 +2600,7 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /api/logLevel
      * Get or set server log level.
-     * %param[opt]:integer name Log name.
+     * %param[opt]:string name Log name.
      *     %value MAIN Main server log.
      *     %value HTTP HTTP log.
      *     %value EC2_TRAN Transaction log.
