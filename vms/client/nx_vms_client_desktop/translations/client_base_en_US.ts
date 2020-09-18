@@ -124,6 +124,10 @@ to view more bookmarks</source>
         <source>Installing</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Verifying update package</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>ContextMenu</name>
@@ -1585,6 +1589,26 @@ to view more bookmarks</source>
         <source>Layout is locked</source>
         <translation></translation>
     </message>
+    <message>
+        <source>This camera does not support advanced PTZ</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Zooming out...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Moving...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Zooming in...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Focusing...</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>PtzOverlayWidget</name>
@@ -2031,6 +2055,18 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Event rules reset to default</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Storage added</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Storage updated</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Storage removed</source>
         <translation></translation>
     </message>
 </context>
@@ -6030,10 +6066,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Storage is not configured on the following Server:</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Learn more</source>
         <translation></translation>
     </message>
@@ -6616,10 +6648,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Bookmarks can only be added to an online server.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Server offline</source>
         <translation></translation>
     </message>
@@ -6659,6 +6687,13 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Failed to connect to the selected server</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QnWorkbenchController</name>
+    <message>
+        <source>To switch between cameras press Shift + Arrow</source>
         <translation></translation>
     </message>
 </context>
@@ -6710,6 +6745,21 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
         <source>Unable to acknowledge event on removed camera.</source>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>QnWorkbenchPtzHandler</name>
+    <message>
+        <source>Zooming in...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Zooming out...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Moving...</source>
         <translation></translation>
     </message>
 </context>
@@ -7540,16 +7590,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
 </context>
 <context>
-    <name>nx::vms::client::desktop::AnalyticsSearchListModel</name>
-    <message numerus="yes">
-        <source>+%n values</source>
-        <translation>
-            <numerusform>+%n value</numerusform>
-            <numerusform>+%n values</numerusform>
-        </translation>
-    </message>
-</context>
-<context>
     <name>nx::vms::client::desktop::AnalyticsSearchListModel::Private</name>
     <message>
         <source>deleted camera</source>
@@ -7582,6 +7622,10 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::AsyncImageWidget</name>
     <message>
         <source>NO DATA</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>DISABLED</source>
         <translation></translation>
     </message>
 </context>
@@ -7786,6 +7830,10 @@ If you intended to move analytics data to another storage location, please conta
         <source>High minimum value can lead to archive length decrease on other cameras.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>High pre-recording time will increase RAM utilization on the server</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
@@ -7933,22 +7981,6 @@ If you intended to move analytics data to another storage location, please conta
 <context>
     <name>nx::vms::client::desktop::ClientUpdateTool</name>
     <message>
-        <source>Update file is not found</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Update package is corrupted</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Failed to download update package: %1</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Update package is corrupted: %1</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>This update is already installed.</source>
         <translation></translation>
     </message>
@@ -7974,6 +8006,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Installation package has been lost.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>File %1 does not exist</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>There is no valid client package to download</source>
         <translation></translation>
     </message>
 </context>
@@ -8413,6 +8453,30 @@ If you intended to move analytics data to another storage location, please conta
         <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Equidistant</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Stereographic</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Equisolid</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Ceiling</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Wall</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Floor/Table</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
@@ -8567,6 +8631,10 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>NOT A CAMERA</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>DISABLED</source>
         <translation></translation>
     </message>
 </context>
@@ -8930,6 +8998,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
 </context>
 <context>
+    <name>nx::vms::client::desktop::NameValueTable</name>
+    <message numerus="yes">
+        <source>+%n values</source>
+        <translation>
+            <numerusform>+%n value</numerusform>
+            <numerusform>+%n values</numerusform>
+        </translation>
+    </message>
+</context>
+<context>
     <name>nx::vms::client::desktop::NotificationListModel::Private</name>
     <message>
         <source>Alarm: %1</source>
@@ -9012,10 +9090,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Failed to download update</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Waiting for peer data</source>
         <translation></translation>
     </message>
@@ -9048,10 +9122,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Internal client error.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Unknown error.</source>
         <translation></translation>
     </message>
@@ -9081,6 +9151,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Update installation failed.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Update file verification failed.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Verifying update</source>
         <translation></translation>
     </message>
 </context>

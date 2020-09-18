@@ -122,6 +122,11 @@
         <source>Limit Frame Rate to save CPU</source>
         <translation></translation>
     </message>
+    <message>
+        <location/>
+        <source>Use Hardware Video Decoding</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>AggregationWidget</name>
@@ -1320,32 +1325,12 @@
     <name>FisheyeSettingsWidget</name>
     <message>
         <location filename="../src/nx/vms/client/desktop/resource_properties/fisheye/fisheye_settings_widget.ui"/>
-        <source>Ceiling Mount</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Wall Mount</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Floor/Table Mount</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
         <source>Fisheye Dewarping</source>
         <translation></translation>
     </message>
     <message>
         <location/>
         <source>Auto Calibration</source>
-        <translation></translation>
-    </message>
-    <message>
-        <location/>
-        <source>Mount Angle Correction:</source>
         <translation></translation>
     </message>
     <message>
@@ -1366,6 +1351,26 @@
     <message>
         <location/>
         <source>Ellipticity</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show grid</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Mount</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Angle</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Lens projection</source>
         <translation></translation>
     </message>
 </context>
@@ -1442,6 +1447,11 @@
     <message>
         <location/>
         <source>Run Application when PC Boots up</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Play audio from all cameras on layout</source>
         <translation></translation>
     </message>
 </context>
@@ -1963,6 +1973,11 @@
     <message>
         <location/>
         <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location/>
+        <source>Show aim overlay for PTZ cameras</source>
         <translation></translation>
     </message>
 </context>

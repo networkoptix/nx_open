@@ -1,2 +1,2 @@
 call current_branch.bat
-crowdin download -b %CURRENT_BRANCH% --config crowdin-vms.yaml --debug %*
+crowdin download -b %CURRENT_BRANCH% --config vms.yaml --debug %*

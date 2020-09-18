@@ -1859,6 +1859,10 @@
         <source>RTP error in secondary stream (%1)</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
+        <translation></translation>
+    </message>
 </context>
 <context>
     <name>utils::QnCameraNamesWatcher</name>
