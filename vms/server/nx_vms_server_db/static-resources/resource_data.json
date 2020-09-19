@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.3.816",
+    "version": "4.1.3.832",
     "data": [
         {
             "keys": [
@@ -3215,12 +3215,12 @@
         },
         {
             "keys": [
-                "Hikvision|DS-7216*", "HIKVISION|DS-7216*"
+                "Hikvision|DS-7216*|V1*",
+                "Hikvision|DS-7216*|V2*"
             ],
-            "forcedOnvifParams":
-            {
-                "videoEncoders":
-                [
+            "comment": "We don't know if firmware v2 behaves same as v1 or same as v3, let it be as v1",
+            "forcedOnvifParams": {
+                "videoEncoders": [
                     "VideoEncoderConfigurationToken001,VideoEncoderConfigurationToken019",
                     "VideoEncoderConfigurationToken002,VideoEncoderConfigurationToken020",
                     "VideoEncoderConfigurationToken003,VideoEncoderConfigurationToken021",
@@ -3237,6 +3237,33 @@
                     "VideoEncoderConfigurationToken014,VideoEncoderConfigurationToken032",
                     "VideoEncoderConfigurationToken015,VideoEncoderConfigurationToken033",
                     "VideoEncoderConfigurationToken016,VideoEncoderConfigurationToken034"
+                ]
+            }
+        },
+        {
+            "keys": [
+                "Hikvision|DS-7216*|V3*",
+                "Hikvision|DS-7216*|V4*"
+            ],
+            "forcedOnvifParams":
+            {
+                "videoEncoders": [
+                    "VideoEncoderConfigurationToken001,VideoEncoderConfigurationToken017",
+                    "VideoEncoderConfigurationToken002,VideoEncoderConfigurationToken018",
+                    "VideoEncoderConfigurationToken003,VideoEncoderConfigurationToken019",
+                    "VideoEncoderConfigurationToken004,VideoEncoderConfigurationToken020",
+                    "VideoEncoderConfigurationToken005,VideoEncoderConfigurationToken021",
+                    "VideoEncoderConfigurationToken006,VideoEncoderConfigurationToken022",
+                    "VideoEncoderConfigurationToken007,VideoEncoderConfigurationToken023",
+                    "VideoEncoderConfigurationToken008,VideoEncoderConfigurationToken024",
+                    "VideoEncoderConfigurationToken009,VideoEncoderConfigurationToken025",
+                    "VideoEncoderConfigurationToken010,VideoEncoderConfigurationToken026",
+                    "VideoEncoderConfigurationToken011,VideoEncoderConfigurationToken027",
+                    "VideoEncoderConfigurationToken012,VideoEncoderConfigurationToken028",
+                    "VideoEncoderConfigurationToken013,VideoEncoderConfigurationToken029",
+                    "VideoEncoderConfigurationToken014,VideoEncoderConfigurationToken030",
+                    "VideoEncoderConfigurationToken015,VideoEncoderConfigurationToken031",
+                    "VideoEncoderConfigurationToken016,VideoEncoderConfigurationToken032"
                 ]
             }
         },
