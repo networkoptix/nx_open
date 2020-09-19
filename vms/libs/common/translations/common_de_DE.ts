@@ -1861,7 +1861,7 @@
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</translation>
+      <translation>Analytics-Speicher &quot;%1&quot; DB-Fehler: Unzureichende Berechtigungen für den Einhängepunkt.</translation>
     </message>
   </context>
   <context>

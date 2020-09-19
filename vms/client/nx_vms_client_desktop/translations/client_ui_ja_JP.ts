@@ -125,7 +125,7 @@
     <message>
       <location/>
       <source>Use Hardware Video Decoding</source>
-      <translation type="unfinished">Use Hardware Video Decoding</translation>
+      <translation>ハードウェア ビデオ デコードを使用する</translation>
     </message>
   </context>
   <context>
@@ -1356,22 +1356,22 @@
     <message>
       <location/>
       <source>Show grid</source>
-      <translation type="unfinished">Show grid</translation>
+      <translation>グリッド表示</translation>
     </message>
     <message>
       <location/>
       <source>Mount</source>
-      <translation type="unfinished">Mount</translation>
+      <translation>マウント</translation>
     </message>
     <message>
       <location/>
       <source>Angle</source>
-      <translation type="unfinished">Angle</translation>
+      <translation>角度</translation>
     </message>
     <message>
       <location/>
       <source>Lens projection</source>
-      <translation type="unfinished">Lens projection</translation>
+      <translation>レンズ投影</translation>
     </message>
   </context>
   <context>
@@ -1452,7 +1452,7 @@
     <message>
       <location/>
       <source>Play audio from all cameras on layout</source>
-      <translation type="unfinished">Play audio from all cameras on layout</translation>
+      <translation>レイアウト上のすべてのカメラからオーディオを再生する</translation>
     </message>
   </context>
   <context>
@@ -1978,7 +1978,7 @@
     <message>
       <location/>
       <source>Show aim overlay for PTZ cameras</source>
-      <translation type="unfinished">Show aim overlay for PTZ cameras</translation>
+      <translation>PTZカメラの照準オーバーレイを表示</translation>
     </message>
   </context>
   <context>

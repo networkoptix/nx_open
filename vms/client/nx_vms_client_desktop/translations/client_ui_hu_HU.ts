@@ -125,7 +125,7 @@
     <message>
       <location/>
       <source>Use Hardware Video Decoding</source>
-      <translation type="unfinished">Use Hardware Video Decoding</translation>
+      <translation>Használja a Hardveres videó dekódolást</translation>
     </message>
   </context>
   <context>
@@ -1356,22 +1356,22 @@
     <message>
       <location/>
       <source>Show grid</source>
-      <translation type="unfinished">Show grid</translation>
+      <translation>Rács megjelenítése</translation>
     </message>
     <message>
       <location/>
       <source>Mount</source>
-      <translation type="unfinished">Mount</translation>
+      <translation>Csatolás</translation>
     </message>
     <message>
       <location/>
       <source>Angle</source>
-      <translation type="unfinished">Angle</translation>
+      <translation>Szög</translation>
     </message>
     <message>
       <location/>
       <source>Lens projection</source>
-      <translation type="unfinished">Lens projection</translation>
+      <translation>Lencsevetítés</translation>
     </message>
   </context>
   <context>
@@ -1452,7 +1452,7 @@
     <message>
       <location/>
       <source>Play audio from all cameras on layout</source>
-      <translation type="unfinished">Play audio from all cameras on layout</translation>
+      <translation>Játsszon hangot az összes kameráról az elrendezésben</translation>
     </message>
   </context>
   <context>
@@ -1978,7 +1978,7 @@
     <message>
       <location/>
       <source>Show aim overlay for PTZ cameras</source>
-      <translation type="unfinished">Show aim overlay for PTZ cameras</translation>
+      <translation>A PTZ kamerák segédvezérlőjeinek megjelenítése</translation>
     </message>
   </context>
   <context>

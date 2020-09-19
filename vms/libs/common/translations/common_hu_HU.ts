@@ -1861,7 +1861,7 @@
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</translation>
+      <translation>Analytics-tárhely &quot;%1&quot; adatbázis hiba: Nincs engedély a csatlakozási ponthoz.</translation>
     </message>
   </context>
   <context>
