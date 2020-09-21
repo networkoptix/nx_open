@@ -8,6 +8,7 @@ ToolTip
     id: control
 
     font.pixelSize: 13
+    font.weight: Font.Normal
     leftPadding: 8
     rightPadding: 8
     topPadding: 2

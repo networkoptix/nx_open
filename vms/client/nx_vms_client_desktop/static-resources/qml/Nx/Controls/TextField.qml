@@ -14,6 +14,7 @@ TextField
     rightPadding: 8
 
     font.pixelSize: 14
+    font.weight: Font.Normal
     passwordCharacter: "\u25cf"
 
     property bool warningState: false

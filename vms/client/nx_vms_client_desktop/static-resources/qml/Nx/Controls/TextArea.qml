@@ -1,3 +1,4 @@
+import QtQuick 2.0
 import QtQuick.Controls 2.0
 import Nx 1.0
 
@@ -24,6 +25,7 @@ ScrollView
         implicitHeight: control.implicitHeight
 
         font.pixelSize: 14
+        font.weight: Font.Normal
 
         color: enabled ? ColorTheme.text : ColorTheme.transparent(ColorTheme.text, 0.3)
 

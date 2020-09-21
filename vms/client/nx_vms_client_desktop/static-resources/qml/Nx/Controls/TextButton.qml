@@ -13,6 +13,7 @@ AbstractButton
     property color pressedColor: color
 
     font.pixelSize: 13
+    font.weight: Font.Normal
     hoverEnabled: true
     background: null
     spacing: 2
