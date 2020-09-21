@@ -227,7 +227,11 @@ void GlobalToolTipAttached::Private::adjustPosition()
     if (!parent)
         return;
 
-    const QSize rootSize = item->window()->size();
+    const QQuickWindow* window = item->window();
+    if (!window)
+        return;
+
+    const QSize rootSize = window->size();
 
     constexpr qreal cursorPadding = 16;
     constexpr qreal topEdgePadding = 2;
