@@ -15,7 +15,7 @@ extern "C" {
 } // extern "C"
 
 class MFXFrameAllocator;
-class QuickSyncSurface;
+struct QuickSyncSurface;
 
 namespace nx::media::quick_sync {
 
