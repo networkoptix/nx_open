@@ -150,14 +150,30 @@ void WearablePreparer::checkLocally(WearablePayload& payload)
         return;
     }
 
+    if (delegate->endTime() == AV_NOPTS_VALUE)
+    {
+        payload.status = WearablePayload::NoTimestamp;
+        return;
+    }
+    qint64 durationMs = (delegate->endTime() - delegate->startTime()) / 1000;
     qint64 startTimeMs = delegate->startTime() / 1000;
+    qint64 timeOffsetMs = 0;
 
     if (startTimeMs == 0)
     {
         // correct creation time for iPhone raw files
         QString startTimeString = delegate->getTagValue("com.apple.quicktime.creationdate");
         if (startTimeString.isEmpty())
+        {
             startTimeString = delegate->getTagValue("creation_time");
+            QString androidVersion = delegate->getTagValue("com.android.version");
+            if (!androidVersion.isEmpty())
+            {
+                // Android mp4 muxer sets creation time at the end of video recording, so we need to
+                // subtract duration to get start time.
+                timeOffsetMs = durationMs;
+            }
+        }
 
         QDateTime startDateTime = QDateTime::fromString(startTimeString, Qt::ISODate);
         if (startDateTime.isValid())
@@ -169,7 +185,7 @@ void WearablePreparer::checkLocally(WearablePayload& payload)
             if (!ignoreTimeZone)
                 startDateTime.setTimeSpec(Qt::UTC);
 
-            startTimeMs = startDateTime.toMSecsSinceEpoch();
+            startTimeMs = startDateTime.toMSecsSinceEpoch() - timeOffsetMs;
         }
     }
 
@@ -178,8 +194,6 @@ void WearablePreparer::checkLocally(WearablePayload& payload)
         payload.status = WearablePayload::NoTimestamp;
         return;
     }
-
-    qint64 durationMs = (delegate->endTime() - delegate->startTime()) / 1000;
 
     if (durationMs == 0)
     {
