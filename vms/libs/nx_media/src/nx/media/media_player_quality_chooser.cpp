@@ -221,6 +221,14 @@ static Result chooseHighStreamIfPossible(
         const QSize& maxResolution =
             VideoDecoderRegistry::instance()->maxResolution(input.transcodingCodec);
 
+        if (maxResolution.isEmpty())
+        {
+            NX_DEBUG(kLogTag,
+                "Panoramic camera: Resolution is not limited, return source resolution %1 x %2:",
+                highResolution.width(), highResolution.height());
+            return {Player::HighVideoQuality, highResolution};
+        }
+
         const QSize& resolution = limitResolution(highResolution, maxResolution);
 
         NX_DEBUG(kLogTag,
