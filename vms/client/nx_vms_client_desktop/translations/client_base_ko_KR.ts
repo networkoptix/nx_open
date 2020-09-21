@@ -1585,7 +1585,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Moving...</source>
-      <translation type="unfinished">Moving...</translation>
+      <translation>이중 중...</translation>
     </message>
     <message>
       <source>Zooming in...</source>

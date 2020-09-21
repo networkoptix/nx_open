@@ -224,8 +224,8 @@
         "searchCamPlaceholder": "검색",
         "resolution": {
             "auto": "자동",
-            "high": "높은",
-            "low": "낮은"
+            "high": "높음",
+            "low": "낮음"
         },
         "chromeCastWarning": "크롬캐스트는 많은 리소스가 요구되어 서버에 문제가 발생할 수 있습니다.",
         "voiceCommands": {
