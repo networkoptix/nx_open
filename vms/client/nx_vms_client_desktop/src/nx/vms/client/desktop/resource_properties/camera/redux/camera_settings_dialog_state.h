@@ -280,7 +280,19 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractReduxState
         QList<AnalyticsEngineInfo> engines;
 
         // Engines, which are enabled by the user.
-        UserEditable<QSet<QnUuid>> enabledEngines;
+        UserEditable<QSet<QnUuid>> userEnabledEngines;
+
+        // All Engines which are actually enabled for the Camera. Includes device-dependent Engines.
+        QSet<QnUuid> enabledEngines() const
+        {
+            QSet<QnUuid> result;
+            for (const auto& engine: engines)
+            {
+                if (engine.isDeviceDependent || userEnabledEngines().contains(engine.id))
+                    result.insert(engine.id);
+            }
+            return result;
+        }
 
         struct EngineSettings
         {

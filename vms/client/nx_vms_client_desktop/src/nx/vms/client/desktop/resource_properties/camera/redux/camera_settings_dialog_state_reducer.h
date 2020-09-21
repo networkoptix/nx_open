@@ -76,7 +76,7 @@ public:
         State state, const QList<AnalyticsEngineInfo>& value);
     static std::pair<bool, State> setCurrentAnalyticsEngineId(State state, const QnUuid& engineId);
 
-    static State setEnabledAnalyticsEngines(State state, const QSet<QnUuid>& value);
+    static State setUserEnabledAnalyticsEngines(State state, const QSet<QnUuid>& value);
     static State setAnalyticsStreamIndex(
         State state, const QnUuid& engineId, State::StreamIndex value, ModificationSource source);
 

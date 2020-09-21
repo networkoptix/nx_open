@@ -109,13 +109,13 @@ public:
 
     /**
      * @return Ids of Analytics Engines which are actually compatible with the Device, enabled by
-     *     the user and active (running on the current server).
+     *     the user and active (running on the current server). Includes device-dependent Engines.
      */
     QSet<QnUuid> enabledAnalyticsEngines() const;
 
     /**
      * @return Analytics Engines which are actually compatible with the Device, enabled by the user
-     * and active (running on the current server).
+     * and active (running on the current server). Includes device-dependent Engines.
      */
     const nx::vms::common::AnalyticsEngineResourceList enabledAnalyticsEngineResources() const;
 

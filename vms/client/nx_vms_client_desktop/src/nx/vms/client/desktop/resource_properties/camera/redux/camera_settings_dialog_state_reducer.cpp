@@ -622,7 +622,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.recordingHint = {};
     state.recordingAlert = {};
     state.motionAlert = {};
-    state.analytics.enabledEngines = {};
+    state.analytics.userEnabledEngines = {};
     state.analytics.settingsByEngineId = {};
     state.analytics.streamByEngineId = {};
     state.enableMotionDetection = {};
@@ -792,8 +792,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
                 state = resetDeviceAgentData(std::move(state), engineId, deviceAgentData).second;
         }
 
-        state.analytics.enabledEngines.setBase(firstCamera->userEnabledAnalyticsEngines());
-        state.analytics.enabledEngines.resetUser();
+        state.analytics.userEnabledEngines.setBase(firstCamera->userEnabledAnalyticsEngines());
+        state.analytics.userEnabledEngines.resetUser();
 
         state.wearableIgnoreTimeZone = firstCamera->wearableIgnoreTimeZone();
     }
@@ -1541,7 +1541,7 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setCurrentAnalyticsEngi
     return {true, std::move(state)};
 }
 
-State CameraSettingsDialogStateReducer::setEnabledAnalyticsEngines(
+State CameraSettingsDialogStateReducer::setUserEnabledAnalyticsEngines(
     State state, const QSet<QnUuid>& value)
 {
     // Filter out engines which are not available anymore.
@@ -1552,7 +1552,7 @@ State CameraSettingsDialogStateReducer::setEnabledAnalyticsEngines(
             actualValue.insert(id);
     }
 
-    state.analytics.enabledEngines.setUser(actualValue);
+    state.analytics.userEnabledEngines.setUser(actualValue);
     state.hasChanges = true;
     return state;
 }

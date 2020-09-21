@@ -101,12 +101,12 @@ public:
     Q_INVOKABLE QnUuid resourceId() const;
     Q_INVOKABLE QVariantList analyticsEngines() const;
     void setAnalyticsEngines(const QList<AnalyticsEngineInfo>& value);
-    Q_INVOKABLE QVariantList enabledAnalyticsEngines() const;
-    void setEnabledAnalyticsEngines(const QSet<QnUuid>& value);
+    Q_INVOKABLE QVariantList userEnabledAnalyticsEngines() const;
+    void setUserEnabledAnalyticsEngines(const QSet<QnUuid>& value);
     Q_INVOKABLE QnUuid currentAnalyticsEngineId() const;
     Q_INVOKABLE void setCurrentAnalyticsEngineId(const QnUuid& engineId);
     Q_INVOKABLE bool analyticsSettingsLoading() const;
-    Q_INVOKABLE void setEnabledAnalyticsEngines(const QVariantList& value);
+    Q_INVOKABLE void setUserEnabledAnalyticsEngines(const QVariantList& value);
     Q_INVOKABLE int analyticsStreamIndex(const QnUuid& engineId) const;
     Q_INVOKABLE void setAnalyticsStreamIndex(const QnUuid& engineId, int value);
     void setAnalyticsStreamIndex(const QnUuid& engineId,

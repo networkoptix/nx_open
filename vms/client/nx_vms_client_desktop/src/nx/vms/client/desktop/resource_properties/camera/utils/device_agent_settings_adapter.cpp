@@ -104,8 +104,7 @@ void DeviceAgentSettingsAdapter::refreshSettings()
         return;
 
     const QnUuid& cameraId = d->camera->getId();
-    QSet<QnUuid> enabledEngines = d->store->state().analytics.enabledEngines.get();
-    for (const QnUuid& engineId: enabledEngines)
+    for (const QnUuid& engineId: d->store->state().analytics.enabledEngines())
         d->settingsManager->refreshSettings(DeviceAgentId{cameraId, engineId});
 }
 

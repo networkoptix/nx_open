@@ -410,15 +410,18 @@ void CameraSettingsDialogStore::setAnalyticsEngines(const QList<AnalyticsEngineI
         [&](State state) { return Reducer::setAnalyticsEngines(std::move(state), value); });
 }
 
-QVariantList CameraSettingsDialogStore::enabledAnalyticsEngines() const
+QVariantList CameraSettingsDialogStore::userEnabledAnalyticsEngines() const
 {
-    return toVariantList(d->state.analytics.enabledEngines.get());
+    return toVariantList(d->state.analytics.userEnabledEngines.get());
 }
 
-void CameraSettingsDialogStore::setEnabledAnalyticsEngines(const QSet<QnUuid>& value)
+void CameraSettingsDialogStore::setUserEnabledAnalyticsEngines(const QSet<QnUuid>& value)
 {
     d->executeAction(
-        [&](State state) { return Reducer::setEnabledAnalyticsEngines(std::move(state), value); });
+        [&](State state)
+        {
+            return Reducer::setUserEnabledAnalyticsEngines(std::move(state), value);
+        });
 }
 
 QnUuid CameraSettingsDialogStore::currentAnalyticsEngineId() const
@@ -440,9 +443,9 @@ bool CameraSettingsDialogStore::analyticsSettingsLoading() const
     return d->state.analytics.settingsByEngineId.value(currentAnalyticsEngineId()).loading;
 }
 
-void CameraSettingsDialogStore::setEnabledAnalyticsEngines(const QVariantList& value)
+void CameraSettingsDialogStore::setUserEnabledAnalyticsEngines(const QVariantList& value)
 {
-    setEnabledAnalyticsEngines(fromVariantList<QList<QnUuid>>(value).toSet());
+    setUserEnabledAnalyticsEngines(fromVariantList<QList<QnUuid>>(value).toSet());
 }
 
 int CameraSettingsDialogStore::analyticsStreamIndex(const QnUuid& engineId) const

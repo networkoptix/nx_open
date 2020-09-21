@@ -402,7 +402,7 @@ void CameraSettingsDialogStateConversionFunctions::applyStateToCameras(
                 Qn::CR_SecondaryLiveVideo, /*save*/ false);
         }
 
-        camera->setUserEnabledAnalyticsEngines(state.analytics.enabledEngines());
+        camera->setUserEnabledAnalyticsEngines(state.analytics.userEnabledEngines());
 
         for (const auto& [id, index]: nx::utils::constKeyValueRange(state.analytics.streamByEngineId))
         {

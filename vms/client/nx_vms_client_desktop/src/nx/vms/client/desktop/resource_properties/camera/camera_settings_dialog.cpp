@@ -123,6 +123,7 @@ struct CameraSettingsDialog::Private: public QObject
                 store->setRecordingEnabled(false);
         }
 
+        // Actual for the single-camera mode only.
         if (!store->state().analytics.enabledEngines().empty())
         {
             for (const auto& camera: cameras)

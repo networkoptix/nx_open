@@ -43,7 +43,7 @@ Item
 
             loading = store.analyticsSettingsLoading()
             analyticsEngines = store.analyticsEngines()
-            enabledAnalyticsEngines = store.enabledAnalyticsEngines()
+            enabledAnalyticsEngines = store.userEnabledAnalyticsEngines()
             supportsDualStreaming = store.dualStreamingEnabled()
             if (settingsView.resourceId !== resourceId)
                 settingsView.resourceId = resourceId
@@ -283,7 +283,7 @@ Item
             if (index !== -1)
                 engines.splice(index, 1)
         }
-        store.setEnabledAnalyticsEngines(engines)
+        store.setUserEnabledAnalyticsEngines(engines)
     }
 
     function updateCurrentSection()
