@@ -265,18 +265,30 @@ def _check_storages(api, ini, camera_count):
         * ini['minimumArchiveFreeSpacePerCameraSeconds']
         * ini['archiveBitratePerCameraMbps'] * 1000 ** 2 // 8
     )
+
+    best_storage_candidate = None
+    maximum_available_storage_size_bytes = 0
     for storage in _get_storages(api, ini):
-        if (
-            storage.is_used_for_writing and
-                storage.free_space >= storage.reserved_space + space_for_recordings_bytes
-        ):
+        if not storage.is_used_for_writing:
+            continue
+
+        available_storage_size_bytes = storage.free_space - storage.reserved_space
+        if maximum_available_storage_size_bytes < available_storage_size_bytes:
+            best_storage_candidate = storage
+            maximum_available_storage_size_bytes = available_storage_size_bytes
+
+        if available_storage_size_bytes >= space_for_recordings_bytes:
             break
     else:
         raise exceptions.BoxStateError(
             f"Server has no video archive Storage "
             f"with at least {to_megabytes(space_for_recordings_bytes)} MB "
-            f"of non-reserved free space.")
-
+            f"of non-reserved free space. "
+            f"The best Storage candidate is {best_storage_candidate.url!r}: capacity "
+            f"{to_megabytes(best_storage_candidate.capacity)} MB; "
+            f"{to_megabytes(best_storage_candidate.free_space)} MB free, of which "
+            f"{to_megabytes(best_storage_candidate.reserved_space)} MB reserved, thus giving "
+            f"{to_megabytes(maximum_available_storage_size_bytes)} MB available.")
 
 def get_cumulative_swap_kilobytes(box):
     output = box.eval('cat /proc/vmstat')
@@ -373,6 +385,7 @@ class Storage:
             self.free_space = int(raw['freeSpace'])
             self.reserved_space = int(raw['reservedSpace'])
             self.is_used_for_writing = raw['isUsedForWriting']
+            self.capacity = int(raw['totalSpace'])
             flags_joined = raw['storageStatus']
             if flags_joined == '' or flags_joined == 'none':
                 flags = []
