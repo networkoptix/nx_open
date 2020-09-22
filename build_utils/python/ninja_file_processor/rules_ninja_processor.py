@@ -25,7 +25,7 @@ class RulesNinjaFileProcessor(NinjaFileProcessor):  # pylint:disable=too-few-pub
     # Universal regex for parsing specific rules.ninja syntax.
     _LINE_RE = re.compile(
         r'(?P<is_rule>rule (?P<rule_name>.+?))\s+'
-        r'|(?P<is_command>\s+command\s+=\s+(?P<command>.+?))\s+')
+        r'|(?P<is_command>\s+command\s+=\s+(?P<command>.+))\s*')
 
     def __init__(self, file_name: Path, debug_output: bool = False) -> None:
         self._line_number_by_rule = {}
