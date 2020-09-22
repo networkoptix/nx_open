@@ -39,7 +39,7 @@ private:
     void pushBestShot(nx::common::metadata::ObjectMetadataPacketPtr objectMetadataPacket);
 
     void cleanUpOldTracks();
-    void assignRaughBestShots();
+    void assignRaughBestShots(bool checkTimeout);
     void scheduleTrackCleanup();
 
 private:

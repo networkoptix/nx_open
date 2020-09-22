@@ -8,7 +8,7 @@
 using namespace std::chrono;
 using namespace nx::common::metadata;
 
-static const seconds kTimerInterval{2};
+static const milliseconds kTimerInterval{100};
 
 static ObjectMetadataPacketPtr makeBestShotPacket(
     ObjectMetadata objectMetadata,
@@ -57,7 +57,7 @@ void ObjectTrackBestShotProxy::scheduleTrackCleanup()
             if (m_stopped)
                 return;
 
-            assignRaughBestShots();
+            assignRaughBestShots(/*checkTimeout*/ true);
             cleanUpOldTracks();
             scheduleTrackCleanup();
         });
@@ -87,7 +87,7 @@ void ObjectTrackBestShotProxy::stop()
         });
     promise.get_future().wait();
     NX_MUTEX_LOCKER lock(&m_mutex);
-    cleanUpOldTracks();
+    assignRaughBestShots(/*checkTimeout*/ false);
 }
 
 void ObjectTrackBestShotProxy::assignBestShotFromPacket(
@@ -130,13 +130,13 @@ void ObjectTrackBestShotProxy::pushBestShot(ObjectMetadataPacketPtr objectMetada
     m_bestShotHandler(objectMetadataPacket);
 }
 
-void ObjectTrackBestShotProxy::assignRaughBestShots()
+void ObjectTrackBestShotProxy::assignRaughBestShots(bool checkTimeout)
 {
     for (auto it = m_trackContexts.begin(); it != m_trackContexts.end(); ++it)
     {
         TrackContext& trackContext = it->second;
-        const bool hasExpired =
-            trackContext.timeoutSinceFirstFrame.hasExpired(m_autoBestShotDelay);
+        const bool hasExpired = !checkTimeout
+            || trackContext.timeoutSinceFirstFrame.hasExpired(m_autoBestShotDelay);
 
         if (hasExpired && trackContext.bestShotType == BestShotType::none)
         {

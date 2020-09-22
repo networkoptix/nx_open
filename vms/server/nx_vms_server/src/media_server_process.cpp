@@ -4206,6 +4206,9 @@ void MediaServerProcess::stopObjects()
     NX_DEBUG(this, "Stopping the universal TCP listener");
     m_universalTcpListener->stop();
 
+    NX_DEBUG(this, "Stopping the analytics manager");
+    serverModule()->analyticsManager()->stop(); //< Stop processing analytics events.
+
     NX_DEBUG(this, "Stopping the server module");
     serverModule()->stop();
 
@@ -4288,9 +4291,6 @@ void MediaServerProcess::stopObjects()
 
     NX_DEBUG(this, "Stopping the resource discovery manager");
     commonModule()->resourceDiscoveryManager()->stop();
-
-    NX_DEBUG(this, "Stopping the analytics manager");
-    serverModule()->analyticsManager()->stop(); //< Stop processing analytics events.
 
     NX_DEBUG(this, "Stopping the plugin manager");
     serverModule()->pluginManager()->unloadPlugins();
