@@ -125,7 +125,7 @@
     <message>
       <location/>
       <source>Use Hardware Video Decoding</source>
-      <translation type="unfinished">Use Hardware Video Decoding</translation>
+      <translation>Gebruik hardware-videodecodering</translation>
     </message>
   </context>
   <context>
@@ -1356,22 +1356,22 @@
     <message>
       <location/>
       <source>Show grid</source>
-      <translation type="unfinished">Show grid</translation>
+      <translation>Raster tonen</translation>
     </message>
     <message>
       <location/>
       <source>Mount</source>
-      <translation type="unfinished">Mount</translation>
+      <translation>Activeer</translation>
     </message>
     <message>
       <location/>
       <source>Angle</source>
-      <translation type="unfinished">Angle</translation>
+      <translation>Hoek</translation>
     </message>
     <message>
       <location/>
       <source>Lens projection</source>
-      <translation type="unfinished">Lens projection</translation>
+      <translation>Lens projectie</translation>
     </message>
   </context>
   <context>
@@ -1452,7 +1452,7 @@
     <message>
       <location/>
       <source>Play audio from all cameras on layout</source>
-      <translation type="unfinished">Play audio from all cameras on layout</translation>
+      <translation>Speel audio af van alle camera's op de lay-out</translation>
     </message>
   </context>
   <context>
@@ -1978,7 +1978,7 @@
     <message>
       <location/>
       <source>Show aim overlay for PTZ cameras</source>
-      <translation type="unfinished">Show aim overlay for PTZ cameras</translation>
+      <translation>Doeloverlay weergeven voor PTZ-camera's</translation>
     </message>
   </context>
   <context>

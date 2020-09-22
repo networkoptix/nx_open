@@ -1801,7 +1801,7 @@
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</translation>
+      <translation>分析存儲 &quot;%1&quot; DB錯誤：掛載點權限不足。</translation>
     </message>
   </context>
   <context>

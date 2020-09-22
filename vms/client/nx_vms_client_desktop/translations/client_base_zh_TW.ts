@@ -127,7 +127,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Verifying update package</source>
-      <translation type="unfinished">Verifying update package</translation>
+      <translation>正在驗證更新套件</translation>
     </message>
   </context>
   <context>
@@ -1578,23 +1578,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>This camera does not support advanced PTZ</source>
-      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+      <translation>本攝影機不支援進階PTZ</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation type="unfinished">Zooming out...</translation>
+      <translation>縮放中(縮小)...</translation>
     </message>
     <message>
       <source>Moving...</source>
-      <translation type="unfinished">Moving...</translation>
+      <translation>移動中...</translation>
     </message>
     <message>
       <source>Zooming in...</source>
-      <translation type="unfinished">Zooming in...</translation>
+      <translation>縮放中(放大)...</translation>
     </message>
     <message>
       <source>Focusing...</source>
-      <translation type="unfinished">Focusing...</translation>
+      <translation>對焦中...</translation>
     </message>
   </context>
   <context>
@@ -2037,15 +2037,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Storage added</source>
-      <translation type="unfinished">Storage added</translation>
+      <translation>增加存儲空間</translation>
     </message>
     <message>
       <source>Storage updated</source>
-      <translation type="unfinished">Storage updated</translation>
+      <translation>存儲空間已更新</translation>
     </message>
     <message>
       <source>Storage removed</source>
-      <translation type="unfinished">Storage removed</translation>
+      <translation>存儲空間已移除</translation>
     </message>
   </context>
   <context>
@@ -6633,7 +6633,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchController</name>
     <message>
       <source>To switch between cameras press Shift + Arrow</source>
-      <translation type="unfinished">To switch between cameras press Shift + Arrow</translation>
+      <translation>請按Shift +箭頭鍵以切換不同攝影機之畫面</translation>
     </message>
   </context>
   <context>
@@ -6691,15 +6691,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchPtzHandler</name>
     <message>
       <source>Zooming in...</source>
-      <translation type="unfinished">Zooming in...</translation>
+      <translation>縮放中(縮小)...</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation type="unfinished">Zooming out...</translation>
+      <translation>縮放中(放大)...</translation>
     </message>
     <message>
       <source>Moving...</source>
-      <translation type="unfinished">Moving...</translation>
+      <translation>移動中...</translation>
     </message>
   </context>
   <context>
@@ -7531,7 +7531,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>DISABLED</source>
-      <translation type="unfinished">DISABLED</translation>
+      <translation>已停用</translation>
     </message>
   </context>
   <context>
@@ -7734,7 +7734,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+      <translation>拉高提前錄製時間將增加伺服器上的RAM使用率</translation>
     </message>
   </context>
   <context>
@@ -7906,7 +7906,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>File %1 does not exist</source>
-      <translation type="unfinished">File %1 does not exist</translation>
+      <translation>檔案 %1 不存在</translation>
     </message>
     <message>
       <source>There is no valid client package to download</source>

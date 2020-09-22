@@ -126,7 +126,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Verifying update package</source>
-      <translation type="unfinished">Verifying update package</translation>
+      <translation>업데이트 패키지 확인 중</translation>
     </message>
   </context>
   <context>
@@ -1577,11 +1577,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>This camera does not support advanced PTZ</source>
-      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+      <translation>이 카메라는 고급 PTZ 기능을 지원하지 않습니다.</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation type="unfinished">Zooming out...</translation>
+      <translation>축소하는 중...</translation>
     </message>
     <message>
       <source>Moving...</source>
@@ -1589,11 +1589,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Zooming in...</source>
-      <translation type="unfinished">Zooming in...</translation>
+      <translation>확대하는 중...</translation>
     </message>
     <message>
       <source>Focusing...</source>
-      <translation type="unfinished">Focusing...</translation>
+      <translation>초점 맞추는 중...</translation>
     </message>
   </context>
   <context>
@@ -2036,15 +2036,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Storage added</source>
-      <translation type="unfinished">Storage added</translation>
+      <translation>추가된 저장공간</translation>
     </message>
     <message>
       <source>Storage updated</source>
-      <translation type="unfinished">Storage updated</translation>
+      <translation>업데이트된 저장공간</translation>
     </message>
     <message>
       <source>Storage removed</source>
-      <translation type="unfinished">Storage removed</translation>
+      <translation>제거된 저장공간</translation>
     </message>
   </context>
   <context>
@@ -6628,7 +6628,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchController</name>
     <message>
       <source>To switch between cameras press Shift + Arrow</source>
-      <translation type="unfinished">To switch between cameras press Shift + Arrow</translation>
+      <translation>카메라를 전환하시려면 Shift + 화살표를 누르십시오.</translation>
     </message>
   </context>
   <context>
@@ -6686,15 +6686,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchPtzHandler</name>
     <message>
       <source>Zooming in...</source>
-      <translation type="unfinished">Zooming in...</translation>
+      <translation>확대하는 중...</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation type="unfinished">Zooming out...</translation>
+      <translation>축소하는 중...</translation>
     </message>
     <message>
       <source>Moving...</source>
-      <translation type="unfinished">Moving...</translation>
+      <translation>이동 중...</translation>
     </message>
   </context>
   <context>
@@ -6765,7 +6765,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>AVI (Audio/Video Interleaved)</source>
-      <translation type="unfinished">AVI (Audio/Video Interleaved)</translation>
+      <translation>AVI (오디오/비디오 인터리브) (*.avi)</translation>
     </message>
   </context>
   <context>
@@ -7526,7 +7526,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>DISABLED</source>
-      <translation type="unfinished">DISABLED</translation>
+      <translation>비 활성화됨</translation>
     </message>
   </context>
   <context>
@@ -7729,7 +7729,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+      <translation>사전녹화 시간을 늘리면 서버의 RAM 사용률이 증가됩니다.</translation>
     </message>
   </context>
   <context>
@@ -7901,11 +7901,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>File %1 does not exist</source>
-      <translation type="unfinished">File %1 does not exist</translation>
+      <translation>%1 파일이 존재하지 않습니다.</translation>
     </message>
     <message>
       <source>There is no valid client package to download</source>
-      <translation type="unfinished">There is no valid client package to download</translation>
+      <translation>다운로드가 가능한 유효 클라이언트 패키지가 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -8341,27 +8341,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Equidistant</source>
-      <translation type="unfinished">Equidistant</translation>
+      <translation>Equidistant</translation>
     </message>
     <message>
       <source>Stereographic</source>
-      <translation type="unfinished">Stereographic</translation>
+      <translation>Stereographic</translation>
     </message>
     <message>
       <source>Equisolid</source>
-      <translation type="unfinished">Equisolid</translation>
+      <translation>Equisolid</translation>
     </message>
     <message>
       <source>Ceiling</source>
-      <translation type="unfinished">Ceiling</translation>
+      <translation>천장</translation>
     </message>
     <message>
       <source>Wall</source>
-      <translation type="unfinished">Wall</translation>
+      <translation>벽</translation>
     </message>
     <message>
       <source>Floor/Table</source>
-      <translation type="unfinished">Floor/Table</translation>
+      <translation>바닥/테이블</translation>
     </message>
   </context>
   <context>
@@ -8519,7 +8519,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>DISABLED</source>
-      <translation type="unfinished">DISABLED</translation>
+      <translation>비 활성화됨</translation>
     </message>
   </context>
   <context>
@@ -9036,11 +9036,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update file verification failed.</source>
-      <translation type="unfinished">Update file verification failed.</translation>
+      <translation>업데이트 파일 검증에 실패하였습니다.</translation>
     </message>
     <message>
       <source>Verifying update</source>
-      <translation type="unfinished">Verifying update</translation>
+      <translation>업데이트 검증 중</translation>
     </message>
   </context>
   <context>
