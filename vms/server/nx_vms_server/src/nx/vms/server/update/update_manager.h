@@ -48,8 +48,6 @@ private:
     void onGlobalUpdateSettingChanged();
     void onDownloaderFailed(const QString& fileName);
     void onDownloaderFinished(const QString& fileName);
-    void onDownloaderFileStatusChanged(
-        const common::p2p::downloader::FileInformation& fileInformation);
     void processFoundEndpoint(const nx::vms::discovery::ModuleEndpoint& endpoint);
     update::FindPackageResult findPackage(
         nx::update::Package* outPackage,

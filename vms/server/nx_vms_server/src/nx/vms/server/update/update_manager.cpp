@@ -69,10 +69,6 @@ void UpdateManager::connectToSignals()
         downloader(), &Downloader::downloadFinished,
         this, &UpdateManager::onDownloaderFinished, Qt::QueuedConnection);
 
-    connect(
-        downloader(), &Downloader::fileStatusChanged,
-        this, &UpdateManager::onDownloaderFileStatusChanged, Qt::QueuedConnection);
-
     const discovery::Manager* discoveryManager =
         serverModule()->commonModule()->moduleDiscoveryManager();
     connect(discoveryManager, &discovery::Manager::found,
@@ -259,13 +255,6 @@ void UpdateManager::onDownloaderFinished(const QString& fileName)
         return;
 
     extract();
-}
-
-void UpdateManager::onDownloaderFileStatusChanged(
-    const downloader::FileInformation& fileInformation)
-{
-    if (fileInformation.status == FileInformation::Status::downloaded)
-        onDownloaderFinished(fileInformation.name);
 }
 
 void UpdateManager::processFoundEndpoint(const discovery::ModuleEndpoint& endpoint)
