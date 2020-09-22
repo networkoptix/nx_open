@@ -81,6 +81,8 @@ add_custom_command(
 add_custom_target(distribution_deb_mediaserver ALL
     DEPENDS ${installer_output_list}
 )
+nx_add_targets_to_strengthened(${installer_output_list})
+
 nx_create_openssl_signature(distribution_deb_mediaserver ${server_update_file})
 
 if(targetDevice STREQUAL "linux_arm32")

@@ -53,6 +53,11 @@ include(cmake/find_python.cmake)
 include(cmake/rdep.cmake)
 nx_rdep_configure()
 
+# Setup ninja_tool. Substitute CMAKE_MAKE_PROGRAM value with custom launcher and perform
+# initialization of ninja_tool-related data.
+include(cmake/ninja_tool.cmake)
+nx_setup_ninja_preprocessor()
+
 include(cmake/vcs_helpers.cmake)
 nx_vcs_get_info(CHANGESET changeSet BRANCH branch CURRENT_REFS currentRefs)
 if(NOT changeSet OR NOT branch OR NOT currentRefs)
@@ -240,3 +245,5 @@ if(withDocumentation)
 endif()
 
 nx_save_known_files()
+
+nx_save_ninja_preprocessor_script()

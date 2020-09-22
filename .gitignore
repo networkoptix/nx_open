@@ -26,3 +26,6 @@ compile_commands.json
 /build-*/
 
 _ReSharper.Caches
+
+# Python cache
+__pycache__

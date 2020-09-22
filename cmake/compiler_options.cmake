@@ -4,9 +4,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-if(developerBuild)
-    set(CMAKE_LINK_DEPENDS_NO_SHARED ON)
-endif()
+set(CMAKE_LINK_DEPENDS_NO_SHARED ON)
 
 if(LINUX AND NOT ANDROID)
     option(useLdGold "Use ld.gold to link binaries" OFF)
