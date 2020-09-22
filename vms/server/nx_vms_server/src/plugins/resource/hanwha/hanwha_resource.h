@@ -158,6 +158,7 @@ public:
     CameraDiagnostics::Result ensureMulticastEnabled(Qn::ConnectionRole role);
     virtual QnAdvancedStreamParams advancedLiveStreamParams() const override;
 protected:
+    virtual int defaultGovLengthForStream(const QSize& resolution, int maxFps) const override;
     virtual CameraDiagnostics::Result initializeCameraDriver() override;
 
     virtual QnAbstractPtzController* createPtzControllerInternal() const override;

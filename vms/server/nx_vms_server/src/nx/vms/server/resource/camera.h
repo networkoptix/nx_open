@@ -269,7 +269,7 @@ signals:
 
 protected:
     virtual bool allowRtspVideoLayout() const override;
-    int defaultGovLengthForStream(const QSize& resolution, int maxFps) const;
+    virtual int defaultGovLengthForStream(const QSize& resolution, int maxFps) const;
 
     virtual int getMaxChannelsFromDriver() const { return 1; }
 

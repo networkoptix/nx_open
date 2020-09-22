@@ -4133,6 +4133,11 @@ QnAdvancedStreamParams HanwhaResource::advancedLiveStreamParams() const
     return result;
 }
 
+int HanwhaResource::defaultGovLengthForStream(const QSize& /*resolution*/, int maxFps) const
+{
+    return maxFps;
+}
+
 } // namespace plugins
 } // namespace vms::server
 } // namespace nx
