@@ -124,7 +124,10 @@ public:
     QString foreignAddress;
     unsigned short foreignPort = 0;
     bool terminated = false;
-    quint64 killTimerID = 0;
+    nx::utils::TimerManager::TimerGuard killTimerGuard;
+    nx::utils::TimerManager::TimerGuard checkPermissionsTimerGuard;
+    QnResourcePtr resource;
+    Qn::Permission requiredPermission = Qn::Permission::NoPermissions;
     QnMutex mutex;
 };
 
@@ -155,14 +158,16 @@ ProgressiveDownloadingServer::ProgressiveDownloadingServer(
         arg(d->foreignAddress).arg(d->foreignPort).
         arg(ProgressiveDownloadingServer_count.fetchAndAddOrdered(1)+1));
 
-    const int sessionLiveTimeoutSec =
-        d->serverModule->settings().progressiveDownloadSessionLiveTimeSec();
-    if( sessionLiveTimeoutSec > 0 )
-        d->killTimerID = commonModule()->timerManager()->addTimer(
-            this,
-            std::chrono::milliseconds(sessionLiveTimeoutSec*MS_PER_SEC));
+    const std::chrono::seconds timeout(d->serverModule->settings().progressiveDownloadSessionLiveTimeSec());
+    if (timeout.count() > 0)
+    {
+        d->killTimerGuard = commonModule()->timerManager()->addTimerEx(
+            [this, timeout](const auto&) { terminate(NX_FMT("Session live timeout %1", timeout)); },
+            timeout);
+    }
 
-    setObjectName( "ProgressiveDownloadingServer" );
+    setupPermissionsCheckTimer();
+    setObjectName("ProgressiveDownloadingServer");
 }
 
 ProgressiveDownloadingServer::~ProgressiveDownloadingServer()
@@ -173,14 +178,14 @@ ProgressiveDownloadingServer::~ProgressiveDownloadingServer()
         arg(d->foreignAddress).arg(d->foreignPort).
         arg(ProgressiveDownloadingServer_count.fetchAndAddOrdered(-1)-1));
 
-    quint64 killTimerID = 0;
     {
-        QnMutexLocker lk( &d->mutex );
-        killTimerID = d->killTimerID;
-        d->killTimerID = 0;
+        nx::utils::TimerManager::TimerGuard killTimerGuard;
+        nx::utils::TimerManager::TimerGuard checkPermissionsTimerGuard;
+
+        QnMutexLocker lk(&d->mutex);
+        std::swap(killTimerGuard, d->killTimerGuard);
+        std::swap(checkPermissionsTimerGuard, d->checkPermissionsTimerGuard);
     }
-    if( killTimerID )
-        commonModule()->timerManager()->joinAndDeleteTimer( killTimerID );
 
     stop();
 }
@@ -367,23 +372,23 @@ void ProgressiveDownloadingServer::run()
     if (decodedUrlQuery.hasQueryItem(QnCodecParams::quality))
         quality = QnLexical::deserialized<Qn::StreamQuality>(decodedUrlQuery.queryItemValue(QnCodecParams::quality), Qn::StreamQuality::undefined);
 
-    QnResourcePtr resource = nx::camera_id_helper::findCameraByFlexibleId(
+    d->resource = nx::camera_id_helper::findCameraByFlexibleId(
         commonModule()->resourcePool(), resId);
-    if (!resource)
+    if (!d->resource)
     {
         d->response.messageBody = QByteArray("Resource with id ") + QByteArray(resId.toLatin1()) + QByteArray(" not found ");
         sendResponse(nx::network::http::StatusCode::notFound, "text/plain");
         return;
     }
 
-    if (!resourceAccessManager()->hasPermission(d->accessRights, resource, Qn::ReadPermission))
+    if (!resourceAccessManager()->hasPermission(d->accessRights, d->resource, Qn::ReadPermission))
     {
         sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden);
         return;
     }
 
     Qn::MediaStreamEvent mediaStreamEvent = Qn::MediaStreamEvent::NoEvent;
-    QnSecurityCamResourcePtr camRes = resource.dynamicCast<QnSecurityCamResource>();
+    QnSecurityCamResourcePtr camRes = d->resource.dynamicCast<QnSecurityCamResource>();
     if (camRes)
         mediaStreamEvent = camRes->checkForErrors();
     if (mediaStreamEvent)
@@ -399,7 +404,7 @@ void ProgressiveDownloadingServer::run()
     config.computeSignature = addSignature;
     d->transcoder = std::make_unique<QnFfmpegTranscoder>(config, commonModule()->metrics());
 
-    QnMediaResourcePtr mediaRes = resource.dynamicCast<QnMediaResource>();
+    QnMediaResourcePtr mediaRes = d->resource.dynamicCast<QnMediaResource>();
     if (mediaRes)
     {
         QnLegacyTranscodingSettings extraParams;
@@ -416,7 +421,7 @@ void ProgressiveDownloadingServer::run()
         d->transcoder->setStartTimeOffset(100 * 1000); // droid client has issue if enumerate timings from 0
     }
 
-    const auto physicalResource = resource.dynamicCast<QnVirtualCameraResource>();
+    const auto physicalResource = d->resource.dynamicCast<QnVirtualCameraResource>();
     if (!physicalResource)
     {
         d->response.messageBody = QByteArray("Transcoding error. Bad resource");
@@ -514,12 +519,13 @@ void ProgressiveDownloadingServer::run()
     QString position = decodedUrlQuery.queryItemValue(StreamingParams::START_POS_PARAM_NAME);
 
     bool isLive = position.isEmpty() || position == "now";
-    auto requiredPermission = isLive
+    d->requiredPermission = isLive
         ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
-    if (!commonModule()->resourceAccessManager()->hasPermission(d->accessRights, resource, requiredPermission))
+    if (!commonModule()->resourceAccessManager()->hasPermission(
+        d->accessRights, d->resource, d->requiredPermission))
     {
         if (commonModule()->resourceAccessManager()->hasPermission(
-            d->accessRights, resource, Qn::Permission::ViewLivePermission))
+            d->accessRights, d->resource, Qn::Permission::ViewLivePermission))
         {
             sendMediaEventErrorResponse(Qn::MediaStreamEvent::ForbiddenWithNoLicense);
             return;
@@ -552,10 +558,10 @@ void ProgressiveDownloadingServer::run()
         // TODO do we need create transcoder for this request type?
         // TODO is this request type still needed?
         QByteArray callback = decodedUrlQuery.queryItemValue("callback").toLatin1();
-        processPositionRequest(resource, timeUSec, callback);
+        processPositionRequest(d->resource, timeUSec, callback);
         return;
     }
-    auto camera = d->serverModule->videoCameraPool()->getVideoCamera(resource);
+    auto camera = d->serverModule->videoCameraPool()->getVideoCamera(d->resource);
     if (isLive)
     {
         //if camera is offline trying to put it online
@@ -576,7 +582,7 @@ void ProgressiveDownloadingServer::run()
     else
     {
         d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (
-            d->serverModule->dataProviderFactory()->createDataProvider(resource, Qn::CR_Archive)));
+            d->serverModule->dataProviderFactory()->createDataProvider(d->resource, Qn::CR_Archive)));
         d->archiveDP->open(d->serverModule->archiveIntegrityWatcher());
         d->archiveDP->jumpTo(timeUSec, accurateSeek ? timeUSec : 0);
 
@@ -611,6 +617,13 @@ void ProgressiveDownloadingServer::run()
         return;
     }
 
+    const auto user = resourcePool()->getResourceById<QnUserResource>(d->accessRights.userId);
+    if (!user)
+    {
+        sendJsonResponse(NX_FMT("User not found %1", d->accessRights));
+        return;
+    }
+
     if (camRes && camRes->isAudioEnabled() && d->transcoder->isCodecSupported(AV_CODEC_ID_VORBIS))
         d->transcoder->setAudioCodec(AV_CODEC_ID_VORBIS, QnTranscoder::TM_FfmpegTranscode);
 
@@ -619,10 +632,20 @@ void ProgressiveDownloadingServer::run()
     d->response.headers.insert( std::make_pair("Cache-Control", "no-cache") );
     sendResponse(nx::network::http::StatusCode::ok, mimeType);
 
-    dataConsumer.setAuditHandle(commonModule()->auditManager()->notifyPlaybackStarted(authSession(), resource->getId(), timeUSec, false));
+    dataConsumer.setAuditHandle(commonModule()->auditManager()->notifyPlaybackStarted(
+        authSession(), d->resource->getId(), timeUSec, false));
     dataConsumer.start();
-    while( dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated )
-        readRequest(); // just reading socket to determine client connection is closed
+
+    {
+        const auto credentialsConnection = QObject::connect(
+            user.data(), &QnUserResource::credentialsChanged,
+            [&](const auto& user) { terminate(NX_FMT("%1 credentials changed", user)); });
+        const auto connectionsGuard = nx::utils::makeScopeGuard(
+            [&] { QObject::disconnect(credentialsConnection); });
+
+        while (dataConsumer.isRunning() && d->socket->isConnected() && !d->terminated)
+            readRequest(); // just reading socket to determine client connection is closed
+    }
 
     if (!d->socket->isConnected())
         metricsGuard.fire();
@@ -651,13 +674,36 @@ void ProgressiveDownloadingServer::run()
         camera->notInUse(this);
 }
 
-void ProgressiveDownloadingServer::onTimer(const quint64& /*timerID*/)
+void ProgressiveDownloadingServer::setupPermissionsCheckTimer()
 {
+    Q_D(ProgressiveDownloadingServer);
+    const auto period = commonModule()->globalSettings()->checkVideoStreamPeriod();
+    d->checkPermissionsTimerGuard = commonModule()->timerManager()->addTimerEx(
+        [this, d, period](const auto&)
+        {
+            {
+                QnMutexLocker lk(&d->mutex);
+                if (commonModule()->resourceAccessManager()->hasPermission(
+                    d->accessRights, d->resource, d->requiredPermission))
+                {
+                    NX_VERBOSE(this, "Permissions are fine, next check in %1", period);
+                    setupPermissionsCheckTimer();
+                    return;
+                }
+            }
+
+            terminate("Permissions are lost");
+        },
+        period);
+}
+
+void ProgressiveDownloadingServer::terminate(const QString& reason)
+{
+    NX_DEBUG(this, "%1, terminate connection...", reason);
     Q_D(ProgressiveDownloadingServer);
 
     QnMutexLocker lk( &d->mutex );
     d->terminated = true;
-    d->killTimerID = 0;
     pleaseStop();
 }
 

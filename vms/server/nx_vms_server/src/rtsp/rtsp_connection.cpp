@@ -58,6 +58,7 @@ extern "C"
 #include <api/helpers/camera_id_helper.h>
 #include <api/global_settings.h>
 #include <nx/metrics/metrics_storage.h>
+#include <core/resource_access/resource_access_subject.h>
 
 class QnTcpListener;
 
@@ -280,12 +281,14 @@ public:
     QnMutex archiveDpMutex;
     QnMediaServerModule* serverModule = nullptr;
     std::atomic<CameraParameters> m_cameraParameters{CameraParameter::noParams};
+
+    nx::utils::TimerManager::TimerGuard timerGuard;
 };
 
 // ----------------------------- QnRtspConnectionProcessor ----------------------------
 
 QnRtspConnectionProcessor::QnRtspConnectionProcessor(
-    std::unique_ptr<nx::network::AbstractStreamSocket> socket, 
+    std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner,
     QnMediaServerModule* serverModule)
     :
@@ -293,6 +296,7 @@ QnRtspConnectionProcessor::QnRtspConnectionProcessor(
 {
     Q_D(QnRtspConnectionProcessor);
     d->serverModule = serverModule;
+    setupTimer();
 }
 
 QnRtspConnectionProcessor::~QnRtspConnectionProcessor()
@@ -657,7 +661,7 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::waitForKeyFrame(
     QnAbstractMediaData::DataType dataType, MediaQuality quality)
 {
     Q_D(QnRtspConnectionProcessor);
-	
+
     const auto resource = getResource()->toResourcePtr();
 
     auto provider = quality == MediaQuality::MEDIA_Quality_Low ? d->liveDpLow : d->liveDpHi;
@@ -672,8 +676,8 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::waitForKeyFrame(
     auto camera = d->serverModule->videoCameraPool()->getVideoCamera(resource);
     if (!camera)
     {
-        NX_DEBUG(this, 
-            "Wait for SDP data for camera %1 quality %2 failed. No camera", 
+        NX_DEBUG(this,
+            "Wait for SDP data for camera %1 quality %2 failed. No camera",
             resource->getUrl(), quality);
         return QnConstAbstractMediaDataPtr();
     }
@@ -742,7 +746,7 @@ QnConstAbstractMediaDataPtr QnRtspConnectionProcessor::getCameraData(
     const auto resource = getResource()->toResourcePtr();
     if (!archive.open(resource, d->serverModule->archiveIntegrityWatcher()))
     {
-        NX_DEBUG(this, "Failed to get data for camera %1, couldn't open archive, quality: %2", 
+        NX_DEBUG(this, "Failed to get data for camera %1, couldn't open archive, quality: %2",
             resource->getUrl(), quality);
         return nullptr;
     }
@@ -819,13 +823,13 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeDescribe()
 
     int numAudio = 0;
     QnVirtualCameraResourcePtr cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes);
-    if (cameraResource) 
+    if (cameraResource)
     {
         // avoid race condition if camera is starting now
         if (cameraResource->isAudioEnabled())
             numAudio = 1;
     }
-    else 
+    else
     {
         QnConstResourceAudioLayoutPtr audioLayout = d->mediaRes->getAudioLayout(d->liveDpHi.data());
         if (audioLayout)
@@ -1016,8 +1020,11 @@ qint64 QnRtspConnectionProcessor::getRtspTime()
         return AV_NOPTS_VALUE;
 }
 
-void QnRtspConnectionProcessor::at_camera_resourceChanged(const QnResourcePtr & /*resource*/)
+void QnRtspConnectionProcessor::at_camera_resourceChanged(const QnResourcePtr& /*camera*/)
 {
+    if (needToStop())
+        return;
+
     Q_D(QnRtspConnectionProcessor);
 
     if (auto cameraResource = qSharedPointerDynamicCast<QnVirtualCameraResource>(d->mediaRes))
@@ -1027,12 +1034,56 @@ void QnRtspConnectionProcessor::at_camera_resourceChanged(const QnResourcePtr & 
     }
 }
 
-void QnRtspConnectionProcessor::at_camera_parentIdChanged(const QnResourcePtr & /*resource*/)
+void QnRtspConnectionProcessor::at_camera_parentIdChanged(const QnResourcePtr& /*camera*/)
 {
+    if (needToStop())
+        return;
+
     Q_D(QnRtspConnectionProcessor);
 
     if (d->mediaRes && d->mediaRes->toResource()->hasFlags(Qn::foreigner))
         pleaseStop();
+}
+
+void QnRtspConnectionProcessor::at_user_permissionsTimer()
+{
+    if (needToStop())
+        return;
+
+    Q_D(QnRtspConnectionProcessor);
+
+    if (resourceAccessManager()->hasPermission(
+        d->accessRights,
+        d->mediaRes.dynamicCast<QnResource>(),
+        requiredPermission(getStreamingMode())))
+    {
+        return;
+    }
+
+    NX_DEBUG(this, "Resource access is lost, closing connection...");
+    pleaseStop();
+}
+
+void QnRtspConnectionProcessor::at_user_credentialsChanged(const QnResourcePtr& user)
+{
+    if (needToStop())
+        return;
+
+    NX_DEBUG(this, "%1 credentials are changed, closing connection...", user);
+    pleaseStop();
+}
+
+void QnRtspConnectionProcessor::setupTimer()
+{
+    Q_D(QnRtspConnectionProcessor);
+    d->timerGuard = commonModule()->timerManager()->addTimerEx(
+        [this](const auto&)
+        {
+            at_user_permissionsTimer();
+            if (!needToStop())
+                setupTimer();
+        },
+        commonModule()->globalSettings()->checkVideoStreamPeriod());
 }
 
 void QnRtspConnectionProcessor::waitForResourceInitializing(const QnNetworkResourcePtr& resource)
@@ -1380,7 +1431,7 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composePlay()
 
     if (!currentDP)
     {
-        NX_DEBUG(this, "Failed to play rtsp session, resource %1 is not initialized yet", 
+        NX_DEBUG(this, "Failed to play rtsp session, resource %1 is not initialized yet",
             d->mediaRes ? d->mediaRes->toResource()->getUrl() : QString());
         return nx::network::http::StatusCode::serviceUnavailable;
     }
@@ -1667,6 +1718,20 @@ bool QnRtspConnectionProcessor::processRequest()
     {
         NX_DEBUG(this, "RTSP request forbidden: [%1]", d->clientRequest);
         sendUnauthorizedResponse(nx::network::http::StatusCode::forbidden);
+        return false;
+    }
+
+    if (const auto user = resourcePool()->getResourceById<QnUserResource>(d->accessRights.userId))
+    {
+        Qn::directConnect(
+            user.data(), &QnUserResource::credentialsChanged,
+            this, &QnRtspConnectionProcessor::at_user_credentialsChanged);
+    }
+    else
+    {
+        sendResponse(
+            nx::network::http::StatusCode::internalServerError,
+            NX_FMT("User not found %1", d->accessRights).toUtf8());
         return false;
     }
 

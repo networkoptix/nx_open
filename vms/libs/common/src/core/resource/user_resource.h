@@ -106,13 +106,16 @@ public:
 signals:
     void permissionsChanged(const QnUserResourcePtr& user);
     void userRoleChanged(const QnUserResourcePtr& user);
-    void enabledChanged(const QnUserResourcePtr& user);
 
+    void enabledChanged(const QnUserResourcePtr& user);
     void hashesChanged(const QnResourcePtr& user);
+    void sessionExpired(const QnResourcePtr& user);
+
+    /** Includes enabledChanged, hashesChanged and sessionExpired. */
+    void credentialsChanged(const QnResourcePtr& user);
 
     void emailChanged(const QnResourcePtr& user);
     void fullNameChanged(const QnResourcePtr& user);
-    void sessionExpired(const QnResourcePtr& user);
 
 protected:
     virtual void updateInternal(const QnResourcePtr &other, Qn::NotifierList& notifiers) override;

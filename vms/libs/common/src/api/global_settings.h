@@ -419,6 +419,9 @@ public:
 
     bool forceAnalyticsDbStoragePermissions() const;
 
+    std::chrono::milliseconds checkVideoStreamPeriod() const;
+    void setCheckVideoStreamPeriod(std::chrono::milliseconds value);
+
 signals:
     void initialized();
 
@@ -592,6 +595,7 @@ private:
     QnResourcePropertyAdaptor<bool>* m_keepHanwhaIoPortStateIntactOnInitializationAdaptor= nullptr;
     QnResourcePropertyAdaptor<int>* m_mediaBufferSizeKbAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_forceAnalyticsDbStoragePermissionsAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* m_checkVideoStreamPeriodMsAdaptor = nullptr;
 
     AdaptorList m_allAdaptors;
 

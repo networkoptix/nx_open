@@ -74,7 +74,7 @@ public:
     static bool doesPathEndWithCameraId() { return true; } //< See the base class method.
 
     QnRtspConnectionProcessor(
-        std::unique_ptr<nx::network::AbstractStreamSocket> socket, 
+        std::unique_ptr<nx::network::AbstractStreamSocket> socket,
         QnTcpListener* owner,
         QnMediaServerModule* serverModule);
     virtual ~QnRtspConnectionProcessor();
@@ -97,11 +97,15 @@ public:
 private:
     virtual void run();
     void addResponseRangeHeader();
+
 private slots:
-    void at_camera_parentIdChanged(const QnResourcePtr & /*resource*/);
-    void at_camera_resourceChanged(const QnResourcePtr & /*resource*/);
+    void at_camera_parentIdChanged(const QnResourcePtr& camera);
+    void at_camera_resourceChanged(const QnResourcePtr& camera);
+    void at_user_permissionsTimer();
+    void at_user_credentialsChanged(const QnResourcePtr& user);
 
 private:
+    void setupTimer();
     void checkQuality();
     bool processRequest();
     bool parseRequestParams();

@@ -775,6 +775,9 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
     m_forceAnalyticsDbStoragePermissionsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "forceAnalyticsDbStoragePermissions", false,  this);
 
+    m_checkVideoStreamPeriodMsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+        "checkVideoStreamPeriodMs", 10000, this);
+
     connect(
         m_systemNameAdaptor,
         &QnAbstractResourcePropertyAdaptor::valueChanged,
@@ -1011,6 +1014,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_keepHanwhaIoPortStateIntactOnInitializationAdaptor
         << m_mediaBufferSizeKbAdaptor
         << m_forceAnalyticsDbStoragePermissionsAdaptor
+        << m_checkVideoStreamPeriodMsAdaptor
     ;
 
     return result;
@@ -1901,6 +1905,16 @@ void QnGlobalSettings::setMediaBufferSizeKb(int value)
 bool QnGlobalSettings::forceAnalyticsDbStoragePermissions() const
 {
     return m_forceAnalyticsDbStoragePermissionsAdaptor->value();
+}
+
+std::chrono::milliseconds QnGlobalSettings::checkVideoStreamPeriod() const
+{
+    return std::chrono::milliseconds(m_checkVideoStreamPeriodMsAdaptor->value());
+}
+
+void QnGlobalSettings::setCheckVideoStreamPeriod(std::chrono::milliseconds value)
+{
+    m_checkVideoStreamPeriodMsAdaptor->setValue(value.count());
 }
 
 QString QnGlobalSettings::additionalLocalFsTypes() const

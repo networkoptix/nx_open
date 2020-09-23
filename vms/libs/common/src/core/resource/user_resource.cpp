@@ -20,6 +20,13 @@ std::chrono::minutes kDefaultLdapPasswordExperationPeriod(5);
 
 const QnUuid QnUserResource::kAdminGuid("99cbc715-539b-4bfe-856f-799b45b69b1e");
 
+static void connectOwnSlots(QnUserResource* self)
+{
+    QObject::connect(self, &QnUserResource::enabledChanged, self, &QnUserResource::credentialsChanged);
+    QObject::connect(self, &QnUserResource::hashesChanged, self, &QnUserResource::credentialsChanged);
+    QObject::connect(self, &QnUserResource::sessionExpired, self, &QnUserResource::credentialsChanged);
+}
+
 QnUserResource::QnUserResource(QnUserType userType):
     m_userType(userType),
     m_realm(nx::network::AppInfo::realm()),
@@ -27,6 +34,7 @@ QnUserResource::QnUserResource(QnUserType userType):
 {
     addFlags(Qn::user | Qn::remote);
     setTypeId(nx::vms::api::UserData::kResourceTypeId);
+    connectOwnSlots(this);
 }
 
 QnUserResource::QnUserResource(const QnUserResource& right):
@@ -45,6 +53,7 @@ QnUserResource::QnUserResource(const QnUserResource& right):
     m_fullName(right.m_fullName),
     m_ldapPasswordExperationPeriod(right.m_ldapPasswordExperationPeriod)
 {
+    connectOwnSlots(this);
 }
 
 QnUserResource::~QnUserResource()

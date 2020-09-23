@@ -143,11 +143,7 @@ Authenticator::Result Authenticator::tryAllMethods(
                         });
                 };
 
-            connect(user.data(), &QnUserResource::permissionsChanged, this, removeKey, Qt::DirectConnection);
-            connect(user.data(), &QnUserResource::userRoleChanged, this, removeKey, Qt::DirectConnection);
-            connect(user.data(), &QnUserResource::enabledChanged, this, removeKey, Qt::DirectConnection);
-            connect(user.data(), &QnUserResource::hashesChanged, this, removeKey, Qt::DirectConnection);
-            connect(user.data(), &QnUserResource::sessionExpired, this, removeKey, Qt::DirectConnection);
+            connect(user.data(), &QnUserResource::credentialsChanged, this, removeKey, Qt::DirectConnection);
         }
     }
 

@@ -12,10 +12,7 @@ class QnFfmpegTranscoder;
 
 class ProgressiveDownloadingServerPrivate;
 
-class ProgressiveDownloadingServer
-:
-    virtual public QnTCPConnectionProcessor,
-    public nx::utils::TimerEventHandler
+class ProgressiveDownloadingServer: public QnTCPConnectionProcessor
 {
 public:
     static bool doesPathEndWithCameraId() { return true; } //< See the base class method.
@@ -30,9 +27,10 @@ public:
 
 protected:
     virtual void run() override;
-    virtual void onTimer( const quint64& timerID ) override;
 
 private:
+    void setupPermissionsCheckTimer();
+    void terminate(const QString& reason);
     static QByteArray getMimeType(const QByteArray& streamingFormat);
     void sendMediaEventErrorResponse(Qn::MediaStreamEvent mediaEvent);
     void sendJsonResponse(const QString& errorString);
