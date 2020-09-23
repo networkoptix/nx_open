@@ -986,6 +986,10 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                     videoCodecCtx->width = qMax(8, videoData->width);
                     videoCodecCtx->height = qMax(8, videoData->height);
                 }
+                // codec_tag from another source container can cause an issue. Reset value.
+                // #: avc1 -> do not match to h264(because of mp4/mov tag diff?)
+                if (context.fileFormat == QnAviArchiveMetadata::Format::mp4)
+                    videoCodecCtx->codec_tag = 0;
 
                 // Force video tag due to ffmpeg miss out it for h265 in AVI
                 if (videoCodecCtx->codec_id == AV_CODEC_ID_H265 &&
@@ -993,6 +997,7 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 {
                     videoCodecCtx->codec_tag = MKTAG('h','v', 'c', '1');
                 }
+
                 videoCodecCtx->bit_rate = 1000000 * 6;
                 videoCodecCtx->flags |= CODEC_FLAG_GLOBAL_HEADER;
                 AVRational defaultFrameRate = {1, 60};
