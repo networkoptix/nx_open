@@ -46,6 +46,7 @@ struct QnChunksRequestData
     qint64 endTimeMs = DATETIME_NOW;
     std::chrono::milliseconds detailLevel{1};
     bool keepSmallChunks = false;
+    bool preciseBounds = false;
 
     // Serialized search filter. For motion requests it's a QList<QRegion> object, for analytics
     // it's an nx::analytics::db::Filter object.

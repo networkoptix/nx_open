@@ -28,8 +28,17 @@ QnTimePeriodList QnChunksRequestHelper::load(const QnChunksRequestData& request)
 {
     // TODO: #akulikov #backup storages: Alter this for two storage managers kinds.
 
-    const auto archivePeriods = QnStorageManager::getRecordedPeriods(
+    auto archivePeriods = QnStorageManager::getRecordedPeriods(
         serverModule(), request, kAllArchive);
+    if (request.preciseBounds)
+    {
+        const QnTimePeriod bounds(request.startTimeMs, request.endTimeMs == DATETIME_NOW
+            ? QnTimePeriod::kInfiniteDuration
+            : request.endTimeMs - request.startTimeMs);
+
+        NX_VERBOSE(this, "Crop archive periods to %1", bounds);
+        archivePeriods = QnTimePeriodList::intersection(archivePeriods, QnTimePeriodList{bounds});
+    }
 
     switch (request.periodsType)
     {

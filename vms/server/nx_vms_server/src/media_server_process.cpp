@@ -2718,6 +2718,8 @@ void MediaServerProcess::registerRestHandlers(
      *     %value 2 Only chunks with analytics event (parameter "filter" might be applied).
      * %param[opt]:option keepSmallChunks If specified, standalone chunks smaller than the detail
      *     level are not removed from the result.
+     * %param[opt]:option preciseBounds If specified, the result chunks a precisely cropped to
+     *     [startTime, endTime]. The default behavior may produce chunks that exceed these bounds.
      * %param[opt]:integer limit Maximum number of chunks to return.
      * %param[opt]:option flat [DEPRECATED in favor of "groupBy"] If specified, do not group chunk
      *     lists by Server.

@@ -17,6 +17,7 @@ const QString kStartTimeParam(lit("startTime"));
 const QString kEndTimeParam(lit("endTime"));
 const QString kDetailParam(lit("detail"));
 const QString kKeepSmallChunksParam(lit("keepSmallChunks"));
+const QString kPreciseBoundsParam(lit("preciseBounds"));
 const QString kPeriodsTypeParam(lit("periodsType"));
 const QString kFilterParam(lit("filter"));
 const QString kLocalParam(lit("local"));
@@ -67,6 +68,8 @@ QnChunksRequestData QnChunksRequestData::fromParams(QnResourcePool* resourcePool
         request.detailLevel = std::chrono::milliseconds(params.value(kDetailParam).toLongLong());
     if (params.contains(kKeepSmallChunksParam))
         request.keepSmallChunks = true;
+    if (params.contains(kPreciseBoundsParam))
+        request.preciseBounds = true;
 
     if (params.contains(kPeriodsTypeParam))
     {
@@ -109,6 +112,8 @@ QnRequestParamList QnChunksRequestData::toParams() const
     result.insert(kDetailParam, QString::number(detailLevel.count()));
     if (keepSmallChunks)
         result.insert(kKeepSmallChunksParam, QString());
+    if (preciseBounds)
+        result.insert(kPreciseBoundsParam, QString());
     result.insert(kPeriodsTypeParam, QString::number(periodsType));
     result.insert(kFilterParam, filter);
     result.insert(kLimitParam, QString::number(limit));
