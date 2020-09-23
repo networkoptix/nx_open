@@ -3875,17 +3875,9 @@ QnTimePeriodList HanwhaResource::getDtsTimePeriods(
         return QnTimePeriodList();
 
     const auto& periods = timeline.cbegin()->second;
-    auto itr = std::lower_bound(periods.begin(), periods.end(), startTimeMs);
-    if (itr != periods.begin())
-    {
-        --itr;
-        if (itr->endTimeMs() <= startTimeMs)
-            ++itr; //< Case if previous chunk does not contain startTime.
-    }
-    auto endItr = std::lower_bound(periods.begin(), periods.end(), endTimeMs);
 
-    return QnTimePeriodList::filterTimePeriods(
-        itr, endItr, detailLevel, keepSmalChunks, limit, sortOrder);
+    return timePeriodListFromRange(
+        periods, startTimeMs, endTimeMs, detailLevel, keepSmalChunks, limit, sortOrder);
 }
 
 QnConstResourceAudioLayoutPtr HanwhaResource::getAudioLayout(

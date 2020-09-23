@@ -86,6 +86,22 @@ TEST(DeviceFileCatalog, catalogRange)
     }
 }
 
+TEST(DeviceFileCatalog, GetTimePeriods)
+{
+    QnMediaServerModule serverModule;
+    DeviceFileCatalog catalog(
+        &serverModule, QString(), QnServer::HiQualityCatalog, QnServer::StoragePool::Normal);
+
+    nx::vms::server::Chunk chunk1;
+    chunk1.startTimeMs = 5;
+    chunk1.durationMs = 5;
+    catalog.addRecord(chunk1);
+
+    const auto result = catalog.getTimePeriods(
+        /*startTimeMs*/ 1, /*endTimeMs*/ 10, /*detailLevel*/ 0, /*keepSmall*/ true,
+        /*limit*/ 1000, Qt::DescendingOrder);
+}
+
 TEST(DeviceFileCatalog, mergeData)
 {
     QnMediaServerModule serverModule;

@@ -261,19 +261,8 @@ QnTimePeriodList QnPlVmax480Resource::getDtsTimePeriods(
     if (!m_chunks.empty())
         startTimeMs = qMin(startTimeMs, m_chunks.last().startTimeMs);
 
-    QnTimePeriod period(startTimeMs, endTimeMs - startTimeMs);
-
-    auto itr = std::lower_bound(m_chunks.begin(), m_chunks.end(), startTimeMs);
-    if (itr != m_chunks.begin())
-    {
-        --itr;
-        if (itr->endTimeMs() <= startTimeMs)
-            ++itr; //< Case if previous chunk does not contain startTime.
-    }
-    auto endItr = std::lower_bound(m_chunks.begin(), m_chunks.end(), endTimeMs);
-
-    return QnTimePeriodList::filterTimePeriods(
-        itr, endItr, detailLevel, keepSmalChunks, limit, sortOrder);
+    return timePeriodListFromRange(
+        m_chunks, startTimeMs, endTimeMs, detailLevel, keepSmalChunks, limit, sortOrder);
 }
 
 Qn::LicenseType QnPlVmax480Resource::calculateLicenseType() const

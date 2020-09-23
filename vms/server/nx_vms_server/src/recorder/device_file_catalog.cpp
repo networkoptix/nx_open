@@ -997,7 +997,7 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(
     qint64 startTimeMs,
     qint64 endTimeMs,
     qint64 detailLevel,
-    bool keepSmalChunks,
+    bool keepSmallChunks,
     int limit,
     Qt::SortOrder sortOrder)
 {
@@ -1006,21 +1006,8 @@ QnTimePeriodList DeviceFileCatalog::getTimePeriods(
     if (m_chunks.empty())
         return result;
 
-    auto itr = std::lower_bound(m_chunks.begin(), m_chunks.end(), startTimeMs);
-    /* Checking if we should include a chunk, containing startTime. */
-    if (itr != m_chunks.begin())
-    {
-        --itr;
-        if (itr->endTimeMs() <= startTimeMs)
-            ++itr; //< Case if previous chunk does not contain startTime.
-    }
-
-    if (itr == m_chunks.end() || itr->startTimeMs >= endTimeMs)
-        return result;
-
-    auto endItr = std::lower_bound(m_chunks.begin(), m_chunks.end(), endTimeMs);
-    return QnTimePeriodList::filterTimePeriods(
-        itr, endItr, detailLevel, keepSmalChunks, limit, sortOrder);
+    return timePeriodListFromRange(
+        m_chunks, startTimeMs, endTimeMs, detailLevel, keepSmallChunks, limit, sortOrder);
 }
 
 QnRecordingStatsData DeviceFileCatalog::getStatistics(qint64 bitrateAnalyzePeriodMs) const

@@ -103,7 +103,7 @@ public:
         qint64 startTimeMs,
         qint64 endTimeMs,
         qint64 detailLevel,
-        bool keepSmalChunks,
+        bool keepSmallChunks,
         int limit,
         Qt::SortOrder sortOrder);
     void close();

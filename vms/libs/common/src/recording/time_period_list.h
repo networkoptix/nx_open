@@ -50,106 +50,9 @@ public:
      *                                  any of the periods in this time period list.
      */
     bool intersects(const QnTimePeriod& period) const;
-
     bool containTime(qint64 timeMs) const;
-
     bool containPeriod(const QnTimePeriod &period) const;
-
     QnTimePeriodList intersected(const QnTimePeriod &period) const;
-
-
-    template <class Iterator>
-    static QnTimePeriodList filterTimePeriodsAsc(
-        Iterator itr,
-        Iterator endItr,
-        qint64 detailLevel,
-        bool keepSmallChunks,
-        int limit)
-    {
-        QnTimePeriodList result;
-        if (endItr <= itr)
-            return result;
-        result.push_back(QnTimePeriod(itr->startTimeMs, itr->durationMs));
-
-        for (++itr; itr != endItr; ++itr)
-        {
-            QnTimePeriod& last = result.last();
-            if (last.isInfinite())
-                break;
-
-            const qint64 lastEndTime = last.endTimeMs();
-            if (itr->startTimeMs - lastEndTime < detailLevel)
-            {
-                last.durationMs = itr->isInfinite() ? QnTimePeriod::kInfiniteDuration
-                    : qMax(last.durationMs, itr->endTimeMs() - last.startTimeMs);
-            }
-            else
-            {
-                if (!last.isInfinite() && last.durationMs < detailLevel && !keepSmallChunks)
-                    result.pop_back();
-                if (result.size() >= limit)
-                    break;
-                result.push_back(QnTimePeriod(itr->startTimeMs, itr->durationMs));
-            }
-        }
-
-        if (!result.last().isInfinite() && result.last().durationMs < detailLevel && !keepSmallChunks)
-            result.pop_back();
-        return result;
-    }
-
-    template <class Iterator>
-    static QnTimePeriodList filterTimePeriodsDesc(
-        Iterator itr,
-        Iterator endItr,
-        qint64 detailLevel,
-        bool keepSmallChunks,
-        int limit)
-    {
-        QnTimePeriodList result;
-        if (endItr <= itr)
-            return result;
-        --endItr;
-        result.push_back(QnTimePeriod(endItr->startTimeMs, endItr->durationMs));
-
-        for (--endItr; endItr >= itr; --endItr)
-        {
-            QnTimePeriod& last = result.last();
-            if (endItr->endTimeMs() > last.startTimeMs - detailLevel)
-            {
-                const qint64 lastEndTime = last.endTimeMs();
-                last.startTimeMs = qMin<int64_t>(last.startTimeMs, endItr->startTimeMs);
-                if (!last.isInfinite())
-                    last.durationMs = lastEndTime - last.startTimeMs;
-            }
-            else
-            {
-                if (!last.isInfinite() && last.durationMs < detailLevel && !keepSmallChunks)
-                    result.pop_back();
-                if (result.size() >= limit)
-                    break;
-                result.push_back(QnTimePeriod(endItr->startTimeMs, endItr->durationMs));
-            }
-        }
-
-        if (!result.last().isInfinite() && result.last().durationMs < detailLevel && !keepSmallChunks)
-            result.pop_back();
-        return result;
-    }
-
-    template <class Iterator>
-    static QnTimePeriodList filterTimePeriods(
-        Iterator itr,
-        Iterator endItr,
-        qint64 detailLevel,
-        bool keepSmalChunks,
-        int limit,
-        Qt::SortOrder sortOrder)
-    {
-        return sortOrder == Qt::SortOrder::AscendingOrder
-            ? filterTimePeriodsAsc(itr, endItr, detailLevel, keepSmalChunks, limit)
-            : filterTimePeriodsDesc(itr, endItr, detailLevel, keepSmalChunks, limit);
-    }
 
     /** Get list of periods, that starts in the target period. */
     QnTimePeriodList intersectedPeriods(const QnTimePeriod &period) const;
@@ -288,6 +191,69 @@ public:
      */
     QnTimePeriodList simplified() const;
 };
+
+template<typename Container>
+QnTimePeriodList timePeriodListFromRange(
+    const Container& container,
+    int64_t startTimeMs, int64_t endTimeMs,
+    // Skip periods less than that or merge adjacent if the gap between them is less than this
+    // value.
+    int64_t detailLevelMs,
+    bool keepSmallChunks, int limit, Qt::SortOrder sortOrder)
+{
+    QnTimePeriodList result;
+    if (!NX_ASSERT(startTimeMs < endTimeMs))
+        return result;
+
+    // Searching for the chunk range bounds.
+    auto itr = std::lower_bound(container.cbegin(), container.cend(), startTimeMs);
+    /* Checking if we should include a chunk, containing startTime. */
+    if (itr != container.cbegin())
+    {
+        --itr;
+        if (itr->endTimeMs() <= startTimeMs)
+            ++itr; //< Case if previous chunk does not contain startTime.
+    }
+
+    auto endItr = std::lower_bound(container.begin(), container.end(), endTimeMs);
+    if (itr == endItr || itr->startTimeMs >= endTimeMs)
+        return result;
+
+    // The chunk range is determined. Building  a time period list from it by merging chunks and
+    // skipping small ones if needed.
+    result.push_back(QnTimePeriod(itr->startTimeMs, itr->durationMs));
+    for (++itr; itr != endItr; ++itr)
+    {
+        QnTimePeriod& last = result.last();
+        if (last.isInfinite())
+            break;
+
+        if (itr->startTimeMs - last.endTimeMs() < detailLevelMs)
+        {
+            last.durationMs = itr->isInfinite()
+                ? QnTimePeriod::kInfiniteDuration
+                : qMax(last.durationMs, itr->endTimeMs() - last.startTimeMs);
+        }
+        else
+        {
+            if (last.durationMs < detailLevelMs && !keepSmallChunks)
+                result.pop_back();
+
+            result.push_back(QnTimePeriod(itr->startTimeMs, itr->durationMs));
+        }
+    }
+
+    if (!result.last().isInfinite() && result.last().durationMs < detailLevelMs && !keepSmallChunks)
+        result.pop_back();
+
+    if (sortOrder == Qt::DescendingOrder)
+        std::reverse(result.begin(), result.end());
+
+    while (result.size() > limit)
+        result.pop_back();
+
+    return result;
+}
 
 struct MultiServerPeriodData
 {
