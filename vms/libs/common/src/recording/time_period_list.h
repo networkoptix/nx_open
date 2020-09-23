@@ -11,6 +11,8 @@
 
 #include "time_period.h"
 #include <nx/utils/uuid.h>
+#include <nx/utils/log/assert.h>
+
 class QnTimePeriodListTimeIterator;
 
 /**
