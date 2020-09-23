@@ -9,10 +9,7 @@ function(verify_python_at_least_37)
 
     if (NOT "${PYTHON_VERSION}" MATCHES "Python 3\.(7|8)(\..*)?")
         set(PYTHON_EXECUTABLE PYTHON_EXECUTABLE-NOTFOUND PARENT_SCOPE)
-        return()
     endif()
-
-    message(STATUS "Found python executable: '${PYTHON_EXECUTABLE}'.")
 endfunction()
 
 function(find_python_at_least_37_in_dir)
@@ -37,11 +34,13 @@ function(find_python_at_least_37_in_dir)
             NO_DEFAULT_PATH
         )
 
-        if(NOT ${PYTHON_EXECUTABLE} STREQUAL PYTHON_EXECUTABLE-NOTFOUND)
+        if(PYTHON_EXECUTABLE)
             verify_python_at_least_37()
         endif()
 
-        if(NOT ${PYTHON_EXECUTABLE} STREQUAL PYTHON_EXECUTABLE-NOTFOUND)
+        set(PYTHON_EXECUTABLE ${PYTHON_EXECUTABLE} PARENT_SCOPE)
+
+        if(PYTHON_EXECUTABLE)
             return()
         endif()
     endforeach ()
@@ -55,11 +54,11 @@ function(find_python_at_least_37)
     endif()
 
     foreach(SEARCH_PATH IN LISTS SEARCH_PATHS_LIST)
-        message("Searching Python in \"${SEARCH_PATH}\"...")
+        message(DEBUG "Searching Python in \"${SEARCH_PATH}\"...")
 
         find_python_at_least_37_in_dir(PATTERNS ${ARGV} SEARCH_PATH ${SEARCH_PATH})
 
-        if(NOT ${PYTHON_EXECUTABLE} STREQUAL PYTHON_EXECUTABLE-NOTFOUND)
+        if(PYTHON_EXECUTABLE)
             return()
         endif()
     endforeach()
@@ -67,13 +66,11 @@ function(find_python_at_least_37)
     message(FATAL_ERROR "Python >=3.7 executable not found.")
 endfunction()
 
-if("${PYTHON_EXECUTABLE}" STREQUAL PYTHON_EXECUTABLE-NOTFOUND
-    OR "${PYTHON_EXECUTABLE}" STREQUAL ""
-)
+if(NOT PYTHON_EXECUTABLE)
     find_python_at_least_37(python3.8 python3.7 python3 python)
-else()
-    message(STATUS "Found python executable: '${PYTHON_EXECUTABLE}'.")
 endif()
+
+message(STATUS "Found python executable: '${PYTHON_EXECUTABLE}'.")
 
 set(ENV{PYTHONDONTWRITEBYTECODE} True)
 
