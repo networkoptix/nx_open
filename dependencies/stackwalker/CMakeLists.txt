@@ -1,6 +1,6 @@
 set(stackwalker_dir ${CMAKE_SOURCE_DIR}/artifacts/stackwalker/Main/StackWalker)
 
-file(GLOB sources ${stackwalker_dir}/*.cpp)
+file(GLOB sources CONFIGURE_DEPENDS ${stackwalker_dir}/*.cpp)
 
 add_definitions(-D_UNICODE)
 

@@ -10,7 +10,7 @@ nx_configure_file(
     maven/filter-resources/mobile_client_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
 
-file(GLOB_RECURSE QML_FILES static-resources/qml/*.qml static-resources/qml/*.js)
+file(GLOB_RECURSE QML_FILES CONFIGURE_DEPENDS static-resources/qml/*.qml static-resources/qml/*.js)
 
 set(resources)
 
@@ -28,13 +28,13 @@ if(IOS)
 
     set(icons_dir ${customization_dir}/icons/ios/ios/images)
 
-    file(GLOB resources ${icons_dir}/logo*.png)
+    file(GLOB resources CONFIGURE_DEPENDS ${icons_dir}/logo*.png)
     list(APPEND resources ${mobile_client_ios_launch_screen})
     list(APPEND resources ${CMAKE_CURRENT_LIST_DIR}/ios/qt.conf)
 
     nx_copy(${CMAKE_CURRENT_SOURCE_DIR}/ios/mobile_client.xcassets
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-    file(GLOB icons ${icons_dir}/icon_*.png)
+    file(GLOB icons CONFIGURE_DEPENDS ${icons_dir}/icon_*.png)
     nx_copy(${icons}
         DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/mobile_client.xcassets/AppIcon.appiconset)
     list(APPEND resources ${CMAKE_CURRENT_BINARY_DIR}/mobile_client.xcassets)

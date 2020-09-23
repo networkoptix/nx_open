@@ -1,7 +1,7 @@
 set(qthttpserver_dir ${CMAKE_SOURCE_DIR}/artifacts/qthttpserver)
 
-file(GLOB sources "${qthttpserver_dir}/*.cpp")
-file(GLOB headers "${qthttpserver_dir}/*.h")
+file(GLOB sources CONFIGURE_DEPENDS "${qthttpserver_dir}/*.cpp")
+file(GLOB headers CONFIGURE_DEPENDS "${qthttpserver_dir}/*.h")
 qt5_wrap_cpp(moc_sources ${headers})
 
 add_library(qthttpserver

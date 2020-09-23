@@ -52,7 +52,7 @@ add_subdirectory(${metadataSdkDir}/nx_kit ${CMAKE_CURRENT_BINARY_DIR}/nx_kit)
 # Define nx_sdk lib, static, depends on nx_kit.
 
 set(SDK_SRC_DIR ${metadataSdkDir}/src)
-file(GLOB_RECURSE SDK_SRC ${SDK_SRC_DIR}/*)
+file(GLOB_RECURSE SDK_SRC CONFIGURE_DEPENDS ${SDK_SRC_DIR}/*)
 
 add_library(nx_sdk STATIC ${SDK_SRC})
 target_include_directories(nx_sdk PUBLIC ${SDK_SRC_DIR})
@@ -64,7 +64,8 @@ target_compile_definitions(nx_sdk PRIVATE NX_PLUGIN_API=${API_EXPORT_MACRO}) #< 
 # Define sample_analytics_plugin lib, dynamic, depends on nx_kit and nx_sdk.
 
 set(SAMPLE_ANALYTICS_PLUGIN_SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
-file(GLOB_RECURSE SAMPLE_ANALYTICS_PLUGIN_SRC ${SAMPLE_ANALYTICS_PLUGIN_SRC_DIR}/*)
+file(GLOB_RECURSE SAMPLE_ANALYTICS_PLUGIN_SRC CONFIGURE_DEPENDS
+    ${SAMPLE_ANALYTICS_PLUGIN_SRC_DIR}/*)
 
 add_library(sample_analytics_plugin SHARED ${SAMPLE_ANALYTICS_PLUGIN_SRC})
 target_include_directories(sample_analytics_plugin PRIVATE ${SAMPLE_ANALYTICS_PLUGIN_SRC_DIR})

@@ -19,7 +19,7 @@ set(zip_log ${logs_dir}/${sdk_name}_zip.log)
 
 # Collect source files for statically prepared files.
 set(copied_static_origin ${CMAKE_CURRENT_SOURCE_DIR}/files)
-file(GLOB_RECURSE copied_static_files ${copied_static_origin}/*)
+file(GLOB_RECURSE copied_static_files CONFIGURE_DEPENDS ${copied_static_origin}/*)
 
 # Collect source files for SDK.
 set(copied_nx_sdk_src_origin ${CMAKE_SOURCE_DIR}/vms/libs/nx_sdk/src)
@@ -33,13 +33,13 @@ set(copied_samples_dir ${CMAKE_SOURCE_DIR}/vms/server/plugins/storage)
 # Collect source files for the sample 1 - FTP Storage Plugin.
 set(copied_sample_1_target ftp_storage_plugin)
 set(copied_sample_1_origin ${copied_samples_dir}/${copied_sample_1_target})
-file(GLOB_RECURSE copied_sample_1_files ${copied_sample_1_origin}/src/*)
+file(GLOB_RECURSE copied_sample_1_files CONFIGURE_DEPENDS ${copied_sample_1_origin}/src/*)
 list(APPEND copied_sample_1_files ${copied_sample_1_origin}/readme.md)
 
 # Collect source files for the sample 2 - Test Storage Plugin.
 set(copied_sample_2_target test_storage_plugin)
 set(copied_sample_2_origin ${copied_samples_dir}/${copied_sample_2_target})
-file(GLOB_RECURSE copied_sample_2_files ${copied_sample_2_origin}/src/*)
+file(GLOB_RECURSE copied_sample_2_files CONFIGURE_DEPENDS ${copied_sample_2_origin}/src/*)
 list(APPEND copied_sample_2_files ${copied_sample_2_origin}/readme.md)
 
 set(copy_sdk_files_script ${CMAKE_CURRENT_BINARY_DIR}/copy_sdk_files.cmake)

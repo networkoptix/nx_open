@@ -7,7 +7,7 @@ find_program(ANDROIDDEPLOYQT_EXECUTABLE androiddeployqt HINTS "${QT_DIR}/bin")
 function(find_buildtools sdk_path result_variable)
     set(buildToolsDir "${sdk_path}/build-tools")
 
-    file(GLOB versions RELATIVE "${buildToolsDir}" "${buildToolsDir}/*.*.*")
+    file(GLOB versions RELATIVE "${buildToolsDir}" CONFIGURE_DEPENDS "${buildToolsDir}/*.*.*")
     list(SORT versions)
 
     if(NOT versions)

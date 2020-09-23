@@ -24,22 +24,24 @@ nx_configure_file(${CMAKE_SOURCE_DIR}/vms/libs/nx_sdk/src/nx_sdk_version.inc.in
 
 # Collect source files for statically prepared files.
 set(copied_static_origin ${CMAKE_CURRENT_SOURCE_DIR}/files)
-file(GLOB_RECURSE copied_static_files ${copied_static_origin}/*)
+file(GLOB_RECURSE copied_static_files CONFIGURE_DEPENDS ${copied_static_origin}/*)
 
 # Collect source files for nx_kit.
 set(copied_nx_kit_origin ${CMAKE_SOURCE_DIR}/open/artifacts/nx_kit)
-file(GLOB_RECURSE copied_nx_kit_files ${copied_nx_kit_origin}/*)
+file(GLOB_RECURSE copied_nx_kit_files CONFIGURE_DEPENDS ${copied_nx_kit_origin}/*)
 
 # Collect source files for SDK.
 set(copied_nx_sdk_src_nx_origin ${CMAKE_SOURCE_DIR}/vms/libs/nx_sdk/src/nx)
-file(GLOB_RECURSE copied_nx_sdk_src_nx_files ${copied_nx_sdk_src_nx_origin}/*)
+file(GLOB_RECURSE copied_nx_sdk_src_nx_files CONFIGURE_DEPENDS ${copied_nx_sdk_src_nx_origin}/*)
 set(copied_nx_sdk_unit_tests_origin ${CMAKE_SOURCE_DIR}/vms/libs/nx_sdk/unit_tests)
-file(GLOB_RECURSE copied_nx_sdk_unit_tests_files ${copied_nx_sdk_unit_tests_origin}/*)
+file(GLOB_RECURSE copied_nx_sdk_unit_tests_files CONFIGURE_DEPENDS
+    ${copied_nx_sdk_unit_tests_origin}/*)
 
 # Exclude documentation files from SDK source files.
 set(nx_sdk_src_settings_model_file ${copied_nx_sdk_src_nx_origin}/sdk/settings_model.md)
 list(REMOVE_ITEM copied_nx_sdk_src_nx_files ${nx_sdk_src_settings_model_file})
-file(GLOB_RECURSE nx_sdk_documentation_image_files ${copied_nx_sdk_src_nx_origin}/sdk/doc/*)
+file(GLOB_RECURSE nx_sdk_documentation_image_files CONFIGURE_DEPENDS
+    ${copied_nx_sdk_src_nx_origin}/sdk/doc/*)
 nx_subtract_lists(copied_nx_sdk_src_nx_files nx_sdk_documentation_image_files)
 
 # Generate public version of "settings_model.md"
@@ -53,15 +55,17 @@ set(copied_samples_dir ${CMAKE_SOURCE_DIR}/vms/server/plugins/analytics)
 # Collect source files for the sample 1 - Sample Analytics Plugin.
 set(copied_sample_1_target sample_analytics_plugin)
 set(copied_sample_1_origin ${copied_samples_dir}/${copied_sample_1_target})
-file(GLOB_RECURSE copied_sample_1_files ${copied_sample_1_origin}/src/*)
+file(GLOB_RECURSE copied_sample_1_files CONFIGURE_DEPENDS
+    ${copied_sample_1_origin}/src/*)
 
 # Collect source files for the sample 2 - Stub Analytics Plugin.
 set(copied_sample_2_target stub_analytics_plugin)
 set(copied_sample_2_origin ${copied_samples_dir}/${copied_sample_2_target})
-file(GLOB_RECURSE copied_sample_2_files ${copied_sample_2_origin}/src/*)
+file(GLOB_RECURSE copied_sample_2_files CONFIGURE_DEPENDS ${copied_sample_2_origin}/src/*)
 set(copied_sample_unit_tests_target stub_analytics_plugin/unit_tests/src)
 set(copied_sample_unit_tests_origin ${copied_samples_dir}/${copied_sample_unit_tests_target})
-file(GLOB_RECURSE copied_sample_unit_tests_files ${copied_sample_unit_tests_origin}/*)
+file(GLOB_RECURSE copied_sample_unit_tests_files CONFIGURE_DEPENDS
+    ${copied_sample_unit_tests_origin}/*)
 
 set(copy_sdk_files_script ${CMAKE_CURRENT_BINARY_DIR}/copy_sdk_files.cmake)
 

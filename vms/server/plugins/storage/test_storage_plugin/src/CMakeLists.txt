@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.1)
 
 project(test_storage_plugin)
 
-file(GLOB_RECURSE source_files ${CMAKE_CURRENT_SOURCE_DIR}/*)
+file(GLOB_RECURSE source_files CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/*)
 add_library(test_storage_plugin SHARED ${source_files})
 
 target_include_directories(test_storage_plugin PRIVATE ../../../src) #< SDK headers.

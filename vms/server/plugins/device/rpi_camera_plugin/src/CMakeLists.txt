@@ -6,7 +6,7 @@ project(rpi_camera_plugin)
 
 set(rpiSysroot "" CACHE STRING
     "Path to Raspberry Pi sysroot containing libs bcm_host and openmaxil.")
-    
+
 if("${rpiSysroot}" STREQUAL "")
     message(FATAL_ERROR "rpiSysroot not defined or empty.")
 endif()
@@ -18,7 +18,7 @@ set(nxKitLibraryType "STATIC" CACHE STRING "" FORCE)
 set(nxKitWithTests "NO" CACHE STRING "" FORCE)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../../../nx_kit ${CMAKE_CURRENT_BINARY_DIR}/nx_kit)
 
-file(GLOB_RECURSE source_files ${CMAKE_CURRENT_SOURCE_DIR}/*)
+file(GLOB_RECURSE source_files CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/*)
 add_library(rpi_camera_plugin SHARED ${source_files})
 
 target_link_libraries(rpi_camera_plugin PRIVATE

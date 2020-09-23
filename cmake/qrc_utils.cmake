@@ -34,7 +34,7 @@ function(nx_generate_qrc qrc_file)
             set(prefix) #< Clear NOTFOUND value.
         endif()
         if(IS_DIRECTORY ${input})
-            file(GLOB_RECURSE files "${input}/*")
+            file(GLOB_RECURSE files CONFIGURE_DEPENDS "${input}/*")
             foreach(file ${files})
                 if(file MATCHES "(.orig|.rej)$")
                     # These files are often left by version control systems, but they should

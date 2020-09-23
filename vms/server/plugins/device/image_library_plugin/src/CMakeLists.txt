@@ -9,7 +9,7 @@ set(nxKitLibraryType "STATIC" CACHE STRING "" FORCE)
 set(nxKitWithTests "NO" CACHE STRING "" FORCE)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../../../nx_kit ${CMAKE_CURRENT_BINARY_DIR}/nx_kit)
 
-file(GLOB_RECURSE source_files ${CMAKE_CURRENT_SOURCE_DIR}/*)
+file(GLOB_RECURSE source_files CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/*)
 add_library(image_library_plugin SHARED ${source_files})
 
 target_link_libraries(image_library_plugin PRIVATE nx_kit)

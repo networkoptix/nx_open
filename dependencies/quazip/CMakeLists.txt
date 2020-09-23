@@ -1,7 +1,7 @@
 set(quazip_dir ${CMAKE_SOURCE_DIR}/artifacts/quazip/quazip)
 
-file(GLOB sources "${quazip_dir}/*.c" "${quazip_dir}/*.cpp")
-file(GLOB headers "${quazip_dir}/*.h")
+file(GLOB sources CONFIGURE_DEPENDS "${quazip_dir}/*.c" "${quazip_dir}/*.cpp")
+file(GLOB headers CONFIGURE_DEPENDS "${quazip_dir}/*.h")
 qt5_wrap_cpp(moc_sources ${headers})
 
 add_definitions(-DQUAZIP_BUILD)

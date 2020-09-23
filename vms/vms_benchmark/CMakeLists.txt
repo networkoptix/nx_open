@@ -9,7 +9,7 @@ nx_configure_file(
     ${CMAKE_CURRENT_BINARY_DIR}/release/lib/vms_benchmark_release/version.py
 )
 
-file(GLOB_RECURSE benchmark_sources
+file(GLOB_RECURSE benchmark_sources CONFIGURE_DEPENDS
     ${CMAKE_CURRENT_SOURCE_DIR}/*.py ${CMAKE_CURRENT_BINARY_DIR}/release/lib/*.py)
 
 set(py_installer_args
@@ -37,7 +37,7 @@ if(targetDevice STREQUAL "windows-x64")
     )
 else()
     set(exe_extension "")
-    
+
     set(py_installer_with_env_command
         LD_LIBRARY_PATH=${python_dir}/lib
         PYTHONPATH=${python_dir}/lib/python3.6/site-packages

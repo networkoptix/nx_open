@@ -6,7 +6,7 @@ project(axis_camera_plugin)
 
 set(CMAKE_AUTOMOC ON)
 
-file(GLOB_RECURSE source_files ${CMAKE_CURRENT_SOURCE_DIR}/*)
+file(GLOB_RECURSE source_files CONFIGURE_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/*)
 add_library(axis_camera_plugin SHARED ${source_files})
 
 find_package(Qt5Core REQUIRED)

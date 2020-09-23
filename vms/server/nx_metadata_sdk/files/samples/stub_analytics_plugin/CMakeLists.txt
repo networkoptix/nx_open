@@ -56,7 +56,7 @@ add_subdirectory(${metadataSdkDir}/nx_kit ${CMAKE_CURRENT_BINARY_DIR}/nx_kit)
 # Define nx_sdk lib, static, depends on nx_kit.
 
 set(SDK_SRC_DIR ${metadataSdkDir}/src)
-file(GLOB_RECURSE SDK_SRC ${SDK_SRC_DIR}/*)
+file(GLOB_RECURSE SDK_SRC CONFIGURE_DEPENDS ${SDK_SRC_DIR}/*)
 
 add_library(nx_sdk STATIC ${SDK_SRC})
 target_include_directories(nx_sdk PUBLIC ${SDK_SRC_DIR})
@@ -73,7 +73,7 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/../../unit_tests ${CMAKE_CURRENT_BINA
 # Define stub_analytics_plugin lib, dynamic, depends on nx_kit and nx_sdk.
 
 set(STUB_ANALYTICS_PLUGIN_SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
-file(GLOB_RECURSE STUB_ANALYTICS_PLUGIN_SRC ${STUB_ANALYTICS_PLUGIN_SRC_DIR}/*)
+file(GLOB_RECURSE STUB_ANALYTICS_PLUGIN_SRC CONFIGURE_DEPENDS ${STUB_ANALYTICS_PLUGIN_SRC_DIR}/*)
 
 add_library(stub_analytics_plugin SHARED ${STUB_ANALYTICS_PLUGIN_SRC})
 target_include_directories(stub_analytics_plugin PRIVATE ${STUB_ANALYTICS_PLUGIN_SRC_DIR})
@@ -91,7 +91,8 @@ endif()
 #--------------------------------------------------------------------------------------------------
 # Define stub_analytics_plugin_ut executable, depends on stub_analytics_plugin.
 
-file(GLOB_RECURSE STUB_ANALYTICS_PLUGIN_UNIT_TESTS_SRC ${CMAKE_CURRENT_LIST_DIR}/unit_tests/src/*)
+file(GLOB_RECURSE STUB_ANALYTICS_PLUGIN_UNIT_TESTS_SRC CONFIGURE_DEPENDS
+    ${CMAKE_CURRENT_LIST_DIR}/unit_tests/src/*)
 add_executable(stub_analytics_plugin_ut ${STUB_ANALYTICS_PLUGIN_UNIT_TESTS_SRC})
 target_link_libraries(stub_analytics_plugin_ut PRIVATE stub_analytics_plugin)
 

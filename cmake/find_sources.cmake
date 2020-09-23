@@ -51,7 +51,7 @@ endfunction()
 function(nx_find_files var src_dir extension)
     cmake_parse_arguments(FIND "" "" "EXCLUDE" ${ARGN})
 
-    file(GLOB_RECURSE CODE_FILES ${src_dir}/*.${extension})
+    file(GLOB_RECURSE CODE_FILES CONFIGURE_DEPENDS ${src_dir}/*.${extension})
 
     get_filename_component(src_dir_absolute ${src_dir} ABSOLUTE)
 

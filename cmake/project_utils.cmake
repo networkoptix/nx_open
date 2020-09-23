@@ -51,7 +51,7 @@ function(nx_add_target name type)
 
     if(IS_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/translations")
         file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/qm/translations")
-        file(GLOB ts_files "${CMAKE_CURRENT_SOURCE_DIR}/translations/*.ts")
+        file(GLOB ts_files CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/translations/*.ts")
 
         set_source_files_properties(${ts_files}
             PROPERTIES OUTPUT_LOCATION "${CMAKE_CURRENT_BINARY_DIR}/qm/translations")

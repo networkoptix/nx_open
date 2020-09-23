@@ -27,7 +27,7 @@ if(MACOSX)
     set(mac_sources src/ui/workaround/mac_utils.mm)
 endif()
 
-file(GLOB_RECURSE QML_FILES static-resources/qml/*.qml static-resources/qml/*.js)
+file(GLOB_RECURSE QML_FILES CONFIGURE_DEPENDS static-resources/qml/*.qml static-resources/qml/*.js)
 
 # Place Roboto font into resources so it can be loaded by Qt WebEngine.
 set(client_font_roboto_regular ${roboto_fonts_directory}/bin/fonts/Roboto-Regular.ttf)
