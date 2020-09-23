@@ -444,12 +444,19 @@ TEST_F(AuthenticationTest, localUserWithCloudLikeName)
 TEST_F(AuthenticationTest, disabledUser)
 {
     const QString userCredentials[] = { "test2", "password" };
-
     addLocalUser(userCredentials[0], userCredentials[1], false);
+
     testServerReturnCode(
         userCredentials[0],
         userCredentials[1],
         nx::network::http::AuthType::authDigest,
+        nx::network::http::StatusCode::unauthorized,
+        Qn::Auth_DisabledUser);
+
+    testServerReturnCode(
+        userCredentials[0],
+        userCredentials[1],
+        nx::network::http::AuthType::authBasic,
         nx::network::http::StatusCode::unauthorized,
         Qn::Auth_DisabledUser);
 }

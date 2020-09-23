@@ -56,6 +56,12 @@ Qn::AuthResult GenericUserDataProvider::authorize(
     const nx::network::http::header::Authorization& authorizationHeader,
     nx::network::http::HttpHeaders* const /*responseHeaders*/)
 {
+    if (const auto user = res.dynamicCast<QnUserResource>(); user && !user->isEnabled())
+    {
+        NX_VERBOSE(this, "%1 is disabled", user);
+        return Qn::Auth_DisabledUser;
+    }
+
     if (authorizationHeader.authScheme == nx::network::http::header::AuthScheme::digest)
     {
         QByteArray ha1;
@@ -88,12 +94,6 @@ Qn::AuthResult GenericUserDataProvider::authorize(
         {
             NX_VERBOSE(this, lm("Wrong digest for %1").args(user));
             return Qn::Auth_WrongPassword;
-        }
-
-        if (user && !user->isEnabled())
-        {
-            NX_VERBOSE(this, lm("Disabled user %1").args(user));
-            return Qn::Auth_DisabledUser;
         }
 
         return Qn::Auth_OK;
