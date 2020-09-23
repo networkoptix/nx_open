@@ -41,6 +41,7 @@ def determine_package_versions(
         "pandoc": "2.2.1",
         "cassandra": "2.7.0",
         "doxygen": "1.8.14",
+        "verify_globs": "1.0",
         "gstreamer": "1.0",
         "icu": "60.2",
         "android-sdk": "28",
@@ -233,6 +234,14 @@ def sync_dependencies(target, syncher, platform, arch, box, release_version, opt
 
     sync("any/root-certificates", path_variable="root_certificates_path")
     sync("any/customization_pack", path_variable="customization_package_directory")
+
+    if platform == 'android':
+        build_utils_platform = 'linux'
+    elif platform == 'ios':
+        build_utils_platform = 'macosx'
+    else:
+        build_utils_platform = platform
+    sync("%s/verify_globs" % build_utils_platform, path_variable="verify_globs_directory")
 
 
 def parse_target(target):

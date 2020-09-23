@@ -22,7 +22,7 @@ def clean_build_directory(build_dir: str,
 
     if build_file_processor is None:
         build_filename = os.path.join(build_dir, NINJA_BUILD_FILE_NAME)
-        build_file_processor = BuildNinjaFileProcessor(build_filename)
+        build_file_processor = BuildNinjaFileProcessor(build_filename, build_directory=build_dir)
 
     if not build_file_processor.is_loaded():
         build_file_processor.load_data()
@@ -139,6 +139,7 @@ def run_script(build_dir: str, script_file_name: str, force_patch: bool) -> None
     strengthened_targets = set()
     commands_to_run = list()
     do_clean = False
+    substitute_verify_globs = False
 
     print(f"Reading script {script_file_name}...")
     with open(script_file_name) as script_file:
@@ -160,13 +161,15 @@ def run_script(build_dir: str, script_file_name: str, force_patch: bool) -> None
                 commands_to_run.append(args[0])
             elif command == "clean":
                 do_clean = True
+            elif command == "substitute_verify_globs":
+                substitute_verify_globs = True
             else:
                 print(f"Unknown command: {command}")
 
     print("Done")
 
     build_file_name = os.path.join(build_dir, NINJA_BUILD_FILE_NAME)
-    build_file_processor = BuildNinjaFileProcessor(build_file_name)
+    build_file_processor = BuildNinjaFileProcessor(build_file_name, build_directory=build_dir)
 
     if do_clean:
         clean_build_directory(build_dir=build_dir, build_file_processor=build_file_processor)
@@ -175,6 +178,7 @@ def run_script(build_dir: str, script_file_name: str, force_patch: bool) -> None
         strengthened_targets=strengthened_targets,
         script_timestamp=os.path.getmtime(script_file_name),
         build_file_processor=build_file_processor,
+        substitute_verify_globs=substitute_verify_globs,
         force_patch=force_patch)
 
     for command in commands_to_run:
@@ -189,6 +193,7 @@ def patch_ninja_build(
         strengthened_targets: set,
         script_timestamp: float,
         build_file_processor: BuildNinjaFileProcessor,
+        substitute_verify_globs: bool,
         force_patch: bool = False) -> None:
     """Do patching of build.ninja. Also searches for the "include" directive for rules.ninja, and
     patches rules.ninja too.
@@ -202,6 +207,8 @@ def patch_ninja_build(
     :type script_timestamp: float
     :param build_file_processor: The instance of BuildNinjaFileProcessor class.
     :type build_file_processor: BuildNinjaFileProcessor
+    :param substitute_verify_globs: Whether to substitute VERIFY_GLOBS command with custom script.
+    :type substitute_verify_globs: bool
     :param force_patch: Whether force-patch file, regardless of the script modification time,
         defaults to False
     :type force_patch: bool, optional
@@ -220,7 +227,8 @@ def patch_ninja_build(
 
     print("Patching build.ninja...")
     patch_rules_file(
-        build_file_processor, script_timestamp=script_timestamp, force_patch=force_patch)
+        build_file_processor, substitute_verify_globs,
+        script_timestamp=script_timestamp, force_patch=force_patch)
     if strengthened_targets:
         build_file_processor.strengthen_dependencies(strengthened_targets)
     build_file_processor.save_data()
@@ -229,11 +237,13 @@ def patch_ninja_build(
 
 def patch_rules_file(
         build_file_processor: BuildNinjaFileProcessor,
+        substitute_verify_globs: bool,
         script_timestamp: float,
         force_patch: bool = False) -> None:
 
     rules_file_name = build_file_processor.get_rules_file_name()
-    rules_file_processor = RulesNinjaFileProcessor(rules_file_name)
+    rules_file_processor = RulesNinjaFileProcessor(
+        rules_file_name, build_directory=build_file_processor.build_directory)
 
     if not force_patch:
         if not rules_file_processor.needs_patching(script_version_timestamp=script_timestamp):
@@ -244,6 +254,8 @@ def patch_rules_file(
 
     print("Patching rules.ninja...")
     rules_file_processor.patch_cmake_rerun()
+    if substitute_verify_globs:
+        rules_file_processor.patch_verify_globs()
     rules_file_processor.save_data()
     print("Done")
 

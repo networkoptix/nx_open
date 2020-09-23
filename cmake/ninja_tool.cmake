@@ -38,6 +38,10 @@ function(nx_add_custom_pre_build_command command)
     set_property(GLOBAL APPEND_STRING PROPERTY pre_build_commands "run ${command}\n")
 endfunction()
 
+function(nx_use_custom_verify_globs)
+    set_property(GLOBAL APPEND_STRING PROPERTY pre_build_commands "substitute_verify_globs\n")
+endfunction()
+
 function(nx_save_ninja_preprocessor_script)
     get_property(targets GLOBAL PROPERTY pre_build_commands)
     file(WRITE ${CMAKE_BINARY_DIR}/pre_build.ninja ${targets})

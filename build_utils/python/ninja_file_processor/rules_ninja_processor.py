@@ -6,6 +6,7 @@ rules).
 import re
 import os
 import sys
+import platform
 from pathlib import Path
 from typing import Tuple
 
@@ -21,15 +22,19 @@ class RulesNinjaFileProcessor(NinjaFileProcessor):  # pylint:disable=too-few-pub
         pass
 
     _RERUN_CMAKE_RULE = "RERUN_CMAKE"
+    _VERIFY_GLOBS_RULE = "VERIFY_GLOBS"
+    _VERIFY_GLOBS_TOOL_PATH = "verify_globs-1.0/verify_globs"
+    _SELF_RUN_OPTIONS = "--log-output --stack-trace"
 
     # Universal regex for parsing specific rules.ninja syntax.
     _LINE_RE = re.compile(
         r'(?P<is_rule>rule (?P<rule_name>.+?))\s+'
         r'|(?P<is_command>\s+command\s+=\s+(?P<command>.+))\s*')
 
-    def __init__(self, file_name: Path, debug_output: bool = False) -> None:
+    def __init__(self, file_name: Path, build_directory: Path, debug_output: bool = False) -> None:
         self._line_number_by_rule = {}
-        super().__init__(file_name=file_name, debug_output=debug_output)
+        super().__init__(
+            file_name=file_name, build_directory=build_directory, debug_output=debug_output)
 
     def _parse_line(self, line: str) -> Line:
         match = self._LINE_RE.match(line)
@@ -59,7 +64,8 @@ class RulesNinjaFileProcessor(NinjaFileProcessor):  # pylint:disable=too-few-pub
             print(f"Can't find {self._RERUN_CMAKE_RULE} in rules.ninja file.")
             return
 
-        self_run_string = f'"{sys.executable}" "{os.path.abspath(sys.argv[0])}"'
+        self_run_string = (
+            f'"{sys.executable}" "{os.path.abspath(sys.argv[0])}" {self._SELF_RUN_OPTIONS}')
         if self_run_string in command:  # ninja_tool is already added.
             return
 
@@ -91,3 +97,34 @@ class RulesNinjaFileProcessor(NinjaFileProcessor):  # pylint:disable=too-few-pub
 
         raise NinjaFileProcessorParseError(
             self, f'No command found for rule "{rule}"')
+
+    def patch_verify_globs(self) -> None:
+        """Use custom script to verify globs."""
+
+        try:
+            command_line_index, command = self._find_command_by_rule(
+                self._VERIFY_GLOBS_RULE)
+        except self.RuleLookupError:
+            print(f"Can't find {self._VERIFY_GLOBS_RULE} in rules.ninja file.")
+            return
+
+        tools_directory = Path(os.environ.get("RDEP_PACKAGES_DIR"))
+        if platform.system() == "Linux":
+            platform_rdep_dir = "linux"
+        elif platform.system() == "Windows":
+            platform_rdep_dir = "windows"
+        elif platform.system() == "Darwin":
+            platform_rdep_dir = "macosx"
+
+        verify_globs_full_path = tools_directory.joinpath(
+            platform_rdep_dir, self._VERIFY_GLOBS_TOOL_PATH)
+        verify_globs_run_string = (
+            f"{verify_globs_full_path.as_posix()} {self.build_directory.as_posix()}")
+        if verify_globs_run_string == command:  # verify_globs.py is already added.
+            return
+
+        updated_line = f"  command = {verify_globs_run_string}\n"
+        self._lines[command_line_index] = Line(
+            raw=updated_line, parsed=None, type=LineType.COMMAND)
+
+        self._is_patch_applied = True  # pylint:disable=attribute-defined-outside-init

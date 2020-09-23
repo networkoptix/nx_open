@@ -51,7 +51,8 @@ class NinjaFileProcessor(metaclass=ABCMeta):
 
     _ADDED_LINES_MARKER_START = "# Start of lines added by ninja_tool\n"
 
-    def __init__(self, file_name: Path, debug_output: bool = False) -> None:
+    def __init__(self, file_name: Path, build_directory: Path, debug_output: bool = False) -> None:
+        self.build_directory = Path(build_directory)
         self._lines = []
         self._added_lines = []
         self._file_name = Path(file_name)

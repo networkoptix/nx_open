@@ -40,10 +40,11 @@ class BuildNinjaFileProcessor(NinjaFileProcessor):
 
     _MOCARG_RE = re.compile(r'.*moc(?:.exe)? @([^"]+)')
 
-    def __init__(self, file_name: Path, debug_output: bool = True) -> None:
+    def __init__(self, file_name: Path, build_directory: Path, debug_output: bool = False) -> None:
         self._line_number_by_output = {}
         self._rules_file_name = Path("")
-        super().__init__(file_name=file_name, debug_output=debug_output)
+        super().__init__(
+            file_name=file_name, build_directory=build_directory, debug_output=debug_output)
 
     def _parse_line(self, line: str) -> Line:  # pylint:disable=inconsistent-return-statements
         match = self._LINE_RE.match(line)
