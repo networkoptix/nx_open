@@ -215,7 +215,7 @@ std::optional<Rect> MetadataParser::parseRegionListElement()
 
     if (!seenRegion)
         NX_DEBUG(NX_SCOPE_TAG, "No 'Region' elements in 'RegionList' element");
-    if (min.x >= max.x || min.y >= max.y)
+    if (min.x > max.x || min.y > max.y)
         return std::nullopt;
 
     Rect rect;

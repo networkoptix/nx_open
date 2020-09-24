@@ -294,14 +294,15 @@ Engine::DeviceData& Engine::getCachedDeviceData(const IDeviceInfo* deviceInfo)
     {
         timeout.invalidate();
 
-        if (fetchSupportedEventTypeIds(&data, deviceInfo)
-            || fetchSupportedObjectTypeIds(&data, deviceInfo))
+        const bool eventTypesFetched = fetchSupportedEventTypeIds(&data, deviceInfo);
+        const bool objectTypesFetched = fetchSupportedObjectTypeIds(&data, deviceInfo);
+        if (eventTypesFetched || objectTypesFetched)
         {
-            const QString eventObjectTypeId = "nx.hikvision.event";
+            static const char eventObjectTypeId[] = "nx.hikvision.event";
             if (!data.supportedEventTypeIds.isEmpty()
                 && !data.supportedObjectTypeIds.contains(eventObjectTypeId))
             {
-                data.supportedObjectTypeIds.push_back("nx.hikvision.event");
+                data.supportedObjectTypeIds.push_back(eventObjectTypeId);
             }
 
             timeout.restart();
