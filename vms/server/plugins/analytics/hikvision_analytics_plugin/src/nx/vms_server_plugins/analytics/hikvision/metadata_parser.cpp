@@ -323,7 +323,13 @@ Ptr<ObjectMetadata> MetadataParser::parseTargetElement()
     }
 
     if (!typeId)
-        typeId = "nx.hikvision.event"; // Treat rule activations as objects.
+    {
+        // Treat rule activations as objects.
+        if (*trackId < 0)
+            typeId = "nx.hikvision.event"; 
+        else
+            return nullptr;
+    }
 
     auto& entry = m_cache[*trackId];
     if (boundingBox || !attributes.empty() || entry.trackId.isNull())
