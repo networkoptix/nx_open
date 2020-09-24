@@ -246,4 +246,5 @@ endif()
 
 nx_save_known_files()
 
+nx_use_custom_verify_globs()
 nx_save_ninja_preprocessor_script()
