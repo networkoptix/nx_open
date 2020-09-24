@@ -24,6 +24,8 @@
 #include "../watchers/camera_settings_analytics_engines_watcher.h"
 #include "../camera_advanced_parameters_manifest_manager.h"
 
+#include <nx/utils/log/log.h>
+
 namespace nx::vms::client::desktop {
 
 using State = CameraSettingsDialogState;
@@ -602,6 +604,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
     CameraSettingsAnalyticsEnginesWatcher* analyticsEnginesWatcher,
     CameraAdvancedParametersManifestManager* advancedParametersManifestManager)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "Reset state, loading %1 cameras", cameras.size());
     const auto firstCamera = cameras.empty()
         ? Camera()
         : cameras.first();
@@ -689,6 +692,7 @@ State CameraSettingsDialogStateReducer::loadCameras(
 
     if (firstCamera)
     {
+        NX_VERBOSE(NX_SCOPE_TAG, "Single camera %1 is selected", firstCamera);
         auto& singleProperties = state.singleCameraProperties;
         singleProperties.id = firstCamera->getId().toSimpleString();
         singleProperties.name.setBase(firstCamera->getName());
@@ -1524,6 +1528,8 @@ State CameraSettingsDialogStateReducer::setAnalyticsEngines(
     else if (!analyticsEngineIsPresentInList(state.analytics.currentEngineId, state))
         state.analytics.currentEngineId = state.analytics.engines[0].id;
 
+    NX_VERBOSE(NX_SCOPE_TAG, "Current analytics engine reset to %1",
+        state.analytics.currentEngineId);
     return state;
 }
 
@@ -1537,6 +1543,8 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setCurrentAnalyticsEngi
         return {false, std::move(state)};
 
     state.analytics.currentEngineId = value;
+    NX_VERBOSE(NX_SCOPE_TAG, "Current analytics engine selected as %1",
+        state.analytics.currentEngineId);
 
     return {true, std::move(state)};
 }
@@ -1611,6 +1619,8 @@ State CameraSettingsDialogStateReducer::refreshDeviceAgentSettings(
 
     auto& settings = state.analytics.settingsByEngineId[engineId];
     settings.loading = true;
+
+    NX_VERBOSE(NX_SCOPE_TAG, "Loading device agent settings for %1", engineId);
     return state;
 }
 
@@ -1622,6 +1632,10 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::resetDeviceAgentData(
     settings.values.setBase(data.values);
     settings.values.resetUser();
     settings.loading = data.status != DeviceAgentData::Status::ok;
+
+    NX_VERBOSE(NX_SCOPE_TAG, "Device agent settings reset for %1, status is %2, loading: %3",
+        engineId, (int)data.status, settings.loading);
+
     return std::make_pair(true, std::move(state));
 }
 

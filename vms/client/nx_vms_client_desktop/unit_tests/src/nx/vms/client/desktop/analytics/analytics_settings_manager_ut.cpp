@@ -13,7 +13,16 @@ namespace test {
 using namespace nx::vms::api::analytics; //< TODO: Remove lexical reduplication.
 using namespace nx::vms::common;
 
-static const auto kEmptyReply = QJson::deserialized<DeviceAgentSettingsResponse>(R"json(
+DeviceAgentSettingsResponse deserializedResponse(QByteArray data)
+{
+    bool success = true;
+    const auto result =  QJson::deserialized<DeviceAgentSettingsResponse>(data, {}, &success);
+    NX_ASSERT(success);
+    return result;
+}
+
+// Such reply may be sent by the server when device agent is actually offline.
+static const auto kEmptyReply = deserializedResponse(R"json(
     {
         "analyzedStreamIndex": "primary",
         "settingsModel": {},
@@ -21,25 +30,33 @@ static const auto kEmptyReply = QJson::deserialized<DeviceAgentSettingsResponse>
     }
 )json");
 
-static const auto kData1Reply = QJson::deserialized<DeviceAgentSettingsResponse>(R"json(
+static const auto kData1Reply = deserializedResponse(R"json(
     {
         "analyzedStreamIndex": "primary",
         "settingsModel": {
-            "items": [ { "name": "generateCars", "type": "CheckBox" } ]
+            "items": [ { "name": "generateCars", "type": "CheckBox" } ],
             "type": "Settings"
         },
-        "settingsValues": { "generateCars": true }
+        "settingsValues": { "generateCars": true },
+        "session": {
+            "id": "{14eb242a-7ad7-4915-bfde-f681674db440}",
+            "sequenceNumber": "1"
+        }
     }
 )json");
 
-static const auto kData2Reply= QJson::deserialized<DeviceAgentSettingsResponse>(R"json(
+static const auto kData2Reply = deserializedResponse(R"json(
     {
         "analyzedStreamIndex": "primary",
         "settingsModel": {
-            "items": [ { "name": "generatePersons", "type": "CheckBox" } ]
+            "items": [ { "name": "generatePersons", "type": "CheckBox" } ],
             "type": "Settings"
         },
-        "settingsValues": { "generatePersons": false }
+        "settingsValues": { "generatePersons": false },
+        "session": {
+            "id": "{99a457f2-b469-411e-b3dc-f4fbd83b7381}",
+            "sequenceNumber": "1"
+        }
     }
 )json");
 
@@ -135,8 +152,10 @@ TEST_F(AnalyticsSettingsManagerTest, listenToExternalChanges)
     whenDataReceived(kData2Reply);
 
     // Check consumer received actual data.
-    ASSERT_EQ(notifier()->lastData.model, kData2Reply.settingsModel);
-    ASSERT_EQ(notifier()->lastData.values, kData2Reply.settingsValues);
+    ASSERT_EQ(QJson::serialized(notifier()->lastData.model),
+        QJson::serialized(kData2Reply.settingsModel));
+    ASSERT_EQ(QJson::serialized(notifier()->lastData.values),
+        QJson::serialized(kData2Reply.settingsValues));
 }
 
 // Update actual values on applying changes.
@@ -151,7 +170,8 @@ TEST_F(AnalyticsSettingsManagerTest, immediateUpdateOnApplyChanges)
     manager()->applyChanges({{deviceAgentId(), actualValues}});
     EXPECT_TRUE(requestWasSent());
     EXPECT_EQ(notifier()->counter, 2); //< Update immediately on changed values.
-    ASSERT_EQ(listener()->data().values, actualValues);
+    ASSERT_EQ(QJson::serialized(listener()->data().values),
+        QJson::serialized(actualValues));
 }
 
 } // namespace test

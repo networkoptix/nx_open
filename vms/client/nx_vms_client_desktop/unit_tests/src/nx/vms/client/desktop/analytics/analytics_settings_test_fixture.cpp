@@ -7,6 +7,8 @@
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/core/access/access_types.h>
 
+#include <nx/vms/api/analytics/device_agent_settings_response.h>
+
 namespace nx::vms::client::desktop {
 namespace test {
 
@@ -16,7 +18,6 @@ using namespace nx::vms::common;
 
 AnalyticsSettingsMockApiInterface::AnalyticsSettingsMockApiInterface()
 {
-    m_session.id = QnUuid::createUuid();
 }
 
 rest::Handle AnalyticsSettingsMockApiInterface::getSettings(
@@ -45,12 +46,9 @@ bool AnalyticsSettingsMockApiInterface::requestWasSent(const DeviceAgentId& agen
 
 void AnalyticsSettingsMockApiInterface::sendReply(
     const DeviceAgentId& agentId,
-    DeviceAgentSettingsResponse response,
+    const DeviceAgentSettingsResponse& response,
     bool success)
 {
-    ++m_session.sequenceNumber;
-    response.session = m_session;
-
     auto request = std::find_if(m_requests.begin(), m_requests.end(),
         [&agentId](const auto& info) { return info.agentId == agentId; });
     NX_ASSERT(request != m_requests.end());

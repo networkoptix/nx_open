@@ -236,9 +236,14 @@ void AnalyticsSettingsManager::Private::loadResponseData(
     // Data can be received as an API request reply or directly in the transaction. We need to
     // determine which source is more actual. Session id will be changed when camera jumps onto
     // another server. Sequence number grows on the server side.
-    if (data.session.id == response.session.id
+    // Session id is always null when the plugin is disabled, and we definitely must handle reply
+    // in this case.
+    if (!response.session.id.isNull()
+        && data.session.id == response.session.id
         && data.session.sequenceNumber >= response.session.sequenceNumber)
     {
+        // While we are loading settings for the first time, we must never skip the response.
+        NX_ASSERT(data.status != DeviceAgentData::Status::loading);
         return;
     }
 
