@@ -115,14 +115,22 @@ TEST_F(MetricsStoragesApi, state)
     ASSERT_FALSE(storages.isEmpty());
     auto storage = storages[0];
     auto storage2 = storages[1];
-    storage->setStatus(Qn::Offline);
 
-    auto systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
-    auto storageData = systemValues["storages"][storage->getId().toSimpleString()];
-    auto stateData = storageData["state"];
-    ASSERT_EQ("Inaccessible", stateData["status"].toString());
-    ASSERT_EQ(0, stateData["issues24h"].toInt());
+    // Checking that storage went online after adding and this fact has been registered in metrics.
+    nx::vms::api::metrics::SystemValues systemValues;
+    while (true)
+    {
+        systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
+        auto storageData = systemValues["storages"][storage->getId().toSimpleString()];
+        auto stateData = storageData["state"];
+        ASSERT_EQ(0, stateData["issues24h"].toInt());
+        if ("Online" == stateData["status"].toString())
+            break;
 
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    }
+
+    // Generating issues for the first storage.
     auto eventConnector = launcher->serverModule()->eventConnector();
     static const int kIssues = 10;
     for (int i = 0; i < kIssues; ++i)
@@ -130,16 +138,21 @@ TEST_F(MetricsStoragesApi, state)
         eventConnector->at_storageFailure(storage->getParentServer(), /*time*/ 0,
             nx::vms::api::EventReason::storageFull, storage);
     }
-    storage->setStatus(Qn::Online);
 
-    do
+    // Now issue count for the first storage should be equal to the generated. For the second one
+    // no issues should have been registered.
+    while (true)
     {
         systemValues = launcher->get<SystemValues>("/ec2/metrics/values");
-        storageData = systemValues["storages"][storage->getId().toSimpleString()];
-        stateData = storageData["state"];
-    } while (kIssues != stateData["issues24h"].toInt());
-    ASSERT_EQ("Online", stateData["status"].toString());
-    ASSERT_EQ(kIssues, stateData["issues24h"].toInt());
+        auto storageData = systemValues["storages"][storage->getId().toSimpleString()];
+        auto stateData = storageData["state"];
+
+        ASSERT_EQ("Online", stateData["status"].toString());
+        if (kIssues == stateData["issues24h"].toInt())
+            break;
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    }
 
     auto storageData2 = systemValues["storages"][storage2->getId().toSimpleString()];
     auto stateData2 = storageData2["state"];
