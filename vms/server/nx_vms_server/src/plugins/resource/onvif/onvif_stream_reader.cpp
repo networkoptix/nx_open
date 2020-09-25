@@ -760,6 +760,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(
 
     Q_UNUSED(isPrimary);
 
+    QUrl resultUrl;
     if (isMedia2UsageForced(m_onvifRes))
     {
         Media2::StreamUri streamUriFetcher(m_onvifRes);
@@ -772,70 +773,76 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(
         if (!streamUriFetcher.receiveBySoap(request))
             return streamUriFetcher.requestFailedResult();
 
-        *mediaUrl = QString::fromStdString(streamUriFetcher.get()->Uri);
-        return CameraDiagnostics::NoErrorResult();
+        resultUrl.setUrl(m_onvifRes->fromOnvifDiscoveredUrl(
+            streamUriFetcher.get()->Uri,
+            /*updatePort*/ false));
     }
-
-
-    StreamUriResp response;
-    StreamUriReq request;
-    onvifXsd__StreamSetup streamSetup;
-    onvifXsd__Transport transport;
-
-    request.StreamSetup = &streamSetup;
-    request.StreamSetup->Transport = &transport;
-    request.StreamSetup->Stream = streamTypeFromNxRtpTransportType(
-        m_onvifRes->preferredRtpTransport());
-    request.StreamSetup->Transport->Tunnel = 0;
-    request.StreamSetup->Transport->Protocol = onvifXsd__TransportProtocol::RTSP;
-    request.ProfileToken = profileToken;
-
-    int soapRes = soapWrapper.getStreamUri(request, response);
-    if (soapRes != SOAP_OK) {
-    #if defined(PL_ONVIF_DEBUG)
-        qCritical() << "QnOnvifStreamReader::fetchStreamUrl (primary stream = " << isPrimary
-            << "): can't get stream URL of ONVIF device (URL: " << m_onvifRes->getMediaUrl()
-            << ", UniqueId: " << m_onvifRes->getUniqueId()
-            << "). Root cause: SOAP request failed. GSoap error code: "
-            << soapRes << ". " << soapWrapper.getLastErrorDescription();
-    #endif
-        return CameraDiagnostics::RequestFailedResult(
-            QLatin1String("getStreamUri"), soapWrapper.getLastErrorDescription());
-    }
-
-    if (!response.MediaUri)
+    else
     {
-    #if defined(PL_ONVIF_DEBUG)
-        qCritical() << "QnOnvifStreamReader::fetchStreamUrl (primary stream = "  << isPrimary
-            << "): can't get stream URL of ONVIF device (URL: " << m_onvifRes->getMediaUrl()
-            << ", UniqueId: " << m_onvifRes->getUniqueId() << "). Root cause: got empty response.";
-    #endif
-        return CameraDiagnostics::RequestFailedResult(
-            QLatin1String("getStreamUri"), QLatin1String("empty media uri"));
-    }
+        StreamUriResp response;
+        StreamUriReq request;
+        onvifXsd__StreamSetup streamSetup;
+        onvifXsd__Transport transport;
 
-    #if defined(PL_ONVIF_DEBUG)
+        request.StreamSetup = &streamSetup;
+        request.StreamSetup->Transport = &transport;
+        request.StreamSetup->Stream = streamTypeFromNxRtpTransportType(
+            m_onvifRes->preferredRtpTransport());
+        request.StreamSetup->Transport->Tunnel = 0;
+        request.StreamSetup->Transport->Protocol = onvifXsd__TransportProtocol::RTSP;
+        request.ProfileToken = profileToken;
+
+        int soapRes = soapWrapper.getStreamUri(request, response);
+        if (soapRes != SOAP_OK)
+        {
+        #if defined(PL_ONVIF_DEBUG)
+            qCritical() << "QnOnvifStreamReader::fetchStreamUrl (primary stream = " << isPrimary
+                << "): can't get stream URL of ONVIF device (URL: " << m_onvifRes->getMediaUrl()
+                << ", UniqueId: " << m_onvifRes->getUniqueId()
+                << "). Root cause: SOAP request failed. GSoap error code: "
+                << soapRes << ". " << soapWrapper.getLastErrorDescription();
+        #endif
+            return CameraDiagnostics::RequestFailedResult(
+                QLatin1String("getStreamUri"), soapWrapper.getLastErrorDescription());
+        }
+
+        if (!response.MediaUri)
+        {
+        #if defined(PL_ONVIF_DEBUG)
+            qCritical() << "QnOnvifStreamReader::fetchStreamUrl (primary stream = " << isPrimary
+                << "): can't get stream URL of ONVIF device (URL: " << m_onvifRes->getMediaUrl()
+                << ", UniqueId: " << m_onvifRes->getUniqueId() << "). Root cause: got empty response.";
+        #endif
+            return CameraDiagnostics::RequestFailedResult(
+                QLatin1String("getStreamUri"), QLatin1String("empty media uri"));
+        }
+
+        #if defined(PL_ONVIF_DEBUG)
         qDebug() << "URL of ONVIF device stream (UniqueId: " << m_onvifRes->getUniqueId()
             << ") successfully fetched: " << response.MediaUri->Uri.c_str();
-    #endif
-    QUrl relutUrl(m_onvifRes->fromOnvifDiscoveredUrl(response.MediaUri->Uri, false));
+        #endif
 
-    if (relutUrl.host().size()==0)
+        resultUrl.setUrl(m_onvifRes->fromOnvifDiscoveredUrl(
+            response.MediaUri->Uri,
+            /*updatePort*/ false));
+    }
+
+    if (resultUrl.host().size()==0)
     {
-        QString temp = relutUrl.toString();
-        relutUrl.setHost(m_onvifRes->getHostAddress());
+        QString temp = resultUrl.toString();
+        resultUrl.setHost(m_onvifRes->getHostAddress());
     #if defined(PL_ONVIF_DEBUG)
         qCritical() << "pure URL(error) " << temp<< " Trying to fix: " << relutUrl.toString();
     #endif
     }
 
-    *mediaUrl = relutUrl.toString();
+    *mediaUrl = resultUrl.toString();
 
     const bool isDahua = m_onvifRes->getVendor().toLower() == "dahua";
     const bool fixWrongUri = m_onvifRes->resourceData().value<bool>(ResourceDataKey::kFixWrongUri);
 
     if (isDahua || fixWrongUri)
-        fixDahuaStreamUrl(mediaUrl, request.ProfileToken);
+        fixDahuaStreamUrl(mediaUrl, profileToken);
 
     return CameraDiagnostics::NoErrorResult();
 }
