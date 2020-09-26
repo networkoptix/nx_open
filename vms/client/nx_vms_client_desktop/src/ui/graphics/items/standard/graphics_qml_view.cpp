@@ -237,6 +237,9 @@ struct GraphicsQmlView::Private
     QOpenGLBuffer texcoordBuffer;
     bool vaoInitialized = false;
 
+    bool renderRequested = false;
+    bool sceneChanged = false;
+
     Private(GraphicsQmlView* view): view(view) {}
 
     void ensureOffscreen(const QRectF& rect, QOpenGLWidget* glWidget);
@@ -244,15 +247,18 @@ struct GraphicsQmlView::Private
     void updateSizes();
     void tryInitializeFbo();
     void scheduleUpdateSizes();
+    void paintQml(QPainter* painter, const QRectF& channelRect, QOpenGLWidget* glWidget);
 };
 
 GraphicsQmlView::GraphicsQmlView(QGraphicsItem* parent, Qt::WindowFlags wFlags):
     QGraphicsWidget(parent, wFlags), d(new Private(this))
 {
     d->renderControl.reset(new RenderControl(this));
+
     connect(d->renderControl.data(), &QQuickRenderControl::renderRequested, this,
         [this]()
         {
+            d->renderRequested = true;
             this->update();
         }
     );
@@ -260,6 +266,7 @@ GraphicsQmlView::GraphicsQmlView(QGraphicsItem* parent, Qt::WindowFlags wFlags):
     connect(d->renderControl.data(), &QQuickRenderControl::sceneChanged, this,
         [this]()
         {
+            d->sceneChanged = true;
             this->update();
         }
     );
@@ -590,6 +597,44 @@ bool GraphicsQmlView::focusNextPrevChild(bool next)
     return event.isAccepted();
 }
 
+void GraphicsQmlView::Private::paintQml(
+    QPainter* painter,
+    const QRectF& channelRect,
+    QOpenGLWidget* glWidget)
+{
+    if (!sceneChanged && !renderRequested)
+        return;
+
+    QnGlNativePainting::begin(glWidget, painter);
+
+    ensureOffscreen(channelRect, glWidget);
+
+    if (openglContext->makeCurrent(offscreenSurface.data()))
+    {
+        tryInitializeFbo();
+
+        if (fbo)
+        {
+            if (sceneChanged)
+            {
+                renderControl->polishItems();
+                renderRequested = renderControl->sync() || renderRequested;
+                sceneChanged = false;
+            }
+
+            if (renderRequested)
+            {
+                renderControl->render();
+                quickWindow->resetOpenGLState();
+                openglContext->functions()->glFlush();
+                renderRequested = false;
+            }
+        }
+    }
+
+    QnGlNativePainting::end(painter);
+}
+
 void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
     if (!d->rootItem)
@@ -599,26 +644,7 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
 
     auto channelRect = rect();
 
-    QnGlNativePainting::begin(glWidget, painter);
-
-    d->ensureOffscreen(channelRect, glWidget);
-
-    if (d->openglContext->makeCurrent(d->offscreenSurface.data()))
-    {
-        d->tryInitializeFbo();
-
-        if (d->fbo)
-        {
-            d->renderControl->polishItems();
-            d->renderControl->sync();
-
-            d->renderControl->render();
-            d->quickWindow->resetOpenGLState();
-            d->openglContext->functions()->glFlush();
-        }
-    }
-
-    QnGlNativePainting::end(painter);
+    d->paintQml(painter, channelRect, glWidget);
 
     if (!d->fbo)
         return;
