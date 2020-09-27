@@ -1,6 +1,9 @@
 function _createItemsRecursively(parent, visualParent, model, depth)
 {
     var type = model.type
+    if (!type)
+        return null
+
     if (type === "GroupBox" && depth === 1)
         type = "Panel"
 
