@@ -424,7 +424,7 @@ int PPSUnit::deserializeID(quint8* buffer, quint8* end)
     try {
         pic_parameter_set_id = extractUEGolombCode();
     }
-    catch(BitStreamException&) {
+    catch (BitStreamException&) {
         return NOT_ENOUGHT_BUFFER;
     }
 }
@@ -1221,7 +1221,7 @@ int SliceUnit::deserializeSliceHeader(const SPSUnit* sps, const PPSUnit* pps)
 
 #endif
         return 0;
-    } catch(BitStreamException&) {
+    } catch (BitStreamException&) {
         return NOT_ENOUGHT_BUFFER;
     }
 }

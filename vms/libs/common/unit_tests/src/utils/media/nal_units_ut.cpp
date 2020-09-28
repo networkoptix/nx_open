@@ -120,7 +120,7 @@ TEST(NalUnits, find4BytesStartcodes)
 
 TEST(NalUnits, convertStartCodesToSizes)
 {
-    // Simple
+    // Simple.
     {
         uint8_t data[] = {
             0x00, 0x00, 0x00, 0x01, 0x1c, 0xe8};
@@ -153,7 +153,36 @@ TEST(NalUnits, convertStartCodesToSizes)
         ASSERT_EQ(converted[8], 0x00);
         ASSERT_EQ(converted[9], 0x05);
     }
-    // Trailing zeros
+    // Padding.
+    {
+        uint8_t data[] = {
+            0x00, 0x00, 0x00, 0x01, 0x1c, 0xe8,
+            0x00, 0x00, 0x00, 0x01, 0xe5, 0xaf, 0xfc, 0x69, 0xb1};
+
+        auto converted = nx::media::nal::convertStartCodesToSizes(data, sizeof(data), 32);
+        ASSERT_EQ(converted.size(), sizeof(data) + 32);
+        ASSERT_EQ(converted[0], 0x00);
+        ASSERT_EQ(converted[1], 0x00);
+        ASSERT_EQ(converted[2], 0x00);
+        ASSERT_EQ(converted[3], 0x02);
+        ASSERT_EQ(converted[4], 0x1c);
+        ASSERT_EQ(converted[5], 0xe8);
+
+        ASSERT_EQ(converted[6], 0x00);
+        ASSERT_EQ(converted[7], 0x00);
+        ASSERT_EQ(converted[8], 0x00);
+        ASSERT_EQ(converted[9], 0x05);
+
+        // Padding.
+        ASSERT_EQ(converted[15], 0x00);
+        ASSERT_EQ(converted[16], 0x00);
+        ASSERT_EQ(converted[17], 0x00);
+        ASSERT_EQ(converted[18], 0x00);
+        ASSERT_EQ(converted[19], 0x00);
+
+        ASSERT_EQ(converted[46], 0x00);
+    }
+    // Trailing zeros.
     {
         uint8_t data[] = {
             0x00, 0x00, 0x00, 0x01, 0x1c, 0xe8, 0x00,

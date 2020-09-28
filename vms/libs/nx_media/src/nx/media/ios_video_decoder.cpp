@@ -402,14 +402,15 @@ int IOSVideoDecoder::decode(
         if (compressedVideoData->compressionType == AV_CODEC_ID_H264 &&
             d->needConvertStartCodeToSizes)
         {
-            covnertedData = nx::media::nal::convertStartCodesToSizes(avpkt.data, avpkt.size);
+            covnertedData = nx::media::nal::convertStartCodesToSizes(
+                avpkt.data, avpkt.size, AV_INPUT_BUFFER_PADDING_SIZE);
             if (covnertedData.empty())
             {
                 NX_WARNING(this, "Failed to convert from AnnexB to file format");
                 return false;
             }
             avpkt.data = covnertedData.data();
-            avpkt.size = covnertedData.size();
+            avpkt.size = covnertedData.size() - AV_INPUT_BUFFER_PADDING_SIZE;
         }
     }
     else
