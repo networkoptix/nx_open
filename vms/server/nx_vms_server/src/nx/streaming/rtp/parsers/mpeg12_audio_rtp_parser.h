@@ -3,6 +3,7 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <nx/streaming/rtp/parsers/rtp_stream_parser.h>
+#include <nx/streaming/rtp/parsers/mpeg12_audio_header_parser.h>
 
 namespace nx::streaming::rtp {
 
@@ -22,7 +23,7 @@ public:
 
 private:
     void createAudioFrame();
-    Result updateFromMpegAudioHeader(const uint8_t* mpegAudioHeaderStart, int payloadSize);
+    Result updateFromMpegAudioHeader(const Mpeg12AudioHeader& mpegAudioHeader);
     void cleanUp();
 
 private:
@@ -30,7 +31,7 @@ private:
     QSharedPointer<QnRtspAudioLayout> m_audioLayout;
     quint32 m_rtpTimestamp = 0;
     int m_audioFrameSize = 0;
-    bool m_skipFragmentsUntilNextAudioFrame = false;
+    bool m_skipFragmentsUntilNextAudioFrame = true;
 
     std::vector<DataChunk> m_audioDataChunks;
 };

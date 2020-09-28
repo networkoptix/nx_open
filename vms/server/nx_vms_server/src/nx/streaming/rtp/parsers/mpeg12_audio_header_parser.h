@@ -35,6 +35,7 @@ struct Mpeg12AudioHeader
     MpegLayer layer = MpegLayer::undefined;
     int bitrateKbps = 0;
     int samplingRate = 0;
+    bool isPadded = false;
     MpegChannelMode channelMode = MpegChannelMode::undefined;
 };
 

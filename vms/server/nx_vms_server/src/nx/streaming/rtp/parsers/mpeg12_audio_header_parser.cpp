@@ -31,25 +31,25 @@ static const BitrateTable kBitrateTable = {{
     MpegAudioVersion::mpeg1, {{
         MpegLayer::layer1, {
             {1, 32}, {2, 64}, {3, 96}, {4, 128}, {5, 160}, {6, 192}, {7, 224}, {8, 256}, {9, 288},
-            {10, 320}, {11, 352}, {12, 384}, {12, 416}, {13, 448}}
+            {10, 320}, {11, 352}, {12, 384}, {13, 416}, {14, 448}}
         }, {
         MpegLayer::layer2, {
             {1, 32}, {2, 48}, {3, 56}, {4, 64}, {5, 80}, {6, 96}, {7, 112}, {8, 128}, {9, 160},
-            {10, 192}, {11, 224}, {12, 256}, {12, 320}, {13, 384}}
+            {10, 192}, {11, 224}, {12, 256}, {13, 320}, {14, 384}}
         }, {
         MpegLayer::layer3, {
             {1, 32}, {2, 40}, {3, 48}, {4, 56}, {5, 64}, {6, 80}, {7, 96}, {8, 112}, {9, 128},
-            {10, 160}, {11, 192}, {12, 224}, {12, 256}, {13, 320}}
+            {10, 160}, {11, 192}, {12, 224}, {13, 256}, {14, 320}}
         }}
     }, {
     MpegAudioVersion::mpeg2, {{
         MpegLayer::layer1, {
             {1, 32}, {2, 48}, {3, 56}, {4, 64}, {5, 80}, {6, 96}, {7, 112}, {8, 128}, {9, 144},
-            {10, 160}, {11, 176}, {12, 192}, {12, 224}, {13, 256}}
+            {10, 160}, {11, 176}, {12, 192}, {13, 224}, {14, 256}}
         }, {
         MpegLayer::layer2, {
             {1, 8}, {2, 16}, {3, 24}, {4, 32}, {5, 40}, {6, 48}, {7, 56}, {8, 64}, {9, 80},
-            {10, 96}, {11, 112}, {12, 128}, {12, 144}, {13, 160}}}
+            {10, 96}, {11, 112}, {12, 128}, {13, 144}, {14, 160}}}
         }
     }
 };
@@ -218,8 +218,9 @@ std::optional<Mpeg12AudioHeader> Mpeg12AudioHeaderParser::parse(
         }
 
         result.samplingRate = *samplingRate;
+        result.isPadded = reader.getBits(kPaddingBit);
 
-        reader.skipBits(kPaddingBit + kPrivateBit);
+        reader.skipBits(kPrivateBit);
 
         const uint32_t channelModeEncoded = reader.getBits(kChannelModeBits);
         result.channelMode = toMpegChannelMode(channelModeEncoded);

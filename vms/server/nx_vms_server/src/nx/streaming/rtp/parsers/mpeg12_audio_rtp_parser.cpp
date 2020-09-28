@@ -1,15 +1,17 @@
 #include "mpeg12_audio_rtp_parser.h"
 
 #include <nx/streaming/rtp/rtp.h>
-#include <nx/streaming/rtp/parsers/mpeg12_audio_header_parser.h>
 #include <nx/streaming/audio_data_packet.h>
 #include <nx/streaming/av_codec_media_context.h>
 
 namespace nx::streaming::rtp {
 
-static const int kAudioHeaderSize = 4;
-static const int kAudioHeaderMbzFieldSize = 2;
-static const int kAudioHeaderFragmentOffsetFieldSize = 2;
+static constexpr int kAudioHeaderSize = 4;
+static constexpr int kAudioHeaderMbzFieldSize = 2;
+static constexpr int kAudioHeaderFragmentOffsetFieldSize = 2;
+
+static constexpr int kLayer1PaddingBytes = 4;
+static constexpr int kLayer23PaddingBytes = 1;
 
 AVCodecID codecIdFromMpegLayer(MpegLayer mpegLayer)
 {
@@ -75,14 +77,35 @@ StreamParser::Result Mpeg12AudioParser::processData(
     }
 
     currentPtr += RtpHeader::kSize + kAudioHeaderMbzFieldSize;
-    const int fragmentOffset = *(uint16_t*)(currentPtr);
+    const int fragmentOffset = ntohs(*(uint16_t*)(currentPtr));
     currentPtr += kAudioHeaderFragmentOffsetFieldSize;
-    const int payloadSize = bytesRead - RtpHeader::kSize - kAudioHeaderSize;
+
+    const int rtpPaddingSize = rtpHeader->padding
+        ? *(rtpBufferBase + bufferOffset + bytesRead  - 1)
+        : 0;
+
+    int payloadSize = bytesRead - RtpHeader::kSize - kAudioHeaderSize - rtpPaddingSize;
 
     if (fragmentOffset == 0)
     {
+        const std::optional<const Mpeg12AudioHeader> mpegAudioHeader =
+            Mpeg12AudioHeaderParser::parse(currentPtr, payloadSize);
+
+        if (!mpegAudioHeader)
+            return {false, "Unable to parse MPEG audio header"};
+
+        if (mpegAudioHeader->isPadded)
+        {
+            payloadSize -= (mpegAudioHeader->layer == MpegLayer::layer1)
+                ? kLayer1PaddingBytes
+                : kLayer23PaddingBytes;
+
+            // Disabling padding bit just in case to not confuse decoders that handle it.
+            *const_cast<uint8_t*>(currentPtr + 2) &= ~(1 << 1);
+        }
+
         m_skipFragmentsUntilNextAudioFrame = false;
-        const StreamParser::Result result = updateFromMpegAudioHeader(currentPtr, payloadSize);
+        const StreamParser::Result result = updateFromMpegAudioHeader(*mpegAudioHeader);
         if (!result.success)
         {
             m_skipFragmentsUntilNextAudioFrame = true;
@@ -91,21 +114,15 @@ StreamParser::Result Mpeg12AudioParser::processData(
     }
 
     if (fragmentOffset == 0 || !m_skipFragmentsUntilNextAudioFrame)
-        m_audioDataChunks.push_back({ currentPtr, payloadSize });
+        m_audioDataChunks.push_back({currentPtr, payloadSize});
 
     return {true};
 }
 
 StreamParser::Result Mpeg12AudioParser::updateFromMpegAudioHeader(
-    const uint8_t* mpegAudioHeaderStart, int payloadSize)
+    const Mpeg12AudioHeader& mpegAudioHeader)
 {
-    const std::optional<Mpeg12AudioHeader> mpegAudioHeader =
-        Mpeg12AudioHeaderParser::parse(mpegAudioHeaderStart, payloadSize);
-
-    if (!mpegAudioHeader)
-        return {false, "Unable to parse MPEG audio header"};
-
-    const AVCodecID codecId = codecIdFromMpegLayer(mpegAudioHeader->layer);
+    const AVCodecID codecId = codecIdFromMpegLayer(mpegAudioHeader.layer);
     if (!NX_ASSERT(codecId != AV_CODEC_ID_NONE))
         return {false, "Unable to determine codec"};
 
@@ -113,8 +130,8 @@ StreamParser::Result Mpeg12AudioParser::updateFromMpegAudioHeader(
     m_mediaContext = QnConstMediaContextPtr(context);
 
     AVCodecContext* const avCodecContext = context->getAvCodecContext();
-    avCodecContext->channels = channelNumberFromChannelMode(mpegAudioHeader->channelMode);
-    avCodecContext->sample_rate = mpegAudioHeader->samplingRate;
+    avCodecContext->channels = channelNumberFromChannelMode(mpegAudioHeader.channelMode);
+    avCodecContext->sample_rate = mpegAudioHeader.samplingRate;
 
     QnResourceAudioLayout::AudioTrack track;
     track.codecContext = m_mediaContext;
