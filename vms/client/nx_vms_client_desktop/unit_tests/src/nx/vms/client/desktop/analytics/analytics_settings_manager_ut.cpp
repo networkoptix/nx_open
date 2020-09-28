@@ -102,9 +102,30 @@ protected:
         m_notifier.reset(new ListenerNotifier(listener()));
     }
 
+    DeviceAgentSettingsResponse givenDataOlderThan(const DeviceAgentSettingsResponse& other) const
+    {
+        DeviceAgentSettingsResponse data(other);
+        data.session.sequenceNumber = other.session.sequenceNumber - 1;
+        data.settingsModelId = QnUuid::createUuid(); //< Make sure this will cause model change.
+        return data;
+    }
+
+    DeviceAgentSettingsResponse givenDataNewerThan(const DeviceAgentSettingsResponse& other) const
+    {
+        DeviceAgentSettingsResponse data(other);
+        data.session.sequenceNumber = other.session.sequenceNumber + 1;
+        data.settingsModelId = QnUuid::createUuid(); //< Make sure this will cause model change.
+        return data;
+    }
+
     void whenDataReceived(const DeviceAgentSettingsResponse& data)
     {
         m_serverInterfaceMock->sendReply(deviceAgentId(), data);
+    }
+
+    void whenReceivedTransactionUpdate(const DeviceAgentSettingsResponse& data)
+    {
+        m_manager->storeSettings(deviceAgentId(), data);
     }
 
     bool requestWasSent() const
@@ -172,6 +193,53 @@ TEST_F(AnalyticsSettingsManagerTest, immediateUpdateOnApplyChanges)
     EXPECT_EQ(notifier()->counter, 2); //< Update immediately on changed values.
     ASSERT_EQ(QJson::serialized(listener()->data().values),
         QJson::serialized(actualValues));
+}
+
+// Explicit refresh must be handled
+TEST_F(AnalyticsSettingsManagerTest, explicitRefreshCall)
+{
+    givenDeviceAgent();
+    whenDataReceived(kData1Reply);
+    EXPECT_EQ(notifier()->counter, 1); //< First update here.
+
+    manager()->refreshSettings(deviceAgentId());
+    EXPECT_EQ(notifier()->counter, 2); //< "Loading" status set.
+    whenDataReceived(kData1Reply);
+    EXPECT_EQ(notifier()->counter, 3); //< "Loading" status cleared.
+}
+
+// Refresh race: request before newer data was received.
+TEST_F(AnalyticsSettingsManagerTest, refreshCallRace)
+{
+    givenDeviceAgent();
+    whenDataReceived(kData1Reply);
+    EXPECT_EQ(notifier()->counter, 1); //< First update here.
+
+    manager()->refreshSettings(deviceAgentId());
+    EXPECT_EQ(notifier()->counter, 2); //< "Loading" status set.
+
+    const auto newerData = givenDataNewerThan(kData1Reply);
+    whenReceivedTransactionUpdate(newerData);
+
+    EXPECT_EQ(notifier()->counter, 3); //< "Loading" status cleared, newer data handled.
+
+    whenDataReceived(kData1Reply);
+    EXPECT_EQ(notifier()->counter, 3); //< Outdated response on our requested data was skipped.
+}
+
+TEST_F(AnalyticsSettingsManagerTest, checkSequenceNumber)
+{
+    givenDeviceAgent();
+    whenDataReceived(kData1Reply);
+    EXPECT_EQ(notifier()->counter, 1); //< First update here.
+
+    const auto olderData = givenDataOlderThan(kData1Reply);
+    whenReceivedTransactionUpdate(olderData);
+    EXPECT_EQ(notifier()->counter, 1); //< No update was emitted.
+
+    const auto newerData = givenDataNewerThan(kData1Reply);
+    whenReceivedTransactionUpdate(newerData);
+    EXPECT_EQ(notifier()->counter, 2); //< Newer model was processed.
 }
 
 } // namespace test
