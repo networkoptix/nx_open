@@ -15,7 +15,7 @@ namespace analytics {
 class ObjectTrackBestShotPacket: public RefCountable<IObjectTrackBestShotPacket>
 {
 public:
-    ObjectTrackBestShotPacket(Uuid trackId, int64_t timestampUs, Rect boundingBox = Rect());
+    ObjectTrackBestShotPacket(Uuid trackId = Uuid(), int64_t timestampUs = -1, Rect boundingBox = Rect());
 
     virtual int64_t timestampUs() const override;
 
@@ -24,6 +24,9 @@ public:
     virtual int imageDataSize() const override;
     virtual const char* imageDataFormat() const override;
 
+    void setTrackId(const Uuid& trackId);
+    void setTimestampUs(int64_t timestampUs);
+    void setBoundingBox(const Rect& boundingBox);
     void setImageUrl(std::string imageUrl);
     void setImageData(std::vector<char> imageData);
     void setImageDataFormat(std::string imageDataFormat);

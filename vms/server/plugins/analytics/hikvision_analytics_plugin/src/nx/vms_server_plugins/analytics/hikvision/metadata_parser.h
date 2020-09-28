@@ -12,6 +12,7 @@
 #include <nx/sdk/analytics/rect.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
+#include <nx/sdk/analytics/helpers/object_track_best_shot_packet.h>
 
 #include <QtCore/QString>
 #include <QtCore/QByteArray>
@@ -23,7 +24,14 @@ namespace nx::vms_server_plugins::analytics::hikvision {
 class MetadataParser
 {
 public:
-    nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadataPacket> parsePacket(QByteArray bytes);
+    struct Result
+    {
+        nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadataPacket> metadataPacket;
+        std::vector<nx::sdk::Ptr<nx::sdk::analytics::ObjectTrackBestShotPacket>> bestShotPackets;
+    };
+
+public:
+    Result parsePacket(QByteArray bytes);
 
 private:
     struct MinMaxRect
@@ -34,16 +42,29 @@ private:
 
     struct CacheEntry
     {
-        CacheEntry()
-        {
-            lifetime.restart();
-        }
-
+        bool bestShotGenerated = false;
         std::optional<nx::sdk::analytics::Rect> boundingBox;
         std::vector<nx::sdk::Ptr<nx::sdk::Attribute>> attributes;
         nx::sdk::Uuid trackId;
         nx::utils::ElapsedTimer lastUpdate;
         nx::utils::ElapsedTimer lifetime;
+
+        CacheEntry()
+        {
+            lifetime.restart();
+        }
+    };
+
+    struct TargetResult
+    {
+        nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadata> metadata;
+        nx::sdk::Ptr<nx::sdk::analytics::ObjectTrackBestShotPacket> bestShotPacket;
+    };
+
+    struct TargetListResult
+    {
+        std::vector<nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadata>> metadatas;
+        std::vector<nx::sdk::Ptr<nx::sdk::analytics::ObjectTrackBestShotPacket>> bestShotPackets;
     };
 
 private:
@@ -57,10 +78,10 @@ private:
     std::optional<nx::sdk::analytics::Rect> parseRegionListElement();
     nx::sdk::Ptr<nx::sdk::Attribute> parsePropertyElement();
     std::vector<nx::sdk::Ptr<nx::sdk::Attribute>> parsePropertyListElement();
-    nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadata> parseTargetElement();
-    std::vector<nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadata>> parseTargetListElement();
-    std::vector<nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadata>> parseTargetDetectionElement();
-    nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadataPacket> parseMetadataElement();
+    TargetResult parseTargetElement();
+    TargetListResult parseTargetListElement();
+    TargetListResult parseTargetDetectionElement();
+    Result parseMetadataElement();
 
     void evictStaleCacheEntries();
 

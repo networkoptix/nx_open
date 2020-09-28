@@ -73,7 +73,13 @@ void DeviceAgent::doPushDataPacket(Result<void>* /*outResult*/, IDataPacket* dat
     const auto metadataPacket = dataPacket->queryInterface<ICustomMetadataPacket>();
     QByteArray metadataBytes(metadataPacket->data(), metadataPacket->dataSize());
 
-    if (const auto packet = m_metadataParser.parsePacket(metadataBytes))
+    const auto result = m_metadataParser.parsePacket(metadataBytes);
+    if (const auto& packet = result.metadataPacket)
+    {
+        packet->setTimestampUs(dataPacket->timestampUs());
+        m_handler->handleMetadata(packet.get());
+    }
+    for (const auto& packet: result.bestShotPackets)
     {
         packet->setTimestampUs(dataPacket->timestampUs());
         m_handler->handleMetadata(packet.get());

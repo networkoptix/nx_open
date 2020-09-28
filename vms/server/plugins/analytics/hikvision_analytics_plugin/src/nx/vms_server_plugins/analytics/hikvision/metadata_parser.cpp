@@ -1,6 +1,7 @@
 #include "metadata_parser.h"
 
 #include <utility>
+#include <string_view>
 
 #include <nx/utils/log/log_main.h>
 #include <nx/sdk/helpers/uuid_helper.h>
@@ -19,7 +20,7 @@ constexpr auto kCacheEntryMaximumLifetime = 30s;
 
 } // namespace
 
-Ptr<ObjectMetadataPacket> MetadataParser::parsePacket(QByteArray bytes)
+MetadataParser::Result MetadataParser::parsePacket(QByteArray bytes)
 {
     evictStaleCacheEntries();
 
@@ -32,13 +33,13 @@ Ptr<ObjectMetadataPacket> MetadataParser::parsePacket(QByteArray bytes)
     m_xml.clear();
     m_xml.addData(bytes);
 
-    Ptr<ObjectMetadataPacket> packet;
+    Result result;
 
     if (m_xml.readNextStartElement())
     {
         if (m_xml.name() == "Metadata")
         {
-            packet = parseMetadataElement();
+            result = parseMetadataElement();
         }
         else
         {
@@ -52,7 +53,7 @@ Ptr<ObjectMetadataPacket> MetadataParser::parsePacket(QByteArray bytes)
             m_xml.lineNumber(), m_xml.columnNumber(), m_xml.errorString(), bytes);
     }
 
-    return packet;
+    return result;
 }
 
 std::optional<QString> MetadataParser::parseStringElement()
@@ -272,7 +273,7 @@ std::vector<Ptr<Attribute>> MetadataParser::parsePropertyListElement()
     return attributes;
 }
 
-Ptr<ObjectMetadata> MetadataParser::parseTargetElement()
+MetadataParser::TargetResult MetadataParser::parseTargetElement()
 {
     std::optional<int> trackId;
     std::optional<std::string> typeId;
@@ -298,7 +299,7 @@ Ptr<ObjectMetadata> MetadataParser::parseTargetElement()
         {
             typeId = parseRecognitionElement();
             if (!typeId)
-                return nullptr;
+                return {};
         }
         else if (m_xml.name() == "RegionList")
         {
@@ -314,13 +315,14 @@ Ptr<ObjectMetadata> MetadataParser::parseTargetElement()
         }
     }
     if (m_xml.hasError())
-        return nullptr;
+        return {};
 
     if (!trackId)
     {
         NX_DEBUG(NX_SCOPE_TAG, "No 'targetID' or 'ruleID' element in 'Target' element");
-        return nullptr;
+        return {};
     }
+
 
     if (!typeId)
     {
@@ -329,6 +331,17 @@ Ptr<ObjectMetadata> MetadataParser::parseTargetElement()
             typeId = "nx.hikvision.event"; 
         else
             return nullptr;
+    }
+
+    bool shouldGenerateBestShot = false;
+    for (auto it = attributes.begin(); it != attributes.end(); ++it)
+    {
+        if ((*it)->name() == "triggerEvent"sv && (*it)->value() == "true"sv)
+        {
+            attributes.erase(it);
+            shouldGenerateBestShot = true;
+            break;
+        }
     }
 
     auto& entry = m_cache[*trackId];
@@ -346,7 +359,7 @@ Ptr<ObjectMetadata> MetadataParser::parseTargetElement()
     if (!entry.boundingBox)
     {
         NX_DEBUG(NX_SCOPE_TAG, "No 'RegionList' element in 'Target' element");
-        return nullptr;
+        return {};
     }
 
     auto metadata = makePtr<ObjectMetadata>();
@@ -355,12 +368,24 @@ Ptr<ObjectMetadata> MetadataParser::parseTargetElement()
     metadata->setBoundingBox(*entry.boundingBox);
     metadata->addAttributes(entry.attributes);
 
-    return metadata;
+    Ptr<ObjectTrackBestShotPacket> bestShotPacket;
+    if (shouldGenerateBestShot && !entry.bestShotGenerated)
+    {
+        bestShotPacket = makePtr<ObjectTrackBestShotPacket>();
+
+        bestShotPacket->setTrackId(entry.trackId);
+        bestShotPacket->setBoundingBox(*entry.boundingBox);
+
+        entry.bestShotGenerated = true;
+    }
+
+    return {std::move(metadata), std::move(bestShotPacket)};
 }
 
-std::vector<Ptr<ObjectMetadata>> MetadataParser::parseTargetListElement()
+MetadataParser::TargetListResult MetadataParser::parseTargetListElement()
 {
     std::vector<Ptr<ObjectMetadata>> metadatas;
+    std::vector<Ptr<ObjectTrackBestShotPacket>> bestShotPackets;
 
     bool seenTarget = false;
 
@@ -369,8 +394,12 @@ std::vector<Ptr<ObjectMetadata>> MetadataParser::parseTargetListElement()
         if (m_xml.name() == "Target")
         {
             seenTarget = true;
-            if (auto metadata = parseTargetElement())
-                metadatas.push_back(std::move(metadata));
+
+            auto result = parseTargetElement();
+            if (result.metadata)
+                metadatas.push_back(std::move(result.metadata));
+            if (result.bestShotPacket)
+                bestShotPackets.push_back(std::move(result.bestShotPacket));
         }
         else
         {
@@ -378,17 +407,17 @@ std::vector<Ptr<ObjectMetadata>> MetadataParser::parseTargetListElement()
         }
     }
     if (m_xml.hasError())
-        return metadatas;
+        return {};
 
     if (!seenTarget)
         NX_DEBUG(NX_SCOPE_TAG, "No 'Target' elements in 'TargetList' element");
 
-    return metadatas;
+    return {std::move(metadatas), std::move(bestShotPackets)};
 }
 
-std::vector<Ptr<ObjectMetadata>> MetadataParser::parseTargetDetectionElement()
+MetadataParser::TargetListResult MetadataParser::parseTargetDetectionElement()
 {
-    std::vector<Ptr<ObjectMetadata>> metadatas;
+    TargetListResult result;
 
     bool seenTargetList = false;
 
@@ -397,7 +426,7 @@ std::vector<Ptr<ObjectMetadata>> MetadataParser::parseTargetDetectionElement()
         if (m_xml.name() == "TargetList")
         {
             seenTargetList = true;
-            metadatas = parseTargetListElement();
+            result = parseTargetListElement();
         }
         else
         {
@@ -405,21 +434,21 @@ std::vector<Ptr<ObjectMetadata>> MetadataParser::parseTargetDetectionElement()
         }
     }
     if (m_xml.hasError())
-        return metadatas;
+        return {};
 
     if (!seenTargetList)
         NX_DEBUG(NX_SCOPE_TAG, "No 'TargetList' element in 'TargetDetection' element");
 
-    return metadatas;
+    return result;
 }
 
-Ptr<ObjectMetadataPacket> MetadataParser::parseMetadataElement()
+MetadataParser::Result MetadataParser::parseMetadataElement()
 {
     bool seenType = false;
     bool seenTargetDetection = false;
 
     std::optional<QString> type;
-    std::vector<Ptr<ObjectMetadata>> metadatas;
+    TargetListResult result;
 
     while (m_xml.readNextStartElement())
     {
@@ -431,7 +460,7 @@ Ptr<ObjectMetadataPacket> MetadataParser::parseMetadataElement()
         else if (m_xml.name() == "TargetDetection")
         {
             seenTargetDetection = true;
-            metadatas = parseTargetDetectionElement();
+            result = parseTargetDetectionElement();
         }
         else
         {
@@ -439,28 +468,33 @@ Ptr<ObjectMetadataPacket> MetadataParser::parseMetadataElement()
         }
     }
     if (m_xml.hasError())
-        return nullptr;
+        return {};
 
     if (!seenType)
         NX_DEBUG(NX_SCOPE_TAG, "No 'type' element in 'Metadata' element");
     if (!seenTargetDetection)
         NX_DEBUG(NX_SCOPE_TAG, "No 'TargetDetection' element in 'Metadata' element");
 
-    if (!type || metadatas.empty())
-        return nullptr;
+    if (!type)
+        return {};
 
     if (*type != "activityTarget")
-        return nullptr;
+        return {};
 
-    auto packet = makePtr<ObjectMetadataPacket>();
+    Ptr<ObjectMetadataPacket> metadataPacket;
+    if (!result.metadatas.empty())
+    {
+        metadataPacket = makePtr<ObjectMetadataPacket>();
 
-    packet->setDurationUs(
-        std::chrono::duration_cast<std::chrono::microseconds>(kCacheEntryInactivityLifetime).count());
+        metadataPacket->setDurationUs(
+            std::chrono::duration_cast<std::chrono::microseconds>(
+                kCacheEntryInactivityLifetime).count());
 
-    for (auto metadata: metadatas)
-        packet->addItem(metadata.get());
+        for (auto metadata: result.metadatas)
+            metadataPacket->addItem(metadata.get());
+    }
 
-    return packet;
+    return {std::move(metadataPacket), std::move(result.bestShotPackets)};
 }
 
 void MetadataParser::evictStaleCacheEntries()

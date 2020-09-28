@@ -56,6 +56,21 @@ const char* ObjectTrackBestShotPacket::imageDataFormat() const
     return m_imageDataFormat.c_str();
 }
 
+void ObjectTrackBestShotPacket::setTrackId(const Uuid& trackId)
+{
+    m_trackId = trackId;
+}
+
+void ObjectTrackBestShotPacket::setTimestampUs(int64_t timestampUs)
+{
+    m_timestampUs = timestampUs;
+}
+
+void ObjectTrackBestShotPacket::setBoundingBox(const Rect& boundingBox)
+{
+    m_boundingBox = boundingBox;
+}
+
 void ObjectTrackBestShotPacket::setImageUrl(std::string imageUrl)
 {
     m_imageUrl = std::move(imageUrl);
