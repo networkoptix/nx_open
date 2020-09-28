@@ -19,6 +19,7 @@ QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, RecordingState)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StatusChangeReason)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, StorageStatuses)
 QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, LicenseType)
+QN_DEFINE_METAOBJECT_ENUM_LEXICAL_FUNCTIONS(Qn, ConnectionRole)
 
 // ATTENTION: Assigning backwards-compatible misspelled values with `Auxilary` in them. Such values
 // should go before the correct ones, so both versions are supported on input, and only deprecated
@@ -234,6 +235,11 @@ Qn::ConnectionRole fromStreamIndex(nx::vms::api::StreamIndex streamIndex)
         default:
             return ConnectionRole::CR_Default;
     }
+}
+
+QString toString(ConnectionRole value)
+{
+    return QnLexical::serialized(value);
 }
 
 } // namespace Qn

@@ -182,6 +182,7 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
         CR_Archive
     };
     QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(Qn::ConnectionRole)
+    QString toString(ConnectionRole value);
 
     nx::vms::api::StreamIndex toStreamIndex(ConnectionRole role);
 

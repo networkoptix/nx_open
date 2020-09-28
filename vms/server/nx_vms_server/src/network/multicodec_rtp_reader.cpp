@@ -165,13 +165,10 @@ bool QnMulticodecRtpReader::gotKeyData(const QnAbstractMediaDataPtr& mediaData)
 
 QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
 {
-    NX_VERBOSE(this, "Getting next data %1 (%2), role=%3", m_resource->getName(), m_resource->getId(), m_role);
-
+    NX_VERBOSE(this, "%1: Getting next data", m_logName);
     if (!isStreamOpened())
     {
-        NX_VERBOSE(this, "Getting next data, stream is not opened, exiting, device: %1 (%2)",
-            m_resource->getName(), m_resource->getId());
-
+        NX_VERBOSE(this, "%1: Getting next data, stream is not opened, exiting", m_logName);
         return QnAbstractMediaDataPtr(0);
     }
 
@@ -183,10 +180,10 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
 
     if (playbackRange.isValid())
     {
-        NX_VERBOSE(this, "Getting next data, seeking to position %1-%2 us, device %3 (%4)",
+        NX_VERBOSE(this, "%1: Getting next data, seeking to position %2-%3 us",
+            m_logName,
             playbackRange.startTimeUsec,
-            playbackRange.endTimeUsec,
-            m_resource->getName(), m_resource->getId());
+            playbackRange.endTimeUsec);
 
         m_RtpSession.sendPlay(
             playbackRange.startTimeUsec,
@@ -209,9 +206,7 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
 
     if (result)
     {
-        NX_VERBOSE(this, "Got some stream data, device %1 (%2) dataType(%3), role=%4",
-            m_resource->getName(), m_resource->getId(), result->dataType,
-            m_role);
+        NX_VERBOSE(this, "%1: Got some stream data, dataType: %2", m_logName, result->dataType);
 
         m_gotSomeFrame = true;
         return result;
@@ -219,15 +214,13 @@ QnAbstractMediaDataPtr QnMulticodecRtpReader::getNextData()
 
     if (m_pleaseStop)
     {
-        NX_VERBOSE(this, "Device %1 (%2). RTSP terminated because of pleaseStop call",
-            m_resource->getName(), m_resource->getId());
+        NX_VERBOSE(this, "%1: RTSP terminated because of pleaseStop call", m_logName);
         return result;
     }
 
     if (!m_gotSomeFrame)
     {
-        NX_VERBOSE(this, "No frame has arrived since the stream was opened, device %1 (%2), role=%3",
-            m_resource->getName(), m_resource->getId(), m_role);
+        NX_VERBOSE(this, "%1: No frame has arrived since the stream was opened", m_logName);
         return result; // if no frame received yet do not report network issue error
     }
 
@@ -686,6 +679,8 @@ void QnMulticodecRtpReader::setCustomTrackParserFactory(
 
 CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
 {
+    m_logName = toString(m_resource) + "(Role: " + toString(m_role) + ")";
+
     m_pleaseStop = false;
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
@@ -907,7 +902,6 @@ void QnMulticodecRtpReader::setDefaultTransport(nx::vms::api::RtpTransportType r
 void QnMulticodecRtpReader::setRole(Qn::ConnectionRole role)
 {
     m_role = role;
-    m_logName += "(Role: " + toString(role) + ")";
 
     // Force camera time for NVR archives
     if (role == Qn::ConnectionRole::CR_Archive)
