@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <vector>
 
 #include <QtCore/QObject>
@@ -8,6 +9,7 @@
 #include <QtNetwork/QAuthenticator>
 
 #include <nx/utils/thread/mutex.h>
+#include <nx/utils/url.h>
 #include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/i_device_agent.h>
@@ -56,8 +58,7 @@ protected:
         const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
         
 private:
-    nx::sdk::Result<void> startFetchingMetadata(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes);
+    nx::sdk::Result<void> startFetchingMetadata();
     void stopFetchingMetadata();
 
 private:
@@ -65,10 +66,13 @@ private:
     EngineManifest m_parsedManifest;
     QByteArray m_jsonManifest;
     QUrl m_url;
+    std::uint16_t m_localMetadataPort = 0;
+    nx::utils::Url m_externalMetadataUrl;
     QAuthenticator m_auth;
     Monitor* m_monitor = nullptr;
 
     nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
+    nx::sdk::Ptr<nx::sdk::analytics::IMetadataTypes> m_neededMetadataTypes;
 };
 
 } // nx::vms_server_plugins::analytics::axis

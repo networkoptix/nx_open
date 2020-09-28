@@ -3,6 +3,7 @@
 #include <optional>
 
 #include <QtCore/QString>
+#include <QtCore/QJsonObject>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/vms_server_plugins/utils/analytics/engine_manifest_base.h>
@@ -36,9 +37,10 @@ struct EngineManifest: nx::vms_server_plugins::utils::analytics::EngineManifestB
     QStringList allowedTopics; //< Prorietary. Topic filter.
     QStringList forbiddenDescriptions; //< Proprietary. Black list.
     QList<EventType> eventTypes; //< Extends the inherited field. White list.
+    QJsonObject deviceAgentSettingsModel;
 };
 #define AxisEngineManifest_Fields EngineManifestBase_Fields \
-    (allowedTopics)(forbiddenDescriptions)(eventTypes)
+    (allowedTopics)(forbiddenDescriptions)(eventTypes)(deviceAgentSettingsModel)
 
 QN_FUSION_DECLARE_FUNCTIONS(EventType, (json))
 QN_FUSION_DECLARE_FUNCTIONS(EngineManifest, (json))

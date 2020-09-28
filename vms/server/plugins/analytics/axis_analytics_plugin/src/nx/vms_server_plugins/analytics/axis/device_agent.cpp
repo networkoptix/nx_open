@@ -9,6 +9,7 @@
 
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/analytics/helpers/metadata_types.h>
+#include <nx/sdk/helpers/settings_response.h>
 #include <nx/sdk/helpers/plugin_diagnostic_event.h>
 #include <nx/sdk/helpers/error.h>
 
@@ -19,6 +20,7 @@
 
 namespace nx::vms_server_plugins::analytics::axis {
 
+using namespace nx::utils;
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
@@ -28,16 +30,16 @@ namespace {
  * Fence Guard event types are a special case. Their descriptions as reported by camera
  * contain arbitrary user-provided profile names. If we treat these generically, when
  * multiple cameras are attached that have differently named profiles in corresponding
- * profile slots, only one of this names ends up used by the VMS, which confuses users.
+ * profile slots, only one of these names ends up used by the VMS, which confuses users.
  *
  * Moreover, cameras report profiles in different slots as different event types, though
  * logically they are the same kind of event. There is also a special any-profile
- * event type, that is sent whenever ony of the other profiles is sent.
+ * event type, that is sent whenever any of the other profiles is sent.
  *
  * Thus we threat Fence Guard events specially:
  * 1) Any-profile event type is removed.
  * 2) All profile-specific event types together are translated to a single event type with
- * id nx.axis.FenceGuard, whose name no longer include any profile-specific information.
+ * id nx.axis.FenceGuard, whose name no longer includes any profile-specific information.
  * 3) If the user still wishes to disambiguate between different profiles, the profile
  * name remains a part of the event's description. 
  */
@@ -129,27 +131,49 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 void DeviceAgent::doSetNeededMetadataTypes(
     Result<void>* outResult, const IMetadataTypes* neededMetadataTypes)
 {
-    const auto neededMetadataTypesPtr = splitFenceGuardEvents(
+    m_neededMetadataTypes = splitFenceGuardEvents(
         *neededMetadataTypes, m_parsedManifest.eventTypes);
-    neededMetadataTypes = neededMetadataTypesPtr.get();
 
-    const auto eventTypeIds = neededMetadataTypes->eventTypeIds();
-    if (const char* const kMessage = "Event type id list is null";
-        !NX_ASSERT(eventTypeIds, kMessage))
-    {
-        *outResult = error(ErrorCode::internalError, kMessage);
-        return;
-    }
     stopFetchingMetadata();
-
-    if (eventTypeIds->count() != 0)
-        *outResult = startFetchingMetadata(neededMetadataTypes);
+    *outResult = startFetchingMetadata();
 }
 
 void DeviceAgent::doSetSettings(
-    Result<const ISettingsResponse*>* /*outResult*/, const IStringMap* /*settings*/)
+    Result<const ISettingsResponse*>* outResult, const IStringMap* settings)
 {
-    // There are no DeviceAgent settings for this plugin.
+    auto response = makePtr<SettingsResponse>();
+    auto errors = makePtr<StringMap>();
+
+    m_localMetadataPort = QString(settings->value("Network.Metadata.LocalPort")).toUInt();
+
+    static const char kExternalAddress[] = "Network.Metadata.ExternalAddress";
+    if (Url url = NX_FMT("//%1", settings->value(kExternalAddress)).toQString();
+            url.isValid() && url.scheme().isEmpty() && url.userInfo().isEmpty() &&
+            url.path().isEmpty() && !url.hasFragment() && !url.hasQuery())
+    {
+        if (url.port() == 0)
+            url.setPort(-1);
+
+        m_externalMetadataUrl = std::move(url);
+    }
+    else
+    {
+        errors->setItem(kExternalAddress,
+            "Malformed; Should be either host:port, just host, or empty");
+    }
+
+    if (m_neededMetadataTypes)
+    {
+        stopFetchingMetadata();
+        if (auto result = startFetchingMetadata(); !result.isOk())
+        {
+            *outResult = error(result.error().errorCode(), result.error().errorMessage()->str());
+            return;
+        }
+    }
+
+    response->setErrors(errors);
+    *outResult = response.releasePtr();
 }
 
 void DeviceAgent::getPluginSideSettings(
@@ -157,10 +181,21 @@ void DeviceAgent::getPluginSideSettings(
 {
 }
 
-Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
+Result<void> DeviceAgent::startFetchingMetadata()
 {
-    m_monitor = new Monitor(this, m_url, m_auth, m_handler.get());
-    return m_monitor->startMonitoring(metadataTypes);
+    const auto eventTypeIds = m_neededMetadataTypes->eventTypeIds();
+    if (const char* const kMessage = "Event type id list is null";
+        !NX_ASSERT(eventTypeIds, kMessage))
+    {
+        return error(ErrorCode::internalError, kMessage);
+    }
+
+    if (eventTypeIds->count() == 0)
+        return {};
+
+    m_monitor = new Monitor(
+        this, m_url, m_auth, m_localMetadataPort, m_externalMetadataUrl, m_handler.get());
+    return m_monitor->startMonitoring(m_neededMetadataTypes.get());
 }
 
 void DeviceAgent::stopFetchingMetadata()

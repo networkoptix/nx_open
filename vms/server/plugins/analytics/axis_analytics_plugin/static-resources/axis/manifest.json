@@ -14,5 +14,37 @@
     ],
     "forbiddenDescriptions": [
         "xinternal_data"
-    ]
+    ],
+    "deviceAgentSettingsModel":
+    {
+        "type": "Settings",
+        "items": [
+            {
+                "type": "GroupBox",
+                "caption": "Network",
+                "items": [
+                    {
+                        "type": "GroupBox",
+                        "caption": "Metadata",
+                        "items": [
+                            {
+                                "type": "SpinBox",
+                                "name": "Network.Metadata.LocalPort",
+                                "caption": "Local port",
+                                "description": "Local TCP port where server expects to receive metadata from camera. When set to 0, will be chosen by the host OS.",
+                                "minValue": 0,
+                                "maxValue": 65535
+                            },
+                            {
+                                "type": "TextField",
+                                "name": "Network.Metadata.ExternalAddress",
+                                "caption": "External address",
+                                "description": "IP address or domain name (optionally followed by TCP port after colon) of the server from camera's perspective. This is where the camera will send metadata. If empty, the server's local IP address is used. If the port is 0 or omitted, event reception port is used."
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
 }

@@ -130,12 +130,16 @@ Monitor::Monitor(
     DeviceAgent* deviceAgent,
     const QUrl& url,
     const QAuthenticator& auth,
+    std::uint16_t localMetadataPort,
+    const nx::utils::Url& externalMetadataUrl,
     IDeviceAgent::IHandler* handler)
     :
     m_deviceAgent(deviceAgent),
     m_url(url),
     m_endpoint(url.toString() + "/vapix/services"),
     m_auth(auth),
+    m_localMetadataPort(localMetadataPort),
+    m_externalMetadataUrl(externalMetadataUrl),
     m_handler(handler),
     m_httpServer(nullptr)
 {
@@ -156,8 +160,15 @@ void Monitor::addRules(
         NX_FMT("%1:%2", m_url.host(), m_url.port(80)).toQString().toLatin1(),
         m_auth.user().toLatin1(), m_auth.password().toLatin1());
 
-    std::string fullPath =
-        std::string("http://") + localAddress.toStdString() + kWebServerPath;
+    auto externalMetadataUrl = m_externalMetadataUrl;
+    externalMetadataUrl.setScheme("http");
+    if (externalMetadataUrl.host().isEmpty())
+        externalMetadataUrl.setHost(localAddress.address.toString());
+    if (externalMetadataUrl.port() == -1)
+        externalMetadataUrl.setPort(localAddress.port);
+    externalMetadataUrl.setPath(QString::fromStdString(kWebServerPath));
+
+    std::string fullPath = externalMetadataUrl.toStdString();
 
     for (int i = 0; i < eventTypeIds->count(); ++i)
     {
@@ -256,10 +267,10 @@ Result<void> Monitor::startMonitoring(const IMetadataTypes* metadataTypes)
     if (localIp == nx::network::HostAddress())
         return error(ErrorCode::internalError, kGetLocalIpFailureErrorString);
 
-    nx::network::SocketAddress localAddress(localIp);
+    nx::network::SocketAddress localAddress(localIp, m_localMetadataPort);
+
     m_httpServer = new nx::network::http::TestHttpServer;
     m_httpServer->server().bindToAioThread(m_aioTimer.getAioThread());
-
     m_httpServer->bindAndListen(localAddress);
     m_httpServer->registerRequestProcessor<axisHandler>(
         kWebServerPath.c_str(),

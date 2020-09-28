@@ -85,6 +85,9 @@ void Engine::getManifest(Result<const IString*>* outResult) const
 EngineManifest Engine::fetchSupportedEvents(const IDeviceInfo* deviceInfo)
 {
     EngineManifest result;
+
+    result.deviceAgentSettingsModel = m_parsedManifest.deviceAgentSettingsModel;
+
     const char* const ip_port = deviceInfo->url() + sizeof("http://") - 1;
     nx::axis::CameraController axisCameraController(
         ip_port,

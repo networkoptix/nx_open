@@ -3,10 +3,12 @@
 #include <map>
 #include <vector>
 #include <shared_mutex>
+#include <cstdint>
 
 #include <QtCore/QUrl>
 #include <QtNetwork/QAuthenticator>
 
+#include <nx/utils/url.h>
 #include <nx/sdk/ptr.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 #include <nx/network/http/http_async_client.h>
@@ -60,6 +62,8 @@ public:
         DeviceAgent* deviceAgent,
         const QUrl& resourceUrl,
         const QAuthenticator& auth,
+        std::uint16_t localMetadataPort,
+        const nx::utils::Url& externalMetadataUrl,
         nx::sdk::analytics::IDeviceAgent::IHandler* handler);
     virtual ~Monitor();
 
@@ -90,6 +94,8 @@ public:
     const QUrl m_url;
     const QUrl m_endpoint;
     const QAuthenticator m_auth;
+    const std::uint16_t m_localMetadataPort;
+    const nx::utils::Url m_externalMetadataUrl;
     nx::sdk::analytics::IDeviceAgent::IHandler* m_handler = nullptr;
     ElapsedEvents m_eventsToCatch; //< The monitor treats events from this list.
     nx::network::http::TestHttpServer* m_httpServer;
