@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.3.832",
+    "version": "4.1.3.833",
     "data": [
         {
             "keys": [
@@ -4428,7 +4428,8 @@
         {
             "keys": [
                 "Hikvision|DS-9664NI-I16",
-                "Hikvision|DS-9632NI-I8"
+                "Hikvision|DS-9632NI-I8",
+                "Hikvision|DS-7216HUHI-K2(S)"
             ],
             "fetchVideoSourceConfigurationsViaProfiles": true
         },
