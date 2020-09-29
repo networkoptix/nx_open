@@ -1863,7 +1863,7 @@ to view more bookmarks</source>
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
       <translation>
-        <numerusform>%1의 %n 세션에 대 한 세부 정보</numerusform>
+        <numerusform>%1의 %n 세션에 대한 세부 정보</numerusform>
       </translation>
     </message>
     <message numerus="yes">
