@@ -282,6 +282,8 @@ public:
             {
                 NX_VERBOSE(this, "readDiskCounterValues: DeviceIoControl failed for drive '%1'", driveName);
             }
+
+            CloseHandle(handle);
         }
 
         // Creating HDD items and populating result.
