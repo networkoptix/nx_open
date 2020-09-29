@@ -328,9 +328,9 @@ MetadataParser::TargetResult MetadataParser::parseTargetElement()
     {
         // Treat rule activations as objects.
         if (*trackId < 0)
-            typeId = "nx.hikvision.event"; 
+            typeId = "nx.hikvision.event";
         else
-            return nullptr;
+            return {};
     }
 
     bool shouldGenerateBestShot = false;
