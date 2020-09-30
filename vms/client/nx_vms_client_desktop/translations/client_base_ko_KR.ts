@@ -5282,7 +5282,7 @@ to %1</source>
     </message>
     <message>
       <source>This server already has more than max cameras</source>
-      <translation>현재 서버 최대 치 임</translation>
+      <translation>현재 서버에 등록된 카메라 수보다 적습니다  </translation>
     </message>
     <message>
       <source>To avoid issues adjust max number of devices</source>
