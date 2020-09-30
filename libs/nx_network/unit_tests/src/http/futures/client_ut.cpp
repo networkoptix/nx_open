@@ -71,8 +71,11 @@ TEST_F(FuturesHttpClient, get_canceled)
 {
     whenGettable(kFooPath, kExpectedBody);
 
-    auto future = client->get(expandUrl(kFooPath));
-    client->executeInAioThreadSync([&]{ client = std::nullopt; });
+    cf::future<Response> future;
+    client->executeInAioThreadSync([&]{
+        future = client->get(expandUrl(kFooPath));
+        client = std::nullopt;
+    });
     try
     {
         future.get();
