@@ -39,7 +39,8 @@ function(nx_add_custom_pre_build_command command)
 endfunction()
 
 function(nx_use_custom_verify_globs)
-    set_property(GLOBAL APPEND_STRING PROPERTY pre_build_commands "substitute_verify_globs\n")
+    set_property(GLOBAL APPEND_STRING
+        PROPERTY pre_build_commands "substitute_verify_globs ${verify_globs_directory}\n")
 endfunction()
 
 function(nx_save_ninja_preprocessor_script)

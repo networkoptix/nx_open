@@ -23,7 +23,7 @@ class RulesNinjaFileProcessor(NinjaFileProcessor):  # pylint:disable=too-few-pub
 
     _RERUN_CMAKE_RULE = "RERUN_CMAKE"
     _VERIFY_GLOBS_RULE = "VERIFY_GLOBS"
-    _VERIFY_GLOBS_TOOL_PATH = "verify_globs-1.0/verify_globs"
+    _VERIFY_GLOBS_TOOL_NAME = "verify_globs"
     _SELF_RUN_OPTIONS = "--log-output --stack-trace"
 
     # Universal regex for parsing specific rules.ninja syntax.
@@ -98,7 +98,7 @@ class RulesNinjaFileProcessor(NinjaFileProcessor):  # pylint:disable=too-few-pub
         raise NinjaFileProcessorParseError(
             self, f'No command found for rule "{rule}"')
 
-    def patch_verify_globs(self) -> None:
+    def patch_verify_globs(self, verify_globs_path: Path) -> None:
         """Use custom script to verify globs."""
 
         try:
@@ -108,16 +108,7 @@ class RulesNinjaFileProcessor(NinjaFileProcessor):  # pylint:disable=too-few-pub
             print(f"Can't find {self._VERIFY_GLOBS_RULE} in rules.ninja file.")
             return
 
-        tools_directory = Path(os.environ.get("RDEP_PACKAGES_DIR"))
-        if platform.system() == "Linux":
-            platform_rdep_dir = "linux"
-        elif platform.system() == "Windows":
-            platform_rdep_dir = "windows"
-        elif platform.system() == "Darwin":
-            platform_rdep_dir = "macosx"
-
-        verify_globs_full_path = tools_directory.joinpath(
-            platform_rdep_dir, self._VERIFY_GLOBS_TOOL_PATH)
+        verify_globs_full_path = verify_globs_path.joinpath(self._VERIFY_GLOBS_TOOL_NAME)
         verify_globs_run_string = (
             f"{verify_globs_full_path.as_posix()} {self.build_directory.as_posix()}")
         if verify_globs_run_string == command:  # verify_globs.py is already added.

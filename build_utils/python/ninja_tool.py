@@ -139,7 +139,7 @@ def run_script(build_dir: str, script_file_name: str, force_patch: bool) -> None
     strengthened_targets = set()
     commands_to_run = list()
     do_clean = False
-    substitute_verify_globs = False
+    verify_globs_path = None
 
     print(f"Reading script {script_file_name}...")
     with open(script_file_name) as script_file:
@@ -162,7 +162,11 @@ def run_script(build_dir: str, script_file_name: str, force_patch: bool) -> None
             elif command == "clean":
                 do_clean = True
             elif command == "substitute_verify_globs":
-                substitute_verify_globs = True
+                if len(args) != 1:
+                    print("There must be exactly one argument for "
+                        "\"substitute_verify_globs\" command.")
+                    continue
+                verify_globs_path = args[0]
             else:
                 print(f"Unknown command: {command}")
 
@@ -178,7 +182,7 @@ def run_script(build_dir: str, script_file_name: str, force_patch: bool) -> None
         strengthened_targets=strengthened_targets,
         script_timestamp=os.path.getmtime(script_file_name),
         build_file_processor=build_file_processor,
-        substitute_verify_globs=substitute_verify_globs,
+        verify_globs_path=Path(verify_globs_path) if verify_globs_path else None,
         force_patch=force_patch)
 
     for command in commands_to_run:
@@ -193,7 +197,7 @@ def patch_ninja_build(
         strengthened_targets: set,
         script_timestamp: float,
         build_file_processor: BuildNinjaFileProcessor,
-        substitute_verify_globs: bool,
+        verify_globs_path: Path,
         force_patch: bool = False) -> None:
     """Do patching of build.ninja. Also searches for the "include" directive for rules.ninja, and
     patches rules.ninja too.
@@ -207,9 +211,10 @@ def patch_ninja_build(
     :type script_timestamp: float
     :param build_file_processor: The instance of BuildNinjaFileProcessor class.
     :type build_file_processor: BuildNinjaFileProcessor
-    :param substitute_verify_globs: Whether to substitute VERIFY_GLOBS command with custom script.
-    :type substitute_verify_globs: bool
-    :param force_patch: Whether force-patch file, regardless of the script modification time,
+    :param verify_globs_path: Path to verify_globs tool if it should be use instead of cmake
+        VerifyGlobs checker; `None` otherwise.
+    :type verify_globs_path: Path
+    :param force_patch: Whether to force-patch the file, regardless of the script modification time,
         defaults to False
     :type force_patch: bool, optional
     """
@@ -227,7 +232,7 @@ def patch_ninja_build(
 
     print("Patching build.ninja...")
     patch_rules_file(
-        build_file_processor, substitute_verify_globs,
+        build_file_processor, verify_globs_path,
         script_timestamp=script_timestamp, force_patch=force_patch)
     if strengthened_targets:
         build_file_processor.strengthen_dependencies(strengthened_targets)
@@ -237,7 +242,7 @@ def patch_ninja_build(
 
 def patch_rules_file(
         build_file_processor: BuildNinjaFileProcessor,
-        substitute_verify_globs: bool,
+        verify_globs_path: Path,
         script_timestamp: float,
         force_patch: bool = False) -> None:
 
@@ -254,8 +259,8 @@ def patch_rules_file(
 
     print("Patching rules.ninja...")
     rules_file_processor.patch_cmake_rerun()
-    if substitute_verify_globs:
-        rules_file_processor.patch_verify_globs()
+    if verify_globs_path:
+        rules_file_processor.patch_verify_globs(verify_globs_path)
     rules_file_processor.save_data()
     print("Done")
 
