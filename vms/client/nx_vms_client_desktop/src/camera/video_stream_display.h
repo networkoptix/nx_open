@@ -178,6 +178,7 @@ private:
     bool processDecodedFrame(QnAbstractVideoDecoder* dec, const QSharedPointer<CLVideoDecoderOutput>& outFrame, bool enableFrameQueue, bool reverseMode);
     void checkQueueOverflow(QnAbstractVideoDecoder* dec);
     void clearReverseQueue();
+    void deleteDecoder();
 
     void calcSampleAR(QSharedPointer<CLVideoDecoderOutput> outFrame, QnAbstractVideoDecoder* dec);
 

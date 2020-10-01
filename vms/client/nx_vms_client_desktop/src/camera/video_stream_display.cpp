@@ -87,14 +87,28 @@ QnVideoStreamDisplay::~QnVideoStreamDisplay()
 
     delete m_bufferedFrameDisplayer;
     QnMutexLocker _lock( &m_mtx );
-
-    m_decoderData.decoder.reset();
+    deleteDecoder();
     freeScaleContext();
 }
 
 void QnVideoStreamDisplay::endOfRun()
 {
     QnMutexLocker lock(&m_mtx);
+    deleteDecoder();
+}
+
+void QnVideoStreamDisplay::deleteDecoder()
+{
+    // TODO Fix it, do not keep avframe in ffmpeg video decoder. Remove external data option
+    if (m_lastDisplayedFrame &&
+        m_lastDisplayedFrame->isExternalData() &&
+        m_lastDisplayedFrame->memoryType() != MemoryType::VideoMemory)
+    {
+        QSharedPointer<CLVideoDecoderOutput> tmpFrame(new CLVideoDecoderOutput());
+        tmpFrame->copyFrom(m_lastDisplayedFrame.get());
+        m_lastDisplayedFrame = tmpFrame;
+    }
+
     m_decoderData.decoder.reset();
 }
 
@@ -478,7 +492,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
         clearReverseQueue();
         QnMutexLocker lock( &m_mtx );
         if (reverseMode != m_prevReverseMode)
-            m_decoderData.decoder.reset();
+            deleteDecoder();
         if (m_decoderData.decoder)
             m_decoderData.decoder->resetDecoder();
 
@@ -496,6 +510,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
             if (!data->flags.testFlag(QnAbstractMediaData::MediaFlags_AVKey))
                 return Status_Skipped;
 
+            deleteDecoder();
             dec = createVideoDecoder(data, enableFrameQueue);
             m_decoderData.decoder.reset(dec);
             m_decoderData.compressionType = data->compressionType;
