@@ -293,13 +293,13 @@
         },
         {
             "keys": [
-                "Hikvision|DS-2TD2636*"
+                "hikvision|DS-2TD2636*"
             ],
             "useInvertedActiveStateForOpenIdleState": true
         },
         {
             "keys": [
-                "Hikvision|*"
+                "hikvision|*"
             ],
             "channelsLimitedByEncoders": false
         },
@@ -542,7 +542,7 @@
         },
         {
             "keys": [
-                "Hikvision|*"
+                "hikvision|*"
             ],
             "possibleDefaultCredentials": [
                 {
@@ -556,7 +556,7 @@
         },
         {
             "keys": [
-                "*Hikvision*|DS-7716NI-K4"
+                "*hikvision*|DS-7716NI-K4"
             ],
             "extractHikvisionChannelFromVideoSource": true
         },
@@ -578,10 +578,13 @@
         {
             "keys": [
                 "VISTA|VK2-ENCODER",
-                "*|DW-CP04", "*|DW-CP16",
+                "*|DW-CP04",
+                "*|DW-CP16",
                 "Avigilon|ENC-*",
-                "ACTI|V32", "ACTi Corporation|V32",
-                "ACTI|V23", "ACTi Corporation|V23",
+                "ACTI|V32",
+                "ACTi Corporation|V32",
+                "ACTI|V23",
+                "ACTi Corporation|V23",
                 "BOSCH|VIP-X1600-XFM4",
                 "Axis|AXISM7014*",
                 "Axis|AXISM7016*",
@@ -629,11 +632,11 @@
                 "DS-6708*|Embedded*",
                 "DS-6716*|Embedded*",
                 "DS-6716*|Embedded_Net_DVR",
-                "Hikvision|DS-6716*",
+                "hikvision|DS-6716*",
                 "GrandStream|GXV3504",
-                "Hikvision|DS-6701*",
-                "Hikvision|DS-6704*",
-                "Hikvision|DS-6716*",
+                "hikvision|DS-6701*",
+                "hikvision|DS-6704*",
+                "hikvision|DS-6716*",
                 "Honeywell|HVE4",
                 "Pelco|NET5504",
                 "Pelco|NET5508",
@@ -752,7 +755,7 @@
                 "ltd8308*|embedded net dvr",
                 "ds-9016*|embedded net dvr",
                 "lnr616|digimerge",
-                "Hikvision|rvi-r16ma",
+                "hikvision|rvi-r16ma",
                 "ds-7616*|network video recorder",
                 "eve four|siqura",
                 "dh-nvr5816*|private",
@@ -763,7 +766,7 @@
                 "rvi-ipn8*|group",
                 "ds-7732*|network video recorder",
                 "ar326-16|imperial dvr",
-                "Hikvision|ds-7108*",
+                "hikvision|ds-7108*",
                 "ds-7608*|network video recorder",
                 "ds-h108*|embedded net dvr",
                 "ds-7716ni-i4/16p|501 pelham - nvr",
@@ -776,7 +779,7 @@
                 "dhi-nvr5208*|general",
                 "n16nxp|speco",
                 "moxa inc.|vport_364a_4ch_video_encoder",
-                "Hikvision|ds-8016*",
+                "hikvision|ds-8016*",
                 "hve-16781|enc-h264-16",
                 "kiloview electronics co., ltd.|e1",
                 "indigovision|bx100",
@@ -796,10 +799,10 @@
                 "hikvision|ds-7204*",
                 "vcn-enc|vlr-enc-16",
                 "rvi-hdr16lb-t|rvi_dvr",
-                "Hikvision|ds-7332*",
+                "hikvision|ds-7332*",
                 "avtech|avx931a",
                 "3s|s4071",
-                "Hikvision|ds-8616*",
+                "hikvision|ds-8616*",
                 "videojet-x10|bosch",
                 "dnr716|general",
                 "videojet-x20|bosch",
@@ -808,15 +811,15 @@
                 "nr916x|general",
                 "dahua|dhi-nvr5864*",
                 "dnr832|general",
-                "Hikvision|ds-7216*",
+                "hikvision|ds-7216*",
                 "ali-qvr3004h|embedded net dvr",
                 "rvi-ipn4/1-4p|group",
                 "private|dh-nvr4816-4k",
                 "onvif|ltd8516k-st",
-                "Hikvision|ds-7316*",
+                "hikvision|ds-7316*",
                 "hev0118h|hitron_hev0118h",
                 "dahua|dh-hcvr4104*",
-                "Hikvision|ds-8632*",
+                "hikvision|ds-8632*",
                 "ltn8708k-p8|home 8ch embedded",
                 "ds-8616*|network video recorder",
                 "axis|axis p7224",
@@ -838,16 +841,16 @@
                 "dahua|x24a5l",
                 "dhi-ivss7024dr-8t|private",
                 "rvi-hdr16lb-m_v.2|rvi",
-                "Hikvision|ds-7708*",
+                "hikvision|ds-7708*",
                 "dahua|ipc-hum8231*",
                 "uniview|nvr201*",
                 "DW|DW-ENHD16*",
                 "dahua|hcvr5104*",
-                "Hikvision|ds-8116*",
+                "hikvision|ds-8116*",
                 "dahua|n52b3p",
                 "tr2116a|embedded net dvr",
                 "vlr-enc-16|vlr-enc-16",
-                "Hikvision|ds-9016*",
+                "hikvision|ds-9016*",
                 "onvif_encoder|mam-6me1012mta",
                 "costar|mam-6me1012mta",
                 "mam-6me1012mta|mam-6me1012mta-jh",
@@ -863,9 +866,9 @@
                 "rvi-ipn16/2-pro-4k|general",
                 "hq-thd1602*|embedded net dvr",
                 "none|nvr302-08e-p8",
-                "Hikvision|hik%2fds-7816*",
+                "hikvision|hik%2fds-7816*",
                 "ltd8308*|embedded_net_dvr",
-                "DS-6708*|Hikvision",
+                "DS-6708*|hikvision",
                 "c7413-awr|dvr support center",
                 "ds-7116*|business ddd co,.ltd.",
                 "acti|v24",
@@ -885,7 +888,7 @@
                 "hisi|vi-m-4-1000*",
                 "ds-7716*|network video recorder",
                 "2d|eli-sip-eb21-4r",
-                "Hikvision|ds-7616*",
+                "hikvision|ds-7616*",
                 "zkd408a|embedded net dvr",
                 "zkd608a|embedded net dvr",
                 "mam-6me1012mta|encoder2",
@@ -944,10 +947,10 @@
                 "ds-7204huhi-k1/p|thuis",
                 "os103t|onvif",
                 "dahua|nvr5216*",
-                "Hikvision|ds-7116*",
+                "hikvision|ds-7116*",
                 "rvi-r16ma|rvi_dvr",
                 "scw|nvr-imp32",
-                "Hikvision|ds-7716*",
+                "hikvision|ds-7716*",
                 "eclipse|esg-nvr32-8",
                 "axis|axis m7104",
                 "onvif|ip-ds411-4",
@@ -970,7 +973,7 @@
                 "3r global inc.|xpm4m32",
                 "3r global inc.|xst08",
                 "unix|ipm32r32p",
-                "Hikvision|ds-7732*",
+                "hikvision|ds-7732*",
                 "axis|axisp7304*",
                 "axis|axism7104*",
                 "ev1004turbo|vistas del cuatro",
@@ -1106,41 +1109,41 @@
                 "general|dr-tw2516a",
                 "acti|v31",
                 "*|UL-DVR302-16Z",
-                "Hangzhou Hikvision Digital Technology*|ds-7216*",
+                "hikvision|ds-7216*",
                 "Dahua|XVR5104*",
                 "onvif|ltn8916",
                 "geovision|gv-vs2800",
                 "bosch|vip x1 xf e",
                 "n/a|ds-6601hfhi",
                 "truen co., ltd.|tcs-3000",
-                "hangzhou hikvision digital technology co., ltd|ds-9632*",
+                "hikvision|ds-9632*",
                 "rgi-3228|rgi-3228",
-                "hangzhou hikvision digital technology co., ltd|rvi-r16ma",
-                "hangzhou hikvision digital technology co., ltd|ds-7108*",
-                "hangzhou hikvision digital technology co., ltd|ds-8016*",
+                "hikvision|rvi-r16ma",
+                "hikvision|ds-7108*",
+                "hikvision|ds-8016*",
                 "ali-qvr3016h|embedded net dvr",
-                "hangzhou hikvision digital technology co., ltd|ds-7204*",
-                "hangzhou hikvision digital technology co., ltd|ds-7332*",
-                "hangzhou hikvision digital technology co., ltd|ds-8616*",
+                "hikvision|ds-7204*",
+                "hikvision|ds-7332*",
+                "hikvision|ds-8616*",
                 "digital watchdog|dw-enhd16",
-                "hangzhou hikvision digital technology co., ltd|ds-7316*",
-                "hangzhou hikvision digital technology co., ltd|ds-8632*",
+                "hikvision|ds-7316*",
+                "hikvision|ds-8632*",
                 "dhi-nvr5832-16p-4ks2|private",
-                "hangzhou hikvision digital technology co., ltd|ds-7708*",
+                "hikvision|ds-7708*",
                 "dahua|dhi-nvr4208-8p-4ks2",
-                "hangzhou hikvision digital technology co., ltd|ds-9016*",
-                "hangzhou hikvision digital technology co., ltd|ds-8116*",
+                "hikvision|ds-9016*",
+                "hikvision|ds-8116*",
                 "dahua|dh-hcvr5216an-s3",
-                "hangzhou hikvision digital technology co., ltd|ds-7616*",
-                "hangzhou hikvision digital technology co., ltd|ds-6716*",
-                "hangzhou hikvision digital technology co., ltd|ds-7116*",
-                "hangzhou hikvision digital technology co., ltd|ds-7716*",
-                "hangzhou hikvision digital technology co., ltd|ds-6708*",
-                "hangzhou hikvision digital technology co., ltd|ds-7732*",
+                "hikvision|ds-7616*",
+                "hikvision|ds-6716*",
+                "hikvision|ds-7116*",
+                "hikvision|ds-7716*",
+                "hikvision|ds-6708*",
+                "hikvision|ds-7732*",
                 "eneo|xpm16",
                 "unix|ilt08r",
                 "unix|xst16",
-                "hangzhou hikvision digital technology co., ltd|ds-7208*",
+                "hikvision|ds-7208*",
                 "amdv8m16-h5|general",
                 "dw-enhd16|dat",
                 "ds-7204hghi-f1|cctv caldeira flucal",
@@ -1149,10 +1152,10 @@
                 "s-64 e v2-xt|s-64 e v2-xt-511970",
                 "s-64 e v2-xt|s-64 e v2-xt-511971",
                 "s-64 e v2-xt|s-64 e v2-xt-511969",
-                "hangzhou hikvision digital technology co., ltd|ds-9664*",
+                "hikvision|ds-9664*",
                 "dw-enhd16|mai",
                 "i discover hd10ch v2.0|house dvr",
-                "hangzhou hikvision digital technology co., ltd|dvr-216q-k2",
+                "hikvision|dvr-216q-k2",
                 "-ipn32/2l-4k|rvi",
                 "onvif_encoder|hae-216",
                 "nvr800-a04d|huawei-holosens-nvr800-b04",
@@ -1184,7 +1187,7 @@
                 "none|nvr308-32r",
                 "none|nvr301-04l-p4",
                 "none|nvr304-16ep",
-                "hangzhou hikvision digital technology co., ltd|ds-7608*",
+                "hikvision|ds-7608*",
                 "hik/ds-7108hgh-f1/n/-af-dvr--a/8-1|embedded net xvr",
                 "general|xs-xvr3108m-h1",
                 "dw-enhd16|encoder",
@@ -1496,7 +1499,7 @@
         },
         {
             "keys": [
-                "Honeywell|HVE4", "Hikvision|DS-6704HFI"
+                "Honeywell|HVE4", "hikvision|DS-6704HFI"
             ],
             "forcedOnvifParams":
             {
@@ -1530,7 +1533,7 @@
         },
         {
             "keys": [
-                "Hikvision|DS-6708*", "HIKVISION|DS-6708*"
+                "hikvision|DS-6708*"
             ],
             "forcedOnvifParams":
             {
@@ -1549,7 +1552,7 @@
         },
         {
             "keys": [
-                "Hikvision|DS-2CD6362F-I*|V5.0.*", "Hikvision|DS-2CD6362F-I*|V5.3.*", "Hikvision|DS-2CD6362F-I*|V5.1.*", "Hikvision|DS-2CD6362F-I*|V5.2.*", "Hikvision|HNCA12-FEA"
+                "hikvision|DS-2CD6362F-I*|V5.0.*", "hikvision|DS-2CD6362F-I*|V5.3.*", "hikvision|DS-2CD6362F-I*|V5.1.*", "hikvision|DS-2CD6362F-I*|V5.2.*", "hikvision|HNCA12-FEA"
             ],
             "forcedOnvifParams":
             {
@@ -1568,7 +1571,7 @@
         },
         {
             "keys": [
-                "Hikvision|DS-6716HWI", "Hikvision|DS-6716HFI", "Hikvision|DS-6716*",
+                "hikvision|DS-6716HWI", "hikvision|DS-6716HFI", "hikvision|DS-6716*",
                 "DS-6716*|Embedded_Net_DVR", "DS-6716*|Embedded Net DVS",
                 "Embedded_Net_DVR|DS-6716*", "Embedded Net DVS|DS-6716*"
             ],
@@ -1597,71 +1600,59 @@
         },
         {
             "keys": [
-                "HIKVISION|DS-2TD1217*",
-                "HIKVISION|DFI6256A",
+                "hikvision|DS-2TD1217*",
+                "hikvision|DFI6256A",
                 "hikvision|DS-2CD2955FWD*",
-                "HIKVISION|DS-2CD2135FWD*",
-                "HIKVISION|DS-2CD2555FWD*",
+                "hikvision|DS-2CD2135FWD*",
+                "hikvision|DS-2CD2555FWD*",
                 "AMTK|AH5583T*"
             ],
             "pullInputEventsAsOdm": true
         },
         {
             "keys": [
-                "HIKVISION|DS-2CD2132F-IWS",
-                "HIKVISION|DS-2CD2655FWD-IZS",
-                "HIKVISION|DS-2CD2742FWD*",
-                "HIKVISION|DS-2CD2942F-IS",
-                "HIKVISION|DS-2CD63C2F-IS",
-                "HIKVISION|DS-2DE4A220IW-DE",
-                "Hikvision|DS-2CD2655FWD-IZS",
-                "Hikvision|DS-2CD2942F-IS",
-                "Hikvision|DS-2CD63C2F-IS",
-                "Hikvision|DS-2DE4A220IW-DE",
-                "HIKVISION|DS-2CD4032FWD*",
-                "HIKVISION|DS-2CD2142FWD*",
+                "hikvision|DS-2CD2132F-IWS",
+                "hikvision|DS-2CD2742FWD*",
+                "hikvision|DS-2CD2655FWD-IZS",
+                "hikvision|DS-2CD2942F-IS",
+                "hikvision|DS-2CD63C2F-IS",
+                "hikvision|DS-2DE4A220IW-DE",
+                "hikvision|DS-2CD4032FWD*",
                 "hikvision|DS-2CD2142FWD*",
-                "Hikvision|DS-6716*",
-                "Hikvision|DS-6708*",
-                "HIKVISION|DS-2CD4A26FWD-*",
-                "HIKVISION|iDS-2CD8426*",
-                "Hikvision|DS-2DF8223*",
+                "hikvision|DS-6716*",
+                "hikvision|DS-6708*",
+                "hikvision|DS-2CD4A26FWD-*",
+                "hikvision|iDS-2CD8426*",
+                "hikvision|DS-2DF8223*",
                 "hikvision|DS-2CD2155FWD-IS",
-                "HIKVISION|DS-2CD4026FWD-AP",
-                "HIKVISION|DS-2DE3304W-DE",
+                "hikvision|DS-2CD4026FWD-AP",
+                "hikvision|DS-2DE3304W-DE",
                 "ONVIF|NC328-VBZ",
-                "HIKVISION|DS-2TD1217*",
-                "HIKVISION|DFI6256A",
+                "hikvision|DS-2TD1217*",
+                "hikvision|DFI6256A",
                 "hikvision|DS-2CD2955FWD*",
-                "HIKVISION|DS-2CD2135FWD*",
-                "HIKVISION|DS-2CD2555FWD*",
-                "Hikvision|DS-2TD2617B*"
+                "hikvision|DS-2CD2135FWD*",
+                "hikvision|DS-2CD2555FWD*",
+                "hikvision|DS-2TD2617B*"
             ],
             "parseOnvifNotificationsWithHttpReader": true
         },
         {
             "keys": [
-                "HIKVISION|DS-2CD2132F-IWS",
-                "HIKVISION|DS-2CD2655FWD-IZS",
-                "HIKVISION|DS-2CD2742FWD-IS",
-                "HIKVISION|DS-2CD2942F-IS",
-                "HIKVISION|DS-2DE4A220IW-DE",
-                "Hikvision|DS-2CD2655FWD-IZS",
-                "Hikvision|DS-2CD2742FWD-IS",
-                "Hikvision|DS-2CD2942F-IS",
-                "Hikvision|DS-2DE4A220IW-DE",
-                "Hikvision|DS-2CD2522FWD*",
-                "HIKVISION|DS-2CD2522FWD*",
-                "HIKVISION|DS-2CD4032FWD*",
-                "HIKVISION|DS-2CD2142FWD-IWS",
-                "HIKVISION|DS-2CD2142FWD*",
+                "hikvision|DS-2CD2132F-IWS",
+                "hikvision|DS-2CD2655FWD-IZS",
+                "hikvision|DS-2CD2742FWD-IS",
+                "hikvision|DS-2CD2942F-IS",
+                "hikvision|DS-2DE4A220IW-DE",
+                "hikvision|DS-2CD2522FWD*",
+                "hikvision|DS-2CD4032FWD*",
                 "hikvision|DS-2CD2142FWD*",
-                "HIKVISION|DS-2CD4A26FWD-*",
-                "HIKVISION|iDS-2CD8426*",
-                "Hikvision|DS-2CD2625FWD*",
-                "Hikvision|DS-2TD2166*",
-                "Hikvision|DS-2CD4026FWD-AP",
-                "HIKVISION|DS-2DE3304W-DE",
+                "hikvision|DS-2CD4A26FWD-*",
+                "hikvision|iDS-2CD8426*",
+                "hikvision|DS-2CD2625FWD*",
+                "hikvision|DS-2TD2166*",
+                "hikvision|DS-2CD4026FWD-AP",
+                "hikvision|DS-2DE3304W-DE",
                 "ONVIF|H47",
                 "ONVIF|IP-2CD4B26FWD-IZS",
                 "*|NC304-WDA"
@@ -2961,10 +2952,10 @@
         },
         {
             "keys": [
-                "HIKVISION|DS-2DF5220S-DE4/W",
-                "HIKVISION|DS-2TD4237*",
-                "HIKVISION|DS-2TD4136*",
-                "HIKVISION|DS-2TD4166*"
+                "hikvision|DS-2DF5220S-DE4/W",
+                "hikvision|DS-2TD4237*",
+                "hikvision|DS-2TD4136*",
+                "hikvision|DS-2TD4166*"
             ],
             "useOnvifPtz": true,
             "ptzMapper": {
@@ -3054,7 +3045,7 @@
         },
         {
             "keys": [
-                "Hikvision|DS-2DP1636Z-D"
+                "hikvision|DS-2DP1636Z-D"
             ],
             "forcedOnvifParams":
             {
@@ -3157,11 +3148,11 @@
         },
         {
             "keys": ["*|CMD-C244","COMMANDCO|*","ONVIF|NTH-IP4T"],
-            "onvifManufacturerReplacement": "Hikvision"
+            "onvifManufacturerReplacement": "hikvision"
         },
         {
             "keys": [
-                "HIKVISION|DS-2DE4220IW*", "HIKVISION|DS-2DE4220W*", "Hikvision|DS-2DE4220IW*", "Hikvision|DS-2DE4220W*"
+                "hikvision|DS-2DE4220IW*", "hikvision|DS-2DE4220W*"
             ],
             "useOnvifPtz": true,
             "ptzMapper": {
@@ -3188,7 +3179,7 @@
         },
         {
             "keys": [
-                "HIKVISION|DS-2DF8436IX*", "Hikvision|DS-2DF8436IX*"
+                "hikvision|DS-2DF8436IX*"
             ],
             "useOnvifPtz": true,
             "ptzMapper": {
@@ -3215,8 +3206,8 @@
         },
         {
             "keys": [
-                "Hikvision|DS-7216*|V1*",
-                "Hikvision|DS-7216*|V2*"
+                "hikvision|DS-7216*|V1*",
+                "hikvision|DS-7216*|V2*"
             ],
             "comment": "We don't know if firmware v2 behaves same as v1 or same as v3, let it be as v1",
             "forcedOnvifParams": {
@@ -3242,8 +3233,8 @@
         },
         {
             "keys": [
-                "Hikvision|DS-7216*|V3*",
-                "Hikvision|DS-7216*|V4*"
+                "hikvision|DS-7216*|V3*",
+                "hikvision|DS-7216*|V4*"
             ],
             "forcedOnvifParams":
             {
@@ -3269,7 +3260,7 @@
         },
         {
             "keys": [
-                "HIKVISION|DS-2DE4A220IW*", "Hikvision|DS-2DE4A220IW*"
+                "hikvision|DS-2DE4A220IW*"
             ],
             "useOnvifPtz": true,
             "ptzMapper": {
@@ -3296,7 +3287,7 @@
         },
         {
             "keys": [
-                "DS-6716HQHI-SATA|Embedded_Net_DVR", "Hikvision|DS-6716HQHI-SATA"
+                "DS-6716HQHI-SATA|Embedded_Net_DVR", "hikvision|DS-6716HQHI-SATA"
             ],
             "forcedOnvifParams":
             {
@@ -3323,7 +3314,7 @@
         },
         {
             "keys": [
-                "HIKVISION|DS-2DP1636ZIX-D/236", "Hikvision|DS-2DP1636ZIX-D/236"
+                "hikvision|DS-2DP1636ZIX-D/236"
             ],
             "ptzMapper": {
                 "fromCamera": {
@@ -3407,7 +3398,7 @@
         },
         {
             "keys": [
-                "HIKVISION|DS-2DE7330IW-*", "Hikvision|DS-2DE7330IW-*"
+                "hikvision|DS-2DE7330IW-*"
             ],
             "useOnvifPtz": true,
             "ptzMapper": {
@@ -3579,14 +3570,14 @@
             "Axis|AXISQ3708*",
             "AXIS|AXISQ3708*",
             "Axis|AXISQ6000*","AXIS|AXISQ6000*","Axis|Q6000*","AXIS|Q6000*",
-            "HIKVISION|DS-2PT3326IZ*", "Hikvision|DS-2PT3326IZ*",
+            "hikvision|DS-2PT3326IZ*",
             "Dahua|IPC-HDBW7233X-AS-E2-0280B",
-            "Hikvision|DS-2CD6D24*", "HIKVISION|DS-2CD6D24*",
-            "Hikvision|DS-2TD2636*", "HIKVISION|DS-2TD2636*",
+            "hikvision|DS-2CD6D24*",
+            "hikvision|DS-2TD2636*",
             "Dahua|IPC-PDBW8800*",
             "Geovision|GV-SV48000",
-            "Hikvision|DS-2CD6924F*", "HIKVISION|DS-2CD6924F*",
-            "Hikvision|DS-2CD6D54*", "HIKVISION|DS-2CD6D54*",
+            "hikvision|DS-2CD6924F*",
+            "hikvision|DS-2CD6D54*",
             "NVM3-A16|IP-Camera", "IPNC|NVM3-A16",
             "Hanwha|*", "Hanwha Techwin|*",
             "Samsung|*", "Samsung Techwin|*",
@@ -3665,9 +3656,10 @@
         },
         {
             "keys": [
-                "HIKVISION|iDS-2CD8426*", "hikvision|iDS-2CD8426*",
-                "Hikvision|DS-2DF8223*", "ONVIF|K20IC-*",
-                "HIKVISION|DFI6256A"
+                "hikvision|iDS-2CD8426*",
+                "hikvision|DS-2DF8223*",
+                "ONVIF|K20IC-*",
+                "hikvision|DFI6256A"
             ],
             "clearInputsTimeoutSec": 1,
             "comment": "considers input state as 0 after specified timeout"
@@ -3810,7 +3802,7 @@
         {
             "_comment1": "Mapping for firmware: V5.4.9 build 171025",
             "keys": [
-                "HIKVISION|DS-2DF8836*"
+                "hikvision|DS-2DF8836*"
             ],
             "useOnvifPtz": true,
             "ptzMapper": {
@@ -3838,7 +3830,7 @@
         {
             "_comment1": "Mapped for V5.5.3 build 171214",
             "keys": [
-                "Hikvision|DS-2DE4A320*"
+                "hikvision|DS-2DE4A320*"
             ],
             "useOnvifPtz": true,
             "ptzMapper": {
@@ -4245,7 +4237,7 @@
         },
         {
             "keys": [
-                "Hikvision|DS-2CD2342WD*"
+                "hikvision|DS-2CD2342WD*"
             ],
             "reopenBothStreams": true
         },
@@ -4308,7 +4300,7 @@
         {
             "_comment1": "Mapping for firmware: V5.5.0 build 171106",
             "keys": [
-                "HIKVISION|DS-2DF8236*"
+                "hikvision|DS-2DF8236*"
             ],
             "useOnvifPtz": true,
             "ptzMapper": {
@@ -4369,8 +4361,8 @@
         {
             "_comment1": "Mapped for V5.5.8 build 180902",
             "keys": [
-                "HIKVISION|DS-2DE4215IW*",
-                "HIKVISION|DS-2DE4*A*215IW*"
+                "hikvision|DS-2DE4215IW*",
+                "hikvision|DS-2DE4*A*215IW*"
             ],
             "useOnvifPtz": true,
             "ptzMapper": {
@@ -4398,9 +4390,9 @@
         {
             "_comment1": "Mapped for V5.5.3 build 171214",
             "keys": [
-                "Hikvision|DS-2DE4A320*",
-                "Hikvision|DS-2DE4A225*",
-                "Hikvision|DS-2DE4A425*"
+                "hikvision|DS-2DE4A320*",
+                "hikvision|DS-2DE4A225*",
+                "hikvision|DS-2DE4A425*"
             ],
             "useOnvifPtz": true,
             "ptzMapper": {
@@ -4427,16 +4419,16 @@
         },
         {
             "keys": [
-                "Hikvision|DS-9664NI-I16",
-                "Hikvision|DS-9632NI-I8",
-                "Hikvision|DS-7216HUHI-K2(S)"
+                "hikvision|DS-9664NI-I16",
+                "hikvision|DS-9632NI-I8",
+                "hikvision|DS-7216HUHI-K2(S)"
             ],
             "fetchVideoSourceConfigurationsViaProfiles": true
         },
         {
             "_comment1": "Mapped for V5.2.2 build 171214",
             "keys": [
-                "HIKVISION|DS-MH6171I*"
+                "hikvision|DS-MH6171I*"
             ],
             "useOnvifPtz": true,
             "ptzMapper": {
@@ -4597,7 +4589,7 @@
         },
         {
             "keys": [
-                "HIKVISION|DS-2DP1636ZIX-D/250", "Hikvision|DS-2DP1636ZIX-D/250"
+                "hikvision|DS-2DP1636ZIX-D/250"
             ],
             "useOnvifPtz": true,
             "ptzMapper": {
