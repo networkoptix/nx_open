@@ -17,7 +17,7 @@
             "_": "The following fields belong to the private plugin implementation.",
             "autodetect": true,
             "internalName": "GlobalChange",
-            "description": "Global scene change %1",
+            "description": " %1",
             "positiveState": "started",
             "negativeState": "stopped",
             "flags": "stateDependent"
@@ -27,7 +27,7 @@
             "name": "Excessive brightness",
             "autodetect": true,
             "internalName": "SignalTooBright",
-            "description": "Excessive brightness %1",
+            "description": " %1",
             "positiveState": "started",
             "negativeState": "stopped",
             "flags": "stateDependent"
@@ -37,7 +37,7 @@
             "name": "Insufficient brightness",
             "autodetect": true,
             "internalName": "SignalTooDark",
-            "description": "Insufficient brightness %1",
+            "description": " %1",
             "positiveState": "started",
             "negativeState": "stopped",
             "flags": "stateDependent"
@@ -65,7 +65,7 @@
             "name": "IVA: Intrusion (one field). Object in field",
             "autodetect": false,
             "internalName": "Objekt_in_Field_1",
-            "description": "IVA Object intrusion %1",
+            "description": " %1",
             "positiveState": "started",
             "negativeState": "stopped",
             "flags": "stateDependent"
@@ -76,7 +76,7 @@
             "name": "IVA: Intrusion (two fields). Left to right",
             "autodetect": false,
             "internalName": "Left_to_right",
-            "description": "IVA Object moving from left field to right field %1",
+            "description": " %1",
             "positiveState": "started",
             "negativeState": "stopped",
             "flags": "stateDependent"
@@ -86,7 +86,7 @@
             "name": "IVA: Intrusion (two fields). Right to left",
             "autodetect": false,
             "internalName": "Right_to_left",
-            "description": "IVA Object moving from right field to left field %1",
+            "description": " %1",
             "positiveState": "started",
             "negativeState": "stopped",
             "flags": "stateDependent"
@@ -96,7 +96,7 @@
             "name": "IVA: TrafficIncidents. Wrong way",
             "autodetect": false,
             "internalName": "Wrong_way",
-            "description": "IVA Traffic Incident 'Wrong way' %1",
+            "description": " %1",
             "positiveState": "started",
             "negativeState": "stopped",
             "flags": "stateDependent"
@@ -106,7 +106,7 @@
             "name": "IVA: TrafficIncidents. Pedestrian",
             "autodetect": false,
             "internalName": "Pedestrian",
-            "description": "IVA Traffic Incident 'Pedestrian' %1",
+            "description": " %1",
             "positiveState": "started",
             "negativeState": "stopped",
             "flags": "stateDependent"
@@ -116,7 +116,7 @@
             "name": "IVA: TrafficIncidents. Slow vehicle",
             "autodetect": false,
             "internalName": "Slow_vehicle",
-            "description": "IVA Traffic Incident 'Slow vehicle' %1",
+            "description": " %1",
             "positiveState": "started",
             "negativeState": "stopped",
             "flags": "stateDependent"
@@ -126,7 +126,7 @@
             "name": "IVA: TrafficIncidents. Stopped vehicle",
             "autodetect": false,
             "internalName": "Stopped_vehicle",
-            "description": "IVA Traffic Incident 'Stopped vehicle' %1",
+            "description": " %1",
             "positiveState": "started",
             "negativeState": "stopped",
             "flags": "stateDependent"
@@ -136,7 +136,7 @@
             "name": "IVA: TrafficIncidents. Dropped object",
             "autodetect": false,
             "internalName": "Dropped_object",
-            "description": "IVA Traffic Incident 'Dropped object' %1",
+            "description": " %1",
             "positiveState": "started",
             "negativeState": "stopped",
             "flags": "stateDependent"
@@ -149,7 +149,7 @@
             "name": "Signal loss",
             "autodetect": true,
             "internalName": "SignalLoss",
-            "description": "Signal loss %1",
+            "description": " %1",
             "positiveState": "started",
             "negativeState": "stopped",
             "flags": "stateDependent"
@@ -160,7 +160,7 @@
             "name": "IVA: Wrong way",
             "autodetect": false,
             "internalName": "Wrong_way",
-            "description": "IVA Traffic wrong way %1",
+            "description": " %1",
             "positiveState": "started",
             "negativeState": "stopped",
             "flags": "stateDependent"
@@ -170,7 +170,7 @@
             "name": "Motion detection",
             "autodetect": true,
             "internalName": "MotionAlarm",
-            "description": "Motion detection %1",
+            "description": " %1",
             "positiveState": "started",
             "negativeState": "stopped",
             "flags": "stateDependent"
@@ -180,7 +180,7 @@
             "name": "Blurry signal",
             "autodetect": true,
             "internalName": "SignalTooBlurry",
-            "description": "Blurry signal %1",
+            "description": " %1",
             "positiveState": "started",
             "negativeState": "stopped",
             "flags": "stateDependent"
@@ -190,7 +190,7 @@
             "name": "Flame detection",
             "autodetect": true,
             "internalName": "FlameDetected",
-            "description": "Flame detection %1",
+            "description": " %1",
             "positiveState": "started",
             "negativeState": "stopped",
             "flags": "stateDependent"
@@ -200,7 +200,7 @@
             "name": "Smoke detection",
             "autodetect": true,
             "internalName": "SmokeDetected",
-            "description": "Smoke detection %1",
+            "description": " %1",
             "positiveState": "started",
             "negativeState": "stopped",
             "flags": "stateDependent"
