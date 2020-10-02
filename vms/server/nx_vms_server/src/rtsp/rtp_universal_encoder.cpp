@@ -291,13 +291,14 @@ bool QnUniversalRtpEncoder::open(
     int status = -1;
     if (media->dataType == QnAbstractMediaData::VIDEO)
     {
-        QSize sourceSize = getVideoSize(media);
-        if (sourceSize.isEmpty())
+        if (method == QnTranscoder::TM_FfmpegTranscode)
         {
-            NX_WARNING(this, "Failed to get frame size, codec: %1", media->compressionType);
-            return false;
+            QSize sourceSize = getVideoSize(media);
+            if (sourceSize.isEmpty())
+                NX_DEBUG(this, "Failed to get frame size, codec: %1", media->compressionType);
+            else
+                m_transcoder.setSourceResolution(sourceSize);
         }
-        m_transcoder.setSourceResolution(sourceSize);
         m_transcoder.setTranscodingSettings(extraTranscodeParams);
         m_transcoder.setVideoCodec(m_codec, method, Qn::StreamQuality::normal, videoSize);
         status = m_transcoder.open(

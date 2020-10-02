@@ -48,6 +48,7 @@ QSize getFrameSize(const QnConstCompressedVideoDataPtr& frame)
 
             return QSize();
         }
+        // TODO support mpeg2video header(VMS-20363)
         default:
             return QSize();
     }
