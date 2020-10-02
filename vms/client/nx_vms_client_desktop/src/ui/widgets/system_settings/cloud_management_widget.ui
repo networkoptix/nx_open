@@ -294,7 +294,7 @@ Cloud Account&gt;</string>
           <item>
            <widget class="QLabel" name="linkedHintLabel">
             <property name="text">
-             <string notr="true">This system is connected to</string>
+             <string>This system is connected to</string>
             </property>
            </widget>
           </item>
