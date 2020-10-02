@@ -34,6 +34,8 @@ public:
 
     virtual bool isCompatible(const nx::sdk::IDeviceInfo* deviceInfo) const override;
 
+    nx::sdk::analytics::Plugin* plugin() const;
+
 protected:
     virtual void doSetSettings(
         nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult,

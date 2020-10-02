@@ -5,6 +5,7 @@
 
 #include <chrono>
 #include <algorithm>
+#include <set>
 
 #include "attributes_parser.h"
 #include "string_helper.h"
@@ -18,26 +19,52 @@ namespace vms_server_plugins {
 namespace analytics {
 namespace hikvision {
 
-static const QString kMonitorUrlTemplate("/ISAPI/Event/notification/alertStream");
-static const QString kLprUrlTemplate("/ISAPI/Traffic/channels/1/vehicleDetect/plates");
+namespace {
 
-static const int kDefaultHttpPort = 80;
-static const std::chrono::seconds kLprHttpRequestTimeout(15);
-static const std::chrono::minutes kKeepAliveTimeout(2);
-static const std::chrono::seconds kMinReopenInterval(10);
-static const std::chrono::seconds kLprRequestsTimeout(2);
-static const std::chrono::seconds kExpiredEventTimeout(5);
+const QString kMonitorUrlTemplate("/ISAPI/Event/notification/alertStream");
+const QString kLprUrlTemplate("/ISAPI/Traffic/channels/1/vehicleDetect/plates");
+
+constexpr int kDefaultHttpPort = 80;
+constexpr std::chrono::seconds kLprHttpRequestTimeout(15);
+constexpr std::chrono::minutes kKeepAliveTimeout(2);
+constexpr std::chrono::seconds kMinReopenInterval(10);
+constexpr std::chrono::seconds kLprRequestsTimeout(2);
+constexpr std::chrono::seconds kExpiredEventTimeout(5);
+constexpr int kMaxSupportedRegionCount = 4;
+
+std::vector<QString> addEventTypesForObjectTracking(
+    std::vector<QString> ids, const std::vector<QString>& objectTypes)
+{
+    std::set<QString> uniqueIds(ids.begin(), ids.end());
+
+    if (std::find(objectTypes.begin(), objectTypes.end(), "nx.hikvision.event")
+            != objectTypes.end())
+    {
+        constexpr char kPattern[] = "nx.hikvision.Alarm2Thermal%1";
+
+        uniqueIds.emplace(nx::format(kPattern, "Any"));
+        for (int i = 1; i <= kMaxSupportedRegionCount; ++i)
+            uniqueIds.emplace(nx::format(kPattern, i));
+    }
+
+    ids.assign(uniqueIds.begin(), uniqueIds.end());
+
+    return ids;
+}
+
+} // namespace
 
 HikvisionMetadataMonitor::HikvisionMetadataMonitor(
     const Hikvision::EngineManifest& manifest,
     const nx::vms::api::analytics::DeviceAgentManifest& deviceManifest,
     const nx::utils::Url& url,
     const QAuthenticator& auth,
-    const std::vector<QString>& eventTypes)
+    const std::vector<QString>& eventTypes,
+    const std::vector<QString>& objectTypes)
     :
     m_manifest(manifest),
     m_deviceManifest(deviceManifest),
-    m_monitorUrl(buildMonitoringUrl(url, eventTypes)),
+    m_monitorUrl(buildMonitoringUrl(url, eventTypes, objectTypes)),
     m_lprUrl(buildLprUrl(url)),
     m_auth(auth)
 {
@@ -96,12 +123,13 @@ void HikvisionMetadataMonitor::clearHandlers()
 
 nx::utils::Url HikvisionMetadataMonitor::buildMonitoringUrl(
     const nx::utils::Url& resourceUrl,
-    const std::vector<QString>& eventTypes) const
+    const std::vector<QString>& eventTypes,
+    const std::vector<QString>& objectTypes) const
 {
     const int channel =
         std::max(1, QUrlQuery(resourceUrl.query()).queryItemValue("channel").toInt());
     QString eventListIds;
-    for (const auto& eventTypeId: eventTypes)
+    for (const auto& eventTypeId: addEventTypesForObjectTracking(eventTypes, objectTypes))
     {
         const auto name = m_manifest.eventTypeById(eventTypeId).internalName;
         eventListIds += lit("/%1-%2").arg(name).arg(channel).toLower();
@@ -270,7 +298,6 @@ std::vector<HikvisionEvent> HikvisionMetadataMonitor::makeHikvisionEvents(
                 // This is a thermal event, probably it should generate some more thermal events.
                 for (const Region& region: eventWithRegions.regions)
                 {
-                    constexpr int kMaxSupportedRegionCount = 4;
                     if (region.id <= kMaxSupportedRegionCount)
                     {
                         // Add the same event one more time and update it.

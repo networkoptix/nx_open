@@ -6,6 +6,7 @@
 #include <map>
 #include <vector>
 
+#include <nx/utils/elapsed_timer.h>
 #include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/attribute.h>
 #include <nx/sdk/analytics/point.h>
@@ -13,11 +14,13 @@
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/object_track_best_shot_packet.h>
+#include <nx/sdk/helpers/uuid_helper.h>
 
 #include <QtCore/QString>
 #include <QtCore/QByteArray>
 #include <QtCore/QXmlStreamReader>
-#include <nx/utils/elapsed_timer.h>
+
+#include "common.h"
 
 namespace nx::vms_server_plugins::analytics::hikvision {
 
@@ -33,6 +36,9 @@ public:
 public:
     Result parsePacket(QByteArray bytes);
 
+    nx::sdk::Ptr<nx::sdk::analytics::ObjectTrackBestShotPacket> processEvent(
+        const HikvisionEvent& event);
+
 private:
     struct MinMaxRect
     {
@@ -42,15 +48,17 @@ private:
 
     struct CacheEntry
     {
-        bool bestShotGenerated = false;
+        bool shouldGenerateBestShot = false;
+        bool bestShotIsGenerated = false;
         std::optional<nx::sdk::analytics::Rect> boundingBox;
         std::vector<nx::sdk::Ptr<nx::sdk::Attribute>> attributes;
-        nx::sdk::Uuid trackId;
+        nx::sdk::Uuid trackId = nx::sdk::UuidHelper::randomUuid();
         nx::utils::ElapsedTimer lastUpdate;
         nx::utils::ElapsedTimer lifetime;
 
         CacheEntry()
         {
+            lastUpdate.restart();
             lifetime.restart();
         }
     };
@@ -82,6 +90,9 @@ private:
     TargetListResult parseTargetListElement();
     TargetListResult parseTargetDetectionElement();
     Result parseMetadataElement();
+
+    nx::sdk::Ptr<nx::sdk::analytics::ObjectTrackBestShotPacket> tryGenerateBestShot(
+        CacheEntry* entry);
 
     void evictStaleCacheEntries();
 

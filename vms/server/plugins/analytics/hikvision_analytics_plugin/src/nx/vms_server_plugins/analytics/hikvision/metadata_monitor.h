@@ -36,7 +36,8 @@ public:
         const nx::vms::api::analytics::DeviceAgentManifest& deviceManifest,
         const nx::utils::Url& resourceUrl,
         const QAuthenticator& auth,
-        const std::vector<QString>& eventTypes);
+        const std::vector<QString>& eventTypes,
+        const std::vector<QString>& objectTypes);
     virtual ~HikvisionMetadataMonitor();
 
     void startMonitoring();
@@ -53,7 +54,8 @@ public:
 private:
     nx::utils::Url buildMonitoringUrl(
         const nx::utils::Url& resourceUrl,
-        const std::vector<QString>& eventTypes) const;
+        const std::vector<QString>& eventTypes,
+        const std::vector<QString>& objectTypes) const;
     nx::utils::Url buildLprUrl(const nx::utils::Url& resourceUrl) const;
 
     void initMonitorUnsafe();

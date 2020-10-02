@@ -54,18 +54,8 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 void DeviceAgent::doSetNeededMetadataTypes(
     Result<void>* outResult, const IMetadataTypes* neededMetadataTypes)
 {
-    const auto eventTypeIds = neededMetadataTypes->eventTypeIds();
-    if (const char* const kMessage = "Event type id list is null";
-        !NX_ASSERT(eventTypeIds, kMessage))
-    {
-        *outResult = error(ErrorCode::internalError, kMessage);
-        return;
-    }
-
     stopFetchingMetadata();
-
-    if (eventTypeIds->count() != 0)
-        *outResult = startFetchingMetadata(neededMetadataTypes);
+    *outResult = startFetchingMetadata(neededMetadataTypes);
 }
 
 void DeviceAgent::doPushDataPacket(Result<void>* /*outResult*/, IDataPacket* dataPacket)
@@ -91,6 +81,12 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
     auto monitorHandler =
         [this](const HikvisionEventList& events)
         {
+            if (!NX_ASSERT(m_handler))
+                return;
+
+            if (!NX_ASSERT(m_eventTimestampAdjuster))
+                return;
+
             using namespace std::chrono;
             auto packet = makePtr<EventMetadataPacket>();
 
@@ -112,19 +108,26 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
                 eventMetadata->setIsActive(hikvisionEvent.isActive);
                 eventMetadata->setConfidence(1.0);
 
-                packet->setTimestampUs(
-                    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
+                const auto timestampUs = m_eventTimestampAdjuster->getCurrentTimeUs(
+                    hikvisionEvent.dateTime.toMSecsSinceEpoch() * 1000);
+                packet->setTimestampUs(timestampUs);
 
                 packet->setDurationUs(-1);
                 packet->addItem(eventMetadata.get());
+
+                if (const auto bestShotPacket = m_metadataParser.processEvent(hikvisionEvent))
+                {
+                    bestShotPacket->setTimestampUs(timestampUs);
+                    m_handler->handleMetadata(bestShotPacket.get());
+                }
             }
 
-            if (NX_ASSERT(m_handler))
-                m_handler->handleMetadata(packet.get());
+            m_handler->handleMetadata(packet.get());
         };
 
     NX_ASSERT(m_engine);
     std::vector<QString> eventTypes;
+    std::vector<QString> objectTypes;
 
     const auto eventTypeIdList = metadataTypes->eventTypeIds();
     if (const char* const kMessage = "Event type id list is null";
@@ -136,6 +139,16 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
     for (int i = 0; i < eventTypeIdList->count(); ++i)
         eventTypes.push_back(eventTypeIdList->at(i));
 
+    const auto objectTypeIdList = metadataTypes->objectTypeIds();
+    if (const char* const kMessage = "Object type id list is null";
+        !NX_ASSERT(objectTypeIdList, kMessage))
+    {
+        return error(ErrorCode::internalError, kMessage);
+    }
+
+    for (int i = 0; i < objectTypeIdList->count(); ++i)
+        objectTypes.push_back(objectTypeIdList->at(i));
+
     m_monitor =
         std::make_unique<HikvisionMetadataMonitor>(
             m_engine->engineManifest(),
@@ -143,7 +156,8 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
                 m_deviceAgentManifest),
             m_url,
             m_auth,
-            eventTypes);
+            eventTypes,
+            objectTypes);
 
     m_monitor->setDeviceInfo(m_name, m_uniqueId);
     m_monitor->addHandler(m_uniqueId, monitorHandler);
@@ -181,6 +195,12 @@ void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
     m_uniqueId = deviceInfo->id();
     m_sharedId = deviceInfo->sharedId();
     m_channelNumber = deviceInfo->channelNumber();
+
+    m_eventTimestampAdjuster.emplace(deviceInfo->url(),
+        [utilityProvider = m_engine->plugin()->utilityProvider()]()
+        {
+            return std::chrono::milliseconds(utilityProvider->vmsSystemTimeSinceEpochMs());
+        });
 }
 
 void DeviceAgent::setDeviceAgentManifest(const QByteArray& manifest)

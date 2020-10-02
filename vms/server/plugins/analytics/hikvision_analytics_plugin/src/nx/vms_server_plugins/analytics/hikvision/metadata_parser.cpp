@@ -4,7 +4,6 @@
 #include <string_view>
 
 #include <nx/utils/log/log_main.h>
-#include <nx/sdk/helpers/uuid_helper.h>
 
 namespace nx::vms_server_plugins::analytics::hikvision {
 
@@ -54,6 +53,19 @@ MetadataParser::Result MetadataParser::parsePacket(QByteArray bytes)
     }
 
     return result;
+}
+
+Ptr<ObjectTrackBestShotPacket> MetadataParser::processEvent(const HikvisionEvent& event)
+{
+    evictStaleCacheEntries();
+
+    if (!event.typeId.startsWith("nx.hikvision.Alarm2Thermal") || !event.region)
+        return nullptr;
+
+    auto& entry = m_cache[-event.region->id];
+    entry.shouldGenerateBestShot = true;
+    
+    return tryGenerateBestShot(&entry);
 }
 
 std::optional<QString> MetadataParser::parseStringElement()
@@ -109,7 +121,7 @@ std::optional<float> MetadataParser::parseCoordinateElement()
     return *value / kCoordinateDomain;
 }
 
-std::optional<Point> MetadataParser::parsePointElement()
+std::optional<nx::sdk::analytics::Point> MetadataParser::parsePointElement()
 {
     std::optional<float> x;
     std::optional<float> y;
@@ -145,13 +157,13 @@ std::optional<Point> MetadataParser::parsePointElement()
     if (!x || !y)
         return std::nullopt;
 
-    return Point{*x, *y};
+    return nx::sdk::analytics::Point{*x, *y};
 }
 
 std::optional<MetadataParser::MinMaxRect> MetadataParser::parseRegionElement()
 {
-    Point min = {1, 1};
-    Point max = {0, 0};
+    nx::sdk::analytics::Point min = {1, 1};
+    nx::sdk::analytics::Point max = {0, 0};
 
     bool seenPoint = false;
 
@@ -187,8 +199,8 @@ std::optional<MetadataParser::MinMaxRect> MetadataParser::parseRegionElement()
 
 std::optional<Rect> MetadataParser::parseRegionListElement()
 {
-    Point min = {1, 1};
-    Point max = {0, 0};
+    nx::sdk::analytics::Point min = {1, 1};
+    nx::sdk::analytics::Point max = {0, 0};
 
     bool seenRegion = false;
 
@@ -333,28 +345,24 @@ MetadataParser::TargetResult MetadataParser::parseTargetElement()
             return {};
     }
 
-    bool shouldGenerateBestShot = false;
+    auto& entry = m_cache[*trackId];
     for (auto it = attributes.begin(); it != attributes.end(); ++it)
     {
         if ((*it)->name() == "triggerEvent"sv && (*it)->value() == "true"sv)
         {
             attributes.erase(it);
-            shouldGenerateBestShot = true;
+            entry.shouldGenerateBestShot = true;
             break;
         }
     }
 
-    auto& entry = m_cache[*trackId];
-    if (boundingBox || !attributes.empty() || entry.trackId.isNull())
+    if (boundingBox || !attributes.empty())
         entry.lastUpdate.restart();
-    if (entry.trackId.isNull())
-        entry.trackId = nx::sdk::UuidHelper::randomUuid();
 
     if (boundingBox)
         entry.boundingBox = *boundingBox;
     if (!attributes.empty())
         entry.attributes = attributes;
-
 
     if (!entry.boundingBox)
     {
@@ -368,18 +376,7 @@ MetadataParser::TargetResult MetadataParser::parseTargetElement()
     metadata->setBoundingBox(*entry.boundingBox);
     metadata->addAttributes(entry.attributes);
 
-    Ptr<ObjectTrackBestShotPacket> bestShotPacket;
-    if (shouldGenerateBestShot && !entry.bestShotGenerated)
-    {
-        bestShotPacket = makePtr<ObjectTrackBestShotPacket>();
-
-        bestShotPacket->setTrackId(entry.trackId);
-        bestShotPacket->setBoundingBox(*entry.boundingBox);
-
-        entry.bestShotGenerated = true;
-    }
-
-    return {std::move(metadata), std::move(bestShotPacket)};
+    return {std::move(metadata), tryGenerateBestShot(&entry)};
 }
 
 MetadataParser::TargetListResult MetadataParser::parseTargetListElement()
@@ -495,6 +492,25 @@ MetadataParser::Result MetadataParser::parseMetadataElement()
     }
 
     return {std::move(metadataPacket), std::move(result.bestShotPackets)};
+}
+
+nx::sdk::Ptr<nx::sdk::analytics::ObjectTrackBestShotPacket> MetadataParser::tryGenerateBestShot(
+    CacheEntry* entry)
+{
+    if (!entry->shouldGenerateBestShot || entry->bestShotIsGenerated)
+        return nullptr;
+
+    if (!entry->boundingBox)
+        return nullptr;
+
+    auto bestShotPacket = makePtr<ObjectTrackBestShotPacket>();
+
+    bestShotPacket->setTrackId(entry->trackId);
+    bestShotPacket->setBoundingBox(*entry->boundingBox);
+
+    entry->bestShotIsGenerated = true;
+
+    return bestShotPacket;
 }
 
 void MetadataParser::evictStaleCacheEntries()

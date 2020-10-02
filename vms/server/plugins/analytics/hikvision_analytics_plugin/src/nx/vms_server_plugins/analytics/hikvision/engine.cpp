@@ -331,6 +331,11 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
     return vendor.startsWith(kHikvisionTechwinVendor);
 }
 
+nx::sdk::analytics::Plugin* Engine::plugin() const
+{
+    return m_plugin;
+}
+
 } // namespace hikvision
 } // namespace analytics
 } // namespace vms_server_plugins
