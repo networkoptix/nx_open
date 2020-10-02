@@ -42,46 +42,6 @@
             "negativeState": "stopped",
             "flags": "stateDependent"
         },
-        {
-            "id": "nx.bosch.SignalTooBlurry",
-            "name": "Blurry signal",
-            "autodetect": true,
-            "internalName": "SignalTooBlurry",
-            "description": "Blurry signal %1",
-            "positiveState": "started",
-            "negativeState": "stopped",
-            "flags": "stateDependent"
-        },
-        {
-            "id": "nx.bosch.FlameDetected",
-            "name": "Flame detection",
-            "autodetect": true,
-            "internalName": "FlameDetected",
-            "description": "Flame detection %1",
-            "positiveState": "started",
-            "negativeState": "stopped",
-            "flags": "stateDependent"
-        },
-        {
-            "id": "nx.bosch.SmokeDetected",
-            "name": "Smoke detection",
-            "autodetect": true,
-            "internalName": "SmokeDetected",
-            "description": "Smoke detection %1",
-            "positiveState": "started",
-            "negativeState": "stopped",
-            "flags": "stateDependent"
-        },
-        {
-            "id": "nx.bosch.MotionAlarm",
-            "name": "Motion detection",
-            "autodetect": true,
-            "internalName": "MotionAlarm",
-            "description": "Motion detection %1",
-            "positiveState": "started",
-            "negativeState": "stopped",
-            "flags": "stateDependent"
-        },
 
         {
             "id": "nx.bosch.Detect_any_object",
@@ -204,7 +164,46 @@
             "positiveState": "started",
             "negativeState": "stopped",
             "flags": "stateDependent"
+        },
+        {
+            "id": "nx.bosch.MotionAlarm",
+            "name": "Motion detection",
+            "autodetect": true,
+            "internalName": "MotionAlarm",
+            "description": "Motion detection %1",
+            "positiveState": "started",
+            "negativeState": "stopped",
+            "flags": "stateDependent"
+        },
+        {
+            "id": "nx.bosch.SignalTooBlurry",
+            "name": "Blurry signal",
+            "autodetect": true,
+            "internalName": "SignalTooBlurry",
+            "description": "Blurry signal %1",
+            "positiveState": "started",
+            "negativeState": "stopped",
+            "flags": "stateDependent"
+        },
+        {
+            "id": "nx.bosch.FlameDetected",
+            "name": "Flame detection",
+            "autodetect": true,
+            "internalName": "FlameDetected",
+            "description": "Flame detection %1",
+            "positiveState": "started",
+            "negativeState": "stopped",
+            "flags": "stateDependent"
+        },
+        {
+            "id": "nx.bosch.SmokeDetected",
+            "name": "Smoke detection",
+            "autodetect": true,
+            "internalName": "SmokeDetected",
+            "description": "Smoke detection %1",
+            "positiveState": "started",
+            "negativeState": "stopped",
+            "flags": "stateDependent"
         }
-
     ]
 }
