@@ -419,6 +419,12 @@ QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
 QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
     QnCompressedVideoDataPtr data, bool draw, QnFrameScaler::DownscaleFactor force_factor)
 {
+    {
+        //  Clear previos frame, since decoder clear it on decode call
+        QnMutexLocker lock(&m_mtx);
+        if (m_lastDisplayedFrame && m_lastDisplayedFrame->isExternalData())
+            m_lastDisplayedFrame.reset();
+    }
     updateRenderList();
 
     // use only 1 frame for non selected video
@@ -732,6 +738,13 @@ bool QnVideoStreamDisplay::downscaleFrame(const CLVideoDecoderOutputPtr& src, CL
 
 QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(int channel, QnFrameScaler::DownscaleFactor force_factor)
 {
+    {
+        //  Clear previos frame, since decoder clear it on decode call
+        QnMutexLocker lock(&m_mtx);
+        if (m_lastDisplayedFrame && m_lastDisplayedFrame->isExternalData())
+            m_lastDisplayedFrame.reset();
+    }
+
     // use only 1 frame for non selected video
     if (m_reverseMode || !m_decoderData.decoder || m_needResetDecoder)
         return Status_Skipped;
