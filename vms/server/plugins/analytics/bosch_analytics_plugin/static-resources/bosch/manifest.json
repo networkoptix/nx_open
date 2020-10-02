@@ -54,7 +54,7 @@
 
         {
             "id": "nx.bosch.Detect_any_motion",
-            "name": "IVA: Detect any motion",
+            "name": "MOTION+: Detect any motion",
             "autodetect": false,
             "internalName": "Detect_any_motion",
             "description": "IVA motion detected"
@@ -62,7 +62,7 @@
 
         {
             "id": "nx.bosch.IVA.Intrusion.Objekt_in_Field_1",
-            "name": "IVA: Intrusion. Object in field",
+            "name": "IVA: Intrusion (one field). Object in field",
             "autodetect": false,
             "internalName": "Objekt_in_Field_1",
             "description": "IVA Object intrusion %1",
@@ -73,7 +73,7 @@
 
         {
             "id": "nx.bosch.IVA.Intrusion.Left_to_right",
-            "name": "IVA: Intrusion. Left to right",
+            "name": "IVA: Intrusion (two fields). Left to right",
             "autodetect": false,
             "internalName": "Left_to_right",
             "description": "IVA Object moving from left field to right field %1",
@@ -83,7 +83,7 @@
         },
         {
             "id": "nx.bosch.IVA.Intrusion.Right_to_left",
-            "name": "IVA: Intrusion. Right to left",
+            "name": "IVA: Intrusion (two fields). Right to left",
             "autodetect": false,
             "internalName": "Right_to_left",
             "description": "IVA Object moving from right field to left field %1",
