@@ -945,6 +945,14 @@
     </message>
   </context>
   <context>
+    <name>CloudManagementWidget</name>
+    <message>
+      <location filename="../src/ui/widgets/system_settings/cloud_management_widget.ui"/>
+      <source>This system is connected to</source>
+      <translation>Dieses System ist verbunden mit</translation>
+    </message>
+  </context>
+  <context>
     <name>ConnectToCloudDialog</name>
     <message>
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
