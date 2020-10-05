@@ -61,7 +61,8 @@ if(targetDevice STREQUAL "edge1")
     set(_withTestCamera OFF)
 endif()
 
-if(LINUX AND box MATCHES "none" AND NOT developerBuild)
+if(LINUX AND box MATCHES "none" AND NOT developerBuild
+    AND NOT "${arch}" STREQUAL "arm64" AND NOT "${arch}" STREQUAL "arm")
     set(_withRootTool ON)
 endif()
 
