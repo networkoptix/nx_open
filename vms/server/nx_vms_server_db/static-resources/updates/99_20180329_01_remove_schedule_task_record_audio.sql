@@ -2,6 +2,9 @@
 
 ALTER TABLE vms_scheduletask RENAME TO vms_scheduletask_tmp;
 
+DELETE FROM vms_scheduletask_tmp
+    WHERE camera_attrs_id NOT IN (SELECT id FROM vms_camera_user_attributes);
+
 CREATE TABLE "vms_scheduletask" (
     id integer PRIMARY KEY AUTOINCREMENT,
     camera_attrs_id integer NOT NULL,

@@ -2127,6 +2127,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/99_20180122_remove_secondary_stream_quality.sql")))
         return resyncIfNeeded(ResyncCameraAttributes);
 
+    if (updateName.endsWith(lit("/99_20180329_01_remove_schedule_task_record_audio.sql")))
+        return resyncIfNeeded(ResyncCameraAttributes);
+
     if (updateName.endsWith(lit("/99_20180329_02_add_record_thresholds_camera_attributes.sql")))
         return resyncIfNeeded(ResyncCameraAttributes);
 
