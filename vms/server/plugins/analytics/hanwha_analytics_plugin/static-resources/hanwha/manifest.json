@@ -1,8 +1,7 @@
 {
     "streamTypeFilter": "metadata",
     "capabilities": "deviceDependent|keepObjectBoundingBoxRotation|noAutoBestShots",
-    "objectTypes":
-    [
+    "objectTypes": [
         {
             "id": "nx.hanwha.ObjectDetection.Person",
             "name": "Person tracking",
@@ -24,8 +23,7 @@
             "internalName": "LicensePlate"
         }
     ],
-    "deviceAgentSettingsModel":
-    {
+    "deviceAgentSettingsModel": {
         "type": "Settings",
         "sections": [
             {
@@ -679,8 +677,7 @@
             }
         ]
     },
-    "eventTypes":
-    [
+    "eventTypes": [
         {
             "id": "nx.hanwha.FaceDetection",
             "name": "Face detection",
@@ -785,16 +782,6 @@
             "positiveState": "activated",
             "negativeState": "deactivated",
             "flags": "stateDependent|hidden"
-        },
-        {
-            "id": "nx.hanwha.MotionDetection",
-            "name": "Motion detection",
-            "internalName": "MotionDetection",
-            "description": "Motion %1",
-            "positiveState": "has been detected%1",
-            "negativeState": "has ended%1",
-            "flags": "stateDependent | regionDependent",
-            "regionDescription": " in the region #%1"
         },
         {
             "id": "nx.hanwha.AudioAnalytics.Scream",
@@ -932,8 +919,19 @@
         }
 
     ],
-    "groups":
-    [
+    "unusedEventTypes": [
+        {
+            "id": "nx.hanwha.MotionDetection",
+            "name": "Motion detection",
+            "internalName": "MotionDetection",
+            "description": "Motion %1",
+            "positiveState": "has been detected%1",
+            "negativeState": "has ended%1",
+            "flags": "stateDependent | regionDependent",
+            "regionDescription": " in the region #%1"
+        }
+    ],
+    "groups": [
         {
             "id": "nx.hanwha.Queue",
             "name": "Queue"
