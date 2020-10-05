@@ -704,33 +704,33 @@
             "id": "nx.hanwha.VideoAnalytics.Passing",
             "name": "Virtual line crossing",
             "internalName": "VideoAnalytics.Passing",
-            "description": "Virtual line %1 was crossed",
+            "description": "Virtual line%1 was crossed",
             "flags": "regionDependent",
-            "regionDescription": "#%1"
+            "regionDescription": " #%1"
         },
         {
             "id": "nx.hanwha.VideoAnalytics.Entering",
             "name": "Entering the area",
             "internalName": "VideoAnalytics.Entering",
-            "description": "Object has entered %1",
+            "description": "Object has entered%1",
             "flags": "regionDependent",
-            "regionDescription": "the region #%1"
+            "regionDescription": " the region #%1"
         },
         {
             "id": "nx.hanwha.VideoAnalytics.Exiting",
             "name": "Exiting the area",
             "internalName": "VideoAnalytics.Exiting",
-            "description": "Object has exited %1",
+            "description": "Object has exited%1",
             "flags": "regionDependent",
-            "regionDescription": "the region #%1"
+            "regionDescription": " the region #%1"
         },
         {
             "id": "nx.hanwha.VideoAnalytics.AppearDisappear",
             "name": "Appearing in the area",
             "internalName": "VideoAnalytics.AppearDisappear,VideoAnalytics.Appearing",
-            "description": "Object appeared %1",
+            "description": "Object appeared%1",
             "flags": "regionDependent",
-            "regionDescription": "in the region #%1"
+            "regionDescription": " in the region #%1"
         },
         {
             "id": "nx.hanwha.VideoAnalytics.Intrusion",
@@ -790,11 +790,11 @@
             "id": "nx.hanwha.MotionDetection",
             "name": "Motion detection",
             "internalName": "MotionDetection",
-            "description": "Motion %1%2",
-            "positiveState": "has been detected",
-            "negativeState": "has ended",
+            "description": "Motion %1",
+            "positiveState": "has been detected%1",
+            "negativeState": "has ended%1",
             "flags": "stateDependent | regionDependent",
-            "regionDescription": "  in the region #%1"
+            "regionDescription": " in the region #%1"
         },
         {
             "id": "nx.hanwha.AudioAnalytics.Scream",
@@ -827,9 +827,9 @@
             "id": "nx.hanwha.VideoAnalytics.Loitering",
             "name": "Loitering",
             "internalName": "VideoAnalytics.Loitering",
-            "description": "Loitering has been detected %1",
+            "description": "Loitering has been detected%1",
             "flags": "regionDependent",
-            "regionDescription": "in the region #%1"
+            "regionDescription": " in the region #%1"
         },
         {
             "id": "nx.hanwha.Queue.1.Level.High",

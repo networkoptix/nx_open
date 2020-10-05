@@ -45,7 +45,8 @@ QString StringHelper::buildDescription(
 
     if (descriptor.flags.testFlag(EventTypeFlag::regionDependent))
     {
-        const auto& regionStr = descriptor.regionDescription.arg(eventRegion ? *eventRegion : 0);
+        const auto regionStr =
+            eventRegion ? descriptor.regionDescription.arg(*eventRegion) : QString();
         description = description.arg(regionStr);
     }
 
