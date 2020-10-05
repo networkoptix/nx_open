@@ -16,6 +16,7 @@ namespace {
 constexpr double kCoordinateDomain = 1000;
 constexpr auto kCacheEntryInactivityLifetime = 3s;
 constexpr auto kCacheEntryMaximumLifetime = 30s;
+constexpr auto kEventObjectTypeId = "nx.hikvision.event"sv;
 
 } // namespace
 
@@ -340,7 +341,7 @@ MetadataParser::TargetResult MetadataParser::parseTargetElement()
     {
         // Treat rule activations as objects.
         if (*trackId < 0)
-            typeId = "nx.hikvision.event";
+            typeId = kEventObjectTypeId;
         else
             return {};
     }
@@ -359,8 +360,15 @@ MetadataParser::TargetResult MetadataParser::parseTargetElement()
     if (boundingBox || !attributes.empty())
         entry.lastUpdate.restart();
 
-    if (boundingBox)
+    if (boundingBox && (
+        typeId != kEventObjectTypeId
+        || !entry.boundingBox
+        || (boundingBox->width > entry.boundingBox->width
+            && boundingBox->height > entry.boundingBox->height)))
+    {
         entry.boundingBox = *boundingBox;
+    }
+
     if (!attributes.empty())
         entry.attributes = attributes;
 
