@@ -60,10 +60,12 @@ def determine_package_versions(
         v["libva"] = "2.6"
         v["intel-media-sdk"] = "19.4.0"
         v["sysroot"] = "xenial-1"
+        v["qt"] += "-1"
 
     if platform == "macosx":
         v["festival"] = "2.1"
         v["ffmpeg"] = "3.1.9-3"
+        v["qt"] += "-1"
 
     if platform == "android":
         v["ffmpeg"] = "3.1.1"
@@ -86,6 +88,7 @@ def determine_package_versions(
         v["ffmpeg"] = "3.1.9-6"
         v["openssl"] = "1.0.2q-2"
         v["sysroot"] = "xenial"
+        v["qt"] += "-1"
 
     if box == "bpi":
         v["festival"] = "2.4-1"
@@ -106,6 +109,7 @@ def determine_package_versions(
         v["ffmpeg"] = "3.1.9-3"
         v["intel-media-sdk"] = "2019R1"
         v["glew"] = "2.1.0"
+        v["qt"] += "-1"
         if debug:
             for package in ("qt", "festival", "openal", "openssl", "sigar", "icu"):
                 v[package] += "-debug"
