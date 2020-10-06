@@ -672,7 +672,11 @@ DeviceAgentSettingsResponse DeviceAnalyticsBinding::makeDeviceAgentSettingsRespo
     DeviceAgentSettingsResponse result;
     result.session = m_deviceAgentContext.settingsSession;
     result.settingsModelId = m_deviceAgentContext.settingsContext.modelId;
-    result.settingsModel = m_deviceAgentContext.settingsContext.model;
+
+    SettingsEngineWrapper settingsEngine(serverModule()->eventConnector(), m_engine, m_device);
+    settingsEngine.loadModelFromJsonObject(m_deviceAgentContext.settingsContext.model);
+
+    result.settingsModel = settingsEngine.serializeModel();
     result.settingsValues = m_deviceAgentContext.settingsContext.values;
 
     const QnUuid engineId = m_engine->getId();
