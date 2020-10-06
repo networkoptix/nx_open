@@ -949,7 +949,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/cloud_management_widget.ui"/>
       <source>This system is connected to</source>
-      <translation type="unfinished">This system is connected to</translation>
+      <translation>이 시스템은 아래 VIVEex-Link 계정으로 연결되었습니다.</translation>
     </message>
   </context>
   <context>
