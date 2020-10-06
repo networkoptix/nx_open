@@ -126,7 +126,7 @@ PluginDiagnosticMessageBuilder::PluginDiagnosticMessageBuilder(
     m_suspicionCaption(std::move(suspicionCaption)),
     m_suspicionDetails(std::move(suspicionDetails))
 {
-    NX_ASSERT(!suspicionCaption.isEmpty());
+    NX_ASSERT(!m_suspicionCaption.isEmpty());
 
     NX_ASSERT(m_error.isOk());
     NX_ASSERT(m_sdkMethod == SdkMethod::undefined);
