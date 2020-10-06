@@ -249,11 +249,11 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(
             auth);
     }
 
+    const int channel = QUrlQuery(url.query()).queryItemValue(QLatin1String("channel")).toInt();
+
     // Optimization: do not pull resource every time if resource already in pool.
     if (rpResource)
     {
-        int channel = QUrlQuery(url.query()).queryItemValue(QLatin1String("channel")).toInt();
-
         if (channel == 0 && !hasRunningLiveProvider(rpResource)) {
             resource->calcTimeDrift();
             if (!resource->readDeviceInformation())
@@ -351,6 +351,10 @@ QList<QnResourcePtr> OnvifResourceSearcher::checkHostAddrInternal(
             resource->fetchChannelCount(limitedByEncoders);
             if (resource->getMaxChannels() > 1)
                 setupResourceGroupIfNeed(resource, resource->getPhysicalId());
+
+            if (channel > 1)
+                resource->updateToChannel(channel - 1);
+
             resList << resource;
 
             // checking for multichannel encoders
