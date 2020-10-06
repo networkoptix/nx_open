@@ -79,6 +79,7 @@ public:
 
     QString fixedFileName() const;
     void setProgressBounds(qint64 bof, qint64 eof);
+    qint64 eofDateTimeUs() const;
 
     /*
     * Calc hash for writing file
@@ -252,7 +253,7 @@ private:
     bool m_interleavedStream = false;
     Qn::StreamQuality m_transcodeQuality = Qn::StreamQuality::normal;
     int m_transcoderFixedFrameRate = 0;
-    QnMutex m_mutex;
+    mutable QnMutex m_mutex;
     AVCodecID m_lastCompressionType = AV_CODEC_ID_NONE;
 };
 

@@ -292,11 +292,11 @@ void QnRecordingManager::startRecording(
         NX_INFO(this, "Recording started for camera %1", id);
         // Reset eof time from recorder
         recorder->recorder->setProgressBounds(AV_NOPTS_VALUE, AV_NOPTS_VALUE);
-        camera->inUse(recorder->recorder.get());
         recorder->recorder->start();
-        recorder->reorderingProvider->start();
-        provider->startIfNotRunning();
     }
+    camera->inUse(recorder->recorder.get());
+    recorder->reorderingProvider->start();
+    provider->startIfNotRunning();
 }
 
 bool QnRecordingManager::stopRecording(
@@ -317,8 +317,8 @@ bool QnRecordingManager::stopRecording(
         const auto lastTimestamp = recorder->reorderingProvider->flush();
         if (lastTimestamp) //< Record reordering buffer before stop.
             recorder->recorder->setProgressBounds(AV_NOPTS_VALUE, lastTimestamp->count());
-        else
-            recorder->recorder->pleaseStop();
+        else if (recorder->recorder->eofDateTimeUs() == AV_NOPTS_VALUE)
+            recorder->recorder->pleaseStop();  //< Stop now if lastPacketTime to process is not scheduled.
         return true;
     }
     return false;

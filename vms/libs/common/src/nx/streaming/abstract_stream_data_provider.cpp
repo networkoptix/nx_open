@@ -48,10 +48,6 @@ void QnAbstractStreamDataProvider::addDataProcessor(QnAbstractMediaDataReceptor*
         m_dataprocessors.push_back(dp);
         dp->consumers += 1;
     }
-    else
-    {
-        NX_DEBUG(this, "Data processor is already added: %1", dp);
-    }
 }
 
 bool QnAbstractStreamDataProvider::needConfigureProvider() const
