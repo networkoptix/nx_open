@@ -1197,7 +1197,24 @@
                 "kps|xst08",
                 "dhi-nvr4416-16p-4k|private",
                 "dw-enhd16|jhdc_dw-enhd16",
-                "dahua|x51a3e"
+                "dahua|x51a3e",
+                "hen161*4|general",
+                "general|hen161*",
+                "general|rvnvr080020a",
+                "dvs-ip5-4|onvif",
+                "nvr304-32ep-b|pier",
+                "ezip-nvr2a08hs-8p|general",
+                "etrovision technology|ev3151a",
+                "ar315-8|embedded net dvr",
+                "dw-en4k16|dw-noel-elem",
+                "general|opdvr08-000",
+                "general|opdvr04-000",
+                "general|opdvr16-000",
+                "fsdi-dck-10|ip-camera",
+                "bosch|vip_x1_xf_e",
+                "bosch|vip_x1_xf_iva",
+                "dw-enhd16|camer",
+                "l-ipr-5216-ep-4k|general"
             ],
             "analogEncoder": true
         },
@@ -1605,7 +1622,8 @@
                 "hikvision|DS-2CD2955FWD*",
                 "hikvision|DS-2CD2135FWD*",
                 "hikvision|DS-2CD2555FWD*",
-                "AMTK|AH5583T*"
+                "AMTK|AH5583T*",
+                "HIKVISION|DS-2CD7A26G0*"
             ],
             "pullInputEventsAsOdm": true
         },
@@ -1633,7 +1651,8 @@
                 "hikvision|DS-2CD2955FWD*",
                 "hikvision|DS-2CD2135FWD*",
                 "hikvision|DS-2CD2555FWD*",
-                "hikvision|DS-2TD2617B*"
+                "hikvision|DS-2TD2617B*",
+                "HIKVISION|DS-2CD7A26G0*"
             ],
             "parseOnvifNotificationsWithHttpReader": true
         },
@@ -3646,7 +3665,10 @@
             "avigilon|15c-h4a-3mh-270",
             "ms9321-ehv|vivotek ms9321-ehv",
             "univiewtec|ipbp4k180",
-            "axis|axis p3719*"
+            "axis|axis p3719*",
+            "s16a|mobotix s16a",
+            "hikvision|ds-2cd6944g0-ihs",
+            "dahua|ipc-pdbw8802-a180"
             ],
             "canShareLicenseGroup": true
         },
@@ -3822,34 +3844,6 @@
                         "device":  [0, 0.09, 0.17, 0.27, 0.38, 0.48, 0.57, 0.66, 0.77, 0.92, 1],
                         "logical": [1, 3.68, 6.05, 8.95, 12.32, 15.05, 17.37, 19.74, 22.32, 25.00, 26.58],
                         "logicalMultiplier": 27,
-                        "space": "35MmEquiv"
-                    }
-                }
-            }
-        },
-        {
-            "_comment1": "Mapped for V5.5.3 build 171214",
-            "keys": [
-                "hikvision|DS-2DE4A320*"
-            ],
-            "useOnvifPtz": true,
-            "ptzMapper": {
-                "fromCamera": {
-                    "x": {
-                        "extrapolationMode": "PeriodicExtrapolation",
-                        "device":  [  -1,1],
-                        "logical": [-180, 180]
-                    },
-                    "y": {
-                        "extrapolationMode": "ConstantExtrapolation",
-                        "device":  [-1, 1],
-                        "logical": [5, -90]
-                    },
-                    "z": {
-                        "extrapolationMode": "ConstantExtrapolation",
-                        "device":  [0, 0.05, 0.1, 0.02, 0.05, 0.1, 0.2, 0.5, 1],
-                        "logical": [1, 1.5, 2, 3.0, 3.5, 4.5, 6, 6.5, 7],
-                        "logicalMultiplier": 35,
                         "space": "35MmEquiv"
                     }
                 }
@@ -4069,7 +4063,8 @@
         {
             "_comment1": "Mapping for firmware: IPC_HCMN2108-B0009P30D1809",
             "keys": [
-                "hikvision|DS-2DE4225*"
+                "hikvision|DS-2DE4225*",
+                "hikvision|DS-2DE4425*"
             ],
             "useOnvifPtz": true,
             "ptzMapper": {
@@ -4389,9 +4384,7 @@
         {
             "_comment1": "Mapped for V5.5.3 build 171214",
             "keys": [
-                "hikvision|DS-2DE4A320*",
-                "hikvision|DS-2DE4A225*",
-                "hikvision|DS-2DE4A425*"
+                "hikvision|DS-2DE4A320*"
             ],
             "useOnvifPtz": true,
             "ptzMapper": {
@@ -4679,6 +4672,92 @@
             "__comment": "Format: four comma separated values for send, recv, connect, accept timeouts OR one value - the same for all four timeouts",
             "keys": [ "QWL|AU2" ],
             "onvifTimeoutSeconds": "40"
+        },
+        {
+            "_comment1": "Mapped for v5.6.15 build 191211",
+            "keys": [
+                "Hikvision|DS-2DE4A225*",
+                "Hikvision|DS-2DE4A425*"
+            ],
+            "useOnvifPtz": true,
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [ 0,360]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [-90, -5]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.05, 0.1, 0.02, 0.05, 0.1, 0.2, 0.5, 1],
+                        "logical": [1, 1.5, 2, 3.0, 3.5, 4.5, 6, 6.5, 7],
+                        "logicalMultiplier": 35,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "_comment": "Mapping for HIKVISION DS-2DF8425IX on firmware: v5.4.2 build 170824",
+        "keys": [
+                "HIKVISION|DS-2DF8425IX*", "Hikvision|DS-2DF8425IX*"
+            ],
+            "useOnvifPtz": true,
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [ -180,180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [-90, 20]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+                        "logical": [1, 3.4, 5.8, 8.2, 10.6, 13, 15.4, 17.8, 20.2, 22.6, 25],
+                        "logicalMultiplier": 35,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "_comment1": "Mapped for V5.3.9 build 150910",
+            "keys": [
+                "hikvision|DS-2DE5174*"
+            ],
+            "useOnvifPtz": true,
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [  -1,1],
+                        "logical": [-180, 180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [-1, 1],
+                        "logical": [0, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0, 0.1, 0.15, 0.20, 0.25, 0.3, 0.35, 0.4, 0.5, 0.6, 0.7, 0.8, 1],
+                        "logical": [1.00, 1.93, 2.93, 3.87, 4.8, 5.8, 6.73, 7.77, 9.53, 11.33, 13.07, 14.67, 16.13],
+                        "logicalMultiplier": 35,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
         }
+
     ]
 }
