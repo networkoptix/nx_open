@@ -1054,6 +1054,9 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             const bool transcodingIsRequired = srcAudioCodec == AV_CODEC_ID_MP2
                 && context.fileFormat == QnAviArchiveMetadata::Format::avi;
 
+            if (transcodingIsRequired && m_dstAudioCodec == AV_CODEC_ID_NONE)
+                m_dstAudioCodec = srcAudioCodec;
+
             if ((m_dstAudioCodec == AV_CODEC_ID_NONE || m_dstAudioCodec == srcAudioCodec)
                 && !transcodingIsRequired)
             {

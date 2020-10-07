@@ -208,21 +208,15 @@ bool QnDesktopDataProvider::EncodedAudioInfo::setupFormat(QString& errMessage)
     m_audioFormat.setChannelCount(2);
     m_audioFormat.setSampleType(QAudioFormat::SignedInt);
 
-    if (!m_audioDevice.isFormatSupported(m_audioFormat))
+    m_audioFormat = m_audioDevice.nearestFormat(m_audioFormat);
+    if (!m_audioFormat.isValid())
     {
-        m_audioFormat.setChannelCount(1);
-        if (!m_audioDevice.isFormatSupported(m_audioFormat))
-        {
-            m_audioFormat.setSampleRate(AUDIO_CAUPTURE_ALT_FREQUENCY);
-            if (!m_audioDevice.isFormatSupported(m_audioFormat))
-            {
-                errMessage = tr("44.1 kHz and 48 kHz audio formats are not supported by the audio "
-                    "capturing device. Please select another audio device or \"none\" in the "
-                    "Screen Recording settings.");
-                return false;
-            }
-        }
+        errMessage = tr("The audio capturing device supports no suitable audio formats."
+            "Please select another audio device or \"none\" in the Screen Recording settings.");
+
+        return false;
     }
+
     m_audioQueue.setMaxSize(AUDIO_QUEUE_MAX_SIZE);
     return true;
 }
