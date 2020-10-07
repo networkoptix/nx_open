@@ -125,7 +125,7 @@
     <message>
       <location/>
       <source>Use Hardware Video Decoding</source>
-      <translation type="unfinished">Use Hardware Video Decoding</translation>
+      <translation>Використовуйте апаратне декодування відео</translation>
     </message>
   </context>
   <context>
@@ -949,7 +949,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/cloud_management_widget.ui"/>
       <source>This system is connected to</source>
-      <translation type="unfinished">This system is connected to</translation>
+      <translation>Ця система підключена до</translation>
     </message>
   </context>
   <context>
@@ -1364,22 +1364,22 @@
     <message>
       <location/>
       <source>Show grid</source>
-      <translation type="unfinished">Show grid</translation>
+      <translation>Показати сітку</translation>
     </message>
     <message>
       <location/>
       <source>Mount</source>
-      <translation type="unfinished">Mount</translation>
+      <translation>Кріплення</translation>
     </message>
     <message>
       <location/>
       <source>Angle</source>
-      <translation type="unfinished">Angle</translation>
+      <translation>Кут</translation>
     </message>
     <message>
       <location/>
       <source>Lens projection</source>
-      <translation type="unfinished">Lens projection</translation>
+      <translation>Проекція лінзи</translation>
     </message>
   </context>
   <context>
@@ -1460,7 +1460,7 @@
     <message>
       <location/>
       <source>Play audio from all cameras on layout</source>
-      <translation type="unfinished">Play audio from all cameras on layout</translation>
+      <translation>Відтворювати аудіо з усіх камер на розкладці</translation>
     </message>
   </context>
   <context>
@@ -1986,7 +1986,7 @@
     <message>
       <location/>
       <source>Show aim overlay for PTZ cameras</source>
-      <translation type="unfinished">Show aim overlay for PTZ cameras</translation>
+      <translation>Показати перекриття прицілу для поворотних камер</translation>
     </message>
   </context>
   <context>

@@ -1981,7 +1981,7 @@
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</translation>
+      <translation>Сховище аналітики &quot;%1&quot; помилка БД: недостатньо прав для точки монтування.</translation>
     </message>
   </context>
   <context>

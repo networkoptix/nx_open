@@ -131,7 +131,7 @@
         "maxEventLogRecords": "Nombre maximal d'enregistrements du journal des événements à conserver dans la base de données. La quantité réelle d'enregistrements non supprimés peut dépasser de 20% la valeur spécifiée.",
         "forceLiveCacheForPrimaryStream": "S'il faut mettre certaines images en cache pour le flux principal. Valeurs: \"oui\" - toujours activé (peut utiliser beaucoup de RAM), \"non\" - toujours désactivé sauf lorsque requis par la lecture (par exemple, HLS), \"auto\" - similaire à \"non\", mais activé lorsque l'amélioration de l'expérience utilisateur (par exemple, lorsqu'un plug-in Analytics fonctionne sur la caméra).",
         "additionalLocalFsTypes": "Types de systèmes de fichiers supplémentaires à prendre en compte pour décider si une partition donnée convient comme stockage de serveur. Une liste de noms de système de fichiers séparés par des virgules, tels qu'ils figurent dans /proc/mounts, est attendue.",
-        "mediaBufferSizeKb": "Server-side media buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value, but slows down the auto quality switching and reaction to media seek operations."
+        "mediaBufferSizeKb": "Taille du tampon média côté serveur en Ko. Une valeur plus élevée permet d'utiliser une connexion Internet plus efficace avec une valeur de retard aller-retour élevée, mais ralentit la commutation automatique de la qualité et la réaction à l'opération de recherche média."
     },
     "info": {
         "tabs": {

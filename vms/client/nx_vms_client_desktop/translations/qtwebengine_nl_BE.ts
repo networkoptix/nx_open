@@ -393,7 +393,7 @@
     </message>
     <message>
       <source>Enter username and password for &quot;%1&quot; at %2://%3</source>
-      <translation>Enter username and password for &quot;%1&quot; at %2://%3</translation>
+      <translation>Voer gebruikersnaam en wachtwoord voor &quot;%1&quot; op %2://%3 in</translation>
     </message>
     <message>
       <source>Javascript Alert - %1</source>

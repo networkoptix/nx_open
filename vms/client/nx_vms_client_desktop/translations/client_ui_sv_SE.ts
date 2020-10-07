@@ -949,7 +949,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/cloud_management_widget.ui"/>
       <source>This system is connected to</source>
-      <translation type="unfinished">This system is connected to</translation>
+      <translation>Detta system är anslutet till</translation>
     </message>
   </context>
   <context>
