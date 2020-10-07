@@ -93,7 +93,7 @@ private:
         const std::shared_ptr<SharedResources>& sharedRes,
         int channel);
 
-    static QSize fetchMaxResolution(
+    static QSize fetchRoiResolution(
         const std::shared_ptr<SharedResources>& sharedRes,
         const nx::sdk::IDeviceInfo* deviceInfo);
 

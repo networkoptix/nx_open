@@ -30,7 +30,7 @@ class DeviceAgent:
 {
 public:
     DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo,
-        bool isNvr, QSize maxResolution);
+        bool isNvr, QSize roiResolution);
     virtual ~DeviceAgent();
 
     virtual void setHandler(
@@ -88,7 +88,6 @@ private:
     MetadataMonitor* m_monitor = nullptr;
     nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
 
-    FrameSize m_frameSize;
     Settings m_settings;
     mutable SettingsProcessor m_settingsProcessor;
     mutable std::mutex m_settingsMutex;

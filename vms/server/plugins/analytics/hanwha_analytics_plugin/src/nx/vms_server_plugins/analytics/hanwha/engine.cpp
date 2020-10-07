@@ -220,12 +220,8 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
 
     const bool isNvr = fetchIsNvr(sharedRes);
 
-    // We need max resolution to translate relative coordinates to absolute and backward.
-    // fetchMaxResolution may fail for some devices, in this case we get max resolution with
-    // a special request later.
-    const QSize maxResolution = fetchMaxResolution(sharedRes, deviceInfo);
-
-    const auto deviceAgent = new DeviceAgent(this, deviceInfo, isNvr, maxResolution);
+    const QSize roiResolution = fetchRoiResolution(sharedRes, deviceInfo);
+    const auto deviceAgent = new DeviceAgent(this, deviceInfo, isNvr, roiResolution);
 
     const std::string firmwareVersion = deviceAgent->loadFirmwareVersion();
     const bool areSettingsAndTrackingAllowed = isFirmwareActual(firmwareVersion);
@@ -376,25 +372,32 @@ std::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
     return attributes.attribute<bool>("Eventsource", "ObjectDetection", channel).value_or(false);
 }
 
-/*static*/ QSize Engine::fetchMaxResolution(const std::shared_ptr<SharedResources>& sharedRes,
+/*static*/ QSize Engine::fetchRoiResolution(const std::shared_ptr<SharedResources>& sharedRes,
     const nx::sdk::IDeviceInfo* deviceInfo)
 {
-    static const QString kNoMaxResolution = "1x1";
+    QString roiMaxXAsString = "0";
+    QString roiMaxYAsString = "0";
 
     if (const auto& information = sharedRes->sharedContext->information())
     {
         if (const auto& attributes = information->attributes; attributes.isValid())
         {
-            const QString maxResolutionAsString = attributes.attribute<QString>(
-                "Media", "MaxResolution", deviceInfo->channelNumber())
-                .value_or(kNoMaxResolution);
-            const auto maxResolutionAsList = maxResolutionAsString.split('x');
-            if (maxResolutionAsList.size() == 2)
-                return QSize(maxResolutionAsList[0].toInt(), maxResolutionAsList[1].toInt());
+            roiMaxXAsString = attributes.attribute<QString>(
+                "Eventsource", "ROICoordinate.MaxX", deviceInfo->channelNumber())
+                .value_or(roiMaxXAsString);
+            roiMaxYAsString = attributes.attribute<QString>(
+                "Eventsource", "ROICoordinate.MaxY", deviceInfo->channelNumber())
+                .value_or(roiMaxYAsString);
         }
     }
 
-    return {};
+    if (roiMaxXAsString == "0" || roiMaxYAsString == "0")
+    {
+        NX_DEBUG(typeid(Engine), "ROI max coordinated reading failure for the Device %1 (%2). "
+            "ROI settings can't work fine.", deviceInfo->name(), deviceInfo->id());
+    }
+
+    return QSize(roiMaxXAsString.toInt() + 1, roiMaxYAsString.toInt() + 1);
 }
 
 /*static*/ bool Engine::fetchIsNvr(const std::shared_ptr<SharedResources>& sharedRes)
@@ -457,7 +460,7 @@ std::optional<QSet<QString>> Engine::eventTypeIdsFromParameters(
 
     if (!supportedEventTypesParameter.is_initialized())
     {
-        NX_DEBUG(this, "Supported event types parameter is not initialzied for %1 (%2)",
+        NX_DEBUG(this, "Supported event types parameter is not initialized for %1 (%2)",
             deviceInfo->name(), deviceInfo->id());
         return std::nullopt;
     }

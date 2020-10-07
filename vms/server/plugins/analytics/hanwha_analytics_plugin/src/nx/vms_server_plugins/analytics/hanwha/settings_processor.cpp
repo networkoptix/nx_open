@@ -5,6 +5,8 @@
 
 #include <nx/network/http/http_client.h>
 
+#include <algorithm>
+
 #include "device_response_json_parser.h"
 
 namespace nx::vms_server_plugins::analytics::hanwha {
@@ -21,26 +23,6 @@ std::unique_ptr<nx::network::http::HttpClient> createHttpClient(
     return result;
 }
 
-}
-
-//-------------------------------------------------------------------------------------------------
-
-void SettingsProcessor::setFrameSize(FrameSize frameSize)
-{
-    if (FrameSize() < frameSize)
-    {
-        m_frameSize = frameSize;
-        return;
-    }
-
-    std::optional<FrameSize> frameSizeOptional = loadFrameSizeFromDevice();
-    if (frameSizeOptional)
-    {
-        m_frameSize = *frameSizeOptional;
-        return;
-    }
-
-    m_frameSize = kDdefaultFrameSize;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -158,6 +140,13 @@ std::string SettingsProcessor::makeEventTypeReadingRequest(const char* eventType
 
 //-------------------------------------------------------------------------------------------------
 
+std::string SettingsProcessor::makeOrientationReadingRequest() const
+{
+    return makeReadingRequestToDeviceSync("image", "flip", "view");
+}
+
+//-------------------------------------------------------------------------------------------------
+
 void SettingsProcessor::updateAnalyticsModeOnDevice() const
 {
     const int channelNumber = m_valueTransformer->transformChannelNumber(m_cameraChannelNumber);
@@ -217,10 +206,49 @@ std::string SettingsProcessor::loadFirmwareVersionFromDevice() const
 
 //-------------------------------------------------------------------------------------------------
 
+void SettingsProcessor::loadAndHoldFrameRotationFromDevice()
+{
+    const int channelNumber = m_valueTransformer->transformChannelNumber(m_cameraChannelNumber);
+    const std::string sunapiReply = makeOrientationReadingRequest();
+    nx::kit::Json channelInfo = DeviceResponseJsonParser::extractChannelInfo(
+        sunapiReply, "Flip", channelNumber);
+    int rotationAngle = 0;
+    try
+    {
+        std::string rotationAngleAsString;
+        SettingPrimitivesDeviceIo::deserializeOrThrow(
+            channelInfo, "Rotate", FrameSize() /* unused */, &rotationAngleAsString);
+
+        rotationAngle = stoi(rotationAngleAsString); //< may throw
+        const int kExpectedRotateValues[] = { 0, 90, 270 };
+        if (std::find(std::cbegin(kExpectedRotateValues),
+            std::cend(kExpectedRotateValues),
+            rotationAngle) == std::cend(kExpectedRotateValues))
+        {
+            NX_DEBUG(this, "Unexpected rotation angle %1 returned, 0 value will be used instead",
+                rotationAngle);
+            rotationAngle = 0;
+        }
+    }
+    catch (const SettingPrimitivesDeviceIo::CameraResponseJsonError&)
+    {
+        NX_DEBUG(this, "Rotation angle was not read, 0 value will be used instead");
+    }
+    catch (const std::logic_error&)
+    {
+        // `stoi` may throw exception `out_of_range` or `invalid_argument`, that are
+        // descendants of `logic_error`
+        NX_DEBUG(this, "Rotation angle read in not an integer, 0 value will be used instead");
+    }
+    m_frameSize.isRotated = (rotationAngle != 0);
+}
+
 void SettingsProcessor::loadAndHoldSettingsFromDevice()
 {
-    std::string sunapiReply;
+    // Updates m_frameSize::isRotated, many all roi settings depend on it.
+    loadAndHoldFrameRotationFromDevice();
 
+    std::string sunapiReply;
     const int channelNumber = m_valueTransformer->transformChannelNumber(m_cameraChannelNumber);
 
     if (m_settings.analyticsCategories[shockDetection])

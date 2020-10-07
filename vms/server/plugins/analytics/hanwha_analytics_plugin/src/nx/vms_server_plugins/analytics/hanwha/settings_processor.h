@@ -12,8 +12,6 @@
 
 namespace nx::vms_server_plugins::analytics::hanwha {
 
-static const FrameSize kDdefaultFrameSize{ 3840, 2160 };
-
 struct DeviceAccessInfo
 {
     nx::utils::Url url;
@@ -30,9 +28,6 @@ private:
     int m_cameraChannelNumber = 0;
     FrameSize m_frameSize;
 
-private:
-    void setFrameSize(FrameSize frameSize);
-
 public:
     SettingsProcessor(
         Settings& settings,
@@ -46,9 +41,9 @@ public:
             ? std::unique_ptr<ValueTransformer>(new NvrValueTransformer(cameraChannelNumber))
             : std::unique_ptr<ValueTransformer>(new CameraValueTransformer)),
         m_deviceAccessInfo(deviceAccessInfo),
-        m_cameraChannelNumber(cameraChannelNumber)
+        m_cameraChannelNumber(cameraChannelNumber),
+        m_frameSize(frameSize)
     {
-        setFrameSize(frameSize);
     }
 
 private:
@@ -59,7 +54,11 @@ private:
 
     std::string makeEventTypeReadingRequest(const char* eventTypeInternalName) const;
 
+    std::string makeOrientationReadingRequest() const;
+
     void updateAnalyticsModeOnDevice() const;
+
+    void loadAndHoldFrameRotationFromDevice();
 
 public:
     std::optional<QSet<QString>> loadSupportedEventTypes() const;

@@ -15,12 +15,16 @@ namespace nx::vms_server_plugins::analytics::hanwha {
 /** Video frame dimensions - needed for translating relative coordinates to absolute. */
 struct FrameSize
 {
-    int width = 1;
-    int height = 1;
+    int rawWidth = 1;
+    int rawHeight = 1;
+    bool isRotated = false;
     FrameSize() = default;
-    FrameSize(int width, int height) : width(width), height(height) {}
+    FrameSize(int width, int height) : rawWidth(width), rawHeight(height) {}
 
-    int area() const { return width * height; }
+    int width() const { return isRotated ? rawHeight : rawWidth; }
+    int height() const { return isRotated ? rawWidth : rawHeight; }
+
+    int area() const { return rawWidth * rawHeight; }
 
     bool operator<(const FrameSize other) const
     {
@@ -29,23 +33,23 @@ struct FrameSize
 
     int xRelativeToAbsolute(double x) const
     {
-        int result = int(x * width + 0.5);
-        return std::min(result, width - 1);
+        int result = int(x * width() + 0.5);
+        return std::min(result, width() - 1);
     };
     int yRelativeToAbsolute(double y) const
     {
-        int result = int(y * height + 0.5);
-        return std::min(result, height - 1);
+        int result = int(y * height() + 0.5);
+        return std::min(result, height() - 1);
     };
 
     double xAbsoluteToRelative(int x) const
     {
-        return float(x) / width;
+        return float(x) / width();
     };
 
     double yAbsoluteToRelative(int y) const
     {
-        return float(y) / height;
+        return float(y) / height();
     };
 };
 

@@ -140,7 +140,7 @@ The example of incoming json (the beginning):
         std::istringstream stream(resolution);
         FrameSize profileFrameSize;
         char x;
-        stream >> profileFrameSize.width >> x >> profileFrameSize.height;
+        stream >> profileFrameSize.rawWidth >> x >> profileFrameSize.rawHeight;
         bool bad = !stream;
 
         if (!bad && x == 'x' && maxFrameSize < profileFrameSize)

@@ -43,16 +43,15 @@ using namespace nx::network;
 //-------------------------------------------------------------------------------------------------
 
 DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo,
-    bool isNvr, QSize maxResolution)
+    bool isNvr, QSize roiResolution)
     :
     m_engine(engine),
-    m_frameSize(maxResolution.width(), maxResolution.height()),
     m_settingsProcessor(
         m_settings,
         DeviceAccessInfo{ deviceInfo->url(), deviceInfo->login(), deviceInfo->password() },
         deviceInfo->channelNumber(),
         isNvr,
-        m_frameSize),
+        FrameSize(roiResolution.width(), roiResolution.height())),
     m_objectMetadataXmlParser(
         url::Builder(deviceInfo->url())
             .setUserName(deviceInfo->login())
