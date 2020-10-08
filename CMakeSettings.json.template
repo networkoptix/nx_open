@@ -12,7 +12,7 @@
       "variables": [],
       "environments": [
         {
-          "qtdir": "${env.RDEP_PACKAGES_DIR}/windows-x64/qt-5.11.3-debug/bin"
+          "qtdir": "${env.RDEP_PACKAGES_DIR}/windows-x64/qt-5.11.3-1-debug/bin"
         } ],
     },
     {
@@ -27,7 +27,7 @@
       "variables": [],
       "environments": [
         {
-          "qtdir": "${env.RDEP_PACKAGES_DIR}/windows-x64/qt-5.11.3/bin"
+          "qtdir": "${env.RDEP_PACKAGES_DIR}/windows-x64/qt-5.11.3-1/bin"
         } ],
     }
   ]
