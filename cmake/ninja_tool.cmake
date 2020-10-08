@@ -2,6 +2,8 @@
 # executed on a pre-build step.
 include(CMakeParseArguments)
 
+set(ninja_tool_script_name "${CMAKE_BINARY_DIR}/pre_build.ninja_tool")
+
 function(nx_setup_ninja_preprocessor)
     if(CMAKE_GENERATOR STREQUAL "Ninja")
         set(launcher_name "${CMAKE_SOURCE_DIR}/build_utils/ninja/ninja_launcher")
@@ -17,10 +19,10 @@ function(nx_setup_ninja_preprocessor)
         get_property(property_set GLOBAL PROPERTY pre_build_commands SET)
 
         # Always add "clean" command to the script.
-        set_property(GLOBAL PROPERTY pre_build_commands "clean\n")
+        set_property(GLOBAL PROPERTY pre_build_commands "clean\n\n")
 
-        # Remove old pre_build.ninja file.
-        file(REMOVE ${CMAKE_BINARY_DIR}/pre_build.ninja)
+        # Remove old pre_build.ninja_tool file.
+        file(REMOVE ${ninja_tool_script_name})
     endif()
 endfunction()
 
@@ -28,28 +30,27 @@ function(nx_add_targets_to_strengthened)
     foreach(target ${ARGN})
         if(TARGET ${target})
             set_property(
-                GLOBAL APPEND_STRING PROPERTY pre_build_commands "strengthen ${target}\n")
+                GLOBAL APPEND_STRING PROPERTY pre_build_commands "strengthen ${target}\n\n")
         else()
             file(RELATIVE_PATH file ${CMAKE_BINARY_DIR} "${target}")
             set_property(
-                GLOBAL APPEND_STRING PROPERTY pre_build_commands "strengthen ${file}\n")
+                GLOBAL APPEND_STRING PROPERTY pre_build_commands "strengthen ${file}\n\n")
         endif()
     endforeach()
 endfunction()
 
 function(nx_add_custom_pre_build_command command)
-    set_property(GLOBAL APPEND_STRING PROPERTY pre_build_commands "run ${command}\n")
+    set_property(GLOBAL APPEND_STRING PROPERTY pre_build_commands "run ${command}\n\n")
 endfunction()
 
 function(nx_use_custom_verify_globs)
     set_property(GLOBAL APPEND_STRING
-        PROPERTY pre_build_commands "substitute_verify_globs ${verify_globs_directory}\n")
+        PROPERTY pre_build_commands "substitute_verify_globs ${verify_globs_directory}\n\n")
 endfunction()
 
 function(nx_add_pre_build_artifacts_check)
-    # Run python script with "cmake -E" to pass PYTHONPATH environment variable.
     # TODO: Modify ninja_tool `run` to allow it run programs with custom environment variables set.
-    # The preffered syntax in "pre_build.ninja" file would be the following:
+    # The preffered syntax in "pre_build.ninja_tool" file would be the following:
     # run [<ENV-VARIABLE1>=<VALUE1> [...<ENV-VARIABLEN>=<VALUEN>]] <COMMAND> [<ARG1> [...<ARGN>]]
     nx_c_escape_string("${CMAKE_SOURCE_DIR}/build_utils/python/run_after_fetch.py"
         run_after_fetch_escaped)
@@ -77,5 +78,5 @@ endfunction()
 
 function(nx_save_ninja_preprocessor_script)
     get_property(targets GLOBAL PROPERTY pre_build_commands)
-    file(WRITE ${CMAKE_BINARY_DIR}/pre_build.ninja ${targets})
+    file(WRITE ${ninja_tool_script_name} ${targets})
 endfunction()

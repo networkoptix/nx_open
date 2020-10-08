@@ -19,6 +19,7 @@ launcher script (this one). See the list of such parameters in this documentatio
 from pathlib import Path
 import argparse
 import sys
+import re
 
 
 def main():
@@ -64,21 +65,43 @@ def is_fetch_timestamp_newer_than_timestamps_file(sources_dir, timestamp_file):
     else:
         real_git_root_path = git_root_path
 
-    if not real_git_root_path.is_dir():
-        raise Exception(f"Critical error: worktree git root path {real_git_root_path!r} is not a"
-            " directory.")
+    if real_git_root_path.is_dir():
+        fetch_head_path = real_git_root_path.joinpath("FETCH_HEAD")
+        if not fetch_head_path.is_file():
+            # FETCH_HEAD is not a file so no fetches have been done yet; no need to do packages
+            # synchronization.
+            return False
 
-    fetch_head_path = real_git_root_path.joinpath("FETCH_HEAD")
-    if not fetch_head_path.is_file():
-        # FETCH_HEAD is not a file so no fetches have been done yet; no need to do artifacts
-        # synchronization.
-        return False
+        fetch_head_timestamp_s = fetch_head_path.stat().st_mtime
+
+    else:
+        print(
+            f"WARNING: No repository detected in {Path(sources_dir).as_posix()!r},"
+            " trying to use git_info.txt.")
+
+        git_info_path = Path(sources_dir).joinpath("git_info.txt")
+        if not git_info_path.is_file():
+            print(f"WARNING: {git_info_path.as_posix()!r} is not found. Forcing script run.")
+            return True
+
+        with open(git_info_path) as f:
+            content = f.readlines()
+            for line in content:
+                match = re.match(r"^fetchTimestampS=(?P<fetch_timestamp>[\d\.,]+)", line)
+                if match:
+                    fetch_head_timestamp_s = float(match['fetch_timestamp'].replace(",", "."))
+                    break
+            else:
+                print(
+                    'WARNING: "fetchTimestampS" field is not found in'
+                    f'{git_info_path.as_posix()!r}. Forcing script run.')
+                return True
 
     timestamp_file_path = Path(timestamp_file)
     if not timestamp_file_path.is_file():
-        return True  #< No artifacts synchronization has been done yet; have to do it now.
+        return True  #< No packages synchronization has been done yet; have to do it now.
 
-    return fetch_head_path.stat().st_mtime > timestamp_file_path.stat().st_mtime
+    return fetch_head_timestamp_s > timestamp_file_path.stat().st_mtime
 
 
 if __name__ == "__main__":

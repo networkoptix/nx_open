@@ -70,11 +70,11 @@ class RdepSyncher:
 
         return True
 
-    def generate_cmake_include(self, file_name):
-        if Path(file_name).exists() and not self.have_updated_packages:
+    def generate_cmake_include(self, cmake_include_file, sync_script_file):
+        if not self._need_to_write_depencdencies_file(cmake_include_file, sync_script_file):
             return
 
-        with open(file_name, "w") as f:
+        with open(cmake_include_file, "w") as f:
             f.write("# Package versions.\n")
             for k, v in self.versions.items():
                 f.write("set({0}_version \"{1}\")\n".format(k, v))
@@ -101,3 +101,15 @@ class RdepSyncher:
                 cmake_files = glob.glob(os.path.join(path, "*.cmake"))
                 if cmake_files and len(cmake_files) == 1:
                     f.write("include(\"{}\")\n".format(cmake_files[0].replace("\\", "/")))
+
+    def _need_to_write_depencdencies_file(self,
+        cmake_include_file: str, sync_script_file: str) -> bool:
+
+        if self.have_updated_packages:
+            return True
+
+        if not Path(cmake_include_file).exists():
+            return True
+
+        # Check whether sync_dependencies.py was updated.
+        return Path(sync_script_file).stat().st_mtime > Path(cmake_include_file).stat().st_mtime

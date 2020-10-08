@@ -15,7 +15,7 @@ from ninja_file_processor.build_ninja_processor import BuildNinjaFileProcessor
 from ninja_file_processor.rules_ninja_processor import RulesNinjaFileProcessor
 
 NINJA_BUILD_FILE_NAME = 'build.ninja'
-NINJA_PREBUILD_FILE_NAME = 'pre_build.ninja'
+NINJA_PREBUILD_FILE_NAME = 'pre_build.ninja_tool'
 
 def clean_build_directory(build_dir: str,
         build_file_processor: BuildNinjaFileProcessor = None,

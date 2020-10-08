@@ -5,6 +5,7 @@ from __future__ import print_function
 import os
 import sys
 import argparse
+import platform as system_platform
 from pathlib import Path
 from rdep_cmake import RdepSyncher
 
@@ -240,10 +241,13 @@ def sync_dependencies(target, syncher, platform, arch, box, release_version, opt
     sync("any/root-certificates", path_variable="root_certificates_path")
     sync("any/customization_pack", path_variable="customization_package_directory")
 
-    if platform == 'android':
+    build_platform = system_platform.system()
+    if build_platform == 'Windows':
+        build_utils_platform = 'windows'
+    elif build_platform == 'Linux':
         build_utils_platform = 'linux'
-    elif platform == 'ios':
-        build_utils_platform = 'macosx'
+    elif build_platform == 'Darwin':
+        build_utils_platform = 'macos'
     else:
         build_utils_platform = platform
     sync("%s/verify_globs" % build_utils_platform, path_variable="verify_globs_directory")
@@ -363,7 +367,8 @@ def main():
 
     sync_dependencies(args.target, syncher, platform, arch, box, args.release_version, options)
 
-    syncher.generate_cmake_include(syncher.cmake_include_file)
+    syncher.generate_cmake_include(
+        cmake_include_file=syncher.cmake_include_file, sync_script_file=__file__)
 
 
 if __name__ == "__main__":
