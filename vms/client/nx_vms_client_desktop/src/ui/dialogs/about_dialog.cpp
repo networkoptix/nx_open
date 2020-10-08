@@ -38,6 +38,7 @@
 #include <ui/help/help_topics.h>
 #include <ui/models/resource/resource_list_model.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
 
 #include <helpers/cloud_url_helper.h>
@@ -115,24 +116,28 @@ void QnAboutDialog::changeEvent(QEvent *event)
 
 void QnAboutDialog::generateServersReport()
 {
-    const auto watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
-
+    const bool isAdmin = accessController()->hasGlobalPermission(GlobalPermission::admin);
     QnMediaServerResourceList servers;
     QStringList report;
-    for (const auto& data: watcher->components())
+
+    if (isAdmin)
     {
-        if (data.component != QnWorkbenchVersionMismatchWatcher::Component::server)
-            continue;
+        const auto watcher = context()->instance<QnWorkbenchVersionMismatchWatcher>();
+        for (const auto& data: watcher->components())
+        {
+            if (data.component != QnWorkbenchVersionMismatchWatcher::Component::server)
+                continue;
 
-        NX_ASSERT(data.server);
-        if (!data.server)
-            continue;
+            NX_ASSERT(data.server);
+            if (!data.server)
+                continue;
 
-        QString version = L'v' + data.version.toString();
-        QString serverText = lit("%1: %2")
-            .arg(QnResourceDisplayInfo(data.server).toString(Qn::RI_WithUrl), version);
-        report << serverText;
-        servers << data.server;
+            QString version = L'v' + data.version.toString();
+            QString serverText = lit("%1: %2")
+                .arg(QnResourceDisplayInfo(data.server).toString(Qn::RI_WithUrl), version);
+            report << serverText;
+            servers << data.server;
+        }
     }
 
     this->m_serversReport = report.join(lit("<br/>"));
