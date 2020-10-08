@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.16.0 FATAL_ERROR)
 
 include(cmake/utils.cmake)
+nx_init_known_files_list()
 include(cmake/option.cmake)
 include(cmake/default_target.cmake)
 
@@ -93,7 +94,6 @@ include(CMakeDependentOption)
 include(ExternalProject)
 include(code_signing)
 include(target_detection)
-nx_init_known_files_list()
 include(find_sources)
 include(moc_utils)
 include(qrc_utils)
@@ -246,5 +246,6 @@ endif()
 
 nx_save_known_files()
 
+nx_add_pre_build_artifacts_check()
 nx_use_custom_verify_globs()
 nx_save_ninja_preprocessor_script()

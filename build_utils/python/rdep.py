@@ -75,6 +75,7 @@ class Rdep:
     def __init__(self, root):
         self._config = RdepConfig()
         self._repo_config = RepositoryConfig(root)
+        self._updated_packages = set()
 
         self.root = root
         self.verbose = False
@@ -171,6 +172,12 @@ class Rdep:
         except Exception:
             return None
 
+    def _mark_package_as_updated(self, target: str, package: str) -> None:
+        self._updated_packages.add(posixpath.join(target, package))
+
+    def is_package_updated(self, target: str, package: str) -> bool:
+        return posixpath.join(target, package) in self._updated_packages
+
     def _try_sync(self, target, package):
         url = self._repo_config.get_url()
         src = posixpath.join(url, target, package)
@@ -213,6 +220,7 @@ class Rdep:
             return self.SYNC_NOT_FOUND
 
         time = PackageConfig(dst).get_timestamp()
+
         if newtime == time and not self.force:
             os.remove(config_file)
             return self.SYNC_SUCCESS
@@ -238,6 +246,8 @@ class Rdep:
             config_file, dst_config_file))
         shutil.copy(config_file, dst_config_file)
         os.remove(config_file)
+
+        self._mark_package_as_updated(target, package)
 
         return self.SYNC_SUCCESS
 
@@ -409,19 +419,23 @@ class Rdep:
             print("Package {0} not found.".format(package), file=sys.stderr)
         print(path)
 
-    def sync_timestamps(self):
+    def sync_timestamps(self) -> bool:
+        return self.fetch_timestamps(self.root)
+
+    def fetch_timestamps(self, directory: str) -> bool:
         url = self._repo_config.get_url()
         url = posixpath.join(url, TIMESTAMPS_FILE)
 
-        command = [self._config.get_rsync("rsync"), url, _cygwin_path(self.root)]
+        command = [self._config.get_rsync("rsync"), url, _cygwin_path(directory)]
         command += ADDITIONAL_SYNC_ARGS
         self._verbose_rsync(command)
         try:
             subprocess.check_output(command)
-            self._fix_permissions(os.path.join(self.root, TIMESTAMPS_FILE))
         except Exception:
-            print("Could not sync timestamps file.")
+            print(f'Could not fetch timestamps.dat file to {directory}')
             return False
+
+        return True
 
 
 def main():

@@ -5,6 +5,7 @@ from __future__ import print_function
 import os
 import sys
 import argparse
+from pathlib import Path
 from rdep_cmake import RdepSyncher
 
 
@@ -332,14 +333,19 @@ def main():
         help="Force running rsync even if package timestamp is up to date")
     parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output")
 
-    args = parser.parse_args()
+    args, _ = parser.parse_known_args()
 
     platform, arch, box = parse_target(args.target)
 
     version_overrides, location_overrides = parse_overrides(args.overrides)
     options = parse_options(args.options)
 
-    syncher = RdepSyncher(args.packages_dir)
+    syncher = RdepSyncher(
+        args.packages_dir,
+        verbose=args.verbose,
+        sync_timestamps=options.get("sync-timestamps"))
+
+    syncher.cmake_include_file = args.cmake_include_file
     syncher.rdep_target = args.target
     syncher.versions = determine_package_versions(
         args.target,
@@ -352,13 +358,12 @@ def main():
     syncher.versions.update(version_overrides)
     syncher.locations = location_overrides
     syncher.rdep.force = args.force
-    syncher.rdep.verbose = args.verbose
     syncher.rdep.fast_check = not args.force
     syncher.use_local = args.use_local and not args.force
 
     sync_dependencies(args.target, syncher, platform, arch, box, args.release_version, options)
 
-    syncher.generate_cmake_include(args.cmake_include_file)
+    syncher.generate_cmake_include(syncher.cmake_include_file)
 
 
 if __name__ == "__main__":

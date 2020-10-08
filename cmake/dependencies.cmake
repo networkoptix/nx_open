@@ -58,6 +58,9 @@ if(sync_options)
 endif()
 
 set(ENV{PYTHONPATH} "${CMAKE_SOURCE_DIR}/build_utils/python")
+set(packages_sync_flag_file ${CMAKE_BINARY_DIR}/packages_sync_timestamp.cmake)
+nx_store_known_file(${packages_sync_flag_file})
+file(TOUCH ${packages_sync_flag_file})
 execute_process(COMMAND ${sync_command} RESULT_VARIABLE sync_result)
 
 if(NOT sync_result STREQUAL "0")

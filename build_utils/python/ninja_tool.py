@@ -7,6 +7,7 @@ import sys
 import argparse
 import re
 import traceback
+import subprocess
 from pathlib import Path
 
 from ninja_file_processor.ninja_file_processor import NinjaFileProcessorError
@@ -187,7 +188,7 @@ def run_script(build_dir: str, script_file_name: str, force_patch: bool) -> None
 
     for command in commands_to_run:
         print(f"Running {command}...")
-        os.system(command)
+        subprocess.call(command, shell=True)
 
     print("All done")
 
