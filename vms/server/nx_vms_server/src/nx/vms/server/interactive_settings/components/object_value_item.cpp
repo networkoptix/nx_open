@@ -10,6 +10,12 @@ QJsonObject mergeObjects(const QJsonObject& object, const QJsonObject& newObject
 {
     QJsonObject result = object;
 
+    // Empty object is considered a special value and turns corresponding object in the old
+    // structure to an empty one without actual merging. Total replacement in the case of an empty
+    // object is needed to allow plugins to report ROI item deletion.
+    if (newObject.isEmpty())
+        return QJsonObject();
+
     for (auto it = newObject.begin(); it != newObject.end(); ++it)
     {
         const QString& key = it.key();
