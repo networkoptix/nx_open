@@ -29,7 +29,7 @@ def main():
     sync("windows/ilmerge", path_variable="ilmerge_directory")
     sync("windows/paxton_plugin_references", path_variable="references_directory")
 
-    syncher.generate_cmake_include(args.cmake_include_file)
+    syncher.generate_cmake_include(args.cmake_include_file, sync_script_file=__file__)
 
 
 if __name__ == "__main__":
