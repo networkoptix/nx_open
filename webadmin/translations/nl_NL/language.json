@@ -131,7 +131,7 @@
         "maxEventLogRecords": "Maximale logboekrecords om in de database te bewaren. Het werkelijke aantal niet-verwijderde records kan tot 20% hoger zijn dan de opgegeven waarde.",
         "forceLiveCacheForPrimaryStream": "Of u sommige frames in de cache wilt opslaan voor de primaire stream. Waarden: \"yes\" - altijd ingeschakeld (kan veel RAM gebruiken), \"no\" - altijd uitgeschakeld behalve wanneer vereist voor het afspelen (bijv. HLS), \"auto\" - vergelijkbaar met \"no\", maar ingeschakeld wanneer de gebruikerservaring te verbeteren (bijvoorbeeld wanneer een bepaalde Analytics-plug-in op de camera werkt).",
         "additionalLocalFsTypes": "Aanvullende bestandstypes om na te gaan of een bepaalde partitie geschikt is voor serveropslag. Kommagescheiden lijst van bestandssysteemnamen zoals ze staan vermeld in /proc/mounts wordt verwacht.",
-        "mediaBufferSizeKb": "Server-side media buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value, but slows down the auto quality switching and reaction to media seek operations."
+        "mediaBufferSizeKb": "Server side RTSP-buffergrootte in KB. Hogere waardes maken het mogelijk om efficiënter internet te gebruiken met een hogere round trip vertragingswaarde, maar vertraagt de automatische kwaliteitsschakeling en reactie op de media zoekbewerking."
     },
     "info": {
         "tabs": {

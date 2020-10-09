@@ -126,7 +126,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Verifying update package</source>
-      <translation type="unfinished">Verifying update package</translation>
+      <translation>Updatepakket verifiëren</translation>
     </message>
   </context>
   <context>
@@ -1591,23 +1591,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>This camera does not support advanced PTZ</source>
-      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+      <translation>Deze camera ondersteunt geen geavanceerde PTZ</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation type="unfinished">Zooming out...</translation>
+      <translation>Uitzoomen...</translation>
     </message>
     <message>
       <source>Moving...</source>
-      <translation type="unfinished">Moving...</translation>
+      <translation>In beweging...</translation>
     </message>
     <message>
       <source>Zooming in...</source>
-      <translation type="unfinished">Zooming in...</translation>
+      <translation>Inzoomen...</translation>
     </message>
     <message>
       <source>Focusing...</source>
-      <translation type="unfinished">Focusing...</translation>
+      <translation>Scherpstellen...</translation>
     </message>
   </context>
   <context>
@@ -2059,15 +2059,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Storage added</source>
-      <translation type="unfinished">Storage added</translation>
+      <translation>Opslag toegevoegd</translation>
     </message>
     <message>
       <source>Storage updated</source>
-      <translation type="unfinished">Storage updated</translation>
+      <translation>Opslag bijgewerkt</translation>
     </message>
     <message>
       <source>Storage removed</source>
-      <translation type="unfinished">Storage removed</translation>
+      <translation>Opslag verwijderd</translation>
     </message>
   </context>
   <context>
@@ -6696,7 +6696,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <name>QnWorkbenchController</name>
     <message>
       <source>To switch between cameras press Shift + Arrow</source>
-      <translation type="unfinished">To switch between cameras press Shift + Arrow</translation>
+      <translation>Om te schakelen tussen camera's druk op Shift + Pijl</translation>
     </message>
   </context>
   <context>
@@ -6754,15 +6754,15 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <name>QnWorkbenchPtzHandler</name>
     <message>
       <source>Zooming in...</source>
-      <translation type="unfinished">Zooming in...</translation>
+      <translation>Inzoomen...</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation type="unfinished">Zooming out...</translation>
+      <translation>Uitzoomen...</translation>
     </message>
     <message>
       <source>Moving...</source>
-      <translation type="unfinished">Moving...</translation>
+      <translation>In beweging...</translation>
     </message>
   </context>
   <context>
@@ -7628,7 +7628,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>DISABLED</source>
-      <translation type="unfinished">DISABLED</translation>
+      <translation>UITGESCHAKELD</translation>
     </message>
   </context>
   <context>
@@ -7834,7 +7834,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+      <translation>Een hoge voor-opnametijd verhoogt het RAM-gebruik op de server</translation>
     </message>
   </context>
   <context>
@@ -8012,11 +8012,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>File %1 does not exist</source>
-      <translation type="unfinished">File %1 does not exist</translation>
+      <translation>Bestand %1 bestaat niet</translation>
     </message>
     <message>
       <source>There is no valid client package to download</source>
-      <translation type="unfinished">There is no valid client package to download</translation>
+      <translation>Er is geen geldig clientpakket om te downloaden</translation>
     </message>
   </context>
   <context>
@@ -8457,27 +8457,27 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Equidistant</source>
-      <translation type="unfinished">Equidistant</translation>
+      <translation>Equidistant</translation>
     </message>
     <message>
       <source>Stereographic</source>
-      <translation type="unfinished">Stereographic</translation>
+      <translation>Stereografisch</translation>
     </message>
     <message>
       <source>Equisolid</source>
-      <translation type="unfinished">Equisolid</translation>
+      <translation>Equisolid</translation>
     </message>
     <message>
       <source>Ceiling</source>
-      <translation type="unfinished">Ceiling</translation>
+      <translation>Plafond</translation>
     </message>
     <message>
       <source>Wall</source>
-      <translation type="unfinished">Wall</translation>
+      <translation>Muur</translation>
     </message>
     <message>
       <source>Floor/Table</source>
-      <translation type="unfinished">Floor/Table</translation>
+      <translation>Vloer/tafel</translation>
     </message>
   </context>
   <context>
@@ -8637,7 +8637,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>DISABLED</source>
-      <translation type="unfinished">DISABLED</translation>
+      <translation>UITGESCHAKELD</translation>
     </message>
   </context>
   <context>
@@ -9157,11 +9157,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Update file verification failed.</source>
-      <translation type="unfinished">Update file verification failed.</translation>
+      <translation>Verificatie van updatebestand is mislukt.</translation>
     </message>
     <message>
       <source>Verifying update</source>
-      <translation type="unfinished">Verifying update</translation>
+      <translation>Update verifiëren</translation>
     </message>
   </context>
   <context>
