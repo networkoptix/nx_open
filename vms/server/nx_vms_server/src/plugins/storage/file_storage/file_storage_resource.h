@@ -107,7 +107,7 @@ private:
 
     // mounts network (smb) folder to temporary local path
     Qn::StorageInitResult mountTmpDrive(const QString& url);
-    bool testWriteCapInternal() const;
+    bool testWriteCapInternal(bool directAccessOnly) const;
 
     void setLocalPathSafe(const QString &path);
     QString getLocalPathSafe() const;
@@ -118,7 +118,7 @@ private:
     Qn::StorageInitResult initStorageDirectory(const QString& url);
     Qn::StorageInitResult initRemoteStorage(const QString& url);
     Qn::StorageInitResult checkMountedStatus() const;
-    Qn::StorageInitResult testWrite() const;
+    Qn::StorageInitResult testWrite(bool directAccessOnly = false) const;
     bool isValid() const;
 
     virtual bool doRemoveFile(const QString& url) override;

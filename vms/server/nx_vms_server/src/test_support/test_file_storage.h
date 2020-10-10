@@ -16,6 +16,7 @@ public:
         bool isBackup = false);
 
     virtual Qn::StorageInitResult initOrUpdate() override;
+    virtual int getCapabilities() const override;
 };
 
 } // namespace nx::vms::server::test_support

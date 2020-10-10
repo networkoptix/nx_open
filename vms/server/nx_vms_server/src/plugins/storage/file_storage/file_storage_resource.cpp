@@ -395,17 +395,23 @@ bool QnFileStorageResource::checkDBCap() const
             return *m_dbReady;
     }
 
-    // Same for mounted by hand remote storages (NAS)
+    bool dbReady = true;
+
+    // Same for mounted by hand remote storages (NAS).
     QList<PlatformMonitor::PartitionSpace> partitions =
-        serverModule()->platform()->monitor()->
-            PlatformMonitor::totalPartitionSpaceInfo(
+        serverModule()->platform()->monitor()->PlatformMonitor::totalPartitionSpaceInfo(
             PlatformMonitor::NetworkPartition);
 
-    bool dbReady = true;
     for(const PlatformMonitor::PartitionSpace& partition: partitions)
     {
-        if(getPath().startsWith(partition.path))
+        if (getPath().startsWith(partition.path))
             dbReady = false;
+    }
+
+    if (dbReady)
+    {
+        // Indirect access means testing using the root tool, which can not be used by SQLite.
+        dbReady = testWrite(/*directAccessOnly*/ false);
     }
 
     {
@@ -848,7 +854,7 @@ qint64 QnFileStorageResource::getFileSize(const QString& url) const
     return rootTool()->fileSize(translateUrlToLocal(url));
 }
 
-bool QnFileStorageResource::testWriteCapInternal() const
+bool QnFileStorageResource::testWriteCapInternal(bool directAccessOnly) const
 {
     QString fileName(lit("%1%2.tmp"));
     QString localGuid = commonModule()->moduleGUID().toString();
@@ -859,18 +865,20 @@ bool QnFileStorageResource::testWriteCapInternal() const
     if (file.open(QIODevice::WriteOnly))
         return true;
 
-#if defined(Q_OS_UNIX)
-    int rootToolFd = rootTool()->open(fileName, QIODevice::WriteOnly);
-    if (rootToolFd > 0)
+    if (!directAccessOnly)
     {
-        ::close(rootToolFd);
-        return true;
+        #if defined(Q_OS_UNIX)
+            if (int fd = rootTool()->open(fileName, QIODevice::WriteOnly); fd > 0)
+            {
+                ::close(fd);
+                return true;
+            }
+        #endif
     }
-#endif
 
     NX_WARNING(
-        this, "[initOrUpdate, WriteTest] Open file '%1' for writing failed",
-        hidePassword(fileName));
+        this, "[initOrUpdate, WriteTest] Open file '%1' (%2 access) for writing failed",
+        hidePassword(fileName), directAccessOnly ? "direct" : "root-tool");
 
     return false;
 }
@@ -945,9 +953,9 @@ QString QnFileStorageResource::getFsPath() const
     return m_localPath.isEmpty() ? resourcePath : m_localPath;
 }
 
-Qn::StorageInitResult QnFileStorageResource::testWrite() const
+Qn::StorageInitResult QnFileStorageResource::testWrite(bool directAccessOnly) const
 {
-    return testWriteCapInternal() ? Qn::StorageInit_Ok : Qn::StorageInit_WrongPath;
+    return testWriteCapInternal(directAccessOnly) ? Qn::StorageInit_Ok : Qn::StorageInit_WrongPath;
 }
 
 Qn::StorageInitResult QnFileStorageResource::initOrUpdate()

@@ -236,8 +236,14 @@ bool QnStorageResource::isBackup() const
     return m_isBackup;
 }
 
-bool QnStorageResource::isWritable() const {
-    return (getCapabilities() & QnAbstractStorageResource::cap::WriteFile) == QnAbstractStorageResource::cap::WriteFile;
+bool QnStorageResource::isWritable() const
+{
+    return getCapabilities() & QnAbstractStorageResource::cap::WriteFile;
+}
+
+bool QnStorageResource::isDbReady() const
+{
+    return getCapabilities() & QnAbstractStorageResource::cap::DBReady;
 }
 
 void QnStorageResource::setStatusFlag(Qn::StorageStatuses status)

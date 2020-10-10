@@ -173,6 +173,7 @@
 #include <nx/analytics/utils.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/std/algorithm.h>
 
 #ifdef Q_OS_MACX
 #include <utils/mac_utils.h>
@@ -2627,6 +2628,10 @@ void ActionHandler::confirmAnalyticsStorageLocation()
         {
             const auto serverName = server->getName();
             auto storages = server->getStorages();
+
+            nx::utils::remove_if(
+                storages,
+                [](const auto& s) { return !(s->statusFlag() & Qn::StorageStatus::dbReady); });
 
             if (storages.empty())
                 continue;

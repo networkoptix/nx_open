@@ -30,6 +30,11 @@ StorageResourcePtr TestFileStorage::create(
     return storage;
 }
 
+int TestFileStorage::getCapabilities() const
+{
+    return QnAbstractStorageResource::cap::DBReady | QnAbstractStorageResource::cap::WriteFile;
+}
+
 Qn::StorageInitResult TestFileStorage::initOrUpdate()
 {
     const auto url = getUrl();

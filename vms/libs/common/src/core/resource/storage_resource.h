@@ -77,6 +77,7 @@ public:
     bool isBackup() const;
 
     bool isWritable() const;
+    bool isDbReady() const;
 
     virtual qint64 nxOccupedSpace() const { return 0; }
 

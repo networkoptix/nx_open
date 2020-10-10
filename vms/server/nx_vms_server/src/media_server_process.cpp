@@ -1395,6 +1395,9 @@ void MediaServerProcess::at_serverModuleConflict(nx::vms::discovery::ModuleEndpo
 
 void MediaServerProcess::at_checkAnalyticsUsed()
 {
+    // Normally analytics DB storage is selected on the client side before enabling any analytics.
+    // This code is just a fallback in case if analytics are enabled elsewhere.
+
     if (!m_storageInitializationDone)
         return; //< Initially analytics initialized from initStoragesAsync.
 
@@ -1406,7 +1409,9 @@ void MediaServerProcess::at_checkAnalyticsUsed()
 
     if (m_mediaServer->metadataStorageId().isNull() && !QFile::exists(getMetadataDatabaseName()))
     {
-        m_mediaServer->setMetadataStorageId(selectDefaultStorageForAnalyticsEvents(m_mediaServer));
+        const auto storage = selectDefaultStorageForAnalyticsEvents(m_mediaServer);
+        NX_INFO(this, "Selected analytics storage: %1", storage);
+        m_mediaServer->setMetadataStorageId(storage);
         m_mediaServer->saveProperties();
     }
 
@@ -4740,8 +4745,8 @@ QnUuid MediaServerProcess::selectDefaultStorageForAnalyticsEvents(QnMediaServerR
             if (fileStorage->isLocal()
                 && !fileStorage->isSystem()
                 && fileStorage->isUsedForWriting()
-                && storage->initOrUpdate() == Qn::StorageInit_Ok
-                && fileStorage->isWritable()
+                && fileStorage->initOrUpdate() == Qn::StorageInit_Ok
+                && fileStorage->isDbReady()
                 && fileStorage->getTotalSpace() > maxTotalSpace)
             {
                 maxTotalSpace = fileStorage->getTotalSpace();
