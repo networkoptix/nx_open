@@ -381,14 +381,13 @@ bool QnFileStorageResource::checkDBCap() const
     if (!isValid())
         return false;
 
-#ifdef _WIN32
-    return true;
-#else
-    // if storage is mounted via mediaserver (smb://...)
-    // let's not create media DB there
+    // If a storage is mounted via mediaserver (smb://...) let's not create media DB there.
     if (!getLocalPathSafe().isEmpty())
         return false;
 
+#ifdef _WIN32
+    return true;
+#else
     {
         QnMutexLocker lk(&m_mutex);
         if (m_dbReady.is_initialized())
