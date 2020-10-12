@@ -30,6 +30,7 @@ constexpr std::chrono::minutes kKeepAliveTimeout(2);
 constexpr std::chrono::seconds kMinReopenInterval(10);
 constexpr std::chrono::seconds kLprRequestsTimeout(2);
 constexpr std::chrono::seconds kExpiredEventTimeout(5);
+constexpr int kAlarmLevels = 2;
 constexpr int kMaxSupportedRegionCount = 4;
 
 std::vector<QString> addEventTypesForObjectTracking(
@@ -40,11 +41,13 @@ std::vector<QString> addEventTypesForObjectTracking(
     if (std::find(objectTypes.begin(), objectTypes.end(), "nx.hikvision.event")
             != objectTypes.end())
     {
-        constexpr char kPattern[] = "nx.hikvision.Alarm2Thermal%1";
-
-        uniqueIds.emplace(nx::format(kPattern, "Any"));
-        for (int i = 1; i <= kMaxSupportedRegionCount; ++i)
-            uniqueIds.emplace(nx::format(kPattern, i));
+        constexpr char kPattern[] = "nx.hikvision.Alarm%1Thermal%2";
+        for (int i = 1; i <= kAlarmLevels; ++i)
+        {
+            uniqueIds.emplace(nx::format(kPattern, i, "Any"));
+            for (int j = 1; j <= kMaxSupportedRegionCount; ++j)
+                uniqueIds.emplace(nx::format(kPattern, i, j));
+        }
     }
 
     ids.assign(uniqueIds.begin(), uniqueIds.end());

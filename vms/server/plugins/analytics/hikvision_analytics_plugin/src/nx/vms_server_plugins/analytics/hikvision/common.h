@@ -5,6 +5,7 @@
 
 #include <optional>
 
+#include <nx/sdk/uuid.h>
 #include <nx/vms_server_plugins/utils/analytics/engine_manifest_base.h>
 #include <nx/fusion/model_functions_fwd.h>
 #include <nx/utils/thread/mutex.h>
@@ -67,6 +68,7 @@ struct HikvisionEvent
 {
     QDateTime dateTime;
     QString typeId;
+    nx::sdk::Uuid trackId;
     QString caption;
     QString description;
     std::optional<int> channel;

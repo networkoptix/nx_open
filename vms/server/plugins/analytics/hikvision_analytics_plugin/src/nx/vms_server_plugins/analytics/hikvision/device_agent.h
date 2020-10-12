@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mutex>
 #include <optional>
 
 #include <QtCore/QObject>
@@ -84,6 +85,7 @@ private:
     std::unique_ptr<HikvisionMetadataMonitor> m_monitor;
     nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
 
+    std::mutex m_metadataParserMutex;
     MetadataParser m_metadataParser;
     std::optional<nx::utils::TimeHelper> m_eventTimestampAdjuster;
 };

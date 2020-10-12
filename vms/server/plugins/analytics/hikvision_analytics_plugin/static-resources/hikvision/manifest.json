@@ -319,8 +319,16 @@
             ]
         },
         {
-            "id": "nx.hikvision.event",
+            "id": "nx.hikvision.ThermalObject",
             "name": "Temperature tracking"
+        },
+        {
+            "id": "nx.hikvision.ThermalObjectPreAlarm",
+            "name": "Temperature pre-alarm"
+        },
+        {
+            "id": "nx.hikvision.ThermalObjectAlarm",
+            "name": "Temperature alarm"
         }
     ]
 }

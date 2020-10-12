@@ -49,6 +49,8 @@ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     handler->addRef();
     m_handler.reset(handler);
+
+    m_metadataParser.setHandler(m_handler);
 }
 
 void DeviceAgent::doSetNeededMetadataTypes(
@@ -63,17 +65,8 @@ void DeviceAgent::doPushDataPacket(Result<void>* /*outResult*/, IDataPacket* dat
     const auto metadataPacket = dataPacket->queryInterface<ICustomMetadataPacket>();
     QByteArray metadataBytes(metadataPacket->data(), metadataPacket->dataSize());
 
-    const auto result = m_metadataParser.parsePacket(metadataBytes);
-    if (const auto& packet = result.metadataPacket)
-    {
-        packet->setTimestampUs(dataPacket->timestampUs());
-        m_handler->handleMetadata(packet.get());
-    }
-    for (const auto& packet: result.bestShotPackets)
-    {
-        packet->setTimestampUs(dataPacket->timestampUs());
-        m_handler->handleMetadata(packet.get());
-    }
+    std::unique_lock lock(m_metadataParserMutex);
+    m_metadataParser.parsePacket(metadataBytes, dataPacket->timestampUs());
 }
 
 Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
@@ -90,7 +83,7 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
             using namespace std::chrono;
             auto packet = makePtr<EventMetadataPacket>();
 
-            for (const auto& hikvisionEvent: events)
+            for (auto hikvisionEvent: events)
             {
                 const bool wrongChannel = hikvisionEvent.channel.has_value()
                     && hikvisionEvent.channel != m_channelNumber;
@@ -98,28 +91,29 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
                 if (wrongChannel)
                     return;
 
+                const auto timestampUs = m_eventTimestampAdjuster->getCurrentTimeUs(
+                    hikvisionEvent.dateTime.toMSecsSinceEpoch() * 1000);
+
+                {
+                    std::unique_lock lock(m_metadataParserMutex);
+                    m_metadataParser.processEvent(&hikvisionEvent, timestampUs);
+                }
+
                 auto eventMetadata = makePtr<EventMetadata>();
                 NX_VERBOSE(this, lm("Got event: %1 %2 Channel %3")
                     .args(hikvisionEvent.caption, hikvisionEvent.description, m_channelNumber));
 
                 eventMetadata->setTypeId(hikvisionEvent.typeId.toStdString());
+                eventMetadata->setTrackId(hikvisionEvent.trackId);
                 eventMetadata->setCaption(hikvisionEvent.caption.toStdString());
                 eventMetadata->setDescription(hikvisionEvent.description.toStdString());
                 eventMetadata->setIsActive(hikvisionEvent.isActive);
                 eventMetadata->setConfidence(1.0);
 
-                const auto timestampUs = m_eventTimestampAdjuster->getCurrentTimeUs(
-                    hikvisionEvent.dateTime.toMSecsSinceEpoch() * 1000);
                 packet->setTimestampUs(timestampUs);
 
                 packet->setDurationUs(-1);
                 packet->addItem(eventMetadata.get());
-
-                if (const auto bestShotPacket = m_metadataParser.processEvent(hikvisionEvent))
-                {
-                    bestShotPacket->setTimestampUs(timestampUs);
-                    m_handler->handleMetadata(bestShotPacket.get());
-                }
             }
 
             m_handler->handleMetadata(packet.get());
