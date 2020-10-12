@@ -235,7 +235,7 @@ public:
     QSharedPointer<QnArchiveStreamReader> archiveDP;
     bool archiveDpOpened = false;
     QSharedPointer<QnThumbnailsStreamReader> thumbnailsDP;
-    PlaybackMode playbackMode;
+    std::atomic<PlaybackMode> playbackMode;
     AuditHandle auditRecordHandle;
     QElapsedTimer lastReportTime;
     qint64 lastMediaPacketTime;
@@ -1055,7 +1055,7 @@ void QnRtspConnectionProcessor::at_user_permissionsTimer()
     if (resourceAccessManager()->hasPermission(
         d->accessRights,
         d->mediaRes.dynamicCast<QnResource>(),
-        requiredPermission(getStreamingMode())))
+        requiredPermission(d->playbackMode)))
     {
         return;
     }
