@@ -942,6 +942,9 @@ QVariantMap ExtendedRuleProcessor::eventDescriptionMap(
         {
             auto camRes = resourcePool()->getResourceById<QnVirtualCameraResource>(
                 action->getRuntimeParams().eventResourceId);
+            if (!camRes)
+                break;
+
             cameraHistoryPool()->updateCameraHistorySync(camRes);
             if (camRes->hasVideo(nullptr))
             {
