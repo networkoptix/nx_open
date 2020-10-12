@@ -79,7 +79,6 @@ public:
 
     QString fixedFileName() const;
     void setProgressBounds(qint64 bof, qint64 eof);
-    qint64 eofDateTimeUs() const;
 
     /*
     * Calc hash for writing file

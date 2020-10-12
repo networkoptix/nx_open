@@ -1272,12 +1272,6 @@ void QnStreamRecorder::setProgressBounds(qint64 bof, qint64 eof)
     m_lastProgress = -1;
 }
 
-qint64 QnStreamRecorder::eofDateTimeUs() const
-{
-    QnMutexLocker lock(&m_mutex);
-    return m_eofDateTimeUs;
-}
-
 void QnStreamRecorder::setNeedCalcSignature(bool value)
 {
     if (m_needCalcSignature == value)

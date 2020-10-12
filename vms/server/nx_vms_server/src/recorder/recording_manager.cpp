@@ -317,7 +317,7 @@ bool QnRecordingManager::stopRecording(
         const auto lastTimestamp = recorder->reorderingProvider->flush();
         if (lastTimestamp) //< Record reordering buffer before stop.
             recorder->recorder->setProgressBounds(AV_NOPTS_VALUE, lastTimestamp->count());
-        else if (recorder->recorder->eofDateTimeUs() == AV_NOPTS_VALUE)
+        else
             recorder->recorder->pleaseStop();  //< Stop now if lastPacketTime to process is not scheduled.
         return true;
     }
