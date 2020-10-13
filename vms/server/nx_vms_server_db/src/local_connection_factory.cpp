@@ -837,6 +837,8 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %// NOTE: Fields cameraName and cameraId do not appear here because they are excluded
      *     %// from serialization of CameraDataEx by not including them in the field enumerating
      *     %// macro CameraAttributesData_Fields_Short.
+     *     %param[unused] cameraId
+     *     %param[unused] cameraName
      *     %param userDefinedGroupName Name of the user-defined camera group.
      *     %param scheduleEnabled Whether recording to the archive is enabled for the camera.
      *         %value false
