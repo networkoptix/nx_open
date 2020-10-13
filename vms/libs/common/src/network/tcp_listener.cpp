@@ -346,9 +346,10 @@ void QnTcpListener::run()
                 {
                     commonModule()->metrics()->tcpConnections().total()++;
                     clientSocket->setBeforeDestroyCallback(
-                        [metrics = commonModule()->metrics()]()
+                        [weakRef = this->commonModule()->metricsWeakRef()]()
                         {
-                            metrics->tcpConnections().total()--;
+                            if (auto metrics = weakRef.lock())
+                                metrics->tcpConnections().total()--;
                         });
                 }
                 processNewConnection(std::move(clientSocket));
