@@ -3,6 +3,8 @@
 #include <map>
 #include <string>
 
+#include <nx/utils/scope_guard.h>
+
 #include <boost/optional.hpp>
 
 #include <QtCore/QAtomicInt>
@@ -282,34 +284,36 @@ void TimerManager::run()
 
                 m_runningTaskID = timerId;
 
-                {
-                    // Using unlocker to ensure exception-safety.
-                    QnMutexUnlocker unlocker(&lk);
+                auto recycler = nx::utils::makeScopeGuard(
+                    [&]
+                    {
+                        if (m_taskToTime.find(timerId) != m_taskToTime.cend())
+                        {
+                            m_taskToTime.erase(timerId);
+                            m_timeToTask.erase(taskIter);
 
-                    NX_VERBOSE(this, lm("Executing task %1").arg(timerId));
-                    taskContext.func(timerId);
-                    NX_VERBOSE(this, lm("Done task %1").arg(timerId));
-                }
+                            if (!taskContext.singleShot)
+                                addTaskNonSafe(
+                                    lk,
+                                    timerId,
+                                    std::move(taskContext),
+                                    taskContext.repeatPeriod);
+                        }
 
-                if (m_taskToTime.find(timerId) != m_taskToTime.cend())
-                {
-                    m_taskToTime.erase(timerId);
-                    m_timeToTask.erase(taskIter);
+                        m_runningTaskID = 0;
+                        m_cond.wakeAll();    //notifying threads, waiting on joinAndDeleteTimer
 
-                    if (!taskContext.singleShot)
-                        addTaskNonSafe(
-                            lk,
-                            timerId,
-                            std::move(taskContext),
-                            taskContext.repeatPeriod);
-                }
+                        lk.unlock();
+                        //giving chance to another thread to remove task
+                        lk.relock();
+                    });
 
-                m_runningTaskID = 0;
-                m_cond.wakeAll();    //notifying threads, waiting on joinAndDeleteTimer
+                // Using unlocker to ensure exception-safety.
+                QnMutexUnlocker unlocker(&lk);
 
-                lk.unlock();
-                //giving chance to another thread to remove task
-                lk.relock();
+                NX_VERBOSE(this, lm("Executing task %1").arg(timerId));
+                taskContext.func(timerId);
+                NX_VERBOSE(this, lm("Done task %1").arg(timerId));
             }
 
             if (m_terminated)
