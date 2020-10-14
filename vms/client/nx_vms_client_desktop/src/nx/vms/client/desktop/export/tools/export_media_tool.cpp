@@ -85,6 +85,8 @@ struct ExportMediaTool::Private
             return false;
         }
 
+        exportRecorder->setPreciseStartPosition(startTimeUs);
+
         connect(exportRecorder.data(), &QnStreamRecorder::finished, q,
             [this]()
             {

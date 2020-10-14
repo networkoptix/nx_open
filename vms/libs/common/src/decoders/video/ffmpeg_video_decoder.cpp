@@ -451,7 +451,8 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
         }
 
         QnFfmpegAvPacket avpkt((unsigned char*) data->data(), (int) data->dataSize());
-        avpkt.dts = avpkt.pts = data->timestamp;
+        avpkt.dts = data->timestamp;
+        avpkt.pts = AV_NOPTS_VALUE;
         // HACK for CorePNG to decode as normal PNG by default
         avpkt.flags = AV_PKT_FLAG_KEY;
 
@@ -533,7 +534,10 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
                     }
                 }
             }
+            if (m_prevTimestamp != AV_NOPTS_VALUE)
+                m_prevFrameDuration = data->timestamp - m_prevTimestamp;
             m_prevTimestamp = data->timestamp;
+
         }
 
         // sometimes ffmpeg can't decode image files. Try to decode in QT
@@ -563,8 +567,15 @@ bool QnFfmpegVideoDecoder::decode(const QnConstCompressedVideoDataPtr& data, QSh
     }
     else {
         QnFfmpegAvPacket avpkt;
-        avpkt.pts = avpkt.dts = m_prevTimestamp;
         decodeVideo(m_context, m_frame, &got_picture, &avpkt); // flush
+
+        // In case of b-frames stream ffmpeg gives last flushed frames with AV_NOPTS_VALUE, so use
+        // m_prevFrameDuration to get frame pts
+        if (m_frame->pkt_dts == AV_NOPTS_VALUE)
+        {
+            m_frame->pkt_dts = m_prevTimestamp + m_prevFrameDuration;
+            m_prevTimestamp = m_frame->pkt_dts;
+        }
     }
 
     if (got_picture)

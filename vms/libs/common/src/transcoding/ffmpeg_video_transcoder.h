@@ -2,6 +2,9 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+#include <map>
+#include <memory>
+
 #include <QCoreApplication>
 #include <QElapsedTimer>
 
@@ -42,6 +45,8 @@ public:
     void setFixedFrameRate(int value);
     //!Returns picture size (in pixels) of output video stream
     QSize getOutputResolution() const;
+    // It used to skip some video frames inside GOP when transcoding is used
+    void setPreciseStartPosition(int64_t startTimeUs);
 
     void setOutputResolutionLimit(const QSize& resolution);
     // Force to use this source resolution, instead of max stream resolution from resource streams
@@ -52,10 +57,18 @@ private:
     QSharedPointer<CLVideoDecoderOutput> processFilterChain(
         const QSharedPointer<CLVideoDecoderOutput>& decodedFrame);
     bool prepareFilters(AVCodecID dstCodec, const QnConstCompressedVideoDataPtr& video);
+    std::pair<uint32_t, QnFfmpegVideoDecoder*> getDecoder(
+        const QnConstCompressedVideoDataPtr& video);
+    std::pair<uint32_t, QnFfmpegVideoDecoder*> getNextDecoderToFlush();
 
 private:
     DecoderConfig m_config;
-    QVector<QnFfmpegVideoDecoder*> m_videoDecoders;
+
+    // It used to skip some video frames inside GOP when transcoding is used
+    int64_t m_startTimeUs = 0;
+
+    uint32_t m_lastFlushedDecoder = 0;
+    std::map<uint32_t, std::unique_ptr<QnFfmpegVideoDecoder>> m_videoDecoders;
     nx::core::transcoding::FilterChain m_filters;
     QSize m_outputResolutionLimit;
     QSize m_targetResolution;

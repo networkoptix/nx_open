@@ -83,7 +83,6 @@ QnFfmpegVideoTranscoder::QnFfmpegVideoTranscoder(
         m_lastSrcWidth[i] = -1;
         m_lastSrcHeight[i] = -1;
     }
-    m_videoDecoders.resize(CL_MAX_CHANNELS);
     m_videoEncodingBuffer = (quint8*) qMallocAligned(kMaxEncodedFrameSize, 32);
     m_decodedVideoFrame->setUseExternalData(true);
     if (m_metrics)
@@ -108,10 +107,8 @@ void QnFfmpegVideoTranscoder::close()
     QnFfmpegHelper::deleteAvCodecContext(m_encoderCtx);
     m_encoderCtx = 0;
 
-    for (int i = 0; i < m_videoDecoders.size(); ++i) {
-        delete m_videoDecoders[i];
-        m_videoDecoders[i] = 0;
-    }
+    m_lastFlushedDecoder = 0;
+    m_videoDecoders.clear();
 }
 
 void QnFfmpegVideoTranscoder::setOutputResolutionLimit(const QSize& resolution)
@@ -245,38 +242,66 @@ int QnFfmpegVideoTranscoder::transcodePacket(const QnConstAbstractMediaDataPtr& 
 
     if( result )
         result->reset();
-    if (!media)
-        return 0;
+
+    const auto video = std::dynamic_pointer_cast<const QnCompressedVideoData>(media);
 
     if (!m_lastErrMessage.isEmpty())
         return -3;
 
-    const auto video = std::dynamic_pointer_cast<const QnCompressedVideoData>(media);
+
     if (auto ret = transcodePacketImpl(video, result))
         return ret;
 
-    if (m_lastEncodedTime != qint64(AV_NOPTS_VALUE))
-        movigAverage(m_averageVideoTimePerFrame, video->timestamp - m_lastEncodedTime);
-    m_lastEncodedTime = video->timestamp;
+    if (video)
+    {
+        if (m_lastEncodedTime != qint64(AV_NOPTS_VALUE))
+            movigAverage(m_averageVideoTimePerFrame, video->timestamp - m_lastEncodedTime);
+        m_lastEncodedTime = video->timestamp;
+    }
 
     movigAverage(m_averageCodingTimePerFrame, m_encodeTimer.elapsed() * 1000 /*mks*/);
     return 0;
 }
 
+void QnFfmpegVideoTranscoder::setPreciseStartPosition(int64_t startTimeUs)
+{
+    m_startTimeUs = startTimeUs;
+}
+
+std::pair<uint32_t, QnFfmpegVideoDecoder*> QnFfmpegVideoTranscoder::getDecoder(
+        const QnConstCompressedVideoDataPtr& video)
+{
+    QnFfmpegVideoDecoder* decoder = nullptr;
+    auto decoderIter = m_videoDecoders.find(video->channelNumber);
+    if (decoderIter != m_videoDecoders.end())
+        return std::make_pair(decoderIter->first, decoderIter->second.get());
+
+    decoder = new QnFfmpegVideoDecoder(m_config, m_metrics, video);
+    m_videoDecoders[video->channelNumber].reset(decoder);
+    return std::make_pair(video->channelNumber, decoder);
+}
+
+std::pair<uint32_t, QnFfmpegVideoDecoder*> QnFfmpegVideoTranscoder::getNextDecoderToFlush()
+{
+    if (m_videoDecoders.empty())
+        return std::make_pair(0, nullptr);
+    auto decoderIter = m_videoDecoders.begin();
+    m_lastFlushedDecoder = m_lastFlushedDecoder % m_videoDecoders.size();
+    decoderIter = std::next(decoderIter, m_lastFlushedDecoder);
+    ++m_lastFlushedDecoder;
+    return std::make_pair(decoderIter->first, decoderIter->second.get());
+}
+
 int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDataPtr& video, QnAbstractMediaDataPtr* const result)
 {
-
-    if (!m_encoderCtx)
+    if (!m_encoderCtx && video)
         open(video);
     if (!m_encoderCtx)
         return -3; //< encode error
 
-    QnFfmpegVideoDecoder* decoder = m_videoDecoders[video->channelNumber];
+    const auto [channelNumber, decoder] = video ? getDecoder(video) : getNextDecoderToFlush();
     if (!decoder)
-    {
-        decoder = m_videoDecoders[video->channelNumber] = 
-            new QnFfmpegVideoDecoder(m_config, m_metrics, video);
-    }
+        return 0;
 
     if (result)
         *result = QnCompressedVideoDataPtr();
@@ -284,10 +309,13 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     if (!decoder->decode(video, &m_decodedVideoFrame))
         return 0; // ignore decode error
 
-    if (video->flags.testFlag(QnAbstractMediaData::MediaFlags_Ignore))
+    if (m_decodedVideoFrame->pkt_dts < m_startTimeUs)
+        return 0; // Ignore frames before start time.
+
+    if (video && video->flags.testFlag(QnAbstractMediaData::MediaFlags_Ignore))
         return 0; // do not transcode ignored frames
 
-    m_decodedVideoFrame->channel = video->channelNumber;
+    m_decodedVideoFrame->channel = channelNumber;
     CLVideoDecoderOutputPtr decodedFrame = m_decodedVideoFrame;
 
     decodedFrame->pts = m_decodedVideoFrame->pkt_dts;

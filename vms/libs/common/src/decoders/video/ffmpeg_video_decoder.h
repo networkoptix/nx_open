@@ -120,6 +120,7 @@ private:
     typedef QVector<QPair<qint64, FrameMetadata> > MotionMap;
     mutable double m_prevSampleAspectRatio;
     qint64 m_prevTimestamp;
+    qint64 m_prevFrameDuration = 0;
     bool m_spsFound;
     MultiThreadDecodePolicy m_mtDecodingPolicy;
     bool m_useMtDecoding;

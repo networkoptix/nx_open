@@ -71,6 +71,9 @@ public:
     */
     void setMotionFileList(QSharedPointer<QBuffer> motionFileList[CL_MAX_CHANNELS]);
 
+    // It used to skip some video frames inside GOP when transcoding is used
+    void setPreciseStartPosition(int64_t startTimeUs);
+
     void close();
 
     qint64 duration() const  { return m_endDateTimeUs - m_startDateTimeUs; }
@@ -192,6 +195,7 @@ private:
     void cleanFfmpegContexts();
     void addSignatureFrameIfNeed();
     void updateProgress(qint64 timestampUs);
+    void flushTranscoder();
 protected:
     bool m_firstTime;
     bool m_gotKeyFrame[CL_MAX_CHANNELS];
@@ -203,6 +207,7 @@ protected:
     std::vector<StreamRecorderContext> m_recordingContextVector;
 
 private:
+    int64_t m_preciseStartTimeUs = 0;
     bool m_waitEOF;
 
     bool m_packetWrited;

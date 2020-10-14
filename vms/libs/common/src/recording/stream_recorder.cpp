@@ -170,6 +170,11 @@ QnStreamRecorder::~QnStreamRecorder()
     delete m_videoTranscoder;
 }
 
+void QnStreamRecorder::setPreciseStartPosition(int64_t startTimeUs)
+{
+    m_preciseStartTimeUs = startTimeUs;
+}
+
 void QnStreamRecorder::updateSignatureAttr(StreamRecorderContext* context)
 {
     NX_VERBOSE(this) << "SignVideo: update signature at" << context->fileName;
@@ -212,8 +217,23 @@ void QnStreamRecorder::updateSignatureAttr(StreamRecorderContext* context)
     NX_ASSERT(metadataUpdated, "SignVideo: metadata tag was not updated");
 }
 
+void QnStreamRecorder::flushTranscoder()
+{
+    while (true)
+    {
+        QnAbstractMediaDataPtr result;
+        m_videoTranscoder->transcodePacket(QnAbstractMediaDataPtr(), &result);
+        if (!result || result->dataSize() == 0)
+            break;
+        writeData(result, /*stream index*/0);
+    }
+}
+
 void QnStreamRecorder::close()
 {
+    if (m_packetWrited && m_videoTranscoder)
+        flushTranscoder();
+
     m_lastCompressionType = AV_CODEC_ID_NONE;
     for (size_t i = 0; i < m_recordingContextVector.size(); ++i)
     {
@@ -514,7 +534,8 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
             .arg((md->timestamp - m_endDateTimeUs) / 1000));
         close();
     }
-    else if (m_startDateTimeUs != qint64(AV_NOPTS_VALUE))
+    else if (m_startDateTimeUs != qint64(AV_NOPTS_VALUE) &&
+        !(md->flags & QnAbstractMediaData::MediaFlags_Ignore))
     {
         if (md->timestamp - m_startDateTimeUs > m_truncateInterval * 3 && m_truncateInterval > 0)
         {
@@ -946,6 +967,8 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                         DecoderConfig(), commonModule()->metrics(), m_dstVideoCodec);
                     m_videoTranscoder->setUseMultiThreadEncode(true);
                     m_videoTranscoder->setUseMultiThreadDecode(true);
+                    m_videoTranscoder->setPreciseStartPosition(m_preciseStartTimeUs);
+                    m_startDateTimeUs = m_preciseStartTimeUs;
                     m_videoTranscoder->setQuality(m_transcodeQuality);
                     if (m_transcoderFixedFrameRate)
                         m_videoTranscoder->setFixedFrameRate(m_transcoderFixedFrameRate);
