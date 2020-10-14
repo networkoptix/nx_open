@@ -81,7 +81,10 @@ void QnClientPtzControllerPool::cacheCameraPresets(const QnResourcePtr &resource
     if (!controller)
         return;
 
-    /* These presets will be cached in the QnCachingPtzController instance */
+    // Cache presets and tours in the QnCachingPtzController instance.
     QnPtzPresetList presets;
     controller->getPresets(&presets);
+
+    QnPtzTourList tours;
+    controller->getTours(&tours);
 }

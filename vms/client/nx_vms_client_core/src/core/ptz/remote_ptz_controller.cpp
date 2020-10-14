@@ -112,14 +112,20 @@ bool QnRemotePtzController::sendRequest(
     const nx::core::ptz::Options& options,
     PtzDeserializationHelper helper) const
 {
+    NX_VERBOSE(this, "Sending command %1 to %2", QnLexical::serialized(command), m_camera);
+
     auto server = getMediaServer();
-    if (!server)
+    if (!NX_ASSERT(server))
         return false;
 
     if (isPointless(command, options))
+    {
+        NX_VERBOSE(this, "Sending canceled as the command is pointless");
         return false;
+    }
 
-    if (auto connection = server->restConnection())
+    auto connection = server->restConnection();
+    if (NX_ASSERT(connection))
     {
         QnRequestParamList params = baseParams;
         if (server->getVersion() < nx::utils::SoftwareVersion(3, 0))
@@ -129,18 +135,12 @@ bool QnRemotePtzController::sendRequest(
         params.insert("cameraId", m_camera->getId().toString());
 
         if (!helper)
-        {
-            helper = [](const QnJsonRestResult& /*data*/)
-                {
-                    return QVariant();
-                };
-        }
+            helper = [](const QnJsonRestResult& /*data*/) { return QVariant(); };
 
         PtzServerCallback callback = nx::utils::guarded(this,
             [this, command, deserializer=std::move(helper)](
-                bool success, rest::Handle /*handle*/, const QnJsonRestResult& data)
+                bool /*success*/, rest::Handle /*handle*/, const QnJsonRestResult& data)
             {
-                Q_UNUSED(success);
                 QVariant value = deserializer(data);
                 auto notConstThis = const_cast<QnRemotePtzController*>(this);
                 emit notConstThis->finished(command, value);
@@ -270,7 +270,8 @@ bool QnRemotePtzController::createPreset(const QnPtzPreset& preset)
     QnRequestParamList params;
     params.insert("presetName", preset.name);
     params.insert("presetId", preset.id);
-    return sendRequest(Qn::CreatePresetPtzCommand, params, nx::Buffer(), kDefaultOptions);
+    auto helper = makeInputHelper(preset);
+    return sendRequest(Qn::CreatePresetPtzCommand, params, nx::Buffer(), kDefaultOptions, helper);
 }
 
 bool QnRemotePtzController::updatePreset(const QnPtzPreset& preset)
@@ -336,7 +337,7 @@ bool QnRemotePtzController::getTours(QnPtzTourList* /*tours*/) const
 {
     QnRequestParamList params;
     auto helper = makeDeserializationHelper<QnPtzTourList>();
-    return sendRequest(Qn::GetToursPtzCommand, params, nx::Buffer(), kDefaultOptions);
+    return sendRequest(Qn::GetToursPtzCommand, params, nx::Buffer(), kDefaultOptions, helper);
 }
 
 bool QnRemotePtzController::getActiveObject(QnPtzObject* /*object*/) const
