@@ -161,8 +161,8 @@ QnLiveStreamProvider::~QnLiveStreamProvider()
         QnMutexLocker lock(&m_startMutex);
         m_restartRequested = false;
     }
-    m_restartThreadSheduler.pleaseStopSync();
     stop();
+    m_restartThreadSheduler.pleaseStopSync();
 
     directDisconnectAll();
     for (int i = 0; i < CL_MAX_CHANNELS; ++i)
