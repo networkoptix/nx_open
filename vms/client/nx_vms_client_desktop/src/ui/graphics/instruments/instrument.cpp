@@ -206,6 +206,10 @@ QList<QGraphicsItem *> Instrument::items(QGraphicsView *view, const QPointF &sce
         return QList<QGraphicsItem *>();
     }
 
+    const bool pointIsValid = std::isfinite(scenePos.x()) && std::isfinite(scenePos.y());
+    if (!NX_ASSERT(pointIsValid, "Invalid scene transformation"))
+        return {};
+
     /* Note that it would be more correct to use view->mapToScene(QRect(viewPos, QSize(1, 1))).
      * However, this is not the way it is implemented in Qt, so we have no other options but to mimic Qt behavior. */
     QRectF pointRect = QRectF(scenePos, QSizeF(1, 1));
