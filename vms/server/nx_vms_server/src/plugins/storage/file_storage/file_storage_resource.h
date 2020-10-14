@@ -91,7 +91,7 @@ private:
     Qn::StorageInitResult initOrUpdateInternal();
     Qn::StorageInitResult updatePermissions(const QString& url) const;
     bool checkWriteCap() const;
-    bool checkDBCap() const;
+    bool checkDbReady() const;
 #if defined(Q_OS_WIN)
     Qn::StorageInitResult updatePermissionsHelper(
         LPWSTR userName,
@@ -107,7 +107,7 @@ private:
 
     // mounts network (smb) folder to temporary local path
     Qn::StorageInitResult mountTmpDrive(const QString& url);
-    bool testWriteCapInternal(bool directAccessOnly) const;
+    bool canWrite(bool directAccess) const;
 
     void setLocalPathSafe(const QString &path);
     QString getLocalPathSafe() const;
@@ -118,7 +118,6 @@ private:
     Qn::StorageInitResult initStorageDirectory(const QString& url);
     Qn::StorageInitResult initRemoteStorage(const QString& url);
     Qn::StorageInitResult checkMountedStatus() const;
-    Qn::StorageInitResult testWrite(bool directAccessOnly = false) const;
     bool isValid() const;
 
     virtual bool doRemoveFile(const QString& url) override;

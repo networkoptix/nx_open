@@ -361,7 +361,7 @@ Qn::StorageInitResult QnFileStorageResource::initOrUpdateInternal()
     if (!isValid() && (result = isSmb ? initRemoteStorage(url) : initStorageDirectory(url)) != Qn::StorageInit_Ok)
         return result;
 
-    return testWrite();
+    return canWrite(/*directAccess*/ false) ? Qn::StorageInit_Ok : Qn::StorageInit_WrongPath;
 }
 
 bool QnFileStorageResource::isSystem() const
@@ -371,12 +371,7 @@ bool QnFileStorageResource::isSystem() const
     return lockedIsSystem ? *lockedIsSystem : false;
 }
 
-bool QnFileStorageResource::checkWriteCap() const
-{
-    return isValid();
-}
-
-bool QnFileStorageResource::checkDBCap() const
+bool QnFileStorageResource::checkDbReady() const
 {
     if (!isValid())
         return false;
@@ -410,7 +405,7 @@ bool QnFileStorageResource::checkDBCap() const
     if (dbReady)
     {
         // Indirect access means testing using the root tool, which can not be used by SQLite.
-        dbReady = testWrite(/*directAccessOnly*/ false);
+        dbReady = canWrite(/*directAccessOnly*/ true);
     }
 
     {
@@ -426,18 +421,11 @@ int QnFileStorageResource::getCapabilities() const
     if (!isValid())
         return 0;
 
-    if (checkDBCap())
-    {
-        QnMutexLocker lk(&m_mutex);
-        m_capabilities |= QnAbstractStorageResource::cap::DBReady;
-    }
-
-    int writeCap = checkWriteCap() ? QnAbstractStorageResource::cap::WriteFile : 0;
-    {
-        QnMutexLocker lk(&m_mutex);
-        return m_capabilities | writeCap;
-    }
-    return 0;
+    const bool dbReady = checkDbReady();
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_capabilities
+        | QnAbstractStorageResource::cap::WriteFile //< If it is valid it is writable.
+        | (dbReady ? QnAbstractStorageResource::cap::DBReady : 0);
 }
 
 QString QnFileStorageResource::translateUrlToLocal(const QString &url) const
@@ -853,7 +841,7 @@ qint64 QnFileStorageResource::getFileSize(const QString& url) const
     return rootTool()->fileSize(translateUrlToLocal(url));
 }
 
-bool QnFileStorageResource::testWriteCapInternal(bool directAccessOnly) const
+bool QnFileStorageResource::canWrite(bool directAccess) const
 {
     QString fileName(lit("%1%2.tmp"));
     QString localGuid = commonModule()->moduleGUID().toString();
@@ -864,7 +852,7 @@ bool QnFileStorageResource::testWriteCapInternal(bool directAccessOnly) const
     if (file.open(QIODevice::WriteOnly))
         return true;
 
-    if (!directAccessOnly)
+    if (!directAccess)
     {
         #if defined(Q_OS_UNIX)
             if (int fd = rootTool()->open(fileName, QIODevice::WriteOnly); fd > 0)
@@ -877,7 +865,7 @@ bool QnFileStorageResource::testWriteCapInternal(bool directAccessOnly) const
 
     NX_WARNING(
         this, "[initOrUpdate, WriteTest] Open file '%1' (%2 access) for writing failed",
-        hidePassword(fileName), directAccessOnly ? "direct" : "root-tool");
+        hidePassword(fileName), directAccess ? "direct" : "root-tool");
 
     return false;
 }
@@ -950,11 +938,6 @@ QString QnFileStorageResource::getFsPath() const
     const QString resourcePath = getPath();
     QnMutexLocker lk(&m_mutex);
     return m_localPath.isEmpty() ? resourcePath : m_localPath;
-}
-
-Qn::StorageInitResult QnFileStorageResource::testWrite(bool directAccessOnly) const
-{
-    return testWriteCapInternal(directAccessOnly) ? Qn::StorageInit_Ok : Qn::StorageInit_WrongPath;
 }
 
 Qn::StorageInitResult QnFileStorageResource::initOrUpdate()
