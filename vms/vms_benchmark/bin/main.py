@@ -62,6 +62,7 @@ from vms_benchmark import service_objects
 from vms_benchmark import box_tests
 from vms_benchmark import host_tests
 from vms_benchmark import exceptions
+from vms_benchmark.pinger import Pinger
 
 vms_version = None
 
@@ -1217,6 +1218,15 @@ def _connect_to_box(conf, ini):
     return box
 
 
+def _try_ping_box(conf: ConfigParser) -> None:
+    try:
+        if not Pinger(conf['boxHostnameOrIp']).ping():
+            raise exceptions.BoxConnectionError(
+                'The box is not accessible via ping (ICMP). Check if the box is powered on and '
+                'connected to the network; check config option boxHostnameOrIp.')
+    except FileNotFoundError as e:
+        raise exceptions.VmsBenchmarkError(f'Cannot find "ping" program on the host: {e}')
+
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
 @click.option(
     '--config',
@@ -1271,6 +1281,8 @@ def main(conf_file, ini_file, log_file):
 
         raise InvalidBoxLoginConfigOptionValue(
             f"Config option boxLogin should be set and not empty on Windows.")
+
+    _try_ping_box(conf)
 
     box = _connect_to_box(conf, ini)
     linux_distribution = LinuxDistributionDetector.detect(box)
