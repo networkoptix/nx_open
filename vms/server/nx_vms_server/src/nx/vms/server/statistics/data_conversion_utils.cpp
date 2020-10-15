@@ -17,14 +17,14 @@ StatisticsCameraData toStatisticsData(CameraDataEx&& data)
     (CameraDataEx&) statisticsCameraData = std::move(data);
 
     // find out if default password worked
-    const auto& defCred = ResourcePropertyKey::kDefaultCredentials;
-    const auto it = std::find_if(
+    const auto explicitCredentialsIt = std::find_if(
         statisticsCameraData.addParams.begin(),
         statisticsCameraData.addParams.end(),
-        [&defCred](const auto& param) { return param.name == defCred; });
+        [](const auto& param) { return param.name == ResourcePropertyKey::kCredentials; });
 
-    const bool isDefCred =
-        (it != statisticsCameraData.addParams.end()) && !it->value.isEmpty();
+    const bool isDefaultCredentials =
+        (explicitCredentialsIt == statisticsCameraData.addParams.end())
+        || explicitCredentialsIt->value.isEmpty();
 
     const static std::set<QString> kCameraParamsToRemove =
     {
@@ -45,7 +45,9 @@ StatisticsCameraData toStatisticsData(CameraDataEx&& data)
         [](const auto& param) { return kCameraParamsToRemove.count(param.name); });
 
     statisticsCameraData.addParams.push_back(
-        nx::vms::api::ResourceParamData(defCred, isDefCred ? lit("true") : lit("false")));
+        nx::vms::api::ResourceParamData(
+            ResourcePropertyKey::kDefaultCredentials,
+            isDefaultCredentials ? lit("true") : lit("false")));
 
     const static std::vector<QString> kCameraParamsToDefault =
     {
