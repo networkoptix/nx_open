@@ -66,8 +66,8 @@ void UpdateManager::connectToSignals()
         this, &UpdateManager::onDownloaderFailed, Qt::QueuedConnection);
 
     connect(
-        downloader(), &Downloader::downloadFinished,
-        this, &UpdateManager::onDownloaderFinished, Qt::QueuedConnection);
+        downloader(), &Downloader::fileStatusChanged,
+        this, &UpdateManager::onDownloaderFileStatusChanged, Qt::QueuedConnection);
 
     const discovery::Manager* discoveryManager =
         serverModule()->commonModule()->moduleDiscoveryManager();
@@ -243,16 +243,23 @@ void UpdateManager::onDownloaderFailed(const QString& fileName)
     downloader()->deleteFile(fileName);
 }
 
-void UpdateManager::onDownloaderFinished(const QString& fileName)
+void UpdateManager::onDownloaderFileStatusChanged(
+    const downloader::FileInformation& fileInformation)
 {
-    NX_DEBUG(this, "Download finished for file %1", fileName);
+    if (fileInformation.status != FileInformation::Status::downloaded)
+        return;
 
     if (!m_targetUpdateInfo.isValid())
         return;
 
     nx::update::Package package;
-    if (findPackage(&package) != update::FindPackageResult::ok || package.file != fileName)
+    if (findPackage(&package) != update::FindPackageResult::ok
+        || package.file != fileInformation.name)
+    {
         return;
+    }
+
+    NX_DEBUG(this, "Download finished for file %1", fileInformation.name);
 
     extract();
 }
