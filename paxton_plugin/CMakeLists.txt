@@ -34,6 +34,11 @@ nx_rdep_configure()
 
 set(ENV{PYTHONPATH} ${rdep_dir})
 set(depenencies_cmake_file ${CMAKE_BINARY_DIR}/dependencies.cmake)
+
+# Force creation of dependencies.cmake on the generation phase, because we must update it
+# even if no packages were updated.
+FILE(REMOVE ${depenencies_cmake_file})
+
 execute_process(
     COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/sync_dependencies.py
         --packages-dir=${PACKAGES_DIR}
