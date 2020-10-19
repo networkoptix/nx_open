@@ -39,10 +39,11 @@ using namespace std::chrono;
 static const int MAX_REVERSE_QUEUE_SIZE = 1024*1024 * 300; // at bytes
 static const double FPS_EPS = 1e-6;
 
+constexpr int kMaxFrameQueueSize = 6;
+
 QnVideoStreamDisplay::QnVideoStreamDisplay(
     const QnMediaResourcePtr& resource, bool canDownscale, int channelNumber):
     m_resource(resource),
-    m_frameQueueIndex(0),
     m_decodeMode(QnAbstractVideoDecoder::DecodeMode_Full),
     m_canDownscale(canDownscale),
     m_channelNumber(channelNumber),
@@ -72,8 +73,6 @@ QnVideoStreamDisplay::QnVideoStreamDisplay(
     m_lastIgnoreTime(AV_NOPTS_VALUE),
     m_isPaused(false)
 {
-    for (int i = 0; i < kMaxFrameQueueSize; ++i)
-        m_frameQueue[i] = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
 }
 
 QnVideoStreamDisplay::~QnVideoStreamDisplay()
@@ -392,9 +391,6 @@ MultiThreadDecodePolicy QnVideoStreamDisplay::toEncoderPolicy(bool useMtDecoding
 QnAbstractVideoDecoder* QnVideoStreamDisplay::createVideoDecoder(
     QnCompressedVideoDataPtr data, bool mtDecoding) const
 {
-    for (int i = 0; i < kMaxFrameQueueSize; ++i)
-        m_frameQueue[i]->clean();
-
     QnAbstractVideoDecoder* decoder;
 
 #ifdef __QSV_SUPPORTED__
@@ -469,12 +465,6 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
     {
         foreach(QnAbstractRenderer* render, m_renderList)
             render->waitForFrameDisplayed(data->channelNumber);
-        m_frameQueueIndex = 0;
-        for (int i = 1; i < kMaxFrameQueueSize; ++i)
-        {
-            if (!m_frameQueue[i]->isExternalData())
-                m_frameQueue[i]->clean();
-        }
         m_queueUsed = false;
     }
 
@@ -538,7 +528,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
          !CLVideoDecoderOutput::isPixelFormatSupported(pixFmt) ||
          scaleFactor != QnFrameScaler::factor_1);
 
-    QSharedPointer<CLVideoDecoderOutput> outFrame = m_frameQueue[m_frameQueueIndex];
+    QSharedPointer<CLVideoDecoderOutput> outFrame(new CLVideoDecoderOutput());
 
     foreach(QnAbstractRenderer* render, m_renderList) {
         if (render->isDisplaying(outFrame))
@@ -693,7 +683,6 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
         m_reverseQueue.enqueue(outFrame);
         m_reverseSizeInBytes += av_image_get_buffer_size((AVPixelFormat)outFrame->format, outFrame->width, outFrame->height, /*align*/ 1);
         checkQueueOverflow(dec);
-        m_frameQueue[m_frameQueueIndex] = QSharedPointer<CLVideoDecoderOutput>( new CLVideoDecoderOutput() );
         if (!(m_reverseQueue.front()->flags & AV_REVERSE_REORDERED))
             return Status_Buffered; // frame does not ready. need more frames. does not perform wait
         outFrame = m_reverseQueue.dequeue();
@@ -760,7 +749,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::flushFrame(int ch
         scaleFactor = determineScaleFactor(m_renderList, channel, dec->getWidth(), dec->getHeight(), force_factor);
     }
 
-    QSharedPointer<CLVideoDecoderOutput> outFrame = m_frameQueue[m_frameQueueIndex];
+    QSharedPointer<CLVideoDecoderOutput> outFrame(new CLVideoDecoderOutput());
 
     foreach(QnAbstractRenderer* render, m_renderList)
         render->finishPostedFramesRender(channel);
@@ -836,7 +825,6 @@ bool QnVideoStreamDisplay::processDecodedFrame(
                 render->draw(outFrame, getMaxScreenSizeUnsafe()); //< Send the new one.
         }
         // Allow frame queue for selected video.
-        m_frameQueueIndex = (m_frameQueueIndex + 1) % kMaxFrameQueueSize;
         m_queueUsed = true;
     }
     else

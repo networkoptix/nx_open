@@ -26,7 +26,6 @@ class QnCompressedVideoData;
 class QnAbstractRenderer;
 class QnBufferedFrameDisplayer;
 
-static const int kMaxFrameQueueSize = 6;
 static const int MAX_QUEUE_TIME = 1000 * 200;
 
 /**
@@ -117,13 +116,6 @@ private:
     std::set<QnAbstractRenderer*> m_renderList;
     bool m_renderListModified;
     QnMediaResourcePtr m_resource;
-
-    /**
-      * to reduce image size for weak video cards
-      */
-
-    QSharedPointer<CLVideoDecoderOutput> m_frameQueue[kMaxFrameQueueSize];
-    int m_frameQueueIndex;
 
     QnAbstractVideoDecoder::DecodeMode m_decodeMode;
     bool m_canDownscale;
