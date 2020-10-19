@@ -176,7 +176,8 @@ void CLVideoDecoderOutput::copyDataOnlyFrom(const AVFrame* src)
             h >>= descriptor->log2_chroma_h;
             w >>= descriptor->log2_chroma_w;
         }
-        copyPlane(data[i], src->data[i], w, linesize[i], src->linesize[i], h);
+        const int bytes = (w * descriptor->comp[i].step * descriptor->comp[i].depth) / 8;
+        copyPlane(data[i], src->data[i], bytes, linesize[i], src->linesize[i], h);
     }
 }
 
