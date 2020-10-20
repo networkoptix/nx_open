@@ -41,7 +41,6 @@ public:
     virtual ~HikvisionMetadataMonitor();
 
     void startMonitoring();
-    void stopMonitoring();
 
     void addHandler(const QString& handlerId, const Handler& handler);
     void removeHandler(const QString& handlerId);
@@ -52,6 +51,8 @@ public:
 
     void setDeviceInfo(const QString& deviceName, const QString& id);
 private:
+    void stopMonitoring();
+
     nx::utils::Url buildMonitoringUrl(
         const nx::utils::Url& resourceUrl,
         const std::vector<QString>& eventTypes,
@@ -81,6 +82,7 @@ private:
     const nx::utils::Url m_lprUrl;
     const QAuthenticator m_auth;
     nx::network::aio::Timer m_monitorTimer;
+    nx::network::aio::Timer m_timer;
     nx::network::aio::Timer m_lprTimer;
     QElapsedTimer m_timeSinceLastOpen;
     std::unique_ptr<nx::network::http::AsyncClient> m_monitorHttpClient;

@@ -71,7 +71,8 @@ HikvisionMetadataMonitor::HikvisionMetadataMonitor(
     m_lprUrl(buildLprUrl(url)),
     m_auth(auth)
 {
-    m_lprTimer.bindToAioThread(m_monitorTimer.getAioThread());
+    m_monitorTimer.bindToAioThread(m_timer.getAioThread());
+    m_lprTimer.bindToAioThread(m_timer.getAioThread());
 }
 
 HikvisionMetadataMonitor::~HikvisionMetadataMonitor() { stopMonitoring(); }
@@ -85,13 +86,13 @@ void HikvisionMetadataMonitor::setDeviceInfo(const QString& deviceName, const QS
 void HikvisionMetadataMonitor::startMonitoring()
 {
     NX_VERBOSE(this, "Started");
-    m_monitorTimer.post([this]() { initMonitorUnsafe(); });
+    m_timer.post([this]() { initMonitorUnsafe(); });
 }
 
 void HikvisionMetadataMonitor::stopMonitoring()
 {
     nx::utils::promise<void> promise;
-    m_monitorTimer.post([this, &promise]() {
+    m_timer.post([this, &promise]() {
         if (m_monitorHttpClient)
             m_monitorHttpClient->pleaseStopSync();
         if (m_lprHttpClient)
@@ -169,7 +170,7 @@ void HikvisionMetadataMonitor::initEventMonitor()
 {
     auto httpClient = std::make_unique<nx::network::http::AsyncClient>();
     m_monitorTimer.pleaseStopSync();
-    httpClient->bindToAioThread(m_monitorTimer.getAioThread());
+    httpClient->bindToAioThread(m_timer.getAioThread());
 
     httpClient->setOnResponseReceived([this]() { at_monitorResponseReceived(); });
     httpClient->setOnSomeMessageBodyAvailable([this]() { at_monitorSomeBytesAvailable(); });
@@ -193,7 +194,7 @@ void HikvisionMetadataMonitor::initLprMonitor()
 {
     auto httpClient = std::make_unique<nx::network::http::AsyncClient>();
     m_lprTimer.pleaseStopSync();
-    httpClient->bindToAioThread(m_lprTimer.getAioThread());
+    httpClient->bindToAioThread(m_timer.getAioThread());
 
     httpClient->setOnDone([this]() { at_LprRequestDone(); });
 
