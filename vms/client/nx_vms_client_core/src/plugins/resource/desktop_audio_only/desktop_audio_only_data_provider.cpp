@@ -425,7 +425,6 @@ QnWritableCompressedAudioDataPtr QnDesktopAudioOnlyDataProvider::encodePacket(ch
         timeBaseMs.den = 1000;
 
         audio.reset(new QnWritableCompressedAudioData(
-            CL_MEDIA_ALIGNMENT,
             outputPacket.size,
             m_encoderCtxPtr));
 

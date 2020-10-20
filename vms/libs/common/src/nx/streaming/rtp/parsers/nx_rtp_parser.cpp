@@ -171,7 +171,7 @@ StreamParser::Result QnNxRtpParser::processData(quint8* rtpBufferBase, int buffe
                 dataSize -= RTSP_FFMPEG_VIDEO_HEADER_SIZE;
                 payload += RTSP_FFMPEG_VIDEO_HEADER_SIZE; // deserialize video flags
 
-                QnWritableCompressedVideoData *video = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, fullPayloadLen, context);
+                auto video = new QnWritableCompressedVideoData(fullPayloadLen, context);
                 m_nextDataPacket = QnCompressedVideoDataPtr(video);
                 m_nextDataPacketBuffer = &video->m_data;
 
@@ -180,7 +180,8 @@ StreamParser::Result QnNxRtpParser::processData(quint8* rtpBufferBase, int buffe
             }
             else if (context && context->getCodecType() == AVMEDIA_TYPE_AUDIO && dataType == QnAbstractMediaData::AUDIO)
             {
-                QnWritableCompressedAudioData *audio = new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, dataSize); // , context
+                // TODO: #rvasilenko why don't we pass context in the constructor?
+                auto audio = new QnWritableCompressedAudioData(dataSize); // , context
                 audio->context = context;
                 //audio->format.fromAvStream(context->ctx());
                 m_nextDataPacket = QnCompressedAudioDataPtr(audio);

@@ -16,7 +16,7 @@ public:
     {
     }
 
-    QnAbstractMediaData* clone(QnAbstractAllocator* allocator) const override {  return nullptr; };
+    QnAbstractMediaData* clone() const override {  return nullptr; };
     const char* data() const override { return nullptr; }
     size_t dataSize() const override { return m_size; }
 

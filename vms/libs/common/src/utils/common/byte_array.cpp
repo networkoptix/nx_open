@@ -1,76 +1,23 @@
-
 #include "byte_array.h"
 
-#include <functional>
-
-#include <nx/utils/memory/system_allocator.h>
 #include <nx/utils/log/assert.h>
 #include <nx/kit/utils.h>
 
-#include <libavcodec/avcodec.h>
-
-#include "warnings.h"
-
-//#define CALC_QnByteArray_ALLOCATION
-#ifdef CALC_QnByteArray_ALLOCATION
-QAtomicInt QnByteArray_bytesAllocated;
-#endif
-
-
-using namespace std::placeholders;
-
-QnByteArray::QnByteArray(unsigned int alignment, unsigned int capacity)
-:    //TODO #ak delegate constructor
-    m_allocator(QnSystemAllocator::instance()),
-    m_alignment(alignment),
-    m_capacity(0),
-    m_size(0),
-    m_data(NULL),
-    m_ignore(0),
-    m_ownBuffer( true )
-{
-    if (capacity > 0)
-        reallocate(capacity);
-}
-
 QnByteArray::QnByteArray(
-    QnAbstractAllocator* const allocator,
-    unsigned int alignment,
-    unsigned int capacity)
-:
-    m_allocator(allocator),
+    size_t alignment,
+    size_t capacity,
+    size_t padding)
+    :
     m_alignment(alignment),
-    m_capacity(0),
-    m_size(0),
-    m_data(NULL),
-    m_ignore(0),
-    m_ownBuffer( true )
+    m_padding(padding)
 {
     if (capacity > 0)
         reallocate(capacity);
-}
-
-QnByteArray::QnByteArray( char* buf, unsigned int dataSize )
-:
-    m_allocator( QnSystemAllocator::instance() ),
-    m_alignment( 1 ),
-    m_capacity( dataSize ),
-    m_size( dataSize ),
-    m_data( buf ),
-    m_ignore( 0 ),
-    m_ownBuffer( false )
-{
 }
 
 QnByteArray::~QnByteArray()
 {
-    if( m_ownBuffer )
-    {
-        nx::kit::utils::freeAligned( m_data, std::bind( &QnAbstractAllocator::release, m_allocator, _1 ) );
-#ifdef CALC_QnByteArray_ALLOCATION
-        QnByteArray_bytesAllocated.fetchAndAddOrdered( -(int)(m_capacity + AV_INPUT_BUFFER_PADDING_SIZE) );
-#endif
-    }
+    nx::kit::utils::freeAligned(m_data);
 }
 
 void QnByteArray::clear()
@@ -79,15 +26,12 @@ void QnByteArray::clear()
     m_ignore = 0;
 }
 
-char *QnByteArray::data()
+char* QnByteArray::data()
 {
-    if( !m_ownBuffer )
-        reallocate( m_capacity );
-
     return m_data + m_ignore;
 }
 
-void QnByteArray::ignore_first_bytes(int bytes_to_ignore)
+void QnByteArray::ignore_first_bytes(size_t bytes_to_ignore)
 {
     m_ignore = bytes_to_ignore;
 }
@@ -97,11 +41,8 @@ int QnByteArray::getAlignment() const
     return m_alignment;
 }
 
-unsigned int QnByteArray::write( const char *data, unsigned int size )
+size_t QnByteArray::write(const char* data, size_t size)
 {
-    if( !m_ownBuffer )
-        reallocate( m_capacity );
-
     reserve(m_size + size);
 
     memcpy(m_data + m_size, data, size);
@@ -111,20 +52,16 @@ unsigned int QnByteArray::write( const char *data, unsigned int size )
     return size;
 }
 
-void QnByteArray::uncheckedWrite( const char *data, unsigned int size )
+void QnByteArray::uncheckedWrite(const char* data, size_t size)
 {
     NX_ASSERT(m_size + size <= m_capacity, "Buffer MUST be preallocated!");
-    memcpy(m_data + m_size, data, size);  //1s
+    memcpy(m_data + m_size, data, size); // 1s
     m_size += size;
 }
 
-unsigned int QnByteArray::write(quint8 value)
+size_t QnByteArray::write(quint8 value)
 {
-    if( !m_ownBuffer )
-        reallocate( m_capacity );
-
     reserve(m_size + 1);
-
     memcpy(m_data + m_size, &value, 1);
 
     m_size += 1;
@@ -132,11 +69,8 @@ unsigned int QnByteArray::write(quint8 value)
     return 1;
 }
 
-unsigned int QnByteArray::writeAt(const char *data, unsigned int size, int pos)
+size_t QnByteArray::writeAt(const char* data, size_t size, int pos)
 {
-    if( !m_ownBuffer )
-        reallocate( m_capacity );
-
     reserve(pos + size);
 
     memcpy(m_data + pos, data, size);
@@ -149,39 +83,32 @@ unsigned int QnByteArray::writeAt(const char *data, unsigned int size, int pos)
 
 void QnByteArray::writeFiller(quint8 filler, int size)
 {
-    if( !m_ownBuffer )
-        reallocate( m_capacity );
-
     reserve(m_size + size);
-
     memset(m_data + m_size, filler, size);
     m_size += size;
 }
 
-char *QnByteArray::startWriting(unsigned int size)
+char* QnByteArray::startWriting(size_t size)
 {
-    if( !m_ownBuffer )
-        reallocate( m_capacity );
-
     reserve(m_size + size);
-
     return m_data + m_size;
 }
 
-void QnByteArray::resize(unsigned int size)
+void QnByteArray::resize(size_t size)
 {
     reserve(size);
 
     m_size = size;
 }
 
-void QnByteArray::reserve(unsigned int size)
+void QnByteArray::reserve(size_t size)
 {
-    if(size <= m_capacity)
+    if (size <= m_capacity)
         return;
 
-    if(!reallocate(qMax(m_capacity * 2, size)))
-        qnWarning("Could not reserve '%1' bytes.", size);
+    const size_t newSize = qMax(m_capacity * 2, size);
+    const bool success = reallocate(newSize);
+    NX_ASSERT(success, "Could not reserve %1 bytes.", newSize);
 }
 
 void QnByteArray::removeTrailingZeros()
@@ -190,111 +117,56 @@ void QnByteArray::removeTrailingZeros()
         --m_size;
 }
 
-QnByteArray& QnByteArray::operator=( const QnByteArray& right )
+QnByteArray& QnByteArray::operator=(const QnByteArray& right)
 {
-    if( &right == this )
+    if (&right == this)
         return *this;
 
-    if( m_ownBuffer )
-    {
-#ifdef CALC_QnByteArray_ALLOCATION
-        QnByteArray_bytesAllocated.fetchAndAddOrdered( -(int)(m_capacity + AV_INPUT_BUFFER_PADDING_SIZE) );
-#endif
-        nx::kit::utils::freeAligned( m_data, std::bind( &QnAbstractAllocator::release, m_allocator, _1 ) );
-    }
+    nx::kit::utils::freeAligned(m_data);
 
-    m_allocator = right.m_allocator;
     m_alignment = right.m_alignment;
     m_capacity = right.m_size;
     m_size = right.m_size;
-    m_data = (char*)nx::kit::utils::mallocAligned(
-        m_capacity + AV_INPUT_BUFFER_PADDING_SIZE,
-        m_alignment,
-        std::bind( &QnAbstractAllocator::alloc, m_allocator, _1 ) );
+    m_padding = right.m_padding;
+    m_data = (char*) nx::kit::utils::mallocAligned(
+        m_capacity + m_padding,
+        m_alignment);
 
-#ifdef CALC_QnByteArray_ALLOCATION
-    QnByteArray_bytesAllocated.fetchAndAddOrdered( m_capacity + AV_INPUT_BUFFER_PADDING_SIZE );
-#endif
-    memcpy( m_data, right.constData(), right.size() );
+    memcpy(m_data, right.constData(), right.size());
     m_ignore = 0;
-    m_ownBuffer = true;
 
     return *this;
 }
 
-QnByteArray& QnByteArray::operator=( QnByteArray&& right )
+bool QnByteArray::reallocate(size_t capacity)
 {
-    if( &right == this )
-        return *this;
-
-    if( m_ownBuffer )
+    if (!(NX_ASSERT(capacity >= m_size,
+            "Unable to decrease capacity. Did you forget to clear() the buffer?")))
     {
-        nx::kit::utils::freeAligned( m_data, std::bind( &QnAbstractAllocator::release, m_allocator, _1 ) );
-#ifdef CALC_QnByteArray_ALLOCATION
-        QnByteArray_bytesAllocated.fetchAndAddOrdered( -(int)(m_capacity + AV_INPUT_BUFFER_PADDING_SIZE) );
-#endif
-    }
-
-    m_allocator = right.m_allocator;
-    m_alignment = right.m_alignment;
-    m_capacity = right.m_capacity;
-    m_size = right.m_size;
-    m_data = right.m_data;
-    m_ignore = right.m_ignore;
-    m_ownBuffer = right.m_ownBuffer;
-
-    right.m_alignment = 1;
-    right.m_capacity = 0;
-    right.m_size = 0;
-    right.m_data = nullptr;
-    right.m_ignore = 0;
-    right.m_ownBuffer = true;
-
-    return *this;
-}
-
-bool QnByteArray::reallocate(unsigned int capacity)
-{
-    if (capacity < m_size)
-    {
-        qWarning("QnByteArray::reallocate(): Unable to decrease capacity. "
-                 "Did you forget to clear() the buffer?");
         return false;
     }
 
     if (capacity < m_capacity)
         return true;
 
-    char* data = (char*)nx::kit::utils::mallocAligned(
-        (size_t) capacity + AV_INPUT_BUFFER_PADDING_SIZE,
-        m_alignment,
-        std::bind( &QnAbstractAllocator::alloc, m_allocator, _1 ) );
+    char* data = (char*) nx::kit::utils::mallocAligned(
+        (size_t) capacity + m_padding, m_alignment);
 
     if (!data)
         return false;
 
-#ifdef CALC_QnByteArray_ALLOCATION
-    QnByteArray_bytesAllocated.fetchAndAddOrdered( capacity + AV_INPUT_BUFFER_PADDING_SIZE );
-#endif
-
     if (m_data && m_size)
         memcpy(data, m_data, m_size);
-    /**
-     * If the first 23 bits of the additional bytes are not 0, then damaged
-     * MPEG bitstreams could cause overread and segfault.
-     */
-    memset(data + capacity, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 
-    if (m_ownBuffer && m_data)
-    {
-        nx::kit::utils::freeAligned( m_data, std::bind( &QnAbstractAllocator::release, m_allocator, _1 ) );
-#ifdef CALC_QnByteArray_ALLOCATION
-        QnByteArray_bytesAllocated.fetchAndAddOrdered( -(int)(m_capacity + AV_INPUT_BUFFER_PADDING_SIZE) );
-#endif
-    }
+    // If the first 23 bits of the additional bytes are not 0, then damaged MPEG bitstreams could
+    // cause overread and segfault.
+    memset(data + capacity, 0, m_padding);
+
+    if (m_data)
+        nx::kit::utils::freeAligned(m_data);
+
     m_capacity = capacity;
     m_data = data;
-    m_ownBuffer = true;
 
     return true;
 }

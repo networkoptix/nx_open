@@ -328,7 +328,7 @@ QnAbstractMediaDataPtr QnFfmpegAudioTranscoder::createMediaDataFromAVPacket(cons
     if (!m_context)
         m_context = QnConstMediaContextPtr(new QnAvCodecMediaContext(m_encoderCtx));
 
-    auto resultAudioData = new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, packet.size, m_context);
+    auto resultAudioData = new QnWritableCompressedAudioData(packet.size, m_context);
     resultAudioData->compressionType = m_codecId;
 
     AVRational r = {1, 1000000};

@@ -112,7 +112,7 @@ bool QnProxyAudioTransmitter::processAudioData(const QnConstCompressedAudioDataP
     }
 
     m_serializer->setDataPacket(data);
-    QnByteArray sendBuffer(CL_MEDIA_ALIGNMENT, 1024 * 64);
+    QnByteArray sendBuffer(CL_MEDIA_ALIGNMENT, 1024 * 64, AV_INPUT_BUFFER_PADDING_SIZE);
 
     sendBuffer.resize(4); // reserve space for RTP TCP header
     while(!m_needStop && m_serializer->getNextPacket(sendBuffer))

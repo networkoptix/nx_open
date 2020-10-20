@@ -73,10 +73,7 @@ QnAbstractMediaDataPtr QnSpeechSynthesisDataProvider::getNextData()
         return QnAbstractMediaDataPtr();
 
     QnWritableCompressedAudioDataPtr packet(
-        new QnWritableCompressedAudioData(
-            CL_MEDIA_ALIGNMENT,
-            kDefaultDataChunkSize,
-            m_ctx));
+        new QnWritableCompressedAudioData(kDefaultDataChunkSize, m_ctx));
 
     const int bytesRest = m_rawBuffer.size() - m_curPos;
     packet->m_data.write(

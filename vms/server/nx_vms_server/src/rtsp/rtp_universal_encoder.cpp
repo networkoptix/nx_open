@@ -215,7 +215,7 @@ QList<QString> getSdpAttributesFromMedia(QnConstAbstractMediaDataPtr media, int 
 }
 
 QnUniversalRtpEncoder::QnUniversalRtpEncoder(const Config& config, nx::metrics::Storage* metrics):
-    m_outputBuffer(CL_MEDIA_ALIGNMENT, 0),
+    m_outputBuffer(CL_MEDIA_ALIGNMENT, 0, AV_INPUT_BUFFER_PADDING_SIZE),
     m_config(config),
     m_transcoder(config.transcoderConfig, metrics)
 {

@@ -103,7 +103,7 @@ bool AsyncChannelAudioConsumer::transcodeAndSend(const QnAbstractDataPacketPtr& 
         return false;
     }
 
-    QnByteArray transcodedPacket(CL_MEDIA_ALIGNMENT, /*capacity*/ 0);
+    QnByteArray transcodedPacket(CL_MEDIA_ALIGNMENT, /*capacity*/ 0, AV_INPUT_BUFFER_PADDING_SIZE);
     int status = m_transcoder->transcodePacket(mediaData, &transcodedPacket);
     if (status != 0)
     {

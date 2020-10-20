@@ -30,8 +30,7 @@ std::unique_ptr<QnAbstractStreamDataProvider> getProvider(const QSize& maxResolu
 
 QnWritableCompressedVideoDataPtr getVideoData(QnAbstractStreamDataProvider* provider)
 {
-    QnWritableCompressedVideoDataPtr videoData(
-        new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, 1024));
+    QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(1024));
     videoData->compressionType = AV_CODEC_ID_H264;
     videoData->dataProvider = provider;
     return videoData;

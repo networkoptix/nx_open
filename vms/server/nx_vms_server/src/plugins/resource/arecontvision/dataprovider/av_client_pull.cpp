@@ -11,7 +11,7 @@
 QnPlAVClinetPullStreamReader::QnPlAVClinetPullStreamReader(const QnPlAreconVisionResourcePtr& res)
 :
     parent_type(res),
-    m_videoFrameBuff(CL_MEDIA_ALIGNMENT, 1024*1024)
+    m_videoFrameBuff(CL_MEDIA_ALIGNMENT, 1024*1024, AV_INPUT_BUFFER_PADDING_SIZE)
 {
     /**/
     //setQuality(getQuality());  // to update stream params

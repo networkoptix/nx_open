@@ -96,7 +96,7 @@ bool H264Parser::isBufferOverflow() const
         addHeaderSize = getSpsPpsSize();
 
     int totalSize = m_videoFrameSize + addHeaderSize;
-    return totalSize > (int) MAX_ALLOWED_FRAME_SIZE;
+    return totalSize > MAX_ALLOWED_FRAME_SIZE;
 }
 
 QnCompressedVideoDataPtr H264Parser::createVideoData(const quint8* rtpBuffer, quint32 rtpTime)
@@ -108,10 +108,7 @@ QnCompressedVideoDataPtr H264Parser::createVideoData(const quint8* rtpBuffer, qu
     int totalSize = m_videoFrameSize + addHeaderSize;
 
     QnWritableCompressedVideoDataPtr result =
-        QnWritableCompressedVideoDataPtr(
-            new QnWritableCompressedVideoData(
-                CL_MEDIA_ALIGNMENT,
-                totalSize));
+        QnWritableCompressedVideoDataPtr(new QnWritableCompressedVideoData(totalSize));
     result->compressionType = AV_CODEC_ID_H264;
 
     if (m_keyDataExists)
@@ -346,7 +343,7 @@ StreamParser::Result H264Parser::processData(
     const auto prevSequenceNum = m_prevSequenceNum;
     m_prevSequenceNum = sequenceNum;
 
-    if (m_videoFrameSize > (int) MAX_ALLOWED_FRAME_SIZE)
+    if (m_videoFrameSize > MAX_ALLOWED_FRAME_SIZE)
     {
         clearInternalBuffer();
         return {false, "Too large RTP/H.264 frame. Truncate video buffer"};
@@ -519,7 +516,7 @@ StreamParser::Result H264Parser::processData(
         clearInternalBuffer();
         return {false, "RTP parser buffer overflow"};
     }
-    
+
     return {true};
 }
 

@@ -23,7 +23,10 @@ QnAudioStreamDisplay::QnAudioStreamDisplay(int bufferMs, int prebufferMs):
     m_forceDownmix(qnSettings->isAudioDownmixed()),
     m_sampleConvertMethod(SampleConvertMethod::none),
     m_isConvertMethodInitialized(false),
-    m_decodedAudioBuffer(CL_MEDIA_ALIGNMENT, AVCODEC_MAX_AUDIO_FRAME_SIZE),
+    m_decodedAudioBuffer(
+        CL_MEDIA_ALIGNMENT,
+        AVCODEC_MAX_AUDIO_FRAME_SIZE,
+        AV_INPUT_BUFFER_PADDING_SIZE),
     m_startBufferingTime(AV_NOPTS_VALUE),
     m_lastAudioTime(AV_NOPTS_VALUE),
     m_audioQueueMutex(QnMutex::Recursive),

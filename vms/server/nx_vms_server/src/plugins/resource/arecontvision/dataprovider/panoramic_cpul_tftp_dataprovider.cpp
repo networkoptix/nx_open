@@ -352,9 +352,10 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
         AVJpeg::Header::GetHeader((unsigned char*)img.data(), size.width, size.height, quality, m_model.toLatin1().data());
     }
 
-    if (!qBetween(1U, m_videoFrameBuff.size(), MAX_ALLOWED_FRAME_SIZE))
+    if (!qBetween((size_t) 1, m_videoFrameBuff.size(), (size_t) MAX_ALLOWED_FRAME_SIZE))
         return QnAbstractMediaDataPtr();
-    QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, m_videoFrameBuff.size()));
+    QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(
+        m_videoFrameBuff.size()));
     videoData->m_data.write(m_videoFrameBuff);
 
 

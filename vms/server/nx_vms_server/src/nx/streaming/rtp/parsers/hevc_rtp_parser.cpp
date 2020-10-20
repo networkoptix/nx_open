@@ -100,7 +100,7 @@ StreamParser::Result HevcParser::processData(
     m_lastRtpTimestamp = rtpTimestamp;
 
     // Check buffer overflow
-    if (!gotData && m_videoFrameSize > (int) MAX_ALLOWED_FRAME_SIZE)
+    if (!gotData && m_videoFrameSize > MAX_ALLOWED_FRAME_SIZE)
     {
         NX_WARNING(this, "RTP parser buffer overflow.");
         return handlePacketLoss(m_previousPacketSequenceNumber, sequenceNumber);
@@ -280,7 +280,7 @@ StreamParser::Result HevcParser::handlePacketLoss(
     int currentSequenceNumber)
 {
     reset();
-    return {false, NX_FMT("Packet loss detected. Previous sequence %1, next sequence %2", 
+    return {false, NX_FMT("Packet loss detected. Previous sequence %1, next sequence %2",
         previousSequenceNumber, currentSequenceNumber)};
 }
 
@@ -505,10 +505,7 @@ QnCompressedVideoDataPtr HevcParser::createVideoData(const uint8_t* rtpBuffer, u
     int totalSize = m_videoFrameSize + additionalBufferSize();
 
     QnWritableCompressedVideoDataPtr result =
-        QnWritableCompressedVideoDataPtr(
-            new QnWritableCompressedVideoData(
-                CL_MEDIA_ALIGNMENT,
-                totalSize));
+        QnWritableCompressedVideoDataPtr(new QnWritableCompressedVideoData(totalSize));
 
     result->compressionType = AV_CODEC_ID_H265;
     result->width = m_context.width;

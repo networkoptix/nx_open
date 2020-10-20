@@ -328,7 +328,8 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
     }
 
 
-    QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, m_videoFrameBuff.size()));
+    QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(
+        m_videoFrameBuff.size()));
 
     QnByteArray& imgToSend = videoData->m_data;
     imgToSend.write(m_videoFrameBuff);

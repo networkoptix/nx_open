@@ -1,33 +1,31 @@
-#ifndef QN_BYTE_ARRAY_H
-#define QN_BYTE_ARRAY_H
+#pragma once
 
 #include <QtCore/QByteArray>
 #include <QtCore/qglobal.h>
 
-#include <nx/utils/memory/abstract_allocator.h>
-
-class QByteArray;
-
 /**
  * Container class for aligned memory chunks.
  */
-class QnByteArray {
+class QnByteArray
+{
 public:
     /**
-     * Constructor.
-     *
-     * \param alignment                 Alignment of array data.
-     * \param capacity                  Initial array capacity.
+     * @param alignment Alignment of the array data.
+     * @param capacity Initial array capacity.
+     * @param padding Additional data beyond the array capacity, which will be filled with zeroes.
+     *     Used to prevent overread and segfault for damaged MPEG bitstreams.
      */
-    explicit QnByteArray( unsigned int alignment, unsigned int capacity );
-    explicit QnByteArray( QnAbstractAllocator* const allocator, unsigned int alignment, unsigned int capacity );
-    //!Takes external buffer \a data. This buffer is not deleted in destructor!
-    explicit QnByteArray( char* buf, unsigned int dataSize );
-
-    /**
-     * Destructor.
-     */
+    explicit QnByteArray(
+        size_t alignment,
+        size_t capacity,
+        size_t padding);
     ~QnByteArray();
+
+    QnByteArray() = default;
+    QnByteArray(QnByteArray&& other) = delete;
+    QnByteArray(const QnByteArray&) = delete;
+    QnByteArray& operator=(const QnByteArray& right);
+    QnByteArray& operator=(QnByteArray&& source) = delete;
 
     /**
      * Clears this byte array. Note that capacity remains unchanged.
@@ -35,63 +33,57 @@ public:
     void clear();
 
     /**
-     * \returns                         Pointer to the data stored in this array.
+     * Pointer to the data stored in this array.
      */
-    inline const char *constData() const { return m_data + m_ignore; }
+    inline const char* constData() const { return m_data + m_ignore; }
 
     /**
-     * \returns                         Pointer to the data stored in this array.
+     * Pointer to the data stored in this array.
      */
-    inline const char *data() const { return constData(); }
+    inline const char* data() const { return constData(); }
 
     /**
-     * \returns                         Pointer to the data stored in this array.
+     * Pointer to the data stored in this array.
      */
     char *data();
 
     /**
-     * \returns                         Size of this array.
+     * Size of this array.
      */
-    inline unsigned int size() const { return m_size - m_ignore; }
+    inline size_t size() const { return m_size - m_ignore; }
 
     /**
-     * \returns                         Capacity of this array.
+     * Capacity of this array.
      */
-    inline unsigned int capacity() const { return m_capacity; }
+    inline size_t capacity() const { return m_capacity; }
 
     /**
      * \param data                      Pointer to the data to append to this array
      * \param size                      Size of the data to append.
      * \returns                         New size of this array, or 0 in case of an error.
      */
-    unsigned int write(const char *data, unsigned int size);
+    size_t write(const char* data, size_t size);
 
-    unsigned int write(quint8 value);
+    size_t write(quint8 value);
 
     /**
      * Write to buffer without any checks. Buffer MUST be preallocated before that call
      * \param data                      Pointer to the data to append to this array
      * \param size                      Size of the data to append.
      */
-    void uncheckedWrite( const char *data, unsigned int size );
-    //{
-    //    NX_ASSERT(m_size + size <= m_capacity, "Buffer MUST be preallocated!");
-    //    memcpy(m_data + m_size, data, size);
-    //    m_size += size;
-    //}
-
+    void uncheckedWrite(const char* data, size_t size);
 
     /**
      * \param data                      Data to append to this array.
      * \returns                         New size of this array, or 0 in case of an error.
      */
-    inline unsigned int write(const QByteArray &data) { return write(data.constData(), data.size()); }
+    inline size_t write(const QByteArray& data) { return write(data.constData(), data.size()); }
 
     /**
      * \param data                      Data to append to this array.
      * \returns                         New size of this array, or 0 in case of an error.
      */
-    inline unsigned int write(const QnByteArray &data) { return write(data.constData(), data.size()); }
+    inline size_t write(const QnByteArray& data) { return write(data.constData(), data.size()); }
 
     /**
      * Appends an array of given size filled with the given byte value to this array.
@@ -109,26 +101,26 @@ public:
      * \param size                      Size of the data.
      * \param pos                       Position to overwrite.
      */
-    unsigned int writeAt(const char *data, unsigned int size, int pos);
+    size_t writeAt(const char* data, size_t size, int pos);
 
     /**
      * Reserves given amount of bytes in this array and returns a pointer to
      * the reserved memory region.
      *
      * This function is to be used when some external mechanism is employed
-     * for writing into memory. <tt>finishWriting(unsigned int)</tt> must be
+     * for writing into memory. <tt>finishWriting(size_t)</tt> must be
      * called after external writing operation is complete.
      *
      * \param size                      Number of bytes to reserve for writing.
      * \returns                         Pointer to the reserved memory region.
      */
-    char *startWriting(unsigned int size);
+    char* startWriting(size_t size);
 
     /**
      * \param size                      Number of bytes that were appended to this
      *                                  array using external mechanisms.
      */
-    inline void finishWriting(unsigned int size) { m_size += size; }
+    inline void finishWriting(size_t size) { m_size += size; }
 
     /**
      * Removes trailing zero bytes from this array.
@@ -140,40 +132,28 @@ public:
      *
      * \param size                      Number of bytes to reserve.
      */
-    void reserve(unsigned int size);
+    void reserve(size_t size);
 
     /**
      * \param size                      New size for this array.
      */
-    void resize(unsigned int size);
-
-
-
+    void resize(size_t size);
 
     /* Deprecated functions follow. */
 
     // TODO: #Elric this function breaks data alignment.
-    void ignore_first_bytes(int bytes_to_ignore);
+    void ignore_first_bytes(size_t bytes_to_ignore);
 
     int getAlignment() const;
 
-    QnByteArray& operator=( const QnByteArray& );
-    QnByteArray& operator=( QnByteArray&& );
-
-protected:
-    bool reallocate(unsigned int capacity);
+private:
+    bool reallocate(size_t capacity);
 
 private:
-    QnAbstractAllocator* m_allocator;
-    unsigned int m_alignment;
-    unsigned int m_capacity;
-    unsigned int m_size;
-    char *m_data;
-    int m_ignore;
-    //!true, if we own memory pointed to by \a m_data
-    bool m_ownBuffer;
-
-    QnByteArray( const QnByteArray& );
+    size_t m_alignment = 1;
+    size_t m_capacity = 0;
+    size_t m_size = 0;
+    size_t m_padding = 0;
+    size_t m_ignore = 0;
+    char* m_data = nullptr;
 };
-
-#endif // QN_BYTE_ARRAY_H

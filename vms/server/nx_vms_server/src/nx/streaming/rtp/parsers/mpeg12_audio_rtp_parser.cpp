@@ -148,7 +148,7 @@ QnConstResourceAudioLayoutPtr Mpeg12AudioParser::getAudioLayout()
 void Mpeg12AudioParser::createAudioFrame()
 {
     QnWritableCompressedAudioDataPtr audioFrame(
-        new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, m_audioFrameSize));
+        new QnWritableCompressedAudioData(m_audioFrameSize));
 
     for (const DataChunk& dataChunk: m_audioDataChunks)
         audioFrame->m_data.write((const char*)dataChunk.start, dataChunk.length);

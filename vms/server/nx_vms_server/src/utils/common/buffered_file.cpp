@@ -195,8 +195,8 @@ QBufferedFile::QBufferedFile(
         qPower2Ceil((unsigned) (fileBlockSize + minBufferSize), SECTOR_SIZE),
         SECTOR_SIZE),
     m_queueWriter(0),
-    m_cachedBuffer(CL_MEDIA_ALIGNMENT, SECTOR_SIZE),
-    m_tmpBuffer(CL_MEDIA_ALIGNMENT, SECTOR_SIZE),
+    m_cachedBuffer(CL_MEDIA_ALIGNMENT, SECTOR_SIZE, AV_INPUT_BUFFER_PADDING_SIZE),
+    m_tmpBuffer(CL_MEDIA_ALIGNMENT, SECTOR_SIZE, AV_INPUT_BUFFER_PADDING_SIZE),
     m_lastSeekPos(AV_NOPTS_VALUE),
     m_writerPoolId(writerPoolId)
 {

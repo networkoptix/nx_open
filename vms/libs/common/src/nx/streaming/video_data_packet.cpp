@@ -1,6 +1,7 @@
 #include "video_data_packet.h"
 
 #include <nx/utils/app_info.h>
+#include <nx/utils/log/assert.h>
 
 namespace {
 
@@ -34,35 +35,29 @@ void QnCompressedVideoData::assign(const QnCompressedVideoData* other)
 }
 
 QnWritableCompressedVideoData::QnWritableCompressedVideoData(
-    unsigned int alignment,
-    unsigned int capacity,
-    QnConstMediaContextPtr ctx )
-:   //TODO #ak delegate constructor (requires msvc2013)
-    QnCompressedVideoData( ctx ),
-    m_data(alignment, capacity)
+    size_t capacity,
+    QnConstMediaContextPtr ctx)
+    :
+    QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, capacity, AV_INPUT_BUFFER_PADDING_SIZE, ctx)
 {
-    NX_ASSERT(capacity <= kMaxValidCapacity);
 }
 
 QnWritableCompressedVideoData::QnWritableCompressedVideoData(
-    QnAbstractAllocator* allocator,
-    unsigned int alignment,
-    unsigned int capacity,
-    QnConstMediaContextPtr ctx )
-:
-    QnCompressedVideoData( ctx ),
-    m_data(allocator, alignment, capacity)
+    size_t alignment,
+    size_t capacity,
+    size_t padding,
+    QnConstMediaContextPtr ctx)
+    :
+    QnCompressedVideoData(ctx),
+    m_data(alignment, capacity, padding)
 {
     NX_ASSERT(capacity <= kMaxValidCapacity);
 }
 
 //!Implementation of QnAbstractMediaData::clone
-QnWritableCompressedVideoData* QnWritableCompressedVideoData::clone( QnAbstractAllocator* allocator ) const
+QnWritableCompressedVideoData* QnWritableCompressedVideoData::clone() const
 {
-    QnWritableCompressedVideoData* rez = new QnWritableCompressedVideoData(
-        allocator,
-        m_data.getAlignment(),
-        m_data.size() );
+    auto rez = new QnWritableCompressedVideoData();
     rez->assign(this);
     return rez;
 }
@@ -79,8 +74,8 @@ size_t QnWritableCompressedVideoData::dataSize() const
     return m_data.size();
 }
 
-void QnWritableCompressedVideoData::assign( const QnWritableCompressedVideoData* other )
+void QnWritableCompressedVideoData::assign(const QnWritableCompressedVideoData* other)
 {
-    QnCompressedVideoData::assign( other );
+    QnCompressedVideoData::assign(other);
     m_data = other->m_data;
 }

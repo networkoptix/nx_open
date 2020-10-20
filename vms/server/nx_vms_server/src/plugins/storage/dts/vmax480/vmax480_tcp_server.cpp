@@ -274,7 +274,7 @@ void QnVMax480ConnectionProcessor::run()
         QnByteArray* mediaBuffer = nullptr;
         if (dataType == VMAXDT_GotVideoPacket)
         {
-            QnWritableCompressedVideoData* video = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, dataSize);
+            QnWritableCompressedVideoData* video = new QnWritableCompressedVideoData(dataSize);
             media = video;
             mediaBuffer = &video->m_data;
             switch (internalCodecID) {
@@ -337,7 +337,7 @@ void QnVMax480ConnectionProcessor::run()
                 av->time_base.den = av->sample_rate;
             }
 
-            QnWritableCompressedAudioData* audio = new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, dataSize, d->context);
+            auto audio = new QnWritableCompressedAudioData(dataSize, d->context);
             media = audio;
             mediaBuffer = &audio->m_data;
         }

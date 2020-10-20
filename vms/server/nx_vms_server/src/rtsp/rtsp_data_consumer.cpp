@@ -70,7 +70,7 @@ QnRtspDataConsumer::QnRtspDataConsumer(QnRtspConnectionProcessor* owner):
     m_adaptiveSleep(MAX_FRAME_DURATION_MS*1000),
     m_useUTCTime(true),
     m_fastChannelZappingSize(0),
-    m_sendBuffer(CL_MEDIA_ALIGNMENT, 1024*256),
+    m_sendBuffer(CL_MEDIA_ALIGNMENT, 1024*256, AV_INPUT_BUFFER_PADDING_SIZE),
     m_someDataIsDropped(false),
     m_framesSinceRangeCheck(0),
     m_videoChannels(1),

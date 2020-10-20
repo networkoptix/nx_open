@@ -739,7 +739,7 @@ QnCompressedVideoDataPtr QnSignHelper::createSignatureFrame(AVCodecContext* srcC
         out_size = correctNalPrefix(srcCodecExtraData, videoBuf, out_size, videoBufSize);
     }
 
-    generatedFrame = QnWritableCompressedVideoDataPtr(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, 0));
+    generatedFrame = QnWritableCompressedVideoDataPtr(new QnWritableCompressedVideoData());
     generatedFrame->compressionType = videoCodecCtx->codec_id;
     generatedFrame->m_data.write((const char*) videoBuf, out_size);
     generatedFrame->flags = QnAbstractMediaData::MediaFlags_AVKey;

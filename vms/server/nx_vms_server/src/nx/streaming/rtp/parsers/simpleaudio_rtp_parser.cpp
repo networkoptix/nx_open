@@ -78,7 +78,8 @@ StreamParser::Result SimpleAudioParser::processData(quint8* rtpBufferBase, int b
     if (curPtr >= end)
         return {false, "Malformed audio packet. Invalid padding"};
 
-    QnWritableCompressedAudioDataPtr audioData = QnWritableCompressedAudioDataPtr(new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, end - curPtr));
+    QnWritableCompressedAudioDataPtr audioData = QnWritableCompressedAudioDataPtr(
+        new QnWritableCompressedAudioData(end - curPtr));
     audioData->compressionType = !m_context? AV_CODEC_ID_NONE : m_context->getCodecId();
     audioData->context = m_context;
     audioData->timestamp = qFromBigEndian(rtpHeader->timestamp);

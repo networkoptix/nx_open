@@ -112,8 +112,7 @@ QnAbstractMediaDataPtr FfmpegAudioDemuxer::getNextData()
     stream->codec->channels = stream->codecpar->channels;
     stream->codec->sample_rate = stream->codecpar->sample_rate;
     QnConstMediaContextPtr codecContext(new QnAvCodecMediaContext(stream->codec));
-    QnWritableCompressedAudioData* audioData = new QnWritableCompressedAudioData(
-        CL_MEDIA_ALIGNMENT, packet.size, codecContext);
+    auto audioData = new QnWritableCompressedAudioData(packet.size, codecContext);
     audioData->duration = av_rescale_q(packet.duration, stream->time_base, AVRational{1, 1000000});
     data = QnAbstractMediaDataPtr(audioData);
     audioData->channelNumber = 0;

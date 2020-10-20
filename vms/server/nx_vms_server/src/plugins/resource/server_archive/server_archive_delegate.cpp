@@ -370,7 +370,7 @@ begin_label:
             if (!getNextChunk(chunk, chunkCatalog, ignoreChunks))
             {
                 if (m_reverseMode) {
-                    data = QnAbstractMediaDataPtr(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, 0));
+                    data = QnAbstractMediaDataPtr(new QnWritableCompressedVideoData());
                     data->timestamp = INT64_MAX; // EOF reached
                 }
                 else if (data)

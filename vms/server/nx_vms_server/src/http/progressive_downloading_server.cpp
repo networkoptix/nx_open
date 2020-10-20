@@ -665,7 +665,7 @@ void ProgressiveDownloadingServer::run()
         sendChunk(QnSignHelper::buildSignatureFileEnd(signature));
     }
 
-    QnByteArray emptyChunk((unsigned)0,0);
+    QnByteArray emptyChunk;
     sendChunk(emptyChunk);
     sendBuffer(QByteArray("\r\n"));
 

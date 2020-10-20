@@ -100,7 +100,7 @@ TEST(SimpleReorderer, bufferOverflow)
 {
     SimpleReorderer reorderer({ /*minDuration*/ 10us, /* maxDuration*/ 10us });
 
-    auto addData = 
+    auto addData =
         [&](qint64 timestamp)
         {
             QnAbstractDataPacketPtr data(new QnWritableCompressedVideoData());

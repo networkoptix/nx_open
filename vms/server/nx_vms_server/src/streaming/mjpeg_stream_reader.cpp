@@ -121,7 +121,7 @@ QnAbstractMediaDataPtr MJPEGStreamReader::getNextData()
     if (allocSize > MAX_ALLOWED_FRAME_SIZE)
         return QnWritableCompressedVideoDataPtr();
 
-    QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, allocSize));
+    QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(allocSize));
     videoData->m_data.write(realHeaderEnd+4, headerBufferEnd - (realHeaderEnd+4));
 
     int dataLeft = contentLen - videoData->m_data.size();

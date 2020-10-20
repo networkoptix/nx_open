@@ -1,5 +1,17 @@
 #include "audio_data_packet.h"
 
+#include <nx/utils/app_info.h>
+#include <nx/utils/log/assert.h>
+
+namespace {
+
+static const unsigned int kMaxValidCapacityMB =
+    (nx::utils::AppInfo::isEdgeServer() || nx::utils::AppInfo::isNx1()) ? 10 : 256;
+
+static const unsigned int kMaxValidCapacity = kMaxValidCapacityMB * 1024 * 1024;
+
+} // namespace
+
 ////////////////////////////////////////////////////////////
 //// class QnCodecAudioFormat
 ////////////////////////////////////////////////////////////
@@ -108,32 +120,28 @@ quint64 QnCompressedAudioData::getDurationMs() const
 ////////////////////////////////////////////////////////////
 
 QnWritableCompressedAudioData::QnWritableCompressedAudioData(
-    unsigned int alignment,
-    unsigned int capacity,
-    QnConstMediaContextPtr ctx )
-:   //TODO #ak delegate constructor
-    QnCompressedAudioData( ctx ),
-    m_data( alignment, capacity )
+    size_t capacity,
+    QnConstMediaContextPtr ctx)
+    :
+    QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, capacity, AV_INPUT_BUFFER_PADDING_SIZE, ctx)
 {
 }
 
 QnWritableCompressedAudioData::QnWritableCompressedAudioData(
-    QnAbstractAllocator* allocator,
-    unsigned int alignment,
-    unsigned int capacity,
-    QnConstMediaContextPtr ctx )
-:
-    QnCompressedAudioData( ctx ),
-    m_data( allocator, alignment, capacity )
+    size_t alignment,
+    size_t capacity,
+    size_t padding,
+    QnConstMediaContextPtr ctx)
+    :
+    QnCompressedAudioData(ctx),
+    m_data(alignment, capacity, padding)
 {
+    NX_ASSERT(capacity <= kMaxValidCapacity);
 }
 
-QnWritableCompressedAudioData* QnWritableCompressedAudioData::clone( QnAbstractAllocator* allocator ) const
+QnWritableCompressedAudioData* QnWritableCompressedAudioData::clone() const
 {
-    QnWritableCompressedAudioData* rez = new QnWritableCompressedAudioData(
-        allocator,
-        m_data.getAlignment(),
-        m_data.size() );
+    QnWritableCompressedAudioData* rez = new QnWritableCompressedAudioData();
     rez->assign(this);
     return rez;
 }

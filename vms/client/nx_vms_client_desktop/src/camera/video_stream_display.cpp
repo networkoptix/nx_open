@@ -551,7 +551,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
 
     if ((data->flags & AV_REVERSE_BLOCK_START) && m_decodeMode != QnAbstractVideoDecoder::DecodeMode_Fastest)
     {
-        QnWritableCompressedVideoDataPtr emptyData(new QnWritableCompressedVideoData(1,0));
+        QnWritableCompressedVideoDataPtr emptyData(new QnWritableCompressedVideoData());
         while (dec->decode(emptyData, &m_tmpFrame))
         {
             if (scaleFactor == QnFrameScaler::factor_unknown && dec->getWidth() > 0)

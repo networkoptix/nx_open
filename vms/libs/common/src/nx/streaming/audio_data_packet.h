@@ -41,25 +41,22 @@ typedef std::shared_ptr<const QnCompressedAudioData> QnConstCompressedAudioDataP
 
 
 //!Stores video data buffer using \a QnByteArray
-class QnWritableCompressedAudioData
-:
-    public QnCompressedAudioData
+class QnWritableCompressedAudioData: public QnCompressedAudioData
 {
 public:
     QnByteArray m_data;
 
+    /** Default FFMpeg alignment and padding are used. */
+    QnWritableCompressedAudioData(size_t capacity = 0, QnConstMediaContextPtr ctx = {});
+
     QnWritableCompressedAudioData(
-        unsigned int alignment = CL_MEDIA_ALIGNMENT,
-        unsigned int capacity = 0,
-        QnConstMediaContextPtr ctx = QnConstMediaContextPtr(nullptr) );
-    QnWritableCompressedAudioData(
-        QnAbstractAllocator* allocator,
-        unsigned int alignment = CL_MEDIA_ALIGNMENT,
-        unsigned int capacity = 0,
-        QnConstMediaContextPtr ctx = QnConstMediaContextPtr(nullptr) );
+        size_t alignment,
+        size_t capacity,
+        size_t padding,
+        QnConstMediaContextPtr ctx = {});
 
     //!Implementation of QnAbstractMediaData::clone
-    virtual QnWritableCompressedAudioData* clone( QnAbstractAllocator* allocator = QnSystemAllocator::instance() ) const override;
+    virtual QnWritableCompressedAudioData* clone() const override;
     //!Implementation of QnAbstractMediaData::data
     virtual const char* data() const override;
     //!Implementation of QnAbstractMediaData::dataSize

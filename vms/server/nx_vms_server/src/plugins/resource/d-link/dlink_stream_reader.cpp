@@ -357,8 +357,9 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG(AVCodecID ci)
 
     int dataLeft = vh->ulDataLength;//qMin(vh->ulDataLength, (quint32)1024*1024*10); // to avoid crash
 
-
-    QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, dataLeft+FF_INPUT_BUFFER_PADDING_SIZE));
+    // TODO: #rvasilenko do we need second padding?
+    QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(
+        dataLeft + AV_INPUT_BUFFER_PADDING_SIZE));
     char* curPtr = videoData->m_data.data();
     videoData->m_data.startWriting(dataLeft); // this call does nothing
     videoData->m_data.finishWriting(dataLeft);
@@ -372,7 +373,6 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG(AVCodecID ci)
         dataLeft -= readed;
     }
 
-
     videoData->compressionType = ci;
     videoData->width = vh->usWidth;
     videoData->height = vh->usWidth;
@@ -384,7 +384,6 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMPEG(AVCodecID ci)
     videoData->timestamp = qnSyncTime->currentMSecsSinceEpoch() * 1000;
 
     return videoData;
-
 }
 
 
@@ -416,7 +415,9 @@ QnAbstractMediaDataPtr PlDlinkStreamReader::getNextDataMJPEG()
     int contentLen = getIntParam(contentLenPtr + 16);
     contentLen = qMin(contentLen, 10*1024*1024); // to avoid crash if camera is crazy
 
-    QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, contentLen+FF_INPUT_BUFFER_PADDING_SIZE));
+    // TODO: #rvasilenko do we need second padding?
+    QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(
+        contentLen + AV_INPUT_BUFFER_PADDING_SIZE));
     videoData->m_data.write(realHeaderEnd+4, headerBufferEnd - (realHeaderEnd+4));
 
     int dataLeft = contentLen - static_cast<int>(videoData->dataSize());

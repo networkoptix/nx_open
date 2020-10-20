@@ -377,7 +377,7 @@ int QnFfmpegVideoTranscoder::transcodePacketImpl(const QnConstCompressedVideoDat
     if (!got_packet)
         return 0;
 
-    QnWritableCompressedVideoData* resultVideoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, outPacket.size);
+    auto resultVideoData = new QnWritableCompressedVideoData(outPacket.size);
 
     if (m_fixedFrameRate)
     {

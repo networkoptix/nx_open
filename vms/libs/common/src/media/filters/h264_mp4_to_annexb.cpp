@@ -158,8 +158,7 @@ QnConstAbstractDataPacketPtr H2645Mp4ToAnnexB::processData(const QnConstAbstract
             return data;
     }
 
-    QnWritableCompressedVideoDataPtr result(
-        new QnWritableCompressedVideoData(FF_INPUT_BUFFER_PADDING_SIZE));
+    QnWritableCompressedVideoDataPtr result(new QnWritableCompressedVideoData());
     result->QnCompressedVideoData::assign(videoData);
 
     const int resultDataSize = header.size() + videoData->dataSize();

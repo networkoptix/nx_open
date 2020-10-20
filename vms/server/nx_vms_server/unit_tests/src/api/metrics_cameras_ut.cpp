@@ -68,7 +68,7 @@ public:
         m_camera->blockInitialization();
         m_camera->setMinDays(kMinDays);
         m_camera->setMaxFps(30);
-        
+
         auto customVideoLayout = QnCustomResourceVideoLayoutPtr(
             new QnCustomResourceVideoLayout(QSize(kChannelCount, 1)));
         for (int i = 0; i < kChannelCount; ++i)
@@ -173,7 +173,7 @@ public:
         video->width = liveParams.resolution.width();
         video->height = liveParams.resolution.height();
         const auto currentTimeMs = qnSyncTime->currentMSecsSinceEpoch();
-        
+
         video->m_data.resize(1000 * 50);
 
         for (int channel = 0; channel < channelCount; ++channel)

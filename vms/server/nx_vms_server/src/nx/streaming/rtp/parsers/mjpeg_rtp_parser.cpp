@@ -642,7 +642,7 @@ StreamParser::Result MjpegParser::processData(quint8* rtpBufferBase, int bufferO
 
 
     // Check buffer overflow
-    if (m_frameSize + bytesLeft > (int) MAX_ALLOWED_FRAME_SIZE)
+    if (m_frameSize + bytesLeft > MAX_ALLOWED_FRAME_SIZE)
     {
         m_chunks.clear();
         m_frameSize = 0;
@@ -661,7 +661,7 @@ StreamParser::Result MjpegParser::processData(quint8* rtpBufferBase, int bufferO
             m_frameSize < 2 || EOI_marker[0] != jpeg_end[0] || EOI_marker[1] != jpeg_end[1];
 
         QnWritableCompressedVideoDataPtr videoData(new QnWritableCompressedVideoData(
-            CL_MEDIA_ALIGNMENT, m_headerLen + m_frameSize + (needAddMarker ? 2 : 0)));
+            m_headerLen + m_frameSize + (needAddMarker ? 2 : 0)));
         m_mediaData = videoData;
         videoData->m_data.uncheckedWrite((const char*)m_hdrBuffer, m_headerLen);
         //m_videoData->data.write(m_frameData);

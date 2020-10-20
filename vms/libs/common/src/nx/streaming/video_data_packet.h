@@ -8,7 +8,7 @@
 #include <nx/streaming/media_data_packet.h>
 
 
-const unsigned int MAX_ALLOWED_FRAME_SIZE = 1024*1024*10;
+constexpr auto MAX_ALLOWED_FRAME_SIZE = 1024*1024*10;
 
 //!Contains video data specific fields. Video data buffer stored in a child class
 class QnCompressedVideoData
@@ -30,7 +30,7 @@ public:
     /*!
         Does nothing. Overridden method MUST return \a QnWritableCompressedVideoData
     */
-    virtual QnCompressedVideoData* clone( QnAbstractAllocator* allocator = QnSystemAllocator::instance() ) const override = 0;
+    virtual QnCompressedVideoData* clone() const override = 0;
 
     void assign(const QnCompressedVideoData* other);
 };
@@ -40,25 +40,22 @@ typedef std::shared_ptr<const QnCompressedVideoData> QnConstCompressedVideoDataP
 
 
 //!Stores video data buffer using \a QnByteArray
-class QnWritableCompressedVideoData
-:
-    public QnCompressedVideoData
+class QnWritableCompressedVideoData: public QnCompressedVideoData
 {
 public:
     QnByteArray m_data;
 
+    /** Default FFMpeg alignment and padding are used. */
+    QnWritableCompressedVideoData(size_t capacity = 0, QnConstMediaContextPtr ctx = {});
+
     QnWritableCompressedVideoData(
-        unsigned int alignment = CL_MEDIA_ALIGNMENT,
-        unsigned int capacity = 0,
-        QnConstMediaContextPtr ctx = QnConstMediaContextPtr(nullptr) );
-    QnWritableCompressedVideoData(
-        QnAbstractAllocator* allocator,
-        unsigned int alignment = CL_MEDIA_ALIGNMENT,
-        unsigned int capacity = 0,
-        QnConstMediaContextPtr ctx = QnConstMediaContextPtr(nullptr) );
+        size_t alignment,
+        size_t capacity,
+        size_t padding,
+        QnConstMediaContextPtr ctx = {});
 
     //!Implementation of QnAbstractMediaData::clone
-    virtual QnWritableCompressedVideoData* clone( QnAbstractAllocator* allocator = QnSystemAllocator::instance() ) const override;
+    virtual QnWritableCompressedVideoData* clone() const override;
     //!Implementation of QnAbstractMediaData::data
     virtual const char* data() const override;
     //!Implementation of QnAbstractMediaData::dataSize

@@ -279,7 +279,8 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                 if (m_indexToChannel[packet.stream_index] == -1)
                     continue;
 
-                QnWritableCompressedVideoData* videoData = new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, packet.size, getCodecContext(stream));
+                auto videoData = new QnWritableCompressedVideoData(packet.size,
+                    getCodecContext(stream));
                 videoData->channelNumber = m_indexToChannel[stream->index]; // [packet.stream_index]; // defalut value
                 if (stream->codecpar->width > 16 && stream->codecpar->height > 16)
                 {
@@ -304,7 +305,8 @@ QnAbstractMediaDataPtr QnAviArchiveDelegate::getNextData()
                 stream->codec->channel_layout = stream->codecpar->channel_layout;
                 stream->codec->channels = stream->codecpar->channels;
                 stream->codec->sample_rate = stream->codecpar->sample_rate;
-                QnWritableCompressedAudioData* audioData = new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, packet.size, getCodecContext(stream));
+                QnWritableCompressedAudioData* audioData = new QnWritableCompressedAudioData(
+                    packet.size, getCodecContext(stream));
                 //audioData->format.fromAvStream(stream->codec);
                 time_base = av_q2d(stream->time_base)*1e+6;
                 audioData->duration = qint64(time_base * packet.duration);

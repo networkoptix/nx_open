@@ -516,7 +516,7 @@ void QnThumbnailsLoader::process() {
 
             if(!invalidated && m_mode == Mode::Default) { // TODO: #Elric mode check may be wrong here.
                 /* Make sure decoder's buffer is empty. */
-                QnWritableCompressedVideoDataPtr emptyData(new QnWritableCompressedVideoData(1, 0));
+                QnWritableCompressedVideoDataPtr emptyData(new QnWritableCompressedVideoData());
                 while (decoder.decode(emptyData, &outFrame))
                 {
                     if(timingsQueue.isEmpty()) {

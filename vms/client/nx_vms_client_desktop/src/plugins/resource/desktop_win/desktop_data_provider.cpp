@@ -60,7 +60,7 @@ namespace {
 } // namespace
 
 QnDesktopDataProvider::EncodedAudioInfo::EncodedAudioInfo(QnDesktopDataProvider* owner):
-    m_tmpAudioBuffer(CL_MEDIA_ALIGNMENT, FF_MIN_BUFFER_SIZE),
+    m_tmpAudioBuffer(FF_MIN_BUFFER_SIZE),
     m_owner(owner)
 {
 }
@@ -140,7 +140,7 @@ void QnDesktopDataProvider::EncodedAudioInfo::gotData()
     {
         // write data
         int packetSize = data->dwBytesRecorded;
-        QnWritableCompressedAudioDataPtr outData(new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, packetSize));
+        QnWritableCompressedAudioDataPtr outData(new QnWritableCompressedAudioData(packetSize));
         outData->m_data.write(data->lpData, data->dwBytesRecorded);
         outData->timestamp = m_owner->currentTime(); // - m_startDelay;
         m_audioQueue.push(outData);
@@ -589,7 +589,8 @@ int QnDesktopDataProvider::processData(bool flush)
     if (got_packet > 0)
     {
 
-        QnWritableCompressedVideoDataPtr video = QnWritableCompressedVideoDataPtr(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, m_outPacket->size, m_videoContext));
+        QnWritableCompressedVideoDataPtr video = QnWritableCompressedVideoDataPtr(
+            new QnWritableCompressedVideoData(m_outPacket->size, m_videoContext));
         video->m_data.write((const char*) m_videoBuf, m_outPacket->size);
         video->compressionType = m_videoCodecCtx->codec_id;
         video->timestamp = av_rescale_q(m_videoCodecCtx->coded_frame->pts, m_videoCodecCtx->time_base, timeBaseNative) + m_initTime;
@@ -704,7 +705,8 @@ void QnDesktopDataProvider::putAudioData()
             timeBaseMs.num = 1;
             timeBaseMs.den = 1000;
 
-            QnWritableCompressedAudioDataPtr audio = QnWritableCompressedAudioDataPtr(new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, m_outPacket->size, m_audioContext));
+            QnWritableCompressedAudioDataPtr audio = QnWritableCompressedAudioDataPtr(
+                new QnWritableCompressedAudioData(m_outPacket->size, m_audioContext));
             audio->m_data.write((const char*) m_encodedAudioBuf, m_outPacket->size);
             audio->compressionType = m_audioCodecCtx->codec_id;
             audio->timestamp = av_rescale_q(audioPts, timeBaseMs, timeBaseNative) + m_initTime;

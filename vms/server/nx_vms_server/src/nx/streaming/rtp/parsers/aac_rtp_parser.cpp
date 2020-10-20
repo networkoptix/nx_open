@@ -204,8 +204,7 @@ StreamParser::Result AacParser::processData(quint8* rtpBufferBase, int bufferOff
         if (auIndex.size() > i)
             rtpTimeOffset = auIndex[i];
 
-        QnWritableCompressedAudioDataPtr audioData(
-            new QnWritableCompressedAudioData(CL_MEDIA_ALIGNMENT, unitSize));
+        QnWritableCompressedAudioDataPtr audioData(new QnWritableCompressedAudioData(unitSize));
         audioData->compressionType = AV_CODEC_ID_AAC;
         audioData->context = m_context;
         audioData->timestamp = rtpTime + rtpTimeOffset;

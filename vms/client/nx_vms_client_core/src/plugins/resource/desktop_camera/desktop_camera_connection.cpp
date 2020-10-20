@@ -55,7 +55,7 @@ protected:
         if (m_needStop)
             return true;
 
-        QnByteArray sendBuffer(CL_MEDIA_ALIGNMENT, 1024 * 64);
+        QnByteArray sendBuffer(CL_MEDIA_ALIGNMENT, 1024 * 64, AV_INPUT_BUFFER_PADDING_SIZE);
 
         QnAbstractMediaDataPtr media = std::dynamic_pointer_cast<QnAbstractMediaData>(packet);
         if (!media)

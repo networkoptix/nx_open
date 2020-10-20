@@ -182,7 +182,7 @@ static const qint64 USEC_IN_MSEC = 1000;
 
 void FileTranscoder::run()
 {
-    QnByteArray outPacket( 1, 0 );
+    QnByteArray outPacket;
 
     qint64 prevSrcPacketTimestamp = -1;
     qint64 srcUSecRead = 0;

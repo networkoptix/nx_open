@@ -199,7 +199,7 @@ void StreamingChunkTranscoderThread::run()
             continue;
         }
 
-        QnByteArray resultStream(1, RESERVED_TRANSCODED_PACKET_SIZE);
+        QnByteArray resultStream(1, RESERVED_TRANSCODED_PACKET_SIZE, AV_INPUT_BUFFER_PADDING_SIZE);
 
 #ifdef SAVE_INPUT_STREAM_TO_FILE
         m_inputFile.write(srcMediaData->data.constData(), srcMediaData->data.size());
@@ -286,7 +286,7 @@ void StreamingChunkTranscoderThread::finishTranscoding(
     const std::map<int, std::unique_ptr<TranscodeContext>>::iterator& transcodingIter,
     bool transcodingFinishedSuccessfully)
 {
-    QnByteArray resultStream(1, RESERVED_TRANSCODED_PACKET_SIZE);
+    QnByteArray resultStream(1, RESERVED_TRANSCODED_PACKET_SIZE, AV_INPUT_BUFFER_PADDING_SIZE);
 
     int res = transcodingIter->second->dataSourceCtx->transcoder->finalize(&resultStream);
 

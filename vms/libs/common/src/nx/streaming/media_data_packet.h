@@ -16,8 +16,6 @@
 #include <nx/streaming/aligned_allocator.h>
 #include <nx/streaming/abstract_data_packet.h>
 #include <nx/streaming/media_context.h>
-#include <nx/utils/memory/abstract_allocator.h>
-#include <nx/utils/memory/system_allocator.h>
 
 #include <nx/fusion/model_functions_fwd.h>
 #include <common/common_globals.h>
@@ -126,8 +124,7 @@ public:
     QnAbstractMediaData(DataType _dataType);
     virtual ~QnAbstractMediaData();
 
-    virtual QnAbstractMediaData* clone(
-        QnAbstractAllocator* allocator = QnSystemAllocator::instance()) const = 0;
+    virtual QnAbstractMediaData* clone() const = 0;
 
     virtual const char* data() const = 0;
     virtual size_t dataSize() const = 0;
@@ -157,10 +154,8 @@ struct QnEmptyMediaData : public QnAbstractMediaData
 
 public:
     QnEmptyMediaData();
-    QnEmptyMediaData(QnAbstractAllocator* allocator);
 
-    virtual QnEmptyMediaData* clone(
-        QnAbstractAllocator* allocator = QnSystemAllocator::instance()) const override;
+    virtual QnEmptyMediaData* clone() const override;
 
     virtual const char* data() const override;
     virtual size_t dataSize() const override;
@@ -183,9 +178,7 @@ struct QnAbstractCompressedMetadata: public QnAbstractMediaData
 {
 
 public:
-    QnAbstractCompressedMetadata(MetadataType type, int bufferSize);
-
-    QnAbstractCompressedMetadata(MetadataType type, int bufferSize, QnAbstractAllocator* allocator);
+    QnAbstractCompressedMetadata(MetadataType type, size_t bufferSize);
 
     virtual bool containTime(const qint64 timeUsec) const;
 
@@ -200,10 +193,8 @@ public:
 struct QnCompressedMetadata: public QnAbstractCompressedMetadata
 {
     QnCompressedMetadata(MetadataType type, int bufferSize = 0);
-    QnCompressedMetadata(MetadataType type, int bufferSize, QnAbstractAllocator* allocator);
 
-    virtual QnAbstractMediaData* clone(
-        QnAbstractAllocator* allocator = QnSystemAllocator::instance()) const override;
+    virtual QnAbstractMediaData* clone() const override;
     virtual const char* data() const override;
     virtual size_t dataSize() const override;
 
@@ -257,7 +248,6 @@ public:
     static const int kMotionDataBufferSize = Qn::kMotionGridWidth*Qn::kMotionGridHeight / 8;
 
     QnMetaDataV1(std::chrono::microseconds timestamp, int initialValue = 0, int extraBufferSize = 0);
-    QnMetaDataV1(std::chrono::microseconds timestamp, QnAbstractAllocator* allocator, int initialValue = 0);
 
     static QnMetaDataV1Ptr fromLightData(const QnMetaDataV1Light& lightData);
 
@@ -322,8 +312,7 @@ public:
         int* maskStart = 0,
         int* maskEnd = 0);
 
-    virtual QnMetaDataV1* clone(
-        QnAbstractAllocator* allocator = QnSystemAllocator::instance()) const override;
+    virtual QnMetaDataV1* clone() const override;
 
     virtual const char* data() const override;
     char* data();

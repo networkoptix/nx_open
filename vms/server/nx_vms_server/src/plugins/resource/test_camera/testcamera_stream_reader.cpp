@@ -87,7 +87,7 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::getNextData()
         if (!needToStop())
         {
             using namespace nx::vms;
-            const auto reasonParamsEncoded = 
+            const auto reasonParamsEncoded =
                 event::NetworkIssueEvent::encodeTimeoutMsecs(timer.elapsedMs());
             const auto networkResource = getResource().dynamicCast<QnSecurityCamResource>();
             if (NX_ASSERT(networkResource))
@@ -154,7 +154,7 @@ QnAbstractMediaDataPtr QnTestCameraStreamReader::receiveFramePacketBody(
     using namespace nx::vms::testcamera::packet;
 
     const auto frame = std::make_shared<QnWritableCompressedVideoData>(
-        CL_MEDIA_ALIGNMENT, header.dataSize(), m_context);
+        header.dataSize(), m_context);
 
     if (header.flags() & Flag::ptsIncluded)
     {

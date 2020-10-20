@@ -113,7 +113,7 @@ bool ProgressiveDownloadingConsumer::processData(const QnAbstractDataPacketPtr& 
         media->timestamp += m_utcShift;
     }
 
-    QnByteArray result(CL_MEDIA_ALIGNMENT, 0);
+    QnByteArray result(CL_MEDIA_ALIGNMENT, 0, AV_INPUT_BUFFER_PADDING_SIZE);
     bool isArchive = !(media->flags & QnAbstractMediaData::MediaFlags_LIVE);
 
     QnByteArray* const resultPtr =
@@ -246,7 +246,7 @@ void ProgressiveDownloadingConsumer::doRealtimeDelay( const QnAbstractDataPacket
 
 void ProgressiveDownloadingConsumer::finalizeMediaStream()
 {
-    QnByteArray result(CL_MEDIA_ALIGNMENT, 0);
+    QnByteArray result(CL_MEDIA_ALIGNMENT, 0 ,AV_INPUT_BUFFER_PADDING_SIZE);
     if ((m_owner->getTranscoder()->finalize(&result) == 0) &&
         (result.size() > 0))
     {

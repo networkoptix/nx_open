@@ -41,7 +41,7 @@ QnAbstractMediaDataPtr QnSingleShotFileStreamreader::getNextData()
         return QnAbstractMediaDataPtr();
 
     QByteArray srcData = file->readAll();
-    QnWritableCompressedVideoDataPtr outData(new QnWritableCompressedVideoData(CL_MEDIA_ALIGNMENT, srcData.size()));
+    QnWritableCompressedVideoDataPtr outData(new QnWritableCompressedVideoData(srcData.size()));
     outData->m_data.write(srcData);
 
     outData->compressionType = compressionType;

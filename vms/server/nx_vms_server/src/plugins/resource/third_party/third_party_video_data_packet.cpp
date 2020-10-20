@@ -24,9 +24,9 @@ QnThirdPartyCompressedVideoData::~QnThirdPartyCompressedVideoData()
     m_mediaPacket = nullptr;
 }
 
-QnWritableCompressedVideoData* QnThirdPartyCompressedVideoData::clone( QnAbstractAllocator* allocator ) const
+QnWritableCompressedVideoData* QnThirdPartyCompressedVideoData::clone() const
 {
-    QnWritableCompressedVideoData* cloned = new QnWritableCompressedVideoData(allocator);
+    QnWritableCompressedVideoData* cloned = new QnWritableCompressedVideoData();
     cloned->QnCompressedVideoData::assign( this );
     cloned->m_data.write( static_cast<const char*>(m_mediaPacket->data()), m_mediaPacket->dataSize() );
     return cloned;
