@@ -134,13 +134,13 @@ protected:
     const P2pConnectionPtr& connection,
     const QByteArray& payload);
 protected:
+    static QString peerName(const QnUuid& id);
     QMap<vms::api::PersistentIdData, P2pConnectionPtr> getCurrentSubscription() const;
 
     /**  Local connections are not supposed to be shown in 'aliveMessage' */
     bool isLocalConnection(const vms::api::PersistentIdData& peer) const;
     void createOutgoingConnections(const QMap<vms::api::PersistentIdData, P2pConnectionPtr>& currentSubscription);
     bool hasStartingConnections() const;
-    void printPeersMessage();
     P2pConnectionPtr findConnectionById(const vms::api::PersistentIdData& id) const;
     void emitPeerFoundLostSignals();
     void connectSignals(const P2pConnectionPtr& connection);

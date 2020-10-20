@@ -35,20 +35,15 @@ void P2pMessageBusTestBase::createData(
     }
 
     settings->synchronizeNow();
+    createCameras(server, camerasCount, propertiesPerCamera);
+    createUsers(server, userCount);
+}
 
-    std::vector<nx::vms::api::UserData> users;
-
-    for (int i = 0; i < userCount; ++i)
-    {
-        nx::vms::api::UserData userData;
-        userData.id = QnUuid::createUuid();
-        userData.name = lm("user_%1").arg(i);
-        userData.isEnabled = true;
-        userData.isCloud = false;
-        userData.realm = nx::network::AppInfo::realm();
-        users.push_back(userData);
-    }
-
+void P2pMessageBusTestBase::createCameras(
+    const Appserver2Ptr & server,
+    int camerasCount,
+    int propertiesPerCamera)
+{
     std::vector<nx::vms::api::CameraData> cameras;
     std::vector<nx::vms::api::CameraAttributesData> userAttrs;
     nx::vms::api::ResourceParamWithRefDataList cameraParams;
@@ -81,15 +76,37 @@ void P2pMessageBusTestBase::createData(
         }
     }
     auto connection = server->moduleInstance()->commonModule()->ec2Connection();
-    auto userManager = connection->getUserManager(Qn::kSystemAccess);
     auto cameraManager = connection->getCameraManager(Qn::kSystemAccess);
     auto resourceManager = connection->getResourceManager(Qn::kSystemAccess);
 
-    for (const auto& user: users)
-        ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(user));
     ASSERT_EQ(ec2::ErrorCode::ok, cameraManager->saveUserAttributesSync(userAttrs));
     ASSERT_EQ(ec2::ErrorCode::ok, resourceManager->saveSync(cameraParams));
     ASSERT_EQ(ec2::ErrorCode::ok, cameraManager->addCamerasSync(cameras));
+}
+
+void P2pMessageBusTestBase::createUsers(
+    const Appserver2Ptr& server,
+    int userCount)
+{
+    std::vector<nx::vms::api::UserData> users;
+
+    for (int i = 0; i < userCount; ++i)
+    {
+        nx::vms::api::UserData userData;
+        userData.id = QnUuid::createUuid();
+        userData.name = lm("user_%1").arg(i);
+        userData.isEnabled = true;
+        userData.isCloud = false;
+        userData.realm = nx::network::AppInfo::realm();
+        users.push_back(userData);
+    }
+
+    const auto& moduleGuid = server->moduleInstance()->commonModule()->moduleGUID();
+    auto connection = server->moduleInstance()->commonModule()->ec2Connection();
+    auto userManager = connection->getUserManager(Qn::kSystemAccess);
+
+    for (const auto& user : users)
+        ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(user));
 }
 
 void P2pMessageBusTestBase::startServers(int count, int keepDbAtServerIndex, quint16 baseTcpPort)

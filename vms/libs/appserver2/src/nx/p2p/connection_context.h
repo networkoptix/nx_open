@@ -12,6 +12,14 @@ namespace ec2 { class QnAbstractTransaction; }
 namespace nx {
 namespace p2p {
 
+enum class UpdateSequenceResult
+{
+    ok,
+    notSubscribed,
+    alreadyKnown
+};
+QString toString(UpdateSequenceResult value);
+
 /** MiscData contains members that managed by P2pMessageBus. P2pConnection doesn't touch it */
 class ConnectionContext: public QObject
 {
@@ -24,7 +32,7 @@ public:
     bool isRemotePeerSubscribedTo(const vms::api::PersistentIdData& peer) const;
     bool isRemotePeerSubscribedTo(const QnUuid& peer) const;
     bool isLocalPeerSubscribedTo(const vms::api::PersistentIdData& peer) const;
-    bool updateSequence(const ec2::QnAbstractTransaction& tran);
+    UpdateSequenceResult updateSequence(const ec2::QnAbstractTransaction& tran);
 
     vms::api::PersistentIdData decode(PeerNumberType shortPeerNumber) const;
     PeerNumberType encode(const vms::api::PersistentIdData& fullId,

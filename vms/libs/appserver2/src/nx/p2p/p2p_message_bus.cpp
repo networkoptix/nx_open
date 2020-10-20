@@ -32,6 +32,11 @@ using namespace ec2;
 using namespace vms::api;
 using namespace nx::utils;
 
+QString MessageBus::peerName(const QnUuid& id)
+{
+    return qnStaticCommon->moduleDisplayName(id);
+}
+
 struct GotTransactionFuction
 {
     typedef void result_type;
@@ -127,8 +132,7 @@ void MessageBus::printTran(
     const ec2::QnAbstractTransaction& tran,
     Connection::Direction direction) const
 {
-    auto localPeerName = qnStaticCommon->moduleDisplayName(commonModule()->moduleGUID());
-    auto remotePeerName = qnStaticCommon->moduleDisplayName(connection->remotePeer().id);
+    auto localPeerName = peerName(commonModule()->moduleGUID());
     QString msgName;
     QString directionName;
     if (direction == Connection::Direction::outgoing)
@@ -142,14 +146,16 @@ void MessageBus::printTran(
         directionName = lit("<---");
     }
 
-    NX_VERBOSE(this, lm("%1 tran:\t %2 %3 %4. Command: %5. Seq=%6. Created by %7").args(
+    NX_VERBOSE(this, "%1 tran:\t %2 %3 %4. Command: %5. Seq: %6. timestamp: %7. Created by: %8(dbId=%9).",
         msgName,
         localPeerName,
         directionName,
-        remotePeerName,
+        peerName(connection->remotePeer().id),
         toString(tran.command),
         tran.persistentInfo.sequence,
-        qnStaticCommon->moduleDisplayName(tran.peerID)));
+        tran.persistentInfo.timestamp,
+        peerName(tran.peerID),
+        tran.persistentInfo.dbID);
 }
 
 void MessageBus::start()
@@ -198,8 +204,9 @@ void MessageBus::addOutgoingConnectionToPeer(
 
     int pos = nx::utils::random::number((int) 0, (int) m_remoteUrls.size());
     m_remoteUrls.insert(m_remoteUrls.begin() + pos, RemoteConnection(peer, url));
-    NX_VERBOSE(this, "addOutgoingConnectionToPeer() to peer %1 type %2 using url \"%3\"",
-        peer, peerType, _url);
+    NX_VERBOSE(this, "peer %1 addOutgoingConnection to peer %2 type %3 using url \"%4\"",
+        peerName(localPeer().id),
+        peerName(peer), peerType, _url);
     executeInThread(m_thread, [this]() {doPeriodicTasks();});
 }
 
@@ -226,12 +233,15 @@ void MessageBus::removeOutgoingConnectionFromPeer(const QnUuid& id)
     if (itr != m_connections.end() && itr.value()->direction() == Connection::Direction::outgoing)
     {
         NX_VERBOSE(this,
-            "removeOutgoingConnectionFromPeer() from peer %1 with outgoing connection", id);
+            "peer %1 removeOutgoingConnection from peer %2 (active connection closed)",
+            peerName(localPeer().id), peerName(id));
         removeConnectionUnsafe(itr.value());
     }
     else
     {
-        NX_VERBOSE(this, "removeOutgoingConnectionFromPeer() from peer %1", id);
+        NX_VERBOSE(this,
+            "peer %1 removeOutgoingConnection from peer %2",
+            peerName(localPeer().id), peerName(id));
     }
 }
 
@@ -285,7 +295,7 @@ void MessageBus::createOutgoingConnections(
                 });
 
             if (remoteConnection.disconnectTimes.size() >= 2
-                || (remoteConnection.disconnectTimes.size() >= 1 
+                || (remoteConnection.disconnectTimes.size() >= 1
                 && remoteConnection.lastConnectionState == ConnectionBase::State::Unauthorized))
             {
                 continue;
@@ -319,38 +329,6 @@ void MessageBus::createOutgoingConnections(
             connection->startConnection();
         }
     }
-}
-
-void MessageBus::printPeersMessage()
-{
-    QList<QString> records;
-
-    for (auto itr = m_peers->allPeerDistances.constBegin(); itr != m_peers->allPeerDistances.constEnd(); ++itr)
-    {
-        const auto& peer = itr.value();
-
-        RoutingInfo outViaList;
-        qint32 minDistance = peer.minDistance(&outViaList);
-        if (minDistance == kMaxDistance)
-            continue;
-        m_localShortPeerInfo.encode(itr.key());
-
-        QStringList outViaListStr;
-        for (const auto& peer: outViaList.keys())
-            outViaListStr << qnStaticCommon->moduleDisplayName(peer.id);
-
-        records << lit("\t\t\t\t\t To:  %1(dbId=%2). Distance: %3 (via %4)")
-            .arg(qnStaticCommon->moduleDisplayName(itr.key().id))
-            .arg(itr.key().persistentId.toString())
-            .arg(minDistance)
-            .arg(outViaListStr.join(","));
-    }
-
-    NX_VERBOSE(
-        this,
-        lit("Peer %1 records:\n%3")
-        .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
-        .arg(records.join("\n")));
 }
 
 bool MessageBus::isLocalConnection(const PersistentIdData& peer) const
@@ -499,9 +477,9 @@ void MessageBus::removeConnectionUnsafe(QWeakPointer<ConnectionBase> weakRef)
     NX_DEBUG(this,
         "Peer %1:%2 has closed connection to %3:%4",
         localPeer().peerType,
-        qnStaticCommon->moduleDisplayName(localPeer().id),
+        peerName(localPeer().id),
         remotePeer.peerType,
-        qnStaticCommon->moduleDisplayName(remotePeer.id));
+        peerName(remotePeer.id));
 
     if (auto callback = context(connection)->onConnectionClosedCallback)
         callback();
@@ -632,16 +610,15 @@ void MessageBus::at_gotMessage(
         messageType != MessageType::pushTransactionData &&
         messageType != MessageType::pushTransactionList)
     {
-        auto localPeerName = qnStaticCommon->moduleDisplayName(commonModule()->moduleGUID());
-        auto remotePeerName = qnStaticCommon->moduleDisplayName(connection->remotePeer().id);
+        auto localPeerName = peerName(commonModule()->moduleGUID());
 
         NX_VERBOSE(
             this,
-            lit("Got message:\t %1 <--- %2. Type: %3. Size=%4")
-            .arg(localPeerName)
-            .arg(remotePeerName)
-            .arg(toString(messageType))
-            .arg(payload.size() + 1));
+            "Got message:\t %1 <--- %2. Type: %3. Size=%4",
+            localPeerName,
+            peerName(connection->remotePeer().id),
+            toString(messageType),
+            payload.size() + 1);
     }
 
     bool result = false;
@@ -808,12 +785,12 @@ bool MessageBus::handlePeersMessage(const P2pConnectionPtr& connection, const QB
                 {
                     NX_VERBOSE(
                         this,
-                        lm("Peer %1 ignores alivePeers record due to route loop. Distance to %2 is %3. Distance to gateway %4 is %5")
-                        .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
-                        .arg(qnStaticCommon->moduleDisplayName(shortPeers.decode(peer.peerNumber).id))
-                        .arg(distance)
-                        .arg(qnStaticCommon->moduleDisplayName(firstVia.id))
-                        .arg(gatewayDistance));
+                        "Peer %1 ignores alivePeers record due to route loop. Distance to %2 is %3. Distance to gateway %4 is %5",
+                        peerName(localPeer().id),
+                        peerName(shortPeers.decode(peer.peerNumber).id),
+                        distance,
+                        peerName(firstVia.id),
+                        gatewayDistance);
                     continue; //< Route loop detected.
                 }
             }
@@ -906,13 +883,14 @@ void MessageBus::sendTransactionImpl(
         {
             if (context->sendDataInProgress)
             {
-                NX_VERBOSE(this, "Send to server %1 already in progress", remotePeer.id);
+                NX_VERBOSE(this, "Send to server %1 already in progress", peerName(remotePeer.id));
                 return;
             }
 
-            if (!context->updateSequence(tran))
+            const auto reason = context->updateSequence(tran);
+            if (reason != UpdateSequenceResult::ok)
             {
-                NX_VERBOSE(this, "Server %1 already knows transaction %2", remotePeer.id, tran);
+                NX_VERBOSE(this, "Server %1 skip transaction %2. Reason: %3", peerName(remotePeer.id), tran, toString(reason));
                 return;
             }
         }
@@ -920,33 +898,34 @@ void MessageBus::sendTransactionImpl(
         {
             if (!context->isRemotePeerSubscribedTo(tran.peerID))
             {
-                NX_VERBOSE(this, "Peer %1 is not subscribed for %2", remotePeer.id, tran.peerID);
+                NX_VERBOSE(this, "Peer %1 is not subscribed for %2", peerName(remotePeer.id), tran.peerID);
                 return;
             }
         }
     }
     else if (remotePeer == peerId)
     {
-        NX_VERBOSE(this, "Peer %1 is myself");
+        NX_VERBOSE(this, "Peer %1 is myself", peerName(remotePeer.id));
         return;
     }
     else if (connection->remotePeer().isCloudServer())
     {
         if (!descriptor->isPersistent)
         {
-            NX_VERBOSE(this, "Cloud %1 is not iterested in non-persistent transactions", remotePeer.id);
+            NX_VERBOSE(this, "Cloud %1 is not iterested in non-persistent transactions", peerName(remotePeer.id));
             return;
         }
 
         if (context->sendDataInProgress)
         {
-            NX_VERBOSE(this, "Send to cloud %1 already in progress", remotePeer.id);
+            NX_VERBOSE(this, "Send to cloud %1 already in progress", peerName(remotePeer.id));
             return;
         }
 
-        if (!context->updateSequence(tran))
+        const auto reason = context->updateSequence(tran);
+        if (reason != UpdateSequenceResult::ok)
         {
-            NX_VERBOSE(this, "Cloud %1 already knows transaction %2", remotePeer.id, tran);
+            NX_VERBOSE(this, "Cloud %1 skip transaction %2. Reason: %3", peerName(remotePeer.id), tran, toString(reason));
             return;
         }
     }
@@ -1446,9 +1425,9 @@ void MessageBus::emitPeerFoundLostSignals()
     for (const auto& peer: newPeers)
     {
         NX_DEBUG(this,
-            lit("Peer %1 has found peer %2")
-            .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
-            .arg(qnStaticCommon->moduleDisplayName(peer.id)));
+            "Peer %1 has found peer %2",
+            peerName(localPeer().id),
+            peerName(peer.id));
         emitAsync(this, &MessageBus::peerFound, peer.id, peer.peerType);
     }
 
@@ -1462,9 +1441,9 @@ void MessageBus::emitPeerFoundLostSignals()
         if (!hasSimilarPeer)
         {
             NX_DEBUG(this,
-                lit("Peer %1 has lost peer %2")
-                .arg(qnStaticCommon->moduleDisplayName(localPeer().id))
-                .arg(qnStaticCommon->moduleDisplayName(peer.id)));
+                "Peer %1 has lost peer %2",
+                peerName(localPeer().id),
+                peerName(peer.id));
             emitAsync(this, &MessageBus::peerLost, peer.id, peer.peerType);
             sendRuntimeInfoRemovedToClients(peer.id);
         }

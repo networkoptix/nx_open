@@ -70,7 +70,8 @@ protected:
 private:
     friend struct GotTransactionFuction;
 
-    void sendAlivePeersMessage(const P2pConnectionPtr& connection = P2pConnectionPtr());
+    void sendAlivePeersMessage(const P2pConnectionPtr& connection);
+    void sendAlivePeersMessage();
     void startStopConnections(
         const QMap<vms::api::PersistentIdData, P2pConnectionPtr>& currentSubscription);
 
@@ -89,6 +90,10 @@ private:
 
     void resotreAfterDbError();
     bool needSubscribeDelay();
+    QString printDistanceRecord(
+        const vms::api::PersistentIdData& peer,
+        int minDistance,
+        const RoutingInfo& viaList);
 
     bool pushTransactionList(
         const P2pConnectionPtr& connection,

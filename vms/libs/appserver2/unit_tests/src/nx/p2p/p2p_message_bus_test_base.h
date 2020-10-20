@@ -45,6 +45,13 @@ protected:
         int propertiesPerCamera,
         int userCount = 0);
 
+    void createCameras(
+        const Appserver2Ptr& server,
+        int camerasCount,
+        int propertiesPerCamera);
+
+    void createUsers(const Appserver2Ptr& server, int userCount);
+
     bool waitForCondition(std::function<bool()> condition, std::chrono::milliseconds timeout);
     bool waitForConditionOnAllServers(
         std::function<bool(const Appserver2Ptr&)> condition,

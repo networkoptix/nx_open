@@ -4,6 +4,17 @@
 namespace nx {
 namespace p2p {
 
+QString toString(UpdateSequenceResult value)
+{
+    switch (value)
+    {
+        case UpdateSequenceResult::ok: return "ok";
+        case UpdateSequenceResult::notSubscribed: return "notSubscribed";
+        case UpdateSequenceResult::alreadyKnown: return "alreadyKnown";
+        default: return "unknown";
+    }
+}
+
 bool ConnectionContext::isRemotePeerSubscribedTo(const vms::api::PersistentIdData& peer) const
 {
     return remoteSubscription.values.contains(peer);
@@ -22,7 +33,7 @@ bool ConnectionContext::isLocalPeerSubscribedTo(const vms::api::PersistentIdData
     return itr != localSubscription.end();
 }
 
-bool ConnectionContext::updateSequence(const ec2::QnAbstractTransaction& tran)
+UpdateSequenceResult ConnectionContext::updateSequence(const ec2::QnAbstractTransaction& tran)
 {
     NX_ASSERT(!sendDataInProgress);
     const vms::api::PersistentIdData peerId(tran.peerID, tran.persistentInfo.dbID);
@@ -30,15 +41,15 @@ bool ConnectionContext::updateSequence(const ec2::QnAbstractTransaction& tran)
     if (itr == remoteSubscription.values.end())
     {
         if (!isRemoteSubscribedToAll)
-            return false;
+            return UpdateSequenceResult::notSubscribed;
         itr = remoteSubscription.values.insert(peerId, 0);
     }
     if (tran.persistentInfo.sequence > itr.value())
     {
         itr.value() = tran.persistentInfo.sequence;
-        return true;
+        return UpdateSequenceResult::ok;
     }
-    return false;
+    return UpdateSequenceResult::alreadyKnown;
 }
 
 vms::api::PersistentIdData ConnectionContext::decode(PeerNumberType shortPeerNumber) const

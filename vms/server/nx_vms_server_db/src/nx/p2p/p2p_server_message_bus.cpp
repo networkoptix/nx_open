@@ -116,79 +116,94 @@ ServerMessageBus::~ServerMessageBus()
     stop();
 }
 
+QString ServerMessageBus::printDistanceRecord(
+    const vms::api::PersistentIdData& peer,
+    int minDistance,
+    const RoutingInfo& viaList)
+{
+    QStringList outViaListStr;
+    for (const auto& peer: viaList.keys())
+        outViaListStr << peerName(peer.id);
+
+    return NX_FMT("\t\t\t\t\t To:  %1(dbId=%2). Distance: %3 (via %4)",
+        peerName(peer.id),
+        peer.persistentId.toString(),
+        minDistance,
+        outViaListStr.join(","));
+}
+
 void ServerMessageBus::sendAlivePeersMessage(const P2pConnectionPtr& connection)
 {
-    auto serializeMessage = [this](const P2pConnectionPtr& connection)
+    QList<QString> recordsStr;
+
+    std::vector<PeerDistanceRecord> records;
+    records.reserve(m_peers->allPeerDistances.size());
+    const auto localPeer = vms::api::PersistentIdData(this->localPeer());
+    for (auto itr = m_peers->allPeerDistances.cbegin(); itr != m_peers->allPeerDistances.cend(); ++itr)
     {
-        std::vector<PeerDistanceRecord> records;
-        records.reserve(m_peers->allPeerDistances.size());
-        const auto localPeer = vms::api::PersistentIdData(this->localPeer());
-        for (auto itr = m_peers->allPeerDistances.cbegin(); itr != m_peers->allPeerDistances.cend(); ++itr)
-        {
-            if (isLocalConnection(itr.key()))
-                continue; //< don't show this connection to other servers
+        if (isLocalConnection(itr.key()))
+            continue; //< don't show this connection to other servers
 
-            RoutingInfo viaList;
-            qint32 minDistance = itr->minDistance(&viaList);
+        RoutingInfo viaList;
+        qint32 minDistance = itr->minDistance(&viaList);
 
 
-            // Don't broadcast foreign offline distances
-            if (minDistance < kMaxDistance && minDistance > kMaxOnlineDistance)
-                minDistance = itr->distanceVia(localPeer);
+        // Don't broadcast foreign offline distances
+        if (minDistance < kMaxDistance && minDistance > kMaxOnlineDistance)
+            minDistance = itr->distanceVia(localPeer);
 
-            if (minDistance == kMaxDistance)
-                continue;
-            const PeerNumberType peerNumber = m_localShortPeerInfo.encode(itr.key());
-            PeerNumberType firstViaNumber = kUnknownPeerNumnber;
-            if (!viaList.isEmpty() && !viaList.first().firstVia.isNull())
-                firstViaNumber = m_localShortPeerInfo.encode(viaList.first().firstVia);
-            records.emplace_back(PeerDistanceRecord{peerNumber, minDistance, firstViaNumber});
-        }
-        NX_ASSERT(!records.empty());
+        if (minDistance == kMaxDistance)
+            continue;
 
-        std::sort(records.begin(), records.end(),
-            [](const PeerDistanceRecord& left, const PeerDistanceRecord& right)
-            {
-                if (left.distance != right.distance)
-                    return left.distance < right.distance;
-                return left.peerNumber < right.peerNumber;
-            });
+        if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
+            recordsStr << printDistanceRecord(itr.key(), minDistance, viaList);
 
-        QByteArray data = serializePeersMessage(records, 1);
-        data.data()[0] = (quint8)MessageType::alivePeers;
-        return data;
-    };
-
-    auto sendAlivePeersMessage = [this](const P2pConnectionPtr& connection, const QByteArray& data)
-    {
-        int peersIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>(
-            m_intervals.sendPeersInfoInterval).count();
-        auto connectionContext = context(connection);
-        if (connectionContext->localPeersTimer.isValid() && !connectionContext->localPeersTimer.hasExpired(peersIntervalMs))
-            return;
-        if (data != connectionContext->localPeersMessage)
-        {
-            connectionContext->localPeersMessage = data;
-            connectionContext->localPeersTimer.restart();
-            if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
-                printPeersMessage();
-            connection->sendMessage(data);
-        }
-    };
-
-    if (connection)
-    {
-        sendAlivePeersMessage(connection, serializeMessage(connection));
-        return;
+        const PeerNumberType peerNumber = m_localShortPeerInfo.encode(itr.key());
+        PeerNumberType firstViaNumber = kUnknownPeerNumnber;
+        if (!viaList.isEmpty() && !viaList.first().firstVia.isNull())
+            firstViaNumber = m_localShortPeerInfo.encode(viaList.first().firstVia);
+        records.emplace_back(PeerDistanceRecord{peerNumber, minDistance, firstViaNumber});
     }
+    NX_ASSERT(!records.empty());
 
-    for (const auto& connection : m_connections)
+    std::sort(records.begin(), records.end(),
+        [](const PeerDistanceRecord& left, const PeerDistanceRecord& right)
+        {
+            if (left.distance != right.distance)
+                return left.distance < right.distance;
+            return left.peerNumber < right.peerNumber;
+        });
+
+    QByteArray data = serializePeersMessage(records, 1);
+    data.data()[0] = (quint8)MessageType::alivePeers;
+
+    int peersIntervalMs = std::chrono::duration_cast<std::chrono::milliseconds>(
+        m_intervals.sendPeersInfoInterval).count();
+    auto connectionContext = context(connection);
+    if (connectionContext->localPeersTimer.isValid() && !connectionContext->localPeersTimer.hasExpired(peersIntervalMs))
+        return;
+    if (data != connectionContext->localPeersMessage)
+    {
+        connectionContext->localPeersMessage = data;
+        connectionContext->localPeersTimer.restart();
+        if (nx::utils::log::isToBeLogged(nx::utils::log::Level::verbose, this))
+        {
+            NX_VERBOSE(this, "Peer %1 records:\n%2",
+                peerName(localPeer.id), recordsStr.join("\n"));
+        }
+        connection->sendMessage(data);
+    }
+}
+
+void ServerMessageBus::sendAlivePeersMessage()
+{
+    for (const auto& connection: m_connections)
     {
         if (connection->state() != Connection::State::Connected)
             continue;
         if (!context(connection)->isRemoteStarted)
             continue;
-        sendAlivePeersMessage(connection, serializeMessage(connection));
+        sendAlivePeersMessage(connection);
     }
 }
 
@@ -259,11 +274,12 @@ P2pConnectionPtr ServerMessageBus::findBestConnectionToSubscribe(
 {
     P2pConnectionPtr result;
     int minSubscriptions = std::numeric_limits<int>::max();
-    for (const auto& via : viaList)
+    for (const auto& via: viaList)
     {
+        if (via == localPeer())
+            return P2pConnectionPtr(); //< Better distance via ourself. Unsubscribe.
         auto connection = findConnectionById(via);
-        NX_ASSERT(connection);
-        if (!connection)
+        if (!NX_ASSERT(connection))
             continue;
         int subscriptions = context(connection)->localSubscription.size() + newSubscriptions.value(connection);
         if (subscriptions < minSubscriptions)
@@ -306,11 +322,10 @@ void ServerMessageBus::doSubscribe(const QMap<vms::api::PersistentIdData, P2pCon
 
         if (auto connection = findConnectionById(peer))
         {
-            if (!connection->remotePeer().isServer())
+            if (connection->remotePeer().isClient())
                 continue;
         }
 
-        //auto subscribedVia = currentSubscription.value(peer);
         while (currentSubscriptionItr != currentSubscription.cend() && currentSubscriptionItr.key() < peer)
             ++currentSubscriptionItr;
         P2pConnectionPtr subscribedVia;
@@ -322,13 +337,11 @@ void ServerMessageBus::doSubscribe(const QMap<vms::api::PersistentIdData, P2pCon
 
         const auto& info = itr.value();
         qint32 minDistance = info.minDistance();
+        if (minDistance > 1 && needDelay)
+            continue; //< allow only direct subscription if network configuration are still changing
+
         if (minDistance < subscribedDistance)
         {
-            if (minDistance > 1)
-            {
-                if (needDelay)
-                    continue; //< allow only direct subscription if network configuration are still changing
-            }
             RoutingInfo viaListData;
             info.minDistance(&viaListData);
             const auto viaList = viaListData.keys();
@@ -339,13 +352,8 @@ void ServerMessageBus::doSubscribe(const QMap<vms::api::PersistentIdData, P2pCon
             if (std::any_of(viaList.begin(), viaList.end(),
                 [this, &peer, &localPeer](const vms::api::PersistentIdData& via)
                 {
-                    if (via == localPeer)
-                        return true; //< 'subscribedVia' has lost 'peer'. Update subscription later as soon as new minDistance will be discovered.
                     auto connection = findConnectionById(via);
-                    NX_ASSERT(connection);
-                    if (!connection)
-                        return true; //< It shouldn't be.
-                    return context(connection)->isRemotePeerSubscribedTo(peer);
+                    return connection && context(connection)->isRemotePeerSubscribedTo(peer);
                 }))
             {
                 continue;
@@ -356,11 +364,11 @@ void ServerMessageBus::doSubscribe(const QMap<vms::api::PersistentIdData, P2pCon
             {
                 NX_VERBOSE(
                     this,
-                    lit("Peer %1 is changing subscription to %2. subscribed via %3. new subscribe via %4")
-                    .arg(qnStaticCommon->moduleDisplayName(localPeer.id))
-                    .arg(qnStaticCommon->moduleDisplayName(peer.id))
-                    .arg(qnStaticCommon->moduleDisplayName(subscribedVia->remotePeer().id))
-                    .arg(qnStaticCommon->moduleDisplayName(connection->remotePeer().id)));
+                    "Peer %1 is changing subscription to %2. subscribed via %3. new subscribe via %4",
+                    peerName(localPeer.id),
+                    peerName(peer.id),
+                    peerName(subscribedVia->remotePeer().id),
+                    connection ? peerName(connection->remotePeer().id) : "none");
             }
             newSubscription[peer] = connection;
             ++tmpNewSubscription[connection];
@@ -596,11 +604,10 @@ void ServerMessageBus::resubscribePeers(
     for (auto itr = newSubscription.begin(); itr != newSubscription.end(); ++itr)
     {
         updatedSubscription[itr.value()].push_back(itr.key());
-        NX_ASSERT(itr.key() != localPeer()); //< Subscription on myself is not allowed.
     }
-    for (auto& value : updatedSubscription)
+    for (auto& value: updatedSubscription)
         std::sort(value.begin(), value.end());
-    for (auto connection : m_connections.values())
+    for (auto connection: m_connections.values())
     {
         const auto& newValue = updatedSubscription.value(connection);
         auto connectionContext = context(connection);

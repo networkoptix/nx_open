@@ -84,7 +84,7 @@ bool ConnectionProcessor::isPeerCompatible(const vms::api::PeerDataEx& remotePee
         NX_WARNING(
             this,
             lm("Reject incoming P2P connection from peer %1 because of different systemId. "
-                "Local peer version: %2, remote peer version: %3")
+                "Local peer systemId: %2, remote peer systemId: %3")
             .arg(d->socket->getForeignAddress().address.toString())
             .arg(commonModule->globalSettings()->localSystemId())
             .arg(remotePeer.systemId));
