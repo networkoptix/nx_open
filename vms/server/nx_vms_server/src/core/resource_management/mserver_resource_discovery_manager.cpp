@@ -104,7 +104,8 @@ QnResourceList QnMServerResourceDiscoveryManager::CheckHostAddrAsync(const QnMan
         for (const auto& resource : result)
         {
             const auto connection = ns->commonModule()->ec2Connection();
-            if (auto camera = resource.dynamicCast<nx::vms::server::resource::Camera>())
+            auto camera = resource.dynamicCast<nx::vms::server::resource::Camera>();
+            if (camera && !input.userSession.access.isNull())
             {
                 camera->setCameraManagerFactory(
                     [userSession = input.userSession]
