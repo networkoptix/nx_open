@@ -15,6 +15,7 @@ if(NOT sync_target)
     set(sync_target ${default_target_device})
 endif()
 
+FILE(REMOVE ${cmake_include_file})
 set(sync_command ${PYTHON_EXECUTABLE} ${CMAKE_SOURCE_DIR}/sync_dependencies.py
     --packages-dir=${PACKAGES_DIR}
     --target=${rdep_target}
