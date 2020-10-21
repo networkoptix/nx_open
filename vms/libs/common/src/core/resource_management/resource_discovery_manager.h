@@ -180,7 +180,7 @@ protected:
     bool m_server;
     std::atomic<bool> m_ready;
 
-    QList<nx::network::HostAddress> m_allLocalAddresses;
+    std::optional<QList<nx::network::HostAddress>> m_allLocalAddresses;
 
     QScopedPointer<QTimer> m_timer;
     State m_state;

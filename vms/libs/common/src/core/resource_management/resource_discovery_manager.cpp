@@ -293,16 +293,24 @@ void QnResourceDiscoveryManager::updateLocalNetworkInterfaces()
         | nx::network::AddressFilter::ipV6
         | nx::network::AddressFilter::noLocal
         | nx::network::AddressFilter::noLoopback;
-    auto localAddresses = nx::network::allLocalAddresses(addressMask);
-    if (localAddresses != m_allLocalAddresses)
-    {
-        // Skip first time.
-        // We suppose here that allLocalAddresses never returns empty list
-        if (!m_allLocalAddresses.isEmpty())
-            emit localInterfacesChanged();
 
-        m_allLocalAddresses = localAddresses;
+    auto localAddresses = nx::network::allLocalAddresses(addressMask);
+    if (!m_allLocalAddresses)
+    {
+        NX_DEBUG(this, "Network addresses initial: %1", containerString(localAddresses));
     }
+    else if (*m_allLocalAddresses != localAddresses)
+    {
+        NX_DEBUG(this, "Network addresses changed: %1", containerString(localAddresses));
+        emit localInterfacesChanged();
+    }
+    else
+    {
+        NX_DEBUG(this, "Network addresses are up to date: %1", containerString(localAddresses));
+        return;
+    }
+
+    m_allLocalAddresses = localAddresses;
 }
 
 bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourcePtr& camera, int awaitingToMoveCameraCnt)
