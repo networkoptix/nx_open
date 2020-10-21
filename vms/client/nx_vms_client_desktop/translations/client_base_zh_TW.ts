@@ -977,7 +977,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Objects Frames and Info...</source>
-      <translation>物件影像幀數和信息...</translation>
+      <translation>物件影像張數和訊息...</translation>
     </message>
     <message>
       <source>Pin Calendar</source>

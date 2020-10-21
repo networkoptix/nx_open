@@ -120,7 +120,7 @@
     <message>
       <location/>
       <source>Limit Frame Rate to save CPU</source>
-      <translation>限制幀率以節省CPU</translation>
+      <translation>限制每秒張數以節省CPU</translation>
     </message>
     <message>
       <location/>
