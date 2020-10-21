@@ -44,7 +44,7 @@ static constexpr auto kMinQuality = Qn::StreamQuality::low;
 static constexpr auto kMaxQuality = Qn::StreamQuality::highest;
 
 static constexpr int kMinArchiveDaysAlertThreshold = 5;
-static constexpr auto kPreRecoringAlertThreshold = 30s;
+static constexpr auto kPreRecordingAlertThreshold = 30s;
 
 template<class Data>
 void fetchFromCameras(
@@ -471,7 +471,7 @@ std::optional<State::RecordingAlert> updateArchiveLengthAlert(const State& state
 std::optional<State::RecordingAlert> updateHighPreRecordingAlert(const State& state)
 {
     const bool warning =
-        seconds(state.recording.thresholds.beforeSec()) >= kPreRecoringAlertThreshold;
+        seconds(state.recording.thresholds.beforeSec()) >= kPreRecordingAlertThreshold;
 
     if (warning)
         return State::RecordingAlert::highPreRecordingValue;

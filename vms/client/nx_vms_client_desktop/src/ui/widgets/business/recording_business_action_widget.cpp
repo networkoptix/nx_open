@@ -28,9 +28,6 @@ QnRecordingBusinessActionWidget::QnRecordingBusinessActionWidget(QWidget *parent
         ui->qualityComboBox->addItem(toDisplayString((Qn::StreamQuality)i), i);
     }
 
-    static constexpr int kMaxPreRecordingSecs = 60;
-    ui->beforeSpinBox->setMaximum(kMaxPreRecordingSecs);
-
     connect(ui->qualityComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(paramsChanged()));
     connect(ui->fpsSpinBox, SIGNAL(editingFinished()), this, SLOT(paramsChanged()));
     connect(ui->fpsSpinBox, SIGNAL(valueChanged(int)), this, SLOT(paramsChanged()));

@@ -679,17 +679,30 @@ void QnBusinessRuleWidget::at_scheduleButton_clicked()
 
 void QnBusinessRuleWidget::updateWarningLabel()
 {
+    static const QString kGenericEventWarning = tr(
+        "Force Acknowledgement will only work for Generic Events"
+        " if camera identifiers are used in the Generic Event URL");
+
+    static const QString kCameraPreRecordingWarning = tr(
+        "High pre-recording time will increase RAM utilization on the server");
+
+    using namespace std::chrono;
+    static constexpr auto kPreRecordingAlertThreshold = 30s; //< Same as for Camera Schedule.
+
+    QString warning;
+
     if (m_model->eventType() == EventType::userDefinedEvent
         && m_model->actionType() == ActionType::showPopupAction
         && m_model->actionParams().needConfirmation)
-        {
-            static const QString warning = tr(
-                "Force Acknowledgement will only work for Generic Events"
-                " if camera identifiers are used in the Generic Event URL");
-            ui->actionWarningLabel->setText(warning);
-            ui->actionWarningLabel->show();
-            return;
-        }
+    {
+        warning = kGenericEventWarning;
+    }
+    if (m_model->actionType() == ActionType::cameraRecordingAction
+        && milliseconds(m_model->actionParams().recordBeforeMs) > kPreRecordingAlertThreshold)
+    {
+        warning = kCameraPreRecordingWarning;
+    }
 
-    ui->actionWarningLabel->hide();
+    ui->actionWarningLabel->setText(warning);
+    ui->actionWarningLabel->setVisible(!warning.isEmpty());
 }
