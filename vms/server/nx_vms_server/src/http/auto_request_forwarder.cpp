@@ -116,6 +116,13 @@ void QnAutoRequestForwarder::processRequest(nx::network::http::Request* const re
         return;
     }
 
+    if (request->requestLine.method == "OPTIONS")
+    {
+        NX_VERBOSE(this, "Request [%1] is skipped: OPTIONS method",
+            detail::hidePassword(request->requestLine));
+        return; //< Don't forward request.
+    }
+
     const bool liveStreamRequested = urlQuery.hasQueryItem(StreamingParams::LIVE_PARAM_NAME);
 
     QnResourcePtr camera;

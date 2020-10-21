@@ -614,11 +614,13 @@ bool QnTCPConnectionProcessor::isConnectionCanBePersistent() const
 {
     Q_D(const QnTCPConnectionProcessor);
 
-    if( d->request.requestLine.version == nx::network::http::http_1_1 )
+    if (d->protocol.startsWith("RTSP"))
+        return true;
+    else if( d->request.requestLine.version == nx::network::http::http_1_1 )
         return nx::network::http::getHeaderValue( d->request.headers, "Connection" ).toLower() != "close";
     else if( d->request.requestLine.version == nx::network::http::http_1_0 )
         return nx::network::http::getHeaderValue( d->request.headers, "Connection" ).toLower() == "keep-alive";
-    else    //e.g., RTSP
+    else
         return false;
 }
 

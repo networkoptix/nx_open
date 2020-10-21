@@ -1815,6 +1815,8 @@ void QnRtspConnectionProcessor::run()
 
     if (!processRequest())
         return;
+    if (d->request.requestLine.method == "OPTIONS")
+        return; //< Go up to the parent handler. It allows to make route on the next request.
 
     auto guard = nx::utils::makeScopeGuard(
         [d]()
@@ -1822,6 +1824,7 @@ void QnRtspConnectionProcessor::run()
             d->socket->shutdown();
             d->deleteDP();
             d->trackInfo.clear();
+            d->socket.reset();
         });
 
     auto metrics = commonModule()->metrics();
