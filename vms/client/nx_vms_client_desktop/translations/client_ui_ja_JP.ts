@@ -613,12 +613,12 @@
     <message>
       <location/>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation>録画スケジュールの品質とフレームレート (FPS) 設定は無関係になります。</translation>
+      <translation>録画スケジュールの品質とフレームレート(FPS) の設定はカメラに設定されなくなります。</translation>
     </message>
     <message>
       <location/>
       <source>Calculate bitrate per GOP instead of bitrate per second</source>
-      <translation>1秒あたりのビットレートではなくGOPあたりのビットレートを計算する</translation>
+      <translation>毎秒のビットレートの代わりにGOPあたりのビットレートを計算する</translation>
     </message>
     <message>
       <location/>
@@ -658,7 +658,7 @@
     <message>
       <location/>
       <source>Generate</source>
-      <translation>一般</translation>
+      <translation>生成</translation>
     </message>
     <message>
       <location/>

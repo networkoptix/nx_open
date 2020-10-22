@@ -1640,10 +1640,6 @@ to view more bookmarks</source>
   <context>
     <name>QObject</name>
     <message>
-      <source>Parameter 1 is null.</source>
-      <translation>Parameter 1 ist Null.</translation>
-    </message>
-    <message>
       <source>Executable %1 Media File (x64) (*.exe)</source>
       <translation>Ausführbare %1 Mediendatei (x64) (*.exe)</translation>
     </message>
@@ -2366,6 +2362,10 @@ to view more bookmarks</source>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
       <translation>Bestätigung erzwingen funktioniert nur für generische Ereignisse, wenn Kamerakennungen in der URL für generische Ereignisse verwendet werden</translation>
+    </message>
+    <message>
+      <source>High pre-recording time will increase RAM utilization on the server</source>
+      <translation>Eine hohe Voraufzeichnungszeit erhöht die RAM-Auslastung auf dem Server</translation>
     </message>
   </context>
   <context>
@@ -3227,12 +3227,12 @@ to %1</source>
       <translation>Audiogerät &quot;%1&quot; konnte nicht initialisiert werden.</translation>
     </message>
     <message>
-      <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>44,1 kHz und 48 kHz Audioformate werden vom Tonaufnahmegerät nicht unterstützt! Bitte wählen Sie ein anderes Audiogerät oder &quot;Keine&quot; in den Aufnahmeeinstellungen.</translation>
-    </message>
-    <message>
       <source>Could not detect capturing resolution</source>
       <translation>Die Erfassungsauflösung konnte nicht erkannt werden</translation>
+    </message>
+    <message>
+      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation>Das Audioaufnahmegerät unterstützt keine geeigneten Audioformate. Bitte wählen Sie in den Bildschirmaufnahmeeinstellungen ein anderes Audiogerät oder &quot;keines&quot;.</translation>
     </message>
   </context>
   <context>

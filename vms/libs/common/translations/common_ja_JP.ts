@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>empty</source>
-      <translation>空</translation>
+      <translation>なし</translation>
     </message>
     <message>
       <source>less than an hour</source>
@@ -1748,7 +1748,7 @@
     </message>
     <message>
       <source>PoE over Budget</source>
-      <translation>PoEオーバーバジェット</translation>
+      <translation>PoE電源利用可能な総ワット数を超える</translation>
     </message>
     <message>
       <source>Fan Error</source>
@@ -1756,7 +1756,7 @@
     </message>
     <message>
       <source>PoE over budget at %1</source>
-      <translation>%1予算を超えるPoE</translation>
+      <translation>%1のワット数が利用可能なPOEワット数を超える</translation>
     </message>
     <message>
       <source>Fan error at %1</source>

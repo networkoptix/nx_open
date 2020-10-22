@@ -1668,10 +1668,6 @@ to view more bookmarks</source>
   <context>
     <name>QObject</name>
     <message>
-      <source>Parameter 1 is null.</source>
-      <translation>משתנה 1 הינו null.</translation>
-    </message>
-    <message>
       <source>Executable %1 Media File (x64) (*.exe)</source>
       <translation>Executable %1 Media File (x64) (*.exe)</translation>
     </message>
@@ -2424,6 +2420,10 @@ to view more bookmarks</source>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
       <translation>כפיית אישור תעבוד רק לאירועים גנריים אם במשתני המצלמה נעשה שימוש ב-URL של האירוע הגנרי</translation>
+    </message>
+    <message>
+      <source>High pre-recording time will increase RAM utilization on the server</source>
+      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
     </message>
   </context>
   <context>
@@ -3300,12 +3300,12 @@ to %1</source>
       <translation>לא היתה אפשרות לאתחל התקן שמע &quot;%1&quot;.</translation>
     </message>
     <message>
-      <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>תבניות שמע 44.1kHz ו- 48kHz אינן נתמכות על-ידי התקן לכידת שמע. בחר התקן שמע אחר או &quot;ללא&quot; בהגדרות הקלטת המסך.</translation>
-    </message>
-    <message>
       <source>Could not detect capturing resolution</source>
       <translation>לא ניתן היה לאתר רזולוציית לכידה</translation>
+    </message>
+    <message>
+      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
     </message>
   </context>
   <context>

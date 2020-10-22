@@ -1,6 +1,6 @@
 
 <form class="form-horizontal" novalidate ng-if="!activeGroup.urlPrefix">
-    <div class="form-group">
+    <div class="form-group" ng-if="apiMethod.method">
         <label class="col-sm-2 control-label">{{apiMethod.method}}:</label>
         <div class="col-sm-10">
             <p class="form-control-static">{{activeFunction.url}}</p>

@@ -1626,10 +1626,6 @@ to view more bookmarks</source>
   <context>
     <name>QObject</name>
     <message>
-      <source>Parameter 1 is null.</source>
-      <translation>Thông số 1 là null.</translation>
-    </message>
-    <message>
       <source>Executable %1 Media File (x64) (*.exe)</source>
       <translation>Thực thi %1 Lưu trữ Truyền thông (x64) (*.exe)</translation>
     </message>
@@ -2337,6 +2333,10 @@ to view more bookmarks</source>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
       <translation>Buộc công nhận sẽ chỉ hoạt động cho các sự kiện chung nếu số nhận dạng camera được sử dụng trong URL sự kiện chung</translation>
+    </message>
+    <message>
+      <source>High pre-recording time will increase RAM utilization on the server</source>
+      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
     </message>
   </context>
   <context>
@@ -3191,12 +3191,12 @@ to %1</source>
       <translation>Không thể khởi tạo thiết bị âm thanh &quot;%1&quot;.</translation>
     </message>
     <message>
-      <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>Các định dạng âm thanh 44.1 kHz và 48 kHz không được hỗ trợ. Hãy chọn thiết bị âm thanh khác hoặc &quot;none&quot; trong màn hình Recoding.</translation>
-    </message>
-    <message>
       <source>Could not detect capturing resolution</source>
       <translation>Không thể phát hiện độ phân giải chụp</translation>
+    </message>
+    <message>
+      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
     </message>
   </context>
   <context>

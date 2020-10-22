@@ -1641,10 +1641,6 @@ több könyvjelző megjelenítéséhez</translation>
   <context>
     <name>QObject</name>
     <message>
-      <source>Parameter 1 is null.</source>
-      <translation>1-es paraméter nulla.</translation>
-    </message>
-    <message>
       <source>Executable %1 Media File (x64) (*.exe)</source>
       <translation>%1 futtatható media fájl (x64) (*.exe)</translation>
     </message>
@@ -2367,6 +2363,10 @@ több könyvjelző megjelenítéséhez</translation>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
       <translation>A kényszerítő nyugtázás csak akkor fog működni az általános eseményeknél, ha a kamera azonosítókat használják az általános esemény URL-jében</translation>
+    </message>
+    <message>
+      <source>High pre-recording time will increase RAM utilization on the server</source>
+      <translation>A magas előzetes felvételi idő növeli a kiszolgáló RAM-kihasználtságát</translation>
     </message>
   </context>
   <context>
@@ -3230,12 +3230,12 @@ to %1</source>
       <translation>&quot;%1&quot; audio eszköz inicialzálása sikertelen.</translation>
     </message>
     <message>
-      <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>44.1kHz és 48 kHz-es formátumok audio formátumok rögzítését az eszköz nem támogatja. Válasszon más audio eszközt, vagy &quot;semmi&quot; gombot, a képernyő felvétel-beállítások megnyitásához.</translation>
-    </message>
-    <message>
       <source>Could not detect capturing resolution</source>
       <translation>Nem sikerült észlelni a rögzítési felbontást</translation>
+    </message>
+    <message>
+      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
     </message>
   </context>
   <context>

@@ -1627,10 +1627,6 @@ to view more bookmarks</source>
   <context>
     <name>QObject</name>
     <message>
-      <source>Parameter 1 is null.</source>
-      <translation>參數 1 為空值.</translation>
-    </message>
-    <message>
       <source>Executable %1 Media File (x64) (*.exe)</source>
       <translation>可執行的 %1 媒體檔案 (x64) (*.exe)</translation>
     </message>
@@ -2338,6 +2334,10 @@ to view more bookmarks</source>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
       <translation>如在通用事件URL中使用了攝影機識別碼，則強制確認僅適用於通用事件</translation>
+    </message>
+    <message>
+      <source>High pre-recording time will increase RAM utilization on the server</source>
+      <translation>拉高提前錄製時間將增加伺服器上的RAM使用率</translation>
     </message>
   </context>
   <context>
@@ -3196,12 +3196,12 @@ to %1</source>
       <translation>無法初始化音源編碼器 &quot;%1&quot;.</translation>
     </message>
     <message>
-      <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>音源擷取裝置不支援 44.1khz 和 48khz 格式. 請在螢幕錄影設定中選擇其他音源裝置或選擇&quot;無&quot;.</translation>
-    </message>
-    <message>
       <source>Could not detect capturing resolution</source>
       <translation>無法偵測到擷取之解析度</translation>
+    </message>
+    <message>
+      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
     </message>
   </context>
   <context>
@@ -8524,7 +8524,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>DISABLED</source>
-      <translation type="unfinished">DISABLED</translation>
+      <translation>已停用</translation>
     </message>
   </context>
   <context>

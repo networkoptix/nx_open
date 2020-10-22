@@ -1641,10 +1641,6 @@ om du vill visa fler bokmärken</translation>
   <context>
     <name>QObject</name>
     <message>
-      <source>Parameter 1 is null.</source>
-      <translation>Parametern 1 är null.</translation>
-    </message>
-    <message>
       <source>Executable %1 Media File (x64) (*.exe)</source>
       <translation>Exekverbar %1 Mediefil (x64) (*.exe)</translation>
     </message>
@@ -2367,6 +2363,10 @@ om du vill visa fler bokmärken</translation>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
       <translation>Forcerad kvittering fungerar bara för generiska händelser om kamerans modifierare används i generiska händelse URL-er</translation>
+    </message>
+    <message>
+      <source>High pre-recording time will increase RAM utilization on the server</source>
+      <translation>Hög förinspelningstid kommer att öka RAM-utnyttjande på servern</translation>
     </message>
   </context>
   <context>
@@ -3232,12 +3232,12 @@ till %1</translation>
       <translation>Kunde inte initiera ljudenheten &quot;%1&quot;.</translation>
     </message>
     <message>
-      <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>44,1 kHz och 48 kHz ljudformat stöds inte av ljudinspelningsenheten. Välj en annan ljudenhet eller &quot;ingen&quot; i inställningarna för skärminspelning.</translation>
-    </message>
-    <message>
       <source>Could not detect capturing resolution</source>
       <translation>Det gick inte att upptäcka upplösningen</translation>
+    </message>
+    <message>
+      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
     </message>
   </context>
   <context>

@@ -1640,10 +1640,6 @@ to view more bookmarks</source>
   <context>
     <name>QObject</name>
     <message>
-      <source>Parameter 1 is null.</source>
-      <translation>Il parametro 1 è nullo.</translation>
-    </message>
-    <message>
       <source>Executable %1 Media File (x64) (*.exe)</source>
       <translation>Eseguibile %1 File multimediale (x64) (*.exe)</translation>
     </message>
@@ -2366,6 +2362,10 @@ to view more bookmarks</source>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
       <translation>La notifica forzato funziona solo per gli eventi generici se i identificatori della telecamera vengono utilizzati nell'URL dell'evento generico</translation>
+    </message>
+    <message>
+      <source>High pre-recording time will increase RAM utilization on the server</source>
+      <translation>Un tempo di pre-registrazione elevato aumenterà l'utilizzo della RAM sul server</translation>
     </message>
   </context>
   <context>
@@ -3228,12 +3228,12 @@ to %1</source>
       <translation>Impossibile inizializzare il dispositivo audio &quot;%1&quot;.</translation>
     </message>
     <message>
-      <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>I formati audio 44,1 kHz e 48 kHz non sono supportati dal dispositivo di acquisizione audio. Si prega di selezionare un altro dispositivo audio o &quot;nessuna&quot; nelle impostazioni di cattura schermo.</translation>
-    </message>
-    <message>
       <source>Could not detect capturing resolution</source>
       <translation>Impossibile rilevare la risoluzione di acquisizione</translation>
+    </message>
+    <message>
+      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
     </message>
   </context>
   <context>

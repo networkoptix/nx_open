@@ -1626,10 +1626,6 @@ to view more bookmarks</source>
   <context>
     <name>QObject</name>
     <message>
-      <source>Parameter 1 is null.</source>
-      <translation>변수 1은 null입니다.</translation>
-    </message>
-    <message>
       <source>Executable %1 Media File (x64) (*.exe)</source>
       <translation>실행가능한 %1 Media File (x64) (*.exe)</translation>
     </message>
@@ -2337,6 +2333,10 @@ to view more bookmarks</source>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
       <translation>카메라 식별자가 일반 이벤트 URL에서 사용되는 경우 강제 승인은 일반 이벤트에 대해서만 작동합니다.</translation>
+    </message>
+    <message>
+      <source>High pre-recording time will increase RAM utilization on the server</source>
+      <translation>사전녹화 시간을 늘리면 서버의 RAM 사용률이 증가됩니다.</translation>
     </message>
   </context>
   <context>
@@ -3191,12 +3191,12 @@ to %1</source>
       <translation>오디오 장치 &quot;%1&quot; 를 초기화할 수 없습니다.</translation>
     </message>
     <message>
-      <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>44.1 khz와 48 Khz 오디오 포맷 오디오 캡처 장치에서 지원 되지 않습니다. 다른 오디오 장치 또는 화면 녹화 설정에서 "없음"을 선택 하십시오</translation>
-    </message>
-    <message>
       <source>Could not detect capturing resolution</source>
       <translation>캡처 해상도를 감지 할 수 없습니다</translation>
+    </message>
+    <message>
+      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
     </message>
   </context>
   <context>

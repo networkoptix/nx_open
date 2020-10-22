@@ -1626,10 +1626,6 @@ to view more bookmarks</source>
   <context>
     <name>QObject</name>
     <message>
-      <source>Parameter 1 is null.</source>
-      <translation>パラメーター1が空白</translation>
-    </message>
-    <message>
       <source>Executable %1 Media File (x64) (*.exe)</source>
       <translation>実行可能 %1 メディアファイル (x64) (*.exe)</translation>
     </message>
@@ -2337,6 +2333,10 @@ to view more bookmarks</source>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
       <translation>カメラ識別子が汎用イベントURLで使用されている場合、強制承認は汎用イベントに対してのみ機能します</translation>
+    </message>
+    <message>
+      <source>High pre-recording time will increase RAM utilization on the server</source>
+      <translation>プリレコーディング時間が長いと、サーバーのRAM使用率が増加します</translation>
     </message>
   </context>
   <context>
@@ -3191,12 +3191,12 @@ to %1</source>
       <translation>オーディオデバイス&quot;%1&quot; を初期化できませんでした</translation>
     </message>
     <message>
-      <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>44.1 kHzと48 kHzのオーディオ形式は、オーディオキャプチャデバイスではサポートされていません　別のオーディオデバイスを選択するか、スクリーン録画設定で&quot;なし&quot;を選択してください</translation>
-    </message>
-    <message>
       <source>Could not detect capturing resolution</source>
       <translation>キャプチャ解像度を検出できませんでした</translation>
+    </message>
+    <message>
+      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
     </message>
   </context>
   <context>

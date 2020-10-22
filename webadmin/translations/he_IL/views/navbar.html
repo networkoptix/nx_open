@@ -48,7 +48,7 @@
             </ul>
         </nav>
 
-        <nav ng-if="!noPanel" class="hidden-xs" id="navbar-non-collapse" role="navigation">
+        <nav ng-if="!noPanel && !nav.show" class="hidden-xs" id="navbar-non-collapse" role="navigation">
             <ul class="nav navbar-nav">
                 <li ng-hide="!user.isAdmin || hasProxy" ng-class="{active:isActive('/settings')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/settings/">הגדרות</a>

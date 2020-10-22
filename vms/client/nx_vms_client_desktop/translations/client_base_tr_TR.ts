@@ -1640,10 +1640,6 @@ to view more bookmarks</source>
   <context>
     <name>QObject</name>
     <message>
-      <source>Parameter 1 is null.</source>
-      <translation>Parametre 1 Geçersiz.</translation>
-    </message>
-    <message>
       <source>Executable %1 Media File (x64) (*.exe)</source>
       <translation>Yürütülebilir %1 Medya Dosyası (x64) (*.exe)</translation>
     </message>
@@ -2366,6 +2362,10 @@ to view more bookmarks</source>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
       <translation>Zorla Onaylama, yalnızca Genel Olay URL'sinde kamera tanımlayıcıları kullanılıyorsa çalışır</translation>
+    </message>
+    <message>
+      <source>High pre-recording time will increase RAM utilization on the server</source>
+      <translation>Yüksek ön kayıt süresi, sunucuda RAM kullanımını artıracaktır</translation>
     </message>
   </context>
   <context>
@@ -3227,12 +3227,12 @@ to %1</source>
       <translation>&quot;%1&quot; ses cihazı yüklenemedi;.</translation>
     </message>
     <message>
-      <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation>44.1Khz ve 48Khz ses formatları yakalama cihazı tarafından desteklenmiyor. Lütfen başka bir ses cihazı seçin yada kayıt seçeneklerinden &quot;yok&quot; u işaretleyin.</translation>
-    </message>
-    <message>
       <source>Could not detect capturing resolution</source>
       <translation>Yakalama çözünürlüğü tespit edilemedi</translation>
+    </message>
+    <message>
+      <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
     </message>
   </context>
   <context>

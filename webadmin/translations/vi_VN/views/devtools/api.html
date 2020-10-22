@@ -66,8 +66,7 @@
                                 <span class="label label-danger" ng-if="activeFunction.proprietary">độc quyền</span>
                                 <div ng-bind-html="activeFunction.description.xml"></div>
 
-                                <ng-include src="Config.viewsDir + 'devtools/api_form.html'"
-                                            ng-if="apiMethod.method"></ng-include>
+                                <ng-include src="Config.viewsDir + 'devtools/api_form.html'"></ng-include>
 
                                 <div ng-if="activeFunction.result.params || activeFunction.result.caption">
                                     <h3>Các kết quả</h3>
