@@ -1640,10 +1640,6 @@ to view more bookmarks</source>
 <context>
     <name>QObject</name>
     <message>
-        <source>Parameter 1 is null.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Executable %1 Media File (x64) (*.exe)</source>
         <translation></translation>
     </message>
@@ -2366,6 +2362,10 @@ to view more bookmarks</source>
     <message>
         <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>High pre-recording time will increase RAM utilization on the server</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3227,12 +3227,12 @@ to %1</source>
         <translation></translation>
     </message>
     <message>
-        <source>44.1 kHz and 48 kHz audio formats are not supported by the audio capturing device. Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+        <source>Could not detect capturing resolution</source>
         <translation></translation>
     </message>
     <message>
-        <source>Could not detect capturing resolution</source>
-        <translation></translation>
+        <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
