@@ -72,7 +72,15 @@ function(nx_add_pre_build_artifacts_check)
         " --customization=${customization}"
         " --cmake-include-file=${cmake_include_file_escaped}"
         " --options sync-timestamps=True"
-        " --verbose")
+    )
+
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        string(APPEND check_artifacts_command " --debug")
+    endif()
+    if(rdepVerbose)
+        string(APPEND check_artifacts_command " --verbose")
+    endif()
+
     nx_add_custom_pre_build_command("${check_artifacts_command}")
 endfunction()
 
