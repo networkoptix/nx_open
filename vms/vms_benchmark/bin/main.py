@@ -682,6 +682,7 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
         report("Cannot obtain swap information.")
 
     for [test_number, test_camera_count] in zip(itertools.count(1, 1), ini['virtualCameraCount']):
+        _obtain_and_check_box_ram_free_bytes(box_platform, ini, test_camera_count)
         total_live_stream_count = math.ceil(
             ini['liveStreamsPerCameraRatio'] * test_camera_count)
         total_archive_stream_count = math.ceil(
@@ -999,11 +1000,14 @@ def _run_load_tests(api, box, box_platform, conf, ini, vms):
 
 def _obtain_and_check_box_ram_free_bytes(box_platform, ini, test_camera_count):
     ram_free_bytes = box_platform.obtain_ram_free_bytes()
-    ram_required_bytes = test_camera_count * ini['ramPerCameraMegabytes'] * 1024 ** 2
+    ram_per_camera_bytes = ini['ramPerCameraMegabytes'] * 1024 ** 2
+    ram_required_bytes = test_camera_count * ram_per_camera_bytes
 
     if ram_free_bytes < ram_required_bytes:
+        maximum_camera_count = int(ram_free_bytes / ram_per_camera_bytes)
         raise exceptions.InsufficientResourcesError(
-            f"Not enough free RAM on the box for {test_camera_count} cameras.")
+            f"Not enough free RAM on the box for {test_camera_count} camera(s); "
+            f"maximum number of cameras is {maximum_camera_count}.")
 
     return ram_free_bytes
 
