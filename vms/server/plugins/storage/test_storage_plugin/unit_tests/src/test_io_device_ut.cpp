@@ -4,7 +4,7 @@
 #include <algorithm>
 #include "test_common.h"
 
-TEST_F(TestStorageTest, IODevice_open_Read)
+TEST_F(TestStorageTest, DISABLED_IODevice_open_Read)
 {
     int ecode;
     IODeviceUniquePtr ioDevice1(
@@ -72,7 +72,7 @@ TEST_F(TestStorageTest, IODevice_open_Write_NotExisting)
             nullptr));
 }
 
-TEST_F(TestStorageTest, IODevice_MediaFile_Read_Seek)
+TEST_F(TestStorageTest, DISABLED_IODevice_MediaFile_Read_Seek)
 {
     char buf[512];
     int ecode;

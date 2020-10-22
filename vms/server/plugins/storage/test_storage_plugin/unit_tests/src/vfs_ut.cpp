@@ -6,7 +6,7 @@
 
 using namespace utils;
 
-TEST(SimpleVfsFromJson, main) 
+TEST(SimpleVfsFromJson, DISABLED_main)
 {
     VfsPair vfsPair;
     ASSERT_TRUE(buildVfsFromJson(kTestJson, "storage", &vfsPair));

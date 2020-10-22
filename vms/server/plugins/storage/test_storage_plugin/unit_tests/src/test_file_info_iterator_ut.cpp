@@ -52,7 +52,7 @@ TEST_F(TestFileInfoIteratorTest, Folders)
     fileIterator->releaseRef();
 }
 
-TEST_F(TestFileInfoIteratorTest, Files)
+TEST_F(TestFileInfoIteratorTest, DISABLED_Files)
 {
     auto fileIterator = storage->getFileIterator(
         "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/", 

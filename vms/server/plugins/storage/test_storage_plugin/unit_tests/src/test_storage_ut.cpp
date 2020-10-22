@@ -19,7 +19,7 @@ TEST_F(TestStorageTest, permanentGetters)
     ASSERT_TRUE(storage->getCapabilities() & nx_spl::cap::DBReady);
 }
 
-TEST_F(TestStorageTest, existGetters)
+TEST_F(TestStorageTest, DISABLED_existGetters)
 {
     ASSERT_TRUE(storage->fileExists("test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/1453550461076_60000.mkv", nullptr));
     ASSERT_TRUE(storage->fileExists("test://storage/some/path/low_quality/someCameraId1/2016/01/23/15/1453550461077_60000.mkv", nullptr));
@@ -36,7 +36,7 @@ TEST_F(TestStorageTest, existGetters)
     ASSERT_NE(ecode, nx_spl::error::NoError);
 }
 
-TEST_F(TestStorageTest, removeFile)
+TEST_F(TestStorageTest, DISABLED_removeFile)
 {
     int ecode;
     storage->removeFile("test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/1453550461076_60000.mkv", &ecode);
@@ -47,7 +47,7 @@ TEST_F(TestStorageTest, removeFile)
     ASSERT_NE(ecode, nx_spl::error::NoError);
 }
 
-TEST_F(TestStorageTest, removeDir)
+TEST_F(TestStorageTest, DISABLED_removeDir)
 {
     int ecode;
     storage->removeDir("test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/1453550461076_60000.mkv", &ecode);
@@ -62,7 +62,7 @@ TEST_F(TestStorageTest, removeDir)
     ASSERT_NE(ecode, nx_spl::error::NoError);
 }
 
-TEST_F(TestStorageTest, renameFile)
+TEST_F(TestStorageTest, DISABLED_renameFile)
 {
     int ecode;
     storage->renameFile(
