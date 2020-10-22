@@ -1072,10 +1072,10 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             srcAudioCodec = mediaContext->getCodecId();
 
             // In the case of MP2 We don't have information about bitrate until we get the first
-            // audio packet. This leads to problems with playback of AVI files in VLC, so we always
-            // "transcode" MP2 to MP2 for AVI.
+            // audio packet. This leads to problems with playback in VLC, so we always
+            // "transcode" MP2 to MP2 when exporting.
             const bool transcodingIsRequired = srcAudioCodec == AV_CODEC_ID_MP2
-                && context.fileFormat == QnAviArchiveMetadata::Format::avi;
+                && m_role == StreamRecorderRole::fileExport;
 
             if (transcodingIsRequired && m_dstAudioCodec == AV_CODEC_ID_NONE)
                 m_dstAudioCodec = srcAudioCodec;
