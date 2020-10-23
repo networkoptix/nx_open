@@ -16,7 +16,8 @@ class H2645Mp4ToAnnexB: public AbstractMediaDataFilter
 {
 public:
     //!Implementation of AbstractMediaDataFilter::processData
-    virtual QnConstAbstractDataPacketPtr processData(const QnConstAbstractDataPacketPtr& data ) override;
+    virtual QnConstAbstractDataPacketPtr processData(
+        const QnConstAbstractDataPacketPtr& data) override;
 
 private:
     QnConstMediaContextPtr m_newContext;

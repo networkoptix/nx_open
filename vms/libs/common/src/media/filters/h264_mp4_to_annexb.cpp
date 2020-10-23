@@ -128,8 +128,7 @@ std::vector<uint8_t> readH265SeqHeaderFromExtraData(const uint8_t* extraData, in
     return result;
 }
 
-
-QnConstAbstractDataPacketPtr H2645Mp4ToAnnexB::processData(const QnConstAbstractDataPacketPtr& data )
+QnConstAbstractDataPacketPtr H2645Mp4ToAnnexB::processData(const QnConstAbstractDataPacketPtr& data)
 {
     const QnCompressedVideoData* videoData =
         dynamic_cast<const QnCompressedVideoData*>(data.get());
@@ -141,6 +140,12 @@ QnConstAbstractDataPacketPtr H2645Mp4ToAnnexB::processData(const QnConstAbstract
 
     if (isStartCode(videoData->data(), videoData->dataSize()))
         return data;
+
+    if (!videoData->context)
+    {
+        NX_DEBUG(this, "Invalid video stream, failed to convert to AnnexB format, no extra data");
+        return data;
+    }
 
     std::vector<uint8_t> header;
     const uint8_t* extraData = videoData->context->getExtradata();
@@ -155,7 +160,11 @@ QnConstAbstractDataPacketPtr H2645Mp4ToAnnexB::processData(const QnConstAbstract
         else if (codecId == AV_CODEC_ID_H265)
             header = readH265SeqHeaderFromExtraData(extraData, extraDataSize);
         if (header.empty())
+        {
+            NX_DEBUG(this,
+                "Invalid video stream, failed to convert to AnnexB format, invalid extra data");
             return data;
+        }
     }
 
     QnWritableCompressedVideoDataPtr result(new QnWritableCompressedVideoData());
