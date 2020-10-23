@@ -87,7 +87,7 @@
     </message>
     <message>
       <source>stopped</source>
-      <translation>停止</translation>
+      <translation>停止状態</translation>
     </message>
     <message>
       <source>starting</source>
@@ -99,7 +99,7 @@
     </message>
     <message>
       <source>started</source>
-      <translation>開始</translation>
+      <translation>実行中</translation>
     </message>
     <message>
       <source>resuming</source>

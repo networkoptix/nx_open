@@ -47,12 +47,12 @@
     <message>
       <location filename="../src/ui/dialogs/adjust_video_dialog.ui"/>
       <source>Image Enhancement</source>
-      <translation>イメージ拡張</translation>
+      <translation>画像補正</translation>
     </message>
     <message>
       <location/>
       <source>Enable image enhancement</source>
-      <translation>イメージ拡張有効</translation>
+      <translation>画像補正有効</translation>
     </message>
     <message>
       <location/>
@@ -668,7 +668,7 @@
     <message>
       <location/>
       <source>Logical ID</source>
-      <translation>論理ID</translation>
+      <translation>自定義ID</translation>
     </message>
     <message>
       <location/>
@@ -688,7 +688,7 @@
     <message>
       <location/>
       <source>Trust camera timestamp</source>
-      <translation>カメラのタイムスタンプを信頼する</translation>
+      <translation>カメラのタイムスタンプを使う</translation>
     </message>
     <message>
       <location/>
@@ -703,22 +703,22 @@
     <message>
       <location/>
       <source>Native</source>
-      <translation>ネイティブ</translation>
+      <translation>モニタ解像度と同じ</translation>
     </message>
     <message>
       <location/>
       <source>Native camera presets will not be avaliable.</source>
-      <translation>ネイティブカメラのプリセットは利用できません。</translation>
+      <translation>カメラのネイティブプリセットは利用できません。</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation>このカメラはパンとチルトをサポートします</translation>
+      <translation>このカメラはパンとチルトを使うことが出来ます</translation>
     </message>
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation>このカメラはズームをサポートしています</translation>
+      <translation>このカメラはズームを使うことが出来ます</translation>
     </message>
     <message>
       <location/>
@@ -796,7 +796,7 @@
     <message>
       <location/>
       <source>Logical ID</source>
-      <translation>論理ID</translation>
+      <translation>自定義ID</translation>
     </message>
   </context>
   <context>
@@ -1024,7 +1024,7 @@
     <message>
       <location/>
       <source>Omit Logging</source>
-      <translation>ログインを省略</translation>
+      <translation>ログ書込みを省略</translation>
     </message>
   </context>
   <context>
@@ -1269,7 +1269,7 @@
     <message>
       <location/>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation>回転、歪み補正、イメージ強調など</translation>
+      <translation>回転、歪み補正、画像補正など</translation>
     </message>
     <message>
       <location/>
@@ -1837,7 +1837,7 @@
     <message>
       <location/>
       <source>Activate License</source>
-      <translation>アクティベートライセンス</translation>
+      <translation>ライセンスを有効化</translation>
     </message>
     <message>
       <location/>
@@ -1976,7 +1976,7 @@
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation>Tour cycle</translation>
+      <translation>ツアー間隔</translation>
     </message>
     <message>
       <location/>
@@ -2577,12 +2577,12 @@
     <message>
       <location/>
       <source>Initial video length</source>
-      <translation>イニシャルビデオの長さ</translation>
+      <translation>元の映像</translation>
     </message>
     <message>
       <location/>
       <source>Exported video length</source>
-      <translation>エクスポートされたビデオの長さ</translation>
+      <translation>エクスポート後の映像の長さ</translation>
     </message>
     <message>
       <location/>
@@ -2592,7 +2592,7 @@
     <message>
       <location/>
       <source>Frames interval</source>
-      <translation>フレームインターバル</translation>
+      <translation>フレーム間隔</translation>
     </message>
     <message>
       <location/>
@@ -2671,7 +2671,7 @@
     <message>
       <location/>
       <source>Capture Cursor</source>
-      <translation>キャプチャーカーソル</translation>
+      <translation>カーソルを録画する</translation>
     </message>
     <message>
       <location/>
@@ -3239,7 +3239,7 @@
     <message>
       <location/>
       <source>Send anonymous usage and crash statistics to software developers</source>
-      <translation>anonymou使用とクラッシュ統計をソフトウェア開発に送信</translation>
+      <translation>匿名の使用統計とクラッシュレポートをソフトウェア開発に送信</translation>
     </message>
     <message>
       <location/>

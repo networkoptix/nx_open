@@ -342,7 +342,7 @@
     </message>
     <message>
       <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-      <translation>ポートt %1 にアクセス可能か確認してください.</translation>
+      <translation>ポート %1 にアクセス可能か確認してください.</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
@@ -1083,7 +1083,7 @@
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
       <translation>
-        <numerusform>時</numerusform>
+        <numerusform>時間</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1504,7 +1504,7 @@
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
-        <numerusform>最初の発生: %1 時分 %2 月日(合計%n 回)</numerusform>
+        <numerusform>最初の発生: 月日%1 %2 月日(合計%n 回)</numerusform>
       </translation>
     </message>
     <message numerus="yes">

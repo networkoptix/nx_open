@@ -544,7 +544,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Image Enhancement...</source>
-      <translation>イメージ拡張...</translation>
+      <translation>画像補正...</translation>
     </message>
     <message>
       <source>Rotate to...</source>
@@ -788,7 +788,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Synchronize Streams</source>
-      <translation>ストレームの同期</translation>
+      <translation>ストリームの同期</translation>
     </message>
     <message>
       <source>Disable Stream Synchronization</source>
@@ -1315,7 +1315,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>License activated</source>
-      <translation>アクティベートされたライセンス</translation>
+      <translation>ライセンスを有効化しました</translation>
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
@@ -1468,7 +1468,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Short</source>
-      <translation>短い</translation>
+      <translation>短い形式</translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
@@ -1478,7 +1478,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Long</source>
-      <translation>文字数</translation>
+      <translation>長い形式</translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
@@ -1722,11 +1722,11 @@ to view more bookmarks</source>
     <name>QnAdjustVideoDialog</name>
     <message>
       <source>Image Enhancement</source>
-      <translation>イメージ拡張</translation>
+      <translation>画像補正</translation>
     </message>
     <message>
       <source>Image Enhancement - %1</source>
-      <translation>イメージ拡張 - %1</translation>
+      <translation>画像補正 - %1</translation>
     </message>
   </context>
   <context>
@@ -2055,7 +2055,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>If the backup is not set up on the current server of the cameras, their archive will not be backed up.</source>
-      <translation>バックアップでは、このサーバでカメラが設定されていない場合、そのアーカイブはバックアップされません</translation>
+      <translation>バックアップ設定を行っていないサーバーにカメラ管理が移動した場合、そのカメラの映像はバックアップされません。</translation>
     </message>
   </context>
   <context>
@@ -2082,7 +2082,7 @@ to view more bookmarks</source>
     <message>
       <source>Hi-Res Streams</source>
       <comment>Cameras Backup</comment>
-      <translation>高解像度ストリーム</translation>
+      <translation>低解像度ストリーム</translation>
     </message>
     <message>
       <source>All Streams</source>
@@ -2695,7 +2695,7 @@ to view more bookmarks</source>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation>%1 の記録を無効</translation>
+      <translation>%1 の録画が無効です</translation>
     </message>
   </context>
   <context>
@@ -2722,7 +2722,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Invalid current password.</source>
-      <translation>無効はパスワード.</translation>
+      <translation>現在のパスワードと一致しません</translation>
     </message>
   </context>
   <context>
@@ -4132,11 +4132,11 @@ to %1</source>
     </message>
     <message>
       <source>Server Time</source>
-      <translation>サーバー時間</translation>
+      <translation>サーバー時刻</translation>
     </message>
     <message>
       <source>Client Time</source>
-      <translation>クライアント時間</translation>
+      <translation>クライアント時刻</translation>
     </message>
     <message>
       <source>Stretch</source>
@@ -4199,7 +4199,7 @@ to %1</source>
     </message>
     <message>
       <source>Image Enhancement</source>
-      <translation>イメージ拡張</translation>
+      <translation>画像補正</translation>
     </message>
     <message>
       <source>Hi-Res</source>
@@ -4301,7 +4301,7 @@ to %1</source>
     </message>
     <message>
       <source>Systems will be merged shortly</source>
-      <translation>システムをすぐに統合されます</translation>
+      <translation>システムはすぐに統合されます</translation>
     </message>
     <message>
       <source>You will be reconnected.</source>
@@ -4745,11 +4745,11 @@ to %1</source>
     </message>
     <message>
       <source>Native</source>
-      <translation>Native</translation>
+      <translation>モニタ解像度と同じ</translation>
     </message>
     <message>
       <source>Quarter Native</source>
-      <translation>Quarter Native</translation>
+      <translation>モニタ解像度の1/4</translation>
     </message>
   </context>
   <context>
@@ -5216,7 +5216,7 @@ to %1</source>
     </message>
     <message>
       <source>%1 (up %2)</source>
-      <translation>%1 (最大 %2)</translation>
+      <translation>%1 (稼働 %2)</translation>
     </message>
   </context>
   <context>
@@ -5537,7 +5537,7 @@ to %1</source>
     </message>
     <message>
       <source>Activate License</source>
-      <translation>ライセンスのアクティベート</translation>
+      <translation>ライセンスを有効化</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
@@ -6032,27 +6032,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Remote archive synchronization has been started</source>
-      <translation>リモートアーカイブの同期が開始されました</translation>
+      <translation>カメラストレージとの同期が開始されました</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been finished</source>
-      <translation>リモートアーカイブの同期が完了しました</translation>
+      <translation>カメラストレージとの同期が完了しました</translation>
     </message>
     <message>
       <source>Remote archive synchronization is in progress</source>
-      <translation>リモートアーカイブの同期が進行中です</translation>
+      <translation>カメラストレージとの同期が進行中です</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been started for the following device:</source>
-      <translation>次のデバイスのリモートアーカイブ同期が開始されました：</translation>
+      <translation>次のデバイスのカメラストレージとの同期が開始されました：</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
-      <translation>次のデバイスのリモートアーカイブ同期が完了しました：</translation>
+      <translation>次のデバイスのカメラストレージとの同期が完了しました：</translation>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation>Remote archive synchronization</translation>
+      <translation>カメラストレージとの同期</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
@@ -6086,7 +6086,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No online server in the System has internet access for time synchronization.</source>
-      <translation>システム内のどのオンラインサーバーにも時間同期のためのインターネットアクセスはありません。</translation>
+      <translation>システム内のどのオンラインサーバーにも時刻同期のためのインターネットアクセスはありません。</translation>
     </message>
     <message>
       <source>The System is running in safe mode.</source>
@@ -6635,7 +6635,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchIncompatibleServersActionHandler</name>
     <message>
       <source>Systems will be merged shortly</source>
-      <translation>システムをすぐに統合されます</translation>
+      <translation>システムはすぐに統合されます</translation>
     </message>
     <message>
       <source>Servers from the other System will appear in the resource tree.</source>
@@ -7595,7 +7595,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Native</source>
       <comment>Native PTZ preset type</comment>
-      <translation>Native</translation>
+      <translation>モニタ解像度と同じ</translation>
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
@@ -9259,7 +9259,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
-      <translation>透かし模様は、管理者以外のユーザーのライブ、アーカイブ、エクスポートされたビデオに表示されます。あなたや他の管理者が透かし模様を見ることはありません。</translation>
+      <translation>透かし模様は、管理者以外のユーザーのライブ、アーカイブ、エクスポート後の映像に表示されます。あなたや他の管理者が透かし模様を見ることはありません。</translation>
     </message>
     <message>
       <source>Only client-server video traffic can be encrypted</source>
@@ -9536,11 +9536,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::TimestampOverlaySettingsWidget</name>
     <message>
       <source>Long</source>
-      <translation>文字数</translation>
+      <translation>長い形式</translation>
     </message>
     <message>
       <source>Short</source>
-      <translation>短い</translation>
+      <translation>短い形式</translation>
     </message>
   </context>
   <context>
@@ -9908,12 +9908,12 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation>ライセンスの無効化のために以下を完了してください</translation>
+      <translation>以下を入力してください</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
       <translation>
-        <numerusform>各ライセンスキーは最大 %n 回無効化されることに注意してください。</numerusform>
+        <numerusform>各ライセンスキーの無効化は最大%n回までとなりますのでご注意ください</numerusform>
       </translation>
     </message>
   </context>
@@ -10173,7 +10173,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Delete Showreel %1?</source>
-      <translation>Delete Showreel %1?</translation>
+      <translation>シーケンス表示「%1」を削除しますか?</translation>
     </message>
   </context>
   <context>

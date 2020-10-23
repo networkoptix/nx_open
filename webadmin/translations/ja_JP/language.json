@@ -90,7 +90,7 @@
         "maxP2pQueueSizeBytes": "最大P2Pキューサイズ(バイト)",
         "maxRecordQueueSizeBytes": "レコードキューの最大サイズ（バイト）",
         "maxRecordQueueSizeElements": "レコードキューの最大サイズ（要素）",
-        "maxRemoteArchiveSynchronizationThreads": "最大リモートアーカイブ同期スレッド",
+        "maxRemoteArchiveSynchronizationThreads": "最大カメラストレージとの同期スレッド",
         "maxRtspConnectDurationSeconds": "最大RTSP接続期間の秒数",
         "maxSceneItems": "最大シーンアイテム（0はデフォルト）",
         "proxyConnectTimeoutSec": "プロキシ接続タイムアウト（秒）",

@@ -3232,7 +3232,7 @@ to %1</source>
     </message>
     <message>
       <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+      <translation>Het audio-opnameapparaat ondersteunt geen geschikte audioformaten. Selecteer een ander audioapparaat of &quot;geen&quot; in de schermopname-instellingen.</translation>
     </message>
   </context>
   <context>

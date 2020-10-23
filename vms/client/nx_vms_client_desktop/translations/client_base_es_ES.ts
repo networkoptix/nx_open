@@ -3235,7 +3235,7 @@ a %1</translation>
     </message>
     <message>
       <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+      <translation>El dispositivo de captura de audio no admite formatos de audio adecuados. Seleccione otro dispositivo de audio o &quot;ninguno&quot; en la configuración de Grabación de pantalla.</translation>
     </message>
   </context>
   <context>
