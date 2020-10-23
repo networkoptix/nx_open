@@ -70,9 +70,9 @@ std::string jsonTypeName(enum JsonType type)
 }
 
 bool checkJsonObjValue(
-    const struct JsonVal* val, 
-    enum JsonType type, 
-    const char* key, 
+    const struct JsonVal* val,
+    enum JsonType type,
+    const char* key,
     const char* originalString)
 {
     const char* noKeyErrorStr = "[TestStorage, JSON]: no '%s' key found: json string: %s\n";
@@ -86,7 +86,7 @@ bool checkJsonObjValue(
 
     if (val->type != type)
     {
-        LOG(wrongTypeErrorStr, key, jsonTypeName(type).c_str(), 
+        LOG(wrongTypeErrorStr, key, jsonTypeName(type).c_str(),
             jsonTypeName(val->type).c_str(), originalString);
         return false;
     }
@@ -94,9 +94,9 @@ bool checkJsonObjValue(
     return true;
 }
 
-std::string fsJoin(const std::string& subPath1, const std::string& subPath2) 
+std::string fsJoin(const std::string& subPath1, const std::string& subPath2)
 {
-    if (subPath1[subPath1.size() - 1] == '/') 
+    if (subPath1[subPath1.size() - 1] == '/')
         return subPath1 + subPath2;
 
     return subPath1 + "/" + subPath2;
@@ -117,7 +117,7 @@ std::string pathFromTimeStamp(const char* timestampString, const char* durationS
 {
     std::stringstream out;
     time_t t = (time_t)(std::stoll(timestampString) / 1000);
-    struct tm *ltime = localtime(&t);
+    struct tm *ltime = gmtime(&t);
 
     out.fill('0');
     out << (1900 + ltime->tm_year) << "/"
@@ -149,7 +149,7 @@ bool addChunks(JsonVal* arrayVal, FsStubNode* root,  const std::string& rootPath
             return false;
 
         FsStubNode_add(
-            root, 
+            root,
             fsJoin(rootPath,
                    pathFromTimeStamp(startTimeVal->u.string,
                                      durationVal->u.string)).c_str(),

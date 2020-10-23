@@ -4,13 +4,13 @@
 #include <algorithm>
 #include "test_common.h"
 
-TEST_F(TestStorageTest, DISABLED_IODevice_open_Read)
+TEST_F(TestStorageTest, IODevice_open_Read)
 {
     int ecode;
     IODeviceUniquePtr ioDevice1(
         dynamic_cast<TestIODeviceHelper*>(
             storage->open(
-                "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/1453550461076_60000.mkv",
+                "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/12/1453550461076_60000.mkv",
                 nx_spl::io::ReadOnly,
                 &ecode)),
         ioDeviceDeleter);
@@ -28,7 +28,7 @@ TEST_F(TestStorageTest, IODevice_open_Read_NotExisting)
     IODeviceUniquePtr ioDevice1(
         dynamic_cast<TestIODeviceHelper*>(
             storage->open(
-                "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/not_existing.mkv",
+                "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/12/not_existing.mkv",
                 nx_spl::io::ReadOnly,
                 &ecode)),
         ioDeviceDeleter);
@@ -42,7 +42,7 @@ TEST_F(TestStorageTest, IODevice_open_Write_Existing)
     IODeviceUniquePtr ioDevice1(
         dynamic_cast<TestIODeviceHelper*>(
             storage->open(
-                "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/1453550461076_60000.mkv",
+                "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/12/1453550461076_60000.mkv",
                 nx_spl::io::WriteOnly,
                 &ecode)),
         ioDeviceDeleter);
@@ -60,7 +60,7 @@ TEST_F(TestStorageTest, IODevice_open_Write_NotExisting)
     IODeviceUniquePtr ioDevice1(
         dynamic_cast<TestIODeviceHelper*>(
             storage->open(
-                "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/not_existing.mkv",
+                "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/12/not_existing.mkv",
                 nx_spl::io::WriteOnly,
                 &ecode)),
         ioDeviceDeleter);
@@ -68,18 +68,18 @@ TEST_F(TestStorageTest, IODevice_open_Write_NotExisting)
     ASSERT_NE(ioDevice1.get(), nullptr);
     ASSERT_TRUE(
         storage->fileExists(
-            "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/not_existing.mkv",
+            "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/12/not_existing.mkv",
             nullptr));
 }
 
-TEST_F(TestStorageTest, DISABLED_IODevice_MediaFile_Read_Seek)
+TEST_F(TestStorageTest, IODevice_MediaFile_Read_Seek)
 {
     char buf[512];
     int ecode;
     IODeviceUniquePtr ioDevice1(
         dynamic_cast<TestIODeviceHelper*>(
             storage->open(
-                "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/1453550461076_60000.mkv",
+                "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/12/1453550461076_60000.mkv",
                 nx_spl::io::ReadOnly,
                 &ecode)),
         ioDeviceDeleter);

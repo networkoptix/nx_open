@@ -52,10 +52,10 @@ TEST_F(TestFileInfoIteratorTest, Folders)
     fileIterator->releaseRef();
 }
 
-TEST_F(TestFileInfoIteratorTest, DISABLED_Files)
+TEST_F(TestFileInfoIteratorTest, Files)
 {
     auto fileIterator = storage->getFileIterator(
-        "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/", 
+        "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/12/",
         nullptr);
     ASSERT_TRUE(fileIterator);
 
@@ -63,15 +63,15 @@ TEST_F(TestFileInfoIteratorTest, DISABLED_Files)
     auto fInfo = fileIterator->next(&ecode);
     ASSERT_EQ(ecode, nx_spl::error::NoError);
     ASSERT_EQ(strcmp(
-        fInfo->url, 
-        "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/1453550461075_60000.mkv"), 0);
+        fInfo->url,
+        "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/12/1453550461075_60000.mkv"), 0);
     ASSERT_EQ(fInfo->type, nx_spl::isFile);
 
     fInfo = fileIterator->next(&ecode);
     ASSERT_EQ(ecode, nx_spl::error::NoError);
     ASSERT_EQ(strcmp(
-        fInfo->url, 
-        "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/15/1453550461076_60000.mkv"), 0);
+        fInfo->url,
+        "test://storage/some/path/hi_quality/someCameraId1/2016/01/23/12/1453550461076_60000.mkv"), 0);
 
     fileIterator->releaseRef();
 }
