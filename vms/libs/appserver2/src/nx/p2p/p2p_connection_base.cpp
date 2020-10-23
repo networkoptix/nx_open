@@ -426,6 +426,16 @@ MessageType ConnectionBase::getMessageType(const nx::Buffer& buffer, bool isClie
         : MessageType::unknown;
 }
 
+void ConnectionBase::setMaxSendBufferSize(size_t value)
+{
+    m_timer.post(
+        [this, value]()
+        {
+            m_extraBufferSize = m_dataToSend.dataSize();
+            m_maxBufferSize = value;
+        });
+}
+
 void ConnectionBase::sendMessage(const nx::Buffer& data)
 {
     NX_ASSERT(!data.isEmpty());
@@ -463,7 +473,7 @@ void ConnectionBase::sendMessage(const nx::Buffer& data)
 #else
             m_dataToSend.push_back(data);
 #endif
-            if (m_maxBufferSize > 0 && m_dataToSend.dataSize() > m_maxBufferSize)
+            if (m_maxBufferSize > 0 && m_dataToSend.dataSize() > m_maxBufferSize + m_extraBufferSize)
             {
                 NX_WARNING(this,
                     "p2p send queue overflow for peer %1, queue size: %2. Close connection.",
@@ -495,6 +505,7 @@ void ConnectionBase::onMessageSent(SystemError::ErrorCode errorCode, size_t byte
         return;
     }
     using namespace std::placeholders;
+    m_extraBufferSize = std::max(int64_t(0), m_extraBufferSize - m_dataToSend.front().size());
     m_dataToSend.pop_front();
     if (!m_dataToSend.empty())
     {

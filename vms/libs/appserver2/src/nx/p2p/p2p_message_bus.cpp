@@ -322,7 +322,7 @@ void MessageBus::createOutgoingConnections(
                 std::make_unique<ConnectionContext>(),
                 std::move(connectionLockGuard),
                 [this](const auto& remotePeer) { return validateRemotePeerData(remotePeer); }));
-            connection->setMaxSendBufferSize(commonModule()->globalSettings()->maxRecorderQueueSizeBytes());
+            connection->setMaxSendBufferSize(commonModule()->globalSettings()->maxP2pQueueSizeBytes());
             m_outgoingConnections.insert(remoteConnection.peerId, connection);
             ++m_connectionTries;
             connectSignals(connection);

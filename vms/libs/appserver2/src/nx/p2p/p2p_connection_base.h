@@ -107,7 +107,12 @@ public:
     QString idForToStringFromPtr() const;
     QString lastErrorMessage() const { return m_lastErrorMessage; }
 
-    void setMaxSendBufferSize(size_t value) { m_maxBufferSize = value; }
+    /**
+     * Limit the unsent buffer size in bytes. If buffer overflow then connection is closed with error.
+     * Note: the size control is applied for messages that was sent after this call only.
+     */
+    void setMaxSendBufferSize(size_t value);
+
     size_t maxSendBufferSize() const { return m_maxBufferSize; }
     size_t sendBufferSize() const { return m_dataToSend.dataSize(); }
 signals:
@@ -202,6 +207,7 @@ private:
     QByteArray m_connectionGuid;
     size_t m_startedClassId = 0;
     QString m_lastErrorMessage;
+    int64_t m_extraBufferSize = 0;
     size_t m_maxBufferSize = 0;
 };
 

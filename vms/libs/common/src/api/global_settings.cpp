@@ -59,7 +59,7 @@ const int kProxyConnectTimeoutDefault = 5;
 
 const QString kMaxP2pQueueSizeBytesName("maxP2pQueueSizeBytes");
 const QString kMaxP2pQueueSizeForAllClientsBytesName("maxP2pAllClientsSizeBytes");
-const int kMaxP2pQueueSizeBytesDefault = 1024 * 1024 * 50;
+const int kMaxP2pQueueSizeBytesDefault = 1024 * 1024 * 128;
 const qint64 kMaxP2pQueueSizeForAllClientsBytesDefault = 1024 * 1024 * 1024;
 const QString kMaxRecorderQueueSizeBytesName("maxRecordQueueSizeBytes");
 const int kMaxRecorderQueueSizeBytesDefault = 1024 * 1024 * 24;
