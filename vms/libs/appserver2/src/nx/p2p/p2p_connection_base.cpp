@@ -505,7 +505,7 @@ void ConnectionBase::onMessageSent(SystemError::ErrorCode errorCode, size_t byte
         return;
     }
     using namespace std::placeholders;
-    m_extraBufferSize = std::max(int64_t(0), m_extraBufferSize - m_dataToSend.front().size());
+    m_extraBufferSize = std::max(int64_t(0), m_extraBufferSize - int64_t(m_dataToSend.front().size()));
     m_dataToSend.pop_front();
     if (!m_dataToSend.empty())
     {
