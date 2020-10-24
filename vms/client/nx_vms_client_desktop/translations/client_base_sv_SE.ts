@@ -3237,7 +3237,7 @@ till %1</translation>
     </message>
     <message>
       <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+      <translation>Ljudupptagningsenheten stöder inga lämpliga ljudformat. Välj en annan ljudenhet eller &quot;ingen&quot; i inställningarna för skärminspelning.</translation>
     </message>
   </context>
   <context>
