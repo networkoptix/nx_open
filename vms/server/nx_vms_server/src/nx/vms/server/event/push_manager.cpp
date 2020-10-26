@@ -262,16 +262,11 @@ PushNotification PushManager::makeNotification(const vms::event::AbstractActionP
     const auto params = action->getParams();
     const auto event = action->getRuntimeParams();
     const auto common = serverModule()->commonModule();
-    const auto resource =
-        [&]()
-        {
-            for (const auto& id: event.metadata.cameraRefs)
-            {
-                if (const auto r = resourcePool()->getResourceById(QnUuid::fromStringSafe(id)))
-                    return r;
-            }
-            return resourcePool()->getResourceById(event.eventResourceId);
-        }();
+
+    // Mobile Client can not handle more than one resource.
+    QnResourcePtr resource;
+    if (const auto ids = event.sourceResourceIds(); !ids.empty())
+        resource = resourcePool()->getResourceById(ids.front());
 
     auto language = common->globalSettings()->pushNotificationsLanguage();
     if (language.isEmpty())

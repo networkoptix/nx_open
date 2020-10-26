@@ -82,6 +82,21 @@ void EventParameters::setAnalyticsEngineId(const QnUuid& id)
     analyticsEngineId = id;
 }
 
+std::vector<QnUuid> EventParameters::sourceResourceIds() const
+{
+    std::vector<QnUuid> result;
+    for (const auto& ref: metadata.cameraRefs)
+    {
+        if (const auto id = QnUuid::fromStringSafe(ref); !id.isNull())
+            result.push_back(id);
+    }
+
+    if (!eventResourceId.isNull())
+        result.push_back(eventResourceId);
+
+    return result;
+}
+
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS_FOR_TYPES(
     (EventMetaData)(EventParameters),
     (ubjson)(json)(eq)(xml)(csv_record), _Fields, (brief, true))

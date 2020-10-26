@@ -91,14 +91,9 @@ public:
         event.eventType = type;
         event.eventTimestampUsec = 111222333444555;
         if (options & cameraRef)
-        {
-            event.eventResourceId = serverId;
             event.metadata.cameraRefs.push_back(resource.toString());
-        }
         else
-        {
             event.eventResourceId = std::move(resource);
-        }
 
         ActionParameters action;
         if (users.empty())
@@ -164,9 +159,7 @@ public:
             resource.toSimpleString());
     }
 
-    void setUserPermissions(
-        const std::string& users,
-        vms::api::GlobalPermission permissions = vms::api::GlobalPermission::adminPermissions)
+    void setUserPermissions(const std::string& users, vms::api::GlobalPermission permissions)
     {
         for (const auto u: users)
             m_users[QString(u)]->setRawPermissions(permissions);
@@ -320,24 +313,44 @@ TEST_F(PushManagerTest, Permissions)
 {
     setUserPermissions("ab", vms::api::GlobalPermission::none);
     {
-        const auto sent = testEvent(EventType::cameraMotionEvent, cameraId);
+        const auto sent = testEvent(EventType::cameraMotionEvent, cameraId, {}, {}, {}, addSource);
         ASSERT_TRUE(sent);
         EXPECT_LIST(sent->targets, ({"c@xxx.com"}));
         EXPECT_EQ(sent->notification.title, "Motion on Camera");
     }
+    {
+        const auto sent = testEvent(EventType::userDefinedEvent, cameraId, {}, {}, {}, cameraRef);
+        ASSERT_TRUE(sent);
+        EXPECT_LIST(sent->targets, ({"c@xxx.com"}));
+        EXPECT_EQ(sent->notification.title, "Generic Event");
+    }
+
     setUserPermissions("bc", vms::api::GlobalPermission::viewerPermissions);
     {
-        const auto sent = testEvent(EventType::cameraMotionEvent, cameraId);
+        const auto sent = testEvent(EventType::cameraMotionEvent, cameraId, {}, {}, {}, addSource);
         ASSERT_TRUE(sent);
         EXPECT_LIST(sent->targets, ({"b@xxx.com", "c@xxx.com"}));
         EXPECT_EQ(sent->notification.title, "Motion on Camera");
     }
-    setUserPermissions("abc");
     {
-        const auto sent = testEvent(EventType::cameraMotionEvent, cameraId);
+        const auto sent = testEvent(EventType::userDefinedEvent, cameraId, {}, {}, {}, cameraRef);
+        ASSERT_TRUE(sent);
+        EXPECT_LIST(sent->targets, ({"b@xxx.com", "c@xxx.com"}));
+        EXPECT_EQ(sent->notification.title, "Generic Event");
+    }
+
+    setUserPermissions("abc", vms::api::GlobalPermission::adminPermissions);
+    {
+        const auto sent = testEvent(EventType::cameraMotionEvent, cameraId, {}, {}, {}, addSource);
         ASSERT_TRUE(sent);
         EXPECT_LIST(sent->targets, ({"a@xxx.com", "b@xxx.com", "c@xxx.com"}));
         EXPECT_EQ(sent->notification.title, "Motion on Camera");
+    }
+    {
+        const auto sent = testEvent(EventType::userDefinedEvent, cameraId, {}, {}, {}, cameraRef);
+        ASSERT_TRUE(sent);
+        EXPECT_LIST(sent->targets, ({"a@xxx.com", "b@xxx.com", "c@xxx.com"}));
+        EXPECT_EQ(sent->notification.title, "Generic Event");
     }
 }
 

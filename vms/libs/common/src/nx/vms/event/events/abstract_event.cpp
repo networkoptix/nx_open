@@ -270,27 +270,49 @@ bool hasAccessToSource(const EventParameters& params, const QnUserResourcePtr& u
 
     const auto context = user->commonModule();
 
-    const auto eventType = params.eventType;
-
-    const auto resource = context->resourcePool()->getResourceById(params.eventResourceId);
-    const bool hasViewPermission = resource && context->resourceAccessManager()->hasPermission(
-        user, resource, Qn::ViewContentPermission);
-
-    if (isSourceCameraRequired(eventType))
+    if (isSourceCameraRequired(params.eventType))
     {
-        const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
-        NX_ASSERT(camera, "Event has occurred without its camera %1", params.eventResourceId);
-        return camera && hasViewPermission;
+        const auto camera = context->resourcePool()->getResourceById(params.eventResourceId)
+            .dynamicCast<QnVirtualCameraResource>();
+        if (!NX_ASSERT(camera, "Event has occurred without its camera %1", params.eventResourceId))
+            return false;
+        const auto hasPermission = context->resourceAccessManager()->hasPermission(
+            user, camera, Qn::ViewContentPermission);
+        NX_VERBOSE(NX_SCOPE_TAG, "%1 %2 permission for the event from the camera %3",
+            user, hasPermission ? "has" : "has not", camera);
+        return hasPermission;
     }
 
-    if (isSourceServerRequired(eventType))
+    if (isSourceServerRequired(params.eventType))
     {
-        const auto server = resource.dynamicCast<QnMediaServerResource>();
-        NX_ASSERT(server, "Event has occurred without its server %1", params.eventResourceId);
-        /* Only admins should see notifications with servers. */
-        return server && hasViewPermission;
+        const auto server = context->resourcePool()->getResourceById(params.eventResourceId)
+            .dynamicCast<QnMediaServerResource>();
+        if (!NX_ASSERT(server, "Event has occurred without its server %1", params.eventResourceId))
+            return false;
+        const auto hasPermission = context->resourceAccessManager()->hasPermission(
+            user, server, Qn::ViewContentPermission);
+        NX_VERBOSE(NX_SCOPE_TAG, "%1 %2 permission for the event from the server %3",
+            user, hasPermission ? "has" : "has not", server);
+        return hasPermission;
     }
 
+    if (const auto ids = params.sourceResourceIds(); !ids.empty())
+    {
+        for (const auto& id: ids)
+        {
+            if (const auto r = context->resourcePool()->getResourceById(id);
+                context->resourceAccessManager()->hasPermission(user, r, Qn::ViewContentPermission))
+            {
+                NX_VERBOSE(NX_SCOPE_TAG, "%1 has permission for the event from %2", user, r);
+                return true;
+            }
+        }
+        NX_VERBOSE(NX_SCOPE_TAG, "%1 has not permission for the event from resources %2",
+            user, containerString(ids));
+        return false;
+    }
+
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 has permission for the event with no source");
     return true;
 }
 
