@@ -333,6 +333,8 @@ public:
 
 void NX_NETWORK_API serializeHeaders(const HttpHeaders& headers, BufferType* const dstBuffer);
 
+NX_NETWORK_API extern const StringType kDeletedCookieValue;
+
 class NX_NETWORK_API Request
 {
 public:

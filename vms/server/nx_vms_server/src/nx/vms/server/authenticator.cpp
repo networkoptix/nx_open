@@ -111,9 +111,9 @@ Authenticator::Result Authenticator::tryAllMethods(
             const auto value = nx::network::http::getHeaderValue(
                 request.headers, Qn::EC2_RUNTIME_GUID_HEADER_NAME);
 
-            // Some browsers like chrome refuse to delete expited cookies. Since this value is
+            // Some browsers like chrome refuse to delete expired cookies. Since this value is
             // copied from it we have to check it was not deleted.
-            return value == "deleted" ? nx::network::http::StringType() : value;
+            return value == nx::network::http::kDeletedCookieValue ? nx::network::http::StringType() : value;
         }();
 
     if (!sessionKey.isEmpty())

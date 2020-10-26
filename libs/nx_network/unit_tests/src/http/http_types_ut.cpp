@@ -462,7 +462,7 @@ static const auto kTestResponse = QByteArrayList({
     "X-Runtime-Guid: {d1a49afe-a2a2-990a-2c54-b77e768e6ad2}",
     "Set-Cookie: username=admin; Path=/",
     "Set-Cookie: authorizationKey=88d13fb76ea9; Path=/; HttpOnly",
-    "Set-Cookie: orderId=deleted; Path=/; expires=Thu, 01 Jan 1970 00:00 : 00 GMT",
+    "Set-Cookie: orderId=_DELETED_COOKIE_VALUE_; Path=/; expires=Thu, 01 Jan 1970 00:00 : 00 GMT",
 ""}).join("\r\n");
 
 static const std::map<nx::String, nx::String> kTestCookie{

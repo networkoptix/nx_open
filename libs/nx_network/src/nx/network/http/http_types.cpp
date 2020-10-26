@@ -605,6 +605,8 @@ bool parseRequestOrResponse(
     return true;
 }
 
+const StringType kDeletedCookieValue("_DELETED_COOKIE_VALUE_");
+
 bool Request::parse(const ConstBufferRefType& data)
 {
     return parseRequestOrResponse(data, this, &Request::requestLine);
@@ -651,7 +653,9 @@ BufferType Request::getCookieValue(const BufferType& name) const
     for (const BufferType& value : cookieIter->second.split(';'))
     {
         QList<BufferType> params = value.split('=');
-        if (params.size() > 1 && params[0].trimmed() == name)
+        // Some browsers like chrome refuse to delete expired cookies so we check if they
+        // were not deleted.
+        if (params.size() > 1 && params[0].trimmed() == name && params[1] != kDeletedCookieValue)
             return params[1];
     }
 
@@ -734,7 +738,7 @@ void Response::setCookie(
 void Response::setDeletedCookie(const StringType& name)
 {
     insertHeader(&headers, {kSetCookieHeaderName,
-        name + "=deleted; Path=/; expires=Thu, 01 Jan 1970 00:00 : 00 GMT"});
+        name + "=" + kDeletedCookieValue + "; Path=/; expires=Thu, 01 Jan 1970 00:00 : 00 GMT"});
 }
 
 std::map<StringType, StringType> Response::getCookies() const
@@ -744,7 +748,7 @@ std::map<StringType, StringType> Response::getCookies() const
     for (auto it = setCookieHeaders.first; it != setCookieHeaders.second; ++it)
     {
         const auto data = it->second;
-        if (data.contains("=deleted"))
+        if (data.contains("=" + kDeletedCookieValue))
             continue;
 
         const auto nameEnd = data.indexOf('=');

@@ -401,9 +401,10 @@ TEST_F(AuthenticationTest, getNonce)
     for (const auto& r: {"/api/getNonce?userName=admin", "/web/api/getNonce?userName=admin"})
     {
         expectGetResult(r, {});
-        expectGetResult(r, {{"Cookie", "x-runtime-guid=deleted"}});
-        expectGetResult(r, {{"X-Runtime-Guid", "deleted"}});
-        expectGetResult(r, {{"Cookie", "x-runtime-guid=deleted"}, {"X-Runtime-Guid", "deleted"}});
+        expectGetResult(r, {{"Cookie", "x-runtime-guid=_DELETED_COOKIE_VALUE_"}});
+        expectGetResult(r, {{"X-Runtime-Guid", "_DELETED_COOKIE_VALUE_"}});
+        expectGetResult(r, {{"Cookie", "x-runtime-guid=_DELETED_COOKIE_VALUE_"},
+            {"X-Runtime-Guid", "_DELETED_COOKIE_VALUE_"}});
     }
 }
 
