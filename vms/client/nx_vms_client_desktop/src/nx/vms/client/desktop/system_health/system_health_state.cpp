@@ -298,7 +298,7 @@ bool SystemHealthState::Private::calculateState(SystemHealthIndex index) const
                 && !qnClientShowOnce->testFlag(kCloudPromoShowOnceKey);
 
         case SystemHealthIndex::StoragesNotConfigured:
-            return !m_serversWithoutStorages.empty();
+            return isAdmin() && !m_serversWithoutStorages.empty();
 
         default:
             NX_ASSERT(false, "This system health index is not handled by SystemHealthState");
