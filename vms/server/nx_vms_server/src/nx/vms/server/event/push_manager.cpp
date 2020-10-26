@@ -263,11 +263,6 @@ PushNotification PushManager::makeNotification(const vms::event::AbstractActionP
     const auto event = action->getRuntimeParams();
     const auto common = serverModule()->commonModule();
 
-    // Mobile Client can not handle more than one resource.
-    QnResourcePtr resource;
-    if (const auto ids = event.sourceResourceIds(); !ids.empty())
-        resource = resourcePool()->getResourceById(ids.front());
-
     auto language = common->globalSettings()->pushNotificationsLanguage();
     if (language.isEmpty())
     {
@@ -278,7 +273,11 @@ PushNotification PushManager::makeNotification(const vms::event::AbstractActionP
     QnTranslationManager::LocaleRollback localeGuard(
         serverModule()->findInstance<QnTranslationManager>(), language);
 
+    // Mobile Client can not handle more than one resource.
+    const auto resources = vms::event::sourceResources(event, common->resourcePool());
+    const auto resource = (resources && !resources->isEmpty()) ? resources->front() : QnResourcePtr();
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
+
     vms::event::StringsHelper strings(common);
     const auto caption = params.sayText.isEmpty() //< Used to store custom caption text.
         ? strings.notificationCaption(event, camera, /*useHtml*/ false)

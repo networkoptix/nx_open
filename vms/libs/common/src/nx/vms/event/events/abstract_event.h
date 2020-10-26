@@ -47,6 +47,15 @@ bool isSourceCameraRequired(EventType eventType);
 /** Check if server required for this event to OCCUR. Always includes requiresServerResource(). */
 bool isSourceServerRequired(EventType eventType);
 
+/**
+ * Finds all resources related to this event.
+ * - std::nullopt - means there are no any resources.
+ * - QnResourceList - the list of resources, that could be found. Empty list means there were some
+ * incorrect id's in the list.
+ */
+std::optional<QnResourceList> sourceResources(
+    const EventParameters& params, QnResourcePool* resourcePool);
+
 /** Checks if the user has an access to this event. */
 bool hasAccessToSource(const EventParameters& params, const QnUserResourcePtr& user);
 

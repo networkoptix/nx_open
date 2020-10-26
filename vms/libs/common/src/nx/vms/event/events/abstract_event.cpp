@@ -263,6 +263,32 @@ bool isSourceServerRequired(EventType eventType)
     }
 }
 
+std::optional<QnResourceList> sourceResources(
+    const EventParameters& params, QnResourcePool* resourcePool)
+{
+    if (params.eventResourceId.isNull() && params.metadata.cameraRefs.empty())
+        return std::nullopt;
+
+    QnResourceList result;
+    for (const auto& ref: params.metadata.cameraRefs)
+    {
+        if (auto r = camera_id_helper::findCameraByFlexibleId(resourcePool, ref))
+            result.push_back(std::move(r));
+        else
+            NX_DEBUG(NX_SCOPE_TAG, "Unable to find event %1 resource ref %2", params.eventType, ref);
+    }
+
+    if (const auto& id = params.eventResourceId; !id.isNull())
+    {
+        if (auto r = resourcePool->getResourceById(id))
+            result.push_back(std::move(r));
+        else
+            NX_DEBUG(NX_SCOPE_TAG, "Unable to find event %1 resource id %2", params.eventType, id);
+    }
+
+    return result;
+}
+
 bool hasAccessToSource(const EventParameters& params, const QnUserResourcePtr& user)
 {
     if (!user || !user->commonModule())
@@ -298,24 +324,26 @@ bool hasAccessToSource(const EventParameters& params, const QnUserResourcePtr& u
         return hasPermission;
     }
 
-    if (const auto ids = params.sourceResourceIds(); !ids.empty())
+    const auto resources = sourceResources(params, context->resourcePool());
+    if (!resources)
     {
-        for (const auto& id: ids)
-        {
-            if (const auto r = context->resourcePool()->getResourceById(id);
-                context->resourceAccessManager()->hasPermission(user, r, Qn::ViewContentPermission))
-            {
-                NX_VERBOSE(NX_SCOPE_TAG, "%1 has permission for the event from %2", user, r);
-                return true;
-            }
-        }
-        NX_VERBOSE(NX_SCOPE_TAG, "%1 has not permission for the event from resources %2",
-            user, containerString(ids));
-        return false;
+        NX_VERBOSE(NX_SCOPE_TAG, "%1 has permission for the event with no source");
+        return true;
     }
 
-    NX_VERBOSE(NX_SCOPE_TAG, "%1 has permission for the event with no source");
-    return true;
+    for (const auto& r: *resources)
+    {
+        if (context->resourceAccessManager()->hasPermission(user, r, Qn::ViewContentPermission))
+        {
+            NX_VERBOSE(NX_SCOPE_TAG, "%1 has permission for the event from %2", user, r);
+            return true;
+        }
+    }
+
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 has not permission for the event from %2",
+        user, containerString(*resources));
+    return false;
+
 }
 
 AbstractEvent::AbstractEvent(

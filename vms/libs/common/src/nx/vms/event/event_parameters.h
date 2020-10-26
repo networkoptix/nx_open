@@ -110,9 +110,6 @@ struct EventParameters
 
     /** Hash for events aggregation. */
     QnUuid getParamsHash() const;
-
-    /** All source resource ids related to this object (including eventResourceId and metadata.cameraRefs). */
-    std::vector<QnUuid> sourceResourceIds() const;
 };
 
 #define EventParameters_Fields \
