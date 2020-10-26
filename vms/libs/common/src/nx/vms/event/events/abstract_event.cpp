@@ -289,8 +289,10 @@ bool hasAccessToSource(const EventParameters& params, const QnUserResourcePtr& u
             .dynamicCast<QnMediaServerResource>();
         if (!NX_ASSERT(server, "Event has occurred without its server %1", params.eventResourceId))
             return false;
-        const auto hasPermission = context->resourceAccessManager()->hasPermission(
-            user, server, Qn::ViewContentPermission);
+
+        // Only admins should see notifications with servers.
+        const auto hasPermission = context->resourceAccessManager()->hasGlobalPermission(
+            user, GlobalPermission::admin);
         NX_VERBOSE(NX_SCOPE_TAG, "%1 %2 permission for the event from the server %3",
             user, hasPermission ? "has" : "has not", server);
         return hasPermission;
