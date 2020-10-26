@@ -612,9 +612,9 @@ QnCompressedMetadata::QnCompressedMetadata(MetadataType type, int bufferSize):
 
 QnAbstractMediaData* QnCompressedMetadata::clone() const
 {
-    QnCompressedMetadata* cloned = new QnCompressedMetadata(metadataType, 0);
+    auto cloned = new QnCompressedMetadata(metadataType, 0);
     cloned->assign(this);
-    cloned->m_data.write(m_data.constData(), m_data.size());
+    cloned->m_data = m_data;
     return cloned;
 }
 
