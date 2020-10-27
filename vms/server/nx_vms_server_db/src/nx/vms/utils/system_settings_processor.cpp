@@ -8,6 +8,7 @@
 #include <nx_ec/access_helpers.h>
 #include <rest/server/json_rest_result.h>
 #include <audit/audit_manager.h>
+#include <utils/crypt/symmetrical.h>
 
 #include <QStringLiteral>
 
@@ -84,7 +85,17 @@ nx::network::http::StatusCode::Value SystemSettingsProcessor::updateSettings(
                 setting->serializedValue(),
                 paramIter.value());
 
-            setting->setSerializedValue(paramIter.value());
+            // It's a crutch. A full fledged fix is in the 4.3.
+            if (setting->key() == nx::settings_names::kNamePassword)
+            {
+                setting->setSerializedValue(
+                    nx::utils::encodeHexStringFromStringAES128CBC(paramIter.value()));
+            }
+            else
+            {
+                setting->setSerializedValue(paramIter.value());
+            }
+
             dirty = true;
             auditManager()->notifySettingsChanged(authSession, setting->key());
         }
