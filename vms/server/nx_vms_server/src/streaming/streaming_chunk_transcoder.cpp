@@ -141,7 +141,10 @@ bool StreamingChunkTranscoder::transcodeAsync(
 
         const auto liveCache = camera->liveCache(transcodeParams.streamQuality());
         if (!liveCache)
+        {
+            chunk->doneModification(StreamingChunk::rcError);
             return false;
+        }
 
         const quint64 cacheEndTimestamp = liveCache->currentTimestamp();
         if (transcodeParams.alias().isEmpty() &&
