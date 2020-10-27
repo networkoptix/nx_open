@@ -48,31 +48,44 @@ MSSettings::MSSettings(
 
 void MSSettings::initializeROSettingsFromConfFile(const QString& fileName)
 {
+    NX_DEBUG(this, "Init RO settings file: %1", fileName);
     m_roSettings.reset(new QSettings(fileName, QSettings::IniFormat));
 }
 
 void MSSettings::initializeROSettings()
 {
-#ifndef _WIN32
-    QFileInfo defaultFileInfo(defaultConfigFileName);
-    if (!defaultFileInfo.exists())
-    {
-        QFileInfo templateInfo(templateConfigFileName);
-        if (templateInfo.exists())
+    #ifndef _WIN32
+        QFileInfo defaultFileInfo(defaultConfigFileName);
+        if (!defaultFileInfo.exists())
         {
-            QFile file(templateConfigFileName);
-            file.rename(defaultConfigFileName);
+            QFileInfo templateInfo(templateConfigFileName);
+            if (templateInfo.exists())
+            {
+                QFile file(templateConfigFileName);
+                if (file.rename(defaultConfigFileName))
+                {
+                    NX_DEBUG(this, "Using RO settings template file: %1", templateConfigFileName);
+                }
+                else
+                {
+                    NX_DEBUG(this, "Failed to use RO settings template file: %1 -- %2",
+                        templateConfigFileName, file.error());
+                }
+            }
         }
-    }
-#endif
+
+        NX_DEBUG(this, "Init RO settings default file: %1", defaultConfigFileName);
+    #else
+        NX_DEBUG(this, "Init RO settings system registry: %1/%2",
+            QnAppInfo::organizationName(), QnServerAppInfo::applicationName());
+    #endif
+
     m_roSettings.reset(new QSettings(
-#ifndef _WIN32
-        defaultConfigFileName, QSettings::IniFormat
-#else
-        QSettings::SystemScope,
-        QnAppInfo::organizationName(),
-        QnServerAppInfo::applicationName()
-#endif
+        #ifndef _WIN32
+            defaultConfigFileName, QSettings::IniFormat
+        #else
+            QSettings::SystemScope, QnAppInfo::organizationName(), QnServerAppInfo::applicationName()
+        #endif
     ));
 }
 
@@ -133,17 +146,25 @@ QString MSSettings::defaultConfigDirectory()
 
 void MSSettings::initializeRunTimeSettingsFromConfFile(const QString& fileName)
 {
+    NX_DEBUG(this, "Init run-time settings file: %1", fileName);
     m_rwSettings.reset(new QSettings(fileName, QSettings::IniFormat));
 }
 
 void MSSettings::initializeRunTimeSettings()
 {
+    #ifndef _WIN32
+        NX_DEBUG(this, "Init run-time settings default file: %1", defaultConfigFileNameRunTime);
+    #else
+        NX_DEBUG(this, "Init run-time settings system registry: %1/%2",
+            QnAppInfo::organizationName(), QCoreApplication::applicationName());
+    #endif
+
     m_rwSettings.reset(new QSettings(
-#ifndef _WIN32
-        defaultConfigFileNameRunTime, QSettings::IniFormat
-#else
-        QSettings::SystemScope, QnAppInfo::organizationName(), QCoreApplication::applicationName()
-#endif
+        #ifndef _WIN32
+            defaultConfigFileNameRunTime, QSettings::IniFormat
+        #else
+            QSettings::SystemScope, QnAppInfo::organizationName(), QCoreApplication::applicationName()
+        #endif
     ));
 }
 

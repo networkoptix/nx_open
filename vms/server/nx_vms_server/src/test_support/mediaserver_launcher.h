@@ -102,7 +102,6 @@ private:
     void fillDefaultSettings();
     void setFeatures(MediaServerFeatures features, bool isEnabled);
 
-    std::ofstream m_configFile;
     nx::ut::utils::WorkDirResource m_workDirResource;
     nx::network::SocketAddress m_serverEndpoint;
     QString m_configFilePath;

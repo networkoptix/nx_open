@@ -130,12 +130,31 @@ void MediaServerLauncher::addCmdOption(const std::string& option)
 
 void MediaServerLauncher::prepareToStart()
 {
-    m_configFilePath = *m_workDirResource.getDirName() + lit("/mserver.conf");
-    m_configFile.open(m_configFilePath.toUtf8().constData());
-
     m_settings["removeDbOnStartup"] = m_firstStartup ? "true" : "false";
-    for (const auto& p: m_settings)
-        m_configFile << p.first << " = " << p.second.toStdString() << std::endl;
+
+    m_configFilePath = *m_workDirResource.getDirName() + lit("/mserver.conf");
+    NX_DEBUG(this, "Write config: %1", m_configFilePath);
+
+    std::ofstream configFile;
+    configFile.exceptions(configFile.exceptions() | std::ios::failbit);
+    try
+    {
+        configFile.open(m_configFilePath.toUtf8().constData());
+        for (const auto& p: m_settings)
+        {
+            NX_VERBOSE(this, "Set: %1 = %2", p.first, p.second);
+            configFile << p.first << " = " << p.second.toStdString() << std::endl;
+        }
+
+        configFile.flush();
+        configFile.close();
+        NX_DEBUG(this, "Written config: %1", m_configFilePath);
+    }
+    catch (const std::exception& e)
+    {
+        NX_ASSERT(false, "Unable to write config '%1': %2", m_configFilePath, e.what());
+        std::cerr << e.what() << '\n';
+    }
 
     m_cmdOptions.push_back("--conf-file=" + m_configFilePath.toUtf8().toStdString());
 
@@ -143,9 +162,6 @@ void MediaServerLauncher::prepareToStart()
     std::transform(m_cmdOptions.cbegin(), m_cmdOptions.cend(), std::back_inserter(argv),
         [](const std::string& s) { return s.data(); });
     argv.push_back(nullptr);
-
-    m_configFile.flush();
-    m_configFile.close();
 
     m_mediaServerProcess.reset();
     m_mediaServerProcess.reset(new MediaServerProcess((int) argv.size() - 1, (char**) argv.data()));
