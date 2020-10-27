@@ -127,7 +127,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Verifying update package</source>
-      <translation type="unfinished">Verifying update package</translation>
+      <translation>正在验证更新包</translation>
     </message>
   </context>
   <context>
@@ -1578,23 +1578,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>This camera does not support advanced PTZ</source>
-      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+      <translation>本摄像机不支持高级PTZ</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation type="unfinished">Zooming out...</translation>
+      <translation>正在缩小...</translation>
     </message>
     <message>
       <source>Moving...</source>
-      <translation type="unfinished">Moving...</translation>
+      <translation>正在移动...</translation>
     </message>
     <message>
       <source>Zooming in...</source>
-      <translation type="unfinished">Zooming in...</translation>
+      <translation>正在放大...</translation>
     </message>
     <message>
       <source>Focusing...</source>
-      <translation type="unfinished">Focusing...</translation>
+      <translation>对焦中...</translation>
     </message>
   </context>
   <context>
@@ -2033,11 +2033,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Storage added</source>
-      <translation type="unfinished">Storage added</translation>
+      <translation>已添加存储</translation>
     </message>
     <message>
       <source>Storage updated</source>
-      <translation type="unfinished">Storage updated</translation>
+      <translation>存储已更新</translation>
     </message>
     <message>
       <source>Storage removed</source>

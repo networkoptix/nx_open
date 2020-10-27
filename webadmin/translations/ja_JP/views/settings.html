@@ -105,8 +105,7 @@
 <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
                                    target="_blank">詳細情報</a></uib-alert>
-                            <uib-alert type="danger" ng-if="!hasInternetOnServer">サーバー設定を行う為にインターネットに接続します
-{{Config.cloud.productName}}</uib-alert>
+                            <uib-alert type="danger" ng-if="!hasInternetOnServer">{{Config.cloud.productName}}の設定を行うためには、サーバーをインターネットに接続してください。</uib-alert>
                             <uib-alert type="danger" ng-if="hasInternetOnServer && !hasInternetOnClient">システムを{{Config.cloud.productName}}に接続するのにインターネット接続が必要です</uib-alert>
                             <p ng-if="canConnectToCloud"><button
                                     class="btn btn-default"

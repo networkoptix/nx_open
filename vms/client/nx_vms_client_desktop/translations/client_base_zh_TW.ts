@@ -2033,7 +2033,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Storage added</source>
-      <translation>增加存儲空間</translation>
+      <translation>存儲空間已增加</translation>
     </message>
     <message>
       <source>Storage updated</source>
@@ -3201,7 +3201,7 @@ to %1</source>
     </message>
     <message>
       <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+      <translation>未偵測到合適的音頻格式。請選擇其他音源裝置，或請在“螢幕錄影”設定中選擇 &quot;無&quot;。</translation>
     </message>
   </context>
   <context>

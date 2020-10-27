@@ -8341,11 +8341,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Equidistant</source>
-      <translation>等距離</translation>
+      <translation>等立体角射影</translation>
     </message>
     <message>
       <source>Stereographic</source>
-      <translation>ステレオグラフィック</translation>
+      <translation>立体射影</translation>
     </message>
     <message>
       <source>Equisolid</source>
