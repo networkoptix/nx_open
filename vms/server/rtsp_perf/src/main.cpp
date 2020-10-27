@@ -39,6 +39,23 @@ static bool validateConfig(const RtspPerf::Config& config)
     return true;
 }
 
+static bool loadUrlsFromFile(const QString& filePath, QStringList* urls)
+{
+    std::ifstream file(filePath.toUtf8().constData());
+    if (!file)
+    {
+        print(std::cerr, "ERROR: Failed to open file with url list: %1",
+            filePath.toUtf8().constData());
+        return false;
+    }
+
+    std::string url;
+    while (std::getline(file, url))
+        urls->push_back(url.c_str());
+
+    return true;
+}
+
 static std::optional<RtspPerf::Config> makeConfig(const QCoreApplication& app)
 {
     QCommandLineParser parser;
@@ -91,6 +108,11 @@ static std::optional<RtspPerf::Config> makeConfig(const QCoreApplication& app)
         "'--server' will be ignored. Repeat to set multiple URLs.", "url", "");
     parser.addOption(urlOption);
 
+    QCommandLineOption urlFileOption(QStringList() << "url-file",
+        "The path to the file containing URLS, otherwise the behavior is the same as the url "
+        "parameter", "url-file", "");
+    parser.addOption(urlFileOption);
+
     QCommandLineOption logLevelOption(QStringList() << "log-level",
         "Log level: one of NONE, ERROR, WARNING, INFO, DEBUG, VERBOSE.", "level", "");
     parser.addOption(logLevelOption);
@@ -138,6 +160,11 @@ static std::optional<RtspPerf::Config> makeConfig(const QCoreApplication& app)
     config.sessionConfig.archivePosition =
         std::chrono::milliseconds(parser.value(archivePositionOption).toLongLong());
 
+    if (parser.isSet(urlFileOption))
+    {
+        if (!loadUrlsFromFile(parser.value(urlFileOption), &config.urls))
+            return std::nullopt;
+    }
     if (parser.isSet(logLevelOption))
     {
         const QString logLevel = parser.value(logLevelOption);
