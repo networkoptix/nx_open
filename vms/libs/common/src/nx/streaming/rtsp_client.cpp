@@ -46,6 +46,8 @@ auto splitKeyValue(const QString& nameAndValue, QChar delimiter)
 
 } // namespace
 
+QString extractRtspParam(const QString& buffer, const QString& paramName);
+
 const QByteArray QnRtspClient::kPlayCommand("PLAY");
 const QByteArray QnRtspClient::kSetupCommand("SETUP");
 const QByteArray QnRtspClient::kOptionsCommand("OPTIONS");
@@ -442,7 +444,7 @@ CameraDiagnostics::Result QnRtspClient::sendDescribe()
         return result;
     }
 
-    QString rangeStr = extractRTSPParam(QLatin1String(response), QLatin1String("Range:"));
+    QString rangeStr = extractRtspParam(QLatin1String(response), QLatin1String("Range:"));
     if (!rangeStr.isEmpty())
         parseRangeHeader(rangeStr);
 
@@ -452,6 +454,12 @@ CameraDiagnostics::Result QnRtspClient::sendDescribe()
         return CameraDiagnostics::NoMediaTrackResult(m_url);
     }
 
+    m_contentBase = parseContentBase(response);
+    return CameraDiagnostics::NoErrorResult();
+}
+
+QString QnRtspClient::parseContentBase(const QString& response)
+{
     /*
      * RFC2326
      * 1. The RTSP Content-Base field.
@@ -461,12 +469,23 @@ CameraDiagnostics::Result QnRtspClient::sendDescribe()
      * treated as if it were an empty embedded URL, and thus inherits the
      * entire base URL.
     */
-    m_contentBase = extractRTSPParam(QLatin1String(response), QLatin1String("Content-Base:"));
-    if (m_contentBase.isEmpty())
-        m_contentBase = extractRTSPParam(QLatin1String(response), QLatin1String("Content-Location:"));
-    if (m_contentBase.isEmpty())
-        m_contentBase = m_url.toString(); // TODO remove url params?
-    return CameraDiagnostics::NoErrorResult();
+    QString contentBase = extractRtspParam(response, "Content-Base:");
+    if (!contentBase.isEmpty())
+    {
+        if (nx::utils::Url(contentBase).isValid())
+            return contentBase;
+        NX_DEBUG(this, "Invalid Content-Base url: [%1], ignore it", contentBase);
+    }
+
+    contentBase = extractRtspParam(response, "Content-Location:");
+    if (!contentBase.isEmpty())
+    {
+        if (nx::utils::Url(contentBase).isValid())
+            return contentBase;
+        NX_DEBUG(this, "Invalid Content-Location url: [%1], ignore it", contentBase);
+    }
+
+    return m_url.toString(); // TODO remove url params?
 }
 
 bool QnRtspClient::play(qint64 positionStart, qint64 positionEnd, double scale)
@@ -585,7 +604,7 @@ CameraDiagnostics::Result QnRtspClient::sendOptions()
     if (!result)
         NX_DEBUG(this, "OPTIONS request failed for URL %1", request.requestLine.url);
 
-    QString allowedMethods = extractRTSPParam(QLatin1String(response), QLatin1String("Public:"));
+    QString allowedMethods = extractRtspParam(QLatin1String(response), QLatin1String("Public:"));
     if (!allowedMethods.contains("GET_PARAMETER"))
         m_config.disableKeepAlive = true;
 
@@ -671,7 +690,6 @@ bool QnRtspClient::sendSetup()
             // full track url in a prefix
             request.requestLine.url = setupUrl;
         }
-
         request.requestLine.version = nx::network::rtsp::rtsp_1_0;
         addCommonHeaders(request.headers);
 
@@ -738,7 +756,7 @@ bool QnRtspClient::sendSetup()
 
 void QnRtspClient::parseSetupResponse(const QString& response, SDPTrackInfo* track, int trackIndex)
 {
-    QString sessionParam = extractRTSPParam(response, QLatin1String("Session:"));
+    QString sessionParam = extractRtspParam(response, QLatin1String("Session:"));
     bool isFirstParam = true;
     for (const auto& parameter: sessionParam.split(';', QString::SkipEmptyParts))
     {
@@ -764,7 +782,7 @@ void QnRtspClient::parseSetupResponse(const QString& response, SDPTrackInfo* tra
         }
     }
 
-    QString transportParam = extractRTSPParam(response, "Transport:");
+    QString transportParam = extractRtspParam(response, "Transport:");
 
     for (const auto& parameter: transportParam.split(';', QString::SkipEmptyParts))
     {
@@ -909,18 +927,18 @@ bool QnRtspClient::sendPlay(qint64 startPos, qint64 endPos, double scale)
 
     while (1)
     {
-        QString cseq = extractRTSPParam(QLatin1String(response), QLatin1String("CSeq:"));
+        QString cseq = extractRtspParam(QLatin1String(response), QLatin1String("CSeq:"));
         if (cseq.toInt() == (int)m_csec-1)
             break;
         else if (!readTextResponse(response))
             return false; // try next response
     }
 
-    QString tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Range:"));
+    QString tmp = extractRtspParam(QLatin1String(response), QLatin1String("Range:"));
     if (!tmp.isEmpty())
         parseRangeHeader(tmp);
 
-    tmp = extractRTSPParam(QLatin1String(response), QLatin1String("x-video-layout:"));
+    tmp = extractRtspParam(QLatin1String(response), QLatin1String("x-video-layout:"));
     if (!tmp.isEmpty())
         m_videoLayout = tmp; // refactor here: add all attributes to list
 
@@ -1020,7 +1038,7 @@ bool QnRtspClient::processTextResponseInsideBinData()
         textResponse.append((const char*) m_responseBuffer, curPtr - m_responseBuffer);
         memmove(m_responseBuffer, curPtr, bEnd - curPtr);
         m_responseBufferLen = bEnd - curPtr;
-        QString tmp = extractRTSPParam(QLatin1String(textResponse), QLatin1String("Range:"));
+        QString tmp = extractRtspParam(QLatin1String(textResponse), QLatin1String("Range:"));
         if (!tmp.isEmpty())
             parseRangeHeader(tmp);
     }
@@ -1213,7 +1231,7 @@ bool QnRtspClient::readTextResponse(QByteArray& response)
     return false;
 }
 
-QString QnRtspClient::extractRTSPParam(const QString& buffer, const QString& paramName)
+QString extractRtspParam(const QString& buffer, const QString& paramName)
 {
     int pos = buffer.indexOf(paramName, 0, Qt::CaseInsensitive);
     if (pos > 0)
@@ -1239,7 +1257,7 @@ QString QnRtspClient::extractRTSPParam(const QString& buffer, const QString& par
 
 void QnRtspClient::updateTransportHeader(QByteArray& response)
 {
-    QString tmp = extractRTSPParam(QLatin1String(response), QLatin1String("Transport:"));
+    QString tmp = extractRtspParam(QLatin1String(response), QLatin1String("Transport:"));
     if (tmp.size() > 0)
     {
         QStringList tmpList = tmp.split(QLatin1Char(';'));

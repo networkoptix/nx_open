@@ -285,6 +285,7 @@ public:
     void parseSetupResponse(const QString& response, SDPTrackInfo* outTrack, int trackIndex);
     std::chrono::milliseconds keepAliveTimeOut() const { return m_keepAliveTimeOut; }
     QString sessionId() const { return m_SessionId; }
+
 private:
     void addRangeHeader( nx::network::http::Request* const request, qint64 startPos, qint64 endPos );
     nx::network::http::Request createDescribeRequest();
@@ -295,7 +296,6 @@ private:
     bool readTextResponse(QByteArray &response);
     void addAuth( nx::network::http::Request* const request );
 
-    QString extractRTSPParam(const QString &buffer, const QString &paramName);
     void updateTransportHeader(QByteArray &response);
 
     bool parseSDP(const QByteArray& response);
@@ -308,6 +308,7 @@ private:
     bool sendRequestInternal(nx::network::http::Request&& request);
     void addCommonHeaders(nx::network::http::HttpHeaders& headers);
     void addAdditionalHeaders(const QString& requestName, nx::network::http::HttpHeaders* outHeaders);
+    QString parseContentBase(const QString& buffer);
 
     QByteArray nptPosToString(qint64 posUsec) const;
 
