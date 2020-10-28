@@ -145,10 +145,18 @@ QRectF interpolatedRectangle(
     microseconds futureRectangleTimestamp,
     microseconds timestamp)
 {
-    if (!rectangle.isValid())
+    const auto isValidRectangle =
+        [](const QRectF& rect)
+        {
+            // Rectangle can be used as a point, and that's OK.
+            return AreaHighlightOverlayWidget::AreaInformation::isPoint(rect)
+                || rect.isValid();
+        };
+
+    if (!isValidRectangle(rectangle))
         return futureRectangle;
 
-    if (!futureRectangle.isValid())
+    if (!isValidRectangle(futureRectangle))
         return rectangle;
 
     if (futureRectangleTimestamp <= rectangleTimestamp)

@@ -24,7 +24,8 @@ public:
          * API allows to send only text info, assigned to a certain point. This is implemented by
          * sending a null rectangle, which top left pos is used as a point coordinates.
          */
-        bool isPoint() { return rectangle.isNull(); }
+        static bool isPoint(const QRectF& rect) { return rect.isNull(); }
+        bool isPoint() { return isPoint(rectangle); }
     };
 
     AreaHighlightOverlayWidget(QGraphicsWidget* parent);
