@@ -75,7 +75,7 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(0, massSystemUpdateClearDownloads,
         "[Dev] Forces the Client to remove downloaded data for system updates.");
 
-    NX_INI_FLAG(true, skipUpdateFilesVerification, "[Dev] Skip update files signature check.");
+    NX_INI_FLAG(false, skipUpdateFilesVerification, "[Dev] Skip update files signature check.");
 
     NX_INI_FLAG(0, forceCompatibilityMode,
         "[Dev] Forces the compatibility mode dialog to appear when connecting to the system.");

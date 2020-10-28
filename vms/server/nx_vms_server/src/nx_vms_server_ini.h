@@ -44,7 +44,7 @@ struct Ini: public nx::kit::IniConfig
         "After this delay server will start update installation automatically if detects that\n"
         "it was supposed to install the update.");
 
-    NX_INI_FLAG(true, skipUpdateFilesVerification, "Skip update files signature check.");
+    NX_INI_FLAG(false, skipUpdateFilesVerification, "Skip update files signature check.");
 
     NX_INI_FLAG(0, disableArchiveIntegrityWatcher, "Disables media files integrity check.");
 
