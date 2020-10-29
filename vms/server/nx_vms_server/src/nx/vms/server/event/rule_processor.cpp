@@ -500,8 +500,7 @@ vms::event::AbstractActionPtr RuleProcessor::processToggleableAction(
     const bool condOK = checkRuleCondition(event, rule);
     vms::event::AbstractActionPtr action;
 
-    EventRuleKey key(rule->getUniqueId(), event->getExternalUniqueKey());
-    RunningRuleInfo& runtimeRule = m_rulesInProgress[key];
+    RunningRuleInfo& runtimeRule = m_rulesInProgress[rule->getUniqueId()];
 
     // Ignore 'Off' event if some event resources are still running.
     if (event->getToggleState() == vms::api::EventState::inactive && !runtimeRule.resources.isEmpty())
@@ -533,11 +532,18 @@ vms::event::AbstractActionPtr RuleProcessor::processToggleableAction(
 
     bool isActionRunning = action && action->getToggleState() == vms::api::EventState::active;
     if (isActionRunning)
-        runtimeRule.isActionRunning.insert(QnUuid());
+        runtimeRule.isActionRunning.insert(ResourceKey());
     else
         runtimeRule.isActionRunning.clear();
 
     return action;
+}
+
+RuleProcessor::ResourceKey RuleProcessor::getResourceKey(const vms::event::AbstractEventPtr& event) const
+{
+    return event->getResource()
+        ? ResourceKey(event->getResource()->getId(), event->getExternalUniqueKey())
+        : ResourceKey();
 }
 
 vms::event::AbstractActionPtr RuleProcessor::processInstantAction(
@@ -545,26 +551,25 @@ vms::event::AbstractActionPtr RuleProcessor::processInstantAction(
     const vms::event::RulePtr& rule)
 {
     bool condOK = checkRuleCondition(event, rule);
-    EventRuleKey key(rule->getUniqueId(), event->getExternalUniqueKey());
-    RunningRuleMap::iterator itr = m_rulesInProgress.find(key);
+    RunningRuleMap::iterator itr = m_rulesInProgress.find(rule->getUniqueId());
     if (itr != m_rulesInProgress.end())
     {
         // Instant action connected to continue event.
         // Update stats to prevent multiple action for repeation 'on' event state.
         RunningRuleInfo& runtimeRule = itr->second;
-        QnUuid resId = event->getResource() ? event->getResource()->getId() : QnUuid();
+        const auto resourceKey = getResourceKey(event);
 
         if (condOK && event->getToggleState() == vms::api::EventState::active)
         {
             // Allow separate action for each resource of source event but ingore repeated 'on' state.
-            if (runtimeRule.isActionRunning.contains(resId))
+            if (runtimeRule.isActionRunning.contains(resourceKey))
                 return vms::event::AbstractActionPtr(); //< If action by rule was already run.
             else
-                runtimeRule.isActionRunning.insert(resId);
+                runtimeRule.isActionRunning.insert(resourceKey);
         }
         else
         {
-            runtimeRule.isActionRunning.remove(resId);
+            runtimeRule.isActionRunning.remove(resourceKey);
         }
     }
 
@@ -686,13 +691,12 @@ vms::event::AbstractActionList RuleProcessor::matchActions(
         // TODO: think a bit more about reasoning in this piece of code
         // Add to rulesInProgress
         // For continuing event put information to m_eventsInProgress.
-        QnUuid resId = event->getResource() ? event->getResource()->getId() : QnUuid();
-        EventRuleKey key(rule->getUniqueId(), event->getExternalUniqueKey());
-        RunningRuleInfo& runtimeRule = m_rulesInProgress[key];
+        const auto resourceKey = getResourceKey(event);
+        RunningRuleInfo& runtimeRule = m_rulesInProgress[rule->getUniqueId()];
         if (event->getToggleState() == vms::api::EventState::active)
-            runtimeRule.resources[resId] = event;
+            runtimeRule.resources[resourceKey] = event;
         else
-            runtimeRule.resources.remove(resId);
+            runtimeRule.resources.remove(resourceKey);
 
         vms::event::AbstractActionPtr action;
 
@@ -705,7 +709,7 @@ vms::event::AbstractActionList RuleProcessor::matchActions(
             result.push_back(action);
 
         // Remove from rulesInProgress
-        auto itr = m_rulesInProgress.find(key);
+        auto itr = m_rulesInProgress.find(rule->getUniqueId());
         if (itr != m_rulesInProgress.end() && itr->second.resources.isEmpty())
             m_rulesInProgress.erase(itr); // clear running info if event is finished (all running event resources actually finished)
     }
@@ -828,21 +832,20 @@ void RuleProcessor::at_resourceMonitor(const QnResourcePtr& resource,  bool isAd
 
 void RuleProcessor::terminateRunningRule(const vms::event::RulePtr& rule)
 {
-    EventRuleKey key(rule->getUniqueId(), QString());
-    auto itr = m_rulesInProgress.lower_bound(key);
-    while (itr != m_rulesInProgress.end() && itr->first.ruleId == rule->getUniqueId())
+    auto itr = m_rulesInProgress.find(rule->getUniqueId());
+    if (itr != m_rulesInProgress.end())
     {
 
         const RunningRuleInfo& runtimeRule = itr->second;
         bool isToggledAction = vms::event::hasToggleState(rule->actionType()); //< We decided to terminate continuous actions only if rule is changed.
         if (!runtimeRule.isActionRunning.isEmpty() && !runtimeRule.resources.isEmpty() && isToggledAction)
         {
-            for (const QnUuid& resId: runtimeRule.isActionRunning)
+            for (const auto& resourceKey: runtimeRule.isActionRunning)
             {
                 // Terminate all actions. If action is instant, terminate all resources on which it was started.
                 vms::event::AbstractEventPtr event;
-                if (!resId.isNull())
-                    event = runtimeRule.resources.value(resId);
+                if (!resourceKey.resourceId.isNull())
+                    event = runtimeRule.resources.value(resourceKey);
                 else
                     event = runtimeRule.resources.begin().value(); //< For continuous action, resourceID is not specified and only one record is used.
                 if (event)
@@ -859,14 +862,14 @@ void RuleProcessor::terminateRunningRule(const vms::event::RulePtr& rule)
             }
         }
         itr = m_rulesInProgress.erase(itr);
-
-        QString aggKey = rule->getUniqueId();
-        auto actionItr = m_aggregateActions.lowerBound(aggKey);
-        while (actionItr != m_aggregateActions.end() && actionItr.key().startsWith(aggKey))
-            actionItr = m_aggregateActions.erase(actionItr);
     }
-}
 
+    QString aggKey = rule->getUniqueId();
+    auto actionItr = m_aggregateActions.lowerBound(aggKey);
+    while (actionItr != m_aggregateActions.end() && actionItr.key().startsWith(aggKey))
+        actionItr = m_aggregateActions.erase(actionItr);
+
+}
 void RuleProcessor::at_ruleRemoved(QnUuid id)
 {
     QnMutexLocker lock(&m_mutex);
@@ -931,16 +934,27 @@ void RuleProcessor::notifyResourcesAboutEventIfNeccessary(
 }
 
 
-RuleProcessor::EventRuleKey::EventRuleKey(const QString& ruleId, const QString& eventKey):
-    ruleId(ruleId), eventKey(eventKey)
+RuleProcessor::ResourceKey::ResourceKey(const QnUuid& resourceId, const QString& resourceExtId):
+    resourceId(resourceId), resourceExtId(resourceExtId)
 {
 }
 
-bool RuleProcessor::EventRuleKey::operator<(const EventRuleKey& right) const
+bool RuleProcessor::ResourceKey::operator<(const ResourceKey& right) const
 {
-    if (ruleId != right.ruleId)
-        return ruleId < right.ruleId;
-    return eventKey < right.eventKey;
+    if (resourceId != right.resourceId)
+        return resourceId < right.resourceId;
+    return resourceExtId < right.resourceExtId;
+}
+
+bool RuleProcessor::ResourceKey::operator==(const ResourceKey& right) const
+{
+    return resourceId == right.resourceId
+        && resourceExtId == right.resourceExtId;
+}
+
+uint qHash(const RuleProcessor::ResourceKey& key)
+{
+    return qHash(key.resourceId) ^ qHash(key.resourceExtId);
 }
 
 } // namespace event

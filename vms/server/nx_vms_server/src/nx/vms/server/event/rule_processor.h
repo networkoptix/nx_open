@@ -93,6 +93,18 @@ class RuleProcessor:
     Q_OBJECT
 
 public:
+
+    struct ResourceKey
+    {
+        ResourceKey() = default;
+        ResourceKey(const QnUuid& resourceId, const QString& resourceExtId);
+        bool operator<(const ResourceKey& right) const;
+        bool operator==(const ResourceKey& right) const;
+
+        QnUuid resourceId;
+        QString resourceExtId;
+    };
+
     RuleProcessor(QnMediaServerModule* serverModule);
     virtual ~RuleProcessor() override;
 
@@ -202,20 +214,11 @@ private:
     struct RunningRuleInfo
     {
         RunningRuleInfo() {}
-        QMap<QnUuid, vms::event::AbstractEventPtr> resources;
-        QSet<QnUuid> isActionRunning; // actions that has been started by resource. Continues action starts only onces for all event resources.
+        QMap<ResourceKey, vms::event::AbstractEventPtr> resources;
+        QSet<ResourceKey> isActionRunning; // actions that has been started by resource. Continues action starts only onces for all event resources.
     };
 
-    struct EventRuleKey
-    {
-        EventRuleKey(const QString& ruleId, const QString& eventKey);
-        bool operator<(const EventRuleKey& right) const;
-
-        QString ruleId;
-        QString eventKey;
-    };
-
-    using RunningRuleMap = std::map<EventRuleKey, RunningRuleInfo>;
+    using RunningRuleMap = std::map<QString, RunningRuleInfo>;
 
     /**
      * @brief m_eventsInProgress Events that are toggled and state is On
@@ -230,6 +233,7 @@ private:
 
     void processEventInternal(const vms::event::AbstractEventPtr& event);
     void processDelayedEvents();
+    ResourceKey getResourceKey(const vms::event::AbstractEventPtr& event) const;
 
     QMap<QString, ProcessorAggregationInfo> m_aggregateActions; // aggregation counter for instant actions
     QMap<QString, QSet<QnUuid>> m_actionInProgress;               // remove duplicates for long actions
@@ -248,6 +252,8 @@ private:
     std::map<nx::vms::server::resource::Camera*, QWeakPointer<nx::vms::server::resource::Camera>>
         m_knownCameras;
 };
+
+uint qHash(const RuleProcessor::ResourceKey& key);
 
 } // namespace event
 } // namespace vms::server
