@@ -519,5 +519,24 @@ TEST_F(CameraSettingsDialogStateReducerTest, analyzedStreamIndexAndVisibility)
     ASSERT_EQ(state3.analytics.streamByEngineId.value(testEngineId)(), State::StreamIndex::undefined);
 }
 
+/**
+ * Make sure when the quality limits is changed (e.g. 'Low' become unavailable), brush should be
+ * changed accordingly.
+ */
+TEST_F(CameraSettingsDialogStateReducerTest, qualityLimitsChangeKeepsBrush)
+{
+    CameraResourceStubPtr camera(new CameraResourceStub());
+    State initialState = Reducer::loadCameras({}, {camera});
+
+    EXPECT_EQ(initialState.recording.minRelevantQuality, nx::vms::api::StreamQuality::lowest);
+    EXPECT_EQ(initialState.recording.brush.isAutomaticBitrate(), true);
+    EXPECT_EQ(initialState.recording.brush.quality, nx::vms::api::StreamQuality::normal);
+
+    // With minimal fps we can have the only one bitrate, so it is called the best.
+    State minFpsState = Reducer::setScheduleBrushFps(std::move(initialState), 1);
+    EXPECT_EQ(minFpsState.recording.minRelevantQuality, nx::vms::api::StreamQuality::highest);
+    EXPECT_EQ(minFpsState.recording.brush.quality, nx::vms::api::StreamQuality::highest);
+}
+
 } // namespace test
 } // namespace nx::vms::client::desktop

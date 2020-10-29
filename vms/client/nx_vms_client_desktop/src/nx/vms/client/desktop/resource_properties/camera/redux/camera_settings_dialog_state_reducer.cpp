@@ -167,9 +167,10 @@ Qn::StreamQuality calculateQualityForBitrateMbps(const State& state, float bitra
 
 State loadMinMaxCustomBitrate(State state)
 {
-    state.recording.minBitrateMbps = calculateBitrateForQualityMbps(state,
+    State::RecordingSettings& settings = state.recording;
+    settings.minBitrateMbps = calculateBitrateForQualityMbps(state,
         Qn::StreamQuality::lowest);
-    state.recording.maxBitrateMpbs = calculateBitrateForQualityMbps(state,
+    settings.maxBitrateMpbs = calculateBitrateForQualityMbps(state,
         Qn::StreamQuality::highest);
 
     static const std::array<Qn::StreamQuality, 4> kUserVisibleQualities{{
@@ -178,15 +179,18 @@ State loadMinMaxCustomBitrate(State state)
         Qn::StreamQuality::high,
         Qn::StreamQuality::highest}};
 
-    state.recording.minRelevantQuality = Qn::StreamQuality::lowest;
+    settings.minRelevantQuality = Qn::StreamQuality::lowest;
     for (const auto quality: kUserVisibleQualities)
     {
         const auto bitrate = calculateBitrateForQualityMbps(state, quality);
-        if (bitrate <= state.recording.minBitrateMbps)
-            state.recording.minRelevantQuality = quality;
+        if (bitrate <= settings.minBitrateMbps)
+            settings.minRelevantQuality = quality;
         else
             break;
     }
+
+    // Brush quality may not be lower than minimal.
+    settings.brush.quality = std::max(settings.brush.quality, settings.minRelevantQuality);
 
     return state;
 }
