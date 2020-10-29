@@ -3233,7 +3233,7 @@ to %1</source>
     </message>
     <message>
       <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+      <translation>Il dispositivo di acquisizione audio non supporta formati audio idonei. Selezionare un altro dispositivo audio o &quot;nessuno&quot; nelle impostazioni di registrazione.</translation>
     </message>
   </context>
   <context>
