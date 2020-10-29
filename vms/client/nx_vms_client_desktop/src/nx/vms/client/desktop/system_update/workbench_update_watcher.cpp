@@ -332,7 +332,7 @@ void WorkbenchUpdateWatcher::showUpdateNotification(
     }
 
     if (result != QDialogButtonBox::Cancel)
-        action(action::SystemUpdateAction)->trigger();
+        menu()->trigger(action::SystemUpdateAction);
 }
 
 const UpdateContents& WorkbenchUpdateWatcher::getUpdateContents() const

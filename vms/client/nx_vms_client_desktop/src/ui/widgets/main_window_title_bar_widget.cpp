@@ -153,7 +153,7 @@ QnMainWindowTitleBarWidget::QnMainWindowTitleBarWidget(
     connect(d->mainMenuButton, &ToolButton::justPressed, this,
         [this]()
         {
-            action(action::MainMenuAction)->trigger();
+            menu()->trigger(action::MainMenuAction);
         });
 
     connect(action(action::MainMenuAction), &QAction::triggered, this,
@@ -287,7 +287,7 @@ void QnMainWindowTitleBarWidget::mouseDoubleClickEvent(QMouseEvent* event)
         return;
     }
 
-    action(action::EffectiveMaximizeAction)->trigger();
+    menu()->trigger(action::EffectiveMaximizeAction);
     event->accept();
 #endif
 }

@@ -556,7 +556,11 @@ void QnWorkbenchDisplay::initSceneView()
 
     /* Note that selection often changes there and back, and we don't want such changes to
      * affect our logic, so we use queued connections here. */ // TODO: #Elric I don't see queued connections
-    connect(m_scene, SIGNAL(selectionChanged()), context()->action(action::SelectionChangeAction), SLOT(trigger()));
+    connect(m_scene, &QGraphicsScene::selectionChanged, this,
+        [this]
+        {
+            context()->menu()->trigger(action::SelectionChangeAction);
+        });
     connect(m_scene, SIGNAL(selectionChanged()), this, SLOT(at_scene_selectionChanged()));
     connect(m_scene, SIGNAL(destroyed()), this, SLOT(at_scene_destroyed()));
 

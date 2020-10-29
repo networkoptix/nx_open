@@ -294,7 +294,7 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
     {
         // We must handle 'move' event _before_ we activate fullscreen.
         qApp->processEvents();
-        context->action(nx::vms::client::desktop::ui::action::EffectiveMaximizeAction)->trigger();
+        context->menu()->trigger(ui::action::EffectiveMaximizeAction);
     }
     else
     {

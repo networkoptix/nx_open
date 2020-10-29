@@ -17,6 +17,7 @@
 #include <ui/help/help_topics.h>
 
 #include <watchers/cloud_status_watcher.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 
 // TODO: #dklychkov Uncomment when cloud login is implemented
 //#define DIRECT_CLOUD_CONNECT
@@ -79,7 +80,7 @@ QnCloudStatusPanel::QnCloudStatusPanel(QWidget* parent):
         {
             if (qnCloudStatusWatcher->status() == QnCloudStatusWatcher::LoggedOut)
             {
-                action(action::LoginToCloud)->trigger();
+                context()->menu()->trigger(action::LoginToCloud);
                 return;
             }
 

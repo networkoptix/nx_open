@@ -73,7 +73,7 @@ ResourceTreeWorkbenchPanel::ResourceTreeWorkbenchPanel(
             NX_ASSERT(!m_inSelection);
 
             QScopedValueRollback<bool> guard(m_inSelection, true);
-            action(action::SelectionChangeAction)->trigger();
+            menu()->trigger(action::SelectionChangeAction);
         });
 
     connect(action(action::SelectionChangeAction), &QAction::triggered, this,

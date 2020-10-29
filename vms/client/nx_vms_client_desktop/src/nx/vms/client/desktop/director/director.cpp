@@ -5,6 +5,7 @@
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/debug_utils/instruments/debug_info_instrument.h>
 
 namespace nx::vmx::client::desktop {
@@ -35,13 +36,13 @@ void Director::quit(bool force)
     if (force)
     {
         executeDelayedParented(
-            [this] { context()->action(action::DelayedForcedExitAction)->trigger(); },
+            [this] { context()->menu()->trigger(action::DelayedForcedExitAction); },
             kQuitDelay, this);
     }
     else
     {
         executeDelayedParented(
-            [this] { context()->action(action::ExitAction)->trigger(); },
+            [this] { context()->menu()->trigger(action::ExitAction); },
             kQuitDelay, this);
     }
 }

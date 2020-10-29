@@ -812,7 +812,7 @@ void LayoutsHandler::closeLayoutsInternal(
     }
 
     if (workbench()->layouts().empty())
-        action(action::OpenNewTabAction)->trigger();
+        menu()->trigger(action::OpenNewTabAction);
 }
 
 bool LayoutsHandler::closeAllLayouts(bool force)

@@ -318,7 +318,7 @@ QnWorkbenchConnectHandler::QnWorkbenchConnectHandler(QObject* parent):
             if (mainWindow()->welcomeScreen())
                 mainWindow()->setWelcomeScreenVisible(!checked);
             if (workbench()->layouts().isEmpty())
-                action(action::OpenNewTabAction)->trigger();
+                menu()->trigger(action::OpenNewTabAction);
         }, Qt::QueuedConnection); //< QueuedConnection is needed here because 2 title bars
                                   // (windowed/welcomescreen and fullscreen) are subscribed
                                   // to MainMenuAction, and main menu must not change
@@ -505,7 +505,7 @@ void QnWorkbenchConnectHandler::handleConnectReply(
                 executeDelayedParented(
                     [this]
                     {
-                        action(action::ExitAction)->trigger();
+                        menu()->trigger(action::ExitAction);
                     }, kVideowallCloseTimeoutMSec, this
                 );
             }

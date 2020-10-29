@@ -765,7 +765,7 @@ bool MainWindow::event(QEvent* event)
 {
     const bool result = base_type::event(event);
     if (event->type() == QnEvent::WinSystemMenu)
-        action(action::MainMenuAction)->trigger();
+        menu()->trigger(action::MainMenuAction);
 
     return result;
 }
