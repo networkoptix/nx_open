@@ -327,9 +327,7 @@ static bool extractSubstring(const char** pdata, StringRef* stringRef)
 
     stringRef->data = *pdata;
     stringRef->size = current - *pdata;
-
-    if (*current)
-        *pdata = current + 1;
+    *pdata = *current ? current + 1 : current;
 
     return true;
 }
