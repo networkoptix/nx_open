@@ -204,6 +204,86 @@ nx::network::SocketAddress QnPlAxisResourceSearcher::obtainFixedHostAddress(
     return useDiscoveredAddress ? discoveredAddress : lastNonIpv4LinkLocalTimeMarkedAddress.address;
 }
 
+QString macFromHexData(const char* data)
+{
+    QString result;
+    for (int i = 0; i < 12; i++)
+    {
+        if (i > 0 && i % 2 == 0)
+            result += '-';
+        result += data[i];
+    }
+    return result;
+}
+
+bool parseNameAndMacFromRawData(const QByteArray& responseData, QString* outName, QString* outMac)
+{
+    int iqpos = responseData.indexOf("AXIS");
+
+    if (iqpos < 0)
+        return false;
+
+    QByteArray prefix2("axis-00");
+    int macpos = responseData.indexOf("- 00", iqpos);
+    if (macpos < 0) {
+        macpos = responseData.indexOf("- AC", iqpos);
+        if (macpos < 0)
+            return false;
+        prefix2 = QByteArray("axis-ac");
+    }
+    macpos += 2;
+
+    for (int i = iqpos; i < macpos; i++)
+    {
+        const unsigned char c = responseData.at(i);
+        if (c < 0x20 || c == 0x7F) // Control char.
+            *outName += QLatin1Char('?');
+        else
+            *outName += QLatin1Char(c); //< Assume Latin-1 encoding.
+    }
+
+    int macpos2 = responseData.indexOf(prefix2, macpos);
+    if (macpos2 > 0)
+        macpos = macpos2 + 5; // replace real MAC to virtual MAC if exists
+
+    if (macpos + 12 > responseData.size())
+        return false;
+
+    while (responseData.at(macpos) == ' ')
+        ++macpos;
+
+    if (macpos + 12 > responseData.size())
+        return false;
+
+    *outMac = macFromHexData(responseData.data() + macpos);
+
+    return true;
+}
+
+bool parseNameAndMacFromMdns(
+    const QnMdnsPacket::ResourceRecord& record, QString* outName, QString* outMac)
+{
+    if (record.recordType != QnMdnsPacket::kTextRecordType)
+        return false;
+
+    if (!record.recordName.contains("AXIS"))
+        return false;
+
+    QByteArray nameAndMac = record.recordName.left(record.recordName.indexOf('.'));
+
+    auto macDelimiter = nameAndMac.lastIndexOf('-');
+    if (macDelimiter == -1)
+        return false;
+
+    *outName = nameAndMac.left(macDelimiter).trimmed();
+    const QByteArray macStr = nameAndMac.mid(macDelimiter + 1).trimmed();
+    if (macStr.size() != 12)
+        return false;
+    *outMac = macFromHexData(macStr.data());
+
+    return true;
+}
+
 QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     const QnResourceList& result,
     const QByteArray& responseData,
@@ -218,59 +298,27 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
 
     QList<QnNetworkResourcePtr> local_results;
 
-    int iqpos = responseData.indexOf("AXIS");
-
-    if (iqpos<0)
-        return local_results;
-
-    QByteArray prefix2("axis-00");
-    int macpos = responseData.indexOf("- 00", iqpos);
-    if (macpos < 0) {
-        macpos = responseData.indexOf("- AC", iqpos);
-        if (macpos < 0)
-            return local_results;
-        prefix2 = QByteArray("axis-ac");
-    }
-    macpos += 2;
-
-    for (int i = iqpos; i < macpos; i++)
+    QnMdnsPacket packet;
+    bool success = false;
+    bool hasDeserializedMdnsPacket = packet.fromDatagram(responseData);
+    if (hasDeserializedMdnsPacket)
     {
-        const unsigned char c = responseData.at(i);
-        if (c < 0x20 || c == 0x7F) // Control char.
-            name += QLatin1Char('?');
-        else
-            name += QLatin1Char(c); //< Assume Latin-1 encoding.
+        for (const auto& record: packet.answerRRs + packet.additionalRRs)
+        {
+            success = parseNameAndMacFromMdns(record, &name, &smac);
+            if (success)
+                break;
+        }
     }
 
-    int macpos2 = responseData.indexOf(prefix2, macpos);
-    if (macpos2 > 0)
-        macpos = macpos2 + 5; // replace real MAC to virtual MAC if exists
+    if (!success)
+        success = parseNameAndMacFromRawData(responseData, &name, &smac);
+    if (!success)
+        return local_results;
 
     name.replace(QLatin1Char(' '), QString()); // remove spaces
     name.replace(QLatin1Char('-'), QString()); // remove spaces
     name.replace(QLatin1Char('\t'), QString()); // remove tabs
-
-    if (macpos+12 > responseData.size())
-        return local_results;
-
-    //macpos++; // -
-
-    while(responseData.at(macpos)==' ')
-        ++macpos;
-
-    if (macpos+12 > responseData.size())
-        return local_results;
-
-    for (int i = 0; i < 12; i++)
-    {
-        if (i > 0 && i % 2 == 0)
-            smac += QLatin1Char('-');
-
-        smac += QLatin1Char(responseData[macpos + i]);
-    }
-
-    //response.fromDatagram(responseData);
-
     smac = smac.toUpper();
 
     for(const QnResourcePtr& res: result)
@@ -301,9 +349,8 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     resource->setMAC(mac);
 
     quint16 port = nx::network::http::DEFAULT_HTTP_PORT;
-    QnMdnsPacket packet;
     bool deviceAddressFound = false;
-    if (packet.fromDatagram(responseData))
+    if (hasDeserializedMdnsPacket)
     {
         auto rrsToInspect = packet.answerRRs + packet.additionalRRs;
 
