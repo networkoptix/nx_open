@@ -7,12 +7,14 @@
 #include <algorithm>
 #include <set>
 
-#include "attributes_parser.h"
-#include "string_helper.h"
 #include <nx/fusion/serialization_format.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/utils/std/cpp14.h>
+
+#include "attributes_parser.h"
+#include "string_helper.h"
+#include "metadata_parser.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -38,7 +40,7 @@ std::vector<QString> addEventTypesForObjectTracking(
 {
     std::set<QString> uniqueIds(ids.begin(), ids.end());
 
-    if (std::find(objectTypes.begin(), objectTypes.end(), "nx.hikvision.event")
+    if (std::find(objectTypes.begin(), objectTypes.end(), "nx.hikvision.ThermalObject")
             != objectTypes.end())
     {
         constexpr char kPattern[] = "nx.hikvision.Alarm%1Thermal%2";

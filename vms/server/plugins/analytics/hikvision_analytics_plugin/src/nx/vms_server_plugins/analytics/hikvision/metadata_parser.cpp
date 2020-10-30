@@ -5,6 +5,8 @@
 
 #include <nx/utils/log/log_main.h>
 
+#include <QtCore/QDateTime>
+
 namespace nx::vms_server_plugins::analytics::hikvision {
 
 using namespace std::literals;
@@ -14,14 +16,14 @@ using namespace nx::sdk::analytics;
 namespace {
 
 constexpr double kCoordinateDomain = 1000;
-constexpr auto kCacheEntryInactivityLifetime = 3s;
+constexpr auto kCacheEntryInactivityLifetime = 1s;
 constexpr auto kCacheEntryMaximumLifetime = 30s;
+
+} // namespace
 
 const QString kThermalObjectTypeId = "nx.hikvision.ThermalObject";
 const QString kThermalObjectPreAlarmTypeId = "nx.hikvision.ThermalObjectPreAlarm";
 const QString kThermalObjectAlarmTypeId = "nx.hikvision.ThermalObjectAlarm";
-
-} // namespace
 
 void MetadataParser::setHandler(Ptr<IDeviceAgent::IHandler> handler)
 {
@@ -41,14 +43,22 @@ void MetadataParser::parsePacket(QByteArray bytes, std::int64_t timestampUs)
     m_xml.clear();
     m_xml.addData(bytes);
 
-    m_timestampUs = timestampUs;
+    if (timestampUs > m_currentTimestampUs)
+        m_currentTimestampUs = timestampUs;
 
     while (m_xml.readNextStartElement())
     {
         if (m_xml.name() == "Metadata")
+        {
+            m_lastMetadataTimestampUs = m_currentTimestampUs;
+            m_sinceLastMetadata.restart();
+
             parseMetadataElement();
+        }
         else
+        {
             m_xml.skipCurrentElement();
+        }
     }
     if (m_xml.hasError())
     {
@@ -57,57 +67,31 @@ void MetadataParser::parsePacket(QByteArray bytes, std::int64_t timestampUs)
     }
 }
 
-void MetadataParser::processEvent(HikvisionEvent* event, std::int64_t timestampUs)
+void MetadataParser::processEvent(HikvisionEvent* event)
 {
     evictStaleCacheEntries();
-
-    m_timestampUs = timestampUs;
 
     if (!event->region)
         return;
 
     auto& entry = m_cache[-event->region->id];
-    if (entry.state == State::initial)
-        return;
 
     if (event->typeId.startsWith("nx.hikvision.Alarm1Thermal"))
-    {
-        if (event->isActive)
-        {
-            if (entry.state == State::thermalInitial)
-                entry.state = State::thermalShouldStartPreAlarm;
-        }
-        else
-        {
-            if (entry.state == State::thermalAlarmActive)
-            {
-                entry.state = State::thermalShouldStopAlarm;
-                processEntry(&entry, event);
-            }
-
-            if (entry.state == State::thermalPreAlarmActive)
-                entry.state = State::thermalShouldStopPreAlarm;
-        }
-    }
+        entry.thermalPreAlarmShouldBeActive = event->isActive;
     else if (event->typeId.startsWith("nx.hikvision.Alarm2Thermal"))
-    {
-        if (event->isActive)
-        {
-            if (entry.state == State::thermalInitial)
-            {
-                entry.state = State::thermalShouldStartPreAlarm;
-                processEntry(&entry, event);
-            }
+        entry.thermalAlarmShouldBeActive = event->isActive;
 
-            if (entry.state == State::thermalPreAlarmActive)
-                entry.state = State::thermalShouldStartAlarm;
-        }
-        else
-        {
-            if (entry.state == State::thermalAlarmActive)
-                entry.state = State::thermalShouldStopAlarm;
-        }
-    }
+    if (entry.trackId.isNull())
+        return;
+
+    const auto timestampUs = std::chrono::duration_cast<std::chrono::microseconds>(
+        std::chrono::microseconds(m_lastMetadataTimestampUs)
+        + m_sinceLastMetadata.elapsed()).count();
+
+    if (timestampUs > m_currentTimestampUs)
+        m_currentTimestampUs = timestampUs;
+
+    event->dateTime = QDateTime::fromMSecsSinceEpoch(m_currentTimestampUs / 1000);
     
     processEntry(&entry, event);
 }
@@ -357,33 +341,24 @@ void MetadataParser::parseTargetElement()
         return;
 
     auto& entry = m_cache[*trackId];
-
-    if (entry.state == State::initial)
+    if (entry.trackId.isNull())
     {
+        entry.trackId = nx::sdk::UuidHelper::randomUuid();
         entry.typeId = *typeId;
 
         entry.lastUpdate.restart();
         entry.lifetime.restart();
     }
 
-    if (entry.typeId.startsWith(kThermalObjectTypeId))
+    if (!entry.typeId.startsWith(kThermalObjectTypeId))
     {
-        if (entry.state == State::initial)
-            entry.state = State::thermalInitial;
-    }
-    else
-    {
-        if (entry.state == State::initial)
-            entry.state = State::normalInitial;
-
         for (auto it = attributes.begin(); it != attributes.end(); ++it)
         {
             if ((*it)->name() == "triggerEvent"sv && (*it)->value() == "true"sv)
             {
                 attributes.erase(it);
 
-                if (entry.state == State::normalInitial)
-                    entry.state = State::normalShouldGenerateBestShot;
+                entry.regularBestShotShouldBeGenerated = true;
 
                 break;
             }
@@ -394,7 +369,7 @@ void MetadataParser::parseTargetElement()
         entry.lastUpdate.restart();
 
     // Thermal updates for non-point rules sometimes contain points with min/max
-    // temperature. Don't collapse boundig box when that happens.
+    // temperature. Don't collapse bounding box when that happens.
     if (boundingBox && (
         !entry.typeId.startsWith(kThermalObjectTypeId)
         || !entry.boundingBox
@@ -455,7 +430,7 @@ void MetadataParser::parseMetadataElement()
 Ptr<ObjectMetadataPacket> MetadataParser::makeMetadataPacket(const CacheEntry& entry)
 {
     auto packet = makePtr<ObjectMetadataPacket>();
-    packet->setTimestampUs(m_timestampUs);
+    packet->setTimestampUs(m_currentTimestampUs);
     packet->setDurationUs(
         std::chrono::duration_cast<std::chrono::microseconds>(
             kCacheEntryInactivityLifetime).count());
@@ -479,7 +454,7 @@ void MetadataParser::processEntry(CacheEntry* entry, HikvisionEvent* event)
         [&]()
         {
             const auto closingMetadataPacket = makeMetadataPacket(*entry);
-            closingMetadataPacket->setDurationUs(0);
+            closingMetadataPacket->setDurationUs(1);
             m_handler->handleMetadata(closingMetadataPacket.get());
 
             entry->trackId = nx::sdk::UuidHelper::randomUuid();
@@ -488,46 +463,36 @@ void MetadataParser::processEntry(CacheEntry* entry, HikvisionEvent* event)
 
     bool shouldGenerateBestShot = false;
 
-    switch (entry->state)
+    if (entry->regularBestShotShouldBeGenerated != entry->regularBestShotIsGenerated)
     {
-        case State::normalShouldGenerateBestShot:
-        {
-            shouldGenerateBestShot = true;
-            entry->state = State::normalBestShotGenerated;
-            break;
-        }
-        case State::thermalShouldStartPreAlarm:
-        {
-            changeTrackId();
-            shouldGenerateBestShot = true;
+        entry->regularBestShotIsGenerated = entry->regularBestShotShouldBeGenerated;
+        shouldGenerateBestShot = entry->regularBestShotShouldBeGenerated;
+    }
+    else if (entry->thermalPreAlarmIsActive != entry->thermalPreAlarmShouldBeActive)
+    {
+        changeTrackId();
+        if (entry->thermalPreAlarmShouldBeActive)
             entry->typeId = kThermalObjectPreAlarmTypeId;
-            entry->state = State::thermalPreAlarmActive;
-            break;
-        }
-        case State::thermalShouldStopPreAlarm:
-        {
-            changeTrackId();
-            entry->typeId = kThermalObjectTypeId;
-            entry->state = State::thermalInitial;
-            break;
-        }
-        case State::thermalShouldStartAlarm:
-        {
-            changeTrackId();
-            shouldGenerateBestShot = true;
+        else if (entry->thermalAlarmIsActive)
             entry->typeId = kThermalObjectAlarmTypeId;
-            entry->state = State::thermalAlarmActive;
-            break;
-        }
-        case State::thermalShouldStopAlarm:
-        {
-            changeTrackId();
+        else
+            entry->typeId = kThermalObjectTypeId;
+
+        entry->thermalPreAlarmIsActive = entry->thermalPreAlarmShouldBeActive;
+        shouldGenerateBestShot = entry->thermalPreAlarmShouldBeActive;
+    }
+    else if (entry->thermalAlarmIsActive != entry->thermalAlarmShouldBeActive)
+    {
+        changeTrackId();
+        if (entry->thermalAlarmShouldBeActive)
+            entry->typeId = kThermalObjectAlarmTypeId;
+        else if (entry->thermalPreAlarmIsActive)
             entry->typeId = kThermalObjectPreAlarmTypeId;
-            entry->state = State::thermalPreAlarmActive;
-            break;
-        }
-        default:
-            break;
+        else
+            entry->typeId = kThermalObjectTypeId;
+
+        entry->thermalAlarmIsActive = entry->thermalAlarmShouldBeActive;
+        shouldGenerateBestShot = entry->thermalAlarmShouldBeActive;
     }
 
     if (entry->lifetime.hasExpired(kCacheEntryMaximumLifetime))
@@ -539,7 +504,7 @@ void MetadataParser::processEntry(CacheEntry* entry, HikvisionEvent* event)
     if (shouldGenerateBestShot)
     {
         const auto bestShotPacket = makePtr<ObjectTrackBestShotPacket>();
-        bestShotPacket->setTimestampUs(m_timestampUs);
+        bestShotPacket->setTimestampUs(m_currentTimestampUs);
         bestShotPacket->setTrackId(entry->trackId);
         bestShotPacket->setBoundingBox(*entry->boundingBox);
         m_handler->handleMetadata(bestShotPacket.get());

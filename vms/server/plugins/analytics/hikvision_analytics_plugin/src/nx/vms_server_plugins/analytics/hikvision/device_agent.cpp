@@ -66,7 +66,7 @@ void DeviceAgent::doPushDataPacket(Result<void>* /*outResult*/, IDataPacket* dat
     QByteArray metadataBytes(metadataPacket->data(), metadataPacket->dataSize());
 
     std::unique_lock lock(m_metadataParserMutex);
-    m_metadataParser.parsePacket(metadataBytes, dataPacket->timestampUs());
+    m_metadataParser.parsePacket(metadataBytes, metadataPacket->timestampUs());
 }
 
 Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
@@ -77,11 +77,6 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
             if (!NX_ASSERT(m_handler))
                 return;
 
-            if (!NX_ASSERT(m_eventTimestampAdjuster))
-                return;
-
-            using namespace std::chrono;
-            auto packet = makePtr<EventMetadataPacket>();
 
             for (auto hikvisionEvent: events)
             {
@@ -91,12 +86,9 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
                 if (wrongChannel)
                     return;
 
-                const auto timestampUs = m_eventTimestampAdjuster->getCurrentTimeUs(
-                    hikvisionEvent.dateTime.toMSecsSinceEpoch() * 1000);
-
                 {
                     std::unique_lock lock(m_metadataParserMutex);
-                    m_metadataParser.processEvent(&hikvisionEvent, timestampUs);
+                    m_metadataParser.processEvent(&hikvisionEvent);
                 }
 
                 auto eventMetadata = makePtr<EventMetadata>();
@@ -110,13 +102,11 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
                 eventMetadata->setIsActive(hikvisionEvent.isActive);
                 eventMetadata->setConfidence(1.0);
 
-                packet->setTimestampUs(timestampUs);
-
-                packet->setDurationUs(-1);
+                auto packet = makePtr<EventMetadataPacket>();
+                packet->setTimestampUs(hikvisionEvent.dateTime.toMSecsSinceEpoch() * 1000);
                 packet->addItem(eventMetadata.get());
+                m_handler->handleMetadata(packet.get());
             }
-
-            m_handler->handleMetadata(packet.get());
         };
 
     NX_ASSERT(m_engine);
@@ -189,12 +179,6 @@ void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
     m_uniqueId = deviceInfo->id();
     m_sharedId = deviceInfo->sharedId();
     m_channelNumber = deviceInfo->channelNumber();
-
-    m_eventTimestampAdjuster.emplace(deviceInfo->url(),
-        [utilityProvider = m_engine->plugin()->utilityProvider()]()
-        {
-            return std::chrono::milliseconds(utilityProvider->vmsSystemTimeSinceEpochMs());
-        });
 }
 
 void DeviceAgent::setDeviceAgentManifest(const QByteArray& manifest)

@@ -25,13 +25,17 @@
 
 namespace nx::vms_server_plugins::analytics::hikvision {
 
+extern const QString kThermalObjectTypeId;
+extern const QString kThermalObjectPreAlarmTypeId;
+extern const QString kThermalObjectAlarmTypeId;
+
 class MetadataParser
 {
 public:
     void setHandler(nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> handler);
 
     void parsePacket(QByteArray bytes, std::int64_t timestampUs);
-    void processEvent(HikvisionEvent* event, std::int64_t timestampUs);
+    void processEvent(HikvisionEvent* event);
 
 private:
     struct MinMaxRect
@@ -40,29 +44,19 @@ private:
         nx::sdk::analytics::Point max;
     };
 
-    enum class State
-    {
-        initial,
-
-        normalInitial,
-        normalShouldGenerateBestShot,
-        normalBestShotGenerated,
-
-        thermalInitial,
-        thermalShouldStartPreAlarm,
-        thermalPreAlarmActive,
-        thermalShouldStopPreAlarm,
-        thermalShouldStartAlarm,
-        thermalAlarmActive,
-        thermalShouldStopAlarm,
-    };
-
     struct CacheEntry
     {
-        nx::sdk::Uuid trackId = nx::sdk::UuidHelper::randomUuid();
+        nx::sdk::Uuid trackId;
         QString typeId;
 
-        State state = State::initial;
+        bool regularBestShotShouldBeGenerated = false;
+        bool regularBestShotIsGenerated = false;
+
+        bool thermalPreAlarmShouldBeActive = false;
+        bool thermalPreAlarmIsActive = false;
+
+        bool thermalAlarmShouldBeActive = false;
+        bool thermalAlarmIsActive = false;
 
         std::optional<nx::sdk::analytics::Rect> boundingBox;
         std::vector<nx::sdk::Ptr<nx::sdk::Attribute>> attributes;
@@ -98,7 +92,9 @@ private:
     nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
 
     QXmlStreamReader m_xml;
-    std::int64_t m_timestampUs = -1;
+    std::int64_t m_lastMetadataTimestampUs = -1;
+    std::int64_t m_currentTimestampUs = -1;
+    nx::utils::ElapsedTimer m_sinceLastMetadata;
 
     std::map<int, CacheEntry> m_cache;
 };

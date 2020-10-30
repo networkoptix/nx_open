@@ -2,6 +2,7 @@
 
 #include "device_agent.h"
 #include "common.h"
+#include "metadata_parser.h"
 #include "string_helper.h"
 #include "attributes_parser.h"
 
@@ -20,6 +21,8 @@
 #include <nx/utils/log/log_main.h>
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/error.h>
+
+#include "metadata_parser.h"
 
 namespace nx {
 namespace vms_server_plugins {
@@ -298,11 +301,12 @@ Engine::DeviceData& Engine::getCachedDeviceData(const IDeviceInfo* deviceInfo)
         const bool objectTypesFetched = fetchSupportedObjectTypeIds(&data, deviceInfo);
         if (eventTypesFetched || objectTypesFetched)
         {
-            static const char eventObjectTypeId[] = "nx.hikvision.event";
             if (!data.supportedEventTypeIds.isEmpty()
-                && !data.supportedObjectTypeIds.contains(eventObjectTypeId))
+                && !data.supportedObjectTypeIds.contains(kThermalObjectTypeId))
             {
-                data.supportedObjectTypeIds.push_back(eventObjectTypeId);
+                data.supportedObjectTypeIds.push_back(kThermalObjectTypeId);
+                data.supportedObjectTypeIds.push_back(kThermalObjectPreAlarmTypeId);
+                data.supportedObjectTypeIds.push_back(kThermalObjectAlarmTypeId);
             }
 
             timeout.restart();

@@ -88,6 +88,7 @@ private:
     std::mutex m_metadataParserMutex;
     MetadataParser m_metadataParser;
     std::optional<nx::utils::TimeHelper> m_eventTimestampAdjuster;
+    std::optional<nx::utils::TimeHelper> m_objectTimestampAdjuster;
 };
 
 } // namespace hikvision
