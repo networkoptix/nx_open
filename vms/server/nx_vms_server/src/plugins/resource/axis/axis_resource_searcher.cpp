@@ -87,17 +87,22 @@ QList<QnResourcePtr> QnPlAxisResourceSearcher::checkHostAddr(const nx::utils::Ur
         .toUrl();
     nx::network::http::StatusCode::Value status;
 
+    nx::network::http::AsyncHttpClient::Timeouts timeouts;
+    timeouts.sendTimeout = std::chrono::milliseconds(kDefaultAxisTimeout);
+    timeouts.messageBodyReadTimeout = std::chrono::milliseconds(kDefaultAxisTimeout);
+    timeouts.responseReadTimeout = std::chrono::milliseconds(kDefaultAxisTimeout);
+
     QByteArray response1;
     nx::network::http::downloadFileSync(nx::network::url::Builder(baseRequestUrl)
         .setQuery("action=list&group=root.Network.Bonjour.FriendlyName").toUrl(),
-        (int*) &status, &response1);
+        (int*) &status, &response1, timeouts);
     if (response1.isEmpty() || !nx::network::http::StatusCode::isSuccessCode(status))
         return QList<QnResourcePtr>();
 
     QByteArray response2;
     nx::network::http::downloadFileSync(nx::network::url::Builder(baseRequestUrl)
         .setQuery("action=list&group=root.Network.eth0.MACAddress").toUrl(),
-        (int*) &status, &response2);
+        (int*) &status, &response2, timeouts);
     if (response2.isEmpty() || !nx::network::http::StatusCode::isSuccessCode(status))
         return QList<QnResourcePtr>();
 
@@ -438,6 +443,11 @@ void QnPlAxisResourceSearcher::addMultichannelResources(QList<T>& result)
             result.push_back(resource);
         }
     }
+}
+
+bool QnPlAxisResourceSearcher::isSequential() const
+{
+    return true;
 }
 
 #endif // #ifdef ENABLE_AXIS
