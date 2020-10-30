@@ -101,7 +101,6 @@ public:
     virtual void setEndOfPlaybackHandler(std::function<void()> handler) override;
     virtual void setErrorHandler(
         std::function<void(const QString& errorString)> handler) override;
-    bool isOpened() const;
 
     CameraDiagnostics::Result lastError() const;
 

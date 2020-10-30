@@ -1278,11 +1278,6 @@ nx::vms::api::StreamDataFilters QnArchiveStreamReader::streamDataFilter() const
     return m_streamDataFilter;
 }
 
-bool QnArchiveStreamReader::isOpened() const
-{
-    return !m_firstTime;
-}
-
 void QnArchiveStreamReader::setPlaybackRange(const QnTimePeriod& playbackRange)
 {
     {
@@ -1290,8 +1285,6 @@ void QnArchiveStreamReader::setPlaybackRange(const QnTimePeriod& playbackRange)
         m_outOfPlaybackMask = false;
         m_playbackMaskHelper.setPlaybackRange(playbackRange);
     }
-    if (!playbackRange.isEmpty() && !isOpened())
-        jumpTo(playbackRange.startTimeMs * 1000LL, 0);
 }
 
 QnTimePeriod QnArchiveStreamReader::getPlaybackRange() const

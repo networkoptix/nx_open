@@ -332,6 +332,8 @@ AbstractOnDemandDataProviderPtr StreamingChunkTranscoder::createArchiveReader(
         transcodeParams.startTimestamp() / USEC_IN_MSEC,
         duration_cast<milliseconds>(transcodeParams.duration()).count()));
 
+    archiveReader->jumpTo(transcodeParams.startTimestamp(), 0);
+
     auto mediaDataProvider = OnDemandMediaDataProviderPtr(new OnDemandMediaDataProvider(dp));
     archiveReader->start();
 
