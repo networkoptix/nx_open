@@ -2953,7 +2953,7 @@ to %1</source>
     </message>
     <message>
       <source>Client and Server have different versions</source>
-      <translation>클라이언트와 서버는 서로 다른 버전</translation>
+      <translation>클라이언트와 서버의 버전이 다릅니다.</translation>
     </message>
     <message>
       <source>Client - %1</source>
