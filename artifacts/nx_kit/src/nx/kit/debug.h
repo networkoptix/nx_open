@@ -10,7 +10,7 @@
  */
 
 #include <iostream>
-#include <cstdint>
+#include <stdint.h>
 #include <functional>
 #include <sstream>
 #include <memory>
