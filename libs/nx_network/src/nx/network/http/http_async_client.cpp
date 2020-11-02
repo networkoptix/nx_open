@@ -122,7 +122,7 @@ AsyncClient::State AsyncClient::state() const
 
 bool AsyncClient::failed() const
 {
-    return m_state == State::sFailed || response() == nullptr;
+    return m_state == State::sFailed || (response() == nullptr && !m_expectOnlyBody);
 }
 
 SystemError::ErrorCode AsyncClient::lastSysErrorCode() const
