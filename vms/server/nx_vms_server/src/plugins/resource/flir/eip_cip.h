@@ -3,7 +3,7 @@
 
 #include <QHostAddress>
 #include <nx/network/socket.h>
-#include <cstdint>
+#include <stdint.h>
 #include <nx/network/abstract_socket.h>
 
 typedef quint16 eip_status_t;

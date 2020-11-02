@@ -3,7 +3,7 @@
 #include <map>
 #include <vector>
 #include <shared_mutex>
-#include <cstdint>
+#include <stdint.h>
 
 #include <QtCore/QUrl>
 #include <QtNetwork/QAuthenticator>

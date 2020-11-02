@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <cstdint>
+#include <stdint.h>
 
 #include <nx/kit/flags.h>
 #include <nx/sdk/interface.h>

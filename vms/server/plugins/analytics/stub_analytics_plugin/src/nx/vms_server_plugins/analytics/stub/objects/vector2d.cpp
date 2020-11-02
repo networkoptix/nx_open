@@ -3,7 +3,7 @@
 #include "vector2d.h"
 
 #include <cmath>
-#include <cstdint>
+#include <stdint.h>
 
 namespace nx {
 namespace vms_server_plugins {

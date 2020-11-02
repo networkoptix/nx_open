@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstdint>
+#include <stdint.h>
 
 #include <nx/utils/url.h>
 #include <nx/vms_server_plugins/utils/exception.h>

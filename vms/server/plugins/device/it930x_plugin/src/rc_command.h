@@ -2,7 +2,7 @@
 #define RETURN_CHANNEL_CMD_X_H
 
 #include <vector>
-#include <cstdint>
+#include <stdint.h>
 #include <cstring>
 
 namespace ite

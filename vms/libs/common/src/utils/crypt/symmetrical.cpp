@@ -1,7 +1,7 @@
 #include "symmetrical.h"
 
 #include <array>
-#include <cstdint>
+#include <stdint.h>
 #include <cstring> //< CBC mode, for memset
 
 #include <nx/utils/uuid.h>

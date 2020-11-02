@@ -4,7 +4,7 @@
 
 #include <string>
 #include <functional>
-#include <cstdint>
+#include <stdint.h>
 
 #include <common.h>
 #include "detail/fs_stub.h"

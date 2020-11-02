@@ -1,7 +1,7 @@
 #include "proxy_video_decoder_utils.h"
 #if defined(ENABLE_PROXY_DECODER)
 
-#include <cstdint>
+#include <stdint.h>
 #include <deque>
 
 #include <nx/utils/string.h>

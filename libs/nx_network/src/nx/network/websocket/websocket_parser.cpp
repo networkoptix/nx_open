@@ -3,7 +3,7 @@
 #include <nx/utils/gzip/gzip_compressor.h>
 
 #include <algorithm>
-#include <cstdint>
+#include <stdint.h>
 
 namespace nx {
 namespace network {

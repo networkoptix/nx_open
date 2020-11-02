@@ -1,7 +1,7 @@
 #pragma once
 
 #include <set>
-#include <cstdint>
+#include <stdint.h>
 #include <server/server_globals.h>
 
 namespace nx::vms::server {

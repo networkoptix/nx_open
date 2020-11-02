@@ -1,7 +1,7 @@
 #include "server_stream_recorder.h"
 
 #include <limits>
-#include <cstdint>
+#include <stdint.h>
 
 #include <boost/algorithm/cxx11/any_of.hpp>
 

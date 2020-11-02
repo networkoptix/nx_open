@@ -1,7 +1,6 @@
 #pragma once
 
-#include <cstdint>
-#include <list>
+#include <vector>
 
 #include <nx/network/socket_common.h>
 #include <nx/network/stun/message.h>

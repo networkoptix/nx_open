@@ -1,7 +1,6 @@
 #include "application.h"
 
 //#define QN_USE_VLD
-#include <cstdint>
 
 #ifdef QN_USE_VLD
 #   include <vld.h>

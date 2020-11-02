@@ -7,7 +7,7 @@
 #include <string>
 #include <memory>
 #include <stdexcept>
-#include <cstdint>
+#include <stdint.h>
 #include <mutex>
 #include "storage/third_party_storage.h"
 #include "ftplib/ftplib.h"

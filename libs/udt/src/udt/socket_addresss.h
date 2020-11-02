@@ -7,7 +7,7 @@
 #   include <netinet/in.h>
 #endif
 
-#include <cstdint>
+#include <stdint.h>
 #include <string>
 
 #ifdef _WIN32

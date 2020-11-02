@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <list>
-#include <cstdint>
+#include <stdint.h>
 
 #include <nx/utils/memory/cycle_buffer.h>
 #include <nx/utils/uuid.h>

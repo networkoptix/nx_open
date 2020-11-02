@@ -15,7 +15,7 @@
 #endif
 
 #include <chrono>
-#include <cstdint>
+#include <stdint.h>
 #include <string>
 
 #include <QtCore/QtEndian>
