@@ -1027,7 +1027,7 @@ nx::media::CameraStreamCapability HanwhaResource::mediaCapabilityForRole(Qn::Con
     const auto resolution = streamResolution(role);
     const auto bitrateControlType = streamBitrateControl(role);
 
-    const auto limits = m_codecInfo.limits(
+    const auto limits = m_codecInfo.lock()->limits(
         getChannel(),
         codec,
         lit("General"),
@@ -2481,7 +2481,7 @@ CameraDiagnostics::Result HanwhaResource::fetchPtzLimits(QnPtzLimits* outPtzLimi
     return CameraDiagnostics::NoErrorResult();
 }
 
-CameraDiagnostics::Result HanwhaResource::fetchCodecInfo(HanwhaCodecInfo* outCodecInfo)
+CameraDiagnostics::Result HanwhaResource::fetchCodecInfo(nx::utils::Lockable<HanwhaCodecInfo>* outCodecInfo)
 {
     if (isBypassSupported())
     {
@@ -2496,11 +2496,11 @@ CameraDiagnostics::Result HanwhaResource::fetchCodecInfo(HanwhaCodecInfo* outCod
                 lit("Can't fetch codec info via bypass"));
         }
 
-        *outCodecInfo = HanwhaCodecInfo(response, cgiParameters());
-        if (!outCodecInfo->isValid())
+        HanwhaCodecInfo codecInfo(response, cgiParameters());
+        if (!codecInfo.isValid())
             return CameraDiagnostics::CameraInvalidParams(lit("Can't fetch bypass codec info"));
-
-        outCodecInfo->updateToChannel(getChannel());
+        codecInfo.updateToChannel(getChannel());
+        *outCodecInfo->lock() = codecInfo;
     }
     else
     {
@@ -2508,7 +2508,7 @@ CameraDiagnostics::Result HanwhaResource::fetchCodecInfo(HanwhaCodecInfo* outCod
         if (!codecInfo)
             return codecInfo.diagnostics;
 
-        *outCodecInfo = codecInfo.value;
+        *outCodecInfo->lock() = codecInfo.value;
     }
     return CameraDiagnostics::NoErrorResult();
 }
@@ -2661,7 +2661,7 @@ int HanwhaResource::closestFrameRate(Qn::ConnectionRole role, int desiredFrameRa
     const auto resolution = streamResolution(role);
     const auto codec = streamCodec(role);
 
-    const auto limits = m_codecInfo.limits(
+    const auto limits = m_codecInfo.lock()->limits(
         getChannel(),
         codec,
         lit("General"),
@@ -2693,7 +2693,8 @@ int HanwhaResource::profileByRole(Qn::ConnectionRole role, bool isBypassProfile)
 
 AVCodecID HanwhaResource::defaultCodecForStream(Qn::ConnectionRole /*role*/) const
 {
-    const auto& codecs = m_codecInfo.codecs(getChannel());
+    const auto codecInfo = m_codecInfo.lock();
+    const auto& codecs = codecInfo->codecs(getChannel());
 
     if (codecs.find(AVCodecID::AV_CODEC_ID_H264) != codecs.cend())
         return AVCodecID::AV_CODEC_ID_H264;
@@ -2707,9 +2708,11 @@ AVCodecID HanwhaResource::defaultCodecForStream(Qn::ConnectionRole /*role*/) con
 
 QSize HanwhaResource::defaultResolutionForStream(Qn::ConnectionRole role) const
 {
-    const auto& resolutions = m_codecInfo.resolutions(
+    const auto defaultCodec = defaultCodecForStream(role);
+    const auto codecInfo = m_codecInfo.lock();
+    const auto& resolutions = codecInfo->resolutions(
         getChannel(),
-        defaultCodecForStream(role),
+        defaultCodec,
         lit("General"));
 
     if (resolutions.empty())
@@ -2733,7 +2736,7 @@ int HanwhaResource::defaultBitrateForStream(Qn::ConnectionRole role) const
     const auto codec = streamCodec(role);
     const auto bitrateControl = streamBitrateControl(role);
 
-    const auto limits = m_codecInfo.limits(
+    const auto limits = m_codecInfo.lock()->limits(
         getChannel(),
         codec,
         lit("General"),
@@ -2853,21 +2856,24 @@ QString HanwhaResource::suggestCodecProfile(
     Qn::ConnectionRole role,
     const QString& desiredProfile) const
 {
-    const auto& profiles = m_codecInfo.codecProfiles(codec);
-    if (profiles.contains(desiredProfile))
-        return desiredProfile;
+    {
+        const auto codecInfo = m_codecInfo.lock();
+        const auto& profiles = codecInfo->codecProfiles(codec);
+        if (profiles.contains(desiredProfile))
+            return desiredProfile;
+    }
 
     return defaultCodecProfileForStream(role);
 }
 
 QSize HanwhaResource::bestSecondaryResolution(
     const QSize& primaryResolution,
-    const std::vector<QSize>& resolutionList) const
+    const std::vector<QSize>& resolutionList)
 {
     if (primaryResolution.isEmpty())
     {
         NX_WARNING(
-            this,
+            NX_SCOPE_TAG,
             lit("Primary resolution height is 0. Can not determine secondary resolution"));
 
         return QSize();
@@ -3101,7 +3107,7 @@ bool HanwhaResource::addResolutionRanges(
     QnCameraAdvancedParameter* inOutParameter,
     const HanwhaAdavancedParameterInfo& info) const
 {
-    const auto codecs = m_codecInfo.codecs(getChannel());
+    const auto codecs = m_codecInfo.lock()->codecs(getChannel());
     const auto streamPrefix =
         info.profileDependency() == Qn::ConnectionRole::CR_LiveVideo
             ? "PRIMARY%"
@@ -3116,7 +3122,7 @@ bool HanwhaResource::addResolutionRanges(
             .arg(streamPrefix);
         codecCondition.value = codecString;
 
-        const auto resolutions = m_codecInfo.resolutions(getChannel(), codec, "General");
+        const auto resolutions = m_codecInfo.lock()->resolutions(getChannel(), codec, "General");
         QString resolutionRangeString;
         for (const auto& resolution: resolutions)
         {
@@ -3149,7 +3155,8 @@ bool HanwhaResource::addDependencies(
         return false;
 
     const auto channel = getChannel();
-    const auto codecs = m_codecInfo.codecs(channel);
+    const auto codecInfo = m_codecInfo.lock();
+    const auto codecs = codecInfo->codecs(channel);
 
     const auto streamPrefix = info.profileDependency() == Qn::ConnectionRole::CR_LiveVideo
         ? lit("PRIMARY%")
@@ -3157,10 +3164,10 @@ bool HanwhaResource::addDependencies(
 
     for (const auto& codec: codecs)
     {
-        const auto resolutions = m_codecInfo.resolutions(channel, codec, lit("General"));
-        for (const auto& resolution : resolutions)
+        const auto resolutions = codecInfo->resolutions(channel, codec, lit("General"));
+        for (const auto& resolution: resolutions)
         {
-            auto limits = m_codecInfo.limits(channel, codec, lit("General"), resolution);
+            auto limits = codecInfo->limits(channel, codec, lit("General"), resolution);
 
             const auto codecString = toHanwhaString(codec);
             QnCameraAdvancedParameterCondition codecCondition;

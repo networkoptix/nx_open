@@ -19,6 +19,7 @@
 #include <core/ptz/ptz_auxiliary_trait.h>
 #include <nx/core/ptz/type.h>
 #include <nx/utils/timer_holder.h>
+#include <nx/utils/lockable.h>
 
 extern "C" {
 
@@ -201,7 +202,7 @@ private:
 
     CameraDiagnostics::Result fetchPtzLimits(QnPtzLimits* outPtzLimits);
 
-    CameraDiagnostics::Result fetchCodecInfo(HanwhaCodecInfo* outCodecInfo);
+    CameraDiagnostics::Result fetchCodecInfo(nx::utils::Lockable<HanwhaCodecInfo>* outCodecInfo);
     CameraDiagnostics::Result enableMulticast(
         int profileNumber,
         const nx::vms::server::resource::MulticastParameters& multicastParameters);
@@ -228,9 +229,9 @@ private:
         Qn::ConnectionRole role,
         const QString& desiredProfile) const;
 
-    QSize bestSecondaryResolution(
+    static QSize bestSecondaryResolution(
         const QSize& primaryResolution,
-        const std::vector<QSize>& resolutionList) const;
+        const std::vector<QSize>& resolutionList);
 
     QnCameraAdvancedParams filterParameters(const QnCameraAdvancedParams& allParameters) const;
 
@@ -363,7 +364,7 @@ private:
 
     mutable QnMutex m_mutex;
     int m_maxProfileCount = 0;
-    HanwhaCodecInfo m_codecInfo;
+    nx::utils::Lockable<HanwhaCodecInfo> m_codecInfo;
     std::map<Qn::ConnectionRole, ProfileNumbers> m_profileByRole;
 
     QnPtzLimits m_ptzLimits;
