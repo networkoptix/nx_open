@@ -19,7 +19,7 @@ ObjectTrackBestShotResolver::~ObjectTrackBestShotResolver()
 }
 
 void ObjectTrackBestShotResolver::resolve(
-    const Ptr<IObjectTrackBestShotPacket>& bestShotPacket,
+    const Ptr<IObjectTrackBestShotPacket1>& bestShotPacket,
     ImageHandler imageHandler)
 {
     if (!NX_ASSERT(bestShotPacket))

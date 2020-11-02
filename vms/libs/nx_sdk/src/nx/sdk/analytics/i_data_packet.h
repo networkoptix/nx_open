@@ -4,6 +4,7 @@
 
 #include <cstdint>
 
+#include <nx/kit/flags.h>
 #include <nx/sdk/interface.h>
 
 namespace nx {
@@ -16,6 +17,18 @@ namespace analytics {
 class IDataPacket: public Interface<IDataPacket>
 {
 public:
+    enum class Flags: uint32_t
+    {
+        none = 0,
+
+        /**
+         * Indicates that the timestamp is sampled from an camera's own internal clock and should
+         * be translated to VMS system clock.
+         */
+        cameraClockTimestamp = 1 << 0,
+    };
+
+public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IDataPacket"); }
 
     /**
@@ -24,6 +37,8 @@ public:
     virtual int64_t timestampUs() const = 0;
 };
 using IDataPacket0 = IDataPacket;
+
+NX_KIT_ENABLE_FLAGS(IDataPacket::Flags);
 
 } // namespace analytics
 } // namespace sdk

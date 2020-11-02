@@ -10,6 +10,7 @@
 #include <nx/vms/event/events/events_fwd.h>
 
 #include <common/common_module.h>
+#include <utils/common/synctime.h>
 #include <core/resource/security_cam_resource.h>
 #include <nx/vms/server/event/event_connector.h>
 #include <nx/vms/server/sdk_support/utils.h>
@@ -77,7 +78,13 @@ MetadataHandler::MetadataHandler(
             pushObjectMetadataToSinks(std::move(objectMetadataPacket));
         },
         std::chrono::seconds(pluginsIni().autoGenerateBestShotDelayS),
-        std::chrono::seconds(pluginsIni().trackExpirationDelayS))
+        std::chrono::seconds(pluginsIni().trackExpirationDelayS)),
+    m_timeHelper(
+        device->getUniqueId(),
+        []()
+        {
+            return qnSyncTime->currentTimePoint();
+        })
 {
     const auto engineResource =
         resourcePool()->getResourceById<resource::AnalyticsEngineResource>(m_engineId);
@@ -139,13 +146,13 @@ void MetadataHandler::handleMetadata(IMetadataPacket* metadataPacket)
     }
 
     bool handled = false;
-    if (const auto eventsPacket = metadataPacket->queryInterface<IEventMetadataPacket>())
+    if (const auto eventsPacket = metadataPacket->queryInterface<IEventMetadataPacket0>())
     {
         handleEventMetadataPacket(eventsPacket);
         handled = true;
     }
 
-    if (const auto objectsPacket = metadataPacket->queryInterface<IObjectMetadataPacket>())
+    if (const auto objectsPacket = metadataPacket->queryInterface<IObjectMetadataPacket0>())
     {
         handleObjectMetadataPacket(objectsPacket);
         handled = true;
@@ -167,12 +174,18 @@ void MetadataHandler::handleMetadata(IMetadataPacket* metadataPacket)
 }
 
 void MetadataHandler::handleEventMetadataPacket(
-    const Ptr<IEventMetadataPacket>& eventMetadataPacket)
+    const Ptr<IEventMetadataPacket0>& eventMetadataPacket)
 {
     if (eventMetadataPacket->count() <= 0)
     {
         NX_VERBOSE(this, "%1(): Received empty event packet; ignoring.", __func__);
         return;
+    }
+
+    int64_t timestampUs = eventMetadataPacket->timestampUs();
+    if (const auto packetWithFlags = eventMetadataPacket->queryInterface<IEventMetadataPacket1>())
+    {
+        timestampUs = translateTimestampFromCameraToVmsSystemUs(timestampUs, packetWithFlags->flags());
     }
 
     for (int i = 0; i < eventMetadataPacket->count(); ++i)
@@ -187,12 +200,12 @@ void MetadataHandler::handleEventMetadataPacket(
         if (!eventMetadataV0)
             break;
 
-        handleEventMetadata(eventMetadataV0, eventMetadataPacket->timestampUs());
+        handleEventMetadata(eventMetadataV0, timestampUs);
     }
 }
 
 void MetadataHandler::handleObjectMetadataPacket(
-    const Ptr<IObjectMetadataPacket>& objectMetadataPacket)
+    const Ptr<IObjectMetadataPacket0>& objectMetadataPacket)
 {
     auto data = std::make_shared<nx::common::metadata::ObjectMetadataPacket>() ;
     for (int i = 0; i < objectMetadataPacket->count(); ++i)
@@ -237,6 +250,13 @@ void MetadataHandler::handleObjectMetadataPacket(
             data->timestampUs);
     }
 
+    if (const auto packetWithFlags =
+            objectMetadataPacket->queryInterface<IObjectMetadataPacket1>())
+    {
+        data->timestampUs = translateTimestampFromCameraToVmsSystemUs(
+            data->timestampUs, packetWithFlags->flags());
+    }
+
     postprocessObjectMetadataPacket(data, ObjectMetadataType::regular);
 }
 
@@ -256,6 +276,13 @@ void MetadataHandler::handleObjectTrackBestShotPacket(
 
         return;
     }
+    if (const auto packetWithFlags =
+            objectTrackBestShotPacket->queryInterface<IObjectTrackBestShotPacket2>())
+    {
+        bestShotPacket->timestampUs = translateTimestampFromCameraToVmsSystemUs(
+            bestShotPacket->timestampUs, packetWithFlags->flags());
+    }
+
 
     bestShotPacket->durationUs = 0;
     bestShotPacket->deviceId = m_resource->getId();
@@ -283,7 +310,7 @@ void MetadataHandler::handleObjectTrackBestShotPacket(
 
     const auto sdkBestShotPacketWithImageAndAttributes =
         objectTrackBestShotPacket->queryInterface<
-            nx::sdk::analytics::IObjectTrackBestShotPacket>();
+            nx::sdk::analytics::IObjectTrackBestShotPacket1>();
 
     if (sdkBestShotPacketWithImageAndAttributes)
         fetchAttributes(sdkBestShotPacketWithImageAndAttributes, &bestShot);
@@ -304,7 +331,7 @@ void MetadataHandler::handleObjectTrackBestShotPacket(
 void MetadataHandler::handleObjectTrackBestShotPacketWithImage(
     QnUuid trackId,
     const nx::common::metadata::ObjectMetadataPacketPtr& bestShotPacket,
-    const Ptr<nx::sdk::analytics::IObjectTrackBestShotPacket>& sdkBestShotPacketWithImage)
+    const Ptr<nx::sdk::analytics::IObjectTrackBestShotPacket1>& sdkBestShotPacketWithImage)
 {
     m_objectTrackBestShotResolver.resolve(
         sdkBestShotPacketWithImage,
@@ -483,6 +510,15 @@ void MetadataHandler::at_compatibleEventTypesMaybeChanged(
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_eventTypeDescriptors.reset();
+}
+
+int64_t MetadataHandler::translateTimestampFromCameraToVmsSystemUs(
+    int64_t timestampUs, IDataPacket::Flags flags)
+{
+    if (!!(flags & IDataPacket::Flags::cameraClockTimestamp))
+        timestampUs = m_timeHelper.getCurrentTimeUs(timestampUs);
+
+    return timestampUs;
 }
 
 } // namespace analytics

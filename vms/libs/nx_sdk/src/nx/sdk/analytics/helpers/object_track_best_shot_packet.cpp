@@ -26,6 +26,11 @@ void ObjectTrackBestShotPacket::getTrackId(Uuid* outValue) const
     *outValue = m_trackId;
 }
 
+ObjectTrackBestShotPacket::Flags ObjectTrackBestShotPacket::flags() const
+{
+    return m_flags;
+}
+
 int64_t ObjectTrackBestShotPacket::timestampUs() const
 {
     return m_timestampUs;
@@ -59,6 +64,11 @@ const char* ObjectTrackBestShotPacket::imageDataFormat() const
 void ObjectTrackBestShotPacket::setTrackId(const Uuid& trackId)
 {
     m_trackId = trackId;
+}
+
+void ObjectTrackBestShotPacket::setFlags(Flags flags)
+{
+    m_flags = flags;
 }
 
 void ObjectTrackBestShotPacket::setTimestampUs(int64_t timestampUs)

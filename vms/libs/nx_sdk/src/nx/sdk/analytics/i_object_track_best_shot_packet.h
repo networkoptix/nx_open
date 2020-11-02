@@ -41,8 +41,8 @@ public:
     public: Rect boundingBox() const { Rect value; getBoundingBox(&value); return value; }
 };
 
-class IObjectTrackBestShotPacket:
-    public Interface<IObjectTrackBestShotPacket, IObjectTrackBestShotPacket0>
+class IObjectTrackBestShotPacket1:
+    public Interface<IObjectTrackBestShotPacket1, IObjectTrackBestShotPacket0>
 {
 public:
     static auto interfaceId()
@@ -89,7 +89,19 @@ public:
      */
     virtual int attributeCount() const = 0;
 };
-using IObjectTrackBestShotPacket1 = IObjectTrackBestShotPacket;
+
+class IObjectTrackBestShotPacket:
+    public Interface<IObjectTrackBestShotPacket, IObjectTrackBestShotPacket1>
+{
+public:
+    static auto interfaceId()
+    {
+        return makeId("nx::sdk::analytics::IObjectTrackBestShotPacket2");
+    }
+
+    virtual Flags flags() const = 0;
+};
+using IObjectTrackBestShotPacket2 = IObjectTrackBestShotPacket;
 
 } // namespace analytics
 } // namespace sdk

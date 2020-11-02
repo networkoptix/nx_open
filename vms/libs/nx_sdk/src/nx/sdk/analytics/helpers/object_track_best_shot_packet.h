@@ -17,6 +17,7 @@ class ObjectTrackBestShotPacket: public RefCountable<IObjectTrackBestShotPacket>
 public:
     ObjectTrackBestShotPacket(Uuid trackId = Uuid(), int64_t timestampUs = -1, Rect boundingBox = Rect());
 
+    virtual Flags flags() const override;
     virtual int64_t timestampUs() const override;
 
     virtual const char* imageUrl() const override;
@@ -25,6 +26,7 @@ public:
     virtual const char* imageDataFormat() const override;
 
     void setTrackId(const Uuid& trackId);
+    void setFlags(Flags flags);
     void setTimestampUs(int64_t timestampUs);
     void setBoundingBox(const Rect& boundingBox);
     void setImageUrl(std::string imageUrl);
@@ -47,6 +49,7 @@ protected:
 
 private:
     Uuid m_trackId;
+    Flags m_flags = Flags::none;
     int64_t m_timestampUs = -1;
     Rect m_boundingBox;
 

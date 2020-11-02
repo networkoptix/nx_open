@@ -7,6 +7,7 @@
 
 #include <utils/common/connective.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/time_helper.h>
 
 #include <nx/analytics/types.h>
 
@@ -69,10 +70,10 @@ private:
         const QString& eventTypeId) const;
 
     void handleEventMetadataPacket(
-        const nx::sdk::Ptr<nx::sdk::analytics::IEventMetadataPacket>& eventMetadataPacket);
+        const nx::sdk::Ptr<nx::sdk::analytics::IEventMetadataPacket0>& eventMetadataPacket);
 
     void handleObjectMetadataPacket(
-        const nx::sdk::Ptr<nx::sdk::analytics::IObjectMetadataPacket>& objectMetadataPacket);
+        const nx::sdk::Ptr<nx::sdk::analytics::IObjectMetadataPacket0>& objectMetadataPacket);
 
     void handleObjectTrackBestShotPacket(
         const nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackBestShotPacket0>&
@@ -81,7 +82,7 @@ private:
     void handleObjectTrackBestShotPacketWithImage(
         QnUuid trackId,
         const nx::common::metadata::ObjectMetadataPacketPtr& bestShotPacket,
-        const nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackBestShotPacket>&
+        const nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackBestShotPacket1>&
             sdkBestShotPacketWithImage);
 
     void handleEventMetadata(
@@ -96,6 +97,9 @@ private:
         const nx::common::metadata::ObjectMetadataPacketPtr& packet);
 
     void at_compatibleEventTypesMaybeChanged(const QnVirtualCameraResourcePtr& device);
+
+    int64_t translateTimestampFromCameraToVmsSystemUs(
+        int64_t timestampUs, nx::sdk::analytics::IDataPacket::Flags flags);
 
 private:
     nx::Mutex m_mutex;
@@ -112,6 +116,7 @@ private:
 
     ObjectTrackBestShotResolver m_objectTrackBestShotResolver;
     ObjectTrackBestShotProxy m_objectTrackBestShotProxy;
+    nx::utils::TimeHelper m_timeHelper;
 };
 
 } // namespace nx::vms::server::analytics

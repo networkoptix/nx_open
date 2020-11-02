@@ -8,6 +8,11 @@ namespace nx {
 namespace sdk {
 namespace analytics {
 
+EventMetadataPacket::Flags EventMetadataPacket::flags() const
+{
+    return m_flags;
+}
+
 int64_t EventMetadataPacket::timestampUs() const
 {
     return m_timestampUs;
@@ -31,6 +36,11 @@ const IEventMetadata* EventMetadataPacket::getAt(int index) const
     auto& eventMetadata = m_events[index];
     eventMetadata->addRef();
     return eventMetadata.get();
+}
+
+void EventMetadataPacket::setFlags(Flags flags)
+{
+    m_flags = flags;
 }
 
 void EventMetadataPacket::setTimestampUs(int64_t timestampUs)

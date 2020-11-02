@@ -8,6 +8,11 @@ namespace nx {
 namespace sdk {
 namespace analytics {
 
+ObjectMetadataPacket::Flags ObjectMetadataPacket::flags() const
+{
+    return m_flags;
+}
+
 int64_t ObjectMetadataPacket::timestampUs() const
 {
     return m_timestampUs;
@@ -31,6 +36,11 @@ const IObjectMetadata* ObjectMetadataPacket::getAt(int index) const
     auto& objectMetadata = m_objects[index];
     objectMetadata->addRef();
     return objectMetadata.get();
+}
+
+void ObjectMetadataPacket::setFlags(Flags flags)
+{
+    m_flags = flags;
 }
 
 void ObjectMetadataPacket::setTimestampUs(int64_t timestampUs)

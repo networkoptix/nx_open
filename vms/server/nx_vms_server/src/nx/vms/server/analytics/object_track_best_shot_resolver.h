@@ -28,7 +28,7 @@ public:
     virtual ~ObjectTrackBestShotResolver();
 
     void resolve(
-        const nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackBestShotPacket>& bestShotPacket,
+        const nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackBestShotPacket1>& bestShotPacket,
         ImageHandler imageHandler);
 
     void stop();
