@@ -18,7 +18,7 @@ StreamingChunkCacheKey::StreamingChunkCacheKey(
     const QString& uniqueResourceID,
     int channel,
     const QString& containerFormat,
-    const QString& alias,
+    const QByteArray& alias,
     quint64 startTimestamp,
     std::chrono::microseconds duration,
     MediaQuality streamQuality,
@@ -86,7 +86,7 @@ unsigned int StreamingChunkCacheKey::channel() const
     return m_channel;
 }
 
-QString StreamingChunkCacheKey::alias() const
+const QByteArray& StreamingChunkCacheKey::alias() const
 {
     return m_alias;
 }
@@ -223,7 +223,7 @@ bool StreamingChunkCacheKey::operator!=(const StreamingChunkCacheKey& right) con
 
 uint qHash(const StreamingChunkCacheKey& key)
 {
-    auto videoCodecs = 
+    auto videoCodecs =
         [&key]()
         {
             uint result = 0;

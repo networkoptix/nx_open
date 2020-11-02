@@ -817,7 +817,7 @@ nx::network::http::StatusCode::Value HttpLiveStreamingProcessor::getResourceChun
         uniqueResourceID.toString(),
         params.channel,
         params.containerFormat,
-        params.alias ? *params.alias : QString(),
+        params.alias ? params.alias->toUtf8() : QByteArray(),
         startTimestamp,
         std::chrono::microseconds(chunkDuration),
         params.streamQuality,

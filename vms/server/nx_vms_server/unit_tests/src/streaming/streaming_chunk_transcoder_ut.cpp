@@ -45,7 +45,7 @@ protected:
             m_cameraResourceId.toSimpleString(),
             0,
             "mpeg2ts",
-            QString(),
+            QByteArray(),
             0,
             std::chrono::seconds(1),
             MediaQuality::MEDIA_Quality_Low,

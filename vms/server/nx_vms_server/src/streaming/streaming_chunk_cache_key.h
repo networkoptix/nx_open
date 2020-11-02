@@ -34,7 +34,7 @@ public:
         const QString& uniqueResourceID,
         int channel,
         const QString& containerFormat,
-        const QString& alias,
+        const QByteArray& alias,
         quint64 startTimestamp,
         std::chrono::microseconds duration,
         MediaQuality streamQuality,
@@ -43,7 +43,7 @@ public:
 
     const QString& srcResourceUniqueID() const;
     unsigned int channel() const;
-    QString alias() const;
+    const QByteArray& alias() const;
     /** Chunk start timestamp (micros). This is internal timestamp, not calendar time. */
     quint64 startTimestamp() const;
     std::chrono::microseconds duration() const;
@@ -80,7 +80,7 @@ private:
     QString m_uniqueResourceID;
     int m_channel;
     QString m_containerFormat;
-    QString m_alias;
+    QByteArray m_alias;
     quint64 m_startTimestamp;
     std::chrono::microseconds m_duration;
     MediaQuality m_streamQuality;
