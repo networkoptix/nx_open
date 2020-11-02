@@ -30,6 +30,7 @@ set(nx_kit_files
     src/nx/kit/test.cpp
     src/nx/kit/json.h
     src/nx/kit/json.cpp
+    src/nx/kit/flags.h
     src/ini_config_c.h
     src/ini_config_c_impl.h
 )
