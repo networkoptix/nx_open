@@ -27,6 +27,7 @@
 #include <cstring>
 #include <limits>
 #include <sstream>
+#include <stdint.h>
 
 namespace json11 {
 

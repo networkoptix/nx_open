@@ -9,6 +9,7 @@
 #include <functional>
 #include <iostream>
 #include <sstream>
+#include <stdint.h>
 #include <string>
 
 #include <nx/kit/utils.h>

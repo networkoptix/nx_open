@@ -13,6 +13,7 @@
 #include <cstring>
 #include <cstdio>
 #include <cstdlib>
+#include <stdint.h>
 #include <string>
 #include <sstream>
 #include <vector>

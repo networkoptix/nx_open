@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <cstdint>
+#include <stdint.h>
 #include "../plugins/plugin_api.h"
 
 #if defined(_WIN32)
