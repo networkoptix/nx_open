@@ -1,15 +1,23 @@
 # This file contains functions for populating the script for ninja_tool with commands to be
 # executed on a pre-build step.
+option(runNinjaTool "Invoke ninja_tool.py (via ninja_launcher) before each invocation of ninja." ON)
+
 include(CMakeParseArguments)
 
 set(ninja_tool_script_name "${CMAKE_BINARY_DIR}/pre_build.ninja_tool")
 
 function(nx_setup_ninja_preprocessor)
     if(CMAKE_GENERATOR STREQUAL "Ninja")
-        set(launcher_name "${CMAKE_SOURCE_DIR}/build_utils/ninja/ninja_launcher")
+        if(runNinjaTool)
+            set(launcher_name "${CMAKE_SOURCE_DIR}/build_utils/ninja/ninja_launcher")
 
-        if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-            string(APPEND launcher_name ".bat")
+            if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+                string(APPEND launcher_name ".bat")
+            else()
+                string(APPEND launcher_name ".sh")
+            endif()
+        else()
+            find_program(launcher_name ninja)
         endif()
 
         set(CMAKE_MAKE_PROGRAM ${launcher_name}
