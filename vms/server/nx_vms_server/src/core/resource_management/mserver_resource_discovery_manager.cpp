@@ -580,8 +580,9 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
                     "Camera %1 has not answered to %2 discovery loops in a row.",
                     netResourceString(netRes), m_resourceDiscoveryCounter[uniqId]);
 
-                if (QnLiveStreamProvider::hasRunningLiveProvider(netRes)
-                    || (camRes && camRes->isLicenseUsed()))
+                const bool hasProvider = QnLiveStreamProvider::hasRunningLiveProvider(netRes);
+                const bool hasLicense = camRes && camRes->isLicenseUsed();
+                if (!camRes->hasFlags(Qn::desktop_camera) && (hasProvider || hasLicense))
                 {
                     if (res->getStatus() == Qn::Offline && !m_disconnectSended[uniqId])
                     {
