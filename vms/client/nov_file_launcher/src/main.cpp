@@ -267,10 +267,15 @@ int launchFile(const wstring& executePath)
         set<wstring> checkedDirs;
         checkDir(checkedDirs, dstDir);
 
-        if (filePosList.size() > 1)
+        if (!filePosList.empty())
         {
             QnLauncherProgress progress(std::wstring(QN_CLIENT_DISPLAY_NAME)
                 + L" - " + loadString(IDS_UNPACKING).c_str());
+
+            // Since we are calculating embedded file size as a difference between positions inside
+            // the launcher file, we need to determine where the last embedded file ends.
+            // We can use index table file position because it goes right after embedded files data.
+            filePosList.push_back(indexTablePos);
 
             progress.setRange(filePosList.front(), filePosList.back());
 
