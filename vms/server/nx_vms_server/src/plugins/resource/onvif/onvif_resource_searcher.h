@@ -29,6 +29,7 @@ public:
     virtual QList<QnResourcePtr> checkHostAddr(
         const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
 
+    static bool isCustomOnvifPort(const QString& vendor, int port);
 private:
     int autoDetectDevicePort(const nx::utils::Url& url);
 

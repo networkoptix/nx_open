@@ -27,16 +27,24 @@
 
 namespace {
 
+struct PortInfo
+{
+    QString vendor;
+    int port = 0;
+};
+
 /*
  *  Port list used for manual camera add
  */
-const static std::array<int, 4> kOnvifDeviceAltPorts =
+
+const static std::array<PortInfo, 4> kOnvifDeviceAltPorts =
 {
-    8081, //FLIR default port
-    8032, // DW default port
-    50080, // NEW DW cam default port
-    9988 // Dahua default port
+    PortInfo{"flir", 8081}, //FLIR default port
+    PortInfo{"Digital Watchdog", 8032}, // DW default port
+    PortInfo{"Digital Watchdog", 50080}, // NEW DW cam default port
+    PortInfo{"dahua", 9988} // Dahua default port
 };
+
 static const int kDefaultOnvifPort = 80;
 static const std::chrono::milliseconds kManualDiscoveryConnectTimeout(5000);
 
@@ -61,6 +69,15 @@ bool hasRunningLiveProvider(QnNetworkResourcePtr netRes)
 
     netRes->unlockConsumers();
     return rez;
+}
+
+bool OnvifResourceSearcher::isCustomOnvifPort(const QString& vendor, int port)
+{
+    return std::any_of(kOnvifDeviceAltPorts.begin(), kOnvifDeviceAltPorts.end(),
+        [&](const auto& portInfo)
+        {
+            return portInfo.port == port && portInfo.vendor.compare(vendor, Qt::CaseInsensitive) == 0;
+        });
 }
 
 OnvifResourceSearcher::OnvifResourceSearcher(QnMediaServerModule* serverModule)
@@ -138,11 +155,11 @@ int OnvifResourceSearcher::autoDetectDevicePort(const nx::utils::Url& url)
     std::vector<std::unique_ptr<GSoapDeviceGetSystemDateAndTimeAsyncWrapper>> requestList;
     int result = -1;
     int workers = (int)kOnvifDeviceAltPorts.size();
-    for (auto port: kOnvifDeviceAltPorts)
+    for (const auto& portInfo: kOnvifDeviceAltPorts)
     {
         std::unique_ptr<DeviceSoapWrapper> soapWrapper(new DeviceSoapWrapper(
             SoapTimeouts(serverModule()->settings().onvifTimeouts()),
-            lit("http://%1:%2/onvif/device_service").arg(url.host()).arg(port).toStdString(),
+            lit("http://%1:%2/onvif/device_service").arg(url.host()).arg(portInfo.port).toStdString(),
             /*login*/ QString(),
             /*password*/ QString(),
             /*timeDrift*/ 0));
@@ -154,11 +171,11 @@ int OnvifResourceSearcher::autoDetectDevicePort(const nx::utils::Url& url)
         _onvifDevice__GetSystemDateAndTime request;
         asyncWrapper->callAsync(
             request,
-            [&, port](int soapResultCode)
+            [&, portInfo](int soapResultCode)
             {
                 QnMutexLocker lock(&mutex);
                 if (soapResultCode == SOAP_OK && result == -1)
-                    result = port;
+                    result = portInfo.port;
 
                 --workers;
                 waitCond.wakeAll();

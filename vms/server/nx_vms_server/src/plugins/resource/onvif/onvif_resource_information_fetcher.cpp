@@ -28,6 +28,7 @@
 #include <common/common_module.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/match/wildcard.h>
+#include "onvif_resource_searcher.h"
 
 using namespace nx::plugins;
 using namespace nx::plugins::onvif;
@@ -366,6 +367,15 @@ QnUuid OnvifResourceInformationFetcher::getOnvifResourceType(const QString& manu
         return onvifTypeId; // no child resourceType found. Use root ONVIF resource type
 }
 
+QUrl toHttpUrl(const QString& vendor, const QUrl& onvifUrl)
+{
+    auto result = onvifUrl;
+    result.setPath(QString());
+    if (OnvifResourceSearcher::isCustomOnvifPort(vendor, result.port()))
+        result.setPort(-1);
+    return result;
+}
+
 QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(
     const QString& manufacturer, const QString& firmware, const QHostAddress& sender,
     const QHostAddress& discoveryIp, const QString& model,
@@ -407,7 +417,7 @@ QnPlOnvifResourcePtr OnvifResourceInformationFetcher::createResource(
     resource->setFirmware(firmware);
 
     resource->setPhysicalId(uniqId);
-    resource->setUrl(deviceUrl);
+    resource->setUrl(toHttpUrl(resource->getVendor(), QUrl(deviceUrl)).toString());
     resource->setDeviceOnvifUrl(deviceUrl);
 
     if (!login.isEmpty())
