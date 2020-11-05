@@ -245,9 +245,10 @@ struct GraphicsQmlView::Private
     void ensureOffscreen();
     void ensureVao(QnTextureGLShaderProgram* shader);
     void updateSizes();
-    void tryInitializeFbo();
+    bool isFboInitializationRequired();
+    void initializeFbo();
     void scheduleUpdateSizes();
-    void paintQml(QPainter* painter, const QRectF& channelRect, QOpenGLWidget* glWidget);
+    void paintQml();
 };
 
 GraphicsQmlView::GraphicsQmlView(QGraphicsItem* parent, Qt::WindowFlags wFlags):
@@ -358,22 +359,29 @@ QQmlEngine* GraphicsQmlView::engine() const
     return d->qmlEngine;
 }
 
-void GraphicsQmlView::Private::tryInitializeFbo()
+bool GraphicsQmlView::Private::isFboInitializationRequired()
 {
     if (!quickWindow)
-        return;
+        return false;
 
     const QSize requiredSize = quickWindow->size() * qApp->devicePixelRatio();
 
     if (fbo && fbo->size() == requiredSize)
-        return;
+        return false;
 
     if (!fboTimer.isValid())
         fboTimer.start();
 
     // Avoid frequent re-creation of FrameBuffer objects because it's time consuming.
     if (fbo && !fboTimer.hasExpired(duration_cast<milliseconds>(kFboResizeTimeout).count()))
-        return;
+        return false;
+
+    return true;
+}
+
+void GraphicsQmlView::Private::initializeFbo()
+{
+    const QSize requiredSize = quickWindow->size() * qApp->devicePixelRatio();
 
     QScopedPointer<QOpenGLFramebufferObject> newFbo(
         new QOpenGLFramebufferObject(
@@ -474,7 +482,7 @@ void GraphicsQmlView::Private::ensureOffscreen()
 
     openglContext->makeCurrent(offscreenSurface.data());
     renderControl->initialize(openglContext.data());
-    tryInitializeFbo();
+    initializeFbo();
     openglContext->doneCurrent();
 
     offscreenInitialized = true;
@@ -600,36 +608,37 @@ bool GraphicsQmlView::focusNextPrevChild(bool next)
     return event.isAccepted();
 }
 
-void GraphicsQmlView::Private::paintQml(
-    QPainter* painter,
-    const QRectF& channelRect,
-    QOpenGLWidget* glWidget)
+void GraphicsQmlView::Private::paintQml()
 {
+    const bool mustInitFbo = isFboInitializationRequired();
+
+    renderRequested = renderRequested || mustInitFbo;
+    sceneChanged = sceneChanged || mustInitFbo;
+
     if (!sceneChanged && !renderRequested)
         return;
 
-    if (openglContext->makeCurrent(offscreenSurface.data()))
+    if (!openglContext->makeCurrent(offscreenSurface.data()))
+        return;
+
+    if (mustInitFbo)
+        initializeFbo();
+
+    if (!fbo)
+        return;
+
+    if (sceneChanged)
     {
-        tryInitializeFbo();
+        renderControl->polishItems();
+        renderRequested = renderControl->sync() || renderRequested;
+        sceneChanged = false;
+    }
 
-        if (fbo)
-        {
-            if (sceneChanged)
-            {
-                renderControl->polishItems();
-                renderRequested = renderControl->sync() || renderRequested;
-                sceneChanged = false;
-            }
-
-            if (renderRequested)
-            {
-                renderControl->render();
-                quickWindow->resetOpenGLState();
-                QOpenGLFramebufferObject::bindDefault();
-                openglContext->functions()->glFlush();
-                renderRequested = false;
-            }
-        }
+    if (renderRequested)
+    {
+        renderControl->render();
+        openglContext->functions()->glFlush();
+        renderRequested = false;
     }
 }
 
@@ -642,7 +651,7 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
 
     auto channelRect = rect();
 
-    d->paintQml(painter, channelRect, glWidget);
+    d->paintQml();
 
     if (!d->fbo)
         return;
