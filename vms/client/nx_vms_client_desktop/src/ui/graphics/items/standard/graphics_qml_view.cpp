@@ -242,7 +242,7 @@ struct GraphicsQmlView::Private
 
     Private(GraphicsQmlView* view): view(view) {}
 
-    void ensureOffscreen(const QRectF& rect, QOpenGLWidget* glWidget);
+    void ensureOffscreen();
     void ensureVao(QnTextureGLShaderProgram* shader);
     void updateSizes();
     void tryInitializeFbo();
@@ -274,6 +274,8 @@ GraphicsQmlView::GraphicsQmlView(QGraphicsItem* parent, Qt::WindowFlags wFlags):
     d->quickWindow.reset(new QQuickWindow(d->renderControl.data()));
     d->quickWindow->setTitle(QString::fromLatin1("Offscreen"));
     d->quickWindow->setGeometry(0, 0, 640, 480); //< Will be resized later.
+
+    d->ensureOffscreen();
 
     d->qmlEngine = qnClientCoreModule->mainQmlEngine();
 
@@ -449,13 +451,13 @@ void GraphicsQmlView::Private::updateSizes()
     quickWindow->setGeometry(pos.x(), pos.y(), qCeil(size.width()), qCeil(size.height()));
 }
 
-void GraphicsQmlView::Private::ensureOffscreen(const QRectF&, QOpenGLWidget* glWidget)
+void GraphicsQmlView::Private::ensureOffscreen()
 {
     if (offscreenInitialized)
         return;
 
     openglContext.reset(new QOpenGLContext());
-    openglContext->setShareContext(glWidget->context());
+    openglContext->setShareContext(QOpenGLContext::globalShareContext());
     openglContext->create();
     NX_ASSERT(openglContext->isValid());
 
@@ -472,6 +474,7 @@ void GraphicsQmlView::Private::ensureOffscreen(const QRectF&, QOpenGLWidget* glW
 
     openglContext->makeCurrent(offscreenSurface.data());
     renderControl->initialize(openglContext.data());
+    tryInitializeFbo();
     openglContext->doneCurrent();
 
     offscreenInitialized = true;
@@ -605,10 +608,6 @@ void GraphicsQmlView::Private::paintQml(
     if (!sceneChanged && !renderRequested)
         return;
 
-    QnGlNativePainting::begin(glWidget, painter);
-
-    ensureOffscreen(channelRect, glWidget);
-
     if (openglContext->makeCurrent(offscreenSurface.data()))
     {
         tryInitializeFbo();
@@ -626,13 +625,12 @@ void GraphicsQmlView::Private::paintQml(
             {
                 renderControl->render();
                 quickWindow->resetOpenGLState();
+                QOpenGLFramebufferObject::bindDefault();
                 openglContext->functions()->glFlush();
                 renderRequested = false;
             }
         }
     }
-
-    QnGlNativePainting::end(painter);
 }
 
 void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
