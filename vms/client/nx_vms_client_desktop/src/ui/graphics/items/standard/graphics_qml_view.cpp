@@ -503,10 +503,17 @@ void GraphicsQmlView::Private::ensureVao(QnTextureGLShaderProgram* shader)
     vertices.create();
     vertices.bind();
 
+    if (!shader->initialized())
+    {
+        // These attribute indexes are used all over the code.
+        shader->bindAttributeLocation("aPosition", 0);
+        shader->bindAttributeLocation("aTexCoord", 1);
+        NX_ASSERT(shader->link());
+        shader->markInitialized();
+    };
+
     initializeQuadBuffer(shader, "aPosition", &positionBuffer);
     initializeQuadBuffer(shader, "aTexCoord", &texcoordBuffer, kTexCoordArray);
-
-    shader->markInitialized();
 
     vertices.release();
 
