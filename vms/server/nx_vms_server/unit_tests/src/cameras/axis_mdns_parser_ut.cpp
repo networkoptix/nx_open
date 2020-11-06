@@ -6,7 +6,7 @@
 #include <nx/utils/std/algorithm.h>
 
 
-static char packetWithAdditionalRssRecords[] =
+static unsigned char packetWithAdditionalRssRecords[] =
 {
     0x00, 0x00, 0x84, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x04, 0x05, 0x5f, 0x68, 0x74,
     0x74, 0x70, 0x04, 0x5f, 0x74, 0x63, 0x70, 0x05, 0x6c, 0x6f, 0x63, 0x61, 0x6c, 0x00, 0x00, 0x0c,
@@ -21,7 +21,7 @@ static char packetWithAdditionalRssRecords[] =
     0x2c, 0xe7
 };
 
-static char packetWithQueriesRecords[] =
+static unsigned char packetWithQueriesRecords[] =
 
 {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x05, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x1b, 0x41, 0x58, 0x49,
@@ -56,7 +56,8 @@ TEST(AxisResourceSearcher, parsePacketWithTextRecords)
     nx::utils::MacAddress mac;
     QnMdnsPacket packet;
 
-    QByteArray data(packetWithAdditionalRssRecords, sizeof(packetWithAdditionalRssRecords));
+    QByteArray data(
+        (const char*) packetWithAdditionalRssRecords, sizeof(packetWithAdditionalRssRecords));
     packet.fromDatagram(data);
     nx::utils::remove_if(packet.additionalRRs,
         [](const auto& record)
@@ -74,7 +75,8 @@ TEST(AxisResourceSearcher, parsePacketWithPtrRecords)
     nx::utils::MacAddress mac;
     QnMdnsPacket packet;
 
-    QByteArray data(packetWithAdditionalRssRecords, sizeof(packetWithAdditionalRssRecords));
+    QByteArray data(
+        (const char*) packetWithAdditionalRssRecords, sizeof(packetWithAdditionalRssRecords));
     packet.fromDatagram(data);
     nx::utils::remove_if(packet.additionalRRs,
         [](const auto& record)
@@ -93,7 +95,8 @@ TEST(AxisResourceSearcher, parsePacketWithQueriesRecords)
     nx::utils::MacAddress mac;
     QnMdnsPacket packet;
 
-    QByteArray data(packetWithQueriesRecords, sizeof(packetWithQueriesRecords));
+    QByteArray data(
+        (const char*) packetWithQueriesRecords, sizeof(packetWithQueriesRecords));
     packet.fromDatagram(data);
     ASSERT_TRUE(QnPlAxisResourceSearcher::parseNameAndMacFromMdns(packet, &name, &mac));
     ASSERT_EQ("AXIS M3046-V", name);
@@ -105,7 +108,8 @@ TEST(AxisResourceSearcher, parsePacketRaw)
     QString name;
     nx::utils::MacAddress mac;
 
-    QByteArray data(packetWithQueriesRecords, sizeof(packetWithQueriesRecords));
+    QByteArray data(
+        (const char*) packetWithQueriesRecords, sizeof(packetWithQueriesRecords));
     ASSERT_TRUE(QnPlAxisResourceSearcher::parseNameAndMacFromRawData(data, &name, &mac));
     ASSERT_EQ("AXIS M3046-V", name);
     ASSERT_EQ("AC-CC-8E-95-33-57", mac.toString());
