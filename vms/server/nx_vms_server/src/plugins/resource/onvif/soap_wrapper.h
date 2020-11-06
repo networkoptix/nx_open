@@ -181,7 +181,10 @@ public:
     }
     virtual bool lastErrorIsNotAuthenticated() override
     {
-        return PasswordHelper::isNotAuthenticated(m_bindingProxy.soap_fault());
+         //< Some cameras don't follow standard and return 'unauthorized' result in the soap status.
+        return m_bindingProxy.soap->status == 401
+            || m_bindingProxy.soap->error == 401
+            || PasswordHelper::isNotAuthenticated(m_bindingProxy.soap_fault());
     }
     virtual bool lastErrorIsConflict() override
     {
