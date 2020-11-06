@@ -60,6 +60,8 @@ struct QnMdnsPacket
     static const quint16 kARecordType = 0x01;
     static const quint16 kTextRecordType = 0x10;
 
+    static const quint16 kAnyRecordType = 0xff;
+
 
     quint16 transactionId;
     quint16 flags;
@@ -77,8 +79,8 @@ public:
     void addQuery();
     void toDatagram(QByteArray& datagram);
     bool fromDatagram(const QByteArray& datagram);
-
 private:
+    void reset();
     int parseName(
             const QByteArray& message,
             int nameOffset,

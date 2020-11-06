@@ -204,19 +204,8 @@ nx::network::SocketAddress QnPlAxisResourceSearcher::obtainFixedHostAddress(
     return useDiscoveredAddress ? discoveredAddress : lastNonIpv4LinkLocalTimeMarkedAddress.address;
 }
 
-QString macFromHexData(const char* data)
-{
-    QString result;
-    for (int i = 0; i < 12; i++)
-    {
-        if (i > 0 && i % 2 == 0)
-            result += '-';
-        result += data[i];
-    }
-    return result;
-}
-
-bool parseNameAndMacFromRawData(const QByteArray& responseData, QString* outName, QString* outMac)
+bool QnPlAxisResourceSearcher::parseNameAndMacFromRawData(
+    const QByteArray& responseData, QString* outName, nx::utils::MacAddress* outMac)
 {
     int iqpos = responseData.indexOf("AXIS");
 
@@ -242,6 +231,9 @@ bool parseNameAndMacFromRawData(const QByteArray& responseData, QString* outName
             *outName += QLatin1Char(c); //< Assume Latin-1 encoding.
     }
 
+    if (outName->endsWith(" - "))
+        outName->chop(3);
+
     int macpos2 = responseData.indexOf(prefix2, macpos);
     if (macpos2 > 0)
         macpos = macpos2 + 5; // replace real MAC to virtual MAC if exists
@@ -255,33 +247,65 @@ bool parseNameAndMacFromRawData(const QByteArray& responseData, QString* outName
     if (macpos + 12 > responseData.size())
         return false;
 
-    *outMac = macFromHexData(responseData.data() + macpos);
-
-    return true;
+    *outMac = nx::utils::MacAddress(responseData.mid(macpos, 12));
+    return !outMac->isNull();
 }
 
-bool parseNameAndMacFromMdns(
-    const QnMdnsPacket::ResourceRecord& record, QString* outName, QString* outMac)
+bool parseMdnsString(const QByteArray& nameAndMac, QString* outName, nx::utils::MacAddress* outMac)
 {
-    if (record.recordType != QnMdnsPacket::kTextRecordType)
+    const int axisPos = nameAndMac.indexOf("AXIS");
+    if (axisPos == -1)
         return false;
 
-    if (!record.recordName.contains("AXIS"))
-        return false;
-
-    QByteArray nameAndMac = record.recordName.left(record.recordName.indexOf('.'));
-
-    auto macDelimiter = nameAndMac.lastIndexOf('-');
+    const int macDelimiter = nameAndMac.lastIndexOf('-');
     if (macDelimiter == -1)
         return false;
 
-    *outName = nameAndMac.left(macDelimiter).trimmed();
+    *outName = nameAndMac.mid(axisPos, macDelimiter - axisPos).trimmed();
     const QByteArray macStr = nameAndMac.mid(macDelimiter + 1).trimmed();
-    if (macStr.size() != 12)
-        return false;
-    *outMac = macFromHexData(macStr.data());
 
-    return true;
+    *outMac = nx::utils::MacAddress(macStr);
+    return !outMac->isNull();
+}
+
+bool QnPlAxisResourceSearcher::parseNameAndMacFromMdns(
+    const QnMdnsPacket& packet, QString* outName, nx::utils::MacAddress* outMac)
+{
+    bool result = false;
+    for (const auto& record : packet.answerRRs + packet.additionalRRs)
+    {
+        switch (record.recordType)
+        {
+            case QnMdnsPacket::kTextRecordType:
+                result = parseMdnsString(record.recordName.left(record.recordName.indexOf('.')), outName, outMac);
+                break;
+            case QnMdnsPacket::kPtrRecordType:
+                result = parseMdnsString(record.data.left(record.data.size() - 2), outName, outMac);
+                break;
+            default:
+                break;
+        }
+        if (result)
+            break;
+    }
+    if (result)
+        return result;
+
+    for (const auto& record: packet.queries)
+    {
+        switch (record.queryType)
+        {
+            case QnMdnsPacket::kAnyRecordType:
+                result = parseMdnsString(record.queryName.left(record.queryName.indexOf('.')), outName, outMac);
+                break;
+            default:
+                break;
+        }
+        if (result)
+            break;
+    }
+
+    return result;
 }
 
 QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
@@ -293,7 +317,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     QString discoveryAddressStr = discoveryAddress.toString();
     QString foundAddressStr = foundHostAddress.toString();
 
-    QString smac;
+    nx::utils::MacAddress macAddress;
     QString name;
 
     QList<QnNetworkResourcePtr> local_results;
@@ -302,31 +326,21 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     bool success = false;
     bool hasDeserializedMdnsPacket = packet.fromDatagram(responseData);
     if (hasDeserializedMdnsPacket)
-    {
-        for (const auto& record: packet.answerRRs + packet.additionalRRs)
-        {
-            success = parseNameAndMacFromMdns(record, &name, &smac);
-            if (success)
-                break;
-        }
-    }
-
+        success = parseNameAndMacFromMdns(packet, &name, &macAddress);
     if (!success)
-        success = parseNameAndMacFromRawData(responseData, &name, &smac);
+        success = parseNameAndMacFromRawData(responseData, &name, &macAddress);
     if (!success)
         return local_results;
 
     name.replace(QLatin1Char(' '), QString()); // remove spaces
     name.replace(QLatin1Char('-'), QString()); // remove spaces
     name.replace(QLatin1Char('\t'), QString()); // remove tabs
-    smac = smac.toUpper();
 
     for(const QnResourcePtr& res: result)
     {
         QnNetworkResourcePtr net_res = res.dynamicCast<QnNetworkResource>();
 
-        if (net_res->getMAC().toString() == smac)
-            //&& QHostAddress(net_res->getHostAddress()) == foundHostAddress)
+        if (net_res->getMAC() == macAddress)
         {
             return local_results; // already found;
         }
@@ -345,8 +359,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     resource->setTypeId(rt);
     resource->setName(name);
     resource->setModel(name);
-    auto mac = nx::utils::MacAddress(smac);
-    resource->setMAC(mac);
+    resource->setMAC(macAddress);
 
     quint16 port = nx::network::http::DEFAULT_HTTP_PORT;
     bool deviceAddressFound = false;
@@ -376,7 +389,7 @@ QList<QnNetworkResourcePtr> QnPlAxisResourceSearcher::processPacket(
     url.setScheme(lit("http"));
 
     auto fixedIpPort = obtainFixedHostAddress(
-        mac, nx::network::SocketAddress(foundHostAddress.toString(), port));
+        macAddress, nx::network::SocketAddress(foundHostAddress.toString(), port));
 
     url.setHost(fixedIpPort.address.toString());
     url.setPort(fixedIpPort.port);

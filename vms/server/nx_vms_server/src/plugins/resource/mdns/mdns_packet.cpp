@@ -29,8 +29,24 @@ void QnMdnsPacket::toDatagram(QByteArray& datagram)
     }
 }
 
+void QnMdnsPacket::reset()
+{
+    transactionId = 0;
+    flags = 0;
+    questionCount = 0;
+    answerRRCount = 0;
+    authorityRRCount = 0;
+    additionalRRCount = 0;
+    queries.clear();
+    answerRRs.clear();
+    authorityRRs.clear();
+    additionalRRs.clear();
+}
+
 bool QnMdnsPacket::fromDatagram(const QByteArray& message)
 {
+    reset();
+
     const auto bufferStart = message.constData();
     const auto bufferSize = message.size();
 

@@ -7,6 +7,10 @@
 
 #include "core/resource_management/resource_searcher.h"
 #include "../mdns/mdns_resource_searcher.h"
+#include <nx/network/socket_common.h>
+#include <nx/vms/server/resource/resource_fwd.h>
+
+struct QnMdnsPacket;
 
 class QnPlAxisResourceSearcher : public QnMdnsResourceSearcher
 {
@@ -33,6 +37,11 @@ public:
 
     virtual QList<QnResourcePtr> checkHostAddr(
         const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) override;
+
+    static bool parseNameAndMacFromMdns(
+        const QnMdnsPacket& packet, QString* outName, nx::utils::MacAddress* outMac);
+    static bool parseNameAndMacFromRawData(
+        const QByteArray& responseData, QString* outName, nx::utils::MacAddress* outMac);
 
     virtual bool isSequential() const override;
 
