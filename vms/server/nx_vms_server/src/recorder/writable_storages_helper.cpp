@@ -170,7 +170,7 @@ std::vector<WritableStoragesHelper::SpaceInfo> WritableStoragesHelper::filterOut
     std::vector<SpaceInfo> result;
     for (const auto& info: infos)
     {
-        if (info.effective < 0)
+        if (info.effective <= 0)
         {
             NX_DEBUG(
                 typeid(WritableStoragesHelper),

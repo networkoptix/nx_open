@@ -178,36 +178,29 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
     if (!toCatalog)
         return CopyError::GetCatalogError;
 
-    if (toCatalog->lastChunkStartTime() < chunkKey.chunk.startTimeMs) {
+    if (toCatalog->lastChunkStartTime() < chunkKey.chunk.startTimeMs)
+    {
         {   // update sync data
             QnMutexLocker lk(&m_syncDataMutex);
             SyncDataMap::iterator syncDataIt = m_syncData.find(chunkKey);
             NX_ASSERT(syncDataIt != m_syncData.cend());
             auto catalogSize = fromCatalog->size();
             int curFileIndex = fromCatalog->findFileIndex(
-                chunkKey.chunk.startTimeMs,
-                DeviceFileCatalog::FindMethod::OnRecordHole_NextChunk
-            );
+                chunkKey.chunk.startTimeMs, DeviceFileCatalog::FindMethod::OnRecordHole_NextChunk);
+
             syncDataIt->second.currentIndex = curFileIndex;
             syncDataIt->second.totalChunks = (int) catalogSize - syncDataIt->second.startIndex;
         }
 
         QString fromFileFullName = fromCatalog->fullFileName(chunkKey.chunk);
         auto fromStorage = QnStorageManager::getStorageByUrl(
-            serverModule(),
-            fromFileFullName,
-            QnServer::StoragePool::Normal
-        );
+            serverModule(), fromFileFullName, QnServer::StoragePool::Normal);
 
         if (!fromStorage)
             return CopyError::FromStorageError;
 
-        std::unique_ptr<QIODevice> fromFile = std::unique_ptr<QIODevice>(
-            fromStorage->open(
-                fromFileFullName,
-                QIODevice::ReadOnly
-            )
-        );
+        auto fromFile =
+            std::unique_ptr<QIODevice>(fromStorage->open(fromFileFullName, QIODevice::ReadOnly));
 
         if (!fromFile)
         {   // This means that source storage is not available or
@@ -228,10 +221,11 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
         auto relativeFileName = fromFileFullName.mid(fromStorage->getUrl().size());
         auto toStorage = serverModule()->backupStorageManager()->getOptimalStorageRoot();
 
-        if (!toStorage) {
+        if (!toStorage || toStorage->getFreeSpace() < toStorage->getSpaceLimit() / 2)
+        {
             serverModule()->backupStorageManager()->clearSpace(true);
             toStorage = serverModule()->backupStorageManager()->getOptimalStorageRoot();
-            if (!toStorage)
+            if (!toStorage || toStorage->getFreeSpace() < toStorage->getSpaceLimit() / 2)
                 return CopyError::NoBackupStorageError;
         }
 
@@ -242,12 +236,8 @@ QnScheduleSync::CopyError QnScheduleSync::copyChunk(const ChunkKey &chunkKey)
             relativeFileName.replace(oldSeparator, newSeparator);
         auto newFileName = toStorage->getUrl() + relativeFileName;
 
-        std::unique_ptr<QIODevice> toFile = std::unique_ptr<QIODevice>(
-            toStorage->open(
-                newFileName,
-                QIODevice::WriteOnly
-            )
-        );
+        auto toFile =
+            std::unique_ptr<QIODevice>(toStorage->open(newFileName, QIODevice::WriteOnly));
 
         if (!toFile) {
             NX_WARNING(this, lit("[Backup::copyFile] Target file %1 open failed")
@@ -363,7 +353,6 @@ void QnScheduleSync::initSyncData()
 template<typename NeedMoveOnCB>
 vms::api::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
 {
-    // Let's check if at least one target backup storage is available first.
     if (!serverModule()->backupStorageManager()->getOptimalStorageRoot())
     {
         NX_DEBUG(this, "[Backup] No approprirate storages found. Bailing out.");
@@ -387,6 +376,7 @@ vms::api::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
             NX_VERBOSE(this, "[Backup] chunks ended, backup done");
             break;
         }
+
         m_syncTimePoint = (*chunkKeyVector)[0].chunk.startTimeMs;
         m_syncEndTimePoint = qMax((*chunkKeyVector)[0].chunk.endTimeMs(), m_syncEndTimePoint);
         NX_VERBOSE(this, lit("[Backup] found chunk to backup: %1").arg(m_syncTimePoint));
@@ -415,6 +405,7 @@ vms::api::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
                 }
             }
         }
+
         const auto needMoveOnCode = needMoveOn();
         if (needMoveOnCode != SyncCode::ok)
         {
@@ -426,6 +417,7 @@ vms::api::EventReason QnScheduleSync::synchronize(NeedMoveOnCB needMoveOn)
             break;
         }
     }
+
     NX_DEBUG(this, "[Backup] successfully finished...");
     m_interrupted = true; // we are done till the next backup period
     return vms::api::EventReason::backupDone;
