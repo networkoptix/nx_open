@@ -13,7 +13,7 @@ namespace nx::vms_server_plugins::analytics::hanwha {
     const std::string& jsonReply)
 {
 /*
-The example of incoming json 1:
+The example of the incoming json 1:
 {
     "Response": "Success"
 }
@@ -40,121 +40,13 @@ The example of incoming json 2:
     return std::nullopt; //< not an error
 }
 
-/*static*/ std::optional<QSet<QString>> DeviceResponseJsonParser::parseEventTypes(
-    const std::string& jsonReply)
-{
-/*
-The example of incoming json (the beginning):
-{
-    "AlarmInput": {
-        "1": false
-    },
-    "AlarmOutput": {
-        "1": false
-    },
-    "ChannelEvent": [
-        {
-            "Channel": 0,
-            "MotionDetection": false,
-            "Tampering": false,
-            "AudioDetection": false,
-            "DefocusDetection": false,
-...
-*/
-    std::string error;
-    nx::kit::Json json = nx::kit::Json::parse(jsonReply, error);
-    if (!json.is_object())
-    {
-        NX_DEBUG(NX_SCOPE_TAG, NX_FMT("JSON parsing error. Root is not an object"));
-        return std::nullopt;
-    }
-
-    const nx::kit::Json jsonChannelEvent = json["ChannelEvent"];
-    if (!jsonChannelEvent.is_array())
-    {
-        NX_DEBUG(NX_SCOPE_TAG, NX_FMT("JSON parsing error. \"ChannelEvent\" field absent"));
-        return std::nullopt;
-    }
-
-    QSet<QString> result;
-    auto items = jsonChannelEvent[0].object_items();
-    for (const auto& [key, value]: items)
-    {
-        if (key != "Channel") //< Channel is a special field, not an EventType
-            result.insert(QString::fromStdString(key));
-    }
-
-    return result;
-}
-
-/*static*/ std::optional<FrameSize> DeviceResponseJsonParser::parseFrameSize(
-    const std::string& jsonReply)
-{
-/*
-The example of incoming json (the beginning):
-{
-    "VideoProfiles": [
-        {
-            "Channel": 0,
-            "Profiles": [
-                {
-                    "Profile": 1,
-                    "Name": "MJPEG",
-                    "EncodingType": "MJPEG",
-                    "RTPMulticastEnable": false,
-                    "RTPMulticastAddress": "",
-                    "RTPMulticastPort": 0,
-                    "RTPMulticastTTL": 5,
-                    "Resolution": "3840x2160",
-                    "FrameRate": 1,
-                    "CompressionLevel": 10,
-                    "Bitrate": 6144,
-...
-*/
-    std::string error;
-    nx::kit::Json json = nx::kit::Json::parse(jsonReply, error);
-    if (!json.is_object())
-    {
-        NX_DEBUG(NX_SCOPE_TAG, NX_FMT("JSON parsing error. Root is not an object"));
-        return std::nullopt;
-    }
-
-    const std::vector<nx::kit::Json>& videoProfiles = json["VideoProfiles"].array_items();
-    if (videoProfiles.empty())
-    {
-        NX_DEBUG(NX_SCOPE_TAG, NX_FMT("JSON parsing error. \"VideoProfiles\" array absent"));
-        return std::nullopt;
-    }
-
-    const std::vector<nx::kit::Json>& profiles = videoProfiles[0]["Profiles"].array_items();
-    if (videoProfiles.empty())
-    {
-        NX_DEBUG(NX_SCOPE_TAG, NX_FMT("JSON parsing error. Channel 0 \"Profiles\" array absent"));
-        return std::nullopt;
-    }
-
-    FrameSize maxFrameSize;
-    for (const nx::kit::Json& profile: profiles)
-    {
-        std::string resolution = profile["Resolution"].string_value();
-        std::istringstream stream(resolution);
-        FrameSize profileFrameSize;
-        char x;
-        stream >> profileFrameSize.rawWidth >> x >> profileFrameSize.rawHeight;
-        bool bad = !stream;
-
-        if (!bad && x == 'x' && maxFrameSize < profileFrameSize)
-            maxFrameSize = profileFrameSize;
-
-    }
-    return maxFrameSize;
-}
+//-------------------------------------------------------------------------------------------------
 
 /*static*/ std::optional<std::string> DeviceResponseJsonParser::parseFirmwareVersion(
     const std::string& jsonReply)
 {
 /*
-The example of incoming json:
+The example of the incoming json:
 {
     "Model": "PNV-A9081R",
     "SerialNumber": "ZNKZ70GM800002Y",
@@ -195,6 +87,66 @@ The example of incoming json:
 }
 
 //-------------------------------------------------------------------------------------------------
+
+/*static*/ std::optional<bool> DeviceResponseJsonParser::parseFrameIsRotated(
+    const std::string& jsonReply, int chanelNumber)
+{
+/*
+The example of the incoming json:
+{
+    "Flip": [
+        {
+            "Channel": 0,
+            "HorizontalFlipEnable": false,
+            "VerticalFlipEnable": false,
+            "Rotate": "270"
+        }
+    ]
+}
+*/
+    nx::kit::Json channelInfo = extractChannelInfo(jsonReply, "Flip", chanelNumber);
+
+    if (!channelInfo.is_object())
+    {
+        NX_DEBUG(NX_SCOPE_TAG, NX_FMT("JSON parsing error. Root is not an object"));
+        return std::nullopt;
+    }
+
+    const nx::kit::Json jsonAngle = channelInfo["Rotate"];
+    if (!jsonAngle.is_string())
+    {
+        NX_DEBUG(NX_SCOPE_TAG, NX_FMT("JSON parsing error. \"Rotate\" field absent"));
+        return std::nullopt;
+    }
+
+    const std::string rotationAngleAsString = jsonAngle.string_value();
+
+    int rotationAngle = 0;
+    try
+    {
+        rotationAngle = stoi(rotationAngleAsString); //< may throw
+        const int kExpectedRotateValues[] = { 0, 90, 270 };
+        if (std::find(std::cbegin(kExpectedRotateValues),
+            std::cend(kExpectedRotateValues),
+            rotationAngle) == std::cend(kExpectedRotateValues))
+        {
+            NX_DEBUG(NX_SCOPE_TAG,
+                "Unexpected rotation angle %1 returned, 0 value will be used instead",
+                rotationAngle);
+            return std::nullopt;
+        }
+    }
+    catch (const std::logic_error&)
+    {
+        // `stoi` may throw exception `out_of_range` or `invalid_argument`, that are
+        // descendants of `logic_error`
+        NX_DEBUG(NX_SCOPE_TAG, "Rotation angle read in not an integer");
+        return std::nullopt;
+    }
+    return (rotationAngle != 0);
+}
+
+//-------------------------------------------------------------------------------------------------
 // Extract functions.
 //-------------------------------------------------------------------------------------------------
 
@@ -202,7 +154,7 @@ The example of incoming json:
     const std::string& cameraReply, const char* eventName, int channelNumber)
 {
     /*
-    The example of incoming json:
+    The example of the incoming json:
     {
         "ShockDetection": [
             {
@@ -231,6 +183,8 @@ The example of incoming json:
     return {};
 }
 
+//-------------------------------------------------------------------------------------------------
+
 /**
  * Extract information about min and max object size (as a json object) of a desired type from
  * the json object (that corresponds to some event and channel)
@@ -254,6 +208,8 @@ The example of incoming json:
     }
     return result;
 }
+
+//-------------------------------------------------------------------------------------------------
 
 // TODO: Unite extractMdRoiInfo, extractIvaLineInfo, extractIvaRoiInfo, extractOdRoiInfo into one function
 
@@ -281,6 +237,8 @@ The example of incoming json:
     return result;
 }
 
+//-------------------------------------------------------------------------------------------------
+
 /**
  * Extract information about IVA line (as a json object) of a desired type from
  * the json object (that corresponds to some event and channel)
@@ -305,6 +263,8 @@ The example of incoming json:
     return result;
 }
 
+//-------------------------------------------------------------------------------------------------
+
 /**
  * Extract information about IVA ROI (as a json object) of a desired type from
  * the json object (that corresponds to some event and channel)
@@ -328,6 +288,8 @@ The example of incoming json:
     }
     return result;
 }
+
+//-------------------------------------------------------------------------------------------------
 
 /**
  * Extract information about object detection ROI (as a json object) of a desired type from

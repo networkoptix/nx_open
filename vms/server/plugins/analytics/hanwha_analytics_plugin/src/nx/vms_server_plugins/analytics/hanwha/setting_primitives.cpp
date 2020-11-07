@@ -20,9 +20,9 @@ PluginPoint::PluginPoint(const nx::kit::Json& json)
         y = members[1].number_value();
 }
 
-std::ostream& PluginPoint::toSunapiStream(std::ostream& os, FrameSize frameSize) const
+std::ostream& PluginPoint::toSunapiStream(std::ostream& os, RoiResolution roiResolution) const
 {
-    os << frameSize.xRelativeToAbsolute(x) << ',' << frameSize.yRelativeToAbsolute(y);
+    os << roiResolution.xRelativeToAbsolute(x) << ',' << roiResolution.yRelativeToAbsolute(y);
     return os;
 }
 
@@ -37,7 +37,7 @@ nx::kit::Json PluginPoint::toJson() const
 }
 
 //-------------------------------------------------------------------------------------------------
-bool PluginPoint::fromSunapiString(const char*& begin, const char* end, FrameSize frameSize)
+bool PluginPoint::fromSunapiString(const char*& begin, const char* end, RoiResolution roiResolution)
 {
     // correct data is {int, comma, int}
 
@@ -55,26 +55,26 @@ bool PluginPoint::fromSunapiString(const char*& begin, const char* end, FrameSiz
     if (conversionResult.ec != std::errc())
         return false; // non an int
 
-    this->x = frameSize.xAbsoluteToRelative(ix);
-    this->y = frameSize.yAbsoluteToRelative(iy);
+    this->x = roiResolution.xAbsoluteToRelative(ix);
+    this->y = roiResolution.yAbsoluteToRelative(iy);
     return true;
 }
 
-bool PluginPoint::fromSunapiString(const std::string& value, FrameSize frameSize)
+bool PluginPoint::fromSunapiString(const std::string& value, RoiResolution roiResolution)
 {
     const char* begin = value.c_str();
-    return fromSunapiString(begin, begin + value.length(), frameSize);
+    return fromSunapiString(begin, begin + value.length(), roiResolution);
 }
 
-std::istream& PluginPoint::fromSunapiStream(std::istream& is, FrameSize frameSize)
+std::istream& PluginPoint::fromSunapiStream(std::istream& is, RoiResolution roiResolution)
 {
     int ix = 0;
     int iy = 0;
     is >> ix;
     is.ignore();
     is >> iy;
-    this->x = frameSize.xAbsoluteToRelative(ix);
-    this->y = frameSize.yAbsoluteToRelative(iy);
+    this->x = roiResolution.xAbsoluteToRelative(ix);
+    this->y = roiResolution.yAbsoluteToRelative(iy);
     return is;
 }
 //-------------------------------------------------------------------------------------------------

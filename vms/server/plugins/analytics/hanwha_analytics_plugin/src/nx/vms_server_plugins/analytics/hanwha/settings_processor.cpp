@@ -5,6 +5,8 @@
 
 #include <nx/network/http/http_client.h>
 
+#include <plugins/resource/hanwha/hanwha_request_helper.h>
+
 #include <algorithm>
 
 #include "device_response_json_parser.h"
@@ -35,7 +37,7 @@ std::unique_ptr<nx::network::http::HttpClient> createHttpClient(
  *     media/videoprofile/view
  * /return the answer from the device or empty string, if no answer received.
 */
-std::string SettingsProcessor::makeReadingRequestToDeviceSync(
+std::string BasicSettingsProcessor::makeReadingRequestToDeviceSync(
     const char* domain, const char* submenu, const char* action, bool useChannel /*= true*/) const
 {
     std::string result;
@@ -86,7 +88,7 @@ std::string SettingsProcessor::makeReadingRequestToDeviceSync(
  * \return empty string, if the request is successful
  *     string with error message, if not
  */
-std::string SettingsProcessor::makeWritingRequestToDeviceSync(const std::string& query) const
+std::string BasicSettingsProcessor::makeWritingRequestToDeviceSync(const std::string& query) const
 {
     nx::utils::Url command(m_deviceAccessInfo.url);
     constexpr const char* kEventPath = "/stw-cgi/eventsources.cgi";
@@ -133,27 +135,39 @@ std::string SettingsProcessor::makeWritingRequestToDeviceSync(const std::string&
 
 //-------------------------------------------------------------------------------------------------
 
-std::string SettingsProcessor::makeEventTypeReadingRequest(const char* eventTypeInternalName) const
+std::string BasicSettingsProcessor::makeEventTypeReadingRequest(const char* eventTypeInternalName) const
 {
     return makeReadingRequestToDeviceSync("eventsources", eventTypeInternalName, "view");
 }
 
 //-------------------------------------------------------------------------------------------------
 
-std::string SettingsProcessor::makeOrientationReadingRequest() const
+std::string BasicSettingsProcessor::makeOrientationReadingRequest() const
 {
     return makeReadingRequestToDeviceSync("image", "flip", "view");
 }
 
 //-------------------------------------------------------------------------------------------------
 
+/**
+ * Used for NVRs only. Get the event types, supported directly by the device, not by NVR channel.
+ * For non-NVR devices the event types are taken from Hanwha shared context.
+ */
+std::string BasicSettingsProcessor::makeEventsStatusReadingRequest() const
+{
+    return makeReadingRequestToDeviceSync("eventstatus", "eventstatus", "check");
+}
+
+//-------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+
 void SettingsProcessor::updateAnalyticsModeOnDevice() const
 {
     const int channelNumber = m_valueTransformer->transformChannelNumber(m_cameraChannelNumber);
-    AnalyticsMode currentAnalyticsMode;
+    AnalyticsMode currentAnalyticsMode(
+        m_settings.shockDetection.m_settingsCapabilities, m_roiResolution);
     std::string sunapiReply = makeEventTypeReadingRequest("videoanalysis2");
-    SettingGroup::readFromDeviceReply(
-        sunapiReply, &currentAnalyticsMode, m_frameSize, channelNumber);
+    SettingGroup::readFromDeviceReply(sunapiReply, &currentAnalyticsMode, channelNumber);
 
     AnalyticsMode desiredAnalyticsMode = (m_settings.IntelligentVideoIsActive())
         ? currentAnalyticsMode.addIntelligentVideoMode()
@@ -162,32 +176,12 @@ void SettingsProcessor::updateAnalyticsModeOnDevice() const
     if (desiredAnalyticsMode != currentAnalyticsMode)
     {
         const std::string query =
-            desiredAnalyticsMode.buildDeviceWritingQuery(m_frameSize, m_cameraChannelNumber);
+            desiredAnalyticsMode.buildDeviceWritingQuery(m_cameraChannelNumber);
         const std::string error = makeWritingRequestToDeviceSync(query);
         if (!error.empty())
             NX_DEBUG(this, NX_FMT("Request failed. Url = %1", query));
     }
 
-}
-
-//-------------------------------------------------------------------------------------------------
-
-/**
- * Used for NVRs only. Get the event types, supported directly by the device, not by NVR channel.
- */
-std::optional<QSet<QString>> SettingsProcessor::loadSupportedEventTypes() const
-{
-    std::string jsonReply = makeReadingRequestToDeviceSync("eventstatus", "eventstatus", "check");
-    return DeviceResponseJsonParser::parseEventTypes(jsonReply);
-}
-
-//-------------------------------------------------------------------------------------------------
-
-std::optional<FrameSize> SettingsProcessor::loadFrameSizeFromDevice() const
-{
-    // request path = /stw-cgi/media.cgi?msubmenu=videoprofile&action=view&Channel=0
-    const std::string jsonReply = makeReadingRequestToDeviceSync("media", "videoprofile", "view");
-    return DeviceResponseJsonParser::parseFrameSize(jsonReply);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -212,36 +206,32 @@ void SettingsProcessor::loadAndHoldFrameRotationFromDevice()
     const std::string sunapiReply = makeOrientationReadingRequest();
     nx::kit::Json channelInfo = DeviceResponseJsonParser::extractChannelInfo(
         sunapiReply, "Flip", channelNumber);
-    int rotationAngle = 0;
-    try
-    {
-        std::string rotationAngleAsString;
-        SettingPrimitivesDeviceIo::deserializeOrThrow(
-            channelInfo, "Rotate", FrameSize() /* unused */, &rotationAngleAsString);
 
-        rotationAngle = stoi(rotationAngleAsString); //< may throw
-        const int kExpectedRotateValues[] = { 0, 90, 270 };
-        if (std::find(std::cbegin(kExpectedRotateValues),
-            std::cend(kExpectedRotateValues),
-            rotationAngle) == std::cend(kExpectedRotateValues))
+    const std::optional<bool> isRotated =
+        DeviceResponseJsonParser::parseFrameIsRotated(sunapiReply, channelNumber);
+
+    m_roiResolution.isRotated = isRotated.has_value() && *isRotated;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void SettingsProcessor::loadAndHoldExclusiveSettingsFromServer(const nx::sdk::IStringMap* sourceMap)
+{
+    const auto sender = [this](const std::string& request)
+    {
+        return this->makeWritingRequestToDeviceSync(request);
+    };
+
+    if (m_settings.analyticsCategories[videoAnalytics])
+    {
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
         {
-            NX_DEBUG(this, "Unexpected rotation angle %1 returned, 0 value will be used instead",
-                rotationAngle);
-            rotationAngle = 0;
+            m_settings.ivaLines[i].readExclusiveFromServerOrThrow(sourceMap);
         }
     }
-    catch (const SettingPrimitivesDeviceIo::CameraResponseJsonError&)
-    {
-        NX_DEBUG(this, "Rotation angle was not read, 0 value will be used instead");
-    }
-    catch (const std::logic_error&)
-    {
-        // `stoi` may throw exception `out_of_range` or `invalid_argument`, that are
-        // descendants of `logic_error`
-        NX_DEBUG(this, "Rotation angle read in not an integer, 0 value will be used instead");
-    }
-    m_frameSize.isRotated = (rotationAngle != 0);
 }
+
+//-------------------------------------------------------------------------------------------------
 
 void SettingsProcessor::loadAndHoldSettingsFromDevice()
 {
@@ -255,40 +245,17 @@ void SettingsProcessor::loadAndHoldSettingsFromDevice()
     {
         sunapiReply = makeEventTypeReadingRequest("shockdetection");
         SettingGroup::readFromDeviceReply(
-            sunapiReply, &m_settings.shockDetection, m_frameSize, channelNumber);
+            sunapiReply, &m_settings.shockDetection, channelNumber);
     }
 
     if (m_settings.analyticsCategories[tamperingDetection])
     {
         sunapiReply = makeEventTypeReadingRequest("tamperingdetection");
         SettingGroup::readFromDeviceReply(
-            sunapiReply, &m_settings.tamperingDetection, m_frameSize, channelNumber);
+            sunapiReply, &m_settings.tamperingDetection, channelNumber);
     }
 
     sunapiReply.clear();
-    if (m_settings.analyticsCategories[motionDetection])
-    {
-#if 0
-        // Hanwha analyticsMode detection selection is currently removed from the Clients interface
-        // Hanwha Motion detection support is currently removed from the Clients interface
-
-        sunapiReply = makeEventTypeReadingRequest("videoanalysis2");
-        readFromDeviceReply(sunapiReply, &m_settings.analyticsMode, m_frameSize, channelNumber);
-        readFromDeviceReply(sunapiReply,
-            &m_settings.motionDetectionObjectSize, m_frameSize, channelNumber);
-
-        for (int i = 0; i < Settings::kMultiplicity; ++i)
-        {
-            readFromDeviceReply(sunapiReply,
-                &m_settings.motionDetectionIncludeArea[i], m_frameSize, channelNumber, i);
-        }
-        for (int i = 0; i < Settings::kMultiplicity; ++i)
-        {
-            readFromDeviceReply(sunapiReply,
-                &m_settings.motionDetectionExcludeArea[i], m_frameSize, channelNumber, i);
-        }
-#endif
-    }
 
     if (m_settings.analyticsCategories[videoAnalytics])
     {
@@ -296,24 +263,24 @@ void SettingsProcessor::loadAndHoldSettingsFromDevice()
             sunapiReply = makeEventTypeReadingRequest("videoanalysis2");
 
         SettingGroup::readFromDeviceReply(
-            sunapiReply, &m_settings.ivaObjectSize, m_frameSize, channelNumber);
+            sunapiReply, &m_settings.ivaObjectSize, channelNumber);
 
         for (int i = 0; i < Settings::kMultiplicity; ++i)
         {
             SettingGroup::readFromDeviceReply(
-                sunapiReply, &m_settings.ivaLines[i], m_frameSize, channelNumber, i);
+                sunapiReply, &m_settings.ivaLines[i], channelNumber, i);
         }
 
         for (int i = 0; i < Settings::kMultiplicity; ++i)
         {
             SettingGroup::readFromDeviceReply(
-                sunapiReply, &m_settings.ivaAreas[i], m_frameSize, channelNumber, i);
+                sunapiReply, &m_settings.ivaAreas[i], channelNumber, i);
         }
 
         for (int i = 0; i < Settings::kMultiplicity; ++i)
         {
             SettingGroup::readFromDeviceReply(
-                sunapiReply, &m_settings.ivaExcludeAreas[i], m_frameSize, channelNumber, i);
+                sunapiReply, &m_settings.ivaExcludeAreas[i], channelNumber, i);
         }
     }
 
@@ -321,7 +288,7 @@ void SettingsProcessor::loadAndHoldSettingsFromDevice()
     {
         sunapiReply = makeEventTypeReadingRequest("defocusdetection");
         SettingGroup::readFromDeviceReply(
-            sunapiReply, &m_settings.defocusDetection, m_frameSize, channelNumber);
+            sunapiReply, &m_settings.defocusDetection, channelNumber);
     }
 
 #if 1
@@ -330,7 +297,7 @@ void SettingsProcessor::loadAndHoldSettingsFromDevice()
     {
         sunapiReply = makeEventTypeReadingRequest("fogdetection");
         SettingGroup::readFromDeviceReply(
-            sunapiReply, &m_settings.fogDetection, m_frameSize, channelNumber);
+            sunapiReply, &m_settings.fogDetection, channelNumber);
     }
 #endif
 
@@ -338,32 +305,32 @@ void SettingsProcessor::loadAndHoldSettingsFromDevice()
     {
         sunapiReply = makeEventTypeReadingRequest("objectdetection");
         SettingGroup::readFromDeviceReply(
-            sunapiReply, &m_settings.objectDetectionGeneral, m_frameSize, channelNumber);
+            sunapiReply, &m_settings.objectDetectionGeneral, channelNumber);
 
         sunapiReply = makeEventTypeReadingRequest("metaimagetransfer");
         SettingGroup::readFromDeviceReply(
-            sunapiReply, &m_settings.objectDetectionBestShot, m_frameSize, channelNumber);
+            sunapiReply, &m_settings.objectDetectionBestShot, channelNumber);
     }
 
     if (m_settings.analyticsCategories[audioDetection])
     {
         sunapiReply = makeEventTypeReadingRequest("audiodetection");
         SettingGroup::readFromDeviceReply(
-            sunapiReply, &m_settings.audioDetection, m_frameSize, channelNumber);
+            sunapiReply, &m_settings.audioDetection, channelNumber);
     }
 
     if (m_settings.analyticsCategories[audioAnalytics])
     {
         sunapiReply = makeEventTypeReadingRequest("audioanalysis");
         SettingGroup::readFromDeviceReply(
-            sunapiReply, &m_settings.soundClassification, m_frameSize, channelNumber);
+            sunapiReply, &m_settings.soundClassification, channelNumber);
     }
 
     if (m_settings.analyticsCategories[faceMaskDetection])
     {
         sunapiReply = makeEventTypeReadingRequest("maskdetection");
         SettingGroup::readFromDeviceReply(
-            sunapiReply, &m_settings.faceMaskDetection, m_frameSize, channelNumber);
+            sunapiReply, &m_settings.faceMaskDetection, channelNumber);
     }
 }
 
@@ -455,45 +422,26 @@ void SettingsProcessor::transferAndHoldSettingsFromServerToDevice(
         // Hanwha analyticsMode detection selection is currently removed from the Clients interface
         // desired analytics mode if selected implicitly now.
         SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
-            m_settings.analyticsMode, sender, m_frameSize, m_cameraChannelNumber);
-#endif
-#if 0
-        // Hanwha Motion detection support is currently removed from the Clients interface
-        SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
-            m_settings.motionDetectionObjectSize, sender, m_frameSize, m_cameraChannelNumber);
-
-        for (int i = 0; i < Settings::kMultiplicity; ++i)
-        {
-            SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
-                m_settings.motionDetectionIncludeArea[i], sender,
-                m_frameSize, m_cameraChannelNumber, i);
-        }
-
-        for (int i = 0; i < Settings::kMultiplicity; ++i)
-        {
-            SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
-                m_settings.motionDetectionExcludeArea[i], sender,
-                m_frameSize, m_cameraChannelNumber, i);
-        }
+            m_settings.analyticsMode, sender, m_cameraChannelNumber);
 #endif
     }
 
     if (m_settings.analyticsCategories[shockDetection])
     {
         SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
-            m_settings.shockDetection, sender, m_frameSize, m_cameraChannelNumber);
+            m_settings.shockDetection, sender, m_cameraChannelNumber);
     }
 
     if (m_settings.analyticsCategories[tamperingDetection])
     {
         SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
-            m_settings.tamperingDetection, sender, m_frameSize, m_cameraChannelNumber);
+            m_settings.tamperingDetection, sender, m_cameraChannelNumber);
     }
 
     if (m_settings.analyticsCategories[defocusDetection])
     {
         SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
-            m_settings.defocusDetection, sender, m_frameSize, m_cameraChannelNumber);
+            m_settings.defocusDetection, sender, m_cameraChannelNumber);
     }
 
 #if 1
@@ -501,31 +449,31 @@ void SettingsProcessor::transferAndHoldSettingsFromServerToDevice(
     if (m_settings.analyticsCategories[fogDetection])
     {
         SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
-            m_settings.fogDetection, sender, m_frameSize, m_cameraChannelNumber);
+            m_settings.fogDetection, sender, m_cameraChannelNumber);
     }
 #endif
 
     if (m_settings.analyticsCategories[videoAnalytics])
     {
         SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
-            m_settings.ivaObjectSize, sender, m_frameSize, m_cameraChannelNumber);
+            m_settings.ivaObjectSize, sender, m_cameraChannelNumber);
 
         for (int i = 0; i < Settings::kMultiplicity; ++i)
         {
             SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
-                m_settings.ivaLines[i], sender, m_frameSize, m_cameraChannelNumber, i);
+                m_settings.ivaLines[i], sender, m_cameraChannelNumber, i);
         }
 
         for (int i = 0; i < Settings::kMultiplicity; ++i)
         {
             SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
-                m_settings.ivaAreas[i], sender, m_frameSize, m_cameraChannelNumber, i);
+                m_settings.ivaAreas[i], sender, m_cameraChannelNumber, i);
         }
 
         for (int i = 0; i < Settings::kMultiplicity; ++i)
         {
             SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
-                m_settings.ivaExcludeAreas[i], sender, m_frameSize, m_cameraChannelNumber, i);
+                m_settings.ivaExcludeAreas[i], sender, m_cameraChannelNumber, i);
         }
 
         updateAnalyticsModeOnDevice();
@@ -534,28 +482,28 @@ void SettingsProcessor::transferAndHoldSettingsFromServerToDevice(
     if (m_settings.analyticsCategories[objectDetection])
     {
         SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
-            m_settings.objectDetectionGeneral, sender, m_frameSize, m_cameraChannelNumber);
+            m_settings.objectDetectionGeneral, sender, m_cameraChannelNumber);
 
         SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
-            m_settings.objectDetectionBestShot, sender, m_frameSize, m_cameraChannelNumber);
+            m_settings.objectDetectionBestShot, sender, m_cameraChannelNumber);
     }
 
     if (m_settings.analyticsCategories[audioDetection])
     {
         SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
-            m_settings.audioDetection, sender, m_frameSize, m_cameraChannelNumber);
+            m_settings.audioDetection, sender, m_cameraChannelNumber);
     }
 
     if (m_settings.analyticsCategories[audioAnalytics])
     {
         SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
-            m_settings.soundClassification, sender, m_frameSize, m_cameraChannelNumber);
+            m_settings.soundClassification, sender, m_cameraChannelNumber);
     }
 
     if (m_settings.analyticsCategories[faceMaskDetection])
     {
         SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
-            m_settings.faceMaskDetection, sender, m_frameSize, m_cameraChannelNumber);
+            m_settings.faceMaskDetection, sender, m_cameraChannelNumber);
     }
 }
 

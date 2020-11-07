@@ -18,6 +18,7 @@
 #include <nx/sdk/helpers/error.h>
 
 #include "device_agent.h"
+#include "device_agent_builder.h"
 #include "common.h"
 #include "string_helper.h"
 
@@ -28,27 +29,9 @@ namespace {
 static const QString kSamsungTechwinVendor("samsung");
 static const QString kHanwhaTechwinVendor("hanwha");
 
-static const QString kVideoAnalytics("VideoAnalytics");
-static const QString kAudioAnalytics("AudioAnalytics");
-static const QString kQueueEvent("QueueEvent");
-static const std::map<QString, QString> kSpecialEventTypes = {
-    {kVideoAnalytics, kVideoAnalytics},
-    {kAudioAnalytics, kAudioAnalytics},
-    {kQueueEvent, "Queue"}
-};
-
 // TODO: Decide on these unused constants.
 static const std::chrono::milliseconds kAttributesTimeout(4000);
 static const QString kAttributesPath("/stw-cgi/attributes.cgi/cgis");
-
-QString specialEventName(const QString& eventName)
-{
-    const auto itr = kSpecialEventTypes.find(eventName);
-    if (itr == kSpecialEventTypes.cend())
-        return QString();
-
-    return itr->second;
-}
 
 static bool isFirmwareActual(const std::string& firmwareVersion)
 {
@@ -82,42 +65,6 @@ static bool isFirmwareActual(const std::string& firmwareVersion)
     return major == 1 && minor >= 41;
 }
 
-template <typename Pred>
-QJsonValue filterJsonObjects(QJsonValue value, Pred pred)
-{
-    if (value.isObject())
-    {
-        auto object = value.toObject();
-        if (!pred(object))
-            return QJsonValue::Undefined;
-
-        for (QJsonValueRef elementValueRef: object)
-        {
-            if (!(elementValueRef.isArray() || elementValueRef.isObject()))
-                continue;
-
-            elementValueRef = filterJsonObjects(elementValueRef, pred);
-        }
-        return object;
-    }
-    if (value.isArray())
-    {
-        auto array = value.toArray();
-        for (auto it = array.begin(); it != array.end(); )
-        {
-            if (QJsonValue elementValue = filterJsonObjects(*it, pred); elementValue.isUndefined())
-                it = array.erase(it);
-            else
-            {
-                *it = elementValue;
-                ++it;
-            }
-        }
-        return array;
-    }
-    return value;
-}
-
 QJsonValue filterOutItemsAndSections(QJsonValue value)
 {
     if (!value.isObject())
@@ -130,6 +77,8 @@ QJsonValue filterOutItemsAndSections(QJsonValue value)
 
 } // namespace
 
+//-------------------------------------------------------------------------------------------------
+
 Ini::Ini(): IniConfig("nx_hanwha_plugin.ini")
 {
     reload();
@@ -140,6 +89,8 @@ Ini& ini()
     static Ini ini;
     return ini;
 }
+
+//-------------------------------------------------------------------------------------------------
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
@@ -168,6 +119,8 @@ void Engine::SharedResources::setResourceAccess(
     monitor->setResourceAccess(url, auth);
 }
 
+//-------------------------------------------------------------------------------------------------
+
 Engine::Engine(Plugin* plugin): m_plugin(plugin)
 {
     QByteArray manifestData;
@@ -195,11 +148,13 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
         if (file.open(QFile::ReadOnly))
         {
             NX_INFO(this,
-                lm("Switch to external object metadata attribute filters file %1").arg(QFileInfo(file).absoluteFilePath()));
+                lm("Switch to external object metadata attribute filters file %1").
+                arg(QFileInfo(file).absoluteFilePath()));
             attributeFiltersData = file.readAll();
         }
     }
-    m_objectMetadataAttributeFilters = QJson::deserialized<Hanwha::ObjectMetadataAttributeFilters>(attributeFiltersData);
+    m_objectMetadataAttributeFilters =
+        QJson::deserialized<Hanwha::ObjectMetadataAttributeFilters>(attributeFiltersData);
 }
 
 void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDeviceInfo* deviceInfo)
@@ -218,31 +173,17 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
                 m_sharedResources.remove(QString::fromUtf8(deviceInfo->sharedId()));
         });
 
-    const bool isNvr = fetchIsNvr(sharedRes);
+    std::shared_ptr<nx::vms::server::plugins::HanwhaSharedResourceContext>& context =
+        sharedRes->sharedContext;
 
-    const QSize roiResolution = fetchRoiResolution(sharedRes, deviceInfo);
-    const auto deviceAgent = new DeviceAgent(this, deviceInfo, isNvr, roiResolution);
-
-    const std::string firmwareVersion = deviceAgent->loadFirmwareVersion();
-    const bool areSettingsAndTrackingAllowed = isFirmwareActual(firmwareVersion);
-
-    std::optional<QSet<QString>> eventTypeFilter = isNvr
-        ? deviceAgent->loadRealSupportedEventTypes()
-        : std::nullopt;
-
-    auto deviceAgentManifest = buildDeviceAgentManifest(sharedRes,
-        deviceInfo, areSettingsAndTrackingAllowed, eventTypeFilter);
-
-    if (!deviceAgentManifest)
-        return;
-
-    deviceAgent->setManifest(std::move(*deviceAgentManifest));
-
-    deviceAgent->loadAndHoldDeviceSettings();
+    DeviceAgentBuilder builder(deviceInfo, this, context);
+    std::unique_ptr<DeviceAgent> deviceAgent = builder.createDeviceAgent();
+    if (deviceAgent)
+        deviceAgent->loadAndHoldDeviceSettings();
 
     ++sharedRes->deviceAgentCount;
 
-    *outResult = deviceAgent;
+    *outResult = deviceAgent.release();
 }
 
 void Engine::getManifest(Result<const IString*>* outResult) const
@@ -260,274 +201,14 @@ void Engine::getManifest(Result<const IString*>* outResult) const
     // There are no DeviceAgent settings for this plugin.
 }
 
-/*virtual*/ void Engine::getPluginSideSettings(Result<const ISettingsResponse*>* /*outResult*/) const
+/*virtual*/ void Engine::getPluginSideSettings(
+    Result<const ISettingsResponse*>* /*outResult*/) const
 {
 }
 
-/*virtual*/ void Engine::doExecuteAction(Result<IAction::Result>* /*outResult*/, const IAction* /*action*/)
+/*virtual*/ void Engine::doExecuteAction(
+    Result<IAction::Result>* /*outResult*/, const IAction* /*action*/)
 {
-}
-
-std::optional<Hanwha::DeviceAgentManifest> Engine::buildDeviceAgentManifest(
-    const std::shared_ptr<SharedResources>& sharedRes,
-    const IDeviceInfo* deviceInfo,
-    bool areSettingsAndTrackingAllowed,
-    const std::optional<QSet<QString>>& filter) const
-{
-    Hanwha::DeviceAgentManifest deviceAgentManifest;
-
-    const auto supportsObjectTracking = areSettingsAndTrackingAllowed
-        && fetchSupportsObjectDetection(sharedRes, deviceInfo->channelNumber());
-
-    if (supportsObjectTracking)
-    {
-        // DeviceAgent should understand all engine's object types.
-        deviceAgentManifest.supportedObjectTypeIds.reserve(m_manifest.objectTypes.size());
-        for (const nx::vms::api::analytics::ObjectType& objectType: m_manifest.objectTypes)
-            deviceAgentManifest.supportedObjectTypeIds.push_back(objectType.id);
-    }
-    else
-    {
-        NX_DEBUG(this, "Device %1 (%2): doesn't support object detection/tracking.",
-            deviceInfo->name(), deviceInfo->id());
-    }
-
-    std::optional<QSet<QString>> supportedEventTypeIds =
-        fetchSupportedEventTypeIds(sharedRes, deviceInfo, filter);
-
-    if (!supportedEventTypeIds)
-    {
-        NX_DEBUG(this, "Supported Event Type list is empty for the Device %1 (%2)",
-            deviceInfo->name(), deviceInfo->id());
-        return std::nullopt;
-    }
-    if (supportsObjectTracking)
-    {
-        supportedEventTypeIds->insert("nx.hanwha.trackingEvent.Person");
-        supportedEventTypeIds->insert("nx.hanwha.trackingEvent.Face");
-        supportedEventTypeIds->insert("nx.hanwha.trackingEvent.Vehicle");
-        supportedEventTypeIds->insert("nx.hanwha.trackingEvent.LicensePlate");
-    }
-
-    deviceAgentManifest.supportedEventTypeIds = QList<QString>::fromSet(*supportedEventTypeIds);
-
-    if (!areSettingsAndTrackingAllowed)
-    {
-        deviceAgentManifest.deviceAgentSettingsModel = filterOutItemsAndSections(
-            m_manifest.deviceAgentSettingsModel);
-    }
-    else
-    {
-        deviceAgentManifest.deviceAgentSettingsModel = filterJsonObjects(
-            m_manifest.deviceAgentSettingsModel,
-            [&](const QJsonObject& node) {
-                bool keepByDefault = true;
-
-                bool keepForObjectTracking = false;
-                if (const auto required = node["_requiredForObjectDetection"]; required.toBool())
-                {
-                    keepByDefault = false;
-                    keepForObjectTracking = supportsObjectTracking;
-                }
-
-                bool keepForEvents = false;
-                if (const auto eventTypeIds = node["_requiredForEventTypeIds"].toArray();
-                    !eventTypeIds.empty())
-                {
-                    keepByDefault = false;
-                    for (const auto eventTypeId : eventTypeIds)
-                    {
-                        if (supportedEventTypeIds->contains(eventTypeId.toString()))
-                        {
-                            keepForEvents = true;
-                            break;
-                        }
-                    }
-                }
-
-                return keepByDefault || keepForObjectTracking || keepForEvents;
-            });
-    }
-
-    // Stream selection is always disabled.
-    deviceAgentManifest.capabilities.setFlag(
-        nx::vms::api::analytics::DeviceAgentManifest::disableStreamSelection);
-
-    return deviceAgentManifest;
-}
-
-/*static*/ bool Engine::fetchSupportsObjectDetection(
-    const std::shared_ptr<SharedResources>& sharedRes,
-    int channel)
-{
-    const auto& information = sharedRes->sharedContext->information();
-    if (!information)
-        return false;
-
-    const auto& attributes = information->attributes;
-    if (!attributes.isValid())
-        return false;
-
-    // What Hanwha calls "object detection" we at NX usually call "object tracking".
-    return attributes.attribute<bool>("Eventsource", "ObjectDetection", channel).value_or(false);
-}
-
-/*static*/ QSize Engine::fetchRoiResolution(const std::shared_ptr<SharedResources>& sharedRes,
-    const nx::sdk::IDeviceInfo* deviceInfo)
-{
-    QString roiMaxXAsString = "0";
-    QString roiMaxYAsString = "0";
-
-    if (const auto& information = sharedRes->sharedContext->information())
-    {
-        if (const auto& attributes = information->attributes; attributes.isValid())
-        {
-            roiMaxXAsString = attributes.attribute<QString>(
-                "Eventsource", "ROICoordinate.MaxX", deviceInfo->channelNumber())
-                .value_or(roiMaxXAsString);
-            roiMaxYAsString = attributes.attribute<QString>(
-                "Eventsource", "ROICoordinate.MaxY", deviceInfo->channelNumber())
-                .value_or(roiMaxYAsString);
-        }
-    }
-
-    if (roiMaxXAsString == "0" || roiMaxYAsString == "0")
-    {
-        NX_DEBUG(typeid(Engine), "ROI max coordinated reading failure for the Device %1 (%2). "
-            "ROI settings can't work fine.", deviceInfo->name(), deviceInfo->id());
-    }
-
-    return QSize(roiMaxXAsString.toInt() + 1, roiMaxYAsString.toInt() + 1);
-}
-
-/*static*/ bool Engine::fetchIsNvr(const std::shared_ptr<SharedResources>& sharedRes)
-{
-    if (const auto& information = sharedRes->sharedContext->information())
-        return information->deviceType == nx::vms::server::plugins::HanwhaDeviceType::nvr;
-    return false;
-}
-
-std::optional<QSet<QString>> Engine::fetchSupportedEventTypeIds(
-    const std::shared_ptr<SharedResources>& sharedRes,
-    const IDeviceInfo* deviceInfo,
-    const std::optional<QSet<QString>>& filter) const
-{
-    const auto& information = sharedRes->sharedContext->information();
-    if (!information)
-    {
-        NX_DEBUG(this, "Unable to fetch device information for %1 (%2)",
-            deviceInfo->name(), deviceInfo->id());
-        return std::nullopt;
-    }
-
-    const auto& cgiParameters = information->cgiParameters;
-    if (!cgiParameters.isValid())
-    {
-        NX_DEBUG(this, "CGI parameters are invalid for %1 (%2)",
-            deviceInfo->name(), deviceInfo->id());
-        return std::nullopt;
-    }
-
-    const auto& eventStatuses = sharedRes->sharedContext->eventStatuses();
-    if (!eventStatuses || !eventStatuses->isSuccessful())
-    {
-        NX_DEBUG(this, "Unable to fetch event statuses for %1 (%2)",
-            deviceInfo->name(), deviceInfo->id());
-        return std::nullopt;
-    }
-
-    return eventTypeIdsFromParameters(
-        sharedRes->sharedContext->url(),
-        cgiParameters, eventStatuses.value, deviceInfo, filter);
-}
-
-std::optional<QSet<QString>> Engine::eventTypeIdsFromParameters(
-    const nx::utils::Url& url,
-    const nx::vms::server::plugins::HanwhaCgiParameters& parameters,
-    const nx::vms::server::plugins::HanwhaResponse& eventStatuses,
-    const IDeviceInfo* deviceInfo,
-    const std::optional<QSet<QString>>& filter) const
-{
-    if (!parameters.isValid())
-    {
-        NX_DEBUG(this, "CGI parameters are invalid for %1 (%2)",
-            deviceInfo->name(), deviceInfo->id());
-        return std::nullopt;
-    }
-
-    auto supportedEventTypesParameter = parameters.parameter(
-        "eventstatus/eventstatus/monitor/Channel.#.EventType");
-
-    if (!supportedEventTypesParameter.is_initialized())
-    {
-        NX_DEBUG(this, "Supported event types parameter is not initialized for %1 (%2)",
-            deviceInfo->name(), deviceInfo->id());
-        return std::nullopt;
-    }
-
-    QSet<QString> result;
-
-    QStringList supportedEventTypes = supportedEventTypesParameter->possibleValues();
-    const auto alarmInputParameter = parameters.parameter(
-        "eventstatus/eventstatus/monitor/AlarmInput");
-
-    if (alarmInputParameter)
-    {
-        NX_VERBOSE(this, "Adding %1 to supported event type list for %2 (%3)",
-            alarmInputParameter->name(), deviceInfo->name(), deviceInfo->id());
-
-        supportedEventTypes.push_back(alarmInputParameter->name());
-    }
-
-    if (filter)
-    {
-        nx::utils::remove_if(supportedEventTypes,
-            [&filter](const QString& value)
-            {
-                return !filter->contains(value);
-            });
-    }
-
-    NX_VERBOSE(this,
-        lm("camera %1 report supported analytics events %2").arg(url).arg(supportedEventTypes));
-    for (const auto& eventTypeName: supportedEventTypes)
-    {
-        auto eventTypeId = m_manifest.eventTypeIdByName(eventTypeName);
-        if (!eventTypeId.isEmpty())
-        {
-            NX_VERBOSE(this, "Adding %1 to supported event type list %2 (%3)",
-                eventTypeId, deviceInfo->name(), deviceInfo->id());
-            result.insert(eventTypeId);
-        }
-
-        const auto altEventName = specialEventName(eventTypeName);
-        if (!altEventName.isEmpty())
-        {
-            const auto& responseParameters = eventStatuses.response();
-            for (const auto& entry: responseParameters)
-            {
-                const auto& fullEventTypeName = entry.first;
-                const bool isMatched =
-                    fullEventTypeName.startsWith(lm("Channel.%1.%2.").args(
-                        deviceInfo->channelNumber(), altEventName));
-
-                if (isMatched)
-                {
-                    eventTypeId = m_manifest.eventTypeIdByName(fullEventTypeName);
-                    if (!eventTypeId.isNull())
-                    {
-                        NX_VERBOSE(this, "Adding %1 to supported event type list %2 (%3)",
-                            eventTypeId, deviceInfo->name(), deviceInfo->id());
-
-                        result.insert(eventTypeId);
-                    }
-                }
-            }
-        }
-    }
-
-    NX_VERBOSE(this, "Supported event type list for %1 (%2): %3");
-    return result;
 }
 
 const Hanwha::EngineManifest& Engine::manifest() const
@@ -646,6 +327,8 @@ std::shared_ptr<vms::server::plugins::HanwhaSharedResourceContext> Engine::share
 }
 
 } // namespace nx::vms_server_plugins::analytics::hanwha
+
+//-------------------------------------------------------------------------------------------------
 
 namespace {
 

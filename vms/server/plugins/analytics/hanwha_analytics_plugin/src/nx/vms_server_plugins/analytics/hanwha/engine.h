@@ -19,6 +19,8 @@
 
 #include "common.h"
 #include "metadata_monitor.h"
+#include "setting_group.h"
+#include "settings_capabilities.h"
 
 namespace nx::vms_server_plugins::analytics::hanwha {
 
@@ -89,34 +91,6 @@ protected:
         const nx::sdk::analytics::IAction* action) override;
 
 private:
-    static bool fetchSupportsObjectDetection(
-        const std::shared_ptr<SharedResources>& sharedRes,
-        int channel);
-
-    static QSize fetchRoiResolution(
-        const std::shared_ptr<SharedResources>& sharedRes,
-        const nx::sdk::IDeviceInfo* deviceInfo);
-
-    static bool fetchIsNvr(const std::shared_ptr<SharedResources>& sharedRes);
-
-    std::optional<QSet<QString>> fetchSupportedEventTypeIds(
-        const std::shared_ptr<SharedResources>& sharedRes,
-        const nx::sdk::IDeviceInfo* deviceInfo,
-        const std::optional<QSet<QString>>& filter) const;
-
-    std::optional<Hanwha::DeviceAgentManifest> buildDeviceAgentManifest(
-        const std::shared_ptr<SharedResources>& sharedRes,
-        const nx::sdk::IDeviceInfo* deviceInfo,
-        bool areSettingsAndTrackingAllowed,
-        const std::optional<QSet<QString>>& filter) const;
-
-    std::optional<QSet<QString>> eventTypeIdsFromParameters(
-        const nx::utils::Url& url,
-        const nx::vms::server::plugins::HanwhaCgiParameters& parameters,
-        const nx::vms::server::plugins::HanwhaResponse& eventStatuses,
-        const nx::sdk::IDeviceInfo* deviceInfo,
-        const std::optional<QSet<QString>>& filter) const;
-
     std::shared_ptr<SharedResources> sharedResources(const nx::sdk::IDeviceInfo* deviceInfo);
 
 private:

@@ -24,19 +24,11 @@ public:
      */
     static std::optional<std::string> parseError(const std::string& jsonReply);
 
-    /**
-     * Parse the reply to check eventstatus BYPASS request to get the list of event types,
-     * supported by the device, connected to the current channel of NVR.
-     */
-    static std::optional<QSet<QString>> parseEventTypes(const std::string& jsonReply);
-
-    /**
-     * Extract frameSize from json string. If fail, returns std::nullopt.
-     */
-    static std::optional<FrameSize> parseFrameSize(const std::string& jsonReply);
-
     /** Extract FirmwareVersion from json string. If fail, returns std::nullopt.*/
     static std::optional<std::string> parseFirmwareVersion(const std::string& jsonReply);
+
+    /** Extract if video is rotated (to portrait) mode from json string. If fail, returns std::nullopt.*/
+    static std::optional<bool> parseFrameIsRotated(const std::string& jsonReply, int chanelNumber);
 
     // Extracting functions:
 
@@ -70,7 +62,7 @@ public:
      * Extract information about IVA ROI (as a json object) of a desired type from
      * the json object (that corresponds to some event and channel)
      */
-    static nx::kit::Json  extractIvaRoiInfo(nx::kit::Json channelInfo, int sunapiIndex);
+    static nx::kit::Json extractIvaRoiInfo(nx::kit::Json channelInfo, int sunapiIndex);
 
     /**
      * Extract information about object detection ROI (as a json object) of a desired type from

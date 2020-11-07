@@ -23,7 +23,7 @@
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/log/log_message.h>
-
+#include <nx/utils/std/algorithm.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/vms/server/analytics/predefined_attributes.h>
 
@@ -42,16 +42,24 @@ using namespace nx::network;
 
 //-------------------------------------------------------------------------------------------------
 
-DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo,
-    bool isNvr, QSize roiResolution)
+DeviceAgent::DeviceAgent(
+    const nx::sdk::IDeviceInfo* deviceInfo,
+    Engine* engine,
+    const SettingsCapabilities& settingsCapabilities,
+    RoiResolution roiResolution,
+    bool isNvr,
+    const Hanwha::DeviceAgentManifest& deviceAgentManifest)
     :
     m_engine(engine),
+    m_settingsCapabilities(settingsCapabilities),
+    m_roiResolution(roiResolution),
+    m_settings(m_settingsCapabilities, m_roiResolution),
     m_settingsProcessor(
-        m_settings,
-        DeviceAccessInfo{ deviceInfo->url(), deviceInfo->login(), deviceInfo->password() },
-        deviceInfo->channelNumber(),
+        deviceInfo,
         isNvr,
-        FrameSize(roiResolution.width(), roiResolution.height())),
+        m_settings,
+        m_roiResolution),
+    m_manifest(deviceAgentManifest),
     m_objectMetadataXmlParser(
         url::Builder(deviceInfo->url())
             .setUserName(deviceInfo->login())
@@ -190,7 +198,9 @@ void DeviceAgent::setSupportedEventCategoties()
 {
     if (!m_serverHasSentInitialSettings)
     {
-        // we should ignore initial settings
+        // First time we should load settings that are not stored on the device.
+        m_settingsProcessor.loadAndHoldExclusiveSettingsFromServer(sourceMap);
+
         m_serverHasSentInitialSettings = true;
         return;
     }
@@ -363,13 +373,6 @@ void DeviceAgent::setManifest(Hanwha::DeviceAgentManifest manifest)
 void DeviceAgent::setMonitor(MetadataMonitor* monitor)
 {
     m_monitor = monitor;
-}
-
-//-------------------------------------------------------------------------------------------------
-
-std::optional<QSet<QString>> DeviceAgent::loadRealSupportedEventTypes() const
-{
-    return m_settingsProcessor.loadSupportedEventTypes();
 }
 
 //-------------------------------------------------------------------------------------------------

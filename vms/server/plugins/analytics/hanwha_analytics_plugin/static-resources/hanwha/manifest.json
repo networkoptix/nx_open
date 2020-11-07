@@ -250,7 +250,8 @@
                                         "type": "Repeater",
                                         "count": 4,
                                         "startIndex": 1,
-                                        "template": {
+                                        "template":
+                                        {
                                             "type": "GroupBox",
                                             "caption": "IVA Line #",
                                             "filledCheckItems": [ "IVA.Line#.Points" ],
@@ -269,6 +270,7 @@
                                                 {
                                                     "type": "GroupBox",
                                                     "caption": "Type",
+                                                    "name": "IVA.Line#.ObjectTypeFilter",
                                                     "items": [
                                                         {
                                                             "type": "CheckBox",
@@ -310,7 +312,8 @@
                                         "type": "Repeater",
                                         "count": 4,
                                         "startIndex": 1,
-                                        "template": {
+                                        "template":
+                                        {
                                             "type": "GroupBox",
                                             "caption": "IVA Area #",
                                             "filledCheckItems": [ "IVA.IncludeArea#.Points" ],
@@ -325,6 +328,7 @@
                                                 {
                                                     "type": "GroupBox",
                                                     "caption": "Type",
+                                                    "name": "IVA.IncludeArea#.ObjectTypeFilter",
                                                     "items": [
                                                         {
                                                             "type": "CheckBox",
@@ -736,6 +740,14 @@
             "description": "Intrusion has been detected"
         },
         {
+            "id": "nx.hanwha.VideoAnalytics.Loitering",
+            "name": "Loitering",
+            "internalName": "VideoAnalytics.Loitering",
+            "description": "Loitering has been detected%1",
+            "flags": "regionDependent",
+            "regionDescription": " in the region #%1"
+        },
+        {
             "id": "nx.hanwha.ShockDetection",
             "name": "Shock detection",
             "internalName": "ShockDetection",
@@ -809,14 +821,6 @@
             "name": "Sound - Glass break",
             "internalName": "AudioAnalytics.GlassBreak",
             "description": "Glass break has been detected"
-        },
-        {
-            "id": "nx.hanwha.VideoAnalytics.Loitering",
-            "name": "Loitering",
-            "internalName": "VideoAnalytics.Loitering",
-            "description": "Loitering has been detected%1",
-            "flags": "regionDependent",
-            "regionDescription": " in the region #%1"
         },
         {
             "id": "nx.hanwha.Queue.1.Level.High",
@@ -917,7 +921,6 @@
             "internalName": "nx.hanwha.ObjectDetection.LicensePlate",
             "groupId": "nx.hanwha.ObjectDetection"
         }
-
     ],
     "unusedEventTypes": [
         {

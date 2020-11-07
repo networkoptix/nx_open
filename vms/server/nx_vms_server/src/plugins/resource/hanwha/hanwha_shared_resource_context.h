@@ -47,9 +47,11 @@ struct HanwhaResult
     {
     }
 
-    inline operator bool() const { return diagnostics.errorCode == CameraDiagnostics::ErrorCode::noError; }
-    inline Value* operator->() { return &value; }
-    inline const Value* operator->() const { return &value; }
+    operator bool() const { return diagnostics.errorCode == CameraDiagnostics::ErrorCode::noError; }
+    Value& operator*() { return value; }
+    const Value& operator*() const { return value; }
+    Value* operator->() { return &value; }
+    const Value* operator->() const { return &value; }
 };
 
 template<typename Value>

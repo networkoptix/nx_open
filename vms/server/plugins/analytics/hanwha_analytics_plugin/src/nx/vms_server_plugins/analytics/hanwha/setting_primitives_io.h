@@ -45,35 +45,35 @@ namespace SettingPrimitivesDeviceIo
 struct CameraResponseJsonError {};
 
 void deserializeOrThrow(
-    const nx::kit::Json& json, const char* key, FrameSize /*frameSize*/, bool* result);
+    const nx::kit::Json& json, const char* key, RoiResolution /*roiResolution*/, bool* result);
 std::string serialize(bool value);
 
 void deserializeOrThrow(
-    const nx::kit::Json& json, const char* key, FrameSize /*frameSize*/, int* result);
+    const nx::kit::Json& json, const char* key, RoiResolution /*roiResolution*/, int* result);
 
 void deserializeOrThrow(
-    const nx::kit::Json& json, const char* key, FrameSize /*frameSize*/, std::string* result);
+    const nx::kit::Json& json, const char* key, RoiResolution /*roiResolution*/, std::string* result);
 
 void deserializeOrThrow(
-    const nx::kit::Json& json, const char* key, FrameSize frameSize, PluginPoint* result);
+    const nx::kit::Json& json, const char* key, RoiResolution roiResolution, PluginPoint* result);
 
 void deserializeOrThrow(
-    const nx::kit::Json& json, const char* key, FrameSize frameSize,
+    const nx::kit::Json& json, const char* key, RoiResolution roiResolution,
     std::vector<PluginPoint>* result);
-std::string serialize(const std::vector<PluginPoint>& points, FrameSize frameSize);
+std::string serialize(const std::vector<PluginPoint>& points, RoiResolution roiResolution);
 
 void deserializeOrThrow(
-    const nx::kit::Json& json, FrameSize frameSize, ObjectSizeConstraints* result);
+    const nx::kit::Json& json, RoiResolution roiResolution, ObjectSizeConstraints* result);
 
 void deserializeOrThrow(
-    const nx::kit::Json& json, const char* key, FrameSize frameSize, UnnamedPolygon* result);
+    const nx::kit::Json& json, const char* key, RoiResolution roiResolution, UnnamedPolygon* result);
 
 void deserializeOrThrow(
-    const nx::kit::Json& json, const char* key, FrameSize /*frameSize*/, Direction* result);
+    const nx::kit::Json& json, const char* key, RoiResolution /*roiResolution*/, Direction* result);
 
 void deserializeOrThrow(
-    const nx::kit::Json& json, const char* key, FrameSize /*frameSize*/, bool* result,
-    const char* desired);
+    const nx::kit::Json& json, const char* key, RoiResolution /*roiResolution*/,
+    bool* result, const char* desired);
 
 } // namespace SettingPrimitivesDeviceIo
 

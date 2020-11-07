@@ -5,6 +5,8 @@
 #include <QtCore/QString>
 
 #include <nx/utils/url.h>
+#include <nx/sdk/i_device_info.h>
+#include <nx/sdk/i_string_map.h>
 
 #include "settings.h"
 #include "value_transformer.h"
@@ -19,34 +21,23 @@ struct DeviceAccessInfo
     QString password;
 };
 
-class SettingsProcessor
-{
-private:
-    Settings& m_settings;
-    std::unique_ptr<ValueTransformer> m_valueTransformer;
-    DeviceAccessInfo m_deviceAccessInfo;
-    int m_cameraChannelNumber = 0;
-    FrameSize m_frameSize;
+//-------------------------------------------------------------------------------------------------
 
+class BasicSettingsProcessor
+{
 public:
-    SettingsProcessor(
-        Settings& settings,
-        const DeviceAccessInfo& deviceAccessInfo,
-        int cameraChannelNumber,
-        bool isNvr,
-        FrameSize frameSize)
-        :
-        m_settings(settings),
+    BasicSettingsProcessor(
+        const nx::sdk::IDeviceInfo* deviceInfo,
+        bool isNvr)
+    :
         m_valueTransformer(isNvr
-            ? std::unique_ptr<ValueTransformer>(new NvrValueTransformer(cameraChannelNumber))
+            ? std::unique_ptr<ValueTransformer>(new NvrValueTransformer(deviceInfo->channelNumber()))
             : std::unique_ptr<ValueTransformer>(new CameraValueTransformer)),
-        m_deviceAccessInfo(deviceAccessInfo),
-        m_cameraChannelNumber(cameraChannelNumber),
-        m_frameSize(frameSize)
+        m_deviceAccessInfo(DeviceAccessInfo{ deviceInfo->url(), deviceInfo->login(), deviceInfo->password() }),
+        m_cameraChannelNumber(deviceInfo->channelNumber())
     {
     }
 
-private:
     std::string makeReadingRequestToDeviceSync(const char* domain, const char* submenu,
         const char* action, bool useChannel = true) const;
 
@@ -56,15 +47,43 @@ private:
 
     std::string makeOrientationReadingRequest() const;
 
+    std::string makeEventsStatusReadingRequest() const;
+
+    virtual ~BasicSettingsProcessor() = default;
+
+protected:
+    std::unique_ptr<ValueTransformer> m_valueTransformer;
+    DeviceAccessInfo m_deviceAccessInfo;
+    int m_cameraChannelNumber = 0;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class SettingsProcessor: public BasicSettingsProcessor
+{
+public:
+    SettingsProcessor(
+        const nx::sdk::IDeviceInfo* deviceInfo,
+        bool isNvr,
+        Settings& settings,
+        RoiResolution& roiResolution)
+    :
+        BasicSettingsProcessor(deviceInfo, isNvr),
+        m_settings(settings),
+        m_roiResolution(roiResolution)
+    {
+    }
+
+private:
+
     void updateAnalyticsModeOnDevice() const;
 
     void loadAndHoldFrameRotationFromDevice();
 
 public:
-    std::optional<QSet<QString>> loadSupportedEventTypes() const;
-
-    std::optional<FrameSize> loadFrameSizeFromDevice() const;
     std::string loadFirmwareVersionFromDevice() const;
+
+    void loadAndHoldExclusiveSettingsFromServer(const nx::sdk::IStringMap* sourceMap);
 
     void loadAndHoldSettingsFromDevice();
 
@@ -74,6 +93,10 @@ public:
         nx::sdk::StringMap* errorMap,
         nx::sdk::StringMap* valueMap,
         const nx::sdk::IStringMap* sourceMap);
+
+private:
+    Settings& m_settings;
+    RoiResolution& m_roiResolution;
 };
 
 } // namespace nx::vms_server_plugins::analytics::hanwha

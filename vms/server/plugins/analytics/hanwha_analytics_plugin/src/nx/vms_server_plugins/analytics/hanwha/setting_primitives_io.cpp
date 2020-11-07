@@ -173,7 +173,8 @@ std::string serialize(const NamedLineFigure& value)
 namespace SettingPrimitivesDeviceIo
 {
 
-void deserializeOrThrow(const nx::kit::Json& json, const char* key, FrameSize /*frameSize*/, bool* result)
+void deserializeOrThrow(const nx::kit::Json& json,
+    const char* key, RoiResolution /*roiResolution*/, bool* result)
 {
     NX_ASSERT(key);
 
@@ -190,7 +191,7 @@ std::string serialize(bool value)
 
 //-------------------------------------------------------------------------------------------------
 
-void deserializeOrThrow(const nx::kit::Json& json, const char* key, FrameSize /*frameSize*/, int* result)
+void deserializeOrThrow(const nx::kit::Json& json, const char* key, RoiResolution /*roiResolution*/, int* result)
 {
     NX_ASSERT(key);
 
@@ -200,7 +201,7 @@ void deserializeOrThrow(const nx::kit::Json& json, const char* key, FrameSize /*
         throw CameraResponseJsonError{};
 }
 
-void deserializeOrThrow(const nx::kit::Json& json, const char* key, FrameSize /*frameSize*/, std::string* result)
+void deserializeOrThrow(const nx::kit::Json& json, const char* key, RoiResolution /*roiResolution*/, std::string* result)
 {
     NX_ASSERT(key);
 
@@ -210,7 +211,7 @@ void deserializeOrThrow(const nx::kit::Json& json, const char* key, FrameSize /*
         throw CameraResponseJsonError{};
 }
 
-void deserializeOrThrow(const nx::kit::Json& json, const char* key, FrameSize frameSize, PluginPoint* result)
+void deserializeOrThrow(const nx::kit::Json& json, const char* key, RoiResolution roiResolution, PluginPoint* result)
 {
     NX_ASSERT(key);
 
@@ -220,11 +221,11 @@ void deserializeOrThrow(const nx::kit::Json& json, const char* key, FrameSize fr
 
     const std::string value = param.string_value();
 
-    if (!result->fromSunapiString(value, frameSize))
+    if (!result->fromSunapiString(value, roiResolution))
         throw CameraResponseJsonError();
 }
 
-void deserializeOrThrow(const nx::kit::Json& json, const char* key, FrameSize frameSize, std::vector<PluginPoint>* result)
+void deserializeOrThrow(const nx::kit::Json& json, const char* key, RoiResolution roiResolution, std::vector<PluginPoint>* result)
 {
     NX_ASSERT(key);
 
@@ -240,29 +241,29 @@ void deserializeOrThrow(const nx::kit::Json& json, const char* key, FrameSize fr
 
         const int ix = point["x"].int_value();
         const int iy = point["y"].int_value();
-        result->emplace_back(frameSize.xAbsoluteToRelative(ix), frameSize.yAbsoluteToRelative(iy));
+        result->emplace_back(roiResolution.xAbsoluteToRelative(ix), roiResolution.yAbsoluteToRelative(iy));
     }
 }
 
-void deserializeOrThrow(const nx::kit::Json& json, FrameSize frameSize, ObjectSizeConstraints* result)
+void deserializeOrThrow(const nx::kit::Json& json, RoiResolution roiResolution, ObjectSizeConstraints* result)
 {
     PluginPoint minSize, maxSize;
-    deserializeOrThrow(json, "MinimumObjectSizeInPixels", frameSize, &minSize);
-    deserializeOrThrow(json, "MaximumObjectSizeInPixels", frameSize, &maxSize);
+    deserializeOrThrow(json, "MinimumObjectSizeInPixels", roiResolution, &minSize);
+    deserializeOrThrow(json, "MaximumObjectSizeInPixels", roiResolution, &maxSize);
     result->minWidth = minSize.x;
     result->minHeight = minSize.y;
     result->maxWidth = maxSize.x;
     result->maxHeight = maxSize.y;
 }
 
-void deserializeOrThrow(const nx::kit::Json& json, const char* key, FrameSize frameSize, UnnamedPolygon* result)
+void deserializeOrThrow(const nx::kit::Json& json, const char* key, RoiResolution roiResolution, UnnamedPolygon* result)
 {
     std::vector<PluginPoint> points;
-    deserializeOrThrow(json, key, frameSize, &points);
+    deserializeOrThrow(json, key, roiResolution, &points);
     result->points = points;
 }
 
-void deserializeOrThrow(const nx::kit::Json& json, const char* key, FrameSize /*frameSize*/, Direction* result)
+void deserializeOrThrow(const nx::kit::Json& json, const char* key, RoiResolution /*roiResolution*/, Direction* result)
 {
     NX_ASSERT(key);
 
@@ -285,7 +286,8 @@ void deserializeOrThrow(const nx::kit::Json& json, const char* key, FrameSize /*
         throw CameraResponseJsonError{};
 }
 
-void deserializeOrThrow(const nx::kit::Json& json, const char* key, FrameSize /*frameSize*/, bool* result, const char* desired)
+void deserializeOrThrow(const nx::kit::Json& json,
+    const char* key, RoiResolution /*roiResolution*/, bool* result, const char* desired)
 {
     NX_ASSERT(key);
 
@@ -305,13 +307,13 @@ void deserializeOrThrow(const nx::kit::Json& json, const char* key, FrameSize /*
         throw CameraResponseJsonError{};
 }
 
-std::string serialize(const std::vector<PluginPoint>& points, FrameSize frameSize)
+std::string serialize(const std::vector<PluginPoint>& points, RoiResolution roiResolution)
 {
     std::stringstream stream;
     if (!points.empty())
-        points.front().toSunapiStream(stream, frameSize);
+        points.front().toSunapiStream(stream, roiResolution);
     for (size_t i = 1; i < points.size(); ++i)
-        points[i].toSunapiStream(stream << ',', frameSize);
+        points[i].toSunapiStream(stream << ',', roiResolution);
     return stream.str();
 }
 

@@ -13,20 +13,20 @@ namespace nx::vms_server_plugins::analytics::hanwha {
 //-------------------------------------------------------------------------------------------------
 
 /** Video frame dimensions - needed for translating relative coordinates to absolute. */
-struct FrameSize
+struct RoiResolution
 {
     int rawWidth = 1;
     int rawHeight = 1;
     bool isRotated = false;
-    FrameSize() = default;
-    FrameSize(int width, int height) : rawWidth(width), rawHeight(height) {}
+    RoiResolution() = default;
+    RoiResolution(int width, int height) : rawWidth(width), rawHeight(height) {}
 
     int width() const { return isRotated ? rawHeight : rawWidth; }
     int height() const { return isRotated ? rawWidth : rawHeight; }
 
     int area() const { return rawWidth * rawHeight; }
 
-    bool operator<(const FrameSize other) const
+    bool operator<(const RoiResolution other) const
     {
         return area() < other.area();
     }
@@ -68,11 +68,11 @@ struct PluginPoint
 
     nx::kit::Json toJson() const;
 
-    std::ostream& toSunapiStream(std::ostream& os, FrameSize frameSize) const;
+    std::ostream& toSunapiStream(std::ostream& os, RoiResolution roiResolution) const;
 
-    bool fromSunapiString(const std::string& value, FrameSize frameSize);
-    bool fromSunapiString(const char*& begin, const char* end, FrameSize frameSize);
-    std::istream& fromSunapiStream(std::istream& is, FrameSize frameSize);
+    bool fromSunapiString(const std::string& value, RoiResolution roiResolution);
+    bool fromSunapiString(const char*& begin, const char* end, RoiResolution roiResolution);
+    std::istream& fromSunapiStream(std::istream& is, RoiResolution roiResolution);
 };
 
 //-------------------------------------------------------------------------------------------------

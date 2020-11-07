@@ -2,6 +2,8 @@
 
 #include "setting_group.h"
 
+#include <vector>
+
 namespace nx::vms_server_plugins::analytics::hanwha {
 
 enum AnalyticsCategory
@@ -43,9 +45,9 @@ struct Settings
     ObjectDetectionGeneral objectDetectionGeneral;
     ObjectDetectionBestShot objectDetectionBestShot;
     IvaObjectSize ivaObjectSize;
-    IvaLine ivaLines[kMultiplicity];
-    IvaArea ivaAreas[kMultiplicity];
-    IvaExcludeArea ivaExcludeAreas[kMultiplicity];
+    std::vector<IvaLine> ivaLines;// [kMultiplicity] ;
+    std::vector<IvaArea> ivaAreas;// [kMultiplicity] ;
+    std::vector<IvaExcludeArea> ivaExcludeAreas;// [kMultiplicity] ;
     AudioDetection audioDetection;
     SoundClassification soundClassification;
     FaceMaskDetection faceMaskDetection;
@@ -53,6 +55,31 @@ struct Settings
     AnalyticsCategories analyticsCategories = {false};
 
     bool IntelligentVideoIsActive() const;
+
+    Settings(const SettingsCapabilities& settingsCapabilities, const RoiResolution& roiResolution):
+        //m_settingsCapabilities(settingsCapabilities),
+
+        shockDetection(settingsCapabilities, roiResolution),
+        tamperingDetection(settingsCapabilities, roiResolution),
+        defocusDetection(settingsCapabilities, roiResolution),
+        fogDetection(settingsCapabilities, roiResolution),
+        objectDetectionGeneral(settingsCapabilities, roiResolution),
+        objectDetectionBestShot(settingsCapabilities, roiResolution),
+        ivaObjectSize(settingsCapabilities, roiResolution),
+
+        audioDetection(settingsCapabilities, roiResolution),
+        soundClassification(settingsCapabilities, roiResolution),
+        faceMaskDetection(settingsCapabilities, roiResolution)
+    {
+        for (int i = 0; i < kMultiplicity; ++i)
+            ivaLines.emplace_back(settingsCapabilities, roiResolution);
+
+        for (int i = 0; i < kMultiplicity; ++i)
+            ivaAreas.emplace_back(settingsCapabilities, roiResolution);
+
+        for (int i = 0; i < kMultiplicity; ++i)
+            ivaExcludeAreas.emplace_back(settingsCapabilities, roiResolution);
+    }
 };
 
 } // namespace nx::vms_server_plugins::analytics::hanwha

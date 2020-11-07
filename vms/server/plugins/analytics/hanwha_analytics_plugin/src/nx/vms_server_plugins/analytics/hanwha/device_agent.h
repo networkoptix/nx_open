@@ -19,6 +19,7 @@
 #include "engine.h"
 #include "metadata_monitor.h"
 #include "settings.h"
+#include "settings_capabilities.h"
 #include "settings_processor.h"
 #include "object_metadata_xml_parser.h"
 #include "value_transformer.h"
@@ -29,8 +30,14 @@ class DeviceAgent:
     public nx::sdk::RefCountable<nx::sdk::analytics::IConsumingDeviceAgent>
 {
 public:
-    DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo,
-        bool isNvr, QSize roiResolution);
+    DeviceAgent(
+        const nx::sdk::IDeviceInfo* deviceInfo,
+        Engine* engine,
+        const SettingsCapabilities& settingsCapabilities,
+        RoiResolution roiResolution,
+        bool isNvr,
+        const Hanwha::DeviceAgentManifest& deviceAgentManifest);
+
     virtual ~DeviceAgent();
 
     virtual void setHandler(
@@ -68,14 +75,11 @@ private:
     void stopFetchingMetadata();
 
 public:
-    std::optional<QSet<QString>> loadRealSupportedEventTypes() const;
-
     std::string loadFirmwareVersion() const;
 
+    const SettingsCapabilities& settingsCapabilities() { return m_settingsCapabilities; }
 private:
     Engine* const m_engine;
-
-    Hanwha::DeviceAgentManifest m_manifest;
 
     nx::utils::Url m_url;
     QString m_model;
@@ -88,8 +92,12 @@ private:
     MetadataMonitor* m_monitor = nullptr;
     nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
 
+    const SettingsCapabilities m_settingsCapabilities;
+    RoiResolution m_roiResolution;
     Settings m_settings;
     mutable SettingsProcessor m_settingsProcessor;
+    Hanwha::DeviceAgentManifest m_manifest;
+
     mutable std::mutex m_settingsMutex;
     bool m_serverHasSentInitialSettings = false;
 

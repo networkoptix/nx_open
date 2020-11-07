@@ -129,14 +129,14 @@ void AnalyticsMode::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIn
     result->setValue(key(KeyIndex::detectionType), serialize(detectionType));
 }
 
-void AnalyticsMode::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
+void AnalyticsMode::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
 {
     using namespace SettingPrimitivesDeviceIo;
-    deserializeOrThrow(channelInfo, "DetectionType", frameSize, &detectionType);
+    deserializeOrThrow(channelInfo, "DetectionType", m_roiResolution, &detectionType);
     initialized = true;
 }
 
-std::string AnalyticsMode::buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const
+std::string AnalyticsMode::buildDeviceWritingQuery(int channelNumber) const
 {
     std::ostringstream query;
     if (initialized)
@@ -151,229 +151,6 @@ std::string AnalyticsMode::buildDeviceWritingQuery(FrameSize /*frameSize*/, int 
     return query.str();
 }
 
-//-------------------------------------------------------------------------------------------------
-
-#if 1
-// Hanwha analyticsMode detection support is currently removed from the Clients interface
-
-bool MotionDetectionObjectSize::operator==(const MotionDetectionObjectSize& rhs) const
-{
-    return initialized == rhs.initialized
-        && constraints.minWidth == rhs.constraints.minWidth
-        && constraints.minHeight == rhs.constraints.minHeight
-        && constraints.maxWidth == rhs.constraints.maxWidth
-        && constraints.maxHeight == rhs.constraints.maxHeight
-        ;
-}
-
-void MotionDetectionObjectSize::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
-{
-    using namespace SettingPrimitivesServerIo;
-    deserializeOrThrow(value(sourceMap, KeyIndex::constraints), &constraints);
-    initialized = true;
-}
-
-void MotionDetectionObjectSize::writeToServer(
-    nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
-{
-    using namespace SettingPrimitivesServerIo;
-    result->setValue(key(KeyIndex::constraints), serialize(constraints));
-}
-
-void MotionDetectionObjectSize::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
-{
-    using namespace SettingPrimitivesDeviceIo;
-    nx::kit::Json objectSizeInfo = DeviceResponseJsonParser::extractObjectSizeInfo(channelInfo, "MotionDetection");
-    deserializeOrThrow(objectSizeInfo, frameSize, &constraints);
-    initialized = true;
-}
-
-std::string MotionDetectionObjectSize::buildMinObjectSize(FrameSize frameSize) const
-{
-    std::stringstream stream;
-    stream
-        << frameSize.xRelativeToAbsolute(constraints.minWidth)
-        << ','
-        << frameSize.yRelativeToAbsolute(constraints.minHeight);
-    return stream.str();
-}
-
-std::string MotionDetectionObjectSize::buildMaxObjectSize(FrameSize frameSize) const
-{
-    std::stringstream stream;
-    stream
-        << frameSize.xRelativeToAbsolute(constraints.maxWidth)
-        << ','
-        << frameSize.yRelativeToAbsolute(constraints.maxHeight);
-    return stream.str();
-}
-
-std::string MotionDetectionObjectSize::buildDeviceWritingQuery(FrameSize frameSize, int channelNumber) const
-{
-    std::ostringstream query;
-    if (initialized)
-    {
-        query
-            << "msubmenu=" << kSunapiEventName
-            << "&action=" << "set"
-            << "&Channel=" << channelNumber
-            << "&DetectionType.MotionDetection.MinimumObjectSizeInPixels="
-                << buildMinObjectSize(frameSize)
-            << "&DetectionType.MotionDetection.MaximumObjectSizeInPixels="
-                << buildMaxObjectSize(frameSize)
-            ;
-    }
-    return query.str();
-}
-
-//-------------------------------------------------------------------------------------------------
-
-bool MotionDetectionIncludeArea::operator==(const MotionDetectionIncludeArea& rhs) const
-{
-    return initialized == rhs.initialized
-        && unnamedPolygon == rhs.unnamedPolygon
-        && thresholdLevel == rhs.thresholdLevel
-        && sensitivityLevel == rhs.sensitivityLevel
-        && minimumDuration == rhs.minimumDuration
-        ;
-}
-
-void MotionDetectionIncludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
-{
-    using namespace SettingPrimitivesServerIo;
-    deserializeOrThrow(value(sourceMap, KeyIndex::unnamedPolygon), &unnamedPolygon);
-    deserializeOrThrow(value(sourceMap, KeyIndex::thresholdLevel), &thresholdLevel);
-    deserializeOrThrow(value(sourceMap, KeyIndex::sensitivityLevel), &sensitivityLevel);
-    deserializeOrThrow(value(sourceMap, KeyIndex::minimumDuration), &minimumDuration);
-    initialized = true;
-}
-
-void MotionDetectionIncludeArea::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
-{
-    using namespace SettingPrimitivesServerIo;
-    result->setValue(key(KeyIndex::unnamedPolygon), serialize(unnamedPolygon));
-    result->setValue(key(KeyIndex::thresholdLevel), serialize(thresholdLevel));
-    result->setValue(key(KeyIndex::sensitivityLevel), serialize(sensitivityLevel));
-    result->setValue(key(KeyIndex::minimumDuration), serialize(minimumDuration));
-}
-
-void MotionDetectionIncludeArea::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
-{
-    nx::kit::Json roiInfo = DeviceResponseJsonParser::extractMdRoiInfo(channelInfo, this->deviceIndex());
-    if (roiInfo == nx::kit::Json())
-    {
-        // No roi info found for current channel => *this should be set into default state.
-        // Current SettingGroup is considered to be uninitialized.
-        *this = MotionDetectionIncludeArea(this->nativeIndex());
-        initialized = true;
-        return;
-    }
-
-    using namespace SettingPrimitivesDeviceIo;
-    deserializeOrThrow(roiInfo, "Coordinates", frameSize, &unnamedPolygon);
-    deserializeOrThrow(roiInfo, "ThresholdLevel", frameSize, &thresholdLevel);
-    deserializeOrThrow(roiInfo, "SensitivityLevel", frameSize, &sensitivityLevel);
-    deserializeOrThrow(roiInfo, "Duration", frameSize, &minimumDuration);
-    initialized = true;
-}
-
-std::string MotionDetectionIncludeArea::buildDeviceWritingQuery(FrameSize frameSize, int channelNumber) const
-{
-    std::ostringstream query;
-    if (initialized)
-    {
-        if (!unnamedPolygon.points.empty())
-        {
-            using namespace SettingPrimitivesDeviceIo;
-            const std::string prefix = "&ROI."s + std::to_string(deviceIndex());
-            query
-                << "msubmenu=" << kSunapiEventName
-                << "&action=" << "set"
-                << "&Channel=" << channelNumber
-                << prefix << ".Coordinate=" << serialize(unnamedPolygon.points, frameSize)
-                << prefix << ".ThresholdLevel=" << thresholdLevel
-                << prefix << ".SensitivityLevel=" << sensitivityLevel
-                << prefix << ".Duration=" << minimumDuration
-                ;
-        }
-        else
-        {
-            query
-                << "msubmenu=" << "videoanalysis2"
-                << "&action=" << "remove"
-                << "&Channel=" << channelNumber
-                << "&ROIIndex=" << deviceIndex();
-        }
-    }
-    return query.str();
-
-}
-//-------------------------------------------------------------------------------------------------
-bool MotionDetectionExcludeArea::operator==(const MotionDetectionExcludeArea& rhs) const
-{
-    return initialized == rhs.initialized
-        && unnamedPolygon == rhs.unnamedPolygon
-        ;
-}
-
-void MotionDetectionExcludeArea::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
-{
-    using namespace SettingPrimitivesServerIo;
-    deserializeOrThrow(value(sourceMap, KeyIndex::unnamedPolygon), &unnamedPolygon);
-    initialized = true;
-}
-
-void MotionDetectionExcludeArea::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
-{
-    using namespace SettingPrimitivesServerIo;
-    result->setValue(key(KeyIndex::unnamedPolygon), serialize(unnamedPolygon));
-}
-
-void MotionDetectionExcludeArea::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
-{
-    nx::kit::Json roiInfo = DeviceResponseJsonParser::extractMdRoiInfo(channelInfo, this->deviceIndex());
-    if (roiInfo == nx::kit::Json(this->deviceIndex()))
-    {
-        *this = MotionDetectionExcludeArea(this->nativeIndex());
-        initialized = true;
-        return;
-    }
-
-    using namespace SettingPrimitivesDeviceIo;
-    deserializeOrThrow(roiInfo, "Coordinates", frameSize, &unnamedPolygon);
-    initialized = true;
-}
-
-std::string MotionDetectionExcludeArea::buildDeviceWritingQuery(FrameSize frameSize, int channelNumber) const
-{
-    std::ostringstream query;
-    if (initialized)
-    {
-        if (!unnamedPolygon.points.empty())
-        {
-            using namespace SettingPrimitivesDeviceIo;
-            const std::string prefix = "&ROI."s + std::to_string(deviceIndex());
-            query
-                << "msubmenu=" << kSunapiEventName
-                << "&action=" << "set"
-                << "&Channel=" << channelNumber
-                << prefix << ".Coordinate=" << serialize(unnamedPolygon.points, frameSize)
-                ;
-        }
-        else
-        {
-            query
-                << "msubmenu=" << kSunapiEventName
-                << "&action=" << "remove"
-                << "&Channel=" << channelNumber
-                << "&ROIIndex=" << deviceIndex()
-                ;
-        }
-    }
-    return query.str();
-}
-
-#endif
 //-------------------------------------------------------------------------------------------------
 
 bool ShockDetection::operator==(const ShockDetection& rhs) const
@@ -403,16 +180,16 @@ void ShockDetection::writeToServer(nx::sdk::SettingsResponse* result, int /*roiI
     result->setValue(key(KeyIndex::sensitivityLevel), serialize(sensitivityLevel));
 }
 
-void ShockDetection::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
+void ShockDetection::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
 {
     using namespace SettingPrimitivesDeviceIo;
-    deserializeOrThrow(channelInfo, "Enable", frameSize, &enabled);
-    deserializeOrThrow(channelInfo, "ThresholdLevel", frameSize, &thresholdLevel);
-    deserializeOrThrow(channelInfo, "Sensitivity", frameSize, &sensitivityLevel);
+    deserializeOrThrow(channelInfo, "Enable", m_roiResolution, &enabled);
+    deserializeOrThrow(channelInfo, "ThresholdLevel", m_roiResolution, &thresholdLevel);
+    deserializeOrThrow(channelInfo, "Sensitivity", m_roiResolution, &sensitivityLevel);
     initialized = true;
 }
 
-std::string ShockDetection::buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const
+std::string ShockDetection::buildDeviceWritingQuery(int channelNumber) const
 {
     std::ostringstream query;
     if (initialized)
@@ -464,18 +241,18 @@ void TamperingDetection::writeToServer(nx::sdk::SettingsResponse* result, int /*
     result->setValue(key(KeyIndex::exceptDarkImages), serialize(exceptDarkImages));
 }
 
-void TamperingDetection::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
+void TamperingDetection::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
 {
     using namespace SettingPrimitivesDeviceIo;
-    deserializeOrThrow(channelInfo, "Enable", frameSize, &enabled);
-    deserializeOrThrow(channelInfo, "ThresholdLevel", frameSize, &thresholdLevel);
-    deserializeOrThrow(channelInfo, "SensitivityLevel", frameSize, &sensitivityLevel);
-    deserializeOrThrow(channelInfo, "Duration", frameSize, &minimumDuration);
-    deserializeOrThrow(channelInfo, "DarknessDetection", frameSize, &exceptDarkImages);
+    deserializeOrThrow(channelInfo, "Enable", m_roiResolution, &enabled);
+    deserializeOrThrow(channelInfo, "ThresholdLevel", m_roiResolution, &thresholdLevel);
+    deserializeOrThrow(channelInfo, "SensitivityLevel", m_roiResolution, &sensitivityLevel);
+    deserializeOrThrow(channelInfo, "Duration", m_roiResolution, &minimumDuration);
+    deserializeOrThrow(channelInfo, "DarknessDetection", m_roiResolution, &exceptDarkImages);
     initialized = true;
 }
 
-std::string TamperingDetection::buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const
+std::string TamperingDetection::buildDeviceWritingQuery(int channelNumber) const
 {
     std::ostringstream query;
     if (initialized)
@@ -525,17 +302,17 @@ void DefocusDetection::writeToServer(nx::sdk::SettingsResponse* result, int /*ro
     result->setValue(key(KeyIndex::minimumDuration), serialize(minimumDuration));
 }
 
-void DefocusDetection::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
+void DefocusDetection::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
 {
     using namespace SettingPrimitivesDeviceIo;
-    deserializeOrThrow(channelInfo, "Enable", frameSize, &enabled);
-    deserializeOrThrow(channelInfo, "ThresholdLevel", frameSize, &thresholdLevel);
-    deserializeOrThrow(channelInfo, "Sensitivity", frameSize, &sensitivityLevel);
-    deserializeOrThrow(channelInfo, "Duration", frameSize, &minimumDuration);
+    deserializeOrThrow(channelInfo, "Enable", m_roiResolution, &enabled);
+    deserializeOrThrow(channelInfo, "ThresholdLevel", m_roiResolution, &thresholdLevel);
+    deserializeOrThrow(channelInfo, "Sensitivity", m_roiResolution, &sensitivityLevel);
+    deserializeOrThrow(channelInfo, "Duration", m_roiResolution, &minimumDuration);
     initialized = true;
 }
 
-std::string DefocusDetection::buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const
+std::string DefocusDetection::buildDeviceWritingQuery(int channelNumber) const
 {
     std::ostringstream query;
     if (initialized)
@@ -584,17 +361,17 @@ void FogDetection::writeToServer(nx::sdk::SettingsResponse* result, int /*roiInd
     result->setValue(key(KeyIndex::minimumDuration), serialize(minimumDuration));
 }
 
-void FogDetection::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
+void FogDetection::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
 {
     using namespace SettingPrimitivesDeviceIo;
-    deserializeOrThrow(channelInfo, "Enable", frameSize, &enabled);
-    deserializeOrThrow(channelInfo, "ThresholdLevel", frameSize, &thresholdLevel);
-    deserializeOrThrow(channelInfo, "SensitivityLevel", frameSize, &sensitivityLevel);
-    deserializeOrThrow(channelInfo, "Duration", frameSize, &minimumDuration);
+    deserializeOrThrow(channelInfo, "Enable", m_roiResolution, &enabled);
+    deserializeOrThrow(channelInfo, "ThresholdLevel", m_roiResolution, &thresholdLevel);
+    deserializeOrThrow(channelInfo, "SensitivityLevel", m_roiResolution, &sensitivityLevel);
+    deserializeOrThrow(channelInfo, "Duration", m_roiResolution, &minimumDuration);
     initialized = true;
 }
 
-std::string FogDetection::buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const
+std::string FogDetection::buildDeviceWritingQuery(int channelNumber) const
 {
     std::ostringstream query;
     if (initialized)
@@ -650,15 +427,15 @@ void ObjectDetectionGeneral::writeToServer(nx::sdk::SettingsResponse* result, in
     result->setValue(key(KeyIndex::minimumDuration), serialize(minimumDuration));
 }
 
-void ObjectDetectionGeneral::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
+void ObjectDetectionGeneral::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
 {
     using namespace SettingPrimitivesDeviceIo;
-    deserializeOrThrow(channelInfo, "Enable", frameSize, &enabled);
-    deserializeOrThrow(channelInfo, "ObjectTypes", frameSize, &person, "Person");
-    deserializeOrThrow(channelInfo, "ObjectTypes", frameSize, &vehicle, "Vehicle");
-    deserializeOrThrow(channelInfo, "ObjectTypes", frameSize, &face, "Face");
-    deserializeOrThrow(channelInfo, "ObjectTypes", frameSize, &licensePlate, "LicensePlate");
-    deserializeOrThrow(channelInfo, "Duration", frameSize, &minimumDuration);
+    deserializeOrThrow(channelInfo, "Enable", m_roiResolution, &enabled);
+    deserializeOrThrow(channelInfo, "ObjectTypes", m_roiResolution, &person, "Person");
+    deserializeOrThrow(channelInfo, "ObjectTypes", m_roiResolution, &vehicle, "Vehicle");
+    deserializeOrThrow(channelInfo, "ObjectTypes", m_roiResolution, &face, "Face");
+    deserializeOrThrow(channelInfo, "ObjectTypes", m_roiResolution, &licensePlate, "LicensePlate");
+    deserializeOrThrow(channelInfo, "Duration", m_roiResolution, &minimumDuration);
     initialized = true;
 }
 
@@ -681,7 +458,7 @@ std::string ObjectDetectionGeneral::buildObjectTypes() const
     return join(mode);
 }
 
-std::string ObjectDetectionGeneral::buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const
+std::string ObjectDetectionGeneral::buildDeviceWritingQuery(int channelNumber) const
 {
     std::ostringstream query;
     if (initialized)
@@ -730,13 +507,13 @@ void ObjectDetectionBestShot::writeToServer(nx::sdk::SettingsResponse* result, i
     result->setValue(key(KeyIndex::licensePlate), serialize(licensePlate));
 }
 
-void ObjectDetectionBestShot::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
+void ObjectDetectionBestShot::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
 {
     using namespace SettingPrimitivesDeviceIo;
-    deserializeOrThrow(channelInfo, "ObjectTypes", frameSize, &person, "Person");
-    deserializeOrThrow(channelInfo, "ObjectTypes", frameSize, &vehicle, "Vehicle");
-    deserializeOrThrow(channelInfo, "ObjectTypes", frameSize, &face, "Face");
-    deserializeOrThrow(channelInfo, "ObjectTypes", frameSize, &licensePlate, "LicensePlate");
+    deserializeOrThrow(channelInfo, "ObjectTypes", m_roiResolution, &person, "Person");
+    deserializeOrThrow(channelInfo, "ObjectTypes", m_roiResolution, &vehicle, "Vehicle");
+    deserializeOrThrow(channelInfo, "ObjectTypes", m_roiResolution, &face, "Face");
+    deserializeOrThrow(channelInfo, "ObjectTypes", m_roiResolution, &licensePlate, "LicensePlate");
     initialized = true;
 }
 
@@ -759,7 +536,7 @@ std::string ObjectDetectionBestShot::buildObjectTypes() const
     return join(mode);
 }
 
-std::string ObjectDetectionBestShot::buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const
+std::string ObjectDetectionBestShot::buildDeviceWritingQuery(int channelNumber) const
 {
     std::ostringstream query;
     if (initialized)
@@ -799,35 +576,35 @@ void IvaObjectSize::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIn
     result->setValue(key(KeyIndex::constraints), serialize(constraints));
 }
 
-void IvaObjectSize::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
+void IvaObjectSize::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
 {
     using namespace SettingPrimitivesDeviceIo;
     nx::kit::Json objectSizeInfo = DeviceResponseJsonParser::extractObjectSizeInfo(channelInfo, "IntelligentVideo");
-    deserializeOrThrow(objectSizeInfo, frameSize, &constraints);
+    deserializeOrThrow(objectSizeInfo, m_roiResolution, &constraints);
     initialized = true;
 }
 
-std::string IvaObjectSize::buildMinObjectSize(FrameSize frameSize) const
+std::string IvaObjectSize::buildMinObjectSize() const
 {
     std::stringstream stream;
     stream
-        << frameSize.xRelativeToAbsolute(constraints.minWidth)
+        << m_roiResolution.xRelativeToAbsolute(constraints.minWidth)
         << ','
-        << frameSize.yRelativeToAbsolute(constraints.minHeight);
+        << m_roiResolution.yRelativeToAbsolute(constraints.minHeight);
     return stream.str();
 }
 
-std::string IvaObjectSize::buildMaxObjectSize(FrameSize frameSize) const
+std::string IvaObjectSize::buildMaxObjectSize() const
 {
     std::stringstream stream;
     stream
-        << frameSize.xRelativeToAbsolute(constraints.maxWidth)
+        << m_roiResolution.xRelativeToAbsolute(constraints.maxWidth)
         << ','
-        << frameSize.yRelativeToAbsolute(constraints.maxHeight);
+        << m_roiResolution.yRelativeToAbsolute(constraints.maxHeight);
     return stream.str();
 }
 
-std::string IvaObjectSize::buildDeviceWritingQuery(FrameSize frameSize, int channelNumber) const
+std::string IvaObjectSize::buildDeviceWritingQuery(int channelNumber) const
 {
     std::ostringstream query;
     if (initialized)
@@ -837,13 +614,15 @@ std::string IvaObjectSize::buildDeviceWritingQuery(FrameSize frameSize, int chan
             << "&action=" << "set"
             << "&Channel=" << channelNumber
             << "&DetectionType.IntelligentVideo.MinimumObjectSizeInPixels="
-                << buildMinObjectSize(frameSize)
+                << buildMinObjectSize()
             << "&DetectionType.IntelligentVideo.MaximumObjectSizeInPixels="
-                << buildMaxObjectSize(frameSize)
+                << buildMaxObjectSize()
             ;
     }
     return query.str();
 }
+
+//-------------------------------------------------------------------------------------------------
 
 bool IvaLine::operator==(const IvaLine& rhs) const
 {
@@ -855,52 +634,83 @@ bool IvaLine::operator==(const IvaLine& rhs) const
         ;
 }
 
-void IvaLine::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
+void IvaLine::assignExclusiveFrom(const IvaLine& other)
+{
+    if (!m_settingsCapabilities.ivaLineRuleName)
+        this->namedLineFigure.name = other.namedLineFigure.name;
+}
+
+void IvaLine::readExclusiveFromServerOrThrow(const nx::sdk::IStringMap* sourceMap)
+{
+    using namespace SettingPrimitivesServerIo;
+    NamedLineFigure tmpLine;
+    deserializeOrThrow(value(sourceMap, KeyIndex::namedLineFigure), &tmpLine);
+    namedLineFigure.name = tmpLine.name;
+}
+
+void IvaLine::readFromServerOrThrow(
+    const nx::sdk::IStringMap* sourceMap,
+    int /*roiIndex*/)
 {
     using namespace SettingPrimitivesServerIo;
     deserializeOrThrow(value(sourceMap, KeyIndex::namedLineFigure), &namedLineFigure);
-    deserializeOrThrow(value(sourceMap, KeyIndex::person), &person);
-    deserializeOrThrow(value(sourceMap, KeyIndex::vehicle), &vehicle);
+    if (m_settingsCapabilities.ivaLineObjectTypeFilter)
+    {
+        deserializeOrThrow(value(sourceMap, KeyIndex::person), &person);
+        deserializeOrThrow(value(sourceMap, KeyIndex::vehicle), &vehicle);
+    }
     deserializeOrThrow(value(sourceMap, KeyIndex::crossing), &crossing);
 
     initialized = true;
 }
 
-void IvaLine::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
+void IvaLine::writeToServer(
+    nx::sdk::SettingsResponse* result,
+    int /*roiIndex*/) const
 {
     using namespace SettingPrimitivesServerIo;
     result->setValue(key(KeyIndex::namedLineFigure), serialize(namedLineFigure));
-    result->setValue(key(KeyIndex::person), serialize(person));
-    result->setValue(key(KeyIndex::vehicle), serialize(vehicle));
+    if (m_settingsCapabilities.ivaLineObjectTypeFilter)
+    {
+        result->setValue(key(KeyIndex::person), serialize(person));
+        result->setValue(key(KeyIndex::vehicle), serialize(vehicle));
+    }
     result->setValue(key(KeyIndex::crossing), serialize(crossing));
 }
 
-void IvaLine::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
+void IvaLine::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
 {
-    nx::kit::Json lineInfo = DeviceResponseJsonParser::extractIvaLineInfo(channelInfo, this->deviceIndex());
+    const nx::kit::Json lineInfo = DeviceResponseJsonParser::extractIvaLineInfo(
+        channelInfo, this->deviceIndex());
+
     if (lineInfo == nx::kit::Json())
     {
-        *this = IvaLine(this->nativeIndex()); // reset value;
+        *this = IvaLine(m_settingsCapabilities, m_roiResolution, this->nativeIndex()); // reset value;
         initialized = true;
         return;
     }
 
     using namespace SettingPrimitivesDeviceIo;
-    deserializeOrThrow(lineInfo, "Coordinates", frameSize, &namedLineFigure.points);
+    deserializeOrThrow(lineInfo, "Coordinates", m_roiResolution, &namedLineFigure.points);
 
-    deserializeOrThrow(lineInfo, "Mode", frameSize, &namedLineFigure.direction);
+    deserializeOrThrow(lineInfo, "Mode", m_roiResolution, &namedLineFigure.direction);
 
     // Direction in the plugin and direction in the device are defined in a different way
     // After reading direction from the device the direction should be treated in a special way.
     if (namedLineFigure.points[0].y < namedLineFigure.points[1].y)
         namedLineFigure.direction = invertedDirection(namedLineFigure.direction);
 
-    deserializeOrThrow(lineInfo, "RuleName", frameSize, &namedLineFigure.name);
-    deserializeOrThrow(lineInfo, "ObjectTypeFilter", frameSize, &person, "Person");
-    deserializeOrThrow(lineInfo, "ObjectTypeFilter", frameSize, &vehicle, "Vehicle");
+    if (m_settingsCapabilities.ivaLineRuleName)
+        deserializeOrThrow(lineInfo, "RuleName", m_roiResolution, &namedLineFigure.name);
+
+    if (m_settingsCapabilities.ivaLineObjectTypeFilter)
+    {
+        deserializeOrThrow(lineInfo, "ObjectTypeFilter", m_roiResolution, &person, "Person");
+        deserializeOrThrow(lineInfo, "ObjectTypeFilter", m_roiResolution, &vehicle, "Vehicle");
+    }
 
     std::string Crossing;
-    deserializeOrThrow(lineInfo, "Mode", frameSize, &Crossing);
+    deserializeOrThrow(lineInfo, "Mode", m_roiResolution, &Crossing);
     this->crossing = Crossing != "Off";
     initialized = true;
 }
@@ -928,7 +738,7 @@ std::string IvaLine::buildFilter() const
     return join(mode);
 }
 
-std::string IvaLine::buildMode(bool inverted /*= false*/) const
+std::string IvaLine::buildMode(/*bool inverted = false*/) const
 {
     if (!crossing)
         return "Off";
@@ -951,7 +761,7 @@ std::string IvaLine::buildMode(bool inverted /*= false*/) const
     return {};
 }
 
-std::string IvaLine::buildDeviceWritingQuery(FrameSize frameSize, int channelNumber) const
+std::string IvaLine::buildDeviceWritingQuery(int channelNumber) const
 {
     std::ostringstream query;
     if (initialized)
@@ -965,11 +775,12 @@ std::string IvaLine::buildDeviceWritingQuery(FrameSize frameSize, int channelNum
                 << "msubmenu=" << kSunapiEventName
                 << "&action=" << "set"
                 << "&Channel=" << channelNumber
-                << prefix << ".Coordinate=" << serialize(namedLineFigure.points, frameSize)
-                << prefix << ".RuleName=" << namedLineFigure.name
-                << prefix << ".ObjectTypeFilter=" << buildFilter()
-                << prefix << ".Mode=" << buildMode()
-                ;
+                << prefix << ".Coordinate=" << serialize(namedLineFigure.points, m_roiResolution);
+            if (m_settingsCapabilities.ivaLineRuleName)
+                query << prefix << ".RuleName=" << namedLineFigure.name;
+            if (m_settingsCapabilities.ivaLineObjectTypeFilter)
+                query << prefix << ".ObjectTypeFilter=" << buildFilter();
+            query << prefix << ".Mode=" << buildMode();
         }
         else
         {
@@ -1002,20 +813,46 @@ bool IvaArea::operator==(const IvaArea& rhs) const
         ;
 }
 
+void IvaArea::assignExclusiveFrom(const IvaArea& other)
+{
+    if (!m_settingsCapabilities.ivaLineRuleName)
+        this->namedPolygon.name = other.namedPolygon.name;
+}
+
+void IvaArea::readExclusiveFromServerOrThrow(const nx::sdk::IStringMap* sourceMap)
+{
+    using namespace SettingPrimitivesServerIo;
+    NamedPolygon tmpPolygon;
+    deserializeOrThrow(value(sourceMap, KeyIndex::namedPolygon), &tmpPolygon);
+    namedPolygon.name = tmpPolygon.name;
+}
+
 void IvaArea::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
     using namespace SettingPrimitivesServerIo;
     deserializeOrThrow(value(sourceMap, KeyIndex::namedPolygon), &namedPolygon);
-    deserializeOrThrow(value(sourceMap, KeyIndex::person), &person);
-    deserializeOrThrow(value(sourceMap, KeyIndex::vehicle), &vehicle);
-    deserializeOrThrow(value(sourceMap, KeyIndex::intrusion), &intrusion);
-    deserializeOrThrow(value(sourceMap, KeyIndex::enter), &enter);
-    deserializeOrThrow(value(sourceMap, KeyIndex::exit), &exit);
-    deserializeOrThrow(value(sourceMap, KeyIndex::appear), &appear);
-    deserializeOrThrow(value(sourceMap, KeyIndex::loitering), &loitering);
-    deserializeOrThrow(value(sourceMap, KeyIndex::intrusionDuration), &intrusionDuration);
-    deserializeOrThrow(value(sourceMap, KeyIndex::appearDuration), &appearDuration);
-    deserializeOrThrow(value(sourceMap, KeyIndex::loiteringDuration), &loiteringDuration);
+    if (m_settingsCapabilities.ivaAreaObjectTypeFilter)
+    {
+        deserializeOrThrow(value(sourceMap, KeyIndex::person), &person);
+        deserializeOrThrow(value(sourceMap, KeyIndex::vehicle), &vehicle);
+    }
+
+    if (m_settingsCapabilities.ivaAreaIntrusion)
+        deserializeOrThrow(value(sourceMap, KeyIndex::intrusion), &intrusion);
+    if (m_settingsCapabilities.ivaAreaEnter)
+        deserializeOrThrow(value(sourceMap, KeyIndex::enter), &enter);
+    if (m_settingsCapabilities.ivaAreaExit)
+        deserializeOrThrow(value(sourceMap, KeyIndex::exit), &exit);
+    if (m_settingsCapabilities.ivaAreaAppear)
+        deserializeOrThrow(value(sourceMap, KeyIndex::appear), &appear);
+    if (m_settingsCapabilities.ivaAreaLoitering)
+        deserializeOrThrow(value(sourceMap, KeyIndex::loitering), &loitering);
+    if (m_settingsCapabilities.ivaAreaIntrusionDuration)
+        deserializeOrThrow(value(sourceMap, KeyIndex::intrusionDuration), &intrusionDuration);
+    if (m_settingsCapabilities.ivaAreaAppearDuration)
+        deserializeOrThrow(value(sourceMap, KeyIndex::appearDuration), &appearDuration);
+    if (m_settingsCapabilities.ivaAreaLoiteringDuration)
+        deserializeOrThrow(value(sourceMap, KeyIndex::loiteringDuration), &loiteringDuration);
     initialized = true;
 }
 
@@ -1023,43 +860,68 @@ void IvaArea::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/)
 {
     using namespace SettingPrimitivesServerIo;
     result->setValue(key(KeyIndex::namedPolygon), serialize(namedPolygon));
-    result->setValue(key(KeyIndex::person), serialize(person));
-    result->setValue(key(KeyIndex::vehicle), serialize(vehicle));
-    result->setValue(key(KeyIndex::intrusion), serialize(intrusion));
-    result->setValue(key(KeyIndex::enter), serialize(enter));
-    result->setValue(key(KeyIndex::exit), serialize(exit));
-    result->setValue(key(KeyIndex::appear), serialize(appear));
-    result->setValue(key(KeyIndex::loitering), serialize(loitering));
-    result->setValue(key(KeyIndex::intrusionDuration), serialize(intrusionDuration));
-    result->setValue(key(KeyIndex::appearDuration), serialize(appearDuration));
-    result->setValue(key(KeyIndex::loiteringDuration), serialize(loiteringDuration));
+    if (m_settingsCapabilities.ivaAreaObjectTypeFilter)
+    {
+        result->setValue(key(KeyIndex::person), serialize(person));
+        result->setValue(key(KeyIndex::vehicle), serialize(vehicle));
+    }
+    if (m_settingsCapabilities.ivaAreaIntrusion)
+        result->setValue(key(KeyIndex::intrusion), serialize(intrusion));
+    if (m_settingsCapabilities.ivaAreaEnter)
+        result->setValue(key(KeyIndex::enter), serialize(enter));
+    if (m_settingsCapabilities.ivaAreaExit)
+        result->setValue(key(KeyIndex::exit), serialize(exit));
+    if (m_settingsCapabilities.ivaAreaAppear)
+        result->setValue(key(KeyIndex::appear), serialize(appear));
+    if (m_settingsCapabilities.ivaAreaLoitering)
+        result->setValue(key(KeyIndex::loitering), serialize(loitering));
+    if (m_settingsCapabilities.ivaAreaIntrusionDuration)
+        result->setValue(key(KeyIndex::intrusionDuration), serialize(intrusionDuration));
+    if (m_settingsCapabilities.ivaAreaAppearDuration)
+        result->setValue(key(KeyIndex::appearDuration), serialize(appearDuration));
+    if (m_settingsCapabilities.ivaAreaLoiteringDuration)
+        result->setValue(key(KeyIndex::loiteringDuration), serialize(loiteringDuration));
 }
 
-void IvaArea::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
+void IvaArea::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
 {
     nx::kit::Json roiInfo = DeviceResponseJsonParser::extractIvaRoiInfo(channelInfo, this->deviceIndex());
     if (roiInfo == nx::kit::Json())
     {
-        *this = IvaArea(this->nativeIndex()); // reset value;
+        *this = IvaArea(m_settingsCapabilities, m_roiResolution, this->nativeIndex()); // reset value;
         initialized = true;
         return ;
     }
 
     using namespace SettingPrimitivesDeviceIo;
-    deserializeOrThrow(roiInfo, "Coordinates", frameSize, &namedPolygon.points);
-    deserializeOrThrow(roiInfo, "RuleName", frameSize, &namedPolygon.name);
-    deserializeOrThrow(roiInfo, "ObjectTypeFilter", frameSize, &person, "Person");
-    deserializeOrThrow(roiInfo, "ObjectTypeFilter", frameSize, &vehicle, "Vehicle");
+    deserializeOrThrow(roiInfo, "Coordinates", m_roiResolution, &namedPolygon.points);
 
-    deserializeOrThrow(roiInfo, "Mode", frameSize, &intrusion, "Intrusion");
-    deserializeOrThrow(roiInfo, "Mode", frameSize, &enter, "Entering");
-    deserializeOrThrow(roiInfo, "Mode", frameSize, &exit, "Exiting");
-    deserializeOrThrow(roiInfo, "Mode", frameSize, &appear, "AppearDisappear");
-    deserializeOrThrow(roiInfo, "Mode", frameSize, &loitering, "Loitering");
+    if (m_settingsCapabilities.ivaAreaRuleName)
+        deserializeOrThrow(roiInfo, "RuleName", m_roiResolution, &namedPolygon.name);
 
-    deserializeOrThrow(roiInfo, "IntrusionDuration", frameSize, &intrusionDuration);
-    deserializeOrThrow(roiInfo, "AppearanceDuration", frameSize, &appearDuration);
-    deserializeOrThrow(roiInfo, "LoiteringDuration", frameSize, &loiteringDuration);
+    if (m_settingsCapabilities.ivaAreaObjectTypeFilter)
+    {
+        deserializeOrThrow(roiInfo, "ObjectTypeFilter", m_roiResolution, &person, "Person");
+        deserializeOrThrow(roiInfo, "ObjectTypeFilter", m_roiResolution, &vehicle, "Vehicle");
+    }
+
+    if (m_settingsCapabilities.ivaAreaIntrusion)
+        deserializeOrThrow(roiInfo, "Mode", m_roiResolution, &intrusion, "Intrusion");
+    if (m_settingsCapabilities.ivaAreaEnter)
+        deserializeOrThrow(roiInfo, "Mode", m_roiResolution, &enter, "Entering");
+    if (m_settingsCapabilities.ivaAreaExit)
+        deserializeOrThrow(roiInfo, "Mode", m_roiResolution, &exit, "Exiting");
+    if (m_settingsCapabilities.ivaAreaAppear)
+        deserializeOrThrow(roiInfo, "Mode", m_roiResolution, &appear, "AppearDisappear");
+    if (m_settingsCapabilities.ivaAreaLoitering)
+        deserializeOrThrow(roiInfo, "Mode", m_roiResolution, &loitering, "Loitering");
+
+    if (m_settingsCapabilities.ivaAreaIntrusionDuration)
+        deserializeOrThrow(roiInfo, "IntrusionDuration", m_roiResolution, &intrusionDuration);
+    if (m_settingsCapabilities.ivaAreaAppearDuration)
+        deserializeOrThrow(roiInfo, "AppearanceDuration", m_roiResolution, &appearDuration);
+    if (m_settingsCapabilities.ivaAreaLoiteringDuration)
+        deserializeOrThrow(roiInfo, "LoiteringDuration", m_roiResolution, &loiteringDuration);
     initialized = true;
 }
 
@@ -1067,19 +929,19 @@ std::string IvaArea::buildMode() const
 {
     std::vector<const char*> mode;
 
-    if (intrusion)
+    if (m_settingsCapabilities.ivaAreaIntrusion && intrusion)
         mode.push_back("Intrusion");
 
-    if (enter)
+    if (m_settingsCapabilities.ivaAreaEnter && enter)
         mode.push_back("Entering");
 
-    if (exit)
+    if (m_settingsCapabilities.ivaAreaExit && exit)
         mode.push_back("Exiting");
 
-    if (appear)
+    if (m_settingsCapabilities.ivaAreaAppear && appear)
         mode.push_back("AppearDisappear");
 
-    if (loitering)
+    if (m_settingsCapabilities.ivaAreaLoitering && loitering)
         mode.push_back("Loitering");
 
     return join(mode);
@@ -1098,7 +960,7 @@ std::string IvaArea::buildFilter() const
     return join(mode);
 }
 
-std::string IvaArea::buildDeviceWritingQuery(FrameSize frameSize, int channelNumber) const
+std::string IvaArea::buildDeviceWritingQuery(int channelNumber) const
 {
     std::ostringstream query;
     if (initialized)
@@ -1111,23 +973,37 @@ std::string IvaArea::buildDeviceWritingQuery(FrameSize frameSize, int channelNum
                 << "msubmenu=" << kSunapiEventName
                 << "&action=" << "set"
                 << "&Channel=" << channelNumber
-                << prefix << ".Coordinate=" << serialize(namedPolygon.points, frameSize)
-                << prefix << ".Type=" << "Inside"
-                << prefix << ".RuleName=" << namedPolygon.name
-                << prefix << ".ObjectTypeFilter=" << buildFilter()
-                << prefix << ".Mode=" << buildMode()
-                << prefix << ".IntrusionDuration=" << intrusionDuration
-                << prefix << ".AppearanceDuration=" << appearDuration
-                << prefix << ".LoiteringDuration=" << loiteringDuration
-                ;
+                << prefix << ".Coordinate=" << serialize(namedPolygon.points, m_roiResolution)
+                << prefix << ".Type=" << "Inside";
+
+            if (m_settingsCapabilities.ivaAreaRuleName)
+                query << prefix << ".RuleName=" << namedPolygon.name;
+
+            if (m_settingsCapabilities.ivaAreaObjectTypeFilter)
+                query << prefix << ".ObjectTypeFilter=" << buildFilter();
+
+            if (m_settingsCapabilities.ivaAreaIntrusion || m_settingsCapabilities.ivaAreaEnter
+                || m_settingsCapabilities.ivaAreaExit || m_settingsCapabilities.ivaAreaAppear
+                || m_settingsCapabilities.ivaAreaLoitering)
+            {
+                query << prefix << ".Mode=" << buildMode();
+            }
+
+            if (m_settingsCapabilities.ivaAreaIntrusionDuration)
+                query << prefix << ".IntrusionDuration=" << intrusionDuration;
+
+            if (m_settingsCapabilities.ivaAreaAppearDuration)
+                query << prefix << ".AppearanceDuration=" << appearDuration;
+            if (m_settingsCapabilities.ivaAreaLoiteringDuration)
+                query << prefix << ".LoiteringDuration=" << loiteringDuration;
         }
         else
         {
-                query
-                << "msubmenu=" << kSunapiEventName
-                << "&action=" << "remove"
-                << "&Channel=" << channelNumber
-                << "&DefinedAreaIndex=" << deviceIndex();
+            query
+            << "msubmenu=" << kSunapiEventName
+            << "&action=" << "remove"
+            << "&Channel=" << channelNumber
+            << "&DefinedAreaIndex=" << deviceIndex();
         }
     }
     return query.str();
@@ -1155,22 +1031,22 @@ void IvaExcludeArea::writeToServer(nx::sdk::SettingsResponse* result, int /*roiI
     result->setValue(key(KeyIndex::unnamedPolygon), serialize(unnamedPolygon));
 }
 
-void IvaExcludeArea::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
+void IvaExcludeArea::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
 {
     nx::kit::Json roiInfo = DeviceResponseJsonParser::extractIvaRoiInfo(channelInfo, this->deviceIndex());
     if (roiInfo == nx::kit::Json())
     {
-        *this = IvaExcludeArea(this->nativeIndex());
+        *this = IvaExcludeArea(m_settingsCapabilities, m_roiResolution, this->nativeIndex());
         initialized = true;
         return;
     }
 
     using namespace SettingPrimitivesDeviceIo;
-    deserializeOrThrow(roiInfo, "Coordinates", frameSize, &unnamedPolygon.points);
+    deserializeOrThrow(roiInfo, "Coordinates", m_roiResolution, &unnamedPolygon.points);
     initialized = true;
 }
 
-std::string IvaExcludeArea::buildDeviceWritingQuery(FrameSize frameSize, int channelNumber) const
+std::string IvaExcludeArea::buildDeviceWritingQuery(int channelNumber) const
 {
     std::ostringstream query;
     if (initialized)
@@ -1183,7 +1059,7 @@ std::string IvaExcludeArea::buildDeviceWritingQuery(FrameSize frameSize, int cha
                 << "msubmenu=" << kSunapiEventName
                 << "&action=" << "set"
                 << "&Channel=" << channelNumber
-                << prefix << ".Coordinate=" << serialize(unnamedPolygon.points, frameSize)
+                << prefix << ".Coordinate=" << serialize(unnamedPolygon.points, m_roiResolution)
                 << prefix << ".Type=" << "Outside"
                 ;
         }
@@ -1225,15 +1101,15 @@ void AudioDetection::writeToServer(nx::sdk::SettingsResponse* result, int /*roiI
     result->setValue(key(KeyIndex::thresholdLevel), serialize(thresholdLevel));
 }
 
-void AudioDetection::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo, FrameSize frameSize)
+void AudioDetection::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
 {
     using namespace SettingPrimitivesDeviceIo;
-    deserializeOrThrow(channelInfo, "Enable", frameSize, &enabled);
-    deserializeOrThrow(channelInfo, "InputThresholdLevel", frameSize, &thresholdLevel);
+    deserializeOrThrow(channelInfo, "Enable", m_roiResolution, &enabled);
+    deserializeOrThrow(channelInfo, "InputThresholdLevel", m_roiResolution, &thresholdLevel);
     initialized = true;
 }
 
-std::string AudioDetection::buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const
+std::string AudioDetection::buildDeviceWritingQuery(int channelNumber) const
 {
     std::ostringstream query;
     if (initialized)
@@ -1291,16 +1167,16 @@ void SoundClassification::writeToServer(nx::sdk::SettingsResponse* result, int /
 }
 
 void SoundClassification::readFromDeviceReplyOrThrow(
-    const nx::kit::Json& channelInfo, FrameSize frameSize)
+    const nx::kit::Json& channelInfo)
 {
     using namespace SettingPrimitivesDeviceIo;
-    deserializeOrThrow(channelInfo, "Enable", frameSize, &enabled);
-    deserializeOrThrow(channelInfo, "NoiseReduction", frameSize, &noisefilter);
-    deserializeOrThrow(channelInfo, "ThresholdLevel", frameSize, &thresholdLevel);
-    deserializeOrThrow(channelInfo, "SoundType", frameSize, &scream, "Scream");
-    deserializeOrThrow(channelInfo, "SoundType", frameSize, &gunshot, "Gunshot");
-    deserializeOrThrow(channelInfo, "SoundType", frameSize, &explosion, "Explosion");
-    deserializeOrThrow(channelInfo, "SoundType", frameSize, &crashingGlass, "GlassBreak");
+    deserializeOrThrow(channelInfo, "Enable", m_roiResolution, &enabled);
+    deserializeOrThrow(channelInfo, "NoiseReduction", m_roiResolution, &noisefilter);
+    deserializeOrThrow(channelInfo, "ThresholdLevel", m_roiResolution, &thresholdLevel);
+    deserializeOrThrow(channelInfo, "SoundType", m_roiResolution, &scream, "Scream");
+    deserializeOrThrow(channelInfo, "SoundType", m_roiResolution, &gunshot, "Gunshot");
+    deserializeOrThrow(channelInfo, "SoundType", m_roiResolution, &explosion, "Explosion");
+    deserializeOrThrow(channelInfo, "SoundType", m_roiResolution, &crashingGlass, "GlassBreak");
     initialized = true;
 }
 
@@ -1323,7 +1199,7 @@ std::string SoundClassification::buildSoundType() const
     return join(mode);
 }
 
-std::string SoundClassification::buildDeviceWritingQuery(FrameSize /*frameSize*/, int channelNumber) const
+std::string SoundClassification::buildDeviceWritingQuery(int channelNumber) const
 {
     std::ostringstream query;
     if (initialized)
@@ -1390,19 +1266,18 @@ void FaceMaskDetection::writeToServer(
 }
 
 void FaceMaskDetection::readFromDeviceReplyOrThrow(
-    const nx::kit::Json& channelInfo, FrameSize frameSize)
+    const nx::kit::Json& channelInfo)
 {
     using namespace SettingPrimitivesDeviceIo;
-    deserializeOrThrow(channelInfo, "Enable", frameSize, &enabled);
+    deserializeOrThrow(channelInfo, "Enable", m_roiResolution, &enabled);
 
     std::string detectionModeString;
-    deserializeOrThrow(channelInfo, "DetectionMode", frameSize, &detectionModeString);
+    deserializeOrThrow(channelInfo, "DetectionMode", m_roiResolution, &detectionModeString);
     deserializeDetectionModeOrThrow(detectionModeString.c_str(), &detectionMode);
     initialized = true;
 }
 
-std::string FaceMaskDetection::buildDeviceWritingQuery(
-    FrameSize /*frameSize*/, int channelNumber) const
+std::string FaceMaskDetection::buildDeviceWritingQuery(int channelNumber) const
 {
     std::ostringstream query;
     if (initialized)
