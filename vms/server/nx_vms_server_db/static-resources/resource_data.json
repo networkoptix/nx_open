@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.3.840",
+    "version": "4.1.3.841",
     "data": [
         {
             "keys": [
@@ -3234,7 +3234,8 @@
         {
             "keys": [
                 "hikvision|DS-7216*|V1*",
-                "hikvision|DS-7216*|V2*"
+                "hikvision|DS-7216*|V2*",
+                "hikvision|DS-7216HUHI-F2/N|V3*"
             ],
             "comment": "We don't know if firmware v2 behaves same as v1 or same as v3, let it be as v1",
             "forcedOnvifParams": {
@@ -3260,7 +3261,8 @@
         },
         {
             "keys": [
-                "hikvision|DS-7216*|V3*",
+                "hikvision|DS-7216HWI*|V3*",
+                "hikvision|DS-7216HGHI*|V3*",
                 "hikvision|DS-7216*|V4*"
             ],
             "forcedOnvifParams":
@@ -4799,7 +4801,46 @@
                     }
                 }
             }
+        },
+        {
+            "_comment": "Calibration for camera fw 3.28.0.112(28426)",
+            "keys": [
+                "Avigilon|2.0C-H4IRPTZ-DP30*"
+            ],
+            "useOnvifPtz": true,
+            "ptzMapper": {
+                "fromCamera": {
+                    "x": {
+                        "extrapolationMode": "PeriodicExtrapolation",
+                        "device":  [ 1,    -1],
+                        "logical": [180, -180]
+                    },
+                    "y": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [ -0.111111,   0.50557],
+                        "logical": [  20, -90]
+                    },
+                    "z": {
+                        "extrapolationMode": "ConstantExtrapolation",
+                        "device":  [0.00, 0.01, 0.02, 0.04, 0.07, 0.15,0.27, 0.37, 0.48, 0.64, 0.70, 0.89, 0.92, 1.00],
+                        "logical": [1.00, 1.23, 1.53, 2.13, 3.23, 5.53, 8.83, 11.80, 15.00, 19.27, 21.00, 26.00, 27.00, 29.00],
+                        "logicalMultiplier": 30,
+                        "space": "35MmEquiv"
+                    }
+                }
+            }
+        },
+        {
+            "keys": [
+                "General|BCS-TIP5201*"
+            ],
+            "onvifVendorSubtype": "Dahua"
+        },
+        {
+            "keys": [
+                "Onvif|BCS-V-TI236*"
+            ],
+            "onvifVendorSubtype": "hikvision"
         }
-
     ]
 }
