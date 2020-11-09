@@ -1167,7 +1167,7 @@ void QnCamDisplay::putData(const QnAbstractDataPacketPtr& data)
     if (video && m_dataQueue.size() < 2)
         hurryUpCkeckForCamera2(video); // check if slow network
 
-    NX_VERBOSE(this, "Media queue size for resource %1 is %2 packets", 
+    NX_VERBOSE(this, "Media queue size for resource %1 is %2 packets",
         m_resource, m_dataQueue.size());
 }
 
@@ -1245,6 +1245,10 @@ void QnCamDisplay::processFillerPacket(
         && m_resource->toResource()->hasFlags(Qn::ResourceFlag::utc);
 
     m_emptyPacketCounter++;
+    const bool needFlushAudio = m_playAudio && m_audioDisplay && m_audioDisplay->msInBuffer() > 0;
+    if (needFlushAudio)
+        return; //< Play the rest of audio buffer before jump to live.
+
     // empty data signal about EOF, or read/network error. So, check counter before EOF signaling
     //bool playUnsync = (emptyData->flags & QnAbstractMediaData::MediaFlags_PlayUnsync);
     bool isFillerPacket = isNvrFillerPacket(timestampUs);
@@ -1560,7 +1564,7 @@ bool QnCamDisplay::processData(const QnAbstractDataPacketPtr& data)
 
             doDelayForAudio(ad, speed);
         }
-        
+
         // we synch video to the audio; so just put audio in player with out thinking
         if (m_playAudio && qAbs(speed-1.0) < FPS_EPS)
         {

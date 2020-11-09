@@ -144,6 +144,7 @@
             forceLiveCacheForPrimaryStream: {type: 'text'},
             additionalLocalFsTypes: {type: 'text'},
             mediaBufferSizeKb: {type: 'number'},
+            mediaBufferSizeForAudioOnlyDeviceKb: {type: 'number'},
             forceAnalyticsDbStoragePermissions: {
                 type: 'checkbox',
                 label: 'Set r-x flags on analytics DB storage mount point (required by SQLite)'

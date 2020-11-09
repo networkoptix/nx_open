@@ -772,6 +772,12 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
             256, //< Default value.
             this);
 
+    m_mediaBufferSizeKbForAudioOnlyDeviceAdaptor =
+        new QnLexicalResourcePropertyAdaptor<int>(
+            "mediaBufferSizeForAudioOnlyDeviceKb",
+            16, //< Default value.
+            this);
+
     m_forceAnalyticsDbStoragePermissionsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
         "forceAnalyticsDbStoragePermissions", false,  this);
 
@@ -1013,6 +1019,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
         << m_additionalLocalFsTypesAdaptor
         << m_keepHanwhaIoPortStateIntactOnInitializationAdaptor
         << m_mediaBufferSizeKbAdaptor
+        << m_mediaBufferSizeKbForAudioOnlyDeviceAdaptor
         << m_forceAnalyticsDbStoragePermissionsAdaptor
         << m_checkVideoStreamPeriodMsAdaptor
     ;
@@ -1900,6 +1907,16 @@ int QnGlobalSettings::mediaBufferSizeKb() const
 void QnGlobalSettings::setMediaBufferSizeKb(int value)
 {
     m_mediaBufferSizeKbAdaptor->setValue(value);
+}
+
+int QnGlobalSettings::mediaBufferSizeForAudioOnlyDeviceKb() const
+{
+    return m_mediaBufferSizeKbForAudioOnlyDeviceAdaptor->value();
+}
+
+void QnGlobalSettings::setMediaBufferSizeForAudioOnlyDeviceKb(int value)
+{
+    m_mediaBufferSizeKbForAudioOnlyDeviceAdaptor->setValue(value);
 }
 
 bool QnGlobalSettings::forceAnalyticsDbStoragePermissions() const

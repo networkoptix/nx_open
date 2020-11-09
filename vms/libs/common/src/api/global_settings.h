@@ -417,6 +417,9 @@ public:
     int mediaBufferSizeKb() const;
     void setMediaBufferSizeKb(int value);
 
+    int mediaBufferSizeForAudioOnlyDeviceKb() const;
+    void setMediaBufferSizeForAudioOnlyDeviceKb(int value);
+
     bool forceAnalyticsDbStoragePermissions() const;
 
     std::chrono::milliseconds checkVideoStreamPeriod() const;
@@ -594,6 +597,7 @@ private:
     QnResourcePropertyAdaptor<QString>* m_additionalLocalFsTypesAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_keepHanwhaIoPortStateIntactOnInitializationAdaptor= nullptr;
     QnResourcePropertyAdaptor<int>* m_mediaBufferSizeKbAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* m_mediaBufferSizeKbForAudioOnlyDeviceAdaptor = nullptr;
     QnResourcePropertyAdaptor<bool>* m_forceAnalyticsDbStoragePermissionsAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_checkVideoStreamPeriodMsAdaptor = nullptr;
 

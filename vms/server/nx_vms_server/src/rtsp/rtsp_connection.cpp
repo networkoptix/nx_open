@@ -1686,7 +1686,15 @@ bool QnRtspConnectionProcessor::processRequest()
     }
 
     if (auto cameraRes = d->mediaRes.dynamicCast<QnVirtualCameraResource>())
+    {
         d->m_cameraParameters = cameraParameters(cameraRes);
+        if (!cameraRes->hasVideo())
+        {
+            d->socket->setSendBufferSize(
+                globalSettings()->mediaBufferSizeForAudioOnlyDeviceKb() * 1024);
+        }
+
+    }
 
     if (d->dataProcessor)
         d->dataProcessor->pauseNetwork();
