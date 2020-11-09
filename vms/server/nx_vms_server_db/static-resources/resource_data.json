@@ -1059,11 +1059,7 @@
                 "general|nvr7000k",
                 "s-64 e v2-xt|siqura",
                 "d44_nvr8pro7|general",
-                "bosch|vip_x16*",
-                "private|dhi-nvr5216-4ks2",
-                "general|dvr08cvi-4k",
                 "dh-nvr608-32-4ks2|private",
-                "private|dh-nvr4832-4k",
                 "dh-nvr4208-8p-4k|private",
                 "MarchNetworks|Edge16e",
                 "bosch|vip_x16_xf_e",
@@ -1218,7 +1214,18 @@
                 "Hanwha_Techwin|SPE-16*",
                 "Hanwha_Techwin|SPE-100*",
                 "Hanwha_Techwin|SPE-101*",
-                "Hanwha_Techwin|SPE-410*"
+                "Hanwha_Techwin|SPE-410*",
+                "dahua|dhi-nvr5208*",
+                "dahua|dhi-nvr2116*",
+                "dahua|dhi-nvr5224*",
+                "onvif|x2-cctv-nvr*",
+                "general|k-nl404k",
+                "ac|nv4108e-hs",
+                "bosch|videojet_multi_4000",
+                "axis|axisq7414*",
+                "dahua|dh-nvr5432*",
+                "dahua|n41b1p2",
+                "tecsarlead|4ch1h4poe-5-sm"
             ],
             "analogEncoder": true
         },
@@ -3683,7 +3690,9 @@
             "axis|axisp3715*",
             "axis|p3715*",
             "axis|axis p3715*",
-            "hikvision|DS-2TD2617*"
+            "hikvision|DS-2TD2617*",
+            "dahua|ipc-pdbw82041-b360",
+            "digital watchdog|dwc-pvx16w2"
             ],
             "canShareLicenseGroup": true
         },
