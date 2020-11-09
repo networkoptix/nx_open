@@ -826,7 +826,7 @@ nx::network::rtsp::StatusCodeValue QnRtspConnectionProcessor::composeDescribe()
     if (cameraResource)
     {
         // avoid race condition if camera is starting now
-        if (cameraResource->isAudioEnabled())
+        if (cameraResource->isAudioEnabled() && cameraResource->isAudioSupported())
             numAudio = 1;
     }
     else
