@@ -231,7 +231,6 @@ int launchFile(const wstring& executePath)
         return -3;
     }
 
-    char* buffer = new char[catalogSize];
     try
     {
         vector<int64_t> filePosList;
@@ -259,7 +258,6 @@ int launchFile(const wstring& executePath)
 
             fileNameList.push_back(builtinFileName);
         }
-        delete [] buffer;
         wstring dstDir = getDstDir();
 
         logfile << L"Preparing folder: " << dstDir << "\n";
@@ -300,7 +298,6 @@ int launchFile(const wstring& executePath)
     }
     catch(...)
     {
-        delete [] buffer;
         logfile << "Exception caught";
         return -2;
     }
