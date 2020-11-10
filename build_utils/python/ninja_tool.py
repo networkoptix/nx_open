@@ -105,6 +105,7 @@ def find_extra_files(build_dir: Path, known_files: set) -> list:
     exclusions = {
         NINJA_BUILD_FILE_NAME,
         NINJA_PREBUILD_FILE_NAME,
+        "compile_commands.json",
         "CTestTestfile.cmake",
         "cmake_install.cmake",
         "CMakeCache.txt",
