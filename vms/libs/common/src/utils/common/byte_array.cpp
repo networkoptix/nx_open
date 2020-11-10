@@ -111,10 +111,13 @@ void QnByteArray::reserve(size_t size)
     NX_ASSERT(success, "Could not reserve %1 bytes.", newSize);
 }
 
-void QnByteArray::removeTrailingZeros()
+void QnByteArray::removeTrailingZeros(int maxBytesToRemove)
 {
-    while (m_size > 0 && m_data[m_size - 1] == 0)
+    while (m_size > 0 && m_data[m_size - 1] == 0 && maxBytesToRemove > 0)
+    {
         --m_size;
+        --maxBytesToRemove;
+    }
 }
 
 QnByteArray& QnByteArray::operator=(const QnByteArray& right)

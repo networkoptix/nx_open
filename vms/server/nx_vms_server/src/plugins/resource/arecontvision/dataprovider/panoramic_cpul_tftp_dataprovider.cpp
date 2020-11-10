@@ -232,7 +232,7 @@ QnAbstractMediaDataPtr AVPanoramicClientPullSSTFTPStreamreader::getNextData()
         return QnAbstractMediaDataPtr(0);
     }
 
-    img.removeTrailingZeros();
+    img.removeTrailingZeros(readed);
 
     int lp_size;
     const unsigned char* last_packet = m_tftp_client->getLastPacket(lp_size);

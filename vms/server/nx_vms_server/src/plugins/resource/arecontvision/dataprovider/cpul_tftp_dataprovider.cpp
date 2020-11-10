@@ -204,7 +204,7 @@ QnAbstractMediaDataPtr AVClientPullSSTFTPStreamreader::getNextData()
     if (readed == 0) // cannot read data
         return QnCompressedVideoDataPtr(0);
 
-    img.removeTrailingZeros();
+    img.removeTrailingZeros(readed);
 
     int lp_size;
     const unsigned char* last_packet = m_tftp_client->getLastPacket(lp_size);

@@ -125,7 +125,7 @@ public:
     /**
      * Removes trailing zero bytes from this array.
      */
-    void removeTrailingZeros();
+    void removeTrailingZeros(int maxBytesToRemove);
 
     /**
      * Attempts to allocate memory for at least the given number of bytes.
