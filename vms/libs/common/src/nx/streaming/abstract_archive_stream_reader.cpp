@@ -11,8 +11,8 @@
 #include "abstract_archive_integrity_watcher.h"
 #include <utils/common/synctime.h>
 
-// TODO: #rvasilenko filters are moved to mediaserver core
-//#include <core/dataprovider/abstract_media_data_filter.h>
+#include <media/filters/abstract_media_data_filter.h>
+
 
 QnAbstractArchiveStreamReader::QnAbstractArchiveStreamReader(const QnResourcePtr &dev):
     QnAbstractMediaStreamDataProvider(dev)
@@ -119,8 +119,11 @@ void QnAbstractArchiveStreamReader::run()
 
         QnAbstractMediaDataPtr data = getNextData();
 
-//        for (const auto& filter: m_filters)
-//            data = std::dynamic_pointer_cast<QnAbstractMediaData>(filter->processData(data));
+        for (const auto& filter: m_filters)
+        {
+            data = std::const_pointer_cast<QnAbstractMediaData>(
+                std::dynamic_pointer_cast<const QnAbstractMediaData>(filter->processData(data)));
+        }
 
         if (!data && !needToStop())
         {
