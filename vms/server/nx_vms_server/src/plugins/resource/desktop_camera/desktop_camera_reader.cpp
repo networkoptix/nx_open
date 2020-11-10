@@ -93,7 +93,7 @@ int QnDesktopCameraStreamReader::processTextResponse()
 {
     int bufferSize = 4;
     int startPos = QByteArray::fromRawData((char*) m_recvBuffer, bufferSize).indexOf('$');
-    while (startPos == -1 && m_socket->isConnected())
+    while (startPos == -1 && m_socket->isConnected() && bufferSize < sizeof(m_recvBuffer) - 4)
     {
         int readed = m_socket->recv(m_recvBuffer + bufferSize, 4);
         if (readed > 0) {
@@ -140,7 +140,14 @@ QnAbstractMediaDataPtr QnDesktopCameraStreamReader::getNextData()
             }
 
             if (bufferSize == 4 && (m_recvBuffer[0] != '$' || m_recvBuffer[1] > 1)) // check for streamID [0..1] as well
+            {
                 bufferSize = processTextResponse();
+                if (bufferSize == -1)
+                {
+                    m_socket->close();
+                    return createEmptyPacket();
+                }
+            }
         }
         if (!m_socket->isConnected())
             return createEmptyPacket();
