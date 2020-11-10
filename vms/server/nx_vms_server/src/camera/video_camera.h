@@ -168,7 +168,6 @@ private:
     void createReader(QnServer::ChunksCatalog catalog);
     QnLiveStreamProviderPtr readerByQuality(MediaQuality streamQuality) const;
     void resetCachesIfNeeded(MediaQuality streamQuality);
-    void stop();
 
 private:
     QnMutex m_readersMutex;
@@ -194,6 +193,7 @@ private:
 
     QElapsedTimer m_lastActivityTimer;
     nx::utils::SafeElapsedTimer m_tryToInitTimer;
+    bool m_stopped = false;
 private:
     enum class ForceLiveCacheForPrimaryStream { no, yes, auto_ };
 

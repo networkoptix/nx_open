@@ -444,7 +444,7 @@ void QnVideoCameraGopKeeper::updateCameraActivity()
         dynamic_cast<QnSecurityCamResource*>(m_resource.data());
     bool canUseProvider = m_catalog == QnServer::HiQualityCatalog
         || !cameraResource || cameraResource->hasDualStreaming();
-    
+
     if (auto camera = m_resource.dynamicCast<QnSecurityCamResource>())
     {
         if (camera->getCameraCapabilities().testFlag(Qn::dontAutoOpenCamera))
@@ -519,7 +519,7 @@ QnVideoCamera::QnVideoCamera(
     m_hlsLivePlaylistManager.resize( std::max<>( MEDIA_Quality_High, MEDIA_Quality_Low ) + 1 );
     m_lastActivityTimer.invalidate();
 
-    connect(resource.data(), &QnResource::resourceChanged, this, 
+    connect(resource.data(), &QnResource::resourceChanged, this,
         [this]()
         {
             m_tryToInitTimer.invalidate(); //< Try to init again without delay.
@@ -544,6 +544,7 @@ QnVideoCameraGopKeeper* QnVideoCamera::getGopKeeper(StreamIndex streamIndex) con
 void QnVideoCamera::stopAndCleanup()
 {
     QnMutexLocker lock(&m_getReaderMutex);
+    m_stopped = true;
 
     if (m_primaryReader)
         m_primaryReader->disableStartThread();
@@ -574,15 +575,15 @@ void QnVideoCamera::stopAndCleanup()
         m_secondaryReader->pleaseStop();
     }
 
-    stop();
-}
+    auto primaryReader = m_primaryReader;
+    auto secondaryReader = m_secondaryReader;
 
-void QnVideoCamera::stop()
-{
-    if (m_primaryReader)
-        m_primaryReader->stop();
-    if (m_secondaryReader)
-        m_secondaryReader->stop();
+    lock.unlock();
+
+    if (primaryReader)
+        primaryReader->stop();
+    if (secondaryReader)
+        secondaryReader->stop();
 }
 
 QnVideoCamera::~QnVideoCamera()
@@ -969,14 +970,14 @@ void QnVideoCamera::stopIfNoActivity()
 
     if (needStopPrimary)
     {
-        NX_DEBUG(this, "Stop video camera %1 for role 'Promary' because there is no dataConsumers any nore",  
+        NX_DEBUG(this, "Stop video camera %1 for role 'Promary' because there is no dataConsumers any nore",
             m_resource);
         m_primaryReader->pleaseStop();
     }
 
     if (needStopSecondary)
     {
-        NX_DEBUG(this, "Stop video camera %1 for role 'Secondary' because there is no dataConsumers any nore", 
+        NX_DEBUG(this, "Stop video camera %1 for role 'Secondary' because there is no dataConsumers any nore",
             m_resource);
         m_secondaryReader->pleaseStop();
     }
@@ -1046,7 +1047,7 @@ QnLiveStreamProviderPtr QnVideoCamera::getLiveReaderNonSafe(
 {
     std::chrono::seconds kCameraTryToInitInterval(30);
 
-    if (m_resource->hasFlags(Qn::foreigner))
+    if (m_resource->hasFlags(Qn::foreigner) || m_stopped)
         return nullptr;
 
     if (m_resource->isInitialized())
@@ -1152,12 +1153,12 @@ bool QnVideoCamera::ensureLiveCacheStarted(
     return true;
 }
 
-QnLiveStreamProviderPtr QnAbstractMediaServerVideoCamera::getPrimaryReader(bool autoStartReader) 
-{ 
-    return getLiveReader(QnServer::HiQualityCatalog, autoStartReader); 
+QnLiveStreamProviderPtr QnAbstractMediaServerVideoCamera::getPrimaryReader(bool autoStartReader)
+{
+    return getLiveReader(QnServer::HiQualityCatalog, autoStartReader);
 }
 
-QnLiveStreamProviderPtr QnAbstractMediaServerVideoCamera::getSecondaryReader(bool autoStartReader) 
-{ 
-    return getLiveReader(QnServer::LowQualityCatalog, autoStartReader); 
+QnLiveStreamProviderPtr QnAbstractMediaServerVideoCamera::getSecondaryReader(bool autoStartReader)
+{
+    return getLiveReader(QnServer::LowQualityCatalog, autoStartReader);
 }
