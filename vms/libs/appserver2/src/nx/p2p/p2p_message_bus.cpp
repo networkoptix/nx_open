@@ -123,6 +123,7 @@ void MessageBus::dropConnectionsThreadUnsafe()
     if (m_peers)
     {
         m_peers->clear();
+        addOfflinePeersFromDb();
         emitPeerFoundLostSignals();
     }
 }
