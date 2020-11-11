@@ -133,7 +133,7 @@ private:
             QnUuid::createUuid().toString(), //< uniqueResourceID,
             0, //< channel,
             "video/mp2t", //< containerFormat,
-            QString(), //< alias,
+            QByteArray(), //< alias,
             0, //< startTimestamp,
             std::chrono::seconds(10), //< duration,
             MediaQuality::MEDIA_Quality_High, //< streamQuality,
