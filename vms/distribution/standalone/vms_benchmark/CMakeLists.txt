@@ -181,7 +181,8 @@ add_custom_command(OUTPUT ${zip_file}
         ${vms_benchmark_dev_all_platforms_dir}/files/high.ts
         ${vms_benchmark_dev_all_platforms_dir}/files/low.ts
         ${CMAKE_BINARY_DIR}/bin/vms_benchmark${executable_extension}
-        ${CMAKE_BINARY_DIR}/build_info.txt
+        ${distribution_output_dir}/build_info.txt
+        ${distribution_output_dir}/build_info.json
         ${CMAKE_CURRENT_SOURCE_DIR}/files/vms_benchmark.conf
         ${CMAKE_CURRENT_SOURCE_DIR}/files/readme.md
         vms_benchmark/

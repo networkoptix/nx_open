@@ -116,9 +116,13 @@
         <?endif?>
 
         <ComponentGroup Id="server_txt_files" Directory="InstallDirRoot" Source="$(var.CMAKE_BINARY_DIR)">
-            <Component><File Name="build_info.txt" KeyPath="yes"/></Component>
             <Component><File Name="specific_features.txt" KeyPath="yes"/></Component>
             <Component><File Name="nx_log_viewer.html" KeyPath="yes"/></Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="build_info_files" Directory="InstallDirRoot" Source="$(var.CMAKE_BINARY_DIR)/distrib">
+            <Component><File Name="build_info.txt" KeyPath="yes"/></Component>
+            <Component><File Name="build_info.json" KeyPath="yes"/></Component>
         </ComponentGroup>
 
         <Feature Id="ServerFeature" Title="$(var.productName) Media Server" Level="1"
@@ -144,6 +148,7 @@
 
             <ComponentRef Id='ServerVersion'/>
             <ComponentGroupRef Id='server_txt_files'/>
+            <ComponentGroupRef Id='build_info_files'/>
             <ComponentRef Id='ServerConfiguration'/>
             <ComponentRef Id='ServerConfigurationStatisticsFlag'/>
             <ComponentRef Id='ServerConfigurationPassword'/>

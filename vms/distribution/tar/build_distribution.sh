@@ -607,7 +607,12 @@ buildDistribution()
     echo "$VERSION" >"$STAGE_VMS/version.txt"
 
     echo "Copying build_info.txt"
-    cp -r "$BUILD_DIR/build_info.txt" "$STAGE_VMS/"
+    cp "$DISTRIBUTION_OUTPUT_DIR/build_info.txt" "$STAGE_VMS/"
+
+    echo "Copying build_info.json"
+    cp "$DISTRIBUTION_OUTPUT_DIR/build_info.json" "$STAGE_VMS/"
+
+    echo "Copying specific_features.txt"
     cp -r "$BUILD_DIR/specific_features.txt" "$STAGE_VMS/"
 
     copyBuildLibs

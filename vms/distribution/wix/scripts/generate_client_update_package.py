@@ -106,7 +106,8 @@ def create_client_update_file(config, output_file):
         zip.write(os.path.join(binaries_dir, launcher_version_name), launcher_version_name)
         zip.write(os.path.join(binaries_dir, minilauncher_binary_name), minilauncher_binary_name)
         zip.write(os.path.join(current_binary_dir, 'qt.conf'), 'qt.conf')
-        zip.write(os.path.join(config['cmake_binary_dir'], 'build_info.txt'), 'build_info.txt')
+        zip.write(os.path.join(config['distribution_output_dir'], 'build_info.txt'), 'build_info.txt')
+        zip.write(os.path.join(config['distribution_output_dir'], 'build_info.json'), 'build_info.json')
 
 
 def main():

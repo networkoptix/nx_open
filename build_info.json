@@ -1,0 +1,18 @@
+{
+    "version": "@releaseVersion@.@buildNumber@",
+    "fullVersion": "@releaseVersion@.@buildNumber@-@changeSet@-@customization@@publication_type_suffix@",
+    "productType": "@productType@",
+    "publicationType": "@publicationType@",
+    "customization": "@customization@",
+    "cloudHost": "@cloudHost@",
+    "cloudGroup": "@cloudGroup@",
+    "arch": "@arch@",
+    "platform": "@platform@",
+    "platformModification": "@modification@",
+    "changeSet": "@changeSet@",
+    "branch": "@branch@",
+    "currentRefs": "@currentRefs@",
+    "brand": "@customization.brand@",
+    "protoVersion": @vmsProtocolVersion@,
+    "metaVersion": "@metaVersion@"
+}

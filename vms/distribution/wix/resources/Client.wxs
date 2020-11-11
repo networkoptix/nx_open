@@ -107,11 +107,17 @@
             </Directory>
         </DirectoryRef>
 
-        <ComponentGroup Id="info_files"
+        <ComponentGroup Id="nx_log_viewer"
                 Directory="InstallDirRoot"
                 Source="$(var.CMAKE_BINARY_DIR)">
-            <Component><File Name="build_info.txt" KeyPath="yes"/></Component>
             <Component><File Name="nx_log_viewer.html" KeyPath="yes"/></Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="build_info_files"
+                Directory="InstallDirRoot"
+                Source="$(var.CMAKE_BINARY_DIR)/distrib">
+            <Component><File Name="build_info.txt" KeyPath="yes"/></Component>
+            <Component><File Name="build_info.json" KeyPath="yes"/></Component>
         </ComponentGroup>
 
         <!-- These libraries are used in TrayTool and not in MediaServer, so they are here. -->
@@ -150,7 +156,8 @@
             <ComponentGroupRef Id="ClientFontsComponent"/>
             <ComponentGroupRef Id="ClientBgComponent"/>
             <ComponentGroupRef Id="ClientQmlComponent"/>
-            <ComponentGroupRef Id="info_files"/>
+            <ComponentGroupRef Id="nx_log_viewer"/>
+            <ComponentGroupRef Id="build_info_files"/>
         </Feature>
     </Fragment>
 </Wix>

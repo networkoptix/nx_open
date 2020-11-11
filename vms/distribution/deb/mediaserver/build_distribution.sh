@@ -310,10 +310,14 @@ buildDistribution()
     echo "Creating stage dir $STAGE_MODULE/etc"
     mkdir -p "$STAGE_MODULE/etc" #< TODO: This folder is always empty. Is it needed?
 
-    echo "Copying build_info.txt"
+    echo "Prepare stage directory"
     mkdir -p "$STAGE_MODULE/"
-    cp "$BUILD_DIR/build_info.txt" "$STAGE_MODULE/"
-    cp "$BUILD_DIR/specific_features.txt" "$STAGE_MODULE/"
+
+    echo "Copying build_info.txt"
+    cp "$DISTRIBUTION_OUTPUT_DIR/build_info.txt" "$STAGE_MODULE/"
+
+    echo "Copying build_info.json"
+    cp "$DISTRIBUTION_OUTPUT_DIR/build_info.json" "$STAGE_MODULE/"
 
     copyLibs
     copyQtLibs
