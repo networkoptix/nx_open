@@ -19,6 +19,7 @@ struct EndpointAdditionalInfo
     QString mac;
     QString uniqId;
     QString discoveryIp;
+    QString onvifUrl;
     std::set<QString> additionalManufacturers;
 
     QString defaultLogin;
@@ -34,6 +35,7 @@ struct EndpointAdditionalInfo
         const QString& newMac,
         const QString& newUniqId,
         const QString& newDiscoveryIp,
+        const QString& newOnvifUrl,
         const std::set<QString> additionalManufacturers = std::set<QString>())
         :
         name(newName),
@@ -42,6 +44,7 @@ struct EndpointAdditionalInfo
         mac(newMac),
         uniqId(newUniqId),
         discoveryIp(newDiscoveryIp),
+        onvifUrl(newOnvifUrl),
         additionalManufacturers(additionalManufacturers)
     {
     }
@@ -75,7 +78,7 @@ public:
     OnvifResourceInformationFetcher(QnMediaServerModule* serverModule);
 
     void findResources(const EndpointInfoHash& endpointInfo, QnResourceList& result, DiscoveryMode discoveryMode) const;
-    void findResources(const QString& endpoint, const EndpointAdditionalInfo& info, QnResourceList& result, DiscoveryMode discoveryMode) const;
+    void findResources(const EndpointAdditionalInfo& info, QnResourceList& result, DiscoveryMode discoveryMode) const;
     static QnPlOnvifResourcePtr createOnvifResourceByManufacturer(
         QnMediaServerModule* serverModule,
         const QString& manufacturer);

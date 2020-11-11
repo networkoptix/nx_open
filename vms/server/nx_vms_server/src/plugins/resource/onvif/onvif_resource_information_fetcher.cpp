@@ -126,7 +126,7 @@ void OnvifResourceInformationFetcher::findResources(const EndpointInfoHash& endp
     EndpointInfoHash::ConstIterator iter = endpointInfo.begin();
 
     while(iter != endpointInfo.end() && !m_shouldStop) {
-        findResources(iter.key(), iter.value(), result, discoveryMode);
+        findResources(iter.value(), result, discoveryMode);
 
         ++iter;
     }
@@ -193,12 +193,12 @@ bool OnvifResourceInformationFetcher::needIgnoreCamera(
 }
 
 void OnvifResourceInformationFetcher::findResources(
-    const QString& endpoint,
     const EndpointAdditionalInfo& originalInfo,
     QnResourceList& result,
     DiscoveryMode discoveryMode) const
 {
-    if (endpoint.isEmpty()) {
+    if (originalInfo.onvifUrl.isEmpty())
+    {
         qDebug() << "OnvifResourceInformationFetcher::findResources: response packet was received, but appropriate URL was not found.";
         return;
     }
@@ -214,17 +214,17 @@ void OnvifResourceInformationFetcher::findResources(
     //if (info.name.contains(QLatin1String("netw")) || info.manufacturer.contains(QLatin1String("netw")))
     //    int n = 0;
     auto dataPool = serverModule()->commonModule()->resourceDataPool();
-    if (needIgnoreCamera(dataPool, QUrl(endpoint).host(), info.manufacturer, info.name))
+    if (needIgnoreCamera(dataPool, QUrl(info.onvifUrl).host(), info.manufacturer, info.name))
         return;
 
     QString manufacturer = info.manufacturer;
     QString model = info.name;
     QString firmware;
-    QHostAddress sender(QUrl(endpoint).host());
+    QHostAddress sender(QUrl(info.onvifUrl).host());
     // TODO: #rvasilenko UTF unuse std::string
     DeviceSoapWrapper soapWrapper(
         SoapTimeouts(serverModule()->settings().onvifTimeouts()),
-        endpoint.toStdString(), QString(), QString(), 0);
+        info.onvifUrl.toStdString(), QString(), QString(), 0);
 
     QnVirtualCameraResourcePtr existResource = resourcePool()->getNetResourceByPhysicalId(info.uniqId).dynamicCast<QnVirtualCameraResource>();
 
@@ -277,7 +277,7 @@ void OnvifResourceInformationFetcher::findResources(
         auth.setPassword(soapWrapper.password());
         CameraDiagnostics::Result result = QnPlOnvifResource::readDeviceInformation(
             serverModule()->commonModule(),
-            SoapTimeouts(serverModule()->settings().onvifTimeouts()), endpoint, auth, INT_MAX, &extInfo);
+            SoapTimeouts(serverModule()->settings().onvifTimeouts()), info.onvifUrl, auth, INT_MAX, &extInfo);
 
         if (m_shouldStop)
             return;
@@ -296,12 +296,12 @@ void OnvifResourceInformationFetcher::findResources(
             mac = extInfo.mac;
 
         auto dataPool = serverModule()->commonModule()->resourceDataPool();
-        if (needIgnoreCamera(dataPool, QUrl(endpoint).host(), manufacturer, model))
+        if (needIgnoreCamera(dataPool, QUrl(info.onvifUrl).host(), manufacturer, model))
             return;
     }
 
     if (model.isEmpty()) {
-        qWarning() << "OnvifResourceInformationFetcher::findResources: can't fetch name of ONVIF device: endpoint: " << endpoint << ", UniqueId: " << info.uniqId;
+        qWarning() << "OnvifResourceInformationFetcher::findResources: can't fetch name of ONVIF device: endpoint: " << info.onvifUrl << ", UniqueId: " << info.uniqId;
         model = info.uniqId;
     }
 
@@ -309,7 +309,7 @@ void OnvifResourceInformationFetcher::findResources(
         manufacturer, model, mac, info.discoveryIp);
 
     QnPlOnvifResourcePtr res = createResource(manufacturer, firmware, QHostAddress(sender), QHostAddress(info.discoveryIp),
-                                              model, mac, info.uniqId, soapWrapper.login(), soapWrapper.password(), endpoint);
+                                              model, mac, info.uniqId, soapWrapper.login(), soapWrapper.password(), info.onvifUrl);
     if (res)
         result << res;
     else
@@ -339,10 +339,10 @@ void OnvifResourceInformationFetcher::findResources(
         for (int i = 1; i < onvifRes->getMaxChannels(); ++i)
         {
             auto subres = createResource(manufacturer, firmware, QHostAddress(sender), QHostAddress(info.discoveryIp),
-                model, mac, info.uniqId, soapWrapper.login(), soapWrapper.password(), endpoint);
+                model, mac, info.uniqId, soapWrapper.login(), soapWrapper.password(), info.onvifUrl);
             if (res) {
                 QString suffix = QString(QLatin1String("?channel=%1")).arg(i+1);
-                subres->setUrl(endpoint + suffix);
+                subres->setUrl(info.onvifUrl + suffix);
                 subres->setPhysicalId(info.uniqId + suffix.replace(QLatin1String("?"), QLatin1String("_")));
                 subres->setName(res->getName() + QString(QLatin1String("-channel %1")).arg(i+1));
                 subres->setGroupId(groupId);

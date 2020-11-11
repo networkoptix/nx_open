@@ -461,14 +461,16 @@ void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const 
         return;
     }
 
-    QString appropriateAddr = getAppropriateAddress(source, addrPrefixes);
-    if (appropriateAddr.isEmpty() || hash.contains(appropriateAddr)) {
+    QString endpointId = nx::utils::replaceNonFileNameCharacters(getEndpointAddress(source), QLatin1Char('_'));
+    if (endpointId.isEmpty() || hash.contains(endpointId))
+    {
         return;
     }
 
     const auto name = extractScope(source, QLatin1String(SCOPES_NAME_PREFIX));
     const auto manufacturer = getManufacturer(source, name);
     const auto location = extractScope(source, QLatin1String(SCOPES_LOCATION_PREFIX));
+    const auto appropriateAddr = getAppropriateAddress(source, addrPrefixes);
     const auto additionalVendors = additionalManufacturers(
         source,
         kManufacturerScopePrefixes);
@@ -486,11 +488,10 @@ void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const 
     if (macAddressRequired && mac.isEmpty())
         return;
 
-    QString endpointId = nx::utils::replaceNonFileNameCharacters(getEndpointAddress(source), QLatin1Char('_'));
     QString uniqId = !mac.isEmpty() ? mac : endpointId;
 
     hash.insert(
-        appropriateAddr,
+        endpointId,
         EndpointAdditionalInfo(
             name,
             manufacturer,
@@ -498,6 +499,7 @@ void OnvifResourceSearcherWsdd::addEndpointToHash(EndpointInfoHash& hash, const 
             mac,
             uniqId,
             host,
+            appropriateAddr,
             additionalVendors));
 }
 
