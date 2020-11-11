@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.3.841",
+    "version": "4.1.3.842",
     "data": [
         {
             "keys": [
@@ -4539,7 +4539,8 @@
                 "TD-*|IPC",
                 "TD-*|TVT",
                 "HEW2*|Honeywell",
-                "*|bosch"
+                "*|bosch",
+                "*|General"
             ],
             "swapVendorAndModel": true
         },
