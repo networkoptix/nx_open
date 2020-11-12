@@ -69,6 +69,7 @@ DeviceAgent::DeviceAgent(
         m_engine->objectMetadataAttributeFilters())
 {
     this->setDeviceInfo(deviceInfo);
+    this->setSupportedEventCategoties();
 }
 
 //-------------------------------------------------------------------------------------------------
