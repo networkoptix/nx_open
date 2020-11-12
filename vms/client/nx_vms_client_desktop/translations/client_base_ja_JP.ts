@@ -8649,7 +8649,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update Files</source>
-      <translation>ファイルを更新</translation>
+      <translation>更新ファイル</translation>
     </message>
     <message>
       <source>Some servers are offline and will not be updated. Skip them?</source>
@@ -8779,7 +8779,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Browse for Another File...</source>
-      <translation>他のファイルを参照しています...</translation>
+      <translation>別のファイルを参照...</translation>
     </message>
     <message>
       <source>Select Another Build</source>
