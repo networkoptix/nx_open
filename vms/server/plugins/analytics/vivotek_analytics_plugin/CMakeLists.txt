@@ -4,4 +4,5 @@ nx_add_server_plugin(vivotek_analytics_plugin NO_MOC
         nx_kit
         nx_utils
         nx_network
+        nx_plugin_utils
 )

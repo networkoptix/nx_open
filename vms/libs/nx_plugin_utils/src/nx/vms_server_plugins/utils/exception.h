@@ -1,16 +1,16 @@
 #pragma once
 
-#include <tuple>
-#include <exception>
+#include <utility>
 #include <variant>
+#include <system_error>
 
-#include <nx/sdk/result.h>
 #include <nx/utils/exception.h>
-#include <nx/utils/log/log_message.h>
+#include <nx/sdk/result.h>
+#include <nx/sdk/helpers/error.h>
 
 #include <QtCore/QString>
 
-namespace nx::vms_server_plugins::analytics::vivotek {
+namespace nx::vms_server_plugins::utils {
 
 class Exception: public nx::utils::Exception
 {
@@ -43,26 +43,6 @@ private:
     std::variant<std::error_code, nx::sdk::ErrorCode> m_errorCode;
 };
 
-template <typename... Args>
-auto addExceptionContextAndRethrow(Args&&... args)
-{
-    return
-        [args = std::make_tuple(std::forward<Args>(args)...)](auto future)
-        {
-            try
-            {
-                return future.get();
-            }
-            catch (nx::utils::Exception& exception)
-            {
-                std::apply(
-                    [&](const auto&... args) { exception.addContext(args...); },
-                    args);
-                throw;
-            }
-        };
-}
-
 const auto translateSystemError =
     [](auto future)
     {
@@ -76,4 +56,33 @@ const auto translateSystemError =
         }
     };
 
-} // namespace nx::vms_server_plugins::analytics::vivotek
+template <typename Value, typename Function>
+void interceptExceptions(nx::sdk::Result<Value>* outResult, Function&& function) noexcept
+{
+    try
+    {
+        if constexpr(std::is_void_v<Value>)
+        {
+            std::forward<Function>(function)();
+            *outResult = {};
+        }
+        else
+        {
+            *outResult = std::forward<Function>(function)();
+        }
+    }
+    catch (const Exception& exception)
+    {
+        *outResult = exception.toSdkError();
+    }
+    catch (const std::exception& exception)
+    {
+        *outResult = error(nx::sdk::ErrorCode::internalError, exception.what());
+    }
+    catch (...)
+    {
+        *outResult = error(nx::sdk::ErrorCode::internalError, "Unknown exception occurred");
+    }
+}
+
+} // namespace nx::vms_server_plugins::utils

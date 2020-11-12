@@ -1,7 +1,9 @@
 #pragma once
 
 #include <exception>
+#include <utility>
 #include <string>
+#include <tuple>
 
 #include <QString>
 
@@ -39,6 +41,24 @@ public:
 private:
     std::string m_message;
 };
+
+template <typename... Args>
+auto addExceptionContextAndRethrow(Args&&... args)
+{
+    return
+        [args = std::make_tuple(std::forward<Args>(args)...)](auto future)
+        {
+            try
+            {
+                return future.get();
+            }
+            catch (Exception& exception)
+            {
+                std::apply([&](const auto&... args) { exception.addContext(args...); }, args);
+                throw;
+            }
+        };
+}
 
 } // namespace nx::utils
 

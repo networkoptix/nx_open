@@ -1,15 +1,16 @@
 #include "parse_event_metadata_packets.h"
 
+#include <nx/vms_server_plugins/utils/exception.h>
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 
 #include "event_types.h"
 #include "utils.h"
-#include "exception.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
+using namespace nx::vms_server_plugins::utils;
 
 namespace {
 

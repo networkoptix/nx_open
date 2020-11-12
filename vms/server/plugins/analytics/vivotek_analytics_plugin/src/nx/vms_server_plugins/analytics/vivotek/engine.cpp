@@ -4,29 +4,33 @@
 #include <exception>
 #include <utility>
 
-#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
+#include <nx/utils/log/assert.h>
+#include <nx/vms_server_plugins/utils/exception.h>
 #include <nx/kit/debug.h>
-#include <nx/sdk/helpers/error.h>
 
 #include <QtCore/QJsonObject>
 
+#include "plugin.h"
 #include "ini.h"
 #include "device_agent.h"
-#include "exception.h"
 #include "json_utils.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
 using namespace std::literals;
-
-using namespace nx::kit;
+using namespace nx::vms_server_plugins::utils;
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(Ptr<IUtilityProvider> utilityProvider):
+Engine::Engine(Plugin& plugin):
     nx::sdk::analytics::Engine(NX_DEBUG_ENABLE_OUTPUT),
-    m_utilityProvider(std::move(utilityProvider))
+    m_plugin(plugin)
 {
+}
+
+Plugin& Engine::plugin() const
+{
+    return m_plugin;
 }
 
 bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
@@ -36,27 +40,30 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 
 std::string Engine::manifestString() const
 {
-    const auto manifest = QJsonObject{
-        {"capabilities", "deviceDependent"},
-    };
+    NX_ASSERT(false, "should never be called");
+    return "";
+}
 
-    return serializeJson(manifest).toStdString();
+void Engine::getManifest(Result<const IString*>* outResult) const
+{
+    interceptExceptions(outResult,
+        [&]()
+        {
+            const auto manifest = QJsonObject{
+                {"capabilities", "deviceDependent"},
+            };
+
+            return new sdk::String(serializeJson(manifest).toStdString());
+        });
 }
 
 void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDeviceInfo* deviceInfo)
 {
-    try
-    {
-        *outResult = new DeviceAgent(deviceInfo, m_utilityProvider);
-    }
-    catch (const Exception& exception)
-    {
-        *outResult = exception.toSdkError();
-    }
-    catch (const std::exception& exception)
-    {
-        *outResult = error(ErrorCode::internalError, exception.what());
-    }
+    interceptExceptions(outResult,
+        [&]()
+        {
+            return new DeviceAgent(*this, deviceInfo);
+        });
 }
 
 } // namespace nx::vms_server_plugins::analytics::vivotek

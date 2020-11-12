@@ -3,8 +3,8 @@
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log_message.h>
 #include <nx/network/websocket/websocket_handshake.h>
+#include <nx/vms_server_plugins/utils/exception.h>
 
-#include "exception.h"
 #include "utils.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
@@ -12,6 +12,7 @@ namespace nx::vms_server_plugins::analytics::vivotek {
 using namespace std::literals;
 using namespace nx::utils;
 using namespace nx::network;
+using namespace nx::vms_server_plugins::utils;
 
 namespace {
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <optional>
-#include <exception>
 
 #include <nx/utils/thread/cf/cfuture.h>
 #include <nx/utils/url.h>

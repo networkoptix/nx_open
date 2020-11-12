@@ -1,18 +1,18 @@
 #include "geometry.h"
 
 #include <cmath>
-
 #include <iterator>
+
 #include <nx/utils/log/assert.h>
+#include <nx/vms_server_plugins/utils/exception.h>
 
 #include <boost/geometry/geometry.hpp>
-
-#include "exception.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
+using namespace nx::vms_server_plugins::utils;
 
 namespace bg = boost::geometry;
 

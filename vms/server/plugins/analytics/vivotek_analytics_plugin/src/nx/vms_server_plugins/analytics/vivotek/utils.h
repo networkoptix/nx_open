@@ -3,10 +3,9 @@
 #include <cstdint>
 
 #include <nx/utils/url.h>
+#include <nx/vms_server_plugins/utils/exception.h>
 
 #include <QtCore/QString>
-
-#include "exception.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
@@ -19,7 +18,7 @@ decltype(auto) at(Container&& container, const Key& key)
     }
     catch (const std::out_of_range&)
     {
-        throw Exception("No element at key %1", key);
+        throw nx::vms_server_plugins::utils::Exception("No element at key %1", key);
     }
 }
 

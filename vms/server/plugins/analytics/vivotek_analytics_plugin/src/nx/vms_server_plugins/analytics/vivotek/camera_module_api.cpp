@@ -1,17 +1,18 @@
 #include "camera_module_api.h"
 
 #include <nx/utils/log/log_message.h>
+#include <nx/vms_server_plugins/utils/exception.h>
 
 #include <QtCore/QUrlQuery>
 
 #include "camera_parameter_api.h"
 #include "http_client.h"
-#include "exception.h"
 #include "utils.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
 using namespace nx::utils;
+using namespace nx::vms_server_plugins::utils;
 
 namespace {
 

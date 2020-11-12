@@ -4,10 +4,10 @@
 #include <system_error>
 
 #include <nx/utils/log/log_message.h>
+#include <nx/vms_server_plugins/utils/exception.h>
 
 #include <QtCore/QString>
 
-#include "exception.h"
 #include "utils.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
@@ -15,6 +15,7 @@ namespace nx::vms_server_plugins::analytics::vivotek {
 using namespace nx::sdk;
 using namespace nx::utils;
 using namespace nx::network;
+using namespace nx::vms_server_plugins::utils;
 
 HttpClient::HttpClient()
 {

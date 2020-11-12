@@ -2,28 +2,27 @@
 
 #include <system_error>
 
-#define NX_PRINT_PREFIX (m_logUtils.printPrefix)
-#include <nx/kit/debug.h>
+#include <nx/utils/url.h>
+#include <nx/vms_server_plugins/utils/exception.h>
+#include <nx/network/url/url_builder.h>
 #include <nx/sdk/helpers/error.h>
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/settings_response.h>
 #include <nx/sdk/helpers/plugin_diagnostic_event.h>
-#include <nx/utils/url.h>
-#include <nx/network/url/url_builder.h>
 
-#include "ini.h"
+#include "plugin.h"
+#include "engine.h"
 #include "object_types.h"
 #include "event_types.h"
 #include "parse_event_metadata_packets.h"
-#include "exception.h"
 #include "json_utils.h"
 #include "utils.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
 using namespace std::literals;
-using namespace nx::kit;
+using namespace nx::vms_server_plugins::utils;
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 using namespace nx::utils;
@@ -54,19 +53,16 @@ const auto ignoreCancellation =
 
 } // namespace
 
-DeviceAgent::DeviceAgent(
-    const nx::sdk::IDeviceInfo* deviceInfo, Ptr<IUtilityProvider> utilityProvider)
+DeviceAgent::DeviceAgent(Engine& engine, const IDeviceInfo* deviceInfo)
 :
     m_basicPollable(std::make_unique<aio::BasicPollable>()),
-    m_logUtils(NX_DEBUG_ENABLE_OUTPUT,
-        NX_FMT("[%1_device_%2]", libContext().name(), deviceInfo->id()).toStdString()),
     m_url(network::url::Builder(deviceInfo->url())
         .setUserName(deviceInfo->login())
         .setPassword(deviceInfo->password())
         .setPath("")
         .toUrl()),
     m_timestampAdjuster(deviceInfo->url(),
-        [utilityProvider = std::move(utilityProvider)]()
+        [utilityProvider = engine.plugin().utilityProvider()]()
         {
             return std::chrono::milliseconds(utilityProvider->vmsSystemTimeSinceEpochMs());
         })
@@ -75,117 +71,98 @@ DeviceAgent::DeviceAgent(
 
 void DeviceAgent::doSetSettings(Result<const ISettingsResponse*>* outResult, const IStringMap* values)
 {
-    try
-    {
-        CameraSettings settings;
-
-        if (!m_isFirstDoSetSettingsCall)
+    interceptExceptions(outResult,
+        [&]()
         {
-            settings.parseFromServer(*values);
-            settings.storeTo(m_url);
-        }
+            CameraSettings settings;
 
-        settings.fetchFrom(m_url);
-        *outResult = settings.serializeToServer().releasePtr();
+            if (!m_isFirstDoSetSettingsCall)
+            {
+                settings.parseFromServer(*values);
+                settings.storeTo(m_url);
+            }
 
-        m_isFirstDoSetSettingsCall = false;
-    }
-    catch (const Exception& exception)
-    {
-        *outResult = exception.toSdkError();
-    }
-    catch (const std::exception& exception)
-    {
-        *outResult = error(ErrorCode::internalError, exception.what());
-    }
+            settings.fetchFrom(m_url);
+            auto newValues = settings.serializeToServer();
+
+            m_isFirstDoSetSettingsCall = false;
+
+            return newValues.releasePtr();
+        });
 }
 
 void DeviceAgent::getPluginSideSettings(Result<const ISettingsResponse*>* outResult) const
 {
-    try
-    {
-        CameraSettings settings;
+    interceptExceptions(outResult,
+        [&]()
+        {
+            CameraSettings settings;
 
-        settings.fetchFrom(m_url);
+            settings.fetchFrom(m_url);
 
-        auto& self = const_cast<DeviceAgent&>(*this);
-        self.updateAvailableMetadataTypes(settings);
-        self.refreshMetadataStreaming();
+            auto& self = const_cast<DeviceAgent&>(*this);
+            self.updateAvailableMetadataTypes(settings);
+            self.refreshMetadataStreaming();
 
-        *outResult = settings.serializeToServer().releasePtr();
-    }
-    catch (const Exception& exception)
-    {
-        *outResult = exception.toSdkError();
-    }
-    catch (const std::exception& exception)
-    {
-        *outResult = error(ErrorCode::internalError, exception.what());
-    }
+            return settings.serializeToServer().releasePtr();
+        });
 }
 
 void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 {
-    try
-    {
-        CameraSettings settings;
-        settings.fetchFrom(m_url);
+    interceptExceptions(outResult,
+        [&]()
+        {
+            CameraSettings settings;
+            settings.fetchFrom(m_url);
 
-        auto manifest = QJsonObject{
-            {"objectTypes",
-                [&]()
-                {
-                    QJsonArray types;
-
-                    for (const auto& objectType: kObjectTypes)
+            const auto manifest = QJsonObject{
+                {"objectTypes",
+                    [&]()
                     {
-                        if (!objectType.isAvailable(settings))
-                            continue;
+                        QJsonArray types;
 
-                        types.push_back(QJsonObject{
-                            {"id", objectType.id},
-                            {"name", objectType.prettyName},
-                        });
-                    }
+                        for (const auto& objectType: kObjectTypes)
+                        {
+                            if (!objectType.isAvailable(settings))
+                                continue;
 
-                    return types;
-                }(),
-            },
-            {"eventTypes",
-                [&]()
-                {
-                    QJsonArray types;
+                            types.push_back(QJsonObject{
+                                {"id", objectType.id},
+                                {"name", objectType.prettyName},
+                            });
+                        }
 
-                    for (const auto& eventType: kEventTypes)
+                        return types;
+                    }(),
+                },
+                {"eventTypes",
+                    [&]()
                     {
-                        if (!eventType.isAvailable(settings))
-                            continue;
+                        QJsonArray types;
 
-                        QJsonObject type = {
-                            {"id", eventType.id},
-                            {"name", eventType.prettyName},
-                        };
-                        if (eventType.isProlonged)
-                            type["flags"] = "stateDependent";
+                        for (const auto& eventType: kEventTypes)
+                        {
+                            if (!eventType.isAvailable(settings))
+                                continue;
 
-                        types.push_back(std::move(type));
-                    }
+                            QJsonObject type = {
+                                {"id", eventType.id},
+                                {"name", eventType.prettyName},
+                            };
+                            if (eventType.isProlonged)
+                                type["flags"] = "stateDependent";
 
-                    return types;
-                }(),
-            },
-        };
+                            types.push_back(std::move(type));
+                        }
 
-        *outResult = new sdk::String(serializeJson(manifest).toStdString());
-    }
-    catch (const Exception& exception)
-    {
-        *outResult = exception.toSdkError();
-    }
-    catch (const std::exception& exception)
-    {
-        *outResult = error(ErrorCode::internalError, exception.what());
-    }
+                        return types;
+                    }(),
+                },
+            };
+
+            return new sdk::String(serializeJson(manifest).toStdString());
+        });
 }
 
 void DeviceAgent::setHandler(IHandler* handler)
@@ -209,25 +186,18 @@ void DeviceAgent::setHandler(IHandler* handler)
 void DeviceAgent::doSetNeededMetadataTypes(
     Result<void>* outResult, const IMetadataTypes* neededMetadataTypes)
 {
-    try
-    {
-        m_neededMetadataTypes = NoNativeMetadataTypes;
+    interceptExceptions(outResult,
+        [&]()
+        {
+            m_neededMetadataTypes = NoNativeMetadataTypes;
 
-        m_neededMetadataTypes.setFlag(
-            ObjectNativeMetadataType, !!neededMetadataTypes->objectTypeIds()->count());
-        m_neededMetadataTypes.setFlag(
-            EventNativeMetadataType, !!neededMetadataTypes->eventTypeIds()->count());
+            m_neededMetadataTypes.setFlag(
+                ObjectNativeMetadataType, !!neededMetadataTypes->objectTypeIds()->count());
+            m_neededMetadataTypes.setFlag(
+                EventNativeMetadataType, !!neededMetadataTypes->eventTypeIds()->count());
 
-        refreshMetadataStreaming();
-    }
-    catch (const Exception& exception)
-    {
-        *outResult = exception.toSdkError();
-    }
-    catch (const std::exception& exception)
-    {
-        *outResult = error(ErrorCode::internalError, exception.what());
-    }
+            refreshMetadataStreaming();
+        });
 }
 
 void DeviceAgent::emitDiagnostic(

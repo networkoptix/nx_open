@@ -2,7 +2,7 @@
 
 #include <nx/sdk/helpers/error.h>
 
-namespace nx::vms_server_plugins::analytics::vivotek {
+namespace nx::vms_server_plugins::utils {
 
 using namespace nx::sdk;
 
@@ -50,17 +50,17 @@ Exception::Exception(std::error_code errorCode):
 
 std::error_code Exception::errorCode() const
 {
-    if (std::holds_alternative<nx::sdk::ErrorCode>(m_errorCode))
+    if (std::holds_alternative<ErrorCode>(m_errorCode))
         return {};
 
     return std::get<std::error_code>(m_errorCode);
 }
 
-nx::sdk::Error Exception::toSdkError() const
+Error Exception::toSdkError() const
 {
-    nx::sdk::ErrorCode errorCode;
-    if (std::holds_alternative<nx::sdk::ErrorCode>(m_errorCode))
-        errorCode = std::get<nx::sdk::ErrorCode>(m_errorCode);
+    ErrorCode errorCode;
+    if (std::holds_alternative<ErrorCode>(m_errorCode))
+        errorCode = std::get<ErrorCode>(m_errorCode);
     else
         errorCode = toSdk(std::get<std::error_code>(m_errorCode));
 
@@ -70,4 +70,4 @@ nx::sdk::Error Exception::toSdkError() const
     return error(errorCode, what());
 }
 
-} // namespace nx::vms_server_plugins::analytics::vivotek
+} // namespace nx::vms_server_plugins::utils

@@ -9,7 +9,6 @@
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
-
 class CameraModuleApi
 {
 public:

@@ -5,6 +5,7 @@
 #include <optional>
 
 #include <nx/sdk/ptr.h>
+#include <nx/sdk/i_device_info.h>
 #include <nx/sdk/i_plugin_diagnostic_event.h>
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/log_utils.h>
@@ -18,20 +19,19 @@
 
 #include <QtCore/QString>
 
-#include "engine.h"
 #include "camera_settings.h"
 #include "native_metadata_source.h"
 #include "object_metadata_packet_parser.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
+class Engine;
+
 class DeviceAgent:
     public nx::sdk::RefCountable<nx::sdk::analytics::IDeviceAgent>
 {
 public:
-    explicit DeviceAgent(
-        const nx::sdk::IDeviceInfo* deviceInfo,
-        nx::sdk::Ptr<nx::sdk::IUtilityProvider> utilityProvider);
+    explicit DeviceAgent(Engine& engine, const nx::sdk::IDeviceInfo* deviceInfo);
 
 protected:
     virtual void doSetSettings(
@@ -65,7 +65,6 @@ private:
 
 private:
     const std::unique_ptr<nx::network::aio::BasicPollable> m_basicPollable;
-    const nx::sdk::LogUtils m_logUtils;
     const nx::utils::Url m_url; //< `http://username:password@host:port` only
 
     bool m_isFirstDoSetSettingsCall = true;

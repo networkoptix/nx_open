@@ -1,8 +1,9 @@
 #include "camera_settings.h"
 
+#include <nx/utils/log/log_message.h>
+#include <nx/vms_server_plugins/utils/exception.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/helpers/settings_response.h>
-#include <nx/utils/log/log_message.h>
 
 #include <QtCore/QString>
 #include <QtCore/QUrlQuery>
@@ -14,7 +15,6 @@
 #include "camera_parameter_api.h"
 #include "camera_vca_parameter_api.h"
 #include "json_utils.h"
-#include "exception.h"
 #include "utils.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
@@ -25,6 +25,7 @@ using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 using namespace nx::utils;
 using namespace nx::network;
+using namespace nx::vms_server_plugins::utils;
 
 namespace {
 

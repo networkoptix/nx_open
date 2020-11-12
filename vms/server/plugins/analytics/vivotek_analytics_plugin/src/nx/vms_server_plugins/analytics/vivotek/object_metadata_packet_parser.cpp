@@ -3,13 +3,13 @@
 #include <chrono>
 #include <algorithm>
 
+#include <nx/utils/log/log_message.h>
+#include <nx/vms_server_plugins/utils/exception.h>
 #include <nx/sdk/analytics/point.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
-#include <nx/utils/log/log_message.h>
 
 #include "camera_vca_parameter_api.h"
 #include "object_types.h"
-#include "exception.h"
 #include "utils.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
@@ -17,6 +17,7 @@ namespace nx::vms_server_plugins::analytics::vivotek {
 using namespace std::literals;
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
+using namespace nx::vms_server_plugins::utils;
 
 namespace {
 

@@ -6,6 +6,7 @@ namespace nx::vms_server_plugins::analytics::vivotek {
 
 using namespace std::literals;
 using namespace nx::utils;
+using namespace nx::vms_server_plugins::utils;
 
 Url withoutUserInfo(Url url)
 {

@@ -1,7 +1,7 @@
 #include "plugin.h"
 
-#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
-#include <nx/kit/debug.h>
+#include <nx/vms_server_plugins/utils/exception.h>
+#include <nx/sdk/helpers/string.h>
 
 #include <QtCore/QJsonObject>
 
@@ -10,24 +10,34 @@
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
-using namespace nx::kit;
+using namespace nx::vms_server_plugins::utils;
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Result<IEngine*> Plugin::doObtainEngine()
+void Plugin::getManifest(Result<const IString*>* outResult) const
 {
-    return new Engine(utilityProvider());
+    interceptExceptions(outResult,
+        [&]()
+        {
+            const auto manifest = QJsonObject{
+                {"id", "nx.vivotek"},
+                {"name", "VIVOTEK analytics plugin"},
+                {"description", "Supports analytics on VIVOTEK cameras."},
+                {"version", "1.0.0"},
+                {"vendor", "VIVOTEK"},
+            };
+
+            return new String(serializeJson(manifest).toStdString());
+        });
 }
 
-std::string Plugin::manifestString() const
+void Plugin::doCreateEngine(Result<IEngine*>* outResult)
 {
-    return serializeJson(QJsonObject{
-        {"id", "nx.vivotek"},
-        {"name", "VIVOTEK analytics plugin"},
-        {"description", "Supports analytics on VIVOTEK cameras."},
-        {"version", "1.0.0"},
-        {"vendor", "VIVOTEK"},
-    }).toStdString();
+    interceptExceptions(outResult,
+        [&]()
+        {
+            return new Engine(*this);
+        });
 }
 
 extern "C" NX_PLUGIN_API nx::sdk::IPlugin* createNxPlugin()

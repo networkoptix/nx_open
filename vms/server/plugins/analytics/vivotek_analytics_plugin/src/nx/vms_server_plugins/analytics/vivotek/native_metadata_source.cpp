@@ -1,15 +1,15 @@
 #include "native_metadata_source.h"
 
 #include <nx/utils/general_macros.h>
+#include <nx/vms_server_plugins/utils/exception.h>
 
 #include <QtCore/QStringList>
-
-#include "exception.h"
 
 namespace nx::vms_server_plugins::analytics::vivotek {
 
 using namespace nx::utils;
 using namespace nx::network;
+using namespace nx::vms_server_plugins::utils;
 
 cf::future<cf::unit> NativeMetadataSource::open(const Url& url, NativeMetadataTypes types)
 {
