@@ -350,7 +350,9 @@ QList<QnResourcePtr> QnPlVmax480ResourceSearcher::checkHostAddr(const nx::utils:
 
     if (channels == -1)
     {
-        if (!checkVmaxDevice(url))
+        nx::utils::Url httpUrl(url);
+        httpUrl.setPort(httpPort);
+        if (!checkVmaxDevice(httpUrl))
             return result; //< Check if it is VMAX device to not send plain text password.
 
         CLSimpleHTTPClient client(url.host(), httpPort, TCP_TIMEOUT, QAuthenticator());
