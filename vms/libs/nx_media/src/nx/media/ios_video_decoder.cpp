@@ -23,7 +23,7 @@ extern "C" {
 
 #if defined(TARGET_OS_IPHONE)
 #include <CoreVideo/CoreVideo.h>
-#include "ios_device_info.h"
+#include <nx/utils/ios_device_info.h>
 #endif
 
 #include <QtMultimedia/QAbstractVideoBuffer>
@@ -229,6 +229,7 @@ public:
     AVCodecContext* codecContext;
     AVFrame* frame;
     qint64 lastPts;
+    bool needConvertStartCodeToSizes = false;
     bool isHardwareAccelerated = false;
 };
 
@@ -254,6 +255,7 @@ void IOSVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& fr
         return;
     }
 
+    needConvertStartCodeToSizes = false;
     codecContext->thread_count = 1;
     codecContext->opaque = this;
     codecContext->get_format = get_format;
@@ -270,6 +272,7 @@ void IOSVideoDecoderPrivate::initContext(const QnConstCompressedVideoDataPtr& fr
         codecContext->extradata = (uint8_t*)av_malloc(extradata.size());
         codecContext->extradata_size = extradata.size();
         memcpy(codecContext->extradata, extradata.data(), extradata.size());
+        needConvertStartCodeToSizes = true;
     }
 
     if (avcodec_open2(codecContext, codec, nullptr) < 0)
@@ -381,6 +384,7 @@ int IOSVideoDecoder::decode(
     }
 
     QnFfmpegAvPacket avpkt;
+    std::vector<uint8_t> covnertedData;
     if (compressedVideoData)
     {
         avpkt.data = (unsigned char*) compressedVideoData->data();
@@ -395,14 +399,17 @@ int IOSVideoDecoder::decode(
             memset(avpkt.data + avpkt.size, 0, AV_INPUT_BUFFER_PADDING_SIZE);
 
         d->lastPts = compressedVideoData->timestamp;
-        if (compressedVideoData->compressionType == AV_CODEC_ID_H264
-            && avpkt.size >= 4
-            && avpkt.data[0] == 0
-            && avpkt.data[1] == 0
-            && avpkt.data[2] == 0
-            && avpkt.data[3] == 1)
+        if (compressedVideoData->compressionType == AV_CODEC_ID_H264 &&
+            d->needConvertStartCodeToSizes)
         {
-            nx::media_utils::convertStartCodesToSizes(avpkt.data, avpkt.size);
+            covnertedData = nx::media::nal::convertStartCodesToSizes(avpkt.data, avpkt.size);
+            if (covnertedData.empty())
+            {
+                NX_WARNING(this, "Failed to convert from AnnexB to file format");
+                return false;
+            }
+            avpkt.data = covnertedData.data();
+            avpkt.size = covnertedData.size();
         }
     }
     else

@@ -92,31 +92,6 @@ const quint8* NALUnit::findNALWithStartCode(const quint8* buffer, const quint8* 
     return end;
 }
 
-const quint8* NALUnit::findNALWithStartCodeEx(
-    const quint8* buffer,
-    const quint8* end,
-    const quint8** startCodePrefix )
-{
-    for (buffer += 2; buffer < end;)
-    {
-        if (*buffer > 1)
-            buffer += 3;
-        else if (*buffer == 0)
-            buffer ++;
-        else if (buffer[-2] == 0 && buffer[-1] == 0)    //*buffer == 1
-        {
-            if( startCodePrefix )
-                *startCodePrefix = buffer-2;
-            return buffer+1;
-        }
-        else
-            buffer+=3;
-    }
-    if( startCodePrefix )
-        *startCodePrefix = end;
-    return end;
-}
-
 int NALUnit::encodeNAL(quint8* dstBuffer, size_t dstBufferSize)
 {
     return encodeNAL(m_nalBuffer, m_nalBuffer+m_nalBufferLen, dstBuffer, dstBufferSize);
@@ -449,7 +424,7 @@ int PPSUnit::deserializeID(quint8* buffer, quint8* end)
     try {
         pic_parameter_set_id = extractUEGolombCode();
     }
-    catch (BitStreamException&) {
+    catch(BitStreamException&) {
         return NOT_ENOUGHT_BUFFER;
     }
 }
@@ -686,7 +661,7 @@ int SPSUnit::deserialize()
         //m_pulldown = ((abs(getFPS() - 23.97) < FRAME_RATE_EPS) || (abs(getFPS() - 59.94) < FRAME_RATE_EPS)) && pic_struct_present_flag;
 
         return 0;
-    } catch (BitStreamException& ) {
+    } catch (BitStreamException&) {
         return NOT_ENOUGHT_BUFFER;
     }
 }
@@ -1246,7 +1221,7 @@ int SliceUnit::deserializeSliceHeader(const SPSUnit* sps, const PPSUnit* pps)
 
 #endif
         return 0;
-    } catch (BitStreamException&) {
+    } catch(BitStreamException&) {
         return NOT_ENOUGHT_BUFFER;
     }
 }
@@ -1560,7 +1535,7 @@ int SliceUnit::serializeSliceHeader(BitStreamWriter& bitWriter, const QMap<quint
         }
 
         return 0;
-    } catch (BitStreamException& e) {
+    } catch (BitStreamException&) {
         return NOT_ENOUGHT_BUFFER;
     }
 }
@@ -1682,7 +1657,7 @@ void SEIUnit::deserialize(SPSUnit& sps, int orig_hrd_parameters_present_flag)
             m_processedMessages.insert(payloadType);
             curBuff += payloadSize;
         }
-    } catch (BitStreamException& ) {
+    } catch (BitStreamException&) {
         qWarning() << "Bad SEI detected. SEI too short";
     }
     return;
@@ -2085,3 +2060,54 @@ namespace h264
         }
     }
 }
+
+namespace nx::media::nal {
+
+std::vector<NalUnitInfo> findNalUnitsAnnexB(const uint8_t* data, int32_t size)
+{
+    std::vector<NalUnitInfo> result;
+    const uint8_t* dataEnd = data + size;
+    const uint8_t* naluStart = NALUnit::findNextNAL(data, dataEnd);
+    const uint8_t* nextNaluStart = nullptr;
+    while (naluStart < dataEnd)
+    {
+        nextNaluStart = NALUnit::findNextNAL(naluStart, dataEnd);
+        const uint8_t *naluEnd = nextNaluStart == dataEnd ? dataEnd : nextNaluStart - 3;
+
+        //skipping leading_zero_8bits and trailing_zero_8bits
+        while (naluEnd > naluStart && naluEnd[-1] == 0)
+            --naluEnd;
+
+        if (naluEnd > naluStart)
+            result.emplace_back(NalUnitInfo{naluStart, int(naluEnd - naluStart)});
+
+        naluStart = nextNaluStart;
+    }
+    return result;
+}
+
+std::vector<uint8_t> convertStartCodesToSizes(const uint8_t* data, int32_t size, int32_t padding)
+{
+    constexpr int kNaluSizeLenght = 4;
+    std::vector<uint8_t> result;
+    auto nalUnits = findNalUnitsAnnexB(data, size);
+    if (nalUnits.empty())
+        return result;
+
+    int32_t resultSize = padding;
+    for (const auto& nalu: nalUnits)
+        resultSize += nalu.size + kNaluSizeLenght;
+
+    result.resize(resultSize, 0);
+    uint8_t* resultData = result.data();
+    for (const auto& nalu: nalUnits)
+    {
+        uint32_t* ptr = (uint32_t*)resultData;
+        *ptr = htonl(nalu.size);
+        memcpy(resultData + kNaluSizeLenght, nalu.data, nalu.size);
+        resultData += nalu.size + kNaluSizeLenght;
+    }
+    return result;
+}
+
+} // namespace nx::media::nal

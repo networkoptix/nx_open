@@ -68,3 +68,129 @@ TEST(NalUnits, hevcDecodeSpsNoCrash)
         ASSERT_EQ(result, entry.second);
     }
 }
+
+TEST(NalUnits, find4BytesStartcodes)
+{
+    // Simple
+    {
+        uint8_t data[] = {
+            0x00, 0x00, 0x00, 0x01, 0x1c, 0xe8};
+
+        auto sizes = nx::media::nal::findNalUnitsAnnexB(data, sizeof(data));
+        ASSERT_EQ(sizes.size(), 1);
+        ASSERT_EQ(sizes[0].data, data + 4);
+        ASSERT_EQ(sizes[0].size, 2);
+    }
+    {
+        uint8_t data[] = {
+            0x00, 0x00, 0x00, 0x01, 0x1c, 0xe8,
+            0x00, 0x00, 0x00, 0x01, 0xe5, 0xaf, 0xfc, 0x69, 0xb1};
+
+        auto sizes = nx::media::nal::findNalUnitsAnnexB(data, sizeof(data));
+        ASSERT_EQ(sizes.size(), 2);
+        ASSERT_EQ(sizes[0].data, data + 4);
+        ASSERT_EQ(sizes[0].size, 2);
+        ASSERT_EQ(sizes[1].data, data + 10);
+        ASSERT_EQ(sizes[1].size, 5);
+    }
+    {
+        uint8_t data[] = {
+            0x01, 0xe5, 0xaf, 0xfc, 0x69, 0xb1, 0x1c, 0xe8};
+
+        auto sizes = nx::media::nal::findNalUnitsAnnexB(data, sizeof(data));
+        ASSERT_EQ(sizes.size(), 0);
+    }
+
+    // Trailing zeros
+    {
+        uint8_t data[] = {
+            0x00, 0x00, 0x00, 0x01, 0x1c, 0xe8, 0x00,
+            0x00, 0x00, 0x00, 0x01, 0xe5, 0xaf, 0xfc, 0x69, 0xb1, 0x00, 0x00};
+
+        auto sizes = nx::media::nal::findNalUnitsAnnexB(data, sizeof(data));
+        ASSERT_EQ(sizes.size(), 2);
+        ASSERT_EQ(sizes[0].data, data + 4);
+        ASSERT_EQ(sizes[0].size, 2);
+
+        ASSERT_EQ(sizes[1].data, data + 11);
+        ASSERT_EQ(sizes[1].size, 5);
+    }
+}
+
+
+TEST(NalUnits, convertStartCodesToSizes)
+{
+    // Simple
+    {
+        uint8_t data[] = {
+            0x00, 0x00, 0x00, 0x01, 0x1c, 0xe8};
+
+        auto converted = nx::media::nal::convertStartCodesToSizes(data, sizeof(data));
+        ASSERT_EQ(converted.size(), sizeof(data));
+        ASSERT_EQ(converted[0], 0x00);
+        ASSERT_EQ(converted[1], 0x00);
+        ASSERT_EQ(converted[2], 0x00);
+        ASSERT_EQ(converted[3], 0x02);
+        ASSERT_EQ(converted[4], 0x1c);
+        ASSERT_EQ(converted[5], 0xe8);
+    }
+    {
+        uint8_t data[] = {
+            0x00, 0x00, 0x00, 0x01, 0x1c, 0xe8,
+            0x00, 0x00, 0x00, 0x01, 0xe5, 0xaf, 0xfc, 0x69, 0xb1};
+
+        auto converted = nx::media::nal::convertStartCodesToSizes(data, sizeof(data));
+        ASSERT_EQ(converted.size(), sizeof(data));
+        ASSERT_EQ(converted[0], 0x00);
+        ASSERT_EQ(converted[1], 0x00);
+        ASSERT_EQ(converted[2], 0x00);
+        ASSERT_EQ(converted[3], 0x02);
+        ASSERT_EQ(converted[4], 0x1c);
+        ASSERT_EQ(converted[5], 0xe8);
+
+        ASSERT_EQ(converted[6], 0x00);
+        ASSERT_EQ(converted[7], 0x00);
+        ASSERT_EQ(converted[8], 0x00);
+        ASSERT_EQ(converted[9], 0x05);
+    }
+    // Trailing zeros
+    {
+        uint8_t data[] = {
+            0x00, 0x00, 0x00, 0x01, 0x1c, 0xe8, 0x00,
+            0x00, 0x00, 0x00, 0x01, 0xe5, 0xaf, 0xfc, 0x69, 0xb1, 0x00, 0x00};
+
+        auto converted = nx::media::nal::convertStartCodesToSizes(data, sizeof(data));
+        ASSERT_EQ(converted.size(), sizeof(data) - 3);
+        ASSERT_EQ(converted[0], 0x00);
+        ASSERT_EQ(converted[1], 0x00);
+        ASSERT_EQ(converted[2], 0x00);
+        ASSERT_EQ(converted[3], 0x02);
+        ASSERT_EQ(converted[4], 0x1c);
+        ASSERT_EQ(converted[5], 0xe8);
+
+        ASSERT_EQ(converted[6], 0x00);
+        ASSERT_EQ(converted[7], 0x00);
+        ASSERT_EQ(converted[8], 0x00);
+        ASSERT_EQ(converted[9], 0x05);
+    }
+    // 3 bytes starcode
+    {
+        uint8_t data[] = {
+            0x00, 0x00, 0x01, 0x1c, 0xe8,
+            0x00, 0x00, 0x01, 0xe5, 0xaf, 0xfc, 0x69, 0xb1};
+
+        auto converted = nx::media::nal::convertStartCodesToSizes(data, sizeof(data));
+        ASSERT_EQ(converted.size(), sizeof(data) + 2);
+        ASSERT_EQ(converted[0], 0x00);
+        ASSERT_EQ(converted[1], 0x00);
+        ASSERT_EQ(converted[2], 0x00);
+        ASSERT_EQ(converted[3], 0x02);
+        ASSERT_EQ(converted[4], 0x1c);
+        ASSERT_EQ(converted[5], 0xe8);
+
+        ASSERT_EQ(converted[6], 0x00);
+        ASSERT_EQ(converted[7], 0x00);
+        ASSERT_EQ(converted[8], 0x00);
+        ASSERT_EQ(converted[9], 0x05);
+    }
+}

@@ -63,16 +63,11 @@ public:
         delete [] m_nalBuffer;
     }
 
+    /*!
+        \return pointer to nal_unit. If not found, \a end is returned.
+    */
     static const quint8* findNextNAL(const quint8* buffer, const quint8* end);
     static const quint8* findNALWithStartCode(const quint8* buffer, const quint8* end, bool longCodesAllowed);
-    /*!
-        \param startCodePrefix If not \a NULL, pointer to \a start_code_prefix_one_3bytes is stored here
-        \return pointer to nal_unit. If not found, \a end is returned. \a *startCodePrefix set to \a end in this case
-    */
-    static const quint8* findNALWithStartCodeEx(
-        const quint8* buffer,
-        const quint8* end,
-        const quint8** startCodePrefix );
 
     static int encodeNAL(quint8* srcBuffer, quint8* srcEnd, quint8* dstBuffer, size_t dstBufferSize);
     int encodeNAL(quint8* dstBuffer, size_t dstBufferSize);
@@ -546,6 +541,20 @@ private:
     int m_fullHeaderLen;
     int deserializeSliceHeader(const SPSUnit* sps, const PPSUnit* pps);
 };
+
+namespace nx::media::nal {
+
+struct NalUnitInfo
+{
+    const uint8_t* data = nullptr;
+    int size = 0;
+};
+
+std::vector<NalUnitInfo> findNalUnitsAnnexB(const uint8_t* data, int32_t size);
+
+std::vector<uint8_t> convertStartCodesToSizes(const uint8_t* data, int32_t size);
+
+} // namespace nx::media::nal
 
 namespace h264
 {

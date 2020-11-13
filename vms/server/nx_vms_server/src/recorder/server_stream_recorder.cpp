@@ -1070,21 +1070,20 @@ bool QnServerStreamRecorder::mediaHasBuiltinContext(const QnConstAbstractMediaDa
         case AV_CODEC_ID_H264:
         case AV_CODEC_ID_HEVC:
         {
-            std::vector<std::pair<const quint8*, size_t>> nalUnits;
-            readNALUsFromAnnexBStream(videoFrame, &nalUnits);
-
-            for (const std::pair<const quint8*, size_t>& nalu: nalUnits)
+            auto nalUnits = nx::media::nal::findNalUnitsAnnexB(
+                (const uint8_t*)videoFrame->data(), videoFrame->dataSize());
+            for (const auto& nalu: nalUnits)
             {
                 if (codecId == AV_CODEC_ID_H264)
                 {
-                    auto nalUnitType = *nalu.first & 0x1f;
+                    auto nalUnitType = *nalu.data & 0x1f;
                     if (nalUnitType == NALUnitType::nuSPS)
                         return true;
                 }
                 else if (codecId == AV_CODEC_ID_HEVC)
                 {
                     hevc::NalUnitHeader header;
-                    header.decode(nalu.first, (int) nalu.second);
+                    header.decode(nalu.data, nalu.size);
                     if (hevc::isParameterSet(header.unitType))
                         return true;
                 }

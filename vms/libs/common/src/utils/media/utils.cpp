@@ -29,7 +29,7 @@ QSize getFrameSize(const QnConstCompressedVideoDataPtr& frame)
         case AV_CODEC_ID_H264:
         {
             SPSUnit sps;
-            if (nx::media_utils::h264::extractSps(frame, sps))
+            if (nx::media::h264::extractSps(frame, sps))
                 return QSize(sps.getWidth(), sps.getHeight());
             return QSize();
         }

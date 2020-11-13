@@ -99,7 +99,7 @@ void SeamlessVideoDecoderPrivate::updateSar(const QnConstCompressedVideoDataPtr&
         case AV_CODEC_ID_H264:
         {
             SPSUnit sps;
-            if (!nx::media_utils::h264::extractSps(frame, sps))
+            if (!nx::media::h264::extractSps(frame, sps))
                 return;
             sar = sps.getSar();
             break;

@@ -5,7 +5,7 @@
 #include "core/resource/param.h"
 #include "utils/media/nalUnits.h"
 
-namespace nx::media_utils {
+namespace nx::media::h264 {
 
 //dishonorably stolen from libavcodec source
 #ifndef AV_RB16
@@ -18,12 +18,12 @@ namespace nx::media_utils {
 /**
  * @param data data->context should not be null.
  */
-void readH264NALUsFromExtraData(
-    const QnConstCompressedVideoDataPtr& data,
-    std::vector<std::pair<const quint8*, size_t>>* const nalUnits)
+std::vector<nal::NalUnitInfo> readH264NALUsFromExtraData(
+    const QnConstCompressedVideoDataPtr& data)
 {
+    std::vector<nal::NalUnitInfo> result;
     NX_ASSERT(data->context);
-    const unsigned char* p = data->context->getExtradata();
+    const uint8_t* p = data->context->getExtradata();
 
     //sps & pps is in the extradata, parsing it...
     //following code has been taken from libavcodec/h264.c
@@ -44,7 +44,7 @@ void readH264NALUsFromExtraData(
         p += 2; //skipping nalusize
         if (nalsize > data->context->getExtradataSize() - (p - data->context->getExtradata()))
             break;
-        nalUnits->emplace_back((const quint8*)p, nalsize);
+        result.emplace_back(nal::NalUnitInfo{p, nalsize});
         p += nalsize;
     }
 
@@ -56,55 +56,11 @@ void readH264NALUsFromExtraData(
         p += 2;
         if (nalsize > data->context->getExtradataSize() - (p - data->context->getExtradata()))
             break;
-        nalUnits->emplace_back((const quint8*)p, nalsize);
+        result.emplace_back(nal::NalUnitInfo{p, nalsize});
         p += nalsize;
     }
+    return result;
 }
-
-void readNALUsFromAnnexBStream(
-    const uint8_t* data,
-    int32_t size,
-    std::vector<std::pair<const quint8*, size_t>>* const nalUnits)
-{
-    const uint8_t* dataEnd = data + size;
-    const uint8_t* naluEnd = nullptr;
-    for (const uint8_t
-        *curNalu = NALUnit::findNALWithStartCodeEx(data, dataEnd, &naluEnd),
-        *nextNalu = NULL;
-        curNalu < dataEnd;
-        curNalu = nextNalu)
-    {
-        nextNalu = NALUnit::findNALWithStartCodeEx(curNalu, dataEnd, &naluEnd);
-        NX_ASSERT(nextNalu > curNalu);
-        //skipping leading_zero_8bits and trailing_zero_8bits
-        while ((naluEnd > curNalu) && (*(naluEnd - 1) == 0))
-            --naluEnd;
-        if (naluEnd > curNalu)
-            nalUnits->emplace_back((const quint8*)curNalu, naluEnd - curNalu);
-    }
-}
-
-void readNALUsFromAnnexBStream(
-    const QnConstCompressedVideoDataPtr& data,
-    std::vector<std::pair<const quint8*, size_t>>* const nalUnits)
-{
-    readNALUsFromAnnexBStream((const uint8_t*)data->data(), data->dataSize(), nalUnits);
-}
-
-void convertStartCodesToSizes(const uint8_t* data, int32_t size)
-{
-    std::vector<std::pair<const quint8*, size_t>> nalUnits;
-    readNALUsFromAnnexBStream(data, size, &nalUnits);
-    for (const auto& nalu: nalUnits)
-    {
-        if (nalu.second < 4)
-            break;
-        uint32_t* ptr = (uint32_t*)(nalu.first - 4);
-        *ptr = htonl(nalu.second);
-    }
-}
-
-namespace h264 {
 
 bool extractSps(const QnConstCompressedVideoDataPtr& videoData, SPSUnit& sps)
 {
@@ -112,11 +68,9 @@ bool extractSps(const QnConstCompressedVideoDataPtr& videoData, SPSUnit& sps)
 
     for (const auto& nalu: nalUnits)
     {
-        if ((*nalu.first & 0x1f) == nuSPS)
+        if ((*nalu.data & 0x1f) == nuSPS)
         {
-            if (nalu.second < 4)
-                continue;   //invalid sps
-            sps.decodeBuffer(nalu.first, nalu.first + nalu.second);
+            sps.decodeBuffer(nalu.data, nalu.data + nalu.size);
             return sps.deserialize() == 0;
         }
     }
@@ -130,43 +84,27 @@ bool isH264SeqHeaderInExtraData(const QnConstCompressedVideoDataPtr& data)
         data->context->getExtradata()[0] == 1;
 }
 
-std::vector<std::pair<const quint8*, size_t>> decodeNalUnits(
-    const QnConstCompressedVideoDataPtr& videoData)
+std::vector<nal::NalUnitInfo> decodeNalUnits(
+    const QnConstCompressedVideoDataPtr& data)
 {
-    std::vector<std::pair<const quint8*, size_t>> nalUnits;
-    if (isH264SeqHeaderInExtraData(videoData))
-        readH264NALUsFromExtraData(videoData, &nalUnits);
+    if (isH264SeqHeaderInExtraData(data))
+        return readH264NALUsFromExtraData(data);
     else
-        readNALUsFromAnnexBStream(videoData, &nalUnits);
-    return nalUnits;
+        return nal::findNalUnitsAnnexB((const uint8_t*)data->data(), data->dataSize());
 }
 
 void getSpsPps(const uint8_t* data, int32_t size,
     std::vector<std::vector<uint8_t>>& spsVector,
     std::vector<std::vector<uint8_t>>& ppsVector)
 {
-    std::vector<std::pair<const quint8*, size_t>> nalUnits;
-    readNALUsFromAnnexBStream(data, size, &nalUnits);
+    auto nalUnits = nal::findNalUnitsAnnexB(data, size);
     for (const auto& nalu: nalUnits)
     {
-        if ((*nalu.first & 0x1f) == nuSPS)
-        {
-            if (nalu.second < 4)
-            {
-                NX_WARNING(NX_SCOPE_TAG, "Invalid sps found");
-                continue;
-            }
-            spsVector.emplace_back(nalu.first, nalu.first + nalu.second);
-        }
-        if ((*nalu.first & 0x1f) == nuPPS)
-        {
-            if (nalu.second < 4)
-            {
-                NX_WARNING(NX_SCOPE_TAG, "Invalid pps found");
-                continue;
-            }
-            ppsVector.emplace_back(nalu.first, nalu.first + nalu.second);
-        }
+        if ((*nalu.data & 0x1f) == nuSPS)
+            spsVector.emplace_back(nalu.data, nalu.data + nalu.size);
+
+        if ((*nalu.data & 0x1f) == nuPPS)
+            ppsVector.emplace_back(nalu.data, nalu.data + nalu.size);
     }
 }
 
@@ -203,6 +141,7 @@ std::vector<uint8_t> buildExtraData(const uint8_t* data, int32_t size)
     BitStreamWriter bitstream(extradata.data(), extradata.data() + extradataSize);
     try
     {
+        // See ISO_IEC_14496-15 AVCDecoderConfigurationRecord.
         bitstream.putBits(8, 1); // Version.
         bitstream.putBits(8, sps[1]); // Profile.
         bitstream.putBits(8, sps[2]); // Profile compat.
