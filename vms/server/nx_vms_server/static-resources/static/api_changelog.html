@@ -104,7 +104,7 @@ parameter <strong><code>analyzedStreamIndex</code></strong> has been added to th
 Parameter <strong><code>settings</code></strong> of the JSON request has been renamed to
 <strong><code>settingsValues</code></strong>. Request now must contain the
 <strong><code>settingsModelId</code></strong> field, value of which may be retrieved via the
-corresponding <strong><code>GET</strong></code> request. Parameters
+corresponding <strong><code>GET</code></strong> request. Parameters
 <i><strong><code>values</code></strong></i> and <i><strong><code>model</code></strong></i>
 of the JSON response have been renamed to <b><strong><code>settingsValues</code></strong></b> and
 <b><strong><code>settingsModel</code></strong></b> respectively. Parameters
@@ -150,9 +150,9 @@ values have to be used for retrieving thumbnails of Objects detected by Analytic
 Information about the stream that has been used by analytics to detect a particular Object is
 contained in the metadata that comes in the RTSP stream and in the response of
 <strong><code>/ec2/analyticsLookupObjectTracks</code></strong> as a value of the
-<strong><code>bestShot.streamIndex</strong></code> field. The index of the stream that is currently
+<strong><code>bestShot.streamIndex</code></strong> field. The index of the stream that is currently
 used by a particular Engine on a particular Device can be retrieved via the
-<strong><code>/ec2/deviceAnalyticsSettings</strong></code> request.
+<strong><code>/ec2/deviceAnalyticsSettings</code></strong> request.
 </p>
 <h3>Retaining compatibility until expired</h3>
 <p>

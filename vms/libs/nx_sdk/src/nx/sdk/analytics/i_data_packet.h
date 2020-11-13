@@ -22,8 +22,8 @@ public:
         none = 0,
 
         /**
-         * Indicates that the timestamp is sampled from an camera's own internal clock and should
-         * be translated to VMS system clock.
+         * Indicates that the timestamp is sampled from a camera's own internal clock and should
+         * be translated to VMS System clock.
          */
         cameraClockTimestamp = 1 << 0,
     };
