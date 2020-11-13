@@ -319,6 +319,9 @@ buildDistribution()
     echo "Copying build_info.json"
     cp "$DISTRIBUTION_OUTPUT_DIR/build_info.json" "$STAGE_MODULE/"
 
+    echo "Copying specific_features.txt"
+    cp "$BUILD_DIR/specific_features.txt" "$STAGE_MODULE/"
+
     copyLibs
     copyQtLibs
     copyMediaserverPlugins
