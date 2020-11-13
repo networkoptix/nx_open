@@ -1036,12 +1036,12 @@
     <message>
       <source>hrs</source>
       <comment>Long suffix for displaying hours</comment>
-      <translation>時</translation>
+      <translation>時間</translation>
     </message>
     <message>
       <source>days</source>
       <comment>Long suffix for displaying days</comment>
-      <translation> 日</translation>
+      <translation>日</translation>
     </message>
     <message>
       <source>wks</source>
@@ -1090,7 +1090,7 @@
       <source>days</source>
       <comment>Full suffix for displaying days</comment>
       <translation>
-        <numerusform> 日</numerusform>
+        <numerusform>日</numerusform>
       </translation>
     </message>
     <message numerus="yes">
