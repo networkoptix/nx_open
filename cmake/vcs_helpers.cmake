@@ -113,7 +113,7 @@ function(_extract_git_info)
 
     set(_current_refs_output "")
     execute_process(
-        COMMAND git -C "${dir}" log --decorate -n1 --format=format:"%D"
+        COMMAND git -C "${dir}" log --decorate -n1 --format=format:%D
         OUTPUT_VARIABLE _current_refs_output
         RESULT_VARIABLE is_log_failed
         OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -128,7 +128,9 @@ function(_extract_git_info)
     # If _current_refs_output is empty, GIT_CURRENT_REFS variable in the parent scope will have
     # the default value.
     if(_current_refs_output)
-        string(REGEX REPLACE "HEAD, |HEAD -> " "" _current_refs "${_current_refs_output}")
+        string(REGEX REPLACE
+            "HEAD, |HEAD -> " "" _current_refs_with_spaces "${_current_refs_output}")
+        string(REGEX REPLACE " " "" _current_refs "${_current_refs_with_spaces}")
         set(${GIT_CURRENT_REFS} "${_current_refs}" PARENT_SCOPE)
     endif()
 endfunction()
