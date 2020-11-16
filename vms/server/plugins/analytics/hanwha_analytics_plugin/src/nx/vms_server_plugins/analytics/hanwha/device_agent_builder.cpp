@@ -220,6 +220,25 @@ SettingsCapabilities DeviceAgentBuilder::fetchSettingsCapabilities() const
     result.ivaAreaLoiteringDuration = cgi.parameter("eventsources", "videoanalysis2", "set",
         "DefinedArea.#.LoiteringDuration").is_initialized();
 
+    // Temperature
+    result.temperatureDetection.coordinate = cgi.parameter("eventsources",
+        "boxtemperaturedetection", "set", "ROI.#.Coordinate").is_initialized();
+
+    result.temperatureDetection.temperatureType = cgi.parameter("eventsources",
+        "boxtemperaturedetection", "set", "ROI.#.TemperatureType").is_initialized();
+
+    result.temperatureDetection.detectionType = cgi.parameter("eventsources",
+        "boxtemperaturedetection", "set", "ROI.#.DetectionType").is_initialized();
+
+    result.temperatureDetection.thresholdTemperature = cgi.parameter("eventsources",
+        "boxtemperaturedetection", "set", "ROI.#.ThresholdTemperature").is_initialized();
+
+    result.temperatureDetection.duration = cgi.parameter("eventsources",
+        "boxtemperaturedetection", "set", "ROI.#.Duration").is_initialized();
+
+    result.temperatureDetection.areaEmissivity = cgi.parameter("eventsources",
+        "boxtemperaturedetection", "set", "ROI.#.NormalizedEmissivity").is_initialized();
+
     return result;
 }
 //-------------------------------------------------------------------------------------------------
@@ -397,6 +416,38 @@ QStringList DeviceAgentBuilder::fetchInternalEventTypeNamesForPopulousFamilies()
 
 //-------------------------------------------------------------------------------------------------
 
+QString DeviceAgentBuilder::fetchTemperatureChangeEventTypeNameInternal(const Information& info) const
+{
+    static const QString kTemperatureChangeInternalName = "BoxTemperatureDetection";
+    const QString prefix =
+        nx::format("Channel.%1.%2", info.channelNumber, kTemperatureChangeInternalName);
+
+    for (const auto& [eventTypeDecoratedName, status]: info.eventStatusMap)
+    {
+        if (eventTypeDecoratedName.startsWith(prefix))
+        {
+            return m_engineManifest.eventTypeIdByName(kTemperatureChangeInternalName);
+        }
+    }
+    return {};
+}
+
+//-------------------------------------------------------------------------------------------------
+
+QString DeviceAgentBuilder::fetchTemperatureChangeEventTypeName() const
+{
+    QString result = fetchTemperatureChangeEventTypeNameInternal(m_directInfo);
+
+    if (!result.isEmpty() && m_directInfo.isNvr)
+    {
+        QString bypassedResult = fetchTemperatureChangeEventTypeNameInternal(m_bypassedInfo);
+        result = (result == bypassedResult) ? result : QString();
+    }
+    return result;
+}
+
+//-------------------------------------------------------------------------------------------------
+
 QStringList DeviceAgentBuilder::obtainEventTypeIds(
     const QStringList& eventTypeFamilyNames,
     const QStringList& eventTypeInternalNamesForPopulousFamilies) const
@@ -444,6 +495,17 @@ QStringList DeviceAgentBuilder::obtainEventTypeIds(
 
 //-------------------------------------------------------------------------------------------------
 
+QStringList DeviceAgentBuilder::addTemepatureChangeEventTypeNameIfNeeded(
+    const QStringList& eventTypeIds) const
+{
+    QStringList result(eventTypeIds);
+    if (const QString eventTypeId = fetchTemperatureChangeEventTypeName(); !eventTypeId.isEmpty())
+        result.append(eventTypeId);
+    return result;
+}
+
+//-------------------------------------------------------------------------------------------------
+
 QStringList DeviceAgentBuilder::addObjectDetectionEventTypeNamesIfNeeded(
     const QStringList& eventTypeIds) const
 {
@@ -477,8 +539,11 @@ QStringList DeviceAgentBuilder::buildSupportedEventTypeIds() const
     const QStringList eventTypeIds = obtainEventTypeIds(
         eventTypeFamilyNames, eventTypeInternalNamesForPopulousFamilies);
 
+    const QStringList eventTypeIdsWithTemperatureEvent =
+        addTemepatureChangeEventTypeNameIfNeeded(eventTypeIds);
+
     const QStringList eventTypeIdsWithTrackingEvents =
-        addObjectDetectionEventTypeNamesIfNeeded(eventTypeIds);
+        addObjectDetectionEventTypeNamesIfNeeded(eventTypeIdsWithTemperatureEvent);
 
     return eventTypeIdsWithTrackingEvents;
 }

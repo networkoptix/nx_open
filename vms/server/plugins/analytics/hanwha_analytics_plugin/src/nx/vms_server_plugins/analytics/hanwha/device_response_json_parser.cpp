@@ -315,6 +315,30 @@ The example of the incoming json:
     return result;
 }
 
+/**
+ * Extract information about temperature change detection ROI (as a json object) of a desired
+ * type from the json object (that corresponds to some event and channel)
+ */
+/*static*/ nx::kit::Json DeviceResponseJsonParser::extractTemperatureRoiInfo(
+    nx::kit::Json channelInfo, int sunapiIndex)
+{
+    nx::kit::Json result;
+    const nx::kit::Json& rois = channelInfo["ROIs"];
+    if (!rois.is_array())
+        return result;
+
+    for (const nx::kit::Json& roi: rois.array_items())
+    {
+        const nx::kit::Json& roiIndex = roi["ROI"];
+        if (roiIndex.is_number() && roiIndex.int_value() == sunapiIndex)
+        {
+            result = roi;
+            return result;
+        }
+    }
+    return result;
+}
+
 //-------------------------------------------------------------------------------------------------
 
 } // namespace nx::vms_server_plugins::analytics::hanwha

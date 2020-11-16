@@ -332,6 +332,16 @@ void SettingsProcessor::loadAndHoldSettingsFromDevice()
         SettingGroup::readFromDeviceReply(
             sunapiReply, &m_settings.faceMaskDetection, channelNumber);
     }
+
+    if (m_settings.analyticsCategories[temperatureChangeDetection])
+    {
+        sunapiReply = makeEventTypeReadingRequest("boxtemperaturedetection");
+        for (int i = 0; i < Settings::kTemperatureMultiplicity; ++i)
+        {
+            SettingGroup::readFromDeviceReply(
+                sunapiReply, &m_settings.temperatureChangeDetection[i], channelNumber, i);
+        }
+    }
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -401,6 +411,13 @@ void SettingsProcessor::transferAndHoldSettingsFromDeviceToServer(
 
     if (m_settings.analyticsCategories[faceMaskDetection])
         m_settings.faceMaskDetection.writeToServer(response);
+
+    if (m_settings.analyticsCategories[temperatureChangeDetection])
+    {
+        for (int i = 0; i < Settings::kTemperatureMultiplicity; ++i)
+            m_settings.temperatureChangeDetection[i].writeToServer(response);
+
+    }
 
 }
 
@@ -504,6 +521,15 @@ void SettingsProcessor::transferAndHoldSettingsFromServerToDevice(
     {
         SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
             m_settings.faceMaskDetection, sender, m_cameraChannelNumber);
+    }
+
+    if (m_settings.analyticsCategories[temperatureChangeDetection])
+    {
+        for (int i = 0; i < Settings::kTemperatureMultiplicity; ++i)
+        {
+            SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
+                m_settings.temperatureChangeDetection[i], sender, m_cameraChannelNumber, i);
+        }
     }
 }
 

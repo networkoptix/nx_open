@@ -184,6 +184,9 @@ void DeviceAgent::setSupportedEventCategoties()
 
     m_settings.analyticsCategories[faceMaskDetection] =
         m_manifest.supportedEventTypeIds.contains("nx.hanwha.FaceMaskDetection");
+
+    m_settings.analyticsCategories[temperatureChangeDetection] =
+        m_manifest.supportedEventTypeIds.contains("nx.hanwha.TemperatureChangeDetection");
 }
 
 //-------------------------------------------------------------------------------------------------

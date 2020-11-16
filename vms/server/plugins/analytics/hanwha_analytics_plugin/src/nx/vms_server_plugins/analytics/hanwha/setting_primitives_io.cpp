@@ -144,6 +144,29 @@ std::string serialize(const UnnamedPolygon& value)
 
 //-------------------------------------------------------------------------------------------------
 
+void deserializeOrThrow(const char* source, UnnamedRect* destination)
+{
+    if (!source)
+        throw DeserializationError();
+
+    std::optional<UnnamedRect> tmp = UnnamedRect::fromServerString(source);
+
+    if (tmp)
+    {
+        *destination = *tmp;
+        return;
+    }
+
+    throw DeserializationError();
+}
+
+std::string serialize(const UnnamedRect& value)
+{
+    return value.toServerString();
+}
+
+//-------------------------------------------------------------------------------------------------
+
 void deserializeOrThrow(const char* source, NamedLineFigure* destination)
 {
     if (!source)

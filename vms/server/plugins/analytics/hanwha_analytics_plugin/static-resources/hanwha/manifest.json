@@ -28,6 +28,87 @@
         "sections": [
             {
                 "type": "Section",
+                "caption": "Temperature Change Detection",
+                "_requiredForEventTypeIds": [ "nx.hanwha.TemperatureChangeDetection" ],
+                "items": [
+                    {
+                        "type": "SwitchButton",
+                        "name": "Temperature.Enable",
+                        "caption": "Enable",
+                        "defaultValue": false
+                    },
+                    {
+                        "type": "GroupBox",
+                        "caption": "Temperature Change Detection",
+                        "items":
+                        [
+                            {
+                                "type": "Repeater",
+                                "count": 3,
+                                "startIndex": 1,
+                                "template":
+                                {
+                                    "type": "GroupBox",
+                                    "caption": "Temperature Area #",
+                                    "filledCheckItems": [ "Temerature.Area#.Points" ],
+                                    "items": [
+                                        {
+                                            "type": "BoxFigure",
+                                            "name": "Temperature.Area#.Points",
+                                            "caption": "Area #"
+                                        },
+                                        {
+                                            "type": "ComboBox",
+                                            "name": "Temperature.Area#.TemperatureType",
+                                            "caption": "Temperature Type",
+                                            "defaultValue": "Maximum",
+                                            "range": [ "Maximum", "Minimum", "Average" ],
+                                            "itemCaptions": {
+                                                "Maximum": "Max",
+                                                "Minimum": "Min",
+                                                "Average": "Avg"
+                                            }
+                                        },
+                                        {
+                                            "type": "ComboBox",
+                                            "name": "Temperature.Area#.DetectionType",
+                                            "caption": "Detection Type",
+                                            "defaultValue": "Minimum",
+                                            "range": [ "Above", "Below", "Increase", "Decrease" ]
+                                        },
+                                        {
+                                            "type": "SpinBox",
+                                            "name": "Temperature.Area#.ThresholdTemperature",
+                                            "caption": "Threshold Temperature (Detection) (F)",
+                                            "defaultValue": 68,
+                                            "minValue": -4,
+                                            "maxValue": 266
+                                        },
+                                        {
+                                            "type": "SpinBox",
+                                            "name": "Temperature.Area#.Duration",
+                                            "caption": "Minimum Duration (s)",
+                                            "defaultValue": 1,
+                                            "minValue": 1,
+                                            "maxValue": 60
+                                        },
+                                        {
+                                            "type": "SpinBox",
+                                            "name": "Temperature.Area#.AreaEmissivity",
+                                            "caption": "Area Emissivity",
+                                            "defaultValue": 50,
+                                            "minValue": 1,
+                                            "maxValue": 99
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "type": "Section",
                 "caption": "Shock Detection",
                 "_requiredForEventTypeIds": [ "nx.hanwha.ShockDetection" ],
                 "items": [
@@ -756,7 +837,7 @@
         {
             "id": "nx.hanwha.TemperatureChangeDetection",
             "name": "Temperature change detection",
-            "internalName": "TemperatureChangeDetection",
+            "internalName": "BoxTemperatureDetection",
             "description": "Temperature change %1",
             "positiveState": "has been detected",
             "negativeState": "is not detected",

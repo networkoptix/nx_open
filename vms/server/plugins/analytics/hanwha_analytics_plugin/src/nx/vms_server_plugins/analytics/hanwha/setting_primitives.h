@@ -108,6 +108,17 @@ struct ObjectSizeConstraints
 
 //-------------------------------------------------------------------------------------------------
 
+struct UnnamedRect
+{
+    std::vector<PluginPoint> points;
+
+    bool operator==(const UnnamedRect& rhs) const { return points == rhs.points; }
+    static std::optional<UnnamedRect> fromServerString(const char* source);
+    std::string toServerString() const;
+};
+
+//-------------------------------------------------------------------------------------------------
+
 struct UnnamedPolygon
 {
     std::vector<PluginPoint> points;

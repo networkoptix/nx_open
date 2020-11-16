@@ -299,6 +299,27 @@ std::string ObjectSizeConstraints::toServerString() const
 
 //-------------------------------------------------------------------------------------------------
 
+/*static*/ std::optional<UnnamedRect> UnnamedRect::fromServerString(const char* source)
+{
+    std::optional<std::vector<PluginPoint>> points = ServerStringToPluginPoints(source);
+    if (!points)
+        return std::nullopt; //< Failed to read points
+
+    if (points->size() > 0 && points->size() != 2)
+        return std::nullopt; //< Should have exactly 2 points or be empty.
+
+    UnnamedRect result;
+    result.points = *points;
+    return result;
+}
+
+std::string UnnamedRect::toServerString() const
+{
+    return pluginPointsToServerString(points);
+}
+
+//-------------------------------------------------------------------------------------------------
+
 /*static*/ std::optional<UnnamedPolygon> UnnamedPolygon::fromServerString(const char* source)
 {
     std::optional<std::vector<PluginPoint>> points = ServerStringToPluginPoints(source);

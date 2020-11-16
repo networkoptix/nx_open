@@ -1300,4 +1300,139 @@ std::string FaceMaskDetection::buildDetectionMode() const
         : kNoMaskDetectionMode;
 }
 
+//-------------------------------------------------------------------------------------------------
+
+bool TemperatureChangeDetection::operator==(const TemperatureChangeDetection& rhs) const
+{
+    return initialized == rhs.initialized
+        && unnamedRect == rhs.unnamedRect
+        && temperatureType == rhs.temperatureType
+        && detectionType == rhs.detectionType
+        && thresholdTemperature == rhs.thresholdTemperature
+        && duration == rhs.duration
+        && areaEmissivity == rhs.areaEmissivity;
+}
+
+void TemperatureChangeDetection::readFromServerOrThrow(
+    const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
+{
+    using namespace SettingPrimitivesServerIo;
+    if (m_settingsCapabilities.temperatureDetection.coordinate)
+        deserializeOrThrow(value(sourceMap, KeyIndex::unnamedRect), &unnamedRect);
+
+    if (m_settingsCapabilities.temperatureDetection.temperatureType)
+        deserializeOrThrow(value(sourceMap, KeyIndex::temperatureType), &temperatureType);
+
+    if (m_settingsCapabilities.temperatureDetection.detectionType)
+        deserializeOrThrow(value(sourceMap, KeyIndex::detectionType), &detectionType);
+
+    if (m_settingsCapabilities.temperatureDetection.thresholdTemperature)
+        deserializeOrThrow(value(sourceMap, KeyIndex::thresholdTemperature), &thresholdTemperature);
+
+    if (m_settingsCapabilities.temperatureDetection.duration)
+        deserializeOrThrow(value(sourceMap, KeyIndex::duration), &duration);
+
+    if (m_settingsCapabilities.temperatureDetection.areaEmissivity)
+        deserializeOrThrow(value(sourceMap, KeyIndex::areaEmissivity), &areaEmissivity);
+    initialized = true;
+}
+
+void TemperatureChangeDetection::writeToServer(
+    nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
+{
+    using namespace SettingPrimitivesServerIo;
+    if (m_settingsCapabilities.temperatureDetection.coordinate)
+        result->setValue(key(KeyIndex::unnamedRect), serialize(unnamedRect));
+
+    if (m_settingsCapabilities.temperatureDetection.temperatureType)
+        result->setValue(key(KeyIndex::temperatureType), serialize(temperatureType));
+
+    if (m_settingsCapabilities.temperatureDetection.detectionType)
+        result->setValue(key(KeyIndex::detectionType), serialize(detectionType));
+
+    if (m_settingsCapabilities.temperatureDetection.thresholdTemperature)
+        result->setValue(key(KeyIndex::thresholdTemperature), serialize(thresholdTemperature));
+
+    if (m_settingsCapabilities.temperatureDetection.duration)
+        result->setValue(key(KeyIndex::duration), serialize(duration));
+
+    if (m_settingsCapabilities.temperatureDetection.areaEmissivity)
+        result->setValue(key(KeyIndex::areaEmissivity), serialize(areaEmissivity));
+}
+
+void TemperatureChangeDetection::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
+{
+    nx::kit::Json roiInfo =
+        DeviceResponseJsonParser::extractTemperatureRoiInfo(channelInfo, this->deviceIndex());
+    if (roiInfo == nx::kit::Json())
+    {
+        *this = TemperatureChangeDetection(
+            m_settingsCapabilities, m_roiResolution, this->nativeIndex()); // reset value;
+        initialized = true;
+        return;
+    }
+
+    using namespace SettingPrimitivesDeviceIo;
+
+    if (m_settingsCapabilities.temperatureDetection.coordinate)
+        deserializeOrThrow(roiInfo, "Coordinates", m_roiResolution, &unnamedRect.points);
+
+    if (m_settingsCapabilities.temperatureDetection.temperatureType)
+        deserializeOrThrow(roiInfo, "TemperatureType", m_roiResolution, &temperatureType);
+    if (m_settingsCapabilities.temperatureDetection.detectionType)
+        deserializeOrThrow(roiInfo, "DetectionType", m_roiResolution, &detectionType);
+    if (m_settingsCapabilities.temperatureDetection.thresholdTemperature)
+        deserializeOrThrow(roiInfo, "ThresholdTemperature", m_roiResolution, &thresholdTemperature);
+    if (m_settingsCapabilities.temperatureDetection.duration)
+        deserializeOrThrow(roiInfo, "Duration", m_roiResolution, &duration);
+    if (m_settingsCapabilities.temperatureDetection.areaEmissivity)
+        deserializeOrThrow(roiInfo, "NormalizedEmissivity", m_roiResolution, &areaEmissivity);
+    initialized = true;
+}
+
+std::string TemperatureChangeDetection::buildDeviceWritingQuery(int channelNumber) const
+{
+    std::ostringstream query;
+    if (initialized)
+    {
+        if (!unnamedRect.points.empty())
+        {
+            using namespace SettingPrimitivesDeviceIo;
+            const std::string prefix = "&ROI."s + std::to_string(deviceIndex());
+            query << "msubmenu=" << kSunapiEventName << "&action="
+                  << "set"
+                  << "&Channel=" << channelNumber;
+
+            if (m_settingsCapabilities.temperatureDetection.coordinate)
+                query << prefix << ".Coordinate=" << serialize(unnamedRect.points, m_roiResolution);
+
+            if (m_settingsCapabilities.temperatureDetection.temperatureType)
+                query << prefix << ".TemperatureType=" << temperatureType;
+
+            if (m_settingsCapabilities.temperatureDetection.detectionType)
+                query << prefix << ".DetectionType=" << detectionType;
+
+            if (m_settingsCapabilities.temperatureDetection.thresholdTemperature)
+                query << prefix << ".ThresholdTemperature=" << thresholdTemperature;
+
+            if (m_settingsCapabilities.temperatureDetection.duration)
+                query << prefix << ".Duration=" << duration;
+
+            if (m_settingsCapabilities.temperatureDetection.duration)
+                query << prefix << ".NormalizedEmissivity=" << areaEmissivity;
+
+            //query << "TemperatureUnit=" << "Fahrenheit"; //"Celsius"
+        }
+        else
+        {
+            query << "msubmenu=" << kSunapiEventName << "&action="
+                  << "remove"
+                  << "&Channel=" << channelNumber << "&DefinedAreaIndex=" << deviceIndex();
+        }
+    }
+    return query.str();
+}
+
+//-------------------------------------------------------------------------------------------------
+
 } // namespace nx::vms_server_plugins::analytics::hanwha

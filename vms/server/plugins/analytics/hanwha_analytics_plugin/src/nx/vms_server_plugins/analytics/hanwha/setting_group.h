@@ -746,6 +746,8 @@ private:
     std::string buildSoundType() const;
 };
 
+//-------------------------------------------------------------------------------------------------
+
 struct FaceMaskDetection: public SettingGroup
 {
     enum class DetectionMode
@@ -791,6 +793,67 @@ private:
     static void deserializeDetectionModeOrThrow(
         const char* serializedDetectionMode,
         DetectionMode* outDetectionMode);
+};
+
+//-------------------------------------------------------------------------------------------------
+
+struct TemperatureChangeDetection: public SettingGroup
+{
+    UnnamedRect unnamedRect;
+    std::string temperatureType = "Maximum";
+    std::string detectionType = "Above";
+    int thresholdTemperature = 90;
+    int duration = 5;
+    int areaEmissivity = 50;
+
+    static constexpr int kStartServerRoiIndexFrom = 1;
+    static constexpr int kStartDeviceRoiIndexFrom = 1;
+
+    enum class KeyIndex
+    {
+        unnamedRect,
+        temperatureType,
+        detectionType,
+        thresholdTemperature,
+        duration,
+        areaEmissivity
+    };
+    static constexpr const char* kKeys[] = {
+        "Temperature.Area#.Points",
+        "Temperature.Area#.TemperatureType",
+        "Temperature.Area#.DetectionType",
+        "Temperature.Area#.ThresholdTemperature",
+        "Temperature.Area#.Duration",
+        "Temperature.Area#.AreaEmissivity"
+    };
+    static constexpr const char* kJsonEventName = "BoxTemperatureDetection";
+    static constexpr const char* kSunapiEventName = "boxtemperaturedetection";
+
+    TemperatureChangeDetection(const SettingsCapabilities& settingsCapabilities,
+        const RoiResolution& roiResolution,
+        int roiIndex = -1):
+        SettingGroup(settingsCapabilities,
+            roiResolution,
+            kKeys,
+            roiIndex,
+            kStartServerRoiIndexFrom,
+            kStartDeviceRoiIndexFrom)
+    {
+    }
+
+    bool operator==(const TemperatureChangeDetection& rhs) const;
+    bool operator!=(const TemperatureChangeDetection& rhs) const { return !(*this == rhs); }
+    void assignExclusiveFrom(const TemperatureChangeDetection& other){};
+
+    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
+    void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
+
+    // The following functions perhaps should be moved to the inheritor-class.
+    // The idea is that the current class interacts with the server only,
+    // and the inheritor interacts with the device.
+    // The decision will be made during other plugins construction.
+    void readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo);
+    std::string buildDeviceWritingQuery(int channelNumber) const;
 };
 
 //-------------------------------------------------------------------------------------------------

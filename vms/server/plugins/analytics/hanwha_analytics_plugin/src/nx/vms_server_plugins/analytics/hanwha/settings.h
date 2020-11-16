@@ -18,6 +18,7 @@ enum AnalyticsCategory
     audioDetection,
     audioAnalytics, //< includes Scream, Gunshot, Explosion, GlassBreak
     faceMaskDetection,
+    temperatureChangeDetection,
     count //< number event of categories
 };
 
@@ -27,6 +28,7 @@ using AnalyticsCategories = std::array<bool, AnalyticsCategory::count>;
 struct Settings
 {
     static const int kMultiplicity = 4;
+    static const int kTemperatureMultiplicity = 3;
 #if 0
     // Hanwha analyticsMode detection selection is currently removed from the Clients interface
     // desired analytics mode if selected implicitly now
@@ -51,6 +53,7 @@ struct Settings
     AudioDetection audioDetection;
     SoundClassification soundClassification;
     FaceMaskDetection faceMaskDetection;
+    std::vector<TemperatureChangeDetection> temperatureChangeDetection; //[kTemperatureMultiplicity];
 
     AnalyticsCategories analyticsCategories = {false};
 
@@ -79,6 +82,9 @@ struct Settings
 
         for (int i = 0; i < kMultiplicity; ++i)
             ivaExcludeAreas.emplace_back(settingsCapabilities, roiResolution);
+
+        for (int i = 0; i < kTemperatureMultiplicity; ++i)
+            temperatureChangeDetection.emplace_back(settingsCapabilities, roiResolution);
     }
 };
 

@@ -26,6 +26,9 @@ std::string serialize(std::string value);
 void deserializeOrThrow(const char* source, ObjectSizeConstraints* destination);
 std::string serialize(const ObjectSizeConstraints& value);
 
+void deserializeOrThrow(const char* source, UnnamedRect* destination);
+std::string serialize(const UnnamedRect& value);
+
 void deserializeOrThrow(const char* source, UnnamedPolygon* destination);
 std::string serialize(const UnnamedPolygon& value);
 
