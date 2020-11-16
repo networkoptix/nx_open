@@ -101,8 +101,6 @@ public:
 
     virtual QString idForToStringFromPtr() const override; //< Used by toString(const T*).
 
-    void setLdapPasswordExperationPeriod(std::chrono::milliseconds value);
-
 signals:
     void permissionsChanged(const QnUserResourcePtr& user);
     void userRoleChanged(const QnUserResourcePtr& user);
@@ -145,7 +143,6 @@ private:
     QString m_fullName;
     std::shared_ptr<nx::network::aio::Timer> m_ldapPasswordTimer;
     std::atomic<bool> m_ldapPasswordValid{false};
-    std::chrono::milliseconds m_ldapPasswordExperationPeriod{0};
 };
 
 Q_DECLARE_METATYPE(QnUserResourcePtr)

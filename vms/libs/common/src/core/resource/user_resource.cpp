@@ -1,22 +1,18 @@
 #include "user_resource.h"
 
 #include <api/model/password_data.h>
+#include <api/global_settings.h>
 #include <common/common_module.h>
 #include <core/resource_management/resource_properties.h>
 #include <utils/common/synctime.h>
 #include <utils/crypt/symmetrical.h>
+#include <utils/common/ldap.h>
 
 #include <nx/network/app_info.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/log/log.h>
 #include <nx/network/aio/timer.h>
-
-namespace {
-
-std::chrono::minutes kDefaultLdapPasswordExperationPeriod(5);
-
-} // namespace
 
 const QnUuid QnUserResource::kAdminGuid("99cbc715-539b-4bfe-856f-799b45b69b1e");
 
@@ -29,8 +25,7 @@ static void connectOwnSlots(QnUserResource* self)
 
 QnUserResource::QnUserResource(QnUserType userType):
     m_userType(userType),
-    m_realm(nx::network::AppInfo::realm()),
-    m_ldapPasswordExperationPeriod(kDefaultLdapPasswordExperationPeriod)
+    m_realm(nx::network::AppInfo::realm())
 {
     addFlags(Qn::user | Qn::remote);
     setTypeId(nx::vms::api::UserData::kResourceTypeId);
@@ -50,8 +45,7 @@ QnUserResource::QnUserResource(const QnUserResource& right):
     m_isOwner(right.m_isOwner.load()),
     m_isEnabled(right.m_isEnabled.load()),
     m_email(right.m_email),
-    m_fullName(right.m_fullName),
-    m_ldapPasswordExperationPeriod(right.m_ldapPasswordExperationPeriod)
+    m_fullName(right.m_fullName)
 {
     connectOwnSlots(this);
 }
@@ -463,10 +457,13 @@ void QnUserResource::prolongatePassword()
     if (!m_ldapPasswordTimer)
         m_ldapPasswordTimer = std::make_shared<nx::network::aio::Timer>();
 
+
+    const std::chrono::milliseconds ldapPasswordExperationPeriod(
+        commonModule()->globalSettings()->ldapSettings().passwordExperationPeriodMs);
     m_ldapPasswordTimer->pleaseStopSync();
     m_ldapPasswordValid = true;
     m_ldapPasswordTimer->start(
-        m_ldapPasswordExperationPeriod,
+        ldapPasswordExperationPeriod,
         [this]()
         {
             m_ldapPasswordValid = false;
@@ -493,9 +490,4 @@ void QnUserResource::fillIdUnsafe()
 QString QnUserResource::idForToStringFromPtr() const
 {
     return getName();
-}
-
-void QnUserResource::setLdapPasswordExperationPeriod(std::chrono::milliseconds value)
-{
-    m_ldapPasswordExperationPeriod = value;
 }

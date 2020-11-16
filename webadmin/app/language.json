@@ -89,6 +89,7 @@
         "ldapSearchBase": "LDAP search base",
         "ldapSearchFilter": "LDAP search filter",
         "ldapUri": "LDAP URI",
+        "ldapPasswordExperationPeriod": "LDAP user password expiration period. Updated only after previous perioud is expired",
         "localSystemId": "Local System ID",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Max difference between synchronized and Internet time (milliseconds)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Max difference between synchronized and local time (milliseconds)",

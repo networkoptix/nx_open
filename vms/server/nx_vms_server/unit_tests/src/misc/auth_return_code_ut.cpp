@@ -111,6 +111,11 @@ public:
         ASSERT_EQ(ec2::ErrorCode::ok, userManager->saveSync(ldapUserWithFilledDigest));
 
         auto settings = server->commonModule()->globalSettings();
+
+        QnLdapSettings ldapSettings;
+        ldapSettings.passwordExperationPeriodMs = std::chrono::milliseconds(2);
+        settings->setLdapSettings(ldapSettings);
+
         settings->setCloudSystemId(QnUuid::createUuid().toString());
         settings->setCloudAuthKey(QnUuid::createUuid().toString());
         settings->synchronizeNowSync();
@@ -488,8 +493,6 @@ TEST_F(AuthenticationTest, ldapCachedPasswordHasExpired)
     auto ldapManagerPtr = ldapManager.get();
     server->authenticator()->setLdapManager(std::move(ldapManager));
     ldapManagerPtr->setPassword(kLdapUserPassword); //< Password for the LDAP Server.
-
-    getUser(ldapUserWithEmptyDigest)->setLdapPasswordExperationPeriod(std::chrono::milliseconds(1));
 
     testServerReturnCode(
         ldapUserWithEmptyDigest.name,

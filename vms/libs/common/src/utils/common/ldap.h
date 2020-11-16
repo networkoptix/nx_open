@@ -5,6 +5,8 @@
 #include <nx/fusion/model_functions_fwd.h>
 #include <utils/common/ldap_fwd.h>
 
+const std::chrono::milliseconds kDefaultLdapPasswordExperationPeriod = std::chrono::minutes(5);
+
 struct QnLdapSettings
 {
     QUrl uri;
@@ -12,6 +14,7 @@ struct QnLdapSettings
     QString adminPassword;
     QString searchBase;
     QString searchFilter;
+    std::chrono::milliseconds passwordExperationPeriodMs = kDefaultLdapPasswordExperationPeriod;
     int searchTimeoutS = 0;
 
     QString toString() const;

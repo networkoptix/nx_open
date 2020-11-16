@@ -83,6 +83,7 @@
             ldapSearchBase: {type: 'text'},
             ldapSearchFilter: {type: 'text'},
             ldapUri: {type: 'text'},
+            ldapPasswordExperationPeriod: {type: 'number'},
             autoDiscoveryEnabled: {type: 'checkbox', setupWizard: true},
             smtpConnectionType: {type: 'text'},
             smtpHost: {type: 'text'},

@@ -224,21 +224,15 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initLdapAdaptors()
 {
     m_ldapUriAdaptor = new QnLexicalResourcePropertyAdaptor<QUrl>(ldapUri, QUrl(), this);
     m_ldapAdminDnAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        ldapAdminDn,
-        QString(),
-        this);
+        ldapAdminDn, QString(), this);
     m_ldapAdminPasswordAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        ldapAdminPassword,
-        QString(),
-        this);
+        ldapAdminPassword, QString(), this);
     m_ldapSearchBaseAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        ldapSearchBase,
-        QString(),
-        this);
+        ldapSearchBase, QString(), this);
     m_ldapSearchFilterAdaptor = new QnLexicalResourcePropertyAdaptor<QString>(
-        ldapSearchFilter,
-        QString(),
-        this);
+        ldapSearchFilter, QString(), this);
+    m_ldapPasswordExperationPeriodAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
+        ldapPasswordExperationPeriod, kDefaultLdapPasswordExperationPeriod.count(), this);
     m_ldapSearchTimeoutSAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         ldapSearchTimeoutS, ldapSearchTimeoutSDefault, this);
 
@@ -249,6 +243,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initLdapAdaptors()
         << m_ldapAdminPasswordAdaptor
         << m_ldapSearchBaseAdaptor
         << m_ldapSearchFilterAdaptor
+        << m_ldapPasswordExperationPeriodAdaptor
         << m_ldapSearchTimeoutSAdaptor;
     for (auto adaptor: result)
     {
@@ -1201,6 +1196,8 @@ QnLdapSettings QnGlobalSettings::ldapSettings() const
     result.adminPassword = nx::utils::decodeStringFromHexStringAES128CBC(m_ldapAdminPasswordAdaptor->value());
     result.searchBase = m_ldapSearchBaseAdaptor->value();
     result.searchFilter = m_ldapSearchFilterAdaptor->value();
+    result.passwordExperationPeriodMs =
+            std::chrono::milliseconds(m_ldapPasswordExperationPeriodAdaptor->value());
     result.searchTimeoutS = m_ldapSearchTimeoutSAdaptor->value();
     return result;
 }
@@ -1215,6 +1212,7 @@ void QnGlobalSettings::setLdapSettings(const QnLdapSettings& settings)
         : QString());
     m_ldapSearchBaseAdaptor->setValue(settings.searchBase);
     m_ldapSearchFilterAdaptor->setValue(settings.searchFilter);
+    m_ldapPasswordExperationPeriodAdaptor->setValue(settings.passwordExperationPeriodMs.count());
     m_ldapSearchTimeoutSAdaptor->setValue(settings.searchTimeoutS);
 }
 

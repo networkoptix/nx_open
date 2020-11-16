@@ -95,6 +95,7 @@ const QString ldapAdminDn(lit("ldapAdminDn"));
 const QString ldapAdminPassword(lit("ldapAdminPassword"));
 const QString ldapSearchBase(lit("ldapSearchBase"));
 const QString ldapSearchFilter(lit("ldapSearchFilter"));
+const QString ldapPasswordExperationPeriod(lit("ldapPasswordExperationPeriod"));
 const QString ldapSearchTimeoutS(lit("ldapSearchTimeoutS"));
 const int ldapSearchTimeoutSDefault(30);
 
@@ -534,6 +535,7 @@ private:
     QnResourcePropertyAdaptor<QString>* m_ldapAdminPasswordAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_ldapSearchBaseAdaptor = nullptr;
     QnResourcePropertyAdaptor<QString>* m_ldapSearchFilterAdaptor = nullptr;
+    QnResourcePropertyAdaptor<int>* m_ldapPasswordExperationPeriodAdaptor = nullptr;
     QnResourcePropertyAdaptor<int>* m_ldapSearchTimeoutSAdaptor = nullptr;
 
     QnResourcePropertyAdaptor<int>* m_ec2ConnectionKeepAliveTimeoutAdaptor = nullptr;
