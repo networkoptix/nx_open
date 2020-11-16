@@ -250,19 +250,20 @@ bool HanwhaCodecInfo::parseResponse(const HanwhaResponse& response)
 
         const auto split = parameterName.split(L'.');
 
-        if (split.size() != 6)
+        if (split.size() < 6)
             continue;
 
         if (split[0] != kHanwhaChannelProperty)
             continue;
 
+        const int lastIndex = split.size() - 1;
         auto& limits = m_channelInfo
             [split[1] /*Channel*/]
             [split[2] /*Codec*/]
             [split[3] /*StreamType*/]
-            [split[4].toLower() /*Resolution*/];
+            [split[lastIndex-1].toLower() /*Resolution*/];
 
-        limits.setLimit(split[5], parameterValue);
+        limits.setLimit(split[lastIndex], parameterValue);
     }
 
     return true;
