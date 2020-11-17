@@ -1,4 +1,4 @@
-<div class="api_changelog" >
+<div class="api_changelog">
 
 <!-- Uncomment the following line to enable live-reload during editing this document. -->
 <!--
@@ -39,8 +39,7 @@ and params can be <strong>renamed</strong>, though often <strong>deprecated name
 supported for a while, when noted below.
 </p>
 <!--============================================================================================-->
-
-<hr/><h2>VMS <b>4.1_hotfix</b> relative to <i>4.1</i></h2>
+<hr/><h2>VMS <b>4.1_patch</b> relative to <i>4.1</i></h2>
 <!--............................................................................................-->
 <h3>Breaking compatibility</h3>
 <p>
@@ -54,6 +53,7 @@ The <strong><code><i>cameraAdvancedParams</i></code></strong> value is removed f
 The new function <strong><code><b>GET /api/getCameraParamManifest</b></code></strong> is added to
 get this information.
 </p>
+<!--............................................................................................-->
 <h3>Retaining compatibility until expired</h3>
 <p>
 Parameter <strong><code><i>startTime</i></code></strong> is deprecated in favor of
@@ -79,7 +79,29 @@ Parameter <strong><code><i>duration</i></code></strong> is deprecated in favor o
     /ec2/bookmarks/update
 </pre>
 </p>
-
+<!--............................................................................................-->
+<h3>Errata fixed in the API documentation (not changing API behavior)</h3>
+<p>
+In function <strong><code>GET /ec2/getCamerasEx</code></strong>, removed mentioning of
+non-existing result parameters <code><i>cameraId</i></code> and
+<code><i>cameraName</i></code>.
+</p>
+<p>
+In function <strong><code>GET /api/getEcents</code></strong>, fixed enumaration values for
+the result parameters:
+<pre>
+    reply[].actionType
+    reply[].eventParams.eventType
+    reply[].eventParams.reasonCode
+</pre>
+</p>
+<!-- Proprietary part commented out.
+<p>
+<em>[proprietary]</em> In function <strong><code>POST /api/executeEventAction</code></strong>,
+fixed enumaration values for <code>actionType</code> parameter.
+</p>
+-->
+<!--============================================================================================-->
 <hr/><h2>VMS <b>4.1</b> relative to <i>4.0</i></h2>
 <!--............................................................................................-->
 <h3>Breaking compatibility</h3>
@@ -182,7 +204,6 @@ but also additional parameter values affected by the set operation in the functi
     /api/setCameraParam
 </pre>
 </p>
-
 <p>
 Params <strong><code>scheduleTask.<i>beforeThreshold</i></code></strong> and <strong><code>
 scheduleTask.<i>afterThreshold</i></code></strong> were removed in favor of the new
@@ -195,7 +216,6 @@ scheduleTask.<i>afterThreshold</i></code></strong> were removed in favor of the 
     /ec2/getCamerasEx
 </pre>
 </p>
-
 <p>
 Added optional param <strong><code><b>currentPassword</b></code></strong>, which is required if new
 <strong><code>password</code></strong> is provided in functions:
@@ -204,12 +224,10 @@ Added optional param <strong><code><b>currentPassword</b></code></strong>, which
     /api/detachFromCloud
 </pre>
 </p>
-
 <p>
 Added required param <strong><code><b>currentPassword</b></code></strong> in function
 <strong><code>/api/restoreState</code></strong>.
 </p>
-
 <p>
 Expanded <strong><code>dewarpingParams</code></strong> and <strong><code>contrastParams</code>
 </strong> fields in the layout items description in functions:
@@ -219,7 +237,6 @@ Expanded <strong><code>dewarpingParams</code></strong> and <strong><code>contras
     /ec2/saveLayouts
 </pre>
 </p>
-
 <p>
 Parameters <strong><code>layout.<i>horizontalSpacing</i></code></strong> and <strong><code>
 layout.<i>verticalSpacing</i></code></strong> were removed in favor of the new
@@ -230,10 +247,8 @@ layout.<i>verticalSpacing</i></code></strong> were removed in favor of the new
     /ec2/saveLayouts
 </pre>
 </p>
-
 <!--............................................................................................-->
 <h3>Retaining compatibility until expired</h3>
-
 <p>
 Function <strong><code>/api/get<i>t</i>ime</code></strong> deprecated in favor of the new
 function <strong><code>/api/get<b>T</b>ime</code></strong> (deprecated function support expires
@@ -260,7 +275,6 @@ Made <strong><i>GET</i></strong> method deprecated in favor of the newly impleme
 <strong><b>POST</b></strong> in function <strong><code>/api/restart</code></strong>
 (deprecated function support expires after 4.0).
 </p>
-
 <!--............................................................................................-->
 <h3>Retaining compatibility</h3>
 <p>
