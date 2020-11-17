@@ -113,6 +113,7 @@ LocalConnectionFactory::LocalConnectionFactory(
 void LocalConnectionFactory::shutdown()
 {
     m_serverQueryProcessor->stop();
+    m_serverConnector->stop();
 
     pleaseStop();
     join();

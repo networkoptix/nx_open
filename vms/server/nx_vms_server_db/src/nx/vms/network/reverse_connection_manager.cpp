@@ -36,14 +36,16 @@ void ReverseConnectionManager::startReceivingNotifications(ec2::AbstractECConnec
         this, &ReverseConnectionManager::onReverseConnectionRequest);
 }
 
-ReverseConnectionManager::~ReverseConnectionManager()
+void ReverseConnectionManager::stop()
 {
+    NX_DEBUG(this, "Stopping...");
     this->disconnect();
 
     decltype (m_outgoingClients) outgoingClients;
     decltype (m_incomingConnections) incomingConnections;
     {
         QnMutexLocker lock(&m_mutex);
+        m_isStopped = true;
         std::swap(outgoingClients, m_outgoingClients);
         std::swap(incomingConnections, m_incomingConnections);
     }
@@ -61,12 +63,27 @@ ReverseConnectionManager::~ReverseConnectionManager()
         for (auto& promise: peer.promises)
             promise.second.set_value(nullptr);
     }
+
+    NX_DEBUG(this, "Stopped");
+}
+
+ReverseConnectionManager::~ReverseConnectionManager()
+{
+    {
+        QnMutexLocker lock(&m_mutex);
+        if (m_isStopped)
+            return;
+    }
+
+    stop();
 }
 
 void ReverseConnectionManager::onReverseConnectionRequest(
     const nx::vms::api::ReverseConnectionData& data)
 {
     QnMutexLocker lock(&m_mutex);
+    if (m_isStopped)
+        return;
 
     NX_DEBUG(this, lm("Got incoming request. %1 connection(s) to the target server %2 is(are) requested.")
         .arg(data.socketCount).arg(data.targetServer.toString()));
@@ -120,6 +137,9 @@ void ReverseConnectionManager::onReverseConnectionRequest(
 void ReverseConnectionManager::onOutgoingConnectDone(nx::network::http::AsyncClient* httpClient)
 {
     QnMutexLocker lock(&m_mutex);
+    if (m_isStopped)
+        return;
+
     for (auto itr = m_outgoingClients.begin(); itr != m_outgoingClients.end(); ++itr)
     {
         if (httpClient == itr->get())
@@ -154,6 +174,9 @@ void ReverseConnectionManager::onOutgoingConnectDone(nx::network::http::AsyncCli
 bool ReverseConnectionManager::saveIncomingConnection(const QnUuid& peerId, Connection connection)
 {
     QnMutexLocker lock(&m_mutex);
+    if (m_isStopped)
+        return false;
+
     const auto peer = m_incomingConnections.find(peerId);
     if (peer == m_incomingConnections.end() || peer->second.requested == 0)
     {
@@ -240,6 +263,9 @@ cf::future<ReverseConnectionManager::Connection> ReverseConnectionManager::rever
     const QnUuid& peerId, std::chrono::milliseconds timeout)
 {
     QnMutexLocker lock(&m_mutex);
+    if (m_isStopped)
+        return cf::make_ready_future<ReverseConnectionManager::Connection>(nullptr);
+
     auto& peer = m_incomingConnections[peerId];
     if (!peer.connections.empty())
     {
@@ -277,6 +303,9 @@ void ReverseConnectionManager::restartPromiseTimer(
                 {
                     const auto now = std::chrono::steady_clock::now();
                     QnMutexLocker lock(&m_mutex);
+                    if (m_isStopped)
+                        return;
+
                     while (!peer->promises.empty() && peer->promises.begin()->first <= now)
                     {
                         NX_VERBOSE(this, "Notify expired promise for %1", peerId);

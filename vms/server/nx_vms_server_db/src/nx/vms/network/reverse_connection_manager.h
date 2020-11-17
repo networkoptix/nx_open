@@ -25,6 +25,7 @@ class ReverseConnectionManager:
 public:
     ReverseConnectionManager(QnHttpConnectionListener* tcpListener);
     virtual ~ReverseConnectionManager() override;
+    void stop();
 
     void startReceivingNotifications(ec2::AbstractECConnection* connection);
     bool saveIncomingConnection(const QnUuid& peerId, Connection connection);
@@ -55,6 +56,7 @@ private:
 private:
     QnHttpConnectionListener* const m_tcpListener = nullptr;
     mutable QnMutex m_mutex;
+    bool m_isStopped = false;
     std::set<std::unique_ptr<nx::network::http::AsyncClient>> m_outgoingClients;
     std::map<QnUuid, IncomingConnections> m_incomingConnections;
 };
