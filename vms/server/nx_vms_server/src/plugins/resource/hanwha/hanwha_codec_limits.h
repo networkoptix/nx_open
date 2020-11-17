@@ -40,19 +40,19 @@ public:
         const HanwhaResponse& response,
         const HanwhaCgiParameters& cgiParameters);
 
-    boost::optional<HanwhaCodecLimits> limits(
+    std::optional<HanwhaCodecLimits> limits(
         int channel,
         AVCodecID codec,
         const QString& streamType,
         const QSize& resolution) const;
 
-    boost::optional<HanwhaCodecLimits> limits(
+    std::optional<HanwhaCodecLimits> limits(
         int channel,
         const QString& codec,
         const QString& streamType,
         const QString& resolution) const;
 
-    boost::optional<HanwhaCodecLimits> limits(
+    std::optional<HanwhaCodecLimits> limits(
         int channel,
         const QString& path) const;
 

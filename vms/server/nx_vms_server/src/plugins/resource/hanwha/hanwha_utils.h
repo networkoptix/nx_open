@@ -3,10 +3,9 @@
 #include <plugins/resource/hanwha/hanwha_common.h>
 
 #include <set>
+#include <optional>
 
 #include <QtCore/QSize>
-
-#include <boost/optional/optional.hpp>
 
 #include <nx/core/resource/device_type.h>
 
@@ -76,35 +75,35 @@ QStringList fromHanwhaInternalRange(const QStringList& internalRange);
 
 QString channelParameter(int channelNumber, const QString& parameterName);
 
-boost::optional<bool> toBool(const boost::optional<QString>& str);
+std::optional<bool> toBool(const std::optional<QString>& str);
 
-boost::optional<int> toInt(const boost::optional<QString>& str);
+std::optional<int> toInt(const std::optional<QString>& str);
 
-boost::optional<double> toDouble(const boost::optional<QString>& str);
+std::optional<double> toDouble(const std::optional<QString>& str);
 
-boost::optional<AVCodecID> toCodecId(const boost::optional<QString>& str);
+std::optional<AVCodecID> toCodecId(const std::optional<QString>& str);
 
-boost::optional<QSize> toQSize(const boost::optional<QString>& str);
+std::optional<QSize> toQSize(const std::optional<QString>& str);
 
 HanwhaChannelProfiles parseProfiles(
     const HanwhaResponse& response,
-    const boost::optional<int>& forcedChannel = boost::none);
+    const std::optional<int>& forcedChannel = std::nullopt);
 
 QString profileSuffixByRole(Qn::ConnectionRole role);
 
 QString profileFullProductName(const QString& applicationName);
 
-boost::optional<HanwhaVideoProfile> findProfile(
+std::optional<HanwhaVideoProfile> findProfile(
     const HanwhaProfileMap& profiles,
     Qn::ConnectionRole role,
     const QString& applicationName);
 
 std::set<int> findProfilesToRemove(
     const HanwhaProfileMap& profiles,
-    boost::optional<HanwhaVideoProfile> primaryProfile,
-    boost::optional<HanwhaVideoProfile> secondaryProfile);
+    std::optional<HanwhaVideoProfile> primaryProfile,
+    std::optional<HanwhaVideoProfile> secondaryProfile);
 
-boost::optional<int> extractPropertyChannel(const QString& fullPropertyName);
+std::optional<int> extractPropertyChannel(const QString& fullPropertyName);
 
 nx::core::resource::DeviceType fromHanwhaToNxDeviceType(HanwhaDeviceType hanwhaDeviceType);
 

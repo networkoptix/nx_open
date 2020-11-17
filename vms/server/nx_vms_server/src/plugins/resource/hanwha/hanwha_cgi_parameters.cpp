@@ -26,7 +26,7 @@ HanwhaCgiParameters::HanwhaCgiParameters(
         reader.error() == QXmlStreamReader::PrematureEndOfDocumentError;
 }
 
-boost::optional<HanwhaCgiParameter> HanwhaCgiParameters::parameter(
+std::optional<HanwhaCgiParameter> HanwhaCgiParameters::parameter(
     const QString& cgi,
     const QString& submenu,
     const QString& action,
@@ -34,30 +34,30 @@ boost::optional<HanwhaCgiParameter> HanwhaCgiParameters::parameter(
 {
     auto cgiItr = m_parameters.find(cgi);
     if (cgiItr == m_parameters.cend())
-        return boost::none;
+        return std::nullopt;
 
     auto submenuItr = cgiItr->second.find(submenu);
     if (submenuItr == cgiItr->second.cend())
-        return boost::none;
+        return std::nullopt;
 
     auto actionItr = submenuItr->second.find(action);
     if (actionItr == submenuItr->second.cend())
-        return boost::none;
+        return std::nullopt;
 
     auto parameterItr = actionItr->second.find(parameter);
     if (parameterItr == actionItr->second.cend())
-        return boost::none;
+        return std::nullopt;
 
     return parameterItr->second;
 }
 
-boost::optional<HanwhaCgiParameter> HanwhaCgiParameters::parameter(const QString& path) const
+std::optional<HanwhaCgiParameter> HanwhaCgiParameters::parameter(const QString& path) const
 {
     auto split = path.split("/");
     if (split.size() != 4)
     {
         NX_ASSERT(false);
-        return boost::none;
+        return std::nullopt;
     }
 
     return parameter(split[0], split[1], split[2], split[3]);

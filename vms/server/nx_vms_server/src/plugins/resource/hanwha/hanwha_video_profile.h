@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QtCore/QSize>
+#include <optional>
 
-#include <boost/optional/optional.hpp>
+#include <QtCore/QSize>
 
 #include <common/common_globals.h>
 
@@ -36,19 +36,19 @@ struct HanwhaVideoProfile
     int rtpMulticastPort = 0;
     int rtpMulticastTtl = 0;
 
-    boost::optional<Qn::BitrateControl> bitrateControl;
-    boost::optional<Qn::EncodingPriority> encodiingPriority;
+    std::optional<Qn::BitrateControl> bitrateControl;
+    std::optional<Qn::EncodingPriority> encodiingPriority;
 
-    boost::optional<int> govLength;
-    boost::optional<int> maxGovLength;
-    boost::optional<int> minGovLength;
+    std::optional<int> govLength;
+    std::optional<int> maxGovLength;
+    std::optional<int> minGovLength;
 
-    boost::optional<bool> dynamicGovEnabled;
-    boost::optional<int> dynamicGovLength;
-    boost::optional<int> maxDynamicGovLength;
+    std::optional<bool> dynamicGovEnabled;
+    std::optional<int> dynamicGovLength;
+    std::optional<int> maxDynamicGovLength;
 
-    boost::optional<QString> codecProfile;
-    boost::optional<Qn::EntropyCoding> entropyCoding;
+    std::optional<QString> codecProfile;
+    std::optional<Qn::EntropyCoding> entropyCoding;
 
     bool audioEnabled = false;
     bool fixed = false;

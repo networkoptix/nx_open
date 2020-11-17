@@ -37,22 +37,22 @@ nx::network::http::StatusCode::Value HanwhaAttributes::statusCode() const
     return m_statusCode;
 }
 
-boost::optional<QString> HanwhaAttributes::findAttribute(
+std::optional<QString> HanwhaAttributes::findAttribute(
     const QString& group,
     const QString& attributeName,
     int channel) const
 {
     auto channelMap = m_attributes.find(channel);
     if (channelMap == m_attributes.cend())
-        return boost::none;
+        return std::nullopt;
 
     auto groupMap = channelMap->second.find(group);
     if (groupMap == channelMap->second.cend())
-        return boost::none;
+        return std::nullopt;
 
     auto attribute = groupMap->second.find(attributeName);
     if (attribute == groupMap->second.cend())
-        return boost::none;
+        return std::nullopt;
 
     return attribute->second;
 }
@@ -81,7 +81,7 @@ void HanwhaAttributes::parseAttribute(QXmlStreamReader& reader, const QString& g
 }
 
 template<>
-boost::optional<bool> HanwhaAttributes::attribute<bool>(
+std::optional<bool> HanwhaAttributes::attribute<bool>(
     const QString& group,
     const QString& attributeName,
     int channel) const
@@ -90,7 +90,7 @@ boost::optional<bool> HanwhaAttributes::attribute<bool>(
 }
 
 template<>
-boost::optional<QString> HanwhaAttributes::attribute<QString>(
+std::optional<QString> HanwhaAttributes::attribute<QString>(
     const QString& group,
     const QString& attributeName,
     int channel) const
@@ -99,7 +99,7 @@ boost::optional<QString> HanwhaAttributes::attribute<QString>(
 }
 
 template<>
-boost::optional<int> HanwhaAttributes::attribute<int>(
+std::optional<int> HanwhaAttributes::attribute<int>(
     const QString& group,
     const QString& attributeName,
     int channel) const
@@ -108,7 +108,7 @@ boost::optional<int> HanwhaAttributes::attribute<int>(
 }
 
 template<>
-boost::optional<double> HanwhaAttributes::attribute<double>(
+std::optional<double> HanwhaAttributes::attribute<double>(
     const QString& group,
     const QString& attributeName,
     int channel) const

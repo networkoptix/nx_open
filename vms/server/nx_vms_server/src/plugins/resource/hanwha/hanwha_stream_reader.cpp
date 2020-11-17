@@ -262,7 +262,7 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(QString* outUrl)
         if (m_hanwhaResource->isNvr())
         {
             m_overlappedId = m_hanwhaResource->sharedContext()->overlappedId();
-            if (m_overlappedId == boost::none)
+            if (m_overlappedId == std::nullopt)
             {
                 return CameraDiagnostics::CameraInvalidParams(
                     lit("Unknown current overlapped ID."));
@@ -302,8 +302,8 @@ CameraDiagnostics::Result HanwhaStreamReader::streamUri(QString* outUrl)
 
     if (!m_hanwhaResource->isNvr() && role == Qn::ConnectionRole::CR_Archive)
     {
-        NX_ASSERT(m_overlappedId != boost::none);
-        if (m_overlappedId == boost::none)
+        NX_ASSERT(m_overlappedId != std::nullopt);
+        if (m_overlappedId == std::nullopt)
         {
             return CameraDiagnostics::CameraInvalidParams(
                 lit("No overlapped id is set for archive export."));
@@ -401,7 +401,6 @@ QnAbstractMediaDataPtr HanwhaStreamReader::createEmptyPacket()
     NX_ASSERT(m_hanwhaResource->isNvr());
     if (!m_hanwhaResource->isNvr())
         return QnAbstractMediaDataPtr();
-
 
     const auto context = m_hanwhaResource->sharedContext();
     const int speed = m_rtpReader.rtspClient().getScale();

@@ -169,7 +169,7 @@ public:
     nx::core::resource::OverlappedTimePeriods overlappedTimelineSync(int channelNumber) const;
     qint64 timelineStartUs(int channelNumber) const;
     qint64 timelineEndUs(int channelNumber) const;
-    boost::optional<int> overlappedId() const;
+    std::optional<int> overlappedId() const;
     std::chrono::milliseconds timeShift() const;
     void setTimeShift(std::chrono::milliseconds);
 

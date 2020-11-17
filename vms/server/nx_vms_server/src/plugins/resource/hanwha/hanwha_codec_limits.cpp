@@ -68,7 +68,7 @@ HanwhaCodecInfo::HanwhaCodecInfo(
         m_isValid &= fetchCodecProfiles(cgiParameters);
 }
 
-boost::optional<HanwhaCodecLimits> HanwhaCodecInfo::limits(
+std::optional<HanwhaCodecLimits> HanwhaCodecInfo::limits(
     int channel,
     AVCodecID codec,
     const QString& streamType,
@@ -80,7 +80,7 @@ boost::optional<HanwhaCodecLimits> HanwhaCodecInfo::limits(
     return limits(channel, codecString, streamType, resolutionString);
 }
 
-boost::optional<HanwhaCodecLimits> HanwhaCodecInfo::limits(
+std::optional<HanwhaCodecLimits> HanwhaCodecInfo::limits(
     int channel,
     const QString& codec,
     const QString& streamType,
@@ -92,19 +92,19 @@ boost::optional<HanwhaCodecLimits> HanwhaCodecInfo::limits(
     if (channelInfo == m_channelInfo.cend())
     {
         NX_WARNING(this, lm("Channel information for channel %1 not found in cache").args(channel));
-        return boost::none;
+        return std::nullopt;
     }
 
     auto codecInfo = channelInfo->second.find(codec);
     if (codecInfo == channelInfo->second.cend())
     {
         NX_WARNING(this, lm("Codec information for codec %1 not found in cache").args(codec));
-        return boost::none;
+        return std::nullopt;
     }
 
     auto streamTypeInfo = codecInfo->second.find(streamType);
     if (streamTypeInfo == codecInfo->second.cend())
-        return boost::none;
+        return std::nullopt;
 
     auto resolutionInfo = streamTypeInfo->second.find(resolution);
     if (resolutionInfo == streamTypeInfo->second.cend())
@@ -112,17 +112,17 @@ boost::optional<HanwhaCodecLimits> HanwhaCodecInfo::limits(
         NX_WARNING(
             this,
             lm("Resolution information for resolution %1 not found in cache").args(resolution));
-        return boost::none;
+        return std::nullopt;
     }
 
     return resolutionInfo->second;
 }
 
-boost::optional<HanwhaCodecLimits> HanwhaCodecInfo::limits(int channel, const QString& path) const
+std::optional<HanwhaCodecLimits> HanwhaCodecInfo::limits(int channel, const QString& path) const
 {
     auto split = path.split(L'/');
     if (split.size() != 3)
-        return boost::none;
+        return std::nullopt;
 
     return limits(channel, split[0], split[1], split[2]);
 }
@@ -290,7 +290,7 @@ bool HanwhaCodecInfo::fetchCodecProfiles(const HanwhaCgiParameters& cgiParameter
         const auto profiles = cgiParameters.parameter(
             lit("media/videoprofile/add_update/%1").arg(profileParameter));
 
-        if (profiles != boost::none)
+        if (profiles != std::nullopt)
             m_codecProfiles[codecId] = profiles->possibleValues();
     }
 

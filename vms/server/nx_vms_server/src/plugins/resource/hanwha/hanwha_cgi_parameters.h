@@ -1,8 +1,7 @@
 #pragma once
 
 #include <set>
-
-#include <boost/optional/optional.hpp>
+#include <optional>
 
 #include <QtCore/QXmlStreamReader>
 
@@ -24,13 +23,13 @@ public:
         const nx::Buffer& rawBuffer,
         nx::network::http::StatusCode::Value statusCode);
 
-    boost::optional<HanwhaCgiParameter> parameter(
+    std::optional<HanwhaCgiParameter> parameter(
         const QString& cgi,
         const QString& submenu,
         const QString& action,
         const QString& parameter) const;
 
-    boost::optional<HanwhaCgiParameter> parameter(const QString& path) const;
+    std::optional<HanwhaCgiParameter> parameter(const QString& path) const;
 
     bool isValid() const;
 

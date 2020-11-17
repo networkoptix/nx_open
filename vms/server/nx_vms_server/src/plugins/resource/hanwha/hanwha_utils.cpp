@@ -20,10 +20,10 @@ QString channelParameter(int channelNumber, const QString& parameterName)
         .arg(parameterName);
 }
 
-boost::optional<bool> toBool(const boost::optional<QString>& str)
+std::optional<bool> toBool(const std::optional<QString>& str)
 {
-    if (!str.is_initialized())
-        return boost::none;
+    if (!str.has_value())
+        return std::nullopt;
 
     auto lowerCase = str->toLower();
     if (lowerCase == kHanwhaTrue.toLower())
@@ -31,56 +31,56 @@ boost::optional<bool> toBool(const boost::optional<QString>& str)
     else if (lowerCase == kHanwhaFalse.toLower())
         return false;
 
-    return boost::none;
+    return std::nullopt;
 }
 
-boost::optional<int> toInt(const boost::optional<QString>& str)
+std::optional<int> toInt(const std::optional<QString>& str)
 {
-    if (!str.is_initialized())
-        return boost::none;
+    if (!str.has_value())
+        return std::nullopt;
 
     bool success = false;
     int numericValue = str->toInt(&success);
 
     if (!success)
-        return boost::none;
+        return std::nullopt;
 
     return numericValue;
 }
 
-boost::optional<double> toDouble(const boost::optional<QString>& str)
+std::optional<double> toDouble(const std::optional<QString>& str)
 {
-    if (!str.is_initialized())
-        return boost::none;
+    if (!str.has_value())
+        return std::nullopt;
 
     bool success = false;
     int numericValue = str->toDouble(&success);
 
     if (!success)
-        return boost::none;
+        return std::nullopt;
 
     return numericValue;
 }
 
-boost::optional<AVCodecID> toCodecId(const boost::optional<QString>& str)
+std::optional<AVCodecID> toCodecId(const std::optional<QString>& str)
 {
-    if (!str.is_initialized())
-        return boost::none;
+    if (!str.has_value())
+        return std::nullopt;
 
     return fromHanwhaString<AVCodecID>(*str);
 }
 
-boost::optional<QSize> toQSize(const boost::optional<QString>& str)
+std::optional<QSize> toQSize(const std::optional<QString>& str)
 {
-    if (!str.is_initialized())
-        return boost::none;
+    if (!str.has_value())
+        return std::nullopt;
 
     return fromHanwhaString<QSize>(*str);
 }
 
 HanwhaChannelProfiles parseProfiles(
     const HanwhaResponse& response,
-    const boost::optional<int>& forcedChannel)
+    const std::optional<int>& forcedChannel)
 {
     NX_ASSERT(response.isSuccessful());
     if (!response.isSuccessful())
@@ -100,7 +100,7 @@ HanwhaChannelProfiles parseProfiles(
 
         bool success = false;
         auto profileChannel = kHanwhaInvalidChannel;
-        if (forcedChannel != boost::none)
+        if (forcedChannel != std::nullopt)
         {
             profileChannel = *forcedChannel;
         }
@@ -143,14 +143,14 @@ QString profileFullProductName(const QString& applicationName)
         .remove(QRegExp("[^a-zA-Z]"));
 }
 
-boost::optional<HanwhaVideoProfile> findProfile(
+std::optional<HanwhaVideoProfile> findProfile(
     const HanwhaProfileMap& profiles,
     Qn::ConnectionRole role,
     const QString& applicationName)
 {
     const auto suffix = profileSuffixByRole(role);
     const auto productName = profileFullProductName(applicationName);
-    boost::optional<HanwhaVideoProfile> result;
+    std::optional<HanwhaVideoProfile> result;
 
     QString bestPrefix;
     for (const auto& entry : profiles)
@@ -172,14 +172,14 @@ boost::optional<HanwhaVideoProfile> findProfile(
 
 std::set<int> findProfilesToRemove(
     const HanwhaProfileMap& profiles,
-    boost::optional<HanwhaVideoProfile> primaryProfile,
-    boost::optional<HanwhaVideoProfile> secondaryProfile)
+    std::optional<HanwhaVideoProfile> primaryProfile,
+    std::optional<HanwhaVideoProfile> secondaryProfile)
 {
     std::set<int> result;
     auto isTheSameProfile =
-        [](const boost::optional<HanwhaVideoProfile> profile, int profileNumber)
+        [](const std::optional<HanwhaVideoProfile> profile, int profileNumber)
     {
-        return profile != boost::none && profileNumber == profile->number;
+        return profile != std::nullopt && profileNumber == profile->number;
     };
 
     for (const auto& entry : profiles)
@@ -200,16 +200,16 @@ std::set<int> findProfilesToRemove(
     return result;
 };
 
-boost::optional<int> extractPropertyChannel(const QString& fullPropertyName)
+std::optional<int> extractPropertyChannel(const QString& fullPropertyName)
 {
     const auto split = fullPropertyName.split(L'.', QString::SplitBehavior::SkipEmptyParts);
     if (split.size() < 2 || split[0].trimmed() != kHanwhaChannelProperty)
-        return boost::none;
+        return std::nullopt;
 
     bool success = false;
     const auto propertyChannel = split[1].toInt(&success);
     if (!success)
-        return boost::none;
+        return std::nullopt;
 
     return propertyChannel;
 }
@@ -384,7 +384,6 @@ QString toHanwhaString(const QSize& value)
         .arg(value.width())
         .arg(value.height());
 }
-
 
 QString toHanwhaString(Qn::BitrateControl bitrateControl)
 {

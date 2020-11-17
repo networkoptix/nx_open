@@ -181,16 +181,16 @@ SettingsCapabilities DeviceAgentBuilder::fetchSettingsCapabilities() const
 
     // Line
     result.ivaLineRuleName = cgi.parameter("eventsources", "videoanalysis2", "set",
-        "Line.#.RuleName").is_initialized();
+        "Line.#.RuleName").has_value();
 
     result.ivaLineObjectTypeFilter = cgi.parameter("eventsources", "videoanalysis2", "set",
-        "Line.#.ObjectTypeFilter").is_initialized();
+        "Line.#.ObjectTypeFilter").has_value();
 
     // Area
     result.ivaAreaRuleName = cgi.parameter("eventsources", "videoanalysis2", "set",
-        "DefinedArea.#.ObjectTypeFilter").is_initialized();
+        "DefinedArea.#.ObjectTypeFilter").has_value();
     result.ivaAreaObjectTypeFilter = cgi.parameter("eventsources", "videoanalysis2", "set",
-        "DefinedArea.#.ObjectTypeFilter").is_initialized();
+        "DefinedArea.#.ObjectTypeFilter").has_value();
 
     auto mode = cgi.parameter("eventsources", "videoanalysis2", "set",
         "DefinedArea.#.Mode");
@@ -212,32 +212,32 @@ SettingsCapabilities DeviceAgentBuilder::fetchSettingsCapabilities() const
     }
 
     result.ivaAreaIntrusionDuration = cgi.parameter("eventsources", "videoanalysis2", "set",
-        "DefinedArea.#.IntrusionDuration").is_initialized();
+        "DefinedArea.#.IntrusionDuration").has_value();
 
     result.ivaAreaAppearDuration = cgi.parameter("eventsources", "videoanalysis2", "set",
-        "DefinedArea.#.AppearanceDuration").is_initialized();
+        "DefinedArea.#.AppearanceDuration").has_value();
 
     result.ivaAreaLoiteringDuration = cgi.parameter("eventsources", "videoanalysis2", "set",
-        "DefinedArea.#.LoiteringDuration").is_initialized();
+        "DefinedArea.#.LoiteringDuration").has_value();
 
     // Temperature
     result.temperatureDetection.coordinate = cgi.parameter("eventsources",
-        "boxtemperaturedetection", "set", "ROI.#.Coordinate").is_initialized();
+        "boxtemperaturedetection", "set", "ROI.#.Coordinate").has_value();
 
     result.temperatureDetection.temperatureType = cgi.parameter("eventsources",
-        "boxtemperaturedetection", "set", "ROI.#.TemperatureType").is_initialized();
+        "boxtemperaturedetection", "set", "ROI.#.TemperatureType").has_value();
 
     result.temperatureDetection.detectionType = cgi.parameter("eventsources",
-        "boxtemperaturedetection", "set", "ROI.#.DetectionType").is_initialized();
+        "boxtemperaturedetection", "set", "ROI.#.DetectionType").has_value();
 
     result.temperatureDetection.thresholdTemperature = cgi.parameter("eventsources",
-        "boxtemperaturedetection", "set", "ROI.#.ThresholdTemperature").is_initialized();
+        "boxtemperaturedetection", "set", "ROI.#.ThresholdTemperature").has_value();
 
     result.temperatureDetection.duration = cgi.parameter("eventsources",
-        "boxtemperaturedetection", "set", "ROI.#.Duration").is_initialized();
+        "boxtemperaturedetection", "set", "ROI.#.Duration").has_value();
 
     result.temperatureDetection.areaEmissivity = cgi.parameter("eventsources",
-        "boxtemperaturedetection", "set", "ROI.#.NormalizedEmissivity").is_initialized();
+        "boxtemperaturedetection", "set", "ROI.#.NormalizedEmissivity").has_value();
 
     return result;
 }
@@ -327,7 +327,7 @@ QStringList DeviceAgentBuilder::fetchEventTypeFamilyNamesInternal(const Informat
     auto supportedEventTypesParameter = info.cgiParameters.parameter(
         "eventstatus/eventstatus/monitor/Channel.#.EventType");
 
-    if (!supportedEventTypesParameter.is_initialized())
+    if (!supportedEventTypesParameter.has_value())
     {
         NX_DEBUG(this, "Supported event types parameter is not initialized for %1",
             m_deviceDebugInfo);

@@ -59,11 +59,11 @@ struct Parameter
     QString value;
 };
 
-static boost::optional<Parameter> parseLine(const nx::Buffer& line)
+static std::optional<Parameter> parseLine(const nx::Buffer& line)
 {
     const auto separatorPosition = line.indexOf('=');
     if (separatorPosition < 0)
-        return boost::none;
+        return std::nullopt;
 
     return Parameter(
         line.left(separatorPosition).trimmed(),
@@ -76,7 +76,7 @@ static HanwhaChunkLoader::OverlappedIdList parseOverlappedIdListData(const nx::B
     for (const auto& line: data.split('\n'))
     {
         const auto parameter = parseLine(line.trimmed());
-        if (parameter == boost::none)
+        if (parameter == std::nullopt)
             continue;
 
         if (parameter->name != kOverlappedIdListParameter)
@@ -260,7 +260,7 @@ void HanwhaChunkLoader::setTimeShift(std::chrono::milliseconds value)
     }
 }
 
-boost::optional<int> HanwhaChunkLoader::overlappedId() const
+std::optional<int> HanwhaChunkLoader::overlappedId() const
 {
     QnMutexLocker lock(&m_mutex);
     NX_ASSERT(m_isNvr, lit("Method should be called only for NVRs"));
@@ -268,7 +268,7 @@ boost::optional<int> HanwhaChunkLoader::overlappedId() const
         return m_overlappedIds.back();
 
     // For cameras we should import all chunks from all overlapped IDs.
-    return boost::none;
+    return std::nullopt;
 }
 
 void HanwhaChunkLoader::setEnableSearchRecordingPeriodRetieval(bool enableRetrieval)
@@ -854,8 +854,8 @@ void HanwhaChunkLoader::setUpThreadUnsafe(const HanwhaInformation& information)
     const auto searchRecordingPeriodAttribute = information.attributes.attribute<bool>(
         lit("Recording/SearchPeriod"));
 
-    if (searchRecordingPeriodAttribute != boost::none)
-        m_hasSearchRecordingPeriodSubmenu = searchRecordingPeriodAttribute.get();
+    if (searchRecordingPeriodAttribute != std::nullopt)
+        m_hasSearchRecordingPeriodSubmenu = searchRecordingPeriodAttribute.value();
 
     m_isNvr = information.deviceType == HanwhaDeviceType::nvr;
     m_maxChannels = information.channelCount;

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QtCore/QUrl>
+#include <optional>
 
-#include <boost/optional.hpp>
+#include <QtCore/QUrl>
 
 #include <nx/utils/thread/rw_lock.h>
 
@@ -27,7 +27,7 @@ public:
 
     HanwhaRequestHelper(
         const std::shared_ptr<HanwhaSharedResourceContext>& resourceContext,
-        boost::optional<int> bypassChannel = boost::none);
+        std::optional<int> bypassChannel = std::nullopt);
 
     HanwhaAttributes fetchAttributes(const QString& attributesPath);
 
@@ -76,13 +76,13 @@ public:
         const QString& submenu,
         const QString& action,
         const Parameters& parameters,
-        const boost::optional<int>& bypassChannel = boost::none);
+        const std::optional<int>& bypassChannel = std::nullopt);
 
     static utils::Url buildRequestUrl(
         const HanwhaSharedResourceContext* sharedContext,
         const QString& path,
         const Parameters& parameters,
-        const boost::optional<int> bypassChannel = boost::none);
+        const std::optional<int> bypassChannel = std::nullopt);
 
 private:
     utils::Url buildRequestUrl(
@@ -111,7 +111,7 @@ public:
 private:
     const std::shared_ptr<HanwhaSharedResourceContext> m_resourceContext;
     QString m_groupBy;
-    boost::optional<int> m_bypassChannel;
+    std::optional<int> m_bypassChannel;
 };
 
 } // namespace plugins

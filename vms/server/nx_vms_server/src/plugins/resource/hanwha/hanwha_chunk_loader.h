@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <QtCore/QUrl>
 #include <QtNetwork/QAuthenticator>
 
@@ -82,7 +84,7 @@ public:
      * kind of "default" overlapped ID and all overlapped periods
      * should be properly handled for them.
      */
-    boost::optional<int> overlappedId() const;
+    std::optional<int> overlappedId() const;
 
     void setEnableSearchRecordingPeriodRetieval(bool enableRetrieval);
 

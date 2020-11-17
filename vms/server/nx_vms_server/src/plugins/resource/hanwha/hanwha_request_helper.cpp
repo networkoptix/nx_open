@@ -29,7 +29,7 @@ const QString kAction = lit("action");
 
 HanwhaRequestHelper::HanwhaRequestHelper(
     const std::shared_ptr<HanwhaSharedResourceContext>& resourceContext,
-    boost::optional<int> bypassChannel)
+    std::optional<int> bypassChannel)
     :
     m_resourceContext(resourceContext),
     m_bypassChannel(bypassChannel)
@@ -148,7 +148,7 @@ utils::Url HanwhaRequestHelper::buildRequestUrl(
     const QString& submenu,
     const QString& action,
     const HanwhaRequestHelper::Parameters& parameters,
-    const boost::optional<int>& /*bypassChannel*/)
+    const std::optional<int>& /*bypassChannel*/)
 {
     QUrlQuery query;
 
@@ -177,7 +177,7 @@ nx::utils::Url HanwhaRequestHelper::buildRequestUrl(
     const HanwhaSharedResourceContext* sharedContext,
     const QString& path,
     const Parameters& parameters,
-    const boost::optional<int> bypassChannel)
+    const std::optional<int> bypassChannel)
 {
     NX_ASSERT(sharedContext, lit("No shared context provided."));
     if (!sharedContext)
@@ -197,7 +197,7 @@ nx::utils::Url HanwhaRequestHelper::buildRequestUrl(
         query.addQueryItem(parameter.first, parameter.second);
 
     url.setQuery(query);
-    if (bypassChannel != boost::none)
+    if (bypassChannel != std::nullopt)
         return makeBypassUrl(url, *bypassChannel);
     return url;
 }
@@ -229,7 +229,7 @@ bool HanwhaRequestHelper::doRequestInternal(
     httpClient.setMessageBodyReadTimeout(kHttpTimeout);
     httpClient.setResponseReadTimeout(kHttpTimeout);
 
-    auto realUrl = m_bypassChannel == boost::none ? url : makeBypassUrl(url, *m_bypassChannel);
+    auto realUrl = m_bypassChannel == std::nullopt ? url : makeBypassUrl(url, *m_bypassChannel);
 
     nx::utils::RwLocker lock(m_resourceContext->requestLock(), requestType);
     if (!httpClient.doGet(realUrl))

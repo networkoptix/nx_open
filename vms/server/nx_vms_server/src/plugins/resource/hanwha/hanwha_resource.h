@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/optional.hpp>
+#include <optional>
 
 #include <core/ptz/ptz_limits.h>
 
@@ -102,8 +102,8 @@ public:
     int profileByRole(Qn::ConnectionRole role, bool isBypassProfile = false) const;
 
     CameraDiagnostics::Result findProfiles(
-        boost::optional<HanwhaVideoProfile>* outPrimaryProfile,
-        boost::optional<HanwhaVideoProfile>* outSecondaryProfile,
+        std::optional<HanwhaVideoProfile>* outPrimaryProfile,
+        std::optional<HanwhaVideoProfile>* outSecondaryProfile,
         int* totalProfileNumber,
         std::set<int>* profilesToRemoveIfProfilesExhausted,
         bool useBypass = false);
@@ -117,8 +117,8 @@ public:
     CameraDiagnostics::Result createProfile(int* outProfileNumber, Qn::ConnectionRole role);
 
     // Returns profile number for role if profile was found and has been considered as correct,
-    // otherwise returns boost::none.
-    boost::optional<int> verifyProfile(Qn::ConnectionRole role);
+    // otherwise returns std::nullopt.
+    std::optional<int> verifyProfile(Qn::ConnectionRole role);
 
     CameraDiagnostics::Result updateProfileNameIfNeeded(
         Qn::ConnectionRole role,
@@ -135,10 +135,10 @@ public:
 
     QString nxProfileName(
         Qn::ConnectionRole role,
-        boost::optional<int> forcedProfileNameLength = boost::none) const;
+        std::optional<int> forcedProfileNameLength = std::nullopt) const;
 
     bool needToReplaceProfile(
-        const boost::optional<HanwhaVideoProfile>& nxProfileToReplace,
+        const std::optional<HanwhaVideoProfile>& nxProfileToReplace,
         Qn::ConnectionRole role) const;
 
     std::shared_ptr<HanwhaSharedResourceContext> sharedContext() const;
@@ -153,7 +153,7 @@ public:
         HanwhaProfileParameterFlags flags) const;
 
     bool isBypassSupported() const;
-    boost::optional<int> bypassChannel() const;
+    std::optional<int> bypassChannel() const;
 
     CameraDiagnostics::Result enableAudioInput();
     CameraDiagnostics::Result ensureMulticastEnabled(Qn::ConnectionRole role);
@@ -266,7 +266,7 @@ private:
         const HanwhaAdavancedParameterInfo& info,
         CreateDependencyFunc createDependencyFunc) const;
 
-    boost::optional<HanwhaAdavancedParameterInfo> advancedParameterInfo(const QString& id) const;
+    std::optional<HanwhaAdavancedParameterInfo> advancedParameterInfo(const QString& id) const;
 
     QString toHanwhaAdvancedParameterValue(
         const QnCameraAdvancedParameter& parameter,
@@ -297,7 +297,7 @@ private:
 
     QString groupLead(const QString& groupName) const;
 
-    boost::optional<QnCameraAdvancedParamValue> findButtonParameter(
+    std::optional<QnCameraAdvancedParamValue> findButtonParameter(
         const QnCameraAdvancedParamValueList) const;
 
     bool executeCommand(const QnCameraAdvancedParamValue& command);
@@ -325,7 +325,7 @@ private:
         bool isProxied = false;
     };
 
-    boost::optional<HanwhaPortInfo> portInfoFromId(const QString& id) const;
+    std::optional<HanwhaPortInfo> portInfoFromId(const QString& id) const;
 
     bool setOutputPortStateInternal(const QString& outputId, bool activate);
 

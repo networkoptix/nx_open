@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QtCore/QXmlStreamReader>
+#include <optional>
 
-#include <boost/optional/optional.hpp>
+#include <QtCore/QXmlStreamReader>
 
 #include <nx/network/http/http_types.h>
 
@@ -19,7 +19,7 @@ public:
     explicit HanwhaAttributes(const QString& attributesXml, nx::network::http::StatusCode::Value statusCode);
 
     template<typename T>
-    boost::optional<T> attribute(
+    std::optional<T> attribute(
         const QString& /*group*/,
         const QString& /*attributeName*/,
         int /*channel*/ = kNoChannel) const
@@ -32,7 +32,7 @@ public:
     }
 
     template<typename T>
-    boost::optional<T> attribute(const QString& path) const
+    std::optional<T> attribute(const QString& path) const
     {
         auto split = path.split(L'/');
         auto splitSize = split.size();
@@ -46,12 +46,12 @@ public:
             int channel  = split[2].toInt(&success);
 
             if (!success)
-                return boost::none;
+                return std::nullopt;
 
             return attribute<T>(split[0], split[1], channel);
         }
 
-        return boost::none;
+        return std::nullopt;
     }
 
     bool isValid() const;
@@ -60,7 +60,7 @@ public:
 
 private:
 
-    boost::optional<QString> findAttribute(
+    std::optional<QString> findAttribute(
         const QString& group,
         const QString& attributeName,
         int channel) const;
@@ -83,25 +83,25 @@ private:
 };
 
 template<>
-boost::optional<bool> HanwhaAttributes::attribute<bool>(
+std::optional<bool> HanwhaAttributes::attribute<bool>(
     const QString& group,
     const QString& attributeName,
     int channel) const;
 
 template<>
-boost::optional<QString> HanwhaAttributes::attribute<QString>(
+std::optional<QString> HanwhaAttributes::attribute<QString>(
     const QString& group,
     const QString& attributeName,
     int channel) const;
 
 template<>
-boost::optional<int> HanwhaAttributes::attribute<int>(
+std::optional<int> HanwhaAttributes::attribute<int>(
     const QString& group,
     const QString& attributeName,
     int channel) const;
 
 template<>
-boost::optional<double> HanwhaAttributes::attribute<double>(
+std::optional<double> HanwhaAttributes::attribute<double>(
     const QString& group,
     const QString& attributeName,
     int channel) const;

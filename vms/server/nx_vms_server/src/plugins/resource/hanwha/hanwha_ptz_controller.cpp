@@ -280,14 +280,14 @@ bool HanwhaPtzController::getPosition(
     const auto y = response.parameter<double>(kHanwhaTiltProperty);
     const auto z = response.parameter<double>(kHanwhaZoomProperty);
 
-    if (x != boost::none)
-        outPosition->pan = x.get();
+    if (x != std::nullopt)
+        outPosition->pan = x.value();
 
-    if (y != boost::none)
-        outPosition->tilt = y.get();
+    if (y != std::nullopt)
+        outPosition->tilt = y.value();
 
-    if (z != boost::none)
-        outPosition->zoom = z.get();
+    if (z != std::nullopt)
+        outPosition->zoom = z.value();
 
     return true;
 }
@@ -334,10 +334,10 @@ bool HanwhaPtzController::getFlip(
     const auto verticalFlip = response.parameter<bool>(
         channelParameter(m_hanwhaResource->getChannel(), kHanwhaVerticalFlipProperty));
 
-    if (horizontalFlip.is_initialized() && *horizontalFlip)
+    if (horizontalFlip.value_or(false))
         *flip |= Qt::Orientation::Horizontal;
 
-    else if (verticalFlip.is_initialized() && *verticalFlip)
+    else if (verticalFlip.value_or(false))
         *flip |= Qt::Orientation::Vertical;
 
     return true;

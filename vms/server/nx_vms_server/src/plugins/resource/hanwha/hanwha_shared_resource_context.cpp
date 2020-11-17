@@ -214,7 +214,7 @@ SessionContextPtr HanwhaSharedResourceContext::session(
         return SessionContextPtr();
 
     const auto sessionKey = response.parameter<QString>(lit("SessionKey"));
-    if (sessionKey == boost::none)
+    if (sessionKey == std::nullopt)
         return SessionContextPtr();
 
     strongSessionCtx = SessionContextPtr::create(*sessionKey, clientId);
@@ -296,8 +296,8 @@ HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
     const auto maxArchiveSessionsAttribute = info.attributes.attribute<int>(
         lit("System/MaxSearchSession"));
 
-    if (maxArchiveSessionsAttribute != boost::none)
-        m_maxArchiveSessions = maxArchiveSessionsAttribute.get();
+    if (maxArchiveSessionsAttribute != std::nullopt)
+        m_maxArchiveSessions = maxArchiveSessionsAttribute.value();
 
     info.cgiParameters = helper.fetchCgiParameters(lit("cgis"));
     if (!info.cgiParameters.isValid())
@@ -318,7 +318,7 @@ HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
     const auto interfacesParameter = info.cgiParameters.parameter(
         lit("network/interface/view/InterfaceName"));
 
-    if (interfacesParameter != boost::none)
+    if (interfacesParameter != std::nullopt)
     {
         const auto possibleValues = interfacesParameter->possibleValues();
         if (!possibleValues.isEmpty())
@@ -364,7 +364,7 @@ HanwhaResult<HanwhaInformation> HanwhaSharedResourceContext::loadInformation()
         info.firmware = value->trimmed();
 
     const auto maxChannels = info.attributes.attribute<int>(lit("System/MaxChannel"));
-    info.channelCount = maxChannels.is_initialized() ? *maxChannels : 1;
+    info.channelCount = maxChannels.value_or(1);
 
     return {CameraDiagnostics::NoErrorResult(), std::move(info)};
 }
@@ -414,11 +414,11 @@ HanwhaResult<HanwhaResponse> HanwhaSharedResourceContext::loadVideoProfiles()
     return {CameraDiagnostics::NoErrorResult(), std::move(videoProfiles)};
 }
 
-boost::optional<int> HanwhaSharedResourceContext::overlappedId() const
+std::optional<int> HanwhaSharedResourceContext::overlappedId() const
 {
     QnMutexLocker lock(&m_servicesMutex);
     if (!m_chunkLoader)
-        return boost::none;
+        return std::nullopt;
 
     return m_chunkLoader->overlappedId();
 }
@@ -508,7 +508,6 @@ CameraDiagnostics::Result HanwhaSharedResourceContext::initializeAlarmInputs()
 
         if (parameterName.endsWith("State"))
             portCircuitTypes[portNumber] = parameterValue;
-
 
         if (parameterName.endsWith("Enable"))
             portActivityStatuses[portNumber] = parameterValue;
@@ -601,7 +600,7 @@ HanwhaResult<bool> HanwhaSharedResourceContext::checkBypassSupport()
     }
 
     const auto bypassParameter = parameters.parameter(lit("bypass/bypass/control/BypassURI"));
-    return {CameraDiagnostics::NoErrorResult(), bypassParameter != boost::none};
+    return {CameraDiagnostics::NoErrorResult(), bypassParameter != std::nullopt};
 }
 
 HanwhaResult<std::set<int>> HanwhaSharedResourceContext::loadPtzCalibratedChannels()

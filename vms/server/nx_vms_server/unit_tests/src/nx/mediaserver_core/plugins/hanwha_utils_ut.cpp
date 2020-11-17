@@ -72,7 +72,7 @@ TEST(HanwhaUtils, findProfile)
     for (const auto& testCase : kTestCases)
     {
         const auto profile = findProfile(kProfileMap, testCase.role, testCase.applicationName);
-        ASSERT_NE(profile, boost::none);
+        ASSERT_NE(profile, std::nullopt);
         ASSERT_EQ(profile->number, testCase.profileNumber);
     }
 }
