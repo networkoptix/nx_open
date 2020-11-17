@@ -186,7 +186,8 @@ void HikvisionMetadataMonitor::initEventMonitor()
     httpClient->setMessageBodyReadTimeout(kKeepAliveTimeout);
 
     m_contentParser = std::make_unique<nx::network::http::MultipartContentParser>();
-    m_contentParser->setNextFilter(std::make_shared<BytestreamFilter>(m_manifest, this));
+    m_contentParser->setNextFilter(
+        std::make_shared<BytestreamFilter>(m_manifest, this, m_contentParser.get()));
 
     m_monitorHttpClient = std::move(httpClient);
     m_monitorHttpClient->doGet(m_monitorUrl);
