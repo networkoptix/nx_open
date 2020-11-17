@@ -59,6 +59,12 @@ NX_UTILS_API bool setDateTime(qint64 millisecondsSinceEpoch);
 NX_UTILS_API QDateTime fromOffsetSinceEpoch(const std::chrono::nanoseconds& offset);
 
 /**
+ * @return parsed time duration and status of operation, support postfixes: h - hours, m - minutes,
+ * s - seconds, ms - milliseconds. Without the postfix, it will be interpreted as seconds.
+ */
+NX_UTILS_API std::pair<bool, std::chrono::milliseconds> parseDuration(const QString& str);
+
+/**
  * Rounds timePoint down to DurationTypeToRoundTo type.
  */
 template<typename DurationTypeToRoundTo>

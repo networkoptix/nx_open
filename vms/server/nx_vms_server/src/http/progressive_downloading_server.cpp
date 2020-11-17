@@ -11,6 +11,7 @@
 #include <nx/utils/log/log.h>
 #include <utils/common/util.h>
 #include <nx/utils/string.h>
+#include <nx/utils/time.h>
 #include <nx/fusion/model_functions.h>
 #include <utils/fs/file.h>
 #include <network/tcp_connection_priv.h>
@@ -46,8 +47,15 @@
 
 namespace {
 
-static const int CONNECTION_TIMEOUT = 1000 * 5;
-static const unsigned int DEFAULT_MAX_FRAMES_TO_CACHE_BEFORE_DROP = 1;
+static constexpr int kConnectionTimeoutMsec = 1000 * 5;
+static constexpr int kDefaultMaxCachedFrames = 1;
+
+static const QString kDropLateFramesParam = "dlf";
+static const QString kStandFrameDurationParam = "sfd";
+static const QString kRealTimeOptimizationParam = "rt";
+static const QString kContinuosTimestampsParam = "ct";
+
+static QAtomicInt ProgressiveDownloadingServer_count = 0;
 
 AVCodecID getPrefferedVideoCodec(const QByteArray& streamingFormat, const QString& defaultCodec)
 {
@@ -65,6 +73,8 @@ AVCodecID getPrefferedVideoCodec(const QByteArray& streamingFormat, const QStrin
 
 bool isCodecCompatibleWithFormat(AVCodecID codec, const QByteArray& streamingFormat)
 {
+    if (streamingFormat == "mkv" || streamingFormat == "matroska")
+        return true;
     if (streamingFormat == "webm")
         return AV_CODEC_ID_VP8 == codec;
     if (streamingFormat == "mpjpeg")
@@ -85,22 +95,40 @@ bool isCodecCompatibleWithFormat(AVCodecID codec, const QByteArray& streamingFor
 const std::optional<CameraMediaStreamInfo> findCompatibleStream(
     const std::vector<CameraMediaStreamInfo>& streams,
     const QByteArray& streamingFormat,
-    const QSize& requestedSize)
+    const QSize& requestedSize,
+    const nx::vms::api::StreamIndex streamIndex)
 {
     QSize maxSize;
     std::optional<CameraMediaStreamInfo> result;
+    NX_DEBUG(NX_SCOPE_TAG, "Looking for compatible stream, format: %1, resolution: %2, index: %3",
+        streamingFormat, requestedSize, streamIndex);
+
     for (const auto& streamInfo: streams)
     {
-        if (streamInfo.transcodingRequired ||
-            !isCodecCompatibleWithFormat((AVCodecID)streamInfo.codec, streamingFormat))
+        QSize streamSize = streamInfo.getResolution();
+        NX_DEBUG(NX_SCOPE_TAG, "Check index: %1, resolution: %2",
+            streamInfo.getEncoderIndex(), streamSize);
+        if (streamInfo.transcodingRequired
+            || !isCodecCompatibleWithFormat((AVCodecID)streamInfo.codec, streamingFormat))
         {
             continue;
         }
 
-        QSize streamSize = streamInfo.getResolution();
-        if (requestedSize.isValid() && requestedSize.height() == streamSize.height())
-            return streamInfo;
+        if (streamIndex != nx::vms::api::StreamIndex::undefined
+            && streamInfo.getEncoderIndex() != streamIndex)
+        {
+            continue;
+        }
 
+        if (requestedSize.isValid())
+        {
+            if (requestedSize.height() != streamSize.height())
+                continue;
+
+            return streamInfo;
+        }
+
+        NX_DEBUG(NX_SCOPE_TAG, "Ready to use index: %1", streamInfo.getEncoderIndex());
         if (streamSize.height() > maxSize.height())
         {
             result = streamInfo;
@@ -111,8 +139,6 @@ const std::optional<CameraMediaStreamInfo> findCompatibleStream(
 }
 
 }
-
-// -------------- ProgressiveDownloadingServer -------------------
 
 class ProgressiveDownloadingServerPrivate: public QnTCPConnectionProcessorPrivate
 {
@@ -131,13 +157,6 @@ public:
     QnMutex mutex;
 };
 
-static QAtomicInt ProgressiveDownloadingServer_count = 0;
-static const QLatin1String DROP_LATE_FRAMES_PARAM_NAME( "dlf" );
-static const QLatin1String STAND_FRAME_DURATION_PARAM_NAME( "sfd" );
-static const QLatin1String RT_OPTIMIZATION_PARAM_NAME( "rt" ); // realtime transcode optimization
-static const QLatin1String CONTINUOUS_TIMESTAMPS_PARAM_NAME( "ct" );
-static const int MS_PER_SEC = 1000;
-
 ProgressiveDownloadingServer::ProgressiveDownloadingServer(
     std::unique_ptr<nx::network::AbstractStreamSocket> socket,
     QnTcpListener* owner,
@@ -149,8 +168,8 @@ ProgressiveDownloadingServer::ProgressiveDownloadingServer(
     Q_D(ProgressiveDownloadingServer);
     d->serverModule = serverModule;
 
-    d->socket->setRecvTimeout(CONNECTION_TIMEOUT);
-    d->socket->setSendTimeout(CONNECTION_TIMEOUT);
+    d->socket->setRecvTimeout(kConnectionTimeoutMsec);
+    d->socket->setSendTimeout(kConnectionTimeoutMsec);
     d->foreignAddress = d->socket->getForeignAddress().address.toString();
     d->foreignPort = d->socket->getForeignAddress().port;
 
@@ -192,7 +211,9 @@ ProgressiveDownloadingServer::~ProgressiveDownloadingServer()
 
 QByteArray ProgressiveDownloadingServer::getMimeType(const QByteArray& streamingFormat)
 {
-    if (streamingFormat == "webm")
+    if (streamingFormat == "mkv")
+        return "video/x-matroska";
+    else if (streamingFormat == "webm")
         return "video/webm";
     else if (streamingFormat == "mpegts")
         return "video/mp2t";
@@ -332,8 +353,8 @@ void ProgressiveDownloadingServer::run()
 
     QnAbstractMediaStreamDataProviderPtr dataProvider;
 
-    d->socket->setRecvTimeout(CONNECTION_TIMEOUT);
-    d->socket->setSendTimeout(CONNECTION_TIMEOUT);
+    d->socket->setRecvTimeout(kConnectionTimeoutMsec);
+    d->socket->setSendTimeout(kConnectionTimeoutMsec);
 
     if (d->clientRequest.isEmpty() && !readRequest())
     {
@@ -365,6 +386,8 @@ void ProgressiveDownloadingServer::run()
     // If user request 'mp4' format use smooth streaming format to make mp4 streamable.
     if (streamingFormat == "mp4")
         streamingFormat = "ismv";
+    if (streamingFormat == "mkv")
+        streamingFormat = "matroska";
 
     const QUrlQuery decodedUrlQuery(getDecodedUrl().toQUrl());
 
@@ -404,31 +427,27 @@ void ProgressiveDownloadingServer::run()
     config.computeSignature = addSignature;
     d->transcoder = std::make_unique<QnFfmpegTranscoder>(config, commonModule()->metrics());
 
-    QnMediaResourcePtr mediaRes = d->resource.dynamicCast<QnMediaResource>();
-    if (mediaRes)
-    {
-        QnLegacyTranscodingSettings extraParams;
-        extraParams.resource = mediaRes;
-        int rotation;
-        if (decodedUrlQuery.hasQueryItem("rotation"))
-            rotation = decodedUrlQuery.queryItemValue("rotation").toInt();
-        else
-            rotation = mediaRes->toResource()->getProperty(QnMediaResource::rotationKey()).toInt();
-        extraParams.rotation = rotation;
-        extraParams.forcedAspectRatio = mediaRes->customAspectRatio();
-
-        d->transcoder->setTranscodingSettings(extraParams);
-        d->transcoder->setStartTimeOffset(100 * 1000); // droid client has issue if enumerate timings from 0
-    }
-
-    const auto physicalResource = d->resource.dynamicCast<QnVirtualCameraResource>();
-    if (!physicalResource)
+    const auto cameraResource = d->resource.dynamicCast<QnVirtualCameraResource>();
+    if (!cameraResource)
     {
         d->response.messageBody = QByteArray("Transcoding error. Bad resource");
         NX_ERROR(this, d->response.messageBody);
         sendResponse(nx::network::http::StatusCode::internalServerError, "plain/text");
         return;
     }
+
+    QnLegacyTranscodingSettings extraParams;
+    extraParams.resource = cameraResource;
+    int rotation;
+    if (decodedUrlQuery.hasQueryItem("rotation"))
+        rotation = decodedUrlQuery.queryItemValue("rotation").toInt();
+    else
+        rotation = cameraResource->toResource()->getProperty(QnMediaResource::rotationKey()).toInt();
+    extraParams.rotation = rotation;
+    extraParams.forcedAspectRatio = cameraResource->customAspectRatio();
+
+    d->transcoder->setTranscodingSettings(extraParams);
+    d->transcoder->setStartTimeOffset(100 * 1000); // droid client has issue if enumerate timings from 0
 
     d->socket->setSendBufferSize(globalSettings()->mediaBufferSizeKb() * 1024);
 
@@ -445,16 +464,20 @@ void ProgressiveDownloadingServer::run()
     }
 
     AVCodecID videoCodec;
-    QnServer::ChunksCatalog qualityToUse;
+    nx::vms::api::StreamIndex streamIndex = nx::vms::api::StreamIndex::undefined;
+    auto stream = decodedUrlQuery.queryItemValue("stream");
+    if (!stream.isEmpty())
+    {
+        streamIndex = stream.toInt() == 0 ?
+            nx::vms::api::StreamIndex::primary : nx::vms::api::StreamIndex::secondary;
+    }
     auto streamInfo = findCompatibleStream(
-        physicalResource->mediaStreams().streams, streamingFormat, videoSize);
+        cameraResource->mediaStreams().streams, streamingFormat, videoSize, streamIndex);
 
     bool accurateSeek = decodedUrlQuery.hasQueryItem("accurate_seek");
     if (streamInfo && !accurateSeek)
     {
-        qualityToUse = streamInfo->getEncoderIndex() == nx::vms::api::StreamIndex::primary
-            ? QnServer::HiQualityCatalog
-            : QnServer::LowQualityCatalog;
+        streamIndex = streamInfo->getEncoderIndex();
         transcodeMethod = QnTranscoder::TM_DirectStreamCopy;
         videoCodec = (AVCodecID)streamInfo->codec;
     }
@@ -474,7 +497,8 @@ void ProgressiveDownloadingServer::run()
             sendMediaEventErrorResponse(Qn::MediaStreamEvent::TooManyOpenedConnections);
             return;
         }
-        qualityToUse = QnServer::HiQualityCatalog;
+        if (streamIndex == nx::vms::api::StreamIndex::undefined)
+            streamIndex = nx::vms::api::StreamIndex::primary;
         videoCodec = getPrefferedVideoCodec(
             streamingFormat, commonModule()->globalSettings()->defaultExportVideoCodec());
         NX_DEBUG(this,
@@ -482,9 +506,7 @@ void ProgressiveDownloadingServer::run()
             videoCodec);
     }
 
-    m_metricsHelper.setStream(qualityToUse == QnServer::HiQualityCatalog
-        ? nx::vms::api::StreamIndex::secondary
-        : nx::vms::api::StreamIndex::primary);
+    m_metricsHelper.setStream(streamIndex);
 
     if (!audioOnly && d->transcoder->setVideoCodec(
             videoCodec,
@@ -502,22 +524,18 @@ void ProgressiveDownloadingServer::run()
 
     //taking max send queue size from url
     bool dropLateFrames = streamingFormat == "mpjpeg";
-    unsigned int maxFramesToCacheBeforeDrop = DEFAULT_MAX_FRAMES_TO_CACHE_BEFORE_DROP;
-    if( decodedUrlQuery.hasQueryItem(DROP_LATE_FRAMES_PARAM_NAME) )
+    int maxFramesToCacheBeforeDrop = kDefaultMaxCachedFrames;
+    if (decodedUrlQuery.hasQueryItem(kDropLateFramesParam))
     {
-        maxFramesToCacheBeforeDrop = decodedUrlQuery.queryItemValue(DROP_LATE_FRAMES_PARAM_NAME).toUInt();
+        maxFramesToCacheBeforeDrop = decodedUrlQuery.queryItemValue(kDropLateFramesParam).toUInt();
         dropLateFrames = true;
     }
 
-    bool continuousTimestamps = decodedUrlQuery.queryItemValue(CONTINUOUS_TIMESTAMPS_PARAM_NAME) != lit("false");
-    const bool standFrameDuration = decodedUrlQuery.hasQueryItem(STAND_FRAME_DURATION_PARAM_NAME);
-    const bool rtOptimization = decodedUrlQuery.hasQueryItem(RT_OPTIMIZATION_PARAM_NAME);
+    const bool rtOptimization = decodedUrlQuery.hasQueryItem( kRealTimeOptimizationParam );
     if (rtOptimization && d->serverModule->settings().ffmpegRealTimeOptimization())
         d->transcoder->setUseRealTimeOptimization(true);
 
-
     QString position = decodedUrlQuery.queryItemValue(StreamingParams::START_POS_PARAM_NAME);
-
     bool isLive = position.isEmpty() || position == "now";
     d->requiredPermission = isLive
         ? Qn::Permission::ViewLivePermission : Qn::Permission::ViewFootagePermission;
@@ -536,22 +554,46 @@ void ProgressiveDownloadingServer::run()
     }
 
     ProgressiveDownloadingConsumer::Config consumerConfig;
-    consumerConfig.standFrameDuration = standFrameDuration;
     consumerConfig.dropLateFrames = dropLateFrames;
     consumerConfig.maxFramesToCacheBeforeDrop = maxFramesToCacheBeforeDrop;
     consumerConfig.liveMode = isLive;
-    consumerConfig.continuousTimestamps = continuousTimestamps;
     consumerConfig.audioOnly = audioOnly;
     consumerConfig.streamingFormat = streamingFormat;
+    consumerConfig.standFrameDuration = decodedUrlQuery.hasQueryItem(kStandFrameDurationParam);
+    consumerConfig.continuousTimestamps =
+        decodedUrlQuery.queryItemValue(kContinuosTimestampsParam) != QString("false");
     QString endPosition =
         decodedUrlQuery.queryItemValue(StreamingParams::END_POS_PARAM_NAME);
     if (!endPosition.isEmpty())
         consumerConfig.endTimeUsec = nx::utils::parseDateTime(endPosition);
-    ProgressiveDownloadingConsumer dataConsumer(this, consumerConfig);
+
     qint64 timeUSec = DATETIME_NOW;
     if (!isLive)
         timeUSec = nx::utils::parseDateTime(position);
+    const QString durationStr = decodedUrlQuery.queryItemValue("duration");
+    if (!durationStr.isEmpty())
+    {
+        const auto duratonResult = nx::utils::parseDuration(durationStr);
+        if (!duratonResult.first)
+        {
+            NX_DEBUG(this, "Close session, invalid url param 'duraion': %1", durationStr);
+            d->response.messageBody = QByteArray("Invalid url param: duration");
+            sendResponse(nx::network::http::StatusCode::badRequest, "text/plain");
+            return;
+        }
+        if (isLive)
+        {
+            consumerConfig.duration = duratonResult.second;
+        }
+        else
+        {
+            const int64_t durationUsec = std::chrono::duration_cast<std::chrono::microseconds>(
+                duratonResult.second).count();
+            consumerConfig.endTimeUsec = timeUSec + durationUsec;
+        }
+    }
 
+    ProgressiveDownloadingConsumer dataConsumer(this, consumerConfig);
     bool isUTCRequest = !decodedUrlQuery.queryItemValue("posonly").isNull();
     if (isUTCRequest)
     {
@@ -570,6 +612,8 @@ void ProgressiveDownloadingServer::run()
             sendResponse(nx::network::http::StatusCode::notFound, "text/plain");
             return;
         }
+        QnServer::ChunksCatalog qualityToUse = streamIndex == nx::vms::api::StreamIndex::primary ?
+            QnServer::HiQualityCatalog : QnServer::LowQualityCatalog;
         QnLiveStreamProviderPtr liveReader = camera->getLiveReader(qualityToUse);
         dataProvider = liveReader;
         if (liveReader) {
@@ -584,6 +628,9 @@ void ProgressiveDownloadingServer::run()
         d->archiveDP = QSharedPointer<QnArchiveStreamReader> (dynamic_cast<QnArchiveStreamReader*> (
             d->serverModule->dataProviderFactory()->createDataProvider(d->resource, Qn::CR_Archive)));
         d->archiveDP->open(d->serverModule->archiveIntegrityWatcher());
+        MediaQuality qualityToUse = streamIndex == nx::vms::api::StreamIndex::primary ?
+            MEDIA_Quality_High : MEDIA_Quality_Low;
+        d->archiveDP->setQuality(qualityToUse, false);
         d->archiveDP->jumpTo(timeUSec, accurateSeek ? timeUSec : 0);
 
         if (auto mediaEvent = d->archiveDP->lastError().toMediaStreamEvent())

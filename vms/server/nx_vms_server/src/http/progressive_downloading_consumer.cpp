@@ -92,8 +92,15 @@ bool ProgressiveDownloadingConsumer::processData(const QnAbstractDataPacketPtr& 
         return true;
     }
 
-    if (m_config.endTimeUsec != AV_NOPTS_VALUE && media->timestamp > m_config.endTimeUsec)
+    if (m_firstMediaTime == AV_NOPTS_VALUE)
+        m_firstMediaTime = media->timestamp;
+
+    const int64_t durationUsec = media->timestamp - m_firstMediaTime;
+    if ((m_config.endTimeUsec != AV_NOPTS_VALUE && media->timestamp > m_config.endTimeUsec)
+        || (m_config.duration.count() > 0 && durationUsec > m_config.duration.count()))
     {
+        NX_DEBUG(this, "Close stream, duration: %1, startTime: %2us, current: %3us, endTime %4us",
+            m_config.duration, m_firstMediaTime, media->timestamp, m_config.endTimeUsec);
         m_needStop = true; // EOF reached
         finalizeMediaStream();
         return true;

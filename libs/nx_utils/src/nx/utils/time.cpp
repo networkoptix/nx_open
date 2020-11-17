@@ -2,6 +2,7 @@
 
 #include <QtCore/QDateTime>
 #include <QtCore/QTimeZone>
+#include <QtCore/QRegularExpression>
 
 #include <nx/utils/log/log.h>
 
@@ -197,6 +198,32 @@ NX_UTILS_API QDateTime fromOffsetSinceEpoch(const nanoseconds& offset)
 {
     return QDateTime::fromMSecsSinceEpoch(
         duration_cast<milliseconds>(offset).count());
+}
+
+std::pair<bool, std::chrono::milliseconds> parseDuration(const QString& str)
+{
+    QRegularExpression regex("^(\\d+)(d|h|s|ms|m)?$");
+    QRegularExpressionMatch match = regex.match(str.toLower());
+    if (!match.hasMatch())
+        return std::make_pair(false, std::chrono::milliseconds::zero());
+
+    bool ok = false;
+    uint64_t count = match.captured(1).toULongLong(&ok);
+    if (!ok)
+        return std::make_pair(false, std::chrono::milliseconds::zero());
+
+    if (match.captured(2) == "d")
+        return std::make_pair(true, std::chrono::hours(count * 24));
+    if (match.captured(2) == "h")
+        return std::make_pair(true, std::chrono::hours(count));
+    if (match.captured(2) == "m")
+        return std::make_pair(true, std::chrono::minutes(count));
+    if (match.captured(2) == "s" || match.captured(2).isEmpty())
+        return std::make_pair(true, std::chrono::seconds(count));
+    if (match.captured(2) == "ms")
+        return std::make_pair(true, std::chrono::milliseconds(count));
+
+    return std::make_pair(false, std::chrono::milliseconds::zero());
 }
 
 namespace test {

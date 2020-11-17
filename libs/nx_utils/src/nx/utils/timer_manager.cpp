@@ -4,6 +4,7 @@
 #include <string>
 
 #include <nx/utils/scope_guard.h>
+#include <nx/utils/time.h>
 
 #include <boost/optional.hpp>
 
@@ -417,41 +418,8 @@ std::chrono::milliseconds parseTimerDuration(
     const QString& durationNotTrimmed,
     std::chrono::milliseconds defaultValue)
 {
-    QString duration = durationNotTrimmed.trimmed();
-
-    std::chrono::milliseconds res;
-    bool ok(true);
-    const auto toUInt =
-        [&](int suffixLen) -> qulonglong
-        {
-            const auto& stringWithoutSuffix =
-                suffixLen
-                ? duration.left(duration.length() - suffixLen)
-                : duration;
-
-            if (stringWithoutSuffix.isEmpty())
-            {
-                ok = false;
-                return 0;
-            }
-
-            return stringWithoutSuffix.toULongLong(&ok);
-        };
-
-    if (duration.endsWith("ms", Qt::CaseInsensitive))
-        res = std::chrono::milliseconds(toUInt(2));
-    else if (duration.endsWith("s", Qt::CaseInsensitive))
-        res = std::chrono::seconds(toUInt(1));
-    else if (duration.endsWith("m", Qt::CaseInsensitive))
-        res = std::chrono::minutes(toUInt(1));
-    else if (duration.endsWith("h", Qt::CaseInsensitive))
-        res = std::chrono::hours(toUInt(1));
-    else if (duration.endsWith("d", Qt::CaseInsensitive))
-        res = std::chrono::hours(toUInt(1)) * 24;
-    else
-        res = std::chrono::seconds(toUInt(0));
-
-    return ok ? res : defaultValue;
+    auto result = parseDuration(durationNotTrimmed.trimmed());
+    return result.first ? result.second: defaultValue;
 }
 
 std::optional<std::chrono::milliseconds> parseOptionalTimerDuration(

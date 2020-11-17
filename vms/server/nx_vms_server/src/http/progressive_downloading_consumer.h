@@ -20,6 +20,7 @@ public:
         bool continuousTimestamps = false;
         bool audioOnly = false;
         int64_t endTimeUsec = AV_NOPTS_VALUE;
+        std::chrono::microseconds duration {0}; //< Used for live streams.
         QString streamingFormat;
     };
 
@@ -39,6 +40,7 @@ private:
     ProgressiveDownloadingServer* m_owner;
     const Config m_config;
     int64_t m_lastMediaTime {AV_NOPTS_VALUE};
+    int64_t m_firstMediaTime {AV_NOPTS_VALUE};
     int64_t m_utcShift {0};
     int64_t m_rtStartTime {AV_NOPTS_VALUE};
     int64_t m_lastRtTime {0};

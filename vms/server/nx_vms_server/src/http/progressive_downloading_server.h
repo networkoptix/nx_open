@@ -9,7 +9,6 @@
 #include <nx/metrics/streams_metric_helper.h>
 
 class QnFfmpegTranscoder;
-
 class ProgressiveDownloadingServerPrivate;
 
 class ProgressiveDownloadingServer: public QnTCPConnectionProcessor
