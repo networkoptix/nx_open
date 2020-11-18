@@ -97,20 +97,21 @@ static void writeFile(
     for (const auto& pathWithStorage: pathsWithStorages)
     {
         const auto filePath = closeDirPath(pathWithStorage.first) + idToInfo.first + "/info.txt";
+        const auto filePathWithHiddenPassword = nx::utils::url::hidePassword(filePath);
         auto file = std::unique_ptr<QIODevice>(pathWithStorage.second->open(
            filePath,
            QIODevice::WriteOnly | QIODevice::Truncate));
 
         if (!file)
         {
-            NX_DEBUG(typeid(Writer), "Failed to open file '%1'", filePath);
+            NX_DEBUG(typeid(Writer), "Failed to open file '%1'", filePathWithHiddenPassword);
             continue;
         }
 
         if (file->write(idToInfo.second))
-            NX_DEBUG(typeid(Writer), "Successfully written file '%1'", filePath);
+            NX_DEBUG(typeid(Writer), "Successfully written file '%1'", filePathWithHiddenPassword);
         else
-            NX_DEBUG(typeid(Writer), "Failed to write file '%1'", filePath);
+            NX_DEBUG(typeid(Writer), "Failed to write file '%1'", filePathWithHiddenPassword);
     }
 }
 
