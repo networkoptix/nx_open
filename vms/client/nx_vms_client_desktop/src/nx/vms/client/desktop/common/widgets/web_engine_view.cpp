@@ -15,6 +15,7 @@
 #include <QtWebEngineWidgets/QWebEngineContextMenuData>
 #include <QtWebEngineWidgets/QWebEngineScript>
 #include <QtWebEngineWidgets/QWebEngineScriptCollection>
+#include <QtWebEngineWidgets/QWebEngineSettings>
 
 using namespace nx::vms::client::desktop;
 
@@ -78,6 +79,10 @@ private:
     {
         action(QWebEnginePage::ViewSource)->setVisible(false);
         action(QWebEnginePage::SavePage)->setVisible(false);
+
+        // Allow mixed content here because camera web page may be served via https
+        // (because it's proxied) but includes hardcoded links to http resources.
+        settings()->setAttribute(QWebEngineSettings::AllowRunningInsecureContent, true);
     }
 
     const WebEngineView& m_view;
