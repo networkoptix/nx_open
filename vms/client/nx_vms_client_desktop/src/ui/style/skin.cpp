@@ -26,7 +26,6 @@ namespace {
 
 static const QSize kHugeSize(100000, 100000);
 
-
 void correctPixelRatio(QPixmap& pixmap)
 {
     if (QnSkin::isHiDpi())

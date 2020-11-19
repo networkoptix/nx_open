@@ -1302,7 +1302,7 @@ std::string FaceMaskDetection::buildDetectionMode() const
 
 //-------------------------------------------------------------------------------------------------
 
-bool TemperatureChangeDetection::operator==(const TemperatureChangeDetection& rhs) const
+bool TemperatureChangeDetectionItem::operator==(const TemperatureChangeDetectionItem& rhs) const
 {
     return initialized == rhs.initialized
         && unnamedRect == rhs.unnamedRect
@@ -1313,7 +1313,7 @@ bool TemperatureChangeDetection::operator==(const TemperatureChangeDetection& rh
         && areaEmissivity == rhs.areaEmissivity;
 }
 
-void TemperatureChangeDetection::readFromServerOrThrow(
+void TemperatureChangeDetectionItem::readFromServerOrThrow(
     const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
     using namespace SettingPrimitivesServerIo;
@@ -1337,7 +1337,7 @@ void TemperatureChangeDetection::readFromServerOrThrow(
     initialized = true;
 }
 
-void TemperatureChangeDetection::writeToServer(
+void TemperatureChangeDetectionItem::writeToServer(
     nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
 {
     using namespace SettingPrimitivesServerIo;
@@ -1360,13 +1360,13 @@ void TemperatureChangeDetection::writeToServer(
         result->setValue(key(KeyIndex::areaEmissivity), serialize(areaEmissivity));
 }
 
-void TemperatureChangeDetection::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
+void TemperatureChangeDetectionItem::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
 {
     nx::kit::Json roiInfo =
         DeviceResponseJsonParser::extractTemperatureRoiInfo(channelInfo, this->deviceIndex());
     if (roiInfo == nx::kit::Json())
     {
-        *this = TemperatureChangeDetection(
+        *this = TemperatureChangeDetectionItem(
             m_settingsCapabilities, m_roiResolution, this->nativeIndex()); // reset value;
         initialized = true;
         return;
@@ -1390,7 +1390,7 @@ void TemperatureChangeDetection::readFromDeviceReplyOrThrow(const nx::kit::Json&
     initialized = true;
 }
 
-std::string TemperatureChangeDetection::buildDeviceWritingQuery(int channelNumber) const
+std::string TemperatureChangeDetectionItem::buildDeviceWritingQuery(int channelNumber) const
 {
     std::ostringstream query;
     if (initialized)
@@ -1429,6 +1429,52 @@ std::string TemperatureChangeDetection::buildDeviceWritingQuery(int channelNumbe
                   << "remove"
                   << "&Channel=" << channelNumber << "&DefinedAreaIndex=" << deviceIndex();
         }
+    }
+    return query.str();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+bool TemperatureChangeDetectionToggle::operator==(
+    const TemperatureChangeDetectionToggle& rhs) const
+{
+    return initialized == rhs.initialized
+        && enabled == rhs.enabled;
+}
+
+void TemperatureChangeDetectionToggle::readFromServerOrThrow(
+    const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
+{
+    using namespace SettingPrimitivesServerIo;
+    deserializeOrThrow(value(sourceMap, KeyIndex::enabled), &enabled);
+
+    initialized = true;
+}
+
+void TemperatureChangeDetectionToggle::writeToServer(
+    nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
+{
+    using namespace SettingPrimitivesServerIo;
+    result->setValue(key(KeyIndex::enabled), serialize(enabled));
+}
+
+void TemperatureChangeDetectionToggle::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
+{
+    enabled = DeviceResponseJsonParser::extractTemperatureChangeDetectionToggle(
+        channelInfo, this->deviceIndex()).value_or(false);
+    initialized = true;
+}
+
+std::string TemperatureChangeDetectionToggle::buildDeviceWritingQuery(int channelNumber) const
+{
+    std::ostringstream query;
+    if (initialized)
+    {
+            using namespace SettingPrimitivesDeviceIo;
+            query << "msubmenu=" << kSunapiEventName
+                << "&action=" << "set"
+                << "&Channel=" << channelNumber
+                << "&Enable=" << serialize(enabled);
     }
     return query.str();
 }

@@ -73,7 +73,7 @@
                                             "type": "ComboBox",
                                             "name": "Temperature.Area#.DetectionType",
                                             "caption": "Detection Type",
-                                            "defaultValue": "Minimum",
+                                            "defaultValue": "Above",
                                             "range": [ "Above", "Below", "Increase", "Decrease" ]
                                         },
                                         {

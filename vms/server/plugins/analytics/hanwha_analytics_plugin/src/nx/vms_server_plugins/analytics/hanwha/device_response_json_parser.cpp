@@ -185,6 +185,20 @@ The example of the incoming json:
 
 //-------------------------------------------------------------------------------------------------
 
+/*static*/ std::optional<bool> DeviceResponseJsonParser::extractTemperatureChangeDetectionToggle(
+    const nx::kit::Json& channelInfo, int chanelNumber)
+{
+    const nx::kit::Json jsonEnable = channelInfo["Enable"];
+    if (!jsonEnable.is_bool())
+    {
+        NX_DEBUG(NX_SCOPE_TAG, NX_FMT("JSON parsing error. \"Enable\" field absent"));
+        return std::nullopt;
+    }
+    return jsonEnable.bool_value();
+}
+
+//-------------------------------------------------------------------------------------------------
+
 /**
  * Extract information about min and max object size (as a json object) of a desired type from
  * the json object (that corresponds to some event and channel)

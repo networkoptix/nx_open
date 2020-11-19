@@ -53,7 +53,8 @@ struct Settings
     AudioDetection audioDetection;
     SoundClassification soundClassification;
     FaceMaskDetection faceMaskDetection;
-    std::vector<TemperatureChangeDetection> temperatureChangeDetection; //[kTemperatureMultiplicity];
+    std::vector<TemperatureChangeDetectionItem> temperatureChangeDetectionItems; //[kTemperatureMultiplicity];
+    TemperatureChangeDetectionToggle temperatureChangeDetectionToggle;
 
     AnalyticsCategories analyticsCategories = {false};
 
@@ -72,7 +73,8 @@ struct Settings
 
         audioDetection(settingsCapabilities, roiResolution),
         soundClassification(settingsCapabilities, roiResolution),
-        faceMaskDetection(settingsCapabilities, roiResolution)
+        faceMaskDetection(settingsCapabilities, roiResolution),
+        temperatureChangeDetectionToggle(settingsCapabilities, roiResolution)
     {
         for (int i = 0; i < kMultiplicity; ++i)
             ivaLines.emplace_back(settingsCapabilities, roiResolution);
@@ -84,7 +86,7 @@ struct Settings
             ivaExcludeAreas.emplace_back(settingsCapabilities, roiResolution);
 
         for (int i = 0; i < kTemperatureMultiplicity; ++i)
-            temperatureChangeDetection.emplace_back(settingsCapabilities, roiResolution);
+            temperatureChangeDetectionItems.emplace_back(settingsCapabilities, roiResolution);
     }
 };
 

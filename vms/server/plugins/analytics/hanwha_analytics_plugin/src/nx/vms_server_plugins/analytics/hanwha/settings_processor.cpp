@@ -336,10 +336,13 @@ void SettingsProcessor::loadAndHoldSettingsFromDevice()
     if (m_settings.analyticsCategories[temperatureChangeDetection])
     {
         sunapiReply = makeEventTypeReadingRequest("boxtemperaturedetection");
+        SettingGroup::readFromDeviceReply(
+            sunapiReply, &m_settings.temperatureChangeDetectionToggle, channelNumber);
+
         for (int i = 0; i < Settings::kTemperatureMultiplicity; ++i)
         {
             SettingGroup::readFromDeviceReply(
-                sunapiReply, &m_settings.temperatureChangeDetection[i], channelNumber, i);
+                sunapiReply, &m_settings.temperatureChangeDetectionItems[i], channelNumber, i);
         }
     }
 }
@@ -350,21 +353,6 @@ void SettingsProcessor::transferAndHoldSettingsFromDeviceToServer(
     nx::sdk::SettingsResponse* response)
 {
     loadAndHoldSettingsFromDevice();
-
-    if (m_settings.analyticsCategories[motionDetection])
-    {
-#if 0
-        // Hanwha Motion detection support is currently removed from the Clients interface
-
-        m_settings.motionDetectionObjectSize.writeToServer(response);
-
-        for (int i = 0; i < Settings::kMultiplicity; ++i)
-            m_settings.motionDetectionIncludeArea[i].writeToServer(response);
-
-        for (int i = 0; i < Settings::kMultiplicity; ++i)
-            m_settings.motionDetectionExcludeArea[i].writeToServer(response);
-#endif
-    }
 
     if (m_settings.analyticsCategories[shockDetection])
         m_settings.shockDetection.writeToServer(response);
@@ -414,11 +402,11 @@ void SettingsProcessor::transferAndHoldSettingsFromDeviceToServer(
 
     if (m_settings.analyticsCategories[temperatureChangeDetection])
     {
+        m_settings.temperatureChangeDetectionToggle.writeToServer(response);
+
         for (int i = 0; i < Settings::kTemperatureMultiplicity; ++i)
-            m_settings.temperatureChangeDetection[i].writeToServer(response);
-
+            m_settings.temperatureChangeDetectionItems[i].writeToServer(response);
     }
-
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -461,14 +449,11 @@ void SettingsProcessor::transferAndHoldSettingsFromServerToDevice(
             m_settings.defocusDetection, sender, m_cameraChannelNumber);
     }
 
-#if 1
-    // Fog detection is broken in Hanwha firmware <= 1.41.
     if (m_settings.analyticsCategories[fogDetection])
     {
         SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
             m_settings.fogDetection, sender, m_cameraChannelNumber);
     }
-#endif
 
     if (m_settings.analyticsCategories[videoAnalytics])
     {
@@ -525,10 +510,13 @@ void SettingsProcessor::transferAndHoldSettingsFromServerToDevice(
 
     if (m_settings.analyticsCategories[temperatureChangeDetection])
     {
+        SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
+            m_settings.temperatureChangeDetectionToggle, sender, m_cameraChannelNumber);
+
         for (int i = 0; i < Settings::kTemperatureMultiplicity; ++i)
         {
             SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
-                m_settings.temperatureChangeDetection[i], sender, m_cameraChannelNumber, i);
+                m_settings.temperatureChangeDetectionItems[i], sender, m_cameraChannelNumber, i);
         }
     }
 }

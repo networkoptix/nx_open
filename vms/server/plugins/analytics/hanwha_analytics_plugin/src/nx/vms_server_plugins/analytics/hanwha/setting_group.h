@@ -797,7 +797,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-struct TemperatureChangeDetection: public SettingGroup
+struct TemperatureChangeDetectionItem: public SettingGroup
 {
     UnnamedRect unnamedRect;
     std::string temperatureType = "Maximum";
@@ -829,7 +829,7 @@ struct TemperatureChangeDetection: public SettingGroup
     static constexpr const char* kJsonEventName = "BoxTemperatureDetection";
     static constexpr const char* kSunapiEventName = "boxtemperaturedetection";
 
-    TemperatureChangeDetection(const SettingsCapabilities& settingsCapabilities,
+    TemperatureChangeDetectionItem(const SettingsCapabilities& settingsCapabilities,
         const RoiResolution& roiResolution,
         int roiIndex = -1):
         SettingGroup(settingsCapabilities,
@@ -841,10 +841,48 @@ struct TemperatureChangeDetection: public SettingGroup
     {
     }
 
-    bool operator==(const TemperatureChangeDetection& rhs) const;
-    bool operator!=(const TemperatureChangeDetection& rhs) const { return !(*this == rhs); }
-    void assignExclusiveFrom(const TemperatureChangeDetection& other){};
+    bool operator==(const TemperatureChangeDetectionItem& rhs) const;
+    bool operator!=(const TemperatureChangeDetectionItem& rhs) const { return !(*this == rhs); }
+    void assignExclusiveFrom(const TemperatureChangeDetectionItem& other){};
 
+    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
+    void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
+
+    // The following functions perhaps should be moved to the inheritor-class.
+    // The idea is that the current class interacts with the server only,
+    // and the inheritor interacts with the device.
+    // The decision will be made during other plugins construction.
+    void readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo);
+    std::string buildDeviceWritingQuery(int channelNumber) const;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+struct TemperatureChangeDetectionToggle: public SettingGroup
+{
+    bool enabled = false;
+
+    enum class KeyIndex
+    {
+        enabled,
+    };
+    static constexpr const char* kKeys[] = {
+        "Temperature.Enable",
+    };
+    static constexpr const char* kJsonEventName = "BoxTemperatureDetection";
+    static constexpr const char* kSunapiEventName = "boxtemperaturedetection";
+
+    TemperatureChangeDetectionToggle(const SettingsCapabilities& settingsCapabilities,
+        const RoiResolution& roiResolution,
+        int /*roiIndex*/ = -1):
+        SettingGroup(settingsCapabilities, roiResolution, kKeys)
+    {
+    }
+    bool operator==(const TemperatureChangeDetectionToggle& rhs) const;
+    bool operator!=(const TemperatureChangeDetectionToggle& rhs) const { return !(*this == rhs); }
+    void assignExclusiveFrom(const TemperatureChangeDetectionToggle& other){};
+
+    void readExclusiveFromServerOrThrow(const nx::sdk::IStringMap* settings) {}
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
