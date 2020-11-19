@@ -54,7 +54,7 @@ int Scaler::ensureInitialized(const Frame* inputFrame)
         (AVPixelFormat)inputFrame->frame()->format
     };
 
-    if (m_scaleContext && m_sourceParams == currentSourceParams)
+    if (m_scaleContext && m_scaledFrame && m_sourceParams == currentSourceParams)
         return 0;
 
     uninitialize();
