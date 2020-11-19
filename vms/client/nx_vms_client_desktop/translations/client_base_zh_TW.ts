@@ -1582,7 +1582,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation>縮放中(縮小)...</translation>
+      <translation>縮小中...</translation>
     </message>
     <message>
       <source>Moving...</source>
@@ -1590,7 +1590,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Zooming in...</source>
-      <translation>縮放中(放大)...</translation>
+      <translation>放大中...</translation>
     </message>
     <message>
       <source>Focusing...</source>
@@ -2337,7 +2337,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation>拉高提前錄製時間將增加伺服器上的RAM使用率</translation>
+      <translation>設定越多的預錄時間將增加伺服器上的RAM使用率</translation>
     </message>
   </context>
   <context>
@@ -6691,11 +6691,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchPtzHandler</name>
     <message>
       <source>Zooming in...</source>
-      <translation>縮放中(縮小)...</translation>
+      <translation>放大中...</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation>縮放中(放大)...</translation>
+      <translation>縮小中...</translation>
     </message>
     <message>
       <source>Moving...</source>
@@ -7734,7 +7734,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation>拉高提前錄製時間將增加伺服器上的RAM使用率</translation>
+      <translation>設定越多的預錄時間將增加伺服器上的RAM使用率</translation>
     </message>
   </context>
   <context>
@@ -7910,7 +7910,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>There is no valid client package to download</source>
-      <translation type="unfinished">There is no valid client package to download</translation>
+      <translation>沒有可下載的有效客戶端套件</translation>
     </message>
   </context>
   <context>
@@ -8358,15 +8358,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Ceiling</source>
-      <translation type="unfinished">Ceiling</translation>
+      <translation>吸頂</translation>
     </message>
     <message>
       <source>Wall</source>
-      <translation type="unfinished">Wall</translation>
+      <translation>壁掛</translation>
     </message>
     <message>
       <source>Floor/Table</source>
-      <translation type="unfinished">Floor/Table</translation>
+      <translation>直立</translation>
     </message>
   </context>
   <context>

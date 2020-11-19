@@ -1369,7 +1369,7 @@
     <message>
       <location/>
       <source>Mount</source>
-      <translation type="unfinished">Mount</translation>
+      <translation>安裝</translation>
     </message>
     <message>
       <location/>

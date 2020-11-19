@@ -2041,7 +2041,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Storage removed</source>
-      <translation type="unfinished">Storage removed</translation>
+      <translation>储存空间已移除</translation>
     </message>
   </context>
   <context>
@@ -2337,7 +2337,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+      <translation>高预录制时间将提高服务器上的 RAM 使用</translation>
     </message>
   </context>
   <context>
@@ -3197,7 +3197,7 @@ to %1</source>
     </message>
     <message>
       <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+      <translation>音频捕获设备不支持合适的音频格式。请选择其他音频设备，或在“屏幕录制”设置中选择 &quot;无&quot;。</translation>
     </message>
   </context>
   <context>
@@ -6629,7 +6629,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchController</name>
     <message>
       <source>To switch between cameras press Shift + Arrow</source>
-      <translation type="unfinished">To switch between cameras press Shift + Arrow</translation>
+      <translation>要在摄像机之间切换，请按Shift +箭头键</translation>
     </message>
   </context>
   <context>
@@ -6687,15 +6687,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchPtzHandler</name>
     <message>
       <source>Zooming in...</source>
-      <translation type="unfinished">Zooming in...</translation>
+      <translation>正在放大...</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation type="unfinished">Zooming out...</translation>
+      <translation>正在缩小...</translation>
     </message>
     <message>
       <source>Moving...</source>
-      <translation type="unfinished">Moving...</translation>
+      <translation>正在移动...</translation>
     </message>
   </context>
   <context>
@@ -7527,7 +7527,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>DISABLED</source>
-      <translation type="unfinished">DISABLED</translation>
+      <translation>已停用</translation>
     </message>
   </context>
   <context>
@@ -7730,7 +7730,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+      <translation>较高的预记录时间将增加服务器上的RAM利用率</translation>
     </message>
   </context>
   <context>
@@ -7902,11 +7902,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>File %1 does not exist</source>
-      <translation type="unfinished">File %1 does not exist</translation>
+      <translation>%1 文件不存在</translation>
     </message>
     <message>
       <source>There is no valid client package to download</source>
-      <translation type="unfinished">There is no valid client package to download</translation>
+      <translation>没有要下载的有效客户端软件包</translation>
     </message>
   </context>
   <context>
@@ -8354,15 +8354,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Ceiling</source>
-      <translation type="unfinished">Ceiling</translation>
+      <translation>天花板</translation>
     </message>
     <message>
       <source>Wall</source>
-      <translation type="unfinished">Wall</translation>
+      <translation>壁挂</translation>
     </message>
     <message>
       <source>Floor/Table</source>
-      <translation type="unfinished">Floor/Table</translation>
+      <translation>直立</translation>
     </message>
   </context>
   <context>
@@ -8520,7 +8520,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>DISABLED</source>
-      <translation type="unfinished">DISABLED</translation>
+      <translation>已停用</translation>
     </message>
   </context>
   <context>
