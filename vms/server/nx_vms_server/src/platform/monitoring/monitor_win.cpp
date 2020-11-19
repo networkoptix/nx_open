@@ -230,9 +230,14 @@ public:
             checkError("PdhLookupPerfNameByIndexW", status);
             return QString();
         }
+        
+        if (size == 0)
+        {
+            NX_WARNING(this, "Zero-sized performance object name (%1) received from OS", index);
+            return QString();
+        }
 
-        QByteArray buffer;
-        buffer.resize(size * sizeof(WCHAR));
+        QByteArray buffer((size + 1) * sizeof(WCHAR), '\0');
         if(INVOKE(PdhLookupPerfNameByIndexW(NULL, index, reinterpret_cast<LPWSTR>(buffer.data()), &size)) != ERROR_SUCCESS)
             return QString();
 
