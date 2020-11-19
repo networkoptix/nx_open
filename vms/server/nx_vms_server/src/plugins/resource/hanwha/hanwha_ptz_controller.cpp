@@ -337,7 +337,7 @@ bool HanwhaPtzController::getFlip(
     if (horizontalFlip.value_or(false))
         *flip |= Qt::Orientation::Horizontal;
 
-    else if (verticalFlip.value_or(false))
+    if (verticalFlip.value_or(false))
         *flip |= Qt::Orientation::Vertical;
 
     return true;
