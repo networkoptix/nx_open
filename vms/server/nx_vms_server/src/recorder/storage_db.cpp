@@ -223,11 +223,11 @@ bool QnStorageDb::resetIoDevice()
     m_ioDevice.reset(m_storage->open(m_dbFileName, QIODevice::ReadWrite | QIODevice::Unbuffered));
     if (!m_ioDevice)
     {
-        NX_WARNING(this, lm("%1 DB file open failed").args(m_dbFileName));
+        NX_WARNING(this, lm("%1 DB file open failed").args(nx::utils::url::hidePassword(m_dbFileName)));
         return false;
     }
 
-    NX_DEBUG(this, "Db file '%1' has been opened successfully", m_dbFileName);
+    NX_DEBUG(this, "Db file '%1' has been opened successfully", nx::utils::url::hidePassword(m_dbFileName));
     return true;
 }
 
@@ -292,7 +292,7 @@ void QnStorageDb::addCatalogFromMediaFolder(
 bool QnStorageDb::startDbFile()
 {
     m_ioDevice.reset();
-    NX_DEBUG(this, "startDbFile: Removing DB file '%1'", m_dbFileName);
+    NX_DEBUG(this, "startDbFile: Removing DB file '%1'", nx::utils::url::hidePassword(m_dbFileName));
     m_storage->removeFile(m_dbFileName);
 
     if (!resetIoDevice())
@@ -412,7 +412,7 @@ bool QnStorageDb::writeVacuumedData(
         this,
         "QnStorageDb::serializedData() completed successfully. time = %1 ms", timer.elapsedMs());
 
-    NX_DEBUG(this, "writeVacuumedData: Removing DB file '%1'", m_dbFileName);
+    NX_DEBUG(this, "writeVacuumedData: Removing DB file '%1'", nx::utils::url::hidePassword(m_dbFileName));
     bool res = m_storage->removeFile(m_dbFileName);
     NX_ASSERT(res);
     if (!res)
