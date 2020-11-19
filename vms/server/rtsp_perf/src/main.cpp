@@ -74,7 +74,9 @@ static std::optional<RtspPerf::Config> makeConfig(const QCoreApplication& app)
     parser.addOption(countOption);
 
     QCommandLineOption livePercentOption(QStringList() << "l" << "live_percent",
-        "Percentage of live streams. By default: 100", "live percent", "100");
+        "Percentage of live streams. By default: 100. Archive streams will start from the position "
+        "set by the 'archive-position' parameter, if it is not specified, the initial position "
+        "will be selected randomly in the interval [-3600..-60] seconds", "live percent", "100");
     parser.addOption(livePercentOption);
 
     QCommandLineOption timeoutOption(QStringList() << "t" << "timeout",
@@ -138,6 +140,12 @@ static std::optional<RtspPerf::Config> makeConfig(const QCoreApplication& app)
     parser.addOption(archivePositionOption);
 
     parser.process(app);
+
+    if (parser.optionNames().size() == 0)
+    {
+        parser.showHelp();
+        return std::nullopt;
+    }
 
     RtspPerf::Config config;
     config.count = parser.value(countOption).toInt();
