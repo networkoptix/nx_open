@@ -1168,6 +1168,7 @@ void QnWorkbenchConnectHandler::at_selectCurrentServerAction_triggered()
         && NX_ASSERT(currentUser) && currentUser->isCloud();
 
     nx::utils::Url url;
+    url.setScheme(nx::network::http::kSecureUrlSchemeName);
     url.setUserName(currentUrl.userName());
     url.setPassword(currentUrl.password());
     url.setPort(endpoint->port);
