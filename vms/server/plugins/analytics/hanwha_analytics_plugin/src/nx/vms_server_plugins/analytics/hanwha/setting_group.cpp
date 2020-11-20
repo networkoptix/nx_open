@@ -1427,7 +1427,8 @@ std::string TemperatureChangeDetectionItem::buildDeviceWritingQuery(int channelN
         {
             query << "msubmenu=" << kSunapiEventName << "&action="
                   << "remove"
-                  << "&Channel=" << channelNumber << "&DefinedAreaIndex=" << deviceIndex();
+                  << "&Channel=" << channelNumber
+                  << "&ROIIndex=" << deviceIndex();
         }
     }
     return query.str();
