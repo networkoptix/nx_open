@@ -223,32 +223,47 @@ bool TamperingDetection::operator==(const TamperingDetection& rhs) const
 void TamperingDetection::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
     using namespace SettingPrimitivesServerIo;
-    deserializeOrThrow(value(sourceMap, KeyIndex::enabled), &enabled);
-    deserializeOrThrow(value(sourceMap, KeyIndex::thresholdLevel), &thresholdLevel);
-    deserializeOrThrow(value(sourceMap, KeyIndex::sensitivityLevel), &sensitivityLevel);
-    deserializeOrThrow(value(sourceMap, KeyIndex::minimumDuration), &minimumDuration);
-    deserializeOrThrow(value(sourceMap, KeyIndex::exceptDarkImages), &exceptDarkImages);
+    if (m_settingsCapabilities.tampering.enabled)
+        deserializeOrThrow(value(sourceMap, KeyIndex::enabled), &enabled);
+    if (m_settingsCapabilities.tampering.thresholdLevel)
+        deserializeOrThrow(value(sourceMap, KeyIndex::thresholdLevel), &thresholdLevel);
+    if (m_settingsCapabilities.tampering.sensitivityLevel)
+        deserializeOrThrow(value(sourceMap, KeyIndex::sensitivityLevel), &sensitivityLevel);
+    if (m_settingsCapabilities.tampering.minimumDuration)
+        deserializeOrThrow(value(sourceMap, KeyIndex::minimumDuration), &minimumDuration);
+    if (m_settingsCapabilities.tampering.exceptDarkImages)
+        deserializeOrThrow(value(sourceMap, KeyIndex::exceptDarkImages), &exceptDarkImages);
     initialized = true;
 }
 
 void TamperingDetection::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
 {
     using namespace SettingPrimitivesServerIo;
-    result->setValue(key(KeyIndex::enabled), serialize(enabled));
-    result->setValue(key(KeyIndex::thresholdLevel), serialize(thresholdLevel));
-    result->setValue(key(KeyIndex::sensitivityLevel), serialize(sensitivityLevel));
-    result->setValue(key(KeyIndex::minimumDuration), serialize(minimumDuration));
-    result->setValue(key(KeyIndex::exceptDarkImages), serialize(exceptDarkImages));
+    if (m_settingsCapabilities.tampering.enabled)
+        result->setValue(key(KeyIndex::enabled), serialize(enabled));
+    if (m_settingsCapabilities.tampering.thresholdLevel)
+        result->setValue(key(KeyIndex::thresholdLevel), serialize(thresholdLevel));
+    if (m_settingsCapabilities.tampering.sensitivityLevel)
+        result->setValue(key(KeyIndex::sensitivityLevel), serialize(sensitivityLevel));
+    if (m_settingsCapabilities.tampering.minimumDuration)
+        result->setValue(key(KeyIndex::minimumDuration), serialize(minimumDuration));
+    if (m_settingsCapabilities.tampering.exceptDarkImages)
+        result->setValue(key(KeyIndex::exceptDarkImages), serialize(exceptDarkImages));
 }
 
 void TamperingDetection::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
 {
     using namespace SettingPrimitivesDeviceIo;
-    deserializeOrThrow(channelInfo, "Enable", m_roiResolution, &enabled);
-    deserializeOrThrow(channelInfo, "ThresholdLevel", m_roiResolution, &thresholdLevel);
-    deserializeOrThrow(channelInfo, "SensitivityLevel", m_roiResolution, &sensitivityLevel);
-    deserializeOrThrow(channelInfo, "Duration", m_roiResolution, &minimumDuration);
-    deserializeOrThrow(channelInfo, "DarknessDetection", m_roiResolution, &exceptDarkImages);
+    if (m_settingsCapabilities.tampering.enabled)
+        deserializeOrThrow(channelInfo, "Enable", m_roiResolution, &enabled);
+    if (m_settingsCapabilities.tampering.thresholdLevel)
+        deserializeOrThrow(channelInfo, "ThresholdLevel", m_roiResolution, &thresholdLevel);
+    if (m_settingsCapabilities.tampering.sensitivityLevel)
+        deserializeOrThrow(channelInfo, "SensitivityLevel", m_roiResolution, &sensitivityLevel);
+    if (m_settingsCapabilities.tampering.minimumDuration)
+        deserializeOrThrow(channelInfo, "Duration", m_roiResolution, &minimumDuration);
+    if (m_settingsCapabilities.tampering.exceptDarkImages)
+        deserializeOrThrow(channelInfo, "DarknessDetection", m_roiResolution, &exceptDarkImages);
     initialized = true;
 }
 
@@ -261,13 +276,18 @@ std::string TamperingDetection::buildDeviceWritingQuery(int channelNumber) const
         query
             << "msubmenu=" << kSunapiEventName
             << "&action=" << "set"
-            << "&Channel=" << channelNumber
-            << "&Enable=" << serialize(enabled)
-            << "&ThresholdLevel=" << thresholdLevel
-            << "&SensitivityLevel=" << sensitivityLevel
-            << "&Duration=" << minimumDuration
-            << "&DarknessDetection=" << serialize(exceptDarkImages)
-            ;
+            << "&Channel=" << channelNumber;
+
+        if (m_settingsCapabilities.tampering.thresholdLevel)
+            query << "&Enable=" << serialize(enabled);
+        if (m_settingsCapabilities.tampering.thresholdLevel)
+            query << "&ThresholdLevel=" << thresholdLevel;
+        if (m_settingsCapabilities.tampering.sensitivityLevel)
+            query << "&SensitivityLevel=" << sensitivityLevel;
+        if (m_settingsCapabilities.tampering.minimumDuration)
+            query << "&Duration=" << minimumDuration;
+        if (m_settingsCapabilities.tampering.exceptDarkImages)
+            query << "&DarknessDetection=" << serialize(exceptDarkImages);
     }
     return query.str();
 }
@@ -1317,22 +1337,22 @@ void TemperatureChangeDetectionItem::readFromServerOrThrow(
     const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
     using namespace SettingPrimitivesServerIo;
-    if (m_settingsCapabilities.temperatureDetection.coordinate)
+    if (m_settingsCapabilities.temperature.coordinate)
         deserializeOrThrow(value(sourceMap, KeyIndex::unnamedRect), &unnamedRect);
 
-    if (m_settingsCapabilities.temperatureDetection.temperatureType)
+    if (m_settingsCapabilities.temperature.temperatureType)
         deserializeOrThrow(value(sourceMap, KeyIndex::temperatureType), &temperatureType);
 
-    if (m_settingsCapabilities.temperatureDetection.detectionType)
+    if (m_settingsCapabilities.temperature.detectionType)
         deserializeOrThrow(value(sourceMap, KeyIndex::detectionType), &detectionType);
 
-    if (m_settingsCapabilities.temperatureDetection.thresholdTemperature)
+    if (m_settingsCapabilities.temperature.thresholdTemperature)
         deserializeOrThrow(value(sourceMap, KeyIndex::thresholdTemperature), &thresholdTemperature);
 
-    if (m_settingsCapabilities.temperatureDetection.duration)
+    if (m_settingsCapabilities.temperature.duration)
         deserializeOrThrow(value(sourceMap, KeyIndex::duration), &duration);
 
-    if (m_settingsCapabilities.temperatureDetection.areaEmissivity)
+    if (m_settingsCapabilities.temperature.areaEmissivity)
         deserializeOrThrow(value(sourceMap, KeyIndex::areaEmissivity), &areaEmissivity);
     initialized = true;
 }
@@ -1341,22 +1361,22 @@ void TemperatureChangeDetectionItem::writeToServer(
     nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
 {
     using namespace SettingPrimitivesServerIo;
-    if (m_settingsCapabilities.temperatureDetection.coordinate)
+    if (m_settingsCapabilities.temperature.coordinate)
         result->setValue(key(KeyIndex::unnamedRect), serialize(unnamedRect));
 
-    if (m_settingsCapabilities.temperatureDetection.temperatureType)
+    if (m_settingsCapabilities.temperature.temperatureType)
         result->setValue(key(KeyIndex::temperatureType), serialize(temperatureType));
 
-    if (m_settingsCapabilities.temperatureDetection.detectionType)
+    if (m_settingsCapabilities.temperature.detectionType)
         result->setValue(key(KeyIndex::detectionType), serialize(detectionType));
 
-    if (m_settingsCapabilities.temperatureDetection.thresholdTemperature)
+    if (m_settingsCapabilities.temperature.thresholdTemperature)
         result->setValue(key(KeyIndex::thresholdTemperature), serialize(thresholdTemperature));
 
-    if (m_settingsCapabilities.temperatureDetection.duration)
+    if (m_settingsCapabilities.temperature.duration)
         result->setValue(key(KeyIndex::duration), serialize(duration));
 
-    if (m_settingsCapabilities.temperatureDetection.areaEmissivity)
+    if (m_settingsCapabilities.temperature.areaEmissivity)
         result->setValue(key(KeyIndex::areaEmissivity), serialize(areaEmissivity));
 }
 
@@ -1374,18 +1394,18 @@ void TemperatureChangeDetectionItem::readFromDeviceReplyOrThrow(const nx::kit::J
 
     using namespace SettingPrimitivesDeviceIo;
 
-    if (m_settingsCapabilities.temperatureDetection.coordinate)
+    if (m_settingsCapabilities.temperature.coordinate)
         deserializeOrThrow(roiInfo, "Coordinates", m_roiResolution, &unnamedRect.points);
 
-    if (m_settingsCapabilities.temperatureDetection.temperatureType)
+    if (m_settingsCapabilities.temperature.temperatureType)
         deserializeOrThrow(roiInfo, "TemperatureType", m_roiResolution, &temperatureType);
-    if (m_settingsCapabilities.temperatureDetection.detectionType)
+    if (m_settingsCapabilities.temperature.detectionType)
         deserializeOrThrow(roiInfo, "DetectionType", m_roiResolution, &detectionType);
-    if (m_settingsCapabilities.temperatureDetection.thresholdTemperature)
+    if (m_settingsCapabilities.temperature.thresholdTemperature)
         deserializeOrThrow(roiInfo, "ThresholdTemperature", m_roiResolution, &thresholdTemperature);
-    if (m_settingsCapabilities.temperatureDetection.duration)
+    if (m_settingsCapabilities.temperature.duration)
         deserializeOrThrow(roiInfo, "Duration", m_roiResolution, &duration);
-    if (m_settingsCapabilities.temperatureDetection.areaEmissivity)
+    if (m_settingsCapabilities.temperature.areaEmissivity)
         deserializeOrThrow(roiInfo, "NormalizedEmissivity", m_roiResolution, &areaEmissivity);
     initialized = true;
 }
@@ -1403,22 +1423,22 @@ std::string TemperatureChangeDetectionItem::buildDeviceWritingQuery(int channelN
                   << "set"
                   << "&Channel=" << channelNumber;
 
-            if (m_settingsCapabilities.temperatureDetection.coordinate)
+            if (m_settingsCapabilities.temperature.coordinate)
                 query << prefix << ".Coordinate=" << serialize(unnamedRect.points, m_roiResolution);
 
-            if (m_settingsCapabilities.temperatureDetection.temperatureType)
+            if (m_settingsCapabilities.temperature.temperatureType)
                 query << prefix << ".TemperatureType=" << temperatureType;
 
-            if (m_settingsCapabilities.temperatureDetection.detectionType)
+            if (m_settingsCapabilities.temperature.detectionType)
                 query << prefix << ".DetectionType=" << detectionType;
 
-            if (m_settingsCapabilities.temperatureDetection.thresholdTemperature)
+            if (m_settingsCapabilities.temperature.thresholdTemperature)
                 query << prefix << ".ThresholdTemperature=" << thresholdTemperature;
 
-            if (m_settingsCapabilities.temperatureDetection.duration)
+            if (m_settingsCapabilities.temperature.duration)
                 query << prefix << ".Duration=" << duration;
 
-            if (m_settingsCapabilities.temperatureDetection.duration)
+            if (m_settingsCapabilities.temperature.duration)
                 query << prefix << ".NormalizedEmissivity=" << areaEmissivity;
 
             //query << "TemperatureUnit=" << "Fahrenheit"; //"Celsius"

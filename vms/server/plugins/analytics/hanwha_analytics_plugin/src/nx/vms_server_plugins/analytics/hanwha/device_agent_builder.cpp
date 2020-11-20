@@ -179,6 +179,21 @@ SettingsCapabilities DeviceAgentBuilder::fetchSettingsCapabilities() const
         return result;
     }
 
+    result.tampering.enabled = cgi.parameter("eventsources","tamperingdetection",
+        "set", "Enable").has_value();
+
+    result.tampering.thresholdLevel =
+        cgi.parameter("eventsources", "tamperingdetection", "set", "ThresholdLevel").has_value();
+
+    result.tampering.sensitivityLevel =
+        cgi.parameter("eventsources", "tamperingdetection", "set", "SensitivityLevel").has_value();
+
+    result.tampering.minimumDuration =
+        cgi.parameter("eventsources", "tamperingdetection", "set", "Duration").has_value();
+
+    result.tampering.exceptDarkImages =
+        cgi.parameter("eventsources", "tamperingdetection", "set", "DarknessDetection").has_value();
+
     // Line
     result.ivaLineRuleName = cgi.parameter("eventsources", "videoanalysis2", "set",
         "Line.#.RuleName").has_value();
@@ -221,22 +236,22 @@ SettingsCapabilities DeviceAgentBuilder::fetchSettingsCapabilities() const
         "DefinedArea.#.LoiteringDuration").has_value();
 
     // Temperature
-    result.temperatureDetection.coordinate = cgi.parameter("eventsources",
+    result.temperature.coordinate = cgi.parameter("eventsources",
         "boxtemperaturedetection", "set", "ROI.#.Coordinate").has_value();
 
-    result.temperatureDetection.temperatureType = cgi.parameter("eventsources",
+    result.temperature.temperatureType = cgi.parameter("eventsources",
         "boxtemperaturedetection", "set", "ROI.#.TemperatureType").has_value();
 
-    result.temperatureDetection.detectionType = cgi.parameter("eventsources",
+    result.temperature.detectionType = cgi.parameter("eventsources",
         "boxtemperaturedetection", "set", "ROI.#.DetectionType").has_value();
 
-    result.temperatureDetection.thresholdTemperature = cgi.parameter("eventsources",
+    result.temperature.thresholdTemperature = cgi.parameter("eventsources",
         "boxtemperaturedetection", "set", "ROI.#.ThresholdTemperature").has_value();
 
-    result.temperatureDetection.duration = cgi.parameter("eventsources",
+    result.temperature.duration = cgi.parameter("eventsources",
         "boxtemperaturedetection", "set", "ROI.#.Duration").has_value();
 
-    result.temperatureDetection.areaEmissivity = cgi.parameter("eventsources",
+    result.temperature.areaEmissivity = cgi.parameter("eventsources",
         "boxtemperaturedetection", "set", "ROI.#.NormalizedEmissivity").has_value();
 
     return result;

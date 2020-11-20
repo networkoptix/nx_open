@@ -2,28 +2,38 @@
 
 namespace nx::vms_server_plugins::analytics::hanwha {
 
-struct TemperatureDetectionCapabilities
-{
-    bool coordinate = false;
-    bool temperatureType = false; //< Minimum/Maximum/Average
-    bool detectionType = false; //< Above/Below/Increase/Decrease
-    bool thresholdTemperature = false; //< F degree
-    bool duration = false;
-    bool areaEmissivity = false; // float [1..99]
-
-    // parameters common for all temperature boxes:
-    // bool btdEnable = false;
-    // struct Overlay
-    //{
-    //    bool area;
-    //    bool avgTemperature;
-    //    bool minTemperature;
-    //    bool maxTemperature;
-    //};
-};
-
 struct SettingsCapabilities
 {
+    struct Tampering
+    {
+        bool enabled = false;
+        bool thresholdLevel = false;
+        bool sensitivityLevel = false;
+        bool minimumDuration = false;
+        bool exceptDarkImages = false;
+    };
+    struct Temperature
+    {
+        bool coordinate = false;
+        bool temperatureType = false; //< Minimum/Maximum/Average
+        bool detectionType = false; //< Above/Below/Increase/Decrease
+        bool thresholdTemperature = false; //< F degree
+        bool duration = false;
+        bool areaEmissivity = false; // float [1..99]
+
+        // parameters common for all temperature boxes:
+        // bool btdEnable = false;
+        // struct Overlay
+        //{
+        //    bool area;
+        //    bool avgTemperature;
+        //    bool minTemperature;
+        //    bool maxTemperature;
+        //};
+    };
+
+    Tampering tampering;
+
     //IvaLine
     bool ivaLineRuleName = false; //< `IvaLine::namedLineFigure::name`
     bool ivaLineObjectTypeFilter = false; //< `IvaLine::person` and `IvaLine::vehicle`
@@ -42,7 +52,7 @@ struct SettingsCapabilities
     bool ivaAreaAppearDuration = false;
     bool ivaAreaLoiteringDuration = false;
 
-    TemperatureDetectionCapabilities temperatureDetection;
+    Temperature temperature;
 };
 
 } // namespace nx::vms_server_plugins::analytics::hanwha
