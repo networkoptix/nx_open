@@ -329,6 +329,33 @@ The example of the incoming json:
     return result;
 }
 
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Extract information about face mask detection ROI (exclude area) (as a json object)
+ */
+/*static*/ nx::kit::Json DeviceResponseJsonParser::extractMaskRoiInfo(
+    nx::kit::Json channelInfo, int sunapiIndex)
+{
+    nx::kit::Json result;
+    const nx::kit::Json& Lines = channelInfo["ExcludeAreas"];
+    if (!Lines.is_array())
+        return result;
+
+    for (const nx::kit::Json& Line: Lines.array_items())
+    {
+        const nx::kit::Json& roiIndex = Line["ExcludeArea"];
+        if (roiIndex.is_number() && roiIndex.int_value() == sunapiIndex)
+        {
+            result = Line;
+            return result;
+        }
+    }
+    return result;
+}
+
+//-------------------------------------------------------------------------------------------------
+
 /**
  * Extract information about temperature change detection ROI (as a json object) of a desired
  * type from the json object (that corresponds to some event and channel)

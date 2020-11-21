@@ -656,7 +656,7 @@ bool IvaLine::operator==(const IvaLine& rhs) const
 
 void IvaLine::assignExclusiveFrom(const IvaLine& other)
 {
-    if (!m_settingsCapabilities.ivaLineRuleName)
+    if (!m_settingsCapabilities.ivaLine.ruleName)
         this->namedLineFigure.name = other.namedLineFigure.name;
 }
 
@@ -674,7 +674,7 @@ void IvaLine::readFromServerOrThrow(
 {
     using namespace SettingPrimitivesServerIo;
     deserializeOrThrow(value(sourceMap, KeyIndex::namedLineFigure), &namedLineFigure);
-    if (m_settingsCapabilities.ivaLineObjectTypeFilter)
+    if (m_settingsCapabilities.ivaLine.objectTypeFilter)
     {
         deserializeOrThrow(value(sourceMap, KeyIndex::person), &person);
         deserializeOrThrow(value(sourceMap, KeyIndex::vehicle), &vehicle);
@@ -690,7 +690,7 @@ void IvaLine::writeToServer(
 {
     using namespace SettingPrimitivesServerIo;
     result->setValue(key(KeyIndex::namedLineFigure), serialize(namedLineFigure));
-    if (m_settingsCapabilities.ivaLineObjectTypeFilter)
+    if (m_settingsCapabilities.ivaLine.objectTypeFilter)
     {
         result->setValue(key(KeyIndex::person), serialize(person));
         result->setValue(key(KeyIndex::vehicle), serialize(vehicle));
@@ -720,10 +720,10 @@ void IvaLine::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
     if (namedLineFigure.points[0].y < namedLineFigure.points[1].y)
         namedLineFigure.direction = invertedDirection(namedLineFigure.direction);
 
-    if (m_settingsCapabilities.ivaLineRuleName)
+    if (m_settingsCapabilities.ivaLine.ruleName)
         deserializeOrThrow(lineInfo, "RuleName", m_roiResolution, &namedLineFigure.name);
 
-    if (m_settingsCapabilities.ivaLineObjectTypeFilter)
+    if (m_settingsCapabilities.ivaLine.objectTypeFilter)
     {
         deserializeOrThrow(lineInfo, "ObjectTypeFilter", m_roiResolution, &person, "Person");
         deserializeOrThrow(lineInfo, "ObjectTypeFilter", m_roiResolution, &vehicle, "Vehicle");
@@ -796,9 +796,9 @@ std::string IvaLine::buildDeviceWritingQuery(int channelNumber) const
                 << "&action=" << "set"
                 << "&Channel=" << channelNumber
                 << prefix << ".Coordinate=" << serialize(namedLineFigure.points, m_roiResolution);
-            if (m_settingsCapabilities.ivaLineRuleName)
+            if (m_settingsCapabilities.ivaLine.ruleName)
                 query << prefix << ".RuleName=" << namedLineFigure.name;
-            if (m_settingsCapabilities.ivaLineObjectTypeFilter)
+            if (m_settingsCapabilities.ivaLine.objectTypeFilter)
                 query << prefix << ".ObjectTypeFilter=" << buildFilter();
             query << prefix << ".Mode=" << buildMode();
         }
@@ -835,7 +835,7 @@ bool IvaArea::operator==(const IvaArea& rhs) const
 
 void IvaArea::assignExclusiveFrom(const IvaArea& other)
 {
-    if (!m_settingsCapabilities.ivaLineRuleName)
+    if (!m_settingsCapabilities.ivaLine.ruleName)
         this->namedPolygon.name = other.namedPolygon.name;
 }
 
@@ -851,27 +851,27 @@ void IvaArea::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*
 {
     using namespace SettingPrimitivesServerIo;
     deserializeOrThrow(value(sourceMap, KeyIndex::namedPolygon), &namedPolygon);
-    if (m_settingsCapabilities.ivaAreaObjectTypeFilter)
+    if (m_settingsCapabilities.ivaArea.objectTypeFilter)
     {
         deserializeOrThrow(value(sourceMap, KeyIndex::person), &person);
         deserializeOrThrow(value(sourceMap, KeyIndex::vehicle), &vehicle);
     }
 
-    if (m_settingsCapabilities.ivaAreaIntrusion)
+    if (m_settingsCapabilities.ivaArea.intrusion)
         deserializeOrThrow(value(sourceMap, KeyIndex::intrusion), &intrusion);
-    if (m_settingsCapabilities.ivaAreaEnter)
+    if (m_settingsCapabilities.ivaArea.enter)
         deserializeOrThrow(value(sourceMap, KeyIndex::enter), &enter);
-    if (m_settingsCapabilities.ivaAreaExit)
+    if (m_settingsCapabilities.ivaArea.exit)
         deserializeOrThrow(value(sourceMap, KeyIndex::exit), &exit);
-    if (m_settingsCapabilities.ivaAreaAppear)
+    if (m_settingsCapabilities.ivaArea.appear)
         deserializeOrThrow(value(sourceMap, KeyIndex::appear), &appear);
-    if (m_settingsCapabilities.ivaAreaLoitering)
+    if (m_settingsCapabilities.ivaArea.loitering)
         deserializeOrThrow(value(sourceMap, KeyIndex::loitering), &loitering);
-    if (m_settingsCapabilities.ivaAreaIntrusionDuration)
+    if (m_settingsCapabilities.ivaArea.intrusionDuration)
         deserializeOrThrow(value(sourceMap, KeyIndex::intrusionDuration), &intrusionDuration);
-    if (m_settingsCapabilities.ivaAreaAppearDuration)
+    if (m_settingsCapabilities.ivaArea.appearDuration)
         deserializeOrThrow(value(sourceMap, KeyIndex::appearDuration), &appearDuration);
-    if (m_settingsCapabilities.ivaAreaLoiteringDuration)
+    if (m_settingsCapabilities.ivaArea.loiteringDuration)
         deserializeOrThrow(value(sourceMap, KeyIndex::loiteringDuration), &loiteringDuration);
     initialized = true;
 }
@@ -880,26 +880,26 @@ void IvaArea::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/)
 {
     using namespace SettingPrimitivesServerIo;
     result->setValue(key(KeyIndex::namedPolygon), serialize(namedPolygon));
-    if (m_settingsCapabilities.ivaAreaObjectTypeFilter)
+    if (m_settingsCapabilities.ivaArea.objectTypeFilter)
     {
         result->setValue(key(KeyIndex::person), serialize(person));
         result->setValue(key(KeyIndex::vehicle), serialize(vehicle));
     }
-    if (m_settingsCapabilities.ivaAreaIntrusion)
+    if (m_settingsCapabilities.ivaArea.intrusion)
         result->setValue(key(KeyIndex::intrusion), serialize(intrusion));
-    if (m_settingsCapabilities.ivaAreaEnter)
+    if (m_settingsCapabilities.ivaArea.enter)
         result->setValue(key(KeyIndex::enter), serialize(enter));
-    if (m_settingsCapabilities.ivaAreaExit)
+    if (m_settingsCapabilities.ivaArea.exit)
         result->setValue(key(KeyIndex::exit), serialize(exit));
-    if (m_settingsCapabilities.ivaAreaAppear)
+    if (m_settingsCapabilities.ivaArea.appear)
         result->setValue(key(KeyIndex::appear), serialize(appear));
-    if (m_settingsCapabilities.ivaAreaLoitering)
+    if (m_settingsCapabilities.ivaArea.loitering)
         result->setValue(key(KeyIndex::loitering), serialize(loitering));
-    if (m_settingsCapabilities.ivaAreaIntrusionDuration)
+    if (m_settingsCapabilities.ivaArea.intrusionDuration)
         result->setValue(key(KeyIndex::intrusionDuration), serialize(intrusionDuration));
-    if (m_settingsCapabilities.ivaAreaAppearDuration)
+    if (m_settingsCapabilities.ivaArea.appearDuration)
         result->setValue(key(KeyIndex::appearDuration), serialize(appearDuration));
-    if (m_settingsCapabilities.ivaAreaLoiteringDuration)
+    if (m_settingsCapabilities.ivaArea.loiteringDuration)
         result->setValue(key(KeyIndex::loiteringDuration), serialize(loiteringDuration));
 }
 
@@ -916,31 +916,31 @@ void IvaArea::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
     using namespace SettingPrimitivesDeviceIo;
     deserializeOrThrow(roiInfo, "Coordinates", m_roiResolution, &namedPolygon.points);
 
-    if (m_settingsCapabilities.ivaAreaRuleName)
+    if (m_settingsCapabilities.ivaArea.ruleName)
         deserializeOrThrow(roiInfo, "RuleName", m_roiResolution, &namedPolygon.name);
 
-    if (m_settingsCapabilities.ivaAreaObjectTypeFilter)
+    if (m_settingsCapabilities.ivaArea.objectTypeFilter)
     {
         deserializeOrThrow(roiInfo, "ObjectTypeFilter", m_roiResolution, &person, "Person");
         deserializeOrThrow(roiInfo, "ObjectTypeFilter", m_roiResolution, &vehicle, "Vehicle");
     }
 
-    if (m_settingsCapabilities.ivaAreaIntrusion)
+    if (m_settingsCapabilities.ivaArea.intrusion)
         deserializeOrThrow(roiInfo, "Mode", m_roiResolution, &intrusion, "Intrusion");
-    if (m_settingsCapabilities.ivaAreaEnter)
+    if (m_settingsCapabilities.ivaArea.enter)
         deserializeOrThrow(roiInfo, "Mode", m_roiResolution, &enter, "Entering");
-    if (m_settingsCapabilities.ivaAreaExit)
+    if (m_settingsCapabilities.ivaArea.exit)
         deserializeOrThrow(roiInfo, "Mode", m_roiResolution, &exit, "Exiting");
-    if (m_settingsCapabilities.ivaAreaAppear)
+    if (m_settingsCapabilities.ivaArea.appear)
         deserializeOrThrow(roiInfo, "Mode", m_roiResolution, &appear, "AppearDisappear");
-    if (m_settingsCapabilities.ivaAreaLoitering)
+    if (m_settingsCapabilities.ivaArea.loitering)
         deserializeOrThrow(roiInfo, "Mode", m_roiResolution, &loitering, "Loitering");
 
-    if (m_settingsCapabilities.ivaAreaIntrusionDuration)
+    if (m_settingsCapabilities.ivaArea.intrusionDuration)
         deserializeOrThrow(roiInfo, "IntrusionDuration", m_roiResolution, &intrusionDuration);
-    if (m_settingsCapabilities.ivaAreaAppearDuration)
+    if (m_settingsCapabilities.ivaArea.appearDuration)
         deserializeOrThrow(roiInfo, "AppearanceDuration", m_roiResolution, &appearDuration);
-    if (m_settingsCapabilities.ivaAreaLoiteringDuration)
+    if (m_settingsCapabilities.ivaArea.loiteringDuration)
         deserializeOrThrow(roiInfo, "LoiteringDuration", m_roiResolution, &loiteringDuration);
     initialized = true;
 }
@@ -949,19 +949,19 @@ std::string IvaArea::buildMode() const
 {
     std::vector<const char*> mode;
 
-    if (m_settingsCapabilities.ivaAreaIntrusion && intrusion)
+    if (m_settingsCapabilities.ivaArea.intrusion && intrusion)
         mode.push_back("Intrusion");
 
-    if (m_settingsCapabilities.ivaAreaEnter && enter)
+    if (m_settingsCapabilities.ivaArea.enter && enter)
         mode.push_back("Entering");
 
-    if (m_settingsCapabilities.ivaAreaExit && exit)
+    if (m_settingsCapabilities.ivaArea.exit && exit)
         mode.push_back("Exiting");
 
-    if (m_settingsCapabilities.ivaAreaAppear && appear)
+    if (m_settingsCapabilities.ivaArea.appear && appear)
         mode.push_back("AppearDisappear");
 
-    if (m_settingsCapabilities.ivaAreaLoitering && loitering)
+    if (m_settingsCapabilities.ivaArea.loitering && loitering)
         mode.push_back("Loitering");
 
     return join(mode);
@@ -996,25 +996,27 @@ std::string IvaArea::buildDeviceWritingQuery(int channelNumber) const
                 << prefix << ".Coordinate=" << serialize(namedPolygon.points, m_roiResolution)
                 << prefix << ".Type=" << "Inside";
 
-            if (m_settingsCapabilities.ivaAreaRuleName)
+            if (m_settingsCapabilities.ivaArea.ruleName)
                 query << prefix << ".RuleName=" << namedPolygon.name;
 
-            if (m_settingsCapabilities.ivaAreaObjectTypeFilter)
+            if (m_settingsCapabilities.ivaArea.objectTypeFilter)
                 query << prefix << ".ObjectTypeFilter=" << buildFilter();
 
-            if (m_settingsCapabilities.ivaAreaIntrusion || m_settingsCapabilities.ivaAreaEnter
-                || m_settingsCapabilities.ivaAreaExit || m_settingsCapabilities.ivaAreaAppear
-                || m_settingsCapabilities.ivaAreaLoitering)
+            if (m_settingsCapabilities.ivaArea.intrusion
+                || m_settingsCapabilities.ivaArea.enter
+                || m_settingsCapabilities.ivaArea.exit
+                || m_settingsCapabilities.ivaArea.appear
+                || m_settingsCapabilities.ivaArea.loitering)
             {
                 query << prefix << ".Mode=" << buildMode();
             }
 
-            if (m_settingsCapabilities.ivaAreaIntrusionDuration)
+            if (m_settingsCapabilities.ivaArea.intrusionDuration)
                 query << prefix << ".IntrusionDuration=" << intrusionDuration;
 
-            if (m_settingsCapabilities.ivaAreaAppearDuration)
+            if (m_settingsCapabilities.ivaArea.appearDuration)
                 query << prefix << ".AppearanceDuration=" << appearDuration;
-            if (m_settingsCapabilities.ivaAreaLoiteringDuration)
+            if (m_settingsCapabilities.ivaArea.loiteringDuration)
                 query << prefix << ".LoiteringDuration=" << loiteringDuration;
         }
         else
@@ -1244,7 +1246,9 @@ bool FaceMaskDetection::operator==(const FaceMaskDetection& rhs) const
 {
     return initialized == rhs.initialized
         && enabled == rhs.enabled
-        && detectionMode == rhs.detectionMode;
+        && detectionMode == rhs.detectionMode
+        && duration == rhs.duration
+        ;
 }
 
 /*static*/
@@ -1272,8 +1276,12 @@ void FaceMaskDetection::readFromServerOrThrow(
     const nx::sdk::IStringMap* settings, int /*roiIndex*/)
 {
     using namespace SettingPrimitivesServerIo;
-    deserializeOrThrow(value(settings, KeyIndex::enabled), &enabled);
-    deserializeDetectionModeOrThrow(value(settings, KeyIndex::detectionMode), &detectionMode);
+    if (m_settingsCapabilities.mask.enabled)
+        deserializeOrThrow(value(settings, KeyIndex::enabled), &enabled);
+    if (m_settingsCapabilities.mask.detectionMode)
+        deserializeDetectionModeOrThrow(value(settings, KeyIndex::detectionMode), &detectionMode);
+    if (m_settingsCapabilities.mask.duration)
+        deserializeOrThrow(value(settings, KeyIndex::duration), &duration);
     initialized = true;
 }
 
@@ -1281,8 +1289,12 @@ void FaceMaskDetection::writeToServer(
     nx::sdk::SettingsResponse* settingsDestination, int /*roiIndex*/) const
 {
     using namespace SettingPrimitivesServerIo;
-    settingsDestination->setValue(key(KeyIndex::enabled), serialize(enabled));
-    settingsDestination->setValue(key(KeyIndex::detectionMode), buildDetectionMode());
+    if (m_settingsCapabilities.mask.enabled)
+        settingsDestination->setValue(key(KeyIndex::enabled), serialize(enabled));
+    if (m_settingsCapabilities.mask.detectionMode)
+        settingsDestination->setValue(key(KeyIndex::detectionMode), buildDetectionMode());
+    if (m_settingsCapabilities.mask.duration)
+        settingsDestination->setValue(key(KeyIndex::duration), serialize(duration));
 }
 
 void FaceMaskDetection::readFromDeviceReplyOrThrow(
@@ -1292,8 +1304,12 @@ void FaceMaskDetection::readFromDeviceReplyOrThrow(
     deserializeOrThrow(channelInfo, "Enable", m_roiResolution, &enabled);
 
     std::string detectionModeString;
-    deserializeOrThrow(channelInfo, "DetectionMode", m_roiResolution, &detectionModeString);
-    deserializeDetectionModeOrThrow(detectionModeString.c_str(), &detectionMode);
+    if (m_settingsCapabilities.mask.enabled)
+        deserializeOrThrow(channelInfo, "DetectionMode", m_roiResolution, &detectionModeString);
+    if (m_settingsCapabilities.mask.detectionMode)
+        deserializeDetectionModeOrThrow(detectionModeString.c_str(), &detectionMode);
+    if (m_settingsCapabilities.mask.duration)
+        deserializeOrThrow(channelInfo, "Duration", m_roiResolution, &duration);
     initialized = true;
 }
 
@@ -1306,9 +1322,14 @@ std::string FaceMaskDetection::buildDeviceWritingQuery(int channelNumber) const
         query
             << "msubmenu=" << kSunapiEventName
             << "&action=" << "set"
-            << "&Channel=" << channelNumber
-            << "&Enable=" << serialize(enabled)
-            << "&DetectionMode=" << buildDetectionMode();
+            << "&Channel=" << channelNumber;
+
+        if (m_settingsCapabilities.mask.enabled)
+            query << "&Enable=" << serialize(enabled);
+        if (m_settingsCapabilities.mask.detectionMode)
+            query << "&DetectionMode=" << buildDetectionMode();
+        if (m_settingsCapabilities.mask.duration)
+            query << "&Duration=" << duration;
     }
     return query.str();
 }

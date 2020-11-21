@@ -53,8 +53,9 @@ struct Settings
     AudioDetection audioDetection;
     SoundClassification soundClassification;
     FaceMaskDetection faceMaskDetection;
-    std::vector<TemperatureChangeDetectionItem> temperatureChangeDetectionItems; //[kTemperatureMultiplicity];
     TemperatureChangeDetectionToggle temperatureChangeDetectionToggle;
+    std::vector<TemperatureChangeDetectionItem>
+        temperatureChangeDetectionItems; //[kTemperatureMultiplicity];
 
     AnalyticsCategories analyticsCategories = {false};
 

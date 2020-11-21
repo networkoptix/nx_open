@@ -31,28 +31,38 @@ struct SettingsCapabilities
         //    bool maxTemperature;
         //};
     };
+    struct IvaLine
+    {
+        bool ruleName = false; //< `IvaLine::namedLineFigure::name`
+        bool objectTypeFilter = false; //< `IvaLine::person` and `IvaLine::vehicle`
+    };
+    struct IvaArea
+    {
+        bool ruleName = false; //< `IvaArea::namedPolygon::name`
+        bool objectTypeFilter = false; //< `IvaArea::person` and `IvaLine::vehicle`
+
+        bool intrusion = true;
+        bool enter = true;
+        bool exit = true;
+        bool appear = false; //< appear/disappear is a single event
+        bool loitering = false;
+
+        bool intrusionDuration = true;
+        bool appearDuration = false;
+        bool loiteringDuration = false;
+    };
+    struct Mask
+    {
+        bool enabled = false;
+        bool detectionMode = false;
+        bool duration = false;
+    };
 
     Tampering tampering;
-
-    //IvaLine
-    bool ivaLineRuleName = false; //< `IvaLine::namedLineFigure::name`
-    bool ivaLineObjectTypeFilter = false; //< `IvaLine::person` and `IvaLine::vehicle`
-
-    // IvaArea
-    bool ivaAreaRuleName = false; //< `IvaArea::namedPolygon::name`
-    bool ivaAreaObjectTypeFilter = false; //< `IvaArea::person` and `IvaLine::vehicle`
-
-    bool ivaAreaIntrusion = true;
-    bool ivaAreaEnter = true;
-    bool ivaAreaExit = true;
-    bool ivaAreaAppear = false; //< appear/disappear is a single event
-    bool ivaAreaLoitering = false;
-
-    bool ivaAreaIntrusionDuration = true;
-    bool ivaAreaAppearDuration = false;
-    bool ivaAreaLoiteringDuration = false;
-
+    IvaLine ivaLine;
+    IvaArea ivaArea;
     Temperature temperature;
+    Mask mask;
 };
 
 } // namespace nx::vms_server_plugins::analytics::hanwha

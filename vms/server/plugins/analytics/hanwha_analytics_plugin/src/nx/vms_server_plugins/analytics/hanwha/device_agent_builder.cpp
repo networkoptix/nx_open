@@ -195,44 +195,46 @@ SettingsCapabilities DeviceAgentBuilder::fetchSettingsCapabilities() const
         cgi.parameter("eventsources", "tamperingdetection", "set", "DarknessDetection").has_value();
 
     // Line
-    result.ivaLineRuleName = cgi.parameter("eventsources", "videoanalysis2", "set",
+    result.ivaLine.ruleName =
+        cgi.parameter("eventsources", "videoanalysis2", "set",
         "Line.#.RuleName").has_value();
 
-    result.ivaLineObjectTypeFilter = cgi.parameter("eventsources", "videoanalysis2", "set",
+    result.ivaLine.objectTypeFilter =
+        cgi.parameter("eventsources", "videoanalysis2", "set",
         "Line.#.ObjectTypeFilter").has_value();
 
     // Area
-    result.ivaAreaRuleName = cgi.parameter("eventsources", "videoanalysis2", "set",
+    result.ivaArea.ruleName = cgi.parameter("eventsources", "videoanalysis2", "set",
         "DefinedArea.#.ObjectTypeFilter").has_value();
-    result.ivaAreaObjectTypeFilter = cgi.parameter("eventsources", "videoanalysis2", "set",
+    result.ivaArea.objectTypeFilter = cgi.parameter("eventsources", "videoanalysis2", "set",
         "DefinedArea.#.ObjectTypeFilter").has_value();
 
     auto mode = cgi.parameter("eventsources", "videoanalysis2", "set",
         "DefinedArea.#.Mode");
     if (mode)
     {
-        result.ivaAreaIntrusion = mode->possibleValues().contains("Intrusion");
-        result.ivaAreaEnter = mode->possibleValues().contains("Entering");
-        result.ivaAreaExit = mode->possibleValues().contains("Exiting");
-        result.ivaAreaAppear = mode->possibleValues().contains("AppearDisappear");
-        result.ivaAreaLoitering = mode->possibleValues().contains("Loitering");
+        result.ivaArea.intrusion = mode->possibleValues().contains("Intrusion");
+        result.ivaArea.enter = mode->possibleValues().contains("Entering");
+        result.ivaArea.exit = mode->possibleValues().contains("Exiting");
+        result.ivaArea.appear = mode->possibleValues().contains("AppearDisappear");
+        result.ivaArea.loitering = mode->possibleValues().contains("Loitering");
     }
     else
     {
-        result.ivaAreaIntrusion = false;
-        result.ivaAreaEnter = false;
-        result.ivaAreaExit = false;
-        result.ivaAreaAppear = false;
-        result.ivaAreaLoitering = false;
+        result.ivaArea.intrusion = false;
+        result.ivaArea.enter = false;
+        result.ivaArea.exit = false;
+        result.ivaArea.appear = false;
+        result.ivaArea.loitering = false;
     }
 
-    result.ivaAreaIntrusionDuration = cgi.parameter("eventsources", "videoanalysis2", "set",
+    result.ivaArea.intrusionDuration = cgi.parameter("eventsources", "videoanalysis2", "set",
         "DefinedArea.#.IntrusionDuration").has_value();
 
-    result.ivaAreaAppearDuration = cgi.parameter("eventsources", "videoanalysis2", "set",
+    result.ivaArea.appearDuration = cgi.parameter("eventsources", "videoanalysis2", "set",
         "DefinedArea.#.AppearanceDuration").has_value();
 
-    result.ivaAreaLoiteringDuration = cgi.parameter("eventsources", "videoanalysis2", "set",
+    result.ivaArea.loiteringDuration = cgi.parameter("eventsources", "videoanalysis2", "set",
         "DefinedArea.#.LoiteringDuration").has_value();
 
     // Temperature
@@ -253,6 +255,14 @@ SettingsCapabilities DeviceAgentBuilder::fetchSettingsCapabilities() const
 
     result.temperature.areaEmissivity = cgi.parameter("eventsources",
         "boxtemperaturedetection", "set", "ROI.#.NormalizedEmissivity").has_value();
+
+    //Mask
+    result.mask.enabled =
+        cgi.parameter("eventsources", "maskdetection", "set", "Enable").has_value();
+    result.mask.detectionMode =
+        cgi.parameter("eventsources", "maskdetection", "set", "DetectionMode").has_value();
+    result.mask.duration =
+        cgi.parameter("eventsources", "maskdetection", "set", "Duration").has_value();
 
     return result;
 }
@@ -576,27 +586,27 @@ QJsonValue DeviceAgentBuilder::buildSettingsModel(
             if (const QString name = node["name"].toString(); !name.isNull())
             {
                 if (name == "IVA.Line#.ObjectTypeFilter")
-                    return settingsCapabilities.ivaLineObjectTypeFilter;
+                    return settingsCapabilities.ivaLine.objectTypeFilter;
                 if (name == "IVA.IncludeArea#.ObjectTypeFilter")
-                    return settingsCapabilities.ivaAreaObjectTypeFilter;
+                    return settingsCapabilities.ivaArea.objectTypeFilter;
 
                 if (name == "IVA.IncludeArea#.Intrusion")
-                    return settingsCapabilities.ivaAreaIntrusion;
+                    return settingsCapabilities.ivaArea.intrusion;
                 if (name == "IVA.IncludeArea#.Enter")
-                    return settingsCapabilities.ivaAreaEnter;
+                    return settingsCapabilities.ivaArea.enter;
                 if (name == "IVA.IncludeArea#.Exit")
-                    return settingsCapabilities.ivaAreaExit;
+                    return settingsCapabilities.ivaArea.exit;
                 if (name == "IVA.IncludeArea#.Appear")
-                    return settingsCapabilities.ivaAreaAppear;
+                    return settingsCapabilities.ivaArea.appear;
                 if (name == "IVA.IncludeArea#.Loitering")
-                    return settingsCapabilities.ivaAreaLoitering;
+                    return settingsCapabilities.ivaArea.loitering;
 
                 if (name == "IVA.IncludeArea#.IntrusionDuration")
-                    return settingsCapabilities.ivaAreaIntrusionDuration;
+                    return settingsCapabilities.ivaArea.intrusionDuration;
                 if (name == "IVA.IncludeArea#.AppearDuration")
-                    return settingsCapabilities.ivaAreaAppearDuration;
+                    return settingsCapabilities.ivaArea.appearDuration;
                 if (name == "IVA.IncludeArea#.LoiteringDuration")
-                    return settingsCapabilities.ivaAreaLoiteringDuration;
+                    return settingsCapabilities.ivaArea.loiteringDuration;
             }
 
             bool keepByDefault = true;

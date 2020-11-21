@@ -280,7 +280,7 @@
             },
             {
                 "type": "Section",
-                "caption": "[AI] Objects & IVA",
+                "caption": "[AI] Objects & IVA & Face Mask",
                 "_requiredForObjectDetection": true,
                 "_requiredForEventTypeIds": [
                     "nx.hanwha.VideoAnalytics.Passing",
@@ -331,8 +331,7 @@
                                         "type": "Repeater",
                                         "count": 4,
                                         "startIndex": 1,
-                                        "template":
-                                        {
+                                        "template": {
                                             "type": "GroupBox",
                                             "caption": "IVA Line #",
                                             "filledCheckItems": [ "IVA.Line#.Points" ],
@@ -393,8 +392,7 @@
                                         "type": "Repeater",
                                         "count": 4,
                                         "startIndex": 1,
-                                        "template":
-                                        {
+                                        "template": {
                                             "type": "GroupBox",
                                             "caption": "IVA Area #",
                                             "filledCheckItems": [ "IVA.IncludeArea#.Points" ],
@@ -626,6 +624,46 @@
                                 ]
                             }
                         ]
+                    },
+                    {
+                        "type": "Section",
+                        "caption": "Face Mask Detection",
+                        "_requiredForEventTypeIds": [ "nx.hanwha.FaceMaskDetection" ],
+                        "items": [
+                            {
+                                "type": "SwitchButton",
+                                "name": "FaceMaskDetection.Enable",
+                                "caption": "Enable",
+                                "defaultValue": false
+                            },
+                            {
+                                "type": "GroupBox",
+                                "caption": "Face Mask Detection",
+                                "items": [
+                                    {
+                                        "type": "RadioButtonGroup",
+                                        "name": "FaceMaskDetection.DetectionMode",
+                                        "caption": "Detection Mode",
+                                        "range": [
+                                            "MASK",
+                                            "NO_MASK"
+                                        ],
+                                        "itemCaptions": {
+                                            "MASK": "Mask",
+                                            "NO_MASK": "No Mask"
+                                        }
+                                    },
+                                    {
+                                        "type": "SpinBox",
+                                        "name": "FaceMaskDetection.Duration",
+                                        "caption": "Minimum Duration (s)",
+                                        "defaultValue": 1,
+                                        "minValue": 0,
+                                        "maxValue": 5
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ]
             },
@@ -723,38 +761,6 @@
                                         "value": false
                                     }
                                 ]
-                            }
-                        ]
-                    }
-                ]
-            },
-            {
-                "type": "Section",
-                "caption": "Face Mask Detection",
-                "_requiredForEventTypeIds": [ "nx.hanwha.FaceMaskDetection" ],
-                "items": [
-                    {
-                        "type": "SwitchButton",
-                        "name": "FaceMaskDetection.Enable",
-                        "caption": "Enable",
-                        "defaultValue": false
-                    },
-                    {
-                        "type": "GroupBox",
-                        "caption": "Face Mask Detection",
-                        "items": [
-                            {
-                                "type": "RadioButtonGroup",
-                                "name": "FaceMaskDetection.DetectionMode",
-                                "caption": "Detection Mode",
-                                "range": [
-                                    "MASK",
-                                    "NO_MASK"
-                                ],
-                                "itemCaptions": {
-                                    "MASK": "Mask",
-                                    "NO_MASK": "No Mask"
-                                }
                             }
                         ]
                     }

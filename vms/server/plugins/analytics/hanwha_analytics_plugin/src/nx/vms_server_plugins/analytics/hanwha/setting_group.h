@@ -526,7 +526,7 @@ struct IvaLine: public SettingGroup
 
     bool IsActive() const
     {
-        if (m_settingsCapabilities.ivaLineObjectTypeFilter)
+        if (m_settingsCapabilities.ivaLine.objectTypeFilter)
             return !namedLineFigure.points.empty() &&  (person || vehicle) && crossing;
         else
             return !namedLineFigure.points.empty() && crossing;
@@ -604,12 +604,12 @@ struct IvaArea: public SettingGroup
     }
     bool IsActive() const
     {
-        const bool isAnyObjectTypeOn = m_settingsCapabilities.ivaAreaObjectTypeFilter ? (person || vehicle) : true;
-        const bool isAnyEventTypeOn = m_settingsCapabilities.ivaAreaIntrusion && intrusion
-            || m_settingsCapabilities.ivaAreaEnter && enter
-            || m_settingsCapabilities.ivaAreaExit && exit
-            || m_settingsCapabilities.ivaAreaAppear && appear
-            || m_settingsCapabilities.ivaAreaLoitering && loitering;
+        const bool isAnyObjectTypeOn = m_settingsCapabilities.ivaArea.objectTypeFilter ? (person || vehicle) : true;
+        const bool isAnyEventTypeOn = m_settingsCapabilities.ivaArea.intrusion && intrusion
+            || m_settingsCapabilities.ivaArea.enter && enter
+            || m_settingsCapabilities.ivaArea.exit && exit
+            || m_settingsCapabilities.ivaArea.appear && appear
+            || m_settingsCapabilities.ivaArea.loitering && loitering;
         return !namedPolygon.points.empty() && isAnyObjectTypeOn && isAnyEventTypeOn;
     }
     bool operator==(const IvaArea& rhs) const;
@@ -758,14 +758,17 @@ struct FaceMaskDetection: public SettingGroup
 
     bool enabled = false;
     DetectionMode detectionMode = DetectionMode::noMask;
+    int duration = 1;
 
     enum class KeyIndex {
         enabled,
         detectionMode,
+        duration,
     };
     static constexpr const char* kKeys[] = {
         "FaceMaskDetection.Enable",
         "FaceMaskDetection.DetectionMode",
+        "FaceMaskDetection.Duration",
     };
     static constexpr const char* kJsonEventName = "MaskDetection";
     static constexpr const char* kSunapiEventName = "maskdetection";

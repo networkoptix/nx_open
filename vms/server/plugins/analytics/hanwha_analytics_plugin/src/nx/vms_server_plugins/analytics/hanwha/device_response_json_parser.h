@@ -75,6 +75,11 @@ public:
     static nx::kit::Json extractOdRoiInfo(nx::kit::Json channelInfo, int sunapiIndex);
 
     /**
+     * Extract information about face mask detection ROI (exclude area) (as a json object);
+     */
+    static nx::kit::Json extractMaskRoiInfo(nx::kit::Json channelInfo, int sunapiIndex);
+
+    /**
      * Extract information about temperature change detection ROI (as a json object) of a desired
      * type from the json object (that corresponds to some event and channel)
      */

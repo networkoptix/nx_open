@@ -291,15 +291,12 @@ void SettingsProcessor::loadAndHoldSettingsFromDevice()
             sunapiReply, &m_settings.defocusDetection, channelNumber);
     }
 
-#if 1
-    // Fog detection is broken in Hanwha firmware <= 1.41.
     if (m_settings.analyticsCategories[fogDetection])
     {
         sunapiReply = makeEventTypeReadingRequest("fogdetection");
         SettingGroup::readFromDeviceReply(
             sunapiReply, &m_settings.fogDetection, channelNumber);
     }
-#endif
 
     if (m_settings.analyticsCategories[objectDetection])
     {
