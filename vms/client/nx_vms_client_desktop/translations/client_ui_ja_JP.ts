@@ -2047,7 +2047,7 @@
     <message>
       <location/>
       <source>Advanced Update Settings</source>
-      <translation>拡張システム設定</translation>
+      <translation>詳細設定</translation>
     </message>
     <message>
       <location/>

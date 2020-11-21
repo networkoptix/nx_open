@@ -118,7 +118,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Downloading update package</source>
-      <translation>アップロードパッケージのダウンロード中</translation>
+      <translation>更新パッケージのダウンロード中</translation>
     </message>
     <message>
       <source>Installing</source>
