@@ -10,7 +10,7 @@
 #include <transcoding/filters/fisheye_image_filter.h>
 #include <transcoding/filters/contrast_image_filter.h>
 #include <transcoding/filters/rotate_image_filter.h>
-#include <transcoding/filters/time_image_filter.h>
+#include <nx/vms/common/transcoding/text_image_filter.h>
 #include <nx/core/transcoding/filters/paint_image_filter.h>
 #include <nx/core/transcoding/filters/timestamp_filter.h>
 #include <nx/core/transcoding/filters/watermark_filter.h>

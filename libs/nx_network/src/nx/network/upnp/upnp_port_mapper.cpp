@@ -223,7 +223,7 @@ void PortMapper::addNewDevice(
     if (m_isEnabled)
     {
         updateExternalIp(newDevice);
-        for (const auto map : m_mapRequests)
+        for (const auto& map: m_mapRequests)
             ensureMapping(newDevice, map.first.port, map.first.protocol);
     }
 
@@ -360,7 +360,7 @@ void PortMapper::ensureMapping(Device& device, quint16 inPort, Protocol protocol
 
         // Save existing mappings in case if router can silently remap them
         device.engagedPorts.clear();
-        for (const auto mapping : list)
+        for (const auto& mapping : list)
             device.engagedPorts.insert(PortId(mapping.externalPort, mapping.protocol));
 
         const auto deviceMap = device.mapped.find(PortId(inPort, protocol));
@@ -372,7 +372,7 @@ void PortMapper::ensureMapping(Device& device, quint16 inPort, Protocol protocol
         }
 
         const auto callback = request->second;
-        for (const auto mapping : list)
+        for (const auto& mapping : list)
             if (mapping.internalIp == device.internalIp && mapping.internalPort == inPort
                 && mapping.protocol == protocol
                 && (mapping.duration == std::chrono::milliseconds::zero()

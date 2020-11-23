@@ -25,6 +25,7 @@ void resetStyle(QWidget* widget);
 
 void resetButtonStyle(QAbstractButton* button);
 void setAccentStyle(QAbstractButton* button);
+void setAccentStyle(QDialog* dialog, QDialogButtonBox::StandardButton standardButton);
 void setWarningButtonStyle(QAbstractButton* button);
 
 void setTabShape(QTabBar* tabBar, style::TabShape tabShape);

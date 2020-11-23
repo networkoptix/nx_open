@@ -28,7 +28,10 @@ bool LegacyTranscodingSettings::isEmpty() const
     if (rotation != 0)
         return false;
 
-    if (timestampParams.enabled)
+    if (timestampParams.filterParams.enabled)
+        return false;
+
+    if (cameraNameParams.enabled)
         return false;
 
     if (watermark.visible())

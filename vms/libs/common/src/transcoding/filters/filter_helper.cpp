@@ -3,10 +3,39 @@
 #ifdef ENABLE_DATA_PROVIDERS
 
 #include <core/resource/media_resource.h>
-
-#include <transcoding/filters/time_image_filter.h>
-
+#include <nx/vms/common/transcoding/text_image_filter.h>
 #include <nx/core/transcoding/filters/legacy_transcoding_settings.h>
+#include <translation/datetime_formatter.h>
+#include <utils/common/util.h>
+#include <utils/media/frame_info.h>
+
+namespace {
+
+QString getFrameTimestampText(
+    const CLVideoDecoderOutputPtr& frame,
+    const nx::vms::common::transcoding::TimestampParams& params)
+{
+    QString result;
+    qint64 displayTime = (params.timeMs > 0)
+        ? params.timeMs
+        : frame->pts / 1000;
+
+    displayTime += params.displayOffset;
+
+    if (displayTime * 1000 >= UTC_TIME_DETECTION_THRESHOLD)
+        result = datetime::toString(displayTime);
+    else
+        result = datetime::toString(displayTime, datetime::Format::hh_mm_ss_zzz);
+
+    return result;
+}
+
+QString getCameraName(const QnLegacyTranscodingSettings& settings)
+{
+    return settings.resource->toResource()->getName();
+}
+
+} // namespace
 
 nx::core::transcoding::FilterChain QnImageFilterHelper::createFilterChain(
     const nx::core::transcoding::LegacyTranscodingSettings& legacy)
@@ -21,10 +50,55 @@ nx::core::transcoding::FilterChain QnImageFilterHelper::createFilterChain(
 
     nx::core::transcoding::FilterChain result(
         settings, legacy.resource->getDewarpingParams(), legacy.resource->getVideoLayout());
-    if (legacy.timestampParams.enabled)
+
+    if (legacy.timestampParams.filterParams.enabled
+        && legacy.cameraNameParams.enabled
+        && legacy.timestampParams.filterParams.corner == legacy.cameraNameParams.corner)
     {
-        result.addLegacyFilter(QnAbstractImageFilterPtr(new QnTimeImageFilter(
-            legacy.resource->getVideoLayout(), legacy.timestampParams)));
+        // Both markers should be placed in the same corner, creating single filter.
+        const auto textGetter =
+            [settings = legacy](const CLVideoDecoderOutputPtr& frame)
+            {
+                return QString("%1\n%2").arg(
+                    getCameraName(settings),
+                    getFrameTimestampText(frame, settings.timestampParams));
+            };
+        const auto filter = nx::vms::common::transcoding::TextImageFilter::create(
+            legacy.resource->getVideoLayout(),
+            legacy.timestampParams.filterParams.corner,
+            textGetter);
+        result.addLegacyFilter(filter);
+        return result;
+    }
+
+    if (legacy.timestampParams.filterParams.enabled)
+    {
+        const auto textGetter =
+            [settings = legacy.timestampParams](const CLVideoDecoderOutputPtr& frame)
+            {
+                return getFrameTimestampText(frame, settings);
+            };
+
+        const auto filter = nx::vms::common::transcoding::TextImageFilter::create(
+            legacy.resource->getVideoLayout(),
+            legacy.timestampParams.filterParams.corner,
+            textGetter);
+        result.addLegacyFilter(filter);
+    }
+
+    if (legacy.cameraNameParams.enabled)
+    {
+        const auto textGetter =
+            [settings = legacy](const CLVideoDecoderOutputPtr& /*frame*/)
+            {
+                return getCameraName(settings);
+            };
+
+        const auto filter = nx::vms::common::transcoding::TextImageFilter::create(
+            legacy.resource->getVideoLayout(),
+            legacy.cameraNameParams.corner,
+            textGetter);
+        result.addLegacyFilter(filter);
     }
 
     return result;

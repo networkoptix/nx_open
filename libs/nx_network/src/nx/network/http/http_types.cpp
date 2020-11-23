@@ -1391,7 +1391,7 @@ bool Range::full(size_t contentSize) const
     }
 
     quint64 curPos = 0;
-    for (const std::pair<quint64, quint64>& range: rangesSorted)
+    for (const std::pair<quint64, quint64> range: rangesSorted)
     {
         if (range.first > curPos)
             return false;
@@ -1418,13 +1418,13 @@ quint64 Range::totalRangeLength(size_t contentSize) const
 
     quint64 curPos = 0;
     quint64 totalLength = 0;
-    for (const std::pair<quint64, quint64>& range : rangesSorted)
+    for (const auto& [start, end]: rangesSorted)
     {
-        if (curPos < range.first)
-            curPos = range.first;
-        if (range.second < curPos)
+        if (curPos < start)
+            curPos = start;
+        if (end < curPos)
             continue;
-        const quint64 endPos = std::min<quint64>(contentSize - 1, range.second);
+        const quint64 endPos = std::min<quint64>(contentSize - 1, end);
         totalLength += endPos - curPos + 1;
         curPos = endPos + 1;
         if (curPos >= contentSize)

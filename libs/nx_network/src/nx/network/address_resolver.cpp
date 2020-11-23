@@ -242,7 +242,7 @@ std::deque<AddressEntry> AddressResolver::HostAddressInfo::getAll() const
     const auto endeque =
         [&entries](const std::vector<AddressEntry>& v)
         {
-            for (const auto i: v)
+            for (const auto& i: v)
                 entries.push_back(i);
         };
 

@@ -170,7 +170,7 @@ namespace QnUbjsonDetail {
                 /* Assemble the chunks. */
                 target->clear();
                 target->reserve(size);
-                for(const QByteArray chunk: chunks)
+                for(const QByteArray& chunk: chunks)
                     target->append(chunk);
                 return true;
             }

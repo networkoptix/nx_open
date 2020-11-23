@@ -108,7 +108,7 @@ AnalyticsArchiveDirectory::ObjectTrackMatchResult AnalyticsArchiveDirectory::mat
     std::vector<
         std::pair<std::chrono::milliseconds /*timestamp*/, int64_t /*trackGroupId*/>> trackGroups;
 
-    for (const auto deviceId: deviceIds)
+    for (const auto& deviceId: deviceIds)
     {
         auto deviceResult = matchObjects(deviceId, filter);
 

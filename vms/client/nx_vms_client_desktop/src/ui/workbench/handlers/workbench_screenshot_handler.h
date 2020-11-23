@@ -9,7 +9,6 @@
 
 #include <ui/workbench/workbench_context_aware.h>
 
-#include <transcoding/timestamp_params.h>
 
 #include <nx/vms/client/desktop/image_providers/image_provider.h>
 
@@ -18,6 +17,8 @@
 
 #include <utils/common/connective.h>
 #include <utils/common/aspect_ratio.h>
+
+#include <nx/vms/common/transcoding/timestamp_params.h>
 
 class QPainter;
 class QnProgressDialog;
@@ -32,7 +33,8 @@ struct QnScreenshotParameters
     bool isUtc = false;
     qint64 displayTimeMsec = 0;
     QString filename;
-    QnTimeStampParams timestampParams;
+    nx::vms::common::transcoding::TimestampParams timestampParams;
+    nx::vms::common::transcoding::FilterParams cameraNameParams;
     nx::vms::api::ImageCorrectionData imageCorrectionParams;
     nx::vms::api::DewarpingData itemDewarpingParams;
     QRectF zoomRect;

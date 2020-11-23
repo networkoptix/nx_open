@@ -6,7 +6,8 @@
 
 #include <core/resource/resource_fwd.h>
 
-#include <transcoding/timestamp_params.h>
+#include <nx/vms/common/transcoding/filter_params.h>
+#include <nx/vms/common/transcoding/timestamp_params.h>
 
 #include <nx/core/watermark/watermark.h>
 
@@ -28,7 +29,8 @@ struct LegacyTranscodingSettings
     QRectF zoomWindow;
     nx::vms::api::ImageCorrectionData contrastParams;
     nx::vms::api::DewarpingData itemDewarpingParams;
-    QnTimeStampParams timestampParams;
+    nx::vms::common::transcoding::TimestampParams timestampParams;
+    nx::vms::common::transcoding::FilterParams cameraNameParams;
     Watermark watermark;
 
     bool isEmpty() const;

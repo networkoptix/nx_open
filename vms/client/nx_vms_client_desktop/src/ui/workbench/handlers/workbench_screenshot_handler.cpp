@@ -35,6 +35,7 @@
 #include <ui/dialogs/common/file_messages.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
+#include <ui/style/custom_style.h>
 
 #include <ui/help/help_topics.h>
 #include <ui/help/help_topic_accessor.h>
@@ -59,8 +60,10 @@ namespace {
 
 QnScreenshotParameters::QnScreenshotParameters()
 {
-    timestampParams.enabled = true;
-    timestampParams.corner = Qt::BottomRightCorner;
+    timestampParams.filterParams.enabled = true;
+    timestampParams.filterParams.corner = Qt::BottomRightCorner;
+    cameraNameParams.enabled = true;
+    cameraNameParams.corner = Qt::BottomRightCorner;
 }
 
 QString QnScreenshotParameters::timeString(bool forFilename) const
@@ -79,6 +82,57 @@ QString QnScreenshotParameters::timeString(bool forFilename) const
     return datetime::toString(displayTimeMsec, timeFormat);
 }
 
+template <typename CornerData>
+QComboBox* createCornerComboBox(
+    const QString& emptySettingName,
+    const CornerData& data,
+    QDialog* parent)
+{
+    const auto comboBox = new QComboBox(parent);
+    comboBox->addItem(emptySettingName, -1);
+    comboBox->addItem(QnScreenshotLoader::tr("Top left corner"), Qt::TopLeftCorner);
+    comboBox->addItem(QnScreenshotLoader::tr("Top right corner"), Qt::TopRightCorner);
+    comboBox->addItem(QnScreenshotLoader::tr("Bottom left corner"), Qt::BottomLeftCorner);
+    comboBox->addItem(QnScreenshotLoader::tr("Bottom right corner"), Qt::BottomRightCorner);
+
+    if (data.enabled)
+    {
+        const int itemIndex = comboBox->findData(data.corner, Qt::UserRole, Qt::MatchExactly);
+        comboBox->setCurrentIndex(itemIndex);
+    }
+    else
+    {
+        comboBox->setCurrentIndex(0);
+    }
+    return comboBox;
+}
+
+template <typename CornerData>
+void updateCornerData(
+    QComboBox* comboBox,
+    CornerData& data)
+{
+    const int index = comboBox->currentIndex();
+    const int value = comboBox->itemData(index).toInt();
+    data.enabled = (value >= 0);
+    if (data.enabled)
+        data.corner = static_cast<Qt::Corner>(value);
+}
+
+QString getCameraName(const QnMediaResourceWidget* widget)
+{
+    if (!widget)
+        return QString();
+
+    const auto mediaResource = widget->resource();
+    if (!mediaResource)
+        return QString();
+
+    if (const auto resource = mediaResource->toResource())
+        return resource->getName();
+
+    return QString();
+}
 
 // -------------------------------------------------------------------------- //
 // QnScreenshotLoader
@@ -325,9 +379,10 @@ void QnWorkbenchScreenshotHandler::takeDebugScreenshotsSet(QnMediaResourceWidget
                     for (const crn_type &crn: tsCorners) {
                         Key tsKey(keyStack, crn.first);
 
-                        parameters.timestampParams.enabled = crn.second >= 0;
-                        if (parameters.timestampParams.enabled)
-                            parameters.timestampParams.corner = static_cast<Qt::Corner>(crn.second);
+                        auto& filterParams = parameters.timestampParams.filterParams;
+                        filterParams.enabled = crn.second >= 0;
+                        if (filterParams.enabled)
+                            filterParams.corner = static_cast<Qt::Corner>(crn.second);
 
                         for (const QString &fmt: formats) {
                             Key fmtKey(keyStack, fmt);
@@ -418,23 +473,21 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
     dialog->setFileMode(QFileDialog::AnyFile);
     dialog->setAcceptMode(QFileDialog::AcceptSave);
 
-    QComboBox* comboBox = new QComboBox(dialog.data());
-    comboBox->addItem(tr("No Timestamp"), -1);
-    comboBox->addItem(tr("Top Left Corner"), Qt::TopLeftCorner);
-    comboBox->addItem(tr("Top Right Corner"), Qt::TopRightCorner);
-    comboBox->addItem(tr("Bottom Left Corner"), Qt::BottomLeftCorner);
-    comboBox->addItem(tr("Bottom Right Corner"), Qt::BottomRightCorner);
+    const auto timestampComboBox = createCornerComboBox(
+        tr("No timestamp"),
+        parameters.timestampParams.filterParams,
+        dialog.data());
+    const auto cameraNameComboBox = createCornerComboBox(
+        tr("No camera name"),
+        parameters.cameraNameParams,
+        dialog.data());
 
-    if (!parameters.timestampParams.enabled)
-        comboBox->setCurrentIndex(0);
-    else
-        comboBox->setCurrentIndex(comboBox->findData(parameters.timestampParams.corner, Qt::UserRole, Qt::MatchExactly));
-
-    dialog->addWidget(tr("Timestamp:"), comboBox);
+    dialog->addWidget(tr("Timestamp:"), timestampComboBox);
+    dialog->addWidget(tr("Camera name:"), cameraNameComboBox);
+    setAccentStyle(dialog.data(), QDialogButtonBox::Save);
     setHelpTopic(dialog.data(), Qn::MainWindow_MediaItem_Screenshot_Help);
 
     QString fileName;
-
 
     forever {
         if (!dialog->exec())
@@ -482,17 +535,11 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
         break;
     }
 
-    {
-        int corner = comboBox->itemData(comboBox->currentIndex()).toInt();
-        parameters.timestampParams.enabled = (corner >= 0);
-        if (parameters.timestampParams.enabled)
-            parameters.timestampParams.corner = static_cast<Qt::Corner>(corner);
-    }
-
+    updateCornerData(timestampComboBox, parameters.timestampParams.filterParams);
+    updateCornerData(cameraNameComboBox, parameters.cameraNameParams);
     parameters.filename = fileName;
     return true;
 }
-
 
 // TODO: #GDM #Business may be we should encapsulate in some other object to get parameters and clear connection if user cancelled the process?
 void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
@@ -523,6 +570,7 @@ void QnWorkbenchScreenshotHandler::at_imageLoaded(const QImage &image) {
         transcodeParams.resource = parameters.resource;
         transcodeParams.contrastParams = parameters.imageCorrectionParams;
         transcodeParams.timestampParams = parameters.timestampParams;
+        transcodeParams.cameraNameParams = parameters.cameraNameParams;
         transcodeParams.rotation = parameters.rotationAngle;
         transcodeParams.zoomWindow = parameters.zoomRect;
         transcodeParams.watermark = watermark();

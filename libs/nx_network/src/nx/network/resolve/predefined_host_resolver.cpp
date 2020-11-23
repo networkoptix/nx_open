@@ -29,7 +29,7 @@ SystemError::ErrorCode PredefinedHostResolver::resolve(
         return SystemError::hostNotFound;
     }
 
-    for (const auto entry: it->second)
+    for (const auto& entry: it->second)
     {
         if (ipVersion == AF_INET && !entry.host.ipV4())
             continue; //< Only ipv4 hosts are requested.

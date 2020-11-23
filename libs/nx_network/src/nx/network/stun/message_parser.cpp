@@ -191,8 +191,13 @@ Attribute* MessageParser::parseErrorCode()
     // but the code must not be the value that is the modular, so we need
     // to compute the class and add it to the code as well
     int number = (val & 0x000000ff);
+
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wtautological-overlap-compare"
     if (number < 0 && number >= 100)
         return NULL;
+#pragma clang diagnostic pop
+
     int code = _class * 100 + number;
 
     // Parsing the UTF encoded error string

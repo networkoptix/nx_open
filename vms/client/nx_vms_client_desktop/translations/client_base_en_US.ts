@@ -5105,6 +5105,25 @@ to %1</source>
     </message>
 </context>
 <context>
+    <name>QnScreenshotLoader</name>
+    <message>
+        <source>Top left corner</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Top right corner</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bottom left corner</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Bottom right corner</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
         <source>Export Bookmark...</source>
@@ -6856,26 +6875,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>No Timestamp</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Top Left Corner</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Top Right Corner</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Bottom Left Corner</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Bottom Right Corner</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Failed to save screenshot</source>
         <translation></translation>
     </message>
@@ -6890,6 +6889,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>JPEG Image</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>No timestamp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No camera name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Camera name:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

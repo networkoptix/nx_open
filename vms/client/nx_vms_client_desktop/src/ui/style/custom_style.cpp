@@ -111,6 +111,20 @@ void setAccentStyle(QAbstractButton* button)
     button->update();
 }
 
+
+void setAccentStyle(QDialog* dialog, QDialogButtonBox::StandardButton standardButton)
+{
+    if (!NX_ASSERT(dialog, "Dialog can't be null"))
+        return;
+
+    const auto buttonBox = dialog->findChild<QDialogButtonBox*>();
+    if (!buttonBox)
+        return;
+
+    if (const auto button = buttonBox->button(standardButton))
+        setAccentStyle(button);
+}
+
 void setWarningButtonStyle(QAbstractButton* button)
 {
     button->setProperty(style::Properties::kWarningStyleProperty, true);
