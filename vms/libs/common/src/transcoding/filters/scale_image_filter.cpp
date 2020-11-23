@@ -3,13 +3,23 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
-QnScaleImageFilter::QnScaleImageFilter(const QSize& size, AVPixelFormat format): m_size(size), m_format(format)
+QnScaleImageFilter::QnScaleImageFilter(
+    const QSize& size,
+    AVPixelFormat format)
+    :
+    m_size(size),
+    m_format(format)
 {
 }
 
 CLVideoDecoderOutputPtr QnScaleImageFilter::updateImage(const CLVideoDecoderOutputPtr& frame)
 {
-    return CLVideoDecoderOutputPtr(frame->scaled(m_size, m_format));
+    CLVideoDecoderOutputPtr result(frame->scaled(m_size, m_format));
+
+    // `scaled()` can return an empty pointer. Better process as is than crash.
+    return NX_ASSERT(result, "Error while scaling frame to %1 (%2)", m_size, m_format)
+        ? result
+        : frame;
 }
 
 QSize QnScaleImageFilter::updatedResolution(const QSize& /*srcSize*/)

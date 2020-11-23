@@ -167,15 +167,15 @@ CLVideoDecoderOutputPtr QnFisheyeImageFilter::updateImage(const CLVideoDecoderOu
         return srcFrame;
 
     CLVideoDecoderOutputPtr frame;
-    if (m_itemDewarping.panoFactor > 1)
-        frame = CLVideoDecoderOutputPtr(srcFrame->scaled(updatedResolution(srcFrame->size())));
+    const auto updatedSize = updatedResolution(srcFrame->size());
+    if (updatedSize != srcFrame->size())
+        frame = CLVideoDecoderOutputPtr(srcFrame->scaled(updatedSize));
     else
         frame = srcFrame;
 
-    // TODO: srcFrame->scaled can return an empty pointer. Maybe we should do something more sensitive here
-    NX_ASSERT(frame);
-    if (!frame)
-        return frame;
+    // `scaled()` can return an empty pointer. Better process as is than crash.
+    if (!NX_ASSERT(frame, "Error while scaling frame to %1", updatedSize))
+        frame = srcFrame;
 
     int left = 0;
     int right = frame->width;
