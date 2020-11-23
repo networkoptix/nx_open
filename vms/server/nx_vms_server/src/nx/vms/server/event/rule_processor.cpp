@@ -284,6 +284,12 @@ void RuleProcessor::executeAction(const vms::event::AbstractActionPtr& action)
             }
             break;
         }
+        case vms::api::ActionType::sendMailAction:
+        {
+            // This action doesn't use any resources and should be invoked only once.
+            doExecuteAction(action, {});
+            return;
+        }
         case vms::api::ActionType::buzzerAction:
         {
             if (action->getParams().useSource)
