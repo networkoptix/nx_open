@@ -14,5 +14,5 @@
     "currentRefs": "@currentRefs@",
     "brand": "@customization.brand@",
     "protoVersion": @vmsProtocolVersion@,
-    "metaVersion": "@metaVersion@"
+    "metaVersion": "@usedMetaVersion@"
 }
