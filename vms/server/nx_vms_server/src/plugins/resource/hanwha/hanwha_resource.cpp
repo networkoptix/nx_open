@@ -1383,7 +1383,10 @@ CameraDiagnostics::Result HanwhaResource::initIo()
         }
 
         if (const auto result = sharedContext()->initializeAlarmInputs(); !result)
-            return result;
+        {
+            NX_WARNING(this, "Error on alarm inputs initialization: %1", result.toString(serverModule()->resourcePool()));
+            return CameraDiagnostics::NoErrorResult();
+        }
     }
 
     if (maxAlarmOutputs.has_value() && *maxAlarmOutputs > 0)
