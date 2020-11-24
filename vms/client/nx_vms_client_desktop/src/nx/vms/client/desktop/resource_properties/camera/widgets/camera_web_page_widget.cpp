@@ -160,8 +160,11 @@ public:
         if (pageHost != m_serverUrl.host() && pageHost != m_ipAddress)
             return;
 
+        const auto requestHost = info.requestUrl().host();
+
         // Requested host matches camera IP address.
-        if (info.requestUrl().host() != m_ipAddress)
+        // Allow server host match because request port may need to be changed (80 -> server port).
+        if (requestHost != m_ipAddress && requestHost != m_serverUrl.host())
             return;
 
         // Redirect the request through the server.
@@ -271,13 +274,14 @@ void CameraWebPageWidget::Private::createNewPage()
             (function() {
                 XMLHttpRequest.prototype.realOpen = XMLHttpRequest.prototype.open;
                 var newOpen = function(method, url, async, user, password) {
-                    var newUrl = url.replace(/^(https?:\/\/)?(%1)(:\d+)?(.*)/g, '$1' + '%2:%3' + '$4');
+                    var newUrl = url.replace(/^(https?:\/\/)?(%1|%2)(:\d+)?(.*)/g, '$1' + '%3:%4' + '$4');
                     this.realOpen(method, newUrl, async, user, password);
                 };
                 XMLHttpRequest.prototype.open = newOpen;
             })()
             )JS")
             .arg(QRegExp::escape(lastCamera.ipAddress))
+            .arg(QRegExp::escape(lastRequestUrl.host()))
             .arg(lastRequestUrl.host())
             .arg(lastRequestUrl.port());
         script.setName("fixupXmlHttpRequestUrl");

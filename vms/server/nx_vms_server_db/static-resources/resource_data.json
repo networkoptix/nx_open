@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.3.843",
+    "version": "4.1.3.844",
     "data": [
         {
             "keys": [
@@ -4849,6 +4849,12 @@
                 "Onvif|BCS-V-TI236*"
             ],
             "onvifVendorSubtype": "hikvision"
+        },
+        {
+            "keys": [
+                "DW|DWC-M*"
+            ],
+            "fixupRequestUrls": true
         }
     ]
 }
