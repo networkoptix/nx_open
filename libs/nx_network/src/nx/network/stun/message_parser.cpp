@@ -192,11 +192,8 @@ Attribute* MessageParser::parseErrorCode()
     // to compute the class and add it to the code as well
     int number = (val & 0x000000ff);
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wtautological-overlap-compare"
-    if (number < 0 && number >= 100)
+    if (number >= 100)
         return NULL;
-#pragma clang diagnostic pop
 
     int code = _class * 100 + number;
 
