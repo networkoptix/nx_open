@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Select area</source>
-      <translation>エリア選択</translation>
+      <translation>エリアを選択</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
@@ -81,7 +81,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Export bookmark</source>
-      <translation>ブックマークのエクスポート</translation>
+      <translation>ブックマークをエクスポート</translation>
     </message>
   </context>
   <context>
@@ -6074,7 +6074,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
-      <translation>どのサーバーも時間同期のためのインターネットアクセスがありません</translation>
+      <translation>時刻同期のためのインターネット接続ができません</translation>
     </message>
     <message>
       <source>The System is in safe mode</source>
@@ -6082,11 +6082,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The System has no internet access for time synchronization</source>
-      <translation>システムには時間同期のためのインターネットアクセスがありません</translation>
+      <translation>時刻同期のためのインターネット接続ができません</translation>
     </message>
     <message>
       <source>No online server in the System has internet access for time synchronization.</source>
-      <translation>システム内のどのオンラインサーバーにも時刻同期のためのインターネットアクセスはありません。</translation>
+      <translation>システム内のどのオンラインサーバーも時刻同期のためのインターネット接続ができません。</translation>
     </message>
     <message>
       <source>The System is running in safe mode.</source>
@@ -6129,7 +6129,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
-      <translation>フェールオーバーが有効になっている場合、サーバーはこの設定に関係なくカメラステータスの更新を要求する場合があります。</translation>
+      <translation>フェイルオーバーが有効になっている場合、サーバーはこの設定に関係なくカメラステータスの更新を要求することがあります。</translation>
     </message>
   </context>
   <context>
@@ -8349,7 +8349,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Equisolid</source>
-      <translation>Equisolid</translation>
+      <translation>等立体角射影</translation>
     </message>
     <message>
       <source>Ceiling</source>
@@ -9243,7 +9243,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::SecuritySettingsWidget</name>
     <message>
       <source>Tracks and logs all user actions.</source>
-      <translation>すべてのユーザーアクションを追跡して記録する</translation>
+      <translation>すべてのユーザーアクションを追跡して記録します。</translation>
     </message>
     <message>
       <source>minutes</source>
@@ -9263,7 +9263,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Only client-server video traffic can be encrypted</source>
-      <translation>クライアント・サーバーのビデオ・トラフィックのみ暗号化できます</translation>
+      <translation>クライアント・サーバー間の映像トラフィックのみ暗号化できます。</translation>
     </message>
   </context>
   <context>
@@ -9498,14 +9498,14 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>VMS Time</source>
-      <translation>VMS時間</translation>
+      <translation>VMS時刻</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation>時間、すべてのサーバー間の同期。特定のサーバーのOS時間によって異なる場合があります。</translation>
+      <translation>全サーバー間で同期されます。サーバーごとのOS時刻とは異なる場合があります。</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>

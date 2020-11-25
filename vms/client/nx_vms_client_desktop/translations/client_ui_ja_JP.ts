@@ -949,7 +949,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/cloud_management_widget.ui"/>
       <source>This system is connected to</source>
-      <translation type="unfinished">This system is connected to</translation>
+      <translation>このシステムは以下に接続されています</translation>
     </message>
   </context>
   <context>
@@ -3290,7 +3290,7 @@
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation>VMS時間</translation>
+      <translation>VMS時刻</translation>
     </message>
     <message>
       <location/>

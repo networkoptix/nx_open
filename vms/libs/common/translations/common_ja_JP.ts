@@ -1498,7 +1498,7 @@
     <message>
       <source>Time: %1 on %2</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>時間: %1 時分 %2・月日</translation>
+      <translation>日時: %2 %1</translation>
     </message>
     <message numerus="yes">
       <source>First occurrence: %1 on %2 (%n times total)</source>
@@ -1748,7 +1748,7 @@
     </message>
     <message>
       <source>PoE over Budget</source>
-      <translation>PoE電源利用可能な総ワット数を超える</translation>
+      <translation>PoE給電容量超過</translation>
     </message>
     <message>
       <source>Fan Error</source>
@@ -1756,7 +1756,7 @@
     </message>
     <message>
       <source>PoE over budget at %1</source>
-      <translation>%1のワット数が利用可能なPOEワット数を超える</translation>
+      <translation>%1のPoE給電量が給電能力を超えています</translation>
     </message>
     <message>
       <source>Fan error at %1</source>

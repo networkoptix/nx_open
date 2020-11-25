@@ -29,7 +29,7 @@
         "confirmRestoreDefaultTitle": "工場出荷時の状態に戻します",
         "unexpectedError": "失敗: 予期しないエラーが発生しました",
         "connnetionError": "接続エラー",
-        "wrongPassword": "間違ったパスワード",
+        "wrongPassword": "パスワードが間違っています。",
         "error": "エラー: ",
         "restartNeeded": "変更が保存されました。サーバーを再起動して新しい設定を適用しますか？",
         "settingsSaved": "設定が保存されました",
