@@ -254,7 +254,10 @@ void HanwhaResourceSearcher::readSunApiResponse(QnResourceList& resultResourceLi
     {
         success = readSunApiResponseFromSocket(socket.get(), &resultResourceList);
         if (!success)
+        {
             m_sunApiSocketList.clear();
+            break;
+        }
     }
 
     if (m_sunapiReceiveSocket && m_sunapiReceiveSocket->hasData())
