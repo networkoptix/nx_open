@@ -235,9 +235,9 @@ void ImageToFramePainter::updateTargetImage()
         m_croppedImage = m_image.copy(sourceImageRect);
 
         const auto drawHeight = qPower2Ceil(
-            static_cast<unsigned int>(targetImageRect.height()), 2);
+            static_cast<unsigned int>(targetImageRect.height() + m_imageOffsetInBuffer.y()), 2);
         const auto drawWidth = qPower2Ceil(
-            static_cast<unsigned int>(targetImageRect.width()), CL_MEDIA_ALIGNMENT);
+            static_cast<unsigned int>(targetImageRect.width() + m_imageOffsetInBuffer.x()), CL_MEDIA_ALIGNMENT);
 
         m_finalImageBytes = createAlignedBuffer(
             drawWidth * drawHeight * kARGBBytesCount);
