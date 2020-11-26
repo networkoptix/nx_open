@@ -62,14 +62,16 @@ bool isSpecialTimeValue(qint64 value)
 
 }
 
-QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* reader)
+QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(
+    QnArchiveStreamReader* reader,
+    const QString& rtpLogTag)
     :
     QnAbstractArchiveDelegate(),
     m_rtspSession(new QnRtspClient(
         QnRtspClient::Config{
             /*shouldGuessAuthDigest*/ true,
             /*backChannelAudioOnly*/ false,
-            /*disableKeepAlive*/ true })),
+            /*disableKeepAlive*/ true})),
     m_rtpData(0),
     m_tcpMode(true),
     m_position(DATETIME_NOW),
@@ -89,7 +91,8 @@ QnRtspClientArchiveDelegate::QnRtspClientArchiveDelegate(QnArchiveStreamReader* 
     m_playNowModeAllowed(true),
     m_reader(reader),
     m_frameCnt(0),
-    m_maxSessionDurationMs(std::numeric_limits<qint64>::max())
+    m_maxSessionDurationMs(std::numeric_limits<qint64>::max()),
+    m_rtpLogTag(rtpLogTag)
 {
     m_rtspSession->setPlayNowModeAllowed(true); //< Default value.
     m_footageUpToDate.test_and_set();
@@ -824,7 +827,7 @@ QnAbstractDataPacketPtr QnRtspClientArchiveDelegate::processFFmpegRtpPayload(qui
     auto itr = m_parsers.find(channelNum);
     if (itr == m_parsers.end())
     {
-        auto parser = new nx::streaming::rtp::QnNxRtpParser(m_camera->getId());
+        auto parser = new nx::streaming::rtp::QnNxRtpParser(m_camera->getId(), m_rtpLogTag);
         // TODO: Use nx::network::http::header::Server here
         // to get RFC2616-conformant Server header parsing function.
         auto serverVersion = extractServerVersion(m_rtspSession->serverInfo());

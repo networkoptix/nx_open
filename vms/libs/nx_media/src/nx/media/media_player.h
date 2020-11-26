@@ -108,6 +108,9 @@ class Player: public QObject
     Q_PROPERTY(bool tooManyConnectionsError READ tooManyConnectionsError
         NOTIFY tooManyConnectionsErrorChanged)
 
+    /** Human-readable tag for logging and debugging purposes. */
+    Q_PROPERTY(QString tag READ tag WRITE setTag NOTIFY tagChanged)
+
 public:
     enum class State
     {
@@ -248,6 +251,9 @@ public:
 
     bool tooManyConnectionsError() const;
 
+    QString tag() const;
+    void setTag(const QString& value);
+
 public slots:
     void play();
     void pause();
@@ -274,6 +280,7 @@ signals:
     void currentResolutionChanged();
     void audioEnabledChanged();
     void tooManyConnectionsErrorChanged();
+    void tagChanged();
 
 protected: //< for tests
     void testSetOwnedArchiveReader(QnArchiveStreamReader* archiveReader);

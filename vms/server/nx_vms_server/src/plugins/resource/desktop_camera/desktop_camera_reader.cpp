@@ -20,8 +20,8 @@ QnDesktopCameraStreamReader::QnDesktopCameraStreamReader(
     :
     CLServerPushStreamReader(res),
     m_parsers({
-        QSharedPointer<QnNxRtpParser>::create(res->getId()),
-        QSharedPointer<QnNxRtpParser>::create(res->getId())})
+        QSharedPointer<QnNxRtpParser>::create(res->getId(), "DesktopCamera1"),
+        QSharedPointer<QnNxRtpParser>::create(res->getId(), "DesktopCamera2")})
 {
 }
 

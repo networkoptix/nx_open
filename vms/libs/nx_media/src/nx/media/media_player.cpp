@@ -249,6 +249,9 @@ public:
     // Hardware decoding has been used for the last presented frame.
     bool isHwAccelerated;
 
+    // Human-readable tag for logging and debugging purposes.
+    QString tag = "MediaPlayer";
+
     QnTimePeriodList periods;
     void applyVideoQuality();
 
@@ -779,7 +782,7 @@ bool PlayerPrivate::createArchiveReader()
     {
         const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
         NX_ASSERT(camera);
-        auto rtspArchiveDelegate = new QnRtspClientArchiveDelegate(archiveReader.get());
+        auto rtspArchiveDelegate = new QnRtspClientArchiveDelegate(archiveReader.get(), tag);
         rtspArchiveDelegate->setCamera(camera);
         archiveDelegate = rtspArchiveDelegate;
     }
@@ -1160,6 +1163,22 @@ bool Player::tooManyConnectionsError() const
 {
     Q_D(const Player);
     return d->tooManyConnections;
+}
+
+QString Player::tag() const
+{
+    Q_D(const Player);
+    return d->tag;
+}
+
+void Player::setTag(const QString& value)
+{
+    Q_D(Player);
+    if (d->tag == value)
+        return;
+
+    d->tag = value;
+    emit tagChanged();
 }
 
 bool Player::liveMode() const

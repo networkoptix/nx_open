@@ -59,6 +59,8 @@ Window
         onResourceIdChanged: video.videoOutput.clear()
         onSourceChanged: updatePlayingState()
         maxTextureSize: textureSizeHelper.maxTextureSize
+
+        tag: "FigureEditor"
     }
 
     CursorManager

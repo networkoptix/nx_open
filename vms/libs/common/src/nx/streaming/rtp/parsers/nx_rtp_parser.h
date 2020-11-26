@@ -12,8 +12,8 @@ namespace nx::streaming::rtp {
 class QnNxRtpParser: public VideoStreamParser
 {
 public:
-    /** @param debugSourceId Human-readable stream source id for logging. */
-    QnNxRtpParser(QnUuid deviceId);
+    /** @param tag Human-readable tag for logging. */
+    QnNxRtpParser(QnUuid deviceId, const QString& tag);
 
     virtual void setSdpInfo(const Sdp::Media& /*sdp*/) override {};
     virtual StreamParser::Result processData(quint8* rtpBufferBase, int bufferOffset, int readed, bool& gotData) override;

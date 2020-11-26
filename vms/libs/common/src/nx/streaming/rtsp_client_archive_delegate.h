@@ -25,7 +25,7 @@ class QnRtspClientArchiveDelegate: public QnAbstractArchiveDelegate
 {
     Q_OBJECT
 public:
-    QnRtspClientArchiveDelegate(QnArchiveStreamReader* reader);
+    QnRtspClientArchiveDelegate(QnArchiveStreamReader* reader, const QString& rtpLogTag = QString());
     virtual ~QnRtspClientArchiveDelegate();
 
     void setCamera(const QnSecurityCamResourcePtr &camera);
@@ -149,6 +149,7 @@ private:
     QElapsedTimer m_sessionTimeout;
     std::chrono::milliseconds m_maxSessionDurationMs;
     nx::vms::api::StreamDataFilters m_streamDataFilter{ nx::vms::api::StreamDataFilter::media};
+    QString m_rtpLogTag;
 };
 
 typedef QSharedPointer<QnRtspClientArchiveDelegate> QnRtspClientArchiveDelegatePtr;

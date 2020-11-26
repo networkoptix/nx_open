@@ -561,7 +561,8 @@ std::unique_ptr<QnArchiveStreamReader> createArchiveStreamReader(
     std::unique_ptr<QnArchiveStreamReader> archiveReader =
         std::make_unique<QnArchiveStreamReader>(camera);
 
-    const auto rtspArchiveDelegate = new QnRtspClientArchiveDelegate(archiveReader.get());
+    const auto rtspArchiveDelegate = new QnRtspClientArchiveDelegate(archiveReader.get(),
+        "StorageUtilsUT");
     rtspArchiveDelegate->setStreamDataFilter(vms::api::StreamDataFilter::media);
     rtspArchiveDelegate->setCamera(camera);
 

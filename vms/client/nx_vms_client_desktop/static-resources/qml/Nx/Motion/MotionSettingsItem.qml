@@ -303,6 +303,8 @@ Rectangle
 
         onResourceIdChanged: video.clear()
         onSourceChanged: videoContainer.updatePlayingState()
+
+        tag: "MotionSettings"
     }
 
     MediaPlayerMotionProvider

@@ -425,7 +425,8 @@ void QnThumbnailsLoader::process() {
         {
             if (server->getStatus() != Qn::Online)
                 continue;
-            QnRtspClientArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate(nullptr));
+            QnRtspClientArchiveDelegatePtr rtspDelegate(new QnRtspClientArchiveDelegate(
+                /*reader*/ nullptr, "ThumbnailLoader"));
             rtspDelegate->setMultiserverAllowed(false);
             if (m_mode == Mode::Default)
                 rtspDelegate->setQuality(MEDIA_Quality_Low, true, QSize());

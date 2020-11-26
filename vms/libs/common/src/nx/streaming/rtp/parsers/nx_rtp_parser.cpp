@@ -24,19 +24,19 @@ static const int RTSP_FFMPEG_GENERIC_HEADER_SIZE = 8;
 static const int RTSP_FFMPEG_VIDEO_HEADER_SIZE = 3;
 static const int RTSP_FFMPEG_METADATA_HEADER_SIZE = 8; //< m_duration + metadataType
 
-QnNxRtpParser::QnNxRtpParser(QnUuid deviceId):
+QnNxRtpParser::QnNxRtpParser(QnUuid deviceId, const QString& tag):
     VideoStreamParser(),
     m_deviceId(deviceId),
     m_nextDataPacketBuffer(nullptr),
     m_position(AV_NOPTS_VALUE),
     m_isAudioEnabled(true),
     m_primaryLogger(
-        lm("rtp_parser_@%1_").arg(nx::kit::utils::toString(this)),
+        lm("rtp_parser_%1@%2_").args(tag, nx::kit::utils::toString(this)),
         m_deviceId,
         /*engineId*/ QnUuid(),
         nx::vms::api::StreamIndex::primary),
     m_secondaryLogger(
-        lm("rtp_parser_@%1_").arg(nx::kit::utils::toString(this)),
+        lm("rtp_parser_%1@%2_").args(tag, nx::kit::utils::toString(this)),
         m_deviceId,
         /*engineId*/ QnUuid(),
         nx::vms::api::StreamIndex::secondary)

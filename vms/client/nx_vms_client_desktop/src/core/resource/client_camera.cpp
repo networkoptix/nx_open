@@ -102,7 +102,7 @@ QnAbstractStreamDataProvider* QnClientCameraResource::createLiveDataProvider()
     const auto camera = toSharedPointer(this);
 
     QnArchiveStreamReader *result = new QnArchiveStreamReader(camera);
-    auto delegate = new QnRtspClientArchiveDelegate(result);
+    auto delegate = new QnRtspClientArchiveDelegate(result, "ClientCamera");
     delegate->setCamera(camera);
     result->setArchiveDelegate(delegate);
 
