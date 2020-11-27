@@ -63,9 +63,7 @@ bool backupDatabaseLive(
         return false;
     }
 
-    const auto freeSpace = nx::SystemCommands().freeSpace(backupDir.toStdString());
-    deleteOldBackupFilesIfNeeded(backupDir, freeSpace, reason);
-
+    deleteOldBackupFilesIfNeeded(backupDir, reason);
     NX_WARNING(NX_SCOPE_TAG, "Successfully created DB backup %1", fileName);
     return true;
 }
@@ -117,13 +115,19 @@ QList<DbBackupFileData> allBackupFilesDataSorted(const QString& backupDir, const
     return result;
 }
 
-void deleteOldBackupFilesIfNeeded(const QString& backupDir, qint64 freeSpace, const QString& reason)
+void deleteOldBackupFilesIfNeeded(const QString& backupDir, const QString& reason)
 {
-    const qint64 kMaxFreeSpace = 10 * 1024 * 1024LL * 1024LL; //< 10Gb
-    const int kMaxBackupFilesCount = freeSpace > kMaxFreeSpace ? 6 : 1;
+    const qint64 freeSpaceTreshold = 10 * 1024 * 1024LL * 1024LL;
     const auto allBackupFiles = allBackupFilesDataSorted(backupDir, reason);
-    for (int i = kMaxBackupFilesCount; i < allBackupFiles.size(); ++i)
-        nx::SystemCommands().removePath(allBackupFiles[i].fullPath.toStdString());
+    int filesCount = allBackupFiles.size();
+    while (true)
+    {
+        const int maxFileCount =
+            nx::SystemCommands().freeSpace(backupDir.toStdString()) > freeSpaceTreshold ? 6 : 1;
+        if (filesCount <= maxFileCount)
+            break;
+        nx::SystemCommands().removePath(allBackupFiles[--filesCount].fullPath.toStdString());
+    }
 }
 
 } // namespace utils

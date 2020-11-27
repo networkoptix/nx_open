@@ -86,18 +86,6 @@ protected:
         m_freeSpace = freeSpace;
     }
 
-    void whenDeleteOldFilesFunctionCalled()
-    {
-        vms::utils::deleteOldBackupFilesIfNeeded(m_testDir, m_freeSpace);
-    }
-
-    void thenOldestFilesShouldBeDeleted(int filesLeft)
-    {
-        const auto foundFiles = nx::vms::utils::allBackupFilesDataSorted(m_testDir);
-        ASSERT_EQ(filesLeft, foundFiles.size());
-        ASSERT_EQ(foundFiles[0].timestamp, m_backupFilesDataFound[0].timestamp);
-    }
-
 private:
     QList<nx::vms::utils::DbBackupFileData> m_backupFilesDataFound;
     QList<QString> m_backupFilesCreated;
@@ -319,24 +307,6 @@ TEST_F(BackupDbUt, allBackupFilesData_correctnessCheck)
     whenSomeFilesCreated(/*count*/ 15, FileType::nonBackup);
     whenAllBackupFilesDataCollected();
     thenAllBackupFilesShouldBeFound();
-}
-
-TEST_F(BackupDbUt, rotation_freeSpaceMoreThan10Gb)
-{
-    givenDiskFreeSpace(11 * 1024 * 1024LL * 1024LL);
-    whenSomeFilesCreated(/*count*/ 10, FileType::backup);
-    whenAllBackupFilesDataCollected();
-    whenDeleteOldFilesFunctionCalled();
-    thenOldestFilesShouldBeDeleted(/*filesLeft*/ 6);
-}
-
-TEST_F(BackupDbUt, rotation_freeSpaceLessThan10Gb)
-{
-    givenDiskFreeSpace(9 * 1024 * 1024LL * 1024LL);
-    whenSomeFilesCreated(/*count*/ 10, FileType::backup);
-    whenAllBackupFilesDataCollected();
-    whenDeleteOldFilesFunctionCalled();
-    thenOldestFilesShouldBeDeleted(/*filesLeft*/ 1);
 }
 
 TEST_F(BackupDbIt, NewServer)

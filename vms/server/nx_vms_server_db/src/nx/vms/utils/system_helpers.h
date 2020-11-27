@@ -34,8 +34,7 @@ QList<DbBackupFileData> allBackupFilesDataSorted(
     const QString& backupDir, const QString& reason = {});
 
 /* Newest files come first */
-void deleteOldBackupFilesIfNeeded(
-    const QString& backupDir, qint64 freeSpace, const QString& reason = {});
+void deleteOldBackupFilesIfNeeded(const QString& backupDir, const QString& reason = {});
 
 } // namespace utils
 } // namespace vms
