@@ -1,6 +1,7 @@
 #include "bytestream_filter.h"
 
 #include <nx/utils/log/log.h>
+#include <nx/utils/std/algorithm.h>
 
 #include "common.h"
 #include "string_helper.h"
@@ -13,7 +14,7 @@ namespace hanwha {
 namespace {
 
 static const QString kChannelField("channel");
-static const std::set<QString> kRegionFields = {"regionid", "queue"};
+static const std::set<QString> kRegionFields = {"regionid", "queue", "definedareaid", "lineid"};
 
 static const QString kActive("true");
 static const QString kInactive("false");
@@ -45,6 +46,7 @@ std::vector<Event> BytestreamFilter::parseMetadataState(
     std::vector<Event> result;
     auto split = buffer.split(L'\n');
 
+    std::set<QString> regionedTypeIds;
     for (const auto& entry: split)
     {
         auto trimmed = entry.trimmed();
@@ -58,8 +60,17 @@ std::vector<Event> BytestreamFilter::parseMetadataState(
             QString::fromUtf8(nameAndValue[1]).toLower().trimmed());
 
         if (event)
+        {
             result.push_back(*event);
+            if (event->region)
+                regionedTypeIds.insert(event->typeId);
+        }
     }
+
+    // Camera sends duplicate events, with and without region id, so for each event type we remove
+    // ones that have no region id if any are present with region id.
+    nx::utils::remove_if(result,
+        [&](auto& event) { return !event.region && regionedTypeIds.count(event.typeId); });
 
     return result;
 }

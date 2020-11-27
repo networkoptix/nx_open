@@ -17,7 +17,7 @@ using namespace std::chrono;
 namespace {
 
 static const QString kMonitorUrlTemplate =
-    lit("http://%1:%2/stw-cgi/eventstatus.cgi?msubmenu=eventstatus&action=monitordiff");
+    lit("http://%1:%2/stw-cgi/eventstatus.cgi?msubmenu=eventstatus&action=monitordiff&SchemaBased=True");
 
 static const int kDefaultHttpPort = 80;
 static const minutes kKeepAliveTimeout(2);
