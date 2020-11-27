@@ -387,11 +387,13 @@ std::vector<QnCameraAdvancedParameter> StreamCapabilityAdvancedParametersProvide
     codec.name = lit("Codec");
     codec.dataType = QnCameraAdvancedParameter::DataType::Enumeration;
     codec.range = makeRange(codecResolutionCapabilities.keys());
+    codec.availableInOffline = true;
 
     QnCameraAdvancedParameter resolution;
     resolution.id = parameterName(kResolution);
     resolution.name = lit("Resolution");
     resolution.dataType = QnCameraAdvancedParameter::DataType::Enumeration;
+    resolution.availableInOffline = true;
 
     const auto traitAttributes = trait(nx::media::CameraTraitType::aspectRatioDependent);
     const bool doesResolutionDependOnAspectRatio = m_streamIndex == StreamIndex::secondary
@@ -483,6 +485,7 @@ std::vector<QnCameraAdvancedParameter> StreamCapabilityAdvancedParametersProvide
     bitrate.unit = lit("Kbps");
     bitrate.dataType = QnCameraAdvancedParameter::DataType::Number;
     bitrate.range = lit("1,100000");
+    bitrate.availableInOffline = true;
 
     QnCameraAdvancedParameter fps;
     fps.id = parameterName(kFps);
@@ -490,6 +493,7 @@ std::vector<QnCameraAdvancedParameter> StreamCapabilityAdvancedParametersProvide
     fps.unit = lit("Frames per Second");
     fps.dataType = QnCameraAdvancedParameter::DataType::Number;
     fps.range = lit("1,100");
+    fps.availableInOffline = true;
 
     // Dependencies: bitrate -> codec + resolution; fps -> codec + resolution.
     for (auto codecResolution = codecResolutionCapabilities.begin();

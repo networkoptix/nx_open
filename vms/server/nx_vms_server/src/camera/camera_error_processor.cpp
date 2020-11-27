@@ -76,12 +76,11 @@ void ErrorProcessor::processStreamError(
         ownerResource->setStatus(Qn::Unauthorized);
         return;
     }
-
     if (!streamReader->reinitResourceOnStreamError())
         return;
 
     const auto kMaxTimeFromPreviousFrameUs = 5 * 1000 * 1000;
-    const auto hasGopData =
+    const auto hasVideoTimeoutExpired =
         [&](nx::vms::api::StreamIndex streamIndex)
         {
             const auto nowUs = qnSyncTime->currentUSecsSinceEpoch();
@@ -89,15 +88,17 @@ void ErrorProcessor::processStreamError(
             {
                 auto lastFrame = videoCamera->getLastVideoFrame(streamIndex, i);
                 if (lastFrame && nowUs - lastFrame->timestamp < kMaxTimeFromPreviousFrameUs)
-                    return true;
+                    return false;
             }
-            return false;
+            return true;
         };
-    const bool gotVideoFrameRecently = hasGopData(nx::vms::api::StreamIndex::primary)
-        || hasGopData(nx::vms::api::StreamIndex::secondary);
 
+    nx::vms::api::StreamIndex streamIndex =
+        streamReader->getRole() == Qn::ConnectionRole::CR_LiveVideo
+        ? nx::vms::api::StreamIndex::primary
+        : nx::vms::api::StreamIndex::secondary;
 
-    if (!gotVideoFrameRecently
+    if (hasVideoTimeoutExpired(streamIndex)
         && error.errorCode != CameraDiagnostics::ErrorCode::tooManyOpenedConnections)
     {
         if (streamReader->getStatistics(0)->hasMediaData())
@@ -105,6 +106,9 @@ void ErrorProcessor::processStreamError(
         else
             ownerResource->setLastMediaIssue(CameraDiagnostics::NoMediaStreamResult());
 
+        NX_DEBUG(this, "Camera: %1, no frames in the stream %2, camera for %3ms, change "
+            "camera status to offline",
+            ownerResource, streamIndex, kMaxTimeFromPreviousFrameUs / 1000);
         ownerResource->setStatus(Qn::Offline);
     }
 }
