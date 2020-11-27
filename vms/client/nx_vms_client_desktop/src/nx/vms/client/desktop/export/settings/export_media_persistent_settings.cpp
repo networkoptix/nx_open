@@ -88,7 +88,7 @@ OverlaySettingsPtr ExportTextOverlayPersistentSettingsBase::createRuntimeSetting
     document->setTextWidth(overlayWidth);
     document->setDocumentMargin(indent);
 
-    return createRuntimeSettingsFromDocument(std::move(document), overlayWidth, document->size().height());
+    return createRuntimeSettingsFromDocument(std::move(document));
 }
 
 std::unique_ptr<QTextDocument> ExportTextOverlayPersistentSettingsBase::createDocument() const
@@ -107,9 +107,10 @@ std::unique_ptr<QTextDocument> ExportTextOverlayPersistentSettingsBase::createDo
 }
 
 OverlaySettingsPtr ExportTextOverlayPersistentSettingsBase::createRuntimeSettingsFromDocument(
-    std::unique_ptr<QTextDocument> document, int width, int height) const
+    std::unique_ptr<QTextDocument> document) const
 {
-    QImage targetImage(width, height, QImage::Format_ARGB32_Premultiplied);
+    QImage targetImage(document->size().width(), document->size().height(),
+        QImage::Format_ARGB32_Premultiplied);
     targetImage.fill(Qt::transparent);
 
     QPainter imagePainter(&targetImage);
@@ -167,7 +168,7 @@ OverlaySettingsPtr ExportTimestampOverlayPersistentSettings::createRuntimeSettin
 
     document->setDocumentMargin(indent);
 
-    return createRuntimeSettingsFromDocument(std::move(document), document->size().width(), document->size().height());
+    return createRuntimeSettingsFromDocument(std::move(document));
 }
 
 void ExportInfoOverlayPersistentSettings::rescale(qreal factor)

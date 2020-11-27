@@ -69,7 +69,7 @@ struct ExportTextOverlayPersistentSettingsBase: public ExportOverlayPersistentSe
 protected:
     std::unique_ptr<QTextDocument> createDocument() const;
     nx::core::transcoding::OverlaySettingsPtr createRuntimeSettingsFromDocument(
-        std::unique_ptr<QTextDocument> document, int width, int height) const;
+        std::unique_ptr<QTextDocument> document) const;
 };
 #define ExportTextOverlayPersistentSettingsBase_Fields \
     ExportOverlayPersistentSettings_Fields \
