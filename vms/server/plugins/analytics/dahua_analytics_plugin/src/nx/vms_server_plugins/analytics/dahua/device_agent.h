@@ -1,71 +1,57 @@
 #pragma once
 
-#include <QtCore/QObject>
-#include <QtCore/QUrl>
-#include <QtCore/QString>
-#include <QtNetwork/QAuthenticator>
-
-#include <nx/utils/thread/mutex.h>
+#include <vector>
 
 #include <nx/sdk/helpers/ref_countable.h>
+#include <nx/sdk/i_device_info.h>
 #include <nx/sdk/analytics/i_device_agent.h>
-#include <nx/utils/url.h>
+#include <nx/sdk/analytics/i_metadata_types.h>
 
-#include "engine.h"
+#include "events.h"
 #include "metadata_monitor.h"
 
 namespace nx::vms_server_plugins::analytics::dahua {
 
+class Engine;
+
 class DeviceAgent:
-    public QObject,
     public nx::sdk::RefCountable<nx::sdk::analytics::IDeviceAgent>
 {
-public:
-    DeviceAgent(Engine* engine,
-        const nx::sdk::IDeviceInfo* deviceInfo,
-        const nx::vms::api::analytics::DeviceAgentManifest& deviceAgentParsedManifest);
+private:
+    class ManifestBuilder;
 
+public:
+    explicit DeviceAgent(Engine* engine, nx::sdk::Ptr<const nx::sdk::IDeviceInfo> info);
     virtual ~DeviceAgent();
 
-    virtual void setHandler(nx::sdk::analytics::IDeviceAgent::IHandler* handler) override;
+    Engine* engine() const;
+    nx::sdk::Ptr<const nx::sdk::IDeviceInfo> info() const;
+    nx::sdk::Ptr<IHandler> handler() const;
 
 protected:
     virtual void doSetSettings(
         nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult,
-        const nx::sdk::IStringMap* settings) override;
+        const nx::sdk::IStringMap* values) override;
+
     virtual void getPluginSideSettings(
         nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult) const override;
+
     virtual void getManifest(nx::sdk::Result<const nx::sdk::IString*>* outResult) const override;
+
+    virtual void setHandler(IHandler* handler) override;
+
     virtual void doSetNeededMetadataTypes(
-        nx::sdk::Result<void>* outValue,
-        const nx::sdk::analytics::IMetadataTypes* neededMetadataTypes) override;
+        nx::sdk::Result<void>* outResult,
+        const nx::sdk::analytics::IMetadataTypes* types) override;
 
 private:
-    void setDeviceInfo(const nx::sdk::IDeviceInfo* deviceInfo);
-
-    nx::sdk::Result<void> startFetchingMetadata(
-        const nx::sdk::analytics::IMetadataTypes* metadataTypes);
-
-    void stopFetchingMetadata();
+    std::vector<const EventType*> fetchSupportedEventTypes() const;
 
 private:
     Engine* const m_engine;
-
-    // Device Agent manifest is stored in serialized and deserialized states, since both of them
-    // needed.
-    const QByteArray m_jsonManifest;
-    const nx::vms::api::analytics::DeviceAgentManifest m_parsedManifest;
-
-    nx::utils::Url m_url;
-    QString m_model;
-    QString m_firmware;
-    QAuthenticator m_auth;
-    QString m_uniqueId;
-    QString m_sharedId;
-    int m_channelNumber = 0;
-
-    std::unique_ptr<MetadataMonitor> m_monitor;
-    nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
+    const nx::sdk::Ptr<const nx::sdk::IDeviceInfo> m_info;
+    nx::sdk::Ptr<IHandler> m_handler;
+    MetadataMonitor m_metadataMonitor;
 };
 
 } // namespace nx::vms_server_plugins::analytics::dahua

@@ -28,14 +28,14 @@ cf::future<cf::unit> NativeMetadataSource::open(const Url& url, NativeMetadataTy
 
                 return m_webSocket.open(std::move(url));
             })
-        .then(addExceptionContextAndRethrow("Failed to open native metadata source"));
+        .then(Exception::addFutureContext("Failed to open native metadata source"));
 }
 
 cf::future<JsonValue> NativeMetadataSource::read()
 {
     return m_webSocket.read()
         .then_unwrap(NX_WRAP_FUNC_TO_LAMBDA(parseJson))
-        .then(addExceptionContextAndRethrow("Failed to read native metadata"));
+        .then(Exception::addFutureContext("Failed to read native metadata"));
 }
 
 void NativeMetadataSource::close()
@@ -66,7 +66,7 @@ cf::future<cf::unit> NativeMetadataSource::enableDetailMetadata(Url url)
                             return m_vcaParameterApi->reloadConfig();
                         });
             })
-        .then(addExceptionContextAndRethrow("Failed to enable detail metadata"));
+        .then(Exception::addFutureContext("Failed to enable detail metadata"));
 }
 
 } // namespace nx::vms_server_plugins::analytics::vivotek

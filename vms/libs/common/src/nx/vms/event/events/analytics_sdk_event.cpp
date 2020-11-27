@@ -80,7 +80,8 @@ EventParameters AnalyticsSdkEvent::getRuntimeParamsEx(
 
 QString AnalyticsSdkEvent::getExternalUniqueKey() const
 {
-    return m_eventTypeId;
+    const char recordSeparator[] = "\x1E";
+    return m_eventTypeId + recordSeparator + m_objectTrackId.toString();
 }
 
 bool AnalyticsSdkEvent::checkEventParams(const EventParameters& params) const

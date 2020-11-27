@@ -86,6 +86,13 @@ QN_FUSION_DECLARE_FUNCTIONS(BestShot, (json)(ubjson));
 struct BestShotEx: public BestShot
 {
     QnUuid deviceId;
+
+    BestShotEx() = default;
+
+    BestShotEx(const BestShot& bestShot):
+        BestShot(bestShot)
+    {
+    }
 };
 #define BestShotEx_analytics_storage_Fields BestShot_analytics_storage_Fields(deviceId)
 QN_FUSION_DECLARE_FUNCTIONS(BestShotEx, (json)(ubjson));

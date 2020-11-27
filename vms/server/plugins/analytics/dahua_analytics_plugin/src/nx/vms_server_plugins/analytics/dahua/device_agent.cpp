@@ -1,43 +1,166 @@
-#include <chrono>
-
-#include <nx/sdk/analytics/helpers/event_metadata.h>
-#include <nx/sdk/analytics/helpers/event_metadata_packet.h>
-#include <nx/utils/log/log_main.h>
-#include <nx/fusion/model_functions.h>
-
-#include <nx/sdk/helpers/string.h>
-#include <nx/sdk/helpers/error.h>
-
-#include "common.h"
 #include "device_agent.h"
+
+#include <algorithm>
+#include <set>
+
+#include <nx/utils/string.h>
+#include <nx/utils/url.h>
+#include <nx/utils/log/log_main.h>
+#include <nx/utils/log/assert.h>
+#include <nx/vms_server_plugins/utils/exception.h>
+#include <nx/vms_server_plugins/utils/http.h>
+#include <nx/fusion/serialization/json.h>
+#include <nx/network/http/futures/client.h>
+#include <nx/sdk/helpers/string.h>
+
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
+
+#include "engine.h"
 
 namespace nx::vms_server_plugins::analytics::dahua {
 
+using namespace nx::utils;
+using namespace nx::vms_server_plugins::utils;
+using namespace nx::network;
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-DeviceAgent::DeviceAgent(
-    Engine* engine,
-    const IDeviceInfo* deviceInfo,
-    const nx::vms::api::analytics::DeviceAgentManifest& deviceAgentParsedManifest)
-    :
-    m_engine(engine),
-    m_jsonManifest(QJson::serialized(deviceAgentParsedManifest)),
-    m_parsedManifest(deviceAgentParsedManifest)
-
+class DeviceAgent::ManifestBuilder
 {
-    setDeviceInfo(deviceInfo);
+public:
+    static QJsonObject build(const DeviceAgent& deviceAgent)
+    {
+        return ManifestBuilder(deviceAgent).build();
+    }
+
+private:
+    explicit ManifestBuilder(const DeviceAgent& deviceAgent):
+        m_supportedEventTypes(deviceAgent.fetchSupportedEventTypes())
+    {
+    }
+
+    QJsonObject build() const
+    {
+        return QJsonObject{
+            {"groups", buildGroups()},
+            {"eventTypes", buildEventTypes()},
+            {"objectTypes", buildObjectTypes()},
+        };
+    }
+
+    QJsonArray buildGroups() const
+    {
+        QJsonArray jsonGroups;
+
+        for (const auto group: kEventTypeGroups)
+        {
+            if (std::none_of(
+                    m_supportedEventTypes.begin(), m_supportedEventTypes.end(),
+                    [&](const auto type) { return type->group == group; }))
+            {
+                continue;
+            }
+
+            QJsonObject jsonGroup = {
+                {"id", group->id},
+                {"name", group->prettyName},
+            };
+
+            jsonGroups.push_back(std::move(jsonGroup));
+        }
+
+        return jsonGroups;
+    }
+
+    QJsonArray buildEventTypes() const
+    {
+        QJsonArray jsonTypes;
+
+        for (const auto type: m_supportedEventTypes)
+        {
+            QJsonObject jsonType = {
+                {"id", type->id},
+                {"name", type->prettyName},
+            };
+
+            std::vector<QString> flags = {
+                "useTrackBestShotAsPreview",
+            };
+            if (type->isStateDependent)
+                flags.push_back("stateDependent");
+            if (type->isRegionDependent)
+                flags.push_back("regionDependent");
+            if (!flags.empty())
+                jsonType["flags"] = nx::utils::join(flags, "|");
+
+            if (const auto group = type->group)
+                jsonType["groupId"] = group->id;
+
+            jsonTypes.push_back(std::move(jsonType));
+        }
+
+        return jsonTypes;
+    }
+           
+    QJsonArray buildObjectTypes() const
+    {
+        std::set<const ObjectType*> supportedTypes;
+        for (const auto eventType: m_supportedEventTypes)
+        {
+            const auto& types = eventType->objectTypes;
+            supportedTypes.insert(types.begin(), types.end());
+        }
+
+        QJsonArray jsonTypes;
+
+        for (const auto type: supportedTypes)
+        {
+            QJsonObject jsonType = {
+                {"id", type->id},
+                {"name", type->prettyName},
+            };
+
+            jsonTypes.push_back(std::move(jsonType));
+        }
+
+        return jsonTypes;
+    }
+             
+private:
+    const std::vector<const EventType*> m_supportedEventTypes;
+};
+
+DeviceAgent::DeviceAgent(Engine* engine, Ptr<const nx::sdk::IDeviceInfo> info):
+    m_engine(engine),
+    m_info(std::move(info)),
+    m_metadataMonitor(this)
+{
 }
 
 DeviceAgent::~DeviceAgent()
 {
-    stopFetchingMetadata();
+    m_metadataMonitor.setNeededTypes(nullptr);
+}
+
+Engine* DeviceAgent::engine() const
+{
+    return m_engine;
+}
+
+Ptr<const IDeviceInfo> DeviceAgent::info() const
+{
+    return m_info;
+}
+
+Ptr<DeviceAgent::IHandler> DeviceAgent::handler() const
+{
+    return m_handler;
 }
 
 void DeviceAgent::doSetSettings(
-    Result<const ISettingsResponse*>* /*outResult*/, const IStringMap* /*settings*/)
+    Result<const ISettingsResponse*>* /*outResult*/, const IStringMap* /*values*/)
 {
-    // There are no DeviceAgent settings for this plugin.
 }
 
 void DeviceAgent::getPluginSideSettings(
@@ -45,117 +168,84 @@ void DeviceAgent::getPluginSideSettings(
 {
 }
 
-void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
+void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 {
-    handler->addRef();
-    m_handler.reset(handler);
+    interceptExceptions(outResult,
+        [&]()
+        {
+            const QJsonObject manifest = ManifestBuilder::build(*this);
+            return new sdk::String(QJson::serialize(manifest).toStdString());
+        });
+}
+
+void DeviceAgent::setHandler(IHandler* handler)
+{
+    if (!NX_ASSERT(!m_handler))
+        return;
+
+    m_handler = addRefToPtr(handler);
 }
 
 void DeviceAgent::doSetNeededMetadataTypes(
-    Result<void>* outResult, const IMetadataTypes* neededMetadataTypes)
+    Result<void>* outResult, const IMetadataTypes* types)
 {
-    const auto eventTypeIds = neededMetadataTypes->eventTypeIds();
-    if (const char* const kMessage = "Event type id list is null";
-        !NX_ASSERT(eventTypeIds, kMessage))
-    {
-        *outResult = error(ErrorCode::internalError, kMessage);
-        return;
-    }
-
-    stopFetchingMetadata();
-
-    if (eventTypeIds->count() != 0)
-        *outResult = startFetchingMetadata(neededMetadataTypes);
-}
-
-Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTypes)
-{
-    auto monitorHandler =
-        [this](const EventList& events)
+    interceptExceptions(outResult,
+        [&]()
         {
-            using namespace std::chrono;
-            auto packet = makePtr<EventMetadataPacket>();
+            m_metadataMonitor.setNeededTypes(addRefToPtr(types));
+        });
+}
 
-            for (const auto& dahuaEvent: events)
-            {
-                if (dahuaEvent.channel.has_value() && dahuaEvent.channel != m_channelNumber)
-                    return;
-
-                auto eventMetadata = makePtr<EventMetadata>();
-                NX_VERBOSE(this, "Got event: %1 %2 Channel %3",
-                    dahuaEvent.caption, dahuaEvent.description, m_channelNumber);
-
-                eventMetadata->setTypeId(dahuaEvent.typeId.toStdString());
-                eventMetadata->setCaption(dahuaEvent.caption.toStdString());
-                eventMetadata->setDescription(dahuaEvent.description.toStdString());
-                eventMetadata->setIsActive(dahuaEvent.isActive);
-                eventMetadata->setConfidence(1.0);
-
-                packet->setTimestampUs(
-                    duration_cast<microseconds>(system_clock::now().time_since_epoch()).count());
-
-                packet->setDurationUs(-1);
-                packet->addItem(eventMetadata.get());
-            }
-
-            if (NX_ASSERT(m_handler))
-                m_handler->handleMetadata(packet.get());
-        };
-
-    NX_ASSERT(m_engine);
-    std::vector<QString> eventTypes;
-
-    const auto eventTypeIds = metadataTypes->eventTypeIds();
-    if (const char* const kMessage = "Event type id list is empty";
-        !NX_ASSERT(eventTypeIds, kMessage))
+std::vector<const EventType*> DeviceAgent::fetchSupportedEventTypes() const
+{
+    try
     {
-        return error(ErrorCode::internalError, kMessage);
+        Url url = m_info->url();
+        url.setUserName(m_info->login());
+        url.setPassword(m_info->password());
+        url.setPath("/cgi-bin/eventManager.cgi");
+        url.setQuery("action=getExposureEvents");
+
+        std::vector<const EventType*> types;
+
+        http::futures::Client httpClient;
+        const auto response = Exception::translate(
+            [&]{ return http::futures::Client().get(url).get(); });
+        verifySuccessOrThrow(response);
+
+        NX_VERBOSE(this, "Raw list of event types supported by camera:\n%1",
+            response.messageBody);
+
+        for (auto line: response.messageBody.split('\n'))
+        {
+            line = line.trimmed();
+            if (line.isEmpty())
+                continue;
+
+            const auto pair = line.split('=');
+            if (pair.size() != 2)
+                throw Exception("Failed to parse response from camera");
+
+            if (const auto type = EventType::findByNativeId(QString::fromUtf8(pair[1])))
+                types.push_back(type);
+        }
+
+        NX_VERBOSE(this, "Ids of event types supported by camera:\n%1",
+            [&]()
+            {
+                std::vector<QString> ids;
+                for (const auto type: types)
+                    ids.push_back(NX_FMT("\t%1", type->id));
+                return nx::utils::join(ids, "\n");
+            }());
+
+        return types;
     }
-
-    for (int i = 0; i < eventTypeIds->count(); ++i)
-        eventTypes.push_back(eventTypeIds->at(i));
-
-    m_monitor = std::make_unique<MetadataMonitor>(
-        m_engine->parsedManifest(),
-        m_parsedManifest,
-        m_url,
-        m_auth,
-        eventTypes);
-
-    m_monitor->addHandler(m_uniqueId, monitorHandler);
-    m_monitor->startMonitoring();
-
-    return {};
-}
-
-void DeviceAgent::stopFetchingMetadata()
-{
-    if (m_monitor)
-        m_monitor->removeHandler(m_uniqueId);
-
-    NX_ASSERT(m_engine);
-
-    m_monitor = nullptr;
-}
-
-void DeviceAgent::getManifest(Result<const IString*>* outResult) const
-{
-    if (m_jsonManifest.isEmpty())
-        *outResult = error(ErrorCode::otherError, "DeviceAgent manifest is empty");
-    else
-        *outResult = new nx::sdk::String(m_jsonManifest);
-}
-
-void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
-{
-    m_url = deviceInfo->url();
-    m_model = deviceInfo->model();
-    m_firmware = deviceInfo->firmware();
-    m_auth.setUser(deviceInfo->login());
-    m_auth.setPassword(deviceInfo->password());
-    m_uniqueId = deviceInfo->id();
-    m_sharedId = deviceInfo->sharedId();
-    m_channelNumber = deviceInfo->channelNumber();
+    catch (Exception& exception)
+    {
+        exception.addContext("Failed to fetch supported event types");
+        throw;
+    }
 }
 
 } // namespace nx::vms_server_plugins::analytics::dahua

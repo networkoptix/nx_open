@@ -56,7 +56,7 @@ cf::future<cf::unit> WebSocket::open(const Url& url)
 
                 return cf::unit();
             })
-        .then(addExceptionContextAndRethrow(
+        .then(Exception::addFutureContext(
             "Failed to connect to websocket server at %1", withoutUserInfo(std::move(url))));
 }
 
@@ -71,9 +71,9 @@ cf::future<nx::Buffer> WebSocket::read()
             m_buffer.clear();
             return m_nested->readSome(&m_buffer);
         })
-        .then(translateSystemError)
+        .then(Exception::translateFuture)
         .then_unwrap([this](auto&&) { return std::move(m_buffer); })
-        .then(addExceptionContextAndRethrow("Failed to read from websocket"));
+        .then(Exception::addFutureContext("Failed to read from websocket"));
 }
 
 void WebSocket::close()

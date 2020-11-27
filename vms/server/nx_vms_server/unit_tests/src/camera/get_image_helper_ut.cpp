@@ -41,14 +41,18 @@ TEST(GetImageHelper, updateDstSize_sourceRatio)
     outFrame.height = 1080 / 2;
     outFrame.sample_aspect_ratio = 1;
 
-    EXPECT_EQ(QSize(1920, 1080), updateDstSize(&camera, {1920, 1080}, outFrame, AspectRatio::source));
-    EXPECT_EQ(QSize(1920, 1080), updateDstSize(&camera, {0, 1080}, outFrame, AspectRatio::source));
-    EXPECT_EQ(QSize(1920, 1080), updateDstSize(&camera, {1920, 0}, outFrame, AspectRatio::source));
+    EXPECT_EQ(QSize(1920, 1080),
+        updateDstSize(&camera, {1920, 1080}, outFrame, QRectF(), AspectRatio::source));
+    EXPECT_EQ(QSize(1920, 1080),
+        updateDstSize(&camera, {0, 1080}, outFrame, QRectF(), AspectRatio::source));
+    EXPECT_EQ(QSize(1920, 1080),
+        updateDstSize(&camera, {1920, 0}, outFrame, QRectF(), AspectRatio::source));
     EXPECT_EQ(QSize(outFrame.width, outFrame.height),
-        updateDstSize(&camera, {0, 0}, outFrame, AspectRatio::source));
+        updateDstSize(&camera, {0, 0}, outFrame, QRectF(), AspectRatio::source));
 
     outFrame.sample_aspect_ratio = 2;
-    EXPECT_EQ(QSize(1920, 540), updateDstSize(&camera, {0, 0}, outFrame, AspectRatio::source));
+    EXPECT_EQ(QSize(1920, 540),
+        updateDstSize(&camera, {0, 0}, outFrame, QRectF(), AspectRatio::source));
 }
 
 TEST(GetImageHelper, updateDstSize_autoRatio)
@@ -63,9 +67,12 @@ TEST(GetImageHelper, updateDstSize_autoRatio)
         .Times(AtLeast(1))
         .WillRepeatedly(Return(QnAspectRatio(1920, 1080)));
 
-    EXPECT_EQ(QSize(1376, 768), updateDstSize(&camera, {1024, 768}, outFrame, AspectRatio::auto_));
-    EXPECT_EQ(QSize(1024, 576), updateDstSize(&camera, {1024, 0}, outFrame, AspectRatio::auto_));
-    EXPECT_EQ(QSize(1376, 768), updateDstSize(&camera, {0, 768}, outFrame, AspectRatio::auto_));
+    EXPECT_EQ(QSize(1376, 768),
+        updateDstSize(&camera, {1024, 768}, outFrame, QRectF(), AspectRatio::auto_));
+    EXPECT_EQ(QSize(1024, 576),
+        updateDstSize(&camera, {1024, 0}, outFrame, QRectF(), AspectRatio::auto_));
+    EXPECT_EQ(QSize(1376, 768),
+        updateDstSize(&camera, {0, 768}, outFrame, QRectF(), AspectRatio::auto_));
 }
 
 TEST(GetImageHelper, updateDstSize_minSize)
@@ -80,19 +87,21 @@ TEST(GetImageHelper, updateDstSize_minSize)
 
     // Width and height specified.
     EXPECT_EQ(QSize(kMinSize, kMinSize),
-        updateDstSize(&camera, {kMinSize / 2, kMinSize / 2}, outFrame, AspectRatio::source));
+        updateDstSize(&camera, {kMinSize / 2, kMinSize / 2}, outFrame, QRectF(),
+            AspectRatio::source));
 
     // Width and height specified (persisting aspect ratio).
     EXPECT_EQ(QSize(kMinSize * 2, kMinSize),
-        updateDstSize(&camera, {kMinSize / 2, kMinSize / 4}, outFrame, AspectRatio::source));
+        updateDstSize(&camera, {kMinSize / 2, kMinSize / 4}, outFrame, QRectF(),
+            AspectRatio::source));
 
     // Width specified.
     EXPECT_EQ(QSize(kMinSize, kMinSize),
-        updateDstSize(&camera, {0, kMinSize / 2}, outFrame, AspectRatio::source));
+        updateDstSize(&camera, {0, kMinSize / 2}, outFrame, QRectF(), AspectRatio::source));
 
     // Nothing specified, should use source.
     EXPECT_EQ(QSize(kMinSize, kMinSize),
-        updateDstSize(&camera, {0, 0}, outFrame, AspectRatio::source));
+        updateDstSize(&camera, {0, 0}, outFrame, QRectF(), AspectRatio::source));
 }
 
 TEST(GetImageHelper, updateDstSize_maxSize)
@@ -107,19 +116,23 @@ TEST(GetImageHelper, updateDstSize_maxSize)
 
     // Width and height specified.
     EXPECT_EQ(QSize(kMaxSize, kMaxSize),
-        updateDstSize(&camera, {kMaxSize * 2, kMaxSize * 2}, outFrame, AspectRatio::source));
+        updateDstSize(&camera, {kMaxSize * 2, kMaxSize * 2}, outFrame, QRectF(),
+            AspectRatio::source));
 
     // Width and height specified (persisting aspect ratio).
     EXPECT_EQ(QSize(kMaxSize / 2, kMaxSize),
-        updateDstSize(&camera, {kMaxSize * 2, kMaxSize * 4}, outFrame, AspectRatio::source));
+        updateDstSize(&camera, {kMaxSize * 2, kMaxSize * 4}, outFrame, QRectF(),
+            AspectRatio::source));
 
     // Width specified.
     EXPECT_EQ(QSize(kMaxSize, kMaxSize),
-        updateDstSize(&camera, {0, kMaxSize * 2}, outFrame, AspectRatio::source));
+        updateDstSize(&camera, {0, kMaxSize * 2}, outFrame, QRectF(),
+            AspectRatio::source));
 
     // Nothing specified, should use source.
     EXPECT_EQ(QSize(kMaxSize, kMaxSize),
-        updateDstSize(&camera, {0, 0}, outFrame, AspectRatio::source));
+        updateDstSize(&camera, {0, 0}, outFrame, QRectF(),
+            AspectRatio::source));
 }
 
 /**

@@ -32,7 +32,7 @@ cf::future<JsonValue> CameraVcaParameterApi::fetch(const QString& scope)
     url.setPath(NX_FMT("/VCA/%1", scope));
     return m_httpClient.get(url)
         .then_unwrap(NX_WRAP_FUNC_TO_LAMBDA(parseJson))
-        .then(addExceptionContextAndRethrow(
+        .then(Exception::addFutureContext(
             "Failed to fetch %1 VCA parameters from %2", scope, withoutUserInfo(m_url)));
 }
 
@@ -43,7 +43,7 @@ cf::future<cf::unit> CameraVcaParameterApi::store(
     url.setPath(NX_FMT("/VCA/%1", scope));
     return m_httpClient.post(url, "application/json", serializeJson(parameters))
         .then(cf::discard_value)
-        .then(addExceptionContextAndRethrow(
+        .then(Exception::addFutureContext(
             "Failed to store %1 VCA parameters to %2", scope, withoutUserInfo(m_url)));
 }
 
@@ -53,7 +53,7 @@ cf::future<cf::unit> CameraVcaParameterApi::reloadConfig()
     url.setPath("/VCA/Config/Reload");
     return m_httpClient.get(url)
         .then(cf::discard_value)
-        .then(addExceptionContextAndRethrow(
+        .then(Exception::addFutureContext(
             "Failed to reload VCA config on %1", withoutUserInfo(m_url)));
 }
 

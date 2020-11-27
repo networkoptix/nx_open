@@ -107,6 +107,7 @@ QSize updateDstSize(
     const QnVirtualCameraResource* camera,
     const QSize& srcSize,
     const CLVideoDecoderOutput& outFrame,
+    const QRectF& crop,
     nx::api::ImageRequest::AspectRatio aspectRatio)
 {
     QSize dstSize(srcSize);
@@ -120,8 +121,11 @@ QSize updateDstSize(
         if (customAr.isValid())
             ar = customAr.toFloat();
     }
-    NX_VERBOSE(typeid(QnGetImageHelper), "%1(): AR: %2, SAR: %3, mode: %4",
-        __func__, ar, sar, aspectRatio);
+    if (!crop.isEmpty())
+        ar *= crop.width() / crop.height();
+
+    NX_VERBOSE(typeid(QnGetImageHelper), "%1(): AR: %2, SAR: %3, mode: %4, crop: %5",
+        __func__, ar, sar, aspectRatio, crop);
 
     NX_ASSERT(ar > 0);
     if (!dstSize.isEmpty())
@@ -665,7 +669,8 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
     std::bitset<CL_MAX_CHANNELS> channelMask((1 << channelCount) - 1);
 
     QList<QnAbstractImageFilterPtr> filterChain;
-    const QSize dstSize = updateDstSize(camera.get(), request.size, *frame, request.aspectRatio);
+    const QSize dstSize = updateDstSize(
+        camera.get(), request.size, *frame, request.crop, request.aspectRatio);
 
     if (!request.crop.isEmpty())
         filterChain << QnAbstractImageFilterPtr(new QnCropImageFilter(request.crop));

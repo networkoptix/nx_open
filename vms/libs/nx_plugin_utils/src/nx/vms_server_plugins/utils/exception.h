@@ -14,6 +14,16 @@ namespace nx::vms_server_plugins::utils {
 
 class Exception: public nx::utils::Exception
 {
+private:
+    struct FutureTranslator
+    {
+        template <typename Future>
+        decltype(auto) operator()(Future&& future) const
+        {
+            return translate([&]{ return std::forward<Future>(future).get(); });
+        };
+    };
+
 public:
     using nx::utils::Exception::Exception;
 
@@ -39,22 +49,34 @@ public:
 
     nx::sdk::Error toSdkError() const;
 
-private:
-    std::variant<std::error_code, nx::sdk::ErrorCode> m_errorCode;
-};
-
-const auto translateSystemError =
-    [](auto future)
+    template <typename Callable>
+    static decltype(auto) translate(Callable&& callable)
     {
         try
         {
-            return future.get();
+            return std::forward<decltype(callable)>(callable)();
+        }
+        catch (const Exception&)
+        {
+            throw;
         }
         catch (const std::system_error& exception)
         {
             throw Exception(exception);
         }
-    };
+        catch (...)
+        {
+            nx::utils::Exception::translate([&]{ throw; });
+            throw; // unreachable
+        }
+    }
+
+    // MSVC bug prevents this from being a simple lambda
+    static constexpr FutureTranslator translateFuture{};
+
+private:
+    std::variant<std::error_code, nx::sdk::ErrorCode> m_errorCode;
+};
 
 template <typename Value, typename Function>
 void interceptExceptions(nx::sdk::Result<Value>* outResult, Function&& function) noexcept

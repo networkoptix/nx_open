@@ -198,6 +198,18 @@ static Ptr<RefCountable> toPtr(RefCountable* refCountable)
 }
 
 /**
+ * If refCountable is null, returns null.
+ * Otherwise, increments refeference counter and returns owning pointer.
+ */
+template<class RefCountable>
+static Ptr<RefCountable> addRefToPtr(RefCountable* refCountable)
+{
+    if (refCountable)
+        refCountable->addRef();
+    return toPtr(refCountable);
+}
+
+/**
  * Creates a new object via `new` (with reference count of 1) and returns a smart pointer to it.
  */
 template<class RefCountable, typename... Args>

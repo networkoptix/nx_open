@@ -7,6 +7,7 @@ nx_add_target(nx_plugin_utils LIBRARY LIBRARY_TYPE STATIC
         nx_utils
         nx_fusion
         nx_sdk
+        nx_network
 )
 
 if(WINDOWS)

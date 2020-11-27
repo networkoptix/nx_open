@@ -9,6 +9,11 @@ Exception::Exception(std::string message):
 {
 }
 
+Exception::Exception(const std::exception& exception):
+    m_message(exception.what())
+{
+}
+
 Exception::Exception(const QString& message):
     m_message(message.toStdString())
 {

@@ -380,7 +380,8 @@ void EventRibbon::Private::updateTilePreview(int index)
         ? nx::api::ImageRequest::RoundMethod::precise
         : nx::api::ImageRequest::RoundMethod::iFrameAfter;
     request.objectTrackId = objectTrackId;
-    request.crop = QRectF(0.0, 0.0, 1.0, 1.0); //< Whole frame.
+    if (!previewCropRect.isEmpty())
+        request.crop = QRectF(0.0, 0.0, 1.0, 1.0); //< Whole frame.
 
     bool forceUpdate = true;
     const auto streamSelectionMode = modelIndex.data(Qn::PreviewStreamSelectionRole)

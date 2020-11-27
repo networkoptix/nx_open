@@ -84,6 +84,13 @@ std::vector<ObjectTrackEx> ObjectTrackSearcher::lookup(nx::sql::QueryContext* qu
 
 BestShotEx ObjectTrackSearcher::lookupBestShot(nx::sql::QueryContext* queryContext)
 {
+    if (auto track = m_objectTrackCache.getTrackById(m_filter.objectTrackId))
+    {
+        BestShotEx bestShot(std::move(track->bestShot));
+        bestShot.deviceId = std::move(track->deviceId);
+        return bestShot;;
+    }
+
     auto query = queryContext->connection()->createQuery();
     query->setForwardOnly(true);
     query->prepare(R"sql(
