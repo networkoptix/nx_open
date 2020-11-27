@@ -637,8 +637,6 @@ WorkbenchExportHandler::ExportToolInstance WorkbenchExportHandler::prepareExport
         case ExportSettingsDialog::Mode::Media:
         {
             auto settings = dialog.exportMediaSettings();
-            exportId = d->createExportContext(settings,
-                /*saveExistingLayout*/ false, /*forceTranscoding*/ false);
 
             if (FileExtensionUtils::isLayout(settings.fileName.extension))
             {
@@ -666,11 +664,15 @@ WorkbenchExportHandler::ExportToolInstance WorkbenchExportHandler::prepareExport
                     item.rotation = settings.transcodingSettings.rotation;
                     layoutSettings.layout->updateItem(item);
                 }
-
+                exportId = d->createExportContext(layoutSettings,
+                    /*saveExistingLayout*/ false, /*forceTranscoding*/ false);
                 tool.reset(new ExportLayoutTool(layoutSettings));
             }
             else
             {
+                exportId = d->createExportContext(settings,
+                    /*saveExistingLayout*/ false, /*forceTranscoding*/ false);
+
                 tool.reset(new ExportMediaTool(settings));
             }
             break;
