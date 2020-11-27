@@ -152,6 +152,9 @@ ExportSettingsDialog::ExportSettingsDialog(
     connect(ui->bookmarkSettingsPage, &BookmarkOverlaySettingsWidget::dataChanged,
         d, &Private::setBookmarkOverlaySettings);
 
+    connect(ui->infoSettingsPage, &InfoOverlaySettingsWidget::dataChanged,
+        d, &Private::setInfoOverlaySettings);
+
     ui->bookmarkButton->setVisible(bookmark.isValid());
     if (!bookmark.isValid()) // Just in case...
         ui->bookmarkButton->setState(SelectableTextButton::State::deactivated);
@@ -192,6 +195,9 @@ ExportSettingsDialog::ExportSettingsDialog(
 
     connect(ui->textSettingsPage, &TextOverlaySettingsWidget::deleteClicked,
         ui->textButton, &SelectableTextButton::deactivate);
+
+    connect(ui->infoSettingsPage, &InfoOverlaySettingsWidget::deleteClicked,
+        ui->infoButton, &SelectableTextButton::deactivate);
 
     connect(ui->bookmarkSettingsPage, &BookmarkOverlaySettingsWidget::deleteClicked,
         ui->bookmarkButton, &SelectableTextButton::deactivate);
@@ -278,6 +284,19 @@ void ExportSettingsDialog::setupSettingsButtons()
     ui->textButton->setProperty(kOverlayPropertyName,
         qVariantFromValue(ExportOverlayType::text));
 
+    ui->infoButton->setDeactivatable(true);
+    ui->infoButton->setDeactivatedText(tr("Add Info"));
+    ui->infoButton->setDeactivationToolTip(tr("Delete Info"));
+    ui->infoButton->setText(tr("Info"));
+    ui->infoButton->setDeactivatedIcon(qnSkin->icon("text_buttons/info.png"));
+    ui->infoButton->setIcon(qnSkin->icon(
+        "text_buttons/info_hovered.png",
+        "text_buttons/info_selected.png"));
+    ui->infoButton->setProperty(kPagePropertyName,
+        qVariantFromValue(ui->infoSettingsPage));
+    ui->infoButton->setProperty(kOverlayPropertyName,
+        qVariantFromValue(ExportOverlayType::info));
+
     ui->speedButton->setDeactivatable(true);
     ui->speedButton->setDeactivatedText(tr("Rapid Review"));
     ui->speedButton->setDeactivationToolTip(tr("Reset Speed"));
@@ -323,6 +342,7 @@ void ExportSettingsDialog::setupSettingsButtons()
     group->add(ui->timestampButton);
     group->add(ui->imageButton);
     group->add(ui->textButton);
+    group->add(ui->infoButton);
     group->add(ui->speedButton);
     group->setSelectionFallback(ui->cameraExportSettingsButton);
 
@@ -383,6 +403,8 @@ SelectableTextButton* ExportSettingsDialog::buttonForOverlayType(ExportOverlayTy
             return ui->imageButton;
         case ExportOverlayType::text:
             return ui->textButton;
+        case ExportOverlayType::info:
+            return ui->infoButton;
         case ExportOverlayType::bookmark:
             return ui->bookmarkButton;
         default:
@@ -423,6 +445,7 @@ void ExportSettingsDialog::initSettingsWidgets()
     ui->bookmarkSettingsPage->setData(mediaPersistentSettings.bookmarkOverlay);
     ui->imageSettingsPage->setData(mediaPersistentSettings.imageOverlay);
     ui->textSettingsPage->setData(mediaPersistentSettings.textOverlay);
+    ui->infoSettingsPage->setData(mediaPersistentSettings.infoOverlay);
 
     ui->mediaFilenamePanel->setFilename(d->selectedFileName(Mode::Media));
     ui->layoutFilenamePanel->setFilename(d->selectedFileName(Mode::Layout));
@@ -551,9 +574,7 @@ void ExportSettingsDialog::updateWidgetsState()
         if (!button)
             continue;
         if (button->state() == SelectableTextButton::State::deactivated)
-        {
             button->setState(SelectableTextButton::State::unselected);
-        }
     }
 }
 
@@ -609,6 +630,7 @@ void ExportSettingsDialog::setMediaParams(
         ui->timestampButton->setEnabled(false);
         ui->imageButton->setEnabled(false);
         ui->textButton->setEnabled(false);
+        ui->infoButton->setEnabled(false);
         ui->speedButton->setEnabled(false);
         ui->exportMediaSettingsPage->setData({false, false});
     }

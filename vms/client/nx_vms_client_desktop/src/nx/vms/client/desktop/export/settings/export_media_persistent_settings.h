@@ -6,6 +6,8 @@
 #include <nx/vms/client/desktop/common/utils/filesystem.h>
 #include <nx/vms/client/desktop/export/data/export_media_settings.h>
 
+class QTextDocument;
+
 namespace nx::vms::client::desktop {
 
 // TODO: #vkutin Stop using int(ExportOverlayType) as an integer index.
@@ -16,6 +18,7 @@ enum class ExportOverlayType
     timestamp,
     image,
     text,
+    info,
     bookmark,
 
     none,
@@ -62,6 +65,11 @@ struct ExportTextOverlayPersistentSettingsBase: public ExportOverlayPersistentSe
 
     virtual nx::core::transcoding::OverlaySettingsPtr createRuntimeSettings() const override;
     virtual void rescale(qreal factor) override;
+
+protected:
+    std::unique_ptr<QTextDocument> createDocument() const;
+    nx::core::transcoding::OverlaySettingsPtr createRuntimeSettingsFromDocument(
+        std::unique_ptr<QTextDocument> document, int width, int height) const;
 };
 #define ExportTextOverlayPersistentSettingsBase_Fields \
     ExportOverlayPersistentSettings_Fields \
@@ -99,6 +107,18 @@ struct ExportTimestampOverlayPersistentSettings: public ExportOverlayPersistentS
     ExportOverlayPersistentSettings_Fields \
     (format)(fontSize)
 
+struct ExportInfoOverlayPersistentSettings: public ExportTextOverlayPersistentSettingsBase
+{
+    Qt::DateFormat format = Qt::DefaultLocaleLongDate;
+    bool exportCameraName = false;
+    bool exportDate = false;
+
+    virtual nx::core::transcoding::OverlaySettingsPtr createRuntimeSettings() const override;
+    virtual void rescale(qreal factor) override;
+};
+#define ExportInfoOverlayPersistentSettings_Fields \
+    ExportTextOverlayPersistentSettingsBase_Fields (exportCameraName)(exportDate)
+
 struct ExportRapidReviewPersistentSettings
 {
     bool enabled = false;
@@ -126,6 +146,7 @@ struct ExportMediaPersistentSettings
     ExportTextOverlayPersistentSettings textOverlay;
     ExportTimestampOverlayPersistentSettings timestampOverlay;
     ExportBookmarkOverlayPersistentSettings bookmarkOverlay;
+    ExportInfoOverlayPersistentSettings infoOverlay;
 
     ExportMediaPersistentSettings() = default;
     ExportMediaPersistentSettings(const QVector<ExportOverlayType>& used): usedOverlays(used) {}
@@ -155,13 +176,14 @@ struct ExportMediaPersistentSettings
 };
 
 #define ExportMediaPersistentSettings_Fields (applyFilters)(fileFormat)(dimension)(rapidReview)\
-    (usedOverlays)(imageOverlay)(timestampOverlay)(textOverlay)(bookmarkOverlay)
+    (usedOverlays)(imageOverlay)(timestampOverlay)(textOverlay)(bookmarkOverlay)(infoOverlay)
 
 #define EXPORT_MEDIA_PERSISTENT_TYPES \
     (ExportTimestampOverlayPersistentSettings) \
     (ExportImageOverlayPersistentSettings) \
     (ExportTextOverlayPersistentSettings) \
     (ExportBookmarkOverlayPersistentSettings) \
+    (ExportInfoOverlayPersistentSettings) \
     (ExportRapidReviewPersistentSettings) \
     (ExportMediaPersistentSettings)
 
@@ -173,6 +195,7 @@ Q_DECLARE_METATYPE(nx::vms::client::desktop::ExportTimestampOverlayPersistentSet
 Q_DECLARE_METATYPE(nx::vms::client::desktop::ExportImageOverlayPersistentSettings)
 Q_DECLARE_METATYPE(nx::vms::client::desktop::ExportTextOverlayPersistentSettings)
 Q_DECLARE_METATYPE(nx::vms::client::desktop::ExportBookmarkOverlayPersistentSettings)
+Q_DECLARE_METATYPE(nx::vms::client::desktop::ExportInfoOverlayPersistentSettings)
 Q_DECLARE_METATYPE(nx::vms::client::desktop::ExportRapidReviewPersistentSettings)
 Q_DECLARE_METATYPE(nx::vms::client::desktop::ExportMediaPersistentSettings)
 

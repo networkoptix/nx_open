@@ -106,6 +106,7 @@
             <widget class="nx::vms::client::desktop::TimestampOverlaySettingsWidget" name="timestampSettingsPage"/>
             <widget class="nx::vms::client::desktop::ImageOverlaySettingsWidget" name="imageSettingsPage"/>
             <widget class="nx::vms::client::desktop::TextOverlaySettingsWidget" name="textSettingsPage"/>
+            <widget class="nx::vms::client::desktop::InfoOverlaySettingsWidget" name="infoSettingsPage"/>
             <widget class="nx::vms::client::desktop::RapidReviewSettingsWidget" name="rapidReviewSettingsPage"/>
            </widget>
           </item>
@@ -177,6 +178,13 @@
                  <widget class="nx::vms::client::desktop::SelectableTextButton" name="textButton">
                   <property name="text">
                    <string notr="true">&lt;Text&gt;</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="nx::vms::client::desktop::SelectableTextButton" name="infoButton">
+                  <property name="text">
+                   <string notr="true">&lt;Info&gt;</string>
                   </property>
                  </widget>
                 </item>
@@ -645,6 +653,12 @@
    <class>nx::vms::client::desktop::BookmarkOverlaySettingsWidget</class>
    <extends>QWidget</extends>
    <header location="global">nx/vms/client/desktop/export/widgets/bookmark_overlay_settings_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::InfoOverlaySettingsWidget</class>
+   <extends>QWidget</extends>
+   <header>nx/vms/client/desktop/export/widgets/info_overlay_settings_widget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

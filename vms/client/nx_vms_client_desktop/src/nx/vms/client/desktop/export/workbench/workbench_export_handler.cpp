@@ -177,7 +177,7 @@ struct WorkbenchExportHandler::Private
 
         Filename fileName() const { return Private::fileName(settings); }
         nx::core::transcoding::Settings transcodingSettings() const
-        { 
+        {
             return std::visit([](auto&& settings) { return settings.transcodingSettings; }, settings);
         }
     };
@@ -240,7 +240,7 @@ struct WorkbenchExportHandler::Private
                 progressDialog->hide();
             });
 
-        runningExports.insert(exportProcessId, 
+        runningExports.insert(exportProcessId,
             ExportContext{settings, saveExistingLayout, progressDialog});
 
         return exportProcessId;
@@ -637,7 +637,7 @@ WorkbenchExportHandler::ExportToolInstance WorkbenchExportHandler::prepareExport
         case ExportSettingsDialog::Mode::Media:
         {
             auto settings = dialog.exportMediaSettings();
-            exportId = d->createExportContext(settings, 
+            exportId = d->createExportContext(settings,
                 /*saveExistingLayout*/ false, /*forceTranscoding*/ false);
 
             if (FileExtensionUtils::isLayout(settings.fileName.extension))
@@ -678,7 +678,7 @@ WorkbenchExportHandler::ExportToolInstance WorkbenchExportHandler::prepareExport
         case ExportSettingsDialog::Mode::Layout:
         {
             const auto settings = dialog.exportLayoutSettings();
-            exportId = d->createExportContext(settings, 
+            exportId = d->createExportContext(settings,
                 /*saveExistingLayout*/ false, /*forceTranscoding*/ false);
             tool.reset(new ExportLayoutTool(settings));
             break;
@@ -805,7 +805,7 @@ void WorkbenchExportHandler::at_saveLocalLayoutAction_triggered()
     std::unique_ptr<nx::vms::client::desktop::AbstractExportTool> exportTool;
     exportTool.reset(new ExportLayoutTool(layoutSettings));
 
-    QnUuid exportId = d->createExportContext(layoutSettings, 
+    QnUuid exportId = d->createExportContext(layoutSettings,
         /*saveExistingLayout*/ true, /*forceTranscoding*/ false);
 
     runExport(std::make_pair(exportId, std::move(exportTool)));

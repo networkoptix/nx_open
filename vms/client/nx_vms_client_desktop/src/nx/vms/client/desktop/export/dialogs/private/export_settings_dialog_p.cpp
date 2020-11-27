@@ -595,6 +595,13 @@ void ExportSettingsDialog::Private::setBookmarkOverlaySettings(
     updateOverlayWidget(ExportOverlayType::bookmark);
 }
 
+void ExportSettingsDialog::Private::setInfoOverlaySettings(
+    const ExportInfoOverlayPersistentSettings& settings)
+{
+    copyOverlaySettingsWithoutPosition(m_exportMediaPersistentSettings.infoOverlay, settings);
+    updateOverlayWidget(ExportOverlayType::info);
+}
+
 void ExportSettingsDialog::Private::validateSettings(Mode mode)
 {
     ExportMediaValidator::Results results;
@@ -658,23 +665,29 @@ void ExportSettingsDialog::Private::updateOverlayWidget(ExportOverlayType type)
             updateTimestampText();
             break;
         }
-
-        // Tricky case fallthrough. It is intended, really.
-        case ExportOverlayType::bookmark:
-            updateBookmarkText();
-        case ExportOverlayType::image:
-        case ExportOverlayType::text:
+        case ExportOverlayType::info:
         {
-            const auto runtime = m_exportMediaPersistentSettings.overlaySettings(type)
-                ->createRuntimeSettings();
-            NX_ASSERT(runtime->type() == nx::core::transcoding::OverlaySettings::Type::image);
-            if (runtime->type() != nx::core::transcoding::OverlaySettings::Type::image)
-                break;
-            const auto imageOverlay =
-                static_cast<nx::core::transcoding::ImageOverlaySettings*>(runtime.data());
-            overlay->setImage(imageOverlay->image);
+            if (!m_exportMediaSettings.mediaResource)
+                return;
+
+            const auto& data = m_exportMediaPersistentSettings.infoOverlay;
+            auto font = overlay->font();
+            font.setPixelSize(data.fontSize);
+            overlay->setFont(font);
+
+            updateInfoText();
+            updateOverlayImage(type, overlay);
             break;
         }
+
+        case ExportOverlayType::bookmark:
+            updateBookmarkText();
+            updateOverlayImage(type, overlay);
+            break;
+        case ExportOverlayType::text:
+        case ExportOverlayType::image:
+            updateOverlayImage(type, overlay);
+            break;
 
         default:
             NX_ASSERT(false); //< Should not happen.
@@ -779,6 +792,41 @@ void ExportSettingsDialog::Private::updateTimestampText()
 {
     overlay(ExportOverlayType::timestamp)->setText(timestampText(
         m_exportMediaSettings.period.startTimeMs));
+}
+
+void ExportSettingsDialog::Private::updateInfoText()
+{
+    const auto& data = m_exportMediaPersistentSettings.infoOverlay;
+
+    const QString cameraName = m_exportMediaSettings.mediaResource->toResource()->getName();
+
+    const auto exportTime = nx::utils::millisSinceEpoch();
+    const auto exportTimeString = nx::core::transcoding::TimestampFilter::timestampTextUtc(
+        exportTime.count(), 0, data.format);
+
+    QString text;
+    if (data.exportCameraName)
+    {
+        text += htmlBold(cameraName);
+        if (data.exportDate)
+            text += "<br>";
+    }
+    if (data.exportDate)
+        text += QString("Exported: %1").arg(exportTimeString);
+
+    m_exportMediaPersistentSettings.infoOverlay.text = text;
+}
+
+void ExportSettingsDialog::Private::updateOverlayImage(ExportOverlayType type, ExportOverlayWidget* overlay)
+{
+    const auto runtime = m_exportMediaPersistentSettings.overlaySettings(type)
+        ->createRuntimeSettings();
+    if (!NX_ASSERT(runtime->type() == nx::core::transcoding::OverlaySettings::Type::image))
+        return;
+
+    const auto imageOverlay =
+        static_cast<nx::core::transcoding::ImageOverlaySettings*>(runtime.data());
+    overlay->setImage(imageOverlay->image);
 }
 
 ExportOverlayWidget* ExportSettingsDialog::Private::overlay(ExportOverlayType type)

@@ -83,21 +83,33 @@ void ExportTextOverlayPersistentSettingsBase::rescale(qreal factor)
 
 OverlaySettingsPtr ExportTextOverlayPersistentSettingsBase::createRuntimeSettings() const
 {
-    QScopedPointer<QTextDocument> document(new QTextDocument);
+    std::unique_ptr<QTextDocument> document = createDocument();
+
+    document->setTextWidth(overlayWidth);
+    document->setDocumentMargin(indent);
+
+    return createRuntimeSettingsFromDocument(std::move(document), overlayWidth, document->size().height());
+}
+
+std::unique_ptr<QTextDocument> ExportTextOverlayPersistentSettingsBase::createDocument() const
+{
+    std::unique_ptr<QTextDocument> document(new QTextDocument);
     if (mightBeHtml(text))
         document->setHtml(text);
     else
         document->setPlainText(text);
 
-    document->setTextWidth(overlayWidth);
-    document->setDocumentMargin(indent);
-
     QFont font;
     font.setPixelSize(fontSize);
     document->setDefaultFont(font);
 
-    QImage targetImage(overlayWidth, document->size().height(),
-        QImage::Format_ARGB32_Premultiplied);
+    return document;
+}
+
+OverlaySettingsPtr ExportTextOverlayPersistentSettingsBase::createRuntimeSettingsFromDocument(
+    std::unique_ptr<QTextDocument> document, int width, int height) const
+{
+    QImage targetImage(width, height, QImage::Format_ARGB32_Premultiplied);
     targetImage.fill(Qt::transparent);
 
     QPainter imagePainter(&targetImage);
@@ -149,6 +161,33 @@ OverlaySettingsPtr ExportTimestampOverlayPersistentSettings::createRuntimeSettin
     return OverlaySettingsPtr(runtimeSettings.take());
 }
 
+ nx::core::transcoding::OverlaySettingsPtr ExportInfoOverlayPersistentSettings::createRuntimeSettings() const
+{
+    std::unique_ptr<QTextDocument> document = createDocument();
+
+    document->setDocumentMargin(indent);
+
+    return createRuntimeSettingsFromDocument(std::move(document), document->size().width(), document->size().height());
+}
+
+void ExportInfoOverlayPersistentSettings::rescale(qreal factor)
+{
+    ExportOverlayPersistentSettings::rescale(factor);
+
+    const int oldFontSize = fontSize;
+    fontSize = qMax(qRound(fontSize * factor), minimumFontSize());
+    if (fontSize == oldFontSize)
+        return;
+
+    const auto effectiveFactor = qreal(fontSize) / oldFontSize;
+    overlayWidth = qRound(overlayWidth * effectiveFactor);
+
+    static constexpr int kMinimumRoundingRadius = 1;
+    static constexpr int kMinimumIndent = 4;
+    indent = qMax(fontSize / 4, kMinimumIndent);
+    roundingRadius = qMax(fontSize / 8, kMinimumRoundingRadius);
+}
+
 ExportOverlayPersistentSettings* ExportMediaPersistentSettings::overlaySettings(
     ExportOverlayType type)
 {
@@ -162,6 +201,8 @@ ExportOverlayPersistentSettings* ExportMediaPersistentSettings::overlaySettings(
             return &textOverlay;
         case ExportOverlayType::bookmark:
             return &bookmarkOverlay;
+        case ExportOverlayType::info:
+            return &infoOverlay;
         default:
             return nullptr;
     }
@@ -180,6 +221,8 @@ const ExportOverlayPersistentSettings* ExportMediaPersistentSettings::overlaySet
             return &textOverlay;
         case ExportOverlayType::bookmark:
             return &bookmarkOverlay;
+        case ExportOverlayType::info:
+            return &infoOverlay;
         default:
             return nullptr;
     }
@@ -246,4 +289,5 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(nx::vms::client::desktop, ExportOverla
     (nx::vms::client::desktop::ExportOverlayType::timestamp, "timestamp")
     (nx::vms::client::desktop::ExportOverlayType::image, "image")
     (nx::vms::client::desktop::ExportOverlayType::text, "text")
-    (nx::vms::client::desktop::ExportOverlayType::bookmark, "bookmark"))
+    (nx::vms::client::desktop::ExportOverlayType::bookmark, "bookmark")
+    (nx::vms::client::desktop::ExportOverlayType::info, "info"))

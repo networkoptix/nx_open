@@ -94,6 +94,7 @@ public:
     void setImageOverlaySettings(const ExportImageOverlayPersistentSettings& settings);
     void setTextOverlaySettings(const ExportTextOverlayPersistentSettings& settings);
     void setBookmarkOverlaySettings(const ExportBookmarkOverlayPersistentSettings& settings);
+    void setInfoOverlaySettings(const ExportInfoOverlayPersistentSettings& settings);
 
     void validateSettings(Mode mode);
 
@@ -120,6 +121,8 @@ private:
     void updateOverlays();
     void updateBookmarkText();
     void updateTimestampText();
+    void updateInfoText();
+    void updateOverlayImage(ExportOverlayType type, ExportOverlayWidget* overlay);
     void overlayPositionChanged(ExportOverlayType type);
     void refreshMediaPreview();
     void updateOverlaysVisibility();
