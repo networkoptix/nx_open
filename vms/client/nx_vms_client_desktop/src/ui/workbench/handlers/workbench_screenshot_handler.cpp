@@ -450,7 +450,12 @@ bool QnWorkbenchScreenshotHandler::updateParametersFromDialog(QnScreenshotParame
     QString previousDir = qnSettings->lastScreenshotDir();
     if (previousDir.isEmpty())
         previousDir = qnSettings->mediaFolder();
-    QString suggestion = nx::utils::replaceNonFileNameCharacters(parameters.filename
+
+    static constexpr int kMaxFileNameLength = 200;
+    const auto baseFileName = parameters.filename.length() > kMaxFileNameLength
+        ? parameters.filename.leftRef(kMaxFileNameLength) + '~'
+        : parameters.filename;
+    QString suggestion = nx::utils::replaceNonFileNameCharacters(baseFileName
         + QLatin1Char('_') + parameters.timeString(true), QLatin1Char('_')).
         replace(QChar::Space, QLatin1Char('_'));
     suggestion = QnEnvironment::getUniqueFileName(previousDir, suggestion);
