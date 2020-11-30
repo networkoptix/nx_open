@@ -36,7 +36,7 @@ private:
     nx::network::http::AsyncClient m_httpClient;
     std::optional<nx::network::http::MultipartContentParser> m_multipartContentParser;
     MetadataParser m_parser;
-    nx::utils::ElapsedTimer m_sinceLastRestart;
+    nx::utils::ElapsedTimer m_sinceLastStart;
 };
 
 } // namespace nx::vms_server_plugins::analytics::dahua

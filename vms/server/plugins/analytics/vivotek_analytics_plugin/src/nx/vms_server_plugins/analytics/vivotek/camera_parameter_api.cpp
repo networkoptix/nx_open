@@ -67,7 +67,7 @@ std::map<QString, QString> CameraParameterApi::fetch(
         const auto responseBody = HttpClient().get(url).get();
         return parse(QString::fromUtf8(responseBody));
     }
-    catch (nx::utils::Exception& exception)
+    catch (ContextedException& exception)
     {
         exception.addContext("Failed to fetch parameters from camera at %1",
             withoutUserInfo(m_url));
@@ -90,7 +90,7 @@ void CameraParameterApi::store(const std::map<QString, QString>& parameters)
 
         HttpClient().get(url).get();
     }
-    catch (nx::utils::Exception& exception)
+    catch (ContextedException& exception)
     {
         exception.addContext("Failed to store parameters to camera at %1",
             withoutUserInfo(m_url));

@@ -39,7 +39,7 @@ QString getFirmwareVersion(const Url& cameraUrl)
 
         return versionParts[2];
     }
-    catch (nx::utils::Exception& exception)
+    catch (ContextedException& exception)
     {
         exception.addContext("Failed to fetch firmware version");
         throw;
@@ -75,7 +75,7 @@ std::map<QString, CameraModuleApi::ModuleInfo> CameraModuleApi::fetchModuleInfos
 
         return moduleInfos;
     }
-    catch (nx::utils::Exception& exception)
+    catch (ContextedException& exception)
     {
         exception.addContext("Failed to fetch VADP module list");
         throw;
@@ -130,7 +130,7 @@ void CameraModuleApi::enable(const QString& name, bool isEnabled)
                 "HTTP response body doesn't contain expected pattern indicating success");
         }
     }
-    catch (nx::utils::Exception& exception)
+    catch (ContextedException& exception)
     {
         exception.addContext("Failed to %1 VADP module %2",
             isEnabled ? "enable" : "disable", name);

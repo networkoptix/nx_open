@@ -100,6 +100,7 @@ void MetadataMonitor::start()
 
     NX_DEBUG(this, "Starting %1", url);
 
+    m_sinceLastStart.restart();
     m_httpClient.doGet(url);
 }
 
@@ -116,11 +117,9 @@ void MetadataMonitor::restart()
 {
     stop();
 
-    m_timer.start(std::max(0ms, kMinRestartInterval - m_sinceLastRestart.elapsed()),
+    m_timer.start(std::max(0ms, kMinRestartInterval - m_sinceLastStart.elapsed()),
         [this]()
         {
-            m_sinceLastRestart.restart();
-
             start();
         });
 }

@@ -12,7 +12,7 @@
 
 namespace nx::vms_server_plugins::utils {
 
-class Exception: public nx::utils::Exception
+class Exception: public nx::utils::ContextedException
 {
 private:
     struct FutureTranslator
@@ -25,11 +25,11 @@ private:
     };
 
 public:
-    using nx::utils::Exception::Exception;
+    using ContextedException::ContextedException;
 
     template <typename... Args>
     explicit Exception(nx::sdk::ErrorCode errorCode, Args&&... args):
-        nx::utils::Exception(std::forward<Args>(args)...),
+        ContextedException(std::forward<Args>(args)...),
         m_errorCode(errorCode)
     {
     }
@@ -40,7 +40,7 @@ public:
 
     template <typename... Args>
     explicit Exception(std::error_code errorCode, const Args&... args):
-        Exception(errorCode)
+        ContextedException(errorCode)
     {
         addContext(args...);
     }
@@ -66,7 +66,7 @@ public:
         }
         catch (...)
         {
-            nx::utils::Exception::translate([&]{ throw; });
+            ContextedException::translate([&]{ throw; });
             throw; // unreachable
         }
     }
