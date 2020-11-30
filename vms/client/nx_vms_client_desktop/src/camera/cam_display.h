@@ -69,8 +69,6 @@ public:
 
     virtual void pleaseStop() override;
 
-    void pause();
-    void resume();
 
     void setLightCPUMode(QnAbstractVideoDecoder::DecodeMode val);
 
@@ -170,7 +168,6 @@ protected:
     void processNewSpeed(float speed);
     bool useSync(QnConstAbstractMediaDataPtr md);
     int getBufferingMask();
-    void pauseAudio();
 
 private:
     void hurryUpCheck(QnCompressedVideoDataPtr vd, float speed, qint64 needToSleep, qint64 realSleepTime);

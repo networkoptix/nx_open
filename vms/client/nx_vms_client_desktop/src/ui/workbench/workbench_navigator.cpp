@@ -1123,9 +1123,6 @@ void QnWorkbenchNavigator::stepBackward()
         && !m_currentMediaWidget->display()->camDisplay()->isBuffering())
     {
 
-        if (reader->isSingleShotMode())
-            m_currentMediaWidget->display()->camDisplay()->playAudio(false); // TODO: #Elric wtf?
-
         reader->previousFrame(currentTime);
         updateSliderFromReader();
     }
@@ -1159,7 +1156,6 @@ void QnWorkbenchNavigator::setPlayingTemporary(bool playing)
         m_currentMediaWidget->display()->archiveReader()->resumeMedia();
     else
         m_currentMediaWidget->display()->archiveReader()->pauseMedia();
-    m_currentMediaWidget->display()->camDisplay()->playAudio(playing);
 }
 
 // -------------------------------------------------------------------------- //

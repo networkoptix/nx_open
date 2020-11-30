@@ -199,29 +199,6 @@ void QnCamDisplay::setAudioBufferSize(int bufferSize, int prebufferSize)
 
 }
 
-void QnCamDisplay::pause()
-{
-    QnAbstractDataConsumer::pause();
-    m_isRealTimeSource = false;
-    emit liveMode(false);
-    QnMutexLocker lock( &m_audioChangeMutex );
-    m_audioDisplay->suspend();
-}
-
-void QnCamDisplay::resume()
-{
-    nx::vms::client::desktop::ini().reload();
-
-    m_delay.afterdelay();
-    m_singleShotMode = false;
-    {
-        QnMutexLocker lock( &m_audioChangeMutex );
-        m_audioDisplay->resume();
-    }
-    m_firstAfterJumpTime = AV_NOPTS_VALUE;
-    QnAbstractDataConsumer::resume();
-}
-
 void QnCamDisplay::addVideoRenderer(int channelCount, QnAbstractRenderer* vw, bool canDownscale)
 {
     NX_ASSERT(channelCount <= CL_MAX_CHANNELS);
@@ -1032,7 +1009,18 @@ void QnCamDisplay::setSingleShotMode(bool single)
     {
         m_isRealTimeSource = false;
         emit liveMode(false);
-        pauseAudio();
+
+        if (!m_forceMtDecoding)
+            setMTDecoding(false);
+
+        QnMutexLocker lock(&m_audioChangeMutex);
+        m_audioDisplay->suspend();
+    }
+    else
+    {
+        QnMutexLocker lock(&m_audioChangeMutex);
+        // AudioPackets are filtered out if `m_playAudio` is false, so we omit additional checks.
+        m_audioDisplay->resume();
     }
     for (int i = 0; i < CL_MAX_CHANNELS && m_display[i]; ++i)
         m_display[i]->setPausedSafe(single);
@@ -1785,17 +1773,6 @@ void QnCamDisplay::playAudio(bool play)
         else
             setMTDecoding(play);
     }
-}
-
-void QnCamDisplay::pauseAudio()
-{
-    m_playAudio = false;
-    {
-        QnMutexLocker lock( &m_audioChangeMutex );
-        m_audioDisplay->suspend();
-    }
-    if (!m_forceMtDecoding)
-        setMTDecoding(false);
 }
 
 // ==========================================================================
