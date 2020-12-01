@@ -4745,7 +4745,7 @@ void QnPlOnvifResource::updateToChannel(int value)
 }
 
 QnConstResourceVideoLayoutPtr QnPlOnvifResource::getVideoLayout(
-        const QnAbstractStreamDataProvider* dataProvider) const
+        const QnAbstractStreamDataProvider* dataProvider)
 {
     {
         QnMutexLocker lock(&m_layoutMutex);
@@ -4766,9 +4766,8 @@ QnConstResourceVideoLayoutPtr QnPlOnvifResource::getVideoLayout(
         m_videoLayout = videoLayout;
     }
 
-    auto nonConstThis = const_cast<QnPlOnvifResource*>(this);
-    nonConstThis->setProperty(ResourcePropertyKey::kVideoLayout, videoLayout->toString());
-    nonConstThis->savePropertiesAsync();
+    setProperty(ResourcePropertyKey::kVideoLayout, videoLayout->toString());
+    savePropertiesAsync();
 
     return m_videoLayout;
 }

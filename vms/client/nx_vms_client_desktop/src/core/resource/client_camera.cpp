@@ -83,7 +83,7 @@ QString QnClientCameraResource::idForToStringFromPtr() const
 }
 
 QnConstResourceVideoLayoutPtr QnClientCameraResource::getVideoLayout(
-    const QnAbstractStreamDataProvider* dataProvider) const
+    const QnAbstractStreamDataProvider* dataProvider)
 {
     return QnVirtualCameraResource::getVideoLayout(dataProvider);
 }

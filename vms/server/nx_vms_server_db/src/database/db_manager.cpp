@@ -2221,6 +2221,9 @@ bool QnDbManager::afterInstallUpdate(const QString& updateName)
     if (updateName.endsWith(lit("/99_20200908_fix_axis_analytic_plugin_fence_guard_rules.sql")))
         return ec2::db::fixAxisAnalyticPluginFenceGuardRules(m_sdb) && resyncIfNeeded(ResyncRules);
 
+    if (updateName.endsWith(lit("/99_20201201_video_layout_property_clean.sql")))
+        return resyncIfNeeded(ResyncResourceProperties);
+
     NX_DEBUG(this, lit("SQL update %1 does not require post-actions.").arg(updateName));
     return true;
 }

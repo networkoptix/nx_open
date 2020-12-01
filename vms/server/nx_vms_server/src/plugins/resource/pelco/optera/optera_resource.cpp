@@ -47,7 +47,7 @@ QnOpteraResource::~QnOpteraResource()
 {
 }
 
-QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractStreamDataProvider* /*dataProvider*/) const
+QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractStreamDataProvider* /*dataProvider*/)
 {
     if (m_videoLayout)
         return m_videoLayout;
@@ -66,11 +66,8 @@ QnConstResourceVideoLayoutPtr QnOpteraResource::getVideoLayout(const QnAbstractS
         m_videoLayout = QnResourceVideoLayoutPtr(new QnDefaultResourceVideoLayout());
     }
 
-    auto resourceId = getId();
-
-    commonModule()->resourcePropertyDictionary()->setValue(resourceId, ResourcePropertyKey::kVideoLayout,
-        m_videoLayout->toString());
-    commonModule()->resourcePropertyDictionary()->saveParams(resourceId);
+    setProperty(ResourcePropertyKey::kVideoLayout, m_videoLayout->toString());
+    savePropertiesAsync();
 
     return m_videoLayout;
 }

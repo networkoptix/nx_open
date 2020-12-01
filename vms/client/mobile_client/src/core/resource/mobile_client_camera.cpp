@@ -6,7 +6,7 @@ QnMobileClientCamera::QnMobileClientCamera(const QnUuid& resourceTypeId):
 }
 
 QnConstResourceVideoLayoutPtr QnMobileClientCamera::getVideoLayout(
-    const QnAbstractStreamDataProvider* /*dataProvider*/) const
+    const QnAbstractStreamDataProvider* /*dataProvider*/)
 {
     return QnMediaResource::getVideoLayout();
 }

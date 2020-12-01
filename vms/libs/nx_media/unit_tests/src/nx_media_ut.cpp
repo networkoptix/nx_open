@@ -195,7 +195,7 @@ public:
     }
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(
-        const QnAbstractStreamDataProvider* /*dataProvider*/ = nullptr) const override
+        const QnAbstractStreamDataProvider* /*dataProvider*/ = nullptr) override
     {
         return m_videoLayout;
     }

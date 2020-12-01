@@ -60,7 +60,7 @@ QnConstResourceVideoLayoutPtr QnMediaResource::getDefaultVideoLayout()
 }
 
 QnConstResourceVideoLayoutPtr QnMediaResource::getVideoLayout(
-    const QnAbstractStreamDataProvider* dataProvider) const
+    const QnAbstractStreamDataProvider* dataProvider)
 {
     QnMutexLocker lock(&m_layoutMutex);
 

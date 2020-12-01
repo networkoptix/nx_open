@@ -224,7 +224,7 @@ QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getDefaultVideoLayout(
     return m_defaultVideoLayout;
 }
 
-int QnArecontPanoramicResource::getChannelCount() const
+int QnArecontPanoramicResource::getChannelCount()
 {
     auto layout = getVideoLayout(nullptr);
     if (!layout)
@@ -240,7 +240,7 @@ void QnArecontPanoramicResource::initializeVideoLayoutUnsafe() const
 }
 
 QnConstResourceVideoLayoutPtr QnArecontPanoramicResource::getVideoLayout(
-    const QnAbstractStreamDataProvider* /*dataProvider*/) const
+    const QnAbstractStreamDataProvider* /*dataProvider*/)
 {
     QnMutexLocker lock(&m_layoutMutex);
     if (!m_customVideoLayout)

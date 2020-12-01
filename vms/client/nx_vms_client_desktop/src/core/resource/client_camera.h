@@ -15,7 +15,7 @@ public:
     explicit QnClientCameraResource(const QnUuid& resourceTypeId);
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(
-        const QnAbstractStreamDataProvider* dataProvider = nullptr) const override;
+        const QnAbstractStreamDataProvider* dataProvider = nullptr) override;
     virtual QnConstResourceAudioLayoutPtr getAudioLayout(
         const QnAbstractStreamDataProvider* dataProvider = nullptr) const override;
 

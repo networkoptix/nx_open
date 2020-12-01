@@ -97,7 +97,7 @@ QnAbstractStreamDataProvider* QnAviResource::createDataProvider(
     return result;
 }
 
-QnConstResourceVideoLayoutPtr QnAviResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const
+QnConstResourceVideoLayoutPtr QnAviResource::getVideoLayout(const QnAbstractStreamDataProvider* dataProvider)
 {
     // Try to return cached value, which is calculated on first opening.
     {

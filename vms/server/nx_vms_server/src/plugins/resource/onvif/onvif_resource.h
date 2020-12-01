@@ -335,7 +335,7 @@ public:
     void updateToChannel(int value);
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(
-        const QnAbstractStreamDataProvider* dataProvider) const override;
+        const QnAbstractStreamDataProvider* dataProvider) override;
 
     CameraDiagnostics::Result fetchChannelCount(bool limitedByEncoders = true);
 

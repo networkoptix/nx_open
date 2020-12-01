@@ -23,7 +23,7 @@ public:
     virtual ~QnOpteraResource();
 
     virtual QnConstResourceVideoLayoutPtr getVideoLayout(
-        const QnAbstractStreamDataProvider* dataProvider) const override;
+        const QnAbstractStreamDataProvider* dataProvider) override;
 
 protected:
     virtual CameraDiagnostics::Result initializeCameraDriver() override;

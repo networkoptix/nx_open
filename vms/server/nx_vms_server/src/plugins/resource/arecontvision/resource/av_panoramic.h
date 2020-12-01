@@ -24,14 +24,14 @@ protected:
 
     virtual QnAbstractStreamDataProvider* createLiveDataProvider();
 
-    virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) const override;
+    virtual QnConstResourceVideoLayoutPtr getVideoLayout(const QnAbstractStreamDataProvider* dataProvider) override;
 private:
     bool setSpecialParam(const QString& id, const QString& value);
     bool setResolution(bool full);
     bool setCamQuality(int q);
     QnConstResourceVideoLayoutPtr getDefaultVideoLayout() const;
     void initializeVideoLayoutUnsafe() const;
-    int getChannelCount() const;
+    int getChannelCount();
 protected:
     bool m_isRotated;
     mutable QSharedPointer<QnCustomResourceVideoLayout> m_customVideoLayout;
