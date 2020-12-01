@@ -1,15 +1,25 @@
 #pragma once
 
+#include <deque>
+
 #include <QtCore/QTime>
 #include <QtCore/QElapsedTimer>
 
 #include "core/resource_management/resource_discovery_manager.h"
 #include <nx/vms/server/server_module_aware.h>
+#include <nx/utils/elapsed_timer.h>
 
 class QnMServerResourceDiscoveryManager:
     public QnResourceDiscoveryManager
 {
     Q_OBJECT
+private:
+    struct OfflineResource
+    {
+        QnUuid id;
+        nx::utils::ElapsedTimer sinceLastCheck{/*started*/ true};
+    };
+
 public:
     typedef QnResourceDiscoveryManager base_type;
 
@@ -45,6 +55,9 @@ protected:
 private:
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_resourceDeleted(const QnResourcePtr& resource);
+    void at_statusChanged(const QnResourcePtr& resource, Qn::StatusChangeReason);
+
+    void tryDisconnectOfflineResources();
 
     void markOfflineIfNeeded(QSet<QString>& discoveredResources);
 
@@ -71,4 +84,5 @@ private:
     QnMutex m_discoveryMutex;
     QElapsedTimer m_startupTimer;
     int m_discoveryCounter = 0;
+    std::deque<OfflineResource> m_offlineResources;
 };
