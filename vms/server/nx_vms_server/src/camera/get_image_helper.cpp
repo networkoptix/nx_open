@@ -27,6 +27,7 @@ using StreamIndex = nx::vms::api::StreamIndex;
 namespace {
 
 static constexpr int kMaxGopLen = 300;
+static constexpr std::chrono::seconds kMaxGopDuration{11};
 static constexpr int kRoundFactor = 4;
 static constexpr int kGetFrameExtraTriesPerChannel = 10;
 
@@ -658,7 +659,7 @@ CLVideoDecoderOutputPtr QnGetImageHelper::getImageWithCertainQuality(
         return nullptr;
     }
     else if (!isSpecialArchiveTime(request.usecSinceEpoch) && !request.tolerant
-        && frame->pkt_dts - request.usecSinceEpoch > std::chrono::microseconds(MAX_FRAME_DURATION).count())
+        && frame->pkt_dts - request.usecSinceEpoch > std::chrono::microseconds(kMaxGopDuration).count())
     {
         NX_VERBOSE(this, "%1() frame for a requested archive position is not found", __func__);
         return nullptr;
