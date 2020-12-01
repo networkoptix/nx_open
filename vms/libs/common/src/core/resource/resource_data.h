@@ -36,6 +36,8 @@ public:
         return m_dataByKey.contains(key);
     }
 
+    void clearKeyTags();
+
 private:
     typedef void (*CopyFunction)(const void *src, void *dst);
 

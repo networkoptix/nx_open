@@ -40,7 +40,7 @@ signals:
 private:
     bool loadInternal(const QString &fileName);
 private:
-    QHash<QString, QnResourceData> m_dataByKey;
+    QMap<QString, QnResourceData> m_dataByKey;
     QHash<QString, QString> m_shortVendorByName;
 
     /** Cache of the search results to avoid using too much regexps. */

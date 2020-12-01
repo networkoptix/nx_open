@@ -21,6 +21,8 @@ static bool deserialize(QnJsonContext *ctx, const QJsonValue &value, QnResourceD
     if(!QJson::deserialize(ctx, map, lit("keys"), &result.keys) || !QJson::deserialize(ctx, value, &result.data))
         return false;
 
+    result.data.clearKeyTags();
+
     *target = result;
     return true;
 }

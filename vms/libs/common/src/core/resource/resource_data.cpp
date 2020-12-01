@@ -114,6 +114,17 @@ bool QnResourceData::value(const QString &key, int type, void *value, const Copy
     return serializer->deserialize(&ctx, data.json, value);
 }
 
+void QnResourceData::clearKeyTags()
+{
+    for (auto it = m_dataByKey.begin(); it != m_dataByKey.end();)
+    {
+        if (it.key().toLower() == "keys" || it.key().startsWith("_comment", Qt::CaseInsensitive))
+            it = m_dataByKey.erase(it);
+        else
+            ++it;
+    }
+}
+
 void QnResourceData::add(const QnResourceData &other) {
     if(m_dataByKey.isEmpty()) {
         m_dataByKey = other.m_dataByKey;
