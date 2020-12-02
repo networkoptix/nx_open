@@ -334,15 +334,15 @@ void PortMapper::checkMapping(
             return;
         }
 
-        SocketAddress address(device.externalIp, stillMapped ? exPort : 0);
+        const auto externalIp = device.externalIp;
         const auto callback = request->second;
 
         if (!stillMapped)
             ensureMapping(device, inPort, protocol);
 
         lk.unlock();
-        if (address.address != HostAddress())
-            return callback(std::move(address));
+        if (externalIp != HostAddress())
+            return callback(SocketAddress(externalIp, stillMapped ? exPort : 0));
     });
 }
 
@@ -399,7 +399,9 @@ void PortMapper::ensureMapping(Device& device, quint16 inPort, Protocol protocol
 
         if (deviceMap != device.mapped.end())
         {
-            SocketAddress invalid(device.externalIp, 0);
+            const auto invalid = device.externalIp == HostAddress()
+                ? SocketAddress()
+                : SocketAddress(device.externalIp, 0);
 
             // address lose should be saved and reported
             device.mapped.erase(deviceMap);
