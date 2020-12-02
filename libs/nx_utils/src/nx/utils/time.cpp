@@ -2,13 +2,13 @@
 
 #include <QtCore/QDateTime>
 #include <QtCore/QTimeZone>
-#include <QtCore/QRegularExpression>
 
 #include <nx/utils/log/log.h>
 
 #if defined(Q_OS_LINUX)
     #include <time.h>
     #include <sys/time.h>
+    #include <unistd.h>
     #include <QtCore/QFile>
     #include <QtCore/QProcess>
     #include <nx/utils/app_info.h>
@@ -27,6 +27,8 @@ namespace {
 
 static milliseconds utcTimeShift(0); //< Addition time shift for test purpose only.
 static milliseconds monotonicTimeShift(0);
+
+static std::optional<std::chrono::steady_clock::time_point> testMonotonicTime;
 
 } // namespace
 
@@ -70,6 +72,8 @@ std::chrono::milliseconds millisSinceEpoch()
 
 steady_clock::time_point monotonicTime()
 {
+    if (testMonotonicTime)
+        return *testMonotonicTime;
     return steady_clock::now() + monotonicTimeShift;
 }
 
@@ -79,35 +83,35 @@ bool setTimeZone([[maybe_unused]] const QString& timeZoneId)
         const QString& timeZoneFile = getTimeZoneFile(timeZoneId);
         if (timeZoneFile.isNull())
         {
-            NX_ERROR(typeid(TimeFunctionTag), lm("setTimeZone(): Unsupported time zone id %1").arg(timeZoneId));
+            NX_ERROR(typeid(TimeFunctionTag), nx::format("setTimeZone(): Unsupported time zone id %1").arg(timeZoneId));
             return false;
         }
 
         if (unlink("/etc/localtime") != 0)
         {
-            NX_ERROR(typeid(TimeFunctionTag), lm("setTimeZone(): Unable to delete /etc/localtime"));
+            NX_ERROR(typeid(TimeFunctionTag), nx::format("setTimeZone(): Unable to delete /etc/localtime"));
             return false;
         }
         if (symlink(timeZoneFile.toLatin1().data(), "/etc/localtime") != 0)
         {
-            NX_ERROR(typeid(TimeFunctionTag), lm("setTimeZone(): Unable to create symlink /etc/localtime"));
+            NX_ERROR(typeid(TimeFunctionTag), nx::format("setTimeZone(): Unable to create symlink /etc/localtime"));
             return false;
         }
         QFile tzFile("/etc/timezone");
         if (!tzFile.open(QFile::WriteOnly | QFile::Truncate))
         {
-            NX_ERROR(typeid(TimeFunctionTag), lm("setTimeZone(): Unable to rewrite /etc/timezone"));
+            NX_ERROR(typeid(TimeFunctionTag), nx::format("setTimeZone(): Unable to rewrite /etc/timezone"));
             return false;
         }
         if (tzFile.write(timeZoneId.toLatin1()) <= 0)
         {
-            NX_ERROR(typeid(TimeFunctionTag), lm("setTimeZone(): Unable to write time zone id to /etc/localtime"));
+            NX_ERROR(typeid(TimeFunctionTag), nx::format("setTimeZone(): Unable to write time zone id to /etc/localtime"));
             return false;
         }
 
         return true;
     #else
-        NX_ERROR(typeid(TimeFunctionTag), lm("setTimeZone(): Unsupported platform"));
+        NX_ERROR(typeid(TimeFunctionTag), nx::format("setTimeZone(): Unsupported platform"));
         return false;
     #endif
 }
@@ -135,7 +139,7 @@ QString getCurrentTimeZoneId()
         if (id.isEmpty())
         {
             // Obtain time zone via POSIX functions (thread-safe).
-            NX_DEBUG(typeid(TimeFunctionTag), lm(
+            NX_DEBUG(typeid(TimeFunctionTag), nx::format(
                 "getCurrentTimeZoneId(): QDateTime time zone id is empty, trying localtime_r()"));
             constexpr int kMaxTimeZoneSize = 32;
             struct timespec timespecTime;
@@ -159,7 +163,7 @@ QString getCurrentTimeZoneId()
         id == "Etc/Universal" ||
         id == "Etc/Zulu")
     {
-        NX_DEBUG(typeid(TimeFunctionTag), lm("getCurrentTimeZoneId(): Converting %1 -> UTC").arg(id));
+        NX_DEBUG(typeid(TimeFunctionTag), nx::format("getCurrentTimeZoneId(): Converting %1 -> UTC").arg(id));
         return "UTC";
     }
 
@@ -174,7 +178,7 @@ bool setDateTime([[maybe_unused]] qint64 millisecondsSinceEpoch)
         tv.tv_usec = (millisecondsSinceEpoch % 1000) * 1000;
         if (settimeofday(&tv, 0) != 0)
         {
-            NX_ERROR(typeid(TimeFunctionTag), lm("setDateTime(): settimeofday() failed"));
+            NX_ERROR(typeid(TimeFunctionTag), nx::format("setDateTime(): settimeofday() failed"));
             return false;
         }
 
@@ -185,10 +189,10 @@ bool setDateTime([[maybe_unused]] qint64 millisecondsSinceEpoch)
             if (QProcess::execute("hwclock -w") == 0)
                 return true;
         }
-        NX_ERROR(typeid(TimeFunctionTag), lm("setDateTime(): \"hwclock -w\" fails"));
+        NX_ERROR(typeid(TimeFunctionTag), nx::format("setDateTime(): \"hwclock -w\" fails"));
         return false;
     #else
-        NX_ERROR(typeid(TimeFunctionTag), lm("setDateTime(): unsupported platform"));
+        NX_ERROR(typeid(TimeFunctionTag), nx::format("setDateTime(): unsupported platform"));
     #endif
 
     return false;
@@ -200,30 +204,42 @@ NX_UTILS_API QDateTime fromOffsetSinceEpoch(const nanoseconds& offset)
         duration_cast<milliseconds>(offset).count());
 }
 
-std::pair<bool, std::chrono::milliseconds> parseDuration(const QString& str)
+std::optional<std::chrono::milliseconds> parseDuration(const QString& str)
 {
-    QRegularExpression regex("^(\\d+)(d|h|s|ms|m)?$");
-    QRegularExpressionMatch match = regex.match(str.toLower());
-    if (!match.hasMatch())
-        return std::make_pair(false, std::chrono::milliseconds::zero());
+    QString duration = str.toLower();
+    std::chrono::milliseconds result;
+    bool ok(true);
+    const auto toUInt =
+        [&](int suffixLen) -> qulonglong
+        {
+            const auto& stringWithoutSuffix = suffixLen
+                ? duration.left(duration.length() - suffixLen)
+                : duration;
 
-    bool ok = false;
-    uint64_t count = match.captured(1).toULongLong(&ok);
+            if (stringWithoutSuffix.isEmpty())
+            {
+                ok = false;
+                return 0;
+            }
+            return stringWithoutSuffix.toULongLong(&ok);
+        };
+    if (duration.endsWith("ms", Qt::CaseInsensitive))
+        result = std::chrono::milliseconds(toUInt(2));
+    else if (duration.endsWith("s", Qt::CaseInsensitive))
+        result = std::chrono::seconds(toUInt(1));
+    else if (duration.endsWith("m", Qt::CaseInsensitive))
+        result = std::chrono::minutes(toUInt(1));
+    else if (duration.endsWith("h", Qt::CaseInsensitive))
+        result = std::chrono::hours(toUInt(1));
+    else if (duration.endsWith("d", Qt::CaseInsensitive))
+        result = std::chrono::hours(toUInt(1)) * 24;
+    else
+        result = std::chrono::seconds(toUInt(0));
+
     if (!ok)
-        return std::make_pair(false, std::chrono::milliseconds::zero());
+        return std::nullopt;
 
-    if (match.captured(2) == "d")
-        return std::make_pair(true, std::chrono::hours(count * 24));
-    if (match.captured(2) == "h")
-        return std::make_pair(true, std::chrono::hours(count));
-    if (match.captured(2) == "m")
-        return std::make_pair(true, std::chrono::minutes(count));
-    if (match.captured(2) == "s" || match.captured(2).isEmpty())
-        return std::make_pair(true, std::chrono::seconds(count));
-    if (match.captured(2) == "ms")
-        return std::make_pair(true, std::chrono::milliseconds(count));
-
-    return std::make_pair(false, std::chrono::milliseconds::zero());
+    return result;
 }
 
 namespace test {
@@ -234,6 +250,28 @@ void ScopedTimeShift::shiftCurrentTime(ClockType clockType, milliseconds diff)
         utcTimeShift = diff;
     else if (clockType == ClockType::steady)
         monotonicTimeShift = diff;
+}
+
+ScopedSyntheticMonotonicTime::ScopedSyntheticMonotonicTime(
+    const std::chrono::steady_clock::time_point& initTime):
+    m_initTime(initTime)
+{
+    testMonotonicTime = initTime;
+}
+
+ScopedSyntheticMonotonicTime::~ScopedSyntheticMonotonicTime()
+{
+    testMonotonicTime.reset();
+}
+
+void ScopedSyntheticMonotonicTime::applyRelativeShift(std::chrono::milliseconds value)
+{
+    testMonotonicTime = testMonotonicTime.value() + value;
+}
+
+void ScopedSyntheticMonotonicTime::applyAbsoluteShift(std::chrono::milliseconds value)
+{
+    testMonotonicTime = m_initTime + value;
 }
 
 } // namespace test

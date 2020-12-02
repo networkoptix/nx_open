@@ -163,8 +163,7 @@ TEST_F(MetricsGenerators, ValueBinary)
 
 TEST_F(MetricsGenerators, ValueCounts)
 {
-    nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
-
+    nx::utils::test::ScopedSyntheticMonotonicTime timeShift;
     const auto count = parseFormulaOrThrow("count %a 30m", monitors).generator;
     const auto count7 = parseFormulaOrThrow("countValues %a 40m 7", monitors).generator;
     const auto countHello = parseFormulaOrThrow("countValues %a 50m Hello", monitors).generator;
@@ -201,7 +200,7 @@ TEST_F(MetricsGenerators, ValueCounts)
     EXPECT_EQ(count7(), api::metrics::Value(0));
     EXPECT_EQ(countHello(), api::metrics::Value(1));
 
-    timeShift.applyAbsoluteShift(std::chrono::minutes(55));
+    timeShift.applyAbsoluteShift(std::chrono::minutes(56));
     resource.update("a", api::metrics::Value());
 
     EXPECT_EQ(count(), api::metrics::Value(0));
@@ -226,7 +225,7 @@ TEST_F(MetricsGenerators, ValueCounts)
 
 TEST_F(MetricsGenerators, ValueFloat)
 {
-    nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
+    nx::utils::test::ScopedSyntheticMonotonicTime timeShift;
     const auto sampleAvg = parseFormulaOrThrow("sampleAvg %b 1m", monitors).generator;
     const auto counterDelta = parseFormulaOrThrow("counterDelta %b 40s", monitors).generator;
     const auto counterToAvg = parseFormulaOrThrow("counterToAvg %b 20s", monitors).generator;
@@ -239,7 +238,7 @@ TEST_F(MetricsGenerators, ValueFloat)
     EXPECT_EQ(counterDelta(), api::metrics::Value(0));
     EXPECT_EQ(counterToAvg(), api::metrics::Value());
 
-    timeShift.applyAbsoluteShift(std::chrono::seconds(10));
+    timeShift.applyAbsoluteShift(std::chrono::seconds(10) + std::chrono::milliseconds(1));
     resource.update("b", 100);
 
     NX_DEBUG(this, history());
@@ -247,7 +246,7 @@ TEST_F(MetricsGenerators, ValueFloat)
     EXPECT_VALUE(counterDelta(), 100);
     EXPECT_VALUE(counterToAvg(), 10);
 
-    timeShift.applyAbsoluteShift(std::chrono::seconds(20));
+    timeShift.applyAbsoluteShift(std::chrono::seconds(20) + std::chrono::milliseconds(2));
     resource.update("b", 200);
 
     NX_DEBUG(this, history());
@@ -255,7 +254,7 @@ TEST_F(MetricsGenerators, ValueFloat)
     EXPECT_VALUE(counterDelta(), 200);
     EXPECT_VALUE(counterToAvg(), 10);
 
-    timeShift.applyAbsoluteShift(std::chrono::seconds(40));
+    timeShift.applyAbsoluteShift(std::chrono::seconds(40) + std::chrono::milliseconds(3));
     resource.update("b", 600);
 
     NX_DEBUG(this, history());
@@ -263,7 +262,7 @@ TEST_F(MetricsGenerators, ValueFloat)
     EXPECT_VALUE(counterDelta(), 600);
     EXPECT_VALUE(counterToAvg(), 20);
 
-    timeShift.applyAbsoluteShift(std::chrono::minutes(1));
+    timeShift.applyAbsoluteShift(std::chrono::minutes(1) + std::chrono::milliseconds(4));
     resource.update("b", 30);
 
     NX_DEBUG(this, history());
@@ -271,14 +270,14 @@ TEST_F(MetricsGenerators, ValueFloat)
     EXPECT_VALUE(counterDelta(), 30 - 200);
     EXPECT_VALUE(counterToAvg(), -28.5);
 
-    timeShift.applyAbsoluteShift(std::chrono::minutes(1) + std::chrono::seconds(30));
+    timeShift.applyAbsoluteShift(std::chrono::seconds(90) + std::chrono::milliseconds(5));
 
     NX_DEBUG(this, history());
     EXPECT_VALUE(sampleAvg(), 248.3);
     EXPECT_VALUE(counterDelta(), 30 - 600);
     EXPECT_VALUE(counterToAvg(), 0);
 
-    timeShift.applyAbsoluteShift(std::chrono::minutes(2));
+    timeShift.applyAbsoluteShift(std::chrono::minutes(2) + std::chrono::milliseconds(6));
 
     NX_DEBUG(this, history());
     EXPECT_VALUE(sampleAvg(), 30);
@@ -288,7 +287,7 @@ TEST_F(MetricsGenerators, ValueFloat)
 
 TEST_F(MetricsGenerators, ValueSpike)
 {
-    nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
+    nx::utils::test::ScopedSyntheticMonotonicTime timeShift;
     const auto sampleAvg = parseFormulaOrThrow("sampleAvg %b 10s", monitors).generator;
     const auto counterDelta = parseFormulaOrThrow("counterDelta %b 10s", monitors).generator;
     const auto counterToAvg = parseFormulaOrThrow("counterToAvg %b 10s", monitors).generator;
@@ -349,7 +348,7 @@ TEST_F(MetricsGenerators, ValueSpike)
 
     for (int i = 1; i <= 5; ++i)
     {
-        timeShift.applyAbsoluteShift(std::chrono::seconds(15 + i));
+        timeShift.applyAbsoluteShift(std::chrono::seconds(15 + i) + std::chrono::milliseconds(1));
 
         EXPECT_VALUE(sampleAvg(), 0);
         EXPECT_VALUE(counterDelta(), 0);
@@ -359,7 +358,7 @@ TEST_F(MetricsGenerators, ValueSpike)
 
 TEST_F(MetricsGenerators, ValueBlanks)
 {
-    nx::utils::test::ScopedTimeShift timeShift(nx::utils::test::ClockType::steady);
+    nx::utils::test::ScopedSyntheticMonotonicTime timeShift;
     const auto sampleAvg = parseFormulaOrThrow("sampleAvg %b 1m", monitors).generator;
     const auto counterDelta = parseFormulaOrThrow("counterDelta %b 10s", monitors).generator;
     const auto counterToAvg = parseFormulaOrThrow("counterToAvg %b 20s", monitors).generator;
@@ -387,7 +386,7 @@ TEST_F(MetricsGenerators, ValueBlanks)
     EXPECT_VALUE(counterDelta(), 0);
     EXPECT_VALUE(counterToAvg(), 0);
 
-    timeShift.applyAbsoluteShift(std::chrono::seconds(30));
+    timeShift.applyAbsoluteShift(std::chrono::seconds(30) + std::chrono::milliseconds(1));
 
     EXPECT_EQ(sampleAvg(), api::metrics::Value());
     EXPECT_VALUE(counterDelta(), 0);
@@ -399,7 +398,7 @@ TEST_F(MetricsGenerators, ValueBlanks)
     EXPECT_VALUE(counterDelta(), 0);
     EXPECT_VALUE(counterToAvg(), 5);
 
-    timeShift.applyAbsoluteShift(std::chrono::seconds(40));
+    timeShift.applyAbsoluteShift(std::chrono::seconds(40) + std::chrono::milliseconds(1));
 
     EXPECT_EQ(sampleAvg(), 150);
     EXPECT_VALUE(counterDelta(), 0);

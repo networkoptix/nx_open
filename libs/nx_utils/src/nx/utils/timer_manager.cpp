@@ -117,7 +117,7 @@ TimerManager::~TimerManager()
 void TimerManager::stop()
 {
     {
-        QnMutexLocker lk(&m_mutex);
+        NX_MUTEX_LOCKER lk(&m_mutex);
         m_terminated = true;
         m_cond.wakeAll();
     }
@@ -139,13 +139,13 @@ TimerId TimerManager::addTimer(
 {
     const auto timerId = generateNextTimerId();
 
-    QnMutexLocker lk(&m_mutex);
+    NX_MUTEX_LOCKER lk(&m_mutex);
     addTaskNonSafe(
         lk,
         timerId,
         TaskContext(std::move(func)),
         delay);
-    NX_VERBOSE(this, lm("Added timer %1, delay %2").arg(timerId).arg(delay));
+    NX_VERBOSE(this, nx::format("Added timer %1, delay %2").arg(timerId).arg(delay));
     return timerId;
 }
 
@@ -164,13 +164,13 @@ TimerId TimerManager::addNonStopTimer(
 {
     const auto timerId = generateNextTimerId();
 
-    QnMutexLocker lk(&m_mutex);
+    NX_MUTEX_LOCKER lk(&m_mutex);
     addTaskNonSafe(
         lk,
         timerId,
         TaskContext(std::move(func), repeatPeriod),
         firstShotDelay);
-    NX_VERBOSE(this, lm("Added non stop timer %1, repeat period %2, first shot delay %3")
+    NX_VERBOSE(this, nx::format("Added non stop timer %1, repeat period %2, first shot delay %3")
         .arg(timerId).arg(repeatPeriod).arg(firstShotDelay));
     return timerId;
 }
@@ -179,10 +179,10 @@ bool TimerManager::modifyTimerDelay(
     TimerId timerId,
     std::chrono::milliseconds newDelay)
 {
-    NX_VERBOSE(this, lm("Modifying timer %1, new delay %2 ms")
+    NX_VERBOSE(this, nx::format("Modifying timer %1, new delay %2 ms")
         .arg(timerId).arg(newDelay.count()));
 
-    QnMutexLocker lk(&m_mutex);
+    NX_MUTEX_LOCKER lk(&m_mutex);
     if (m_runningTaskID == timerId)
         return false; //< Timer being executed at the moment.
 
@@ -213,31 +213,31 @@ bool TimerManager::modifyTimerDelay(
 
 bool TimerManager::hasPendingTasks() const
 {
-    QnMutexLocker lk(&m_mutex);
+    NX_MUTEX_LOCKER lk(&m_mutex);
     return !m_timeToTask.empty() || m_runningTaskID != 0;
 }
 
 void TimerManager::deleteTimer(const TimerId& timerId)
 {
-    QnMutexLocker lk(&m_mutex);
+    NX_MUTEX_LOCKER lk(&m_mutex);
 
-    NX_VERBOSE(this, lm("Deleting timer %1").arg(timerId));
+    NX_VERBOSE(this, nx::format("Deleting timer %1").arg(timerId));
 
     deleteTaskNonSafe(lk, timerId);
 }
 
 void TimerManager::joinAndDeleteTimer(const TimerId& timerId)
 {
-    NX_ASSERT(timerId, lm("Timer id should be a positive number, 0 given."));
+    NX_ASSERT(timerId, nx::format("Timer id should be a positive number, 0 given."));
     if (timerId == 0)
         return;
 
-    QnMutexLocker lk(&m_mutex);
+    NX_MUTEX_LOCKER lk(&m_mutex);
     //having locked m_mutex we garantee, that execution of timer timerId will not start
 
     if (QThread::currentThread() != this)
     {
-        NX_VERBOSE(this, lm("Waiting for timer %1 to complete").arg(timerId));
+        NX_VERBOSE(this, nx::format("Waiting for timer %1 to complete").arg(timerId));
 
         while (m_runningTaskID == timerId)
             m_cond.wait(lk.mutex());      //waiting for timer handler execution finish
@@ -258,9 +258,9 @@ constexpr static std::chrono::milliseconds kErrorSkipTimeout =
 
 void TimerManager::run()
 {
-    QnMutexLocker lk(&m_mutex);
+    NX_MUTEX_LOCKER lk(&m_mutex);
 
-    NX_DEBUG(this, lm("started"));
+    NX_DEBUG(this, nx::format("started"));
 
     while (!m_terminated)
     {
@@ -310,11 +310,11 @@ void TimerManager::run()
                     });
 
                 // Using unlocker to ensure exception-safety.
-                QnMutexUnlocker unlocker(&lk);
+                nx::Unlocker<nx::Mutex> unlocker(&lk);
 
-                NX_VERBOSE(this, lm("Executing task %1").arg(timerId));
+                NX_VERBOSE(this, "Executing task %1", timerId);
                 taskContext.func(timerId);
-                NX_VERBOSE(this, lm("Done task %1").arg(timerId));
+                NX_VERBOSE(this, "Done task %1", timerId);
             }
 
             if (m_terminated)
@@ -332,7 +332,7 @@ void TimerManager::run()
         }
         catch (exception& e)
         {
-            NX_ERROR(this, lm("Error. Exception in %1:%2. %3")
+            NX_ERROR(this, nx::format("Error. Exception in %1:%2. %3")
                 .arg(QLatin1String(__FILE__)).arg(__LINE__).arg(QLatin1String(e.what())));
             timeToWait = kErrorSkipTimeout;
             m_runningTaskID = 0;
@@ -347,11 +347,11 @@ void TimerManager::run()
             m_cond.wait(lk.mutex());
     }
 
-    NX_DEBUG(this, lm("stopped"));
+    NX_DEBUG(this, nx::format("stopped"));
 }
 
 void TimerManager::addTaskNonSafe(
-    const QnMutexLockerBase& /*lk*/,
+    const nx::Locker<nx::Mutex>& /*lk*/,
     const TimerId timerId,
     TaskContext taskContext,
     std::chrono::milliseconds delay)
@@ -373,7 +373,7 @@ void TimerManager::addTaskNonSafe(
 }
 
 void TimerManager::deleteTaskNonSafe(
-    const QnMutexLockerBase& /*lk*/,
+    const nx::Locker<nx::Mutex>& /*lk*/,
     const TimerId timerId)
 {
     const std::map<TimerId, qint64>::iterator it = m_taskToTime.find(timerId);
@@ -419,7 +419,7 @@ std::chrono::milliseconds parseTimerDuration(
     std::chrono::milliseconds defaultValue)
 {
     auto result = parseDuration(durationNotTrimmed.trimmed());
-    return result.first ? result.second: defaultValue;
+    return result ? *result : defaultValue;
 }
 
 std::optional<std::chrono::milliseconds> parseOptionalTimerDuration(

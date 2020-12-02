@@ -574,7 +574,7 @@ void ProgressiveDownloadingServer::run()
     if (!durationStr.isEmpty())
     {
         const auto duratonResult = nx::utils::parseDuration(durationStr);
-        if (!duratonResult.first)
+        if (!duratonResult)
         {
             NX_DEBUG(this, "Close session, invalid url param 'duraion': %1", durationStr);
             d->response.messageBody = QByteArray("Invalid url param: duration");
@@ -583,12 +583,12 @@ void ProgressiveDownloadingServer::run()
         }
         if (isLive)
         {
-            consumerConfig.duration = duratonResult.second;
+            consumerConfig.duration = *duratonResult;
         }
         else
         {
             const int64_t durationUsec = std::chrono::duration_cast<std::chrono::microseconds>(
-                duratonResult.second).count();
+                *duratonResult).count();
             consumerConfig.endTimeUsec = timeUSec + durationUsec;
         }
     }

@@ -5,6 +5,7 @@
 #include <QtCore/QDateTime>
 
 #include <chrono>
+#include <optional>
 
 namespace nx {
 namespace utils {
@@ -62,7 +63,7 @@ NX_UTILS_API QDateTime fromOffsetSinceEpoch(const std::chrono::nanoseconds& offs
  * @return parsed time duration and status of operation, support postfixes: h - hours, m - minutes,
  * s - seconds, ms - milliseconds. Without the postfix, it will be interpreted as seconds.
  */
-NX_UTILS_API std::pair<bool, std::chrono::milliseconds> parseDuration(const QString& str);
+NX_UTILS_API std::optional<std::chrono::milliseconds> parseDuration(const QString& str);
 
 /**
  * Rounds timePoint down to DurationTypeToRoundTo type.
@@ -85,7 +86,7 @@ enum class ClockType
 };
 
 /**
- * Provides a way to shift result of utcTime() by some value.
+ * Provides a way to shift the result of utcTime() or monotonicTime() relative to the system values.
  * Test-only!
  */
 class ScopedTimeShift
@@ -154,6 +155,27 @@ private:
     NX_UTILS_API static void shiftCurrentTime(
         ClockType clockType,
         std::chrono::milliseconds diff);
+};
+
+/**
+ * Provides a way to shift the result of monotonicTime() and make it independent of the system time.
+ * Test-only!
+ */
+class NX_UTILS_API ScopedSyntheticMonotonicTime
+{
+public:
+    ScopedSyntheticMonotonicTime(const ScopedSyntheticMonotonicTime&) = delete;
+    ScopedSyntheticMonotonicTime& operator=(const ScopedSyntheticMonotonicTime&) = delete;
+
+public:
+    ScopedSyntheticMonotonicTime(
+        const std::chrono::steady_clock::time_point& initTime = monotonicTime());
+    ~ScopedSyntheticMonotonicTime();
+    void applyRelativeShift(std::chrono::milliseconds value);
+    void applyAbsoluteShift(std::chrono::milliseconds value);
+
+private:
+    std::chrono::steady_clock::time_point m_initTime;
 };
 
 } // namespace test

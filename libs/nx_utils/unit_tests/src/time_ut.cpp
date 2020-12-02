@@ -23,75 +23,77 @@ TEST(Time, timeSinceEpoch_equals_time_t)
         duration_cast<seconds>(testRunTime).count()+1);
 }
 
-TEST(Time, parseDuration)
+TEST(Time, parseDurationCorrect)
 {
     using namespace std::chrono;
     {
         const auto result = parseDuration("2h");
-        ASSERT_EQ(result.first, true);
-        ASSERT_EQ(result.second, hours(2));
+        ASSERT_TRUE(result);
+        ASSERT_EQ(*result, 2h);
     }
     {
         const auto result = parseDuration("2H");
-        ASSERT_EQ(result.first, true);
-        ASSERT_EQ(result.second, hours(2));
+        ASSERT_TRUE(result);
+        ASSERT_EQ(*result, 2h);
     }
     {
         const auto result = parseDuration("1d");
-        ASSERT_EQ(result.first, true);
-        ASSERT_EQ(result.second, hours(24));
+        ASSERT_TRUE(result);
+        ASSERT_EQ(*result, 24h);
     }
     {
         const auto result = parseDuration("256m");
-        ASSERT_EQ(result.first, true);
-        ASSERT_EQ(result.second, minutes(256));
+        ASSERT_TRUE(result);
+        ASSERT_EQ(*result, 256min);
     }
     {
         const auto result = parseDuration("2s");
-        ASSERT_EQ(result.first, true);
-        ASSERT_EQ(result.second, seconds(2));
+        ASSERT_TRUE(result);
+        ASSERT_EQ(*result, 2s);
     }
     {
         const auto result = parseDuration("2");
-        ASSERT_EQ(result.first, true);
-        ASSERT_EQ(result.second, milliseconds(2000));
+        ASSERT_TRUE(result);
+        ASSERT_EQ(*result, 2000ms);
     }
     {
         const auto result = parseDuration("2ms");
-        ASSERT_EQ(result.first, true);
-        ASSERT_EQ(result.second, milliseconds(2));
+        ASSERT_TRUE(result);
+        ASSERT_EQ(*result, 2ms);
     }
     {
         const auto result = parseDuration("1234567890ms");
-        ASSERT_EQ(result.first, true);
-        ASSERT_EQ(result.second, milliseconds(1234567890));
-    }
-
-    {
-        const auto result = parseDuration("qqms");
-        ASSERT_EQ(result.first, false);
-    }
-    {
-        const auto result = parseDuration("qqms123");
-        ASSERT_EQ(result.first, false);
-    }
-    {
-        const auto result = parseDuration("h1");
-        ASSERT_EQ(result.first, false);
-    }
-    {
-        const auto result = parseDuration("1hs");
-        ASSERT_EQ(result.first, false);
-    }
-    {
-        const auto result = parseDuration("h");
-        ASSERT_EQ(result.first, false);
-    }
-    {
-        const auto result = parseDuration("ms");
-        ASSERT_EQ(result.first, false);
+        ASSERT_TRUE(result);
+        ASSERT_EQ(*result, milliseconds(1234567890));
     }
 }
 
+TEST(Time, parseDurationIncorrect)
+{
+    {
+        const auto result = parseDuration("qqms");
+        ASSERT_FALSE(result);
+    }
+    {
+        const auto result = parseDuration("qqms123");
+        ASSERT_FALSE(result);
+    }
+    {
+        const auto result = parseDuration("h1");
+        ASSERT_FALSE(result);
+    }
+    {
+        const auto result = parseDuration("1hs");
+        ASSERT_FALSE(result);
+    }
+    {
+        const auto result = parseDuration("h");
+        ASSERT_FALSE(result);
+    }
+    {
+        const auto result = parseDuration("ms");
+        ASSERT_FALSE(result);
+    }
+}
 
 } // namespace nx::utils
