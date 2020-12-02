@@ -1981,7 +1981,7 @@
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</translation>
+      <translation>Błąd bazy danych analizy wideo &quot;%1&quot;: niewystarczające uprawnienia w zamontowanej lokalizacji.</translation>
     </message>
   </context>
   <context>

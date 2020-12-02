@@ -126,7 +126,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Verifying update package</source>
-      <translation type="unfinished">Verifying update package</translation>
+      <translation>Weryfikacja pakietu aktualizacji</translation>
     </message>
   </context>
   <context>
@@ -1619,23 +1619,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>This camera does not support advanced PTZ</source>
-      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+      <translation>Ta kamera nie obsługuje zaawansowanego PTZ</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation type="unfinished">Zooming out...</translation>
+      <translation>Oddalam...</translation>
     </message>
     <message>
       <source>Moving...</source>
-      <translation type="unfinished">Moving...</translation>
+      <translation>Przesuwam...</translation>
     </message>
     <message>
       <source>Zooming in...</source>
-      <translation type="unfinished">Zooming in...</translation>
+      <translation>Zbliżam...</translation>
     </message>
     <message>
       <source>Focusing...</source>
-      <translation type="unfinished">Focusing...</translation>
+      <translation>Ustawiam ostrość...</translation>
     </message>
   </context>
   <context>
@@ -2101,15 +2101,15 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Storage added</source>
-      <translation type="unfinished">Storage added</translation>
+      <translation>Dodano archiwum</translation>
     </message>
     <message>
       <source>Storage updated</source>
-      <translation type="unfinished">Storage updated</translation>
+      <translation>Zaktualizowano archiwum</translation>
     </message>
     <message>
       <source>Storage removed</source>
-      <translation type="unfinished">Storage removed</translation>
+      <translation>Usunięto archiwum</translation>
     </message>
   </context>
   <context>
@@ -2423,7 +2423,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+      <translation>Długi czas nagrywania przedalarmowego zwiększy wykorzystanie pamięci RAM na serwerze</translation>
     </message>
   </context>
   <context>
@@ -3304,7 +3304,7 @@ to %1</source>
     </message>
     <message>
       <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+      <translation>Urządzenie przechwytujące dźwięk nie obsługuje odpowiednich formatów dźwięku. Proszę wybrać inne urządzenie audio lub &quot;brak&quot; w ustawieniach nagrywania ekranu.</translation>
     </message>
   </context>
   <context>
@@ -6831,7 +6831,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchController</name>
     <message>
       <source>To switch between cameras press Shift + Arrow</source>
-      <translation type="unfinished">To switch between cameras press Shift + Arrow</translation>
+      <translation>Aby przełączać się między kamerami, naciśnij Shift + Strzałka</translation>
     </message>
   </context>
   <context>
@@ -6889,15 +6889,15 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchPtzHandler</name>
     <message>
       <source>Zooming in...</source>
-      <translation type="unfinished">Zooming in...</translation>
+      <translation>Zbliżam...</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation type="unfinished">Zooming out...</translation>
+      <translation>Oddalam...</translation>
     </message>
     <message>
       <source>Moving...</source>
-      <translation type="unfinished">Moving...</translation>
+      <translation>Przesuwam...</translation>
     </message>
   </context>
   <context>
@@ -7831,7 +7831,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>DISABLED</source>
-      <translation type="unfinished">DISABLED</translation>
+      <translation>WYŁĄCZONY</translation>
     </message>
   </context>
   <context>
@@ -8043,7 +8043,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+      <translation>Długi czas nagrywania przedalarmowego zwiększy wykorzystanie pamięci RAM na serwerze</translation>
     </message>
   </context>
   <context>
@@ -8233,11 +8233,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>File %1 does not exist</source>
-      <translation type="unfinished">File %1 does not exist</translation>
+      <translation>Plik %1 nie istnieje</translation>
     </message>
     <message>
       <source>There is no valid client package to download</source>
-      <translation type="unfinished">There is no valid client package to download</translation>
+      <translation>Nie ma prawidłowego pakietu klienta do pobrania</translation>
     </message>
   </context>
   <context>
@@ -8688,27 +8688,27 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Equidistant</source>
-      <translation type="unfinished">Equidistant</translation>
+      <translation>Równoodległy</translation>
     </message>
     <message>
       <source>Stereographic</source>
-      <translation type="unfinished">Stereographic</translation>
+      <translation>Stereograficzny</translation>
     </message>
     <message>
       <source>Equisolid</source>
-      <translation type="unfinished">Equisolid</translation>
+      <translation>Equisolid</translation>
     </message>
     <message>
       <source>Ceiling</source>
-      <translation type="unfinished">Ceiling</translation>
+      <translation>Sufit</translation>
     </message>
     <message>
       <source>Wall</source>
-      <translation type="unfinished">Wall</translation>
+      <translation>Ściana</translation>
     </message>
     <message>
       <source>Floor/Table</source>
-      <translation type="unfinished">Floor/Table</translation>
+      <translation>Podłoga/stół</translation>
     </message>
   </context>
   <context>
@@ -8872,7 +8872,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>DISABLED</source>
-      <translation type="unfinished">DISABLED</translation>
+      <translation>WYŁĄCZONY</translation>
     </message>
   </context>
   <context>
@@ -9398,11 +9398,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update file verification failed.</source>
-      <translation type="unfinished">Update file verification failed.</translation>
+      <translation>Weryfikacja pliku aktualizacji nie powiodła się.</translation>
     </message>
     <message>
       <source>Verifying update</source>
-      <translation type="unfinished">Verifying update</translation>
+      <translation>Weryfikowanie aktualizacji</translation>
     </message>
   </context>
   <context>
