@@ -140,7 +140,6 @@ void ConnectionBase::pleaseStopSync()
     {
         NX_ASSERT(m_startedClassId == typeid(*this).hash_code(),
             "Please call pleaseStopSync() in the destructor of the nested class.");
-        m_startedClassId = 0;
     }
 
     m_timer.executeInAioThreadSync([this]() { stopWhileInAioThread(); });
@@ -148,7 +147,6 @@ void ConnectionBase::pleaseStopSync()
 
 ConnectionBase::~ConnectionBase()
 {
-    pleaseStopSync();
 }
 
 nx::utils::Url ConnectionBase::remoteAddr() const
@@ -344,7 +342,7 @@ void ConnectionBase::onHttpClientDone()
 
 void ConnectionBase::startConnection()
 {
-     m_startedClassId = typeid(*this).hash_code();
+    m_startedClassId = typeid(*this).hash_code();
 
     auto headers = m_additionalRequestHeaders;
     nx::network::websocket::addClientHeaders(
@@ -360,9 +358,6 @@ void ConnectionBase::startConnection()
     requestUrlQuery.addQueryItem("format", QnLexical::serialized(localPeer().dataFormat));
 
     requestUrl.setQuery(requestUrlQuery.toString());
-
-    m_httpClient->bindToAioThread(m_timer.getAioThread());
-
     if (requestUrl.password().isEmpty())
         fillAuthInfo(m_httpClient.get(), m_credentialsSource == CredentialsSource::serverKey);
 
@@ -373,6 +368,8 @@ void ConnectionBase::startConnection()
 
 void ConnectionBase::startReading()
 {
+    m_startedClassId = typeid(*this).hash_code();
+
     NX_VERBOSE(this, "Connection Starting reading, state [%1]", state());
     using namespace std::placeholders;
     m_p2pTransport->readSomeAsync(
