@@ -1,40 +1,18 @@
 #include "clock_label.h"
 
+#include <chrono>
+
 #include <QtCore/QDateTime>
 
-#include <QtWidgets/QGraphicsSceneMouseEvent>
-
-#include <client/client_settings.h>
-
-#include <ui/common/palette.h>
-#include <ui/style/nx_style.h>
-#include <utils/common/synctime.h>
 #include <translation/datetime_formatter.h>
 
-
-QnClockDataProvider::QnClockDataProvider(QObject* parent):
-    base_type(parent),
-    m_timer(new QTimer(this)),
-    m_clockType(localSystemClock)
+namespace
 {
-   connect(m_timer, &QTimer::timeout, this,
-        [this]()
-        {
-            emit timeChanged(
-                datetime::toString(m_clockType == serverClock
-                    ? qnSyncTime->currentMSecsSinceEpoch()
-                    : QDateTime::currentMSecsSinceEpoch(),
-                    datetime::Format::hh_mm_ss));
-        });
-    m_timer->start(100);
-}
 
-QnClockDataProvider::~QnClockDataProvider() = default;
+using namespace std::chrono;
+static constexpr auto kClockUpdatePeriod = 1s;
 
-void QnClockDataProvider::setClockType(ClockType clockType)
-{
-    m_clockType = clockType;
-}
+} // namespace
 
 QnClockLabel::QnClockLabel(QGraphicsItem* parent):
     base_type(parent)
@@ -44,32 +22,15 @@ QnClockLabel::QnClockLabel(QGraphicsItem* parent):
     font.setWeight(QFont::DemiBold);
     setFont(font);
 
-    m_provider = new QnClockDataProvider(this);
-    connect(m_provider, &QnClockDataProvider::timeChanged, this, &QnClockLabel::setText);
-
-    m_serverTimeAction = new QAction(tr("Server Time"), this);
-    addAction(m_serverTimeAction);
-    m_localTimeAction = new QAction(tr("Local System Time"), this);
-    addAction(m_localTimeAction);
+    m_timerId = startTimer(kClockUpdatePeriod);
 }
 
 QnClockLabel::~QnClockLabel()
 {
-    m_provider->disconnect(this);
+    killTimer(m_timerId);
 }
 
-void QnClockLabel::contextMenuEvent(QGraphicsSceneContextMenuEvent* event)
+void QnClockLabel::timerEvent(QTimerEvent*)
 {
-#ifdef _DEBUG
-    //displaying clock type selection menu
-    QMenu menu;
-    menu.addActions(actions());
-    QAction* selectedAction = menu.exec(event->screenPos());
-    if (selectedAction == m_serverTimeAction)
-        m_provider->setClockType(QnClockDataProvider::serverClock);
-    else if(selectedAction == m_localTimeAction)
-        m_provider->setClockType(QnClockDataProvider::localSystemClock);
-#else
-    base_type::contextMenuEvent( event );
-#endif
+    setText(datetime::toString(QDateTime::currentMSecsSinceEpoch(), datetime::Format::hh_mm_ss));
 }
