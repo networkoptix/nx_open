@@ -37,8 +37,69 @@
       "projectTarget": "mobile_client.exe (bin\\mobile_client.exe)",
       "name": "mobile_client.exe (bin\\mobile_client.exe)",
       "env": "Path=${env.qtdir}"
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "mediaserver.exe (bin\\mediaserver.exe)",
+      "name": "mediaserver.exe (bin\\mediaserver.exe)",
+      "args": [
+        "-e"
+      ],
+      "env": "Path=${env.qtdir};${env.Path}"
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "testcamera.exe (bin\\testcamera.exe)",
+      "name": "testcamera.exe (bin\\testcamera.exe)",
+      "env": "Path=${env.qtdir};${env.Path}",
+      "args": [
+        "--pts",
+        "--fps-primary",
+        30,
+        "--fps-secondary",
+        7,
+        "files=\"${env.RDEP_PACKAGES_DIR}/any/vms_benchmark-dev/files/high.ts\";secondary-files=\"${env.RDEP_PACKAGES_DIR}/any/vms_benchmark-dev/files/low.ts\";count=1"
+      ]
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "rtsp_perf.exe (bin\\rtsp_perf.exe)",
+      "name": "rtsp_perf.exe (bin\\rtsp_perf.exe)",
+      "env": "Path=${env.qtdir};${env.Path}"
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "traytool.exe (bin\\traytool.exe)",
+      "name": "traytool.exe (bin\\traytool.exe)",
+      "env": "Path=${env.qtdir};${env.Path}"
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "launcher.exe (bin\\launcher.exe)",
+      "name": "launcher.exe (bin\\launcher.exe)",
+      "env": "Path=${env.qtdir};${env.Path}"
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "HD Witness Launcher.exe (bin\\HD Witness Launcher.exe)",
+      "name": "HD Witness Launcher.exe (bin\\HD Witness Launcher.exe)",
+      "env": "Path=${env.qtdir};${env.Path}"
+    },
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "applauncher.exe (bin\\applauncher.exe)",
+      "name": "applauncher.exe (bin\\applauncher.exe)",
+      "env": "Path=${env.qtdir};${env.Path}"
     }
   ],
   "defaults": {},
   "version": "0.2.1"
 }
+

@@ -1,34 +1,65 @@
 ﻿{
   "configurations": [
    {
-      "name": "x64-Debug",
+      "name": "Debug+ut+sdk",
       "generator": "Ninja",
       "configurationType": "Debug",
       "inheritEnvironments": [ "msvc_x64_x64" ],
-      "buildRoot": "${projectDir}\\build\\${name}",
-      "cmakeCommandArgs": "",
+      "buildRoot": "${projectDir}-build-debug",
+      "cmakeCommandArgs": "-DwithTests=ON -DwithSdk=ON -DCMAKE_C_COMPILER_WORKS=1 -DCMAKE_CXX_COMPILER_WORKS=1",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "variables": [],
       "environments": [
         {
           "qtdir": "${env.RDEP_PACKAGES_DIR}/windows-x64/qt-5.11.3-1-debug/bin"
-        } ],
+        } ]
     },
     {
-      "name": "x64-Release",
+      "name": "Debug (minimal)",
       "generator": "Ninja",
-      "configurationType": "Release",
+      "configurationType": "Debug",
       "inheritEnvironments": [ "msvc_x64_x64" ],
-      "buildRoot": "${projectDir}\\build\\${name}",
-      "cmakeCommandArgs": "-DdeveloperBuild=OFF",
+      "buildRoot": "${projectDir}-build-debug",
+      "cmakeCommandArgs": "-DCMAKE_C_COMPILER_WORKS=1 -DCMAKE_CXX_COMPILER_WORKS=1",
       "buildCommandArgs": "",
       "ctestCommandArgs": "",
       "variables": [],
       "environments": [
         {
           "qtdir": "${env.RDEP_PACKAGES_DIR}/windows-x64/qt-5.11.3-1/bin"
-        } ],
+        } ]
+    },
+    {
+      "name": "Release+ut+sdk",
+      "generator": "Ninja",
+      "configurationType": "Release",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "buildRoot": "${projectDir}-build",
+      "cmakeCommandArgs": "-DwithTests=ON -DwithSdk=ON -DCMAKE_C_COMPILER_WORKS=1 -DCMAKE_CXX_COMPILER_WORKS=1",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "variables": [],
+      "environments": [
+        {
+          "qtdir": "${env.RDEP_PACKAGES_DIR}/windows-x64/qt-5.11.3-1/bin"
+        } ]
+    },
+    {
+      "name": "Release+ut+distrib",
+      "generator": "Ninja",
+      "configurationType": "Release",
+      "inheritEnvironments": [ "msvc_x64_x64" ],
+      "buildRoot": "${projectDir}-build",
+      "cmakeCommandArgs": "-DwithDistributions=ON -DwithTests=ON -DwithUnitTestsArchive=ON -DCMAKE_C_COMPILER_WORKS=1 -DCMAKE_CXX_COMPILER_WORKS=1",
+      "buildCommandArgs": "",
+      "ctestCommandArgs": "",
+      "variables": [],
+      "environments": [
+        {
+          "qtdir": "${env.RDEP_PACKAGES_DIR}/windows-x64/qt-5.11.3-1/bin"
+        } ]
     }
   ]
 }
+
