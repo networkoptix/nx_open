@@ -476,6 +476,7 @@ QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
 
     QSharedPointer<CLVideoDecoderOutput> m_tmpFrame( new CLVideoDecoderOutput() );
     m_tmpFrame->setUseExternalData(true);   //temp frame will take internal ffmpeg buffer for optimization
+    m_tmpFrame->channel = data->channelNumber;
 
     if (data->compressionType == AV_CODEC_ID_NONE)
     {
