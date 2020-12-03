@@ -225,7 +225,21 @@ std::vector<DeviceData> getDeviceList()
         if (uniqueId.empty())
             uniqueId = std::to_string(nameIndex) + "-" + name;
 
-        deviceList.push_back(DeviceData(name, devicePath, uniqueId));
+        NX_DEBUG(NX_SCOPE_TAG, "Found new device: %1, path: %2, id: %3", name, devicePath, uniqueId);
+        bool deviceUpdated = false;
+        for (auto& device: deviceList)
+        {
+            if (device.uniqueId == uniqueId)
+            {
+                NX_DEBUG(NX_SCOPE_TAG, "Change device path: %1, path: %2, old path: %3",
+                    name, devicePath, device.path);
+                device.path = devicePath;
+                device.name = name;
+                deviceUpdated = true;
+            }
+        }
+        if (!deviceUpdated)
+            deviceList.push_back(DeviceData(name, devicePath, uniqueId));
     }
 
     return deviceList;
