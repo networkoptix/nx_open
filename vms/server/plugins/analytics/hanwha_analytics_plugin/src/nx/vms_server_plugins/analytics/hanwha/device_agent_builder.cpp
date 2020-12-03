@@ -179,6 +179,7 @@ SettingsCapabilities DeviceAgentBuilder::fetchSettingsCapabilities() const
         return result;
     }
 
+    // Tampering
     result.tampering.enabled = cgi.parameter("eventsources","tamperingdetection",
         "set", "Enable").has_value();
 
@@ -194,6 +195,22 @@ SettingsCapabilities DeviceAgentBuilder::fetchSettingsCapabilities() const
     result.tampering.exceptDarkImages =
         cgi.parameter("eventsources", "tamperingdetection", "set", "DarknessDetection").has_value();
 
+    // Defocus
+    result.tampering.enabled = cgi.parameter("eventsources","defocusdetection",
+        "set", "Enable").has_value();
+
+    result.tampering.thresholdLevel =
+        cgi.parameter("eventsources", "defocusdetection", "set", "ThresholdLevel").has_value();
+
+    result.tampering.sensitivityLevel =
+        cgi.parameter("eventsources", "defocusdetection", "set", "SensitivityLevel").has_value();
+
+    result.tampering.minimumDuration =
+        cgi.parameter("eventsources", "defocusdetection", "set", "Duration").has_value();
+
+    result.videoAnalysis = cgi.hasSubmenu("eventsources", "videoanalysis");
+    result.videoAnalysis2 = cgi.hasSubmenu("eventsources", "videoanalysis2");
+
     // Line
     result.ivaLine.ruleName =
         cgi.parameter("eventsources", "videoanalysis2", "set",
@@ -205,7 +222,7 @@ SettingsCapabilities DeviceAgentBuilder::fetchSettingsCapabilities() const
 
     // Area
     result.ivaArea.ruleName = cgi.parameter("eventsources", "videoanalysis2", "set",
-        "DefinedArea.#.ObjectTypeFilter").has_value();
+        "DefinedArea.#.RuleName").has_value();
     result.ivaArea.objectTypeFilter = cgi.parameter("eventsources", "videoanalysis2", "set",
         "DefinedArea.#.ObjectTypeFilter").has_value();
 
@@ -585,6 +602,9 @@ QJsonValue DeviceAgentBuilder::buildSettingsModel(
         {
             if (const QString name = node["name"].toString(); !name.isNull())
             {
+                if (name == "IVA")
+                    return settingsCapabilities.videoAnalysis2;
+
                 if (name == "IVA.Line#.ObjectTypeFilter")
                     return settingsCapabilities.ivaLine.objectTypeFilter;
                 if (name == "IVA.IncludeArea#.ObjectTypeFilter")

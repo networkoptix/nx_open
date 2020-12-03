@@ -306,29 +306,41 @@ bool DefocusDetection::operator==(const DefocusDetection& rhs) const
 void DefocusDetection::readFromServerOrThrow(const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
     using namespace SettingPrimitivesServerIo;
-    deserializeOrThrow(value(sourceMap, KeyIndex::enabled), &enabled);
-    deserializeOrThrow(value(sourceMap, KeyIndex::thresholdLevel), &thresholdLevel);
-    deserializeOrThrow(value(sourceMap, KeyIndex::sensitivityLevel), &sensitivityLevel);
-    deserializeOrThrow(value(sourceMap, KeyIndex::minimumDuration), &minimumDuration);
+    if (m_settingsCapabilities.defocus.enabled)
+        deserializeOrThrow(value(sourceMap, KeyIndex::enabled), &enabled);
+    if (m_settingsCapabilities.defocus.thresholdLevel)
+        deserializeOrThrow(value(sourceMap, KeyIndex::thresholdLevel), &thresholdLevel);
+    if (m_settingsCapabilities.defocus.sensitivityLevel)
+        deserializeOrThrow(value(sourceMap, KeyIndex::sensitivityLevel), &sensitivityLevel);
+    if (m_settingsCapabilities.defocus.minimumDuration)
+        deserializeOrThrow(value(sourceMap, KeyIndex::minimumDuration), &minimumDuration);
     initialized = true;
 }
 
 void DefocusDetection::writeToServer(nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
 {
     using namespace SettingPrimitivesServerIo;
-    result->setValue(key(KeyIndex::enabled), serialize(enabled));
-    result->setValue(key(KeyIndex::thresholdLevel), serialize(thresholdLevel));
-    result->setValue(key(KeyIndex::sensitivityLevel), serialize(sensitivityLevel));
-    result->setValue(key(KeyIndex::minimumDuration), serialize(minimumDuration));
+    if (m_settingsCapabilities.defocus.enabled)
+        result->setValue(key(KeyIndex::enabled), serialize(enabled));
+    if (m_settingsCapabilities.defocus.thresholdLevel)
+        result->setValue(key(KeyIndex::thresholdLevel), serialize(thresholdLevel));
+    if (m_settingsCapabilities.defocus.sensitivityLevel)
+        result->setValue(key(KeyIndex::sensitivityLevel), serialize(sensitivityLevel));
+    if (m_settingsCapabilities.defocus.minimumDuration)
+        result->setValue(key(KeyIndex::minimumDuration), serialize(minimumDuration));
 }
 
 void DefocusDetection::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
 {
     using namespace SettingPrimitivesDeviceIo;
-    deserializeOrThrow(channelInfo, "Enable", m_roiResolution, &enabled);
-    deserializeOrThrow(channelInfo, "ThresholdLevel", m_roiResolution, &thresholdLevel);
-    deserializeOrThrow(channelInfo, "Sensitivity", m_roiResolution, &sensitivityLevel);
-    deserializeOrThrow(channelInfo, "Duration", m_roiResolution, &minimumDuration);
+    if (m_settingsCapabilities.defocus.enabled)
+        deserializeOrThrow(channelInfo, "Enable", m_roiResolution, &enabled);
+    if (m_settingsCapabilities.defocus.thresholdLevel)
+        deserializeOrThrow(channelInfo, "ThresholdLevel", m_roiResolution, &thresholdLevel);
+    if (m_settingsCapabilities.defocus.sensitivityLevel)
+        deserializeOrThrow(channelInfo, "Sensitivity", m_roiResolution, &sensitivityLevel);
+    if (m_settingsCapabilities.defocus.minimumDuration)
+        deserializeOrThrow(channelInfo, "Duration", m_roiResolution, &minimumDuration);
     initialized = true;
 }
 
@@ -341,12 +353,16 @@ std::string DefocusDetection::buildDeviceWritingQuery(int channelNumber) const
         query
             << "msubmenu=" << kSunapiEventName
             << "&action=" << "set"
-            << "&Channel=" << channelNumber
-            << "&Enable=" << serialize(enabled)
-            << "&ThresholdLevel=" << thresholdLevel
-            << "&Sensitivity=" << sensitivityLevel
-            << "&Duration=" << minimumDuration
-            ;
+            << "&Channel=" << channelNumber;
+
+        if (m_settingsCapabilities.defocus.enabled)
+            query << "&Enable=" << serialize(enabled);
+        if (m_settingsCapabilities.defocus.thresholdLevel)
+            query << "&ThresholdLevel=" << thresholdLevel;
+        if (m_settingsCapabilities.defocus.sensitivityLevel)
+            query << "&Sensitivity=" << sensitivityLevel;
+        if (m_settingsCapabilities.defocus.minimumDuration)
+            query << "&Duration=" << minimumDuration;
     }
     return query.str();
 }

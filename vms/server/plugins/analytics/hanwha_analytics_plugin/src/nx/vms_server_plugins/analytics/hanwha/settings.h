@@ -78,16 +78,16 @@ struct Settings
         temperatureChangeDetectionToggle(settingsCapabilities, roiResolution)
     {
         for (int i = 0; i < kMultiplicity; ++i)
-            ivaLines.emplace_back(settingsCapabilities, roiResolution);
+            ivaLines.emplace_back(settingsCapabilities, roiResolution, i);
 
         for (int i = 0; i < kMultiplicity; ++i)
-            ivaAreas.emplace_back(settingsCapabilities, roiResolution);
+            ivaAreas.emplace_back(settingsCapabilities, roiResolution, i);
 
         for (int i = 0; i < kMultiplicity; ++i)
-            ivaExcludeAreas.emplace_back(settingsCapabilities, roiResolution);
+            ivaExcludeAreas.emplace_back(settingsCapabilities, roiResolution, i);
 
         for (int i = 0; i < kTemperatureMultiplicity; ++i)
-            temperatureChangeDetectionItems.emplace_back(settingsCapabilities, roiResolution);
+            temperatureChangeDetectionItems.emplace_back(settingsCapabilities, roiResolution, i);
     }
 };
 

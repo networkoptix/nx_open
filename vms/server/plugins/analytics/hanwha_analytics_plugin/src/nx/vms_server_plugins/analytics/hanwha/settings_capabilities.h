@@ -12,6 +12,13 @@ struct SettingsCapabilities
         bool minimumDuration = false;
         bool exceptDarkImages = false;
     };
+    struct Defocus
+    {
+        bool enabled = false;
+        bool thresholdLevel = false;
+        bool sensitivityLevel = false;
+        bool minimumDuration = false;
+    };
     struct Temperature
     {
         bool coordinate = false;
@@ -59,6 +66,9 @@ struct SettingsCapabilities
     };
 
     Tampering tampering;
+    Defocus defocus;
+    bool videoAnalysis = false;
+    bool videoAnalysis2 = false;
     IvaLine ivaLine;
     IvaArea ivaArea;
     Temperature temperature;

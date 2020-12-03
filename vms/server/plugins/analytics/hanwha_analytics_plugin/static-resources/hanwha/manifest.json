@@ -280,6 +280,7 @@
             },
             {
                 "type": "Section",
+                "name": "IVA",
                 "caption": "[AI] Objects & IVA & Face Mask",
                 "_requiredForObjectDetection": true,
                 "_requiredForEventTypeIds": [

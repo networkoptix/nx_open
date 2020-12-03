@@ -15,6 +15,7 @@
 #include <nx/sdk/helpers/string.h>
 #include <nx/sdk/helpers/error.h>
 #include <nx/sdk/helpers/uuid_helper.h>
+#include <nx/sdk/helpers/plugin_diagnostic_event.h>
 
 #include <nx/sdk/analytics/helpers/event_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
@@ -69,7 +70,6 @@ DeviceAgent::DeviceAgent(
         m_engine->objectMetadataAttributeFilters())
 {
     this->setDeviceInfo(deviceInfo);
-    this->setSupportedEventCategoties();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -86,6 +86,8 @@ DeviceAgent::~DeviceAgent()
 {
     handler->addRef();
     m_handler.reset(handler);
+
+    setSupportedEventCategoties();
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -145,6 +147,19 @@ DeviceAgent::~DeviceAgent()
 
 void DeviceAgent::setSupportedEventCategoties()
 {
+    if (!m_settingsCapabilities.videoAnalysis2 && m_settingsCapabilities.videoAnalysis)
+    {
+        NX_ASSERT(m_handler);
+
+        m_handler->handlePluginDiagnosticEvent(new PluginDiagnosticEvent(
+            PluginDiagnosticEvent::Level::warning, "IVA settings unavailable",
+            "Unfortunately this camera doesn't support modern 'videoanalysis2' API that we use to"
+            " configure its Intelligent Video Analytics settings. It only supports older"
+            " 'videoanalysis' API, which we currently don't support. This means that IVA settings"
+            " are not configurable within the plugin settings. However You can still use the"
+            " camera's web interface to configure them."));
+    }
+
     m_settings.analyticsCategories.fill(false);
 
     m_settings.analyticsCategories[motionDetection] =
@@ -162,13 +177,15 @@ void DeviceAgent::setSupportedEventCategoties()
     m_settings.analyticsCategories[fogDetection] =
         m_manifest.supportedEventTypeIds.contains("nx.hanwha.FogDetection");
 
+
     m_settings.analyticsCategories[videoAnalytics] =
-        m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Passing")
-        || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Entering")
-        || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Exiting")
-        || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.AppearDisappear")
-        || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Intrusion")
-        || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Loitering");
+        m_settingsCapabilities.videoAnalysis2
+        && (m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Passing")
+            || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Entering")
+            || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Exiting")
+            || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.AppearDisappear")
+            || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Intrusion")
+            || m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Loitering"));
 
     m_settings.analyticsCategories[objectDetection] =
         !m_manifest.supportedObjectTypeIds.isEmpty();
@@ -362,14 +379,6 @@ void DeviceAgent::setDeviceInfo(const IDeviceInfo* deviceInfo)
     m_uniqueId = deviceInfo->id();
     m_sharedId = deviceInfo->sharedId();
     m_channelNumber = deviceInfo->channelNumber();
-}
-
-//-------------------------------------------------------------------------------------------------
-
-void DeviceAgent::setManifest(Hanwha::DeviceAgentManifest manifest)
-{
-    m_manifest = manifest;
-    setSupportedEventCategoties();
 }
 
 //-------------------------------------------------------------------------------------------------

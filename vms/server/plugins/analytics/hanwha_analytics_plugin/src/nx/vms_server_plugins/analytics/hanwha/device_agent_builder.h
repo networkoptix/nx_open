@@ -51,6 +51,8 @@ public:
     std::unique_ptr<DeviceAgent> createDeviceAgent() const;
 
 private:
+    bool hasSubmenu(const QString endpoint, const QString submenu);
+
     SettingsCapabilities fetchSettingsCapabilities() const;
 
     RoiResolution fetchRoiResolution() const;

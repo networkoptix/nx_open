@@ -44,7 +44,6 @@ public:
         nx::sdk::analytics::IDeviceAgent::IHandler* IHandler) override;
 
     void setDeviceInfo(const nx::sdk::IDeviceInfo* deviceInfo);
-    void setManifest(Hanwha::DeviceAgentManifest manifest);
 
     void setMonitor(MetadataMonitor* monitor);
 

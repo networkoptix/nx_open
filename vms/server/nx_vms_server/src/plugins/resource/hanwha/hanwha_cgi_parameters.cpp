@@ -63,6 +63,19 @@ std::optional<HanwhaCgiParameter> HanwhaCgiParameters::parameter(const QString& 
     return parameter(split[0], split[1], split[2], split[3]);
 }
 
+bool HanwhaCgiParameters::hasSubmenu(const QString& cgi, const QString& submenu) const
+{
+    auto cgiItr = m_parameters.find(cgi);
+    if (cgiItr == m_parameters.cend())
+        return false;
+
+    auto submenuItr = cgiItr->second.find(submenu);
+    if (submenuItr == cgiItr->second.cend())
+        return false;
+
+    return true;
+}
+
 bool HanwhaCgiParameters::isValid() const
 {
     return m_isValid

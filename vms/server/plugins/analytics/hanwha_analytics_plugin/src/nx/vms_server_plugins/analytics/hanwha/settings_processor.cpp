@@ -225,9 +225,10 @@ void SettingsProcessor::loadAndHoldExclusiveSettingsFromServer(const nx::sdk::IS
     if (m_settings.analyticsCategories[videoAnalytics])
     {
         for (int i = 0; i < Settings::kMultiplicity; ++i)
-        {
             m_settings.ivaLines[i].readExclusiveFromServerOrThrow(sourceMap);
-        }
+
+        for (int i = 0; i < Settings::kMultiplicity; ++i)
+            m_settings.ivaAreas[i].readExclusiveFromServerOrThrow(sourceMap);
     }
 }
 

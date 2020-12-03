@@ -31,6 +31,8 @@ public:
 
     std::optional<HanwhaCgiParameter> parameter(const QString& path) const;
 
+    bool hasSubmenu(const QString& cgi, const QString& submenu) const;
+
     bool isValid() const;
 
     nx::network::http::StatusCode::Value statusCode() const;
