@@ -1931,7 +1931,7 @@
     <message>
       <location/>
       <source>Background Image</source>
-      <translation>背景イメージ</translation>
+      <translation>背景画像</translation>
     </message>
     <message>
       <location/>
@@ -1951,7 +1951,7 @@
     <message>
       <location/>
       <source>Image</source>
-      <translation>イメージ:</translation>
+      <translation>画像</translation>
     </message>
     <message>
       <location/>

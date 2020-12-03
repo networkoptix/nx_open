@@ -43,7 +43,7 @@
     <name>QAbstractSpinBox</name>
     <message>
       <source>&amp;Select All</source>
-      <translation type="unfinished">&amp;Select All</translation>
+      <translation>&amp;Seleccionar-ho tot</translation>
     </message>
     <message>
       <source>&amp;Step up</source>
@@ -82,19 +82,19 @@
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation type="unfinished">Scroll Left</translation>
+      <translation>Desplaçar cap a l’esquerra</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation type="unfinished">Scroll Right</translation>
+      <translation>Desplaçar cap a la dreta</translation>
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation type="unfinished">Scroll Up</translation>
+      <translation>Desplaçar cap amunt</translation>
     </message>
     <message>
       <source>Scroll Down</source>
-      <translation type="unfinished">Scroll Down</translation>
+      <translation>Desplaçar cap avall</translation>
     </message>
     <message>
       <source>Previous Page</source>
@@ -208,7 +208,7 @@
     </message>
     <message>
       <source>Exit</source>
-      <translation type="unfinished">Exit</translation>
+      <translation>Sortir</translation>
     </message>
     <message>
       <source>Cut</source>
@@ -224,7 +224,7 @@
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Seleccionar-ho tot</translation>
     </message>
   </context>
   <context>
@@ -340,7 +340,7 @@ Press ESC to cancel</translation>
     <name>QDialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
   </context>
   <context>
@@ -479,7 +479,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Obrir</translation>
     </message>
     <message>
       <source>Save As</source>
@@ -495,7 +495,7 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>&amp;Open</source>
-      <translation type="unfinished">&amp;Open</translation>
+      <translation>&amp;Obrir</translation>
     </message>
     <message>
       <source>&amp;Choose</source>
@@ -515,11 +515,11 @@ Press ESC to cancel</translation>
     </message>
     <message>
       <source>&amp;Rename</source>
-      <translation type="unfinished">&amp;Rename</translation>
+      <translation>&amp;Reanomenar</translation>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation type="unfinished">&amp;Delete</translation>
+      <translation>&amp;Eliminar</translation>
     </message>
     <message>
       <source>Show &amp;hidden files</source>
@@ -565,7 +565,7 @@ Please verify the correct file name was given.</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Eliminar</translation>
     </message>
     <message>
       <source>&apos;%1&apos; is write protected.
@@ -628,7 +628,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Desconegut</translation>
     </message>
     <message>
       <source>Sidebar</source>
@@ -724,7 +724,7 @@ Do you want to delete it anyway?</translation>
     <name>QGnomeTheme</name>
     <message>
       <source>&amp;OK</source>
-      <translation type="unfinished">&amp;OK</translation>
+      <translation>&amp;OK</translation>
     </message>
     <message>
       <source>&amp;Save</source>
@@ -732,11 +732,11 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>&amp;Cancel</source>
-      <translation type="unfinished">&amp;Cancel</translation>
+      <translation>&amp;Cancel·lar</translation>
     </message>
     <message>
       <source>&amp;Close</source>
-      <translation type="unfinished">&amp;Close</translation>
+      <translation>&amp;Tancar</translation>
     </message>
     <message>
       <source>Close without Saving</source>
@@ -771,7 +771,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Error desconegut</translation>
     </message>
     <message>
       <source>file to open is a directory</source>
@@ -798,14 +798,14 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Error desconegut</translation>
     </message>
   </context>
   <context>
     <name>QImageWriter</name>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Error desconegut</translation>
     </message>
     <message>
       <source>Device is not set</source>
@@ -863,11 +863,11 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Eliminar</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Seleccionar-ho tot</translation>
     </message>
   </context>
   <context>
@@ -882,18 +882,18 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Help</source>
-      <translation type="unfinished">Help</translation>
+      <translation>Ajuda</translation>
     </message>
   </context>
   <context>
     <name>QPlatformTheme</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Save</source>
@@ -905,7 +905,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation type="unfinished">Open</translation>
+      <translation>Obrir</translation>
     </message>
     <message>
       <source>&amp;Yes</source>
@@ -937,23 +937,23 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Tancar</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancel·lar</translation>
     </message>
     <message>
       <source>Discard</source>
-      <translation type="unfinished">Discard</translation>
+      <translation>Descartar</translation>
     </message>
     <message>
       <source>Help</source>
-      <translation type="unfinished">Help</translation>
+      <translation>Ajuda</translation>
     </message>
     <message>
       <source>Apply</source>
-      <translation type="unfinished">Apply</translation>
+      <translation>Aplicar</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -968,7 +968,7 @@ Do you want to delete it anyway?</translation>
     <name>QProgressDialog</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Cancel·lar</translation>
     </message>
   </context>
   <context>
@@ -1005,7 +1005,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Top</source>
-      <translation type="unfinished">Top</translation>
+      <translation>Part superior</translation>
     </message>
     <message>
       <source>Right edge</source>
@@ -1013,7 +1013,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Bottom</source>
-      <translation type="unfinished">Bottom</translation>
+      <translation>Part inferior</translation>
     </message>
     <message>
       <source>Page left</source>
@@ -1076,7 +1076,7 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Pictures</source>
-      <translation type="unfinished">Pictures</translation>
+      <translation>Imatges</translation>
     </message>
     <message>
       <source>Temporary Directory</source>
@@ -1120,18 +1120,18 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Descarregar</translation>
     </message>
   </context>
   <context>
     <name>QTabBar</name>
     <message>
       <source>Scroll Left</source>
-      <translation type="unfinished">Scroll Left</translation>
+      <translation>Desplaçar cap a l’esquerra</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation type="unfinished">Scroll Right</translation>
+      <translation>Desplaçar cap a la dreta</translation>
     </message>
   </context>
   <context>
@@ -1169,11 +1169,11 @@ Do you want to delete it anyway?</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Eliminar</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Seleccionar-ho tot</translation>
     </message>
   </context>
 </TS>

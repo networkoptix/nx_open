@@ -1504,7 +1504,7 @@
       <source>First occurrence: %1 on %2 (%n times total)</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
-        <numerusform>最初の発生: 月日%1 %2 月日(合計%n 回)</numerusform>
+        <numerusform>最初の発生: %2 %1 (合計%n 回)</numerusform>
       </translation>
     </message>
     <message numerus="yes">

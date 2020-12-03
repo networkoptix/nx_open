@@ -125,7 +125,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Error desconegut.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
@@ -204,7 +204,7 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
@@ -584,7 +584,7 @@
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Hora</translation>
     </message>
     <message>
       <source>Time Licenses</source>
@@ -838,7 +838,7 @@
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Error desconegut</translation>
     </message>
     <message>
       <source>Server with matching Hardware ID not found</source>
@@ -857,11 +857,11 @@
     <name>QnResourceNameStrings</name>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Càmeres</translation>
     </message>
     <message>
       <source>cameras</source>
-      <translation type="unfinished">cameras</translation>
+      <translation>càmeres</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -873,11 +873,11 @@
     </message>
     <message>
       <source>Devices</source>
-      <translation type="unfinished">Devices</translation>
+      <translation>Dispositius</translation>
     </message>
     <message>
       <source>devices</source>
-      <translation type="unfinished">devices</translation>
+      <translation>dispositius</translation>
     </message>
     <message>
       <source>Device</source>
@@ -950,7 +950,7 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Desconegut</translation>
     </message>
     <message>
       <source>FREE License</source>
@@ -1186,7 +1186,7 @@
     <name>QnUserRolesManager</name>
     <message>
       <source>Owner</source>
-      <translation type="unfinished">Owner</translation>
+      <translation>Propietari</translation>
     </message>
     <message>
       <source>Administrator</source>
@@ -1261,7 +1261,7 @@
     </message>
     <message>
       <source>Unknown error.</source>
-      <translation type="unfinished">Unknown error.</translation>
+      <translation>Error desconegut.</translation>
     </message>
     <message>
       <source>Extraction was cancelled.</source>
@@ -1731,7 +1731,7 @@
     </message>
     <message>
       <source>Analytics Event</source>
-      <translation type="unfinished">Analytics Event</translation>
+      <translation>Esdeveniment d'analítica</translation>
     </message>
     <message>
       <source>%1 at %2</source>

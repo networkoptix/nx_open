@@ -1375,7 +1375,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
       <translation>
-        <numerusform>%nライセンス無効</numerusform>
+        <numerusform>%nライセンスを無効化しました</numerusform>
       </translation>
     </message>
   </context>
@@ -2096,7 +2096,7 @@ to view more bookmarks</source>
     <message>
       <source>Lo-Res Streams</source>
       <comment>Cameras Backup</comment>
-      <translation>解像度ストリーム</translation>
+      <translation>低解像度ストリーム</translation>
     </message>
     <message>
       <source>affect all servers in System</source>
@@ -2877,7 +2877,7 @@ to %1</source>
     <message>
       <source>System connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1 に接続されたシステム</translation>
+      <translation>システムは%1 に接続されました</translation>
     </message>
     <message>
       <source>Failed to connect System to %1</source>
@@ -2913,7 +2913,7 @@ to %1</source>
     </message>
     <message>
       <source>Server has a different version:</source>
-      <translation>サーバーは異なるバージョン:</translation>
+      <translation>サーバーのバージョンが異なります：</translation>
     </message>
     <message>
       <source>You will be asked to restart the client in compatibility mode.</source>
@@ -4140,15 +4140,15 @@ to %1</source>
     </message>
     <message>
       <source>Stretch</source>
-      <translation>モニターサイズに合せる</translation>
+      <translation>ウィンドウサイズに引き伸ばし</translation>
     </message>
     <message>
       <source>Fit</source>
-      <translation>縦に合す</translation>
+      <translation>縦幅を合わせる</translation>
     </message>
     <message>
       <source>Crop</source>
-      <translation>横に合す</translation>
+      <translation>横幅を合わせる</translation>
     </message>
     <message>
       <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
@@ -8787,7 +8787,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Update to Specific Build</source>
-      <translation>特定のビルドを更新</translation>
+      <translation>特定のビルドに更新</translation>
     </message>
     <message>
       <source>Uploading updates...</source>
@@ -10056,7 +10056,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Components of System have different versions:</source>
-      <translation>システムのコンポーネントは異なるバージョン:</translation>
+      <translation>バージョンの異なるサーバーが含まれています</translation>
     </message>
     <message>
       <source>Please update all components to the version %1</source>
