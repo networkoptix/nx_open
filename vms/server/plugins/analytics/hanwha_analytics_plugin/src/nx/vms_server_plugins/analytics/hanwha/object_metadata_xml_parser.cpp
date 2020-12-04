@@ -271,7 +271,8 @@ std::vector<Ptr<Attribute>> ObjectMetadataXmlParser::extractAttributes(
 
             std::unordered_map<std::string, int> counts;
             forEachChildElement(element, "",
-                [&](const auto& child) {
+                [&](const auto& child)
+                {
                     ++counts[child.tagName().toStdString()];
                 });
 
@@ -286,7 +287,8 @@ std::vector<Ptr<Attribute>> ObjectMetadataXmlParser::extractAttributes(
 
             std::unordered_map<std::string, int> indices;
             forEachChildElement(element, "",
-                [&](const auto& child) {
+                [&](const auto& child)
+                {
                     const auto name  = child.tagName().toStdString();
 
                     QString suffix;
@@ -306,7 +308,6 @@ std::vector<Ptr<Attribute>> ObjectMetadataXmlParser::extractAttributes(
 
                 walk(walk, rootTag, element);
             });
-
 
     std::vector<Ptr<Attribute>> result;
     result.reserve(trackData.attributes.size());
@@ -350,7 +351,8 @@ ObjectMetadataXmlParser::ObjectResult ObjectMetadataXmlParser::extractObjectMeta
         return {};
 
     const QString objectTypeName = QString::fromStdString(classInfo->internalClassName).trimmed();
-    std::string objectTypeId = m_engineManifest.objectTypeIdByInternalName(objectTypeName).toStdString();
+    const std::string objectTypeId =
+        m_engineManifest.objectTypeIdByInternalName(objectTypeName).toStdString();
     if (objectTypeId.empty())
         return {};
 
@@ -396,7 +398,6 @@ ObjectMetadataXmlParser::ObjectResult ObjectMetadataXmlParser::extractObjectMeta
         metadata->setBoundingBox(relativeRect);
         metadata->addAttributes(attributes);
     }
-
 
     return {std::move(metadata), std::move(bestShotPacket), objectTypeId, objectId};
 }

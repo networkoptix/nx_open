@@ -212,7 +212,7 @@ void DeviceAgent::setSupportedEventCategoties()
  * Read the plugin settings from the server to deviceAgent settings and write them into the
  * agent's device (usually a camera).
  * If a setting can not be written, its name is added to `outResult` error map.
- * if a setting is written successfully, corresponding deviceAgest setting is updated.
+ * if a setting is written successfully, corresponding deviceAgent setting is updated.
 */
 /*virtual*/ void DeviceAgent::doSetSettings(
     Result<const ISettingsResponse*>* outResult, const IStringMap* sourceMap) /*override*/

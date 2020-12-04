@@ -125,18 +125,27 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
 {
     QByteArray manifestData;
     QFile f(":/hanwha/manifest.json");
+    QString filename = QFileInfo(f).absoluteFilePath();
     if (f.open(QFile::ReadOnly))
         manifestData = f.readAll();
+    else
+        NX_WARNING(this, "Unable to open Engine manifest in Server resource %1", filename);
+
     {
         QFile file("plugins/hanwha/manifest.json");
+        filename = QFileInfo(file).absoluteFilePath();
         if (file.open(QFile::ReadOnly))
         {
-            NX_INFO(this,
-                lm("Switch to external manifest file %1").arg(QFileInfo(file).absoluteFilePath()));
+            NX_INFO(this, "Switching to external Engine manifest file %1", filename);
             manifestData = file.readAll();
         }
     }
-    m_manifest = QJson::deserialized<Hanwha::EngineManifest>(manifestData);
+    bool success = false;
+    m_manifest = QJson::deserialized<Hanwha::EngineManifest>(
+        manifestData, /*defaultValue*/ {}, &success);
+    if (!success)
+        NX_WARNING(this, "Invalid Engine manifest JSON in file %1", filename);
+
     m_manifest.initializeObjectTypeMap();
 
     QByteArray attributeFiltersData;
