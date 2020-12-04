@@ -300,17 +300,7 @@ Engine::DeviceData& Engine::getCachedDeviceData(const IDeviceInfo* deviceInfo)
         const bool eventTypesFetched = fetchSupportedEventTypeIds(&data, deviceInfo);
         const bool objectTypesFetched = fetchSupportedObjectTypeIds(&data, deviceInfo);
         if (eventTypesFetched || objectTypesFetched)
-        {
-            if (!data.supportedEventTypeIds.isEmpty()
-                && !data.supportedObjectTypeIds.contains(kThermalObjectTypeId))
-            {
-                data.supportedObjectTypeIds.push_back(kThermalObjectTypeId);
-                data.supportedObjectTypeIds.push_back(kThermalObjectPreAlarmTypeId);
-                data.supportedObjectTypeIds.push_back(kThermalObjectAlarmTypeId);
-            }
-
             timeout.restart();
-        }
     }
     return data;
 }

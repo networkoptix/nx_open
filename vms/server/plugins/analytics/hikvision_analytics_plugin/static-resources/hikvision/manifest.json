@@ -320,15 +320,24 @@
         },
         {
             "id": "nx.hikvision.ThermalObject",
-            "name": "Temperature tracking"
+            "name": "Temperature tracking",
+            "sourceCapabilities": [
+                "thermometry"
+            ]
         },
         {
             "id": "nx.hikvision.ThermalObjectPreAlarm",
-            "name": "Temperature pre-alarm"
+            "name": "Temperature pre-alarm",
+            "sourceCapabilities": [
+                "thermometry"
+            ]
         },
         {
             "id": "nx.hikvision.ThermalObjectAlarm",
-            "name": "Temperature alarm"
+            "name": "Temperature alarm",
+            "sourceCapabilities": [
+                "thermometry"
+            ]
         }
     ]
 }
