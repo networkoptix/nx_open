@@ -39,6 +39,16 @@ QnWritableCompressedVideoDataPtr getVideoData(QnAbstractStreamDataProvider* prov
 TEST(FfmpegVideoTranscoder, ResolutionTest)
 {
     av_register_all();
+
+    {
+        // Round target resolution if there is no filters
+        QSize sourceResolution = QSize(720, 570);
+        auto provider = getProvider(sourceResolution);
+        QnFfmpegVideoTranscoder transcoder(DecoderConfig(), nullptr, AV_CODEC_ID_H264);
+        ASSERT_TRUE(transcoder.open(getVideoData(provider.get())));
+        ASSERT_EQ(transcoder.getOutputResolution(), QSize(720, 572));
+    }
+
     {
         // Use max resolution from resource.
         QSize maxResourceResolution = QSize(1920, 1080);

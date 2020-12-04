@@ -261,6 +261,24 @@ void FilterChain::prepareWatermarkFilter()
         push_back(QnAbstractImageFilterPtr(new WatermarkImageFilter(m_settings.watermark)));
 }
 
+void FilterChain::createScaleImageFilter(const QSize& dstSize)
+{
+    auto scaleFilter = !empty()
+        ? front().dynamicCast<QnScaleImageFilter>()
+        : QSharedPointer<QnScaleImageFilter>();
+
+    if (!scaleFilter)
+    {
+        // Adding scale filter.
+        scaleFilter.reset(new QnScaleImageFilter(dstSize));
+        push_front(scaleFilter);
+    }
+    else
+    {
+        scaleFilter->setOutputImageSize(dstSize);
+    }
+}
+
 void FilterChain::prepareDownscaleFilter(const QSize& srcFrameResolution,
     const QSize& resolutionLimit)
 {
@@ -268,11 +286,13 @@ void FilterChain::prepareDownscaleFilter(const QSize& srcFrameResolution,
     for (auto prevResizeRatio = 1.0; prevResizeRatio > 0.07; )
     {
         // We can't be sure the way input image scale affects output, so adding a loop...
-        const QSize resultResolution = apply(srcFrameResolution);
+        const QSize resultResolution = QnCodecTranscoder::roundSize(apply(srcFrameResolution));
         if (resultResolution.width() <= resolutionLimit.width() &&
             resultResolution.height() <= resolutionLimit.height())
         {
-            break;  //resolution is OK
+            if (resultResolution != srcFrameResolution && empty())
+                createScaleImageFilter(resultResolution);
+            return;  //resolution is OK
         }
 
         auto resizeRatio = 1.0;
@@ -308,20 +328,7 @@ void FilterChain::prepareDownscaleFilter(const QSize& srcFrameResolution,
             QSize(srcFrameResolution.width() * resizeRatio,
                 srcFrameResolution.height() * resizeRatio));
 
-        auto scaleFilter = !empty()
-            ? front().dynamicCast<QnScaleImageFilter>()
-            : QSharedPointer<QnScaleImageFilter>();
-
-        if (!scaleFilter)
-        {
-            // Adding scale filter.
-            scaleFilter.reset(new QnScaleImageFilter(resizeToSize));
-            push_front(scaleFilter);
-        }
-        else
-        {
-            scaleFilter->setOutputImageSize(resizeToSize);
-        }
+        createScaleImageFilter(resizeToSize);
     }
 }
 
