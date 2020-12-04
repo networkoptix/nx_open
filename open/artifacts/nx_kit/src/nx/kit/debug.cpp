@@ -4,6 +4,7 @@
 
 #include <chrono>
 #include <deque>
+#include <fstream>
 #include <vector>
 #include <numeric>
 #include <algorithm>
@@ -198,6 +199,28 @@ void printHexDump(
     }
     s += "\n}";
     printFunc(s.c_str());
+}
+
+void saveStr(
+    PrintFunc printFunc,
+    const char* originDir,
+    const char* filename,
+    const char* strCaption,
+    const std::string& str)
+{
+    const std::string effectiveFilename = nx::kit::utils::absolutePath(originDir, filename);
+
+    std::ofstream file(effectiveFilename);
+    if (!file.good())
+    {
+        printFunc(("####### ERROR: Unable to rewrite file " + effectiveFilename).c_str());
+        return;
+    }
+
+    printFunc(("####### Saving string (" + std::string(strCaption) + ") to file "
+        + effectiveFilename).c_str());
+
+    file.write(str.c_str(), str.size()); //< Support '\0' inside the string.
 }
 
 } // namespace detail

@@ -33,6 +33,34 @@ TEST(utils, baseName)
     #if defined(_WIN32)
         ASSERT_STREQ("bar", baseName("d:bar"));
         ASSERT_STREQ("bar", baseName("X:\\bar"));
+        ASSERT_STREQ("bar", baseName("X:/bar"));
+    #endif
+}
+
+TEST(utils, absolutePath)
+{
+    ASSERT_STREQ("", absolutePath("", ""));
+    ASSERT_STREQ("origin", absolutePath("origin", ""));
+    ASSERT_STREQ("/x/y", absolutePath("", "/x/y"));
+
+    ASSERT_STREQ("/x/y", absolutePath("ignored", "/x/y"));
+    ASSERT_STREQ("x/y", absolutePath("", "x/y"));
+    ASSERT_STREQ("origin/x/y", absolutePath("origin", "x/y"));
+    ASSERT_STREQ("origin/x/y", absolutePath("origin/", "x/y"));
+
+    #if defined(_WIN32)
+        ASSERT_STREQ("\\x\\y", absolutePath("", "\\x\\y"));
+
+        ASSERT_STREQ("C:\\x\\y", absolutePath("ignored", "C:\\x\\y"));
+        ASSERT_STREQ("C:/x/y", absolutePath("ignored", "C:/x/y"));
+        ASSERT_STREQ("x\\y", absolutePath("", "x\\y"));
+        ASSERT_STREQ("\\x\\y", absolutePath("ignored", "\\x\\y"));
+        ASSERT_STREQ("origin\\x/y", absolutePath("origin\\", "x/y"));
+        ASSERT_STREQ("origin\\x\\y", absolutePath("origin", "x\\y"));
+        ASSERT_STREQ("origin\\x\\y/z", absolutePath("origin", "x\\y/z"));
+
+        ASSERT_STREQ("origin\\a\\path", absolutePath("origin\\a", "path"));
+        ASSERT_STREQ("origin/a/path", absolutePath("origin/a", "path"));
     #endif
 }
 
