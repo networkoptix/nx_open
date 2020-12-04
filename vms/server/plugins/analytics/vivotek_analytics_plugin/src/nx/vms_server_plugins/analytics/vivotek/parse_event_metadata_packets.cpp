@@ -72,11 +72,14 @@ std::vector<Ptr<EventMetadataPacket>> parseEventMetadataPackets(const JsonValue&
     const auto data = native["Data"].to<JsonArray>();
     for (int i = 0; i < data.size(); ++i)
     {
-        const auto behaviorAlarmInfo = data[i]["BehaviorAlarmInfo"].to<JsonArray>();
-        for (int j = 0; j < behaviorAlarmInfo.size(); ++j)
+        if (data[i].contains("BehaviorAlarmInfo"))
         {
-            if (auto packet = parsePacket(behaviorAlarmInfo[j].to<JsonObject>()))
-                packets.push_back(std::move(packet));
+            const auto behaviorAlarmInfo = data[i]["BehaviorAlarmInfo"].to<JsonArray>();
+            for (int j = 0; j < behaviorAlarmInfo.size(); ++j)
+            {
+                if (auto packet = parsePacket(behaviorAlarmInfo[j].to<JsonObject>()))
+                    packets.push_back(std::move(packet));
+            }
         }
     }
 

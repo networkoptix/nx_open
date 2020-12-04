@@ -140,7 +140,7 @@ JsonValue JsonValue::at(int index) const
 void JsonValue::to(bool* value) const
 {
     if (!isBool())
-        throw Exception("%1 is not a boolean", path);
+        throw Exception("%1 is %2 while %3 is expected", path, type(), Bool);
 
     *value = toBool();
 }
@@ -150,7 +150,7 @@ void JsonValue::to(int* value) const
     auto doubleValue = to<double>();
     double roundedDoubleValue = std::round(doubleValue);
     if (roundedDoubleValue != doubleValue)
-        throw Exception("%1 is not an integer", path);
+        throw Exception("%1 has fractional part", path);
     if (roundedDoubleValue < INT_MIN || INT_MAX < roundedDoubleValue)
         throw Exception("%1 is out of int range", path);
 
@@ -165,7 +165,7 @@ void JsonValue::to(float* value) const
 void JsonValue::to(double* value) const
 {
     if (!isDouble())
-        throw Exception("%1 is not a number", path);
+        throw Exception("%1 is %2 while %3 is expected", path, type(), Double);
 
     *value = toDouble();
 }
@@ -173,7 +173,7 @@ void JsonValue::to(double* value) const
 void JsonValue::to(QString* value) const
 {
     if (!isString())
-        throw Exception("%1 is not a string", path);
+        throw Exception("%1 is %2 while %3 is expected", path, type(), String);
 
     *value = toString();
 }
@@ -181,7 +181,7 @@ void JsonValue::to(QString* value) const
 void JsonValue::to(JsonObject* value) const
 {
     if (!isObject())
-        throw Exception("%1 is not an object", path);
+        throw Exception("%1 is %2 while %3 is expected", path, type(), Object);
 
     *value = toObject();
     value->path = path;
@@ -190,10 +190,25 @@ void JsonValue::to(JsonObject* value) const
 void JsonValue::to(JsonArray* value) const
 {
     if (!isArray())
-        throw Exception("%1 is not an array", path);
+        throw Exception("%1 is %2 while %3 is expected", path, type(), Array);
 
     *value = toArray();
     value->path = path;
+}
+
+bool JsonValue::contains(const QString& string) const
+{
+    if (isString())
+        return to<QString>().contains(string);
+
+    if (isObject())
+        return to<JsonObject>().contains(string);
+
+    if (isArray())
+        return to<JsonArray>().contains(string);
+
+    throw Exception("%1 is %2 while %3, %4 or %5 is expected",
+        path, type(), String, Object, Array);
 }
 
 JsonValueRef::JsonValueRef(QJsonValueRef valueRef):
@@ -205,6 +220,11 @@ JsonValueRef& JsonValueRef::operator=(QJsonValueRef valueRef)
 {
     QJsonValueRef::operator=(valueRef);
     return *this;
+}
+
+bool JsonValueRef::contains(const QString& string) const
+{
+    return JsonValue(*this).contains(string);
 }
 
 JsonValue parseJson(const QByteArray& bytes)
@@ -225,8 +245,9 @@ QByteArray serializeJson(const QJsonValue& json)
         document.setObject(json.toObject());
     else if (json.isArray())
         document.setArray(json.toArray());
-    else if (!NX_ASSERT(json.isObject() || json.isArray()))
-        throw std::invalid_argument("Can only serialize object or array");
+    else
+        throw Exception("Can only serialize %1 or %2", JsonValue::Object, JsonValue::Array);
+
     return document.toJson(QJsonDocument::Compact);
 }
 

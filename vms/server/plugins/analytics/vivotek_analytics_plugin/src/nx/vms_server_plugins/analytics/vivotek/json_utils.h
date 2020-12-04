@@ -80,6 +80,8 @@ struct JsonValue: QJsonValue
         to(&value);
         return value;
     }
+
+    bool contains(const QString& string) const;
 };
 
 struct JsonValueRef: QJsonValueRef
@@ -115,6 +117,8 @@ struct JsonValueRef: QJsonValueRef
     {
         return JsonValue(*this).to<Value>();
     }
+
+    bool contains(const QString& string) const;
 };
 
 JsonValue parseJson(const QByteArray& bytes);
