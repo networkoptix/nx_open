@@ -177,7 +177,7 @@ static constexpr int kHexDumpBytesPerLine = 16;
 void printHexDump(
     PrintFunc printFunc, const char* caption, const char* const bytes, int size)
 {
-    std::string s = format("Hex dump \"%s\", %d bytes @%p:", caption, size, bytes);
+    std::string s = format("####### Hex dump \"%s\", %d bytes @%p:", caption, size, bytes);
 
     if (size <= 8) //< Print in single line.
     {
@@ -247,7 +247,7 @@ void Timer::mark(const char* markStr)
     const auto t = getTimeUs() - d->startTimeUs;
     if (std::find(d->marks.begin(), d->marks.end(), std::string(markStr)) != d->marks.end())
     {
-        d->printFunc((std::string("NX_TIME(") + d->tag + ") INTERNAL ERROR: Timer mark \""
+        d->printFunc((std::string("####### NX_TIME(") + d->tag + ") INTERNAL ERROR: Timer mark \""
             + markStr + "\" already defined.").c_str());
     }
     else
@@ -278,7 +278,7 @@ void Timer::finish()
         s.append(format("last: %3d ms", (int) ((500 + t) / 1000)));
     }
 
-    d->printFunc((std::string("NX_TIME(") + d->tag + "): " + s).c_str());
+    d->printFunc((std::string("####### NX_TIME(") + d->tag + "): " + s).c_str());
 }
 
 } // namespace detail
@@ -321,7 +321,7 @@ void Fps::mark(const char* markStr /*= nullptr */)
         double deltaAvg = d->deltaUsList.empty() ? 0 :
             std::accumulate(d->deltaUsList.begin(), d->deltaUsList.end(), 0.0)
                 / d->deltaUsList.size();
-        d->printFunc(format("NX_FPS(%s): avg %4.1f, dt %3d ms, avg dt %3d ms%s",
+        d->printFunc(format("####### NX_FPS(%s): avg %4.1f, dt %3d ms, avg dt %3d ms%s",
             d->tag,
             1000000.0 / deltaAvg,
             int((500 + deltaUs) / 1000),
