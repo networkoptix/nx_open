@@ -165,6 +165,18 @@ NX_KIT_API void intentionallyCrash(const char* message);
  */
 NX_KIT_API std::string hexDumpLine(const char* bytes, int size, int bytesPerLine = 0);
 
+#if !defined(NX_DEBUG_SAVE_DIR)
+    /** If needed, redefine to provide a relative path origin for NX_SAVE_... macros. */
+    #define NX_DEBUG_SAVE_DIR ::nx::kit::IniConfig::iniFilesDir()
+#endif
+
+/**
+ * Saves the string to the file, If the path is relative, use NX_DEBUG_SAVE_DIR as the origin.
+ */
+#define NX_SAVE_STR(FILENAME, STR) \
+    ::nx::kit::debug::detail::saveStr( \
+        NX_KIT_DEBUG_DETAIL_PRINT_FUNC, (NX_DEBUG_SAVE_DIR), (FILENAME), #STR, (STR))
+
 //-------------------------------------------------------------------------------------------------
 // Time
 
@@ -293,6 +305,13 @@ private:
 
 NX_KIT_API void printHexDump(
     PrintFunc printFunc, const char* caption, const char* bytes, int size);
+
+NX_KIT_API void saveStr(
+    PrintFunc printFunc,
+    const char* originDir,
+    const char* filename,
+    const char* strCaption,
+    const std::string& str);
 
 } // namespace detail
 
