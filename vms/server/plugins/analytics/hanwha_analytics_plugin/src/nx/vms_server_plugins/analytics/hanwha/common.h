@@ -63,7 +63,7 @@ public:
         const Hanwha::EventType& eventTypeDescriptorById(const QString& id) const;
         const Hanwha::ObjectType& objectTypeDescriptorById(const QString& id) const;
 
-        void InitializeObjectTypeMap();
+        void initializeObjectTypeMap();
         QString objectTypeIdByInternalName(const QString& eventName) const;
 
     private:

@@ -137,7 +137,7 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
         }
     }
     m_manifest = QJson::deserialized<Hanwha::EngineManifest>(manifestData);
-    m_manifest.InitializeObjectTypeMap();
+    m_manifest.initializeObjectTypeMap();
 
     QByteArray attributeFiltersData;
     QFile attributeFiltersFile(":/hanwha/object_metadata_attribute_filters.json");
@@ -198,7 +198,7 @@ void Engine::getManifest(Result<const IString*>* outResult) const
 /*virtual*/ void Engine::doSetSettings(
     Result<const ISettingsResponse*>* /*outResult*/, const IStringMap* /*settings*/)
 {
-    // There are no DeviceAgent settings for this plugin.
+    // There are no Engine settings for this plugin.
 }
 
 /*virtual*/ void Engine::getPluginSideSettings(

@@ -45,7 +45,7 @@ const char* ObjectTrackInfo::bestShotImageData() const
 
 int ObjectTrackInfo::bestShotImageDataSize() const
 {
-    return m_bestShotImageData.size();
+    return (int) m_bestShotImageData.size();
 }
 
 const char* ObjectTrackInfo::bestShotImageDataFormat() const

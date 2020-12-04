@@ -13,7 +13,7 @@ struct LoggingIni: public nx::kit::IniConfig
         "will be written. If empty, no logging is performed.");
 
     NX_INI_FLAG(1, logObjectMetadataDetails,
-        "If set, additional information about objects (uuid, bounding boxes) will be logged");
+        "If set, additional information about objects (uuid, bounding boxes) will be logged.");
 
     bool isLoggingEnabled() const
     {

@@ -53,7 +53,7 @@ const char* ObjectTrackBestShotPacket::imageData() const
 
 int ObjectTrackBestShotPacket::imageDataSize() const
 {
-    return m_imageData.size();
+    return (int) m_imageData.size();
 }
 
 const char* ObjectTrackBestShotPacket::imageDataFormat() const
