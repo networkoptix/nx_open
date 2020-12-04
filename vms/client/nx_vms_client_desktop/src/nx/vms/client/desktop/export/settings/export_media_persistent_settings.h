@@ -109,7 +109,7 @@ struct ExportTimestampOverlayPersistentSettings: public ExportOverlayPersistentS
 
 struct ExportInfoOverlayPersistentSettings: public ExportTextOverlayPersistentSettingsBase
 {
-    Qt::DateFormat format = Qt::DefaultLocaleLongDate;
+    Qt::DateFormat format = Qt::DefaultLocaleShortDate;
     bool exportCameraName = false;
     bool exportDate = false;
 
