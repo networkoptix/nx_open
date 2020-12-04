@@ -9008,9 +9008,9 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::NameValueTable</name>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
+      <translation>
+        <numerusform>+%n valors</numerusform>
+        <numerusform>+%n valors</numerusform>
       </translation>
     </message>
   </context>

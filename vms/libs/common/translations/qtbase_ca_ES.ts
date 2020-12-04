@@ -5,38 +5,38 @@
     <name>CloseButton</name>
     <message>
       <source>Close Tab</source>
-      <translation type="unfinished">Close Tab</translation>
+      <translation>Tanca la pestanya</translation>
     </message>
   </context>
   <context>
     <name>MAC_APPLICATION_MENU</name>
     <message>
       <source>Services</source>
-      <translation type="unfinished">Services</translation>
+      <translation>Serveis</translation>
     </message>
     <message>
       <source>Hide %1</source>
-      <translation type="unfinished">Hide %1</translation>
+      <translation>Amaga %1</translation>
     </message>
     <message>
       <source>Hide Others</source>
-      <translation type="unfinished">Hide Others</translation>
+      <translation>Amaga els altres</translation>
     </message>
     <message>
       <source>Show All</source>
-      <translation type="unfinished">Show All</translation>
+      <translation>Mostra-ho tot</translation>
     </message>
     <message>
       <source>Preferences...</source>
-      <translation type="unfinished">Preferences...</translation>
+      <translation>Preferències...</translation>
     </message>
     <message>
       <source>Quit %1</source>
-      <translation type="unfinished">Quit %1</translation>
+      <translation>Tanca %1</translation>
     </message>
     <message>
       <source>About %1</source>
-      <translation type="unfinished">About %1</translation>
+      <translation>Quant a %1</translation>
     </message>
   </context>
   <context>
