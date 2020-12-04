@@ -55,7 +55,7 @@ NX_KIT_API std::string fileBaseNameWithoutExt(const char* file);
 #endif
 
 #if !defined(NX_DEBUG_INI)
-    /** If needed, redefine to form a prefix for NX_DEBUG_ENABLE... macros. */
+    /** If needed, redefine to form a prefix for NX_DEBUG_ENABLE_... macros. */
     #define NX_DEBUG_INI ini().
 #endif
 
