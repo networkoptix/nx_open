@@ -6,6 +6,7 @@
 #include <QtCore/QUrlQuery>
 #include <QtCore/QFile>
 
+#include <nx/kit/debug.h>
 #include <nx/network/http/http_client.h>
 #include <plugins/resource/hanwha/hanwha_cgi_parameters.h>
 #include <nx/vms/api/analytics/device_agent_manifest.h>
@@ -121,6 +122,25 @@ void Engine::SharedResources::setResourceAccess(
 
 //-------------------------------------------------------------------------------------------------
 
+void Engine::injectBoundingBoxColorPaletteIntoSettingsModel(QByteArray* manifest)
+{
+    // NOTE: Ideally, this job would be done after parsing the manifest string, but QJsonValue
+    // does not allow for easy effective iteration, hence performing it on the JSON string level.
+
+    // TODO: ATTENTION: The color names are coupled with the palette hard-coded in
+    //     nx/vms/client/desktop/analytics/object_display_settings.cpp.
+
+    const QByteArray itemList =
+        "\"" + QByteArray(kNoSpecialColorComboBoxItem) + "\", "
+        + R"("Magenta", "Blue", "Green", "Yellow", "Cyan", "Purple", "Orange", "Red", "White")";
+
+    manifest->replace(
+        R"json("range": [ "_nx_sys_color_range" ])json",
+        R"json("range": [ )json" + itemList + " ]");
+}
+
+//-------------------------------------------------------------------------------------------------
+
 Engine::Engine(Plugin* plugin): m_plugin(plugin)
 {
     QByteArray manifestData;
@@ -140,6 +160,9 @@ Engine::Engine(Plugin* plugin): m_plugin(plugin)
             manifestData = file.readAll();
         }
     }
+
+    injectBoundingBoxColorPaletteIntoSettingsModel(&manifestData);
+
     bool success = false;
     m_manifest = QJson::deserialized<Hanwha::EngineManifest>(
         manifestData, /*defaultValue*/ {}, &success);

@@ -7,6 +7,7 @@
 #include <QtCore/QString>
 #include <QtNetwork/QAuthenticator>
 
+#include <nx/sdk/i_string_map.h>
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/helpers/string_map.h>
 #include <nx/sdk/analytics/i_device_agent.h>
@@ -72,6 +73,8 @@ private:
         const nx::sdk::analytics::IMetadataTypes* metadataTypes);
 
     void stopFetchingMetadata();
+
+    void applyWearingMaskBoundingBoxColorSettings(const nx::sdk::IStringMap* settings);
 
 public:
     std::string loadFirmwareVersion() const;

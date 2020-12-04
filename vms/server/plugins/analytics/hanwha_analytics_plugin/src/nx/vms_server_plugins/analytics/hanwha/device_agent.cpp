@@ -208,6 +208,25 @@ void DeviceAgent::setSupportedEventCategoties()
 
 //-------------------------------------------------------------------------------------------------
 
+void DeviceAgent::applyWearingMaskBoundingBoxColorSettings(const nx::sdk::IStringMap* settings)
+{
+    const std::string defaultValue = m_engine->kNoSpecialColorComboBoxItem;
+    const char* wearingMaskColor = settings->value("ObjectDetection.FaceMaskDetectedColor");
+    if (!wearingMaskColor)
+        wearingMaskColor = "";
+    if (wearingMaskColor == defaultValue)
+        wearingMaskColor = nullptr;
+
+    const char* notWearingMaskColor = settings->value("ObjectDetection.FaceMaskNotDetectedColor");
+    if (!notWearingMaskColor)
+        notWearingMaskColor = "";
+    if (notWearingMaskColor == defaultValue)
+        notWearingMaskColor = nullptr;
+
+    m_objectMetadataXmlParser.setWearingMaskBoundingBoxColor(wearingMaskColor);
+    m_objectMetadataXmlParser.setNotWearingMaskBoundingBoxColor(notWearingMaskColor);
+}
+
 /**
  * Read the plugin settings from the server to deviceAgent settings and write them into the
  * agent's device (usually a camera).
@@ -217,6 +236,8 @@ void DeviceAgent::setSupportedEventCategoties()
 /*virtual*/ void DeviceAgent::doSetSettings(
     Result<const ISettingsResponse*>* outResult, const IStringMap* sourceMap) /*override*/
 {
+    applyWearingMaskBoundingBoxColorSettings(sourceMap);
+
     if (!m_serverHasSentInitialSettings)
     {
         // First time we should load settings that are not stored on the device.

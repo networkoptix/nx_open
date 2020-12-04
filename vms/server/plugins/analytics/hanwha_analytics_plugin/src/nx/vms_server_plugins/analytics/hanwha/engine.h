@@ -76,6 +76,9 @@ public:
     std::shared_ptr<vms::server::plugins::HanwhaSharedResourceContext> sharedContext(
         QString m_sharedId);
 
+public:
+    static constexpr char kNoSpecialColorComboBoxItem[] = "No special color";
+
 protected:
     virtual void doSetSettings(
         nx::sdk::Result<const nx::sdk::ISettingsResponse*>* outResult,
@@ -92,6 +95,7 @@ protected:
 
 private:
     std::shared_ptr<SharedResources> sharedResources(const nx::sdk::IDeviceInfo* deviceInfo);
+    static void injectBoundingBoxColorPaletteIntoSettingsModel(QByteArray* manifest);
 
 private:
     nx::sdk::analytics::Plugin* const m_plugin;

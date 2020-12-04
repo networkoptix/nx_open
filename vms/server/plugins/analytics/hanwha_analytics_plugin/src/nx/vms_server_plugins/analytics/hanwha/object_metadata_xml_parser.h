@@ -40,6 +40,21 @@ public:
         const Hanwha::EngineManifest& engineManifest,
         const Hanwha::ObjectMetadataAttributeFilters& objectAttributeFilters);
 
+    /**
+     * Sets the value of "nx.sys.color" attribute for the nx.hanwha.ObjectDetection.Face Objects
+     * with "WearsMask" attribute set to "true" (case-insensitive). If not called, or called with
+     * an empty string, "nx.sys.color" attribute will not be set for such Objects.
+     */
+    void setWearingMaskBoundingBoxColor(const QString& value);
+
+    /**
+     * Sets the value of "nx.sys.color" attribute for the nx.hanwha.ObjectDetection.Face Objects
+     * with "WearsMask" attribute missing or set to a value other than "true" (case-insensitive).
+     * If not called, or called with an empty string, "nx.sys.color" attribute will not be set for
+     * such Objects.
+     */
+    void setNotWearingMaskBoundingBoxColor(const QString& value);
+
     Result parse(const QByteArray& data, int64_t timestampUs);
 
 private:
@@ -80,6 +95,10 @@ private:
 
     ObjectResult extractObjectMetadata(const QDomElement& object, std::int64_t timestampUs);
 
+    void addColorAttributeIfNeeded(
+        std::vector<nx::sdk::Ptr<nx::sdk::Attribute>>* attributes,
+        const std::string& objectTypeId);
+
     void collectGarbage();
 
 private:
@@ -88,6 +107,8 @@ private:
     const Hanwha::ObjectMetadataAttributeFilters& m_objectAttributeFilters;
     FrameScale m_frameScale;
     std::unordered_map<ObjectId, TrackData> m_objectTrackCache;
+    QString m_wearingMaskBoundingBoxColor;
+    QString m_notWearingMaskBoundingBoxColor;
 };
 
 //-------------------------------------------------------------------------------------------------

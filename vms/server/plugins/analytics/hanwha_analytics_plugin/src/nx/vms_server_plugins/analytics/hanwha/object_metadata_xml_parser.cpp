@@ -6,6 +6,7 @@
 #include <optional>
 #include <vector>
 
+#include <nx/kit/utils.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/match/wildcard.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
@@ -113,6 +114,18 @@ ObjectMetadataXmlParser::ObjectMetadataXmlParser(
     m_engineManifest(engineManifest),
     m_objectAttributeFilters(objectAttributeFilters)
 {
+}
+
+void ObjectMetadataXmlParser::setWearingMaskBoundingBoxColor(const QString& value)
+{
+    NX_VERBOSE(this, "%1(%2)", __func__, nx::kit::utils::toString(value));
+    m_wearingMaskBoundingBoxColor = value;
+}
+
+void ObjectMetadataXmlParser::setNotWearingMaskBoundingBoxColor(const QString& value)
+{
+    NX_VERBOSE(this, "%1(%2)", __func__, nx::kit::utils::toString(value));
+    m_notWearingMaskBoundingBoxColor = value;
 }
 
 ObjectMetadataXmlParser::Result ObjectMetadataXmlParser::parse(
@@ -329,6 +342,40 @@ std::vector<Ptr<Attribute>> ObjectMetadataXmlParser::extractAttributes(
     return result;
 }
 
+void ObjectMetadataXmlParser::addColorAttributeIfNeeded(
+    std::vector<Ptr<Attribute>>* attributes,
+    const std::string& objectTypeId)
+{
+    if (objectTypeId != "nx.hanwha.ObjectDetection.Face")
+        return;
+
+    const auto wearsMaskAttributeIt = std::find_if(attributes->begin(), attributes->end(),
+        [this](const auto& attribute)
+        {
+            return attribute->name() == std::string("WearsMask");
+        });
+
+    if (wearsMaskAttributeIt != attributes->end()
+        && QString((*wearsMaskAttributeIt)->value()).toLower() == "true")
+    {
+        // The attribute is true.
+        if (!m_wearingMaskBoundingBoxColor.isEmpty())
+        {
+            attributes->push_back(makePtr<Attribute>(Attribute::Type::string,
+                "nx.sys.color", m_wearingMaskBoundingBoxColor.toStdString()));
+        }
+    }
+    else
+    {
+        // The attribute is missing or non-true.
+        if (!m_notWearingMaskBoundingBoxColor.isEmpty())
+        {
+            attributes->push_back(makePtr<Attribute>(Attribute::Type::string,
+                "nx.sys.color", m_notWearingMaskBoundingBoxColor.toStdString()));
+        }
+    }
+}
+
 ObjectMetadataXmlParser::ObjectResult ObjectMetadataXmlParser::extractObjectMetadata(
     const QDomElement& object, std::int64_t timestampUs)
 {
@@ -373,7 +420,8 @@ ObjectMetadataXmlParser::ObjectResult ObjectMetadataXmlParser::extractObjectMeta
     if (rect)
         relativeRect = applyFrameScale(*rect);
 
-    const auto attributes = extractAttributes(trackData, appearance);
+    auto attributes = extractAttributes(trackData, appearance);
+    addColorAttributeIfNeeded(&attributes, objectTypeId);
 
     if (!imageRef.isNull())
     {
