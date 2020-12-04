@@ -96,6 +96,14 @@ NX_KIT_API void stringReplaceAll(
 NX_KIT_API std::string baseName(std::string path);
 
 /**
+ * If the specified path is absolute, just return it, otherwise, convert it to an absolute path
+ * using the specified origin dir. On Windows, both `/` and `\` are supported, and paths without
+ * a drive letter but started with `/` or `\` are treated as absolute.
+ */
+NX_KIT_API std::string absolutePath(
+    const std::string& originDir, const std::string& path);
+
+/**
  * @return Process name, without .exe in Windows.
  */
 NX_KIT_API std::string getProcessName();

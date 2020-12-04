@@ -53,6 +53,55 @@ std::string baseName(std::string path)
     #endif
 }
 
+std::string absolutePath(
+    const std::string& originDir, const std::string& path)
+{
+    if (originDir.empty())
+        return path;
+    if (path.empty())
+        return originDir;
+
+    if (path[0] == '/')
+        return path;
+
+    #if defined(_WIN32)
+        if (path[0] == '\\')
+            return path;
+        if (path.size() >= 2
+            && ((path[0] >= 'a' && path[0] <= 'z') || (path[0] >= 'A' && path[0] <= 'Z'))
+            && path[1] == ':')
+        {
+            return path;
+        }
+    #endif
+
+    char separator = '/';
+
+    if (originDir[originDir.size() - 1] == '/')
+        separator = '\0'; //< The separator is not needed.
+
+    #if defined(_WIN32)
+        if (originDir[originDir.size() - 1] == '\\')
+            separator = '\0'; //< The separator is not needed.
+        if (separator)
+        {
+            if (path.find('\\') != std::string::npos)
+                separator = '\\'; //< Change to backslash if backslashes exist in path.
+            else if (path.find('/') == std::string::npos
+                && originDir.find('\\') != std::string::npos)
+            {
+                // Neither slash nor backslash exists in path, but backslash exists in the origin.
+                separator = '\\';
+            }
+        }
+    #endif
+
+    if (separator)
+        return originDir + separator + path;
+
+    return originDir + path;
+}
+
 std::string getProcessName()
 {
     std::string processName =
