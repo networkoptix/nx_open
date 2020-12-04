@@ -1,7 +1,10 @@
 #include "object_display_settings.h"
 
+#include <regex>
+
 #include <QtCore/QHash>
 
+#include <nx/kit/utils.h>
 #include <nx/utils/random.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
@@ -73,8 +76,51 @@ QColor ObjectDisplaySettings::objectColor(const QString& objectTypeId)
     return settings.color;
 }
 
+/**
+ * Palette used for nx.sys.color attribute value.
+ * TODO: ATTENTION: These color names are coupled with hanwha_analytics_plugin.
+ */
+static const std::map</*name*/ std::string, /*hexRgb*/ std::string> kBoundingBoxPalette{
+    {"Magenta", "#E040FB"},
+    {"Blue", "#536DFE"},
+    {"Green", "#B2FF59"},
+    {"Yellow", "#FFFF00"},
+    {"Cyan", "#18FFFF"},
+    {"Purple", "#7C4DFF"},
+    {"Orange", "#FFAB40"},
+    {"Red", "#FF4081"},
+    {"White", "#FFFFFF"},
+};
+
 QColor ObjectDisplaySettings::objectColor(const nx::common::metadata::ObjectMetadata& object)
 {
+    for (const auto& attribute: object.attributes)
+    {
+        if (attribute.name != "nx.sys.color")
+            continue;
+
+        std::string value = attribute.value.toStdString();
+
+        if (!std::regex_match(value, std::regex("#[A-Fa-f0-9]{6}")))
+        {
+            const auto paletteEntry = kBoundingBoxPalette.find(value);
+
+            if (paletteEntry == kBoundingBoxPalette.end())
+            {
+                // The specified color is missing in the palette; ignore the attribute.
+                NX_DEBUG(this, "Analytics: Invalid nx.sys.color = %1 in ObjectMetadata %2%3",
+                    nx::kit::utils::toString(attribute.value),
+                    object.typeId,
+                    object.trackId);
+                break;
+            }
+
+            value = paletteEntry->second;
+        }
+
+        return QColor(QString::fromLatin1(value.c_str()));
+    }
+
     return objectColor(object.typeId);
 }
 
