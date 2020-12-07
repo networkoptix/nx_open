@@ -2951,7 +2951,8 @@ void MediaServerProcess::registerRestHandlers(
 
     /**%apidoc GET /ec2/analyticsTrackBestShot
      * Get the best shot for analytics track
-     * %param:string objectTrackId analytics object track id
+     * %param:string objectTrackId analytics object track id.
+     * %param:string cameraId Id of the camera that generated the object track.
      */
     reg("ec2/analyticsTrackBestShot", new QnMultiserverThumbnailRestHandler(serverModule()));
 
