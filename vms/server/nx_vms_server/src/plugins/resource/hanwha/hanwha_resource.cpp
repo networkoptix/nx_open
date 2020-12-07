@@ -1558,6 +1558,9 @@ CameraDiagnostics::Result HanwhaResource::initConfigurationalPtz()
 
     NX_VERBOSE(this, lm("%1: Supported PTZ capabilities alternative: %2")
         .args(getPhysicalId(), ptzCapabilityBits(configurationalCapabilities)));
+
+    setPtzCapabilities(configurationalCapabilities, core::ptz::Type::configurational);
+
     return CameraDiagnostics::NoErrorResult();
 }
 
