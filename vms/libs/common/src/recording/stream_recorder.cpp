@@ -525,6 +525,17 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
         return saveMotion(std::dynamic_pointer_cast<const QnMetaDataV1>(md));
     }
 
+    if (md->dataType == QnAbstractMediaData::DataType::GENERIC_METADATA
+        && md->timestamp < m_startDateTimeUs)
+    {
+        NX_VERBOSE(this,
+            "Timestamp of metadata (%1us) is less than the start timestamp of the file "
+            "being recorded currently (%2us), ignoring metadata",
+            md->timestamp, m_startDateTimeUs);
+
+        return true;
+    }
+
     if (m_endDateTimeUs != qint64(AV_NOPTS_VALUE)
         && md->timestamp - m_endDateTimeUs > MAX_FRAME_DURATION_MS * 2 * 1000LL
         && m_truncateInterval > 0)
