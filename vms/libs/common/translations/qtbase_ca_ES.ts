@@ -20,7 +20,7 @@
     </message>
     <message>
       <source>Hide Others</source>
-      <translation>Amaga els altres</translation>
+      <translation>Amaga la resta</translation>
     </message>
     <message>
       <source>Show All</source>
@@ -43,7 +43,7 @@
     <name>QAbstractSpinBox</name>
     <message>
       <source>&amp;Select All</source>
-      <translation>&amp;Seleccionar-ho tot</translation>
+      <translation>&amp;Selecciona-ho tot</translation>
     </message>
     <message>
       <source>&amp;Step up</source>
@@ -82,19 +82,19 @@
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation>Desplaçar cap a l’esquerra</translation>
+      <translation>Desplaça cap a l’esquerra</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Desplaçar cap a la dreta</translation>
+      <translation>Desplaça cap a la dreta</translation>
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation>Desplaçar cap amunt</translation>
+      <translation>Desplaça cap amunt</translation>
     </message>
     <message>
       <source>Scroll Down</source>
-      <translation>Desplaçar cap avall</translation>
+      <translation>Desplaça cap avall</translation>
     </message>
     <message>
       <source>Previous Page</source>
@@ -224,7 +224,7 @@
     </message>
     <message>
       <source>Select All</source>
-      <translation>Seleccionar-ho tot</translation>
+      <translation>Selecciona-ho tot</translation>
     </message>
   </context>
   <context>
@@ -867,7 +867,7 @@ Voleu suprimir de totes maneres?</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Seleccionar-ho tot</translation>
+      <translation>Selecciona-ho tot</translation>
     </message>
   </context>
   <context>
@@ -1173,7 +1173,7 @@ Voleu suprimir de totes maneres?</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Seleccionar-ho tot</translation>
+      <translation>Selecciona-ho tot</translation>
     </message>
   </context>
 </TS>
