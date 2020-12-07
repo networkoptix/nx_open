@@ -57,7 +57,9 @@ QTextBlockFormat getBlockFormat(const Qt::Alignment textAlignment)
 
 void updateDocumentFont(
     const DocumentPtr& document,
-    const QFont font)
+    const QFont font,
+    const Qt::Alignment textAlignment,
+    const int offset)
 {
     document->setDefaultFont(font);
     document->setDocumentMargin(QFontMetrics(font).averageCharWidth() / 2);
@@ -65,21 +67,32 @@ void updateDocumentFont(
     auto format = frame->frameFormat();
     format.setTopMargin(0);
     format.setBottomMargin(0);
+
+    if (offset != 0)
+    {
+        if (textAlignment == Qt::AlignLeft)
+            format.setRightMargin(offset);
+        else
+            format.setLeftMargin(offset);
+    }
+
     frame->setFrameFormat(format);
 }
 
 DocumentPtr makeDocument(
     const Qt::Alignment textAlignment,
     const QString& text,
-    int frameWidth,
-    int initialPixelSize)
+    const int frameWidth,
+    const int maxTextWidth,
+    const int initialPixelSize)
 {
     QFont font;
     font.setBold(true);
     font.setPixelSize(qMax(kMinTextHeight, initialPixelSize));
 
     const DocumentPtr document(new QTextDocument());
-    updateDocumentFont(document, font);
+    const int offset = frameWidth - maxTextWidth;
+    updateDocumentFont(document, font, textAlignment, offset);
 
     QTextCursor cursor(document.data());
     cursor.setBlockFormat(getBlockFormat(textAlignment));
@@ -90,7 +103,7 @@ DocumentPtr makeDocument(
     while (font.pixelSize() > kMinTextHeight && document->idealWidth() > frameWidth)
     {
         font.setPixelSize(font.pixelSize() - 1);
-        updateDocumentFont(document, font);
+        updateDocumentFont(document, font, textAlignment, offset);
     }
 
     document->setTextWidth(frameWidth);
@@ -120,11 +133,13 @@ struct TextImageFilter::Private
     QSharedPointer<quint8> imageBuffer;
 
     int bufferYOffset = 0;
+    qreal widthFactor = 1.0;
 
     Private(
         const VideoLayoutPtr& videoLayout,
         const Qt::Corner corner,
-        const TextGetter& textGetter);
+        const TextGetter& textGetter,
+        const qreal widthFactor);
 
     void updateTextData(
         const QString& newText,
@@ -139,11 +154,13 @@ struct TextImageFilter::Private
 TextImageFilter::Private::Private(
     const VideoLayoutPtr& videoLayout,
     const Qt::Corner corner,
-    const TextGetter& textGetter)
+    const TextGetter& textGetter,
+    const qreal widthFactor)
     :
     textGetter(textGetter),
     corner(corner),
-    checkHash(videoLayout && videoLayout->channelCount() > 1)
+    checkHash(videoLayout && videoLayout->channelCount() > 1),
+    widthFactor(widthFactor)
 {
 }
 
@@ -160,7 +177,9 @@ void TextImageFilter::Private::updateTextData(
     }
 
     const int initialTextHeight = frameSize.height() / kMaxTextLinesInFrame;
-    document = makeDocument(getAlignFromCorner(corner), text, frameSize.width(), initialTextHeight);
+    const auto align = getAlignFromCorner(corner);
+    const int maxTextWidth = frameSize.width() * widthFactor;
+    document = makeDocument(align, text, frameSize.width(), maxTextWidth, initialTextHeight);
 
     const QFontMetrics metrics(document->defaultFont());
     const unsigned int textWidth = document->textWidth();
@@ -198,17 +217,20 @@ qint64 TextImageFilter::Private::calculateHash(
 QnAbstractImageFilterPtr TextImageFilter::create(
     const VideoLayoutPtr& videoLayout,
     const Qt::Corner corner,
-    const TextGetter& linesGetter)
+    const TextGetter& linesGetter,
+    const qreal widthFactor)
 {
-    return QnAbstractImageFilterPtr(new TextImageFilter(videoLayout, corner, linesGetter));
+    return QnAbstractImageFilterPtr(
+        new TextImageFilter(videoLayout, corner, linesGetter, widthFactor));
 }
 
 TextImageFilter::TextImageFilter(
     const VideoLayoutPtr& videoLayout,
     const Qt::Corner corner,
-    const TextGetter& linesGetter)
+    const TextGetter& linesGetter,
+    const qreal widthFactor)
     :
-    d(new Private(videoLayout, corner, linesGetter))
+    d(new Private(videoLayout, corner, linesGetter, widthFactor))
 {
 }
 

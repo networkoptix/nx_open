@@ -11,6 +11,18 @@
 
 namespace {
 
+Qt::Edge getVerticalEdge(Qt::Corner corner)
+{
+    switch (corner)
+    {
+        case Qt::TopLeftCorner:
+        case Qt::TopRightCorner:
+            return Qt::TopEdge;
+        default:
+            return Qt::BottomEdge;
+    }
+}
+
 QString getFrameTimestampText(
     const CLVideoDecoderOutputPtr& frame,
     const nx::vms::common::transcoding::TimestampParams& params)
@@ -51,24 +63,32 @@ nx::core::transcoding::FilterChain QnImageFilterHelper::createFilterChain(
     nx::core::transcoding::FilterChain result(
         settings, legacy.resource->getDewarpingParams(), legacy.resource->getVideoLayout());
 
-    if (legacy.timestampParams.filterParams.enabled
-        && legacy.cameraNameParams.enabled
-        && legacy.timestampParams.filterParams.corner == legacy.cameraNameParams.corner)
+    qreal widthFactor = 1.0;
+
+    if (legacy.timestampParams.filterParams.enabled && legacy.cameraNameParams.enabled)
     {
-        // Both markers should be placed in the same corner, creating single filter.
-        const auto textGetter =
-            [settings = legacy](const CLVideoDecoderOutputPtr& frame)
-            {
-                return QString("%1\n%2").arg(
-                    getCameraName(settings),
-                    getFrameTimestampText(frame, settings.timestampParams));
-            };
-        const auto filter = nx::vms::common::transcoding::TextImageFilter::create(
-            legacy.resource->getVideoLayout(),
-            legacy.timestampParams.filterParams.corner,
-            textGetter);
-        result.addLegacyFilter(filter);
-        return result;
+        const auto timestampCorner = legacy.timestampParams.filterParams.corner;
+        const auto cameraNameCorner = legacy.cameraNameParams.corner;
+        if (timestampCorner == cameraNameCorner)
+        {
+            // Both markers should be placed in the same corner, creating single filter.
+            const auto textGetter =
+                [settings = legacy](const CLVideoDecoderOutputPtr& frame)
+                {
+                    return QString("%1\n%2").arg(
+                        getCameraName(settings),
+                        getFrameTimestampText(frame, settings.timestampParams));
+                };
+            const auto filter = nx::vms::common::transcoding::TextImageFilter::create(
+                legacy.resource->getVideoLayout(),
+                legacy.timestampParams.filterParams.corner,
+                textGetter);
+            result.addLegacyFilter(filter);
+            return result;
+        }
+
+        if (getVerticalEdge(timestampCorner) == getVerticalEdge(cameraNameCorner))
+            widthFactor = 0.5;
     }
 
     if (legacy.timestampParams.filterParams.enabled)
@@ -82,7 +102,8 @@ nx::core::transcoding::FilterChain QnImageFilterHelper::createFilterChain(
         const auto filter = nx::vms::common::transcoding::TextImageFilter::create(
             legacy.resource->getVideoLayout(),
             legacy.timestampParams.filterParams.corner,
-            textGetter);
+            textGetter,
+            widthFactor);
         result.addLegacyFilter(filter);
     }
 
@@ -97,7 +118,8 @@ nx::core::transcoding::FilterChain QnImageFilterHelper::createFilterChain(
         const auto filter = nx::vms::common::transcoding::TextImageFilter::create(
             legacy.resource->getVideoLayout(),
             legacy.cameraNameParams.corner,
-            textGetter);
+            textGetter,
+            widthFactor);
         result.addLegacyFilter(filter);
     }
 

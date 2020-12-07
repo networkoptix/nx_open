@@ -18,12 +18,15 @@ public:
     static QnAbstractImageFilterPtr create(
         const VideoLayoutPtr& videoLayout,
         const Qt::Corner corner,
-        const TextGetter& textGetter);
+        const TextGetter& textGetter,
+        const qreal widthFactor = 1.0);
 
     TextImageFilter(
         const VideoLayoutPtr& videoLayout,
         const Qt::Corner corner,
-        const TextGetter& linesGetter);
+        const TextGetter& linesGetter,
+        const qreal widthFactor = 1.0);
+
     virtual ~TextImageFilter();
 
     virtual CLVideoDecoderOutputPtr updateImage(const CLVideoDecoderOutputPtr& frame) override;
