@@ -35,9 +35,16 @@ Engine::Engine(bool enableOutput):
     NX_PRINT << "Created " << this << ": \"" << libContext().name() << "\"";
 }
 
-std::string Engine::settingValue(const std::string& settingName)
+// TODO: Consider making a template with param type, checked according to the manifest.
+std::string Engine::settingValue(const std::string& settingName) const
 {
-    return m_settings[settingName];
+    const auto it = m_settings.find(settingName);
+    if (it != m_settings.end())
+        return it->second;
+
+    NX_PRINT << "ERROR: Requested setting "
+        << nx::kit::utils::toString(settingName) << " is missing; implying empty string.";
+    return "";
 }
 
 Result<IAction::Result> Engine::executeAction(

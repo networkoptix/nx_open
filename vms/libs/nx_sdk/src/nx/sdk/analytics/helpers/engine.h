@@ -60,7 +60,7 @@ protected:
      * @return Setting value, or an empty string if such setting does not exist, having logged the
      *     error.
      */
-    std::string settingValue(const std::string& settingName);
+    std::string settingValue(const std::string& settingName) const;
 
     /**
      * Action handler. Called when some Action defined by this Engine is triggered by the Server.

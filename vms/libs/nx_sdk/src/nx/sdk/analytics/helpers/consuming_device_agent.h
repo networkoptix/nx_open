@@ -113,7 +113,7 @@ protected:
      * @return Setting value, or an empty string if such setting does not exist, having logged the
      *     error.
      */
-    std::string settingValue(const std::string& paramName);
+    std::string settingValue(const std::string& settingName) const;
 
     void pushManifest(const std::string& pushManifest);
 

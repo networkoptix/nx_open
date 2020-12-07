@@ -221,9 +221,15 @@ void ConsumingDeviceAgent::pushPluginDiagnosticEvent(
 }
 
 // TODO: Consider making a template with param type, checked according to the manifest.
-std::string ConsumingDeviceAgent::settingValue(const std::string& paramName)
+std::string ConsumingDeviceAgent::settingValue(const std::string& settingName) const
 {
-    return m_settings[paramName];
+    const auto it = m_settings.find(settingName);
+    if (it != m_settings.end())
+        return it->second;
+
+    NX_PRINT << "ERROR: Requested setting "
+        << nx::kit::utils::toString(settingName) << " is missing; implying empty string.";
+    return "";
 }
 
 void ConsumingDeviceAgent::pushManifest(const std::string& manifest)
