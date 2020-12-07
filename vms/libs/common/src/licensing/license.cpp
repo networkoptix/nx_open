@@ -103,6 +103,7 @@ static std::array<LicenseTypeInfo, Qn::LC_Count> licenseTypeInfo = {
     LicenseTypeInfo{Qn::LC_Start, "starter", /*allowedToShareChannel*/ true},
     LicenseTypeInfo{Qn::LC_Free, "free", /*allowedToShareChannel*/ true},
     LicenseTypeInfo{Qn::LC_Bridge, "bridge", false},
+    LicenseTypeInfo{Qn::LC_Nvr, "nvr", /*allowedToShareChannel*/ true},
     LicenseTypeInfo{Qn::LC_Invalid, "", false},
 };
 
@@ -171,6 +172,24 @@ QnLicense::QnLicense(const api::DetailedLicenseData& value)
 bool QnLicense::isInfoMode() const
 {
     return m_signature.isEmpty() && m_signature2.isEmpty();
+}
+
+bool QnLicense::isUniqueLicenseType() const
+{
+    return isUniqueLicenseType(type());
+}
+
+bool QnLicense::isUniqueLicenseType(Qn::LicenseType licenseType)
+{
+    return licenseType == Qn::LC_Start || licenseType == Qn::LC_Nvr;
+}
+
+bool QnLicense::isDeactivatable() const
+{
+    Qn::LicenseType licenseType = type(); // Avoid double calculation.
+    return (licenseType != Qn::LC_Trial)
+        && (licenseType != Qn::LC_Nvr)
+        && !isSaas();
 }
 
 QnLicense::RegionalSupport QnLicense::regionalSupport() const
@@ -245,6 +264,8 @@ QString QnLicense::displayName(Qn::LicenseType licenseType)
             return tr("Free");
         case Qn::LC_Bridge:
             return tr("Bridge");
+        case Qn::LC_Nvr:
+            return tr("NVR");
         case Qn::LC_Invalid:
             return tr("Invalid");
         default:
@@ -283,6 +304,8 @@ QString QnLicense::longDisplayName(Qn::LicenseType licenseType)
             return tr("Free Licenses");
         case Qn::LC_Bridge:
             return tr("Bridge Licenses");
+        case Qn::LC_Nvr:
+            return tr("NVR Licenses");
         case Qn::LC_Invalid:
             return tr("Invalid Licenses");
         default:
@@ -316,6 +339,8 @@ QString QnLicense::displayText(Qn::LicenseType licenseType, int count)
             return tr("%n Free Licenses", "", count);
         case Qn::LC_Bridge:
             return tr("%n Bridge Licenses", "", count);
+        case Qn::LC_Nvr:
+            return tr("%n NVR Licenses", "", count);
         case Qn::LC_Invalid:
             return tr("%n Invalid Licenses", "", count);
         default:
@@ -359,6 +384,9 @@ QString QnLicense::displayText(Qn::LicenseType licenseType, int count, int total
                 "%n will be replaced by the total count", count).arg(total);
         case Qn::LC_Bridge:
             return tr("%n/%1 Bridge Licenses",
+                "%n will be replaced by the total count", count).arg(total);
+        case Qn::LC_Nvr:
+            return tr("%n/%1 NVR Licenses",
                 "%n will be replaced by the total count", count).arg(total);
         case Qn::LC_Invalid:
             return tr("%n/%1 Invalid Licenses",

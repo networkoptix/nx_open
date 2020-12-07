@@ -232,8 +232,7 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(
         mergeStatus = utils::MergeSystemsStatus::bothSystemBoundToCloud;
     }
 
-    if (mergeStatus != utils::MergeSystemsStatus::ok
-        && mergeStatus != utils::MergeSystemsStatus::starterLicense)
+    if (!utils::MergeSystemsStatus::allowsToMerge(mergeStatus))
     {
         updateErrorLabel(
             utils::MergeSystemsStatus::getErrorMessage(mergeStatus, moduleInformation));
@@ -281,7 +280,8 @@ void QnMergeSystemsDialog::at_mergeTool_systemFound(
     m_mergeButton->setText(tr("Merge with %1").arg(systemName));
     m_mergeButton->show();
 
-    if (mergeStatus == utils::MergeSystemsStatus::starterLicense)
+    // Ok status returns empty string.
+    if (utils::MergeSystemsStatus::allowsToMerge(mergeStatus))
     {
         updateErrorLabel(
             utils::MergeSystemsStatus::getErrorMessage(mergeStatus, moduleInformation));

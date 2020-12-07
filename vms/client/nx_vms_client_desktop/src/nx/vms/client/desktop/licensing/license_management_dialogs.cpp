@@ -322,13 +322,16 @@ void LicenseActivationDialogs::licenseAlreadyActivatedHere(QWidget* parent)
     );
 }
 
-void LicenseActivationDialogs::activationError(QWidget* parent, QnLicenseErrorCode errorCode)
+void LicenseActivationDialogs::activationError(
+    QWidget* parent,
+    QnLicenseErrorCode errorCode,
+    Qn::LicenseType licenseType)
 {
     Private::showMessage(
         parent,
         QnMessageBoxIcon::Critical,
         tr("Failed to activate license"),
-        QnLicenseValidator::errorMessage(errorCode)
+        QnLicenseValidator::errorMessage(errorCode, licenseType)
     );
 }
 

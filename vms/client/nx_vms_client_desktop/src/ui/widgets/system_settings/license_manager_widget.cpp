@@ -564,17 +564,17 @@ bool QnLicenseManagerWidget::canRemoveLicense(const QnLicensePtr &license) const
         && errorCode != QnLicenseErrorCode::FutureLicense;
 }
 
-bool QnLicenseManagerWidget::canDeactivateLicense(const QnLicensePtr &license) const
+bool QnLicenseManagerWidget::canDeactivateLicense(const QnLicensePtr& license) const
 {
     if (!NX_ASSERT(license))
+        return false;
+
+    if (!license->isDeactivatable())
         return false;
 
     // TODO: add more checks according to specs
     const auto errorCode = m_validator->validate(license);
     const bool activeLicense = errorCode == QnLicenseErrorCode::NoError; // Only active licenses
-
-    // TODO: Make a common helper function to sync with QnLicenseDetailsDialog constructor.
-    const bool acceptedLicenseType = (license->type() != Qn::LC_Trial) && !license->isSaas();
 
     const auto serverId = m_validator->serverId(license);
     const auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
@@ -590,7 +590,7 @@ bool QnLicenseManagerWidget::canDeactivateLicense(const QnLicensePtr &license) c
             return info.data.hardwareIds.contains(license->hardwareId());
         }();
 
-    return activeLicense && onlineServer && sameHwId && acceptedLicenseType;
+    return activeLicense && onlineServer && sameHwId;
 }
 
 void QnLicenseManagerWidget::removeLicense(const QnLicensePtr& license, ForceRemove force)
@@ -859,9 +859,9 @@ void QnLicenseManagerWidget::processReply(
             {
                 // QNetworkReply slots should not start event loop.
                 executeLater(
-                    [this, errCode]
+                    [this, errCode, licenseType = license->type()]
                     {
-                        LicenseActivationDialogs::activationError(this, errCode);
+                        LicenseActivationDialogs::activationError(this, errCode, licenseType);
                     }, this);
 
                 ui->licenseWidget->setState(QnLicenseWidget::Normal);
@@ -955,12 +955,12 @@ void QnLicenseManagerWidget::at_licenseWidget_stateChanged()
                     executeLater(
                         [this] { LicenseActivationDialogs::licenseIsIncompatible(this); }, this);
                     break;
-                case QnLicenseErrorCode::TooManyLicensesPerDevice:
+                case QnLicenseErrorCode::TooManyLicensesPerSystem:
                     // QNetworkReply slots should not start event loop.
                     executeLater(
-                        [this, errCode]
+                        [this, errCode, licenseType = license->type()]
                         {
-                            LicenseActivationDialogs::activationError(this, errCode);
+                            LicenseActivationDialogs::activationError(this, errCode, licenseType);
                         }, this);
                     break;
                 default:

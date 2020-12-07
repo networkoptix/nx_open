@@ -39,7 +39,8 @@ QLicenseStubValidator::QLicenseStubValidator(QnCommonModule* commonModule, QObje
 {
 }
 
-QnLicenseErrorCode QLicenseStubValidator::validate(const QnLicensePtr& license, ValidationMode mode) const
+QnLicenseErrorCode QLicenseStubValidator::validate(const QnLicensePtr& license,
+    ValidationMode mode) const
 {
     auto futureStub = dynamic_cast<QnFutureLicenseStub*>(license.data());
     if (futureStub)
@@ -48,9 +49,8 @@ QnLicenseErrorCode QLicenseStubValidator::validate(const QnLicensePtr& license, 
     auto stub = dynamic_cast<QnLicenseStub*>(license.data());
     if (stub)
     {
-        // Only single Start license per system is allowed
-        if (license->type() == Qn::LC_Start)
-            return isValidStartLicense(license);
+        if (license->isUniqueLicenseType())
+            return isValidUniqueLicense(license);
 
         return QnLicenseErrorCode::NoError;
     }

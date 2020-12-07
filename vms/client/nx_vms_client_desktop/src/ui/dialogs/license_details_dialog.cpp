@@ -51,9 +51,7 @@ QnLicenseDetailsDialog::QnLicenseDetailsDialog(const QnLicensePtr& license, QWid
     addGeneric(tr("License Key"), QString::fromLatin1(license->key()));
     addGeneric(tr("Locked to Hardware ID"), license->hardwareId());
 
-    // TODO: Make a common helper function to sync with LicenseManagerWidget::canDeactivateLicense.
-    const bool deactivatableLicenseType = (license->type() != Qn::LC_Trial) && !license->isSaas();
-    if (deactivatableLicenseType)
+    if (license->isDeactivatable())
     {
         addGeneric(tr("Deactivations Remaining"),
             QString::number(license->deactivationsCountLeft()));
@@ -72,7 +70,9 @@ QnLicenseDetailsDialog::QnLicenseDetailsDialog(const QnLicensePtr& license, QWid
     }
 
     setWarningStyle(ui->errorLabel);
-    ui->errorLabel->setText(QnLicenseValidator::errorMessage(QnLicenseErrorCode::FutureLicense));
+    ui->errorLabel->setText(QnLicenseValidator::errorMessage(
+        QnLicenseErrorCode::FutureLicense,
+        Qn::LC_Invalid));
     ui->errorLabel->setVisible(license->type() == Qn::LC_Invalid);
 
     const auto licenseDescription = details.join('\n');

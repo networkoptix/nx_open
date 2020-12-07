@@ -108,7 +108,7 @@ void QnWorkbenchIncompatibleServersActionHandler::connectToCurrentSystem(
     if (password.isEmpty())
         return;
 
-    if (!validateStartLicenses(server, password))
+    if (!validateUniqueLicenses(server, password))
         return;
 
     if (QnConnectionValidator::validateConnection(moduleInformation) !=
@@ -204,7 +204,7 @@ void QnWorkbenchIncompatibleServersActionHandler::at_connectTool_finished(int er
     }
 }
 
-bool QnWorkbenchIncompatibleServersActionHandler::validateStartLicenses(
+bool QnWorkbenchIncompatibleServersActionHandler::validateUniqueLicenses(
     const QnFakeMediaServerResourcePtr& server,
     const QString& adminPassword)
 {
@@ -212,36 +212,25 @@ bool QnWorkbenchIncompatibleServersActionHandler::validateStartLicenses(
     if (!server)
         return true;
 
-    const auto licenseHelper = QnLicenseListHelper(licensePool()->getLicenses());
-    if (licenseHelper.totalLicenseByType(Qn::LC_Start, licensePool()->validator()) == 0)
-        return true; /* We have no start licenses so all is OK. */
+    QAuthenticator auth;
+    auth.setUser(helpers::kFactorySystemUser);
+    auth.setPassword(adminPassword);
 
-    if (!serverHasStartLicenses(server, adminPassword))
+    using namespace utils::MergeSystemsStatus;
+    const Value mergeStatus = remoteLicensesConflict(licensePool(), server->getUrl(), auth);
+
+    if (mergeStatus == Value::ok)
         return true;
 
+    // Warn that some of the licenses will be deactivated.
     const auto message = utils::MergeSystemsStatus::getErrorMessage(
-        utils::MergeSystemsStatus::starterLicense, server->getModuleInformation());
+        mergeStatus, server->getModuleInformation());
 
     const auto result = QnMessageBox::warning(mainWindowWidget(),
         tr("Total amount of licenses will decrease"), message,
         QDialogButtonBox::Ok | QDialogButtonBox::Cancel, QDialogButtonBox::Ok);
 
     return (result != QDialogButtonBox::Cancel);
-}
-
-bool QnWorkbenchIncompatibleServersActionHandler::serverHasStartLicenses(
-    const QnMediaServerResourcePtr& server,
-    const QString& adminPassword)
-{
-    QAuthenticator auth;
-    auth.setUser(helpers::kFactorySystemUser);
-    auth.setPassword(adminPassword);
-
-    /* Check if there is a valid starter license in the remote system. */
-    const auto remoteLicensesList = remoteLicenses(server->getUrl(), auth);
-
-    /* Warn that some of the licenses will be deactivated. */
-    return QnLicenseListHelper(remoteLicensesList).totalLicenseByType(Qn::LC_Start, nullptr) > 0;
 }
 
 QString QnWorkbenchIncompatibleServersActionHandler::requestPassword() const

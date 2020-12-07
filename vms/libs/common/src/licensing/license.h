@@ -108,6 +108,15 @@ public:
 
     bool isInfoMode() const;
 
+    /** These license types are system unique. */
+    bool isUniqueLicenseType() const;
+
+    /** These license types are system unique. */
+    static bool isUniqueLicenseType(Qn::LicenseType licenseType);
+
+    /** Check if license can possibly be deactivated at all. */
+    bool isDeactivatable() const;
+
     static QnLicensePtr readFromStream(QTextStream& stream);
     static QnLicensePtr createFromKey(const QByteArray& key);
 

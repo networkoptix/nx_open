@@ -5,6 +5,7 @@
 #include <licensing/license_fwd.h>
 
 #include <common/common_module_aware.h>
+#include <common/common_globals.h>
 
 #include <nx/utils/uuid.h>
 
@@ -16,7 +17,7 @@ enum class QnLicenseErrorCode
     InvalidBrand,               /**< License belong to other customization */
     Expired,                    /**< Expired */
     InvalidType,                /**< Such license type isn't allowed for that device. */
-    TooManyLicensesPerDevice,   /**< Too many licenses of this type per device. */
+    TooManyLicensesPerSystem,   /**< Too many licenses of this type per system. */
     FutureLicense               /**< License type is unknown, may be license from future version. */
 };
 
@@ -55,12 +56,15 @@ public:
 
     QString validationInfo(const QnLicensePtr& license, ValidationMode mode = VM_Regular) const;
 
-    static QString errorMessage(QnLicenseErrorCode errCode);
+    static QString errorMessage(QnLicenseErrorCode errCode, Qn::LicenseType licenseType);
 
     /** Id of the server this license attached to (if it is present in the current system). */
     QnUuid serverId(const QnLicensePtr& license) const;
 
 protected:
-    QnLicenseErrorCode isValidStartLicense(const QnLicensePtr& license,
+    /**
+     * Check if only one license of this type is allowed to exist in the system.
+     */
+    QnLicenseErrorCode isValidUniqueLicense(const QnLicensePtr& license,
         ValidationMode mode = VM_Regular) const;
 };

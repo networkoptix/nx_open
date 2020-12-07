@@ -98,6 +98,7 @@ angular.module('webadminApp')
                     errorToShow = L.join.cloudHostConflict;
                     break;
                 case 'STARTER_LICENSE_ERROR':
+                case 'NVR_LICENSE_ERROR':
                     errorToShow = L.join.licenceError;
                     dialogs.alert(errorToShow);
                     return false;

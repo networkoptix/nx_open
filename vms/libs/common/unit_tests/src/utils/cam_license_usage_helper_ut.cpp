@@ -478,6 +478,33 @@ TEST_F(QnCamLicenseUsageHelperTest, borrowStartLicenses)
     ASSERT_TRUE(m_helper->isValid());
 }
 
+/** Test for nvr license borrowing. */
+TEST_F(QnCamLicenseUsageHelperTest, borrowNvrLicenses)
+{
+    addRecordingCamera(Qn::LC_VMAX);
+    addRecordingCamera(Qn::LC_AnalogEncoder);
+    addRecordingCamera(Qn::LC_Analog);
+    addRecordingCamera(Qn::LC_Professional);
+
+    ASSERT_FALSE(m_helper->isValid());
+
+    /* Nvr licenses can be used instead of some other types. */
+    addLicenses(Qn::LC_Nvr, 10);
+    ASSERT_TRUE(m_helper->isValid());
+
+    /* Nvr licenses can't be used instead of edge licenses. */
+    addRecordingCamera(Qn::LC_Edge);
+    ASSERT_FALSE(m_helper->isValid());
+    addLicenses(Qn::LC_Edge, 1);
+    ASSERT_TRUE(m_helper->isValid());
+
+    /* Nvr licenses can't be used instead of io licenses. */
+    addRecordingCamera(Qn::LC_IO);
+    ASSERT_FALSE(m_helper->isValid());
+    addLicenses(Qn::LC_IO, 1);
+    ASSERT_TRUE(m_helper->isValid());
+}
+
 /** Test for several start licenses in the same system. */
 TEST_F(QnCamLicenseUsageHelperTest, checkStartLicenseOverlapping)
 {
@@ -492,6 +519,23 @@ TEST_F(QnCamLicenseUsageHelperTest, checkStartLicenseOverlapping)
 
     /* One licenses with 8 channels. */
     addLicenses(Qn::LC_Start, 8);
+    ASSERT_TRUE(m_helper->isValid());
+}
+
+/** Test for several NVR licenses in the same system. */
+TEST_F(QnCamLicenseUsageHelperTest, checkNvrLicenseOverlapping)
+{
+    addRecordingCameras(Qn::LC_Professional, 8, true);
+
+    ASSERT_FALSE(m_helper->isValid());
+
+    /* Two licenses with 6 channels each. */
+    addLicenses(Qn::LC_Nvr, 6);
+    addLicenses(Qn::LC_Nvr, 6);
+    ASSERT_FALSE(m_helper->isValid());
+
+    /* One licenses with 8 channels. */
+    addLicenses(Qn::LC_Nvr, 8);
     ASSERT_TRUE(m_helper->isValid());
 }
 

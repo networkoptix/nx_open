@@ -13,8 +13,6 @@
 #include <rest/server/rest_connection_processor.h>
 #include <licensing/license_validator.h>
 
-// #define START_LICENSES_DEBUG
-
 static const int kDefaultTimeoutMs = 10 * 1000;
 static const QString kUrlParameter("url");
 static const QString kKeyParameter("getKey");
@@ -87,23 +85,10 @@ int QnPingSystemRestHandler::executeGet(
         return nx::network::http::StatusCode::ok;
     }
 
-    /* Check if there is a valid starter license in the local system. */
-    QnLicenseListHelper helper(owner->licensePool()->getLicenses());
-    if (helper.totalLicenseByType(Qn::LC_Start, owner->licensePool()->validator()) > 0)
-    {
-
-        /* Check if there is a valid starter license in the remote system. */
-        QnLicenseList remoteLicensesList = remoteLicenses(url, QAuthenticator());
-
-        /* Warn that some of the licenses will be deactivated. */
-        QnLicenseListHelper remoteHelper(remoteLicensesList);
-        if (remoteHelper.totalLicenseByType(Qn::LC_Start, nullptr) > 0)
-            result.setError(QnJsonRestResult::CantProcessRequest, lit("STARTER_LICENSE_ERROR"));
-    }
-
-#ifdef START_LICENSES_DEBUG
-    result.setError(QnJsonRestResult::CantProcessRequest, lit("STARTER_LICENSE_ERROR"));
-#endif
+    using namespace utils::MergeSystemsStatus;
+    const Value mergeStatus = remoteLicensesConflict(owner->licensePool(), url, QAuthenticator());
+    if (mergeStatus != Value::ok)
+        result.setError(QnJsonRestResult::CantProcessRequest, toString(mergeStatus));
 
     return nx::network::http::StatusCode::ok;
 }

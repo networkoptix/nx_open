@@ -187,16 +187,10 @@ void QnMergeSystemsTool::at_pingSystem_finished(
         ? utils::MergeSystemsStatus::fromString(errorString)
         : utils::MergeSystemsStatus::unknownError;
 
-    auto isOk = [](utils::MergeSystemsStatus::Value errorCode)
-        {
-            return errorCode == utils::MergeSystemsStatus::ok
-                || errorCode == utils::MergeSystemsStatus::starterLicense;
-        };
-
-    if (isOk(errorCode) && moduleInformation.ecDbReadOnly)
+    if (utils::MergeSystemsStatus::allowsToMerge(errorCode) && moduleInformation.ecDbReadOnly)
         errorCode = utils::MergeSystemsStatus::safeMode;
 
-    if (isOk(errorCode))
+    if (utils::MergeSystemsStatus::allowsToMerge(errorCode))
     {
         m_twoStepRequests.clear();
         emit systemFound(errorCode, moduleInformation, ctx.proxy);

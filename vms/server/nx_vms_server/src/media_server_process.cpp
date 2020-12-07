@@ -2580,6 +2580,7 @@ void MediaServerProcess::registerRestHandlers(
      *         %value "FORBIDDEN" The user does not have permission for merge.
      *         %value "BACKUP_ERROR" The database backup could not be created.
      *         %value "STARTER_LICENSE_ERROR" You are about to merge Systems with Starter licenses.
+     *         %value "NVR_LICENSE_ERROR" You are about to merge Systems with NVR licenses.
      *         %value "CONFIGURATION_ERROR" Could not configure the remote System.
      *         %value "DEPENDENT_SYSTEM_BOUND_TO_CLOUD" System can only be merged with non-cloud.
      *         %value "CLOUD_SYSTEMS_HAVE_DIFFERENT_OWNERS" Cannot merge two cloud systems with

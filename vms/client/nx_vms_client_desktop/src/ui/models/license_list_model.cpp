@@ -128,7 +128,7 @@ QVariant QnLicenseListModel::textData(const QModelIndex& index, bool fullText) c
                 return expirationInfo(license, fullStatus).second;
 
             if (fullStatus)
-                return QnLicenseValidator::errorMessage(code);
+                return QnLicenseValidator::errorMessage(code, license->type());
 
             return code == QnLicenseErrorCode::Expired
                 ? tr("Expired")

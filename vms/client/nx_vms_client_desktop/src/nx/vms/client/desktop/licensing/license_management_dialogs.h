@@ -3,6 +3,7 @@
 #include <QtCore/QCoreApplication> //< For Q_DECLARE_TR_FUNCTIONS.
 
 #include <licensing/license_fwd.h>
+#include <common/common_globals.h>
 
 #include <nx/vms/client/desktop/license/license_helpers.h>
 
@@ -43,7 +44,9 @@ public:
     static void licenseAlreadyActivatedHere(QWidget* parent);
 
     /** Warn about failed activation. */
-    static void activationError(QWidget* parent, QnLicenseErrorCode errorCode);
+    static void activationError(QWidget* parent,
+        QnLicenseErrorCode errorCode,
+        Qn::LicenseType licenseType);
 
     /** Warn about a network error while activating a license. */
     static void networkError(QWidget* parent);

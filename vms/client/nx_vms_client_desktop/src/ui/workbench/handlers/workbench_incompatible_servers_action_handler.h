@@ -24,9 +24,14 @@ public:
 
 private:
     void connectToCurrentSystem(const QnFakeMediaServerResourcePtr& server);
-    bool validateStartLicenses(const QnFakeMediaServerResourcePtr& server, const QString& adminPassword);
-    bool serverHasStartLicenses(
-        const QnMediaServerResourcePtr& server,
+
+    /**
+     * Some license types can exist only once in the system (Starter, Nvr). Check if the local
+     * system has no conflicts with remote system over those license types.
+     * @return true if there is no conflict or if user is ok to deactivate conflicting licenses.
+     */
+    bool validateUniqueLicenses(
+        const QnFakeMediaServerResourcePtr& server,
         const QString& adminPassword);
 
     QString requestPassword() const;

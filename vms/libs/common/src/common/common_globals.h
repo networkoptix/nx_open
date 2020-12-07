@@ -435,9 +435,9 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
 
         /**
          * Like a professional license.
-         * Could not be activated on ARM devices.
-         * Only one license key per system (not server). If systems are merged and each of them had some start licenses originally,
-         * new merged system will only take one start license( the one with bigger channels). Other start licenses will become invalid.
+         * Only one license key per system (not server). If systems are merged and each of them had
+         * some start licenses originally, new merged system will only take one start license (the
+         * one with bigger number of channels). Other start licenses will become invalid.
          */
         LC_Start,
 
@@ -451,6 +451,14 @@ QN_DECLARE_METAOBJECT_HEADER(Qn,
          * For all new DVR/NVR devices except of VMAX
          */
         LC_Bridge,
+
+        /**
+         * Like a professional license.
+         * Only one license key per system (not server). If systems are merged and each of them had
+         * some NVR licenses originally, new merged system will only take one NVR license (the one
+         * with bigger number of channels). Other NVR licenses will become invalid.
+         */
+        LC_Nvr,
 
         /**
          * Invalid license. Required when the correct license type is not known in current version.

@@ -171,7 +171,7 @@ int QnActivateLicenseRestHandler::activateLicense(const QString& licenseKey,
             result.setError(
                 QnJsonRestResult::CantProcessRequest,
                 QString("Can't activate license: %1").arg(
-                    QnLicenseValidator::errorMessage(licenseErrCode)));
+                    QnLicenseValidator::errorMessage(licenseErrCode, license->type())));
             return nx::network::http::StatusCode::ok;
         }
     }

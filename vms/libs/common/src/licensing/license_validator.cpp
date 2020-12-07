@@ -59,8 +59,8 @@ QnLicenseErrorCode QnLicenseValidator::validate(const QnLicensePtr& license,
     if (license->expirationTime() > 0 && qnSyncTime->currentMSecsSinceEpoch() > license->expirationTime())
         return QnLicenseErrorCode::Expired;
 
-    if (license->type() == Qn::LC_Start)
-        return isValidStartLicense(license, mode);
+    if (license->isUniqueLicenseType())
+        return isValidUniqueLicense(license, mode);
 
     if (license->type() == Qn::LC_Invalid)
         return QnLicenseErrorCode::FutureLicense;
@@ -74,10 +74,10 @@ QString QnLicenseValidator::validationInfo(const QnLicensePtr& license, Validati
     if (code == QnLicenseErrorCode::NoError)
         return lit("Ok");
 
-    return errorMessage(code);
+    return errorMessage(code, license->type());
 }
 
-QString QnLicenseValidator::errorMessage(QnLicenseErrorCode errCode)
+QString QnLicenseValidator::errorMessage(QnLicenseErrorCode errCode, Qn::LicenseType licenseType)
 {
     switch (errCode)
     {
@@ -93,10 +93,22 @@ QString QnLicenseValidator::errorMessage(QnLicenseErrorCode errCode)
             return tr("License is expired"); // license is out of date
         case QnLicenseErrorCode::InvalidType:
             return tr("Invalid type");
-        case QnLicenseErrorCode::TooManyLicensesPerDevice:
-            return tr("Only one starter license is allowed per System.")
-                + '\n'
-                + tr("You already have one active starter license.");
+        case QnLicenseErrorCode::TooManyLicensesPerSystem:
+            switch (licenseType)
+            {
+                case Qn::LC_Start:
+                    return tr("Only one Starter license is allowed per System.")
+                        + '\n'
+                        + tr("You already have one active Starter license.");
+                case Qn::LC_Nvr:
+                    return tr("Only one NVR license is allowed per System.")
+                        + '\n'
+                        + tr("You already have one active NVR license.");
+                default:
+                    return tr("Only one license of this type is allowed per System.")
+                        + '\n'
+                        + tr("You already have one active license of the same type.");
+            }
         case QnLicenseErrorCode::FutureLicense:
             return tr("This license type requires higher software version");
         default:
@@ -121,10 +133,10 @@ QnUuid QnLicenseValidator::serverId(const QnLicensePtr& license) const
     return QnUuid();
 }
 
-QnLicenseErrorCode QnLicenseValidator::isValidStartLicense(const QnLicensePtr& license,
+QnLicenseErrorCode QnLicenseValidator::isValidUniqueLicense(const QnLicensePtr& license,
     ValidationMode mode) const
 {
-    // Only single Start license per system is allowed
+    // Only single license of this type per system is allowed
     for (const QnLicensePtr& otherLicense: licensePool()->getLicenses())
     {
         // Skip other license types and current license itself.
@@ -133,7 +145,7 @@ QnLicenseErrorCode QnLicenseValidator::isValidStartLicense(const QnLicensePtr& l
 
         // Do not allow to activate new start license when there is one already.
         if (mode == ValidationMode::VM_CanActivate)
-            return QnLicenseErrorCode::TooManyLicensesPerDevice;
+            return QnLicenseErrorCode::TooManyLicensesPerSystem;
 
         // Skip other licenses if they have less channels.
         if (otherLicense->cameraCount() < license->cameraCount())
@@ -141,12 +153,12 @@ QnLicenseErrorCode QnLicenseValidator::isValidStartLicense(const QnLicensePtr& l
 
         // Mark current as invalid if it has less channels.
         if (otherLicense->cameraCount() > license->cameraCount())
-            return QnLicenseErrorCode::TooManyLicensesPerDevice;
+            return QnLicenseErrorCode::TooManyLicensesPerSystem;
 
         // We found another license with the same number of channels.
         // Mark the least license as valid.
         if (otherLicense->key() < license->key())
-            return QnLicenseErrorCode::TooManyLicensesPerDevice;
+            return QnLicenseErrorCode::TooManyLicensesPerSystem;
     }
 
     return QnLicenseErrorCode::NoError;

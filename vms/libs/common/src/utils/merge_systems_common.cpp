@@ -28,7 +28,9 @@ const QHash<Value, QString> kErrorToStringHash{
     { cloudSystemsHaveDifferentOwners, lit("CLOUD_SYSTEMS_HAVE_DIFFERENT_OWNERS") },
     { unconfiguredSystem, lit("UNCONFIGURED_SYSTEM") },
     { unknownError, lit("UNKNOWN_ERROR") },
-    { duplicateMediaServerFound, lit("DUPLICATE_MEDIASERVER_FOUND") }};
+    { duplicateMediaServerFound, lit("DUPLICATE_MEDIASERVER_FOUND") },
+    { nvrLicense, "NVR_LICENSE_ERROR"}
+};
 
 class ErrorStrings
 {
@@ -70,6 +72,11 @@ public:
             case starterLicense:
                 return tr("You are about to merge Systems with Starter licenses.")
                     + L'\n' + tr("Only one Starter license is allowed per System,"
+                        " so the second license will be deactivated.")
+                    + L'\n' + tr("Merge anyway?");
+            case nvrLicense:
+                return tr("You are about to merge Systems with NVR licenses.")
+                    + L'\n' + tr("Only one NVR license is allowed per System,"
                         " so the second license will be deactivated.")
                     + L'\n' + tr("Merge anyway?");
             case safeMode:
@@ -130,6 +137,19 @@ Value fromString(const QString& str)
 QString getErrorMessage(Value value, const nx::vms::api::ModuleInformation& moduleInformation)
 {
     return ErrorStrings::getErrorMessage(value, moduleInformation);
+}
+
+bool allowsToMerge(Value value)
+{
+    switch (value)
+    {
+        case ok:
+        case starterLicense:
+        case nvrLicense:
+            return true;
+        default:
+            return false;
+    }
 }
 
 } // namespace MergeSystemsStatus

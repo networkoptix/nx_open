@@ -1,7 +1,8 @@
 #include "license_usage_helper.h"
 
-#include <numeric>
 #include <functional>
+#include <numeric>
+#include <vector>
 
 #include <QtCore/QJsonObject>
 
@@ -87,7 +88,7 @@ struct LicenseCompatibility
  * Start -> Professional -> Analog -> (VMAX, AnalogEncoder)
  * Start -> Professional -> Bridge
  */
-static std::array<LicenseCompatibility, 23> compatibleLicenseType =
+static std::vector<LicenseCompatibility> compatibleLicenseType =
 {
     LicenseCompatibility(Qn::LC_Analog,         Qn::LC_VMAX),
     LicenseCompatibility(Qn::LC_Analog,         Qn::LC_AnalogEncoder),
@@ -108,6 +109,12 @@ static std::array<LicenseCompatibility, 23> compatibleLicenseType =
     LicenseCompatibility(Qn::LC_Start,          Qn::LC_VMAX),
     LicenseCompatibility(Qn::LC_Start,          Qn::LC_AnalogEncoder),
     LicenseCompatibility(Qn::LC_Start,          Qn::LC_Bridge),
+
+    LicenseCompatibility(Qn::LC_Nvr,            Qn::LC_Professional),
+    LicenseCompatibility(Qn::LC_Nvr,            Qn::LC_Analog),
+    LicenseCompatibility(Qn::LC_Nvr,            Qn::LC_VMAX),
+    LicenseCompatibility(Qn::LC_Nvr,            Qn::LC_AnalogEncoder),
+    LicenseCompatibility(Qn::LC_Nvr,            Qn::LC_Bridge),
 
     LicenseCompatibility(Qn::LC_Trial,          Qn::LC_Edge),
     LicenseCompatibility(Qn::LC_Trial,          Qn::LC_Professional),
@@ -535,6 +542,7 @@ QList<Qn::LicenseType> QnCamLicenseUsageHelper::calculateLicenseTypes() const
         << Qn::LC_AnalogEncoder
         << Qn::LC_IO
         << Qn::LC_Start
+        << Qn::LC_Nvr
         ;
 }
 
