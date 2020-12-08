@@ -4809,11 +4809,11 @@ to %1</source>
     </message>
     <message>
       <source>%1 TB</source>
-      <translation>%1 Tb</translation>
+      <translation>%1 TB</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 Gb</translation>
+      <translation>%1 GB</translation>
     </message>
     <message>
       <source>Current Bitrate</source>
@@ -5809,7 +5809,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 Gb</translation>
+      <translation>%1 GB</translation>
     </message>
     <message>
       <source>Too small and system partitions are reserved and not used for writing if there is enough other storage space available.</source>
@@ -7959,11 +7959,11 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
     <message>
       <source>This camera requires password to be set up.</source>
-      <translation>本攝影機需要密碼以進行設定.</translation>
+      <translation>此攝影機需要密碼以進行設定.</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up.</source>
-      <translation>某些選定攝影機需設定密碼以進行安裝.</translation>
+      <translation>某些選定的攝影機需要設置密碼以進行設定.</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>

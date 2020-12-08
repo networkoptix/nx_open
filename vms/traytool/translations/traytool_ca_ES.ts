@@ -67,7 +67,7 @@
     </message>
     <message>
       <source>Server will be stopped. Continue?</source>
-      <translation type="unfinished">Server will be stopped. Continue?</translation>
+      <translation>El servidor s'aturarà. Voleu continuar?</translation>
     </message>
     <message>
       <source>Show Server Log</source>

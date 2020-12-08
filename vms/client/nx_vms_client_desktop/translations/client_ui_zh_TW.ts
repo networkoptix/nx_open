@@ -320,7 +320,7 @@
     <message>
       <location/>
       <source>on the next day</source>
-      <translation>第二天</translation>
+      <translation>隔天</translation>
     </message>
   </context>
   <context>
@@ -598,7 +598,7 @@
     <message>
       <location/>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>請勿變更這些設定除非您明白可能造成的對系統效能的潛在影響.</translation>
+      <translation>請避免變更這些設定，除非您清楚明白該變更對系統運作及其效能的潛在影響.</translation>
     </message>
     <message>
       <location/>
@@ -613,17 +613,17 @@
     <message>
       <location/>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation>錄影排程中的畫質和張數(FPS) 設定將失去作用.</translation>
+      <translation>錄影排程中的影像品質和幀率(FPS) 設定將不會發生作用.</translation>
     </message>
     <message>
       <location/>
       <source>Calculate bitrate per GOP instead of bitrate per second</source>
-      <translation>計算每個 GOP 的流量而不是每秒流量</translation>
+      <translation>位元率的計算將改以GOP為單位，而非每秒為單位。</translation>
     </message>
     <message>
       <location/>
       <source>It will increase bitrate for camera.</source>
-      <translation>這會增加攝影機的流量.</translation>
+      <translation>攝影機的位元率將會增加</translation>
     </message>
     <message>
       <location/>
@@ -761,7 +761,7 @@
     <message>
       <location/>
       <source>Web Page</source>
-      <translation>網頁:</translation>
+      <translation>網頁</translation>
     </message>
     <message>
       <location/>
