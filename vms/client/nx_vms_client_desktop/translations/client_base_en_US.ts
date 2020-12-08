@@ -2761,17 +2761,6 @@ to view more bookmarks</source>
     </message>
 </context>
 <context>
-    <name>QnClockLabel</name>
-    <message>
-        <source>Server Time</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Local System Time</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
     <name>QnCloudManagementWidget</name>
     <message>
         <source>Connect to your Systems
@@ -8410,6 +8399,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>Add Info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete Info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Info</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
