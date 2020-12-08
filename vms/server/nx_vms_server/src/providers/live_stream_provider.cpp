@@ -109,15 +109,15 @@ QnLiveStreamProvider::QnLiveStreamProvider(const nx::vms::server::resource::Came
     m_prevCameraControlDisabled = m_cameraRes->isCameraControlDisabled();
     m_resolutionCheckTimer.invalidate();
 
-    Qn::directConnect(res.data(), &QnResource::videoLayoutChanged, this, 
-        [this](const QnResourcePtr&) 
+    Qn::directConnect(res.data(), &QnResource::videoLayoutChanged, this,
+        [this](const QnResourcePtr&)
         {
             NX_DEBUG(this, "Video layout changed, Device: %1, role: %2", m_cameraRes, getRole());
             m_videoChannels = std::min(CL_MAX_CHANNELS, m_cameraRes->getVideoLayout()->channelCount());
             QnMutexLocker lock(&m_liveMutex);
             updateSoftwareMotion();
         });
-    
+
     if (m_cameraRes)
     {
         Qn::directConnect(m_cameraRes.data(), &QnSecurityCamResource::motionRegionChanged, this,
@@ -236,7 +236,7 @@ void QnLiveStreamProvider::setCameraControlDisabled(bool value)
 void QnLiveStreamProvider::strictFpsToLimit(float* fps) const
 {
     const float maxFps = m_cameraRes->getMaxFps(toStreamIndex(getRole()));
-    *fps = qBound((float) QnLiveStreamParams::kMinSecondStreamFps, *fps, maxFps);
+    *fps = qBound(1.0F, *fps, maxFps);
 }
 
 QnLiveStreamParams QnLiveStreamProvider::mergeWithAdvancedParams(const QnLiveStreamParams& value)

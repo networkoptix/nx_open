@@ -8,7 +8,7 @@
 struct QnLiveStreamParams
 {
     static const float kFpsNotInitialized;
-    static const int kMinSecondStreamFps = 2;
+    static const int kMinSecondStreamSharedFps = 2;
 
     Qn::StreamQuality quality = Qn::StreamQuality::undefined;
     float fps = kFpsNotInitialized;

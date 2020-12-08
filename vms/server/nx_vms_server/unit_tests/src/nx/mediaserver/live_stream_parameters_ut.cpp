@@ -235,7 +235,7 @@ TEST_F(LiveStreamParametersWithoutAdvancedParams, secondaryFps)
     params.fps = m_camera->getMaxFps();
     m_videoCamera->getPrimaryReader()->setPrimaryStreamParams(params);
     secondaryParams = m_videoCamera->getSecondaryReader()->getLiveParams();
-    EXPECT_EQ(2, (int) secondaryParams.fps);
+    EXPECT_EQ(1, (int) secondaryParams.fps);
 
     m_camera->setStreamFpsSharingMethod(Qn::PixelsFpsSharing);
     params.fps = 1;

@@ -267,12 +267,12 @@ void QnWorkbenchResourcesSettingsHandler::at_copyRecordingScheduleAction_trigger
             if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing
                 && camera->getMotionType() == Qn::MotionType::MT_SoftwareGrid)
             {
-                decreaseAlways = QnLiveStreamParams::kMinSecondStreamFps;
+                decreaseAlways = QnLiveStreamParams::kMinSecondStreamSharedFps;
             }
 
             int decreaseIfMotionPlusLQ = 0;
             if (camera->streamFpsSharingMethod() == Qn::BasicFpsSharing)
-                decreaseIfMotionPlusLQ = QnLiveStreamParams::kMinSecondStreamFps;
+                decreaseIfMotionPlusLQ = QnLiveStreamParams::kMinSecondStreamSharedFps;
 
             QnScheduleTaskList tasks;
             for (auto task: schedule)

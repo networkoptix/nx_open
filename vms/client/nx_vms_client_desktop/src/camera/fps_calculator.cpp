@@ -30,13 +30,13 @@ void calculateMaxFps(
         {
             case Qn::MotionType::MT_HardwareGrid:
                 if (shareFps)
-                    cameraDualStreamingFps -= QnLiveStreamParams::kMinSecondStreamFps;
+                    cameraDualStreamingFps -= QnLiveStreamParams::kMinSecondStreamSharedFps;
                 break;
             case Qn::MotionType::MT_SoftwareGrid:
                 if (shareFps)
                 {
-                    cameraFps -= QnLiveStreamParams::kMinSecondStreamFps;
-                    cameraDualStreamingFps -= QnLiveStreamParams::kMinSecondStreamFps;
+                    cameraFps -= QnLiveStreamParams::kMinSecondStreamSharedFps;
+                    cameraDualStreamingFps -= QnLiveStreamParams::kMinSecondStreamSharedFps;
                 }
                 break;
             default:
