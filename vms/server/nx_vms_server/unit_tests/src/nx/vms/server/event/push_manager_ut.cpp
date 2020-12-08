@@ -182,9 +182,9 @@ private:
     PushManager m_pushManager;
     std::map<QString, QnUserResourcePtr> m_users;
 
-    http::TestHttpServer m_cloudService;
     nx::utils::SyncQueue<Buffer> m_cloudRequests;
     std::atomic<http::StatusCode::Value> m_cloudState{http::StatusCode::created};
+    http::TestHttpServer m_cloudService;
 };
 
 #define EXPECT_LIST(VALUE, EXPECTED) \
