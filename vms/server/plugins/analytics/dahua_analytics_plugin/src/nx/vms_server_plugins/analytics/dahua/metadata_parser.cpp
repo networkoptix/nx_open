@@ -1,7 +1,7 @@
 #include "metadata_parser.h"
 
 #include <nx/utils/log/log_main.h>
-#include <nx/sdk/helpers/uuid_helper.h>
+#include <nx/utils/std/optional.h>
 #include <nx/sdk/analytics/helpers/object_metadata_packet.h>
 #include <nx/sdk/analytics/helpers/object_metadata.h>
 #include <nx/sdk/analytics/helpers/event_metadata_packet.h>
@@ -14,11 +14,14 @@
 #include <QtCore/QJsonArray>
 #include <QtCore/QDateTime>
 
+#include "plugin.h"
+#include "engine.h"
 #include "device_agent.h"
 
 namespace nx::vms_server_plugins::analytics::dahua {
 
 using namespace std::literals;
+using namespace nx::utils;
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
@@ -48,23 +51,27 @@ QString formatReceivedEventForLog(const Event& event)
     if (const auto& name = event.ruleName)
         text += NX_FMT("\nruleName: %1", *name);
 
-    if (const auto& object = event.object)
+    if (!event.objects.empty())
     {
-        text += "\nobject:";
-
-        text += NX_FMT("\n\ttypeId: %1", object->type->id);
-
-        text += "\n\tboundingBox:";
-        text += NX_FMT("\n\t\tx: %1", object->boundingBox.x);
-        text += NX_FMT("\n\t\ty: %1", object->boundingBox.y);
-        text += NX_FMT("\n\t\twidth: %1", object->boundingBox.width);
-        text += NX_FMT("\n\t\theight: %1", object->boundingBox.height);
-
-        if (!object->attributes.empty())
+        text += "\nobjects:";
+        for (const auto& object: event.objects)
         {
-            text += "\n\tattributes:";
-            for (const auto& attribute: object->attributes)
-                text += NX_FMT("\n\t\t%1: %2", attribute.name, attribute.value);
+            text += NX_FMT("\n\t%1:", object.id);
+
+            text += NX_FMT("\n\t\ttypeId: %1", object.type->id);
+
+            text += "\n\t\tboundingBox:";
+            text += NX_FMT("\n\t\t\tx: %1", object.boundingBox.x);
+            text += NX_FMT("\n\t\t\ty: %1", object.boundingBox.y);
+            text += NX_FMT("\n\t\t\twidth: %1", object.boundingBox.width);
+            text += NX_FMT("\n\t\t\theight: %1", object.boundingBox.height);
+
+            if (!object.attributes.empty())
+            {
+                text += "\n\t\tattributes:";
+                for (const auto& attribute: object.attributes)
+                    text += NX_FMT("\n\t\t\t%1: %2", attribute.name, attribute.value);
+            }
         }
     }
 
@@ -82,6 +89,9 @@ std::optional<Object> parseObject(const QJsonObject& jsonObject)
             return std::nullopt;
     }
 
+    if (const auto id = jsonObject["ObjectID"]; id.isDouble())
+        object.id = id.toInt();
+
     if (const auto box = jsonObject["BoundingBox"].toArray(); box.size() == 4)
     {
         object.boundingBox.x = box[0].toDouble() / kCoordinateDomain;
@@ -98,26 +108,32 @@ std::optional<Object> parseObject(const QJsonObject& jsonObject)
 
 void parseEventData(Event *event, const QJsonObject& data)
 {
-    if (const auto utc = data["UTC"]; utc.isDouble())
-    {
-        event->timestamp = std::chrono::seconds(utc.toInt())
-            + std::chrono::milliseconds(data["UTCMS"].toInt());
-    }
-
     if (const auto eventSeq = data["EventSeq"]; eventSeq.isDouble())
         event->sequenceId = eventSeq.toInt();
 
     if (const auto name = data["Name"]; name.isString())
         event->ruleName = name.toString();
 
-    if (auto object = data["Object"].toObject(); !object.isEmpty())
-        event->object = parseObject(object);
+    if (const auto objects = data["Objects"].toArray(); !objects.isEmpty())
+    {
+        for (int i = 0; i < objects.size(); ++i)
+        {
+            if (auto object = parseObject(objects[i].toObject()))
+                event->objects.push_back(std::move(*object));
+        }
+    }
+    else if (const auto jsonObject = data["Object"].toObject(); !jsonObject.isEmpty())
+    {
+        if (auto object = parseObject(jsonObject))
+            event->objects.push_back(std::move(*object));
+    }
 }
 
 } // namespace
 
 MetadataParser::MetadataParser(DeviceAgent* deviceAgent):
-    m_deviceAgent(deviceAgent)
+    m_deviceAgent(deviceAgent),
+    m_utilityProvider(deviceAgent->engine()->plugin()->utilityProvider())
 {
 }
 
@@ -143,6 +159,37 @@ void MetadataParser::terminateOngoingEvents()
             for (auto it = m_ongoingEvents.begin(); it != m_ongoingEvents.end(); )
                 terminate((it++)->second);
         });
+}
+
+Uuid MetadataParser::ObjectIdToTrackIdMap::operator()(const decltype(Object::id)& objectId)
+{
+    const auto it = m_entries.try_emplace(objectId).first;
+    auto& entry = it->second;
+
+    entry.sinceLastAccess.restart();
+    cleanUpStaleEntries();
+
+    return entry.trackId;
+}
+
+void MetadataParser::ObjectIdToTrackIdMap::cleanUpStaleEntries()
+{
+    constexpr auto kCleanupInterval = 30s;
+    if (!m_sinceLastCleanup.hasExpired(kCleanupInterval))
+        return;
+
+    for (auto it = m_entries.begin(); it != m_entries.end(); )
+    {
+        const auto& entry = it->second;
+
+        constexpr auto kEntryTimeout = 5min;
+        if (entry.sinceLastAccess.hasExpired(kEntryTimeout))
+            it = m_entries.erase(it);
+        else
+            ++it;
+    }
+
+    m_sinceLastCleanup.restart();
 }
 
 MetadataParser::OngoingEvent::Key MetadataParser::getKey(const Event& event)
@@ -215,6 +262,8 @@ void MetadataParser::parseEvent(const QByteArray& data)
 
     Event event;
 
+    event.timestamp = std::chrono::milliseconds(m_utilityProvider->vmsSystemTimeSinceEpochMs());
+
     int offset = 0;
     while (offset < data.size())
     {
@@ -279,22 +328,29 @@ void MetadataParser::parseEvent(const QByteArray& data)
 
 void MetadataParser::process(const Event& event)
 {
-    Uuid trackId;
-    bool eventShouldBeEmitted = false;
     if (event.type->isStateDependent)
     {
-        bool isFirst = false;
-        bool isLast = false;
-
         const auto key = getKey(event);
-        auto& ongoingEvent = m_ongoingEvents[key];
-        if (ongoingEvent.trackId.isNull())
-        {
-            ongoingEvent.trackId = UuidHelper::randomUuid();
+        const auto [it, isEmplaced] = m_ongoingEvents.try_emplace(key);
+        auto& ongoingEvent = it->second;
+
+        if (isEmplaced)
             ongoingEvent.timer.bindToAioThread(m_basicPollable.getAioThread());
-            isFirst = true;
+
+        if (!event.objects.empty())
+        {
+            const auto& newPrimaryObject = *std::min_element(
+                event.objects.begin(), event.objects.end(),
+                [](const auto& a, const auto& b) { return a.id < b.id; });
+
+            if (auto& primaryObject = ongoingEvent.primaryObject;
+                !primaryObject || primaryObject->id == newPrimaryObject.id)
+            {
+                primaryObject = newPrimaryObject;
+            }
         }
         
+        bool isErased = false;
         if (event.isActive)
         {
             ongoingEvent.Event::operator=(event);
@@ -312,76 +368,74 @@ void MetadataParser::process(const Event& event)
         else
         {
             ongoingEvent.timer.pleaseStopSync();
-            m_ongoingEvents.erase(key);
-            isLast = true;
+            m_ongoingEvents.erase(it);
+            isErased = true;
         }
 
-        trackId = ongoingEvent.trackId;
-        eventShouldBeEmitted = (isFirst != isLast);
+        emitObjects(event);
+        if (isEmplaced != isErased)
+            emitEvent(event, getIf(&ongoingEvent.primaryObject));
     }
     else
     {
-        trackId = UuidHelper::randomUuid();
-        eventShouldBeEmitted = true;
+        emitObjects(event);
+        emitEvent(event);
     }
-
-    emitObject(event, trackId);
-    if (eventShouldBeEmitted)
-        emitEvent(event, trackId);
 }
 
-void MetadataParser::emitObject(const Event& event, const nx::sdk::Uuid& trackId)
+void MetadataParser::emitObjects(const Event& event)
 {
-    if (!event.object)
-        return;
-
-    auto& object = *event.object;
-
-    const auto packet = makePtr<ObjectMetadataPacket>();
-    const auto metadata = makePtr<ObjectMetadata>();
-
-    metadata->setTypeId(object.type->id.toStdString());
-    metadata->setTrackId(trackId);
-    metadata->setBoundingBox(object.boundingBox);
-
-    if (event.timestamp)
+    for (const auto& object: event.objects)
     {
-        packet->setTimestampUs(
-            std::chrono::duration_cast<std::chrono::microseconds>(*event.timestamp).count());
-        packet->setFlags(ObjectMetadataPacket::Flags::cameraClockTimestamp);
-    }
-    packet->setDurationUs(
-        std::chrono::duration_cast<std::chrono::microseconds>(
-            event.isActive ? kInstantTrackDuration : 1us).count());
+        const auto trackId = m_objectIdToTrackIdMap(object.id);
 
-    for (const auto& [name, value, type]: object.attributes)
-    {
-        metadata->addAttribute(
-            makePtr<Attribute>(type, name.toStdString(), value.toStdString()));
-    }
+        const auto packet = makePtr<ObjectMetadataPacket>();
+        const auto metadata = makePtr<ObjectMetadata>();
 
-    packet->addItem(metadata.get());
-    emitMetadataPacket(packet);
+        metadata->setTypeId(object.type->id.toStdString());
+        metadata->setTrackId(trackId);
+        metadata->setBoundingBox(object.boundingBox);
 
-    const auto bestShotPacket = makePtr<ObjectTrackBestShotPacket>();
-    bestShotPacket->setTrackId(trackId);
-    bestShotPacket->setBoundingBox(object.boundingBox);
-    if (event.timestamp)
-    {
-        bestShotPacket->setTimestampUs(
-            std::chrono::duration_cast<std::chrono::microseconds>(*event.timestamp).count());
-        bestShotPacket->setFlags(ObjectMetadataPacket::Flags::cameraClockTimestamp);
+        if (event.timestamp)
+        {
+            packet->setTimestampUs(
+                std::chrono::duration_cast<std::chrono::microseconds>(*event.timestamp).count());
+        }
+        packet->setDurationUs(
+            std::chrono::duration_cast<std::chrono::microseconds>(
+                event.isActive ? kInstantTrackDuration : 1us).count());
+
+        for (const auto& [name, value, type]: object.attributes)
+        {
+            metadata->addAttribute(
+                makePtr<Attribute>(type, name.toStdString(), value.toStdString()));
+        }
+
+        packet->addItem(metadata.get());
+        emitMetadataPacket(packet);
+
+        const auto bestShotPacket = makePtr<ObjectTrackBestShotPacket>();
+        bestShotPacket->setTrackId(trackId);
+        bestShotPacket->setBoundingBox(object.boundingBox);
+        if (event.timestamp)
+        {
+            bestShotPacket->setTimestampUs(
+                std::chrono::duration_cast<std::chrono::microseconds>(*event.timestamp).count());
+        }
+        emitMetadataPacket(bestShotPacket);
     }
-    emitMetadataPacket(bestShotPacket);
 }
 
-void MetadataParser::emitEvent(const Event& event, const nx::sdk::Uuid& trackId)
+void MetadataParser::emitEvent(const Event& event, const Object* primaryObject)
 {
     const auto packet = makePtr<EventMetadataPacket>();
     const auto metadata = makePtr<EventMetadata>();
 
     metadata->setTypeId(event.type->id.toStdString());
-    metadata->setTrackId(trackId);
+
+    if (primaryObject)
+        metadata->setTrackId(m_objectIdToTrackIdMap(primaryObject->id));
+
     metadata->setIsActive(event.isActive);
 
     metadata->setCaption(event.type->prettyName.toStdString());
@@ -397,13 +451,11 @@ void MetadataParser::emitEvent(const Event& event, const nx::sdk::Uuid& trackId)
     {
         packet->setTimestampUs(
             std::chrono::duration_cast<std::chrono::microseconds>(*event.timestamp).count());
-
-        packet->setFlags(EventMetadataPacket::Flags::cameraClockTimestamp);
     }
     
-    if (const auto& object = event.object)
+    if (primaryObject)
     {
-        for (const auto& [name, value, type]: object->attributes)
+        for (const auto& [name, value, type]: primaryObject->attributes)
         {
             metadata->addAttribute(
                 makePtr<Attribute>(type, name.toStdString(), value.toStdString()));

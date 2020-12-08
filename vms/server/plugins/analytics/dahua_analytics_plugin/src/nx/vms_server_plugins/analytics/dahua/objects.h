@@ -39,6 +39,7 @@ extern const std::vector<const ObjectType*>& kObjectTypes;
 struct Object
 {
     const ObjectType* type = nullptr;
+    int id = -1;
     nx::sdk::analytics::Rect boundingBox;
     std::vector<ObjectAttribute> attributes;
 };

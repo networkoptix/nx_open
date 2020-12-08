@@ -27,7 +27,7 @@ extern const std::vector<const EventTypeGroup*>& kEventTypeGroups;
 
 struct EventType
 {
-    std::vector<QString> nativeIds;
+    QString nativeId;
     QString id;
     QString prettyName;
     QString description;
@@ -76,7 +76,7 @@ struct Event
     std::optional<std::chrono::milliseconds> timestamp;
     bool isActive = false;
     std::optional<QString> ruleName;
-    std::optional<Object> object;
+    std::vector<Object> objects;
 };
 
 } // namespace nx::vms_server_plugins::analytics::dahua

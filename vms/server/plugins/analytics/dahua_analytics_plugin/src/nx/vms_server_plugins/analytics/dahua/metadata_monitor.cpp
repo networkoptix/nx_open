@@ -131,7 +131,7 @@ Url MetadataMonitor::buildUrl() const
     Url url = deviceInfo->url();
     url.setPath("/cgi-bin/eventManager.cgi");
 
-    std::vector<QString> allNativeIds;
+    std::vector<QString> nativeIds;
 
     const auto eventTypeIds = m_neededTypes->eventTypeIds();
     for (int i = 0; i < eventTypeIds->count(); ++i)
@@ -142,12 +142,10 @@ Url MetadataMonitor::buildUrl() const
         if (!NX_ASSERT(type))
             continue;
 
-        const auto& nativeIds = type->nativeIds;
-        allNativeIds.insert(allNativeIds.begin(), nativeIds.begin(), nativeIds.end());
+        nativeIds.push_back(type->nativeId);
     }
 
-    url.setQuery(NX_FMT("action=attach&codes=[%1]&heartbeat=3",
-        nx::utils::join(allNativeIds, ",")));
+    url.setQuery(NX_FMT("action=attach&codes=[%1]&heartbeat=3", nx::utils::join(nativeIds, ",")));
 
     return url;
 }

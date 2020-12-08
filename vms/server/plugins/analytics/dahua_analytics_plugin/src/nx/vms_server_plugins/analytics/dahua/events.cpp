@@ -92,7 +92,7 @@ static std::vector<const EventType*> eventTypes;
 
 NX_DEFINE_EVENT_TYPE(VideoMotion)
 {
-    nativeIds = {"VideoMotion"};
+    nativeId = "VideoMotion";
     id = "nx.dahua.VideoMotion";
     prettyName = "Motion detection";
     description = "Video motion";
@@ -103,7 +103,7 @@ NX_DEFINE_EVENT_TYPE(VideoMotion)
 
 NX_DEFINE_EVENT_TYPE(VideoLoss)
 {
-    nativeIds = {"VideoLoss"};
+    nativeId = "VideoLoss";
     id = "nx.dahua.VideoLoss";
     prettyName = "Video loss detection";
     description = "Video loss";
@@ -113,7 +113,7 @@ NX_DEFINE_EVENT_TYPE(VideoLoss)
 
 NX_DEFINE_EVENT_TYPE(VideoBlind)
 {
-    nativeIds = {"VideoBlind"};
+    nativeId = "VideoBlind";
     id = "nx.dahua.VideoBlind";
     prettyName = "Video blind detection";
     description = "Video blind";
@@ -123,7 +123,7 @@ NX_DEFINE_EVENT_TYPE(VideoBlind)
 
 NX_DEFINE_EVENT_TYPE(VideoUnFocus)
 {
-    nativeIds = {"VideoUnFocus"};
+    nativeId = "VideoUnFocus";
     id = "nx.dahua.VideoUnFocus";
     prettyName = "Defocus detection";
     description = "Defocus";
@@ -133,8 +133,7 @@ NX_DEFINE_EVENT_TYPE(VideoUnFocus)
 
 NX_DEFINE_EVENT_TYPE(VideoAbnormalDetection)
 {
-    // Documentation contains wrong value for nativeId - VideoAbnormalDetection
-    nativeIds = {"SceneChange", "VideoAbnormalDetection"},
+    nativeId = "VideoAbnormalDetection";
     id = "nx.dahua.VideoAbnormalDetection";
     prettyName = "Scene change detection (Video abnormal detection)";
     description = "Scene change";
@@ -144,7 +143,7 @@ NX_DEFINE_EVENT_TYPE(VideoAbnormalDetection)
 
 NX_DEFINE_EVENT_TYPE(CrossLineDetection)
 {
-    nativeIds = {"CrossLineDetection"};
+    nativeId = "CrossLineDetection";
     id = "nx.dahua.CrossLineDetection";
     prettyName = "Tripwire detection (Cross line detection)";
     description = "Cross line";
@@ -156,7 +155,7 @@ NX_DEFINE_EVENT_TYPE(CrossLineDetection)
 
 NX_DEFINE_EVENT_TYPE(CrossRegionDetection)
 {
-    nativeIds = {"CrossRegionDetection"};
+    nativeId = "CrossRegionDetection";
     id = "nx.dahua.CrossRegionDetection";
     prettyName = "Intrusion detection (Cross region detection)";
     description = "Intrusion";
@@ -168,7 +167,7 @@ NX_DEFINE_EVENT_TYPE(CrossRegionDetection)
 
 NX_DEFINE_EVENT_TYPE(LeftDetection)
 {
-    nativeIds = {"LeftDetection"};
+    nativeId = "LeftDetection";
     id = "nx.dahua.LeftDetection";
     prettyName = "Abandoned object detection (Left object detection)";
     description = "Abandoned object";
@@ -180,7 +179,7 @@ NX_DEFINE_EVENT_TYPE(LeftDetection)
 
 NX_DEFINE_EVENT_TYPE(TakenAwayDetection)
 {
-    nativeIds = {"TakenAwayDetection"};
+    nativeId = "TakenAwayDetection";
     id = "nx.dahua.TakenAwayDetection";
     prettyName = "Missing object detection (Taken away detection)";
     description = "Taken away object";
@@ -192,7 +191,7 @@ NX_DEFINE_EVENT_TYPE(TakenAwayDetection)
 
 NX_DEFINE_EVENT_TYPE(FaceDetection)
 {
-    nativeIds = {"FaceDetection"};
+    nativeId = "FaceDetection";
     id = "nx.dahua.FaceDetection";
     prettyName = "Face detection";
     description = "Face";
@@ -203,7 +202,7 @@ NX_DEFINE_EVENT_TYPE(FaceDetection)
 
 NX_DEFINE_EVENT_TYPE(AudioMutation)
 {
-    nativeIds = {"AudioMutation"};
+    nativeId = "AudioMutation";
     id = "nx.dahua.AudioMutation";
     prettyName = "Audio intensity change detection (Audio mutation detection)";
     description = "Audio intensity change";
@@ -213,7 +212,7 @@ NX_DEFINE_EVENT_TYPE(AudioMutation)
 
 NX_DEFINE_EVENT_TYPE(AudioAnomaly)
 {
-    nativeIds = {"AudioAnomaly"};
+    nativeId = "AudioAnomaly";
     id = "nx.dahua.AudioAnomaly";
     prettyName = "Audio anomaly detection (Audio input abnormal detection)";
     description = "Audio input abnormal";
@@ -223,7 +222,7 @@ NX_DEFINE_EVENT_TYPE(AudioAnomaly)
 
 NX_DEFINE_EVENT_TYPE(StorageNotExist)
 {
-    nativeIds = {"StorageNotExist"};
+    nativeId = "StorageNotExist";
     id = "nx.dahua.StorageNotExist";
     prettyName = "Storage absence detection";
     description = "Storage absence";
@@ -233,7 +232,7 @@ NX_DEFINE_EVENT_TYPE(StorageNotExist)
 
 NX_DEFINE_EVENT_TYPE(StorageFailure)
 {
-    nativeIds = {"StorageFailure"};
+    nativeId = "StorageFailure";
     id = "nx.dahua.StorageFailure";
     prettyName = "Storage failure detection";
     description = "Storage failure";
@@ -243,7 +242,7 @@ NX_DEFINE_EVENT_TYPE(StorageFailure)
 
 NX_DEFINE_EVENT_TYPE(StorageLowSpace)
 {
-    nativeIds = {"StorageLowSpace"};
+    nativeId = "StorageLowSpace";
     id = "nx.dahua.StorageLowSpace";
     prettyName = "Storage low space detection";
     description = "Storage low space";
@@ -253,7 +252,7 @@ NX_DEFINE_EVENT_TYPE(StorageLowSpace)
 
 NX_DEFINE_EVENT_TYPE(HeatImagingTemper)
 {
-    nativeIds = {"HeatImagingTemper"};
+    nativeId = "HeatImagingTemper";
     id = "nx.dahua.HeatImagingTemper";
     prettyName = "High temperature detection";
     description = "High temperature";
@@ -263,7 +262,7 @@ NX_DEFINE_EVENT_TYPE(HeatImagingTemper)
 
 NX_DEFINE_EVENT_TYPE(LoginFailure)
 {
-    nativeIds = {"LoginFailure"};
+    nativeId = "LoginFailure";
     id = "nx.dahua.LoginFailure";
     prettyName = "Login error detection";
     description = "Login error detected";
@@ -272,7 +271,7 @@ NX_DEFINE_EVENT_TYPE(LoginFailure)
 
 NX_DEFINE_EVENT_TYPE(AlarmLocal)
 {
-    nativeIds = {"AlarmLocal"};
+    nativeId = "AlarmLocal";
     id = "nx.dahua.AlarmLocal";
     prettyName = "Alarm detection";
     description = "Alarm local";
@@ -282,7 +281,7 @@ NX_DEFINE_EVENT_TYPE(AlarmLocal)
 
 NX_DEFINE_EVENT_TYPE(AlarmOutput)
 {
-    nativeIds = {"AlarmOutput"};
+    nativeId = "AlarmOutput";
     id = "nx.dahua.AlarmOutput";
     prettyName = "Alarm output detection";
     description = "Alarm local";
@@ -292,7 +291,7 @@ NX_DEFINE_EVENT_TYPE(AlarmOutput)
 
 NX_DEFINE_EVENT_TYPE(CrowdDetection)
 {
-    nativeIds = {"CrowdDetection"};
+    nativeId = "CrowdDetection";
     id = "nx.dahua.CrowdDetection";
     prettyName = "Crowd detection (Crowd density overrun detection)";
     description = "Crowd dencity overrun";
@@ -302,7 +301,7 @@ NX_DEFINE_EVENT_TYPE(CrowdDetection)
 
 NX_DEFINE_EVENT_TYPE(ParkingDetection)
 {
-    nativeIds = {"ParkingDetection"};
+    nativeId = "ParkingDetection";
     id = "nx.dahua.ParkingDetection";
     prettyName = "Parking detection";
     description = "Parking";
@@ -312,7 +311,7 @@ NX_DEFINE_EVENT_TYPE(ParkingDetection)
 
 NX_DEFINE_EVENT_TYPE(RioterDetection)
 {
-    nativeIds = {"RioterDetection"};
+    nativeId = "RioterDetection";
     id = "nx.dahua.RioterDetection";
     prettyName = "Rioter detection (People gathering detection)";
     description = "People gathering";
@@ -323,7 +322,7 @@ NX_DEFINE_EVENT_TYPE(RioterDetection)
 
 NX_DEFINE_EVENT_TYPE(MoveDetection)
 {
-    nativeIds = {"MoveDetection"};
+    nativeId = "MoveDetection";
     id = "nx.dahua.MoveDetection";
     prettyName = "Fast moving detection";
     description = "Fast moving";
@@ -334,7 +333,7 @@ NX_DEFINE_EVENT_TYPE(MoveDetection)
 
 NX_DEFINE_EVENT_TYPE(WanderDetection)
 {
-    nativeIds = {"WanderDetection"};
+    nativeId = "WanderDetection";
     id = "nx.dahua.WanderDetection";
     prettyName = "Wander detection (Loitering detection)";
     description = "Loitering";
@@ -346,7 +345,7 @@ NX_DEFINE_EVENT_TYPE(WanderDetection)
 
 NX_DEFINE_EVENT_TYPE(StayDetection)
 {
-    nativeIds = {"StayDetection"};
+    nativeId = "StayDetection";
     id = "nx.dahua.StayDetection";
     prettyName = "Stay detection";
     description = "Stay";
@@ -358,7 +357,7 @@ NX_DEFINE_EVENT_TYPE(StayDetection)
 
 NX_DEFINE_EVENT_TYPE(QueueStayDetection)
 {
-    nativeIds = {"QueueStayDetection"};
+    nativeId = "QueueStayDetection";
     id = "nx.dahua.QueueStayDetection";
     prettyName = "Queue stay detection";
     description = "Queue stay";
@@ -394,10 +393,7 @@ static const auto eventTypeByNativeId =
         std::map<QStringView, const EventType*> map;
 
         for (const auto type: eventTypes)
-        {
-            for (const auto& nativeId: type->nativeIds)
-                map[nativeId] = type;
-        }
+            map[type->nativeId] = type;
 
         return map;
     }();
