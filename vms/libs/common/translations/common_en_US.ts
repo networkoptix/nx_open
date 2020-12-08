@@ -193,11 +193,11 @@
     </message>
     <message>
         <source>You are about to merge Systems with NVR licenses.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -792,25 +792,25 @@
     </message>
     <message>
         <source>NVR</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>NVR Licenses</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message numerus="yes">
         <source>%n NVR Licenses</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n NVR License</numerusform>
+            <numerusform>%n NVR Licenses</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>%n/%1 NVR Licenses</source>
         <comment>%n will be replaced by the total count</comment>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>%n/%1 NVR License</numerusform>
+            <numerusform>%n/%1 NVR Licenses</numerusform>
         </translation>
     </message>
 </context>
@@ -877,27 +877,27 @@
     </message>
     <message>
         <source>Only one Starter license is allowed per System.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>You already have one active Starter license.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Only one NVR license is allowed per System.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>You already have one active NVR license.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>Only one license of this type is allowed per System.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <source>You already have one active license of the same type.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
