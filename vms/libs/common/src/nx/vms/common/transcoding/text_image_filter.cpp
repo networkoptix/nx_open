@@ -278,7 +278,7 @@ CLVideoDecoderOutputPtr TextImageFilter::updateImage(const CLVideoDecoderOutputP
     QPainter p(d->textImage.data());
     p.setRenderHints(
         QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::HighQualityAntialiasing);
-    d->document->drawContents(&p);
+    d->document->drawContents(&p, d->textImage->rect());
 
     // Copy and convert RGBA32 image back to frame buffer.
     bgra_to_yv12_simd_intr(

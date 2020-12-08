@@ -11,15 +11,15 @@
 
 namespace {
 
-Qt::Edge getVerticalEdge(Qt::Corner corner)
+Qt::Edge getHorizontalEdge(Qt::Corner corner)
 {
     switch (corner)
     {
         case Qt::TopLeftCorner:
-        case Qt::TopRightCorner:
-            return Qt::TopEdge;
+        case Qt::BottomLeftCorner:
+            return Qt::LeftEdge;
         default:
-            return Qt::BottomEdge;
+            return Qt::RightEdge;
     }
 }
 
@@ -87,7 +87,7 @@ nx::core::transcoding::FilterChain QnImageFilterHelper::createFilterChain(
             return result;
         }
 
-        if (getVerticalEdge(timestampCorner) == getVerticalEdge(cameraNameCorner))
+        if (getHorizontalEdge(timestampCorner) != getHorizontalEdge(cameraNameCorner))
             widthFactor = 0.5;
     }
 
