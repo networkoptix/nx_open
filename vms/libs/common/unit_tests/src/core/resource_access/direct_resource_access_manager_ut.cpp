@@ -843,15 +843,15 @@ TEST_F(QnDirectResourceAccessManagerTest, checkServerAsAdmin)
     checkPermissions(server, desired, forbidden);
 }
 
-/* All users has read-only access to server by default. */
+/* Non-admin user can't view servers by default. */
 TEST_F(QnDirectResourceAccessManagerTest, checkServerAsViewer)
 {
     loginAs(GlobalPermission::customUser);
 
     auto server = addServer();
 
-    Qn::Permissions desired = Qn::ReadPermission | Qn::ViewContentPermission;
-    Qn::Permissions forbidden = Qn::FullServerPermissions;
+    Qn::Permissions desired = Qn::ReadPermission;
+    Qn::Permissions forbidden = Qn::FullServerPermissions | Qn::ViewContentPermission;
     forbidden &= ~desired;
 
     checkPermissions(server, desired, forbidden);
@@ -898,12 +898,13 @@ TEST_F(QnDirectResourceAccessManagerTest, checkStoragesAsCustom)
     auto storage = addStorage(server);
 
     Qn::Permissions desired = 0;
-    Qn::Permissions forbidden = Qn::ReadWriteSavePermission | Qn::RemovePermission;
+    Qn::Permissions forbidden =
+        Qn::ReadWriteSavePermission | Qn::RemovePermission | Qn::ViewContentPermission;
 
-    /* We do have access to server. */
-    checkPermissions(server, Qn::ReadPermission | Qn::ViewContentPermission, 0);
+    /* We don't have actual access to server. */
+    checkPermissions(server, Qn::ReadPermission, 0);
 
-    /* But no access to its storages. */
+    /* Neither access to its storages. */
     checkPermissions(storage, desired, forbidden);
 }
 

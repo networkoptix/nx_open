@@ -70,15 +70,8 @@ bool nodeRequiresChildren(
 
                 if (isLoggedIn && !hasAccessAllMediaPermission)
                 {
-                    const auto accessibleVia =
-                        accessProvider->accessibleVia(accessController->user(), node->resource());
-
-                    using Source = QnAbstractResourceAccessProvider::Source;
-                    const bool isNotImplicitAccess =
-                        accessibleVia != Source::implicitMonitorAccess
-                        && accessibleVia != Source::none;
-
-                    return !isNotImplicitAccess;
+                    return !accessProvider->hasAccess(
+                        accessController->user(), node->resource());
                 }
             }
             return false;
@@ -797,34 +790,40 @@ Qt::ItemFlags QnResourceTreeModelNode::flags(int column) const
         m_editable.checked = true;
     }
 
-    if(m_editable.value)
+    if (m_editable.value)
         result |= Qt::ItemIsEditable;
 
-    switch(m_type)
+    switch (m_type)
     {
-    case NodeType::resource:
-    case NodeType::edge:
-    case NodeType::layoutItem:
-    case NodeType::sharedLayout:
-    case NodeType::sharedResource:
-    {
-        // Any of flags is sufficient.
-        if (m_flags & (Qn::media | Qn::layout | Qn::server | Qn::videowall))
-            result |= Qt::ItemIsDragEnabled;
+        case NodeType::resource:
+        case NodeType::edge:
+        case NodeType::layoutItem:
+        case NodeType::sharedLayout:
+        case NodeType::sharedResource:
+        {
+            // Any of flags is sufficient.
+            if (m_flags & (Qn::media | Qn::layout | Qn::videowall))
+                result |= Qt::ItemIsDragEnabled;
 
-        // Web page is a combination of flags.
-        if (m_flags.testFlag(Qn::web_page))
+            if (m_flags.testFlag(Qn::server) &&
+                resourceAccessProvider()->hasAccess(accessController()->user(), resource()))
+            {
+                result |= Qt::ItemIsDragEnabled;
+            }
+
+            // Web page is a combination of flags.
+            if (m_flags.testFlag(Qn::web_page))
+                result |= Qt::ItemIsDragEnabled;
+            break;
+        }
+        case NodeType::videoWallItem: // TODO: #GDM #VW drag of empty item on scene should create new layout
+        case NodeType::recorder:
+        case NodeType::layoutTour:
             result |= Qt::ItemIsDragEnabled;
-        break;
-    }
-    case NodeType::videoWallItem: // TODO: #GDM #VW drag of empty item on scene should create new layout
-    case NodeType::recorder:
-    case NodeType::layoutTour:
-        result |= Qt::ItemIsDragEnabled;
-        break;
-    default:
-        break;
-    }
+            break;
+        default:
+            break;
+        }
     return result;
 }
 

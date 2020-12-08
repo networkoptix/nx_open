@@ -1316,18 +1316,14 @@ void QnResourceTreeModel::updateSystemHasManyServers()
         servers = servers.filtered(
             [this](const QnMediaServerResourcePtr& server)
             {
-                const auto accessibleVia =
-                    resourceAccessProvider()->accessibleVia(accessController()->user(), server);
-
-                using Source = QnAbstractResourceAccessProvider::Source;
-                const bool isNotImplicitAccess = accessibleVia != Source::implicitMonitorAccess
-                    && accessibleVia != Source::none;
+                if (resourceAccessProvider()->hasAccess(accessController()->user(), server))
+                    return true;
 
                 const auto serverNodes = m_nodesByResource.value(server);
                 bool nodeHasChildren = std::any_of(serverNodes.cbegin(), serverNodes.cend(),
                     [](const auto& node) { return node->children().count() > 0; });
 
-                return isNotImplicitAccess || nodeHasChildren;
+                return nodeHasChildren;
             });
     }
 

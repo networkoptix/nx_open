@@ -55,11 +55,7 @@ bool isAcceptableForModelServer(
         return false;
     }
 
-    const auto accessibleVia =
-        context->resourceAccessProvider()->accessibleVia(context->user(), resource);
-
-    return (accessibleVia != QnAbstractResourceAccessProvider::Source::none)
-        && (accessibleVia != QnAbstractResourceAccessProvider::Source::implicitMonitorAccess);
+    return context->resourceAccessProvider()->hasAccess(context->user(), resource);
 }
 
 bool isAcceptableForModelUser(

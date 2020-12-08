@@ -257,17 +257,6 @@ bool QnResourceTreeModelUserNodes::showMediaForSubject(const QnResourceAccessSub
     if (subject.user() && subject.user()->userRole() == Qn::UserRole::customUserRole)
         return false;
 
-    if (media->hasFlags(Qn::server))
-    {
-        const auto accessibleVia = resourceAccessProvider()->accessibleVia(subject, media);
-
-        using Source = QnAbstractResourceAccessProvider::Source;
-        const bool isNotImplicitAccess = accessibleVia != Source::implicitMonitorAccess
-            && accessibleVia != Source::none;
-
-        return isNotImplicitAccess;
-    }
-
     return resourceAccessProvider()->hasAccess(subject, media);
 }
 
