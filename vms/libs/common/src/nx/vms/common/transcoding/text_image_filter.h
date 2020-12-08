@@ -2,6 +2,8 @@
 
 #ifdef ENABLE_DATA_PROVIDERS
 
+#include <functional>
+
 #include <nx/utils/impl_ptr.h>
 #include <transcoding/filters/abstract_image_filter.h>
 

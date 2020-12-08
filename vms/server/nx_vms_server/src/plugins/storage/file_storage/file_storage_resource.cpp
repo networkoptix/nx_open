@@ -846,28 +846,46 @@ bool QnFileStorageResource::canWrite(bool directAccess) const
     QString fileName(lit("%1%2.tmp"));
     QString localGuid = commonModule()->moduleGUID().toString();
     localGuid = localGuid.mid(1, localGuid.length() - 2);
-    fileName = fileName.arg(closeDirPath(translateUrlToLocal(getUrl()))).arg(localGuid);
+    const auto rootPath = translateUrlToLocal(getUrl());
+    fileName = fileName.arg(closeDirPath(rootPath)).arg(localGuid);
 
-    QFile file(fileName);
-    if (file.open(QIODevice::WriteOnly))
-        return true;
-
-    if (!directAccess)
+    try
     {
-        #if defined(Q_OS_UNIX)
-            if (int fd = rootTool()->open(fileName, QIODevice::WriteOnly); fd > 0)
+        #if defined (Q_OS_UNIX)
+            if (directAccess)
             {
+                if (!rootTool()->changeOwner(rootPath))
+                    NX_DEBUG(this, "canWrite: Failed to change owner for the root path");
+
+                if (!rootTool()->removePath(fileName))
+                    throw std::runtime_error("Failed to remove previous file");
+            }
+            else
+            {
+                int fd = -1;
+                if (fd = rootTool()->open(fileName, QIODevice::WriteOnly); fd < 0)
+                    throw std::runtime_error("Failed to open file for writing");
+
                 ::close(fd);
+                NX_DEBUG(this, "canWrite: Write test via root-tool succeeded");
                 return true;
             }
         #endif
+
+        if (!QFile(fileName).open(QIODevice::WriteOnly))
+            throw std::runtime_error("Failed to open file for writing");
+
+        NX_DEBUG(this, "canWrite: Direct write test succeeded");
+        return true;
     }
+    catch (const std::exception& e)
+    {
+        NX_WARNING(
+            this, "canWrite: Open file '%1' (%2 access) for writing failed. Error: %3",
+            hidePassword(fileName), directAccess ? "direct" : "root-tool", e.what());
 
-    NX_WARNING(
-        this, "[initOrUpdate, WriteTest] Open file '%1' (%2 access) for writing failed",
-        hidePassword(fileName), directAccess ? "direct" : "root-tool");
-
-    return false;
+        return false;
+    }
 }
 
 Qn::StorageInitResult QnFileStorageResource::checkMountedStatus() const

@@ -2,6 +2,8 @@
 
 #include <QtCore/QUrl>
 
+#include <chrono>
+
 #include <nx/fusion/model_functions_fwd.h>
 #include <utils/common/ldap_fwd.h>
 
