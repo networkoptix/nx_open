@@ -2762,17 +2762,6 @@ több könyvjelző megjelenítéséhez</translation>
     </message>
   </context>
   <context>
-    <name>QnClockLabel</name>
-    <message>
-      <source>Server Time</source>
-      <translation>Szerveridő</translation>
-    </message>
-    <message>
-      <source>Local System Time</source>
-      <translation>Helyi rendszeridő</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCloudManagementWidget</name>
     <message>
       <source>Connect to your Systems
@@ -5108,6 +5097,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnScreenshotLoader</name>
+    <message>
+      <source>Top left corner</source>
+      <translation type="unfinished">Top left corner</translation>
+    </message>
+    <message>
+      <source>Top right corner</source>
+      <translation type="unfinished">Top right corner</translation>
+    </message>
+    <message>
+      <source>Bottom left corner</source>
+      <translation type="unfinished">Bottom left corner</translation>
+    </message>
+    <message>
+      <source>Bottom right corner</source>
+      <translation type="unfinished">Bottom right corner</translation>
+    </message>
+  </context>
+  <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>Export Bookmark...</source>
@@ -6861,26 +6869,6 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <translation>Képernyőkép mentése...</translation>
     </message>
     <message>
-      <source>No Timestamp</source>
-      <translation>Nincs időbélyeg</translation>
-    </message>
-    <message>
-      <source>Top Left Corner</source>
-      <translation>Bal felső sarok</translation>
-    </message>
-    <message>
-      <source>Top Right Corner</source>
-      <translation>Jobb felső sarok</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner</source>
-      <translation>Bal alsó sarok</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner</source>
-      <translation>Jobb alsó sarok</translation>
-    </message>
-    <message>
       <source>Failed to save screenshot</source>
       <translation>Screenshot mentése sikertelen</translation>
     </message>
@@ -6895,6 +6883,18 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message>
       <source>JPEG Image</source>
       <translation>JPEG kép</translation>
+    </message>
+    <message>
+      <source>No timestamp</source>
+      <translation type="unfinished">No timestamp</translation>
+    </message>
+    <message>
+      <source>No camera name</source>
+      <translation type="unfinished">No camera name</translation>
+    </message>
+    <message>
+      <source>Camera name:</source>
+      <translation type="unfinished">Camera name:</translation>
     </message>
   </context>
   <context>
@@ -8404,6 +8404,18 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
       <translation>Arra készül, hogy hosszú videót exportál. Nagyon sok tárhelyet igényelhet, és jelentős időt vehet igénybe.</translation>
+    </message>
+    <message>
+      <source>Add Info</source>
+      <translation type="unfinished">Add Info</translation>
+    </message>
+    <message>
+      <source>Delete Info</source>
+      <translation type="unfinished">Delete Info</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation type="unfinished">Info</translation>
     </message>
   </context>
   <context>

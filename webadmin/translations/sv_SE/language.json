@@ -84,6 +84,7 @@
         "ldapSearchBase": "LDAP-sökbas",
         "ldapSearchFilter": "LDAP-sökfilter",
         "ldapUri": "LDAP URI",
+        "ldapPasswordExperationPeriod": "LDAP-användarens lösenord har löpt ut. Uppdaterad endast efter att tidigare period har löpt ut",
         "localSystemId": "Lokalt system-ID",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Max skillnad mellan synkroniserad och Internet-tid (millisekunder)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Max skillnad mellan synkroniserad och lokal tid (millisekunder)",
@@ -131,7 +132,8 @@
         "maxEventLogRecords": "Maximal händelselogg poster för att hålla i databasen. Verklig mängd återlästa poster kan vara upp till 20% högre än det angivna värdet.",
         "forceLiveCacheForPrimaryStream": "Om du vill cache några ramar för primärströmmen. Värden: \"ja\" - alltid aktiverat (kan använda mycket RAM), \"nej\" - alltid inaktiverat utom när det krävs av uppspelningen (t.ex. HLS), \"auto\" - liknande \"nej\" men tänds när det förbättras användarupplevelse (t.ex. när någon Analytics-plugin fungerar på kameran).",
         "additionalLocalFsTypes": "Ytterligare filsystemtyper att tänka på när man beslutar om en given partition är lämplig att vara en serverlagring. Kommaseparerad lista över filsystemnamn som de listas i / proc / mounts förväntas.",
-        "mediaBufferSizeKb": "Serversidans RTSP buffertstorlek i KB. Större värde gör det möjligt att använda effektivare internet med hög runda resa förseningsvärde men sakta ner automatisk kvalitet växling och reaktion på RTSP söka drift."
+        "mediaBufferSizeKb": "Serversidans RTSP buffertstorlek i KB. Större värde gör det möjligt att använda effektivare internet med hög runda resa förseningsvärde men sakta ner automatisk kvalitet växling och reaktion på RTSP söka drift.",
+        "mediaBufferSizeForAudioOnlyDeviceKb": "Serverbuffertstorlek på serversidan i KB. Det har samma betydelse som parametern 'mediaBufferSizeKb' men den tillämpas endast på ljudenheter."
     },
     "info": {
         "tabs": {

@@ -127,7 +127,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Verifying update package</source>
-      <translation type="unfinished">Verifying update package</translation>
+      <translation>S'està verificant el paquet d'actualització</translation>
     </message>
   </context>
   <context>
@@ -729,7 +729,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation>Mitja</translation>
+      <translation>Mitjana</translation>
     </message>
     <message>
       <source>Large</source>
@@ -1333,57 +1333,57 @@ per veure més marcadors</translation>
     <name>LicenseDeactivationDialogs</name>
     <message numerus="yes">
       <source>Failed to deactivate %n licenses</source>
-      <translation type="unfinished">
-        <numerusform>Failed to deactivate %n licenses</numerusform>
-        <numerusform>Failed to deactivate %n licenses</numerusform>
+      <translation>
+        <numerusform>No s'han pogut desactivar les llicències %n</numerusform>
+        <numerusform>No s'han pogut desactivar les llicències %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n licenses cannot be deactivated</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
-        <numerusform>%1 of %n licenses cannot be deactivated</numerusform>
+      <translation>
+        <numerusform>%1 de %n llicències no es poden desactivar</numerusform>
+        <numerusform>%1 de %n llicències no es poden desactivar</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate %n Other</numerusform>
-        <numerusform>Deactivate %n Other</numerusform>
+      <translation>
+        <numerusform>Desactiva %n Altres</numerusform>
+        <numerusform>Desactiva %n Altres</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cannot deactivate licenses</source>
-      <translation type="unfinished">
-        <numerusform>Cannot deactivate licenses</numerusform>
-        <numerusform>Cannot deactivate licenses</numerusform>
+      <translation>
+        <numerusform>No es poden desactivar les llicències</numerusform>
+        <numerusform>No es poden desactivar les llicències</numerusform>
       </translation>
     </message>
     <message>
       <source>Please try again later.</source>
-      <translation type="unfinished">Please try again later.</translation>
+      <translation>Torneu-ho a intentar més tard.</translation>
     </message>
     <message>
       <source>Cannot connect to the License Server</source>
-      <translation type="unfinished">Cannot connect to the License Server</translation>
+      <translation>No es pot connectar amb el servidor de llicències</translation>
     </message>
     <message>
       <source>Please make sure your server has active Internet connection or check firewall settings.</source>
-      <translation type="unfinished">Please make sure your server has active Internet connection or check firewall settings.</translation>
+      <translation>Assegureu-vos que el servidor té connexió a Internet activa o comproveu la configuració del tallafoc.</translation>
     </message>
     <message>
       <source>License Server error</source>
-      <translation type="unfinished">License Server error</translation>
+      <translation>Error del servidor de llicències</translation>
     </message>
     <message>
       <source>Failed to remove license from Server</source>
-      <translation type="unfinished">Failed to remove license from Server</translation>
+      <translation>No s'ha pogut eliminar la llicència del servidor</translation>
     </message>
     <message numerus="yes">
       <source>%n licenses deactivated</source>
-      <translation type="unfinished">
-        <numerusform>%n licenses deactivated</numerusform>
-        <numerusform>%n licenses deactivated</numerusform>
+      <translation>
+        <numerusform>%n llicències desactivades</numerusform>
+        <numerusform>%n llicències desactivades</numerusform>
       </translation>
     </message>
   </context>
@@ -1391,64 +1391,64 @@ per veure més marcadors</translation>
     <name>LicenseManagementMessagesPrivate</name>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation type="unfinished">
-        <numerusform>%n channels.</numerusform>
-        <numerusform>%n channels.</numerusform>
+      <translation>
+        <numerusform>%n canals.</numerusform>
+        <numerusform>%n canals.</numerusform>
       </translation>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation type="unfinished">To get a valid License Key please contact %1.</translation>
+      <translation>Per obtenir una clau de llicència vàlida, poseu-vos en contacte amb %1.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
-      <translation type="unfinished">If the problem persists, please contact %1.</translation>
+      <translation>Si el problema continua, poseu-vos en contacte amb %1.</translation>
     </message>
     <message>
       <source>Please contact %1.</source>
-      <translation type="unfinished">Please contact %1.</translation>
+      <translation>Poseu-vos en contacte amb %1.</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact your Regional / License support:</source>
-      <translation type="unfinished">To get a valid License Key please contact your Regional / License support:</translation>
+      <translation>Per obtenir una clau de llicència vàlida, poseu-vos en contacte amb el servei de suport regional o de llicències:</translation>
     </message>
     <message>
       <source>If the problem persists, please contact your Regional / License support:</source>
-      <translation type="unfinished">If the problem persists, please contact your Regional / License support:</translation>
+      <translation>Si el problema continua, poseu-vos en contacte amb el servei de suport regional o de llicències:</translation>
     </message>
     <message>
       <source>Please contact your Regional / License support:</source>
-      <translation type="unfinished">Please contact your Regional / License support:</translation>
+      <translation>Poseu-vos en contacte amb el servei de suport regional o de llicències:</translation>
     </message>
   </context>
   <context>
     <name>LocalFiles</name>
     <message>
       <source>Path &quot;%1&quot; is invalid. Please try another path.</source>
-      <translation type="unfinished">Path &quot;%1&quot; is invalid. Please try another path.</translation>
+      <translation>El camí &quot;%1&quot; no és vàlid. Proveu un altre camí.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; already exists. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; already exists. Please try another name.</translation>
+      <translation>L'arxiu &quot;%1&quot; ja existeix. Proveu un altre nom.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; is used by another process.</source>
-      <translation type="unfinished">File &quot;%1&quot; is used by another process.</translation>
+      <translation>Un altre procés utilitza l'arxiu &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>File &quot;%1&quot; cannot be written. Please try another name.</source>
-      <translation type="unfinished">File &quot;%1&quot; cannot be written. Please try another name.</translation>
+      <translation>No es pot escriure a l'arxiu &quot;%1&quot;. Proveu un altre nom.</translation>
     </message>
     <message>
       <source>File name &quot;%1&quot; is reserved by operating system. Please try another name.</source>
-      <translation type="unfinished">File name &quot;%1&quot; is reserved by operating system. Please try another name.</translation>
+      <translation>El nom de l'arxiu &quot;%1&quot; està reservat pel sistema operatiu. Proveu un altre nom.</translation>
     </message>
     <message numerus="yes">
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
-      <translation type="unfinished">
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
-        <numerusform>File name must not contain the following reserved characters:</numerusform>
+      <translation>
+        <numerusform>El nom de l'arxiu ha de contenir els caràcters reservats següents:</numerusform>
+        <numerusform>El nom de l'arxiu no pot contenir els caràcters reservats següents:</numerusform>
       </translation>
     </message>
   </context>
@@ -1456,120 +1456,120 @@ per veure més marcadors</translation>
     <name>PasswordInformation</name>
     <message>
       <source>Good</source>
-      <translation type="unfinished">Good</translation>
+      <translation>Adequat</translation>
     </message>
     <message>
       <source>Fair</source>
-      <translation type="unfinished">Fair</translation>
+      <translation>Suficient</translation>
     </message>
     <message>
       <source>Weak</source>
-      <translation type="unfinished">Weak</translation>
+      <translation>Feble</translation>
     </message>
     <message>
       <source>Password should contain different types of symbols.</source>
-      <translation type="unfinished">Password should contain different types of symbols.</translation>
+      <translation>La contrasenya ha de contenir diferents tipus de símbols.</translation>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
-      <translation type="unfinished">
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
-        <numerusform>Password should contain %n different combinations of either characters, symbols, or digits</numerusform>
+      <translation>
+        <numerusform>La contrasenya ha de contenir %n combinacions diferents de caràcters, símbols o números</numerusform>
+        <numerusform>La contrasenya ha de contenir %n combinacions diferents de caràcters, símbols o números</numerusform>
       </translation>
     </message>
     <message>
       <source>Short</source>
-      <translation type="unfinished">Short</translation>
+      <translation>Curta</translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
-      <translation type="unfinished">
-        <numerusform>Password must be at least %n characters long.</numerusform>
-        <numerusform>Password must be at least %n characters long.</numerusform>
+      <translation>
+        <numerusform>La contrasenya ha de tenir un mínim de %n caràcters.</numerusform>
+        <numerusform>La contrasenya ha de tenir un mínim de %n caràcters.</numerusform>
       </translation>
     </message>
     <message>
       <source>Long</source>
-      <translation type="unfinished">Long</translation>
+      <translation>Llarga</translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
-      <translation type="unfinished">
-        <numerusform>Password must be no longer than %n characters.</numerusform>
-        <numerusform>Password must be no longer than %n characters.</numerusform>
+      <translation>
+        <numerusform>La contrasenya ha de tenir un màxim de %n caràcters.</numerusform>
+        <numerusform>La contrasenya ha de tenir un màxim de %n caràcters.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together.</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
-        <numerusform>Password should not contain %n or more consecutive characters together.</numerusform>
+      <translation>
+        <numerusform>La contrasenya no ha de contenir %n o més caràcters iguals consecutius.</numerusform>
+        <numerusform>La contrasenya no ha de contenir %n o més caràcters iguals consecutius.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters.</source>
-      <translation type="unfinished">
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
-        <numerusform>Password should not contain %n or more repeating characters.</numerusform>
+      <translation>
+        <numerusform>La contrasenya no ha de contenir %n o més caràcters repetits.</numerusform>
+        <numerusform>La contrasenya no ha de contenir %n o més caràcters repetits.</numerusform>
       </translation>
     </message>
     <message>
       <source>Common</source>
-      <translation type="unfinished">Common</translation>
+      <translation>Comú</translation>
     </message>
     <message>
       <source>This password is in list of the most popular passwords.</source>
-      <translation type="unfinished">This password is in list of the most popular passwords.</translation>
+      <translation>Aquesta contrasenya es troba a la llista de les contrasenyes més populars.</translation>
     </message>
     <message>
       <source>Incorrect</source>
-      <translation type="unfinished">Incorrect</translation>
+      <translation>Incorrecte</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation type="unfinished">Only latin letters, numbers and keyboard symbols %1 are allowed.</translation>
+      <translation>Només es permeten lletres llatines, números i símbols del teclat %1.</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
-      <translation type="unfinished">Only latin letters, numbers and keyboard symbols are allowed.</translation>
+      <translation>Només es permeten lletres llatines, números i símbols del teclat.</translation>
     </message>
   </context>
   <context>
     <name>PermissionsInfoTable</name>
     <message>
       <source>Cameras &amp; Resources</source>
-      <translation type="unfinished">Cameras &amp; Resources</translation>
+      <translation>Càmeres i recursos</translation>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation type="unfinished">Shared Layouts</translation>
+      <translation>Dissenys compartits</translation>
     </message>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Tot</translation>
     </message>
     <message>
       <source>Permissions</source>
-      <translation type="unfinished">Permissions</translation>
+      <translation>Permisos</translation>
     </message>
   </context>
   <context>
     <name>Ptz</name>
     <message>
       <source>Cannot get the current position from camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot get the current position from camera &quot;%1&quot;</translation>
+      <translation>No es pot obtenir la posició actual de la càmera &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Please wait for the camera to go online.</source>
-      <translation type="unfinished">Please wait for the camera to go online.</translation>
+      <translation>Espereu que la càmera es connecti.</translation>
     </message>
     <message>
       <source>Failed to get current position</source>
-      <translation type="unfinished">Failed to get current position</translation>
+      <translation>No s'ha pogut obtenir la posició actual</translation>
     </message>
     <message>
       <source>Cannot set the current position for camera &quot;%1&quot;</source>
-      <translation type="unfinished">Cannot set the current position for camera &quot;%1&quot;</translation>
+      <translation>No es pot definir la posició actual de la càmera &quot;%1&quot;</translation>
     </message>
     <message>
       <source>Failed to set current position</source>
@@ -1592,23 +1592,23 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>This camera does not support advanced PTZ</source>
-      <translation type="unfinished">This camera does not support advanced PTZ</translation>
+      <translation>Aquesta càmera no és compatible amb PTZ avançat</translation>
     </message>
     <message>
       <source>Zooming out...</source>
-      <translation type="unfinished">Zooming out...</translation>
+      <translation>Allunyant...</translation>
     </message>
     <message>
       <source>Moving...</source>
-      <translation type="unfinished">Moving...</translation>
+      <translation>Movent...</translation>
     </message>
     <message>
       <source>Zooming in...</source>
-      <translation type="unfinished">Zooming in...</translation>
+      <translation>Apropant...</translation>
     </message>
     <message>
       <source>Focusing...</source>
-      <translation type="unfinished">Focusing...</translation>
+      <translation>Enfocant...</translation>
     </message>
   </context>
   <context>
@@ -2056,15 +2056,15 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Storage added</source>
-      <translation type="unfinished">Storage added</translation>
+      <translation>S'ha afegit l'emmagatzematge</translation>
     </message>
     <message>
       <source>Storage updated</source>
-      <translation type="unfinished">Storage updated</translation>
+      <translation>S'ha actualitzat l'emmagatzematge</translation>
     </message>
     <message>
       <source>Storage removed</source>
-      <translation type="unfinished">Storage removed</translation>
+      <translation>S'ha suprimit l'emmagatzematge</translation>
     </message>
   </context>
   <context>
@@ -2075,66 +2075,66 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Select Cameras to Backup...</source>
-      <translation type="unfinished">Select Cameras to Backup...</translation>
+      <translation>Seleccioneu les càmeres per fer còpies de seguretat...</translation>
     </message>
     <message>
       <source>If the backup is not set up on the current server of the cameras, their archive will not be backed up.</source>
-      <translation type="unfinished">If the backup is not set up on the current server of the cameras, their archive will not be backed up.</translation>
+      <translation>Si la còpia de seguretat no està configurada al servidor actual de les càmeres, no es farà una còpia de seguretat de l'arxiu.</translation>
     </message>
   </context>
   <context>
     <name>QnBackupScheduleDialog</name>
     <message>
       <source>Until finished</source>
-      <translation type="unfinished">Until finished</translation>
+      <translation>Fins que acabi</translation>
     </message>
   </context>
   <context>
     <name>QnBackupSettingsDialog</name>
     <message>
       <source>By Schedule</source>
-      <translation type="unfinished">By Schedule</translation>
+      <translation>Per calendari</translation>
     </message>
     <message>
       <source>Realtime</source>
-      <translation type="unfinished">Realtime</translation>
+      <translation>En temps real</translation>
     </message>
     <message>
       <source>On Demand</source>
-      <translation type="unfinished">On Demand</translation>
+      <translation>A petició</translation>
     </message>
     <message>
       <source>Hi-Res Streams</source>
       <comment>Cameras Backup</comment>
-      <translation type="unfinished">Hi-Res Streams</translation>
+      <translation>Fluxos d'alta resolució</translation>
     </message>
     <message>
       <source>All Streams</source>
       <comment>Cameras Backup</comment>
-      <translation type="unfinished">All Streams</translation>
+      <translation>Tots els fluxos</translation>
     </message>
     <message>
       <source>Global Settings</source>
-      <translation type="unfinished">Global Settings</translation>
+      <translation>Configuració global</translation>
     </message>
     <message>
       <source>Lo-Res Streams</source>
       <comment>Cameras Backup</comment>
-      <translation type="unfinished">Lo-Res Streams</translation>
+      <translation>Fluxos de baixa resolució</translation>
     </message>
     <message>
       <source>affect all servers in System</source>
       <comment>Relates to &apos;Global Settings&apos; subject</comment>
-      <translation type="unfinished">affect all servers in System</translation>
+      <translation>afecta tots els servidors del sistema</translation>
     </message>
   </context>
   <context>
     <name>QnBlinkingImageButtonWidget</name>
     <message numerus="yes">
       <source>You have %n notifications</source>
-      <translation type="unfinished">
-        <numerusform>You have %n notifications</numerusform>
-        <numerusform>You have %n notifications</numerusform>
+      <translation>
+        <numerusform>Teniu %n notificacions</numerusform>
+        <numerusform>Teniu %n notificacions</numerusform>
       </translation>
     </message>
   </context>
@@ -2142,31 +2142,31 @@ per veure més marcadors</translation>
     <name>QnBookmarkWidget</name>
     <message>
       <source>Do not lock archive</source>
-      <translation type="unfinished">Do not lock archive</translation>
+      <translation>No bloquegis l'arxiu</translation>
     </message>
     <message>
       <source>1 month</source>
-      <translation type="unfinished">1 month</translation>
+      <translation>1 mes</translation>
     </message>
     <message>
       <source>3 month</source>
-      <translation type="unfinished">3 month</translation>
+      <translation>3 mesos</translation>
     </message>
     <message>
       <source>6 month</source>
-      <translation type="unfinished">6 month</translation>
+      <translation>6 mesos</translation>
     </message>
     <message>
       <source>year</source>
-      <translation type="unfinished">year</translation>
+      <translation>any</translation>
     </message>
     <message>
       <source>Name cannot be empty.</source>
-      <translation type="unfinished">Name cannot be empty.</translation>
+      <translation>El nom no pot estar buit.</translation>
     </message>
     <message>
       <source>Description cannot be empty</source>
-      <translation type="unfinished">Description cannot be empty</translation>
+      <translation>La descripció no pot estar buida</translation>
     </message>
   </context>
   <context>
@@ -2181,27 +2181,27 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>The password is incorrect.</source>
-      <translation type="unfinished">The password is incorrect.</translation>
+      <translation>La contrasenya no és correcta.</translation>
     </message>
     <message>
       <source>Select Build</source>
-      <translation type="unfinished">Select Build</translation>
+      <translation>Seleccioneu la compilació</translation>
     </message>
   </context>
   <context>
     <name>QnBusinessResourceValidationStrings</name>
     <message numerus="yes">
       <source>%1 of %n devices</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n devices</numerusform>
-        <numerusform>%1 of %n devices</numerusform>
+      <translation>
+        <numerusform>%1 de %n dispositius</numerusform>
+        <numerusform>%1 de %n dispositius</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n cameras</numerusform>
-        <numerusform>%1 of %n cameras</numerusform>
+      <translation>
+        <numerusform>%1 de %n càmeres</numerusform>
+        <numerusform>%1 de %n càmeres</numerusform>
       </translation>
     </message>
     <message>
@@ -2214,14 +2214,14 @@ per veure més marcadors</translation>
     </message>
     <message numerus="yes">
       <source>%1 of %n I/O modules</source>
-      <translation type="unfinished">
-        <numerusform>%1 of %n I/O modules</numerusform>
-        <numerusform>%1 of %n I/O modules</numerusform>
+      <translation>
+        <numerusform>%1 de %n mòduls I/O</numerusform>
+        <numerusform>%1 de %n mòduls I/O</numerusform>
       </translation>
     </message>
     <message>
       <source>Any Device</source>
-      <translation type="unfinished">Any Device</translation>
+      <translation>Qualsevol dispositiu</translation>
     </message>
     <message>
       <source>Any Camera</source>
@@ -2232,50 +2232,50 @@ per veure més marcadors</translation>
     <name>QnBusinessRuleItemDelegate</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation type="unfinished">Manage Bookmarks</translation>
+      <translation>Gestiona els marcadors</translation>
     </message>
   </context>
   <context>
     <name>QnBusinessRuleViewModel</name>
     <message>
       <source>Error: %1</source>
-      <translation type="unfinished">Error: %1</translation>
+      <translation>Error: %1</translation>
     </message>
     <message>
       <source>Instant</source>
-      <translation type="unfinished">Instant</translation>
+      <translation>Instantani</translation>
     </message>
     <message>
       <source>Stops</source>
-      <translation type="unfinished">Stops</translation>
+      <translation>S'atura</translation>
     </message>
     <message>
       <source>Starts</source>
-      <translation type="unfinished">Starts</translation>
+      <translation>Comença</translation>
     </message>
     <message>
       <source>Occurs</source>
-      <translation type="unfinished">Occurs</translation>
+      <translation>Ocorre</translation>
     </message>
     <message>
       <source>N/A</source>
-      <translation type="unfinished">N/A</translation>
+      <translation>N/D</translation>
     </message>
     <message>
       <source>Every %1</source>
-      <translation type="unfinished">Every %1</translation>
+      <translation>Cada %1</translation>
     </message>
     <message>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Sistema</translation>
     </message>
     <message>
       <source>Any Server</source>
-      <translation type="unfinished">Any Server</translation>
+      <translation>Qualsevol servidor</translation>
     </message>
     <message>
       <source>Any Device</source>
-      <translation type="unfinished">Any Device</translation>
+      <translation>Qualsevol dispositiu</translation>
     </message>
     <message>
       <source>Any Camera</source>
@@ -2283,9 +2283,9 @@ per veure més marcadors</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation type="unfinished">
-        <numerusform>%n Servers</numerusform>
-        <numerusform>%n Servers</numerusform>
+      <translation>
+        <numerusform>%n servidors</numerusform>
+        <numerusform>%n servidors</numerusform>
       </translation>
     </message>
     <message>
@@ -2294,30 +2294,30 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Source Server</source>
-      <translation type="unfinished">Source Server</translation>
+      <translation>Servidor d'origen</translation>
     </message>
     <message>
       <source>Source Camera</source>
-      <translation type="unfinished">Source Camera</translation>
+      <translation>Càmera d'origen</translation>
     </message>
     <message numerus="yes">
       <source>Source and %n more Cameras</source>
-      <translation type="unfinished">
-        <numerusform>Source and %n more Cameras</numerusform>
-        <numerusform>Source and %n more Cameras</numerusform>
+      <translation>
+        <numerusform>Origen i %n càmeres més</numerusform>
+        <numerusform>Origen i %n càmeres més</numerusform>
       </translation>
     </message>
     <message>
       <source>Select at least one Device</source>
-      <translation type="unfinished">Select at least one Device</translation>
+      <translation>Seleccioneu almenys un dispositiu</translation>
     </message>
     <message>
       <source>Select at least one Camera</source>
-      <translation type="unfinished">Select at least one Camera</translation>
+      <translation>Seleccioneu almenys una càmera</translation>
     </message>
     <message>
       <source>Select Server</source>
-      <translation type="unfinished">Select Server</translation>
+      <translation>Selecciona el servidor</translation>
     </message>
     <message>
       <source>Source Server and %1</source>
@@ -2354,7 +2354,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Any Device</source>
-      <translation type="unfinished">Any Device</translation>
+      <translation>Qualsevol dispositiu</translation>
     </message>
     <message>
       <source>Any Camera</source>
@@ -2362,11 +2362,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
-      <translation type="unfinished">Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</translation>
+      <translation>El reconeixement forçat només funcionarà per a esdeveniments genèrics si s'utilitzen identificadors de càmera a l'URL de l'esdeveniment genèric</translation>
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+      <translation>Un temps prolongat d'enregistrament previ augmentarà la utilització de la memòria RAM al servidor</translation>
     </message>
   </context>
   <context>
@@ -2381,105 +2381,105 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>&amp;Schedule...</source>
-      <translation type="unfinished">&amp;Schedule...</translation>
+      <translation>&amp;Programa...</translation>
     </message>
     <message>
       <source>Restore All Rules to Default</source>
-      <translation type="unfinished">Restore All Rules to Default</translation>
+      <translation>Restaura totes les regles predeterminades</translation>
     </message>
     <message>
       <source>No event rules</source>
-      <translation type="unfinished">No event rules</translation>
+      <translation>No hi ha regles d'esdeveniments</translation>
     </message>
     <message>
       <source>Filter by devices...</source>
-      <translation type="unfinished">Filter by devices...</translation>
+      <translation>Filtra per dispositius...</translation>
     </message>
     <message>
       <source>Filter by cameras...</source>
-      <translation type="unfinished">Filter by cameras...</translation>
+      <translation>Filtra per càmeres...</translation>
     </message>
     <message>
       <source>Failed to retrieve rules</source>
-      <translation type="unfinished">Failed to retrieve rules</translation>
+      <translation>No s'han pogut recuperar les regles</translation>
     </message>
     <message>
       <source>Failed to save rule</source>
-      <translation type="unfinished">Failed to save rule</translation>
+      <translation>No s'ha pogut desar la regla</translation>
     </message>
     <message>
       <source>Some rules are not valid. Disable them?</source>
-      <translation type="unfinished">Some rules are not valid. Disable them?</translation>
+      <translation>Algunes regles no són vàlides. Voleu desactivar-les?</translation>
     </message>
     <message>
       <source>Apply changes before exit?</source>
-      <translation type="unfinished">Apply changes before exit?</translation>
+      <translation>Voleu aplicar els canvis abans de sortir?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
-      <translation type="unfinished">This action cannot be undone.</translation>
+      <translation>Aquesta acció no es pot desfer.</translation>
     </message>
     <message>
       <source>Restore all rules to default?</source>
-      <translation type="unfinished">Restore all rules to default?</translation>
+      <translation>Voleu restaurar totes les regles predeterminades?</translation>
     </message>
   </context>
   <context>
     <name>QnBusinessRulesViewModel</name>
     <message>
       <source>On</source>
-      <translation type="unfinished">On</translation>
+      <translation>Encès</translation>
     </message>
     <message>
       <source>Event</source>
-      <translation type="unfinished">Event</translation>
+      <translation>Esdeveniment</translation>
     </message>
     <message>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Origen</translation>
     </message>
     <message>
       <source>Action</source>
-      <translation type="unfinished">Action</translation>
+      <translation>Acció</translation>
     </message>
     <message>
       <source>Target</source>
-      <translation type="unfinished">Target</translation>
+      <translation>Objectiu</translation>
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation type="unfinished">Interval of Action</translation>
+      <translation>Interval d'acció</translation>
     </message>
   </context>
   <context>
     <name>QnBuzzerPolicy</name>
     <message>
       <source>Servers that support buzzer</source>
-      <translation type="unfinished">Servers that support buzzer</translation>
+      <translation>Servidors que admeten el brunzit</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAnalyticsPolicy</name>
     <message>
       <source>Analytics is not available for %1</source>
-      <translation type="unfinished">Analytics is not available for %1</translation>
+      <translation>L'analítica no està disponible per a %1</translation>
     </message>
   </context>
   <context>
     <name>QnCameraAudioTransmitPolicy</name>
     <message>
       <source>Select device</source>
-      <translation type="unfinished">Select device</translation>
+      <translation>Selecciona el dispositiu</translation>
     </message>
     <message>
       <source>Select camera</source>
-      <translation type="unfinished">Select camera</translation>
+      <translation>Selecciona la càmera</translation>
     </message>
     <message numerus="yes">
       <source>%1 does not support two-way audio</source>
-      <translation type="unfinished">
-        <numerusform>%1 does not support two-way audio</numerusform>
-        <numerusform>%1 does not support two-way audio</numerusform>
+      <translation>
+        <numerusform>%1 no admet àudio bidireccional</numerusform>
+        <numerusform>%1 no admet àudio bidireccional</numerusform>
       </translation>
     </message>
   </context>
@@ -2491,83 +2491,83 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>FAILED: %1</source>
-      <translation type="unfinished">FAILED: %1</translation>
+      <translation>ERROR: %1</translation>
     </message>
     <message>
       <source>Confirming server availability.</source>
-      <translation type="unfinished">Confirming server availability.</translation>
+      <translation>S'està confirmant la disponibilitat del servidor.</translation>
     </message>
     <message>
       <source>Evaluating media stream for errors.</source>
-      <translation type="unfinished">Evaluating media stream for errors.</translation>
+      <translation>S'està avaluant el flux de suports per detectar errors.</translation>
     </message>
     <message>
       <source>Diagnostics for device %1</source>
-      <translation type="unfinished">Diagnostics for device %1</translation>
+      <translation>Diagnòstic del dispositiu %1</translation>
     </message>
     <message>
       <source>Diagnostics for camera %1</source>
-      <translation type="unfinished">Diagnostics for camera %1</translation>
+      <translation>Diagnòstic de la càmera %1</translation>
     </message>
     <message>
       <source>Device Diagnostics</source>
-      <translation type="unfinished">Device Diagnostics</translation>
+      <translation>Diagnòstic del dispositiu</translation>
     </message>
     <message>
       <source>Camera Diagnostics</source>
-      <translation type="unfinished">Camera Diagnostics</translation>
+      <translation>Diagnòstic de la càmera</translation>
     </message>
     <message>
       <source>Confirming device is accessible.</source>
-      <translation type="unfinished">Confirming device is accessible.</translation>
+      <translation>S'està confirmant que el dispositiu és accessible.</translation>
     </message>
     <message>
       <source>Confirming camera is accessible.</source>
-      <translation type="unfinished">Confirming camera is accessible.</translation>
+      <translation>S'està confirmant que la càmera és accessible.</translation>
     </message>
     <message>
       <source>Confirming target device provides media stream.</source>
-      <translation type="unfinished">Confirming target device provides media stream.</translation>
+      <translation>S'està confirmant que el dispositiu objectiu proporciona un flux de suports.</translation>
     </message>
     <message>
       <source>Confirming target camera provides media stream.</source>
-      <translation type="unfinished">Confirming target camera provides media stream.</translation>
+      <translation>S'està confirmant que la càmera objectiva proporciona un flux de suports.</translation>
     </message>
     <message>
       <source>Diagnostics for I/O module %1</source>
-      <translation type="unfinished">Diagnostics for I/O module %1</translation>
+      <translation>Diagnòstic del mòdul I/O %1</translation>
     </message>
     <message>
       <source>I/O Module Diagnostics</source>
-      <translation type="unfinished">I/O Module Diagnostics</translation>
+      <translation>Diagnòstic del mòdul I/O</translation>
     </message>
     <message>
       <source>Confirming I/O module is accessible.</source>
-      <translation type="unfinished">Confirming I/O module is accessible.</translation>
+      <translation>S'està confirmant que el mòdul I/O és accessible.</translation>
     </message>
     <message>
       <source>Confirming target I/O module provides media stream.</source>
-      <translation type="unfinished">Confirming target I/O module provides media stream.</translation>
+      <translation>S'està confirmant que el mòdul I/O objectiu proporciona un flux de suports.</translation>
     </message>
     <message>
       <source>Diagnostics complete</source>
-      <translation type="unfinished">Diagnostics complete</translation>
+      <translation>Diagnòstic completat</translation>
     </message>
   </context>
   <context>
     <name>QnCameraInputBusinessEventWidget</name>
     <message>
       <source>automatic</source>
-      <translation type="unfinished">automatic</translation>
+      <translation>automàtic</translation>
     </message>
   </context>
   <context>
     <name>QnCameraInputPolicy</name>
     <message numerus="yes">
       <source>%1 have no input ports</source>
-      <translation type="unfinished">
-        <numerusform>%1 have no input ports</numerusform>
-        <numerusform>%1 have no input ports</numerusform>
+      <translation>
+        <numerusform>%1 no té ports d'entrada</numerusform>
+        <numerusform>%1 no té ports d'entrada</numerusform>
       </translation>
     </message>
   </context>
@@ -2595,31 +2595,31 @@ per veure més marcadors</translation>
     </message>
     <message numerus="yes">
       <source>%n devices found</source>
-      <translation type="unfinished">
-        <numerusform>%n devices found</numerusform>
-        <numerusform>%n devices found</numerusform>
+      <translation>
+        <numerusform>S'han trobat %n dispositius</numerusform>
+        <numerusform>S'han trobat %n dispositius</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n cameras found</source>
-      <translation type="unfinished">
-        <numerusform>%n cameras found</numerusform>
-        <numerusform>%n cameras found</numerusform>
+      <translation>
+        <numerusform>S'han trobat %n càmeres</numerusform>
+        <numerusform>S'han trobat %n càmeres</numerusform>
       </translation>
     </message>
     <message>
       <source>Export selected devices to a file.</source>
-      <translation type="unfinished">Export selected devices to a file.</translation>
+      <translation>Exporta els dispositius seleccionats a un arxiu.</translation>
     </message>
     <message>
       <source>Export selected cameras to a file.</source>
-      <translation type="unfinished">Export selected cameras to a file.</translation>
+      <translation>Exporta les càmeres seleccionades a un arxiu.</translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules found</source>
-      <translation type="unfinished">
-        <numerusform>%n I/O modules found</numerusform>
-        <numerusform>%n I/O modules found</numerusform>
+      <translation>
+        <numerusform>S'han trobat %n mòduls I/O</numerusform>
+        <numerusform>S'han trobat %n mòduls I/O</numerusform>
       </translation>
     </message>
     <message>
@@ -2629,78 +2629,78 @@ per veure més marcadors</translation>
     <message>
       <source>Devices List for %1</source>
       <comment>%1 will be substituted with a server name</comment>
-      <translation type="unfinished">Devices List for %1</translation>
+      <translation>Llista de dispositius per a %1</translation>
     </message>
     <message>
       <source>Cameras List for %1</source>
       <comment>%1 will be substituted with a server name</comment>
-      <translation type="unfinished">Cameras List for %1</translation>
+      <translation>Llista de càmeres per a %1</translation>
     </message>
   </context>
   <context>
     <name>QnCameraListModel</name>
     <message>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Enregistrament</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nom</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Proveïdor</translation>
     </message>
     <message>
       <source>Model</source>
-      <translation type="unfinished">Model</translation>
+      <translation>Model</translation>
     </message>
     <message>
       <source>Firmware</source>
-      <translation type="unfinished">Firmware</translation>
+      <translation>Firmware</translation>
     </message>
     <message>
       <source>IP/Name</source>
-      <translation type="unfinished">IP/Name</translation>
+      <translation>IP/Nom</translation>
     </message>
     <message>
       <source>MAC address</source>
-      <translation type="unfinished">MAC address</translation>
+      <translation>Adreça MAC</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Servidor</translation>
     </message>
     <message>
       <source>ID</source>
-      <translation type="unfinished">ID</translation>
+      <translation>ID</translation>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>ID lògic</translation>
     </message>
   </context>
   <context>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation type="unfinished">Recording or motion detection is disabled for %1</translation>
+      <translation>L'enregistrament o la detecció de moviment estan desactivats per a %1</translation>
     </message>
   </context>
   <context>
     <name>QnCameraOutputBusinessActionWidget</name>
     <message>
       <source>automatic</source>
-      <translation type="unfinished">automatic</translation>
+      <translation>automàtic</translation>
     </message>
   </context>
   <context>
     <name>QnCameraOutputPolicy</name>
     <message numerus="yes">
       <source>%1 have no output relays</source>
-      <translation type="unfinished">
-        <numerusform>%1 have no output relays</numerusform>
-        <numerusform>%1 have no output relays</numerusform>
+      <translation>
+        <numerusform>%1 no té cap repetidor de sortida</numerusform>
+        <numerusform>%1 no té cap repetidor de sortida</numerusform>
       </translation>
     </message>
   </context>
@@ -2712,26 +2712,26 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Repeat Password</source>
-      <translation type="unfinished">Repeat Password</translation>
+      <translation>Repetiu la contrasenya</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation type="unfinished">Passwords do not match.</translation>
+      <translation>Les contrasenyes no coincideixen.</translation>
     </message>
     <message>
       <source>Password should be at least 8 symbols long and contain different types of characters.</source>
-      <translation type="unfinished">Password should be at least 8 symbols long and contain different types of characters.</translation>
+      <translation>La contrasenya ha de tenir com a mínim 8 símbols i contenir diferents tipus de caràcters.</translation>
     </message>
     <message>
       <source>Password should not be equal to camera&apos;s user name</source>
-      <translation type="unfinished">Password should not be equal to camera&apos;s user name</translation>
+      <translation>La contrasenya no ha de ser igual al nom d'usuari de la càmera</translation>
     </message>
   </context>
   <context>
     <name>QnCameraRecordingPolicy</name>
     <message>
       <source>Recording is disabled for %1</source>
-      <translation type="unfinished">Recording is disabled for %1</translation>
+      <translation>L'enregistrament està desactivat per a %1</translation>
     </message>
   </context>
   <context>
@@ -2742,11 +2742,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation type="unfinished">Confirm Password</translation>
+      <translation>Confirmeu la contrasenya</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation type="unfinished">Passwords do not match.</translation>
+      <translation>Les contrasenyes no coincideixen.</translation>
     </message>
     <message>
       <source>Current Password</source>
@@ -2754,22 +2754,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>To modify your password please enter the existing one.</source>
-      <translation type="unfinished">To modify your password please enter the existing one.</translation>
+      <translation>Per modificar la contrasenya, introduïu l'existent.</translation>
     </message>
     <message>
       <source>Invalid current password.</source>
-      <translation type="unfinished">Invalid current password.</translation>
-    </message>
-  </context>
-  <context>
-    <name>QnClockLabel</name>
-    <message>
-      <source>Server Time</source>
-      <translation type="unfinished">Server Time</translation>
-    </message>
-    <message>
-      <source>Local System Time</source>
-      <translation type="unfinished">Local System Time</translation>
+      <translation>La contrasenya actual no és vàlida.</translation>
     </message>
   </context>
   <context>
@@ -2778,14 +2767,14 @@ per veure més marcadors</translation>
       <source>Connect to your Systems
 from anywhere with any
 devices</source>
-      <translation type="unfinished">Connect to your Systems
-from anywhere with any
-devices</translation>
+      <translation>Connecteu-vos als vostres sistemes
+des de qualsevol lloc amb qualsevol
+dispositiu</translation>
     </message>
     <message>
       <source>Disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnect System from %1</translation>
+      <translation>Desconnecta el sistema de %1</translation>
     </message>
     <message>
       <source>Open %1 Portal</source>
@@ -2795,31 +2784,30 @@ devices</translation>
     <message>
       <source>Create %1 Account</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Create %1 Account</translation>
+      <translation>Crea un compte %1</translation>
     </message>
     <message>
       <source>Connect System to %1...</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect System to %1...</translation>
+      <translation>Connecta el sistema a %1...</translation>
     </message>
     <message>
       <source>Create %1
 account</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Create %1
-account</translation>
+      <translation>Crea un compte %1</translation>
     </message>
     <message>
       <source>Connect System
 to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect System
-to %1</translation>
+      <translation>Connecta el sistema
+a %1</translation>
     </message>
     <message>
       <source>Learn more about %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Learn more about %1</translation>
+      <translation>Més informació sobre %1</translation>
     </message>
   </context>
   <context>
@@ -2830,27 +2818,27 @@ to %1</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
-      <translation type="unfinished">Account is not activated.</translation>
+      <translation>El compte no està activat.</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
       <comment>%1 is a cloud site name like &quot;Nx Cloud&quot;</comment>
-      <translation type="unfinished">Please log in to %1 and follow the provided instructions.</translation>
+      <translation>Inicieu la sessió a %1 i seguiu les instruccions proporcionades.</translation>
     </message>
     <message>
       <source>Invalid password</source>
-      <translation type="unfinished">Invalid password</translation>
+      <translation>Contrasenya no vàlida</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>S'han produït massa intents. Torneu-ho a provar d'aquí a un minut.</translation>
     </message>
   </context>
   <context>
     <name>QnCloudStatusPanel</name>
     <message>
       <source>Logging in...</source>
-      <translation type="unfinished">Logging in...</translation>
+      <translation>S'està iniciant la sessió...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
@@ -2859,7 +2847,7 @@ to %1</translation>
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>No es pot connectar amb %1</translation>
     </message>
   </context>
   <context>
@@ -2874,9 +2862,9 @@ to %1</translation>
     <message numerus="yes">
       <source>%n of %1 selected users are not %2 users and will not get mobile notifications.</source>
       <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation type="unfinished">
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
-        <numerusform>%n of %1 selected users are not %2 users and will not get mobile notifications.</numerusform>
+      <translation>
+        <numerusform>%n de %1 usuaris seleccionats no són usuaris %2 i no rebran notificacions per a mòbils.</numerusform>
+        <numerusform>%n d' %1 usuaris seleccionats no són usuaris %2 i no rebran notificacions per a mòbils.</numerusform>
       </translation>
     </message>
   </context>
@@ -2884,7 +2872,7 @@ to %1</translation>
     <name>QnConnectToCloudDialog</name>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Password</source>
@@ -2896,363 +2884,363 @@ to %1</translation>
     </message>
     <message>
       <source>Forgot password?</source>
-      <translation type="unfinished">Forgot password?</translation>
+      <translation>Heu oblidat la contrasenya?</translation>
     </message>
     <message>
       <source>Connect to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect to %1</translation>
+      <translation>Connecta amb %1</translation>
     </message>
     <message>
       <source>Enter %1 Account</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter %1 Account</translation>
+      <translation>Introduïu el compte %1</translation>
     </message>
   </context>
   <context>
     <name>QnConnectToCloudDialogPrivate</name>
     <message>
       <source>None of your servers is connected to the Internet.</source>
-      <translation type="unfinished">None of your servers is connected to the Internet.</translation>
+      <translation>Cap dels vostres servidors no està connectat a Internet.</translation>
     </message>
     <message>
       <source>System connected to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">System connected to %1</translation>
+      <translation>Sistema connectat a %1</translation>
     </message>
     <message>
       <source>Failed to connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Failed to connect System to %1</translation>
+      <translation>No s'ha pogut connectar el sistema a %1</translation>
     </message>
     <message>
       <source>Internal server error. Please try again later.</source>
-      <translation type="unfinished">Internal server error. Please try again later.</translation>
+      <translation>Error al servidor intern. Torneu-ho a intentar més tard.</translation>
     </message>
   </context>
   <context>
     <name>QnConnectionDiagnosticsHelper</name>
     <message>
       <source>You are trying to connect to incompatible Server.</source>
-      <translation type="unfinished">You are trying to connect to incompatible Server.</translation>
+      <translation>Esteu intentant connectar-vos a un servidor incompatible.</translation>
     </message>
     <message>
       <source>Connection details that you have entered are incorrect, please try again.</source>
-      <translation type="unfinished">Connection details that you have entered are incorrect, please try again.</translation>
+      <translation>Les dades de connexió que heu introduït són incorrectes; torneu-ho a intentar.</translation>
     </message>
     <message>
       <source>If this error persists, please contact your VMS administrator.</source>
-      <translation type="unfinished">If this error persists, please contact your VMS administrator.</translation>
+      <translation>Si l'error continua, poseu-vos en contacte amb l'administrador VMS.</translation>
     </message>
     <message>
       <source>Compatibility mode for versions lower than %1 is not supported.</source>
-      <translation type="unfinished">Compatibility mode for versions lower than %1 is not supported.</translation>
+      <translation>No s'admet el mode de compatibilitat per a versions inferiors a %1.</translation>
     </message>
     <message>
       <source>Please close the application and start it again using the shortcut in the start menu.</source>
-      <translation type="unfinished">Please close the application and start it again using the shortcut in the start menu.</translation>
+      <translation>Tanqueu l'aplicació i torneu-la a iniciar mitjançant la drecera del menú d'inici.</translation>
     </message>
     <message>
       <source>Server has a different version:</source>
-      <translation type="unfinished">Server has a different version:</translation>
+      <translation>El servidor té una versió diferent:</translation>
     </message>
     <message>
       <source>You will be asked to restart the client in compatibility mode.</source>
-      <translation type="unfinished">You will be asked to restart the client in compatibility mode.</translation>
+      <translation>Se us demanarà que reinicieu el client en mode de compatibilitat.</translation>
     </message>
     <message>
       <source>The username or password you have entered is incorrect. Please try again.</source>
-      <translation type="unfinished">The username or password you have entered is incorrect. Please try again.</translation>
+      <translation>El nom d'usuari o la contrasenya que heu introduït són incorrectes. Torneu-ho a intentar.</translation>
     </message>
     <message>
       <source>Unable to connect to the server</source>
-      <translation type="unfinished">Unable to connect to the server</translation>
+      <translation>No es pot connectar al servidor</translation>
     </message>
     <message>
       <source>LDAP Server connection timed out.</source>
-      <translation type="unfinished">LDAP Server connection timed out.</translation>
+      <translation>La connexió del servidor LDAP ha esgotat el temps d'espera.</translation>
     </message>
     <message>
       <source>Failed to connect to Server</source>
-      <translation type="unfinished">Failed to connect to Server</translation>
+      <translation>No s'ha pogut connectar amb el servidor</translation>
     </message>
     <message>
       <source>Incorrect username or password</source>
-      <translation type="unfinished">Incorrect username or password</translation>
+      <translation>Nom d'usuari o contrasenya incorrectes</translation>
     </message>
     <message>
       <source>Server may be restarting now. Please try again later.</source>
-      <translation type="unfinished">Server may be restarting now. Please try again later.</translation>
+      <translation>És possible que el servidor es reiniciï ara. Intenteu-ho més tard.</translation>
     </message>
     <message>
       <source>Please check access credentials and try again.</source>
-      <translation type="unfinished">Please check access credentials and try again.</translation>
+      <translation>Comproveu les credencials d'accés i torneu-ho a intentar.</translation>
     </message>
     <message>
       <source>Incompatible Server</source>
-      <translation type="unfinished">Incompatible Server</translation>
+      <translation>Servidor incompatible</translation>
     </message>
     <message>
       <source>Client and Server have different versions</source>
-      <translation type="unfinished">Client and Server have different versions</translation>
+      <translation>El client i el servidor tenen versions diferents</translation>
     </message>
     <message>
       <source>Client - %1</source>
       <comment>%1 is version</comment>
-      <translation type="unfinished">Client - %1</translation>
+      <translation>Client - %1</translation>
     </message>
     <message>
       <source>Server - %1</source>
       <comment>%1 is version</comment>
-      <translation type="unfinished">Server - %1</translation>
+      <translation>Servidor - %1</translation>
     </message>
     <message>
       <source>Download Client version %1?</source>
-      <translation type="unfinished">Download Client version %1?</translation>
+      <translation>Voleu descarregar la versió del client %1?</translation>
     </message>
     <message>
       <source>Restart</source>
-      <translation type="unfinished">Restart</translation>
+      <translation>Reinicia</translation>
     </message>
     <message>
       <source>Failed to download and launch version %1</source>
-      <translation type="unfinished">Failed to download and launch version %1</translation>
+      <translation>No s'ha pogut descarregar i executar la versió %1</translation>
     </message>
     <message>
       <source>Try Again</source>
-      <translation type="unfinished">Try Again</translation>
+      <translation>Torna a intentar-ho</translation>
     </message>
     <message>
       <source>Restart %1 in compatibility mode will be required.</source>
-      <translation type="unfinished">Restart %1 in compatibility mode will be required.</translation>
+      <translation>Caldrà reiniciar %1 en mode de compatibilitat.</translation>
     </message>
     <message>
       <source>Failed to restart %1 in compatibility mode</source>
-      <translation type="unfinished">Failed to restart %1 in compatibility mode</translation>
+      <translation>No s'ha pogut reiniciar %1 en mode de compatibilitat</translation>
     </message>
     <message>
       <source>Please close %1 and start it again using the shortcut in the start menu.</source>
-      <translation type="unfinished">Please close %1 and start it again using the shortcut in the start menu.</translation>
+      <translation>Tanqueu %1 i torneu-lo a iniciar mitjançant la drecera del menú d'inici.</translation>
     </message>
     <message>
       <source>You have to download another version of %1 to connect to this Server.</source>
-      <translation type="unfinished">You have to download another version of %1 to connect to this Server.</translation>
+      <translation>Heu de descarregar una altra versió de %1 per connectar-vos a aquest servidor.</translation>
     </message>
     <message>
       <source>You have to restart %1 in compatibility mode to connect to this Server.</source>
-      <translation type="unfinished">You have to restart %1 in compatibility mode to connect to this Server.</translation>
+      <translation>Heu de reiniciar %1 en mode de compatibilitat per connectar-vos a aquest servidor.</translation>
     </message>
     <message>
       <source>Restart %1 in compatibility mode?</source>
-      <translation type="unfinished">Restart %1 in compatibility mode?</translation>
+      <translation>Voleu reiniciar %1 en mode de compatibilitat?</translation>
     </message>
     <message>
       <source>Failed to restart %1</source>
-      <translation type="unfinished">Failed to restart %1</translation>
+      <translation>No s'ha pogut reiniciar %1</translation>
     </message>
     <message>
       <source>Client version: %1.</source>
-      <translation type="unfinished">Client version: %1.</translation>
+      <translation>Versió del client: %1.</translation>
     </message>
     <message>
       <source>Server version: %1.</source>
-      <translation type="unfinished">Server version: %1.</translation>
+      <translation>Versió del servidor: %1.</translation>
     </message>
     <message>
       <source>Operation is not permitted now. It could happen due to server is restarting now. Please try again later.</source>
-      <translation type="unfinished">Operation is not permitted now. It could happen due to server is restarting now. Please try again later.</translation>
+      <translation>No es pot realitzar l'operació en aquest moment. Pot passar perquè el servidor s'està reiniciant. Torneu-ho a intentar més tard.</translation>
     </message>
     <message>
       <source>Connection to Server could not be established.</source>
-      <translation type="unfinished">Connection to Server could not be established.</translation>
+      <translation>No s'ha pogut establir la connexió amb el servidor.</translation>
     </message>
     <message>
       <source>This user is disabled by system administrator.</source>
-      <translation type="unfinished">This user is disabled by system administrator.</translation>
+      <translation>L'usuari està desactivat per l'administrador del sistema.</translation>
     </message>
     <message>
       <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connection to %1 is not ready yet. Check server Internet connection or try again later.</translation>
+      <translation>La connexió a %1 encara no està preparada. Comproveu la connexió a Internet del servidor o torneu-ho a intentar més tard.</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>S'han produït massa intents. Torneu-ho a provar d'aquí a un minut.</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Descarrega i instal·la</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
-      <translation type="unfinished">Failed to enter compatibility mode for version %1</translation>
+      <translation>No s'ha pogut accedir al mode de compatibilitat per a la versió %1</translation>
     </message>
   </context>
   <context>
     <name>QnConnectionTestingDialog</name>
     <message>
       <source>Success</source>
-      <translation type="unfinished">Success</translation>
+      <translation>Correcte</translation>
     </message>
     <message>
       <source>Request timeout</source>
-      <translation type="unfinished">Request timeout</translation>
+      <translation>La petició ha excedit el temps</translation>
     </message>
     <message>
       <source>Test Failed</source>
-      <translation type="unfinished">Test Failed</translation>
+      <translation>Ha fallat la prova</translation>
     </message>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Connecta</translation>
     </message>
   </context>
   <context>
     <name>QnCustomBusinessEventWidget</name>
     <message>
       <source>If the field is empty, event will always trigger.</source>
-      <translation type="unfinished">If the field is empty, event will always trigger.</translation>
+      <translation>Si el camp està buit, l'esdeveniment sempre s'activarà.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the source with any of the entered keywords.</translation>
+      <translation>L'esdeveniment només s'activarà si hi ha coincidències a l'origen amb alguna de les paraules clau introduïdes.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the caption with any of the entered keywords.</translation>
+      <translation>L'esdeveniment només s'activarà si hi ha coincidències al títol amb alguna de les paraules clau introduïdes.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation type="unfinished">Event will trigger only if there are matches in the description with any of the entered keywords.</translation>
+      <translation>L'esdeveniment només s'activarà si hi ha coincidències a la descripció amb alguna de les paraules clau introduïdes.</translation>
     </message>
     <message>
       <source>Server API</source>
-      <translation type="unfinished">Server API</translation>
+      <translation>API del servidor</translation>
     </message>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
-      <translation type="unfinished">To generate Generic Event, please refer to %1.</translation>
+      <translation>Per generar un esdeveniment genèric, consulteu %1.</translation>
     </message>
   </context>
   <context>
     <name>QnDatabaseManagementWidget</name>
     <message>
       <source>Save Database Backup...</source>
-      <translation type="unfinished">Save Database Backup...</translation>
+      <translation>Desa la còpia de seguretat de la base de dades...</translation>
     </message>
     <message>
       <source>Downloading Database Backup</source>
-      <translation type="unfinished">Downloading Database Backup</translation>
+      <translation>S'està descarregant la còpia de seguretat de la base de dades</translation>
     </message>
     <message>
       <source>Database backup is being downloaded from the server. Please wait.</source>
-      <translation type="unfinished">Database backup is being downloaded from the server. Please wait.</translation>
+      <translation>S'està descarregant la còpia de seguretat de la base de dades del servidor. Espereu, si us plau.</translation>
     </message>
     <message>
       <source>Open Database Backup...</source>
-      <translation type="unfinished">Open Database Backup...</translation>
+      <translation>Obre la còpia de seguretat de la base de dades...</translation>
     </message>
     <message>
       <source>Restoring Database Backup</source>
-      <translation type="unfinished">Restoring Database Backup</translation>
+      <translation>S'està restaurant la còpia de seguretat de la base de dades</translation>
     </message>
     <message>
       <source>Database backup is being uploaded to the server. Please wait.</source>
-      <translation type="unfinished">Database backup is being uploaded to the server. Please wait.</translation>
+      <translation>S'està carregant la còpia de seguretat de la base de dades al servidor. Espereu, si us plau.</translation>
     </message>
     <message>
       <source>You need to connect to a server prior to backup start.</source>
-      <translation type="unfinished">You need to connect to a server prior to backup start.</translation>
+      <translation>Heu de connectar-vos a un servidor abans d'iniciar la còpia de seguretat.</translation>
     </message>
     <message>
       <source>Failed to back up database</source>
-      <translation type="unfinished">Failed to back up database</translation>
+      <translation>S'ha produït un error en la còpia de seguretat de la base de dades</translation>
     </message>
     <message>
       <source>Database backed up to file</source>
-      <translation type="unfinished">Database backed up to file</translation>
+      <translation>S'ha fet una còpia de seguretat de la base de dades a l'arxiu</translation>
     </message>
     <message>
       <source>Failed to open file</source>
-      <translation type="unfinished">Failed to open file</translation>
+      <translation>No s'ha pogut obrir l'arxiu</translation>
     </message>
     <message>
       <source>Restore database?</source>
-      <translation type="unfinished">Restore database?</translation>
+      <translation>Voleu restaurar la base de dades?</translation>
     </message>
     <message>
       <source>Database successfully restored</source>
-      <translation type="unfinished">Database successfully restored</translation>
+      <translation>La base de dades s'ha restaurat correctament</translation>
     </message>
     <message>
       <source>Server application will restart shortly.</source>
-      <translation type="unfinished">Server application will restart shortly.</translation>
+      <translation>L'aplicació del servidor es reiniciarà aviat.</translation>
     </message>
     <message>
       <source>Failed to restore database</source>
-      <translation type="unfinished">Failed to restore database</translation>
+      <translation>S'ha produït un error en restaurar la base de dades</translation>
     </message>
     <message>
       <source>System configuration will be restored from backup, Server application will be restarted.</source>
-      <translation type="unfinished">System configuration will be restored from backup, Server application will be restarted.</translation>
+      <translation>La configuració del sistema es restaurarà des de la còpia de seguretat i es reiniciarà l'aplicació del servidor.</translation>
     </message>
     <message>
       <source>Database Backup Files</source>
-      <translation type="unfinished">Database Backup Files</translation>
+      <translation>Arxius de còpia de seguretat de bases de dades</translation>
     </message>
   </context>
   <context>
     <name>QnDesktopDataProvider</name>
     <message>
       <source>Could not find video encoder %1.</source>
-      <translation type="unfinished">Could not find video encoder %1.</translation>
+      <translation>No s'ha trobat el codificador de vídeo %1.</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
-      <translation type="unfinished">Could not initialize video encoder.</translation>
+      <translation>No s'ha pogut inicialitzar el codificador de vídeo.</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation type="unfinished">Could not initialize audio encoder.</translation>
+      <translation>No s'ha pogut inicialitzar el codificador d'àudio.</translation>
     </message>
     <message>
       <source>Could not start primary audio device.</source>
-      <translation type="unfinished">Could not start primary audio device.</translation>
+      <translation>No s'ha pogut iniciar el dispositiu d'àudio principal.</translation>
     </message>
     <message>
       <source>Screen width must be a multiple of 8.</source>
-      <translation type="unfinished">Screen width must be a multiple of 8.</translation>
+      <translation>L'amplada de la pantalla ha de ser múltiple de 8.</translation>
     </message>
     <message>
       <source>Could not find audio encoder &quot;%1&quot;.</source>
-      <translation type="unfinished">Could not find audio encoder &quot;%1&quot;.</translation>
+      <translation>No s'ha trobat el codificador d'àudio &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Could not initialize audio device &quot;%1&quot;.</source>
-      <translation type="unfinished">Could not initialize audio device &quot;%1&quot;.</translation>
+      <translation>No s'ha pogut inicialitzar el dispositiu d'àudio &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Could not detect capturing resolution</source>
-      <translation type="unfinished">Could not detect capturing resolution</translation>
+      <translation>No s'ha pogut detectar la resolució de captura</translation>
     </message>
     <message>
       <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+      <translation>El dispositiu de captura d'àudio no admet cap format d'àudio adequat. Seleccioneu un altre dispositiu d'àudio o &quot;cap&quot; a la configuració de Gravació de la pantalla.</translation>
     </message>
   </context>
   <context>
     <name>QnDisconnectFromCloudDialogPrivate</name>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Següent</translation>
     </message>
     <message>
       <source>Enter password to continue.</source>
-      <translation type="unfinished">Enter password to continue.</translation>
+      <translation>Introduïu la contrasenya per continuar.</translation>
     </message>
     <message>
       <source>Set local owner password</source>
-      <translation type="unfinished">Set local owner password</translation>
+      <translation>Definiu la contrasenya del propietari local</translation>
     </message>
     <message>
       <source>Login</source>
@@ -3264,19 +3252,19 @@ to %1</translation>
     </message>
     <message>
       <source>Internal Error</source>
-      <translation type="unfinished">Internal Error</translation>
+      <translation>Error intern</translation>
     </message>
     <message>
       <source>Wrong Password</source>
-      <translation type="unfinished">Wrong Password</translation>
+      <translation>Contrasenya incorrecta</translation>
     </message>
     <message>
       <source>Confirm Password</source>
-      <translation type="unfinished">Confirm Password</translation>
+      <translation>Confirmeu la contrasenya</translation>
     </message>
     <message>
       <source>Passwords do not match.</source>
-      <translation type="unfinished">Passwords do not match.</translation>
+      <translation>Les contrasenyes no coincideixen.</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -3284,45 +3272,45 @@ to %1</translation>
     </message>
     <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
-      <translation type="unfinished">You will be disconnected from this System and able to login again through local network with local account</translation>
+      <translation>Us desconnectareu d'aquest sistema i podreu tornar a iniciar la sessió a través de la xarxa local amb un compte local</translation>
     </message>
     <message>
       <source>Failed to disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Failed to disconnect System from %1</translation>
+      <translation>No s'ha pogut desconnectar el sistema de %1</translation>
     </message>
     <message>
       <source>Disconnect System from %1?</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Disconnect System from %1?</translation>
+      <translation>Voleu desconnectar el sistema de %1?</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation type="unfinished">All %1 users will be deleted.</translation>
+      <translation>S'eliminaran tots els usuaris %1.</translation>
     </message>
     <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</translation>
+      <translation>No podreu connectar-vos a aquest sistema amb el vostre compte %1 després de desconnectar-lo de %1.</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>S'han produït massa intents. Torneu-ho a provar d'aquí a un minut.</translation>
     </message>
   </context>
   <context>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation type="unfinished">Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</translation>
+      <translation>El mode d'enregistrament de pànic canvia la configuració d'enregistrament de totes les càmeres als valors màxims de qualitat i FPS.</translation>
     </message>
   </context>
   <context>
     <name>QnEventLogDialog</name>
     <message>
       <source>Filter Similar Rows</source>
-      <translation type="unfinished">Filter Similar Rows</translation>
+      <translation>Filtra files similars</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
@@ -3338,34 +3326,34 @@ to %1</translation>
     </message>
     <message>
       <source>Clear Filter</source>
-      <translation type="unfinished">Clear Filter</translation>
+      <translation>Neteja el filtre</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
-      <translation type="unfinished">Export selected events to file</translation>
+      <translation>Exporta els esdeveniments seleccionats a un arxiu</translation>
     </message>
     <message>
       <source>Any Action</source>
-      <translation type="unfinished">Any Action</translation>
+      <translation>Qualsevol acció</translation>
     </message>
     <message>
       <source>No events</source>
-      <translation type="unfinished">No events</translation>
+      <translation>No hi ha esdeveniments</translation>
     </message>
     <message numerus="yes">
       <source>Event log for period from %1 to %2 - %n events found</source>
       <comment>Dates are substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
-        <numerusform>Event log for period from %1 to %2 - %n events found</numerusform>
+      <translation>
+        <numerusform>Registre d'esdeveniments per al període de %1 a %2 - S'han trobat %n esdeveniments</numerusform>
+        <numerusform>Registre d'esdeveniments per al període de %1 a %2 - S'han trobat %n esdeveniments</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Event log for %1 - %n events found</source>
       <comment>Date is substituted</comment>
-      <translation type="unfinished">
-        <numerusform>Event log for %1 - %n events found</numerusform>
-        <numerusform>Event log for %1 - %n events found</numerusform>
+      <translation>
+        <numerusform>Registre d'esdeveniments per a %1 - S'han trobat %n esdeveniments</numerusform>
+        <numerusform>Registre d'esdeveniments per a %1 - S'han trobat %n esdeveniments</numerusform>
       </translation>
     </message>
     <message>
@@ -3377,27 +3365,27 @@ to %1</translation>
     <name>QnEventLogModel</name>
     <message>
       <source>Motion video</source>
-      <translation type="unfinished">Motion video</translation>
+      <translation>Vídeo en moviment</translation>
     </message>
     <message>
       <source>Date/Time</source>
-      <translation type="unfinished">Date/Time</translation>
+      <translation>Data/hora</translation>
     </message>
     <message>
       <source>Event</source>
-      <translation type="unfinished">Event</translation>
+      <translation>Esdeveniment</translation>
     </message>
     <message>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Origen</translation>
     </message>
     <message>
       <source>Action</source>
-      <translation type="unfinished">Action</translation>
+      <translation>Acció</translation>
     </message>
     <message>
       <source>Target</source>
-      <translation type="unfinished">Target</translation>
+      <translation>Objectiu</translation>
     </message>
     <message>
       <source>Description</source>
@@ -3405,51 +3393,51 @@ to %1</translation>
     </message>
     <message>
       <source>All users</source>
-      <translation type="unfinished">All users</translation>
+      <translation>Tots els usuaris</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n times)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n times)</numerusform>
-        <numerusform>%1 (%n times)</numerusform>
+      <translation>
+        <numerusform>%1 (%n vegades)</numerusform>
+        <numerusform>%1 (%n vegades)</numerusform>
       </translation>
     </message>
     <message>
       <source>Open camera</source>
-      <translation type="unfinished">Open camera</translation>
+      <translation>Obre la càmera</translation>
     </message>
     <message numerus="yes">
       <source>and %n users more...</source>
-      <translation type="unfinished">
-        <numerusform>and %n users more...</numerusform>
-        <numerusform>and %n users more...</numerusform>
+      <translation>
+        <numerusform>i %n usuaris més...</numerusform>
+        <numerusform>i %n usuaris més...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>and %n more...</source>
-      <translation type="unfinished">
-        <numerusform>and %n more...</numerusform>
-        <numerusform>and %n more...</numerusform>
+      <translation>
+        <numerusform>i %n més...</numerusform>
+        <numerusform>i %n més...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Removed subjects</source>
-      <translation type="unfinished">
-        <numerusform>%n Removed subjects</numerusform>
-        <numerusform>%n Removed subjects</numerusform>
+      <translation>
+        <numerusform>%n subjectes eliminats</numerusform>
+        <numerusform>%n subjectes eliminats</numerusform>
       </translation>
     </message>
     <message>
       <source>Subject removed</source>
-      <translation type="unfinished">Subject removed</translation>
+      <translation>Subjecte eliminat</translation>
     </message>
     <message numerus="yes">
       <source>%1 (%n cameras)</source>
       <comment>%1 is description of event. Will be replaced in runtime</comment>
-      <translation type="unfinished">
-        <numerusform>%1 (%n cameras)</numerusform>
-        <numerusform>%1 (%n cameras)</numerusform>
+      <translation>
+        <numerusform>%1 (%n càmeres)</numerusform>
+        <numerusform>%1 (%n càmeres)</numerusform>
       </translation>
     </message>
   </context>
@@ -3457,122 +3445,122 @@ to %1</translation>
     <name>QnExecHttpRequestActionWidget</name>
     <message>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Automàtic</translation>
     </message>
     <message>
       <source>Basic</source>
-      <translation type="unfinished">Basic</translation>
+      <translation>Bàsic</translation>
     </message>
   </context>
   <context>
     <name>QnExecPtzPresetPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation type="unfinished">Select exactly one camera</translation>
+      <translation>Seleccioneu exactament una càmera</translation>
     </message>
     <message>
       <source>%1 has no PTZ presets</source>
-      <translation type="unfinished">%1 has no PTZ presets</translation>
+      <translation>%1 no té cap valor predefinit per a PTZ</translation>
     </message>
   </context>
   <context>
     <name>QnFailoverPriorityDialog</name>
     <message>
       <source>Failover Priority</source>
-      <translation type="unfinished">Failover Priority</translation>
+      <translation>Prioritat de la migració per error</translation>
     </message>
     <message>
       <source>Never</source>
       <comment>Failover priority</comment>
-      <translation type="unfinished">Never</translation>
+      <translation>Mai</translation>
     </message>
     <message>
       <source>Low</source>
       <comment>Failover priority</comment>
-      <translation type="unfinished">Low</translation>
+      <translation>Baixa</translation>
     </message>
     <message>
       <source>Medium</source>
       <comment>Failover priority</comment>
-      <translation>Mitja</translation>
+      <translation>Mitjana</translation>
     </message>
     <message>
       <source>High</source>
       <comment>Failover priority</comment>
-      <translation type="unfinished">High</translation>
+      <translation>Alta</translation>
     </message>
   </context>
   <context>
     <name>QnFailoverPriorityDialogDelegate</name>
     <message>
       <source>Set Priority:</source>
-      <translation type="unfinished">Set Priority:</translation>
+      <translation>Estableix la prioritat:</translation>
     </message>
     <message>
       <source>Select devices to setup failover priority</source>
-      <translation type="unfinished">Select devices to setup failover priority</translation>
+      <translation>Seleccioneu els dispositius per configurar la prioritat de la migració per error</translation>
     </message>
     <message>
       <source>Select cameras to setup failover priority</source>
-      <translation type="unfinished">Select cameras to setup failover priority</translation>
+      <translation>Seleccioneu les càmeres per configurar la prioritat de la migració per error</translation>
     </message>
   </context>
   <context>
     <name>QnFanErrorPolicy</name>
     <message>
       <source>Servers that support fan diagnostic</source>
-      <translation type="unfinished">Servers that support fan diagnostic</translation>
+      <translation>Servidors compatibles amb el diagnòstic de ventiladors</translation>
     </message>
   </context>
   <context>
     <name>QnFileMessages</name>
     <message>
       <source>Overwrite existing file?</source>
-      <translation type="unfinished">Overwrite existing file?</translation>
+      <translation>Voleu sobreescriure l'arxiu existent?</translation>
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation type="unfinished">Failed to overwrite file</translation>
+      <translation>No s'ha pogut sobreescriure l'arxiu</translation>
     </message>
   </context>
   <context>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</translation>
+      <translation>Aquesta càmera no es troba actualment al disseny seleccionat. L'acció funcionarà si s'afegeix una càmera abans que s'activi.</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation type="unfinished">This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</translation>
+      <translation>Aquesta càmera no es troba actualment en alguns dels dissenys seleccionats. L'acció funcionarà si s'afegeix una càmera abans que s'activi.</translation>
     </message>
   </context>
   <context>
     <name>QnFullscreenCameraPolicy</name>
     <message>
       <source>Select exactly one camera</source>
-      <translation type="unfinished">Select exactly one camera</translation>
+      <translation>Seleccioneu exactament una càmera</translation>
     </message>
   </context>
   <context>
     <name>QnGLCheckerInstrument</name>
     <message>
       <source>Video card drivers are outdated or not installed</source>
-      <translation type="unfinished">Video card drivers are outdated or not installed</translation>
+      <translation>Els controladors de targetes de vídeo estan obsolets o no estan instal·lats</translation>
     </message>
     <message>
       <source>%1 may not work properly.</source>
-      <translation type="unfinished">%1 may not work properly.</translation>
+      <translation>És possible que %1 no funcioni correctament.</translation>
     </message>
   </context>
   <context>
     <name>QnGeneralPreferencesWidget</name>
     <message>
       <source>Select folder...</source>
-      <translation type="unfinished">Select folder...</translation>
+      <translation>Seleccioneu la carpeta...</translation>
     </message>
     <message>
       <source>Folder already added</source>
-      <translation type="unfinished">Folder already added</translation>
+      <translation>La carpeta ja s'ha afegit</translation>
     </message>
     <message>
       <source>None</source>
@@ -3580,88 +3568,88 @@ to %1</translation>
     </message>
     <message>
       <source>Auto (%1)</source>
-      <translation type="unfinished">Auto (%1)</translation>
+      <translation>Automàtic (%1)</translation>
     </message>
   </context>
   <context>
     <name>QnGeneralSystemAdministrationWidget</name>
     <message>
       <source>Open Event Log</source>
-      <translation type="unfinished">Open Event Log</translation>
+      <translation>Obre el registre d'esdeveniments</translation>
     </message>
     <message>
       <source>Open Bookmarks List</source>
-      <translation type="unfinished">Open Bookmarks List</translation>
+      <translation>Obre la llista de marcadors</translation>
     </message>
     <message>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Regles d'esdeveniments</translation>
     </message>
     <message>
       <source>Event Log</source>
-      <translation type="unfinished">Event Log</translation>
+      <translation>Registre d'esdeveniments</translation>
     </message>
     <message>
       <source>Audit Trail</source>
-      <translation type="unfinished">Audit Trail</translation>
+      <translation>Pista d'auditoria</translation>
     </message>
     <message>
       <source>Bookmarks</source>
-      <translation type="unfinished">Bookmarks</translation>
+      <translation>Marcadors</translation>
     </message>
     <message>
       <source>Device List</source>
-      <translation type="unfinished">Device List</translation>
+      <translation>Llista de dispositius</translation>
     </message>
     <message>
       <source>Camera List</source>
-      <translation type="unfinished">Camera List</translation>
+      <translation>Llista de càmeres</translation>
     </message>
     <message>
       <source>Open Event Rules Management</source>
-      <translation type="unfinished">Open Event Rules Management</translation>
+      <translation>Obre la gestió de regles d'esdeveniments</translation>
     </message>
     <message>
       <source>Open Audit Trail Log</source>
-      <translation type="unfinished">Open Audit Trail Log</translation>
+      <translation>Obre el registre de pista d'auditoria</translation>
     </message>
     <message>
       <source>Open Device List</source>
-      <translation type="unfinished">Open Device List</translation>
+      <translation>Obre la llista de dispositius</translation>
     </message>
     <message>
       <source>Open Camera List</source>
-      <translation type="unfinished">Open Camera List</translation>
+      <translation>Obre la llista de càmeres</translation>
     </message>
     <message>
       <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation type="unfinished">Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</translation>
+      <translation>La còpia de seguretat inclou la configuració de servidors i càmeres, usuaris, pàgines web, regles d'esdeveniments, etc. El vídeo no es desa.</translation>
     </message>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
-      <translation type="unfinished">Creates a backup of System configuration that can be restored in case of failure.</translation>
+      <translation>Crea una còpia de seguretat de la configuració del sistema que es pot restaurar en cas d'error.</translation>
     </message>
   </context>
   <context>
     <name>QnHistogramWidget</name>
     <message>
       <source>Gamma %1</source>
-      <translation type="unfinished">Gamma %1</translation>
+      <translation>Gamma %1</translation>
     </message>
   </context>
   <context>
     <name>QnIOPortsViewModel</name>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Tipus</translation>
     </message>
     <message>
       <source>Default state</source>
-      <translation type="unfinished">Default state</translation>
+      <translation>Estat predeterminat</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nom</translation>
     </message>
     <message>
       <source>Unknown</source>
@@ -3671,36 +3659,36 @@ to %1</translation>
     <message>
       <source>Disabled</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Disabled</translation>
+      <translation>Desactivat</translation>
     </message>
     <message>
       <source>Input</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Input</translation>
+      <translation>Entrada</translation>
     </message>
     <message>
       <source>Output</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Output</translation>
+      <translation>Sortida</translation>
     </message>
     <message>
       <source>Invalid</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Invalid</translation>
+      <translation>Invàlid</translation>
     </message>
     <message>
       <source>Grounded circuit</source>
       <comment>IO Port State</comment>
-      <translation type="unfinished">Grounded circuit</translation>
+      <translation>Circuit a terra</translation>
     </message>
     <message>
       <source>Invalid state</source>
       <comment>IO Port State</comment>
-      <translation type="unfinished">Invalid state</translation>
+      <translation>Estat invàlid</translation>
     </message>
     <message>
       <source>On click</source>
-      <translation type="unfinished">On click</translation>
+      <translation>En fer clic</translation>
     </message>
     <message>
       <source>Duration</source>
@@ -3709,76 +3697,76 @@ to %1</translation>
     <message>
       <source>Open circuit</source>
       <comment>IO Port State</comment>
-      <translation type="unfinished">Open circuit</translation>
+      <translation>Circuit obert</translation>
     </message>
     <message>
       <source>Toggle state</source>
       <comment>IO Output Port Action</comment>
-      <translation type="unfinished">Toggle state</translation>
+      <translation>Canvia l'estat</translation>
     </message>
     <message>
       <source>Impulse</source>
       <comment>IO Output Port Action</comment>
-      <translation type="unfinished">Impulse</translation>
+      <translation>Impuls</translation>
     </message>
     <message>
       <source>ID</source>
-      <translation type="unfinished">ID</translation>
+      <translation>ID</translation>
     </message>
   </context>
   <context>
     <name>QnInputDialog</name>
     <message>
       <source>Please enter a value.</source>
-      <translation type="unfinished">Please enter a value.</translation>
+      <translation>Introduïu un valor.</translation>
     </message>
   </context>
   <context>
     <name>QnIoModuleOverlayWidgetPrivate</name>
     <message>
       <source>Failed to turn off I/O port %1</source>
-      <translation type="unfinished">Failed to turn off I/O port %1</translation>
+      <translation>No s'ha pogut desactivar el port I/O %1</translation>
     </message>
     <message>
       <source>Failed to turn on I/O port %1</source>
-      <translation type="unfinished">Failed to turn on I/O port %1</translation>
+      <translation>No s'ha pogut activar el port I/O %1</translation>
     </message>
   </context>
   <context>
     <name>QnLdapSettingsDialog</name>
     <message>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Prova</translation>
     </message>
     <message>
       <source>Test failed</source>
-      <translation type="unfinished">Test failed</translation>
+      <translation>Ha fallat la prova</translation>
     </message>
     <message numerus="yes">
       <source>Test completed successfully: %n users found.</source>
-      <translation type="unfinished">
-        <numerusform>Test completed successfully: %n users found.</numerusform>
-        <numerusform>Test completed successfully: %n users found.</numerusform>
+      <translation>
+        <numerusform>La prova s'ha completat correctament: s'han trobat %n usuaris.</numerusform>
+        <numerusform>La prova s'ha completat correctament: s'han trobat %n usuaris.</numerusform>
       </translation>
     </message>
     <message>
       <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
-      <translation type="unfinished">Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</translation>
+      <translation>Canviar qualsevol paràmetre de LDAP diferent de &quot;Filtre de cerca&quot; donarà lloc a la pèrdua de connectivitat per a tots els usuaris de LDAP recuperats.</translation>
     </message>
   </context>
   <context>
     <name>QnLdapSettingsDialogPrivate</name>
     <message>
       <source>The provided settings are not valid.</source>
-      <translation type="unfinished">The provided settings are not valid.</translation>
+      <translation>La configuració proporcionada no és vàlida.</translation>
     </message>
     <message>
       <source>Could not perform a test.</source>
-      <translation type="unfinished">Could not perform a test.</translation>
+      <translation>No s'ha pogut realitzar una prova.</translation>
     </message>
     <message>
       <source>Timed Out</source>
-      <translation type="unfinished">Timed Out</translation>
+      <translation>Temps d'espera superat</translation>
     </message>
   </context>
   <context>
@@ -3789,112 +3777,112 @@ to %1</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>DN</source>
-      <translation type="unfinished">DN</translation>
+      <translation>DN</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nom</translation>
     </message>
   </context>
   <context>
     <name>QnLdapUsersDialog</name>
     <message>
       <source>The provided settings are not valid.</source>
-      <translation type="unfinished">The provided settings are not valid.</translation>
+      <translation>La configuració proporcionada no és vàlida.</translation>
     </message>
     <message>
       <source>Could not perform a test.</source>
-      <translation type="unfinished">Could not perform a test.</translation>
+      <translation>No s'ha pogut realitzar una prova.</translation>
     </message>
     <message>
       <source>Could not load users.</source>
-      <translation type="unfinished">Could not load users.</translation>
+      <translation>No s'han pogut carregar els usuaris.</translation>
     </message>
     <message>
       <source>Error while loading users.</source>
-      <translation type="unfinished">Error while loading users.</translation>
+      <translation>Error en carregar els usuaris.</translation>
     </message>
     <message>
       <source>No new users found.</source>
-      <translation type="unfinished">No new users found.</translation>
+      <translation>No s'han trobat usuaris nous.</translation>
     </message>
     <message>
       <source>Timed Out</source>
-      <translation type="unfinished">Timed Out</translation>
+      <translation>Temps d'espera superat</translation>
     </message>
     <message>
       <source>Import Selected</source>
-      <translation type="unfinished">Import Selected</translation>
+      <translation>Importa la selecció</translation>
     </message>
   </context>
   <context>
     <name>QnLicenseDetailsDialog</name>
     <message>
       <source>License Type</source>
-      <translation type="unfinished">License Type</translation>
+      <translation>Tipus de llicència</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation type="unfinished">License Key</translation>
+      <translation>Clau de llicència</translation>
     </message>
     <message>
       <source>Locked to Hardware ID</source>
-      <translation type="unfinished">Locked to Hardware ID</translation>
+      <translation>Bloquejat a ID de maquinari</translation>
     </message>
     <message>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Genèric</translation>
     </message>
     <message>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Característiques</translation>
     </message>
     <message>
       <source>Screens Allowed</source>
-      <translation type="unfinished">Screens Allowed</translation>
+      <translation>Pantalles permeses</translation>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
-      <translation type="unfinished">Control Sessions Allowed</translation>
+      <translation>Sessions de control permeses</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation type="unfinished">Archive Streams Allowed</translation>
+      <translation>Fluxos d'arxiu permesos</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
-      <translation type="unfinished">Deactivations Remaining</translation>
+      <translation>Desactivacions restants</translation>
     </message>
   </context>
   <context>
     <name>QnLicenseListModel</name>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Tipus</translation>
     </message>
     <message>
       <source>License Key</source>
-      <translation type="unfinished">License Key</translation>
+      <translation>Clau de llicència</translation>
     </message>
     <message>
       <source>Status</source>
-      <translation type="unfinished">Status</translation>
+      <translation>Estat</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Servidor</translation>
     </message>
     <message>
       <source>Never</source>
-      <translation type="unfinished">Never</translation>
+      <translation>Mai</translation>
     </message>
     <message>
       <source>Expired</source>
-      <translation type="unfinished">Expired</translation>
+      <translation>Vençut</translation>
     </message>
     <message>
       <source>OK</source>
@@ -3902,113 +3890,113 @@ to %1</translation>
     </message>
     <message>
       <source>Error</source>
-      <translation type="unfinished">Error</translation>
+      <translation>Error</translation>
     </message>
     <message>
       <source>Server not found</source>
-      <translation type="unfinished">Server not found</translation>
+      <translation>No s'ha trobat el servidor</translation>
     </message>
     <message>
       <source>Expires</source>
-      <translation type="unfinished">Expires</translation>
+      <translation>Venç</translation>
     </message>
     <message>
       <source>License is active</source>
-      <translation type="unfinished">License is active</translation>
+      <translation>La llicència està activa</translation>
     </message>
     <message>
       <source>License is expired</source>
-      <translation type="unfinished">License is expired</translation>
+      <translation>La llicència ha vençut</translation>
     </message>
     <message>
       <source>Expires soon</source>
-      <translation type="unfinished">Expires soon</translation>
+      <translation>Venç aviat</translation>
     </message>
     <message>
       <source>License expires today</source>
-      <translation type="unfinished">License expires today</translation>
+      <translation>La llicència venç avui</translation>
     </message>
     <message>
       <source>License expires tomorrow</source>
-      <translation type="unfinished">License expires tomorrow</translation>
+      <translation>La llicència venç demà</translation>
     </message>
     <message numerus="yes">
       <source>License expires in %n days</source>
-      <translation type="unfinished">
-        <numerusform>License expires in %n days</numerusform>
-        <numerusform>License expires in %n days</numerusform>
+      <translation>
+        <numerusform>La llicència venç d'aquí a %n dies</numerusform>
+        <numerusform>La llicència venç d'aquí a %n dies</numerusform>
       </translation>
     </message>
     <message>
       <source>Channels</source>
-      <translation type="unfinished">Channels</translation>
+      <translation>Canals</translation>
     </message>
   </context>
   <context>
     <name>QnLicenseManagerWidget</name>
     <message>
       <source>You do not have a valid license installed.</source>
-      <translation type="unfinished">You do not have a valid license installed.</translation>
+      <translation>No teniu instal·lada cap llicència vàlida.</translation>
     </message>
     <message>
       <source>Please activate your commercial or trial license.</source>
-      <translation type="unfinished">Please activate your commercial or trial license.</translation>
+      <translation>Activeu la vostra llicència comercial o de prova.</translation>
     </message>
     <message>
       <source>Please activate your commercial license.</source>
-      <translation type="unfinished">Please activate your commercial license.</translation>
+      <translation>Activeu la vostra llicència comercial.</translation>
     </message>
     <message>
       <source>Export</source>
-      <translation type="unfinished">Export</translation>
+      <translation>Exporta</translation>
     </message>
     <message>
       <source>Export licenses to a file</source>
-      <translation type="unfinished">Export licenses to a file</translation>
+      <translation>Exporta les llicències a un arxiu</translation>
     </message>
     <message numerus="yes">
       <source>Deactivate licenses?</source>
-      <translation type="unfinished">
-        <numerusform>Deactivate licenses?</numerusform>
-        <numerusform>Deactivate licenses?</numerusform>
+      <translation>
+        <numerusform>Voleu desactivar les llicències?</numerusform>
+        <numerusform>Voleu desactivar les llicències?</numerusform>
       </translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Suprimeix</translation>
     </message>
     <message>
       <source>Deactivate</source>
-      <translation type="unfinished">Deactivate</translation>
+      <translation>Desactiva</translation>
     </message>
     <message numerus="yes">
       <source>%n channels.</source>
-      <translation type="unfinished">
-        <numerusform>%n channels.</numerusform>
-        <numerusform>%n channels.</numerusform>
+      <translation>
+        <numerusform>%n canals.</numerusform>
+        <numerusform>%n canals.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are currently in use</numerusform>
-        <numerusform>%1 are currently in use</numerusform>
+      <translation>
+        <numerusform>%1 estan actualment en ús</numerusform>
+        <numerusform>%1 estan actualment en ús</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>At least %1 are required</numerusform>
-        <numerusform>At least %1 are required</numerusform>
+      <translation>
+        <numerusform>Es requereixen almenys %1</numerusform>
+        <numerusform>Es requereixen almenys %1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n deactivations remaining.</source>
-      <translation type="unfinished">
-        <numerusform>%n deactivations remaining.</numerusform>
-        <numerusform>%n deactivations remaining.</numerusform>
+      <translation>
+        <numerusform>%n desactivacions restants.</numerusform>
+        <numerusform>%n desactivacions restants.</numerusform>
       </translation>
     </message>
   </context>
@@ -4016,32 +4004,32 @@ to %1</translation>
     <name>QnLicenseWidget</name>
     <message>
       <source>Activate Trial License</source>
-      <translation type="unfinished">Activate Trial License</translation>
+      <translation>Activa la llicència de prova</translation>
     </message>
     <message>
       <source>Activate Free License</source>
-      <translation type="unfinished">Activate Free License</translation>
+      <translation>Activa la llicència gratuïta</translation>
     </message>
     <message>
       <source>Open License File</source>
-      <translation type="unfinished">Open License File</translation>
+      <translation>Obre l'arxiu de llicència</translation>
     </message>
     <message>
       <source>Failed to open file</source>
-      <translation type="unfinished">Failed to open file</translation>
+      <translation>No s'ha pogut obrir l'arxiu</translation>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation type="unfinished">To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</translation>
+      <translation>Per obtenir un arxiu de clau d’activació, envieu la clau de llicència i l'ID de maquinari proporcionats a %1.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</translation>
+      <translation>Envieu la clau de llicència i l'ID de maquinari proporcionats al servei de suport regional o de llicències per obtenir un arxiu de clau d'activació.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</source>
       <comment>%1 will be substituted by a list of contacts</comment>
-      <translation type="unfinished">Please send the provided License Key and Hardware ID to your Regional / License support (%1) to obtain an Activation Key file.</translation>
+      <translation>Envieu la clau de llicència i l'ID de maquinari proporcionats al servei de suport regional o de llicències (%1) per obtenir un arxiu de clau d'activació.</translation>
     </message>
   </context>
   <context>
@@ -4049,54 +4037,54 @@ to %1</translation>
     <message>
       <source>Failed to login to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Failed to login to %1</translation>
+      <translation>No s'ha pogut iniciar la sessió a %1</translation>
     </message>
   </context>
   <context>
     <name>QnLocalSettingsDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>General</translation>
     </message>
     <message>
       <source>Look and Feel</source>
-      <translation type="unfinished">Look and Feel</translation>
+      <translation>Aspecte i comportament</translation>
     </message>
     <message>
       <source>Screen Recording</source>
-      <translation type="unfinished">Screen Recording</translation>
+      <translation>Gravació de pantalla</translation>
     </message>
     <message>
       <source>Notifications</source>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Notificacions</translation>
     </message>
     <message>
       <source>Advanced</source>
-      <translation type="unfinished">Advanced</translation>
+      <translation>Avançat</translation>
     </message>
     <message>
       <source>Settings file is read-only. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation type="unfinished">Settings file is read-only. Please contact your system administrator. All changes will be lost after program exit.</translation>
+      <translation>L'arxiu de configuració és de només lectura. Poseu-vos en contacte amb l'administrador del sistema. Tots els canvis es perdran després de sortir del programa.</translation>
     </message>
     <message>
       <source>Settings cannot be saved. Please contact your system administrator. All changes will be lost after program exit.</source>
-      <translation type="unfinished">Settings cannot be saved. Please contact your system administrator. All changes will be lost after program exit.</translation>
+      <translation>No es pot desar la configuració. Poseu-vos en contacte amb l'administrador del sistema. Tots els canvis es perdran després de sortir del programa.</translation>
     </message>
     <message>
       <source>Restart required</source>
-      <translation type="unfinished">Restart required</translation>
+      <translation>Cal que reinicieu</translation>
     </message>
     <message>
       <source>Restart Now</source>
-      <translation type="unfinished">Restart Now</translation>
+      <translation>Reinicia ara</translation>
     </message>
     <message>
       <source>Restart Later</source>
-      <translation type="unfinished">Restart Later</translation>
+      <translation>Reinicia més endavant</translation>
     </message>
     <message>
       <source>Some changes will take effect only after %1 restart</source>
-      <translation type="unfinished">Some changes will take effect only after %1 restart</translation>
+      <translation>Alguns canvis només s'aplicaran després del reinici de %1</translation>
     </message>
   </context>
   <context>
@@ -4107,31 +4095,31 @@ to %1</translation>
     </message>
     <message>
       <source>Version %1</source>
-      <translation type="unfinished">Version %1</translation>
+      <translation>Versió %1</translation>
     </message>
     <message>
       <source>Saved Sessions</source>
-      <translation type="unfinished">Saved Sessions</translation>
+      <translation>Sessions desades</translation>
     </message>
     <message>
       <source>Auto-Discovered Servers</source>
-      <translation type="unfinished">Auto-Discovered Servers</translation>
+      <translation>Servidors descoberts automàticament</translation>
     </message>
     <message>
       <source>* Last used connection *</source>
-      <translation type="unfinished">* Last used connection *</translation>
+      <translation>* Darrera connexió utilitzada *</translation>
     </message>
     <message>
       <source>%1 at %2</source>
-      <translation type="unfinished">%1 at %2</translation>
+      <translation>%1 a %2</translation>
     </message>
     <message>
       <source>Overwrite existing connection?</source>
-      <translation type="unfinished">Overwrite existing connection?</translation>
+      <translation>Voleu sobreescriure la connexió existent?</translation>
     </message>
     <message>
       <source>Delete connection?</source>
-      <translation type="unfinished">Delete connection?</translation>
+      <translation>Voleu suprimir la connexió?</translation>
     </message>
     <message>
       <source>There is another connection with the same name.</source>
@@ -4207,7 +4195,7 @@ to %1</translation>
     </message>
     <message>
       <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
-      <translation type="unfinished">This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</translation>
+      <translation>Aquesta opció no afectarà el calendari d'enregistrament. El calendari d'enregistrament sempre es basa en l'hora del servidor.</translation>
     </message>
     <message>
       <source>Select File...</source>
@@ -4291,7 +4279,7 @@ to %1</translation>
     </message>
     <message>
       <source>Disabled by schedule</source>
-      <translation type="unfinished">Disabled by schedule</translation>
+      <translation>Desactivat per calendari</translation>
     </message>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
@@ -4403,7 +4391,7 @@ to %1</translation>
     </message>
     <message>
       <source>Speed Up</source>
-      <translation type="unfinished">Speed Up</translation>
+      <translation>Augmenta la velocitat</translation>
     </message>
     <message>
       <source>Next Frame</source>
@@ -4415,7 +4403,7 @@ to %1</translation>
     </message>
     <message>
       <source>Next Chunk</source>
-      <translation type="unfinished">Next Chunk</translation>
+      <translation>Fragment següent</translation>
     </message>
     <message>
       <source>To End</source>
@@ -4423,190 +4411,190 @@ to %1</translation>
     </message>
     <message>
       <source>Previous Chunk</source>
-      <translation type="unfinished">Previous Chunk</translation>
+      <translation>Fragment anterior</translation>
     </message>
     <message>
       <source>NVR cameras do not support not-synchronized playback</source>
-      <translation type="unfinished">NVR cameras do not support not-synchronized playback</translation>
+      <translation>Les càmeres NVR no són compatibles amb la reproducció no sincronitzada</translation>
     </message>
   </context>
   <context>
     <name>QnNetworkSpeedStrings</name>
     <message>
       <source>B/s</source>
-      <translation type="unfinished">B/s</translation>
+      <translation>B/s</translation>
     </message>
     <message>
       <source>MB/s</source>
-      <translation type="unfinished">MB/s</translation>
+      <translation>MB/s</translation>
     </message>
     <message>
       <source>KB/s</source>
-      <translation type="unfinished">KB/s</translation>
+      <translation>KB/s</translation>
     </message>
   </context>
   <context>
     <name>QnNewWearableCameraDialog</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nom</translation>
     </message>
     <message>
       <source>Name cannot be empty</source>
-      <translation type="unfinished">Name cannot be empty</translation>
+      <translation>El nom no pot estar buit</translation>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation type="unfinished">Virtual Camera</translation>
+      <translation>Càmera virtual</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
-      <translation type="unfinished">Virtual Camera %1</translation>
+      <translation>Càmera virtual %1</translation>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation type="unfinished">&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</translation>
+      <translation>&quot;Càmera virtual&quot; és un emmagatzematge virtual per a arxius d'àudio que es pot carregar a qualsevol servidor del vostre sistema i al qual pot accedir qualsevol usuari.</translation>
     </message>
   </context>
   <context>
     <name>QnNotificationSoundManagerDialog</name>
     <message>
       <source>Clip sound up to %1 seconds</source>
-      <translation type="unfinished">Clip sound up to %1 seconds</translation>
+      <translation>Clip de so fins a %1 segons</translation>
     </message>
     <message>
       <source>Rename sound</source>
-      <translation type="unfinished">Rename sound</translation>
+      <translation>Canvia el nom del so</translation>
     </message>
     <message>
       <source>Custom title:</source>
-      <translation type="unfinished">Custom title:</translation>
+      <translation>Títol personalitzat:</translation>
     </message>
     <message>
       <source>Sound Files</source>
-      <translation type="unfinished">Sound Files</translation>
+      <translation>Arxius de so</translation>
     </message>
     <message>
       <source>Select File...</source>
-      <translation type="unfinished">Select File...</translation>
+      <translation>Seleccioneu l'arxiu...</translation>
     </message>
     <message>
       <source>Enter New Title:</source>
-      <translation type="unfinished">Enter New Title:</translation>
+      <translation>Introduïu un títol nou:</translation>
     </message>
     <message>
       <source>Failed to add file</source>
-      <translation type="unfinished">Failed to add file</translation>
+      <translation>No s'ha pogut afegir l'arxiu</translation>
     </message>
     <message>
       <source>Failed to set new title</source>
-      <translation type="unfinished">Failed to set new title</translation>
+      <translation>No s'ha pogut establir el títol nou</translation>
     </message>
     <message>
       <source>Delete sound?</source>
-      <translation type="unfinished">Delete sound?</translation>
+      <translation>Voleu esborrar el so?</translation>
     </message>
   </context>
   <context>
     <name>QnNotificationSoundModel</name>
     <message>
       <source>Downloading sound list...</source>
-      <translation type="unfinished">Downloading sound list...</translation>
+      <translation>S'està descarregant la llista de sons...</translation>
     </message>
     <message>
       <source>No Sound</source>
-      <translation type="unfinished">No Sound</translation>
+      <translation>No hi ha so</translation>
     </message>
     <message>
       <source>Downloading sound...</source>
-      <translation type="unfinished">Downloading sound...</translation>
+      <translation>S'està descarregant el so...</translation>
     </message>
     <message>
       <source>Uploading sound...</source>
-      <translation type="unfinished">Uploading sound...</translation>
+      <translation>S'està carregant el so...</translation>
     </message>
   </context>
   <context>
     <name>QnPanTiltRotationCameraAdvancedParamWidget</name>
     <message>
       <source>Rotation</source>
-      <translation type="unfinished">Rotation</translation>
+      <translation>Rotació</translation>
     </message>
   </context>
   <context>
     <name>QnPerformanceTest</name>
     <message>
       <source>%1 can work in configuration mode only</source>
-      <translation type="unfinished">%1 can work in configuration mode only</translation>
+      <translation>%1 només pot funcionar en mode de configuració</translation>
     </message>
     <message>
       <source>Performance of this computer allows running %1 in configuration mode only.</source>
-      <translation type="unfinished">Performance of this computer allows running %1 in configuration mode only.</translation>
+      <translation>El rendiment d'aquest ordinador només permet executar %1 en mode de configuració.</translation>
     </message>
     <message>
       <source>For full-featured mode please use another computer</source>
-      <translation type="unfinished">For full-featured mode please use another computer</translation>
+      <translation>Per al mode complet, utilitzeu un altre ordinador</translation>
     </message>
   </context>
   <context>
     <name>QnPermissionsWidget</name>
     <message>
       <source>Edit camera settings</source>
-      <translation type="unfinished">Edit camera settings</translation>
+      <translation>Edita la configuració de la càmera</translation>
     </message>
     <message>
       <source>This is also required to create/edit PTZ presets and tours.</source>
-      <translation type="unfinished">This is also required to create/edit PTZ presets and tours.</translation>
+      <translation>Això també és necessari per crear/editar els paràmetres predefinits i tours de PTZ.</translation>
     </message>
     <message>
       <source>Control video walls</source>
-      <translation type="unfinished">Control video walls</translation>
+      <translation>Controla Video Walls</translation>
     </message>
     <message>
       <source>View event log</source>
-      <translation type="unfinished">View event log</translation>
+      <translation>Mostra el registre d'esdeveniments</translation>
     </message>
     <message>
       <source>View archive</source>
-      <translation type="unfinished">View archive</translation>
+      <translation>Mostra l'arxiu</translation>
     </message>
     <message>
       <source>Export archive</source>
-      <translation type="unfinished">Export archive</translation>
+      <translation>Exporta l'arxiu</translation>
     </message>
     <message>
       <source>View bookmarks</source>
-      <translation type="unfinished">View bookmarks</translation>
+      <translation>Mostra els marcadors</translation>
     </message>
     <message>
       <source>Modify bookmarks</source>
-      <translation type="unfinished">Modify bookmarks</translation>
+      <translation>Modifica els marcadors</translation>
     </message>
     <message>
       <source>User Input</source>
-      <translation type="unfinished">User Input</translation>
+      <translation>Entrada d'usuari</translation>
     </message>
     <message>
       <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
-      <translation type="unfinished">PTZ, Device Output, 2-Way Audio, Soft Triggers.</translation>
+      <translation>PTZ, sortida de dispositiu, àudio bidireccional, activadors suaus.</translation>
     </message>
   </context>
   <context>
     <name>QnPoeOverBudgetPolicy</name>
     <message>
       <source>Servers that support PoE monitoring</source>
-      <translation type="unfinished">Servers that support PoE monitoring</translation>
+      <translation>Servidors compatibles amb la supervisió de PoE</translation>
     </message>
   </context>
   <context>
     <name>QnPopupBusinessActionWidget</name>
     <message>
       <source>Manage Bookmarks</source>
-      <translation type="unfinished">Manage Bookmarks</translation>
+      <translation>Gestiona els marcadors</translation>
     </message>
     <message>
       <source>Notification will be shown until one of the users who see it creates bookmark with event description</source>
-      <translation type="unfinished">Notification will be shown until one of the users who see it creates bookmark with event description</translation>
+      <translation>La notificació es mostrarà fins que un dels usuaris que la vegin creï un marcador amb la descripció de l'esdeveniment</translation>
     </message>
   </context>
   <context>
@@ -4620,38 +4608,38 @@ to %1</translation>
     <name>QnPtzManageDialog</name>
     <message>
       <source>Manage PTZ for %1...</source>
-      <translation type="unfinished">Manage PTZ for %1...</translation>
+      <translation>Gestiona PTZ per a %1...</translation>
     </message>
     <message>
       <source>Apply changes before exit?</source>
-      <translation type="unfinished">Apply changes before exit?</translation>
+      <translation>Voleu aplicar els canvis abans de sortir?</translation>
     </message>
   </context>
   <context>
     <name>QnPtzManageModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nom</translation>
     </message>
     <message>
       <source>Hotkey</source>
-      <translation type="unfinished">Hotkey</translation>
+      <translation>Drecera</translation>
     </message>
     <message>
       <source>Home</source>
-      <translation type="unfinished">Home</translation>
+      <translation>Inici</translation>
     </message>
     <message>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Detalls</translation>
     </message>
     <message>
       <source>Tours</source>
-      <translation type="unfinished">Tours</translation>
+      <translation>Tours</translation>
     </message>
     <message>
       <source>Positions</source>
-      <translation type="unfinished">Positions</translation>
+      <translation>Posicions</translation>
     </message>
     <message>
       <source>None</source>
@@ -4924,108 +4912,108 @@ to %1</translation>
     </message>
     <message>
       <source>No local files</source>
-      <translation type="unfinished">No local files</translation>
+      <translation>No hi ha arxius locals</translation>
     </message>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>No s'ha trobat res</translation>
     </message>
     <message>
       <source>add to current layout</source>
-      <translation type="unfinished">add to current layout</translation>
+      <translation>afegeix al disseny actual</translation>
     </message>
     <message>
       <source>open all at a new layout</source>
-      <translation type="unfinished">open all at a new layout</translation>
+      <translation>obre-ho tot en un nou disseny</translation>
     </message>
     <message>
       <source>open all</source>
-      <translation type="unfinished">open all</translation>
+      <translation>obre-ho tot</translation>
     </message>
     <message>
       <source>All types</source>
-      <translation type="unfinished">All types</translation>
+      <translation>Tots els tipus</translation>
     </message>
     <message>
       <source>Servers</source>
-      <translation type="unfinished">Servers</translation>
+      <translation>Servidors</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Dissenys</translation>
     </message>
     <message>
       <source>Showreels</source>
-      <translation type="unfinished">Showreels</translation>
+      <translation>Showreels</translation>
     </message>
     <message>
       <source>Video Walls</source>
-      <translation type="unfinished">Video Walls</translation>
+      <translation>Video Walls</translation>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation type="unfinished">Web Pages</translation>
+      <translation>Pàgines web</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Usuaris</translation>
     </message>
     <message>
       <source>Local Files</source>
-      <translation type="unfinished">Local Files</translation>
+      <translation>Arxius locals</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Cerca</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Càmeres i dispositius</translation>
     </message>
   </context>
   <context>
     <name>QnResourceItemDelegate</name>
     <message>
       <source>Health Monitor</source>
-      <translation type="unfinished">Health Monitor</translation>
+      <translation>Monitor de salut</translation>
     </message>
   </context>
   <context>
     <name>QnResourceSelectionDialog</name>
     <message>
       <source>Select Devices...</source>
-      <translation type="unfinished">Select Devices...</translation>
+      <translation>Selecciona els dispositius...</translation>
     </message>
     <message>
       <source>Select Cameras...</source>
-      <translation type="unfinished">Select Cameras...</translation>
+      <translation>Selecciona les càmeres...</translation>
     </message>
   </context>
   <context>
     <name>QnResourceTreeModelNode</name>
     <message>
       <source>Servers</source>
-      <translation type="unfinished">Servers</translation>
+      <translation>Servidors</translation>
     </message>
     <message>
       <source>Other Systems</source>
-      <translation type="unfinished">Other Systems</translation>
+      <translation>Altres sistemes</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Usuaris</translation>
     </message>
     <message>
       <source>Web Pages</source>
-      <translation type="unfinished">Web Pages</translation>
+      <translation>Pàgines web</translation>
     </message>
     <message>
       <source>Cameras &amp; Resources</source>
-      <translation type="unfinished">Cameras &amp; Resources</translation>
+      <translation>Càmeres i recursos</translation>
     </message>
     <message>
       <source>Layouts</source>
-      <translation type="unfinished">Layouts</translation>
+      <translation>Dissenys</translation>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
@@ -5033,42 +5021,42 @@ to %1</translation>
     </message>
     <message>
       <source>All Shared Layouts</source>
-      <translation type="unfinished">All Shared Layouts</translation>
+      <translation>Tots els dissenys compartits</translation>
     </message>
     <message>
       <source>Shared Layouts</source>
-      <translation type="unfinished">Shared Layouts</translation>
+      <translation>Dissenys compartits</translation>
     </message>
     <message>
       <source>Local Files</source>
-      <translation type="unfinished">Local Files</translation>
+      <translation>Arxius locals</translation>
     </message>
     <message>
       <source>Showreels</source>
-      <translation type="unfinished">Showreels</translation>
+      <translation>Showreels</translation>
     </message>
     <message>
       <source>Showreel</source>
-      <translation type="unfinished">Showreel</translation>
+      <translation>Showreel</translation>
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation type="unfinished">Cameras &amp; Devices</translation>
+      <translation>Càmeres i dispositius</translation>
     </message>
     <message>
       <source>Videowalls</source>
-      <translation type="unfinished">Videowalls</translation>
+      <translation>Video Walls</translation>
     </message>
     <message>
       <source>Analytics Engines</source>
-      <translation type="unfinished">Analytics Engines</translation>
+      <translation>Motors d'analítica</translation>
     </message>
   </context>
   <context>
     <name>QnResourceTreeModelOtherSystemsNode</name>
     <message>
       <source>New System</source>
-      <translation type="unfinished">New System</translation>
+      <translation>Sistema nou</translation>
     </message>
   </context>
   <context>
@@ -5079,34 +5067,53 @@ to %1</translation>
     </message>
     <message>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Informació</translation>
     </message>
     <message>
       <source>Rotate</source>
-      <translation type="unfinished">Rotate</translation>
+      <translation>Gira</translation>
     </message>
   </context>
   <context>
     <name>QnRoutingManagementWidget</name>
     <message>
       <source>Enter URL</source>
-      <translation type="unfinished">Enter URL</translation>
+      <translation>Introduïu l'URL</translation>
     </message>
     <message>
       <source>URL</source>
-      <translation type="unfinished">URL</translation>
+      <translation>URL</translation>
     </message>
     <message>
       <source>Server</source>
-      <translation type="unfinished">Server</translation>
+      <translation>Servidor</translation>
     </message>
     <message>
       <source>Invalid URL</source>
-      <translation type="unfinished">Invalid URL</translation>
+      <translation>La URL no és vàlida</translation>
     </message>
     <message>
       <source>URL already added</source>
-      <translation type="unfinished">URL already added</translation>
+      <translation>La URL ja s'ha afegit</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnScreenshotLoader</name>
+    <message>
+      <source>Top left corner</source>
+      <translation>Cantó superior esquerre</translation>
+    </message>
+    <message>
+      <source>Top right corner</source>
+      <translation>Cantó superior dret</translation>
+    </message>
+    <message>
+      <source>Bottom left corner</source>
+      <translation>Cantó inferior esquerre</translation>
+    </message>
+    <message>
+      <source>Bottom right corner</source>
+      <translation>Cantó inferior dret</translation>
     </message>
   </context>
   <context>
@@ -5117,11 +5124,11 @@ to %1</translation>
     </message>
     <message>
       <source>No bookmarks</source>
-      <translation type="unfinished">No bookmarks</translation>
+      <translation>Sense marcadors</translation>
     </message>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Cerca</translation>
     </message>
     <message>
       <source>Export Bookmarks...</source>
@@ -5132,38 +5139,38 @@ to %1</translation>
     <name>QnSearchBookmarksModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nom</translation>
     </message>
     <message>
       <source>Start time</source>
-      <translation type="unfinished">Start time</translation>
+      <translation>Hora d'inici</translation>
     </message>
     <message>
       <source>Length</source>
-      <translation type="unfinished">Length</translation>
+      <translation>Longitud</translation>
     </message>
     <message>
       <source>Tags</source>
-      <translation type="unfinished">Tags</translation>
+      <translation>Etiquetes</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Càmera</translation>
     </message>
     <message>
       <source>Created</source>
-      <translation type="unfinished">Created</translation>
+      <translation>Creat</translation>
     </message>
     <message>
       <source>Creator</source>
-      <translation type="unfinished">Creator</translation>
+      <translation>Autor</translation>
     </message>
   </context>
   <context>
     <name>QnSelectDevicesButton</name>
     <message>
       <source>Any Device</source>
-      <translation type="unfinished">Any Device</translation>
+      <translation>Qualsevol dispositiu</translation>
     </message>
     <message>
       <source>Any Camera</source>
@@ -5171,40 +5178,40 @@ to %1</translation>
     </message>
     <message>
       <source>All Devices</source>
-      <translation type="unfinished">All Devices</translation>
+      <translation>Tots els dispositius</translation>
     </message>
     <message>
       <source>All Cameras</source>
-      <translation type="unfinished">All Cameras</translation>
+      <translation>Totes les càmeres</translation>
     </message>
     <message>
       <source>Select devices...</source>
-      <translation type="unfinished">Select devices...</translation>
+      <translation>Selecciona els dispositius...</translation>
     </message>
     <message>
       <source>Select cameras...</source>
-      <translation type="unfinished">Select cameras...</translation>
+      <translation>Selecciona les càmeres...</translation>
     </message>
   </context>
   <context>
     <name>QnSelectServersButton</name>
     <message>
       <source>Any Server</source>
-      <translation type="unfinished">Any Server</translation>
+      <translation>Qualsevol servidor</translation>
     </message>
     <message>
       <source>All Servers</source>
-      <translation type="unfinished">All Servers</translation>
+      <translation>Tots els servidors</translation>
     </message>
     <message>
       <source>Select Servers...</source>
-      <translation type="unfinished">Select Servers...</translation>
+      <translation>Selecciona els servidors...</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
-      <translation type="unfinished">
-        <numerusform>%n Servers</numerusform>
-        <numerusform>%n Servers</numerusform>
+      <translation>
+        <numerusform>%n servidors</numerusform>
+        <numerusform>%n servidors</numerusform>
       </translation>
     </message>
   </context>
@@ -5212,21 +5219,21 @@ to %1</translation>
     <name>QnSelectUsersButton</name>
     <message>
       <source>Any User</source>
-      <translation type="unfinished">Any User</translation>
+      <translation>Qualsevol usuari</translation>
     </message>
     <message>
       <source>All Users</source>
-      <translation type="unfinished">All Users</translation>
+      <translation>Tots els usuaris</translation>
     </message>
     <message>
       <source>Select Users...</source>
-      <translation type="unfinished">Select Users...</translation>
+      <translation>Selecciona els usuaris...</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n usuaris</numerusform>
+        <numerusform>%n usuaris</numerusform>
       </translation>
     </message>
   </context>
@@ -5489,39 +5496,39 @@ to %1</translation>
     <name>QnSmtpTestConnectionWidget</name>
     <message>
       <source>Timed Out</source>
-      <translation type="unfinished">Timed Out</translation>
+      <translation>Temps d'espera superat</translation>
     </message>
     <message>
       <source>TLS</source>
-      <translation type="unfinished">TLS</translation>
+      <translation>TLS</translation>
     </message>
     <message>
       <source>SSL</source>
-      <translation type="unfinished">SSL</translation>
+      <translation>SSL</translation>
     </message>
     <message>
       <source>Unsecured</source>
-      <translation type="unfinished">Unsecured</translation>
+      <translation>No segur</translation>
     </message>
     <message>
       <source>In Progress...</source>
-      <translation type="unfinished">In Progress...</translation>
+      <translation>En curs...</translation>
     </message>
     <message>
       <source>Success</source>
-      <translation type="unfinished">Success</translation>
+      <translation>Correcte</translation>
     </message>
     <message>
       <source>Connection timed out</source>
-      <translation type="unfinished">Connection timed out</translation>
+      <translation>Temps de connexió esgotat</translation>
     </message>
     <message>
       <source>Authentication failed</source>
-      <translation type="unfinished">Authentication failed</translation>
+      <translation>S'ha produït un error en l'autenticació</translation>
     </message>
     <message>
       <source>SMTP Error %1</source>
-      <translation type="unfinished">SMTP Error %1</translation>
+      <translation>Error SMTP %1</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -5529,112 +5536,112 @@ to %1</translation>
     </message>
     <message>
       <source>Invalid parameters</source>
-      <translation type="unfinished">Invalid parameters</translation>
+      <translation>Paràmetres invàlids</translation>
     </message>
     <message>
       <source>Cannot perform the test.</source>
-      <translation type="unfinished">Cannot perform the test.</translation>
+      <translation>No es pot realitzar la prova.</translation>
     </message>
     <message>
       <source>No Servers connected to Internet</source>
-      <translation type="unfinished">No Servers connected to Internet</translation>
+      <translation>No hi ha servidors connectats a Internet</translation>
     </message>
   </context>
   <context>
     <name>QnSoftwareTriggerBusinessEventWidget</name>
     <message>
       <source>User Input</source>
-      <translation type="unfinished">User Input</translation>
+      <translation>Entrada d'usuari</translation>
     </message>
   </context>
   <context>
     <name>QnSpeedSlider</name>
     <message>
       <source>%1x</source>
-      <translation type="unfinished">%1x</translation>
+      <translation>%1x</translation>
     </message>
     <message>
       <source>Paused</source>
-      <translation type="unfinished">Paused</translation>
+      <translation>Pausat</translation>
     </message>
   </context>
   <context>
     <name>QnStatusOverlayController</name>
     <message>
       <source>NO DATA</source>
-      <translation type="unfinished">NO DATA</translation>
+      <translation>NO HI HA DADES</translation>
     </message>
     <message>
       <source>UNAUTHORIZED</source>
-      <translation type="unfinished">UNAUTHORIZED</translation>
+      <translation>NO AUTORITZAT</translation>
     </message>
     <message>
       <source>NO SIGNAL</source>
-      <translation type="unfinished">NO SIGNAL</translation>
+      <translation>SENSE SENYAL</translation>
     </message>
     <message>
       <source>SERVER UNAVAILABLE</source>
-      <translation type="unfinished">SERVER UNAVAILABLE</translation>
+      <translation>SERVIDOR NO DISPONIBLE</translation>
     </message>
     <message>
       <source>NO ACCESS</source>
-      <translation type="unfinished">NO ACCESS</translation>
+      <translation>SENSE ACCÉS</translation>
     </message>
     <message>
       <source>DEVICE DISABLED</source>
-      <translation type="unfinished">DEVICE DISABLED</translation>
+      <translation>DISPOSITIU DESACTIVAT</translation>
     </message>
     <message>
       <source>Device Settings</source>
-      <translation type="unfinished">Device Settings</translation>
+      <translation>Configuració del dispositiu</translation>
     </message>
     <message>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Configuració de la càmera</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation type="unfinished">I/O Module Settings</translation>
+      <translation>Configuració del mòdul de I/O</translation>
     </message>
     <message>
       <source>Diagnostics</source>
-      <translation type="unfinished">Diagnostics</translation>
+      <translation>Diagnòstics</translation>
     </message>
     <message>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Activa</translation>
     </message>
     <message>
       <source>Activate License</source>
-      <translation type="unfinished">Activate License</translation>
+      <translation>Activa la llicència</translation>
     </message>
     <message>
       <source>Please check authentication information</source>
-      <translation type="unfinished">Please check authentication information</translation>
+      <translation>Comproveu la informació d'autenticació</translation>
     </message>
     <message>
       <source>NO LIVE STREAM</source>
-      <translation type="unfinished">NO LIVE STREAM</translation>
+      <translation>SENSE FLUX EN DIRECTE</translation>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
-      <translation type="unfinished">TOO MANY CONNECTIONS</translation>
+      <translation>MASSA CONNEXIONS</translation>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
-      <translation type="unfinished">PASSWORD REQUIRED</translation>
+      <translation>ES REQUEREIX UNA CONTRASENYA</translation>
     </message>
     <message>
       <source>Set for this Camera</source>
-      <translation type="unfinished">Set for this Camera</translation>
+      <translation>Defineix per a aquesta càmera</translation>
     </message>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
-      <translation type="unfinished">UNSUPPORTED FIRMWARE VERSION</translation>
+      <translation>VERSIÓ FIRMWARE NO COMPATIBLE</translation>
     </message>
     <message>
       <source>NOT ENOUGH LICENSES</source>
-      <translation type="unfinished">NOT ENOUGH LICENSES</translation>
+      <translation>NO HI HA PROU LLICÈNCIES</translation>
     </message>
   </context>
   <context>
@@ -5653,16 +5660,16 @@ to %1</translation>
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Actualitza</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
-      <translation type="unfinished">Export selected events to file</translation>
+      <translation>Exporta els esdeveniments seleccionats a un arxiu</translation>
     </message>
     <message numerus="yes">
       <source>%n TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>%n TB</numerusform>
         <numerusform>%n TB</numerusform>
       </translation>
@@ -5670,58 +5677,58 @@ to %1</translation>
     <message>
       <source>TB</source>
       <comment>TB - terabytes</comment>
-      <translation type="unfinished">TB</translation>
+      <translation>TB</translation>
     </message>
     <message>
       <source>Last 5 minutes</source>
-      <translation type="unfinished">Last 5 minutes</translation>
+      <translation>Últims 5 minuts</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
-      <translation type="unfinished">Last 60 minutes</translation>
+      <translation>Últims 60 minuts</translation>
     </message>
     <message>
       <source>Last 24 hours</source>
-      <translation type="unfinished">Last 24 hours</translation>
+      <translation>Últimes 24 hores</translation>
     </message>
     <message>
       <source>Longest period available</source>
-      <translation type="unfinished">Longest period available</translation>
+      <translation>Període més llarg disponible</translation>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation type="unfinished">Forecast available only for cameras with enabled recording.</translation>
+      <translation>Previsió disponible només per a càmeres amb enregistrament activat.</translation>
     </message>
   </context>
   <context>
     <name>QnStorageConfigWidget</name>
     <message>
       <source>Backup is already in progress.</source>
-      <translation type="unfinished">Backup is already in progress.</translation>
+      <translation>La còpia de seguretat ja està en curs.</translation>
     </message>
     <message>
       <source>Cannot start backup while archive index rebuild is in progress.</source>
-      <translation type="unfinished">Cannot start backup while archive index rebuild is in progress.</translation>
+      <translation>No es pot iniciar la còpia de seguretat mentre la reconstrucció de l'índex d'arxiu està en curs.</translation>
     </message>
     <message>
       <source>Backup is in progress...</source>
-      <translation type="unfinished">Backup is in progress...</translation>
+      <translation>La còpia de seguretat està en curs...</translation>
     </message>
     <message>
       <source>Main</source>
-      <translation type="unfinished">Main</translation>
+      <translation>Principal</translation>
     </message>
     <message>
       <source>Backup</source>
-      <translation type="unfinished">Backup</translation>
+      <translation>Còpia de seguretat</translation>
     </message>
     <message>
       <source>Add more drives to use them as backup storage.</source>
-      <translation type="unfinished">Add more drives to use them as backup storage.</translation>
+      <translation>Afegiu més unitats per utilitzar-les com a emmagatzematge de còpia de seguretat.</translation>
     </message>
     <message>
       <source>Change &quot;Main&quot; to &quot;Backup&quot; for some of the storage above to enable backup.</source>
-      <translation type="unfinished">Change &quot;Main&quot; to &quot;Backup&quot; for some of the storage above to enable backup.</translation>
+      <translation>Canvieu &quot;Principal&quot; per &quot;Còpia de seguretat&quot; per a algun dels emmagatzematges anteriors per habilitar la còpia de seguretat.</translation>
     </message>
     <message>
       <source>Apply changes to start backup.</source>
@@ -5753,11 +5760,11 @@ to %1</translation>
     </message>
     <message>
       <source>Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation type="unfinished">Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation>La pròxima còpia de seguretat està programada per a &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message>
       <source>Next backup is not scheduled.</source>
-      <translation type="unfinished">Next backup is not scheduled.</translation>
+      <translation>La pròxima còpia de seguretat no està programada.</translation>
     </message>
     <message>
       <source>Depending on the total size of the archive, reindexing can take up to several hours.</source>
@@ -5960,183 +5967,183 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Invalid storage path</source>
-      <translation type="unfinished">Invalid storage path</translation>
+      <translation>El camí d'emmagatzematge no és vàlid</translation>
     </message>
     <message>
       <source>Add this storage anyway?</source>
-      <translation type="unfinished">Add this storage anyway?</translation>
+      <translation>Voleu afegir aquest emmagatzematge de totes maneres?</translation>
     </message>
     <message>
       <source>Storage path used by another server</source>
-      <translation type="unfinished">Storage path used by another server</translation>
+      <translation>Camí d'emmagatzematge utilitzat per un altre servidor</translation>
     </message>
     <message>
       <source>Add Storage</source>
-      <translation type="unfinished">Add Storage</translation>
+      <translation>Afegeix l'emmagatzematge</translation>
     </message>
     <message>
       <source>It is not recommended to use one recording location for different servers.</source>
-      <translation type="unfinished">It is not recommended to use one recording location for different servers.</translation>
+      <translation>No es recomana utilitzar una ubicació d'enregistrament per a servidors diferents.</translation>
     </message>
   </context>
   <context>
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>General</source>
-      <translation type="unfinished">General</translation>
+      <translation>General</translation>
     </message>
     <message>
       <source>Licenses</source>
-      <translation type="unfinished">Licenses</translation>
+      <translation>Llicències</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>Email</translation>
     </message>
     <message>
       <source>Updates</source>
-      <translation type="unfinished">Updates</translation>
+      <translation>Actualitzacions</translation>
     </message>
     <message>
       <source>Routing Management</source>
-      <translation type="unfinished">Routing Management</translation>
+      <translation>Gestió d'encaminament</translation>
     </message>
     <message>
       <source>Time Synchronization</source>
-      <translation type="unfinished">Time Synchronization</translation>
+      <translation>Sincronització d'hora</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Usuaris</translation>
     </message>
     <message>
       <source>Plugins</source>
-      <translation type="unfinished">Plugins</translation>
+      <translation>Connectors</translation>
     </message>
   </context>
   <context>
     <name>QnSystemHealthStringsHelper</name>
     <message>
       <source>Email address is not set</source>
-      <translation type="unfinished">Email address is not set</translation>
+      <translation>No s'ha definit l'Email</translation>
     </message>
     <message>
       <source>No licenses</source>
-      <translation type="unfinished">No licenses</translation>
+      <translation>Sense llicències</translation>
     </message>
     <message>
       <source>Email server is not set</source>
-      <translation type="unfinished">Email server is not set</translation>
+      <translation>No s'ha definit el servidor de l'Email</translation>
     </message>
     <message>
       <source>Storage is not configured</source>
-      <translation type="unfinished">Storage is not configured</translation>
+      <translation>No s'ha configurat l'emmagatzematge</translation>
     </message>
     <message>
       <source>Rebuilding archive index is completed</source>
-      <translation type="unfinished">Rebuilding archive index is completed</translation>
+      <translation>S'ha completat la reconstrucció de l'índex d'arxiu</translation>
     </message>
     <message>
       <source>Rebuilding archive index is canceled by user</source>
-      <translation type="unfinished">Rebuilding archive index is canceled by user</translation>
+      <translation>L'usuari ha cancel·lat la reconstrucció de l'índex d'arxiu</translation>
     </message>
     <message>
       <source>Email address is not set for user %1</source>
-      <translation type="unfinished">Email address is not set for user %1</translation>
+      <translation>No s'ha definit l'Email per a l'usuari %1</translation>
     </message>
     <message>
       <source>Email address is not set.</source>
-      <translation type="unfinished">Email address is not set.</translation>
+      <translation>No s'ha definit l'Email.</translation>
     </message>
     <message>
       <source>Email server is not set.</source>
-      <translation type="unfinished">Email server is not set.</translation>
+      <translation>No s'ha definit el servidor de l'Email.</translation>
     </message>
     <message>
       <source>Any configuration changes except license activation are impossible.</source>
-      <translation type="unfinished">Any configuration changes except license activation are impossible.</translation>
+      <translation>No es poden fer canvis de configuració llevat de l'activació de llicències.</translation>
     </message>
     <message>
       <source>You have no licenses.</source>
-      <translation type="unfinished">You have no licenses.</translation>
+      <translation>No teniu cap llicència.</translation>
     </message>
     <message>
       <source>You cannot record video from cameras.</source>
-      <translation type="unfinished">You cannot record video from cameras.</translation>
+      <translation>No podeu gravar vídeo des de les càmeres.</translation>
     </message>
     <message>
       <source>Rebuilding archive index is completed on the following Server:</source>
-      <translation type="unfinished">Rebuilding archive index is completed on the following Server:</translation>
+      <translation>S'ha completat la reconstrucció de l'índex d'arxiu al servidor següent:</translation>
     </message>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
-      <translation type="unfinished">Rebuilding archive index is canceled by user on the following Server:</translation>
+      <translation>L'usuari ha cancel·lat la reconstrucció de l'índex d'arxiu al servidor següent:</translation>
     </message>
     <message>
       <source>Learn more</source>
-      <translation type="unfinished">Learn more</translation>
+      <translation>Més informació</translation>
     </message>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Connecta</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
-      <translation type="unfinished">Some users have not set their email addresses</translation>
+      <translation>Alguns usuaris no han definit els seus Emails</translation>
     </message>
     <message>
       <source>You cannot receive System notifications by email.</source>
-      <translation type="unfinished">You cannot receive System notifications by email.</translation>
+      <translation>No podeu rebre notificacions del sistema per correu electrònic.</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses.</source>
-      <translation type="unfinished">Some users have not set their email addresses.</translation>
+      <translation>Alguns usuaris no han definit els seus Emails.</translation>
     </message>
     <message>
       <source>They cannot receive System notifications by email.</source>
-      <translation type="unfinished">They cannot receive System notifications by email.</translation>
+      <translation>No poden rebre notificacions del sistema per correu electrònic.</translation>
     </message>
     <message>
       <source>Error while sending email</source>
-      <translation type="unfinished">Error while sending email</translation>
+      <translation>S'ha produït un error en enviar el correu electrònic</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been started</source>
-      <translation type="unfinished">Remote archive synchronization has been started</translation>
+      <translation>S'ha iniciat la sincronització de l'arxiu remot</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been finished</source>
-      <translation type="unfinished">Remote archive synchronization has been finished</translation>
+      <translation>S'ha enllestit la sincronització de l'arxiu remot</translation>
     </message>
     <message>
       <source>Remote archive synchronization is in progress</source>
-      <translation type="unfinished">Remote archive synchronization is in progress</translation>
+      <translation>La sincronització de l'arxiu remot està en curs</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been started for the following device:</source>
-      <translation type="unfinished">Remote archive synchronization has been started for the following device:</translation>
+      <translation>S'ha iniciat la sincronització de l'arxiu remot per al dispositiu següent:</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
-      <translation type="unfinished">Remote archive synchronization has been finished for the following device:</translation>
+      <translation>S'ha enllestit la sincronització de l'arxiu remot per al dispositiu següent:</translation>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation type="unfinished">Remote archive synchronization</translation>
+      <translation>Sincronització de l'arxiu remot</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
-      <translation type="unfinished">Archive integrity problem detected</translation>
+      <translation>S'ha detectat un problema d'integritat a l'arxiu</translation>
     </message>
     <message>
       <source>Connect your System to %1 &amp;mdash; make it accessible from anywhere!</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Connect your System to %1 &amp;mdash; make it accessible from anywhere!</translation>
+      <translation>Connecteu el vostre sistema a %1 perquè sigui accessible des de qualsevol lloc.</translation>
     </message>
     <message>
       <source>Check out %1 &amp;mdash; connect to your System from anywhere!</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Check out %1 &amp;mdash; connect to your System from anywhere!</translation>
+      <translation>Feu una ullada a %1 i connecteu-vos al vostre sistema des de qualsevol lloc.</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
@@ -6144,34 +6151,34 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
-      <translation type="unfinished">No server has internet access for time synchronization</translation>
+      <translation>Cap servidor té accés a Internet per a la sincronització de l'hora</translation>
     </message>
     <message>
       <source>The System is in safe mode</source>
-      <translation type="unfinished">The System is in safe mode</translation>
+      <translation>El sistema està en mode segur</translation>
     </message>
     <message>
       <source>The System has no internet access for time synchronization</source>
-      <translation type="unfinished">The System has no internet access for time synchronization</translation>
+      <translation>El sistema no té accés a Internet per a la sincronització de l'hora</translation>
     </message>
     <message>
       <source>No online server in the System has internet access for time synchronization.</source>
-      <translation type="unfinished">No online server in the System has internet access for time synchronization.</translation>
+      <translation>Cap servidor en línia del sistema té accés a Internet per a la sincronització de l'hora.</translation>
     </message>
     <message>
       <source>The System is running in safe mode.</source>
-      <translation type="unfinished">The System is running in safe mode.</translation>
+      <translation>El sistema s'està executant en mode segur.</translation>
     </message>
     <message>
       <source>Error occurred during remote archive synchronization</source>
-      <translation type="unfinished">Error occurred during remote archive synchronization</translation>
+      <translation>S'ha produït un error durant la sincronització de l'arxiu remot</translation>
     </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
     <message>
       <source>Allow System to optimize device settings</source>
-      <translation type="unfinished">Allow System to optimize device settings</translation>
+      <translation>Permetre que el sistema optimitzi la configuració del dispositiu</translation>
     </message>
     <message>
       <source>Allow System to optimize camera settings</source>
@@ -6319,7 +6326,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Control Video Walls</source>
-      <translation type="unfinished">Control Video Walls</translation>
+      <translation>Controla Video Walls</translation>
     </message>
   </context>
   <context>
@@ -6589,18 +6596,18 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnVideowallScreenWidget</name>
     <message>
       <source>PC %1</source>
-      <translation type="unfinished">PC %1</translation>
+      <translation>Ordinador %1</translation>
     </message>
     <message>
       <source>PC %1 - Display %2</source>
-      <translation type="unfinished">PC %1 - Display %2</translation>
+      <translation>Ordinador %1: pantalla %2</translation>
     </message>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
-      <translation type="unfinished">
-        <numerusform>PC %1 - Displays %2</numerusform>
-        <numerusform>PC %1 - Displays %2</numerusform>
+      <translation>
+        <numerusform>Ordinador %1: pantalles %2</numerusform>
+        <numerusform>Ordinador %1: pantalles %2</numerusform>
       </translation>
     </message>
   </context>
@@ -6863,26 +6870,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Saving Screenshot...</translation>
     </message>
     <message>
-      <source>No Timestamp</source>
-      <translation type="unfinished">No Timestamp</translation>
-    </message>
-    <message>
-      <source>Top Left Corner</source>
-      <translation type="unfinished">Top Left Corner</translation>
-    </message>
-    <message>
-      <source>Top Right Corner</source>
-      <translation type="unfinished">Top Right Corner</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner</source>
-      <translation type="unfinished">Bottom Left Corner</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner</source>
-      <translation type="unfinished">Bottom Right Corner</translation>
-    </message>
-    <message>
       <source>Failed to save screenshot</source>
       <translation type="unfinished">Failed to save screenshot</translation>
     </message>
@@ -6897,6 +6884,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>JPEG Image</source>
       <translation type="unfinished">JPEG Image</translation>
+    </message>
+    <message>
+      <source>No timestamp</source>
+      <translation type="unfinished">No timestamp</translation>
+    </message>
+    <message>
+      <source>No camera name</source>
+      <translation type="unfinished">No camera name</translation>
+    </message>
+    <message>
+      <source>Camera name:</source>
+      <translation type="unfinished">Camera name:</translation>
     </message>
   </context>
   <context>
@@ -7405,7 +7404,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Medium</source>
-      <translation>Mitja</translation>
+      <translation>Mitjana</translation>
     </message>
     <message>
       <source>High</source>
@@ -7807,39 +7806,39 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
     <message>
       <source>License limit exceeded, recording will not be enabled.</source>
-      <translation type="unfinished">License limit exceeded, recording will not be enabled.</translation>
+      <translation>S'ha superat el límit de llicències, no s'activarà l'enregistrament.</translation>
     </message>
     <message>
       <source>Recording Schedule</source>
-      <translation type="unfinished">Recording Schedule</translation>
+      <translation>Calendari d'enregistrament</translation>
     </message>
     <message>
       <source>based on server time</source>
-      <translation type="unfinished">based on server time</translation>
+      <translation>basat en l'hora del servidor</translation>
     </message>
     <message>
       <source>Select areas on the schedule to apply chosen parameters to.</source>
-      <translation type="unfinished">Select areas on the schedule to apply chosen parameters to.</translation>
+      <translation>Seleccioneu les àrees del calendari a les quals voleu aplicar els paràmetres triats.</translation>
     </message>
     <message>
       <source>Set recording parameters and select areas on the schedule grid to apply them to.</source>
-      <translation type="unfinished">Set recording parameters and select areas on the schedule grid to apply them to.</translation>
+      <translation>Establiu els paràmetres d'enregistrament i seleccioneu les àrees del calendari a les quals voleu aplicar-los.</translation>
     </message>
     <message>
       <source>Turn on selector at the top of the window to enable recording.</source>
-      <translation type="unfinished">Turn on selector at the top of the window to enable recording.</translation>
+      <translation>Activeu el selector a la part superior de la finestra per habilitar l'enregistrament.</translation>
     </message>
     <message>
       <source>High minimum value can lead to archive length decrease on other devices.</source>
-      <translation type="unfinished">High minimum value can lead to archive length decrease on other devices.</translation>
+      <translation>Un valor mínim elevat pot provocar una disminució de la longitud de l'arxiu en altres dispositius.</translation>
     </message>
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
-      <translation type="unfinished">High minimum value can lead to archive length decrease on other cameras.</translation>
+      <translation>Un valor mínim elevat pot provocar una disminució de la longitud de l'arxiu en altres càmeres.</translation>
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
-      <translation type="unfinished">High pre-recording time will increase RAM utilization on the server</translation>
+      <translation>Un temps prolongat d'enregistrament previ augmentarà la utilització de la memòria RAM al servidor</translation>
     </message>
   </context>
   <context>
@@ -7945,11 +7944,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation type="unfinished">Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
+      <translation>La detecció de moviment està desactivada. Tots els registres de calendari &quot;Moviment&quot; i &quot;Moviment + Baixa resolució&quot; es canviaran a &quot;Sempre&quot;</translation>
     </message>
     <message>
       <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation type="unfinished">Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
+      <translation>La transmissió dual està desactivada. Tots els registres de calendari &quot;Moviment + Baixa resolució&quot; es canviaran a &quot;Sempre&quot;du</translation>
     </message>
   </context>
   <context>
@@ -8294,19 +8293,19 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ExportScheduleResourceSelectionDialogDelegate</name>
     <message>
       <source>Copy archive length settings</source>
-      <translation type="unfinished">Copy archive length settings</translation>
+      <translation>Copia la configuració de la longitud de l'arxiu</translation>
     </message>
     <message>
       <source>Schedule motion type is not supported by some cameras.</source>
-      <translation type="unfinished">Schedule motion type is not supported by some cameras.</translation>
+      <translation>Algunes càmeres no admeten el tipus de moviment per calendari.</translation>
     </message>
     <message>
       <source>Recording cannot be enabled for some cameras.</source>
-      <translation type="unfinished">Recording cannot be enabled for some cameras.</translation>
+      <translation>L'enregistrament no es pot activar per a algunes càmeres.</translation>
     </message>
     <message>
       <source>Schedule settings are not compatible with some devices.</source>
-      <translation type="unfinished">Schedule settings are not compatible with some devices.</translation>
+      <translation>La configuració del calendari no és compatible amb alguns dispositius.</translation>
     </message>
   </context>
   <context>
@@ -8406,6 +8405,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
       <translation type="unfinished">You are about to export a long video. It may require a lot of storage space and take significant time.</translation>
+    </message>
+    <message>
+      <source>Add Info</source>
+      <translation type="unfinished">Add Info</translation>
+    </message>
+    <message>
+      <source>Delete Info</source>
+      <translation type="unfinished">Delete Info</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation type="unfinished">Info</translation>
     </message>
   </context>
   <context>
@@ -9331,34 +9342,34 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::ScheduleGridWidget</name>
     <message>
       <source>All</source>
-      <translation type="unfinished">All</translation>
+      <translation>Tot</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ScheduleSettingsWidget</name>
     <message>
       <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
-      <translation type="unfinished">Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</translation>
+      <translation>La configuració de qualitat només determina la velocitat de compressió i no afecta la resolució. Baixa, Mitjana, Alta i Millor són valors de taxa de bits predefinits.</translation>
     </message>
     <message>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbit/s</translation>
     </message>
     <message>
       <source>Less Settings</source>
-      <translation type="unfinished">Less Settings</translation>
+      <translation>Menys opcions</translation>
     </message>
     <message>
       <source>More Settings</source>
-      <translation type="unfinished">More Settings</translation>
+      <translation>Més opcions</translation>
     </message>
     <message>
       <source>Motion detection is disabled or not supported</source>
-      <translation type="unfinished">Motion detection is disabled or not supported</translation>
+      <translation>La detecció de moviment està desactivada o no és compatible</translation>
     </message>
     <message>
       <source>Dual-streaming is disabled or not supported</source>
-      <translation type="unfinished">Dual-streaming is disabled or not supported</translation>
+      <translation>La transmissió dual està desactivada o no és compatible</translation>
     </message>
   </context>
   <context>

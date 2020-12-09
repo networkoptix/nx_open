@@ -2726,17 +2726,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnClockLabel</name>
-    <message>
-      <source>Server Time</source>
-      <translation>Thời gian máy chủ</translation>
-    </message>
-    <message>
-      <source>Local System Time</source>
-      <translation>Hiện hệ thống địa phương</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCloudManagementWidget</name>
     <message>
       <source>Connect to your Systems
@@ -5046,6 +5035,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnScreenshotLoader</name>
+    <message>
+      <source>Top left corner</source>
+      <translation type="unfinished">Top left corner</translation>
+    </message>
+    <message>
+      <source>Top right corner</source>
+      <translation type="unfinished">Top right corner</translation>
+    </message>
+    <message>
+      <source>Bottom left corner</source>
+      <translation type="unfinished">Bottom left corner</translation>
+    </message>
+    <message>
+      <source>Bottom right corner</source>
+      <translation type="unfinished">Bottom right corner</translation>
+    </message>
+  </context>
+  <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>Export Bookmark...</source>
@@ -6786,26 +6794,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Lưu ảnh chụp màn hình...</translation>
     </message>
     <message>
-      <source>No Timestamp</source>
-      <translation>Không có thời gian đóng dấu</translation>
-    </message>
-    <message>
-      <source>Top Left Corner</source>
-      <translation>Góc trên bên trái</translation>
-    </message>
-    <message>
-      <source>Top Right Corner</source>
-      <translation>Góc trên bên phải</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner</source>
-      <translation>Góc dưới cùng bên trái</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner</source>
-      <translation>Góc dưới bên phải</translation>
-    </message>
-    <message>
       <source>Failed to save screenshot</source>
       <translation>Không thể lưu ảnh chụp màn hình</translation>
     </message>
@@ -6820,6 +6808,18 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>JPEG Image</source>
       <translation>File JPEG</translation>
+    </message>
+    <message>
+      <source>No timestamp</source>
+      <translation type="unfinished">No timestamp</translation>
+    </message>
+    <message>
+      <source>No camera name</source>
+      <translation type="unfinished">No camera name</translation>
+    </message>
+    <message>
+      <source>Camera name:</source>
+      <translation type="unfinished">Camera name:</translation>
     </message>
   </context>
   <context>
@@ -8284,6 +8284,18 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
       <translation>Bạn sắp xuất một video dài. Nó có thể đòi hỏi nhiều không gian lưu trữ và tốn thời gian đáng kể.</translation>
+    </message>
+    <message>
+      <source>Add Info</source>
+      <translation type="unfinished">Add Info</translation>
+    </message>
+    <message>
+      <source>Delete Info</source>
+      <translation type="unfinished">Delete Info</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation type="unfinished">Info</translation>
     </message>
   </context>
   <context>

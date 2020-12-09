@@ -93,14 +93,14 @@
     <name>QnLocalSystemDescription</name>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Servidor nou</translation>
     </message>
   </context>
   <context>
     <name>QnSystemDescription</name>
     <message>
       <source>Unnamed System</source>
-      <translation type="unfinished">Unnamed System</translation>
+      <translation>Sistema sense nom</translation>
     </message>
   </context>
   <context>

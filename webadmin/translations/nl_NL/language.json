@@ -84,6 +84,7 @@
         "ldapSearchBase": "LDAP-zoekbasis",
         "ldapSearchFilter": "LDAP-zoekfilter",
         "ldapUri": "LDAP-URI",
+        "ldapPasswordExperationPeriod": "Vervalperiode LDAP-gebruikerswachtwoord. Alleen bijgewerkt nadat de vorige periode is verlopen",
         "localSystemId": "Lokaal systeem ID",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Max verschil tussen gesynchroniseerde en internettijd (milliseconden)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Max verschil tussen gesynchroniseerde en lokale tijd (milliseconden)",
@@ -131,7 +132,8 @@
         "maxEventLogRecords": "Maximale logboekrecords om in de database te bewaren. Het werkelijke aantal niet-verwijderde records kan tot 20% hoger zijn dan de opgegeven waarde.",
         "forceLiveCacheForPrimaryStream": "Of u sommige frames in de cache wilt opslaan voor de primaire stream. Waarden: \"yes\" - altijd ingeschakeld (kan veel RAM gebruiken), \"no\" - altijd uitgeschakeld behalve wanneer vereist voor het afspelen (bijv. HLS), \"auto\" - vergelijkbaar met \"no\", maar ingeschakeld wanneer de gebruikerservaring te verbeteren (bijvoorbeeld wanneer een bepaalde Analytics-plug-in op de camera werkt).",
         "additionalLocalFsTypes": "Aanvullende bestandstypes om na te gaan of een bepaalde partitie geschikt is voor serveropslag. Kommagescheiden lijst van bestandssysteemnamen zoals ze staan vermeld in /proc/mounts wordt verwacht.",
-        "mediaBufferSizeKb": "Server side RTSP-buffergrootte in KB. Hogere waardes maken het mogelijk om efficiënter internet te gebruiken met een hogere round trip vertragingswaarde, maar vertraagt de automatische kwaliteitsschakeling en reactie op de media zoekbewerking."
+        "mediaBufferSizeKb": "Server side RTSP-buffergrootte in KB. Hogere waardes maken het mogelijk om efficiënter internet te gebruiken met een hogere round trip vertragingswaarde, maar vertraagt de automatische kwaliteitsschakeling en reactie op de media zoekbewerking.",
+        "mediaBufferSizeForAudioOnlyDeviceKb": "Grootte van mediabuffer aan serverzijde in kB. Het heeft dezelfde betekenis als de parameter 'mediaBufferSizeKb', maar wordt toegepast op apparaten met alleen audio."
     },
     "info": {
         "tabs": {

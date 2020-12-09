@@ -2761,17 +2761,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnClockLabel</name>
-    <message>
-      <source>Server Time</source>
-      <translation>Hora del servidor</translation>
-    </message>
-    <message>
-      <source>Local System Time</source>
-      <translation>Hora del sistema local</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCloudManagementWidget</name>
     <message>
       <source>Connect to your Systems
@@ -5108,6 +5097,25 @@ a %1</translation>
     </message>
   </context>
   <context>
+    <name>QnScreenshotLoader</name>
+    <message>
+      <source>Top left corner</source>
+      <translation>Esquina superior izquierda</translation>
+    </message>
+    <message>
+      <source>Top right corner</source>
+      <translation>Esquina superior derecha</translation>
+    </message>
+    <message>
+      <source>Bottom left corner</source>
+      <translation>Esquina izquierda inferior</translation>
+    </message>
+    <message>
+      <source>Bottom right corner</source>
+      <translation>Esquina derecha inferior</translation>
+    </message>
+  </context>
+  <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>Export Bookmark...</source>
@@ -6860,26 +6868,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
       <translation>Guardando captura de pantalla...</translation>
     </message>
     <message>
-      <source>No Timestamp</source>
-      <translation>Sin marca de tiempo</translation>
-    </message>
-    <message>
-      <source>Top Left Corner</source>
-      <translation>Esquina superior izquierda</translation>
-    </message>
-    <message>
-      <source>Top Right Corner</source>
-      <translation>Esquina superior derecha</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner</source>
-      <translation>Esquina inferior izquierda</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner</source>
-      <translation>Esquina inferior derecha</translation>
-    </message>
-    <message>
       <source>Failed to save screenshot</source>
       <translation>No se pudo guardar la captura de pantalla</translation>
     </message>
@@ -6894,6 +6882,18 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>JPEG Image</source>
       <translation>Imagen JPEG</translation>
+    </message>
+    <message>
+      <source>No timestamp</source>
+      <translation>Sin marca de tiempo</translation>
+    </message>
+    <message>
+      <source>No camera name</source>
+      <translation>Sin nombre de cámara</translation>
+    </message>
+    <message>
+      <source>Camera name:</source>
+      <translation>Nombre de la cámara:</translation>
     </message>
   </context>
   <context>
@@ -8403,6 +8403,18 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
       <translation>Estás a punto de exportar un video largo. Puede requerir una gran cantidad de espacio de almacenamiento y tomar mucho tiempo.</translation>
+    </message>
+    <message>
+      <source>Add Info</source>
+      <translation>Añadir Info</translation>
+    </message>
+    <message>
+      <source>Delete Info</source>
+      <translation>Borrar Info</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>Info</translation>
     </message>
   </context>
   <context>

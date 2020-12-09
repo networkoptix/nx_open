@@ -285,42 +285,42 @@
     <message>
       <location filename="../src/ui/dialogs/backup_schedule_dialog.ui"/>
       <source>Backup Schedule...</source>
-      <translation type="unfinished">Backup Schedule...</translation>
+      <translation>Fes una còpia de seguretat del calendari...</translation>
     </message>
     <message>
       <location/>
       <source>Execute backup on the following days:</source>
-      <translation type="unfinished">Execute backup on the following days:</translation>
+      <translation>Executa la còpia de seguretat els dies següents:</translation>
     </message>
     <message>
       <location/>
       <source>Limit Bandwidth to:</source>
-      <translation type="unfinished">Limit Bandwidth to:</translation>
+      <translation>Limita l'amplada de banda a:</translation>
     </message>
     <message>
       <location/>
       <source>Mbit/s</source>
-      <translation type="unfinished">Mbit/s</translation>
+      <translation>Mbit/s</translation>
     </message>
     <message>
       <location/>
       <source>Bitrate limitation could lead to backup failure.</source>
-      <translation type="unfinished">Bitrate limitation could lead to backup failure.</translation>
+      <translation>La limitació de la taxa de bits podria provocar un error en la còpia de seguretat.</translation>
     </message>
     <message>
       <location/>
       <source>Finish</source>
-      <translation type="unfinished">Finish</translation>
+      <translation>Acaba</translation>
     </message>
     <message>
       <location/>
       <source>Start</source>
-      <translation type="unfinished">Start</translation>
+      <translation>Inicia</translation>
     </message>
     <message>
       <location/>
       <source>on the next day</source>
-      <translation type="unfinished">on the next day</translation>
+      <translation>l'endemà</translation>
     </message>
   </context>
   <context>
@@ -338,7 +338,7 @@
     <message>
       <location/>
       <source>Set Schedule...</source>
-      <translation type="unfinished">Set Schedule...</translation>
+      <translation>Estableix el calendari...</translation>
     </message>
     <message>
       <location/>
@@ -478,7 +478,7 @@
     <message>
       <location/>
       <source>Schedule...</source>
-      <translation type="unfinished">Schedule...</translation>
+      <translation>Programa...</translation>
     </message>
     <message>
       <location/>
@@ -613,7 +613,7 @@
     <message>
       <location/>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation type="unfinished">Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</translation>
+      <translation>Els paràmetres de qualitat i imatges per segon (FPS) del calendari d'enregistrament seran irrellevants.</translation>
     </message>
     <message>
       <location/>
@@ -859,32 +859,32 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_schedule_widget.ui"/>
       <source>Motion Recording</source>
-      <translation type="unfinished">Motion Recording</translation>
+      <translation>Enregistrament de moviment</translation>
     </message>
     <message>
       <location/>
       <source>Recording</source>
-      <translation type="unfinished">Recording</translation>
+      <translation>Enregistrament</translation>
     </message>
     <message>
       <location/>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Activa la llicència...</translation>
     </message>
     <message>
       <location/>
       <source>Copying Schedule</source>
-      <translation type="unfinished">Copying Schedule</translation>
+      <translation>S'està copiant el calendari</translation>
     </message>
     <message>
       <location/>
       <source>Apply changes before copying schedule.</source>
-      <translation type="unfinished">Apply changes before copying schedule.</translation>
+      <translation>Apliqueu els canvis abans de copiar el calendari.</translation>
     </message>
     <message>
       <location/>
       <source>Copy Schedule to...</source>
-      <translation type="unfinished">Copy Schedule to...</translation>
+      <translation>Copia el calendari a...</translation>
     </message>
   </context>
   <context>
@@ -1553,6 +1553,34 @@
       <location/>
       <source>No image</source>
       <translation type="unfinished">No image</translation>
+    </message>
+  </context>
+  <context>
+    <name>InfoOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/export/widgets/info_overlay_settings_widget.ui"/>
+      <source>Info</source>
+      <translation type="unfinished">Info</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Camera name</source>
+      <translation type="unfinished">Camera name</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Export date</source>
+      <translation type="unfinished">Export date</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation type="unfinished">Font Size</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation type="unfinished">Delete</translation>
     </message>
   </context>
   <context>
@@ -2549,22 +2577,22 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/videowall_settings_dialog.ui"/>
       <source>Video Wall Settings</source>
-      <translation type="unfinished">Video Wall Settings</translation>
+      <translation>Configuració del Video Wall</translation>
     </message>
     <message>
       <location/>
       <source>Launch video wall when Windows starts.</source>
-      <translation type="unfinished">Launch video wall when Windows starts.</translation>
+      <translation>Executa el Video Wall quan s'iniciï Windows.</translation>
     </message>
     <message>
       <location/>
       <source>Place shortcut on desktop.</source>
-      <translation type="unfinished">Place shortcut on desktop.</translation>
+      <translation>Col·loca una drecera a l'escriptori.</translation>
     </message>
     <message>
       <location/>
       <source>Enable timeline on video wall</source>
-      <translation type="unfinished">Enable timeline on video wall</translation>
+      <translation>Activa la línia de temps al Video Wall</translation>
     </message>
   </context>
   <context>
@@ -2768,52 +2796,52 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/schedule_settings_widget.ui"/>
       <source>Schedule Settings</source>
-      <translation type="unfinished">Schedule Settings</translation>
+      <translation>Configuració del calendari</translation>
     </message>
     <message>
       <location/>
       <source>Record Always</source>
-      <translation type="unfinished">Record Always</translation>
+      <translation>Enregistra sempre</translation>
     </message>
     <message>
       <location/>
       <source>Motion Only</source>
-      <translation type="unfinished">Motion Only</translation>
+      <translation>Només moviment</translation>
     </message>
     <message>
       <location/>
       <source>Motion + Lo-Res</source>
-      <translation type="unfinished">Motion + Lo-Res</translation>
+      <translation>Moviment + Baixa resolució</translation>
     </message>
     <message>
       <location/>
       <source>Do Not Record</source>
-      <translation type="unfinished">Do Not Record</translation>
+      <translation>No enregistris</translation>
     </message>
     <message>
       <location/>
       <source>Bitrate</source>
-      <translation type="unfinished">Bitrate</translation>
+      <translation>Taxa de bits</translation>
     </message>
     <message>
       <location/>
       <source>FPS</source>
-      <translation type="unfinished">FPS</translation>
+      <translation>FPS</translation>
     </message>
     <message>
       <location/>
       <source>Quality</source>
-      <translation type="unfinished">Quality</translation>
+      <translation>Qualitat</translation>
     </message>
     <message>
       <location/>
       <source>Show Quality</source>
-      <translation type="unfinished">Show Quality</translation>
+      <translation>Mostra la qualitat</translation>
     </message>
     <message>
       <location/>
       <source>Show FPS</source>
-      <translation type="unfinished">Show FPS</translation>
+      <translation>Mostra els FPS</translation>
     </message>
   </context>
   <context>
@@ -3244,7 +3272,7 @@
     <message>
       <location/>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-      <translation type="unfinished">Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</translation>
+      <translation>Atenció! Això farà que els paràmetres de qualitat i imatges per segon (FPS) del calendari d'enregistrament siguin irrellevants.</translation>
     </message>
     <message>
       <location/>
@@ -3460,27 +3488,27 @@
     <message>
       <location filename="../src/ui/dialogs/week_time_schedule_dialog.ui"/>
       <source>Schedule Settings</source>
-      <translation type="unfinished">Schedule Settings</translation>
+      <translation>Configuració del calendari</translation>
     </message>
     <message>
       <location/>
       <source>On</source>
-      <translation type="unfinished">On</translation>
+      <translation>Encès</translation>
     </message>
     <message>
       <location/>
       <source>Off</source>
-      <translation type="unfinished">Off</translation>
+      <translation>Apagat</translation>
     </message>
     <message>
       <location/>
       <source>Schedule</source>
-      <translation type="unfinished">Schedule</translation>
+      <translation>Calendari</translation>
     </message>
     <message>
       <location/>
       <source>Note: Schedule is based on server time.</source>
-      <translation type="unfinished">Note: Schedule is based on server time.</translation>
+      <translation>Nota: el calendari es basa en l'hora del servidor.</translation>
     </message>
   </context>
   <context>

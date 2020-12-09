@@ -2761,17 +2761,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnClockLabel</name>
-    <message>
-      <source>Server Time</source>
-      <translation>Serverzeit</translation>
-    </message>
-    <message>
-      <source>Local System Time</source>
-      <translation>Lokale Systemzeit</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCloudManagementWidget</name>
     <message>
       <source>Connect to your Systems
@@ -5105,6 +5094,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnScreenshotLoader</name>
+    <message>
+      <source>Top left corner</source>
+      <translation>Obere linke Ecke</translation>
+    </message>
+    <message>
+      <source>Top right corner</source>
+      <translation>Obere rechte Ecke</translation>
+    </message>
+    <message>
+      <source>Bottom left corner</source>
+      <translation>Untere linke Ecke</translation>
+    </message>
+    <message>
+      <source>Bottom right corner</source>
+      <translation>Untere rechte Ecke</translation>
+    </message>
+  </context>
+  <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>Export Bookmark...</source>
@@ -6858,26 +6866,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Screenshot speichern...</translation>
     </message>
     <message>
-      <source>No Timestamp</source>
-      <translation>Keine Zeitmarke</translation>
-    </message>
-    <message>
-      <source>Top Left Corner</source>
-      <translation>Obere linke Ecke</translation>
-    </message>
-    <message>
-      <source>Top Right Corner</source>
-      <translation>Obere rechte Ecke</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner</source>
-      <translation>Untere linke Ecke</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner</source>
-      <translation>Untere rechte Ecke</translation>
-    </message>
-    <message>
       <source>Failed to save screenshot</source>
       <translation>Fehler beim Speichern des Screenshots</translation>
     </message>
@@ -6892,6 +6880,18 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>JPEG Image</source>
       <translation>JPEG-Bilddatei</translation>
+    </message>
+    <message>
+      <source>No timestamp</source>
+      <translation>Keine Zeitmarke</translation>
+    </message>
+    <message>
+      <source>No camera name</source>
+      <translation>Kein Kameraname</translation>
+    </message>
+    <message>
+      <source>Camera name:</source>
+      <translation>Kameraname:</translation>
     </message>
   </context>
   <context>
@@ -8401,6 +8401,18 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
       <translation>Sie exportieren gerade ein langes Video. Dies kann viel Speicherplatz erfordern und viel Zeit in Anspruch nehmen.</translation>
+    </message>
+    <message>
+      <source>Add Info</source>
+      <translation>Info hinzufügen</translation>
+    </message>
+    <message>
+      <source>Delete Info</source>
+      <translation>Info löschen</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>Info</translation>
     </message>
   </context>
   <context>

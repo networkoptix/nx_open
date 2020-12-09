@@ -2797,17 +2797,6 @@ to view more bookmarks</translation>
     </message>
   </context>
   <context>
-    <name>QnClockLabel</name>
-    <message>
-      <source>Server Time</source>
-      <translation type="unfinished">Server Time</translation>
-    </message>
-    <message>
-      <source>Local System Time</source>
-      <translation type="unfinished">Local System Time</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCloudManagementWidget</name>
     <message>
       <source>Connect to your Systems
@@ -5169,6 +5158,25 @@ to %1</translation>
     </message>
   </context>
   <context>
+    <name>QnScreenshotLoader</name>
+    <message>
+      <source>Top left corner</source>
+      <translation type="unfinished">Top left corner</translation>
+    </message>
+    <message>
+      <source>Top right corner</source>
+      <translation type="unfinished">Top right corner</translation>
+    </message>
+    <message>
+      <source>Bottom left corner</source>
+      <translation type="unfinished">Bottom left corner</translation>
+    </message>
+    <message>
+      <source>Bottom right corner</source>
+      <translation type="unfinished">Bottom right corner</translation>
+    </message>
+  </context>
+  <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>Export Bookmark...</source>
@@ -6934,26 +6942,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Saving Screenshot...</translation>
     </message>
     <message>
-      <source>No Timestamp</source>
-      <translation type="unfinished">No Timestamp</translation>
-    </message>
-    <message>
-      <source>Top Left Corner</source>
-      <translation type="unfinished">Top Left Corner</translation>
-    </message>
-    <message>
-      <source>Top Right Corner</source>
-      <translation type="unfinished">Top Right Corner</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner</source>
-      <translation type="unfinished">Bottom Left Corner</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner</source>
-      <translation type="unfinished">Bottom Right Corner</translation>
-    </message>
-    <message>
       <source>Failed to save screenshot</source>
       <translation type="unfinished">Failed to save screenshot</translation>
     </message>
@@ -6968,6 +6956,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>JPEG Image</source>
       <translation type="unfinished">JPEG Image</translation>
+    </message>
+    <message>
+      <source>No timestamp</source>
+      <translation type="unfinished">No timestamp</translation>
+    </message>
+    <message>
+      <source>No camera name</source>
+      <translation type="unfinished">No camera name</translation>
+    </message>
+    <message>
+      <source>Camera name:</source>
+      <translation type="unfinished">Camera name:</translation>
     </message>
   </context>
   <context>
@@ -8522,6 +8522,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
       <translation type="unfinished">You are about to export a long video. It may require a lot of storage space and take significant time.</translation>
+    </message>
+    <message>
+      <source>Add Info</source>
+      <translation type="unfinished">Add Info</translation>
+    </message>
+    <message>
+      <source>Delete Info</source>
+      <translation type="unfinished">Delete Info</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation type="unfinished">Info</translation>
     </message>
   </context>
   <context>

@@ -84,6 +84,7 @@
         "ldapSearchBase": "Cơ sở tìm kiếm LDAP",
         "ldapSearchFilter": "Bộ lọc tìm kiếm LDAP",
         "ldapUri": "LDAP URI",
+        "ldapPasswordExperationPeriod": "LDAP user password expiration period. Updated only after previous perioud is expired",
         "localSystemId": "ID hệ thống cục bộ",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Tối đa khác biệt giữa thời gian đồng bộ và Internet (mili giây)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Tối đa khác biệt giữa thời gian đồng bộ và Internet (mili giây)",
@@ -131,7 +132,8 @@
         "maxEventLogRecords": "Bản ghi nhật ký sự kiện tối đa để giữ vào cơ sở dữ liệu. Số lượng thực của các bản ghi chưa được xóa có thể cao hơn tới 20% so với giá trị được chỉ định.",
         "forceLiveCacheForPrimaryStream": "Có nên lưu trữ một số khung cho luồng chính. Giá trị: \"có\" - luôn được bật (có thể sử dụng nhiều RAM), \"không\" - luôn bị tắt trừ khi được yêu cầu phát lại (ví dụ: HLS), \"tự động\" - tương tự như \"không\", nhưng được bật khi cải thiện trải nghiệm người dùng (ví dụ: khi một số plugin Analytics hoạt động trên máy ảnh).",
         "additionalLocalFsTypes": "Các loại hệ thống tệp bổ sung cần xem xét trong khi quyết định xem một phân vùng nhất định có phù hợp để lưu trữ máy chủ hay không. Danh sách tên hệ thống tệp được phân tách bằng dấu phẩy khi chúng được liệt kê trong / Proc / mounts được mong đợi.",
-        "mediaBufferSizeKb": "Server-side media buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value, but slows down the auto quality switching and reaction to media seek operations."
+        "mediaBufferSizeKb": "Server-side media buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value, but slows down the auto quality switching and reaction to media seek operations.",
+        "mediaBufferSizeForAudioOnlyDeviceKb": "Server-side media buffer size in KB. It has same meaning as 'mediaBufferSizeKb' parameter but it is applied to audio only devices."
     },
     "info": {
         "tabs": {

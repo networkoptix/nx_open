@@ -2762,17 +2762,6 @@ om du vill visa fler bokmärken</translation>
     </message>
   </context>
   <context>
-    <name>QnClockLabel</name>
-    <message>
-      <source>Server Time</source>
-      <translation>Servertid</translation>
-    </message>
-    <message>
-      <source>Local System Time</source>
-      <translation>Lokal systemtid</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCloudManagementWidget</name>
     <message>
       <source>Connect to your Systems
@@ -5110,6 +5099,25 @@ till %1</translation>
     </message>
   </context>
   <context>
+    <name>QnScreenshotLoader</name>
+    <message>
+      <source>Top left corner</source>
+      <translation>Övre vänstra hörn</translation>
+    </message>
+    <message>
+      <source>Top right corner</source>
+      <translation>Övre högra hörn</translation>
+    </message>
+    <message>
+      <source>Bottom left corner</source>
+      <translation>Nedre vänstra hörn</translation>
+    </message>
+    <message>
+      <source>Bottom right corner</source>
+      <translation>Nedre högra hörn</translation>
+    </message>
+  </context>
+  <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>Export Bookmark...</source>
@@ -6863,26 +6871,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Sparar skärmdump...</translation>
     </message>
     <message>
-      <source>No Timestamp</source>
-      <translation>Ingen tidsstämpel</translation>
-    </message>
-    <message>
-      <source>Top Left Corner</source>
-      <translation>Övre vänstra hörnet</translation>
-    </message>
-    <message>
-      <source>Top Right Corner</source>
-      <translation>Övre högra hörnet</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner</source>
-      <translation>Nedre vänstra hörnet</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner</source>
-      <translation>Nedre högra hörnet</translation>
-    </message>
-    <message>
       <source>Failed to save screenshot</source>
       <translation>Kunde inte spara skärmdumpen</translation>
     </message>
@@ -6897,6 +6885,18 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>JPEG Image</source>
       <translation>JPEG-bild</translation>
+    </message>
+    <message>
+      <source>No timestamp</source>
+      <translation>Ingen tidsstämpel</translation>
+    </message>
+    <message>
+      <source>No camera name</source>
+      <translation>Inget kameranamn</translation>
+    </message>
+    <message>
+      <source>Camera name:</source>
+      <translation>Kameranamn:</translation>
     </message>
   </context>
   <context>
@@ -8406,6 +8406,18 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
       <translation>Du håller på att exportera en lång video. Det kan kräva mycket lagringsutrymme och ta betydande tid.</translation>
+    </message>
+    <message>
+      <source>Add Info</source>
+      <translation>Lägg till info</translation>
+    </message>
+    <message>
+      <source>Delete Info</source>
+      <translation>Ta bort information</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>Info</translation>
     </message>
   </context>
   <context>

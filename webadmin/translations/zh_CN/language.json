@@ -84,6 +84,7 @@
         "ldapSearchBase": "LDAP 搜索库",
         "ldapSearchFilter": "LDAP 搜索过滤器",
         "ldapUri": "LDAP URI",
+        "ldapPasswordExperationPeriod": "LDAP user password expiration period. Updated only after previous perioud is expired",
         "localSystemId": "本地系统 ID",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "与互联网校时的最大秒差（毫秒）",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "与本地服务器校时的最大秒差 (毫秒)",
@@ -131,7 +132,8 @@
         "maxEventLogRecords": "要保留最多笔在资料库中的事件日志记录。实际未删除记录的数量可能比指定值高出20％。",
         "forceLiveCacheForPrimaryStream": "是否为主串流缓存一些帧数。数值：“是” - 一直启用（可能占用大量RAM），“否” - 一直停用，除非回放需要（例如HLS），“自动” - 类似于“否”，但会在开启时改进使用者体验（例如: 当某些分析插件在摄像机上作用时）。",
         "additionalLocalFsTypes": "在确定给定分区是否适用作服务器存储时, 需考虑附加的文件系统类型。应在列出的文件系统名称列表中使用逗号分隔/ proc / mounts。",
-        "mediaBufferSizeKb": "Server-side media buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value, but slows down the auto quality switching and reaction to media seek operations."
+        "mediaBufferSizeKb": "Server-side media buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value, but slows down the auto quality switching and reaction to media seek operations.",
+        "mediaBufferSizeForAudioOnlyDeviceKb": "Server-side media buffer size in KB. It has same meaning as 'mediaBufferSizeKb' parameter but it is applied to audio only devices."
     },
     "info": {
         "tabs": {

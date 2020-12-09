@@ -2762,17 +2762,6 @@ pour afficher plus de signets</translation>
     </message>
   </context>
   <context>
-    <name>QnClockLabel</name>
-    <message>
-      <source>Server Time</source>
-      <translation>Heure Serveur</translation>
-    </message>
-    <message>
-      <source>Local System Time</source>
-      <translation>Heure Système local</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCloudManagementWidget</name>
     <message>
       <source>Connect to your Systems
@@ -5110,6 +5099,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnScreenshotLoader</name>
+    <message>
+      <source>Top left corner</source>
+      <translation type="unfinished">Top left corner</translation>
+    </message>
+    <message>
+      <source>Top right corner</source>
+      <translation type="unfinished">Top right corner</translation>
+    </message>
+    <message>
+      <source>Bottom left corner</source>
+      <translation type="unfinished">Bottom left corner</translation>
+    </message>
+    <message>
+      <source>Bottom right corner</source>
+      <translation type="unfinished">Bottom right corner</translation>
+    </message>
+  </context>
+  <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>Export Bookmark...</source>
@@ -6863,26 +6871,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <translation>Sauvegarde capture d'écran...</translation>
     </message>
     <message>
-      <source>No Timestamp</source>
-      <translation>Aucun Horodatage</translation>
-    </message>
-    <message>
-      <source>Top Left Corner</source>
-      <translation>Coin supérieur gauche</translation>
-    </message>
-    <message>
-      <source>Top Right Corner</source>
-      <translation>Coin supérieur droit</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner</source>
-      <translation>Coin inférieur gauche</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner</source>
-      <translation>Coin inférieur droit</translation>
-    </message>
-    <message>
       <source>Failed to save screenshot</source>
       <translation>Échec de sauvegarde de capture d'écran</translation>
     </message>
@@ -6897,6 +6885,18 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>JPEG Image</source>
       <translation>Image JPEG</translation>
+    </message>
+    <message>
+      <source>No timestamp</source>
+      <translation type="unfinished">No timestamp</translation>
+    </message>
+    <message>
+      <source>No camera name</source>
+      <translation type="unfinished">No camera name</translation>
+    </message>
+    <message>
+      <source>Camera name:</source>
+      <translation type="unfinished">Camera name:</translation>
     </message>
   </context>
   <context>
@@ -8406,6 +8406,18 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
       <translation>Vous êtes sur le point d'exporter une longue vidéo. Cela peut nécessiter beaucoup d'espace de disque et prendre beaucoup de temps.</translation>
+    </message>
+    <message>
+      <source>Add Info</source>
+      <translation type="unfinished">Add Info</translation>
+    </message>
+    <message>
+      <source>Delete Info</source>
+      <translation type="unfinished">Delete Info</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation type="unfinished">Info</translation>
     </message>
   </context>
   <context>

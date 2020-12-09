@@ -84,6 +84,7 @@
         "ldapSearchBase": "Base de búsqueda LDAP",
         "ldapSearchFilter": "Filtro de búsqueda LDAP",
         "ldapUri": "URI LDAP",
+        "ldapPasswordExperationPeriod": "Período de caducidad de la contraseña de usuario LDAP. Actualizado solo después de que expire el periodo anterior",
         "localSystemId": "ID del sistema local",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Diferencia máxima entre el tiempo sincronizado e Internet (milisegundos)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Diferencia máxima entre tiempo sincronizado y local (milisegundos)",
@@ -131,7 +132,8 @@
         "maxEventLogRecords": "Máximo registro de eventos para mantener en la base de datos. La cantidad real de registros no eliminados puede ser hasta un 20% mayor que el valor especificado.",
         "forceLiveCacheForPrimaryStream": "Si almacenar en caché algunos marcos para la secuencia principal. Valores: \"sí\": siempre habilitado (puede usar una gran cantidad de RAM), \"no\" - siempre deshabilitado, excepto cuando lo requiera la reproducción (por ejemplo, HLS), \"automático\" - similar a \"no\", pero se activa cuando mejora la experiencia del usuario (por ejemplo, cuando algún plugin de analíticas está funcionando en la cámara).",
         "additionalLocalFsTypes": "Tipos de sistema de ficheros adicionales a considerar al decidir si una partición determinada es adecuada para ser un almacenamiento del servidor. Se espera una lista separada por comas de los nombres del sistema de archivos tal como aparecen en /proc/mounts.",
-        "mediaBufferSizeKb": "Tamaño del búfer de medios del lado del servidor en KB. Un valor más grande permite utilizar Internet más eficiente con un alto valor de retardo de ida y vuelta, pero ralentiza el cambio automático de calidad y la reacción a las operaciones de búsqueda de medios."
+        "mediaBufferSizeKb": "Tamaño del búfer de medios del lado del servidor en KB. Un valor más grande permite utilizar Internet más eficiente con un alto valor de retardo de ida y vuelta, pero ralentiza el cambio automático de calidad y la reacción a las operaciones de búsqueda de medios.",
+        "mediaBufferSizeForAudioOnlyDeviceKb": "Tamaño del búfer de medios del lado del servidor en KB. Tiene el mismo significado que el parámetro 'mediaBufferSizeKb' pero se aplica a dispositivos de solo audio."
     },
     "info": {
         "tabs": {

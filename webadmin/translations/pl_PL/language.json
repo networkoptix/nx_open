@@ -84,6 +84,7 @@
         "ldapSearchBase": "Podstawa wyszukiwania LDAP",
         "ldapSearchFilter": "Filtr wyszukiwania LDAP",
         "ldapUri": "Adres URI LDAP",
+        "ldapPasswordExperationPeriod": "Okres ważności hasła użytkownika LDAP. Aktualizowane tylko po wygaśnięciu poprzedniego hasła.",
         "localSystemId": "ID lokalnego systemu",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Max różnica między czasem zsynchronizowanym a internetowym (ms)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Max różnica między czasem zsynchronizowanym a lokalnym (ms)",
@@ -131,7 +132,8 @@
         "maxEventLogRecords": "Maksymalna liczba wpisów do dziennika zdarzeń przechowywanego w bazie danych. Rzeczywista ilość rekordów może być nawet o 20% wyższa niż podana wartość.",
         "forceLiveCacheForPrimaryStream": "Czy buforować niektóre ramki dla strumienia głównego. Wartości: „tak” - zawsze włączone (może zużywać dużo pamięci RAM), „nie” - zawsze wyłączone, chyba że wymaga tego odtwarzanie (np. HLS), „auto” - podobne do „nie”, ale włączone, gdy poprawia to wrażenia użytkownika (np. w niektórych wtyczkach analizy wideo).",
         "additionalLocalFsTypes": "Dodatkowe systemy plików do rozważenia przy wybieraniu partycji jako magazynu dla serwera. Spodziewana jest lista nazw systemów plików oddzielonych przecinkami zgodnie z listą w /proc/mounts.",
-        "mediaBufferSizeKb": "Rozmiar bufora medialnego po stronie serwera, w kilobajtach. Większa wartość pozwala na wykorzystanie w optymalny sposób wolnego połączenia internetowego, ale jednocześnie wydłuża ona czas automatycznego przełączania jakości, przeglądanie wideo i reakcję na otwieranie strumienia wideo."
+        "mediaBufferSizeKb": "Rozmiar bufora medialnego po stronie serwera, w kilobajtach. Większa wartość pozwala na wykorzystanie w optymalny sposób wolnego połączenia internetowego, ale jednocześnie wydłuża ona czas automatycznego przełączania jakości, przeglądanie wideo i reakcję na otwieranie strumienia wideo.",
+        "mediaBufferSizeForAudioOnlyDeviceKb": "Rozmiar bufora nośnika po stronie serwera w KB. Ma to samo znaczenie, co parametr „mediaBufferSizeKb”, ale jest stosowany tylko do urządzeń audio."
     },
     "info": {
         "tabs": {

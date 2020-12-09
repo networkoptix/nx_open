@@ -84,6 +84,7 @@
         "ldapSearchBase": "Vyhledávací základna LDAP",
         "ldapSearchFilter": "Filtr vyhledávání LDAP",
         "ldapUri": "LDAP URI",
+        "ldapPasswordExperationPeriod": "LDAP user password expiration period. Updated only after previous perioud is expired",
         "localSystemId": "ID místního systému",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Maximální rozdíl mezi synchronizovaným a internetovým časem (milisekundy)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Maximální rozdíl mezi synchronizovaným a místním časem (milisekundy)",
@@ -131,7 +132,8 @@
         "maxEventLogRecords": "Maximální záznamy protokolu událostí, které lze uložit do databáze. Skutečné množství nevymazaných záznamů může být až o 20% vyšší než zadaná hodnota.",
         "forceLiveCacheForPrimaryStream": "Určuje, zda ukládat některé snímky pro primární stream. Hodnoty: \"ano\" - vždy povoleno (může využít hodně RAM), \"ne\" - vždy vypnuto, kromě případů, kdy to vyžaduje přehrávání (např.. HLS), \"auto\" - podobné \"ne\", ale pokud je zapnuto, zlepšuje uživatelský zážitek (např. když nějaký plugin Analytický pracuje na kamerě).",
         "additionalLocalFsTypes": "Další typy systémů souborů, které je třeba zvážit při rozhodování, zda je daný oddíl vhodný jako úložiště serveru. Nahrajte jako seznam názvů souborů oddělených čárkami, jak jsou uvedeny v / proc / mounts.",
-        "mediaBufferSizeKb": "Server-side media buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value, but slows down the auto quality switching and reaction to media seek operations."
+        "mediaBufferSizeKb": "Server-side media buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value, but slows down the auto quality switching and reaction to media seek operations.",
+        "mediaBufferSizeForAudioOnlyDeviceKb": "Server-side media buffer size in KB. It has same meaning as 'mediaBufferSizeKb' parameter but it is applied to audio only devices."
     },
     "info": {
         "tabs": {

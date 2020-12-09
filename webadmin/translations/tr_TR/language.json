@@ -84,6 +84,7 @@
         "ldapSearchBase": "LDAP veritabanı",
         "ldapSearchFilter": "LDAP arama filtresi",
         "ldapUri": "LDAP URI",
+        "ldapPasswordExperationPeriod": "LDAP user password expiration period. Updated only after previous perioud is expired",
         "localSystemId": "Yerel Sistem Kimliği",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Eşzamanlı İnternet zamanı arasındaki maksimum fark (milisaniyeler)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Eşzamanlı yerel zaman arasındaki maksimum fark (milisaniyeler)",
@@ -131,7 +132,8 @@
         "maxEventLogRecords": "Veritabanında tutulacak maksimum olay günlüğü kaydı. Silinmemiş kayıtların gerçek miktarı belirtilen değerden %20 daha yüksek olabilir.",
         "forceLiveCacheForPrimaryStream": "Birincil akış için bazı karelerin önbellekte saklanıp saklanmayacağı. Değer:\"evet\" - her zaman etkin ( çok fazla RAM kullanılabilir), \"hayır\" - geri oynatma işleminin gerektirdiği durumlar dışında devre dışı (örn. HLS), \"auto\" hayır'a benzer ancak etkinleştirildiğinde kullanıcı deneyimini arttırır (örneğin, bazı Analitik eklentileri kamera üzerinde çalışırken).",
         "additionalLocalFsTypes": "Belirli bir bölümün sunucu depolama alanı için uygun olup olmadığına karar verirken dikkate alınması gereken ek dosya sistemi türleri. / Proc / mount'larda listelendikleri gibi virgülle ayrılmış dosya sistemi adlarının listesi beklenir.",
-        "mediaBufferSizeKb": "KB cinsinden sunucu tarafı ortam arabellek boyutu. Daha büyük değer, yüksek gidiş-dönüş gecikme değeriyle daha verimli internet kullanımına izin verir, ancak otomatik kalite geçişini ve medya arama işlemlerine tepkiyi yavaşlatır."
+        "mediaBufferSizeKb": "KB cinsinden sunucu tarafı ortam arabellek boyutu. Daha büyük değer, yüksek gidiş-dönüş gecikme değeriyle daha verimli internet kullanımına izin verir, ancak otomatik kalite geçişini ve medya arama işlemlerine tepkiyi yavaşlatır.",
+        "mediaBufferSizeForAudioOnlyDeviceKb": "Server-side media buffer size in KB. It has same meaning as 'mediaBufferSizeKb' parameter but it is applied to audio only devices."
     },
     "info": {
         "tabs": {

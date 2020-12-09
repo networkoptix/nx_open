@@ -84,6 +84,7 @@
         "ldapSearchBase": "LDAP-søkebase",
         "ldapSearchFilter": "LDAP-søkfilter",
         "ldapUri": "LDAP URI",
+        "ldapPasswordExperationPeriod": "LDAP user password expiration period. Updated only after previous perioud is expired",
         "localSystemId": "Lokalt system-ID",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Maksimal forskjell mellom synkronisert og Internett-tid (millisekunder)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Maksimal forskjell mellom synkronisert og lokal tid (millisekunder)",
@@ -131,7 +132,8 @@
         "maxEventLogRecords": "Maksimal hendelsesloggoppføringer for å oppbevare i databasen. Den reelle mengden ubemerkede poster kan være opptil 20% høyere enn den spesifiserte verdien.",
         "forceLiveCacheForPrimaryStream": "Hvorvidt du skal buffer noen rammer for primærstrømmen. Verdier: \"ja\" - alltid aktivert (kan bruke mye RAM), \"nei\" - alltid deaktivert, bortsett fra når det kreves av avspillingen (f.eks. HLS), \"auto\" - lik \"nei\", men slått på når forbedring av brukeropplevelse (f.eks. når noen Analytics-plugin fungerer på kameraet).",
         "additionalLocalFsTypes": "Flere filsystemtyper å vurdere når du bestemmer deg for om en gitt partisjon er egnet til å være en serverlagring. Kommaseparert liste over filsystemnavn slik de er oppført i / proc / mounts forventes.",
-        "mediaBufferSizeKb": "Server-side media buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value, but slows down the auto quality switching and reaction to media seek operations."
+        "mediaBufferSizeKb": "Server-side media buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value, but slows down the auto quality switching and reaction to media seek operations.",
+        "mediaBufferSizeForAudioOnlyDeviceKb": "Server-side media buffer size in KB. It has same meaning as 'mediaBufferSizeKb' parameter but it is applied to audio only devices."
     },
     "info": {
         "tabs": {

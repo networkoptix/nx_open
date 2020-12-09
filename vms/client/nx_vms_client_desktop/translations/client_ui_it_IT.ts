@@ -1556,6 +1556,34 @@
     </message>
   </context>
   <context>
+    <name>InfoOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/export/widgets/info_overlay_settings_widget.ui"/>
+      <source>Info</source>
+      <translation>Informazioni</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Camera name</source>
+      <translation>Nome telecamera</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Export date</source>
+      <translation>Data di esportazione</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation>Dimensione del font</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation>Elimina</translation>
+    </message>
+  </context>
+  <context>
     <name>IoModuleSettingsWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/io_module_settings_widget.ui"/>

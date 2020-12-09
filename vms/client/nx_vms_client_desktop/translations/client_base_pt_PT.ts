@@ -2762,17 +2762,6 @@ para ver mais favoritos</translation>
     </message>
   </context>
   <context>
-    <name>QnClockLabel</name>
-    <message>
-      <source>Server Time</source>
-      <translation>Hora Servidor</translation>
-    </message>
-    <message>
-      <source>Local System Time</source>
-      <translation>Hora local do Sistema</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCloudManagementWidget</name>
     <message>
       <source>Connect to your Systems
@@ -5110,6 +5099,25 @@ a %1</translation>
     </message>
   </context>
   <context>
+    <name>QnScreenshotLoader</name>
+    <message>
+      <source>Top left corner</source>
+      <translation type="unfinished">Top left corner</translation>
+    </message>
+    <message>
+      <source>Top right corner</source>
+      <translation type="unfinished">Top right corner</translation>
+    </message>
+    <message>
+      <source>Bottom left corner</source>
+      <translation type="unfinished">Bottom left corner</translation>
+    </message>
+    <message>
+      <source>Bottom right corner</source>
+      <translation type="unfinished">Bottom right corner</translation>
+    </message>
+  </context>
+  <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>Export Bookmark...</source>
@@ -6863,26 +6871,6 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <translation>Gravar screenshot...</translation>
     </message>
     <message>
-      <source>No Timestamp</source>
-      <translation>Sem Timestamp</translation>
-    </message>
-    <message>
-      <source>Top Left Corner</source>
-      <translation>Canto superior esquerdo</translation>
-    </message>
-    <message>
-      <source>Top Right Corner</source>
-      <translation>Canto superior direito</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner</source>
-      <translation>Canto inferior esquerdo</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner</source>
-      <translation>Canto inferior direito</translation>
-    </message>
-    <message>
       <source>Failed to save screenshot</source>
       <translation>Falha ao salvar captura de tela</translation>
     </message>
@@ -6897,6 +6885,18 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <message>
       <source>JPEG Image</source>
       <translation>Imagem JPEG</translation>
+    </message>
+    <message>
+      <source>No timestamp</source>
+      <translation type="unfinished">No timestamp</translation>
+    </message>
+    <message>
+      <source>No camera name</source>
+      <translation type="unfinished">No camera name</translation>
+    </message>
+    <message>
+      <source>Camera name:</source>
+      <translation type="unfinished">Camera name:</translation>
     </message>
   </context>
   <context>
@@ -8406,6 +8406,18 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
       <translation>Você está prestes a exportar um vídeo longo. Pode exigir muito espaço de armazenamento e levar tempo significativo.</translation>
+    </message>
+    <message>
+      <source>Add Info</source>
+      <translation type="unfinished">Add Info</translation>
+    </message>
+    <message>
+      <source>Delete Info</source>
+      <translation type="unfinished">Delete Info</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation type="unfinished">Info</translation>
     </message>
   </context>
   <context>

@@ -5,15 +5,15 @@
     <name>ArchiveDuration</name>
     <message>
       <source>no data for forecast</source>
-      <translation type="unfinished">no data for forecast</translation>
+      <translation>no hi ha dades per a la previsió</translation>
     </message>
     <message>
       <source>empty</source>
-      <translation type="unfinished">empty</translation>
+      <translation>buit</translation>
     </message>
     <message>
       <source>less than an hour</source>
-      <translation type="unfinished">less than an hour</translation>
+      <translation>menys d'una hora</translation>
     </message>
   </context>
   <context>
@@ -21,37 +21,37 @@
     <message>
       <source>B</source>
       <comment>Suffix for displaying bytes</comment>
-      <translation type="unfinished">B</translation>
+      <translation>B</translation>
     </message>
     <message>
       <source>KB</source>
       <comment>Suffix for displaying kilobytes</comment>
-      <translation type="unfinished">KB</translation>
+      <translation>KB</translation>
     </message>
     <message>
       <source>MB</source>
       <comment>Suffix for displaying megabytes</comment>
-      <translation type="unfinished">MB</translation>
+      <translation>MB</translation>
     </message>
     <message>
       <source>GB</source>
       <comment>Suffix for displaying gigabytes</comment>
-      <translation type="unfinished">GB</translation>
+      <translation>GB</translation>
     </message>
     <message>
       <source>TB</source>
       <comment>Suffix for displaying terabytes</comment>
-      <translation type="unfinished">TB</translation>
+      <translation>TB</translation>
     </message>
     <message>
       <source>PB</source>
       <comment>Suffix for displaying petabytes</comment>
-      <translation type="unfinished">PB</translation>
+      <translation>PB</translation>
     </message>
     <message numerus="yes">
       <source>Byte(s)</source>
       <comment>Full suffix for displaying bytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Byte(s)</numerusform>
         <numerusform>Byte(s)</numerusform>
       </translation>
@@ -59,7 +59,7 @@
     <message numerus="yes">
       <source>Kilobyte(s)</source>
       <comment>Full suffix for displaying kilobytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Kilobyte(s)</numerusform>
         <numerusform>Kilobyte(s)</numerusform>
       </translation>
@@ -67,7 +67,7 @@
     <message numerus="yes">
       <source>Megabyte(s)</source>
       <comment>Full suffix for displaying megabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Megabyte(s)</numerusform>
         <numerusform>Megabyte(s)</numerusform>
       </translation>
@@ -75,7 +75,7 @@
     <message numerus="yes">
       <source>Gigabyte(s)</source>
       <comment>Full suffix for displaying gigabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Gigabyte(s)</numerusform>
         <numerusform>Gigabyte(s)</numerusform>
       </translation>
@@ -83,7 +83,7 @@
     <message numerus="yes">
       <source>Terabyte(s)</source>
       <comment>Full suffix for displaying terabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Terabyte(s)</numerusform>
         <numerusform>Terabyte(s)</numerusform>
       </translation>
@@ -91,7 +91,7 @@
     <message numerus="yes">
       <source>Petabyte(s)</source>
       <comment>Full suffix for displaying petabytes</comment>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Petabyte(s)</numerusform>
         <numerusform>Petabyte(s)</numerusform>
       </translation>
@@ -190,6 +190,14 @@
       <source>Cloud systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Els sistemes al núvol tenen propietaris diferents. No es poden combinar.</translation>
+    </message>
+    <message>
+      <source>You are about to merge Systems with NVR licenses.</source>
+      <translation>Esteu a punt de combinar sistemes amb llicències NVR.</translation>
+    </message>
+    <message>
+      <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>
+      <translation>Només es permet una llicència NVR per sistema, de manera que la segona llicència es desactivarà.</translation>
     </message>
   </context>
   <context>
@@ -782,6 +790,29 @@
         <numerusform>%n / %1 llicències no vàlides</numerusform>
       </translation>
     </message>
+    <message>
+      <source>NVR</source>
+      <translation>NVR</translation>
+    </message>
+    <message>
+      <source>NVR Licenses</source>
+      <translation>Llicències NVR</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n NVR Licenses</source>
+      <translation>
+        <numerusform>%n llicències NVR</numerusform>
+        <numerusform>%n llicències NVR</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 NVR Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 llicències NVR</numerusform>
+        <numerusform>%n/%1 llicències NVR</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseUsageHelper</name>
@@ -845,12 +876,28 @@
       <translation>No s'ha trobat cap servidor amb ID de maquinari coincident</translation>
     </message>
     <message>
-      <source>Only one starter license is allowed per System.</source>
+      <source>Only one Starter license is allowed per System.</source>
       <translation>Només es permet una llicència inicial per sistema.</translation>
     </message>
     <message>
-      <source>You already have one active starter license.</source>
+      <source>You already have one active Starter license.</source>
       <translation>Ja teniu una llicència inicial activa.</translation>
+    </message>
+    <message>
+      <source>Only one NVR license is allowed per System.</source>
+      <translation>Només es permet una llicència NVR per sistema.</translation>
+    </message>
+    <message>
+      <source>You already have one active NVR license.</source>
+      <translation>Ja teniu una llicència NVR activa.</translation>
+    </message>
+    <message>
+      <source>Only one license of this type is allowed per System.</source>
+      <translation>Només es permet una llicència d'aquest tipus per sistema.</translation>
+    </message>
+    <message>
+      <source>You already have one active license of the same type.</source>
+      <translation>Ja teniu una llicència del mateix tipus activa.</translation>
     </message>
   </context>
   <context>
@@ -977,11 +1024,11 @@
     <name>QnStreamRecorder</name>
     <message>
       <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation type="unfinished">Corresponding container in FFMPEG library was not found.</translation>
+      <translation>No s'ha trobat el contenidor corresponent a la biblioteca FFMPEG.</translation>
     </message>
     <message>
       <source>Could not create output file for video recording.</source>
-      <translation type="unfinished">Could not create output file for video recording.</translation>
+      <translation>No s'ha pogut crear el fitxer de sortida per a l'enregistrament de vídeo.</translation>
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
@@ -989,23 +1036,23 @@
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
-      <translation type="unfinished">Could not allocate output audio stream.</translation>
+      <translation>No s'ha pogut assignar el flux d'àudio de sortida.</translation>
     </message>
     <message>
       <source>Invalid audio codec information.</source>
-      <translation type="unfinished">Invalid audio codec information.</translation>
+      <translation>La informació del còdec d'àudio no és vàlida.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation type="unfinished">Video or audio codec is incompatible with the selected format.</translation>
+      <translation>El còdec de vídeo o àudio és incompatible amb el format seleccionat.</translation>
     </message>
     <message>
       <source>File write error. Not enough free space.</source>
-      <translation type="unfinished">File write error. Not enough free space.</translation>
+      <translation>Error d'escriptura d'arxiu. No hi ha prou espai lliure.</translation>
     </message>
     <message>
       <source>Invalid resource type for data export.</source>
-      <translation type="unfinished">Invalid resource type for data export.</translation>
+      <translation>El tipus de recurs per a l'exportació de dades no és vàlid.</translation>
     </message>
     <message>
       <source>No data exported.</source>
@@ -1808,60 +1855,60 @@
     </message>
     <message>
       <source>PoE over Budget</source>
-      <translation type="unfinished">PoE over Budget</translation>
+      <translation>PoE superior al pressupost</translation>
     </message>
     <message>
       <source>Fan Error</source>
-      <translation type="unfinished">Fan Error</translation>
+      <translation>Error del ventilador</translation>
     </message>
     <message>
       <source>PoE over budget at %1</source>
-      <translation type="unfinished">PoE over budget at %1</translation>
+      <translation>PoE superior al pressupost a %1</translation>
     </message>
     <message>
       <source>Fan error at %1</source>
-      <translation type="unfinished">Fan error at %1</translation>
+      <translation>Error del ventilador a %1</translation>
     </message>
     <message>
       <source>Reason: Power limit exceeded (%1)</source>
       <comment>%1 is consumption</comment>
-      <translation type="unfinished">Reason: Power limit exceeded (%1)</translation>
+      <translation>Motiu: s'ha superat el límit de potència (%1)</translation>
     </message>
     <message>
       <source>Show desktop notification</source>
-      <translation type="unfinished">Show desktop notification</translation>
+      <translation>Mostra la notificació d'escriptori</translation>
     </message>
     <message>
       <source>Send mobile notification</source>
-      <translation type="unfinished">Send mobile notification</translation>
+      <translation>Envia notificació mòbil</translation>
     </message>
     <message>
       <source>Consumption</source>
-      <translation type="unfinished">Consumption</translation>
+      <translation>Consum</translation>
     </message>
     <message>
       <source>Device was disconnected</source>
-      <translation type="unfinished">Device was disconnected</translation>
+      <translation>El dispositiu s'ha desconnectat</translation>
     </message>
     <message>
       <source>Camera was disconnected</source>
-      <translation type="unfinished">Camera was disconnected</translation>
+      <translation>La càmera s'ha desconnectat</translation>
     </message>
     <message>
       <source>I/O Module was disconnected</source>
-      <translation type="unfinished">I/O Module was disconnected</translation>
+      <translation>El mòdul I/O s'ha desconnectat</translation>
     </message>
     <message>
       <source>RTP error in primary stream (%1)</source>
-      <translation type="unfinished">RTP error in primary stream (%1)</translation>
+      <translation>Error RTP al flux principal (%1)</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1)</source>
-      <translation type="unfinished">RTP error in secondary stream (%1)</translation>
+      <translation>Error RTP al flux secundari (%1)</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
-      <translation type="unfinished">Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</translation>
+      <translation>Error de base de dades en emmagatzematge d'analítica &quot;%1&quot;: permisos insuficients al punt de muntatge.</translation>
     </message>
   </context>
   <context>

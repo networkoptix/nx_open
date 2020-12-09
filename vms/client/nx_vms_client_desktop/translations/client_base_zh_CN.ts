@@ -2727,17 +2727,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnClockLabel</name>
-    <message>
-      <source>Server Time</source>
-      <translation>服务器时间</translation>
-    </message>
-    <message>
-      <source>Local System Time</source>
-      <translation>本地系统时间</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCloudManagementWidget</name>
     <message>
       <source>Connect to your Systems
@@ -5047,6 +5036,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnScreenshotLoader</name>
+    <message>
+      <source>Top left corner</source>
+      <translation type="unfinished">Top left corner</translation>
+    </message>
+    <message>
+      <source>Top right corner</source>
+      <translation type="unfinished">Top right corner</translation>
+    </message>
+    <message>
+      <source>Bottom left corner</source>
+      <translation type="unfinished">Bottom left corner</translation>
+    </message>
+    <message>
+      <source>Bottom right corner</source>
+      <translation type="unfinished">Bottom right corner</translation>
+    </message>
+  </context>
+  <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>Export Bookmark...</source>
@@ -6788,26 +6796,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>保存截图...</translation>
     </message>
     <message>
-      <source>No Timestamp</source>
-      <translation>无时间戳</translation>
-    </message>
-    <message>
-      <source>Top Left Corner</source>
-      <translation>左上方</translation>
-    </message>
-    <message>
-      <source>Top Right Corner</source>
-      <translation>右上方</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner</source>
-      <translation>左下方</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner</source>
-      <translation>右下方</translation>
-    </message>
-    <message>
       <source>Failed to save screenshot</source>
       <translation>未能保存截图</translation>
     </message>
@@ -6822,6 +6810,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>JPEG Image</source>
       <translation>JPEG 图像</translation>
+    </message>
+    <message>
+      <source>No timestamp</source>
+      <translation type="unfinished">No timestamp</translation>
+    </message>
+    <message>
+      <source>No camera name</source>
+      <translation type="unfinished">No camera name</translation>
+    </message>
+    <message>
+      <source>Camera name:</source>
+      <translation type="unfinished">Camera name:</translation>
     </message>
   </context>
   <context>
@@ -8286,6 +8286,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
       <translation>您即将汇出一段长时视频。它可能需要消耗很多存储空间及时间。</translation>
+    </message>
+    <message>
+      <source>Add Info</source>
+      <translation type="unfinished">Add Info</translation>
+    </message>
+    <message>
+      <source>Delete Info</source>
+      <translation type="unfinished">Delete Info</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation type="unfinished">Info</translation>
     </message>
   </context>
   <context>

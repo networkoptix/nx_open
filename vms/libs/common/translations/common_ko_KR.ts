@@ -185,6 +185,14 @@
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>클라우드 시스템에는 다른 소유자가 있습니다. 머지가 허용되지 않습니다.</translation>
     </message>
+    <message>
+      <source>You are about to merge Systems with NVR licenses.</source>
+      <translation type="unfinished">You are about to merge Systems with NVR licenses.</translation>
+    </message>
+    <message>
+      <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>
+      <translation type="unfinished">Only one NVR license is allowed per System, so the second license will be deactivated.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -752,6 +760,27 @@
         <numerusform>%n/%1 유효하지 않은 라이선스</numerusform>
       </translation>
     </message>
+    <message>
+      <source>NVR</source>
+      <translation type="unfinished">NVR</translation>
+    </message>
+    <message>
+      <source>NVR Licenses</source>
+      <translation type="unfinished">NVR Licenses</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n NVR Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n NVR Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 NVR Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 NVR Licenses</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseUsageHelper</name>
@@ -811,12 +840,28 @@
       <translation>HWID와 일치하는 서버를 찾지 못했습니다</translation>
     </message>
     <message>
-      <source>Only one starter license is allowed per System.</source>
-      <translation>시스템 당 하나의 스타터 라이선스만 허용됩니다.</translation>
+      <source>Only one Starter license is allowed per System.</source>
+      <translation type="unfinished">Only one Starter license is allowed per System.</translation>
     </message>
     <message>
-      <source>You already have one active starter license.</source>
-      <translation>이미 스타터 라이선스가 활성 되었습니다.</translation>
+      <source>You already have one active Starter license.</source>
+      <translation type="unfinished">You already have one active Starter license.</translation>
+    </message>
+    <message>
+      <source>Only one NVR license is allowed per System.</source>
+      <translation type="unfinished">Only one NVR license is allowed per System.</translation>
+    </message>
+    <message>
+      <source>You already have one active NVR license.</source>
+      <translation type="unfinished">You already have one active NVR license.</translation>
+    </message>
+    <message>
+      <source>Only one license of this type is allowed per System.</source>
+      <translation type="unfinished">Only one license of this type is allowed per System.</translation>
+    </message>
+    <message>
+      <source>You already have one active license of the same type.</source>
+      <translation type="unfinished">You already have one active license of the same type.</translation>
     </message>
   </context>
   <context>

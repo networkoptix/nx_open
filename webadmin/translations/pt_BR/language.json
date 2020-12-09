@@ -84,6 +84,7 @@
         "ldapSearchBase": "Base de pesquisa LDAP",
         "ldapSearchFilter": "Filtro de pesquisa LDAP",
         "ldapUri": "URI do LDAP",
+        "ldapPasswordExperationPeriod": "LDAP user password expiration period. Updated only after previous perioud is expired",
         "localSystemId": "ID do sistema local",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Diferença máxima entre o tempo sincronizado e o da Internet (milissegundos)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Diferença máxima entre tempo sincronizado e local (milissegundos)",
@@ -131,7 +132,8 @@
         "maxEventLogRecords": "Registro máximo de registros de eventos para manter no banco de dados. A quantidade real de registros não gravados pode ser até 20% superior ao valor especificado.",
         "forceLiveCacheForPrimaryStream": "Se deseja armazenar alguns quadros para o fluxo principal. Valores: \"sim\" - sempre habilitado (pode usar muito de RAM), \"não\" - sempre desativado, exceto quando necessário pela reprodução (ex.: HLS), \"auto\" - similar a \"não\", mas ativado quando melhorar a experiência do usuário (por exemplo, quando alguns plugins Analytics estão trabalhando na câmera).",
         "additionalLocalFsTypes": "Tipos de sistema de arquivos adicionais a serem considerados ao decidir se uma determinada partição é adequada para ser um armazenamento do servidor. É esperada uma lista separada por vírgula de nomes de sistemas de arquivos, conforme listados em / proc / mounts.",
-        "mediaBufferSizeKb": "Server-side media buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value, but slows down the auto quality switching and reaction to media seek operations."
+        "mediaBufferSizeKb": "Server-side media buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value, but slows down the auto quality switching and reaction to media seek operations.",
+        "mediaBufferSizeForAudioOnlyDeviceKb": "Server-side media buffer size in KB. It has same meaning as 'mediaBufferSizeKb' parameter but it is applied to audio only devices."
     },
     "info": {
         "tabs": {

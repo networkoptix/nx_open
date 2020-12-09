@@ -1556,6 +1556,34 @@
     </message>
   </context>
   <context>
+    <name>InfoOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/export/widgets/info_overlay_settings_widget.ui"/>
+      <source>Info</source>
+      <translation type="unfinished">Info</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Camera name</source>
+      <translation type="unfinished">Camera name</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Export date</source>
+      <translation type="unfinished">Export date</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation type="unfinished">Font Size</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation type="unfinished">Delete</translation>
+    </message>
+  </context>
+  <context>
     <name>IoModuleSettingsWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/io_module_settings_widget.ui"/>
@@ -1593,7 +1621,7 @@
     <message>
       <location/>
       <source>Width:</source>
-      <translation>幅(&amp;W):</translation>
+      <translation>幅:</translation>
     </message>
     <message>
       <location/>
@@ -1603,12 +1631,12 @@
     <message>
       <location/>
       <source>Opacity:</source>
-      <translation>透過(&amp;O):</translation>
+      <translation>不透明度:</translation>
     </message>
     <message>
       <location/>
       <source>Height:</source>
-      <translation>高さ(&amp;H):</translation>
+      <translation>高さ:</translation>
     </message>
     <message>
       <location/>
@@ -1621,7 +1649,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
       <source>Locked</source>
-      <translation>ロックされています</translation>
+      <translation>ロック</translation>
     </message>
     <message>
       <location/>
@@ -1641,7 +1669,7 @@
     <message>
       <location/>
       <source>Generate</source>
-      <translation>一般</translation>
+      <translation>生成</translation>
     </message>
     <message>
       <location/>
@@ -2846,7 +2874,7 @@
     <message>
       <location/>
       <source>to</source>
-      <translation>宛先</translation>
+      <translation>上限</translation>
     </message>
     <message>
       <location/>

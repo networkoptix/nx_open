@@ -5,51 +5,51 @@
     <name>AnalyticsSettings</name>
     <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation type="unfinished">Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</translation>
+      <translation>L'analítica de càmeres només funcionarà quan es visualitzi la càmera. Activeu l'enregistrament perquè funcioni sempre.</translation>
     </message>
   </context>
   <context>
     <name>ContextHintButton</name>
     <message>
       <source>Click to read more</source>
-      <translation type="unfinished">Click to read more</translation>
+      <translation>Feu clic per a més informació</translation>
     </message>
   </context>
   <context>
     <name>EmptyTilesPlaceholder</name>
     <message>
       <source>Searching servers in your local network...</source>
-      <translation type="unfinished">Searching servers in your local network...</translation>
+      <translation>S'estan cercant servidors a la vostra xarxa local...</translation>
     </message>
     <message>
       <source>No servers found</source>
-      <translation type="unfinished">No servers found</translation>
+      <translation>No s'ha trobat cap servidor</translation>
     </message>
     <message>
       <source>Check your network connection or press &quot;Connect to Server&quot; button to enter known server address</source>
-      <translation type="unfinished">Check your network connection or press &quot;Connect to Server&quot; button to enter known server address</translation>
+      <translation>Comproveu la connexió de xarxa o premeu el botó &quot;Connecta amb el servidor&quot; per introduir una adreça de servidor coneguda</translation>
     </message>
   </context>
   <context>
     <name>FactorySystemTileArea</name>
     <message>
       <source>Click to setup</source>
-      <translation type="unfinished">Click to setup</translation>
+      <translation>Feu clic per configurar</translation>
     </message>
   </context>
   <context>
     <name>Figure</name>
     <message>
       <source>Figure</source>
-      <translation type="unfinished">Figure</translation>
+      <translation>Figura</translation>
     </message>
     <message>
       <source>Click to add</source>
-      <translation type="unfinished">Click to add</translation>
+      <translation>Feu clic per afegir</translation>
     </message>
     <message>
       <source>Display on video</source>
-      <translation type="unfinished">Display on video</translation>
+      <translation>Visualitza a vídeo</translation>
     </message>
   </context>
   <context>
@@ -71,70 +71,70 @@
     <name>FigureView</name>
     <message>
       <source>NO PREVIEW</source>
-      <translation type="unfinished">NO PREVIEW</translation>
+      <translation>SENSE VISTA PRÈVIA</translation>
     </message>
   </context>
   <context>
     <name>InformationPanel</name>
     <message>
       <source>Version</source>
-      <translation type="unfinished">Version</translation>
+      <translation>Versió</translation>
     </message>
     <message>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Proveïdor</translation>
     </message>
     <message>
       <source>Camera stream</source>
-      <translation type="unfinished">Camera stream</translation>
+      <translation>Flux de la càmera</translation>
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
-      <translation type="unfinished">Select video stream from the camera for analysis</translation>
+      <translation>Seleccioneu el flux de vídeo de la càmera per a l'anàlisi</translation>
     </message>
     <message>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Actualitza</translation>
     </message>
     <message>
       <source>Refreshing...</source>
-      <translation type="unfinished">Refreshing...</translation>
+      <translation>S'està actualitzant...</translation>
     </message>
   </context>
   <context>
     <name>LabeledItem</name>
     <message>
       <source>Default value:</source>
-      <translation type="unfinished">Default value:</translation>
+      <translation>Valor predeterminat:</translation>
     </message>
   </context>
   <context>
     <name>Line</name>
     <message>
       <source>Line is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Line is not valid. Remove self-intersections to proceed.</translation>
+      <translation>La línia no és vàlida. Elimineu les autointerseccions per continuar.</translation>
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This line requires at least %n points.</numerusform>
-        <numerusform>This line requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Aquesta línia requereix almenys %n punts.</numerusform>
+        <numerusform>Aquesta línia requereix almenys %n punts.</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the line.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the line.</translation>
+      <translation>Feu clic a l'últim punt per acabar de dibuixar la línia.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>S'ha assolit el nombre màxim de punts (%n punts).</numerusform>
+        <numerusform>S'ha assolit el nombre màxim de punts (%n punts).</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on each arrow to toggle the desired direction.</source>
-      <translation type="unfinished">Click on each arrow to toggle the desired direction.</translation>
+      <translation>Feu clic a cada fletxa per canviar la direcció desitjada.</translation>
     </message>
   </context>
   <context>
@@ -149,40 +149,40 @@
     </message>
     <message>
       <source>Save password</source>
-      <translation type="unfinished">Save password</translation>
+      <translation>Desa la contrasenya</translation>
     </message>
     <message>
       <source>Auto-login</source>
-      <translation type="unfinished">Auto-login</translation>
+      <translation>Inici de sessió automàtic</translation>
     </message>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Connecta</translation>
     </message>
   </context>
   <context>
     <name>NxSearchEdit</name>
     <message>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Cerca</translation>
     </message>
   </context>
   <context>
     <name>ObjectSizeConstraints</name>
     <message>
       <source>Size Constraints</source>
-      <translation type="unfinished">Size Constraints</translation>
+      <translation>Limitacions de mida</translation>
     </message>
   </context>
   <context>
     <name>PluginsInformation</name>
     <message>
       <source>No plugins installed</source>
-      <translation type="unfinished">No plugins installed</translation>
+      <translation>No hi ha cap connector instal·lat</translation>
     </message>
     <message>
       <source>Server is offline</source>
-      <translation type="unfinished">Server is offline</translation>
+      <translation>El servidor està desconnectat</translation>
     </message>
   </context>
   <context>
@@ -196,24 +196,24 @@
     <name>Polygon</name>
     <message>
       <source>Polygon is not valid. Remove self-intersections to proceed.</source>
-      <translation type="unfinished">Polygon is not valid. Remove self-intersections to proceed.</translation>
+      <translation>El polígon no és vàlid. Elimineu les autointerseccions per continuar.</translation>
     </message>
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
-      <translation type="unfinished">
-        <numerusform>This polygon requires at least %n points.</numerusform>
-        <numerusform>This polygon requires at least %n points.</numerusform>
+      <translation>
+        <numerusform>Aquest polígon requereix almenys %n punts.</numerusform>
+        <numerusform>Aquest polígon requereix almenys %n punts.</numerusform>
       </translation>
     </message>
     <message>
       <source>Click on the last point to finish drawing the polygon.</source>
-      <translation type="unfinished">Click on the last point to finish drawing the polygon.</translation>
+      <translation>Feu clic a l'últim punt per acabar de dibuixar el polígon.</translation>
     </message>
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
-      <translation type="unfinished">
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
-        <numerusform>The maximum number of points has been reached (%n points).</numerusform>
+      <translation>
+        <numerusform>S'ha assolit el nombre màxim de punts (%n punts).</numerusform>
+        <numerusform>S'ha assolit el nombre màxim de punts (%n punts).</numerusform>
       </translation>
     </message>
   </context>
@@ -221,68 +221,68 @@
     <name>Repeater</name>
     <message>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Afegeix</translation>
     </message>
   </context>
   <context>
     <name>SizeConstraints</name>
     <message>
       <source>MAX</source>
-      <translation type="unfinished">MAX</translation>
+      <translation>MÀX</translation>
     </message>
     <message>
       <source>MIN</source>
-      <translation type="unfinished">MIN</translation>
+      <translation>MÍN</translation>
     </message>
     <message>
       <source>Set minimum and maximum object size.</source>
-      <translation type="unfinished">Set minimum and maximum object size.</translation>
+      <translation>Establiu la mida mínima i màxima de l'objecte.</translation>
     </message>
     <message>
       <source>Minimum object size cannot be greater than maximum.</source>
-      <translation type="unfinished">Minimum object size cannot be greater than maximum.</translation>
+      <translation>La mida mínima de l'objecte no pot ser superior a la mida màxima.</translation>
     </message>
   </context>
   <context>
     <name>SystemTile</name>
     <message>
       <source>INCOMPATIBLE</source>
-      <translation type="unfinished">INCOMPATIBLE</translation>
+      <translation>INCOMPATIBLE</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>DESCONNECTAT</translation>
     </message>
     <message>
       <source>UNREACHABLE</source>
-      <translation type="unfinished">UNREACHABLE</translation>
+      <translation>NO ACCESSIBLE</translation>
     </message>
     <message>
       <source>SAFE MODE</source>
-      <translation type="unfinished">SAFE MODE</translation>
+      <translation>MODE SEGUR</translation>
     </message>
     <message>
       <source>New Server</source>
-      <translation type="unfinished">New Server</translation>
+      <translation>Servidor nou</translation>
     </message>
     <message>
       <source>Edit</source>
-      <translation type="unfinished">Edit</translation>
+      <translation>Edita</translation>
     </message>
     <message>
       <source>Hide</source>
-      <translation type="unfinished">Hide</translation>
+      <translation>Amaga</translation>
     </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
     <message>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>No s'ha trobat res</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation type="unfinished">Connect to Another Server...</translation>
+      <translation>Connecta amb un altre servidor...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
@@ -295,7 +295,7 @@
     <message>
       <source>You have no access to %1. Some features could be unavailable.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">You have no access to %1. Some features could be unavailable.</translation>
+      <translation>No teniu accés a %1. És possible que algunes funcions no estiguin disponibles.</translation>
     </message>
   </context>
 </TS>

@@ -84,6 +84,7 @@
         "ldapSearchBase": "LDAP検索ベース",
         "ldapSearchFilter": "LDAP検索フィルター",
         "ldapUri": "LDAP URI",
+        "ldapPasswordExperationPeriod": "LDAP user password expiration period. Updated only after previous perioud is expired",
         "localSystemId": "ローカルシステムID",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "同期時間とインターネット時間の最大差（ミリ秒）",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "同期時刻とローカル時刻の最大差（ミリ秒）",
@@ -131,7 +132,8 @@
         "maxEventLogRecords": "データベースに保存する最大イベントログレコード。削除されていないレコードの実際の量は、指定された値よりも最大20％大きくなる可能性があります。",
         "forceLiveCacheForPrimaryStream": "プライマリストリーム用にいくつかのフレームをキャッシュするかどうか。値： \"yes\" - 常に有効（多くのRAMを使用する可能性があります）、 \"no\" - 再生で要求される場合を除いて常に無効（HLSなど）、\"auto\" - \"no\"と似ていますが、ユーザーエクスペリエンスが向上すると（たとえば、Analyticsプラグインがカメラで動作しているときに）オンになります。",
         "additionalLocalFsTypes": "与えられたパーティションがサーバーストレージに適しているかどうかを判断する際に考慮すべき追加のファイルシステムタイプ。 /proc/mounts にリストされているファイルシステム名のカンマ区切りリストが必要です。",
-        "mediaBufferSizeKb": "サーバー側のメディアバッファーサイズ（KB）。値が大きいほど、ラウンドトリップ遅延値が高い効率的なインターネットを利用できますが、自動品質切り替えとメディアシーク操作への反応が遅くなります。"
+        "mediaBufferSizeKb": "サーバー側のメディアバッファーサイズ（KB）。値が大きいほど、ラウンドトリップ遅延値が高い効率的なインターネットを利用できますが、自動品質切り替えとメディアシーク操作への反応が遅くなります。",
+        "mediaBufferSizeForAudioOnlyDeviceKb": "Server-side media buffer size in KB. It has same meaning as 'mediaBufferSizeKb' parameter but it is applied to audio only devices."
     },
     "info": {
         "tabs": {

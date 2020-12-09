@@ -1556,6 +1556,34 @@
     </message>
   </context>
   <context>
+    <name>InfoOverlaySettingsWidget</name>
+    <message>
+      <location filename="../src/nx/vms/client/desktop/export/widgets/info_overlay_settings_widget.ui"/>
+      <source>Info</source>
+      <translation type="unfinished">Info</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Camera name</source>
+      <translation type="unfinished">Camera name</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Export date</source>
+      <translation type="unfinished">Export date</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Font Size</source>
+      <translation type="unfinished">Font Size</translation>
+    </message>
+    <message>
+      <location/>
+      <source>Delete</source>
+      <translation type="unfinished">Delete</translation>
+    </message>
+  </context>
+  <context>
     <name>IoModuleSettingsWidget</name>
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/io_module_settings_widget.ui"/>

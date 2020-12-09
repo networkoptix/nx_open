@@ -2831,17 +2831,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnClockLabel</name>
-    <message>
-      <source>Server Time</source>
-      <translation>Czas serwera</translation>
-    </message>
-    <message>
-      <source>Local System Time</source>
-      <translation>Lokalny czas systemu</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCloudManagementWidget</name>
     <message>
       <source>Connect to your Systems
@@ -5223,6 +5212,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnScreenshotLoader</name>
+    <message>
+      <source>Top left corner</source>
+      <translation>Górny lewy róg</translation>
+    </message>
+    <message>
+      <source>Top right corner</source>
+      <translation>Górny prawy róg</translation>
+    </message>
+    <message>
+      <source>Bottom left corner</source>
+      <translation>Dolny lewy róg</translation>
+    </message>
+    <message>
+      <source>Bottom right corner</source>
+      <translation>Dolny prawy róg</translation>
+    </message>
+  </context>
+  <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>Export Bookmark...</source>
@@ -6999,26 +7007,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Zapisywanie zrzutu ekranu...</translation>
     </message>
     <message>
-      <source>No Timestamp</source>
-      <translation>Brak znacznika czasu</translation>
-    </message>
-    <message>
-      <source>Top Left Corner</source>
-      <translation>Lewy górny róg</translation>
-    </message>
-    <message>
-      <source>Top Right Corner</source>
-      <translation>Prawy górny róg</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner</source>
-      <translation>Lewy dolny róg</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner</source>
-      <translation>Prawy dolny róg</translation>
-    </message>
-    <message>
       <source>Failed to save screenshot</source>
       <translation>Nie udało się zapisać zrzutu ekranu</translation>
     </message>
@@ -7033,6 +7021,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>JPEG Image</source>
       <translation>Obraz JPEG</translation>
+    </message>
+    <message>
+      <source>No timestamp</source>
+      <translation>Brak znacznika czasu</translation>
+    </message>
+    <message>
+      <source>No camera name</source>
+      <translation>Brak nazwy kamery</translation>
+    </message>
+    <message>
+      <source>Camera name:</source>
+      <translation>Nazwa kamery:</translation>
     </message>
   </context>
   <context>
@@ -8632,6 +8632,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
       <translation>Za chwilę wyeksportujesz długi film wideo. Może to wymagać dużo przestrzeni dyskowej i potrwać dużo czasu.</translation>
+    </message>
+    <message>
+      <source>Add Info</source>
+      <translation>Dodaj info</translation>
+    </message>
+    <message>
+      <source>Delete Info</source>
+      <translation>Usuń info</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>Info</translation>
     </message>
   </context>
   <context>

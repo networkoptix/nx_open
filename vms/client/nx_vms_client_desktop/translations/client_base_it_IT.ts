@@ -2761,17 +2761,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnClockLabel</name>
-    <message>
-      <source>Server Time</source>
-      <translation>Orario del server</translation>
-    </message>
-    <message>
-      <source>Local System Time</source>
-      <translation>Orario del sistema locale</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCloudManagementWidget</name>
     <message>
       <source>Connect to your Systems
@@ -5106,6 +5095,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnScreenshotLoader</name>
+    <message>
+      <source>Top left corner</source>
+      <translation>In alto nell'angolo sinistro</translation>
+    </message>
+    <message>
+      <source>Top right corner</source>
+      <translation>In alto nell'angolo a destra</translation>
+    </message>
+    <message>
+      <source>Bottom left corner</source>
+      <translation>In basso nell'angolo a sinistra</translation>
+    </message>
+    <message>
+      <source>Bottom right corner</source>
+      <translation>In basso nell'angolo a destra</translation>
+    </message>
+  </context>
+  <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>Export Bookmark...</source>
@@ -6859,26 +6867,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <translation>Salvataggio dello screenshot...</translation>
     </message>
     <message>
-      <source>No Timestamp</source>
-      <translation>Nessun timestamp</translation>
-    </message>
-    <message>
-      <source>Top Left Corner</source>
-      <translation>Angolo in alto a sinistra</translation>
-    </message>
-    <message>
-      <source>Top Right Corner</source>
-      <translation>Angolo in alto a destra</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner</source>
-      <translation>Angolo in basso a sinistra</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner</source>
-      <translation>Angolo in basso a destra</translation>
-    </message>
-    <message>
       <source>Failed to save screenshot</source>
       <translation>Salvataggio screenshot non riuscito</translation>
     </message>
@@ -6893,6 +6881,18 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>JPEG Image</source>
       <translation>Immagine JPEG</translation>
+    </message>
+    <message>
+      <source>No timestamp</source>
+      <translation>Nessun timestamp</translation>
+    </message>
+    <message>
+      <source>No camera name</source>
+      <translation>Nessun nome telecamera</translation>
+    </message>
+    <message>
+      <source>Camera name:</source>
+      <translation>Nome telecamera:</translation>
     </message>
   </context>
   <context>
@@ -8402,6 +8402,18 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
       <translation>Stai per esportare un video lungo. Potrebbe richiedere molto spazio di archiviazione e richiedere molto tempo.</translation>
+    </message>
+    <message>
+      <source>Add Info</source>
+      <translation>Aggiungi Informazioni</translation>
+    </message>
+    <message>
+      <source>Delete Info</source>
+      <translation>Elimina informazioni</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>Informazioni</translation>
     </message>
   </context>
   <context>

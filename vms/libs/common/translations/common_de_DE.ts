@@ -191,6 +191,14 @@
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Cloudsysteme haben unterschiedliche Besitzer. Zusammenführen ist nicht zulässig.</translation>
     </message>
+    <message>
+      <source>You are about to merge Systems with NVR licenses.</source>
+      <translation>Sie sind dabei, Systeme mit NVR-Lizenzen zusammenzuführen.</translation>
+    </message>
+    <message>
+      <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>
+      <translation>Pro System ist nur eine NVR-Lizenz zulässig, daher wird die zweite Lizenz deaktiviert.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -782,6 +790,29 @@
         <numerusform>%n/%1 Ungültige Lizenzen</numerusform>
       </translation>
     </message>
+    <message>
+      <source>NVR</source>
+      <translation>NVR</translation>
+    </message>
+    <message>
+      <source>NVR Licenses</source>
+      <translation>NVR-Lizenzen</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n NVR Licenses</source>
+      <translation>
+        <numerusform>%n NVR-Lizenz</numerusform>
+        <numerusform>%n NVR-Lizenzen</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 NVR Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 NVR-Lizenz</numerusform>
+        <numerusform>%n/%1 NVR-Lizenzen</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseUsageHelper</name>
@@ -845,12 +876,28 @@
       <translation>Server mit passender Hardware-ID wurde nicht gefunden</translation>
     </message>
     <message>
-      <source>Only one starter license is allowed per System.</source>
-      <translation>Pro System ist nur eine Starterlizenz erlaubt.</translation>
+      <source>Only one Starter license is allowed per System.</source>
+      <translation>Pro System ist nur eine Starterlizenz zulässig.</translation>
     </message>
     <message>
-      <source>You already have one active starter license.</source>
+      <source>You already have one active Starter license.</source>
       <translation>Sie haben bereits eine aktive Starterlizenz.</translation>
+    </message>
+    <message>
+      <source>Only one NVR license is allowed per System.</source>
+      <translation>Pro System ist nur eine NVR-Lizenz zulässig.</translation>
+    </message>
+    <message>
+      <source>You already have one active NVR license.</source>
+      <translation>Sie haben bereits eine aktive NVR-Lizenz.</translation>
+    </message>
+    <message>
+      <source>Only one license of this type is allowed per System.</source>
+      <translation>Pro System ist nur eine Lizenz dieses Typs zulässig.</translation>
+    </message>
+    <message>
+      <source>You already have one active license of the same type.</source>
+      <translation>Sie haben bereits eine aktive Lizenz des gleichen Typs.</translation>
     </message>
   </context>
   <context>

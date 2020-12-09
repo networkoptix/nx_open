@@ -84,6 +84,7 @@
         "ldapSearchBase": "בסיס חיפוש LDAP",
         "ldapSearchFilter": "מסנן חיפוש LDAP",
         "ldapUri": "כתובת אתר של LDAP",
+        "ldapPasswordExperationPeriod": "LDAP user password expiration period. Updated only after previous perioud is expired",
         "localSystemId": "מזהה מערכת מקומי",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "הפרש מקסימלי בין זמן סינכרון לבין זמן אינטרנט (אלפיות השנייה)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "הפרש מקסימלי בין זמן סינכרון לבין זמן אינטרנט (אלפיות השנייה)",
@@ -131,7 +132,8 @@
         "maxEventLogRecords": "המספר המרבי של רשומות יומן האירועים שיש לשמור במסד הנתונים. הכמות האמיתית של רשומות שלא נמחקו עשויה להיות גבוהה בעד 20% מהערך שצוין.",
         "forceLiveCacheForPrimaryStream": "האם לשמור במטמון כמה מסגרות עבור הזרם הראשי. ערכים: \"כן\" - מאופשר תמיד (יכול להשתמש בהרבה RAM), \"לא\" - תמיד מושבת למעט כאשר נדרש על ידי הקלטה(למשל HLS), \"אוטומטי\" - דומה \"לא\", אבל מופעלת כאשר משפרת את חוויית המשתמש (לדוגמה, כאשר תוסף כלשהו של Analytics פועל על המצלמה).",
         "additionalLocalFsTypes": "סוגי מערכות קבצים נוספים שיש לקחת בחשבון בעת ההחלטה אם מחיצה נתונה מתאימה לאחסון שרתים. רשימה מופרדת בפסיקים של קבצים כפי שהם מופיעים ב- / proc / mounts.",
-        "mediaBufferSizeKb": "Server-side media buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value, but slows down the auto quality switching and reaction to media seek operations."
+        "mediaBufferSizeKb": "Server-side media buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value, but slows down the auto quality switching and reaction to media seek operations.",
+        "mediaBufferSizeForAudioOnlyDeviceKb": "Server-side media buffer size in KB. It has same meaning as 'mediaBufferSizeKb' parameter but it is applied to audio only devices."
     },
     "info": {
         "tabs": {

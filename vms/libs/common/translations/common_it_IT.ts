@@ -191,6 +191,14 @@
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>I sistemi cloud hanno diversi proprietari. L'unione non è consentita.</translation>
     </message>
+    <message>
+      <source>You are about to merge Systems with NVR licenses.</source>
+      <translation>Stai per unire i sistemi con le licenze NVR.</translation>
+    </message>
+    <message>
+      <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>
+      <translation>È consentita una sola licenza NVR per sistema, quindi la seconda licenza verrà disattivata.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -782,6 +790,29 @@
         <numerusform>%n %1 Licenze non valide</numerusform>
       </translation>
     </message>
+    <message>
+      <source>NVR</source>
+      <translation>NVR</translation>
+    </message>
+    <message>
+      <source>NVR Licenses</source>
+      <translation>Licenze NVR</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n NVR Licenses</source>
+      <translation>
+        <numerusform>%n licenze NVR</numerusform>
+        <numerusform>%n licenze NVR</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 NVR Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 licenze NVR</numerusform>
+        <numerusform>%n/%1 licenze NVR</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseUsageHelper</name>
@@ -845,12 +876,28 @@
       <translation>Server con ID Hardware corrispondente non trovato</translation>
     </message>
     <message>
-      <source>Only one starter license is allowed per System.</source>
-      <translation>È consentita una sola licenza di avviamento per sistema.</translation>
+      <source>Only one Starter license is allowed per System.</source>
+      <translation>È consentita una sola licenza Nvr per sistema.</translation>
     </message>
     <message>
-      <source>You already have one active starter license.</source>
-      <translation>Hai già una licenza di avviamento attiva.</translation>
+      <source>You already have one active Starter license.</source>
+      <translation>Hai già una licenza Nvr attiva.</translation>
+    </message>
+    <message>
+      <source>Only one NVR license is allowed per System.</source>
+      <translation>È consentita una sola licenza NVR per sistema.</translation>
+    </message>
+    <message>
+      <source>You already have one active NVR license.</source>
+      <translation>Hai già una licenza NVR attiva.</translation>
+    </message>
+    <message>
+      <source>Only one license of this type is allowed per System.</source>
+      <translation>È consentita una sola licenza di questo tipo per sistema.</translation>
+    </message>
+    <message>
+      <source>You already have one active license of the same type.</source>
+      <translation>Hai già una licenza attiva dello stesso tipo.</translation>
     </message>
   </context>
   <context>

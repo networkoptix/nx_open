@@ -2831,17 +2831,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnClockLabel</name>
-    <message>
-      <source>Server Time</source>
-      <translation>Čas serveru</translation>
-    </message>
-    <message>
-      <source>Local System Time</source>
-      <translation>Místní čas systému</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCloudManagementWidget</name>
     <message>
       <source>Connect to your Systems
@@ -5225,6 +5214,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnScreenshotLoader</name>
+    <message>
+      <source>Top left corner</source>
+      <translation type="unfinished">Top left corner</translation>
+    </message>
+    <message>
+      <source>Top right corner</source>
+      <translation type="unfinished">Top right corner</translation>
+    </message>
+    <message>
+      <source>Bottom left corner</source>
+      <translation type="unfinished">Bottom left corner</translation>
+    </message>
+    <message>
+      <source>Bottom right corner</source>
+      <translation type="unfinished">Bottom right corner</translation>
+    </message>
+  </context>
+  <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>Export Bookmark...</source>
@@ -7002,26 +7010,6 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <translation>Ukládání snímku obrazovky...</translation>
     </message>
     <message>
-      <source>No Timestamp</source>
-      <translation>Bez časové značky</translation>
-    </message>
-    <message>
-      <source>Top Left Corner</source>
-      <translation>Levý horní roh</translation>
-    </message>
-    <message>
-      <source>Top Right Corner</source>
-      <translation>Pravý horní roh</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner</source>
-      <translation>Levý dolní roh</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner</source>
-      <translation>Pravý dolní roh</translation>
-    </message>
-    <message>
       <source>Failed to save screenshot</source>
       <translation>Uložení obrazovky se nezdařilo</translation>
     </message>
@@ -7036,6 +7024,18 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message>
       <source>JPEG Image</source>
       <translation>Obrázek JPEG</translation>
+    </message>
+    <message>
+      <source>No timestamp</source>
+      <translation type="unfinished">No timestamp</translation>
+    </message>
+    <message>
+      <source>No camera name</source>
+      <translation type="unfinished">No camera name</translation>
+    </message>
+    <message>
+      <source>Camera name:</source>
+      <translation type="unfinished">Camera name:</translation>
     </message>
   </context>
   <context>
@@ -8635,6 +8635,18 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
       <translation>Chystáte se exportovat dlouhé video. To může vyžadovat spoustu úložného prostoru a zabere to značný čas.</translation>
+    </message>
+    <message>
+      <source>Add Info</source>
+      <translation type="unfinished">Add Info</translation>
+    </message>
+    <message>
+      <source>Delete Info</source>
+      <translation type="unfinished">Delete Info</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation type="unfinished">Info</translation>
     </message>
   </context>
   <context>

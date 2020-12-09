@@ -2726,17 +2726,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnClockLabel</name>
-    <message>
-      <source>Server Time</source>
-      <translation>サーバー時間</translation>
-    </message>
-    <message>
-      <source>Local System Time</source>
-      <translation>ローカルシステム時間</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCloudManagementWidget</name>
     <message>
       <source>Connect to your Systems
@@ -5046,6 +5035,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnScreenshotLoader</name>
+    <message>
+      <source>Top left corner</source>
+      <translation type="unfinished">Top left corner</translation>
+    </message>
+    <message>
+      <source>Top right corner</source>
+      <translation type="unfinished">Top right corner</translation>
+    </message>
+    <message>
+      <source>Bottom left corner</source>
+      <translation type="unfinished">Bottom left corner</translation>
+    </message>
+    <message>
+      <source>Bottom right corner</source>
+      <translation type="unfinished">Bottom right corner</translation>
+    </message>
+  </context>
+  <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>Export Bookmark...</source>
@@ -6787,26 +6795,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>スクリーンショット保存...</translation>
     </message>
     <message>
-      <source>No Timestamp</source>
-      <translation>タイムスタンプなし</translation>
-    </message>
-    <message>
-      <source>Top Left Corner</source>
-      <translation>左上</translation>
-    </message>
-    <message>
-      <source>Top Right Corner</source>
-      <translation>右上</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner</source>
-      <translation>左下</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner</source>
-      <translation>右下</translation>
-    </message>
-    <message>
       <source>Failed to save screenshot</source>
       <translation>スクリーン ショットを保存できませんでした</translation>
     </message>
@@ -6821,6 +6809,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>JPEG Image</source>
       <translation>JPEG画像</translation>
+    </message>
+    <message>
+      <source>No timestamp</source>
+      <translation type="unfinished">No timestamp</translation>
+    </message>
+    <message>
+      <source>No camera name</source>
+      <translation type="unfinished">No camera name</translation>
+    </message>
+    <message>
+      <source>Camera name:</source>
+      <translation type="unfinished">Camera name:</translation>
     </message>
   </context>
   <context>
@@ -8286,6 +8286,18 @@ If you intended to move analytics data to another storage location, please conta
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
       <translation>長いビデオをエクスポートしようとしています。多くの記憶領域を必要とし、時間がかかります。</translation>
     </message>
+    <message>
+      <source>Add Info</source>
+      <translation type="unfinished">Add Info</translation>
+    </message>
+    <message>
+      <source>Delete Info</source>
+      <translation type="unfinished">Delete Info</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation type="unfinished">Info</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::FilenamePanel</name>
@@ -8493,7 +8505,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
-      <translation>この ID はシステムで既に使用されています。無料の ID を見つけるには 生成ボタンを使用してください。</translation>
+      <translation>この ID はシステム内で既に使用されています。利用可能な ID を見つけるには 生成ボタンを使用してください。</translation>
     </message>
   </context>
   <context>
@@ -9251,7 +9263,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>hours</source>
-      <translation>時</translation>
+      <translation>時間</translation>
     </message>
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>

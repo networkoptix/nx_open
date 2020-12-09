@@ -191,6 +191,14 @@
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation type="unfinished">Cloud systems have different owners. Merge is not allowed.</translation>
     </message>
+    <message>
+      <source>You are about to merge Systems with NVR licenses.</source>
+      <translation type="unfinished">You are about to merge Systems with NVR licenses.</translation>
+    </message>
+    <message>
+      <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>
+      <translation type="unfinished">Only one NVR license is allowed per System, so the second license will be deactivated.</translation>
+    </message>
   </context>
   <context>
     <name>QObject</name>
@@ -782,6 +790,29 @@
         <numerusform>%n/%1 Invalid Licenses</numerusform>
       </translation>
     </message>
+    <message>
+      <source>NVR</source>
+      <translation type="unfinished">NVR</translation>
+    </message>
+    <message>
+      <source>NVR Licenses</source>
+      <translation type="unfinished">NVR Licenses</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n NVR Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n NVR Licenses</numerusform>
+        <numerusform>%n NVR Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 NVR Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 NVR Licenses</numerusform>
+        <numerusform>%n/%1 NVR Licenses</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>QnLicenseUsageHelper</name>
@@ -845,12 +876,28 @@
       <translation type="unfinished">Server with matching Hardware ID not found</translation>
     </message>
     <message>
-      <source>Only one starter license is allowed per System.</source>
-      <translation type="unfinished">Only one starter license is allowed per System.</translation>
+      <source>Only one Starter license is allowed per System.</source>
+      <translation type="unfinished">Only one Starter license is allowed per System.</translation>
     </message>
     <message>
-      <source>You already have one active starter license.</source>
-      <translation type="unfinished">You already have one active starter license.</translation>
+      <source>You already have one active Starter license.</source>
+      <translation type="unfinished">You already have one active Starter license.</translation>
+    </message>
+    <message>
+      <source>Only one NVR license is allowed per System.</source>
+      <translation type="unfinished">Only one NVR license is allowed per System.</translation>
+    </message>
+    <message>
+      <source>You already have one active NVR license.</source>
+      <translation type="unfinished">You already have one active NVR license.</translation>
+    </message>
+    <message>
+      <source>Only one license of this type is allowed per System.</source>
+      <translation type="unfinished">Only one license of this type is allowed per System.</translation>
+    </message>
+    <message>
+      <source>You already have one active license of the same type.</source>
+      <translation type="unfinished">You already have one active license of the same type.</translation>
     </message>
   </context>
   <context>

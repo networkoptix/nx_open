@@ -2831,17 +2831,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnClockLabel</name>
-    <message>
-      <source>Server Time</source>
-      <translation>זמן שרת</translation>
-    </message>
-    <message>
-      <source>Local System Time</source>
-      <translation>זמן מערכת מקומית</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCloudManagementWidget</name>
     <message>
       <source>Connect to your Systems
@@ -5224,6 +5213,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnScreenshotLoader</name>
+    <message>
+      <source>Top left corner</source>
+      <translation type="unfinished">Top left corner</translation>
+    </message>
+    <message>
+      <source>Top right corner</source>
+      <translation type="unfinished">Top right corner</translation>
+    </message>
+    <message>
+      <source>Bottom left corner</source>
+      <translation type="unfinished">Bottom left corner</translation>
+    </message>
+    <message>
+      <source>Bottom right corner</source>
+      <translation type="unfinished">Bottom right corner</translation>
+    </message>
+  </context>
+  <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>Export Bookmark...</source>
@@ -7001,26 +7009,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>שומר צילום מסך...</translation>
     </message>
     <message>
-      <source>No Timestamp</source>
-      <translation>ללא חותמת זמן</translation>
-    </message>
-    <message>
-      <source>Top Left Corner</source>
-      <translation>פינה שמאלית עליונה</translation>
-    </message>
-    <message>
-      <source>Top Right Corner</source>
-      <translation>פינה ימנית עליונה</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner</source>
-      <translation>פינה שמאלית תחתונה</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner</source>
-      <translation>פינה ימנית תחתונה</translation>
-    </message>
-    <message>
       <source>Failed to save screenshot</source>
       <translation>שמירת צילום המסך נכשלה</translation>
     </message>
@@ -7035,6 +7023,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>JPEG Image</source>
       <translation>קובץ JPEG</translation>
+    </message>
+    <message>
+      <source>No timestamp</source>
+      <translation type="unfinished">No timestamp</translation>
+    </message>
+    <message>
+      <source>No camera name</source>
+      <translation type="unfinished">No camera name</translation>
+    </message>
+    <message>
+      <source>Camera name:</source>
+      <translation type="unfinished">Camera name:</translation>
     </message>
   </context>
   <context>
@@ -8634,6 +8634,18 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
       <translation>אתה עומד לייצא סרטון ארוך. הפעולה עשויה לדרוש הרבה שטח אחסון רב ולהימשך זמן משמעותי.</translation>
+    </message>
+    <message>
+      <source>Add Info</source>
+      <translation type="unfinished">Add Info</translation>
+    </message>
+    <message>
+      <source>Delete Info</source>
+      <translation type="unfinished">Delete Info</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation type="unfinished">Info</translation>
     </message>
   </context>
   <context>

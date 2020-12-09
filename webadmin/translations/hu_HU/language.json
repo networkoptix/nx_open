@@ -84,6 +84,7 @@
         "ldapSearchBase": "LDAP kereső bázis",
         "ldapSearchFilter": "LDAP kereső szűrő",
         "ldapUri": "LDAP URI",
+        "ldapPasswordExperationPeriod": "LDAP user password expiration period. Updated only after previous perioud is expired",
         "localSystemId": "Helyirendszer ID",
         "maxDifferenceBetweenSynchronizedAndInternetTime": "Maximális különbség a szinkronizált és az internetes idő között (milisec)",
         "maxDifferenceBetweenSynchronizedAndLocalTimeMs": "Maximális különbség a szinkronizált és avhelyi idő között (milisec)",
@@ -131,7 +132,8 @@
         "maxEventLogRecords": "Az adatbázisban tárolható maximális eseménynapló-nyilvántartások. A nem törölt rekordok valódi mennyisége akár 20% -kal is magasabb lehet, mint a megadott érték.",
         "forceLiveCacheForPrimaryStream": "Az elsődleges stream képkockáinak gyorsítótárazása. Értékek: \"igen\" - mindig engedélyezve (sok RAM-ot használhat), \"nem\" - mindig letiltva, kivéve, ha a lejátszás megköveteli (pl. HLS), \"auto\" - hasonlóan a \"nem\" -hez, de bekapcsolva, amikor javítja a felhasználói élmény (pl. amikor egy Analytics plugin működik a kamerán).",
         "additionalLocalFsTypes": "További fájlrendszer-típusok, amelyeket mérlegelni kell annak eldöntésekor, hogy egy adott partíció alkalmas-e szerver tárolónak. A fájlrendszer neveinek vesszővel elválasztott listája elvárt, ahogy azok a / proc / mounts fájlban felsorolódjnak.",
-        "mediaBufferSizeKb": "Server-side media buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value, but slows down the auto quality switching and reaction to media seek operations."
+        "mediaBufferSizeKb": "Server-side media buffer size in KB. Bigger value allows to utilize more efficient internet with high round trip delay value, but slows down the auto quality switching and reaction to media seek operations.",
+        "mediaBufferSizeForAudioOnlyDeviceKb": "Server-side media buffer size in KB. It has same meaning as 'mediaBufferSizeKb' parameter but it is applied to audio only devices."
     },
     "info": {
         "tabs": {

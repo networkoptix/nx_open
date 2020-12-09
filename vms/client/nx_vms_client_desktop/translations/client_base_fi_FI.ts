@@ -2762,17 +2762,6 @@ nähdäksesi lisää kirjanmerkkejä</translation>
     </message>
   </context>
   <context>
-    <name>QnClockLabel</name>
-    <message>
-      <source>Server Time</source>
-      <translation>Palvelimen aika</translation>
-    </message>
-    <message>
-      <source>Local System Time</source>
-      <translation>Paikallisen järjestelmän aika</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCloudManagementWidget</name>
     <message>
       <source>Connect to your Systems
@@ -5107,6 +5096,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnScreenshotLoader</name>
+    <message>
+      <source>Top left corner</source>
+      <translation type="unfinished">Top left corner</translation>
+    </message>
+    <message>
+      <source>Top right corner</source>
+      <translation type="unfinished">Top right corner</translation>
+    </message>
+    <message>
+      <source>Bottom left corner</source>
+      <translation type="unfinished">Bottom left corner</translation>
+    </message>
+    <message>
+      <source>Bottom right corner</source>
+      <translation type="unfinished">Bottom right corner</translation>
+    </message>
+  </context>
+  <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>Export Bookmark...</source>
@@ -6860,26 +6868,6 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
       <translation>Tallennetaan ruudunkaappaus...</translation>
     </message>
     <message>
-      <source>No Timestamp</source>
-      <translation>Ei aikaleimaa</translation>
-    </message>
-    <message>
-      <source>Top Left Corner</source>
-      <translation>Vasen yläkulma</translation>
-    </message>
-    <message>
-      <source>Top Right Corner</source>
-      <translation>Oikea yläkulma</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner</source>
-      <translation>Vasen alakulma</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner</source>
-      <translation>Oikea alakulma</translation>
-    </message>
-    <message>
       <source>Failed to save screenshot</source>
       <translation>Ruudunkaappauksen tallentaminen epäonnistui</translation>
     </message>
@@ -6894,6 +6882,18 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message>
       <source>JPEG Image</source>
       <translation>JPEG-kuva</translation>
+    </message>
+    <message>
+      <source>No timestamp</source>
+      <translation type="unfinished">No timestamp</translation>
+    </message>
+    <message>
+      <source>No camera name</source>
+      <translation type="unfinished">No camera name</translation>
+    </message>
+    <message>
+      <source>Camera name:</source>
+      <translation type="unfinished">Camera name:</translation>
     </message>
   </context>
   <context>
@@ -8403,6 +8403,18 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
       <translation>Olet viemässä kestoltaan pitkän videon. Se voi vaatia paljon tallennustilaa ja vie paljon aikaa.</translation>
+    </message>
+    <message>
+      <source>Add Info</source>
+      <translation type="unfinished">Add Info</translation>
+    </message>
+    <message>
+      <source>Delete Info</source>
+      <translation type="unfinished">Delete Info</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation type="unfinished">Info</translation>
     </message>
   </context>
   <context>

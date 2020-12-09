@@ -2761,17 +2761,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>QnClockLabel</name>
-    <message>
-      <source>Server Time</source>
-      <translation>Servertijd</translation>
-    </message>
-    <message>
-      <source>Local System Time</source>
-      <translation>Lokale Systeemtijd</translation>
-    </message>
-  </context>
-  <context>
     <name>QnCloudManagementWidget</name>
     <message>
       <source>Connect to your Systems
@@ -5105,6 +5094,25 @@ to %1</source>
     </message>
   </context>
   <context>
+    <name>QnScreenshotLoader</name>
+    <message>
+      <source>Top left corner</source>
+      <translation>Linkerbovenhoek</translation>
+    </message>
+    <message>
+      <source>Top right corner</source>
+      <translation>Rechterbovenhoek</translation>
+    </message>
+    <message>
+      <source>Bottom left corner</source>
+      <translation>Linkeronderhoek</translation>
+    </message>
+    <message>
+      <source>Bottom right corner</source>
+      <translation>Rechteronderhoek</translation>
+    </message>
+  </context>
+  <context>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>Export Bookmark...</source>
@@ -6858,26 +6866,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <translation>Screenshot opslaan...</translation>
     </message>
     <message>
-      <source>No Timestamp</source>
-      <translation>Geen tijdsstempel</translation>
-    </message>
-    <message>
-      <source>Top Left Corner</source>
-      <translation>Linkerbovenhoek</translation>
-    </message>
-    <message>
-      <source>Top Right Corner</source>
-      <translation>Rechterbovenhoek</translation>
-    </message>
-    <message>
-      <source>Bottom Left Corner</source>
-      <translation>Linkeronderhoek</translation>
-    </message>
-    <message>
-      <source>Bottom Right Corner</source>
-      <translation>Recheronderhoek</translation>
-    </message>
-    <message>
       <source>Failed to save screenshot</source>
       <translation>Opslaan van screenshot is mislukt</translation>
     </message>
@@ -6892,6 +6880,18 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>JPEG Image</source>
       <translation>JPEG Afbeelding</translation>
+    </message>
+    <message>
+      <source>No timestamp</source>
+      <translation>Geen tijdsstempel</translation>
+    </message>
+    <message>
+      <source>No camera name</source>
+      <translation>Geen camera naam</translation>
+    </message>
+    <message>
+      <source>Camera name:</source>
+      <translation>Cameranaam:</translation>
     </message>
   </context>
   <context>
@@ -8401,6 +8401,18 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
       <translation>U staat op het punt een lange video te exporteren. Het vereist mogelijk veel opslagruimte en neemt veel tijd in beslag.</translation>
+    </message>
+    <message>
+      <source>Add Info</source>
+      <translation>Info toevoegen</translation>
+    </message>
+    <message>
+      <source>Delete Info</source>
+      <translation>Info verwijderen</translation>
+    </message>
+    <message>
+      <source>Info</source>
+      <translation>Info</translation>
     </message>
   </context>
   <context>
