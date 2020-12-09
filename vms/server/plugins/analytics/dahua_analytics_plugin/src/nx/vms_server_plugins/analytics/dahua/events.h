@@ -28,6 +28,10 @@ extern const std::vector<const EventTypeGroup*>& kEventTypeGroups;
 struct EventType
 {
     QString nativeId;
+
+    // Some cameras declare support for some events using these rather nativeId.
+    std::vector<QString> aliasNativeIds;
+
     QString id;
     QString prettyName;
     QString description;

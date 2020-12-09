@@ -86,7 +86,15 @@ std::optional<Object> parseObject(const QJsonObject& jsonObject)
     {
         object.type = ObjectType::findByNativeId(type.toString());
         if (!object.type)
+        {
+            NX_DEBUG(NX_SCOPE_TAG, "Object has unknown ObjectType: %1", type.toString());
             return std::nullopt;
+        }
+    }
+    else
+    {
+        NX_DEBUG(NX_SCOPE_TAG, "Object has no ObjectType");
+        return std::nullopt;
     }
 
     if (const auto id = jsonObject["ObjectID"]; id.isDouble())
