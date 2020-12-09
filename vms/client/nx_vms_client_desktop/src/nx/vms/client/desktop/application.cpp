@@ -164,6 +164,8 @@ int runApplicationInternal(QtSingleApplication* application, const QnStartupPara
 
     QnClientModule client(startupParams);
 
+    NX_INFO(NX_SCOPE_TAG, "IniConfig iniFilesDir: %1",  nx::kit::IniConfig::iniFilesDir());
+
     QnGLCheckerInstrument::checkGLHardware();
     client.initWebEngine();
 
