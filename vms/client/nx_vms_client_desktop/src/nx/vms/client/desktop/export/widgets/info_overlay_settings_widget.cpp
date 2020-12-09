@@ -93,4 +93,14 @@ void InfoOverlaySettingsWidget::setData(const ExportInfoOverlayPersistentSetting
     emit dataChanged(m_data);
 }
 
+int InfoOverlaySettingsWidget::maxOverlayWidth() const
+{
+    return m_data.maxOverlayWidth;
+}
+
+void InfoOverlaySettingsWidget::setMaxOverlayWidth(int value)
+{
+    m_data.maxOverlayWidth = value;
+}
+
 } // namespace nx::vms::client::desktop

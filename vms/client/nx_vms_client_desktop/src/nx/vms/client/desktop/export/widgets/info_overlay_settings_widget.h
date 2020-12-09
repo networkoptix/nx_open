@@ -21,6 +21,9 @@ public:
     const ExportInfoOverlayPersistentSettings& data() const;
     void setData(const ExportInfoOverlayPersistentSettings& data);
 
+    int maxOverlayWidth() const;
+    void setMaxOverlayWidth(int value);
+
 signals:
     void dataChanged(const ExportInfoOverlayPersistentSettings& data);
     void deleteClicked();

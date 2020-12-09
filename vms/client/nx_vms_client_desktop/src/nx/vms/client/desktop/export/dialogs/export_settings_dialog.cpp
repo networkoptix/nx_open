@@ -216,6 +216,7 @@ ExportSettingsDialog::ExportSettingsDialog(
             setMaxOverlayWidth(ui->bookmarkSettingsPage, size.width());
             setMaxOverlayWidth(ui->imageSettingsPage, size.width());
             setMaxOverlayWidth(ui->textSettingsPage, size.width());
+            setMaxOverlayWidth(ui->infoSettingsPage, size.width());
         });
 
     if (ui->bookmarkButton->state() != SelectableTextButton::State::deactivated)
