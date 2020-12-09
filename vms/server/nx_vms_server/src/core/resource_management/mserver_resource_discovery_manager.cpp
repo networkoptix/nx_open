@@ -1,5 +1,7 @@
 #include "mserver_resource_discovery_manager.h"
 
+#include <chrono>
+
 #include <QtConcurrent/QtConcurrent>
 #include <QtConcurrent/QtConcurrentMap>
 #include <QtCore/QThreadPool>
@@ -36,11 +38,15 @@
 #include <nx/vms/server/resource/analytics_plugin_resource.h>
 #include <nx/vms/server/resource/analytics_engine_resource.h>
 #include <nx/utils/app_info.h>
+#include <nx/utils/std/algorithm.h>
 
 namespace {
 
-static const int RETRY_COUNT_FOR_FOREIGN_RESOURCES = 2;
-static const int kMinServerStartupTimeToTakeForeignCamerasMs = 1000 * 60;
+using namespace std::literals;
+
+constexpr auto kRetryCountForForeignResources = 2;
+constexpr auto kMinServerStartupTimeToTakeForeignCamerasMs = 1000 * 60;
+constexpr auto kDisconnectTimeout = 20s;
 
 template<class ResourcePointer>
 QString netResourceString(const ResourcePointer& res)
@@ -69,6 +75,12 @@ QnMServerResourceDiscoveryManager::QnMServerResourceDiscoveryManager(
         this,
         &QnMServerResourceDiscoveryManager::at_resourceAdded,
         Qt::DirectConnection);
+
+    // AutoConnection since no locking in at_statusChanged.
+    connect(
+        resourcePool(), &QnResourcePool::statusChanged,
+        this, &QnMServerResourceDiscoveryManager::at_statusChanged);
+
     connect(commonModule()->globalSettings(),
         &QnGlobalSettings::disabledVendorsChanged,
         this,
@@ -209,13 +221,31 @@ void QnMServerResourceDiscoveryManager::sortForeignResources(
     });
 }
 
+void QnMServerResourceDiscoveryManager::markOfflineDisconnectedResources()
+{
+    bool shouldDisconnect = false;
+    for (const auto& [uniqId, elapsedTimer]: m_offlineResourceTimers)
+    {
+        if (elapsedTimer.hasExpired(kDisconnectTimeout))
+            processResourceIsLost(resourcePool()->getResourceByUniqueId<QnNetworkResource>(uniqId));
+    }
+
+    for (auto itr = m_offlineResourceTimers.begin(); itr != m_offlineResourceTimers.end();)
+    {
+        if (m_disconnectSended[itr->first])
+            itr = m_offlineResourceTimers.erase(itr);
+        else
+            ++itr;
+    }
+}
+
 bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceList& resources,
     SearchType searchType)
 {
     // fill camera's ID
     {
         NX_MUTEX_LOCKER lock(&m_discoveryMutex);
-        int foreignResourceIndex = m_discoveryCounter % RETRY_COUNT_FOR_FOREIGN_RESOURCES;
+        int foreignResourceIndex = m_discoveryCounter % kRetryCountForForeignResources;
         while (m_tmpForeignResources.size() <= foreignResourceIndex)
             m_tmpForeignResources.push_back(ResourceList());
         m_tmpForeignResources[foreignResourceIndex].clear();
@@ -247,7 +277,7 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
                 ++itr;
             }
         }
-        if (m_tmpForeignResources.size() == RETRY_COUNT_FOR_FOREIGN_RESOURCES
+        if (m_tmpForeignResources.size() == kRetryCountForForeignResources
             && m_startupTimer.elapsed() > kMinServerStartupTimeToTakeForeignCamerasMs)
         {
             // Exclude duplicates.
@@ -421,10 +451,12 @@ bool QnMServerResourceDiscoveryManager::processDiscoveredResources(QnResourceLis
         }
     }
 
+    markOfflineDisconnectedResources();
+
     // If resource is not discovered last minute and we do not record it and do not see live
     // then readers are not running.
     if (searchType == SearchType::Full)
-        markOfflineIfNeeded(discoveredResources);
+        markOfflineIfNeededAllExcept(discoveredResources);
 
     bool foundSmth = !resources.isEmpty();
     if (foundSmth)
@@ -511,6 +543,21 @@ void QnMServerResourceDiscoveryManager::at_resourceDeleted(const QnResourcePtr& 
         resource, nx::utils::url::hidePassword(resource->getUrl()));
 }
 
+void QnMServerResourceDiscoveryManager::at_statusChanged(
+    const QnResourcePtr& resource, Qn::StatusChangeReason)
+{
+    if (resource->hasFlags(Qn::foreigner) || QnResource::isOnline(resource->getStatus()))
+    {
+        processResourceIsFound(resource.dynamicCast<QnNetworkResource>());
+    }
+    else if (QnResource::isOnline(resource->getPreviousStatus())
+        && resource->getStatus() == Qn::Offline)
+    {
+        if (resource.dynamicCast<QnNetworkResource>())
+            m_offlineResourceTimers.emplace(resource->getUniqueId(), /*started*/ true);
+    }
+}
+
 bool QnMServerResourceDiscoveryManager::hasIpConflict(const QSet<QnNetworkResourcePtr>& cameras)
 {
     if (cameras.size() < 2)
@@ -546,13 +593,14 @@ bool QnMServerResourceDiscoveryManager::hasIpConflict(const QSet<QnNetworkResour
     return false;
 }
 
-void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& discoveredResources)
+void QnMServerResourceDiscoveryManager::markOfflineIfNeededAllExcept(
+    const QSet<QString>& exemptedResources)
 {
     const QnResourceList& resources = resourcePool()->getResources();
 
     for(const QnResourcePtr& res: resources)
     {
-        QnNetworkResource* netRes = dynamic_cast<QnNetworkResource*>(res.data());
+        auto netRes = res.dynamicCast<QnNetworkResource>();
         if (!netRes)
             continue;
 
@@ -567,56 +615,70 @@ void QnMServerResourceDiscoveryManager::markOfflineIfNeeded(QSet<QString>& disco
 
         //check if resource was discovered
         QString uniqId = res->getUniqueId();
-        if (!discoveredResources.contains(uniqId))
+        if (!exemptedResources.contains(uniqId))
+            processResourceIsLost(netRes);
+        else
+            processResourceIsFound(netRes);
+    }
+}
+
+void QnMServerResourceDiscoveryManager::processResourceIsFound(const QnNetworkResourcePtr& resource)
+{
+    if (!resource)
+        return;
+    m_resourceDiscoveryCounter[resource->getUniqueId()] = 0;
+    m_disconnectSended[resource->getUniqueId()] = false;
+    m_offlineResourceTimers.erase(resource->getUniqueId());
+}
+
+void QnMServerResourceDiscoveryManager::processResourceIsLost(const QnNetworkResourcePtr& netRes)
+{
+    if (!netRes)
+        return;
+    // resource is not found
+    QString uniqId = netRes->getUniqueId();
+    m_resourceDiscoveryCounter[uniqId]++;
+
+    if (m_resourceDiscoveryCounter[uniqId] >= m_serverModule->settings().retryCountToMakeCameraOffline())
+    {
+        auto camRes = netRes.dynamicCast<QnVirtualCameraResource>();
+
+        NX_VERBOSE(this,
+            "Camera %1 has not answered to %2 discovery loops in a row.",
+            netResourceString(netRes), m_resourceDiscoveryCounter[uniqId]);
+
+        const bool hasProvider = QnLiveStreamProvider::hasRunningLiveProvider(netRes.data());
+        const bool hasLicense = camRes && camRes->isLicenseUsed();
+        if (!camRes->hasFlags(Qn::desktop_camera) && (hasProvider || hasLicense))
         {
-            // resource is not found
-            m_resourceDiscoveryCounter[uniqId]++;
-
-            if (m_resourceDiscoveryCounter[uniqId] >= m_serverModule->settings().retryCountToMakeCameraOffline())
+            if (netRes->getStatus() == Qn::Offline && !m_disconnectSended[uniqId])
             {
-                QnVirtualCameraResource* camRes = dynamic_cast<QnVirtualCameraResource*>(netRes);
-
                 NX_VERBOSE(this,
-                    "Camera %1 has not answered to %2 discovery loops in a row.",
-                    netResourceString(netRes), m_resourceDiscoveryCounter[uniqId]);
+                    "Send disconnected signal for camera %1",
+                    netResourceString(netRes));
 
-                const bool hasProvider = QnLiveStreamProvider::hasRunningLiveProvider(netRes);
-                const bool hasLicense = camRes && camRes->isLicenseUsed();
-                if (!camRes->hasFlags(Qn::desktop_camera) && (hasProvider || hasLicense))
-                {
-                    if (res->getStatus() == Qn::Offline && !m_disconnectSended[uniqId])
-                    {
-                        NX_VERBOSE(this,
-                            "Send disconnected signal for camera %1",
-                            netResourceString(netRes));
+                QnVirtualCameraResourcePtr cam = netRes.dynamicCast<QnVirtualCameraResource>();
+                if (cam)
+                    cam->issueOccured();
 
-                        QnVirtualCameraResourcePtr cam = res.dynamicCast<QnVirtualCameraResource>();
-                        if (cam)
-                            cam->issueOccured();
-                        emit cameraDisconnected(res, qnSyncTime->currentUSecsSinceEpoch());
-                        m_disconnectSended[uniqId] = true;
-                    }
-                    else if (res->getStatus() >= Qn::Online)
-                    {
-                        m_disconnectSended[uniqId] = false;
-                    }
-                }
-                else
-                {
-                    NX_INFO(this,
-                        "Mark resource %1 as offline"
-                        " because it doesn't response to discovery any more.",
-                        netResourceString(camRes));
 
-                    res->setStatus(Qn::Offline);
-                    m_resourceDiscoveryCounter[uniqId] = 0;
-                }
+                emit cameraDisconnected(netRes, qnSyncTime->currentUSecsSinceEpoch());
+                m_disconnectSended[uniqId] = true;
+            }
+            else if (netRes->getStatus() >= Qn::Online)
+            {
+                m_disconnectSended[uniqId] = false;
             }
         }
         else
         {
+            NX_INFO(this,
+                "Mark resource %1 as offline"
+                " because it doesn't response to discovery any more.",
+                netResourceString(camRes));
+
+            netRes->setStatus(Qn::Offline);
             m_resourceDiscoveryCounter[uniqId] = 0;
-            m_disconnectSended[uniqId] = false;
         }
     }
 }

@@ -1,10 +1,13 @@
 #pragma once
 
+#include <map>
+
 #include <QtCore/QTime>
 #include <QtCore/QElapsedTimer>
 
 #include "core/resource_management/resource_discovery_manager.h"
 #include <nx/vms/server/server_module_aware.h>
+#include <nx/utils/elapsed_timer.h>
 
 class QnMServerResourceDiscoveryManager:
     public QnResourceDiscoveryManager
@@ -45,8 +48,12 @@ protected:
 private:
     void at_resourceAdded(const QnResourcePtr& resource);
     void at_resourceDeleted(const QnResourcePtr& resource);
+    void at_statusChanged(const QnResourcePtr& resource, Qn::StatusChangeReason);
 
-    void markOfflineIfNeeded(QSet<QString>& discoveredResources);
+    void markOfflineIfNeededAllExcept(const QSet<QString>& exemptedResources);
+    void markOfflineDisconnectedResources();
+    void processResourceIsLost(const QnNetworkResourcePtr& netRes);
+    void processResourceIsFound(const QnNetworkResourcePtr& netRes);
 
     void updateResourceStatus(const QnNetworkResourcePtr& rpNetRes);
 
@@ -71,4 +78,5 @@ private:
     QnMutex m_discoveryMutex;
     QElapsedTimer m_startupTimer;
     int m_discoveryCounter = 0;
+    std::map<QString, nx::utils::ElapsedTimer> m_offlineResourceTimers;
 };
