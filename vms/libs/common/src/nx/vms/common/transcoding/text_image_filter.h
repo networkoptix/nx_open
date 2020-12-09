@@ -15,19 +15,22 @@ class TextImageFilter: public QnAbstractImageFilter
 {
 public:
     using VideoLayoutPtr = QSharedPointer<const QnResourceVideoLayout>;
-    using TextGetter = std::function<QString (const CLVideoDecoderOutputPtr& frame)>;
+    using TextGetter =
+        std::function<QString (const CLVideoDecoderOutputPtr& frame, int cutSymbolsCount)>;
+
+    using Factor = QPointF;
 
     static QnAbstractImageFilterPtr create(
         const VideoLayoutPtr& videoLayout,
         const Qt::Corner corner,
         const TextGetter& textGetter,
-        const qreal widthFactor = 1.0);
+        const Factor& factor = Factor(1, 1));
 
     TextImageFilter(
         const VideoLayoutPtr& videoLayout,
         const Qt::Corner corner,
-        const TextGetter& linesGetter,
-        const qreal widthFactor = 1.0);
+        const TextGetter& textGetter,
+        const Factor& factor = Factor(1, 1));
 
     virtual ~TextImageFilter();
 

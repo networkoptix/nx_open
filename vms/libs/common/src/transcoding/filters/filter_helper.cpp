@@ -23,6 +23,16 @@ Qt::Edge getHorizontalEdge(Qt::Corner corner)
     }
 }
 
+QString chopWithTilda(const QString& source, int symbolsCount)
+{
+    if (symbolsCount == 0)
+        return source;
+
+    return source.length() <= symbolsCount
+        ? QString()
+        : source.left(source.length() - symbolsCount - 1) + "~";
+}
+
 QString getFrameTimestampText(
     const CLVideoDecoderOutputPtr& frame,
     const nx::vms::common::transcoding::TimestampParams& params)
@@ -63,7 +73,8 @@ nx::core::transcoding::FilterChain QnImageFilterHelper::createFilterChain(
     nx::core::transcoding::FilterChain result(
         settings, legacy.resource->getDewarpingParams(), legacy.resource->getVideoLayout());
 
-    qreal widthFactor = 1.0;
+    using nx::vms::common::transcoding::TextImageFilter;
+    TextImageFilter::Factor factor(1, 1);
 
     if (legacy.timestampParams.filterParams.enabled && legacy.cameraNameParams.enabled)
     {
@@ -73,13 +84,22 @@ nx::core::transcoding::FilterChain QnImageFilterHelper::createFilterChain(
         {
             // Both markers should be placed in the same corner, creating single filter.
             const auto textGetter =
-                [settings = legacy](const CLVideoDecoderOutputPtr& frame)
+                [settings = legacy]
+                    (const CLVideoDecoderOutputPtr& frame, int cutSymbolsCount)
                 {
+                    const auto cameraName = chopWithTilda(getCameraName(settings), cutSymbolsCount);
+                    if (cameraName.isEmpty())
+                        cutSymbolsCount -= cameraName.length();
+
+                    const auto timestamp = getFrameTimestampText(frame, settings.timestampParams);
+                    if (cameraName.isEmpty())
+                        return chopWithTilda(timestamp, cutSymbolsCount);
+
                     return QString("%1\n%2").arg(
-                        getCameraName(settings),
-                        getFrameTimestampText(frame, settings.timestampParams));
+                        chopWithTilda(cameraName, cutSymbolsCount),
+                        timestamp);
                 };
-            const auto filter = nx::vms::common::transcoding::TextImageFilter::create(
+            const auto filter = TextImageFilter::create(
                 legacy.resource->getVideoLayout(),
                 legacy.timestampParams.filterParams.corner,
                 textGetter);
@@ -88,38 +108,42 @@ nx::core::transcoding::FilterChain QnImageFilterHelper::createFilterChain(
         }
 
         if (getHorizontalEdge(timestampCorner) != getHorizontalEdge(cameraNameCorner))
-            widthFactor = 0.5;
+            factor.setX(0.5);
+        else
+            factor.setY(0.5);
     }
 
     if (legacy.timestampParams.filterParams.enabled)
     {
         const auto textGetter =
-            [settings = legacy.timestampParams](const CLVideoDecoderOutputPtr& frame)
+            [settings = legacy.timestampParams]
+                (const CLVideoDecoderOutputPtr& frame, int cutSymbolsCount)
             {
-                return getFrameTimestampText(frame, settings);
+                return chopWithTilda(getFrameTimestampText(frame, settings), cutSymbolsCount);
             };
 
-        const auto filter = nx::vms::common::transcoding::TextImageFilter::create(
+        const auto filter = TextImageFilter::create(
             legacy.resource->getVideoLayout(),
             legacy.timestampParams.filterParams.corner,
             textGetter,
-            widthFactor);
+            factor);
         result.addLegacyFilter(filter);
     }
 
     if (legacy.cameraNameParams.enabled)
     {
         const auto textGetter =
-            [settings = legacy](const CLVideoDecoderOutputPtr& /*frame*/)
+            [settings = legacy]
+                (const CLVideoDecoderOutputPtr& /*frame*/, int cutSymbolsCount)
             {
-                return getCameraName(settings);
+                return chopWithTilda(getCameraName(settings), cutSymbolsCount);
             };
 
-        const auto filter = nx::vms::common::transcoding::TextImageFilter::create(
+        const auto filter = TextImageFilter::create(
             legacy.resource->getVideoLayout(),
             legacy.cameraNameParams.corner,
             textGetter,
-            widthFactor);
+            factor);
         result.addLegacyFilter(filter);
     }
 

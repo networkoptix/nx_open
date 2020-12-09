@@ -17,6 +17,8 @@
 
 namespace {
 
+using namespace nx::vms::common::transcoding;
+
 static constexpr int kMaxTextLinesInFrame = 20;
 static constexpr int kMinTextHeight = 14;
 
@@ -81,23 +83,27 @@ void updateDocumentFont(
 
 DocumentPtr makeDocument(
     const Qt::Alignment textAlignment,
-    const QString& text,
-    const int frameWidth,
-    const int maxTextWidth,
+    const TextImageFilter::TextGetter& textGetter,
+    const CLVideoDecoderOutputPtr& frame,
+    const TextImageFilter::Factor& factor,
     const int initialPixelSize)
 {
+    const QString initialText = textGetter(frame, /*cutSymbolsCount*/ 0);
+
     QFont font;
     font.setBold(true);
     font.setPixelSize(qMax(kMinTextHeight, initialPixelSize));
 
     const DocumentPtr document(new QTextDocument());
-    const int offset = frameWidth - maxTextWidth;
+    const auto frameSize = frame->size();
+    const int frameWidth = frameSize.width();
+    const int offset = frameWidth * (1 - factor.x());
     updateDocumentFont(document, font, textAlignment, offset);
 
     QTextCursor cursor(document.data());
     cursor.setBlockFormat(getBlockFormat(textAlignment));
     cursor.setBlockCharFormat(getCharFormat());
-    cursor.insertText(text);
+    cursor.insertText(initialText);
 
     // Looking for the most appropriate font size which fits all lines without word wrapping.
     while (font.pixelSize() > kMinTextHeight && document->idealWidth() > frameWidth)
@@ -106,7 +112,17 @@ DocumentPtr makeDocument(
         updateDocumentFont(document, font, textAlignment, offset);
     }
 
+    // Trying to fit overall text height to the frame size, or cut it.
     document->setTextWidth(frameWidth);
+    int cutSymbolsCount = 0;
+    int maxTextHeight = frameSize.height() * factor.y();
+    while (document->size().height() > maxTextHeight && document->toPlainText().length() > 0)
+    {
+        cursor.select(QTextCursor::Document);
+        cursor.removeSelectedText();
+        cursor.insertText(textGetter(frame, ++cutSymbolsCount));
+    }
+
     return document;
 }
 
@@ -127,23 +143,21 @@ struct TextImageFilter::Private
     qint64 hash = -1;
 
     QSize frameSize;
-    QString text;
+    QString sourceText;
     DocumentPtr document;
     QSharedPointer<QImage> textImage;
     QSharedPointer<quint8> imageBuffer;
 
     int bufferYOffset = 0;
-    qreal widthFactor = 1.0;
+    Factor factor = Factor(1, 1);
 
     Private(
         const VideoLayoutPtr& videoLayout,
         const Qt::Corner corner,
         const TextGetter& textGetter,
-        const qreal widthFactor);
+        const Factor sizeFactor);
 
-    void updateTextData(
-        const QString& newText,
-        const CLVideoDecoderOutputPtr& frame);
+    void updateTextData(const CLVideoDecoderOutputPtr& frame);
 
     qint64 calculateHash(
         const quint8* data,
@@ -155,20 +169,17 @@ TextImageFilter::Private::Private(
     const VideoLayoutPtr& videoLayout,
     const Qt::Corner corner,
     const TextGetter& textGetter,
-    const qreal widthFactor)
+    const Factor sizeFactor)
     :
     textGetter(textGetter),
     corner(corner),
     checkHash(videoLayout && videoLayout->channelCount() > 1),
-    widthFactor(widthFactor)
+    factor(sizeFactor)
 {
 }
 
-void TextImageFilter::Private::updateTextData(
-    const QString& newText,
-    const CLVideoDecoderOutputPtr& frame)
+void TextImageFilter::Private::updateTextData(const CLVideoDecoderOutputPtr& frame)
 {
-    text = newText;
     frameSize = frame ? frame->size() : QSize();
     if (!frame)
     {
@@ -178,8 +189,7 @@ void TextImageFilter::Private::updateTextData(
 
     const int initialTextHeight = frameSize.height() / kMaxTextLinesInFrame;
     const auto align = getAlignFromCorner(corner);
-    const int maxTextWidth = frameSize.width() * widthFactor;
-    document = makeDocument(align, text, frameSize.width(), maxTextWidth, initialTextHeight);
+    document = makeDocument(align, textGetter, frame, factor, initialTextHeight);
 
     const QFontMetrics metrics(document->defaultFont());
     const unsigned int textWidth = document->textWidth();
@@ -217,20 +227,20 @@ qint64 TextImageFilter::Private::calculateHash(
 QnAbstractImageFilterPtr TextImageFilter::create(
     const VideoLayoutPtr& videoLayout,
     const Qt::Corner corner,
-    const TextGetter& linesGetter,
-    const qreal widthFactor)
+    const TextGetter& textGetter,
+    const Factor& factor)
 {
     return QnAbstractImageFilterPtr(
-        new TextImageFilter(videoLayout, corner, linesGetter, widthFactor));
+        new TextImageFilter(videoLayout, corner, textGetter, factor));
 }
 
 TextImageFilter::TextImageFilter(
     const VideoLayoutPtr& videoLayout,
     const Qt::Corner corner,
-    const TextGetter& linesGetter,
-    const qreal widthFactor)
+    const TextGetter& textGetter,
+    const Factor& factor)
     :
-    d(new Private(videoLayout, corner, linesGetter, widthFactor))
+    d(new Private(videoLayout, corner, textGetter, factor))
 {
 }
 
@@ -243,10 +253,13 @@ CLVideoDecoderOutputPtr TextImageFilter::updateImage(const CLVideoDecoderOutputP
     if (!frame)
         return frame;
 
-    const auto& text = d->textGetter(frame);
+    const auto& text = d->textGetter(frame, /*cutSymbolsCount*/ 0);
     const auto& frameSize = frame->size();
-    if (text != d->text || frameSize != d->frameSize)
-        d->updateTextData(text, frame);
+    if (text != d->sourceText || frameSize != d->frameSize)
+    {
+        d->sourceText = text;
+        d->updateTextData(frame);
+    }
 
     if (!d->document)
         return frame;
@@ -278,7 +291,7 @@ CLVideoDecoderOutputPtr TextImageFilter::updateImage(const CLVideoDecoderOutputP
     QPainter p(d->textImage.data());
     p.setRenderHints(
         QPainter::Antialiasing | QPainter::TextAntialiasing | QPainter::HighQualityAntialiasing);
-    d->document->drawContents(&p, d->textImage->rect());
+    d->document->drawContents(&p);
 
     // Copy and convert RGBA32 image back to frame buffer.
     bgra_to_yv12_simd_intr(
