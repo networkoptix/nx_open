@@ -7,7 +7,7 @@ function(verify_python_at_least_37)
         ERROR_STRIP_TRAILING_WHITESPACE
     )
 
-    if (NOT "${PYTHON_VERSION}" MATCHES "Python 3\.(7|8)(\..*)?")
+    if (NOT "${PYTHON_VERSION}" MATCHES "Python 3\.(7|8|9)(\..*)?")
         set(PYTHON_EXECUTABLE PYTHON_EXECUTABLE-NOTFOUND PARENT_SCOPE)
     endif()
 endfunction()
