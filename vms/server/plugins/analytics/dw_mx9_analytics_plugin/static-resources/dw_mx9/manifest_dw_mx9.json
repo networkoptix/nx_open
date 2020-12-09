@@ -6,7 +6,7 @@
         "customer",
         "digitalwatchdog"
     ],
-    "_comment_for_supportedCameraVendors": "Common Digital Watchdog cameras have vendor name 'cap'",
+    "_comment_for_supportedCameraVendors": "Other Digital Watchdog cameras usually have vendor name 'cap'",
     "supportedCameraModels": [
         "TD-9442E3",
         "TD-9443E3",

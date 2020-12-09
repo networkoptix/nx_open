@@ -13,7 +13,7 @@
 
 #include "literals.h"
 
-namespace nx::dw_tvt {
+namespace nx::dw_mx9 {
 
 namespace {
 
@@ -135,7 +135,7 @@ static const QByteArray kSubscriptionXmlPeaItem = R"xml(
  * Name in web interface: "Face Detection".
  * Description in web interface: "Smart detection of faces appeared in the tracked scene".
  * Detection area: rectangle.
- * Currently (march 2020) VFD is not supported by DW TVT Camera.
+ * Currently (march 2020) VFD is not supported by DW Mx9 (aka TVT) Camera.
  */
 static const QByteArray kSubscriptionXmlVfdItem = R"xml(
 <item>
@@ -334,10 +334,10 @@ public:
 
         auto optionalBody = m_client.fetchEntireMessageBody();
 
-        // We control DW TVT cameras through one port and receive notifications through the other.
-        // DW TVT has a remarkable bug. If control port is not closed, notification port does not
-        // work correct.
-        // We need to close socket manually after each control request.
+        // We control DW Mx9 (aka TVT) cameras through one port and receive notifications through
+        // the other. DW Mx9 (aka TVT) has a remarkable bug. If the control port is not closed,
+        // the notification port does not work correctly. We need to close the socket manually
+        // after each control request.
         m_client.socket()->close();
 
         if (!optionalBody)
@@ -448,4 +448,4 @@ bool CameraController::readPortConfiguration()
     return true;
 }
 
-} // namespace nx::dw_tvt
+} // namespace nx::dw_mx9

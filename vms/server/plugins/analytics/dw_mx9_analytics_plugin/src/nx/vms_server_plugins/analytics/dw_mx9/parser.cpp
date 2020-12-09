@@ -2,7 +2,7 @@
 
 #include <QStringList>
 
-namespace nx::vms_server_plugins::analytics::dw_tvt {
+namespace nx::vms_server_plugins::analytics::dw_mx9 {
 
 QList<AlarmPair> getAlarmPairs(const QDomDocument& dom)
 {
@@ -29,4 +29,4 @@ QList<AlarmPair> getAlarmPairs(const QDomDocument& dom)
     return result;
 }
 
-} // nx::vms_server_plugins::analytics::dw_tvt
+} // namespace nx::vms_server_plugins::analytics::dw_mx9

@@ -26,13 +26,13 @@
 
 #include "parser.h"
 #include "log.h"
-#include "nx/dw_tvt/literals.h"
+#include "nx/dw_mx9/literals.h"
 
 #define NX_URL_PRINT NX_PRINT << m_url.host().toStdString() << " : "
 
 using namespace std::literals::chrono_literals;
 
-namespace nx::vms_server_plugins::analytics::dw_tvt {
+namespace nx::vms_server_plugins::analytics::dw_mx9 {
 
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
@@ -118,13 +118,13 @@ DeviceAgent::DeviceAgent(
 
     m_cameraManifest = QJson::serialized(typedCameraManifest);
 
-    NX_URL_PRINT << "DW TVT DeviceAgent created";
+    NX_URL_PRINT << "DW Mx9 DeviceAgent created";
 }
 
 DeviceAgent::~DeviceAgent()
 {
     stopFetchingMetadata();
-    NX_URL_PRINT << "DW TVT DeviceAgent destroyed";
+    NX_URL_PRINT << "DW Mx9 DeviceAgent destroyed";
 }
 
 bool DeviceAgent::logHttpRequestResult()
@@ -185,7 +185,7 @@ void DeviceAgent::makeSubscriptionAsync()
 
     const nx::utils::Url url = makeUrl("SetSubscribe");
     const QSet<QByteArray> names = internalNamesToCatch();
-    const QByteArray messageBody = nx::dw_tvt::buildSubscriptionXml(names);
+    const QByteArray messageBody = nx::dw_mx9::buildSubscriptionXml(names);
 
     prepareHttpClient(messageBody);
 
@@ -522,15 +522,15 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* metadataTy
 
     NX_URL_PRINT << "Server demanded to start fetching event(s): " << eventNames.constData();
 
-    NX_URL_PRINT << "Trying to get DW TVT camera tcp notification server port.";
+    NX_URL_PRINT << "Trying to get DW Mx9 camera tcp notification server port.";
     if (!m_cameraController.readPortConfiguration())
     {
         static const char* const kMessage =
-            "Failed to get DW TVT camera tcp notification server port";
+            "Failed to get DW Mx9 camera tcp notification server port";
         NX_URL_PRINT << kMessage;
         return error(ErrorCode::networkError, kMessage);
     }
-    NX_URL_PRINT << "DW TVT camera tcp notification port = "
+    NX_URL_PRINT << "DW Mx9 camera tcp notification port = "
         << m_cameraController.longPollingPort();
 
     makeSubscriptionAsync();
@@ -583,4 +583,4 @@ void DeviceAgent::getPluginSideSettings(
 {
 }
 
-} // nx::vms_server_plugins::analytics::dw_tvt
+} // namespace nx::vms_server_plugins::analytics::dw_mx9

@@ -9,6 +9,6 @@
     #undef NX_PRINT
     #define NX_PRINT NX_UTILS_LOG_STREAM_NO_SPACE( \
         nx::utils::log::Level::debug, \
-        nx::utils::log::Tag(QStringLiteral("dw_tvt_analytics_plugin")) \
+        nx::utils::log::Tag(QStringLiteral("dw_mx9_analytics_plugin")) \
     ) << NX_PRINT_PREFIX
 #endif

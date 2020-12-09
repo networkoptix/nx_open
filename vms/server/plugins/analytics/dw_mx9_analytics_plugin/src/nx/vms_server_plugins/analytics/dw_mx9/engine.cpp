@@ -13,7 +13,7 @@
 #include "device_agent.h"
 #include "log.h"
 
-namespace nx::vms_server_plugins::analytics::dw_tvt {
+namespace nx::vms_server_plugins::analytics::dw_mx9 {
 
 namespace {
 
@@ -31,8 +31,8 @@ using namespace nx::sdk::analytics;
 
 Engine::Engine(Plugin* plugin, const std::string& manifestName): m_plugin(plugin)
 {
-    static const QString kResourceNamePattern=":/dw_tvt/%1.json";
-    static const QString kFileNamePattern = "plugins/dw_tvt/%1.json";
+    static const QString kResourceNamePattern=":/dw_mx9/%1.json";
+    static const QString kFileNamePattern = "plugins/dw_mx9/%1.json";
     QFile f(kResourceNamePattern.arg(QString::fromStdString(manifestName)));
     if (f.open(QFile::ReadOnly))
         m_manifest = f.readAll();
@@ -117,15 +117,15 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
     return true;
 }
 
-} // nx::vms_server_plugins::analytics::dw_tvt
+} // namespace nx::vms_server_plugins::analytics::dw_mx9
 
 namespace {
 
-static const std::string kTvtPluginManifest = /*suppress newline*/ 1 + (const char*) R"json(
+static const std::string kDwMx9PluginManifest = /*suppress newline*/ 1 + (const char*) R"json(
 {
-    "id": "nx.dw_tvt",
-    "name": "DW TVT analytics plugin",
-    "description": "Supports built-in analytics on Digital Watchdog TVT cameras (TD-9xxxE3 series and DWC-Mx94Wixxx series)",
+    "id": "nx.dw_mx9",
+    "name": "DW Mx9 analytic plugin",
+    "description": "Supports built-in analytics on Digital Watchdog DWC-Mx9 series cameras",
     "version": "1.0.1"
 }
 )json";
@@ -139,12 +139,12 @@ static const std::string kProvisionPluginManifest = /*suppress newline*/ 1 + (co
 }
 )json";
 
-static const std::string kTvtManifestName = "manifest_tvt";
+static const std::string kDwMx9ManifestName = "manifest_dw_mx9";
 static const std::string kProvisionManifestName = "manifest_provision";
 
 enum VendorIndex: int
 {
-    tvtVendorIndex = 0,
+    dwMx9VendorIndex = 0,
     provisionVendorIndex,
 };
 
@@ -156,13 +156,13 @@ NX_PLUGIN_API nx::sdk::IPlugin* createNxPluginByIndex(int index)
 {
     switch ((VendorIndex) index)
     {
-        case tvtVendorIndex:
+        case dwMx9VendorIndex:
             return new nx::sdk::analytics::Plugin(
-                kTvtPluginManifest,
+                kDwMx9PluginManifest,
                 [](nx::sdk::analytics::Plugin* plugin)
                 {
-                    return new nx::vms_server_plugins::analytics::dw_tvt::Engine(
-                        plugin, kTvtManifestName);
+                    return new nx::vms_server_plugins::analytics::dw_mx9::Engine(
+                        plugin, kDwMx9ManifestName);
                 });
 
         case provisionVendorIndex:
@@ -170,7 +170,7 @@ NX_PLUGIN_API nx::sdk::IPlugin* createNxPluginByIndex(int index)
                 kProvisionPluginManifest,
                 [](nx::sdk::analytics::Plugin* plugin)
                 {
-                    return new nx::vms_server_plugins::analytics::dw_tvt::Engine(
+                    return new nx::vms_server_plugins::analytics::dw_mx9::Engine(
                         plugin, kProvisionManifestName);
                 });
 

@@ -10,7 +10,7 @@
 
 #include <nx/network/http/http_types.h>
 
-namespace nx::dw_tvt {
+namespace nx::dw_mx9 {
 
 /**
  * Make xml body for subscription request.
@@ -62,4 +62,4 @@ private:
     uint16_t m_longPollingPort = 0;
 };
 
-} // namespace nx::dw_tvt
+} // namespace nx::dw_mx9

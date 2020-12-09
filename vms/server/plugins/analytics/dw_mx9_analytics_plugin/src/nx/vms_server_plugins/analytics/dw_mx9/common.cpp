@@ -2,7 +2,7 @@
 
 #include <nx/fusion/model_functions.h>
 
-namespace nx::vms_server_plugins::analytics::dw_tvt {
+namespace nx::vms_server_plugins::analytics::dw_mx9 {
 
 namespace {
 
@@ -53,7 +53,7 @@ QList<QString> EngineManifest::eventTypeIdListForModel(const QString& model) con
     return result;
 }
 
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventType, (eq)(json), DwTvtEventType_Fields, (brief, true))
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EngineManifest, (json), DwTvtEngineManifest_Fields, (brief, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EventType, (eq)(json), DwMx9EventType_Fields, (brief, true))
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(EngineManifest, (json), DwMx9EngineManifest_Fields, (brief, true))
 
-} // nx::vms_server_plugins::analytics::dw_tvt
+} // namespace nx::vms_server_plugins::analytics::dw_mx9

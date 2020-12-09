@@ -4,7 +4,7 @@
 #include <QDomDocument>
 #include <QFlags>
 
-namespace nx::vms_server_plugins::analytics::dw_tvt {
+namespace nx::vms_server_plugins::analytics::dw_mx9 {
 
 struct AlarmPair
 {
@@ -14,4 +14,4 @@ struct AlarmPair
 
 QList<AlarmPair> getAlarmPairs(const QDomDocument& dom);
 
-} // nx::vms_server_plugins::analytics::dw_tvt
+} // namespace nx::vms_server_plugins::analytics::dw_mx9

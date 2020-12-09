@@ -9,9 +9,9 @@
 
 #include "common.h"
 
-namespace nx::vms_server_plugins::analytics::dw_tvt {
+namespace nx::vms_server_plugins::analytics::dw_mx9 {
 
-/** DW TVT camera plugin engine. */
+/** DW Mx9 (aka TVT) camera plugin engine. */
 class Engine: public nx::sdk::RefCountable<nx::sdk::analytics::IEngine>
 {
 public:
@@ -50,4 +50,4 @@ private:
     EngineManifest m_typedManifest;
 };
 
-} // nx::vms_server_plugins::analytics::dw_tvt
+} // namespace nx::vms_server_plugins::analytics::dw_mx9

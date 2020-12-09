@@ -17,13 +17,13 @@
 #include <nx/sdk/helpers/ref_countable.h>
 #include <nx/sdk/analytics/i_device_agent.h>
 
-#include "nx/dw_tvt/camera_controller.h"
+#include "nx/dw_mx9/camera_controller.h"
 #include "common.h"
 #include "engine.h"
 #include "parser.h"
 #include <nx/network/system_socket.h>
 
-namespace nx::vms_server_plugins::analytics::dw_tvt {
+namespace nx::vms_server_plugins::analytics::dw_mx9 {
 
 /**
  * The purpose of ElapsedEvent is to store information when event of corresponding type happened
@@ -102,7 +102,7 @@ private:
     nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
     nx::network::aio::Timer m_reconnectTimer;
     mutable uint64_t m_packetId = 0; //< autoincrement packet number for log and debug
-    nx::dw_tvt::CameraController m_cameraController;
+    nx::dw_mx9::CameraController m_cameraController;
     QSet<QByteArray> internalNamesToCatch() const;
 
     std::unique_ptr<nx::network::http::AsyncClient> m_httpClient;
@@ -113,4 +113,4 @@ private:
     std::atomic<bool> m_terminated{false};
 };
 
-} // nx::vms_server_plugins::analytics::dw_tvt
+} // namespace nx::vms_server_plugins::analytics::dw_mx9

@@ -19,7 +19,7 @@ def create_mediaserver_debug_file(binaries_dir, output_filename):
         'plugins/axis_analytics_plugin.pdb',
         'plugins/vca_analytics_plugin.pdb',
         'plugins/dahua_analytics_plugin.pdb',
-        'plugins/dw_tvt_analytics_plugin.pdb',
+        'plugins/dw_mx9_analytics_plugin.pdb',
         'plugins/bosch_analytics_plugin.pdb',
         'plugins/vivotek_analytics_plugin.pdb',
         'plugins_optional/image_library_plugin.pdb',
