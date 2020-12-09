@@ -26,6 +26,8 @@ namespace nx::vms::client::desktop {
 using namespace nx::vms::common::p2p::downloader;
 using namespace nx::vms::applauncher::api;
 
+const utils::SoftwareVersion kSignaturesAppearedVersion(4, 2);
+
 bool requestInstalledVersions(QList<nx::utils::SoftwareVersion>* versions)
 {
     // Try to run applauncher if it is not running.
@@ -138,6 +140,18 @@ void ClientUpdateTool::verifyUpdateFile()
 {
     if (m_verificationResult.valid())
         return;
+
+    if (m_updateVersion < kSignaturesAppearedVersion)
+    {
+        NX_VERBOSE(this, "Update file verification is not supported for version %1. Skipping...",
+            m_updateVersion);
+
+        std::promise<common::FileSignature::Result> promise;
+        promise.set_value(common::FileSignature::Result::ok);
+        m_verificationResult = promise.get_future();
+        atVerificationFinished();
+        return;
+    }
 
     NX_VERBOSE(this, "Start verifying the update file %1", m_updateFile);
 
