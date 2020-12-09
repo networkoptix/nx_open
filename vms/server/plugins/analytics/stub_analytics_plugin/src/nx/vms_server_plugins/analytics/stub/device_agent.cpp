@@ -670,6 +670,18 @@ void DeviceAgent::addFixedObjectIfNeeded(Ptr<ObjectMetadataPacket> objectMetadat
     objectMetadata->setTrackId(trackId);
     objectMetadata->setBoundingBox(Rect(0.1F, 0.1F, 0.25F, 0.25F));
 
+    std::string fixedObjectColor;
+    {
+        std::unique_lock<std::mutex> lock(m_deviceAgentSettings.fixedObjectColorMutex);
+        fixedObjectColor = m_deviceAgentSettings.fixedObjectColor;
+    }
+
+    if (fixedObjectColor != kNoSpecialColorSettingValue)
+    {
+        objectMetadata->addAttribute(makePtr<Attribute>(
+            Attribute::Type::string, "nx.sys.color", fixedObjectColor));
+    }
+
     objectMetadataPacket->addItem(objectMetadata.get());
 }
 
@@ -956,6 +968,12 @@ void DeviceAgent::parseSettings()
     m_deviceAgentSettings.generateBicycles = toBool(settingValue(kGenerateBicyclesSetting));
     m_deviceAgentSettings.generateStones = toBool(settingValue(kGenerateStonesSetting));
     m_deviceAgentSettings.generateFixedObject = toBool(settingValue(kGenerateFixedObjectSetting));
+
+    {
+        std::unique_lock<std::mutex> lock(m_deviceAgentSettings.fixedObjectColorMutex);
+        m_deviceAgentSettings.fixedObjectColor = settingValue(kFixedObjectColorSetting);
+    }
+
     m_deviceAgentSettings.generateCounter = toBool(settingValue(kGenerateCounterSetting));
     m_deviceAgentSettings.declareAdditionalEventTypes =
         toBool(settingValue(kDeclareAdditionalEventTypesSetting));

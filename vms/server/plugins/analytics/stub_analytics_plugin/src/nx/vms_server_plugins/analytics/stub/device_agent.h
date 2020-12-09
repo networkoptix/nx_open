@@ -176,6 +176,10 @@ private:
         std::atomic<bool> generateBicycles{true};
         std::atomic<bool> generateStones{false};
         std::atomic<bool> generateFixedObject{false};
+
+        std::mutex fixedObjectColorMutex;
+        std::string fixedObjectColor;
+
         std::atomic<bool> generateCounter{false};
 
         std::atomic<std::chrono::milliseconds> blinkingObjectPeriodMs{

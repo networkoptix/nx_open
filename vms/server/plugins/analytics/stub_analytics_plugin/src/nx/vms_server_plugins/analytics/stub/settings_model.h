@@ -25,6 +25,8 @@ const std::string kGenerateCounterSetting{"generateCounter"};
 const std::string kCounterBoundingBoxSideSizeSetting{"counterBoundingBoxSideSize"};
 const std::string kCounterXOffsetSetting{"counterXOffset"};
 const std::string kCounterYOffsetSetting{"counterYOffset"};
+const std::string kFixedObjectColorSetting{"fixedObjectColor"};
+const std::string kNoSpecialColorSettingValue{"No special color"};
 
 const std::string kDeclareAdditionalEventTypesSetting{"declareAdditionalEventTypesSetting"};
 
@@ -155,6 +157,17 @@ static const std::string kRegularSettingsModelPart1 = /*suppress newline*/ 1 + R
                             "caption": "Generate fixed object",
                             "description": "Generates a fixed object with coordinates (0.25, 0.25, 0.25, 0.25)",
                             "defaultValue": false
+                        },
+                        {
+                            "type": "ComboBox",
+                            "name": ")json" + kFixedObjectColorSetting + R"json(",
+                            "caption": "Fixed object color",
+                            "range": [
+                                ")json" + kNoSpecialColorSettingValue + R"json(",
+                                "Magenta", "Blue", "Green", "Yellow", "Cyan", "Purple", "Orange",
+                                "Red", "White", "#FFFFC0", "!invalid!", "#NONHEX"
+                            ],
+                            "defaultValue": ")json" + kNoSpecialColorSettingValue + R"json("
                         },
                         {
                             "type": "CheckBox",
