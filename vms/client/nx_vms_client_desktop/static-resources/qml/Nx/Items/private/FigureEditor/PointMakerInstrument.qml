@@ -50,14 +50,14 @@ Instrument
                 if (closed)
                 {
                     const p2 = get(0)
-                    if (p1.x === p2.x && p1.y === p2.y)
+                    if (sameCoordinates(p1.x, p2.x) && sameCoordinates(p1.y, p2.y))
                         return true
                 }
 
                 if (count > 1)
                 {
                     const p3 = get(count - 2)
-                    if (p1.x === p3.x && p1.y === p3.y)
+                    if (sameCoordinates(p1.x, p3.x) && sameCoordinates(p1.y, p3.y))
                         return true
                 }
 
@@ -86,7 +86,7 @@ Instrument
 
             const p1 = getPoint(count - 1)
             const p2 = getPoint(index)
-            return p1.x === p2.x && p1.y === p2.y
+            return sameCoordinates(p1.x, p2.x) && sameCoordinates(p1.y, p2.y)
         }
 
         function lastTwoPointsCollapsed()
@@ -255,9 +255,9 @@ Instrument
         index = d.normalizedIndex(index)
 
         const old = pointsModel.get(index)
-        if (old.x !== p.x)
+        if (differentCoordinates(old.x, p.x))
             pointsModel.setProperty(index, "x", p.x)
-        if (old.y !== p.y)
+        if (differentCoordinates(old.y, p.y))
             pointsModel.setProperty(index, "y", p.y)
     }
 
@@ -266,7 +266,7 @@ Instrument
         index = d.normalizedIndex(index)
 
         const old = pointsModel.get(index)
-        if (old.x !== x)
+        if (differentCoordinates(old.x, x))
             pointsModel.setProperty(index, "x", x)
     }
 
@@ -275,7 +275,7 @@ Instrument
         index = d.normalizedIndex(index)
 
         const old = pointsModel.get(index)
-        if (old.y !== y)
+        if (differentCoordinates(old.y, y))
             pointsModel.setProperty(index, "y", y)
     }
 
@@ -311,5 +311,15 @@ Instrument
     {
         pointsModel.clear()
         d.hoveredPointIndex = -1
+    }
+
+    function sameCoordinates(left, right)
+    {
+        return Math.abs(left - right) < 0.000000001
+    }
+
+    function differentCoordinates(left, right)
+    {
+        return !sameCoordinates(left, right)
     }
 }
