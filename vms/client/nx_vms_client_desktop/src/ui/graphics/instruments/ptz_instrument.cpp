@@ -1474,6 +1474,14 @@ void PtzInstrument::at_display_widgetAboutToBeChanged(Qn::ItemRole role)
     if (role != Qn::CentralRole)
         return;
 
+    QnPtzObject ptzObject;
+    if (const auto* mediaWidget = qobject_cast<QnMediaResourceWidget*>(display()->widget(role)))
+        mediaWidget->ptzController()->getActiveObject(&ptzObject);
+
+    const bool ptzStateActive = ptzObject.type != Qn::InvalidPtzObject;
+    if (ptzStateActive)
+        return;
+
     m_externalPtzDirections = {};
 
     menu()->triggerIfPossible(ui::action::PtzContinuousMoveAction, ui::action::Parameters()
