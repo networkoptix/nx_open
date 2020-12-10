@@ -38,7 +38,7 @@
     </div>
 
     <div class="form-group">
-        <label class="col-sm-2 control-label">Requesting URL</label>
+        <label class="col-sm-2 control-label">S'està sol·licitant l'URL</label>
         <div class="col-sm-10">
             <p class="form-control-static">{{getDebugUrl()}}</p>
         </div>
@@ -203,7 +203,7 @@
                         </span>
                 <span class="text">Use credentials</span>
             </label>
-            <p class="help-block">Add login and password to url</p>
+            <p class="help-block">Afegeix l'usuari i la contrasenya a l'URL</p>
         </div>
     </div>
 
@@ -226,7 +226,7 @@
 
 
     <div class="form-group">
-        <label class="col-sm-2 control-label">Requesting URL</label>
+        <label class="col-sm-2 control-label">S'està sol·licitant l'URL</label>
         <div class="col-sm-10">
             <p class="form-control-static">{{getDebugUrl()}}</p>
             <p class="help-block" ng-if="clipboardSupported">
@@ -250,9 +250,9 @@
         <div class="col-sm-offset-2 col-sm-10">
             <button type="submit"
                     ng-if="userAuthenticated && (apiMethod.method !=='POST' || allowProprietary)"
-                    class="btn btn-primary" ng-click="testMethod()">Test method</button>
+                    class="btn btn-primary" ng-click="testMethod()">Mètode de prova</button>
             <a class="btn btn-default" ng-if="apiMethod.method=='GET'"
-               ng-href="{{getDebugUrl()}}" target="_blank">Open in a new tab</a>
+               ng-href="{{getDebugUrl()}}" target="_blank">Obre en un nova pestanya</a>
         </div>
     </div>
 

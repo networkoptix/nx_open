@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>This account is not activated. Please check your email.</source>
-      <translation>Aquest compte no està activat. Comproveu el correu electrònic.</translation>
+      <translation>Aquest compte no està activat. Comproveu l'email.</translation>
     </message>
     <message>
       <source>Credentials are no longer valid.</source>

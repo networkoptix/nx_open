@@ -138,8 +138,8 @@
     </div>
     <p class="vertical-bottom">
         <a ng-if="!settings.liteClient" class="external" ng-href="{{portalUrl}}" title="learn more about {{Config.cloud.productName}}"
-           target="_blank" ng-click="openLink($event)">Help me decide</a>
-        <span ng-if="settings.liteClient">Learn more: {{portalUrl}}</span>
+           target="_blank" ng-click="openLink($event)">Ajuda'm a decidir</a>
+        <span ng-if="settings.liteClient">Més informació: {{portalUrl}}</span>
     </p>
 </div>
 
@@ -196,7 +196,7 @@
         <div class="form-group has-error"
              ng-if="forms.cloudForm.cloudEmail.$touched && forms.cloudForm.cloudEmail.$error.email">
             <div class="help-block">
-                Please, enter a valid email
+                Si us plau, introduïu un email vàlid
             </div>
         </div>
 
@@ -204,7 +204,7 @@
              ng-if="forms.cloudForm.cloudEmail.$touched && forms.cloudForm.cloudEmail.$error.required ||
                     forms.cloudForm.cloudPassword.$touched && forms.cloudForm.cloudPassword.$error.required">
             <div class="help-block">
-                Email and password are required
+                Cal un email i una contrasenya
             </div>
         </div>
 
@@ -216,7 +216,7 @@
 
         <div class="form-group" ng-if="settings.liteClient">
             <p class="help-block">
-                To create an account please visit {{portalUrl}}
+                Per crear un compte, visiteu {{portalUrl}}
             </p>
         </div>
     </form>
@@ -310,7 +310,7 @@
                    uib-typeahead-show-hint="true"
                    uib-typeahead-focus-first="false"
                    uib-typeahead-focus
- placeholder="Existing System URL (https://host:port)"
+ placeholder="URL del sistema existent (https://host:port)"
                    ng-change="clearRemoteError()"
                    required
  class="form-control">

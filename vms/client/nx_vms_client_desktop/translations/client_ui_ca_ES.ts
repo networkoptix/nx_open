@@ -6,22 +6,22 @@
     <message>
       <location filename="../src/ui/dialogs/about_dialog.ui"/>
       <source>About</source>
-      <translation type="unfinished">About</translation>
+      <translation>Quant a…</translation>
     </message>
     <message>
       <location/>
       <source>Information</source>
-      <translation type="unfinished">Information</translation>
+      <translation>Informació</translation>
     </message>
     <message>
       <location/>
       <source>Credits</source>
-      <translation type="unfinished">Credits</translation>
+      <translation>Crèdits</translation>
     </message>
     <message>
       <location/>
       <source>GPU Information</source>
-      <translation type="unfinished">GPU Information</translation>
+      <translation>Informació de la GPU</translation>
     </message>
     <message>
       <location/>
@@ -31,7 +31,7 @@
     <message>
       <location/>
       <source>System Servers</source>
-      <translation type="unfinished">System Servers</translation>
+      <translation>Servidors del sistema</translation>
     </message>
   </context>
   <context>
@@ -39,7 +39,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/accessible_resources_widget.ui"/>
       <source>Filter</source>
-      <translation type="unfinished">Filter</translation>
+      <translation>Filtre</translation>
     </message>
   </context>
   <context>
@@ -52,27 +52,27 @@
     <message>
       <location/>
       <source>Enable image enhancement</source>
-      <translation type="unfinished">Enable image enhancement</translation>
+      <translation>Activa la millora de la imatge</translation>
     </message>
     <message>
       <location/>
       <source>Gamma</source>
-      <translation type="unfinished">Gamma</translation>
+      <translation>Gamma</translation>
     </message>
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Automàtic</translation>
     </message>
     <message>
       <location/>
       <source>Black level</source>
-      <translation type="unfinished">Black level</translation>
+      <translation>Nivell de negres</translation>
     </message>
     <message>
       <location/>
       <source>White level</source>
-      <translation type="unfinished">White level</translation>
+      <translation>Nivell de blancs</translation>
     </message>
   </context>
   <context>
@@ -80,52 +80,52 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/advanced_settings_widget.ui"/>
       <source>Downmix Audio from 5.1 to 2.1</source>
-      <translation type="unfinished">Downmix Audio from 5.1 to 2.1</translation>
+      <translation>Barreja àudio de 5.1 a 2.1</translation>
     </message>
     <message>
       <location/>
       <source>Double Buffering</source>
-      <translation type="unfinished">Double Buffering</translation>
+      <translation>Doble memòria intermèdia</translation>
     </message>
     <message>
       <location/>
       <source>Maximum Live Buffer Length</source>
-      <translation type="unfinished">Maximum Live Buffer Length</translation>
+      <translation>Longitud màxima de la memòria intermèdia en directe</translation>
     </message>
     <message>
       <location/>
       <source>Browse Logs</source>
-      <translation type="unfinished">Browse Logs</translation>
+      <translation>Explora els registres</translation>
     </message>
     <message>
       <location/>
       <source>Clear Local Cache</source>
-      <translation type="unfinished">Clear Local Cache</translation>
+      <translation>Esborra la memòria cau local</translation>
     </message>
     <message>
       <location/>
       <source>Reset All Warnings</source>
-      <translation type="unfinished">Reset All Warnings</translation>
+      <translation>Restableix tots els avisos</translation>
     </message>
     <message>
       <location/>
       <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
-      <translation type="unfinished">Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</translation>
+      <translation>La pantalla Intel HD Graphics pot tenir problemes si el desenfocament està activat. Us recomanem que deixeu l'opció tal com està.</translation>
     </message>
     <message>
       <location/>
       <source>Disable blur</source>
-      <translation type="unfinished">Disable blur</translation>
+      <translation>Desactiva el desenfocament</translation>
     </message>
     <message>
       <location/>
       <source>Limit Frame Rate to save CPU</source>
-      <translation type="unfinished">Limit Frame Rate to save CPU</translation>
+      <translation>Limiteu les imatges per segon per estalviar CPU</translation>
     </message>
     <message>
       <location/>
       <source>Use Hardware Video Decoding</source>
-      <translation type="unfinished">Use Hardware Video Decoding</translation>
+      <translation>Utilitzeu la descodificació de vídeo del maquinari</translation>
     </message>
   </context>
   <context>
@@ -133,22 +133,22 @@
     <message>
       <location filename="../src/ui/widgets/business/aggregation_widget.ui"/>
       <source>Check to set aggregation period</source>
-      <translation type="unfinished">Check to set aggregation period</translation>
+      <translation>Marqueu aquesta opció per definir el període d'agregació</translation>
     </message>
     <message>
       <location/>
       <source>Interval of action :</source>
-      <translation type="unfinished">Interval of action :</translation>
+      <translation>Interval d'acció:</translation>
     </message>
     <message>
       <location/>
       <source>No more than once per</source>
-      <translation type="unfinished">No more than once per</translation>
+      <translation>No més d’una vegada per</translation>
     </message>
     <message>
       <location/>
       <source>Instant</source>
-      <translation type="unfinished">Instant</translation>
+      <translation>Instantani</translation>
     </message>
   </context>
   <context>
@@ -156,17 +156,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/analytics_sdk_event_widget.ui"/>
       <source>Keywords separated by space</source>
-      <translation type="unfinished">Keywords separated by space</translation>
+      <translation>Paraules clau separades per espai</translation>
     </message>
     <message>
       <location/>
       <source>Caption contains:</source>
-      <translation type="unfinished">Caption contains:</translation>
+      <translation>El títol conté:</translation>
     </message>
     <message>
       <location/>
       <source>Description contains:</source>
-      <translation type="unfinished">Description contains:</translation>
+      <translation>La descripció conté:</translation>
     </message>
     <message>
       <location/>
@@ -272,7 +272,7 @@
     <message>
       <location/>
       <source>Email settings</source>
-      <translation type="unfinished">Email settings</translation>
+      <translation>Configuració de l'email</translation>
     </message>
     <message>
       <location/>
@@ -544,12 +544,12 @@
     <message>
       <location filename="../src/ui/widgets/business/buzzer_business_action_widget.ui"/>
       <source>Fixed duration:</source>
-      <translation type="unfinished">Fixed duration:</translation>
+      <translation>Durada fixa:</translation>
     </message>
     <message>
       <location/>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>segons</translation>
     </message>
   </context>
   <context>
@@ -557,12 +557,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/camera_advanced_params_widget.ui"/>
       <source>Category</source>
-      <translation type="unfinished">Category</translation>
+      <translation>Categoria</translation>
     </message>
     <message>
       <location/>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Actualitza</translation>
     </message>
   </context>
   <context>
@@ -570,7 +570,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/dialogs/camera_credentials_dialog.ui"/>
       <source>Authentication credentials</source>
-      <translation type="unfinished">Authentication credentials</translation>
+      <translation>Credencials d'autenticació</translation>
     </message>
   </context>
   <context>
@@ -578,37 +578,37 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_expert_settings_widget.ui"/>
       <source>Do not archive primary stream</source>
-      <translation type="unfinished">Do not archive primary stream</translation>
+      <translation>No arxivis el flux principal</translation>
     </message>
     <message>
       <location/>
       <source>Do not archive secondary stream</source>
-      <translation type="unfinished">Do not archive secondary stream</translation>
+      <translation>No arxivis el flux segundari</translation>
     </message>
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Automàtic</translation>
     </message>
     <message>
       <location/>
       <source>Restore Defaults</source>
-      <translation type="unfinished">Restore Defaults</translation>
+      <translation>Restaura els valors predeterminats</translation>
     </message>
     <message>
       <location/>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation type="unfinished">Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</translation>
+      <translation>No canvieu aquests paràmetres tret que estigueu absolutament segur del seu impacte potencial en el rendiment del sistema.</translation>
     </message>
     <message>
       <location/>
       <source>Camera Settings</source>
-      <translation type="unfinished">Camera Settings</translation>
+      <translation>Configuració de la càmera</translation>
     </message>
     <message>
       <location/>
       <source>Keep camera stream and profile settings</source>
-      <translation type="unfinished">Keep camera stream and profile settings</translation>
+      <translation>Conserva el flux de la càmera i la configuració del perfil</translation>
     </message>
     <message>
       <location/>
@@ -618,22 +618,22 @@
     <message>
       <location/>
       <source>Calculate bitrate per GOP instead of bitrate per second</source>
-      <translation type="unfinished">Calculate bitrate per GOP instead of bitrate per second</translation>
+      <translation>Calcula la taxa de bits per GOP en lloc de la taxa de bits per segon</translation>
     </message>
     <message>
       <location/>
       <source>It will increase bitrate for camera.</source>
-      <translation type="unfinished">It will increase bitrate for camera.</translation>
+      <translation>Augmentarà la taxa de bits de la càmera.</translation>
     </message>
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>Flux secundari</translation>
     </message>
     <message>
       <location/>
       <source>Disable secondary stream</source>
-      <translation type="unfinished">Disable secondary stream</translation>
+      <translation>Desactiva el flux secundari</translation>
     </message>
     <message>
       <location/>
@@ -643,12 +643,12 @@
     <message>
       <location/>
       <source>Archive</source>
-      <translation type="unfinished">Archive</translation>
+      <translation>Arxiu</translation>
     </message>
     <message>
       <location/>
       <source>Media Streaming</source>
-      <translation type="unfinished">Media Streaming</translation>
+      <translation>Transmissió multimèdia</translation>
     </message>
     <message>
       <location/>
@@ -658,57 +658,57 @@
     <message>
       <location/>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>Genera</translation>
     </message>
     <message>
       <location/>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Restableix</translation>
     </message>
     <message>
       <location/>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>ID lògic</translation>
     </message>
     <message>
       <location/>
       <source>Force motion detection for stream</source>
-      <translation type="unfinished">Force motion detection for stream</translation>
+      <translation>Força la detecció de moviment per al flux</translation>
     </message>
     <message>
       <location/>
       <source>RTP transport</source>
-      <translation type="unfinished">RTP transport</translation>
+      <translation>Transport RTP</translation>
     </message>
     <message>
       <location/>
       <source>Custom Media Port</source>
-      <translation type="unfinished">Custom Media Port</translation>
+      <translation>Port multimèdia personalitzat</translation>
     </message>
     <message>
       <location/>
       <source>Trust camera timestamp</source>
-      <translation type="unfinished">Trust camera timestamp</translation>
+      <translation>Confia en la marca horària de la càmera</translation>
     </message>
     <message>
       <location/>
       <source>Preferred PTZ preset type:</source>
-      <translation type="unfinished">Preferred PTZ preset type:</translation>
+      <translation>Tipus de paràmetre predefinit PTZ preferit:</translation>
     </message>
     <message>
       <location/>
       <source>System</source>
-      <translation type="unfinished">System</translation>
+      <translation>Sistema</translation>
     </message>
     <message>
       <location/>
       <source>Native</source>
-      <translation type="unfinished">Native</translation>
+      <translation>Natiu</translation>
     </message>
     <message>
       <location/>
       <source>Native camera presets will not be avaliable.</source>
-      <translation type="unfinished">Native camera presets will not be avaliable.</translation>
+      <translation>Els paràmetres predefinits de la càmera nativa no estaran disponibles.</translation>
     </message>
     <message>
       <location/>
@@ -718,7 +718,7 @@
     <message>
       <location/>
       <source>This camera supports zoom</source>
-      <translation type="unfinished">This camera supports zoom</translation>
+      <translation>Aquesta càmera admet zoom</translation>
     </message>
     <message>
       <location/>
@@ -1212,7 +1212,7 @@
     <message>
       <location/>
       <source>HTTP URL</source>
-      <translation type="unfinished">HTTP URL</translation>
+      <translation>URL HTTP</translation>
     </message>
     <message>
       <location/>
@@ -1720,7 +1720,7 @@
     <message>
       <location/>
       <source>Server URL</source>
-      <translation type="unfinished">Server URL</translation>
+      <translation>URL del servidor</translation>
     </message>
     <message>
       <location/>
@@ -2434,7 +2434,7 @@
     <message>
       <location/>
       <source>Server URL:</source>
-      <translation type="unfinished">Server URL:</translation>
+      <translation>URL del servidor:</translation>
     </message>
     <message>
       <location/>
@@ -2498,7 +2498,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/routing_management_widget.ui"/>
       <source>Add URL</source>
-      <translation type="unfinished">Add URL</translation>
+      <translation>Afegeix l'URL</translation>
     </message>
     <message>
       <location/>
@@ -2892,7 +2892,7 @@
     <message>
       <location/>
       <source>Global Email Settings...</source>
-      <translation type="unfinished">Global Email Settings...</translation>
+      <translation>Configuració global de l'email...</translation>
     </message>
   </context>
   <context>
@@ -3033,7 +3033,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/smtp/smtp_settings_widget.ui"/>
       <source>Outgoing Email Settings</source>
-      <translation type="unfinished">Outgoing Email Settings</translation>
+      <translation>Configuració de l'email de sortida</translation>
     </message>
     <message>
       <location/>
@@ -3211,22 +3211,22 @@
     <message>
       <location filename="../src/ui/dialogs/storage_url_dialog.ui"/>
       <source>Add External Storage...</source>
-      <translation type="unfinished">Add External Storage...</translation>
+      <translation>Afegeix emmagatzematge extern...</translation>
     </message>
     <message>
       <location/>
       <source>Protocol:</source>
-      <translation type="unfinished">Protocol:</translation>
+      <translation>Protocol:</translation>
     </message>
     <message>
       <location/>
       <source>URL:</source>
-      <translation type="unfinished">URL:</translation>
+      <translation>URL:</translation>
     </message>
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Iniciar sessió:</translation>
+      <translation>Usuari:</translation>
     </message>
     <message>
       <location/>

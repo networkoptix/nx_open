@@ -69,7 +69,7 @@
     </message>
     <message>
       <source>The network request was invalid (for example, the URL or scheme is invalid)</source>
-      <translation type="unfinished">The network request was invalid (for example, the URL or scheme is invalid)</translation>
+      <translation>La sol·licitud de xarxa no és vàlida (per exemple, l'URL o l'esquema no són vàlids)</translation>
     </message>
     <message>
       <source>General server failure</source>

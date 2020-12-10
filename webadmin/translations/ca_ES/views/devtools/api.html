@@ -48,7 +48,7 @@
                                     <ul>
                                         <li ng-repeat="function in group.functions | orderBy:'name' | filter: { name: searchFunc }"
                                             ng-if="!function.proprietary || allowProprietary">
-                                            <span class="label label-danger" ng-if="function.proprietary">proprietary</span>
+                                            <span class="label label-danger" ng-if="function.proprietary">propietari</span>
                                             <a ng-click="setActiveFunction(group,function,$event)"
                                                ng-href="#/developers/api{{function.url}}">
                                                 <b ng-if="function.caption"

@@ -104,18 +104,18 @@
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <uib-alert type="warning">This System is not linked to {{Config.cloud.productName}}
+                            <uib-alert type="warning">Aquest sistema no està vinculat a {{Config.cloud.productName}}
                                 <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
-                                   target="_blank">Learn more</a></uib-alert>
+                                   target="_blank">Més informació</a></uib-alert>
                             <uib-alert type="danger" ng-if="!hasInternetOnServer">Connect the server to the Internet to perform setup {{Config.cloud.productName}}</uib-alert>
                             <uib-alert type="danger" ng-if="hasInternetOnServer && !hasInternetOnClient">Internet connection required to connect System to {{Config.cloud.productName}}</uib-alert>
                             <p ng-if="canConnectToCloud"><button
                                     class="btn btn-default"
-                                    ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Connect to {{Config.cloud.productName}}</button>
+                                    ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Connecta a {{Config.cloud.productName}}</button>
                                 <a ng-if="!mode.liteClient"  class="btn btn-default"
                                    ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}"
-                                   target="_blank">Create {{Config.cloud.productName}} Account</a></p>
+                                   target="_blank">Crea un compte de {{Config.cloud.productName}}</a></p>
                         </div>
                     </div>
 
