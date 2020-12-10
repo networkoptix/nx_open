@@ -4079,7 +4079,7 @@ bool MediaServerProcess::setUpMediaServerResource(
     const ec2::AbstractECConnectionPtr& ec2Connection)
 {
     bool foundOwnServerInDb = false;
-    const bool sslAllowed = serverModule->settings().allowSslConnections();
+    const bool sslAllowed = true;
 
     while (m_mediaServer.isNull())
     {
@@ -4171,7 +4171,7 @@ bool MediaServerProcess::setUpMediaServerResource(
 
     nx::vms::api::ModuleInformation selfInformation = commonModule()->moduleInformation();
     selfInformation.version = commonModule()->engineVersion();
-    selfInformation.sslAllowed = serverModule->settings().allowSslConnections();
+    selfInformation.sslAllowed = sslAllowed;
     selfInformation.serverFlags = m_mediaServer->getServerFlags();
     selfInformation.ecDbReadOnly = ec2Connection->connectionInfo().ecDbReadOnly;
 

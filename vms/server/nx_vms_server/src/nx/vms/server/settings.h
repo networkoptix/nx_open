@@ -176,12 +176,6 @@ public:
         0,
         "0 means no limit"
     };
-    Option<bool> allowSslConnections{this, "allowSslConnections", true,
-        "Recommended TCP transport for the Server. Default value is true."
-        "If this parameter is changed to false, other Servers will use HTTP "
-        "instead of HTTPS when opening connections to this Server. "
-        "It allows to save CPU for slow ARM devices."
-    };
     Option<int> mediaStatisticsWindowSize{this, "mediaStatisticsWindowSize", 10,
         "Time period in seconds for media stream statistics."
     };
