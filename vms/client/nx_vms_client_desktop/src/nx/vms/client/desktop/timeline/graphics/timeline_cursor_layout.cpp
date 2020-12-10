@@ -9,8 +9,10 @@
 namespace nx::vms::client::desktop {
 
 namespace {
+
 // Minimal width of big datetime tooltips.
 const qreal kDateTimeTooltipMinimalWidth = 128.0;
+
 } // namespace
 
 TimelineCursorLayout::TimelineCursorLayout():
@@ -36,7 +38,7 @@ TimelineCursorLayout::~TimelineCursorLayout()
 {
 }
 
-void TimelineCursorLayout::setTimeContent(bool isLive, milliseconds pos, bool showDate, bool showHours)
+void TimelineCursorLayout::setTimeContent(bool isLive, milliseconds pos, bool isUtc, bool showHours)
 {
     if (!parentLayoutItem())
         return; // Layout belongs to another universe.
@@ -50,7 +52,7 @@ void TimelineCursorLayout::setTimeContent(bool isLive, milliseconds pos, bool sh
     }
     else
     {
-        if (showDate)
+        if (isUtc)
         {
             QDateTime dateTime = QDateTime::fromMSecsSinceEpoch(pos.count());
             line1 = datetime::toString(dateTime.date(), datetime::Format::dd_MMMM_yyyy);
@@ -58,8 +60,9 @@ void TimelineCursorLayout::setTimeContent(bool isLive, milliseconds pos, bool sh
         }
         else
         {
-            const auto format = showHours ? datetime::Format::hh_mm_ss : datetime::Format::mm_ss;
-            line1 = datetime::toString(pos.count(), format);
+            line1 = datetime::toString(pos.count(), showHours
+                ? datetime::Format::hhh_mm_ss
+                : datetime::Format::mm_ss);
         }
     }
 

@@ -1814,9 +1814,11 @@ void QnTimeSlider::updateToolTipText()
 
     const auto pos = sliderTimePosition();
     bool isUtc = m_options.testFlag(UseUTC);
-    m_positionCursorLayout->setTimeContent(isLive(),
+    m_positionCursorLayout->setTimeContent(
+        isLive(),
         isUtc ? pos + m_localOffset : pos,
-        isUtc,  maximum() >= 1h); //< Longer than 1 hour?
+        isUtc,
+        /*showHours*/ maximum() >= 1h);
 }
 
 void QnTimeSlider::updateLineCommentPixmap(int line)

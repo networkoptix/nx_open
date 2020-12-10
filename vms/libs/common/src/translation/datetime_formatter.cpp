@@ -17,6 +17,32 @@ void removeTimezone(QString& source)
     source.remove(lit(" t"));
 }
 
+QString durationToString(std::chrono::milliseconds value, Format format)
+{
+    const auto hours =
+        std::chrono::duration_cast<std::chrono::hours>(value);
+    const auto minutes =
+        std::chrono::duration_cast<std::chrono::minutes>(value - hours);
+    const auto seconds =
+        std::chrono::duration_cast<std::chrono::seconds>(value - hours - minutes);
+    const auto milliseconds =
+        std::chrono::duration_cast<std::chrono::milliseconds>(value - hours - minutes - seconds);
+
+    QString result = QString::number(hours.count());
+    if (format >= Format::hhh_mm)
+        result += ":" + QString::number(minutes.count()).rightJustified(2, '0');
+    if (format >= Format::hhh_mm_ss)
+        result += ":" + QString::number(seconds.count()).rightJustified(2, '0');
+    if (format >= Format::hhh_mm_ss_zzz)
+        result += ":" + QString::number(milliseconds.count()).rightJustified(3, '0');
+    return result;
+}
+
+bool isDurationFormat(Format format)
+{
+    return Format::duration_formats_begin <= format && format < Format::duration_formats_end;
+}
+
 // These default values are used ONLY in emergency when proper values are not initialized.
 std::map<Format, QString> formatStrings =
 {
@@ -92,24 +118,33 @@ void checkInited()
 
 QString toString(const QDateTime& time, Format format)
 {
+    NX_ASSERT(!isDurationFormat(format), "Inappropriate time format.");
+
     checkInited();
     return time.toString(formatStrings[format]);
 }
 
 QString toString(const QTime& time, Format format)
 {
+    NX_ASSERT(!isDurationFormat(format), "Inappropriate time format.");
+
     checkInited();
     return time.toString(formatStrings[format]);
 }
 
 QString toString(const QDate& date, Format format)
 {
+    NX_ASSERT(!isDurationFormat(format), "Inappropriate time format.");
+
     checkInited();
     return date.toString(formatStrings[format]);
 }
 
 QString toString(qint64 msSinceEpoch, Format format)
 {
+    if (isDurationFormat(format))
+        return durationToString(std::chrono::milliseconds(msSinceEpoch), format);
+
     checkInited();
     return QDateTime::fromMSecsSinceEpoch(msSinceEpoch).toString(formatStrings[format]);
 }
