@@ -52,7 +52,10 @@ EventMetadata* createCommonEvent(const EventType& eventType, bool active)
 {
     auto eventMetadata = new EventMetadata();
     eventMetadata->setTypeId(eventType.id.toStdString());
-    eventMetadata->setDescription(eventType.name.toStdString());
+    std::string description = eventType.name.toStdString();
+    if (eventType.flags.testFlag(nx::vms::api::analytics::EventTypeFlag::stateDependent))
+        description += (active ? " started" : " stopped");
+    eventMetadata->setDescription(description);
     eventMetadata->setIsActive(active);
     eventMetadata->setConfidence(1.0);
     return eventMetadata;
