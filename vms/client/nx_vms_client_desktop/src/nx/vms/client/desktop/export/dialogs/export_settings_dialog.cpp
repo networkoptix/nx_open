@@ -607,6 +607,11 @@ void ExportSettingsDialog::setMediaParams(
 
     Filename baseFileName = currentSettings.fileName;
     QString namePart = resource->getName();
+
+    static constexpr int kMaxNamePartLength = 200;
+    if (namePart.length() > kMaxNamePartLength)
+        namePart = namePart.leftRef(kMaxNamePartLength) + '~';
+
     baseFileName.name = nx::utils::replaceNonFileNameCharacters(namePart + L'_' + timePart, L'_');
 
     const auto camera = resource.dynamicCast<QnVirtualCameraResource>();
