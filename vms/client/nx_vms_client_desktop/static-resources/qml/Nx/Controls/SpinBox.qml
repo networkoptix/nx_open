@@ -39,8 +39,13 @@ SpinBox
         fontMetrics.advanceWidth(textFromValue(from, locale)),
         fontMetrics.advanceWidth(textFromValue(to, locale)))
 
+    property bool _internalUpdate: false
+
     onValueChanged:
-        textInput.updateText()
+    {
+        if (!_internalUpdate)
+            textInput.updateText()
+    }
 
     contentItem: TextInput
     {
@@ -59,15 +64,18 @@ SpinBox
 
         onTextEdited:
         {
-            var newValue = control.valueFromText(text, control.locale)
-            control.value = newValue
+            const newValue = text ? control.valueFromText(text, control.locale) : 0
 
-            if (newValue != control.value)
-                updateText()
+            _internalUpdate = true
+            control.value = newValue
+            _internalUpdate = false
         }
 
-        onEditingFinished:
-            text = textFromValue(control.value, control.locale)
+        onActiveFocusChanged:
+        {
+            if (!activeFocus)
+                text = textFromValue(control.value, control.locale)
+        }
 
         function updateText()
         {
