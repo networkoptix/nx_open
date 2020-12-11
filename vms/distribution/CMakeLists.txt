@@ -54,6 +54,12 @@ endfunction()
 get_distributable_plugins_list(server_plugins_list nx_server_plugins_list)
 get_distributable_plugins_list(server_plugins_optional_list nx_server_plugins_optional_list)
 
+# Append external plugins to the server plugins list  (dw analytics plugin is the only one for
+# now).
+if(include_dw_edge_analytics_plugin AND LINUX AND arch STREQUAL "x64")
+    string(APPEND server_plugins_list " dw_edge_analytics_plugin")
+endif()
+
 if(WINDOWS)
     add_subdirectory(wix)
 elseif(LINUX AND (
