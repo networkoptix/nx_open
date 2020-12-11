@@ -1560,27 +1560,27 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/info_overlay_settings_widget.ui"/>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>情報</translation>
     </message>
     <message>
       <location/>
       <source>Camera name</source>
-      <translation type="unfinished">Camera name</translation>
+      <translation>カメラ名</translation>
     </message>
     <message>
       <location/>
       <source>Export date</source>
-      <translation type="unfinished">Export date</translation>
+      <translation>エクスポート日</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>文字サイズ</translation>
     </message>
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>削除</translation>
     </message>
   </context>
   <context>

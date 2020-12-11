@@ -1,6 +1,6 @@
 <form class="form" role="form" novalidate name="form" id="mergeDialog">
     <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <button type="button" class="close" data-dismiss="modal" ng-click="cancel()"><span aria-hidden="true">&times;</span><span class="sr-only">Tanca</span></button>
         <h3 class="modal-title">Fusionar sistemes</h3>
     </div>
 
@@ -30,7 +30,7 @@
 
 
             <div class="form-group">
-                <label for="otherSystemLogin" class="control-label">Other System Login</label>
+                <label for="otherSystemLogin" class="control-label">Un altre usuari del sistema</label>
                 <div class="">
                     <input ng-model="settings.login" name="otherSystemLogin" id="otherSystemLogin" class="form-control" type="text"
                            placeholder="Iniciar sessió" required>
@@ -38,7 +38,7 @@
             </div>
 
             <div class="form-group">
-                <label for="otherSystemPassword" class="control-label">Other System Password</label>
+                <label for="otherSystemPassword" class="control-label">Una altra contrasenya del sistema</label>
                 <div class="">
                     <input type="password" ng-model="settings.password"  class="form-control" id="otherSystemPassword"
                            autocomplete="new-password"
@@ -48,23 +48,23 @@
         </ng-form>
 
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
-            <label for="currentSystemPassword" class="control-label">Current Password (for this System)</label>
+            <label for="currentSystemPassword" class="control-label">Contrasenya actual (per a aquest sistema)</label>
             <div class="">
                 <input type="password" ng-model="settings.currentPassword"  class="form-control" id="currentSystemPassword" placeholder="Contrasenya" required />
             </div>
         </div>
 
         <div class="form-group" ng-class="{hidden:!systems.systemFound}">
-            <p>The current System is about to be merged <b>{{systems.systemName}}</b> with System <b>{{systems.joinSystemName}}</b></p>
+            <p>El sistema actual <b>{{systems.systemName}}</b> està a punt de combinar-se amb el sistema <b>{{systems.joinSystemName}}</b></p>
             <p>
-                The new System will have password and name from the following System:<br/>
-                <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/> {{systems.systemName}} (current)</label> <br/>
+                El nou sistema tindrà la contrasenya i el nom del sistema següent:<br/>
+                <label><input type="radio" name="keepMySystem" ng-value="true" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-current-system"/> {{systems.systemName}} (actual)</label> <br/>
                 <label ng-if="!systems.remoteSystemIsNew"><input type="radio" name="keepMySystem" ng-value="false" ng-disabled="systems.remoteSystemIsNew" ng-model="settings.keepMySystem" id="checkbox-external-system"/> {{systems.joinSystemName}}</label>
             </p>
         </div>
     </div>
     <div class="modal-footer" >
-        <button class="btn btn-default" ng-class="{'btn-primary':!systems.systemFound}" name="button" ng-click="test()" ng-disabled="findSystemForm.$invalid">Find System</button>
-        <button class="btn btn-primary " ng-class="{hidden:!systems.systemFound}" id="merge-systems-button" name="button" ng-click="join()" ng-disabled="form.$invalid">Merge with {{systems.joinSystemName}}</button>
+        <button class="btn btn-default" ng-class="{'btn-primary':!systems.systemFound}" name="button" ng-click="test()" ng-disabled="findSystemForm.$invalid">Cerca el sistema</button>
+        <button class="btn btn-primary " ng-class="{hidden:!systems.systemFound}" id="merge-systems-button" name="button" ng-click="join()" ng-disabled="form.$invalid">Combina amb {{systems.joinSystemName}}</button>
     </div>
 </form>

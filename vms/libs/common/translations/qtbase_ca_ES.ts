@@ -523,7 +523,7 @@ Premeu ESC per cancel·lar</translation>
     </message>
     <message>
       <source>Show &amp;hidden files</source>
-      <translation>Mostra els fitxers &amp;ocults</translation>
+      <translation>Mostra els arxius &amp;ocults</translation>
     </message>
     <message>
       <source>&amp;New Folder</source>

@@ -5038,19 +5038,19 @@ to %1</source>
     <name>QnScreenshotLoader</name>
     <message>
       <source>Top left corner</source>
-      <translation type="unfinished">Top left corner</translation>
+      <translation>左上</translation>
     </message>
     <message>
       <source>Top right corner</source>
-      <translation type="unfinished">Top right corner</translation>
+      <translation>左上</translation>
     </message>
     <message>
       <source>Bottom left corner</source>
-      <translation type="unfinished">Bottom left corner</translation>
+      <translation>左下</translation>
     </message>
     <message>
       <source>Bottom right corner</source>
-      <translation type="unfinished">Bottom right corner</translation>
+      <translation>右下</translation>
     </message>
   </context>
   <context>
@@ -6812,15 +6812,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No timestamp</source>
-      <translation type="unfinished">No timestamp</translation>
+      <translation>タイムスタンプなし</translation>
     </message>
     <message>
       <source>No camera name</source>
-      <translation type="unfinished">No camera name</translation>
+      <translation>カメラ名なし</translation>
     </message>
     <message>
       <source>Camera name:</source>
-      <translation type="unfinished">Camera name:</translation>
+      <translation>カメラ名:</translation>
     </message>
   </context>
   <context>
@@ -8288,15 +8288,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Add Info</source>
-      <translation type="unfinished">Add Info</translation>
+      <translation>情報を追加</translation>
     </message>
     <message>
       <source>Delete Info</source>
-      <translation type="unfinished">Delete Info</translation>
+      <translation>情報を削除</translation>
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>情報</translation>
     </message>
   </context>
   <context>

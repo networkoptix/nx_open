@@ -1,51 +1,51 @@
 <div class="container">
     <ng-include src="Config.viewsDir + 'devtools/feedback.html'"></ng-include>
     <div ng-if="developersFeedbackForm">
-        <h2>Developer Tools</h2>
+        <h2>Eines per a desenvolupadors</h2>
         <p>
-            Have an idea on how to improve our developer tools or just want to start a conversation?
-            Want to ask a question, or find more information about integrating?
+            Teniu una idea per millorar les nostres eines per a desenvolupadors o simplement voleu iniciar una conversa?
+            Voleu fer una pregunta o trobar més informació sobre la integració?
         </p>
-        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Developer forum</a></p>
-        <p ng-if="developersKnowledgeBase"><a ng-href="{{developersKnowledgeBase}}" target="_blank">Development knowledge base</a></p>
+        <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Fòrum de desenvolupadors</a></p>
+        <p ng-if="developersKnowledgeBase"><a ng-href="{{developersKnowledgeBase}}" target="_blank">Base de coneixement per al desenvolupament</a></p>
     </div>
 
     <div>
-        <h3>Generic Events Generator</h3>
+        <h3>Generador d'esdeveniments genèrics</h3>
         <p>
-            A Generic Event is a method of sending events from 3rd party systems to a System
-            which can be used to trigger System actions in the Events & Rules engine.
-            The Generic Event Generator is a tool which helps developers and integrators build
-            and test HTTP Generic Event calls.
+            Un esdeveniment genèric és un mètode per enviar esdeveniments de sistemes de tercers a un sistema
+            que es pot utilitzar per activar accions del sistema al motor d'esdeveniments i regles.
+            El generador d'esdeveniments genèrics és una eina que ajuda els desenvolupadors i els integradors a crear
+            i provar les crides d'esdeveniments genèrics HTTP.
         </p>
-        <p><a href="#/developers/events">Generic Events Generator</a></p>
+        <p><a href="#/developers/events">Generador d'esdeveniments genèrics</a></p>
     </div>
     <div>
-        <h3>Server API</h3>
+        <h3>API del servidor</h3>
         <p>
-            A REST API that gives developers the ability to access almost every system feature available in the regular
-            client: query/manage system resources (servers, cameras, users, permissions), pull live or recorded video
-            out of System, generate events, create rules, control PTZ cameras, and more.
+            Una API REST que ofereix als desenvolupadors la possibilitat d'accedir a gairebé totes les funcions del sistema disponibles al client
+            normal: consulta/gestió dels recursos del sistema (servidors, càmeres, usuaris, permisos), extracció de vídeo en directe o enregistrat
+            del sistema, generació d'esdeveniments, creació de regles, control de càmeres PTZ i molt més.
         </p>
         <p>
-            <a href="#/developers/api"><b>API Testing Tool (new)</b></a>
-            - interactive documentation and tools for testing API calls<br>
-            <a href="#/developers/changelog">API Changelog</a>
-            - a list of breaking changes in API since the last release<br>
-            <a id="api-doc" href="api.xml" target="_blank">API Documentation</a>
-            - a full list of available Server API calls<br>
+            <a href="#/developers/api"><b>Eina de prova d'API (novetat)</b></a>
+            - documentació interactiva i eines per provar les crides API<br>
+            <a href="#/developers/changelog">registre de canvis de l'API </a>
+            - una llista de canvis recents a l'API des de l'última versió<br>
+            <a id="api-doc" href="api.xml" target="_blank">documentació de l'API</a>
+            - una llista completa de les crides API disponibles al servidor<br>
         </p>
 
     </div>
     <div>
-        <h3>Camera Details Panel</h3>
+        <h3>Tauler de detalls de la càmera</h3>
         <p>
-            Displays additional developer-friendly information for individual cameras in the Web Admin Interface’s View tab:
+            Mostra informació addicional per a desenvolupadors sobre les càmeres individuals a la pestanya Visualització de la interfície d'administració web:
         </p>
         <ul>
-            <li>Camera ID</li>
-            <li>Links for all available video-streams</li>
-            <li>Direct export video from browser</li>
+            <li>ID de la càmera</li>
+            <li>Enllaços per a tots els fluxos de vídeo disponibles</li>
+            <li>Exportació directa de vídeo des del navegador</li>
         </ul>
         <p>
             To open the Camera Details Panel - navigate to the Web Admin interface, choose <a href="#/view">View</a>,

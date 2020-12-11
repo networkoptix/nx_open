@@ -182,7 +182,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Browse Local Files</source>
-      <translation>Explora fitxers locals</translation>
+      <translation>Explora els arxius locals</translation>
     </message>
     <message>
       <source>Show Welcome Screen</source>
@@ -541,7 +541,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Check File Watermark</source>
-      <translation>Comprovar la marca d'aigua del fitxer</translation>
+      <translation>Comprova la marca d'aigua de l'arxiu</translation>
     </message>
     <message>
       <source>Image Enhancement...</source>
@@ -677,7 +677,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>File Settings...</source>
-      <translation>Configuració del fitxer...</translation>
+      <translation>Configuració de l'arxiu...</translation>
     </message>
     <message>
       <source>Layout Settings...</source>
@@ -857,7 +857,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation>Carregar un fitxer...</translation>
+      <translation>Carrega un arxiu...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
@@ -953,7 +953,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Files...</source>
-      <translation>Fitxers...</translation>
+      <translation>Arxius...</translation>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
@@ -1055,7 +1055,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>The file %1 is encrypted. Please enter the password:</source>
-      <translation>El fitxer %1 està xifrat. Si us plau, introduïu la contrasenya:</translation>
+      <translation>L'arxiu %1 està xifrat. Introduïu la contrasenya:</translation>
     </message>
     <message>
       <source>Please re-enter password for layout %1:</source>
@@ -1146,15 +1146,15 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>%1 Media File</source>
-      <translation>%1 Fitxer multimèdia</translation>
+      <translation>%1 arxiu multimèdia</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x64)</source>
-      <translation>Fitxer multimèdia %1 executable (x64)</translation>
+      <translation>Arxiu multimèdia executable %1 (x64)</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x86)</source>
-      <translation>Fitxer multimèdia %1 executable (x86)</translation>
+      <translation>Arxiu multimèdia executable %1 (x86)</translation>
     </message>
   </context>
   <context>
@@ -1286,11 +1286,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Invalid activation key file</source>
-      <translation>El fitxer de clau d’activació no és vàlid</translation>
+      <translation>L'arxiu de clau d'activació no és vàlid</translation>
     </message>
     <message>
       <source>Select a valid activation key file to continue.</source>
-      <translation>Seleccioneu un fitxer de clau d’activació vàlid per continuar.</translation>
+      <translation>Seleccioneu un arxiu de clau d'activació vàlid per continuar.</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1</source>
@@ -1642,11 +1642,11 @@ per veure més marcadors</translation>
     <name>QObject</name>
     <message>
       <source>Executable %1 Media File (x64) (*.exe)</source>
-      <translation>Fitxer multimèdia executable %1 (x64) (*.exe)</translation>
+      <translation>Arxiu multimèdia executable %1 (x64) (*.exe)</translation>
     </message>
     <message>
       <source>Executable %1 Media File (x86) (*.exe)</source>
-      <translation>Fitxer multimèdia %1 executable (x86) (*.exe)</translation>
+      <translation>Arxiu multimèdia executable %1 (x86) (*.exe)</translation>
     </message>
   </context>
   <context>
@@ -1791,7 +1791,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Exportar la selecció al fitxer...</translation>
+      <translation>Exporta la selecció a l'arxiu...</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -1799,7 +1799,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Export selected records to a file</source>
-      <translation>Exportar els registres seleccionats a un fitxer</translation>
+      <translation>Exporta els registres seleccionats a un arxiu</translation>
     </message>
     <message>
       <source>Devices</source>
@@ -2579,7 +2579,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Exportar la selecció al fitxer...</translation>
+      <translation>Exporta la selecció a l'arxiu...</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -3318,7 +3318,7 @@ a %1</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Exportar la selecció al fitxer...</translation>
+      <translation>Exporta la selecció a l'arxiu...</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -4780,7 +4780,7 @@ a %1</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation>Millor</translation>
+      <translation>Òptima</translation>
     </message>
     <message>
       <source>Average</source>
@@ -5652,7 +5652,7 @@ a %1</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
-      <translation>Exportar la selecció al fitxer...</translation>
+      <translation>Exporta la selecció a l'arxiu...</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
@@ -7412,7 +7412,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>Best</source>
-      <translation>Millor</translation>
+      <translation>Òptima</translation>
     </message>
     <message>
       <source>Preset</source>
@@ -7445,7 +7445,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>Millor</translation>
+      <translation>Òptima</translation>
     </message>
     <message>
       <source>Ps</source>
@@ -8533,7 +8533,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation>Seleccionar la carpeta a penjar</translation>
+      <translation>Seleccioneu la carpeta que voleu penjar</translation>
     </message>
   </context>
   <context>
@@ -8779,7 +8779,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>Select Update File...</source>
-      <translation>Selecciona l'arxiu d'actualització...</translation>
+      <translation>Seleccioneu l'arxiu d'actualització...</translation>
     </message>
     <message>
       <source>Update Files</source>
@@ -9349,7 +9349,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <name>nx::vms::client::desktop::ScheduleSettingsWidget</name>
     <message>
       <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
-      <translation>La configuració de qualitat només determina la velocitat de compressió i no afecta la resolució. Baixa, Mitjana, Alta i Millor són valors de taxa de bits predefinits.</translation>
+      <translation>La configuració de qualitat només determina la velocitat de compressió i no afecta la resolució. Baixa, Mitjana, Alta i Òptima són valors de taxa de bits predefinits.</translation>
     </message>
     <message>
       <source>Mbit/s</source>
@@ -9757,14 +9757,14 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <message>
       <source>Uploading %1...</source>
       <comment>Filename will be substituted</comment>
-      <translation type="unfinished">Uploading %1...</translation>
+      <translation>Penjant %1...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::WearableWorker</name>
     <message>
       <source>Failed to send request to the server.</source>
-      <translation type="unfinished">Failed to send request to the server.</translation>
+      <translation>No s'ha pogut enviar la sol·licitud al servidor.</translation>
     </message>
   </context>
   <context>
@@ -10034,33 +10034,33 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>Reason for deactivation</source>
-      <translation type="unfinished">Reason for deactivation</translation>
+      <translation>Motiu de la desactivació</translation>
     </message>
     <message>
       <source>- Choose one -</source>
-      <translation type="unfinished">- Choose one -</translation>
+      <translation>- Trieu-ne un -</translation>
     </message>
     <message>
       <source>I am upgrading my machine</source>
-      <translation type="unfinished">I am upgrading my machine</translation>
+      <translation>Estic actualitzant la meva màquina</translation>
     </message>
     <message>
       <source>I accidentally assigned the license to a wrong machine</source>
-      <translation type="unfinished">I accidentally assigned the license to a wrong machine</translation>
+      <translation>Accidentalment he assignat la llicència a una màquina incorrecta</translation>
     </message>
     <message>
       <source>Other Reason</source>
-      <translation type="unfinished">Other Reason</translation>
+      <translation>Un altre motiu</translation>
     </message>
     <message>
       <source>Please complete the following for license deactivation</source>
-      <translation type="unfinished">Please complete the following for license deactivation</translation>
+      <translation>Empleneu la informació següent per a la desactivació de la llicència</translation>
     </message>
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
-      <translation type="unfinished">
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
-        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
+      <translation>
+        <numerusform>Tingueu en compte que cada clau de llicència es pot desactivar un màxim de %n vegades.</numerusform>
+        <numerusform>Tingueu en compte que cada clau de llicència es pot desactivar un màxim de %n vegades.</numerusform>
       </translation>
     </message>
   </context>
@@ -10068,9 +10068,9 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <name>nx::vms::client::desktop::ui::subject_selection_dialog_private::RoleListDelegate</name>
     <message numerus="yes">
       <source>%n Users</source>
-      <translation type="unfinished">
-        <numerusform>%n Users</numerusform>
-        <numerusform>%n Users</numerusform>
+      <translation>
+        <numerusform>%n usuaris</numerusform>
+        <numerusform>%n usuaris</numerusform>
       </translation>
     </message>
   </context>
@@ -10078,108 +10078,108 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <name>nx::vms::client::desktop::ui::workbench::ActionHandler</name>
     <message>
       <source>Layout is full</source>
-      <translation type="unfinished">Layout is full</translation>
+      <translation>El disseny està ple</translation>
     </message>
     <message>
       <source>Failed to change password</source>
-      <translation type="unfinished">Failed to change password</translation>
+      <translation>No s'ha pogut canviar la contrasenya</translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to move %n devices</numerusform>
-        <numerusform>Failed to move %n devices</numerusform>
+      <translation>
+        <numerusform>No s'ha pogut moure %n dispositius</numerusform>
+        <numerusform>No s'han pogut moure %n dispositius</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Failed to move %n cameras</numerusform>
-        <numerusform>Failed to move %n cameras</numerusform>
+      <translation>
+        <numerusform>No s'ha pogut moure %n càmeres</numerusform>
+        <numerusform>No s'ha pogut moure %n càmeres</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n I/O Modules</source>
-      <translation type="unfinished">
-        <numerusform>Failed to move %n I/O Modules</numerusform>
-        <numerusform>Failed to move %n I/O Modules</numerusform>
+      <translation>
+        <numerusform>No s'ha pogut moure %n mòduls I/O</numerusform>
+        <numerusform>No s'ha pogut moure %n mòduls I/O</numerusform>
       </translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; is not responding.</source>
-      <translation type="unfinished">Server &quot;%1&quot; is not responding.</translation>
+      <translation>El servidor &quot;%1&quot; no respon.</translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n devices. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>El servidor &quot;%1&quot; no pot accedir a %n dispositius. Voleu moure'ls igualment?</numerusform>
+        <numerusform>El servidor &quot;%1&quot; no pot accedir a %n dispositius. Voleu moure'ls igualment?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n cameras. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>El servidor &quot;%1&quot; no pot accedir a %n càmeres. Voleu moure-les igualment?</numerusform>
+        <numerusform>El servidor &quot;%1&quot; no pot accedir a %n càmeres. Voleu moure-les igualment?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
-      <translation type="unfinished">
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
-        <numerusform>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</numerusform>
+      <translation>
+        <numerusform>El servidor &quot;%1&quot; no pot accedir a %n mòduls I/O. Voleu moure'ls igualment?</numerusform>
+        <numerusform>El servidor &quot;%1&quot; no pot accedir a %n mòduls I/O. Voleu moure'ls igualment?</numerusform>
       </translation>
     </message>
     <message>
       <source>Move</source>
-      <translation type="unfinished">Move</translation>
+      <translation>Mou</translation>
     </message>
     <message>
       <source>Virtual Cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual Cameras cannot be moved between servers</translation>
+      <translation>Les càmeres virtuals no es poden moure entre servidors</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
-      <translation type="unfinished">Layout is locked and cannot be changed</translation>
+      <translation>El disseny està bloquejat i no es pot canviar</translation>
     </message>
     <message>
       <source>Open File</source>
-      <translation type="unfinished">Open File</translation>
+      <translation>Obrir l'arxiu</translation>
     </message>
     <message>
       <source>All Supported</source>
-      <translation type="unfinished">All Supported</translation>
+      <translation>Tot compatible</translation>
     </message>
     <message>
       <source>Select folder...</source>
-      <translation type="unfinished">Select folder...</translation>
+      <translation>Seleccioneu la carpeta...</translation>
     </message>
     <message>
       <source>Too short period selected</source>
-      <translation type="unfinished">Too short period selected</translation>
+      <translation>S'ha seleccionat un període massa curt</translation>
     </message>
     <message>
       <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
-      <translation type="unfinished">Cannot perform Preview Search. Please select a period of 15 seconds or longer.</translation>
+      <translation>No es pot realitzar la cerca de vista prèvia. Seleccioneu un període de 15 segons o més.</translation>
     </message>
     <message>
       <source>Preview Search for %1</source>
-      <translation type="unfinished">Preview Search for %1</translation>
+      <translation>Cerca de vista prèvia per a %1</translation>
     </message>
     <message>
       <source>Confirm files deleting</source>
-      <translation type="unfinished">Confirm files deleting</translation>
+      <translation>Confirmeu la supressió d'arxius</translation>
     </message>
     <message numerus="yes">
       <source>Are you sure you want to permanently delete these %n files?</source>
-      <translation type="unfinished">
-        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
-        <numerusform>Are you sure you want to permanently delete these %n files?</numerusform>
+      <translation>
+        <numerusform>Esteu segur que voleu esborrar aquests %n arxius definitivament?</numerusform>
+        <numerusform>Esteu segur que voleu esborrar aquests %n arxius definitivament?</numerusform>
       </translation>
     </message>
     <message>
       <source>There is another user with the same name</source>
-      <translation type="unfinished">There is another user with the same name</translation>
+      <translation>Hi ha un altre usuari amb el mateix nom</translation>
     </message>
     <message>
       <source>Rename</source>
@@ -10187,83 +10187,83 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>Enter new name for the selected item:</source>
-      <translation type="unfinished">Enter new name for the selected item:</translation>
+      <translation>Introduïu un nom nou per a l'element seleccionat:</translation>
     </message>
     <message>
       <source>Updating Background...</source>
-      <translation type="unfinished">Updating Background...</translation>
+      <translation>S'està actualitzant el fons...</translation>
     </message>
     <message>
       <source>Image processing may take a few moments. Please be patient.</source>
-      <translation type="unfinished">Image processing may take a few moments. Please be patient.</translation>
+      <translation>El processament d'imatges pot trigar una estona. Sigueu pacient.</translation>
     </message>
     <message>
       <source>Image too big</source>
-      <translation type="unfinished">Image too big</translation>
+      <translation>La imatge és massa gran</translation>
     </message>
     <message>
       <source>Maximum size is %1 MB.</source>
-      <translation type="unfinished">Maximum size is %1 MB.</translation>
+      <translation>La mida màxima és de %1 MB.</translation>
     </message>
     <message>
       <source>Failed to upload image</source>
-      <translation type="unfinished">Failed to upload image</translation>
+      <translation>No s'ha pogut carregar la imatge</translation>
     </message>
     <message>
       <source>Components of System have different versions:</source>
-      <translation type="unfinished">Components of System have different versions:</translation>
+      <translation>Els components del sistema tenen versions diferents:</translation>
     </message>
     <message>
       <source>Please update all components to the version %1</source>
-      <translation type="unfinished">Please update all components to the version %1</translation>
+      <translation>Actualitzeu tots els components a la versió %1</translation>
     </message>
     <message>
       <source>Update...</source>
-      <translation type="unfinished">Update...</translation>
+      <translation>Actualitza...</translation>
     </message>
     <message>
       <source>Skip</source>
-      <translation type="unfinished">Skip</translation>
+      <translation>Omet</translation>
     </message>
     <message>
       <source>Beta version %1</source>
-      <translation type="unfinished">Beta version %1</translation>
+      <translation>Versió beta %1</translation>
     </message>
     <message>
       <source>Please upgrade to a next available patch or release version once available.</source>
-      <translation type="unfinished">Please upgrade to a next available patch or release version once available.</translation>
+      <translation>Actualitzeu a un pedaç o una versió posterior quan estigui disponible.</translation>
     </message>
     <message>
       <source>System sends anonymous usage statistics</source>
-      <translation type="unfinished">System sends anonymous usage statistics</translation>
+      <translation>El sistema envia estadístiques d'ús anònimes</translation>
     </message>
     <message>
       <source>It will be used by software development team to improve your user experience.</source>
-      <translation type="unfinished">It will be used by software development team to improve your user experience.</translation>
+      <translation>L'equip de desenvolupament de programari ho utilitzarà per millorar l'experiència d'usuari.</translation>
     </message>
     <message>
       <source>To disable it, go to System Administration dialog.</source>
-      <translation type="unfinished">To disable it, go to System Administration dialog.</translation>
+      <translation>Per desactivar aquesta opció, accediu al quadre de diàleg Administració del sistema.</translation>
     </message>
     <message>
       <source>Failed to open server web page</source>
-      <translation type="unfinished">Failed to open server web page</translation>
+      <translation>No s'ha pogut obrir la pàgina web del servidor</translation>
     </message>
     <message numerus="yes">
       <source>Failed to change password on %n cameras of %1</source>
       <comment>Total number of cameras will be substituted as %1</comment>
-      <translation type="unfinished">
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
-        <numerusform>Failed to change password on %n cameras of %1</numerusform>
+      <translation>
+        <numerusform>No s'ha pogut canviar la contrasenya a %n càmeres de %1</numerusform>
+        <numerusform>No s'ha pogut canviar la contrasenya a %n càmeres de %1</numerusform>
       </translation>
     </message>
     <message>
       <source>This build is for testing purposes only.</source>
-      <translation type="unfinished">This build is for testing purposes only.</translation>
+      <translation>Aquesta compilació és només per a proves.</translation>
     </message>
     <message>
       <source>Open Server Settings</source>
-      <translation type="unfinished">Open Server Settings</translation>
+      <translation>Obre la configuració del servidor</translation>
     </message>
     <message>
       <source>OK</source>
@@ -10271,11 +10271,11 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
-      <translation type="unfinished">Confirm storage location for the analytics data on &quot;%1&quot;</translation>
+      <translation>Confirmeu la ubicació d'emmagatzematge per a les dades d'anàlisi a &quot;%1&quot;</translation>
     </message>
     <message>
       <source>the largest available partition</source>
-      <translation type="unfinished">the largest available partition</translation>
+      <translation>la partició més gran disponible</translation>
     </message>
     <message>
       <source>The analytics database should only be stored on a local drive and can take up large amounts of space.

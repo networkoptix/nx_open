@@ -279,7 +279,7 @@
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation type="unfinished">Select folder to upload</translation>
+      <translation>Seleccioneu la carpeta que voleu penjar</translation>
     </message>
   </context>
   <context>

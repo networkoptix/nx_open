@@ -11,7 +11,7 @@
                     aria-expanded="false"
                     ng-click="nav.show = !nav.show">
 
-                <span class="sr-only">Toggle navigation</span>
+                <span class="sr-only">Canvia la navegació</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
@@ -24,26 +24,26 @@
                        ng-click="nav.show = !nav.show" ng-href="#/settings/">Configuració</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/view')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse"
-                       ng-click="nav.show = !nav.show" ng-href="#/view/">View</a></li>
+                       ng-click="nav.show = !nav.show" ng-href="#/view/">Mostra</a></li>
                 <li ng-hide="!settings.liteClient" ng-class="{active:isActive('/client')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse"
                        ng-click="nav.show = !nav.show" ng-href="#/client/">Lite Client</a></li>
                 <li ng-hide="!user.hasAllResources" ng-class="{active:isActive('/info')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse"
-                       ng-click="nav.show = !nav.show" ng-href="#/info/">Monitoring</a></li>
+                       ng-click="nav.show = !nav.show" ng-href="#/info/">Monitoratge</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/developers')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse"
-                       ng-click="nav.show = !nav.show" ng-href="#/developers/">For Developers</a></li>
+                       ng-click="nav.show = !nav.show" ng-href="#/developers/">Per a desenvolupadors</a></li>
                 <li ng-if="user.isOwner || user.isAdmin" ng-class="{active:isActive('/health')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse"
-                       ng-click="nav.show = !nav.show" ng-href="#/health/">Information</a></li>
+                       ng-click="nav.show = !nav.show" ng-href="#/health/">Informació</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/help')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse"
                        ng-click="nav.show = !nav.show" ng-href="#/help/">Ajuda</a></li>
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                <li ng-if="user" ng-hide="settings.liteClient"><a ng-click="logout()" title="Logout">Tancar la sessió</a></li>
+                <li ng-if="user" ng-hide="settings.liteClient"><a ng-click="logout()" title="Tanca la sessió">Tancar la sessió</a></li>
                 <li language-select uib-dropdown></li>
             </ul>
         </nav>
@@ -54,25 +54,25 @@
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/settings/">Configuració</a>
                 </li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/view')}">
-                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/view/">View</a></li>
+                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/view/">Mostra</a></li>
                 <li ng-hide="!settings.liteClient" ng-class="{active:isActive('/client')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/client/">Lite
                         Client</a></li>
                 <li ng-hide="!user.hasAllResources" ng-class="{active:isActive('/info')}">
-                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/info/">Monitoring</a>
+                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/info/">Monitoratge</a>
                 </li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/developers')}">
-                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/developers/">For
-                        Developers</a></li>
+                    <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/developers/">Per a
+                        desenvolupadors</a></li>
                 <li ng-if="user.isOwner || user.isAdmin" ng-class="{active:isActive('/health')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse"
-                       ng-href="#/health/">Information</a></li>
+                       ng-href="#/health/">Informació</a></li>
                 <li ng-hide="settings.liteClient" ng-class="{active:isActive('/help')}">
                     <a data-toggle="collapse" data-target=".navbar-collapse.collapse" ng-href="#/help/">Ajuda</a></li>
             </ul>
 
             <ul class="nav navbar-nav navbar-right">
-                <li ng-if="user" ng-hide="settings.liteClient"><a ng-click="logout()" title="Logout">Tancar la sessió</a></li>
+                <li ng-if="user" ng-hide="settings.liteClient"><a ng-click="logout()" title="Tanca la sessió">Tancar la sessió</a></li>
                 <li language-select uib-dropdown></li>
             </ul>
         </nav>

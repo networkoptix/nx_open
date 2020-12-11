@@ -171,7 +171,7 @@
     <message>
       <location/>
       <source>Event Type:</source>
-      <translation type="unfinished">Event Type:</translation>
+      <translation>Tipus d'esdeveniment:</translation>
     </message>
   </context>
   <context>
@@ -179,22 +179,22 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/archive_length_widget.ui"/>
       <source>Fixed Archive Length</source>
-      <translation type="unfinished">Fixed Archive Length</translation>
+      <translation>Longitud d'arxiu fixa</translation>
     </message>
     <message>
       <location/>
       <source>Auto</source>
-      <translation type="unfinished">Auto</translation>
+      <translation>Automàtic</translation>
     </message>
     <message>
       <location/>
       <source>Max. days</source>
-      <translation type="unfinished">Max. days</translation>
+      <translation>Dies màx.</translation>
     </message>
     <message>
       <location/>
       <source>Min. days</source>
-      <translation type="unfinished">Min. days</translation>
+      <translation>Dies mín.</translation>
     </message>
   </context>
   <context>
@@ -202,12 +202,12 @@
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Actualitza</translation>
     </message>
     <message>
       <location/>
       <source>User actions</source>
-      <translation type="unfinished">User actions</translation>
+      <translation>Accions de l'usuari</translation>
     </message>
     <message>
       <location/>
@@ -227,47 +227,47 @@
     <message>
       <location/>
       <source>Login/logout</source>
-      <translation type="unfinished">Login/logout</translation>
+      <translation>Inici de sessió/tancament de sessió</translation>
     </message>
     <message>
       <location/>
       <source>Event rules</source>
-      <translation type="unfinished">Event rules</translation>
+      <translation>Regles d'esdeveniments</translation>
     </message>
     <message>
       <location/>
       <source>Server actions</source>
-      <translation type="unfinished">Server actions</translation>
+      <translation>Accions del servidor</translation>
     </message>
     <message>
       <location/>
       <source>System actions</source>
-      <translation type="unfinished">System actions</translation>
+      <translation>Accions del sistema</translation>
     </message>
     <message>
       <location/>
       <source>Select all</source>
-      <translation type="unfinished">Select all</translation>
+      <translation>Selecciona-ho tot</translation>
     </message>
     <message>
       <location/>
       <source>Sessions</source>
-      <translation type="unfinished">Sessions</translation>
+      <translation>Sessions</translation>
     </message>
     <message>
       <location/>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Detalls</translation>
     </message>
     <message>
       <location/>
       <source>Audit Trail</source>
-      <translation type="unfinished">Audit Trail</translation>
+      <translation>Pista d'auditoria</translation>
     </message>
     <message>
       <location/>
       <source>Clear Filter</source>
-      <translation type="unfinished">Clear Filter</translation>
+      <translation>Neteja el filtre</translation>
     </message>
     <message>
       <location/>
@@ -277,7 +277,7 @@
     <message>
       <location/>
       <source>All servers are offline. Audit data is not available.</source>
-      <translation type="unfinished">All servers are offline. Audit data is not available.</translation>
+      <translation>Tots els servidors estan desconnectats. Les dades d'auditoria no estan disponibles.</translation>
     </message>
   </context>
   <context>
@@ -328,12 +328,12 @@
     <message>
       <location filename="../src/ui/dialogs/backup_settings_dialog.ui"/>
       <source>Backup Settings</source>
-      <translation type="unfinished">Backup Settings</translation>
+      <translation>Configuració de la còpia de seguretat</translation>
     </message>
     <message>
       <location/>
       <source>Server Settings</source>
-      <translation type="unfinished">Server Settings</translation>
+      <translation>Configuració del servidor</translation>
     </message>
     <message>
       <location/>
@@ -343,22 +343,22 @@
     <message>
       <location/>
       <source>Only further recording will be backed up. Backup process will ignore existing footage.</source>
-      <translation type="unfinished">Only further recording will be backed up. Backup process will ignore existing footage.</translation>
+      <translation>Només es farà una còpia de seguretat dels enregistraments posteriors. El procés de còpia de seguretat ignorarà les imatges existents.</translation>
     </message>
     <message>
       <location/>
       <source>Execute Backup</source>
-      <translation type="unfinished">Execute Backup</translation>
+      <translation>Executa la còpia de seguretat</translation>
     </message>
     <message>
       <location/>
       <source>Backup Archive From</source>
-      <translation type="unfinished">Backup Archive From</translation>
+      <translation>Fes una còpia de seguretat de l'arxiu des de</translation>
     </message>
     <message>
       <location/>
       <source>Backup Quality</source>
-      <translation type="unfinished">Backup Quality</translation>
+      <translation>Qualitat de la còpia de seguretat</translation>
     </message>
   </context>
   <context>
@@ -366,27 +366,27 @@
     <message>
       <location filename="../src/ui/widgets/business/bookmark_business_action_widget.ui"/>
       <source>Fixed duration:</source>
-      <translation type="unfinished">Fixed duration:</translation>
+      <translation>Durada fixa:</translation>
     </message>
     <message>
       <location/>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>segons</translation>
     </message>
     <message>
       <location/>
       <source>Tags:</source>
-      <translation type="unfinished">Tags:</translation>
+      <translation>Etiquetes:</translation>
     </message>
     <message>
       <location/>
       <source>Pre-recording:</source>
-      <translation type="unfinished">Pre-recording:</translation>
+      <translation>Enregistrament previ:</translation>
     </message>
     <message>
       <location/>
       <source>Post-recording:</source>
-      <translation type="unfinished">Post-recording:</translation>
+      <translation>Enregistrament posterior:</translation>
     </message>
   </context>
   <context>
@@ -394,7 +394,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
       <source>Bookmark Info</source>
-      <translation type="unfinished">Bookmark Info</translation>
+      <translation>Informació del marcador</translation>
     </message>
     <message>
       <location/>
@@ -404,17 +404,17 @@
     <message>
       <location/>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>Amplada de l'àrea</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Mida de la lletra</translation>
     </message>
     <message>
       <location/>
       <source>Include description</source>
-      <translation type="unfinished">Include description</translation>
+      <translation>Inclou la descripció</translation>
     </message>
   </context>
   <context>
@@ -422,12 +422,12 @@
     <message>
       <location filename="../src/ui/widgets/bookmark_widget.ui"/>
       <source>Popular tags</source>
-      <translation type="unfinished">Popular tags</translation>
+      <translation>Etiquetes populars</translation>
     </message>
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nom</translation>
     </message>
     <message>
       <location/>
@@ -437,17 +437,17 @@
     <message>
       <location/>
       <source>Timeout</source>
-      <translation type="unfinished">Timeout</translation>
+      <translation>Temps d'espera</translation>
     </message>
     <message>
       <location/>
       <source>Tags</source>
-      <translation type="unfinished">Tags</translation>
+      <translation>Etiquetes</translation>
     </message>
     <message>
       <location/>
       <source>List of tags divided by commas</source>
-      <translation type="unfinished">List of tags divided by commas</translation>
+      <translation>Llista d'etiquetes separades per comes</translation>
     </message>
   </context>
   <context>
@@ -455,17 +455,17 @@
     <message>
       <location filename="../src/ui/dialogs/private/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Actualitza</translation>
     </message>
     <message>
       <location/>
       <source>Bookmark Log</source>
-      <translation type="unfinished">Bookmark Log</translation>
+      <translation>Registre del marcador</translation>
     </message>
     <message>
       <location/>
       <source>Clear Filter</source>
-      <translation type="unfinished">Clear Filter</translation>
+      <translation>Neteja el filtre</translation>
     </message>
   </context>
   <context>
@@ -473,7 +473,7 @@
     <message>
       <location filename="../src/ui/widgets/business/business_rule_widget.ui"/>
       <source>Event</source>
-      <translation type="unfinished">Event</translation>
+      <translation>Esdeveniment</translation>
     </message>
     <message>
       <location/>
@@ -483,32 +483,32 @@
     <message>
       <location/>
       <source>Action</source>
-      <translation type="unfinished">Action</translation>
+      <translation>Acció</translation>
     </message>
     <message>
       <location/>
       <source>Comments:</source>
-      <translation type="unfinished">Comments:</translation>
+      <translation>Comentaris:</translation>
     </message>
     <message>
       <location/>
       <source>When</source>
-      <translation type="unfinished">When</translation>
+      <translation>Quan</translation>
     </message>
     <message>
       <location/>
       <source>Do</source>
-      <translation type="unfinished">Do</translation>
+      <translation>Fes</translation>
     </message>
     <message>
       <location/>
       <source>At</source>
-      <translation type="unfinished">At</translation>
+      <translation>A</translation>
     </message>
     <message>
       <location/>
       <source>Use event source server</source>
-      <translation type="unfinished">Use event source server</translation>
+      <translation>Utilitza el servidor d'origen d'esdeveniment</translation>
     </message>
   </context>
   <context>
@@ -516,7 +516,7 @@
     <message>
       <location filename="../src/ui/dialogs/business_rules_dialog.ui"/>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Afegeix</translation>
     </message>
     <message>
       <location/>
@@ -526,7 +526,7 @@
     <message>
       <location/>
       <source>Event Rules</source>
-      <translation type="unfinished">Event Rules</translation>
+      <translation>Regles d'esdeveniments</translation>
     </message>
     <message>
       <location/>
@@ -536,7 +536,7 @@
     <message>
       <location/>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Prova</translation>
     </message>
   </context>
   <context>
@@ -713,7 +713,7 @@
     <message>
       <location/>
       <source>This camera supports pan and tilt</source>
-      <translation type="unfinished">This camera supports pan and tilt</translation>
+      <translation>Aquesta càmera és compatible amb moviment vertical i horitzontal</translation>
     </message>
     <message>
       <location/>
@@ -723,7 +723,7 @@
     <message>
       <location/>
       <source>Detect motion during archive import</source>
-      <translation type="unfinished">Detect motion during archive import</translation>
+      <translation>Detecta el moviment durant la importació de l'arxiu</translation>
     </message>
   </context>
   <context>
@@ -731,72 +731,72 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_info_widget.ui"/>
       <source>Model</source>
-      <translation type="unfinished">Model</translation>
+      <translation>Model</translation>
     </message>
     <message>
       <location/>
       <source>Vendor</source>
-      <translation type="unfinished">Vendor</translation>
+      <translation>Proveïdor</translation>
     </message>
     <message>
       <location/>
       <source>IP Address</source>
-      <translation type="unfinished">IP Address</translation>
+      <translation>Adreça IP</translation>
     </message>
     <message>
       <location/>
       <source>Ping</source>
-      <translation type="unfinished">Ping</translation>
+      <translation>Ping</translation>
     </message>
     <message>
       <location/>
       <source>Firmware</source>
-      <translation type="unfinished">Firmware</translation>
+      <translation>Firmware</translation>
     </message>
     <message>
       <location/>
       <source>Camera ID</source>
-      <translation type="unfinished">Camera ID</translation>
+      <translation>ID de la càmera</translation>
     </message>
     <message>
       <location/>
       <source>Web Page</source>
-      <translation type="unfinished">Web Page</translation>
+      <translation>Pàgina web</translation>
     </message>
     <message>
       <location/>
       <source>Primary Stream</source>
-      <translation type="unfinished">Primary Stream</translation>
+      <translation>Flux principal</translation>
     </message>
     <message>
       <location/>
       <source>Secondary Stream</source>
-      <translation type="unfinished">Secondary Stream</translation>
+      <translation>Flux secundari</translation>
     </message>
     <message>
       <location/>
       <source>MAC Address</source>
-      <translation type="unfinished">MAC Address</translation>
+      <translation>Adreça MAC</translation>
     </message>
     <message>
       <location/>
       <source>Show on layout</source>
-      <translation type="unfinished">Show on layout</translation>
+      <translation>Mostra al disseny</translation>
     </message>
     <message>
       <location/>
       <source>Event Log</source>
-      <translation type="unfinished">Event Log</translation>
+      <translation>Registre d'esdeveniments</translation>
     </message>
     <message>
       <location/>
       <source>Camera rules</source>
-      <translation type="unfinished">Camera rules</translation>
+      <translation>Regles de la càmera</translation>
     </message>
     <message>
       <location/>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>ID lògic</translation>
     </message>
   </context>
   <context>
@@ -804,7 +804,7 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_input_business_event_widget.ui"/>
       <source>Input ID</source>
-      <translation type="unfinished">Input ID</translation>
+      <translation>ID d'entrada</translation>
     </message>
   </context>
   <context>
@@ -812,7 +812,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_license_panel_widget.ui"/>
       <source>Activate License...</source>
-      <translation type="unfinished">Activate License...</translation>
+      <translation>Activa la llicència...</translation>
     </message>
   </context>
   <context>
@@ -833,12 +833,12 @@
     <message>
       <location/>
       <source>Sensitivity</source>
-      <translation type="unfinished">Sensitivity</translation>
+      <translation>Sensibilitat</translation>
     </message>
     <message>
       <location/>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Restableix</translation>
     </message>
   </context>
   <context>
@@ -846,12 +846,12 @@
     <message>
       <location filename="../src/ui/widgets/business/camera_output_business_action_widget.ui"/>
       <source>Fixed duration:</source>
-      <translation type="unfinished">Fixed duration:</translation>
+      <translation>Durada fixa:</translation>
     </message>
     <message>
       <location/>
       <source>Output ID:</source>
-      <translation type="unfinished">Output ID:</translation>
+      <translation>ID de sortida:</translation>
     </message>
   </context>
   <context>
@@ -892,12 +892,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.ui"/>
       <source>All Cameras</source>
-      <translation type="unfinished">All Cameras</translation>
+      <translation>Totes les càmeres</translation>
     </message>
     <message>
       <location/>
       <source>Select Cameras</source>
-      <translation type="unfinished">Select Cameras</translation>
+      <translation>Selecciona les càmeres</translation>
     </message>
   </context>
   <context>
@@ -905,12 +905,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_settings_general_tab_widget.ui"/>
       <source>Authentication</source>
-      <translation type="unfinished">Authentication</translation>
+      <translation>Autenticació</translation>
     </message>
     <message>
       <location/>
       <source>Edit Credentials</source>
-      <translation type="unfinished">Edit Credentials</translation>
+      <translation>Edita les credencials</translation>
     </message>
     <message>
       <location/>
@@ -920,12 +920,12 @@
     <message>
       <location/>
       <source>Enable audio</source>
-      <translation type="unfinished">Enable audio</translation>
+      <translation>Activa l'àudio</translation>
     </message>
     <message>
       <location/>
       <source>Edit Streams...</source>
-      <translation type="unfinished">Edit Streams...</translation>
+      <translation>Edita els fluxos...</translation>
     </message>
   </context>
   <context>
@@ -933,7 +933,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/dialogs/camera_streams_dialog.ui"/>
       <source>Streams Addresses</source>
-      <translation type="unfinished">Streams Addresses</translation>
+      <translation>Adreces de fluxos</translation>
     </message>
   </context>
   <context>
@@ -941,7 +941,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/change_user_password_dialog.ui"/>
       <source>Change password</source>
-      <translation type="unfinished">Change password</translation>
+      <translation>Canvia la contrasenya</translation>
     </message>
   </context>
   <context>
@@ -949,7 +949,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/cloud_management_widget.ui"/>
       <source>This system is connected to</source>
-      <translation type="unfinished">This system is connected to</translation>
+      <translation>Aquest sistema està connectat a</translation>
     </message>
   </context>
   <context>
@@ -957,7 +957,7 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/connect_to_cloud_dialog.ui"/>
       <source>Stay logged in</source>
-      <translation type="unfinished">Stay logged in</translation>
+      <translation>Mantén-me connectat</translation>
     </message>
   </context>
   <context>
@@ -965,7 +965,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/dialogs/connecting_to_server_dialog.ui"/>
       <source>Connecting...</source>
-      <translation type="unfinished">Connecting...</translation>
+      <translation>Connectant...</translation>
     </message>
   </context>
   <context>
@@ -973,17 +973,17 @@
     <message>
       <location filename="../src/ui/dialogs/connection_name_dialog.ui"/>
       <source>Save connection as...</source>
-      <translation type="unfinished">Save connection as...</translation>
+      <translation>Desa la connexió com...</translation>
     </message>
     <message>
       <location/>
       <source>Enter name:</source>
-      <translation type="unfinished">Enter name:</translation>
+      <translation>Introduïu el nom:</translation>
     </message>
     <message>
       <location/>
       <source>Save password</source>
-      <translation type="unfinished">Save password</translation>
+      <translation>Desa la contrasenya</translation>
     </message>
   </context>
   <context>
@@ -991,12 +991,12 @@
     <message>
       <location filename="../src/ui/dialogs/connection_testing_dialog.ui"/>
       <source>Connection Test</source>
-      <translation type="unfinished">Connection Test</translation>
+      <translation>Prova de la connexió</translation>
     </message>
     <message>
       <location/>
       <source>Testing connection...</source>
-      <translation type="unfinished">Testing connection...</translation>
+      <translation>S'està provant la connexió...</translation>
     </message>
   </context>
   <context>
@@ -1004,27 +1004,27 @@
     <message>
       <location filename="../src/ui/widgets/business/custom_business_event_widget.ui"/>
       <source>Source contains:</source>
-      <translation type="unfinished">Source contains:</translation>
+      <translation>La font conté:</translation>
     </message>
     <message>
       <location/>
       <source>Keywords separated by space</source>
-      <translation type="unfinished">Keywords separated by space</translation>
+      <translation>Paraules clau separades per espai</translation>
     </message>
     <message>
       <location/>
       <source>Caption contains:</source>
-      <translation type="unfinished">Caption contains:</translation>
+      <translation>El títol conté:</translation>
     </message>
     <message>
       <location/>
       <source>Description contains:</source>
-      <translation type="unfinished">Description contains:</translation>
+      <translation>La descripció conté:</translation>
     </message>
     <message>
       <location/>
       <source>Omit Logging</source>
-      <translation type="unfinished">Omit Logging</translation>
+      <translation>Omet el registre</translation>
     </message>
   </context>
   <context>
@@ -1032,7 +1032,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/custom_settings/widgets/custom_settings_widget.ui"/>
       <source>Category</source>
-      <translation type="unfinished">Category</translation>
+      <translation>Categoria</translation>
     </message>
   </context>
   <context>
@@ -1040,12 +1040,12 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/database_management_widget.ui"/>
       <source>Create Backup...</source>
-      <translation type="unfinished">Create Backup...</translation>
+      <translation>Crea una còpia de seguretat...</translation>
     </message>
     <message>
       <location/>
       <source>Restore from Backup...</source>
-      <translation type="unfinished">Restore from Backup...</translation>
+      <translation>Restaura des de la còpia de seguretat...</translation>
     </message>
   </context>
   <context>
@@ -1058,42 +1058,42 @@
     <message>
       <location/>
       <source>SELECT SERVER</source>
-      <translation type="unfinished">SELECT SERVER</translation>
+      <translation>SELECCIONEU EL SERVIDOR</translation>
     </message>
     <message>
       <location/>
       <source>Known Address</source>
-      <translation type="unfinished">Known Address</translation>
+      <translation>Adreça coneguda</translation>
     </message>
     <message>
       <location/>
       <source>Subnet Scan</source>
-      <translation type="unfinished">Subnet Scan</translation>
+      <translation>Escaneig de subxarxa</translation>
     </message>
     <message>
       <location/>
       <source>Address</source>
-      <translation type="unfinished">Address</translation>
+      <translation>Adreça</translation>
     </message>
     <message>
       <location/>
       <source>Hint</source>
-      <translation type="unfinished">Hint</translation>
+      <translation>Consell</translation>
     </message>
     <message>
       <location/>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Port</translation>
     </message>
     <message>
       <location/>
       <source>End IP</source>
-      <translation type="unfinished">End IP</translation>
+      <translation>IP final</translation>
     </message>
     <message>
       <location/>
       <source>Start IP</source>
-      <translation type="unfinished">Start IP</translation>
+      <translation>IP inicial</translation>
     </message>
     <message>
       <location/>
@@ -1108,27 +1108,27 @@
     <message>
       <location/>
       <source>Search</source>
-      <translation type="unfinished">Search</translation>
+      <translation>Cerca</translation>
     </message>
     <message>
       <location/>
       <source>Stop</source>
-      <translation type="unfinished">Stop</translation>
+      <translation>Atura</translation>
     </message>
     <message>
       <location/>
       <source>Add all Devices</source>
-      <translation type="unfinished">Add all Devices</translation>
+      <translation>Afegeix tots els dispositius</translation>
     </message>
     <message>
       <location/>
       <source>Add Devices</source>
-      <translation type="unfinished">Add Devices</translation>
+      <translation>Afegeix dispositius</translation>
     </message>
     <message>
       <location/>
       <source>Default</source>
-      <translation type="unfinished">Default</translation>
+      <translation>Per defecte</translation>
     </message>
   </context>
   <context>
@@ -1136,17 +1136,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/dialogs/eula_dialog.ui"/>
       <source>Copy to Clipboard</source>
-      <translation type="unfinished">Copy to Clipboard</translation>
+      <translation>Copia al porta-retalls</translation>
     </message>
     <message>
       <location/>
       <source>I Do Not Agree</source>
-      <translation type="unfinished">I Do Not Agree</translation>
+      <translation>No hi estic d'acord</translation>
     </message>
     <message>
       <location/>
       <source>I Agree</source>
-      <translation type="unfinished">I Agree</translation>
+      <translation>Hi estic d'acord</translation>
     </message>
   </context>
   <context>
@@ -1154,22 +1154,22 @@
     <message>
       <location filename="../src/ui/dialogs/event_log_dialog.ui"/>
       <source>Event Log</source>
-      <translation type="unfinished">Event Log</translation>
+      <translation>Registre d'esdeveniments</translation>
     </message>
     <message>
       <location/>
       <source>Clear Filter</source>
-      <translation type="unfinished">Clear Filter</translation>
+      <translation>Neteja el filtre</translation>
     </message>
     <message>
       <location/>
       <source>Refresh</source>
-      <translation type="unfinished">Refresh</translation>
+      <translation>Actualitza</translation>
     </message>
     <message>
       <location/>
       <source>All Servers are offline. Logs are not available.</source>
-      <translation type="unfinished">All Servers are offline. Logs are not available.</translation>
+      <translation>Tots els servidors estan desconnectats. Els registres no estan disponibles.</translation>
     </message>
     <message>
       <location/>
@@ -1182,12 +1182,12 @@
     <message>
       <location filename="../src/ui/widgets/business/exec_http_request_action_widget.ui"/>
       <source>HTTP content</source>
-      <translation type="unfinished">HTTP content</translation>
+      <translation>Contingut HTTP</translation>
     </message>
     <message>
       <location/>
       <source>Login to authenticate (optional)</source>
-      <translation type="unfinished">Login to authenticate (optional)</translation>
+      <translation>Inici de sessió per a autenticació (opcional)</translation>
     </message>
     <message>
       <location/>
@@ -1197,7 +1197,7 @@
     <message>
       <location/>
       <source>Password to authenticate (optional)</source>
-      <translation type="unfinished">Password to authenticate (optional)</translation>
+      <translation>Contrasenya per a autenticació (opcional)</translation>
     </message>
     <message>
       <location/>
@@ -1207,7 +1207,7 @@
     <message>
       <location/>
       <source>Content type</source>
-      <translation type="unfinished">Content type</translation>
+      <translation>Tipus de contingut</translation>
     </message>
     <message>
       <location/>
@@ -1217,12 +1217,12 @@
     <message>
       <location/>
       <source>Authentication type</source>
-      <translation type="unfinished">Authentication type</translation>
+      <translation>Tipus d'autenticació</translation>
     </message>
     <message>
       <location/>
       <source>Request type</source>
-      <translation type="unfinished">Request type</translation>
+      <translation>Tipus de sol·licitud</translation>
     </message>
   </context>
   <context>
@@ -1230,7 +1230,7 @@
     <message>
       <location filename="../src/ui/widgets/business/ptz_preset_business_action_widget.ui"/>
       <source>PTZ preset:</source>
-      <translation type="unfinished">PTZ preset:</translation>
+      <translation>Valor predefinit PTZ:</translation>
     </message>
   </context>
   <context>
@@ -1238,7 +1238,7 @@
     <message>
       <location filename="../src/ui/widgets/business/exit_fullscreen_action_widget.ui"/>
       <source>On layout</source>
-      <translation type="unfinished">On layout</translation>
+      <translation>Al disseny</translation>
     </message>
   </context>
   <context>
@@ -1246,12 +1246,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_layout_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Exporta la configuració</translation>
     </message>
     <message>
       <location/>
       <source>Make read-only</source>
-      <translation type="unfinished">Make read-only</translation>
+      <translation>Fes de només lectura</translation>
     </message>
   </context>
   <context>
@@ -1259,22 +1259,22 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_media_settings_widget.ui"/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Exporta la configuració</translation>
     </message>
     <message>
       <location/>
       <source>Apply Filters</source>
-      <translation type="unfinished">Apply Filters</translation>
+      <translation>Aplica els filtres</translation>
     </message>
     <message>
       <location/>
       <source>Rotation, Dewarping, Image Enhancement etc.</source>
-      <translation type="unfinished">Rotation, Dewarping, Image Enhancement etc.</translation>
+      <translation>Rotació, correcció de distorsions, millora de la imatge, etc.</translation>
     </message>
     <message>
       <location/>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
-      <translation type="unfinished">Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</translation>
+      <translation>L'aplicació dels filtres i l'afegiment de superposicions requereixen transcodificació, la qual cosa augmentarà l'ús de la CPU i pot trigar molt de temps.</translation>
     </message>
   </context>
   <context>
@@ -1282,7 +1282,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_password_widget.ui"/>
       <source>Protect with password</source>
-      <translation type="unfinished">Protect with password</translation>
+      <translation>Protegeix amb contrasenya</translation>
     </message>
     <message>
       <location/>
@@ -1295,22 +1295,22 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/dialogs/export_settings_dialog.ui"/>
       <source>Export Video</source>
-      <translation type="unfinished">Export Video</translation>
+      <translation>Exporta el vídeo</translation>
     </message>
     <message>
       <location/>
       <source>Single Camera</source>
-      <translation type="unfinished">Single Camera</translation>
+      <translation>Càmera individual</translation>
     </message>
     <message>
       <location/>
       <source>Export Settings</source>
-      <translation type="unfinished">Export Settings</translation>
+      <translation>Exporta la configuració</translation>
     </message>
     <message>
       <location/>
       <source>Multi Video</source>
-      <translation type="unfinished">Multi Video</translation>
+      <translation>Multivídeo</translation>
     </message>
   </context>
   <context>
@@ -1318,7 +1318,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/common/widgets/filename_panel.ui"/>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Explora...</translation>
     </message>
   </context>
   <context>
@@ -1326,7 +1326,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/details/filtered_resource_selection_widget.ui"/>
       <source>Nothing matches your search</source>
-      <translation type="unfinished">Nothing matches your search</translation>
+      <translation>No hi ha res que coincideixi amb la cerca</translation>
     </message>
   </context>
   <context>
@@ -1334,52 +1334,52 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/fisheye/fisheye_settings_widget.ui"/>
       <source>Fisheye Dewarping</source>
-      <translation type="unfinished">Fisheye Dewarping</translation>
+      <translation>Correcció de distorsions d'ull de peix</translation>
     </message>
     <message>
       <location/>
       <source>Auto Calibration</source>
-      <translation type="unfinished">Auto Calibration</translation>
+      <translation>Calibratge automàtic</translation>
     </message>
     <message>
       <location/>
       <source>Y Offset</source>
-      <translation type="unfinished">Y Offset</translation>
+      <translation>Òfset Y</translation>
     </message>
     <message>
       <location/>
       <source>X Offset</source>
-      <translation type="unfinished">X Offset</translation>
+      <translation>Òfset X</translation>
     </message>
     <message>
       <location/>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Mida</translation>
     </message>
     <message>
       <location/>
       <source>Ellipticity</source>
-      <translation type="unfinished">Ellipticity</translation>
+      <translation>El·lipticitat</translation>
     </message>
     <message>
       <location/>
       <source>Show grid</source>
-      <translation type="unfinished">Show grid</translation>
+      <translation>Mostra la quadrícula</translation>
     </message>
     <message>
       <location/>
       <source>Mount</source>
-      <translation type="unfinished">Mount</translation>
+      <translation>Muntatge</translation>
     </message>
     <message>
       <location/>
       <source>Angle</source>
-      <translation type="unfinished">Angle</translation>
+      <translation>Angle</translation>
     </message>
     <message>
       <location/>
       <source>Lens projection</source>
-      <translation type="unfinished">Lens projection</translation>
+      <translation>Projecció de lent</translation>
     </message>
   </context>
   <context>
@@ -1387,12 +1387,12 @@
     <message>
       <location filename="../src/ui/widgets/business/fullscreen_camera_action_widget.ui"/>
       <source>On layout</source>
-      <translation type="unfinished">On layout</translation>
+      <translation>Al disseny</translation>
     </message>
     <message>
       <location/>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Càmera</translation>
     </message>
     <message>
       <location/>
@@ -1405,62 +1405,62 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/general_preferences_widget.ui"/>
       <source>Misc</source>
-      <translation type="unfinished">Misc</translation>
+      <translation>Miscel·lània</translation>
     </message>
     <message>
       <location/>
       <source>Auto Pause Video</source>
-      <translation type="unfinished">Auto Pause Video</translation>
+      <translation>Pausa el vídeo automàticament</translation>
     </message>
     <message>
       <location/>
       <source>after</source>
-      <translation type="unfinished">after</translation>
+      <translation>després de</translation>
     </message>
     <message>
       <location/>
       <source>Minutes of Inactivity</source>
-      <translation type="unfinished">Minutes of Inactivity</translation>
+      <translation>Minuts d'inactivitat</translation>
     </message>
     <message>
       <location/>
       <source>Add...</source>
-      <translation type="unfinished">Add...</translation>
+      <translation>Afegeix...</translation>
     </message>
     <message>
       <location/>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Suprimeix</translation>
     </message>
     <message>
       <location/>
       <source>Local Media Folders</source>
-      <translation type="unfinished">Local Media Folders</translation>
+      <translation>Carpetes de suports locals</translation>
     </message>
     <message>
       <location/>
       <source>Audio Input</source>
-      <translation type="unfinished">Audio Input</translation>
+      <translation>Entrada d'àudio</translation>
     </message>
     <message>
       <location/>
       <source>First Source</source>
-      <translation type="unfinished">First Source</translation>
+      <translation>Primera font</translation>
     </message>
     <message>
       <location/>
       <source>Second Source</source>
-      <translation type="unfinished">Second Source</translation>
+      <translation>Segona font</translation>
     </message>
     <message>
       <location/>
       <source>Run Application when PC Boots up</source>
-      <translation type="unfinished">Run Application when PC Boots up</translation>
+      <translation>Executa l'aplicació quan s'engega l'ordinador</translation>
     </message>
     <message>
       <location/>
       <source>Play audio from all cameras on layout</source>
-      <translation type="unfinished">Play audio from all cameras on layout</translation>
+      <translation>Reprodueix l'àudio de totes les càmeres al disseny</translation>
     </message>
   </context>
   <context>
@@ -1468,22 +1468,22 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/general_system_administration_widget.ui"/>
       <source>System Settings</source>
-      <translation type="unfinished">System Settings</translation>
+      <translation>Configuració del sistema</translation>
     </message>
     <message>
       <location/>
       <source>Backup and Restore</source>
-      <translation type="unfinished">Backup and Restore</translation>
+      <translation>Còpia de seguretat i recuperació</translation>
     </message>
     <message>
       <location/>
       <source>Security</source>
-      <translation type="unfinished">Security</translation>
+      <translation>Seguretat</translation>
     </message>
     <message>
       <location/>
       <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation type="unfinished">Encrypting video traffic will significantly increase CPU usage.</translation>
+      <translation>El xifratge del trànsit de vídeo augmentarà significativament l'ús de la CPU.</translation>
     </message>
   </context>
   <context>
@@ -1491,17 +1491,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/image_control_widget.ui"/>
       <source>Image Control</source>
-      <translation type="unfinished">Image Control</translation>
+      <translation>Control d'imatge</translation>
     </message>
     <message>
       <location/>
       <source>Aspect ratio</source>
-      <translation type="unfinished">Aspect ratio</translation>
+      <translation>Relació d'aspecte</translation>
     </message>
     <message>
       <location/>
       <source>Default rotation</source>
-      <translation type="unfinished">Default rotation</translation>
+      <translation>Rotació predeterminada</translation>
     </message>
   </context>
   <context>
@@ -1509,7 +1509,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/image_overlay_settings_widget.ui"/>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Imatge</translation>
     </message>
     <message>
       <location/>
@@ -1519,22 +1519,22 @@
     <message>
       <location/>
       <source>Size</source>
-      <translation type="unfinished">Size</translation>
+      <translation>Mida</translation>
     </message>
     <message>
       <location/>
       <source>Opacity</source>
-      <translation type="unfinished">Opacity</translation>
+      <translation>Opacitat</translation>
     </message>
     <message>
       <location/>
       <source>Default</source>
-      <translation type="unfinished">Default</translation>
+      <translation>Per defecte</translation>
     </message>
     <message>
       <location/>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Explora...</translation>
     </message>
   </context>
   <context>
@@ -1542,17 +1542,17 @@
     <message>
       <location filename="../src/ui/dialogs/image_preview_dialog.ui"/>
       <source>Image View</source>
-      <translation type="unfinished">Image View</translation>
+      <translation>Visualització de la imatge</translation>
     </message>
     <message>
       <location/>
       <source>Loading Image...Please Wait.</source>
-      <translation type="unfinished">Loading Image...Please Wait.</translation>
+      <translation>S'està carregant la imatge... Espereu.</translation>
     </message>
     <message>
       <location/>
       <source>No image</source>
-      <translation type="unfinished">No image</translation>
+      <translation>No hi ha imatge</translation>
     </message>
   </context>
   <context>
@@ -1560,27 +1560,27 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/info_overlay_settings_widget.ui"/>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Informació</translation>
     </message>
     <message>
       <location/>
       <source>Camera name</source>
-      <translation type="unfinished">Camera name</translation>
+      <translation>Nom de la càmera</translation>
     </message>
     <message>
       <location/>
       <source>Export date</source>
-      <translation type="unfinished">Export date</translation>
+      <translation>Data d'exportació</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Mida de la lletra</translation>
     </message>
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Suprimeix</translation>
     </message>
   </context>
   <context>
@@ -1588,12 +1588,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/io_module_settings_widget.ui"/>
       <source>Form</source>
-      <translation type="unfinished">Form</translation>
+      <translation>Formulari</translation>
     </message>
     <message>
       <location/>
       <source>Enable tile interface</source>
-      <translation type="unfinished">Enable tile interface</translation>
+      <translation>Activa la interfície mosaic</translation>
     </message>
   </context>
   <context>
@@ -1601,12 +1601,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/layout/widgets/layout_background_settings_widget.ui"/>
       <source>Processing Image...Please Wait.</source>
-      <translation type="unfinished">Processing Image...Please Wait.</translation>
+      <translation>S'està processant la imatge... Espereu.</translation>
     </message>
     <message>
       <location/>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Explora...</translation>
     </message>
     <message>
       <location/>
@@ -1616,32 +1616,32 @@
     <message>
       <location/>
       <source>View...</source>
-      <translation type="unfinished">View...</translation>
+      <translation>Mostra...</translation>
     </message>
     <message>
       <location/>
       <source>Width:</source>
-      <translation type="unfinished">Width:</translation>
+      <translation>Amplada:</translation>
     </message>
     <message>
       <location/>
       <source>Keep Aspect Ratio</source>
-      <translation type="unfinished">Keep Aspect Ratio</translation>
+      <translation>Mantén la relació d'aspecte</translation>
     </message>
     <message>
       <location/>
       <source>Opacity:</source>
-      <translation type="unfinished">Opacity:</translation>
+      <translation>Opacitat:</translation>
     </message>
     <message>
       <location/>
       <source>Height:</source>
-      <translation type="unfinished">Height:</translation>
+      <translation>Altura:</translation>
     </message>
     <message>
       <location/>
       <source>Crop to monitor aspect ratio</source>
-      <translation type="unfinished">Crop to monitor aspect ratio</translation>
+      <translation>Retalla per monitorar la relació d'aspecte</translation>
     </message>
   </context>
   <context>
@@ -1649,37 +1649,37 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/layout/widgets/layout_general_settings_widget.ui"/>
       <source>Locked</source>
-      <translation type="unfinished">Locked</translation>
+      <translation>Bloquejat</translation>
     </message>
     <message>
       <location/>
       <source>Width</source>
-      <translation type="unfinished">Width</translation>
+      <translation>Amplada</translation>
     </message>
     <message>
       <location/>
       <source>Height</source>
-      <translation type="unfinished">Height</translation>
+      <translation>Altura</translation>
     </message>
     <message>
       <location/>
       <source>Logical ID</source>
-      <translation type="unfinished">Logical ID</translation>
+      <translation>ID lògic</translation>
     </message>
     <message>
       <location/>
       <source>Generate</source>
-      <translation type="unfinished">Generate</translation>
+      <translation>Genera</translation>
     </message>
     <message>
       <location/>
       <source>Reset</source>
-      <translation type="unfinished">Reset</translation>
+      <translation>Restableix</translation>
     </message>
     <message>
       <location/>
       <source>Minimum Grid Size</source>
-      <translation type="unfinished">Minimum Grid Size</translation>
+      <translation>Mida mínima de la quadrícula</translation>
     </message>
   </context>
   <context>
@@ -1687,17 +1687,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/event_rules/layout_selection_dialog.ui"/>
       <source>Select layout</source>
-      <translation type="unfinished">Select layout</translation>
+      <translation>Selecciona el disseny</translation>
     </message>
     <message>
       <location/>
       <source>Shared layouts</source>
-      <translation type="unfinished">Shared layouts</translation>
+      <translation>Dissenys compartits</translation>
     </message>
     <message>
       <location/>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation type="unfinished">Select some single user in &quot;Show to&quot; line to display his local layouts in this list</translation>
+      <translation>Seleccioneu un usuari individual a la línia &quot;Mostra a&quot; per mostrar els seus dissenys locals en aquesta llista</translation>
     </message>
   </context>
   <context>
@@ -1705,17 +1705,17 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_settings_dialog.ui"/>
       <source>Optional</source>
-      <translation type="unfinished">Optional</translation>
+      <translation>Opcional</translation>
     </message>
     <message>
       <location/>
       <source>Testing...</source>
-      <translation type="unfinished">Testing...</translation>
+      <translation>Provant...</translation>
     </message>
     <message>
       <location/>
       <source>LDAP Settings</source>
-      <translation type="unfinished">LDAP Settings</translation>
+      <translation>Configuració LDAP</translation>
     </message>
     <message>
       <location/>
@@ -1730,22 +1730,22 @@
     <message>
       <location/>
       <source>Search Base</source>
-      <translation type="unfinished">Search Base</translation>
+      <translation>Base de cerca</translation>
     </message>
     <message>
       <location/>
       <source>Search Filter</source>
-      <translation type="unfinished">Search Filter</translation>
+      <translation>Filtre de cerca</translation>
     </message>
     <message>
       <location/>
       <source>Search Timeout (s)</source>
-      <translation type="unfinished">Search Timeout (s)</translation>
+      <translation>Temps d'espera de cerca (s)</translation>
     </message>
     <message>
       <location/>
       <source>Admin DN or CN</source>
-      <translation type="unfinished">Admin DN or CN</translation>
+      <translation>DN o CN d'administrador</translation>
     </message>
   </context>
   <context>
@@ -1753,7 +1753,7 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation type="unfinished">Fetch Users from LDAP...</translation>
+      <translation>Recupera usuaris de LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -1763,17 +1763,17 @@
     <message>
       <location/>
       <source>Connection error</source>
-      <translation type="unfinished">Connection error</translation>
+      <translation>Error de connexió</translation>
     </message>
     <message>
       <location/>
       <source>Role to assign to imported users</source>
-      <translation type="unfinished">Role to assign to imported users</translation>
+      <translation>Funció per assignar als usuaris importats</translation>
     </message>
     <message>
       <location/>
       <source>Disable imported users</source>
-      <translation type="unfinished">Disable imported users</translation>
+      <translation>Desactiva els usuaris importats</translation>
     </message>
   </context>
   <context>
@@ -1781,17 +1781,17 @@
     <message>
       <location filename="../src/ui/dialogs/license_details_dialog.ui"/>
       <source>License Details</source>
-      <translation type="unfinished">License Details</translation>
+      <translation>Detalls de la llicència</translation>
     </message>
     <message>
       <location/>
       <source>Generic</source>
-      <translation type="unfinished">Generic</translation>
+      <translation>Genèric</translation>
     </message>
     <message>
       <location/>
       <source>Features</source>
-      <translation type="unfinished">Features</translation>
+      <translation>Característiques</translation>
     </message>
   </context>
   <context>
@@ -1799,27 +1799,27 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/license_manager_widget.ui"/>
       <source>Active Licenses</source>
-      <translation type="unfinished">Active Licenses</translation>
+      <translation>Llicències actives</translation>
     </message>
     <message>
       <location/>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Suprimeix</translation>
     </message>
     <message>
       <location/>
       <source>New License</source>
-      <translation type="unfinished">New License</translation>
+      <translation>Llicència nova</translation>
     </message>
     <message>
       <location/>
       <source>Details...</source>
-      <translation type="unfinished">Details...</translation>
+      <translation>Detalls...</translation>
     </message>
     <message>
       <location/>
       <source>The software is licensed to</source>
-      <translation type="unfinished">The software is licensed to</translation>
+      <translation>Es concedeix la llicència del programari a</translation>
     </message>
   </context>
   <context>
@@ -1827,12 +1827,12 @@
     <message>
       <location filename="../src/ui/dialogs/license_notification_dialog.ui"/>
       <source>Warning</source>
-      <translation type="unfinished">Warning</translation>
+      <translation>Avís</translation>
     </message>
     <message>
       <location/>
       <source>License issues:</source>
-      <translation type="unfinished">License issues:</translation>
+      <translation>Problemes de llicència:</translation>
     </message>
   </context>
   <context>
@@ -1840,42 +1840,42 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/license_widget.ui"/>
       <source>Manual Activation</source>
-      <translation type="unfinished">Manual Activation</translation>
+      <translation>Activació manual</translation>
     </message>
     <message>
       <location/>
       <source>Select License File...</source>
-      <translation type="unfinished">Select License File...</translation>
+      <translation>Seleccioneu l'arxiu de llicència...</translation>
     </message>
     <message>
       <location/>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Explora...</translation>
     </message>
     <message>
       <location/>
       <source>License will be bound to the current server</source>
-      <translation type="unfinished">License will be bound to the current server</translation>
+      <translation>La llicència estarà vinculada al servidor actual</translation>
     </message>
     <message>
       <location/>
       <source>Activate Free License</source>
-      <translation type="unfinished">Activate Free License</translation>
+      <translation>Activa la llicència gratuïta</translation>
     </message>
     <message>
       <location/>
       <source>Activate License</source>
-      <translation type="unfinished">Activate License</translation>
+      <translation>Activa la llicència</translation>
     </message>
     <message>
       <location/>
       <source>Internet Activation</source>
-      <translation type="unfinished">Internet Activation</translation>
+      <translation>Activació per Internet</translation>
     </message>
     <message>
       <location/>
       <source>License Key</source>
-      <translation type="unfinished">License Key</translation>
+      <translation>Clau de llicència</translation>
     </message>
     <message>
       <location/>
@@ -1885,12 +1885,12 @@
     <message>
       <location/>
       <source>Activation Key File</source>
-      <translation type="unfinished">Activation Key File</translation>
+      <translation>Arxiu de clau d'activació</translation>
     </message>
     <message>
       <location/>
       <source>Hardware ID</source>
-      <translation type="unfinished">Hardware ID</translation>
+      <translation>ID de maquinari</translation>
     </message>
   </context>
   <context>
@@ -1898,7 +1898,7 @@
     <message>
       <location filename="../src/ui/dialogs/local_settings_dialog.ui"/>
       <source>Local Settings</source>
-      <translation type="unfinished">Local Settings</translation>
+      <translation>Configuració local</translation>
     </message>
   </context>
   <context>
@@ -1906,7 +1906,7 @@
     <message>
       <location filename="../src/ui/dialogs/login_dialog.ui"/>
       <source>Save...</source>
-      <translation type="unfinished">Save...</translation>
+      <translation>Desa...</translation>
     </message>
     <message>
       <location/>
@@ -1916,17 +1916,17 @@
     <message>
       <location/>
       <source>Connection Options:</source>
-      <translation type="unfinished">Connection Options:</translation>
+      <translation>Opcions de connexió:</translation>
     </message>
     <message>
       <location/>
       <source>Host</source>
-      <translation type="unfinished">Host</translation>
+      <translation>Amfitrió</translation>
     </message>
     <message>
       <location/>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Port</translation>
     </message>
     <message>
       <location/>
@@ -1941,12 +1941,12 @@
     <message>
       <location/>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Prova</translation>
     </message>
     <message>
       <location/>
       <source>Auto-Login</source>
-      <translation type="unfinished">Auto-Login</translation>
+      <translation>Inici de sessió automàtic</translation>
     </message>
   </context>
   <context>
@@ -1954,67 +1954,67 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/look_and_feel_preferences_widget.ui"/>
       <source>Look and Feel</source>
-      <translation type="unfinished">Look and Feel</translation>
+      <translation>Aspecte i comportament</translation>
     </message>
     <message>
       <location/>
       <source>Background Image</source>
-      <translation type="unfinished">Background Image</translation>
+      <translation>Imatge de fons</translation>
     </message>
     <message>
       <location/>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Explora...</translation>
     </message>
     <message>
       <location/>
       <source>Language</source>
-      <translation type="unfinished">Language</translation>
+      <translation>Idioma</translation>
     </message>
     <message>
       <location/>
       <source>Time Mode</source>
-      <translation type="unfinished">Time Mode</translation>
+      <translation>Mode d'hora</translation>
     </message>
     <message>
       <location/>
       <source>Image</source>
-      <translation type="unfinished">Image</translation>
+      <translation>Imatge</translation>
     </message>
     <message>
       <location/>
       <source>Mode</source>
-      <translation type="unfinished">Mode</translation>
+      <translation>Mode</translation>
     </message>
     <message>
       <location/>
       <source>Intensity</source>
-      <translation type="unfinished">Intensity</translation>
+      <translation>Intensitat</translation>
     </message>
     <message>
       <location/>
       <source>Show additional info in tree</source>
-      <translation type="unfinished">Show additional info in tree</translation>
+      <translation>Mostra informació addicional a l'arbre</translation>
     </message>
     <message>
       <location/>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>segons</translation>
     </message>
     <message>
       <location/>
       <source>Tour cycle</source>
-      <translation type="unfinished">Tour cycle</translation>
+      <translation>Cicle del tour</translation>
     </message>
     <message>
       <location/>
       <source>IP addresses for cameras, and servers, groups for users, etc.</source>
-      <translation type="unfinished">IP addresses for cameras, and servers, groups for users, etc.</translation>
+      <translation>Adreces IP per a càmeres i servidors, grups per a usuaris, etc.</translation>
     </message>
     <message>
       <location/>
       <source>Show aim overlay for PTZ cameras</source>
-      <translation type="unfinished">Show aim overlay for PTZ cameras</translation>
+      <translation>Mostra la superposició d'objectiu per a les càmeres PTZ</translation>
     </message>
   </context>
   <context>
@@ -2022,7 +2022,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/media_file/media_file_settings_dialog.ui"/>
       <source>File Settings</source>
-      <translation type="unfinished">File Settings</translation>
+      <translation>Configuració de l'arxiu</translation>
     </message>
   </context>
   <context>
@@ -2030,22 +2030,22 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/system_update/multi_server_updates_widget.ui"/>
       <source>Applying System updates at the end of the week is not recommended.</source>
-      <translation type="unfinished">Applying System updates at the end of the week is not recommended.</translation>
+      <translation>No es recomana aplicar actualitzacions del sistema al final de la setmana.</translation>
     </message>
     <message>
       <location/>
       <source>Check for update</source>
-      <translation type="unfinished">Check for update</translation>
+      <translation>Cercar actualitzacions</translation>
     </message>
     <message>
       <location/>
       <source>Updating to...</source>
-      <translation type="unfinished">Updating to...</translation>
+      <translation>S'està actualitzant a...</translation>
     </message>
     <message>
       <location/>
       <source>You have the latest version installed</source>
-      <translation type="unfinished">You have the latest version installed</translation>
+      <translation>Ja teniu la última versió instal·lada</translation>
     </message>
     <message>
       <location/>
@@ -2055,12 +2055,12 @@
     <message>
       <location/>
       <source>Browse</source>
-      <translation type="unfinished">Browse</translation>
+      <translation>Explora</translation>
     </message>
     <message>
       <location/>
       <source>Download &amp;&amp; Install</source>
-      <translation type="unfinished">Download &amp;&amp; Install</translation>
+      <translation>Descarrega i instal·la</translation>
     </message>
     <message>
       <location/>
@@ -2070,17 +2070,17 @@
     <message>
       <location/>
       <source>Link copied</source>
-      <translation type="unfinished">Link copied</translation>
+      <translation>Enllaç copiat</translation>
     </message>
     <message>
       <location/>
       <source>Advanced Update Settings</source>
-      <translation type="unfinished">Advanced Update Settings</translation>
+      <translation>Configuració d'actualització avançada</translation>
     </message>
     <message>
       <location/>
       <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-      <translation type="unfinished">It looks like the update process is taking more time than usual. Please keep waiting.</translation>
+      <translation>Sembla que el procés d'actualització està trigant més temps de l'habitual. Seguiu esperant.</translation>
     </message>
   </context>
   <context>
@@ -2088,12 +2088,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.ui"/>
       <source>Show all layouts</source>
-      <translation type="unfinished">Show all layouts</translation>
+      <translation>Mostra tots els dissenys</translation>
     </message>
     <message>
       <location/>
       <source>Select Layouts</source>
-      <translation type="unfinished">Select Layouts</translation>
+      <translation>Selecciona els dissenys</translation>
     </message>
   </context>
   <context>
@@ -2101,7 +2101,7 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>To server</source>
-      <translation type="unfinished">To server</translation>
+      <translation>Al servidor</translation>
     </message>
     <message>
       <location/>
@@ -2114,12 +2114,12 @@
     <message>
       <location filename="../src/ui/widgets/business/open_layout_action_widget.ui"/>
       <source>Layout</source>
-      <translation type="unfinished">Layout</translation>
+      <translation>Disseny</translation>
     </message>
     <message>
       <location/>
       <source>Show to</source>
-      <translation type="unfinished">Show to</translation>
+      <translation>Mostra a</translation>
     </message>
     <message>
       <location/>
@@ -2132,7 +2132,7 @@
     <message>
       <location filename="../src/ui/dialogs/common/password_dialog.ui"/>
       <source>Sign in</source>
-      <translation type="unfinished">Sign in</translation>
+      <translation>Inicia la sessió</translation>
     </message>
     <message>
       <location/>
@@ -2142,7 +2142,7 @@
     <message>
       <location/>
       <source>Username</source>
-      <translation type="unfinished">Username</translation>
+      <translation>Nom d'usuari</translation>
     </message>
   </context>
   <context>
@@ -2155,17 +2155,17 @@
     <message>
       <location/>
       <source>Volume:</source>
-      <translation type="unfinished">Volume:</translation>
+      <translation>Volum:</translation>
     </message>
     <message>
       <location/>
       <source>Test...</source>
-      <translation type="unfinished">Test...</translation>
+      <translation>Prova...</translation>
     </message>
     <message>
       <location/>
       <source>Play to users</source>
-      <translation type="unfinished">Play to users</translation>
+      <translation>Reprodueix per als usuaris</translation>
     </message>
   </context>
   <context>
@@ -2173,42 +2173,42 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/event_rules/widgets/plugin_diagnostic_event_widget.ui"/>
       <source>Source:</source>
-      <translation type="unfinished">Source:</translation>
+      <translation>Origen:</translation>
     </message>
     <message>
       <location/>
       <source>Caption contains:</source>
-      <translation type="unfinished">Caption contains:</translation>
+      <translation>El títol conté:</translation>
     </message>
     <message>
       <location/>
       <source>Keywords separated by space</source>
-      <translation type="unfinished">Keywords separated by space</translation>
+      <translation>Paraules clau separades per espai</translation>
     </message>
     <message>
       <location/>
       <source>Description contains:</source>
-      <translation type="unfinished">Description contains:</translation>
+      <translation>La descripció conté:</translation>
     </message>
     <message>
       <location/>
       <source>Level:</source>
-      <translation type="unfinished">Level:</translation>
+      <translation>Nivell:</translation>
     </message>
     <message>
       <location/>
       <source>ERROR</source>
-      <translation type="unfinished">ERROR</translation>
+      <translation>ERROR</translation>
     </message>
     <message>
       <location/>
       <source>WARNING</source>
-      <translation type="unfinished">WARNING</translation>
+      <translation>AVÍS</translation>
     </message>
     <message>
       <location/>
       <source>INFO</source>
-      <translation type="unfinished">INFO</translation>
+      <translation>INFORMACIÓ</translation>
     </message>
   </context>
   <context>
@@ -2216,7 +2216,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/server/poe/poe_settings_widget.ui"/>
       <source>Attention! Power limit exceeded</source>
-      <translation type="unfinished">Attention! Power limit exceeded</translation>
+      <translation>Atenció! S'ha superat el límit de potència</translation>
     </message>
   </context>
   <context>
@@ -2224,12 +2224,12 @@
     <message>
       <location filename="../src/ui/widgets/business/popup_business_action_widget.ui"/>
       <source>Force Acknowledgment</source>
-      <translation type="unfinished">Force Acknowledgment</translation>
+      <translation>Reconeixement forçat</translation>
     </message>
     <message>
       <location/>
       <source>Use custom text:</source>
-      <translation type="unfinished">Use custom text:</translation>
+      <translation>Utilitza text personalitzat:</translation>
     </message>
     <message>
       <location/>
@@ -2242,17 +2242,17 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/popup_settings_widget.ui"/>
       <source>Show all notifications</source>
-      <translation type="unfinished">Show all notifications</translation>
+      <translation>Mostra totes les notificacions</translation>
     </message>
     <message>
       <location/>
       <source>System Notifications</source>
-      <translation type="unfinished">System Notifications</translation>
+      <translation>Notificacions del sistema</translation>
     </message>
     <message>
       <location/>
       <source>Events</source>
-      <translation type="unfinished">Events</translation>
+      <translation>Esdeveniments</translation>
     </message>
   </context>
   <context>
@@ -2260,22 +2260,22 @@
     <message>
       <location filename="../src/ui/dialogs/ptz_manage_dialog.ui"/>
       <source>Save Current Position</source>
-      <translation type="unfinished">Save Current Position</translation>
+      <translation>Desar la posició actual</translation>
     </message>
     <message>
       <location/>
       <source>Go To Position</source>
-      <translation type="unfinished">Go To Position</translation>
+      <translation>Ves a la posició</translation>
     </message>
     <message>
       <location/>
       <source>Create Tour</source>
-      <translation type="unfinished">Create Tour</translation>
+      <translation>Crea un tour</translation>
     </message>
     <message>
       <location/>
       <source>Start Tour</source>
-      <translation type="unfinished">Start Tour</translation>
+      <translation>Inicia el tour</translation>
     </message>
     <message>
       <location/>
@@ -2285,27 +2285,27 @@
     <message>
       <location/>
       <source>Details</source>
-      <translation type="unfinished">Details</translation>
+      <translation>Detalls</translation>
     </message>
     <message>
       <location/>
       <source>No Tour Selected</source>
-      <translation type="unfinished">No Tour Selected</translation>
+      <translation>No s'ha seleccionat cap tour</translation>
     </message>
     <message>
       <location/>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>Previsualització</translation>
     </message>
     <message>
       <location/>
       <source>No preview available</source>
-      <translation type="unfinished">No preview available</translation>
+      <translation>No hi ha cap previsualització disponible</translation>
     </message>
     <message>
       <location/>
       <source>Get Preview</source>
-      <translation type="unfinished">Get Preview</translation>
+      <translation>Obtén la previsualització</translation>
     </message>
   </context>
   <context>
@@ -2313,17 +2313,17 @@
     <message>
       <location filename="../src/ui/dialogs/ptz_preset_dialog.ui"/>
       <source>Save Position</source>
-      <translation type="unfinished">Save Position</translation>
+      <translation>Desa la posició</translation>
     </message>
     <message>
       <location/>
       <source>Name:</source>
-      <translation type="unfinished">Name:</translation>
+      <translation>Nom:</translation>
     </message>
     <message>
       <location/>
       <source>Hotkey:</source>
-      <translation type="unfinished">Hotkey:</translation>
+      <translation>Drecera:</translation>
     </message>
   </context>
   <context>
@@ -2331,42 +2331,42 @@
     <message>
       <location filename="../src/ui/widgets/business/push_notification_business_action_widget.ui"/>
       <source>To</source>
-      <translation type="unfinished">To</translation>
+      <translation>Per a</translation>
     </message>
     <message>
       <location/>
       <source>Language Settings</source>
-      <translation type="unfinished">Language Settings</translation>
+      <translation>Configuració d'idioma</translation>
     </message>
     <message>
       <location/>
       <source>Custom notification content</source>
-      <translation type="unfinished">Custom notification content</translation>
+      <translation>Contingut de la notificació personalitzada</translation>
     </message>
     <message>
       <location/>
       <source>Header</source>
-      <translation type="unfinished">Header</translation>
+      <translation>Capçalera</translation>
     </message>
     <message>
       <location/>
       <source>Default notification title will be used if left empty</source>
-      <translation type="unfinished">Default notification title will be used if left empty</translation>
+      <translation>Si es deixa buit, s'utilitzarà el títol de notificació predeterminada</translation>
     </message>
     <message>
       <location/>
       <source>Body</source>
-      <translation type="unfinished">Body</translation>
+      <translation>Cos</translation>
     </message>
     <message>
       <location/>
       <source>Default text will be used if this field is empty</source>
-      <translation type="unfinished">Default text will be used if this field is empty</translation>
+      <translation>Si aquest camp està buit, s'utilitzarà el text predeterminat</translation>
     </message>
     <message>
       <location/>
       <source>Add source device name in body</source>
-      <translation type="unfinished">Add source device name in body</translation>
+      <translation>Afegiu el nom del dispositiu d'origen al cos</translation>
     </message>
   </context>
   <context>
@@ -2379,7 +2379,7 @@
     <message>
       <location/>
       <source>Preview</source>
-      <translation type="unfinished">Preview</translation>
+      <translation>Previsualització</translation>
     </message>
   </context>
   <context>
@@ -2387,7 +2387,7 @@
     <message>
       <location filename="../src/ui/dialogs/build_number_dialog.ui"/>
       <source>Choose a specific build</source>
-      <translation type="unfinished">Choose a specific build</translation>
+      <translation>Trieu una versió específica</translation>
     </message>
   </context>
   <context>
@@ -2395,7 +2395,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_bookmark_dialog.ui"/>
       <source>Bookmark</source>
-      <translation type="unfinished">Bookmark</translation>
+      <translation>Marcador</translation>
     </message>
   </context>
   <context>
@@ -2403,12 +2403,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/system_update/compatibility_version_installation_dialog.ui"/>
       <source>Installing Compatibility Version...</source>
-      <translation type="unfinished">Installing Compatibility Version...</translation>
+      <translation>S'està instal·lant la versió de compatibilitat...</translation>
     </message>
     <message>
       <location/>
       <source>Restart to the updated version when ready</source>
-      <translation type="unfinished">Restart to the updated version when ready</translation>
+      <translation>Reinicia la versió actualitzada quan estigui llest</translation>
     </message>
   </context>
   <context>
@@ -2416,12 +2416,12 @@
     <message>
       <location filename="../src/ui/dialogs/cloud/login_to_cloud_dialog.ui"/>
       <source>Log in</source>
-      <translation type="unfinished">Log in</translation>
+      <translation>Inicia la sessió</translation>
     </message>
     <message>
       <location/>
       <source>Stay logged in</source>
-      <translation type="unfinished">Stay logged in</translation>
+      <translation>Mantén-me connectat</translation>
     </message>
   </context>
   <context>
@@ -2444,7 +2444,7 @@
     <message>
       <location/>
       <source>Check</source>
-      <translation type="unfinished">Check</translation>
+      <translation>Comprova</translation>
     </message>
     <message>
       <location/>
@@ -2454,7 +2454,7 @@
     <message>
       <location/>
       <source>The new System will have password and name from System:</source>
-      <translation type="unfinished">The new System will have password and name from System:</translation>
+      <translation>El nou sistema tindrà la contrasenya i el nom del sistema:</translation>
     </message>
   </context>
   <context>
@@ -2462,7 +2462,7 @@
     <message>
       <location filename="../src/ui/dialogs/common/message_box.ui"/>
       <source>Do not show this message again</source>
-      <translation type="unfinished">Do not show this message again</translation>
+      <translation>No tornis a mostrar aquest missatge</translation>
     </message>
   </context>
   <context>
@@ -2470,7 +2470,7 @@
     <message>
       <location filename="../src/ui/dialogs/notification_sound_manager_dialog.ui"/>
       <source>Notification Sounds</source>
-      <translation type="unfinished">Notification Sounds</translation>
+      <translation>So de les notificacions</translation>
     </message>
     <message>
       <location/>
@@ -2480,17 +2480,17 @@
     <message>
       <location/>
       <source>Add...</source>
-      <translation type="unfinished">Add...</translation>
+      <translation>Afegeix...</translation>
     </message>
     <message>
       <location/>
       <source>Rename...</source>
-      <translation type="unfinished">Rename...</translation>
+      <translation>Canvia el nom...</translation>
     </message>
     <message>
       <location/>
       <source>Delete...</source>
-      <translation type="unfinished">Delete...</translation>
+      <translation>Suprimeix...</translation>
     </message>
   </context>
   <context>
@@ -2503,17 +2503,17 @@
     <message>
       <location/>
       <source>Remove</source>
-      <translation type="unfinished">Remove</translation>
+      <translation>Suprimeix</translation>
     </message>
     <message>
       <location/>
       <source>Add</source>
-      <translation type="unfinished">Add</translation>
+      <translation>Afegeix</translation>
     </message>
     <message>
       <location/>
       <source>Removing this connection option could lead to System malfunction.</source>
-      <translation type="unfinished">Removing this connection option could lead to System malfunction.</translation>
+      <translation>L'eliminació d'aquesta opció de connexió pot provocar un mal funcionament del sistema.</translation>
     </message>
   </context>
   <context>
@@ -2521,7 +2521,7 @@
     <message>
       <location filename="../src/ui/dialogs/system_administration_dialog.ui"/>
       <source>System Administration</source>
-      <translation type="unfinished">System Administration</translation>
+      <translation>Administració del sistema</translation>
     </message>
   </context>
   <context>
@@ -2529,7 +2529,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/user_management_widget.ui"/>
       <source>LDAP Settings...</source>
-      <translation type="unfinished">LDAP Settings...</translation>
+      <translation>Configuració LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -2539,7 +2539,7 @@
     <message>
       <location/>
       <source>Fetch Users from LDAP...</source>
-      <translation type="unfinished">Fetch Users from LDAP...</translation>
+      <translation>Recupera usuaris de LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -2549,27 +2549,27 @@
     <message>
       <location/>
       <source>Search users</source>
-      <translation type="unfinished">Search users</translation>
+      <translation>Cerca usuaris</translation>
     </message>
     <message>
       <location/>
       <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
+      <translation>Activa</translation>
     </message>
     <message>
       <location/>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Desactiva</translation>
     </message>
     <message>
       <location/>
       <source>Delete...</source>
-      <translation type="unfinished">Delete...</translation>
+      <translation>Suprimeix...</translation>
     </message>
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation type="unfinished">Edit Roles...</translation>
+      <translation>Edita els rols...</translation>
     </message>
   </context>
   <context>
@@ -2600,32 +2600,32 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/rapid_review_settings_widget.ui"/>
       <source>Rapid Review</source>
-      <translation type="unfinished">Rapid Review</translation>
+      <translation>Revisió ràpida</translation>
     </message>
     <message>
       <location/>
       <source>Initial video length</source>
-      <translation type="unfinished">Initial video length</translation>
+      <translation>Durada del vídeo inicial</translation>
     </message>
     <message>
       <location/>
       <source>Exported video length</source>
-      <translation type="unfinished">Exported video length</translation>
+      <translation>Durada del vídeo exportat</translation>
     </message>
     <message>
       <location/>
       <source>Speed</source>
-      <translation type="unfinished">Speed</translation>
+      <translation>Velocitat</translation>
     </message>
     <message>
       <location/>
       <source>Frames interval</source>
-      <translation type="unfinished">Frames interval</translation>
+      <translation>Interval d'imatges</translation>
     </message>
     <message>
       <location/>
       <source>Reset Speed</source>
-      <translation type="unfinished">Reset Speed</translation>
+      <translation>Restableix la velocitat</translation>
     </message>
   </context>
   <context>
@@ -2633,17 +2633,17 @@
     <message>
       <location filename="../src/ui/dialogs/reconnect_info_dialog.ui"/>
       <source>Reconnecting...</source>
-      <translation type="unfinished">Reconnecting...</translation>
+      <translation>Reconnectant...</translation>
     </message>
     <message>
       <location/>
       <source>Please wait while the connection is being restored...</source>
-      <translation type="unfinished">Please wait while the connection is being restored...</translation>
+      <translation>Espereu mentre es restaura la connexió...</translation>
     </message>
     <message>
       <location/>
       <source>Server name</source>
-      <translation type="unfinished">Server name</translation>
+      <translation>Nom del servidor</translation>
     </message>
   </context>
   <context>
@@ -2651,32 +2651,32 @@
     <message>
       <location filename="../src/ui/widgets/business/recording_business_action_widget.ui"/>
       <source>Quality:</source>
-      <translation type="unfinished">Quality:</translation>
+      <translation>Qualitat:</translation>
     </message>
     <message>
       <location/>
       <source>FPS</source>
-      <translation type="unfinished">FPS</translation>
+      <translation>FPS</translation>
     </message>
     <message>
       <location/>
       <source>s</source>
-      <translation type="unfinished">s</translation>
+      <translation>s</translation>
     </message>
     <message>
       <location/>
       <source>Pre-Recording:</source>
-      <translation type="unfinished">Pre-Recording:</translation>
+      <translation>Enregistrament previ:</translation>
     </message>
     <message>
       <location/>
       <source>Post-Recording:</source>
-      <translation type="unfinished">Post-Recording:</translation>
+      <translation>Enregistrament posterior:</translation>
     </message>
     <message>
       <location/>
       <source>Fixed duration:</source>
-      <translation type="unfinished">Fixed duration:</translation>
+      <translation>Durada fixa:</translation>
     </message>
   </context>
   <context>
@@ -2684,52 +2684,52 @@
     <message>
       <location filename="../src/ui/widgets/local_settings/recording_settings_widget.ui"/>
       <source>Temporary Folder</source>
-      <translation type="unfinished">Temporary Folder</translation>
+      <translation>Carpeta temporal</translation>
     </message>
     <message>
       <location/>
       <source>Additional Options</source>
-      <translation type="unfinished">Additional Options</translation>
+      <translation>Opcions addicionals</translation>
     </message>
     <message>
       <location/>
       <source>Disable Aero</source>
-      <translation type="unfinished">Disable Aero</translation>
+      <translation>Desactiva l'Aero</translation>
     </message>
     <message>
       <location/>
       <source>Capture Cursor</source>
-      <translation type="unfinished">Capture Cursor</translation>
+      <translation>Captura el cursor</translation>
     </message>
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation type="unfinished">A powerful computer is recommended for &quot;Best&quot; quality and resolution.</translation>
+      <translation>Es recomana utilitzar un ordinador potent per a l'opció de qualitat i resolució &quot;Òptim&quot;.</translation>
     </message>
     <message>
       <location/>
       <source>Browse...</source>
-      <translation type="unfinished">Browse...</translation>
+      <translation>Explora...</translation>
     </message>
     <message>
       <location/>
       <source>Resolution</source>
-      <translation type="unfinished">Resolution</translation>
+      <translation>Resolució</translation>
     </message>
     <message>
       <location/>
       <source>Recording Quality</source>
-      <translation type="unfinished">Recording Quality</translation>
+      <translation>Qualitat de l'enregistrament</translation>
     </message>
     <message>
       <location/>
       <source>Source</source>
-      <translation type="unfinished">Source</translation>
+      <translation>Origen</translation>
     </message>
     <message>
       <location/>
       <source>Screen</source>
-      <translation type="unfinished">Screen</translation>
+      <translation>Pantalla</translation>
     </message>
   </context>
   <context>
@@ -2737,12 +2737,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/recording_threshold_widget.ui"/>
       <source>Pre-Recording</source>
-      <translation type="unfinished">Pre-Recording</translation>
+      <translation>Enregistrament previ</translation>
     </message>
     <message>
       <location/>
       <source>Post-Recording</source>
-      <translation type="unfinished">Post-Recording</translation>
+      <translation>Enregistrament posterior</translation>
     </message>
   </context>
   <context>
@@ -2750,17 +2750,17 @@
     <message>
       <location filename="../src/ui/widgets/resource_browser_widget.ui"/>
       <source>Resources</source>
-      <translation type="unfinished">Resources</translation>
+      <translation>Recursos</translation>
     </message>
     <message>
       <location/>
       <source>Nothing found</source>
-      <translation type="unfinished">Nothing found</translation>
+      <translation>No s'ha trobat res</translation>
     </message>
     <message>
       <location/>
       <source>Drag any image or video file to the application window to play them</source>
-      <translation type="unfinished">Drag any image or video file to the application window to play them</translation>
+      <translation>Arrossegueu qualsevol imatge o arxiu de vídeo a la finestra de l'aplicació per reproduir-los</translation>
     </message>
   </context>
   <context>
@@ -2768,27 +2768,27 @@
     <message>
       <location filename="../src/ui/widgets/business/say_text_business_action_widget.ui"/>
       <source>Speak the following:</source>
-      <translation type="unfinished">Speak the following:</translation>
+      <translation>Digueu el següent:</translation>
     </message>
     <message>
       <location/>
       <source>Type any text here</source>
-      <translation type="unfinished">Type any text here</translation>
+      <translation>Escriviu qualsevol text aquí</translation>
     </message>
     <message>
       <location/>
       <source>Volume:</source>
-      <translation type="unfinished">Volume:</translation>
+      <translation>Volum:</translation>
     </message>
     <message>
       <location/>
       <source>Test...</source>
-      <translation type="unfinished">Test...</translation>
+      <translation>Prova...</translation>
     </message>
     <message>
       <location/>
       <source>Speak to users</source>
-      <translation type="unfinished">Speak to users</translation>
+      <translation>Parleu amb els usuaris</translation>
     </message>
   </context>
   <context>
@@ -2849,7 +2849,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/system_administration/widgets/security_settings_widget.ui"/>
       <source>Enable audit trail</source>
-      <translation type="unfinished">Enable audit trail</translation>
+      <translation>Activa la pista d'auditoria</translation>
     </message>
     <message>
       <location/>
@@ -2859,17 +2859,17 @@
     <message>
       <location/>
       <source>Encrypt video traffic</source>
-      <translation type="unfinished">Encrypt video traffic</translation>
+      <translation>Xifra el trànsit de vídeo</translation>
     </message>
     <message>
       <location/>
       <source>Display watermark with username over video</source>
-      <translation type="unfinished">Display watermark with username over video</translation>
+      <translation>Mostra la filigrana amb el nom d'usuari al vídeo</translation>
     </message>
     <message>
       <location/>
       <source>Watermark Preview</source>
-      <translation type="unfinished">Watermark Preview</translation>
+      <translation>Vista prèvia de la finigrana</translation>
     </message>
     <message>
       <location/>
@@ -2879,7 +2879,7 @@
     <message>
       <location/>
       <source>Limit session duration</source>
-      <translation type="unfinished">Limit session duration</translation>
+      <translation>Limita la durada de la sessió</translation>
     </message>
   </context>
   <context>
@@ -2887,7 +2887,7 @@
     <message>
       <location filename="../src/ui/widgets/business/sendmail_business_action_widget.ui"/>
       <source>Additional Recipients:</source>
-      <translation type="unfinished">Additional Recipients:</translation>
+      <translation>Destinataris addicionals:</translation>
     </message>
     <message>
       <location/>
@@ -2900,7 +2900,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/server_selection_dialog.ui"/>
       <source>Select Servers</source>
-      <translation type="unfinished">Select Servers</translation>
+      <translation>Selecciona els servidors</translation>
     </message>
   </context>
   <context>
@@ -2908,32 +2908,32 @@
     <message>
       <location filename="../src/ui/widgets/properties/server_settings_widget.ui"/>
       <source>Ping</source>
-      <translation type="unfinished">Ping</translation>
+      <translation>Ping</translation>
     </message>
     <message>
       <location/>
       <source>Failover</source>
-      <translation type="unfinished">Failover</translation>
+      <translation>Migració per error</translation>
     </message>
     <message>
       <location/>
       <source>Failover Priority...</source>
-      <translation type="unfinished">Failover Priority...</translation>
+      <translation>Prioritat de la migració per error...</translation>
     </message>
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nom</translation>
     </message>
     <message>
       <location/>
       <source>IP Address</source>
-      <translation type="unfinished">IP Address</translation>
+      <translation>Adreça IP</translation>
     </message>
     <message>
       <location/>
       <source>Port</source>
-      <translation type="unfinished">Port</translation>
+      <translation>Port</translation>
     </message>
   </context>
   <context>
@@ -2941,17 +2941,17 @@
     <message>
       <location filename="../src/ui/widgets/business/show_on_alarm_layout_action_widget.ui"/>
       <source>for</source>
-      <translation type="unfinished">for</translation>
+      <translation>per a</translation>
     </message>
     <message>
       <location/>
       <source>Force Alarm Layout opening</source>
-      <translation type="unfinished">Force Alarm Layout opening</translation>
+      <translation>Força l'obertura del disseny d'alarma</translation>
     </message>
     <message>
       <location/>
       <source>Also show source camera</source>
-      <translation type="unfinished">Also show source camera</translation>
+      <translation>Mostra també la càmera d'origen</translation>
     </message>
   </context>
   <context>
@@ -2959,27 +2959,27 @@
     <message>
       <location filename="../src/ui/widgets/business/show_text_overlay_action_widget.ui"/>
       <source>seconds</source>
-      <translation type="unfinished">seconds</translation>
+      <translation>segons</translation>
     </message>
     <message>
       <location/>
       <source>Display text for:</source>
-      <translation type="unfinished">Display text for:</translation>
+      <translation>Mostra el text per a:</translation>
     </message>
     <message>
       <location/>
       <source>Use custom text:</source>
-      <translation type="unfinished">Use custom text:</translation>
+      <translation>Utilitza text personalitzat:</translation>
     </message>
     <message>
       <location/>
       <source>Rule will work only for prolonged events</source>
-      <translation type="unfinished">Rule will work only for prolonged events</translation>
+      <translation>La regla només funcionarà per a esdeveniments prolongats</translation>
     </message>
     <message>
       <location/>
       <source>Also show on source camera</source>
-      <translation type="unfinished">Also show on source camera</translation>
+      <translation>Mostra també a la càmera d'origen</translation>
     </message>
   </context>
   <context>
@@ -2987,17 +2987,17 @@
     <message>
       <location filename="../src/ui/dialogs/sign_dialog.ui"/>
       <source>Watermark Check</source>
-      <translation type="unfinished">Watermark Check</translation>
+      <translation>Comprovació de filigrana</translation>
     </message>
     <message>
       <location/>
       <source>Checked File:</source>
-      <translation type="unfinished">Checked File:</translation>
+      <translation>Arxiu comprovat:</translation>
     </message>
     <message>
       <location/>
       <source>Check Result:</source>
-      <translation type="unfinished">Check Result:</translation>
+      <translation>Resultat de la comprovació:</translation>
     </message>
   </context>
   <context>
@@ -3005,27 +3005,27 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/smtp/smtp_advanced_settings_widget.ui"/>
       <source>Unsecure Connection</source>
-      <translation type="unfinished">Unsecure Connection</translation>
+      <translation>Connexió no segura</translation>
     </message>
     <message>
       <location/>
       <source>(recommended)</source>
-      <translation type="unfinished">(recommended)</translation>
+      <translation>(recomanat)</translation>
     </message>
     <message>
       <location/>
       <source>Secure connection using TLS.</source>
-      <translation type="unfinished">Secure connection using TLS.</translation>
+      <translation>Connexió segura mitjançant TLS.</translation>
     </message>
     <message>
       <location/>
       <source>Secure connection using SSL.</source>
-      <translation type="unfinished">Secure connection using SSL.</translation>
+      <translation>Connexió segura mitjançant SSL.</translation>
     </message>
     <message>
       <location/>
       <source>Port:</source>
-      <translation type="unfinished">Port:</translation>
+      <translation>Port:</translation>
     </message>
   </context>
   <context>
@@ -3038,12 +3038,12 @@
     <message>
       <location/>
       <source>Advanced settings...</source>
-      <translation type="unfinished">Advanced settings...</translation>
+      <translation>Configuració avançada...</translation>
     </message>
     <message>
       <location/>
       <source>Test</source>
-      <translation type="unfinished">Test</translation>
+      <translation>Prova</translation>
     </message>
   </context>
   <context>
@@ -3051,12 +3051,12 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/smtp/smtp_test_connection_widget.ui"/>
       <source>Server:</source>
-      <translation type="unfinished">Server:</translation>
+      <translation>Servidor:</translation>
     </message>
     <message>
       <location/>
       <source>Port:</source>
-      <translation type="unfinished">Port:</translation>
+      <translation>Port:</translation>
     </message>
     <message>
       <location/>
@@ -3066,17 +3066,17 @@
     <message>
       <location/>
       <source>Security:</source>
-      <translation type="unfinished">Security:</translation>
+      <translation>Seguretat:</translation>
     </message>
     <message>
       <location/>
       <source>Progress:</source>
-      <translation type="unfinished">Progress:</translation>
+      <translation>Progrés:</translation>
     </message>
     <message>
       <location/>
       <source>Result:</source>
-      <translation type="unfinished">Result:</translation>
+      <translation>Resultat:</translation>
     </message>
     <message>
       <location/>
@@ -3094,17 +3094,17 @@
     <message>
       <location filename="../src/ui/widgets/business/software_trigger_business_event_widget.ui"/>
       <source>Available to</source>
-      <translation type="unfinished">Available to</translation>
+      <translation>Disponible per a</translation>
     </message>
     <message>
       <location/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nom</translation>
     </message>
     <message>
       <location/>
       <source>Icon</source>
-      <translation type="unfinished">Icon</translation>
+      <translation>Icona</translation>
     </message>
   </context>
   <context>
@@ -3112,27 +3112,27 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_analytics_widget.ui"/>
       <source>Current Statistics</source>
-      <translation type="unfinished">Current Statistics</translation>
+      <translation>Estadístiques actuals</translation>
     </message>
     <message>
       <location/>
       <source>Forecast for Full Storage Usage</source>
-      <translation type="unfinished">Forecast for Full Storage Usage</translation>
+      <translation>Previsió per a ús d'emmagatzematge complet</translation>
     </message>
     <message>
       <location/>
       <source>Server is offline. Statistics are not available.</source>
-      <translation type="unfinished">Server is offline. Statistics are not available.</translation>
+      <translation>El servidor està desconnectat. Les estadístiques no estan disponibles.</translation>
     </message>
     <message>
       <location/>
       <source>Additional storage</source>
-      <translation type="unfinished">Additional storage</translation>
+      <translation>Emmagatzematge suplementari</translation>
     </message>
     <message>
       <location/>
       <source>Base forecast on data recorded during</source>
-      <translation type="unfinished">Base forecast on data recorded during</translation>
+      <translation>Basa la previsió en les dades registrades durant</translation>
     </message>
   </context>
   <context>
@@ -3145,57 +3145,57 @@
     <message>
       <location/>
       <source>Start Backup Now</source>
-      <translation type="unfinished">Start Backup Now</translation>
+      <translation>Inicia la còpia de seguretat ara</translation>
     </message>
     <message>
       <location/>
       <source>Add External Storage...</source>
-      <translation type="unfinished">Add External Storage...</translation>
+      <translation>Afegeix emmagatzematge extern...</translation>
     </message>
     <message>
       <location/>
       <source>Storage Locations</source>
-      <translation type="unfinished">Storage Locations</translation>
+      <translation>Ubicacions d'emmagatzematge</translation>
     </message>
     <message>
       <location/>
       <source>Reindex Archive</source>
-      <translation type="unfinished">Reindex Archive</translation>
+      <translation>Reindexa l'arxiu</translation>
     </message>
     <message>
       <location/>
       <source>Reindex Backup</source>
-      <translation type="unfinished">Reindex Backup</translation>
+      <translation>Reindexa la còpia de seguretat</translation>
     </message>
     <message>
       <location/>
       <source>Backup Archive</source>
-      <translation type="unfinished">Backup Archive</translation>
+      <translation>Fes una còpia de seguretat de l'arxiu</translation>
     </message>
     <message>
       <location/>
       <source>Backup Settings...</source>
-      <translation type="unfinished">Backup Settings...</translation>
+      <translation>Configuració de la còpia de seguretat...</translation>
     </message>
     <message>
       <location/>
       <source>Analytics data will continue to be stored on the disabled storage.</source>
-      <translation type="unfinished">Analytics data will continue to be stored on the disabled storage.</translation>
+      <translation>Les dades d'anàlisi es continuaran emmagatzemant a l'emmagatzematge desactivat.</translation>
     </message>
     <message>
       <location/>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation type="unfinished">Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</translation>
+      <translation>S'aturarà l'enregistrament a la ubicació d'emmagatzematge desactivada. Tanmateix, es continuaran suprimint les imatges obsoletes.</translation>
     </message>
     <message>
       <location/>
       <source>Recording was enabled on the USB storage</source>
-      <translation type="unfinished">Recording was enabled on the USB storage</translation>
+      <translation>S'ha activat l'enregistrament a l'emmagatzematge USB</translation>
     </message>
     <message>
       <location/>
       <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
-      <translation type="unfinished">Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</translation>
+      <translation>Les dades d'anàlisi poden ocupar grans quantitats d'espai. Us recomanem que trieu una altra ubicació en lloc de la partició del sistema.</translation>
     </message>
   </context>
   <context>
@@ -3239,22 +3239,22 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.ui"/>
       <source>Roles</source>
-      <translation type="unfinished">Roles</translation>
+      <translation>Funcions</translation>
     </message>
     <message>
       <location/>
       <source>Show all users</source>
-      <translation type="unfinished">Show all users</translation>
+      <translation>Mostra tots els usuaris</translation>
     </message>
     <message>
       <location/>
       <source>Select Users</source>
-      <translation type="unfinished">Select Users</translation>
+      <translation>Selecciona els usuaris</translation>
     </message>
     <message>
       <location/>
       <source>Nothing matches your search.</source>
-      <translation type="unfinished">Nothing matches your search.</translation>
+      <translation>No hi ha res que coincideixi amb la cerca.</translation>
     </message>
   </context>
   <context>
@@ -3262,12 +3262,12 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/system_settings_widget.ui"/>
       <source>(recommended)</source>
-      <translation type="unfinished">(recommended)</translation>
+      <translation>(recomanat)</translation>
     </message>
     <message>
       <location/>
       <source>Send anonymous usage and crash statistics to software developers</source>
-      <translation type="unfinished">Send anonymous usage and crash statistics to software developers</translation>
+      <translation>Envia estadístiques d'ús i errors anònimes als desenvolupadors de programari</translation>
     </message>
     <message>
       <location/>
@@ -3277,7 +3277,7 @@
     <message>
       <location/>
       <source>Custom language for mobile notifications</source>
-      <translation type="unfinished">Custom language for mobile notifications</translation>
+      <translation>Idioma personalitzat per a les notificacions mòbils</translation>
     </message>
   </context>
   <context>
@@ -3285,7 +3285,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/text_overlay_settings_widget.ui"/>
       <source>Text</source>
-      <translation type="unfinished">Text</translation>
+      <translation>Text</translation>
     </message>
     <message>
       <location/>
@@ -3295,17 +3295,17 @@
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Mida de la lletra</translation>
     </message>
     <message>
       <location/>
       <source>Enter plain text or HTML</source>
-      <translation type="unfinished">Enter plain text or HTML</translation>
+      <translation>Introduïu text pla o HTML</translation>
     </message>
     <message>
       <location/>
       <source>Area Width</source>
-      <translation type="unfinished">Area Width</translation>
+      <translation>Amplada de l'àrea</translation>
     </message>
   </context>
   <context>
@@ -3313,17 +3313,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.ui"/>
       <source>Sync Time with the Internet</source>
-      <translation type="unfinished">Sync Time with the Internet</translation>
+      <translation>Sincronitza l'hora amb Internet</translation>
     </message>
     <message>
       <location/>
       <source>VMS Time</source>
-      <translation type="unfinished">VMS Time</translation>
+      <translation>Hora de VMS</translation>
     </message>
     <message>
       <location/>
       <source>Do not sync time among servers</source>
-      <translation type="unfinished">Do not sync time among servers</translation>
+      <translation>No sincronitzis l'hora entre servidors</translation>
     </message>
   </context>
   <context>
@@ -3331,17 +3331,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/timestamp_overlay_settings_widget.ui"/>
       <source>Timestamp</source>
-      <translation type="unfinished">Timestamp</translation>
+      <translation>Marca horària</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>Mida de la lletra</translation>
     </message>
     <message>
       <location/>
       <source>Format</source>
-      <translation type="unfinished">Format</translation>
+      <translation>Format</translation>
     </message>
     <message>
       <location/>
@@ -3354,7 +3354,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_profile_widget.ui"/>
       <source>Change Password...</source>
-      <translation type="unfinished">Change Password...</translation>
+      <translation>Canvia la contrasenya...</translation>
     </message>
   </context>
   <context>
@@ -3362,17 +3362,17 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_role_settings_widget.ui"/>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Nom</translation>
     </message>
     <message>
       <location/>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Usuaris</translation>
     </message>
     <message>
       <location/>
       <source>Delete Role</source>
-      <translation type="unfinished">Delete Role</translation>
+      <translation>Suprimeix la funció</translation>
     </message>
   </context>
   <context>
@@ -3380,22 +3380,22 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/user_roles_dialog.ui"/>
       <source>User Roles</source>
-      <translation type="unfinished">User Roles</translation>
+      <translation>Funcions d'usuari</translation>
     </message>
     <message>
       <location/>
       <source>New role</source>
-      <translation type="unfinished">New role</translation>
+      <translation>Funció nova</translation>
     </message>
     <message>
       <location/>
       <source>There are no custom user roles yet.</source>
-      <translation type="unfinished">There are no custom user roles yet.</translation>
+      <translation>Encara no hi ha funcions d'usuari personalitzades.</translation>
     </message>
     <message>
       <location/>
       <source>Click &quot;New role&quot; button to create one.</source>
-      <translation type="unfinished">Click &quot;New role&quot; button to create one.</translation>
+      <translation>Feu clic al botó &quot;Funció nova&quot; per crear-ne una.</translation>
     </message>
   </context>
   <context>
@@ -3403,17 +3403,17 @@
     <message>
       <location filename="../src/ui/widgets/properties/user_settings_widget.ui"/>
       <source>User Type</source>
-      <translation type="unfinished">User Type</translation>
+      <translation>Tipus d'usuari</translation>
     </message>
     <message>
       <location/>
       <source>Role</source>
-      <translation type="unfinished">Role</translation>
+      <translation>Funció</translation>
     </message>
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation type="unfinished">Edit Roles...</translation>
+      <translation>Edita les funcions...</translation>
     </message>
   </context>
   <context>
@@ -3426,12 +3426,12 @@
     <message>
       <location/>
       <source>Sensitivity</source>
-      <translation type="unfinished">Sensitivity</translation>
+      <translation>Sensibilitat</translation>
     </message>
     <message>
       <location/>
       <source>Detect motion</source>
-      <translation type="unfinished">Detect motion</translation>
+      <translation>Detecta el moviment</translation>
     </message>
   </context>
   <context>
@@ -3439,7 +3439,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/wearable_camera_time_zone_widget.ui"/>
       <source>Form</source>
-      <translation type="unfinished">Form</translation>
+      <translation>Formulari</translation>
     </message>
     <message>
       <location/>
@@ -3449,7 +3449,7 @@
     <message>
       <location/>
       <source>Ignore timezone in uploaded files</source>
-      <translation type="unfinished">Ignore timezone in uploaded files</translation>
+      <translation>Ignora la zona horària als arxius penjats</translation>
     </message>
   </context>
   <context>
@@ -3462,12 +3462,12 @@
     <message>
       <location/>
       <source>Upload Footage</source>
-      <translation type="unfinished">Upload Footage</translation>
+      <translation>Penja les imatges</translation>
     </message>
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation>Carregar un fitxer...</translation>
+      <translation>Carrega l'arxiu...</translation>
     </message>
     <message>
       <location/>
@@ -3480,7 +3480,7 @@
     <message>
       <location filename="../src/ui/dialogs/webpage_dialog.ui"/>
       <source>This web page is for C2P integration</source>
-      <translation type="unfinished">This web page is for C2P integration</translation>
+      <translation>Aquesta pàgina web és per a la integració de C2P</translation>
     </message>
   </context>
   <context>
@@ -3516,17 +3516,17 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
       <source>Watermark preview</source>
-      <translation type="unfinished">Watermark preview</translation>
+      <translation>Vista prèvia de la finigrana</translation>
     </message>
     <message>
       <location/>
       <source>Opacity</source>
-      <translation type="unfinished">Opacity</translation>
+      <translation>Opacitat</translation>
     </message>
     <message>
       <location/>
       <source>Frequency</source>
-      <translation type="unfinished">Frequency</translation>
+      <translation>Freqüència</translation>
     </message>
   </context>
 </TS>

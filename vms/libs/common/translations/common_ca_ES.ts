@@ -1028,7 +1028,7 @@
     </message>
     <message>
       <source>Could not create output file for video recording.</source>
-      <translation>No s'ha pogut crear el fitxer de sortida per a l'enregistrament de vídeo.</translation>
+      <translation>No s'ha pogut crear l'arxiu de sortida per a l'enregistrament de vídeo.</translation>
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>

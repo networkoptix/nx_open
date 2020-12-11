@@ -1,16 +1,16 @@
 <div class="container">
-    <h1><a href="#/metrics/">New: System health report</a></h1>
-    <h1><a href="#/developers/serverDocumentation">New: Server Settings Documentation</a></h1>
+    <h1><a href="#/metrics/">Novetat: Informe de salut del sistema</a></h1>
+    <h1><a href="#/developers/serverDocumentation">Novetat: Documentació de configuració del servidor</a></h1>
 </div>
 <div class="container">
-    <h1>Advanced server settings</h1>
+    <h1>Configuració avançada del servidor</h1>
 
     <div class="alert alert-danger" role="alert">
-        <b>Warning!</b> Any changes on this page may cause server to work incorrectly.
+        <b>Atenció!</b> Qualsevol canvi en aquesta pàgina pot fer que el servidor no funcioni correctament.
     </div>
 
 
-    <h2>Storage</h2>
+    <h2>Emmagatzematge</h2>
     <form class="form" role="form" name="form" novalidate>
 
         <table class="table">
@@ -20,10 +20,10 @@
                         URL
                     </th>
                     <th width="200">
-                        Free Space
+                        Espai lliure
                     </th>
                     <th width="150">
-                        Reserved Space
+                        Espai reservat
                     </th>
                     <th >
                     </th>
@@ -44,7 +44,7 @@
                                  ng-style="{width: storage.reservedSpace*100/storage.totalSpace+ '%'}">
                             </div>
 
-                            <div class="progress-label">{{formatSpace(storage.freeSpace)}} of {{formatSpace(storage.totalSpace)}}</div>
+                            <div class="progress-label">{{formatSpace(storage.freeSpace)}} de {{formatSpace(storage.totalSpace)}}</div>
 
 
                             <div class="progress-bar progress-bar-success" role="progressbar"
@@ -71,14 +71,14 @@
                                    min="1"
                                    max="{{toGBs(storage.totalSpace)}}"
                                    required
- placeholder="Reserved space"/>
+ placeholder="Espai reservat"/>
                             <div class="input-group-addon">GB</div>
                         </div>
                         <div class="input-group" ng-if="!storage.isWritable">
                             <input type="number" class="form-control input-sm"
                                    ng-value="storage.reservedSpaceGb"
                                    disabled
- placeholder="Reserved space"/>
+ placeholder="Espai reservat"/>
                             <div class="input-group-addon">GB</div>
                         </div>
                     </td>
@@ -90,7 +90,7 @@
                                    ng-model="storage.isUsedForWriting"
                                    ng-disabled="!storage.isWritable"
                                    name="isUsedForWriting"
-                                   placeholder="Use for writing"/>
+                                   placeholder="Escrigueu aquí"/>
                                 </span>
                                 <icon for="storage.isUsedForWriting" on-true="pencil" title-true="Used for writing"></icon>
                                 <icon for="storage.isWritable && !storage.isUsedForWriting" on-true="pencil" title-true="Writable" class="icon-inactive"></icon>
@@ -107,40 +107,40 @@
             </tbody>
         </table>
         <div id="selectWritableStorageAlert" class="alert alert-warning"  ng-class="{hidden:someSelected}">
-            No main storage drive was selected for writing - video will not be recorded on this server.
+            No s'ha seleccionat cap unitat d'emmagatzematge principal per escriure-hi: el vídeo no s'enregistrarà en aquest servidor.
         </div>
         <div id="reduceArchiveAlert"         class="alert alert-warning" ng-class="{hidden:!reduceArchiveWarning}">
-            Reserved space amount is greater than free space left. Current video footage may be removed to free up some space.
+            L'espai reservat és superior a l'espai lliure disponible. Es poden esborrar imatges de vídeo actuals per alliberar una mica d'espai.
         </div>
-        <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Fix all highlighted settings to save it</div>
+        <div class="alert alert-danger"  ng-class="{hidden:form.$valid}">Corregiu totes les configuracions ressaltades per desar-les</div>
 
-        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Save</button>
+        <button class="btn btn-primary" ng-disabled="form.$invalid" ng-click="save()" >Desa</button>
         <button class="btn btn-warning" ng-click="cancel()">Cancel·lar</button>
     </form>
 
-    <h2>Log settings</h2>
+    <h2>Configuració del registre</h2>
     <form class="form" role="form" name="logLevels" novalidate>
         <div ng-repeat="(name, level) in loggers" class="form-group">
-            <label class="col-sm-4">{{name}} log level</label>
+            <label class="col-sm-4">Nivell de registre {{name}}</label>
             <div class="col-sm-8">
                 <select class="form-control" name="{{name}}LogLevel" id="{{name}}LogLevel" ng-model="loggers[name]">
-                    <option value="none">None: Log disabled.</option>
-                    <option value="error">Error: Log errors only.</option>
-                    <option value="warning">Warning: Log warnings and errors.</option>
-                    <option value="info">Info: Log errors, warnings and all messages.</option>
-                    <option value="debug">Debug: Log every System message and debug information.</option>
-                    <option value="verbose">Verbose: Log all information available.</option>
+                    <option value="none">Cap: registre desactivat.</option>
+                    <option value="error">Errors: només registre d'errors.</option>
+                    <option value="warning">Avisos: registre d'avisos i errors.</option>
+                    <option value="info">Informació: registre d'avisos, errors i tots els missatges.</option>
+                    <option value="debug">Depuració: registre de tots els missatges del sistema i la informació de depuració.</option>
+                    <option value="verbose">Verbós: registre de tota la informació disponible.</option>
                 </select>
             </div>
         </div>
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="changeLogLevels()" >Save</button>
+            <button class="btn btn-primary" ng-click="changeLogLevels()" >Desa</button>
         </div>
     </form>
 
-    <h1>Advanced System settings</h1>
+    <h1>Configuració avançada del sistema</h1>
     <div class="alert alert-danger" role="alert">
-        <b>Warning!</b> Any changes on this page may cause server to work incorrectly.
+        <b>Atenció!</b> Qualsevol canvi en aquesta pàgina pot fer que el servidor no funcioni correctament.
     </div>
 
     <form class="form form-horizontal row" role="form" name="systemSettings" novalidate>
@@ -180,15 +180,15 @@
 
 
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Save</button>
+            <button class="btn btn-primary" ng-click="saveSystemSettings()" >Desa</button>
         </div>
 
     </form>
     <br>
     <div class="alert alert-danger row" role="alert">
-        <b>Warning!</b> Some changes require restart <b>all</b> the servers in System.<br><br>
+        <b>Atenció!</b> Alguns canvis requereixen reiniciar <b>tots</b> els servidors del sistema.<br><br>
         <div class="col-sm-offset-4  col-sm-8">
-            <button class="btn btn-primary" ng-click="restartServer()" >Restart current server</button>
+            <button class="btn btn-primary" ng-click="restartServer()" >Reinicia el servidor actual</button>
         </div>
     </div>
 </div>

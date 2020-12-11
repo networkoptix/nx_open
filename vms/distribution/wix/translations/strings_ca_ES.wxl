@@ -1,71 +1,71 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <WixLocalization xmlns="http://schemas.microsoft.com/wix/2006/localization" Codepage="1252" Language="1027" Culture="ca-es">
-  <String Id="Caption">[WixBundleName] Setup - [WixBundleVersion]</String>
+  <String Id="Caption">[WixBundleName] Configuració - [WixBundleVersion]</String>
   <String Id="Title">[WixBundleName] - [WixBundleVersion]</String>
   <String Id="Components">[InstallerTitle]</String>
-  <String Id="HelpText">/install | /repair | /uninstall | /layout [directory] - installs, repairs, uninstalls or
-   creates a complete local copy of the bundle in directory. Install is the default.
+  <String Id="HelpText">/instal·la | /reparta | /desinstal·la | /disseny [directory] - instal·la, repara, desinstal·la o
+   crea una copia local completa del paquet al directori. El valor predeterminat és Instal·la.
 
-/passive | /quiet -  displays minimal UI with no prompts or displays no UI and
-   no prompts. By default UI and all prompts are displayed.
+/passiu | /silenci -  mostra la interfície d\'usuari mínima sense avisos o no mostra cap interfície d\'usuari
+   ni avís. De manera predeterminada, es mostren totes les interfícies i els avisos.
 
-/norestart   - suppress any attempts to restart. By default UI will prompt before restart.
-/log log.txt - logs to a specific file. By default a log file is created in %TEMP%.</String>
-  <String Id="ConfirmCancelMessage">Are you sure you want to cancel?</String>
-  <String Id="ClientAndServer">Client and Server</String>
-  <String Id="ClientOnly">Client only</String>
-  <String Id="ClientOnlyDesc">The Client application is used to view video and manage the System</String>
-  <String Id="ServerOnly">Server only</String>
-  <String Id="ServerOnlyDesc">The Server application is used to store System information and archives</String>
-  <String Id="HelpHeader">Setup Help</String>
+/no reiniciïs   - omet tots els intents de reinici. De manera predeterminada, la interfície d\'usuari us avisarà abans de reiniciar.
+/registre log.txt - crea un registre en un arxiu específic. De forma predeterminada, es crea un arxiu de registre a %TEMP%.</String>
+  <String Id="ConfirmCancelMessage">Esteu segur que voleu cancel·lar?</String>
+  <String Id="ClientAndServer">Client i servidor</String>
+  <String Id="ClientOnly">Només client</String>
+  <String Id="ClientOnlyDesc">L\'aplicació de client s\'utilitza per veure vídeo i gestionar el sistema</String>
+  <String Id="ServerOnly">Només servidor</String>
+  <String Id="ServerOnlyDesc">L\'aplicació de servidor s\'utilitza per emmagatzemar la informació i els arxius del sistema</String>
+  <String Id="HelpHeader">Ajuda de configuració</String>
   <String Id="HelpCloseButton">Tancar</String>
-  <String Id="InstallOptionsButton">Options</String>
-  <String Id="InstallInstallButton">Install</String>
+  <String Id="InstallOptionsButton">Opcions</String>
+  <String Id="InstallInstallButton">Instal·la</String>
   <String Id="InstallCloseButton">Tancar</String>
-  <String Id="InstallAcceptCheckbox">I agree to the</String>
-  <String Id="InstallLicenseLinkText">End User License Agreement</String>
-  <String Id="OptionsHeader">Setup Options</String>
-  <String Id="OptionsLocationLabel">Install location:</String>
-  <String Id="OptionsBrowseButton">Browse</String>
+  <String Id="InstallAcceptCheckbox">Accepto</String>
+  <String Id="InstallLicenseLinkText">l\'acord de llicència d\'usuari final</String>
+  <String Id="OptionsHeader">Opcions de configuració</String>
+  <String Id="OptionsLocationLabel">Ubicació de l\'instal·lació:</String>
+  <String Id="OptionsBrowseButton">Explora</String>
   <String Id="OptionsOkButton">OK</String>
   <String Id="OptionsCancelButton">Cancel·lar</String>
-  <String Id="ProgressHeader">Setup Progress</String>
-  <String Id="ProgressLabel">Processing...</String>
-  <String Id="OverallProgressPackageText">Initializing...</String>
+  <String Id="ProgressHeader">Progrés de la configuració</String>
+  <String Id="ProgressLabel">Processant...</String>
+  <String Id="OverallProgressPackageText">Inicialitzant...</String>
   <String Id="ProgressCancelButton">Cancel·lar</String>
-  <String Id="ModifyHeader">Modify Setup</String>
-  <String Id="ModifyRepairButton">Repair</String>
-  <String Id="ModifyUninstallButton">Uninstall</String>
+  <String Id="ModifyHeader">Modifica la configuració</String>
+  <String Id="ModifyRepairButton">Repara</String>
+  <String Id="ModifyUninstallButton">Desinstal·la</String>
   <String Id="ModifyCloseButton">Tancar</String>
-  <String Id="SuccessHeader">Setup Successful</String>
-  <String Id="SuccessUninstallHeader">Uninstall Successfully Completed</String>
-  <String Id="SuccessInstallHeader">Installation Successfully Completed</String>
-  <String Id="SuccessLaunchButton">Launch</String>
-  <String Id="SuccessRestartText">You must restart your computer before you can use the software</String>
-  <String Id="SuccessRestartButton">Restart</String>
+  <String Id="SuccessHeader">Configuració correcta</String>
+  <String Id="SuccessUninstallHeader">La desinstal·lació s\'ha completat correctament</String>
+  <String Id="SuccessInstallHeader">La instal·lació s\'ha completat correctament</String>
+  <String Id="SuccessLaunchButton">Executa</String>
+  <String Id="SuccessRestartText">Heu de reiniciar l\'ordinador abans de poder utilitzar el programari</String>
+  <String Id="SuccessRestartButton">Reinicia</String>
   <String Id="SuccessCloseButton">Tancar</String>
-  <String Id="FailureHeader">Setup Failed</String>
-  <String Id="FailureHyperlinkLogText">One or more issues caused the setup to fail. Please fix the issues and then retry setup. For more information see the</String>
-  <String Id="FailureHyperlinkLogTextLink">log file</String>
-  <String Id="FailureRestartText">You must restart your computer to complete the rollback of the software</String>
-  <String Id="FailureRestartButton">Restart</String>
+  <String Id="FailureHeader">La configuració ha fallat</String>
+  <String Id="FailureHyperlinkLogText">Un o més problemes han provocat un error en la configuració. Solucioneu els problemes i torneu a intentar-ho. Per obtenir més informació, consulteu</String>
+  <String Id="FailureHyperlinkLogTextLink">l\'arxiu de registre</String>
+  <String Id="FailureRestartText">Heu de reiniciar l\'ordinador per completar la restauració del programari</String>
+  <String Id="FailureRestartButton">Reinicia</String>
   <String Id="FailureCloseButton">Tancar</String>
-  <String Id="WillInstall">[WixBundleName] will be installed on your device</String>
-  <String Id="FilesInUseHeader">Files In Use</String>
-  <String Id="FilesInUseLabel">The following applications should be stopped to continue the installation:</String>
-  <String Id="FilesInUseCloseRadioButton">Close the applications and attempt to restart them</String>
-  <String Id="FilesInUseDontCloseRadioButton">Do not close applications. A reboot will be required</String>
+  <String Id="WillInstall">[WixBundleName] s\'instal·larà al dispositiu</String>
+  <String Id="FilesInUseHeader">Arxius en ús</String>
+  <String Id="FilesInUseLabel">S\'han d\'aturar les aplicacions següents per continuar amb la instal·lació:</String>
+  <String Id="FilesInUseCloseRadioButton">Tanqueu les aplicacions i intenteu reiniciar-les</String>
+  <String Id="FilesInUseDontCloseRadioButton">No tanqueu les aplicacions. Caldrà reiniciar</String>
   <String Id="FilesInUseOkButton">OK</String>
   <String Id="FilesInUseCancelButton">Cancel·lar</String>
-  <String Id="Options">Options</String>
-  <String Id="SelectApps">Select applications to be installed:</String>
-  <String Id="msierrFirewallCannotConnect">Cannot connect to Windows Firewall.  ([2]   [3]   [4]   [5])</String>
-  <String Id="WixSchedFirewallExceptionsInstall">Configuring Windows Firewall</String>
-  <String Id="WixSchedFirewallExceptionsUninstall">Configuring Windows Firewall</String>
-  <String Id="WixRollbackFirewallExceptionsInstall">Rolling back Windows Firewall configuration</String>
-  <String Id="WixExecFirewallExceptionsInstall">Installing Windows Firewall configuration</String>
-  <String Id="WixRollbackFirewallExceptionsUninstall">Rolling back Windows Firewall configuration</String>
-  <String Id="WixExecFirewallExceptionsUninstall">Uninstalling Windows Firewall configuration</String>
-  <String Id="Product_ArchMismatch_x86">This package is designed for 32-bit OS. Setup will now exit.</String>
-  <String Id="Product_ArchMismatch_x64">This package is designed for 64-bit OS. Setup will now exit.</String>
+  <String Id="Options">Opcions</String>
+  <String Id="SelectApps">Seleccioneu les aplicacions que voleu instal·lar:</String>
+  <String Id="msierrFirewallCannotConnect">No es pot connectar al tallafoc de Windows. ([2]   [3]   [4]   [5])</String>
+  <String Id="WixSchedFirewallExceptionsInstall">S\'està configurant el tallafoc de Windows</String>
+  <String Id="WixSchedFirewallExceptionsUninstall">S\'està configurant el tallafoc de Windows</String>
+  <String Id="WixRollbackFirewallExceptionsInstall">S\'està desfent la configuració del tallafoc de Windows</String>
+  <String Id="WixExecFirewallExceptionsInstall">S\'està instal·lant la configuració del tallafoc de Windows</String>
+  <String Id="WixRollbackFirewallExceptionsUninstall">S\'està desfent la configuració del tallafoc de Windows</String>
+  <String Id="WixExecFirewallExceptionsUninstall">S\'està desinstal·lant la configuració del tallafoc de Windows</String>
+  <String Id="Product_ArchMismatch_x86">Aquest paquet està dissenyat per a sistemes operatius de 32 bits. Se sortirà de la configuració.</String>
+  <String Id="Product_ArchMismatch_x64">Aquest paquet està dissenyat per a sistemes operatius de 64 bits. Se sortirà de la configuració.</String>
 </WixLocalization>

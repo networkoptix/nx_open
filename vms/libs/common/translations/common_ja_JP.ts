@@ -187,11 +187,11 @@
     </message>
     <message>
       <source>You are about to merge Systems with NVR licenses.</source>
-      <translation type="unfinished">You are about to merge Systems with NVR licenses.</translation>
+      <translation>システムをNVRライセンスと統合しようとしています。</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one NVR license is allowed per System, so the second license will be deactivated.</translation>
+      <translation>システムごとに許可されているNVRライセンスは1つだけなので、2番目のライセンスは無効になります。</translation>
     </message>
   </context>
   <context>
@@ -762,23 +762,23 @@
     </message>
     <message>
       <source>NVR</source>
-      <translation type="unfinished">NVR</translation>
+      <translation>NVR</translation>
     </message>
     <message>
       <source>NVR Licenses</source>
-      <translation type="unfinished">NVR Licenses</translation>
+      <translation>NVRライセンス</translation>
     </message>
     <message numerus="yes">
       <source>%n NVR Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n NVR Licenses</numerusform>
+      <translation>
+        <numerusform>%n NVRライセンス</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 NVR Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 NVR Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 NVRライセンス</numerusform>
       </translation>
     </message>
   </context>
@@ -841,27 +841,27 @@
     </message>
     <message>
       <source>Only one Starter license is allowed per System.</source>
-      <translation type="unfinished">Only one Starter license is allowed per System.</translation>
+      <translation>システムごとに許可されるスターターライセンスは1つだけです。</translation>
     </message>
     <message>
       <source>You already have one active Starter license.</source>
-      <translation type="unfinished">You already have one active Starter license.</translation>
+      <translation>すでに1つのスターターライセンスがアクティベートされています</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per System.</source>
-      <translation type="unfinished">Only one NVR license is allowed per System.</translation>
+      <translation>システムごとに許可されるNVRライセンスは1つだけです。</translation>
     </message>
     <message>
       <source>You already have one active NVR license.</source>
-      <translation type="unfinished">You already have one active NVR license.</translation>
+      <translation>既に有効な NVR ライセンスが一つあります。</translation>
     </message>
     <message>
       <source>Only one license of this type is allowed per System.</source>
-      <translation type="unfinished">Only one license of this type is allowed per System.</translation>
+      <translation>このタイプのライセンスは、システムごとに1つだけ許可されます。</translation>
     </message>
     <message>
       <source>You already have one active license of the same type.</source>
-      <translation type="unfinished">You already have one active license of the same type.</translation>
+      <translation>同じタイプのアクティブなライセンスがすでに1つあります。</translation>
     </message>
   </context>
   <context>
