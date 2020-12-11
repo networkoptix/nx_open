@@ -21,8 +21,12 @@ if(customization.desktop.supportsHanwha)
 endif()
 
 set(vmax false) # TODO: rename
+set(include_dw_edge_analytics_plugin false)
 if(customization.desktop.supportsVmax)
     set(vmax true)
+
+    # Temporary solution until generic one is implemented.
+    set(include_dw_edge_analytics_plugin true)
 endif()
 
 # Overridden in hanwha, qulu

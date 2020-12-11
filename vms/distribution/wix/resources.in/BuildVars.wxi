@@ -19,6 +19,7 @@
 
         <?define arch = "${arch}"?>
         <?define vmax = "${vmax}"?>
+        <?define include_dw_edge_analytics_plugin = "${include_dw_edge_analytics_plugin}"?>
 
         <?define customization = "${customization}"?>
         <?define uriProtocol = "${customization.uriProtocol}"?>
