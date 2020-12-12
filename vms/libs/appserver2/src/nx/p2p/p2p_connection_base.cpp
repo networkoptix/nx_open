@@ -237,11 +237,20 @@ void ConnectionBase::onHttpClientDone()
         }
 
         if (m_connectionLockGuard->tryAcquireConnecting())
+        {
+            auto url = m_httpClient->url();
+            // Switch to the HTTPS in case of previous request return 'moved' to the HTTPS.
+            if (m_httpClient->contentLocationUrl().scheme() == nx::network::http::kSecureUrlSchemeName)
+                url.setScheme(nx::network::http::kSecureUrlSchemeName);
+
             m_httpClient->doGet(
-                m_httpClient->url(),
+                url,
                 std::bind(&ConnectionBase::onHttpClientDone, this));
+        }
         else
+        {
             cancelConnecting(State::Error, lm("tryAcquireConnecting failed"));
+        }
         return;
     }
 

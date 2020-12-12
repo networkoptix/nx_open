@@ -48,9 +48,14 @@ protected:
         m_servers[index]->commonModule()->globalSettings()->setWebSocketEnabled(false);
     }
 
-    void connectFirstServerToTheSecond()
+    void forceHttpsOnlyForServer(int index)
     {
-        m_servers[0]->connectTo(m_servers[1].get());
+        m_servers[index]->commonModule()->globalSettings()->setTrafficEncryptionForced(true);
+    }
+
+    void connectFirstServerToTheSecond(bool isSecure = true)
+    {
+        m_servers[0]->connectTo(m_servers[1].get(), isSecure);
         waitUntilConnectionEstablished();
     }
 
@@ -231,6 +236,17 @@ TEST_F(ServerRuntimeEventManagerTest, serverRuntimeEventDeliveredToAnotherServer
     givenNotConnectedServers(2);
     disableWebSocketForServer(1);
     connectFirstServerToTheSecond();
+
+    afterSendingDeviceSettingsMaybeChangedEventFromServer(0);
+    makeSureEventHasBeenDeliveredToServer(1);
+}
+
+TEST_F(ServerRuntimeEventManagerTest, serverRuntimeEventDeliveredToAnotherServer_via_https)
+{
+    givenNotConnectedServers(2);
+    disableWebSocketForServer(0);
+    forceHttpsOnlyForServer(1);
+    connectFirstServerToTheSecond(/*isSecure*/ false);
 
     afterSendingDeviceSettingsMaybeChangedEventFromServer(0);
     makeSureEventHasBeenDeliveredToServer(1);
