@@ -6,7 +6,7 @@
         "openLinkWithTitle": "Per {{title}} visiteu aquest enllaç"
     },
     "setup": {
-        "createAccount": "crear un compte",
+        "createAccount": "crea un compte",
         "errorNoHDD": "Aquest dispositiu està dissenyat per funcionar amb la unitat de disc dur instal·lada.<br>Apagueu el dispositiu i instal·leu una unitat de disc dur.",
         "errorNoNetwork": "Aquest dispositiu necessita connexió de xarxa per funcionar.<br>Connecteu-lo a la xarxa local o a Internet"
     },
@@ -132,7 +132,7 @@
         "maxEventLogRecords": "Registres d'esdeveniments màxims que es mantenen a la base de dades. La quantitat real de registres no eliminats pot ser fins a un 20% superior al valor especificat.",
         "forceLiveCacheForPrimaryStream": "Si cal emmagatzemar alguns segments per al flux principal. Valors: \"sí\" - sempre activat (pot utilitzar molta memòria RAM), \"no\" - sempre desactivat excepte quan la reproducció ho requereixi (per exemple, HLS), \"automàtic\" - similar a \"no\", però activat quan millora el experiència d'usuari (per exemple, quan algun connector d'Analytics està funcionant a la càmera).",
         "additionalLocalFsTypes": "Tipus de sistemes d'arxius addicionals que cal tenir en compte a l'hora de decidir si una partició determinada és adequada per ser un emmagatzematge de servidor. S'espera una llista separada per comes de noms de sistemes d'arxius tal com apareixen a /proc/mounts.",
-        "mediaBufferSizeKb": "Mida de la memòria intermèdia del costat del servidor en KB. Un valor més gran permet utilitzar Internet de manera més eficient amb un valor de retard d’anada i tornada elevat, però alenteix el canvi automàtic de qualitat i la reacció a les operacions de cerca de suports.",
+        "mediaBufferSizeKb": "Mida de la memòria intermèdia del costat del servidor en KB. Un valor més gran permet utilitzar Internet de manera més eficient amb un valor de retard d'anada i tornada elevat, però alenteix el canvi automàtic de qualitat i la reacció a les operacions de cerca de suports.",
         "mediaBufferSizeForAudioOnlyDeviceKb": "Mida de la memòria intermèdia del costat del servidor en KB. Significa el mateix que el paràmetre 'mediaBufferSizeKb', però només s'aplica als dispositius d'àudio."
     },
     "info": {
@@ -225,7 +225,7 @@
         },
         "searchCamPlaceholder": "Cerca",
         "resolution": {
-            "auto": "Automàtic",
+            "auto": "Auto",
             "high": "Alta",
             "low": "Baixa"
         },

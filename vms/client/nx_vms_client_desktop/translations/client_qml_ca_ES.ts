@@ -141,7 +141,7 @@
     <name>LocalSystemTileExpandedAreaPart</name>
     <message>
       <source>Login</source>
-      <translation>Iniciar sessió</translation>
+      <translation>Usuari</translation>
     </message>
     <message>
       <source>Password</source>

@@ -3185,7 +3185,7 @@ to %1</source>
     </message>
     <message>
       <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+      <translation>この録音デバイスは適切な音声形式をサポートしていません。スクリーン録画設定で、別のデバイスまたは &quot;なし&quot; を選択してください。</translation>
     </message>
   </context>
   <context>

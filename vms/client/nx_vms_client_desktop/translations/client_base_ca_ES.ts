@@ -158,7 +158,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Push my screen</source>
-      <translation>Prem la meva pantalla</translation>
+      <translation>Difon la meva pantalla</translation>
     </message>
     <message>
       <source>Select Time Server</source>
@@ -345,7 +345,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Create Account...</source>
-      <translation>Crear un compte...</translation>
+      <translation>Crea un compte...</translation>
     </message>
     <message>
       <source>Event Rules...</source>
@@ -433,7 +433,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Open in New Window</source>
-      <translation>Obrir en una nova finestra</translation>
+      <translation>Obrir en una finestra nova</translation>
     </message>
     <message>
       <source>Monitor in New Window</source>
@@ -1901,11 +1901,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Unsuccessful login</source>
-      <translation>Inici de sessió fallit</translation>
+      <translation>Error en l'inici de sessió</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation>Iniciar sessió</translation>
+      <translation>Usuari</translation>
     </message>
     <message>
       <source>User updated</source>
@@ -2527,11 +2527,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Confirming target device provides media stream.</source>
-      <translation>S'està confirmant que el dispositiu objectiu proporciona un flux de suports.</translation>
+      <translation>S'està confirmant que el dispositiu de destinació proporciona un flux de suports.</translation>
     </message>
     <message>
       <source>Confirming target camera provides media stream.</source>
-      <translation>S'està confirmant que la càmera objectiva proporciona un flux de suports.</translation>
+      <translation>S'està confirmant que la càmera de destinació proporciona un flux de suports.</translation>
     </message>
     <message>
       <source>Diagnostics for I/O module %1</source>
@@ -2547,7 +2547,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Confirming target I/O module provides media stream.</source>
-      <translation>S'està confirmant que el mòdul I/O objectiu proporciona un flux de suports.</translation>
+      <translation>S'està confirmant que el mòdul I/O de destinació proporciona un flux de suports.</translation>
     </message>
     <message>
       <source>Diagnostics complete</source>
@@ -2880,7 +2880,7 @@ a %1</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation>Crear un compte</translation>
+      <translation>Crea un compte</translation>
     </message>
     <message>
       <source>Forgot password?</source>
@@ -3244,7 +3244,7 @@ a %1</translation>
     </message>
     <message>
       <source>Login</source>
-      <translation>Iniciar sessió</translation>
+      <translation>Usuari</translation>
     </message>
     <message>
       <source>Password</source>
@@ -3445,7 +3445,7 @@ a %1</translation>
     <name>QnExecHttpRequestActionWidget</name>
     <message>
       <source>Auto</source>
-      <translation>Automàtic</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>Basic</source>
@@ -3568,7 +3568,7 @@ a %1</translation>
     </message>
     <message>
       <source>Auto (%1)</source>
-      <translation>Automàtic (%1)</translation>
+      <translation>Auto (%1)</translation>
     </message>
   </context>
   <context>
@@ -3773,7 +3773,7 @@ a %1</translation>
     <name>QnLdapUserListModel</name>
     <message>
       <source>Login</source>
-      <translation>Iniciar sessió</translation>
+      <translation>Usuari</translation>
     </message>
     <message>
       <source>Email</source>
@@ -4142,7 +4142,7 @@ a %1</translation>
     </message>
     <message>
       <source>Create account</source>
-      <translation>Crear un compte</translation>
+      <translation>Crea un compte</translation>
     </message>
     <message>
       <source>Forgot password?</source>
@@ -5422,7 +5422,7 @@ a %1</translation>
     <name>QnSmtpAdvancedSettingsWidget</name>
     <message>
       <source>Auto</source>
-      <translation>Automàtic</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>Email</source>
@@ -6278,7 +6278,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>Login</source>
-      <translation>Iniciar sessió</translation>
+      <translation>Usuari</translation>
     </message>
     <message>
       <source>Role</source>
@@ -6344,7 +6344,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <name>QnUserProfileWidget</name>
     <message>
       <source>Login</source>
-      <translation>Iniciar sessió</translation>
+      <translation>Usuari</translation>
     </message>
     <message>
       <source>Name</source>
@@ -6487,7 +6487,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>Login</source>
-      <translation>Iniciar sessió</translation>
+      <translation>Usuari</translation>
     </message>
     <message>
       <source>Login cannot be empty.</source>
@@ -7675,7 +7675,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>
-      <translation>Iniciar sessió</translation>
+      <translation>Usuari</translation>
     </message>
     <message>
       <source>Password</source>
@@ -7687,12 +7687,12 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <message>
       <source>Auto</source>
       <comment>Automatic RTP transport type</comment>
-      <translation>Automàtic</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>Auto</source>
       <comment>Automatic PTZ preset type</comment>
-      <translation>Automàtic</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>System</source>
@@ -8547,7 +8547,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <name>nx::vms::client::desktop::ImageControlWidget</name>
     <message>
       <source>Auto</source>
-      <translation>Automàtic</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>%1 degrees</source>
@@ -9275,7 +9275,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <name>nx::vms::client::desktop::RadassActionFactory</name>
     <message>
       <source>Auto</source>
-      <translation>Automàtica</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <source>Low</source>

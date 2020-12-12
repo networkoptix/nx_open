@@ -39,26 +39,26 @@
 
                     <div>
                         <h3>Reinicia el servidor</h3>
-                        <p>This action will revert this server to defaults (clear the database and reset configuration).
-                            El servidor es desvincularà del sistema actual. Video archive will remain intact.</p>
-                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restore factory defaults</button></p>
+                        <p>Aquesta acció restaurarà els paràmetres predeterminats del servidor (esborrarà la base de dades i restablirà la configuració).
+                            El servidor es desvincularà del sistema actual. L'arxiu de vídeo romandrà intacte.</p>
+                        <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restaura els paràmetres predeterminats de fàbrica</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>Desvincula el servidor del sistema</h3>
                         <p>Aquesta acció desvincularà el servidor de la base de dades de manteniment del sistema, dels usuaris locals i de la configuració.
-                            Video archive will remain intact. <b>Cloud users will be deleted.</b></p>
+                            L'arxiu de vídeo romandrà intacte. <b>S'eliminaran els usuaris del núvol.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Desvincula del sistema</button></p>
                     </div>
                     <div>
-                        <h3>Restart</h3>
-                        <p><button type="button" class="btn btn-default" ng-click="restart()">Restart Server</button>
-                            <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reboot</button></p>
+                        <h3>Reinicia</h3>
+                        <p><button type="button" class="btn btn-default" ng-click="restart()">Reinicia el servidor</button>
+                            <button type="button" class="btn btn-default" ng-if="canHardwareRestart" ng-click="hardwareRestart()">Reinicia</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
-                            <h3>Change admin password</h3>
-                            <p>If System is local (not connected to the cloud) this will change the password for user "admin" and the recovery (root) password on some servers.<br>
-                                Otherwise this will change the recovery password only.</p>
+                            <h3>Canvia la contrasenya de l'administrador</h3>
+                            <p>Si el sistema és local (no està connectat al núvol), canviarà la contrasenya de l'usuari "admin" i la contrasenya de recuperació (primària) d'alguns servidors.<br>
+                                En cas contrari, només canviarà la contrasenya de recuperació.</p>
                             <div class="col-sm-6">
                                 <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
                             </div>

@@ -1,35 +1,35 @@
 <div class="container-fluid">
     <h1>
-        Server Documentation
+        Documentació del servidor
     </h1>
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h2 class="panel-title">These settings are accessible at:</h2>
+            <h2 class="panel-title">Es pot accedir a aquesta configuració a:</h2>
         </div>
         <div class="panel-body">
             <p>
-                For Windows in registry key:
-                HKEY_LOCAL_MACHINE\SOFTWARE\{VMS Vendor}\{VMS Vendor} Media Server
+                Per a Windows, a la clau de registre:
+                HKEY_LOCAL_MACHINE\SOFTWARE\{VMS Vendor}\{VMS Vendor} Servidor de suports
             </p>
             <p>
-                For all other platforms it is placed in a config file:
-                /opt/{vmsvendor}/mediaserver/etc/mediaserver.conf. To temporarily comment out some
-                setting, add the underscore symbol ("_") to the begining of its name, e.g.
-                "absoluteRtcpTimestamps=false" converts to "_absoluteRtcpTimestamps=false".
+                Per a la resta de plataformes, s'ubica en un fitxer de configuració:
+                /opt/{vmsvendor}/mediaserver/etc/mediaserver.conf. Per comentar temporalment algun paràmetre,
+                afegiu el símbol de subratllat ("_") al començament del nom, per exemple:
+                "absoluteRtcpTimestamps=false" es converteix en "_absoluteRtcpTimestamps=false".
             </p>
         </div>
     </div>
     <div class="panel panel-default table-responsive">
         <div class="panel-heading">
-            <h2 class="panel-title">Server Settings</h2>
+            <h2 class="panel-title">Configuració del servidor</h2>
         </div>
         <div class="panel-body">
             <table class="table table-striped table-condensed">
                 <thead>
                     <rt>
-                        <th>Name</th>
+                        <th>Nom</th>
                         <th>Descripció</th>
-                        <th>Default Value</th>
+                        <th>Valor predeterminat</th>
                     </rt>
                 </thead>
                 <tbody>

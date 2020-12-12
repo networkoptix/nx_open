@@ -25,7 +25,7 @@
     </message>
     <message>
       <source>Invalid login.</source>
-      <translation>El nom d'usuari no és vàlid.</translation>
+      <translation>L'usuari no és vàlid.</translation>
     </message>
     <message>
       <source>Internal %1 error. Please contact support team.</source>

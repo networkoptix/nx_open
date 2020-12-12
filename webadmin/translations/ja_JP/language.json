@@ -227,7 +227,7 @@
         "resolution": {
             "auto": "自動",
             "high": "高い",
-            "low": "低い"
+            "low": "低"
         },
         "chromeCastWarning": "Chromecastはリソースを大量に消費するため、サーバーに問題を引き起こす可能性があります。",
         "voiceCommands": {

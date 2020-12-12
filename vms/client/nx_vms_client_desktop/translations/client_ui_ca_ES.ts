@@ -62,7 +62,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>Automàtic</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>
@@ -184,7 +184,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>Automàtic</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>
@@ -588,7 +588,7 @@
     <message>
       <location/>
       <source>Auto</source>
-      <translation>Automàtic</translation>
+      <translation>Auto</translation>
     </message>
     <message>
       <location/>
@@ -1103,7 +1103,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Iniciar sessió</translation>
+      <translation>Usuari</translation>
     </message>
     <message>
       <location/>
@@ -1192,7 +1192,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Iniciar sessió</translation>
+      <translation>Usuari</translation>
     </message>
     <message>
       <location/>
@@ -1931,7 +1931,7 @@
     <message>
       <location/>
       <source>Login</source>
-      <translation>Iniciar sessió</translation>
+      <translation>Usuari</translation>
     </message>
     <message>
       <location/>
@@ -2449,7 +2449,7 @@
     <message>
       <location/>
       <source>Login:</source>
-      <translation>Iniciar sessió:</translation>
+      <translation>Usuari:</translation>
     </message>
     <message>
       <location/>
