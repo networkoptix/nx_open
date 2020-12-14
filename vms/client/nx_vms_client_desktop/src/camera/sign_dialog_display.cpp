@@ -28,12 +28,6 @@ void QnSignDialogDisplay::finalizeSign()
     QByteArray signFromPicture;
     QByteArray calculatedSign;
     QByteArray calculatedSign2; //< new version of signature
-#ifdef SIGN_FRAME_ENABLED
-    calculatedSign = m_mdctx.result();
-    QSharedPointer<CLVideoDecoderOutput> lastFrame = m_display[0]->flush(QnFrameScaler::factor_any, 0);
-    QnSignHelper signHelper;
-    signFromPicture = signHelper.getSign(lastFrame.data(), calculatedSign.size());
-#else
     if (m_reader)
     {
         QnAviArchiveDelegate* aviFile = dynamic_cast<QnAviArchiveDelegate*> (m_reader->getArchiveDelegate());
@@ -66,7 +60,7 @@ void QnSignDialogDisplay::finalizeSign()
             }
         }
     }
-#endif
+
     emit calcSignInProgress(calculatedSign, 100);
     emit gotSignature(calculatedSign, calculatedSign2, signFromPicture);
 }
@@ -112,24 +106,16 @@ bool QnSignDialogDisplay::processData(const QnAbstractDataPacketPtr& data)
     else if (video || audio)
     {
         m_hasProcessedMedia = true;
-#ifndef SIGN_FRAME_ENABLED
         // update digest from current frame
         if (media && media->dataSize() > 4)
         {
             const quint8* data = (const quint8*)media->data();
+            // TODO remove support of old version of signature in 4.3
             QnSignHelper::updateDigest(media->context, m_mdctx, data, static_cast<int>(media->dataSize()));
             // build new version of signature
             m_mediaSigner.processMedia(
                 media->context, data, static_cast<int>(media->dataSize()), media->dataType);
         }
-#else
-        // update digest from previous frames because of last frame it is sign frame itself
-        if (m_prevFrame && m_prevFrame->data.size() > 4)
-        {
-            const quint8* data = (const quint8*)m_prevFrame->data.data();
-            QnSignHelper::updateDigest(m_prevFrame->context, m_mdctx, data, m_prevFrame->data.size());
-        }
-#endif
         if (video)
         {
             video->channelNumber = 0; // ignore layout info

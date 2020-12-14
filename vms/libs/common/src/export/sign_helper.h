@@ -60,7 +60,7 @@ public:
     static QByteArray getSignMagic();
 
     /** Fix signature to make it precisely signSize() bytes length, filled with spaces. */
-    static QByteArray makeSignature(QByteArray source);
+    static QByteArray addSignatureFiller(QByteArray source);
 
     void setVersionStr(const QString& value);
     void setHwIdStr(const QString& value);

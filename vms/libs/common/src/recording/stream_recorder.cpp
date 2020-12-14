@@ -138,11 +138,9 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_prebufferingUsec(0),
     m_bofDateTimeUs(AV_NOPTS_VALUE),
     m_eofDateTimeUs(AV_NOPTS_VALUE),
-    m_endOfData(false),
     m_lastProgress(-1),
     m_needCalcSignature(false),
     m_mediaProvider(0),
-    m_mdctx(EXPORT_SIGN_METHOD),
     m_container(QLatin1String("matroska")),
     m_needReopen(false),
     m_isAudioPresent(false),
@@ -185,36 +183,14 @@ void QnStreamRecorder::updateSignatureAttr(StreamRecorderContext* context)
         NX_VERBOSE(this) << "SignVideo: could not open the file";
         return;
     }
-
-    // Placeholder start for actual signature. Really QnSignHelper::signSize() bytes written.
-    const auto placeholder = QnSignHelper::getSignMagic();
-
-    // Update old metadata (except mp4).
-    if (context->fileFormat != QnAviArchiveMetadata::Format::mp4)
-    {
-        const bool tagUpdated = updateInFile(file.data(),
-            context->fileFormat,
-            placeholder,
-            QnSignHelper::getSignFromDigest(getSignature()));
-        NX_ASSERT(tagUpdated, "SignVideo: signature tag was not updated");
-    }
-
-    // Update new metadata.
-    auto& metadata = context->metadata;
-    QByteArray signPattern = metadata.signature;
-    QByteArray signPlaceholder = signPattern;
-
-    NX_ASSERT(signPattern.indexOf(placeholder) >= 0, "Sign magic must be present in metadata");
-    signPattern.replace(QnSignHelper::getSignMagic(),
-        QnSignHelper::getSignFromDigest(getSignature()));
-
-    metadata.signature = QnSignHelper::makeSignature(signPattern);
+    QByteArray placeholder = QnSignHelper::addSignatureFiller(QnSignHelper::getSignMagic());
+    QByteArray signature = QnSignHelper::addSignatureFiller(m_signer.buildSignature(licensePool()));
 
     //New metadata is stored as json, so signature is written base64 - encoded.
     const bool metadataUpdated = updateInFile(file.data(),
         context->fileFormat,
-        signPlaceholder.toBase64(),
-        metadata.signature.toBase64());
+        placeholder.toBase64(),
+        signature.toBase64());
     NX_ASSERT(metadataUpdated, "SignVideo: metadata tag was not updated");
 }
 
@@ -235,9 +211,6 @@ void QnStreamRecorder::close()
     if (m_packetWrited && m_videoTranscoder)
         flushTranscoder();
 
-    if (m_role == StreamRecorderRole::fileExport)
-        addSignatureFrameIfNeed();
-
     m_lastCompressionType = AV_CODEC_ID_NONE;
     for (size_t i = 0; i < m_recordingContextVector.size(); ++i)
     {
@@ -250,10 +223,8 @@ void QnStreamRecorder::close()
             QnFfmpegHelper::closeFfmpegIOContext(m_recordingContextVector[i].formatCtx->pb);
             if (m_startDateTimeUs != qint64(AV_NOPTS_VALUE))
                 fileSize = m_recordingContextVector[i].storage->getFileSize(m_recordingContextVector[i].fileName);
-#ifndef SIGN_FRAME_ENABLED
             if (m_needCalcSignature)
                 updateSignatureAttr(&m_recordingContextVector[i]);
-#endif
             m_recordingContextVector[i].formatCtx->pb = nullptr;
             avformat_close_input(&m_recordingContextVector[i].formatCtx);
         }
@@ -333,33 +304,6 @@ qint64 QnStreamRecorder::findNextIFrame(qint64 baseTime)
             return media->timestamp;
     }
     return AV_NOPTS_VALUE;
-}
-
-void QnStreamRecorder::addSignatureFrameIfNeed()
-{
-    if (!m_endOfData)
-    {
-        bool isOk = true;
-        if (m_needCalcSignature && !m_firstTime)
-            isOk = addSignatureFrame();
-
-        if (isOk)
-        {
-            m_lastError = StreamRecorderErrorStruct(
-                StreamRecorderError::noError,
-                QnStorageResourcePtr()
-            );
-        }
-
-        m_recordingFinished = true;
-        m_endOfData = true;
-        NX_VERBOSE(this,
-            "END: Stopping; m_endOfData: false; error: %1", isOk ? "true" : "false");
-    }
-    else
-    {
-        NX_VERBOSE(this, "END: Stopping; m_endOfData: true");
-    }
 }
 
 void QnStreamRecorder::updateProgress(qint64 timestampUs)
@@ -809,8 +753,7 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
                     m_lastIFrame = std::dynamic_pointer_cast<const QnCompressedVideoData>(md);
                 AVCodecContext* srcCodec = m_recordingContextVector[i].formatCtx->streams[streamIndex]->codec;
                 NX_VERBOSE(this, "SignVideo: add video packet of size %1", avPkt.size);
-                QnSignHelper::updateDigest(srcCodec, m_mdctx, avPkt.data, avPkt.size);
-                //EVP_DigestUpdate(m_mdctx, (const char*)avPkt.data, avPkt.size);
+                m_signer.processMedia(srcCodec, avPkt.data, avPkt.size, md->dataType);
             }
         }
     }
@@ -913,17 +856,11 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
 
         context.metadata.timeZoneOffset = m_serverTimeZoneMs;
 
-#ifndef SIGN_FRAME_ENABLED
         if (m_needCalcSignature)
         {
-            QByteArray signPattern = QnSignHelper::getSignPattern(licensePool());
-
-            // Add server time zone as one more column to sign pattern.
-            if (m_serverTimeZoneMs != Qn::InvalidUtcOffset)
-                signPattern.append(QByteArray::number(m_serverTimeZoneMs));
-            context.metadata.signature = QnSignHelper::makeSignature(signPattern);
+            context.metadata.signature =
+                QnSignHelper::addSignatureFiller(QnSignHelper::getSignMagic());
         }
-#endif
 
         if (fileExt == lit("avi"))
             context.fileFormat = QnAviArchiveMetadata::Format::avi;
@@ -1321,7 +1258,6 @@ QString QnStreamRecorder::fixedFileName() const
 void QnStreamRecorder::setProgressBounds(qint64 bof, qint64 eof)
 {
     QnMutexLocker lock(&m_mutex);
-    m_endOfData = false;
     m_bofDateTimeUs = bof;
     m_eofDateTimeUs = eof;
     m_lastProgress = -1;
@@ -1335,69 +1271,13 @@ void QnStreamRecorder::setNeedCalcSignature(bool value)
     m_needCalcSignature = value;
 
     if (value)
-    {
-        m_mdctx.reset();
-        m_mdctx.addData(EXPORT_SIGN_MAGIC, sizeof(EXPORT_SIGN_MAGIC));
         NX_VERBOSE(this) << "SignVideo: init";
-    }
-}
-
-QByteArray QnStreamRecorder::getSignature() const
-{
-    return m_mdctx.result();
-}
-
-bool QnStreamRecorder::addSignatureFrame()
-{
-#ifndef SIGN_FRAME_ENABLED
-    QByteArray signText = QnSignHelper::getSignPattern(licensePool());
-    if (m_serverTimeZoneMs != Qn::InvalidUtcOffset)
-        signText.append(QByteArray::number(m_serverTimeZoneMs)); // I've included server timezone to sign to prevent modification this attribute
-    NX_VERBOSE(this) << "SignVideo: add signature";
-    QnSignHelper::updateDigest(nullptr, m_mdctx, (const quint8*)signText.data(), signText.size());
-#else
-    AVCodecContext* srcCodec = m_formatCtx->streams[0]->codec;
-    QnSignHelper signHelper;
-    signHelper.setLogo(QPixmap::fromImage(m_logo));
-    signHelper.setSign(getSignature());
-    QnCompressedVideoDataPtr generatedFrame = signHelper.createSignatureFrame(srcCodec, m_lastIFrame);
-
-    if (generatedFrame == 0)
-    {
-        m_lastErrMessage = lit("Error during watermark generation for file \"%1\".").arg(m_fileName);
-        qWarning() << m_lastErrMessage;
-        return false;
-    }
-
-    generatedFrame->timestamp = m_endDateTimeUs + 100 * 1000ll;
-    m_needCalcSignature = false; // prevent recursive calls
-    //for (int i = 0; i < 2; ++i) // 2 - work, 1 - work at VLC
-    {
-        saveData(generatedFrame);
-        generatedFrame->timestamp += 100 * 1000ll;
-    }
-    m_needCalcSignature = true;
-#endif
-
-    return true;
 }
 
 void QnStreamRecorder::setRole(StreamRecorderRole role)
 {
     m_role = role;
 }
-
-#ifdef SIGN_FRAME_ENABLED
-void QnStreamRecorder::setSignLogo(const QImage& logo)
-{
-    m_logo = logo;
-}
-#endif
-
-//void QnStreamRecorder::setStorage(const QnStorageResourcePtr& storage)
-//{
-//    m_storage = storage;
-//}
 
 void QnStreamRecorder::setContainer(const QString& container)
 {

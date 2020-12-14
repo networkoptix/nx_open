@@ -256,8 +256,5 @@ bool QnAviArchiveMetadata::saveToFile(AVFormatContext* context, Format format)
     if (dewarpingParams.enabled)
         setValueLogged(DewarpingTag, QJson::serialized<QnMediaDewarpingParams>(dewarpingParams));
 
-    if (!signature.isEmpty())
-        setValueLogged(SignatureTag, signature);
-
     return isSuccessful;
 }

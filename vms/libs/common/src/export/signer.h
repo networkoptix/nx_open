@@ -20,6 +20,7 @@ public:
         const QnConstMediaContextPtr& context, const uint8_t* data, int size, QnAbstractMediaData::DataType type);
     QByteArray buildSignature(QnLicensePool* licensePool);
     QByteArray buildSignature(const QByteArray& signPattern);
+
 private:
     nx::utils::QnCryptographicHash m_audioHash;
     nx::utils::QnCryptographicHash m_signatureHash;

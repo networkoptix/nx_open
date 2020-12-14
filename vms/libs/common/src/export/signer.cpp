@@ -15,6 +15,7 @@ MediaSigner::MediaSigner():
 void MediaSigner::processMedia(
     AVCodecContext* context, const uint8_t* data, int size, QnAbstractMediaData::DataType type)
 {
+    // Audio/video order can be broken after muxing/demuxing so use separate hash for audio
     if (type == QnAbstractMediaData::VIDEO)
         QnSignHelper::updateDigest(context, m_signatureHash, data, size);
     else
@@ -24,6 +25,7 @@ void MediaSigner::processMedia(
 void MediaSigner::processMedia(
     const QnConstMediaContextPtr& context, const uint8_t* data, int size, QnAbstractMediaData::DataType type)
 {
+    // Audio/video order can be broken after muxing/demuxing so use separate hash for audio
     if (type == QnAbstractMediaData::VIDEO)
         QnSignHelper::updateDigest(context, m_signatureHash, data, size);
     else

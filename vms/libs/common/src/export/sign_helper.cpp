@@ -767,7 +767,7 @@ QByteArray QnSignHelper::getSignMagic()
     return INITIAL_SIGNATURE_MAGIC;
 }
 
-QByteArray QnSignHelper::makeSignature(QByteArray source)
+QByteArray QnSignHelper::addSignatureFiller(QByteArray source)
 {
     while (source.size() < kSignatureSize)
         source.append(" ");

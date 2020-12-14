@@ -33,6 +33,7 @@ extern "C"
 #include <recording/stream_recorder_data.h>
 
 #include <common/common_module_aware.h>
+#include <export/signer.h>
 #include <core/resource/avi/avi_archive_metadata.h>
 
 class QnAbstractMediaStreamDataProvider;
@@ -94,15 +95,6 @@ public:
 
     void disableRegisterFile(bool disable);
 
-#ifdef SIGN_FRAME_ENABLED
-    void setSignLogo(const QImage& logo);
-#endif
-
-    /*
-    * Return hash value
-    */
-    QByteArray getSignature() const;
-
     void setRole(StreamRecorderRole role);
 
     void setContainer(const QString& container);
@@ -158,7 +150,6 @@ protected:
     }
     virtual void getStoragesAndFileNames(QnAbstractMediaStreamDataProvider*);
 
-    bool addSignatureFrame();
     void markNeedKeyData();
     virtual bool saveData(const QnConstAbstractMediaDataPtr& md);
     virtual void writeData(const QnConstAbstractMediaDataPtr& md, int streamIndex);
@@ -193,7 +184,6 @@ private:
     void updateSignatureAttr(StreamRecorderContext* context);
     qint64 findNextIFrame(qint64 baseTime);
     void cleanFfmpegContexts();
-    void addSignatureFrameIfNeed();
     void updateProgress(qint64 timestampUs);
     void flushTranscoder();
 protected:
@@ -219,15 +209,10 @@ private:
 
     qint64 m_bofDateTimeUs;
     qint64 m_eofDateTimeUs;
-    bool m_endOfData;
     int m_lastProgress;
     bool m_needCalcSignature;
     QnAbstractMediaStreamDataProvider* m_mediaProvider;
 
-    nx::utils::QnCryptographicHash m_mdctx;
-#ifdef SIGN_FRAME_ENABLED
-    QImage m_logo;
-#endif
     QString m_container;
     boost::optional<QnCodecAudioFormat> m_prevAudioFormat;
     bool m_needReopen;
@@ -259,6 +244,7 @@ private:
     int m_transcoderFixedFrameRate = 0;
     mutable QnMutex m_mutex;
     AVCodecID m_lastCompressionType = AV_CODEC_ID_NONE;
+    MediaSigner m_signer;
 };
 
 #endif // ENABLE_DATA_PROVIDERS
