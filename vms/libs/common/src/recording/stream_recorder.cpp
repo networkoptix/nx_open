@@ -235,6 +235,9 @@ void QnStreamRecorder::close()
     if (m_packetWrited && m_videoTranscoder)
         flushTranscoder();
 
+    if (m_role == StreamRecorderRole::fileExport)
+        addSignatureFrameIfNeed();
+
     m_lastCompressionType = AV_CODEC_ID_NONE;
     for (size_t i = 0; i < m_recordingContextVector.size(); ++i)
     {
@@ -406,8 +409,6 @@ bool QnStreamRecorder::processData(const QnAbstractDataPacketPtr& data)
         QnMutexLocker lock(&m_mutex);
         if (m_eofDateTimeUs != qint64(AV_NOPTS_VALUE) && md->timestamp > m_eofDateTimeUs)
         {
-            if (m_role == StreamRecorderRole::fileExport)
-                addSignatureFrameIfNeed();
             pleaseStop();
             return true;
         }
