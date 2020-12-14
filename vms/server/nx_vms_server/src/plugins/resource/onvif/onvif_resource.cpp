@@ -55,6 +55,7 @@
 
 #include <core/resource_management/resource_properties.h>
 #include <utils/media/av_codec_helper.h>
+#include "profile_helper.h"
 
 namespace
 {
@@ -2292,10 +2293,19 @@ void QnPlOnvifResource::scheduleRenewSubscriptionTimer(unsigned int timeoutSec)
         //std::bind(&QnPlOnvifResource::onRenewSubscriptionTimer, this, std::placeholders::_1));
 }
 
-CameraDiagnostics::Result QnPlOnvifResource::updateVideoEncoderUsage(
-    QList<VideoEncoderCapabilities>& optionsList)
+bool QnPlOnvifResource::isMedia2UsageForcedForProfiles() const
 {
-    Media::Profiles profiles(this);
+    return resourceData().value<bool>(ResourceDataKey::kUseMedia2ToFetchProfiles, false)
+        && !getMedia2Url().isEmpty();
+}
+
+template<typename ProfilesFetcher>
+CameraDiagnostics::Result QnPlOnvifResource::updateVideoEncoderUsageInternal(
+    QList<VideoEncoderCapabilities> & optionsList)
+{
+    using namespace nx::vms::server::plugins::onvif;
+
+    ProfilesFetcher profiles(this);
     profiles.receiveBySoap();
     if (!profiles)
     {
@@ -2305,13 +2315,14 @@ CameraDiagnostics::Result QnPlOnvifResource::updateVideoEncoderUsage(
         return profiles.requestFailedResult();
     }
 
-    for (const onvifXsd__Profile* profile: profiles.get()->Profiles)
+    for (const auto profile: profiles.get()->Profiles)
     {
-        if (profile->token.empty() || !profile->VideoEncoderConfiguration)
+        const auto videoToken = ProfileHelper::videoEncoderConfigurationToken(profile);
+        if (profile->token.empty() || videoToken.empty())
             continue;
         for (int i = 0; i < optionsList.size(); ++i)
         {
-            if (optionsList[i].videoEncoderToken == profile->VideoEncoderConfiguration->token)
+            if (optionsList[i].videoEncoderToken == videoToken)
             {
                 optionsList[i].isUsedInProfiles = true;
                 optionsList[i].currentProfile = QString::fromStdString(profile->Name);
@@ -2319,6 +2330,14 @@ CameraDiagnostics::Result QnPlOnvifResource::updateVideoEncoderUsage(
         }
     }
     return CameraDiagnostics::NoErrorResult();
+}
+
+CameraDiagnostics::Result QnPlOnvifResource::updateVideoEncoderUsage(
+    QList<VideoEncoderCapabilities>& optionsList)
+{
+    if (isMedia2UsageForcedForProfiles())
+        return updateVideoEncoderUsageInternal<Media2::Profiles>(optionsList);
+    return updateVideoEncoderUsageInternal<Media::Profiles>(optionsList);
 }
 
 bool QnPlOnvifResource::checkResultAndSetStatus(const CameraDiagnostics::Result& result)

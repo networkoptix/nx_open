@@ -380,6 +380,8 @@ public:
 
     CameraDiagnostics::Result ensureMulticastIsEnabled(nx::vms::api::StreamIndex streamIndex);
 
+    bool isMedia2UsageForcedForProfiles() const;
+
 signals:
     void advancedParameterChanged(const QString &id, const QString &value);
 
@@ -487,7 +489,6 @@ private:
 
     VideoEncoderCapabilities findVideoEncoderCapabilities(
         SupportedVideoEncoding encoding, StreamIndex streamIndex);
-
 protected:
     std::unique_ptr<onvifXsd__EventCapabilities> m_eventCapabilities;
 
@@ -755,6 +756,9 @@ protected:
     void validateMaxFps(
         const std::string& token,
         const std::vector<VideoEncoderConfigurationType>& configurations);
+
+    template<typename ProfilesFetcher>
+    CameraDiagnostics::Result updateVideoEncoderUsageInternal(QList<VideoEncoderCapabilities>& optionsList);
 private:
     mutable QnMutex m_physicalParamsMutex;
     std::unique_ptr<QnOnvifImagingProxy> m_imagingParamsProxy;

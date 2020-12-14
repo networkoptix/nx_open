@@ -144,13 +144,6 @@ static std::string media2TransportProtocolFromNxRtpTransportType(
     return "RTSP";
 }
 
-const bool isMedia2UsageForced(const QnPlOnvifResourcePtr& device)
-{
-    const QnResourceData resData = device->resourceData();
-    return resData.value<bool>(ResourceDataKey::kUseMedia2ToFetchProfiles, false)
-        && !device->getMedia2Url().isEmpty();
-}
-
 struct CameraInfoParams
 {
     CameraInfoParams() {}
@@ -259,7 +252,7 @@ static ProfileSelectionResult tryToChooseExistingProfile(
     const CameraInfoParams& info,
     bool isPrimary)
 {
-    if (isMedia2UsageForced(device))
+    if (device->isMedia2UsageForcedForProfiles())
         return tryToChooseExistingProfileInternal<Media2::Profiles>(device, info, isPrimary);
 
     return tryToChooseExistingProfileInternal<Media::Profiles>(device, info, isPrimary);
@@ -345,19 +338,24 @@ Profile* selectExistingProfile(
     return nullptr;
 }
 
+template <typename ProfileCreatorType>
 static CameraDiagnostics::Result createNewProfile(
     const QnPlOnvifResourcePtr& device,
     std::string name,
-    std::string token)
+    std::string* inOutToken)
 {
-    Media::ProfileCreator profileCreator(device);
+    ProfileCreatorType profileCreator(device);
 
-    Media::ProfileCreator::Request request;
+    typename ProfileCreatorType::Request request;
     request.Name = std::move(name);
-    request.Token = &token;
+    using Media2Type = Media::ProfileCreator;
+    if constexpr (std::is_same_v<ProfileCreatorType, Media::ProfileCreator>)
+        request.Token = inOutToken;
     profileCreator.performRequest(request);
     if (!profileCreator)
         return profileCreator.requestFailedResult();
+    if constexpr (std::is_same_v<ProfileCreatorType, Media2::ProfileCreator>)
+        *inOutToken = profileCreator.get()->Token;
 
     return CameraDiagnostics::NoErrorResult();
 }
@@ -761,7 +759,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchStreamUrl(
     Q_UNUSED(isPrimary);
 
     QUrl resultUrl;
-    if (isMedia2UsageForced(m_onvifRes))
+    if (m_onvifRes->isMedia2UsageForcedForProfiles())
     {
         Media2::StreamUri streamUriFetcher(m_onvifRes);
         Media2::StreamUri::Request request;
@@ -1054,8 +1052,11 @@ CameraDiagnostics::Result QnOnvifStreamReader::fetchUpdateProfile(
             m_onvifRes->getUserDefinedName(), m_onvifRes->getId(), m_onvifRes->getChannel(),
             noProfileName, info.profileToken);
 
-        const CameraDiagnostics::Result result =
-            createNewProfile(m_onvifRes, noProfileName, info.profileToken);
+        CameraDiagnostics::Result result;
+        if (m_onvifRes->isMedia2UsageForcedForProfiles())
+            result = createNewProfile<Media2::ProfileCreator>(m_onvifRes, noProfileName, &info.profileToken);
+        else
+            result = createNewProfile<Media::ProfileCreator>(m_onvifRes, noProfileName, &info.profileToken);
 
         if (!result)
         {
@@ -1193,7 +1194,7 @@ CameraDiagnostics::Result QnOnvifStreamReader::updateProfileConfigurations(
         desiredParameters,
         actualParameters);
 
-    CameraDiagnostics::Result result = isMedia2UsageForced(m_onvifRes)
+    CameraDiagnostics::Result result = m_onvifRes->isMedia2UsageForcedForProfiles()
         ? ProfileHelper::addMedia2Configurations(m_onvifRes, std::move(configurationSet))
         : ProfileHelper::addMediaConfigurations(m_onvifRes, configurationSet);
 
