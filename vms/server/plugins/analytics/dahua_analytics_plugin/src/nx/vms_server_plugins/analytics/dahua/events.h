@@ -6,6 +6,7 @@
 
 #include <QtCore/QString>
 
+#include "attributes.h"
 #include "objects.h"
 
 namespace nx::vms_server_plugins::analytics::dahua {
@@ -35,10 +36,15 @@ struct EventType
     QString id;
     QString prettyName;
     QString description;
-    bool isStateDependent = false;
-    bool isRegionDependent = false;
+    bool isStateDependent = true;
     const EventTypeGroup* group = nullptr;
+    std::function<void(std::vector<Attribute>*, const QJsonObject&)> parseAttributes;
     std::vector<const ObjectType*> objectTypes;
+    std::function<std::vector<QJsonObject>(const QJsonObject&)> extractObjects;
+
+    // Some event types violate documented coordinate domain. This value is used to override the
+    // documented default.
+    std::optional<float> coordinateDomain;
 
     static const EventType kVideoMotion;
     static const EventType kVideoLoss;
@@ -64,7 +70,10 @@ struct EventType
     static const EventType kRioterDetection;
     static const EventType kMoveDetection;
     static const EventType kWanderDetection;
+    static const EventType kNumberStat;
+    static const EventType kManNumDetection;
     static const EventType kStayDetection;
+    static const EventType kQueueNumDetection;
     static const EventType kQueueStayDetection;
 
     static const EventType* findById(const QString& id);
@@ -76,10 +85,12 @@ extern const std::vector<const EventType*>& kEventTypes;
 struct Event
 {
     const EventType* type = nullptr;
-    std::optional<unsigned int> sequenceId;
-    std::optional<std::chrono::milliseconds> timestamp;
+    std::chrono::milliseconds timestamp;
+    unsigned int id = 0;
     bool isActive = false;
     std::optional<QString> ruleName;
+    std::optional<unsigned int> areaId;
+    std::vector<Attribute> attributes;
     std::vector<Object> objects;
 };
 

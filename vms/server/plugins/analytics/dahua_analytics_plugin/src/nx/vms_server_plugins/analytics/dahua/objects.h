@@ -3,27 +3,21 @@
 #include <functional>
 #include <vector>
 
-#include <nx/sdk/helpers/attribute.h>
 #include <nx/sdk/analytics/rect.h>
 
 #include <QtCore/QString>
 #include <QtCore/QJsonObject>
 
-namespace nx::vms_server_plugins::analytics::dahua {
+#include "attributes.h"
 
-struct ObjectAttribute
-{
-    QString name;
-    QString value;
-    nx::sdk::Attribute::Type type = nx::sdk::Attribute::Type::undefined;
-};
+namespace nx::vms_server_plugins::analytics::dahua {
 
 struct ObjectType
 {
     QString nativeId;
     QString id;
     QString prettyName;
-    std::function<std::vector<ObjectAttribute>(const QJsonObject& object)> parseAttributes;
+    std::function<void(std::vector<Attribute>*, const QJsonObject&)> parseAttributes;
 
     static const ObjectType kUnknown;
     static const ObjectType kNonMotor;
@@ -39,9 +33,9 @@ extern const std::vector<const ObjectType*>& kObjectTypes;
 struct Object
 {
     const ObjectType* type = nullptr;
-    int id = -1;
+    unsigned int id = 0;
     nx::sdk::analytics::Rect boundingBox;
-    std::vector<ObjectAttribute> attributes;
+    std::vector<Attribute> attributes;
 };
 
 } // namespace nx::vms_server_plugins::analytics::dahua

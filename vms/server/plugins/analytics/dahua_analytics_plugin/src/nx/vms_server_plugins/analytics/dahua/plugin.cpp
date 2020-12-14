@@ -14,6 +14,11 @@ using namespace nx::vms_server_plugins::utils;
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
+std::chrono::milliseconds Plugin::vmsSystemTimeSinceEpoch() const
+{
+    return std::chrono::milliseconds(utilityProvider()->vmsSystemTimeSinceEpochMs());
+}
+
 void Plugin::getManifest(Result<const IString*>* outResult) const
 {
     interceptExceptions(outResult,

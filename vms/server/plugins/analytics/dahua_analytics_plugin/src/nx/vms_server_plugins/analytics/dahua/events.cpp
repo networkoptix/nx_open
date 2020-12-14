@@ -3,10 +3,60 @@
 #include <map>
 
 #include <QtCore/QStringView>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
 
 namespace nx::vms_server_plugins::analytics::dahua {
 
 namespace {
+
+constexpr auto kPeopleCountingCoordinateDomain = 1024.0; //< Derived experimentally.
+
+void parseNumberStatAttributes(std::vector<Attribute>* attributes, const QJsonObject& eventData)
+{
+    if (const auto value = eventData["Number"]; value.isDouble())
+    {
+        attributes->emplace_back(
+            "Total", QString::number(value.toInt()), Attribute::Type::number);
+    }
+
+    if (const auto value = eventData["EnteredNumber"]; value.isDouble())
+    {
+        attributes->emplace_back(
+            "Entered", QString::number(value.toInt()), Attribute::Type::number);
+    }
+
+    if (const auto value = eventData["ExitedNumber"]; value.isDouble())
+    {
+        attributes->emplace_back(
+            "Exited", QString::number(value.toInt()), Attribute::Type::number);
+    }
+}
+
+std::vector<QJsonObject> extractManList(const QJsonObject& event)
+{
+    std::vector<QJsonObject> objects;
+
+    int i = 0;
+    for (const auto objectValue: event["ManList"].toArray())
+    {
+        if (!objectValue.isObject())
+            continue;
+
+        auto object = objectValue.toObject();
+
+        // Camera doesn't send object type explicitly in this case, Human is implied.
+        // Patch the objects to reuse parsing machinery.
+        object["ObjectType"] = "Human";
+
+        // Likewise there is no object id.
+        object["ObjectID"] = i++;
+
+        objects.push_back(std::move(object));
+    }
+
+    return objects;
+}
 
 // 4.11.10 Find media files with IVS info
 const std::vector<const ObjectType*> ivsObjectTypes = {
@@ -96,8 +146,6 @@ NX_DEFINE_EVENT_TYPE(VideoMotion)
     id = "nx.dahua.VideoMotion";
     prettyName = "Motion detection";
     description = "Video motion";
-    isStateDependent = true;
-    isRegionDependent = true;
     group = &EventTypeGroup::kBasic;
 }
 
@@ -107,7 +155,6 @@ NX_DEFINE_EVENT_TYPE(VideoLoss)
     id = "nx.dahua.VideoLoss";
     prettyName = "Video loss detection";
     description = "Video loss";
-    isStateDependent = true;
     group = &EventTypeGroup::kBasic;
 }
 
@@ -117,7 +164,6 @@ NX_DEFINE_EVENT_TYPE(VideoBlind)
     id = "nx.dahua.VideoBlind";
     prettyName = "Video blind detection";
     description = "Video blind";
-    isStateDependent = true;
     group = &EventTypeGroup::kBasic;
 }
 
@@ -127,7 +173,6 @@ NX_DEFINE_EVENT_TYPE(VideoUnFocus)
     id = "nx.dahua.VideoUnFocus";
     prettyName = "Defocus detection";
     description = "Defocus";
-    isStateDependent = true;
     group = &EventTypeGroup::kBasic;
 }
 
@@ -138,7 +183,6 @@ NX_DEFINE_EVENT_TYPE(VideoAbnormalDetection)
     id = "nx.dahua.VideoAbnormalDetection";
     prettyName = "Scene change detection (Video abnormal detection)";
     description = "Scene change";
-    isStateDependent = true;
     group = &EventTypeGroup::kBasic;
 }
 
@@ -148,8 +192,6 @@ NX_DEFINE_EVENT_TYPE(CrossLineDetection)
     id = "nx.dahua.CrossLineDetection";
     prettyName = "Tripwire detection (Cross line detection)";
     description = "Cross line";
-    isStateDependent = true;
-    isRegionDependent = true;
     group = &EventTypeGroup::kSimpleAnalytics;
     objectTypes = ivsObjectTypes;
 }
@@ -160,8 +202,6 @@ NX_DEFINE_EVENT_TYPE(CrossRegionDetection)
     id = "nx.dahua.CrossRegionDetection";
     prettyName = "Intrusion detection (Cross region detection)";
     description = "Intrusion";
-    isStateDependent = true;
-    isRegionDependent = true;
     group = &EventTypeGroup::kSimpleAnalytics;
     objectTypes = ivsObjectTypes;
 }
@@ -172,8 +212,6 @@ NX_DEFINE_EVENT_TYPE(LeftDetection)
     id = "nx.dahua.LeftDetection";
     prettyName = "Abandoned object detection (Left object detection)";
     description = "Abandoned object";
-    isStateDependent = true;
-    isRegionDependent = true;
     group = &EventTypeGroup::kSimpleAnalytics;
     objectTypes = ivsObjectTypes;
 }
@@ -184,8 +222,6 @@ NX_DEFINE_EVENT_TYPE(TakenAwayDetection)
     id = "nx.dahua.TakenAwayDetection";
     prettyName = "Missing object detection (Taken away detection)";
     description = "Taken away object";
-    isStateDependent = true;
-    isRegionDependent = true;
     group = &EventTypeGroup::kSimpleAnalytics;
     objectTypes = ivsObjectTypes;
 }
@@ -196,7 +232,6 @@ NX_DEFINE_EVENT_TYPE(FaceDetection)
     id = "nx.dahua.FaceDetection";
     prettyName = "Face detection";
     description = "Face";
-    isStateDependent = true;
     group = &EventTypeGroup::kSimpleAnalytics;
     objectTypes = {&ObjectType::kHumanFace};
 }
@@ -207,7 +242,6 @@ NX_DEFINE_EVENT_TYPE(AudioMutation)
     id = "nx.dahua.AudioMutation";
     prettyName = "Audio intensity change detection (Audio mutation detection)";
     description = "Audio intensity change";
-    isStateDependent = true;
     group = &EventTypeGroup::kAudio;
 }
 
@@ -217,7 +251,6 @@ NX_DEFINE_EVENT_TYPE(AudioAnomaly)
     id = "nx.dahua.AudioAnomaly";
     prettyName = "Audio anomaly detection (Audio input abnormal detection)";
     description = "Audio input abnormal";
-    isStateDependent = true;
     group = &EventTypeGroup::kAudio;
 }
 
@@ -227,7 +260,6 @@ NX_DEFINE_EVENT_TYPE(StorageNotExist)
     id = "nx.dahua.StorageNotExist";
     prettyName = "Storage absence detection";
     description = "Storage absence";
-    isStateDependent = true;
     group = &EventTypeGroup::kSystem;
 }
 
@@ -237,7 +269,6 @@ NX_DEFINE_EVENT_TYPE(StorageFailure)
     id = "nx.dahua.StorageFailure";
     prettyName = "Storage failure detection";
     description = "Storage failure";
-    isStateDependent = true;
     group = &EventTypeGroup::kSystem;
 }
 
@@ -247,7 +278,6 @@ NX_DEFINE_EVENT_TYPE(StorageLowSpace)
     id = "nx.dahua.StorageLowSpace";
     prettyName = "Storage low space detection";
     description = "Storage low space";
-    isStateDependent = true;
     group = &EventTypeGroup::kSystem;
 }
 
@@ -257,7 +287,6 @@ NX_DEFINE_EVENT_TYPE(HeatImagingTemper)
     id = "nx.dahua.HeatImagingTemper";
     prettyName = "High temperature detection";
     description = "High temperature";
-    isStateDependent = true;
     group = &EventTypeGroup::kSystem;
 }
 
@@ -268,6 +297,7 @@ NX_DEFINE_EVENT_TYPE(LoginFailure)
     prettyName = "Login error detection";
     description = "Login error detected";
     group = &EventTypeGroup::kSystem;
+    isStateDependent = false;
 }
 
 NX_DEFINE_EVENT_TYPE(AlarmLocal)
@@ -276,7 +306,6 @@ NX_DEFINE_EVENT_TYPE(AlarmLocal)
     id = "nx.dahua.AlarmLocal";
     prettyName = "Alarm detection";
     description = "Alarm local";
-    isStateDependent = true;
     group = &EventTypeGroup::kAlarm;
 }
 
@@ -286,7 +315,6 @@ NX_DEFINE_EVENT_TYPE(AlarmOutput)
     id = "nx.dahua.AlarmOutput";
     prettyName = "Alarm output detection";
     description = "Alarm local";
-    isStateDependent = true;
     group = &EventTypeGroup::kAlarm;
 }
 
@@ -295,8 +323,7 @@ NX_DEFINE_EVENT_TYPE(CrowdDetection)
     nativeId = "CrowdDetection";
     id = "nx.dahua.CrowdDetection";
     prettyName = "Crowd detection (Crowd density overrun detection)";
-    description = "Crowd dencity overrun";
-    isStateDependent = true;
+    description = "Crowd density overrun";
     group = &EventTypeGroup::kComplexAnalytics;
 }
 
@@ -306,8 +333,8 @@ NX_DEFINE_EVENT_TYPE(ParkingDetection)
     id = "nx.dahua.ParkingDetection";
     prettyName = "Parking detection";
     description = "Parking";
-    isStateDependent = true;
     group = &EventTypeGroup::kComplexAnalytics;
+    objectTypes = ivsObjectTypes;
 }
 
 NX_DEFINE_EVENT_TYPE(RioterDetection)
@@ -316,7 +343,6 @@ NX_DEFINE_EVENT_TYPE(RioterDetection)
     id = "nx.dahua.RioterDetection";
     prettyName = "Rioter detection (People gathering detection)";
     description = "People gathering";
-    isStateDependent = true;
     group = &EventTypeGroup::kComplexAnalytics;
     objectTypes = ivsObjectTypes;
 }
@@ -327,7 +353,6 @@ NX_DEFINE_EVENT_TYPE(MoveDetection)
     id = "nx.dahua.MoveDetection";
     prettyName = "Fast moving detection";
     description = "Fast moving";
-    isStateDependent = true;
     group = &EventTypeGroup::kSimpleAnalytics;
     objectTypes = ivsObjectTypes;
 }
@@ -338,10 +363,30 @@ NX_DEFINE_EVENT_TYPE(WanderDetection)
     id = "nx.dahua.WanderDetection";
     prettyName = "Wander detection (Loitering detection)";
     description = "Loitering";
-    isStateDependent = true;
-    isRegionDependent = true;
     group = &EventTypeGroup::kComplexAnalytics;
     objectTypes = ivsObjectTypes;
+}
+
+NX_DEFINE_EVENT_TYPE(NumberStat)
+{
+    nativeId = "NumberStat";
+    id = "nx.dahua.NumberStat";
+    prettyName = "People flow counting";
+    description = "People flow count";
+    parseAttributes = parseNumberStatAttributes;
+    group = &EventTypeGroup::kComplexAnalytics;
+}
+
+NX_DEFINE_EVENT_TYPE(ManNumDetection)
+{
+    nativeId = "ManNumDetection";
+    id = "nx.dahua.ManNumDetection";
+    prettyName = "In-area people counting";
+    description = "In-area people count";
+    group = &EventTypeGroup::kComplexAnalytics;
+    objectTypes = {&ObjectType::kHuman};
+    extractObjects = extractManList;
+    coordinateDomain = kPeopleCountingCoordinateDomain;
 }
 
 NX_DEFINE_EVENT_TYPE(StayDetection)
@@ -350,10 +395,21 @@ NX_DEFINE_EVENT_TYPE(StayDetection)
     id = "nx.dahua.StayDetection";
     prettyName = "Stay detection";
     description = "Stay";
-    isStateDependent = true;
-    isRegionDependent = true;
     group = &EventTypeGroup::kComplexAnalytics;
-    objectTypes = ivsObjectTypes;
+    objectTypes = {&ObjectType::kHuman};
+    coordinateDomain = kPeopleCountingCoordinateDomain;
+}
+
+NX_DEFINE_EVENT_TYPE(QueueNumDetection)
+{
+    nativeId = "QueueNumDetection";
+    id = "nx.dahua.QueueNumDetection";
+    prettyName = "Queue size detection";
+    description = "Queue size";
+    group = &EventTypeGroup::kComplexAnalytics;
+    objectTypes = {&ObjectType::kHuman};
+    extractObjects = extractManList;
+    coordinateDomain = kPeopleCountingCoordinateDomain;
 }
 
 NX_DEFINE_EVENT_TYPE(QueueStayDetection)
@@ -362,9 +418,9 @@ NX_DEFINE_EVENT_TYPE(QueueStayDetection)
     id = "nx.dahua.QueueStayDetection";
     prettyName = "Queue stay detection";
     description = "Queue stay";
-    isStateDependent = true;
-    isRegionDependent = true;
     group = &EventTypeGroup::kComplexAnalytics;
+    objectTypes = {&ObjectType::kHuman};
+    coordinateDomain = kPeopleCountingCoordinateDomain;
 }
 
 #undef NX_DEFINE_EVENT_TYPE

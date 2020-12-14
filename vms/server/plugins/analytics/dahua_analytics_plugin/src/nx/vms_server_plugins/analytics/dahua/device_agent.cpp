@@ -84,13 +84,9 @@ private:
                 {"name", type->prettyName},
             };
 
-            std::vector<QString> flags = {
-                "useTrackBestShotAsPreview",
-            };
+            std::vector<QString> flags;
             if (type->isStateDependent)
                 flags.push_back("stateDependent");
-            if (type->isRegionDependent)
-                flags.push_back("regionDependent");
             if (!flags.empty())
                 jsonType["flags"] = nx::utils::join(flags, "|");
 
