@@ -76,6 +76,7 @@ private:
     using ResourceList = QMap<QString, QnSecurityCamResourcePtr>;
     QVector<ResourceList> m_tmpForeignResources;
     QnMutex m_discoveryMutex;
+    QnMutex m_foundLostResourceMutex;
     QElapsedTimer m_startupTimer;
     int m_discoveryCounter = 0;
     std::map<QString, nx::utils::ElapsedTimer> m_offlineResourceTimers;
