@@ -233,7 +233,7 @@
                 <param name = "MaxSensorWidth" default_value = "1920"/>
                 <param name = "MaxSensorHeight" default_value = "1080"/>
                 <param name = "MaxFPS" default_value = "30"/>
-                <param name = "VideoLayout" default_value = "width=4;height=1;sensors=3,2,1,0"/>
+                <param name = "VideoLayout" default_value = "width=4;height=1;sensors=0,1,2,3"/>
                 <param name = "streamFpsSharing" default_value = "noSharing"/>
             </params>
         </resource>
