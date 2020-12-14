@@ -14,7 +14,7 @@ set(eulaVersionOverride "" CACHE STRING "Overriden EULA version")
 
 # Remember to reset the in-version protocol number in (cmake/vms_protocol_version.cmake) when
 # updating the project version.
-set(releaseVersion 4.1.0)
+set(releaseVersion 4.2.0)
 
 nx_option(developerBuild
     "Disable this option for production builds (Jenkins)"
