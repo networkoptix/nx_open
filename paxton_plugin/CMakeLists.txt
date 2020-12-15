@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10.0 FATAL_ERROR)
 
-set(releaseVersion 4.1.0)
+set(releaseVersion 4.2.0)
 
 project(paxton_plugin VERSION ${releaseVersion} LANGUAGES CSharp)
 
