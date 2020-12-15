@@ -80,6 +80,7 @@
                                             "type": "SpinBox",
                                             "name": "Temperature.Area#.ThresholdTemperature",
                                             "caption": "Threshold Temperature (Detection) (F)",
+                                            "description": "The range is [-4, 266] for Above/Below and is [50, 212] for Increase/Decrease Detection Type",
                                             "defaultValue": 68,
                                             "minValue": -4,
                                             "maxValue": 266
