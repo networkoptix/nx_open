@@ -18,6 +18,7 @@
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/utils/app_info.h>
 #include <translation/translation_manager.h>
+#include <translation/locale_rollback.h>
 
 namespace nx::vms::server::event {
 
@@ -169,13 +170,27 @@ private:
 // -----------------------------------------------------------------------------------------------
 
 PushManager::PushManager(
-    QnMediaServerModule* serverModule, RetryPolicy retryPolicy, bool useEncryption)
+    QnMediaServerModule* serverModule, RetryPolicy retryPolicy, bool useEncryption, QObject* parent)
 :
+    QObject(parent),
     nx::vms::server::ServerModuleAware(serverModule),
     m_retryPolicy(retryPolicy),
     m_pipeline(
         std::make_unique<Pipeline>(serverModule->commonModule()->globalSettings(), useEncryption))
 {
+    connect(
+        serverModule->commonModule()->globalSettings(),
+        &QnGlobalSettings::pushNotificationsLanguageChanged,
+        this,
+        &PushManager::updateTargetLanguage);
+
+    // Neither TranslationManager nor GlobalSettings are ready, so we can't set m_pushLanguage now.
+    // However, we'll receive a signal from GlobalSettings after their initialization.
+    connect(
+        serverModule->commonModule()->globalSettings(),
+        &QnGlobalSettings::initialized,
+        this,
+        &PushManager::updateTargetLanguage);
 }
 
 PushManager::~PushManager()
@@ -189,6 +204,22 @@ PushManager::~PushManager()
         });
 
     promise.get_future().wait();
+}
+
+void PushManager::updateTargetLanguage()
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    auto language = serverModule()->commonModule()->globalSettings()->pushNotificationsLanguage();
+    if (language.isEmpty())
+    {
+        NX_VERBOSE(this, "Notification language is not set, customization language will be used");
+        language = QnAppInfo::defaultLanguage();
+    }
+
+    const auto translationManager = serverModule()->findInstance<QnTranslationManager>();
+    if (NX_ASSERT(translationManager))
+        m_pushLanguage = translationManager->preloadTranslation(language);
 }
 
 bool PushManager::send(const vms::event::AbstractActionPtr& action)
@@ -259,19 +290,20 @@ PushPayload PushManager::makePayload(
 
 PushNotification PushManager::makeNotification(const vms::event::AbstractActionPtr& action) const
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
     const auto params = action->getParams();
     const auto event = action->getRuntimeParams();
     const auto common = serverModule()->commonModule();
 
-    auto language = common->globalSettings()->pushNotificationsLanguage();
-    if (language.isEmpty())
-    {
-        NX_VERBOSE(this, "Notification language is not set, customization language will be used");
-        language = QnAppInfo::defaultLanguage();
-    }
-    NX_VERBOSE(this, "Translate notification to %1", language);
-    QnTranslationManager::LocaleRollback localeGuard(
-        serverModule()->findInstance<QnTranslationManager>(), language);
+    // Right now m_pushLanguage should always be initialized: even if push notifications language
+    // is not configured, we initialize the variable by the app default language. Finding an empty
+    // value here means that something was broken and we don't receive expected signal
+    // from QnGlobalSettings (meaning we wouldn't use the right push language when it's set).
+    NX_ASSERT(!m_pushLanguage.locale().isEmpty(), "Push language locale is not initialized");
+
+    NX_VERBOSE(this, "Translate notification to %1", m_pushLanguage.locale());
+    nx::vms::translation::LocaleRollback localeGuard(m_pushLanguage);
 
     // Mobile Client can not handle more than one resource.
     const auto resources = vms::event::sourceResources(event, common->resourcePool());

@@ -9,6 +9,8 @@
 #include <nx/vms/server/server_module_aware.h>
 #include <nx/network/retry_timer.h>
 
+#include <translation/preloaded_translation_reference.h>
+
 class QnVirtualCameraResource;
 
 namespace nx::vms::server::event {
@@ -44,18 +46,25 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
 // -----------------------------------------------------------------------------------------------
 
 class PushManager:
+    public QObject,
     public /*mixin*/ nx::vms::server::ServerModuleAware
 {
+    Q_OBJECT
+
 public:
     static const nx::network::RetryPolicy kDefaultRetryPolicy;
 
     PushManager(
         QnMediaServerModule* serverModule,
         nx::network::RetryPolicy retryPolicy = kDefaultRetryPolicy,
-        bool useEncryption = true);
+        bool useEncryption = true,
+        QObject* parent = 0);
     ~PushManager();
 
     bool send(const vms::event::AbstractActionPtr& action);
+
+    // Force push notifications language update. Used by unit tests.
+    void updateTargetLanguage();
 
 private:
     PushPayload makePayload(
@@ -72,6 +81,9 @@ private:
     const nx::network::RetryPolicy m_retryPolicy;
     std::unique_ptr<Pipeline> m_pipeline;
     std::list<std::unique_ptr<Dispatcher>> m_dispatchers;
+
+    mutable nx::Mutex m_mutex;
+    nx::vms::translation::PreloadedTranslationReference m_pushLanguage;
 };
 
 } // namespace nx::vms::server::event

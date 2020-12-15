@@ -3,6 +3,8 @@
 #include "translation.h"
 #include "translation_overlay.h"
 
+#include <chrono>
+
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 #include <QtCore/QHash>
@@ -11,9 +13,20 @@
 
 #include <nx/utils/thread/mutex.h>
 
+namespace nx::vms::translation {
+
+class PreloadedTranslationReference;
+class LocaleRollback;
+
+} // namespace nx::vms::translation
+
 class QnTranslationManager: public QObject
 {
     Q_OBJECT
+
+    friend nx::vms::translation::PreloadedTranslationReference;
+    friend nx::vms::translation::LocaleRollback;
+
 public:
     QnTranslationManager(QObject *parent = NULL);
     virtual ~QnTranslationManager();
@@ -36,20 +49,15 @@ public:
     static void installTranslation(const QnTranslation& translation);
 
     /**
-     * Temporary changes the locale that is used in the current thread to translate tr() strings.
-     * When this object is destroyed, the original locale is restored.
+     * Prepares and asynchronously installs the specific locale translation data.
+     * Preloaded translation is required for correct LocaleRollback functioning.
      *
-     * In the case of incorrect locale the current locale remains.
+     * Reference counting is used internally, so the same locale translation may be preloaded
+     * several times. This locale data will be unloaded eventually when all references are deleted.
+     *
+     * Returns an empty value in the case of failure (e.g. when the locale is not found).
      */
-    class LocaleRollback
-    {
-    public:
-        LocaleRollback(QnTranslationManager* manager, const QString& locale);
-        ~LocaleRollback();
-    private:
-        QString m_prevLocale;
-        QPointer<QnTranslationManager> m_manager;
-    };
+    nx::vms::translation::PreloadedTranslationReference preloadTranslation(const QString& locale);
 
     static QString localeCodeToTranslationPath(const QString& localeCode);
     static QString translationPathToLocaleCode(const QString& translationPath);
@@ -62,9 +70,13 @@ protected:
         const QString& translationName) const;
 
 private:
-    bool setCurrentThreadTranslationLocale(const QString& locale);
+    void addPreloadedTranslationReference(const QString& locale);
+    void removePreloadedTranslationReference(const QString& locale);
+
+    void setCurrentThreadTranslationLocale(
+        const QString& locale,
+        std::chrono::milliseconds maxWaitTime);
     QString getCurrentThreadTranslationLocale() const;
-    void uninstallUnusedOverlays();
 
 private:
     QList<QString> m_searchPaths;
@@ -75,5 +87,4 @@ private:
     mutable nx::Mutex m_mutex;
     QHash<Qt::HANDLE, QString> m_threadLocales;
     QHash<QString, QSharedPointer<nx::vms::translation::TranslationOverlay>> m_overlays;
-
 };

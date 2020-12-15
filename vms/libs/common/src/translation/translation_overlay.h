@@ -2,10 +2,12 @@
 
 #include "translation.h"
 
+#include <chrono>
 #include <memory>
 #include <vector>
 
-#include <QStringList>
+#include <QtCore/QObject>
+#include <QtCore/QStringList>
 
 #include <nx/utils/thread/mutex.h>
 
@@ -18,24 +20,33 @@ class TranslationOverlayItem;
  * It's created by QnTranslationManager with the same set of prefixes as the main translation,
  * so we may be pretty sure that all necessary strings are loaded into the overlay too.
  */
-class TranslationOverlay
+class TranslationOverlay: public QObject
 {
 public:
-    TranslationOverlay(QnTranslation&& translation);
+    TranslationOverlay(QnTranslation&& translation, QObject* parent = 0);
     virtual ~TranslationOverlay();
+
+    void addRef();
+    void removeRef();
+
+    bool isInstalled() const;
+    void waitForInstallation(std::chrono::milliseconds maxWaitTime);
 
     void addThreadContext(const Qt::HANDLE& context);
     void removeThreadContext(const Qt::HANDLE& context);
 
-    void uninstallIfUnused();
+private:
+    void handleTranslatorsUnderMutex();
 
 private:
     QnTranslation m_translation;
     std::vector<std::unique_ptr<TranslationOverlayItem>> m_translators;
 
-    bool m_installed = false;
-    QList<Qt::HANDLE> m_threads;
     nx::Mutex m_mutex;
+    int m_refCount = 0;
+    QList<Qt::HANDLE> m_threads;
+    nx::WaitCondition m_installedCondition;
+    std::atomic_bool m_installed = false;
 };
 
 } // namespace nx::vms::translation

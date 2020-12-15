@@ -460,6 +460,7 @@ signals:
     void downloaderPeersChanged();
     void watermarkChanged();
     void sessionTimeoutChanged();
+    void pushNotificationsLanguageChanged();
 
 private:
     typedef QList<QnAbstractResourcePropertyAdaptor*> AdaptorList;

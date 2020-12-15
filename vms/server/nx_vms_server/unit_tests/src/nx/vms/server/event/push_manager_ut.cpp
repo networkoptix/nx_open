@@ -50,6 +50,9 @@ public:
         settings->setCloudSystemId(systemId);
         settings->setCloudHost(m_cloudService.serverAddress().toString());
 
+        // Initialize push notifications language.
+        m_pushManager.updateTargetLanguage();
+
         QnMediaServerResourcePtr server(new QnMediaServerResource(m_serverModule.commonModule()));
         server->setIdUnsafe(serverId);
         server->setName("My Cool Server");

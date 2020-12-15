@@ -5,9 +5,12 @@
 #include <QCoreApplication>
 #include <QtCore/QThread>
 
+#include <nx/utils/guarded_callback.h>
+
 namespace nx::vms::translation {
 
-TranslationOverlay::TranslationOverlay(QnTranslation&& translation):
+TranslationOverlay::TranslationOverlay(QnTranslation&& translation, QObject* parent):
+    QObject(parent),
     m_translation(translation)
 {
     for (const QString& file: translation.filePaths())
@@ -20,6 +23,43 @@ TranslationOverlay::TranslationOverlay(QnTranslation&& translation):
 
 TranslationOverlay::~TranslationOverlay()
 {
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (m_installed)
+    {
+        // The only sane scenario: app is shutting down.
+        // Release translators to avoid possible crashes.
+        for (auto& translator: m_translators)
+            translator.release();
+        m_translators.clear();
+    }
+}
+
+void TranslationOverlay::addRef()
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    m_refCount++;
+    if (m_refCount == 1)
+        handleTranslatorsUnderMutex();
+}
+
+void TranslationOverlay::removeRef()
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (--m_refCount == 0)
+        handleTranslatorsUnderMutex();
+}
+
+bool TranslationOverlay::isInstalled() const
+{
+    return m_installed;
+}
+
+void TranslationOverlay::waitForInstallation(std::chrono::milliseconds maxWaitTime)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (!m_installed)
+        m_installedCondition.wait(&m_mutex, maxWaitTime);
 }
 
 void TranslationOverlay::addThreadContext(const Qt::HANDLE& context)
@@ -29,25 +69,6 @@ void TranslationOverlay::addThreadContext(const Qt::HANDLE& context)
     for (auto& translator: m_translators)
     {
         translator->addThreadContext(context);
-    }
-
-    if (!m_installed)
-    {
-        const auto installTranslators =
-            [this]()
-            {
-                for (auto& translator: m_translators)
-                    qApp->installTranslator(translator.get());
-            };
-
-        // QCoreApplication sends a signal for itself inside of qApp->installTranslator().
-        // As result, it is impossible to call this method from any other thread.
-        if (QThread::currentThread() == qApp->thread())
-            installTranslators();
-        else
-            QMetaObject::invokeMethod(qApp, installTranslators, Qt::BlockingQueuedConnection);
-
-        m_installed = true;
     }
 
     m_threads << context;
@@ -65,27 +86,38 @@ void TranslationOverlay::removeThreadContext(const Qt::HANDLE& context)
     m_threads.removeAll(context);
 }
 
-void TranslationOverlay::uninstallIfUnused()
+void TranslationOverlay::handleTranslatorsUnderMutex()
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
-
-    if (m_installed)
+    // QCoreApplication sends a signal for itself inside of qApp->installTranslator().
+    // As result, it is impossible to install translators from any other thread.
+    if (QThread::currentThread() == qApp->thread())
     {
-        auto uninstallTranslators =
+        if (m_refCount > 0 && !m_installed)
+        {
+            for (auto& translator: m_translators)
+                qApp->installTranslator(translator.get());
+
+            m_installed = true;
+            m_installedCondition.wakeAll();
+        }
+        if (m_installed && m_refCount == 0)
+        {
+            for (auto& translator: m_translators)
+                qApp->removeTranslator(translator.get());
+
+            m_installed = false;
+        }
+    }
+    else
+    {
+        // Call the same method from the main thread.
+        const auto callback = nx::utils::guarded(this,
             [this]()
             {
-                for (auto& translator: m_translators)
-                    qApp->removeTranslator(translator.get());
-            };
-
-        // QCoreApplication sends a signal for itself inside of qApp->removeTranslator().
-        // As result, it is impossible to call this method from any other thread.
-        if (QThread::currentThread() == qApp->thread())
-            uninstallTranslators();
-        else
-            QMetaObject::invokeMethod(qApp, uninstallTranslators, Qt::BlockingQueuedConnection);
-
-        m_installed = false;
+                NX_MUTEX_LOCKER lock(&m_mutex);
+                handleTranslatorsUnderMutex();
+            });
+        QMetaObject::invokeMethod(qApp, callback, Qt::QueuedConnection);
     }
 }
 

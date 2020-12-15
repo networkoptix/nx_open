@@ -6,9 +6,11 @@
 #include <QtCore/QThread>
 
 #include <utils/common/app_info.h>
-#include <utils/common/warnings.h>
 
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log_main.h>
+
+#include <translation/preloaded_translation_reference.h>
 
 namespace {
 
@@ -134,23 +136,31 @@ void QnTranslationManager::installTranslation(const QnTranslation &translation)
     }
 }
 
-QnTranslationManager::LocaleRollback::LocaleRollback(
-    QnTranslationManager* manager,
+nx::vms::translation::PreloadedTranslationReference QnTranslationManager::preloadTranslation(
     const QString& locale)
 {
-    if (!NX_ASSERT(manager, "Translation manager is required"))
-        return;
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
 
-    m_manager = manager;
-    m_prevLocale = manager->getCurrentThreadTranslationLocale();
+        if (!m_overlays.contains(locale))
+        {
+            // Load the required translation.
+            auto translation = loadTranslation(locale);
 
-    m_manager->setCurrentThreadTranslationLocale(locale);
-}
+            if (translation.isEmpty())
+            {
+                // Write to log, return an empty referece.
+                NX_WARNING(this, "Could not load translation for locale '%1'", locale);
+                return nx::vms::translation::PreloadedTranslationReference(this, {});
+            }
 
-QnTranslationManager::LocaleRollback::~LocaleRollback()
-{
-    if (m_manager)
-        m_manager->setCurrentThreadTranslationLocale(m_prevLocale);
+            // Create translators.
+            m_overlays[locale] = QSharedPointer<nx::vms::translation::TranslationOverlay>(
+                new nx::vms::translation::TranslationOverlay(std::move(translation)));
+        }
+    }
+
+    return nx::vms::translation::PreloadedTranslationReference(this, locale);
 }
 
 QString QnTranslationManager::localeCodeToTranslationPath(const QString& localeCode)
@@ -263,14 +273,43 @@ QnTranslation QnTranslationManager::loadTranslationInternal(
     return QnTranslation(languageName, localeCode, filePaths);
 }
 
-bool QnTranslationManager::setCurrentThreadTranslationLocale(const QString& locale)
+void QnTranslationManager::addPreloadedTranslationReference(const QString& locale)
+{
+    if (locale.isEmpty())
+        return;
+
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    if (!NX_ASSERT(m_overlays.contains(locale), "Locale '%1' has not been loaded", locale))
+        return;
+
+    m_overlays[locale]->addRef();
+}
+
+void QnTranslationManager::removePreloadedTranslationReference(const QString& locale)
+{
+    if (locale.isEmpty())
+        return;
+
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    if (!NX_ASSERT(m_overlays.contains(locale), "Locale '%1' has not been loaded", locale))
+        return;
+
+    m_overlays[locale]->removeRef();
+    // Dereferenced translation data is not deleted, so it may be reused later.
+}
+
+void QnTranslationManager::setCurrentThreadTranslationLocale(
+    const QString& locale,
+    std::chrono::milliseconds maxWaitTime)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     Qt::HANDLE id = QThread::currentThreadId();
     const auto& curLocale = m_threadLocales.value(id);
 
     if (locale == curLocale)
-        return true;
+        return;
 
     if (!curLocale.isEmpty())
     {
@@ -280,44 +319,34 @@ bool QnTranslationManager::setCurrentThreadTranslationLocale(const QString& loca
 
     if (!locale.isEmpty())
     {
-        if (!m_overlays.contains(locale))
+        if (!NX_ASSERT(m_overlays.contains(locale), "Locale '%1' has not been loaded", locale))
+            return;
+
+        auto& overlay = m_overlays[locale];
+
+        if (maxWaitTime.count() > 0)
+            overlay->waitForInstallation(maxWaitTime);
+
+        // Perhaps we should use warning instead of asssert when maxWaitTime is zero?
+        if (NX_ASSERT(overlay->isInstalled(), "Translation is not installed for locale '%1'", locale))
         {
-            // Load the required translation.
-            auto translation = loadTranslation(locale);
-            if (!NX_ASSERT(!translation.isEmpty(), "Could not load translation locale '%1'", locale))
-            {
-                return false;
-            }
+            // Enable translation overlay for the given thread.
+            overlay->addThreadContext(id);
 
-            // Create translators.
-            m_overlays[locale] = QSharedPointer<nx::vms::translation::TranslationOverlay>(
-                new nx::vms::translation::TranslationOverlay(std::move(translation)));
+            // Store the new locale of the thread.
+            m_threadLocales[id] = locale;
+
+            // Done.
+            return;
         }
-
-        // Enable translation overlay for the given thread.
-        m_overlays[locale]->addThreadContext(id);
-
-        // Store the new locale of the thread.
-        m_threadLocales[id] = locale;
-    }
-    else
-    {
-        m_threadLocales.remove(id);
-        uninstallUnusedOverlays();
     }
 
-    // Done.
-    return true;
+    // An empty or an invalid locale. Switch to the app default language.
+    m_threadLocales.remove(id);
 }
 
 QString QnTranslationManager::getCurrentThreadTranslationLocale() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_threadLocales.value(QThread::currentThreadId());
-}
-
-void QnTranslationManager::uninstallUnusedOverlays()
-{
-    for (auto& overlay: m_overlays)
-        overlay->uninstallIfUnused();
 }
