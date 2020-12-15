@@ -513,7 +513,7 @@ bool QnStorageListModel::canRemoveStorage(const QnStorageModelInfo& data) const
 bool QnStorageListModel::canStoreAnalytics(const QnStorageModelInfo& data) const
 {
     //TODO: use PartitionType enum value here instead of the serialized literal
-    return data.isOnline && data.storageType == "local";
+    return data.isOnline && data.storageType == "local" && data.isDbReady;
 }
 
 bool QnStorageListModel::storageIsActive(const QnStorageModelInfo& data) const

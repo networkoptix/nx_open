@@ -15,6 +15,7 @@ QnStorageModelInfo::QnStorageModelInfo()
     , isBackup(false)
     , isExternal(false)
     , isOnline(false)
+    , isDbReady(false)
 {}
 
 QnStorageModelInfo::QnStorageModelInfo( const QnStorageSpaceData &reply )
@@ -28,6 +29,7 @@ QnStorageModelInfo::QnStorageModelInfo( const QnStorageSpaceData &reply )
     , isBackup(reply.isBackup)
     , isExternal(reply.isExternal)
     , isOnline(reply.isOnline)
+    , isDbReady(reply.storageStatus.testFlag(Qn::StorageStatus::dbReady))
 {}
 
 QnStorageModelInfo::QnStorageModelInfo( const QnStorageResourcePtr &storage )
@@ -40,5 +42,6 @@ QnStorageModelInfo::QnStorageModelInfo( const QnStorageResourcePtr &storage )
     , isBackup(storage->isBackup())
     , isExternal(storage->isExternal())
     , isOnline(storage->getStatus() == Qn::Online)
+    , isDbReady(storage->statusFlag().testFlag(Qn::StorageStatus::dbReady))
 {}
 

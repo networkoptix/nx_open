@@ -18,6 +18,7 @@ struct QnStorageModelInfo
     bool isBackup;
     bool isExternal;
     bool isOnline;
+    bool isDbReady;
 
     QnStorageModelInfo();
     explicit QnStorageModelInfo(const QnStorageSpaceData &reply);
