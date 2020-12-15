@@ -124,6 +124,16 @@ QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, FisheyeCameraProjection,
     (Qn::FisheyeCameraProjection::equisolid, "equisolid")
 )
 
+QN_DEFINE_EXPLICIT_ENUM_LEXICAL_FUNCTIONS(Qn, UserRole,
+    (Qn::UserRole::customUserRole, "customUserRole")
+    (Qn::UserRole::customPermissions, "customPermissions")
+    (Qn::UserRole::owner, "owner")
+    (Qn::UserRole::administrator, "administrator")
+    (Qn::UserRole::advancedViewer, "advancedViewer")
+    (Qn::UserRole::viewer, "viewer")
+    (Qn::UserRole::liveViewer, "liveViewer")
+)
+
 QN_FUSION_DEFINE_FUNCTIONS_FOR_TYPES(
     (Qn::Permissions)(Qn::FisheyeCameraProjection),
     (debug)

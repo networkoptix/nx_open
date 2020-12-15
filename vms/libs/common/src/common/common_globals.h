@@ -805,7 +805,7 @@ Q_DECLARE_METATYPE(Qn::ResourceFlags)
 // TODO: #Elric #enum
 
 QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
-    (Qn::TimePeriodContent)(Qn::UserRole)(Qn::ConnectionResult),
+    (Qn::TimePeriodContent)(Qn::ConnectionResult),
     (metatype)
 )
 
@@ -821,6 +821,7 @@ QN_FUSION_DECLARE_FUNCTIONS_FOR_TYPES(
     (Qn::RebuildAction)(Qn::BackupAction)
     (Qn::TTHeaderFlag)(Qn::IOPortType)(Qn::IODefaultState)(Qn::AuditRecordType)(Qn::AuthResult)
     (Qn::MediaStreamEvent)(Qn::LicenseType)
+    (Qn::UserRole)
     ,
     (metatype)(lexical)
 )

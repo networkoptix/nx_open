@@ -10,11 +10,13 @@
 #include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subject.h>
 
-namespace
-{
-    const auto kPermissionsTag = lit("curr_perm");
-    const auto kPermissionCountTagTemplate = lit("perm_cnt_%1");
-}
+namespace {
+
+const QString kCurrentUserPermissionsTag = "curr_perm";
+const QString kCurrentUserRoleTag = "curr_role";
+const QString kPermissionCountTagTemplate = "perm_cnt_%1";
+
+} // namespace
 
 QnUsersStatisticsModule::QnUsersStatisticsModule(QObject *parent)
     : base_type(parent)
@@ -65,8 +67,8 @@ QnStatisticValuesHash QnUsersStatisticsModule::values() const
     const auto currentUserPermissions = accessController
         ? accessController->globalPermissions()
         : resourceAccessManager()->globalPermissions(currentUser);
-    const auto value = QnLexical::serialized(currentUserPermissions);
-    result.insert(kPermissionsTag, value);
+    result.insert(kCurrentUserPermissionsTag, QnLexical::serialized(currentUserPermissions));
+    result.insert(kCurrentUserRoleTag, QnLexical::serialized(currentUser->userRole()));
 
     return result;
 }
