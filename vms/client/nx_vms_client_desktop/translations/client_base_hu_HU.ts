@@ -9258,14 +9258,14 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message numerus="yes">
       <source>%n symbols over</source>
       <translation type="unfinished">
-        <numerusform>%n szimbólum felett</numerusform>
+        <numerusform>%n symbols over</numerusform>
         <numerusform>%n symbols over</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n symbols left</source>
       <translation type="unfinished">
-        <numerusform>%n szimbólum maradt</numerusform>
+        <numerusform>%n symbols left</numerusform>
         <numerusform>%n symbols left</numerusform>
       </translation>
     </message>
@@ -10058,7 +10058,7 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message numerus="yes">
       <source>Note that each license key may be deactivated a maximum of %n times.</source>
       <translation type="unfinished">
-        <numerusform>Vegye figyelembe, hogy az egyes licenckulcsokat legfeljebb %n alkalommal lehet deaktiválni.</numerusform>
+        <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
         <numerusform>Note that each license key may be deactivated a maximum of %n times.</numerusform>
       </translation>
     </message>

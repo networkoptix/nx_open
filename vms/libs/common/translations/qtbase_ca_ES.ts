@@ -82,7 +82,7 @@
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation>Desplaça cap a l’esquerra</translation>
+      <translation>Desplaça cap a l'esquerra</translation>
     </message>
     <message>
       <source>Scroll Right</source>
@@ -208,7 +208,7 @@
     </message>
     <message>
       <source>Exit</source>
-      <translation>Sortir</translation>
+      <translation>Surt</translation>
     </message>
     <message>
       <source>Cut</source>
@@ -340,7 +340,7 @@ Premeu ESC per cancel·lar</translation>
     <name>QDialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation>D'acord</translation>
     </message>
   </context>
   <context>
@@ -479,11 +479,11 @@ Premeu ESC per cancel·lar</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation>Obrir</translation>
+      <translation>Obre</translation>
     </message>
     <message>
       <source>Save As</source>
-      <translation>Desa com a</translation>
+      <translation>Desa com</translation>
     </message>
     <message>
       <source>Directory:</source>
@@ -565,13 +565,13 @@ Comproveu que el nom de l'arxiu és correcte.</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Eliminar</translation>
+      <translation>Suprimeix</translation>
     </message>
     <message>
       <source>&apos;%1&apos; is write protected.
 Do you want to delete it anyway?</source>
       <translation>&apos;%1&apos; està protegit contra escriptura.
-Voleu suprimir de totes maneres?</translation>
+Voleu suprimir-lo de totes maneres?</translation>
     </message>
     <message>
       <source>Are you sure you want to delete &apos;%1&apos;?</source>
@@ -863,7 +863,7 @@ Voleu suprimir de totes maneres?</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Eliminar</translation>
+      <translation>Suprimeix</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -882,7 +882,7 @@ Voleu suprimir de totes maneres?</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation>D'acord</translation>
     </message>
     <message>
       <source>Help</source>
@@ -893,7 +893,7 @@ Voleu suprimir de totes maneres?</translation>
     <name>QPlatformTheme</name>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation>D'acord</translation>
     </message>
     <message>
       <source>Save</source>
@@ -905,7 +905,7 @@ Voleu suprimir de totes maneres?</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation>Obrir</translation>
+      <translation>Obre</translation>
     </message>
     <message>
       <source>&amp;Yes</source>
@@ -937,15 +937,15 @@ Voleu suprimir de totes maneres?</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Tancar</translation>
+      <translation>Tanca</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Cancel·lar</translation>
+      <translation>Cancel·la</translation>
     </message>
     <message>
       <source>Discard</source>
-      <translation>Descartar</translation>
+      <translation>Descarta</translation>
     </message>
     <message>
       <source>Help</source>
@@ -953,7 +953,7 @@ Voleu suprimir de totes maneres?</translation>
     </message>
     <message>
       <source>Apply</source>
-      <translation>Aplicar</translation>
+      <translation>Aplica</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -968,7 +968,7 @@ Voleu suprimir de totes maneres?</translation>
     <name>QProgressDialog</name>
     <message>
       <source>Cancel</source>
-      <translation>Cancel·lar</translation>
+      <translation>Cancel·la</translation>
     </message>
   </context>
   <context>
@@ -1033,7 +1033,7 @@ Voleu suprimir de totes maneres?</translation>
     </message>
     <message>
       <source>Scroll left</source>
-      <translation>Desplaça cap a l’esquerra</translation>
+      <translation>Desplaça cap a l'esquerra</translation>
     </message>
     <message>
       <source>Scroll up</source>
@@ -1120,18 +1120,18 @@ Voleu suprimir de totes maneres?</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation>Descarregar</translation>
+      <translation>Descarrega</translation>
     </message>
   </context>
   <context>
     <name>QTabBar</name>
     <message>
       <source>Scroll Left</source>
-      <translation>Desplaçar cap a l’esquerra</translation>
+      <translation>Desplaça cap a l'esquerra</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Desplaçar cap a la dreta</translation>
+      <translation>Desplaça cap a la dreta</translation>
     </message>
   </context>
   <context>
@@ -1169,7 +1169,7 @@ Voleu suprimir de totes maneres?</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Eliminar</translation>
+      <translation>Suprimeix</translation>
     </message>
     <message>
       <source>Select All</source>

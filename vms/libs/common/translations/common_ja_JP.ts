@@ -191,7 +191,7 @@
     </message>
     <message>
       <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>
-      <translation>システムごとに許可されているNVRライセンスは1つだけなので、2番目のライセンスは無効になります。</translation>
+      <translation>NVRライセンスはシステムごとに1つだけ許可されます。2番目のライセンスは無効になります。</translation>
     </message>
   </context>
   <context>

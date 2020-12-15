@@ -143,7 +143,7 @@
     <message>
       <location/>
       <source>No more than once per</source>
-      <translation>No més d’una vegada per</translation>
+      <translation>No més d'una vegada per</translation>
     </message>
     <message>
       <location/>
@@ -212,12 +212,12 @@
     <message>
       <location/>
       <source>Watching archive</source>
-      <translation>Arxiu de visualització</translation>
+      <translation>Veient l'arxiu</translation>
     </message>
     <message>
       <location/>
       <source>Exporting video</source>
-      <translation>S'està exportant el vídeo</translation>
+      <translation>Exportant el vídeo</translation>
     </message>
     <message>
       <location/>
@@ -310,12 +310,12 @@
     <message>
       <location/>
       <source>Finish</source>
-      <translation>Acaba</translation>
+      <translation>Finalitza</translation>
     </message>
     <message>
       <location/>
       <source>Start</source>
-      <translation>Inicia</translation>
+      <translation>Comença</translation>
     </message>
     <message>
       <location/>
@@ -399,7 +399,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation>Eliminar</translation>
+      <translation>Suprimeix</translation>
     </message>
     <message>
       <location/>
@@ -521,7 +521,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation>Eliminar</translation>
+      <translation>Suprimeix</translation>
     </message>
     <message>
       <location/>
@@ -820,7 +820,7 @@
     <message>
       <location filename="../src/ui/dialogs/camera_list_dialog.ui"/>
       <source>Add Device...</source>
-      <translation>Afegir un dispositiu...</translation>
+      <translation>Afegeix el dispositiu...</translation>
     </message>
   </context>
   <context>
@@ -1187,7 +1187,7 @@
     <message>
       <location/>
       <source>Login to authenticate (optional)</source>
-      <translation>Inici de sessió per a autenticació (opcional)</translation>
+      <translation>Usuari per a autenticació (opcional)</translation>
     </message>
     <message>
       <location/>
@@ -1514,7 +1514,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation>Eliminar</translation>
+      <translation>Suprimeix</translation>
     </message>
     <message>
       <location/>
@@ -1911,7 +1911,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation>Eliminar</translation>
+      <translation>Suprimeix</translation>
     </message>
     <message>
       <location/>
@@ -2035,7 +2035,7 @@
     <message>
       <location/>
       <source>Check for update</source>
-      <translation>Cercar actualitzacions</translation>
+      <translation>Cerca actualitzacions</translation>
     </message>
     <message>
       <location/>
@@ -2050,7 +2050,7 @@
     <message>
       <location/>
       <source>Download</source>
-      <translation>Descarregar</translation>
+      <translation>Descarrega</translation>
     </message>
     <message>
       <location/>
@@ -2065,7 +2065,7 @@
     <message>
       <location/>
       <source>Cancel</source>
-      <translation>Cancel·lar</translation>
+      <translation>Cancel·la</translation>
     </message>
     <message>
       <location/>
@@ -2124,7 +2124,7 @@
     <message>
       <location/>
       <source>Select layout...</source>
-      <translation>Seleccionar disseny...</translation>
+      <translation>Seleccioneu un disseny...</translation>
     </message>
   </context>
   <context>
@@ -2150,7 +2150,7 @@
     <message>
       <location filename="../src/ui/widgets/business/play_sound_business_action_widget.ui"/>
       <source>Manage...</source>
-      <translation>Gestionar...</translation>
+      <translation>Gestiona...</translation>
     </message>
     <message>
       <location/>
@@ -2260,7 +2260,7 @@
     <message>
       <location filename="../src/ui/dialogs/ptz_manage_dialog.ui"/>
       <source>Save Current Position</source>
-      <translation>Desar la posició actual</translation>
+      <translation>Desa la posició actual</translation>
     </message>
     <message>
       <location/>
@@ -2280,7 +2280,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation>Eliminar</translation>
+      <translation>Suprimeix</translation>
     </message>
     <message>
       <location/>
@@ -2429,7 +2429,7 @@
     <message>
       <location filename="../src/ui/dialogs/merge_systems_dialog.ui"/>
       <source>Merge Systems...</source>
-      <translation>Combinar sistemes...</translation>
+      <translation>Combina els sistemes...</translation>
     </message>
     <message>
       <location/>
@@ -2475,7 +2475,7 @@
     <message>
       <location/>
       <source>Play</source>
-      <translation>Reproduir</translation>
+      <translation>Reprodueix</translation>
     </message>
     <message>
       <location/>
@@ -2534,7 +2534,7 @@
     <message>
       <location/>
       <source>New User...</source>
-      <translation>Nou usuari...</translation>
+      <translation>Usuari nou...</translation>
     </message>
     <message>
       <location/>
@@ -2569,7 +2569,7 @@
     <message>
       <location/>
       <source>Edit Roles...</source>
-      <translation>Edita els rols...</translation>
+      <translation>Edita les funcions...</translation>
     </message>
   </context>
   <context>
@@ -2869,7 +2869,7 @@
     <message>
       <location/>
       <source>Watermark Preview</source>
-      <translation>Vista prèvia de la finigrana</translation>
+      <translation>Vista prèvia de la filigrana</translation>
     </message>
     <message>
       <location/>
@@ -3081,12 +3081,12 @@
     <message>
       <location/>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation>D'acord</translation>
     </message>
     <message>
       <location/>
       <source>Cancel</source>
-      <translation>Cancel·lar</translation>
+      <translation>Cancel·la</translation>
     </message>
   </context>
   <context>
@@ -3140,7 +3140,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_config_widget.ui"/>
       <source>Cancel</source>
-      <translation>Cancel·lar</translation>
+      <translation>Cancel·la</translation>
     </message>
     <message>
       <location/>
@@ -3203,7 +3203,7 @@
     <message>
       <location filename="../src/ui/widgets/properties/storage_rebuild_widget.ui"/>
       <source>Cancel</source>
-      <translation>Cancel·lar</translation>
+      <translation>Cancel·la</translation>
     </message>
   </context>
   <context>
@@ -3249,7 +3249,7 @@
     <message>
       <location/>
       <source>Select Users</source>
-      <translation>Selecciona els usuaris</translation>
+      <translation>Seleccioneu els usuaris</translation>
     </message>
     <message>
       <location/>
@@ -3290,7 +3290,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation>Eliminar</translation>
+      <translation>Suprimeix</translation>
     </message>
     <message>
       <location/>
@@ -3346,7 +3346,7 @@
     <message>
       <location/>
       <source>Delete</source>
-      <translation>Eliminar</translation>
+      <translation>Suprimeix</translation>
     </message>
   </context>
   <context>
@@ -3457,12 +3457,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/wearable_camera_upload_widget.ui"/>
       <source>Cancel</source>
-      <translation>Cancel·lar</translation>
+      <translation>Cancel·la</translation>
     </message>
     <message>
       <location/>
       <source>Upload Footage</source>
-      <translation>Penja les imatges</translation>
+      <translation>Carrega les imatges</translation>
     </message>
     <message>
       <location/>
@@ -3472,7 +3472,7 @@
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation>Carregar una carpeta...</translation>
+      <translation>Carrega la carpeta...</translation>
     </message>
   </context>
   <context>
@@ -3516,7 +3516,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/watermark/private/watermark_preview_dialog.ui"/>
       <source>Watermark preview</source>
-      <translation>Vista prèvia de la finigrana</translation>
+      <translation>Vista prèvia de la filigrana</translation>
     </message>
     <message>
       <location/>

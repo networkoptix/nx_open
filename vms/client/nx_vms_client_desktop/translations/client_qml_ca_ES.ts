@@ -60,11 +60,11 @@
     </message>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation>D'acord</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Cancel·lar</translation>
+      <translation>Cancel·la</translation>
     </message>
   </context>
   <context>
@@ -189,7 +189,7 @@
     <name>PolyFigure</name>
     <message>
       <source>Delete</source>
-      <translation>Eliminar</translation>
+      <translation>Suprimeix</translation>
     </message>
   </context>
   <context>
@@ -286,7 +286,7 @@
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation>Connectar-se al servidor...</translation>
+      <translation>Connecta amb el servidor...</translation>
     </message>
     <message>
       <source>Loading...</source>

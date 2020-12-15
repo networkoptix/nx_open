@@ -212,7 +212,7 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation>D'acord</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
@@ -264,7 +264,7 @@
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-      <translation>S'ha produït un error d'entrada/sortida. Missatge del SO: &quot;%1&quot;.</translation>
+      <translation>S'ha produït un error d'entrada/sortida. Missatge del sistema operatiu: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Parameters:</source>
@@ -284,7 +284,7 @@
     </message>
     <message>
       <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-      <translation>Assegureu-vos que la càmera està connectat a la xarxa. Proveu de reiniciar la càmera.</translation>
+      <translation>Assegureu-vos que la càmera està connectada a la xarxa. Proveu de reiniciar la càmera.</translation>
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -698,96 +698,96 @@
       <source>%n/%1 Time Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n / %1 llicències temporals</numerusform>
-        <numerusform>%n / %1 llicències temporals</numerusform>
+        <numerusform>%n/%1 llicències temporals</numerusform>
+        <numerusform>%n/%1 llicències temporals</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n / %1 llicències analògiques</numerusform>
-        <numerusform>%n / %1 llicències analògiques</numerusform>
+        <numerusform>%n/%1 llicències analògiques</numerusform>
+        <numerusform>%n/%1 llicències analògiques</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Professional Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 Llicències professionals</numerusform>
-        <numerusform>%n / %1 llicències professionals</numerusform>
+        <numerusform>%n/%1 llicències professionals</numerusform>
+        <numerusform>%n/%1 llicències professionals</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Edge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n / %1 llicències Edge</numerusform>
-        <numerusform>%n / %1 llicències Edge</numerusform>
+        <numerusform>%n/%1 llicències Edge</numerusform>
+        <numerusform>%n/%1 llicències Edge</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Vmax Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n / %1 llicències Vmax</numerusform>
-        <numerusform>%n / %1 llicències Vmax</numerusform>
+        <numerusform>%n/%1 llicències Vmax</numerusform>
+        <numerusform>%n/%1 llicències Vmax</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Encoder Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n / %1 llicències codificador analògic</numerusform>
-        <numerusform>%n / %1 llicències codificador analògic</numerusform>
+        <numerusform>%n/%1 llicències codificador analògic</numerusform>
+        <numerusform>%n/%1 llicències codificador analògic</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Video Wall Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n / %1 llicències Video Wall</numerusform>
-        <numerusform>%n / %1 llicències Video Wall</numerusform>
+        <numerusform>%n/%1 llicències Video Wall</numerusform>
+        <numerusform>%n/%1 llicències Video Wall</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 I/O Module Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n / %1 llicències mòdul I/O</numerusform>
-        <numerusform>%n / %1 llicències mòdul I/O</numerusform>
+        <numerusform>%n/%1 llicències mòdul I/O</numerusform>
+        <numerusform>%n/%1 llicències mòdul I/O</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Start Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n / %1 llicències inicials</numerusform>
-        <numerusform>%n / %1 llicències inicials</numerusform>
+        <numerusform>%n/%1 llicències inicials</numerusform>
+        <numerusform>%n/%1 llicències inicials</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Free Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n / %1 llicències gratuïtes</numerusform>
-        <numerusform>%n / %1 llicències gratuïtes</numerusform>
+        <numerusform>%n/%1 llicències gratuïtes</numerusform>
+        <numerusform>%n/%1 llicències gratuïtes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Bridge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n / %1 llicències Bridge</numerusform>
-        <numerusform>%n / %1 llicències Bridge</numerusform>
+        <numerusform>%n/%1 llicències Bridge</numerusform>
+        <numerusform>%n/%1 llicències Bridge</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Invalid Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n / %1 llicències no vàlides</numerusform>
-        <numerusform>%n / %1 llicències no vàlides</numerusform>
+        <numerusform>%n/%1 llicències no vàlides</numerusform>
+        <numerusform>%n/%1 llicències no vàlides</numerusform>
       </translation>
     </message>
     <message>
@@ -861,7 +861,7 @@
     </message>
     <message>
       <source>Invalid type</source>
-      <translation>Tipus no vàlid</translation>
+      <translation>El tipus no és vàlid</translation>
     </message>
     <message>
       <source>This license type requires higher software version</source>
@@ -1327,7 +1327,7 @@
     </message>
     <message>
       <source>Damaged crypted stream header.</source>
-      <translation>Capçalera de flux xifrat danyada.</translation>
+      <translation>Capçalera de flux xifrat malmesa.</translation>
     </message>
   </context>
   <context>
@@ -1595,7 +1595,7 @@
       <comment>%1 means time, %2 means date</comment>
       <translation>
         <numerusform>%n vegades, primera: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
-        <numerusform>%n vegades, primer: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n vegades, primera: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -1758,7 +1758,7 @@
     </message>
     <message>
       <source>Soft Trigger</source>
-      <translation>Accionador suau</translation>
+      <translation>Activador suau</translation>
     </message>
     <message>
       <source>Soft Trigger %1 at %2</source>
@@ -1770,7 +1770,7 @@
     </message>
     <message>
       <source>Send email</source>
-      <translation>Envia correu electrònic</translation>
+      <translation>Envia un correu electrònic</translation>
     </message>
     <message>
       <source>Acknowledge</source>
@@ -1787,7 +1787,7 @@
     </message>
     <message>
       <source>Storage Issue</source>
-      <translation>Problema d'emmatzematge</translation>
+      <translation>Problema d'emmagatzematge</translation>
     </message>
     <message>
       <source>Storage Issue at %1</source>

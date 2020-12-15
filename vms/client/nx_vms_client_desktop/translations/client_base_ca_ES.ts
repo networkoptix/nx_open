@@ -9,15 +9,15 @@
     </message>
     <message>
       <source>Select area</source>
-      <translation>Seleccionar àrea</translation>
+      <translation>Seleccioneu l'àrea</translation>
     </message>
     <message>
       <source>Select some area on the video...</source>
-      <translation>Seleccionar alguna àrea en el vídeo...</translation>
+      <translation>Seleccioneu alguna àrea en el vídeo...</translation>
     </message>
     <message>
       <source>In selected area</source>
-      <translation>A la zona seleccionada</translation>
+      <translation>A l'àrea seleccionada</translation>
     </message>
     <message>
       <source>Failed to execute plugin action</source>
@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>Action requires some parameters to be filled.</source>
-      <translation>L’acció requereix omplir alguns paràmetres.</translation>
+      <translation>L'acció requereix emplenar alguns paràmetres.</translation>
     </message>
   </context>
   <context>
@@ -44,19 +44,19 @@
     </message>
     <message>
       <source>Cannot add new devices while backup process is running.</source>
-      <translation>No es poden afegir nous dispositius mentre s'executa el procés de còpia de seguretat.</translation>
+      <translation>No es poden afegir dispositius nous mentre s'executa el procés de còpia de seguretat.</translation>
     </message>
     <message>
       <source>Cannot add new cameras while backup process is running.</source>
-      <translation>No es poden afegir càmeres noves mentre s’executa el procés de còpia de seguretat.</translation>
+      <translation>No es poden afegir càmeres noves mentre s'executa el procés de còpia de seguretat.</translation>
     </message>
     <message>
       <source>Cannot add new devices because they store archive on external storage.</source>
-      <translation>No es poden afegir nous dispositius perquè enregistren arxius en emmagatzematge extern.</translation>
+      <translation>No es poden afegir dispositius nous perquè enregistren arxius en emmagatzematge extern.</translation>
     </message>
     <message>
       <source>Cannot add new cameras because they store archive on external storage.</source>
-      <translation>No es poden afegir noves càmeres perquè enregistren arxius en emmagatzematge extern.</translation>
+      <translation>No es poden afegir càmeres noves perquè enregistren arxius en emmagatzematge extern.</translation>
     </message>
   </context>
   <context>
@@ -70,19 +70,19 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Play bookmark from the beginning</source>
-      <translation>Reproduir el marcador des del principi</translation>
+      <translation>Reprodueix el marcador des del principi</translation>
     </message>
     <message>
       <source>Edit bookmark</source>
-      <translation>Editar el marcador</translation>
+      <translation>Edita el marcador</translation>
     </message>
     <message>
       <source>Delete bookmark</source>
-      <translation>Esborrar el marcador</translation>
+      <translation>Suprimeix el marcador</translation>
     </message>
     <message>
       <source>Export bookmark</source>
-      <translation>Exportar marcador</translation>
+      <translation>Exporta el marcador</translation>
     </message>
   </context>
   <context>
@@ -123,7 +123,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Installing</source>
-      <translation>Instal. lant</translation>
+      <translation>Instal·lant</translation>
     </message>
     <message>
       <source>Verifying update package</source>
@@ -134,11 +134,11 @@ per veure més marcadors</translation>
     <name>ContextMenu</name>
     <message>
       <source>Filter...</source>
-      <translation>Filtrar...</translation>
+      <translation>Filtra...</translation>
     </message>
     <message>
       <source>Connect to System</source>
-      <translation>Connectar-se al sistema</translation>
+      <translation>Connecta amb el sistema</translation>
     </message>
     <message>
       <source>Help</source>
@@ -150,7 +150,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Cameras to Backup...</source>
-      <translation>Copia de Seguretat de les Càmeres...</translation>
+      <translation>Copia de seguretat de les càmeres...</translation>
     </message>
     <message>
       <source>Control Video Wall</source>
@@ -162,11 +162,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Select Time Server</source>
-      <translation>Seleccioneu el servidor de temps</translation>
+      <translation>Seleccioneu el servidor d'hora</translation>
     </message>
     <message>
       <source>Fit in View</source>
-      <translation>Ajustar a la vista</translation>
+      <translation>Ajusta a la vista</translation>
     </message>
     <message>
       <source>Main Menu</source>
@@ -174,11 +174,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation>Connectar-se al servidor...</translation>
+      <translation>Connecta amb el servidor...</translation>
     </message>
     <message>
       <source>Disconnect from Server</source>
-      <translation>Desconnectar del Servidor</translation>
+      <translation>Desconnecta del servidor</translation>
     </message>
     <message>
       <source>Browse Local Files</source>
@@ -186,7 +186,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Show Welcome Screen</source>
-      <translation>Mostrar la pantalla de benvinguda</translation>
+      <translation>Mostra la pantalla de benvinguda</translation>
     </message>
     <message>
       <source>New...</source>
@@ -206,7 +206,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>New Window</source>
-      <translation>Nova finestra</translation>
+      <translation>Finestra nova</translation>
     </message>
     <message>
       <source>User...</source>
@@ -214,7 +214,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>New User...</source>
-      <translation>Nou usuari...</translation>
+      <translation>Usuari nou...</translation>
     </message>
     <message>
       <source>Video Wall...</source>
@@ -222,7 +222,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation>Nou video Wall...</translation>
+      <translation>Video Wall nou...</translation>
     </message>
     <message>
       <source>Web Page...</source>
@@ -230,11 +230,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>New Web Page...</source>
-      <translation>Nova pàgina web...</translation>
+      <translation>Pàgina web nova...</translation>
     </message>
     <message>
       <source>New Layout...</source>
-      <translation>Nou Disseny...</translation>
+      <translation>Disseny nou...</translation>
     </message>
     <message>
       <source>Open Layout...</source>
@@ -242,7 +242,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Open...</source>
-      <translation>Obrir...</translation>
+      <translation>Obre...</translation>
     </message>
     <message>
       <source>Folder...</source>
@@ -250,7 +250,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Web Client...</source>
-      <translation>Client Web...</translation>
+      <translation>Client web...</translation>
     </message>
     <message>
       <source>Open Web Client...</source>
@@ -258,7 +258,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Save Current Layout</source>
-      <translation>Desar el Disseny actual</translation>
+      <translation>Desa el disseny actual</translation>
     </message>
     <message>
       <source>Save Current Layout As...</source>
@@ -266,7 +266,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Save Video Wall View</source>
-      <translation>Desar la vista del Video Wall</translation>
+      <translation>Desa la vista del Video Wall</translation>
     </message>
     <message>
       <source>Start Screen Recording</source>
@@ -278,31 +278,31 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Stop current action</source>
-      <translation>Aturar l’acció actual</translation>
+      <translation>Atura l'acció actual</translation>
     </message>
     <message>
       <source>Go to Fullscreen</source>
-      <translation>Anar a pantalla completa</translation>
+      <translation>Ves a pantalla completa</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
-      <translation>Surtir de pantalla completa</translation>
+      <translation>Surt de la pantalla completa</translation>
     </message>
     <message>
       <source>Minimize</source>
-      <translation>Minimitzar</translation>
+      <translation>Minimitza</translation>
     </message>
     <message>
       <source>Maximize</source>
-      <translation>Maximitzar</translation>
+      <translation>Maximitza</translation>
     </message>
     <message>
       <source>Restore Down</source>
-      <translation>Reduir</translation>
+      <translation>Redueix</translation>
     </message>
     <message>
       <source>Open in Browser...</source>
-      <translation>Obrir al navegador...</translation>
+      <translation>Obre al navegador...</translation>
     </message>
     <message>
       <source>System Administration...</source>
@@ -314,7 +314,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>User Management...</source>
-      <translation>Gestió d'Usuari...</translation>
+      <translation>Gestió d'usuari...</translation>
     </message>
     <message>
       <source>Local Settings...</source>
@@ -327,17 +327,17 @@ per veure més marcadors</translation>
     <message>
       <source>Log in to %1...</source>
       <comment>Log in to Nx Cloud</comment>
-      <translation>Iniciar sessió a %1...</translation>
+      <translation>Inicia la sessió a %1...</translation>
     </message>
     <message>
       <source>Log out from %1</source>
       <comment>Log out from Nx Cloud</comment>
-      <translation>Sortir de %1</translation>
+      <translation>Surt de %1</translation>
     </message>
     <message>
       <source>Open %1 Portal...</source>
       <comment>Open Nx Cloud Portal</comment>
-      <translation>Obrir %1 Portal...</translation>
+      <translation>Obre el portal %1...</translation>
     </message>
     <message>
       <source>Account Settings...</source>
@@ -361,15 +361,15 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Merge Systems...</source>
-      <translation>Combinar sistemes...</translation>
+      <translation>Combina els sistemes...</translation>
     </message>
     <message>
       <source>About...</source>
-      <translation>Sobre...</translation>
+      <translation>Quant a...</translation>
     </message>
     <message>
       <source>Exit</source>
-      <translation>Sortir</translation>
+      <translation>Surt</translation>
     </message>
     <message>
       <source>Mark Selection Start</source>
@@ -389,23 +389,23 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Add Bookmark...</source>
-      <translation>Afegir marcador...</translation>
+      <translation>Afegeix el marcador...</translation>
     </message>
     <message>
       <source>Edit Bookmark...</source>
-      <translation>Editar el marcador...</translation>
+      <translation>Edita el marcador...</translation>
     </message>
     <message>
       <source>Remove Bookmark...</source>
-      <translation>Eliminar el marcador...</translation>
+      <translation>Elimina el marcador...</translation>
     </message>
     <message>
       <source>Remove Bookmarks...</source>
-      <translation>Eliminar els marcadors...</translation>
+      <translation>Elimina els marcadors...</translation>
     </message>
     <message>
       <source>Preview Search...</source>
-      <translation>Cerca de previsualització...</translation>
+      <translation>Cerca de vista prèvia...</translation>
     </message>
     <message>
       <source>Server...</source>
@@ -413,7 +413,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Open</source>
-      <translation>Obrir</translation>
+      <translation>Obre</translation>
     </message>
     <message>
       <source>Monitor</source>
@@ -421,7 +421,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Open in New Tab</source>
-      <translation>Obrir en una nova pestanya</translation>
+      <translation>Obre en una pestanya nova</translation>
     </message>
     <message>
       <source>Monitor in New Tab</source>
@@ -429,11 +429,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Open in Alarm Layout</source>
-      <translation>Obrir en Disseny d'alarma</translation>
+      <translation>Obre a disseny d'alarma</translation>
     </message>
     <message>
       <source>Open in New Window</source>
-      <translation>Obrir en una finestra nova</translation>
+      <translation>Obre en una finestra nova</translation>
     </message>
     <message>
       <source>Monitor in New Window</source>
@@ -441,15 +441,15 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Open Video Wall</source>
-      <translation>Obrir el Video Wall</translation>
+      <translation>Obre el Video Wall</translation>
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation>Obrir la carpeta contenidora</translation>
+      <translation>Obre la carpeta contenidora</translation>
     </message>
     <message>
       <source>Identify</source>
-      <translation>Identificar</translation>
+      <translation>Identifica</translation>
     </message>
     <message>
       <source>Attach to Video Wall...</source>
@@ -457,11 +457,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Switch to Video Wall mode...</source>
-      <translation>Canviar a mode Video Wall...</translation>
+      <translation>Canvia a mode Video Wall...</translation>
     </message>
     <message>
       <source>Save Video Wall</source>
-      <translation>Desar el Video Wall</translation>
+      <translation>Desa el Video Wall</translation>
     </message>
     <message>
       <source>Save Current Matrix</source>
@@ -469,15 +469,15 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Load Matrix</source>
-      <translation>Carregar matriu</translation>
+      <translation>Carrega la matriu</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Eliminar</translation>
+      <translation>Suprimeix</translation>
     </message>
     <message>
       <source>Stop Video Wall</source>
-      <translation>Aturar el Video Wall</translation>
+      <translation>Atura el Video Wall</translation>
     </message>
     <message>
       <source>Clear Screen</source>
@@ -485,27 +485,27 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Save Layout</source>
-      <translation>Desar el Disseny</translation>
+      <translation>Desa el disseny</translation>
     </message>
     <message>
       <source>Save Layout As...</source>
-      <translation>Desar el Disseny com a...</translation>
+      <translation>Desa el disseny com...</translation>
     </message>
     <message>
       <source>Maximize Item</source>
-      <translation>Maximitzar l'element</translation>
+      <translation>Maximitza l'element</translation>
     </message>
     <message>
       <source>Restore Item</source>
-      <translation>Restaurar l'element</translation>
+      <translation>Restaura l'element</translation>
     </message>
     <message>
       <source>Show Info</source>
-      <translation>Mostrar la informació</translation>
+      <translation>Mostra la informació</translation>
     </message>
     <message>
       <source>Hide Info</source>
-      <translation>Amagar la informació</translation>
+      <translation>Amaga la informació</translation>
     </message>
     <message>
       <source>PTZ...</source>
@@ -513,15 +513,15 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Save Current Position...</source>
-      <translation>Desar la posició actual...</translation>
+      <translation>Desa la posició actual...</translation>
     </message>
     <message>
       <source>Manage...</source>
-      <translation>Gestionar...</translation>
+      <translation>Gestiona...</translation>
     </message>
     <message>
       <source>Show Motion/Smart Search</source>
-      <translation>Mostra el moviment / cerca intel·ligent</translation>
+      <translation>Mostra la cerca de moviment/intel·ligent</translation>
     </message>
     <message>
       <source>Show Motion</source>
@@ -529,11 +529,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Hide Motion/Smart Search</source>
-      <translation>Amagar la cerca de moviment / intel·ligent</translation>
+      <translation>Amaga la cerca de moviment/intel·ligent</translation>
     </message>
     <message>
       <source>Hide Motion</source>
-      <translation>Amaga el Moviment</translation>
+      <translation>Amaga el moviment</translation>
     </message>
     <message>
       <source>Clear Motion Selection</source>
@@ -541,7 +541,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Check File Watermark</source>
-      <translation>Comprova la marca d'aigua de l'arxiu</translation>
+      <translation>Comprova la filigrana de l'arxiu</translation>
     </message>
     <message>
       <source>Image Enhancement...</source>
@@ -549,7 +549,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Rotate to...</source>
-      <translation>Girar a...</translation>
+      <translation>Gira a...</translation>
     </message>
     <message>
       <source>0 degrees</source>
@@ -569,27 +569,27 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Remove from Layout</source>
-      <translation>Eliminar del disseny</translation>
+      <translation>Elimina del disseny</translation>
     </message>
     <message>
       <source>Stop Sharing Layout</source>
-      <translation>Deixar de compartir el Disseny</translation>
+      <translation>Deixa de compartir el disseny</translation>
     </message>
     <message>
       <source>Edit...</source>
-      <translation>Editar...</translation>
+      <translation>Edita...</translation>
     </message>
     <message>
       <source>Rename</source>
-      <translation>Reanomenar</translation>
+      <translation>Canvia el nom</translation>
     </message>
     <message>
       <source>Delete from Disk</source>
-      <translation>Eliminar del disc</translation>
+      <translation>Elimina del disc</translation>
     </message>
     <message>
       <source>Set as Layout Background</source>
-      <translation>Estableix com a fons del Disseny</translation>
+      <translation>Estableix com a fons del disseny</translation>
     </message>
     <message>
       <source>User Settings...</source>
@@ -605,27 +605,27 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Check Device Issues...</source>
-      <translation>Comprovar els problemes del dispositiu...</translation>
+      <translation>Comprova els problemes del dispositiu...</translation>
     </message>
     <message>
       <source>Check Devices Issues...</source>
-      <translation>Comprovar els problemes del dispositiu...</translation>
+      <translation>Comprova els problemes dels dispositius...</translation>
     </message>
     <message>
       <source>Check Camera Issues...</source>
-      <translation>Comprovar els problemes de la càmera...</translation>
+      <translation>Comprova els problemes de la càmera...</translation>
     </message>
     <message>
       <source>Check Cameras Issues...</source>
-      <translation>Comprovar els problemes de les càmeres...</translation>
+      <translation>Comprova els problemes de les càmeres...</translation>
     </message>
     <message>
       <source>Check I/O Module Issues...</source>
-      <translation>Comprovar els problemes del mòdul de I/O...</translation>
+      <translation>Comprova els problemes del mòdul I/O...</translation>
     </message>
     <message>
       <source>Check I/O Modules Issues...</source>
-      <translation>Comprovar els problemes dels mòduls de I/O...</translation>
+      <translation>Comprova els problemes dels mòduls I/O...</translation>
     </message>
     <message>
       <source>Device Rules...</source>
@@ -637,7 +637,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Camera Rules...</source>
-      <translation>Regles de les càmeres...</translation>
+      <translation>Regles de la càmera...</translation>
     </message>
     <message>
       <source>Cameras Rules...</source>
@@ -645,11 +645,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>I/O Module Rules...</source>
-      <translation>Regles del mòdul de I/O...</translation>
+      <translation>Regles del mòdul I/O...</translation>
     </message>
     <message>
       <source>I/O Modules Rules...</source>
-      <translation>Regles dels mòduls de I/O...</translation>
+      <translation>Regles dels mòduls I/O...</translation>
     </message>
     <message>
       <source>Device Settings...</source>
@@ -669,11 +669,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>I/O Module Settings...</source>
-      <translation>Configuració del mòdul de I/O...</translation>
+      <translation>Configuració del mòdul I/O...</translation>
     </message>
     <message>
       <source>I/O Modules Settings...</source>
-      <translation>Configuració dels mòduls de I/O...</translation>
+      <translation>Configuració dels mòduls I/O...</translation>
     </message>
     <message>
       <source>File Settings...</source>
@@ -689,7 +689,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Add Device...</source>
-      <translation>Afegir un dispositiu...</translation>
+      <translation>Afegeix el dispositiu...</translation>
     </message>
     <message>
       <source>Devices List by Server...</source>
@@ -717,7 +717,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Merge to Currently Connected System...</source>
-      <translation>Combinar amb el sistema actualment connectat...</translation>
+      <translation>Combina amb el sistema actualment connectat...</translation>
     </message>
     <message>
       <source>None</source>
@@ -729,7 +729,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation>Mitjana</translation>
+      <translation>Mitjà</translation>
     </message>
     <message>
       <source>Large</source>
@@ -741,19 +741,19 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Tancar</translation>
+      <translation>Tanca</translation>
     </message>
     <message>
       <source>Close All But This</source>
-      <translation>Tancar tot menys això</translation>
+      <translation>Tanca-ho tot menys això</translation>
     </message>
     <message>
       <source>Play</source>
-      <translation>Reproduir</translation>
+      <translation>Reprodueix</translation>
     </message>
     <message>
       <source>Pause</source>
-      <translation>Pausar</translation>
+      <translation>Pausa</translation>
     </message>
     <message>
       <source>Previous Frame</source>
@@ -765,79 +765,79 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>To Start</source>
-      <translation>Al Inici</translation>
+      <translation>A l'inici</translation>
     </message>
     <message>
       <source>To End</source>
-      <translation>Al Final</translation>
+      <translation>Al final</translation>
     </message>
     <message>
       <source>Volume Down</source>
-      <translation>Abaixar el volum</translation>
+      <translation>Abaixa el volum</translation>
     </message>
     <message>
       <source>Volume Up</source>
-      <translation>Apujar el volum</translation>
+      <translation>Apuja el volum</translation>
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation>Activar el silenci</translation>
+      <translation>Activa el silenci</translation>
     </message>
     <message>
       <source>Jump to Live</source>
-      <translation>Saltar al Directe</translation>
+      <translation>Salta al directe</translation>
     </message>
     <message>
       <source>Synchronize Streams</source>
-      <translation>Sincronitzar els fluxos de vídeo</translation>
+      <translation>Sincronitza els fluxos de vídeo</translation>
     </message>
     <message>
       <source>Disable Stream Synchronization</source>
-      <translation>Desactivar la sincronització de fluxes de Vídeo</translation>
+      <translation>Desactiva la sincronització de fluxos de vídeo</translation>
     </message>
     <message>
       <source>Show Bookmarks</source>
-      <translation>Mostrar els marcadors</translation>
+      <translation>Mostra els marcadors</translation>
     </message>
     <message>
       <source>Hide Bookmarks</source>
-      <translation>Amagar els Marcadors</translation>
+      <translation>Amaga els marcadors</translation>
     </message>
     <message>
       <source>Show Calendar</source>
-      <translation>Mostrar el calendari</translation>
+      <translation>Mostra el calendari</translation>
     </message>
     <message>
       <source>Hide Calendar</source>
-      <translation>Amagar el calendari</translation>
+      <translation>Amaga el calendari</translation>
     </message>
     <message>
       <source>Show Title Bar</source>
-      <translation>Mostrar la barra de títols</translation>
+      <translation>Mostra la barra de títols</translation>
     </message>
     <message>
       <source>Hide Title Bar</source>
-      <translation>Amagar la barra de títols</translation>
+      <translation>Amaga la barra de títols</translation>
     </message>
     <message>
       <source>Pin Tree</source>
-      <translation>Ancorar l'arbre</translation>
+      <translation>Fixa l'arbre</translation>
     </message>
     <message>
       <source>Unpin Tree</source>
-      <translation>Desancorar l'arbre</translation>
+      <translation>Desfixa l'arbre</translation>
     </message>
     <message>
       <source>Show Timeline</source>
-      <translation>Mostrar a la cronologia</translation>
+      <translation>Mostra la línia de temps</translation>
     </message>
     <message>
       <source>Hide Timeline</source>
-      <translation>Amagar la línia de temps</translation>
+      <translation>Amaga la línia de temps</translation>
     </message>
     <message>
       <source>Bookmark Log...</source>
-      <translation>Registre del marcador...</translation>
+      <translation>Afegeix registre a marcadors...</translation>
     </message>
     <message>
       <source>Showreel...</source>
@@ -849,11 +849,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Remove from Showreel</source>
-      <translation>Elimina del Showreel</translation>
+      <translation>Elimina del showreel</translation>
     </message>
     <message>
       <source>Make Showreel</source>
-      <translation>Fer un Showreel</translation>
+      <translation>Fes un showreel</translation>
     </message>
     <message>
       <source>Upload File...</source>
@@ -861,7 +861,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation>Carregar una carpeta...</translation>
+      <translation>Carrega una carpeta...</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
@@ -869,11 +869,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Export Video...</source>
-      <translation>Exportar vídeo...</translation>
+      <translation>Exporta el vídeo...</translation>
     </message>
     <message>
       <source>Export Bookmark...</source>
-      <translation>Exportar marcador...</translation>
+      <translation>Exporta el marcador...</translation>
     </message>
     <message>
       <source>Resolution...</source>
@@ -881,11 +881,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Cell Aspect Ratio...</source>
-      <translation>Relació d'aspecte de cel.la...</translation>
+      <translation>Relació d'aspecte de la cel·la...</translation>
     </message>
     <message>
       <source>Cell Spacing...</source>
-      <translation>Espaiat de Cel.la...</translation>
+      <translation>Espaiat de la cel·la...</translation>
     </message>
     <message>
       <source>Screen Settings...</source>
@@ -893,7 +893,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation>Exportar marcadors...</translation>
+      <translation>Exporta els marcadors...</translation>
     </message>
     <message>
       <source>Forget password</source>
@@ -901,11 +901,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Cancel Upload...</source>
-      <translation>Cancel·lar la càrrega...</translation>
+      <translation>Cancel·la la càrrega...</translation>
     </message>
     <message>
       <source>Copy Schedule...</source>
-      <translation>Copiar l'horari...</translation>
+      <translation>Copia el calendari...</translation>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
@@ -913,43 +913,43 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Show Thumbnails</source>
-      <translation>Mostrar miniatures</translation>
+      <translation>Mostra les miniatures</translation>
     </message>
     <message>
       <source>Hide Thumbnails</source>
-      <translation>Amagar les miniatures</translation>
+      <translation>Amaga les miniatures</translation>
     </message>
     <message>
       <source>Pin Panel</source>
-      <translation>Fixar el panell</translation>
+      <translation>Fixa el tauler</translation>
     </message>
     <message>
       <source>Unpin Panel</source>
-      <translation>Desanclar el panell</translation>
+      <translation>Desfixa el tauler</translation>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation>Càmera Virtual...</translation>
+      <translation>Càmera virtual...</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation>Nova Càmera Virtual...</translation>
+      <translation>Càmera virtual nova...</translation>
     </message>
     <message>
       <source>Show Tree</source>
-      <translation>Mostrar l'arbre</translation>
+      <translation>Mostra l'arbre</translation>
     </message>
     <message>
       <source>Hide Tree</source>
-      <translation>Amagar l'Arbre</translation>
+      <translation>Amaga l'arbre</translation>
     </message>
     <message>
       <source>Show Notifications</source>
-      <translation>Mostrar les notificacions</translation>
+      <translation>Mostra les notificacions</translation>
     </message>
     <message>
       <source>Hide Notifications</source>
-      <translation>Amagar les notificacions</translation>
+      <translation>Amaga les notificacions</translation>
     </message>
     <message>
       <source>Files...</source>
@@ -957,23 +957,23 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Switch to Notifications tab</source>
-      <translation>Canviar a la pestanya Notificacions</translation>
+      <translation>Canvia a la pestanya Notificacions</translation>
     </message>
     <message>
       <source>Switch to Motion tab</source>
-      <translation>Canviar a la pestanya de Moviment</translation>
+      <translation>Canvia a la pestanya Moviment</translation>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
-      <translation>Canviar a la pestanya de Marcadors</translation>
+      <translation>Canvia a la pestanya Marcadors</translation>
     </message>
     <message>
       <source>Switch to Events tab</source>
-      <translation>Canviar a la pestanya d'Esdeveniments</translation>
+      <translation>Canvia a la pestanya Esdeveniments</translation>
     </message>
     <message>
       <source>Switch to Objects tab</source>
-      <translation>Canviar a la pestanya d'objectes</translation>
+      <translation>Canvia a la pestanya Objectes</translation>
     </message>
     <message>
       <source>Objects Frames and Info...</source>
@@ -981,11 +981,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Pin Calendar</source>
-      <translation>Fixar el Calendari</translation>
+      <translation>Fixa el calendari</translation>
     </message>
     <message>
       <source>Unpin Calendar</source>
-      <translation>Desanclar el Calendari</translation>
+      <translation>Desfixa el calendari</translation>
     </message>
     <message>
       <source>Page...</source>
@@ -993,11 +993,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Connect to this Server</source>
-      <translation>Connectar a aquest servidor</translation>
+      <translation>Connecta amb aquest servidor</translation>
     </message>
     <message>
       <source>Pin</source>
-      <translation>Fixar</translation>
+      <translation>Fixa</translation>
     </message>
   </context>
   <context>
@@ -1036,14 +1036,14 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
-      <translation>L'ID del Hardware del servidor amb aquesta llicència no coincideix amb l'ID del hardware en el qual es va activar la llicència.</translation>
+      <translation>L'ID de maquinari del servidor amb aquesta llicència no coincideix amb l'ID de maquinari en el qual es va activar la llicència.</translation>
     </message>
   </context>
   <context>
     <name>EncryptedLayoutStrings</name>
     <message>
       <source>Please enter a valid password</source>
-      <translation>Si us plau, introduïu una contrasenya valida</translation>
+      <translation>Introduïu una contrasenya vàlida</translation>
     </message>
     <message>
       <source>The password is not valid.</source>
@@ -1098,14 +1098,14 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Any analytics event</source>
-      <translation>Qualsevol Esdeveniment d'analítica</translation>
+      <translation>Qualsevol esdeveniment d'analítica</translation>
     </message>
   </context>
   <context>
     <name>ExitFullscreenActionHelper</name>
     <message>
       <source>Select layout...</source>
-      <translation>Seleccionar disseny...</translation>
+      <translation>Selecciona el disseny...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
@@ -1134,7 +1134,7 @@ per veure més marcadors</translation>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation>Entrellaçar Audio i Video</translation>
+      <translation>Entrellaça àudio i vídeo</translation>
     </message>
     <message>
       <source>Matroska</source>
@@ -1165,15 +1165,15 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Select device...</source>
-      <translation>Selecionar un dispositiu...</translation>
+      <translation>Seleccioneu un dispositiu...</translation>
     </message>
     <message>
       <source>Select camera...</source>
-      <translation>Seleccionar una càmera...</translation>
+      <translation>Seleccioneu una càmera...</translation>
     </message>
     <message>
       <source>Select layout...</source>
-      <translation>Seleccionar un Disseny...</translation>
+      <translation>Seleccioneu un disseny...</translation>
     </message>
     <message numerus="yes">
       <source>%n layouts</source>
@@ -1228,26 +1228,26 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation>Desplaçar cap a l’esquerra</translation>
+      <translation>Desplaça cap a l'esquerra</translation>
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation>Desplaçar cap amunt</translation>
+      <translation>Desplaça cap amunt</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Desplaçar cap a la dreta</translation>
+      <translation>Desplaça cap a la dreta</translation>
     </message>
     <message>
       <source>Scroll Down</source>
-      <translation>Desplaçar cap avall</translation>
+      <translation>Desplaça cap avall</translation>
     </message>
   </context>
   <context>
     <name>LayoutTourTextFactory</name>
     <message>
       <source>Start Showreel</source>
-      <translation>Inicia Showreel</translation>
+      <translation>Inicia el showreel</translation>
     </message>
   </context>
   <context>
@@ -1258,7 +1258,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>License you are trying to activate is incompatible with your software.</source>
-      <translation>La llicència que intenteu activar és incompatible amb el vostre software.</translation>
+      <translation>La llicència que intenteu activar és incompatible amb el vostre programari.</translation>
     </message>
     <message>
       <source>To report the issue please contact %1.</source>
@@ -1282,7 +1282,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Please make sure it is entered correctly.</source>
-      <translation>Si us plau, assegureu-vos que s'ha introduït correctament.</translation>
+      <translation>Assegureu-vos que s'ha introduït correctament.</translation>
     </message>
     <message>
       <source>Invalid activation key file</source>
@@ -1294,15 +1294,15 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation>Aquesta llicència ja està activada i està enllaçada a l'ID de hardware %1</translation>
+      <translation>Aquesta llicència ja està activada i està vinculada a l'ID de maquinari %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation>Aquesta llicència ja està activada i està vinculada a l'ID de Hardware %1 el %2</translation>
+      <translation>Aquesta llicència ja està activada i està vinculada a l'ID de maquinari %1 el %2</translation>
     </message>
     <message>
       <source>License already activated on another server</source>
-      <translation>La Llicència ja està activada en un altre servidor</translation>
+      <translation>La llicència ja està activada en un altre servidor</translation>
     </message>
     <message>
       <source>You already activated this license</source>
@@ -1322,11 +1322,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>To report the issue please contact your Regional / License support:</source>
-      <translation>Si us plau, per informar del problema, contacteu amb el servei d'assistència regional o de llicència:</translation>
+      <translation>Per informar del problema, contacteu amb el servei de suport regional o de llicències:</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation>Per activar manualment la clau de llicència, contacteu amb el servei d'assistència regional o de llicència:</translation>
+      <translation>Per activar manualment la clau de llicència, contacteu amb el servei de suport regional o de llicències:</translation>
     </message>
   </context>
   <context>
@@ -1348,8 +1348,8 @@ per veure més marcadors</translation>
     <message numerus="yes">
       <source>Deactivate %n Other</source>
       <translation>
-        <numerusform>Desactiva %n Altres</numerusform>
-        <numerusform>Desactiva %n Altres</numerusform>
+        <numerusform>Desactiva %n altres</numerusform>
+        <numerusform>Desactiva %n altres</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1456,7 +1456,7 @@ per veure més marcadors</translation>
     <name>PasswordInformation</name>
     <message>
       <source>Good</source>
-      <translation>Adequat</translation>
+      <translation>Adequada</translation>
     </message>
     <message>
       <source>Fair</source>
@@ -1515,7 +1515,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Common</source>
-      <translation>Comú</translation>
+      <translation>Comuna</translation>
     </message>
     <message>
       <source>This password is in list of the most popular passwords.</source>
@@ -1523,7 +1523,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Incorrect</source>
-      <translation>Incorrecte</translation>
+      <translation>Incorrecta</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
@@ -1577,11 +1577,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Preset used by some tours. Delete it anyway?</source>
-      <translation>Preset utilitzat per alguns Tours. Vols suprimir-lo de totes maneres?</translation>
+      <translation>Paràmetre predefinit utilitzat per alguns tours. Voleu suprimir-lo de totes maneres?</translation>
     </message>
     <message>
       <source>These tours will become invalid.</source>
-      <translation>Aquests Tours deixaran de ser vàlids.</translation>
+      <translation>Aquests tours deixaran de ser vàlids.</translation>
     </message>
   </context>
   <context>
@@ -1623,11 +1623,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Focus Far</source>
-      <translation>Enfocar Lluny</translation>
+      <translation>Enfoca lluny</translation>
     </message>
     <message>
       <source>Focus Near</source>
-      <translation>Enfocar a prop</translation>
+      <translation>Enfoca a prop</translation>
     </message>
     <message>
       <source>Auto Focus</source>
@@ -1635,7 +1635,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Change Dewarping Mode</source>
-      <translation>Canvia el mode de dewarping</translation>
+      <translation>Canvia el mode de correcció de distorsions</translation>
     </message>
   </context>
   <context>
@@ -1653,14 +1653,14 @@ per veure més marcadors</translation>
     <name>QPlatformTheme</name>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation>D'acord</translation>
     </message>
   </context>
   <context>
     <name>QWebEnginePage</name>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation>Esteu segur que voleu deixar aquesta pàgina? És possible que no es desinin els canvis que heu realitzat.</translation>
+      <translation>Segur que voleu deixar aquesta pàgina? És possible que no es desin els canvis que heu realitzat.</translation>
     </message>
   </context>
   <context>
@@ -1671,15 +1671,15 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>OpenGL version</source>
-      <translation>Versió OpenGL</translation>
+      <translation>Versió d'OpenGL</translation>
     </message>
     <message>
       <source>OpenGL renderer</source>
-      <translation>Render OpenGL</translation>
+      <translation>Renderitzador d'OpenGL</translation>
     </message>
     <message>
       <source>OpenGL vendor</source>
-      <translation>Venedor de OpenGL</translation>
+      <translation>Proveïdor d'OpenGL</translation>
     </message>
     <message>
       <source>OpenGL max texture size</source>
@@ -1691,11 +1691,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Built for %1-%2 with %3.</source>
-      <translation>Construït per %1%2 amb %3.</translation>
+      <translation>Dissenyat per a %1-%2 amb %3.</translation>
     </message>
     <message>
       <source>Regional / License support</source>
-      <translation>Suport regional / de llicència</translation>
+      <translation>Suport regional/de llicències</translation>
     </message>
   </context>
   <context>
@@ -1727,7 +1727,7 @@ per veure més marcadors</translation>
     <name>QnAccessibleResourcesWidget</name>
     <message>
       <source>Giving access to some layouts you give access to all cameras on them. Also user will get access to all new cameras on these layouts.</source>
-      <translation>En donar accés a alguns dissenys, li dóna accés a totes les cámeres en ells. A més, l'usuari tindrà accés a totes les càmeres noves en aquests dissenys.</translation>
+      <translation>En donar accés a alguns dissenys, doneu accés a totes les càmeres que contenen. A més, l'usuari tindrà accés a totes les càmeres noves d'aquests dissenys.</translation>
     </message>
     <message>
       <source>All Cameras &amp; Resources</source>
@@ -1753,22 +1753,22 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Helps avoid problems with OpenGL drawing which result in 100% CPU load.</source>
-      <translation>Ajuda a evitar problemes amb el dibuix de OpenGL que resulten en un 100% de càrrega de CPU.</translation>
+      <translation>Ajuda a evitar problemes amb el dibuix d'OpenGL que resulten en un 100% de càrrega de la CPU.</translation>
     </message>
     <message>
       <source>Adjust to smallest value that does not degrade live view. Bigger buffer makes playback smoother but increases delay between real time and live view; smaller buffer decreases delay but can cause stutters.</source>
-      <translation>Ajustar al valor més petit que no degrada la vista en viu. Un búfer més gran fa que la reproducció sigui més fluida però augmenta el retard entre el temps real i la visualització en viu; un búfer més petit disminueix el retard però pot causar quequejos.</translation>
+      <translation>Ajustar al valor més petit que no degrada la vista en directe. Un búfer més gran fa que la reproducció sigui més fluida però augmenta el retard entre el temps real i la visualització en directe; un búfer més petit disminueix el retard però pot causar quequejos.</translation>
     </message>
     <message>
       <source>Warning! This is an experimental option that saves CPU but may affect animation.</source>
-      <translation>Avís! Es tracta d’una opció experimental que estalvia CPU però pot afectar l’animació.</translation>
+      <translation>Avís! Es tracta d'una opció experimental que estalvia CPU però pot afectar l'animació.</translation>
     </message>
   </context>
   <context>
     <name>QnAuditItemDelegate</name>
     <message>
       <source>Play</source>
-      <translation>Reproduir</translation>
+      <translation>Reprodueix</translation>
     </message>
     <message>
       <source>User settings...</source>
@@ -1787,7 +1787,7 @@ per veure més marcadors</translation>
     <name>QnAuditLogDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Copiar la selecció al porta-retalls</translation>
+      <translation>Copia la selecció al porta-retalls</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -1795,7 +1795,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Seleccionar-ho tot</translation>
+      <translation>Selecciona-ho tot</translation>
     </message>
     <message>
       <source>Export selected records to a file</source>
@@ -1819,7 +1819,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>No sessions</source>
-      <translation>No hi ha sessions</translation>
+      <translation>Sense sessions</translation>
     </message>
     <message>
       <source>No cameras</source>
@@ -1827,11 +1827,11 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Select sessions to see their details</source>
-      <translation>Seleccioneu sessions per veure els seus detalls</translation>
+      <translation>Seleccioneu les sessions per veure'n els detalls</translation>
     </message>
     <message>
       <source>Select cameras to see their details</source>
-      <translation>Seleccioneu càmeres per veure els seus detalls</translation>
+      <translation>Seleccioneu les càmeres per veure'n els detalls</translation>
     </message>
     <message>
       <source>No archive for this position</source>
@@ -1840,7 +1840,7 @@ per veure més marcadors</translation>
     <message numerus="yes">
       <source>These devices are removed from System</source>
       <translation>
-        <numerusform>Aquests dispositius son eliminats del sistema</numerusform>
+        <numerusform>Aquests dispositius s'eliminen del sistema</numerusform>
         <numerusform>Aquests dispositius s'eliminen del sistema</numerusform>
       </translation>
     </message>
@@ -2071,7 +2071,7 @@ per veure més marcadors</translation>
     <name>QnBackupCamerasDialog</name>
     <message>
       <source>Select Devices to Backup...</source>
-      <translation>Seleccioneu Dispositius per fer còpies de seguretat...</translation>
+      <translation>Seleccioneu els dispositius per fer còpies de seguretat...</translation>
     </message>
     <message>
       <source>Select Cameras to Backup...</source>
@@ -2377,7 +2377,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation>&amp;Eliminar</translation>
+      <translation>&amp;Elimina</translation>
     </message>
     <message>
       <source>&amp;Schedule...</source>
@@ -2444,7 +2444,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Target</source>
-      <translation>Objectiu</translation>
+      <translation>Destinació</translation>
     </message>
     <message>
       <source>Interval of Action</source>
@@ -2487,7 +2487,7 @@ per veure més marcadors</translation>
     <name>QnCameraDiagnosticsDialog</name>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation>D'acord</translation>
     </message>
     <message>
       <source>FAILED: %1</source>
@@ -2575,7 +2575,7 @@ per veure més marcadors</translation>
     <name>QnCameraListDialog</name>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Copiar la selecció al porta-retalls</translation>
+      <translation>Copia la selecció al porta-retalls</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -2583,7 +2583,7 @@ per veure més marcadors</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Seleccionar-ho tot</translation>
+      <translation>Selecciona-ho tot</translation>
     </message>
     <message>
       <source>Devices List</source>
@@ -2708,7 +2708,7 @@ per veure més marcadors</translation>
     <name>QnCameraPasswordChangeDialog</name>
     <message>
       <source>New Password</source>
-      <translation>Nova contrasenya</translation>
+      <translation>Contrasenya nova</translation>
     </message>
     <message>
       <source>Repeat Password</source>
@@ -2738,7 +2738,7 @@ per veure més marcadors</translation>
     <name>QnChangeUserPasswordDialog</name>
     <message>
       <source>New Password</source>
-      <translation>Nova contrasenya</translation>
+      <translation>Contrasenya nova</translation>
     </message>
     <message>
       <source>Confirm Password</source>
@@ -2779,7 +2779,7 @@ dispositiu</translation>
     <message>
       <source>Open %1 Portal</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Obrir %1 Portal</translation>
+      <translation>Obre el portal %1</translation>
     </message>
     <message>
       <source>Create %1 Account</source>
@@ -2842,7 +2842,7 @@ a %1</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation>Connectar-se al servidor...</translation>
+      <translation>Connecta amb el servidor...</translation>
     </message>
     <message>
       <source>Cannot connect to %1</source>
@@ -2864,7 +2864,7 @@ a %1</translation>
       <comment>%2 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
       <translation>
         <numerusform>%n de %1 usuaris seleccionats no són usuaris %2 i no rebran notificacions per a mòbils.</numerusform>
-        <numerusform>%n d' %1 usuaris seleccionats no són usuaris %2 i no rebran notificacions per a mòbils.</numerusform>
+        <numerusform>%n de %1 usuaris seleccionats no són usuaris %2 i no rebran notificacions per a mòbils.</numerusform>
       </translation>
     </message>
   </context>
@@ -3268,7 +3268,7 @@ a %1</translation>
     </message>
     <message>
       <source>Disconnect</source>
-      <translation>Desconnectar</translation>
+      <translation>Desconnecta</translation>
     </message>
     <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
@@ -3314,7 +3314,7 @@ a %1</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Copiar la selecció al porta-retalls</translation>
+      <translation>Copia la selecció al porta-retalls</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -3322,7 +3322,7 @@ a %1</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation>Seleccionar-ho tot</translation>
+      <translation>Selecciona-ho tot</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -3385,7 +3385,7 @@ a %1</translation>
     </message>
     <message>
       <source>Target</source>
-      <translation>Objectiu</translation>
+      <translation>Destinació</translation>
     </message>
     <message>
       <source>Description</source>
@@ -3886,7 +3886,7 @@ a %1</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation>D'acord</translation>
     </message>
     <message>
       <source>Error</source>
@@ -4020,7 +4020,7 @@ a %1</translation>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation>Per obtenir un arxiu de clau d’activació, envieu la clau de llicència i l'ID de maquinari proporcionats a %1.</translation>
+      <translation>Per obtenir un arxiu de clau d'activació, envieu la clau de llicència i l'ID de maquinari proporcionats a %1.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
@@ -4091,7 +4091,7 @@ a %1</translation>
     <name>QnLoginDialog</name>
     <message>
       <source>Connect to Server...</source>
-      <translation>Connectar-se al servidor...</translation>
+      <translation>Connecta amb el servidor...</translation>
     </message>
     <message>
       <source>Version %1</source>
@@ -4155,7 +4155,7 @@ a %1</translation>
     <message>
       <source>Log in to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Iniciar sessió a %1</translation>
+      <translation>Inicia la sessió a %1</translation>
     </message>
     <message>
       <source>Welcome to %1!</source>
@@ -4284,7 +4284,7 @@ a %1</translation>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
       <translation>
-        <numerusform>Estableix per a les %n càmeres</numerusform>
+        <numerusform>Defineix per a les %n càmeres</numerusform>
         <numerusform>Defineix per a les %n càmeres</numerusform>
       </translation>
     </message>
@@ -4360,7 +4360,7 @@ a %1</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Eliminar</translation>
+      <translation>Suprimeix</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -4372,7 +4372,7 @@ a %1</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation>Tancar</translation>
+      <translation>Tanca</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -4399,7 +4399,7 @@ a %1</translation>
     </message>
     <message>
       <source>To Start</source>
-      <translation>Al Inici</translation>
+      <translation>A l'inici</translation>
     </message>
     <message>
       <source>Next Chunk</source>
@@ -4407,7 +4407,7 @@ a %1</translation>
     </message>
     <message>
       <source>To End</source>
-      <translation>Al Final</translation>
+      <translation>Al final</translation>
     </message>
     <message>
       <source>Previous Chunk</source>
@@ -4601,7 +4601,7 @@ a %1</translation>
     <name>QnProgressDialog</name>
     <message>
       <source>Cancel</source>
-      <translation>Cancel·lar</translation>
+      <translation>Cancel·la</translation>
     </message>
   </context>
   <context>
@@ -4780,11 +4780,11 @@ a %1</translation>
     </message>
     <message>
       <source>Best</source>
-      <translation>Òptima</translation>
+      <translation>Òptim</translation>
     </message>
     <message>
       <source>Average</source>
-      <translation>Mitjana</translation>
+      <translation>Mitjà</translation>
     </message>
     <message>
       <source>Performance</source>
@@ -5063,7 +5063,7 @@ a %1</translation>
     <name>QnResourceWidget</name>
     <message>
       <source>Close</source>
-      <translation>Tancar</translation>
+      <translation>Tanca</translation>
     </message>
     <message>
       <source>Information</source>
@@ -5120,7 +5120,7 @@ a %1</translation>
     <name>QnSearchBookmarksDialogPrivate</name>
     <message>
       <source>Export Bookmark...</source>
-      <translation>Exportar marcador...</translation>
+      <translation>Exporta el marcador...</translation>
     </message>
     <message>
       <source>No bookmarks</source>
@@ -5132,7 +5132,7 @@ a %1</translation>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation>Exportar marcadors...</translation>
+      <translation>Exporta els marcadors...</translation>
     </message>
   </context>
   <context>
@@ -5163,7 +5163,7 @@ a %1</translation>
     </message>
     <message>
       <source>Creator</source>
-      <translation>Autor</translation>
+      <translation>Creador</translation>
     </message>
   </context>
   <context>
@@ -5186,11 +5186,11 @@ a %1</translation>
     </message>
     <message>
       <source>Select devices...</source>
-      <translation>Selecciona els dispositius...</translation>
+      <translation>Seleccioneu els dispositius...</translation>
     </message>
     <message>
       <source>Select cameras...</source>
-      <translation>Selecciona les càmeres...</translation>
+      <translation>Seleccioneu les càmeres...</translation>
     </message>
   </context>
   <context>
@@ -5205,7 +5205,7 @@ a %1</translation>
     </message>
     <message>
       <source>Select Servers...</source>
-      <translation>Selecciona els servidors...</translation>
+      <translation>Seleccioneu els servidors...</translation>
     </message>
     <message numerus="yes">
       <source>%n Servers</source>
@@ -5227,7 +5227,7 @@ a %1</translation>
     </message>
     <message>
       <source>Select Users...</source>
-      <translation>Selecciona els usuaris...</translation>
+      <translation>Seleccioneu els usuaris...</translation>
     </message>
     <message numerus="yes">
       <source>%n Users</source>
@@ -5601,7 +5601,7 @@ a %1</translation>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation>Configuració del mòdul de I/O</translation>
+      <translation>Configuració del mòdul I/O</translation>
     </message>
     <message>
       <source>Diagnostics</source>
@@ -5637,7 +5637,7 @@ a %1</translation>
     </message>
     <message>
       <source>UNSUPPORTED FIRMWARE VERSION</source>
-      <translation>VERSIÓ FIRMWARE NO COMPATIBLE</translation>
+      <translation>VERSIÓ DE FIRMWARE NO COMPATIBLE</translation>
     </message>
     <message>
       <source>NOT ENOUGH LICENSES</source>
@@ -5648,7 +5648,7 @@ a %1</translation>
     <name>QnStorageAnalyticsWidget</name>
     <message>
       <source>Select All</source>
-      <translation>Seleccionar-ho tot</translation>
+      <translation>Selecciona-ho tot</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -5656,7 +5656,7 @@ a %1</translation>
     </message>
     <message>
       <source>Copy Selection to Clipboard</source>
-      <translation>Copiar la selecció al porta-retalls</translation>
+      <translation>Copia la selecció al porta-retalls</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -5816,7 +5816,7 @@ a %1</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Eliminar</translation>
+      <translation>Suprimeix</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -5824,7 +5824,7 @@ a %1</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Cancel·lar</translation>
+      <translation>Cancel·la</translation>
     </message>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
@@ -6600,14 +6600,14 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>PC %1 - Display %2</source>
-      <translation>Ordinador %1: pantalla %2</translation>
+      <translation>Ordinador %1 - Pantalla %2</translation>
     </message>
     <message numerus="yes">
       <source>PC %1 - Displays %2</source>
       <comment>%2 will be substituted by _list_ of displays</comment>
       <translation>
-        <numerusform>Ordinador %1: pantalles %2</numerusform>
-        <numerusform>Ordinador %1: pantalles %2</numerusform>
+        <numerusform>Ordinador %1 - Pantalles %2</numerusform>
+        <numerusform>Ordinador %1 - Pantalles %2</numerusform>
       </translation>
     </message>
   </context>
@@ -6671,13 +6671,13 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>Delete bookmark?</source>
-      <translation>Esborrar el marcador?</translation>
+      <translation>Voleu suprimir el marcador?</translation>
     </message>
     <message numerus="yes">
       <source>Delete %n bookmarks?</source>
       <translation>
-        <numerusform>Voleu suprimir els marcadors %n?</numerusform>
-        <numerusform>Voleu suprimir els marcadors %n?</numerusform>
+        <numerusform>Voleu suprimir %n marcadors?</numerusform>
+        <numerusform>Voleu suprimir %n marcadors?</numerusform>
       </translation>
     </message>
   </context>
@@ -6685,11 +6685,11 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <name>QnWorkbenchConnectHandler</name>
     <message>
       <source>Connect to Another Server...</source>
-      <translation>Connecta a un altre servidor...</translation>
+      <translation>Connecta amb un altre servidor...</translation>
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation>Connectar-se al servidor...</translation>
+      <translation>Connecta amb el servidor...</translation>
     </message>
     <message>
       <source>Could not connect to server. Video Wall will be closed.</source>
@@ -6832,7 +6832,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>Recording in %1...</source>
-      <translation>Enregistrament a %1...</translation>
+      <translation>Enregistrant a %1...</translation>
     </message>
     <message>
       <source>Recorded Video</source>
@@ -6910,7 +6910,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>New Video Wall...</source>
-      <translation>Nou video Wall...</translation>
+      <translation>Video Wall nou...</translation>
     </message>
     <message>
       <source>New Matrix %1</source>
@@ -6933,7 +6933,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>Stop Video Wall?</source>
-      <translation>Aturar el Video Wall?</translation>
+      <translation>Voleu aturar el Video Wall?</translation>
     </message>
     <message>
       <source>To start it again, you should have physical access to its computer.</source>
@@ -7239,8 +7239,8 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <message numerus="yes">
       <source>These %n layouts are shared with other users, so you delete it for them too.</source>
       <translation>
-        <numerusform>Aquests %n dissenys es comparteixen amb altres usuaris, de manera que també el elimineu per a ells.</numerusform>
-        <numerusform>Aquests %n dissenys es comparteixen amb altres usuaris, de manera que també el elimineu per a ells.</numerusform>
+        <numerusform>Aquests %n dissenys es comparteixen amb altres usuaris, de manera que també els elimineu per a ells.</numerusform>
+        <numerusform>Aquests %n dissenys es comparteixen amb altres usuaris, de manera que també els elimineu per a ells.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7493,7 +7493,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>Close</source>
-      <translation>Tancar</translation>
+      <translation>Tanca</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -7750,7 +7750,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>I/O Module Rules</source>
-      <translation>Regles del mòdul de I/O</translation>
+      <translation>Regles del mòdul I/O</translation>
     </message>
     <message>
       <source>More Info</source>
@@ -8113,7 +8113,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <message numerus="yes">
       <source>Failed to add %n devices</source>
       <translation>
-        <numerusform>No s'ha pogut afegir %n dispositius</numerusform>
+        <numerusform>No s'han pogut afegir %n dispositius</numerusform>
         <numerusform>No s'han pogut afegir %n dispositius</numerusform>
       </translation>
     </message>
@@ -8866,7 +8866,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation>D'acord</translation>
     </message>
     <message>
       <source>There was an error while installing updates:</source>
@@ -8882,7 +8882,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Cancel·lar</translation>
+      <translation>Cancel·la</translation>
     </message>
     <message>
       <source>The latest version is already installed</source>
@@ -8906,7 +8906,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>Download</source>
-      <translation>Descarregar</translation>
+      <translation>Descarrega</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
@@ -9051,7 +9051,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>Select layout...</source>
-      <translation>Seleccionar disseny...</translation>
+      <translation>Selecciona el disseny...</translation>
     </message>
     <message>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
@@ -9294,7 +9294,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <name>nx::vms::client::desktop::RadassActionHandler</name>
     <message>
       <source>Set layout resolution to &quot;Auto&quot; to increase performance.</source>
-      <translation>Establiu la resolució del disseny a &quot;Automàtica&quot; per augmentar el rendiment.</translation>
+      <translation>Establiu la resolució del disseny a &quot;Auto&quot; per augmentar el rendiment.</translation>
     </message>
   </context>
   <context>
@@ -9594,7 +9594,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
       <source>Email address is not set for %n users</source>
       <translation>
         <numerusform>No s'ha definit l'email per a %n usuaris</numerusform>
-        <numerusform>No s'ha definit l'Email per a %n usuaris</numerusform>
+        <numerusform>No s'ha definit l'email per a %n usuaris</numerusform>
       </translation>
     </message>
     <message>
@@ -9752,7 +9752,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <message>
       <source>Finalizing %1...</source>
       <comment>Filename will be substituted</comment>
-      <translation>S'està finalitzant %1...</translation>
+      <translation>Finalitzant %1...</translation>
     </message>
     <message>
       <source>Uploading %1...</source>
@@ -9786,7 +9786,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>Minimize</source>
-      <translation>Minimitzar</translation>
+      <translation>Minimitza</translation>
     </message>
     <message>
       <source>Cannot write file</source>
@@ -9994,7 +9994,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>Start Showreel</source>
-      <translation>Inicia Showreel</translation>
+      <translation>Inicia el showreel</translation>
     </message>
   </context>
   <context>
@@ -10087,22 +10087,22 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <message numerus="yes">
       <source>Failed to move %n devices</source>
       <translation>
-        <numerusform>No s'ha pogut moure %n dispositius</numerusform>
+        <numerusform>No s'han pogut moure %n dispositius</numerusform>
         <numerusform>No s'han pogut moure %n dispositius</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n cameras</source>
       <translation>
-        <numerusform>No s'ha pogut moure %n càmeres</numerusform>
-        <numerusform>No s'ha pogut moure %n càmeres</numerusform>
+        <numerusform>No s'han pogut moure %n càmeres</numerusform>
+        <numerusform>No s'han pogut moure %n càmeres</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to move %n I/O Modules</source>
       <translation>
-        <numerusform>No s'ha pogut moure %n mòduls I/O</numerusform>
-        <numerusform>No s'ha pogut moure %n mòduls I/O</numerusform>
+        <numerusform>No s'han pogut moure %n mòduls I/O</numerusform>
+        <numerusform>No s'han pogut moure %n mòduls I/O</numerusform>
       </translation>
     </message>
     <message>
@@ -10144,7 +10144,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>Open File</source>
-      <translation>Obrir l'arxiu</translation>
+      <translation>Obre l'arxiu</translation>
     </message>
     <message>
       <source>All Supported</source>
@@ -10183,7 +10183,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>Rename</source>
-      <translation>Reanomenar</translation>
+      <translation>Canvia el nom</translation>
     </message>
     <message>
       <source>Enter new name for the selected item:</source>
@@ -10267,7 +10267,7 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     </message>
     <message>
       <source>OK</source>
-      <translation>OK</translation>
+      <translation>D'acord</translation>
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>
@@ -10379,7 +10379,7 @@ Podeu seleccionar una altra ubicació d'emmagatzematge a la pestanya &quot;Gesti
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation>Obrir la carpeta contenidora</translation>
+      <translation>Obre la carpeta contenidora</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>

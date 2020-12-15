@@ -3,7 +3,7 @@
   <String Id="Caption">[WixBundleName] Configuració - [WixBundleVersion]</String>
   <String Id="Title">[WixBundleName] - [WixBundleVersion]</String>
   <String Id="Components">[InstallerTitle]</String>
-  <String Id="HelpText">/instal·la | /reparta | /desinstal·la | /disseny [directory] - instal·la, repara, desinstal·la o
+  <String Id="HelpText">/instal·la | /repara | /desinstal·la | /disseny [directory] - instal·la, repara, desinstal·la o
    crea una copia local completa del paquet al directori. El valor predeterminat és Instal·la.
 
 /passiu | /silenci -  mostra la interfície d\'usuari mínima sense avisos o no mostra cap interfície d\'usuari
@@ -11,52 +11,52 @@
 
 /no reiniciïs   - omet tots els intents de reinici. De manera predeterminada, la interfície d\'usuari us avisarà abans de reiniciar.
 /registre log.txt - crea un registre en un arxiu específic. De forma predeterminada, es crea un arxiu de registre a %TEMP%.</String>
-  <String Id="ConfirmCancelMessage">Esteu segur que voleu cancel·lar?</String>
+  <String Id="ConfirmCancelMessage">Segur que voleu cancel·lar?</String>
   <String Id="ClientAndServer">Client i servidor</String>
   <String Id="ClientOnly">Només client</String>
   <String Id="ClientOnlyDesc">L\'aplicació de client s\'utilitza per veure vídeo i gestionar el sistema</String>
   <String Id="ServerOnly">Només servidor</String>
   <String Id="ServerOnlyDesc">L\'aplicació de servidor s\'utilitza per emmagatzemar la informació i els arxius del sistema</String>
   <String Id="HelpHeader">Ajuda de configuració</String>
-  <String Id="HelpCloseButton">Tancar</String>
+  <String Id="HelpCloseButton">Tanca</String>
   <String Id="InstallOptionsButton">Opcions</String>
   <String Id="InstallInstallButton">Instal·la</String>
-  <String Id="InstallCloseButton">Tancar</String>
+  <String Id="InstallCloseButton">Tanca</String>
   <String Id="InstallAcceptCheckbox">Accepto</String>
   <String Id="InstallLicenseLinkText">l\'acord de llicència d\'usuari final</String>
   <String Id="OptionsHeader">Opcions de configuració</String>
   <String Id="OptionsLocationLabel">Ubicació de l\'instal·lació:</String>
   <String Id="OptionsBrowseButton">Explora</String>
-  <String Id="OptionsOkButton">OK</String>
-  <String Id="OptionsCancelButton">Cancel·lar</String>
+  <String Id="OptionsOkButton">D\'acord</String>
+  <String Id="OptionsCancelButton">Cancel·la</String>
   <String Id="ProgressHeader">Progrés de la configuració</String>
   <String Id="ProgressLabel">Processant...</String>
   <String Id="OverallProgressPackageText">Inicialitzant...</String>
-  <String Id="ProgressCancelButton">Cancel·lar</String>
+  <String Id="ProgressCancelButton">Cancel·la</String>
   <String Id="ModifyHeader">Modifica la configuració</String>
   <String Id="ModifyRepairButton">Repara</String>
   <String Id="ModifyUninstallButton">Desinstal·la</String>
-  <String Id="ModifyCloseButton">Tancar</String>
+  <String Id="ModifyCloseButton">Tanca</String>
   <String Id="SuccessHeader">Configuració correcta</String>
   <String Id="SuccessUninstallHeader">La desinstal·lació s\'ha completat correctament</String>
   <String Id="SuccessInstallHeader">La instal·lació s\'ha completat correctament</String>
   <String Id="SuccessLaunchButton">Executa</String>
   <String Id="SuccessRestartText">Heu de reiniciar l\'ordinador abans de poder utilitzar el programari</String>
   <String Id="SuccessRestartButton">Reinicia</String>
-  <String Id="SuccessCloseButton">Tancar</String>
+  <String Id="SuccessCloseButton">Tanca</String>
   <String Id="FailureHeader">La configuració ha fallat</String>
   <String Id="FailureHyperlinkLogText">Un o més problemes han provocat un error en la configuració. Solucioneu els problemes i torneu a intentar-ho. Per obtenir més informació, consulteu</String>
   <String Id="FailureHyperlinkLogTextLink">l\'arxiu de registre</String>
   <String Id="FailureRestartText">Heu de reiniciar l\'ordinador per completar la restauració del programari</String>
   <String Id="FailureRestartButton">Reinicia</String>
-  <String Id="FailureCloseButton">Tancar</String>
+  <String Id="FailureCloseButton">Tanca</String>
   <String Id="WillInstall">[WixBundleName] s\'instal·larà al dispositiu</String>
   <String Id="FilesInUseHeader">Arxius en ús</String>
   <String Id="FilesInUseLabel">S\'han d\'aturar les aplicacions següents per continuar amb la instal·lació:</String>
   <String Id="FilesInUseCloseRadioButton">Tanqueu les aplicacions i intenteu reiniciar-les</String>
   <String Id="FilesInUseDontCloseRadioButton">No tanqueu les aplicacions. Caldrà reiniciar</String>
-  <String Id="FilesInUseOkButton">OK</String>
-  <String Id="FilesInUseCancelButton">Cancel·lar</String>
+  <String Id="FilesInUseOkButton">D\'acord</String>
+  <String Id="FilesInUseCancelButton">Cancel·la</String>
   <String Id="Options">Opcions</String>
   <String Id="SelectApps">Seleccioneu les aplicacions que voleu instal·lar:</String>
   <String Id="msierrFirewallCannotConnect">No es pot connectar al tallafoc de Windows. ([2]   [3]   [4]   [5])</String>

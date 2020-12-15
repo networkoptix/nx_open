@@ -117,7 +117,7 @@
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
       <translation type="unfinished">
-        <numerusform>Ehhez a vonalhoz legalább %n pont szükséges.</numerusform>
+        <numerusform>This line requires at least %n points.</numerusform>
         <numerusform>This line requires at least %n points.</numerusform>
       </translation>
     </message>
@@ -201,7 +201,7 @@
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
       <translation type="unfinished">
-        <numerusform>Ehhez a sokszöghez legalább %n pont szükséges.</numerusform>
+        <numerusform>This polygon requires at least %n points.</numerusform>
         <numerusform>This polygon requires at least %n points.</numerusform>
       </translation>
     </message>

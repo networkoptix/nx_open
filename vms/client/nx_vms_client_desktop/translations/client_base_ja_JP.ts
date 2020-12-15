@@ -2082,7 +2082,7 @@ to view more bookmarks</source>
     <message>
       <source>Hi-Res Streams</source>
       <comment>Cameras Backup</comment>
-      <translation>低解像度ストリーム</translation>
+      <translation>高解像度ストリーム</translation>
     </message>
     <message>
       <source>All Streams</source>
@@ -2649,7 +2649,7 @@ to view more bookmarks</source>
     <name>QnCameraMotionPolicy</name>
     <message>
       <source>Recording or motion detection is disabled for %1</source>
-      <translation>%1 の記録やモーション検知は無効になります</translation>
+      <translation>%1 の録画やモーション検知は無効です</translation>
     </message>
   </context>
   <context>
@@ -8353,7 +8353,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Equidistant</source>
-      <translation>等立体角射影</translation>
+      <translation>等距離射影</translation>
     </message>
     <message>
       <source>Stereographic</source>
@@ -9506,7 +9506,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation>サーバーOS時間</translation>
+      <translation>サーバーOS時刻</translation>
     </message>
     <message>
       <source>VMS Time</source>

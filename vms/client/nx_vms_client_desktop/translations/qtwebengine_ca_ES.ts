@@ -112,7 +112,7 @@
     </message>
     <message>
       <source>Open link in this window</source>
-      <translation>Obrir l'enllaç en aquesta finestra</translation>
+      <translation>Obre l'enllaç en aquesta finestra</translation>
     </message>
     <message>
       <source>Toggle Play/Pause</source>
@@ -120,7 +120,7 @@
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation>Activar el silenci</translation>
+      <translation>Activa el silenci</translation>
     </message>
     <message>
       <source>Close Page</source>
@@ -195,7 +195,7 @@
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation>Activar el silenci</translation>
+      <translation>Activa el silenci</translation>
     </message>
     <message>
       <source>Close Page</source>
@@ -207,7 +207,7 @@
     </message>
     <message>
       <source>Open link in this window</source>
-      <translation>Obrir l'enllaç en aquesta finestra</translation>
+      <translation>Obre l'enllaç en aquesta finestra</translation>
     </message>
     <message>
       <source>Open link in new background tab</source>
@@ -263,7 +263,7 @@
     </message>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
-      <translation>Esteu segur que voleu deixar aquesta pàgina? És possible que no es desinin els canvis que heu realitzat.</translation>
+      <translation>Segur que voleu deixar aquesta pàgina? És possible que no es desin els canvis que heu realitzat.</translation>
     </message>
     <message>
       <source>&amp;Back</source>
@@ -326,11 +326,11 @@
     </message>
     <message>
       <source>Open link in new window</source>
-      <translation>Obrir l'enllaç en una finestra nova</translation>
+      <translation>Obre l'enllaç en una finestra nova</translation>
     </message>
     <message>
       <source>Open link in new tab</source>
-      <translation>Obrir l'enllaç en una nova pestanya</translation>
+      <translation>Obre l'enllaç en una pestanya nova</translation>
     </message>
     <message>
       <source>Copy link address</source>
