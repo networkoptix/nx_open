@@ -347,6 +347,14 @@ void MetadataHandler::handleObjectTrackBestShotPacketWithImage(
             {
                 NX_VERBOSE(this, "Unable to fetch Bestshot for Track %1, Device %2, Engine Id %3",
                     trackId, m_resource, m_engineId);
+
+                if (bestShotType == ObjectMetadataType::externalBestShot)
+                {
+                    serverModule()->objectTrackBestShotCache()->insert(
+                        trackId,
+                        nx::analytics::db::Image());
+                }
+
                 return;
             }
 
@@ -354,6 +362,10 @@ void MetadataHandler::handleObjectTrackBestShotPacketWithImage(
                 serverModule()->objectTrackBestShotCache()->insert(trackId, *bestShotImage);
 
             postprocessObjectMetadataPacket(bestShotPacket, bestShotType);
+        },
+        [this, trackId]()
+        {
+            serverModule()->objectTrackBestShotCache()->promiseBestShot(trackId);
         });
 }
 

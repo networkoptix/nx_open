@@ -135,12 +135,12 @@ DeviceAgent::~DeviceAgent()
     auto [outEventPacket, outObjectPacket, outBestShotPackets] =
         m_objectMetadataXmlParser.parse(xmlData, incomingPacket->timestampUs());
 
-    if (outEventPacket)
-        m_handler->handleMetadata(outEventPacket.get());
     if (outObjectPacket)
         m_handler->handleMetadata(outObjectPacket.get());
     for (auto bestShotPacket: outBestShotPackets)
         m_handler->handleMetadata(bestShotPacket.get());
+    if (outEventPacket)
+        m_handler->handleMetadata(outEventPacket.get());
 }
 
 //-------------------------------------------------------------------------------------------------

@@ -20,7 +20,8 @@ ObjectTrackBestShotResolver::~ObjectTrackBestShotResolver()
 
 void ObjectTrackBestShotResolver::resolve(
     const Ptr<IObjectTrackBestShotPacket1>& bestShotPacket,
-    ImageHandler imageHandler)
+    ImageHandler imageHandler,
+    BeforeResolveExternalBestShotHandler beforeResolveExternalBestShotHandler)
 {
     if (!NX_ASSERT(bestShotPacket))
         notifyImageResolved(std::nullopt, std::move(imageHandler), ObjectMetadataType::undefined);
@@ -53,6 +54,7 @@ void ObjectTrackBestShotResolver::resolve(
         return;
     }
 
+    beforeResolveExternalBestShotHandler();
     initiateImageRequest(imageUrl, std::move(imageHandler));
 }
 

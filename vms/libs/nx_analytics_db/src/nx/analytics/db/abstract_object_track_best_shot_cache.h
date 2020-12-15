@@ -13,8 +13,11 @@ namespace nx::analytics::db {
  */
 class AbstractObjectTrackBestShotCache
 {
+
 public:
     virtual ~AbstractObjectTrackBestShotCache() {}
+
+    virtual void promiseBestShot(QnUuid trackId) = 0;
 
     virtual void insert(QnUuid trackId, Image image) = 0;
 

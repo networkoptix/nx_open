@@ -83,6 +83,11 @@ struct ObjectMetadata
         return objectMetadataType == ObjectMetadataType::bestShot
             || objectMetadataType == ObjectMetadataType::externalBestShot;
     }
+
+    bool isExternalBestShot() const
+    {
+        return objectMetadataType == ObjectMetadataType::externalBestShot;
+    }
 };
 #define ObjectMetadata_Fields \
     (typeId) \
@@ -113,6 +118,17 @@ struct ObjectMetadataPacket
             objectMetadataList.cbegin(),
             objectMetadataList.cend(),
             [](const ObjectMetadata& objectMetadata) { return objectMetadata.isBestShot(); });
+    }
+
+    bool containsExternalBestShotMetadata() const
+    {
+        return std::any_of(
+            objectMetadataList.cbegin(),
+            objectMetadataList.cend(),
+            [](const ObjectMetadata& objectMetadata)
+            {
+                return objectMetadata.isExternalBestShot();
+            });
     }
 };
 

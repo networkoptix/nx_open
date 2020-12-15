@@ -303,7 +303,7 @@ void ObjectTrackCache::updateObject(
             outTrack->bestShot.timestampUs = packet.timestampUs;
             outTrack->bestShot.rect = boundingBox;
             outTrack->bestShot.streamIndex = packet.streamIndex;
-            if (m_imageCache)
+            if (m_imageCache && packet.containsExternalBestShotMetadata())
             {
                 if (auto image = m_imageCache->fetch(outTrack->id))
                     outTrack->bestShot.image = *image;

@@ -22,6 +22,8 @@ public:
         std::optional<nx::analytics::db::Image>,
         nx::common::metadata::ObjectMetadataType objectMetadataType)>;
 
+    using BeforeResolveExternalBestShotHandler = std::function<void()>;
+
 public:
     ObjectTrackBestShotResolver() = default;
 
@@ -29,7 +31,8 @@ public:
 
     void resolve(
         const nx::sdk::Ptr<nx::sdk::analytics::IObjectTrackBestShotPacket1>& bestShotPacket,
-        ImageHandler imageHandler);
+        ImageHandler imageHandler,
+        BeforeResolveExternalBestShotHandler beforeResolveExternalBestShotHandler);
 
     void stop();
 
