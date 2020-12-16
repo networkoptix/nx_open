@@ -177,7 +177,6 @@ void DeviceAgent::setSupportedEventCategoties()
     m_settings.analyticsCategories[fogDetection] =
         m_manifest.supportedEventTypeIds.contains("nx.hanwha.FogDetection");
 
-
     m_settings.analyticsCategories[videoAnalytics] =
         m_settingsCapabilities.videoAnalysis2
         && (m_manifest.supportedEventTypeIds.contains("nx.hanwha.VideoAnalytics.Passing")
@@ -335,6 +334,11 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadata
                 eventMetadata->setDescription(hanwhaEvent.description.toStdString());
                 eventMetadata->setIsActive(hanwhaEvent.isActive);
                 eventMetadata->setConfidence(1.0);
+
+// Waiting for region support in SDK.
+//                if (hanwhaEvent.region)
+//                    eventMetadata->setRegion(*hanwhaEvent.region);
+
                 if (hanwhaEvent.typeId == "nx.hanwha.AlarmInput")
                 {
                     eventMetadata->addAttribute(makePtr<Attribute>(

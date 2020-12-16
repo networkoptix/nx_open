@@ -869,10 +869,11 @@
             "id": "nx.hanwha.TemperatureChangeDetection",
             "name": "Temperature change detection",
             "internalName": "BoxTemperatureDetection",
-            "description": "Temperature change %1",
-            "positiveState": "has been detected",
-            "negativeState": "is not detected",
-            "flags": "stateDependent"
+            "description": "Temperature change event %1",
+            "positiveState": "started %1",
+            "negativeState": "stopped %1",
+            "flags": "stateDependent | regionDependent",
+            "regionDescription": " in the region #%1"
         },
         {
             "id": "nx.hanwha.AudioDetection",

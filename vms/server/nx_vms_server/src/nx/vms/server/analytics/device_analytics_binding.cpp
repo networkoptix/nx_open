@@ -475,7 +475,7 @@ void DeviceAnalyticsBinding::initializeSettingsContext() const
 
     NX_DEBUG(this,
         "Initializing settings context, "
-        "the model from the Device and Engine manfiests: %1. Device: %2, Engine: %3",
+        "the model from the Device and Engine manifests: %1. Device: %2, Engine: %3",
         (modelFromManifests ? toString(*modelFromManifests): "<null>"), m_device, m_engine);
 
     m_deviceAgentContext.settingsContext.model = modelFromManifests
@@ -839,7 +839,6 @@ sdk_support::MetadataTypes DeviceAnalyticsBinding::neededMetadataTypes() const
         else
             it = result.eventTypeIds.erase(it);
     }
-
 
     // TODO: #dmishin write a normal container toString method.
     const auto containerToString =
