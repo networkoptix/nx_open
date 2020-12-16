@@ -17,7 +17,7 @@ Each Manifest is a JSON object containing fields which can be of the following s
 - Flag set (String) - String containing the named flags listed via `|`.
 - Enumeration (String) - String containing one of the fixed values.
 - SettingsModel (Object) - JSON object of its own schema, described in
-    [settings_model.md](#md_src_nx_sdk_settings_model).
+    [Interactive Settings Engine](@ref md_src_nx_sdk_settings_model).
 
 The following rules apply to the Manifest as a JSON document:
 - Missing object fields are treated as having a default value. Default values are described in this
@@ -49,13 +49,12 @@ For example, for a company called "My Company", an identifier for an Analytics E
 Crossing event may look like `"myCompany.lineCrossing"`.
 
 Identifiers starting with `nx.` must not be used for the entities introduced in the Plugins
-developed by other parties. This prefix may be used in identifiers which are intended to be shared
-by different Plugins, thus, forming a kind of common library.
+developed by parties other than Nx.
 
 There are special, reserved, parts of the identifier name. Identifiers starting with `nx.sys.` are
 used for the VMS internal purposes and as a temporary solution to access certain experimental
 features. Identifiers with `.sys.` in the middle are recognized by VMS to have some special
-behavior, e.g. Object Attributes with identifiers ending with `.sys.hidden` do not appear on video.
+behavior.
 
 ---------------------------------------------------------------------------------------------------
 ## Plugin Manifest

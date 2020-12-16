@@ -20,7 +20,7 @@ Some field names have the same meaning through all the controls and can have som
 - `"name"` - Unique id of the setting. Used when representing a Setting Value.
 - `"defaultValue"` - Default value of the control. Will be sent to the engine on applying changes.
 
-The Settings Model itself is a JSON object, which field `"items`" is a JSON array containing
+The Settings Model itself is a JSON object, which field `"items"` is a JSON array containing
 top-level Setting Models for individual Settings, and those Settings that support inner Settings
 (like `GroupBox`) may have them.
 
