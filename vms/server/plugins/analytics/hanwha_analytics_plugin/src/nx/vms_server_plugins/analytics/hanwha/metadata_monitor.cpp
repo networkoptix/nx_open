@@ -40,6 +40,7 @@ MetadataMonitor::MetadataMonitor(
 MetadataMonitor::~MetadataMonitor()
 {
     stopMonitoring();
+    m_timer.pleaseStopSync();
 }
 
 void MetadataMonitor::startMonitoring()
@@ -67,11 +68,10 @@ void MetadataMonitor::stopMonitoring()
 
 void MetadataMonitor::stopMonitorUnsafe()
 {
+    m_needReopenConnection = false;
     m_monitoringIsInProgress = false;
     if (m_httpClient)
         m_httpClient->pleaseStopSync();
-
-    m_timer.pleaseStopSync();
 }
 
 void MetadataMonitor::addHandler(const QString& handlerId, const Handler& handler)
@@ -126,7 +126,6 @@ void MetadataMonitor::initMonitorUnsafe()
 
     NX_DEBUG(this, "Initialization");
     auto httpClient = nx::network::http::AsyncHttpClient::create();
-    m_timer.cancelSync();
     httpClient->bindToAioThread(m_timer.getAioThread());
 
     connect(
@@ -187,13 +186,16 @@ void MetadataMonitor::at_connectionClosed(nx::network::http::AsyncHttpClientPtr 
     const auto elapsed = m_timeSinceLastOpen.elapsed();
     std::chrono::milliseconds reopenDelay(std::max(0LL, (qint64) std::chrono::duration_cast
         <std::chrono::milliseconds>(kMinReopenInterval).count() - elapsed));
-
+    m_needReopenConnection = true;
     m_timer.start(
         reopenDelay,
         [this]()
         {
-            stopMonitorUnsafe();
-            initMonitorUnsafe();
+            if (m_needReopenConnection)
+            {
+                stopMonitorUnsafe();
+                initMonitorUnsafe();
+            }
         });
 }
 

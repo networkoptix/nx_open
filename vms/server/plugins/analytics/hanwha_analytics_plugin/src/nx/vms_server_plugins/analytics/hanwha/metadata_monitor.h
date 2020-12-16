@@ -65,6 +65,7 @@ private:
     mutable QnMutex m_mutex;
     QMap<QString, Handler> m_handlers;
     std::atomic<bool> m_monitoringIsInProgress{false};
+    std::atomic<bool> m_needReopenConnection{false};
 };
 
 } // namespace hanwha
