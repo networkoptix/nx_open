@@ -221,19 +221,23 @@ Result<const ISettingsResponse*> DeviceAgent::settingsReceived()
     const auto settingsResponse = new sdk::SettingsResponse();
 
     const std::string settingsModel = settingValue(kSettingsModelSettings);
-    if (settingsModel == kAlternativeSettingsModelOption)
-    {
-        settingsResponse->setModel(kAlternativeSettingsModel);
-    }
-    else if (settingsModel == kRegularSettingsModelOption)
-    {
-        const std::string languagePart = (settingValue(kCitySelector) == kGermanOption)
-            ? kGermanCitiesPart
-            : kEnglishCitiesPart;
 
-        settingsResponse->setModel(kRegularSettingsModelPart1
-            + languagePart
-            + kRegularSettingsModelPart2);
+    if (ini().sendSettingsModelWithValues)
+    {
+        if (settingsModel == kAlternativeSettingsModelOption)
+        {
+            settingsResponse->setModel(kAlternativeSettingsModel);
+        }
+        else if (settingsModel == kRegularSettingsModelOption)
+        {
+            const std::string languagePart = (settingValue(kCitySelector) == kGermanOption)
+                ? kGermanCitiesPart
+                : kEnglishCitiesPart;
+
+            settingsResponse->setModel(kRegularSettingsModelPart1
+                + languagePart
+                + kRegularSettingsModelPart2);
+        }
     }
 
     parseSettings();

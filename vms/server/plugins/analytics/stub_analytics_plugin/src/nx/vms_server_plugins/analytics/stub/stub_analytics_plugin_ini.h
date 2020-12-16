@@ -50,6 +50,10 @@ struct Ini: public nx::kit::IniConfig
     NX_INI_INT(0, multiPluginInstanceCount,
         "If >= 1, the multi-IPlugin entry point function will produce the specified number\n"
         "of IPlugin instances, and the single-IPlugin entry point function will return null.");
+
+    NX_INI_FLAG(1, sendSettingsModelWithValues,
+        "If set, Settings Model is being sent along with setting values when\n"
+        "setSettings() or getPluginSideSettings() are called.");
 };
 
 Ini& ini();

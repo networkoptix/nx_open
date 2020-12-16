@@ -62,6 +62,17 @@ public:
         return m_manifestConverter.convert(manifestString);
     }
 
+    std::optional<Manifest> manifestFromSdkString(
+        sdk::Ptr<const sdk::IString> manifestStringFromSdkObject)
+    {
+        sdk::Ptr<const sdk::IString> manifestString = loadManifestStringFromFile();
+        if (!manifestString)
+            manifestString = manifestStringFromSdkObject;
+
+        dumpManifestStringToFile(manifestString);
+        return m_manifestConverter.convert(manifestString);
+    }
+
 private:
     sdk::Ptr<const sdk::IString> loadManifestStringFromFile() const
     {

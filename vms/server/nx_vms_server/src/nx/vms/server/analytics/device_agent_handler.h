@@ -12,6 +12,7 @@
 
 #include <nx/vms/server/analytics/types.h>
 #include <nx/vms/server/analytics/wrappers/types.h>
+#include <nx/vms/server/analytics/wrappers/plugin_diagnostic_message_builder.h>
 #include <nx/vms/server/analytics/metadata_handler.h>
 
 namespace nx::vms::server::analytics {
@@ -48,6 +49,8 @@ signals:
 
 private:
     void handleMetadataViolation(const wrappers::Violation& violation);
+
+    void handleManifestError(const wrappers::PluginDiagnosticMessageBuilder& messageBuilder);
 
 private:
     resource::AnalyticsEngineResourcePtr m_engine;
