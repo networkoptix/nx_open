@@ -12,9 +12,11 @@ set(publicationType "local" CACHE STRING "Product publication type")
 set(buildNumber "0" CACHE STRING "Build number")
 set(eulaVersionOverride "" CACHE STRING "Overriden EULA version")
 
-# Remember to reset the in-version protocol number in (cmake/vms_protocol_version.cmake) when
-# updating the project version.
-set(releaseVersion 4.2.0)
+# IMPORTANT
+# When raising the project version, following should be done:
+# 1. Reset the in-version protocol number in (cmake/vms_protocol_version.cmake).
+# 2. Raise the paxton plugin project version (paxton_plugin/CMakeLists.txt).
+set(releaseVersion 4.2.0) #< See notification above!
 
 nx_option(developerBuild
     "Disable this option for production builds (Jenkins)"
