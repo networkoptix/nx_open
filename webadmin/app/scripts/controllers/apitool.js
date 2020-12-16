@@ -191,14 +191,21 @@ angular.module('webadminApp')
             }
             return newParams;
         }
-        $scope.getDebugUrl = function(){
-            if($scope.apiMethod.method == 'GET'){
-                return mediaserver.debugFunctionUrl($scope.apiMethod.name,
-                                                    cleanParams($scope.apiMethod.params),
-                                                    $scope.apiMethod.addCredentials && $scope.apiMethod);
+        $scope.getDebugUrl = function() {
+            var url = '';
+            if($scope.apiMethod.method == 'GET') {
+                url = mediaserver.debugFunctionUrl(
+                    $scope.apiMethod.name, cleanParams($scope.apiMethod.params),
+                    $scope.apiMethod.addCredentials && $scope.apiMethod);
+            } else {
+                url = mediaserver.debugFunctionUrl($scope.apiMethod.name,null,
+                    $scope.apiMethod.addCredentials && $scope.apiMethod);
+                // Rtsp is special and needs the protocol to be replaced.
+                if ($scope.activeFunction.caption && $scope.activeFunction.caption.indexOf('RTSP') > -1) {
+                    url = url.replace(/https?/i,'rtsp');
+                }
             }
-            return mediaserver.debugFunctionUrl($scope.apiMethod.name, null,
-                                                $scope.apiMethod.addCredentials && $scope.apiMethod);
+            return url;
         };
 
         $scope.getPostData = function(){
