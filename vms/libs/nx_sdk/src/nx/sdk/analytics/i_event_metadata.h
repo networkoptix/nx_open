@@ -31,7 +31,7 @@ public:
     virtual bool isActive() const = 0;
 };
 
-class IEventMetadata: public Interface<IEventMetadata, IEventMetadata0>
+class IEventMetadata1: public Interface<IEventMetadata1, IEventMetadata0>
 {
 public:
     static auto interfaceId() { return makeId("nx::sdk::analytics::IEventMetadata1"); }
@@ -45,7 +45,24 @@ public:
      */
     public: Uuid trackId() const { Uuid value; getTrackId(&value); return value; }
 };
-using IEventMetadata1 = IEventMetadata;
+
+class IEventMetadata: public Interface<IEventMetadata, IEventMetadata1>
+{
+public:
+    static auto interfaceId() { return makeId("nx::sdk::analytics::IEventMetadata2"); }
+
+    /**
+     * Optional property used to identify duplicates of state-dependent Events which are isActive.
+     *
+     * State-dependent (prolonged) Events allow for duplicate EventMetadata instances that denote
+     * the beginning of the Event (with isActive() being true) - all such duplicates except the
+     * first one are ignored by the Server. To be able to do so, the Server uses a key to identify
+     * such duplicates, which consists of the Event's type id, track id (if specified) and this
+     * property (if specified).
+     */
+    virtual const char* key() const = 0;
+};
+using IEventMetadata2 = IEventMetadata;
 
 } // namespace analytics
 } // namespace sdk

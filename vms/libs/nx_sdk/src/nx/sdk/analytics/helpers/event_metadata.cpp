@@ -49,6 +49,11 @@ bool EventMetadata::isActive() const
     return m_isActive;
 }
 
+const char* EventMetadata::key() const
+{
+    return m_key.c_str();
+}
+
 void EventMetadata::setTypeId(std::string typeId)
 {
     m_typeId = std::move(typeId);
@@ -72,6 +77,11 @@ void EventMetadata::setDescription(const std::string& description)
 void EventMetadata::setIsActive(bool isActive)
 {
     m_isActive = isActive;
+}
+
+void EventMetadata::setKey(std::string key)
+{
+    m_key = std::move(key);
 }
 
 void EventMetadata::addAttribute(nx::sdk::Ptr<Attribute> attribute)

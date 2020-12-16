@@ -23,6 +23,7 @@ public:
         QString description,
         nx::common::metadata::Attributes attributes,
         QnUuid objectTrackId,
+        QString key,
         qint64 timeStampUsec);
 
     QnUuid engineId() const;
@@ -46,6 +47,7 @@ private:
     const QString m_description;
     const nx::common::metadata::Attributes m_attributes;
     const QnUuid m_objectTrackId;
+    const QString m_key;
 };
 
 } // namespace event

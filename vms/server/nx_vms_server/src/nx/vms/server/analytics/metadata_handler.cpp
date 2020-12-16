@@ -406,12 +406,18 @@ void MetadataHandler::handleEventMetadata(
 
     setLastEventState(eventTypeId, eventState);
 
-    const Ptr<const IEventMetadata> eventMetadataWithObjectTrackId =
-        eventMetadata->queryInterface<IEventMetadata>();
+    const auto eventMetadataWithObjectTrackId =
+        eventMetadata->queryInterface<IEventMetadata1>();
 
     QnUuid objectTrackId;
     if (eventMetadataWithObjectTrackId)
         objectTrackId = fromSdkUuidToQnUuid(eventMetadataWithObjectTrackId->trackId());
+
+    const auto eventMetadataWithKey = eventMetadata->queryInterface<IEventMetadata2>();
+
+    QString key;
+    if (eventMetadataWithKey)
+        key = eventMetadataWithKey->key();
 
     nx::common::metadata::Attributes attributes;
     for (int i = 0; i < eventMetadata->attributeCount(); ++i)
@@ -429,6 +435,7 @@ void MetadataHandler::handleEventMetadata(
         eventMetadata->description(),
         attributes,
         objectTrackId,
+        key,
         timestampUsec);
 
     if (m_resource->captureEvent(sdkEvent))

@@ -590,6 +590,7 @@ bool EventConnector::createEventFromParams(const vms::event::EventParameters& pa
                 params.description,
                 nx::common::metadata::Attributes(),
                 params.objectTrackId,
+                params.key,
                 params.eventTimestampUsec));
 
             at_analyticsSdkEvent(event);

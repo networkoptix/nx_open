@@ -1,5 +1,6 @@
 #include "analytics_sdk_event.h"
 
+#include <nx/kit/utils.h>
 #include <nx/utils/uuid.h>
 #include <core/resource/resource.h>
 
@@ -37,6 +38,7 @@ AnalyticsSdkEvent::AnalyticsSdkEvent(
     QString description,
     nx::common::metadata::Attributes attributes,
     QnUuid objectTrackId,
+    QString key,
     qint64 timeStampUsec)
     :
     base_type(EventType::analyticsSdkEvent, resource, toggleState, timeStampUsec),
@@ -45,7 +47,8 @@ AnalyticsSdkEvent::AnalyticsSdkEvent(
     m_caption(std::move(caption)),
     m_description(std::move(description)),
     m_attributes(std::move(attributes)),
-    m_objectTrackId(objectTrackId)
+    m_objectTrackId(objectTrackId),
+    m_key(key)
 {
 }
 
@@ -65,6 +68,7 @@ EventParameters AnalyticsSdkEvent::getRuntimeParams() const
     params.setAnalyticsEngineId(m_engineId);
     params.setAnalyticsEventTypeId(m_eventTypeId);
     params.objectTrackId = m_objectTrackId;
+    params.key = m_key;
     params.attributes = m_attributes;
     return params;
 }
@@ -80,8 +84,11 @@ EventParameters AnalyticsSdkEvent::getRuntimeParamsEx(
 
 QString AnalyticsSdkEvent::getExternalUniqueKey() const
 {
-    const char recordSeparator[] = "\x1E";
-    return m_eventTypeId + recordSeparator + m_objectTrackId.toString();
+    static constexpr char recordSeparator[] = "\x1E";
+    const QString key =
+        m_eventTypeId + recordSeparator + m_objectTrackId.toString() + recordSeparator + m_key;
+    NX_VERBOSE(this, "Event's ExternalUniqueKey: %1", nx::kit::utils::toString(key.toStdString()));
+    return key;
 }
 
 bool AnalyticsSdkEvent::checkEventParams(const EventParameters& params) const

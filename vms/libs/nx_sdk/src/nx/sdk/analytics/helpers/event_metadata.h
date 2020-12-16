@@ -24,6 +24,7 @@ public:
     virtual const char* caption() const override;
     virtual const char* description() const override;
     virtual bool isActive() const override;
+    virtual const char* key() const override;
 
     void setTypeId(std::string typeId);
     void setConfidence(float confidence);
@@ -33,6 +34,7 @@ public:
     void addAttribute(nx::sdk::Ptr<Attribute> attribute);
     void addAttributes(const std::vector<nx::sdk::Ptr<Attribute>>& value);
     void setTrackId(Uuid trackId);
+    void setKey(std::string key);
 
 protected:
     virtual const IAttribute* getAttribute(int index) const override;
@@ -46,6 +48,7 @@ private:
     bool m_isActive = false;
     std::vector<nx::sdk::Ptr<Attribute>> m_attributes;
     Uuid m_trackId;
+    std::string m_key;
 };
 
 } // namespace nx

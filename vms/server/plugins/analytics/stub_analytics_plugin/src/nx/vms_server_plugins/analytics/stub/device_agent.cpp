@@ -578,6 +578,8 @@ IMetadataPacket* DeviceAgent::cookSomeEvents()
         description += isActive ? kStartedSuffix : kFinishedSuffix;
 
         eventMetadata->setIsActive(isActive);
+        eventMetadata->setKey("stub-key");
+
         if (m_eventContext.isCurrentEventActive)
             m_eventContext.currentEventTypeIndex = nextEventTypeIndex();
 

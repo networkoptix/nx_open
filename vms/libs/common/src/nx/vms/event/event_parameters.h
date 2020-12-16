@@ -99,7 +99,12 @@ struct EventParameters
     QString analyticsPluginId; //< #spanasenko: It's unused (?!).
     QnUuid analyticsEngineId;
 
+    /** Used for Analytics Events. Takes part in ExternalUniqueKey along with EventTypeId. */
     QnUuid objectTrackId;
+
+    /** Used for Analytics Events. Makes an additional component in ExternalUniqueKey. */
+    QString key;
+
     nx::common::metadata::Attributes attributes;
 
     // TODO: #GDM #vkutin #rvasilenko Consider implementing via std::variant or similar.
