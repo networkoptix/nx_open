@@ -1,5 +1,6 @@
 #pragma once
 
+#include <unordered_set>
 #include <map>
 #include <tuple>
 #include <optional>
@@ -8,6 +9,7 @@
 #include <nx/sdk/uuid.h>
 #include <nx/sdk/ptr.h>
 #include <nx/sdk/i_utility_provider.h>
+#include <nx/sdk/analytics/i_metadata_types.h>
 #include <nx/sdk/analytics/i_metadata_packet.h>
 
 #include <QtCore/QByteArray>
@@ -24,6 +26,7 @@ public:
     explicit MetadataParser(DeviceAgent* deviceAgent);
 
     virtual bool processData(const QnByteArrayConstRef& bytes) override;
+    void setNeededTypes(const nx::sdk::Ptr<const nx::sdk::analytics::IMetadataTypes>& types);
     void terminateOngoingEvents();
 
 private:
@@ -48,6 +51,7 @@ private:
 
 private:
     DeviceAgent* const m_deviceAgent;
+    std::unordered_set<const EventType*> m_neededEventTypes;
     std::map<OngoingEventKey, OngoingEvent> m_ongoingEvents;
 };
 

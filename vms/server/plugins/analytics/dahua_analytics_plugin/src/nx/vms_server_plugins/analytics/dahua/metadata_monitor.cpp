@@ -19,7 +19,8 @@ using namespace nx::sdk::analytics;
 
 namespace {
 
-constexpr auto kKeepAliveTimeout = 2min;
+constexpr auto kHeartbeatInterval = 5s;
+constexpr auto kKeepAliveTimeout = 20s;
 constexpr auto kMinRestartInterval = 10s;
 
 } // namespace
@@ -85,16 +86,15 @@ void MetadataMonitor::setNeededTypes(const Ptr<const IMetadataTypes>& types)
         {
             stop();
 
-            m_neededTypes = types;
+            m_parser.setNeededTypes(types);
 
-            start();
+            if (types && !types->isEmpty())
+                start();
         });
 }
 
 void MetadataMonitor::start()
 {
-    if (!m_neededTypes || m_neededTypes->isEmpty())
-        return;
 
     const auto url = buildUrl();
 
@@ -131,21 +131,12 @@ Url MetadataMonitor::buildUrl() const
     Url url = deviceInfo->url();
     url.setPath("/cgi-bin/eventManager.cgi");
 
-    std::vector<QString> nativeIds;
-
-    const auto eventTypeIds = m_neededTypes->eventTypeIds();
-    for (int i = 0; i < eventTypeIds->count(); ++i)
-    {
-        const QString id = eventTypeIds->at(i);
-
-        const auto type = EventType::findById(id);
-        if (!NX_ASSERT(type))
-            continue;
-
-        nativeIds.push_back(type->nativeId);
-    }
-
-    url.setQuery(NX_FMT("action=attach&codes=[%1]&heartbeat=3", nx::utils::join(nativeIds, ",")));
+    // Instead of requesting only needed event types, we request all of them and then, on arrival,
+    // filter out events of the types we don't need. This is because an undocumented limit appears
+    // to exist, either on the length on the `codes` list or the url itself, past which cameras
+    // ignore the passed entries.
+    url.setQuery(NX_FMT("action=attach&codes=[All]&heartbeat=%1",
+        std::chrono::ceil<std::chrono::seconds>(kHeartbeatInterval).count()));
 
     return url;
 }

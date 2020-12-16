@@ -178,8 +178,8 @@ NX_DEFINE_EVENT_TYPE(VideoUnFocus)
 
 NX_DEFINE_EVENT_TYPE(VideoAbnormalDetection)
 {
-    nativeId = "SceneChange";
-    aliasNativeIds = {"VideoAbnormalDetection"};
+    nativeId = "VideoAbnormalDetection";;
+    aliasNativeId = "SceneChange";
     id = "nx.dahua.VideoAbnormalDetection";
     prettyName = "Scene change detection (Video abnormal detection)";
     description = "Scene change";
@@ -452,8 +452,8 @@ static const auto eventTypeByNativeId =
         for (const auto type: eventTypes)
         {
             map[type->nativeId] = type;
-            for (const auto& aliasNativeId: type->aliasNativeIds)
-                map[aliasNativeId] = type;
+            if (const auto& aliasNativeId = type->aliasNativeId)
+                map[*aliasNativeId] = type;
         }
 
         return map;

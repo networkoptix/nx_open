@@ -31,7 +31,6 @@ private:
 
 private:
     DeviceAgent* const m_deviceAgent;
-    nx::sdk::Ptr<const nx::sdk::analytics::IMetadataTypes> m_neededTypes;
     nx::network::aio::Timer m_timer;
     nx::network::http::AsyncClient m_httpClient;
     std::optional<nx::network::http::MultipartContentParser> m_multipartContentParser;

@@ -194,6 +194,26 @@ bool MetadataParser::processData(const QnByteArrayConstRef& bytes)
     return true;
 }
 
+void MetadataParser::setNeededTypes(const Ptr<const IMetadataTypes>& types)
+{
+    m_neededEventTypes.clear();
+
+    const auto eventTypeIds = types->eventTypeIds();
+    if (!NX_ASSERT(eventTypeIds))
+        return;
+
+    for (int i = 0; i < eventTypeIds->count(); ++i)
+    {
+        const QString id = eventTypeIds->at(i);
+
+        const auto type = EventType::findById(id);
+        if (!NX_ASSERT(type))
+            continue;
+
+        m_neededEventTypes.insert(type);
+    }
+}
+
 void MetadataParser::terminateOngoingEvents()
 {
     for (auto it = m_ongoingEvents.begin(); it != m_ongoingEvents.end(); )
@@ -308,6 +328,8 @@ void MetadataParser::parseEvent(const QByteArray& data)
                 NX_DEBUG(this, "Event has unknown Code: %1", value);
                 return;
             }
+            if (!m_neededEventTypes.count(event.type))
+                return;
         }
         else if (key == "action")
         {

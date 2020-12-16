@@ -30,8 +30,9 @@ struct EventType
 {
     QString nativeId;
 
-    // Some cameras declare support for some events using these rather nativeId.
-    std::vector<QString> aliasNativeIds;
+    // Contrary to documentation, on some APIs, some event types are referred to using this
+    // instead of nativeId.
+    std::optional<QString> aliasNativeId;
 
     QString id;
     QString prettyName;
