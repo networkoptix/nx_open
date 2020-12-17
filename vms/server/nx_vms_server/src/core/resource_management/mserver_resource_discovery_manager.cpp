@@ -226,11 +226,20 @@ void QnMServerResourceDiscoveryManager::markOfflineDisconnectedResources()
     NX_MUTEX_LOCKER lock(&m_foundLostResourceMutex);
 
     bool shouldDisconnect = false;
+    QList<QnNetworkResourcePtr> foundResources;
     for (const auto& [uniqId, elapsedTimer]: m_offlineResourceTimers)
     {
-        if (elapsedTimer.hasExpired(kDisconnectTimeout))
-            processResourceIsLost(resourcePool()->getResourceByUniqueId<QnNetworkResource>(uniqId));
+        auto resource = resourcePool()->getResourceByUniqueId<QnNetworkResource>(uniqId);
+        if (!resource)
+            continue;
+        if (resource->hasFlags(Qn::foreigner) || resource->getStatus() != Qn::Offline)
+            foundResources << resource;
+        else if (elapsedTimer.hasExpired(kDisconnectTimeout))
+            processResourceIsLost(resource);
     }
+
+    for (const auto& resource: foundResources)
+        processResourceIsFound(resource);
 
     for (auto itr = m_offlineResourceTimers.begin(); itr != m_offlineResourceTimers.end();)
     {
@@ -553,11 +562,7 @@ void QnMServerResourceDiscoveryManager::at_statusChanged(
 
     NX_MUTEX_LOCKER lock(&m_foundLostResourceMutex);
 
-    if (resource->hasFlags(Qn::foreigner) || QnResource::isOnline(resource->getStatus()))
-    {
-        processResourceIsFound(resource.dynamicCast<QnNetworkResource>());
-    }
-    else if (QnResource::isOnline(resource->getPreviousStatus())
+    if (QnResource::isOnline(resource->getPreviousStatus())
         && resource->getStatus() == Qn::Offline)
     {
             m_offlineResourceTimers.emplace(resource->getUniqueId(), /*started*/ true);
