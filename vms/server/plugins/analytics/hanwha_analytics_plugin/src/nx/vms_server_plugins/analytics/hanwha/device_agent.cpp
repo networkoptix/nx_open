@@ -335,9 +335,8 @@ Result<void> DeviceAgent::startFetchingMetadata(const IMetadataTypes* /*metadata
                 eventMetadata->setIsActive(hanwhaEvent.isActive);
                 eventMetadata->setConfidence(1.0);
 
-// Waiting for region support in SDK.
-//                if (hanwhaEvent.region)
-//                    eventMetadata->setRegion(*hanwhaEvent.region);
+                if (hanwhaEvent.region)
+                    eventMetadata->setKey(std::to_string(*hanwhaEvent.region));
 
                 if (hanwhaEvent.typeId == "nx.hanwha.AlarmInput")
                 {
