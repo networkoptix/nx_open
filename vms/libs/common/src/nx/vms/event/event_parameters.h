@@ -120,7 +120,7 @@ struct EventParameters
 #define EventParameters_Fields \
     (eventType)(eventTimestampUsec)(eventResourceId)(resourceName)(sourceServerId) \
     (reasonCode)(inputPortId)(caption)(description)(metadata)(omitDbLogging)(analyticsPluginId) \
-    (analyticsEngineId)(objectTrackId)(attributes)
+    (analyticsEngineId)(objectTrackId)(key)(attributes)
 QN_FUSION_DECLARE_FUNCTIONS(EventParameters, (ubjson)(json)(eq)(xml)(csv_record));
 
 bool checkForKeywords(const QString& value, const QString& keywords);
