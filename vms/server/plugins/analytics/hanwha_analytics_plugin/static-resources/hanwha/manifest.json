@@ -549,18 +549,24 @@
                                                 "type": "ComboBox",
                                                 "name": "ObjectDetection.FaceMaskDetectedColor",
                                                 "caption": "Face Mask detected",
-                                                "defaultValue": "Yellow",
-                                                "_comment":
-                                                    "Range is populated at runtime from palette.",
+                                                "defaultValue": "",
+                                                "_comment": "Range is populated at runtime from palette.",
                                                 "range": [ "_nx_sys_color_range" ]
                                             },
                                             {
                                                 "type": "ComboBox",
                                                 "name": "ObjectDetection.FaceMaskNotDetectedColor",
                                                 "caption": "Face Mask not detected",
-                                                "defaultValue": "Red",
-                                                "_comment":
-                                                    "Range is populated at runtime from palette.",
+                                                "defaultValue": "",
+                                                "_comment": "Range is populated at runtime from palette.",
+                                                "range": [ "_nx_sys_color_range" ]
+                                            },
+                                            {
+                                                "type": "ComboBox",
+                                                "name": "ObjectDetection.FaceMaskNotDefinedColor",
+                                                "caption": "It is not clear whether the person is wearing a mask",
+                                                "defaultValue": "",
+                                                "_comment": "Range is populated at runtime from palette.",
                                                 "range": [ "_nx_sys_color_range" ]
                                             }
                                         ]

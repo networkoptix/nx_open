@@ -34,7 +34,6 @@ struct ClassInfo
 
 //-------------------------------------------------------------------------------------------------
 
-
 /**
  * Find first sub-element with tag `childElement`, where `childElement` doesn't contain  namespace.
  * Should be used instead of QDomElement::firstChildElement(), that needs child tag namespace,
@@ -109,9 +108,11 @@ void forEachChildElement(const QDomElement& element, const QString& tagName, F f
 ObjectMetadataXmlParser::ObjectMetadataXmlParser(
         Url baseUrl,
         const Hanwha::EngineManifest& engineManifest,
+        const Settings& settings,
         const Hanwha::ObjectMetadataAttributeFilters& objectAttributeFilters):
     m_baseUrl(std::move(baseUrl)),
     m_engineManifest(engineManifest),
+    m_settings(settings),
     m_objectAttributeFilters(objectAttributeFilters)
 {
 }
@@ -126,6 +127,12 @@ void ObjectMetadataXmlParser::setNotWearingMaskBoundingBoxColor(const QString& v
 {
     NX_VERBOSE(this, "%1(%2)", __func__, nx::kit::utils::toString(value));
     m_notWearingMaskBoundingBoxColor = value;
+}
+
+void ObjectMetadataXmlParser::setNotDefinedMaskBoundingBoxColor(const QString& value)
+{
+    NX_VERBOSE(this, "%1(%2)", __func__, nx::kit::utils::toString(value));
+    m_notDefinedMaskBoundingBoxColor = value;
 }
 
 ObjectMetadataXmlParser::Result ObjectMetadataXmlParser::parse(
@@ -272,45 +279,45 @@ std::vector<Ptr<Attribute>> ObjectMetadataXmlParser::extractAttributes(
 {
     const auto walk =
         [&](auto walk, const QString& key, const QDomElement& element)
+    {
+        const auto domAttrs = element.attributes();
+        for (int i = 0; i < domAttrs.length(); ++i)
         {
-            const auto domAttrs = element.attributes();
-            for (int i = 0; i < domAttrs.length(); ++i)
+            const auto domAttr = domAttrs.item(i);
+            const auto name = domAttr.nodeName();
+            const auto value = domAttr.nodeValue();
+            trackData.attributes[(key + ".@" + name).toStdString()] = value.toStdString();
+        }
+
+        std::unordered_map<std::string, int> counts;
+        forEachChildElement(element, "",
+            [&](const auto& child)
             {
-                const auto domAttr = domAttrs.item(i);
-                const auto name = domAttr.nodeName();
-                const auto value = domAttr.nodeValue();
-                trackData.attributes[(key + ".@" + name).toStdString()] = value.toStdString();
-            }
+                ++counts[child.tagName().toStdString()];
+            });
 
-            std::unordered_map<std::string, int> counts;
-            forEachChildElement(element, "",
-                [&](const auto& child)
-                {
-                    ++counts[child.tagName().toStdString()];
-                });
-
-            if (counts.empty())
+        if (counts.empty())
+        {
+            if (const auto child = element.firstChild(); child.isText())
             {
-                if (const auto child = element.firstChild(); child.isText())
-                {
-                    const QString value = child.toText().data();
-                    trackData.attributes[key.toStdString()] = value.toStdString();
-                }
+                const QString value = child.toText().data();
+                trackData.attributes[key.toStdString()] = value.toStdString();
             }
+        }
 
-            std::unordered_map<std::string, int> indices;
-            forEachChildElement(element, "",
-                [&](const auto& child)
-                {
-                    const auto name  = child.tagName().toStdString();
+        std::unordered_map<std::string, int> indices;
+        forEachChildElement(element, "",
+            [&](const auto& child)
+            {
+                const auto name = child.tagName().toStdString();
 
-                    QString suffix;
-                    if (counts[name] > 1)
-                        suffix = QString("[%1]").arg(++indices[name]);
+                QString suffix;
+                if (counts[name] > 1)
+                    suffix = QString("[%1]").arg(++indices[name]);
 
-                    walk(walk, key + "." + child.tagName() + suffix, child);
-                });
-        };
+                walk(walk, key + "." + child.tagName() + suffix, child);
+            });
+    };
 
     for (const auto& rootTag: m_objectAttributeFilters.roots)
         forEachChildElement(appearance, rootTag,
@@ -342,6 +349,16 @@ std::vector<Ptr<Attribute>> ObjectMetadataXmlParser::extractAttributes(
     return result;
 }
 
+/*static*/ void ObjectMetadataXmlParser::pushMaskColorAttribute(
+    std::vector<Ptr<Attribute>>* attributes, const QString& attribute)
+{
+    if (!attribute.isEmpty())
+    {
+        attributes->push_back(makePtr<Attribute>(Attribute::Type::string,
+            "nx.sys.color", attribute.toStdString()));
+    }
+}
+
 void ObjectMetadataXmlParser::addColorAttributeIfNeeded(
     std::vector<Ptr<Attribute>>* attributes,
     const std::string& objectTypeId)
@@ -349,30 +366,32 @@ void ObjectMetadataXmlParser::addColorAttributeIfNeeded(
     if (objectTypeId != "nx.hanwha.ObjectDetection.Face")
         return;
 
+    if (!attributes->empty())
+    {
+        bool b = m_settings.faceMaskDetection.detectionMode == FaceMaskDetection::DetectionMode::mask;
+        int t = 0;
+    }
+
     const auto wearsMaskAttributeIt = std::find_if(attributes->begin(), attributes->end(),
         [this](const auto& attribute)
         {
             return attribute->name() == std::string("WearsMask");
         });
 
-    if (wearsMaskAttributeIt != attributes->end()
-        && QString((*wearsMaskAttributeIt)->value()).toLower() == "true")
+    if (wearsMaskAttributeIt == attributes->end())
     {
-        // The attribute is true.
-        if (!m_wearingMaskBoundingBoxColor.isEmpty())
+        if (!m_notDefinedMaskBoundingBoxColor.isEmpty())
         {
             attributes->push_back(makePtr<Attribute>(Attribute::Type::string,
-                "nx.sys.color", m_wearingMaskBoundingBoxColor.toStdString()));
+                "nx.sys.color", m_notDefinedMaskBoundingBoxColor.toStdString()));
         }
     }
     else
     {
-        // The attribute is missing or non-true.
-        if (!m_notWearingMaskBoundingBoxColor.isEmpty())
-        {
-            attributes->push_back(makePtr<Attribute>(Attribute::Type::string,
-                "nx.sys.color", m_notWearingMaskBoundingBoxColor.toStdString()));
-        }
+        if (QString((*wearsMaskAttributeIt)->value()).toLower() == "true")
+            pushMaskColorAttribute(attributes, m_wearingMaskBoundingBoxColor);
+        else
+            pushMaskColorAttribute(attributes, m_notWearingMaskBoundingBoxColor);
     }
 }
 

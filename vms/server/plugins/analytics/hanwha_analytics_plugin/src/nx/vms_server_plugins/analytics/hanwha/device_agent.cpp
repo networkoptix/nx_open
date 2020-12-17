@@ -67,6 +67,7 @@ DeviceAgent::DeviceAgent(
             .setPassword(deviceInfo->password())
             .toUrl(),
         m_engine->manifest(),
+        m_settings,
         m_engine->objectMetadataAttributeFilters())
 {
     this->setDeviceInfo(deviceInfo);
@@ -222,8 +223,15 @@ void DeviceAgent::applyWearingMaskBoundingBoxColorSettings(const nx::sdk::IStrin
     if (notWearingMaskColor == defaultValue)
         notWearingMaskColor = nullptr;
 
+    const char* notDefinedMaskColor = settings->value("ObjectDetection.FaceMaskNotDefinedColor");
+    if (!notDefinedMaskColor)
+        notDefinedMaskColor = "";
+    if (notDefinedMaskColor == defaultValue)
+        notDefinedMaskColor = nullptr;
+
     m_objectMetadataXmlParser.setWearingMaskBoundingBoxColor(wearingMaskColor);
     m_objectMetadataXmlParser.setNotWearingMaskBoundingBoxColor(notWearingMaskColor);
+    m_objectMetadataXmlParser.setNotDefinedMaskBoundingBoxColor(notDefinedMaskColor);
 }
 
 /**
