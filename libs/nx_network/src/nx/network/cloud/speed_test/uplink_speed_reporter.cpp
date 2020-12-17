@@ -88,10 +88,11 @@ void UplinkSpeedReporter::start()
 
 void UplinkSpeedReporter::stopTest()
 {
-    m_testInProgress = false;
+    NX_ASSERT(isInSelfAioThread());
     m_speedTestUrlFetcher.reset();
     m_uplinkSpeedTester.reset();
     m_mediatorApiClient.reset();
+    m_testInProgress = false;
 }
 
 void UplinkSpeedReporter::disable(const char* callingFunc)
@@ -133,19 +134,24 @@ void UplinkSpeedReporter::fetchSpeedTestUrl()
 void UplinkSpeedReporter::onSystemCredentialsSet(
     std::optional<hpm::api::SystemCredentials> credentials)
 {
-    NX_VERBOSE(this, "Cloud system credentials have been set: %1", credentials.has_value());
+    dispatch(
+        [this, credentials = std::move(credentials)]() mutable
+        {
+            NX_VERBOSE(this, "Cloud system credentials have been set: %1",
+                credentials.has_value());
 
-    if (!credentials)
-        return disable(__func__);
+            if (!credentials)
+                return disable(__func__);
 
-    if (m_speedTestUrlFetcher)
-        return;
+            if (m_speedTestUrlFetcher)
+                return;
 
-    NX_VERBOSE(this, "Starting scheduler");
-    m_scheduler->start(std::bind(&UplinkSpeedReporter::fetchSpeedTestUrl, this));
+            NX_VERBOSE(this, "Starting scheduler");
+            m_scheduler->start(std::bind(&UplinkSpeedReporter::fetchSpeedTestUrl, this));
 
-    // Manually performing speed test because valid system credentials were set.
-    fetchSpeedTestUrl();
+            // Manually performing speed test because valid system credentials were set.
+            fetchSpeedTestUrl();
+    });
 }
 
 void UplinkSpeedReporter::onFetchSpeedTestUrlComplete(
@@ -194,7 +200,7 @@ void UplinkSpeedReporter::onSpeedTestComplete(
 
     NX_VERBOSE(this, "Fetching Mediator address...");
     m_mediatorConnector->fetchAddress(
-        std::bind(&UplinkSpeedReporter::onFetchMediatorAddressComplete, this, 
+        std::bind(&UplinkSpeedReporter::onFetchMediatorAddressComplete, this,
             _1, _2, std::move(peerConnectionSpeed)));
 }
 
