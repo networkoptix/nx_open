@@ -208,7 +208,7 @@ struct AnalyticsMode: public SettingGroup
     [[nodiscard]] AnalyticsMode addIntelligentVideoMode() const;
     [[nodiscard]] AnalyticsMode removeIntelligentVideoMode() const;
 
-    void readExclusiveFromServerOrThrow(const nx::sdk::IStringMap* settings) {}
+    void readExclusiveFromServer(const nx::sdk::IStringMap* settings) {}
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
@@ -243,7 +243,7 @@ struct ShockDetection : public SettingGroup
     bool operator!=(const ShockDetection& rhs) const { return !(*this == rhs); }
     void assignExclusiveFrom(const ShockDetection& other) {};
 
-    void readExclusiveFromServerOrThrow(const nx::sdk::IStringMap* settings) {}
+    void readExclusiveFromServer(const nx::sdk::IStringMap* settings) {}
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
@@ -288,7 +288,7 @@ struct TamperingDetection: SettingGroup
     bool operator!=(const TamperingDetection& rhs) const { return !(*this == rhs); }
     void assignExclusiveFrom(const TamperingDetection& other) {};
 
-    void readExclusiveFromServerOrThrow(const nx::sdk::IStringMap* settings) {}
+    void readExclusiveFromServer(const nx::sdk::IStringMap* settings) {}
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
@@ -326,7 +326,7 @@ struct DefocusDetection: SettingGroup
     bool operator!=(const DefocusDetection& rhs) const { return !(*this == rhs); }
     void assignExclusiveFrom(const DefocusDetection& other) {};
 
-    void readExclusiveFromServerOrThrow(const nx::sdk::IStringMap* settings) {}
+    void readExclusiveFromServer(const nx::sdk::IStringMap* settings) {}
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
@@ -364,7 +364,7 @@ struct FogDetection: public SettingGroup
     bool operator!=(const FogDetection& rhs) const { return !(*this == rhs); }
     void assignExclusiveFrom(const FogDetection& other) {};
 
-    void readExclusiveFromServerOrThrow(const nx::sdk::IStringMap* settings) {}
+    void readExclusiveFromServer(const nx::sdk::IStringMap* settings) {}
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
@@ -406,7 +406,7 @@ struct ObjectDetectionGeneral: public SettingGroup
     bool operator!=(const ObjectDetectionGeneral& rhs) const { return !(*this == rhs); }
     void assignExclusiveFrom(const ObjectDetectionGeneral& other) {};
 
-    void readExclusiveFromServerOrThrow(const nx::sdk::IStringMap* settings) {}
+    void readExclusiveFromServer(const nx::sdk::IStringMap* settings) {}
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
@@ -447,7 +447,7 @@ struct ObjectDetectionBestShot: public SettingGroup
     bool operator!=(const ObjectDetectionBestShot& rhs) const { return !(*this == rhs); }
     void assignExclusiveFrom(const ObjectDetectionBestShot& other) {};
 
-    void readExclusiveFromServerOrThrow(const nx::sdk::IStringMap* settings) {}
+    void readExclusiveFromServer(const nx::sdk::IStringMap* settings) {}
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
@@ -479,7 +479,7 @@ struct IvaObjectSize : public SettingGroup
     bool operator!=(const IvaObjectSize& rhs) const { return !(*this == rhs); }
     void assignExclusiveFrom(const IvaObjectSize& other) {};
 
-    void readExclusiveFromServerOrThrow(const nx::sdk::IStringMap* settings) {}
+    void readExclusiveFromServer(const nx::sdk::IStringMap* settings) {}
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
@@ -535,7 +535,7 @@ struct IvaLine: public SettingGroup
     bool operator!=(const IvaLine& rhs) const { return !(*this == rhs); }
     void assignExclusiveFrom(const IvaLine& other);
 
-    void readExclusiveFromServerOrThrow(const nx::sdk::IStringMap* settings);
+    void readExclusiveFromServer(const nx::sdk::IStringMap* settings);
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int roiIndex);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
@@ -616,7 +616,7 @@ struct IvaArea: public SettingGroup
     bool operator!=(const IvaArea& rhs) const { return !(*this == rhs); }
     void assignExclusiveFrom(const IvaArea& other);
 
-    void readExclusiveFromServerOrThrow(const nx::sdk::IStringMap* settings);
+    void readExclusiveFromServer(const nx::sdk::IStringMap* settings);
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int roiIndex);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
@@ -655,7 +655,7 @@ struct IvaExcludeArea: public SettingGroup
     bool operator!=(const IvaExcludeArea& rhs) const { return !(*this == rhs); }
     void assignExclusiveFrom(const IvaExcludeArea& other) {}
 
-    void readExclusiveFromServerOrThrow(const nx::sdk::IStringMap* settings) {}
+    void readExclusiveFromServer(const nx::sdk::IStringMap* settings) {}
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int roiIndex);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
@@ -687,7 +687,7 @@ struct AudioDetection: public SettingGroup
     bool operator!=(const AudioDetection& rhs) const { return !(*this == rhs); }
     void assignExclusiveFrom(const AudioDetection& other) {}
 
-    void readExclusiveFromServerOrThrow(const nx::sdk::IStringMap* settings) {}
+    void readExclusiveFromServer(const nx::sdk::IStringMap* settings) {}
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 
@@ -734,7 +734,7 @@ struct SoundClassification: public SettingGroup
     bool operator!=(const SoundClassification& rhs) const { return !(*this == rhs); }
     void assignExclusiveFrom(const SoundClassification& other) {}
 
-    void readExclusiveFromServerOrThrow(const nx::sdk::IStringMap* settings) {}
+    void readExclusiveFromServer(const nx::sdk::IStringMap* settings) {}
 
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settingsDestination, int /*roiIndex*/ = -1) const;
@@ -779,7 +779,7 @@ struct FaceMaskDetection: public SettingGroup
     bool operator!=(const FaceMaskDetection& rhs) const { return !(*this == rhs); }
     void assignExclusiveFrom(const FaceMaskDetection& other) {}
 
-    void readExclusiveFromServerOrThrow(const nx::sdk::IStringMap* settings) {}
+    void readExclusiveFromServer(const nx::sdk::IStringMap* settings) {}
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settingsDestination, int /*roiIndex*/ = -1) const;
 
@@ -885,7 +885,7 @@ struct TemperatureChangeDetectionToggle: public SettingGroup
     bool operator!=(const TemperatureChangeDetectionToggle& rhs) const { return !(*this == rhs); }
     void assignExclusiveFrom(const TemperatureChangeDetectionToggle& other){};
 
-    void readExclusiveFromServerOrThrow(const nx::sdk::IStringMap* settings) {}
+    void readExclusiveFromServer(const nx::sdk::IStringMap* settings) {}
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
 

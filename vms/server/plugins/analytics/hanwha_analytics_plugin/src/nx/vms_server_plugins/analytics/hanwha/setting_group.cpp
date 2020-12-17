@@ -676,11 +676,18 @@ void IvaLine::assignExclusiveFrom(const IvaLine& other)
         this->namedLineFigure.name = other.namedLineFigure.name;
 }
 
-void IvaLine::readExclusiveFromServerOrThrow(const nx::sdk::IStringMap* sourceMap)
+void IvaLine::readExclusiveFromServer(const nx::sdk::IStringMap* sourceMap)
 {
     using namespace SettingPrimitivesServerIo;
     NamedLineFigure tmpLine;
-    deserializeOrThrow(value(sourceMap, KeyIndex::namedLineFigure), &tmpLine);
+    try
+    {
+        deserializeOrThrow(value(sourceMap, KeyIndex::namedLineFigure), &tmpLine);
+    }
+    catch (const DeserializationError&)
+    {
+        // It's ok if sourceMap contains no parameter for KeyIndex::namedLineFigure.
+    }
     namedLineFigure.name = tmpLine.name;
 }
 
@@ -855,11 +862,18 @@ void IvaArea::assignExclusiveFrom(const IvaArea& other)
         this->namedPolygon.name = other.namedPolygon.name;
 }
 
-void IvaArea::readExclusiveFromServerOrThrow(const nx::sdk::IStringMap* sourceMap)
+void IvaArea::readExclusiveFromServer(const nx::sdk::IStringMap* sourceMap)
 {
     using namespace SettingPrimitivesServerIo;
     NamedPolygon tmpPolygon;
-    deserializeOrThrow(value(sourceMap, KeyIndex::namedPolygon), &tmpPolygon);
+    try
+    {
+        deserializeOrThrow(value(sourceMap, KeyIndex::namedPolygon), &tmpPolygon);
+    }
+    catch (const DeserializationError&)
+    {
+        // It's ok if sourceMap contains no parameter for KeyIndex::namedPolygon.
+    }
     namedPolygon.name = tmpPolygon.name;
 }
 
