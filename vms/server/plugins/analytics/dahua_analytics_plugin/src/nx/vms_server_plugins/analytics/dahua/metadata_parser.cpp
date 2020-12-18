@@ -198,6 +198,9 @@ void MetadataParser::setNeededTypes(const Ptr<const IMetadataTypes>& types)
 {
     m_neededEventTypes.clear();
 
+    if (!types)
+        return;
+
     const auto eventTypeIds = types->eventTypeIds();
     if (!NX_ASSERT(eventTypeIds))
         return;
