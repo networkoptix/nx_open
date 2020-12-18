@@ -46,6 +46,7 @@ private:
 
     struct CacheEntry
     {
+        nx::sdk::Uuid originalTrackId;
         nx::sdk::Uuid trackId;
         QString typeId;
 

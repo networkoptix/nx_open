@@ -341,9 +341,10 @@ void MetadataParser::parseTargetElement()
         return;
 
     auto& entry = m_cache[*trackId];
-    if (entry.trackId.isNull())
+    if (entry.originalTrackId.isNull())
     {
-        entry.trackId = nx::sdk::UuidHelper::randomUuid();
+        entry.originalTrackId = nx::sdk::UuidHelper::randomUuid();
+        entry.trackId = entry.originalTrackId;
         entry.typeId = *typeId;
 
         entry.lastUpdate.restart();
@@ -511,7 +512,7 @@ void MetadataParser::processEntry(CacheEntry* entry, HikvisionEvent* event)
     }
     
     if (event)
-        event->trackId = entry->trackId;
+        event->trackId = entry->originalTrackId;
 }
 
 void MetadataParser::evictStaleCacheEntries()
