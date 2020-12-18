@@ -1,5 +1,8 @@
 #include "instrument.h"
+
 #include <cassert>
+#include <cmath>
+
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
 #include <QtGui/QMouseEvent>

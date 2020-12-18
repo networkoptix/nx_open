@@ -1,6 +1,9 @@
 #pragma once
 
 #include <functional>
+
+#include <QtWidgets/QDialogButtonBox>
+
 #include "helper.h"
 
 class QWidget;

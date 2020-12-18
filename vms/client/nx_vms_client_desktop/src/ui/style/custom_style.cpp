@@ -1,13 +1,14 @@
 #include "custom_style.h"
 
-#include <QtCore/QTimer>
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QTimer>
 
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QTabWidget>
-#include <QtWidgets/QStackedWidget>
-#include <QtWidgets/QGraphicsOpacityEffect>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QDialog>
+#include <QtWidgets/QGraphicsOpacityEffect>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QStackedWidget>
+#include <QtWidgets/QTabWidget>
 
 #include <ui/style/generic_palette.h>
 #include <ui/style/nx_style.h>

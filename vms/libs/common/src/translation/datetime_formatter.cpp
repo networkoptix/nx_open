@@ -7,6 +7,7 @@
 #include <QtCore/QLocale>
 
 #include <nx/utils/literal.h>
+#include <nx/utils/log/assert.h>
 
 namespace datetime {
 
