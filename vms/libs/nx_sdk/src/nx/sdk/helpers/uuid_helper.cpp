@@ -8,6 +8,10 @@
 #include <cstdlib>
 
 #include <nx/kit/debug.h>
+#include <chrono>
+#include <random>
+#include <stdint.h>
+#include <mutex>
 
 namespace nx {
 namespace sdk {
@@ -95,32 +99,57 @@ std::string toStdString(const Uuid& uuid, FormatOptions formatOptions)
     return ss.str();
 }
 
+class RandomGenerator64Bit
+{
+public:
+    RandomGenerator64Bit():
+        m_generator(getSeed()),
+        m_distibution(0, std::numeric_limits<uint64_t>::max())
+    {
+    }
+
+    uint64_t value64()
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        return m_distibution(m_generator);
+    }
+
+    std::array<uint64_t, 2> value128()
+    {
+        std::lock_guard<std::mutex> lock(m_mutex);
+        return { m_distibution(m_generator), m_distibution(m_generator) };
+    }
+
+private:
+    uint64_t getSeed()
+    {
+        #if defined(__arm__) || defined(__aarch64__)
+            // Is is known that on certain ARM platforms std::random_device has issues.
+            const auto time = std::chrono::high_resolution_clock::now().time_since_epoch();
+            return time.count() ^ (uintptr_t) this;
+        #else
+            std::random_device r;
+            return r();
+        #endif
+    }
+
+private:
+    std::mt19937_64 m_generator;
+    std::uniform_int_distribution<uint64_t> m_distibution;
+    std::mutex m_mutex;
+};
+
 Uuid randomUuid()
 {
+    static RandomGenerator64Bit generator;
+
     Uuid uuid;
-    int index = 0;
-    const auto add16Bits =
-        [&uuid, &index](int value) //< Converts value to Big Endian.
-        {
-            NX_KIT_ASSERT(index >= 0);
-            NX_KIT_ASSERT(index <= 7);
-            NX_KIT_ASSERT(value >= 0);
-            // NOTE: rand() only guarantees to yield 15 bits.
-            uuid[index * 2 + 0] = value >> 8;
-            uuid[index * 2 + 1] = value & 0xFF;
-            ++index;
-        };
+    memcpy(uuid.data(), generator.value128().data(), sizeof(Uuid));
 
-    add16Bits(std::rand());
-    add16Bits(std::rand());
-    add16Bits(std::rand());
-    add16Bits((std::rand() & 0x0FFF) | 0x4000); //< 16-bit of the form 4xxx (4 is UUID version).
-    add16Bits(std::rand() % 0x3FFF + 0x8000); //< 16-bit in range [0x8000, 0xBFFF].
-    add16Bits(std::rand());
-    add16Bits(std::rand());
-    add16Bits(std::rand());
+    uint8_t* data = uuid.data();
+    data[6] = (data[6] & 0x0F) | 0x40; //< 8-bit of the form 4x (4 is UUID version).
+    data[8] = (data[8] & 0x3F) | 0x80; //< 8-bit in range [0x80, 0xBF].
 
-    NX_KIT_ASSERT(index == 8);
     return uuid;
 }
 
