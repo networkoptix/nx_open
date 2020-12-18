@@ -2869,7 +2869,7 @@
     <message>
       <location/>
       <source>Watermark Preview</source>
-      <translation>透かし表示</translation>
+      <translation>透かしのプレビュー</translation>
     </message>
     <message>
       <location/>
@@ -3526,7 +3526,7 @@
     <message>
       <location/>
       <source>Frequency</source>
-      <translation>周波数</translation>
+      <translation>頻度</translation>
     </message>
   </context>
 </TS>

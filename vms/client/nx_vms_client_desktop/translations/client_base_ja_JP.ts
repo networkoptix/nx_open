@@ -7666,7 +7666,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraMotionSettingsWidget</name>
     <message>
       <source>Motion detection will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation>モーション検出は、カメラが表示されている場合にのみ動作します　すべての時間で動作させるためには記録を有効にします</translation>
+      <translation>モーション検知は、カメラが表示されている場合にのみ動作します。常に動作させるためには録画を有効にしてください。</translation>
     </message>
     <message>
       <source>Maximum number of motion detection rectangles for current camera is reached</source>
