@@ -196,16 +196,16 @@ SettingsCapabilities DeviceAgentBuilder::fetchSettingsCapabilities() const
         cgi.parameter("eventsources", "tamperingdetection", "set", "DarknessDetection").has_value();
 
     // Defocus
-    result.tampering.enabled = cgi.parameter("eventsources","defocusdetection",
+    result.defocus.enabled = cgi.parameter("eventsources","defocusdetection",
         "set", "Enable").has_value();
 
-    result.tampering.thresholdLevel =
+    result.defocus.thresholdLevel =
         cgi.parameter("eventsources", "defocusdetection", "set", "ThresholdLevel").has_value();
 
-    result.tampering.sensitivityLevel =
-        cgi.parameter("eventsources", "defocusdetection", "set", "SensitivityLevel").has_value();
+    result.defocus.sensitivityLevel =
+        cgi.parameter("eventsources", "defocusdetection", "set", "Sensitivity").has_value();
 
-    result.tampering.minimumDuration =
+    result.defocus.minimumDuration =
         cgi.parameter("eventsources", "defocusdetection", "set", "Duration").has_value();
 
     result.videoAnalysis = cgi.hasSubmenu("eventsources", "videoanalysis");

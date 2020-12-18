@@ -278,7 +278,7 @@ std::string TamperingDetection::buildDeviceWritingQuery(int channelNumber) const
             << "&action=" << "set"
             << "&Channel=" << channelNumber;
 
-        if (m_settingsCapabilities.tampering.thresholdLevel)
+        if (m_settingsCapabilities.tampering.enabled)
             query << "&Enable=" << serialize(enabled);
         if (m_settingsCapabilities.tampering.thresholdLevel)
             query << "&ThresholdLevel=" << thresholdLevel;
