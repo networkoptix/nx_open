@@ -21,6 +21,8 @@
 
 namespace {
 
+static const std::chrono::seconds kMinInitializationDelay{3};
+
 } // namespace
 
 // -------------------------------------------------------------------------- //
@@ -311,7 +313,7 @@ void QnResource::setStatus(Qn::ResourceStatus newStatus, Qn::StatusChangeReason 
     {
         if (switchState(initDone, initNone))
         {
-            NX_VERBOSE(this, 
+            NX_VERBOSE(this,
                 "Mark resource %1 as uninitialized because its status %2", getId(), newStatus);
             emit initializedChanged(toSharedPointer(this));
         }
@@ -623,6 +625,14 @@ bool QnResource::init()
     if (!switchState(initNone, initInProgress))
         return false; //< Already initializing
 
+    while (!m_elapsedSinceLastInit.hasExpired(kMinInitializationDelay))
+    {
+        if (commonModule->isNeedToStop())
+           return false;
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    }
+
     const auto parentId = getParentId();
     CameraDiagnostics::Result initResult;
     bool isInitialized = false;
@@ -654,6 +664,8 @@ bool QnResource::init()
 
     if (isInitialized)
         emit initializedChanged(toSharedPointer(this));
+
+    m_elapsedSinceLastInit.restart();
 
     return true;
 }
@@ -688,7 +700,7 @@ void QnResource::initAsync()
     const auto resourcePool = this->resourcePool();
     if (!resourcePool)
     {
-        NX_DEBUG(this, 
+        NX_DEBUG(this,
             "Not running init task for resource %1: resource pool is unavailable", getId());
         return;
     }

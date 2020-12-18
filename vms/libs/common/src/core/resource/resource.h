@@ -309,6 +309,8 @@ private:
     bool m_forceUseLocalProperties = false;
     std::atomic<int> cTestStatus{0};
     std::atomic<Qn::ResourceStatus> m_previousStatus = Qn::ResourceStatus::NotDefined;
+
+    nx::utils::SafeElapsedTimer m_elapsedSinceLastInit;
 };
 
 template<class Resource>
