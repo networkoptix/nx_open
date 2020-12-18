@@ -16,7 +16,8 @@ using namespace nx::sdk::analytics;
 namespace {
 
 constexpr double kCoordinateDomain = 1000;
-constexpr auto kCacheEntryInactivityLifetime = 1s;
+constexpr auto kBoundingBoxLifetime = 1s;
+constexpr auto kCacheEntryInactivityLifetime = 3s;
 constexpr auto kCacheEntryMaximumLifetime = 30s;
 
 } // namespace
@@ -80,6 +81,8 @@ void MetadataParser::processEvent(HikvisionEvent* event)
         entry.thermalPreAlarmShouldBeActive = event->isActive;
     else if (event->typeId.startsWith("nx.hikvision.Alarm2Thermal"))
         entry.thermalAlarmShouldBeActive = event->isActive;
+    else
+        return;
 
     if (entry.trackId.isNull())
         return;
@@ -434,7 +437,7 @@ Ptr<ObjectMetadataPacket> MetadataParser::makeMetadataPacket(const CacheEntry& e
     packet->setTimestampUs(m_currentTimestampUs);
     packet->setDurationUs(
         std::chrono::duration_cast<std::chrono::microseconds>(
-            kCacheEntryInactivityLifetime).count());
+            kBoundingBoxLifetime).count());
 
     const auto metadata = makePtr<ObjectMetadata>();
     metadata->setTrackId(entry.trackId);
