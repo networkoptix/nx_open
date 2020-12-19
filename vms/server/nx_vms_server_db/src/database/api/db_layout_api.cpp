@@ -151,7 +151,9 @@ bool updateItems(
             rotation,
             contrast_params,
             dewarping_params,
-            display_info
+            display_info,
+            display_analytics_objects,
+            display_roi
         ) VALUES (
             :id,
             :resourceId,
@@ -170,7 +172,9 @@ bool updateItems(
             :rotation,
             :contrastParams,
             :dewarpingParams,
-            :displayInfo
+            :displayInfo,
+            :displayAnalyticsObjects,
+            :displayRoi
         )
     )sql");
 
@@ -257,7 +261,9 @@ bool fetchLayouts(
             li.rotation,
             li.contrast_params as contrastParams,
             li.dewarping_params as dewarpingParams,
-            li.display_info as displayInfo
+            li.display_info as displayInfo,
+            li.display_analytics_objects as displayAnalyticsObjects,
+            li.display_roi as displayRoi
         FROM vms_layoutitem li
         JOIN vms_resource r on r.id = li.layout_id
         ORDER BY r.guid

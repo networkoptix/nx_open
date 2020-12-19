@@ -68,23 +68,29 @@ public:
         /** Whether info panel is to be displayed. */
         DisplayInfo = 1 << 3,
 
+        /** Whether detected analytics objects are displayed. */
+        DisplayAnalyticsObjects = 1 << 4,
+
+        /** Whether regions of interest (ROI) are displayed. */
+        DisplayRoi = 1 << 5,
+
         /** Whether the video is to be dewarped. */
-        DisplayDewarped = 1 << 4,
+        DisplayDewarped = 1 << 6,
 
         /** Whether PTZ state can be controlled. */
-        ControlPtz = 1 << 5,
+        ControlPtz = 1 << 7,
 
         /** Whether zoom windows can be created by dragging the mouse. */
-        ControlZoomWindow = 1 << 6,
+        ControlZoomWindow = 1 << 8,
 
-        WindowRotationForbidden = 1 << 7,
-        WindowResizingForbidden = 1 << 8,
+        WindowRotationForbidden = 1 << 9,
+        WindowResizingForbidden = 1 << 10,
 
-        FullScreenMode = 1 << 9,
-        ActivityPresence = 1 << 10,
+        FullScreenMode = 1 << 11,
+        ActivityPresence = 1 << 12,
 
-        AlwaysShowName = 1 << 11,
-        InfoOverlaysForbidden = 1 << 12,
+        AlwaysShowName = 1 << 13,
+        InfoOverlaysForbidden = 1 << 14,
     };
 
     Q_DECLARE_FLAGS(Options, Option)

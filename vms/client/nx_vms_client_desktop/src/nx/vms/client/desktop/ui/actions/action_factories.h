@@ -72,6 +72,19 @@ public:
     virtual ActionList newActions(const Parameters& parameters, QObject* parent) override;
 };
 
+class ShowOnItemsFactory: public Factory
+{
+    Q_OBJECT
+public:
+    ShowOnItemsFactory(QObject* parent);
+    virtual ActionList newActions(const Parameters& parameters, QObject* parent) override;
+
+private:
+    QAction* initInfoAction(const Parameters& parameters, QObject* parent);
+    QAction* initObjectsAction(const Parameters& parameters, QObject* parent);
+    QAction* initRoiAction(const Parameters& parameters, QObject* parent);
+};
+
 } // namespace action
 } // namespace ui
 } // namespace nx::vms::client::desktop

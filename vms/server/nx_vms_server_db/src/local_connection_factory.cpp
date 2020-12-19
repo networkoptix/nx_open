@@ -1560,6 +1560,13 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %param items[].displayInfo Whether to display info for the layout item.
      *         %value false
      *         %value true
+     *     %param items[].displayAnalyticsObjects Whether to display detected analytics objects for
+     *         the layout item.
+     *         %value false
+     *         %value true
+     *     %param items[].displayRoi Whether to display regions of interest for the layout item.
+     *         %value false
+     *         %value true
      * %param locked Whether the layout is locked.
      *     %value false
      *     %value true

@@ -41,6 +41,18 @@ QString DevicesNameTextFactory::text(const Parameters& parameters,
                 resources.filtered<QnVirtualCameraResource>());
 }
 
+FunctionalTextFactory::FunctionalTextFactory(TextFunction&& textFunction, QObject* parent):
+    TextFactory(parent),
+    m_textFunction(std::move(textFunction))
+{
+}
+
+QString FunctionalTextFactory::text(
+    const Parameters& parameters, QnWorkbenchContext* context) const
+{
+    return m_textFunction(parameters, context);
+}
+
 } // namespace action
 } // namespace ui
 } // namespace nx::vms::client::desktop

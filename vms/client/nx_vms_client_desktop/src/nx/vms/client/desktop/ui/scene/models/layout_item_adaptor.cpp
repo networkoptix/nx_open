@@ -54,6 +54,12 @@ LayoutItemAdaptor::LayoutItemAdaptor(const QnLayoutResourcePtr& layout, const Qn
             if (d->itemData.displayInfo != itemData.displayInfo)
                 notifiers.append(&LayoutItemAdaptor::displayInfoChanged);
 
+            if (d->itemData.displayAnalyticsObjects != itemData.displayAnalyticsObjects)
+                notifiers.append(&LayoutItemAdaptor::displayAnalyticsObjectsChanged);
+
+            if (d->itemData.displayRoi != itemData.displayRoi)
+                notifiers.append(&LayoutItemAdaptor::displayRoiChanged);
+
             if (d->itemData.contrastParams != itemData.contrastParams)
                 notifiers.append(&LayoutItemAdaptor::imageCorrectionParamsChanged);
 
@@ -195,6 +201,38 @@ void LayoutItemAdaptor::setDisplayInfo(bool displayInfo)
     d->layout->updateItem(d->itemData);
 
     emit displayInfoChanged();
+}
+
+bool LayoutItemAdaptor::displayAnalyticsObjects() const
+{
+    return d->itemData.displayAnalyticsObjects;
+}
+
+void LayoutItemAdaptor::setDisplayAnalyticsObjects(bool displayAnalyticsObjects)
+{
+    if (d->itemData.displayAnalyticsObjects == displayAnalyticsObjects)
+        return;
+
+    d->itemData.displayAnalyticsObjects = displayAnalyticsObjects;
+    d->layout->updateItem(d->itemData);
+
+    emit displayAnalyticsObjectsChanged();
+}
+
+bool LayoutItemAdaptor::displayRoi() const
+{
+    return d->itemData.displayRoi;
+}
+
+void LayoutItemAdaptor::setDisplayRoi(bool displayRoi)
+{
+    if (d->itemData.displayRoi == displayRoi)
+        return;
+
+    d->itemData.displayRoi = displayRoi;
+    d->layout->updateItem(d->itemData);
+
+    emit displayRoiChanged();
 }
 
 nx::vms::api::ImageCorrectionData LayoutItemAdaptor::imageCorrectionParams() const

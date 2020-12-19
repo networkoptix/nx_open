@@ -529,40 +529,12 @@ ActionVisibility SmartSearchCondition::check(const QnResourceWidgetList& widgets
     return InvisibleAction;
 }
 
-DisplayInfoCondition::DisplayInfoCondition(bool requiredDisplayInfoValue):
-    m_hasRequiredDisplayInfoValue(true),
-    m_requiredDisplayInfoValue(requiredDisplayInfoValue)
+ActionVisibility DisplayInfoCondition::check(
+    const QnResourceWidgetList& widgets, QnWorkbenchContext* /*context*/)
 {
-}
-
-DisplayInfoCondition::DisplayInfoCondition():
-    m_hasRequiredDisplayInfoValue(false),
-    m_requiredDisplayInfoValue(false)
-{
-}
-
-ActionVisibility DisplayInfoCondition::check(const QnResourceWidgetList& widgets, QnWorkbenchContext* /*context*/)
-{
-    for (auto widget: widgets)
-    {
-        if (!widget)
-            continue;
-
-        if (!(widget->visibleButtons() & Qn::InfoButton))
-            continue;
-
-        if (m_hasRequiredDisplayInfoValue)
-        {
-            if (static_cast<bool>(widget->options() & QnResourceWidget::DisplayInfo) == m_requiredDisplayInfoValue)
-                return EnabledAction;
-        }
-        else
-        {
-            return EnabledAction;
-        }
-    }
-
-    return InvisibleAction;
+    const bool enabled = std::any_of(widgets.begin(), widgets.end(),
+        [](auto widget) { return widget->visibleButtons() & Qn::InfoButton; });
+    return enabled ? EnabledAction : InvisibleAction;
 }
 
 ActionVisibility ClearMotionSelectionCondition::check(const QnResourceWidgetList& widgets, QnWorkbenchContext* /*context*/)

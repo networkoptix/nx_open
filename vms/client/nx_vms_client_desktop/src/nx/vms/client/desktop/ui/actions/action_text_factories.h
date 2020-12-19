@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include <core/resource/device_dependent_strings.h>
 
 #include <nx/vms/client/desktop/ui/actions/action_fwd.h>
@@ -34,6 +36,20 @@ public:
     virtual QString text(const Parameters& parameters, QnWorkbenchContext* context) const override;
 private:
     const QnCameraDeviceStringSet m_stringSet;
+};
+
+class FunctionalTextFactory: public TextFactory
+{
+public:
+    using TextFunction = std::function<
+        QString(const Parameters& parameters, QnWorkbenchContext* context)>;
+
+    FunctionalTextFactory(TextFunction&& textFunction, QObject* parent);
+    virtual QString text(const Parameters& parameters, QnWorkbenchContext* context) const override;
+
+private:
+    const TextFunction m_textFunction;
+
 };
 
 } // namespace action

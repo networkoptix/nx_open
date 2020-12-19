@@ -303,7 +303,8 @@ void AnalyticsSearchSynchronizer::updateWorkbench()
 void AnalyticsSearchSynchronizer::updateMediaResourceWidgetAnalyticsMode(
     QnMediaResourceWidget* widget)
 {
-    widget->setAnalyticsEnabled(calculateMediaResourceWidgetAnalyticsEnabled(widget));
+    widget->setAnalyticsObjectsVisibleForcefully(
+        calculateMediaResourceWidgetAnalyticsEnabled(widget));
 
     if (active())
     {

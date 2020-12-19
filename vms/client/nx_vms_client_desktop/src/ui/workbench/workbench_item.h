@@ -262,6 +262,12 @@ public:
     bool displayInfo() const;
     void setDisplayInfo(bool value);
 
+    bool displayAnalyticsObjects() const;
+    void setDisplayAnalyticsObjects(bool value);
+
+    bool displayRoi() const;
+    void setDisplayRoi(bool value);
+
     /**
      * Marks this item as waiting for geometry adjustment. It will be placed
      * at the best slot available when its layout becomes active.
@@ -326,6 +332,8 @@ signals:
     void zoomTargetItemChanged();
     void rotationChanged();
     void displayInfoChanged();
+    void displayAnalyticsObjectsChanged();
+    void displayRoiChanged();
     void dataChanged(Qn::ItemDataRole role);
 
 protected:
@@ -367,4 +375,8 @@ private:
 
     /** Should the info be always displayed on the item. */
     bool m_displayInfo = false;
+    /** Should the detected analytics objects be always displayed on the item. */
+    bool m_displayAnalyticsObjects = false;
+    /** Should the regions of interest be always displayed on the item. */
+    bool m_displayRoi = true;
 };

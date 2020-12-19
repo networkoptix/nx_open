@@ -46,6 +46,8 @@ QnWorkbenchItem::QnWorkbenchItem(const QnResourcePtr& resource,
     setImageEnhancement(data.contrastParams);
     setDewarpingParams(data.dewarpingParams);
     setDisplayInfo(data.displayInfo);
+    setDisplayAnalyticsObjects(data.displayAnalyticsObjects);
+    setDisplayRoi(data.displayRoi);
 }
 
 QnWorkbenchItem::~QnWorkbenchItem()
@@ -71,6 +73,8 @@ QnLayoutItemData QnWorkbenchItem::data() const
     data.dewarpingParams = dewarpingParams();
     data.zoomTargetUuid = zoomTargetItem() ? zoomTargetItem()->uuid() : QnUuid();
     data.displayInfo = displayInfo();
+    data.displayAnalyticsObjects = displayAnalyticsObjects();
+    data.displayRoi = displayRoi();
 
     return data;
 }
@@ -91,6 +95,8 @@ bool QnWorkbenchItem::update(const QnLayoutItemData &data)
     setImageEnhancement(data.contrastParams);
     setDewarpingParams(data.dewarpingParams);
     setDisplayInfo(data.displayInfo);
+    setDisplayAnalyticsObjects(data.displayAnalyticsObjects);
+    setDisplayRoi(data.displayRoi);
     result &= setFlags(static_cast<Qn::ItemFlags>(data.flags));
 
     return result;
@@ -110,6 +116,8 @@ void QnWorkbenchItem::submit(QnLayoutItemData &data) const
     data.zoomTargetUuid = zoomTargetItem() ? zoomTargetItem()->uuid() : QnUuid();
     data.combinedGeometry = combinedGeometry();
     data.displayInfo = displayInfo();
+    data.displayAnalyticsObjects = displayAnalyticsObjects();
+    data.displayRoi = displayRoi();
 }
 
 QnResourcePtr QnWorkbenchItem::resource() const
@@ -304,6 +312,36 @@ void QnWorkbenchItem::setDisplayInfo(bool value)
     m_displayInfo = value;
     emit displayInfoChanged();
     emit dataChanged(Qn::ItemDisplayInfoRole);
+}
+
+bool QnWorkbenchItem::displayAnalyticsObjects() const
+{
+    return m_displayAnalyticsObjects;
+}
+
+void QnWorkbenchItem::setDisplayAnalyticsObjects(bool value)
+{
+    if (m_displayAnalyticsObjects == value)
+        return;
+
+    m_displayAnalyticsObjects = value;
+    emit displayAnalyticsObjectsChanged();
+    emit dataChanged(Qn::ItemDisplayAnalyticsObjectsRole);
+}
+
+bool QnWorkbenchItem::displayRoi() const
+{
+    return m_displayRoi;
+}
+
+void QnWorkbenchItem::setDisplayRoi(bool value)
+{
+    if (m_displayRoi == value)
+        return;
+
+    m_displayRoi = value;
+    emit displayRoiChanged();
+    emit dataChanged(Qn::ItemDisplayRoiRole);
 }
 
 void QnWorkbenchItem::adjustGeometry()

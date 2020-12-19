@@ -164,13 +164,8 @@ private:
 class DisplayInfoCondition: public Condition
 {
 public:
-    DisplayInfoCondition(bool requiredDisplayInfoValue);
-    DisplayInfoCondition();
-    virtual ActionVisibility check(const QnResourceWidgetList& widgets, QnWorkbenchContext* context) override;
-
-private:
-    bool m_hasRequiredDisplayInfoValue;
-    bool m_requiredDisplayInfoValue;
+    virtual ActionVisibility check(
+        const QnResourceWidgetList& widgets, QnWorkbenchContext* context) override;
 };
 
 class ClearMotionSelectionCondition: public Condition

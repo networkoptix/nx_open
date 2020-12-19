@@ -14,6 +14,8 @@ bool operator==(const QnLayoutItemData &l, const QnLayoutItemData &r)
         && qFuzzyEquals(l.zoomRect, r.zoomRect)
         && qFuzzyEquals(l.rotation, r.rotation)
         && l.displayInfo == r.displayInfo
+        && l.displayAnalyticsObjects == r.displayAnalyticsObjects
+        && l.displayRoi == r.displayRoi
         && l.contrastParams == r.contrastParams
         && l.dewarpingParams == r.dewarpingParams
         );

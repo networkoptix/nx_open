@@ -34,6 +34,7 @@
 #include <ui/graphics/items/resource/web_resource_widget.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench.h>
 #include <ui/style/globals.h>
@@ -345,6 +346,130 @@ Factory::ActionList WebPageFactory::newActions(const Parameters& parameters,
     }
 
     return result;
+}
+
+ShowOnItemsFactory::ShowOnItemsFactory(QObject* parent):
+    Factory(parent)
+{
+}
+
+Factory::ActionList ShowOnItemsFactory::newActions(const Parameters& parameters, QObject* parent)
+{
+    ActionList result;
+
+    const QnResourceWidgetList widgets = parameters.widgets();
+
+    if (const auto action = initInfoAction(parameters, parent))
+        result.append(action);
+
+    if (const auto action = initObjectsAction(parameters, parent))
+        result.append(action);
+
+    if (const auto action = initRoiAction(parameters, parent))
+        result.append(action);
+
+    return result;
+}
+
+QAction* ShowOnItemsFactory::initInfoAction(const Parameters& parameters, QObject* parent)
+{
+    const QnResourceWidgetList widgets = parameters.widgets();
+    QList<QnResourceWidget*> actualWidgets;
+    for (const auto widget: widgets)
+    {
+        if (!(widget->visibleButtons() & Qn::InfoButton))
+            return nullptr;
+        actualWidgets.append(widget);
+    }
+
+    const auto action = new QAction(tr("Info"), parent);
+    action->setShortcuts({QKeySequence("I"), QKeySequence("Alt+I")});
+    action->setShortcutVisibleInContextMenu(true);
+    action->setCheckable(true);
+    action->setChecked(std::all_of(actualWidgets.begin(), actualWidgets.end(),
+        [](QnResourceWidget* widget) { return widget->isInfoVisible(); }));
+
+    connect(action, &QAction::triggered, this,
+        [this, actualWidgets, parameters](bool checked)
+        {
+            const bool animate = display()->animationAllowed();
+            for (QnResourceWidget* widget: actualWidgets)
+                widget->setInfoVisible(checked, animate);
+        });
+
+    return action;
+}
+
+QAction* ShowOnItemsFactory::initObjectsAction(const Parameters& parameters, QObject* parent)
+{
+    const QnResourceWidgetList widgets = parameters.widgets();
+    QList<QnMediaResourceWidget*> actualWidgets;
+    for (const auto widget: widgets)
+    {
+        const auto w = qobject_cast<QnMediaResourceWidget*>(widget);
+        if (!w || !w->isAnalyticsSupported())
+            return nullptr;
+        actualWidgets.append(w);
+    }
+
+    const auto action = new QAction(tr("Objects"), parent);
+    action->setCheckable(true);
+    action->setChecked(std::all_of(actualWidgets.begin(), actualWidgets.end(),
+        [](QnMediaResourceWidget* widget)
+        {
+            return widget->isAnalyticsObjectsVisible()
+                || widget->isAnalyticsObjectsVisibleForcefully();
+        }));
+    action->setEnabled(std::none_of(actualWidgets.begin(), actualWidgets.end(),
+        [](QnMediaResourceWidget* widget)
+        {
+            return widget->isAnalyticsObjectsVisibleForcefully();
+        }));
+
+    connect(action, &QAction::triggered, this,
+        [this, actualWidgets, parameters](bool checked)
+        {
+            const bool animate = display()->animationAllowed();
+            for (QnMediaResourceWidget* widget: actualWidgets)
+                widget->setAnalyticsObjectsVisible(checked, animate);
+        });
+
+    return action;
+}
+
+QAction* ShowOnItemsFactory::initRoiAction(const Parameters& parameters, QObject* parent)
+{
+    const QnResourceWidgetList widgets = parameters.widgets();
+    QList<QnMediaResourceWidget*> actualWidgets;
+    for (const auto widget: widgets)
+    {
+        const auto w = qobject_cast<QnMediaResourceWidget*>(widget);
+        if (!w)
+            return nullptr;
+
+        const auto camera = w->resource().dynamicCast<QnVirtualCameraResource>();
+        if (!camera || camera->enabledAnalyticsEngines().isEmpty())
+            return nullptr;
+        actualWidgets.append(w);
+    }
+
+    const auto action = new QAction(tr("Regions of Interest"), parent);
+    action->setCheckable(true);
+    action->setChecked(std::all_of(actualWidgets.begin(), actualWidgets.end(),
+        [](QnMediaResourceWidget* widget)
+        {
+            return widget->isRoiVisible();
+        }));
+
+    connect(action, &QAction::triggered, this,
+        [this, actualWidgets, parameters](bool checked)
+        {
+            const bool animate = display()->animationAllowed();
+            for (QnMediaResourceWidget* widget: actualWidgets)
+                widget->setRoiVisible(checked, animate);
+        });
+
+    return action;
 }
 
 } // namespace action

@@ -171,9 +171,23 @@ public:
 
     bool isLicenseUsed() const;
 
+    bool isRoiVisible() const;
+    void setRoiVisible(bool visible, bool animate);
+
     bool isAnalyticsSupported() const;
-    bool isAnalyticsEnabled() const;
-    void setAnalyticsEnabled(bool enabled);
+
+    bool isAnalyticsObjectsVisible() const;
+    void setAnalyticsObjectsVisible(bool visible, bool animate = true);
+    bool isAnalyticsObjectsVisibleForcefully() const;
+    /**
+     * The same as setAnalyticsObjectsVisible, but the state cannot be deactivated by
+     * setAnalyticsObjectsVisible and it is not saved in the layout.
+     * Useful to temporarily enable objects display, e.g. when analytics search is enabled in the
+     * application.
+     */
+    void setAnalyticsObjectsVisibleForcefully(bool visible, bool animate = true);
+
+    bool isAnalyticsModeEnabled() const;
 
     enum class AreaType
     {
@@ -298,6 +312,10 @@ protected:
         std::function<void(bool, rest::Handle)> resultHandler,
         nx::vms::api::EventState toggleState = nx::vms::api::EventState::undefined);
 
+    void setAnalyticsModeEnabled(bool enabled, bool animate);
+
+    virtual void at_itemDataChanged(int role) override;
+
 private slots:
     void at_resource_propertyChanged(const QnResourcePtr& resource, const QString& key);
     void at_screenshotButton_clicked();
@@ -345,7 +363,7 @@ private:
     Q_SLOT void updateDewarpingParams();
     Q_SLOT void updateCustomAspectRatio();
     Q_SLOT void updateIoModuleVisibility(bool animate);
-    Q_SLOT void updateAnalyticsVisibility();
+    Q_SLOT void updateAnalyticsVisibility(bool animate = false);
 
     void updateCompositeOverlayMode();
 

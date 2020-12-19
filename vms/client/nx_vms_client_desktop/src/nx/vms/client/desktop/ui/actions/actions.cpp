@@ -1084,27 +1084,21 @@ void initialize(Manager* manager, Action* root)
             && !condition::isLayoutTourReviewMode()
             && !condition::tourIsRunning());
 
-    // Used in the context menu.
-    factory(ShowInfoAction)
+    factory()
         .flags(Scene | SingleTarget | MultiTarget)
-        .text(ContextMenu::tr("Show Info"))
-        .shortcut(lit("I"))
-        .condition(ConditionWrapper(new DisplayInfoCondition(false))
-            && !condition::isLayoutTourReviewMode());
-
-    // Used in the context menu.
-    factory(HideInfoAction)
-        .flags(Scene | SingleTarget | MultiTarget)
-        .text(ContextMenu::tr("Hide Info"))
-        .shortcut(lit("I"))
-        .condition(ConditionWrapper(new DisplayInfoCondition(true))
-            && !condition::isLayoutTourReviewMode());
+        .childFactory(new ShowOnItemsFactory(manager))
+        .dynamicText(new FunctionalTextFactory(
+            [](const Parameters& parameters, QnWorkbenchContext* /*context*/)
+            {
+                return ContextMenu::tr("Show on Items", "", parameters.resources().size());
+            },
+            manager));
 
     // Used via the hotkey.
     factory(ToggleInfoAction)
         .flags(Scene | SingleTarget | MultiTarget | HotkeyOnly)
-        .shortcut(lit("I"))
-        .shortcut(lit("Alt+I"))
+        .shortcut("I")
+        .shortcut("Alt+I")
         .condition(ConditionWrapper(new DisplayInfoCondition())
             && !condition::isLayoutTourReviewMode());
 

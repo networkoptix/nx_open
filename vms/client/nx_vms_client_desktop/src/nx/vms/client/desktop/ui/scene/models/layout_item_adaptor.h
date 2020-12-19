@@ -27,6 +27,11 @@ class LayoutItemAdaptor: public QObject
     Q_PROPERTY(QRectF zoomRect READ zoomRect WRITE setZoomRect NOTIFY zoomRectChanged)
     Q_PROPERTY(qreal rotation READ rotation WRITE setRotation NOTIFY rotationChanged)
     Q_PROPERTY(bool displayInfo READ displayInfo WRITE setDisplayInfo NOTIFY displayInfoChanged)
+    Q_PROPERTY(bool displayAnalyticsObjects
+        READ displayAnalyticsObjects
+        WRITE setDisplayAnalyticsObjects
+        NOTIFY displayAnalyticsObjectsChanged)
+    Q_PROPERTY(bool displayRoi READ displayRoi WRITE setDisplayRoi NOTIFY displayRoiChanged)
 
 public:
     LayoutItemAdaptor(const QnLayoutResourcePtr& layout, const QnUuid& itemId);
@@ -59,6 +64,12 @@ public:
     bool displayInfo() const;
     void setDisplayInfo(bool displayInfo);
 
+    bool displayAnalyticsObjects() const;
+    void setDisplayAnalyticsObjects(bool displayAnalyticsObjects);
+
+    bool displayRoi() const;
+    void setDisplayRoi(bool displayRoi);
+
     nx::vms::api::ImageCorrectionData imageCorrectionParams() const;
     void setImageCorrectionParams(const nx::vms::api::ImageCorrectionData& params);
 
@@ -72,6 +83,8 @@ signals:
     void zoomRectChanged();
     void rotationChanged();
     void displayInfoChanged();
+    void displayAnalyticsObjectsChanged();
+    void displayRoiChanged();
     void imageCorrectionParamsChanged();
     void dewarpingParamsChanged();
 

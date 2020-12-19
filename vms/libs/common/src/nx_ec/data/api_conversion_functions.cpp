@@ -394,6 +394,8 @@ void fromApiToResource(const LayoutItemData& src, QnLayoutItemData& dst)
     dst.contrastParams = src.contrastParams;
     dst.dewarpingParams = src.dewarpingParams;
     dst.displayInfo = src.displayInfo;
+    dst.displayAnalyticsObjects = src.displayAnalyticsObjects;
+    dst.displayRoi = src.displayRoi;
 }
 
 void fromResourceToApi(const QnLayoutItemData& src, LayoutItemData& dst)
@@ -415,6 +417,8 @@ void fromResourceToApi(const QnLayoutItemData& src, LayoutItemData& dst)
     dst.contrastParams = src.contrastParams;
     dst.dewarpingParams = src.dewarpingParams;
     dst.displayInfo = src.displayInfo;
+    dst.displayAnalyticsObjects = src.displayAnalyticsObjects;
+    dst.displayRoi = src.displayRoi;
 }
 
 void fromApiToResource(const LayoutData& src, QnLayoutResourcePtr& dst)

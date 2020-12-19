@@ -27,11 +27,16 @@ struct NX_VMS_API LayoutItemData: IdData
     QnUuid zoomTargetId;
     ImageCorrectionData contrastParams;
     DewarpingData dewarpingParams;
-    bool displayInfo = false; /**< Should info be displayed on the item. */
+    /** Should info be displayed on the item. */
+    bool displayInfo = false;
+    /** Should the detected analytics objects be displayed on the item. */
+    bool displayAnalyticsObjects = false;
+    /** Should the regions of interest be displayed on the item. */
+    bool displayRoi = true;
 };
 #define LayoutItemData_Fields IdData_Fields (flags)(left)(top)(right)(bottom)(rotation) \
     (resourceId)(resourcePath)(zoomLeft)(zoomTop)(zoomRight)(zoomBottom)(zoomTargetId) \
-    (contrastParams)(dewarpingParams)(displayInfo)
+    (contrastParams)(dewarpingParams)(displayInfo)(displayAnalyticsObjects)(displayRoi)
 
 struct NX_VMS_API LayoutData: ResourceData
 {

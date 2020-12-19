@@ -52,6 +52,7 @@ public:
     QScopedPointer<WidgetAnalyticsController> analyticsController;
     std::unique_ptr<nx::analytics::MetadataLogParser> analyticsMetadataLogParser;
     bool analyticsEnabled = false;
+    bool analyticsObjectsVisibleForcefully = false;
 
     mutable nx::utils::ElapsedTimer updateDetailsTimer;
     mutable QString currentDetailsText;

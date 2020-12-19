@@ -28,6 +28,8 @@ struct QnLayoutItemData
     QRectF zoomRect;
     qreal rotation = 0.0;
     bool displayInfo = false;
+    bool displayAnalyticsObjects = false;
+    bool displayRoi = true;
 
     nx::vms::api::ImageCorrectionData contrastParams;
     nx::vms::api::DewarpingData dewarpingParams;

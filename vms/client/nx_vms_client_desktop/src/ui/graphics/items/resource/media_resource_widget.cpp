@@ -444,6 +444,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     const bool canRotate = accessController()->hasPermissions(item->layout()->resource(),
         Qn::WritePermission);
     setOption(WindowRotationForbidden, !hasVideo() || !canRotate);
+    setAnalyticsObjectsVisible(item->displayAnalyticsObjects(), false);
+    setRoiVisible(item->displayRoi(), false);
     updateButtonsVisibility();
 }
 
@@ -623,8 +625,12 @@ void QnMediaResourceWidget::initAnalyticsOverlays()
     addOverlayWidget(m_areaHighlightOverlayWidget,
         {Visible, OverlayFlag::autoRotate | OverlayFlag::bindToViewport});
 
-    connect(m_statusOverlay, &QnStatusOverlayWidget::opacityChanged,
-        this, &QnMediaResourceWidget::updateAnalyticsVisibility);
+    connect(m_statusOverlay, &QnStatusOverlayWidget::opacityChanged, this,
+        [this]()
+        {
+            updateAnalyticsVisibility();
+            updateHud(false);
+        });
 }
 
 void QnMediaResourceWidget::initStatusOverlayController()
@@ -1220,6 +1226,12 @@ void QnMediaResourceWidget::updateHud(bool animate)
 {
     base_type::updateHud(animate);
     setOverlayWidgetVisible(m_triggersContainer, isOverlayWidgetVisible(titleBar()), animate);
+    if (m_roiFiguresOverlayWidget)
+    {
+        setOverlayWidgetVisible(m_roiFiguresOverlayWidget,
+            qFuzzyIsNull(m_statusOverlay->opacity()) && isRoiVisible(),
+            animate);
+    }
     updateCompositeOverlayMode();
 }
 
@@ -1639,7 +1651,7 @@ void QnMediaResourceWidget::paintChannelForeground(QPainter *painter, int channe
         }
     }
 
-    if (isAnalyticsEnabled())
+    if (isAnalyticsModeEnabled())
     {
         d->analyticsController->updateAreas(timestamp, channel);
         paintAnalyticsObjectsDebugOverlay(duration_cast<milliseconds>(timestamp), painter, rect);
@@ -1999,6 +2011,12 @@ void QnMediaResourceWidget::optionsChangedNotify(Options changedFlags)
         else
             setProperty(Qn::MotionSelectionModifiers, QVariant()); //< Enable with default modifier.
     }
+
+    if (changedFlags.testFlag(DisplayAnalyticsObjects))
+        setAnalyticsObjectsVisible(options().testFlag(DisplayAnalyticsObjects), false);
+
+    if (changedFlags.testFlag(DisplayRoi))
+        setRoiVisible(options().testFlag(DisplayRoi), false);
 
     base_type::optionsChangedNotify(changedFlags);
 }
@@ -2671,16 +2689,14 @@ void QnMediaResourceWidget::updateIoModuleVisibility(bool animate)
     updateOverlayButton();
 }
 
-void QnMediaResourceWidget::updateAnalyticsVisibility()
+void QnMediaResourceWidget::updateAnalyticsVisibility(bool animate)
 {
-    const auto visibility = (m_statusOverlay->opacity() > 0 || !d->analyticsEnabled)
-        ? Invisible : Visible;
+    if (!m_areaHighlightOverlayWidget)
+        return;
 
-    if (m_roiFiguresOverlayWidget)
-        setOverlayWidgetVisibility(m_roiFiguresOverlayWidget, visibility, false);
-
-    if (m_areaHighlightOverlayWidget)
-        setOverlayWidgetVisibility(m_areaHighlightOverlayWidget, visibility, false);
+    setOverlayWidgetVisible(m_areaHighlightOverlayWidget,
+        m_statusOverlay->opacity() == 0 && d->analyticsEnabled,
+        animate);
 }
 
 void QnMediaResourceWidget::processDiagnosticsRequest()
@@ -2871,22 +2887,63 @@ bool QnMediaResourceWidget::isLicenseUsed() const
     return d->licenseStatus() == QnLicenseUsageStatus::used;
 }
 
+bool QnMediaResourceWidget::isRoiVisible() const
+{
+    return options().testFlag(DisplayRoi);
+}
+
+void QnMediaResourceWidget::setRoiVisible(bool visible, bool animate)
+{
+    if (isRoiVisible() == visible)
+        return;
+
+    setOption(DisplayRoi, visible);
+    item()->setDisplayRoi(visible);
+    updateHud(animate);
+}
+
 bool QnMediaResourceWidget::isAnalyticsSupported() const
 {
     return d->isAnalyticsSupported;
 }
 
-bool QnMediaResourceWidget::isAnalyticsEnabled() const
+bool QnMediaResourceWidget::isAnalyticsObjectsVisible() const
+{
+    return options().testFlag(DisplayAnalyticsObjects);
+}
+
+void QnMediaResourceWidget::setAnalyticsObjectsVisible(bool visible, bool animate)
+{
+    if (isAnalyticsObjectsVisible() == visible)
+        return;
+
+    setOption(DisplayAnalyticsObjects, visible);
+    item()->setDisplayAnalyticsObjects(visible);
+    setAnalyticsModeEnabled(visible || d->analyticsObjectsVisibleForcefully, animate);
+}
+
+bool QnMediaResourceWidget::isAnalyticsObjectsVisibleForcefully() const
+{
+    return d->analyticsObjectsVisibleForcefully;
+}
+
+void QnMediaResourceWidget::setAnalyticsObjectsVisibleForcefully(bool visible, bool animate)
+{
+    d->analyticsObjectsVisibleForcefully = visible;
+    setAnalyticsModeEnabled(visible || isAnalyticsObjectsVisible(), animate);
+}
+
+bool QnMediaResourceWidget::isAnalyticsModeEnabled() const
 {
     return d->isAnalyticsEnabledInStream();
 }
 
-void QnMediaResourceWidget::setAnalyticsEnabled(bool enabled)
+void QnMediaResourceWidget::setAnalyticsModeEnabled(bool enabled, bool animate)
 {
     if (d->analyticsEnabled == enabled)
         return;
 
-        // Cleanup existing object frames in any case.
+    // Cleanup existing object frames in any case.
     if (!enabled)
         d->analyticsController->clearAreas();
 
@@ -2900,7 +2957,17 @@ void QnMediaResourceWidget::setAnalyticsEnabled(bool enabled)
     if (isAnalyticsSupported() || !enabled)
         d->setAnalyticsEnabledInStream(enabled);
 
-    updateAnalyticsVisibility();
+    updateAnalyticsVisibility(animate);
+}
+
+void QnMediaResourceWidget::at_itemDataChanged(int role)
+{
+    base_type::at_itemDataChanged(role);
+
+    if (role == Qn::ItemDisplayAnalyticsObjectsRole)
+        updateAnalyticsVisibility(false);
+    if (role == Qn::ItemDisplayRoiRole)
+        updateHud(false);
 }
 
 nx::vms::client::core::AbstractAnalyticsMetadataProviderPtr

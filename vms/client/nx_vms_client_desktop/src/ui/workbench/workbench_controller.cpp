@@ -450,8 +450,6 @@ QnWorkbenchController::QnWorkbenchController(QObject *parent):
     connect(action(action::StopSmartSearchAction), SIGNAL(triggered()),                                                                 this,                           SLOT(at_stopSmartSearchAction_triggered()));
     connect(action(action::ToggleSmartSearchAction), SIGNAL(triggered()),                                                               this,                           SLOT(at_toggleSmartSearchAction_triggered()));
     connect(action(action::ClearMotionSelectionAction), SIGNAL(triggered()),                                                            this,                           SLOT(at_clearMotionSelectionAction_triggered()));
-    connect(action(action::ShowInfoAction), SIGNAL(triggered()),                                                                        this,                           SLOT(at_showInfoAction_triggered()));
-    connect(action(action::HideInfoAction), SIGNAL(triggered()),                                                                        this,                           SLOT(at_hideInfoAction_triggered()));
     connect(action(action::ToggleInfoAction), SIGNAL(triggered()),                                                                      this,                           SLOT(at_toggleInfoAction_triggered()));
     connect(action(action::CheckFileSignatureAction), SIGNAL(triggered()),                                                              this,                           SLOT(at_checkFileSignatureAction_triggered()));
     connect(action(action::MaximizeItemAction), SIGNAL(triggered()),                                                                    this,                           SLOT(at_maximizeItemAction_triggered()));
@@ -538,13 +536,6 @@ void QnWorkbenchController::displayMotionGrid(const QList<QnResourceWidget *> &w
             continue;
         widget->setOption(QnResourceWidget::DisplayMotion, display);
     }
-}
-
-void QnWorkbenchController::displayWidgetInfo(const QList<QnResourceWidget *> &widgets, bool visible)
-{
-    const bool animate = display()->animationAllowed();
-    foreach(QnResourceWidget *widget, widgets)
-        widget->setInfoVisible(visible, animate);
 }
 
 void QnWorkbenchController::moveCursor(const QPoint &aAxis, const QPoint &bAxis) {
@@ -1552,30 +1543,23 @@ void QnWorkbenchController::at_clearMotionSelectionAction_triggered()
     }
 }
 
-
-void QnWorkbenchController::at_showInfoAction_triggered() {
-    displayWidgetInfo(menu()->currentParameters(sender()).widgets(), true);
-}
-
-void QnWorkbenchController::at_hideInfoAction_triggered() {
-    displayWidgetInfo(menu()->currentParameters(sender()).widgets(), false);
-}
-
-void QnWorkbenchController::at_toggleInfoAction_triggered() {
+void QnWorkbenchController::at_toggleInfoAction_triggered()
+{
     QnResourceWidgetList widgets = menu()->currentParameters(sender()).widgets();
 
-    bool hidden = false;
-    foreach(QnResourceWidget *widget, widgets)
-        if(!(widget->options() & QnResourceWidget::DisplayInfo)){
-            hidden = true;
+    bool visible = true;
+    for (QnResourceWidget* widget: widgets)
+    {
+        if (!widget->options().testFlag(QnResourceWidget::DisplayInfo))
+        {
+            visible = false;
             break;
         }
-
-    if(hidden) {
-        at_showInfoAction_triggered();
-    } else {
-        at_hideInfoAction_triggered();
     }
+
+    const bool animate = display()->animationAllowed();
+    for (QnResourceWidget* widget: widgets)
+        widget->setInfoVisible(!visible, animate);
 }
 
 
