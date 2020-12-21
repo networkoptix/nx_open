@@ -185,7 +185,7 @@ The example of the incoming json:
 
 //-------------------------------------------------------------------------------------------------
 
-/*static*/ std::optional<bool> DeviceResponseJsonParser::extractTemperatureChangeDetectionToggle(
+/*static*/ std::optional<bool> DeviceResponseJsonParser::extractBoxTemperatureDetectionToggle(
     const nx::kit::Json& channelInfo, int chanelNumber)
 {
     const nx::kit::Json jsonEnable = channelInfo["Enable"];
@@ -357,7 +357,7 @@ The example of the incoming json:
 //-------------------------------------------------------------------------------------------------
 
 /**
- * Extract information about temperature change detection ROI (as a json object) of a desired
+ * Extract information about box temperature detection ROI (as a json object) of a desired
  * type from the json object (that corresponds to some event and channel)
  */
 /*static*/ nx::kit::Json DeviceResponseJsonParser::extractTemperatureRoiInfo(

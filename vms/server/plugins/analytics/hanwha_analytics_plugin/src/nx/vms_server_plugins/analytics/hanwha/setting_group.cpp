@@ -1373,7 +1373,7 @@ std::string FaceMaskDetection::buildDetectionMode() const
 
 //-------------------------------------------------------------------------------------------------
 
-bool TemperatureChangeDetectionItem::operator==(const TemperatureChangeDetectionItem& rhs) const
+bool BoxTemperatureDetection::operator==(const BoxTemperatureDetection& rhs) const
 {
     return initialized == rhs.initialized
         && unnamedRect == rhs.unnamedRect
@@ -1384,60 +1384,60 @@ bool TemperatureChangeDetectionItem::operator==(const TemperatureChangeDetection
         && areaEmissivity == rhs.areaEmissivity;
 }
 
-void TemperatureChangeDetectionItem::readFromServerOrThrow(
+void BoxTemperatureDetection::readFromServerOrThrow(
     const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
     using namespace SettingPrimitivesServerIo;
-    if (m_settingsCapabilities.temperature.coordinate)
+    if (m_settingsCapabilities.boxTemperature.coordinate)
         deserializeOrThrow(value(sourceMap, KeyIndex::unnamedRect), &unnamedRect);
 
-    if (m_settingsCapabilities.temperature.temperatureType)
+    if (m_settingsCapabilities.boxTemperature.temperatureType)
         deserializeOrThrow(value(sourceMap, KeyIndex::temperatureType), &temperatureType);
 
-    if (m_settingsCapabilities.temperature.detectionType)
+    if (m_settingsCapabilities.boxTemperature.detectionType)
         deserializeOrThrow(value(sourceMap, KeyIndex::detectionType), &detectionType);
 
-    if (m_settingsCapabilities.temperature.thresholdTemperature)
+    if (m_settingsCapabilities.boxTemperature.thresholdTemperature)
         deserializeOrThrow(value(sourceMap, KeyIndex::thresholdTemperature), &thresholdTemperature);
 
-    if (m_settingsCapabilities.temperature.duration)
+    if (m_settingsCapabilities.boxTemperature.duration)
         deserializeOrThrow(value(sourceMap, KeyIndex::duration), &duration);
 
-    if (m_settingsCapabilities.temperature.areaEmissivity)
+    if (m_settingsCapabilities.boxTemperature.areaEmissivity)
         deserializeOrThrow(value(sourceMap, KeyIndex::areaEmissivity), &areaEmissivity);
     initialized = true;
 }
 
-void TemperatureChangeDetectionItem::writeToServer(
+void BoxTemperatureDetection::writeToServer(
     nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
 {
     using namespace SettingPrimitivesServerIo;
-    if (m_settingsCapabilities.temperature.coordinate)
+    if (m_settingsCapabilities.boxTemperature.coordinate)
         result->setValue(key(KeyIndex::unnamedRect), serialize(unnamedRect));
 
-    if (m_settingsCapabilities.temperature.temperatureType)
+    if (m_settingsCapabilities.boxTemperature.temperatureType)
         result->setValue(key(KeyIndex::temperatureType), serialize(temperatureType));
 
-    if (m_settingsCapabilities.temperature.detectionType)
+    if (m_settingsCapabilities.boxTemperature.detectionType)
         result->setValue(key(KeyIndex::detectionType), serialize(detectionType));
 
-    if (m_settingsCapabilities.temperature.thresholdTemperature)
+    if (m_settingsCapabilities.boxTemperature.thresholdTemperature)
         result->setValue(key(KeyIndex::thresholdTemperature), serialize(thresholdTemperature));
 
-    if (m_settingsCapabilities.temperature.duration)
+    if (m_settingsCapabilities.boxTemperature.duration)
         result->setValue(key(KeyIndex::duration), serialize(duration));
 
-    if (m_settingsCapabilities.temperature.areaEmissivity)
+    if (m_settingsCapabilities.boxTemperature.areaEmissivity)
         result->setValue(key(KeyIndex::areaEmissivity), serialize(areaEmissivity));
 }
 
-void TemperatureChangeDetectionItem::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
+void BoxTemperatureDetection::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
 {
     nx::kit::Json roiInfo =
         DeviceResponseJsonParser::extractTemperatureRoiInfo(channelInfo, this->deviceIndex());
     if (roiInfo == nx::kit::Json())
     {
-        *this = TemperatureChangeDetectionItem(
+        *this = BoxTemperatureDetection(
             m_settingsCapabilities, m_roiResolution, this->nativeIndex()); // reset value;
         initialized = true;
         return;
@@ -1445,23 +1445,23 @@ void TemperatureChangeDetectionItem::readFromDeviceReplyOrThrow(const nx::kit::J
 
     using namespace SettingPrimitivesDeviceIo;
 
-    if (m_settingsCapabilities.temperature.coordinate)
+    if (m_settingsCapabilities.boxTemperature.coordinate)
         deserializeOrThrow(roiInfo, "Coordinates", m_roiResolution, &unnamedRect.points);
 
-    if (m_settingsCapabilities.temperature.temperatureType)
+    if (m_settingsCapabilities.boxTemperature.temperatureType)
         deserializeOrThrow(roiInfo, "TemperatureType", m_roiResolution, &temperatureType);
-    if (m_settingsCapabilities.temperature.detectionType)
+    if (m_settingsCapabilities.boxTemperature.detectionType)
         deserializeOrThrow(roiInfo, "DetectionType", m_roiResolution, &detectionType);
-    if (m_settingsCapabilities.temperature.thresholdTemperature)
+    if (m_settingsCapabilities.boxTemperature.thresholdTemperature)
         deserializeOrThrow(roiInfo, "ThresholdTemperature", m_roiResolution, &thresholdTemperature);
-    if (m_settingsCapabilities.temperature.duration)
+    if (m_settingsCapabilities.boxTemperature.duration)
         deserializeOrThrow(roiInfo, "Duration", m_roiResolution, &duration);
-    if (m_settingsCapabilities.temperature.areaEmissivity)
+    if (m_settingsCapabilities.boxTemperature.areaEmissivity)
         deserializeOrThrow(roiInfo, "NormalizedEmissivity", m_roiResolution, &areaEmissivity);
     initialized = true;
 }
 
-std::string TemperatureChangeDetectionItem::buildDeviceWritingQuery(int channelNumber) const
+std::string BoxTemperatureDetection::buildDeviceWritingQuery(int channelNumber) const
 {
     std::ostringstream query;
     if (initialized)
@@ -1474,22 +1474,22 @@ std::string TemperatureChangeDetectionItem::buildDeviceWritingQuery(int channelN
                   << "set"
                   << "&Channel=" << channelNumber;
 
-            if (m_settingsCapabilities.temperature.coordinate)
+            if (m_settingsCapabilities.boxTemperature.coordinate)
                 query << prefix << ".Coordinate=" << serialize(unnamedRect.points, m_roiResolution);
 
-            if (m_settingsCapabilities.temperature.temperatureType)
+            if (m_settingsCapabilities.boxTemperature.temperatureType)
                 query << prefix << ".TemperatureType=" << temperatureType;
 
-            if (m_settingsCapabilities.temperature.detectionType)
+            if (m_settingsCapabilities.boxTemperature.detectionType)
                 query << prefix << ".DetectionType=" << detectionType;
 
-            if (m_settingsCapabilities.temperature.thresholdTemperature)
+            if (m_settingsCapabilities.boxTemperature.thresholdTemperature)
                 query << prefix << ".ThresholdTemperature=" << thresholdTemperature;
 
-            if (m_settingsCapabilities.temperature.duration)
+            if (m_settingsCapabilities.boxTemperature.duration)
                 query << prefix << ".Duration=" << duration;
 
-            if (m_settingsCapabilities.temperature.duration)
+            if (m_settingsCapabilities.boxTemperature.duration)
                 query << prefix << ".NormalizedEmissivity=" << areaEmissivity;
 
             //query << "TemperatureUnit=" << "Fahrenheit"; //"Celsius"
@@ -1507,14 +1507,14 @@ std::string TemperatureChangeDetectionItem::buildDeviceWritingQuery(int channelN
 
 //-------------------------------------------------------------------------------------------------
 
-bool TemperatureChangeDetectionToggle::operator==(
-    const TemperatureChangeDetectionToggle& rhs) const
+bool BoxTemperatureDetectionToggle::operator==(
+    const BoxTemperatureDetectionToggle& rhs) const
 {
     return initialized == rhs.initialized
         && enabled == rhs.enabled;
 }
 
-void TemperatureChangeDetectionToggle::readFromServerOrThrow(
+void BoxTemperatureDetectionToggle::readFromServerOrThrow(
     const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
     using namespace SettingPrimitivesServerIo;
@@ -1523,21 +1523,21 @@ void TemperatureChangeDetectionToggle::readFromServerOrThrow(
     initialized = true;
 }
 
-void TemperatureChangeDetectionToggle::writeToServer(
+void BoxTemperatureDetectionToggle::writeToServer(
     nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
 {
     using namespace SettingPrimitivesServerIo;
     result->setValue(key(KeyIndex::enabled), serialize(enabled));
 }
 
-void TemperatureChangeDetectionToggle::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
+void BoxTemperatureDetectionToggle::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
 {
-    enabled = DeviceResponseJsonParser::extractTemperatureChangeDetectionToggle(
+    enabled = DeviceResponseJsonParser::extractBoxTemperatureDetectionToggle(
         channelInfo, this->deviceIndex()).value_or(false);
     initialized = true;
 }
 
-std::string TemperatureChangeDetectionToggle::buildDeviceWritingQuery(int channelNumber) const
+std::string BoxTemperatureDetectionToggle::buildDeviceWritingQuery(int channelNumber) const
 {
     std::ostringstream query;
     if (initialized)

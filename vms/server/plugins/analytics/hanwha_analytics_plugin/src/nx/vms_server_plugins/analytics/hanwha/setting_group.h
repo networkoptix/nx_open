@@ -800,7 +800,7 @@ private:
 
 //-------------------------------------------------------------------------------------------------
 
-struct TemperatureChangeDetectionItem: public SettingGroup
+struct BoxTemperatureDetection: public SettingGroup
 {
     UnnamedRect unnamedRect;
     std::string temperatureType = "Maximum";
@@ -822,17 +822,17 @@ struct TemperatureChangeDetectionItem: public SettingGroup
         areaEmissivity
     };
     static constexpr const char* kKeys[] = {
-        "Temperature.Area#.Points",
-        "Temperature.Area#.TemperatureType",
-        "Temperature.Area#.DetectionType",
-        "Temperature.Area#.ThresholdTemperature",
-        "Temperature.Area#.Duration",
-        "Temperature.Area#.AreaEmissivity"
+        "BoxTemperatureDetection.Area#.Points",
+        "BoxTemperatureDetection.Area#.TemperatureType",
+        "BoxTemperatureDetection.Area#.DetectionType",
+        "BoxTemperatureDetection.Area#.ThresholdTemperature",
+        "BoxTemperatureDetection.Area#.Duration",
+        "BoxTemperatureDetection.Area#.AreaEmissivity"
     };
     static constexpr const char* kJsonEventName = "BoxTemperatureDetection";
     static constexpr const char* kSunapiEventName = "boxtemperaturedetection";
 
-    TemperatureChangeDetectionItem(const SettingsCapabilities& settingsCapabilities,
+    BoxTemperatureDetection(const SettingsCapabilities& settingsCapabilities,
         const RoiResolution& roiResolution,
         int roiIndex = -1):
         SettingGroup(settingsCapabilities,
@@ -844,9 +844,9 @@ struct TemperatureChangeDetectionItem: public SettingGroup
     {
     }
 
-    bool operator==(const TemperatureChangeDetectionItem& rhs) const;
-    bool operator!=(const TemperatureChangeDetectionItem& rhs) const { return !(*this == rhs); }
-    void assignExclusiveFrom(const TemperatureChangeDetectionItem& other){};
+    bool operator==(const BoxTemperatureDetection& rhs) const;
+    bool operator!=(const BoxTemperatureDetection& rhs) const { return !(*this == rhs); }
+    void assignExclusiveFrom(const BoxTemperatureDetection& other){};
 
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
     void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
@@ -861,7 +861,7 @@ struct TemperatureChangeDetectionItem: public SettingGroup
 
 //-------------------------------------------------------------------------------------------------
 
-struct TemperatureChangeDetectionToggle: public SettingGroup
+struct BoxTemperatureDetectionToggle: public SettingGroup
 {
     bool enabled = false;
 
@@ -870,20 +870,20 @@ struct TemperatureChangeDetectionToggle: public SettingGroup
         enabled,
     };
     static constexpr const char* kKeys[] = {
-        "Temperature.Enable",
+        "BoxTemperatureDetection.Enable",
     };
     static constexpr const char* kJsonEventName = "BoxTemperatureDetection";
     static constexpr const char* kSunapiEventName = "boxtemperaturedetection";
 
-    TemperatureChangeDetectionToggle(const SettingsCapabilities& settingsCapabilities,
+    BoxTemperatureDetectionToggle(const SettingsCapabilities& settingsCapabilities,
         const RoiResolution& roiResolution,
         int /*roiIndex*/ = -1):
         SettingGroup(settingsCapabilities, roiResolution, kKeys)
     {
     }
-    bool operator==(const TemperatureChangeDetectionToggle& rhs) const;
-    bool operator!=(const TemperatureChangeDetectionToggle& rhs) const { return !(*this == rhs); }
-    void assignExclusiveFrom(const TemperatureChangeDetectionToggle& other){};
+    bool operator==(const BoxTemperatureDetectionToggle& rhs) const;
+    bool operator!=(const BoxTemperatureDetectionToggle& rhs) const { return !(*this == rhs); }
+    void assignExclusiveFrom(const BoxTemperatureDetectionToggle& other){};
 
     void readExclusiveFromServer(const nx::sdk::IStringMap* settings) {}
     void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);

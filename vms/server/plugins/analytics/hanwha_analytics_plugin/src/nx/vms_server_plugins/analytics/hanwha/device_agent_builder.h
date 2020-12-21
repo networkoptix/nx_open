@@ -66,8 +66,8 @@ private:
         const Information& info) const;
     QStringList fetchInternalEventTypeNamesForPopulousFamilies() const;
 
-    QString fetchTemperatureChangeEventTypeNameInternal(const Information& info) const;
-    QString fetchTemperatureChangeEventTypeName() const;
+    QString fetchBoxTemperatureEventTypeNameInternal(const Information& info) const;
+    QString fetchBoxTemperatureEventTypeName() const;
 
     QStringList obtainEventTypeIds(
         const QStringList& eventTypeBunchNames,

@@ -19,7 +19,7 @@ struct SettingsCapabilities
         bool sensitivityLevel = false;
         bool minimumDuration = false;
     };
-    struct Temperature
+    struct BoxTemperature
     {
         bool coordinate = false;
         bool temperatureType = false; //< Minimum/Maximum/Average
@@ -27,16 +27,6 @@ struct SettingsCapabilities
         bool thresholdTemperature = false; //< F degree
         bool duration = false;
         bool areaEmissivity = false; // float [1..99]
-
-        // parameters common for all temperature boxes:
-        // bool btdEnable = false;
-        // struct Overlay
-        //{
-        //    bool area;
-        //    bool avgTemperature;
-        //    bool minTemperature;
-        //    bool maxTemperature;
-        //};
     };
     struct IvaLine
     {
@@ -71,7 +61,7 @@ struct SettingsCapabilities
     bool videoAnalysis2 = false;
     IvaLine ivaLine;
     IvaArea ivaArea;
-    Temperature temperature;
+    BoxTemperature boxTemperature;
     Mask mask;
 };
 

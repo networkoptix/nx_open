@@ -18,7 +18,7 @@ enum AnalyticsCategory
     audioDetection,
     audioAnalytics, //< includes Scream, Gunshot, Explosion, GlassBreak
     faceMaskDetection,
-    temperatureChangeDetection,
+    boxTemperatureDetection,
     count //< number event of categories
 };
 
@@ -28,7 +28,7 @@ using AnalyticsCategories = std::array<bool, AnalyticsCategory::count>;
 struct Settings
 {
     static const int kMultiplicity = 4;
-    static const int kTemperatureMultiplicity = 3;
+    static const int kBoxTemperatureMultiplicity = 3;
 #if 0
     // Hanwha analyticsMode detection selection is currently removed from the Clients interface
     // desired analytics mode if selected implicitly now
@@ -53,9 +53,9 @@ struct Settings
     AudioDetection audioDetection;
     SoundClassification soundClassification;
     FaceMaskDetection faceMaskDetection;
-    TemperatureChangeDetectionToggle temperatureChangeDetectionToggle;
-    std::vector<TemperatureChangeDetectionItem>
-        temperatureChangeDetectionItems; //[kTemperatureMultiplicity];
+    BoxTemperatureDetectionToggle boxTemperatureDetectionToggle;
+    std::vector<BoxTemperatureDetection>
+        boxTemperatureDetectionItems; //[kTemperatureMultiplicity];
 
     AnalyticsCategories analyticsCategories = {false};
 
@@ -75,7 +75,7 @@ struct Settings
         audioDetection(settingsCapabilities, roiResolution),
         soundClassification(settingsCapabilities, roiResolution),
         faceMaskDetection(settingsCapabilities, roiResolution),
-        temperatureChangeDetectionToggle(settingsCapabilities, roiResolution)
+        boxTemperatureDetectionToggle(settingsCapabilities, roiResolution)
     {
         for (int i = 0; i < kMultiplicity; ++i)
             ivaLines.emplace_back(settingsCapabilities, roiResolution, i);
@@ -86,8 +86,8 @@ struct Settings
         for (int i = 0; i < kMultiplicity; ++i)
             ivaExcludeAreas.emplace_back(settingsCapabilities, roiResolution, i);
 
-        for (int i = 0; i < kTemperatureMultiplicity; ++i)
-            temperatureChangeDetectionItems.emplace_back(settingsCapabilities, roiResolution, i);
+        for (int i = 0; i < kBoxTemperatureMultiplicity; ++i)
+            boxTemperatureDetectionItems.emplace_back(settingsCapabilities, roiResolution, i);
     }
 };
 

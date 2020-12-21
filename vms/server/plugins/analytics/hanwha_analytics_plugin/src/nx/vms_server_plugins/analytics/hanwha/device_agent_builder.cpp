@@ -254,23 +254,23 @@ SettingsCapabilities DeviceAgentBuilder::fetchSettingsCapabilities() const
     result.ivaArea.loiteringDuration = cgi.parameter("eventsources", "videoanalysis2", "set",
         "DefinedArea.#.LoiteringDuration").has_value();
 
-    // Temperature
-    result.temperature.coordinate = cgi.parameter("eventsources",
+    // Box temperature
+    result.boxTemperature.coordinate = cgi.parameter("eventsources",
         "boxtemperaturedetection", "set", "ROI.#.Coordinate").has_value();
 
-    result.temperature.temperatureType = cgi.parameter("eventsources",
+    result.boxTemperature.temperatureType = cgi.parameter("eventsources",
         "boxtemperaturedetection", "set", "ROI.#.TemperatureType").has_value();
 
-    result.temperature.detectionType = cgi.parameter("eventsources",
+    result.boxTemperature.detectionType = cgi.parameter("eventsources",
         "boxtemperaturedetection", "set", "ROI.#.DetectionType").has_value();
 
-    result.temperature.thresholdTemperature = cgi.parameter("eventsources",
+    result.boxTemperature.thresholdTemperature = cgi.parameter("eventsources",
         "boxtemperaturedetection", "set", "ROI.#.ThresholdTemperature").has_value();
 
-    result.temperature.duration = cgi.parameter("eventsources",
+    result.boxTemperature.duration = cgi.parameter("eventsources",
         "boxtemperaturedetection", "set", "ROI.#.Duration").has_value();
 
-    result.temperature.areaEmissivity = cgi.parameter("eventsources",
+    result.boxTemperature.areaEmissivity = cgi.parameter("eventsources",
         "boxtemperaturedetection", "set", "ROI.#.NormalizedEmissivity").has_value();
 
     //Mask
@@ -458,17 +458,17 @@ QStringList DeviceAgentBuilder::fetchInternalEventTypeNamesForPopulousFamilies()
 
 //-------------------------------------------------------------------------------------------------
 
-QString DeviceAgentBuilder::fetchTemperatureChangeEventTypeNameInternal(const Information& info) const
+QString DeviceAgentBuilder::fetchBoxTemperatureEventTypeNameInternal(const Information& info) const
 {
-    static const QString kTemperatureChangeInternalName = "BoxTemperatureDetection";
+    static const QString kBoxTemperatureInternalName = "BoxTemperatureDetection";
     const QString prefix =
-        nx::format("Channel.%1.%2", info.channelNumber, kTemperatureChangeInternalName);
+        nx::format("Channel.%1.%2", info.channelNumber, kBoxTemperatureInternalName);
 
     for (const auto& [eventTypeDecoratedName, status]: info.eventStatusMap)
     {
         if (eventTypeDecoratedName.startsWith(prefix))
         {
-            return m_engineManifest.eventTypeIdByName(kTemperatureChangeInternalName);
+            return m_engineManifest.eventTypeIdByName(kBoxTemperatureInternalName);
         }
     }
     return {};
@@ -476,13 +476,13 @@ QString DeviceAgentBuilder::fetchTemperatureChangeEventTypeNameInternal(const In
 
 //-------------------------------------------------------------------------------------------------
 
-QString DeviceAgentBuilder::fetchTemperatureChangeEventTypeName() const
+QString DeviceAgentBuilder::fetchBoxTemperatureEventTypeName() const
 {
-    QString result = fetchTemperatureChangeEventTypeNameInternal(m_directInfo);
+    QString result = fetchBoxTemperatureEventTypeNameInternal(m_directInfo);
 
     if (!result.isEmpty() && m_directInfo.isNvr)
     {
-        QString bypassedResult = fetchTemperatureChangeEventTypeNameInternal(m_bypassedInfo);
+        QString bypassedResult = fetchBoxTemperatureEventTypeNameInternal(m_bypassedInfo);
         result = (result == bypassedResult) ? result : QString();
     }
     return result;
@@ -541,7 +541,7 @@ QStringList DeviceAgentBuilder::addTemepatureChangeEventTypeNameIfNeeded(
     const QStringList& eventTypeIds) const
 {
     QStringList result(eventTypeIds);
-    if (const QString eventTypeId = fetchTemperatureChangeEventTypeName(); !eventTypeId.isEmpty())
+    if (const QString eventTypeId = fetchBoxTemperatureEventTypeName(); !eventTypeId.isEmpty())
         result.append(eventTypeId);
     return result;
 }

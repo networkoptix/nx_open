@@ -28,12 +28,12 @@
         "sections": [
             {
                 "type": "Section",
-                "caption": "Temperature Change Detection",
-                "_requiredForEventTypeIds": [ "nx.hanwha.TemperatureChangeDetection" ],
+                "caption": "Box Temperature Detection",
+                "_requiredForEventTypeIds": [ "nx.hanwha.BoxTemperatureDetection" ],
                 "items": [
                     {
                         "type": "SwitchButton",
-                        "name": "Temperature.Enable",
+                        "name": "BoxTemperatureDetection.Enable",
                         "caption": "Enable",
                         "defaultValue": false
                     },
@@ -54,12 +54,12 @@
                                     "items": [
                                         {
                                             "type": "BoxFigure",
-                                            "name": "Temperature.Area#.Points",
+                                            "name": "BoxTemperatureDetection.Area#.Points",
                                             "caption": "Area #"
                                         },
                                         {
                                             "type": "ComboBox",
-                                            "name": "Temperature.Area#.TemperatureType",
+                                            "name": "BoxTemperatureDetection.Area#.TemperatureType",
                                             "caption": "Temperature Type",
                                             "defaultValue": "Maximum",
                                             "range": [ "Maximum", "Minimum", "Average" ],
@@ -71,14 +71,14 @@
                                         },
                                         {
                                             "type": "ComboBox",
-                                            "name": "Temperature.Area#.DetectionType",
+                                            "name": "BoxTemperatureDetection.Area#.DetectionType",
                                             "caption": "Detection Type",
                                             "defaultValue": "Above",
                                             "range": [ "Above", "Below", "Increase", "Decrease" ]
                                         },
                                         {
                                             "type": "SpinBox",
-                                            "name": "Temperature.Area#.ThresholdTemperature",
+                                            "name": "BoxTemperatureDetection.Area#.ThresholdTemperature",
                                             "caption": "Threshold Temperature (Detection) (F)",
                                             "description": "The range is [-4, 266] for Above/Below and is [50, 212] for Increase/Decrease Detection Type",
                                             "defaultValue": 68,
@@ -87,7 +87,7 @@
                                         },
                                         {
                                             "type": "SpinBox",
-                                            "name": "Temperature.Area#.Duration",
+                                            "name": "BoxTemperatureDetection.Area#.Duration",
                                             "caption": "Minimum Duration (s)",
                                             "defaultValue": 1,
                                             "minValue": 1,
@@ -95,7 +95,7 @@
                                         },
                                         {
                                             "type": "SpinBox",
-                                            "name": "Temperature.Area#.AreaEmissivity",
+                                            "name": "BoxTemperatureDetection.Area#.AreaEmissivity",
                                             "caption": "Area Emissivity",
                                             "defaultValue": 50,
                                             "minValue": 1,
@@ -873,7 +873,7 @@
             "description": "Shock has been detected"
         },
         {
-            "id": "nx.hanwha.TemperatureChangeDetection",
+            "id": "nx.hanwha.BoxTemperatureDetection",
             "name": "Temperature change detection",
             "internalName": "BoxTemperatureDetection",
             "description": "Temperature change event %1",

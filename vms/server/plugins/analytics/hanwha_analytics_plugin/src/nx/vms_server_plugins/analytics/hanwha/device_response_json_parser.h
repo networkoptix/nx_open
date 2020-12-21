@@ -39,8 +39,8 @@ public:
     static nx::kit::Json extractChannelInfo(
         const std::string& cameraReply, const char* eventName, int channelNumber);
 
-    /** Extract if TemperatureChangeDetectionv is enabled If fail, returns std::nullopt.*/
-    static std::optional<bool> extractTemperatureChangeDetectionToggle(
+    /** Extract if BoxTemperatureDetection is enabled If fail, returns std::nullopt.*/
+    static std::optional<bool> extractBoxTemperatureDetectionToggle(
         const nx::kit::Json& channelInfo, int chanelNumber);
 
     /**
@@ -80,7 +80,7 @@ public:
     static nx::kit::Json extractMaskRoiInfo(nx::kit::Json channelInfo, int sunapiIndex);
 
     /**
-     * Extract information about temperature change detection ROI (as a json object) of a desired
+     * Extract information about box temperature detection ROI (as a json object) of a desired
      * type from the json object (that corresponds to some event and channel)
      */
     static nx::kit::Json extractTemperatureRoiInfo(nx::kit::Json channelInfo, int sunapiIndex);
