@@ -40,8 +40,6 @@ QString formatReceivedEventForLog(const Event& event)
     text += NX_FMT("\ntimestamp: %1",
         QDateTime::fromMSecsSinceEpoch(event.timestamp.count()).toString(Qt::ISODateWithMs));
 
-    text += NX_FMT("\nid: %1", event.id);
-
     text += NX_FMT("\nisActive: %1", event.isActive);
 
     if (const auto& name = event.ruleName)
@@ -151,9 +149,6 @@ std::vector<QJsonObject> defaultExtractObjects(const QJsonObject& eventData)
 
 void parseEventData(Event *event, const QJsonObject& data)
 {
-    if (const auto value = data["EventID"]; value.isDouble())
-        event->id = value.toInt();
-
     if (const auto value = data["Name"]; value.isString())
         event->ruleName = value.toString();
 
@@ -362,7 +357,7 @@ void MetadataParser::process(const Event& event)
 {
     if (event.type->isStateDependent)
     {
-        const auto [it, isEmplaced] = m_ongoingEvents.try_emplace({event.type, event.id});
+        const auto [it, isEmplaced] = m_ongoingEvents.try_emplace(event.type);
         auto& ongoingEvent = it->second;
 
         static_cast<Event&>(ongoingEvent) = event;

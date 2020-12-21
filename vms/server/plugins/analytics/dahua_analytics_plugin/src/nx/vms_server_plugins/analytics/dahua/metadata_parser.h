@@ -30,8 +30,6 @@ public:
     void terminateOngoingEvents();
 
 private:
-    using OngoingEventKey = std::tuple<decltype(Event::type), decltype(Event::id)>;
-
     struct OngoingEvent: Event
     {
         std::optional<Object> singleCausingObject;
@@ -52,7 +50,7 @@ private:
 private:
     DeviceAgent* const m_deviceAgent;
     std::unordered_set<const EventType*> m_neededEventTypes;
-    std::map<OngoingEventKey, OngoingEvent> m_ongoingEvents;
+    std::map<decltype(Event::type), OngoingEvent> m_ongoingEvents;
 };
 
 } // namespace nx::vms_server_plugins::analytics::dahua

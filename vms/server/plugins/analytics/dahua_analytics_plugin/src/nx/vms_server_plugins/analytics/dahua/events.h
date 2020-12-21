@@ -87,7 +87,6 @@ struct Event
 {
     const EventType* type = nullptr;
     std::chrono::milliseconds timestamp;
-    unsigned int id = 0;
     bool isActive = false;
     std::optional<QString> ruleName;
     std::optional<unsigned int> areaId;
