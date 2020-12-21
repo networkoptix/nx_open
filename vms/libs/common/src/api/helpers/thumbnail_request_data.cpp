@@ -78,7 +78,10 @@ void QnThumbnailRequestData::loadFromParams(QnResourcePool* resourcePool,
     request.streamSelectionMode =
         QnLexical::deserialized<nx::api::CameraImageRequest::StreamSelectionMode>(
             params.value(kStreamSelectionModeParam), /*defaultValue*/ request.streamSelectionMode);
-    request.objectTrackId = QnUuid(params.value(kObjectTrackIdParam));
+
+    // NOTE: Currently, there is no way to return an error from this function, thus, we use a safe
+    // conversion here, and rely on the caller to properly handle the null value.
+    request.objectTrackId = QnUuid::fromStringSafe(params.value(kObjectTrackIdParam));
 }
 
 QnRequestParamList QnThumbnailRequestData::toParams() const

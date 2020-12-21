@@ -2948,14 +2948,20 @@ void MediaServerProcess::registerRestHandlers(
      *     non-binary, indentation and spacing will be used to improve readability.
      * %param[default]:enum format
      */
-    reg("ec2/cameraThumbnail", new QnMultiserverThumbnailRestHandler(serverModule(), "ec2/cameraThumbnail"));
+    reg(QnMultiserverThumbnailRestHandler::kCameraThumbnailPath,
+        new QnMultiserverThumbnailRestHandler(
+            serverModule(),
+            QnMultiserverThumbnailRestHandler::RequestType::cameraThumbnail));
 
     /**%apidoc GET /ec2/analyticsTrackBestShot
      * Get the best shot for analytics track
      * %param:string objectTrackId analytics object track id.
      * %param:string cameraId Id of the camera that generated the object track.
      */
-    reg("ec2/analyticsTrackBestShot", new QnMultiserverThumbnailRestHandler(serverModule()));
+    reg(QnMultiserverThumbnailRestHandler::kAnalyticsTrackBestShotPath,
+        new QnMultiserverThumbnailRestHandler(
+            serverModule(),
+            QnMultiserverThumbnailRestHandler::RequestType::analyticsTrackBestShot));
 
     /**%apidoc[proprietary] TODO /ec2/statistics
      * %// TODO: Write apidoc comment.

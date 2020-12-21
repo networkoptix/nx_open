@@ -51,13 +51,24 @@ static QByteArray toMimeSubtype(ImageRequest::ThumbnailFormat format, AVPixelFor
 
 } // namespace
 
-const QString QnMultiserverThumbnailRestHandler::kDefaultPath = "ec2/analyticsTrackBestShot";
+/*static*/ QString QnMultiserverThumbnailRestHandler::pathForRequestType(RequestType requestType)
+{
+    switch (requestType)
+    {
+        case RequestType::cameraThumbnail: return kCameraThumbnailPath;
+        case RequestType::analyticsTrackBestShot: return kAnalyticsTrackBestShotPath;
+    }
+    NX_ASSERT(false, "Unknown QnMultiserverThumbnailRestHandler::RequestType", (int) requestType);
+    return "";
+}
 
 QnMultiserverThumbnailRestHandler::QnMultiserverThumbnailRestHandler(
-    QnMediaServerModule* serverModule, const QString& path)
+    QnMediaServerModule* serverModule,
+    RequestType requestType)
     :
     nx::vms::server::ServerModuleAware(serverModule),
-    m_path(path)
+    m_requestType(requestType),
+    m_path(pathForRequestType(requestType))
 {
 }
 
@@ -202,9 +213,28 @@ int QnMultiserverThumbnailRestHandler::getThumbnailLocal(
     QByteArray& contentType,
     nx::network::http::HttpHeaders* outExtraHeaders) const
 {
-    if (!request.request.objectTrackId.isNull())
-        return getThumbnailForAnalyticsTrack(request, result, contentType, outExtraHeaders);
-    return getThumbnailFromArchive(request, result, contentType, outExtraHeaders);
+    switch (m_requestType)
+    {
+        case RequestType::cameraThumbnail:
+            return getThumbnailFromArchive(request, result, contentType, outExtraHeaders);
+
+        case RequestType::analyticsTrackBestShot:
+            if (request.request.objectTrackId.isNull())
+            {
+                return makeError(nx::network::http::StatusCode::badRequest,
+                    "Parameter objectTrackId is missing or invalid",
+                    &result, &contentType, request.format, request.extraFormatting,
+                    QnRestResult::InvalidParameter);
+            }
+            return getThumbnailForAnalyticsTrack(
+                request, result, contentType, outExtraHeaders);
+    }
+    // Internal error.
+    const QString errorMessage = NX_FMT("Unknown RequestType: %1", (int) m_requestType);
+    NX_ASSERT(false, errorMessage);
+    return makeError(nx::network::http::StatusCode::internalServerError,
+        "Internal error: " + errorMessage,
+        &result, &contentType, request.format, request.extraFormatting);
 }
 
 int QnMultiserverThumbnailRestHandler::getThumbnailForAnalyticsTrack(
