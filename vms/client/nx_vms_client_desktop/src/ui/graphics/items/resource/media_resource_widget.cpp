@@ -2328,7 +2328,7 @@ Qn::ResourceStatusOverlay QnMediaResourceWidget::calculateStatusOverlay() const
         if (m_ioCouldBeShown) /// If widget could be shown then licenses Ok
             return Qn::EmptyOverlay;
 
-        if (d->licenseStatus() != QnLicenseUsageStatus::used)
+        if (!NX_ASSERT(d->camera) || !d->camera->isLicenseUsed())
             return Qn::IoModuleDisabledOverlay;
     }
 
@@ -2673,7 +2673,7 @@ void QnMediaResourceWidget::updateIoModuleVisibility(bool animate)
     const QnImageButtonWidget* const button = titleBar()->rightButtonsBar()->button(Qn::IoModuleButton);
     const bool ioBtnChecked = (button && button->isChecked());
     const bool onlyIoData = !d->hasVideo;
-    const bool correctLicenseStatus = isLicenseUsed();
+    const bool correctLicenseStatus = d->camera && d->camera->isLicenseUsed();
 
     /// TODO: #ynikitenkov It needs to refactor error\status overlays totally!
 
@@ -2880,11 +2880,6 @@ const QnSpeedRange& QnMediaResourceWidget::availableSpeedRange()
 {
     static const QnSpeedRange kAvailableSpeedRange(kMaxForwardSpeed, kMaxBackwardSpeed);
     return kAvailableSpeedRange;
-}
-
-bool QnMediaResourceWidget::isLicenseUsed() const
-{
-    return d->licenseStatus() == QnLicenseUsageStatus::used;
 }
 
 bool QnMediaResourceWidget::isRoiVisible() const

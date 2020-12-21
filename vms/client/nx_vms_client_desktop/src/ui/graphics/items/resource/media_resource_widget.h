@@ -169,8 +169,6 @@ public:
     QnSpeedRange speedRange() const;
     static const QnSpeedRange& availableSpeedRange();
 
-    bool isLicenseUsed() const;
-
     bool isRoiVisible() const;
     void setRoiVisible(bool visible, bool animate);
 
