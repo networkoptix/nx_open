@@ -22,6 +22,7 @@
                 <function>
                     <name>&lt;cameraId&gt;</name>
                     <caption>RTSP Streaming</caption>
+                    <method>PLAY</method>
                     <description>
                         Open RTSP video stream from a camera.
                         It is not exactly an API method but rather a URL format which may contain
