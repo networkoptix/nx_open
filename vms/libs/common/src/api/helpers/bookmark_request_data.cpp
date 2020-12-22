@@ -50,9 +50,7 @@ QnRequestParamList bookmarksToParam(const QnCameraBookmark& bookmark)
     result.insert(kNameParam, bookmark.name);
     result.insert(kDescriptionParam, bookmark.description);
     result.insert(kTimeoutParam, QnLexical::serialized(bookmark.timeout));
-    result.insert(kStartTimeParam, QnLexical::serialized(bookmark.startTimeMs));
     result.insert(kStartTimeMsParam, QnLexical::serialized(bookmark.startTimeMs));
-    result.insert(kDurationParam, QnLexical::serialized(bookmark.durationMs));
     result.insert(kDurationMsParam, QnLexical::serialized(bookmark.durationMs));
     result.insert(kCameraIdParam, bookmark.cameraId.toString());
 
@@ -134,9 +132,7 @@ QnRequestParamList QnGetBookmarksRequestData::toParams() const
 {
     QnRequestParamList result = QnMultiserverRequestData::toParams();
 
-    result.insert(kStartTimeParam, QnLexical::serialized(filter.startTimeMs));
     result.insert(kStartTimeMsParam, QnLexical::serialized(filter.startTimeMs));
-    result.insert(kEndTimeParam, QnLexical::serialized(filter.endTimeMs));
     result.insert(kEndTimeMsParam, QnLexical::serialized(filter.endTimeMs));
     result.insert(kFilterParam, QnLexical::serialized(filter.text));
     result.insert(kLimitParam, QnLexical::serialized(filter.limit));
