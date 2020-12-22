@@ -1460,7 +1460,7 @@
     <message>
       <location/>
       <source>Play audio from all cameras on layout</source>
-      <translation type="unfinished">Play audio from all cameras on layout</translation>
+      <translation>自動同時播放佈局中所有攝影機的聲音輸入</translation>
     </message>
   </context>
   <context>
