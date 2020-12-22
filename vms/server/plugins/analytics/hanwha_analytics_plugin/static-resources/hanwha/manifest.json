@@ -874,7 +874,7 @@
         },
         {
             "id": "nx.hanwha.BoxTemperatureDetection",
-            "name": "Temperature change detection",
+            "name": "Box Temperature Detection",
             "internalName": "BoxTemperatureDetection",
             "description": "Temperature change event %1",
             "positiveState": "started %1",
