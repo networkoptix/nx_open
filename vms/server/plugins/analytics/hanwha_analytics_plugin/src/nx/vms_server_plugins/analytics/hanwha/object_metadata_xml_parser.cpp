@@ -380,11 +380,10 @@ void ObjectMetadataXmlParser::addColorAttributeIfNeeded(
 
     if (wearsMaskAttributeIt == attributes->end())
     {
-        if (!m_notDefinedMaskBoundingBoxColor.isEmpty())
-        {
-            attributes->push_back(makePtr<Attribute>(Attribute::Type::string,
-                "nx.sys.color", m_notDefinedMaskBoundingBoxColor.toStdString()));
-        }
+        if (m_settings.faceMaskDetection.detectionMode == FaceMaskDetection::DetectionMode::noMask)
+            pushMaskColorAttribute(attributes, m_wearingMaskBoundingBoxColor);
+        else
+            pushMaskColorAttribute(attributes, m_notWearingMaskBoundingBoxColor);
     }
     else
     {
