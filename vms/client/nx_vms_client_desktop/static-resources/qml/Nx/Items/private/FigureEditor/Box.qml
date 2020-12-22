@@ -77,8 +77,8 @@ Figure
         x: pointMakerInstrument.startX
         y: pointMakerInstrument.startY
 
-        onXChanged: visible && pointMakerInstrument.setPointX(0, x)
-        onYChanged: visible && pointMakerInstrument.setPointY(0, y)
+        onXChanged: visible && mouseArea.width !== 0 && pointMakerInstrument.setPointX(0, x)
+        onYChanged: visible && mouseArea.height !== 0 && pointMakerInstrument.setPointY(0, y)
     }
 
     PointGrip
@@ -92,8 +92,8 @@ Figure
         x: pointMakerInstrument.endX
         y: pointMakerInstrument.endY
 
-        onXChanged: visible && pointMakerInstrument.setPointX(1, x)
-        onYChanged: visible && pointMakerInstrument.setPointY(1, y)
+        onXChanged: visible && mouseArea.width !== 0 && pointMakerInstrument.setPointX(1, x)
+        onYChanged: visible && mouseArea.height !== 0 && pointMakerInstrument.setPointY(1, y)
     }
 
     PointGrip
