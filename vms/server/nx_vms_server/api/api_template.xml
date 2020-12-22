@@ -349,7 +349,7 @@
                         <br/>
                         Example: ws://10.0.2.1/ec2/transactionBus
                     </description>
-                    <method></method>
+                    <method>GET</method>
                     <params/>
                     <result>
                         <caption>A ready-to-use WebSocket connection, read-only as for now</caption>
@@ -475,7 +475,7 @@
                                     example, <code>POST /api/cookieLogin</code> requires to specify
                                     "GET" for the digest calculation.</li>
                                 </ul>
-                            </li>    
+                            </li>
                             <li><code>digest = md5_hex(user_name + ":" + realm + ":" + password)</code></li>
                             <li><code>partial_ha2 = md5_hex(method + ":")</code></li>
                             <li><code>simplified_ha2 = md5_hex(digest + ":" + nonce + ":" + partial_ha2)</code></li>
