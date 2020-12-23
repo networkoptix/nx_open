@@ -1772,7 +1772,6 @@ void initialize(Manager* manager, Action* root)
         .flags(ScopelessHotkey | HotkeyOnly | Slider | SingleTarget)
         .shortcut(lit("L"))
         .text(ContextMenu::tr("Jump to Live"))
-        .checkable()
         .condition(new ArchiveCondition());
 
     factory(ToggleSyncAction)

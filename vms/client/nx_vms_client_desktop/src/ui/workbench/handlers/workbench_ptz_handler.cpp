@@ -212,8 +212,8 @@ void QnWorkbenchPtzHandler::at_ptzActivatePresetAction_triggered()
 
     if (widget->ptzController()->activatePreset(id, 1.0))
     {
-        if (!widget->dewarpingParams().enabled) // do not jump to live if this is a fisheye camera
-            menu()->trigger(action::JumpToLiveAction); // TODO: #Elric ?
+        if (!widget->dewarpingParams().enabled) //< Do not jump to live if this is a fisheye camera.
+            menu()->trigger(action::JumpToLiveAction, widget);
     }
     else
     {
@@ -261,8 +261,8 @@ void QnWorkbenchPtzHandler::at_ptzActivateTourAction_triggered()
 
     if (widget->ptzController()->activateTour(id))
     {
-        if (!widget->dewarpingParams().enabled) // do not jump to live if this is a fisheye camera
-            menu()->trigger(action::JumpToLiveAction); // TODO: #Elric ?
+        if (!widget->dewarpingParams().enabled) //< Do not jump to live if this is a fisheye camera.
+            menu()->trigger(action::JumpToLiveAction, widget);
     }
     else
     {

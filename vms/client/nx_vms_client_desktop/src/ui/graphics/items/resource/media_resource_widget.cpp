@@ -2855,9 +2855,7 @@ void QnMediaResourceWidget::setPtzMode(bool value)
     if (ptzEnabled)
     {
         titleBar()->rightButtonsBar()->setButtonsChecked(Qn::PtzButton, true);
-
-        // TODO: #gdm evil hack! Won't work if SYNC is off and this item is not selected.
-        menu()->trigger(action::JumpToLiveAction);
+        menu()->trigger(action::JumpToLiveAction, this);
     }
 
     setOption(ControlPtz, ptzEnabled);
@@ -3240,23 +3238,8 @@ void QnMediaResourceWidget::configureTriggerButton(SoftwareTriggerButton* button
     connect(button, &SoftwareTriggerButton::clicked, this,
         [this, button, workbenchDisplay = QnWorkbenchContextAware::display()]()
         {
-            if (button->isLive())
-                return;
-
-            const auto syncAction = action(action::ToggleSyncAction);
-            const bool sync = syncAction->isEnabled() && syncAction->isChecked();
-
-            if (sync || workbenchDisplay->widget(Qn::CentralRole) == this)
-            {
-                menu()->trigger(action::JumpToLiveAction);
-            }
-            else if (auto reader = display()->archiveReader())
-            {
-                // TODO: Refactor workbench navigator to avoid switching to live in different places.
-                reader->jumpTo(DATETIME_NOW, 0);
-                reader->setSpeed(1.0);
-                reader->resumeMedia();
-            }
+            if (!button->isLive())
+                menu()->trigger(action::JumpToLiveAction, this);
         });
 }
 

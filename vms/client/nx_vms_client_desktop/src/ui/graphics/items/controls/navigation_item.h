@@ -45,7 +45,7 @@ private slots:
     void updateBookButtonEnabled();
 
     bool at_speedSlider_wheelEvent(QGraphicsSceneWheelEvent* event);
-    void at_liveButton_clicked();
+    void at_jumpToLiveAction_triggered();
     void at_syncButton_clicked();
     void at_stepBackwardButton_clicked();
     void at_stepForwardButton_clicked();
@@ -56,6 +56,7 @@ protected:
     virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget) override;
 
 private:
+    QnImageButtonWidget* newButton(nx::vms::client::desktop::ui::action::IDType id);
     QnImageButtonWidget* newActionButton(nx::vms::client::desktop::ui::action::IDType id);
 
     bool isTimelineRelevant() const;
