@@ -14,18 +14,10 @@ class QnMultiserverThumbnailRestHandler:
     public /*mixin*/ nx::vms::server::ServerModuleAware
 {
 public:
-    static constexpr char kCameraThumbnailPath[] = "ec2/cameraThumbnail";
-    static constexpr char kAnalyticsTrackBestShotPath[] = "ec2/analyticsTrackBestShot";
-
-    enum class RequestType
-    {
-        cameraThumbnail,
-        analyticsTrackBestShot,
-    };
+    static const QString kDefaultPath;
 
     QnMultiserverThumbnailRestHandler(
-        QnMediaServerModule* serverModule,
-        RequestType requestType);
+        QnMediaServerModule* serverModule, const QString& path = kDefaultPath);
 
     virtual int executeGet(
         const QString& path,
@@ -74,9 +66,6 @@ private:
         QByteArray& contentType,
         nx::network::http::HttpHeaders* outExtraHeaders) const;
 
-    static QString pathForRequestType(RequestType requestType);
-
 private:
-    const RequestType m_requestType;
     const QString m_path;
 };

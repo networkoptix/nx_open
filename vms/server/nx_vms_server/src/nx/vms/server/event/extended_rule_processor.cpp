@@ -680,8 +680,7 @@ ExtendedRuleProcessor::TimespampedFrame ExtendedRuleProcessor::getEventScreensho
     request.size = dstSize;
     request.roundMethod = nx::api::CameraImageRequest::RoundMethod::precise;
 
-    QnMultiserverThumbnailRestHandler handler(
-        serverModule(), QnMultiserverThumbnailRestHandler::RequestType::cameraThumbnail);
+    QnMultiserverThumbnailRestHandler handler(serverModule());
     TimespampedFrame timestemedFrame;
     //qint64 frameTimestampUsec = 0;
     QByteArray contentType;
