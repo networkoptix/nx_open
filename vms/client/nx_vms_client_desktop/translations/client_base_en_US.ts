@@ -499,14 +499,6 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Show Info</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Hide Info</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>PTZ...</source>
         <translation></translation>
     </message>
@@ -997,6 +989,13 @@ to view more bookmarks</source>
     <message>
         <source>Pin</source>
         <translation></translation>
+    </message>
+    <message numerus="yes">
+        <source>Show on Items</source>
+        <translation>
+            <numerusform>Show on Item</numerusform>
+            <numerusform>Show on Items</numerusform>
+        </translation>
     </message>
 </context>
 <context>
@@ -1607,6 +1606,10 @@ to view more bookmarks</source>
     </message>
     <message>
         <source>Focusing...</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>PTZ can only be used in the live mode</source>
         <translation></translation>
     </message>
 </context>
@@ -10001,6 +10004,21 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>%1 (active)</source>
         <comment>Template for active PTZ tour</comment>
+        <translation></translation>
+    </message>
+</context>
+<context>
+    <name>nx::vms::client::desktop::ui::action::ShowOnItemsFactory</name>
+    <message>
+        <source>Info</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Objects</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Regions of Interest</source>
         <translation></translation>
     </message>
 </context>
