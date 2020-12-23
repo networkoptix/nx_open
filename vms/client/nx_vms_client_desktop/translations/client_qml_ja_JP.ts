@@ -94,7 +94,7 @@
     </message>
     <message>
       <source>Refresh</source>
-      <translation>リフレッシュ</translation>
+      <translation>再読み込み</translation>
     </message>
     <message>
       <source>Refreshing...</source>

@@ -90,7 +90,7 @@
     <message>
       <location/>
       <source>Maximum Live Buffer Length</source>
-      <translation>最大ライブ バッファーの長さ</translation>
+      <translation>ライブバッファー上限値</translation>
     </message>
     <message>
       <location/>
@@ -202,7 +202,7 @@
     <message>
       <location filename="../src/ui/dialogs/audit_log_dialog.ui"/>
       <source>Refresh</source>
-      <translation>リフレッシュ</translation>
+      <translation>再読み込み</translation>
     </message>
     <message>
       <location/>
@@ -455,7 +455,7 @@
     <message>
       <location filename="../src/ui/dialogs/private/search_bookmarks_dialog.ui"/>
       <source>Refresh</source>
-      <translation>リフレッシュ</translation>
+      <translation>再読み込み</translation>
     </message>
     <message>
       <location/>
@@ -562,7 +562,7 @@
     <message>
       <location/>
       <source>Refresh</source>
-      <translation>リフレッシュ</translation>
+      <translation>再読み込み</translation>
     </message>
   </context>
   <context>
@@ -578,12 +578,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_expert_settings_widget.ui"/>
       <source>Do not archive primary stream</source>
-      <translation>プライマリーストリームのアーカイブを行わない</translation>
+      <translation>プライマリーストリームを録画しない</translation>
     </message>
     <message>
       <location/>
       <source>Do not archive secondary stream</source>
-      <translation>セカンダリーストリームのアーカイブを行わない</translation>
+      <translation>セカンダリーストリームを録画しない</translation>
     </message>
     <message>
       <location/>
@@ -673,7 +673,7 @@
     <message>
       <location/>
       <source>Force motion detection for stream</source>
-      <translation>ストリームのモーション検知を使用</translation>
+      <translation>強制的にモーション検知を行う</translation>
     </message>
     <message>
       <location/>
@@ -812,7 +812,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_license_panel_widget.ui"/>
       <source>Activate License...</source>
-      <translation>ライセンスアクティベート...</translation>
+      <translation>ライセンスの有効化...</translation>
     </message>
   </context>
   <context>
@@ -869,7 +869,7 @@
     <message>
       <location/>
       <source>Activate License...</source>
-      <translation>ライセンスアクティベート...</translation>
+      <translation>ライセンスの有効化...</translation>
     </message>
     <message>
       <location/>
@@ -1164,7 +1164,7 @@
     <message>
       <location/>
       <source>Refresh</source>
-      <translation>リフレッシュ</translation>
+      <translation>再読み込み</translation>
     </message>
     <message>
       <location/>
@@ -1415,12 +1415,12 @@
     <message>
       <location/>
       <source>after</source>
-      <translation>後</translation>
+      <translation>非アクティブ状態</translation>
     </message>
     <message>
       <location/>
       <source>Minutes of Inactivity</source>
-      <translation>分後</translation>
+      <translation>分継続後</translation>
     </message>
     <message>
       <location/>
@@ -1455,12 +1455,12 @@
     <message>
       <location/>
       <source>Run Application when PC Boots up</source>
-      <translation>PC が起動時にアプリケーション起動</translation>
+      <translation>PC 起動時にアプリケーション起動</translation>
     </message>
     <message>
       <location/>
       <source>Play audio from all cameras on layout</source>
-      <translation>レイアウト上のすべてのカメラからオーディオを再生する</translation>
+      <translation>レイアウト上のすべてのカメラから音声を再生する</translation>
     </message>
   </context>
   <context>
@@ -1664,7 +1664,7 @@
     <message>
       <location/>
       <source>Logical ID</source>
-      <translation>論理ID</translation>
+      <translation>自定義ID</translation>
     </message>
     <message>
       <location/>
@@ -1840,7 +1840,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/license_widget.ui"/>
       <source>Manual Activation</source>
-      <translation>マニュアルアクティベート</translation>
+      <translation>オフライン認証</translation>
     </message>
     <message>
       <location/>
@@ -1860,7 +1860,7 @@
     <message>
       <location/>
       <source>Activate Free License</source>
-      <translation>アクティベートフリーライセンス</translation>
+      <translation>無料ライセンスの有効化</translation>
     </message>
     <message>
       <location/>
@@ -1885,7 +1885,7 @@
     <message>
       <location/>
       <source>Activation Key File</source>
-      <translation>アクティベートキーファイル：</translation>
+      <translation>ライセンスファイル:</translation>
     </message>
     <message>
       <location/>
@@ -2106,7 +2106,7 @@
     <message>
       <location/>
       <source>New Virtual Camera...</source>
-      <translation>新規バーチャルカメラ</translation>
+      <translation>新規仮想カメラ...</translation>
     </message>
   </context>
   <context>
@@ -2704,7 +2704,7 @@
     <message>
       <location/>
       <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
-      <translation>&quot;最高&quot;の画質と解像度には、スペックの高いPCを推奨します</translation>
+      <translation>高解像度で&quot;最高&quot;品質の録画を行う場合、スペックの高いPCを推奨します。</translation>
     </message>
     <message>
       <location/>
@@ -2719,7 +2719,7 @@
     <message>
       <location/>
       <source>Recording Quality</source>
-      <translation>録画画質:</translation>
+      <translation>録画品質</translation>
     </message>
     <message>
       <location/>
@@ -3038,7 +3038,7 @@
     <message>
       <location/>
       <source>Advanced settings...</source>
-      <translation>拡張設定...</translation>
+      <translation>詳細設定...</translation>
     </message>
     <message>
       <location/>
@@ -3117,7 +3117,7 @@
     <message>
       <location/>
       <source>Forecast for Full Storage Usage</source>
-      <translation>ストレージ使用率を予測</translation>
+      <translation>ストレージ使用量の予測</translation>
     </message>
     <message>
       <location/>
@@ -3132,7 +3132,7 @@
     <message>
       <location/>
       <source>Base forecast on data recorded during</source>
-      <translation>期間中に記録されたデータの基本予測</translation>
+      <translation>次の期間内の録画データに基づく予測</translation>
     </message>
   </context>
   <context>
@@ -3431,7 +3431,7 @@
     <message>
       <location/>
       <source>Detect motion</source>
-      <translation>動きを検知する</translation>
+      <translation>モーション検知を行う</translation>
     </message>
   </context>
   <context>
@@ -3472,7 +3472,7 @@
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation>フォルダをアップロード...</translation>
+      <translation>フォルダーをアップロード...</translation>
     </message>
   </context>
   <context>
@@ -3508,7 +3508,7 @@
     <message>
       <location/>
       <source>Note: Schedule is based on server time.</source>
-      <translation>注: スケジュールはサーバー時間を使用.</translation>
+      <translation>注: スケジュールはサーバー時刻に依存します。</translation>
     </message>
   </context>
   <context>

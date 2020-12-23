@@ -279,7 +279,7 @@
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation>アップロードするフォルダを選択</translation>
+      <translation>アップロードするフォルダーを選択</translation>
     </message>
   </context>
   <context>

@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>This account is not activated. Please check your email.</source>
-      <translation>このアカウントはアクティベートされていません　メール アドレスを確認してください</translation>
+      <translation>このアカウントは有効化されていません。メールアドレスを確認してください。</translation>
     </message>
     <message>
       <source>Credentials are no longer valid.</source>

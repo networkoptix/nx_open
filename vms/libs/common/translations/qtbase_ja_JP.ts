@@ -447,11 +447,11 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Create New Folder</source>
-      <translation>新しいフォルダの作成</translation>
+      <translation>新しいフォルダーの作成</translation>
     </message>
     <message>
       <source>Create a New Folder</source>
-      <translation>新しいフォルダの作成</translation>
+      <translation>新しいフォルダーの作成</translation>
     </message>
     <message>
       <source>List View</source>
@@ -527,7 +527,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>&amp;New Folder</source>
-      <translation>新しいフォルダ(&amp;N)</translation>
+      <translation>新しいフォルダー(&amp;N)</translation>
     </message>
     <message>
       <source>All files (*)</source>
@@ -561,7 +561,7 @@ Please verify the correct file name was given.</source>
     </message>
     <message>
       <source>New Folder</source>
-      <translation>新しいフォルダ</translation>
+      <translation>新しいフォルダー</translation>
     </message>
     <message>
       <source>Delete</source>
@@ -609,12 +609,12 @@ Do you want to delete it anyway?</source>
     <message>
       <source>File Folder</source>
       <comment>Match Windows Explorer</comment>
-      <translation>ファイルフォルダ</translation>
+      <translation>ファイルフォルダー</translation>
     </message>
     <message>
       <source>Folder</source>
       <comment>All other platforms</comment>
-      <translation>フォルダ</translation>
+      <translation>フォルダー</translation>
     </message>
     <message>
       <source>Alias</source>

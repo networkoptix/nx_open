@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>less than an hour</source>
-      <translation>1時間以内</translation>
+      <translation>1時間未満</translation>
     </message>
   </context>
   <context>
@@ -1096,7 +1096,7 @@
     <message>
       <source>mos</source>
       <comment>Long suffix for displaying months</comment>
-      <translation>月</translation>
+      <translation>ヶ月</translation>
     </message>
     <message>
       <source>yrs</source>
@@ -1149,7 +1149,7 @@
       <source>months</source>
       <comment>Full suffix for displaying months</comment>
       <translation>
-        <numerusform> 月</numerusform>
+        <numerusform>ヶ月</numerusform>
       </translation>
     </message>
     <message numerus="yes">

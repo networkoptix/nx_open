@@ -860,7 +860,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation>フォルダをアップロード...</translation>
+      <translation>フォルダーをアップロード...</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
@@ -928,11 +928,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Virtual Camera...</source>
-      <translation>バーチャルカメラ</translation>
+      <translation>仮想カメラ</translation>
     </message>
     <message>
       <source>New Virtual Camera...</source>
-      <translation>新規バーチャルカメラ</translation>
+      <translation>新規仮想カメラ...</translation>
     </message>
     <message>
       <source>Show Tree</source>
@@ -1263,7 +1263,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Failed to activate license</source>
-      <translation>ライセンスのアクティベートに失敗しました</translation>
+      <translation>ライセンスの有効化に失敗しました</translation>
     </message>
     <message>
       <source>Invalid data received.</source>
@@ -1283,11 +1283,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Invalid activation key file</source>
-      <translation>無効なアクティベーション キー ファイル</translation>
+      <translation>無効なライセンスファイル</translation>
     </message>
     <message>
       <source>Select a valid activation key file to continue.</source>
-      <translation>続けるには有効なアクティベートキー ファイルを選択してください</translation>
+      <translation>続行するには、有効なライセンスファイルを選択してください。</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1</source>
@@ -1299,11 +1299,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>License already activated on another server</source>
-      <translation>ライセンスは既に別のサーバーでアクティベートされています</translation>
+      <translation>ライセンスは既に別のサーバーで使用されています</translation>
     </message>
     <message>
       <source>You already activated this license</source>
-      <translation>ライセンスは既にアクティベートされています</translation>
+      <translation>このライセンスは既に有効化されています</translation>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
@@ -1859,7 +1859,7 @@ to view more bookmarks</source>
       <source>Details for %n sessions of %1</source>
       <comment>Total number will be substituted as %1</comment>
       <translation>
-        <numerusform>%1 の %n セッションの詳細</numerusform>
+        <numerusform>%1 個のうち %n セッションの詳細</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1966,7 +1966,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Click to expand</source>
-      <translation>クリックで拡張</translation>
+      <translation>クリックで展開</translation>
     </message>
     <message>
       <source>Device updated</source>
@@ -2006,7 +2006,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Filled circle mark means the archive is still available</source>
-      <translation>塗りつぶしの丸マークの意味はアーカイブはまだ利用可能</translation>
+      <translation>塗りつぶされた丸のマークは、録画がまだ参照可能であることを表します。</translation>
     </message>
     <message>
       <source>Update installed</source>
@@ -2642,7 +2642,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Logical ID</source>
-      <translation>論理ID</translation>
+      <translation>自定義ID</translation>
     </message>
   </context>
   <context>
@@ -3513,7 +3513,7 @@ to %1</source>
     </message>
     <message>
       <source>Folder already added</source>
-      <translation>フィールドはすでに追加されています</translation>
+      <translation>指定したフォルダーは既に追加されています。</translation>
     </message>
     <message>
       <source>None</source>
@@ -3891,11 +3891,11 @@ to %1</source>
     </message>
     <message>
       <source>Please activate your commercial or trial license.</source>
-      <translation>ライセンスをアクティベートしてください</translation>
+      <translation>ライセンスを有効化してください</translation>
     </message>
     <message>
       <source>Please activate your commercial license.</source>
-      <translation>ライセンスをアクティベートしてください</translation>
+      <translation>ライセンスを有効化してください。</translation>
     </message>
     <message>
       <source>Export</source>
@@ -3950,11 +3950,11 @@ to %1</source>
     <name>QnLicenseWidget</name>
     <message>
       <source>Activate Trial License</source>
-      <translation>トライアルライセンスのアクティベート</translation>
+      <translation>試用ライセンスの有効化</translation>
     </message>
     <message>
       <source>Activate Free License</source>
-      <translation>フリーライセンスのアクティベート</translation>
+      <translation>無料ライセンスの有効化</translation>
     </message>
     <message>
       <source>Open License File</source>
@@ -4141,7 +4141,7 @@ to %1</source>
     </message>
     <message>
       <source>This option will not affect Recording Schedule. Recording Schedule is always based on Server Time.</source>
-      <translation>このオプションは録画スケジュールには反映されません　録画スケジュールはサーバー時間で行われます.</translation>
+      <translation>このオプションは録画スケジュールには反映されません。録画スケジュールはサーバー時刻に基づきます。</translation>
     </message>
     <message>
       <source>Select File...</source>
@@ -4390,15 +4390,15 @@ to %1</source>
     </message>
     <message>
       <source>Virtual Camera</source>
-      <translation>バーチャルカメラ</translation>
+      <translation>仮想カメラ</translation>
     </message>
     <message>
       <source>Virtual Camera %1</source>
-      <translation>バーチャルカメラ%1</translation>
+      <translation>仮想カメラ %1</translation>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;バーチャルカメラ&quot; はビデオファイル用の仮想ストレージで、システム上のどのサーバーにもアップロードでき、どのユーザーでもアクセスできます。</translation>
+      <translation>&quot;仮想カメラ&quot; はビデオファイル用の仮想ストレージです。システム上のどのサーバーにもアップロードでき、どのユーザーでもアクセスできます。</translation>
     </message>
   </context>
   <context>
@@ -4777,7 +4777,7 @@ to %1</source>
     </message>
     <message>
       <source>Calendar Days</source>
-      <translation>カレンダー</translation>
+      <translation>日数</translation>
     </message>
     <message>
       <source>%1 Mbps</source>
@@ -5378,7 +5378,7 @@ to %1</source>
     </message>
     <message>
       <source>System Signature</source>
-      <translation>システムの署名</translation>
+      <translation>システム識別情報</translation>
     </message>
     <message>
       <source>Support Signature</source>
@@ -5409,7 +5409,7 @@ to %1</source>
     </message>
     <message>
       <source>System Signature</source>
-      <translation>システムの署名</translation>
+      <translation>システム識別情報</translation>
     </message>
     <message>
       <source>Support Signature</source>
@@ -5592,7 +5592,7 @@ to %1</source>
     </message>
     <message>
       <source>Refresh</source>
-      <translation>リフレッシュ</translation>
+      <translation>再読み込み</translation>
     </message>
     <message>
       <source>Export selected events to file</source>
@@ -5628,7 +5628,7 @@ to %1</source>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation>録画が有効になっているカメラでのみ使用可能な予測</translation>
+      <translation>録画が有効になっているカメラのみ予測可能です。</translation>
     </message>
   </context>
   <context>
@@ -5703,7 +5703,7 @@ to %1</source>
     </message>
     <message>
       <source>Reindexing is only necessary if your archive folders have been moved, renamed or deleted.</source>
-      <translation>アーカイブ フォルダーの移動、名前の変更または削除された場合、インデックスのリビルドが必要です</translation>
+      <translation>録画フォルダーの移動、名称変更、削除が行われた場合に限り、アーカイブの再インデックスが必要になります。</translation>
     </message>
     <message>
       <source>You can cancel this operation at any moment without data loss.</source>
@@ -5886,7 +5886,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnStorageUrlDialog</name>
     <message>
       <source>\\&lt;Computer Name&gt;\&lt;Folder&gt;</source>
-      <translation>\ &lt; コンピューター名 &gt; \ &lt; フォルダー &gt;</translation>
+      <translation>\\ &lt; コンピューター名 &gt; \ &lt; フォルダー &gt;</translation>
     </message>
     <message>
       <source>Network Shared Resource</source>
@@ -5992,7 +5992,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Any configuration changes except license activation are impossible.</source>
-      <translation>ライセンスアクティベート以外の設定変更は許可されません</translation>
+      <translation>ライセンス有効化以外の設定変更は許可されません。</translation>
     </message>
     <message>
       <source>You have no licenses.</source>
@@ -6739,7 +6739,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>System is in Safe Mode. It is not allowed to make any changes except license activation.</source>
-      <translation>システムは、セーフモードです。ライセンスのアクティベート以外の変更はできません</translation>
+      <translation>システムはセーフモードです。ライセンス有効化以外の変更はできません。</translation>
     </message>
   </context>
   <context>
@@ -6891,7 +6891,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Activate one more license to start Video Wall control session.</source>
-      <translation>ビデオウォール コントロール セッションを開始するには 最低１つのライセンスをアクティベートします</translation>
+      <translation>ビデオウォール コントロール セッションを開始するには、専用ライセンスを１つ以上有効化してください。</translation>
     </message>
     <message>
       <source>Enter the name of Video Wall to create:</source>
@@ -6899,7 +6899,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Activate License...</source>
-      <translation>ライセンスアクティベート...</translation>
+      <translation>ライセンスの有効化...</translation>
     </message>
   </context>
   <context>
@@ -6918,7 +6918,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No video files found in selected folder</source>
-      <translation>選択したフォルダにビデオファイルがありません</translation>
+      <translation>選択したフォルダーにビデオファイルがありません</translation>
     </message>
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
@@ -6958,7 +6958,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>No new files to upload in selected folder</source>
-      <translation>選択したフォルダにアップロードする新しいファイルがありません</translation>
+      <translation>選択したフォルダーには、アップロードできる新しいファイルがありません</translation>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
@@ -7024,16 +7024,16 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Failed to add virtual camera</source>
-      <translation>バーチャルカメラの追加に失敗しました</translation>
+      <translation>仮想カメラの追加に失敗しました</translation>
     </message>
     <message>
       <source>Open Virtual Camera Recordings...</source>
-      <translation>バーチャルカメラ録画を開く...</translation>
+      <translation>仮想カメラの録画ファイルを開く...</translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
       <translation>
-        <numerusform>これらのファイルは別のバーチャルカメラにアップロードできます。</numerusform>
+        <numerusform>これらのファイルは別の仮想カメラにアップロードできます。</numerusform>
       </translation>
     </message>
     <message>
@@ -7244,7 +7244,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
       <translation>
-        <numerusform>一部のビデオファイルはバーチャルカメラ %n にアップロードされています</numerusform>
+        <numerusform>一部のファイルは%n個の仮想カメラにアップロード中です:</numerusform>
       </translation>
     </message>
   </context>
@@ -7831,11 +7831,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation>モーション検知は無効です。すべてのスケジュール録画 &quot;モーション&quot; と&quot;モーション + Lo-Res&quot; は&quot;Always&quot; に変更されます。</translation>
+      <translation>モーション検知が無効になっています。スケジュール録画の &quot;モーションのみ&quot; と&quot;常時低 ＋ モーション高解像度&quot; は&quot;常時録画&quot; に変更されます。</translation>
     </message>
     <message>
       <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation>デュアルストリーミングは無効です。すべてのスケジュール録画&quot;モーション + Lo-Res&quot;は&quot;Always&quot;に変更されます。</translation>
+      <translation>デュアルストリーミングが無効です。すべての&quot;常時低 ＋ モーション高解像度&quot;録画は&quot;常時録画&quot;に変更されます。</translation>
     </message>
   </context>
   <context>
@@ -8303,7 +8303,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::FilenamePanel</name>
     <message>
       <source>Folder</source>
-      <translation>フォルダ</translation>
+      <translation>フォルダー</translation>
     </message>
     <message>
       <source>Name</source>
@@ -8411,7 +8411,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation>アップロードするフォルダを選択</translation>
+      <translation>アップロードするフォルダーを選択</translation>
     </message>
   </context>
   <context>
@@ -9447,7 +9447,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n motion events</source>
       <translation>
-        <numerusform>%n モーションイベント</numerusform>
+        <numerusform>%n 個のモーションイベント</numerusform>
       </translation>
     </message>
   </context>
@@ -9594,7 +9594,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::WearableCameraMotionWidget</name>
     <message>
       <source>Motion is being detected only during video uploading.</source>
-      <translation>動画のアップロード中にのみモーションが検出されています。</translation>
+      <translation>動画のアップロード時のみモーション検出を行います。</translation>
     </message>
     <message>
       <source>Enabling or disabling this setting does not change anything in the existing archive.</source>
@@ -9994,7 +9994,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Virtual Cameras cannot be moved between servers</source>
-      <translation>バーチャルカメラはサーバー間で移動できません</translation>
+      <translation>仮想カメラはサーバー間で移動できません</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
@@ -10235,7 +10235,7 @@ You can select another storage location in the &quot;Storage Management&quot; ta
     </message>
     <message>
       <source>Open Containing Folder</source>
-      <translation>コンテナフォルダーを開く</translation>
+      <translation>ファイルの保存先を開く</translation>
     </message>
     <message>
       <source>Stop file downloading?</source>
