@@ -208,6 +208,8 @@ public:
 
     void setAnalyticsFilter(const nx::analytics::db::Filter& value);
 
+    bool isPlayingLive() const;
+
 signals:
     void motionSelectionChanged();
     void areaSelectionTypeChanged();

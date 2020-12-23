@@ -161,6 +161,8 @@ private:
     QString actionText(QnMediaResourceWidget* widget) const;
     void updateActionText(QnMediaResourceWidget* widget);
 
+    bool checkPlayingLive(QnMediaResourceWidget* widget) const;
+
 private:
     struct PtzData
     {
@@ -243,4 +245,5 @@ private:
     QHash<QnMediaResourceWidget*, QTimer*> m_hideActionTextTimers;
 
     QPointer<QnGraphicsMessageBox> m_noAdvancedPtzWarning;
+    mutable QPointer<QnGraphicsMessageBox> m_ptzInArchiveMessageBox;
 };

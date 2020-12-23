@@ -2492,6 +2492,11 @@ void QnMediaResourceWidget::updateAspectRatio()
     setAspectRatio(aspectRatio);
 }
 
+bool QnMediaResourceWidget::isPlayingLive() const
+{
+    return d->isPlayingLive();
+}
+
 void QnMediaResourceWidget::at_camDisplay_liveChanged()
 {
     const bool isPlayingLive = d->display()->camDisplay()->isRealTimeSource();

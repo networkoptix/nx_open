@@ -1447,7 +1447,7 @@ void PtzInstrument::toggleContinuousPtz(DirectionFlag direction, bool on)
         return;
 
     const auto widget = qobject_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
-    if (!widget || m_externalPtzDirections.testFlag(direction) == on)
+    if (!widget || !checkPlayingLive(widget) || m_externalPtzDirections.testFlag(direction) == on)
         return;
 
     NX_VERBOSE(this, "Toggle continuous PTZ: %1 %2",
@@ -1544,6 +1544,11 @@ bool PtzInstrument::wheelEvent(QGraphicsScene* /*scene*/, QGraphicsSceneWheelEve
     if (!widget || m_dataByWidget.value(widget).isFisheye())
         return false;
 
+    // Wheel events should not be delivered here in non-live mode,
+    // but for additional safety this check is added.
+    if (!checkPlayingLive(widget))
+        return true;
+
     widget->selectThisWidget();
     setTarget(widget);
 
@@ -1561,4 +1566,18 @@ bool PtzInstrument::wheelEvent(QGraphicsScene* /*scene*/, QGraphicsSceneWheelEve
     m_wheelZoomDirection = newDirection;
     updateExternalPtzSpeed();
     return true;
+}
+
+bool PtzInstrument::checkPlayingLive(QnMediaResourceWidget* widget) const
+{
+    if (widget->isPlayingLive())
+        return true;
+
+    if (!m_ptzInArchiveMessageBox)
+    {
+        m_ptzInArchiveMessageBox = QnGraphicsMessageBox::information(
+            tr("PTZ can only be used in the live mode"));
+    }
+
+    return false;
 }
