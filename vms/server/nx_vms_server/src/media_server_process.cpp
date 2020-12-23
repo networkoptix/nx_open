@@ -2946,13 +2946,19 @@ void MediaServerProcess::registerRestHandlers(
      *     server.
      * %param[proprietary]:option extraFormatting If present and the requested result format is
      *     non-binary, indentation and spacing will be used to improve readability.
+     * %param[proprietary]:string objectTrackId Analytics Object Track id.
+     *     %// ATTENTION: This param is used by the Client to retrieve best-shots. The Client must
+     *         be changed to use /ec2/analyticsTrackBestShot function instead of this one, and then
+     *         support from this param must be removed from the handler of this function.
      * %param[default]:enum format
      */
     reg("ec2/cameraThumbnail", new QnMultiserverThumbnailRestHandler(serverModule(), "ec2/cameraThumbnail"));
 
     /**%apidoc GET /ec2/analyticsTrackBestShot
-     * Get the best shot for analytics track
-     * %param:string objectTrackId analytics object track id.
+     * Get the best shot for the Analytics Object Track.
+     * %param:string objectTrackId Analytics Object Track id.
+     *     %// ATTENTION: Logically, this param is mandatory, but technically it's optional, and
+     *         missing and/or invalid values lead to assertion failures and incorrect diagnostics.
      * %param:string cameraId Id of the camera that generated the object track.
      */
     reg("ec2/analyticsTrackBestShot", new QnMultiserverThumbnailRestHandler(serverModule()));
