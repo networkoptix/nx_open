@@ -19,6 +19,8 @@
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOpenGLVertexArrayObject>
 #include <QtGui/QOpenGLBuffer>
+#include <QtGui/QPaintDevice>
+#include <QtGui/QPaintEngine>
 
 #include <QtCore/QtMath>
 #include <QtCore/QElapsedTimer>
@@ -249,6 +251,8 @@ struct GraphicsQmlView::Private
     void initializeFbo();
     void scheduleUpdateSizes();
     void paintQml();
+
+    static QSize rounded(const QSizeF& size);
 };
 
 GraphicsQmlView::GraphicsQmlView(QGraphicsItem* parent, Qt::WindowFlags wFlags):
@@ -364,7 +368,7 @@ bool GraphicsQmlView::Private::isFboInitializationRequired()
     if (!quickWindow)
         return false;
 
-    const QSize requiredSize = quickWindow->size() * qApp->devicePixelRatio();
+    const QSize requiredSize = rounded(QSizeF(quickWindow->size()) * qApp->devicePixelRatio());
 
     if (fbo && fbo->size() == requiredSize)
         return false;
@@ -381,7 +385,7 @@ bool GraphicsQmlView::Private::isFboInitializationRequired()
 
 void GraphicsQmlView::Private::initializeFbo()
 {
-    const QSize requiredSize = quickWindow->size() * qApp->devicePixelRatio();
+    const QSize requiredSize = rounded(QSizeF(quickWindow->size()) * qApp->devicePixelRatio());
 
     QScopedPointer<QOpenGLFramebufferObject> newFbo(
         new QOpenGLFramebufferObject(
@@ -449,14 +453,14 @@ void GraphicsQmlView::Private::updateSizes()
     if (!rootItem || !quickWindow)
         return;
 
-    const auto size = view->size();
+    const QSize size = rounded(view->size());
     rootItem->setSize(size);
 
     QPoint offset;
     QWindow* w = renderControl->renderWindow(&offset);
     const QPoint pos = w ? w->mapToGlobal(offset) : offset;
 
-    quickWindow->setGeometry(pos.x(), pos.y(), qCeil(size.width()), qCeil(size.height()));
+    quickWindow->setGeometry(pos.x(), pos.y(), size.width(), size.height());
 }
 
 void GraphicsQmlView::Private::ensureOffscreen()
@@ -518,6 +522,11 @@ void GraphicsQmlView::Private::ensureVao(QnTextureGLShaderProgram* shader)
     vertices.release();
 
     vaoInitialized = true;
+}
+
+QSize GraphicsQmlView::Private::rounded(const QSizeF& size)
+{
+    return QSize(qCeil(size.width()), qCeil(size.height()));
 }
 
 void GraphicsQmlView::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
@@ -656,7 +665,9 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
 
     const auto glWidget = qobject_cast<QOpenGLWidget*>(scene()->views().first()->viewport());
 
-    auto channelRect = rect();
+    const QSizeF outputSize = d->fboTimer.isValid()
+        ? size()
+        : QSizeF(Private::rounded(size()));
 
     d->paintQml();
 
@@ -675,15 +686,17 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
     functions->glActiveTexture(GL_TEXTURE0);
     functions->glBindTexture(GL_TEXTURE_2D, d->fbo->texture());
 
-    const auto filter = d->fboTimer.isValid() ? GL_LINEAR : GL_NEAREST;
+    const auto devicePixelRatio = painter->paintEngine()->paintDevice()->devicePixelRatioF();
+    const auto naturalFboSize = outputSize * devicePixelRatio;
+    const auto filter = QSizeF(d->fbo->size()) == naturalFboSize ? GL_NEAREST : GL_LINEAR;
     functions->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
     functions->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
 
     const GLfloat posArray[kQuadArrayLength] = {
-        (float)channelRect.left(), (float)channelRect.bottom(),
-        (float)channelRect.right(), (float)channelRect.bottom(),
-        (float)channelRect.right(), (float)channelRect.top(),
-        (float)channelRect.left(), (float)channelRect.top()
+        0.0f, (float)outputSize.height(),
+        (float)outputSize.width(), (float)outputSize.height(),
+        (float)outputSize.width(), 0.0f,
+        0.0f, 0.0f
     };
 
     const auto shaderColor = QVector4D(1.0, 1.0, 1.0, painter->opacity());

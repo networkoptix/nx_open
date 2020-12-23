@@ -9,6 +9,7 @@
 #include <QtWidgets/QGraphicsSceneMouseEvent>
 #include <QtWidgets/QApplication>
 
+#include <client/client_show_once_settings.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/scoped_painter_rollback.h>
 #include <nx/utils/math/fuzzy.h>
@@ -40,6 +41,7 @@
 
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/ui/common/custom_cursors.h>
+#include <nx/vms/client/desktop/ui/graphics/items/overlays/ptz_promo_overlay.h>
 #include <nx/vms/client/desktop/workbench/watchers/keyboard_modifiers_watcher.h>
 
 using nx::vms::client::core::Geometry;
@@ -64,6 +66,8 @@ const qreal itemUnzoomThreshold = 0.975; /* In sync with hardcoded constant in w
 
 // Key to store if we already displayed ptz redirect warning on the current layout.
 static const char* kPtzRedirectLockedLayoutWarningKey = "__ptz_redirect_locked_warning";
+
+static const QString kPtzPromoShowOnceKey = "NewPtzMechanicPromoBlock";
 
 nx::core::ptz::Vector truncate(const nx::core::ptz::Vector& value)
 {
@@ -296,6 +300,19 @@ PtzInstrument::PtzInstrument(QObject *parent):
             }
         });
 
+    connect(qnClientShowOnce, &nx::settings::ShowOnce::changed, this,
+        [this](const QString& key, bool value)
+        {
+            if (key != kPtzPromoShowOnceKey || value)
+                return;
+
+            for (auto iter = m_dataByWidget.begin(); iter != m_dataByWidget.end(); ++iter)
+            {
+                if (iter->overlayWidget)
+                    updatePromo(qobject_cast<QnMediaResourceWidget*>(iter.key()));
+            }
+        });
+
     connect(context()->instance<KeyboardModifiersWatcher>(),
         &KeyboardModifiersWatcher::modifiersChanged,
         this,
@@ -375,7 +392,6 @@ PtzOverlayWidget* PtzInstrument::overlayWidget(QnMediaResourceWidget* widget) co
 PtzOverlayWidget* PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget* widget)
 {
     PtzData& data = m_dataByWidget[widget];
-
     if (data.overlayWidget)
         return data.overlayWidget;
 
@@ -427,6 +443,41 @@ PtzOverlayWidget* PtzInstrument::ensureOverlayWidget(QnMediaResourceWidget* widg
         QnResourceWidget::OverlayFlag::autoRotate, QnResourceWidget::SelectionLayer});
 
     return overlay;
+}
+
+void PtzInstrument::updatePromo(QnMediaResourceWidget* widget)
+{
+    if (qnClientShowOnce->testFlag(kPtzPromoShowOnceKey))
+        return;
+
+    PtzData& data = m_dataByWidget[widget];
+    if (data.isFisheye())
+        return;
+
+    if (!data.promoOverlay)
+    {
+        data.promoOverlay = new PtzPromoOverlay();
+        connect(data.promoOverlay.data(), &PtzPromoOverlay::closeRequested, this,
+            [widget, overlay = data.promoOverlay.data()]()
+            {
+                qnClientShowOnce->setFlag(kPtzPromoShowOnceKey);
+                widget->removeOverlayWidget(overlay);
+                overlay->deleteLater();
+            });
+
+        widget->addOverlayWidget(data.promoOverlay, {QnResourceWidget::Invisible,
+            QnResourceWidget::OverlayFlag::bindToViewport | QnResourceWidget::OverlayFlag::autoRotate,
+            QnResourceWidget::TopControlsLayer});
+    }
+
+    const bool ptzModeEnabled = widget->options().testFlag(QnResourceWidget::ControlPtz);
+    const bool animate = display()->animationAllowed();
+
+    const QnResourceWidget::OverlayVisibility visibility = ptzModeEnabled
+        ? QnResourceWidget::AutoVisible
+        : QnResourceWidget::Invisible;
+
+    widget->setOverlayWidgetVisibility(data.promoOverlay, visibility, animate);
 }
 
 void PtzInstrument::handlePtzRedirect(QnMediaResourceWidget* widget)
@@ -659,6 +710,8 @@ void PtzInstrument::updateOverlayWidgetInternal(QnMediaResourceWidget* widget)
     const PtzData& data = m_dataByWidget[widget];
     if (!data.overlayWidget)
         return;
+
+    updatePromo(widget);
 
     widget->setOverlayWidgetVisibility(data.overlayWidget, visibility, animate);
     if (NX_ASSERT(data.cursorOverlay))

@@ -3,6 +3,7 @@
 #include <QtCore/QBasicTimer>
 #include <QtCore/QVector>
 #include <QtCore/QTimer>
+#include <QtCore/QPointer>
 #include <QtGui/QVector3D>
 
 #include <common/common_globals.h>
@@ -24,6 +25,8 @@ class QnSplashItem;
 class QnMediaResourceWidget;
 class QnResourceWidget;
 class QnGraphicsMessageBox;
+
+namespace nx::vms::client::desktop { class PtzPromoOverlay; }
 
 class PtzInstrument: public DragProcessingInstrument, public QnWorkbenchContextAware
 {
@@ -162,6 +165,7 @@ private:
     void updateActionText(QnMediaResourceWidget* widget);
 
     bool checkPlayingLive(QnMediaResourceWidget* widget) const;
+    void updatePromo(QnMediaResourceWidget* widget);
 
 private:
     struct PtzData
@@ -177,6 +181,7 @@ private:
         nx::core::ptz::Vector requestedSpeed;
         PtzOverlayWidget* overlayWidget = nullptr;
         QGraphicsWidget* cursorOverlay = nullptr;
+        QPointer<nx::vms::client::desktop::PtzPromoOverlay> promoOverlay;
         QMetaObject::Connection capabilitiesConnection;
     };
 

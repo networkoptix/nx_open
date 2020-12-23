@@ -415,13 +415,13 @@ private:
 
 private:
     Qt::Orientations m_markersMode;
-    PtzManipulatorWidget *m_manipulatorWidget;
-    PtzImageButtonWidget *m_zoomInButton;
-    PtzImageButtonWidget *m_zoomOutButton;
-    PtzImageButtonWidget *m_focusInButton;
-    PtzImageButtonWidget *m_focusOutButton;
-    PtzImageButtonWidget *m_focusAutoButton;
-    PtzImageButtonWidget *m_modeButton;
+    PtzManipulatorWidget* m_manipulatorWidget = nullptr;
+    PtzImageButtonWidget* m_zoomInButton = nullptr;
+    PtzImageButtonWidget* m_zoomOutButton = nullptr;
+    PtzImageButtonWidget* m_focusInButton = nullptr;
+    PtzImageButtonWidget* m_focusOutButton = nullptr;
+    PtzImageButtonWidget* m_focusAutoButton = nullptr;
+    PtzImageButtonWidget* m_modeButton = nullptr;
     QPen m_pen;
 };
 

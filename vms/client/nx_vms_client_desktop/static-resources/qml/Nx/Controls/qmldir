@@ -18,7 +18,10 @@ NxCircle 1.0 NxCircle.qml
 NxCirclesPreloader 1.0 NxCirclesPreloader.qml
 NxDotPreloader 1.0 NxDotPreloader.qml
 Panel 1.0 Panel.qml
+PromoPage 1.0 PromoPage.qml
+PromoPages 1.0 PromoPages.qml
 RadioButton 1.0 RadioButton.qml
+ScaleAdjuster 1.0 ScaleAdjuster.qml
 Scrollable 1.0 Scrollable.qml
 ScrollBar 1.0 ScrollBar.qml
 ScrollView 1.0 ScrollView.qml
