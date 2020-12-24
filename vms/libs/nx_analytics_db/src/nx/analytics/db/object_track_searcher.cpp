@@ -64,9 +64,16 @@ std::vector<ObjectTrackEx> ObjectTrackSearcher::lookup(nx::sql::QueryContext* qu
     auto comparator =
         [this](auto& left, auto& right)
         {
+            if (left.firstAppearanceTimeUs != right.firstAppearanceTimeUs)
+            {
+                return m_filter.sortOrder == Qt::SortOrder::AscendingOrder
+                    ? left.firstAppearanceTimeUs < right.firstAppearanceTimeUs
+                    : left.firstAppearanceTimeUs > right.firstAppearanceTimeUs;
+            }
+
             return m_filter.sortOrder == Qt::SortOrder::AscendingOrder
-                ? left.firstAppearanceTimeUs < right.firstAppearanceTimeUs
-                : left.firstAppearanceTimeUs > right.firstAppearanceTimeUs;
+                ? left.id < right.id
+                : left.id > right.id;
         };
 
     std::sort(result.begin(), result.end(), comparator);
