@@ -98,7 +98,7 @@ void QnLookAndFeelPreferencesWidget::applyChanges()
     qnSettings->setExtraInfoInTree(selectedInfoLevel());
     qnSettings->setTimeMode(selectedTimeMode());
     qnSettings->setLocale(selectedTranslation());
-    qnSettings->setPtzAimOverlatyEnabled(isPtzAimOverlayEnabled());
+    qnSettings->setPtzAimOverlayEnabled(isPtzAimOverlayEnabled());
 
     /* Background changes are applied instantly. */
     if (backgroundAllowed())
