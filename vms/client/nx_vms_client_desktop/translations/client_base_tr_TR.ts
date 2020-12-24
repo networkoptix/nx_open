@@ -499,14 +499,6 @@ to view more bookmarks</source>
       <translation>Öğeyi Geri Yükle</translation>
     </message>
     <message>
-      <source>Show Info</source>
-      <translation>Bilgiyi Göster</translation>
-    </message>
-    <message>
-      <source>Hide Info</source>
-      <translation>Bilgiyi Gizle</translation>
-    </message>
-    <message>
       <source>PTZ...</source>
       <translation>PTZ...</translation>
     </message>
@@ -997,6 +989,13 @@ to view more bookmarks</source>
     <message>
       <source>Pin</source>
       <translation>Pin</translation>
+    </message>
+    <message numerus="yes">
+      <source>Show on Items</source>
+      <translation>
+        <numerusform>Öğelerde Göster</numerusform>
+        <numerusform>Öğelerde Göster</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1608,6 +1607,10 @@ to view more bookmarks</source>
     <message>
       <source>Focusing...</source>
       <translation>Odaklanma...</translation>
+    </message>
+    <message>
+      <source>PTZ can only be used in the live mode</source>
+      <translation>PTZ yalnızca canlı modda kullanılabilir</translation>
     </message>
   </context>
   <context>
@@ -10003,6 +10006,21 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>%1 (active)</source>
       <comment>Template for active PTZ tour</comment>
       <translation>%1 (aktif)</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::ShowOnItemsFactory</name>
+    <message>
+      <source>Info</source>
+      <translation type="unfinished">Info</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>Nesneler</translation>
+    </message>
+    <message>
+      <source>Regions of Interest</source>
+      <translation>Özelleştirilmiş Bölgeler</translation>
     </message>
   </context>
   <context>

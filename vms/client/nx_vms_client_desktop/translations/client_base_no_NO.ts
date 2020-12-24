@@ -500,14 +500,6 @@ to view more bookmarks</source>
       <translation>Gjenopprett</translation>
     </message>
     <message>
-      <source>Show Info</source>
-      <translation>Vis info</translation>
-    </message>
-    <message>
-      <source>Hide Info</source>
-      <translation>Skjul info</translation>
-    </message>
-    <message>
       <source>PTZ...</source>
       <translation>PTZ...</translation>
     </message>
@@ -998,6 +990,13 @@ to view more bookmarks</source>
     <message>
       <source>Pin</source>
       <translation>Pin</translation>
+    </message>
+    <message numerus="yes">
+      <source>Show on Items</source>
+      <translation type="unfinished">
+        <numerusform>Show on Items</numerusform>
+        <numerusform>Show on Items</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1609,6 +1608,10 @@ to view more bookmarks</source>
     <message>
       <source>Focusing...</source>
       <translation type="unfinished">Focusing...</translation>
+    </message>
+    <message>
+      <source>PTZ can only be used in the live mode</source>
+      <translation type="unfinished">PTZ can only be used in the live mode</translation>
     </message>
   </context>
   <context>
@@ -10009,6 +10012,21 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <source>%1 (active)</source>
       <comment>Template for active PTZ tour</comment>
       <translation>%1 (aktiv)</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::ShowOnItemsFactory</name>
+    <message>
+      <source>Info</source>
+      <translation type="unfinished">Info</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>Objekter</translation>
+    </message>
+    <message>
+      <source>Regions of Interest</source>
+      <translation type="unfinished">Regions of Interest</translation>
     </message>
   </context>
   <context>

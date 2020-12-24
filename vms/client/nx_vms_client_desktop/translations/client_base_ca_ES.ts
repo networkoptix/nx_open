@@ -500,14 +500,6 @@ per veure més marcadors</translation>
       <translation>Restaura l'element</translation>
     </message>
     <message>
-      <source>Show Info</source>
-      <translation>Mostra la informació</translation>
-    </message>
-    <message>
-      <source>Hide Info</source>
-      <translation>Amaga la informació</translation>
-    </message>
-    <message>
       <source>PTZ...</source>
       <translation>PTZ...</translation>
     </message>
@@ -998,6 +990,13 @@ per veure més marcadors</translation>
     <message>
       <source>Pin</source>
       <translation>Fixa</translation>
+    </message>
+    <message numerus="yes">
+      <source>Show on Items</source>
+      <translation type="unfinished">
+        <numerusform>Show on Items</numerusform>
+        <numerusform>Show on Items</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1609,6 +1608,10 @@ per veure més marcadors</translation>
     <message>
       <source>Focusing...</source>
       <translation>Enfocant...</translation>
+    </message>
+    <message>
+      <source>PTZ can only be used in the live mode</source>
+      <translation type="unfinished">PTZ can only be used in the live mode</translation>
     </message>
   </context>
   <context>
@@ -10008,6 +10011,21 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
       <source>%1 (active)</source>
       <comment>Template for active PTZ tour</comment>
       <translation>%1 (actiu)</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::ShowOnItemsFactory</name>
+    <message>
+      <source>Info</source>
+      <translation>Informació</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>Objectes</translation>
+    </message>
+    <message>
+      <source>Regions of Interest</source>
+      <translation type="unfinished">Regions of Interest</translation>
     </message>
   </context>
   <context>

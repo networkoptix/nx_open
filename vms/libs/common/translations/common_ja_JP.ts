@@ -1041,7 +1041,7 @@
     <message>
       <source>h</source>
       <comment>Suffix for displaying hours</comment>
-      <translation>時</translation>
+      <translation>時間</translation>
     </message>
     <message>
       <source>d</source>
@@ -1056,7 +1056,7 @@
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation>月</translation>
+      <translation>ヶ月</translation>
     </message>
     <message>
       <source>y</source>
@@ -1340,7 +1340,7 @@
     </message>
     <message>
       <source>Generic Event</source>
-      <translation>一般的イベント</translation>
+      <translation>汎用イベント</translation>
     </message>
     <message numerus="yes">
       <source>Motion on Cameras</source>
@@ -1379,25 +1379,25 @@
     <message numerus="yes">
       <source>Input Signal on Devices</source>
       <translation>
-        <numerusform>デバイスの入力</numerusform>
+        <numerusform>デバイスのI/O入力</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Input Signal on Cameras</source>
       <translation>
-        <numerusform>カメラの入力</numerusform>
+        <numerusform>カメラのI/O入力</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Devices Disconnected</source>
       <translation>
-        <numerusform>デバイスの接続が切断されました</numerusform>
+        <numerusform>デバイス切断</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Cameras Disconnected</source>
       <translation>
-        <numerusform>カメラの接続が切断されました</numerusform>
+        <numerusform>カメラ切断</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1480,7 +1480,7 @@
     </message>
     <message>
       <source>Generic Event at %1</source>
-      <translation>一般的イベント %1</translation>
+      <translation>汎用イベント %1</translation>
     </message>
     <message>
       <source>An unknown event has occurred</source>
@@ -1636,15 +1636,15 @@
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following devices:</source>
-      <translation>ライセンスが不足しています。記録は次のデバイスで無効になっています:</translation>
+      <translation>ライセンスが不足しています。以下のデバイスで録画が無効になっています:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following cameras:</source>
-      <translation>ライセンスが不足しています。記録は次のカメラで無効になっています:</translation>
+      <translation>ライセンスが不足しています。以下のカメラで録画が無効になっています:</translation>
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>ライセンスが不足しています。記録は次のI/Oモジュールで無効になっています:</translation>
+      <translation>ライセンスが不足しています。以下のI/Oモジュールで録音が無効になっています:</translation>
     </message>
     <message>
       <source>start</source>

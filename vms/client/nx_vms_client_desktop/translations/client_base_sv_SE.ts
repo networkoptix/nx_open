@@ -500,14 +500,6 @@ om du vill visa fler bokmärken</translation>
       <translation>Återställ objekt</translation>
     </message>
     <message>
-      <source>Show Info</source>
-      <translation>Visa info</translation>
-    </message>
-    <message>
-      <source>Hide Info</source>
-      <translation>Dölj info</translation>
-    </message>
-    <message>
       <source>PTZ...</source>
       <translation>PTZ...</translation>
     </message>
@@ -998,6 +990,13 @@ om du vill visa fler bokmärken</translation>
     <message>
       <source>Pin</source>
       <translation>Fäst</translation>
+    </message>
+    <message numerus="yes">
+      <source>Show on Items</source>
+      <translation type="unfinished">
+        <numerusform>Show on Items</numerusform>
+        <numerusform>Show on Items</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1609,6 +1608,10 @@ om du vill visa fler bokmärken</translation>
     <message>
       <source>Focusing...</source>
       <translation>Fokuserar...</translation>
+    </message>
+    <message>
+      <source>PTZ can only be used in the live mode</source>
+      <translation type="unfinished">PTZ can only be used in the live mode</translation>
     </message>
   </context>
   <context>
@@ -10009,6 +10012,21 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>%1 (active)</source>
       <comment>Template for active PTZ tour</comment>
       <translation>%1 (aktiv)</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::ShowOnItemsFactory</name>
+    <message>
+      <source>Info</source>
+      <translation>Info</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>Objekt</translation>
+    </message>
+    <message>
+      <source>Regions of Interest</source>
+      <translation type="unfinished">Regions of Interest</translation>
     </message>
   </context>
   <context>

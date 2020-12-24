@@ -499,14 +499,6 @@ to view more bookmarks</source>
       <translation>Відновити Елемент</translation>
     </message>
     <message>
-      <source>Show Info</source>
-      <translation>Показати Iнформацію</translation>
-    </message>
-    <message>
-      <source>Hide Info</source>
-      <translation>Сховати Iнформацію</translation>
-    </message>
-    <message>
       <source>PTZ...</source>
       <translation>PTZ...</translation>
     </message>
@@ -997,6 +989,15 @@ to view more bookmarks</source>
     <message>
       <source>Pin</source>
       <translation>Прикріпити</translation>
+    </message>
+    <message numerus="yes">
+      <source>Show on Items</source>
+      <translation type="unfinished">
+        <numerusform>Show on Items</numerusform>
+        <numerusform>Show on Items</numerusform>
+        <numerusform>Show on Items</numerusform>
+        <numerusform>Show on Items</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1636,6 +1637,10 @@ to view more bookmarks</source>
     <message>
       <source>Focusing...</source>
       <translation>Фокусування...</translation>
+    </message>
+    <message>
+      <source>PTZ can only be used in the live mode</source>
+      <translation type="unfinished">PTZ can only be used in the live mode</translation>
     </message>
   </context>
   <context>
@@ -10268,6 +10273,21 @@ If you intended to move analytics data to another storage location, please conta
       <source>%1 (active)</source>
       <comment>Template for active PTZ tour</comment>
       <translation>%1 (активний)</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::ShowOnItemsFactory</name>
+    <message>
+      <source>Info</source>
+      <translation type="unfinished">Info</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>Об'єкти</translation>
+    </message>
+    <message>
+      <source>Regions of Interest</source>
+      <translation type="unfinished">Regions of Interest</translation>
     </message>
   </context>
   <context>

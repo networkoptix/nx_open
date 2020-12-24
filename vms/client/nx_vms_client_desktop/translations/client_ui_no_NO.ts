@@ -120,12 +120,12 @@
     <message>
       <location/>
       <source>Limit Frame Rate to save CPU</source>
-      <translation>Begrens bildefrekvens for å lagre CPU</translation>
+      <translation>Begrens bildefrekvens for å spare CPU</translation>
     </message>
     <message>
       <location/>
       <source>Use Hardware Video Decoding</source>
-      <translation type="unfinished">Use Hardware Video Decoding</translation>
+      <translation>Bruk maskinvare videodekoding (Intel Quicksync)</translation>
     </message>
   </context>
   <context>

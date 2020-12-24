@@ -493,7 +493,7 @@
     <message>
       <location/>
       <source>When</source>
-      <translation>何時</translation>
+      <translation>トリガー</translation>
     </message>
     <message>
       <location/>

@@ -500,14 +500,6 @@ para ver mais favoritos</translation>
       <translation>Restaurar Item</translation>
     </message>
     <message>
-      <source>Show Info</source>
-      <translation>Mostrar Info</translation>
-    </message>
-    <message>
-      <source>Hide Info</source>
-      <translation>Ocultar Info</translation>
-    </message>
-    <message>
       <source>PTZ...</source>
       <translation>PTZ...</translation>
     </message>
@@ -998,6 +990,13 @@ para ver mais favoritos</translation>
     <message>
       <source>Pin</source>
       <translation>Pin</translation>
+    </message>
+    <message numerus="yes">
+      <source>Show on Items</source>
+      <translation type="unfinished">
+        <numerusform>Show on Items</numerusform>
+        <numerusform>Show on Items</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1609,6 +1608,10 @@ para ver mais favoritos</translation>
     <message>
       <source>Focusing...</source>
       <translation type="unfinished">Focusing...</translation>
+    </message>
+    <message>
+      <source>PTZ can only be used in the live mode</source>
+      <translation type="unfinished">PTZ can only be used in the live mode</translation>
     </message>
   </context>
   <context>
@@ -10009,6 +10012,21 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
       <source>%1 (active)</source>
       <comment>Template for active PTZ tour</comment>
       <translation>%1 (activo)</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::ShowOnItemsFactory</name>
+    <message>
+      <source>Info</source>
+      <translation type="unfinished">Info</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>Objetos</translation>
+    </message>
+    <message>
+      <source>Regions of Interest</source>
+      <translation type="unfinished">Regions of Interest</translation>
     </message>
   </context>
   <context>

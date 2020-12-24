@@ -499,14 +499,6 @@ to view more bookmarks</source>
       <translation>Przywróć rozmiar</translation>
     </message>
     <message>
-      <source>Show Info</source>
-      <translation>Pokaż info</translation>
-    </message>
-    <message>
-      <source>Hide Info</source>
-      <translation>Ukryj info</translation>
-    </message>
-    <message>
       <source>PTZ...</source>
       <translation>PTZ...</translation>
     </message>
@@ -997,6 +989,15 @@ to view more bookmarks</source>
     <message>
       <source>Pin</source>
       <translation>Przypnij</translation>
+    </message>
+    <message numerus="yes">
+      <source>Show on Items</source>
+      <translation>
+        <numerusform>Pokaż na elemencie</numerusform>
+        <numerusform>Pokaż na elementach</numerusform>
+        <numerusform>Pokaż na elementach</numerusform>
+        <numerusform>Pokaż na elementach</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1636,6 +1637,10 @@ to view more bookmarks</source>
     <message>
       <source>Focusing...</source>
       <translation>Ustawiam ostrość...</translation>
+    </message>
+    <message>
+      <source>PTZ can only be used in the live mode</source>
+      <translation>PTZ może być używany tylko w trybie na żywo</translation>
     </message>
   </context>
   <context>
@@ -10263,6 +10268,21 @@ If you intended to move analytics data to another storage location, please conta
       <source>%1 (active)</source>
       <comment>Template for active PTZ tour</comment>
       <translation>%1 (aktywne)</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::ShowOnItemsFactory</name>
+    <message>
+      <source>Info</source>
+      <translation>Info</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>Obiekty</translation>
+    </message>
+    <message>
+      <source>Regions of Interest</source>
+      <translation>Regiony zainteresowania</translation>
     </message>
   </context>
   <context>

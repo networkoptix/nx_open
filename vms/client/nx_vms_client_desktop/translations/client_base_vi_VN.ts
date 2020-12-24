@@ -499,14 +499,6 @@ to view more bookmarks</source>
       <translation>Trở lại với dự án</translation>
     </message>
     <message>
-      <source>Show Info</source>
-      <translation>Thông tin hiển thị</translation>
-    </message>
-    <message>
-      <source>Hide Info</source>
-      <translation>Thông tin ẩn</translation>
-    </message>
-    <message>
       <source>PTZ...</source>
       <translation>PTZ...</translation>
     </message>
@@ -997,6 +989,12 @@ to view more bookmarks</source>
     <message>
       <source>Pin</source>
       <translation>Ghim</translation>
+    </message>
+    <message numerus="yes">
+      <source>Show on Items</source>
+      <translation type="unfinished">
+        <numerusform>Show on Items</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1594,6 +1592,10 @@ to view more bookmarks</source>
     <message>
       <source>Focusing...</source>
       <translation type="unfinished">Focusing...</translation>
+    </message>
+    <message>
+      <source>PTZ can only be used in the live mode</source>
+      <translation type="unfinished">PTZ can only be used in the live mode</translation>
     </message>
   </context>
   <context>
@@ -9873,6 +9875,21 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>%1 (active)</source>
       <comment>Template for active PTZ tour</comment>
       <translation>%1 (sáng kiến)</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::ShowOnItemsFactory</name>
+    <message>
+      <source>Info</source>
+      <translation type="unfinished">Info</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>Các đối tượng</translation>
+    </message>
+    <message>
+      <source>Regions of Interest</source>
+      <translation type="unfinished">Regions of Interest</translation>
     </message>
   </context>
   <context>

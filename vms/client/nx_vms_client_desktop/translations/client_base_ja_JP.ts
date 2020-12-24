@@ -499,14 +499,6 @@ to view more bookmarks</source>
       <translation>元に戻す</translation>
     </message>
     <message>
-      <source>Show Info</source>
-      <translation>情報を表示</translation>
-    </message>
-    <message>
-      <source>Hide Info</source>
-      <translation>情報を隠す</translation>
-    </message>
-    <message>
       <source>PTZ...</source>
       <translation>PTZ...</translation>
     </message>
@@ -997,6 +989,12 @@ to view more bookmarks</source>
     <message>
       <source>Pin</source>
       <translation>ピン留めする</translation>
+    </message>
+    <message numerus="yes">
+      <source>Show on Items</source>
+      <translation>
+        <numerusform>アイテムを表示</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1594,6 +1592,10 @@ to view more bookmarks</source>
     <message>
       <source>Focusing...</source>
       <translation>フォーカス中...</translation>
+    </message>
+    <message>
+      <source>PTZ can only be used in the live mode</source>
+      <translation>PTZはライブモードでのみ使用できます</translation>
     </message>
   </context>
   <context>
@@ -3079,7 +3081,7 @@ to %1</source>
     </message>
     <message>
       <source>To generate Generic Event, please refer to %1.</source>
-      <translation>一般的イベントを生成するには、 %1を参照してください。</translation>
+      <translation>汎用イベントを生成するには、 %1を参照してください。</translation>
     </message>
   </context>
   <context>
@@ -9874,6 +9876,21 @@ If you intended to move analytics data to another storage location, please conta
       <source>%1 (active)</source>
       <comment>Template for active PTZ tour</comment>
       <translation>%1(アクティブ)</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::ShowOnItemsFactory</name>
+    <message>
+      <source>Info</source>
+      <translation>情報</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>オブジェクト</translation>
+    </message>
+    <message>
+      <source>Regions of Interest</source>
+      <translation>関心領域</translation>
     </message>
   </context>
   <context>

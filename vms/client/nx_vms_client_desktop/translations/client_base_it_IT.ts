@@ -499,14 +499,6 @@ to view more bookmarks</source>
       <translation>Ripristina elemento</translation>
     </message>
     <message>
-      <source>Show Info</source>
-      <translation>Mostra informazioni</translation>
-    </message>
-    <message>
-      <source>Hide Info</source>
-      <translation>Nascondi informazioni</translation>
-    </message>
-    <message>
       <source>PTZ...</source>
       <translation>PTZ...</translation>
     </message>
@@ -997,6 +989,13 @@ to view more bookmarks</source>
     <message>
       <source>Pin</source>
       <translation>Pin</translation>
+    </message>
+    <message numerus="yes">
+      <source>Show on Items</source>
+      <translation type="unfinished">
+        <numerusform>Show on Items</numerusform>
+        <numerusform>Show on Items</numerusform>
+      </translation>
     </message>
   </context>
   <context>
@@ -1608,6 +1607,10 @@ to view more bookmarks</source>
     <message>
       <source>Focusing...</source>
       <translation>Messa a fuoco...</translation>
+    </message>
+    <message>
+      <source>PTZ can only be used in the live mode</source>
+      <translation type="unfinished">PTZ can only be used in the live mode</translation>
     </message>
   </context>
   <context>
@@ -10005,6 +10008,21 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <source>%1 (active)</source>
       <comment>Template for active PTZ tour</comment>
       <translation>%1 (attivo)</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ui::action::ShowOnItemsFactory</name>
+    <message>
+      <source>Info</source>
+      <translation>Informazioni</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>Oggetti</translation>
+    </message>
+    <message>
+      <source>Regions of Interest</source>
+      <translation type="unfinished">Regions of Interest</translation>
     </message>
   </context>
   <context>
