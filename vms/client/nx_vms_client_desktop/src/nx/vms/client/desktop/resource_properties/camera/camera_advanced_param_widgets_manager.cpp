@@ -54,7 +54,7 @@ void CameraAdvancedParamWidgetsManager::clear()
     m_groupWidget->clear();
     m_itemsAvailableInOffline.clear();
     while (m_contentsWidget->count() > 0)
-        m_contentsWidget->removeWidget(m_contentsWidget->widget(0));
+        delete m_contentsWidget->widget(0);
 }
 
 
@@ -352,7 +352,7 @@ QWidget* CameraAdvancedParamWidgetsManager::createWidgetsForPage(
             if (!compactLayout)
             {
                 // Creating container for compact controls.
-                compactLayout = new QHBoxLayout(m_contentsWidget);
+                compactLayout = new QHBoxLayout();
                 compactLayout->addWidget(widget, 0, Qt::AlignRight);
                 gridLayout->addLayout(compactLayout, row, 0, 1, 2, Qt::AlignVCenter);
             }
