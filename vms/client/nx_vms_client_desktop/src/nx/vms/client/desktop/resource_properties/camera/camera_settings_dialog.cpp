@@ -515,7 +515,7 @@ bool CameraSettingsDialog::setCameras(const QnVirtualCameraResourceList& cameras
 void CameraSettingsDialog::done(int result)
 {
     base_type::done(result);
-    d->resetChanges();
+    setCameras({}, /*force*/ true);
 }
 
 void CameraSettingsDialog::showEvent(QShowEvent* event)
