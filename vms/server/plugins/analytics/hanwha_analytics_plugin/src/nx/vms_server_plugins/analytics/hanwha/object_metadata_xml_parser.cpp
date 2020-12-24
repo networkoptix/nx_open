@@ -173,7 +173,7 @@ ObjectMetadataXmlParser::Result ObjectMetadataXmlParser::parse(
             extractObjectMetadata(object, timestampUs);
 
         if (objectMetadata)
-            objectPacket->addItem(objectMetadata.releasePtr());
+            objectPacket->addItem(objectMetadata.get());
         if (bestShotPacket)
         {
             auto eventData = makePtr<EventMetadata>();
@@ -188,7 +188,7 @@ ObjectMetadataXmlParser::Result ObjectMetadataXmlParser::parse(
             }
             eventData->setConfidence(1.0);
             eventData->setTrackId(bestShotPacket->trackId());
-            eventPacket->addItem(eventData.releasePtr());
+            eventPacket->addItem(eventData.get());
 
             auto& trackData = m_objectTrackCache[objectId];
             if (trackData.trackStartTimeUs)
