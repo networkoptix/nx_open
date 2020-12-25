@@ -8,6 +8,7 @@
 
 #include <nx/utils/literal.h>
 #include <nx/utils/log/assert.h>
+#include <nx/utils/log/log.h>
 
 namespace datetime {
 

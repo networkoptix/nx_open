@@ -356,13 +356,13 @@ void QnTransactionLog::rollback()
 
 nx::vms::api::TranState QnTransactionLog::getTransactionsState()
 {
-    QnReadLocker lock(&m_dbManager->getMutex());
+    NX_MUTEX_LOCKER lock(m_dbManager->getMutex());
     return m_state;
 }
 
 QVector<qint32> QnTransactionLog::getTransactionsState(const QVector<vms::api::PersistentIdData>& filter)
 {
-    QnReadLocker lock(&m_dbManager->getMutex());
+    NX_MUTEX_LOCKER lock(m_dbManager->getMutex());
 
     QVector<qint32> result;
     const auto& values = m_state.values;
@@ -383,7 +383,7 @@ QVector<qint32> QnTransactionLog::getTransactionsState(const QVector<vms::api::P
 
 int QnTransactionLog::getLatestSequence(const vms::api::PersistentIdData& key) const
 {
-    QnReadLocker lock(&m_dbManager->getMutex());
+    NX_MUTEX_LOCKER lock(m_dbManager->getMutex());
     return m_state.values.value(key);
 }
 
@@ -417,7 +417,7 @@ QnTransactionLog::ContainsReason QnTransactionLog::contains(const QnAbstractTran
 
 bool QnTransactionLog::contains(const nx::vms::api::TranState& state) const
 {
-    QnReadLocker lock(&m_dbManager->getMutex());
+    NX_MUTEX_LOCKER lock(m_dbManager->getMutex());
     for (auto itr = state.values.begin(); itr != state.values.end(); ++itr)
     {
         if (itr.value() > m_state.values.value(itr.key()))
@@ -431,7 +431,7 @@ ErrorCode QnTransactionLog::getTransactionsAfter(
     bool onlyCloudData,
     QList<QByteArray>& result)
 {
-    QnReadLocker lock(&m_dbManager->getMutex());
+    NX_MUTEX_LOCKER lock(m_dbManager->getMutex());
 
     const nx::vms::api::TranState& stateToIterate = m_state;
 
@@ -488,7 +488,7 @@ ErrorCode QnTransactionLog::getExactTransactionsAfter(
     bool* outIsFinished)
 {
     *outIsFinished = false;
-    QnReadLocker lock(&m_dbManager->getMutex());
+    NX_MUTEX_LOCKER lock(m_dbManager->getMutex());
 
     QnTransaction<nx::vms::api::UpdateSequenceData> syncMarkersTran(
         ApiCommand::updatePersistentSequence,

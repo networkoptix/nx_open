@@ -163,10 +163,10 @@ bool businessRuleObjectUpdater(EventRuleData& data)
 
 bool QnDbManager::QnDbTransactionExt::beginLazyTran(const char* sourceFile, int sourceLine)
 {
-    m_mutex.lockForWrite(sourceFile, sourceLine);
+    m_mutex->lock(sourceFile, sourceLine);
 
     if (!m_lazyTranInProgress)
-        m_database.transaction();
+        m_database->transaction();
     m_lazyTranInProgress = true;
 
     m_tranLog->beginTran();
@@ -176,19 +176,19 @@ bool QnDbManager::QnDbTransactionExt::beginLazyTran(const char* sourceFile, int 
 bool QnDbManager::QnDbTransactionExt::commitLazyTran()
 {
     m_tranLog->commit();
-    m_mutex.unlock();
+    m_mutex->unlock();
     return true;
 }
 
 bool QnDbManager::QnDbTransactionExt::beginTran(const char* sourceFile, int sourceLine)
 {
-    m_mutex.lockForWrite(sourceFile, sourceLine);
+    m_mutex->lock(sourceFile, sourceLine);
 
     if (m_lazyTranInProgress)
         dbCommit(lit("lazy before new"));
 
     m_lazyTranInProgress = false;
-    m_database.transaction();
+    m_database->transaction();
 
     m_tranLog->beginTran();
     return true;
@@ -197,9 +197,9 @@ bool QnDbManager::QnDbTransactionExt::beginTran(const char* sourceFile, int sour
 void QnDbManager::QnDbTransactionExt::rollback()
 {
     m_tranLog->rollback();
-    m_database.rollback();
+    m_database->rollback();
     m_lazyTranInProgress = false;
-    m_mutex.unlock();
+    m_mutex->unlock();
 }
 
 bool QnDbManager::QnDbTransactionExt::commit()
@@ -210,7 +210,7 @@ bool QnDbManager::QnDbTransactionExt::commit()
     {
         // Commit only on success, otherwise rollback is expected.
         m_tranLog->commit();
-        m_mutex.unlock();
+        m_mutex->unlock();
     }
 
     return rez;
@@ -271,7 +271,7 @@ QnDbManager::QnDbManager(QnCommonModule* commonModule):
     m_licenseOverflowMarked(false),
     m_videoWallLicenseOverflowMarked(false),
     m_initialized(false),
-    m_tranStatic(m_sdbStatic, m_mutexStatic),
+    m_tranStatic(&m_sdbStatic, &m_mutexStatic),
     m_dbJustCreated(false),
     m_isBackupRestore(false),
     m_dbReadOnly(false),
@@ -428,7 +428,7 @@ nx::utils::SoftwareVersion QnDbManager::currentSoftwareVersion(const QString &ba
 bool QnDbManager::init(const nx::utils::Url& dbUrl)
 {
     NX_ASSERT(m_tranLog != nullptr);
-    m_tran.reset(new QnDbTransactionExt(m_sdb, m_tranLog, m_mutex));
+    m_tran.reset(new QnDbTransactionExt(&m_sdb, m_tranLog, &m_mutex));
 
     {
         const QString dbFilePath = dbUrl.toLocalFile();
@@ -4801,7 +4801,7 @@ ErrorCode QnDbManager::doQuery(const std::nullptr_t& /*dummy*/, DatabaseDumpData
     if (!m_initialized)
         return ErrorCode::ioError;
 
-    QnWriteLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
 
     if (!execSQLScript("vacuum;", m_sdb))
         qWarning() << "failed to vacuum database" << Q_FUNC_INFO;
@@ -4843,7 +4843,7 @@ ErrorCode QnDbManager::doQuery(const StoredFilePath& dumpFilePath,
     if (!m_initialized)
         return ErrorCode::ioError;
 
-    QnWriteLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
     m_tran->physicalCommitLazyData();
 
     //have to close/open DB to dump journals to .db file
@@ -4909,7 +4909,7 @@ ec2::database::api::QueryCache::Pool* QnDbManager::queryCachePool()
 ErrorCode QnDbManager::readFullInfoDataComplete(
     FullInfoData* data, const Qn::UserAccessData& userAccess)
 {
-    QnWriteLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
 
     DB_LOAD(nullptr, data->resourceTypes);
     DB_LOAD(QnUuid(), data->servers);
@@ -4958,7 +4958,7 @@ ErrorCode QnDbManager::loadUserListFiltered(
 ErrorCode QnDbManager::readFullInfoDataForMobileClient(
     FullInfoData* data, const Qn::UserAccessData& userAccess)
 {
-    QnWriteLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
 
     DB_LOAD(QnUuid(), data->servers);
     DB_LOAD(QnUuid(), data->serversUserAttributesList);

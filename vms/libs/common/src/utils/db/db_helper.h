@@ -16,10 +16,12 @@ class QnDbHelper:
     public nx::sql::SqlQueryExecutionHelper
 {
 public:
+    // #ak This is a bad name for this class since it actually lives beyond DB transaction
+    // and no concurrent transactions supported. Maybe QnDbConnection?
     class QnDbTransaction
     {
     public:
-        QnDbTransaction(QSqlDatabase& database, QnReadWriteLock& mutex);
+        QnDbTransaction(QSqlDatabase* d, nx::Mutex* m): m_database(d), m_mutex(m) {}
         virtual ~QnDbTransaction();
     protected:
         virtual bool beginTran(const char* sourceFile, int sourceLine);
@@ -30,8 +32,8 @@ public:
         friend class QnDbTransactionLocker;
         friend class QnDbHelper;
 
-        QSqlDatabase& m_database;
-        QnReadWriteLock& m_mutex;
+        QSqlDatabase* const m_database;
+        nx::Mutex* const m_mutex;
     };
 
     class QnAbstractTransactionLocker
@@ -278,7 +280,7 @@ protected:
 
 protected:
     QSqlDatabase m_sdb;
-    mutable QnReadWriteLock m_mutex;
+    mutable nx::Mutex m_mutex;
     QString m_connectionName;
 };
 

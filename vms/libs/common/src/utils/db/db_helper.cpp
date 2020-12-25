@@ -30,22 +30,14 @@ static Ini& ini()
 
 } // namespace
 
-//TODO #AK QnDbTransaction is a bad name for this class since it actually lives beyond DB transaction
-    //and no concurrent transactions supported. Maybe QnDbConnection?
-QnDbHelper::QnDbTransaction::QnDbTransaction(QSqlDatabase& database, QnReadWriteLock& mutex):
-    m_database(database),
-    m_mutex(mutex)
-{
-}
-
 QnDbHelper::QnDbTransaction::~QnDbTransaction()
 {
 }
 
 bool QnDbHelper::QnDbTransaction::beginTran(const char* sourceFile, int sourceLine)
 {
-    m_mutex.lockForWrite(sourceFile, sourceLine);
-    if( !m_database.transaction() )
+    m_mutex->lock(sourceFile, sourceLine);
+    if( !m_database->transaction() )
     {
         //TODO #ak ignoring this error since calling party thinks it always succeeds
         //m_mutex.unlock();
@@ -112,9 +104,9 @@ bool QnDbHelper::tuneDBAfterOpen(QSqlDatabase* const sqlDb)
 
 void QnDbHelper::QnDbTransaction::rollback()
 {
-    m_database.rollback();
+    m_database->rollback();
     //TODO #ak handle rollback error?
-    m_mutex.unlock();
+    m_mutex->unlock();
 }
 
 bool QnDbHelper::QnDbTransaction::commit()
@@ -123,7 +115,7 @@ bool QnDbHelper::QnDbTransaction::commit()
     if (rez)
     {
         // Commit only on success, otherwise rollback is expected.
-        m_mutex.unlock();
+        m_mutex->unlock();
     }
 
     return rez;
@@ -131,16 +123,16 @@ bool QnDbHelper::QnDbTransaction::commit()
 
 bool QnDbHelper::QnDbTransaction::dbCommit(const QString& event)
 {
-    if (m_database.commit())
+    if (m_database->commit())
     {
         NX_VERBOSE(this, lm("Successful commit in %1 on (%2)").args(
-            m_database.databaseName(), event));
+            m_database->databaseName(), event));
         return true;
     }
     else
     {
         NX_WARNING(this, lm("Failed commit in %1 on (%2): %3").args(
-            m_database.databaseName(), event, m_database.lastError()));
+            m_database->databaseName(), event, m_database->lastError()));
         return false;
     }
 }
@@ -166,8 +158,8 @@ bool QnDbHelper::QnDbTransactionLocker::commit()
     if (!m_committed)
     {
         NX_ERROR(this, lit("%1. Commit failed: %2").
-            arg(m_tran->m_database.databaseName()).
-            arg(m_tran->m_database.lastError().text()));
+            arg(m_tran->m_database->databaseName()).
+            arg(m_tran->m_database->lastError().text()));
     }
     return m_committed;
 }

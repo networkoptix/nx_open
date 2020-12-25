@@ -163,14 +163,14 @@ namespace detail
         template <class T1, class T2>
         ErrorCode doQuery(const T1& t1, T2& t2)
         {
-            QnWriteLocker lock(&m_mutex);
+            NX_MUTEX_LOCKER lock(&m_mutex);
             return doQueryNoLock(t1, t2);
         }
 
         template <class OutputData>
         ErrorCode execSqlQuery(const QString& queryStr, OutputData* outputData)
         {
-            QnWriteLocker lock(&m_mutex);
+            NX_MUTEX_LOCKER lock(&m_mutex);
             QSqlQuery query(m_sdb);
             query.setForwardOnly(true);
             if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO) || !query.exec())
@@ -191,7 +191,7 @@ namespace detail
 
         ApiObjectType getObjectType(const QnUuid& objectId)
         {
-            QnWriteLocker lock( &m_mutex );
+            NX_MUTEX_LOCKER lock(&m_mutex);
             return getObjectTypeNoLock( objectId );
         }
         /*!
@@ -229,8 +229,8 @@ namespace detail
         };
 
         friend class ::ec2::QnTransactionLog;
-        QSqlDatabase& getDB() { return m_sdb; }
-        QnReadWriteLock& getMutex() { return m_mutex; }
+        const QSqlDatabase& getDB() { return m_sdb; }
+        nx::Mutex* getMutex() { return &m_mutex; }
 
         // ------------ data retrieval --------------------------------------
         ErrorCode doQueryNoLock(std::nullptr_t /*dummy*/, nx::vms::api::ResourceParamDataList& data);
@@ -719,9 +719,9 @@ namespace detail
         {
         public:
             QnDbTransactionExt(
-                QSqlDatabase& database,
+                QSqlDatabase* database,
                 QnTransactionLog* tranLog,
-                QnReadWriteLock& mutex)
+                nx::Mutex* mutex)
                 :
                 QnDbTransaction(database, mutex),
                 m_tranLog(tranLog),
@@ -741,7 +741,7 @@ namespace detail
             friend class QnLazyTransactionLocker;
             friend class QnDbManager; //< Owner
 
-            QnTransactionLog* m_tranLog;
+            QnTransactionLog* const m_tranLog;
             bool m_lazyTranInProgress;
         };
 
@@ -865,7 +865,7 @@ namespace detail
         QSqlDatabase m_sdbStatic;
         std::unique_ptr<QnDbTransactionExt> m_tran;
         QnDbTransaction m_tranStatic;
-        mutable QnReadWriteLock m_mutexStatic;
+        mutable nx::Mutex m_mutexStatic;
 
         bool m_dbJustCreated;
         bool m_isBackupRestore;

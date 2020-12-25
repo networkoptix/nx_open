@@ -278,7 +278,7 @@ QnServerDb::QnServerDb(QnMediaServerModule* serverModule)
     m_lastCleanuptimeUs(0),
     m_auditCleanuptimeUs(0),
     m_runtimeActionsTotalRecords(0),
-    m_tran(m_sdb, m_mutex)
+    m_tran(&m_sdb, &m_mutex)
 {
 }
 
@@ -406,7 +406,7 @@ bool QnServerDb::createDatabase()
 
 int QnServerDb::auditRecordMaxId() const
 {
-    QnWriteLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
 
     if (!m_sdb.isOpen())
         return -1;
@@ -501,7 +501,7 @@ QnAuditRecordList QnServerDb::getAuditData(const QnTimePeriod& period, const QnU
         request += lit("AND authSession like '%1%'").arg(sessionId.toString());
     request += lit("ORDER BY id");
 
-    QnWriteLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
     QSqlQuery query(m_sdb);
     query.prepare(request);
     query.addBindValue(period.startTimeMs / 1000);
@@ -737,7 +737,7 @@ bool QnServerDb::cleanupAuditLog()
 
 bool QnServerDb::removeLogForRes(const QnUuid& resId)
 {
-    QnWriteLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
 
     if (!m_sdb.isOpen())
         return false;
@@ -759,7 +759,7 @@ bool QnServerDb::removeLogForRes(const QnUuid& resId)
 
 bool QnServerDb::saveActionToDB(const vms::event::AbstractActionPtr& action)
 {
-    QnWriteLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
 
     if (action->isReceivedFromRemoteHost())
         return false; //< Server should save the action before proxing locally.
@@ -912,7 +912,7 @@ vms::event::ActionDataList QnServerDb::getActions(
     vms::event::ActionDataList result;
     QString requestStr = getRequestStr(request, order, limit);
 
-    QnWriteLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
 
     QSqlQuery query(m_sdb);
     query.prepare(requestStr);
@@ -993,7 +993,7 @@ void QnServerDb::getAndSerializeActions(const QnEventLogRequestData& request,
 {
     QString requestStr = getRequestStr(request.filter);
 
-    QnWriteLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
 
     QSqlQuery actionsQuery(m_sdb);
     actionsQuery.prepare(requestStr);
@@ -1109,7 +1109,7 @@ bool QnServerDb::getMaxBookmarksMaxDurationMs(
 
     const auto queryStr = queryTemplate.arg(filterText);
 
-    QnWriteLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
     QSqlQuery query(m_sdb);
 
     if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
@@ -1285,7 +1285,7 @@ bool QnServerDb::getBookmarksInternal(
 
     NX_VERBOSE(this, lit("Got getBookmarks query: %1").arg(queryStr));
     {
-        QnWriteLocker lock(&m_mutex);
+        NX_MUTEX_LOCKER lock(&m_mutex);
         QSqlQuery query(m_sdb);
         query.setForwardOnly(true);
         if (!prepareSQLQuery(&query, queryStr, Q_FUNC_INFO))
@@ -1337,7 +1337,7 @@ bool QnServerDb::updateBookmark(const QnCameraBookmark& bookmark)
 
 bool QnServerDb::containsBookmark(const QnUuid& bookmarkId) const
 {
-    QnWriteLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
 
     QSqlQuery query(m_sdb);
     query.setForwardOnly(true);
@@ -1348,7 +1348,7 @@ bool QnServerDb::containsBookmark(const QnUuid& bookmarkId) const
 
 QnCameraBookmarkTagList QnServerDb::getBookmarkTags(int limit)
 {
-    QnWriteLocker lock(&m_mutex);
+    NX_MUTEX_LOCKER lock(&m_mutex);
 
     QString queryStr(R"(
         SELECT tag as name, count
@@ -1503,7 +1503,7 @@ void QnServerDb::updateBookmarkCount()
     std::function<void()> finalHandler;
 
     {
-        QnWriteLocker lock(&m_mutex);
+        NX_MUTEX_LOCKER lock(&m_mutex);
         if (!m_updateBookmarkCount)
             return;
 
@@ -1614,7 +1614,7 @@ bool QnServerDb::deleteBookmark(const QnUuid& bookmarkId)
 void QnServerDb::setBookmarkCountController(std::function<void(size_t)> handler)
 {
     {
-        QnWriteLocker lock(&m_mutex);
+        NX_MUTEX_LOCKER lock(&m_mutex);
         NX_ASSERT(!m_updateBookmarkCount, "controller is already set");
         m_updateBookmarkCount = std::move(handler);
     }
