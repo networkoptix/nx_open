@@ -477,6 +477,9 @@ void PtzInstrument::updatePromo(QnMediaResourceWidget* widget)
 
     if (!data.promoOverlay)
     {
+        if (qnSettings->isPtzAimOverlayEnabled())
+            return;
+
         data.promoOverlay = new PtzPromoOverlay();
         connect(data.promoOverlay.data(), &PtzPromoOverlay::closeRequested, this,
             [widget, overlay = data.promoOverlay.data()]()
@@ -491,10 +494,12 @@ void PtzInstrument::updatePromo(QnMediaResourceWidget* widget)
             QnResourceWidget::TopControlsLayer});
     }
 
-    const bool ptzModeEnabled = widget->options().testFlag(QnResourceWidget::ControlPtz);
+    const bool showPromo = widget->options().testFlag(QnResourceWidget::ControlPtz)
+        && !qnSettings->isPtzAimOverlayEnabled();
+
     const bool animate = display()->animationAllowed();
 
-    const QnResourceWidget::OverlayVisibility visibility = ptzModeEnabled
+    const QnResourceWidget::OverlayVisibility visibility = showPromo
         ? QnResourceWidget::AutoVisible
         : QnResourceWidget::Invisible;
 
@@ -1530,8 +1535,8 @@ void PtzInstrument::toggleContinuousPtz(
 {
     if (dragProcessor()->isRunning()
         || !supportsContinuousPtz(widget, direction)
-        || !checkPlayingLive(widget)
-        || m_externalPtzDirections.testFlag(direction) == on)
+        || m_externalPtzDirections.testFlag(direction) == on
+        || !checkPlayingLive(widget))
     {
         return;
     }
