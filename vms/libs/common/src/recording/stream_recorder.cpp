@@ -211,6 +211,9 @@ void QnStreamRecorder::close()
     if (m_packetWrited && m_videoTranscoder)
         flushTranscoder();
 
+    if (m_role == StreamRecorderRole::fileExport)
+        m_recordingFinished = true;
+
     m_lastCompressionType = AV_CODEC_ID_NONE;
     for (size_t i = 0; i < m_recordingContextVector.size(); ++i)
     {
