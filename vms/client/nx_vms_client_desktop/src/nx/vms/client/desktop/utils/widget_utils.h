@@ -1,12 +1,14 @@
 #pragma once
 
 #include <QtCore/QPoint>
+#include <QtCore/QString>
 
 class QMenu;
 class QWidget;
 class QLayout;
 class QGraphicsWidget;
 class QGraphicsProxyWidget;
+class QTextDocument;
 
 namespace nx::vms::client::desktop {
 
@@ -26,6 +28,12 @@ public:
     /** Workaround while Qt's QWidget::mapFromGlobal is broken. */
     static QPoint mapFromGlobal(const QGraphicsWidget* to, const QPoint& globalPos);
     static QPoint mapFromGlobal(const QWidget* to, const QPoint& globalPos);
+
+    /** Limit document height, adding specified text (default to "...") as the last visible line. */
+    static void elideDocumentHeight(
+        QTextDocument* document,
+        int maxHeight,
+        const QString& tail = "...");
 };
 
 } // namespace nx::vms::client::desktop

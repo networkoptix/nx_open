@@ -84,6 +84,11 @@ void QnGraphicsToolTipWidget::setText(const QString& text)
     forceLayoutUpdate();
 }
 
+nx::vms::client::desktop::TextEditLabel* QnGraphicsToolTipWidget::textLabel() const
+{
+    return m_textLabel;
+}
+
 void QnGraphicsToolTipWidget::setThumbnailVisible(bool visible)
 {
     if (m_previewWidget->isHidden() != visible)

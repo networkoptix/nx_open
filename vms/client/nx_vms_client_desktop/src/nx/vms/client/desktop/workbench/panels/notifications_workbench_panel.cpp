@@ -39,6 +39,7 @@
 
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/common/widgets/async_image_widget.h>
+#include <nx/vms/client/desktop/common/widgets/text_edit_label.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_panel.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_ribbon.h>
 #include <nx/vms/client/desktop/event_search/widgets/event_tile.h>
@@ -500,6 +501,40 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
     toolTip->updateTailPos();
     toolTip->pointTo(tooltipPos);
     toolTip->setCropMode(AsyncImageWidget::CropMode::never);
+
+    // Limit tooltip width to half of the scene width.
+    // If tooltip is larger then enable word wrap at half of the scene length.
+    // The tooltip cannot be displayed outside of the scene, so if the tooltip goes beyound the
+    // scene edge, use all available space except a small margin.
+
+    static constexpr auto kToolTipMargin = 8; //< Leave some space to the window edge.
+
+    // toolTip has not been shown yet, so we can get layout paddings from its size.
+    const int widthWithoutText = toolTip->size().width();
+
+    // Calculate tooltip maximum allowed width.
+    const auto size = toolTip->scene()->views().first()->size();
+    const int maxToolTipWidth = std::min(
+        size.width() / 2 - widthWithoutText,
+        size.width() - m_eventPanel->size().width() - kToolTipMargin - widthWithoutText);
+
+    // If the tooltip with disabled word wrapping is too wide, enable word wrapping at max width.
+    if (toolTip->textLabel()->document()->idealWidth() > maxToolTipWidth)
+    {
+        toolTip->textLabel()->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
+        toolTip->textLabel()->setLineWrapMode(QTextEdit::FixedPixelWidth);
+        toolTip->textLabel()->setLineWrapColumnOrWidth(maxToolTipWidth);
+        toolTip->updateTailPos();
+    }
+
+    // To simplify the code, just limit the height of the text under tooltip thumbnail to be 1/2 of
+    // the scene height.
+    const int heightWithoutText =
+        toolTip->size().height() + (imageProvider ? size.height() / 2 : 0);
+
+    WidgetUtils::elideDocumentHeight(
+        toolTip->textLabel()->document(),
+        size.height() - heightWithoutText - 2 * kToolTipMargin);
 
     if (multiImageProvider)
     {

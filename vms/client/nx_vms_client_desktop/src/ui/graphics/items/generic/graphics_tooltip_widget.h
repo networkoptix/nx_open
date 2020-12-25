@@ -50,6 +50,8 @@ public:
     AsyncImageWidget::CropMode cropMode() const;
     void setCropMode(AsyncImageWidget::CropMode value);
 
+    nx::vms::client::desktop::TextEditLabel* textLabel() const;
+
 signals:
     void thumbnailClicked();
 

@@ -7,6 +7,8 @@
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QLayout>
 #include <QtWidgets/QMenu>
+#include <QtGui/QTextDocument>
+#include <QtGui/QTextBlock>
 
 namespace nx::vms::client::desktop {
 
@@ -91,6 +93,43 @@ QPoint WidgetUtils::mapFromGlobal(const QGraphicsWidget* to, const QPoint& globa
 
     auto viewPos = mapFromGlobal(views[0], globalPos);
     return to->mapFromScene(views[0]->mapToScene(viewPos)).toPoint();
+}
+
+void WidgetUtils::elideDocumentHeight(QTextDocument* document, int maxHeight, const QString& tail)
+{
+    std::optional<int> lastFullyVisiblePosition;
+
+    // Iterate over document blocks and their lines to find first partially visible line.
+    for (QTextBlock block = document->firstBlock(); block.isValid(); block = block.next())
+    {
+        const QTextLayout* layout = block.layout();
+        for (int lineIndex = 0; lineIndex < layout->lineCount(); ++lineIndex)
+        {
+            const QTextLine line = layout->lineAt(lineIndex);
+
+            const int documentPosition = block.position() + line.textStart();
+
+            // Is line fully visible?
+            if (layout->position().y() + line.naturalTextRect().bottom() <= maxHeight)
+            {
+                // Remember it and go to the next line.
+                lastFullyVisiblePosition = documentPosition;
+                continue;
+            }
+
+            // Found first partially visible line.
+
+            if (!lastFullyVisiblePosition) //< First line is already partially visible.
+                lastFullyVisiblePosition = documentPosition;
+
+            // Replace last fully visible line with tail.
+            QTextCursor cursor(document);
+            cursor.setPosition(*lastFullyVisiblePosition);
+            cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
+            cursor.insertText(tail);
+            return;
+        }
+    }
 }
 
 } // namespace nx::vms::client::desktop
