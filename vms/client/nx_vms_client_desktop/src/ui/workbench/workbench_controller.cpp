@@ -140,27 +140,6 @@ bool tourIsRunning(QnWorkbenchContext* context)
     return context->action(action::ToggleLayoutTourModeAction)->isChecked();
 }
 
-Ptz::Capability requiredCapability(PtzInstrument::DirectionFlag direction)
-{
-    switch (direction)
-    {
-        case PtzInstrument::DirectionFlag::panLeft:
-        case PtzInstrument::DirectionFlag::panRight:
-            return Ptz::ContinuousPanCapability;
-
-        case PtzInstrument::DirectionFlag::tiltUp:
-        case PtzInstrument::DirectionFlag::tiltDown:
-            return Ptz::ContinuousTiltCapability;
-
-        case PtzInstrument::DirectionFlag::zoomIn:
-        case PtzInstrument::DirectionFlag::zoomOut:
-            return Ptz::ContinuousZoomCapability;
-    }
-
-    NX_ASSERT(false);
-    return Ptz::NoPtzCapabilities;
-}
-
 } // namespace
 
 QnWorkbenchController::QnWorkbenchController(QObject *parent):
@@ -657,14 +636,10 @@ void QnWorkbenchController::at_scene_keyPressed(QGraphicsScene* /*scene*/, QEven
             const auto widget = qobject_cast<QnMediaResourceWidget*>(
                 display()->widget(Qn::CentralRole));
 
-            if (!widget || !widget->canControlPtz())
+            if (!m_ptzInstrument->supportsContinuousPtz(widget, direction))
                 return false;
 
-            const auto caps = widget->ptzController()->getCapabilities();
-            if (!caps.testFlag(requiredCapability(direction)))
-                return false;
-
-            m_ptzInstrument->toggleContinuousPtz(direction, true);
+            m_ptzInstrument->toggleContinuousPtz(widget, direction, true);
             return true;
         };
 
@@ -805,31 +780,40 @@ void QnWorkbenchController::at_scene_keyReleased(QGraphicsScene* /*scene*/, QEve
     if (e->isAutoRepeat())
         return;
 
+    const auto tryStopPtz =
+        [this](PtzInstrument::DirectionFlag direction)
+        {
+            const auto widget = qobject_cast<QnMediaResourceWidget*>(
+                display()->widget(Qn::CentralRole));
+
+            m_ptzInstrument->toggleContinuousPtz(widget, direction, false);
+        };
+
     switch (e->key())
     {
         case Qt::Key_Up:
-            m_ptzInstrument->toggleContinuousPtz(PtzInstrument::DirectionFlag::tiltUp, false);
+            tryStopPtz(PtzInstrument::DirectionFlag::tiltUp);
             break;
 
         case Qt::Key_Down:
-            m_ptzInstrument->toggleContinuousPtz(PtzInstrument::DirectionFlag::tiltDown, false);
+            tryStopPtz(PtzInstrument::DirectionFlag::tiltDown);
             break;
 
         case Qt::Key_Left:
-            m_ptzInstrument->toggleContinuousPtz(PtzInstrument::DirectionFlag::panLeft, false);
+            tryStopPtz(PtzInstrument::DirectionFlag::panLeft);
             break;
 
         case Qt::Key_Right:
-            m_ptzInstrument->toggleContinuousPtz(PtzInstrument::DirectionFlag::panRight, false);
+            tryStopPtz(PtzInstrument::DirectionFlag::panRight);
             break;
 
         case Qt::Key_Plus:
         case Qt::Key_Equal:
-            m_ptzInstrument->toggleContinuousPtz(PtzInstrument::DirectionFlag::zoomIn, false);
+            tryStopPtz(PtzInstrument::DirectionFlag::zoomIn);
             break;
 
         case Qt::Key_Minus:
-            m_ptzInstrument->toggleContinuousPtz(PtzInstrument::DirectionFlag::zoomOut, false);
+            tryStopPtz(PtzInstrument::DirectionFlag::zoomOut);
             break;
 
         default:

@@ -54,7 +54,8 @@ public:
     Q_FLAG(DirectionFlag) //< For lexical debug output.
     Q_DECLARE_FLAGS(DirectionFlags, DirectionFlag)
 
-    void toggleContinuousPtz(DirectionFlag direction, bool on);
+    bool supportsContinuousPtz(QnMediaResourceWidget* widget, DirectionFlag direction) const;
+    void toggleContinuousPtz(QnMediaResourceWidget* widget, DirectionFlag direction, bool on);
 
 signals:
     void ptzProcessStarted(QnMediaResourceWidget* widget);

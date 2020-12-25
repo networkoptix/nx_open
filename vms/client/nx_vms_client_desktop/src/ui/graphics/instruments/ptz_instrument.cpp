@@ -116,6 +116,27 @@ PtzInstrument::DirectionFlag oppositeDirection(PtzInstrument::DirectionFlag dire
     return {};
 };
 
+Ptz::Capability requiredCapability(PtzInstrument::DirectionFlag direction)
+{
+    switch (direction)
+    {
+        case PtzInstrument::DirectionFlag::panLeft:
+        case PtzInstrument::DirectionFlag::panRight:
+            return Ptz::ContinuousPanCapability;
+
+        case PtzInstrument::DirectionFlag::tiltUp:
+        case PtzInstrument::DirectionFlag::tiltDown:
+            return Ptz::ContinuousTiltCapability;
+
+        case PtzInstrument::DirectionFlag::zoomIn:
+        case PtzInstrument::DirectionFlag::zoomOut:
+            return Ptz::ContinuousZoomCapability;
+    }
+
+    NX_ASSERT(false);
+    return Ptz::NoPtzCapabilities;
+}
+
 // TODO: Remove code duplication with QnWorkbenchPtzHandler.
 QVector3D applyRotation(const QVector3D& speed, qreal rotation)
 {
@@ -1494,14 +1515,26 @@ bool PtzInstrument::PtzData::hasAdvancedPtz() const
     return hasCapabilities(Ptz::ViewportPtzCapability);
 }
 
-void PtzInstrument::toggleContinuousPtz(DirectionFlag direction, bool on)
+bool PtzInstrument::supportsContinuousPtz(
+    QnMediaResourceWidget* widget, DirectionFlag direction) const
 {
-    if (dragProcessor()->isRunning())
-        return;
+    if (!widget || !widget->canControlPtz())
+        return false;
 
-    const auto widget = qobject_cast<QnMediaResourceWidget*>(display()->widget(Qn::CentralRole));
-    if (!widget || !checkPlayingLive(widget) || m_externalPtzDirections.testFlag(direction) == on)
+    const auto caps = widget->ptzController()->getCapabilities();
+    return caps.testFlag(requiredCapability(direction));
+}
+
+void PtzInstrument::toggleContinuousPtz(
+    QnMediaResourceWidget* widget, DirectionFlag direction, bool on)
+{
+    if (dragProcessor()->isRunning()
+        || !supportsContinuousPtz(widget, direction)
+        || !checkPlayingLive(widget)
+        || m_externalPtzDirections.testFlag(direction) == on)
+    {
         return;
+    }
 
     NX_VERBOSE(this, "Toggle continuous PTZ: %1 %2",
         QMetaEnum::fromType<DirectionFlag>().valueToKey(int(direction)),
