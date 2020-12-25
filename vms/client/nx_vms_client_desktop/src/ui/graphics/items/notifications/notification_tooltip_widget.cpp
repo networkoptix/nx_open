@@ -13,13 +13,9 @@ void QnNotificationToolTipWidget::updateTailPos()
     if (!parentItem())
         return;
 
-    if (!parentItem()->parentItem())
-        return;
-
     QRectF rect = this->rect();
-    QGraphicsItem* list = parentItem()->parentItem();
 
-    const auto parentY = parentItem()->mapToItem(list, m_pointTo).y();
+    const auto parentY = m_pointTo.y();
     const auto tailX = qRound(rect.right() + tailLength());
 
     const auto toolTipHeight = rect.height();

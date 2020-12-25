@@ -64,7 +64,7 @@ protected:
     virtual void setProxyUpdatesEnabled(bool updatesEnabled);
 
 protected:
-    const QGraphicsWidget* m_parentWidget;
+    QGraphicsWidget* const m_parentWidget;
     qreal m_masterOpacity;
 };
 

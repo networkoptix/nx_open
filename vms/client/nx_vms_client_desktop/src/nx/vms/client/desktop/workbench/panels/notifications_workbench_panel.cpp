@@ -471,7 +471,6 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
     m_lastHoveredTile = tile;
 
     auto multiImageProvider = this->multiImageProvider(index);
-    const auto parentWidget = m_eventPanel->graphicsProxyWidget();
     const auto imageProvider = multiImageProvider ? multiImageProvider.get() : tile->preview();
 
     auto text = tile->toolTip();
@@ -482,10 +481,10 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
 
     const auto tilePos = (tile->rect().topLeft() + tile->rect().bottomLeft()) / 2;
     const auto globalPos = QnHiDpiWorkarounds::safeMapToGlobal(tile, tilePos);
-    const auto tooltipPos = WidgetUtils::mapFromGlobal(parentWidget, globalPos);
+    const auto tooltipPos = WidgetUtils::mapFromGlobal(m_parentWidget, globalPos);
 
     QPointer<QnNotificationToolTipWidget> toolTip(
-        new QnNotificationToolTipWidget(parentWidget));
+        new QnNotificationToolTipWidget(m_parentWidget));
 
     toolTip->setOpacity(0.0);
     toolTip->setEnclosingGeometry(tooltipsEnclosingRect);
@@ -553,7 +552,7 @@ void NotificationsWorkbenchPanel::at_eventTileHovered(
                 m_eventPanelHoverProcessor->forceHoverLeave();
         });
 
-    m_eventPanelHoverProcessor = new HoverFocusProcessor(parentWidget);
+    m_eventPanelHoverProcessor = new HoverFocusProcessor(m_eventPanel->graphicsProxyWidget());
     m_eventPanelHoverProcessor->addTargetItem(toolTip);
     m_eventPanelHoverProcessor->setHoverEnterDelay(kToolTipShowDelayMs);
     m_eventPanelHoverProcessor->setHoverLeaveDelay(kToolTipHideDelayMs);
