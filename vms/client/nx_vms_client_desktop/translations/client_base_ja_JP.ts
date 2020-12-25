@@ -1456,7 +1456,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Password should contain different types of symbols.</source>
-      <translation>パスワードは異なる種類のシンボルを含める必要があります</translation>
+      <translation>パスワードには異なる種類の文字を含める必要があります</translation>
     </message>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
@@ -2064,7 +2064,7 @@ to view more bookmarks</source>
     <name>QnBackupScheduleDialog</name>
     <message>
       <source>Until finished</source>
-      <translation>終了迄</translation>
+      <translation>完了まで</translation>
     </message>
   </context>
   <context>
@@ -5657,35 +5657,35 @@ to %1</source>
     </message>
     <message>
       <source>Add more drives to use them as backup storage.</source>
-      <translation>バックアップ ストレージとしてより多くのドライブを追加</translation>
+      <translation>バックアップストレージとして使用するドライブを追加してください。</translation>
     </message>
     <message>
       <source>Change &quot;Main&quot; to &quot;Backup&quot; for some of the storage above to enable backup.</source>
-      <translation>バックアップを有効にするには、上記のストレージの一部を&quot;メイン&quot;から&quot;バックアップ&quot;に変更してください</translation>
+      <translation>バックアップを有効にするには、上記ストレージの一部を&quot;メイン&quot;から&quot;バックアップ&quot;に変更してください。</translation>
     </message>
     <message>
       <source>Apply changes to start backup.</source>
-      <translation>変更を適用してバックアップを開始する</translation>
+      <translation>バックアップを開始するには変更を適用してください。</translation>
     </message>
     <message>
       <source>in %1</source>
-      <translation>%1 中</translation>
+      <translation>%1後</translation>
     </message>
     <message>
       <source>%1 before now</source>
-      <translation>%1 以前</translation>
+      <translation>%1前</translation>
     </message>
     <message>
       <source>Realtime backup is active...</source>
-      <translation>リアルタイムのバックアップがアクティブ...</translation>
+      <translation>リアルタイムバックアップが進行中...</translation>
     </message>
     <message>
       <source>Realtime backup is set up.</source>
-      <translation>リアルタイムのバックアップを設定</translation>
+      <translation>リアルタイムバックアップが設定されています。</translation>
     </message>
     <message>
       <source>There is no backup yet.</source>
-      <translation>まだバックアップはありません</translation>
+      <translation>まだバックアップはありません。</translation>
     </message>
     <message>
       <source>Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</source>
@@ -5709,11 +5709,11 @@ to %1</source>
     </message>
     <message>
       <source>You can cancel this operation at any moment without data loss.</source>
-      <translation>データを失うことがなく任意の時点でこの操作をキャンセルできます</translation>
+      <translation>データを失うことなく、いつでもこの操作をキャンセルできます。</translation>
     </message>
     <message>
       <source>Continue anyway?</source>
-      <translation>続けますか？</translation>
+      <translation>続行しますか?</translation>
     </message>
     <message>
       <source>Hard disk load will increase significantly</source>
@@ -5721,19 +5721,19 @@ to %1</source>
     </message>
     <message>
       <source>Select at least one device in the Backup Settings to start backup.</source>
-      <translation>バックアップを開始するにはバックアップの設定で少なくとも 1 つのデバイスを選択してください</translation>
+      <translation>バックアップを開始するには、バックアップ設定でデバイスを1つ以上選択してください。</translation>
     </message>
     <message>
       <source>Select at least one camera in the Backup Settings to start backup.</source>
-      <translation>バックアップを開始するにはバックアップの設定で少なくとも 1台のカメラを選択してください</translation>
+      <translation>バックアップを開始するには、バックアップ設定でカメラを1つ以上選択してください。</translation>
     </message>
     <message>
       <source>Archive reindexing completed</source>
-      <translation>アーカイブインデックスのリビルド完了しました</translation>
+      <translation>アーカイブの再インデックスが完了しました</translation>
     </message>
     <message>
       <source>Backup reindexing completed</source>
-      <translation>バックアップのインデックスのリビルドが完了しました</translation>
+      <translation>バックアップの再インデックスが完了しました</translation>
     </message>
     <message>
       <source>Backup completed</source>
@@ -6399,7 +6399,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>User is disabled</source>
-      <translation>ユーザーは無効</translation>
+      <translation>ユーザーは無効になっています</translation>
     </message>
     <message>
       <source>Apply changes before switching to another user?</source>
@@ -6994,7 +6994,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>To prevent this you can add additional storage. You can also control which footage will be deleted first by changing archive keep time in camera settings.</source>
-      <translation>これを防ぐために、追加のストレージを追加することができます。また、カメラ設定でアーカイブの保持時間を変更することで、最初に削除する映像を制御することもできます。</translation>
+      <translation>ストレージを追加することでこれを回避できます。また、カメラ設定でアーカイブ保持時間を変更することで、最初に削除される映像を制御することもできます。</translation>
     </message>
     <message>
       <source>Upload anyway?</source>
@@ -8651,7 +8651,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Incompatible %1 instance. To update disconnect System from %1 first.</source>
       <comment>%1 here will be substituted with cloud name e.g. &apos;Nx Cloud&apos;.</comment>
-      <translation>互換性のない %1 インスタンス　更新は最初に %1 からシステムを切断します</translation>
+      <translation>%1 とは互換性がありません。更新するにはシステムを %1 から切断します。</translation>
     </message>
     <message>
       <source>No update package available</source>

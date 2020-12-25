@@ -295,7 +295,7 @@
     <message>
       <location/>
       <source>Limit Bandwidth to:</source>
-      <translation>最大:帯域:</translation>
+      <translation>帯域制限:</translation>
     </message>
     <message>
       <location/>
@@ -310,7 +310,7 @@
     <message>
       <location/>
       <source>Finish</source>
-      <translation>終了:</translation>
+      <translation>終了</translation>
     </message>
     <message>
       <location/>
@@ -320,7 +320,7 @@
     <message>
       <location/>
       <source>on the next day</source>
-      <translation>次の日に</translation>
+      <translation>(翌日)</translation>
     </message>
   </context>
   <context>

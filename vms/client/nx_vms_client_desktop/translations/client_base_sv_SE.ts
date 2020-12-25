@@ -993,9 +993,9 @@ om du vill visa fler bokmärken</translation>
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
-      <translation type="unfinished">
-        <numerusform>Show on Items</numerusform>
-        <numerusform>Show on Items</numerusform>
+      <translation>
+        <numerusform>Visa på objekt</numerusform>
+        <numerusform>Visa på objekt</numerusform>
       </translation>
     </message>
   </context>
@@ -1611,7 +1611,7 @@ om du vill visa fler bokmärken</translation>
     </message>
     <message>
       <source>PTZ can only be used in the live mode</source>
-      <translation type="unfinished">PTZ can only be used in the live mode</translation>
+      <translation>PTZ kan endast användas i live-läge</translation>
     </message>
   </context>
   <context>
@@ -10026,7 +10026,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Regions of Interest</source>
-      <translation type="unfinished">Regions of Interest</translation>
+      <translation>Intresseområden</translation>
     </message>
   </context>
   <context>

@@ -31,10 +31,10 @@
 <div class="panel-body text-center panel-body-big" ng-if="stepIs('start')">
     <div>
         <h2>{{Config.productName}} を始める</h2>
-        <p class="master-description">最初にサーバーを構成してください<br>
-オプションを選択します</p>
+        <p class="master-description">サーバーを構成します。<br>
+オプションを選択してください。</p>
         <div class="spacer" ng-if="!settings.liteClient"><br><br><br></div>
-        <button class="btn btn-primary" autofocus ng-click="next()">新しいシステムをセットアップします</button>
+        <button class="btn btn-primary" autofocus ng-click="next()">新規システムのセットアップ</button>
 
         <div class="horisontal-line-text">
             <span class="line"></span>
@@ -259,7 +259,7 @@
                      !forms.localForm.passwordInput.$dirty &&
                      !forms.localForm.localPasswordConfirmation.$touched">
             <div class="help-block">
-                パスワードには異なる種類の文字を含む、少なくとも 8 シンボルが必要です
+                パスワードは8文字以上で、異なる種類の文字を含む必要があります。
             </div>
         </div>
         <div class="form-group has-error" ng-if="!forms.localForm.passwordInput.password.$valid &&
@@ -310,7 +310,7 @@
                    uib-typeahead-show-hint="true"
                    uib-typeahead-focus-first="false"
                    uib-typeahead-focus
- placeholder="既存のシステム URL (https://host:port)"
+ placeholder="既存システムのURL (https://host:port)"
                    ng-change="clearRemoteError()"
                    required
  class="form-control">
@@ -411,7 +411,7 @@
 
 
 <div class="panel-body text-center" ng-if="stepIs('configureWrongNetwork')">
-    <p><b>最初にネットワークの設定を行って下さい</b></p>
+    <p><b>ネットワーク設定を先に行って下さい</b></p>
     <network-settings settings="networkSettings[0]" ></network-settings>
 
     <p class="vertical-bottom">

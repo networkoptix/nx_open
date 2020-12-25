@@ -398,7 +398,7 @@
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
-      <translation>カメラはアーカイブから復元されました。カメラを削除して再度登録すると、ライブビデオが表示されます。</translation>
+      <translation>カメラはアーカイブから復元されました。カメラを削除して再度登録すると、ライブ映像が表示されます。</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
@@ -1219,7 +1219,7 @@
     </message>
     <message>
       <source>Can view live video from all cameras.</source>
-      <translation>すべてのカメラのライブビデオを表示できます</translation>
+      <translation>すべてのカメラのライブ映像を表示できます。</translation>
     </message>
     <message>
       <source>Custom user role.</source>
@@ -1324,11 +1324,11 @@
     </message>
     <message>
       <source>Device output</source>
-      <translation>デバイス出力</translation>
+      <translation>デバイスI/O出力</translation>
     </message>
     <message>
       <source>Camera output</source>
-      <translation>カメラ出力</translation>
+      <translation>カメラI/O出力</translation>
     </message>
     <message>
       <source>Device recording</source>
@@ -1362,7 +1362,7 @@
     </message>
     <message>
       <source>Server Started</source>
-      <translation>サーバーが起動しました</translation>
+      <translation>サーバー起動</translation>
     </message>
     <message>
       <source>License Issue</source>
@@ -1438,15 +1438,15 @@
     </message>
     <message>
       <source>Input on %1</source>
-      <translation>入力ON %1</translation>
+      <translation>%1 I/O入力</translation>
     </message>
     <message>
       <source>Motion on %1</source>
-      <translation>%1で動体検知</translation>
+      <translation>%1 モーション検知</translation>
     </message>
     <message>
       <source>Network Issue at %1</source>
-      <translation>%1でネットワーク問題発生</translation>
+      <translation>%1 ネットワーク障害</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Failure</source>
@@ -1455,12 +1455,12 @@
     <message>
       <source>Device IP Conflict at %1</source>
       <comment>Device IP Conflict at &lt;server_name&gt;</comment>
-      <translation>デバイスIPが %1 と重複</translation>
+      <translation>%1でデバイスのIPが競合しています</translation>
     </message>
     <message>
       <source>Camera IP Conflict at %1</source>
       <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
-      <translation>カメラIPが %1 と重複</translation>
+      <translation>%1でカメラIPが競合しています</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; Conflict</source>
@@ -1468,7 +1468,7 @@
     </message>
     <message>
       <source>Server &quot;%1&quot; Started</source>
-      <translation>サーバー &quot;%1&quot; 起動しました</translation>
+      <translation>サーバー &quot;%1&quot; が起動しました</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; has a license problem</source>
@@ -1500,15 +1500,15 @@
     </message>
     <message>
       <source>Input Port: %1</source>
-      <translation>入力ポート %1</translation>
+      <translation>I/O入力ポート %1</translation>
     </message>
     <message>
       <source>Reason: %1</source>
-      <translation>理由:・%1</translation>
+      <translation>理由: %1</translation>
     </message>
     <message>
       <source>Conflicting Address: %1</source>
-      <translation>重複アドレス %1</translation>
+      <translation>重複アドレス: %1</translation>
     </message>
     <message>
       <source>MAC #%1: %2</source>
@@ -1526,7 +1526,7 @@
     </message>
     <message>
       <source>Trigger: %1</source>
-      <translation>トリガー：%1</translation>
+      <translation>トリガー: %1</translation>
     </message>
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
@@ -1537,7 +1537,7 @@
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
       <translation>
-        <numerusform>%n 回、最初に： %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n 回、最初: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
       </translation>
     </message>
     <message>
@@ -1555,12 +1555,12 @@
     <message numerus="yes">
       <source>No data received during last %n seconds.</source>
       <translation>
-        <numerusform>%n 秒間データを受信していません.</numerusform>
+        <numerusform>%n 秒間データを受信していません。</numerusform>
       </translation>
     </message>
     <message>
       <source>Connection to device was unexpectedly closed.</source>
-      <translation>デバイスとの通信が予期せずに閉じられました.</translation>
+      <translation>デバイスとの通信が予期せず終了しました。</translation>
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
@@ -1572,11 +1572,11 @@
     </message>
     <message>
       <source>RTP packet loss detected.</source>
-      <translation>RTPパケットロスが検知されました.</translation>
+      <translation>RTPパケットロスが検知されました。</translation>
     </message>
     <message>
       <source>Device does not respond to network requests.</source>
-      <translation>デバイスがネットワーク要求に応答しません.</translation>
+      <translation>デバイスがネットワーク要求に応答しません。</translation>
     </message>
     <message>
       <source>Connection to server is lost.</source>
@@ -1596,7 +1596,7 @@
     </message>
     <message>
       <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
-      <translation>HDD / SSDディスク &quot;%1&quot; がいっぱいです。ディスクに含まれているデータが多すぎてVMSで管理できません。</translation>
+      <translation>HDD / SSDディスク &quot;%1&quot; がいっぱいです。VMS管理外のデータが多すぎます。</translation>
     </message>
     <message>
       <source>System disk &quot;%1&quot; is almost full.</source>
@@ -1604,23 +1604,23 @@
     </message>
     <message>
       <source>Archive backup failed: No available backup storages with sufficient free space</source>
-      <translation>アーカイブのバックアップに失敗しました：バックアップストレージの空き容量が足りません</translation>
+      <translation>アーカイブのバックアップに失敗しました。十分な空き容量をもつバックアップストレージがありません。</translation>
     </message>
     <message>
       <source>Archive backup failed: Target storage failure</source>
-      <translation>アーカイブのバックアップに失敗しました：ターゲットストレージエラー</translation>
+      <translation>アーカイブのバックアップに失敗しました。対象ストレージに障害が発生しています。</translation>
     </message>
     <message>
       <source>Archive backup failed: Source file open/read error</source>
-      <translation>アーカイブのバックアップに失敗しました：ソースファイルのオープン/読込みエラー</translation>
+      <translation>アーカイブのバックアップに失敗しました。ソースファイルのオープン/読込み時にエラーが発生しました。</translation>
     </message>
     <message>
       <source>Archive backup failed: Target file create/write error</source>
-      <translation>アーカイブのバックアップに失敗しました：ターゲットファイルの作成/書き込みエラー</translation>
+      <translation>アーカイブのバックアップに失敗しました。ターゲットファイルの作成/書き込み時にエラーが発生しました。</translation>
     </message>
     <message>
       <source>Archive backup failed: File catalog error</source>
-      <translation>アーカイブのバックアップに失敗しました：ファイルカタログエラー</translation>
+      <translation>アーカイブのバックアップに失敗しました。ファイルカタログに異常があります。</translation>
     </message>
     <message>
       <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
