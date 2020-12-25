@@ -988,8 +988,6 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 if (videoCodecCtx->extradata_size == 0 && videoData->compressionType == AV_CODEC_ID_H264
                     && m_container.compare("mp4", Qt::CaseInsensitive) == 0)
                 {
-                    // Ffmpeg lose 'key' flags on reading
-                    // in case of MKV file with H264 Annex.B stream with filled extra data.
                     std::vector<uint8_t> extradata = nx::media::h264::buildExtraData(
                         (const uint8_t*)videoData->data(), videoData->dataSize());
                     if (!extradata.empty())
