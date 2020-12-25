@@ -313,7 +313,7 @@ void DeviceAgent::updateAgentManifest(const ParsedMetadata& parsedMetadata)
         }
     }
     if (manifestUpdated)
-        m_handler->pushManifest(new nx::sdk::String(QJson::serialized(m_manifest)));
+        m_handler->pushManifest(makePtr<nx::sdk::String>(QJson::serialized(m_manifest)).get());
 }
 
 /*virtual*/ void DeviceAgent::doPushDataPacket(
