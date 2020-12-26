@@ -3234,7 +3234,7 @@ to %1</source>
     </message>
     <message>
       <source>You will be disconnected from this System and able to login again through local network with local account</source>
-      <translation>このシステムから切断し、再びローカル アカウントでローカル ネットワークを介してログインすることができます</translation>
+      <translation>このシステムから切断されます。ローカル ネットワークからローカル アカウントでログインすることができます。</translation>
     </message>
     <message>
       <source>Failed to disconnect System from %1</source>
@@ -5641,7 +5641,7 @@ to %1</source>
     </message>
     <message>
       <source>Cannot start backup while archive index rebuild is in progress.</source>
-      <translation>アーカイブインデックスのリビルド中はバックアップできません.</translation>
+      <translation>アーカイブインデックスの再構築中はバックアップを開始できません。</translation>
     </message>
     <message>
       <source>Backup is in progress...</source>
@@ -5689,19 +5689,19 @@ to %1</source>
     </message>
     <message>
       <source>Archive backup is completed up to &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation>アーカイブバックアップは&lt;b&gt;%1&lt;/b&gt;まで完了</translation>
+      <translation>アーカイブバックアップは &lt;b&gt;%1&lt;/b&gt; まで完了しました。</translation>
     </message>
     <message>
       <source>Next backup is scheduled for &lt;b&gt;%1&lt;/b&gt;</source>
-      <translation>次のバックアップは&lt;b&gt;%1&lt;/b&gt;にスケジュールされています</translation>
+      <translation>次のバックアップは &lt;b&gt;%1&lt;/b&gt; にスケジュールされています。</translation>
     </message>
     <message>
       <source>Next backup is not scheduled.</source>
-      <translation>次のバックアップはスケジュールされていません</translation>
+      <translation>次のバックアップはスケジュールされていません。</translation>
     </message>
     <message>
       <source>Depending on the total size of the archive, reindexing can take up to several hours.</source>
-      <translation>アーカイブの合計サイズによってはインデックスのリビルドに数時間を要します</translation>
+      <translation>録画データの合計サイズによっては、再インデックスに数時間かかる場合があります。</translation>
     </message>
     <message>
       <source>Reindexing is only necessary if your archive folders have been moved, renamed or deleted.</source>
@@ -5767,7 +5767,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Server is unavailable.</source>
-      <translation>サーバーは利用できません。</translation>
+      <translation>サーバーにアクセスできません。</translation>
     </message>
     <message>
       <source>now</source>

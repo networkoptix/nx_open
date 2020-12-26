@@ -24,7 +24,7 @@
     </message>
     <message>
       <source>UAC must be enabled to request privileges for non-admin users.</source>
-      <translation>UAC・管理者以外のユーザーの権限を有効にする必要があります.</translation>
+      <translation>管理者以外のユーザーに特権を要求するには、UACを有効にする必要があります。</translation>
     </message>
   </context>
   <context>
@@ -47,7 +47,7 @@
     </message>
     <message>
       <source>No %1 services installed</source>
-      <translation>・%1・番のサービスがインストールされました</translation>
+      <translation>%1 サービスがインストールされていません。</translation>
     </message>
     <message>
       <source>&amp;Quit</source>

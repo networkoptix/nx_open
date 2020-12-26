@@ -949,7 +949,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/cloud_management_widget.ui"/>
       <source>This system is connected to</source>
-      <translation>このシステムは以下に接続されています</translation>
+      <translation>このシステムは次のアカウントと連携しています。</translation>
     </message>
   </context>
   <context>

@@ -218,7 +218,7 @@
     </message>
     <message>
       <source>Unknown error. Please contact support.</source>
-      <translation>未知のエラー、・サポートにお問い合わせ下さい.</translation>
+      <translation>未知のエラーです。サポートにお問い合わせ下さい。</translation>
     </message>
     <message>
       <source>(unknown)</source>
@@ -476,7 +476,7 @@
     </message>
     <message>
       <source>Could not create output context for format %1.</source>
-      <translation>フォーマット・%1・の出力コンテキストを作成出来ません.</translation>
+      <translation>フォーマット %1 の出力コンテキストを作成出来ませんでした。</translation>
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
@@ -492,7 +492,7 @@
     </message>
     <message>
       <source>Video or audio codec is incompatible with container %1.</source>
-      <translation>ビデオ又はオーディオコーデックが・%1・のフォーマットと互換性がありません.</translation>
+      <translation>映像または音声のコーデックが %1 形式と互換性がありません。</translation>
     </message>
   </context>
   <context>
@@ -1426,15 +1426,15 @@
     </message>
     <message>
       <source>Device %1 was disconnected</source>
-      <translation>デバイス %1 の接続が切断されました</translation>
+      <translation>デバイス %1 が切断されました。</translation>
     </message>
     <message>
       <source>Camera %1 was disconnected</source>
-      <translation>カメラ %1 の接続が切断されました</translation>
+      <translation>カメラ %1 が切断されました。</translation>
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
-      <translation>I/Oモジュール %1 切断</translation>
+      <translation>I/Oモジュール %1 が切断されました。</translation>
     </message>
     <message>
       <source>Input on %1</source>
@@ -1500,7 +1500,7 @@
     </message>
     <message>
       <source>Input Port: %1</source>
-      <translation>I/O入力ポート %1</translation>
+      <translation>I/O入力ポート: %1</translation>
     </message>
     <message>
       <source>Reason: %1</source>
