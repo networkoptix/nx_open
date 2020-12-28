@@ -25,7 +25,8 @@ using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
 DeviceAgent::DeviceAgent(Engine* engine):
-    m_engine(engine)
+    m_engine(engine),
+    m_metadataParser(engine->plugin()->utilityProvider())
 {
 }
 

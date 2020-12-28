@@ -26,12 +26,17 @@ const QString kThermalObjectTypeId = "nx.hikvision.ThermalObject";
 const QString kThermalObjectPreAlarmTypeId = "nx.hikvision.ThermalObjectPreAlarm";
 const QString kThermalObjectAlarmTypeId = "nx.hikvision.ThermalObjectAlarm";
 
+MetadataParser::MetadataParser(const nx::sdk::Ptr<nx::sdk::IUtilityProvider>& utilityProvider):
+    m_utilityProvider(utilityProvider)
+{
+}
+
 void MetadataParser::setHandler(Ptr<IDeviceAgent::IHandler> handler)
 {
     m_handler = handler;
 }
 
-void MetadataParser::parsePacket(QByteArray bytes, std::int64_t timestampUs)
+void MetadataParser::parsePacket(QByteArray bytes, int64_t timestampUs)
 {
     evictStaleCacheEntries();
 
@@ -44,15 +49,14 @@ void MetadataParser::parsePacket(QByteArray bytes, std::int64_t timestampUs)
     m_xml.clear();
     m_xml.addData(bytes);
 
-    if (timestampUs > m_currentTimestampUs)
-        m_currentTimestampUs = timestampUs;
+    m_currentTimestampUs = timestampUs;
 
     while (m_xml.readNextStartElement())
     {
         if (m_xml.name() == "Metadata")
         {
-            m_lastMetadataTimestampUs = m_currentTimestampUs;
             m_sinceLastMetadata.restart();
+            m_lastMetadataTimestampUs = m_currentTimestampUs;
 
             parseMetadataElement();
         }
@@ -72,6 +76,13 @@ void MetadataParser::processEvent(HikvisionEvent* event)
 {
     evictStaleCacheEntries();
 
+    if (m_sinceLastMetadata.isValid())
+        m_currentTimestampUs = m_lastMetadataTimestampUs + m_sinceLastMetadata.elapsedMs() * 1000;
+    else
+        m_currentTimestampUs = m_utilityProvider->vmsSystemTimeSinceEpochMs() * 1000;
+
+    event->dateTime = QDateTime::fromMSecsSinceEpoch(m_currentTimestampUs / 1000);
+
     if (!event->region)
         return;
 
@@ -86,15 +97,6 @@ void MetadataParser::processEvent(HikvisionEvent* event)
 
     if (entry.trackId.isNull())
         return;
-
-    const auto timestampUs = std::chrono::duration_cast<std::chrono::microseconds>(
-        std::chrono::microseconds(m_lastMetadataTimestampUs)
-        + m_sinceLastMetadata.elapsed()).count();
-
-    if (timestampUs > m_currentTimestampUs)
-        m_currentTimestampUs = timestampUs;
-
-    event->dateTime = QDateTime::fromMSecsSinceEpoch(m_currentTimestampUs / 1000);
     
     processEntry(&entry, event);
 }

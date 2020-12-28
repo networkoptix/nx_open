@@ -13,7 +13,6 @@
 #include <nx/sdk/analytics/i_consuming_device_agent.h>
 #include <nx/utils/url.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/utils/time_helper.h>
 
 #include "metadata_monitor.h"
 #include "engine.h"
@@ -87,8 +86,6 @@ private:
 
     std::mutex m_metadataParserMutex;
     MetadataParser m_metadataParser;
-    std::optional<nx::utils::TimeHelper> m_eventTimestampAdjuster;
-    std::optional<nx::utils::TimeHelper> m_objectTimestampAdjuster;
 };
 
 } // namespace hikvision

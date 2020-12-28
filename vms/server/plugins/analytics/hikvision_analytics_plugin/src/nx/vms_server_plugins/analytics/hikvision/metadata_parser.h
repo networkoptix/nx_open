@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstdint>
+#include <stdint.h>
 #include <chrono>
 #include <optional>
 #include <map>
@@ -9,6 +9,7 @@
 #include <nx/utils/elapsed_timer.h>
 #include <nx/sdk/ptr.h>
 #include <nx/sdk/helpers/attribute.h>
+#include <nx/sdk/i_utility_provider.h>
 #include <nx/sdk/analytics/point.h>
 #include <nx/sdk/analytics/rect.h>
 #include <nx/sdk/analytics/i_device_agent.h>
@@ -32,9 +33,11 @@ extern const QString kThermalObjectAlarmTypeId;
 class MetadataParser
 {
 public:
+    explicit MetadataParser(const nx::sdk::Ptr<nx::sdk::IUtilityProvider>& utilityProvider);
+
     void setHandler(nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> handler);
 
-    void parsePacket(QByteArray bytes, std::int64_t timestampUs);
+    void parsePacket(QByteArray bytes, int64_t timestampUs);
     void processEvent(HikvisionEvent* event);
 
 private:
@@ -90,12 +93,13 @@ private:
     void evictStaleCacheEntries();
 
 private:
+    const nx::sdk::Ptr<nx::sdk::IUtilityProvider> m_utilityProvider;
     nx::sdk::Ptr<nx::sdk::analytics::IDeviceAgent::IHandler> m_handler;
 
     QXmlStreamReader m_xml;
-    std::int64_t m_lastMetadataTimestampUs = -1;
-    std::int64_t m_currentTimestampUs = -1;
     nx::utils::ElapsedTimer m_sinceLastMetadata;
+    int64_t m_lastMetadataTimestampUs = -1;
+    int64_t m_currentTimestampUs = -1;
 
     std::map<int, CacheEntry> m_cache;
 };
