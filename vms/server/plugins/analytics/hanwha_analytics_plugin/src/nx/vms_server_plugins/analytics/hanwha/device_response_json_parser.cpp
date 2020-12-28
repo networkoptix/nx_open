@@ -191,7 +191,21 @@ The example of the incoming json:
     const nx::kit::Json jsonEnable = channelInfo["Enable"];
     if (!jsonEnable.is_bool())
     {
-        NX_DEBUG(NX_SCOPE_TAG, NX_FMT("JSON parsing error. \"Enable\" field absent"));
+        NX_DEBUG(NX_SCOPE_TAG, "JSON parsing error. \"Enable\" field absent");
+        return std::nullopt;
+    }
+    return jsonEnable.bool_value();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+/*static*/ std::optional<bool> DeviceResponseJsonParser::extractTemperatureChangeDetectionToggle(
+    const nx::kit::Json& channelInfo, int chanelNumber)
+{
+    const nx::kit::Json jsonEnable = channelInfo["Enable"];
+    if (!jsonEnable.is_bool())
+    {
+        NX_DEBUG(NX_SCOPE_TAG, "JSON parsing error. \"Enable\" field absent");
         return std::nullopt;
     }
     return jsonEnable.bool_value();

@@ -22,6 +22,11 @@ namespace nx::vms_server_plugins::analytics::hanwha {
 
 //-------------------------------------------------------------------------------------------------
 
+/**
+ * SettingsGroup is a base class for any group of ROI settings. Each group contains one or several
+ * settings that correspond to an event. Each member-variable describes one setting. Members'
+ * default values correspond to settings default values (values after device reset).
+ */
 struct SettingGroup
 {
     const SettingsCapabilities& m_settingsCapabilities; //< settingsCapabilities are stored in the DeviceAgent
@@ -197,9 +202,12 @@ struct AnalyticsMode: public SettingGroup
     inline static const std::string IV ="IntelligentVideo";
     inline static const std::string MDAndIV ="MDAndIV";
 
-    AnalyticsMode(const SettingsCapabilities& settingsCapabilities, const RoiResolution& roiResolution, int /*roiIndex*/ = -1):
-        SettingGroup(settingsCapabilities, roiResolution, kKeys) {}
-
+    AnalyticsMode(const SettingsCapabilities& settingsCapabilities,
+        const RoiResolution& roiResolution, int /*roiIndex*/ = -1)
+        :
+        SettingGroup(settingsCapabilities, roiResolution, kKeys)
+    {
+    }
     bool operator==(const AnalyticsMode& rhs) const;
     bool operator!=(const AnalyticsMode& rhs) const { return !(*this == rhs); }
 
@@ -237,8 +245,12 @@ struct ShockDetection : public SettingGroup
     static constexpr const char* kJsonEventName = "ShockDetection";
     static constexpr const char* kSunapiEventName = "shockdetection";
 
-    ShockDetection(const SettingsCapabilities& settingsCapabilities, const RoiResolution& roiResolution, int /*roiIndex*/ = -1) :
-        SettingGroup(settingsCapabilities, roiResolution, kKeys) {}
+    ShockDetection(const SettingsCapabilities& settingsCapabilities,
+        const RoiResolution& roiResolution, int /*roiIndex*/ = -1)
+        :
+        SettingGroup(settingsCapabilities, roiResolution, kKeys)
+    {
+    }
     bool operator==(const ShockDetection& rhs) const;
     bool operator!=(const ShockDetection& rhs) const { return !(*this == rhs); }
     void assignExclusiveFrom(const ShockDetection& other) {};
@@ -282,8 +294,12 @@ struct TamperingDetection: SettingGroup
     static constexpr const char* kJsonEventName = "TamperingDetection";
     static constexpr const char* kSunapiEventName = "tamperingdetection";
 
-    TamperingDetection(const SettingsCapabilities& settingsCapabilities, const RoiResolution& roiResolution, int /*roiIndex*/ = -1):
-        SettingGroup(settingsCapabilities, roiResolution, kKeys) {}
+    TamperingDetection(const SettingsCapabilities& settingsCapabilities,
+        const RoiResolution& roiResolution, int /*roiIndex*/ = -1)
+        :
+        SettingGroup(settingsCapabilities, roiResolution, kKeys)
+    {
+    }
     bool operator==(const TamperingDetection& rhs) const;
     bool operator!=(const TamperingDetection& rhs) const { return !(*this == rhs); }
     void assignExclusiveFrom(const TamperingDetection& other) {};
@@ -358,8 +374,12 @@ struct FogDetection: public SettingGroup
     static constexpr const char* kJsonEventName = "FogDetection";
     static constexpr const char* kSunapiEventName = "fogdetection";
 
-    FogDetection(const SettingsCapabilities& settingsCapabilities, const RoiResolution& roiResolution, int /*roiIndex*/ = -1) :
-        SettingGroup(settingsCapabilities, roiResolution, kKeys) {}
+    FogDetection(const SettingsCapabilities& settingsCapabilities,
+        const RoiResolution& roiResolution, int /*roiIndex*/ = -1)
+        :
+        SettingGroup(settingsCapabilities, roiResolution, kKeys)
+    {
+    }
     bool operator==(const FogDetection& rhs) const;
     bool operator!=(const FogDetection& rhs) const { return !(*this == rhs); }
     void assignExclusiveFrom(const FogDetection& other) {};
@@ -400,8 +420,12 @@ struct ObjectDetectionGeneral: public SettingGroup
     static constexpr const char* kJsonEventName = "ObjectDetection";
     static constexpr const char* kSunapiEventName = "objectdetection";
 
-    ObjectDetectionGeneral(const SettingsCapabilities& settingsCapabilities, const RoiResolution& roiResolution, int /*roiIndex*/ = -1):
-        SettingGroup(settingsCapabilities, roiResolution, kKeys) {}
+    ObjectDetectionGeneral(const SettingsCapabilities& settingsCapabilities,
+        const RoiResolution& roiResolution, int /*roiIndex*/ = -1)
+        :
+        SettingGroup(settingsCapabilities, roiResolution, kKeys)
+    {
+    }
     bool operator == (const ObjectDetectionGeneral& rhs) const;
     bool operator!=(const ObjectDetectionGeneral& rhs) const { return !(*this == rhs); }
     void assignExclusiveFrom(const ObjectDetectionGeneral& other) {};
@@ -441,8 +465,12 @@ struct ObjectDetectionBestShot: public SettingGroup
     static constexpr const char* kJsonEventName = "MetaImageTransfer";
     static constexpr const char* kSunapiEventName = "metaimagetransfer";
 
-    ObjectDetectionBestShot(const SettingsCapabilities& settingsCapabilities, const RoiResolution& roiResolution, int /*roiIndex*/ = -1):
-        SettingGroup(settingsCapabilities, roiResolution, kKeys) {}
+    ObjectDetectionBestShot(const SettingsCapabilities& settingsCapabilities,
+        const RoiResolution& roiResolution, int /*roiIndex*/ = -1)
+        :
+        SettingGroup(settingsCapabilities, roiResolution, kKeys)
+    {
+    }
     bool operator == (const ObjectDetectionBestShot& rhs) const;
     bool operator!=(const ObjectDetectionBestShot& rhs) const { return !(*this == rhs); }
     void assignExclusiveFrom(const ObjectDetectionBestShot& other) {};
@@ -473,8 +501,12 @@ struct IvaObjectSize : public SettingGroup
     static constexpr const char* kJsonEventName = "VideoAnalysis";
     static constexpr const char* kSunapiEventName = "videoanalysis2";
 
-    IvaObjectSize(const SettingsCapabilities& settingsCapabilities, const RoiResolution& roiResolution, int /*roiIndex*/ = -1) :
-        SettingGroup(settingsCapabilities, roiResolution, kKeys) {}
+    IvaObjectSize(const SettingsCapabilities& settingsCapabilities,
+        const RoiResolution& roiResolution, int /*roiIndex*/ = -1)
+        :
+        SettingGroup(settingsCapabilities, roiResolution, kKeys)
+    {
+    }
     bool operator == (const IvaObjectSize& rhs) const;
     bool operator!=(const IvaObjectSize& rhs) const { return !(*this == rhs); }
     void assignExclusiveFrom(const IvaObjectSize& other) {};
@@ -519,8 +551,11 @@ struct IvaLine: public SettingGroup
     static constexpr const char* kJsonEventName = "VideoAnalysis";
     static constexpr const char* kSunapiEventName = "videoanalysis2";
 
-    IvaLine(const SettingsCapabilities& settingsCapabilities, const RoiResolution& roiResolution, int roiIndex = -1):
-    SettingGroup(settingsCapabilities, roiResolution, kKeys, roiIndex, kStartServerRoiIndexFrom, kStartDeviceRoiIndexFrom)
+    IvaLine(const SettingsCapabilities& settingsCapabilities, const RoiResolution& roiResolution,
+        int roiIndex = -1)
+        :
+        SettingGroup(settingsCapabilities, roiResolution, kKeys, roiIndex,
+            kStartServerRoiIndexFrom, kStartDeviceRoiIndexFrom)
     {
     }
 
@@ -598,8 +633,11 @@ struct IvaArea: public SettingGroup
     static constexpr const char* kJsonEventName = "VideoAnalysis";
     static constexpr const char* kSunapiEventName = "videoanalysis2";
 
-    IvaArea(const SettingsCapabilities& settingsCapabilities, const RoiResolution& roiResolution, int roiIndex = -1):
-    SettingGroup(settingsCapabilities, roiResolution, kKeys, roiIndex, kStartServerRoiIndexFrom, kStartDeviceRoiIndexFrom)
+    IvaArea(const SettingsCapabilities& settingsCapabilities, const RoiResolution& roiResolution,
+        int roiIndex = -1)
+        :
+        SettingGroup(settingsCapabilities, roiResolution, kKeys, roiIndex,
+            kStartServerRoiIndexFrom, kStartDeviceRoiIndexFrom)
     {
     }
     bool IsActive() const
@@ -646,8 +684,11 @@ struct IvaExcludeArea: public SettingGroup
     static constexpr const char* kJsonEventName = "VideoAnalysis";
     static constexpr const char* kSunapiEventName = "videoanalysis2";
 
-    IvaExcludeArea(const SettingsCapabilities& settingsCapabilities, const RoiResolution& roiResolution, int roiIndex = -1):
-    SettingGroup(settingsCapabilities, roiResolution, kKeys, roiIndex, kStartServerRoiIndexFrom, kStartDeviceRoiIndexFrom)
+    IvaExcludeArea(const SettingsCapabilities& settingsCapabilities,
+        const RoiResolution& roiResolution, int roiIndex = -1)
+        :
+        SettingGroup(settingsCapabilities, roiResolution, kKeys, roiIndex,
+            kStartServerRoiIndexFrom, kStartDeviceRoiIndexFrom)
     {
     }
 
@@ -681,8 +722,12 @@ struct AudioDetection: public SettingGroup
     static constexpr const char* kJsonEventName = "AudioDetection";
     static constexpr const char* kSunapiEventName = "audiodetection";
 
-    AudioDetection(const SettingsCapabilities& settingsCapabilities, const RoiResolution& roiResolution, int /*roiIndex*/ = -1):
-        SettingGroup(settingsCapabilities, roiResolution, kKeys) {}
+    AudioDetection(const SettingsCapabilities& settingsCapabilities,
+        const RoiResolution& roiResolution, int /*roiIndex*/ = -1)
+        :
+        SettingGroup(settingsCapabilities, roiResolution, kKeys)
+    {
+    }
     bool operator==(const AudioDetection& rhs) const;
     bool operator!=(const AudioDetection& rhs) const { return !(*this == rhs); }
     void assignExclusiveFrom(const AudioDetection& other) {}
@@ -728,8 +773,12 @@ struct SoundClassification: public SettingGroup
     static constexpr const char* kJsonEventName = "AudioAnalysis";
     static constexpr const char* kSunapiEventName = "audioanalysis";
 
-    SoundClassification(const SettingsCapabilities& settingsCapabilities, const RoiResolution& roiResolution, int /*roiIndex*/ = -1):
-        SettingGroup(settingsCapabilities, roiResolution, kKeys) {}
+    SoundClassification(const SettingsCapabilities& settingsCapabilities,
+        const RoiResolution& roiResolution, int /*roiIndex*/ = -1)
+        :
+        SettingGroup(settingsCapabilities, roiResolution, kKeys)
+    {
+    }
     bool operator==(const SoundClassification& rhs) const;
     bool operator!=(const SoundClassification& rhs) const { return !(*this == rhs); }
     void assignExclusiveFrom(const SoundClassification& other) {}
@@ -773,8 +822,12 @@ struct FaceMaskDetection: public SettingGroup
     static constexpr const char* kJsonEventName = "MaskDetection";
     static constexpr const char* kSunapiEventName = "maskdetection";
 
-    FaceMaskDetection(const SettingsCapabilities& settingsCapabilities, const RoiResolution& roiResolution, int /*roiIndex*/ = -1):
-        SettingGroup(settingsCapabilities, roiResolution, kKeys) {}
+    FaceMaskDetection(const SettingsCapabilities& settingsCapabilities,
+        const RoiResolution& roiResolution, int /*roiIndex*/ = -1)
+        :
+        SettingGroup(settingsCapabilities, roiResolution, kKeys)
+    {
+    }
     bool operator==(const FaceMaskDetection& rhs) const;
     bool operator!=(const FaceMaskDetection& rhs) const { return !(*this == rhs); }
     void assignExclusiveFrom(const FaceMaskDetection& other) {}
@@ -806,7 +859,7 @@ struct BoxTemperatureDetection: public SettingGroup
     std::string temperatureType = "Maximum";
     std::string detectionType = "Above";
     int thresholdTemperature = 90;
-    int duration = 5;
+    int duration = 1;
     int areaEmissivity = 50;
 
     static constexpr int kStartServerRoiIndexFrom = 1;
@@ -834,7 +887,8 @@ struct BoxTemperatureDetection: public SettingGroup
 
     BoxTemperatureDetection(const SettingsCapabilities& settingsCapabilities,
         const RoiResolution& roiResolution,
-        int roiIndex = -1):
+        int roiIndex = -1)
+        :
         SettingGroup(settingsCapabilities,
             roiResolution,
             kKeys,
@@ -877,7 +931,8 @@ struct BoxTemperatureDetectionToggle: public SettingGroup
 
     BoxTemperatureDetectionToggle(const SettingsCapabilities& settingsCapabilities,
         const RoiResolution& roiResolution,
-        int /*roiIndex*/ = -1):
+        int /*roiIndex*/ = -1)
+        :
         SettingGroup(settingsCapabilities, roiResolution, kKeys)
     {
     }
@@ -899,4 +954,95 @@ struct BoxTemperatureDetectionToggle: public SettingGroup
 
 //-------------------------------------------------------------------------------------------------
 
+struct TemperatureChangeDetection : public SettingGroup
+{
+    UnnamedRect unnamedRect;
+    std::string temperatureType = "Maximum";
+    int temperatureGap = 40;
+    int duration = 1;
+
+    static constexpr int kStartServerRoiIndexFrom = 1;
+    static constexpr int kStartDeviceRoiIndexFrom = 1;
+
+    enum class KeyIndex
+    {
+        unnamedRect,
+        temperatureType,
+        temperatureGap,
+        duration,
+    };
+    static constexpr const char* kKeys[] = {
+        "TemperatureChangeDetection.Area#.Points",
+        "TemperatureChangeDetection.Area#.TemperatureType",
+        "TemperatureChangeDetection.Area#.TemperatureGap",
+        "TemperatureChangeDetection.Area#.Duration"
+
+    };
+    static constexpr const char* kJsonEventName = "TemperatureChangeDetection";
+    static constexpr const char* kSunapiEventName = "temperaturechangedetection";
+
+    TemperatureChangeDetection(const SettingsCapabilities& settingsCapabilities,
+        const RoiResolution& roiResolution,
+        int roiIndex = -1)
+        :
+        SettingGroup(settingsCapabilities,
+            roiResolution,
+            kKeys,
+            roiIndex,
+            kStartServerRoiIndexFrom,
+            kStartDeviceRoiIndexFrom)
+    {
+    }
+
+    bool operator==(const TemperatureChangeDetection& rhs) const;
+    bool operator!=(const TemperatureChangeDetection& rhs) const { return !(*this == rhs); }
+    void assignExclusiveFrom(const TemperatureChangeDetection& other) {}
+
+    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
+    void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
+
+    void readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo);
+    std::string buildDeviceWritingQuery(int channelNumber) const;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+struct TemperatureChangeDetectionToggle: public SettingGroup
+{
+    bool enabled = false;
+
+    enum class KeyIndex
+    {
+        enabled,
+    };
+    static constexpr const char* kKeys[] = {
+        "TemperatureCHangeDetection.Enable",
+    };
+    static constexpr const char* kJsonEventName = "TemperatureCHangeDetection";
+    static constexpr const char* kSunapiEventName = "temperaturechangedetection";
+
+    TemperatureChangeDetectionToggle(const SettingsCapabilities& settingsCapabilities,
+        const RoiResolution& roiResolution,
+        int /*roiIndex*/ = -1)
+        :
+        SettingGroup(settingsCapabilities, roiResolution, kKeys)
+    {
+    }
+    bool operator==(const TemperatureChangeDetectionToggle& rhs) const;
+    bool operator!=(const TemperatureChangeDetectionToggle& rhs) const { return !(*this == rhs); }
+    void assignExclusiveFrom(const TemperatureChangeDetectionToggle& other) {};
+
+    void readExclusiveFromServer(const nx::sdk::IStringMap* settings) {}
+    void readFromServerOrThrow(const nx::sdk::IStringMap* settings, int /*roiIndex*/ = -1);
+    void writeToServer(nx::sdk::SettingsResponse* settings, int /*roiIndex*/ = -1) const;
+
+    // The following functions perhaps should be moved to the inheritor-class.
+    // The idea is that the current class interacts with the server only,
+    // and the inheritor interacts with the device.
+    // The decision will be made during other plugins construction.
+    void readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo);
+    std::string buildDeviceWritingQuery(int channelNumber) const;
+};
+
+//-------------------------------------------------------------------------------------------------
 } // namespace nx::vms_server_plugins::analytics::hanwha

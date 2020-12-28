@@ -43,6 +43,10 @@ public:
     static std::optional<bool> extractBoxTemperatureDetectionToggle(
         const nx::kit::Json& channelInfo, int chanelNumber);
 
+    /** Extract if TemperatureChangeDetection is enabled If fail, returns std::nullopt.*/
+    static std::optional<bool> extractTemperatureChangeDetectionToggle(
+        const nx::kit::Json& channelInfo, int chanelNumber);
+
     /**
      * Extract information about min and max object size (as a json object) of a desired type from
      * the json object (that corresponds to some event and channel)

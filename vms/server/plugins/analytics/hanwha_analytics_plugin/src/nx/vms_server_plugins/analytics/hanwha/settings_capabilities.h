@@ -19,11 +19,19 @@ struct SettingsCapabilities
         bool sensitivityLevel = false;
         bool minimumDuration = false;
     };
+    struct TemperatureChange
+    {
+        // Since we have no access to a camera yet, let's set all parameters to true.
+        bool unnamedRect = true;
+        bool temperatureType = true; //< If true, supported types are Minimum/Maximum/Average
+        bool temperatureGap = true; //< If true, supported gaps are 40/80/120/160/200
+        bool duration = true;
+    };
     struct BoxTemperature
     {
-        bool coordinate = false;
-        bool temperatureType = false; //< Minimum/Maximum/Average
-        bool detectionType = false; //< Above/Below/Increase/Decrease
+        bool unnamedRect = false;
+        bool temperatureType = false; //< If true, supported types are Minimum/Maximum/Average
+        bool detectionType = false; //< If true, supported types are Above/Below/Increase/Decrease
         bool thresholdTemperature = false; //< F degree
         bool duration = false;
         bool areaEmissivity = false; // float [1..99]
@@ -61,6 +69,7 @@ struct SettingsCapabilities
     bool videoAnalysis2 = false;
     IvaLine ivaLine;
     IvaArea ivaArea;
+    TemperatureChange temperatureChange;
     BoxTemperature boxTemperature;
     Mask mask;
 };

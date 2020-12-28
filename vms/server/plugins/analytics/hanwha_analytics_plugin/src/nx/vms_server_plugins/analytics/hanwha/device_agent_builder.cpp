@@ -255,7 +255,7 @@ SettingsCapabilities DeviceAgentBuilder::fetchSettingsCapabilities() const
         "DefinedArea.#.LoiteringDuration").has_value();
 
     // Box temperature
-    result.boxTemperature.coordinate = cgi.parameter("eventsources",
+    result.boxTemperature.unnamedRect = cgi.parameter("eventsources",
         "boxtemperaturedetection", "set", "ROI.#.Coordinate").has_value();
 
     result.boxTemperature.temperatureType = cgi.parameter("eventsources",
@@ -458,6 +458,39 @@ QStringList DeviceAgentBuilder::fetchInternalEventTypeNamesForPopulousFamilies()
 
 //-------------------------------------------------------------------------------------------------
 
+QString DeviceAgentBuilder::fetchTemperatureChangeEventTypeNameInternal(const Information& info) const
+{
+    static const QString kTemperatureChangeInternalName = "TemperatureChangeDetection";
+    const QString prefix =
+        nx::format("Channel.%1.%2", info.channelNumber, kTemperatureChangeInternalName);
+
+    for (const auto& [eventTypeDecoratedName, status]: info.eventStatusMap)
+    {
+        if (eventTypeDecoratedName.startsWith(prefix))
+        {
+            return m_engineManifest.eventTypeIdByName(kTemperatureChangeInternalName);
+        }
+    }
+    return {};
+}
+
+//-------------------------------------------------------------------------------------------------
+
+QString DeviceAgentBuilder::fetchTemperatureChangeEventTypeName() const
+{
+    QString result = fetchTemperatureChangeEventTypeNameInternal(m_directInfo);
+
+    if (!result.isEmpty() && m_directInfo.isNvr)
+    {
+        const QString bypassedResult = fetchTemperatureChangeEventTypeNameInternal(m_bypassedInfo);
+        if (bypassedResult != result)
+            result = "";
+    }
+    return result;
+}
+
+//-------------------------------------------------------------------------------------------------
+
 QString DeviceAgentBuilder::fetchBoxTemperatureEventTypeNameInternal(const Information& info) const
 {
     static const QString kBoxTemperatureInternalName = "BoxTemperatureDetection";
@@ -482,8 +515,9 @@ QString DeviceAgentBuilder::fetchBoxTemperatureEventTypeName() const
 
     if (!result.isEmpty() && m_directInfo.isNvr)
     {
-        QString bypassedResult = fetchBoxTemperatureEventTypeNameInternal(m_bypassedInfo);
-        result = (result == bypassedResult) ? result : QString();
+        const QString bypassedResult = fetchBoxTemperatureEventTypeNameInternal(m_bypassedInfo);
+        if (bypassedResult != result)
+            result = "";
     }
     return result;
 }
@@ -537,11 +571,13 @@ QStringList DeviceAgentBuilder::obtainEventTypeIds(
 
 //-------------------------------------------------------------------------------------------------
 
-QStringList DeviceAgentBuilder::addTemepatureChangeEventTypeNameIfNeeded(
+QStringList DeviceAgentBuilder::addBoxTemperatureEventTypeNamesIfNeeded(
     const QStringList& eventTypeIds) const
 {
     QStringList result(eventTypeIds);
     if (const QString eventTypeId = fetchBoxTemperatureEventTypeName(); !eventTypeId.isEmpty())
+        result.append(eventTypeId);
+    if (const QString eventTypeId = fetchTemperatureChangeEventTypeName(); !eventTypeId.isEmpty())
         result.append(eventTypeId);
     return result;
 }
@@ -582,7 +618,7 @@ QStringList DeviceAgentBuilder::buildSupportedEventTypeIds() const
         eventTypeFamilyNames, eventTypeInternalNamesForPopulousFamilies);
 
     const QStringList eventTypeIdsWithTemperatureEvent =
-        addTemepatureChangeEventTypeNameIfNeeded(eventTypeIds);
+        addBoxTemperatureEventTypeNamesIfNeeded(eventTypeIds);
 
     const QStringList eventTypeIdsWithTrackingEvents =
         addObjectDetectionEventTypeNamesIfNeeded(eventTypeIdsWithTemperatureEvent);

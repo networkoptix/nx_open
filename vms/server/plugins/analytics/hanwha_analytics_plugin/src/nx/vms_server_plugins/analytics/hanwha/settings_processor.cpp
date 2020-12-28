@@ -331,6 +331,19 @@ void SettingsProcessor::loadAndHoldSettingsFromDevice()
             sunapiReply, &m_settings.faceMaskDetection, channelNumber);
     }
 
+    if (m_settings.analyticsCategories[temperatureChangeDetection])
+    {
+        sunapiReply = makeEventTypeReadingRequest("temperaturechangedetection");
+        SettingGroup::readFromDeviceReply(
+            sunapiReply, &m_settings.temperatureChangeDetectionToggle, channelNumber);
+
+        for (int i = 0; i < Settings::kTemperatureChangeMultiplicity; ++i)
+        {
+            SettingGroup::readFromDeviceReply(
+                sunapiReply, &m_settings.temperatureChangeDetectionItems[i], channelNumber, i);
+        }
+    }
+
     if (m_settings.analyticsCategories[boxTemperatureDetection])
     {
         sunapiReply = makeEventTypeReadingRequest("boxtemperaturedetection");
@@ -397,6 +410,14 @@ void SettingsProcessor::transferAndHoldSettingsFromDeviceToServer(
 
     if (m_settings.analyticsCategories[faceMaskDetection])
         m_settings.faceMaskDetection.writeToServer(response);
+
+    if (m_settings.analyticsCategories[temperatureChangeDetection])
+    {
+        m_settings.temperatureChangeDetectionToggle.writeToServer(response);
+
+        for (int i = 0; i < Settings::kTemperatureChangeMultiplicity; ++i)
+            m_settings.temperatureChangeDetectionItems[i].writeToServer(response);
+    }
 
     if (m_settings.analyticsCategories[boxTemperatureDetection])
     {
@@ -504,6 +525,18 @@ void SettingsProcessor::transferAndHoldSettingsFromServerToDevice(
     {
         SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
             m_settings.faceMaskDetection, sender, m_cameraChannelNumber);
+    }
+
+    if (m_settings.analyticsCategories[temperatureChangeDetection])
+    {
+        SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
+            m_settings.temperatureChangeDetectionToggle, sender, m_cameraChannelNumber);
+
+        for (int i = 0; i < Settings::kBoxTemperatureMultiplicity; ++i)
+        {
+            SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
+                m_settings.temperatureChangeDetectionItems[i], sender, m_cameraChannelNumber, i);
+        }
     }
 
     if (m_settings.analyticsCategories[boxTemperatureDetection])

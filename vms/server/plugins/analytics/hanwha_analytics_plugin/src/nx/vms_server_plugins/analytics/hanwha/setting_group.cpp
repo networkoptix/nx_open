@@ -1388,7 +1388,7 @@ void BoxTemperatureDetection::readFromServerOrThrow(
     const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
 {
     using namespace SettingPrimitivesServerIo;
-    if (m_settingsCapabilities.boxTemperature.coordinate)
+    if (m_settingsCapabilities.boxTemperature.unnamedRect)
         deserializeOrThrow(value(sourceMap, KeyIndex::unnamedRect), &unnamedRect);
 
     if (m_settingsCapabilities.boxTemperature.temperatureType)
@@ -1412,7 +1412,7 @@ void BoxTemperatureDetection::writeToServer(
     nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
 {
     using namespace SettingPrimitivesServerIo;
-    if (m_settingsCapabilities.boxTemperature.coordinate)
+    if (m_settingsCapabilities.boxTemperature.unnamedRect)
         result->setValue(key(KeyIndex::unnamedRect), serialize(unnamedRect));
 
     if (m_settingsCapabilities.boxTemperature.temperatureType)
@@ -1445,7 +1445,7 @@ void BoxTemperatureDetection::readFromDeviceReplyOrThrow(const nx::kit::Json& ch
 
     using namespace SettingPrimitivesDeviceIo;
 
-    if (m_settingsCapabilities.boxTemperature.coordinate)
+    if (m_settingsCapabilities.boxTemperature.unnamedRect)
         deserializeOrThrow(roiInfo, "Coordinates", m_roiResolution, &unnamedRect.points);
 
     if (m_settingsCapabilities.boxTemperature.temperatureType)
@@ -1474,7 +1474,7 @@ std::string BoxTemperatureDetection::buildDeviceWritingQuery(int channelNumber) 
                   << "set"
                   << "&Channel=" << channelNumber;
 
-            if (m_settingsCapabilities.boxTemperature.coordinate)
+            if (m_settingsCapabilities.boxTemperature.unnamedRect)
                 query << prefix << ".Coordinate=" << serialize(unnamedRect.points, m_roiResolution);
 
             if (m_settingsCapabilities.boxTemperature.temperatureType)
@@ -1547,6 +1547,162 @@ std::string BoxTemperatureDetectionToggle::buildDeviceWritingQuery(int channelNu
                 << "&action=" << "set"
                 << "&Channel=" << channelNumber
                 << "&Enable=" << serialize(enabled);
+    }
+    return query.str();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+bool TemperatureChangeDetection::operator==(const TemperatureChangeDetection& rhs) const
+{
+    return initialized == rhs.initialized
+        && unnamedRect == rhs.unnamedRect
+        && temperatureType == rhs.temperatureType
+        && temperatureGap == rhs.temperatureGap
+        && duration == rhs.duration;
+}
+
+void TemperatureChangeDetection::readFromServerOrThrow(
+    const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
+{
+    using namespace SettingPrimitivesServerIo;
+    if (m_settingsCapabilities.temperatureChange.unnamedRect)
+        deserializeOrThrow(value(sourceMap, KeyIndex::unnamedRect), &unnamedRect);
+
+    if (m_settingsCapabilities.temperatureChange.temperatureType)
+        deserializeOrThrow(value(sourceMap, KeyIndex::temperatureType), &temperatureType);
+
+    if (m_settingsCapabilities.temperatureChange.temperatureGap)
+        deserializeOrThrow(value(sourceMap, KeyIndex::temperatureGap), &temperatureGap);
+
+    if (m_settingsCapabilities.temperatureChange.duration)
+        deserializeOrThrow(value(sourceMap, KeyIndex::duration), &duration);
+    initialized = true;
+}
+
+void TemperatureChangeDetection::writeToServer(
+    nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
+{
+    using namespace SettingPrimitivesServerIo;
+    if (m_settingsCapabilities.temperatureChange.unnamedRect)
+        result->setValue(key(KeyIndex::unnamedRect), serialize(unnamedRect));
+
+    if (m_settingsCapabilities.temperatureChange.temperatureType)
+        result->setValue(key(KeyIndex::temperatureType), serialize(temperatureType));
+
+    if (m_settingsCapabilities.temperatureChange.temperatureGap)
+        result->setValue(key(KeyIndex::temperatureGap), serialize(temperatureGap));
+
+    if (m_settingsCapabilities.temperatureChange.duration)
+        result->setValue(key(KeyIndex::duration), serialize(duration));
+}
+
+void TemperatureChangeDetection::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
+{
+    nx::kit::Json roiInfo =
+        DeviceResponseJsonParser::extractTemperatureRoiInfo(channelInfo, this->deviceIndex());
+    if (roiInfo == nx::kit::Json())
+    {
+        *this = TemperatureChangeDetection(
+            m_settingsCapabilities, m_roiResolution, this->nativeIndex()); // reset value;
+        initialized = true;
+        return;
+    }
+
+    using namespace SettingPrimitivesDeviceIo;
+
+    if (m_settingsCapabilities.temperatureChange.unnamedRect)
+        deserializeOrThrow(roiInfo, "Coordinates", m_roiResolution, &unnamedRect.points);
+
+    if (m_settingsCapabilities.temperatureChange.temperatureType)
+        deserializeOrThrow(roiInfo, "Mode", m_roiResolution, &temperatureType);
+    if (m_settingsCapabilities.temperatureChange.temperatureGap)
+        deserializeOrThrow(roiInfo, "Gap", m_roiResolution, &temperatureGap);
+    if (m_settingsCapabilities.temperatureChange.duration)
+        deserializeOrThrow(roiInfo, "DetectionPeriod", m_roiResolution, &duration);
+    initialized = true;
+}
+
+std::string TemperatureChangeDetection::buildDeviceWritingQuery(int channelNumber) const
+{
+    std::ostringstream query;
+    if (initialized)
+    {
+        if (!unnamedRect.points.empty())
+        {
+            using namespace SettingPrimitivesDeviceIo;
+            const std::string prefix = "&ROI."s + std::to_string(deviceIndex());
+            query << "msubmenu=" << kSunapiEventName << "&action="
+                << "set"
+                << "&Channel=" << channelNumber;
+
+            if (m_settingsCapabilities.temperatureChange.unnamedRect)
+                query << prefix << ".Coordinates=" << serialize(unnamedRect.points, m_roiResolution);
+
+            if (m_settingsCapabilities.temperatureChange.temperatureType)
+                query << prefix << ".Mode=" << temperatureType;
+
+            if (m_settingsCapabilities.temperatureChange.temperatureGap)
+                query << prefix << ".Gap=" << temperatureGap;
+
+            if (m_settingsCapabilities.temperatureChange.duration)
+                query << prefix << ".DetectionPeriod=" << duration;
+
+            //query << "TemperatureUnit=" << "Fahrenheit"; //"Celsius"
+        }
+        else
+        {
+            query << "msubmenu=" << kSunapiEventName << "&action="
+                << "remove"
+                << "&Channel=" << channelNumber
+                << "&ROIIndex=" << deviceIndex();
+        }
+    }
+    return query.str();
+}
+
+//-------------------------------------------------------------------------------------------------
+
+bool TemperatureChangeDetectionToggle::operator==(
+    const TemperatureChangeDetectionToggle& rhs) const
+{
+    return initialized == rhs.initialized
+        && enabled == rhs.enabled;
+}
+
+void TemperatureChangeDetectionToggle::readFromServerOrThrow(
+    const nx::sdk::IStringMap* sourceMap, int /*roiIndex*/)
+{
+    using namespace SettingPrimitivesServerIo;
+    deserializeOrThrow(value(sourceMap, KeyIndex::enabled), &enabled);
+
+    initialized = true;
+}
+
+void TemperatureChangeDetectionToggle::writeToServer(
+    nx::sdk::SettingsResponse* result, int /*roiIndex*/) const
+{
+    using namespace SettingPrimitivesServerIo;
+    result->setValue(key(KeyIndex::enabled), serialize(enabled));
+}
+
+void TemperatureChangeDetectionToggle::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
+{
+    enabled = DeviceResponseJsonParser::extractTemperatureChangeDetectionToggle(
+        channelInfo, this->deviceIndex()).value_or(false);
+    initialized = true;
+}
+
+std::string TemperatureChangeDetectionToggle::buildDeviceWritingQuery(int channelNumber) const
+{
+    std::ostringstream query;
+    if (initialized)
+    {
+        using namespace SettingPrimitivesDeviceIo;
+        query << "msubmenu=" << kSunapiEventName
+            << "&action=" << "set"
+            << "&Channel=" << channelNumber
+            << "&Enable=" << serialize(enabled);
     }
     return query.str();
 }
