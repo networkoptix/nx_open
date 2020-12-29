@@ -115,7 +115,7 @@ bool cleanupVideoWalls(const QSqlDatabase& database, const QnUuid &layoutId)
     return nx::sql::SqlQueryExecutionHelper::execSQLQuery(&query, Q_FUNC_INFO);
 }
 
-bool isValidItem(const nx::vms::api::LayoutItemData& item)
+static bool isValidItem(const nx::vms::api::LayoutItemData& item)
 {
     const bool resourceIsPresent = !item.resourceId.isNull()
         || !item.resourcePath.isEmpty();
@@ -183,8 +183,11 @@ bool updateItems(
 
     for (const auto& item: layout.items)
     {
-        if (!NX_ASSERT(isValidItem(item), "Invalid null id item inserting"))
-            continue;
+        if (!isValidItem(item))
+        {
+            NX_DEBUG(NX_SCOPE_TAG, "Invalid item %1 in layout %2", QJson::serialized(item), layout.id);
+            return false;
+        }
 
         QnSql::bind(item, &query);
         query.bindValue(":layoutId", internalId);
