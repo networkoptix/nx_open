@@ -215,13 +215,25 @@ bool RootFileSystem::changeOwner(const QString& path, bool isRecursive)
         groupId = getgid();
     #endif
 
+    NX_DEBUG(this, "Changing ownership for '%1'", nx::utils::url::hidePassword(path));
+    bool result = false;
     if (m_ignoreTool)
-        return SystemCommands().changeOwner(path.toStdString(), userId, groupId, isRecursive);
+    {
+        result = SystemCommands().changeOwner(path.toStdString(), userId, groupId, isRecursive);
+    }
+    else
+    {
+        result = (bool)execViaRootTool(
+            "chown " + enquote(path) + " " + QString::number(userId) + " "
+            + QString::number(groupId) + " " + (isRecursive ? " recursive" : ""),
+            &receiveInt64Action);
+    }
 
-    return (bool) execViaRootTool(
-        "chown " + enquote(path) + " " + QString::number(userId) + " " + QString::number(groupId) +
-            " " + (isRecursive ? " recursive" : ""),
-        &receiveInt64Action);
+    NX_DEBUG(
+        this, "Done with changing ownership for '%1'. Success: %2",
+        nx::utils::url::hidePassword(path), result);
+
+    return result;
 }
 
 bool RootFileSystem::makeReadable(const QString& path)

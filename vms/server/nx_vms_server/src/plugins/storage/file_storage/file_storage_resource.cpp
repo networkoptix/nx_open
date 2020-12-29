@@ -854,7 +854,7 @@ bool QnFileStorageResource::canWrite(bool directAccess) const
         #if defined (Q_OS_UNIX)
             if (directAccess)
             {
-                if (!rootTool()->changeOwner(rootPath))
+                if (!rootTool()->changeOwner(rootPath, /*isRecursive*/ false))
                     NX_DEBUG(this, "canWrite: Failed to change owner for the root path");
 
                 if (!rootTool()->removePath(fileName))

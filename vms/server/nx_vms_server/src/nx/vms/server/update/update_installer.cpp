@@ -146,7 +146,7 @@ UpdateInstaller::~UpdateInstaller()
 
 void UpdateInstaller::prepareAsync(const QString& path, const QByteArray& signature)
 {
-    if (!serverModule()->rootFileSystem()->changeOwner(workDir()))
+    if (!serverModule()->rootFileSystem()->changeOwner(workDir(), /*isRecursive*/ true))
         NX_WARNING(this, "Unable to chown %1", workDir());
 
     NX_DEBUG(this, "Preparing to update installation...");

@@ -3543,7 +3543,7 @@ static void setFdLimit(RootFileSystem* rootFs, int value)
 void MediaServerProcess::prepareOsResources()
 {
     auto rootToolPtr = serverModule()->rootFileSystem();
-    if (!rootToolPtr->changeOwner(nx::kit::IniConfig::iniFilesDir()))
+    if (!rootToolPtr->changeOwner(nx::kit::IniConfig::iniFilesDir(), /*isRecursive*/ true))
         qWarning().noquote() << "Unable to chown" << nx::kit::IniConfig::iniFilesDir();
 
     setFdLimit(rootToolPtr, 32000);
@@ -3559,7 +3559,7 @@ void MediaServerProcess::prepareOsResources()
 
     for (const auto& path: chmodPaths)
     {
-        if (!rootToolPtr->changeOwner(path)) //< Let the errors reach stdout and stderr.
+        if (!rootToolPtr->changeOwner(path, /*isRecursive*/ true)) //< Let the errors reach stdout and stderr.
             qWarning().noquote() << "WARNING: Unable to chown" << path;
     }
 
@@ -3575,7 +3575,7 @@ void MediaServerProcess::prepareOsResources()
         if (entry.isDir() && entry.absoluteFilePath().endsWith("data"))
             continue;
 
-        if (!rootToolPtr->changeOwner(entry.absoluteFilePath()))
+        if (!rootToolPtr->changeOwner(entry.absoluteFilePath(), /*isRecursive*/ true))
             qWarning().noquote() << "WARNING: Unable to chown" << entry.absoluteFilePath();
     }
 }
