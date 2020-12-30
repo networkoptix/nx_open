@@ -311,15 +311,16 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %value Backup_Manual Backup is performed only at a user's request.
      *     %value Backup_RealTime Backup is performed during recording.
      *     %value Backup_Schedule Backup is performed on schedule.
-     * %param backupDaysOfTheWeek Combination (via "|") of the days of week on which the backup is
-     *     active.
-     *     %value Monday
-     *     %value Tuesday
-     *     %value Wednesday
-     *     %value Thursday
-     *     %value Friday
-     *     %value Saturday
-     *     %value Sunday
+     * %param:string backupDaysOfTheWeek Days of week when the backup is allowed: the sum of values
+     *     for each required day, represented as a JSON string.
+     *     %value 2 Monday
+     *     %value 4 Tuesday
+     *     %value 8 Wednesday
+     *     %value 16 Thursday
+     *     %value 32 Friday
+     *     %value 64 Saturday
+     *     %value 128 Sunday
+     *     %value 254 All days
      * %param backupStart Time of day when the backup starts (in seconds passed from 00:00:00).
      * %param backupDuration Duration of the synchronization period (in seconds). -1 if not set.
      * %param backupBitrate Maximum backup bitrate (in bytes per second). Negative value if not
@@ -346,14 +347,16 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %value Backup_Manual Backup is performed only at a user's request.
      *     %value Backup_RealTime Backup is performed during recording.
      *     %value Backup_Schedule Backup is performed on schedule.
-     * %param backupDaysOfTheWeek Combination (via "|") of weekdays the backup is active on.
-     *     %value Monday
-     *     %value Tuesday
-     *     %value Wednesday
-     *     %value Thursday
-     *     %value Friday
-     *     %value Saturday
-     *     %value Sunday
+     * %param:string backupDaysOfTheWeek Days of week when the backup is allowed: the sum of values
+     *     for each required day, represented as a JSON string.
+     *     %value 2 Monday
+     *     %value 4 Tuesday
+     *     %value 8 Wednesday
+     *     %value 16 Thursday
+     *     %value 32 Friday
+     *     %value 64 Saturday
+     *     %value 128 Sunday
+     *     %value 254 All days
      * %param backupStart Time of day when the backup starts (in seconds passed from 00:00:00).
      * %param backupDuration Duration of the synchronization period (in seconds). -1 if not set.
      * %param backupBitrate Maximum backup bitrate (in bytes per second). Negative
@@ -380,15 +383,16 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
     *         %value Backup_Manual Backup is performed only at a user's request.
     *         %value Backup_RealTime Backup is performed during recording.
     *         %value Backup_Schedule Backup is performed on schedule.
-    *     %param backupDaysOfTheWeek Combination (via "|") of the days of week on which the backup
-    *         is active on.
-    *         %value Monday
-    *         %value Tuesday
-    *         %value Wednesday
-    *         %value Thursday
-    *         %value Friday
-    *         %value Saturday
-    *         %value Sunday
+    *     %param:string backupDaysOfTheWeek Days of week when the backup is allowed: the sum of values
+    *         for each required day, represented as a JSON string.
+    *         %value 2 Monday
+    *         %value 4 Tuesday
+    *         %value 8 Wednesday
+    *         %value 16 Thursday
+    *         %value 32 Friday
+    *         %value 64 Saturday
+    *         %value 128 Sunday
+    *         %value 254 All days
     *     %param backupStart Time of day when the backup starts (in seconds passed from 00:00:00).
     *     %param backupDuration Duration of the synchronization period in seconds. -1 if not set.
     *     %param backupBitrate Maximum backup bitrate in bytes per second. Negative
@@ -498,12 +502,12 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param[unused] licenseUsed Whether the license is used for the camera.
      *     %value false
      *     %value true
-     * %param motionType Type of motion detection method.
-     *     %value MT_Default Use default method.
-     *     %value MT_HardwareGrid Use motion detection grid implemented by the camera.
-     *     %value MT_SoftwareGrid Use motion detection grid implemented by the server.
-     *     %value MT_MotionWindow Use motion detection window implemented by the camera.
-     *     %value MT_NoMotion Do not perform motion detection.
+     * %param:string motionType Type of motion detection method.
+     *     %value 0 Use default method.
+     *     %value 1 Use motion detection grid implemented by the camera.
+     *     %value 2 Use motion detection grid implemented by the server.
+     *     %value 4 Use motion detection window implemented by the camera.
+     *     %value 8 Do not perform motion detection.
      * %param motionMask List of motion detection areas and their
      *     sensitivity. The format is proprietary and is likely to change in
      *     future API versions. Currently, this string defines several rectangles separated
@@ -601,12 +605,12 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param[unused] licenseUsed Whether the license is used for the camera.
      *     %value false
      *     %value true
-     * %param motionType Type of motion detection method.
-     *     %value MT_Default Use default method.
-     *     %value MT_HardwareGrid Use motion detection grid implemented by the camera.
-     *     %value MT_SoftwareGrid Use motion detection grid implemented by the server.
-     *     %value MT_MotionWindow Use motion detection window implemented by the camera.
-     *     %value MT_NoMotion Do not perform motion detection.
+     * %param:string Type of motion detection method.
+     *     %value 0 Use default method.
+     *     %value 1 Use motion detection grid implemented by the camera.
+     *     %value 2 Use motion detection grid implemented by the server.
+     *     %value 4 Use motion detection window implemented by the camera.
+     *     %value 8 Do not perform motion detection.
      * %param motionMask List of motion detection areas and their
      *     sensitivity. The format is proprietary and is likely to change in
      *     future API versions. Currently, this string defines several rectangles separated
@@ -701,12 +705,12 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %param licenseUsed Whether the license is used for the camera.
      *         %value false
      *         %value true
-     *     %param motionType Type of motion detection method.
-     *         %value MT_Default Use default method.
-     *         %value MT_HardwareGrid Use motion detection grid implemented by the camera.
-     *         %value MT_SoftwareGrid Use motion detection grid implemented by the server.
-     *         %value MT_MotionWindow Use motion detection window implemented by the camera.
-     *         %value MT_NoMotion Do not perform motion detection.
+     *     %param:string motionType Type of motion detection method.
+     *         %value 0 Use default method.
+     *         %value 1 Use motion detection grid implemented by the camera.
+     *         %value 2 Use motion detection grid implemented by the server.
+     *         %value 4 Use motion detection window implemented by the camera.
+     *         %value 8 Do not perform motion detection.
      *     %param motionMask List of motion detection areas and their
      *         sensitivity. The format is proprietary and is likely to change in
      *         future API versions. Currently, this string defines several rectangles separated
@@ -847,12 +851,12 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %param licenseUsed Whether the license is used for the camera.
      *         %value false
      *         %value true
-     *     %param motionType Type of motion detection method.
-     *         %value MT_Default Use default method.
-     *         %value MT_HardwareGrid Use motion detection grid implemented by the camera.
-     *         %value MT_SoftwareGrid Use motion detection grid implemented by the server.
-     *         %value MT_MotionWindow Use motion detection window implemented by the camera.
-     *         %value MT_NoMotion Do not perform motion detection.
+     *     %param:string motionType Type of motion detection method.
+     *         %value 0 Use default method.
+     *         %value 1 Use motion detection grid implemented by the camera.
+     *         %value 2 Use motion detection grid implemented by the server.
+     *         %value 4 Use motion detection window implemented by the camera.
+     *         %value 8 Do not perform motion detection.
      *     %param motionMask List of motion detection areas and their
      *         sensitivity. The format is proprietary and is likely to change in
      *         future API versions. Currently, this string defines several rectangles separated

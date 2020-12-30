@@ -39,8 +39,7 @@ and params can be <strong>renamed</strong>, though often <strong>deprecated name
 supported for a while, when noted below.
 </p>
 <!--============================================================================================-->
-<hr/><h2>VMS <b>4.1_patch</b> relative to <i>4.1</i></h2>
-<em>NOTE: 4.1_patch here refers to this particular "monthly update" of 4.1.</em>
+<hr/><h2>VMS <b>4.2</b> relative to <i>4.1</i></h2>
 <!--............................................................................................-->
 <h3>Breaking compatibility</h3>
 <p>
@@ -95,6 +94,18 @@ the result parameters:
     reply[].eventParams.eventType
     reply[].eventParams.reasonCode
 </pre>
+</p>
+<p>
+In functions <strong><code>GET /ec2/getMediaServerUserAttributesList</code></strong>,
+<strong><code>POST /ec2/saveMediaServerUserAttributes</code></strong>,
+<strong><code>POST /ec2/saveMediaServerUserAttributesList</code></strong>
+fixed enumaration values for<code><i>backupDaysOfTheWeek</i></code>.
+</p>
+<p>
+In functions <strong><code>GET /ec2/getCamerasEx</code></strong>,
+<strong><code>GET /ec2/getCameraUserAttributesList</code></strong>,
+<strong><code>POST /ec2/saveCameraUserAttributesList</code></strong>
+fixed enumaration values for<code><i>motionType</i></code>.
 </p>
 <!-- Proprietary part commented out.
 <p>
