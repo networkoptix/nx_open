@@ -35,6 +35,10 @@
             "obtainMacFromMulticast": "Never"
         },
         {
+            "keys":["*|TN-B3212K2R", "*|TN-D35032R", "*|TN-P6236W12", "*|WV-S1110V", "Hanwha|*", "Samsung|*", "VIVOTEK|*"],
+            "useMedia2ToFetchProfiles": true
+        },
+        {
             "keys": [
                 "DW|DWC-PF5M1TIR"
             ],
@@ -140,8 +144,8 @@
             "useMedia2ToFetchProfiles": false
         },
         {
-            "keys":["*|TN-B3212K2R", "*|TN-D35032R", "*|TN-P6236W12", "*|WV-S1110V", "Hanwha|*", "Samsung|*", "VIVOTEK|*"],
-            "useMedia2ToFetchProfiles": true
+            "keys":["VIVOTEK|IT9389-HT*", "vivotek|FD8377*"],
+            "useMedia2ToFetchProfiles": false
         },
         {
             "keys":["*|TN-P6236W12"],
