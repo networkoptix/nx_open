@@ -218,6 +218,54 @@
     </message>
   </context>
   <context>
+    <name>PromoPageButtons</name>
+    <message>
+      <source>OK</source>
+      <translation>Aceptar</translation>
+    </message>
+    <message>
+      <source>Next</source>
+      <translation>Siguiente</translation>
+    </message>
+  </context>
+  <context>
+    <name>PtzPromoOverlay</name>
+    <message>
+      <source>Introducing you
+new PTZ controls</source>
+      <translation>Presentando
+nuevos controles PTZ</translation>
+    </message>
+    <message>
+      <source>Here is a quick presentation
+of what has changed</source>
+      <translation>Aquí hay una presentación rápida
+de lo que ha cambiado</translation>
+    </message>
+    <message>
+      <source>Drag over any part of the video
+to activate PTZ</source>
+      <translation>Arrastre sobre cualquier parte del video
+para activar PTZ</translation>
+    </message>
+    <message>
+      <source>Press arrows keys to move and plus or minus keys to zoom</source>
+      <translation>Presione las teclas de flechas para moverse y las teclas más o menos para hacer zoom</translation>
+    </message>
+    <message>
+      <source>Use the mouse wheel to zoom</source>
+      <translation>Usa la rueda del mouse para hacer zoom</translation>
+    </message>
+    <message>
+      <source>Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</source>
+      <translation>Haga clic, doble clic o arrastre el puntero del mouse mientras presiona la tecla Shift para usar PTZ avanzado</translation>
+    </message>
+    <message>
+      <source>Go to Local Settings to enable a drag marker over the center of the video</source>
+      <translation>Vaya a Configuración local para habilitar un marcador de arrastre sobre el centro del video</translation>
+    </message>
+  </context>
+  <context>
     <name>Repeater</name>
     <message>
       <source>Add</source>
