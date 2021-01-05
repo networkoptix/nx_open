@@ -225,7 +225,7 @@
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Nästa</translation>
     </message>
   </context>
   <context>
@@ -233,36 +233,36 @@
     <message>
       <source>Introducing you
 new PTZ controls</source>
-      <translation type="unfinished">Introducing you
-new PTZ controls</translation>
+      <translation>Vi presenterar dig
+nya PTZ-kontroller</translation>
     </message>
     <message>
       <source>Here is a quick presentation
 of what has changed</source>
-      <translation type="unfinished">Here is a quick presentation
-of what has changed</translation>
+      <translation>Här är en snabb presentation
+av vad som har förändrats</translation>
     </message>
     <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
-      <translation type="unfinished">Drag over any part of the video
-to activate PTZ</translation>
+      <translation>Dra över någon del av videon
+att aktivera PTZ</translation>
     </message>
     <message>
       <source>Press arrows keys to move and plus or minus keys to zoom</source>
-      <translation type="unfinished">Press arrows keys to move and plus or minus keys to zoom</translation>
+      <translation>Tryck på piltangenterna för att flytta och plus eller minus för att zooma</translation>
     </message>
     <message>
       <source>Use the mouse wheel to zoom</source>
-      <translation type="unfinished">Use the mouse wheel to zoom</translation>
+      <translation>Använd mushjulet för att zooma</translation>
     </message>
     <message>
       <source>Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</translation>
+      <translation>Klicka, dubbelklicka eller dra muspekaren medan du trycker på Skift-tangenten för att använda Advanced PTZ</translation>
     </message>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
-      <translation type="unfinished">Go to Local Settings to enable a drag marker over the center of the video</translation>
+      <translation>Gå till Lokala inställningar för att aktivera en dra markör över mitten av videon</translation>
     </message>
   </context>
   <context>

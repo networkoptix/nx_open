@@ -225,7 +225,7 @@
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Weiter</translation>
     </message>
   </context>
   <context>
@@ -233,36 +233,36 @@
     <message>
       <source>Introducing you
 new PTZ controls</source>
-      <translation type="unfinished">Introducing you
-new PTZ controls</translation>
+      <translation>Wir stellen Ihnen
+neue PTZ-Steuerelemente vor</translation>
     </message>
     <message>
       <source>Here is a quick presentation
 of what has changed</source>
-      <translation type="unfinished">Here is a quick presentation
-of what has changed</translation>
+      <translation>Hier ist eine kurze Darstellung
+was sich geändert hat</translation>
     </message>
     <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
-      <translation type="unfinished">Drag over any part of the video
-to activate PTZ</translation>
+      <translation>Ziehen Sie über einen beliebigen Teil des Videos,
+ um PTZ zu aktivieren</translation>
     </message>
     <message>
       <source>Press arrows keys to move and plus or minus keys to zoom</source>
-      <translation type="unfinished">Press arrows keys to move and plus or minus keys to zoom</translation>
+      <translation>Drücken Sie die Pfeiltasten, um sich zu bewegen, und die Plus- oder Minustasten, um zu zoomen</translation>
     </message>
     <message>
       <source>Use the mouse wheel to zoom</source>
-      <translation type="unfinished">Use the mouse wheel to zoom</translation>
+      <translation>Verwenden Sie das Mausrad zum Zoomen</translation>
     </message>
     <message>
       <source>Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</translation>
+      <translation>Klicken, doppelklicken oder ziehen Sie den Mauszeiger, während Sie die Umschalttaste drücken, um Advanced PTZ zu verwenden</translation>
     </message>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
-      <translation type="unfinished">Go to Local Settings to enable a drag marker over the center of the video</translation>
+      <translation>Gehen Sie zu Lokale Einstellungen, um eine Ziehmarkierung über die Mitte des Videos zu aktivieren</translation>
     </message>
   </context>
   <context>

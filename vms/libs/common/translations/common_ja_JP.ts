@@ -1624,7 +1624,7 @@
     </message>
     <message>
       <source>Archive backup finished, but is not fully completed because backup time is over. Data is backed up to %1</source>
-      <translation>アーカイブのバックアップは終了しましたが、バックアップ時間を超過したため、完全には完了していません　%1 にデータをバックアップします</translation>
+      <translation>アーカイブのバックアップは終了しましたが、バックアップ時間を超過したため、完全には完了していません。%1 までのデータがバックアップされました。</translation>
     </message>
     <message>
       <source>Archive backup is successfully completed</source>

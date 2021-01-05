@@ -992,9 +992,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
-      <translation type="unfinished">
-        <numerusform>Show on Items</numerusform>
-        <numerusform>Show on Items</numerusform>
+      <translation>
+        <numerusform>Im Artikel anzeigen</numerusform>
+        <numerusform>In Artikeln anzeigen</numerusform>
       </translation>
     </message>
   </context>
@@ -1610,7 +1610,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>PTZ can only be used in the live mode</source>
-      <translation type="unfinished">PTZ can only be used in the live mode</translation>
+      <translation>PTZ kann nur im Live-Modus verwendet werden</translation>
     </message>
   </context>
   <context>
@@ -10021,7 +10021,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Regions of Interest</source>
-      <translation type="unfinished">Regions of Interest</translation>
+      <translation>Interessante Regionen</translation>
     </message>
   </context>
   <context>
