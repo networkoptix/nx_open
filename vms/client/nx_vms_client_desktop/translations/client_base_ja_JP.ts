@@ -4618,7 +4618,7 @@ to %1</source>
     </message>
     <message>
       <source>Saved Position %1</source>
-      <translation>ポジション%1保存</translation>
+      <translation>ポジション%1</translation>
     </message>
     <message>
       <source>Tour should contain at least 2 positions.</source>
@@ -4639,7 +4639,7 @@ to %1</source>
     <name>QnPtzPresetDialog</name>
     <message>
       <source>Saved Position %1</source>
-      <translation>ポジション%1保存</translation>
+      <translation>ポジション%1</translation>
     </message>
     <message>
       <source>None</source>

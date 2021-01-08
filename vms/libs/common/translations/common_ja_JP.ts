@@ -210,11 +210,11 @@
     </message>
     <message>
       <source>Server has been stopped.</source>
-      <translation>サーガーが停止しました.</translation>
+      <translation>サーバーが停止しました。</translation>
     </message>
     <message>
       <source>Media stream is opened but no media data was received.</source>
-      <translation>メディアストリームが開始されましたがメディアデータは何も受信されませんでした.</translation>
+      <translation>メディアストリームは開始されましたが、メディアデータは受信されませんでした。</translation>
     </message>
     <message>
       <source>Unknown error. Please contact support.</source>
@@ -226,11 +226,11 @@
     </message>
     <message>
       <source>Server %1 is not available.</source>
-      <translation>サーバー %1 は無効です.</translation>
+      <translation>サーバー %1 にアクセスできません。</translation>
     </message>
     <message>
       <source>Check that Server is up and running.</source>
-      <translation>サーバーが起動しているか確認してください.</translation>
+      <translation>サーバーが起動しているか確認してください。</translation>
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
@@ -238,11 +238,11 @@
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
-      <translation>サーバーが起動していて適切なバージョンであるか確認してください.</translation>
+      <translation>サーバーが起動していること、適切なバージョンであることを確認してください。</translation>
     </message>
     <message>
       <source>Cannot connect to http port %1.</source>
-      <translation>httpポート%1.に接続できません.</translation>
+      <translation>httpポート %1 に接続できません。</translation>
     </message>
     <message>
       <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
@@ -366,11 +366,11 @@
     </message>
     <message>
       <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
-      <translation>メディア URL %1 を開くことができません　メディア ポート %2 に接続できませんでした</translation>
+      <translation>メディア URL %1 を開くことができません。メディア ポート %2 に接続できませんでした。</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
-      <translation>メディア URL %1 を開くことができません　ポート %2 への接続は異常終了しました</translation>
+      <translation>メディア URL %1 を開くことができません。ポート %2 への接続は異常終了しました。</translation>
     </message>
     <message>
       <source>Could not parse device response. URL %1, request name %2.</source>
@@ -394,7 +394,7 @@
     </message>
     <message>
       <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
-      <translation>メディア URL %1 を開くことができません　サポートされていないメディア プロトコル %2</translation>
+      <translation>メディア URL %1 を開くことができません。メディア プロトコル %2 はサポートされていません。</translation>
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>

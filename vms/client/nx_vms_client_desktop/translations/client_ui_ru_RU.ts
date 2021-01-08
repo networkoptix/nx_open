@@ -633,7 +633,7 @@
     <message>
       <location/>
       <source>Disable secondary stream</source>
-      <translation>Включить вторичный поток</translation>
+      <translation>Отключить вторичный поток</translation>
     </message>
     <message>
       <location/>
