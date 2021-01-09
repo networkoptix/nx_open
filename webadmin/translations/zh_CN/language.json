@@ -154,7 +154,7 @@
         "cloudError": "无法合并系统. 有系统连接到云端. 请先将它断线.",
         "cloudBothError": "无法合并系统. 两个系统都连接到云端. 请先将它离线.",
         "cloudHostConflict": "不能合并系统，因为服务器构建与不同的云主机",
-        "licenceError": "警告! 您将要合并一个有 Starter license 的系统. 每个系统只能存在一个 Starter license, 所以第二个 Starter license 将被停用. 是否仍要合并?",
+        "licenceError": "警告! 您将要合并一个有 Starter授权的系统. 每个系统只能存在一个 Starter授权, 第二个 Starter授权将被停用. 是否仍要合并?",
         "duplicateServersError": "至少有一个具有相同ID的服务器, 所以无法合并系统。请删除此服务器, 然后重试",
         "connectionFailed": "连接失败︰ ",
         "unknownError": "未知的错误",

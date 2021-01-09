@@ -127,7 +127,7 @@
     </message>
     <message>
       <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
-      <translation>只有一个试用授权被允许每个系统，所以第二个授权将被停用。</translation>
+      <translation>每个系统仅允许启用一个Starter授权，第二个授权将被停用。</translation>
     </message>
     <message>
       <source>Merge anyway?</source>

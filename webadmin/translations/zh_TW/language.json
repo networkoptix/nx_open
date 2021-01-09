@@ -154,7 +154,7 @@
         "cloudError": "無法合併系統. 有系統連接到雲端. 請先將它斷線.",
         "cloudBothError": "無法合併系統. 兩個系統都連接到雲端. 請先將它離線.",
         "cloudHostConflict": "無法合併系統. 因為伺服器建構在不同的雲端",
-        "licenceError": "警告! 您將要合併一個有 Starter license 的系統. 每個系統只能存在一個 Starter license, 所以第二個 Starter license 將被停用. 是否仍要合併?",
+        "licenceError": "警告! 您正要合併一個已啟用 Starter授權的系統. 每個系統只能存在一組 Starter授權, 第二組將被停用. 是否仍要合併?",
         "duplicateServersError": "至少有一個具有相同ID的伺服器, 所以無法合併系統。請刪除此伺服器, 然後重試。",
         "connectionFailed": "連接失敗: ",
         "unknownError": "未知的錯誤",

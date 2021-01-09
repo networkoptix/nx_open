@@ -123,11 +123,11 @@
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
-      <translation>您正要用 Starter license 合併系統.</translation>
+      <translation>您正要使用Starter授權合併系統.</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per System, so the second license will be deactivated.</source>
-      <translation>一個系統只允許一個 Starter license 存在, 所以第二個 Starter license 將被停用.</translation>
+      <translation>一個系統只允許一組Starter 授權, 第二組將被停用.</translation>
     </message>
     <message>
       <source>Merge anyway?</source>
@@ -187,11 +187,11 @@
     </message>
     <message>
       <source>You are about to merge Systems with NVR licenses.</source>
-      <translation type="unfinished">You are about to merge Systems with NVR licenses.</translation>
+      <translation>您正要使用 Starter授權合併系統.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one NVR license is allowed per System, so the second license will be deactivated.</translation>
+      <translation>一個系統只允許一組NVR授權, 第二組將被停用.</translation>
     </message>
   </context>
   <context>
@@ -762,23 +762,23 @@
     </message>
     <message>
       <source>NVR</source>
-      <translation type="unfinished">NVR</translation>
+      <translation>NVR</translation>
     </message>
     <message>
       <source>NVR Licenses</source>
-      <translation type="unfinished">NVR Licenses</translation>
+      <translation>NVR授權</translation>
     </message>
     <message numerus="yes">
       <source>%n NVR Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n NVR Licenses</numerusform>
+      <translation>
+        <numerusform>%nNVR授權</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 NVR Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 NVR Licenses</numerusform>
+      <translation>
+        <numerusform>%n%1NVR授權</numerusform>
       </translation>
     </message>
   </context>
@@ -841,11 +841,11 @@
     </message>
     <message>
       <source>Only one Starter license is allowed per System.</source>
-      <translation type="unfinished">Only one Starter license is allowed per System.</translation>
+      <translation>每個系統只能啟用一組Starter授權。</translation>
     </message>
     <message>
       <source>You already have one active Starter license.</source>
-      <translation type="unfinished">You already have one active Starter license.</translation>
+      <translation>有一組Starter授權已啟用中 。</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per System.</source>

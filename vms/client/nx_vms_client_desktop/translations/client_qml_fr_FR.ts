@@ -98,7 +98,7 @@
     </message>
     <message>
       <source>Refreshing...</source>
-      <translation>Rafraîchissant...</translation>
+      <translation>Actualisation en cours...</translation>
     </message>
   </context>
   <context>
@@ -149,7 +149,7 @@
     </message>
     <message>
       <source>Save password</source>
-      <translation>Sauvergarder mot de passe</translation>
+      <translation>Sauvegarder mot de passe</translation>
     </message>
     <message>
       <source>Auto-login</source>
