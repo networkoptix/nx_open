@@ -5,7 +5,7 @@
     <name>ArchiveDuration</name>
     <message>
       <source>no data for forecast</source>
-      <translation>aucune donnée pour prévision</translation>
+      <translation>aucune donnée pour les prévisions</translation>
     </message>
     <message>
       <source>empty</source>
@@ -193,11 +193,11 @@
     </message>
     <message>
       <source>You are about to merge Systems with NVR licenses.</source>
-      <translation type="unfinished">You are about to merge Systems with NVR licenses.</translation>
+      <translation>Vous êtes sur le point de fusionner les systèmes avec des licences NVR.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one NVR license is allowed per System, so the second license will be deactivated.</translation>
+      <translation>Seulement une licence NVR est autorisée par système, la seconde licence sera donc désactivée.</translation>
     </message>
   </context>
   <context>
@@ -792,25 +792,25 @@
     </message>
     <message>
       <source>NVR</source>
-      <translation type="unfinished">NVR</translation>
+      <translation>NVR</translation>
     </message>
     <message>
       <source>NVR Licenses</source>
-      <translation type="unfinished">NVR Licenses</translation>
+      <translation>Licences NVR</translation>
     </message>
     <message numerus="yes">
       <source>%n NVR Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n NVR Licenses</numerusform>
-        <numerusform>%n NVR Licenses</numerusform>
+      <translation>
+        <numerusform>%n Licences NVR</numerusform>
+        <numerusform>%n Licences NVR</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 NVR Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 NVR Licenses</numerusform>
-        <numerusform>%n/%1 NVR Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 Licence NVR</numerusform>
+        <numerusform>%n/%1 Licences NVR</numerusform>
       </translation>
     </message>
   </context>
@@ -877,27 +877,27 @@
     </message>
     <message>
       <source>Only one Starter license is allowed per System.</source>
-      <translation type="unfinished">Only one Starter license is allowed per System.</translation>
+      <translation>Une seule licence de démarrage est autorisée par système.</translation>
     </message>
     <message>
       <source>You already have one active Starter license.</source>
-      <translation type="unfinished">You already have one active Starter license.</translation>
+      <translation>Vous avez déjà une licence de démarrage active.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per System.</source>
-      <translation type="unfinished">Only one NVR license is allowed per System.</translation>
+      <translation>Une seule licence NVR est autorisée par système.</translation>
     </message>
     <message>
       <source>You already have one active NVR license.</source>
-      <translation type="unfinished">You already have one active NVR license.</translation>
+      <translation>Vous avez déjà une licence NVR active.</translation>
     </message>
     <message>
       <source>Only one license of this type is allowed per System.</source>
-      <translation type="unfinished">Only one license of this type is allowed per System.</translation>
+      <translation>Une seule licence de ce type est autorisée par système.</translation>
     </message>
     <message>
       <source>You already have one active license of the same type.</source>
-      <translation type="unfinished">You already have one active license of the same type.</translation>
+      <translation>Vous avez déjà une licence active du même type.</translation>
     </message>
   </context>
   <context>
@@ -1150,14 +1150,14 @@
       <comment>Full suffix for displaying milliseconds</comment>
       <translation>
         <numerusform>milliseconde</numerusform>
-        <numerusform>milliseconde</numerusform>
+        <numerusform>millisecondes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>seconds</source>
       <comment>Full suffix for displaying seconds</comment>
       <translation>
-        <numerusform>secondes</numerusform>
+        <numerusform>seconde</numerusform>
         <numerusform>secondes</numerusform>
       </translation>
     </message>
@@ -1165,7 +1165,7 @@
       <source>minutes</source>
       <comment>Full suffix for displaying minutes</comment>
       <translation>
-        <numerusform>minute</numerusform>
+        <numerusform>minutes</numerusform>
         <numerusform>minute</numerusform>
       </translation>
     </message>
@@ -1173,7 +1173,7 @@
       <source>hours</source>
       <comment>Full suffix for displaying hours</comment>
       <translation>
-        <numerusform>heure</numerusform>
+        <numerusform>heures</numerusform>
         <numerusform>heure</numerusform>
       </translation>
     </message>
@@ -1847,7 +1847,7 @@
     </message>
     <message>
       <source>Buzzer</source>
-      <translation>Buzzer 1</translation>
+      <translation>Buzzer</translation>
     </message>
     <message>
       <source>Archive Backup Finished</source>
@@ -1863,11 +1863,11 @@
     </message>
     <message>
       <source>PoE over budget at %1</source>
-      <translation>PoE supérieur au budget à %1</translation>
+      <translation>PoE supérieur au budget de %1</translation>
     </message>
     <message>
       <source>Fan error at %1</source>
-      <translation>Erreur de ventilateur à %1</translation>
+      <translation>Erreur de ventilateur de %1</translation>
     </message>
     <message>
       <source>Reason: Power limit exceeded (%1)</source>
@@ -1876,7 +1876,7 @@
     </message>
     <message>
       <source>Show desktop notification</source>
-      <translation>Afficher notification bureau</translation>
+      <translation>Afficher notification sur le bureau</translation>
     </message>
     <message>
       <source>Send mobile notification</source>

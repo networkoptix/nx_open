@@ -5,7 +5,7 @@
     <name>AnalyticsSettings</name>
     <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation>Analytiques caméra fonctionne lorsque la caméra est visualisé. Activer l'enregistrement pour le faire fonctionner en tout temps.</translation>
+      <translation>L'analyse vidéo de la caméra ne fonctionnera que lorsque qu'elle est en train d'être visionnée. Activez l'enregistrement pour qu'il fonctionne en permanence.</translation>
     </message>
   </context>
   <context>
@@ -41,7 +41,7 @@
     <name>Figure</name>
     <message>
       <source>Figure</source>
-      <translation>Graphique</translation>
+      <translation>Forme</translation>
     </message>
     <message>
       <source>Click to add</source>
@@ -49,7 +49,7 @@
     </message>
     <message>
       <source>Display on video</source>
-      <translation>Affichage sur vidéo</translation>
+      <translation>Affichage sur la vidéo</translation>
     </message>
   </context>
   <context>
@@ -90,7 +90,7 @@
     </message>
     <message>
       <source>Select video stream from the camera for analysis</source>
-      <translation>Sélectionner flux vidéo de la caméra pour l'analyse</translation>
+      <translation>Sélectionner le flux vidéo de la caméra à analyser</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -117,7 +117,7 @@
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
       <translation>
-        <numerusform>Cette ligne nécessite au moins %n point.</numerusform>
+        <numerusform>Cette ligne nécessite au moins %n points.</numerusform>
         <numerusform>Cette ligne nécessite au moins %n points.</numerusform>
       </translation>
     </message>
@@ -128,7 +128,7 @@
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
       <translation>
-        <numerusform>Le nombre maximum de points a été atteint (%n point).</numerusform>
+        <numerusform>Le nombre maximum de points a été atteint (%n points).</numerusform>
         <numerusform>Le nombre maximum de points a été atteint (%n points).</numerusform>
       </translation>
     </message>
@@ -201,7 +201,7 @@
     <message numerus="yes">
       <source>This polygon requires at least %n points.</source>
       <translation>
-        <numerusform>Ce polygone nécessite au moins %n point.</numerusform>
+        <numerusform>Ce polygone nécessite au moins %n points.</numerusform>
         <numerusform>Ce polygone nécessite au moins %n points.</numerusform>
       </translation>
     </message>
@@ -212,7 +212,7 @@
     <message numerus="yes">
       <source>The maximum number of points has been reached (%n points).</source>
       <translation>
-        <numerusform>Le nombre maximum de points a été atteint (%n point).</numerusform>
+        <numerusform>Le nombre maximum de points a été atteint (%n points).</numerusform>
         <numerusform>Le nombre maximum de points a été atteint (%n points).</numerusform>
       </translation>
     </message>

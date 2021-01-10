@@ -2958,7 +2958,7 @@ to %1</source>
     </message>
     <message>
       <source>Unable to connect to the server</source>
-      <translation>Ne peut pas se connecter au serveur</translation>
+      <translation>Impossible de se connecter au serveur</translation>
     </message>
     <message>
       <source>LDAP Server connection timed out.</source>
@@ -2974,7 +2974,7 @@ to %1</source>
     </message>
     <message>
       <source>Server may be restarting now. Please try again later.</source>
-      <translation>Serveur redémarre peut être maintenant. Veuillez réessayer plus tard.</translation>
+      <translation>Le serveur est peut-être entrain de redémarrer. Veuillez réessayer plus tard.</translation>
     </message>
     <message>
       <source>Please check access credentials and try again.</source>
@@ -3016,11 +3016,11 @@ to %1</source>
     </message>
     <message>
       <source>Restart %1 in compatibility mode will be required.</source>
-      <translation>Redémarrer %1 en mode compatible va être requis.</translation>
+      <translation>Redémarrer %1 en mode compatibilité requis.</translation>
     </message>
     <message>
       <source>Failed to restart %1 in compatibility mode</source>
-      <translation>Échec de redémarrage %1 en mode compatible</translation>
+      <translation>Échec de redémarrage %1 en mode de compatibilité</translation>
     </message>
     <message>
       <source>Please close %1 and start it again using the shortcut in the start menu.</source>
@@ -3032,15 +3032,15 @@ to %1</source>
     </message>
     <message>
       <source>You have to restart %1 in compatibility mode to connect to this Server.</source>
-      <translation>Vous devrez redémarrer %1 en mode de compatibilite pour connecter à ce serveur.</translation>
+      <translation>Vous devrez redémarrer %1 en mode de compatibilité pour se connecter à ce serveur.</translation>
     </message>
     <message>
       <source>Restart %1 in compatibility mode?</source>
-      <translation>Redémarrer %1 en mode compatibilite?</translation>
+      <translation>Redémarrer %1 en mode de compatibilité ?</translation>
     </message>
     <message>
       <source>Failed to restart %1</source>
-      <translation>Échec redémarrage %1</translation>
+      <translation>Échec du redémarrage de %1</translation>
     </message>
     <message>
       <source>Client version: %1.</source>
@@ -3052,7 +3052,7 @@ to %1</source>
     </message>
     <message>
       <source>Operation is not permitted now. It could happen due to server is restarting now. Please try again later.</source>
-      <translation>Opération non autorisée présentement. Cela peut arriver si le serveur redémarre. Veuillez réessayer plus tard.</translation>
+      <translation>Opération non autorisée actuellement. Cela peut arriver si le serveur redémarre. Veuillez réessayer plus tard.</translation>
     </message>
     <message>
       <source>Connection to Server could not be established.</source>
@@ -9024,7 +9024,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>+%n values</source>
       <translation>
-        <numerusform>+%n valeur</numerusform>
+        <numerusform>+%n valeurs</numerusform>
         <numerusform>+%n valeurs</numerusform>
       </translation>
     </message>
