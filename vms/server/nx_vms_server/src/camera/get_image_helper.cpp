@@ -44,12 +44,29 @@ QnCompressedVideoDataPtr getNextArchiveVideoPacket(
 {
     QnCompressedVideoDataPtr video;
     static const int kMaxIterationsToFindVideo = 50;
-    for (int i = 0; i < kMaxIterationsToFindVideo && !video; ++i)
+    for (int i = 0; i < kMaxIterationsToFindVideo; )
     {
         QnAbstractMediaDataPtr media = archiveDelegate->getNextData();
         if (!media || media->timestamp == DATETIME_NOW)
             break;
-        video = std::dynamic_pointer_cast<QnCompressedVideoData>(media);
+
+        if (media->dataType == QnAbstractMediaData::EMPTY_DATA)
+            break;
+
+        if (media->dataType == QnAbstractMediaData::VIDEO)
+        {
+            video = std::dynamic_pointer_cast<QnCompressedVideoData>(media);
+            NX_ASSERT(video);
+            break;
+        }
+
+        if (media->dataType == QnAbstractMediaData::META_V1
+            || media->dataType == QnAbstractMediaData::GENERIC_METADATA)
+        {
+            continue;
+        }
+
+        ++i;
     }
 
     // If ceilTime specified try frame with time > requested time (round time to ceil).
