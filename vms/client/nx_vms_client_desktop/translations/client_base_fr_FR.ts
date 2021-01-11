@@ -21,7 +21,7 @@
     </message>
     <message>
       <source>Failed to execute plugin action</source>
-      <translation>Échec d’exécution d'action plugin</translation>
+      <translation>Impossible d'exécuter l'action du plugin</translation>
     </message>
     <message>
       <source>Enter parameters</source>
@@ -849,11 +849,11 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Upload File...</source>
-      <translation>Envoyer Fichier...</translation>
+      <translation>Télécharger le Fichier...</translation>
     </message>
     <message>
       <source>Upload Folder...</source>
-      <translation>Envoyer Dossier...</translation>
+      <translation>Télécharger le Dossier...</translation>
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
@@ -877,7 +877,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Cell Spacing...</source>
-      <translation>Espacement cellules...</translation>
+      <translation>Espace entre les cellules...</translation>
     </message>
     <message>
       <source>Screen Settings...</source>
@@ -893,11 +893,11 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Cancel Upload...</source>
-      <translation>Annuler l'envoie...</translation>
+      <translation>Annuler le téléchargement...</translation>
     </message>
     <message>
       <source>Copy Schedule...</source>
-      <translation>Copier l'horaire...</translation>
+      <translation>Copier la planification...</translation>
     </message>
     <message>
       <source>Analytics Engine Settings...</source>
@@ -953,7 +953,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Switch to Motion tab</source>
-      <translation>Basculer vers l'onglet Motion</translation>
+      <translation>Basculer vers l'onglet Mouvement</translation>
     </message>
     <message>
       <source>Switch to Bookmarks tab</source>
@@ -993,9 +993,9 @@ pour afficher plus de signets</translation>
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
-      <translation type="unfinished">
-        <numerusform>Show on Items</numerusform>
-        <numerusform>Show on Items</numerusform>
+      <translation>
+        <numerusform>Afficher sur l'élément</numerusform>
+        <numerusform>Afficher sur les éléments</numerusform>
       </translation>
     </message>
   </context>
@@ -1035,7 +1035,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Hardware ID of Server with this license does not match Hardware ID on which license was activated.</source>
-      <translation>ID Matériel du Server avec cette licence ne correspond pas à l'ID Matériel sur lequel la licence a été activée.</translation>
+      <translation>ID Matériel du Serveur lié à cette licence ne correspond pas à l'ID Matériel sur lequel la licence a été activée.</translation>
     </message>
   </context>
   <context>
@@ -1109,7 +1109,7 @@ pour afficher plus de signets</translation>
     <message numerus="yes">
       <source>%n layouts</source>
       <translation>
-        <numerusform>%n mises en page</numerusform>
+        <numerusform>%n mise en page</numerusform>
         <numerusform>%n mises en page</numerusform>
       </translation>
     </message>
@@ -1133,7 +1133,7 @@ pour afficher plus de signets</translation>
     <name>FileSystemStrings</name>
     <message>
       <source>Audio Video Interleave</source>
-      <translation>Interleave Audio Vidéo</translation>
+      <translation>Intercaler l'Audio et la Vidéo</translation>
     </message>
     <message>
       <source>Matroska</source>
@@ -1177,7 +1177,7 @@ pour afficher plus de signets</translation>
     <message numerus="yes">
       <source>%n layouts</source>
       <translation>
-        <numerusform>%n mises en page</numerusform>
+        <numerusform>%n mise en page</numerusform>
         <numerusform>%n mises en page</numerusform>
       </translation>
     </message>
@@ -1269,7 +1269,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Invalid data received.</source>
-      <translation>Données non valides reçues.</translation>
+      <translation>Données reçues invalides.</translation>
     </message>
     <message>
       <source>Database error occurred.</source>
@@ -1293,11 +1293,11 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation>Cette licence est déjà activée et liée au ID Matériel %1</translation>
+      <translation>Cette licence est déjà activée et liée à ID Matériel %1</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation>Cette licence est déjà activée et liée au ID Matériel %1 sur %2</translation>
+      <translation>Cette licence est déjà activée et liée à ID Matériel %1 sur %2</translation>
     </message>
     <message>
       <source>License already activated on another server</source>
@@ -1397,7 +1397,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>To get a valid License Key please contact %1.</source>
-      <translation>Pour obtenir une clé de licence valide, veuillez contacter le %1.</translation>
+      <translation>Pour obtenir une clé de licence valide, veuillez contacter %1.</translation>
     </message>
     <message>
       <source>If the problem persists, please contact %1.</source>
@@ -1446,7 +1446,7 @@ pour afficher plus de signets</translation>
       <source>File name must not contain the following reserved characters:</source>
       <comment>Plural relates to the word _characters_ here, not _file name_.</comment>
       <translation>
-        <numerusform>Nom du fichier ne doit pas contenir les caractères réservés suivants:</numerusform>
+        <numerusform>Nom du fichier ne doit pas contenir le caractère réservé suivant:</numerusform>
         <numerusform>Nom du fichier ne doit pas contenir les caractères réservés suivants:</numerusform>
       </translation>
     </message>
@@ -1472,7 +1472,7 @@ pour afficher plus de signets</translation>
     <message numerus="yes">
       <source>Password should contain %n different combinations of either characters, symbols, or digits</source>
       <translation>
-        <numerusform>Mot de passe doit contenir %n combinaisons différentes de caractères, de symboles ou de chiffres</numerusform>
+        <numerusform>Mot de passe doit contenir %n combinaison différente de caractères, de symboles ou de chiffres</numerusform>
         <numerusform>Mot de passe doit contenir %n combinaisons différentes de caractères, de symboles ou de chiffres</numerusform>
       </translation>
     </message>
@@ -1483,7 +1483,7 @@ pour afficher plus de signets</translation>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
       <translation>
-        <numerusform>Mot de passe doit contenir au moins %n caractères.</numerusform>
+        <numerusform>Mot de passe doit contenir au moins %n caractère.</numerusform>
         <numerusform>Mot de passe doit contenir au moins %n caractères.</numerusform>
       </translation>
     </message>
@@ -1494,15 +1494,15 @@ pour afficher plus de signets</translation>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>
       <translation>
-        <numerusform>Mot de passe ne doit pas dépasser %n caractères.</numerusform>
+        <numerusform>Mot de passe ne doit pas dépasser %n caractère.</numerusform>
         <numerusform>Mot de passe ne doit pas dépasser %n caractères.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together.</source>
       <translation>
-        <numerusform>Mot de passe ne doit pas contenir %n ou plus caractères consécutifs ensemble.</numerusform>
-        <numerusform>Mot de passe ne doit pas contenir %n ou plus caractères consécutifs ensemble.</numerusform>
+        <numerusform>Mot de passe ne doit pas contenir %n ou plusieurs caractères consécutifs ensemble.</numerusform>
+        <numerusform>Mot de passe ne doit pas contenir %n caractères consécutifs ensemble.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1526,7 +1526,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols %1 are allowed.</source>
-      <translation>Uniquement lettres latines, chiffres et symboles clavier %1 sont autorisés.</translation>
+      <translation>Uniquement lettres, chiffres et symboles clavier %1 sont autorisés.</translation>
     </message>
     <message>
       <source>Only latin letters, numbers and keyboard symbols are allowed.</source>
@@ -1611,7 +1611,7 @@ pour afficher plus de signets</translation>
     </message>
     <message>
       <source>PTZ can only be used in the live mode</source>
-      <translation type="unfinished">PTZ can only be used in the live mode</translation>
+      <translation>Le PTZ ne peut être utilisé qu'en mode direct</translation>
     </message>
   </context>
   <context>
@@ -2458,7 +2458,7 @@ pour afficher plus de signets</translation>
     <name>QnBuzzerPolicy</name>
     <message>
       <source>Servers that support buzzer</source>
-      <translation>Serveurs supportent le buzzer</translation>
+      <translation>Serveurs prenant en charge le buzzer</translation>
     </message>
   </context>
   <context>
@@ -3229,7 +3229,7 @@ to %1</source>
     </message>
     <message>
       <source>The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</source>
-      <translation type="unfinished">The audio capturing device supports no suitable audio formats.Please select another audio device or &quot;none&quot; in the Screen Recording settings.</translation>
+      <translation>Le périphérique de capture audio ne prend en charge aucun format audio approprié. Veuillez sélectionner un autre périphérique audio ou &quot;aucun&quot; dans les paramètres d'enregistrement d'écran.</translation>
     </message>
   </context>
   <context>
@@ -5105,19 +5105,19 @@ to %1</source>
     <name>QnScreenshotLoader</name>
     <message>
       <source>Top left corner</source>
-      <translation type="unfinished">Top left corner</translation>
+      <translation>Coin supérieur gauche</translation>
     </message>
     <message>
       <source>Top right corner</source>
-      <translation type="unfinished">Top right corner</translation>
+      <translation>Coin supérieur droit</translation>
     </message>
     <message>
       <source>Bottom left corner</source>
-      <translation type="unfinished">Bottom left corner</translation>
+      <translation>Coin inférieur gauche</translation>
     </message>
     <message>
       <source>Bottom right corner</source>
-      <translation type="unfinished">Bottom right corner</translation>
+      <translation>Coin inférieur droit</translation>
     </message>
   </context>
   <context>
@@ -6891,15 +6891,15 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>No timestamp</source>
-      <translation type="unfinished">No timestamp</translation>
+      <translation>Aucun Horodatage</translation>
     </message>
     <message>
       <source>No camera name</source>
-      <translation type="unfinished">No camera name</translation>
+      <translation>Aucun nom de caméra</translation>
     </message>
     <message>
       <source>Camera name:</source>
-      <translation type="unfinished">Camera name:</translation>
+      <translation>Nom de la caméra:</translation>
     </message>
   </context>
   <context>
@@ -8412,15 +8412,15 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Add Info</source>
-      <translation type="unfinished">Add Info</translation>
+      <translation>Ajouter informations</translation>
     </message>
     <message>
       <source>Delete Info</source>
-      <translation type="unfinished">Delete Info</translation>
+      <translation>Supprimer informations</translation>
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Information</translation>
     </message>
   </context>
   <context>
@@ -10018,7 +10018,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>nx::vms::client::desktop::ui::action::ShowOnItemsFactory</name>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Information</translation>
     </message>
     <message>
       <source>Objects</source>
@@ -10026,7 +10026,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Regions of Interest</source>
-      <translation type="unfinished">Regions of Interest</translation>
+      <translation>Zône d'Intérêt</translation>
     </message>
   </context>
   <context>

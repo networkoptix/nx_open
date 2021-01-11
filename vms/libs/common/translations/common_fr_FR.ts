@@ -170,7 +170,7 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>Système %1 peut seulement être fusionné avec non-%1. Nom Système et mot de passe sont pris du Système %1.</translation>
+      <translation>Le système %1 peut seulement être fusionné avec non-%1. Le nom du système et le mot de passe sont tirés du système %1.</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
@@ -189,7 +189,7 @@
     <message>
       <source>Cloud systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Systèmes en nuage ont des propriétaires différents. La fusion n'est pas autorisée.</translation>
+      <translation>Les systèmes nuage ont des propriétaires différents. La fusion n'est pas autorisée.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with NVR licenses.</source>
@@ -609,77 +609,77 @@
     <message numerus="yes">
       <source>%n Time Licenses</source>
       <translation>
-        <numerusform>%n Licences Temps</numerusform>
+        <numerusform>%n Licence Temps</numerusform>
         <numerusform>%n Licences Temps</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Licenses</source>
       <translation>
-        <numerusform>%n Licences Analogue</numerusform>
-        <numerusform>%n Licences Analogue</numerusform>
+        <numerusform>%n Licence Analogique</numerusform>
+        <numerusform>%n Licences Analogique</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Professional Licenses</source>
       <translation>
-        <numerusform>%n Licences Professionnel</numerusform>
+        <numerusform>%n Licence Professionnel</numerusform>
         <numerusform>%n Licences Professionnel</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Edge Licenses</source>
       <translation>
-        <numerusform>%n Licences Edge</numerusform>
+        <numerusform>%n Licence Edge</numerusform>
         <numerusform>%n Licences Edge</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Vmax Licenses</source>
       <translation>
-        <numerusform>%n Licences Vmax</numerusform>
+        <numerusform>%n Licence Vmax</numerusform>
         <numerusform>%n Licences Vmax</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Analog Encoder Licenses</source>
       <translation>
-        <numerusform>%n Licenses d'encodeur analogue</numerusform>
-        <numerusform>%n Licenses d'encodeur analogue</numerusform>
+        <numerusform>%n Licence d'encodeur analogique</numerusform>
+        <numerusform>%n Licences d'encodeur analogique</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Video Wall Licenses</source>
       <translation>
-        <numerusform>%n Licences de mur vidéo</numerusform>
+        <numerusform>%n Licence de mur vidéo</numerusform>
         <numerusform>%n Licences de mur vidéo</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O Module Licenses</source>
       <translation>
-        <numerusform>%n Licences Module I/O</numerusform>
+        <numerusform>%n Licence Module I/O</numerusform>
         <numerusform>%n Licences Module I/O</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Start Licenses</source>
       <translation>
-        <numerusform>%n Démarrer Licences</numerusform>
-        <numerusform>%n Démarrer Licences</numerusform>
+        <numerusform>%n Licence de démarrage</numerusform>
+        <numerusform>%n Licences de démarrage</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Bridge Licenses</source>
       <translation>
-        <numerusform>%n Licenses Pont</numerusform>
-        <numerusform>%n Licenses Pont</numerusform>
+        <numerusform>%n Licence provisoires</numerusform>
+        <numerusform>%n Licences Provisoires</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n Invalid Licenses</source>
       <translation>
-        <numerusform>%n Licences Invalide</numerusform>
+        <numerusform>%n Licence Invalide</numerusform>
         <numerusform>%n Licences Invalide</numerusform>
       </translation>
     </message>

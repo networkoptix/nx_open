@@ -225,7 +225,7 @@
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Suivant</translation>
     </message>
   </context>
   <context>
@@ -233,36 +233,36 @@
     <message>
       <source>Introducing you
 new PTZ controls</source>
-      <translation type="unfinished">Introducing you
-new PTZ controls</translation>
+      <translation>Présentation
+Les nouvelles commandes PTZ</translation>
     </message>
     <message>
       <source>Here is a quick presentation
 of what has changed</source>
-      <translation type="unfinished">Here is a quick presentation
-of what has changed</translation>
+      <translation>Voici une présentation rapide
+de ce qui a changé</translation>
     </message>
     <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
-      <translation type="unfinished">Drag over any part of the video
-to activate PTZ</translation>
+      <translation>Faites glisser sur n'importe quelle partie de la vidéo
+pour activer le PTZ</translation>
     </message>
     <message>
       <source>Press arrows keys to move and plus or minus keys to zoom</source>
-      <translation type="unfinished">Press arrows keys to move and plus or minus keys to zoom</translation>
+      <translation>Appuyez sur les flèches pour déplacer et sur plus ou moins pour zoomer</translation>
     </message>
     <message>
       <source>Use the mouse wheel to zoom</source>
-      <translation type="unfinished">Use the mouse wheel to zoom</translation>
+      <translation>Utilisez la molette de la souris pour zoomer</translation>
     </message>
     <message>
       <source>Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</translation>
+      <translation>Cliquez, double-cliquez ou faites glisser le pointeur de la souris tout en appuyant sur la touche Maj pour utiliser le PTZ avancé</translation>
     </message>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
-      <translation type="unfinished">Go to Local Settings to enable a drag marker over the center of the video</translation>
+      <translation>Allez dans les paramètres locaux pour activer un marqueur de glissement sur le centre de la vidéo</translation>
     </message>
   </context>
   <context>

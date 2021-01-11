@@ -66,7 +66,7 @@
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
-      <translation>Ne peut pas initialiser l'encodeur audio.</translation>
+      <translation>Impossible d'initialiser l'encodeur audio.</translation>
     </message>
     <message>
       <source>Sample format of input device %1 is not supported.</source>

@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>General file operation failure</source>
-      <translation>Échec général de l'opération de fichier</translation>
+      <translation>Échec général lors de l'opération sur le fichier</translation>
     </message>
     <message>
       <source>The file cannot be written locally, due to access restrictions</source>
@@ -17,7 +17,7 @@
     </message>
     <message>
       <source>Insufficient space on the target drive</source>
-      <translation>Espace insuffisant sur le lecteur cible</translation>
+      <translation>Espace insuffisant sur le disque cible</translation>
     </message>
     <message>
       <source>The directory or file name is too long</source>
@@ -81,7 +81,7 @@
     </message>
     <message>
       <source>The server did not authorize access to the resource</source>
-      <translation>Le serveur n'a pas autorisé l'accès à la ressource</translation>
+      <translation>Le serveur n'a pas autorisé l'accès aux ressources</translation>
     </message>
     <message>
       <source>A problem with the server certificate occurred</source>
@@ -120,7 +120,7 @@
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation>Basculer Muet</translation>
+      <translation>Basculer en mode Muet</translation>
     </message>
     <message>
       <source>Close Page</source>
@@ -172,11 +172,11 @@
     </message>
     <message>
       <source>Insert &amp;Ordered List</source>
-      <translation>Insérer liste &amp;Ordonnée</translation>
+      <translation>Insérer Liste &amp;Ordonnée</translation>
     </message>
     <message>
       <source>Insert &amp;Unordered List</source>
-      <translation>Insérer liste &amp;Desordonné</translation>
+      <translation>Insérer Liste &amp;Désordonné</translation>
     </message>
   </context>
   <context>
@@ -195,7 +195,7 @@
     </message>
     <message>
       <source>Toggle Mute</source>
-      <translation>Basculer Sourdine</translation>
+      <translation>Basculer en mode Muet</translation>
     </message>
     <message>
       <source>Close Page</source>
