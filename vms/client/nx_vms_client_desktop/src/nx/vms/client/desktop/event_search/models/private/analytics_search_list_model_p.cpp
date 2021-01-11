@@ -772,7 +772,9 @@ void AnalyticsSearchListModel::Private::processMetadata()
     std::sort(newTracks.begin(), newTracks.end(),
         [](const ObjectTrack& left, const ObjectTrack& right)
         {
-            return left.firstAppearanceTimeUs < right.firstAppearanceTimeUs;
+            return left.firstAppearanceTimeUs != right.firstAppearanceTimeUs
+                ? left.firstAppearanceTimeUs < right.firstAppearanceTimeUs
+                : left.id < right.id;
         });
 
     ScopedLiveCommit liveCommit(q);
@@ -783,17 +785,26 @@ void AnalyticsSearchListModel::Private::processMetadata()
     if (!m_data.empty())
     {
         const auto latestTime = startTime(m_data.front());
+        const auto latestId = m_data.front().id;
+
         for (; it != newTracks.cend(); ++it)
         {
             const auto timestamp = startTime(*it);
-            if (timestamp >= latestTime)
+            if (timestamp > latestTime || (timestamp == latestTime && it->id > latestId))
                 break;
 
             if (timestamp <= q->fetchedTimeWindow().startTime())
                 continue;
 
-            const auto position = std::lower_bound(m_data.cbegin(), m_data.cend(), timestamp,
-                lowerBoundPredicate) - m_data.begin();
+            const auto position = std::lower_bound(m_data.cbegin(), m_data.cend(), *it,
+                [](const ObjectTrack& left, const ObjectTrack& right)
+                {
+                    const auto leftTime = startTime(left);
+                    const auto rightTime = startTime(right);
+                    return leftTime != rightTime
+                        ? leftTime > rightTime
+                        : left.id > right.id;
+                }) - m_data.begin();
 
             ScopedInsertRows insertRows(q, position, position);
             NX_ASSERT(!m_objectTrackIdToTimestamp.contains(it->id));
@@ -815,8 +826,10 @@ void AnalyticsSearchListModel::Private::processMetadata()
 
         NX_VERBOSE(q, "Live update commit");
         commitInternal(periodToCommit,
-            std::make_reverse_iterator(newTracks.end()), std::make_reverse_iterator(it),
-            /*position*/ 0, /*handleOverlaps*/ false);
+            std::make_reverse_iterator(newTracks.end()),
+            std::make_reverse_iterator(it),
+            /*position*/ 0,
+            /*handleOverlaps*/ false);
     }
 
     NX_VERBOSE(q, "%1 new object tracks inserted in the middle, %2 at the top, %3 skipped as too old",
