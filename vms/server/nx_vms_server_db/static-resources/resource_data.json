@@ -4990,6 +4990,15 @@
                     }
                 }
             }
+        },
+        {
+            "keys": [
+                "Acti|*A416",
+                "Acti|*A418",
+                "Acti|*A811",
+                "Acti|*A818"
+            ],
+            "useOnvifPtz": true
         }
     ]
 }
