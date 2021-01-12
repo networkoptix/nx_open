@@ -1430,7 +1430,8 @@
                 "AXIS|AXISA9161",
                 "AXIS|AXISC1004E",
                 "AXIS|AXISC8033",
-                "AXIS|AXISC1310*"
+                "AXIS|AXISC1310*",
+                "AXIS|AXISA9188*"
             ],
             "noVideoSupport": true
         },
