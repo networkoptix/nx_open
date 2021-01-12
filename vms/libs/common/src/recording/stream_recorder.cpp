@@ -151,7 +151,7 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev):
     m_serverTimeZoneMs(Qn::InvalidUtcOffset),
     m_nextIFrameTime(AV_NOPTS_VALUE),
     m_truncateIntervalEps(0),
-    m_recordingFinished(false),
+    m_finishedSignalSent(false),
     m_role(StreamRecorderRole::serverRecording),
     m_gen(m_rd()),
     m_forcedAudioLayout(nullptr),
@@ -211,9 +211,6 @@ void QnStreamRecorder::close()
     if (m_packetWrited && m_videoTranscoder)
         flushTranscoder();
 
-    if (m_role == StreamRecorderRole::fileExport)
-        m_recordingFinished = true;
-
     m_lastCompressionType = AV_CODEC_ID_NONE;
     for (size_t i = 0; i < m_recordingContextVector.size(); ++i)
     {
@@ -267,10 +264,10 @@ void QnStreamRecorder::close()
     m_firstTime = true;
     m_prevAudioFormat.reset();
 
-    if (m_recordingFinished)
+    if (!m_finishedSignalSent)
     {
-        // close may be called multiple times, so we have to reset flag m_recordingFinished
-        m_recordingFinished = false;
+        // close may be called multiple times, so we have to reset flag m_finishedSignalSent
+        m_finishedSignalSent = true;
         emit recordingFinished(m_lastError, QString());
     }
 }
@@ -529,7 +526,6 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
                     StreamRecorderError::transcodingRequired,
                     QnStorageResourcePtr()
                 );
-                m_recordingFinished = true;
                 m_needStop = true;
                 return false;
             }
@@ -578,9 +574,6 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
         }
         if (!initFfmpegContainer(md))
         {
-            if (!m_recordingContextVector.empty())
-                m_recordingFinished = true;
-
             // clear formatCtx and ioCtx
             cleanFfmpegContexts();
 
@@ -734,7 +727,6 @@ void QnStreamRecorder::writeData(const QnConstAbstractMediaDataPtr& md, int stre
             // that in order means that QIOdevice::writeData() implementation for example
             // in QnBufferedFile or QnLayoutFile returned -1
             // that in order means that disk write operation failed.
-            m_recordingFinished = true;
             m_lastError = StreamRecorderErrorStruct(
                 StreamRecorderError::fileWrite,
                 m_recordingContextVector[i].storage
@@ -774,6 +766,7 @@ void QnStreamRecorder::setTranscoderFixedFrameRate(int value)
 
 bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& mediaData)
 {
+    m_finishedSignalSent = false;
     m_mediaProvider = dynamic_cast<QnAbstractMediaStreamDataProvider*> (mediaData->dataProvider);
     //NX_ASSERT(m_mediaProvider); //< Commented out since
 
@@ -1112,7 +1105,6 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
             m_lastError = StreamRecorderErrorStruct(StreamRecorderError::fileCreate,
                 context.storage);
             NX_ERROR(this, lit("Can't create output file '%1'.").arg(url));
-            m_recordingFinished = true;
             msleep(500); // avoid createFile flood
             return false;
         }

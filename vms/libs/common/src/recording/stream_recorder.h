@@ -229,7 +229,7 @@ private:
     qint64 m_truncateIntervalEps;
 
     /** If true method close() will emit signal recordingFinished() at the end. */
-    bool m_recordingFinished;
+    bool m_finishedSignalSent;
     StreamRecorderRole m_role;
     boost::optional<nx::core::transcoding::FilterChain> m_transcodeFilters;
 
