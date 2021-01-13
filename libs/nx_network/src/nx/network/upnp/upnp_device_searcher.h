@@ -70,6 +70,7 @@ public:
     virtual ~DeviceSearcher();
 
     virtual void pleaseStop() override;
+    void stop();
 
     /**
      * If handler is already added for deviceType, nothing is done
@@ -145,6 +146,7 @@ private:
     nx::Buffer m_receiveBuffer;
     bool m_needToUpdateReceiveSocket;
     nx::utils::TimerManager* m_timerManager;
+    QnReadWriteLock m_stoppingLock;
 
     virtual void onTimer(const quint64& timerID) override;
     void onSomeBytesRead(

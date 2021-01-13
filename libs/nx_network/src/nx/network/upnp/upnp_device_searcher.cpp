@@ -59,14 +59,19 @@ DeviceSearcher::DeviceSearcher(
 
 DeviceSearcher::~DeviceSearcher()
 {
-    pleaseStop();
+    stop();
 }
 
 void DeviceSearcher::pleaseStop()
 {
+}
+
+void DeviceSearcher::stop()
+{
     //stopping dispatching discover packets
     {
         QnMutexLocker lk(&m_mutex);
+        QnWriteLocker lock(&m_stoppingLock);
         m_terminated = true;
     }
     //m_timerID cannot be changed after m_terminated set to true
@@ -510,6 +515,10 @@ void DeviceSearcher::processPacket(DiscoveredDeviceInfo info)
         {
             const auto lock = guard->lock();
             if (!lock)
+                return;
+
+            QnReadLocker stopLock(&m_stoppingLock);
+            if (m_terminated)
                 return;
 
             const SocketAddress devAddress(

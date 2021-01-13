@@ -476,7 +476,7 @@ void QnMediaServerModule::stop()
     m_isStopping = true;
     // TODO: Find out why arent all of these are long runnables.
 
-    m_upnpDeviceSearcher->pleaseStop();
+    m_upnpDeviceSearcher->stop();
     resourceDiscoveryManager()->pleaseStop();
 
     stopStorages();
