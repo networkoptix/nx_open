@@ -87,8 +87,15 @@ public:
      * Extract information about box temperature detection ROI (as a json object) of a desired
      * type from the json object (that corresponds to some event and channel)
      */
-    static nx::kit::Json extractTemperatureRoiInfo(nx::kit::Json channelInfo, int sunapiIndex);
+    static nx::kit::Json extractBoxTemperatureDetectionRoiInfo(
+        nx::kit::Json channelInfo, int sunapiIndex);
 
+    /**
+     * Extract information about temperature change detection ROI (as a json object) of a desired
+     * type from the json object (that corresponds to some event and channel)
+     */
+    static nx::kit::Json extractTemperatureChangeDetectionRoiInfo(
+        nx::kit::Json channelInfo, int sunapiIndex);
 };
 
 //-------------------------------------------------------------------------------------------------

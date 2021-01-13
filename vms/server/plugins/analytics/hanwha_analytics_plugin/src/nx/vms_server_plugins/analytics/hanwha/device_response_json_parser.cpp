@@ -175,7 +175,7 @@ The example of the incoming json:
     if (!jsonChannels.is_array())
         return {};
 
-    for (const auto& channel : jsonChannels.array_items())
+    for (const auto& channel: jsonChannels.array_items())
     {
         if (const auto& j = channel["Channel"]; j.is_number() && j.int_value() == channelNumber)
             return channel;
@@ -225,7 +225,7 @@ The example of the incoming json:
     if (!objectSizeList.is_array())
         return result;
 
-    for (const nx::kit::Json& objectSize : objectSizeList.array_items())
+    for (const nx::kit::Json& objectSize: objectSizeList.array_items())
     {
         const nx::kit::Json& detectionTypeParameter = objectSize["DetectionType"];
         if (detectionTypeParameter.string_value() == detectionTypeValue)
@@ -253,7 +253,7 @@ The example of the incoming json:
     if (!Lines.is_array())
         return result;
 
-    for (const nx::kit::Json& Line : Lines.array_items())
+    for (const nx::kit::Json& Line: Lines.array_items())
     {
         const nx::kit::Json& roiIndex = Line["ROI"];
         if (roiIndex.is_number() && roiIndex.int_value() == sunapiIndex)
@@ -279,7 +279,7 @@ The example of the incoming json:
     if (!Lines.is_array())
         return result;
 
-    for (const nx::kit::Json& Line : Lines.array_items())
+    for (const nx::kit::Json& Line: Lines.array_items())
     {
         const nx::kit::Json& roiIndex = Line["Line"];
         if (roiIndex.is_number() && roiIndex.int_value() == sunapiIndex)
@@ -305,7 +305,7 @@ The example of the incoming json:
     if (!Lines.is_array())
         return result;
 
-    for (const nx::kit::Json& Line : Lines.array_items())
+    for (const nx::kit::Json& Line: Lines.array_items())
     {
         const nx::kit::Json& roiIndex = Line["DefinedArea"];
         if (roiIndex.is_number() && roiIndex.int_value() == sunapiIndex)
@@ -331,7 +331,7 @@ The example of the incoming json:
     if (!Areas.is_array())
         return result;
 
-    for (const nx::kit::Json& Area : Areas.array_items())
+    for (const nx::kit::Json& Area: Areas.array_items())
     {
         const nx::kit::Json& roiIndex = Area["ExcludeArea"];
         if (roiIndex.is_number() && roiIndex.int_value() == sunapiIndex)
@@ -374,11 +374,37 @@ The example of the incoming json:
  * Extract information about box temperature detection ROI (as a json object) of a desired
  * type from the json object (that corresponds to some event and channel)
  */
-/*static*/ nx::kit::Json DeviceResponseJsonParser::extractTemperatureRoiInfo(
+/*static*/ nx::kit::Json DeviceResponseJsonParser::extractBoxTemperatureDetectionRoiInfo(
     nx::kit::Json channelInfo, int sunapiIndex)
 {
     nx::kit::Json result;
     const nx::kit::Json& rois = channelInfo["ROIs"];
+    if (!rois.is_array())
+        return result;
+
+    for (const nx::kit::Json& roi: rois.array_items())
+    {
+        const nx::kit::Json& roiIndex = roi["ROI"];
+        if (roiIndex.is_number() && roiIndex.int_value() == sunapiIndex)
+        {
+            result = roi;
+            return result;
+        }
+    }
+    return result;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Extract information about temperature change detection ROI (as a json object) of a desired
+ * type from the json object (that corresponds to some event and channel)
+ */
+/*static*/ nx::kit::Json DeviceResponseJsonParser::extractTemperatureChangeDetectionRoiInfo(
+    nx::kit::Json channelInfo, int sunapiIndex)
+{
+    nx::kit::Json result;
+    const nx::kit::Json& rois = channelInfo["TemperatureChange"];
     if (!rois.is_array())
         return result;
 

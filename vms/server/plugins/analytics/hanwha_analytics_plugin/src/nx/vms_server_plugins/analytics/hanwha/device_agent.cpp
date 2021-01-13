@@ -203,7 +203,7 @@ void DeviceAgent::setSupportedEventCategoties()
         m_manifest.supportedEventTypeIds.contains("nx.hanwha.FaceMaskDetection");
 
     m_settings.analyticsCategories[temperatureChangeDetection] =
-        m_manifest.supportedEventTypeIds.contains("nx.hanwha.temperatureChangeDetection");
+        m_manifest.supportedEventTypeIds.contains("nx.hanwha.TemperatureChangeDetection");
 
     m_settings.analyticsCategories[boxTemperatureDetection] =
         m_manifest.supportedEventTypeIds.contains("nx.hanwha.BoxTemperatureDetection");

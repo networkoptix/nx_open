@@ -1434,7 +1434,7 @@ void BoxTemperatureDetection::writeToServer(
 void BoxTemperatureDetection::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
 {
     nx::kit::Json roiInfo =
-        DeviceResponseJsonParser::extractTemperatureRoiInfo(channelInfo, this->deviceIndex());
+        DeviceResponseJsonParser::extractBoxTemperatureDetectionRoiInfo(channelInfo, this->deviceIndex());
     if (roiInfo == nx::kit::Json())
     {
         *this = BoxTemperatureDetection(
@@ -1600,7 +1600,7 @@ void TemperatureChangeDetection::writeToServer(
 void TemperatureChangeDetection::readFromDeviceReplyOrThrow(const nx::kit::Json& channelInfo)
 {
     nx::kit::Json roiInfo =
-        DeviceResponseJsonParser::extractTemperatureRoiInfo(channelInfo, this->deviceIndex());
+        DeviceResponseJsonParser::extractTemperatureChangeDetectionRoiInfo(channelInfo, this->deviceIndex());
     if (roiInfo == nx::kit::Json())
     {
         *this = TemperatureChangeDetection(
@@ -1631,7 +1631,7 @@ std::string TemperatureChangeDetection::buildDeviceWritingQuery(int channelNumbe
         if (!unnamedRect.points.empty())
         {
             using namespace SettingPrimitivesDeviceIo;
-            const std::string prefix = "&ROI."s + std::to_string(deviceIndex());
+            const std::string prefix = "&TemperatureChange.ROI."s + std::to_string(deviceIndex());
             query << "msubmenu=" << kSunapiEventName << "&action="
                 << "set"
                 << "&Channel=" << channelNumber;

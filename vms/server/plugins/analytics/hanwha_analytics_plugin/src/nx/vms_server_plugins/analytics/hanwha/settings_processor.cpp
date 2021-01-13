@@ -532,7 +532,7 @@ void SettingsProcessor::transferAndHoldSettingsFromServerToDevice(
         SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
             m_settings.temperatureChangeDetectionToggle, sender, m_cameraChannelNumber);
 
-        for (int i = 0; i < Settings::kBoxTemperatureMultiplicity; ++i)
+        for (int i = 0; i < Settings::kTemperatureChangeMultiplicity; ++i)
         {
             SettingGroup::transferFromServerToDevice(errorMap, valueMap, sourceMap,
                 m_settings.temperatureChangeDetectionItems[i], sender, m_cameraChannelNumber, i);

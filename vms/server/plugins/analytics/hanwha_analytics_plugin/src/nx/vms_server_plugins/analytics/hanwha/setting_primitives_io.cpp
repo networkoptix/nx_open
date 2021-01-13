@@ -35,7 +35,6 @@ void deserializeOrThrow(const char* source, bool* destination)
 std::string serialize(bool value)
 {
     return value ? "true"s : "false"s;
-
 }
 
 //-------------------------------------------------------------------------------------------------

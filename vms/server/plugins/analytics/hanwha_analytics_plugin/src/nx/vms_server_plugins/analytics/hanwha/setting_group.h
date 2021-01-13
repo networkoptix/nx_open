@@ -1016,9 +1016,9 @@ struct TemperatureChangeDetectionToggle: public SettingGroup
         enabled,
     };
     static constexpr const char* kKeys[] = {
-        "TemperatureCHangeDetection.Enable",
+        "TemperatureChangeDetection.Enable",
     };
-    static constexpr const char* kJsonEventName = "TemperatureCHangeDetection";
+    static constexpr const char* kJsonEventName = "TemperatureChangeDetection";
     static constexpr const char* kSunapiEventName = "temperaturechangedetection";
 
     TemperatureChangeDetectionToggle(const SettingsCapabilities& settingsCapabilities,
