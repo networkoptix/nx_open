@@ -2074,7 +2074,7 @@ std::vector<NalUnitInfo> findNalUnitsAnnexB(const uint8_t* data, int32_t size)
         nextNaluStart = NALUnit::findNextNAL(naluStart, dataEnd);
         const uint8_t *naluEnd = nextNaluStart == dataEnd ? dataEnd : nextNaluStart - 3;
 
-        //skipping leading_zero_8bits and trailing_zero_8bits
+        // skipping leading_zero_8bits and trailing_zero_8bits
         while (naluEnd > naluStart && naluEnd[-1] == 0)
             --naluEnd;
 

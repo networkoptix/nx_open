@@ -409,7 +409,7 @@ QSize cropResolution(const QSize& source, const QSize& max)
 
 QSize maxResolution(AVCodecID codec)
 {
-    using namespace nx::media_utils;
+    using namespace nx::media;
     struct CodecMaxSize
     {
         AVCodecID codec;

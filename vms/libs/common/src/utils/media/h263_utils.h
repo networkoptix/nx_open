@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-namespace nx::media_utils::h263 {
+namespace nx::media::h263 {
 
 constexpr int kMaxHeight = 1152;
 constexpr int kMaxWidth = 2048;
@@ -48,4 +48,4 @@ struct PictureHeader
     Format format = Format::Forbidden;
 };
 
-} // nx::media_utils::h263
+} // nx::media::h263

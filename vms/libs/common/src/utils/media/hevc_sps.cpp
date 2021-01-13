@@ -9,7 +9,7 @@
 #include "h264_utils.h"
 
 namespace nx {
-namespace media_utils {
+namespace media {
 namespace hevc {
 
 namespace {
@@ -20,7 +20,6 @@ static const int kReservedNalSpace = 16; //< Where this number comes from?
 
 bool Sps::decodeFromVideoFrame(const QnConstCompressedVideoDataPtr& videoData)
 {
-    using namespace nx::media_utils;
 
     // H.265 nal units have same format (unit delimiter) as H.264 nal units
     auto nalUnits = nx::media::h264::decodeNalUnits(videoData);
@@ -241,5 +240,5 @@ bool Sps::decodeLayer(BitStreamReader& reader, ProfileTierLevel::Layer* outLayer
 }
 
 } // namespace hevc
-} // namespace media_utils
+} // namespace media
 } // namespace nx

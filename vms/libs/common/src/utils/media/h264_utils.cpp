@@ -116,7 +116,7 @@ std::vector<uint8_t> buildExtraData(const uint8_t* data, int32_t size)
 
     if (spsVector.empty() || ppsVector.empty())
     {
-        NX_WARNING(NX_SCOPE_TAG, "Failed to write extra data, no sps/pps found");
+        NX_WARNING(NX_SCOPE_TAG, "Failed to write h264 extra data, no sps/pps found");
         return std::vector<uint8_t>();
     }
 

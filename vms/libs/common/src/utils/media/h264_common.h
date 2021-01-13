@@ -1,9 +1,9 @@
 #pragma once
 
 namespace nx {
-namespace media_utils {
+namespace media {
 namespace h264 {
 
 } // namespace h264
-} // namespace media_utils
+} // namespace media
 } // namespace nx

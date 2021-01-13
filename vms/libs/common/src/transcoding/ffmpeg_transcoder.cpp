@@ -11,7 +11,7 @@ extern "C"
 
 #include <nx/utils/log/log.h>
 #include <utils/media/jpeg_utils.h>
-#include <utils/media/h264_utils.h>
+#include <utils/media/utils.h>
 
 #include "ffmpeg_video_transcoder.h"
 #include "ffmpeg_audio_transcoder.h"
@@ -31,18 +31,6 @@ static AVPixelFormat jpegPixelFormatToRtp(AVPixelFormat value)
     }
 }
 
-static bool fillExtraData(const QnConstCompressedVideoDataPtr& video, AVCodecContext* context)
-{
-    std::vector<uint8_t> extradata = nx::media::h264::buildExtraData(
-        (const uint8_t*)video->data(), video->dataSize());
-    if (extradata.empty())
-        return false;
-
-    context->extradata = (uint8_t*)av_malloc(extradata.size());
-    context->extradata_size = extradata.size();
-    memcpy(context->extradata, extradata.data(), extradata.size());
-    return true;
-}
 
 static qint32 ffmpegReadPacket(void* /*opaque*/, quint8* /*buf*/, int /*size*/)
 {
@@ -251,12 +239,10 @@ int QnFfmpegTranscoder::open(const QnConstCompressedVideoDataPtr& video, const Q
 
             if (video->context)
                 QnFfmpegHelper::mediaContextToAvCodecContext(m_videoEncoderCodecCtx, video->context);
-            if (m_videoEncoderCodecCtx->extradata_size == 0
-                && video->compressionType == AV_CODEC_ID_H264
-                && (m_container.compare("mp4", Qt::CaseInsensitive) == 0
-                ||  m_container.compare("ismv", Qt::CaseInsensitive) == 0))
+            if (m_container.compare("mp4", Qt::CaseInsensitive) == 0
+                ||  m_container.compare("ismv", Qt::CaseInsensitive) == 0)
             {
-                if (!fillExtraData(video, m_videoEncoderCodecCtx))
+                if (!nx::media::fillExtraData(video, m_videoEncoderCodecCtx))
                     NX_WARNING(this, "Failed to build extra data");
             }
 

@@ -68,12 +68,12 @@ static bool isH264IFrame(const QnAbstractMediaDataPtr& data)
 
 static void updateKeyFrameFlagH263(QnAbstractMediaDataPtr& data)
 {
-    nx::media_utils::h263::PictureHeader header;
+    nx::media::h263::PictureHeader header;
     if (header.decode((uint8_t*)data->data(), data->dataSize()))
     {
         data->flags.setFlag(
             QnAbstractMediaData::MediaFlag::MediaFlags_AVKey,
-            nx::media_utils::h263::isKeyFrame(header.pictureType));
+            nx::media::h263::isKeyFrame(header.pictureType));
     }
 }
 

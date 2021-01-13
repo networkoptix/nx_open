@@ -27,8 +27,7 @@
 #include "export/sign_helper.h"
 
 #include <utils/common/util.h>
-#include <utils/media/h264_utils.h>
-
+#include <utils/media/utils.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/utils/log/log.h>
 
@@ -978,21 +977,10 @@ bool QnStreamRecorder::initFfmpegContainer(const QnConstAbstractMediaDataPtr& me
                 videoStream->sample_aspect_ratio = videoCodecCtx->sample_aspect_ratio;
                 videoStream->first_dts = 0;
 
-                if (videoCodecCtx->extradata_size == 0 && videoData->compressionType == AV_CODEC_ID_H264
-                    && m_container.compare("mp4", Qt::CaseInsensitive) == 0)
+                if (m_container.compare("mp4", Qt::CaseInsensitive) == 0)
                 {
-                    std::vector<uint8_t> extradata = nx::media::h264::buildExtraData(
-                        (const uint8_t*)videoData->data(), videoData->dataSize());
-                    if (!extradata.empty())
-                    {
-                        videoCodecCtx->extradata = (uint8_t*)av_malloc(extradata.size());
-                        videoCodecCtx->extradata_size = extradata.size();
-                        memcpy(videoCodecCtx->extradata, extradata.data(), extradata.size());
-                    }
-                    else
-                    {
+                    if (!nx::media::fillExtraData(videoData, videoCodecCtx))
                         NX_WARNING(this, "Failed to build extra data");
-                    }
                 }
             }
         }

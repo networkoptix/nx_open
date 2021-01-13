@@ -61,7 +61,7 @@ TEST(NalUnits, hevcDecodeSpsNoCrash)
 
     for (const auto& entry : kEncodedSps)
     {
-        nx::media_utils::hevc::Sps sps;
+        nx::media::hevc::Sps sps;
         const auto buffer = nx::Buffer::fromHex(entry.first);
         const auto result = sps.decode((const uint8_t*) buffer.constData(), buffer.size());
 

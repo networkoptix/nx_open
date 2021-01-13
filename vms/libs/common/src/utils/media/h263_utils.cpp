@@ -2,7 +2,7 @@
 
 #include <utils/media/bitStream.h>
 
-namespace nx::media_utils::h263 {
+namespace nx::media::h263 {
 
 const uint16_t kFormatResolutions[8][2] = {
     {    0,    0 },
@@ -87,4 +87,4 @@ bool PictureHeader::decode(const uint8_t* data, uint32_t size)
 
 }
 
-} // namespace nx::media_utils::h263
+} // namespace nx::media::h263

@@ -1,10 +1,9 @@
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
+#include <vector>
 
-namespace nx {
-namespace media_utils {
-namespace hevc {
+namespace nx::media::hevc {
 
 enum class NalUnitType
 {
@@ -72,6 +71,7 @@ bool isLeadingPicture(NalUnitType unitType);
 bool isTrailingPicture(NalUnitType unitType);
 bool isParameterSet(NalUnitType unitType);
 
-} // namespace hevc
-} // namespace media_utils
-} // namespace nx
+std::vector<uint8_t> buildExtraData(const uint8_t* data, int32_t size);
+
+} // namespace nx::media::hevc
+

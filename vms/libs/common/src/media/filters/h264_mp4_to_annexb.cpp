@@ -107,8 +107,8 @@ std::vector<uint8_t> readH265SeqHeaderFromExtraData(const uint8_t* extraData, in
     if (!extraData)
         return result;
 
-    nx::media_utils::hevc::HEVCDecoderConfigurationRecord hvcc;
-    if (!hvcc.parse(extraData, extraDataSize))
+    nx::media::hevc::HEVCDecoderConfigurationRecord hvcc;
+    if (!hvcc.read(extraData, extraDataSize))
     {
         NX_WARNING(NX_SCOPE_TAG, "Failed to parse hvcc");
         return result;

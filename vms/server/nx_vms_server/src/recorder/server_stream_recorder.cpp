@@ -1064,7 +1064,7 @@ bool QnServerStreamRecorder::mediaHasBuiltinContext(const QnConstAbstractMediaDa
         return false;
 
     auto codecId = videoFrame->compressionType;
-    using namespace nx::media_utils;
+    using namespace nx::media;
     switch (codecId)
     {
         case AV_CODEC_ID_H264:

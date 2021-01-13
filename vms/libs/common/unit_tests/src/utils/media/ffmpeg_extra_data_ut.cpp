@@ -4,7 +4,7 @@
 #include <utils/media/hevc_decoder_configuration_record.h>
 
 
-TEST(media_utils, build_extradata_h264)
+TEST(media_, build_extradata_h264)
 {
     uint8_t frameData[] = {
         0x00, 0x00, 0x00, 0x01, 0x67, 0x42, 0x00, 0x29, 0xe3, 0x50, 0x14, 0x07, 0xb6, 0x02, 0xdc,
@@ -27,20 +27,7 @@ TEST(media_utils, build_extradata_h264)
     ASSERT_EQ(memcmp(extradata.data() + 11 + kSpsSize, frameData + 8 + kSpsSize, kPpsSize), 0);
 }
 
-#include <sstream>
-#include <iomanip>
-
-std::string toHex(const void* buffer, const int size)
-{
-    const uint8_t* data = (const uint8_t*)buffer;
-    std::stringstream stream;
-    stream << std::hex;
-    for (int i = 0; i < size; ++i)
-        stream << "0x" <<  std::setfill('0') << std::setw(2) << (int)data[i] << ", ";
-    return stream.str();
-}
-
-TEST(media_utils, parse_extradata_h265)
+TEST(media_, parse_extradata_h265)
 {
     uint8_t frameData[] = {
         0x01, 0x01, 0x60, 0x00, 0x00, 0x00, 0xb0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x99, 0xf0, 0x00,
@@ -50,12 +37,20 @@ TEST(media_utils, parse_extradata_h265)
         0x60, 0x00, 0x00, 0x03, 0x00, 0xb0, 0x00, 0x00, 0x03, 0x00, 0x00, 0x03, 0x00, 0x99, 0xa0,
         0x00, 0x80, 0x08, 0x00, 0x87, 0x16, 0x36, 0xb9, 0x24, 0xcb, 0xc4, 0x22, 0x00, 0x01, 0x00,
         0x08, 0x44, 0x01, 0xc0, 0xf2, 0xf0, 0x3c, 0x90, 0x00};
-    nx::media_utils::hevc::HEVCDecoderConfigurationRecord hvcc;
-    ASSERT_TRUE(hvcc.parse(frameData, sizeof(frameData)));
+
+    // Test read.
+    nx::media::hevc::HEVCDecoderConfigurationRecord hvcc;
+    ASSERT_TRUE(hvcc.read(frameData, sizeof(frameData)));
     ASSERT_EQ(hvcc.sps.size(), 1);
     ASSERT_EQ(hvcc.pps.size(), 1);
     ASSERT_EQ(hvcc.vps.size(), 1);
     ASSERT_EQ(hvcc.sps[0].size(), 30);
     ASSERT_EQ(hvcc.pps[0].size(), 8);
     ASSERT_EQ(hvcc.vps[0].size(), 23);
+
+    // Test write.
+    uint8_t serializedData[sizeof(frameData)];
+    ASSERT_EQ(hvcc.size(), sizeof(frameData));
+    ASSERT_TRUE(hvcc.write(serializedData, sizeof(frameData)));
+    ASSERT_EQ(memcmp(serializedData, frameData, sizeof(frameData)), 0);
 }

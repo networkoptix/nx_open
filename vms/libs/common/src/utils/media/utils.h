@@ -5,11 +5,11 @@
 
 /** todo: move it to nx_media */
 
-namespace nx {
-namespace media {
+namespace nx::media {
 
 QSize getFrameSize(const QnConstCompressedVideoDataPtr& frame);
 double getDefaultSampleAspectRatio(const QSize& srcSize);
+bool fillExtraData(const QnConstCompressedVideoDataPtr& video, AVCodecContext* context);
 
-} // namespace media
-} // namespace nx
+} // namespace nx::media
+

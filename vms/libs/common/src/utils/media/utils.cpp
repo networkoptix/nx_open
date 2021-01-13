@@ -4,10 +4,10 @@
 #include <utils/media/jpeg_utils.h>
 #include <utils/media/h263_utils.h>
 #include <utils/media/h264_utils.h>
+#include <utils/media/hevc_common.h>
 #include <utils/media/hevc_sps.h>
 
-namespace nx {
-namespace media {
+namespace nx::media {
 
 QSize getFrameSize(const QnConstCompressedVideoDataPtr& frame)
 {
@@ -21,7 +21,7 @@ QSize getFrameSize(const QnConstCompressedVideoDataPtr& frame)
     {
         case AV_CODEC_ID_H265:
         {
-            nx::media_utils::hevc::Sps sps;
+            hevc::Sps sps;
             if (sps.decodeFromVideoFrame(frame))
                 return QSize(sps.width, sps.height);
             return QSize();
@@ -29,7 +29,7 @@ QSize getFrameSize(const QnConstCompressedVideoDataPtr& frame)
         case AV_CODEC_ID_H264:
         {
             SPSUnit sps;
-            if (nx::media::h264::extractSps(frame, sps))
+            if (h264::extractSps(frame, sps))
                 return QSize(sps.getWidth(), sps.getHeight());
             return QSize();
         }
@@ -42,7 +42,7 @@ QSize getFrameSize(const QnConstCompressedVideoDataPtr& frame)
         case AV_CODEC_ID_H263:
         case AV_CODEC_ID_H263P:
         {
-            nx::media_utils::h263::PictureHeader header;
+            h263::PictureHeader header;
             if (header.decode((uint8_t*)frame->data(), frame->dataSize()))
                 return QSize(header.width, header.height);
 
@@ -92,5 +92,26 @@ double getDefaultSampleAspectRatio(const QSize& srcSize)
     return 1.0;
 }
 
-} // namespace media
-} // namespace nx
+bool fillExtraData(const QnConstCompressedVideoDataPtr& video, AVCodecContext* context)
+{
+    if (context->extradata)
+        return true;
+
+    std::vector<uint8_t> extradata;
+    if (video->compressionType == AV_CODEC_ID_H264)
+        extradata = h264::buildExtraData((const uint8_t*)video->data(), video->dataSize());
+    else if (video->compressionType == AV_CODEC_ID_H265)
+        extradata = hevc::buildExtraData((const uint8_t*)video->data(), video->dataSize());
+    else
+        return true; //< at this moment ignore all other codecs
+
+    if (extradata.empty())
+        return false;
+
+    context->extradata = (uint8_t*)av_malloc(extradata.size());
+    context->extradata_size = extradata.size();
+    memcpy(context->extradata, extradata.data(), extradata.size());
+    return true;
+}
+
+} // namespace nx::media

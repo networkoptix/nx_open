@@ -2,9 +2,11 @@
 
 #include <QtGlobal>
 
-namespace nx {
-namespace media_utils {
-namespace hevc {
+#include <nx/utils/log/log.h>
+#include "utils/media/nalUnits.h"
+#include "hevc_decoder_configuration_record.h"
+
+namespace nx::media::hevc {
 
 namespace {
 
@@ -98,6 +100,26 @@ bool isParameterSet(NalUnitType unitType)
         || unitType == NalUnitType::ppsNut;
 }
 
-} // namespace hevc
-} // namespace media_utils
-} // namespace nx
+std::vector<uint8_t> buildExtraData(const uint8_t* data, int32_t size)
+{
+    // TODO HEVCDecoderConfigurationRecord hvcc;
+    // FFmpeg support both hvcc and nal unit formats, so we can write raw nal units.
+    std::vector<uint8_t> extraData;
+    std::vector<uint8_t> startcode = {0x0, 0x0, 0x0, 0x1};
+    auto nalUnits = nx::media::nal::findNalUnitsAnnexB(data, size);
+    for (const auto& nalu: nalUnits)
+    {
+        NalUnitType unitType = (NalUnitType)((*nalu.data & kPayloadHeaderNalUnitTypeMask) >> 1);
+        if (unitType == NalUnitType::vpsNut
+            || unitType == NalUnitType::ppsNut
+            || unitType == NalUnitType::spsNut)
+        {
+            extraData.insert(extraData.end(), startcode.begin(), startcode.end());
+            extraData.insert(extraData.end(), nalu.data, nalu.data + nalu.size);
+        }
+    }
+    return extraData;
+}
+
+} // namespace nx::media::hevc
+

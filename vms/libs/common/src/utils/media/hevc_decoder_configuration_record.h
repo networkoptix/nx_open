@@ -3,11 +3,13 @@
 #include <vector>
 #include <stdint.h>
 
-namespace nx::media_utils::hevc {
+namespace nx::media::hevc {
 
 struct HEVCDecoderConfigurationRecord
 {
-    bool parse(const uint8_t* data, int size);
+    bool read(const uint8_t* data, int size);
+    bool write(uint8_t* data, int size) const;
+    int size() const;
 
     uint8_t  configurationVersion;
     uint8_t  general_profile_space;
@@ -31,4 +33,4 @@ struct HEVCDecoderConfigurationRecord
     std::vector<std::vector<uint8_t>> vps;
 };
 
-} // namespace nx::media_utils::hevc
+} // namespace nx::media::hevc

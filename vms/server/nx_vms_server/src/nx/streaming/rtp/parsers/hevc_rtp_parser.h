@@ -79,19 +79,19 @@ private:
     Result handlePayload(const uint8_t* payload, int payloadLength);
 
     Result handleSingleNalUnitPacket(
-        const nx::media_utils::hevc::NalUnitHeader* header,
+        const nx::media::hevc::NalUnitHeader* header,
         const uint8_t* payload, //< payload is already shifted for header size
         int payloadLength);
     Result handleAggregationPacket(
-        const nx::media_utils::hevc::NalUnitHeader* header,
+        const nx::media::hevc::NalUnitHeader* header,
         const uint8_t* payload, //< payload is already shifted for header size
         int payloadLength);
     Result handleFragmentationPacket(
-        const nx::media_utils::hevc::NalUnitHeader* header,
+        const nx::media::hevc::NalUnitHeader* header,
         const uint8_t* payload, //< payload is already shifted for header size
         int payloadLength);
     Result handlePaciPacket(
-        const nx::media_utils::hevc::NalUnitHeader* header,
+        const nx::media::hevc::NalUnitHeader* header,
         const uint8_t* payload, //< payload is already shifted for header size
         int payloadLength);
 
@@ -105,14 +105,14 @@ private:
     inline void goBackForPayloadHeader(const uint8_t** outPayload, int* outPayloadLength);
 
     void updateNalFlags(
-        nx::media_utils::hevc::NalUnitType header,
+        nx::media::hevc::NalUnitType header,
         const uint8_t* payload,
         int payloadLength);
 
     void insertPayloadHeader(
         uint8_t** payloadStart,
         int* payloadLength,
-        nx::media_utils::hevc::NalUnitType unitType,
+        nx::media::hevc::NalUnitType unitType,
         uint8_t tid);
 
     int additionalBufferSize() const;

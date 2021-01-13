@@ -78,6 +78,7 @@ class BitStreamWriter: public BitStream
 {
 public:
     BitStreamWriter() = default;
+    BitStreamWriter(uint8_t* buffer, int size);
     BitStreamWriter(uint8_t* buffer, uint8_t* end);
     void setBuffer(uint8_t* buffer, uint8_t* end);
     void setBuffer(uint8_t* buffer, int size);

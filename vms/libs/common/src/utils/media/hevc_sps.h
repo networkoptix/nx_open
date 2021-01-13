@@ -8,7 +8,7 @@
 class QnCompressedVideoData;
 
 namespace nx {
-namespace media_utils {
+namespace media {
 namespace hevc {
 
 // TODO: #dmishin refactor to embed HEVC NALs to existing H264 hierarchy.
@@ -184,5 +184,5 @@ public:
 };
 
 } // namespace hevc
-} // namespace media_utils
+} // namespace media
 } // namespace nx

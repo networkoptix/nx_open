@@ -243,6 +243,11 @@ BitStreamWriter::BitStreamWriter(uint8_t* buffer, uint8_t* end)
     setBuffer(buffer, end);
 }
 
+BitStreamWriter::BitStreamWriter(uint8_t* buffer, int size)
+{
+    setBuffer(buffer, size);
+}
+
 void BitStreamWriter::setBuffer(uint8_t* buffer, uint8_t* end)
 {
     BitStream::setBuffer(buffer, end);

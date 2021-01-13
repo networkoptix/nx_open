@@ -21,7 +21,7 @@ static const nx::Buffer kSdpSeiPrefix("sprop-sei");
 
 } // namespace
 
-namespace hevc = nx::media_utils::hevc;
+namespace hevc = nx::media::hevc;
 
 HevcParser::HevcParser()
 {
@@ -436,7 +436,7 @@ StreamParser::Result HevcParser::handleFragmentationPacket(
 }
 
 StreamParser::Result HevcParser::handlePaciPacket(
-    const nx::media_utils::hevc::NalUnitHeader* /*header*/,
+    const nx::media::hevc::NalUnitHeader* /*header*/,
     const uint8_t* /*payload*/,
     int /*payloadLength*/)
 {
@@ -591,7 +591,7 @@ bool HevcParser::extractPictureDimensionsFromSps(const uint8_t* buffer, int buff
 void HevcParser::insertPayloadHeader(
     uint8_t** payloadStart,
     int* payloadLength,
-    nx::media_utils::hevc::NalUnitType unitType,
+    nx::media::hevc::NalUnitType unitType,
     uint8_t tid)
 {
     *payloadStart -= hevc::NalUnitHeader::kTotalLength;
