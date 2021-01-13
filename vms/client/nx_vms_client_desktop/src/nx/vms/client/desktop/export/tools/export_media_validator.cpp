@@ -112,8 +112,14 @@ ExportMediaValidator::Results ExportMediaValidator::validateSettings(
         return results;
     }
 
-    if (settings.fileName.extension == FileExtension::avi && periods.size() > 1)
-        results.set(int(Result::nonContinuosAvi));
+    if (settings.fileName.extension == FileExtension::avi)
+    {
+        // Problems with audio track can occur even if the video is continuous. So we are displaying
+        // a warning always when exporting to the avi file except for cameras without sound at all.
+        const auto camera = settings.mediaResource.dynamicCast<QnVirtualCameraResource>();
+        if (!camera || camera->isAudioSupported())
+            results.set(int(Result::aviWithAudio));
+    }
 
     if (!validateLength(settings, durationMs))
         results.set(int(Result::tooLong));

@@ -881,9 +881,9 @@ void ExportSettingsDialog::Private::generateAlerts(ExportMediaValidator::Results
                     return ExportSettingsDialog::tr("Chosen settings require transcoding. "
                         "It will increase CPU usage and may take significant time.");
 
-                case ExportMediaValidator::Result::nonContinuosAvi:
+                case ExportMediaValidator::Result::aviWithAudio:
                     return ExportSettingsDialog::tr("AVI format is not recommended to export "
-                        "a non-continuous recording with audio track.");
+                        "a recording with audio track.");
 
                 case ExportMediaValidator::Result::downscaling:
                     return ExportSettingsDialog::tr("We recommend to export video from "

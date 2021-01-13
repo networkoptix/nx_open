@@ -15,7 +15,7 @@ public:
     {
         ok,
         transcoding,
-        nonContinuosAvi,
+        aviWithAudio,
         downscaling,
         tooLong,
         tooBigExeFile,
