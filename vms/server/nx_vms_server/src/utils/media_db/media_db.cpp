@@ -104,6 +104,8 @@ bool DbReader::deserialize(const QByteArray& buffer, Data* parsedData)
     if (!parsedData->header.deserialize(&reader) || parsedData->header.getDbVersion() != kDbVersion)
         return false;
 
+    std::set<int> knownCameraIds;
+
     while (reader.hasBuffer(sizeof(quint64)))
     {
         RecordBase rb(reader.readUint64());
@@ -116,6 +118,9 @@ bool DbReader::deserialize(const QByteArray& buffer, Data* parsedData)
                     return true;
 
                 const auto operation = MediaFileOperation(rb.part1, reader.readUint64());
+                if (knownCameraIds.find(operation.getCameraId()) == knownCameraIds.cend())
+                    return false;
+
                 int index = operation.getCameraId() * 2 + operation.getCatalog();
 
                 if (operation.isClearWholeCatalogOperation())
@@ -137,16 +142,11 @@ bool DbReader::deserialize(const QByteArray& buffer, Data* parsedData)
                     return true;
 
                 const auto operation = MediaFileOperation(rb.part1, reader.readUint64());
+                if (knownCameraIds.find(operation.getCameraId()) == knownCameraIds.cend())
+                    return false;
+
                 int index = operation.getCameraId() * 2 + operation.getCatalog();
                 auto& container = parsedData->addRecords[index];
-                if (container.empty() && parsedData->cameras.size() > 0)
-                {
-                    // Minor optimization. Try to forecast record count to reduce reallocate amount.
-                    container.reserve(
-                        buffer.size()
-                        / MediaFileOperation::kSerializedRecordSize
-                        / parsedData->cameras.size());
-                }
                 container.emplace_back(operation);
                 break;
             }
@@ -159,11 +159,12 @@ bool DbReader::deserialize(const QByteArray& buffer, Data* parsedData)
                 if (bytesRead != bytesToRead)
                     return true;
 
+                knownCameraIds.emplace(camera.getCameraId());
                 parsedData->cameras.emplace_back(camera);
                 break;
             }
             default:
-                NX_ASSERT(false, "Shold never be here");
+                NX_ASSERT(false, "Should never be here");
                 return true;
         }
     }

@@ -569,11 +569,17 @@ protected:
 
     void whenSomeRecordsAreWrittenToTheDb()
     {
+
+        const auto camOp = fromTestCameraOperation(generateCameraOperation());
+        m_dbData.cameras.push_back(camOp);
+        m_writer.writeRecord(camOp);
+
         for (int i = 0; i < iterations; ++i)
         {
             RecordType recordType =
                 i % 2 == 0 ? RecordType::FileOperationAdd : RecordType::FileOperationDelete;
-            const auto fileOp = fromTestFileOperation(generateFileOperation(recordType));
+            auto fileOp = fromTestFileOperation(generateFileOperation(recordType));
+            fileOp.setCameraId(camOp.getCameraId());
 
             int index = fileOp.getCameraId() * 2 + fileOp.getCatalog();
             if (recordType == RecordType::FileOperationAdd)
@@ -583,10 +589,6 @@ protected:
                    {fileOp.getHashInCatalog(), m_dbData.addRecords[index].size()});
 
             m_writer.writeRecord(fileOp);
-
-            const auto camOp = fromTestCameraOperation(generateCameraOperation());
-            m_dbData.cameras.push_back(camOp);
-            m_writer.writeRecord(camOp);
         }
     }
 
@@ -601,7 +603,7 @@ protected:
         ASSERT_EQ(m_dbData.addRecords, readData.addRecords);
         ASSERT_EQ(m_dbData.cameras, readData.cameras);
 
-        for (auto& catalog : readData.removeRecords)
+        for (auto& catalog: m_dbData.removeRecords)
             std::sort(catalog.second.begin(), catalog.second.end());
 
         ASSERT_EQ(readData.removeRecords, m_dbData.removeRecords);
