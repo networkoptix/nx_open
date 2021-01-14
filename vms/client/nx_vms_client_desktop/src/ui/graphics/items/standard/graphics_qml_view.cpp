@@ -247,10 +247,10 @@ struct GraphicsQmlView::Private
     void ensureOffscreen();
     void ensureVao(QnTextureGLShaderProgram* shader);
     void updateSizes();
-    bool isFboInitializationRequired();
-    void initializeFbo();
+    bool isFboInitializationRequired(qreal devicePixelRatio);
+    void initializeFbo(qreal devicePixelRatio);
     void scheduleUpdateSizes();
-    void paintQml();
+    void paintQml(qreal devicePixelRatio);
 
     static QSize rounded(const QSizeF& size);
 };
@@ -363,12 +363,12 @@ QQmlEngine* GraphicsQmlView::engine() const
     return d->qmlEngine;
 }
 
-bool GraphicsQmlView::Private::isFboInitializationRequired()
+bool GraphicsQmlView::Private::isFboInitializationRequired(qreal devicePixelRatio)
 {
     if (!quickWindow)
         return false;
 
-    const QSize requiredSize = rounded(QSizeF(quickWindow->size()) * qApp->devicePixelRatio());
+    const QSize requiredSize = rounded(QSizeF(quickWindow->size()) * devicePixelRatio);
 
     if (fbo && fbo->size() == requiredSize)
         return false;
@@ -383,9 +383,9 @@ bool GraphicsQmlView::Private::isFboInitializationRequired()
     return true;
 }
 
-void GraphicsQmlView::Private::initializeFbo()
+void GraphicsQmlView::Private::initializeFbo(qreal devicePixelRatio)
 {
-    const QSize requiredSize = rounded(QSizeF(quickWindow->size()) * qApp->devicePixelRatio());
+    const QSize requiredSize = rounded(QSizeF(quickWindow->size()) * devicePixelRatio);
 
     QScopedPointer<QOpenGLFramebufferObject> newFbo(
         new QOpenGLFramebufferObject(
@@ -486,7 +486,7 @@ void GraphicsQmlView::Private::ensureOffscreen()
 
     openglContext->makeCurrent(offscreenSurface.data());
     renderControl->initialize(openglContext.data());
-    initializeFbo();
+    initializeFbo(qApp->devicePixelRatio());
     openglContext->doneCurrent();
 
     offscreenInitialized = true;
@@ -624,9 +624,9 @@ bool GraphicsQmlView::focusNextPrevChild(bool next)
     return event.isAccepted();
 }
 
-void GraphicsQmlView::Private::paintQml()
+void GraphicsQmlView::Private::paintQml(qreal devicePixelRatio)
 {
-    const bool mustInitFbo = isFboInitializationRequired();
+    const bool mustInitFbo = isFboInitializationRequired(devicePixelRatio);
 
     renderRequested = renderRequested || mustInitFbo;
     sceneChanged = sceneChanged || mustInitFbo;
@@ -638,7 +638,7 @@ void GraphicsQmlView::Private::paintQml()
         return;
 
     if (mustInitFbo)
-        initializeFbo();
+        initializeFbo(devicePixelRatio);
 
     if (!fbo)
         return;
@@ -669,7 +669,8 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
         ? size()
         : QSizeF(Private::rounded(size()));
 
-    d->paintQml();
+    const auto devicePixelRatio = painter->device()->devicePixelRatioF();
+    d->paintQml(devicePixelRatio);
 
     if (!d->fbo)
         return;
@@ -686,7 +687,6 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
     functions->glActiveTexture(GL_TEXTURE0);
     functions->glBindTexture(GL_TEXTURE_2D, d->fbo->texture());
 
-    const auto devicePixelRatio = painter->paintEngine()->paintDevice()->devicePixelRatioF();
     const auto naturalFboSize = outputSize * devicePixelRatio;
     const auto filter = QSizeF(d->fbo->size()) == naturalFboSize ? GL_NEAREST : GL_LINEAR;
     functions->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
