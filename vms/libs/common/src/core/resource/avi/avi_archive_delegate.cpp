@@ -648,10 +648,10 @@ bool QnAviArchiveDelegate::findStreams()
 
             if (m_durationUs == AV_NOPTS_VALUE && !m_fastStreamFind)
             {
-                av_seek_frame(m_formatContext, /*stream_index*/ -1,
+                const int ret = av_seek_frame(m_formatContext, /*stream_index*/ -1,
                     std::numeric_limits<qint64>::max(), AVSEEK_FLAG_ANY);
-                const auto stream = m_formatContext->streams[0];
-                if (stream->cur_dts != AV_NOPTS_VALUE)
+                const auto stream = ret < 0 ? nullptr : m_formatContext->streams[0];
+                if (stream && stream->cur_dts != AV_NOPTS_VALUE)
                 {
                     const auto dtsRange = stream->first_dts == AV_NOPTS_VALUE
                         ? stream->cur_dts
