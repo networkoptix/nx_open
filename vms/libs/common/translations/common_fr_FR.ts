@@ -672,7 +672,7 @@
     <message numerus="yes">
       <source>%n Bridge Licenses</source>
       <translation>
-        <numerusform>%n Licence provisoires</numerusform>
+        <numerusform>%n Licence provisoire</numerusform>
         <numerusform>%n Licences Provisoires</numerusform>
       </translation>
     </message>
@@ -698,23 +698,23 @@
       <source>%n/%1 Time Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 Licences Temps</numerusform>
-        <numerusform>%n/%1 Licences Temps</numerusform>
+        <numerusform>%n/%1 Licence à durée limitée</numerusform>
+        <numerusform>%n/%1 Licences à durée limitée</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Analog Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 Licences Analogue</numerusform>
-        <numerusform>%n/%1 Licences Analogue</numerusform>
+        <numerusform>%n/%1 Licence Analogique</numerusform>
+        <numerusform>%n/%1 Licences Analogique</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Professional Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 Licences Professionnel</numerusform>
+        <numerusform>%n/%1 Licence Professionnel</numerusform>
         <numerusform>%n/%1 Licences Professionnel</numerusform>
       </translation>
     </message>

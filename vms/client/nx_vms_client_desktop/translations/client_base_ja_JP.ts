@@ -3167,7 +3167,7 @@ to %1</source>
     </message>
     <message>
       <source>Could not start primary audio device.</source>
-      <translation>プライマリーオーディオデバイスを開始できません.</translation>
+      <translation>プライマリーオーディオデバイスを開始できません。</translation>
     </message>
     <message>
       <source>Screen width must be a multiple of 8.</source>
@@ -8152,7 +8152,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Video or audio codec is incompatible with selected format.</source>
-      <translation>ビデオまたはオーディオコーデックは選択された形式と互換性がありません。</translation>
+      <translation>映像または音声のコーデックが、選択した形式との互換性を持ちません。</translation>
     </message>
     <message>
       <source>File write error.</source>

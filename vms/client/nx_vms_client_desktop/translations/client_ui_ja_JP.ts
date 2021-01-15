@@ -578,12 +578,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/widgets/camera_expert_settings_widget.ui"/>
       <source>Do not archive primary stream</source>
-      <translation>プライマリーストリームを録画しない</translation>
+      <translation>プライマリストリームを録画しない</translation>
     </message>
     <message>
       <location/>
       <source>Do not archive secondary stream</source>
-      <translation>セカンダリーストリームを録画しない</translation>
+      <translation>セカンダリストリームを録画しない</translation>
     </message>
     <message>
       <location/>

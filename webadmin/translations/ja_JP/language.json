@@ -115,7 +115,7 @@
         "SystemName": "システム名",
         "takeCameraOwnershipWithoutLock": "ロックなしでカメラ所有権を取る",
         "timeSynchronizationEnabled": "時刻同期有効",
-        "primaryTimeServer": "プライマリ時刻同期サーバ",
+        "primaryTimeServer": "優先時刻同期サーバ",
         "osTimeChangeCheckPeriodMs": "OSの時刻変更チェック期間",
         "syncTimeExchangePeriod": "ネットワーク要求の時刻同期間隔",
         "syncTimeEpsilon": "時刻同期の閾値。時刻差がこの設定値より小さい場合、新しい値は適用されません。",

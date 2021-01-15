@@ -433,11 +433,11 @@
     <name>QnFfmpegAudioTranscoder</name>
     <message>
       <source>Audio context was not specified.</source>
-      <translation>音声コンテンツが指定されていません.</translation>
+      <translation>オーディオコンテキストが指定されていません。</translation>
     </message>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>コーデック%1のエンコーダーを見つけられません.</translation>
+      <translation>コーデック %1 のエンコーダーが見つかりません。</translation>
     </message>
     <message>
       <source>Could not initialize audio encoder.</source>
@@ -449,7 +449,7 @@
     </message>
     <message>
       <source>Could not find decoder for codec %1.</source>
-      <translation>コーデック%1のエンコーダーを見つけられません.</translation>
+      <translation>コーデック %1 のデコーダーが見つかりません。</translation>
     </message>
     <message>
       <source>Could not send audio frame to encoder, Error code: %1.</source>
@@ -488,7 +488,7 @@
     </message>
     <message>
       <source>Could not find codec %1.</source>
-      <translation>コーデック%1が見つかりません.</translation>
+      <translation>コーデック%1が見つかりません。</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with container %1.</source>
@@ -499,7 +499,7 @@
     <name>QnFfmpegVideoTranscoder</name>
     <message>
       <source>Could not find encoder for codec %1.</source>
-      <translation>コーデック%1のエンコーダーを見つけられません.</translation>
+      <translation>コーデック %1 のエンコーダーが見つかりません。</translation>
     </message>
     <message>
       <source>Could not initialize video encoder.</source>
@@ -998,11 +998,11 @@
     </message>
     <message>
       <source>Invalid audio codec information.</source>
-      <translation>無効なオンセイコーデック情報.</translation>
+      <translation>音声コーデック情報が不正です。</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>ビデオまたは音声コーディックは選択したフォーマットと互換性がありません.</translation>
+      <translation>映像または音声のコーデックが、選択した形式との互換性を持ちません。</translation>
     </message>
     <message>
       <source>File write error. Not enough free space.</source>
@@ -1564,11 +1564,11 @@
     </message>
     <message>
       <source>Connection to camera (primary stream) was unexpectedly closed.</source>
-      <translation>カメラ(プライマリーストリーム)との接続は閉じられました.</translation>
+      <translation>カメラ (プライマリストリーム) への接続が予期せず終了しました。</translation>
     </message>
     <message>
       <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
-      <translation>カメラ(セコンダリーストリーム)との接続は閉じられました.</translation>
+      <translation>カメラ (セカンダリストリーム) への接続が予期せず終了しました。</translation>
     </message>
     <message>
       <source>RTP packet loss detected.</source>
@@ -1838,11 +1838,11 @@
     </message>
     <message>
       <source>RTP error in primary stream (%1)</source>
-      <translation>プライマリストリーム内のRTPエラー（%1）</translation>
+      <translation>プライマリストリーム (%1) でのRTPエラー</translation>
     </message>
     <message>
       <source>RTP error in secondary stream (%1)</source>
-      <translation>セカンダリストリーム内のRTPエラー（%1）</translation>
+      <translation>セカンダリストリーム (%1) でのRTPエラー</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>

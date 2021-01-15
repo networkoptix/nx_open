@@ -9024,7 +9024,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>+%n values</source>
       <translation>
-        <numerusform>+%n valeurs</numerusform>
+        <numerusform>+%n valeur</numerusform>
         <numerusform>+%n valeurs</numerusform>
       </translation>
     </message>
