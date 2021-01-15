@@ -8380,10 +8380,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
         <translation></translation>
     </message>
@@ -8414,6 +8410,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
         <source>Info</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>AVI format is not recommended to export a recording with audio track.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
