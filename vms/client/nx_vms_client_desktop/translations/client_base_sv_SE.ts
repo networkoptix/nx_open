@@ -8387,10 +8387,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Valda inställningar kräver omkodning. Det ökar CPU-användningen och kan ta betydande tid.</translation>
     </message>
     <message>
-      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation>AVI-format rekommenderas inte att exportera en icke-kontinuerlig inspelning med ljudspår.</translation>
-    </message>
-    <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
       <translation>Vi rekommenderar att du exporterar video från den här kameran som &quot;Multi Video&quot; att undvika nedskalning.</translation>
     </message>
@@ -8421,6 +8417,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Info</source>
       <translation>Info</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a recording with audio track.</source>
+      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
     </message>
   </context>
   <context>

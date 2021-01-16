@@ -8382,10 +8382,6 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
       <translation>Ausgewählte Einstellungen erfordern eine Umkodierung. Es erhöht die CPU-Auslastung und kann viel Zeit in Anspruch nehmen.</translation>
     </message>
     <message>
-      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation>Das AVI-Format wird nicht empfohlen, um eine nicht fortlaufende Aufzeichnung mit Audiospur zu exportieren.</translation>
-    </message>
-    <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
       <translation>Wir empfehlen, Videos von dieser Kamera als &quot;Multi Video&quot; zu exportieren, um ein Herunterskalieren zu vermeiden.</translation>
     </message>
@@ -8416,6 +8412,10 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     <message>
       <source>Info</source>
       <translation>Info</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a recording with audio track.</source>
+      <translation>Das AVI-Format wird nicht empfohlen, um eine Aufnahme mit Audiospur zu exportieren.</translation>
     </message>
   </context>
   <context>

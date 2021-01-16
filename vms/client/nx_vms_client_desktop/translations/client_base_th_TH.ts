@@ -8264,10 +8264,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>การตั้งค่าที่เลือกจะต้องมีการแปลงรหัส จะเพิ่มการใช้ CPU และอาจใช้เวลามาก</translation>
     </message>
     <message>
-      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation>ไม่แนะนำให้ใช้รูปแบบ AVI เพื่อส่งออกการบันทึกที่ไม่ต่อเนื่องพร้อมเสียง</translation>
-    </message>
-    <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
       <translation>เราขอแนะนำให้ส่งออกวิดีโอจากกล้องนี้เป็น &quot;Multi Video&quot; เพื่อหลีกเลี่ยงการลดขนาด</translation>
     </message>
@@ -8298,6 +8294,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Info</source>
       <translation type="unfinished">Info</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a recording with audio track.</source>
+      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
     </message>
   </context>
   <context>

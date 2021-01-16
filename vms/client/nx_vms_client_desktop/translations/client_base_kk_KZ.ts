@@ -8387,10 +8387,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Chosen settings require transcoding. It will increase CPU usage and may take significant time.</translation>
     </message>
     <message>
-      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation type="unfinished">AVI format is not recommended to export a non-continuous recording with audio track.</translation>
-    </message>
-    <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
       <translation type="unfinished">We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</translation>
     </message>
@@ -8421,6 +8417,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Info</source>
       <translation type="unfinished">Info</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a recording with audio track.</source>
+      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
     </message>
   </context>
   <context>

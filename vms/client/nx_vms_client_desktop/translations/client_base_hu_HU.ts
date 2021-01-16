@@ -8385,10 +8385,6 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <translation>A kiválasztott beállítások átkódolást igényelnek. Ez növeli a CPU használatát, a művelet hosszabb időt vehet igénybe.</translation>
     </message>
     <message>
-      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation>Az AVI formátum nem ajánlott nem folyamatos felvétel készítésére hangsávval.</translation>
-    </message>
-    <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
       <translation>Ennek a kamerának a felvételeit &quot;Multi Video&quot; formátumban javasoljuk kimenteni a minőség megőrzése érdekében.</translation>
     </message>
@@ -8419,6 +8415,10 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message>
       <source>Info</source>
       <translation type="unfinished">Info</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a recording with audio track.</source>
+      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
     </message>
   </context>
   <context>

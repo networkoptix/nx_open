@@ -8617,10 +8617,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>ההגדרות שנבחרו יקודדו. השימוש במעבד יוגדל ועשוי להימשך זמן רב.</translation>
     </message>
     <message>
-      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation>פורמט AVI אינו מומלץ לייצוא הקלטה לא רציפה עם שמע.</translation>
-    </message>
-    <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
       <translation>מומלץ לייצא וידאו מהמצלמה הזאת בתור&quot; "מולטי וידאו"&quot; כדי להימנע downscaling.</translation>
     </message>
@@ -8651,6 +8647,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Info</source>
       <translation type="unfinished">Info</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a recording with audio track.</source>
+      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
     </message>
   </context>
   <context>

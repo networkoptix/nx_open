@@ -8264,10 +8264,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Cài đặt đã chọn được yêu cầu chuyển mã. Nó sẽ làm tăng việc sử dụng CPU và có thể tốn nhiều thời gian.</translation>
     </message>
     <message>
-      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation>Định dạng AVI không được khuyến khích để xuất một bản ghi không liên tục với âm thanh theo dõi.</translation>
-    </message>
-    <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
       <translation>Chúng tôi khuyên bạn nên xuất video từ camera này &quot;Multi Video&quot; để tránh giảm chất lượng hình ảnh.</translation>
     </message>
@@ -8298,6 +8294,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Info</source>
       <translation type="unfinished">Info</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a recording with audio track.</source>
+      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
     </message>
   </context>
   <context>

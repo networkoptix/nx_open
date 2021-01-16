@@ -8381,10 +8381,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Seçilen ayarlar kodlamayı gerektirir. CPU kullanımını artabilir ve işlemler daha uzun zaman alabilir.</translation>
     </message>
     <message>
-      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation>AVI formatı, ses kaydına sahip sürekli olmayan bir kaydı dışa aktarmak için önerilmez.</translation>
-    </message>
-    <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
       <translation>Görüntü kaybını engellemek için &quot;Multi Video&quot; seçmenizi öneririz.</translation>
     </message>
@@ -8415,6 +8411,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Info</source>
       <translation type="unfinished">Info</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a recording with audio track.</source>
+      <translation>AVI formatı, ses parçası içeren bir kaydı dışa aktarmak için önerilmez.</translation>
     </message>
   </context>
   <context>

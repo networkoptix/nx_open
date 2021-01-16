@@ -8384,10 +8384,6 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
       <translation>Valitut asetukset edellyttävät transkoodausta. Se lisää suorittimen käyttöä ja voi kestää huomattavan paljon aikaa.</translation>
     </message>
     <message>
-      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation>AVI-muotoa ei suositella ei-jatkuvan tallennuksen viemiseksi äänen kanssa.</translation>
-    </message>
-    <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
       <translation>Suosittelemme videon viemistä tältä kameralta &quot;monivideoksi&quot; jotta vältät resoluution muuttamisen pienemmäksi.</translation>
     </message>
@@ -8418,6 +8414,10 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message>
       <source>Info</source>
       <translation type="unfinished">Info</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a recording with audio track.</source>
+      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
     </message>
   </context>
   <context>

@@ -8270,10 +8270,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>目前的所選擇的匯出設置需要重新編碼。CPU使用率會暫時提高且需要較長時間來完成。</translation>
     </message>
     <message>
-      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation>AVI格式不建議使用於匯出帶有音軌的非連續錄影.</translation>
-    </message>
-    <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
       <translation>建議使用 &quot;多影像匯出&quot;來匯出此攝影機影像，以保留原始影像品質。</translation>
     </message>
@@ -8304,6 +8300,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Info</source>
       <translation type="unfinished">Info</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a recording with audio track.</source>
+      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
     </message>
   </context>
   <context>

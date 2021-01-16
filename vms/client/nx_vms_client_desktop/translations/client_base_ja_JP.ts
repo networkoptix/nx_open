@@ -8265,10 +8265,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>選択した設定にはトランスコードが必要です。CPU使用量が増加し、時間がかかることがあります。</translation>
     </message>
     <message>
-      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation>AVI形式は、オーディオトラック付きの非連続録画をエクスポートするのにはお勧めできません。</translation>
-    </message>
-    <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
       <translation>ダウンスケールを避けるため、&quot;マルチビデオ&quot;としてエクスポートする事を推奨します。</translation>
     </message>
@@ -8299,6 +8295,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Info</source>
       <translation>情報</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a recording with audio track.</source>
+      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
     </message>
   </context>
   <context>

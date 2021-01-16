@@ -8265,10 +8265,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>선택한 설정은 코드변환이 필요합니다. CPU 사용량이 증가하고 상당한 시간이 걸릴 수 있습니다.</translation>
     </message>
     <message>
-      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation>AVI 방식으로 오디오와 함께 비 연속적인 녹화를 권장 하지 않습니다.</translation>
-    </message>
-    <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
       <translation>다운 스케일링을 피하려면이 카메라의 비디오를 &quot;다중 비디오&quot; 로 내보내는 것이 좋습니다.</translation>
     </message>
@@ -8299,6 +8295,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Info</source>
       <translation type="unfinished">Info</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a recording with audio track.</source>
+      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
     </message>
   </context>
   <context>

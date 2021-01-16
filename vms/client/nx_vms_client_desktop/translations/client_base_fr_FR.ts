@@ -8387,10 +8387,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <translation>Les paramètres choisis nécessitent un transcodage. Cela augmentera l'utilisation du processeur et peut prendre beaucoup de temps.</translation>
     </message>
     <message>
-      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation>Format AVI n'est pas recommandé pour exporter un enregistrement non continu avec une piste audio.</translation>
-    </message>
-    <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
       <translation>Nous recommandons d'exporter la vidéo de cette caméra en tant que &quot;Multi Video&quot; pour éviter la réduction d'échelle.</translation>
     </message>
@@ -8421,6 +8417,10 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Info</source>
       <translation>Information</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a recording with audio track.</source>
+      <translation>Le format AVI n'est pas recommandé pour exporter un enregistrement avec une piste audio.</translation>
     </message>
   </context>
   <context>

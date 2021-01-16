@@ -8382,10 +8382,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <translation>De gekozen instellingen vereisen transcodering. Het verhoogt de CPU belasting en kan veel tijd in beslag nemen.</translation>
     </message>
     <message>
-      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation>Een AVI indeling wordt niet aanbevolen om een ​​niet-continue opname met audiotrack te exporteren.</translation>
-    </message>
-    <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
       <translation>We raden aan om video van deze camera te exporteren als &quot;Multi Video&quot; om downscaling te voorkomen.</translation>
     </message>
@@ -8416,6 +8412,10 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Info</source>
       <translation>Info</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a recording with audio track.</source>
+      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
     </message>
   </context>
   <context>

@@ -8266,10 +8266,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>所选过滤器需要转码，这将增加CPU使用率，可能需要很长时间。</translation>
     </message>
     <message>
-      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation>不建议使用AVI格式导出带有音轨的非连续录制。</translation>
-    </message>
-    <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
       <translation>我们建议将视频从该相机中导出为 &quot;多视频&quot; 以避免降级。</translation>
     </message>
@@ -8300,6 +8296,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Info</source>
       <translation type="unfinished">Info</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a recording with audio track.</source>
+      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
     </message>
   </context>
   <context>

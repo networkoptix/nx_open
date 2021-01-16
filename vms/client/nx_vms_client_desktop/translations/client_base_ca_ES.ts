@@ -8386,10 +8386,6 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
       <translation>Els paràmetres triats requereixen transcodificació. Augmentarà l'ús de la CPU i pot trigar molt de temps.</translation>
     </message>
     <message>
-      <source>AVI format is not recommended to export a non-continuous recording with audio track.</source>
-      <translation>No es recomana el format AVI per exportar un enregistrament no continu amb pista d'àudio.</translation>
-    </message>
-    <message>
       <source>We recommend to export video from this camera as &quot;Multi Video&quot; to avoid downscaling.</source>
       <translation>Us recomanem que exporteu el vídeo des d'aquesta càmera com a &quot;Multivídeo&quot; per evitar reduir l'escala.</translation>
     </message>
@@ -8420,6 +8416,10 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <message>
       <source>Info</source>
       <translation>Informació</translation>
+    </message>
+    <message>
+      <source>AVI format is not recommended to export a recording with audio track.</source>
+      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
     </message>
   </context>
   <context>

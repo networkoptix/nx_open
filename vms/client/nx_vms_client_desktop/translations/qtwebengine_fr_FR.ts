@@ -314,7 +314,7 @@
     </message>
     <message>
       <source>Redo</source>
-      <translation>Rétablir</translation>
+      <translation>Refaire</translation>
     </message>
     <message>
       <source>Select all</source>
@@ -326,11 +326,11 @@
     </message>
     <message>
       <source>Open link in new window</source>
-      <translation>Ouvre le lien dans une nouvelle fenêtre</translation>
+      <translation>Ouvrir le lien dans une nouvelle fenêtre</translation>
     </message>
     <message>
       <source>Open link in new tab</source>
-      <translation>Ouvrir un lien dans un nouvel onglet</translation>
+      <translation>Ouvrir le lien dans un nouvel onglet</translation>
     </message>
     <message>
       <source>Copy link address</source>
@@ -358,7 +358,7 @@
     </message>
     <message>
       <source>Show controls</source>
-      <translation>Afficher les controles</translation>
+      <translation>Afficher les contrôles</translation>
     </message>
     <message>
       <source>Loop</source>
@@ -389,7 +389,7 @@
     <name>UIDelegatesManager</name>
     <message>
       <source>Connect to proxy &quot;%1&quot; using:</source>
-      <translation>Connecter au proxy &quot;%1&quot; utilisant :</translation>
+      <translation>Se connecter au proxy &quot;%1&quot; utilisant :</translation>
     </message>
     <message>
       <source>Enter username and password for &quot;%1&quot; at %2://%3</source>
@@ -401,7 +401,7 @@
     </message>
     <message>
       <source>Javascript Confirm - %1</source>
-      <translation>Javascript Confirm - %1</translation>
+      <translation>Confirmation Javascript - %1</translation>
     </message>
     <message>
       <source>Javascript Prompt - %1</source>
