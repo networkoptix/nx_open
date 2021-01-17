@@ -3291,7 +3291,7 @@ to %1</source>
     <message>
       <source>All %1 users will be deleted.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>Tous les usagers %1 seront supprimés.</translation>
+      <translation>Tous les utilisateurs %1 seront supprimés.</translation>
     </message>
     <message>
       <source>You will not be able to connect to this System with your %1 account after you disconnect this System from %1.</source>
@@ -3755,7 +3755,7 @@ to %1</source>
     </message>
     <message>
       <source>Changing any LDAP settings other than &quot;Search Filter&quot; will result in connectivity loss for all LDAP fetched users.</source>
-      <translation>Modifier les paramètres LDAP autre que &quot;filtre de recherche&quot; entraînera une perte de connectivité pour tous les usagers LDAP récupérés.</translation>
+      <translation>Modifier les paramètres LDAP autre que &quot;filtre de recherche&quot; entraînera une perte de connectivité pour tous les utilisateurs LDAP récupérés.</translation>
     </message>
   </context>
   <context>
@@ -3804,15 +3804,15 @@ to %1</source>
     </message>
     <message>
       <source>Could not load users.</source>
-      <translation>Ne peut pas charger les usagers.</translation>
+      <translation>Impossible de charger les utilisateurs.</translation>
     </message>
     <message>
       <source>Error while loading users.</source>
-      <translation>Erreur lors du chargement d'usagers.</translation>
+      <translation>Erreur lors du chargement des utilisateurs.</translation>
     </message>
     <message>
       <source>No new users found.</source>
-      <translation>Aucun nouveau usager trouvé.</translation>
+      <translation>Aucun nouveau utilisateur trouvé.</translation>
     </message>
     <message>
       <source>Timed Out</source>
@@ -3992,8 +3992,8 @@ to %1</source>
       <source>At least %1 are required</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
       <translation>
-        <numerusform>Au moins %1 est nécessaires</numerusform>
-        <numerusform>Au moins %1 est nécessaires</numerusform>
+        <numerusform>Au moins %1 est nécessaire</numerusform>
+        <numerusform>Au moins %1 sont nécessaires</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -4576,7 +4576,7 @@ to %1</source>
     </message>
     <message>
       <source>User Input</source>
-      <translation>Entrée usager</translation>
+      <translation>Entrée utilisateur</translation>
     </message>
     <message>
       <source>PTZ, Device Output, 2-Way Audio, Soft Triggers.</source>
@@ -4892,19 +4892,19 @@ to %1</source>
     <message>
       <source>User %1 has no %2 permission</source>
       <comment>%1 is the name of selected user, %2 is permission name</comment>
-      <translation>Usager %1 n'a pas d'autorisation %2</translation>
+      <translation>L'utilisateur %1 n'a pas d'autorisation %2</translation>
     </message>
     <message>
       <source>Selected users have no %1 permission</source>
       <comment>%1 is permission name</comment>
-      <translation>Usagers sélectionnés n'ont pas d'autorisation %1</translation>
+      <translation>Les utilisateurs sélectionnés n'ont pas d'autorisation %1</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 selected users have no %2 permission</source>
       <comment>%1 is number of selected users, %2 is permission name</comment>
       <translation>
-        <numerusform>%n de %1 Usagers sélectionnés n'ont pas d'autorisation %2</numerusform>
-        <numerusform>%n de %1 Usagers sélectionnés n'ont pas d'autorisation %2</numerusform>
+        <numerusform>%n de %1 Utilisateur sélectionné n'a pas d'autorisation %2</numerusform>
+        <numerusform>%n de %1 Utilisateurs sélectionnés n'ont pas d'autorisation %2</numerusform>
       </translation>
     </message>
   </context>
@@ -4960,7 +4960,7 @@ to %1</source>
     </message>
     <message>
       <source>Users</source>
-      <translation>Usagers</translation>
+      <translation>Utilisateurs</translation>
     </message>
     <message>
       <source>Local Files</source>
@@ -5005,7 +5005,7 @@ to %1</source>
     </message>
     <message>
       <source>Users</source>
-      <translation>Usagers</translation>
+      <translation>Utilisateurs</translation>
     </message>
     <message>
       <source>Web Pages</source>
@@ -5223,11 +5223,11 @@ to %1</source>
     <name>QnSelectUsersButton</name>
     <message>
       <source>Any User</source>
-      <translation>N’importe quel usager</translation>
+      <translation>N’importe quel utilisateur</translation>
     </message>
     <message>
       <source>All Users</source>
-      <translation>Tous les usagers</translation>
+      <translation>Tous les utilisateurs</translation>
     </message>
     <message>
       <source>Select Users...</source>
@@ -5236,8 +5236,8 @@ to %1</source>
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n usager</numerusform>
-        <numerusform>%n usagers</numerusform>
+        <numerusform>%n utilisateur</numerusform>
+        <numerusform>%n utilisateurs</numerusform>
       </translation>
     </message>
   </context>
@@ -5252,13 +5252,13 @@ to %1</source>
     </message>
     <message>
       <source>User %1 has invalid email address</source>
-      <translation>Usager %1 a un courriel invalide</translation>
+      <translation>L'utilisateur %1 a une adresse e-mail invalide</translation>
     </message>
     <message numerus="yes">
       <source>%n of %1 users have invalid email address</source>
       <translation>
-        <numerusform>%n de %1 usagers ont un courriel invalide</numerusform>
-        <numerusform>%n de %1 usagers ont un courriel invalide</numerusform>
+        <numerusform>%n utilisateur sur %1 a une adresse e-mail invalide</numerusform>
+        <numerusform>%n utilisateurs sur %1 ont une adresse e-mail invalide</numerusform>
       </translation>
     </message>
     <message>
@@ -5442,7 +5442,7 @@ to %1</source>
     </message>
     <message>
       <source>User</source>
-      <translation>Usager</translation>
+      <translation>Utilisateur</translation>
     </message>
     <message>
       <source>Password</source>
@@ -5555,7 +5555,7 @@ to %1</source>
     <name>QnSoftwareTriggerBusinessEventWidget</name>
     <message>
       <source>User Input</source>
-      <translation>Entrée usager</translation>
+      <translation>Entrée utilisateur</translation>
     </message>
   </context>
   <context>
@@ -5865,7 +5865,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>%1 (Scanning... %2%)</source>
-      <translation>%1 (Balayage... %2%)</translation>
+      <translation>%1 (Analyse... %2%)</translation>
     </message>
     <message>
       <source>%1 (Rebuilding... %2%)</source>
@@ -5940,11 +5940,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>QnStorageRebuildWidget</name>
     <message>
       <source>Fast Backup Scan...</source>
-      <translation>Balayage rapide de sauvegarde...</translation>
+      <translation>Analyse de sauvegarde rapide...</translation>
     </message>
     <message>
       <source>Fast Archive Scan...</source>
-      <translation>Balayage rapide d'archive...</translation>
+      <translation>Analyse rapide des archives...</translation>
     </message>
     <message>
       <source>Reindexing Backup...</source>
@@ -6018,7 +6018,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Users</source>
-      <translation>Usagers</translation>
+      <translation>Utlisateurs</translation>
     </message>
     <message>
       <source>Plugins</source>
@@ -6033,7 +6033,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>No licenses</source>
-      <translation>Auncune Licences</translation>
+      <translation>Aucune Licences</translation>
     </message>
     <message>
       <source>Email server is not set</source>
@@ -6049,11 +6049,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Rebuilding archive index is canceled by user</source>
-      <translation>Reconstruction de l'index d'archive annulé par l'usager</translation>
+      <translation>Reconstruction de l'index d'archive annulé par l'utilisateur</translation>
     </message>
     <message>
       <source>Email address is not set for user %1</source>
-      <translation>Adresse courriel non configuré pour usager %1</translation>
+      <translation>L'adresse e-mail n'est pas configuré pour l'utilisateur %1</translation>
     </message>
     <message>
       <source>Email address is not set.</source>
@@ -6069,7 +6069,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>You have no licenses.</source>
-      <translation>Vous n'avez pas de licenses.</translation>
+      <translation>Vous n'avez pas de licences.</translation>
     </message>
     <message>
       <source>You cannot record video from cameras.</source>
@@ -6081,7 +6081,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
-      <translation>Reconstruction de l'index d'archive annulée par l'usager sur le serveur suivant:</translation>
+      <translation>Reconstruction de l'index d'archive annulée par l'utilisateur sur le serveur suivant:</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -6093,7 +6093,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
-      <translation>Certains usagers n’ont pas mis leurs courriel</translation>
+      <translation>Certains utilisateurs n'ont pas défini leurs adresses e-mail</translation>
     </message>
     <message>
       <source>You cannot receive System notifications by email.</source>
@@ -6101,7 +6101,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Some users have not set their email addresses.</source>
-      <translation>Certains usagers n’ont pas mis leurs courriel.</translation>
+      <translation>Certains utilisateurs n'ont pas défini leurs adresses e-mail.</translation>
     </message>
     <message>
       <source>They cannot receive System notifications by email.</source>
@@ -6113,27 +6113,27 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Remote archive synchronization has been started</source>
-      <translation>Synchronisation d'archives à distance a été démarré</translation>
+      <translation>La synchronisation d'archives à distance a été démarré</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been finished</source>
-      <translation>Synchronisation d'archives à distance a été terminée</translation>
+      <translation>La synchronisation d'archives à distance a été terminée</translation>
     </message>
     <message>
       <source>Remote archive synchronization is in progress</source>
-      <translation>Synchronisation d'archives à distance est en cours</translation>
+      <translation>La synchronisation d'archives à distance est en cours</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been started for the following device:</source>
-      <translation>Synchronisation d'archive à distance a été lancée pour le périphérique suivant:</translation>
+      <translation>La synchronisation d'archive à distance a été lancée pour le périphérique suivant:</translation>
     </message>
     <message>
       <source>Remote archive synchronization has been finished for the following device:</source>
-      <translation>Synchronisation d'archive à distance a été terminée pour le périphérique suivant:</translation>
+      <translation>La synchronisation d'archive à distance a été terminée pour le périphérique suivant:</translation>
     </message>
     <message>
       <source>Remote archive synchronization</source>
-      <translation>Remote archive synchronization</translation>
+      <translation>Synchronisation d'archives à distance</translation>
     </message>
     <message>
       <source>Archive integrity problem detected</source>
@@ -6262,7 +6262,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>QnUserListModel</name>
     <message>
       <source>LDAP user</source>
-      <translation>Usager LDAP</translation>
+      <translation>Utilisateur LDAP</translation>
     </message>
     <message>
       <source>Enabled</source>
@@ -6278,7 +6278,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Local user</source>
-      <translation>Usager local</translation>
+      <translation>Utilisateur local</translation>
     </message>
     <message>
       <source>Login</source>
@@ -6291,7 +6291,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 usager</translation>
+      <translation>%1 utilisateur</translation>
     </message>
   </context>
   <context>
@@ -6378,7 +6378,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>QnUserRoleSettingsWidgetPrivate</name>
     <message>
       <source>No users have this role</source>
-      <translation>Aucun usager n’a ce rôle</translation>
+      <translation>Aucun utilisateur n’a ce rôle</translation>
     </message>
     <message>
       <source>Custom with no permissions</source>
@@ -6386,7 +6386,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Users will have no permissions unless changed later.</source>
-      <translation>Usagers n’auront aucune autorisation sauf si changé plus tard.</translation>
+      <translation>Les utilisateurs n'auront pas les permissions à moins de les modifier plus tard.</translation>
     </message>
     <message>
       <source>Assign a new role</source>
@@ -6394,13 +6394,13 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Delete such users</source>
-      <translation>Supprimer ces usagers</translation>
+      <translation>Supprimer ces utilisateurs</translation>
     </message>
     <message numerus="yes">
       <source>Please select an action to perform on %n users with this role</source>
       <translation>
-        <numerusform>Veuillez sélectionner une action à exécuter sur %n usager avec ce rôle</numerusform>
-        <numerusform>Veuillez sélectionner une action à exécuter sur %n usagers avec ce rôle</numerusform>
+        <numerusform>Veuillez sélectionner une action à effectuer sur %n utilisateur avec ce rôle</numerusform>
+        <numerusform>Veuillez sélectionner une action à effectuer sur %n utilisateurs avec ce rôle</numerusform>
       </translation>
     </message>
   </context>
@@ -6435,7 +6435,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>QnUserSettingsDialog</name>
     <message>
       <source>User Information</source>
-      <translation>Information usager</translation>
+      <translation>Informations sur l'utilisateur</translation>
     </message>
     <message>
       <source>Permissions</source>
@@ -6455,15 +6455,15 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>New User...</source>
-      <translation>Nouveau Usager...</translation>
+      <translation>Nouvel utilisateur...</translation>
     </message>
     <message>
       <source>User Settings - %1 (readonly)</source>
-      <translation>Paramètres usager - %1 (lecture seule.)</translation>
+      <translation>Paramètres de l'utilisateur - %1 (lecture seule)</translation>
     </message>
     <message>
       <source>User Settings - %1</source>
-      <translation>Paramètres Usager - %1</translation>
+      <translation>Paramètres de l'utilisateur - %1</translation>
     </message>
     <message>
       <source>Enabled</source>
@@ -6471,16 +6471,16 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>User is disabled</source>
-      <translation>Usager désactivé</translation>
+      <translation>L'utilisateur est désactivé</translation>
     </message>
     <message>
       <source>Apply changes before switching to another user?</source>
-      <translation>Appliquer les changements avant d'aller à un autre usager?</translation>
+      <translation>Appliquer les modifications avant de passer à un autre utilisateur ?</translation>
     </message>
     <message>
       <source>This user has not yet signed up for %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Cet usager n'est pas encore inscrit pour %1</translation>
+      <translation>Cet utilisateur n'est pas encore inscrit pour %1</translation>
     </message>
   </context>
   <context>
@@ -6499,11 +6499,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>User with specified login already exists.</source>
-      <translation>Un usager avec l'identifiant spécifié existe déjà.</translation>
+      <translation>Un utilisateur avec un identifiant spécifié existe déjà.</translation>
     </message>
     <message>
       <source>User has been renamed. Password must be updated.</source>
-      <translation>Usager renommé. Mot de passe doit être MàJ.</translation>
+      <translation>L'utilisateur a été renommé. Le mot de passe doit être mis à jour.</translation>
     </message>
     <message>
       <source>Name</source>
@@ -6532,16 +6532,16 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 Usager avec courriel spécifié existe déjà.</translation>
+      <translation>%1 utilisateur avec une adresse e-mail spécifiée existe déjà.</translation>
     </message>
     <message>
       <source>Local users</source>
-      <translation>Usager local</translation>
+      <translation>Utilisateur local</translation>
     </message>
     <message>
       <source>%1 users</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 usagers</translation>
+      <translation>%1 utilisateurs</translation>
     </message>
     <message>
       <source>%1 belong to this system only and are fully managed by system administrators.</source>
@@ -6968,7 +6968,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Screen is being controlled by another user</source>
-      <translation>Écran contrôlé par un autre usager</translation>
+      <translation>Écran contrôlé par un autre utilisateur</translation>
     </message>
     <message>
       <source>Activate one more license to start Video Wall control session.</source>
@@ -6991,11 +6991,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
-      <translation>Ne peut pas démarrer l'envoie car usager &quot;%1&quot; est en train d'envoyer des vidéos sur cette caméra.</translation>
+      <translation>Ne peut pas démarrer le téléchargement car l'utilisateur &quot;%1&quot; est en train de télécharger des vidéos sur cette caméra.</translation>
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation>Ne peut pas démarrer l'envoie car un autre usager est en train d'envoyer des vidéos sur cette caméra.</translation>
+      <translation>Ne peut pas démarrer le téléchargement car un autre utilisateur est en train de télécharger des vidéos sur cette caméra.</translation>
     </message>
     <message>
       <source>No video files found in selected folder</source>
@@ -7185,19 +7185,19 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>User will still have access to %n removed resources:</source>
       <translation>
-        <numerusform>L'usager aura toujours accès aux %n ressources supprimées:</numerusform>
-        <numerusform>L'usager aura toujours accès aux %n ressources supprimées:</numerusform>
+        <numerusform>L'utilisateur aura toujours accès aux %n ressources supprimées:</numerusform>
+        <numerusform>L'utilisateurs auront toujours accès aux %n ressources supprimées:</numerusform>
       </translation>
     </message>
     <message>
       <source>To remove access, please go to User Settings.</source>
-      <translation>Pour supprimer l’accès, S.V.P allez dans paramètres de l'usager.</translation>
+      <translation>Pour supprimer l'accès, veuillez aller dans les paramètres de l'utilisateur.</translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will get access to %n resources:</source>
       <translation>
-        <numerusform>Tous les usagers avec ce rôle auront accès aux %n ressources:</numerusform>
-        <numerusform>Tous les usagers avec ce rôle auront accès aux %n ressources:</numerusform>
+        <numerusform>Seul utilisateur ayant ce rôle aura accès aux ressources %n:</numerusform>
+        <numerusform>Tous les utilisateurs ayant ce rôle auront accès aux ressources %n:</numerusform>
       </translation>
     </message>
     <message>
@@ -7207,8 +7207,8 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>All users with this role will still have access to %n removed resources:</source>
       <translation>
-        <numerusform>Tous les usagers avec ce rôle auront accès à %n ressource retirée:</numerusform>
-        <numerusform>Tous les usagers avec ce rôle auront accès à %n ressource retirée:</numerusform>
+        <numerusform>Seul l'utilisateur avec ce rôle aura toujours accès aux %n ressources supprimées:</numerusform>
+        <numerusform>Tous les utilisateurs ayant ce rôle auront toujours accès aux %n ressources supprimées :</numerusform>
       </translation>
     </message>
     <message>
@@ -7217,20 +7217,20 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>This layout is shared with other users, so you change it for them too.</source>
-      <translation>Cet mise en page est partagée avec d’autres usagers, vous le changer pour eux aussi.</translation>
+      <translation>Cet mise en page est partagée avec d’autres utilisateurs, vous la modifier pour eux aussi.</translation>
     </message>
     <message numerus="yes">
       <source>User will lose access to %n resources:</source>
       <translation>
-        <numerusform>L'Usager perdra l’accès à %n ressources:</numerusform>
-        <numerusform>L'Usager perdra l’accès à %n ressources:</numerusform>
+        <numerusform>L'utilisateur perdra l’accès à %n ressources:</numerusform>
+        <numerusform>Les utilisateurs perdront l’accès à %n ressources:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>All users with this role will lose access to %n resources:</source>
       <translation>
-        <numerusform>Tous les usagers avec ce rôle perdront l'accès aux %n ressources:</numerusform>
-        <numerusform>Tous les usagers avec ce rôle perdront l'accès aux %n ressources:</numerusform>
+        <numerusform>L'utilisateur avec ce rôle perdra l'accès aux %n ressources:</numerusform>
+        <numerusform>Tous les utilisateurs avec ce rôle perdront l'accès aux %n ressources:</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7243,8 +7243,8 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>These %n layouts are shared with other users, so you delete it for them too.</source>
       <translation>
-        <numerusform>Ces %n mises en page sont partagées avec d’autres usagers, vous les supprimer pour eux aussi.</numerusform>
-        <numerusform>Ces %n mises en page sont partagées avec d’autres usagers, vous les supprimer pour eux aussi.</numerusform>
+        <numerusform>Cette %n mises en page est partagées avec d'autres utilisateurs, vous la supprimer pour eux aussi.</numerusform>
+        <numerusform>Ces %n mises en page sont partagées avec d’autres utilisateurs, vous les supprimer pour eux aussi.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7269,8 +7269,8 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>Delete %n users?</source>
       <translation>
-        <numerusform>Supprimer %n usagers?</numerusform>
-        <numerusform>Supprimer %n usagers?</numerusform>
+        <numerusform>Supprimer %n utilisateur ?</numerusform>
+        <numerusform>Supprimer %n utilisateurs?</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7710,7 +7710,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
-      <translation>Aide à corriger les problèmes de qualité d'image sur certaines caméras. Pour les autres, cela entraînera une augmentation significative du débit.</translation>
+      <translation>Aide à résoudre les problèmes de qualité des images sur certaines caméras ; pour d'autres provoqueront une augmentation significative du débit.</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a camera for quick identification and access</source>
@@ -8123,7 +8123,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Scan</source>
-      <translation>Scan</translation>
+      <translation>Analyser</translation>
     </message>
     <message>
       <source>Search</source>
@@ -8131,11 +8131,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Initializing scan...</source>
-      <translation>Initialisation de balayage ...</translation>
+      <translation>Initialisation de l'analyse...</translation>
     </message>
     <message>
       <source>Scanning online hosts...</source>
-      <translation>Balayage des hôtes en ligne...</translation>
+      <translation>Analyse des hôtes en ligne...</translation>
     </message>
     <message>
       <source>Checking host...</source>
@@ -9059,7 +9059,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>Sélectionnez un seul usager dans &quot;Afficher sur&quot; ligne pour afficher ses mises en page locale dans cette liste</translation>
+      <translation>Sélectionnez un seul utilisateur dans &quot;Afficher sur&quot; ligne pour afficher ses mises en page locale dans cette liste</translation>
     </message>
     <message>
       <source>Local layouts can only be shown to their owners.</source>
@@ -9067,7 +9067,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>None of selected user roles contain users. Action will not work.</source>
-      <translation>Aucun des rôles d'usager sélectionnés ne contient d'usagers. L'action ne fonctionnera pas.</translation>
+      <translation>Aucun des rôles d'utilisateur sélectionnés ne contient d'utilisateurs. L'action ne fonctionnera pas.</translation>
     </message>
     <message>
       <source>Some users do not have access to the selected layout. Action will not work for them.</source>
@@ -9353,7 +9353,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>nx::vms::client::desktop::ScheduleSettingsWidget</name>
     <message>
       <source>Quality setting determines the compression rate only, and does not affect resolution. Low, Medium, High and Best are preset bitrate values.</source>
-      <translation>Le paramètre de qualité détermine uniquement le taux de compression et n'affecte pas la résolution. Faible, moyen, haute et meilleur sont des valeurs de débit prédéfinies.</translation>
+      <translation>Les paramètres de qualité déterminent uniquement le taux de compression et n'affectent pas la résolution. Les valeurs de débit basse, moyenne, élevée et meilleure sont prédéfinies par le débit.</translation>
     </message>
     <message>
       <source>Mbit/s</source>
@@ -9597,8 +9597,8 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
       <translation>
-        <numerusform>Adresse courriel non configuré pour %n usager</numerusform>
-        <numerusform>Adresse courriel non configuré pour %n usagers</numerusform>
+        <numerusform>Adresse courriel non configuré pour %n utilisateur</numerusform>
+        <numerusform>Adresse courriel non configuré pour %n utilisateurs</numerusform>
       </translation>
     </message>
     <message>
@@ -9742,11 +9742,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>nx::vms::client::desktop::WearableCameraUploadWidget</name>
     <message>
       <source>Another user is currently uploading footage to this camera.</source>
-      <translation>Un autre usager est en train d'envoyer des vidéos sur cette caméra.</translation>
+      <translation>Un autre utilisateur est en train de télécharger des vidéos sur cette caméra.</translation>
     </message>
     <message>
       <source>User %1 is currently uploading footage to this camera.</source>
-      <translation>Usager %1 est en train d'envoyer des vidéos sur cette caméra.</translation>
+      <translation>L'utilisateur %1 est en train d'envoyer des vidéos sur cette caméra.</translation>
     </message>
     <message>
       <source>(%1 of %2)</source>
@@ -9955,11 +9955,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>nx::vms::client::desktop::ui::SubjectSelectionDialog</name>
     <message>
       <source>All Users</source>
-      <translation>Tous les usagers</translation>
+      <translation>Tous les utilisateurs</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation>Usagers</translation>
+      <translation>Utilisateurs</translation>
     </message>
     <message>
       <source>Custom Users</source>
@@ -9968,7 +9968,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>%1 users</source>
       <comment>%1 here will be substituted with short cloud name e.g. &apos;Cloud&apos;.</comment>
-      <translation>%1 usagers</translation>
+      <translation>%1 utilisateurs</translation>
     </message>
   </context>
   <context>
@@ -10088,8 +10088,8 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n usager</numerusform>
-        <numerusform>%n usagers</numerusform>
+        <numerusform>%n utilisateur</numerusform>
+        <numerusform>%n utilisateurs</numerusform>
       </translation>
     </message>
   </context>
@@ -10198,7 +10198,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>There is another user with the same name</source>
-      <translation>Il y a un autre usager du même nom</translation>
+      <translation>Il y a un autre utilisateur avec le même nom</translation>
     </message>
     <message>
       <source>Rename</source>

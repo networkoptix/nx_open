@@ -207,7 +207,7 @@
     <message>
       <location/>
       <source>User actions</source>
-      <translation>Actions Usager</translation>
+      <translation>Actions de l'utilisateur</translation>
     </message>
     <message>
       <location/>
@@ -623,7 +623,7 @@
     <message>
       <location/>
       <source>It will increase bitrate for camera.</source>
-      <translation>Cela augmentera le débit pour la caméra.</translation>
+      <translation>Il augmentera le débit de la caméra.</translation>
     </message>
     <message>
       <location/>
@@ -1068,7 +1068,7 @@
     <message>
       <location/>
       <source>Subnet Scan</source>
-      <translation>Balayage du &amp;sous réseau</translation>
+      <translation>Analyse de sous-réseau</translation>
     </message>
     <message>
       <location/>
@@ -1697,7 +1697,7 @@
     <message>
       <location/>
       <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
-      <translation>Sélectionnez un seul usager dans &quot;Afficher sur&quot; ligne pour afficher ses mises en page locale dans cette liste</translation>
+      <translation>Sélectionnez un seul utilisateur dans &quot;Afficher sur&quot; ligne pour afficher ses mises en page locale dans cette liste</translation>
     </message>
   </context>
   <context>
@@ -1753,7 +1753,7 @@
     <message>
       <location filename="../src/ui/dialogs/ldap_users_dialog.ui"/>
       <source>Fetch Users from LDAP...</source>
-      <translation>Cherche usagers depuis LDAP...</translation>
+      <translation>Récupérer les utilisateurs depuis LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -1768,12 +1768,12 @@
     <message>
       <location/>
       <source>Role to assign to imported users</source>
-      <translation>Rôle à attribuer aux usagers importés</translation>
+      <translation>Rôle à assigner aux utilisateurs importés</translation>
     </message>
     <message>
       <location/>
       <source>Disable imported users</source>
-      <translation>Désactiver les usagers importés</translation>
+      <translation>Désactiver les utilisateurs importés</translation>
     </message>
   </context>
   <context>
@@ -2142,7 +2142,7 @@
     <message>
       <location/>
       <source>Username</source>
-      <translation>Nom d'usager</translation>
+      <translation>Nom d'utilisateur</translation>
     </message>
   </context>
   <context>
@@ -2534,12 +2534,12 @@
     <message>
       <location/>
       <source>New User...</source>
-      <translation>Nouveau Usager...</translation>
+      <translation>Nouvel utilisateur...</translation>
     </message>
     <message>
       <location/>
       <source>Fetch Users from LDAP...</source>
-      <translation>Cherche usagers depuis LDAP...</translation>
+      <translation>Récupérer les utilisateurs depuis LDAP...</translation>
     </message>
     <message>
       <location/>
@@ -2549,7 +2549,7 @@
     <message>
       <location/>
       <source>Search users</source>
-      <translation>Rechercher usagers</translation>
+      <translation>Rechercher des utilisateurs</translation>
     </message>
     <message>
       <location/>
@@ -2620,7 +2620,7 @@
     <message>
       <location/>
       <source>Frames interval</source>
-      <translation>Intervalle d'image</translation>
+      <translation>Intervalle des images</translation>
     </message>
     <message>
       <location/>
@@ -3061,7 +3061,7 @@
     <message>
       <location/>
       <source>User:</source>
-      <translation>Usager:</translation>
+      <translation>Utilisateur:</translation>
     </message>
     <message>
       <location/>
@@ -3367,7 +3367,7 @@
     <message>
       <location/>
       <source>Users</source>
-      <translation>Usagers</translation>
+      <translation>Utilisateurs</translation>
     </message>
     <message>
       <location/>
@@ -3380,7 +3380,7 @@
     <message>
       <location filename="../src/ui/dialogs/resource_properties/user_roles_dialog.ui"/>
       <source>User Roles</source>
-      <translation>Rôles Usager</translation>
+      <translation>Rôles de l'utilisateur</translation>
     </message>
     <message>
       <location/>

@@ -8,10 +8,10 @@
     </div>
     <div class="modal-body" ng-if="!authorized" uib-collapse="authorized">
         <div class="form-group" ng-class="{'has-error' : loginForm.username.$invalid && (loginForm.username.$dirty || loginForm.submitted)}">
-            <label for="username" class="control-label">Nom d'usager</label>
+            <label for="username" class="control-label">Nom d'utilisateur</label>
             <input type="text" id="username" name="username" class="form-control" ng-model="user.username" required auto-fill-sync>
             <p class="help-block" ng-show="loginForm.username.$invalid && (loginForm.username.$dirty || loginForm.submitted)">
-                Nom d’usager requis
+                Le nom d'utilisateur est requis
             </p>
         </div>
 

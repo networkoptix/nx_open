@@ -212,7 +212,7 @@
         <div class="col-sm-10">
             <input id="useLogin" type="text" class="form-control input-sm"
                    ng-model="apiMethod.login">
-            <p class="help-block">Il est recommandé de créer un usager dédié pour l'intégrations</p>
+            <p class="help-block">Il est recommandé de créer un utilisateur dédié pour les intégrations</p>
         </div>
     </div>
 
@@ -250,7 +250,7 @@
         <div class="col-sm-offset-2 col-sm-10">
             <button type="submit"
                     ng-if="userAuthenticated && (apiMethod.method !=='POST' || allowProprietary)"
-                    class="btn btn-primary" ng-click="testMethod()">Méthode d’essai</button>
+                    class="btn btn-primary" ng-click="testMethod()">Tester la méthode</button>
             <a class="btn btn-default" ng-if="apiMethod.method=='GET'"
                ng-href="{{getDebugUrl()}}" target="_blank">Ouvrir dans un nouvel onglet</a>
         </div>

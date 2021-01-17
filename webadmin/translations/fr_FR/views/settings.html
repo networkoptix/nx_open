@@ -36,14 +36,14 @@
 
                     <div>
                         <h3>Réinitialiser serveur</h3>
-                        <p>Cette action remet ce serveur aux valeurs par défaut (efface la base de données et réinitialise la configuration).
+                        <p>Cette action réinitialisera ce serveur par défaut (effacer la base de données et réinitialiser la configuration).
                             Le serveur sera détaché du système actuel. Les archives vidéo resteront intactes.</p>
                         <p><button type="button" class="btn btn-default" ng-click="openRestoreDefaultsDialog()">Restaurer les paramètres par défaut</button></p>
                     </div>
                     <div ng-if="user.isOwner">
                         <h3>Détacher le serveur du Système</h3>
-                        <p>Cette action détachera le serveur de la base de données de maintien du Système, des utilisateurs locaux et de la configuration.
-                            Les archives vidéo resteront intactes. <b>Usagers de nuages seront supprimés.</b></p>
+                        <p>Cette action détachera le serveur de la base de données du système, les utilisateurs locaux et la configuration.
+                            Les archives vidéo resteront intactes. <b>Les utilisateurs du nuage seront supprimés.</b></p>
                         <p><button class="btn btn-default" ng-click="disconnectFromSystem()">Détacher du Système</button></p>
                     </div>
                     <div>
@@ -54,7 +54,7 @@
                     <div ng-if="user.isOwner">
                         <form novalidate name="rootPasswordForm" class="form-horizontal" role="form">
                             <h3>Changer mot de passe admin</h3>
-                            <p>Si le système est local (non connecté à un nuage) cela va changer le mot de passe pour l’usager "admin" et le mot de passe de récupération (root) sur certains serveurs.<br>                                Dans le cas contraire, cela va changer le mot de passe de récupération uniquement.</p>
+                            <p>Si le système est local (non connecté à un nuage) cela va changer le mot de passe pour l’utilisateur "admin" et le mot de passe de récupération (root) sur certains serveurs.<br>                                Dans le cas contraire, cela va changer le mot de passe de récupération uniquement.</p>
                             <div class="col-sm-6">
                                 <password-input auto-focus="false" ng-model="settings.rootPassword"></password-input>
                             </div>
@@ -210,7 +210,7 @@
                     <div ng-if="(canRestoreSettings || canRestoreSettingsNotNetwork)">
                         <h3>Restaurer les paramètres serveur</h3>
                         <p><button type="button" class="btn btn-default" ng-if="canRestoreSettings" ng-click="restoreSettings()">Restauration complète</button>
-                            <button type="button" class="btn btn-default" ng-if="canRestoreSettingsNotNetwork" ng-click="restoreSettingsNotNetwork()">Tout restaurer sauf réseau</button></p>
+                            <button type="button" class="btn btn-default" ng-if="canRestoreSettingsNotNetwork" ng-click="restoreSettingsNotNetwork()">Restaurez tout sauf le réseau</button></p>
                     </div>
                     <div ng-if="canRunClient || canStopClient">
                         <h3>Exécuter l’application cliente sur le serveur</h3>

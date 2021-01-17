@@ -109,11 +109,11 @@
     <name>MergeSystemsStatusStrings</name>
     <message>
       <source>The password or user name is invalid.</source>
-      <translation>Mot de passe ou nom d'usager invalide.</translation>
+      <translation>Mot de passe ou nom d'utilisateur invalide.</translation>
     </message>
     <message>
       <source>This user does not have permissions for the requested operation.</source>
-      <translation>Cet usager n’a pas les autorisations pour l’opération demandée.</translation>
+      <translation>Cet utilisateur n’a pas les autorisations pour l’opération demandée.</translation>
     </message>
     <message>
       <source>Cannot create database backup.</source>
@@ -1273,7 +1273,7 @@
     </message>
     <message>
       <source>Custom user role.</source>
-      <translation>Rôle usager personnalisé.</translation>
+      <translation>Rôle utilisateur personnalisé.</translation>
     </message>
     <message>
       <source>Custom permissions.</source>
@@ -1733,8 +1733,8 @@
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>%n usager</numerusform>
-        <numerusform>%n usager</numerusform>
+        <numerusform>%n utilisateur</numerusform>
+        <numerusform>%n utilisateurs</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1750,11 +1750,11 @@
     </message>
     <message>
       <source>All Users</source>
-      <translation>Tous les usagers</translation>
+      <translation>Tous les utilisateurs</translation>
     </message>
     <message>
       <source>Select at least one user</source>
-      <translation>Sélectionner au moins un usager</translation>
+      <translation>Sélectionner au moins un utilisateur</translation>
     </message>
     <message>
       <source>Soft Trigger</source>

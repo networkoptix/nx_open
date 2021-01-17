@@ -35,7 +35,7 @@
         "settingsSaved": "Paramètres enregistrés",
         "confirmHardwareRestart": "Redémarrer le système d’exploitation?",
         "confirmRestoreSettings": "Restaurer tous les paramètres du serveur? Les archives seront gardéess, mais les paramètres réseau seront réinitialisés.",
-        "confirmRestoreSettingsNotNetwork": "Réinitialiser la configuration du serveur? Archives et paramètres réseau seront enregistrées.",
+        "confirmRestoreSettingsNotNetwork": "Réinitialiser la configuration du serveur? Les paramètres d'archive et de réseau seront sauvegardés.",
         "unavailable": "Non disponible",
         "unsafePortConfirm": "Il n’est pas sécuritaire d’utiliser un port inférieur à 1025. Le Serveur ne sera peut-être pas accessible. Continuer quand même?",
         "confirmDisconnectFromCloud": "Déconnecter le système de {{CLOUD_NAME}}",
@@ -103,7 +103,7 @@
         "smtpPort": "Port SMTP",
         "smtpSimple": "SMTP simple",
         "smtpTimeout": "Délai d’attente SMTP",
-        "smtpUser": "Usager SMTP",
+        "smtpUser": "Utilisateur SMTP",
         "statisticsAllowed": "Envoyer des statistiques d'utilisation et des rapports d'erreur anonymes",
         "statisticsReportLastNumber": "Rapport statistique - dernier numéro",
         "statisticsReportLastTime": "Rapport statistique - dernière fois",
@@ -115,7 +115,7 @@
         "SystemName": "Nom système",
         "takeCameraOwnershipWithoutLock": "Prendre propriété des caméras sans verrou",
         "timeSynchronizationEnabled": "Synchronisation de l'heure activée",
-        "primaryTimeServer": "Serveur de synchronisation horaire principal",
+        "primaryTimeServer": "Serveur de synchronisation de l'heure principale",
         "osTimeChangeCheckPeriodMs": "Période de vérification du changement d'heure de l'OS",
         "syncTimeExchangePeriod": "Intervalle de synchronisation de synchronisation de l'heure pour les requêtes réseau",
         "syncTimeEpsilon": "Synchroniser le temps epsilon. La nouvelle valeur n'est pas appliquée si le temps est inférieur à epsilon",
@@ -130,7 +130,7 @@
         "watermarkSettings": "Paramètres du filigrane",
         "maxWebMTranscoders": "Nombre maximal de connexions WEBM pour le serveur. Chrome ouvre 2 connexions à la fois, puis ferme la première. Il est donc recommandé de définir la valeur> = 2 sur ce paramètre.",
         "maxEventLogRecords": "Nombre maximal d'enregistrements du journal des événements à conserver dans la base de données. La quantité réelle d'enregistrements non supprimés peut dépasser de 20% la valeur spécifiée.",
-        "forceLiveCacheForPrimaryStream": "S'il faut mettre certaines images en cache pour le flux principal. Valeurs: \"oui\" - toujours activé (peut utiliser beaucoup de RAM), \"non\" - toujours désactivé sauf lorsque requis par la lecture (par exemple, HLS), \"auto\" - similaire à \"non\", mais activé lorsque l'amélioration de l'expérience utilisateur (par exemple, lorsqu'un plug-in Analytics fonctionne sur la caméra).",
+        "forceLiveCacheForPrimaryStream": "S'il faut mettre en cache certaines images pour le flux primaire. Valeurs : \"oui\" - toujours activé (peut utiliser beaucoup de RAM), \"non\" - toujours désactivé sauf lorsque requis par la lecture (e. . HLS), \"auto\" - similaire à \"no\", mais allumé lorsque l'amélioration de l'expérience utilisateur (par exemple, lorsque certains plugins Analytics fonctionnent sur la caméra).",
         "additionalLocalFsTypes": "Types de systèmes de fichiers supplémentaires à prendre en compte pour décider si une partition donnée convient comme stockage de serveur. Une liste de noms de système de fichiers séparés par des virgules, tels qu'ils figurent dans /proc/mounts, est attendue.",
         "mediaBufferSizeKb": "Taille du tampon média côté serveur en Ko. Une valeur plus élevée permet d'utiliser une connexion Internet plus efficace avec une valeur de retard aller-retour élevée, mais ralentit la commutation automatique de la qualité et la réaction à l'opération de recherche média.",
         "mediaBufferSizeForAudioOnlyDeviceKb": "Taille du tampon média côté serveur en KB. Il a la même signification que le paramètre \"mediaBufferSizeKb\" mais il est appliqué aux appareils audio uniquement."
@@ -154,7 +154,7 @@
         "cloudError": "Impossible de fusionner les systèmes. Le système dépendant est connecté au nuage. Vous devez tout d’abord déconnecter.",
         "cloudBothError": "Impossible de fusionner les systèmes. Ils sont reliés aux nuages. Vous devez en déconnecter un.",
         "cloudHostConflict": "Impossible de fusionner les systèmes, parce que les serveurs sont conçus avec de différents hôtes nuages",
-        "licenceError": "Attention! Vous êtes sur le point de fusionner les systèmes disposant de licences Starter. Une seule licence Starter est autorisé par système, donc la seconde licence sera désactivée. Fusionner quand même ?",
+        "licenceError": "Attention! Vous êtes sur le point de fusionner les systèmes disposant de licences de démarrage Une seule licence de démarrage est autorisé par système, donc la seconde licence sera désactivée. Fusionner quand même ?",
         "duplicateServersError": "Impossible de fusionner des systèmes car ils ont au moins un serveur avec le même ID. Supprimez ce serveur et réessayez.",
         "connectionFailed": "Échec de connexion: ",
         "unknownError": "Erreur inconnue",
@@ -170,7 +170,7 @@
         "authLockout": "Trop de tentatives. Réessayez dans une minute."
     },
     "navigaion": {
-        "cannotGetUser": "Panne du serveur : impossible de récupérer les données d’usager actuel"
+        "cannotGetUser": "Panne du serveur : impossible de récupérer les données d’utilisateur actuel"
     },
     "offlineDialog": {
         "serverOffline": "serveur hors ligne"
