@@ -394,7 +394,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/bookmark_overlay_settings_widget.ui"/>
       <source>Bookmark Info</source>
-      <translation>Info signet</translation>
+      <translation>Informations sur le signet</translation>
     </message>
     <message>
       <location/>
@@ -570,7 +570,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/camera/dialogs/camera_credentials_dialog.ui"/>
       <source>Authentication credentials</source>
-      <translation>Informations d'authentification</translation>
+      <translation>Identifiants d'authentification</translation>
     </message>
   </context>
   <context>
@@ -598,7 +598,7 @@
     <message>
       <location/>
       <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
-      <translation>Ne pas modifier ces paramètres, sauf si vous êtes absolument sûr de leur impact potentiel sur les performances de votre système.</translation>
+      <translation>Ne modifiez pas ces paramètres à moins que vous ne soyez absolument sûr de leur impact potentiel sur les performances de votre système.</translation>
     </message>
     <message>
       <location/>
@@ -613,7 +613,7 @@
     <message>
       <location/>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
-      <translation>Paramètres de qualité et de fréquence d'images (IPS) dans l'horaire d'enregistrement ne seront plus pertinents.</translation>
+      <translation>Les paramètres de qualité et de fréquence d'images (FPS) dans le calendrier d'enregistrement ne seront plus pertinents.</translation>
     </message>
     <message>
       <location/>
@@ -688,7 +688,7 @@
     <message>
       <location/>
       <source>Trust camera timestamp</source>
-      <translation>Confiance d'horodatage de la caméra</translation>
+      <translation>Faire confiance à l'horodatage de la caméra</translation>
     </message>
     <message>
       <location/>
@@ -708,7 +708,7 @@
     <message>
       <location/>
       <source>Native camera presets will not be avaliable.</source>
-      <translation>Préréglages de caméras natifs ne seront pas disponibles.</translation>
+      <translation>Les préréglages natifs de la caméra ne seront pas disponibles.</translation>
     </message>
     <message>
       <location/>
@@ -723,7 +723,7 @@
     <message>
       <location/>
       <source>Detect motion during archive import</source>
-      <translation>Détecter le mouvement lors de l'importation d'archive</translation>
+      <translation>Détecter le mouvement lors de l'importation des archives</translation>
     </message>
   </context>
   <context>
@@ -781,7 +781,7 @@
     <message>
       <location/>
       <source>Show on layout</source>
-      <translation>Afficher sur mise en page</translation>
+      <translation>Afficher sur la mise en page</translation>
     </message>
     <message>
       <location/>
@@ -884,7 +884,7 @@
     <message>
       <location/>
       <source>Copy Schedule to...</source>
-      <translation>Copier l'horaire...</translation>
+      <translation>Copier le calendrier vers...</translation>
     </message>
   </context>
   <context>
@@ -892,12 +892,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.ui"/>
       <source>All Cameras</source>
-      <translation>Toutes Caméras</translation>
+      <translation>Toutes les Caméras</translation>
     </message>
     <message>
       <location/>
       <source>Select Cameras</source>
-      <translation>Sélectionner Caméras</translation>
+      <translation>Sélectionner les caméras</translation>
     </message>
   </context>
   <context>
@@ -910,7 +910,7 @@
     <message>
       <location/>
       <source>Edit Credentials</source>
-      <translation>Modifier identifiants</translation>
+      <translation>Modifier les identifiants</translation>
     </message>
     <message>
       <location/>
@@ -965,7 +965,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/dialogs/connecting_to_server_dialog.ui"/>
       <source>Connecting...</source>
-      <translation>Connexion...</translation>
+      <translation>Connexion en cours...</translation>
     </message>
   </context>
   <context>
@@ -1078,7 +1078,7 @@
     <message>
       <location/>
       <source>Hint</source>
-      <translation>Astuce</translation>
+      <translation>Indice</translation>
     </message>
     <message>
       <location/>
@@ -1136,12 +1136,12 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/ui/dialogs/eula_dialog.ui"/>
       <source>Copy to Clipboard</source>
-      <translation>Copier vers Presse-Papier</translation>
+      <translation>Copier dans le presse-papier</translation>
     </message>
     <message>
       <location/>
       <source>I Do Not Agree</source>
-      <translation>Je n'accepte pas</translation>
+      <translation>Je ne suis pas d'accord</translation>
     </message>
     <message>
       <location/>
@@ -1251,7 +1251,7 @@
     <message>
       <location/>
       <source>Make read-only</source>
-      <translation>Définir en lecture seulement</translation>
+      <translation>Définir en lecture seule</translation>
     </message>
   </context>
   <context>
@@ -1264,7 +1264,7 @@
     <message>
       <location/>
       <source>Apply Filters</source>
-      <translation>Appliquer filtres</translation>
+      <translation>Appliquer les filtres</translation>
     </message>
     <message>
       <location/>
@@ -1274,7 +1274,7 @@
     <message>
       <location/>
       <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
-      <translation>L'application de filtres et l'ajout de superpositions nécessitent un transcodage qui va augmenter l'utilisation du processeur et peut prendre beaucoup de temps.</translation>
+      <translation>L'application de filtres et l'ajout de surcouches nécessitent un transcodage qui augmentera l'utilisation du processeur et peut prendre beaucoup de temps.</translation>
     </message>
   </context>
   <context>
@@ -1282,7 +1282,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/export_password_widget.ui"/>
       <source>Protect with password</source>
-      <translation>Protéger avec mot de passe</translation>
+      <translation>Protéger avec un mot de passe</translation>
     </message>
     <message>
       <location/>
@@ -1483,7 +1483,7 @@
     <message>
       <location/>
       <source>Encrypting video traffic will significantly increase CPU usage.</source>
-      <translation>Cryptage du trafic vidéo augmentera considérablement l'utilisation du processeur.</translation>
+      <translation>Le chiffrage du trafic vidéo augmentera considérablement l'utilisation du processeur.</translation>
     </message>
   </context>
   <context>
@@ -2035,7 +2035,7 @@
     <message>
       <location/>
       <source>Check for update</source>
-      <translation>Vérifier mise à jour</translation>
+      <translation>Vérifier les mises à jour</translation>
     </message>
     <message>
       <location/>
@@ -2101,7 +2101,7 @@
     <message>
       <location filename="../src/ui/dialogs/new_wearable_camera_dialog.ui"/>
       <source>To server</source>
-      <translation>Au serveur</translation>
+      <translation>Vers le serveur</translation>
     </message>
     <message>
       <location/>
@@ -2119,7 +2119,7 @@
     <message>
       <location/>
       <source>Show to</source>
-      <translation>Montrer à</translation>
+      <translation>Afficher à</translation>
     </message>
     <message>
       <location/>
@@ -2132,7 +2132,7 @@
     <message>
       <location filename="../src/ui/dialogs/common/password_dialog.ui"/>
       <source>Sign in</source>
-      <translation>Connecter</translation>
+      <translation>Se connecter</translation>
     </message>
     <message>
       <location/>
@@ -2408,7 +2408,7 @@
     <message>
       <location/>
       <source>Restart to the updated version when ready</source>
-      <translation>Redémarrer vers la version màj lorsque vous êtes prêt</translation>
+      <translation>Redémarrez la version mise à jour lorsqu'elle est prête</translation>
     </message>
   </context>
   <context>
@@ -2592,7 +2592,7 @@
     <message>
       <location/>
       <source>Enable timeline on video wall</source>
-      <translation>Activer la timeline sur mur vidéo</translation>
+      <translation>Activer la chronologie sur le mur vidéo</translation>
     </message>
   </context>
   <context>
@@ -2605,7 +2605,7 @@
     <message>
       <location/>
       <source>Initial video length</source>
-      <translation>Durée de la vidéo Initial</translation>
+      <translation>Durée initiale de la vidéo</translation>
     </message>
     <message>
       <location/>
@@ -2643,7 +2643,7 @@
     <message>
       <location/>
       <source>Server name</source>
-      <translation>Nom serveur</translation>
+      <translation>Nom du serveur</translation>
     </message>
   </context>
   <context>
@@ -2760,7 +2760,7 @@
     <message>
       <location/>
       <source>Drag any image or video file to the application window to play them</source>
-      <translation>Glissez n'importe quel fichier image ou vidéo dans la fenêtre de l'application pour lire</translation>
+      <translation>Faites glisser n'importe quel fichier image ou vidéo dans la fenêtre de l'application pour les lire</translation>
     </message>
   </context>
   <context>
@@ -2859,12 +2859,12 @@
     <message>
       <location/>
       <source>Encrypt video traffic</source>
-      <translation>Crypter le trafic vidéo</translation>
+      <translation>Chiffrer le trafic vidéo</translation>
     </message>
     <message>
       <location/>
       <source>Display watermark with username over video</source>
-      <translation>Afficher le filigrane avec nom d'utilisateur sur la vidéo</translation>
+      <translation>Afficher le filigrane avec le nom d'utilisateur sur la vidéo</translation>
     </message>
     <message>
       <location/>
@@ -2900,7 +2900,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_dialogs/server_selection_dialog.ui"/>
       <source>Select Servers</source>
-      <translation>Sélectionner Serveurs</translation>
+      <translation>Sélectionner les serveurs</translation>
     </message>
   </context>
   <context>
@@ -3185,17 +3185,17 @@
     <message>
       <location/>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>L'enregistrement dans un emplacement de stockage désactivé s'arrêtera. Cependant, la suppression des séquences obsolètes se poursuivra.</translation>
+      <translation>L'enregistrement vers l'emplacement de stockage désactivé s'arrêtera. Cependant, la suppression des séquences obsolètes se poursuivra.</translation>
     </message>
     <message>
       <location/>
       <source>Recording was enabled on the USB storage</source>
-      <translation>Enregistrement a été activé sur le stockage USB</translation>
+      <translation>L'enregistrement a été activé sur le stockage USB</translation>
     </message>
     <message>
       <location/>
       <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
-      <translation>Les données d'analyse peuvent occuper beaucoup d'espace. Nous vous recommandons de choisir un autre emplacement au lieu de la partition système.</translation>
+      <translation>Les données analytiques peuvent prendre beaucoup d'espace. Nous vous recommandons de choisir un autre emplacement à la place de la partition système.</translation>
     </message>
   </context>
   <context>
@@ -3313,7 +3313,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/system_administration/widgets/time_synchronization_widget.ui"/>
       <source>Sync Time with the Internet</source>
-      <translation>Synchroniser le temps avec Internet</translation>
+      <translation>Synchroniser l'heure avec Internet</translation>
     </message>
     <message>
       <location/>
@@ -3390,7 +3390,7 @@
     <message>
       <location/>
       <source>There are no custom user roles yet.</source>
-      <translation>Il n'y a pas encore de rôles utilisateur personnalisés.</translation>
+      <translation>Il n'y a pas encore de rôle utilisateur personnalisé.</translation>
     </message>
     <message>
       <location/>
@@ -3462,17 +3462,17 @@
     <message>
       <location/>
       <source>Upload Footage</source>
-      <translation>Envoie de clip</translation>
+      <translation>Charger des images</translation>
     </message>
     <message>
       <location/>
       <source>Upload File...</source>
-      <translation>Envoyer Fichier...</translation>
+      <translation>Charger un fichier...</translation>
     </message>
     <message>
       <location/>
       <source>Upload Folder...</source>
-      <translation>Envoyer Dossier...</translation>
+      <translation>Charger un dossier...</translation>
     </message>
   </context>
   <context>

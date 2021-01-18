@@ -722,7 +722,7 @@
       <source>%n/%1 Edge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n%1 Licences Edge</numerusform>
+        <numerusform>%n%1 Licence Edge</numerusform>
         <numerusform>%n/%1 Licences Edge</numerusform>
       </translation>
     </message>
@@ -730,7 +730,7 @@
       <source>%n/%1 Vmax Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 Licences Vmax</numerusform>
+        <numerusform>%n/%1 Licence Vmax</numerusform>
         <numerusform>%n/%1 Licences Vmax</numerusform>
       </translation>
     </message>
@@ -738,23 +738,23 @@
       <source>%n/%1 Analog Encoder Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 Licenses d'encodeur analogue</numerusform>
-        <numerusform>%n/%1 Licenses d'encodeur analogue</numerusform>
+        <numerusform>%n/%1 Licence d'encodeur analogique</numerusform>
+        <numerusform>%n/%1 Licences d'encodeur analogique</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Video Wall Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 Licences de mur vidéo</numerusform>
-        <numerusform>%n/%1 Licences de mur vidéo</numerusform>
+        <numerusform>%n/%1 Licence mur vidéo</numerusform>
+        <numerusform>%n/%1 Licences mur vidéo</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 I/O Module Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 Licences Module I/O</numerusform>
+        <numerusform>%n/%1 Licence Module I/O</numerusform>
         <numerusform>%n/%1 Licences Module I/O</numerusform>
       </translation>
     </message>
@@ -762,8 +762,8 @@
       <source>%n/%1 Start Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 Démarrer Licences</numerusform>
-        <numerusform>%n/%1 Démarrer Licences</numerusform>
+        <numerusform>%n/%1 Licence de démarrage</numerusform>
+        <numerusform>%n/%1 Licences de démarrage</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -778,15 +778,15 @@
       <source>%n/%1 Bridge Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 Licenses Pont</numerusform>
-        <numerusform>%n/%1 Licenses Pont</numerusform>
+        <numerusform>%n/%1 Licence Bridge</numerusform>
+        <numerusform>%n/%1 Licences Bridge</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 Invalid Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n/%1 Licences Invalide</numerusform>
+        <numerusform>%n/%1 Licence Invalide</numerusform>
         <numerusform>%n/%1 Licences Invalide</numerusform>
       </translation>
     </message>
@@ -873,7 +873,7 @@
     </message>
     <message>
       <source>Server with matching Hardware ID not found</source>
-      <translation>Aucun Serveur avec ID Matériel correspondant trouvé</translation>
+      <translation>Serveur avec ID Matériel correspondant introuvable</translation>
     </message>
     <message>
       <source>Only one Starter license is allowed per System.</source>
@@ -1292,15 +1292,15 @@
     <name>QnZipExtractor</name>
     <message>
       <source>Zip file is corrupted.</source>
-      <translation>Fichier Zip corrompu.</translation>
+      <translation>Le fichier Zip est corrompu.</translation>
     </message>
     <message>
       <source>Could not find target dir.</source>
-      <translation>Ne peut pas trouver le répertoire cible.</translation>
+      <translation>Impossible de trouver le dossier cible.</translation>
     </message>
     <message>
       <source>Could not open file for writing.</source>
-      <translation>Ne peut pas ouvrir le fichier pour écriture.</translation>
+      <translation>Impossible d'ouvrir le fichier en écriture.</translation>
     </message>
     <message>
       <source>There is no free space on the disk.</source>
@@ -1312,22 +1312,22 @@
     </message>
     <message>
       <source>Extraction was cancelled.</source>
-      <translation>Extraction a été annulée.</translation>
+      <translation>L'extraction a été annulée.</translation>
     </message>
     <message>
       <source>Extractor is busy.</source>
-      <translation>Extracteur occupé.</translation>
+      <translation>L'extracteur est occupé.</translation>
     </message>
   </context>
   <context>
     <name>nx::utils::CryptedFileStream</name>
     <message>
       <source>Wrong crypted stream size.</source>
-      <translation>Mauvaise taille de flux crypté.</translation>
+      <translation>Mauvaise taille de flux chiffré.</translation>
     </message>
     <message>
       <source>Damaged crypted stream header.</source>
-      <translation>En-tête de flux crypté endommagé.</translation>
+      <translation>En-tête de flux chiffré endommagé.</translation>
     </message>
   </context>
   <context>
@@ -1795,7 +1795,7 @@
     </message>
     <message>
       <source>Set to fullscreen</source>
-      <translation>Mettre en plein écran</translation>
+      <translation>Définir en plein écran</translation>
     </message>
     <message>
       <source>Exit fullscreen</source>
@@ -1803,19 +1803,19 @@
     </message>
     <message>
       <source>Open layout</source>
-      <translation>Ouvrir mise en page</translation>
+      <translation>Ouvrir la mise en page</translation>
     </message>
     <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation>Échec de l’utilisation du temps de caméra, trop de lags, temps système sera utilisé</translation>
+      <translation>Impossible de forcer l'utilisation du temps de la caméra, il y a trop de retard, le temps système sera utilisé</translation>
     </message>
     <message>
       <source>Camera time is back to normal</source>
-      <translation>Heure de caméra revenue à la normale</translation>
+      <translation>L'heure de la caméra est revenue à la normale</translation>
     </message>
     <message>
       <source>Multiple %1 events have occurred</source>
-      <translation>Plusieurs événements %1 survenus</translation>
+      <translation>Plusieurs %1 événements se sont produits</translation>
     </message>
     <message>
       <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
@@ -1835,7 +1835,7 @@
     </message>
     <message>
       <source>Plugin Diagnostic Event</source>
-      <translation>Événement de diagnostic plugin</translation>
+      <translation>Événement de diagnostic du plugin</translation>
     </message>
     <message>
       <source>Unknown Plugin Diagnostic Event</source>

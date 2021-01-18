@@ -3073,11 +3073,11 @@ to %1</source>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation>Télécharger et installer</translation>
+      <translation>Télécharger &amp;&amp; Installer</translation>
     </message>
     <message>
       <source>Failed to enter compatibility mode for version %1</source>
-      <translation>Échec du mode de compatibilité pour la version %1</translation>
+      <translation>Impossible d'entrer en mode de compatibilité pour la version %1</translation>
     </message>
   </context>
   <context>
@@ -3107,15 +3107,15 @@ to %1</source>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the source with any of the entered keywords.</source>
-      <translation>Événement se déclenchera uniquement s'il y a des correspondances dans la source avec l'un des mots clés saisis.</translation>
+      <translation>L'événement ne se déclenchera que s'il y a des correspondances dans la source avec l'un des mots clés saisis.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Événement se déclenchera uniquement s'il y a des correspondances dans la légende avec l'un des mots clés saisis.</translation>
+      <translation>L'événement ne se déclenchera que s'il y a des correspondances dans la légende avec l'un des mots clés saisis.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description with any of the entered keywords.</source>
-      <translation>Événement se déclenchera uniquement s'il y a des correspondances dans la description avec l'un des mots clés saisis.</translation>
+      <translation>L'événement ne se déclenchera que s'il y a des correspondances dans la description avec l'un des mots clés saisis.</translation>
     </message>
     <message>
       <source>Server API</source>
@@ -3190,7 +3190,7 @@ to %1</source>
     </message>
     <message>
       <source>Database Backup Files</source>
-      <translation>Fichier de sauvegarde de la base de données</translation>
+      <translation>Fichiers de sauvegarde de la base de données</translation>
     </message>
   </context>
   <context>
@@ -3307,7 +3307,7 @@ to %1</source>
     <name>QnEmptyBusinessActionWidget</name>
     <message>
       <source>Panic Recording mode switches recording settings for all cameras to maximum FPS and quality.</source>
-      <translation>Mode d'enregistrement panique bascule les paramètres d'enregistrement pour toutes les caméras au maximum FPS et qualité.</translation>
+      <translation>Le mode d'enregistrement panique bascule les paramètres d'enregistrement pour toutes les caméras à un maximum de FPS et de qualité.</translation>
     </message>
   </context>
   <context>
@@ -3513,7 +3513,7 @@ to %1</source>
     <name>QnFanErrorPolicy</name>
     <message>
       <source>Servers that support fan diagnostic</source>
-      <translation>Serveurs supportent le diagnostic des ventilateurs</translation>
+      <translation>Serveurs qui prennent en charge le diagnostic ventilateur</translation>
     </message>
   </context>
   <context>
@@ -3531,11 +3531,11 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation>Cette caméra ne figure pas sur la mise en page sélectionnée. L'action fonctionnera si la caméra est ajoutée avant les déclencheurs d'action.</translation>
+      <translation>Cette caméra n'est pas actuellement sur la disposition sélectionnée. L'action fonctionnera si la caméra est ajouté avant les déclencheurs d'action.</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation>Cette caméra ne figure pas sur certaines des mises en page sélectionnées. L'action fonctionnera si la caméra est ajoutée avant les déclencheurs d'action.</translation>
+      <translation>Cette caméra n'est pas actuellement sur certaines des mises en page sélectionnées. L'action fonctionnera si la caméra est ajouté avant les déclencheurs d'action.</translation>
     </message>
   </context>
   <context>
@@ -3627,7 +3627,7 @@ to %1</source>
     </message>
     <message>
       <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation>Sauvegarde inclut les paramètres des serveurs et des caméras, les utilisateurs, les pages Web, les règles d'événement, etc. La vidéo n'est pas enregistrée.</translation>
+      <translation>La sauvegarde comprend les paramètres des serveurs et des caméras, les utilisateurs, les pages Web, les règles d'événement, etc. La vidéo n'est pas enregistrée.</translation>
     </message>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
@@ -3722,7 +3722,7 @@ to %1</source>
     <name>QnInputDialog</name>
     <message>
       <source>Please enter a value.</source>
-      <translation>Veuillez saisir une valeur.</translation>
+      <translation>Veuillez entrer une valeur.</translation>
     </message>
   </context>
   <context>
@@ -3851,11 +3851,11 @@ to %1</source>
     </message>
     <message>
       <source>Control Sessions Allowed</source>
-      <translation>Contrôle Sessions Autorisés</translation>
+      <translation>Contrôle des sessions autorisées</translation>
     </message>
     <message>
       <source>Archive Streams Allowed</source>
-      <translation>Flux Archive Autorisés</translation>
+      <translation>Flux d'archives autorisés</translation>
     </message>
     <message>
       <source>Deactivations Remaining</source>
@@ -4024,7 +4024,7 @@ to %1</source>
     </message>
     <message>
       <source>To obtain an Activation Key file please send the provided License Key and Hardware ID to %1.</source>
-      <translation>Pour obtenir un fichier de clé d'activation, veuillez envoyer la clé de licence et l'ID matériel fournis à %1.</translation>
+      <translation>Pour obtenir un fichier de clé d'activation, veuillez envoyer la clé de licence fournie et l'ID matériel à %1.</translation>
     </message>
     <message>
       <source>Please send the provided License Key and Hardware ID to your Regional / License support to obtain an Activation Key file.</source>
@@ -4288,13 +4288,13 @@ to %1</source>
     <message numerus="yes">
       <source>Set for all %n Cameras</source>
       <translation>
-        <numerusform>Définir pour toutes les %n Caméras</numerusform>
+        <numerusform>Définir pour %n Caméra</numerusform>
         <numerusform>Définir pour toutes les %n Caméras</numerusform>
       </translation>
     </message>
     <message>
       <source>Area Zoom</source>
-      <translation>Zone Zoom</translation>
+      <translation>Zoom de la zone</translation>
     </message>
   </context>
   <context>
@@ -4419,7 +4419,7 @@ to %1</source>
     </message>
     <message>
       <source>NVR cameras do not support not-synchronized playback</source>
-      <translation>Caméras NVR ne prennent pas en charge la lecture non synchronisée</translation>
+      <translation>Les caméras NVR ne prennent pas en charge la lecture non synchronisée</translation>
     </message>
   </context>
   <context>
@@ -4457,7 +4457,7 @@ to %1</source>
     </message>
     <message>
       <source>&quot;Virtual Camera&quot; is a virtual storage for video files, which could be uploaded to any server on your System and be accessed by any user.</source>
-      <translation>&quot;Caméra Virtuelle&quot; est un stockage virtuel pour les fichiers vidéo, qui peut être envoyer sur n'importe quel serveur de votre Système et accessible à tout utilisateur.</translation>
+      <translation>&quot;Caméra Virtuelle&quot; est un stockage virtuel pour les fichiers vidéo, qui pourrait être téléchargé sur n'importe quel serveur de votre système et être accessible par n'importe quel utilisateur.</translation>
     </message>
   </context>
   <context>
@@ -4587,7 +4587,7 @@ to %1</source>
     <name>QnPoeOverBudgetPolicy</name>
     <message>
       <source>Servers that support PoE monitoring</source>
-      <translation>Serveurs supportent la surveillance PoE</translation>
+      <translation>Serveurs qui prennent en charge la surveillance PoE</translation>
     </message>
   </context>
   <context>
@@ -4928,7 +4928,7 @@ to %1</source>
     </message>
     <message>
       <source>open all at a new layout</source>
-      <translation>ouvrir tout dans nouvelle mise en page</translation>
+      <translation>tout ouvrir dans une nouvelle mise en page</translation>
     </message>
     <message>
       <source>open all</source>
@@ -5136,7 +5136,7 @@ to %1</source>
     </message>
     <message>
       <source>Export Bookmarks...</source>
-      <translation>Exporter Signet...</translation>
+      <translation>Exporter les signets...</translation>
     </message>
   </context>
   <context>
@@ -5378,7 +5378,7 @@ to %1</source>
     </message>
     <message>
       <source>Servers with failover enabled will automatically take cameras from offline servers.</source>
-      <translation>Les serveurs avec basculement activés prennent automatiquement les caméras des serveurs hors ligne.</translation>
+      <translation>Les serveurs avec basculement activés prendront automatiquement les caméras des serveurs hors ligne.</translation>
     </message>
   </context>
   <context>
@@ -5629,7 +5629,7 @@ to %1</source>
     </message>
     <message>
       <source>TOO MANY CONNECTIONS</source>
-      <translation>TROP DE CONNECTIONS</translation>
+      <translation>TROP DE CONNEXIONS</translation>
     </message>
     <message>
       <source>PASSWORD REQUIRED</source>
@@ -5685,11 +5685,11 @@ to %1</source>
     </message>
     <message>
       <source>Last 5 minutes</source>
-      <translation>5 dernières minutes</translation>
+      <translation>Les 5 dernières minutes</translation>
     </message>
     <message>
       <source>Last 60 minutes</source>
-      <translation>60 dernières minutes</translation>
+      <translation>Les 60 dernières minutes</translation>
     </message>
     <message>
       <source>Last 24 hours</source>
@@ -5697,11 +5697,11 @@ to %1</source>
     </message>
     <message>
       <source>Longest period available</source>
-      <translation>Période la plus longue disponible</translation>
+      <translation>La période la plus longue disponible</translation>
     </message>
     <message>
       <source>Forecast available only for cameras with enabled recording.</source>
-      <translation>Prévision disponible uniquement pour les caméras avec enregistrement activé.</translation>
+      <translation>Prévisions disponibles uniquement pour les caméras avec enregistrement activé.</translation>
     </message>
   </context>
   <context>
@@ -5812,7 +5812,7 @@ to %1</source>
     </message>
     <message>
       <source>Reindexing can fix problems with archive or backup if they have been lost or damaged, or if some hardware has been replaced.</source>
-      <translation>Réindexation peut résoudre les problèmes d'archivage ou de sauvegarde, s'ils ont été perdus ou endommagés, ou si le matériel a été remplacé.</translation>
+      <translation>La réindexation peut résoudre des problèmes avec l'archive ou la sauvegarde si elles ont été perdues ou endommagées, ou si certains matériels ont été remplacés.</translation>
     </message>
     <message>
       <source>What to do with current analytics data?</source>
@@ -5833,8 +5833,8 @@ to %1</source>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
 If you intended to move analytics data to another storage location, please contact support before proceeding.</source>
-      <translation>Les données d'analyse actuelles ne seront pas automatiquement déplacées vers un autre emplacement et deviendront inaccessibles. Vous pouvez le conserver et le déplacer manuellement ultérieurement ou le supprimer définitivement.
-Si vous avez l'intention de déplacer les données d'analyse vers un autre emplacement de stockage, contactez le support avant de continuer.</translation>
+      <translation>Les données d'analyse actuelles ne seront pas automatiquement déplacées vers un autre emplacement et deviendront inaccessibles. Vous pouvez le garder et le déplacer manuellement plus tard, ou supprimer définitivement.
+Si vous avez l'intention de déplacer les données d'analyse vers un autre emplacement de stockage, veuillez contacter le support avant de continuer.</translation>
     </message>
     <message>
       <source>Server is unavailable.</source>
@@ -6151,27 +6151,27 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Some cameras require passwords to be set</source>
-      <translation>Certaines caméras nécessitent des mots de passe à définir</translation>
+      <translation>Certaines caméras exigent que les mots de passe soient définis</translation>
     </message>
     <message>
       <source>No server has internet access for time synchronization</source>
-      <translation>Aucun serveur n'a accès à Internet pour la synchronisation de l'heure</translation>
+      <translation>Aucun serveur n'a accès à internet pour la synchronisation de l'heure</translation>
     </message>
     <message>
       <source>The System is in safe mode</source>
-      <translation>Système est en mode sans échec</translation>
+      <translation>Le système est en mode sans échec</translation>
     </message>
     <message>
       <source>The System has no internet access for time synchronization</source>
-      <translation>Système n'a pas d'accès Internet pour la synchronisation de l'heure</translation>
+      <translation>Le système n'a pas d'accès internet pour la synchronisation de l'heure</translation>
     </message>
     <message>
       <source>No online server in the System has internet access for time synchronization.</source>
-      <translation>Aucun serveur en ligne dans le système n'a accès à Internet pour la synchronisation du temps.</translation>
+      <translation>Aucun serveur en ligne dans le système n'a accès à internet pour synchroniser le temps.</translation>
     </message>
     <message>
       <source>The System is running in safe mode.</source>
-      <translation>Système fonctionne en mode sans échec.</translation>
+      <translation>Le système fonctionne en mode sans échec.</translation>
     </message>
     <message>
       <source>Error occurred during remote archive synchronization</source>
@@ -6190,27 +6190,27 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Includes information about system, such as cameras models and firmware versions, number of servers, etc.</source>
-      <translation>Inclut des informations sur le système, telles que les modèles de caméras et les versions de firmware, le nombre de serveurs, etc.</translation>
+      <translation>Inclut des informations sur le système, tels que les modèles de caméras et les versions de firmware, le nombre de serveurs, etc.</translation>
     </message>
     <message>
       <source>Does not include any personal information and is completely anonymous.</source>
-      <translation>N'inclut aucune information personnelle et est complètement anonyme.</translation>
+      <translation>N'inclut pas de renseignements personnels et est totalement anonyme.</translation>
     </message>
     <message>
       <source>Enable devices and servers autodiscovery and automated device status check</source>
-      <translation>Activer la découverte automatique des périphériques, serveurs et la vérification automatisée de l'état des périphériques</translation>
+      <translation>Activer la détection automatique des périphériques et des serveurs et la vérification automatique du statut des périphériques</translation>
     </message>
     <message>
       <source>Enable cameras and servers autodiscovery and automated camera status check</source>
-      <translation>Activer la découverte automatique des caméras, serveurs et la vérification automatisée du statut de la caméra</translation>
+      <translation>Activer la détection automatique des caméras et des serveurs et la vérification automatique de l'état de la caméra</translation>
     </message>
     <message>
       <source>When enabled, the system continuously discovers new cameras and servers, and sends discovery requests to cameras for status update.</source>
-      <translation>Lorsqu'il est activé, le système découvre en permanence de nouvelles caméras et serveurs, et envoie des demandes de découverte aux caméras pour la mise à jour du statut.</translation>
+      <translation>Lorsqu'il est activé, le système découvre en permanence de nouvelles caméras et de nouveaux serveurs, et envoie des demandes de découverte aux caméras pour la mise à jour du statut.</translation>
     </message>
     <message>
       <source>If Failover is enabled, server may still request camera status updates regardless of this setting.</source>
-      <translation>Si le basculement est activé, le serveur peut toujours demander des mises à jour de l'état de la caméra, indépendamment de ce paramètre.</translation>
+      <translation>Si le Basculement est activé, le serveur peut toujours demander des mises à jour de l'état de la caméra quel que soit ce paramètre.</translation>
     </message>
   </context>
   <context>
@@ -6229,7 +6229,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Spread Sheet (CSV) File</source>
-      <translation>Fichier Tableur (CSV)</translation>
+      <translation>Fichier de feuille de calcul (CSV)</translation>
     </message>
   </context>
   <context>
@@ -6341,7 +6341,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation>Les utilisateurs peuvent être importés depuis un serveur LDAP. Ils ne pourront se connecter que si le serveur LDAP est en ligne et que leurs comptes sont actifs sur celui-ci.</translation>
+      <translation>Les utilisateurs peuvent être importés depuis un serveur LDAP. Ils ne pourront se connecter que si le serveur LDAP est en ligne et que leurs comptes y sont actifs.</translation>
     </message>
   </context>
   <context>
@@ -6546,12 +6546,12 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>%1 belong to this system only and are fully managed by system administrators.</source>
       <comment>%1 is local users definition, e.g. &apos;Local users&apos;</comment>
-      <translation>%1 appartiennent à ce système uniquement et sont entièrement gérés par les administrateurs système.</translation>
+      <translation>%1 appartient à ce système uniquement et est entièrement géré par les administrateurs système.</translation>
     </message>
     <message>
       <source>%1 can have access to many Systems. Administrators can manage their rights only.</source>
       <comment>%1 is cloud users definition, e.g. &apos;Cloud users&apos;</comment>
-      <translation>%1 peut avoir accès à de nombreux systèmes. Les administrateurs peuvent uniquement gérer leurs droits.</translation>
+      <translation>%1 peut avoir accès à plusieurs systèmes. Les administrateurs ne peuvent gérer que leurs droits.</translation>
     </message>
   </context>
   <context>
@@ -6701,11 +6701,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Video Wall is removed on the server and will be closed.</source>
-      <translation>Mur vidéo est supprimé sur le serveur et sera fermé.</translation>
+      <translation>Le mur vidéo est supprimé sur le serveur et sera fermé.</translation>
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
-      <translation>Échec de connexion au serveur sélectionné</translation>
+      <translation>Impossible de se connecter au serveur sélectionné</translation>
     </message>
   </context>
   <context>
@@ -6756,7 +6756,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Failed to merge %1 to our system.</source>
-      <translation>Échec de la fusion de %1 avec notre système.</translation>
+      <translation>Impossible de fusionner %1 avec notre système.</translation>
     </message>
   </context>
   <context>
@@ -6987,7 +6987,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>QnWorkbenchWearableHandler</name>
     <message>
       <source>Only video files with correct timestamp are supported.</source>
-      <translation>Seuls les fichiers vidéo avec horodatage correct sont pris en charge.</translation>
+      <translation>Seuls les fichiers vidéo avec un horodatage correct sont pris en charge.</translation>
     </message>
     <message>
       <source>Could not start upload as user &quot;%1&quot; is currently uploading footage to this camera.</source>
@@ -7004,51 +7004,51 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>Selected file formats are not supported</source>
       <translation>
-        <numerusform>Formats de fichier sélectionnés ne sont pas pris en charge</numerusform>
-        <numerusform>Formats de fichier sélectionnés ne sont pas pris en charge</numerusform>
+        <numerusform>Le format de fichier sélectionné n'est pas pris en charge</numerusform>
+        <numerusform>Les formats de fichier sélectionnés ne sont pas pris en charge</numerusform>
       </translation>
     </message>
     <message>
       <source>Use .MKV, .AVI, .MP4 or other video files.</source>
-      <translation>Utiliser .MKV, .AVI, .MP4 ou autres fichiers vidéo.</translation>
+      <translation>Utiliser .MKV, .AVI, .MP4 ou d'autres fichiers vidéo.</translation>
     </message>
     <message numerus="yes">
       <source>Selected files do not have timestamps</source>
       <translation>
-        <numerusform>Fichiers sélectionnés n'ont pas d'horodatage</numerusform>
-        <numerusform>Fichiers sélectionnés n'ont pas d'horodatage</numerusform>
+        <numerusform>Le fichier sélectionné n'a pas d'horodatage</numerusform>
+        <numerusform>Les fichiers sélectionnés n'ont pas d'horodatage</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos are already being uploaded</source>
       <translation>
-        <numerusform>Fichiers sélectionnés couvrent les périodes pour lesquelles des vidéos sont en train d'envoyer</numerusform>
-        <numerusform>Fichiers sélectionnés couvrent les périodes pour lesquelles des vidéos sont en train d'envoyer</numerusform>
+        <numerusform>Le fichier sélectionné couvre les périodes pour lesquelles des vidéos sont déjà en cours de téléchargement</numerusform>
+        <numerusform>Les fichiers sélectionnés couvrent les périodes pour lesquelles des vidéos sont déjà en cours de téléchargement</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Selected files cover periods for which videos have already been uploaded</source>
       <translation>
-        <numerusform>Fichiers sélectionnés couvrent les périodes pour lesquelles des vidéos sont déjà envoyer</numerusform>
-        <numerusform>Fichiers sélectionnés couvrent les périodes pour lesquelles des vidéos sont déjà envoyer</numerusform>
+        <numerusform>Le fichier sélectionné couvre les périodes pour lesquelles des vidéos ont déjà été téléchargées</numerusform>
+        <numerusform>Les fichiers sélectionnés couvrent les périodes pour lesquelles des vidéos ont déjà été téléchargées</numerusform>
       </translation>
     </message>
     <message>
       <source>Selected files will not be uploaded</source>
-      <translation>Fichiers sélectionnés ne seront pas envoyés</translation>
+      <translation>Les fichiers sélectionnés ne seront pas téléchargés</translation>
     </message>
     <message>
       <source>Some files will not be uploaded</source>
-      <translation>Certain fichiers ne seront pas envoyés</translation>
+      <translation>Certains fichiers ne seront pas téléchargés</translation>
     </message>
     <message>
       <source>No new files to upload in selected folder</source>
-      <translation>Aucun nouveau fichier à envoyer dans le dossier sélectionné</translation>
+      <translation>Aucun nouveau fichier à télécharger dans le dossier sélectionné</translation>
     </message>
     <message numerus="yes">
       <source>Selected files are too old</source>
       <translation>
-        <numerusform>Les fichiers sélectionnés sont trop vieux</numerusform>
+        <numerusform>Le fichier sélectionné est trop vieux</numerusform>
         <numerusform>Les fichiers sélectionnés sont trop vieux</numerusform>
       </translation>
     </message>
@@ -7069,7 +7069,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>Some footage may be deleted after uploading these files</source>
       <translation>
-        <numerusform>Certaines séquences peuvent être supprimées après le téléchargement de ces fichiers</numerusform>
+        <numerusform>Cette séquence peut être supprimée après le téléchargement de ces fichiers</numerusform>
         <numerusform>Certaines séquences peuvent être supprimées après le téléchargement de ces fichiers</numerusform>
       </translation>
     </message>
@@ -7429,12 +7429,12 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Lst</source>
       <extracomment>Short for &apos;Lowest&apos;</extracomment>
-      <translation>Lst</translation>
+      <translation>Lpb</translation>
     </message>
     <message>
       <source>Lo</source>
       <extracomment>Short for &apos;Low&apos;</extracomment>
-      <translation>B</translation>
+      <translation>Bas</translation>
     </message>
     <message>
       <source>Me</source>
@@ -7444,12 +7444,12 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Hi</source>
       <extracomment>Short for &apos;High&apos;</extracomment>
-      <translation>H</translation>
+      <translation>Haut</translation>
     </message>
     <message>
       <source>Bst</source>
       <extracomment>Short for &apos;Best&apos;</extracomment>
-      <translation>Me</translation>
+      <translation>Mei</translation>
     </message>
     <message>
       <source>Ps</source>
@@ -7472,7 +7472,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>This OS version is no longer supported</source>
-      <translation>Cette version de SE n'est plus supportée</translation>
+      <translation>Cette version d'OS n'est plus prise en charge</translation>
     </message>
     <message>
       <source>This %1 version is no longer supported</source>
@@ -7544,7 +7544,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Selected on Timeline</source>
-      <translation>Sélectionné sur chronologie</translation>
+      <translation>Sélectionné sur la chronologie</translation>
     </message>
     <message>
       <source>Any time</source>
@@ -7557,11 +7557,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Devices on layout</source>
-      <translation>Périphériques sur mise en page</translation>
+      <translation>Périphériques sur la mise en page</translation>
     </message>
     <message>
       <source>Cameras on layout</source>
-      <translation>Caméras sur mise en page</translation>
+      <translation>Caméras sur la mise en page</translation>
     </message>
     <message>
       <source>Any device</source>
@@ -7654,7 +7654,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Select some period on timeline and click with right mouse button on it to create a bookmark.</source>
-      <translation>Sélectionnez une période sur la chronologie et avec le bouton droit de la souris cliquez dessus pour créer un signet.</translation>
+      <translation>Sélectionnez une période sur la chronologie et cliquez avec le bouton droit de la souris dessus pour créer un signet.</translation>
     </message>
     <message numerus="yes">
       <source>%n bookmarks</source>
@@ -7714,7 +7714,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Custom number that can be assigned to a camera for quick identification and access</source>
-      <translation>Numéro personnalisé peut être attribué à une caméra pour une identification et accès rapides</translation>
+      <translation>Numéro personnalisé qui peut être assigné à une caméra pour une identification et un accès rapides</translation>
     </message>
     <message>
       <source>Primary</source>
@@ -7729,13 +7729,13 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>This ID is already used on the following %n cameras:</source>
       <translation>
-        <numerusform>Ce ID est déjà utilisé sur les %n caméras:</numerusform>
-        <numerusform>Ce ID est déjà utilisé sur les %n caméras:</numerusform>
+        <numerusform>Cet ID est déjà utilisé sur la %n caméra suivante :</numerusform>
+        <numerusform>Cet ID est déjà utilisé sur les %n caméras suivantes :</numerusform>
       </translation>
     </message>
     <message>
       <source>Server will not change any cameras settings, it will receive and use camera stream as-is.</source>
-      <translation>Le serveur ne modifiera aucun paramètre de caméra, il recevra et utilisera le flux de caméra tel quel.</translation>
+      <translation>Le serveur ne modifiera pas les paramètres de caméra, il recevra et utilisera le flux de caméra tel quel.</translation>
     </message>
     <message>
       <source>Multicast</source>
@@ -8266,19 +8266,19 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Selected format is not supported by FFMPEG library.</source>
-      <translation>Format sélectionné non pris en charge par la librairie FFMPEG.</translation>
+      <translation>Le format sélectionné n'est pas pris en charge par la bibliothèque FFMPEG.</translation>
     </message>
     <message>
       <source>FFMPEG library error.</source>
-      <translation>Erreur Librairie FFMPEG.</translation>
+      <translation>Erreur de bibliothèque FFMPEG.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with selected format.</source>
-      <translation>Codec vidéo ou audio est incompatible avec le format sélectionné.</translation>
+      <translation>Le codec vidéo ou audio est incompatible avec le format sélectionné.</translation>
     </message>
     <message>
       <source>File write error.</source>
-      <translation>Erreur d'écriture de fichier.</translation>
+      <translation>Erreur d'écriture du fichier.</translation>
     </message>
     <message>
       <source>No data exported.</source>
@@ -8392,7 +8392,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Exported .EXE file will have size over 4 GB and cannot be opened by double-click in Windows. It can be played only in %1 Client.</source>
-      <translation>Le fichier .EXE exporté aura une taille supérieure à 4 Go et ne pourra pas être ouvert en double-cliquant par Windows. Il peut être joué que dans %1 Client.</translation>
+      <translation>Le fichier .EXE exporté aura une taille supérieure à 4 Go et ne peut pas être ouvert par double-clic dans Windows. Il ne peut être lu que dans %1 Client.</translation>
     </message>
     <message>
       <source>Settings are not available for .NOV and .EXE files.</source>
@@ -8400,11 +8400,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Local files, server monitor widgets and webpages will not be exported.</source>
-      <translation>Les fichiers locaux, les widgets du moniteur de serveur et les pages Web ne seront pas exportés.</translation>
+      <translation>Les fichiers locaux, les widgets de surveillance du serveur et les pages Web ne seront pas exportés.</translation>
     </message>
     <message>
       <source>You are about to export a long video. It may require a lot of storage space and take significant time.</source>
-      <translation>Vous êtes sur le point d'exporter une longue vidéo. Cela peut nécessiter beaucoup d'espace de disque et prendre beaucoup de temps.</translation>
+      <translation>Vous êtes sur le point d'exporter une longue vidéo. Cela peut nécessiter beaucoup d'espace de stockage et prendre beaucoup de temps.</translation>
     </message>
     <message>
       <source>Add Info</source>
@@ -8454,7 +8454,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Image is not round</source>
-      <translation>L'image n’est pas rond</translation>
+      <translation>L'image n’est pas ronde</translation>
     </message>
     <message>
       <source>Image might be too dim</source>
@@ -8473,7 +8473,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>nx::vms::client::desktop::FisheyeSettingsWidget</name>
     <message>
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
-      <translation>Utilisez ce réglage pour compenser la distorsion si la caméra n'est pas monté exactement verticalement ou horizontalement.</translation>
+      <translation>Utilisez ce paramètre pour compenser la distorsion si la caméra n'est pas monté exactement verticalement ou horizontalement.</translation>
     </message>
     <message>
       <source>Equidistant</source>
@@ -8570,7 +8570,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Image cannot be loaded.</source>
-      <translation>Image ne peut pas être chargée.</translation>
+      <translation>Impossible de charger l'image.</translation>
     </message>
   </context>
   <context>
@@ -8627,7 +8627,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Custom number that can be assigned to a layout for quick identification and access</source>
-      <translation>Numéro personnalisé peut être attribué à une mise en page pour une identification et accès rapides</translation>
+      <translation>Numéro personnalisé qui peut être assigné à une mise en page pour une identification et un accès rapides</translation>
     </message>
     <message>
       <source>This ID is already used in the System. Use Generate button to find a free ID.</source>
@@ -8946,7 +8946,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Starting update to ...</source>
-      <translation>Démarrage de la mise à jour à ...</translation>
+      <translation>Démarrage de la mise à jour ...</translation>
     </message>
     <message>
       <source>Updating to ...</source>
@@ -8958,7 +8958,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>System updated to</source>
-      <translation>Système mis à jour à</translation>
+      <translation>Système mis à jour</translation>
     </message>
     <message>
       <source>Some servers have no update packages available.</source>
@@ -8998,7 +8998,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Update from mediaservers</source>
-      <translation>Mise à jour de mediaservers</translation>
+      <translation>Mise à jour depuis les serveurs de médias</translation>
     </message>
     <message>
       <source>Unable to check updates on the Internet</source>
@@ -9010,7 +9010,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>%n layouts</source>
       <translation>
-        <numerusform>%n mises en page</numerusform>
+        <numerusform>%n mise en page</numerusform>
         <numerusform>%n mises en page</numerusform>
       </translation>
     </message>

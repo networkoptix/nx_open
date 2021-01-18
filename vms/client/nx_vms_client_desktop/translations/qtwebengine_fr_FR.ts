@@ -211,11 +211,11 @@
     </message>
     <message>
       <source>Open link in new background tab</source>
-      <translation>Ouvrir le lien dans un nouvel onglet d'arrière-plan</translation>
+      <translation>Ouvrir le lien dans un nouvel onglet en arrière-plan</translation>
     </message>
     <message>
       <source>&amp;Bold</source>
-      <translation>&amp;Bold</translation>
+      <translation>&amp;Gras</translation>
     </message>
     <message>
       <source>&amp;Italic</source>
@@ -227,7 +227,7 @@
     </message>
     <message>
       <source>&amp;Strikethrough</source>
-      <translation>&amp;Strikethrough</translation>
+      <translation>&amp;Barré</translation>
     </message>
     <message>
       <source>Align &amp;Left</source>
@@ -247,11 +247,11 @@
     </message>
     <message>
       <source>&amp;Indent</source>
-      <translation>&amp;Indent</translation>
+      <translation>&amp;Indentation</translation>
     </message>
     <message>
       <source>&amp;Outdent</source>
-      <translation>&amp;Outdent</translation>
+      <translation>&amp;Réduire Indentation</translation>
     </message>
     <message>
       <source>Insert &amp;Ordered List</source>
@@ -259,7 +259,7 @@
     </message>
     <message>
       <source>Insert &amp;Unordered List</source>
-      <translation>Insérer liste &amp;Desordonné</translation>
+      <translation>Insérer liste &amp;Désordonné</translation>
     </message>
     <message>
       <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
@@ -279,7 +279,7 @@
     </message>
     <message>
       <source>Select folder to upload</source>
-      <translation>Sélectionner dossier à télécharger</translation>
+      <translation>Sélectionner le dossier à télécharger</translation>
     </message>
   </context>
   <context>
@@ -405,7 +405,7 @@
     </message>
     <message>
       <source>Javascript Prompt - %1</source>
-      <translation>Invite Javascript - %1</translation>
+      <translation>Avis de Javascript - %1</translation>
     </message>
     <message>
       <source>Are you sure you want to leave this page?</source>

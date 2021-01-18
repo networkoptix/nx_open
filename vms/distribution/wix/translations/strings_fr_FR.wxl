@@ -3,20 +3,20 @@
   <String Id="Caption">[WixBundleName] Installation - [WixBundleVersion]</String>
   <String Id="Title">[WixBundleName] - [WixBundleVersion]</String>
   <String Id="Components">[InstallerTitle]</String>
-  <String Id="HelpText">/ installer | / réparer | / désinstaller | / mise en page [directory] - installe, répare, désinstalle ou
-   crée une copie locale complète du bundle dans le répertoire. Installer est la valeur par défaut.
+  <String Id="HelpText">/install | /repair | /uninstall | /layout [directory] - installations, réparations, désinstalle ou
+   crée une copie locale complète du paquet dans le répertoire. L\'installation est la valeur par défaut.
 
-/ passif | / silencieux - affiche une interface utilisateur minimale sans invites ou n\'affiche aucune interface utilisateur et
-   aucune invite. Par défaut, l\'interface utilisateur et toutes les invites sont affichées.
+/passive | /quiet - affiche une interface minimale sans invite ou n\'affiche aucune interface utilisateur et
+   aucune invite de connexion. Par défaut l\'interface utilisateur et toutes les instructions sont affichées.
 
-/ norestart - supprime toute tentative de redémarrage. Par défaut, l\'interface utilisateur s\'affiche avant le redémarrage.
-/ log log.txt - enregistre dans un fichier spécifique. Par défaut, un fichier journal est créé dans %TEMP%.</String>
+/norestart - supprime toutes les tentatives de redémarrage. Par défaut, l\'interface utilisateur vous demandera avant de redémarrer.
+/log log. xt - log dans un fichier spécifique. Par défaut, un fichier journal est créé dans %TEMP%.</String>
   <String Id="ConfirmCancelMessage">Etes-vous sûr de vouloir annuler?</String>
   <String Id="ClientAndServer">Client et serveur</String>
   <String Id="ClientOnly">Client seulement</String>
   <String Id="ClientOnlyDesc">L’app cliente est pour visualiser la vidéo et de gérer le système</String>
   <String Id="ServerOnly">Server seulement</String>
-  <String Id="ServerOnlyDesc">L’application serveur est pour stocker les informations système et archives</String>
+  <String Id="ServerOnlyDesc">L\'application serveur est utilisée pour stocker les informations et les archives du système</String>
   <String Id="HelpHeader">Aide d’installation</String>
   <String Id="HelpCloseButton">Fermer</String>
   <String Id="InstallOptionsButton">Options</String>
