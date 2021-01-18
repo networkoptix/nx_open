@@ -28,6 +28,7 @@
 #include <client_core/client_core_module.h>
 #include <memory>
 #include <ui/workaround/gl_native_painting.h>
+#include <ui/workaround/sharp_pixmap_painting.h>
 #include <opengl_renderer.h>
 #include <ui/graphics/shaders/texture_color_shader_program.h>
 
@@ -526,7 +527,8 @@ void GraphicsQmlView::Private::ensureVao(QnTextureGLShaderProgram* shader)
 
 QSize GraphicsQmlView::Private::rounded(const QSizeF& size)
 {
-    return QSize(qCeil(size.width()), qCeil(size.height()));
+    // Round to the nearest integer to avoid artifacts when using GL_NEAREST.
+    return size.toSize();
 }
 
 void GraphicsQmlView::hoverMoveEvent(QGraphicsSceneHoverEvent* event)
@@ -688,7 +690,8 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
     functions->glBindTexture(GL_TEXTURE_2D, d->fbo->texture());
 
     const auto naturalFboSize = outputSize * devicePixelRatio;
-    const auto filter = QSizeF(d->fbo->size()) == naturalFboSize ? GL_NEAREST : GL_LINEAR;
+    const bool enableSharpPainting = QSizeF(d->fbo->size()) == naturalFboSize;
+    const auto filter = enableSharpPainting ? GL_NEAREST : GL_LINEAR;
     functions->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
     functions->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
 
@@ -703,6 +706,12 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
 
     auto shader = renderer->getTextureShader();
 
+    if (enableSharpPainting)
+    {
+        const auto modelView = sharpMatrix(renderer->pushModelViewMatrix());
+        renderer->setModelViewMatrix(modelView);
+    }
+
     d->ensureVao(shader);
     d->positionBuffer.bind();
     d->positionBuffer.write(0, posArray, kQuadArrayLength * sizeof(GLfloat));
@@ -713,6 +722,9 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
     shader->setTexture(0);
     renderer->drawBindedTextureOnQuadVao(&d->vertices, shader);
     shader->release();
+
+    if (enableSharpPainting)
+        renderer->popModelViewMatrix();
 
     QnGlNativePainting::end(painter);
 }

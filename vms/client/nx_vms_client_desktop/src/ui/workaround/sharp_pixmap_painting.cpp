@@ -1,5 +1,7 @@
 #include "sharp_pixmap_painting.h"
 
+#include <array>
+
 #include <utils/common/scoped_painter_rollback.h>
 
 #include <nx/utils/log/assert.h>
@@ -31,6 +33,39 @@ QTransform sharpTransform(const QTransform& transform, bool* corrected)
         *corrected = false;
 
     return transform;
+}
+
+QMatrix4x4 sharpMatrix(const QMatrix4x4& matrix, bool* corrected)
+{
+    static constexpr std::array kZeroIndices{1, 2, 3, 4, 6, 7, 8, 9, 11, 14};
+    static constexpr std::array kOneIndices{0, 5, 10, 15};
+    const auto data = matrix.data();
+
+    // Check for XY-only translation matrix, using lower precision than Qt.
+    if (std::all_of(
+            kZeroIndices.begin(),
+            kZeroIndices.end(),
+            [data](auto i) { return qAbs(data[i]) < kSharpnessEps; })
+        && std::all_of(
+            kOneIndices.begin(),
+            kOneIndices.end(),
+            [data](auto i) { return qAbs(data[i] - 1.0) < kSharpnessEps; }))
+    {
+        if (corrected)
+            *corrected = true;
+
+        QMatrix4x4 result; //< Start with identity matrix.
+
+        // Round the original translation vector components to the nearest integers.
+        result.data()[12] = std::round(data[12]); //< X translation.
+        result.data()[13] = std::round(data[13]); //< Y translation.
+        return result;
+    }
+
+    if (corrected)
+        *corrected = false;
+
+    return matrix;
 }
 
 void paintSharp(QPainter* painter, std::function<void(QPainter*)> paint)
