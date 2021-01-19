@@ -1267,6 +1267,8 @@ CameraDiagnostics::Result HanwhaResource::initMedia()
 
         initMediaStreamCapabilities();
     }
+    if (!m_capabilities.hasDualStreaming)
+        NX_DEBUG(this, "Camera %1, does not support dual streaming", this);
 
     return CameraDiagnostics::NoErrorResult();
 }

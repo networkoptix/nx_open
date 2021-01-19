@@ -601,6 +601,8 @@ void QnVideoCamera::at_camera_resourceChanged()
     {
         if (!cameraResource->hasDualStreaming() && m_secondaryReader)
         {
+            NX_DEBUG(this, "%1: Stop secondary reader, since dual streaming not supported now",
+                cameraResource);
             if (m_secondaryReader->isRunning())
                 m_secondaryReader->pleaseStop();
         }
