@@ -8298,7 +8298,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>AVI format is not recommended to export a recording with audio track.</source>
-      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
+      <translation>オーディオトラックを含む録画映像をエクスポートする場合、AVI形式は推奨しません。</translation>
     </message>
   </context>
   <context>

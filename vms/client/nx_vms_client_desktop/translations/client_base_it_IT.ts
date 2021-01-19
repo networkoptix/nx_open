@@ -8416,7 +8416,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>AVI format is not recommended to export a recording with audio track.</source>
-      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
+      <translation>Il formato AVI non è consigliato per esportare una registrazione con traccia audio.</translation>
     </message>
   </context>
   <context>

@@ -993,7 +993,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Show on Items</source>
       <translation type="unfinished">
-        <numerusform>Show on Items</numerusform>
+        <numerusform>Weergeven op items</numerusform>
         <numerusform>Show on Items</numerusform>
       </translation>
     </message>
@@ -1610,7 +1610,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>PTZ can only be used in the live mode</source>
-      <translation type="unfinished">PTZ can only be used in the live mode</translation>
+      <translation>PTZ kan alleen in de live-modus worden gebruikt</translation>
     </message>
   </context>
   <context>
@@ -8415,7 +8415,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>AVI format is not recommended to export a recording with audio track.</source>
-      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
+      <translation>AVI-indeling wordt niet aanbevolen om een opname met audiotrack te exporteren.</translation>
     </message>
   </context>
   <context>
@@ -10021,7 +10021,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Regions of Interest</source>
-      <translation type="unfinished">Regions of Interest</translation>
+      <translation>Interessante regio's</translation>
     </message>
   </context>
   <context>
