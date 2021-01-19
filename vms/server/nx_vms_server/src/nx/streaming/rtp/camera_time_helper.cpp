@@ -31,6 +31,12 @@ void CameraTimeHelper::setTimePolicy(TimePolicy policy)
     m_timePolicy = policy;
 }
 
+void CameraTimeHelper::reset()
+{
+    m_linearizer = RptTimeLinearizer();
+    m_localOffset.initialized = false;
+}
+
 microseconds CameraTimeHelper::getCameraTimestamp(
     uint32_t rtpTime,
     const RtcpSenderReport& senderReport,

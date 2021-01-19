@@ -53,6 +53,7 @@ public:
 
     void setResyncThreshold(std::chrono::milliseconds value) { m_resyncThreshold = value; }
     void setTimePolicy(TimePolicy policy);
+    void reset();
 
 private:
     struct RptTimeLinearizer
@@ -74,10 +75,10 @@ private:
     TimeOffsetPtr m_primaryOffset;
     TimeOffset m_localOffset; //< used in case when no rtcp reports
     std::chrono::milliseconds m_resyncThreshold;
-    std::chrono::milliseconds m_streamsSyncThreshold;
-    std::chrono::milliseconds m_forceCameraTimeThreshold;
+    const std::chrono::milliseconds m_streamsSyncThreshold;
+    const std::chrono::milliseconds m_forceCameraTimeThreshold;
+    const std::string m_resourceId;
     TimePolicy m_timePolicy = TimePolicy::bindCameraTimeToLocalTime;
-    std::string m_resourceId;
     RptTimeLinearizer m_linearizer;
     bool m_badCameraTimeState = false;
 };

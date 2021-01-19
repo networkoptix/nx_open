@@ -685,7 +685,7 @@ CameraDiagnostics::Result QnMulticodecRtpReader::openStream()
     m_pleaseStop = false;
     if (isStreamOpened())
         return CameraDiagnostics::NoErrorResult();
-    //m_timeHelper.reset();
+    m_timeHelper.reset();
     m_gotSomeFrame = false;
     m_RtpSession.setTransport(getRtpTransport());
 
