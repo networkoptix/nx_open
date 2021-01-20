@@ -1466,7 +1466,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Short</source>
-      <translation>短い形式</translation>
+      <translation>短い</translation>
     </message>
     <message numerus="yes">
       <source>Password must be at least %n characters long.</source>
@@ -1476,7 +1476,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Long</source>
-      <translation>長い形式</translation>
+      <translation>長い</translation>
     </message>
     <message numerus="yes">
       <source>Password must be no longer than %n characters.</source>

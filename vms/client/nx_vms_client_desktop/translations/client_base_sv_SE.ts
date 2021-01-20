@@ -8420,7 +8420,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>AVI format is not recommended to export a recording with audio track.</source>
-      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
+      <translation>AVI format rekommenderas inte att exportera en inspelning med ljudspår.</translation>
     </message>
   </context>
   <context>
