@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.3.847",
+    "version": "4.1.3.849",
     "data": [
         {
             "keys": [
@@ -4894,7 +4894,7 @@
             "fixupRequestUrls": true
         },
         {
-            "_comment1": "Mapping for firmware: 43.7.0.76-r2",
+            "_comment1": "Mapping for firmware: 43.7.0.76-r3",
             "keys": [
                 "Milesight*|MS-C2971*"
             ],
@@ -4908,12 +4908,12 @@
                     "y": {
                         "extrapolationMode": "ConstantExtrapolation",
                         "device":  [  -1,    1],
-                        "logical": [  -45,  30]
+                        "logical": [  5,  -90]
                     },
                     "z": {
                         "extrapolationMode": "ConstantExtrapolation",
-                        "device":  [0.083, 0.166, 0.262, 0.3458, 0.4166, 0.5375, 0.5833, 0.6667, 0.75, 0.8458, 0.9416, 1.00],
-                        "logical": [1.00 , 1.9375, 3, 4.1875, 5.0625, 6.25, 6.875, 7.9375, 8.875, 9.8125, 10.5625, 11.25],
+                        "device":  [0.0435, 0.115, 0.165, 0.213, 0.326, 0.565, 0.783, 1.00],
+                        "logical": [1.00, 1.889, 2.722, 3.722, 5.556, 8.778, 12.056, 14.056],
                         "logicalMultiplier": 37,
                         "space": "35MmEquiv"
                     }
@@ -4935,33 +4935,6 @@
                 "DW|DWC-M*"
             ],
             "fixupRequestUrls": true
-        },
-        {
-            "_comment1": "Mapping for firmware: 43.7.0.76-r2",
-            "keys": [
-                "Milesight*|MS-C2971*"
-            ],
-            "ptzMapper": {
-                "fromCamera": {
-                    "x": {
-                        "extrapolationMode": "PeriodicExtrapolation",
-                        "device":  [-1,   1],
-                        "logical": [ 360, 0]
-                    },
-                    "y": {
-                        "extrapolationMode": "ConstantExtrapolation",
-                        "device":  [  -1,    1],
-                        "logical": [  -45,  30]
-                    },
-                    "z": {
-                        "extrapolationMode": "ConstantExtrapolation",
-                        "device":  [0.083, 0.166, 0.262, 0.3458, 0.4166, 0.5375, 0.5833, 0.6667, 0.75, 0.8458, 0.9416, 1.00],
-                        "logical": [1.00 , 1.9375, 3, 4.1875, 5.0625, 6.25, 6.875, 7.9375, 8.875, 9.8125, 10.5625, 11.25],
-                        "logicalMultiplier": 37,
-                        "space": "35MmEquiv"
-                    }
-                }
-            }
         },
         {
             "_comment1": "Mapped for V5.5.41 build 200709",
