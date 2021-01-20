@@ -9,7 +9,6 @@
 namespace nx::vms::client::desktop {
 
 class AnalyticsSearchWidget;
-class AnalyticsObjectsVisualizationManager;
 
 /**
  * An utility class to synchronize Right Panel analytics tab state with current media widget
@@ -36,7 +35,6 @@ private:
 
 private:
     const QPointer<AnalyticsSearchWidget> m_analyticsSearchWidget;
-    const QPointer<AnalyticsObjectsVisualizationManager> m_objectsVisualizationManager;
     QMetaObject::Connection m_activeMediaWidgetConnection;
     bool m_areaSelectionActive = false;
     analytics::db::Filter m_filter;

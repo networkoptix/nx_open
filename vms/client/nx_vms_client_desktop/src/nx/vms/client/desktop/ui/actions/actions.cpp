@@ -9,7 +9,6 @@
 #include <nx/fusion/model_functions.h>
 #include <nx/network/app_info.h>
 #include <nx/utils/app_info.h>
-#include <nx/vms/client/desktop/analytics/analytics_menu_action_factory.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/layout_tour/layout_tour_actions.h>
@@ -1178,11 +1177,6 @@ void initialize(Manager* manager, Action* root)
         .autoRepeat(false)
         .condition(ConditionWrapper(new AdjustVideoCondition())
             && !condition::isLayoutTourReviewMode());
-
-    factory(AnalyticsObjectsVisualizationModeAction)
-        .flags(Scene | SingleTarget | MultiTarget | LayoutItemTarget)
-        .text(ContextMenu::tr("Objects Frames and Info..."))
-        .childFactory(new AnalyticsMenuActionFactory(manager));
 
     factory(CreateZoomWindowAction)
         .flags(SingleTarget | WidgetTarget)

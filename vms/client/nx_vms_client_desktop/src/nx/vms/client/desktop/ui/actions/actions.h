@@ -1196,11 +1196,6 @@ enum IDType
     OpenNewSceneAction,
 
     /**
-     * Control in which mode analytics objects must be displayed for the selected cameras.
-     */
-    AnalyticsObjectsVisualizationModeAction,
-
-    /**
      * Connect to chosen server and select it as preferred.
      */
     SelectCurrentServerAction,

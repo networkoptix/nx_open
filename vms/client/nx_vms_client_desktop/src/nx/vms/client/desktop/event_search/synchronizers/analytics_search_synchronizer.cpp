@@ -20,7 +20,6 @@
 
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/analytics/analytics_objects_visualization_manager.h>
 #include <nx/vms/client/desktop/event_search/widgets/analytics_search_widget.h>
 #include <nx/vms/client/desktop/utils/video_cache.h>
 
@@ -43,11 +42,9 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
     QObject* parent)
     :
     AbstractSearchSynchronizer(context, parent),
-    m_analyticsSearchWidget(analyticsSearchWidget),
-    m_objectsVisualizationManager(context->instance<AnalyticsObjectsVisualizationManager>())
+    m_analyticsSearchWidget(analyticsSearchWidget)
 {
     NX_CRITICAL(m_analyticsSearchWidget);
-    NX_CRITICAL(m_objectsVisualizationManager);
 
     connect(this, &AbstractSearchSynchronizer::mediaWidgetAboutToBeChanged, this,
         [this]() { QObject::disconnect(m_activeMediaWidgetConnection); });
@@ -134,32 +131,6 @@ AnalyticsSearchSynchronizer::AnalyticsSearchSynchronizer(
             widget->disconnect(this);
         });
 
-    connect(m_objectsVisualizationManager, &AnalyticsObjectsVisualizationManager::modeChanged,
-        this,
-        [this](const QnLayoutItemIndex& index, AnalyticsObjectsVisualizationMode value)
-        {
-            const auto currentLayout = workbench()->currentLayout();
-            if (index.layout() != currentLayout->resource())
-                return;
-
-            const auto item = currentLayout->item(index.uuid());
-            if (!item)
-                return;
-
-            if (const auto widget = asMediaWidget(display()->widget(item)))
-                updateMediaResourceWidgetAnalyticsMode(widget);
-
-            // Cleanup analytics areas on all target widget zoom windows.
-            for (const auto zoomItem: currentLayout->zoomItems(item))
-            {
-                if (const auto widget = asMediaWidget(display()->widget(zoomItem)))
-                {
-                    NX_ASSERT(widget->isZoomWindow());
-                    updateMediaResourceWidgetAnalyticsMode(widget);
-                }
-            }
-        });
-
     m_analyticsSearchWidget->setLiveTimestampGetter(
         [this](const QnVirtualCameraResourcePtr& camera) -> milliseconds
         {
@@ -200,20 +171,7 @@ bool AnalyticsSearchSynchronizer::calculateMediaResourceWidgetAnalyticsEnabled(
     if (!widget->isAnalyticsSupported())
         return false;
 
-    if (this->active())
-        return true;
-
-    const auto currentLayout = workbench()->currentLayout()->resource();
-    if (!currentLayout)
-        return false;
-
-    const auto item = widget->item();
-    NX_ASSERT(item);
-    if (!item)
-        return false;
-
-    const QnLayoutItemIndex index(currentLayout, item->uuid());
-    return m_objectsVisualizationManager->mode(index) == AnalyticsObjectsVisualizationMode::always;
+    return active();
 }
 
 void AnalyticsSearchSynchronizer::updateAreaSelection()
