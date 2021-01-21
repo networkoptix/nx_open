@@ -7,6 +7,8 @@
 
 namespace nx::streaming::rtp {
 
+static constexpr int kMaxMetadataPacketSizeBytes = 10'000'000;
+
 void BaseMetadataRtpParser::setSdpInfo(const Sdp::Media& sdp)
 {
     NX_DEBUG(this, "Got SDP information about the media track: %1", sdp);
@@ -58,16 +60,38 @@ StreamParser::Result BaseMetadataRtpParser::processData(
     }
 
     const auto* const rtpHeader = (RtpHeader*)(currentRtpPacketBuffer);
-    m_currentDataChunkTimestamp = ntohl(rtpHeader->timestamp);
+    if (rtpHeader->marker)
+        m_trustMarkerBit = true;
+
+    const uint32_t currentDataChunkTimestamp = ntohl(rtpHeader->timestamp);
+
+    if ((m_previousDataChunkTimestamp
+        && *m_previousDataChunkTimestamp != currentDataChunkTimestamp
+        && !m_trustMarkerBit)
+        || (m_buffer.size() > kMaxMetadataPacketSizeBytes))
+    {
+        NX_VERBOSE(this,
+            "Got an RTP packet with timestamp that differs from the previous packet, "
+            "creating metadata");
+
+        m_metadata = makeCompressedMetadata(*m_previousDataChunkTimestamp);
+        if (m_metadata)
+            gotData = true;
+    }
+
+    m_previousDataChunkTimestamp = currentDataChunkTimestamp;
 
     m_buffer.append(
         (const char*)(currentRtpPacketBuffer + *fullRtpHeaderSize),
         bytesRead - *fullRtpHeaderSize);
 
+    if (gotData)
+        return { true };
+
     if (rtpHeader->marker)
     {
         NX_VERBOSE(this, "Got an RTP packet with the marker bit set, creating metadata");
-        m_metadata = makeCompressedMetadata();
+        m_metadata = makeCompressedMetadata(currentDataChunkTimestamp);
         if (m_metadata)
             gotData = true;
     }
@@ -80,13 +104,13 @@ void BaseMetadataRtpParser::cleanUpOnError()
     m_buffer.clear();
 }
 
-QnCompressedMetadataPtr BaseMetadataRtpParser::makeCompressedMetadata()
+QnCompressedMetadataPtr BaseMetadataRtpParser::makeCompressedMetadata(int32_t timestamp)
 {
     const auto metadataPacket = std::make_shared<InStreamCompressedMetadata>(
         m_sdp.rtpmap.codecName,
         std::move(m_buffer));
 
-    metadataPacket->timestamp = m_currentDataChunkTimestamp;
+    metadataPacket->timestamp = timestamp;
 
     m_buffer.clear();
 

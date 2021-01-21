@@ -1,4 +1,5 @@
 #include <set>
+#include <optional>
 
 #include <nx/utils/buffer.h>
 
@@ -8,7 +9,6 @@ namespace nx::streaming::rtp {
 
 class BaseMetadataRtpParser: public StreamParser
 {
-    static constexpr int kInvalidTimestamp = -1;
 
 public:
     virtual void setSdpInfo(const Sdp::Media& sdp) override;
@@ -24,12 +24,13 @@ public:
 private:
     void cleanUpOnError();
 
-    QnCompressedMetadataPtr makeCompressedMetadata();
+    QnCompressedMetadataPtr makeCompressedMetadata(int32_t timestamp);
 
 private:
     Sdp::Media m_sdp;
     nx::Buffer m_buffer;
-    int32_t m_currentDataChunkTimestamp = kInvalidTimestamp;
+    std::optional<uint32_t> m_previousDataChunkTimestamp;
+    bool m_trustMarkerBit = false;
     QnCompressedMetadataPtr m_metadata;
 };
 
