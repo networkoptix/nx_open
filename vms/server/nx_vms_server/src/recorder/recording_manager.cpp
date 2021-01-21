@@ -350,19 +350,18 @@ void QnRecordingManager::startOrStopRecording(
             startRecording(camera, recorders.recorderHiRes, providerHi,
                 QnServer::HiQualityCatalog, recorders.dualStreamingHelper);
 
-        if (providerLow)
-        {
-            const auto currentFps = recorders.recorderHiRes
-                ? recorders.recorderHiRes->recorder->currentScheduleTask().fps : 0;
+        const auto currentFps = recorders.recorderHiRes
+            ? recorders.recorderHiRes->recorder->currentScheduleTask().fps : 0;
 
-            // second stream should run if camera do not share fps or at least MIN_SECONDARY_FPS frames left for second stream
-            bool runSecondStream = cameraRes->isEnoughFpsToRunSecondStream(currentFps) &&
-                                    cameraRes->hasDualStreaming() && providerLow;
-            if (runSecondStream)
-                startRecording(camera, recorders.recorderLowRes, providerLow,
-                    QnServer::LowQualityCatalog, recorders.dualStreamingHelper);
-            else
-                stopRecording(camera, recorders.recorderLowRes, providerLow);
+        // second stream should run if camera do not share fps or at least MIN_SECONDARY_FPS frames left for second stream
+        if (providerLow && cameraRes->isEnoughFpsToRunSecondStream(currentFps))
+        {
+            startRecording(camera, recorders.recorderLowRes, providerLow,
+                QnServer::LowQualityCatalog, recorders.dualStreamingHelper);
+        }
+        else
+        {
+            stopRecording(camera, recorders.recorderLowRes, providerLow);
         }
     }
     else
