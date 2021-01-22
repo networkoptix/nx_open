@@ -9,6 +9,7 @@
 #include "hanwha_archive_delegate.h"
 #include "hanwha_chunk_loader.h"
 #include "hanwha_firmware.h"
+#include "hanwha_default_password_api.h"
 #include "vms_server_hanwha_ini.h"
 
 #include <QtCore/QMap>
@@ -30,6 +31,7 @@
 #include <nx/vms/server/resource/shared_context_pool.h>
 #include <nx/streaming/abstract_archive_delegate.h>
 #include <nx/vms/server/plugins/resource_data_support/hanwha.h>
+#include <nx/network/http/http_client.h>
 
 #include <core/resource_management/resource_discovery_manager.h>
 #include <core/resource/media_stream_capability.h>
@@ -550,6 +552,10 @@ CameraDiagnostics::Result HanwhaResource::ensureMulticastEnabled(Qn::ConnectionR
 
 QnAbstractStreamDataProvider* HanwhaResource::createLiveDataProvider()
 {
+    // No API is available if camera requires changing password.
+    if (m_requiresCustomPassword)
+        return  nullptr;
+
     return new HanwhaStreamReader(toSharedPointer(this));
 }
 
@@ -944,6 +950,16 @@ CameraDiagnostics::Result HanwhaResource::initDevice()
             std::chrono::seconds(ini().chunkReaderResponseTimeoutS),
             std::chrono::seconds(ini().chunkReaderMessageBodyTimeoutS)
         });
+
+    if (const auto defaultPasswordInfo = HanwhaDefaultPasswordApi(this).fetchInfo())
+    {
+        m_requiresCustomPassword = !defaultPasswordInfo->isInitialized;
+        if (m_requiresCustomPassword)
+        {
+            isDefaultPassword = true;
+            return CameraDiagnostics::NoErrorResult();
+        }
+    }
 
     const auto info = m_sharedContext->information();
     if (!info)
@@ -3908,6 +3924,17 @@ QnConstResourceAudioLayoutPtr HanwhaResource::getAudioLayout(
 
 bool HanwhaResource::setCameraCredentialsSync(const QAuthenticator& auth, QString* outErrorString)
 {
+    if (m_requiresCustomPassword)
+    {
+        HanwhaDefaultPasswordApi helper(this);
+        const bool result = helper.setPassword(auth.password());
+
+        if (result)
+            m_requiresCustomPassword = false;
+
+        return result;
+    }
+
     HanwhaRequestHelper helper(sharedContext());
     auto response = helper.view(lit("security/users"));
     if (!response.isSuccessful())

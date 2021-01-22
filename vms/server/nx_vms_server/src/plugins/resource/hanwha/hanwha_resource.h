@@ -400,6 +400,8 @@ private:
     std::shared_ptr<HanwhaSharedResourceContext> m_sharedContext;
     std::unique_ptr<HanwhaRemoteArchiveManager> m_remoteArchiveManager;
     std::unique_ptr<HanwhaArchiveDelegate> m_remoteArchiveDelegate;
+
+    bool m_requiresCustomPassword = false;
 };
 
 } // namespace plugins

@@ -191,6 +191,8 @@ bool ratioComparator(const QString& lhs, const QString& rhs);
 qint64 hanwhaDateTimeToMsec(const QByteArray& value, std::chrono::milliseconds timeShift = {});
 QDateTime toHanwhaDateTime(qint64 valueMs, std::chrono::milliseconds timeShift = {});
 
+nx::Buffer encryptPasswordUrlEncoded(const nx::Buffer& password, const nx::Buffer& publicKey);
+
 } // namespace plugins
 } // namespace vms::server
 } // namespace nx

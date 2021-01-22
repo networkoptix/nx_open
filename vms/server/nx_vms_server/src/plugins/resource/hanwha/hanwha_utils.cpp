@@ -1,7 +1,14 @@
 #include "hanwha_utils.h"
 #include "hanwha_common.h"
 
+#include <openssl/rsa.h>
+#include <openssl/pem.h>
+#include <openssl/bio.h>
+#include <openssl/err.h>
+
 #include <utils/common/app_info.h>
+
+#include <nx/utils/type_utils.h>
 
 namespace nx {
 namespace vms::server {
@@ -592,6 +599,47 @@ QDateTime toHanwhaDateTime(qint64 valueMs, std::chrono::milliseconds timeShift)
 {
     return QDateTime::fromMSecsSinceEpoch(valueMs, Qt::OffsetFromUTC)
         .addMSecs(-std::chrono::milliseconds(timeShift).count());
+}
+
+nx::Buffer encryptPasswordUrlEncoded(const nx::Buffer& password, const nx::Buffer& publicKey)
+{
+    nx::Buffer encryptedPassword;
+
+    const auto keyBio = nx::utils::wrapUnique(BIO_new_mem_buf(publicKey.data(), -1), &BIO_free_all);
+
+    RSA* rsaPtr = RSA_new();
+    rsaPtr = PEM_read_bio_RSAPublicKey(keyBio.get(), &rsaPtr, NULL, NULL);
+
+    const auto rsa = nx::utils::wrapUnique(rsaPtr, &RSA_free);
+
+    // Get the maximum length of the data block that RSA can process at a time.
+    const int encryptedChunkSize = RSA_size(rsa.get());
+
+    std::vector<char> encryptedChunkBuffer;
+    encryptedChunkBuffer.reserve(encryptedChunkSize + 1);
+    memset(encryptedChunkBuffer.data(), 0, encryptedChunkSize + 1);
+
+    // Because the filling method is RSA_PKCS1_PADDING, so we need to subtract 11
+    // (no idea why exactly 11).
+    const int blockLength = encryptedChunkSize - 11;
+    nx::Buffer blockForEncryption;
+    // Encrypt the data in segments.
+    for (int position = 0; position < password.length(); position += blockLength)
+    {
+        blockForEncryption = password.mid(position, blockLength);
+        memset(encryptedChunkBuffer.data(), 0, encryptedChunkSize + 1);
+        const int bytesEncrypted = RSA_public_encrypt(
+            blockForEncryption.length(),
+            (const unsigned char*) blockForEncryption.data(),
+            (unsigned char*) encryptedChunkBuffer.data(),
+            rsa.get(),
+            RSA_PKCS1_PADDING);
+
+        if (bytesEncrypted >= 0)
+            encryptedPassword.append(nx::Buffer(encryptedChunkBuffer.data(), bytesEncrypted));
+    }
+
+    return QUrl::toPercentEncoding(encryptedPassword.toBase64());
 }
 
 } // namespace plugins
