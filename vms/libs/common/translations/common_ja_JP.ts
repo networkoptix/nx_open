@@ -164,17 +164,17 @@
     <message>
       <source>%1 System can only be merged with non-%1. System name and password are taken from %1 System.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 システムはクラウドに接続されていない-%1 システムとのみ統合できます. システム名とパスワードは %1 システムから取得されます.</translation>
+      <translation>%1 システムは %1 に接続されていないシステムとのみ統合できます。システム名とパスワードは %1 システムから取得されます。</translation>
     </message>
     <message>
       <source>Both Systems are connected to %1. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>両方のシステムは %1 に接続しています　統合は許可されていません</translation>
+      <translation>両方のシステムが %1 に接続しています。統合は許可されません。</translation>
     </message>
     <message>
       <source>These Systems are built with different %1 URL. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>これらのシステムは異なる %1 の URL で構築されています　統合は許可されていません</translation>
+      <translation>これらのシステムは異なる %1 のURLで構築されています。統合は許可されません。</translation>
     </message>
     <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>

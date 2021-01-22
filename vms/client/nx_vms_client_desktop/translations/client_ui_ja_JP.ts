@@ -703,7 +703,7 @@
     <message>
       <location/>
       <source>Native</source>
-      <translation>モニタ解像度と同じ</translation>
+      <translation>カメラ</translation>
     </message>
     <message>
       <location/>

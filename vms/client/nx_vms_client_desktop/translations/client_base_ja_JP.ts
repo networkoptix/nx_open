@@ -6576,7 +6576,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Web Page</source>
-      <translation>ウェブページ:</translation>
+      <translation>ウェブページ</translation>
     </message>
   </context>
   <context>
@@ -7597,7 +7597,7 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Native</source>
       <comment>Native PTZ preset type</comment>
-      <translation>モニタ解像度と同じ</translation>
+      <translation>カメラ</translation>
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
@@ -8298,7 +8298,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>AVI format is not recommended to export a recording with audio track.</source>
-      <translation>オーディオトラックを含む録画映像をエクスポートする場合、AVI形式は推奨しません。</translation>
+      <translation>オーディオトラックを含む録画映像をエクスポートする場合、AVI形式は推奨されません。</translation>
     </message>
   </context>
   <context>
