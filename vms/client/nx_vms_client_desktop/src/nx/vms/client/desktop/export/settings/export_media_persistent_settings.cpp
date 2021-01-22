@@ -167,8 +167,7 @@ OverlaySettingsPtr ExportTimestampOverlayPersistentSettings::createRuntimeSettin
     std::unique_ptr<QTextDocument> document = createDocument();
 
     document->setDocumentMargin(indent);
-    document->setTextWidth(qMin<int>(document->size().width(), maxOverlayWidth));
-
+    document->setTextWidth(qMin<qreal>(document->idealWidth(), maxOverlayWidth));
     return createRuntimeSettingsFromDocument(std::move(document));
 }
 
