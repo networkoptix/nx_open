@@ -1,6 +1,6 @@
 {
     "streamTypeFilter": "metadata",
-    "capabilities": "deviceDependent|noAutoBestShots",
+    "capabilities": "deviceDependent|noAutoBestShots|keepObjectBoundingBoxRotation",
     "eventTypes": [
         {
             "id": "nx.hikvision.loitering",
