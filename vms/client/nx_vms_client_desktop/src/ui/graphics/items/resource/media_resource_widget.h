@@ -328,7 +328,7 @@ private slots:
     void processEnableLicenseRequest();
     void processMoreLicensesRequest();
     void at_renderWatcher_widgetChanged(QnResourceWidget* widget);
-    void at_zoomRectChanged();
+    void handleZoomRectChanged();
     void at_ptzController_changed(Qn::PtzDataFields fields);
 
     void at_entropixEnhancementButton_clicked();

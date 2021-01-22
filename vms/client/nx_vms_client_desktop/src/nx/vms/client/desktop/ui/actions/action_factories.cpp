@@ -407,7 +407,8 @@ QAction* ShowOnItemsFactory::initObjectsAction(const Parameters& parameters, QOb
     for (const auto widget: widgets)
     {
         const auto w = qobject_cast<QnMediaResourceWidget*>(widget);
-        if (!w || !w->isAnalyticsSupported())
+        // No menu option for zoom windows.
+        if (!w || !w->isAnalyticsSupported() || w->zoomRect().isValid())
             return nullptr;
         actualWidgets.append(w);
     }
@@ -444,7 +445,8 @@ QAction* ShowOnItemsFactory::initRoiAction(const Parameters& parameters, QObject
     for (const auto widget: widgets)
     {
         const auto w = qobject_cast<QnMediaResourceWidget*>(widget);
-        if (!w)
+        // No menu option for zoom windows.
+        if (!w || w->zoomRect().isValid())
             return nullptr;
 
         const auto camera = w->resource().dynamicCast<QnVirtualCameraResource>();

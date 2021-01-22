@@ -391,7 +391,7 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
         &QnMediaResourceWidget::updateButtonsVisibility); // TODO: #GDM #Common get rid of resourceChanged
 
     connect(this, &QnResourceWidget::zoomRectChanged, this,
-        &QnMediaResourceWidget::at_zoomRectChanged);
+        &QnMediaResourceWidget::handleZoomRectChanged);
     connect(context->instance<QnWorkbenchRenderWatcher>(), &QnWorkbenchRenderWatcher::widgetChanged,
         this, &QnMediaResourceWidget::at_renderWatcher_widgetChanged);
 
@@ -447,6 +447,8 @@ QnMediaResourceWidget::QnMediaResourceWidget(QnWorkbenchContext* context, QnWork
     setAnalyticsObjectsVisible(item->displayAnalyticsObjects(), false);
     setRoiVisible(item->displayRoi(), false);
     updateButtonsVisibility();
+
+    handleZoomRectChanged();
 }
 
 QnMediaResourceWidget::~QnMediaResourceWidget()
@@ -2566,11 +2568,19 @@ void QnMediaResourceWidget::at_renderWatcher_widgetChanged(QnResourceWidget *wid
         updateRendererEnabled();
 }
 
-void QnMediaResourceWidget::at_zoomRectChanged()
+void QnMediaResourceWidget::handleZoomRectChanged()
 {
     updateButtonsVisibility();
     updateAspectRatio();
     updateIconButton();
+
+    // We never show analytics-related stuff for zoom windows
+    if (zoomRect().isValid())
+    {
+        setRoiVisible(/*visible*/ false, /*animated*/ false);
+        setAnalyticsObjectsVisible(/*visible*/ false, /*animated*/ false);
+        setAnalyticsObjectsVisibleForcefully(/*visible*/ false, /*animated*/ false);
+    }
 
     // TODO: #PTZ probably belongs to instrument.
     if (options() & DisplayDewarped)
@@ -2912,6 +2922,7 @@ bool QnMediaResourceWidget::isAnalyticsObjectsVisible() const
 
 void QnMediaResourceWidget::setAnalyticsObjectsVisible(bool visible, bool animate)
 {
+    visible = visible && zoomRect().isEmpty(); //< Don not show analytics for zoom windows.
     if (isAnalyticsObjectsVisible() == visible)
         return;
 
@@ -2927,6 +2938,7 @@ bool QnMediaResourceWidget::isAnalyticsObjectsVisibleForcefully() const
 
 void QnMediaResourceWidget::setAnalyticsObjectsVisibleForcefully(bool visible, bool animate)
 {
+    visible = visible && zoomRect().isEmpty(); //< Don not show analytics for zoom windows.
     d->analyticsObjectsVisibleForcefully = visible;
     setAnalyticsModeEnabled(visible || isAnalyticsObjectsVisible(), animate);
 }
