@@ -9465,7 +9465,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Email address is not set for %n users</source>
       <translation>
-        <numerusform>Emailアドレスがユーザー %n に設定されていません</numerusform>
+        <numerusform>%n ユーザーのEmailアドレスが設定されていません</numerusform>
       </translation>
     </message>
     <message>
