@@ -51,15 +51,6 @@
             "internalName": "Detect_any_object",
             "description": "New object(s) detected"
         },
-
-        {
-            "id": "nx.bosch.Detect_any_motion",
-            "name": "MOTION+: Detect any motion",
-            "autodetect": false,
-            "internalName": "Detect_any_motion",
-            "description": "IVA motion detected"
-        },
-
         {
             "id": "nx.bosch.IVA.Intrusion.Objekt_in_Field_1",
             "name": "IVA: Intrusion (one field). Object in field",
@@ -204,6 +195,13 @@
             "positiveState": "started",
             "negativeState": "stopped",
             "flags": "stateDependent"
+        },
+        {
+            "id": "nx.bosch.Detect_any_motion",
+            "name": "MOTION+: Detect any motion",
+            "autodetect": false,
+            "internalName": "Detect_any_motion",
+            "description": "IVA motion detected"
         }
     ]
 }
