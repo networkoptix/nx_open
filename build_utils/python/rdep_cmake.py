@@ -79,12 +79,21 @@ class RdepSyncher:
         with open(cmake_include_file, "w") as f:
             f.write("# Packages.\n")
             f.write("set(rdep_package_names\n")
-            for package_name in self._synched_packages.keys():
-                f.write(f'    "{package_name}"\n')
+            f.writelines([f'    "{name}"\n' for name in self._synched_packages.keys()])
             f.write(")\n")
-            f.write("".join(
-                f'set(RDEP_{pack.upper()}_ROOT "{path}")\n'
-                for pack, path in self._synched_packages.items()))
+
+            f.write("\n# Package paths.\n")
+            f.writelines(
+                [f'set(RDEP_{name.upper()}_ROOT "{path}")\n'
+                for name, path in self._synched_packages.items()])
+
+            f.write("\n# Package uniqueness checks.\n")
+            f.writelines([
+                (f"if(CONAN_{name.upper()}_ROOT)\n"
+                f'    message(FATAL_ERROR "Package {name} exists in both RDep and Conan pacakge '
+                'managers. Generation can not proceed.")\n'
+                "endif()\n")
+                for name in self._synched_packages.keys()])
 
             f.write("\n# Package versions.\n")
             for k, v in self.versions.items():

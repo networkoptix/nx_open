@@ -365,3 +365,29 @@ function(nx_remove_proprietary_docs input output)
 
     nx_store_known_file(${output})
 endfunction()
+
+function(nx_check_package_paths_changes package_type)
+    set(package_list_name ${package_type}_package_names)
+    foreach(package ${${package_list_name}})
+        string(TOUPPER "${package_type}_${package}_ROOT" package_path_variable_name)
+        string(TOUPPER "PACKAGE_${package}_ROOT" cached_path_variable_name)
+
+        if(NOT DEFINED ${cached_path_variable_name})
+            set(${cached_path_variable_name} "${${package_path_variable_name}}"
+                CACHE INTERNAL "Path to package ${package}."
+            )
+        elseif(NOT "${${cached_path_variable_name}}" STREQUAL "${${package_path_variable_name}}")
+            if(NOT ${package} IN_LIST cache_spoiling_packages)
+                continue()
+            endif()
+
+            message(FATAL_ERROR
+                "\nPath to package ${package} has been changed from "
+                "\"${${cached_path_variable_name}}\" to \"${${package_path_variable_name}}\".\n"
+                "You should manually remove CMakeCache.txt from the build directory.\n"
+                "ATTENTION: This will lead to reseting all the custom build parameters that could "
+                "have been added by you and you will have to restore them manually.\n"
+            )
+        endif()
+    endforeach()
+endfunction()

@@ -8,6 +8,18 @@ set(customWebAdminPackageDirectory "" CACHE STRING
     "Custom location of server-external package")
 mark_as_advanced(customWebAdminPackageDirectory)
 
+# List of packages for which change in path must entail reset of cache variables. TODO: Add
+# explicit variable lists to reset them instead of failing generation.
+set(cache_spoiling_packages
+    "android-ndk"
+    "clang"
+    "doxygen"
+    "firebase"
+    "gcc-toolchain"
+    "qt"
+    "wix"
+)
+
 set(cmake_include_file ${CMAKE_BINARY_DIR}/dependencies.cmake)
 
 set(sync_target ${targetDevice})
@@ -191,4 +203,6 @@ macro(load_dependencies)
             set(RDEP_ANDROID-SDK_ROOT $ENV{ANDROID_HOME})
         endif()
     endif()
+
+    nx_check_package_paths_changes(rdep)
 endmacro()
