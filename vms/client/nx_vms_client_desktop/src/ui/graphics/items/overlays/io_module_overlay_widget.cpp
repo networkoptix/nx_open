@@ -198,6 +198,14 @@ void QnIoModuleOverlayWidgetPrivate::setIOModule(const QnVirtualCameraResourcePt
 void QnIoModuleOverlayWidgetPrivate::setPorts(const QnIOPortDataList& newPorts)
 {
     ports = newPorts;
+    std::sort(ports.begin(), ports.end(),
+        [](const QnIOPortData& left, const QnIOPortData& right)
+        {
+            return nx::utils::naturalStringCompare(
+                left.getName(),
+                right.getName(),
+                Qt::CaseInsensitive) < 0;
+        });
 
     for (const auto& port : ports)
     {

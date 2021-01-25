@@ -46,6 +46,16 @@ static constexpr auto kMaxQuality = Qn::StreamQuality::highest;
 static constexpr int kMinArchiveDaysAlertThreshold = 5;
 static constexpr auto kPreRecordingAlertThreshold = 30s;
 
+QnIOPortDataList sortedPorts(QnIOPortDataList ports)
+{
+    std::sort(ports.begin(), ports.end(),
+        [](const QnIOPortData& left, const QnIOPortData& right)
+        {
+            return nx::utils::naturalStringCompare(left.id, right.id, Qt::CaseInsensitive) < 0;
+        });
+    return ports;
+}
+
 template<class Data>
 void fetchFromCameras(
     UserEditableMultiple<Data>& value,
@@ -768,7 +778,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
                 QnLexical::deserialized<vms::api::IoModuleVisualStyle>(
                     firstCamera->getProperty(ResourcePropertyKey::kIoOverlayStyle), {}));
 
-            state.singleIoModuleSettings.ioPortsData.setBase(firstCamera->ioPortDescriptions());
+            state.singleIoModuleSettings.ioPortsData.setBase(
+                sortedPorts(firstCamera->ioPortDescriptions()));
         }
 
         state.singleCameraSettings.logicalId.setBase(firstCamera->logicalId());
@@ -1291,7 +1302,7 @@ State CameraSettingsDialogStateReducer::setIoPortDataList(
     if (!state.isSingleCamera() || state.devicesDescription.isIoModule != CombinedValue::All)
         return state;
 
-    state.singleIoModuleSettings.ioPortsData.setUser(value);
+    state.singleIoModuleSettings.ioPortsData.setUser(sortedPorts(value));
     state.hasChanges = true;
     return state;
 }
