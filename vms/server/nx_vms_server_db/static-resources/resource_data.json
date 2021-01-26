@@ -4903,7 +4903,7 @@
                     "x": {
                         "extrapolationMode": "PeriodicExtrapolation",
                         "device":  [-1,   1],
-                        "logical": [ 360, 0]
+                        "logical": [ 0, 360]
                     },
                     "y": {
                         "extrapolationMode": "ConstantExtrapolation",
