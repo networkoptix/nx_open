@@ -153,15 +153,15 @@ def sync_dependencies(target, syncher, platform, arch, box, release_version, opt
             sync("linux/clang")
     elif platform == "android":
         if "ANDROID_HOME" not in os.environ:
-            sync("android/android-sdk", path_variable="android_sdk_directory")
+            sync("android/android-sdk")
         if "ANDROID_NDK" not in os.environ:
             sync("android/android-ndk")
 
-    sync("any/cloud_hosts")
-    sync("qt", path_variable="QT_DIR")
+    sync("any/cloud_hosts", version="")
+    sync("qt")
     sync("any/boost")
 
-    sync("any/detection_plugin_interface")
+    sync("any/detection_plugin_interface", version="")
 
     if box in ("bpi", "edge1"):
         sync("linux_arm32/openssl")
@@ -171,76 +171,75 @@ def sync_dependencies(target, syncher, platform, arch, box, release_version, opt
     if box in ("bpi", "edge1"):
         sync("linux_arm32/ffmpeg")
     else:
+        if (platform, arch, box) == ("linux", "arm32", "none"):
+            sync("rpi/ffmpeg", do_not_include=True)
         sync("ffmpeg")
 
-    if (platform, arch, box) == ("linux", "arm", "none"):
-        sync("rpi/ffmpeg", do_not_include=True)
-
     if platform == "linux":
-        sync("sysroot", path_variable="sysroot_directory")
+        sync("sysroot")
 
     if platform in ("android", "windows") or box == "bpi":
         sync("openal")
 
     if platform == "windows":
-        sync("icu", path_variable="icu_directory")
+        sync("icu")
         sync("directx")
-        sync("vmaxproxy-2.1")
-        sync("ucrt-10-redist", path_variable="ucrt_directory")
-        sync("msvc-2017-redist", path_variable="vcrt_directory")
-        sync("windows/wix-3.11", path_variable="wix_directory")
-        sync("windows/ilmerge", path_variable="ilmerge_directory")
+        sync("vmaxproxy", version="2.1")
+        sync("ucrt", version="10-redist")
+        sync("msvc", version="2017-redist")
+        sync("windows/wix", version="3.11")
+        sync("windows/ilmerge", version="")
         sync("intel-media-sdk")
         sync("glew")
 
     if platform in ("windows", "linux"):
-        sync("%s/pandoc" % platform, path_variable="pandoc_directory")
+        sync("%s/pandoc" % platform)
 
     if box == "edge1":
-        sync("cpro-1.0.1")
-        sync("gdb")
+        sync("cpro", version="1.0.1")
+        sync("gdb", version="")
 
     if arch == "x64":
         sync("cassandra")
 
     if have_desktop_client:
-        sync("any/help", path_variable="help_directory")
+        sync("any/help")
 
     if have_desktop_client or have_mobile_client:
-        sync("any/roboto-fonts", path_variable="roboto_fonts_directory")
+        sync("any/roboto-fonts", version="")
 
     if (have_mediaserver or have_desktop_client) and box != "edge1":
         sync("festival")
         if syncher.versions["festival-vox"] != "system":
-            sync("any/festival-vox", path_variable="festival_vox_directory")
+            sync("any/festival-vox")
 
     if platform in ("android", "ios"):
         sync("libjpeg-turbo")
 
     if platform in ("macosx", "ios"):
-        sync("any/certificates", path_variable="certificates_path")
+        sync("any/certificates")
 
     if have_mediaserver:
         if platform == "windows" or (platform == "linux" and arch == "x64"):
-            sync("vms_benchmark-dev", path_variable="vms_benchmark_dev_dir")
-            sync("any/vms_benchmark-dev", path_variable="vms_benchmark_dev_all_platforms_dir")
-            sync("dw_edge_analytics_plugin")
+            sync("vms_benchmark-dev", version="")
+            sync("any/vms_benchmark_aux_files", version="")
+            sync("dw_edge_analytics_plugin", version="")
 
         sync("sigar")
-        sync("any/apidoctool-2.1", path_variable="APIDOCTOOL_PATH")
+        sync("any/apidoctool", version="2.1")
         if not sync("any/server-external", optional=True):
-            sync("any/server-external-" + release_version)
+            sync("any/server-external", version=release_version)
 
         if box == "edge1":
-            sync("openldap-2.4.42-1")
+            sync("openldap", version="2.4.42-1")
             sync("sasl2")
 
     if have_mediaserver or have_desktop_client:
-        sync("%s/doxygen" % platform, path_variable="doxygen_directory")
-        sync("any/update_verification_keys", path_variable="update_verification_keys_dir")
+        sync("%s/doxygen" % platform)
+        sync("any/update_verification_keys", version="")
 
-    sync("any/root-certificates", path_variable="root_certificates_path")
-    sync("any/customization_pack", path_variable="customization_package_directory")
+    sync("any/root-certificates", version="")
+    sync("any/customization_pack")
 
     build_platform = system_platform.system()
     if build_platform == 'Windows':
@@ -251,7 +250,7 @@ def sync_dependencies(target, syncher, platform, arch, box, release_version, opt
         build_utils_platform = 'macos'
     else:
         build_utils_platform = platform
-    sync("%s/verify_globs" % build_utils_platform, path_variable="verify_globs_directory")
+    sync("%s/verify_globs" % build_utils_platform)
 
 
 def parse_target(target):

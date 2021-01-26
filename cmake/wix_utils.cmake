@@ -1,9 +1,9 @@
-find_program(heat_executable heat HINTS ${wix_directory}/bin NO_DEFAULT_PATH)
+find_program(heat_executable heat HINTS ${RDEP_WIX_ROOT}/bin NO_DEFAULT_PATH)
 if(NOT heat_executable)
     message(FATAL_ERROR "Cannot find heat.")
 endif()
 
-find_program(candle_executable candle HINTS ${wix_directory}/bin NO_DEFAULT_PATH)
+find_program(candle_executable candle HINTS ${RDEP_WIX_ROOT}/bin NO_DEFAULT_PATH)
 if(NOT candle_executable)
     message(FATAL_ERROR "Cannot find candle.")
 endif()

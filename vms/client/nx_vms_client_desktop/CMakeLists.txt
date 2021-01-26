@@ -39,7 +39,7 @@ if(WINDOWS)
 endif()
 
 nx_set_qrc_source_files_properties(
-    ${update_verification_keys_dir}/keys ALIAS_PREFIX update_verification_keys/)
+    ${RDEP_UPDATE_VERIFICATION_KEYS_ROOT}/keys ALIAS_PREFIX update_verification_keys/)
 
 nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
     ADDITIONAL_SOURCES
@@ -51,7 +51,7 @@ nx_add_target(nx_vms_client_desktop LIBRARY ${library_type}
         "${customization_dir}/nx_client_desktop/resources"
         "${customization_dir}/icons/all/logo.png"
         "${customization_dir}/license.html"
-        "${update_verification_keys_dir}/keys"
+        "${RDEP_UPDATE_VERIFICATION_KEYS_ROOT}/keys"
         "${nov_file_launcher_executable}"
         "${client_font_roboto_regular}"
     ADDITIONAL_MOCABLES

@@ -98,7 +98,7 @@ if(targetDevice STREQUAL "windows-x64")
         ${CMAKE_BINARY_DIR}/bin/udt.dll
         ${CMAKE_BINARY_DIR}/bin/rtsp_perf.exe
         ${CMAKE_BINARY_DIR}/bin/testcamera.exe
-        ${vms_benchmark_dev_dir}/files/plink.exe
+        ${RDEP_VMS_BENCHMARK-DEV_ROOT}/files/plink.exe
     )
 
     list(APPEND create_subdirectories_commands
@@ -178,8 +178,8 @@ add_custom_command(OUTPUT ${zip_file}
     COMMAND ${CMAKE_COMMAND} -E make_directory vms_benchmark
 
     COMMAND ${CMAKE_COMMAND} -E copy
-        ${vms_benchmark_dev_all_platforms_dir}/files/high.ts
-        ${vms_benchmark_dev_all_platforms_dir}/files/low.ts
+        ${RDEP_VMS_BENCHMARK_AUX_FILES_ROOT}/files/high.ts
+        ${RDEP_VMS_BENCHMARK_AUX_FILES_ROOT}/files/low.ts
         ${CMAKE_BINARY_DIR}/bin/vms_benchmark${executable_extension}
         ${distribution_output_dir}/build_info.txt
         ${distribution_output_dir}/build_info.json

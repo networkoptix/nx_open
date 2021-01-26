@@ -20,9 +20,8 @@ class RdepSyncher:
         self.rdep.verbose = verbose
         self.rdep.fast_check = True
 
-        self._exported_paths = {}
         self._env_exported_paths = {}
-        self._synched_package_dirs = []
+        self._synched_packages = {}
         self._include_ignored_dirs = []
 
         if sync_timestamps:
@@ -32,7 +31,7 @@ class RdepSyncher:
 
     def sync(self,
             package,
-            path_variable=None,
+            version=None,
             env_path_variable=None,
             optional=False,
             do_not_include=False):
@@ -40,7 +39,12 @@ class RdepSyncher:
 
         self.rdep.targets = [target] if target else [self.rdep_target]
 
-        version = self.versions.get(pack)
+        if version is None:
+            if pack not in self.versions:
+                print(f'error: Undetermined version of "{pack}" package', file=sys.stderr)
+                exit(1)
+            version = self.versions[pack]
+
         full_package_name = pack + "-" + version if version else pack
         path = self.locations.get(pack)
 
@@ -58,9 +62,7 @@ class RdepSyncher:
 
         path = path.replace("\\", "/")
 
-        self._synched_package_dirs.append(path)
-        if path_variable:
-            self._exported_paths[path_variable] = path
+        self._synched_packages[pack] = path
         if env_path_variable:
             self._env_exported_paths[env_path_variable] = path
         if do_not_include:
@@ -75,13 +77,18 @@ class RdepSyncher:
             return
 
         with open(cmake_include_file, "w") as f:
-            f.write("# Package versions.\n")
+            f.write("# Packages.\n")
+            f.write("set(rdep_package_names\n")
+            for package_name in self._synched_packages.keys():
+                f.write(f'    "{package_name}"\n')
+            f.write(")\n")
+            f.write("".join(
+                f'set(RDEP_{pack.upper()}_ROOT "{path}")\n'
+                for pack, path in self._synched_packages.items()))
+
+            f.write("\n# Package versions.\n")
             for k, v in self.versions.items():
                 f.write("set({0}_version \"{1}\")\n".format(k, v))
-
-            f.write("\n# Exported package directories.\n")
-            for k, v in self._exported_paths.items():
-                f.write("set({0} \"{1}\")\n".format(k, v))
 
             f.write("\n# Package directories exported to environment.\n")
             for k, v in self._env_exported_paths.items():
@@ -89,12 +96,12 @@ class RdepSyncher:
 
             f.write("\n# List of synchronized package directories.\n")
             f.write("set(synched_package_dirs\n")
-            for path in self._synched_package_dirs:
-                f.write("    \"{}\"\n".format(path))
+            for path in self._synched_packages.values():
+                f.write(f'    "{path}"\n')
             f.write(")\n")
 
             f.write("\n# Includes.\n")
-            for path in self._synched_package_dirs:
+            for path in self._synched_packages.values():
                 if path in self._include_ignored_dirs:
                     continue
 

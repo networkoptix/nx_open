@@ -12,7 +12,7 @@ set(target.arch "${os.arch}")
 
 message(STATUS "Generating license")
 execute_process(
-    COMMAND ${pandoc_directory}/bin/pandoc
+    COMMAND ${RDEP_PANDOC_ROOT}/bin/pandoc
         -s ${customization.dir}/license.html
         -t plain --wrap none -o ${CMAKE_CURRENT_BINARY_DIR}/license.txt
     RESULT_VARIABLE pandoc_result

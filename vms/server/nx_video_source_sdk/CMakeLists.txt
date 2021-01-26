@@ -94,7 +94,7 @@ else()
     if(targetDevice STREQUAL "linux_arm32")
         set(extraArgs ${extraArgs}
             --with-rpi-samples
-            -DrpiSysroot=${sysroot_directory}
+            -DrpiSysroot=${RDEP_SYSROOT_ROOT}
         )
     endif()
 endif()

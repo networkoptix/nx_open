@@ -23,11 +23,11 @@ def main():
     def sync(package, **kwargs):
         return syncher.sync(package, **kwargs)
 
-    sync("any/cloud_hosts")
-    sync("any/customization_pack", path_variable="customization_package_directory")
-    sync("windows/wix-3.11", path_variable="wix_directory")
-    sync("windows/ilmerge", path_variable="ilmerge_directory")
-    sync("windows/paxton_plugin_references", path_variable="references_directory")
+    sync("any/cloud_hosts", version="")
+    sync("any/customization_pack")
+    sync("windows/wix", version="3.11")
+    sync("windows/ilmerge", version="")
+    sync("windows/paxton_plugin_references")
 
     syncher.generate_cmake_include(args.cmake_include_file, sync_script_file=__file__)
 

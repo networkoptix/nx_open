@@ -30,7 +30,7 @@ endif()
 
 add_custom_command(
     OUTPUT package.wixobj
-    COMMAND ${wix_directory}/bin/candle.exe
+    COMMAND ${RDEP_WIX_ROOT}/bin/candle.exe
         ${CMAKE_CURRENT_SOURCE_DIR}/package.wxs
         -I${CMAKE_CURRENT_BINARY_DIR}
         -nologo
@@ -44,7 +44,7 @@ add_custom_command(
 
 add_custom_command(
     OUTPUT ${installerMsiFile}
-    COMMAND ${wix_directory}/bin/light.exe
+    COMMAND ${RDEP_WIX_ROOT}/bin/light.exe
         ${CMAKE_CURRENT_BINARY_DIR}/package.wixobj
         ${lightOptions}
         -out ${installerMsiFile}
@@ -55,7 +55,7 @@ add_custom_command(
 
 add_custom_command(
     OUTPUT bundle.wixobj
-    COMMAND ${wix_directory}/bin/candle.exe
+    COMMAND ${RDEP_WIX_ROOT}/bin/candle.exe
         ${CMAKE_CURRENT_SOURCE_DIR}/bundle.wxs
         -I${CMAKE_CURRENT_BINARY_DIR}
         -nologo
@@ -70,7 +70,7 @@ add_custom_command(
 
 add_custom_command(
     OUTPUT ${installerUnsignedExeFile}
-    COMMAND ${wix_directory}/bin/light.exe
+    COMMAND ${RDEP_WIX_ROOT}/bin/light.exe
         ${CMAKE_CURRENT_BINARY_DIR}/bundle.wixobj
         -out ${installerUnsignedExeFile}
         ${lightOptions}
@@ -100,13 +100,13 @@ if(codeSigning)
 
     add_custom_command(
         OUTPUT ${installerExeFile}
-        COMMAND ${wix_directory}/bin/insignia.exe
+        COMMAND ${RDEP_WIX_ROOT}/bin/insignia.exe
             -ib ${installerUnsignedExeFile}
             -o ${engineExeFile}
 
         COMMAND ${signCommand} ${engineExeFile}
 
-        COMMAND ${wix_directory}/bin/insignia.exe
+        COMMAND ${RDEP_WIX_ROOT}/bin/insignia.exe
             -ab ${engineExeFile} ${installerUnsignedExeFile}
             -o ${installerExeFile}
 

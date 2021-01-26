@@ -53,7 +53,7 @@ endfunction()
 
 function(nx_use_custom_verify_globs)
     set_property(GLOBAL APPEND_STRING
-        PROPERTY pre_build_commands "substitute_verify_globs ${verify_globs_directory}\n\n")
+        PROPERTY pre_build_commands "substitute_verify_globs ${RDEP_VERIFY_GLOBS_ROOT}\n\n")
 endfunction()
 
 function(nx_add_pre_build_artifacts_check)

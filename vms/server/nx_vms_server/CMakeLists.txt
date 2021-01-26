@@ -7,7 +7,7 @@ nx_configure_file(
     maven/filter-resources/mediaserver_core_app_info_impl.cpp
     ${CMAKE_CURRENT_BINARY_DIR})
 
-set(apidoctool_jar "${APIDOCTOOL_PATH}/apidoctool.jar")
+set(apidoctool_jar "${RDEP_APIDOCTOOL_ROOT}/apidoctool.jar")
 
 set(apidoctool_params
     "-config" "${CMAKE_CURRENT_SOURCE_DIR}/api/apidoctool.properties"
@@ -79,7 +79,7 @@ set_property(SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/webadmin_skins/${customization.s
     PROPERTY RESOURCE_ALIAS_PREFIX static/skin/)
 
 nx_set_qrc_source_files_properties(
-    ${update_verification_keys_dir}/keys ALIAS_PREFIX update_verification_keys/)
+    ${RDEP_UPDATE_VERIFICATION_KEYS_ROOT}/keys ALIAS_PREFIX update_verification_keys/)
 
 nx_add_target(nx_vms_server LIBRARY
     ADDITIONAL_SOURCES
@@ -90,7 +90,7 @@ nx_add_target(nx_vms_server LIBRARY
         ${customization_dir}/mediaserver_core/resources
         ${CMAKE_CURRENT_SOURCE_DIR}/webadmin_skins/${customization.skin}
         ${favicon}
-        ${update_verification_keys_dir}/keys
+        ${RDEP_UPDATE_VERIFICATION_KEYS_ROOT}/keys
         ${static_resources}
     PUBLIC_LIBS
         nx_kit #< This dependency should come first to satisfy OutputRedirector.

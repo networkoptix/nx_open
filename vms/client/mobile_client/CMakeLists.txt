@@ -109,7 +109,7 @@ if(IOS)
         message(FATAL_ERROR "customization.mobile.ios.bundleName cannot be equal to customization.mobile.displayName.")
     endif()
 
-    set(provisioning_profiles_dir "${certificates_path}/mobile_client/ios/provisioning_profiles")
+    set(provisioning_profiles_dir "${RDEP_CERTIFICATES_ROOT}/mobile_client/ios/provisioning_profiles")
 
     if(developerBuild)
         nx_configure_file(maven/filter-resources/mobile_client-beta.entitlements

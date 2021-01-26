@@ -26,7 +26,7 @@ set(py_installer_args
     ${CMAKE_CURRENT_SOURCE_DIR}/bin/main.py
 )
 
-set(python_dir ${vms_benchmark_dev_dir}/python)
+set(python_dir ${RDEP_VMS_BENCHMARK-DEV_ROOT}/python)
 
 if(targetDevice STREQUAL "windows-x64")
     set(exe_extension ".exe")
@@ -49,7 +49,7 @@ endif()
 add_custom_command(
     OUTPUT
         ${CMAKE_BINARY_DIR}/bin/vms_benchmark${exe_extension}
-    
+
     COMMAND ${CMAKE_COMMAND} -E echo "  Building VMS Benchmark executable"
 
     COMMAND ${CMAKE_COMMAND} -E make_directory ${build_dir}
@@ -79,7 +79,7 @@ add_custom_command(
 
     COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_SOURCE_DIR}/vms_benchmark.builddir.ini
-        ${CMAKE_BINARY_DIR}/bin/vms_benchmark.ini 
+        ${CMAKE_BINARY_DIR}/bin/vms_benchmark.ini
 )
 
 set_target_properties(vms_benchmark_local_test PROPERTIES FOLDER utils)

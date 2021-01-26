@@ -75,9 +75,9 @@ set(referenceList
     "System.Core"
     "System.Windows.Forms"
     "System.Net"
-    "${references_directory}/bin/log4net.dll"
-    "${references_directory}/bin/Paxton.Net2.OemDvrInterfaces.dll"
-    "${references_directory}/bin/Newtonsoft.Json.dll"
+    "${RDEP_PAXTON_PLUGIN_REFERENCES_ROOT}/bin/log4net.dll"
+    "${RDEP_PAXTON_PLUGIN_REFERENCES_ROOT}/bin/Paxton.Net2.OemDvrInterfaces.dll"
+    "${RDEP_PAXTON_PLUGIN_REFERENCES_ROOT}/bin/Newtonsoft.Json.dll"
 )
 
 set(CMAKE_CSharp_FLAGS /platform:x86)
@@ -116,11 +116,11 @@ set_target_properties(paxton_plugin PROPERTIES
 # Merging references into a single library. Note: OemDvrInterfaces.dll is not to be merged!
 add_custom_command(TARGET paxton_plugin POST_BUILD
     COMMAND
-        ${ilmerge_directory}/bin/ilmerge.exe
+        ${RDEP_ILMERGE_ROOT}/bin/ilmerge.exe
         /out:"${paxtonDriverOutputName}.dll"
         "${paxtonDriverIntermediateName}.dll"
-        "${references_directory}/bin/Newtonsoft.Json.dll"
-        "${references_directory}/bin/log4net.dll"
+        "${RDEP_PAXTON_PLUGIN_REFERENCES_ROOT}/bin/Newtonsoft.Json.dll"
+        "${RDEP_PAXTON_PLUGIN_REFERENCES_ROOT}/bin/log4net.dll"
         /target:dll
         /targetplatform:v4,C:/Windows/Microsoft.NET/Framework64/v4.0.30319
         /wildcards

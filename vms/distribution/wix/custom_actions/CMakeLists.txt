@@ -8,11 +8,11 @@ set(vsPath "vs2015")
 if (CMAKE_CXX_COMPILER_VERSION MATCHES "19.*")
     set(vsPath "vs2017")
 endif()
-message("Using ${vsPath} libraries from ${wix_directory}/sdk/${vsPath}/lib/${arch}")
+message("Using ${vsPath} libraries from ${RDEP_WIX_ROOT}/sdk/${vsPath}/lib/${arch}")
 
 add_definitions(-D_USRDLL -DUNICODE -D_CONSOLE -D_UNICODE)
-include_directories("${wix_directory}/sdk/inc")
-link_directories("${wix_directory}/sdk/${vsPath}/lib/${arch}")
+include_directories("${RDEP_WIX_ROOT}/sdk/inc")
+link_directories("${RDEP_WIX_ROOT}/sdk/${vsPath}/lib/${arch}")
 add_compile_options(/MT)
 
 nx_add_target(wix_custom_actions LIBRARY LIBRARY_TYPE SHARED

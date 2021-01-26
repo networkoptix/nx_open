@@ -4,7 +4,7 @@ import shutil
 import os
 
 arch = '${arch}'
-wix_directory = '${wix_directory}/bin'
+wix_directory = '${RDEP_WIX_ROOT}/bin'
 qt_directory = '${qt.dir}'
 build_configuration = '${build.configuration}'
 installer_language = '${installerLanguage}'

@@ -10,9 +10,9 @@ if(useLoginKeychain)
 endif()
 
 if(NOT useLoginKeychain AND codeSigning)
-    nx_find_first_matching_file(certificate "${certificates_path}/macosx/*.p12")
+    nx_find_first_matching_file(certificate "${RDEP_CERTIFICATES_ROOT}/macosx/*.p12")
     if(NOT certificate)
-        message(FATAL_ERROR "Cannot find any certificates in ${certificates_path}/macosx")
+        message(FATAL_ERROR "Cannot find any certificates in ${RDEP_CERTIFICATES_ROOT}/macosx")
     endif()
 
     # TODO: #GDM Shouldn't this be a bit more safe?
@@ -22,7 +22,7 @@ if(NOT useLoginKeychain AND codeSigning)
         COMMAND ${CMAKE_SOURCE_DIR}/build_utils/macos/prepare_build_keychain.sh
             --keychain ${codeSigningKeychainName}
             --keychain-password ${codeSigningKeychainPassword}
-            --certificate ${root_certificates_path}/apple/AppleWWDRCA.cer
+            --certificate ${root_RDEP_CERTIFICATES_ROOT}/apple/AppleWWDRCA.cer
             --ignore-import-errors
     )
     set(import_cert_command

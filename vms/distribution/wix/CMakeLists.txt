@@ -27,7 +27,7 @@ endif()
 
 include(wix_utils)
 
-file(TO_CMAKE_PATH ${wix_directory} wix_directory)
+file(TO_CMAKE_PATH ${RDEP_WIX_ROOT} RDEP_WIX_ROOT)
 
 add_subdirectory(custom_actions)
 

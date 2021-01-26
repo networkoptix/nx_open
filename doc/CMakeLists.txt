@@ -5,10 +5,10 @@ nx_configure_file(
 file(COPY "index.html"
     DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 
-if(doxygen_directory)
+if(RDEP_DOXYGEN_ROOT)
     add_custom_target(documentation
         COMMENT "Generating documentation..."
-        COMMAND ${doxygen_directory}/bin/doxygen
+        COMMAND ${RDEP_DOXYGEN_ROOT}/bin/doxygen
     )
 
     set(documentation_zip_file "${distribution_output_dir}/doc.zip")
