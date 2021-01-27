@@ -292,7 +292,30 @@ void DeviceAgent::updateAgentManifest(const ParsedMetadata& parsedMetadata)
     for (const ParsedEvent& parsedEvent: parsedMetadata.events)
     {
         const QString topic = ExtractEventTypeNameFromTopic(parsedEvent.topic);
-        if (!m_wsntTopics.contains(topic))
+        if (topic == "Detect_any_motion")
+        {
+            if (m_manifest.supportedObjectTypeIds.contains(kObjectDetectionObjectTypeId))
+            {
+                m_manifest.supportedObjectTypeIds.removeOne(kObjectDetectionObjectTypeId);
+                NX_DEBUG(this,
+                    "Object type removed from manifest: %1",
+                    kObjectDetectionObjectTypeId);
+                manifestUpdated = true;
+            }
+        }
+        else if (topic == "Detect_any_object")
+        {
+            if (!m_manifest.supportedObjectTypeIds.contains(kObjectDetectionObjectTypeId))
+            {
+                m_manifest.supportedObjectTypeIds.append(kObjectDetectionObjectTypeId);
+                NX_DEBUG(this,
+                    "Object type added to manifest: %1",
+                    kObjectDetectionObjectTypeId);
+                manifestUpdated = true;
+            }
+        }
+
+        if (!m_wsntTopics.contains(topic)) //< 'if' (not 'else if') is used intentionally here
         {
             m_wsntTopics.insert(topic);
             auto it = engineEventTypes.find(topic);
