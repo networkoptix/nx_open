@@ -81,7 +81,7 @@ auto merge_sorted_lists(
     const auto lessPriority =
         [lessItem](const IteratorRange& left, const IteratorRange& right) -> bool
         {
-            return !lessItem(*left.first, *right.first);
+            return lessItem(*right.first, *left.first);
         };
 
     std::make_heap(queueData.begin(), queueData.end(), lessPriority);
