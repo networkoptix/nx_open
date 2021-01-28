@@ -6,6 +6,7 @@
 #include <QtCore/QThread>
 
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/log/log_main.h>
 
 namespace nx::vms::translation {
 
@@ -28,8 +29,17 @@ TranslationOverlay::~TranslationOverlay()
     {
         // The only sane scenario: app is shutting down.
         // Release translators to avoid possible crashes.
+        NX_DEBUG(
+            this,
+            "Translation overlay for locale %1 is still being used on destruction (ref count: %2)",
+            m_translation.localeCode(),
+            m_refCount);
         for (auto& translator: m_translators)
+        {
+            translator->moveToThread(qApp->thread());
+            translator->setParent(qApp);
             translator.release();
+        }
         m_translators.clear();
     }
 }
