@@ -37,7 +37,6 @@ std::vector<QJsonObject> extractManList(const QJsonObject& event)
 {
     std::vector<QJsonObject> objects;
 
-    int i = 0;
     for (const auto objectValue: event["ManList"].toArray())
     {
         if (!objectValue.isObject())
@@ -49,13 +48,41 @@ std::vector<QJsonObject> extractManList(const QJsonObject& event)
         // Patch the objects to reuse parsing machinery.
         object["ObjectType"] = "Human";
 
-        // Likewise there is no object id.
-        object["ObjectID"] = i++;
-
         objects.push_back(std::move(object));
     }
 
     return objects;
+}
+
+std::vector<QJsonObject> extractVehicleWithPlate(const QJsonObject& event)
+{
+    std::vector<QJsonObject> objects;
+
+    if (const auto value = event["Vehicle"]; value.isObject())
+    {
+        auto vehicle = value.toObject();
+        vehicle["TrafficCar"] = event["TrafficCar"];
+        objects.push_back(std::move(vehicle));
+    }
+    if (const auto value = event["Object"]; value.isObject())
+    {
+        auto plate = value.toObject();
+        plate["TrafficCar"] = event["TrafficCar"];
+        objects.push_back(std::move(plate));
+    }
+
+    return objects;
+}
+
+const Object* findFirstVehicleObject(const std::vector<Object>& objects)
+{
+    for (const auto& object: objects)
+    {
+        if (object.type == &ObjectType::kVehicle)
+            return &object;
+    }
+
+    return nullptr;
 }
 
 // 4.11.10 Find media files with IVS info
@@ -421,6 +448,19 @@ NX_DEFINE_EVENT_TYPE(QueueStayDetection)
     group = &EventTypeGroup::kComplexAnalytics;
     objectTypes = {&ObjectType::kHuman};
     coordinateDomain = kPeopleCountingCoordinateDomain;
+}
+
+NX_DEFINE_EVENT_TYPE(TrafficJunction)
+{
+    nativeId = "TrafficJunction";
+    id = "nx.dahua.TrafficJunction";
+    prettyName = "Traffic detection";
+    description = "Traffic";
+    isStateDependent = false;
+    group = &EventTypeGroup::kComplexAnalytics;
+    objectTypes = {&ObjectType::kVehicle, &ObjectType::kPlate};
+    extractObjects = extractVehicleWithPlate;
+    selectRepresentingObject = findFirstVehicleObject;
 }
 
 #undef NX_DEFINE_EVENT_TYPE

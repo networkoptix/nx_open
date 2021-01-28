@@ -31,7 +31,15 @@ Plugin* Engine::plugin() const
 bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 {
     const auto vendor = QString(deviceInfo->vendor()).toLower();
-    return vendor.startsWith("dahua");
+    if (vendor.startsWith("dahua"))
+        return true;
+
+    // Hard-coded as this model reports vendor incorrectly.
+    const auto model = QString(deviceInfo->model()).toLower();
+    if (vendor == "general" && model.startsWith("itc215-pw6m-irlzf"))
+        return true;
+
+    return false;
 }
 
 std::string Engine::manifestString() const
