@@ -290,12 +290,14 @@ std::vector<ObjectTrackEx> ObjectTrackSearcher::lookupTracksUsingArchive(
     std::set<std::int64_t> analyzedObjectGroups;
 
     TrackQueryResult result;
+    std::map<QnUuid, QnTimePeriod> previousPeriods;
     for (int i = 0; i < kMaxObjectLookupIterations; ++i)
     {
-        auto matchResult = m_analyticsArchive->matchObjects(
+        const auto matchResult = m_analyticsArchive->matchObjects(
             m_filter.deviceIds,
-            *archiveFilter);
-        const int fetchedObjectGroupsCount = matchResult.trackGroups.size();
+            *archiveFilter,
+            &previousPeriods);
+        const int fetchedObjectGroupsCount = (int) matchResult.trackGroups.size();
 
         const std::set<std::int64_t> uniqueTrackGroups(
             matchResult.trackGroups.begin(), matchResult.trackGroups.end());
@@ -324,10 +326,8 @@ std::vector<ObjectTrackEx> ObjectTrackSearcher::lookupTracksUsingArchive(
 
         // Repeating match.
         // NOTE: Both time period boundaries are inclusive.
-        if (m_filter.sortOrder == Qt::AscendingOrder)
-            archiveFilter->startTime = matchResult.timePeriod.endTime() + std::chrono::milliseconds(1);
-        else
-            archiveFilter->endTime = matchResult.timePeriod.startTime();
+        for (const auto& [deviceId, period]: matchResult.timePeriods)
+            previousPeriods[deviceId].addPeriod(period);
     }
 
     NX_WARNING(this, "Failed to select all required objects in %1 iterations. Filter %2",

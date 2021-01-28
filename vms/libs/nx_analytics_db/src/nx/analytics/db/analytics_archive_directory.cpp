@@ -95,8 +95,11 @@ QnTimePeriodList AnalyticsArchiveDirectory::matchPeriods(
 
 AnalyticsArchiveDirectory::ObjectTrackMatchResult AnalyticsArchiveDirectory::matchObjects(
     std::vector<QnUuid> deviceIds,
-    ArchiveFilter filter)
+    ArchiveFilter filter,
+    const std::map<QnUuid, QnTimePeriod>* previousPeriods)
 {
+    using namespace std::chrono;
+
     if (deviceIds.empty())
         copyAllDeviceIds(&deviceIds);
 
@@ -105,52 +108,52 @@ AnalyticsArchiveDirectory::ObjectTrackMatchResult AnalyticsArchiveDirectory::mat
         filter.limit > 0 ? filter.limit : kMaxObjectLookupResultSet,
         kMaxObjectLookupResultSet);
 
-    std::vector<
-        std::pair<std::chrono::milliseconds /*timestamp*/, int64_t /*trackGroupId*/>> trackGroups;
-
+    DeviceResults deviceResults;
     for (const auto& deviceId: deviceIds)
     {
-        auto deviceResult = matchObjects(deviceId, filter);
-
-        std::transform(
-            deviceResult.data.begin(), deviceResult.data.end(),
-            std::back_inserter(trackGroups),
-            [this](const auto& item)
+        ArchiveFilter filterCopy = filter;
+        if (previousPeriods)
+        {
+            auto itr = previousPeriods->find(deviceId);
+            if (itr != previousPeriods->end() && !itr->second.isEmpty())
             {
-                NX_VERBOSE(this, "Found (%1; %2)", item.timestampMs, item.trackGroupId);
+                if (filter.sortOrder == Qt::AscendingOrder)
+                    filterCopy.startTime = milliseconds(itr->second.endTimeMs()) + 1ms;
+                else
+                    filterCopy.endTime = milliseconds(itr->second.startTime());
+            }
+        }
 
-                return std::make_pair(
-                    std::chrono::milliseconds(item.timestampMs), item.trackGroupId);
-            });
+        deviceResults.emplace(deviceId, matchObjects(deviceId, filterCopy));
     }
 
-    return toObjectTrackMatchResult(filter, std::move(trackGroups));
+    return toObjectTrackMatchResult(filter, std::move(deviceResults));
 }
 
 AnalyticsArchiveDirectory::ObjectTrackMatchResult
     AnalyticsArchiveDirectory::toObjectTrackMatchResult(
         const ArchiveFilter& filter,
-        TrackGroups trackGroups)
+        DeviceResults deviceResults)
 {
-    if (filter.sortOrder == Qt::AscendingOrder)
-        std::sort(trackGroups.begin(), trackGroups.end(), std::less<>());
-    else
-        std::sort(trackGroups.begin(), trackGroups.end(), std::greater<>());
-
     ObjectTrackMatchResult result;
-    std::transform(
-        trackGroups.begin(), trackGroups.end(),
-        std::back_inserter(result.trackGroups),
-        std::mem_fn(&std::pair<std::chrono::milliseconds, int64_t>::second));
 
-    if (!trackGroups.empty())
+    for (const auto& [deviceId, deviceResult]: deviceResults)
     {
-        result.timePeriod.setStartTime(
-            std::min<>(trackGroups.front().first, trackGroups.back().first));
-
-        result.timePeriod.setEndTime(
-            std::max<>(trackGroups.front().first, trackGroups.back().first));
+        std::transform(
+            deviceResult.data.begin(), deviceResult.data.end(),
+            std::back_inserter(result.trackGroups),
+            [this](const auto& item)
+            {
+                NX_VERBOSE(this, "Found (%1; %2)", item.timestampMs, item.trackGroupId);
+                return item.trackGroupId;
+            });
+        result.timePeriods.emplace(deviceId, deviceResult.boundingPeriod);
     }
+
+    if (filter.sortOrder == Qt::AscendingOrder)
+        std::sort(result.trackGroups.begin(), result.trackGroups.end(), std::less<>());
+    else
+        std::sort(result.trackGroups.begin(), result.trackGroups.end(), std::greater<>());
 
     return result;
 }

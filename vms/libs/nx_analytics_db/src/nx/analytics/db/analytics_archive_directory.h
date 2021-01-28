@@ -25,7 +25,7 @@ public:
     struct ObjectTrackMatchResult
     {
         std::vector<std::int64_t> trackGroups;
-        QnTimePeriod timePeriod;
+        std::map<QnUuid, QnTimePeriod> timePeriods;
     };
 
     AnalyticsArchiveDirectory(
@@ -59,7 +59,8 @@ public:
      */
     ObjectTrackMatchResult matchObjects(
         std::vector<QnUuid> deviceIds,
-        ArchiveFilter filter);
+        ArchiveFilter filter,
+        const std::map<QnUuid, QnTimePeriod>* previousPeriods = nullptr);
 
     /**
      * @return std::nullopt if filter specifies an empty data set.
@@ -85,12 +86,11 @@ private:
         const QnUuid& deviceId,
         const ArchiveFilter& filter);
 
-    using TrackGroups =
-        std::vector<std::pair<std::chrono::milliseconds /*timestamp*/, int64_t /*trackGroupId*/>>;
+    using DeviceResults = std::map<QnUuid, AnalyticsArchive::MatchObjectsResult>;
 
     ObjectTrackMatchResult toObjectTrackMatchResult(
         const ArchiveFilter& filter,
-        TrackGroups trackGroups);
+        DeviceResults deviceResults);
 
     void copyAllDeviceIds(std::vector<QnUuid>* deviceIds);
 };
