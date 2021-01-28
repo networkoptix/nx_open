@@ -202,7 +202,7 @@ std::vector<const EventType*> DeviceAgent::fetchSupportedEventTypes() const
         url.setPath("/cgi-bin/eventManager.cgi");
         url.setQuery("action=getExposureEvents");
 
-        std::set<const EventType*> types;
+        std::vector<const EventType*> types;
 
         http::futures::Client httpClient;
         const auto response = Exception::translate(
@@ -223,14 +223,8 @@ std::vector<const EventType*> DeviceAgent::fetchSupportedEventTypes() const
                 throw Exception("Failed to parse response from camera");
 
             if (const auto type = EventType::findByNativeId(QString::fromUtf8(pair[1])))
-                types.insert(type);
+                types.push_back(type);
         }
-
-        // Hard-coded as this model currently fails to report support for this event even though
-        // it does support it.
-        const auto model = QString(m_info->model()).toLower();
-        if (model.startsWith("itc215-pw6m-irlzf"))
-            types.insert(&EventType::kTrafficJunction);
 
         NX_VERBOSE(this, "Ids of event types supported by camera:\n%1",
             [&]()
@@ -241,7 +235,7 @@ std::vector<const EventType*> DeviceAgent::fetchSupportedEventTypes() const
                 return nx::utils::join(ids, "\n");
             }());
 
-        return std::vector(types.begin(), types.end());
+        return types;
     }
     catch (Exception& exception)
     {

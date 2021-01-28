@@ -22,7 +22,6 @@ struct ObjectType
     static const ObjectType kUnknown;
     static const ObjectType kNonMotor;
     static const ObjectType kVehicle;
-    static const ObjectType kPlate;
     static const ObjectType kHuman;
     static const ObjectType kHumanFace;
 
@@ -34,6 +33,7 @@ extern const std::vector<const ObjectType*>& kObjectTypes;
 struct Object
 {
     const ObjectType* type = nullptr;
+    unsigned int id = 0;
     nx::sdk::analytics::Rect boundingBox;
     std::vector<Attribute> attributes;
 };

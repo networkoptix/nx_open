@@ -58,12 +58,9 @@ QString formatReceivedEventForLog(const Event& event)
     if (!event.objects.empty())
     {
         text += "\nobjects:";
-        const auto& objects = event.objects;
-        for (size_t i = 0; i < objects.size(); ++i)
+        for (const auto& object: event.objects)
         {
-            const auto& object = objects[i];
-
-            text += NX_FMT("\n\t%1:", i);
+            text += NX_FMT("\n\t%1:", object.id);
 
             text += NX_FMT("\n\t\ttypeId: %1", object.type->id);
 
@@ -103,6 +100,9 @@ std::optional<Object> parseObject(const QJsonObject& jsonObject, const EventType
         NX_DEBUG(NX_SCOPE_TAG, "Object has no ObjectType");
         return std::nullopt;
     }
+
+    if (const auto value = jsonObject["ObjectID"]; value.isDouble())
+        object.id = value.toInt();
 
     if (const auto value = jsonObject["BoundingBox"]; value.isArray())
     {
@@ -166,17 +166,6 @@ void parseEventData(Event *event, const QJsonObject& data)
         if (auto object = parseObject(jsonObject, event->type))
             event->objects.push_back(std::move(*object));
     }
-}
-
-const Object* selectRepresentingObject(const Event& event)
-{
-    if (const auto& selectRepresentingObject = event.type->selectRepresentingObject)
-        return selectRepresentingObject(event.objects);
-
-    if (event.objects.size() == 1)
-        return &event.objects[0];
-
-    return nullptr;
 }
 
 } // namespace
@@ -375,21 +364,17 @@ void MetadataParser::process(const Event& event)
 
         if (isEmplaced)
         {
-            const Object* representingObject = selectRepresentingObject(event);
-
-            Uuid representingTrackId;
+            Uuid trackId;
             for (const auto& object: event.objects)
             {
-                const auto trackId = UuidHelper::randomUuid();
+                trackId = UuidHelper::randomUuid();
                 emitObject(object, trackId, event);
-                if (&object == representingObject)
-                    representingTrackId = trackId;
             }
 
-            if (representingObject)
+            if (event.objects.size() == 1)
             {
-                ongoingEvent.representingObject = *representingObject;
-                ongoingEvent.trackId = representingTrackId;
+                ongoingEvent.singleCausingObject = event.objects[0];
+                ongoingEvent.trackId = trackId;
             }
             else
             {
@@ -398,26 +383,22 @@ void MetadataParser::process(const Event& event)
         }
 
         if (isEmplaced == event.isActive)
-            emitEvent(event, &ongoingEvent.trackId, getIf(&ongoingEvent.representingObject));
+            emitEvent(event, &ongoingEvent.trackId, getIf(&ongoingEvent.singleCausingObject));
 
         if (!event.isActive)
             m_ongoingEvents.erase(it);
     }
     else
     {
-        const Object* representingObject = selectRepresentingObject(event);
-
-        Uuid representingTrackId;
+        Uuid trackId;
         for (const auto& object: event.objects)
         {
-            const auto trackId = UuidHelper::randomUuid();
+            trackId = UuidHelper::randomUuid();
             emitObject(object, trackId, event);
-            if (&object == representingObject)
-                representingTrackId = trackId;
         }
 
-        if (representingObject)
-            emitEvent(event, &representingTrackId, representingObject);
+        if (event.objects.size() == 1)
+            emitEvent(event, &trackId, &event.objects[0]);
         else
             emitEvent(event, nullptr, nullptr);
     }
@@ -455,7 +436,7 @@ void MetadataParser::emitObject(const Object& object, const Uuid& trackId, const
 }
 
 void MetadataParser::emitEvent(
-    const Event& event, const Uuid* trackId, const Object* representingObject)
+    const Event& event, const Uuid* trackId, const Object* singleCausingObject)
 {
     const auto packet = makePtr<EventMetadataPacket>();
     const auto metadata = makePtr<EventMetadata>();
@@ -486,9 +467,9 @@ void MetadataParser::emitEvent(
             makePtr<sdk::Attribute>(type, name.toStdString(), value.toStdString()));
     }
     
-    if (representingObject)
+    if (singleCausingObject)
     {
-        for (const auto& [name, value, type]: representingObject->attributes)
+        for (const auto& [name, value, type]: singleCausingObject->attributes)
         {
             metadata->addAttribute(
                 makePtr<sdk::Attribute>(type, name.toStdString(), value.toStdString()));

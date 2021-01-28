@@ -11,15 +11,6 @@ using namespace nx::sdk;
 
 namespace {
 
-bool isValidStringTrafficAttributeValue(const QJsonValue& jsonValue) {
-    if (!jsonValue.isString())
-        return false;
-
-    const auto value = jsonValue.toString();
-    // "unknow" is not a typo, trailing "n" is missing intentionally.
-    return value != "" && !value.toLower().startsWith("unknow");
-}
-
 void parseHumanAttributes(std::vector<Attribute>* attributes, const QJsonObject& object)
 {
     if (const auto value = object["Stature"]; value.isDouble())
@@ -27,83 +18,6 @@ void parseHumanAttributes(std::vector<Attribute>* attributes, const QJsonObject&
         attributes->emplace_back(
             "Height (cm)", QString::number(value.toInt()), Attribute::Type::number);
     }
-}
-
-void parseVehicleAttributes(std::vector<Attribute>* attributes, const QJsonObject& object)
-{
-    constexpr auto& isValidStringValue = isValidStringTrafficAttributeValue;
-
-    if (const auto value = object["Category"]; isValidStringValue(value))
-        attributes->emplace_back("Category", value.toString());
-
-    if (const auto value = object["Text"]; isValidStringValue(value))
-        attributes->emplace_back("Logo", value.toString());
-
-    if (const auto value = object["Speed"]; value.isDouble())
-    {
-        attributes->emplace_back(
-            "Speed (km/h)", QString::number(value.toDouble()), Attribute::Type::number);
-    }
-
-    if (const auto value = object["TrafficCar"]; value.isObject())
-    {
-        const auto trafficCar = value.toObject();
-
-        if (const auto value = trafficCar["CarType"]; isValidStringValue(value))
-            attributes->emplace_back("Type", value.toString());
-
-        if (const auto value = trafficCar["VehicleColor"]; isValidStringValue(value))
-            attributes->emplace_back("Color", value.toString());
-
-        if (const auto value = trafficCar["VehicleSize"]; isValidStringValue(value))
-            attributes->emplace_back("Size", value.toString());
-
-        if (const auto value = trafficCar["PlateNumber"]; isValidStringValue(value))
-            attributes->emplace_back("LicensePlateNumber", value.toString());
-
-        if (const auto value = trafficCar["PlateType"]; isValidStringValue(value))
-            attributes->emplace_back("LicensePlateType", value.toString());
-
-        if (const auto value = trafficCar["PlateColor"]; isValidStringValue(value))
-            attributes->emplace_back("LicensePlateColor", value.toString());
-
-        if (const auto value = trafficCar["Country"]; isValidStringValue(value))
-            attributes->emplace_back("LicensePlateCountry", value.toString());
-
-        if (const auto value = trafficCar["Province"]; isValidStringValue(value))
-            attributes->emplace_back("LicensePlateProvince", value.toString());
-
-        if (const auto value = trafficCar["Lane"]; value.isDouble())
-        {
-            attributes->emplace_back(
-                "Lane", QString::number(value.toDouble()), Attribute::Type::number);
-        }
-    }
-}
-
-void parsePlateAttributes(std::vector<Attribute>* attributes, const QJsonObject& object)
-{
-    constexpr auto& isValidStringValue = isValidStringTrafficAttributeValue;
-
-    if (const auto value = object["Text"]; isValidStringValue(value))
-        attributes->emplace_back("Number", value.toString());
-
-    if (const auto value = object["TrafficCar"]; value.isObject())
-    {
-        const auto trafficCar = value.toObject();
-
-        if (const auto value = trafficCar["PlateType"]; isValidStringValue(value))
-            attributes->emplace_back("Type", value.toString());
-
-        if (const auto value = trafficCar["PlateColor"]; isValidStringValue(value))
-            attributes->emplace_back("Color", value.toString());
-    }
-
-    if (const auto value = object["Country"]; isValidStringValue(value))
-        attributes->emplace_back("Country", value.toString());
-
-    if (const auto value = object["Province"]; isValidStringValue(value))
-        attributes->emplace_back("Province", value.toString());
 }
 
 void parseHumanFaceAttributes(std::vector<Attribute>* attributes, const QJsonObject& object)
@@ -224,15 +138,6 @@ NX_DEFINE_OBJECT_TYPE(Vehicle)
     nativeId = "Vehicle";
     id = "nx.dahua.Vehicle";
     prettyName = "Vehicle";
-    parseAttributes = parseVehicleAttributes;
-}
-
-NX_DEFINE_OBJECT_TYPE(Plate)
-{
-    nativeId = "Plate";
-    id = "nx.dahua.Plate";
-    prettyName = "License plate";
-    parseAttributes = parsePlateAttributes;
 }
 
 NX_DEFINE_OBJECT_TYPE(HumanFace)

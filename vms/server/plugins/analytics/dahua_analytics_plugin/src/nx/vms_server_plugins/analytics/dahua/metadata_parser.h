@@ -32,7 +32,7 @@ public:
 private:
     struct OngoingEvent: Event
     {
-        std::optional<Object> representingObject;
+        std::optional<Object> singleCausingObject;
         nx::sdk::Uuid trackId;
     };
 
@@ -43,7 +43,7 @@ private:
     void emitObject(const Object& object, const nx::sdk::Uuid& trackId, const Event& event);
 
     void emitEvent(
-        const Event& event, const nx::sdk::Uuid* trackId, const Object* representingObject);
+        const Event& event, const nx::sdk::Uuid* trackId, const Object* singleCausingObject);
 
     void emitMetadataPacket(const nx::sdk::Ptr<nx::sdk::analytics::IMetadataPacket>& packet);
 

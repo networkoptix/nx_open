@@ -42,7 +42,6 @@ struct EventType
     std::function<void(std::vector<Attribute>*, const QJsonObject&)> parseAttributes;
     std::vector<const ObjectType*> objectTypes;
     std::function<std::vector<QJsonObject>(const QJsonObject&)> extractObjects;
-    std::function<const Object*(const std::vector<Object>& objects)> selectRepresentingObject;
 
     // Some event types violate documented coordinate domain. This value is used to override the
     // documented default.
@@ -77,7 +76,6 @@ struct EventType
     static const EventType kStayDetection;
     static const EventType kQueueNumDetection;
     static const EventType kQueueStayDetection;
-    static const EventType kTrafficJunction;
 
     static const EventType* findById(const QString& id);
     static const EventType* findByNativeId(const QString& nativeId);
