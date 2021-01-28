@@ -1,14 +1,14 @@
 """
 This script is a conditional launcher for another python script. It checks whether the modification
 time of the file passed via --checker-flag-file is older than the modification time of the
-FETCH_HEAD flie of the git working tree directory passed via --checker-source-dir. If true, then
+FETCH_HEAD file of the git working tree directory passed via --checker-source-dir. If true, then
 the script passed via --checker-run-script is executed, otherwise nothing happens. It is possible
 to set some paths to PYTHONPATH for the script to run via --checker-pythonpath.
 
 The script to run is loaded and run as a python module, therefore:
 1. The name of the script to run must be passed as a file name without .py extension.
 2. PYTHONPATH must contain the path to the script to run (e.g if you want to run a
-file that resides in "/tmp", --checker-pythonpath must contain at least the "/tmp" value.
+file that resides in "/tmp", --checker-pythonpath must contain at least the "/tmp" value).
 3. The script to run must have the "main" function as an entry point.
 4. If the script to run uses the "argparse" module, it must not use parse_args(), and can use
 parse_known_args() instead.
