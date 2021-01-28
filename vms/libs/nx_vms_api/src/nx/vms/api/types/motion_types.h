@@ -4,13 +4,35 @@
 
 namespace nx::vms::api {
 
+/**%apidoc
+ * Type of motion detection method.
+ */
 enum MotionType
 {
-    MT_Default = 0x0,
-    MT_HardwareGrid = 0x1,
-    MT_SoftwareGrid = 0x2,
-    MT_MotionWindow = 0x4,
-    MT_NoMotion = 0x8
+    /**%apidoc Use default method.
+     * %caption 0
+     */
+    MT_Default = 0,
+
+    /**%apidoc Use motion detection grid implemented by the camera.
+     * %caption 1
+     */
+    MT_HardwareGrid = 1 << 0,
+
+    /**%apidoc Use motion detection grid implemented by the server.
+     * %caption 2
+     */
+    MT_SoftwareGrid = 1 << 1,
+
+    /**%apidoc Use motion detection window implemented by the camera.
+     * %caption 4
+     */
+    MT_MotionWindow = 1 << 2,
+
+    /**%apidoc Do not perform motion detection.
+     * %caption 8
+     */
+    MT_NoMotion = 1 << 3,
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(MotionType)
 

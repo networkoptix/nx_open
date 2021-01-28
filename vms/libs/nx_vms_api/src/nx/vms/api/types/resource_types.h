@@ -44,6 +44,7 @@ QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(RecordingType)
 NX_VMS_API QString toString(RecordingType value);
 NX_VMS_API std::ostream& operator<<(std::ostream& os, RecordingType value);
 
+/**%apidoc Quality of the recording. */
 enum class StreamQuality
 {
     lowest = 0,
@@ -53,17 +54,40 @@ enum class StreamQuality
     highest = 4,
     preset = 5,
     undefined = 6,
-    rapidReview = 7, //< Used for rapid review only. The bitrate should be very high.
+    
+    /**%apidoc[unused]
+     * %// Used for rapid review only. The bitrate should be very high.
+     */
+    rapidReview = 7,
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(StreamQuality)
 NX_VMS_API QString toString(StreamQuality value);
 NX_VMS_API std::ostream& operator<<(std::ostream& os, StreamQuality value);
 
+/**%apidoc
+ * Priority for the Camera to be moved to another Server for failover (if the current Server
+ * fails).
+ */
 enum class FailoverPriority
 {
+    /**%apidoc Will never be moved to another Server.
+     * %caption Never
+     */
     never = 0,
+
+    /**%apidoc Low priority against other Cameras.
+     * %caption Low
+     */
     low = 1,
+
+    /**%apidoc Medium priority against other Cameras.
+     * %caption Medium
+     */
     medium = 2,
+
+    /**%apidoc High priority against other cameras.
+     * %caption High
+     */
     high = 3,
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(FailoverPriority)
@@ -90,7 +114,7 @@ enum ServerFlag
     SF_IfListCtrl = 0x008,
     SF_timeCtrl = 0x010,
 
-    /** System name is default, so it will be displayed as "Unassigned System' in NxTool. */
+    //* System name is default, so it will be displayed as "Unassigned System' in NxTool. */
     //SF_AutoSystemName = 0x020,
 
     SF_ArmServer = 0x040,
@@ -117,10 +141,27 @@ Q_DECLARE_FLAGS(ServerFlags, ServerFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(ServerFlags)
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(ServerFlag)
 
+/**%apidoc
+ * Settings for storage redundancy.
+ */
 enum class BackupType
 {
+    /**%apidoc
+     * Backup is performed only at user's request.
+     * %caption BackupManual
+     */
     manual = 0,
+    
+    /**%apidoc
+     * Backup is performed during recording.
+     * %caption BackupRealTime
+     */
     realtime = 1,
+
+    /**%apidoc
+     * Backup is performed according to the schedule.
+     * %caption BackupSchedule
+     */
     scheduled = 2
 };
 QN_ENABLE_ENUM_NUMERIC_SERIALIZATION(BackupType)

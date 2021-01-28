@@ -301,30 +301,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * </p>
      * %permissions Administrator.
      * %param serverId Server unique id. If such object exists, omitted fields will not be changed.
-     * %param serverName Server name.
-     * %param maxCameras Maximum number of cameras on the server.
-     * %param allowAutoRedundancy Whether the server can take cameras from
-     *     an offline server automatically.
-     *     %value false
-     *     %value true
-     * %param backupType Settings for storage redundancy.
-     *     %value Backup_Manual Backup is performed only at a user's request.
-     *     %value Backup_RealTime Backup is performed during recording.
-     *     %value Backup_Schedule Backup is performed on schedule.
-     * %param:string backupDaysOfTheWeek Days of week when the backup is allowed: the sum of values
-     *     for each required day, represented as a JSON string.
-     *     %value 2 Monday
-     *     %value 4 Tuesday
-     *     %value 8 Wednesday
-     *     %value 16 Thursday
-     *     %value 32 Friday
-     *     %value 64 Saturday
-     *     %value 128 Sunday
-     *     %value 254 All days
-     * %param backupStart Time of day when the backup starts (in seconds passed from 00:00:00).
-     * %param backupDuration Duration of the synchronization period (in seconds). -1 if not set.
-     * %param backupBitrate Maximum backup bitrate (in bytes per second). Negative value if not
-     *     limited.
      * %// AbstractCameraManager::saveUserAttributes
      */
     regUpdate<MediaServerUserAttributesData>(p, ApiCommand::saveMediaServerUserAttributes);
@@ -336,69 +312,18 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * content type "application/json". An example of such array can be seen in the result of
      * <code>GET /ec2/getMediaServerUserAttributesList</code>.
      * </p>
-     * %param serverId Server unique id.
-     * %param serverName Server name.
-     * %param maxCameras Maximum number of cameras on the server.
-     * %param allowAutoRedundancy Whether the server can take cameras from an offline server
-     *     automatically.
-     *     %value false
-     *     %value true
-     * %param backupType Settings for storage redundancy.
-     *     %value Backup_Manual Backup is performed only at a user's request.
-     *     %value Backup_RealTime Backup is performed during recording.
-     *     %value Backup_Schedule Backup is performed on schedule.
-     * %param:string backupDaysOfTheWeek Days of week when the backup is allowed: the sum of values
-     *     for each required day, represented as a JSON string.
-     *     %value 2 Monday
-     *     %value 4 Tuesday
-     *     %value 8 Wednesday
-     *     %value 16 Thursday
-     *     %value 32 Friday
-     *     %value 64 Saturday
-     *     %value 128 Sunday
-     *     %value 254 All days
-     * %param backupStart Time of day when the backup starts (in seconds passed from 00:00:00).
-     * %param backupDuration Duration of the synchronization period (in seconds). -1 if not set.
-     * %param backupBitrate Maximum backup bitrate (in bytes per second). Negative
-     *     value if not limited.
-     * %param metadataStorageId Storage identifier to keep metadata SQL database.
      * %// AbstractMediaServerManager::saveUserAttributes
      */
     regUpdate<MediaServerUserAttributesDataList>(p, ApiCommand::saveMediaServerUserAttributesList);
 
     /**%apidoc GET /ec2/getMediaServerUserAttributesList
-    * Read additional Server attributes.
-    * %param[default] format
-    * %param[opt] id Server unique id. If omitted, return data for all servers.
-    * %return List of objects with additional server attributes for all servers, in the requested
-    *     format.
-    *     %param serverId Server unique id.
-    *     %param serverName Server name.
-    *     %param maxCameras Maximum number of cameras on the server.
-    *     %param allowAutoRedundancy Whether the server can take cameras from
-    *         an offline server automatically.
-    *         %value false
-    *         %value true
-    *     %param backupType Settings for storage redundancy.
-    *         %value Backup_Manual Backup is performed only at a user's request.
-    *         %value Backup_RealTime Backup is performed during recording.
-    *         %value Backup_Schedule Backup is performed on schedule.
-    *     %param:string backupDaysOfTheWeek Days of week when the backup is allowed: the sum of values
-    *         for each required day, represented as a JSON string.
-    *         %value 2 Monday
-    *         %value 4 Tuesday
-    *         %value 8 Wednesday
-    *         %value 16 Thursday
-    *         %value 32 Friday
-    *         %value 64 Saturday
-    *         %value 128 Sunday
-    *         %value 254 All days
-    *     %param backupStart Time of day when the backup starts (in seconds passed from 00:00:00).
-    *     %param backupDuration Duration of the synchronization period in seconds. -1 if not set.
-    *     %param backupBitrate Maximum backup bitrate in bytes per second. Negative
-    *         value if not limited.
-    * %// AbstractMediaServerManager::getUserAttributes
-    */
+     * Read additional Server attributes.
+     * %param[default] format
+     * %param[opt] id Server unique id. If omitted, return data for all servers.
+     * %return List of objects with additional server attributes for all servers, in the requested
+     *     format.
+     * %// AbstractMediaServerManager::getUserAttributes
+     */
     regGet<QnUuid, MediaServerUserAttributesDataList>(p, ApiCommand::getMediaServerUserAttributesList);
 
     /**%apidoc[proprietary] POST /ec2/removeMediaServer
@@ -502,12 +427,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param[unused] licenseUsed Whether the license is used for the camera.
      *     %value false
      *     %value true
-     * %param:string motionType Type of motion detection method.
-     *     %value 0 Use default method.
-     *     %value 1 Use motion detection grid implemented by the camera.
-     *     %value 2 Use motion detection grid implemented by the server.
-     *     %value 4 Use motion detection window implemented by the camera.
-     *     %value 8 Do not perform motion detection.
      * %param motionMask List of motion detection areas and their
      *     sensitivity. The format is proprietary and is likely to change in
      *     future API versions. Currently, this string defines several rectangles separated
@@ -533,15 +452,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %value 5 Friday
      *         %value 6 Saturday
      *         %value 7 Sunday
-     *     %param scheduleTasks[].streamQuality Quality of the recording.
-     *         %value undefined
-     *         %value lowest
-     *         %value low
-     *         %value normal
-     *         %value high
-     *         %value highest
-     *         %value preset
-     *         %//value[proprietary] rapidReview
      *     %param scheduleTasks[].fps Frames per second (integer).
      * %param audioEnabled Whether audio is enabled on the camera.
      *     %value false
@@ -566,12 +476,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     for.
      * %param preferredServerId Unique id of a server which has the highest priority of hosting
      *     the camera for failover (if the current server fails).
-     * %param failoverPriority Priority for the camera to be moved
-     *     to another server for failover (if the current server fails).
-     *     %value FP_Never Will never be moved to another server.
-     *     %value FP_Low Low priority against other cameras.
-     *     %value FP_Medium Medium priority against other cameras.
-     *     %value FP_High High priority against other cameras.
      * %param backupType Combination (via "|") of the flags defining backup options.
      *     %value CameraBackup_Disabled Backup is disabled.
      *     %value CameraBackup_HighQuality Backup is in high quality.
@@ -605,12 +509,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      * %param[unused] licenseUsed Whether the license is used for the camera.
      *     %value false
      *     %value true
-     * %param:string Type of motion detection method.
-     *     %value 0 Use default method.
-     *     %value 1 Use motion detection grid implemented by the camera.
-     *     %value 2 Use motion detection grid implemented by the server.
-     *     %value 4 Use motion detection window implemented by the camera.
-     *     %value 8 Do not perform motion detection.
      * %param motionMask List of motion detection areas and their
      *     sensitivity. The format is proprietary and is likely to change in
      *     future API versions. Currently, this string defines several rectangles separated
@@ -636,15 +534,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         %value 5 Friday
      *         %value 6 Saturday
      *         %value 7 Sunday
-     *     %param scheduleTasks[].streamQuality Quality of the recording.
-     *         %value undefined
-     *         %value lowest
-     *         %value low
-     *         %value normal
-     *         %value high
-     *         %value highest
-     *         %value preset
-     *         %//value[proprietary] rapidReview
      *     %param scheduleTasks[].fps Frames per second (integer).
      * %param audioEnabled Whether audio is enabled on the camera.
      *     %value false
@@ -669,12 +558,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     for.
      * %param preferredServerId Unique id of a server which has the highest priority of hosting
      *     the camera for failover (if the current server fails).
-     * %param failoverPriority Priority for the camera to be moved
-     *     to another server for failover (if the current server fails).
-     *     %value FP_Never Will never be moved to another server.
-     *     %value FP_Low Low priority against other cameras.
-     *     %value FP_Medium Medium priority against other cameras.
-     *     %value FP_High High priority against other cameras.
      * %param backupType Combination (via "|") of the flags defining backup options.
      *     %value CameraBackup_Disabled Backup is disabled.
      *     %value CameraBackup_HighQuality Backup is in high quality.
@@ -705,12 +588,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %param licenseUsed Whether the license is used for the camera.
      *         %value false
      *         %value true
-     *     %param:string motionType Type of motion detection method.
-     *         %value 0 Use default method.
-     *         %value 1 Use motion detection grid implemented by the camera.
-     *         %value 2 Use motion detection grid implemented by the server.
-     *         %value 4 Use motion detection window implemented by the camera.
-     *         %value 8 Do not perform motion detection.
      *     %param motionMask List of motion detection areas and their
      *         sensitivity. The format is proprietary and is likely to change in
      *         future API versions. Currently, this string defines several rectangles separated
@@ -736,15 +613,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *             %value 5 Friday
      *             %value 6 Saturday
      *             %value 7 Sunday
-     *         %param scheduleTasks[].streamQuality Quality of the recording.
-     *             %value undefined
-     *             %value lowest
-     *             %value low
-     *             %value normal
-     *             %value high
-     *             %value highest
-     *             %value preset
-     *             %//value[proprietary] rapidReview
      *         %param scheduleTasks[].fps Frames per second (integer).
      *     %param audioEnabled Whether audio is enabled on the camera.
      *         %value false
@@ -769,12 +637,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         video for.
      *     %param preferredServerId Unique id of a server which has the highest priority of hosting
      *         the camera for failover (if the current server fails).
-     *     %param failoverPriority Priority for the camera to be moved
-     *         to another server for failover (if the current server fails).
-     *         %value FP_Never Will never be moved to another server.
-     *         %value FP_Low Low priority against other cameras.
-     *         %value FP_Medium Medium priority against other cameras.
-     *         %value FP_High High priority against other cameras.
      *     %param backupType Combination (via "|") of the flags defining backup options.
      *         %value CameraBackup_Disabled Backup is disabled.
      *         %value CameraBackup_HighQuality Backup is in high quality.
@@ -851,12 +713,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *     %param licenseUsed Whether the license is used for the camera.
      *         %value false
      *         %value true
-     *     %param:string motionType Type of motion detection method.
-     *         %value 0 Use default method.
-     *         %value 1 Use motion detection grid implemented by the camera.
-     *         %value 2 Use motion detection grid implemented by the server.
-     *         %value 4 Use motion detection window implemented by the camera.
-     *         %value 8 Do not perform motion detection.
      *     %param motionMask List of motion detection areas and their
      *         sensitivity. The format is proprietary and is likely to change in
      *         future API versions. Currently, this string defines several rectangles separated
@@ -882,22 +738,13 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *             %value 5 Friday
      *             %value 6 Saturday
      *             %value 7 Sunday
-     *         %param scheduleTasks[].streamQuality Quality of the recording.
-     *             %value undefined
-     *             %value lowest
-     *             %value low
-     *             %value normal
-     *             %value high
-     *             %value highest
-     *             %value preset
-     *             %//value[proprietary] rapidReview
      *         %param scheduleTasks[].fps Frames per second (integer).
      *     %param audioEnabled Whether audio is enabled on the camera.
      *         %value false
      *         %value true
      *     %param disableDualStreaming
-     *         %value false turn of dual streaming.
-     *         %value true enable dual streaming if it supported by camera.
+     *         %value false Turn off dual streaming.
+     *         %value true Enable dual streaming if it supported by the camera.
      *     %param controlEnabled Whether server manages the camera (changes resolution, FPS, create
      *         profiles, etc).
      *         %value false
@@ -915,12 +762,6 @@ void LocalConnectionFactory::registerRestHandlers(QnRestProcessorPool* const p)
      *         video for.
      *     %param preferredServerId Unique id of a server which has the highest priority of hosting
      *         the camera for failover (if the current server fails).
-     *     %param failoverPriority Priority for the camera to be moved
-     *         to another server for failover (if the current server fails).
-     *         %value FP_Never Will never be moved to another server.
-     *         %value FP_Low Low priority against other cameras.
-     *         %value FP_Medium Medium priority against other cameras.
-     *         %value FP_High High priority against other cameras.
      *     %param backupType Combination (via "|") of the flags defining backup options.
      *         %value CameraBackup_Disabled Backup is disabled.
      *         %value CameraBackup_HighQuality Backup is in high quality.

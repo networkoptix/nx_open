@@ -12,18 +12,59 @@ namespace api {
 
 enum class DayOfWeek
 {
+    /**%apidoc No days
+     * %caption 0
+     */
     none = 0,
 
+    /**%apidoc Monday
+     * %caption 2
+     */
     monday    = 1 << Qt::Monday,
+    
+    /**%apidoc Tuesday
+     * %caption 4
+     */
     tuesday   = 1 << Qt::Tuesday,
+    
+    /**%apidoc Wednesday
+     * %caption 8
+     */
     wednesday = 1 << Qt::Wednesday,
-    thursday  = 1 << Qt::Thursday,
-    friday    = 1 << Qt::Friday,
-    saturday  = 1 << Qt::Saturday,
-    sunday    = 1 << Qt::Sunday,
-
+    
+    /**%apidoc Thursday
+     * %caption 16
+     */
+    thursday = 1 << Qt::Thursday,
+    
+    /**%apidoc Friday
+     * %caption 32
+     */
+    friday = 1 << Qt::Friday,
+    
+    /**%apidoc Saturday
+     * %caption 64
+     */
+    saturday = 1 << Qt::Saturday,
+    
+    /**%apidoc Sunday
+     * %caption 128
+     */
+    sunday = 1 << Qt::Sunday,
+   
+    /**%apidoc Workdays (all except Saturday and Sunday)
+     * %caption 62
+     */
     weekdays = monday | tuesday | wednesday | thursday | friday,
+    
+    /**%apidoc Weekend (Saturday and Sunday)
+     * %caption 192
+     */
     weekends = saturday | sunday,
+    
+    /**%apidoc All days
+     * %caption 254
+     */
     all = weekdays | weekends
 };
 Q_DECLARE_FLAGS(DaysOfWeek, DayOfWeek)

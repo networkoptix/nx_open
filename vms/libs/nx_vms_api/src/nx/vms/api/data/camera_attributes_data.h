@@ -61,7 +61,7 @@ struct NX_VMS_API CameraAttributesData: Data
     QString userDefinedGroupName;
     bool scheduleEnabled = false;
     bool licenseUsed = false;       //< TODO: #GDM Field is not used.
-    MotionType motionType = MT_Default;
+    MotionType motionType = MT_Default; /**<%apidoc:string */
     QnLatin1Array motionMask;
     std::vector<ScheduleTaskData> scheduleTasks;
     bool audioEnabled = false;

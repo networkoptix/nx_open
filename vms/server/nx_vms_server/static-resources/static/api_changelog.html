@@ -96,19 +96,26 @@ the result parameters:
 </pre>
 </p>
 <p>
-Fixed enumaration values for <code><strong>backupDaysOfTheWeek</strong></code> in functions:
+Fixed enumaration values for <code><strong>backupType</strong></code> and
+<code><strong>backupDaysOfTheWeek</strong></code> in functions:
 <pre>
+    GET /ec2/getMediaServersEx
     GET /ec2/getMediaServerUserAttributesList
     POST /ec2/saveMediaServerUserAttributes
     POST /ec2/saveMediaServerUserAttributesList
 </pre>
 </p>
 <p>
-Fixed enumaration values for <code><strong>motionType</strong></code> in functions:
+Fixed enumaration values for <code><strong>motionType</strong></code>,
+<code><strong>streamQuality</strong></code> and
+<code><strong>failoverPriority</strong></code> in functions:
 <pre>
     GET /ec2/getCamerasEx
     GET /ec2/getCameraUserAttributesList
+    POST /ec2/saveCameraUserAttributes
     POST /ec2/saveCameraUserAttributesList
+    GET /ec2/getStatisticsReport
+    GET /ec2/getFullInfo
 </pre>
 </p>
 <!-- Proprietary part commented out.

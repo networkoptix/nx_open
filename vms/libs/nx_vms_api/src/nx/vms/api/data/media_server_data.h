@@ -62,22 +62,43 @@ struct NX_VMS_API MediaServerData: ResourceData
 
 struct NX_VMS_API MediaServerUserAttributesData: Data
 {
+    /**%apidoc Server unique id. */
     QnUuid serverId;
-    QString serverName;
-    int maxCameras = 0;
-    bool allowAutoRedundancy = false; //< Server can take cameras from offline server automatically.
 
-    // Redundant storage settings.
+    /**%apidoc Server name. */
+    QString serverName;
+
+    /**%apidoc Maximum number of Cameras on the Server. */
+    int maxCameras = 0;
+
+    /**%apidoc
+     * Whether the Server can take Cameras from an offline Server automatically.
+     * %value false
+     * %value true
+     */
+    bool allowAutoRedundancy = false;
+    
     BackupType backupType = BackupType::manual;
 
-    // Days of week mask.
+    /**%apidoc:string
+     * Days of week when the backup is allowed: the sum of values for each required day,
+     * represented as a JSON string.
+     */
     DaysOfWeek backupDaysOfTheWeek = DayOfWeek::all;
 
-    int backupStart = 0; //< Seconds from 00:00:00. Error if bDOW set and this is not set.
+    /**%apidoc
+     * Time of day when the backup starts (in seconds passed from 00:00:00).
+     * %// It is an error if bDOW is set and this value is not set.
+     */
+    int backupStart = 0; 
+
+    /**%apidoc Duration of the synchronization period (in seconds). -1 if not set. */
     int backupDuration = -1; //< Duration of synchronization period in seconds. -1 if not set.
 
-    // Bitrate cap in bytes per second. Negative value if not capped. Not capped by default.
+    /**%apidoc Maximum backup bitrate (in bytes per second). Negative value if not limited. */
     int backupBitrate = kDefaultBackupBitrate;
+
+    /**%apidoc Id of a Storage used to keep Analytics metadata database. */
     QnUuid metadataStorageId;
 
     static const int kDefaultBackupBitrate;
