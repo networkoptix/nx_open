@@ -1141,25 +1141,16 @@ void QnWorkbenchVideoWallHandler::restoreMessages(const QnUuid& controllerUuid, 
 
 bool QnWorkbenchVideoWallHandler::canStartControlMode(const QnUuid& layoutId) const
 {
-    const auto localInstanceId = runtimeInfoManager()->localInfo().uuid;
-
-    if (!m_licensesHelper->canStartControlSession(localInstanceId))
-    {
-        showLicensesErrorDialog(
-            tr("Activate one more license to start Video Wall control session."));
-        return false;
-    }
-
     // There is no layout for the target item, so nobody already controls it.
     if (layoutId.isNull())
         return true;
 
     // Check if another client instance already controls this layout.
+    const auto localInstanceId = runtimeInfoManager()->localInfo().uuid;
     const auto activePeers = runtimeInfoManager()->items()->getItems();
     for (const QnPeerRuntimeInfo& info: activePeers)
     {
-        if (info.data.videoWallControlSession == layoutId
-            && info.uuid != runtimeInfoManager()->localInfo().uuid)
+        if (info.data.videoWallControlSession == layoutId && info.uuid != localInstanceId)
         {
             showControlledByAnotherUserMessage();
             return false;

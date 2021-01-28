@@ -721,24 +721,6 @@ int QnVideoWallLicenseUsageHelper::licensesForScreens(int screens)
     return (screens + 1) / 2;
 }
 
-bool QnVideoWallLicenseUsageHelper::canStartControlSession(const QnUuid& controllerInstanceId)
-{
-    int controlSessions = 0;
-    for (const auto& videowall: commonModule()->resourcePool()->getResources<QnVideoWallResource>())
-    {
-        // Calculating running control sessions.
-        for (const QnVideoWallItem& item: videowall->items()->getItems())
-        {
-            const auto controlledBy = item.runtimeStatus.controlledBy;
-
-            // Skip own control sessions as they must be closed when new one is started.
-            if (!controlledBy.isNull() && controlledBy != controllerInstanceId)
-                ++controlSessions;
-        }
-    }
-    return controlSessions < totalLicenses(Qn::LC_VideoWall);
-}
-
 /************************************************************************/
 /* QnVideoWallLicenseUsageProposer                                      */
 /************************************************************************/

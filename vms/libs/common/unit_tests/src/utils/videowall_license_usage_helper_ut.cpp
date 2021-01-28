@@ -67,20 +67,6 @@ protected:
         return item;
     }
 
-    bool canStartControlSession(const QnUuid& instanceId) const
-    {
-        return m_helper->canStartControlSession(instanceId);
-    }
-
-    void startControlSession(
-        const QnVideoWallResourcePtr& videowall,
-        QnVideoWallItem item,
-        QnUuid instanceId)
-    {
-        item.runtimeStatus.controlledBy = instanceId;
-        videowall->items()->updateItem(item);
-    }
-
     bool enoughLicenses() const
     {
         return m_helper->isValid(Qn::LC_VideoWall);
@@ -92,30 +78,6 @@ protected:
     QScopedPointer<QnVideoWallLicenseUsageHelper> m_helper;
     QScopedPointer<QLicenseStubValidator> m_validator;
 };
-
-/**
- * Validate scenarios when user can and cannot start a control session.
- */
-TEST_F(QnVideowallLicenseUsageHelperTest, proposeToStartVideowallControl)
-{
-    auto videowall = addVideoWall();
-    auto item = addItem(videowall);
-
-    addLicenses(1);
-
-    // In the initial state we can start controlling.
-    const auto localInstanceId = QnUuid::createUuid();
-    ASSERT_TRUE(canStartControlSession(localInstanceId));
-
-    startControlSession(videowall, item, localInstanceId);
-
-    // Another client cannot start control.
-    const auto anotherInstanceId = QnUuid::createUuid();
-    ASSERT_FALSE(canStartControlSession(anotherInstanceId));
-
-    // We can switch our control to another item.
-    ASSERT_TRUE(canStartControlSession(localInstanceId));
-}
 
 /**
  * License text should be based on the screen count only. All changes in the screens count must be

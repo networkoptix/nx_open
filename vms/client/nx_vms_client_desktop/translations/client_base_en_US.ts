@@ -967,10 +967,6 @@ to view more bookmarks</source>
         <translation></translation>
     </message>
     <message>
-        <source>Objects Frames and Info...</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Pin Calendar</source>
         <translation></translation>
     </message>
@@ -6964,10 +6960,6 @@ If you intended to move analytics data to another storage location, please conta
         <translation></translation>
     </message>
     <message>
-        <source>Activate one more license to start Video Wall control session.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Enter the name of Video Wall to create:</source>
         <translation></translation>
     </message>
@@ -7570,25 +7562,6 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
         <source>Selected camera</source>
-        <translation></translation>
-    </message>
-</context>
-<context>
-    <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
-    <message>
-        <source>Show Always</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Show Only with &quot;Objects&quot; Tab</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Show</source>
-        <translation></translation>
-    </message>
-    <message>
-        <source>Do Not Show</source>
         <translation></translation>
     </message>
 </context>
