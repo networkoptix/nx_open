@@ -9,6 +9,9 @@ set(ninja_tool_script_name "${CMAKE_BINARY_DIR}/pre_build.ninja_tool")
 function(nx_setup_ninja_preprocessor)
     if(CMAKE_GENERATOR STREQUAL "Ninja")
         if(runNinjaTool)
+            # Prevent runing ninja_tool on generation stage.
+            set(ENV{DISABLE_NINJA_TOOL} "true")
+
             set(launcher_name "${CMAKE_SOURCE_DIR}/build_utils/ninja/ninja_launcher")
 
             if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
