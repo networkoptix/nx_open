@@ -81,6 +81,7 @@ def determine_package_versions(
         v["festival"] = "2.4-1"
         v["festival-vox"] = "2.4"
         v["ffmpeg"] = "3.1.9-6"
+        v["ffmpeg-rpi"] = "3.1.9-6"
         v["openssl"] = "1.0.2q-2"
         v["sysroot"] = "jessie"
 
@@ -171,8 +172,8 @@ def sync_dependencies(target, syncher, platform, arch, box, release_version, opt
     if box in ("bpi", "edge1"):
         sync("linux_arm32/ffmpeg")
     else:
-        if (platform, arch, box) == ("linux", "arm32", "none"):
-            sync("rpi/ffmpeg", do_not_include=True)
+        if (platform, arch, box) == ("linux", "arm", "none"):
+            sync("rpi/ffmpeg-rpi", do_not_include=True)
         sync("ffmpeg")
 
     if platform == "linux":
