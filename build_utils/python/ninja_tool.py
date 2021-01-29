@@ -17,21 +17,20 @@ from ninja_file_processor.rules_ninja_processor import RulesNinjaFileProcessor
 NINJA_BUILD_FILE_NAME = 'build.ninja'
 NINJA_PREBUILD_FILE_NAME = 'pre_build.ninja_tool'
 
-def clean_build_directory(build_dir: str,
+def clean_build_directory(build_dir: Path,
         build_file_processor: BuildNinjaFileProcessor = None,
         remove_unknown_files: bool = True) -> None:
 
     if build_file_processor is None:
-        build_filename = os.path.join(build_dir, NINJA_BUILD_FILE_NAME)
+        build_filename = build_dir / NINJA_BUILD_FILE_NAME
         build_file_processor = BuildNinjaFileProcessor(build_filename, build_directory=build_dir)
 
     if not build_file_processor.is_loaded():
         build_file_processor.load_data()
 
     build_files = build_file_processor.get_known_files()
-    known_files = get_files_from_list_file(os.path.join(build_dir, "known_files.txt"))
-    conan_files = get_files_from_conan_manifest(
-        os.path.join(build_dir, "conan_imports_manifest.txt"))
+    known_files = get_files_from_list_file(build_dir / "known_files.txt")
+    conan_files = get_files_from_conan_manifest(build_dir / "conan_imports_manifest.txt")
 
     all_known_files = set()
     for file_name in build_files | known_files | conan_files:
@@ -62,7 +61,7 @@ def clean_build_directory(build_dir: str,
         print("Done")
 
 
-def get_files_from_list_file(list_file_name: str) -> set:
+def get_files_from_list_file(list_file_name: Path) -> set:
     result = set()
     with open(list_file_name) as list_file:
         for line in list_file:
@@ -72,7 +71,7 @@ def get_files_from_list_file(list_file_name: str) -> set:
     return result
 
 
-def get_files_from_conan_manifest(conan_manifest_file_name: str) -> set:
+def get_files_from_conan_manifest(conan_manifest_file_name: Path) -> set:
     result = set()
     try:
         with open(conan_manifest_file_name) as manifest:
@@ -123,21 +122,20 @@ def find_extra_files(build_dir: Path, known_files: set) -> list:
 
     result = []
 
-    build_dir_path = Path(build_dir).resolve()
-    for file in build_dir_path.rglob('*'):
+    for file in build_dir.rglob('*'):
         if any(d in file.parent.parts for d in exclusion_dirs):
             continue
         if file.name in exclusions or file.suffix in exclusion_extensions:
             continue
-        if str(file.relative_to(build_dir_path).as_posix()) in known_files:
+        if str(file.relative_to(build_dir).as_posix()) in known_files:
             continue
 
-        result.append(build_dir_path.joinpath(file))
+        result.append(build_dir / file)
 
     return result
 
 
-def run_script(build_dir: str, script_file_name: str, force_patch: bool) -> None:
+def run_script(build_dir: Path, script_file_name: str, force_patch: bool) -> None:
     strengthened_targets = set()
     commands_to_run = list()
     do_clean = False
@@ -174,7 +172,7 @@ def run_script(build_dir: str, script_file_name: str, force_patch: bool) -> None
 
     print("Done")
 
-    build_file_name = os.path.join(build_dir, NINJA_BUILD_FILE_NAME)
+    build_file_name = build_dir / NINJA_BUILD_FILE_NAME
     build_file_processor = BuildNinjaFileProcessor(build_file_name, build_directory=build_dir)
 
     if do_clean:
@@ -195,7 +193,7 @@ def run_script(build_dir: str, script_file_name: str, force_patch: bool) -> None
 
 
 def patch_ninja_build(
-        file_name: str,
+        file_name: Path,
         strengthened_targets: set,
         script_timestamp: float,
         build_file_processor: BuildNinjaFileProcessor,
@@ -267,11 +265,11 @@ def patch_rules_file(
     print("Done")
 
 
-def redirect_output(file_name):
+def redirect_output(file_name: Path):
     """Redirects stderr and stdout to the file."""
 
-    log_dir = os.path.dirname(file_name)
-    Path(log_dir).mkdir(parents=True, exist_ok=True)
+    log_dir = file_name.parent
+    log_dir.mkdir(parents=True, exist_ok=True)
 
     log_fd = open(file_name, 'w')
     sys.stdout = log_fd
@@ -282,9 +280,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "-d", "--build-dir",
-        type=str,
+        type=Path,
         help="Ninja build directory.",
-        default=os.getcwd())
+        default=Path.cwd())
     parser.add_argument(
         "-f", "--force",
         action='store_true',
@@ -299,13 +297,8 @@ def main():
         help="List files unknown to the build system, and exit.")
     parser.add_argument(
         "-o", "--log-output",
-        type=str,
-        help="Log file name.",
-        dest="output",
-        action='store',
-        nargs='?',
-        const=os.path.join(os.getcwd(), "build_logs", "pre_build.log"),
-        default=None)
+        action='store_true',
+        help='Log output to file "<build-dir>/build_logs/pre_build.log".')
     parser.add_argument(
         "-t", "--stack-trace",
         action='store_true',
@@ -313,10 +306,9 @@ def main():
 
     args = parser.parse_args()
 
-    if args.output is not None:
-        redirect_output(args.output)
-
-    build_dir = os.path.abspath(args.build_dir)
+    build_dir = args.build_dir.resolve()
+    if args.log_output:
+        redirect_output(build_dir / "build_logs" / "pre_build.log")
 
     try:
         if args.clean:
@@ -324,7 +316,7 @@ def main():
         elif args.list_unknown:
             clean_build_directory(build_dir=build_dir, remove_unknown_files=False)
         else:
-            script_filename = os.path.join(build_dir, NINJA_PREBUILD_FILE_NAME)
+            script_filename = build_dir / NINJA_PREBUILD_FILE_NAME
             run_script(
                 build_dir=build_dir, script_file_name=script_filename, force_patch=args.force)
 
