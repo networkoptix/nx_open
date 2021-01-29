@@ -117,6 +117,7 @@ void DeviceAgent::getManifest(Result<const IString*>* outResult) const
             settings.fetchFrom(m_url);
 
             const auto manifest = QJsonObject{
+                {"capabilities", "keepObjectBoundingBoxRotation"},
                 {"objectTypes",
                     [&]()
                     {
