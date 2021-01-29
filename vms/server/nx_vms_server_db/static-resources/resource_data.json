@@ -16,7 +16,6 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-
     "version": "4.1.3.852",
     "data": [
         {
@@ -4974,6 +4973,19 @@
                 "Acti|*A818"
             ],
             "useOnvifPtz": true
+        },
+        {
+            "keys": [
+                "Samsung|LND-6010R*",
+                "Samsung|LNV-6010R*",
+                "Samsung|LNO-6010R*",
+                "Samsung|XNO-6010R*",
+                "hanwha|LND-6010R*",
+                "hanwha|LNV-6010R*",
+                "hanwha|LNO-6010R*",
+                "hanwha|XNO-6010R*"
+            ],
+            "useMedia2ToFetchProfiles": false
         }
     ]
 }
