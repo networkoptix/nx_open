@@ -133,12 +133,10 @@ namespace
             bool beingEdited = m_editedRow == index.row();
 
             bool hoveredRow = m_hoverTracker && m_hoverTracker->hoveredIndex().row() == index.row();
-            bool hasActiveAction = index.column() == QnStorageListModel::ActionsColumn
-                && index.data(Qn::ItemMouseCursorRole).toInt() == Qt::PointingHandCursor;
-                // TODO: add a separate data role for such cases?
+            bool hasHoverableText = index.data(QnStorageListModel::ShowTextOnHoverRole).toBool();
 
             // Hide actions when their row is not hovered.
-            if (hasActiveAction && !hoveredRow)
+            if (hasHoverableText && !hoveredRow)
                 return;
 
             auto storage = index.data(Qn::StorageInfoDataRole).value<QnStorageModelInfo>();
@@ -150,9 +148,9 @@ namespace
             // Set proper color for action text buttons.
             if (index.column() == QnStorageListModel::ActionsColumn)
             {
-                if (hasActiveAction && hovered)
+                if (hasHoverableText && hovered)
                     opt.palette.setColor(QPalette::Text, colorTheme()->color("light14"));
-                else if (hasActiveAction)
+                else if (hasHoverableText)
                     opt.palette.setColor(QPalette::Text, opt.palette.color(QPalette::WindowText));
                 else // Either hidden (has no text) or selected, we can use 'Selected' style for both.
                     opt.palette.setColor(QPalette::Text, opt.palette.color(QPalette::Light));
@@ -809,13 +807,16 @@ void QnStorageConfigWidget::at_storageView_clicked(const QModelIndex& index)
             // Network storage.
             m_model->removeStorage(record);
         }
-        else if (m_model->canStoreAnalytics(record))
+        else if (m_model->couldStoreAnalytics(record))
         {
-            // Local storage, may be used to store analytics.
-            if (record.id != m_model->metadataStorageId())
+            const auto storageId = record.id;
+            if (storageId != m_model->metadataStorageId())
             {
-                const auto storageId = record.id;
-                confirmNewMetadataStorage(storageId);
+                // Check storage access rights.
+                if (record.isDbReady || qnGlobalSettings->forceAnalyticsDbStoragePermissions())
+                    confirmNewMetadataStorage(storageId);
+                else
+                    QnMessageBox::critical(this, tr("Insufficient permissions to store analytics data."));
             }
         }
     }

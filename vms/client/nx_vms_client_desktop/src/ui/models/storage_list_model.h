@@ -21,7 +21,7 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 
-class QnStorageListModel : public ScopedModelOperations<Customized<QAbstractListModel>>
+class QnStorageListModel: public ScopedModelOperations<Customized<QAbstractListModel>>
 {
     Q_OBJECT
     using base_type = ScopedModelOperations<Customized<QAbstractListModel>>;
@@ -38,6 +38,11 @@ public:
         CheckBoxColumn,
 
         ColumnCount
+    };
+
+    enum Roles
+    {
+        ShowTextOnHoverRole = Qt::UserRole + 1,
     };
 
     QnStorageListModel(QObject* parent = nullptr);
@@ -65,8 +70,12 @@ public:
     /** Check if storage can be removed from the system. */
     bool canRemoveStorage(const QnStorageModelInfo& data) const;
 
-    // Check if storage can be used to store analytics metadata.
-    bool canStoreAnalytics(const QnStorageModelInfo& data) const;
+    /**
+     * Check if storage could be used to store analytics metadata (i.e. has required storage type).
+     * Actual access rights are not checked by this call, since in some scenarios they could be set
+     * later by the caller.
+     */
+    bool couldStoreAnalytics(const QnStorageModelInfo& data) const;
 
     /**
      *  Check if storage is active on the server.
@@ -91,6 +100,7 @@ private:
     QString displayData(const QModelIndex& index, bool forcedText) const;
     QVariant mouseCursorData(const QModelIndex& index) const;
     QVariant checkstateData(const QModelIndex& index) const;
+    bool showTextOnHover(const QModelIndex& index) const;
 
     /* Check if the whole section is in rebuild. */
     bool isStoragePoolInRebuild(const QnStorageModelInfo& storage) const;

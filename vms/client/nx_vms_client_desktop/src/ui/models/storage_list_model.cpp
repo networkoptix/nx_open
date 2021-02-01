@@ -35,7 +35,7 @@ namespace
 
 // ------------------ QnStorageListMode --------------------------
 
-QnStorageListModel::QnStorageListModel(QObject* parent) :
+QnStorageListModel::QnStorageListModel(QObject* parent):
     base_type(parent),
     m_server(),
     m_storages(),
@@ -170,7 +170,7 @@ QString urlPath(const QString& url)
 
 QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedText) const
 {
-    QnStorageModelInfo storageData = storage(index);
+    const QnStorageModelInfo& storageData = storage(index);
     switch (index.column())
     {
         case CheckBoxColumn:
@@ -268,7 +268,7 @@ QString QnStorageListModel::displayData(const QModelIndex& index, bool forcedTex
             if (canRemoveStorage(storageData))
                 return tr("Remove");
 
-            if (canStoreAnalytics(storageData))
+            if (couldStoreAnalytics(storageData))
                 return tr("Use to store analytics data");
 
             return QString();
@@ -286,12 +286,10 @@ QVariant QnStorageListModel::mouseCursorData(const QModelIndex& index) const
     if (m_readOnly)
         return QVariant();
 
-    if (index.column() == ActionsColumn)
-        if (!index.data(Qt::DisplayRole).toString().isEmpty()
-            && m_storages.at(index.row()).id != m_metadataStorageId)
-                return QVariant::fromValue<int>(Qt::PointingHandCursor);
-
-    return QVariant();
+    // Right now all active cells (i.e. cells with pointing hand cursor) have "hoverable" text.
+    return showTextOnHover(index)
+        ? QVariant::fromValue<int>(Qt::PointingHandCursor)
+        : QVariant();
 }
 
 QVariant QnStorageListModel::checkstateData(const QModelIndex& index) const
@@ -303,6 +301,16 @@ QVariant QnStorageListModel::checkstateData(const QModelIndex& index) const
     return storageData.isUsed && storageData.isWritable
         ? Qt::Checked
         : Qt::Unchecked;
+}
+
+bool QnStorageListModel::showTextOnHover(const QModelIndex& index) const
+{
+    if (index.column() != ActionsColumn)
+        return false;
+
+    const QnStorageModelInfo& storageData = storage(index);
+    return (storageData.id != m_metadataStorageId
+        && (couldStoreAnalytics(storageData) || canRemoveStorage(storageData)));
 }
 
 QVariant QnStorageListModel::data(const QModelIndex& index, int role) const
@@ -326,7 +334,7 @@ QVariant QnStorageListModel::data(const QModelIndex& index, int role) const
                 if (canRemoveStorage(storage))
                     return qnSkin->pixmap("text_buttons/trash.png");
 
-                if (canStoreAnalytics(storage))
+                if (couldStoreAnalytics(storage))
                     return qnSkin->pixmap("text_buttons/analytics.png");
             }
 
@@ -353,9 +361,11 @@ QVariant QnStorageListModel::data(const QModelIndex& index, int role) const
                     /* HTML tooltips are word wrapped: */
                     return lit("<span>%1</span").arg(text.toHtmlEscaped());
                 }
-
-                return QVariant();
             }
+            return QVariant();
+
+        case ShowTextOnHoverRole:
+            return showTextOnHover(index);
 
         default:
             return QVariant();
@@ -510,10 +520,10 @@ bool QnStorageListModel::canRemoveStorage(const QnStorageModelInfo& data) const
     return data.isExternal || !data.isOnline;
 }
 
-bool QnStorageListModel::canStoreAnalytics(const QnStorageModelInfo& data) const
+bool QnStorageListModel::couldStoreAnalytics(const QnStorageModelInfo& data) const
 {
     //TODO: use PartitionType enum value here instead of the serialized literal
-    return data.isOnline && data.storageType == "local" && data.isDbReady;
+    return data.isOnline && data.storageType == "local";
 }
 
 bool QnStorageListModel::storageIsActive(const QnStorageModelInfo& data) const
