@@ -7871,7 +7871,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>I/O Ports</source>
-      <translation>Ports I/O</translation>
+      <translation>Ports E/S</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -8159,7 +8159,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>All devices are already added</source>
-      <translation>Tous périphériques déjà ajoutés</translation>
+      <translation>Tous les périphériques sont déjà ajoutés</translation>
     </message>
     <message numerus="yes">
       <source>%n devices are being added. You can close this dialog or start a new search</source>
@@ -8758,7 +8758,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Downgrade to earlier versions is not possible</source>
-      <translation>Rétrogradation vers une version antérieure n'est pas possible</translation>
+      <translation>Rétrograder vers les versions précédentes n'est pas possible</translation>
     </message>
     <message>
       <source>Update file is not found</source>
@@ -8766,7 +8766,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Upgrade package is broken</source>
-      <translation>Paquet de mise à niveau brisé</translation>
+      <translation>Le paquet de mise à jour est cassé</translation>
     </message>
     <message>
       <source>Missing update package for some servers</source>
@@ -9270,7 +9270,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>%n symbols left</source>
       <translation>
-        <numerusform>%n symbole restants</numerusform>
+        <numerusform>%n symbole restant</numerusform>
         <numerusform>%n symboles restants</numerusform>
       </translation>
     </message>
@@ -9373,7 +9373,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Dual-streaming is disabled or not supported</source>
-      <translation>Flux double est désactivée ou non prise en charge</translation>
+      <translation>Double Flux désactivée ou non prise en charge</translation>
     </message>
   </context>
   <context>
@@ -9387,15 +9387,15 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>nx::vms::client::desktop::SecuritySettingsWidget</name>
     <message>
       <source>Tracks and logs all user actions.</source>
-      <translation>Suit et log toutes les actions de l'utilisateur.</translation>
+      <translation>Suivre et enregistrer toutes les actions de l'utilisateur.</translation>
     </message>
     <message>
       <source>minutes</source>
-      <translation>minute</translation>
+      <translation>minutes</translation>
     </message>
     <message>
       <source>hours</source>
-      <translation>heure</translation>
+      <translation>heures</translation>
     </message>
     <message>
       <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
@@ -9541,7 +9541,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Store Update Files</source>
-      <translation>Conserver fichiers de mise à jour</translation>
+      <translation>Stocker les fichiers de mise à jour</translation>
     </message>
     <message>
       <source>Client</source>
@@ -9571,7 +9571,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>nx::vms::client::desktop::SimpleMotionSearchWidget</name>
     <message>
       <source>No motion</source>
-      <translation>Auncun mouvement</translation>
+      <translation>Aucun mouvement</translation>
     </message>
     <message>
       <source>No motion detected</source>
@@ -9603,7 +9603,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Set Passwords</source>
-      <translation>Définir mot de passe</translation>
+      <translation>Définir les mots de passe</translation>
     </message>
   </context>
   <context>
@@ -9643,11 +9643,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Server OS Time</source>
-      <translation>Heure SE serveur</translation>
+      <translation>Heure de l'OS du serveur</translation>
     </message>
     <message>
       <source>VMS Time</source>
-      <translation>Temps VMS</translation>
+      <translation>Heure du VMS</translation>
     </message>
   </context>
   <context>
@@ -9761,7 +9761,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Uploading %1...</source>
       <comment>Filename will be substituted</comment>
-      <translation>Envoie %1...</translation>
+      <translation>Téléchargement %1...</translation>
     </message>
   </context>
   <context>
@@ -9807,11 +9807,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Export failed</source>
-      <translation>Exporation échoué</translation>
+      <translation>L'exportation a échoué</translation>
     </message>
     <message>
       <source>Selected period cannot be exported for the current camera.</source>
-      <translation>Période sélectionnée ne peut pas être exportée pour la caméra actuelle.</translation>
+      <translation>La période sélectionnée ne peut pas être exportée pour la caméra actuelle.</translation>
     </message>
     <message>
       <source>Several bookmarks can be exported as layout only.</source>
@@ -9827,7 +9827,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Starting export...</source>
-      <translation>Démarrer l'export...</translation>
+      <translation>Démarrage de l'exportation...</translation>
     </message>
     <message>
       <source>Saving layout</source>
@@ -9843,7 +9843,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Starting saving...</source>
-      <translation>Démarrer la sauvegarde...</translation>
+      <translation>Démarrage de l'enregistrement...</translation>
     </message>
     <message>
       <source>We are preparing files for the export process. Please wait for a few seconds.</source>
@@ -9851,7 +9851,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Transcoding is required. Export session restarted.</source>
-      <translation>Le transcodage est requis. Session d'exportation redémarré.</translation>
+      <translation>Un transcodage est nécessaire. La session d'exportation a redémarré.</translation>
     </message>
   </context>
   <context>
@@ -9888,7 +9888,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>nx::vms::client::desktop::integrations::entropix::ReconstructResolutionIntegration</name>
     <message>
       <source>Reconstruct Resolution</source>
-      <translation>Reconstruire résolution</translation>
+      <translation>Reconstruire la résolution</translation>
     </message>
   </context>
   <context>
@@ -10382,7 +10382,7 @@ Vous pouvez sélectionner un autre emplacement de stockage dans l'onglet &quot;S
     </message>
     <message>
       <source>Failed to overwrite file</source>
-      <translation>Échec du remplacement de fichier</translation>
+      <translation>Impossible d'écraser le fichier</translation>
     </message>
     <message>
       <source>Failed to save file</source>
@@ -10390,7 +10390,7 @@ Vous pouvez sélectionner un autre emplacement de stockage dans l'onglet &quot;S
     </message>
     <message>
       <source>%1 folder is blocked for writing.</source>
-      <translation>Dossier %1 bloqué en écriture.</translation>
+      <translation>Le dossier %1 est bloqué en écriture.</translation>
     </message>
     <message>
       <source>Downloading file...</source>
