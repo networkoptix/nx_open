@@ -29,6 +29,9 @@ public:
     QnUuid engineId() const;
     const QString& eventTypeId() const;
 
+    QString caption() const { return m_caption; }
+    QString description() const { return m_description; }
+
     virtual EventParameters getRuntimeParams() const override;
     virtual EventParameters getRuntimeParamsEx(
         const EventParameters& ruleEventParams) const override;

@@ -50,10 +50,10 @@ using namespace std::literals::chrono_literals;
 
 namespace {
 
-enum class EventContinuityType
+enum class EventIsActive
 {
-    impulse,
-    prolonged,
+    yes,
+    no,
 };
 
 struct EventDescriptor
@@ -61,18 +61,21 @@ struct EventDescriptor
     std::string eventTypeId;
     std::string caption;
     std::string description;
-    EventContinuityType continuityType = EventContinuityType::impulse;
+    std::string prolongedEventKey;
+    EventIsActive isActive;
 
     EventDescriptor(
         std::string eventTypeId,
         std::string caption,
         std::string description,
-        EventContinuityType continuityType)
+        EventIsActive isActive = EventIsActive::yes,
+        std::string prolongedEventKey = "")
         :
         eventTypeId(std::move(eventTypeId)),
         caption(std::move(caption)),
         description(std::move(description)),
-        continuityType(continuityType)
+        prolongedEventKey(prolongedEventKey),
+        isActive(isActive)
     {
     }
 };
@@ -80,33 +83,72 @@ struct EventDescriptor
 static const std::vector<EventDescriptor> kEventsToFire = {
     {
         kObjectInTheAreaEventType,
-        "Object in the Area - prolonged event (caption)",
-        "Object in the Area - prolonged event (description)",
-        EventContinuityType::prolonged
+        "Object in the Area - prolonged event (caption) key1, STARTED",
+        "Object in the Area - prolonged event (description) key1, STARTED",
+        EventIsActive::yes,
+        "key1"
+    },
+    {
+        kObjectInTheAreaEventType,
+        "Object in the Area - prolonged event (caption) DUPLICATE key1, STARTED",
+        "Object in the Area - prolonged event (description) DUPLICATE key1, STARTED",
+        EventIsActive::yes,
+        "key1"
+    },
+    {
+        kObjectInTheAreaEventType,
+        "Object in the Area - prolonged event (caption) key2, STARTED",
+        "Object in the Area - prolonged event (description) key2, STARTED",
+        EventIsActive::yes,
+        "key2"
+    },
+    {
+        kObjectInTheAreaEventType,
+        "Object in the Area - prolonged event (caption) key1, FINISHED",
+        "Object in the Area - prolonged event (description) key1, FINISHED",
+        EventIsActive::no,
+        "key1"
+    },
+    {
+        kObjectInTheAreaEventType,
+        "Object in the Area - prolonged event (caption) NEW key1, STARTED",
+        "Object in the Area - prolonged event (description) NEW key1, STARTED",
+        EventIsActive::yes,
+        "key1"
+    },
+    {
+        kObjectInTheAreaEventType,
+        "Object in the Area - prolonged event (caption) key2, FINISHED",
+        "Object in the Area - prolonged event (description) key2, FINISHED",
+        EventIsActive::no,
+        "key2"
+    },
+    {
+        kObjectInTheAreaEventType,
+        "Object in the Area - prolonged event (caption) key1, FINISHED",
+        "Object in the Area - prolonged event (description) key1, FINISHED",
+        EventIsActive::no,
+        "key1"
     },
     {
         kLineCrossingEventType,
         "Line crossing - impulse event (caption)",
         "Line crossing - impulse event (description)",
-        EventContinuityType::impulse
     },
     {
         kSuspiciousNoiseEventType,
         "Suspicious noise - group impulse event (caption)",
         "Suspicious noise - group impulse event (description)",
-        EventContinuityType::impulse
     },
     {
         kGunshotEventType,
         "Gunshot - group impulse event (caption)",
         "Gunshot - group impulse event (description)",
-        EventContinuityType::impulse
     },
     {
         kAdditionalEventType,
         "Caption: Additional Event",
         "Description: Additional Event",
-        EventContinuityType::impulse
     }
 };
 
@@ -559,50 +601,17 @@ IMetadataPacket* DeviceAgent::cookSomeEvents()
 
     auto eventMetadata = makePtr<EventMetadata>();
     eventMetadata->setTypeId(descriptor.eventTypeId);
+    eventMetadata->setCaption(descriptor.caption);
+    eventMetadata->setDescription(descriptor.description);
+    eventMetadata->setIsActive(descriptor.isActive == EventIsActive::yes);
+    eventMetadata->setKey(descriptor.prolongedEventKey);
 
-    auto nextEventTypeIndex =
-        [this]()
-        {
-            return (m_eventContext.currentEventTypeIndex == (int) kEventsToFire.size() - 1)
-                ? 0
-                : (m_eventContext.currentEventTypeIndex + 1);
-        };
+    NX_PRINT/*NX_OUTPUT*/ << "Firing event: "
+        << "type: " << eventMetadata->typeId()
+        << ", isActive: " << eventMetadata->isActive();
 
-    bool isActive = false;
-    auto caption = descriptor.caption;
-    auto description = descriptor.description;
-
-    if (descriptor.continuityType == EventContinuityType::prolonged)
-    {
-        static const std::string kStartedSuffix{" STARTED"};
-        static const std::string kFinishedSuffix{" FINISHED"};
-
-        isActive = !m_eventContext.isCurrentEventActive;
-        caption += isActive ? kStartedSuffix : kFinishedSuffix;
-        description += isActive ? kStartedSuffix : kFinishedSuffix;
-
-        eventMetadata->setIsActive(isActive);
-        eventMetadata->setKey("stub-key");
-
-        if (m_eventContext.isCurrentEventActive)
-            m_eventContext.currentEventTypeIndex = nextEventTypeIndex();
-
-        m_eventContext.isCurrentEventActive = isActive;
-    }
-    else
-    {
-        isActive = true;
-        eventMetadata->setIsActive(isActive);
-        m_eventContext.isCurrentEventActive = false;
-        m_eventContext.currentEventTypeIndex = nextEventTypeIndex();
-    }
-
-    eventMetadata->setCaption(std::move(caption));
-    eventMetadata->setDescription(std::move(description));
-
-    NX_OUTPUT << "Firing event: "
-        << "type: " << descriptor.eventTypeId
-        << ", isActive: " << (isActive ? "true" : "false");
+    m_eventContext.currentEventTypeIndex =
+        (m_eventContext.currentEventTypeIndex + 1) % ((int) kEventsToFire.size());
 
     eventMetadataPacket->addItem(eventMetadata.get());
     return eventMetadataPacket;

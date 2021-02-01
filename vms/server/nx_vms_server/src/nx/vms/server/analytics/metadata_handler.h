@@ -62,10 +62,6 @@ signals:
     void sdkEventTriggered(const nx::vms::event::AnalyticsSdkEventPtr& event);
 
 private:
-    nx::vms::api::EventState lastEventState(const QString& eventTypeId) const;
-
-    void setLastEventState(const QString& eventTypeId, nx::vms::api::EventState eventState);
-
     std::optional<nx::vms::api::analytics::EventTypeDescriptor> eventTypeDescriptor(
         const QString& eventTypeId) const;
 
@@ -107,7 +103,6 @@ private:
     QnUuid m_engineId;
     const ViolationHandler m_violationHandler;
     mutable std::optional<nx::analytics::EventTypeDescriptorMap> m_eventTypeDescriptors;
-    QMap<QString, nx::vms::api::EventState> m_eventStateMap;
     MetadataSinkSet m_metadataSinks;
     nx::analytics::MetadataLogger m_metadataLogger;
     ObjectCoordinatesTranslator m_objectCoordinatesTranslator;

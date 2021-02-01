@@ -372,8 +372,6 @@ void MetadataHandler::handleObjectTrackBestShotPacketWithImage(
 void MetadataHandler::handleEventMetadata(
     const Ptr<const IEventMetadata0>& eventMetadata, qint64 timestampUsec)
 {
-    auto eventState = nx::vms::api::EventState::undefined;
-
     const char* const eventTypeId = eventMetadata->typeId();
     // TODO: #dmishin: Properly handle the null value.
     NX_VERBOSE(this, "%1(): typeId %2", __func__, eventTypeId);
@@ -388,23 +386,9 @@ void MetadataHandler::handleEventMetadata(
         return;
     }
 
-    if (descriptor->flags.testFlag(nx::vms::api::analytics::EventTypeFlag::stateDependent))
-    {
-        eventState = eventMetadata->isActive()
-            ? nx::vms::api::EventState::active
-            : nx::vms::api::EventState::inactive;
-
-        const bool isDuplicate = eventState == nx::vms::api::EventState::inactive
-            && lastEventState(eventTypeId) == nx::vms::api::EventState::inactive;
-
-        if (isDuplicate)
-        {
-            NX_VERBOSE(this, "%1(): Ignoring duplicate event", __func__);
-            return;
-        }
-    }
-
-    setLastEventState(eventTypeId, eventState);
+    const auto eventState = eventMetadata->isActive()
+        ? nx::vms::api::EventState::active
+        : nx::vms::api::EventState::inactive;
 
     const auto eventMetadataWithObjectTrackId =
         eventMetadata->queryInterface<IEventMetadata1>();
@@ -443,6 +427,11 @@ void MetadataHandler::handleEventMetadata(
         NX_VERBOSE(this, "%1(): Capturing event", __func__);
         return;
     }
+
+    NX_VERBOSE(this, "Processing Analytics Event: caption %1, typeId %2, externalUniqueKey %3",
+        sdkEvent->caption(),
+        sdkEvent->eventTypeId(),
+        nx::kit::utils::toString(sdkEvent->getExternalUniqueKey()));
 
     emit sdkEventTriggered(sdkEvent);
 }
@@ -508,20 +497,6 @@ void MetadataHandler::setMetadataSinks(MetadataSinkSet metadataSinks)
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     m_metadataSinks = std::move(metadataSinks);
-}
-
-nx::vms::api::EventState MetadataHandler::lastEventState(const QString& eventTypeId) const
-{
-    if (m_eventStateMap.contains(eventTypeId))
-        return m_eventStateMap[eventTypeId];
-
-    return nx::vms::api::EventState::inactive;
-}
-
-void MetadataHandler::setLastEventState(
-    const QString& eventTypeId, nx::vms::api::EventState eventState)
-{
-    m_eventStateMap[eventTypeId] = eventState;
 }
 
 void MetadataHandler::at_compatibleEventTypesMaybeChanged(

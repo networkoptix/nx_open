@@ -219,7 +219,6 @@ private:
     struct EventContext
     {
         int currentEventTypeIndex = 0;
-        bool isCurrentEventActive = false;
     };
 
     EventContext m_eventContext;
