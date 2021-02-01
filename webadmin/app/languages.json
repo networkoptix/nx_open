@@ -1,6 +1,7 @@
 [
 {"_": "This file is for developer builds only. Content is hardcoded",
  "name": "ar_SA", "language": "ar_SA"},
+{"name": "ca_ES", "language": "ca_ES"},
 {"name": "de_DE", "language": "de_DE"},
 {"name": "en_GB", "language": "en_GB"},
 {"name": "en_US", "language": "en_US"},
