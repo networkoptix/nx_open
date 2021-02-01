@@ -5833,6 +5833,10 @@ If you intended to move analytics data to another storage location, please conta
         <source>now</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Insufficient permissions to store analytics data.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>QnStorageListModel</name>
