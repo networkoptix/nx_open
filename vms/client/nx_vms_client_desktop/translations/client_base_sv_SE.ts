@@ -968,10 +968,6 @@ om du vill visa fler bokmärken</translation>
       <translation>Växla till objektfliken</translation>
     </message>
     <message>
-      <source>Objects Frames and Info...</source>
-      <translation>Objektramar och Info...</translation>
-    </message>
-    <message>
       <source>Pin Calendar</source>
       <translation>Fäst kalender</translation>
     </message>
@@ -5844,6 +5840,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>now</source>
       <translation>nu</translation>
     </message>
+    <message>
+      <source>Insufficient permissions to store analytics data.</source>
+      <translation>Otillräckliga behörigheter för att lagra analysdata.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6971,10 +6971,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Skärmen styrs av en annan användare</translation>
     </message>
     <message>
-      <source>Activate one more license to start Video Wall control session.</source>
-      <translation>Aktivera ytterligare en licens för att starta videoväggskontrollen.</translation>
-    </message>
-    <message>
       <source>Enter the name of Video Wall to create:</source>
       <translation>Ange namnet på videovägg att att skapa:</translation>
     </message>
@@ -7578,25 +7574,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Selected camera</source>
       <translation>Vald kamera</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
-    <message>
-      <source>Show Always</source>
-      <translation>Visa alltid</translation>
-    </message>
-    <message>
-      <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation>Visa endast med &quot;objekt&quot; fliken</translation>
-    </message>
-    <message>
-      <source>Show</source>
-      <translation>Visa</translation>
-    </message>
-    <message>
-      <source>Do Not Show</source>
-      <translation>Visa inte</translation>
     </message>
   </context>
   <context>

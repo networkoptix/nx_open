@@ -967,10 +967,6 @@ to view more bookmarks</source>
       <translation>Przejdź do karty Obiekty</translation>
     </message>
     <message>
-      <source>Objects Frames and Info...</source>
-      <translation>Obiekty i informacje...</translation>
-    </message>
-    <message>
       <source>Pin Calendar</source>
       <translation>Przypnij kalendarz</translation>
     </message>
@@ -5970,6 +5966,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>now</source>
       <translation>teraz</translation>
     </message>
+    <message>
+      <source>Insufficient permissions to store analytics data.</source>
+      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -7113,10 +7113,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Ekran jest kontrolowany przez innego użytkownika</translation>
     </message>
     <message>
-      <source>Activate one more license to start Video Wall control session.</source>
-      <translation>Uaktywnij jedną lub więcej licencji, aby rozpocząć sesję sterowania ścianą wideo.</translation>
-    </message>
-    <message>
       <source>Enter the name of Video Wall to create:</source>
       <translation>Wprowadź nazwę nowej ściany wideo:</translation>
     </message>
@@ -7776,25 +7772,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Selected camera</source>
       <translation>Wybrana kamera</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
-    <message>
-      <source>Show Always</source>
-      <translation>Pokaż zawsze</translation>
-    </message>
-    <message>
-      <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation>Pokaż tylko z kartą &quot;Obiektów&quot;</translation>
-    </message>
-    <message>
-      <source>Show</source>
-      <translation>Pokaż</translation>
-    </message>
-    <message>
-      <source>Do Not Show</source>
-      <translation>Nie pokazuj</translation>
     </message>
   </context>
   <context>

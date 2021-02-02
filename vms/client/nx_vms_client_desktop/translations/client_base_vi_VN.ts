@@ -967,10 +967,6 @@ to view more bookmarks</source>
       <translation>Chuyển sang tab Đối tượng</translation>
     </message>
     <message>
-      <source>Objects Frames and Info...</source>
-      <translation>Khung Đối tượng và Thông tin...</translation>
-    </message>
-    <message>
       <source>Pin Calendar</source>
       <translation>Pin Lịch</translation>
     </message>
@@ -5772,6 +5768,10 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <source>now</source>
       <translation>hiện nay</translation>
     </message>
+    <message>
+      <source>Insufficient permissions to store analytics data.</source>
+      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6891,10 +6891,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
       <translation>Màn hình đang được kiểm soát bởi một người dùng khác</translation>
     </message>
     <message>
-      <source>Activate one more license to start Video Wall control session.</source>
-      <translation>Kích hoạt thêm bản quyền để bắt đầu phiên điều khiển Video Wall.</translation>
-    </message>
-    <message>
       <source>Enter the name of Video Wall to create:</source>
       <translation>Nhập tên để tạo Video Wall:</translation>
     </message>
@@ -7470,25 +7466,6 @@ Nếu bạn có ý định di chuyển dữ liệu phân tích đến một vị
     <message>
       <source>Selected camera</source>
       <translation>Camera đã chọn</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
-    <message>
-      <source>Show Always</source>
-      <translation>Luôn hiển thị</translation>
-    </message>
-    <message>
-      <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation>Chỉ hiển thị với &quot;Đối tượng&quot; Tab</translation>
-    </message>
-    <message>
-      <source>Show</source>
-      <translation>Buổi diễn</translation>
-    </message>
-    <message>
-      <source>Do Not Show</source>
-      <translation>Không hiển thị</translation>
     </message>
   </context>
   <context>

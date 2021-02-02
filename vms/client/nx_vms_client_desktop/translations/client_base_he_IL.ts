@@ -967,10 +967,6 @@ to view more bookmarks</source>
       <translation>עבור לכרטיסיית אובייקטים</translation>
     </message>
     <message>
-      <source>Objects Frames and Info...</source>
-      <translation>מסגרות אובייקטים ומידע...</translation>
-    </message>
-    <message>
       <source>Pin Calendar</source>
       <translation>הצמד לוח שנה</translation>
     </message>
@@ -5972,6 +5968,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>now</source>
       <translation>עכשיו</translation>
     </message>
+    <message>
+      <source>Insufficient permissions to store analytics data.</source>
+      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -7115,10 +7115,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>המסך נשלט על ידי משתמש אחר</translation>
     </message>
     <message>
-      <source>Activate one more license to start Video Wall control session.</source>
-      <translation>הפעל רישיון נוסף כדי להתחיל את השליטה בקיר הוידאו.</translation>
-    </message>
-    <message>
       <source>Enter the name of Video Wall to create:</source>
       <translation>הכנס את שם קיר הוידאו שברצונך ליצור:</translation>
     </message>
@@ -7778,25 +7774,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Selected camera</source>
       <translation>מצלמה שנבחרה</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
-    <message>
-      <source>Show Always</source>
-      <translation>הצג תמיד</translation>
-    </message>
-    <message>
-      <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation>הצג רק עם לשונית &quot;אובייקטים&quot;</translation>
-    </message>
-    <message>
-      <source>Show</source>
-      <translation>הצג</translation>
-    </message>
-    <message>
-      <source>Do Not Show</source>
-      <translation>אל תציג</translation>
     </message>
   </context>
   <context>

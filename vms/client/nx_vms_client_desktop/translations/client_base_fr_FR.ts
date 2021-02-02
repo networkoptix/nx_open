@@ -968,10 +968,6 @@ pour afficher plus de signets</translation>
       <translation>Basculer vers l'onglet objets</translation>
     </message>
     <message>
-      <source>Objects Frames and Info...</source>
-      <translation>Cadres et infos objets...</translation>
-    </message>
-    <message>
       <source>Pin Calendar</source>
       <translation>Épingler Calendrier</translation>
     </message>
@@ -5844,6 +5840,10 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <source>now</source>
       <translation>maintenant</translation>
     </message>
+    <message>
+      <source>Insufficient permissions to store analytics data.</source>
+      <translation>Autorisations insuffisantes pour stocker les données d'analyse.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6971,10 +6971,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <translation>Écran contrôlé par un autre utilisateur</translation>
     </message>
     <message>
-      <source>Activate one more license to start Video Wall control session.</source>
-      <translation>Activer une licence de plus pour démarrer la session de contrôle Mur Vidéo.</translation>
-    </message>
-    <message>
       <source>Enter the name of Video Wall to create:</source>
       <translation>Entrez le nom de mur vidéo à créer:</translation>
     </message>
@@ -7578,25 +7574,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Selected camera</source>
       <translation>Caméra sélectionnée</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
-    <message>
-      <source>Show Always</source>
-      <translation>Toujours afficher</translation>
-    </message>
-    <message>
-      <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation>Afficher uniquement avec l'onglet &quot;Objets&quot;</translation>
-    </message>
-    <message>
-      <source>Show</source>
-      <translation>Afficher</translation>
-    </message>
-    <message>
-      <source>Do Not Show</source>
-      <translation>Ne pas afficher</translation>
     </message>
   </context>
   <context>

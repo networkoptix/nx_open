@@ -967,10 +967,6 @@ to view more bookmarks</source>
       <translation>Перейдіть на вкладку Об’єкти</translation>
     </message>
     <message>
-      <source>Objects Frames and Info...</source>
-      <translation>Кадри об'єктів та інформація...</translation>
-    </message>
-    <message>
       <source>Pin Calendar</source>
       <translation>Прикрiпити Календар</translation>
     </message>
@@ -5975,6 +5971,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>now</source>
       <translation>зараз</translation>
     </message>
+    <message>
+      <source>Insufficient permissions to store analytics data.</source>
+      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -7118,10 +7118,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Екран керується іншим користувачем</translation>
     </message>
     <message>
-      <source>Activate one more license to start Video Wall control session.</source>
-      <translation>Активуйте одну додаткову ліцензію, щоб почати сеанс керування відео Стіною.</translation>
-    </message>
-    <message>
       <source>Enter the name of Video Wall to create:</source>
       <translation>Введіть назву відео Стіни:</translation>
     </message>
@@ -7781,25 +7777,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Selected camera</source>
       <translation>Обрана камера</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
-    <message>
-      <source>Show Always</source>
-      <translation>Показувати Завжди</translation>
-    </message>
-    <message>
-      <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation>Показати Лише за допомогою &quot;Об'єкти&quot; Вкладка</translation>
-    </message>
-    <message>
-      <source>Show</source>
-      <translation>Відобразити</translation>
-    </message>
-    <message>
-      <source>Do Not Show</source>
-      <translation>Не відображати</translation>
     </message>
   </context>
   <context>

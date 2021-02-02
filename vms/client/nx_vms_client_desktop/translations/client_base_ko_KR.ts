@@ -967,10 +967,6 @@ to view more bookmarks</source>
       <translation>개체 탭으로 전환</translation>
     </message>
     <message>
-      <source>Objects Frames and Info...</source>
-      <translation>개체 프레임 및 정보...</translation>
-    </message>
-    <message>
       <source>Pin Calendar</source>
       <translation>달력고정</translation>
     </message>
@@ -5773,6 +5769,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>now</source>
       <translation>지금</translation>
     </message>
+    <message>
+      <source>Insufficient permissions to store analytics data.</source>
+      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6892,10 +6892,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>스크린은 다른 사용자에 의해 제어 되고 있습니다</translation>
     </message>
     <message>
-      <source>Activate one more license to start Video Wall control session.</source>
-      <translation>비디오월 제어 세션을 시작 하려면 하나 이상의 라이선스를 활성화 해야 합니다.</translation>
-    </message>
-    <message>
       <source>Enter the name of Video Wall to create:</source>
       <translation>비디오 월 이름 입력:</translation>
     </message>
@@ -7471,25 +7467,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Selected camera</source>
       <translation>선택된 카메라</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
-    <message>
-      <source>Show Always</source>
-      <translation>항상 표시</translation>
-    </message>
-    <message>
-      <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation>&quot;객체&quot; 탭으로 로만 표시</translation>
-    </message>
-    <message>
-      <source>Show</source>
-      <translation>보이기</translation>
-    </message>
-    <message>
-      <source>Do Not Show</source>
-      <translation>표시하지 않음</translation>
     </message>
   </context>
   <context>

@@ -968,10 +968,6 @@ nähdäksesi lisää kirjanmerkkejä</translation>
       <translation>Vaihda Objektit-välilehdelle</translation>
     </message>
     <message>
-      <source>Objects Frames and Info...</source>
-      <translation>Objektien kuvat ja tiedot...</translation>
-    </message>
-    <message>
       <source>Pin Calendar</source>
       <translation>Kiinnitä kalenteri</translation>
     </message>
@@ -5841,6 +5837,10 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
       <source>now</source>
       <translation type="unfinished">now</translation>
     </message>
+    <message>
+      <source>Insufficient permissions to store analytics data.</source>
+      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6968,10 +6968,6 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
       <translation>Toinen käyttäjä ohjaa näyttöä</translation>
     </message>
     <message>
-      <source>Activate one more license to start Video Wall control session.</source>
-      <translation>Aktivoi lisää lisenssejä käynnistääksesi Videoseinä -ohjausistunnon.</translation>
-    </message>
-    <message>
       <source>Enter the name of Video Wall to create:</source>
       <translation>Nimeä luomasi Videoseinä:</translation>
     </message>
@@ -7575,25 +7571,6 @@ Jos aiot siirtää analytiikkatietoja toiseen tallennuspaikkaan, ota yhteyttä t
     <message>
       <source>Selected camera</source>
       <translation>Valittu kamera</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
-    <message>
-      <source>Show Always</source>
-      <translation>Näytä aina</translation>
-    </message>
-    <message>
-      <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation>Näytä vain &quot;objektilla&quot; välilehti</translation>
-    </message>
-    <message>
-      <source>Show</source>
-      <translation>Näytä</translation>
-    </message>
-    <message>
-      <source>Do Not Show</source>
-      <translation>Älä näytä</translation>
     </message>
   </context>
   <context>

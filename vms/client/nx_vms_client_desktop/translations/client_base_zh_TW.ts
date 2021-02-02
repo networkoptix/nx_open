@@ -968,10 +968,6 @@ to view more bookmarks</source>
       <translation>切換至物件分頁</translation>
     </message>
     <message>
-      <source>Objects Frames and Info...</source>
-      <translation>物件影像張數和訊息...</translation>
-    </message>
-    <message>
       <source>Pin Calendar</source>
       <translation>鎖定月曆</translation>
     </message>
@@ -5778,6 +5774,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>now</source>
       <translation>現在</translation>
     </message>
+    <message>
+      <source>Insufficient permissions to store analytics data.</source>
+      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6897,10 +6897,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>螢幕正在被其它使用者操控</translation>
     </message>
     <message>
-      <source>Activate one more license to start Video Wall control session.</source>
-      <translation>再啟動一個授權來開啟電視牆控制連線.</translation>
-    </message>
-    <message>
       <source>Enter the name of Video Wall to create:</source>
       <translation>請輸入新增電視牆的名稱:</translation>
     </message>
@@ -7476,25 +7472,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Selected camera</source>
       <translation>選取攝影機</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
-    <message>
-      <source>Show Always</source>
-      <translation>永遠顯示</translation>
-    </message>
-    <message>
-      <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation>僅顯示 &quot;物件&quot; 分頁</translation>
-    </message>
-    <message>
-      <source>Show</source>
-      <translation>顯示</translation>
-    </message>
-    <message>
-      <source>Do Not Show</source>
-      <translation>不顯示</translation>
     </message>
   </context>
   <context>

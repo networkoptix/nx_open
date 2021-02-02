@@ -967,10 +967,6 @@ to view more bookmarks</source>
       <translation>Cambiar a la pestaña Objetos</translation>
     </message>
     <message>
-      <source>Objects Frames and Info...</source>
-      <translation>Objetos Marcos e Información...</translation>
-    </message>
-    <message>
       <source>Pin Calendar</source>
       <translation>Sujete el Calendario</translation>
     </message>
@@ -5841,6 +5837,10 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
       <source>now</source>
       <translation>ahora</translation>
     </message>
+    <message>
+      <source>Insufficient permissions to store analytics data.</source>
+      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6968,10 +6968,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
       <translation>La pantalla está siendo controlada por otro usuario</translation>
     </message>
     <message>
-      <source>Activate one more license to start Video Wall control session.</source>
-      <translation>Active una licencia más para iniciar la Sesión de control de Pared de vídeo.</translation>
-    </message>
-    <message>
       <source>Enter the name of Video Wall to create:</source>
       <translation>Introduzca el nombre de la pared de vídeo para crear:</translation>
     </message>
@@ -7575,25 +7571,6 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     <message>
       <source>Selected camera</source>
       <translation>Cámara seleccionada</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
-    <message>
-      <source>Show Always</source>
-      <translation>Mostrar siempre</translation>
-    </message>
-    <message>
-      <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation>Mostrar solo con &quot;objetos&quot; pestaña</translation>
-    </message>
-    <message>
-      <source>Show</source>
-      <translation>Mostrar</translation>
-    </message>
-    <message>
-      <source>Do Not Show</source>
-      <translation>Ocultar</translation>
     </message>
   </context>
   <context>

@@ -967,10 +967,6 @@ to view more bookmarks</source>
       <translation>Přepněte na kartu Objekty</translation>
     </message>
     <message>
-      <source>Objects Frames and Info...</source>
-      <translation>Informace o ohraničených objektech...</translation>
-    </message>
-    <message>
       <source>Pin Calendar</source>
       <translation>Připnout kalendář</translation>
     </message>
@@ -5973,6 +5969,10 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <source>now</source>
       <translation>nyní</translation>
     </message>
+    <message>
+      <source>Insufficient permissions to store analytics data.</source>
+      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -7116,10 +7116,6 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
       <translation>Obrazovka je ovládána jiným uživatelem</translation>
     </message>
     <message>
-      <source>Activate one more license to start Video Wall control session.</source>
-      <translation>Aktivujte ještě jednu licenci pro spuštění relace videostěny.</translation>
-    </message>
-    <message>
       <source>Enter the name of Video Wall to create:</source>
       <translation>Zadejte název videostěny, který chcete vytvořit:</translation>
     </message>
@@ -7779,25 +7775,6 @@ Pokud jste chtěli přesunout analytická data do jiného úložiště, kontaktu
     <message>
       <source>Selected camera</source>
       <translation>Vybraná kamera</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
-    <message>
-      <source>Show Always</source>
-      <translation>Zobrazit vždy</translation>
-    </message>
-    <message>
-      <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation>Zobrazit pouze s &quot;objekty&quot; Tab</translation>
-    </message>
-    <message>
-      <source>Show</source>
-      <translation>Zobrazit</translation>
-    </message>
-    <message>
-      <source>Do Not Show</source>
-      <translation>Nezobrazovat</translation>
     </message>
   </context>
   <context>

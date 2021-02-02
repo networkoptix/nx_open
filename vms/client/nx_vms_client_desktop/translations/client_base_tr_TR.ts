@@ -967,10 +967,6 @@ to view more bookmarks</source>
       <translation>Nesneler sekmesine geç</translation>
     </message>
     <message>
-      <source>Objects Frames and Info...</source>
-      <translation>Nesne Çerçeveleri ve Bilgi...</translation>
-    </message>
-    <message>
       <source>Pin Calendar</source>
       <translation>Takvimi Tuttur</translation>
     </message>
@@ -5838,6 +5834,10 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <source>now</source>
       <translation>şimdi</translation>
     </message>
+    <message>
+      <source>Insufficient permissions to store analytics data.</source>
+      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6965,10 +6965,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
       <translation>Ekran başka bir kullanıcı tarafından kontrol ediliyor</translation>
     </message>
     <message>
-      <source>Activate one more license to start Video Wall control session.</source>
-      <translation>Video wall kontrolünü başlatmak için 1 den fazla lisans eklemeniz gerekir.</translation>
-    </message>
-    <message>
       <source>Enter the name of Video Wall to create:</source>
       <translation>Oluşturacağınız Video Wall İsmini Girin:</translation>
     </message>
@@ -7572,25 +7568,6 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     <message>
       <source>Selected camera</source>
       <translation>Seçilen kamera</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
-    <message>
-      <source>Show Always</source>
-      <translation>Her zaman göster</translation>
-    </message>
-    <message>
-      <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation>Sadece &quot;Objects&quot; Sekmesini Göster</translation>
-    </message>
-    <message>
-      <source>Show</source>
-      <translation>Göster</translation>
-    </message>
-    <message>
-      <source>Do Not Show</source>
-      <translation>Gösterme</translation>
     </message>
   </context>
   <context>

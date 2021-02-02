@@ -968,10 +968,6 @@ több könyvjelző megjelenítéséhez</translation>
       <translation>Váltás az Objektumok fülre</translation>
     </message>
     <message>
-      <source>Objects Frames and Info...</source>
-      <translation>Objektum keretek és információk...</translation>
-    </message>
-    <message>
       <source>Pin Calendar</source>
       <translation>Naptár rögzítése</translation>
     </message>
@@ -5842,6 +5838,10 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <source>now</source>
       <translation>most</translation>
     </message>
+    <message>
+      <source>Insufficient permissions to store analytics data.</source>
+      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6969,10 +6969,6 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
       <translation>A képernyőt másik felhasználó fogja vezérelni</translation>
     </message>
     <message>
-      <source>Activate one more license to start Video Wall control session.</source>
-      <translation>Aktiváljon egy vagy több licencet a Videófal vezérlés megkezdéséhez.</translation>
-    </message>
-    <message>
       <source>Enter the name of Video Wall to create:</source>
       <translation>A létrehozáshoz adja meg a videofal nevét:</translation>
     </message>
@@ -7576,25 +7572,6 @@ Ha az analitikai adatokat egy másik tárolóhelyre kívánja áthelyezni, kérj
     <message>
       <source>Selected camera</source>
       <translation>Kiválasztott kamera</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
-    <message>
-      <source>Show Always</source>
-      <translation>Mindig mutat</translation>
-    </message>
-    <message>
-      <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation>Csak &quot;objektum megjelenítése&quot; Tab</translation>
-    </message>
-    <message>
-      <source>Show</source>
-      <translation>Megjelenítés</translation>
-    </message>
-    <message>
-      <source>Do Not Show</source>
-      <translation>Ne jelenjen meg</translation>
     </message>
   </context>
   <context>

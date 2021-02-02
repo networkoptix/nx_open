@@ -968,10 +968,6 @@ to view more bookmarks</translation>
       <translation type="unfinished">Switch to Objects tab</translation>
     </message>
     <message>
-      <source>Objects Frames and Info...</source>
-      <translation type="unfinished">Objects Frames and Info...</translation>
-    </message>
-    <message>
       <source>Pin Calendar</source>
       <translation type="unfinished">Pin Calendar</translation>
     </message>
@@ -5844,6 +5840,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>now</source>
       <translation type="unfinished">now</translation>
     </message>
+    <message>
+      <source>Insufficient permissions to store analytics data.</source>
+      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6971,10 +6971,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>Screen is being controlled by another user</translation>
     </message>
     <message>
-      <source>Activate one more license to start Video Wall control session.</source>
-      <translation>Activate one more license to start Video Wall control session.</translation>
-    </message>
-    <message>
       <source>Enter the name of Video Wall to create:</source>
       <translation>Enter the name of Video Wall to create:</translation>
     </message>
@@ -7578,25 +7574,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Selected camera</source>
       <translation type="unfinished">Selected camera</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
-    <message>
-      <source>Show Always</source>
-      <translation type="unfinished">Show Always</translation>
-    </message>
-    <message>
-      <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation type="unfinished">Show Only with &quot;Objects&quot; Tab</translation>
-    </message>
-    <message>
-      <source>Show</source>
-      <translation type="unfinished">Show</translation>
-    </message>
-    <message>
-      <source>Do Not Show</source>
-      <translation type="unfinished">Do Not Show</translation>
     </message>
   </context>
   <context>

@@ -968,10 +968,6 @@ to view more bookmarks</source>
       <translation>Bytt til fanen Objekter</translation>
     </message>
     <message>
-      <source>Objects Frames and Info...</source>
-      <translation>Objekter Rammer og Info...</translation>
-    </message>
-    <message>
       <source>Pin Calendar</source>
       <translation>Fest kalender</translation>
     </message>
@@ -5844,6 +5840,10 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <source>now</source>
       <translation>nå</translation>
     </message>
+    <message>
+      <source>Insufficient permissions to store analytics data.</source>
+      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6971,10 +6971,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
       <translation>Skjermen blir kontrollert av en annen bruker</translation>
     </message>
     <message>
-      <source>Activate one more license to start Video Wall control session.</source>
-      <translation>Aktiver en lisens til for å starte Video Wall-kontrolløkten.</translation>
-    </message>
-    <message>
       <source>Enter the name of Video Wall to create:</source>
       <translation>Skriv inn navnet på Video Wall som skal opprettes:</translation>
     </message>
@@ -7578,25 +7574,6 @@ Hvis du hadde tenkt å flytte analysedata til et annet lagringssted, kan du kont
     <message>
       <source>Selected camera</source>
       <translation>Valgte kamera</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
-    <message>
-      <source>Show Always</source>
-      <translation>Vis alltid</translation>
-    </message>
-    <message>
-      <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation>Vis bare med &quot;objekter&quot; fane</translation>
-    </message>
-    <message>
-      <source>Show</source>
-      <translation>Vis</translation>
-    </message>
-    <message>
-      <source>Do Not Show</source>
-      <translation>Ikke vis</translation>
     </message>
   </context>
   <context>

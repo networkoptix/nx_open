@@ -967,10 +967,6 @@ to view more bookmarks</source>
       <translation>オブジェクトタブに切り替え</translation>
     </message>
     <message>
-      <source>Objects Frames and Info...</source>
-      <translation>オブジェクトフレームと情報...</translation>
-    </message>
-    <message>
       <source>Pin Calendar</source>
       <translation>カレンダー固定</translation>
     </message>
@@ -5773,6 +5769,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>now</source>
       <translation>今</translation>
     </message>
+    <message>
+      <source>Insufficient permissions to store analytics data.</source>
+      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6892,10 +6892,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>スクリーンが別のユーザーによって制御されています</translation>
     </message>
     <message>
-      <source>Activate one more license to start Video Wall control session.</source>
-      <translation>ビデオウォール コントロール セッションを開始するには、専用ライセンスを１つ以上有効化してください。</translation>
-    </message>
-    <message>
       <source>Enter the name of Video Wall to create:</source>
       <translation>登録するビデオウォールの名前入力:</translation>
     </message>
@@ -7471,25 +7467,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Selected camera</source>
       <translation>選択したカメラ</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
-    <message>
-      <source>Show Always</source>
-      <translation>常に表示</translation>
-    </message>
-    <message>
-      <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation>&quot;オブジェクト&quot; タブでのみ表示</translation>
-    </message>
-    <message>
-      <source>Show</source>
-      <translation>表示</translation>
-    </message>
-    <message>
-      <source>Do Not Show</source>
-      <translation>非表示</translation>
     </message>
   </context>
   <context>

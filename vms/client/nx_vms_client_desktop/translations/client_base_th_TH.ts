@@ -967,10 +967,6 @@ to view more bookmarks</source>
       <translation>สลับไปที่แท็บวัตถุ</translation>
     </message>
     <message>
-      <source>Objects Frames and Info...</source>
-      <translation>เฟรมวัตถุและข้อมูลต่างๆ</translation>
-    </message>
-    <message>
       <source>Pin Calendar</source>
       <translation>การตรึงปฏิทิน</translation>
     </message>
@@ -5772,6 +5768,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>now</source>
       <translation>ขณะนี้</translation>
     </message>
+    <message>
+      <source>Insufficient permissions to store analytics data.</source>
+      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6891,10 +6891,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>หน้าจอกำลังควบคุมโดยผู้ใช้รายอื่น</translation>
     </message>
     <message>
-      <source>Activate one more license to start Video Wall control session.</source>
-      <translation>เปิดใช้งานใบอนุญาตอีกหนึ่งใบเพื่อเริ่มต้นเซ็ตอัพ Video Wall</translation>
-    </message>
-    <message>
       <source>Enter the name of Video Wall to create:</source>
       <translation>ใส่ชื่อของจอแสดงผล ของการสร้าง:</translation>
     </message>
@@ -7470,25 +7466,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Selected camera</source>
       <translation>เลือกกล้อง</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
-    <message>
-      <source>Show Always</source>
-      <translation>แสดงเสมอ</translation>
-    </message>
-    <message>
-      <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation>แสดงเฉพาะกับ &quot;วัตถุ&quot; แท็บ</translation>
-    </message>
-    <message>
-      <source>Show</source>
-      <translation>แสดง</translation>
-    </message>
-    <message>
-      <source>Do Not Show</source>
-      <translation>ไม่แสดง</translation>
     </message>
   </context>
   <context>

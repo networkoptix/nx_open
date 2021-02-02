@@ -967,10 +967,6 @@ to view more bookmarks</source>
       <translation>Passa alla scheda Oggetti</translation>
     </message>
     <message>
-      <source>Objects Frames and Info...</source>
-      <translation>Oggetti Frame e Info...</translation>
-    </message>
-    <message>
       <source>Pin Calendar</source>
       <translation>Calendario appuntato</translation>
     </message>
@@ -5840,6 +5836,10 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <source>now</source>
       <translation>ora</translation>
     </message>
+    <message>
+      <source>Insufficient permissions to store analytics data.</source>
+      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6967,10 +6967,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
       <translation>Lo schermo è controllato da un altro utente</translation>
     </message>
     <message>
-      <source>Activate one more license to start Video Wall control session.</source>
-      <translation>Attiva un'altra licenza per avviare la sessione di controllo di Video Wall.</translation>
-    </message>
-    <message>
       <source>Enter the name of Video Wall to create:</source>
       <translation>Inserire il nome del Video Wall per crearlo:</translation>
     </message>
@@ -7574,25 +7570,6 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     <message>
       <source>Selected camera</source>
       <translation>Telecamera selezionata</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
-    <message>
-      <source>Show Always</source>
-      <translation>Visualizza sempre</translation>
-    </message>
-    <message>
-      <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation>Mostra solo con &quot;oggetti&quot; scheda</translation>
-    </message>
-    <message>
-      <source>Show</source>
-      <translation>Visualizza</translation>
-    </message>
-    <message>
-      <source>Do Not Show</source>
-      <translation>Non visualizzare</translation>
     </message>
   </context>
   <context>

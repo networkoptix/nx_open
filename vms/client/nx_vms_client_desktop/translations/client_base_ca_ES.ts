@@ -968,10 +968,6 @@ per veure més marcadors</translation>
       <translation>Canvia a la pestanya Objectes</translation>
     </message>
     <message>
-      <source>Objects Frames and Info...</source>
-      <translation>Marcs i informació d'objectes...</translation>
-    </message>
-    <message>
       <source>Pin Calendar</source>
       <translation>Fixa el calendari</translation>
     </message>
@@ -5843,6 +5839,10 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
       <source>now</source>
       <translation>ara</translation>
     </message>
+    <message>
+      <source>Insufficient permissions to store analytics data.</source>
+      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+    </message>
   </context>
   <context>
     <name>QnStorageListModel</name>
@@ -6970,10 +6970,6 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
       <translation>Un altre usuari controla la pantalla</translation>
     </message>
     <message>
-      <source>Activate one more license to start Video Wall control session.</source>
-      <translation>Activeu una llicència més per iniciar la sessió de control de Video Wall.</translation>
-    </message>
-    <message>
       <source>Enter the name of Video Wall to create:</source>
       <translation>Introduïu el nom del Video Wall que voleu crear:</translation>
     </message>
@@ -7577,25 +7573,6 @@ Si teniu intenció de traslladar les dades d'anàlisi a una altra ubicació d'em
     <message>
       <source>Selected camera</source>
       <translation>Càmera seleccionada</translation>
-    </message>
-  </context>
-  <context>
-    <name>nx::vms::client::desktop::AnalyticsMenuActionFactory</name>
-    <message>
-      <source>Show Always</source>
-      <translation>Mostra-ho sempre</translation>
-    </message>
-    <message>
-      <source>Show Only with &quot;Objects&quot; Tab</source>
-      <translation>Mostra-ho només amb la pestanya &quot;Objectes&quot;</translation>
-    </message>
-    <message>
-      <source>Show</source>
-      <translation>Mostra</translation>
-    </message>
-    <message>
-      <source>Do Not Show</source>
-      <translation>No mostris</translation>
     </message>
   </context>
   <context>
