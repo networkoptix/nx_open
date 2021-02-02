@@ -446,5 +446,14 @@
             </params>
         </resource>
         <resource name = "AXISC1410" public = "AXISC3003E"/>
+        <resource name = "AXISP3255" public = "AXISQ1775"/>
+        <resource name = "AXISQ6135" public = "AXISQ1775"/>
+        <resource name = "AXISV5925" public = "AXISQ1775"/>
+        <resource name = "AXISQ8752" public = "AXISQ1775"/>
+        <resource name = "AXISP1455" public = "AXISQ1775"/>
+        <resource name = "AXISQ6100" public = "AXISQ3617"/>
+        <resource name = "AXISP3247" public = "AXISQ6044"/>
+        <resource name = "AXISI8016" public = "AXISQ6044"/>
+        <resource name = "AXISP3248" public = "AXISQ6044"/>
     </oem>
 </resources>
