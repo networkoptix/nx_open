@@ -1,6 +1,7 @@
 #include "sharp_pixmap_painting.h"
 
 #include <array>
+#include <cmath>
 
 #include <utils/common/scoped_painter_rollback.h>
 
