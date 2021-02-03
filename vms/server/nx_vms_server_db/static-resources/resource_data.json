@@ -144,7 +144,18 @@
             "useMedia2ToFetchProfiles": false
         },
         {
-            "keys":["VIVOTEK|IT9389-HT*", "vivotek|FD8377*"],
+            "keys":[
+                "VIVOTEK|IT9389-HT*",
+                "vivotek|FD8377*",
+                "VIVOTEK|FD9189*",
+                "VIVOTEK|FD9380*",
+                "VIVOTEK|FD9388*",
+                "VIVOTEK|IB9391*",
+                "VIVOTEK|SD9362*",
+                "VIVOTEK|SD9366*",
+                "VIVOTEK|IB9387*",
+                "VIVOTEK|FD8369*"
+            ],
             "useMedia2ToFetchProfiles": false
         },
         {
