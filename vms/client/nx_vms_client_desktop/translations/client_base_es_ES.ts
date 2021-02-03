@@ -5839,7 +5839,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>Insufficient permissions to store analytics data.</source>
-      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+      <translation>Permisos insuficientes para almacenar datos analíticos.</translation>
     </message>
   </context>
   <context>
@@ -8394,7 +8394,7 @@ Si tenía la intención de mover los datos analíticos a otra ubicación de alma
     </message>
     <message>
       <source>AVI format is not recommended to export a recording with audio track.</source>
-      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
+      <translation>No se recomienda el formato AVI para exportar una grabación con pista de audio.</translation>
     </message>
   </context>
   <context>

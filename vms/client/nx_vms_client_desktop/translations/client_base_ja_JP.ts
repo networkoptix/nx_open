@@ -5771,7 +5771,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Insufficient permissions to store analytics data.</source>
-      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+      <translation>分析データを保存する権限がありません。</translation>
     </message>
   </context>
   <context>
@@ -6689,7 +6689,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWorkbenchNotificationsHandler</name>
     <message>
       <source>Unable to acknowledge event on removed camera.</source>
-      <translation>削除されたカメラでイベントを確認できません。</translation>
+      <translation>削除されたカメラのイベントは確認できません。</translation>
     </message>
   </context>
   <context>

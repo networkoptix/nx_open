@@ -5837,7 +5837,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Insufficient permissions to store analytics data.</source>
-      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+      <translation>Onvoldoende rechten om analysegegevens op te slaan.</translation>
     </message>
   </context>
   <context>
