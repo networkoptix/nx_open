@@ -942,17 +942,6 @@
             "description": "Shock has been detected"
         },
         {
-            "id": "nx.hanwha.TemperatureChangeDetection",
-            "name": "Temperature Change Detection",
-            "internalName": "TemperatureChangeDetection",
-            "description": "Temperature change event %1",
-            "positiveState": "started %1",
-            "negativeState": "stopped %1",
-            "flags": "stateDependent | regionDependent",
-            "regionDescription": " in the region #%1",
-            "sunapi": "2.5.7 - 2.21"
-        },
-        {
             "id": "nx.hanwha.BoxTemperatureDetection",
             "name": "Box Temperature Detection",
             "internalName": "BoxTemperatureDetection",
@@ -1133,6 +1122,17 @@
             "negativeState": "has ended%1",
             "flags": "stateDependent | regionDependent",
             "regionDescription": " in the region #%1"
+        },
+        {
+            "id": "nx.hanwha.TemperatureChangeDetection",
+            "name": "Temperature Change Detection",
+            "internalName": "TemperatureChangeDetection",
+            "description": "Temperature change event %1",
+            "positiveState": "started %1",
+            "negativeState": "stopped %1",
+            "flags": "stateDependent | regionDependent",
+            "regionDescription": " in the region #%1",
+            "sunapi": "2.5.7 - 2.21"
         }
     ],
     "groups": [
