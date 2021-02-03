@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.1.3.854",
+    "version": "4.1.3.855",
     "data": [
         {
             "keys": [
@@ -1291,7 +1291,10 @@
                 "dahua|x51b1e",
                 "dahua|hcvr4216as3",
                 "dahua|dhi-nvr2108*",
-                "general|d861a8"
+                "general|d861a8",
+                "*|VP-16-V2",
+                "Dahua|X51A3E2",
+                "Dahua|C52A2N"
             ],
             "analogEncoder": true
         },
