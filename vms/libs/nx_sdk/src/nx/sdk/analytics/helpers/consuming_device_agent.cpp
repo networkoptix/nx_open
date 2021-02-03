@@ -66,8 +66,7 @@ bool ConsumingDeviceAgent::pullMetadataPackets(
 void ConsumingDeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
-    handler->addRef();
-    m_handler.reset(handler);
+    m_handler = shareToPtr(handler);
 }
 
 void ConsumingDeviceAgent::doPushDataPacket(

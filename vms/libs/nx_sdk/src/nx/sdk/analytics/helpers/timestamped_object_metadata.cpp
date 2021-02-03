@@ -42,8 +42,7 @@ const IAttribute* TimestampedObjectMetadata::getAttribute(int index) const
     if (!NX_KIT_ASSERT(attribute))
         return nullptr;
 
-    attribute->addRef();
-    return attribute.get();
+    return shareToPtr(attribute).releasePtr();
 }
 
 int TimestampedObjectMetadata::attributeCount() const

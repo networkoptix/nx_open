@@ -19,8 +19,7 @@ const IStringList* MetadataTypes::getEventTypeIds() const
     if (!NX_KIT_ASSERT(m_eventTypeIds))
         return nullptr;
 
-    m_eventTypeIds->addRef();
-    return m_eventTypeIds.get();
+    return shareToPtr(m_eventTypeIds).releasePtr();
 }
 
 const IStringList* MetadataTypes::getObjectTypeIds() const
@@ -28,8 +27,7 @@ const IStringList* MetadataTypes::getObjectTypeIds() const
     if (!NX_KIT_ASSERT(m_objectTypeIds))
         return nullptr;
 
-    m_objectTypeIds->addRef();
-    return m_objectTypeIds.get();
+    return shareToPtr(m_objectTypeIds).releasePtr();
 }
 
 bool MetadataTypes::isEmpty() const

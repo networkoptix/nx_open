@@ -48,8 +48,7 @@ Result<IEngine*> Plugin::doObtainEngine()
 
 void Plugin::setUtilityProvider(IUtilityProvider* utilityProvider)
 {
-    utilityProvider->addRef();
-    m_utilityProvider.reset(utilityProvider);
+    m_utilityProvider = shareToPtr(utilityProvider);
 }
 
 void Plugin::getManifest(Result<const IString*>* outResult) const

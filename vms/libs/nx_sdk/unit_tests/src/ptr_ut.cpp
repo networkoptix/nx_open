@@ -148,6 +148,36 @@ TEST(Ptr, toPtr)
     ASSERT_TRUE(Data::s_destructorCalled);
 }
 
+TEST(Ptr, shareToPtr)
+{
+    Data::s_destructorCalled = false;
+    {
+        Data* p = new Data(42);
+        {
+            // Test shareToPtr(RefCountable*).
+            const Ptr<Data> data = shareToPtr(p);
+            ASSERT_EQ(p, data.get());
+            ASSERT_EQ(2, data->refCount());
+            ASSERT_FALSE(Data::s_destructorCalled);
+            
+            // Test shareToPtr(const Ptr<RefCountable>&).
+            {
+                const Ptr<Data> data2 = shareToPtr(data);
+                ASSERT_EQ(p, data2.get());
+                ASSERT_EQ(3, data2->refCount());
+                ASSERT_FALSE(Data::s_destructorCalled);
+            } //< data2.~Ptr() called.
+            ASSERT_EQ(2, data->refCount());
+            ASSERT_FALSE(Data::s_destructorCalled);
+        } //< data.~Ptr() called.
+        ASSERT_EQ(1, p->refCount());
+        ASSERT_FALSE(Data::s_destructorCalled);
+        
+        delete p;
+    }
+    ASSERT_TRUE(Data::s_destructorCalled);
+}
+
 TEST(Ptr, assign)
 {
     Data::s_destructorCalled = false;

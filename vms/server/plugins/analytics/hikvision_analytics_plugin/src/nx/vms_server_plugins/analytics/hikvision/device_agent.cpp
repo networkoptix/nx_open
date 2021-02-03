@@ -48,9 +48,7 @@ void DeviceAgent::getPluginSideSettings(
 
 void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
-    handler->addRef();
-    m_handler.reset(handler);
-
+    m_handler = shareToPtr(handler);
     m_metadataParser.setHandler(m_handler);
 }
 

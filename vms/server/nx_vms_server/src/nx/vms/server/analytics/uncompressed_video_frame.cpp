@@ -167,8 +167,7 @@ void UncompressedVideoFrame::getPixelAspectRatio(PixelAspectRatio* outValue) con
 nx::sdk::IList<nx::sdk::analytics::IMetadataPacket>*
     UncompressedVideoFrame::getMetadataList() const
 {
-    m_metadataPacketList->addRef();
-    return m_metadataPacketList.get();
+    return shareToPtr(m_metadataPacketList).releasePtr();
 }
 
 UncompressedVideoFrame::PixelFormat UncompressedVideoFrame::pixelFormat() const

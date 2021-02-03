@@ -85,8 +85,7 @@ DeviceAgent::~DeviceAgent()
 
 /*virtual*/ void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler) /*override*/
 {
-    handler->addRef();
-    m_handler.reset(handler);
+    m_handler = shareToPtr(handler);
 
     setSupportedEventCategoties();
 }

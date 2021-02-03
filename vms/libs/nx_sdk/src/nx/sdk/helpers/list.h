@@ -27,8 +27,7 @@ public:
         if (!NX_KIT_ASSERT(item))
             return;
 
-        item->addRef();
-        m_items.push_back(nx::sdk::toPtr(item));
+        m_items.push_back(nx::sdk::shareToPtr(item));
     }
 
     void clear()
@@ -45,8 +44,7 @@ protected:
         if (!NX_KIT_ASSERT(m_items[index]))
             return nullptr;
 
-        m_items[index]->addRef();
-        return m_items[index].get();
+        return nx::sdk::shareToPtr(m_items[index]).releasePtr();
     }
 
 private:

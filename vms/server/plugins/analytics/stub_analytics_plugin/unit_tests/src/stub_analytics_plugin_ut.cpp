@@ -170,11 +170,7 @@ public:
 
     virtual const IStringMap* getParams() const override
     {
-        if (!m_params)
-            return nullptr;
-
-        m_params->addRef();
-        return m_params.get();
+        return shareToPtr(m_params).releasePtr();
     }
 
     void setParams(const std::vector<std::pair<std::string, std::string>>& params)

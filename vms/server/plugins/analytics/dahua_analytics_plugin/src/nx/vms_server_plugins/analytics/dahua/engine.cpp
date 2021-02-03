@@ -58,7 +58,7 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
     interceptExceptions(outResult,
         [&]()
         {
-            return new DeviceAgent(this, addRefToPtr(deviceInfo));
+            return new DeviceAgent(this, shareToPtr(deviceInfo));
         });
 }
 

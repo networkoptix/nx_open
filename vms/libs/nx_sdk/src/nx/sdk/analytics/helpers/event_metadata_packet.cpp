@@ -33,9 +33,7 @@ const IEventMetadata* EventMetadataPacket::getAt(int index) const
     if (index < 0 || index >= (int) m_events.size())
         return nullptr;
 
-    auto& eventMetadata = m_events[index];
-    eventMetadata->addRef();
-    return eventMetadata.get();
+    return shareToPtr(m_events[index]).releasePtr();
 }
 
 void EventMetadataPacket::setFlags(Flags flags)
@@ -55,9 +53,9 @@ void EventMetadataPacket::setDurationUs(int64_t durationUs)
 
 void EventMetadataPacket::addItem(const IEventMetadata* eventMetadata)
 {
-    NX_KIT_ASSERT(eventMetadata);
-    eventMetadata->addRef();
-    m_events.push_back(toPtr(eventMetadata));
+    if (!NX_KIT_ASSERT(eventMetadata))
+        return;
+    m_events.push_back(shareToPtr(eventMetadata));
 }
 
 void EventMetadataPacket::clear()

@@ -18,26 +18,17 @@ SettingsResponse::SettingsResponse(
 
 IStringMap* SettingsResponse::getValues() const
 {
-    if (m_values)
-        m_values->addRef();
-
-    return m_values.get();
+    return shareToPtr(m_values).releasePtr();
 }
 
 IStringMap* SettingsResponse::getErrors() const
 {
-    if (m_errors)
-        m_errors->addRef();
-
-    return m_errors.get();
+    return shareToPtr(m_errors).releasePtr();
 }
 
 IString* SettingsResponse::getModel() const
 {
-    if (m_model)
-        m_model->addRef();
-
-    return m_model.get();
+    return shareToPtr(m_model).releasePtr();
 }
 
 void SettingsResponse::setValue(std::string key, std::string value)

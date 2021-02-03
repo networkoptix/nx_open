@@ -114,17 +114,12 @@ protected:
 
     virtual IObjectTrackInfo* getObjectTrackInfo() const override
     {
-        if (!m_objectTrackInfo)
-            return nullptr;
-
-        m_objectTrackInfo->addRef();
-        return m_objectTrackInfo.get();
+        return shareToPtr(m_objectTrackInfo).releasePtr();
     }
 
     virtual const IStringMap* getParams() const override
     {
-        m_params->addRef();
-        return m_params.get();
+        return shareToPtr(m_params).releasePtr();
     }
 
 private:

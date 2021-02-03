@@ -77,8 +77,7 @@ ThirdPartyResourceSearcher::ThirdPartyResourceSearcher(QnMediaServerModule* serv
             pluginName += "_" + QnUuid::createUuid().toString();
         }
 
-        pluginInterface->addRef();
-        nx::sdk::Ptr<nx::sdk::IRefCountable> pluginRefCountable = nx::sdk::toPtr(
+        const auto pluginRefCountable = nx::sdk::shareToPtr(
             reinterpret_cast<nx::sdk::IRefCountable*>(pluginInterface));
 
         m_contextByPluginName[pluginName] = {pluginRefCountable, discoveryManagerWrapper};

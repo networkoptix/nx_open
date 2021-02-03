@@ -33,9 +33,7 @@ const IObjectMetadata* ObjectMetadataPacket::getAt(int index) const
     if (index < 0 || index >= (int) m_objects.size())
         return nullptr;
 
-    auto& objectMetadata = m_objects[index];
-    objectMetadata->addRef();
-    return objectMetadata.get();
+    return shareToPtr(m_objects[index]).releasePtr();
 }
 
 void ObjectMetadataPacket::setFlags(Flags flags)
@@ -55,9 +53,9 @@ void ObjectMetadataPacket::setDurationUs(int64_t durationUs)
 
 void ObjectMetadataPacket::addItem(const IObjectMetadata* objectMetadata)
 {
-    NX_KIT_ASSERT(objectMetadata);
-    objectMetadata->addRef();
-    m_objects.push_back(toPtr(objectMetadata));
+    if (!NX_KIT_ASSERT(objectMetadata))
+        return;
+    m_objects.push_back(shareToPtr(objectMetadata));
 }
 
 void ObjectMetadataPacket::clear()

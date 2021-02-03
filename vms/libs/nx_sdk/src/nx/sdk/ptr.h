@@ -198,15 +198,25 @@ static Ptr<RefCountable> toPtr(RefCountable* refCountable)
 }
 
 /**
- * If refCountable is null, returns null.
- * Otherwise, increments refeference counter and returns owning pointer.
+ * Increments the reference counter and returns a new owning smart pointer. If refCountable is
+ * null, just returns null.
  */
 template<class RefCountable>
-static Ptr<RefCountable> addRefToPtr(RefCountable* refCountable)
+static Ptr<RefCountable> shareToPtr(RefCountable* refCountable)
 {
     if (refCountable)
         refCountable->addRef();
     return toPtr(refCountable);
+}
+
+/**
+ * Increments the reference counter and returns a new owning smart pointer. If ptr is null, just
+ * returns null.
+ */
+template<class RefCountable>
+static Ptr<RefCountable> shareToPtr(const Ptr<RefCountable>& ptr)
+{
+    return ptr; //< Invoke the copy constructor.
 }
 
 /**

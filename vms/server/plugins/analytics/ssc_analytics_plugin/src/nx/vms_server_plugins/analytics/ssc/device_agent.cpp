@@ -93,8 +93,7 @@ void DeviceAgent::getManifest(Result<const IString*>* outResult) const
 
 void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
-    handler->addRef();
-    m_handler.reset(handler);
+    m_handler = shareToPtr(handler);
 }
 
 void DeviceAgent::doSetNeededMetadataTypes(

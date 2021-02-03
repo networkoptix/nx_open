@@ -179,7 +179,7 @@ void DeviceAgent::setHandler(IHandler* handler)
     if (!NX_ASSERT(!m_handler))
         return;
 
-    m_handler = addRefToPtr(handler);
+    m_handler = shareToPtr(handler);
 }
 
 void DeviceAgent::doSetNeededMetadataTypes(
@@ -188,7 +188,7 @@ void DeviceAgent::doSetNeededMetadataTypes(
     interceptExceptions(outResult,
         [&]()
         {
-            m_metadataMonitor.setNeededTypes(addRefToPtr(types));
+            m_metadataMonitor.setNeededTypes(shareToPtr(types));
         });
 }
 

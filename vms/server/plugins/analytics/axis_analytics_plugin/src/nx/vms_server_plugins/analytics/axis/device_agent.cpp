@@ -124,8 +124,7 @@ DeviceAgent::~DeviceAgent()
 
 void DeviceAgent::setHandler(IDeviceAgent::IHandler* handler)
 {
-    handler->addRef();
-    m_handler.reset(handler);
+    m_handler = shareToPtr(handler);
 }
 
 void DeviceAgent::doSetNeededMetadataTypes(

@@ -173,8 +173,7 @@ void DeviceAgent::setHandler(IHandler* handler)
         m_basicPollable->executeInAioThreadSync(
             [&]()
             {
-                handler->addRef();
-                m_handler = toPtr(handler);
+                m_handler = shareToPtr(handler);
             });
     }
     catch (const std::exception& exception)

@@ -57,10 +57,9 @@ protected:
     }
 
 protected:
-    virtual nx::sdk::IList<nx::sdk::analytics::IMetadataPacket>* getMetadataList() const
+    virtual nx::sdk::IList<nx::sdk::analytics::IMetadataPacket>* getMetadataList() const override
     {
-        m_metadataList->addRef();
-        return m_metadataList.get();
+        return shareToPtr(m_metadataList).releasePtr();
     }
 
 private:

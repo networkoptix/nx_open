@@ -107,8 +107,7 @@ const IAttribute* ObjectTrackBestShotPacket::getAttribute(int index) const
     if (index >= (int) m_attributes.size() || index < 0)
         return nullptr;
 
-    m_attributes[index]->addRef();
-    return  m_attributes[index].get();
+    return shareToPtr(m_attributes[index]).releasePtr();
 }
 
 int ObjectTrackBestShotPacket::attributeCount() const
