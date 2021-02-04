@@ -575,7 +575,7 @@ bool ConnectionBase::handleMessage(const nx::Buffer& message)
     return true;
 }
 
-nx::network::http::AuthInfoCache::AuthorizationCacheItem ConnectionBase::authData() const
+nx::network::http::AuthInfoCache::Item ConnectionBase::authData() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_httpAuthCacheItem;

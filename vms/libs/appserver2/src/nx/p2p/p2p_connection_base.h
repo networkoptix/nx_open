@@ -83,7 +83,7 @@ public:
     virtual const vms::api::PeerDataEx& localPeer() const override { return m_localPeer; }
     virtual const vms::api::PeerDataEx& remotePeer() const override { return m_remotePeer; }
     virtual bool isIncoming() const override { return m_direction == Direction::incoming;  }
-    virtual nx::network::http::AuthInfoCache::AuthorizationCacheItem authData() const override;
+    virtual nx::network::http::AuthInfoCache::Item authData() const override;
     virtual std::multimap<QString, QString> httpQueryParams() const override;
 
     State state() const;
@@ -198,7 +198,7 @@ private:
     int m_sendSequence = 0;
     int m_lastReceivedSequence = 0;
 
-    nx::network::http::AuthInfoCache::AuthorizationCacheItem m_httpAuthCacheItem;
+    nx::network::http::AuthInfoCache::Item m_httpAuthCacheItem;
     mutable QnMutex m_mutex;
 
     nx::network::http::HttpHeaders m_additionalRequestHeaders;

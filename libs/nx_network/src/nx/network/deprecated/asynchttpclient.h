@@ -221,7 +221,7 @@ public:
 
     void setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody);
 
-    AuthInfoCache::AuthorizationCacheItem authCacheItem() const;
+    AuthInfoCache::Item authCacheItem() const;
     /**
      * Caller uses it to report that message body has ended (it may be tricky to detect message body end in some cases).
      * NOTE: May be invoked within someMessageBodyAvailable handler only.

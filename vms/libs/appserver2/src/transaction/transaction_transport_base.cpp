@@ -502,7 +502,7 @@ int QnTransactionTransportBase::remotePeerProtocolVersion() const
     return m_remotePeerEcProtoVersion;
 }
 
-nx::network::http::AuthInfoCache::AuthorizationCacheItem QnTransactionTransportBase::authData() const
+nx::network::http::AuthInfoCache::Item QnTransactionTransportBase::authData() const
 {
     QnMutexLocker lock(&m_mutex);
     return m_httpAuthCacheItem;

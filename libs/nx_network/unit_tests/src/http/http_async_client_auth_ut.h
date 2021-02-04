@@ -11,21 +11,22 @@ class AuthHttpServer:
     public nx::network::test::SynchronousStreamSocketServer
 {
 public:
+    enum class NextResponse {unauthorized, success};
+
     struct AuthHeader
     {
         AuthType type;
         nx::Buffer header;
     };
 
+    void setNextResponse(NextResponse nextResponse);
     void appendAuthHeader(AuthHeader value);
     std::vector<nx::Buffer> receivedRequests();
 
 private:
-    enum class NextResponse {unauthorized, success};
-
     std::vector<nx::Buffer> m_receivedRequests;
     std::vector<AuthHeader> m_authHeaders;
-    NextResponse m_nextRepsonse = NextResponse::unauthorized;
+    NextResponse m_nextResponse = NextResponse::unauthorized;
 
     virtual void processConnection(AbstractStreamSocket* connection) override;
     nx::Buffer nextResponse();
@@ -51,6 +52,7 @@ public:
 
     void givenHttpServerWithAuthorization(
         std::vector<AuthHttpServer::AuthHeader> authData);
+    void whenServerIsGoingToRespondWith(AuthHttpServer::NextResponse nextResponse);
     void whenClientSendHttpRequestAndIsRequiredToUse(AuthType auth, const char* username = nullptr);
     void thenClientAuthenticatedBy(const char* exptectedHeaderResponse);
     void thenClientGotResponseWithCode(int expectedHttpCode);

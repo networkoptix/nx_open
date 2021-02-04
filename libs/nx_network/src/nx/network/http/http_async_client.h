@@ -306,7 +306,7 @@ public:
     void removeAdditionalHeader(const StringType& key);
     void setAdditionalHeaders(HttpHeaders additionalHeaders);
     void setAuthType(AuthType value);
-    AuthInfoCache::AuthorizationCacheItem authCacheItem() const;
+    AuthInfoCache::Item authCacheItem() const;
 
     Credentials credentials() const;
     void setCredentials(const Credentials& credentials);
@@ -385,7 +385,7 @@ private:
     HttpHeaders m_additionalHeaders;
     int m_awaitedMessageNumber;
     QString m_remoteEndpointWithProtocol;
-    AuthInfoCache::AuthorizationCacheItem m_authCacheItem;
+    AuthInfoCache::Item m_authCacheItem;
     SystemError::ErrorCode m_lastSysErrorCode;
     int m_requestSequence;
     bool m_forcedEof;

@@ -36,10 +36,10 @@ bool TransactionTransportStub::isIncoming() const
     return m_isIncoming;
 }
 
-nx::network::http::AuthInfoCache::AuthorizationCacheItem TransactionTransportStub::authData() const
+nx::network::http::AuthInfoCache::Item TransactionTransportStub::authData() const
 {
     // TODO
-    return nx::network::http::AuthInfoCache::AuthorizationCacheItem();
+    return nx::network::http::AuthInfoCache::Item();
 }
 
 std::multimap<QString, QString>  TransactionTransportStub::httpQueryParams() const

@@ -81,11 +81,17 @@ bool addAuthorization(
     }
     else if (wwwAuthenticateHeader.authScheme == header::AuthScheme::digest)
     {
+	    // TODO: #ak This is incorrect value for "uri" actually. See [rfc7616#3.4] and [rfc7230#5.5].
+        // The proper fix may be incompatible with some buggy cameras.
+        // But, without a proper fix we can run into incompatibility with some HTTP servers.
+        const auto effectiveUri = request->requestLine.url.toString(
+             QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::FullyEncoded).toUtf8();
+
         header::DigestAuthorization digestAuthorizationHeader;
         if (!calcDigestResponse(
                 request->requestLine.method,
                 credentials,
-                request->requestLine.url.path().toUtf8(),
+                effectiveUri,
                 wwwAuthenticateHeader,
                 &digestAuthorizationHeader))
         {
@@ -265,8 +271,6 @@ static bool calcDigestResponse(
     outputParams->emplace("nonce", nonce);
     outputParams->emplace("uri", uri);
 
-    const BufferType nonceCount = "00000001";     //TODO #ak generate it
-    const BufferType clientNonce = "0a4f113b";    //TODO #ak generate it
 
     QByteArray digestResponse;
     if (qop.isEmpty())
@@ -275,6 +279,9 @@ static bool calcDigestResponse(
     }
     else
     {
+        const BufferType nonceCount = fieldOrEmpty(inputParams, "nc");
+        const BufferType clientNonce = "0a4f113b";    //TODO #ak generate it
+
         digestResponse = calcResponseAuthInt(
             ha1, nonce, nonceCount, clientNonce, qop, ha2, algorithm);
 

@@ -2,6 +2,8 @@
 
 #include <memory>
 #include <mutex>
+#include <tuple>
+#include <map>
 
 #ifndef Q_MOC_RUN
 #include <boost/optional.hpp>
@@ -11,6 +13,7 @@
 
 #include <nx/network/socket_common.h>
 #include <nx/utils/url.h>
+#include <nx/utils/elapsed_timer.h>
 
 #include "auth_tools.h"
 #include "http_types.h"
@@ -34,7 +37,7 @@ struct AuthInfo
 class NX_NETWORK_API AuthInfoCache
 {
 public:
-    class AuthorizationCacheItem
+    class Item
     {
     public:
         nx::utils::Url url;
@@ -43,31 +46,22 @@ public:
         std::shared_ptr<header::WWWAuthenticate> wwwAuthenticateHeader;
         std::shared_ptr<header::Authorization> authorizationHeader;
 
-        AuthorizationCacheItem() = default;
+        Item() = default;
 
-        AuthorizationCacheItem(
+        Item(
             const nx::utils::Url& url,
             const StringType& method,
             const Credentials& userCredentials,
-            header::WWWAuthenticate wwwAuthenticateHeader,
-            header::Authorization authorization)
+            header::WWWAuthenticate wwwAuthenticateHeader)
             :
             url(url),
             method(method),
             userCredentials(userCredentials),
             wwwAuthenticateHeader(
                 std::make_shared<header::WWWAuthenticate>(
-                    std::move(wwwAuthenticateHeader))),
-            authorizationHeader(
-                std::make_shared<header::Authorization>(
-                    std::move(authorization)))
+                    std::move(wwwAuthenticateHeader)))
         {
         }
-
-        AuthorizationCacheItem(AuthorizationCacheItem&& /*right*/) = default;
-        AuthorizationCacheItem(const AuthorizationCacheItem& /*right*/) = default;
-        AuthorizationCacheItem& operator=(const AuthorizationCacheItem& /*right*/) = default;
-        AuthorizationCacheItem& operator=(AuthorizationCacheItem&& /*right*/) = default;
     };
 
     AuthInfoCache() = default;
@@ -75,14 +69,7 @@ public:
     /**
      * Save successful authorization information in cache for later use.
      */
-    template<typename AuthorizationCacheItemRef>
-    void cacheAuthorization(AuthorizationCacheItemRef&& item)
-    {
-        std::lock_guard<std::mutex> lk(m_mutex);
-
-        m_cachedAuthorization.reset(new AuthorizationCacheItem(
-            std::forward<AuthorizationCacheItemRef>(item)));
-    }
+    void cacheAuthorization(Item item);
 
     /**
      * Adds Authorization header to request, if corresponding data can be found in cache.
@@ -92,7 +79,7 @@ public:
     bool addAuthorizationHeader(
         const nx::utils::Url& url,
         Request* const request,
-        AuthInfoCache::AuthorizationCacheItem* const authzData);
+        AuthInfoCache::Item* const item);
 
     /**
      * @param url Required since request->requestLine.url can contain only path.
@@ -100,23 +87,31 @@ public:
     static bool addAuthorizationHeader(
         const nx::utils::Url& url,
         Request* const request,
-        AuthInfoCache::AuthorizationCacheItem authzData);
+        AuthInfoCache::Item item);
+
     static AuthInfoCache* instance();
 
 private:
-    // TODO: #ak (2.4) This information should stored globally depending on server endpoint, server path, user credentials.
-    /**
-     * Authorization header, successfully used with m_url.
-     */
-    std::unique_ptr<AuthorizationCacheItem> m_cachedAuthorization;
+    using Key = std::tuple<StringType, nx::utils::Url>;
+
+    struct Entry
+    {
+        Item item;
+        nx::utils::ElapsedTimer timeout;
+    };
+
+private:
     mutable std::mutex m_mutex;
+    std::map<Key, Entry> m_entries;
 
-    AuthorizationCacheItem getCachedAuthentication(
+private:
+    static Key makeKey(StringType method, const nx::utils::Url& url);
+
+    Item getCachedAuthentication(
         const nx::utils::Url& url,
-        const StringType& method) const;
+        const StringType& method);
 
-    AuthInfoCache(const AuthInfoCache&);
-    AuthInfoCache& operator=(const AuthInfoCache&);
+    void cleanUpStaleEntries();
 };
 
 } // namespace nx

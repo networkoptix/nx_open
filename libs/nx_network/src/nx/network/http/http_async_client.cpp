@@ -1543,61 +1543,18 @@ bool AsyncClient::resendRequestWithAuthorization(
     auto wwwAuthenticateHeader = extractAuthenticateHeader(response.headers, isProxy, m_authType);
     if(!wwwAuthenticateHeader)
         return false;
-    if (wwwAuthenticateHeader->authScheme == header::AuthScheme::basic &&
-        (credentials.authToken.type == AuthTokenType::password || credentials.authToken.empty()))
-    {
-        header::BasicAuthorization basicAuthorization(
-            credentials.username.toUtf8(),
-            credentials.authToken.value);
-        nx::network::http::insertOrReplaceHeader(
-            &m_request.headers,
-            nx::network::http::HttpHeader(
-                authorizationHeaderName,
-                basicAuthorization.serialized()));
 
-        // TODO: #ak MUST add to cache only after OK response.
-        m_authCacheItem = AuthInfoCache::AuthorizationCacheItem(
+    // TODO: #ak MUST add to cache only after OK response.
+    m_authCacheItem = AuthInfoCache::Item(
+        m_contentLocationUrl,
+        m_request.requestLine.method,
+        credentials,
+        std::move(*wwwAuthenticateHeader));
+    AuthInfoCache::instance()->cacheAuthorization(m_authCacheItem);
+    if (!AuthInfoCache::instance()->addAuthorizationHeader(
             m_contentLocationUrl,
-            m_request.requestLine.method,
-            credentials,
-            std::move(*wwwAuthenticateHeader),
-            std::move(basicAuthorization));
-        AuthInfoCache::instance()->cacheAuthorization(m_authCacheItem);
-    }
-    else if (wwwAuthenticateHeader->authScheme == header::AuthScheme::digest)
-    {
-        header::DigestAuthorization digestAuthorizationHeader;
-        // TODO: #ak This is incorrect value for "uri" actually. See [rfc7616#3.4] and [rfc7230#5.5].
-        // The proper fix may be incompatible with some buggy cameras.
-        // But, without a proper fix we can run into incompatibility with some HTTP servers.
-        const auto effectiveRequestUri = m_request.requestLine.url.toString(
-            QUrl::RemoveScheme | QUrl::RemovePort | QUrl::RemoveAuthority | QUrl::FullyEncoded).toUtf8();
-        if (!calcDigestResponse(
-                m_request.requestLine.method,
-                credentials,
-                effectiveRequestUri,
-                *wwwAuthenticateHeader,
-                &digestAuthorizationHeader))
-        {
-            return false;
-        }
-        BufferType authorizationStr;
-        digestAuthorizationHeader.serialize(&authorizationStr);
-
-        nx::network::http::insertOrReplaceHeader(
-            &m_request.headers,
-            nx::network::http::HttpHeader(authorizationHeaderName, authorizationStr));
-        // TODO: #ak MUST add to cache only after OK response.
-        // TODO: #ak It seems cache key is not correct because don't take uri into account
-        m_authCacheItem = AuthInfoCache::AuthorizationCacheItem(
-            m_contentLocationUrl, //< TODO: #ak MUST be a VALID effectiveRequestUri.
-            m_request.requestLine.method,
-            credentials,
-            std::move(*wwwAuthenticateHeader),
-            std::move(digestAuthorizationHeader));
-        AuthInfoCache::instance()->cacheAuthorization(m_authCacheItem);
-    }
-    else
+            &m_request,
+            &m_authCacheItem))
     {
         return false;
     }
@@ -1675,7 +1632,7 @@ void AsyncClient::setAuthType(AuthType value)
     m_authType = value;
 }
 
-AuthInfoCache::AuthorizationCacheItem AsyncClient::authCacheItem() const
+AuthInfoCache::Item AsyncClient::authCacheItem() const
 {
     return m_authCacheItem;
 }

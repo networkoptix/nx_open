@@ -35,6 +35,12 @@ const char* kResponseForLowercaseMd5DigestHeader =
         "response=\"900afe7b3e6d522346fcfaaa897b6b35\", algorithm=\"md5\", cnonce=\"0a4f113b\", "
         "nc=\"00000001\", qop=\"auth\"";
 
+const char* kSecondResponseForLowercaseMd5DigestHeader =
+        "Digest username=\"zorz_user\", realm=\"Http Server\", "
+        "nonce=\"f3164f6a1801ecb0870af2c468a6d7af\", uri=\"/HttpAsyncClient_auth\", "
+        "response=\"5ac1762adef95bd27c0fd100076a3477\", algorithm=\"md5\", cnonce=\"0a4f113b\", "
+        "nc=\"00000002\", qop=\"auth\"";
+
 } // namespace
 
 void AuthHttpServer::processConnection(AbstractStreamSocket* connection)
@@ -59,6 +65,11 @@ std::vector<nx::Buffer> AuthHttpServer::receivedRequests()
     return m_receivedRequests;
 }
 
+void AuthHttpServer::setNextResponse(NextResponse nextResponse)
+{
+    m_nextResponse = nextResponse;
+}
+
 void AuthHttpServer::appendAuthHeader(AuthHeader value)
 {
     ASSERT_NE(value.type, AuthType::authBasicAndDigest);
@@ -68,10 +79,10 @@ void AuthHttpServer::appendAuthHeader(AuthHeader value)
 nx::Buffer AuthHttpServer::nextResponse()
 {
     nx::Buffer response;
-    switch (m_nextRepsonse)
+    switch (m_nextResponse)
     {
         case NextResponse::unauthorized:
-            m_nextRepsonse = NextResponse::success;
+            m_nextResponse = NextResponse::success;
 
             response =
                 "HTTP/1.1 401 Unauthorized\r\n"
@@ -82,7 +93,7 @@ nx::Buffer AuthHttpServer::nextResponse()
 
             break;
         case NextResponse::success:
-            m_nextRepsonse = NextResponse::unauthorized;
+            m_nextResponse = NextResponse::unauthorized;
             response =
                 "HTTP/1.1 200 OK\r\n"
                 "Content-Length: 0\r\n"
@@ -136,6 +147,11 @@ void HttpClientAsyncAuthorization::givenHttpServerWithAuthorization(std::vector<
     m_httpServer->start();
 }
 
+void HttpClientAsyncAuthorization::whenServerIsGoingToRespondWith(
+    AuthHttpServer::NextResponse nextResponse)
+{
+    m_httpServer->setNextResponse(nextResponse);
+}
 
 void HttpClientAsyncAuthorization::whenClientSendHttpRequestAndIsRequiredToUse(AuthType auth,
     const char *username)
@@ -171,8 +187,8 @@ void HttpClientAsyncAuthorization::thenClientAuthenticatedBy(const char* exptect
         return;
     }
 
-    ASSERT_EQ(requests.size(), 2);
-    ASSERT_THAT(requests[1].toStdString(), testing::HasSubstr(exptectedHeaderResponse));
+    ASSERT_GE(requests.size(), 2);
+    ASSERT_THAT(requests.back().toStdString(), testing::HasSubstr(exptectedHeaderResponse));
 }
 
 void HttpClientAsyncAuthorization::thenClientGotResponseWithCode(int expectedHttpCode)
@@ -227,6 +243,20 @@ TEST_F(HttpClientAsyncAuthorization, lowercaseAlgorithm)
     whenClientSendHttpRequestAndIsRequiredToUse(AuthType::authDigest);
     thenClientGotResponseWithCode(200);
     thenClientAuthenticatedBy(kResponseForLowercaseMd5DigestHeader);
+}
+
+TEST_F(HttpClientAsyncAuthorization, nonce_count_is_incremented)
+{
+    givenHttpServerWithAuthorization({{AuthType::authDigest, kLowercaseMd5DigestHeader}});
+
+    whenClientSendHttpRequestAndIsRequiredToUse(AuthType::authDigest);
+    thenClientGotResponseWithCode(200);
+    thenClientAuthenticatedBy(kResponseForLowercaseMd5DigestHeader);
+
+    whenServerIsGoingToRespondWith(AuthHttpServer::NextResponse::success);
+    whenClientSendHttpRequestAndIsRequiredToUse(AuthType::authDigest);
+    thenClientGotResponseWithCode(200);
+    thenClientAuthenticatedBy(kSecondResponseForLowercaseMd5DigestHeader);
 }
 
 TEST_F(HttpClientAsyncAuthorization, cached_authorization_of_a_different_user_is_not_used)

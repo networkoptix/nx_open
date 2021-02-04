@@ -408,7 +408,7 @@ void AsyncHttpClient::setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody
     m_delegate.setExpectOnlyMessageBodyWithoutHeaders(expectOnlyBody);
 }
 
-AuthInfoCache::AuthorizationCacheItem AsyncHttpClient::authCacheItem() const
+AuthInfoCache::Item AsyncHttpClient::authCacheItem() const
 {
     return m_delegate.authCacheItem();
 }
