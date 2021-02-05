@@ -20,6 +20,9 @@ class IUtilityProvider;
  * All methods are guaranteed to be called without overlapping even if from different threads (i.e.
  * with a guaranteed barrier between the calls), thus, no synchronization is required for the
  * implementation.
+ *
+ * ATTENTION: If the Plugins's dynamic library is linked to any dynamic libraries, including the
+ * ones from the OS, consult @ref md_src_nx_sdk_dynamic_libraries to avoid potential issues.
  */
 class IPlugin: public Interface<IPlugin>
 {

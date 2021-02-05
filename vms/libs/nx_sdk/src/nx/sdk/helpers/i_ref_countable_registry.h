@@ -20,6 +20,8 @@ namespace sdk {
  * The instance of a registry is destroyed when the LibContext destructor is called, i.e. on the
  * static deinitialization phase. On destruction, it attempts to detect and log objects which were
  * not deleted, failing an assertion if there are any such objects.
+ *
+ * For a high-level description of this mechanism, see @ref md_src_nx_sdk_helpers_lib_context.
  */
 class IRefCountableRegistry
 {

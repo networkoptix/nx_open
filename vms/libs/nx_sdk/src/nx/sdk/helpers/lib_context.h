@@ -14,6 +14,8 @@ namespace sdk {
 /**
  * Interface to LibContext which is used by the Server to set up the context for each plugin
  * dynamic library.
+ *
+ * For a high-level description of this mechanism, see @ref md_src_nx_sdk_helpers_lib_context.
  */
 class ILibContext
 {
