@@ -65,7 +65,7 @@ angular.module('webadminApp')
         function errorHandler(errorToShow){
             switch(errorToShow){
                 case 'FAIL':
-                    errorToShow = L.join.systemIsUnreacheble;
+                    errorToShow = L.join.SystemIsUnreacheble;
                     break;
                 case 'currentPassword':
                     errorToShow = L.join.incorrectCurrentPassword;
@@ -115,7 +115,7 @@ angular.module('webadminApp')
                 url = url + ':' + Config.defaultPort;
             }
             if(!hasProtocol){
-                url = 'http://' + url;
+                url = 'https://' + url;
             }
             return url;
         }
