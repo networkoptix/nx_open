@@ -21,8 +21,9 @@
 
 #include <utils/resource_property_adaptors.h>
 
-using namespace nx;
 using namespace nx::vms::client::desktop;
+
+using EventType = nx::vms::api::EventType;
 
 QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
     base_type(parent),
@@ -32,7 +33,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
     m_systemHealthCheckBoxes(),
     m_adaptor(new QnBusinessEventsFilterResourcePropertyAdaptor(this)),
     m_updating(false),
-    m_helper(new vms::event::StringsHelper(commonModule()))
+    m_helper(new nx::vms::event::StringsHelper(commonModule()))
 {
     ui->setupUi(this);
 
@@ -41,7 +42,7 @@ QnPopupSettingsWidget::QnPopupSettingsWidget(QWidget* parent):
 
     setHelpTopic(this, Qn::SystemSettings_Notifications_Help);
 
-    for (vms::api::EventType eventType : vms::event::allEvents())
+    for (EventType eventType: nx::vms::event::allEvents())
     {
         QCheckBox* checkbox = new QCheckBox(this);
         checkbox->setText(m_helper->eventName(eventType));
@@ -109,11 +110,11 @@ void QnPopupSettingsWidget::loadDataToUi()
     if (context()->user())
         m_adaptor->setResource(context()->user());
 
-    QList<vms::api::EventType> watchedEvents = context()->user()
+    QList<EventType> watchedEvents = context()->user()
         ? m_adaptor->watchedEvents()
-        : vms::event::allEvents();
+        : nx::vms::event::allEvents();
 
-    for (vms::api::EventType eventType : m_businessRulesCheckBoxes.keys())
+    for (EventType eventType: nx::vms::event::allEvents())
     {
         bool checked = watchedEvents.contains(eventType);
         m_businessRulesCheckBoxes[eventType]->setChecked(checked);
@@ -146,15 +147,17 @@ bool QnPopupSettingsWidget::hasChanges() const
         || (context()->user() && m_adaptor->watchedEvents() != watchedEvents());
 }
 
-QList<vms::api::EventType> QnPopupSettingsWidget::watchedEvents() const
+QList<EventType> QnPopupSettingsWidget::watchedEvents() const
 {
     if (ui->showAllCheckBox->isChecked())
-        return vms::event::allEvents();
+        return nx::vms::event::allEvents();
 
-    QList<vms::api::EventType> result;
-    for (vms::api::EventType eventType : m_businessRulesCheckBoxes.keys())
+    QList<EventType> result;
+    for (EventType eventType: nx::vms::event::allEvents())
+    {
         if (m_businessRulesCheckBoxes[eventType]->isChecked())
             result << eventType;
+    }
     return result;
 }
 
