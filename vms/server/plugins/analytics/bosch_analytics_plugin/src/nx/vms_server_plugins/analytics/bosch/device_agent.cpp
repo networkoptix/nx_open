@@ -196,7 +196,6 @@ Ptr<EventMetadataPacket> DeviceAgent::buildObjectDetectionEventPacket(int64_t ts
     using namespace std::chrono;
 
     Ptr<EventMetadataPacket> packet = nx::sdk::makePtr<EventMetadataPacket>();
-
     const Bosch::EventType* eventType =
         m_engine->manifest().eventTypeByInternalName(kObjectDetectionEventTypeId.split('.').back());
     if (!eventType)
@@ -355,13 +354,19 @@ void DeviceAgent::updateAgentManifest(const ParsedMetadata& parsedMetadata)
             << i
             << "  ===EVENTS======================================================================="
             << std::endl;
-        for (const auto& event : parsedMetadata.events)
+        for (const auto& event: parsedMetadata.events)
             std::cout << event.topic.toStdString() << " isActive = " << event.isActive << std::endl;
 
         m_handler->handleMetadata(eventPacket.get());
 
         ++i;
     }
+
+    // A device may send spurious objects if MOTION+ analysis type is set on the device.
+    // Motion+ is detected by Detect_any_motion event received. We check it in updateAgentManifest
+    // function.
+    if (!m_manifest.supportedObjectTypeIds.contains(kObjectDetectionObjectTypeId))
+        return;
 
     Ptr<ObjectMetadataPacket> objectPacket =
         buildObjectPacket(parsedMetadata, dataPacket->timestampUs());
@@ -377,7 +382,7 @@ void DeviceAgent::updateAgentManifest(const ParsedMetadata& parsedMetadata)
 
         m_handler->handleMetadata(objectPacket.get());
 
-        for (const auto& object : parsedMetadata.objects)
+        for (const auto& object: parsedMetadata.objects)
         {
             if (!m_idCache.alreadyContains(object.id))
             {
