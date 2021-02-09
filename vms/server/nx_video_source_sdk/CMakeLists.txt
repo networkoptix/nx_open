@@ -33,6 +33,7 @@ set(copied_nx_sdk_src_files
     ${copied_nx_sdk_src_origin}/camera/camera_plugin.h
     ${copied_nx_sdk_src_origin}/camera/camera_plugin_types.h
     ${copied_nx_sdk_src_origin}/nx/sdk/ptr.h
+    ${copied_nx_sdk_src_origin}/nx/sdk/dynamic_libraries.md
 )
 
 set(copied_samples_dir ${CMAKE_SOURCE_DIR}/vms/server/plugins/device)

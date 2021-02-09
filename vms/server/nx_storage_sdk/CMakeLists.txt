@@ -26,6 +26,7 @@ set(copied_nx_sdk_src_origin ${CMAKE_SOURCE_DIR}/vms/libs/nx_sdk/src)
 set(copied_nx_sdk_src_files
     ${copied_nx_sdk_src_origin}/plugins/plugin_api.h
     ${copied_nx_sdk_src_origin}/storage/third_party_storage.h
+    ${copied_nx_sdk_src_origin}/nx/sdk/dynamic_libraries.md
 )
 
 set(copied_samples_dir ${CMAKE_SOURCE_DIR}/vms/server/plugins/storage)

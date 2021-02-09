@@ -8,41 +8,38 @@
 
 #include <plugins/plugin_api.h>
 
-/*! \mainpage
-    \par
-    This project demonstrates usage of camera integration plugin API to add support of camera with remote archive (e.g., storage is bound directly to camera)\n
-
-    \par Build how-to
-    Use provided CMakeLists.txt project file to generate solution for your favorite build tool or IDE.
-    Compiles to dynamic library. Tested on MS Windows 10 and Ubuntu 16.04.LTS\n
-    Does not require any third party library\n
-    Successful build results in libimage_library_plugin.so (linux) and image_library_plugin.dll (mswin)
-
-    \par Usage
-        You MUST have mediaserver installed to use this plugin.\n
-    To use plugin simply put built library to mediaserver directory and restart server.\n
-        To use this plugin, launch client aplication and use manual camera search ("Add Camera(s)..." in media server menu) filling "Camera Address" field with
-    absolute path to local directory, containing jpeg file(s). Specified directory will be found as camera with archive and appear in tree menu.
-
-    \par Implements following camera integration interfaces:
-    - \a nxcip::CameraDiscoveryManager (\a DiscoveryManager) to find this plugin
-    - \a nxcip::BaseCameraManager2 (\a CameraManager) to retrieve camera properties and access other managers
-    - \a nxcip::CameraMediaEncoder2 (\a MediaEncoder) to receive LIVE media stream from camera
-    - \a nxcip::StreamReader (\a StreamReader) to provide media stream directly from plugin
-    - \a nxcip::DtsArchiveReader (\a ArchiveReader) to access archive
-
-    \par Object life-time management:
-    - plugin entry point is \a createNXPluginInstance function
-    - all classes, implementing \a nxcip interfaces, delegate reference counting (by using \a CommonRefManager(CommonRefManager*) constructor)
-        to factory class instance (e.g., \a CameraManager is a factory for \a MediaEncoder). This garantees that \a CameraManager instance
-        is removed later than \a MediaEncoder instance
-    - all factory classes (except for \a CameraDiscoveryManager) hold pointer to child class object (e.g., \a MediaEncoder is a child for \a CameraManager)
-        and delete all children on destruction
-*/
-
 class DiscoveryManager;
 
-//!Main plugin class. Hosts and initializes necessary internal data
+/**
+ * Main plugin class. Hosts and initializes the necessary internal data.
+ *
+ * This project demonstrates usage of camera integration plugin API to add support of a camera with
+ * a remote archive (e.g. the storage is bound directly to the camera).
+ *
+ * Usage:
+ *
+ * To use this plugin, launch client aplication and use manual camera search ("Add Camera(s)..." in
+ * media server menu) filling "Camera Address" field with absolute path to local directory,
+ * containing jpeg file(s). Specified directory will be found as camera with archive and appear in
+ * tree menu.
+ *
+ * Implements following camera integration interfaces:
+ * - nxcip::CameraDiscoveryManager (DiscoveryManager) to find this plugin.
+ * - nxcip::BaseCameraManager2 (CameraManager) to retrieve camera properties and access other
+ *     managers.
+ * - nxcip::CameraMediaEncoder2 (MediaEncoder) to receive LIVE media stream from camera.
+ * - nxcip::StreamReader (StreamReader) to provide media stream directly from plugin.
+ * - nxcip::DtsArchiveReader (ArchiveReader) to access archive.
+ *
+ * Object life-time management:
+ * - Plugin entry point is createNXPluginInstance function.
+ * - All classes implementing `nxcip::` interfaces delegate reference counting (by using
+ *     CommonRefManager(CommonRefManager*) constructor) to factory class instance (e.g.
+ *     CameraManager is a factory for MediaEncoder). This garantees that CameraManager instance
+ *     is removed later than MediaEncoder instance.
+ * - All factory classes (except for CameraDiscoveryManager) hold pointer to child class object
+ *     (e.g. MediaEncoder is a child for CameraManager) and delete all children on destruction.
+ */ 
 class ImageLibraryPlugin
 :
     public nxpl::PluginInterface

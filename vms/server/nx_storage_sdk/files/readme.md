@@ -10,7 +10,7 @@ under the terms of Mozilla Public License 2.0: www.mozilla.org/MPL/2.0/, with th
 exception of certain files which may be licensed under the terms of other open-source licenses
 explicitly referenced in those files.
 
-See the license texts in `licenses` directory located in the root directory of this package.
+See the license texts in `licenses/` directory located in the root directory of this package.
 
 ---------------------------------------------------------------------------------------------------
 ## Introduction
@@ -28,7 +28,8 @@ dedicated interface) `class nxpl::PluginInterface` (`src/plugins/plugin_api.h`).
 interface also defines the name and the prototype of the entry point function.
 
 ATTENTION: If you consider linking your Plugin to any dynamic libraries, including the ones from
-the OS, consult `src/nx/sdk/dynamic_libraries.md` to avoid potential issues.
+the OS, consult [src/nx/sdk/dynamic_libraries.md](@ref md_src_nx_sdk_dynamic_libraries) to avoid
+potential issues.
 
 To make it possible to develop plugins using a different C++ compiler (e.g. with an incompatible
 ABI) rather than the one used to compile the VMS itself, or potentially in languages other than
@@ -120,4 +121,4 @@ code:
 - Removed unused interface `nxpl::Plugin3` which only added `setLocale()` to `nxpl::Plugin2`.
 - SDK headers moved:
     - `include/plugins/storage/third_party/third_party_storage.h` -> `src/storage/`.
-    - `include/plugins/plugin_api.h -> src/plugins/`.
+    - `include/plugins/plugin_api.h` -> `src/plugins/`.

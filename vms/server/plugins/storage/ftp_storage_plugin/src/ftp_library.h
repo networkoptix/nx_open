@@ -1,7 +1,42 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef __FTP_THIRD_PARTY_LIBRARY_H__
-#define __FTP_THIRD_PARTY_LIBRARY_H__
+#pragma once
+
+/**@file
+ * This is the example project aimed to demonstrate a possible implementation of a Storage plugin.
+ * - nx_spl::StorageFactory::createStorage() function will receive url to base folder.
+ *     For example: `ftp://10.10.2.54/some/path`
+ * - All other API functions which have URL parameter will receive URL without scheme and host.
+ *     For example: `/some/path/folder1/folder2`
+ * - In FileInfoIterator::next() the plugin should provide full URL to target location (with or
+ *     without scheme + host).
+ *     For example:
+ *     <pre><code>
+ *     fileInfo.url = ftp://10.10.2.54/some/path/file1.mkv // right
+ *     fileInfo.url = /some/path/file1.mkv // right
+ *     fileInfo.url = file1.mkv // wrong
+ *     </code></pre>
+ * - Some of the API functions are called frequently, for example open(), some - based on some
+ *     (sometimes quite long) timeout, for example, removeDir(). But the Server calls all of them
+ *     in time, so every function should be implemented correctly.
+ * - For some storages types, for example FTP, it may be impossible to 'honestly' implement such
+ *     fuctions as getTotalSpace() and getFreeSpace(). In this case these functions are allowed to
+ *     return some sensible constant value. Keep in mind that getTotalSpace() is used mainly in
+ *     determing "best"​ storage algorithm. For example if some storage total space is far smaller
+ *     than others this storage won't be selected for writing. Or if some storage is twice larger
+ *     than another, it will be written on twice more data. Also total space value is displayed in
+ *     client for every storage in list. getFreeSpace() is used to rotate data on storages. If the
+ *     Server sees that some storage free space becomes lower than predefined limit (5 GB by
+ *     default) it will try to remove some old files and folders on this storage.
+ *
+ * Usage of the plugin:
+ * 
+ * Connect to the Server with a Client. In external storage selection dialog you should be able to
+ * see new storage type (FTP). Enter a valid ftp url and credentials and press Ok. For example:
+ * - Url: `ftp://10.2.3.87/path/to/storage`
+ * - Login: `user1`
+ * - Password: `12345678`
+ */
 
 #include <vector>
 #include <string>
@@ -11,52 +46,6 @@
 #include <mutex>
 #include "storage/third_party_storage.h"
 #include "ftplib/ftplib.h"
-
-/*! \mainpage
-
-    \section intro_sec Introduction
-    This is the example project aimed to demonstrate NX Storage plugin API SDK possible implementation.
-    \subsection tips_subsec Some tips
-    - nx_spl::StorageFactory::createStorage() function will receive url to base folder
-      For example:
-      \code
-      'ftp://10.10.2.54/some/path'.
-      \endcode
-    - All other API functions which have URL parameter will receive URL without scheme and host.
-      For example:
-      \code
-      /some/path/folder1/folder2
-      \endcode
-    - In FileInfoIterator::next() plug-in should provide full URL to target location (with or without scheme + host).
-      For example:
-      \code
-      fileInfo.url = ftp://10.10.2.54/some/path/file1.mkv   // right
-      fileInfo.url = /some/path/file1.mkv                   // right
-      fileInfo.url = file1.mkv                              // wrong
-      \endcode
-    - Some of the API functions are called frequently, for example open(), some - based on some (sometimes quite long) timeout, for example, removeDir().
-      But MediaServer calls all of them in time, so every function should be implemented correctly.
-    - For some storages types, for example FTP, it may be impossible to 'honestly' implement such fuctions as getTotalSpace() and getFreeSpace().
-      In this case these functions are allowed to return some sensible constant value. Keep in mind that getTotalSpace() is used mainly in determing "best"​ storage algorithm.
-      For example if some storage total space is far smaller than others this storage won't be selected for writing.
-      Or if some storage is twice larger than another, it will be written on twice more data. Also total space value is displayed in client for every storage in list.
-      getFreeSpace() is used to rotate data on storages. If MediaServer sees that some storage free space becomes lower than predefined limit (5gb by default)
-      it will try to remove some old files and folders on this storage.
-
-    \section build_how_to Build how-to
-    Use provided CMakeLists.txt project file to generate solution for your favorite build tool or IDE.
-    There are no external dependencies used in this example. All you need to build the library is a relatively modern C++ compiler.
-
-    \section usage Usage
-    You should have NX Mediaserver installed. Put built plugin library in mediaserver/bin/plugins (linux) or mediaserver/plugins (windows) folder and restart mediaserver.
-    Connect to the server with client. In external storage selection dialog you should be able to see new storage type (FTP).
-    Enter valid ftp url and credentials and press Ok. For example,
-    \code
-    Url:        ftp://10.2.3.87/path/to/storage
-    Login:        user1
-    Password:    12345678
-    \endcode
-*/
 
 namespace nx_spl
 {
@@ -328,5 +317,3 @@ namespace nx_spl
         virtual int releaseRef() const override;
     }; // class FtpStorageFactory
 } // namespace Qn
-
-#endif // __FTP_THIRD_PARTY_LIBRARY_H__
