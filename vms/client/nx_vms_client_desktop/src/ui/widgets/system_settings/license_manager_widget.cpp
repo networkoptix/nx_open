@@ -246,7 +246,7 @@ QnLicenseManagerWidget::QnLicenseManagerWidget(QWidget *parent) :
             }
         });
 
-    setHelpTopic(this, Qn::SystemSettings_Licenses_Help);
+    setHelpTopic(this, Qn::Licenses_Help);
 
     connect(ui->detailsButton,  &QPushButton::clicked, this,
         [this]()

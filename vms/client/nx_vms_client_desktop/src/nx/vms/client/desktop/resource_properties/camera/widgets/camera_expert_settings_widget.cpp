@@ -172,6 +172,7 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
     sizePolicy.setRetainSizeWhenHidden(true);
     ui->comboBoxForcedMotionStream->setSizePolicy(sizePolicy);
 
+    setHelpTopic(this, Qn::CameraSettingsExpertPage_Help);
     setHelpTopic(ui->secondStreamGroupBox, Qn::CameraSettings_SecondStream_Help);
     setHelpTopic(ui->settingsDisableControlCheckBox, Qn::CameraSettings_Expert_SettingsControl_Help);
     setHelpTopic(ui->checkBoxPrimaryRecorder, Qn::CameraSettings_Expert_DisableArchivePrimary_Help);

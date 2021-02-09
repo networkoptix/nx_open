@@ -574,7 +574,7 @@ QVariant QnPtzManageModel::presetData(const QnPtzPresetItemModel &presetModel, i
     case Qn::ValidRole:
         return true;
     case Qn::HelpTopicIdRole:
-        return column == HomeColumn ? Qn::PtzManagement_HomePosition_Help : Qn::PtzPresets_Help;
+        return Qn::PtzPresets_Help;
     default:
         break;
     }
@@ -632,7 +632,7 @@ QVariant QnPtzManageModel::tourData(const QnPtzTourItemModel &tourModel, int col
         // TODO: some gradations required: fully invalid, only warning (eg. hotkey duplicates)
         return tourIsValid(tourModel);
     case Qn::HelpTopicIdRole:
-        return column == HomeColumn ? Qn::PtzManagement_HomePosition_Help : Qn::PtzManagement_Tour_Help;
+        return Qn::PtzManagement_Tour_Help;
     default:
         break;
     }

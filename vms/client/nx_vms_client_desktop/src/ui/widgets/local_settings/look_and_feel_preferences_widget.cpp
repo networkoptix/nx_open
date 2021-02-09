@@ -55,7 +55,6 @@ QnLookAndFeelPreferencesWidget::QnLookAndFeelPreferencesWidget(QWidget *parent) 
     ui->imageNameLineEdit->setPlaceholderText(L'<' + tr("No image") + L'>');
 
     setHelpTopic(this,                                                        Qn::SystemSettings_General_Customizing_Help);
-    setHelpTopic(ui->languageLabel,           ui->languageComboBox,           Qn::SystemSettings_General_Language_Help);
     setHelpTopic(ui->tourCycleTimeLabel,      ui->tourCycleTimeSpinBox,       Qn::SystemSettings_General_TourCycleTime_Help);
     setHelpTopic(ui->showIpInTreeCheckBox,                                    Qn::SystemSettings_General_ShowIpInTree_Help);
 

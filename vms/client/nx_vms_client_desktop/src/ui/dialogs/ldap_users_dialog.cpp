@@ -80,7 +80,7 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
         this,
         SLOT(at_testLdapSettingsFinished(int, const QnLdapUsers &,int, const QString &)));
 
-    setHelpTopic(this, Qn::UserSettings_LdapFetch_Help);
+    setHelpTopic(this, Qn::Ldap_Help);
 }
 
 QnLdapUsersDialog::~QnLdapUsersDialog() {}

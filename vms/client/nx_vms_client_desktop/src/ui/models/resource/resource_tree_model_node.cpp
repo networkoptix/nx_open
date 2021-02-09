@@ -908,10 +908,11 @@ int QnResourceTreeModelNode::helpTopicId() const
     switch (m_type)
     {
         case NodeType::users:
+        case NodeType::filteredUsers:
             return Qn::MainWindow_Tree_Users_Help;
 
         case NodeType::localResources:
-            return Qn::MainWindow_Tree_Local_Help;
+            return Qn::MediaFolders_Help;
 
         case NodeType::recorder:
             return Qn::MainWindow_Tree_Recorder_Help;
@@ -920,7 +921,16 @@ int QnResourceTreeModelNode::helpTopicId() const
             return Qn::Videowall_Display_Help;
 
         case NodeType::videoWallMatrix:
-            return Qn::Videowall_Matrix_Help;
+            return Qn::Videowall_Management_Help;
+
+        case NodeType::layoutTours:
+        case NodeType::layoutTour:
+            return Qn::Showreel_Help;
+
+        case NodeType::otherSystems:
+        case NodeType::cloudSystem:
+        case NodeType::localSystem:
+            return Qn::OtherSystems_Help;
 
         default:
             break;
@@ -938,11 +948,10 @@ int QnResourceTreeModelNode::helpTopicId() const
         return Qn::MainWindow_Tree_Users_Help;
 
     if (m_flags.testFlag(Qn::local))
-    {
-        if (m_flags.testFlag(Qn::video))
-            return Qn::MainWindow_Tree_Exported_Help;
-        return Qn::MainWindow_Tree_Local_Help;
-    }
+        return Qn::MainWindow_Tree_Exported_Help;
+
+    if (m_flags.testFlag(Qn::fake_server))
+        return Qn::OtherSystems_Help;
 
     if (m_flags.testFlag(Qn::server))
         return Qn::MainWindow_Tree_Servers_Help;

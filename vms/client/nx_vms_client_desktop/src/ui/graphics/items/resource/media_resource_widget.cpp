@@ -1898,7 +1898,7 @@ int QnMediaResourceWidget::helpTopicAt(const QPointF &) const
     const Qn::ResourceStatusOverlay statusOverlay = statusOverlayController()->statusOverlay();
 
     if (statusOverlay == Qn::AnalogWithoutLicenseOverlay)
-        return Qn::MainWindow_MediaItem_AnalogLicense_Help;
+        return Qn::Licenses_Help;
 
     if (statusOverlay == Qn::OfflineOverlay || statusOverlay == Qn::OldFirmwareOverlay)
         return Qn::MainWindow_MediaItem_Diagnostics_Help;

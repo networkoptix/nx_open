@@ -35,11 +35,10 @@ QnGeneralPreferencesWidget::QnGeneralPreferencesWidget(
     if (!nx::vms::utils::isAutoRunSupported())
         ui->autoStartCheckBox->hide();
 
-    setHelpTopic(ui->mediaFoldersGroupBox, Qn::SystemSettings_General_MediaFolders_Help);
+    setHelpTopic(ui->mediaFoldersGroupBox, Qn::MediaFolders_Help);
     setHelpTopic(ui->pauseOnInactivityCheckBox, Qn::SystemSettings_General_AutoPause_Help);
     setHelpTopic(ui->idleTimeoutSpinBox, ui->idleTimeoutWidget,
         Qn::SystemSettings_General_AutoPause_Help);
-    setHelpTopic(ui->autoStartCheckBox, Qn::SystemSettings_General_AutoStartWithSystem_Help);
 
     ui->idleTimeoutWidget->setEnabled(false);
 

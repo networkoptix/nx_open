@@ -252,7 +252,7 @@ QnLdapSettingsDialog::QnLdapSettingsDialog(QWidget *parent)
             "loss for all LDAP fetched users."));
     ui->ldapAdminWarningLabel->setVisible(context()->user() && context()->user()->isLdap());
 
-    setHelpTopic(this, Qn::UserSettings_LdapIntegration_Help);
+    setHelpTopic(this, Qn::Ldap_Help);
 }
 
 QnLdapSettingsDialog::~QnLdapSettingsDialog() {}

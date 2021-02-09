@@ -153,7 +153,7 @@ QnGeneralSystemAdministrationWidget::QnGeneralSystemAdministrationWidget(QWidget
     setHelpTopic(m_buttons[kEventLogButton     ], Qn::EventLog_Help);
     setHelpTopic(m_buttons[kCameraListButton   ], Qn::Administration_General_CamerasList_Help);
     setHelpTopic(m_buttons[kAuditLogButton     ], Qn::AuditTrail_Help);
-    setHelpTopic(m_buttons[kBookmarksButton    ], Qn::Bookmarks_Usage_Help);
+    setHelpTopic(m_buttons[kBookmarksButton], Qn::Bookmarks_Search_Help);
 
     auto backupHint = nx::vms::client::desktop::HintButton::hintThat(ui->backupGroupBox);
     backupHint->addHintLine(tr("Creates a backup of System configuration that can be restored in case of failure."));

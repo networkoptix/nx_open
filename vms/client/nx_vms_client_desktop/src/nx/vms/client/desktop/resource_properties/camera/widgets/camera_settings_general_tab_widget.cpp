@@ -5,6 +5,8 @@
 #include "../redux/camera_settings_dialog_store.h"
 
 #include <ui/common/read_only.h>
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/common/utils/aligner.h>
@@ -30,6 +32,10 @@ CameraSettingsGeneralTabWidget::CameraSettingsGeneralTabWidget(
     ui->wearableTimeZoneWidget->setStore(store);
     ui->wearableMotionWidget->setStore(store);
     ui->wearableUploadWidget->setStore(store);
+    setHelpTopic(ui->wearableArchiveLengthWidget, Qn::WearableCamera_Help);
+    setHelpTopic(ui->wearableTimeZoneWidget, Qn::WearableCamera_Help);
+    setHelpTopic(ui->wearableMotionWidget, Qn::WearableCamera_Help);
+    setHelpTopic(ui->wearableUploadWidget, Qn::WearableCamera_Help);
 
     ui->editStreamsPanel->hide();
     ui->overEditStreamsLine->hide();

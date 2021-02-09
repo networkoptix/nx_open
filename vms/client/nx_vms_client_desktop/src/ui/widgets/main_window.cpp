@@ -613,10 +613,13 @@ std::pair<int, bool> MainWindow::calculateHelpTopic() const
     if (auto layout = workbench()->currentLayout())
     {
         if (!layout->data(Qn::VideoWallResourceRole).value<QnVideoWallResourcePtr>().isNull())
-            return {Qn::Videowall_Appearance_Help, false};
+            return {Qn::Videowall_Display_Help, false};
 
         if (layout->isSearchLayout())
             return {Qn::MainWindow_Scene_PreviewSearch_Help, true};
+
+        if (layout->isLayoutTourReview())
+            return {Qn::Showreel_Help, true};
 
         if (QnLayoutResourcePtr resource = layout->resource())
         {

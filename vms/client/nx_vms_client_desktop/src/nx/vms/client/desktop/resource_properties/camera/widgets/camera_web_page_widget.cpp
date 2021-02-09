@@ -35,6 +35,8 @@
 
 #include <nx/cloud/vms_gateway/vms_gateway_embeddable.h>
 
+#include <ui/help/help_topic_accessor.h>
+#include <ui/help/help_topics.h>
 #include <ui/dialogs/common/password_dialog.h>
 
 using namespace std::chrono;
@@ -381,6 +383,8 @@ CameraWebPageWidget::CameraWebPageWidget(CameraSettingsDialogStore* store, QWidg
 {
     NX_ASSERT(store);
     connect(store, &CameraSettingsDialogStore::stateChanged, this, &CameraWebPageWidget::loadState);
+
+    setHelpTopic(this, Qn::CameraSettingsWebPage_Help);
 }
 
 CameraWebPageWidget::~CameraWebPageWidget()

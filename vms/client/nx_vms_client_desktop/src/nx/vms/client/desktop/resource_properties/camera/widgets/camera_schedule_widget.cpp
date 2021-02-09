@@ -138,6 +138,10 @@ void CameraScheduleWidget::setupUi()
             tr("based on server time")));
     */
 
+    setHelpTopic(this, Qn::CameraSettingsRecordingPage_Help);
+    setHelpTopic(ui->licensesButton, Qn::Licenses_Help);
+    setHelpTopic(ui->licenseUsageLabel, Qn::Licenses_Help);
+    setHelpTopic(ui->licenseAlertBar, Qn::Licenses_Help);
     setHelpTopic(ui->exportScheduleButton, Qn::CameraSettings_Recording_Export_Help);
 }
 

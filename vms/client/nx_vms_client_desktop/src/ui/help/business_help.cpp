@@ -39,7 +39,7 @@ int eventHelpId(EventType type)
         case EventType::analyticsSdkEvent:
             return Qn::EventsActions_VideoAnalytics_Help;
         case EventType::softwareTriggerEvent:
-            return Qn::EventActions_SoftTrigger_Help;
+            return Qn::EventsActions_SoftTrigger_Help;
         default:
             return type >= EventType::userDefinedEvent
                 ? Qn::EventsActions_Generic_Help

@@ -162,7 +162,6 @@ NotificationsWorkbenchPanel::NotificationsWorkbenchPanel(
     item->setZValue(ContentItemZOrder);
     item->setProperty(Qn::NoHandScrollOver, true);
     item->setProperty(Qn::BlockMotionSelection, true);
-    setHelpTopic(item, Qn::MainWindow_Notifications_Help);
     connect(item, &QGraphicsWidget::geometryChanged, this,
         &NotificationsWorkbenchPanel::updateControlsGeometry);
 
@@ -401,6 +400,7 @@ void NotificationsWorkbenchPanel::at_showingProcessor_hoverEntered()
 void NotificationsWorkbenchPanel::createEventPanel(QGraphicsWidget* parentWidget)
 {
     m_eventPanel.reset(new EventPanel(context()));
+    setHelpTopic(m_eventPanel.get(), Qn::NotificationsPanel_Help);
 
     // TODO: #vkutin Get rid of proxying.
     m_eventPanelContainer = new QnMaskedProxyWidget(parentWidget);
