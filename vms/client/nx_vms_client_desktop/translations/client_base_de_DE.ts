@@ -5837,7 +5837,7 @@ Wenn Sie Analysedaten an einen anderen Speicherort verschieben möchten, wenden 
     </message>
     <message>
       <source>Insufficient permissions to store analytics data.</source>
-      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+      <translation>Unzureichende Berechtigungen zum Speichern von Analysedaten.</translation>
     </message>
   </context>
   <context>
