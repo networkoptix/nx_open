@@ -456,20 +456,24 @@ void QnUserResource::prolongatePassword()
     QnMutexLocker lk(&m_mutex);
     if (!m_ldapPasswordTimer)
         m_ldapPasswordTimer = std::make_shared<nx::network::aio::Timer>();
+    else
+        m_ldapPasswordTimer->pleaseStopSync();
 
+    const auto period = commonModule()->globalSettings()->ldapSettings().passwordExperationPeriodMs;
+    if (!m_ldapPasswordValid)
+        NX_DEBUG(this, "Keep LDAP password verified for %1", period);
+    else
+        NX_VERBOSE(this, "Prolong LDAP password for %1", period);
 
-    const std::chrono::milliseconds ldapPasswordExperationPeriod(
-        commonModule()->globalSettings()->ldapSettings().passwordExperationPeriodMs);
-    m_ldapPasswordTimer->pleaseStopSync();
     m_ldapPasswordValid = true;
     m_ldapPasswordTimer->start(
-        ldapPasswordExperationPeriod,
+        period,
         [this]()
         {
+            NX_DEBUG(this, "Invalidate LDAP password");
             m_ldapPasswordValid = false;
             emit sessionExpired(toSharedPointer(this));
         });
-
 }
 
 bool QnUserResource::passwordExpired() const
