@@ -50,7 +50,7 @@ void Engine::getManifest(Result<const IString*>* outResult) const
         [&]()
         {
             const auto manifest = QJsonObject{
-                {"capabilities", "deviceDependent"},
+                {"capabilities", "deviceDependent|keepObjectBoundingBoxRotation"},
             };
 
             return new sdk::String(serializeJson(manifest).toStdString());
