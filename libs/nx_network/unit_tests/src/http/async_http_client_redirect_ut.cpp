@@ -67,6 +67,7 @@ protected:
         m_resourceServer.reset();
 
         m_resourceServer = std::make_unique<TestHttpServer>(
+            server::Role::resourceServer,
             SocketFactory::createSslAdapter(
                 std::make_unique<TCPServerSocket>(AF_INET), ssl::EncryptionUse::always));
 

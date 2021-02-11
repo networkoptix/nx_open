@@ -58,8 +58,7 @@ protected:
         nx::network::http::Request* const request,
         ProxyTargetDetectedHandler handler) = 0;
 
-    virtual std::unique_ptr<aio::AbstractAsyncConnector>
-        createTargetConnector() = 0;
+    virtual std::unique_ptr<aio::AbstractAsyncConnector> createTargetConnector();
 
 private:
     nx::network::http::Request m_request;
@@ -97,6 +96,22 @@ private:
         std::unique_ptr<AbstractStreamSocket> connection);
 
     void processSslHandshakeResult(SystemError::ErrorCode handshakeResult);
+};
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Implements regular HTTP proxy.
+ * Host to proxy to is taken from the request URL.
+ */
+class NX_NETWORK_API ProxyHandler:
+    public AbstractProxyHandler
+{
+protected:
+    virtual void detectProxyTarget(
+        const HttpServerConnection& connection,
+        Request* const request,
+        ProxyTargetDetectedHandler handler) override;
 };
 
 } // namespace proxy

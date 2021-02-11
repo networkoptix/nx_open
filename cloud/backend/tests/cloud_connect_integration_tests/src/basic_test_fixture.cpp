@@ -554,7 +554,9 @@ void BasicTestFixture::startHttpServer()
     auto cloudServerSocket = std::make_unique<CloudServerSocket>(
         &SocketGlobals::cloud().mediatorConnector());
 
-    m_httpServer = std::make_unique<nx::network::http::TestHttpServer>(std::move(cloudServerSocket));
+    m_httpServer = std::make_unique<nx::network::http::TestHttpServer>(
+        nx::network::http::server::Role::resourceServer,
+        std::move(cloudServerSocket));
     m_httpServer->registerStaticProcessor("/static", m_staticMsgBody, "text/plain");
     m_staticUrl = nx::utils::Url(lm("http://%1/static").arg(serverSocketCloudAddress()));
 

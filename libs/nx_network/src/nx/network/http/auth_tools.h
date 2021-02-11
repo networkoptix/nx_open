@@ -59,24 +59,43 @@ public:
 
 //-------------------------------------------------------------------------------------------------
 
+struct AuthInfo
+{
+    Credentials user;
+    Credentials proxyUser;
+    // TODO: #ak Remove proxyEndpoint and isProxySecure from here.
+    SocketAddress proxyEndpoint;
+    bool isProxySecure = false;
+};
+
+//-------------------------------------------------------------------------------------------------
+
 /**
  * Generates Authorization header and adds it to the request.
  */
-bool NX_NETWORK_API addAuthorization(
-    Request* const request,
+NX_NETWORK_API std::optional<header::Authorization> generateAuthorization(
+    const Request& request,
     const Credentials& credentials,
     const header::WWWAuthenticate& wwwAuthenticateHeader);
+
+NX_NETWORK_API std::optional<header::Authorization> generateDigestAuthorization(
+    const Request& request,
+    const Credentials& credentials,
+    const header::WWWAuthenticate& wwwAuthenticateHeader,
+    int nonceCount);
 
 BufferType NX_NETWORK_API calcHa1(
     const StringType& userName,
     const StringType& realm,
     const StringType& userPassword,
     const StringType& algorithm = {});
+
 BufferType NX_NETWORK_API calcHa1(
     const QString& userName,
     const QString& realm,
     const QString& userPassword,
     const QString& algorithm = {});
+
 BufferType NX_NETWORK_API calcHa1(
     const char* userName,
     const char* realm,
@@ -113,13 +132,16 @@ bool NX_NETWORK_API calcDigestResponse(
     const boost::optional<BufferType>& predefinedHA1,
     const StringType& uri,
     const header::WWWAuthenticate& wwwAuthenticateHeader,
-    header::DigestAuthorization* const digestAuthorizationHeader);
+    header::DigestAuthorization* const digestAuthorizationHeader,
+    int nonceCount = 1);
+
 bool NX_NETWORK_API calcDigestResponse(
     const StringType& method,
     const Credentials& credentials,
     const StringType& uri,
     const header::WWWAuthenticate& wwwAuthenticateHeader,
-    header::DigestAuthorization* const digestAuthorizationHeader);
+    header::DigestAuthorization* const digestAuthorizationHeader,
+    int nonceCount = 1);
 
 /**
  * To be used by server to validate recevied Authorization against known credentials.

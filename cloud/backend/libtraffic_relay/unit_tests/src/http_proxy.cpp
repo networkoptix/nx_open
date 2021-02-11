@@ -301,11 +301,13 @@ protected:
             sslAcceptor->setNonBlockingMode(true);
 
             peerServer = std::make_unique<nx::network::http::TestHttpServer>(
+                nx::network::http::server::Role::resourceServer,
                 std::move(sslAcceptor));
         }
         else if (encryptionUse == network::ssl::EncryptionUse::never)
         {
             peerServer = std::make_unique<nx::network::http::TestHttpServer>(
+                nx::network::http::server::Role::resourceServer,
                 std::move(acceptor));
         }
 

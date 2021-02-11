@@ -25,11 +25,20 @@ public:
         LookupResultHandler completionHandler) = 0;
 };
 
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Authenticates request using HTTP Digest authentication.
+ * User credentials are taken from AbstractAuthenticationDataProvider instance.
+ */
 class NX_NETWORK_API BaseAuthenticationManager:
     public AbstractAuthenticationManager
 {
 public:
-    BaseAuthenticationManager(AbstractAuthenticationDataProvider* authenticationDataProvider);
+    BaseAuthenticationManager(
+        AbstractAuthenticationDataProvider* authenticationDataProvider,
+        Role role = Role::resourceServer);
+
     virtual ~BaseAuthenticationManager() override;
 
     virtual void authenticate(
@@ -40,9 +49,10 @@ public:
 private:
     AbstractAuthenticationDataProvider* m_authenticationDataProvider;
     nx::utils::Counter m_startedAsyncCallsCounter;
+    const Role m_role;
 
     void reportAuthenticationFailure(AuthenticationCompletionHandler completionHandler);
-    header::WWWAuthenticate generateWwwAuthenticateHeader();
+    std::pair<StringType, StringType> generateWwwAuthenticateHeader();
 
     void passwordLookupDone(
         PasswordLookupResult passwordLookupResult,

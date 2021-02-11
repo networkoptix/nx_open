@@ -1,8 +1,3 @@
-/**********************************************************
-* May 17, 2016
-* akolesnikov
-***********************************************************/
-
 #include "authentication_manager.h"
 
 #include <future>
@@ -58,12 +53,12 @@ void AuthenticationManager::authenticate(
     const auto allowedAuthMethods = m_authRestrictionList.getAllowedAuthMethods(request);
     if (allowedAuthMethods & AuthMethod::noAuth)
     {
-        authenticationResult.isSucceeded = true;
+        authenticationResult.statusCode = nx::network::http::StatusCode::ok;
         return;
     }
     if (!(allowedAuthMethods & AuthMethod::httpDigest))
     {
-        authenticationResult.isSucceeded = false;
+        authenticationResult.statusCode = nx::network::http::StatusCode::unauthorized;
         return;
     }
 
@@ -96,7 +91,7 @@ void AuthenticationManager::authenticate(
     {
         if (authenticated.get().toBool())
         {
-            authenticationResult.isSucceeded = true;
+            authenticationResult.statusCode = nx::network::http::StatusCode::ok;
             return;
         }
     }
@@ -106,8 +101,10 @@ void AuthenticationManager::authenticate(
         (authzHeader->userid().isEmpty()) ||
         !validateNonce(authzHeader->digest->params["nonce"]))
     {
-        authenticationResult.wwwAuthenticate = prepareWWWAuthenticateHeader();
-        authenticationResult.isSucceeded = false;
+        authenticationResult.responseHeaders.emplace(
+            nx::network::http::header::WWWAuthenticate::NAME,
+            prepareWWWAuthenticateHeader().serialized());
+        authenticationResult.statusCode = nx::network::http::StatusCode::unauthorized;
         return;
     }
 
@@ -125,7 +122,7 @@ void AuthenticationManager::authenticate(
     {
         if (validateHa1Func(foundHa1.get().toString().toLatin1()))
         {
-            authenticationResult.isSucceeded = true;
+            authenticationResult.statusCode = nx::network::http::StatusCode::ok;
             return;
         }
     }
@@ -136,12 +133,12 @@ void AuthenticationManager::authenticate(
                 realm(),
                 password.get().toString())))
         {
-            authenticationResult.isSucceeded = true;
+            authenticationResult.statusCode = nx::network::http::StatusCode::ok;
             return;
         }
     }
 
-    authenticationResult.isSucceeded = false;
+    authenticationResult.statusCode = nx::network::http::StatusCode::unauthorized;
 }
 
 nx::String AuthenticationManager::realm()

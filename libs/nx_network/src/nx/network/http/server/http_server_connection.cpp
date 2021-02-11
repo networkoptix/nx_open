@@ -160,7 +160,7 @@ void HttpServerConnection::onAuthenticationDone(
     nx::network::http::server::AuthenticationResult authenticationResult,
     std::unique_ptr<RequestContext> requestContext)
 {
-    if (!authenticationResult.isSucceeded)
+    if (!StatusCode::isSuccessCode(authenticationResult.statusCode))
     {
         sendUnauthorizedResponse(
             std::move(requestContext),
@@ -199,13 +199,7 @@ void HttpServerConnection::sendUnauthorizedResponse(
         authenticationResult.responseHeaders.begin(),
         authenticationResult.responseHeaders.end(),
         std::inserter(response.response->headers, response.response->headers.end()));
-    response.response->statusLine.statusCode = nx::network::http::StatusCode::unauthorized;
-    if (authenticationResult.wwwAuthenticate)
-    {
-        response.response->headers.emplace(
-            header::WWWAuthenticate::NAME,
-            authenticationResult.wwwAuthenticate->serialized());
-    }
+    response.response->statusLine.statusCode = authenticationResult.statusCode;
 
     prepareAndSendResponse(
         std::move(requestContext->descriptor),

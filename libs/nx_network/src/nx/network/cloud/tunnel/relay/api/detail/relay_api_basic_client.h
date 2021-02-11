@@ -1,6 +1,5 @@
 #pragma once
 
-#include <nx/network/http/auth_cache.h>
 #include <nx/network/http/fusion_data_http_client.h>
 #include <nx/network/http/rest/http_rest_client.h>
 #include <nx/network/url/url_parse_helper.h>

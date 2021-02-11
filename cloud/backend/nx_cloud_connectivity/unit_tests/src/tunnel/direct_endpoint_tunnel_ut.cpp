@@ -147,6 +147,7 @@ private:
     void startIpv6Server()
     {
         m_testServer = std::make_unique<nx::network::http::TestHttpServer>(
+            nx::network::http::server::Role::resourceServer,
             std::make_unique<TCPServerSocket>(AF_INET6));
 
         ASSERT_TRUE(m_testServer->bindAndListen(SocketAddress::anyPrivateAddressV6))

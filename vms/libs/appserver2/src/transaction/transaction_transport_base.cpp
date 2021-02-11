@@ -502,12 +502,6 @@ int QnTransactionTransportBase::remotePeerProtocolVersion() const
     return m_remotePeerEcProtoVersion;
 }
 
-nx::network::http::AuthInfoCache::Item QnTransactionTransportBase::authData() const
-{
-    QnMutexLocker lock(&m_mutex);
-    return m_httpAuthCacheItem;
-}
-
 std::multimap<QString, QString> QnTransactionTransportBase::httpQueryParams() const
 {
     return m_httpQueryParams;
@@ -1245,13 +1239,6 @@ void QnTransactionTransportBase::at_responseReceived(
         return;
     }
 
-    //saving credentials we used to authorize request
-    if (client->request().headers.find(nx::network::http::header::Authorization::NAME) !=
-        client->request().headers.end())
-    {
-        m_httpAuthCacheItem = client->authCacheItem();
-    }
-
     nx::network::http::HttpHeaders::const_iterator itrGuid = client->response()->headers.find(Qn::EC2_GUID_HEADER_NAME);
     nx::network::http::HttpHeaders::const_iterator itrRuntimeGuid = client->response()->headers.find(Qn::EC2_RUNTIME_GUID_HEADER_NAME);
     nx::network::http::HttpHeaders::const_iterator itrSystemIdentityTime = client->response()->headers.find(Qn::EC2_SYSTEM_IDENTITY_HEADER_NAME);
@@ -1343,11 +1330,10 @@ void QnTransactionTransportBase::at_responseReceived(
         return;
     }
 
-    if (client->authCacheItem().userCredentials.authToken.type == nx::network::http::AuthTokenType::password)
+    if (client->credentials().authToken.type == nx::network::http::AuthTokenType::password)
     {
-        m_remotePeerCredentials.setUser(client->authCacheItem().userCredentials.username);
-        m_remotePeerCredentials.setPassword(
-            client->authCacheItem().userCredentials.authToken.value);
+        m_remotePeerCredentials.setUser(client->credentials().username);
+        m_remotePeerCredentials.setPassword(client->credentials().authToken.value);
     }
 
     if (getState() == QnTransactionTransportBase::Error || getState() == QnTransactionTransportBase::Closed)

@@ -14,9 +14,11 @@ namespace http {
 namespace server {
 
 BaseAuthenticationManager::BaseAuthenticationManager(
-    AbstractAuthenticationDataProvider* authenticationDataProvider)
+    AbstractAuthenticationDataProvider* authenticationDataProvider,
+    Role role)
     :
-    m_authenticationDataProvider(authenticationDataProvider)
+    m_authenticationDataProvider(authenticationDataProvider),
+    m_role(role)
 {
 }
 
@@ -33,7 +35,8 @@ void BaseAuthenticationManager::authenticate(
     using namespace std::placeholders;
 
     boost::optional<header::DigestAuthorization> authzHeader;
-    const auto authHeaderIter = request.headers.find(header::Authorization::NAME);
+    const auto authHeaderIter = request.headers.find(
+        m_role == Role::resourceServer ? header::Authorization::NAME : header::kProxyAuthorization);
     if (authHeaderIter != request.headers.end())
     {
         authzHeader.emplace(header::DigestAuthorization());
@@ -76,21 +79,26 @@ void BaseAuthenticationManager::reportAuthenticationFailure(
 {
     completionHandler(
         nx::network::http::server::AuthenticationResult(
-            false,
+            m_role == Role::resourceServer
+                ? StatusCode::unauthorized
+                : StatusCode::proxyAuthenticationRequired,
             nx::utils::stree::ResourceContainer(),
-            generateWwwAuthenticateHeader(),
-            nx::network::http::HttpHeaders(),
+            nx::network::http::HttpHeaders{generateWwwAuthenticateHeader()},
             nullptr));
 }
 
-header::WWWAuthenticate BaseAuthenticationManager::generateWwwAuthenticateHeader()
+std::pair<StringType, StringType> BaseAuthenticationManager::generateWwwAuthenticateHeader()
 {
     header::WWWAuthenticate wwwAuthenticate;
     wwwAuthenticate.authScheme = header::AuthScheme::digest;
     wwwAuthenticate.params.emplace("nonce", generateNonce());
     wwwAuthenticate.params.emplace("realm", realm());
     wwwAuthenticate.params.emplace("algorithm", "MD5");
-    return wwwAuthenticate;
+    return std::make_pair(
+        m_role == Role::resourceServer
+            ? header::WWWAuthenticate::NAME
+            : header::kProxyAuthenticate,
+        wwwAuthenticate.serialized());
 }
 
 void BaseAuthenticationManager::passwordLookupDone(

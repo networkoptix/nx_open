@@ -27,6 +27,7 @@ template<typename ConnectionAcceptor>
 HttpServer::HttpServer(std::unique_ptr<ConnectionAcceptor> connectionAcceptor)
 {
     m_httpServer = std::make_unique<nx::network::http::TestHttpServer>(
+        nx::network::http::server::Role::resourceServer,
         std::move(connectionAcceptor));
     m_httpServer->registerRequestProcessorFunc(
         nx::network::http::kAnyPath,

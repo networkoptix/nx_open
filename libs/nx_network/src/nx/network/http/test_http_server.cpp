@@ -12,9 +12,10 @@ namespace network {
 namespace http {
 
 TestAuthenticationManager::TestAuthenticationManager(
-    nx::network::http::server::AbstractAuthenticationDataProvider* authenticationDataProvider)
+    nx::network::http::server::AbstractAuthenticationDataProvider* authenticationDataProvider,
+    server::Role role)
     :
-    BaseType(authenticationDataProvider),
+    BaseType(authenticationDataProvider, role),
     m_authenticationEnabled(false)
 {
 }
@@ -31,9 +32,8 @@ void TestAuthenticationManager::authenticate(
     else
     {
         completionHandler(nx::network::http::server::AuthenticationResult(
-            true,
+            StatusCode::ok,
             nx::utils::stree::ResourceContainer(),
-            std::nullopt,
             nx::network::http::HttpHeaders(),
             nullptr));
     }

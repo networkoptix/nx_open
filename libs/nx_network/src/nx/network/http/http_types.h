@@ -523,6 +523,8 @@ private:
     const Authorization& operator=(const Authorization&);
 };
 
+static constexpr char kProxyAuthorization[] = "Proxy-Authorization";
+
 /**
  * Convenient class for generating Authorization header with Basic authentication method.
  */
@@ -562,6 +564,8 @@ public:
     void serialize(BufferType* const dstBuffer) const;
     BufferType serialized() const;
 };
+
+static constexpr char kProxyAuthenticate[] = "Proxy-Authenticate";
 
 static const StringType IDENTITY_CODING("identity");
 static const StringType ANY_CODING("*");

@@ -261,6 +261,8 @@ public:
         httpClient->setUserPassword(password);
         httpClient->setAuthType(authType);
         httpClient->addAdditionalHeader(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray());
+        httpClient->setDisablePrecalculatedAuthorization(
+            m_precalculatedAuthorizationInHttpClientDisabled);
         testServerReturnCode(std::move(httpClient), expectedStatusCode, expectedAuthResult);
     }
 
@@ -373,6 +375,14 @@ public:
         ASSERT_EQ(expectedResilt, result) << lm("%1:%2 (%3) -> %4 != %5")
             .args(user, password, clientIp, expectedResilt, result).toStdString();
     }
+
+    void disablePrecalculatedAuthorizationInHttpClient()
+    {
+        m_precalculatedAuthorizationInHttpClientDisabled = true;
+    }
+
+private:
+    bool m_precalculatedAuthorizationInHttpClientDisabled = false;
 };
 
 std::unique_ptr<MediaServerLauncher> AuthenticationTest::server;
@@ -551,6 +561,8 @@ static const Authenticator::LockoutOptions kLockoutOptions{
 
 TEST_F(AuthenticationTest, lockoutTest)
 {
+    disablePrecalculatedAuthorizationInHttpClient();
+
     server->authenticator()->setLockoutOptions(kLockoutOptions);
 
     // Lockout does not happen on a random attemp.
@@ -570,6 +582,8 @@ TEST_F(AuthenticationTest, lockoutTest)
 
 TEST_F(AuthenticationTest, sessionKey)
 {
+    disablePrecalculatedAuthorizationInHttpClient();
+
     // Initial request to authorize session.
     const auto sessionKey = QnUuid::createUuid().toByteArray();
     {

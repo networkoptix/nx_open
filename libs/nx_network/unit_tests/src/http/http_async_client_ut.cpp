@@ -1,9 +1,12 @@
+#include <variant>
+
 #include <gtest/gtest.h>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/network/http/auth_tools.h>
 #include <nx/network/http/buffer_source.h>
 #include <nx/network/http/http_async_client.h>
+#include <nx/network/http/server/proxy/proxy_handler.h>
 #include <nx/network/http/test_http_server.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/system_socket.h>
@@ -67,22 +70,20 @@ public:
     HttpAsyncClient():
         m_proxyHost(lm("%1.com").args(QnUuid::createUuid().toSimpleString()).toStdString())
     {
-        m_httpClient.setResponseReadTimeout(kNoTimeout);
-        m_httpClient.setMessageBodyReadTimeout(kNoTimeout);
-
         m_credentials = Credentials("username", PasswordAuthToken("password"));
 
-        m_httpClient.setCredentials(m_credentials);
+        createClient();
     }
 
     ~HttpAsyncClient()
     {
-        m_httpClient.pleaseStopSync();
+        if (m_client)
+            m_client->pleaseStopSync();
     }
 
 protected:
     TestHttpServer m_httpServer;
-    AsyncClient m_httpClient;
+    std::unique_ptr<AsyncClient> m_client;
     nx::utils::SyncQueue<nx::network::http::Request> m_receivedRequests;
 
     virtual void SetUp() override
@@ -103,6 +104,11 @@ protected:
         ASSERT_TRUE(m_httpServer.bindAndListen());
     }
 
+    void sendRequest(const nx::utils::Url& url)
+    {
+        m_client->doGet(url, [this]() { saveResponse(); });
+    }
+
     nx::utils::Url prepareUrl(const std::string& requestPath = std::string())
     {
         const auto serverAddress = m_synchronousServer
@@ -110,6 +116,20 @@ protected:
             : m_httpServer.serverAddress();
         return nx::network::url::Builder().setScheme(nx::network::http::kUrlSchemeName)
             .setEndpoint(serverAddress).setPath(requestPath);
+    }
+
+    void createClient()
+    {
+        if (m_client)
+        {
+            m_client->pleaseStopSync();
+            m_client.reset();
+        }
+
+        m_client = std::make_unique<AsyncClient>();
+        m_client->setResponseReadTimeout(kNoTimeout);
+        m_client->setMessageBodyReadTimeout(kNoTimeout);
+        m_client->setCredentials(m_credentials);
     }
 
     void enableAuthentication()
@@ -132,7 +152,7 @@ protected:
 
     void whenSendConnectRequest()
     {
-        m_httpClient.doConnect(
+        m_client->doConnect(
             prepareUrl("/connect_test"),
             m_proxyHost.c_str(),
             [this]() { saveResponse(); });
@@ -140,7 +160,7 @@ protected:
 
     void whenSendToBrokenHttpServerThatSendsExtraResponseMessages()
     {
-        m_httpClient.doGet(
+        m_client->doGet(
             prepareUrl(kExtraResponseHandlerPath),
             [this]() { saveResponse(); });
     }
@@ -225,8 +245,8 @@ private:
     void saveResponse()
     {
         m_responses.push(RequestResult{
-            m_httpClient.lastSysErrorCode(),
-            m_httpClient.response() ? *m_httpClient.response() : http::Response()});
+            m_client->lastSysErrorCode(),
+            m_client->response() ? *m_client->response() : http::Response()});
     }
 };
 
@@ -265,7 +285,7 @@ protected:
 
     void whenPerformedUpgrade()
     {
-        m_httpClient.doUpgrade(
+        m_client->doUpgrade(
             prepareUrl(kTestPath),
             kUpgradeTo,
             std::bind(&HttpAsyncClientConnectionUpgrade::onUpgradeDone, this));
@@ -351,11 +371,11 @@ private:
     void onUpgradeDone()
     {
         ResponseContext response;
-        response.connection = m_httpClient.takeSocket();
-        if (!m_httpClient.failed())
+        response.connection = m_client->takeSocket();
+        if (!m_client->failed())
         {
             response.statusCode = static_cast<nx::network::http::StatusCode::Value>(
-                m_httpClient.response()->statusLine.statusCode);
+                m_client->response()->statusLine.statusCode);
         }
         m_upgradeResponses.push(std::move(response));
     }
@@ -407,6 +427,311 @@ TEST(HttpAsyncClientTypes, lexicalSerialization)
         nx::network::http::AuthType::authDigest);
     ASSERT_EQ(QnLexical::deserialized<nx::network::http::AuthType>("authBasic"),
         nx::network::http::AuthType::authBasic);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+class HttpAsyncClientAuthorization:
+    public HttpAsyncClient
+{
+    using base_type = HttpAsyncClient;
+
+    static constexpr char kPath[] = "/HttpAsyncClientAuthorization/1";
+
+protected:
+    virtual void SetUp() override
+    {
+        base_type::SetUp();
+
+        m_credentials = Credentials("n", PasswordAuthToken("x"));
+    }
+
+    void givenServerWithDigestAuthentication()
+    {
+        m_httpServer.registerRequestProcessorFunc(
+            kPath,
+            [this](auto&&... args) { processRequest(std::forward<decltype(args)>(args)...); });
+    }
+
+    void whenIssueRequest()
+    {
+        createClient();
+        m_client->setCredentials(m_credentials);
+
+        sendRequest(prepareUrl(kPath));
+    }
+
+    void thenRequestSucceeded()
+    {
+        base_type::thenRequestSucceeded();
+
+        m_lastClientAuthorization = m_authorizationReceived.pop();
+    }
+
+    void andAuthenticationWasPassedInOneStep()
+    {
+        ASSERT_EQ(0, m_lastClientAuthorization->requestNumberInConnection);
+    }
+
+    void andCachedServerNonceWasUsed()
+    {
+        ASSERT_TRUE(m_lastClientAuthorization->repeatedNonceIsUsed);
+    }
+
+    void andNonceCountInTheLastRequestWas(int expected)
+    {
+        auto ncIter = m_lastClientAuthorization->header.digest->params.find("nc");
+        ASSERT_NE(m_lastClientAuthorization->header.digest->params.end(), ncIter);
+        ASSERT_EQ(expected, ncIter->second.toInt(nullptr, 16));
+    }
+
+private:
+    struct ClientAuthorization
+    {
+        header::Authorization header;
+        int requestNumberInConnection = 0;
+        bool repeatedNonceIsUsed = false;
+    };
+
+    Credentials m_credentials;
+    nx::utils::SyncQueue<ClientAuthorization> m_authorizationReceived;
+    std::map<StringType, int /*use count*/> m_generatedNonces;
+    std::optional<ClientAuthorization> m_lastClientAuthorization;
+
+private:
+    void processRequest(
+        RequestContext ctx,
+        RequestProcessedHandler completionHandler)
+    {
+        const auto authzStr = getHeaderValue(ctx.request.headers, "Authorization");
+        if (!authzStr.isEmpty())
+        {
+            header::DigestAuthorization authorization;
+            if (authorization.parse(authzStr) &&
+                authorization.authScheme == header::AuthScheme::digest &&
+                validateAuthorization(
+                    ctx.request.requestLine.method,
+                    m_credentials,
+                    authorization))
+            {
+                const auto nonceUseCount =
+                    ++m_generatedNonces[authorization.digest->params["nonce"]];
+
+                m_authorizationReceived.push(ClientAuthorization{
+                    authorization,
+                    ctx.connection->messagesReceivedCount() - 1,
+                    nonceUseCount > 1});
+                return completionHandler(StatusCode::ok);
+            }
+        }
+
+        http::RequestResult result(StatusCode::unauthorized);
+
+        const auto nonce = QnUuid::createUuid().toSimpleByteArray();
+        m_generatedNonces.emplace(nonce, 0);
+
+        header::WWWAuthenticate wwwAuthenticate;
+        wwwAuthenticate.authScheme = header::AuthScheme::digest;
+        wwwAuthenticate.params["nonce"] = nonce;
+        wwwAuthenticate.params["realm"] = "nx";
+        wwwAuthenticate.params["algorithm"] = "MD5";
+        wwwAuthenticate.params["qop"] = "auth";
+        ctx.response->headers.emplace(wwwAuthenticate.NAME, wwwAuthenticate.serialized());
+
+        completionHandler(std::move(result));
+    }
+};
+
+TEST_F(HttpAsyncClientAuthorization, server_nonce_is_cached_and_reused)
+{
+    givenServerWithDigestAuthentication();
+
+    whenIssueRequest();
+    thenRequestSucceeded();
+
+    whenIssueRequest();
+    thenRequestSucceeded();
+    andAuthenticationWasPassedInOneStep();
+    andCachedServerNonceWasUsed();
+    andNonceCountInTheLastRequestWas(2);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+namespace {
+
+class TransparentProxyHandler:
+    public server::proxy::AbstractProxyHandler
+{
+public:
+    TransparentProxyHandler(const SocketAddress& target):
+        m_target(target)
+    {
+    }
+
+protected:
+    virtual void detectProxyTarget(
+        const HttpServerConnection& /*connection*/,
+        Request* const request,
+        ProxyTargetDetectedHandler handler)
+    {
+        // Replacing the Host header with the proxy target as specified in [rfc7230; 5.4].
+        request->headers.erase("Host");
+        request->headers.emplace("Host", m_target.toString().toUtf8());
+
+        handler(StatusCode::ok, m_target);
+    }
+
+private:
+    const SocketAddress m_target;
+};
+
+} // namespace
+
+class HttpAsyncClientProxy:
+    public ::testing::Test
+{
+public:
+    HttpAsyncClientProxy():
+        m_proxy(server::Role::proxy),
+        m_transparentProxy(server::Role::proxy)
+    {
+    }
+
+    ~HttpAsyncClientProxy()
+    {
+        if (m_client)
+            m_client->pleaseStopSync();
+    }
+
+protected:
+    static constexpr char kResourcePath[] = "/HttpAsyncClientProxy/resource";
+    static constexpr char kResource[] = "HttpAsyncClientProxy test resource";
+
+    virtual void SetUp() override
+    {
+        m_resourceServer.registerStaticProcessor(
+            kResourcePath,
+            kResource,
+            "text/plain");
+
+        m_resourceServer.setAuthenticationEnabled(true);
+
+        m_userCredentials.username = "n";
+        m_userCredentials.authToken = PasswordAuthToken("x");
+        m_resourceServer.registerUserCredentials(m_userCredentials);
+
+        ASSERT_TRUE(m_resourceServer.bindAndListen());
+
+        // Launching proxy server.
+        m_proxy.registerRequestProcessor<server::proxy::ProxyHandler>(kAnyPath);
+        ASSERT_TRUE(m_proxy.bindAndListen());
+
+        m_transparentProxy.registerRequestProcessor<TransparentProxyHandler>(
+            kAnyPath,
+            [this]()
+            {
+                return std::make_unique<TransparentProxyHandler>(
+                    m_resourceServer.serverAddress());
+            });
+        ASSERT_TRUE(m_transparentProxy.bindAndListen());
+    }
+
+    void enableAuthorizationOnProxy()
+    {
+        m_proxyCredentials = Credentials();
+        m_proxyCredentials->username = "p";
+        m_proxyCredentials->authToken = PasswordAuthToken("h");
+
+        m_proxy.setAuthenticationEnabled(true);
+        m_proxy.registerUserCredentials(*m_proxyCredentials);
+
+        m_transparentProxy.setAuthenticationEnabled(true);
+        m_transparentProxy.registerUserCredentials(*m_proxyCredentials);
+    }
+
+    void whenRequestingResourceThroughProxy()
+    {
+        m_client = std::make_unique<AsyncClient>();
+
+        if (m_proxyCredentials)
+            m_client->setProxyUserCredentials(*m_proxyCredentials);
+        m_client->setProxyVia(m_proxy.serverAddress(), false);
+
+        m_client->setUserCredentials(m_userCredentials);
+        m_client->doGet(
+            getUrl(kResourcePath),
+            [this]() { saveResponse(); });
+    }
+
+    void whenRequestingResourceThroughTransparentProxy()
+    {
+        m_client = std::make_unique<AsyncClient>();
+        m_client->setUserCredentials(m_userCredentials);
+        if (m_proxyCredentials)
+            m_client->setProxyUserCredentials(*m_proxyCredentials);
+
+        m_client->doGet(
+            url::Builder(getUrl(kResourcePath))
+                .setEndpoint(m_transparentProxy.serverAddress()),
+            [this]() { saveResponse(); });
+    }
+
+    nx::utils::Url getUrl(const std::string_view&)
+    {
+        return url::Builder().setScheme(kUrlSchemeName)
+            .setEndpoint(m_resourceServer.serverAddress())
+            .setPath(kResourcePath).toUrl();
+    }
+
+    void thenResourceIsDelivered()
+    {
+        auto result = m_responseQueue.pop();
+        if (result.index() == 0)
+            FAIL() << SystemError::toString(std::get<0>(result)).toStdString();
+
+        auto response = std::get<Response>(result);
+        ASSERT_EQ(StatusCode::ok, response.statusLine.statusCode);
+        ASSERT_EQ(kResource, response.messageBody);
+    }
+
+private:
+    nx::network::http::TestHttpServer m_resourceServer;
+    nx::network::http::TestHttpServer m_proxy;
+    nx::network::http::TestHttpServer m_transparentProxy;
+    std::unique_ptr<AsyncClient> m_client;
+    Credentials m_userCredentials;
+    std::optional<Credentials> m_proxyCredentials;
+    nx::utils::SyncQueue<std::variant<SystemError::ErrorCode, Response>> m_responseQueue;
+
+private:
+    void saveResponse()
+    {
+        if (m_client->failed())
+            return m_responseQueue.push(m_client->lastSysErrorCode());
+
+        auto response = *m_client->response();
+        response.messageBody += m_client->fetchMessageBodyBuffer();
+        m_responseQueue.push(std::move(response));
+    }
+};
+
+TEST_F(HttpAsyncClientProxy, proxy_authorization_works)
+{
+    enableAuthorizationOnProxy();
+
+    whenRequestingResourceThroughProxy();
+    thenResourceIsDelivered();
+}
+
+// "Transparent proxying" is a proxying when client is not aware it is actually
+// interacting with a proxy.
+TEST_F(HttpAsyncClientProxy, authorization_on_a_transparent_proxy)
+{
+    enableAuthorizationOnProxy();
+
+    whenRequestingResourceThroughTransparentProxy();
+    thenResourceIsDelivered();
 }
 
 } // namespace test

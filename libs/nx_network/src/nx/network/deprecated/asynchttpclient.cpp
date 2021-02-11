@@ -328,6 +328,11 @@ void AsyncHttpClient::setUserCredentials(const Credentials& userCredentials)
     m_delegate.setUserCredentials(userCredentials);
 }
 
+Credentials AsyncHttpClient::credentials() const
+{
+    return m_delegate.credentials();
+}
+
 void AsyncHttpClient::setProxyUserAuthToken(const AuthToken& userToken)
 {
     m_delegate.setProxyUserAuthToken(userToken);
@@ -406,11 +411,6 @@ void AsyncHttpClient::setAuthType(AuthType value)
 void AsyncHttpClient::setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody)
 {
     m_delegate.setExpectOnlyMessageBodyWithoutHeaders(expectOnlyBody);
-}
-
-AuthInfoCache::Item AsyncHttpClient::authCacheItem() const
-{
-    return m_delegate.authCacheItem();
 }
 
 void AsyncHttpClient::forceEndOfMsgBody()

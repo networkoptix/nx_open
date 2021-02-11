@@ -16,29 +16,29 @@ class HttpServerConnection;
 
 namespace server {
 
+enum class Role
+{
+    resourceServer,
+    proxy,
+};
+
 struct AuthenticationResult
 {
-    bool isSucceeded;
+    StatusCode::Value statusCode = StatusCode::unauthorized;
     nx::utils::stree::ResourceContainer authInfo;
-    std::optional<nx::network::http::header::WWWAuthenticate> wwwAuthenticate;
     nx::network::http::HttpHeaders responseHeaders;
     std::unique_ptr<nx::network::http::AbstractMsgBodySource> msgBody;
 
-    AuthenticationResult():
-        isSucceeded(false)
-    {
-    }
+    AuthenticationResult() = default;
 
     AuthenticationResult(
-        bool isSucceeded,
+        StatusCode::Value statusCode,
         nx::utils::stree::ResourceContainer authInfo,
-        std::optional<nx::network::http::header::WWWAuthenticate> wwwAuthenticate,
         nx::network::http::HttpHeaders responseHeaders,
         std::unique_ptr<nx::network::http::AbstractMsgBodySource> msgBody)
         :
-        isSucceeded(isSucceeded),
+        statusCode(statusCode),
         authInfo(std::move(authInfo)),
-        wwwAuthenticate(std::move(wwwAuthenticate)),
         responseHeaders(std::move(responseHeaders)),
         msgBody(std::move(msgBody))
     {
@@ -50,7 +50,7 @@ struct SuccessfulAuthenticationResult:
 {
     SuccessfulAuthenticationResult()
     {
-        isSucceeded = true;
+        statusCode = StatusCode::ok;
     }
 };
 

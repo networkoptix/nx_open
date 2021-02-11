@@ -1,119 +1,58 @@
 #pragma once
 
-#include <memory>
-#include <mutex>
-#include <tuple>
+#include <chrono>
 #include <map>
-
-#ifndef Q_MOC_RUN
-#include <boost/optional.hpp>
-#endif
-
-#include <QtCore/QUrl>
+#include <optional>
+#include <tuple>
 
 #include <nx/network/socket_common.h>
-#include <nx/utils/url.h>
-#include <nx/utils/elapsed_timer.h>
+#include <nx/utils/data_structures/time_out_cache.h>
+#include <nx/utils/thread/mutex.h>
 
-#include "auth_tools.h"
 #include "http_types.h"
+#include "server/abstract_authentication_manager.h"
 
-namespace nx {
-namespace network {
-namespace http {
+namespace nx::network::http {
 
-struct AuthInfo
-{
-    Credentials user;
-    Credentials proxyUser;
-    // TODO: #ak Remove proxyEndpoint and isProxySecure from here.
-    SocketAddress proxyEndpoint;
-    bool isProxySecure = false;
-};
+// TODO: #ak Move this class to http::GlobalContext in master branch.
 
 /**
- * This cache is to help http clients to authenticate on server without receiving HTTP Unauthorized error first.
+ * This cache is to help http clients to authenticate on server without receiving HTTP
+ * Unauthorized error first.
+ * Implemented on top of LRU cache.
  */
 class NX_NETWORK_API AuthInfoCache
 {
 public:
-    class Item
-    {
-    public:
-        nx::utils::Url url;
-        StringType method;
-        Credentials userCredentials;
-        std::shared_ptr<header::WWWAuthenticate> wwwAuthenticateHeader;
-        std::shared_ptr<header::Authorization> authorizationHeader;
+    static constexpr auto kDefaultEntryLifeTime = std::chrono::minutes(5);
+    static constexpr std::size_t kDefaultCacheSize = 100000;
 
-        Item() = default;
-
-        Item(
-            const nx::utils::Url& url,
-            const StringType& method,
-            const Credentials& userCredentials,
-            header::WWWAuthenticate wwwAuthenticateHeader)
-            :
-            url(url),
-            method(method),
-            userCredentials(userCredentials),
-            wwwAuthenticateHeader(
-                std::make_shared<header::WWWAuthenticate>(
-                    std::move(wwwAuthenticateHeader)))
-        {
-        }
-    };
-
-    AuthInfoCache() = default;
+    AuthInfoCache();
 
     /**
-     * Save successful authorization information in cache for later use.
+     * Complexity: ammortized O(log(N)).
      */
-    void cacheAuthorization(Item item);
+    std::optional<header::WWWAuthenticate> getServerResponse(
+        const SocketAddress& serverEndpoint,
+        server::Role serverRole,
+        const StringType& userName);
 
     /**
-     * Adds Authorization header to request, if corresponding data can be found in cache.
-     * @return True if necessary information has been found in cache and added to request.
-     *   False otherwise.
+     * Overrides existing entry, if any.
      */
-    bool addAuthorizationHeader(
-        const nx::utils::Url& url,
-        Request* const request,
-        AuthInfoCache::Item* const item);
+    void cacheServerResponse(
+        const SocketAddress& serverEndpoint,
+        server::Role serverRole,
+        const StringType& userName,
+        header::WWWAuthenticate authenticateHeader);
 
-    /**
-     * @param url Required since request->requestLine.url can contain only path.
-     */
-    static bool addAuthorizationHeader(
-        const nx::utils::Url& url,
-        Request* const request,
-        AuthInfoCache::Item item);
-
-    static AuthInfoCache* instance();
+    static AuthInfoCache& instance();
 
 private:
-    using Key = std::tuple<StringType, nx::utils::Url>;
+    using Key = std::tuple<SocketAddress, server::Role, StringType>;
 
-    struct Entry
-    {
-        Item item;
-        nx::utils::ElapsedTimer timeout;
-    };
-
-private:
-    mutable std::mutex m_mutex;
-    std::map<Key, Entry> m_entries;
-
-private:
-    static Key makeKey(StringType method, const nx::utils::Url& url);
-
-    Item getCachedAuthentication(
-        const nx::utils::Url& url,
-        const StringType& method);
-
-    void cleanUpStaleEntries();
+    nx::utils::TimeOutCache<Key, header::WWWAuthenticate, std::map> m_cache;
+    nx::Mutex m_mutex;
 };
 
-} // namespace nx
-} // namespace network
-} // namespace http
+} // namespace nx::network::http

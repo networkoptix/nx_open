@@ -1,5 +1,7 @@
 #include "auth_tools.h"
 
+#include <cinttypes>
+
 #include <openssl/md5.h>
 
 #include <QtCore/QCryptographicHash>
@@ -61,8 +63,8 @@ static void extractValues(
 
 } // namespace
 
-bool addAuthorization(
-    Request* const request,
+std::optional<header::Authorization> generateAuthorization(
+    const Request& request,
     const Credentials& credentials,
     const header::WWWAuthenticate& wwwAuthenticateHeader)
 {
@@ -72,40 +74,45 @@ bool addAuthorization(
         header::BasicAuthorization basicAuthorization(
             credentials.username.toUtf8(),
             credentials.authToken.value);
-        nx::network::http::insertOrReplaceHeader(
-            &request->headers,
-            nx::network::http::HttpHeader(
-                header::Authorization::NAME,
-                basicAuthorization.serialized()));
-        return true;
+        return basicAuthorization;
     }
     else if (wwwAuthenticateHeader.authScheme == header::AuthScheme::digest)
     {
-	    // TODO: #ak This is incorrect value for "uri" actually. See [rfc7616#3.4] and [rfc7230#5.5].
-        // The proper fix may be incompatible with some buggy cameras.
-        // But, without a proper fix we can run into incompatibility with some HTTP servers.
-        const auto effectiveUri = request->requestLine.url.toString(
-             QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::FullyEncoded).toUtf8();
-
-        header::DigestAuthorization digestAuthorizationHeader;
-        if (!calcDigestResponse(
-                request->requestLine.method,
-                credentials,
-                effectiveUri,
-                wwwAuthenticateHeader,
-                &digestAuthorizationHeader))
-        {
-            return false;
-        }
-        insertOrReplaceHeader(
-            &request->headers,
-            nx::network::http::HttpHeader(
-                header::Authorization::NAME,
-                digestAuthorizationHeader.serialized()));
-        return true;
+        return generateDigestAuthorization(
+            request,
+            credentials,
+            wwwAuthenticateHeader,
+            1);
     }
 
-    return false;
+    return std::nullopt;
+}
+
+NX_NETWORK_API std::optional<header::Authorization> generateDigestAuthorization(
+    const Request& request,
+    const Credentials& credentials,
+    const header::WWWAuthenticate& wwwAuthenticateHeader,
+    int nonceCount)
+{
+	// TODO: #ak This is incorrect value for "uri" actually. See [rfc7616#3.4] and [rfc7230#5.5].
+    // The proper fix may be incompatible with some buggy cameras.
+    // But, without a proper fix we can run into incompatibility with some HTTP servers.
+    const auto effectiveUri = request.requestLine.url.toString(
+        QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::FullyEncoded).toUtf8();
+
+    header::DigestAuthorization digestAuthorizationHeader;
+    if (!calcDigestResponse(
+            request.requestLine.method,
+            credentials,
+            effectiveUri,
+            wwwAuthenticateHeader,
+            &digestAuthorizationHeader,
+            nonceCount))
+    {
+        return std::nullopt;
+    }
+
+    return digestAuthorizationHeader;
 }
 
 boost::optional<QCryptographicHash::Algorithm> parseAlgorithm(
@@ -209,12 +216,13 @@ BufferType calcResponseAuthInt(
 }
 
 
-static BufferType fieldOrEmpty(
+static BufferType fieldOrDefault(
     const std::map<BufferType, BufferType>& inputParams,
-    const BufferType& name)
+    const BufferType& name,
+    const BufferType& defaultValue = BufferType())
 {
     const auto iter = inputParams.find(name);
-    return iter != inputParams.end() ? iter->second : BufferType();
+    return iter != inputParams.end() ? iter->second : defaultValue;
 }
 
 static bool isQopTypeSupported(const BufferType& qopAttributeValue)
@@ -240,13 +248,13 @@ static bool calcDigestResponse(
     const std::map<BufferType, BufferType>& inputParams,
     std::map<BufferType, BufferType>* const outputParams)
 {
-    const auto algorithm = fieldOrEmpty(inputParams, "algorithm");
+    const auto algorithm = fieldOrDefault(inputParams, "algorithm");
     if (!parseAlgorithm(algorithm))
         return false; //< such algorithm is not supported
 
-    const auto nonce = fieldOrEmpty(inputParams, "nonce");
-    const auto realm = fieldOrEmpty(inputParams, "realm");
-    const auto qop = fieldOrEmpty(inputParams, "qop");
+    const auto nonce = fieldOrDefault(inputParams, "nonce");
+    const auto realm = fieldOrDefault(inputParams, "realm");
+    const auto qop = fieldOrDefault(inputParams, "qop");
 
     if (!isQopTypeSupported(qop))
         return false;
@@ -271,7 +279,6 @@ static bool calcDigestResponse(
     outputParams->emplace("nonce", nonce);
     outputParams->emplace("uri", uri);
 
-
     QByteArray digestResponse;
     if (qop.isEmpty())
     {
@@ -279,7 +286,7 @@ static bool calcDigestResponse(
     }
     else
     {
-        const BufferType nonceCount = fieldOrEmpty(inputParams, "nc");
+        const BufferType nonceCount = fieldOrDefault(inputParams, "nc", "00000001");
         const BufferType clientNonce = "0a4f113b";    //TODO #ak generate it
 
         digestResponse = calcResponseAuthInt(
@@ -300,12 +307,19 @@ bool calcDigestResponse(
     const boost::optional<BufferType>& predefinedHa1,
     const StringType& uri,
     const header::WWWAuthenticate& wwwAuthenticateHeader,
-    header::DigestAuthorization* const digestAuthorizationHeader)
+    header::DigestAuthorization* const digestAuthorizationHeader,
+    int nonceCount)
 {
     if (wwwAuthenticateHeader.authScheme != header::AuthScheme::digest)
         return false;
 
-    //TODO #ak have to set digestAuthorizationHeader->digest->userid somewhere
+    // TODO #ak have to set digestAuthorizationHeader->digest->userid somewhere
+
+    auto params = wwwAuthenticateHeader.params;
+    StringType nc;
+    nc.resize(9);
+    nc.resize(std::snprintf(nc.data(), nc.size(), "%08" PRIx32, nonceCount));
+    params.emplace("nc", nc);
 
     return calcDigestResponse(
         method,
@@ -313,7 +327,7 @@ bool calcDigestResponse(
         userPassword,
         predefinedHa1,
         uri,
-        wwwAuthenticateHeader.params,
+        std::move(params),
         &digestAuthorizationHeader->digest->params);
 }
 
@@ -322,7 +336,8 @@ bool calcDigestResponse(
     const Credentials& credentials,
     const StringType& uri,
     const header::WWWAuthenticate& wwwAuthenticateHeader,
-    header::DigestAuthorization* const digestAuthorizationHeader)
+    header::DigestAuthorization* const digestAuthorizationHeader,
+    int nonceCount)
 {
     boost::optional<StringType> userPassword;
     boost::optional<BufferType> predefinedHa1;
@@ -335,7 +350,8 @@ bool calcDigestResponse(
         predefinedHa1,
         uri,
         wwwAuthenticateHeader,
-        digestAuthorizationHeader);
+        digestAuthorizationHeader,
+        nonceCount);
 }
 
 bool validateAuthorization(
@@ -347,11 +363,11 @@ bool validateAuthorization(
 {
     const auto& digestParams = digestAuthorizationHeader.digest->params;
 
-    const auto uri = fieldOrEmpty(digestParams, "uri");
+    const auto uri = fieldOrDefault(digestParams, "uri");
     if (uri.isEmpty())
         return false;
 
-    const auto algorithm = fieldOrEmpty(digestParams, "algorithm");
+    const auto algorithm = fieldOrDefault(digestParams, "algorithm");
     if (!parseAlgorithm(algorithm))
         return false; //< Such algorithm is not supported.
 
@@ -363,8 +379,8 @@ bool validateAuthorization(
     if (!result)
         return false;
 
-    const auto calculatedResponse = fieldOrEmpty(outputParams, "response");
-    const auto response = fieldOrEmpty(digestParams, "response");
+    const auto calculatedResponse = fieldOrDefault(outputParams, "response");
+    const auto response = fieldOrDefault(digestParams, "response");
     return !response.isEmpty() && response == calculatedResponse;
 }
 

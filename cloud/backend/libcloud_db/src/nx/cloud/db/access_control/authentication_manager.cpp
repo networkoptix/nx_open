@@ -296,7 +296,7 @@ nx::network::http::server::AuthenticationResult
         std::optional<nx::utils::stree::ResourceContainer> authProperties)
 {
     nx::network::http::server::AuthenticationResult authResponse;
-    authResponse.isSucceeded = true;
+    authResponse.statusCode = nx::network::http::StatusCode::ok;
     if (authProperties)
         authResponse.authInfo = std::move(*authProperties);
     return authResponse;
@@ -310,7 +310,12 @@ nx::network::http::server::AuthenticationResult
     nx::network::http::server::AuthenticationResult authResponse;
     prepareUnauthorizedResponse(authResult, &authResponse);
     if (wwwAuthenticate)
-        authResponse.wwwAuthenticate = wwwAuthenticate;
+    {
+        authResponse.responseHeaders.emplace(
+            nx::network::http::header::WWWAuthenticate::NAME,
+            wwwAuthenticate->serialized());
+    }
+
     return authResponse;
 }
 

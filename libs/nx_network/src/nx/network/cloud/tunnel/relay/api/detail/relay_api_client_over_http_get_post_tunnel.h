@@ -3,7 +3,6 @@
 #include <list>
 
 #include <nx/network/abstract_socket.h>
-#include <nx/network/http/auth_cache.h>
 #include <nx/network/http/fusion_data_http_client.h>
 
 #include "get_post_tunnel_context.h"

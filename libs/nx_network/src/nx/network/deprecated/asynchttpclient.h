@@ -12,7 +12,6 @@
 #include "nx/network/abstract_socket.h"
 #include "nx/network/aio/abstract_pollable.h"
 #include "nx/network/aio/timer.h"
-#include "nx/network/http/auth_cache.h"
 #include "nx/network/http/http_async_client.h"
 #include "nx/network/http/http_stream_reader.h"
 
@@ -180,6 +179,8 @@ public:
     void setProxyUserCredentials(const Credentials& userCredentials);
     void setAuth(const AuthInfo& auth);
 
+    Credentials credentials() const;
+
     void setProxyVia(const SocketAddress& proxyEndpoint, bool isSecure);
 
     void setMaxNumberOfRedirects(int maxNumberOfRedirects);
@@ -221,7 +222,6 @@ public:
 
     void setExpectOnlyMessageBodyWithoutHeaders(bool expectOnlyBody);
 
-    AuthInfoCache::Item authCacheItem() const;
     /**
      * Caller uses it to report that message body has ended (it may be tricky to detect message body end in some cases).
      * NOTE: May be invoked within someMessageBodyAvailable handler only.

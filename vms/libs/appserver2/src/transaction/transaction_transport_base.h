@@ -159,7 +159,6 @@ public:
     nx::network::SocketAddress remoteSocketAddr() const;
     int remotePeerProtocolVersion() const;
 
-    virtual nx::network::http::AuthInfoCache::Item authData() const override;
     virtual std::multimap<QString, QString> httpQueryParams() const override;
 
     // This is multi thread getters/setters
@@ -301,7 +300,6 @@ private:
     bool m_base64EncodeOutgoingTransactions;
     std::vector<nx::network::http::HttpHeader> m_outgoingClientHeaders;
     size_t m_sentTranSequence;
-    nx::network::http::AuthInfoCache::Item m_httpAuthCacheItem;
     //!Number of threads waiting on \a QnTransactionTransportBase::waitForNewTransactionsReady
     int m_waiterCount;
     QnWaitCondition m_cond;

@@ -3,6 +3,7 @@
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QDateTime>
 
+#include <nx/fusion/model_functions.h>
 #include <nx/network/buffered_stream_socket.h>
 #include <nx/network/socket_factory.h>
 #include <nx/network/socket_global.h>
@@ -14,11 +15,11 @@
 #include <nx/utils/crypt/linux_passwd_crypt.h>
 #include <nx/utils/system_error.h>
 
+#include "auth_cache.h"
 #include "auth_tools.h"
 #include "buffer_source.h"
 #include "custom_headers.h"
-
-#include <nx/fusion/model_functions.h>
+#include "nonce_cache.h"
 
 using std::make_pair;
 
@@ -1378,28 +1379,30 @@ void AsyncClient::addAppropriateAuthenticationInformation()
             HttpHeader(Qn::CUSTOM_USERNAME_HEADER_NAME, m_user.username.toUtf8()));
     }
 
-    if (m_precalculatedAuthorizationDisabled)
+    if (m_precalculatedAuthorizationDisabled || m_user.username.isEmpty())
         return;
 
-    // If that url has already been authenticated, adding same authentication info to the request
-    // First request per tcp-connection always uses authentication
-    //    This is done due to limited AuthInfoCache implementation
-    if (m_authCacheItem.url.isEmpty() ||
-        !AuthInfoCache::instance()->addAuthorizationHeader(
-            m_contentLocationUrl,
-            &m_request,
-            &m_authCacheItem))
+    // If there is a server' nonce in the cache, then calculating Digest response right now.
+    const auto cachedServerResponse = AuthInfoCache::instance().getServerResponse(
+        url::getEndpoint(m_contentLocationUrl),
+        server::Role::resourceServer,
+        m_user.username.toUtf8());
+
+    if (cachedServerResponse &&
+        cachedServerResponse->authScheme == header::AuthScheme::digest)
+    {
+        addDigestAuthorizationToRequest(
+            url::getEndpoint(m_contentLocationUrl),
+            server::Role::resourceServer,
+            m_user,
+            *cachedServerResponse,
+            header::Authorization::NAME);
+    }
+    else
     {
         if (m_authType == AuthType::authBasic && m_user.authToken.type == AuthTokenType::password)
         {
-            header::BasicAuthorization basicAuthorization(
-                m_user.username.toUtf8(),
-                m_user.authToken.value);
-            nx::network::http::insertOrReplaceHeader(
-                &m_request.headers,
-                nx::network::http::HttpHeader(
-                    header::Authorization::NAME,
-                    basicAuthorization.serialized()));
+            addBasicAuthorizationToRequest();
         }
         else
         {
@@ -1526,7 +1529,6 @@ static std::optional<header::WWWAuthenticate> extractAuthenticateHeader(
     return std::nullopt;
 }
 
-
 bool AsyncClient::resendRequestWithAuthorization(
     const nx::network::http::Response& response,
     bool isProxy)
@@ -1541,22 +1543,35 @@ bool AsyncClient::resendRequestWithAuthorization(
     const auto credentials = isProxy ? m_proxyUser : m_user;
 
     auto wwwAuthenticateHeader = extractAuthenticateHeader(response.headers, isProxy, m_authType);
-    if(!wwwAuthenticateHeader)
+    if (!wwwAuthenticateHeader)
         return false;
 
-    // TODO: #ak MUST add to cache only after OK response.
-    m_authCacheItem = AuthInfoCache::Item(
-        m_contentLocationUrl,
-        m_request.requestLine.method,
-        credentials,
-        std::move(*wwwAuthenticateHeader));
-    AuthInfoCache::instance()->cacheAuthorization(m_authCacheItem);
-    if (!AuthInfoCache::instance()->addAuthorizationHeader(
-            m_contentLocationUrl,
-            &m_request,
-            &m_authCacheItem))
+    if (wwwAuthenticateHeader->authScheme == header::AuthScheme::digest)
     {
-        return false;
+        const auto& serverEndpoint = isProxy && m_proxyEndpoint
+            ? *m_proxyEndpoint
+            : url::getEndpoint(m_contentLocationUrl);
+        const auto serverRole = isProxy ? server::Role::proxy : server::Role::resourceServer;
+
+        AuthInfoCache::instance().cacheServerResponse(
+            serverEndpoint,
+            serverRole,
+            credentials.username.toUtf8(),
+            *wwwAuthenticateHeader);
+
+        if (!addDigestAuthorizationToRequest(
+                serverEndpoint,
+                serverRole,
+                credentials,
+                *wwwAuthenticateHeader,
+                authorizationHeaderName))
+        {
+            return false;
+        }
+    }
+    else if (wwwAuthenticateHeader->authScheme == header::AuthScheme::basic)
+    {
+        addBasicAuthorizationToRequest();
     }
 
     doSomeCustomLogic(response, &m_request);
@@ -1567,6 +1582,54 @@ bool AsyncClient::resendRequestWithAuthorization(
         m_authorizationTried = true;
     initiateHttpMessageDelivery();
     return true;
+}
+
+bool AsyncClient::addDigestAuthorizationToRequest(
+    const SocketAddress& serverEndpoint,
+    server::Role serverRole,
+    const Credentials& credentials,
+    const header::WWWAuthenticate& authenticateHeader,
+    const StringType& authorizationHeaderName)
+{
+    int nonceCount = 1;
+    if (const auto nonceIter = authenticateHeader.params.find("nonce");
+        nonceIter != authenticateHeader.params.end())
+    {
+        nonceCount = NonceCache::instance().getNonceCount(
+            serverEndpoint, serverRole, nonceIter->second);
+    }
+
+    const auto authorization = generateDigestAuthorization(
+        m_request,
+        credentials,
+        authenticateHeader,
+        nonceCount);
+    if (!authorization)
+    {
+        NX_VERBOSE(this, "Failed to generate Authorization header for URL %1, username %2",
+            m_contentLocationUrl, credentials.username);
+        return false;
+    }
+
+    nx::network::http::insertOrReplaceHeader(
+        &m_request.headers,
+        nx::network::http::HttpHeader(
+            authorizationHeaderName,
+            authorization->serialized()));
+
+    return true;
+}
+
+void AsyncClient::addBasicAuthorizationToRequest()
+{
+    header::BasicAuthorization basicAuthorization(
+        m_user.username.toUtf8(),
+        m_user.authToken.value);
+    nx::network::http::insertOrReplaceHeader(
+        &m_request.headers,
+        nx::network::http::HttpHeader(
+            header::Authorization::NAME,
+            basicAuthorization.serialized()));
 }
 
 void AsyncClient::doSomeCustomLogic(
@@ -1630,11 +1693,6 @@ const char* AsyncClient::toString(State state)
 void AsyncClient::setAuthType(AuthType value)
 {
     m_authType = value;
-}
-
-AuthInfoCache::Item AsyncClient::authCacheItem() const
-{
-    return m_authCacheItem;
 }
 
 void AsyncClient::forceEndOfMsgBody()

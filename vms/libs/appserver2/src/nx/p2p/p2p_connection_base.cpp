@@ -309,14 +309,6 @@ void ConnectionBase::onHttpClientDone()
             lm("Can't establish WEB socket connection. Validation failed. Error: %1. Switch to the HTTP mode").arg((int)error));
     }
 
-    //saving credentials we used to authorize request
-    if (m_httpClient->request().headers.find(nx::network::http::header::Authorization::NAME) !=
-        m_httpClient->request().headers.end())
-    {
-        QnMutexLocker lock(&m_mutex);
-        m_httpAuthCacheItem = m_httpClient->authCacheItem();
-    }
-
     using namespace nx::network;
     websocket::FrameType frameType = remotePeer.dataFormat == Qn::JsonFormat
         ? websocket::FrameType::text
@@ -573,12 +565,6 @@ bool ConnectionBase::handleMessage(const nx::Buffer& message)
     emit gotMessage(weakPointer(), messageType, message.mid(messageHeaderSize(isClient)));
 
     return true;
-}
-
-nx::network::http::AuthInfoCache::Item ConnectionBase::authData() const
-{
-    QnMutexLocker lock(&m_mutex);
-    return m_httpAuthCacheItem;
 }
 
 std::multimap<QString, QString> ConnectionBase::httpQueryParams() const

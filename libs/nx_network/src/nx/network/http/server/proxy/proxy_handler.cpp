@@ -1,5 +1,7 @@
 #include "proxy_handler.h"
 
+#include <nx/network/aio/stream_socket_connector.h>
+#include <nx/network/url/url_parse_helper.h>
 #include <nx/network/socket_factory.h>
 #include <nx/utils/log/log.h>
 
@@ -47,6 +49,11 @@ void AbstractProxyHandler::setSslHandshakeTimeout(
     std::optional<std::chrono::milliseconds> timeout)
 {
     m_sslHandshakeTimeout = timeout;
+}
+
+std::unique_ptr<aio::AbstractAsyncConnector> AbstractProxyHandler::createTargetConnector()
+{
+    return std::make_unique<aio::StreamSocketConnector>();
 }
 
 void AbstractProxyHandler::fixRequestHeaders()
@@ -236,6 +243,24 @@ void AbstractProxyHandler::processSslHandshakeResult(
             m_request.requestLine.url, m_encryptedConnection->getLocalAddress()));
 
     proxyRequestToTarget(std::exchange(m_encryptedConnection, {}));
+}
+
+//-------------------------------------------------------------------------------------------------
+
+void ProxyHandler::detectProxyTarget(
+    const HttpServerConnection& /*connection*/,
+    Request* const request,
+    ProxyTargetDetectedHandler handler)
+{
+    if (request->requestLine.url.host().isEmpty())
+        return handler(StatusCode::badRequest, TargetHost());
+
+    // Replacing the Host header with the proxy target as specified in [rfc7230; 5.4].
+    const auto targetEndpoint = url::getEndpoint(request->requestLine.url);
+    request->headers.erase("Host");
+    request->headers.emplace("Host", targetEndpoint.toString().toUtf8());
+
+    handler(StatusCode::ok, targetEndpoint);
 }
 
 } // namespace proxy

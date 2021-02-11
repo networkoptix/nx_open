@@ -24,7 +24,8 @@ class NX_NETWORK_API TestAuthenticationManager:
 
 public:
     TestAuthenticationManager(
-        nx::network::http::server::AbstractAuthenticationDataProvider* authenticationDataProvider);
+        nx::network::http::server::AbstractAuthenticationDataProvider* authenticationDataProvider,
+        server::Role role);
 
     virtual void authenticate(
         const nx::network::http::HttpServerConnection& connection,
@@ -52,16 +53,17 @@ public:
         nx::network::http::Response* const /*response*/,
         nx::network::http::RequestProcessedHandler /*completionHandler*/)>;
 
-    TestHttpServer():
+    TestHttpServer(server::Role role = server::Role::resourceServer):
         TestHttpServer(
+            role,
             true,
             nx::network::NatTraversalSupport::disabled)
     {
     }
 
     template<typename... Args>
-    TestHttpServer(Args... args):
-        m_authenticationManager(&m_credentialsProvider)
+    TestHttpServer(server::Role role, Args... args):
+        m_authenticationManager(&m_credentialsProvider, role)
     {
         m_authenticationManager.setAuthenticationEnabled(false);
 

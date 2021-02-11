@@ -125,6 +125,7 @@ void ReverseConnectionManager::onReverseConnectionRequest(
             .setPath(kReverseConnectionListenerPath).toUrl();
         httpClient->addAdditionalHeader(
             Qn::PROXY_SENDER_HEADER_NAME, commonModule()->moduleGUID().toSimpleByteArray());
+        httpClient->setDisablePrecalculatedAuthorization(true);
         httpClient->doConnect(
             url,
             kReverseConnectionListenerPath,

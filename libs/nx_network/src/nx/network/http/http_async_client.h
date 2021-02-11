@@ -15,8 +15,9 @@
 #include <nx/utils/url.h>
 
 #include "abstract_msg_body_source.h"
-#include "auth_cache.h"
+#include "auth_tools.h"
 #include "http_stream_reader.h"
+#include "server/abstract_authentication_manager.h"
 
 #include <nx/fusion/model_functions_fwd.h>
 
@@ -306,7 +307,6 @@ public:
     void removeAdditionalHeader(const StringType& key);
     void setAdditionalHeaders(HttpHeaders additionalHeaders);
     void setAuthType(AuthType value);
-    AuthInfoCache::Item authCacheItem() const;
 
     Credentials credentials() const;
     void setCredentials(const Credentials& credentials);
@@ -385,7 +385,6 @@ private:
     HttpHeaders m_additionalHeaders;
     int m_awaitedMessageNumber;
     QString m_remoteEndpointWithProtocol;
-    AuthInfoCache::Item m_authCacheItem;
     SystemError::ErrorCode m_lastSysErrorCode;
     int m_requestSequence;
     bool m_forcedEof;
@@ -429,10 +428,21 @@ private:
      * @return true, if connected.
      */
     bool reconnectIfAppropriate();
+
     /** Composes request with authorization header based on response. */
     bool resendRequestWithAuthorization(
         const nx::network::http::Response& response,
         bool isProxy = false);
+
+    bool addDigestAuthorizationToRequest(
+        const SocketAddress& serverEndpoint,
+        server::Role serverRole,
+        const Credentials& credentials,
+        const header::WWWAuthenticate& authenticateHeader,
+        const StringType& authorizationHeaderName);
+
+    void addBasicAuthorizationToRequest();
+
     void doSomeCustomLogic(
         const nx::network::http::Response& response,
         Request* const request);

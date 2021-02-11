@@ -25,7 +25,6 @@ public:
     virtual const nx::vms::api::PeerData& remotePeer() const override;
     virtual nx::utils::Url remoteAddr() const override;
     virtual bool isIncoming() const override;
-    virtual nx::network::http::AuthInfoCache::Item authData() const override;
     virtual std::multimap<QString, QString> httpQueryParams() const override;
 
 private:
