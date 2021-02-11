@@ -5,7 +5,7 @@
     <name>AnalyticsSearchWidget::Private</name>
     <message>
       <source>Any type</source>
-      <translation>Tous Types</translation>
+      <translation>Tout Type</translation>
     </message>
     <message>
       <source>Select area</source>
@@ -7072,8 +7072,8 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
       <translation>
-        <numerusform>Il n'y a pas beaucoup d'espace libre sur le stockage du serveur. Certaines anciennes séquences peuvent être supprimées pour libérer de l'espace. Notez que si les fichiers sélectionnés sont les plus anciens sur le serveur, ils seront supprimés juste après leur téléchargement.</numerusform>
-        <numerusform>Il n'y a pas beaucoup d'espace libre sur le stockage du serveur. Certaines anciennes séquences peuvent être supprimées pour libérer de l'espace. Notez que si les fichiers sélectionnés sont les plus anciens sur le serveur, ils seront supprimés juste après leur téléchargement.</numerusform>
+        <numerusform>Il n'y a pas beaucoup d'espace libre sur le stockage du serveur. Certaines anciennes séquences peuvent être supprimées pour libérer de l'espace. Notez que si les fichiers sélectionnés sont les plus anciens sur le serveur, ils seront supprimés juste après avoir été téléchargés.</numerusform>
+        <numerusform>Il n'y a pas beaucoup d'espace libre sur le stockage des serveurs. Certaines anciennes séquences peuvent être supprimées pour libérer de l'espace. Notez que si les fichiers sélectionnés sont les plus anciens sur les serveurs, ils seront supprimés juste après leur téléchargement.</numerusform>
       </translation>
     </message>
     <message>
@@ -7082,11 +7082,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Upload anyway?</source>
-      <translation>Envoyer quand même?</translation>
+      <translation>Télécharger quand même ?</translation>
     </message>
     <message>
       <source>Could not finish upload to %1</source>
-      <translation>Impossible de terminer l'envoie vers %1</translation>
+      <translation>Impossible de terminer le téléchargement vers %1</translation>
     </message>
     <message>
       <source>Make sure there is enough space on server storage.</source>
@@ -7098,35 +7098,35 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation>Arrêter l'envoie?</translation>
+      <translation>Arrêter le téléchargement?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
-      <translation>Fichiers déjà envoyés seront conservés.</translation>
+      <translation>Les fichiers déjà téléchargés seront conservés.</translation>
     </message>
     <message>
       <source>Uploading footage</source>
-      <translation>Envoie de clip</translation>
+      <translation>Téléchargement des images</translation>
     </message>
     <message>
       <source>Failed to add virtual camera</source>
-      <translation>Échec d'ajout de caméra virtuelle</translation>
+      <translation>Impossible d'ajouter la caméra virtuelle</translation>
     </message>
     <message>
       <source>Open Virtual Camera Recordings...</source>
-      <translation>Ouvrir enregistrements de caméra virtuelle...</translation>
+      <translation>Ouvrir les enregistrements de la caméra virtuelle...</translation>
     </message>
     <message numerus="yes">
       <source>You can upload these files to a different instance of a Virtual Camera.</source>
       <translation>
-        <numerusform>Vous pouvez envoyer ce fichier sur une instance différente d'une caméra virtuelle.</numerusform>
+        <numerusform>Vous pouvez télécharger ce fichier dans une autre instance d'une Caméra Virtuelle.</numerusform>
         <numerusform>Vous pouvez envoyer ces fichiers sur une instance différente d'une caméra virtuelle.</numerusform>
       </translation>
     </message>
     <message>
       <source>%1 has unsupported format.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1 a un format non supporté.</translation>
+      <translation>Le format de %1 n'est pas pris en charge.</translation>
     </message>
     <message>
       <source>%1 does not have timestamp.</source>
@@ -7136,17 +7136,17 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>%1 is older than allowed in camera archive settings.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1 est plus ancien que les paramètres d'archivage de caméra autorisés.</translation>
+      <translation>%1 est plus ancien que celui autorisé dans les paramètres d'archivage de caméra.</translation>
     </message>
     <message>
       <source>%1 covers period for which video has already been uploaded.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1 couvre la période pour laquelle la vidéo a déjà été envoyer.</translation>
+      <translation>%1 couvre la période pour laquelle la vidéo a déjà été téléchargée.</translation>
     </message>
     <message>
       <source>%1 covers period for which video is being uploaded.</source>
       <comment>Filename will be substituted</comment>
-      <translation>%1 couvre la période pour laquelle la vidéo est envoyer.</translation>
+      <translation>%1 couvre la période pendant laquelle la vidéo est téléchargée.</translation>
     </message>
   </context>
   <context>
@@ -7339,7 +7339,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation>Arrêter l'envoie?</translation>
+      <translation>Arrêter le téléchargement?</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -7348,8 +7348,8 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>Some video files are still being uploaded to %n virtual cameras:</source>
       <translation>
-        <numerusform>Certains fichiers vidéo sont encore en envoie sur %n caméras portables:</numerusform>
-        <numerusform>Certains fichiers vidéo sont encore en envoie sur %n caméras portables:</numerusform>
+        <numerusform>Certains fichiers vidéo sont toujours en cours de téléchargement sur %n caméra virtuelle:</numerusform>
+        <numerusform>Certains fichiers vidéo sont toujours en cours de téléchargement sur %n caméras virtuelles:</numerusform>
       </translation>
     </message>
   </context>
@@ -7361,7 +7361,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Session duration limit can be changed by the system administrators</source>
-      <translation>Limite de durée de session peut être modifiée par les administrateurs système</translation>
+      <translation>La limite de durée de session peut être modifiée par les administrateurs système</translation>
     </message>
   </context>
   <context>
@@ -7747,8 +7747,8 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>Use License</source>
       <translation>
-        <numerusform>Utilise Licence</numerusform>
-        <numerusform>Utilise Licence</numerusform>
+        <numerusform>Utiliser la licence</numerusform>
+        <numerusform>Utiliser les Licences</numerusform>
       </translation>
     </message>
   </context>
@@ -7760,15 +7760,15 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Maximum number of motion detection rectangles for current camera is reached</source>
-      <translation>Nombre maximal de rectangles de détection de mouvement pour caméra actuelle atteint</translation>
+      <translation>Nombre maximal de rectangles de détection de mouvement pour la caméra actuelle atteint</translation>
     </message>
     <message>
       <source>Maximum number of ignore motion rectangles for current camera is reached</source>
-      <translation>Nombre maximal de rectangles mouvement ignoré pour caméra actuelle atteint</translation>
+      <translation>Le nombre maximum de rectangles d'ignorance de mouvement pour la caméra actuelle est atteint</translation>
     </message>
     <message>
       <source>Maximum number of detect motion rectangles for current camera is reached</source>
-      <translation>Nombre maximal de rectangles mouvement détecté pour caméra actuelle atteint</translation>
+      <translation>Le nombre maximum de rectangles de détection de mouvement pour la caméra actuelle est atteint</translation>
     </message>
     <message>
       <source>Reset motion regions to default?</source>
@@ -7780,7 +7780,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Motion detection stream is disabled</source>
-      <translation>Flux détection de mouvement désactivé</translation>
+      <translation>Le flux de détection de mouvement est désactivé</translation>
     </message>
   </context>
   <context>
@@ -7925,11 +7925,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation>La détection de mouvement est désactivée, tous les enregistrements programmés &quot;Motion&quot; et &quot;Motion + Lo-Res&quot; seront remplacés par &quot;Always&quot;</translation>
+      <translation>La détection de mouvement est désactivée, tous les enregistrements programmés &quot;Mouv.&quot; et &quot;Mouv. + Basse Réso&quot; seront remplacés par &quot;Toujours&quot;</translation>
     </message>
     <message>
       <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation>Flux double désactivée, tous les enregistrements de calendrier &quot;Motion + Lo-Res&quot; sera changé en &quot;Always&quot;</translation>
+      <translation>Le double flux est désactivée, tous les enregistrements du calendrier &quot;Mouv. + Basse Réso&quot; seront changé en &quot;Toujours&quot;</translation>
     </message>
   </context>
   <context>
@@ -7945,8 +7945,8 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>%n more required</source>
       <translation>
-        <numerusform>%n de plus requis</numerusform>
-        <numerusform>%n de plus requis</numerusform>
+        <numerusform>%n de plus est requis</numerusform>
+        <numerusform>%n de plus sont requis</numerusform>
       </translation>
     </message>
   </context>
@@ -7981,7 +7981,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Broken update package.</source>
-      <translation>Paquet de mise à jour brisé.</translation>
+      <translation>Paquet de mise à jour invalide.</translation>
     </message>
     <message>
       <source>Internal error.</source>
@@ -7993,7 +7993,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Installation package has been lost.</source>
-      <translation>Paquet d'installation perdu.</translation>
+      <translation>Le paquet d'installation a été perdu.</translation>
     </message>
     <message>
       <source>File %1 does not exist</source>
@@ -8050,11 +8050,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>nx::vms::client::desktop::DefaultPasswordAlertBar</name>
     <message>
       <source>This camera requires password to be set up.</source>
-      <translation>Cette caméra nécessite un mot de passe à définir.</translation>
+      <translation>Cette caméra nécessite un mot de passe pour être configuré.</translation>
     </message>
     <message>
       <source>Some of selected cameras require password to be set up.</source>
-      <translation>Certaines caméras sélectionnées nécessitent un mot de passe à définir.</translation>
+      <translation>Certaines caméras sélectionnées nécessitent un mot de passe pour être configurées.</translation>
     </message>
     <message>
       <source>Ask your system administrator to do it.</source>
@@ -8062,7 +8062,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Set Password</source>
-      <translation>Définir mot de passe</translation>
+      <translation>Définir le mot de passe</translation>
     </message>
   </context>
   <context>
@@ -8142,7 +8142,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <source>%n devices are being added. You can close this dialog or start a new search</source>
       <translation>
         <numerusform>%n appareil en cours d'ajout. Vous pouvez fermer cette boîte de dialogue ou lancer une nouvelle recherche</numerusform>
-        <numerusform>%n appareils en cours d'ajout. Vous pouvez fermer cette boîte de dialogue ou lancer une nouvelle recherche</numerusform>
+        <numerusform>%n appareils sont en cours d'ajout. Vous pouvez fermer cette boîte de dialogue ou lancer une nouvelle recherche</numerusform>
       </translation>
     </message>
     <message>
@@ -8791,15 +8791,15 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>OS versions of some components are no longer supported. Please remove them from the System or update their OS to a supported version.</source>
-      <translation>Versions d'OS de certains composants ne sont plus prises en charge. Veuillez les supprimer du système ou mettre à jour leur OS vers une version prise en charge.</translation>
+      <translation>Les versions OS de certains composants ne sont plus supportées. Veuillez les supprimer du système ou mettre à jour leur système d'exploitation vers une version prise en charge.</translation>
     </message>
     <message>
       <source>OS version of the client is no longer supported. Please update its OS to a supported version.</source>
-      <translation>Version OS du client n'est plus prise en charge. Veuillez mettre à jour son OS avec une version prise en charge.</translation>
+      <translation>La version OS du client n'est plus prise en charge. Veuillez mettre à jour son système d'exploitation vers une version prise en charge.</translation>
     </message>
     <message>
       <source>Failed to start update</source>
-      <translation>Échec du démarrage de la mise à jour</translation>
+      <translation>Impossible de démarrer la mise à jour</translation>
     </message>
     <message>
       <source>Failed to cancel update</source>
@@ -8815,7 +8815,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Failed to download update packages to some components</source>
-      <translation>Échec du téléchargement de paquets de mise à jour pour certains composants</translation>
+      <translation>Impossible de télécharger les paquets de mise à jour vers certains composants</translation>
     </message>
     <message>
       <source>If the problem persists, please contact Customer Support.</source>
@@ -8859,7 +8859,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Finish Update</source>
-      <translation>Terminer mise à jour</translation>
+      <translation>Terminer la mise à jour</translation>
     </message>
     <message>
       <source>Cancel</source>
@@ -8879,11 +8879,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Upload</source>
-      <translation>Envoyer</translation>
+      <translation>Télécharger</translation>
     </message>
     <message>
       <source>Upload &amp;&amp; Install</source>
-      <translation>Envoyer et Installer</translation>
+      <translation>Télécharger &amp;&amp; Installer</translation>
     </message>
     <message>
       <source>Download</source>
@@ -8891,7 +8891,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
-      <translation>Télécharger et installer</translation>
+      <translation>Télécharger &amp;&amp; Installer</translation>
     </message>
     <message>
       <source>Browse for Another File...</source>
@@ -8907,7 +8907,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Uploading updates...</source>
-      <translation>Envoie de mise à jour...</translation>
+      <translation>Téléchargement des mises à jour...</translation>
     </message>
     <message>
       <source>Downloading client package...</source>
@@ -9055,7 +9055,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>nx::vms::client::desktop::PasswordDialog</name>
     <message>
       <source>Sign In</source>
-      <translation>Connecter</translation>
+      <translation>Se connecter</translation>
     </message>
   </context>
   <context>
@@ -9090,7 +9090,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Waiting for peer data</source>
-      <translation>En attente de données homologues</translation>
+      <translation>En attente des données des pairs</translation>
     </message>
     <message>
       <source>There is not enough space to download update files.</source>
@@ -9118,7 +9118,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Internal downloader error.</source>
-      <translation>Erreur interne du téléchargeur.</translation>
+      <translation>Erreur interne de téléchargement.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -9146,7 +9146,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>This OS version is no longer supported.</source>
-      <translation>Cette version de OS n'est plus supportée.</translation>
+      <translation>Cette version d'OS n'est plus prise en charge.</translation>
     </message>
     <message>
       <source>Update installation failed.</source>
@@ -9283,7 +9283,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message numerus="yes">
       <source>For exporting as Rapid Review video length should be at least %n seconds.</source>
       <translation>
-        <numerusform>Pour l’exportation révision rapide, la longueur vidéo doit être d'au moins %n secondes.</numerusform>
+        <numerusform>Pour l’exportation révision rapide, la longueur vidéo doit être d'au moins %n seconde.</numerusform>
         <numerusform>Pour l’exportation révision rapide, la longueur vidéo doit être d'au moins %n secondes.</numerusform>
       </translation>
     </message>
@@ -9421,23 +9421,23 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>library file cannot be loaded</source>
-      <translation>fichier de bibliothèque ne peut pas être chargé</translation>
+      <translation>le fichier librairie ne peut pas être chargé</translation>
     </message>
     <message>
       <source>invalid or incompatible plugin library</source>
-      <translation>bibliothèque de plugin invalide ou incompatible</translation>
+      <translation>la librairie du plugin est invalide ou incompatible</translation>
     </message>
     <message>
       <source>plugin library failed to initialize</source>
-      <translation>bibliothèque plugin n'a pas pu initialiser</translation>
+      <translation>l'initialisation de la librairie du plugin a échoué</translation>
     </message>
     <message>
       <source>plugin returned bad manifest</source>
-      <translation>plugin retourné mauvais manifeste</translation>
+      <translation>le plugin a renvoyé le manifeste incorrect</translation>
     </message>
     <message>
       <source>plugin API version is no longer supported</source>
-      <translation>version API du plugin n'est plus supportée</translation>
+      <translation>la version de l'API du plugin n'est plus prise en charge</translation>
     </message>
     <message>
       <source>unknown error</source>
@@ -9453,7 +9453,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>plugin is in the black list</source>
-      <translation>plugin dans la liste noire</translation>
+      <translation>le plugin est dans la liste noire</translation>
     </message>
     <message>
       <source>Status</source>
@@ -9461,7 +9461,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>plugin is optional and is not in the white list</source>
-      <translation>plugin optionnel et n'est pas dans la liste blanche</translation>
+      <translation>le plugin est optionnel et n'est pas dans la liste blanche</translation>
     </message>
     <message>
       <source>internal error</source>
@@ -9631,7 +9631,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>nx::vms::client::desktop::TimeSynchronizationWidget</name>
     <message>
       <source>Time, common and synchronized between all servers. Can be different with OS time on any particular server.</source>
-      <translation>Temps, commun et synchronisé entre tous les serveurs. Peut être différent avec l'heure du système d'exploitation sur un serveur particulier.</translation>
+      <translation>Temps, communs et synchronisés entre tous les serveurs. Peut être différent avec l'heure de l'OS sur un serveur particulier.</translation>
     </message>
     <message>
       <source>Synchronized with the Internet</source>
@@ -9681,15 +9681,15 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Could not create upload on the server side: %1</source>
-      <translation>Impossible de créer l'envoie côté serveur: %1</translation>
+      <translation>Impossible de créer le téléchargement du côté du serveur : %1</translation>
     </message>
     <message>
       <source>Could not upload file chunk to the server</source>
-      <translation>Impossible d"envoyer le fragment de fichier sur le serveur</translation>
+      <translation>Impossible d'envoyer le fragment de fichier sur le serveur</translation>
     </message>
     <message>
       <source>Could not check uploaded file on the server</source>
-      <translation>Impossible de vérifier le fichier envoyer sur le serveur</translation>
+      <translation>Impossible de vérifier le fichier téléchargé sur le serveur</translation>
     </message>
     <message>
       <source>File was corrupted while being uploaded to the server</source>
@@ -9872,15 +9872,15 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>nx::vms::client::desktop::ui::AnalyticsSdkEventWidget</name>
     <message>
       <source>Analytics events can be set up on a certain cameras.</source>
-      <translation>Événements Analytics peuvent être configurés sur certaines caméras.</translation>
+      <translation>Les événements Analytics peuvent être configurés sur certaines caméras.</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
-      <translation>Choisissez les caméras en utilisant le bouton ci-dessus pour voir la liste des événements supportés.</translation>
+      <translation>Choisissez les caméras en utilisant le bouton ci-dessus pour voir la liste des événements pris en charge.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the caption with any of the entered keywords.</source>
-      <translation>Événement se déclenchera uniquement s'il y a des correspondances dans la légende avec l'un des mots clés saisis.</translation>
+      <translation>L'événement ne se déclenchera que s'il y a des correspondances dans la légende avec l'un des mots clés saisis.</translation>
     </message>
     <message>
       <source>If the field is empty, event will always trigger.</source>
@@ -9888,7 +9888,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation>Ce champ est sensible à la casse.</translation>
+      <translation>Ce champ est sensible.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
@@ -9921,7 +9921,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>This field is case sensitive.</source>
-      <translation>Ce champ est sensible à la casse.</translation>
+      <translation>Ce champ est sensible.</translation>
     </message>
     <message>
       <source>Event will trigger only if there are matches in the description field with any of the entered keywords.</source>
@@ -10132,11 +10132,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message>
       <source>Virtual Cameras cannot be moved between servers</source>
-      <translation>Caméras virtuelles ne peuvent pas être déplacées entre les serveurs</translation>
+      <translation>Les caméras virtuelles ne peuvent pas être déplacées entre les serveurs</translation>
     </message>
     <message>
       <source>Layout is locked and cannot be changed</source>
-      <translation>La mise en page est verrouillée et ne peut être changée</translation>
+      <translation>La mise en page est verrouillée et ne peut pas être modifiée</translation>
     </message>
     <message>
       <source>Open File</source>
@@ -10278,10 +10278,10 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
 Once a location to store analytics data is selected, it cannot be easily changed without losing existing data. We recommend to choose the location carefully and to avoid using the system partition as it may cause severe system malfunction.
 By default analytics data will be stored on %1.
 You can select another storage location in the &quot;Storage Management&quot; tab of the Server Settings dialog.</source>
-      <translation>La base de données d'analyse ne doit être stockée que sur un lecteur local et peut occuper de grandes quantités d'espace.
-Une fois qu'un emplacement pour stocker des données d'analyse est sélectionné, il ne peut pas être facilement modifié sans perdre les données existantes. Nous vous recommandons de choisir l’emplacement avec soin et d’éviter d’utiliser la partition système car cela pourrait entraîner un dysfonctionnement grave du système.
-Par défaut, les données analytiques seront stockées sur %1.
-Vous pouvez sélectionner un autre emplacement de stockage dans l'onglet &quot;Sgestion de stockage&quot; de la boîte de dialogue Paramètres serveur.</translation>
+      <translation>La base de données analytique ne devrait être stockée que sur un disque local et peut prendre beaucoup d'espace.
+Une fois qu'un emplacement pour stocker des données d'analyse est sélectionné, il ne peut pas être facilement modifié sans perdre des données existantes. Nous vous recommandons de choisir l'emplacement soigneusement et d'éviter d'utiliser la partition système car elle peut causer un dysfonctionnement grave du système.
+Par défaut les données d'analyse seront stockées sur %1.
+Vous pouvez sélectionner un autre emplacement de stockage dans l'onglet &quot;Gestion de stockage&quot; de la boîte de dialogue Paramètres du serveur.</translation>
     </message>
   </context>
   <context>
