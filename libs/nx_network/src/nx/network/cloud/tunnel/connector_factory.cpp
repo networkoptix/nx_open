@@ -56,16 +56,44 @@ CloudConnectors ConnectorFactory::defaultFactoryFunction(
         connectors.emplace_back(std::move(context));
     }
 
-    if (((s_cloudConnectTypeMask & (int)ConnectType::proxy) > 0) &&
-        response.trafficRelayUrl)
+    if (((s_cloudConnectTypeMask & (int) ConnectType::proxy) > 0) &&
+        (!response.trafficRelayUrls.empty() || response.trafficRelayUrl))
     {
-        TunnelConnectorContext context;
-        context.connector = std::make_unique<relay::Connector>(
-            nx::utils::Url(QString::fromUtf8(*response.trafficRelayUrl)),
-            targetAddress,
-            connectSessionId);
-        context.startDelay = response.params.trafficRelayingStartDelay;
-        connectors.emplace_back(std::move(context));
+        auto relayUrls = response.trafficRelayUrls;
+        if (response.trafficRelayUrl)
+            relayUrls.push_back(*response.trafficRelayUrl);
+
+        for (const auto& urlStr: relayUrls)
+        {
+            nx::utils::Url url(urlStr);
+            TunnelConnectorContext context;
+            context.startDelay = response.params.trafficRelayingStartDelay;
+
+            QUrlQuery urlQuery(url.query());
+            if (urlQuery.hasQueryItem(nx::hpm::api::kDelayParamName))
+            {
+                auto extraDuration = nx::utils::parseDuration(
+                    urlQuery.queryItemValue(nx::hpm::api::kDelayParamName));
+                if (extraDuration)
+                {
+                    context.startDelay += *extraDuration;
+                }
+                else
+                {
+                    NX_DEBUG(this, "Failed to parse extra duration (%1) for relay URL %2",
+                        urlQuery.queryItemValue(nx::hpm::api::kDelayParamName), url);
+                }
+                urlQuery.removeQueryItem(nx::hpm::api::kDelayParamName);
+                url.setQuery(urlQuery);
+            }
+
+            context.connector = std::make_unique<relay::Connector>(
+                url,
+                targetAddress,
+                connectSessionId);
+
+            connectors.emplace_back(std::move(context));
+        }
     }
 
     return connectors;

@@ -63,6 +63,7 @@ public:
     std::list<network::SocketAddress> udpEndpointList;
     /** Optional for backward compatibility. */
     std::optional<nx::String> trafficRelayUrl;
+    std::vector<nx::String> trafficRelayUrls;
     /**
      * May differ from ConnectRequest::destinationHostName
      * if connect by domain name (e.g., cloud system id) has been requested.
@@ -76,8 +77,10 @@ public:
     virtual bool parseAttributes(const nx::network::stun::Message& message) override;
 };
 
+static constexpr char kDelayParamName[] = "delay";
+
 #define ConnectResponse_Fields \
-    (forwardedTcpEndpointList)(udpEndpointList)(trafficRelayUrl) \
+    (forwardedTcpEndpointList)(udpEndpointList)(trafficRelayUrl)(trafficRelayUrls) \
     (destinationHostFullName)(params)(cloudConnectVersion)
 
 QN_FUSION_DECLARE_FUNCTIONS(ConnectResponse, (json), NX_NETWORK_API)

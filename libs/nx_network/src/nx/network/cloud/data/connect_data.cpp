@@ -57,6 +57,11 @@ void ConnectResponse::serializeAttributes(nx::network::stun::Message* const mess
     message->newAttribute< attrs::UdtHpEndpointList >(std::move(udpEndpointList));
     if (trafficRelayUrl)
         message->newAttribute<attrs::TrafficRelayUrl>(std::move(*trafficRelayUrl));
+
+    message->newAttribute<attrs::StringList>(
+        attrs::trafficRelayUrlList,
+        trafficRelayUrls);
+
     message->newAttribute<attrs::HostName>(destinationHostFullName);
     params.serializeAttributes(message);
     message->addAttribute(attrs::cloudConnectVersion, (int)cloudConnectVersion);
@@ -70,6 +75,11 @@ bool ConnectResponse::parseAttributes(const nx::network::stun::Message& message)
     nx::String trafficRelayEndpointLocal;
     if (readStringAttributeValue<attrs::TrafficRelayUrl>(message, &trafficRelayEndpointLocal))
         trafficRelayUrl = std::move(trafficRelayEndpointLocal);
+
+    readAttributeValue<attrs::StringList>(
+        message,
+        attrs::trafficRelayUrlList,
+        &trafficRelayUrls);
 
     readStringAttributeValue<attrs::HostName>(message, &destinationHostFullName);
 
