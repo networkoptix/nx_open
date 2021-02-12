@@ -5,7 +5,7 @@
     <name>AnalyticsSettings</name>
     <message>
       <source>Camera analytics will work only when camera is being viewed. Enable recording to make it work all the time.</source>
-      <translation>カメラ分析は、カメラが表示されているときにのみ機能します。録画を有効にして、常に機能するようにします。</translation>
+      <translation>カメラ分析は、カメラが表示されているときにのみ機能します。常に動作させるためには録画を有効にしてください。</translation>
     </message>
   </context>
   <context>
