@@ -204,6 +204,9 @@ angular.module('nxCommon')
                 animations.push(animation);
                 return animation.deferred.promise;
             },
+            isRunning:function() {
+                return animationRunning;
+            },
             progress:function(scope,value,dependency,duration){ // Animate progress from 0 to 1
                 scope[value] = 0;
                 return this.animate(scope,value,1,dependency,duration);

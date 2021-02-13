@@ -501,8 +501,8 @@ angular.module('nxCommon')
                 viewport.dblclick(viewportDblClick);
                 viewport.click(viewportClick);
                 viewport.mousewheel(viewportMouseWheel);
-                
-                //For touch screens
+
+                // For touch screens
                 viewport.on('touchstart', viewportMouseDown);
                 viewport.on('touchmove', viewportMouseMove);
                 viewport.on('touchstop', viewportMouseLeave);
@@ -537,8 +537,14 @@ angular.module('nxCommon')
                         scope.emptyArchive = !hasArchive;
                         scope.loading = false;
                         if (hasArchive) {
+                            if (!animateScope.isRunning()) {
+                                animateScope.start(render);
+                            }
                             initTimeline(); // There is archive - init timeline
                         } else { // No archive - wait and repeat attempt
+                            if (animateScope.isRunning()) {
+                                animateScope.stopHandler(render);
+                            }
                             $timeout(initRecordsProvider, Config.webclient.updateArchiveStateTimeout);
                         }
                     });
@@ -566,7 +572,6 @@ angular.module('nxCommon')
                 // !!! Start drawing
                 animateScope.setDuration(timelineConfig.animationDuration);
                 animateScope.setScope(scope);
-                animateScope.start(render);
                 
                 //scope.scaleManager is set to null so that the garbage collecter cleans the object
                 scope.$on('$destroy', function () {

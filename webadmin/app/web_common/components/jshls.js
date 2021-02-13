@@ -475,19 +475,19 @@ import * as Hls from 'hls.js';
         this.handleMediaError = function () {
             if (autoRecoverError) {
                 var now = performance.now();
-                if (!recoverDecodingErrorDate || (now - recoverDecodingErrorDate) > 3000) {
+                if (!recoverDecodingErrorDate || (now - recoverDecodingErrorDate) > 6000) {
                     recoverDecodingErrorDate = performance.now();
                     console.log(',try to recover media Error ...');
                     this.hls.recoverMediaError();
+                    this.video.play();
+                } else if (!recoverSwapAudioCodecDate || (now - recoverSwapAudioCodecDate) > 6000) {
+                    recoverSwapAudioCodecDate = performance.now();
+                    console.log(',try to swap Audio Codec and recover media Error ...');
+                    this.hls.swapAudioCodec();
+                    this.hls.recoverMediaError();
+                    this.video.play();
                 } else {
-                    if (!recoverSwapAudioCodecDate || (now - recoverSwapAudioCodecDate) > 3000) {
-                        recoverSwapAudioCodecDate = performance.now();
-                        console.log(',try to swap Audio Codec and recover media Error ...');
-                        this.hls.swapAudioCodec();
-                        this.hls.recoverMediaError();
-                    } else {
-                        console.log(',cannot recover, last media error recovery failed ...');
-                    }
+                    console.log(',cannot recover, last media error recovery failed ...');
                 }
             }
         };
