@@ -592,9 +592,9 @@ Grouping element which generates N items from the given template and displaying 
 
 [/proprietary]
 
-Repeater expands ‘#N’ (or short form ‘#') string in its template to an item number. Nested
-repeaters distinguish their numbering by N number in ‘#N’. To escape ‘#’ sign, it must be doubled:
-'##’.
+Repeater expands '#N' (or short form '#') string in its template to an item number. Nested
+repeaters distinguish their numbering by N number in '#N'. To escape '#' sign, it must be doubled:
+'##'.
 
 When the Repeater is used with a generic grouping item (like `GroupBox`) and it should hide empty
 items, then the grouping item should set the field `"filledCheckItems"`. This field should contain
