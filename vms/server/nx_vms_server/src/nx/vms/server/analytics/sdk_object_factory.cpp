@@ -186,8 +186,8 @@ bool SdkObjectFactory::initPluginResources()
         auto sdkPluginItr = sdkPluginsById.find(pluginData.id);
         if (sdkPluginItr == sdkPluginsById.cend())
         {
-            NX_WARNING(this,
-                "Unable to find an SDK plugin object. Plugin name: %1, plugin Id (%2)",
+            NX_DEBUG(this,
+                "Unable to find an SDK Plugin object. Plugin name: %1, Plugin Id (%2)",
                 pluginData.name, pluginData.id);
             continue;
         }
@@ -227,7 +227,7 @@ bool SdkObjectFactory::initEngineResources()
     }
 
     std::map<QnUuid, std::vector<nx::vms::api::AnalyticsEngineData>> engineDataByPlugin;
-    for (const auto& databaseAnalyticsEngine : databaseAnalyticsEngines)
+    for (auto& databaseAnalyticsEngine: databaseAnalyticsEngines)
     {
         engineDataByPlugin[databaseAnalyticsEngine.parentId]
             .push_back(std::move(databaseAnalyticsEngine));
@@ -294,8 +294,9 @@ bool SdkObjectFactory::createEngine(
     const auto plugin = pluginResource->sdkPlugin();
     if (!plugin)
     {
-        return error("Plugin Resource %1 (%2) has no corresponding Plugin object",
+        NX_DEBUG(this, "Plugin Resource %1 (%2) has no corresponding Plugin object",
             pluginResource->getName(), pluginResource->getId());
+        return false;
     }
 
     const wrappers::EnginePtr engine = plugin->createEngine(engineResource);
