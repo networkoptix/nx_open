@@ -197,7 +197,7 @@ QN_HELP_TOPIC(Systems_MergeSystems_Help,                        "merge_all_serve
 
 QN_HELP_TOPIC(Videowall_Help, "configuring_video_wall_several.htm")
 QN_HELP_TOPIC(Videowall_Attach_Help, "creating_new_video_wall.htm")
-QN_HELP_TOPIC(Videowall_Management_Help, "video_wall_management.htm.htm")
+QN_HELP_TOPIC(Videowall_Management_Help, "video_wall_management.htm")
 QN_HELP_TOPIC(Videowall_Display_Help, "controlling_video_wall_display.htm")
 
 QN_HELP_TOPIC(Setup_Wizard_Help,                                "vms_quick_start.htm")
