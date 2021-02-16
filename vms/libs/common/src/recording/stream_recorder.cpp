@@ -517,7 +517,6 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
         {
             NX_DEBUG(this, "Video compression type has changed from %1 to %2. Close file",
                 m_lastCompressionType, md->compressionType);
-            close();
 
             if (m_role == StreamRecorderRole::fileExport)
             {
@@ -526,8 +525,10 @@ bool QnStreamRecorder::saveData(const QnConstAbstractMediaDataPtr& md)
                     QnStorageResourcePtr()
                 );
                 m_needStop = true;
-                return false;
             }
+            close();
+            if (m_role == StreamRecorderRole::fileExport)
+                return false;
         }
         m_lastCompressionType = md->compressionType;
     }
