@@ -3,17 +3,18 @@
     <div ng-if="developersFeedbackForm">
         <h2>Outils développeur</h2>
         <p>
-            Vous avez une idée sur la façon d'améliorer nos outils de développement ou voulez commencer une conversation?
+            Vous avez une idée sur la façon d'améliorer nos outils de développement ou vous voulez simplement entamer une conversation ?
             Vous voulez poser une question ou trouver plus d'informations sur l'intégration?
         </p>
         <p ng-if="developersFeedbackForm"><a ng-href="{{developersFeedbackForm}}" target="_blank">Forum des développeurs</a></p>
-        <p ng-if="developersKnowledgeBase"><a ng-href="{{developersKnowledgeBase}}" target="_blank">Base de connaissances développement</a></p>
+        <p ng-if="developersKnowledgeBase"><a ng-href="{{developersKnowledgeBase}}" target="_blank">Base de connaissances pour le développement</a></p>
     </div>
 
     <div>
         <h3>Générateur d’événements génériques</h3>
         <p>
-            Un événement générique est une méthode d'envoie d'événements depuis des systèmes tiers vers un système, qui peut être utilisé pour déclencher des actions système dans le moteur d'événements et de règles.
+            Un événement générique est une méthode d'envoi d'événements de systèmes tiers vers un système
+            qui peut être utilisé pour déclencher des actions système dans le moteur Événements et Règles.
             Le Générateur d'événements génériques est un outil qui aide les développeurs et les intégrateurs à construire
             et à tester les appels d'Événement Générique HTTP.
         </p>
@@ -22,7 +23,9 @@
     <div>
         <h3>API Serveur</h3>
         <p>
-            Une API REST qui donne aux développeurs la possibilité d’accéder à presque toutes les fonctionnalités système disponibles dans le client normal: interroger / gérer les ressources système (serveurs, caméras, utilisateurs, autorisations), extraire une vidéo en direct ou enregistrée du système, générer des événements, créer règles, contrôlez les caméras PTZ, etc.
+            Une API REST qui donne aux développeurs la possibilité d'accéder à presque toutes les fonctionnalités système disponibles dans le client régulier
+            : requête / gestion des ressources système (serveurs, caméras, utilisateurs, autorisations), tirez la vidéo en direct ou enregistrée
+            hors du système, générer des événements, créer des règles, contrôler des caméras PTZ, et plus encore.
         </p>
         <p>
             <a href="#/developers/api"><b>Outil de test API (nouveau)</b></a>
@@ -40,7 +43,7 @@
             Affiche des informations supplémentaires utiles aux développeurs pour des caméras individuelles dans l'onglet Afficher de l'interface Web Admin:
         </p>
         <ul>
-            <li>ID Caméra</li>
+            <li>ID de la caméra</li>
             <li>Liens pour tous les flux vidéo disponibles</li>
             <li>Exportation directe de vidéos depuis le navigateur</li>
         </ul>
@@ -60,7 +63,10 @@
     <div>
         <h3>Stockage SDK</h3>
         <p>
-            Le SDK de stockage permet aux développeurs de lire ou d’écrire sur n’importe quel emplacement de stockage: local, distant et même nuage. La création d'un plug-in de stockage nécessite la mise en œuvre de fonctions standard telles que: flux d'E/S, si le fichier existe, suppression du fichier, liste des fichiers du dossier, etc. Le SDK de stockage contient un exemple d'utilisation d'un serveur FTP comme emplacement de stockage.
+            Le SDK de Stockage permet aux développeurs de lire ou d'écrire sur n'importe quel emplacement de stockage : local, distant, et même
+            sur le cloud. La création d'un plugin de stockage nécessite l'implémentation de fonctions standard telles que: flux I/O, si le fichier
+            existe, supprimez le fichier, la liste des fichiers dans le dossier, etc. Le SDK de stockage contient un exemple pour utiliser un serveur FTP
+            comme emplacement de stockage.
         </p>
         <p><a id="sdk-storage" ng-href="#/sdkeula/storage_sdk" >obtenir SDK</a></p>
     </div>
