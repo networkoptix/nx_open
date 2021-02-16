@@ -175,28 +175,25 @@ QIODevice* QnFileStorageResource::openInternal(
     if (openMode.testFlag(QIODevice::Unbuffered))
         ioBlockSize = ffmpegBufferSize = 0;
 
+    std::unique_ptr<QBufferedFile> result;
+
 #if defined (Q_OS_WIN)
-    std::unique_ptr<QBufferedFile> rez(
-        new QBufferedFile(
-            std::shared_ptr<IQnFile>(new QnFile(fileName)),
-            ioBlockSize,
-            ffmpegBufferSize,
-            ffmpegMaxBufferSize,
-            getId()));
-    if (rez)
-    {
-        rez->setSystemFlags(systemFlags);
-        rez->open(openMode);
-    }
-    return rez.release();
+    result = std::make_unique<QBufferedFile>(
+        std::make_shared<QnFile>(fileName),
+        ioBlockSize,
+        ffmpegBufferSize,
+        ffmpegMaxBufferSize,
+        getId());
 
 #elif defined(Q_OS_UNIX)
-
     int fd = rootTool()->open(fileName, openMode);
     if (fd < 0)
     {
-        if (openMode & QIODevice::WriteOnly && rootTool()->makeDirectory(QnFile::absolutePath(fileName)))
+        if ((openMode & QIODevice::WriteOnly)
+            && rootTool()->makeDirectory(QnFile::absolutePath(fileName)))
+        {
             fd = rootTool()->open(fileName, openMode);
+        }
 
         if (fd < 0)
         {
@@ -205,14 +202,19 @@ QIODevice* QnFileStorageResource::openInternal(
         }
     }
 
-    auto result = new QBufferedFile(
+    result = std::make_unique<QBufferedFile>(
         std::make_shared<QnFile>(fd), ioBlockSize, ffmpegBufferSize, ffmpegMaxBufferSize, getId());
-    result->open(openMode);
 
-    return result;
-#endif
+#endif // if (Q_OS_WIN)
 
-    return nullptr;
+    if (result)
+    {
+        result->setSystemFlags(systemFlags);
+        if (!result->open(openMode))
+            return nullptr;
+    }
+
+    return result.release();
 }
 
 nx::vms::server::RootFileSystem* QnFileStorageResource::rootTool() const

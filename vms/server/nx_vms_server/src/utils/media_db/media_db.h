@@ -1,13 +1,13 @@
-#ifndef __MEDIA_DB_H__
-#define __MEDIA_DB_H__
+#pragma once
 
 #include <queue>
 #include <cmath>
+#include <chrono>
 
 #include <boost/variant.hpp>
 #include <QtCore>
 
-#include <nx/utils/log/log.h>
+#include <nx/utils/elapsed_timer.h>
 #include <recorder/device_file_catalog.h>
 #include "media_file_operation.h"
 
@@ -127,16 +127,24 @@ class MediaDbWriter
 {
 public:
     MediaDbWriter();
-    void setDevice(QIODevice* ioDevice);
+    void setDevice(QIODevice* ioDevice, const QString& fileName);
     void writeRecord(const DBRecord &record);
 
     static bool writeFileHeader(QIODevice* ioDevice, uint8_t dbVersion);
 
 private:
+    const std::chrono::seconds kReportErrorTresholdTime{10};
+
     QDataStream m_stream;
+    QString m_fileName;
+    QMap<int, size_t> m_errnoCount;
+    QMap<QString, size_t> m_errorSourceCount;
+    nx::utils::ElapsedTimer m_errorTimer{/*started*/ true};
+    size_t m_errorTotal = 0;
+
+    void onError(const QString& source, int error);
+    void reportErrorIfNeeded();
 };
 
 } // namespace media_db
 } // namespace nx
-
-#endif // __MEDIA_DB_TYPES_H__

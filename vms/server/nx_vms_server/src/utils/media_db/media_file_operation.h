@@ -3,6 +3,8 @@
 #include "record_base.h"
 #include "bytestream.h"
 
+#include <nx/utils/log/log.h>
+
 namespace nx
 {
 namespace media_db

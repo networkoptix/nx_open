@@ -563,7 +563,7 @@ protected:
         const auto path = *m_workDirResource.getDirName();
         m_fileName = path + "/test.nxdb";
         reopenFile();
-        m_writer.setDevice(m_ioDevice.get());
+        m_writer.setDevice(m_ioDevice.get(), m_fileName);
         ASSERT_TRUE(media_db::MediaDbWriter::writeFileHeader(m_ioDevice.get(), 1));
     }
 

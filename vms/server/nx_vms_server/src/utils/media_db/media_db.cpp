@@ -1,8 +1,14 @@
-#include <algorithm>
 #include "media_db.h"
+
+#include <QtCore/QTextStream>
+
+#include <algorithm>
 #include <cerrno>
+#include <functional>
 
 #include <recorder/device_file_catalog.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/url.h>
 
 namespace nx::media_db {
 
@@ -11,7 +17,10 @@ namespace {
 class RecordVisitor : public boost::static_visitor<>
 {
 public:
-    RecordVisitor(QDataStream* stream): m_stream(stream) {}
+    RecordVisitor(QDataStream* stream, std::function<void(const QString&, int)> onError):
+        m_stream(stream)
+    {
+    }
 
     void operator() (const CameraOperation& cameraOperation) const
     {
@@ -20,11 +29,7 @@ public:
 
         m_stream->writeRawData(writer.data(), writer.data().size());
         if (m_stream->status() == QDataStream::WriteFailed)
-        {
-            qWarning()
-                << "Media DB Camera operation write error: QDataStream::WriteRawData wrong bytes written count. errno: "
-                << strerror(errno);
-        }
+            m_onError("camera", errno);
     }
 
     void operator() (const MediaFileOperation& mediaFileOperation) const
@@ -34,12 +39,7 @@ public:
 
         m_stream->writeRawData(writer.data(), writer.data().size());
         if (m_stream->status() == QDataStream::WriteFailed)
-        {
-            qWarning()
-                << "Media DB Media File operation write error: QDataStream::WriteFailed. errno: "
-                << strerror(errno);
-            return;
-        }
+            m_onError("file", errno);
     }
 
     void operator() (const boost::blank&) const
@@ -49,6 +49,7 @@ public:
 
 private:
     QDataStream *m_stream;
+    std::function<void(const QString&, int)> m_onError;
 };
 
 
@@ -201,12 +202,51 @@ bool MediaDbWriter::writeFileHeader(QIODevice* ioDevice, uint8_t dbVersion)
 
 void MediaDbWriter::writeRecord(const DBRecord &record)
 {
-    boost::apply_visitor(RecordVisitor(&m_stream), record);
+    reportErrorIfNeeded();
+    if (!m_stream.device())
+        return;
+
+    auto onErrorCb = [this](const QString& source, int err) { onError(source, err); };
+    boost::apply_visitor(RecordVisitor(&m_stream, onErrorCb), record);
 }
 
-void MediaDbWriter::setDevice(QIODevice* ioDevice)
+void MediaDbWriter::setDevice(QIODevice* ioDevice, const QString& fileName)
 {
     m_stream.setDevice(ioDevice);
+    m_fileName = fileName;
+}
+
+void MediaDbWriter::onError(const QString& source, int err)
+{
+    m_errnoCount[err] += 1;
+    m_errorSourceCount[source] += 1;
+}
+
+void MediaDbWriter::reportErrorIfNeeded()
+{
+    const size_t errorTotal = std::accumulate(
+        m_errnoCount.cbegin(), m_errnoCount.cend(), 0,
+        [](size_t init, size_t val) { return init + val; });
+
+    if (errorTotal != m_errorTotal
+        && m_errorTimer.elapsed() > kReportErrorTresholdTime
+        && nx::utils::log::isToBeLogged(nx::utils::log::Level::warning, this))
+    {
+        QString logMessage;
+        QTextStream logStream(&logMessage);
+        logStream << errorTotal << " media db write errors detected for file '"
+            << nx::utils::url::hidePassword(m_fileName) << "'. ";
+
+        for (auto it = m_errnoCount.begin(); it != m_errnoCount.end(); ++it)
+            logStream << strerror(it.key()) << ": " << it.value() << ". ";
+
+        for (auto it = m_errorSourceCount.begin(); it != m_errorSourceCount.end(); ++it)
+            logStream << it.key() << ": " << it.value() << ". ";
+
+        NX_WARNING(this, logMessage);
+        m_errorTimer.restart();
+        m_errorTotal = errorTotal;
+    }
 }
 
 } // namespace nx::media_db

@@ -80,7 +80,20 @@ void QnStorageDb::startVacuum(
             const bool vacuumResult =
                 measureTime([this, data]() { return vacuum(data); }, "Vacuum:");
 
-            m_dbWriter->setDevice(m_ioDevice.get());
+            if (m_ioDevice)
+            {
+                NX_DEBUG(
+                    this, "Media db file '%1' is ready for writing new records",
+                    nx::utils::url::hidePassword(m_dbFileName));
+                m_dbWriter->setDevice(m_ioDevice.get(), m_dbFileName);
+            }
+            else
+            {
+                NX_WARNING(
+                    this, "Failed to open fo write media db file '%1'. No new records will be saved",
+                    nx::utils::url::hidePassword(m_dbFileName));
+            }
+
             completionHandler(vacuumResult);
         }));
 }
