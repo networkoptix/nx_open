@@ -25,6 +25,8 @@ QnCloudSystemDescription::QnCloudSystemDescription(
     m_ownerFullName(ownerFullName),
     m_running(running)
 {
+    connect(this, &QnCloudSystemDescription::reachableStateChanged,
+        this, &QnCloudSystemDescription::runningStateChanged);
 }
 
 void QnCloudSystemDescription::setRunning(bool running)
@@ -43,7 +45,7 @@ bool QnCloudSystemDescription::isCloudSystem() const
 
 bool QnCloudSystemDescription::isRunning() const
 {
-    return m_running;
+    return m_running && isReachable();
 }
 
 bool QnCloudSystemDescription::isNewSystem() const
