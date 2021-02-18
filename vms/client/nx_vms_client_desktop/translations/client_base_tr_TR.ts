@@ -5836,7 +5836,7 @@ Analytics verilerini başka bir depolama konumuna taşımak istiyorsanız, devam
     </message>
     <message>
       <source>Insufficient permissions to store analytics data.</source>
-      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+      <translation>Analiz verilerini depolamak için yetersiz izin.</translation>
     </message>
   </context>
   <context>

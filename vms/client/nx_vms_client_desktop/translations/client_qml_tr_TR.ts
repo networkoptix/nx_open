@@ -225,7 +225,7 @@
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>İleri</translation>
     </message>
   </context>
   <context>
