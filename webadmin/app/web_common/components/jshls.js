@@ -387,6 +387,8 @@ import * as Hls from 'hls.js';
             fmp4Data = {'audio': [], 'video': []};
             
             this.hls = new Hls({
+                capLevelToPlayerSize: true,
+                liveBackBufferLength: 60 * 5, // Limits the live buffer in seconds. default infinity
                 debug: debugMode,
                 enableWorker: enableWorker,
                 manifestLoadingTimeOut: loadingTimeOut,
