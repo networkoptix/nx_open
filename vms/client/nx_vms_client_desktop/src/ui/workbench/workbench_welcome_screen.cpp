@@ -238,7 +238,7 @@ void QnWorkbenchWelcomeScreen::setVisibleControls(bool visible)
 
 QString QnWorkbenchWelcomeScreen::connectingToSystem() const
 {
-    return m_connectingSystemName;
+    return m_connectingSystemId;
 }
 
 void QnWorkbenchWelcomeScreen::openConnectingTile()
@@ -265,10 +265,10 @@ void QnWorkbenchWelcomeScreen::handleConnectingToSystem()
 
 void QnWorkbenchWelcomeScreen::setConnectingToSystem(const QString& value)
 {
-    if (m_connectingSystemName == value)
+    if (m_connectingSystemId == value)
         return;
 
-    m_connectingSystemName = value;
+    m_connectingSystemId = value;
     emit connectingToSystemChanged();
 }
 
@@ -452,6 +452,7 @@ void QnWorkbenchWelcomeScreen::connectToCloudSystem(const QString& systemId)
     if (!isLoggedInToCloud())
         return;
 
+    setConnectingToSystem(systemId);
     menu()->trigger(action::ConnectToCloudSystemAction,
         action::Parameters().withArgument(Qn::CloudSystemIdRole, systemId));
 }

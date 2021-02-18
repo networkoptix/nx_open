@@ -166,7 +166,7 @@ protected:
 private:
     bool m_receivingResources = false;
     bool m_visibleControls = false;
-    QString m_connectingSystemName;
+    QString m_connectingSystemId;
     QString m_message;
     std::unique_ptr<QnStartupTileManager> m_startupTileManager;
 };
