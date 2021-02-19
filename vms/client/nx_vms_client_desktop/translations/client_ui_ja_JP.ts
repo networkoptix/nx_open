@@ -189,7 +189,7 @@
     <message>
       <location/>
       <source>Max. days</source>
-      <translation>最大(日)</translation>
+      <translation>最長(日)</translation>
     </message>
     <message>
       <location/>
@@ -623,7 +623,7 @@
     <message>
       <location/>
       <source>It will increase bitrate for camera.</source>
-      <translation>カメラのビットレートが上がります。</translation>
+      <translation>カメラのビットレートが増加します。</translation>
     </message>
     <message>
       <location/>
@@ -879,12 +879,12 @@
     <message>
       <location/>
       <source>Apply changes before copying schedule.</source>
-      <translation>スケジュールコピーの前に適用してください</translation>
+      <translation>スケジュールをコピーする前に変更を適用してください。</translation>
     </message>
     <message>
       <location/>
       <source>Copy Schedule to...</source>
-      <translation>スケジュールコピー...</translation>
+      <translation>スケジュールをコピー...</translation>
     </message>
   </context>
   <context>
@@ -1334,7 +1334,7 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/resource_properties/fisheye/fisheye_settings_widget.ui"/>
       <source>Fisheye Dewarping</source>
-      <translation>魚眼レンズ歪補正</translation>
+      <translation>魚眼補正</translation>
     </message>
     <message>
       <location/>
@@ -1369,7 +1369,7 @@
     <message>
       <location/>
       <source>Mount</source>
-      <translation>マウント</translation>
+      <translation>取付箇所</translation>
     </message>
     <message>
       <location/>
@@ -2080,7 +2080,7 @@
     <message>
       <location/>
       <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
-      <translation>通常より時間を要しますがお待ちください.</translation>
+      <translation>通常より時間を要しますがこのままお待ちください。</translation>
     </message>
   </context>
   <context>
@@ -2361,7 +2361,7 @@
     <message>
       <location/>
       <source>Default text will be used if this field is empty</source>
-      <translation>このフィールドが空の場合、既定のテキストが使用されます</translation>
+      <translation>このフィールドが空の場合、デフォルトのテキストが使用されます</translation>
     </message>
     <message>
       <location/>
@@ -3272,7 +3272,7 @@
     <message>
       <location/>
       <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
-      <translation>注： 画質とフレーム数のみで、録画スケジュールには影響しません.</translation>
+      <translation>注： 録画スケジュールの画質・フレームレート (FPS) 設定は無視されます。</translation>
     </message>
     <message>
       <location/>

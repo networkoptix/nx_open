@@ -1483,13 +1483,13 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>Password should not contain %n or more consecutive characters together.</source>
       <translation>
-        <numerusform>パスワードに %n 以上の連続した文字を含めないでください</numerusform>
+        <numerusform>パスワードには %n 個以上連続した文字を含めることはできません。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Password should not contain %n or more repeating characters.</source>
       <translation>
-        <numerusform>パスワードに %n 以上の繰り返し文字を使用しないでください</numerusform>
+        <numerusform>パスワードには %n 個以上連続した文字を含めることはできません。</numerusform>
       </translation>
     </message>
     <message>
@@ -1701,7 +1701,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>...and %n more</source>
       <translation>
-        <numerusform>...と更に %n</numerusform>
+        <numerusform>...さらに %n 件</numerusform>
       </translation>
     </message>
   </context>
@@ -3365,13 +3365,13 @@ to %1</source>
     <message numerus="yes">
       <source>and %n users more...</source>
       <translation>
-        <numerusform>%n ユーザーさらに...</numerusform>
+        <numerusform>さらに %n ユーザー...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>and %n more...</source>
       <translation>
-        <numerusform>%n さらに...</numerusform>
+        <numerusform>さらに %n 件...</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -3558,7 +3558,7 @@ to %1</source>
     </message>
     <message>
       <source>Open Event Rules Management</source>
-      <translation>アラーム/イベントルールを開く</translation>
+      <translation>イベントルール管理を開く</translation>
     </message>
     <message>
       <source>Open Audit Trail Log</source>
@@ -6146,7 +6146,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnTableExportHelper</name>
     <message>
       <source>Close all programs which may use this file and try again</source>
-      <translation>このファイルが使用するすべてのプログラムを閉じて、もう一度やり直してください</translation>
+      <translation>このファイルを使用するすべてのプログラムを閉じて、もう一度やり直してください</translation>
     </message>
     <message>
       <source>File used by another process</source>
@@ -7578,7 +7578,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Helps fix image quality issues on some cameras; for others will cause significant bitrate increase.</source>
-      <translation>一部のカメラで画質の問題を解決するのに役立ちますが、他のカメラのビットレート増価の原因になります。</translation>
+      <translation>一部のカメラで画質の問題を解決するのに役立ちますが、他のカメラではビットレートが大幅に増加します。</translation>
     </message>
     <message>
       <source>Custom number that can be assigned to a camera for quick identification and access</source>
@@ -7676,7 +7676,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::CameraScheduleWidget</name>
     <message>
       <source>License limit exceeded, recording will not be enabled.</source>
-      <translation>ライセンス数の限度を超えると、録画できなくなります</translation>
+      <translation>ライセンス上限を超過しているため、録画を有効化できません。</translation>
     </message>
     <message>
       <source>Recording Schedule</source>
@@ -7688,11 +7688,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Select areas on the schedule to apply chosen parameters to.</source>
-      <translation>スケジュールに選択した録画パラメーターを適用する範囲を選択します</translation>
+      <translation>選択したパラメータを適用するスケジュール領域を指定してください。</translation>
     </message>
     <message>
       <source>Set recording parameters and select areas on the schedule grid to apply them to.</source>
-      <translation>録音パラメーターを設定し、適用するスケジュール グリッド上の領域を選択します</translation>
+      <translation>録画パラメーターを指定した後、スケジュールグリッドの領域を選択することで録画スケジュールが設定されます。</translation>
     </message>
     <message>
       <source>Turn on selector at the top of the window to enable recording.</source>
@@ -7829,7 +7829,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n more required</source>
       <translation>
-        <numerusform>%n 以上必要</numerusform>
+        <numerusform>追加で %n ライセンス必要</numerusform>
       </translation>
     </message>
   </context>
@@ -8102,7 +8102,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>...and %n more</source>
       <translation>
-        <numerusform>...と更に %n</numerusform>
+        <numerusform>... さらに %n 件</numerusform>
       </translation>
     </message>
   </context>
@@ -8156,7 +8156,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Schedule motion type is not supported by some cameras.</source>
-      <translation>モーションタイプのスケジュールは幾つかのカメラでサポートされません.</translation>
+      <translation>モーションタイプのスケジュールは一部カメラではサポートされません。</translation>
     </message>
     <message>
       <source>Recording cannot be enabled for some cameras.</source>
@@ -8164,7 +8164,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Schedule settings are not compatible with some devices.</source>
-      <translation>幾つかのデバイスでスケジュール設定の互換性がありません.</translation>
+      <translation>スケジュール設定は、一部のデバイスと互換性がありません。</translation>
     </message>
   </context>
   <context>
@@ -8328,7 +8328,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>nx::vms::client::desktop::FisheyeSettingsWidget</name>
     <message>
       <source>Use this setting to compensate for distortion if camera is not mounted exactly vertically or horizontally.</source>
-      <translation>カメラが垂直または水平に正確に取り付けられていない場合は、この設定を使用して歪みを補正します。</translation>
+      <translation>カメラが正確に垂直または水平に取り付けられていない場合は、この設定を使用して歪みを補正します。</translation>
     </message>
     <message>
       <source>Equidistant</source>
@@ -8533,7 +8533,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>The specified IP address range has more than 255 addresses.</source>
-      <translation>IPアドレス範囲を255以内にしてください.</translation>
+      <translation>IPアドレス範囲を255以内にしてください。</translation>
     </message>
     <message>
       <source>Can not start the search process</source>
@@ -9455,7 +9455,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>... and %n more</source>
       <translation>
-        <numerusform>... %n さらに</numerusform>
+        <numerusform>... さらに %n 件</numerusform>
       </translation>
     </message>
     <message numerus="yes">

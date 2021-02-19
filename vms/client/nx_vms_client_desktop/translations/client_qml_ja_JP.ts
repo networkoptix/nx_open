@@ -337,7 +337,7 @@ PTZを有効にする</translation>
     <message>
       <source>You have no access to %1. Some features could be unavailable.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1 へのアクセスがありません　いくつかの機能が使用できない可能性があります</translation>
+      <translation>%1 へのアクセスがありません。一部機能が利用できない可能性があります。</translation>
     </message>
   </context>
 </TS>

@@ -45,7 +45,7 @@
   <String Id="SuccessRestartButton">再起動</String>
   <String Id="SuccessCloseButton">閉じる</String>
   <String Id="FailureHeader">セットアップに失敗しました</String>
-  <String Id="FailureHyperlinkLogText">セットアップ失敗の原因が1 つまたはそれ以上あります　問題を修正しセットアップを再試行してください　詳細については次を参照してください</String>
+  <String Id="FailureHyperlinkLogText">セットアップ失敗の原因が1 つまたはそれ以上あります。問題を修正しセットアップを再試行してください。詳細については次を参照してください。</String>
   <String Id="FailureHyperlinkLogTextLink">ログファイル</String>
   <String Id="FailureRestartText">ソフトウェアのロールバックを完了するにはコンピューターを再起動する必要があります</String>
   <String Id="FailureRestartButton">再起動</String>

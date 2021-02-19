@@ -306,11 +306,11 @@
     </message>
     <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
-      <translation>メディアエラー発生 デバイス障害を開いて詳細を確認してください.</translation>
+      <translation>メディアエラーが多すぎます。デバイス障害ダイアログを開いて詳細を確認してください。</translation>
     </message>
     <message>
       <source>Too many media errors. Please open camera issues dialog for more details.</source>
-      <translation>メディアエラー発生 カメラ障害を開いて詳細を確認してください.</translation>
+      <translation>メディアエラーが多すぎます。カメラ障害ダイアログを開いて詳細を確認してください。</translation>
     </message>
     <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
@@ -334,7 +334,7 @@
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-      <translation>メディアエラー発生　IOモジュール障害を開いて詳細を確認してください.　</translation>
+      <translation>メディアエラーが多すぎます。I/Oモジュール障害ダイアログを開いて詳細を確認してください。</translation>
     </message>
     <message>
       <source>Device initialization process is in progress.</source>
@@ -480,7 +480,7 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>録音用の出力ストリームを割り当てることができません.</translation>
+      <translation>録画用の出力ストリームを割り当てることができません。</translation>
     </message>
     <message>
       <source>Could not perform direct stream copy because frame size is undefined.</source>
@@ -787,25 +787,25 @@
     <message numerus="yes">
       <source>%n %2 are used out of %1.</source>
       <translation>
-        <numerusform>%1.ライセンス中の %n %2 を使用.</numerusform>
+        <numerusform>%1 ライセンス中の %n %2 を使用します。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n %2 will be used out of %1.</source>
       <translation>
-        <numerusform>%1.ライセンス中の %n %2 を使用.</numerusform>
+        <numerusform>%1 ライセンス中の %n %2 を使用します。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Activate %n more %1.</source>
       <translation>
-        <numerusform>%n より %1 をアクティブにします</numerusform>
+        <numerusform>追加で %n %1 を有効化してください。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n more %1 will be used.</source>
       <translation>
-        <numerusform>%n より多くの %1 が使用されます</numerusform>
+        <numerusform>追加で %n %1 が使用されます。</numerusform>
       </translation>
     </message>
   </context>
@@ -990,11 +990,11 @@
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
-      <translation>録音用の出力ストリームを割り当てることができません.</translation>
+      <translation>録画用の出力ストリームを割り当てることができません。</translation>
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
-      <translation>録音用の出力ストリームを割り当てることができません.</translation>
+      <translation>音声出力ストリームを割り当てることができません。</translation>
     </message>
     <message>
       <source>Invalid audio codec information.</source>
@@ -1745,7 +1745,7 @@
     </message>
     <message>
       <source>Failed to force using camera time, it lags too much, system time will be used</source>
-      <translation>カメラ時間が使用できませんでした。時間がかかりすぎます。システム時間が使用されます。</translation>
+      <translation>時刻ずれが大きすぎるため、カメラ時刻は使用できませんでした。システム時刻が使用されます。</translation>
     </message>
     <message>
       <source>Camera time is back to normal</source>
