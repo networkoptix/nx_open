@@ -45,7 +45,7 @@ bool QnCloudSystemDescription::isCloudSystem() const
 
 bool QnCloudSystemDescription::isRunning() const
 {
-    return m_running && isReachable();
+    return m_running || isReachable();
 }
 
 bool QnCloudSystemDescription::isNewSystem() const
