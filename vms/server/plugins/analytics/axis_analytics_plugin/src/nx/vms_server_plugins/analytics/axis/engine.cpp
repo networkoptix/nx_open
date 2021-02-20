@@ -141,9 +141,10 @@ namespace {
 static const std::string kPluginManifest = /*suppress newline*/ 1 + (const char*) R"json(
 {
     "id": "nx.axis",
-    "name": "Axis analytics plugin",
-    "description": "Supports built-in analytics on Axis cameras",
-    "version": "1.0.0"
+    "name": "Axis Camera Analytics",
+    "description": "Enables in-camera analytics support for Axis IP Cameras",
+    "version": "1.0.0",
+    "vendor": "Axis"
 }
 )json";
 

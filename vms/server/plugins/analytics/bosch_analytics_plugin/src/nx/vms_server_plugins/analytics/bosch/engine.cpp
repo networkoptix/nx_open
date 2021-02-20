@@ -148,8 +148,8 @@ namespace {
 static const std::string kPluginManifest = /*suppress newline*/ 1 + (const char*)R"json(
 {
     "id": "nx.bosch",
-    "name": "Bosch analytics",
-    "description": "Access control solution designed to make it easier than ever to manage and monitoring facility access.",
+    "name": "Bosch Camera Analytics",
+    "description": "Enables in-camera analytics support for Bosch IP Cameras",
     "version": "1.0.0",
     "vendor": "Bosch"
 }

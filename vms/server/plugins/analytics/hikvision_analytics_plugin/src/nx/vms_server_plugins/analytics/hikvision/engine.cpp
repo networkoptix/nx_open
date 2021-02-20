@@ -340,9 +340,10 @@ namespace {
 static const std::string kPluginManifest = /*suppress newline*/ 1 + (const char*) R"json(
 {
     "id": "nx.hikvision",
-    "name": "Hikvision analytics plugin",
-    "description": "Supports built-in analytics on Hikvision cameras",
-    "version": "1.0.0"
+    "name": "Hikvision Camera Analytics",
+    "description": "Enables in-camera analytics support for Hikvision IP Cameras",
+    "version": "1.0.0",
+    "vendor": "Hikvision"
 }
 )json";
 

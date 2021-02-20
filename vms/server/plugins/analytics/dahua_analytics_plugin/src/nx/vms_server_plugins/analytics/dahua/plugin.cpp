@@ -26,9 +26,10 @@ void Plugin::getManifest(Result<const IString*>* outResult) const
         {
             const auto manifest = QJsonObject{
                 {"id", "nx.dahua"},
-                {"name", "Dahua analytics plugin"},
-                {"description", "Supports built-in analytics on Dahua cameras"},
+                {"name", "Dahua Camera Analytics"},
+                {"description", "Enables in-camera analytics support for Dahua IP Cameras"},
                 {"version", "1.0.0"},
+                {"vendor", "Dahua"},
             };
 
             return new sdk::String(QJson::serialize(manifest).toStdString());

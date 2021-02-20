@@ -21,8 +21,8 @@ void Plugin::getManifest(Result<const IString*>* outResult) const
         {
             const auto manifest = QJsonObject{
                 {"id", "nx.vivotek"},
-                {"name", "VIVOTEK analytics plugin"},
-                {"description", "Supports analytics on VIVOTEK cameras."},
+                {"name", "VIVOTEK Camera Analytics"},
+                {"description", "Enables in-camera analytics support for VIVOTEK IP Cameras"},
                 {"version", "1.0.0"},
                 {"vendor", "VIVOTEK"},
             };

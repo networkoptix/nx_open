@@ -390,12 +390,14 @@ bool Engine::isCompatible(const IDeviceInfo* deviceInfo) const
 
 namespace {
 
+// Integration with SSC gasoline guns using RS232 protocol.
 static const std::string kPluginManifest = /*suppress newline*/ 1 + (const char*) R"json(
 {
     "id": "nx.ssc",
-    "name": "SSC analytics plugin",
-    "description": "Supports integration with SSC gasoline guns using RS232 protocol",
-    "version": "1.0.0"
+    "name": "SSC Camera Analytics",
+    "description": "Enables in-camera analytics support for SSC IP Cameras",
+    "version": "1.0.0",
+    "vendor": "SSC"
 }
 )json";
 

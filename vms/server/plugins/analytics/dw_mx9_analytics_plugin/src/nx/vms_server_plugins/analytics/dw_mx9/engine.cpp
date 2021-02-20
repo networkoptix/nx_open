@@ -124,18 +124,21 @@ namespace {
 static const std::string kDwMx9PluginManifest = /*suppress newline*/ 1 + (const char*) R"json(
 {
     "id": "nx.dw_mx9",
-    "name": "DW Mx9 analytic plugin",
-    "description": "Supports built-in analytics on Digital Watchdog DWC-Mx9 series cameras",
-    "version": "1.0.1"
+    "name": "DW Mx9 Camera Analytics",
+    "description": "Enables in-camera analytics support for DW Mx9 IP Cameras",
+    "version": "1.0.1",
+    "vendor": "DW MTT"
 }
 )json";
 
+// Used for 340IPE / 341IPE series.
 static const std::string kProvisionPluginManifest = /*suppress newline*/ 1 + (const char*)R"json(
 {
     "id": "nx.provision_isr",
-    "name": "Provision ISR analytics plugin",
-    "description": "Supports built-in analytics on Provision ISR cameras (340IPE / 341IPE series)",
-    "version": "1.0.1"
+    "name": "Provision ISR Camera Analytics",
+    "description": "Enables in-camera analytics support for Provision ISR IP Cameras",
+    "version": "1.0.1",
+    "vendor": "Provision ISR"
 }
 )json";
 

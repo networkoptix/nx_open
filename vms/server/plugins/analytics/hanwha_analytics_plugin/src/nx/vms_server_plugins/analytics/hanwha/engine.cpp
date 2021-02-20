@@ -367,8 +367,8 @@ namespace {
 static const std::string kPluginManifest = /*suppress newline*/ 1 + (const char*) R"json(
 {
     "id": "nx.hanwha",
-    "name": "Hanwha analytics",
-    "description": "Supports built-in analytics on Hanwha cameras",
+    "name": "Hanwha Camera Analytics",
+    "description": "Enables in-camera analytics support for Hanwha IP Cameras",
     "version": "1.0.1",
     "vendor": "Hanwha"
 }

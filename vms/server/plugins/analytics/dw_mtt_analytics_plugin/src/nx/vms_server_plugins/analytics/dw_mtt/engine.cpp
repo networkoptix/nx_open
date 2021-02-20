@@ -131,9 +131,10 @@ namespace {
 static const std::string kPluginManifest = /*suppress newline*/ 1 + (const char*) R"json(
 {
     "id": "nx.dw_mtt",
-    "name": "DW MTT analytics plugin",
-    "description": "Supports built-in analytics on Digital Watchdog cameras (MTT series)",
-    "version": "1.0.0"
+    "name": "DW MTT Camera Analytics",
+    "description": "Enables in-camera analytics support for DW MTT IP Cameras",
+    "version": "1.0.0",
+    "vendor": "DW MTT"
 }
 )json";
 
