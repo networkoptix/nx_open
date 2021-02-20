@@ -5,7 +5,7 @@
     [
         {
             "id": "nx.bosch.ObjectDetection.AnyObject",
-            "name": "Some object tracking",
+            "name": "Object tracking",
             "internalName": "AnyObject",
             "_comment": "Bosch does not send object type information"
         }
