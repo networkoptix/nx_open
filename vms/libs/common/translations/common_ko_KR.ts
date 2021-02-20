@@ -762,23 +762,23 @@
     </message>
     <message>
       <source>NVR</source>
-      <translation type="unfinished">NVR</translation>
+      <translation>NVR</translation>
     </message>
     <message>
       <source>NVR Licenses</source>
-      <translation type="unfinished">NVR Licenses</translation>
+      <translation>NVR 라이선스</translation>
     </message>
     <message numerus="yes">
       <source>%n NVR Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n NVR Licenses</numerusform>
+      <translation>
+        <numerusform>%n NVR 라이센스</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 NVR Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 NVR Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 NVR 라이센스</numerusform>
       </translation>
     </message>
   </context>
@@ -849,11 +849,11 @@
     </message>
     <message>
       <source>Only one NVR license is allowed per System.</source>
-      <translation type="unfinished">Only one NVR license is allowed per System.</translation>
+      <translation>시스템 당 하나의 NVR 라이센스 만 허용됩니다.</translation>
     </message>
     <message>
       <source>You already have one active NVR license.</source>
-      <translation type="unfinished">You already have one active NVR license.</translation>
+      <translation>이미 하나의 활성 NVR 라이센스가 있습니다.</translation>
     </message>
     <message>
       <source>Only one license of this type is allowed per System.</source>

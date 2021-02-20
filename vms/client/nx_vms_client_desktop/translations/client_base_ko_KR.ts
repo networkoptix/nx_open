@@ -988,8 +988,8 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
-      <translation type="unfinished">
-        <numerusform>Show on Items</numerusform>
+      <translation>
+        <numerusform>아이템 표시</numerusform>
       </translation>
     </message>
   </context>
@@ -1591,7 +1591,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>PTZ can only be used in the live mode</source>
-      <translation type="unfinished">PTZ can only be used in the live mode</translation>
+      <translation>PTZ는 라이브 모드에서만 사용할 수 있습니다.</translation>
     </message>
   </context>
   <context>
@@ -5771,7 +5771,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Insufficient permissions to store analytics data.</source>
-      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+      <translation>분석 데이터를 저장할 수있는 권한이 없습니다.</translation>
     </message>
   </context>
   <context>
@@ -8275,7 +8275,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>AVI format is not recommended to export a recording with audio track.</source>
-      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
+      <translation>AVI 형식은 오디오 트랙이있는 녹음을 내보내는 데 권장되지 않습니다.</translation>
     </message>
   </context>
   <context>
@@ -9867,7 +9867,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Regions of Interest</source>
-      <translation type="unfinished">Regions of Interest</translation>
+      <translation>관심 영역</translation>
     </message>
   </context>
   <context>

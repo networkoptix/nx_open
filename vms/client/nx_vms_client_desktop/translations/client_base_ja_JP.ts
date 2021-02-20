@@ -3927,7 +3927,7 @@ to %1</source>
       <source>%1 are currently in use</source>
       <comment>Text like &apos;6 Profesional Licenses&apos; will be substituted</comment>
       <translation>
-        <numerusform>%1 は現在使用中です</numerusform>
+        <numerusform>%1 を使用中</numerusform>
       </translation>
     </message>
     <message numerus="yes">
