@@ -5838,7 +5838,7 @@ Se si intende spostare i dati di analisi in un'altra posizione di memoria, conta
     </message>
     <message>
       <source>Insufficient permissions to store analytics data.</source>
-      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+      <translation>Autorizzazioni insufficienti per memorizzare i dati di analisi.</translation>
     </message>
   </context>
   <context>
