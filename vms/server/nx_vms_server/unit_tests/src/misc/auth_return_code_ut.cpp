@@ -167,14 +167,16 @@ public:
         const nx::vms::api::UserData& userDataToUse,
         nx::network::http::AuthType authType,
         int expectedStatusCode,
-        Qn::AuthResult expectedAuthResult)
+        Qn::AuthResult expectedAuthResult,
+        bool expectAuditRecordOnFailure = true)
     {
         testServerReturnCode(
             userDataToUse.name,
             "invalid password",
             authType,
             expectedStatusCode,
-            expectedAuthResult);
+            expectedAuthResult,
+            expectAuditRecordOnFailure);
     }
 
     void testCookieAuth(
@@ -254,7 +256,8 @@ public:
         const QString& password,
         nx::network::http::AuthType authType,
         int expectedStatusCode,
-        boost::optional<Qn::AuthResult> expectedAuthResult = boost::none)
+        boost::optional<Qn::AuthResult> expectedAuthResult = boost::none,
+        bool expectAuditRecordOnFailure = true)
     {
         auto httpClient = std::make_unique<nx::network::http::HttpClient>();
         httpClient->setUserName(login);
@@ -263,13 +266,19 @@ public:
         httpClient->addAdditionalHeader(Qn::CUSTOM_CHANGE_REALM_HEADER_NAME, QByteArray());
         httpClient->setDisablePrecalculatedAuthorization(
             m_precalculatedAuthorizationInHttpClientDisabled);
-        testServerReturnCode(std::move(httpClient), expectedStatusCode, expectedAuthResult);
+
+        testServerReturnCode(
+            std::move(httpClient),
+            expectedStatusCode,
+            expectedAuthResult,
+            expectAuditRecordOnFailure);
     }
 
     void testServerReturnCode(
         std::unique_ptr<nx::network::http::HttpClient> httpClient,
         int expectedStatusCode,
-        boost::optional<Qn::AuthResult> expectedAuthResult = boost::none)
+        boost::optional<Qn::AuthResult> expectedAuthResult = boost::none,
+        bool expectAuditRecordOnFailure = true)
     {
         const auto startTime = std::chrono::steady_clock::now();
         constexpr const auto maxPeriodToWaitForMediaServerStart = std::chrono::seconds(150);
@@ -305,16 +314,19 @@ public:
                 static const std::chrono::seconds kMaxWaitTime(10);
                 nx::utils::ElapsedTimer timer;
                 timer.restart();
-                // Server send "Unauthorized" response before it write data to the auditLog.
-                do
+                if (expectAuditRecordOnFailure)
                 {
-                    server->commonModule()->auditManager()->flushAuditRecords();
-                    outputData = server->serverModule()->serverDb()->getAuditData(period, QnUuid());
-                    if (outputData.isEmpty())
-                        std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                } while (outputData.isEmpty() && timer.elapsed() < kMaxWaitTime);
-                ASSERT_TRUE(!outputData.isEmpty());
-                ASSERT_EQ(Qn::AuditRecordType::AR_UnauthorizedLogin, outputData.last().eventType);
+                    // Server send "Unauthorized" response before it write data to the auditLog.
+                    do
+                    {
+                        server->commonModule()->auditManager()->flushAuditRecords();
+                        outputData = server->serverModule()->serverDb()->getAuditData(period, QnUuid());
+                        if (outputData.isEmpty())
+                            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                    } while (outputData.isEmpty() && timer.elapsed() < kMaxWaitTime);
+                    ASSERT_TRUE(!outputData.isEmpty());
+                    ASSERT_EQ(Qn::AuditRecordType::AR_UnauthorizedLogin, outputData.last().eventType);
+                }
             }
         }
     }
@@ -407,7 +419,8 @@ TEST_F(AuthenticationTest, noCloudConnect)
         userData,
         nx::network::http::AuthType::authDigest,
         nx::network::http::StatusCode::unauthorized,
-        Qn::Auth_CloudConnectError);
+        Qn::Auth_CloudConnectError,
+        /*expectAuditRecordOnFailure*/ false);
 
 }
 
@@ -484,14 +497,16 @@ TEST_F(AuthenticationTest, noLdapConnect)
         ldapUserWithEmptyDigest,
         nx::network::http::AuthType::authBasicAndDigest,
         nx::network::http::StatusCode::unauthorized,
-        Qn::Auth_LDAPConnectError);
+        Qn::Auth_LDAPConnectError,
+        /*expectAuditRecordOnFailure*/ false);
 
     // We have cloud user but not connected to cloud yet.
     testServerReturnCodeForWrongPassword(
         ldapUserWithFilledDigest,
         nx::network::http::AuthType::authBasicAndDigest, //< TODO: should be set to only digest.
         nx::network::http::StatusCode::unauthorized,
-        Qn::Auth_LDAPConnectError);
+        Qn::Auth_LDAPConnectError,
+        /*expectAuditRecordOnFailure*/ false);
 }
 
 TEST_F(AuthenticationTest, ldapCachedPasswordHasExpired)

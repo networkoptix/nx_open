@@ -143,7 +143,12 @@ bool QnUniversalRequestProcessor::authenticate(Qn::UserAccessData* accessRights,
         }
         else if (result.code != Qn::Auth_OK)
         {
-            if (result.code != Qn::Auth_WrongInternalLogin)
+            if (result.code == Qn::Auth_WrongLogin
+                || result.code == Qn::Auth_WrongDigest
+                || result.code == Qn::Auth_WrongPassword
+                || result.code == Qn::Auth_Forbidden
+                || result.code == Qn::Auth_DisabledUser
+                || result.code == Qn::Auth_InvalidCsrfToken)
             {
                 NX_DEBUG(this, "Failure to authenticate request %1 with error %2. userName: %3",
                     url.toString(QUrl::RemoveAuthority),
