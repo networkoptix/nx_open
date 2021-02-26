@@ -57,6 +57,20 @@ class GenericHttpSigningClient():
                 backoff_factor=0.1)
             session = requests.Session()
             session.mount(self.url, HTTPAdapter(max_retries=retries))
+            # An additional redirection check to avoid repeating a file transfer.
+            response = session.get(self.url)
+            if response.history:
+                if len(response.history) > 1:
+                    raise Exception("Too many redirects. Please check the nginx configuration.")
+                elif response.history[0].status_code not in [301, 307, 308]:
+                    raise Exception(
+                        "Unexpected redirect: {} {}. Please, check configuration".format(
+                            response.history[0].status_code,
+                            response.history[0].reason
+                        )
+                    )
+                else:
+                    self.url = response.url
             try:
                 with open(self.file, 'rb') as file_handle:
                     r = session.post(
