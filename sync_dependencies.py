@@ -224,7 +224,7 @@ def sync_dependencies(target, syncher, platform, arch, box, release_version, opt
         if platform == "windows" or (platform == "linux" and arch == "x64"):
             sync("vms_benchmark-dev", version="")
             sync("any/vms_benchmark_aux_files", version="")
-            sync("dw_edge_analytics_plugin", version="")
+            sync("dw_edge_analytics_plugin", version="2.0.18")
 
         sync("sigar")
         sync("any/apidoctool", version="2.1")
