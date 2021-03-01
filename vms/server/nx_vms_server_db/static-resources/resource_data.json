@@ -16,7 +16,7 @@
     "If it undershoots, then 35mm fov should be decreased.           "
     ],
 
-    "version": "4.2.1.1",
+    "version": "4.2.1.2",
     "data": [
         {
             "keys": [
@@ -3616,6 +3616,7 @@
             }
         },
         {
+            "_comment1": "Mapping updated for firmware: HCMN-R2103.28.11.200423",
             "keys": [
                 "UNIVIEW|IPC6252SL-X33*", "NONE|IPC6252SL-X33*", "UNIVIEW|IPC6252SR*"
             ],
@@ -3628,7 +3629,7 @@
                     },
                     "y": {
                         "extrapolationMode": "ConstantExtrapolation",
-                        "device":  [1, -0.1666667],
+                        "device":  [1, -1],
                         "logical": [-90, 15]
                     },
                     "z": {
