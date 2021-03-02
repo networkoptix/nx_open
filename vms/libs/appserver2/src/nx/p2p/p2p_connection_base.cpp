@@ -318,6 +318,7 @@ void ConnectionBase::onHttpClientDone()
 
     if (useWebsocketMode)
     {
+        NX_DEBUG(this, "Using websocket p2p transport for connection with '%1'", m_httpClient->url());
         auto socket = m_httpClient->takeSocket();
         socket->setNonBlockingMode(true);
         m_p2pTransport.reset(new P2PWebsocketTransport(
@@ -325,6 +326,7 @@ void ConnectionBase::onHttpClientDone()
     }
     else
     {
+        NX_DEBUG(this, "Using http p2p transport for connection with '%1'", m_httpClient->url());
         auto url = m_httpClient->url();
         auto urlPath = url.path().replace(kWebsocketUrlPath, kHttpUrlPath);
         url.setPath(urlPath);
@@ -499,6 +501,9 @@ void ConnectionBase::onMessageSent(SystemError::ErrorCode errorCode, size_t byte
     if (errorCode != SystemError::noError ||
         bytesSent == 0)
     {
+        NX_DEBUG(
+            this, "onMessageSent: Connection closed. Error: %1, bytesSent: %2",
+            errorCode, bytesSent);
         setState(State::Error);
         return;
     }
@@ -524,12 +529,14 @@ void ConnectionBase::onNewMessageRead(SystemError::ErrorCode errorCode, size_t b
 {
     if (bytesRead == 0)
     {
+        NX_DEBUG( this, "onNewMessageRead: Connection closed by remote peer");
         setState(State::Error);
         return; //< connection closed
     }
 
     if (errorCode != SystemError::noError || !handleMessage(m_readBuffer))
     {
+        NX_DEBUG( this, "onNewMessageRead: Connection closed with error: %1", errorCode);
         setState(State::Error);
         return;
     }
