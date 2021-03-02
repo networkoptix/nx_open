@@ -64,11 +64,17 @@ void MetadataParser::parsePacket(QByteArray bytes, int64_t timestampUs)
         {
             m_xml.skipCurrentElement();
         }
-    }
-    if (m_xml.hasError())
-    {
-        NX_DEBUG(NX_SCOPE_TAG, "Failed to parse metadata XML at %1:%2: %3 [[[%4]]]",
-            m_xml.lineNumber(), m_xml.columnNumber(), m_xml.errorString(), bytes);
+
+        /*
+         This error check is moved here form beneath the loop while fixing spurious "Premature
+         end of document" bug. The whole xml-reading algorithm in incorrect (has many excessive
+         steps) and should be rewritten in future.
+        */
+        if (m_xml.hasError())
+        {
+            NX_DEBUG(NX_SCOPE_TAG, "Failed to parse metadata XML at %1:%2: %3 [[[%4]]]",
+                m_xml.lineNumber(), m_xml.columnNumber(), m_xml.errorString(), bytes);
+        }
     }
 }
 
@@ -97,7 +103,7 @@ void MetadataParser::processEvent(HikvisionEvent* event)
 
     if (entry.trackId.isNull())
         return;
-    
+
     processEntry(&entry, event);
 }
 
@@ -339,7 +345,7 @@ void MetadataParser::parseTargetElement()
             m_xml.skipCurrentElement();
         }
     }
-    if (m_xml.hasError())
+    if (m_xml.hasError())//
         return;
 
     if (!trackId || !typeId)
@@ -456,7 +462,7 @@ void MetadataParser::processEntry(CacheEntry* entry, HikvisionEvent* event)
     if (!entry->boundingBox)
         return;
 
-    const auto changeTrackId = 
+    const auto changeTrackId =
         [&]()
         {
             const auto closingMetadataPacket = makeMetadataPacket(*entry);
@@ -506,7 +512,7 @@ void MetadataParser::processEntry(CacheEntry* entry, HikvisionEvent* event)
 
     const auto metadataPacket = makeMetadataPacket(*entry);
     m_handler->handleMetadata(metadataPacket.get());
-    
+
     if (shouldGenerateBestShot)
     {
         const auto bestShotPacket = makePtr<ObjectTrackBestShotPacket>();
@@ -515,7 +521,7 @@ void MetadataParser::processEntry(CacheEntry* entry, HikvisionEvent* event)
         bestShotPacket->setBoundingBox(*entry->boundingBox);
         m_handler->handleMetadata(bestShotPacket.get());
     }
-    
+
     if (event)
         event->trackId = entry->originalTrackId;
 }
