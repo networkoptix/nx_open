@@ -78,6 +78,11 @@ protected:
         m_rawDataChannel->setReadErrorState(SystemError::connectionReset);
     }
 
+    void givenDepletedDataSource()
+    {
+        m_rawDataChannel->setReadErrorState(std::make_tuple(SystemError::noError, 0));
+    }
+
     void whenReceiveRandomBytes()
     {
         auto randomBytes = nx::utils::generateRandomName(128);
@@ -134,6 +139,11 @@ protected:
     void thenRecvFailed()
     {
         ASSERT_NE(SystemError::noError, m_recvResultQueue.pop());
+    }
+
+    void thenEofIsReported()
+    {
+        ASSERT_EQ(SystemError::connectionReset, m_recvResultQueue.pop());
     }
 
     void thenDefaultDelegateIsSelected()
@@ -225,6 +235,16 @@ TEST_F(ProtocolDetectingAsyncChannel, data_source_io_error_is_reported)
     givenBrokenDataSource();
     whenReadAsync();
     thenRecvFailed();
+}
+
+TEST_F(ProtocolDetectingAsyncChannel, data_source_eof_is_reported)
+{
+    registerMultipleProtocols();
+    givenDepletedDataSource();
+
+    whenReadAsync();
+
+    thenEofIsReported();
 }
 
 } // namespace test

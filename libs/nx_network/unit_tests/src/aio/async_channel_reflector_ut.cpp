@@ -66,8 +66,8 @@ protected:
 
     void whenUnderlyingChannelIsFullyFunctionalAgain()
     {
-        m_channelToReflect->setSendErrorState(boost::none);
-        m_channelToReflect->setReadErrorState(boost::none);
+        m_channelToReflect->setSendErrorState(std::nullopt);
+        m_channelToReflect->setReadErrorState(std::nullopt);
     }
 
     void thenSameDataHasBeenReflected()

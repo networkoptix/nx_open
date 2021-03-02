@@ -292,13 +292,14 @@ void BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::readProtoco
 template<typename Base, typename AsyncChannelInterface>
 void BaseProtocolDetectingAsyncChannel<Base, AsyncChannelInterface>::analyzeReadResult(
     SystemError::ErrorCode osErrorCode,
-    std::size_t /*bytesRead*/)
+    std::size_t bytesRead)
 {
-    if (osErrorCode != SystemError::noError)
+    if (osErrorCode != SystemError::noError ||
+        bytesRead == 0) //< Connection is closed.
     {
         nx::utils::swapAndCall(
             m_protocolDetectionCompletionHandler,
-            osErrorCode);
+            osErrorCode == SystemError::noError ? SystemError::connectionReset : osErrorCode);
         return;
     }
 

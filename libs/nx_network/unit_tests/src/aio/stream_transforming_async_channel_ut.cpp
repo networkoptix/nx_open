@@ -453,8 +453,8 @@ protected:
 
     void whenUnderlyingChannelIsFullyFunctionalAgain()
     {
-        rawDataChannel()->setReadErrorState(boost::none);
-        rawDataChannel()->setSendErrorState(boost::none);
+        rawDataChannel()->setReadErrorState(std::nullopt);
+        rawDataChannel()->setSendErrorState(std::nullopt);
     }
 
     void thenReadTimedoutHasBeenRaised()

@@ -2,8 +2,8 @@
 
 #include <atomic>
 #include <memory>
-
-#include <boost/optional.hpp>
+#include <optional>
+#include <tuple>
 
 #include <nx/network/abstract_socket.h>
 #include <nx/network/aio/abstract_async_channel.h>
@@ -29,6 +29,8 @@ public:
         retry,
     };
 
+    using IoState = std::tuple<SystemError::ErrorCode, size_t /*bytes*/>;
+
     AsyncChannel(
         utils::bstream::AbstractInput* input,
         utils::bstream::AbstractOutput* output,
@@ -36,9 +38,11 @@ public:
     virtual ~AsyncChannel() override;
 
     virtual void bindToAioThread(AbstractAioThread* aioThread) override;
+
     virtual void readSomeAsync(
         nx::Buffer* const buffer,
         IoCompletionHandler handler) override;
+
     virtual void sendAsync(
         const nx::Buffer& buffer,
         IoCompletionHandler handler) override;
@@ -51,8 +55,10 @@ public:
     void waitForReadSequenceToBreak();
     QByteArray dataRead() const;
     void setErrorState();
-    void setSendErrorState(boost::optional<SystemError::ErrorCode> sendErrorCode);
-    void setReadErrorState(boost::optional<SystemError::ErrorCode> sendErrorCode);
+    void setSendErrorState(std::optional<IoState> sendErrorCode);
+    void setSendErrorState(SystemError::ErrorCode errorCode);
+    void setReadErrorState(std::optional<IoState> sendErrorCode);
+    void setReadErrorState(SystemError::ErrorCode errorCode);
 
     void waitForAnotherReadErrorReported();
     void waitForAnotherSendErrorReported();
@@ -67,8 +73,8 @@ private:
     utils::bstream::AbstractInput* m_input;
     utils::bstream::AbstractOutput* m_output;
     InputDepletionPolicy m_inputDepletionPolicy;
-    boost::optional<SystemError::ErrorCode> m_readErrorState;
-    boost::optional<SystemError::ErrorCode> m_sendErrorState;
+    std::optional<IoState> m_readErrorState;
+    std::optional<IoState> m_sendErrorState;
     std::atomic<std::size_t> m_totalBytesRead;
     mutable QnMutex m_mutex;
     QByteArray m_totalDataRead;
