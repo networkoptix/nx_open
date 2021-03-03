@@ -550,7 +550,7 @@ APPLY(407, saveStorage, nx::vms::api::StorageData, \
                        false, /* system*/ \
                        CreateHashByIdHelper(), /* getHash*/ \
                        MediaServerNotificationManagerHelper(), \
-                       ModifyResourceAccess(), /* save permission checker */ \
+                       ModifyStorageAccess(), /* save permission checker */ \
                        ReadResourceAccess(), /* read permission checker */ \
                        InvalidFilterFunc(), /* Filter save func */ \
                        InvalidFilterFunc(), /* Filter read func */ \
@@ -563,7 +563,7 @@ APPLY(408, saveStorages, nx::vms::api::StorageDataList, \
                        MediaServerNotificationManagerHelper(), \
                        InvalidAccess(), /* save permission checker */ \
                        InvalidAccess(), /* read permission checker */ \
-                       FilterListByAccess<ModifyResourceAccess>(), /* Filter save func */ \
+                       FilterListByAccess<ModifyStorageAccess>(), /* Filter save func */ \
                        FilterListByAccess<ReadResourceAccess>(), /* Filter read func */ \
                        ReadListAccessOut<ReadResourceAccess>(), /* Check remote peer rights for outgoing transaction */ \
                        RegularTransactionType()) /* regular transaction type */ \

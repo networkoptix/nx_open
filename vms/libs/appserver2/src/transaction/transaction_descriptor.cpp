@@ -18,6 +18,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <utils/license_usage_helper.h>
+#include <nx_ec/data/api_conversion_functions.h>
 
 #include <nx/cloud/db/client/data/auth_data.h>
 
@@ -27,6 +28,30 @@
 using namespace nx::vms;
 
 namespace ec2 {
+
+namespace transaction_descriptor {
+
+ErrorCode canModifyStorage(const CanModifyStorageData& data)
+{
+    if (data.modifyResourceResult != ErrorCode::ok)
+        return data.modifyResourceResult;
+
+    if (!data.hasExistingStorage)
+        return ErrorCode::ok;
+
+    const auto existingStorage = data.getExistingStorageDataFunc();
+    if (existingStorage.parentId == data.request.parentId
+        && data.request.url != existingStorage.url)
+    {
+        data.logErrorFunc(nx::format(
+            "Got inconsistent update request for storage '%1'. Urls differ.", data.request.id));
+        return ErrorCode::badRequest;
+    }
+
+    return ErrorCode::ok;
+}
+
+} // namespace transaction_descriptor
 
 namespace detail {
 
@@ -507,6 +532,32 @@ struct ModifyResourceAccess
         }
 
         return ErrorCode::ok;
+    }
+};
+
+struct ModifyStorageAccess
+{
+    ErrorCode operator()(
+        QnCommonModule* commonModule,
+        const Qn::UserAccessData& accessData,
+        const nx::vms::api::StorageData& param)
+    {
+        transaction_descriptor::CanModifyStorageData data;
+        const auto existingResource = commonModule->resourcePool()->getResourceById(param.id);
+        data.hasExistingStorage = (bool) existingResource;
+        data.getExistingStorageDataFunc =
+            [&]()
+            {
+                nx::vms::api::ResourceData result;
+                fromResourceToApi(existingResource, result);
+                return result;
+            };
+
+        data.logErrorFunc = [this](const QString& message) { NX_DEBUG(this, message); };
+        data.modifyResourceResult = ModifyResourceAccess()(commonModule, accessData, param);
+        data.request = param;
+
+        return transaction_descriptor::canModifyStorage(data);
     }
 };
 

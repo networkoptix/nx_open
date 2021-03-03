@@ -78,6 +78,21 @@ enum class RemotePeerAccess
     Partial
 };
 
+namespace transaction_descriptor {
+
+struct CanModifyStorageData
+{
+    ErrorCode modifyResourceResult = ErrorCode::failure;
+    bool hasExistingStorage;
+    nx::vms::api::StorageData request;
+    std::function<void(const QString&)> logErrorFunc;
+    std::function<nx::vms::api::ResourceData()> getExistingStorageDataFunc;
+};
+
+ErrorCode canModifyStorage(const CanModifyStorageData& data);
+
+} // namespace transaction_descriptor
+
 namespace detail {
 
 struct NoneType {};
