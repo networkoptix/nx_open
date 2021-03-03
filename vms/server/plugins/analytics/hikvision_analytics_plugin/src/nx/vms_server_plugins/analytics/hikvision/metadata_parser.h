@@ -84,6 +84,7 @@ private:
     void parseTargetListElement();
     void parseTargetDetectionElement();
     void parseMetadataElement();
+    void gotoElementEnd();
 
     nx::sdk::Ptr<nx::sdk::analytics::ObjectMetadataPacket> makeMetadataPacket(
         const CacheEntry& entry);

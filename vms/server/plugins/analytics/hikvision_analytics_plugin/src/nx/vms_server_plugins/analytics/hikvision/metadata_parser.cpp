@@ -51,30 +51,22 @@ void MetadataParser::parsePacket(QByteArray bytes, int64_t timestampUs)
 
     m_currentTimestampUs = timestampUs;
 
-    while (m_xml.readNextStartElement())
+    if (m_xml.readNextStartElement() && m_xml.name() == "Metadata")
     {
-        if (m_xml.name() == "Metadata")
-        {
-            m_sinceLastMetadata.restart();
-            m_lastMetadataTimestampUs = m_currentTimestampUs;
+        m_lastMetadataTimestampUs = m_currentTimestampUs;
+        m_sinceLastMetadata.restart();
+        parseMetadataElement();
 
-            parseMetadataElement();
-        }
-        else
-        {
-            m_xml.skipCurrentElement();
-        }
-
-        /*
-         This error check is moved here form beneath the loop while fixing spurious "Premature
-         end of document" bug. The whole xml-reading algorithm in incorrect (has many excessive
-         steps) and should be rewritten in future.
-        */
         if (m_xml.hasError())
         {
             NX_DEBUG(NX_SCOPE_TAG, "Failed to parse metadata XML at %1:%2: %3 [[[%4]]]",
                 m_xml.lineNumber(), m_xml.columnNumber(), m_xml.errorString(), bytes);
         }
+    }
+    else
+    {
+        NX_DEBUG(NX_SCOPE_TAG, "Failed to parse metadata XML. Unknown root element: %1,\n[[[\n%2\n]]]",
+            m_xml.name(), bytes);
     }
 }
 
@@ -171,8 +163,8 @@ std::optional<nx::sdk::analytics::Point> MetadataParser::parsePointElement()
             x = parseCoordinateElement();
         else if (m_xml.name() == "y")
             y = parseCoordinateElement();
-        else
-            m_xml.skipCurrentElement();
+
+        gotoElementEnd();
     }
     if (m_xml.hasError())
         return std::nullopt;
@@ -201,10 +193,8 @@ std::optional<MetadataParser::MinMaxRect> MetadataParser::parseRegionElement()
                 max.y = std::max(max.y, point->y);
             }
         }
-        else
-        {
-            m_xml.skipCurrentElement();
-        }
+
+        gotoElementEnd();
     }
     if (m_xml.hasError())
         return std::nullopt;
@@ -233,10 +223,8 @@ std::optional<Rect> MetadataParser::parseRegionListElement()
                 max.y = std::max(max.y, rect->max.y);
             }
         }
-        else
-        {
-            m_xml.skipCurrentElement();
-        }
+
+        gotoElementEnd();
     }
     if (m_xml.hasError())
         return std::nullopt;
@@ -263,8 +251,8 @@ Ptr<Attribute> MetadataParser::parsePropertyElement()
             description = parseStringElement();
         else if (m_xml.name() == "value")
             value = parseStringElement();
-        else
-            m_xml.skipCurrentElement();
+
+        gotoElementEnd();
     }
     if (m_xml.hasError())
         return nullptr;
@@ -289,10 +277,8 @@ std::vector<Ptr<Attribute>> MetadataParser::parsePropertyListElement()
             if (auto attribute = parsePropertyElement())
                 attributes.push_back(std::move(attribute));
         }
-        else
-        {
-            m_xml.skipCurrentElement();
-        }
+
+        gotoElementEnd();
     }
 
     return attributes;
@@ -340,12 +326,10 @@ void MetadataParser::parseTargetElement()
         {
             attributes = parsePropertyListElement();
         }
-        else
-        {
-            m_xml.skipCurrentElement();
-        }
+
+        gotoElementEnd();
     }
-    if (m_xml.hasError())//
+    if (m_xml.hasError())
         return;
 
     if (!trackId || !typeId)
@@ -403,8 +387,8 @@ void MetadataParser::parseTargetListElement()
     {
         if (m_xml.name() == "Target")
             parseTargetElement();
-        else
-            m_xml.skipCurrentElement();
+
+        gotoElementEnd();
     }
 }
 
@@ -414,8 +398,8 @@ void MetadataParser::parseTargetDetectionElement()
     {
         if (m_xml.name() == "TargetList")
             parseTargetListElement();
-        else
-            m_xml.skipCurrentElement();
+
+        gotoElementEnd();
     }
 }
 
@@ -432,11 +416,15 @@ void MetadataParser::parseMetadataElement()
         {
             parseTargetDetectionElement();
         }
-        else
-        {
-            m_xml.skipCurrentElement();
-        }
+
+        gotoElementEnd();
     }
+}
+
+void MetadataParser::gotoElementEnd()
+{
+    if (!m_xml.isEndElement())
+        m_xml.skipCurrentElement();
 }
 
 Ptr<ObjectMetadataPacket> MetadataParser::makeMetadataPacket(const CacheEntry& entry)
