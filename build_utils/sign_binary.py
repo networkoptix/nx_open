@@ -49,6 +49,20 @@ def sign_binary(
             backoff_factor=0.1)
         session = requests.Session()
         session.mount(url, HTTPAdapter(max_retries=retries))
+        # An additional redirection check to avoid repeating a file transfer.
+        response = session.get(url)
+        if response.history:
+            if len(response.history) > 1:
+                raise Exception("Too many redirects. Please check the nginx configuration.")
+            elif response.history[0].status_code not in [301, 307, 308]:
+                raise Exception(
+                    "Unexpected redirect: {} {}. Please, check configuration".format(
+                        response.history[0].status_code,
+                        response.history[0].reason
+                    )
+                )
+            else:
+                url = response.url
         try:
             r = session.post(url, params=params, files=files, timeout=request_timeout)
             if r.status_code == 200:
