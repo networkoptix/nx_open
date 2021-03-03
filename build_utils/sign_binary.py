@@ -118,7 +118,7 @@ def main():
     args = parser.parse_args()
 
     return sign_binary(
-        url=args.url,
+        url=args.url + '/signtool',
         file=args.file,
         output=args.output if args.output else args.file,
         customization=args.customization,
