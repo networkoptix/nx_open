@@ -801,8 +801,8 @@
     <message numerus="yes">
       <source>%n NVR Licenses</source>
       <translation>
-        <numerusform>%n/ NVR Lisansı</numerusform>
-        <numerusform>%n/ NVR Lisansı</numerusform>
+        <numerusform>%n NVR Lisansı</numerusform>
+        <numerusform>%n NVR Lisansı</numerusform>
       </translation>
     </message>
     <message numerus="yes">
