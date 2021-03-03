@@ -589,6 +589,10 @@ public:
         "Path to a directory where additional keys for update files verification are located."
     };
 
+    Option<int> maxCamerasPerServer{ this, "maxCamerasPerServer", 128,
+        "Maximum amount of cameras per media server."
+    };
+
     #if defined(__arm__)
         static constexpr qint64 kDefaultMinStorageSpace = 100 * 1024 * 1024; //< 100MB
         static constexpr unsigned int kDefaultHlsMaxChunkBufferSize = 2 * 1024 * 1024;

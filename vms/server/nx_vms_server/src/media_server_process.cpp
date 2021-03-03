@@ -4103,7 +4103,8 @@ bool MediaServerProcess::setUpMediaServerResource(
             server = QnMediaServerResourcePtr(new QnMediaServerResource(commonModule()));
             const QnUuid serverGuid(serverModule->settings().serverGuid());
             server->setIdUnsafe(serverGuid);
-            server->setMaxCameras(nx::utils::AppInfo::isEdgeServer() ? 1 : 128);
+            server->setMaxCameras(nx::utils::AppInfo::isEdgeServer()
+                ? 1 : serverModule->settings().maxCamerasPerServer());
 
             QString serverName(getDefaultServerName());
             auto beforeRestoreDbData = commonModule()->beforeRestoreDbData();
