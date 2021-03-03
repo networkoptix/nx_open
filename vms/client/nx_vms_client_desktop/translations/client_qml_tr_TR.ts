@@ -233,36 +233,35 @@
     <message>
       <source>Introducing you
 new PTZ controls</source>
-      <translation type="unfinished">Introducing you
-new PTZ controls</translation>
+      <translation>Size
+yeni PTZ kontrolü sunuyoruz</translation>
     </message>
     <message>
       <source>Here is a quick presentation
 of what has changed</source>
-      <translation type="unfinished">Here is a quick presentation
-of what has changed</translation>
+      <translation>İşte nelerin değiştiğine dair hızlı bir sunum</translation>
     </message>
     <message>
       <source>Drag over any part of the video
 to activate PTZ</source>
-      <translation type="unfinished">Drag over any part of the video
-to activate PTZ</translation>
+      <translation>PTZ'yi etkinleştirmek için videonun
+herhangi bir bölümü üzerine sürükleyin</translation>
     </message>
     <message>
       <source>Press arrows keys to move and plus or minus keys to zoom</source>
-      <translation type="unfinished">Press arrows keys to move and plus or minus keys to zoom</translation>
+      <translation>Taşımak için ok tuşlarına ve yakınlaştırmak için artı veya eksi tuşlarına basın</translation>
     </message>
     <message>
       <source>Use the mouse wheel to zoom</source>
-      <translation type="unfinished">Use the mouse wheel to zoom</translation>
+      <translation>Yakınlaştırmak için fare tekerleğini kullanın</translation>
     </message>
     <message>
       <source>Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</source>
-      <translation type="unfinished">Click, double-click, or drag the mouse pointer while pressing the Shift key to use Advanced PTZ</translation>
+      <translation>Gelişmiş PTZ'yi kullanmak için Shift tuşuna basarken fare imlecine tıklayın, çift tıklayın veya sürükleyin</translation>
     </message>
     <message>
       <source>Go to Local Settings to enable a drag marker over the center of the video</source>
-      <translation type="unfinished">Go to Local Settings to enable a drag marker over the center of the video</translation>
+      <translation>Videonun ortasında bir sürükleme işaretini etkinleştirmek için Yerel Ayarlar'a gidin</translation>
     </message>
   </context>
   <context>

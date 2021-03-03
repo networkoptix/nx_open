@@ -10175,7 +10175,7 @@ Server Settings (서버 설정) 대화 상자의 &quot;Storage Management (스�
     </message>
     <message>
       <source>Showreel %1</source>
-      <translation> %1 쇼릴</translation>
+      <translation>%1 쇼릴</translation>
     </message>
     <message>
       <source>Delete Showreel %1?</source>

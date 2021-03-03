@@ -235,7 +235,7 @@ new PTZ controls</source>
     <message>
       <source>Here is a quick presentation
 of what has changed</source>
-      <translation>변경된 내용의  간단한 프리젠 테이션입니다</translation>
+      <translation>변경된 내용의 간단한 프리젠 테이션입니다</translation>
     </message>
     <message>
       <source>Drag over any part of the video

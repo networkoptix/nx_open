@@ -7992,7 +7992,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>File %1 does not exist</source>
-      <translation>Bestand %s bestaat niet</translation>
+      <translation>Bestand %1 bestaat niet</translation>
     </message>
     <message>
       <source>There is no valid client package to download</source>

@@ -193,11 +193,11 @@
     </message>
     <message>
       <source>You are about to merge Systems with NVR licenses.</source>
-      <translation type="unfinished">You are about to merge Systems with NVR licenses.</translation>
+      <translation>Sistemleri NVR lisanslarıyla birleştirmek üzeresiniz.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one NVR license is allowed per System, so the second license will be deactivated.</translation>
+      <translation>Sistem başına yalnızca bir NVR lisansına izin verilir, bu nedenle ikinci lisans devre dışı bırakılır.</translation>
     </message>
   </context>
   <context>
@@ -792,25 +792,25 @@
     </message>
     <message>
       <source>NVR</source>
-      <translation type="unfinished">NVR</translation>
+      <translation>NVR</translation>
     </message>
     <message>
       <source>NVR Licenses</source>
-      <translation type="unfinished">NVR Licenses</translation>
+      <translation>NVR Lisansı</translation>
     </message>
     <message numerus="yes">
       <source>%n NVR Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n NVR Licenses</numerusform>
-        <numerusform>%n NVR Licenses</numerusform>
+      <translation>
+        <numerusform>%n/ NVR Lisansı</numerusform>
+        <numerusform>%n/ NVR Lisansı</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 NVR Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 NVR Licenses</numerusform>
-        <numerusform>%n/%1 NVR Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 NVR Lisansı</numerusform>
+        <numerusform>%n/%1 NVR Lisansı</numerusform>
       </translation>
     </message>
   </context>
@@ -877,27 +877,27 @@
     </message>
     <message>
       <source>Only one Starter license is allowed per System.</source>
-      <translation type="unfinished">Only one Starter license is allowed per System.</translation>
+      <translation>Sistem başına yalnızca bir başlangıç lisansına izin verilir.</translation>
     </message>
     <message>
       <source>You already have one active Starter license.</source>
-      <translation type="unfinished">You already have one active Starter license.</translation>
+      <translation>Zaten bir tane başlangıç lisansınız var.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per System.</source>
-      <translation type="unfinished">Only one NVR license is allowed per System.</translation>
+      <translation>Sistem başına yalnızca bir NVR lisansına izin verilir.</translation>
     </message>
     <message>
       <source>You already have one active NVR license.</source>
-      <translation type="unfinished">You already have one active NVR license.</translation>
+      <translation>Zaten bir aktif NVR lisansınız var.</translation>
     </message>
     <message>
       <source>Only one license of this type is allowed per System.</source>
-      <translation type="unfinished">Only one license of this type is allowed per System.</translation>
+      <translation>Sistem başına bu türden yalnızca bir lisansa izin verilir.</translation>
     </message>
     <message>
       <source>You already have one active license of the same type.</source>
-      <translation type="unfinished">You already have one active license of the same type.</translation>
+      <translation>Halihazırda aynı türde bir aktif lisansınız var.</translation>
     </message>
   </context>
   <context>
