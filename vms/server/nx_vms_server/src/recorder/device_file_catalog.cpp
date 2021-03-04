@@ -206,7 +206,7 @@ bool DeviceFileCatalog::addChunk(const Chunk& chunk)
     {
         // update catalog to fix bug from previous version
         auto chunkToUpdate = m_chunks[m_chunks.size()-2];
-        chunkToUpdate.startTimeMs =
+        chunkToUpdate.durationMs =
             m_chunks[m_chunks.size()-1].startTimeMs - chunkToUpdate.startTimeMs;
         m_chunks.update(m_chunks.size()-2, chunkToUpdate);
         return true;
