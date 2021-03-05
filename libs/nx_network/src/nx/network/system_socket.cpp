@@ -678,6 +678,16 @@ int CommunicatingSocket<SocketInterfaceToImplement>::recv(
                 sysErrorCodeBak = SystemError::timedOut;
             SystemError::setLastErrorCode(sysErrorCodeBak);
         }
+        else
+        {
+            // This may be a driver bug that may occur on some win10 systems. So we replace
+            // WSA_IO_PENDING error with SystemError::timedOut.
+            // See https://stackoverflow.com/questions/52419993/unexpected-wsa-io-pending-from-blocking-with-overlapped-i-o-attribute-winsock2
+            auto sysErrorCode = SystemError::getLastOSErrorCode();
+            if (sysErrorCode == WSA_IO_PENDING)
+                sysErrorCode = SystemError::timedOut;
+            SystemError::setLastErrorCode(sysErrorCode);
+        }
     #else
         unsigned int recvTimeout = 0;
         if (!this->getRecvTimeout(&recvTimeout))
