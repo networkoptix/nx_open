@@ -234,7 +234,7 @@
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation>サーバー%1から不正な応答を受信：&quot;%2&quot;.</translation>
+      <translation>サーバー %1 の不正な応答: &quot;%2&quot;</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
@@ -246,15 +246,15 @@
     </message>
     <message>
       <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
-      <translation>ファームウェアの更新を行ってください　問題が継続する場合はサポートにお問合せください.</translation>
+      <translation>ファームウェアの更新を行ってください。問題が継続する場合はサポートにお問合せください。</translation>
     </message>
     <message>
       <source>Failed to configure parameter %1.</source>
-      <translation>パラメーター %1.設定失敗.</translation>
+      <translation>パラメーター %1 設定失敗</translation>
     </message>
     <message>
       <source>Please contact support.</source>
-      <translation>サポートにお問合せください.</translation>
+      <translation>サポートにお問合せください。</translation>
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
@@ -266,43 +266,43 @@
     </message>
     <message>
       <source>Please try to reboot the device, then restore factory defaults on the web-page.</source>
-      <translation>デバイス再起動後にWebページより工場出荷時にリストアしてください.</translation>
+      <translation>デバイスを再起動し、Webページから工場出荷時にリストアしてください。</translation>
     </message>
     <message>
       <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-      <translation>カメラ再起動後にWebページより工場出荷時にリストアしてください.</translation>
+      <translation>カメラを再起動し、Webページから工場出荷時にリストアしてください。</translation>
     </message>
     <message>
       <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
-      <translation>デバイスがネットワークに接続されている事を確認して再起動を行ってください.</translation>
+      <translation>デバイスがネットワークに接続されていることを確認してください。デバイスを再起動してください。</translation>
     </message>
     <message>
       <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-      <translation>カメラがネットワークに接続されている事を確認して再起動を行ってください.</translation>
+      <translation>カメラがネットワークに接続されていることを確認してください。カメラを再起動してください。</translation>
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>デバイス要求&quot;%1&quot; は、エラー&quot;%2&quot; により失敗しました.</translation>
+      <translation>デバイスリクエスト &quot;%1&quot; は、エラー &quot;%2&quot; で失敗しました。</translation>
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>カメラ要求&quot;%1&quot; は、エラー&quot;%2&quot; により失敗しました。</translation>
+      <translation>カメラリクエスト &quot;%1&quot; は、エラー &quot;%2&quot; で失敗しました。</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
-      <translation>不明なデバイス障害.</translation>
+      <translation>不明なデバイス障害です。</translation>
     </message>
     <message>
       <source>Unknown camera issue.</source>
-      <translation>不明なカメラ障害.</translation>
+      <translation>不明なカメラ障害です。</translation>
     </message>
     <message>
       <source>Invalid data was received from the device %1.</source>
-      <translation>デバイス %1.より無効なデータ受信.</translation>
+      <translation>デバイス %1 から無効なデータを受信しました。</translation>
     </message>
     <message>
       <source>Invalid data was received from the camera %1.</source>
-      <translation>カメラ %1.より無効なデータ受信.</translation>
+      <translation>カメラ %1から無効なデータを受信しました。</translation>
     </message>
     <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
@@ -314,23 +314,23 @@
     </message>
     <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-      <translation>IOモジュールを再起動してブラウザより初期設定に戻してください.</translation>
+      <translation>I/Oモジュールを再起動し、Webページから工場出荷時にリストアしてください。</translation>
     </message>
     <message>
       <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
-      <translation>IOモジュールがネットワークに接続されているか確認し　IOモジュールの再起動を行ってください.</translation>
+      <translation>I/Oモジュールがネットワークに接続されていることを確認してください。I/Oモジュールを再起動してください。</translation>
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>I/Oモジュール要求&quot;%1&quot; はエラー&quot;%2&quot; により失敗しました。</translation>
+      <translation>I/Oモジュールリクエスト &quot;%1&quot; は、エラー &quot;%2&quot; で失敗しました。</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
-      <translation>不明なIOモジュール障害.</translation>
+      <translation>不明なI/Oモジュール障害です。</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module %1.</source>
-      <translation>IOモジュール %1.より無効なデータを受信しました.</translation>
+      <translation>I/Oモジュール %1 から無効なデータを受信しました。</translation>
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
@@ -338,31 +338,31 @@
     </message>
     <message>
       <source>Device initialization process is in progress.</source>
-      <translation>デバイスイニシャライズ中.</translation>
+      <translation>デバイスをイニシャライズしています。</translation>
     </message>
     <message>
       <source>Camera initialization process is in progress.</source>
-      <translation>カメライニシャライズ中.</translation>
+      <translation>カメラをイニシャライズしています。</translation>
     </message>
     <message>
       <source>I/O Module initialization process is in progress.</source>
-      <translation>IOモジュールイニシャライズ中.</translation>
+      <translation>I/Oモジュールをイニシャライズしています。</translation>
     </message>
     <message>
       <source>Make sure port %1 is accessible (e.g. forwarded).</source>
-      <translation>ポート %1 にアクセス可能か確認してください.</translation>
+      <translation>ポート %1 にアクセス可能か (ポート転送など) 確認してください。</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the device web-page.</source>
-      <translation>解決しない場合はデバイスの web ページで工場出荷時に戻します</translation>
+      <translation>解決しない場合は、デバイスのwebページで工場出荷時にリストアしてください。</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the camera web-page.</source>
-      <translation>解決しない場合はカメラの web ページで工場出荷時に戻します</translation>
+      <translation>解決しない場合は、カメラのwebページで工場出荷時にリストアしてください。</translation>
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
-      <translation>解決しない場合はI/Oモジュールの web ページで工場出荷時に戻します</translation>
+      <translation>解決しない場合は、I/Oモジュールのwebページで工場出荷時にリストアしてください。</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
@@ -374,27 +374,27 @@
     </message>
     <message>
       <source>Could not parse device response. URL %1, request name %2.</source>
-      <translation>デバイスの応答を解析できませんでした　URL %1　要求名 %2</translation>
+      <translation>デバイスの応答を解析できませんでした。URL %1, 要求名 %2</translation>
     </message>
     <message>
       <source>Could not parse camera response. URL %1, request name %2.</source>
-      <translation>カメラの応答を解析できませんでした　URL %1　要求名 %2</translation>
+      <translation>カメラの応答を解析できませんでした。URL %1, 要求名 %2</translation>
     </message>
     <message>
       <source>Could not parse I/O module response. URL %1, request name %2.</source>
-      <translation>I/Oモジュールの応答を解析できませんでした　URL %1　要求名 %2</translation>
+      <translation>I/Oモジュールの応答を解析できませんでした。URL %1, 要求名 %2</translation>
     </message>
     <message>
       <source>No supported media tracks at URL %1.</source>
-      <translation>URL %1 でサポートされるメディアトラックがありません</translation>
+      <translation>URL %1 にはサポートされているメディアトラックがありません。</translation>
     </message>
     <message>
       <source>Not authorized. URL %1.</source>
-      <translation>権限がありません　URL %1</translation>
+      <translation>権限がありません。URL %1</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
-      <translation>メディア URL %1 を開くことができません。メディア プロトコル %2 はサポートされていません。</translation>
+      <translation>メディアURL %1 を開くことができません。メディアプロトコル %2 はサポートされていません。</translation>
     </message>
     <message>
       <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
@@ -402,19 +402,19 @@
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
-      <translation>まず、録画をOnにしてデバイス設定で fps を減少します (エラー&quot;%1&quot;)。</translation>
+      <translation>まず、(録画オフの場合は)録画をOnにして、デバイス設定で fps を下げてください (エラー&quot;%1&quot;)。</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
-      <translation>まず、録画をOnにしてカメラ設定で fps を減少します (エラー&quot;%1&quot;)。</translation>
+      <translation>まず、(録画オフの場合は)録画をOnにして、カメラ設定で fps を下げてください (エラー&quot;%1&quot;)。</translation>
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>まず、録画をOnにしてI/Oモジュール設定で fps を減少します (エラー&quot;%1&quot;)。</translation>
+      <translation>まず、(録画オフの場合は)録画をOnにして、I/Oモジュール設定で fps を下げてください (エラー&quot;%1&quot;)。</translation>
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
-      <translation>ファームウェアを更新してください。最小サポートバージョンは %1です。現在のバージョンは %2です。</translation>
+      <translation>ファームウェアを更新してください。サポートバージョンは %1 以上です。現在のバージョンは %2 です。</translation>
     </message>
     <message>
       <source>Plugin error. %1</source>
@@ -530,7 +530,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>IOモジュール</translation>
+      <translation>I/Oモジュール</translation>
     </message>
     <message>
       <source>Start</source>
@@ -566,7 +566,7 @@
     </message>
     <message>
       <source>I/O Module Licenses</source>
-      <translation>IOモジュールライセンス</translation>
+      <translation>I/Oモジュールライセンス</translation>
     </message>
     <message>
       <source>Start Licenses</source>
@@ -845,7 +845,7 @@
     </message>
     <message>
       <source>You already have one active Starter license.</source>
-      <translation>すでに1つのスターターライセンスがアクティベートされています</translation>
+      <translation>既に有効なスターターライセンスがあります。</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per System.</source>
@@ -900,19 +900,19 @@
     </message>
     <message>
       <source>I/O Modules</source>
-      <translation>IOモジュール</translation>
+      <translation>I/Oモジュール</translation>
     </message>
     <message>
       <source>I/O modules</source>
-      <translation>IOモジュール</translation>
+      <translation>I/Oモジュール</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>IOモジュール</translation>
+      <translation>I/Oモジュール</translation>
     </message>
     <message>
       <source>I/O module</source>
-      <translation>IOモジュール</translation>
+      <translation>I/Oモジュール</translation>
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>

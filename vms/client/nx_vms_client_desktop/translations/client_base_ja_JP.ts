@@ -612,11 +612,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Check I/O Module Issues...</source>
-      <translation>IOモジュール障害確認...</translation>
+      <translation>I/Oモジュール障害確認...</translation>
     </message>
     <message>
       <source>Check I/O Modules Issues...</source>
-      <translation>IOモジュール障害確認...</translation>
+      <translation>I/Oモジュール障害確認...</translation>
     </message>
     <message>
       <source>Device Rules...</source>
@@ -636,11 +636,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>I/O Module Rules...</source>
-      <translation>IOモジュールルール...</translation>
+      <translation>I/Oモジュール ルール...</translation>
     </message>
     <message>
       <source>I/O Modules Rules...</source>
-      <translation>IOモジュールルール...</translation>
+      <translation>I/Oモジュール ルール...</translation>
     </message>
     <message>
       <source>Device Settings...</source>
@@ -660,11 +660,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>I/O Module Settings...</source>
-      <translation>IOモジュール設定...</translation>
+      <translation>I/Oモジュール設定...</translation>
     </message>
     <message>
       <source>I/O Modules Settings...</source>
-      <translation>IOモジュール設定...</translation>
+      <translation>I/Oモジュール設定...</translation>
     </message>
     <message>
       <source>File Settings...</source>
@@ -1285,11 +1285,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1</source>
-      <translation>このライセンスは既に有効化され、ハードウェア ID %1 にリンクされています</translation>
+      <translation>このライセンスは既にハードウェア ID %1 にリンクされています</translation>
     </message>
     <message>
       <source>This license is already activated and linked to Hardware ID %1 on %2</source>
-      <translation>このライセンスは既に有効化され、%2 のハードウェア ID %1 にリンクされています</translation>
+      <translation>このライセンスは既に %2 のハードウェア ID %1 にリンクされています</translation>
     </message>
     <message>
       <source>License already activated on another server</source>
@@ -1301,7 +1301,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To activate License Key manually please contact %1.</source>
-      <translation>ライセンスキーを手動でアクティベートするには、 %1 までご連絡ください。</translation>
+      <translation>ライセンスキーを手動で有効化するには、 %1 までご連絡ください。</translation>
     </message>
     <message>
       <source>Network error</source>
@@ -1317,7 +1317,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>To activate License Key manually please contact your Regional / License support:</source>
-      <translation>ライセンスキーを手動でアクティベートするには、地域/ライセンスサポートにお問い合わせください:</translation>
+      <translation>ライセンスキーを手動で有効化するには、地域/ライセンスサポートにお問い合わせください:</translation>
     </message>
   </context>
   <context>
@@ -2458,23 +2458,23 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>FAILED: %1</source>
-      <translation>失敗 %1</translation>
+      <translation>失敗: %1</translation>
     </message>
     <message>
       <source>Confirming server availability.</source>
-      <translation>サーバーをチェック.</translation>
+      <translation>サーバーをチェック</translation>
     </message>
     <message>
       <source>Evaluating media stream for errors.</source>
-      <translation>ストリームエラーをチェック.</translation>
+      <translation>メディアストリームのエラーをチェック</translation>
     </message>
     <message>
       <source>Diagnostics for device %1</source>
-      <translation>%1 デバイス診断</translation>
+      <translation>デバイス %1 の診断</translation>
     </message>
     <message>
       <source>Diagnostics for camera %1</source>
-      <translation>%1 カメラ診断</translation>
+      <translation>カメラ %1の診断</translation>
     </message>
     <message>
       <source>Device Diagnostics</source>
@@ -2486,35 +2486,35 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Confirming device is accessible.</source>
-      <translation>利用可能なデバイス.</translation>
+      <translation>デバイスへのアクセス確認</translation>
     </message>
     <message>
       <source>Confirming camera is accessible.</source>
-      <translation>利用可能なカメラ.</translation>
+      <translation>カメラへのアクセス確認</translation>
     </message>
     <message>
       <source>Confirming target device provides media stream.</source>
-      <translation>利用可能なデバイスストリーム.</translation>
+      <translation>対象デバイスのメディアストリームを確認</translation>
     </message>
     <message>
       <source>Confirming target camera provides media stream.</source>
-      <translation>利用可能なカメラストリーム.</translation>
+      <translation>対象カメラのメディアストリームを確認</translation>
     </message>
     <message>
       <source>Diagnostics for I/O module %1</source>
-      <translation>IOモジュール %1 の診断</translation>
+      <translation>I/O モジュール %1 の診断</translation>
     </message>
     <message>
       <source>I/O Module Diagnostics</source>
-      <translation>IOモジュール診断</translation>
+      <translation>I/Oモジュール診断</translation>
     </message>
     <message>
       <source>Confirming I/O module is accessible.</source>
-      <translation>IOモジュールへのアクセス確認.</translation>
+      <translation>I/Oモジュールへのアクセス確認</translation>
     </message>
     <message>
       <source>Confirming target I/O module provides media stream.</source>
-      <translation>ターゲットIOモジュールのメディアストリーム確認.</translation>
+      <translation>対象I/Oモジュールのメディアストリームを確認</translation>
     </message>
     <message>
       <source>Diagnostics complete</source>
@@ -2582,7 +2582,7 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>%n I/O modules found</source>
       <translation>
-        <numerusform>%n IOモジュール検出</numerusform>
+        <numerusform>%n 個のI/Oモジュールを検出</numerusform>
       </translation>
     </message>
     <message>
@@ -2777,7 +2777,7 @@ to %1</source>
     </message>
     <message>
       <source>Account is not activated.</source>
-      <translation>アカウントが有効化されていません</translation>
+      <translation>アカウントが有効化されていません。</translation>
     </message>
     <message>
       <source>Please log in to %1 and follow the provided instructions.</source>
@@ -4206,7 +4206,7 @@ to %1</source>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>IOモジュール</translation>
+      <translation>I/Oモジュール</translation>
     </message>
     <message>
       <source>Lo-Res</source>
@@ -5531,7 +5531,7 @@ to %1</source>
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation>IOモジュール設定</translation>
+      <translation>I/Oモジュール設定</translation>
     </message>
     <message>
       <source>Diagnostics</source>
@@ -7798,11 +7798,11 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>I/O Module Settings</source>
-      <translation>IOモジュール設定</translation>
+      <translation>I/Oモジュール設定</translation>
     </message>
     <message>
       <source>I/O Modules Settings</source>
-      <translation>IOモジュール設定</translation>
+      <translation>I/Oモジュール設定</translation>
     </message>
     <message>
       <source>Plugins</source>
@@ -9979,7 +9979,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Server &quot;%1&quot; cannot access %n I/O modules. Move them anyway?</source>
       <translation>
-        <numerusform>サーバー&quot;%1&quot; は%n Ioモジュールにアクセスできません　移動しますか？</numerusform>
+        <numerusform>サーバー &quot;%1&quot; は %n 個のI/Oモジュールにアクセスできません。移動しますか？</numerusform>
       </translation>
     </message>
     <message>
@@ -10008,7 +10008,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Too short period selected</source>
-      <translation>あまりにも短い期間の選択</translation>
+      <translation>選択された期間が短すぎます</translation>
     </message>
     <message>
       <source>Cannot perform Preview Search. Please select a period of 15 seconds or longer.</source>
