@@ -1,5 +1,6 @@
 #include "transaction_descriptor.h"
 #include "transaction_message_bus.h"
+#include "amend_transaction_data.h"
 
 #include <iostream>
 
@@ -556,6 +557,7 @@ struct ModifyStorageAccess
         data.logErrorFunc = [this](const QString& message) { NX_DEBUG(this, message); };
         data.modifyResourceResult = ModifyResourceAccess()(commonModule, accessData, param);
         data.request = param;
+        amendOutputDataIfNeeded(accessData, commonModule->resourceAccessManager(), &data.request);
 
         return transaction_descriptor::canModifyStorage(data);
     }
