@@ -22,7 +22,7 @@ if(NOT useLoginKeychain AND codeSigning)
         COMMAND ${CMAKE_SOURCE_DIR}/build_utils/macos/prepare_build_keychain.sh
             --keychain ${codeSigningKeychainName}
             --keychain-password ${codeSigningKeychainPassword}
-            --certificate ${root_RDEP_CERTIFICATES_ROOT}/apple/AppleWWDRCA.cer
+            --certificate ${RDEP_ROOT-CERTIFICATES_ROOT}/apple/AppleWWDRCA.cer
             --ignore-import-errors
     )
     set(import_cert_command
