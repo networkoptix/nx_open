@@ -2213,7 +2213,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Instant</source>
-      <translation>実行</translation>
+      <translation>即時</translation>
     </message>
     <message>
       <source>Stops</source>
@@ -2233,7 +2233,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Every %1</source>
-      <translation>毎 %1</translation>
+      <translation>%1 ごと</translation>
     </message>
     <message>
       <source>System</source>
@@ -2281,7 +2281,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Select at least one Camera</source>
-      <translation>少なくとも1つのカメラを選択してください</translation>
+      <translation>少なくとも 1 つのカメラを選択してください</translation>
     </message>
     <message>
       <source>Select Server</source>
@@ -2330,7 +2330,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Force Acknowledgement will only work for Generic Events if camera identifiers are used in the Generic Event URL</source>
-      <translation>カメラ識別子が汎用イベントURLで使用されている場合、強制承認は汎用イベントに対してのみ機能します</translation>
+      <translation>カメラ識別子が汎用イベントURLで使用されている場合、確認要求は汎用イベントに対してのみ機能します</translation>
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
@@ -2377,7 +2377,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Some rules are not valid. Disable them?</source>
-      <translation>いくつかのルールが無効です　それらを無効にしますか?</translation>
+      <translation>一部のルール設定が不正です。それらを無効にしますか？</translation>
     </message>
     <message>
       <source>Apply changes before exit?</source>
@@ -2385,7 +2385,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>This action cannot be undone.</source>
-      <translation>この操作は元に戻せません</translation>
+      <translation>この操作は元に戻せません。</translation>
     </message>
     <message>
       <source>Restore all rules to default?</source>
@@ -2396,7 +2396,7 @@ to view more bookmarks</source>
     <name>QnBusinessRulesViewModel</name>
     <message>
       <source>On</source>
-      <translation>使用</translation>
+      <translation>有効</translation>
     </message>
     <message>
       <source>Event</source>
@@ -2416,7 +2416,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Interval of Action</source>
-      <translation>アクション間隔</translation>
+      <translation>実行間隔</translation>
     </message>
   </context>
   <context>
@@ -3478,11 +3478,11 @@ to %1</source>
     <name>QnFullscreenCameraActionWidget</name>
     <message>
       <source>This camera is not currently on the selected layout. Action will work if camera is added before action triggers.</source>
-      <translation>このカメラは現在選択されているレイアウトに含まれていません。アクションが実行される前にカメラを追加すればアクションは動作します。</translation>
+      <translation>このカメラを含まないレイアウトが選択されています。アクションが実行される前にカメラを追加すればアクションは動作します。</translation>
     </message>
     <message>
       <source>This camera is not currently on some of the selected layouts. Action will work if camera is added before action triggers.</source>
-      <translation>このカメラは現在選択されているレイアウトに含まれていません。アクションが実行される前にカメラを追加すればアクションは動作します。</translation>
+      <translation>このカメラを含まないレイアウトが選択されています。アクションが実行される前にカメラを追加すればアクションは動作します。</translation>
     </message>
   </context>
   <context>
@@ -4685,7 +4685,7 @@ to %1</source>
     </message>
     <message>
       <source>Instant</source>
-      <translation>実行</translation>
+      <translation>即時</translation>
     </message>
     <message>
       <source>Position</source>
@@ -5325,8 +5325,8 @@ to %1</source>
 &lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</source>
       <comment>Do not translate tags (text between &apos;&lt;&apos; and &apos;&gt;&apos; symbols. Do not remove &apos;
 &apos; sequence</comment>
-      <translation>Html タグはカスタムテキストで使用します:
-&lt;h4&gt;Headers (h1-h6)&lt;/h4&gt;Also different &lt;font color=&quot;red&quot;&gt;colors&lt;/font&gt; and &lt;font size=&quot;18&quot;&gt;sizes&lt;/font&gt; could be applied. Text could be &lt;s&gt;stricken&lt;/s&gt;, &lt;u&gt;underlined&lt;/u&gt;, &lt;b&gt;bold&lt;/b&gt; or &lt;i&gt;italic&lt;/i&gt;</translation>
+      <translation>カスタムテキストでは Html タグが利用可能です:
+&lt;h4&gt;ヘッダー (h1-h6)&lt;/h4&gt; や &lt;font color=&quot;red&quot;&gt;色&lt;/font&gt;、 &lt;font size=&quot;18&quot;&gt;サイズ&lt;/font&gt; が適用できます。テキストは&lt;s&gt;取り消し線&lt;/s&gt;、&lt;u&gt;下線&lt;/u&gt;、&lt;b&gt;太字&lt;/b&gt;、&lt;i&gt;イタリック&lt;/i&gt;の装飾が可能です。</translation>
     </message>
   </context>
   <context>
@@ -8887,7 +8887,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation>承認</translation>
+      <translation>確認</translation>
     </message>
   </context>
   <context>
@@ -9113,13 +9113,13 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>%n symbols over</source>
       <translation>
-        <numerusform>%n 文字以上</numerusform>
+        <numerusform>%n 文字オーバー</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n symbols left</source>
       <translation>
-        <numerusform>残り%n 文字</numerusform>
+        <numerusform>残り %n 文字</numerusform>
       </translation>
     </message>
   </context>

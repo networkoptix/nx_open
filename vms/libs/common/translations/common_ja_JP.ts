@@ -1712,7 +1712,7 @@
     </message>
     <message>
       <source>Acknowledge</source>
-      <translation>承認</translation>
+      <translation>確認</translation>
     </message>
     <message>
       <source>Analytics Event</source>

@@ -133,22 +133,22 @@
     <message>
       <location filename="../src/ui/widgets/business/aggregation_widget.ui"/>
       <source>Check to set aggregation period</source>
-      <translation>間隔チェック</translation>
+      <translation>集計期間を設定する場合チェック</translation>
     </message>
     <message>
       <location/>
       <source>Interval of action :</source>
-      <translation>アクションインターバル:</translation>
+      <translation>実行間隔:</translation>
     </message>
     <message>
       <location/>
       <source>No more than once per</source>
-      <translation>間隔</translation>
+      <translation>前回実行から</translation>
     </message>
     <message>
       <location/>
       <source>Instant</source>
-      <translation>実行</translation>
+      <translation>即時</translation>
     </message>
   </context>
   <context>
@@ -2119,12 +2119,12 @@
     <message>
       <location/>
       <source>Show to</source>
-      <translation>表示</translation>
+      <translation>表示先</translation>
     </message>
     <message>
       <location/>
       <source>Select layout...</source>
-      <translation>レイアウトを選択</translation>
+      <translation>レイアウトを選択...</translation>
     </message>
   </context>
   <context>

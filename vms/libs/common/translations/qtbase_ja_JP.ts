@@ -591,7 +591,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>My Computer</source>
-      <translation>マイコンピュータ</translation>
+      <translation>マイコンピューター</translation>
     </message>
     <message>
       <source>Drive</source>
@@ -709,11 +709,11 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>My Computer</source>
-      <translation>マイコンピュータ</translation>
+      <translation>マイコンピューター</translation>
     </message>
     <message>
       <source>Computer</source>
-      <translation>コンピュータ</translation>
+      <translation>コンピューター</translation>
     </message>
     <message>
       <source>%1 byte(s)</source>

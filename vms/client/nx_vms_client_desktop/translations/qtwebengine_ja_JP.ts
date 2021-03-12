@@ -81,7 +81,7 @@
     </message>
     <message>
       <source>The server did not authorize access to the resource</source>
-      <translation>サーバーはリソースへのアクセスを承認しませんでした</translation>
+      <translation>サーバーがリソースへのアクセスを許可しませんでした</translation>
     </message>
     <message>
       <source>A problem with the server certificate occurred</source>
