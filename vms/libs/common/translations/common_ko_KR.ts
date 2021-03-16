@@ -187,11 +187,11 @@
     </message>
     <message>
       <source>You are about to merge Systems with NVR licenses.</source>
-      <translation type="unfinished">You are about to merge Systems with NVR licenses.</translation>
+      <translation>시스템을 NVR 라이센스와 병합하려고합니다.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one NVR license is allowed per System, so the second license will be deactivated.</translation>
+      <translation>시스템 당 하나의 NVR 라이선스 만 허용되므로 두 번째 라이선스는 비활성화됩니다.</translation>
     </message>
   </context>
   <context>
@@ -841,11 +841,11 @@
     </message>
     <message>
       <source>Only one Starter license is allowed per System.</source>
-      <translation type="unfinished">Only one Starter license is allowed per System.</translation>
+      <translation>시스템 당 하나의 스타터 라이센스 만 허용됩니다.</translation>
     </message>
     <message>
       <source>You already have one active Starter license.</source>
-      <translation type="unfinished">You already have one active Starter license.</translation>
+      <translation>이미 활성 스타터 라이센스가 하나 있습니다.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per System.</source>
@@ -857,11 +857,11 @@
     </message>
     <message>
       <source>Only one license of this type is allowed per System.</source>
-      <translation type="unfinished">Only one license of this type is allowed per System.</translation>
+      <translation>이 유형의 라이센스는 시스템 당 하나만 허용됩니다.</translation>
     </message>
     <message>
       <source>You already have one active license of the same type.</source>
-      <translation type="unfinished">You already have one active license of the same type.</translation>
+      <translation>동일한 유형의 활성 라이센스가 이미 하나 있습니다.</translation>
     </message>
   </context>
   <context>
