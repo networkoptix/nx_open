@@ -988,9 +988,9 @@ to view more bookmarks</source>
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Mostrar en Items</numerusform>
-        <numerusform>Show on Items</numerusform>
+        <numerusform>Mostrar en Items</numerusform>
       </translation>
     </message>
   </context>
