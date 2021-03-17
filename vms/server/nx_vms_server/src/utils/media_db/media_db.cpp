@@ -18,7 +18,8 @@ class RecordVisitor : public boost::static_visitor<>
 {
 public:
     RecordVisitor(QDataStream* stream, std::function<void(const QString&, int)> onError):
-        m_stream(stream)
+        m_stream(stream),
+        m_onError(onError)
     {
     }
 
