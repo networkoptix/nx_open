@@ -1673,7 +1673,7 @@
     <message numerus="yes">
       <source>%n Users</source>
       <translation>
-        <numerusform>ユーザー %n</numerusform>
+        <numerusform>%n ユーザー</numerusform>
       </translation>
     </message>
     <message numerus="yes">
