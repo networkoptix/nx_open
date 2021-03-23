@@ -22,6 +22,7 @@ constexpr auto kCacheEntryMaximumLifetime = 30s;
 
 } // namespace
 
+const QString kUndefinedObjectTypeId = "nx.hikvision.undefined";
 const QString kThermalObjectTypeId = "nx.hikvision.ThermalObject";
 const QString kThermalObjectPreAlarmTypeId = "nx.hikvision.ThermalObjectPreAlarm";
 const QString kThermalObjectAlarmTypeId = "nx.hikvision.ThermalObjectAlarm";
@@ -287,7 +288,8 @@ std::vector<Ptr<Attribute>> MetadataParser::parsePropertyListElement()
 void MetadataParser::parseTargetElement()
 {
     std::optional<int> trackId;
-    std::optional<QString> typeId;
+    // typeId is stored in "recognition" xml-element. No element means object type is undefined.
+    std::optional<QString> typeId = kUndefinedObjectTypeId;
     std::optional<Rect> boundingBox;
     std::vector<Ptr<Attribute>> attributes;
 
@@ -303,7 +305,7 @@ void MetadataParser::parseTargetElement()
         {
             typeId = parseRecognitionElement();
             if (!typeId)
-                return;
+                typeId = kUndefinedObjectTypeId;
         }
         else if (m_xml.name() == "ruleID")
         {
@@ -332,7 +334,7 @@ void MetadataParser::parseTargetElement()
     if (m_xml.hasError())
         return;
 
-    if (!trackId || !typeId)
+    if (!trackId)
         return;
 
     auto& entry = m_cache[*trackId];

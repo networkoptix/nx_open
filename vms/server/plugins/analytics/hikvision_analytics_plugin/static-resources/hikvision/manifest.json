@@ -298,6 +298,16 @@
     ],
     "objectTypes": [
         {
+            "id": "nx.hikvision.undefined",
+            "name": "Undefined object",
+            "sourceCapabilities": [
+                "behaviorAnalysis",
+                "ANPR",
+                "shipsDetection",
+                "thermometry"
+            ]
+        },
+        {
             "id": "nx.hikvision.human",
             "name": "Human",
             "sourceCapabilities": [
