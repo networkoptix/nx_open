@@ -1560,7 +1560,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>These tours will become invalid.</source>
-      <translation>これらのツアーは無効になります</translation>
+      <translation>これらのツアーは無効になります。</translation>
     </message>
   </context>
   <context>
@@ -1822,31 +1822,31 @@ to view more bookmarks</source>
     <message numerus="yes">
       <source>These devices are removed from System</source>
       <translation>
-        <numerusform>これらのデバイスはシステムから削除されます</numerusform>
+        <numerusform>これらのデバイスはシステムから削除されています。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These cameras are removed from System</source>
       <translation>
-        <numerusform>これらのカメラはシステムから削除されます</numerusform>
+        <numerusform>これらのカメラはシステムから削除されています。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These servers are removed from System</source>
       <translation>
-        <numerusform>これらのサーバーはシステムから削除されます</numerusform>
+        <numerusform>これらのサーバーはシステムから削除されています。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These users are removed from System</source>
       <translation>
-        <numerusform>これらのユーザーはシステムから削除されます</numerusform>
+        <numerusform>これらのユーザーはシステムから削除されています。</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These resources are removed from System</source>
       <translation>
-        <numerusform>これらのリソースはシステムから削除されます</numerusform>
+        <numerusform>これらのリソースはシステムから削除されています。</numerusform>
       </translation>
     </message>
     <message>
@@ -7138,13 +7138,13 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>Delete %n shared layouts?</source>
       <translation>
-        <numerusform>共有 %n レイアウトを削除しますか？</numerusform>
+        <numerusform>共有されている %n レイアウトを削除しますか？</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These %n layouts are shared with other users, so you delete it for them too.</source>
       <translation>
-        <numerusform>これらの %n レイアウトは他のユーザーと共有されています</numerusform>
+        <numerusform>これらの %n レイアウトは他のユーザーと共有されています。削除すると、共有しているユーザーからも参照できなくなります。</numerusform>
       </translation>
     </message>
     <message numerus="yes">

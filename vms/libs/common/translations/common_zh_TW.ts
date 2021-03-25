@@ -187,11 +187,11 @@
     </message>
     <message>
       <source>You are about to merge Systems with NVR licenses.</source>
-      <translation>您正要使用 Starter授權合併系統.</translation>
+      <translation>您正要使用NVR授權合併系統.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>
-      <translation>一個系統只允許一組NVR授權, 第二組將被停用.</translation>
+      <translation>每個系統僅允許啟用一組NVR授權, 第二組將被停用.</translation>
     </message>
   </context>
   <context>
@@ -778,7 +778,7 @@
       <source>%n/%1 NVR Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n%1NVR授權</numerusform>
+        <numerusform>%n/%1 NVR授權</numerusform>
       </translation>
     </message>
   </context>
@@ -841,27 +841,27 @@
     </message>
     <message>
       <source>Only one Starter license is allowed per System.</source>
-      <translation>每個系統只能啟用一組Starter授權。</translation>
+      <translation>每個系統僅允許啟用一組Starter授權。</translation>
     </message>
     <message>
       <source>You already have one active Starter license.</source>
-      <translation>有一組Starter授權已啟用中 。</translation>
+      <translation>您已有一組Starter授權啟用中 。</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per System.</source>
-      <translation type="unfinished">Only one NVR license is allowed per System.</translation>
+      <translation>每個系統僅允許啟用一組NVR授權。</translation>
     </message>
     <message>
       <source>You already have one active NVR license.</source>
-      <translation type="unfinished">You already have one active NVR license.</translation>
+      <translation>您已有一組NVR授權啟用中。</translation>
     </message>
     <message>
       <source>Only one license of this type is allowed per System.</source>
-      <translation type="unfinished">Only one license of this type is allowed per System.</translation>
+      <translation>每個系統僅允許使用一組此種類型的授權。</translation>
     </message>
     <message>
       <source>You already have one active license of the same type.</source>
-      <translation type="unfinished">You already have one active license of the same type.</translation>
+      <translation>您已啟用一組同類型的授權。</translation>
     </message>
   </context>
   <context>

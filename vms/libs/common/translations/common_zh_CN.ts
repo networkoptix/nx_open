@@ -187,11 +187,11 @@
     </message>
     <message>
       <source>You are about to merge Systems with NVR licenses.</source>
-      <translation type="unfinished">You are about to merge Systems with NVR licenses.</translation>
+      <translation>您正使用NVR授權合併系統</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one NVR license is allowed per System, so the second license will be deactivated.</translation>
+      <translation>每个系统只允许一组NVR授权，第二组将被终止。</translation>
     </message>
   </context>
   <context>
@@ -762,23 +762,23 @@
     </message>
     <message>
       <source>NVR</source>
-      <translation type="unfinished">NVR</translation>
+      <translation>NVR</translation>
     </message>
     <message>
       <source>NVR Licenses</source>
-      <translation type="unfinished">NVR Licenses</translation>
+      <translation>NVR授权</translation>
     </message>
     <message numerus="yes">
       <source>%n NVR Licenses</source>
-      <translation type="unfinished">
-        <numerusform>%n NVR Licenses</numerusform>
+      <translation>
+        <numerusform>%nNVR授权</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n/%1 NVR Licenses</source>
       <comment>%n will be replaced by the total count</comment>
-      <translation type="unfinished">
-        <numerusform>%n/%1 NVR Licenses</numerusform>
+      <translation>
+        <numerusform>%n/%1 NVR授权</numerusform>
       </translation>
     </message>
   </context>
@@ -841,27 +841,27 @@
     </message>
     <message>
       <source>Only one Starter license is allowed per System.</source>
-      <translation type="unfinished">Only one Starter license is allowed per System.</translation>
+      <translation>每個系統只允許启动一組Starter授权.</translation>
     </message>
     <message>
       <source>You already have one active Starter license.</source>
-      <translation type="unfinished">You already have one active Starter license.</translation>
+      <translation>您已有一组启用中的Starter授权。</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per System.</source>
-      <translation type="unfinished">Only one NVR license is allowed per System.</translation>
+      <translation>每個系統只允許一組NVR授权。</translation>
     </message>
     <message>
       <source>You already have one active NVR license.</source>
-      <translation type="unfinished">You already have one active NVR license.</translation>
+      <translation>您已有一组启用中的NVR授权。</translation>
     </message>
     <message>
       <source>Only one license of this type is allowed per System.</source>
-      <translation type="unfinished">Only one license of this type is allowed per System.</translation>
+      <translation>每个系统仅允许使用一个这种类型的授权。</translation>
     </message>
     <message>
       <source>You already have one active license of the same type.</source>
-      <translation type="unfinished">You already have one active license of the same type.</translation>
+      <translation>您已启用一组同类型的授权。</translation>
     </message>
   </context>
   <context>
