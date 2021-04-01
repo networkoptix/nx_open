@@ -618,7 +618,7 @@ void ProgressiveDownloadingServer::run()
         dataProvider = liveReader;
         if (liveReader) {
             if (camera->isSomeActivity() && !audioOnly)
-                dataConsumer.copyLastGopFromCamera(camera, streamInfo->getEncoderIndex()); //< Don't copy deprecated gop if camera is not running now
+                dataConsumer.copyLastGopFromCamera(camera, streamIndex); //< Don't copy deprecated gop if camera is not running now
             liveReader->startIfNotRunning();
             camera->inUse(this);
         }
