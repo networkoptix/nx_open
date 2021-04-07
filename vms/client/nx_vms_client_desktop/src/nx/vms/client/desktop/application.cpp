@@ -77,8 +77,9 @@
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_access_controller.h>
 
-#ifdef Q_OS_MAC
-#include <ui/workaround/mac_utils.h>
+#ifdef Q_OS_MACOS
+    #include <sys/sysctl.h>
+    #include <ui/workaround/mac_utils.h>
 #endif
 
 #include <ui/workaround/combobox_wheel_filter.h>
@@ -141,6 +142,45 @@ Qt::WindowFlags calculateWindowFlags()
         result |= Qt::FramelessWindowHint | Qt::X11BypassWindowManagerHint;
 
     return result;
+}
+
+static void initQmlGlyphCacheWorkaround()
+{
+    #if defined (Q_OS_MACOS)
+        #if defined(__amd64)
+            // Fixes issue with QML texts rendering observed on the MacBook laptops with
+            // Nvidia GeForce GT 750M discrete graphic hardware and all M1 macs.
+            size_t len = 0;
+            sysctlbyname("hw.model", nullptr, &len, nullptr, 0);
+            QByteArray hardwareModel(len, 0);
+            sysctlbyname("hw.model", hardwareModel.data(), &len, nullptr, 0);
+
+            // Detect running under Rosetta2.
+            // https://developer.apple.com/documentation/apple-silicon/about-the-rosetta-translation-environment
+            const auto processIsTranslated = 
+                []() -> bool
+                {
+                    int ret = 0;
+                    size_t size = sizeof(ret);
+                    if (sysctlbyname("sysctl.proc_translated", &ret, &size, nullptr, 0) == -1)
+                        return errno != ENOENT; //< Assume native only when ENOENT is returned.
+                    return (bool) ret;
+                };
+
+            const bool glyphcacheWorkaround =
+                hardwareModel.contains("MacBookPro11,2")
+                || hardwareModel.contains("MacBookPro11,3")
+                || processIsTranslated();
+        #else
+            // Currently all Apple Silicon macs require this.
+            const bool glyphcacheWorkaround = true;
+        #endif
+    #else
+        const bool glyphcacheWorkaround = false;
+    #endif
+
+    if (glyphcacheWorkaround)
+        qputenv("QML_USE_GLYPHCACHE_WORKAROUND", "1");
 }
 
 } // namespace
@@ -374,6 +414,8 @@ int runApplication(int argc, char** argv)
     AllowSetForegroundWindow(ASFW_ANY);
     win32_exception::installGlobalUnhandledExceptionHandler();
 #endif
+
+    initQmlGlyphCacheWorkaround();
 
     nx::utils::rlimit::setMaxFileDescriptors(8000);
 
