@@ -38,6 +38,10 @@ def sign_binary(
         'sign_timeout': sign_timeout
     }
 
+    # It necessary to add '/signtool' to the end of url for redirection purposes.
+    if not url.endswith('/signtool'):
+        url += '/signtool'
+
     last_status_code = 0
     for current_try in range(1, max_retries + 1):
         print('Signing file {}'.format(file))
@@ -132,7 +136,7 @@ def main():
     args = parser.parse_args()
 
     return sign_binary(
-        url=args.url + '/signtool',
+        url=args.url,
         file=args.file,
         output=args.output if args.output else args.file,
         customization=args.customization,
