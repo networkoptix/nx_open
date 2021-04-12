@@ -87,6 +87,9 @@ void DeviceAgent::doSetSettings(Result<const ISettingsResponse*>* outResult, con
 
             m_isFirstDoSetSettingsCall = false;
 
+            updateAvailableMetadataTypes(settings);
+            refreshMetadataStreaming();
+
             return newValues.releasePtr();
         });
 }

@@ -386,9 +386,13 @@ void MetadataHandler::handleEventMetadata(
         return;
     }
 
-    const auto eventState = eventMetadata->isActive()
-        ? nx::vms::api::EventState::active
-        : nx::vms::api::EventState::inactive;
+    auto eventState = nx::vms::api::EventState::undefined;
+    if (descriptor->flags.testFlag(nx::vms::api::analytics::EventTypeFlag::stateDependent))
+    {
+        eventState = eventMetadata->isActive()
+            ? nx::vms::api::EventState::active
+            : nx::vms::api::EventState::inactive;
+    }
 
     const auto eventMetadataWithObjectTrackId =
         eventMetadata->queryInterface<IEventMetadata1>();
