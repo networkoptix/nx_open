@@ -2574,13 +2574,13 @@ void QnMediaResourceWidget::handleZoomRectChanged()
     updateAspectRatio();
     updateIconButton();
 
-    // We never show analytics-related stuff for zoom windows
-    if (zoomRect().isValid())
-    {
-        setRoiVisible(/*visible*/ false, /*animated*/ false);
-        setAnalyticsObjectsVisible(/*visible*/ false, /*animated*/ false);
-        setAnalyticsObjectsVisibleForcefully(/*visible*/ false, /*animated*/ false);
-    }
+    if (!zoomRect().isValid())
+        return;
+
+    // We never show analytics-related stuff for zoom windows.
+    setRoiVisible(/*visible*/ false, /*animated*/ false);
+    setAnalyticsObjectsVisible(/*visible*/ false, /*animated*/ false);
+    setAnalyticsObjectsVisibleForcefully(/*visible*/ false, /*animated*/ false);
 
     // TODO: #PTZ probably belongs to instrument.
     if (options() & DisplayDewarped)
