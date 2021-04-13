@@ -6985,7 +6985,7 @@ If you intended to move analytics data to another storage location, please conta
     <message numerus="yes">
       <source>There is not much free space left on server storage. Some old footage may be deleted to free up space. Note that if selected files happen to be the oldest on the server, they will be deleted right after being uploaded.</source>
       <translation>
-        <numerusform>サーバーストレージには空き容量がほとんどありません。一部の古い映像は空き容量を増やすために削除されることがあります。選択したファイルがサーバー上で最も古いファイルの場合は、アップロードされた直後に削除されます。</numerusform>
+        <numerusform>サーバーストレージには十分な空き容量がありません。保存領域を確保するために、古い映像が削除されることがあります。また、選択したファイルがサーバー上で最も古いファイルの場合は、アップロードされた直後に削除されることにご注意ください。</numerusform>
       </translation>
     </message>
     <message>

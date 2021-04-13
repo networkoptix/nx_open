@@ -3185,7 +3185,7 @@
     <message>
       <location/>
       <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
-      <translation>無効な保存場所への記録は停止します。ただし、古い映像の削除は続行されます。</translation>
+      <translation>無効化された保存先への録画は停止しますが、古い映像は引き続き削除されます。</translation>
     </message>
     <message>
       <location/>
