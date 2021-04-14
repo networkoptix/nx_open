@@ -28,6 +28,7 @@ if(targetDevice STREQUAL "windows-x64")
 
     set(dependencies
         ${ucrt_directory}/bin/api-ms-win-core-console-l1-1-0.dll
+        ${ucrt_directory}/bin/api-ms-win-core-console-l1-2-0.dll
         ${ucrt_directory}/bin/api-ms-win-core-datetime-l1-1-0.dll
         ${ucrt_directory}/bin/api-ms-win-core-debug-l1-1-0.dll
         ${ucrt_directory}/bin/api-ms-win-core-errorhandling-l1-1-0.dll

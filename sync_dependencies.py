@@ -52,6 +52,7 @@ def determine_package_versions(
         "server-external": release_version,
         "certificates": customization,
         "customization_pack": f"{customization}_v2",
+        "winsdk-redist": "10.0.19041.0",
     }
 
     # Desktop Linux.
@@ -186,7 +187,7 @@ def sync_dependencies(target, syncher, platform, arch, box, release_version, opt
         sync("icu")
         sync("directx")
         sync("vmaxproxy", version="2.1")
-        sync("ucrt", version="10-redist")
+        sync("winsdk-redist")
         sync("msvc", version="2017-redist")
         sync("windows/wix", version="3.11")
         sync("windows/ilmerge", version="")
