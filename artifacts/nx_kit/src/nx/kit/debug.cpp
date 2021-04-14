@@ -210,7 +210,7 @@ void saveStr(
 {
     const std::string effectiveFilename = nx::kit::utils::absolutePath(originDir, filename);
 
-    std::ofstream file(effectiveFilename);
+    std::ofstream file(effectiveFilename, std::ios::binary); //< Binary to avoid CR+LF on Windows.
     if (!file.good())
     {
         printFunc(("####### ERROR: Unable to rewrite file " + effectiveFilename).c_str());
@@ -221,6 +221,28 @@ void saveStr(
         + effectiveFilename).c_str());
 
     file.write(str.c_str(), str.size()); //< Support '\0' inside the string.
+}
+
+void saveBin(
+    PrintFunc printFunc,
+    const char* originDir,
+    const char* filename,
+    const char* bytes,
+    int size)
+{
+    const std::string effectiveFilename = nx::kit::utils::absolutePath(originDir, filename);
+
+    std::ofstream file(effectiveFilename, std::ios::binary);
+    if (!file.good())
+    {
+        printFunc(("####### ERROR: Unable to rewrite file " + effectiveFilename).c_str());
+        return;
+    }
+
+    printFunc(nx::kit::utils::format("####### Saving %d byte(s) to file %s",
+        size, effectiveFilename.c_str()).c_str());
+
+    file.write(bytes, size);
 }
 
 } // namespace detail

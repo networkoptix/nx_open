@@ -171,11 +171,20 @@ NX_KIT_API std::string hexDumpLine(const char* bytes, int size, int bytesPerLine
 #endif
 
 /**
- * Saves the string to the file, If the path is relative, use NX_DEBUG_SAVE_DIR as the origin.
+ * Saves the string to a file. All bytes of the string are saved in binary form as-is, including
+ * newlines (so `\n` produces a Unix-style `LF` even on Windows) and zero bytes (if any). If the
+ * path is relative, use NX_DEBUG_SAVE_DIR as the origin.
  */
 #define NX_SAVE_STR(FILENAME, STR) \
     ::nx::kit::debug::detail::saveStr( \
         NX_KIT_DEBUG_DETAIL_PRINT_FUNC, (NX_DEBUG_SAVE_DIR), (FILENAME), #STR, (STR))
+
+/**
+ * Saves the bytes to a binary file. If the path is relative, use NX_DEBUG_SAVE_DIR as the origin.
+ */
+#define NX_SAVE_BIN(FILENAME, BYTES, SIZE) \
+    ::nx::kit::debug::detail::saveBin( \
+        NX_KIT_DEBUG_DETAIL_PRINT_FUNC, (NX_DEBUG_SAVE_DIR), (FILENAME), (BYTES), (SIZE))
 
 //-------------------------------------------------------------------------------------------------
 // Time
@@ -312,6 +321,13 @@ NX_KIT_API void saveStr(
     const char* filename,
     const char* strCaption,
     const std::string& str);
+
+NX_KIT_API void saveBin(
+    PrintFunc printFunc,
+    const char* originDir,
+    const char* filename,
+    const char* bytes,
+    int size);
 
 } // namespace detail
 
