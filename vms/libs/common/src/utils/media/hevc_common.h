@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <vector>
+#include <QtCore/QString>
 
 namespace nx::media::hevc {
 
@@ -61,7 +62,7 @@ struct NalUnitHeader
     static const int kTotalLengthBit = 16;
     static const int kTotalLength = 2;
 
-    bool decode(const uint8_t* const payload, int payloadLength);
+    bool decode(const uint8_t* const payload, int payloadLength, QString* outErrorString = nullptr);
 };
 
 PacketType fromNalUnitTypeToPacketType(NalUnitType unitType);

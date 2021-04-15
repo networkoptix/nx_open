@@ -36,19 +36,27 @@ bool FuHeader::decode(const uint8_t* const payload, int payloadLength)
     return true;
 }
 
-bool NalUnitHeader::decode(const uint8_t* const payload, int payloadLength)
+bool NalUnitHeader::decode(const uint8_t* const payload, int payloadLength, QString* outErrorString)
 {
+    if (outErrorString)
+        outErrorString->clear();
+
     if (payloadLength < kTotalLength)
+    {
+        if (outErrorString)
+            *outErrorString = NX_FMT("Payload length is too short: %1 byte(s)", payloadLength);
         return false;
+    }
 
     if (payload[0] & kPayloadHeaderForbiddenZeroBitMask)
+    {
+        if (outErrorString)
+            *outErrorString = "payload contains forbidden zero bit";
         return false;
+    }
 
     unitType = (NalUnitType)((payload[0] & kPayloadHeaderNalUnitTypeMask) >> 1);
     layerId = ((*((uint16_t*)payload) & kPayloadHeaderLayerIdMask) >> kTidFieldLengthBit);
-
-    if (layerId) //< Should always be zero
-        return false;
 
     tid = payload[1] & kPayloadHeaderTidMask;
     return true;

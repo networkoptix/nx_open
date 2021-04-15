@@ -295,9 +295,10 @@ StreamParser::Result HevcParser::handlePayload(const uint8_t* payload, int paylo
         return {false, "Not enough data in RTP payload"};
 
     hevc::NalUnitHeader packetHeader;
-    if (!packetHeader.decode(payload, payloadLength))
+    QString errorString;
+    if (!packetHeader.decode(payload, payloadLength, &errorString))
     {
-        return {false, "Can't decode packet header"};
+        return {false, NX_FMT("Can't decode H.265 packet header: %1", errorString)};
     }
 
     updateNalFlags(packetHeader.unitType, payload, payloadLength);
