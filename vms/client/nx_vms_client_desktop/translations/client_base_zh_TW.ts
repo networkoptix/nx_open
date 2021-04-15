@@ -9036,7 +9036,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Verifying update</source>
-      <translation>驗證更新</translation>
+      <translation>驗證更新中</translation>
     </message>
   </context>
   <context>

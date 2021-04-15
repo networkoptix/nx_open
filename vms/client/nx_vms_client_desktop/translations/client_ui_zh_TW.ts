@@ -1379,7 +1379,7 @@
     <message>
       <location/>
       <source>Lens projection</source>
-      <translation type="unfinished">Lens projection</translation>
+      <translation>鏡頭投影</translation>
     </message>
   </context>
   <context>
@@ -1560,27 +1560,27 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/info_overlay_settings_widget.ui"/>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>關於</translation>
     </message>
     <message>
       <location/>
       <source>Camera name</source>
-      <translation type="unfinished">Camera name</translation>
+      <translation>攝影機名稱</translation>
     </message>
     <message>
       <location/>
       <source>Export date</source>
-      <translation type="unfinished">Export date</translation>
+      <translation>匯出日期</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>字體大小</translation>
     </message>
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>刪除</translation>
     </message>
   </context>
   <context>
@@ -2014,7 +2014,7 @@
     <message>
       <location/>
       <source>Show aim overlay for PTZ cameras</source>
-      <translation type="unfinished">Show aim overlay for PTZ cameras</translation>
+      <translation>顯示PTZ攝影機的指定覆蓋區</translation>
     </message>
   </context>
   <context>

@@ -9032,7 +9032,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Verifying update</source>
-      <translation type="unfinished">Verifying update</translation>
+      <translation>验证更新中</translation>
     </message>
   </context>
   <context>

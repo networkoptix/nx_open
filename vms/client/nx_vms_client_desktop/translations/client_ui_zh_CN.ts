@@ -125,7 +125,7 @@
     <message>
       <location/>
       <source>Use Hardware Video Decoding</source>
-      <translation type="unfinished">Use Hardware Video Decoding</translation>
+      <translation>使用硬件视频解码</translation>
     </message>
   </context>
   <context>
@@ -949,7 +949,7 @@
     <message>
       <location filename="../src/ui/widgets/system_settings/cloud_management_widget.ui"/>
       <source>This system is connected to</source>
-      <translation type="unfinished">This system is connected to</translation>
+      <translation>该系统已连接到</translation>
     </message>
   </context>
   <context>
@@ -1364,22 +1364,22 @@
     <message>
       <location/>
       <source>Show grid</source>
-      <translation type="unfinished">Show grid</translation>
+      <translation>显示网格</translation>
     </message>
     <message>
       <location/>
       <source>Mount</source>
-      <translation type="unfinished">Mount</translation>
+      <translation>挂载</translation>
     </message>
     <message>
       <location/>
       <source>Angle</source>
-      <translation type="unfinished">Angle</translation>
+      <translation>角度</translation>
     </message>
     <message>
       <location/>
       <source>Lens projection</source>
-      <translation type="unfinished">Lens projection</translation>
+      <translation>镜头投影</translation>
     </message>
   </context>
   <context>
@@ -1460,7 +1460,7 @@
     <message>
       <location/>
       <source>Play audio from all cameras on layout</source>
-      <translation type="unfinished">Play audio from all cameras on layout</translation>
+      <translation>自动同时播放布局中所有摄像机的声音输入</translation>
     </message>
   </context>
   <context>
@@ -1560,27 +1560,27 @@
     <message>
       <location filename="../src/nx/vms/client/desktop/export/widgets/info_overlay_settings_widget.ui"/>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>信息</translation>
     </message>
     <message>
       <location/>
       <source>Camera name</source>
-      <translation type="unfinished">Camera name</translation>
+      <translation>摄像机名称</translation>
     </message>
     <message>
       <location/>
       <source>Export date</source>
-      <translation type="unfinished">Export date</translation>
+      <translation>导出日期</translation>
     </message>
     <message>
       <location/>
       <source>Font Size</source>
-      <translation type="unfinished">Font Size</translation>
+      <translation>字体大小</translation>
     </message>
     <message>
       <location/>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>删除</translation>
     </message>
   </context>
   <context>
@@ -2014,7 +2014,7 @@
     <message>
       <location/>
       <source>Show aim overlay for PTZ cameras</source>
-      <translation type="unfinished">Show aim overlay for PTZ cameras</translation>
+      <translation>显示PTZ摄像机的指定覆盖区</translation>
     </message>
   </context>
   <context>
