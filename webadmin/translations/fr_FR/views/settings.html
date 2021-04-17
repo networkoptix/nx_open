@@ -100,7 +100,7 @@
                         </div>
 
                         <div ng-if="!cloudSystemID">
-                            <uib-alert type="warning">Ce Système n'est pas lié au{{Config.cloud.productName}}
+                            <uib-alert type="warning">Ce Système n'est pas lié au {{Config.cloud.productName}}
                                 <a ng-if="!mode.liteClient"
                                    ng-href="{{Config.cloud.portalUrl}}"
                                    target="_blank">En savoir plus</a></uib-alert>
@@ -111,7 +111,7 @@
                                     ng-click="connectToCloud()" ng-disabled="!hasInternetOnServer || !hasInternetOnClient">Connecter à {{Config.cloud.productName}}</button>
                                 <a ng-if="!mode.liteClient"  class="btn btn-default"
                                    ng-href="{{Config.cloud.portalUrl + Config.cloud.portalRegisterUrl + Config.cloud.webadminContext}}"
-                                   target="_blank">Céer compte {{Config.cloud.productName}}</a></p>
+                                   target="_blank">Créer compte {{Config.cloud.productName}}</a></p>
                         </div>
                     </div>
 
