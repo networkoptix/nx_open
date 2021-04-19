@@ -78,6 +78,7 @@ QnResourceDataPool::QnResourceDataPool(QObject *parent):
     m_shortVendorByName.insert(lit("samsung techwin"), lit("samsung"));
     m_shortVendorByName.insert(lit("2n telecommunications"), lit("2nt"));
     m_shortVendorByName.insert(lit("hangzhou hikvision digital technology co., ltd"), lit("hikvision"));
+    m_shortVendorByName.insert(lit("arecont vision"), lit("arecontvision"));
 }
 
 QnResourceDataPool::~QnResourceDataPool() {

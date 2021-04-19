@@ -115,6 +115,6 @@ public:
     // this function is designed for manual resource addition
     virtual QList<QnResourcePtr> checkHostAddr(const nx::utils::Url& url, const QAuthenticator& auth, bool doMultichannelCheck) = 0;
 
-	// Searcher is able to find non-network resources.
+    // Searcher is able to find non-network resources.
     virtual bool canFindLocalResources() const { return false; }
 };

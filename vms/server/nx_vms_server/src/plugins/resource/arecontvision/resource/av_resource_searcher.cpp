@@ -4,20 +4,23 @@
 
 #include <QtCore/QCoreApplication>
 
-#include "av_resource.h"
-#include "../tools/AVJpegHeader.h"
 #include <nx/network/nettools.h>
-#include "utils/common/sleep.h"
-#include "nx/utils/log/log.h"
-#include "core/resource/camera_resource.h"
-#include "plugins/resource/archive_camera/archive_camera.h"
+#include <nx/utils/log/log.h>
+#include <nx/utils/random.h>
+#include <nx/network/socket.h>
+#include <utils/common/sleep.h>
 
+#include <core/resource_management/resource_data_pool.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/camera_resource.h>
+
+#include "plugins/resource/archive_camera/archive_camera.h"
 #include "plugins/resource/mdns/mdns_resource_searcher.h"
+
+#include "av_resource.h"
 #include "av_panoramic.h"
 #include "av_singesensor.h"
-#include <nx/network/socket.h>
-#include <nx/utils/random.h>
-#include "core/resource_management/resource_pool.h"
+#include "../tools/AVJpegHeader.h"
 
 #define CL_BROAD_CAST_RETRY 1
 
@@ -289,6 +292,10 @@ QList<QnResourcePtr> QnPlArecontResourceSearcher::checkHostAddr(const nx::utils:
     model = getValueFromString(model);
 
     if (model.isEmpty())
+        return QList<QnResourcePtr>();
+
+    auto resourceData = dataPool()->data(manufacturer(), model);
+    if (resourceData.value<bool>(ResourceDataKey::kForceONVIF))
         return QList<QnResourcePtr>();
 
     QnUuid rt = qnResTypePool->getLikeResourceTypeId(manufacturer(), model);

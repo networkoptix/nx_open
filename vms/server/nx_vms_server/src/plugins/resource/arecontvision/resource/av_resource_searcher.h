@@ -2,12 +2,12 @@
 
 #ifdef ENABLE_ARECONT
 
-#include "core/resource_management/resource_searcher.h"
-#include "plugins/resource/arecontvision/resource/av_resource.h"
-#include <nx/vms/server/server_module_aware.h>
 #include <array>
 
-class QnCommonModule;
+#include <nx/vms/server/server_module_aware.h>
+
+#include "core/resource_management/resource_searcher.h"
+#include "plugins/resource/arecontvision/resource/av_resource.h"
 
 class QnPlArecontResourceSearcher:
     public QnAbstractNetworkResourceSearcher,
