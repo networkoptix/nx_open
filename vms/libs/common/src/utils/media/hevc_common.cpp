@@ -49,7 +49,7 @@ bool NalUnitHeader::decode(const uint8_t* const payload, int payloadLength, QStr
     }
 
     if (payload[0] & kPayloadHeaderForbiddenZeroBitMask)
-        NX_VERBOSE(this, "Incorrect hevc nal unit header, forbidden zero bit is set!");
+        NX_WARNING(this, "Incorrect hevc nal unit header, forbidden zero bit is set!");
 
     unitType = (NalUnitType)((payload[0] & kPayloadHeaderNalUnitTypeMask) >> 1);
     layerId = ((*((uint16_t*)payload) & kPayloadHeaderLayerIdMask) >> kTidFieldLengthBit);
