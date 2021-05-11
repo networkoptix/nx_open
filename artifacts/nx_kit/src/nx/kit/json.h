@@ -9,7 +9,7 @@
  * This file should be included into projects using Json11 via nx_kit, instead of Json11 original
  * header json11.hpp. Then, use nx::kit::Json - the main class of the Json11 lib.
  */
- 
+
 // Includes from json11.hpp are duplicated here to put them in the global namespace.
 #include <string>
 #include <vector>
@@ -36,11 +36,13 @@ class NX_KIT_API JsonValue; //< Considered private in Json11, but is exported fo
 //-------------------------------------------------------------------------------------------------
 // Explicitly instantiate and export a type used in class Json - suppresses an MSVC warning.
 
-namespace std {
+#if defined(_MSC_VER)
+    namespace std {
 
-template class NX_KIT_API std::shared_ptr<nx::kit::detail::json11::JsonValue>;
+    template class NX_KIT_API std::shared_ptr<nx::kit::detail::json11::JsonValue>;
 
-} // namespace std
+    } // namespace std
+#endif
 
 //-------------------------------------------------------------------------------------------------
 // Include the original Json11 header and make its classes available in namespace nx::kit.
@@ -48,7 +50,7 @@ template class NX_KIT_API std::shared_ptr<nx::kit::detail::json11::JsonValue>;
 namespace nx {
 namespace kit {
 
-namespace detail { 
+namespace detail {
 
 #include "../../json11/json11.hpp" //< Original Json11 header.
 
