@@ -64,7 +64,6 @@
 #define NX_INI_INT(DEFAULT, PARAM, DESCR) int PARAM
 #define NX_INI_STRING(DEFAULT, PARAM, DESCR) const char* PARAM
 #define NX_INI_FLOAT(DEFAULT, PARAM, DESCR) float PARAM
-#define NX_INI_DOUBLE(DEFAULT, PARAM, DESCR) double PARAM
 
 struct Ini NX_INI_STRUCT; //< Ini struct definition: expands using the macros defined above.
 
@@ -72,7 +71,6 @@ struct Ini NX_INI_STRUCT; //< Ini struct definition: expands using the macros de
 #undef NX_INI_INT
 #undef NX_INI_STRING
 #undef NX_INI_FLOAT
-#undef NX_INI_DOUBLE
 
 enum NxIniOutput { NX_INI_OUTPUT_NONE, NX_INI_OUTPUT_STDOUT, NX_INI_OUTPUT_STDERR };
 

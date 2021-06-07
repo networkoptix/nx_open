@@ -22,7 +22,6 @@ struct CppIni: public IniConfig
         #undef NX_INI_INT
         #undef NX_INI_STRING
         #undef NX_INI_FLOAT
-        #undef NX_INI_DOUBLE
 
         #define NX_INI_FLAG(DEFAULT, PARAM, DESCR) \
             pIni->PARAM = regBoolParam(&pIni->PARAM, (DEFAULT), #PARAM, (DESCR))
@@ -32,8 +31,6 @@ struct CppIni: public IniConfig
             pIni->PARAM = regStringParam(&pIni->PARAM, (DEFAULT), #PARAM, (DESCR))
         #define NX_INI_FLOAT(DEFAULT, PARAM, DESCR) \
             pIni->PARAM = regFloatParam(&pIni->PARAM, (DEFAULT), #PARAM, (DESCR))
-        #define NX_INI_DOUBLE(DEFAULT, PARAM, DESCR) \
-            pIni->PARAM = regDoubleParam(&pIni->PARAM, (DEFAULT), #PARAM, (DESCR))
 
         NX_INI_STRUCT //< Fields initialization: expands using the macros defined above.
     }

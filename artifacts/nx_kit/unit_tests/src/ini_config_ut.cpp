@@ -34,9 +34,6 @@ std::ostream& operator<<(std::ostream& s, IniConfig::ParamType value)
         case IniConfig::ParamType::float_:
             return s << "float";
 
-        case IniConfig::ParamType::double_:
-            return s << "double";
-
         case IniConfig::ParamType::string:
             return s << "string";
     }
@@ -62,8 +59,7 @@ struct TestIni: IniConfig
     NX_INI_STRING("plain string", str5, "Plain string.");
     NX_INI_STRING("plain string with \\ backslash", str6, "Plain string with backslash.");
     NX_INI_INT(113, intNumber, "Test int number.");
-    NX_INI_FLOAT(310.55f, floatNumber ,"Test float number.");
-    NX_INI_DOUBLE(-0.45, doubleNumber, "Test double number.");
+    NX_INI_FLOAT(310.55F, floatNumber ,"Test float number.");
 };
 
 static const TestIni defaultIni; //< Source of default values for comparison.
@@ -93,8 +89,7 @@ struct SavedIni: IniConfig
     NX_INI_STRING("another plain string", str5, "Plain string.");
     NX_INI_STRING("another plain string with \\ backslash", str6, "Plain string with backslash.");
     NX_INI_INT(777, intNumber, "Test int number.");
-    NX_INI_FLOAT(0.432f, floatNumber ,"Test float number.");
-    NX_INI_DOUBLE(34.45, doubleNumber, "Test double number.");
+    NX_INI_FLOAT(0.432F, floatNumber ,"Test float number.");
 };
 
 template<class ExpectedIni, class ActualIni>
@@ -115,7 +110,6 @@ static void assertIniEquals(int line, const ExpectedIni& expected, const ActualI
     ASSERT_INI_PARAM_STREQ(str6);
     ASSERT_INI_PARAM_EQ(intNumber);
     ASSERT_INI_PARAM_EQ(floatNumber);
-    ASSERT_INI_PARAM_EQ(doubleNumber);
 
     #undef ASSERT_INI_PARAM_EQ
     #undef ASSERT_INI_PARAM_STREQ
@@ -156,7 +150,6 @@ static void generateIniFile(const SavedIni& ini)
     GENERATE_INI_PARAM_STR(str6);
     GENERATE_INI_PARAM_VAL(intNumber);
     GENERATE_INI_PARAM_VAL(floatNumber);
-    GENERATE_INI_PARAM_VAL(doubleNumber);
 
     #undef GENERATE_INI_PARAM_STR
     #undef GENERATE_INI_PARAM_VAL
@@ -236,7 +229,6 @@ test.ini [{iniFilePath}]
   * str6="another plain string with \\ backslash"
   * intNumber=777
   * floatNumber=0.432
-  * doubleNumber=34.45
 )");
 
     testReload(__LINE__, savedIni, &ini(), "values not changed, silent", "");
@@ -272,7 +264,6 @@ str5="Octal escape sequence \666 does not fit in one byte"
 str6="Hex escape sequence \xDEAD does not fit in one byte"
 intNumber=3.14
 floatNumber=non-number
-doubleNumber=0.0.0
 )";
     nx::kit::utils::stringReplaceAll(&content, "{TAB}", "\x09");
     nx::kit::utils::stringReplaceAll(&content, "{NUL}", std::string("\0", 1));
@@ -303,7 +294,6 @@ test.ini ERROR: The name part (before "=") is empty. Line 4, file {iniFilePath}
   ! str6="plain string with \\ backslash" [invalid value in file]
   ! intNumber=113 [invalid value in file]
   ! floatNumber=310.55 [invalid value in file]
-  ! doubleNumber=-0.45 [invalid value in file]
   ! nullStr [unexpected param in file]
   ! unknownParam [unexpected param in file]
   ! unknownParamWithEmptyValue [unexpected param in file]
@@ -337,11 +327,7 @@ TEST(iniConfig, testGetParamTypeAndValue)
 
     ASSERT_TRUE(ini.getParamTypeAndValue("floatNumber", &type, &data));
     ASSERT_EQ(IniConfig::ParamType::float_, type);
-    ASSERT_EQ(310.55f, *static_cast<const float*>(data));
-
-    ASSERT_TRUE(ini.getParamTypeAndValue("doubleNumber", &type, &data));
-    ASSERT_EQ(IniConfig::ParamType::double_, type);
-    ASSERT_EQ(-0.45, *static_cast<const double*>(data));
+    ASSERT_EQ(310.55F, *static_cast<const float*>(data));
 
     ASSERT_TRUE(ini.getParamTypeAndValue("str5", &type, &data));
     ASSERT_EQ(IniConfig::ParamType::string, type);

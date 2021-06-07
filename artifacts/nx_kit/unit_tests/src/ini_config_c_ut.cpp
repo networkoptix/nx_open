@@ -19,7 +19,6 @@ static void assertIniEquals(int line, const Ini& expected, const Ini& actual)
     ASSERT_INI_PARAM_EQ(testInt);
     ASSERT_INI_PARAM_STREQ(testString);
     ASSERT_INI_PARAM_EQ(testFloat);
-    ASSERT_INI_PARAM_EQ(testDouble);
 
     #undef ASSERT_INI_PARAM_EQ
     #undef ASSERT_INI_PARAM_STREQ
@@ -35,7 +34,6 @@ static void generateIniFile(const Ini& iniInstance)
     GENERATE_INI_PARAM(testInt);
     GENERATE_INI_PARAM(testString);
     GENERATE_INI_PARAM(testFloat);
-    GENERATE_INI_PARAM(testDouble);
 
     #undef GENERATE_INI_PARAM
 
@@ -45,7 +43,7 @@ static void generateIniFile(const Ini& iniInstance)
 TEST(ini_config_c, test)
 {
     const Ini defaultIni = ini; //< Source of default values for comparison.
-    const Ini savedIni { false, 555, "new string", 36.6f, 42.42 };
+    const Ini savedIni { false, 555, "new string", 36.6F };
 
     ASSERT_TRUE(nx_ini_isEnabled());
     ASSERT_STREQ(NX_INI_FILE, nx_ini_iniFile());
