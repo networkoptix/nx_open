@@ -48,7 +48,6 @@ namespace kit {
  *         NX_INI_INT(7, myInt, "Here 7 is the default value.");
  *         NX_INI_STRING("Default value", myStr, "Description.");
  *         NX_INI_FLOAT(1.0, myFloat, "Here 1.0 is the default value.");
- *         NX_INI_DOUBLE(1.0, myDouble, "Here 1.0 is the default value.");
  *     };
  *
  *     Ini& ini();
@@ -120,7 +119,13 @@ public:
     const char* iniFile() const; /**< @return Stored copy of the string supplied to the ctor. */
     const char* iniFilePath() const; /**< @return iniFilesDir() + iniFile(). */
 
-    /** Reload values from .ini file, logging the values first time, or if changed. */
+    /**
+     * Reload values from .ini file, logging the values first time, or if changed.
+     *
+     * Can be called from any thread. Creates a fence, so the values in the fields are available to
+     * other threads immediately after reloading finishes. The fields themselves, though not
+     * declared atomic, are 32-bit values and thus will always be updated atomically.
+     */
     void reload();
 
     class Tweaks;
@@ -131,7 +136,6 @@ public:
         string, /**< const char* */
         integer, /**< int */
         float_, /**< float */
-        double_ /**< double */
     };
 
     /**
@@ -154,9 +158,6 @@ protected:
     #define NX_INI_FLOAT(DEFAULT, PARAM, DESCRIPTION) \
         const float PARAM = regFloatParam(&PARAM, DEFAULT, #PARAM, DESCRIPTION)
 
-    #define NX_INI_DOUBLE(DEFAULT, PARAM, DESCRIPTION) \
-        const double PARAM = regDoubleParam(&PARAM, DEFAULT, #PARAM, DESCRIPTION)
-
 protected: // Used by the above macros.
     bool regBoolParam(const bool* pValue, bool defaultValue,
         const char* paramName, const char* description);
@@ -168,9 +169,6 @@ protected: // Used by the above macros.
         const char* paramName, const char* description);
 
     float regFloatParam(const float* pValue, float defaultValue,
-        const char* paramName, const char* description);
-
-    double regDoubleParam(const double* pValue, double defaultValue,
         const char* paramName, const char* description);
 
 private:

@@ -7,6 +7,7 @@
 #include <fstream>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <sstream>
 #include <string>
 #include <unordered_map>
@@ -45,7 +46,6 @@ template<typename Value> struct TypeId {};
 template<> struct TypeId<bool> { static constexpr auto value = IniConfig::ParamType::boolean; };
 template<> struct TypeId<int> { static constexpr auto value = IniConfig::ParamType::integer; };
 template<> struct TypeId<float> { static constexpr auto value = IniConfig::ParamType::float_; };
-template<> struct TypeId<double> { static constexpr auto value = IniConfig::ParamType::double_; };
 template<> struct TypeId<const char*> { static constexpr auto value = IniConfig::ParamType::string; };
 
 struct ParsedNameValue
@@ -168,6 +168,9 @@ struct AbstractParam
     const std::string description;
     const IniConfig::ParamType type;
 
+    // For string params, the values are owned here; never cleaned up to guarantee char*.
+    std::vector<std::string> historicValues;
+
     AbstractParam(const char* name, const char* description, IniConfig::ParamType type):
         name(name), description(description), type(type)
     {
@@ -286,11 +289,7 @@ bool Param<const char*>::reload(const std::string* value, std::ostream* output)
 {
     const std::string oldValue = *pValue ? *pValue : "";
 
-    if (*pValue != defaultValue)
-    {
-        free(const_cast<char*>(*pValue));
-        *pValue = defaultValue;
-    }
+    *pValue = defaultValue;
 
     std::string error;
     if (value) //< Exists in .ini file, and can be empty: copy all chars to *pValue.
@@ -306,8 +305,8 @@ bool Param<const char*>::reload(const std::string* value, std::ostream* output)
 
         if (error.empty())
         {
-            *pValue = (char*) malloc(str.size() + 1);
-            memcpy(const_cast<char*>(*pValue), str.c_str(), str.size() + 1);
+            historicValues.push_back(str);
+            *pValue = historicValues.back().c_str();
         }
         else
         {
@@ -320,13 +319,6 @@ bool Param<const char*>::reload(const std::string* value, std::ostream* output)
     printValueLine(output, newValue, error.empty() ? "" : " [invalid value in file]",
         newValue == (defaultValue ? defaultValue : ""));
     return oldValue != newValue;
-}
-
-template<>
-Param<const char*>::~Param()
-{
-    if (*pValue != defaultValue)
-        free(const_cast<char*>(*pValue));
 }
 
 } // namespace
@@ -399,6 +391,8 @@ private:
     void reloadParams(std::ostream* output, bool* outputIsNeeded) const;
 
 private:
+    std::mutex m_reloadMutex;
+
     bool m_firstTimeReload = true;
     bool m_iniFileEverExisted = false;
     std::map<std::string, std::string> m_iniMap;
@@ -550,6 +544,8 @@ void IniConfig::Impl::reload()
     if (!m_firstTimeReload && !m_iniFileEverExisted)
         return;
 
+    const std::lock_guard<std::mutex> lock(m_reloadMutex);
+
     std::ostringstream outputString;
     std::ostream* out = output() ? &outputString : nullptr;
 
@@ -684,13 +680,6 @@ float IniConfig::regFloatParam(
     const char* paramName, const char* description)
 {
     return d->regParam<float>(pValue, defaultValue, paramName, description);
-}
-
-double IniConfig::regDoubleParam(
-    const double* pValue, double defaultValue,
-    const char* paramName, const char* description)
-{
-    return d->regParam<double>(pValue, defaultValue, paramName, description);
 }
 
 const char* IniConfig::iniFile() const
