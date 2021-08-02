@@ -181,7 +181,7 @@ static const ParsedCmdLineArgs& parsedCmdLineArgs()
 
     parsedArgs.reset(new ParsedCmdLineArgs);
 
-    const auto& args = nx::kit::utils::getProcessCmdLineArgs();
+    const std::vector<std::string>& args = nx::kit::utils::getProcessCmdLineArgs();
 
     if (args.size() == 1)
         return *parsedArgs; //< Do nothing if no args were specified.
@@ -196,6 +196,10 @@ static const ParsedCmdLineArgs& parsedCmdLineArgs()
 
     for (int i = /*skip argv[0]*/ 1; i < (int) args.size(); ++i)
     {
+        // Stop processing args after "--" - let main() process them.
+        if (arg(i) == "--")
+            break;
+
         const std::string tmpOption = "--tmp";
         const std::string tmpOptionEq = "--tmp=";
         if (arg(i) == tmpOption)
@@ -433,25 +437,33 @@ static std::string baseTempDir()
     return value;
 }
 
-static void printHelp(const std::string& argv0)
+static void printHelp(const std::string& argv0, const char* specificArgsHelp)
 {
-    std::cerr << //< stderr is used to avoid mixing with the output from static initialization.
-        "\n" <<
-        "Usage:\n" <<
-        "\n" <<
-        "  " << argv0 << " [options]\n" <<
-        "\n" <<
-        "Options:\n" <<
-        "\n" <<
-        "  -h|--help\n" <<
-        "    Show usage help.\n" <<
-        "\n" <<
-        "  --stop-on-failure\n" <<
-        "    Stop on first test failure.\n" <<
-        "\n" <<
-        "  --tmp[=]<temp-dir>\n" <<
-        "    Use <temp-dir> for temp files instead of a random dir in the system temp dir.\n" <<
-        "";
+    const std::string usageExample = argv0 + " [<options>]" +
+        (specificArgsHelp ? " [-- <specific-args>]" : "");
+
+    const std::string specificArgsSection = specificArgsHelp
+        ? (std::string("\n<specific-args>:\n\n") + specificArgsHelp)
+        : "";
+
+    // NOTE: stderr is used to avoid mixing with the output from static initialization.
+    std::cerr <<
+R"(
+Usage:
+
+  )" + usageExample + R"(
+
+<options>:
+
+  -h|--help
+    Show usage help.
+
+  --stop-on-failure
+    Stop on first test failure.
+
+  --tmp[=]<temp-dir>
+    Use <temp-dir> for temp files instead of a random dir in the system temp dir.
+)" + specificArgsSection;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -529,11 +541,11 @@ static bool runTest(Test& test, int testNumber)
     return success;
 }
 
-int runAllTests(const char *testSuiteName)
+int runAllTests(const char *testSuiteName, const char* specificArgsHelp)
 {
     if (parsedCmdLineArgs().showHelp)
     {
-        printHelp(nx::kit::utils::getProcessCmdLineArgs()[0]);
+        printHelp(nx::kit::utils::getProcessCmdLineArgs()[0], specificArgsHelp);
         exit(0);
     }
 

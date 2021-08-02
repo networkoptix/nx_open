@@ -477,6 +477,51 @@ TEST(utils, stringReplaceAll)
     #undef STR
 }
 
+TEST(utils, stringStartsWith)
+{
+    ASSERT_TRUE(stringStartsWith("abc", "a"));
+    ASSERT_TRUE(stringStartsWith("abc", "ab"));
+    ASSERT_TRUE(stringStartsWith("abc", "abc"));
+    ASSERT_TRUE(stringStartsWith("abc", ""));
+    ASSERT_TRUE(stringStartsWith("", ""));
+
+    ASSERT_FALSE(stringStartsWith("", "a"));
+    ASSERT_FALSE(stringStartsWith("b", "a"));
+    ASSERT_FALSE(stringStartsWith("abc", "X"));
+    ASSERT_FALSE(stringStartsWith("abc", "c"));
+    ASSERT_FALSE(stringStartsWith("abc", "abX"));
+    ASSERT_FALSE(stringStartsWith("a", "a_longer_prefix"));
+}
+
+TEST(utils, stringEndsWith)
+{
+    ASSERT_TRUE(stringEndsWith("abc", "c"));
+    ASSERT_TRUE(stringEndsWith("abc", "bc"));
+    ASSERT_TRUE(stringEndsWith("abc", "abc"));
+    ASSERT_TRUE(stringEndsWith("abc", ""));
+    ASSERT_TRUE(stringEndsWith("", ""));
+
+    ASSERT_FALSE(stringEndsWith("", "a"));
+    ASSERT_FALSE(stringEndsWith("b", "a"));
+    ASSERT_FALSE(stringEndsWith("abc", "X"));
+    ASSERT_FALSE(stringEndsWith("abc", "a"));
+    ASSERT_FALSE(stringEndsWith("abc", "Xbc"));
+    ASSERT_FALSE(stringEndsWith("x", "a_longer_suffix"));
+}
+
+TEST(utils, trimString)
+{
+    ASSERT_EQ("abc", trimString("abc"));
+    ASSERT_EQ("a", trimString("a"));
+    ASSERT_EQ("", trimString(""));
+    ASSERT_EQ("a", trimString(" a"));
+    ASSERT_EQ("a  b", trimString("  a  b"));
+    ASSERT_EQ("a", trimString("a "));
+    ASSERT_EQ("a  b", trimString("a  b  "));
+    ASSERT_EQ("a\nb", trimString("\na\nb"));
+    ASSERT_EQ("a\nb", trimString("a\nb\n\n"));
+}
+
 } // namespace test
 } // namespace utils
 } // namespace kit

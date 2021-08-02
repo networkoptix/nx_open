@@ -87,6 +87,12 @@ NX_KIT_API void stringInsertAfterEach(std::string* s, char sample, const char* i
 NX_KIT_API void stringReplaceAll(
     std::string* s, const std::string& sample, const std::string& replacement);
 
+// TODO: Remove when migrating to C++20 - it has std::string::starts_with()/ends_with().
+NX_KIT_API bool stringStartsWith(const std::string& s, const std::string& prefix);
+NX_KIT_API bool stringEndsWith(const std::string& s, const std::string& suffix);
+
+NX_KIT_API std::string trimString(const std::string& s);
+
 //-------------------------------------------------------------------------------------------------
 // OS support.
 

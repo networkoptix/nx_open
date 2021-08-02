@@ -556,6 +556,30 @@ void stringReplaceAll(std::string* s, const std::string& sample, const std::stri
     }
 }
 
+bool stringStartsWith(const std::string& s, const std::string& prefix)
+{
+    return s.rfind(prefix, /*pos*/ 0) == 0;
+}
+
+bool stringEndsWith(const std::string& s, const std::string& suffix)
+{
+    return s.size() >= suffix.size()
+        && s.compare(s.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
+std::string trimString(const std::string& s)
+{
+    int start = 0;
+    while (start < (int) s.size() && s.at(start) <= ' ')
+        ++start;
+    int end = (int) s.size() - 1;
+    while (end >= 0 && s.at(end) <= ' ')
+        --end;
+    if (end < start)
+        return "";
+    return s.substr(start, end - start + 1);
+}
+
 } // namespace utils
 } // namespace kit
 } // namespace nx

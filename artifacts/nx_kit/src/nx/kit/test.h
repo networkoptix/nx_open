@@ -130,7 +130,7 @@ NX_KIT_API const char* staticTempDir();
  * </code></pre>
  * @return Number of failed tests.
  */
-NX_KIT_API int runAllTests(const char *testSuiteName);
+NX_KIT_API int runAllTests(const char *testSuiteName, const char* specificArgsHelp = nullptr);
 
 /** Allows zero bytes in the content. */
 NX_KIT_API void createFile(const std::string& filename, const std::string& content);
