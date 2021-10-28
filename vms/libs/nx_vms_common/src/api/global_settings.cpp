@@ -823,7 +823,7 @@ QnGlobalSettings::AdaptorList QnGlobalSettings::initMiscAdaptors()
             this);
 
     m_forceAnalyticsDbStoragePermissionsAdaptor = new QnLexicalResourcePropertyAdaptor<bool>(
-        "forceAnalyticsDbStoragePermissions", false,  this);
+        "forceAnalyticsDbStoragePermissions", true,  this);
 
     m_checkVideoStreamPeriodMsAdaptor = new QnLexicalResourcePropertyAdaptor<int>(
         "checkVideoStreamPeriodMs", 10000, this);
