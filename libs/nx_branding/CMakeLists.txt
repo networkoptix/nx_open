@@ -8,7 +8,7 @@ nx_add_target(nx_branding LIBRARY WERROR
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/branding.cpp"
     PUBLIC_LIBS
-        Qt5::Core
+        Qt6::Core
     FOLDER common/libs
 )
 

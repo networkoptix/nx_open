@@ -26,10 +26,10 @@ nx_add_target(nx_vms_common LIBRARY
     ADDITIONAL_RESOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/resources"
     PUBLIC_LIBS
-        Qt5::Gui
-        Qt5::Concurrent
-        Qt5::Multimedia
-        Qt5::Xml
+        Qt6::Gui
+        Qt6::Concurrent
+        Qt6::Multimedia
+        Qt6::Xml
         ffmpeg::ffmpeg
         nx_vms_api
         nx_vms_utils
@@ -63,7 +63,7 @@ endif()
 
 target_include_directories(nx_vms_common
     PRIVATE
-        ${Qt5Core_PRIVATE_INCLUDE_DIRS}
+        ${Qt6Core_PRIVATE_INCLUDE_DIRS}
         ${device_vendor_names_root}/src
         ${aes_library_root}/src
     PUBLIC

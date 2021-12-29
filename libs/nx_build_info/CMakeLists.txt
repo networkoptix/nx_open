@@ -8,7 +8,7 @@ nx_add_target(nx_build_info LIBRARY WERROR
     ADDITIONAL_SOURCES
         "${CMAKE_CURRENT_BINARY_DIR}/build_info.cpp"
     PUBLIC_LIBS
-        Qt5::Core
+        Qt6::Core
         nx_kit nx_reflect
     FOLDER common/libs
 )

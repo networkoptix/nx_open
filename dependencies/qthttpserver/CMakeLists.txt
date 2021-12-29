@@ -4,7 +4,7 @@ set(qthttpserver_dir ${open_source_root}/artifacts/qthttpserver)
 
 file(GLOB sources CONFIGURE_DEPENDS "${qthttpserver_dir}/*.cpp")
 file(GLOB headers CONFIGURE_DEPENDS "${qthttpserver_dir}/*.h")
-qt5_wrap_cpp(moc_sources ${headers})
+qt6_wrap_cpp(moc_sources ${headers})
 
 add_library(qthttpserver STATIC
     ${headers} ${sources} ${moc_sources}
@@ -13,7 +13,7 @@ set_target_properties(qthttpserver PROPERTIES FOLDER third_party)
 
 target_link_libraries(qthttpserver
     PUBLIC
-        Qt5::Core Qt5::Network
+        Qt6::Core Qt6::Network
 )
 
 target_include_directories(qthttpserver

@@ -3,8 +3,8 @@
 nx_add_target(nx_sql LIBRARY NO_MOC
     WERROR_IF NOT WINDOWS
     PUBLIC_LIBS
-        Qt5::Core
-        Qt5::Sql
+        Qt6::Core
+        Qt6::Sql
         nx_kit
         nx_utils
     FOLDER common/libs

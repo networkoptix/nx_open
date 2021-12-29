@@ -14,7 +14,7 @@ set(sources
     ${qtkeychain_dir}/keychain.h
 )
 
-set(libs Qt5::Core)
+set(libs Qt6::Core)
 
 if(WIN32)
     list(APPEND sources ${qtkeychain_dir}/keychain_win.cpp)
@@ -42,9 +42,9 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
         ${qtkeychain_dir}/plaintextstore.cpp
     )
 
-    find_package(Qt5DBus REQUIRED)
-    list(APPEND libs Qt5::DBus)
-    qt5_add_dbus_interface(sources
+    find_package(Qt6DBus REQUIRED)
+    list(APPEND libs Qt6::DBus)
+    qt6_add_dbus_interface(sources
         ${qtkeychain_dir}/org.kde.KWallet.xml kwallet_interface KWalletInterface)
 
     find_package(PkgConfig REQUIRED)
@@ -55,7 +55,7 @@ if(UNIX AND NOT APPLE AND NOT ANDROID)
     list(APPEND libs ${LIBSECRET_LIBRARIES})
 endif()
 
-qt5_wrap_cpp(moc_sources
+qt6_wrap_cpp(moc_sources
     ${qtkeychain_dir}/keychain.h
     ${qtkeychain_dir}/keychain_p.h
     ${qtkeychain_dir}/gnomekeyring_p.h

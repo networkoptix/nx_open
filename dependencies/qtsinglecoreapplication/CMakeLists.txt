@@ -14,4 +14,4 @@ nx_add_qt_mocables(qtsinglecoreapplication
 )
 
 target_include_directories(qtsinglecoreapplication PUBLIC ${src_dir}/src)
-target_link_libraries(qtsinglecoreapplication PRIVATE Qt5::Network)
+target_link_libraries(qtsinglecoreapplication PRIVATE Qt6::Network)

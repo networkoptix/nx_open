@@ -4,7 +4,7 @@ set(quazip_dir ${open_source_root}/artifacts/quazip/quazip)
 
 file(GLOB sources CONFIGURE_DEPENDS "${quazip_dir}/*.c" "${quazip_dir}/*.cpp")
 file(GLOB headers CONFIGURE_DEPENDS "${quazip_dir}/*.h")
-qt5_wrap_cpp(moc_sources
+qt6_wrap_cpp(moc_sources
     ${quazip_dir}/quazipfile.h
     ${quazip_dir}/quagzipfile.h
     ${quazip_dir}/quaziodevice.h
@@ -27,7 +27,7 @@ if(WINDOWS)
     target_include_directories(quazip PUBLIC ${QT_DIR}/include/QtZlib)
 endif()
 
-target_link_libraries(quazip Qt5::Core)
+target_link_libraries(quazip Qt6::Core Qt6::Core5Compat)
 
 if(NOT WINDOWS)
     target_link_libraries(quazip z)

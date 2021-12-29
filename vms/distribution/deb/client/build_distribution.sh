@@ -305,7 +305,6 @@ copyQtLibs()
         QuickTemplates2
         QuickControls2
         QuickShapes
-        X11Extras
         XcbQpa
         DBus
         Xml

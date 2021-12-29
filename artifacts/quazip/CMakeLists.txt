@@ -6,25 +6,25 @@ cmake_minimum_required(VERSION 2.6)
 # and producing a warning when unset since 3.7.1)
 cmake_policy(SET CMP0042 NEW)
 
-option(BUILD_WITH_QT4 "Build QuaZip with Qt4 no matter if Qt5 was found" OFF)
+option(BUILD_WITH_QT4 "Build QuaZip with Qt4 no matter if Qt6 was found" OFF)
 
 if( NOT BUILD_WITH_QT4 )
-    # try Qt5 first, and prefer that if found
-    find_package(Qt5Core QUIET)
+    # try Qt6 first, and prefer that if found
+    find_package(Qt6 COMPONENTS Core)
 endif()
 
-if(Qt5Core_FOUND)
+if(Qt6Core_FOUND)
     set(CMAKE_CXX_STANDARD 11)
-    set(QTCORE_LIBRARIES ${Qt5Core_LIBRARIES})
+    set(QTCORE_LIBRARIES ${Qt6Core_LIBRARIES})
     set(QUAZIP_LIB_VERSION_SUFFIX 5)
     # if there is no QT_ROOT, try to deduce it from Qt QtCore include
     if("${QT_ROOT}" STREQUAL "")
         set(QT_ROOT ${QT_QTCORE_INCLUDE_DIR}/../..)
     endif()
-    include_directories(${Qt5Core_INCLUDE_DIRS})
+    include_directories(${Qt6Core_INCLUDE_DIRS})
 
     macro(qt_wrap_cpp)
-        qt5_wrap_cpp(${ARGN})
+        qt6_wrap_cpp(${ARGN})
     endmacro()
 else()
     set(qt_min_version "4.5.0")

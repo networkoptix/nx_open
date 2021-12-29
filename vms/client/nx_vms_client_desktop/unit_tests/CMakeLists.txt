@@ -4,7 +4,7 @@ nx_add_test(nx_vms_client_desktop_ut
     PUBLIC_LIBS
         nx_vms_common_test_support
         nx_vms_client_desktop
-        Qt5::Test
+        Qt6::Test
     ADDITIONAL_MOCABLES
         src/qml/qml_dialog_with_state_ut.h
     FOLDER client/tests
