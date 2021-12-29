@@ -14,7 +14,7 @@ nx_add_target(nx_utils LIBRARY
     PUBLIC_LIBS
         Boost::headers
         OpenSSL::OpenSSL
-        Qt5::Core Qt5::Xml
+        Qt6::Core Qt6::Xml
         quazip
         nx_branding
         nx_build_info
@@ -43,7 +43,7 @@ target_compile_definitions(nx_utils
 
 target_include_directories(nx_utils
     PRIVATE
-        ${Qt5Core_PRIVATE_INCLUDE_DIRS}
+        ${Qt6Core_PRIVATE_INCLUDE_DIRS}
 )
 
 if (IOS)

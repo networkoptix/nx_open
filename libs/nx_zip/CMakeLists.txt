@@ -2,7 +2,7 @@
 
 nx_add_target(nx_zip LIBRARY WERROR
     PUBLIC_LIBS
-        Qt5::Core
+        Qt6::Core
         quazip
         nx_utils
     FOLDER common/libs

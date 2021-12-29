@@ -1,22 +1,20 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-find_package(Qt5
+find_package(Qt6
     COMPONENTS
         OpenGL
+        OpenGLWidgets
         Svg
         QuickWidgets
+        QuickControls2
         QuickTemplates2
-        WebEngine
+        WebEngineQuick
         WebEngineWidgets
         Test)
 
 find_package(hidapi REQUIRED)
 
 find_package(range-v3 REQUIRED)
-
-if(LINUX)
-    find_package(Qt5 COMPONENTS X11Extras)
-endif()
 
 if(WINDOWS)
     set(nov_file_launcher_executable "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/launcher${CMAKE_EXECUTABLE_SUFFIX}")
@@ -25,7 +23,7 @@ else()
 endif()
 
 nx_find_files(ui_files src "ui")
-qt5_wrap_ui(uic_files ${ui_files})
+qt6_wrap_ui(uic_files ${ui_files})
 
 if(MACOSX)
     set(mac_sources src/ui/workaround/mac_utils.mm)
@@ -121,11 +119,12 @@ nx_add_target(nx_vms_client_desktop LIBRARY
         ${QML_FILES}
         ${SHADER_FILES}
     PUBLIC_LIBS
-        Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Network
-        Qt5::Qml Qt5::QuickWidgets Qt5::QuickTemplates2 Qt5::Xml Qt5::Multimedia Qt5::Concurrent
-        Qt5::Svg
-        Qt5::WebEngine
-        Qt5::WebEngineWidgets
+        Qt6::Core Qt6::Gui Qt6::Widgets Qt6::OpenGLWidgets Qt6::Network
+        Qt6::Qml Qt6::QuickWidgets Qt6::QuickControls2 Qt6::QuickTemplates2
+        Qt6::Xml Qt6::Multimedia Qt6::Concurrent
+        Qt6::Svg
+        Qt6::WebEngineQuick
+        Qt6::WebEngineWidgets
         nx_vms_client_core
         nx_speech_synthesizer
         nx_audio
@@ -164,16 +163,16 @@ endif()
 
 target_include_directories(nx_vms_client_desktop
     PRIVATE
-        ${Qt5Gui_PRIVATE_INCLUDE_DIRS}
-        ${Qt5Widgets_PRIVATE_INCLUDE_DIRS}
-        ${Qt5WebEngine_PRIVATE_INCLUDE_DIRS}
-        ${Qt5QuickTemplates2_PRIVATE_INCLUDE_DIRS}
+        ${Qt6Gui_PRIVATE_INCLUDE_DIRS}
+        ${Qt6Widgets_PRIVATE_INCLUDE_DIRS}
+        ${Qt6WebEngine_PRIVATE_INCLUDE_DIRS}
+        ${Qt6WebEngineQuick_PRIVATE_INCLUDE_DIRS}
+        ${Qt6QuickTemplates2_PRIVATE_INCLUDE_DIRS}
 )
 
 if(LINUX)
     target_link_libraries(nx_vms_client_desktop
         PRIVATE
-            Qt5::X11Extras
             Xss
             Xfixes
             X11

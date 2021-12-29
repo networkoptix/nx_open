@@ -11,7 +11,7 @@ nx_add_target(nx_network LIBRARY NO_MOC
         ${mac_sources}
     WERROR_IF NOT WINDOWS AND NOT ANDROID AND NOT IOS
     PUBLIC_LIBS
-        Qt5::Network
+        Qt6::Network
         OpenSSL::OpenSSL
         nx_kit
         nx_utils

@@ -6,7 +6,7 @@ file(GLOB sources CONFIGURE_DEPENDS "${qt-mustache_dir}/qt-mustache/*.cpp")
 file(GLOB headers CONFIGURE_DEPENDS "${qt-mustache_dir}/qt-mustache/*.h")
 
 add_library(qt-mustache STATIC ${headers} ${sources})
-target_link_libraries(qt-mustache PRIVATE Qt5::Core)
+target_link_libraries(qt-mustache PRIVATE Qt6::Core)
 
 set_target_properties(qt-mustache PROPERTIES FOLDER third_party)
 

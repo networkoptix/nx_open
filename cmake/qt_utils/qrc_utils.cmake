@@ -1,10 +1,11 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 function(_nx_validate_rcc_executable)
-    if(NOT Qt5Core_RCC_EXECUTABLE)
+    get_target_property(QT_RCC_EXECUTABLE Qt6::rcc LOCATION)
+    if(NOT QT_RCC_EXECUTABLE)
         message(FATAL_ERROR
-            "rcc executable is not known: variable Qt5Core_RCC_EXECUTABLE is not set. "
-            "Find Qt5Core module before adding a qrc file.")
+            "rcc executable is not known: variable QT_RCC_EXECUTABLE is not set. "
+            "Find Qt6Core module before adding a qrc file.")
     endif()
 endfunction()
 
@@ -116,9 +117,10 @@ function(nx_add_qrc qrc_file out_cpp_file_variable)
     set(cpp_file ${CMAKE_CURRENT_BINARY_DIR}/qrc_${resource_name}.cpp)
 
     _nx_validate_rcc_executable()
+    get_target_property(QT_RCC_EXECUTABLE Qt6::rcc LOCATION)
     add_custom_command(
         OUTPUT ${cpp_file}
-        COMMAND ${Qt5Core_RCC_EXECUTABLE}
+        COMMAND ${QT_RCC_EXECUTABLE}
         ARGS ${QRC_OPTIONS} --name ${resource_name} --output ${cpp_file} ${qrc_file}
         MAIN_DEPENDENCY ${qrc_file}
         DEPENDS ${QRC_DEPENDS}
@@ -145,9 +147,10 @@ function(nx_add_external_resources_target target)
     nx_generate_qrc(${qrc_file} ${QRC_FILES} USED_FILES_VARIABLE qrc_used_files)
 
     _nx_validate_rcc_executable()
+    get_target_property(QT_RCC_EXECUTABLE Qt6::rcc LOCATION)
     add_custom_command(
         OUTPUT ${QRC_TARGET_FILE}
-        COMMAND ${Qt5Core_RCC_EXECUTABLE}
+        COMMAND ${QT_RCC_EXECUTABLE}
             -binary
             --name ${resource_name}
             --output ${QRC_TARGET_FILE}

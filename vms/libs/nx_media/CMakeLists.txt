@@ -90,7 +90,7 @@ nx_add_target(nx_media
 
 target_include_directories(nx_media
     PRIVATE
-        ${Qt5Multimedia_PRIVATE_INCLUDE_DIRS}
+        ${Qt6Multimedia_PRIVATE_INCLUDE_DIRS}
         ${additional_sources_include_dirs}
 )
 
@@ -119,7 +119,7 @@ else()
 endif()
 
 if(ANDROID)
-    target_link_libraries(nx_media PRIVATE Qt5::AndroidExtras)
+    target_link_libraries(nx_media PRIVATE Qt6::AndroidExtras)
 endif()
 
 if(withTests)

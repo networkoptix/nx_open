@@ -54,8 +54,9 @@ function(nx_add_qt_mocables target)
         return()
     endif()
 
-    if(NOT Qt5Core_MOC_EXECUTABLE)
-        message(FATAL_ERROR "Qt5 moc is not known: Qt5Core_MOC_EXECUTABLE is not set.")
+    get_target_property(QT_MOC_EXECUTABLE Qt6::moc LOCATION)
+    if(NOT QT_MOC_EXECUTABLE)
+        message(FATAL_ERROR "Qt6 moc is not known: QT_MOC_EXECUTABLE is not set.")
     endif()
 
     set(moc_parameters_file
@@ -78,7 +79,7 @@ function(nx_add_qt_mocables target)
 
         add_custom_command(
             OUTPUT ${moc_file}
-            COMMAND ${Qt5Core_MOC_EXECUTABLE}
+            COMMAND ${QT_MOC_EXECUTABLE}
                 -o ${moc_file} ${file} @${moc_parameters_file} ${MOC_FLAGS}
             DEPENDS ${file} ${moc_parameters_file}
             VERBATIM

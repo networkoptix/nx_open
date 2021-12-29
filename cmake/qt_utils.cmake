@@ -1,5 +1,7 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+set(QT_HOST_PATH "${CONAN_QT-HOST_ROOT}")
+
 include("${CMAKE_CURRENT_LIST_DIR}/qt_utils/moc_utils.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/qt_utils/translation_utils.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/qt_utils/qrc_utils.cmake")
@@ -14,7 +16,7 @@ endif()
 
 find_package(OpenSSL REQUIRED)
 
-find_package(Qt5
+find_package(Qt6
     COMPONENTS
         LinguistTools
         Core
@@ -25,4 +27,5 @@ find_package(Qt5
         Concurrent
         Multimedia
         Qml
+        Core5Compat
 )

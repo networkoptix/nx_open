@@ -17,7 +17,7 @@ include(ECMPackageConfigHelpers)
 include(ECMSetupVersion)
 include(ECMGeneratePriFile)
 
-option(BUILD_WITH_QT4 "Build qtkeychain with Qt4 no matter if Qt5 was found" OFF)
+option(BUILD_WITH_QT4 "Build qtkeychain with Qt4 no matter if Qt6 was found" OFF)
 option(BUILD_TEST_APPLICATION "Build test application" ON)
 option(BUILD_TRANSLATIONS "Build translations" ON)
 option(QTKEYCHAIN_STATIC "Build static library" OFF)
@@ -35,54 +35,54 @@ if (WIN32)
 endif()
 
 if( NOT BUILD_WITH_QT4 )
-    # try Qt5 first, and prefer that if found
-    find_package(Qt5Core QUIET)
+    # try Qt6 first, and prefer that if found
+    find_package(Qt6Core QUIET)
 endif()
 
-if (Qt5Core_FOUND AND NOT BUILD_WITH_QT4)
+if (Qt6Core_FOUND AND NOT BUILD_WITH_QT4)
   set(QTKEYCHAIN_VERSION_INFIX 5)
 
   if(UNIX AND NOT APPLE AND NOT ANDROID)
-    find_package(Qt5DBus REQUIRED)
-    include_directories(${Qt5DBus_INCLUDE_DIRS})
-    set(QTDBUS_LIBRARIES ${Qt5DBus_LIBRARIES})
+    find_package(Qt6DBus REQUIRED)
+    include_directories(${Qt6DBus_INCLUDE_DIRS})
+    set(QTDBUS_LIBRARIES ${Qt6DBus_LIBRARIES})
     macro(qt_add_dbus_interface)
-      qt5_add_dbus_interface(${ARGN})
+      Qt6_add_dbus_interface(${ARGN})
     endmacro()
   endif()
 
   if(BUILD_TRANSLATIONS)
-    find_package(Qt5LinguistTools REQUIRED)
+    find_package(Qt6LinguistTools REQUIRED)
     macro(qt_add_translation)
-      qt5_add_translation(${ARGN})
+      qt6_add_translation(${ARGN})
     endmacro(qt_add_translation)
     macro(qt_create_translation)
-      qt5_create_translation(${ARGN})
+      qt6_create_translation(${ARGN})
     endmacro(qt_create_translation)
   endif()
 
   macro(qt_wrap_cpp)
-    qt5_wrap_cpp(${ARGN})
+    qt6_wrap_cpp(${ARGN})
   endmacro()
 
-  set(QTCORE_LIBRARIES ${Qt5Core_LIBRARIES})
-  include_directories(${Qt5Core_INCLUDE_DIRS})
+  set(QTCORE_LIBRARIES ${Qt6Core_LIBRARIES})
+  include_directories(${Qt6Core_INCLUDE_DIRS})
 
-  if (NOT Qt5Core_VERSION VERSION_LESS "5.7.0")
+  if (NOT Qt6Core_VERSION VERSION_LESS "5.7.0")
     if (CMAKE_COMPILER_IS_GNUCXX)
       if ((NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.7.0") AND (CMAKE_CXX_COMPILER_VERSION VERSION_LESS "6.1.0"))
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
       elseif(CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.7.0")
-        message(FATAL_ERROR "Can't build QtKeychain using g++-${CMAKE_CXX_COMPILER_VERSION} and Qt ${Qt5Core_VERSION}: compiler supporting C++11 is required")
+        message(FATAL_ERROR "Can't build QtKeychain using g++-${CMAKE_CXX_COMPILER_VERSION} and Qt ${Qt6Core_VERSION}: compiler supporting C++11 is required")
       endif()
     elseif (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
       if (NOT ${CMAKE_CXX_COMPILER_VERSION} VERSION_LESS 3.3)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
       else()
-        message(FATAL_ERROR "Can't build QtKeychain using clang++-${CMAKE_CXX_COMPILER_VERSION} and Qt ${Qt5Core_VERSION}: compiler supporting C++11 is required")
+        message(FATAL_ERROR "Can't build QtKeychain using clang++-${CMAKE_CXX_COMPILER_VERSION} and Qt ${Qt6Core_VERSION}: compiler supporting C++11 is required")
       endif()
     elseif ((CMAKE_CXX_COMPILER_ID MATCHES "MSVC") AND (MSVC_VERSION LESS 1700))
-      message(FATAL_ERROR "Can't build QtKeychain using VC++-${MSVC_VERSION} and Qt ${Qt5Core_VERSION}: compiler supporting C++11 is required")
+      message(FATAL_ERROR "Can't build QtKeychain using VC++-${MSVC_VERSION} and Qt ${Qt6Core_VERSION}: compiler supporting C++11 is required")
     endif()
   endif()
 else()
@@ -180,11 +180,11 @@ if ( BUILD_TRANSLATIONS )
     add_custom_target(translations DEPENDS ${qtkeychain_QM_FILES})
 
     if(NOT QT_TRANSLATIONS_DIR)
-	# If this directory is missing, we are in a Qt5 environment.
+	# If this directory is missing, we are in a Qt6 environment.
 	# Extract the qmake executable location
-	get_target_property(QT5_QMAKE_EXECUTABLE Qt5::qmake IMPORTED_LOCATION)
-	# Ask Qt5 where to put the translations
-	execute_process( COMMAND ${QT5_QMAKE_EXECUTABLE} -query QT_INSTALL_TRANSLATIONS
+	get_target_property(Qt6_QMAKE_EXECUTABLE Qt6::qmake IMPORTED_LOCATION)
+	# Ask Qt6 where to put the translations
+	execute_process( COMMAND ${Qt6_QMAKE_EXECUTABLE} -query QT_INSTALL_TRANSLATIONS
 	    OUTPUT_VARIABLE qt_translations_dir OUTPUT_STRIP_TRAILING_WHITESPACE )
 	# make sure we have / and not \ as qmake gives on windows
 	file( TO_CMAKE_PATH "${qt_translations_dir}" qt_translations_dir)

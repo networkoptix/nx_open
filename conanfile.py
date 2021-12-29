@@ -60,11 +60,13 @@ class NxOpenConan(ConanFile):
     requires = (
         f"ffmpeg/{ffmpeg_version}" "#25419419d970893ebb7b5213d879c77c",
         "openssl/1.1.1q" "#a23bd98469b500b2d658a17351fa279c",
-        "qt/5.15.6" "#48b4cf4fa89839127f1cb92179c426ff",
+        "qt/6.4.1" "#e5f378ecdbcc948496a08d46175c58fd",
         "roboto-fonts/1.0" "#a1d64ec2d6a2e16f8f476b2b47162123",
     )
 
     def build_requirements(self):
+        self.build_requires("qt-host/6.4.1" "#32f7f5ac57afb4ee664383966dd2111f")
+
         if self.isLinux:
             # Note: For gcc-toolchain requirement see open/cmake/conan_profiles/gcc.profile.
             if self.options.useClang:
@@ -79,10 +81,6 @@ class NxOpenConan(ConanFile):
 
     def requirements(self):
         self.requires("boost/1.78.0" "#298dce0adb40278309cc5f76fc92b47a")
-
-        # Until we have arm64 macs in CI to build native tools, run x86_64 tools using Rosetta 2.
-        if self.isMacos and self.settings.arch in ("armv8", "x86_64"):
-            self.options["qt"].tools_target = "Macos_x86_64"
 
         if self.isWindows or self.isLinux:
             if self.settings.arch == "x86_64":
