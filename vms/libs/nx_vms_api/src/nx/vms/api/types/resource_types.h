@@ -66,7 +66,7 @@ constexpr auto nxReflectVisitAllEnumItems(ResourceStatus*, Visitor&& visitor)
     );
 }
 
-inline uint qHash(ResourceStatus value, uint seed = 0)
+inline size_t qHash(ResourceStatus value, size_t seed = 0)
 {
     return QT_PREPEND_NAMESPACE(qHash)((int) value, seed);
 }

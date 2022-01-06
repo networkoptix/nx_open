@@ -17,7 +17,7 @@
 #include <nx/fusion/serialization/compressed_time_fwd.h>
 
 #define QN_FUSION_DECLARE_FUNCTIONS_hash(TYPE, ... /* PREFIX */)                \
-__VA_ARGS__ uint qHash(const TYPE &value, uint seed = 0);
+__VA_ARGS__ size_t qHash(const TYPE &value, size_t seed = 0);
 
 #define QN_FUSION_DECLARE_FUNCTIONS_eq(TYPE, ... /* PREFIX */)                  \
 __VA_ARGS__ bool operator==(const TYPE &l, const TYPE &r);                      \

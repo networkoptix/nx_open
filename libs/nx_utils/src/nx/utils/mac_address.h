@@ -40,7 +40,7 @@ private:
     Data m_data = {};
 };
 
-inline uint qHash(const MacAddress& value, uint seed = 0)
+inline size_t qHash(const MacAddress& value, size_t seed = 0)
 {
     const auto data = value.bytes();
     return qHashRange(data.cbegin(), data.cend(), seed);

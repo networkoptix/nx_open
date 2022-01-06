@@ -20,7 +20,7 @@ NX_REFLECTION_ENUM_CLASS(Source,
     intercom //< Accessible as an intercom child.
 )
 
-inline uint qHash(Source value, uint seed)
+inline size_t qHash(Source value, size_t seed)
 {
     return ::qHash(static_cast<int>(value), seed);
 }

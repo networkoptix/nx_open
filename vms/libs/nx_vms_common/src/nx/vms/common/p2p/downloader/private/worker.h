@@ -52,7 +52,7 @@ public:
             return id == other.id && manager == other.manager;
         }
 
-        friend uint qHash(const Peer& peer)
+        friend size_t qHash(const Peer& peer)
         {
             return qHash(peer.id) + qHash(peer.manager);
         }
@@ -100,7 +100,7 @@ private:
             return peerManager == other.peerManager && handle == other.handle;
         }
 
-        friend uint qHash(const RequestHandle& handle)
+        friend size_t qHash(const RequestHandle& handle)
         {
             return qHash(handle.peerManager) + ::qHash(handle.handle);
         }

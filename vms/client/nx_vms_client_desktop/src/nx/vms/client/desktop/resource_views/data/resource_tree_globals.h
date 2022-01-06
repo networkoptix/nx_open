@@ -15,7 +15,7 @@ class QKeySequence;
 namespace nx::vms::client::desktop {
 namespace ResourceTree {
 
-Q_NAMESPACE
+Q_NAMESPACE_EXPORT(NX_VMS_CLIENT_DESKTOP_API)
 Q_CLASSINFO("RegisterEnumClassesUnscoped", "false")
 
 /**
@@ -72,7 +72,7 @@ NX_REFLECTION_ENUM_CLASS(NodeType,
 )
 Q_ENUM_NS(NodeType);
 
-inline uint qHash(NodeType value, uint seed = 0)
+inline size_t qHash(NodeType value, size_t seed = 0)
 {
     return ::qHash(static_cast<int>(value), seed);
 }
@@ -169,7 +169,7 @@ struct ExpandedNodeId
     operator bool() const { return type != NodeType{}; }
 };
 
-inline uint qHash(const ExpandedNodeId& value, uint seed = 0)
+inline size_t qHash(const ExpandedNodeId& value, uint seed = 0)
 {
     const auto combine = QtPrivate::QHashCombine();
     return combine(combine(combine(seed,

@@ -65,7 +65,7 @@ WidgetsList subtractWidgets(const WidgetsList& first, const WidgetsList& second)
 
 } // anonymous namespace
 
-uint qHash(const QPointer<QGraphicsWidget>& widget)
+size_t qHash(const QPointer<QGraphicsWidget>& widget)
 {
     return ::qHash(widget.data());
 }

@@ -102,14 +102,14 @@ struct EventCategory
 
 void registerQmlType();
 
-inline uint qHash(RightPanel::TimeSelection source)
+inline size_t qHash(RightPanel::TimeSelection source)
 {
-    return uint(source);
+    return size_t(source);
 }
 
-inline uint qHash(RightPanel::CameraSelection source)
+inline size_t qHash(RightPanel::CameraSelection source)
 {
-    return uint(source);
+    return size_t(source);
 }
 
 inline uint qHash(RightPanel::SystemSelection source)

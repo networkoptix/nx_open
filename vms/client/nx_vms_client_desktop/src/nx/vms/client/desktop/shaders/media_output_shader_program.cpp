@@ -138,7 +138,7 @@ bool MediaOutputShaderProgram::Key::operator==(const Key& other) const
             || (viewProjection == other.viewProjection && cameraProjection == other.cameraProjection));
 }
 
-uint qHash(const MediaOutputShaderProgram::Key& key, uint seed)
+size_t qHash(const MediaOutputShaderProgram::Key& key, uint seed)
 {
     const auto combine = QtPrivate::QHashCombine();
 

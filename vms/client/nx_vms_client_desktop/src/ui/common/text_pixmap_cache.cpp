@@ -135,7 +135,7 @@ public:
         {
         }
 
-        friend uint qHash(const Key& key)
+        friend size_t qHash(const Key& key)
         {
             using ::qHash;
             return

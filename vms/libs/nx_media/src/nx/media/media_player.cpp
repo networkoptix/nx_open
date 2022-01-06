@@ -39,9 +39,9 @@
 #include <nx/media/quick_sync/quick_sync_surface.h>
 #endif // __QSV_SUPPORTED__
 
-static uint qHash(const MetadataType& value)
+static size_t qHash(const MetadataType& value)
 {
-    return uint(value);
+    return size_t(value);
 }
 
 namespace nx {

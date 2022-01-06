@@ -66,7 +66,7 @@ private:
     const QScopedPointer<Private> d;
 };
 
-uint qHash(const ViewNodePath& path);
+size_t qHash(const ViewNodePath& path);
 
 } // namespace details
 } // namespace node_view

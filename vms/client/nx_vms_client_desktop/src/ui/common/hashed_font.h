@@ -29,7 +29,7 @@ public:
         return m_font;
     }
 
-    friend uint qHash(const QnHashedFont &font) {
+    friend size_t qHash(const QnHashedFont &font) {
         return font.m_hash;
     }
 

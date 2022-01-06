@@ -599,7 +599,7 @@ namespace Qn {
         equisolid
     )
 
-    inline uint qHash(FisheyeCameraProjection value, uint seed = 0)
+    inline size_t qHash(FisheyeCameraProjection value, size_t seed = 0)
     {
         return ::qHash(int(value), seed);
     }

@@ -72,7 +72,7 @@ QN_FUSION_DEFINE_FUNCTIONS(SoftwareVersion, (json_lexical)(xml_lexical))
 
 } // namespace nx::vms::api
 
-uint qHash(const nx::vms::api::SoftwareVersion& softwareVersion)
+size_t qHash(const nx::vms::api::SoftwareVersion& softwareVersion)
 {
     return softwareVersion.major() ^ softwareVersion.minor()
         ^ softwareVersion.bugfix() ^ softwareVersion.build();

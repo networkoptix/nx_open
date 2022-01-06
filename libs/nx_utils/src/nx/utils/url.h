@@ -180,7 +180,7 @@ private:
     Url(const QUrl& other);
 };
 
-inline quint32 qHash(const Url& url)
+inline size_t qHash(const Url& url)
 {
     return qHash(url.toString());
 }

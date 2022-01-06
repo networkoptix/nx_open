@@ -265,7 +265,7 @@ public:
 };
 
 // TODO: #akolesnikov Remove this function.
-inline uint qHash(const SocketAddress &address)
+inline size_t qHash(const SocketAddress &address)
 {
     return qHash(QString::fromStdString(address.address.toString()), address.port);
 }

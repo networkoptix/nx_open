@@ -25,7 +25,7 @@ struct ButtonInfo
     bool operator==(const ButtonInfo& other) const = default;
 };
 
-uint qHash(ButtonInfo key, uint seed = 0) noexcept
+size_t qHash(ButtonInfo key, size_t seed = 0) noexcept
 {
     QtPrivate::QHashCombine hash;
 
