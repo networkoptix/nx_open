@@ -9,7 +9,7 @@
 #include <QtCore/QHash>
 #include <QtCore/QPointer>
 #include <QtCore/QVector>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QMenu>
 
 #include <client/client_module.h>

@@ -2,7 +2,7 @@
 
 #include "workbench_selection_watcher.h"
 
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_target_provider.h>

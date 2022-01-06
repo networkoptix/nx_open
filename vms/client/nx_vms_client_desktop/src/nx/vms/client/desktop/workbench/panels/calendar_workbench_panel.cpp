@@ -2,7 +2,7 @@
 
 #include "calendar_workbench_panel.h"
 
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <nx/vms/client/desktop/ui/scene/widgets/timeline_calendar_widget.h>
 #include <ui/help/help_topic_accessor.h>

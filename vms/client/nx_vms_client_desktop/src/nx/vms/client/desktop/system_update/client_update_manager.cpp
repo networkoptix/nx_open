@@ -7,7 +7,7 @@
 
 #include <QtCore/QDateTime>
 #include <QtCore/QTimer>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtQml/QtQml>
 
 #include <client/client_message_processor.h>

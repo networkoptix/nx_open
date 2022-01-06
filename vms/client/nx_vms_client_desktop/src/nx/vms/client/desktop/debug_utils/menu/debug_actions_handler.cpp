@@ -2,7 +2,7 @@
 
 #include "debug_actions_handler.h"
 
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QPushButton>
 

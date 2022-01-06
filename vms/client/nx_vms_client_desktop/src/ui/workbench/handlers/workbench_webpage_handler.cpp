@@ -2,7 +2,7 @@
 
 #include "workbench_webpage_handler.h"
 
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <client/client_globals.h>
 #include <client/client_message_processor.h>

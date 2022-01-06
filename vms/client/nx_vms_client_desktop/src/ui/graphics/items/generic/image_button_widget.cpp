@@ -7,12 +7,12 @@
 
 #include <QtGui/QPainter>
 #include <QtGui/QIcon>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QStyle>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>
 #include <QtWidgets/QMenu>
-#include <QtWidgets/QOpenGLWidget>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 
 #include <ui/workaround/gl_native_painting.h>
 #include <ui/workaround/sharp_pixmap_painting.h>

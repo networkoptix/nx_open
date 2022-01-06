@@ -3,7 +3,7 @@
 #include "utils.h"
 
 #include <QtCore/QMetaProperty>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QAbstractItemView>
 #include <QtWidgets/QWidget>
 #include <QtQml/QQmlContext>

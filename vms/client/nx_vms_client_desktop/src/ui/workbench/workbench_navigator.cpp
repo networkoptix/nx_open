@@ -7,7 +7,7 @@
 
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QTimer>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCompleter>
 #include <QtWidgets/QGraphicsSceneContextMenuEvent>

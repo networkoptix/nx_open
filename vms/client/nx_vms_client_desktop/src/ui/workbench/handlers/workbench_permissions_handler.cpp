@@ -2,7 +2,7 @@
 
 #include "workbench_permissions_handler.h"
 
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>

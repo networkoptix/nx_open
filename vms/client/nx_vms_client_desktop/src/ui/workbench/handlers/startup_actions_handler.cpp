@@ -7,7 +7,7 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QTimer>
 #include <QtQml/QQmlEngine>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <api/helpers/layout_id_helper.h>
 #include <client/client_module.h>

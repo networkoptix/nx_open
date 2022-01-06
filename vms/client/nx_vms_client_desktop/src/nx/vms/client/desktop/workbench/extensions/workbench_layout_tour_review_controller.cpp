@@ -3,7 +3,7 @@
 #include "workbench_layout_tour_review_controller.h"
 
 #include <QtCore/QScopedValueRollback>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <client/client_meta_types.h>
 #include <client/client_runtime_settings.h>

@@ -7,7 +7,7 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QThread>
 #include <QtQuick/QQuickItem>
-#include <QtWebEngine/QQuickWebEngineProfile>
+#include <QtWebEngineQuick/QQuickWebEngineProfile>
 #include <QtWidgets/QApplication>
 
 #include <api/server_rest_connection.h>

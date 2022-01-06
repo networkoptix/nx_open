@@ -6,7 +6,7 @@
 #include <QtCore/QTimer>
 #include <QtQuick/QQuickItem>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QTreeView>

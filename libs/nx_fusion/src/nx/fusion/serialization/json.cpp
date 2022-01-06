@@ -6,6 +6,7 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QtNumeric> //< for qIsFinite
+#include <QtGui/QBrush>
 
 #include <nx/kit/utils.h>
 #include <nx/utils/log/log.h>

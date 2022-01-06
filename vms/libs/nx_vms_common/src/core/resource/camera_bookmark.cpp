@@ -2,8 +2,8 @@
 
 #include "camera_bookmark.h"
 
-#include <QtCore/QLinkedList>
 #include <QtCore/QMap>
+#include <QtCore5Compat/QLinkedList>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/common/system_context.h>

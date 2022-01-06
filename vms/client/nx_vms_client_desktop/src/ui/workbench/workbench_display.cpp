@@ -7,12 +7,12 @@
 
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QtAlgorithms>
+#include <QtGui/QAction>
 #include <QtGui/QScreen>
 #include <QtGui/QWindow>
-#include <QtGui/private/qopengltexturecache_p.h>
-#include <QtWidgets/QAction>
+#include <QtOpenGL/private/qopengltexturecache_p.h>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QtWidgets/QGraphicsProxyWidget>
-#include <QtWidgets/QOpenGLWidget>
 
 #include <camera/client_video_camera.h>
 #include <camera/resource_display.h>

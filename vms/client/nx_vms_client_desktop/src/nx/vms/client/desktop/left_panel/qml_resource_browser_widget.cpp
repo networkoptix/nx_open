@@ -5,10 +5,9 @@
 #include <QtCore/QCoreApplication>
 #include <QtCore/QItemSelectionModel>
 #include <QtCore/QScopedValueRollback>
+#include <QtGui/QAction>
 #include <QtQml/QQmlContext>
 #include <QtQml/QQmlEngine>
-#include <QtQuick/QQuickItem>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QToolTip>
 
 #include <client/client_globals.h>

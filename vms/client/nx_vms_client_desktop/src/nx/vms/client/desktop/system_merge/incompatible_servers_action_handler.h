@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QObject>
+
 #include <core/resource/client_resource_fwd.h>
 #include <nx/utils/uuid.h>
 #include <ui/workbench/workbench_context_aware.h>

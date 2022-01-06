@@ -5,7 +5,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QSettings>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <quazip/quazip.h>
 #include <quazip/quazipfile.h>

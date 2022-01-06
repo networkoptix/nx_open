@@ -3,7 +3,7 @@
 #include "rotate_action_factory.h"
 
 #include <QtCore/QCoreApplication>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <client/client_globals.h>
 #include <core/resource/layout_resource.h>

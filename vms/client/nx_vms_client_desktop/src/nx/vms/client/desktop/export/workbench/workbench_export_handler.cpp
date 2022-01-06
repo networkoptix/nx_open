@@ -2,7 +2,7 @@
 
 #include "workbench_export_handler.h"
 
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QPushButton>
 
 #include <camera/camera_data_manager.h>

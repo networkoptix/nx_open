@@ -4,7 +4,7 @@
 
 #include <QtCore/QString>
 
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <client/client_globals.h>
 #include <common/common_globals.h>

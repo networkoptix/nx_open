@@ -4,7 +4,7 @@
 
 #include <QtCore/QPointer>
 
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <common/common_globals.h>
 

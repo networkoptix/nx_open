@@ -15,7 +15,7 @@
 #elif defined(Q_OS_MACOS)
     #include <CoreGraphics/CGEventSource.h>
 #elif defined(Q_OS_LINUX)
-    #include <QX11Info>
+    #include <QtGui/private/qtx11extras_p.h>
     #include <X11/extensions/scrnsaver.h>
 #endif
 

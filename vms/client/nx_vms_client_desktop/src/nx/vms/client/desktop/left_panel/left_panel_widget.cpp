@@ -9,7 +9,7 @@
 #include <QtQuick/QQuickItem>
 #include <QtQml/QQmlContext>
 #include <QtQml/QQmlEngine>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QToolTip>
 
 #include <client/client_globals.h>

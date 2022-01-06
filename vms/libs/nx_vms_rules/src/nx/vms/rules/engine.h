@@ -6,6 +6,7 @@
 #include <memory>
 #include <unordered_map>
 
+#include <QtCore/QHash>
 #include <QtCore/QList>
 #include <QtCore/QMap>
 #include <QtCore/QSet>

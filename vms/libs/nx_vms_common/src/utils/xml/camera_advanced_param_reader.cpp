@@ -2,6 +2,7 @@
 
 #include "camera_advanced_param_reader.h"
 
+#include <QtCore/QIODevice>
 #include <QtXml/QDomElement>
 
 #include <nx/utils/log/log.h>

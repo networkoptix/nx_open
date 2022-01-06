@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QObject>
+
 #include <nx/utils/uuid.h>
 
 #include "rules_fwd.h"

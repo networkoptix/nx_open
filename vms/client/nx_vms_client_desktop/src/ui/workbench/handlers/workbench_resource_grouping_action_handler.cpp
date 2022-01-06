@@ -2,7 +2,7 @@
 
 #include "workbench_resource_grouping_action_handler.h"
 
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <client/client_globals.h>
 #include <core/resource/resource_fwd.h>

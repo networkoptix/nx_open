@@ -6,7 +6,7 @@
 
 #include <QtCore/QEventLoop>
 #include <QtCore/QTimer>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <client/client_settings.h>
 #include <common/common_globals.h>

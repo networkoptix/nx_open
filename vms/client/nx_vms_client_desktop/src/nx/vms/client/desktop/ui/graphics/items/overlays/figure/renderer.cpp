@@ -10,10 +10,10 @@
 
 #include <QtCore/qmath.h>
 #include <QtGui/QPainter>
-#include <QtGui/QOpenGLBuffer>
+#include <QtOpenGL/QOpenGLBuffer>
 #include <QtGui/QOpenGLContext>
-#include <QtGui/QOpenGLVertexArrayObject>
-#include <QtWidgets/QOpenGLWidget>
+#include <QtOpenGL/QOpenGLVertexArrayObject>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 
 #include <opengl_renderer.h>
 #include <ui/graphics/shaders/base_shader_program.h>

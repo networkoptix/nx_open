@@ -6,7 +6,7 @@
 
 #include <QtCore/QHash>
 #include <QtCore/QSet>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <api/runtime_info_manager.h>
 #include <client/client_message_processor.h>

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QObject>
+
 #include <nx/vms/client/core/common/utils/common_module_aware.h>
 #include <nx/vms/event/event_fwd.h>
 

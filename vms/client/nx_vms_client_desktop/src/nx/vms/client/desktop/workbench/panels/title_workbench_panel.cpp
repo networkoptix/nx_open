@@ -4,7 +4,7 @@
 
 #include <QtCore/QScopedValueRollback>
 
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <nx/vms/client/desktop/workbench/workbench_animations.h>
 

@@ -6,7 +6,7 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QModelIndex>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QMenu>
 
 #include <core/resource/camera_resource.h>

@@ -4,7 +4,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QStandardPaths>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>

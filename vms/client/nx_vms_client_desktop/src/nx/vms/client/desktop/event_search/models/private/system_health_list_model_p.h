@@ -8,7 +8,7 @@
 
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSet>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <core/resource/resource_fwd.h>
 #include <health/system_health.h>

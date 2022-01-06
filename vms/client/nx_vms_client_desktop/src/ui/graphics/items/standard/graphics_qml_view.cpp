@@ -7,13 +7,14 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QtMath>
 #include <QtGui/QOffscreenSurface>
-#include <QtGui/QOpenGLBuffer>
 #include <QtGui/QOpenGLContext>
-#include <QtGui/QOpenGLFramebufferObject>
 #include <QtGui/QOpenGLFunctions>
-#include <QtGui/QOpenGLVertexArrayObject>
 #include <QtGui/QPaintDevice>
 #include <QtGui/QPaintEngine>
+#include <QtOpenGL/QOpenGLBuffer>
+#include <QtOpenGL/QOpenGLFramebufferObject>
+#include <QtOpenGL/QOpenGLVertexArrayObject>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QtQml/QQmlComponent>
 #include <QtQml/QQmlEngine>
 #include <QtQuick/QQuickItem>
@@ -23,7 +24,6 @@
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsSceneHoverEvent>
 #include <QtWidgets/QGraphicsView>
-#include <QtWidgets/QOpenGLWidget>
 
 #include <qt_graphics_items/graphics_utils.h>
 

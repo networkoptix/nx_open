@@ -4,7 +4,7 @@
 #include "ui_push_notification_business_action_widget.h"
 
 #include <QtCore/QScopedValueRollback>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <business/business_resource_validation.h>
 #include <core/resource/user_resource.h>

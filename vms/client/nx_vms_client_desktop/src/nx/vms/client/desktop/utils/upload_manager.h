@@ -4,6 +4,8 @@
 
 #include <functional>
 
+#include <QtCore/QObject>
+
 #include <core/resource/resource_fwd.h>
 #include <api/server_rest_connection_fwd.h>
 

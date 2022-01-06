@@ -4,6 +4,7 @@
 
 #include <vector>
 
+#include <QtCore/QObject>
 #include <QtCore/QVector>
 
 extern "C" {

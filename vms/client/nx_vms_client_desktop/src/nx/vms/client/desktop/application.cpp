@@ -24,16 +24,14 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QSettings>
 #include <QtCore/QString>
+#include <QtGui/QAction>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QWindow>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
-#include <QtWebEngine/QtWebEngine>
-#include <QtWidgets/QAction>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QDesktopWidget>
-#include <QtWidgets/QOpenGLWidget>
 
 #if defined(Q_OS_WIN)
     #include <QtPlatformHeaders/QWindowsWindowFunctions>

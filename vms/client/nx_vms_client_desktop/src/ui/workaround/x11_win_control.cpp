@@ -6,8 +6,8 @@
 #ifdef Q_WS_X11
 
 #include <QtCore/QString>
-#include <QX11Info>
 #include <QtCore/QList>
+#include <QtGui/private/qtx11extras_p.h>
 
 #include <X11/Xatom.h>
 #include <X11/Xlib.h>

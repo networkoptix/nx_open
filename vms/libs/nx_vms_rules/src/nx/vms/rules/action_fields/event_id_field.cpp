@@ -3,6 +3,7 @@
 #include "event_id_field.h"
 
 #include <QtCore/QDataStream>
+#include <QtCore/QIODevice>
 
 #include "../aggregated_event.h"
 #include "../ini.h"

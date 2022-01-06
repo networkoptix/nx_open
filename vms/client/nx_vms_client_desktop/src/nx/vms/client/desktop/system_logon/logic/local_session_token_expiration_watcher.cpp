@@ -2,7 +2,7 @@
 
 #include "local_session_token_expiration_watcher.h"
 
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <client_core/client_core_module.h>
 #include <nx/vms/client/core/network/network_module.h>

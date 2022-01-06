@@ -2,8 +2,8 @@
 
 #include "radass_action_factory.h"
 
-#include <QtWidgets/QAction>
-#include <QtWidgets/QActionGroup>
+#include <QtGui/QAction>
+#include <QtGui/QActionGroup>
 
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
 #include <nx/vms/client/desktop/radass/radass_types.h>

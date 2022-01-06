@@ -5,7 +5,7 @@
 #include <chrono>
 
 #include <QtCore/QList>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <api/runtime_info_manager.h>
 #include <business/business_resource_validation.h>

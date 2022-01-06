@@ -15,7 +15,7 @@
 #include <QtQml/QQmlEngine>
 #include <QtQuick/QQuickItem>
 #include <QtQuickWidgets/QQuickWidget>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QHBoxLayout>

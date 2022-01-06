@@ -4,7 +4,7 @@
 
 #include <QtCore/QEvent>
 #include <QtCore/QScopedValueRollback>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QMenu>
 
 #include <nx/fusion/model_functions.h>

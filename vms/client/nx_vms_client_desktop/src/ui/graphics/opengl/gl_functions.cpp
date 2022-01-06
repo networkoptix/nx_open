@@ -10,7 +10,7 @@
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOffscreenSurface>
-#include <QtWidgets/QOpenGLWidget>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 
 #include <nx/utils/log/assert.h>
 #include <nx/utils/thread/mutex.h>

@@ -2,7 +2,8 @@
 
 #include "timeline_actions_factory.h"
 
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
+#include <QtGui/QActionGroup>
 
 #include <camera/camera_data_manager.h>
 #include <nx/vms/api/types/storage_location.h>

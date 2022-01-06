@@ -4,7 +4,7 @@
 
 #include <QtGui/QOpenGLContext>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QOpenGLWidget>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QtWidgets/QGraphicsSceneWheelEvent>
 #include <QtGui/QWheelEvent>
 

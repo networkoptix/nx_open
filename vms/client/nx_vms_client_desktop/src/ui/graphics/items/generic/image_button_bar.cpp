@@ -4,7 +4,7 @@
 
 #include <QtCore/QScopedValueRollback>
 #include <QtWidgets/QGraphicsLinearLayout>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <utils/math/math.h>
 #include <utils/common/checked_cast.h>

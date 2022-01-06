@@ -7,7 +7,7 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QPropertyAnimation>
 #include <QtCore/QSettings>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QGraphicsLinearLayout>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>

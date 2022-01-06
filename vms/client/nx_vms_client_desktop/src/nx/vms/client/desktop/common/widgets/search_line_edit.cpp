@@ -4,7 +4,7 @@
 
 #include <QtWidgets/QCompleter>
 #include <QtWidgets/QLineEdit>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <ui/common/palette.h>
 #include <nx/vms/client/desktop/style/skin.h>

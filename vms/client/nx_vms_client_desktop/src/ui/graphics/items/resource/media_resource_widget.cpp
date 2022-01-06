@@ -8,10 +8,10 @@
 #include <QtCore/QTimer>
 #include <QtCore/QVarLengthArray>
 #include <QtGui/QPainter>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsLinearLayout>
-#include <QtWidgets/QOpenGLWidget>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 
 #include <qt_graphics_items/graphics_stacked_widget.h>
 

@@ -5,7 +5,7 @@
 
 #include <algorithm>
 
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <core/resource/resource.h>
 #include <nx/vms/client/desktop/common/models/item_model_algorithm.h>

@@ -4,10 +4,11 @@
 
 #include <QtCore/QProcess>
 #include <QtCore/QScopedValueRollback>
+#include <QtGui/QAction>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QImage>
 #include <QtGui/QImageWriter>
-#include <QtWidgets/QAction>
+
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QGroupBox>

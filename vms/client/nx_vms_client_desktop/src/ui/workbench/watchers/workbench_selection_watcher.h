@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QObject>
+
 #include <core/resource/resource_fwd.h>
 
 #include <nx/vms/client/desktop/ui/actions/action_types.h>

@@ -9,9 +9,9 @@
 #include <QtGui/private/qinputcontrol_p.h>
 #include <QtQuick/QQuickItem>
 #include <QtWebChannel/QWebChannel>
-#include <QtWebEngine/QQuickWebEngineProfile>
-#include <QtWebEngine/private/qquickwebengineaction_p.h>
-#include <QtWebEngine/private/qquickwebengineview_p.h>
+#include <QtWebEngineQuick/QQuickWebEngineProfile>
+#include <QtWebEngineQuick/private/qquickwebengineaction_p.h>
+#include <QtWebEngineQuick/private/qquickwebengineview_p.h>
 #include <QtWidgets/QColorDialog>
 #include <QtWidgets/QGraphicsScene>
 #include <QtWidgets/QGraphicsView>

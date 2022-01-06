@@ -13,7 +13,7 @@
 #include <QtCore/QTimer>
 #include <QtGui/QDesktopServices>
 #include <QtQml/QtQml>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>

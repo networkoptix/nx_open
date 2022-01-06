@@ -3,6 +3,7 @@
 #pragma once
 
 #include <QDataStream>
+#include <QtCore/QIODevice>
 
 namespace dsh {
 

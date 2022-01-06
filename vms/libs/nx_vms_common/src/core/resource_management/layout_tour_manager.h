@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QObject>
+
 #include <nx/vms/api/data/layout_tour_data.h>
 
 #include <nx/utils/thread/mutex.h>

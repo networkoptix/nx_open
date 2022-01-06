@@ -6,7 +6,7 @@
 
 #include <QtCore/QPointer>
 #include <QtQml/QtQml>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <api/runtime_info_manager.h>
 #include <client/client_module.h>
