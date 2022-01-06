@@ -49,7 +49,7 @@ enum class Command
     relativeFocus,
 };
 
-inline uint qHash(const Command& command, uint seed)
+inline size_t qHash(const Command& command, uint seed)
 {
     return ::qHash((int)command, seed);
 }

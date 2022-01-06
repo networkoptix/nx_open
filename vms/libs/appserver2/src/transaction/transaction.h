@@ -1689,7 +1689,7 @@ struct TransactionPersistentInfo
     qint32 sequence = 0;
     nx::vms::api::Timestamp timestamp;
 
-    friend uint qHash(const TransactionPersistentInfo& id)
+    friend size_t qHash(const TransactionPersistentInfo& id)
     {
         QByteArray idData(id.dbID.toRfc4122());
         idData.append((const char*) &id.timestamp, sizeof(id.timestamp));

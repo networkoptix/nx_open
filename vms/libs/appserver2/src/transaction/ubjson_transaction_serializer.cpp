@@ -21,7 +21,7 @@ namespace ec2
         return true;
     }
 
-    uint qHash(const QnUbjsonTransactionSerializer::CacheKey &id)
+    size_t qHash(const QnUbjsonTransactionSerializer::CacheKey& id) 
     {
         QByteArray idData(id.persistentInfo.dbID.toRfc4122());
         idData

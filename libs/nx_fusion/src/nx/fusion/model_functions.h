@@ -19,7 +19,7 @@
 namespace QnHashAutomation {
     struct Visitor {
     public:
-        Visitor(uint seed): m_result(seed) {}
+        Visitor(size_t seed): m_result(seed) {}
 
         template<class T, class Access>
         bool operator()(const T &value, const Access &access) {
@@ -29,12 +29,12 @@ namespace QnHashAutomation {
             return true;
         }
 
-        uint result() const {
+        size_t result() const {
             return m_result;
         }
 
     private:
-        uint m_result;
+        size_t m_result;
     };
 
 } // namespace QnHashAutomation
@@ -47,7 +47,7 @@ namespace QnHashAutomation {
  * \param PREFIX                        Optional function definition prefix, e.g. <tt>inline</tt>.
  */
 #define QN_FUSION_DEFINE_FUNCTIONS_hash(TYPE, ... /* PREFIX */)                 \
-__VA_ARGS__ uint qHash(const TYPE &value, uint seed) {                          \
+__VA_ARGS__ size_t qHash(const TYPE &value, size_t seed) {                          \
     QnHashAutomation::Visitor visitor(seed);                                    \
     QnFusion::visit_members(value, visitor);                                    \
     return visitor.result();                                                    \

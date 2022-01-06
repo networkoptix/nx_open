@@ -46,7 +46,7 @@ inline bool operator ==(const QnInterfaceAndAddr& lhs, const QnInterfaceAndAddr&
         && lhs.netMask == rhs.netMask;
 }
 
-inline uint qHash(const QnInterfaceAndAddr& iface, uint seed=0)
+inline size_t qHash(const QnInterfaceAndAddr& iface, uint seed=0)
 {
     return  qHash(iface.name, seed^0xa03f)
         + qHash(iface.address, seed^0x17a317a3)

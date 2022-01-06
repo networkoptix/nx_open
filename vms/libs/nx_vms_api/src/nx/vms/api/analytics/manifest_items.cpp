@@ -11,7 +11,7 @@ bool operator==(const EventType& lh, const EventType& rh)
     return lh.id == rh.id;
 }
 
-uint qHash(const EventType& eventType)
+size_t qHash(const EventType& eventType)
 {
     return qHash(eventType.id);
 }

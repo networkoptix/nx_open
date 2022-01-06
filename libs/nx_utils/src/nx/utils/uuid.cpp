@@ -224,9 +224,9 @@ QString changedGuidByteOrder(const QString& guid)
 
 } // namespace nx::utils
 
-uint qHash(const QnUuid& uuid, uint seed) throw()
+size_t qHash(const QnUuid& uuid, size_t seed) throw()
 {
-    return qHash(uuid.getQUuid(), seed);
+    return qHash(uuid.getQUuid()) ^ seed;
 }
 
 QDataStream& operator<<(QDataStream& s, const QnUuid& id)

@@ -155,7 +155,7 @@ struct EventType: public ExtendedType
 };
 #define EventType_Fields ExtendedType_Fields (flags)(groupId)(provider)
 NX_REFLECTION_INSTRUMENT(EventType, EventType_Fields);
-uint NX_VMS_API qHash(const EventType& eventType);
+size_t NX_VMS_API qHash(const EventType& eventType);
 
 enum class ObjectTypeFlag
 {

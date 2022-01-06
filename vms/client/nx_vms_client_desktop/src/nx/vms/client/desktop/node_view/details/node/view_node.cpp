@@ -213,7 +213,7 @@ ConstWeakNodePtr ViewNode::currentSharedNode() const
     return result.toWeakRef();
 }
 
-uint qHash(const ViewNodePath& path)
+size_t qHash(const ViewNodePath& path)
 {
     return qHash(path.indices());
 }

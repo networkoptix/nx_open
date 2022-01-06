@@ -110,6 +110,6 @@ namespace ec2
         QCache<CacheKey, const QByteArray> m_cache;
     };
 
-    uint qHash(const QnUbjsonTransactionSerializer::CacheKey &id);
+    size_t qHash(const QnUbjsonTransactionSerializer::CacheKey &id);
 
 }

@@ -179,7 +179,7 @@ private:
     QString nodePath(const NodePtr& node) const { return toString(sourceIndex(node)); }
 
 public:
-    friend uint qHash(const NodePtr& node, uint seed) { return ::qHash(node.get(), seed); }
+    friend size_t qHash(const NodePtr& node, size_t seed) { return ::qHash(node.get(), seed); }
 
 private:
     QPointer<QAbstractItemModel> m_sourceModel;

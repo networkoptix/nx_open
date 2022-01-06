@@ -59,7 +59,7 @@ private:
         bool operator==(const Key& other) const;
         bool operator<(const Key& other) const;
 
-        friend uint qHash(const Key& key)
+        friend size_t qHash(const Key& key)
         {
             return qHash(key.vendor) ^ qHash(key.model) ^ qHash(key.firmware);
         }

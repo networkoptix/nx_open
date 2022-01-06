@@ -11,13 +11,8 @@
 #include <QtGui/QColor>
 #include <QtNetwork/QAuthenticator>
 
-inline uint qHash(const QPoint &value, uint seed = 0) {
-    using ::qHash;
-
-    return qHash(qMakePair(value.x(), value.y()), seed);
-}
-
-inline uint qHash(const QColor &color, uint seed = 0) {
+inline size_t qHash(const QColor &color, size_t seed = 0) noexcept
+{
     using ::qHash;
 
     if(color.isValid()) {
@@ -27,11 +22,12 @@ inline uint qHash(const QColor &color, uint seed = 0) {
     }
 }
 
-inline uint qHash(const std::type_index &index, uint seed = 0) {
+inline size_t qHash(const std::type_index &index, size_t seed = 0) noexcept
+{
     return qHash(index.hash_code(), seed);
 }
 
-inline uint qHash(const QAuthenticator& auth, uint seed = 0)
+inline size_t qHash(const QAuthenticator& auth, size_t seed = 0) noexcept
 {
     using ::qHash;
     return qHash(auth.user() + auth.password(), seed);

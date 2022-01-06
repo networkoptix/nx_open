@@ -24,10 +24,6 @@
 #include <nx/vms/client/desktop/image_providers/ffmpeg_image_provider.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 
-static uint qHash(const QSize& key, uint seed = 0)
-{
-    return qHash(qMakePair(key.width(), key.height()), seed);
-}
 
 namespace nx::vms::client::desktop {
 

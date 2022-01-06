@@ -44,6 +44,6 @@ public:
 
 } // namespace nx::vms::api
 
-uint qHash(const nx::vms::api::SoftwareVersion& softwareVersion);
+size_t qHash(const nx::vms::api::SoftwareVersion& softwareVersion);
 
 Q_DECLARE_METATYPE(nx::vms::api::SoftwareVersion)

@@ -108,7 +108,7 @@ QString toString(const OsInfo& info)
     return components.join('-');
 }
 
-uint qHash(const OsInfo& osInfo, uint seed)
+size_t qHash(const OsInfo& osInfo, size_t seed)
 {
     return ::qHash(osInfo.platform + osInfo.variant + osInfo.variantVersion + osInfo.flavor, seed);
 }

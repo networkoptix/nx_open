@@ -58,6 +58,6 @@ struct NX_UTILS_API OsInfo
 NX_REFLECTION_INSTRUMENT(OsInfo, OsInfo_Fields);
 
 NX_UTILS_API QString toString(const OsInfo& info);
-NX_UTILS_API uint qHash(const OsInfo& osInfo, uint seed = 0);
+NX_UTILS_API size_t qHash(const OsInfo& osInfo, size_t seed = 0);
 
 } // namespace nx::utils
