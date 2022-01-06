@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QObject>
+
 #include "health/system_health.h"
 
 class QnSystemHealthStringsHelper: public QObject

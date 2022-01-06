@@ -2,7 +2,7 @@
 
 #include "layout_tours_handler.h"
 
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>

@@ -2,7 +2,7 @@
 
 #include "action_conditions.h"
 
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <camera/camera_data_manager.h>
 #include <camera/resource_display.h>

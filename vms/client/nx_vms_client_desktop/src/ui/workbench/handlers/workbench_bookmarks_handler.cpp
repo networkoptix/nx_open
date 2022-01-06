@@ -4,7 +4,7 @@
 
 #include <chrono>
 
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <api/common_message_processor.h>
 #include <camera/camera_bookmarks_manager.h>

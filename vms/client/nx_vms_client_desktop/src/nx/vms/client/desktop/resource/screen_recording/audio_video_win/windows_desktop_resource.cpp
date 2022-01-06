@@ -2,7 +2,7 @@
 
 #include "windows_desktop_resource.h"
 
-#include <QtWidgets/QOpenGLWidget>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 
 #include <core/resource/media_server_resource.h>
 #include <nx/vms/client/core/resource/screen_recording/desktop_camera_connection.h>

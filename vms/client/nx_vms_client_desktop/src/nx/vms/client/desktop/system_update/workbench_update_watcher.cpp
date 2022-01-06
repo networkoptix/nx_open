@@ -3,7 +3,7 @@
 #include "workbench_update_watcher.h"
 
 #include <QtCore/QTimer>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QPushButton>
 
 #include <client/client_settings.h>

@@ -5,7 +5,7 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QTimer>
 #include <QtWidgets/QApplication>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <core/resource/resource.h>
 #include <nx/vms/client/desktop/left_panel/qml_resource_browser_widget.h>

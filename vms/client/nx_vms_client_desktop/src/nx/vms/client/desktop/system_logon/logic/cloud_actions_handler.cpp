@@ -3,7 +3,7 @@
 #include "cloud_actions_handler.h"
 
 #include <QtGui/QDesktopServices>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <client/client_globals.h>
 #include <core/resource/user_resource.h>

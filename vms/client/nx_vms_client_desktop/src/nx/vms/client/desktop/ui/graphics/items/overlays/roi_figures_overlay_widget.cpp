@@ -7,7 +7,7 @@
 #include <QtGui/QTextDocument>
 #include <QtGui/QTextCursor>
 #include <QtGui/QPainter>
-#include <QtWidgets/QOpenGLWidget>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QtWidgets/QGraphicsTextItem>
 
 #include <nx/vms/client/desktop/ui/graphics/items/overlays/figure/decorations_helper.h>

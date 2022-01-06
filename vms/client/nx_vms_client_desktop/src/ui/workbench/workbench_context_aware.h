@@ -7,6 +7,8 @@
 #include <nx/vms/client/desktop/ui/actions/action_fwd.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 
+class QWidget;
+
 class QnWorkbenchContext;
 class QnWorkbenchAccessController;
 class QnWorkbenchDisplay;

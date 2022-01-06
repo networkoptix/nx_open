@@ -7,6 +7,8 @@
 #include <string>
 #include <thread>
 
+#include <QtCore/QIODevice>
+
 #include <nx/utils/buffer.h>
 #include <nx/utils/move_only_func.h>
 #include <nx/utils/system_error.h>

@@ -4,7 +4,7 @@
 
 #include <QtCore/QPointer>
 #include <QtCore/QScopedPointer>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QPushButton>
 
 #include <nx/vms/client/desktop/common/utils/command_action.h>

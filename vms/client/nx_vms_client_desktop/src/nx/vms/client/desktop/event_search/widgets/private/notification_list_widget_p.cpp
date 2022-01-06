@@ -3,8 +3,8 @@
 #include "notification_list_widget_p.h"
 
 #include <QtCore/QSortFilterProxyModel>
+#include <QtGui/QAction>
 #include <QtGui/QMouseEvent>
-#include <QtWidgets/QAction>
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QPushButton>

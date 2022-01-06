@@ -4,7 +4,7 @@
 #include "ui_general_system_administration_widget.h"
 
 #include <QtGui/QResizeEvent>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QPushButton>
 
 #include <api/runtime_info_manager.h>

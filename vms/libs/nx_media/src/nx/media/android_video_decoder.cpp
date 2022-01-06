@@ -12,7 +12,7 @@
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOpenGLShaderProgram>
-#include <QtGui/QOpenGLFramebufferObject>
+#include <QtOpenGL/QOpenGLFramebufferObject>
 
 #include <QtGui/QOffscreenSurface>
 #include <QtCore/QCache>

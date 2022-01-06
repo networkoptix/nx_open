@@ -2,7 +2,7 @@
 
 #include "incompatible_servers_action_handler.h"
 
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>

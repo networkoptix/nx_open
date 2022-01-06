@@ -3,7 +3,7 @@
 #include "workbench_virtual_camera_handler.h"
 
 #include <QtCore/QDirIterator>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <api/model/virtual_camera_reply.h>
 #include <api/server_rest_connection.h>

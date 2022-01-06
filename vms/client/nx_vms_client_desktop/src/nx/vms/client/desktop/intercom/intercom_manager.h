@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QObject>
+
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/desktop/system_context_aware.h>

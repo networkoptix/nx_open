@@ -8,7 +8,7 @@
 #include <QtCore/QTimer>
 #include <QtGui/QImageWriter>
 #include <QtGui/QPainter>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QComboBox>
 
 #include <camera/cam_display.h>

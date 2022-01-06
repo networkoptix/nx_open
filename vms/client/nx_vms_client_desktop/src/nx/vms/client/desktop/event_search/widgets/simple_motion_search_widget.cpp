@@ -4,7 +4,7 @@
 
 #include <QtCore/QList>
 #include <QtGui/QRegion>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>

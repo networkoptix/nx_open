@@ -4,6 +4,7 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QTimer>
+#include <QtCore/QFile>
 #include <QtGui/QDesktopServices>
 #include <QtGui/QCursor>
 #include <QtGui/QHelpEvent>

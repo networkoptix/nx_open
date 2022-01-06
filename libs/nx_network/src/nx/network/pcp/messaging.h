@@ -3,6 +3,7 @@
 #ifndef PCP_MESSAGING_H
 #define PCP_MESSAGING_H
 
+#include <QtCore/QByteArray>
 #include <QtCore/QDataStream>
 
 #ifdef _WIN32

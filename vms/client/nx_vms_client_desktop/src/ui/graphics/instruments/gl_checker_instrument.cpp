@@ -4,8 +4,8 @@
 
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
-#include <QtWidgets/QAction>
-#include <QtWidgets/QOpenGLWidget>
+#include <QtGui/QAction>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 
 #include <nx/utils/log/log.h>
 #include <nx/utils/software_version.h>

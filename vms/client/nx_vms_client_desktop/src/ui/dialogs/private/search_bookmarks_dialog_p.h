@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QObject>
+
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/uuid.h>
 #include <recording/time_period.h>

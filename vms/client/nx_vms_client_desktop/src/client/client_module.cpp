@@ -7,10 +7,12 @@
 #include <QtCore/QDir>
 #include <QtCore/QFileInfo>
 #include <QtCore/QResource>
+#include <QtCore/QSettings>
+#include <QtCore/QStandardPaths>
 #include <QtGui/QPalette>
 #include <QtGui/QSurfaceFormat>
-#include <QtWebEngine/QtWebEngine>
-#include <QtWebEngineWidgets/QWebEngineSettings>
+#include <QtQml/QQmlEngine>
+#include <QtWebEngineCore/QWebEngineSettings>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QToolTip>
 

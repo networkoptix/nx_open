@@ -4,7 +4,7 @@
 
 #include <chrono>
 
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QApplication>
 
 #include <client/client_runtime_settings.h>

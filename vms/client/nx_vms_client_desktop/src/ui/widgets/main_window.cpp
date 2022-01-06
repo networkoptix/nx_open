@@ -6,7 +6,7 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtGui/QFileOpenEvent>
 #include <QtGui/QWindowStateChangeEvent>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QBoxLayout>
 #include <QtWidgets/QStackedLayout>

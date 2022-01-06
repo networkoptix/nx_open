@@ -4,7 +4,7 @@
 #include "reply_read_timeout.h"
 
 #include <QtCore/QDir>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtCore/QFile>
 #include <QtCore/QTimer>
 #include <QtWebEngineWidgets/QWebEngineDownloadItem>

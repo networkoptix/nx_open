@@ -5,7 +5,7 @@
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
 #include <QtCore/QScopedValueRollback>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <client/client_globals.h>
 #include <core/resource/resource.h>

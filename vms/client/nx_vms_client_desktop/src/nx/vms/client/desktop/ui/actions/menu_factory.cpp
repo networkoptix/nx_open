@@ -2,7 +2,7 @@
 
 #include "menu_factory.h"
 
-#include <QtWidgets/QActionGroup>
+#include <QtGui/QActionGroup>
 
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>

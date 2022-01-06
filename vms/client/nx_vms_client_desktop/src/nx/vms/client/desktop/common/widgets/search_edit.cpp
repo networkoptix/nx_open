@@ -6,7 +6,7 @@
 #include <QtGui/QFocusEvent>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QLabel>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QCompleter>
 #include <QtWidgets/QVBoxLayout>

@@ -2,7 +2,7 @@
 
 #include <QtCore/QObject>
 #include <QtCore/QUrl>
-#include <QtWebEngine/QQuickWebEngineProfile>
+#include <QtWebEngineQuick/QQuickWebEngineProfile>
 
 #include <nx/utils/impl_ptr.h>
 

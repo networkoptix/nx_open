@@ -9,7 +9,7 @@
 #include <QtGui/QGuiApplication>
 #include <QtGui/QOffscreenSurface>
 #include <QtGui/QOpenGLContext>
-#include <QtGui/QOpenGLFramebufferObject>
+#include <QtOpenGL/QOpenGLFramebufferObject>
 #include <QtGui/QPainter>
 #include <QtQml/QQmlComponent>
 #include <QtQml/QQmlEngine>

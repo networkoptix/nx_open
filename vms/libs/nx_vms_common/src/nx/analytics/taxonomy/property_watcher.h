@@ -5,6 +5,7 @@
 #include <set>
 #include <functional>
 
+#include <QtCore/QObject>
 #include <QtCore/QString>
 
 #include <core/resource/resource_fwd.h>

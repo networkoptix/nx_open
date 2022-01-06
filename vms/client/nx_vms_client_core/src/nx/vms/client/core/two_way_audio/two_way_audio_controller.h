@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QObject>
+
 #include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/impl_ptr.h>

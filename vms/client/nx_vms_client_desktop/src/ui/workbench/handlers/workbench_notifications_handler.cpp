@@ -5,8 +5,9 @@
 #include <chrono>
 
 #include <QtCore/QtGlobal>
+#include <QtGui/QAction>
 #include <QtGui/QGuiApplication>
-#include <QtWidgets/QAction>
+
 
 #include <business/business_resource_validation.h>
 #include <camera/camera_bookmarks_manager.h>

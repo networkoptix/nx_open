@@ -42,7 +42,7 @@
 #include <QtGui/QFocusEvent>
 #include <QtWidgets/QCompleter>
 #include <QtWidgets/QLineEdit>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 LineEdit::LineEdit(QWidget* parent):
     QWidget(parent),

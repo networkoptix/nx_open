@@ -5,7 +5,7 @@
 #include <boost/algorithm/cxx11/any_of.hpp>
 #include <boost/algorithm/cxx11/copy_if.hpp>
 
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QInputDialog>
 #include <QtWidgets/QPushButton>

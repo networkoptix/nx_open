@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QObject>
+
 #include <nx/vms/client/desktop/radass/radass_fwd.h>
 #include <nx/vms/client/desktop/resource/resource_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>

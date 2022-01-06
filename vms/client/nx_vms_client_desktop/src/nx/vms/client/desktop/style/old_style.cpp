@@ -9,7 +9,7 @@
 #include <QtGui/QPainter>
 #include <QtWidgets/QAbstractButton>
 #include <QtWidgets/QAbstractItemView>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsWidget>
 #include <QtWidgets/QHeaderView>

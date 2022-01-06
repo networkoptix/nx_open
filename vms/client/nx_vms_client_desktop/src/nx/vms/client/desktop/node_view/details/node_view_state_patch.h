@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QVariant>
+
 #include "node_view_state.h"
 #include "node/view_node_path.h"
 

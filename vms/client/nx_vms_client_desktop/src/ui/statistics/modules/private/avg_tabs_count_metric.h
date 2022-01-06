@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <QtCore/QHash>
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 

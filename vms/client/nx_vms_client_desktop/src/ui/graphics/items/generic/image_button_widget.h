@@ -7,10 +7,10 @@
 #include <QtCore/QPointer>
 #include <QtGui/QPixmap>
 #include <QtGui/QIcon>
-#include <QtGui/QOpenGLBuffer>
+#include <QtOpenGL/QOpenGLBuffer>
 #include <QtGui/QOpenGLFunctions>
-#include <QtGui/QOpenGLVertexArrayObject>
-#include <QtGui/QOpenGLTexture>
+#include <QtOpenGL/QOpenGLVertexArrayObject>
+#include <QtOpenGL/QOpenGLTexture>
 
 #include <ui/processors/clickable.h>
 #include <ui/animation/animated.h>

@@ -2,7 +2,7 @@
 
 #include "layout_tour_actions.h"
 
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <core/resource_management/layout_tour_manager.h>
 #include <nx/utils/uuid.h>

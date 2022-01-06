@@ -2,7 +2,7 @@
 
 #include "bookmark_search_synchronizer.h"
 
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <core/resource/camera_resource.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>

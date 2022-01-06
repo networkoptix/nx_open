@@ -3,7 +3,7 @@
 #include "sign_dialog.h"
 #include "ui_sign_dialog.h"
 
-#include <QtWidgets/QOpenGLWidget>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 
 #include <camera/cam_display.h>
 #include <camera/gl_renderer.h>

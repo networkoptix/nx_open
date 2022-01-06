@@ -3,6 +3,7 @@
 #include "archive_frame_extractor.h"
 
 #include <atomic>
+#include <condition_variable>
 #include <deque>
 #include <memory>
 #include <thread>

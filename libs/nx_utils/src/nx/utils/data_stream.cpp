@@ -2,6 +2,8 @@
 
 #include "data_stream.h"
 
+#include <QtCore/QByteArray>
+
 namespace nx::utils {
 
 DataStream::DataStream(const std::string_view& buf):

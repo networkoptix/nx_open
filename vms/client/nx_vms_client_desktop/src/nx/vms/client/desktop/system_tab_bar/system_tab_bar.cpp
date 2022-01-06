@@ -4,7 +4,7 @@
 
 #include <QtCore/QScopedValueRollback>
 #include <QtGui/QPainter>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QToolButton>
 
 #include <nx/vms/client/desktop/application_context.h>

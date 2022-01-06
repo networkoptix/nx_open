@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QObject>
+
 #include <nx/vms/utils/translation/scoped_locale.h>
 
 #include "rules_fwd.h"

@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QObject>
+
 #include <core/resource/resource_fwd.h>
 #include <common/common_module_aware.h>
 

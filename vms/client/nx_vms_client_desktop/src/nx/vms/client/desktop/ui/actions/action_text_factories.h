@@ -4,6 +4,8 @@
 
 #include <functional>
 
+#include <QtCore/QObject>
+
 #include <core/resource/device_dependent_strings.h>
 
 #include <nx/vms/client/desktop/ui/actions/action_fwd.h>

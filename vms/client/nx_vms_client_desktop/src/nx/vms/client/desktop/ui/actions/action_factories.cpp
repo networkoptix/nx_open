@@ -3,8 +3,8 @@
 #include "action_factories.h"
 
 #include <QtQuick/QQuickItem>
-#include <QtWebEngineWidgets/QWebEnginePage>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
+#include <QtGui/QActionGroup>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QWidget>
 

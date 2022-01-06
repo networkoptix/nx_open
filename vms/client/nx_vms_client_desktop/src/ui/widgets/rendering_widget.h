@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <QtWidgets/QOpenGLWidget>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 
 #include <core/resource/resource_fwd.h>
 

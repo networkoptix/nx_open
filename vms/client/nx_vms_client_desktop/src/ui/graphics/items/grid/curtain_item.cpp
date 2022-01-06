@@ -5,7 +5,7 @@
 #include <limits>
 
 #include <QtGui/QPainter>
-#include <QtWidgets/QOpenGLWidget>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>

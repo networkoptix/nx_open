@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include <QtGui/QAction>
 #include <QtWidgets/QWidget>
 
 #include <analytics/common/object_metadata.h>

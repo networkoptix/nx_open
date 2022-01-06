@@ -4,7 +4,7 @@
 
 #include <memory>
 
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QMenu>
 
 #include <client/client_runtime_settings.h>

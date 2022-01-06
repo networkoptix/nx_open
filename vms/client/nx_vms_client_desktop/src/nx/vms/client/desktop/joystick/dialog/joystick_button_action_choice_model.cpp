@@ -3,7 +3,7 @@
 #include "joystick_button_action_choice_model.h"
 
 #include <QtCore/qhashfunctions.h>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <utils/math/math.h>
 

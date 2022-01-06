@@ -7,7 +7,7 @@
 #include <set>
 #include <vector>
 
-#include <QtWidgets/QOpenGLWidget>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 #include <nx/utils/thread/mutex.h>
 #include <QSharedPointer>
 #include <nx/utils/thread/wait_condition.h>

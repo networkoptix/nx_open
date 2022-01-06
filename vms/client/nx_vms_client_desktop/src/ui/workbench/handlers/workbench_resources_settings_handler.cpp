@@ -2,7 +2,7 @@
 
 #include "workbench_resources_settings_handler.h"
 
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <client/client_module.h>
 #include <client/client_settings.h>

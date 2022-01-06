@@ -10,7 +10,7 @@
 #include <QtWidgets/QDialogButtonBox>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QStyle>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <client/client_settings.h>
 #include <nx/utils/log/assert.h>

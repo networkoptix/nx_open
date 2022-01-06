@@ -2,6 +2,8 @@
 
 #include "system_health_list_model.h"
 
+#include <QtWidgets/QWidget>
+
 #include <client/client_globals.h>
 #include <core/resource/resource.h>
 #include <nx/utils/metatypes.h>

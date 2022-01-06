@@ -4,7 +4,7 @@
 #include "buttons.h"
 
 #include <QtCore/QTimer>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QVBoxLayout>
 
 #include <ui/animation/animator_group.h>

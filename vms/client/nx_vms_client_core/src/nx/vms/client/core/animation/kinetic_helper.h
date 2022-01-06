@@ -5,7 +5,7 @@
 #include <limits>
 
 #include <QtCore/QElapsedTimer>
-#include <QtCore/QLinkedList>
+#include <QtCore5Compat/QLinkedList>
 #include <QtCore/QPair>
 #include <QtCore/QtMath>
 #include <QDebug>

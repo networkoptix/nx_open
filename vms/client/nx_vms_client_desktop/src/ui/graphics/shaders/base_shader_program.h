@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <QtGui/QOpenGLShaderProgram>
+#include <QtOpenGL/QOpenGLShaderProgram>
 
 class QnGLShaderProgram : public QOpenGLShaderProgram
 {

@@ -7,7 +7,7 @@
 #include <boost/algorithm/cxx11/any_of.hpp>
 
 #include <QtCore/QMargins>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QGraphicsLayout>
 
 #include <qt_graphics_items/graphics_widget.h>

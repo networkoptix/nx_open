@@ -2,7 +2,7 @@
 
 #include "resource_tree_settings_action_handler.h"
 
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <core/resource/user_resource.h>
 #include <ui/workbench/workbench_context.h>

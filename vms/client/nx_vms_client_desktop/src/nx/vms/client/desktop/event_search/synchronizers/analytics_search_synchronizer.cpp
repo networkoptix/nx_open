@@ -6,7 +6,7 @@
 #include <limits>
 
 #include <QtCore/QScopedValueRollback>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 
 #include <camera/cam_display.h>
 #include <camera/resource_display.h>

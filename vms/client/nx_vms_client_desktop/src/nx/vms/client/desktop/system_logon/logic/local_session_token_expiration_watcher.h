@@ -5,6 +5,7 @@
 #include <memory>
 #include <optional>
 
+#include <QtCore/QObject>
 #include <QtCore/QPointer>
 
 #include <nx/utils/uuid.h>
