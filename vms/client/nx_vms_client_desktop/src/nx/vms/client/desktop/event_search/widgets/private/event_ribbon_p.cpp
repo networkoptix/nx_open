@@ -298,7 +298,7 @@ void EventRibbon::Private::updateTile(int index)
         QTextDocument doc;
         doc.setHtml(nx::vms::common::html::toHtml(tileDescription));
         WidgetUtils::elideDocumentLines(&doc, kTileDescriptionLineLimit);
-        tileDescription = doc.toHtml("utf-8");
+        tileDescription = doc.toHtml();
     }
 
     // Check whether the tile is a special progress bar tile.

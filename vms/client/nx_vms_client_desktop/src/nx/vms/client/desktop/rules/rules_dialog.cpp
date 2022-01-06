@@ -343,7 +343,7 @@ void RulesDialog::displayAction(const SimplifiedRule& rule)
 void RulesDialog::resetFilter()
 {
     ui->searchLineEdit->clear();
-    rulesFilterModel->clear();
+    rulesFilterModel->invalidate();
 }
 
 void RulesDialog::resetSelection()

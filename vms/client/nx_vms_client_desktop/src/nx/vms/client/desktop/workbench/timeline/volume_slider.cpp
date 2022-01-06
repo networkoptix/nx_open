@@ -168,7 +168,7 @@ void VolumeSlider::updateTooltipPos()
     m_tooltip->setEnclosingRect(parentWindowGeometry);
 }
 
-void VolumeSlider::enterEvent(QEvent* /*event*/)
+void VolumeSlider::enterEvent(QEnterEvent* /*event*/)
 {
     m_hideTooltipTimer.stop();
     updateTooltipPos();

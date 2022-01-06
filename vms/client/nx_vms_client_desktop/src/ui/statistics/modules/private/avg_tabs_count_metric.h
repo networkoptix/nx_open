@@ -7,6 +7,7 @@
 #include <QtCore/QPointer>
 
 #include <statistics/base/base_fwd.h>
+#include <statistics/base/time_duration_metric.h>
 #include <statistics/base/abstract_metric.h>
 
 namespace nx::vms::client::desktop { class Workbench; }

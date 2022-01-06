@@ -72,7 +72,9 @@ class SystemNonClientAreaRemover::Private:
 {
 public:
     virtual bool nativeEventFilter(
-        const QByteArray& /*eventType*/, void* message, long* result) override
+        const QByteArray& /*eventType*/,
+        void* message,
+        qintptr* result) override
     {
         const auto msg = static_cast<MSG*>(message);
         const auto widget = idToWidget.value(WId(msg->hwnd));

@@ -57,12 +57,23 @@ void QnGraphicsView::wheelEvent(QWheelEvent* event)
 
     QGraphicsSceneWheelEvent wheelEvent(QEvent::GraphicsSceneWheel);
     wheelEvent.setWidget(viewport());
-    wheelEvent.setScenePos(mapToScene(event->pos()));
-    wheelEvent.setScreenPos(event->globalPos());
+    wheelEvent.setScenePos(mapToScene(event->position().toPoint()));
+    wheelEvent.setScreenPos(event->globalPosition().toPoint());
     wheelEvent.setButtons(event->buttons());
     wheelEvent.setModifiers(event->modifiers());
-    wheelEvent.setDelta(event->delta());
-    wheelEvent.setOrientation(event->orientation());
+    const auto angleDelta = event->angleDelta();
+    if (angleDelta.y() != 0)
+    {
+        wheelEvent.setDelta(angleDelta.y());
+        wheelEvent.setOrientation(Qt::Vertical);
+    }
+    else
+    {
+        wheelEvent.setDelta(angleDelta.x());
+        wheelEvent.setOrientation(Qt::Horizontal);
+    }
+    wheelEvent.setPhase(event->phase());
+    wheelEvent.setInverted(event->isInverted());
     wheelEvent.setAccepted(false);
     QApplication::sendEvent(scene(), &wheelEvent);
     event->setAccepted(wheelEvent.isAccepted());

@@ -68,7 +68,7 @@ struct QmlTestDialog::Private
             return;
 
         QTextStream in(history.get());
-        in.setCodec("UTF-8");
+        in.setEncoding(QStringConverter::Utf8);
 
         while (!in.atEnd())
         {
@@ -85,7 +85,7 @@ struct QmlTestDialog::Private
             return;
 
         QTextStream out(history.get());
-        out.setCodec("UTF-8");
+        out.setEncoding(QStringConverter::Utf8);
 
         for (int i = 0; i < editBox->count(); ++i)
             out << editBox->itemText(i) << "\n";

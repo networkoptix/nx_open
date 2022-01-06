@@ -176,7 +176,7 @@ struct EventTile::Private
         {
             doc.setTextWidth(width);
             WidgetUtils::elideDocumentLines(&doc, kTileTitleLineLimit, true);
-            titleByWidth.insert(width, new QString(doc.toHtml("utf-8")));
+            titleByWidth.insert(width, new QString(doc.toHtml()));
         }
     }
 

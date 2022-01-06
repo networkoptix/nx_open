@@ -16,6 +16,8 @@ void serialize(const bool &value, QString *target)
 
 bool deserialize(const QString &value, bool *target)
 {
+    using qunicodechar = char16_t;
+
     /* We also support upper/lower case combinations and "0" & "1"
      * during deserialization. */
     if (value.isEmpty())
@@ -210,7 +212,7 @@ bool serialize(const QBitArray& value, QString* target)
 
     for (int i = 0; i < size; ++i)
     {
-        QByteRef byte = byteArray[i / 8];
+        char& byte = byteArray[i / 8];
         byte = static_cast<char>(byte | (value.testBit(i) ? 1 : 0) << (i % 8));
     }
 

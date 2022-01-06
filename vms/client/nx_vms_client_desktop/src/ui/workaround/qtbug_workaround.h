@@ -23,7 +23,7 @@ public:
     QnQtbugWorkaround(QObject *parent = nullptr);
     virtual ~QnQtbugWorkaround();
 
-    virtual bool nativeEventFilter(const QByteArray &eventType, void *message, long *result) override;
+    virtual bool nativeEventFilter(const QByteArray& eventType, void* message, qintptr* result) override;
 
 protected:
     Q_DECLARE_PRIVATE(QnQtbugWorkaround)

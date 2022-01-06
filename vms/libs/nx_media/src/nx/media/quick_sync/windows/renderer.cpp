@@ -7,7 +7,6 @@
 
 #include <QtGui/QOffscreenSurface>
 #include <QtGui/QOpenGLContext>
-#include <QtPlatformHeaders/QWGLNativeContext>
 
 
 #include "renderer.h"
@@ -181,7 +180,7 @@ void Renderer::unregisterTexture()
 
 bool Renderer::registerTexture(GLuint textureId, QOpenGLContext* context)
 {
-    HGLRC guiGlrc = context->nativeHandle().value<QWGLNativeContext>().context();
+    HGLRC guiGlrc = context->nativeInterface<QNativeInterface::QWGLContext>()->nativeContext();
     wglShareLists(guiGlrc, m_rc);
 
     auto wglDXOpenDeviceNV = (PFNWGLDXOPENDEVICENVPROC)wglGetProcAddress("wglDXOpenDeviceNV");

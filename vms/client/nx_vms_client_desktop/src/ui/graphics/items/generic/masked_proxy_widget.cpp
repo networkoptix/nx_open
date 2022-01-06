@@ -24,9 +24,9 @@ void blitPixmap(const QPixmap& source, QPixmap& destination, const QPoint& locat
     blitter.drawPixmap(location, source);
 }
 
-int sceneDevicePixelRatio(const QGraphicsScene* scene)
+qreal sceneDevicePixelRatio(const QGraphicsScene* scene)
 {
-    int ratio = 1;
+    qreal ratio = 1;
     if (!scene)
         return ratio;
 

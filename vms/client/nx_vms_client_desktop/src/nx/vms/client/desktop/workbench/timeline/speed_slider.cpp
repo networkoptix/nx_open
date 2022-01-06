@@ -291,7 +291,7 @@ void SpeedSlider::updateTooltipPos()
     m_tooltip->setEnclosingRect(parentWindowGeometry);
 }
 
-void SpeedSlider::enterEvent(QEvent* /*event*/)
+void SpeedSlider::enterEvent(QEnterEvent* /*event*/)
 {
     m_hideTooltipTimer.stop();
     updateTooltipPos();

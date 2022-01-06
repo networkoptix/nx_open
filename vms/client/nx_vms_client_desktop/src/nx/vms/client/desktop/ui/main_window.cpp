@@ -4,7 +4,8 @@
 
 #include <QtCore/QCoreApplication>
 #include <QtCore/QFileInfo>
-#include <QtGui/private/qguiapplication_p.h>
+#include <QtGui/private/qevent_p.h>
+#include <QtQml/QQmlEngine>
 #include <QtQml/QQmlContext>
 #include <QtQml/QQmlEngine>
 #include <QtQml/QQmlError>
@@ -50,17 +51,18 @@ protected:
         // QTBUG-77393 fix: in QML second press event of a doubleclick does not have
         // Qt::MouseEventCreatedDoubleClick flag set.
 
-        QMouseEvent pressEvent(QEvent::MouseButtonPress, event->localPos(), event->localPos(),
-            event->screenPos(), event->button(), event->buttons(), event->modifiers(), event->source());
+        QMouseEvent pressEvent(QEvent::MouseButtonPress,
+            event->position(), event->scenePosition(), event->globalPosition(),
+            event->button(), event->buttons(), event->modifiers(), event->pointingDevice());
 
-        QGuiApplicationPrivate::setMouseEventFlags(&pressEvent,
-            pressEvent.flags() | Qt::MouseEventCreatedDoubleClick);
+        QMutableSinglePointEvent::from(&pressEvent)->setDoubleClick(true);
 
         QCoreApplication::sendEvent(quickWindow(), &pressEvent);
         event->setAccepted(pressEvent.isAccepted());
 
-        QMouseEvent mappedEvent(event->type(), event->localPos(), event->localPos(), event->screenPos(),
-            event->button(), event->buttons(), event->modifiers(), event->source());
+        QMouseEvent mappedEvent(event->type(),
+            event->position(), event->scenePosition(), event->globalPosition(),
+            event->button(), event->buttons(), event->modifiers(), event->pointingDevice());
 
         QCoreApplication::sendEvent(quickWindow(), &mappedEvent);
     }

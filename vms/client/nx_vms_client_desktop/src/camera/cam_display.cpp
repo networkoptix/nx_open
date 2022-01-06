@@ -83,9 +83,8 @@ static void updateActivity()
         }
         else
         {
-            SetThreadExecutionState(QSysInfo::windowsVersion() < QSysInfo::WV_VISTA
-                ? ES_USER_PRESENT | ES_CONTINUOUS
-                : ES_AWAYMODE_REQUIRED | ES_DISPLAY_REQUIRED | ES_SYSTEM_REQUIRED | ES_CONTINUOUS);
+            SetThreadExecutionState(
+                ES_AWAYMODE_REQUIRED | ES_DISPLAY_REQUIRED | ES_SYSTEM_REQUIRED | ES_CONTINUOUS);
         }
 #endif
         // Update system activity timer once per 20 seconds.

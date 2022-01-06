@@ -48,7 +48,7 @@ public:
 protected:
     virtual bool event(QEvent* event) override;
     virtual void paintEvent(QPaintEvent* event) override;
-    virtual void enterEvent(QEvent* event) override;
+    virtual void enterEvent(QEnterEvent* event) override;
     virtual void leaveEvent(QEvent* event) override;
     virtual bool eventFilter(QObject* obj, QEvent* event) override;
 

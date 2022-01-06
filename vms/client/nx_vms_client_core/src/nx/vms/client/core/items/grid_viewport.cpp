@@ -374,9 +374,9 @@ void GridViewport::itemChange(ItemChange change, const ItemChangeData& data)
     QQuickItem::itemChange(change, data);
 }
 
-void GridViewport::geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry)
+void GridViewport::geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry)
 {
-    QQuickItem::geometryChanged(newGeometry, oldGeometry);
+    QQuickItem::geometryChange(newGeometry, oldGeometry);
     d->updateFitContentsParameters(false);
     d->positionItems();
     if (d->zoomedItem)
