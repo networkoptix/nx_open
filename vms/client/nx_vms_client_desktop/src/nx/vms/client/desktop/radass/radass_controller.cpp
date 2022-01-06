@@ -209,7 +209,7 @@ struct RadassController::Private
             consumerByScreenSize.insert((screenSquare << 32) + pps, info);
         }
 
-        QMapIterator<qint64, Consumer> itr(consumerByScreenSize);
+        QMultiMapIterator<qint64, Consumer> itr(consumerByScreenSize);
         if (method == FindMethod::Biggest)
             itr.toBack();
 

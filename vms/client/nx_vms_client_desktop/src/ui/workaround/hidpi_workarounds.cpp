@@ -459,9 +459,10 @@ QEvent* QnHiDpiWorkarounds::fixupEvent(
         {
             const auto& enterEvent = *static_cast<QEnterEvent*>(source);
             target.reset(new QEnterEvent(
-                enterEvent.localPos(),
-                enterEvent.windowPos(),
-                widget->mapToGlobal(enterEvent.pos()) + frac(enterEvent.screenPos())));
+                enterEvent.position(),
+                enterEvent.scenePosition(),
+                widget->mapToGlobal(enterEvent.position()) + frac(enterEvent.globalPosition()),
+                enterEvent.pointingDevice()));
             target->setAccepted(source->isAccepted());
             return target.get();
         }
@@ -470,17 +471,17 @@ QEvent* QnHiDpiWorkarounds::fixupEvent(
         {
             const auto& wheelEvent = *static_cast<QWheelEvent*>(source);
             target.reset(new QWheelEvent(
-                wheelEvent.posF(),
-                widget->mapToGlobal(wheelEvent.pos()) + frac(wheelEvent.globalPosF()),
+                wheelEvent.position(),
+                widget->mapToGlobal(wheelEvent.position()) + frac(wheelEvent.globalPosition()),
                 wheelEvent.pixelDelta(),
                 wheelEvent.angleDelta(),
-                wheelEvent.delta(),
-                wheelEvent.orientation(),
                 wheelEvent.buttons(),
                 wheelEvent.modifiers(),
                 wheelEvent.phase(),
+                wheelEvent.inverted(),
                 wheelEvent.source(),
-                wheelEvent.inverted()));
+                wheelEvent.pointingDevice()
+                ));
             target->setAccepted(source->isAccepted());
             return target.get();
         }

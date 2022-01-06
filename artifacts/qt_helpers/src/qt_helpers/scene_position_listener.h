@@ -69,15 +69,14 @@ public:
     bool isEnabled() const { return m_enabled; }
     void setEnabled(bool enabled);
 
+    void itemGeometryChanged(QQuickItem* item, QQuickGeometryChange, const QRectF&) override;
+    void itemParentChanged(QQuickItem* item, QQuickItem* parent) override;
+    void itemChildRemoved(QQuickItem* item, QQuickItem* child) override;
+    void itemDestroyed(QQuickItem* item) override;
+
 signals:
     void scenePosChanged();
     void enabledChanged();
-
-protected:
-    void itemGeometryChanged(QQuickItem* item, const QRectF&, const QRectF&);
-    void itemParentChanged(QQuickItem* item, QQuickItem* parent);
-    void itemChildRemoved(QQuickItem* item, QQuickItem* child);
-    void itemDestroyed(QQuickItem* item);
 
 private:
     void updateScenePos();

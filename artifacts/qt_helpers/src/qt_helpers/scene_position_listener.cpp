@@ -114,7 +114,7 @@ void ScenePositionListener::setEnabled(bool enabled)
     updateScenePos();
 }
 
-void ScenePositionListener::itemGeometryChanged(QQuickItem* item, const QRectF&, const QRectF&)
+void ScenePositionListener::itemGeometryChanged(QQuickItem* item, QQuickGeometryChange, const QRectF&)
 {
     Q_UNUSED(item)
 

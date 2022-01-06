@@ -147,7 +147,7 @@ void ShortcutHintWidget::addKeySequence(const QKeySequence& keySequence)
 {
     for (int i = 0; i < keySequence.count(); ++i)
     {
-        const auto keyString = keyToString(static_cast<Qt::Key>(keySequence[i]));
+        const auto keyString = keyToString(keySequence[i].key());
         layout()->addWidget(new KeyHintLabel(keyString.trimmed()));
         if (i < keySequence.count() - 1)
             layout()->addWidget(new QLabel("+"));

@@ -38,7 +38,7 @@ QnQtbugWorkaround::~QnQtbugWorkaround() {
     return;
 }
 
-bool QnQtbugWorkaround::nativeEventFilter(const QByteArray &, void *message, long *result) {
+bool QnQtbugWorkaround::nativeEventFilter(const QByteArray&, void* message, qintptr* result) {
     Q_UNUSED(result);
     Q_D(QnQtbugWorkaround);
 
@@ -121,7 +121,8 @@ QnQtbugWorkaround::~QnQtbugWorkaround() {
     return;
 }
 
-bool QnQtbugWorkaround::nativeEventFilter(const QByteArray &eventType, void *message, long *result) {
+bool QnQtbugWorkaround::nativeEventFilter(const QByteArray& eventType, void* message, qintptr* result)
+{
     Q_UNUSED(eventType)
     Q_UNUSED(message)
     Q_UNUSED(result)

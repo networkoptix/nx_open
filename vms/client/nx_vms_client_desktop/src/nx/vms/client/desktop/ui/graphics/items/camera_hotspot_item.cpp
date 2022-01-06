@@ -90,7 +90,7 @@ void CameraHotspotItem::paint(
     if (!qFuzzyIsNull(nx::vms::client::core::Geometry::length(paintedHotspotData.direction)))
     {
         const auto directionLine = QLineF(QPointF(), d->hotspotData.direction);
-        const auto rotatedDirectionLine = option->matrix.map(directionLine).unitVector();
+        const auto rotatedDirectionLine = painter->transform().map(directionLine).unitVector();
         paintedHotspotData.direction =
             rotatedDirectionLine.translated(-rotatedDirectionLine.p1()).p2();
     }

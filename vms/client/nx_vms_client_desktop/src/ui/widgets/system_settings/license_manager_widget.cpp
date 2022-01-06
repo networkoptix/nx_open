@@ -883,7 +883,7 @@ void QnLicenseManagerWidget::processReply(
     }
 
     QTextStream is(&replyData);
-    is.setCodec("UTF-8");
+    is.setEncoding(QStringConverter::Utf8);
     reply->deleteLater();
 
     while (!is.atEnd())

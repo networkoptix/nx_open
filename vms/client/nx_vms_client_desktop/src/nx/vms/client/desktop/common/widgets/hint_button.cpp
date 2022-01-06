@@ -194,7 +194,7 @@ void HintButton::paintEvent(QPaintEvent* /*event*/)
     }
 }
 
-void HintButton::enterEvent(QEvent* /*event*/)
+void HintButton::enterEvent(QEnterEvent* /*event*/)
 {
     bool skipHover = !isEnabled();
 

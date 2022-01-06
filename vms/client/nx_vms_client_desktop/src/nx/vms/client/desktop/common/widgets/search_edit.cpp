@@ -111,7 +111,7 @@ public:
 
     HoverablePushButton(QWidget* widget, const Callback& hoverCallback);
 
-    void enterEvent(QEvent* event) override;
+    void enterEvent(QEnterEvent* event) override;
     void leaveEvent(QEvent* event) override;
 
 private:
@@ -128,7 +128,7 @@ HoverablePushButton::HoverablePushButton(QWidget* widget, const Callback& hoverC
     setAttribute(Qt::WA_NoMousePropagation);
 }
 
-void HoverablePushButton::enterEvent(QEvent* /*event*/)
+void HoverablePushButton::enterEvent(QEnterEvent* /*event*/)
 {
     if (m_hoverCallback)
         m_hoverCallback(true);
@@ -474,7 +474,7 @@ void SearchEdit::inputMethodEvent(QInputMethodEvent* event)
     d->lineEdit->event(event);
 }
 
-void SearchEdit::enterEvent(QEvent* /*event*/)
+void SearchEdit::enterEvent(QEnterEvent* /*event*/)
 {
     setHovered(true);
 }

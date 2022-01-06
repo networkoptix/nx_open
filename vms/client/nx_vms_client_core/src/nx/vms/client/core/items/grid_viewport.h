@@ -144,7 +144,7 @@ signals:
 
 protected:
     virtual void itemChange(ItemChange change, const ItemChangeData& value) override;
-    virtual void geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry) override;
+    virtual void geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry) override;
 
 private:
     class Private;

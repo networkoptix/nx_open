@@ -425,7 +425,7 @@ void CameraHotspotsEditorWidget::wheelEvent(QWheelEvent* event)
 
     auto hotspotData = hotspotAt(d->selectedHotspotIndex.value());
 
-    QMatrix rotationMatrix;
+    QTransform rotationMatrix;
     rotationMatrix.rotate(event->angleDelta().y() / 8.0);
     hotspotData.direction = rotationMatrix.map(hotspotData.direction);
 

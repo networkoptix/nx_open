@@ -16,7 +16,7 @@ void WidgetProfiler::saveWidgetsReport(const QString& filePath,
     if (!file.isOpen())
         return;
     QTextStream textStream(&file);
-    textStream.setCodec("UTF-8");
+    textStream.setEncoding(QStringConverter::Utf8);
     textStream << "WIDGET COUNT BY TYPE" << Qt::endl << Qt::endl << getWidgetStatistics() << Qt::endl;
     textStream << "WIDGETS HIERARCHY DUMP" << Qt::endl << Qt::endl << getWidgetHierarchy(parent);
     textStream.flush();

@@ -19,6 +19,12 @@ class QnWindowsProcessPrivate {
 public:
     QnWindowsProcessPrivate(): initialized(false), current(false), valid(false), pid(-1), handle(INVALID_HANDLE_VALUE) {}
 
+    ~QnWindowsProcessPrivate()
+    {
+        if (initialized && valid && !current && handle && handle != INVALID_HANDLE_VALUE)
+            CloseHandle(handle);
+    }
+
 private:
     void tryInitialize() {
         if(initialized)
@@ -42,12 +48,15 @@ private:
         if(process->state() == QProcess::NotRunning)
             return; /* Cannot initialize yet. */
 
-        if(PROCESS_INFORMATION *info = process->pid()) {
-            pid = info->dwProcessId;
-            handle = info->hProcess;
+        if ((pid = process->processId()))
+        {
+            handle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_SET_INFORMATION, FALSE, pid);
+            NX_ASSERT(handle && handle != INVALID_HANDLE_VALUE, "Unable to get process handle.");
             initialized = true;
             valid = true;
-        } else {
+        }
+        else
+        {
             initialized = true;
             valid = false;
         }

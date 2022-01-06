@@ -14,7 +14,8 @@ namespace {
 QString passwordPlaceholder(QStyle* style)
 {
     static constexpr auto kPlaceholderLength = 10;
-    const auto passwordPlaceholderChar = style->styleHint(QStyle::SH_LineEdit_PasswordCharacter);
+    const auto passwordPlaceholderChar =
+        QChar(style->styleHint(QStyle::SH_LineEdit_PasswordCharacter));
     return QString(kPlaceholderLength, passwordPlaceholderChar);
 }
 
