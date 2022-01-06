@@ -58,7 +58,7 @@ void VariantAnimator::setAccessor(nx::vms::client::desktop::AbstractAccessor *ac
     m_accessor.reset(accessor);
 
     invalidateDuration();
-    setInternalTypeInternal(currentValue().userType());
+    setInternalTypeInternal(currentValue().metaType());
 }
 
 void VariantAnimator::setConverter(AbstractConverter *converter) {
@@ -70,7 +70,7 @@ void VariantAnimator::setConverter(AbstractConverter *converter) {
     m_converter.reset(converter);
 
     invalidateDuration();
-    setInternalTypeInternal(currentValue().userType());
+    setInternalTypeInternal(currentValue().metaType());
 }
 
 void VariantAnimator::setEasingCurve(const QEasingCurve &easingCurve)
@@ -125,17 +125,19 @@ void VariantAnimator::setTargetObjectInternal(QObject *target)
     }
 
     invalidateDuration();
-    setInternalTypeInternal(currentValue().userType());
+    setInternalTypeInternal(currentValue().metaType());
 }
 
-int VariantAnimator::internalType() const {
+QMetaType VariantAnimator::internalType() const
+{
     if(converter() == nullptr)
         return m_internalType;
 
     return converter()->targetType();
 }
 
-int VariantAnimator::externalType() const {
+QMetaType VariantAnimator::externalType() const
+{
     if(converter() == nullptr)
         return m_internalType;
 
@@ -159,12 +161,12 @@ QVariant VariantAnimator::toExternal(const QVariant &internal) const {
 void VariantAnimator::setTargetValue(const QVariant &targetValue)
 {
     QVariant internalTargetValue = toInternal(targetValue);
-    if (targetValue.type() == QVariant::Double)
+    if (targetValue.typeId() == QMetaType::Double)
     {
         if (qFuzzyEquals(m_internalTargetValue.toDouble(), internalTargetValue.toDouble()))
             return;
     }
-    else if (targetValue.canConvert(QMetaType::LongLong))
+    else if (targetValue.canConvert<qlonglong>())
     {
         if (m_internalTargetValue.toLongLong() == internalTargetValue.toLongLong())
             return;
@@ -180,9 +182,7 @@ void VariantAnimator::setTargetValue(const QVariant &targetValue)
         start();
 }
 
-void VariantAnimator::setInternalTypeInternal(int newInternalType) {
-    NX_ASSERT(newInternalType >= 0);
-
+void VariantAnimator::setInternalTypeInternal(QMetaType newInternalType) {
     if(m_internalType == newInternalType)
         return;
 
@@ -230,9 +230,9 @@ QVariant VariantAnimator::interpolated(const QVariant &from, const QVariant &to,
 
 QVariant VariantAnimator::currentValue() const {
     if(accessor() == nullptr || targetObject() == nullptr) {
-        if (internalType() == QMetaType::UnknownType)
+        if (!internalType().isValid())
             return QVariant();
-        return QVariant(internalType(), static_cast<void *>(nullptr));
+        return QVariant(internalType());
     }
 
     return toInternal(accessor()->get(targetObject()));
@@ -277,34 +277,35 @@ void VariantAnimator::updateState(State newState) {
     base_type::updateState(newState);
 }
 
-void VariantAnimator::updateInternalType(int newInternalType) {
+void VariantAnimator::updateInternalType(QMetaType newInternalType) {
     m_internalType = newInternalType;
 
-    m_internalStartValue = (newInternalType == QMetaType::UnknownType)
+    m_internalStartValue = (newInternalType.id() == QMetaType::UnknownType)
             ? QVariant()
-            : QVariant(newInternalType, static_cast<void *>(nullptr));
-    m_internalTargetValue = (newInternalType == QMetaType::UnknownType)
+            : QVariant(newInternalType);
+    m_internalTargetValue = (newInternalType.id() == QMetaType::UnknownType)
             ? QVariant()
-            : QVariant(newInternalType, static_cast<void *>(nullptr));
+            : QVariant(newInternalType);
 
     m_linearCombinator = LinearCombinator::forType(internalType());
     if(m_linearCombinator == nullptr) {
-        NX_ASSERT(false, "No linear combinator registered for type '%1'.", QMetaType::typeName(internalType()));
-        m_linearCombinator = LinearCombinator::forType(0);
+        NX_ASSERT(false, "No linear combinator registered for type '%1'.", internalType().name());
+        m_linearCombinator = LinearCombinator::forType({});
     }
 
     m_magnitudeCalculator = MagnitudeCalculator::forType(internalType());
     if(m_magnitudeCalculator == nullptr) {
-        NX_ASSERT(false, "No magnitude calculator registered for type '%1'.", QMetaType::typeName(internalType()));
-        m_magnitudeCalculator = MagnitudeCalculator::forType(0);
+        NX_ASSERT(false, "No magnitude calculator registered for type '%1'.", internalType().name());
+        m_magnitudeCalculator = MagnitudeCalculator::forType({});
     }
 
     invalidateDuration();
 }
 
 void VariantAnimator::updateTargetValue(const QVariant &newTargetValue) {
-    if(newTargetValue.userType() != internalType()) {
-        NX_ASSERT(false, "Value of invalid type was provided - expected '%1', got '%2'.", QMetaType::typeName(internalType()), QMetaType::typeName(newTargetValue.userType()));
+    if(newTargetValue.metaType() != internalType())
+    {
+        NX_ASSERT(false, "Value of invalid type was provided - expected '%1', got '%2'.", internalType().name(), newTargetValue.metaType().name());
         return;
     }
 

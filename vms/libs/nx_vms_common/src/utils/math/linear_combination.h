@@ -53,7 +53,7 @@ public:
      *
      * \note                            This function is thread-safe.
      */
-    static LinearCombinator *forType(int type);
+    static LinearCombinator *forType(QMetaType type);
 
     /**
      * \param combinator                Linear combinator to register.
@@ -67,7 +67,7 @@ public:
      *
      * \param type                      <tt>QMetaType::Type</tt> for this linear combinator.
      */
-    LinearCombinator(int type);
+    LinearCombinator(QMetaType type);
 
     /**
      * Virtual destructor.
@@ -77,9 +77,7 @@ public:
     /**
      * \returns                         <tt>QMetaType::Type</tt> of this linear combinator.
      */
-    int type() const {
-        return m_type;
-    }
+    QMetaType type() const { return m_type; }
 
     QVariant combine(qreal a, const QVariant &x, qreal b, const QVariant &y) const;
 
@@ -111,7 +109,7 @@ protected:
     void initZero();
 
 private:
-    int m_type;
+    QMetaType m_type;
     QVariant m_zero;
 };
 
@@ -120,7 +118,7 @@ template<class T>
 class TypedLinearCombinator: public LinearCombinator {
     typedef LinearCombinator base_type;
 public:
-    TypedLinearCombinator(): base_type(qMetaTypeId<T>()) {}
+    TypedLinearCombinator(): base_type(QMetaType::fromType<T>()) {}
 
     using base_type::combine;
 

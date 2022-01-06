@@ -133,7 +133,7 @@ public:
             return defaultValue;
 
         QVariant result = *pos;
-        if (!result.convert(static_cast<QVariant::Type>(qMetaTypeId<T>())))
+        if (!result.convert(QMetaType::fromType<T>()))
             return defaultValue;
 
         return result.value<T>();

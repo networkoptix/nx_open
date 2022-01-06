@@ -46,12 +46,9 @@ void Metatypes::initialize()
     qRegisterMetaType<MacAddress>();
 
     qRegisterMetaType<Url>();
-    qRegisterMetaTypeStreamOperators<Url>();
-    qRegisterMetaTypeStreamOperators<QList<Url>>();
 
     qRegisterMetaType<QnUuid>();
     qRegisterMetaType<QSet<QnUuid>>("QSet<QnUuid>");
-    qRegisterMetaTypeStreamOperators<QnUuid>();
 
     qRegisterMetaType<SharedGuardPtr>();
 
@@ -62,12 +59,6 @@ void Metatypes::initialize()
     qRegisterMetaType<std::chrono::seconds>();
     qRegisterMetaType<std::chrono::milliseconds>();
     qRegisterMetaType<std::chrono::microseconds>();
-
-    qRegisterMetaTypeStreamOperators<std::chrono::hours>();
-    qRegisterMetaTypeStreamOperators<std::chrono::minutes>();
-    qRegisterMetaTypeStreamOperators<std::chrono::seconds>();
-    qRegisterMetaTypeStreamOperators<std::chrono::milliseconds>();
-    qRegisterMetaTypeStreamOperators<std::chrono::microseconds>();
 
     QMetaType::registerConverter<std::chrono::hours, std::chrono::minutes>();
     QMetaType::registerConverter<std::chrono::hours, std::chrono::seconds>();

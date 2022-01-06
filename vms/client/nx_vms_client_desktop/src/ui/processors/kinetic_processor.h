@@ -65,7 +65,7 @@ public:
      * \param type                      <tt>QMetaType::Type</tt> for spatial type of this processor.
      * \param parent                    Parent for this object.
      */
-    KineticProcessor(int type, QObject *parent = nullptr);
+    KineticProcessor(QMetaType type, QObject *parent = nullptr);
 
     /**
      * Virtual destructor.
@@ -92,7 +92,7 @@ public:
     /**
      * \returns                         <tt>QMetaType::Type</tt> for spatial type of this processor.
      */
-    int type() const {
+    QMetaType type() const {
         return mType;
     }
 
@@ -277,7 +277,7 @@ protected:
     /* 'Stable' state. */
 
     /** <tt>QMetaType::Type</tt> for the spatial type of this processor. */
-    int mType;
+    QMetaType mType;
 
     /** Magnitude calculator. */
     MagnitudeCalculator *mMagnitudeCalculator;

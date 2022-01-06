@@ -34,8 +34,7 @@ inline bool fromQVariant(const QVariant& value, QString* result)
 {
     if (!value.isValid())
         return false;
-
-    if (value.type() == QVariant::StringList)
+    if (value.typeId() == QMetaType::QStringList)
         *result = value.toStringList().join(",");
     else
         *result = value.toString();

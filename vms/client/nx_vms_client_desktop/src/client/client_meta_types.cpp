@@ -83,6 +83,7 @@
 #include <nx/vms/client/desktop/utils/virtual_camera_payload.h>
 #include <nx/vms/client/desktop/utils/virtual_camera_state.h>
 #include <nx/vms/client/desktop/utils/webengine_profile_manager.h>
+#include <nx/vms/client/desktop/workbench/timeline/archive_frame_extractor.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail.h>
 #include <nx/vms/client/desktop/workbench/timeline/timeline_globals.h>
 #include <nx/vms/client/desktop/workbench/workbench.h>
@@ -165,10 +166,6 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaType<QVector<QColor> >();
     qRegisterMetaType<QValidator::State>();
 
-    qRegisterMetaTypeStreamOperators<QList<QUrl>>();
-    qRegisterMetaTypeStreamOperators<QnTimePeriod>();
-    qRegisterMetaTypeStreamOperators<QList<QRegion>>();
-
     qRegisterMetaType<LayoutResourcePtr>();
 
     qRegisterMetaType<ResourceTree::NodeType>();
@@ -176,11 +173,8 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaType<Qn::ItemDataRole>();
     qRegisterMetaType<workbench::timeline::ThumbnailPtr>();
     qRegisterMetaType<QnLicenseWarningState>();
-    qRegisterMetaTypeStreamOperators<QnLicenseWarningState>();
     qRegisterMetaType<QnLicenseWarningStateHash>();
-    qRegisterMetaTypeStreamOperators<QnLicenseWarningStateHash>();
     qRegisterMetaType<Qn::TimeMode>();
-    qRegisterMetaTypeStreamOperators<Qn::TimeMode>();
     qRegisterMetaType<QnBackgroundImage>();
     qRegisterMetaType<Qn::ImageBehavior>();
     qRegisterMetaType<ui::action::IDType>("ui::action::IDType");
@@ -209,6 +203,8 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaType<UpdateDeliveryInfo>();
     qRegisterMetaType<UpdateContents>();
 
+    qRegisterMetaType<nx::vms::client::desktop::ArchiveFrameExtractor::Result>();
+
     QMetaType::registerConverter<QVariantMap, QnTimePeriod>(variantMapToTimePeriod);
     QMetaType::registerConverter<QString, QnResourcePtr>(stringToResource);
     QMetaType::registerConverter<QString, QnResourceList>(stringToResourceList);
@@ -222,14 +218,12 @@ void QnClientMetaTypes::initialize()
 
     WebViewController::registerMetaType();
 
-    QMetaType::registerComparators<QnUuid>();
-
     QnJsonSerializer::registerSerializer<Qn::ImageBehavior>();
     QnJsonSerializer::registerSerializer<QnBackgroundImage>();
     QnJsonSerializer::registerSerializer<QVector<QnUuid> >();
 
     qRegisterMetaType<RecordScheduleCellData>();
-    QMetaType::registerComparators<RecordScheduleCellData>();
+    qRegisterMetaType<nx::vms::client::desktop::RecordScheduleCellData>();
 
     registerQmlTypes();
 }

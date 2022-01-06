@@ -103,7 +103,6 @@ void Metatypes::initialize()
     qRegisterMetaType<DiscoveredServerData>();
     qRegisterMetaType<DiscoveredServerDataList>();
     qRegisterMetaType<EventReason>();
-    qRegisterMetaTypeStreamOperators<EventReason>();
     qRegisterMetaType<EventRuleData>();
     qRegisterMetaType<EventRuleDataList>();
     qRegisterMetaType<FullInfoData>();
@@ -150,7 +149,6 @@ void Metatypes::initialize()
     qRegisterMetaType<ServerFootageDataList>();
     qRegisterMetaType<ServerRuntimeEventData>();
     qRegisterMetaType<SoftwareVersion>();
-    qRegisterMetaTypeStreamOperators<SoftwareVersion>();
     qRegisterMetaType<StorageData>();
     qRegisterMetaType<StorageDataList>();
     qRegisterMetaType<SyncRequestData>();

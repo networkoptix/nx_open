@@ -90,7 +90,6 @@ void initializeMetaTypes()
     qRegisterMetaType<nx::media::PlayerStatistics>();
 
     qRegisterMetaType<MotionSelection>();
-    qRegisterMetaTypeStreamOperators<MotionSelection>();
 
     // To create properties of type QAbstractItemModel* in QML and to assign C++ object properties
     // of that type from QML.

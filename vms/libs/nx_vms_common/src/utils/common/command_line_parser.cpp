@@ -224,7 +224,7 @@ bool QnCommandLineParser::parse(const QStringList& arguments, QTextStream *error
 
         /* Convert to typed value. */
         QVariant typedValue = value;
-        bool success = typedValue.convert(static_cast<QVariant::Type>(parameter.type()));
+        bool success = typedValue.convert(static_cast<QMetaType::Type>(parameter.type()));
         if (!success)
         {
             if (errorStream)

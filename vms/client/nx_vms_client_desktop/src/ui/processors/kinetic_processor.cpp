@@ -13,7 +13,7 @@ static constexpr int kDefaultMaxShiftCount = 10;
 
 } // namespace
 
-KineticProcessor::KineticProcessor(int type, QObject *parent):
+KineticProcessor::KineticProcessor(QMetaType type, QObject *parent):
     QObject(parent),
     mState(Measuring),
     mType(type),
@@ -26,14 +26,14 @@ KineticProcessor::KineticProcessor(int type, QObject *parent):
 {
     mMagnitudeCalculator = MagnitudeCalculator::forType(type);
     if(mMagnitudeCalculator == nullptr) {
-        NX_ASSERT(false, "No magnitude calculator is registered for the given type '%1'.", type);
-        mMagnitudeCalculator = MagnitudeCalculator::forType(0);
+        NX_ASSERT(false, "No magnitude calculator is registered for the given type '%1'.", type.name());
+        mMagnitudeCalculator = MagnitudeCalculator::forType({});
     }
 
     mLinearCombinator = LinearCombinator::forType(type);
     if(mLinearCombinator == nullptr) {
-        NX_ASSERT(false, "No linear combinator is registered for the given type '%1'.", type);
-        mLinearCombinator = LinearCombinator::forType(0);
+        NX_ASSERT(false, "No linear combinator is registered for the given type '%1'.", type.name());
+        mLinearCombinator = LinearCombinator::forType({});
     }
 
     reset();
@@ -51,8 +51,13 @@ void KineticProcessor::reset() {
 }
 
 void KineticProcessor::shift(const QVariant &dv) {
-    if(dv.userType() != mType) {
-        NX_ASSERT(false, "Spatial displacement of invalid type was given - expected type '%1', got type '%2'.", QMetaType::typeName(mType), QMetaType::typeName(dv.userType()));
+    if(dv.metaType() != mType)
+    {
+        NX_ASSERT(
+            false,
+            "Spatial displacement of invalid type was given - expected type '%1', got type '%2'.",
+            mType.name(),
+            dv.metaType().name());
         return;
     }
 
@@ -218,4 +223,3 @@ KineticProcessHandler::~KineticProcessHandler() {
     if(mProcessor != nullptr)
         mProcessor->setHandler(nullptr);
 }
-

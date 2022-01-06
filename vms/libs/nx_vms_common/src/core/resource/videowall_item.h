@@ -62,7 +62,7 @@ public:
     }
 };
 
-QDebug operator<<(QDebug dbg, const QnVideoWallItem& item);
+NX_VMS_COMMON_API QDebug operator<<(QDebug dbg, const QnVideoWallItem& item);
 
 Q_DECLARE_METATYPE(QnVideoWallItem)
 Q_DECLARE_TYPEINFO(QnVideoWallItem, Q_MOVABLE_TYPE);

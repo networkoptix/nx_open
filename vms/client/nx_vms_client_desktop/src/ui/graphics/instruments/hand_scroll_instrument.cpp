@@ -18,7 +18,7 @@ HandScrollInstrument::HandScrollInstrument(QObject* parent):
         QEvent::MouseButtonRelease, AnimationEvent::Animation), parent),
     m_mouseButtons(Qt::RightButton)
 {
-    const auto processor = new KineticCuttingProcessor(QMetaType::QPointF, this);
+    const auto processor = new KineticCuttingProcessor(QMetaType(QMetaType::QPointF), this);
     processor->setHandler(this);
     processor->setMaxShiftInterval(0.01);
     processor->setSpeedCuttingThreshold(56); //< In pixels per second.

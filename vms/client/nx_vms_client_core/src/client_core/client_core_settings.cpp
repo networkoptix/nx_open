@@ -38,7 +38,6 @@ QnClientCoreSettings::QnClientCoreSettings(QObject* parent) :
     m_settings(new QSettings(this))
 {
     qRegisterMetaType<QnStringSet>("QnStringSet");
-    qRegisterMetaTypeStreamOperators<QnStringSet>();
 
     m_settings->beginGroup(kCoreSettingsGroup);
     init();

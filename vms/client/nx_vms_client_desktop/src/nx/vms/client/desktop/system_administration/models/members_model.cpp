@@ -864,7 +864,6 @@ public:
 void MembersModel::registerQmlType()
 {
     qRegisterMetaType<nx::vms::client::desktop::MembersModelGroup>();
-    QMetaType::registerComparators<QList<nx::vms::client::desktop::MembersModelGroup>>();
 
     // Main model.
     qmlRegisterType<MembersModel>("nx.vms.client.desktop", 1, 0, "MembersModel");

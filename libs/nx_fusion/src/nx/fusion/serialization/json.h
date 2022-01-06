@@ -134,7 +134,7 @@ class QnJsonSerializer:
 {
     typedef QnContextSerializer<QJsonValue, QnJsonContext> base_type;
 public:
-    QnJsonSerializer(int type): base_type(type) {}
+    QnJsonSerializer(QMetaType type): base_type(type) {}
 };
 
 template<class T>

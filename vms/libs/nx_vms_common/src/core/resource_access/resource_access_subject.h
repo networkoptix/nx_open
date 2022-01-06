@@ -37,7 +37,7 @@ private:
     QnUuid m_id;
 };
 
-QDebug operator<<(QDebug dbg, const QnResourceAccessSubject& subject);
+NX_VMS_COMMON_API QDebug operator<<(QDebug dbg, const QnResourceAccessSubject& subject);
 
 namespace std {
 

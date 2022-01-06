@@ -8,25 +8,27 @@
 #include <nx/utils/log/log.h>
 
 QVariant AbstractConverter::convertSourceToTarget(const QVariant &source) const {
-    if(source.userType() != sourceType()) {
+    if (source.metaType() != sourceType())
+    {
         NX_ASSERT(false,
             "Source of invalid type: expected '%1', got '%2'.",
-            QMetaType::typeName(sourceType()), QMetaType::typeName(source.userType()));
+            sourceType().name(), source.metaType().name());
 
-        return QVariant(targetType(), static_cast<const void *>(nullptr));
+        return QVariant(targetType());
     }
 
     return doConvertSourceToTarget(source);
 }
 
 QVariant AbstractConverter::convertTargetToSource(const QVariant &target) const {
-    if(target.userType() != targetType()) {
+    if (target.metaType() != targetType())
+    {
         NX_ASSERT(false,
             "Target of invalid type: expected '%1', got '%2'.",
-            QMetaType::typeName(targetType()),
-            QMetaType::typeName(target.userType()));
+            targetType().name(),
+            target.metaType().name());
 
-        return QVariant(sourceType(), static_cast<const void *>(nullptr));
+        return QVariant(sourceType());
     }
 
     return doConvertTargetToSource(target);

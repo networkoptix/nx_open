@@ -33,7 +33,7 @@ std::string SqlFilterField::toString() const
 
 void SqlFilterField::bindFields(QSqlQuery* query) const
 {
-    if (m_value.type() == QVariant::Uuid)
+    if (m_value.typeId() == QMetaType::QUuid)
         query->bindValue(m_placeHolderName.c_str(), m_value.toUuid().toRfc4122());
     else
         query->bindValue(m_placeHolderName.c_str(), m_value);

@@ -25,17 +25,17 @@ void convert(const QColor &source, QVector4D *target) {
 }
 
 QnColorToVectorConverter::QnColorToVectorConverter():
-    AbstractConverter(QMetaType::QColor, QMetaType::QVector4D)
+    AbstractConverter(QMetaType(QMetaType::QColor), QMetaType(QMetaType::QVector4D))
 {}
 
 QVariant QnColorToVectorConverter::doConvertSourceToTarget(const QVariant &source) const {
-    NX_ASSERT(source.userType() == QMetaType::QColor);
+    NX_ASSERT(source.typeId() == QMetaType::QColor);
 
     return convert<QVector4D>(*static_cast<const QColor *>(source.constData()));
 }
 
 QVariant QnColorToVectorConverter::doConvertTargetToSource(const QVariant &target) const {
-    NX_ASSERT(target.userType() == QMetaType::QVector4D);
+    NX_ASSERT(target.typeId() == QMetaType::QVector4D);
 
     return convert<QColor>(*static_cast<const QVector4D *>(target.constData()));
 }

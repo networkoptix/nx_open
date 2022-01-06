@@ -59,7 +59,7 @@ public:
     void setAbsoluteMovementSpeed(qreal absoluteMovementSpeed);
 
 protected:
-    virtual void updateInternalType(int newType) override;
+    virtual void updateInternalType(QMetaType newType) override;
 
     virtual int estimatedDuration(const QVariant &from, const QVariant &to) const override;
 

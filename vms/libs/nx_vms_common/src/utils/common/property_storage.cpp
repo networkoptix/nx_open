@@ -94,10 +94,12 @@ bool QnPropertyStorage::setValue(const QString &name, const QVariant &value) {
 QnPropertyStorage::UpdateStatus QnPropertyStorage::updateValue(int id, const QVariant &value) {
     QVariant newValue = value;
 
-    int type = m_typeById.value(id, QMetaType::UnknownType);
-    if(type != QMetaType::UnknownType && int(value.type()) != type) {
-        if(!newValue.convert(static_cast<QVariant::Type>(type))) {
-            NX_ASSERT(false, "Cannot assign a value of type '%1' to a property '%2' of type '%3'.", QMetaType::typeName(value.userType()), name(id), QMetaType::typeName(type));
+    const auto type = m_typeById.value(id, {});
+    if (type.id() != QMetaType::UnknownType && value.metaType() != type)
+    {
+        if (!newValue.convert(type))
+        {
+            NX_ASSERT(false, "Cannot assign a value of type '%1' to a property '%2' of type '%3'.", value.metaType().name(), name(id), type.name());
             return Failed;
         }
     }
@@ -155,13 +157,15 @@ QStringList QnPropertyStorage::argumentNames(int id) const {
     return m_argumentNamesById.value(id);
 }
 
-int QnPropertyStorage::type(int id) const {
+QMetaType QnPropertyStorage::type(int id) const
+{
     QnPropertyStorageLocker locker(this);
 
-    return m_typeById.value(id, QMetaType::UnknownType);
+    return m_typeById.value(id, {});
 }
 
-void QnPropertyStorage::setType(int id, int type) {
+void QnPropertyStorage::setType(int id, QMetaType type)
+{
     QnPropertyStorageLocker locker(this);
 
     if(m_typeById[id] == type)
@@ -169,8 +173,8 @@ void QnPropertyStorage::setType(int id, int type) {
 
     m_typeById[id] = type;
 
-    if(type != QMetaType::UnknownType)
-        updateValue(id, QVariant(type, static_cast<const void *>(NULL)));
+    if (type.id() != QMetaType::UnknownType)
+        updateValue(id, QVariant(type));
 }
 
 bool QnPropertyStorage::isWritableLocked(int id) const {
@@ -242,7 +246,7 @@ bool QnPropertyStorage::updateFromCommandLine(int &argc, const char **argv, QTex
             continue;
         }
 
-        int type = m_typeById.value(id, QMetaType::UnknownType);
+        const auto type = m_typeById.value(id, {});
 
         for(const QString &name: m_argumentNamesById.value(id)) {
             parser.addParameter(
@@ -250,7 +254,7 @@ bool QnPropertyStorage::updateFromCommandLine(int &argc, const char **argv, QTex
                 name,
                 QString(),
                 QString(),
-                type == QMetaType::Bool ? QVariant(QLatin1String("true")) : QVariant()
+                type.id() == QMetaType::Bool ? QVariant(QLatin1String("true")) : QVariant()
             );
         }
     }
@@ -275,7 +279,7 @@ bool QnPropertyStorage::updateFromCommandLine(int &argc, const char **argv, QTex
                 *errorStream
                     << nx::format("Invalid value for '%1' argument - expected %2, provided '%3'.").args(
                         name,
-                        QMetaType::typeName(m_typeById.value(id, QMetaType::UnknownType)),
+                        m_typeById.value(id, {}).name(),
                         value.toString())
                     << Qt::endl;
 
@@ -357,17 +361,17 @@ QVariant QnPropertyStorage::readValueFromJson(const QJsonObject &json, int id, c
     if(!QJson::deserialize(json, name(id), &jsonValue))
         return defaultValue;
 
-    int type = this->type(id);
-    QnJsonSerializer *serializer = QnJsonSerializer::serializer(type);
+    const auto type = this->type(id);
+    QnJsonSerializer *serializer = QnJsonSerializer::serializer(type.id());
     if(!serializer) {
-        NX_ASSERT(false, "Could not deserialize type '%1' from json, serializer is not registered.", QMetaType::typeName(type));
+        NX_ASSERT(false, "Could not deserialize type '%1' from json, serializer is not registered.", type.name());
         return defaultValue;
     }
 
     QVariant result;
     QnJsonContext ctx;
     if(!serializer->deserialize(&ctx, jsonValue, &result)) {
-        NX_ASSERT(false, "Invalid json value '%1' for type '%2'.", jsonValue, QMetaType::typeName(type));
+        NX_ASSERT(false, "Invalid json value '%1' for type '%2'.", jsonValue, type.name());
         return defaultValue;
     }
 

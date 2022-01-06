@@ -29,7 +29,7 @@ WheelZoomInstrument::WheelZoomInstrument(QObject* parent):
     ),
     QnWorkbenchContextAware(parent)
 {
-    KineticCuttingProcessor* processor = new KineticCuttingProcessor(QMetaType::QReal, this);
+    KineticCuttingProcessor* processor = new KineticCuttingProcessor(QMetaType(QMetaType::QReal), this);
     processor->setHandler(this);
     processor->setMaxShiftInterval(0.4);
     processor->setFriction(kDegreesFor2x / 2);

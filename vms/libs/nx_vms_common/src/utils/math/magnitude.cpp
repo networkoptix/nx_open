@@ -22,7 +22,7 @@ namespace {
     template<class T>
     class StandardMagnitudeCalculator: public MagnitudeCalculator {
     public:
-        StandardMagnitudeCalculator(): MagnitudeCalculator(qRegisterMetaType<T>()) {}
+        StandardMagnitudeCalculator(): MagnitudeCalculator(QMetaType(qRegisterMetaType<T>())) {}
 
     protected:
         virtual qreal calculateInternal(const void *value) const override {
@@ -32,7 +32,7 @@ namespace {
 
     class NoopMagnitudeCalculator: public MagnitudeCalculator {
     public:
-        NoopMagnitudeCalculator(): MagnitudeCalculator(QMetaType::UnknownType) {}
+        NoopMagnitudeCalculator(): MagnitudeCalculator({}) {}
 
     private:
         virtual qreal calculateInternal(const void *) const override {
@@ -63,7 +63,7 @@ namespace {
         using base_type::insert;
 
         void insert(MagnitudeCalculator *calculator) {
-            insert(calculator->type(), calculator);
+            insert(calculator->type().id(), calculator);
         }
     };
 
@@ -71,16 +71,18 @@ namespace {
 
 } // anonymous namespace
 
-MagnitudeCalculator *MagnitudeCalculator::forType(int type) {
-    return storage()->value(type);
+MagnitudeCalculator *MagnitudeCalculator::forType(QMetaType type)
+{
+    return storage()->value(type.id());
 }
 
 void MagnitudeCalculator::registerCalculator(MagnitudeCalculator *calculator) {
     storage()->insert(calculator);
 }
 
-qreal MagnitudeCalculator::calculate(const QVariant &value) const {
-    NX_ASSERT(value.userType() == m_type || m_type == 0);
+qreal MagnitudeCalculator::calculate(const QVariant& value) const
+{
+    NX_ASSERT(value.metaType() == m_type || !m_type.isValid());
 
     return calculate(value.constData());
 }

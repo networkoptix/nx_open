@@ -26,7 +26,7 @@ namespace {
     template<class T>
     class StandardLinearCombinator: public LinearCombinator {
     public:
-        StandardLinearCombinator(): LinearCombinator(qRegisterMetaType<T>()) { initZero(); }
+        StandardLinearCombinator(): LinearCombinator(QMetaType(qRegisterMetaType<T>())) { initZero(); }
 
     protected:
         virtual void calculateInternal(qreal a, const void *x, qreal b, const void *y, void *result) const override {
@@ -36,7 +36,7 @@ namespace {
 
     class NoopLinearCombinator: public LinearCombinator {
     public:
-        NoopLinearCombinator(): LinearCombinator(QMetaType::UnknownType) { initZero(); }
+        NoopLinearCombinator(): LinearCombinator({}) { initZero(); }
 
     protected:
         virtual void calculateInternal(qreal, const void *, qreal, const void *, void *) const override {}
@@ -64,7 +64,7 @@ namespace {
         using base_type::insert;
 
         void insert(LinearCombinator *calculator) {
-            insert(calculator->type(), calculator);
+            insert(calculator->type().id(), calculator);
         }
     };
 
@@ -73,12 +73,12 @@ namespace {
 } // anonymous namespace
 
 
-LinearCombinator::LinearCombinator(int type): 
+LinearCombinator::LinearCombinator(QMetaType type): 
     m_type(type)
 {}
 
-LinearCombinator *LinearCombinator::forType(int type) {
-    return storage()->value(type);
+LinearCombinator *LinearCombinator::forType(QMetaType type) {
+    return storage()->value(type.id());
 }
 
 void LinearCombinator::registerCombinator(LinearCombinator *combinator) {
@@ -87,7 +87,7 @@ void LinearCombinator::registerCombinator(LinearCombinator *combinator) {
 }
 
 QVariant LinearCombinator::combine(qreal a, const QVariant &x, qreal b, const QVariant &y) const {
-    NX_ASSERT((x.userType() == m_type && y.userType() == m_type) || m_type == 0);
+    NX_ASSERT((x.metaType() == m_type && y.metaType() == m_type) || m_type.id() == QMetaType::UnknownType);
 
     QVariant result(m_type, static_cast<const void *>(NULL));
     calculateInternal(a, x.constData(), b, y.constData(), result.data());
