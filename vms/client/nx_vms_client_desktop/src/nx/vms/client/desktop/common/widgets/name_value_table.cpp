@@ -9,12 +9,15 @@
 #include <QtGui/QGuiApplication>
 #include <QtGui/QOffscreenSurface>
 #include <QtGui/QOpenGLContext>
+#include <QtGui/QOpenGLFunctions>
 #include <QtOpenGL/QOpenGLFramebufferObject>
 #include <QtGui/QPainter>
 #include <QtQml/QQmlComponent>
 #include <QtQml/QQmlEngine>
 #include <QtQuick/QQuickItem>
 #include <QtQuick/QQuickRenderControl>
+#include <QtQuick/QQuickRenderTarget>
+#include <QtQuick/QQuickGraphicsDevice>
 #include <QtQuick/QQuickWindow>
 
 #include <client_core/client_core_module.h>
@@ -131,9 +134,28 @@ public:
         quickWindow->setGeometry(QRect({}, outSize));
 
         const QSize deviceSize = outSize * quickWindow->effectiveDevicePixelRatio();
-        quickWindow->setRenderTarget(ensureFramebuffer(widget, deviceSize));
-        outPixmap = QPixmap::fromImage(renderControl->grab());
-        quickWindow->setRenderTarget(nullptr);
+
+        auto fbo = ensureFramebuffer(widget, deviceSize);
+
+        quickWindow->setRenderTarget(
+            QQuickRenderTarget::fromOpenGLTexture(fbo->texture(), fbo->size(), fbo->format().samples()));
+
+        renderControl->polishItems();
+
+        renderControl->beginFrame();
+        renderControl->sync();
+        renderControl->render();
+        renderControl->endFrame();
+
+        QOpenGLFramebufferObject::bindDefault();
+        context->functions()->glFlush();
+
+        quickWindow->setRenderTarget({});
+
+        auto image = fbo->toImage();
+        image.setDevicePixelRatio(quickWindow->effectiveDevicePixelRatio());
+        outPixmap = QPixmap::fromImage(image);
+
         QOpenGLFramebufferObject::bindDefault();
     }
 
@@ -174,7 +196,9 @@ private:
         surface->create();
 
         const auto contextGuard = bindContext();
-        renderControl->initialize(QOpenGLContext::currentContext());
+        quickWindow->setGraphicsDevice(
+            QQuickGraphicsDevice::fromOpenGLContext(QOpenGLContext::currentContext()));
+        renderControl->initialize();
     }
 
     QOpenGLFramebufferObject* ensureFramebuffer(NameValueTable* widget, const QSize& size)
