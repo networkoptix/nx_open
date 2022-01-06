@@ -17,8 +17,10 @@
 #include <QtOpenGLWidgets/QOpenGLWidget>
 #include <QtQml/QQmlComponent>
 #include <QtQml/QQmlEngine>
+#include <QtQuick/QQuickGraphicsDevice>
 #include <QtQuick/QQuickItem>
 #include <QtQuick/QQuickRenderControl>
+#include <QtQuick/QQuickRenderTarget>
 #include <QtQuick/QQuickWindow>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QGraphicsScene>
@@ -38,7 +40,7 @@ using namespace std::chrono;
 
 namespace {
 
-const auto kFboResizeTimeout = 50ms;
+const auto kTextureResizeTimeout = 50ms;
 constexpr auto kQuadVertexCount = 4;
 constexpr auto kCoordPerVertex = 2; //< x, y
 constexpr auto kQuadArrayLength = kQuadVertexCount * kCoordPerVertex;
@@ -196,8 +198,9 @@ struct GraphicsQmlView::Private
     QScopedPointer<RenderControl> renderControl;
     QScopedPointer<QOffscreenSurface> offscreenSurface;
     QScopedPointer<QOpenGLContext> openglContext;
-    QScopedPointer<QOpenGLFramebufferObject> fbo;
-    QElapsedTimer fboTimer;
+    QElapsedTimer textureResizeTimer;
+    GLuint renderTexture = 0;
+    QSize renderTextureSize;
     QScopedPointer<QQmlComponent> qmlComponent;
     QQmlEngine* qmlEngine = nullptr;
 
@@ -215,8 +218,8 @@ struct GraphicsQmlView::Private
     void ensureOffscreen();
     void ensureVao(QnTextureGLShaderProgram* shader);
     void updateSizes();
-    bool isFboInitializationRequired(qreal devicePixelRatio);
-    void initializeFbo(qreal devicePixelRatio);
+    bool isTextureInitializationRequired(qreal devicePixelRatio);
+    void initializeTexture(qreal devicePixelRatio);
     void scheduleUpdateSizes();
     void paintQml(qreal devicePixelRatio);
 
@@ -263,8 +266,8 @@ GraphicsQmlView::~GraphicsQmlView()
     d->qmlComponent.reset();
     d->quickWindow.reset();
     d->renderControl.reset();
-    if (d->fbo)
-        d->fbo.reset();
+    if (d->renderTexture)
+        d->openglContext->functions()->glDeleteTextures(1, &d->renderTexture);
 }
 
 QQuickWindow* GraphicsQmlView::quickWindow() const
@@ -335,7 +338,7 @@ void GraphicsQmlView::Private::resetComponent()
 
 void GraphicsQmlView::Private::scheduleUpdateSizes()
 {
-    fboTimer.restart();
+    textureResizeTimer.restart();
     updateSizes();
 }
 
@@ -349,41 +352,49 @@ QQmlEngine* GraphicsQmlView::engine() const
     return d->qmlEngine;
 }
 
-bool GraphicsQmlView::Private::isFboInitializationRequired(qreal devicePixelRatio)
+bool GraphicsQmlView::Private::isTextureInitializationRequired(qreal devicePixelRatio)
 {
     if (!quickWindow)
         return false;
 
     const QSize requiredSize = rounded(QSizeF(quickWindow->size()) * devicePixelRatio);
 
-    if (fbo && fbo->size() == requiredSize)
+    if (renderTexture && renderTextureSize == requiredSize)
         return false;
 
-    if (!fboTimer.isValid())
-        fboTimer.start();
+    if (!textureResizeTimer.isValid())
+        textureResizeTimer.start();
 
-    // Avoid frequent re-creation of FrameBuffer objects because it's time consuming.
-    if (fbo && !fboTimer.hasExpired(duration_cast<milliseconds>(kFboResizeTimeout).count()))
+    // Avoid frequent texture resize because it's time consuming.
+    if (renderTexture
+        && !textureResizeTimer.hasExpired(duration_cast<milliseconds>(kTextureResizeTimeout).count()))
+    {
         return false;
+    }
 
     return true;
 }
 
-void GraphicsQmlView::Private::initializeFbo(qreal devicePixelRatio)
+void GraphicsQmlView::Private::initializeTexture(qreal devicePixelRatio)
 {
-    const QSize requiredSize = rounded(QSizeF(quickWindow->size()) * devicePixelRatio);
+    renderTextureSize = rounded(QSizeF(quickWindow->size()) * devicePixelRatio);
 
-    QScopedPointer<QOpenGLFramebufferObject> newFbo(
-        new QOpenGLFramebufferObject(
-            requiredSize, QOpenGLFramebufferObject::CombinedDepthStencil));
+    QOpenGLFunctions* f = openglContext->functions();
 
-    if (!newFbo->isValid())
-        return;
+    if (!renderTexture)
+        f->glGenTextures(1, &renderTexture);
 
-    fbo.swap(newFbo);
-    quickWindow->setRenderTarget(fbo.data());
+    f->glBindTexture(GL_TEXTURE_2D, renderTexture);
+    f->glTexImage2D(
+        GL_TEXTURE_2D, 0, GL_RGBA,
+        renderTextureSize.width(), renderTextureSize.height(), 0,
+        GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
-    fboTimer.invalidate();
+    const auto renderTarget =
+        QQuickRenderTarget::fromOpenGLTexture(renderTexture, renderTextureSize);
+    quickWindow->setRenderTarget(renderTarget);
+
+    textureResizeTimer.invalidate();
 }
 
 bool GraphicsQmlView::event(QEvent* event)
@@ -469,8 +480,11 @@ void GraphicsQmlView::Private::ensureOffscreen()
     NX_ASSERT(offscreenSurface->isValid());
 
     openglContext->makeCurrent(offscreenSurface.data());
-    renderControl->initialize(openglContext.data());
-    initializeFbo(qApp->devicePixelRatio());
+
+    quickWindow->setGraphicsDevice(QQuickGraphicsDevice::fromOpenGLContext(openglContext.get()));
+    renderControl->initialize();
+
+    initializeTexture(qApp->devicePixelRatio());
     openglContext->doneCurrent();
 
     offscreenInitialized = true;
@@ -569,7 +583,16 @@ void GraphicsQmlView::wheelEvent(QGraphicsSceneWheelEvent* event)
 {
     const QPointF mousePoint = event->pos();
     const QPoint globalPos = event->screenPos();
-    QWheelEvent mappedEvent(mousePoint, globalPos, event->delta(), event->buttons(), event->modifiers(), event->orientation());
+
+    const auto angleDelta = event->orientation() == Qt::Horizontal
+        ? QPoint{event->delta(), 0}
+        : QPoint{0, event->delta()};
+
+    QWheelEvent mappedEvent(
+        mousePoint, globalPos,
+        event->pixelDelta(), angleDelta,
+        event->buttons(), event->modifiers(),
+        event->phase(), event->isInverted());
     QCoreApplication::sendEvent(d->quickWindow.data(), &mappedEvent);
     event->setAccepted(mappedEvent.isAccepted());
 }
@@ -637,10 +660,10 @@ bool GraphicsQmlView::focusNextPrevChild(bool next)
 
 void GraphicsQmlView::Private::paintQml(qreal devicePixelRatio)
 {
-    const bool mustInitFbo = isFboInitializationRequired(devicePixelRatio);
+    const bool mustInitTexture = isTextureInitializationRequired(devicePixelRatio);
 
-    renderRequested = renderRequested || mustInitFbo;
-    sceneChanged = sceneChanged || mustInitFbo;
+    renderRequested = renderRequested || mustInitTexture;
+    sceneChanged = sceneChanged || mustInitTexture;
 
     if (!sceneChanged && !renderRequested)
         return;
@@ -648,11 +671,13 @@ void GraphicsQmlView::Private::paintQml(qreal devicePixelRatio)
     if (!openglContext->makeCurrent(offscreenSurface.data()))
         return;
 
-    if (mustInitFbo)
-        initializeFbo(devicePixelRatio);
+    if (mustInitTexture)
+        initializeTexture(devicePixelRatio);
 
-    if (!fbo)
+    if (!renderTexture)
         return;
+
+    renderControl->beginFrame();
 
     if (sceneChanged)
     {
@@ -664,9 +689,15 @@ void GraphicsQmlView::Private::paintQml(qreal devicePixelRatio)
     if (renderRequested)
     {
         renderControl->render();
-        openglContext->functions()->glFlush();
         renderRequested = false;
     }
+
+    renderControl->endFrame();
+
+    QOpenGLFramebufferObject::bindDefault();
+    openglContext->functions()->glFlush();
+
+    openglContext->doneCurrent();
 }
 
 void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, QWidget*)
@@ -676,33 +707,30 @@ void GraphicsQmlView::paint(QPainter* painter, const QStyleOptionGraphicsItem*, 
 
     const auto glWidget = qobject_cast<QOpenGLWidget*>(scene()->views().first()->viewport());
 
-    const QSizeF outputSize = d->fboTimer.isValid()
+    const QSizeF outputSize = d->textureResizeTimer.isValid()
         ? size()
         : QSizeF(Private::rounded(size()));
 
     const auto devicePixelRatio = painter->device()->devicePixelRatioF();
     d->paintQml(devicePixelRatio);
 
-    if (!d->fbo)
-        return;
-
-    QnGlNativePainting::begin(glWidget, painter);
-
     auto renderer = QnOpenGLRendererManager::instance(glWidget);
     glWidget->makeCurrent();
+
+    QnGlNativePainting::begin(glWidget, painter);
 
     const auto functions = glWidget->context()->functions();
     functions->glEnable(GL_BLEND);
     functions->glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     functions->glActiveTexture(GL_TEXTURE0);
-    functions->glBindTexture(GL_TEXTURE_2D, d->fbo->texture());
+    functions->glBindTexture(GL_TEXTURE_2D, d->renderTexture);
 
-    const auto naturalFboSize = outputSize * devicePixelRatio;
-    const bool enableSharpPainting = QSizeF(d->fbo->size()) == naturalFboSize;
+    const auto naturalTextureSize = outputSize * devicePixelRatio;
+    const bool enableSharpPainting = QSizeF(d->renderTextureSize) == naturalTextureSize;
     const auto filter = enableSharpPainting ? GL_NEAREST : GL_LINEAR;
-    functions->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
-    functions->glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+    functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+    functions->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
 
     const GLfloat posArray[kQuadArrayLength] = {
         0.0f, (float)outputSize.height(),
