@@ -32,18 +32,14 @@ Target convert(const Source &source) {
  */
 class AbstractConverter {
 public:
-    AbstractConverter(int sourceType, int targetType):
+    AbstractConverter(QMetaType sourceType, QMetaType targetType):
         m_sourceType(sourceType),
         m_targetType(targetType)
     {}
 
-    int sourceType() const {
-        return m_sourceType;
-    }
+    QMetaType sourceType() const { return m_sourceType; }
 
-    int targetType() const {
-        return m_targetType;
-    }
+    QMetaType targetType() const { return m_targetType; }
 
     QVariant convertSourceToTarget(const QVariant &source) const;
 
@@ -57,8 +53,8 @@ protected:
     virtual QVariant doConvertTargetToSource(const QVariant &target) const = 0;
 
 private:
-    int m_sourceType;
-    int m_targetType;
+    QMetaType m_sourceType;
+    QMetaType m_targetType;
 };
 
 #endif // QN_CONVERTER_H

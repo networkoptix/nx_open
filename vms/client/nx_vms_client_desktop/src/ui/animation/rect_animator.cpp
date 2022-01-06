@@ -20,15 +20,16 @@ RectAnimator::RectAnimator(QObject *parent):
 
 RectAnimator::~RectAnimator() {}
 
-void RectAnimator::updateInternalType(int newType) {
-    if(newType != QMetaType::UnknownType && newType != QMetaType::QRectF)
-        NX_ASSERT(false, "Type '%1' is not supported by this animator.", QMetaType::typeName(newType));
+void RectAnimator::updateInternalType(QMetaType newType)
+{
+    if (newType.id() != QMetaType::UnknownType && newType.id() != QMetaType::QRectF)
+        NX_ASSERT(false, "Type '%1' is not supported by this animator.", newType.name());
 
     base_type::updateInternalType(newType);
 }
 
 int RectAnimator::estimatedDuration(const QVariant &from, const QVariant &to) const {
-    if(internalType() != QMetaType::QRectF)
+    if (internalType().id() != QMetaType::QRectF)
         return base_type::estimatedDuration(from, to);
 
     QRectF startRect = from.toRectF();

@@ -22,7 +22,7 @@ using namespace nx::vms::common;
 class QnResourceDataJsonSerializer: public QnJsonSerializer {
 public:
     QnResourceDataJsonSerializer():
-        QnJsonSerializer(qMetaTypeId<QnResourceData>())
+        QnJsonSerializer(QMetaType::fromType<QnResourceData>())
     {
         registerKey<QnPtzMapperPtr>(lit("ptzMapper"));
         registerEnumKey<Ptz::Traits>(lit("ptzTraits"));

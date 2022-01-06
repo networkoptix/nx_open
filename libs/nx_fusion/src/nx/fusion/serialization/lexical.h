@@ -25,7 +25,7 @@ namespace QnLexicalDetail {
 class QnLexicalSerializer: public QnBasicSerializer<QString>, public QnStaticSerializerStorage<QnLexicalSerializer, QnLexicalDetail::StorageInstance> {
     typedef QnBasicSerializer<QString> base_type;
 public:
-    QnLexicalSerializer(int type): base_type(type) {}
+    QnLexicalSerializer(QMetaType type): base_type(type) {}
 };
 
 template<class T>

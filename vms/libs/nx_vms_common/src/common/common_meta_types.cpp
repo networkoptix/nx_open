@@ -223,7 +223,6 @@ void QnCommonMetaTypes::initialize()
     qRegisterMetaType<Qn::PanicMode>();
 
     qRegisterMetaType<Qn::ResourceInfoLevel>();
-    qRegisterMetaTypeStreamOperators<Qn::ResourceInfoLevel>();
 
     qRegisterMetaType<QnGetNonceReply>();
 

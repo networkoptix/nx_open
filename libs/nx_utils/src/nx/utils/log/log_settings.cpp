@@ -117,9 +117,9 @@ Settings::Settings(QSettings* settings)
             const Level level = levelFromString(levelKey);
             const QVariant& value = settings->value(levelKey);
 
-            switch (value.type())
+            switch (value.typeId())
             {
-                case QVariant::String:
+                case QMetaType::QString:
                 {
                     const QString& valueString = value.toString().trimmed();
                     if (valueString == "*")
@@ -128,7 +128,7 @@ Settings::Settings(QSettings* settings)
                         logger.level.filters[Filter(valueString)] = level;
                     break;
                 }
-                case QVariant::StringList:
+                case QMetaType::QStringList:
                 {
                     for (const QString& valueString: value.toStringList())
                         logger.level.filters[Filter(valueString.trimmed())] = level;

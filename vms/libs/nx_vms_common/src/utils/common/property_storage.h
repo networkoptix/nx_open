@@ -68,8 +68,8 @@ public:
     void setArgumentNames(int id, const QStringList &argumentNames);
     QStringList argumentNames(int id) const;
 
-    int type(int id) const;
-    void setType(int id, int type);
+    QMetaType type(int id) const;
+    void setType(int id, QMetaType type);
 
     bool isWritable(int id) const;
     void setWritable(int id, bool writable);
@@ -125,7 +125,7 @@ private:                                                                        
 private:                                                                        \
     void init(const Dummy<ID> &) {                                              \
         init(Dummy<ID - 1>());                                                  \
-        setType(ID, qMetaTypeId<TYPE>());                                       \
+        setType(ID, QMetaType::fromType<TYPE>());                                       \
         setName(ID, QLatin1String(NAME));                                       \
         setValue(ID, QVariant::fromValue<TYPE>(DEFAULT_VALUE));                 \
         setWritable(ID, WRITABLE);                                              \
@@ -167,7 +167,7 @@ private:
     QHash<int, QString> m_nameById;
     QHash<QString, int> m_idByName;
     QHash<int, QStringList> m_argumentNamesById;
-    QHash<int, int> m_typeById;
+    QHash<int, QMetaType> m_typeById;
     QHash<int, bool> m_writableById;
     mutable QHash<int, QnPropertyNotifier *> m_notifiers;
 };

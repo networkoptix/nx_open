@@ -53,7 +53,7 @@ public:
      *
      * \note                            This function is thread-safe.
      */
-    static MagnitudeCalculator *forType(int type);
+    static MagnitudeCalculator *forType(QMetaType type);
 
     /**
      * \tparam T                        Type to get magnitude calculator for.
@@ -63,7 +63,7 @@ public:
      */
     template<class T>
     static TypedMagnitudeCalculator<T> *forType() {
-        return forType(qMetaTypeId<T>())->template typed<T>();
+        return forType(QMetaType::fromType<T>())->template typed<T>();
     }
 
     /**
@@ -78,7 +78,7 @@ public:
      *
      * \param type                      <tt>QMetaType::Type</tt> for this magnitude calculator.
      */
-    MagnitudeCalculator(int type): m_type(type) {}
+    MagnitudeCalculator(QMetaType type): m_type(type) {}
 
     /**
      * Virtual destructor.
@@ -88,9 +88,7 @@ public:
     /**
      * \returns                         <tt>QMetaType::Type</tt> of this magnitude calculator.
      */
-    int type() const {
-        return m_type;
-    }
+    QMetaType type() const { return m_type; }
 
     /**
      * Note that this function will NX_ASSERT if the type of the supplied variant
@@ -119,7 +117,7 @@ protected:
     virtual qreal calculateInternal(const void *value) const = 0;
 
 private:
-    int m_type;
+    QMetaType m_type;
 };
 
 
@@ -127,7 +125,7 @@ template<class T>
 class TypedMagnitudeCalculator: public MagnitudeCalculator {
     typedef MagnitudeCalculator base_type;
 public:
-    TypedMagnitudeCalculator(): base_type(qMetaTypeId<T>()) {}
+    TypedMagnitudeCalculator(): base_type(QMetaType::fromType<T>()) {}
 
     using base_type::calculate;
 
@@ -139,7 +137,7 @@ public:
 
 template<class T>
 const TypedMagnitudeCalculator<T> *MagnitudeCalculator::typed() const {
-    if(qMetaTypeId<T>() == m_type) {
+    if(QMetaType::fromType<T>() == m_type) {
         return static_cast<const TypedMagnitudeCalculator<T> *>(this);
     } else {
         return NULL;

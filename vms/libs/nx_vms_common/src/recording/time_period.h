@@ -195,7 +195,7 @@ constexpr bool operator<(qint64 timeMs, const QnTimePeriod& other)
 
 NX_VMS_COMMON_API QnTimePeriod variantMapToTimePeriod(const QVariantMap& map);
 NX_VMS_COMMON_API void PrintTo(const QnTimePeriod& period, ::std::ostream* os);
-QDebug operator<<(QDebug dbg, const QnTimePeriod &period);
+NX_VMS_COMMON_API QDebug operator<<(QDebug dbg, const QnTimePeriod &period);
 NX_VMS_COMMON_API std::string toString(const QnTimePeriod& period);
 
 Q_DECLARE_TYPEINFO(QnTimePeriod, Q_MOVABLE_TYPE);

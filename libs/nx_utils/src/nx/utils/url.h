@@ -256,8 +256,8 @@ inline bool deserialize(QnJsonContext* /*ctx*/, const QJsonValue& value, nx::uti
     return true;
 }
 
-QDataStream& operator<<(QDataStream& stream, const nx::utils::Url& url);
-QDataStream& operator>>(QDataStream& stream, nx::utils::Url& url);
+NX_UTILS_API QDataStream& operator<<(QDataStream& stream, const nx::utils::Url& url);
+NX_UTILS_API QDataStream& operator>>(QDataStream& stream, nx::utils::Url& url);
 
 namespace std {
 

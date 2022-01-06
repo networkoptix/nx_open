@@ -20,7 +20,7 @@ Q_DECLARE_METATYPE(QnCommandLineDefaultImpliedValue);
 
 namespace command_line_parser_detail {
     inline QVariant defaultImpliedValue() {
-        return QVariant(qMetaTypeId<QnCommandLineDefaultImpliedValue>(), static_cast<const void *>(NULL));
+        return QVariant(QMetaType::fromType<QnCommandLineDefaultImpliedValue>());
     }
 }
 

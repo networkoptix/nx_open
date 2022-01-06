@@ -30,10 +30,10 @@ public:
 template<class T>
 class QnResourcePropertyHandler: public QnAbstractResourcePropertyHandler {
 public:
-    QnResourcePropertyHandler(): m_type(qMetaTypeId<T>()) {}
+    QnResourcePropertyHandler(): m_type(QMetaType::fromType<T>()) {}
 
     virtual bool equals(const QVariant &l, const QVariant &r) const override {
-        if(l.userType() != m_type || r.userType() != m_type)
+        if (l.userType() != m_type.id() || r.userType() != m_type.id())
             return false;
 
         const T &ll = *static_cast<const T *>(l.constData());
@@ -42,7 +42,7 @@ public:
     }
 
     virtual bool serialize(const QVariant &value, QString *target) const override {
-        if(value.userType() == m_type) {
+        if (value.userType() == m_type.id()) {
             return serialize(*static_cast<const T *>(value.constData()), target);
         } else {
             return false;
@@ -50,8 +50,8 @@ public:
     }
 
     virtual bool deserialize(const QString &value, QVariant *target) const override {
-        if(target->userType() != m_type)
-            *target = QVariant(m_type, NULL);
+        if (target->userType() != m_type.id())
+            *target = QVariant(m_type);
 
         return deserialize(value, static_cast<T *>(target->data()));
     }
@@ -60,7 +60,7 @@ public:
     virtual bool deserialize(const QString &value, T *target) const = 0;
 
 private:
-    int m_type;
+    QMetaType m_type;
 };
 
 template<class T>
@@ -214,7 +214,7 @@ public:
         :
         QnAbstractResourcePropertyAdaptor(
             key, QVariant::fromValue(defaultValue), handler, parent, std::move(label)),
-        m_type(qMetaTypeId<T>()),
+        m_type(QMetaType::fromType<T>()),
         m_defaultValue(defaultValue),
         m_isValueValid(std::move(isValueValid))
     {
@@ -237,7 +237,7 @@ public:
     T value() const
     {
         QVariant baseValue = base_type::value();
-        if (baseValue.userType() == m_type)
+        if (baseValue.userType() == m_type.id())
         {
             if (auto v = baseValue.value<T>(); NX_ASSERT(isValueValid(v), "%1 = %2", key(), baseValue))
                 return v;
@@ -304,7 +304,7 @@ protected:
     }
 
 private:
-    const int m_type;
+    const QMetaType m_type;
     const T m_defaultValue;
     const std::function<bool(const T&)> m_isValueValid;
     QString m_defaultSerializedValue;

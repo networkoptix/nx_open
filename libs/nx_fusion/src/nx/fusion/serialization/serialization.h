@@ -55,29 +55,29 @@ private:
 
 class QnSerializerBase {
 public:
-    QnSerializerBase(int type): m_type(type) {}
+    QnSerializerBase(QMetaType type): m_type(type) {}
     virtual ~QnSerializerBase() {}
 
-    int type() const {
+    QMetaType type() const {
         return m_type;
     }
 
     QString idForToStringFromPtr() const {
-        return QString::number(m_type);
+        return QString::number(m_type.id());
     }
 
 private:
-    int m_type;
+    QMetaType m_type;
 };
 
 class QnContextSerializerBase: public QnSerializerBase {
 public:
-    QnContextSerializerBase(int type): QnSerializerBase(type) {}
+    QnContextSerializerBase(QMetaType type): QnSerializerBase(type) {}
 };
 
 class QnBasicSerializerBase: public QnSerializerBase {
 public:
-    QnBasicSerializerBase(int type): QnSerializerBase(type) {}
+    QnBasicSerializerBase(QMetaType type): QnSerializerBase(type) {}
 };
 
 template<class D, class Context>
@@ -86,10 +86,10 @@ public:
     typedef Context context_type;
     typedef D data_type;
 
-    QnContextSerializer(int type): QnContextSerializerBase(type) {}
+    QnContextSerializer(QMetaType type): QnContextSerializerBase(type) {}
 
     void serialize(context_type *ctx, const QVariant &value, data_type *target) const {
-        NX_ASSERT(ctx && value.userType() == type() && target);
+        NX_ASSERT(ctx && value.metaType() == type() && target);
 
         serializeInternal(ctx, value.constData(), target);
     }
@@ -103,7 +103,7 @@ public:
     bool deserialize(context_type *ctx, const data_type &value, QVariant *target) const {
         NX_ASSERT(ctx && target);
 
-        *target = QVariant(type(), static_cast<const void *>(NULL));
+        *target = QVariant(type());
         return deserializeInternal(ctx, value, target->data());
     }
 
@@ -124,7 +124,7 @@ public:
     using typename Base::context_type;
     using typename Base::data_type;
 
-    QnDefaultContextSerializer(): Base(qMetaTypeId<T>()) {}
+    QnDefaultContextSerializer(): Base(QMetaType::fromType<T>()) {}
 
 protected:
     virtual void serializeInternal(context_type *ctx, const void *value, data_type *target) const override {
@@ -141,10 +141,10 @@ class QnBasicSerializer: public QnBasicSerializerBase {
 public:
     typedef D data_type;
 
-    QnBasicSerializer(int type): QnBasicSerializerBase(type) {}
+    QnBasicSerializer(QMetaType type): QnBasicSerializerBase(type) {}
 
     void serialize(const QVariant &value, data_type *target) const {
-        NX_ASSERT(value.userType() == type() && target);
+        NX_ASSERT(value.userType() == type().id() && target);
 
         serializeInternal(value.constData(), target);
     }
@@ -178,7 +178,7 @@ class QnDefaultBasicSerializer: public Base {
 public:
     using typename Base::data_type;
 
-    QnDefaultBasicSerializer(): Base(qMetaTypeId<T>()) {}
+    QnDefaultBasicSerializer(): Base(QMetaType::fromType<T>()) {}
 
 protected:
     virtual void serializeInternal(const void *value, data_type *target) const override {
@@ -199,7 +199,7 @@ public:
         NX_ASSERT(!m_storage.empty(), "%1 search in empty storage", this);
 
         const auto value = m_storage.value(type);
-        NX_VERBOSE(this, "Return type %1 '%2': %3", type, QMetaType::typeName(type), value);
+        NX_VERBOSE(this, "Return type %1 '%2': %3", type, QMetaType(type).name(), value);
         return value;
     }
 
@@ -213,15 +213,15 @@ public:
     void registerSerializer(Serializer* serializer)
     {
         const auto type = serializer->type();
-        if (const auto existing = m_storage.value(type))
+        if (const auto existing = m_storage.value(type.id()))
         {
             NX_ASSERT(typeid(*existing) == typeid(*serializer),
                 "%1 Overriding %2 with %3", this, existing, serializer);
             return;
         }
 
-        NX_DEBUG(this, "Register %1 '%2': %3", type, QMetaType::typeName(type), serializer);
-        m_storage.insert(type, serializer);
+        NX_DEBUG(this, "Register %1 '%2': %3", type.id(), type.name(), serializer);
+        m_storage.insert(type.id(), serializer);
     }
 
     template<class T>

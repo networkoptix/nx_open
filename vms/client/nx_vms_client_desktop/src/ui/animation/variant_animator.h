@@ -155,9 +155,9 @@ protected:
         return m_linearCombinator;
     }
 
-    int internalType() const;
+    QMetaType internalType() const;
 
-    int externalType() const;
+    QMetaType externalType() const;
 
     QVariant toInternal(const QVariant &external) const;
 
@@ -179,7 +179,7 @@ protected:
 
     virtual void updateTargetValue(const QVariant &newTargetValue);
 
-    virtual void updateInternalType(int newType);
+    virtual void updateInternalType(QMetaType newType);
 
     virtual void updateState(State newState) override;
 
@@ -191,7 +191,7 @@ private slots:
 private:
     void setTargetObjectInternal(QObject *target);
 
-    void setInternalTypeInternal(int newInternalType);
+    void setInternalTypeInternal(QMetaType newInternalType);
 
     qreal easingCurveProgress(int currentTime) const;
 
@@ -202,7 +202,7 @@ private:
     QScopedPointer<AbstractConverter> m_converter;
     QEasingCurve m_easingCurve;
     qreal m_easingCurveCorrection;
-    int m_internalType;
+    QMetaType m_internalType;
     QVariant m_internalStartValue;
     QVariant m_internalTargetValue;
     QObject *m_target;

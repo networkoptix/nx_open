@@ -15,7 +15,7 @@ class KineticCuttingProcessor: public KineticProcessor {
     typedef KineticProcessor base_type;
 
 public:
-    KineticCuttingProcessor(int type, QObject *parent = nullptr):
+    KineticCuttingProcessor(QMetaType type, QObject *parent = nullptr):
         base_type(type, parent),
         m_speedCuttingThreshold(std::numeric_limits<qreal>::max())
     {}

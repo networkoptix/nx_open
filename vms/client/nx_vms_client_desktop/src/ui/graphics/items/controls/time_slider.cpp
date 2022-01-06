@@ -655,7 +655,7 @@ QnTimeSlider::QnTimeSlider(
     static const qreal kScrollProcessorSpeedCuttingThreshold = kWindowScrollMaxSpeed / 10.0;
 
     /* Prepare kinetic zoom processor. */
-    const auto kineticZoomProcessor = new KineticCuttingProcessor(QMetaType::QReal, this);
+    const auto kineticZoomProcessor = new KineticCuttingProcessor(QMetaType(QMetaType::QReal), this);
     kineticZoomProcessor->setHandler(m_kineticZoomHandler.data());
     kineticZoomProcessor->setMaxShiftInterval(kZoomProcessorMaxShiftIntervalSeconds);
     kineticZoomProcessor->setFlags(KineticProcessor::IgnoreDeltaTime);
@@ -665,7 +665,7 @@ QnTimeSlider::QnTimeSlider(
     m_kineticZoomHandler->updateKineticProcessor();
 
     /* Prepare kinetic drag processor. */
-    const auto kineticScrollProcessor = new KineticCuttingProcessor(QMetaType::QReal, this);
+    const auto kineticScrollProcessor = new KineticCuttingProcessor(QMetaType(QMetaType::QReal), this);
     kineticScrollProcessor->setHandler(m_kineticScrollHandler.data());
     kineticScrollProcessor->setMaxShiftInterval(kScrollProcessorMaxShiftIntervalSeconds);
     kineticScrollProcessor->setMaxSpeedMagnitude(kWindowScrollMaxSpeed);

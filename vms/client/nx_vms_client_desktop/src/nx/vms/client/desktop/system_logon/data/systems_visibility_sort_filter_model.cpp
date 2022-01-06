@@ -213,7 +213,7 @@ bool SystemsVisibilitySortFilterModel::lessThan(
     }
 
     if (leftVisibilityScope != rightVisibilityScope)
-        return leftVisibilityScope > rightVisibilityScope;
+        return leftVisibilityScope.toInt() > rightVisibilityScope.toInt();
 
     if (sourceLeft.data(QnSystemsModel::IsCloudSystemRoleId)
         != sourceRight.data(QnSystemsModel::IsCloudSystemRoleId))
@@ -242,8 +242,8 @@ bool SystemsVisibilitySortFilterModel::lessThan(
     if (namesOrder != 0)
         return namesOrder < 0;
 
-    return sourceLeft.data(QnSystemsModel::SystemIdRoleId)
-        < sourceRight.data(QnSystemsModel::SystemIdRoleId);
+    return sourceLeft.data(QnSystemsModel::SystemIdRoleId).toString()
+        < sourceRight.data(QnSystemsModel::SystemIdRoleId).toString();
 }
 
 bool SystemsVisibilitySortFilterModel::isHidden(const QModelIndex& sourceIndex) const
