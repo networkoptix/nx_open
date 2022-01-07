@@ -104,7 +104,7 @@ bool WaitConditionStdDelegate::wait(MutexDelegate* mutex, std::chrono::milliseco
 {
     const auto delegate = static_cast<MutexStdDelegate*>(mutex);
     if (!delegate->m_mutex)
-        return true; //< Recursive mutex causes immidiate return, just like Qt.
+        return true; //< Recursive mutex causes immediate return, just like Qt.
 
     // std::condition_variable interface requires unique_lock<std::mutex> to be used.
     std::unique_lock<std::mutex> lock(*delegate->m_mutex, std::adopt_lock);

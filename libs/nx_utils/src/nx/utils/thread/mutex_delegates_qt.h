@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include <QMutex>
 #include <QReadWriteLock>
 #include <QWaitCondition>
@@ -23,7 +25,8 @@ public:
 
 private:
     friend class WaitConditionQtDelegate;
-    QMutex m_delegate;
+    std::unique_ptr<QMutex> m_mutex;
+    std::unique_ptr<QRecursiveMutex> m_recursiveMutex;
 };
 
 class NX_UTILS_API ReadWriteLockQtDelegate: public ReadWriteLockDelegate
