@@ -4,29 +4,41 @@
 
 namespace nx {
 
-MutexQtDelegate::MutexQtDelegate(Mutex::RecursionMode mode):
-    m_delegate(mode == Mutex::Recursive ? QMutex::Recursive : QMutex::NonRecursive)
+MutexQtDelegate::MutexQtDelegate(Mutex::RecursionMode mode)
 {
+    if (mode == Mutex::NonRecursive)
+        m_mutex = std::make_unique<QMutex>();
+    else
+        m_recursiveMutex = std::make_unique<QRecursiveMutex>();
 }
 
 void MutexQtDelegate::lock(const char* /*sourceFile*/, int /*sourceLine*/, int /*lockId*/)
 {
-    m_delegate.lock();
+    if (m_mutex)
+        m_mutex->lock();
+    else
+        m_recursiveMutex->lock();
 }
 
 void MutexQtDelegate::unlock()
 {
-    m_delegate.unlock();
+    if (m_mutex)
+        m_mutex->unlock();
+    else
+        m_recursiveMutex->unlock();
 }
 
 bool MutexQtDelegate::tryLock(const char* /*sourceFile*/, int /*sourceLine*/, int /*lockId*/)
 {
-    return m_delegate.tryLock();
+    if (m_mutex)
+        return m_mutex->try_lock();
+    else
+        return m_recursiveMutex->try_lock();
 }
 
 bool MutexQtDelegate::isRecursive() const
 {
-    return m_delegate.isRecursive();
+    return (bool) m_recursiveMutex;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -71,8 +83,12 @@ void ReadWriteLockQtDelegate::unlock()
 
 bool WaitConditionQtDelegate::wait(MutexDelegate* mutex, std::chrono::milliseconds timeout)
 {
+    const auto delegate = static_cast<MutexQtDelegate*>(mutex);
+    if (!delegate->m_mutex)
+        return true; //< Recursive mutex causes immediate return.
+
     return m_delegate.wait(
-        &static_cast<MutexQtDelegate*>(mutex)->m_delegate,
+        delegate->m_mutex.get(),
         timeout == std::chrono::milliseconds::max() ? ULONG_MAX : (unsigned long) timeout.count());
 }
 

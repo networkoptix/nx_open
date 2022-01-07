@@ -30,7 +30,8 @@ private:
     void beforeUnlock();
 
 private:
-    QMutex m_mutex;
+    std::unique_ptr<QMutex> m_mutex;
+    std::unique_ptr<QRecursiveMutex> m_recursiveMutex;
     const bool m_isAnalyzerInUse = false;
     std::uintptr_t threadHoldingMutex;
     size_t recursiveLockCount = 0;

@@ -7,9 +7,13 @@
 namespace nx {
 
 MutexDebugDelegate::MutexDebugDelegate(Mutex::RecursionMode mode, bool isAnalyzerInUse):
-    m_mutex(mode == Mutex::Recursive ? QMutex::Recursive : QMutex::NonRecursive),
     m_isAnalyzerInUse(isAnalyzerInUse)
 {
+    if (mode == Mutex::NonRecursive)
+        m_mutex = std::make_unique<QMutex>();
+    else
+        m_recursiveMutex = std::make_unique<QRecursiveMutex>();
+
     if (m_isAnalyzerInUse)
         MutexLockAnalyzer::instance()->mutexCreated(this);
 }
@@ -29,19 +33,25 @@ MutexDebugDelegate::~MutexDebugDelegate()
 
 void MutexDebugDelegate::lock(const char* sourceFile, int sourceLine, int lockId)
 {
-    m_mutex.lock();
+    if (m_mutex)
+        m_mutex->lock();
+    else
+        m_recursiveMutex->lock();
     afterLock(sourceFile, sourceLine, lockId);
 }
 
 void MutexDebugDelegate::unlock()
 {
     beforeUnlock();
-    m_mutex.unlock();
+    if (m_mutex)
+        m_mutex->unlock();
+    else
+        m_recursiveMutex->unlock();
 }
 
 bool MutexDebugDelegate::tryLock(const char* sourceFile, int sourceLine, int lockId)
 {
-    const auto result = m_mutex.tryLock();
+    const auto result = m_mutex ? m_mutex->try_lock() : m_recursiveMutex->try_lock();
     if (result)
         afterLock(sourceFile, sourceLine, lockId);
 
@@ -50,7 +60,7 @@ bool MutexDebugDelegate::tryLock(const char* sourceFile, int sourceLine, int loc
 
 bool MutexDebugDelegate::isRecursive() const
 {
-    return m_mutex.isRecursive();
+    return (bool) m_recursiveMutex;
 }
 
 
@@ -127,10 +137,13 @@ void ReadWriteLockDebugDelegate::unlock()
 bool WaitConditionDebugDelegate::wait(MutexDelegate* mutex, std::chrono::milliseconds timeout)
 {
     auto mutexDelegate = static_cast<MutexDebugDelegate*>(mutex);
+    if (!mutexDelegate->m_mutex)
+        return true; //< Recursive mutex causes immediate return.
+
     mutexDelegate->beforeUnlock();
 
     const auto result = m_delegate.wait(
-        &mutexDelegate->m_mutex,
+        mutexDelegate->m_mutex.get(),
         (timeout == std::chrono::milliseconds::max())
             ? ULONG_MAX
             : (unsigned long) timeout.count());
@@ -151,4 +164,3 @@ void WaitConditionDebugDelegate::wakeOne()
 }
 
 } // namespace nx
-
