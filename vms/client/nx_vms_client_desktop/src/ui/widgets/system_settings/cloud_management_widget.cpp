@@ -60,7 +60,7 @@ QnCloudManagementWidget::QnCloudManagementWidget(QWidget *parent):
         setPaletteColor(label, QPalette::WindowText, nxColor);
 
     ui->arrow1Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_arrow.png"));
-    ui->arrow2Label->setPixmap(*ui->arrow1Label->pixmap());
+    ui->arrow2Label->setPixmap(ui->arrow1Label->pixmap());
 
     ui->promo1Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_promo_1.png"));
     ui->promo2Label->setPixmap(qnSkin->pixmap("promo/cloud_tab_promo_2.png"));

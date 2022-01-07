@@ -102,7 +102,7 @@ void QnFramedLabel::paintEvent(QPaintEvent* event)
     {
         QnScopedPainterOpacityRollback opacityRollback(&painter, painter.opacity() * m_opacity);
 
-        QPixmap thumbnail = *pixmap();
+        QPixmap thumbnail = pixmap();
         if (m_autoScale)
         {
             thumbnail = thumbnail.scaled(
@@ -129,7 +129,7 @@ void QnFramedLabel::paintEvent(QPaintEvent* event)
 
 bool QnFramedLabel::pixmapExists() const
 {
-    return pixmap() && !pixmap()->isNull();
+    return pixmap().isNull();
 }
 
 QSize QnFramedLabel::frameSize() const

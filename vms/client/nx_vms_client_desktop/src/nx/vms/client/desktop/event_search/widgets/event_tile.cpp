@@ -610,10 +610,7 @@ void EventTile::setTimestamp(const QString& value)
 
 QPixmap EventTile::icon() const
 {
-    if (const auto pixmapPtr = ui->iconLabel->pixmap())
-        return *pixmapPtr;
-
-    return QPixmap();
+    return ui->iconLabel->pixmap();
 }
 
 void EventTile::setIcon(const QPixmap& value)
