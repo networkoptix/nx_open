@@ -6,7 +6,6 @@
 #include <nx/vms/event/events/conflict_event.h>
 
 class QHostAddress;
-class QStringList;
 
 namespace nx::vms::event {
 
