@@ -2,6 +2,11 @@
 
 #include "desktop_audio_only_data_provider.h"
 
+#include <algorithm>
+
+#include <QtMultimedia/QAudioSource>
+#include <QtMultimedia/QAudioDevice>
+
 #include <speex/speex_preprocess.h>
 
 #include <decoders/audio/ffmpeg_audio_decoder.h>
@@ -32,10 +37,10 @@ struct DesktopAudioOnlyDataProvider::AudioSourceInfo
 {
     ~AudioSourceInfo();
 
-    QAudioDeviceInfo deviceInfo;
+    QAudioDevice deviceInfo;
     QAudioFormat format;
     QIODevice* ioDevice = nullptr;
-    std::unique_ptr<QAudioInput> input;
+    std::unique_ptr<QAudioSource> input;
     QByteArray buffer;
     char* frameBuffer = nullptr;
     SpeexPreprocessState* speexPreprocessState = nullptr;
@@ -81,7 +86,7 @@ void DesktopAudioOnlyDataProvider::resizeBuffers(int frameSize)
     {
         auto size =
             frameSize *
-            audioInput->format.sampleSize() / kBitsInByte *
+            audioInput->format.bytesPerSample() *
             kStereoChannelCount;
 
         audioInput->frameBuffer =
@@ -162,33 +167,42 @@ bool DesktopAudioOnlyDataProvider::initSpeex(int frameSize, int sampleRate)
 }
 
 QAudioFormat DesktopAudioOnlyDataProvider::getAppropriateAudioFormat(
-    const QAudioDeviceInfo& deviceInfo,
+    const QAudioDevice& deviceInfo,
     QString* errorString)
 {
     QAudioFormat result;
     result.setSampleRate(kDefaultSampleRate);
     result.setChannelCount(kDefaultChannelCount);
-    result.setSampleSize(kDefaultSampleSize);
-    result.setCodec(kDefaultCodec);
-    result.setByteOrder(QAudioFormat::LittleEndian);
-    result.setSampleType(QAudioFormat::SignedInt);
+    result.setSampleFormat(QAudioFormat::Int16);
 
     if (!deviceInfo.isFormatSupported(result))
     {
         qDebug() << "Default format is not supported, trying to use nearest";
-        result = deviceInfo.nearestFormat(result);
+
+        if (!deviceInfo.supportedSampleFormats().contains(result.sampleFormat()))
+        {
+            if (errorString)
+            {
+                *errorString = tr("Sample format of input device %1 is not supported.")
+                    .arg(deviceInfo.description());
+            }
+
+            return {};
+        }
+
+        // Set the nearest supported values.
+
+        result.setChannelCount(std::clamp(
+            result.channelCount(),
+            deviceInfo.minimumChannelCount(),
+            deviceInfo.maximumChannelCount()));
+
+        result.setSampleRate(std::clamp(
+            result.sampleRate(),
+            deviceInfo.minimumSampleRate(),
+            deviceInfo.maximumSampleRate()));
     }
 
-    if (result.sampleSize() != kDefaultSampleSize
-        || result.sampleType() != QAudioFormat::SignedInt)
-    {
-        if (errorString)
-        {
-            *errorString = tr("Sample format of input device %1 is not supported.")
-                .arg(deviceInfo.deviceName());
-        }
-        result = QAudioFormat();
-    }
     return result;
 }
 
@@ -214,13 +228,13 @@ bool DesktopAudioOnlyDataProvider::initInputDevices()
 
     AudioSourceInfoPtr sourceInfo(new AudioSourceInfo());
 
-    sourceInfo->deviceInfo = static_cast<QAudioDeviceInfo>(primaryAudioDevice);
+    sourceInfo->deviceInfo = static_cast<QAudioDevice>(primaryAudioDevice);
     m_audioSourcesInfo.push_back(sourceInfo);
 
     if (!secondaryAudioDevice.isNull())
     {
         sourceInfo.reset(new AudioSourceInfo());
-        sourceInfo->deviceInfo = static_cast<QAudioDeviceInfo>(secondaryAudioDevice);
+        sourceInfo->deviceInfo = static_cast<QAudioDevice>(secondaryAudioDevice);
         m_audioSourcesInfo.push_back(sourceInfo);
     }
     for (const auto& source: m_audioSourcesInfo)
@@ -230,7 +244,7 @@ bool DesktopAudioOnlyDataProvider::initInputDevices()
             return false;
 
         source->format = format;
-        source->input.reset(new QAudioInput(source->deviceInfo, source->format));
+        source->input.reset(new QAudioSource(source->deviceInfo, source->format));
     }
 
     return true;
@@ -287,7 +301,7 @@ void DesktopAudioOnlyDataProvider::preprocessAudioBuffers(
     NX_ASSERT(!preprocessList.empty());
 
     const auto kSampleSizeInBytes =
-        preprocessList.at(0)->format.sampleSize() / kBitsInByte;
+        preprocessList.at(0)->format.bytesPerSample();
 
     const auto kFrameSizeInBytes = m_frameSize * kSampleSizeInBytes;
 
