@@ -3,9 +3,9 @@
 #include "webengine_profile_manager.h"
 
 #include <QtCore/QHash>
-#include <QtNetwork/QNetworkProxy>
 #include <QtQml/QtQml>
-#include <QtWebEngine/private/qquickwebenginedownloaditem_p.h>
+#include <QtNetwork/QNetworkProxy>
+#include <QtWebEngineQuick/private/qquickwebenginedownloadrequest_p.h>
 
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
@@ -50,6 +50,11 @@ QQuickWebEngineProfile* WebEngineProfileManager::Private::getOrCreateProfile(
     if (!profile)
     {
         profile = new QQuickWebEngineProfile(parent);
+
+        // Ensure the profile has a QML context needed for construction of script collection value.
+        if (!qmlContext(profile))
+            QQmlEngine::setContextForObject(profile, qmlContext(parent));
+
         profile->setOffTheRecord(offTheRecord);
 
         if (!proxy.isEmpty())
@@ -62,7 +67,10 @@ QQuickWebEngineProfile* WebEngineProfileManager::Private::getOrCreateProfile(
         profile->setPersistentCookiesPolicy(QQuickWebEngineProfile::ForcePersistentCookies);
 
         QObject::connect(profile, &QQuickWebEngineProfile::downloadRequested,
-            parent, &WebEngineProfileManager::downloadRequested);
+            parent, [this](QQuickWebEngineDownloadRequest* download)
+            {
+                parent->downloadRequested(download);
+            });
     }
     return profile.data();
 }

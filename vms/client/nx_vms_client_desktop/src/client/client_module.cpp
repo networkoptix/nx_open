@@ -12,6 +12,7 @@
 #include <QtGui/QPalette>
 #include <QtGui/QSurfaceFormat>
 #include <QtQml/QQmlEngine>
+#include <QtWebEngineCore/QWebEngineProfile>
 #include <QtWebEngineCore/QWebEngineSettings>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QToolTip>
@@ -306,7 +307,7 @@ void QnClientModule::initWebEngine()
 
     qputenv("QTWEBENGINE_DIALOG_SET", "QtQuickControls2");
 
-    const auto settings = QWebEngineSettings::defaultSettings();
+    const auto settings = QWebEngineProfile::defaultProfile()->settings();
     // We must support Flash for some camera admin pages to work.
     settings->setAttribute(QWebEngineSettings::PluginsEnabled, true);
 

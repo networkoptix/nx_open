@@ -7,7 +7,7 @@
 #include <QtGui/QAction>
 #include <QtCore/QFile>
 #include <QtCore/QTimer>
-#include <QtWebEngineWidgets/QWebEngineDownloadItem>
+#include <QtWebEngineCore/QWebEngineDownloadRequest>
 
 #include <platform/environment.h>
 
@@ -327,7 +327,8 @@ void WebDownloader::startDownload()
         });
 
     connect(m_item, SIGNAL(receivedBytesChanged()), this, SLOT(onReceivedBytesChanged()));
-    connect(m_item, SIGNAL(stateChanged()), this, SLOT(onStateChanged()));
+    connect(m_item, SIGNAL(stateChanged(QWebEngineDownloadRequest::DownloadState)),
+        this, SLOT(onStateChanged(QWebEngineDownloadRequest::DownloadState)));
     DownloadItemReadTimeout::set(m_item, kDataReadTimeout);
     QMetaObject::invokeMethod(m_item, "accept");
 }
@@ -402,16 +403,15 @@ void WebDownloader::onReceivedBytesChanged()
         m_item->property("totalBytes").value<qint64>());
 }
 
-void WebDownloader::onStateChanged()
+void WebDownloader::onStateChanged(QWebEngineDownloadRequest::DownloadState state)
 {
-    int state = m_item->property("state").toInt();
     switch (state)
     {
-        case QWebEngineDownloadItem::DownloadRequested:
-        case QWebEngineDownloadItem::DownloadInProgress:
+        case QWebEngineDownloadRequest::DownloadRequested:
+        case QWebEngineDownloadRequest::DownloadInProgress:
             setState(State::Downloading);
             break;
-        case QWebEngineDownloadItem::DownloadCompleted:
+        case QWebEngineDownloadRequest::DownloadCompleted:
             setState(State::Completed);
             break;
         default:

@@ -2,7 +2,7 @@
 
 #include "camera_web_page_workarounds.h"
 
-#include <QtWebEngine/QQuickWebEngineScript>
+#include <QtWebEngineCore/QWebEngineScript>
 
 #include <nx/utils/log/format.h>
 #include <nx/vms/client/desktop/common/widgets/webview_controller.h>
@@ -20,7 +20,7 @@ void CameraWebPageWorkarounds::setXmlHttpRequestTimeout(
     std::chrono::milliseconds timeout)
 {
     // Inject script that overrides the timeout before sending the XMLHttpRequest.
-    auto script = std::make_unique<QQuickWebEngineScript>();
+    QWebEngineScript script;
     const auto s = nx::format(R"JS(
         XMLHttpRequest.prototype.realSend = XMLHttpRequest.prototype.send;
         XMLHttpRequest.prototype.send = function(data) {
@@ -31,13 +31,13 @@ void CameraWebPageWorkarounds::setXmlHttpRequestTimeout(
         };
         )JS").arg(timeout.count());
 
-    script->setName(overrideXmlHttpRequestScriptName);
-    script->setSourceCode(s);
-    script->setInjectionPoint(QQuickWebEngineScript::DocumentCreation);
-    script->setRunOnSubframes(true);
-    script->setWorldId(QQuickWebEngineScript::MainWorld);
+    script.setName(overrideXmlHttpRequestScriptName);
+    script.setSourceCode(s);
+    script.setInjectionPoint(QWebEngineScript::DocumentCreation);
+    script.setRunsOnSubFrames(true);
+    script.setWorldId(QWebEngineScript::MainWorld);
 
-    controller->addProfileScript(std::move(script));
+    controller->addProfileScript(script);
 }
 
 } // namespace nx::vms::client::desktop

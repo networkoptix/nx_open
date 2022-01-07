@@ -9,8 +9,10 @@
 #include <QtGui/private/qinputcontrol_p.h>
 #include <QtQuick/QQuickItem>
 #include <QtWebChannel/QWebChannel>
+#include <QtWebEngineCore/QWebEngineCertificateError>
 #include <QtWebEngineQuick/QQuickWebEngineProfile>
 #include <QtWebEngineQuick/private/qquickwebengineaction_p.h>
+#include <QtWebEngineQuick/private/qquickwebenginescriptcollection_p.h>
 #include <QtWebEngineQuick/private/qquickwebengineview_p.h>
 #include <QtWidgets/QColorDialog>
 #include <QtWidgets/QGraphicsScene>
@@ -759,31 +761,21 @@ void WebViewController::setMenuSave(bool enabled)
         });
 }
 
-void WebViewController::addProfileScript(std::unique_ptr<QQuickWebEngineScript> script)
+void WebViewController::addProfileScript(const QWebEngineScript& script)
 {
     d->callWhenReady(
-        [script = std::move(script)](QQuickItem* root) mutable
+        [&script](QQuickItem* root) mutable
         {
             const auto profile = root->property("profile").value<QQuickWebEngineProfile*>();
             if (!profile)
                 return;
 
-            script->setParent(profile);
-
             // Avoid script duplication with the same name.
             auto scripts = profile->userScripts();
-            for (int i = 0; i < scripts.count(&scripts); ++i)
-            {
-                if (scripts.at(&scripts, i)->name() == script->name())
-                {
-                    // Found a script with the same name, replace it with the new one.
-                    scripts.replace(&scripts, i, script.release());
-                    return;
-                }
-            }
+            if (scripts->contains(script))
+                scripts->remove(script);
 
-            // No script with the same name exists, add the new one to the list.
-            scripts.append(&scripts, script.release());
+            scripts->insert(script);
         });
 }
 
@@ -1122,13 +1114,17 @@ void WebViewController::requestCertificateDialog(QObject* selection)
         QMetaObject::invokeMethod(selection, "selectNone");
 }
 
-bool WebViewController::verifyCertificate(const QString& chain, const QUrl& url)
+bool WebViewController::verifyCertificate(const QWebEngineCertificateError& error)
 {
     if (!nx::network::ini().verifySslCertificates)
         return true;
 
+    QString pemString;
+    for (const auto& cert: error.certificateChain())
+        pemString += cert.toPem();
+
     return d->certificateValidator
-        ? d->certificateValidator(chain, url)
+        ? d->certificateValidator(pemString, error.url())
         : false;
 }
 
