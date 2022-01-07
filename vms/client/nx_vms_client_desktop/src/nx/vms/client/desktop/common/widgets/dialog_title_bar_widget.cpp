@@ -161,7 +161,7 @@ private:
             ? m_window->windowIcon().pixmap(q->maximumHeight())
             : QPixmap());
 
-        ui->iconLabel->setVisible(!ui->iconLabel->pixmap()->isNull());
+        ui->iconLabel->setVisible(!ui->iconLabel->pixmap().isNull());
     }
 
     void updateState()
