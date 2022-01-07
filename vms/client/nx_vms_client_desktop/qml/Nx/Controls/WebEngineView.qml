@@ -1,7 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick 2.15
-import QtWebEngine 1.10
+import QtWebEngine
 import QtWebChannel 1.0
 
 import nx.vms.client.desktop.utils 1.0
@@ -10,31 +10,30 @@ Item
 {
     // Helper properties for providing additional JS APIs using Qt MetaObject system.
     property bool enableInjections: false
+    onEnableInjectionsChanged: loadUserScripts()
 
-    Component
+    function loadUserScripts()
     {
-        id: webChannelScript
-
-        WebEngineScript
+        if (!enableInjections)
         {
-            injectionPoint: WebEngineScript.DocumentCreation
-            worldId: WebEngineScript.MainWorld
-            name: "QWebChannel"
-            sourceUrl: "qrc:///qtwebchannel/qwebchannel.js"
+            webView.userScripts.clear()
+            return
         }
-    }
 
-    Component
-    {
-        id: injectScript
-
-        WebEngineScript
-        {
-            worldId: WebEngineScript.MainWorld
-            injectionPoint: WebEngineScript.DocumentReady
-            name: "NxObjectInjectorScript"
-            sourceUrl: "qrc:///qml/Nx/Controls/web_engine_inject.js"
-        }
+        webView.userScripts.collection = [
+            {
+                worldId: WebEngineScript.MainWorld,
+                injectionPoint: WebEngineScript.DocumentReady,
+                name: "NxObjectInjectorScript",
+                sourceUrl: "qrc:///qml/Nx/Controls/web_engine_inject.js"
+            },
+            {
+                injectionPoint: WebEngineScript.DocumentCreation,
+                worldId: WebEngineScript.MainWorld,
+                name: "QWebChannel",
+                sourceUrl: "qrc:///qtwebchannel/qwebchannel.js"
+            }
+        ]
     }
 
     // If set, then all connections are proxied via resourceId parent VMS Server.
@@ -67,6 +66,7 @@ Item
     signal loadingStatusChanged(int status)
     signal closeWindows() //< Close all child windows.
 
+    Component.onCompleted: loadUserScripts()
     Component.onDestruction: closeWindows()
 
     WebEngineView
@@ -85,18 +85,15 @@ Item
             console.debug("Certificate error reported for", error.url)
 
             let accepted =
-                controller && controller.verifyCertificate(error.certificateChain, error.url)
+                controller && controller.verifyCertificate(error)
             console.debug("Native certificate validator returned", accepted)
 
             if (accepted)
-                error.ignoreCertificateError()
+                error.acceptCertificate()
             else
                 error.rejectCertificate()
         }
         webChannel: enableInjections ? nxWebChannel : null
-        userScripts: enableInjections
-            ? [webChannelScript.createObject(webView), injectScript.createObject(webView)]
-            : []
 
         profile: getProfile(offTheRecord, resourceId)
 
@@ -109,7 +106,7 @@ Item
 
         onLoadingChanged: function(loadRequest)
         {
-            if (loadRequest.status == WebEngineLoadRequest.LoadFailedStatus
+            if (loadRequest.status == WebEngineDownloadRequest.LoadFailedStatus
                 && loadRequest.errorDomain == WebEngineView.InternalErrorDomain)
             {
                 // Content cannot be interpreted by Qt WebEngine, avoid continuous reloading.
@@ -146,7 +143,7 @@ Item
             request.dialogReject()
         }
 
-        onNewViewRequested: function(request)
+        onNewWindowRequested: function(request)
         {
             // If menu navigation is disabled, assume that content is intended to be view-only and
             // disable opening new windows.
@@ -170,7 +167,7 @@ Item
             {
                 // Copy properties to the newly created WebEngineView.
                 root.enableInjections = enableInjections
-                root.userScripts = userScripts //< FIXME: what should we do with registerObjects?
+                root.userScripts.collection = userScripts.collection //< FIXME: what should we do with registerObjects?
 
                 root.resourceId = resourceId
                 root.profile = profile
@@ -263,17 +260,21 @@ Item
 
             const actions = getContextMenuActions(request)
 
-            controller.showMenu(request.x, request.y, actions)
+            controller.showMenu(request.position.x, request.position.y, actions)
         }
 
         onNavigationRequested: function(request)
         {
+            // When webView is empty there should be no redirects.
+            if (webView.url == "" && request.isMainFrame)
+                return
+
             if (!redirectLinksToDesktop)
                 return
 
             if (request.navigationType == WebEngineNavigationRequest.LinkClickedNavigation)
             {
-                request.action = WebEngineNavigationRequest.IgnoreRequest
+                request.reject()
                 Qt.openUrlExternally(request.url)
             }
         }

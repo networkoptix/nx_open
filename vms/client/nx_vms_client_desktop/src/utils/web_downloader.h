@@ -5,6 +5,7 @@
 #include <QtCore/QFileInfo>
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QPointer>
+#include <QtWebEngineCore/QWebEngineDownloadRequest>
 
 #include <nx/utils/uuid.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -48,7 +49,7 @@ private slots:
     void onDownloadProgress(qint64 bytesRead, qint64 bytesTotal);
 
     void onReceivedBytesChanged();
-    void onStateChanged();
+    void onStateChanged(QWebEngineDownloadRequest::DownloadState state);
 
 private:
     State m_state = State::Init;

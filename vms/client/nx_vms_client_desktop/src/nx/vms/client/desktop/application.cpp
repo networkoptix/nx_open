@@ -366,8 +366,6 @@ int runApplication(int argc, char** argv)
         QSurfaceFormat::setDefaultFormat(format);
     }
 
-    QtWebEngine::initialize();
-
     auto application = std::make_unique<QApplication>(argc, argv);
     initApplication(startupParams);
 

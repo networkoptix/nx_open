@@ -14,7 +14,8 @@
 #include <core/resource/resource_fwd.h>
 
 class QQuickWebEngineProfile;
-class QQuickWebEngineScript;
+class QWebEngineCertificateError;
+class QWebEngineScript;
 
 class QnWorkbenchContext;
 class QnWorkbenchItem;
@@ -147,7 +148,7 @@ public:
      * Add a script to the web page current profile. If the script with the same name already
      * exists, it is replaced with the new one.
      */
-    void addProfileScript(std::unique_ptr<QQuickWebEngineScript> script);
+    void addProfileScript(const QWebEngineScript& script);
 
     /** Get a list of actions for context menu. Optionally set a parent for each QAction. */
     QList<QAction*> getContextMenuActions(QObject* parent = nullptr) const;
@@ -212,7 +213,7 @@ public:
      * Request external validator to check provided certificate chain. If no validator has been set,
      * returns false (i.e. only valid public certificates are accepted by the Chromium engine).
      */
-    Q_INVOKABLE bool verifyCertificate(const QString& chain, const QUrl& url);
+    Q_INVOKABLE bool verifyCertificate(const QWebEngineCertificateError& error);
 
     virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
