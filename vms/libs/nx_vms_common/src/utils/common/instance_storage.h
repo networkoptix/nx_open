@@ -35,8 +35,11 @@ public:
         QObject*& result = m_instanceByMetaObject[&T::staticMetaObject];
         if (!result)
         {
-            result = new T(m_this.data());
-            m_instances.push_back(result);
+            auto newInstance = new T(m_this.data());
+            // After construction of T result may no longer be valid!
+            m_instanceByMetaObject.insert(&T::staticMetaObject, newInstance);
+            m_instances.push_back(newInstance);
+            return newInstance;
         }
 
         return static_cast<T*>(result);

@@ -99,7 +99,7 @@ void CameraThumbnailManager::refreshSelectedCamera()
     if (!m_selectedCamera)
         return;
 
-    ThumbnailData& data = m_thumbnailByCamera[m_selectedCamera];
+    ThumbnailData data = m_thumbnailByCamera[m_selectedCamera];
 
     if (!m_selectedCamera->isOnline())
     {
@@ -114,6 +114,7 @@ void CameraThumbnailManager::refreshSelectedCamera()
     data.status = data.loadingHandle != kInvalidHandle
         ? Qn::ThumbnailStatus::Refreshing
         : Qn::ThumbnailStatus::NoData;
+    m_thumbnailByCamera[m_selectedCamera] = data;
 }
 
 bool CameraThumbnailManager::autoRotate() const
