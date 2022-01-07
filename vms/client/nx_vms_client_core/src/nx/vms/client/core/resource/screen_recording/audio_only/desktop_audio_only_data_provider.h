@@ -13,6 +13,8 @@ extern "C"
 
 #include "../desktop_data_provider_base.h"
 
+class QAudioDevice;
+
 namespace nx::vms::client::core {
 
 class DesktopAudioOnlyDataProvider: public DesktopDataProviderBase
@@ -39,7 +41,7 @@ private:
     typedef std::shared_ptr<AudioSourceInfo> AudioSourceInfoPtr;
 
     static QAudioFormat getAppropriateAudioFormat(
-        const QAudioDeviceInfo& deviceInfo,
+        const QAudioDevice& deviceInfo,
         QString* errorString = nullptr);
 
 private:

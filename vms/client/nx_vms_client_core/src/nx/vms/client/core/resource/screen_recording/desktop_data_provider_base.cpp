@@ -78,26 +78,22 @@ void DesktopDataProviderBase::monoToStereo(qint16 *dst, qint16 *src1, qint16 *sr
 
 AVSampleFormat DesktopDataProviderBase::fromQtAudioFormat(const QAudioFormat& format) const
 {
-    if (format.sampleType() == QAudioFormat::SampleType::SignedInt)
+    switch (format.sampleFormat())
     {
-        if (format.sampleSize() == 16)
-            return AV_SAMPLE_FMT_S16;
-
-        if (format.sampleSize() == 32)
-            return AV_SAMPLE_FMT_S32;
-    }
-    else if (format.sampleType() == QAudioFormat::SampleType::UnSignedInt)
-    {
-        if (format.sampleSize() == 8)
+        case QAudioFormat::UInt8:
             return AV_SAMPLE_FMT_U8;
-    }
-    else if (format.sampleType() == QAudioFormat::SampleType::Float)
-    {
-        if (format.sampleSize() == 32)
-            return AV_SAMPLE_FMT_FLT;
-
-        if (format.sampleSize() == 64)
-            return AV_SAMPLE_FMT_DBL;
+        case QAudioFormat::Int16:
+            return AV_SAMPLE_FMT_S16;
+        case QAudioFormat::Int32:
+            return AV_SAMPLE_FMT_S32;
+        case QAudioFormat::Float:
+            if (format.bytesPerSample() == 4)
+                return AV_SAMPLE_FMT_FLT;
+            if (format.bytesPerSample() == 8)
+                return AV_SAMPLE_FMT_DBL;
+            break;
+        default:
+            break;
     }
 
     return AV_SAMPLE_FMT_NONE;

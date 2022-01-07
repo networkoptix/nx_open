@@ -3,7 +3,8 @@
 #include "audio_recorder_settings.h"
 
 #include <QtCore/QDir>
-#include <QtMultimedia/QAudioDeviceInfo>
+#include <QtMultimedia/QMediaDevices>
+#include <QtMultimedia/QAudioDevice>
 
 #if defined(Q_OS_WIN)
     #include <nx/vms/client/core/resource/screen_recording/audio_device_info_win.h>
@@ -29,7 +30,7 @@ QString getFullDeviceName(const QString& shortName)
 
 AudioRecorderSettings::DeviceList fetchDevicesList()
 {
-    auto availableDevices = QAudioDeviceInfo::availableDevices(QAudio::AudioInput);
+    auto availableDevices = QMediaDevices::audioInputs();
 
     if (nx::build_info::isWindows())
     {
@@ -37,30 +38,31 @@ AudioRecorderSettings::DeviceList fetchDevicesList()
         // QAudioDeviceInfo::availableDevices(), one from WASAPI, one from winMM, see QTBUG-75781.
         // Since they are actually the same devices provided by different interfaces, bad things
         // may occur when both are selected as input source (immediate crash on use attempt).
+        // TODO: Qt6 QAudioDeviceInfo::availableDevices() is replaced with QMediaDevices::audioInputs().
+        // Suggested workaround with realm() method can't be used in Qt 6 - no such method exists.
 
         // Device order will be kept.
         QStringList nameOrder;
         for (const auto& deviceInfo: availableDevices)
-            nameOrder.append(deviceInfo.deviceName());
+            nameOrder.append(deviceInfo.description());
         nameOrder.removeDuplicates();
 
         std::sort(availableDevices.begin(), availableDevices.end(),
-            [&nameOrder](const QAudioDeviceInfo& l, const QAudioDeviceInfo& r)
+            [&nameOrder](const QAudioDevice& l, const QAudioDevice& r)
             {
                 // First WASAPI one (1-2 channels usually), then winMM one (18 channels usually).
-                // Qt 5.14 provides QAudioDeviceInfo::realm() getter, it should be used instead.
-                if (l.deviceName() == r.deviceName())
-                    return l.supportedChannelCounts() < r.supportedChannelCounts();
-                return nameOrder.indexOf(l.deviceName()) < nameOrder.indexOf(r.deviceName());
+                if (l.description() == r.description())
+                    return l.maximumChannelCount() < r.maximumChannelCount();
+                return nameOrder.indexOf(l.description()) < nameOrder.indexOf(r.description());
             });
 
         const auto getDuplicatingWasapiDeviceItr =
             [&availableDevices]()
             {
                 return std::adjacent_find(availableDevices.begin(), availableDevices.end(),
-                    [](const QAudioDeviceInfo& l, const QAudioDeviceInfo& r)
+                    [](const QAudioDevice& l, const QAudioDevice& r)
                     {
-                        return l.deviceName() == r.deviceName();
+                        return l.description() == r.description();
                     });
             };
 
@@ -72,7 +74,7 @@ AudioRecorderSettings::DeviceList fetchDevicesList()
     QMap<QString, int> countByName; //< #vbreus Is it still makes sense, or just was workaround?
     for (const auto& info: availableDevices)
     {
-        const QString name = getFullDeviceName(info.deviceName());
+        const QString name = getFullDeviceName(info.description());
         int& count = countByName[name];
         ++count;
         devices.append(AudioDeviceInfo(info, name, count));
@@ -161,7 +163,7 @@ AudioDeviceInfo AudioRecorderSettings::defaultPrimaryAudioDevice() const
     const DeviceList& devices = availableDevices();
 
     // On windows it always returns non-existent "Default Audio Input Device".
-    const QAudioDeviceInfo info = QAudioDeviceInfo::defaultInputDevice();
+    const QAudioDevice info = QMediaDevices::defaultAudioInput();
 
     if (!info.isNull())
     {

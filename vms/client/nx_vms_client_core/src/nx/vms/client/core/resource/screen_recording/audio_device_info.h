@@ -2,16 +2,16 @@
 
 #pragma once
 
-#include <QtMultimedia/QAudioDeviceInfo>
+#include <QtMultimedia/QAudioDevice>
 
 namespace nx::vms::client::core {
 
-class AudioDeviceInfo: public QAudioDeviceInfo
+class AudioDeviceInfo: public QAudioDevice
 {
 public:
     AudioDeviceInfo() = default;
-    AudioDeviceInfo(const QAudioDeviceInfo& info, const QString& name, int deviceNumber = 1):
-        QAudioDeviceInfo(info),
+    AudioDeviceInfo(const QAudioDevice& info, const QString& name, int deviceNumber = 1):
+        QAudioDevice(info),
         m_name(name),
         m_deviceNumber(deviceNumber)
     {
@@ -23,7 +23,7 @@ public:
     QString fullName() const
     {
         if (m_name.isEmpty())
-            return deviceName();
+            return description();
 
         if (m_deviceNumber <= 1)
             return m_name;

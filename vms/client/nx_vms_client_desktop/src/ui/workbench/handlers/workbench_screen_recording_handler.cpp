@@ -6,6 +6,7 @@
 
 #include <QtGui/QAction>
 #include <QtWidgets/QApplication>
+#include <QtMultimedia/QMediaDevices>
 
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
@@ -213,7 +214,8 @@ void QnWorkbenchScreenRecordingHandler::startRecordingInternal()
     core::AudioDeviceInfo secondAudioDevice;
     if (recorderSettings.secondaryAudioDevice().fullName() != audioDevice.fullName())
         secondAudioDevice = recorderSettings.secondaryAudioDevice();
-    if (core::AudioDeviceInfo::availableDevices(QAudio::AudioInput).isEmpty()) {
+    if (QMediaDevices::audioInputs().isEmpty())
+    {
         audioDevice = core::AudioDeviceInfo(); // no audio devices
         secondAudioDevice = core::AudioDeviceInfo();
     }

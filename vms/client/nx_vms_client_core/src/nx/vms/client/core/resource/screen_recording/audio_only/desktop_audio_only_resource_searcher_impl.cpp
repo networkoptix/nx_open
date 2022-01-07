@@ -2,7 +2,8 @@
 
 #include "desktop_audio_only_resource_searcher_impl.h"
 
-#include <QtMultimedia/QAudioDeviceInfo>
+#include <QtMultimedia/QAudioDevice>
+#include <QtMultimedia/QMediaDevices>
 
 #include "desktop_audio_only_resource.h"
 
@@ -11,8 +12,7 @@ namespace nx::vms::client::core {
 QnResourceList DesktopAudioOnlyResourceSearcherImpl::findResources()
 {
     QnResourceList result;
-    const auto availableDevices =
-        QAudioDeviceInfo::availableDevices(QAudio::AudioInput);
+    const auto availableDevices = QMediaDevices::audioInputs();
 
     if (!availableDevices.isEmpty())
         result << QnResourcePtr(new DesktopAudioOnlyResource());

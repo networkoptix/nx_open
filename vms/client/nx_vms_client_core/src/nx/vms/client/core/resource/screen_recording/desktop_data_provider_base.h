@@ -5,7 +5,7 @@
 #include <memory>
 
 #include <QtCore/QPointer>
-#include <QtMultimedia/QAudioInput>
+#include <QtMultimedia/QAudioFormat>
 
 #include <nx/streaming/audio_data_packet.h>
 #include <utils/media/voice_spectrum_analyzer.h>

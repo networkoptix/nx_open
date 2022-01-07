@@ -5,7 +5,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QStandardPaths>
-#include <QtMultimedia/QAudioDeviceInfo>
+#include <QtMultimedia/QAudioDevice>
 
 #include <client/client_settings.h>
 #include <common/common_module.h>

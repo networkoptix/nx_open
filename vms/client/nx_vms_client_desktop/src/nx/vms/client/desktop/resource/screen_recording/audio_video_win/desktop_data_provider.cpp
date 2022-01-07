@@ -245,16 +245,33 @@ bool EncodedAudioInfo::setupFormat(QString& errMessage)
     m_audioFormat.setSampleRate(AUDIO_CAPTURE_FREQUENCY);
     m_audioFormat.setSampleSize(16);
     m_audioFormat.setChannelCount(2);
-    m_audioFormat.setSampleType(QAudioFormat::SignedInt);
 
-    m_audioFormat = m_audioDevice.nearestFormat(m_audioFormat);
-    if (!m_audioFormat.isValid())
+    if (!m_audioDevice.isFormatSupported(m_audioFormat))
     {
-        errMessage = DesktopDataProvider::tr(
-            "The audio capturing device supports no suitable audio formats."
-            "Please select another audio device or \"none\" in the Screen Recording settings.");
+        if (!m_audioDevice.supportedSampleFormats().contains(m_audioFormat.sampleFormat()))
+            m_audioFormat.setSampleFormat(m_audioDevice.preferredFormat().sampleFormat());
 
-        return false;
+        // Set the nearest supported values.
+
+        m_audioFormat.setChannelCount(std::clamp(
+            m_audioFormat.channelCount(),
+            m_audioDevice.minimumChannelCount(),
+            m_audioDevice.maximumChannelCount()));
+
+        m_audioFormat.setSampleRate(std::clamp(
+            m_audioFormat.sampleRate(),
+            m_audioDevice.minimumSampleRate(),
+            m_audioDevice.maximumSampleRate()));
+
+        if (!m_audioDevice.isFormatSupported(m_audioFormat))
+        {
+            m_audioFormat = {};
+            errMessage = DesktopDataProvider::tr(
+                "The audio capturing device supports no suitable audio formats."
+                "Please select another audio device or \"none\" in the Screen Recording settings.");
+
+            return false;
+        }
     }
 
     m_audioQueue.setMaxSize(AUDIO_QUEUE_MAX_SIZE);
