@@ -162,7 +162,6 @@ void QnClientMetaTypes::initialize()
     nx::vms::client::core::initializeMetaTypes();
 
     qRegisterMetaType<Qt::KeyboardModifiers>();
-    qRegisterMetaType<QVector<QnUuid> >();
     qRegisterMetaType<QVector<QColor> >();
     qRegisterMetaType<QValidator::State>();
 
@@ -220,7 +219,6 @@ void QnClientMetaTypes::initialize()
 
     QnJsonSerializer::registerSerializer<Qn::ImageBehavior>();
     QnJsonSerializer::registerSerializer<QnBackgroundImage>();
-    QnJsonSerializer::registerSerializer<QVector<QnUuid> >();
 
     qRegisterMetaType<RecordScheduleCellData>();
     qRegisterMetaType<nx::vms::client::desktop::RecordScheduleCellData>();

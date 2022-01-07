@@ -242,8 +242,6 @@ template NX_VMS_COMMON_API void QnUserRolesManager::usersAndRoles(
 template NX_VMS_COMMON_API void QnUserRolesManager::usersAndRoles(
     const std::set<QnUuid>& ids, QnUserResourceList& users, QList<QnUuid>& roles);
 template NX_VMS_COMMON_API void QnUserRolesManager::usersAndRoles(
-    const QVector<QnUuid>& ids, QnUserResourceList& users, QList<QnUuid>& roles);
-template NX_VMS_COMMON_API void QnUserRolesManager::usersAndRoles(
     const QList<QnUuid>& ids, QnUserResourceList& users, QList<QnUuid>& roles);
 template NX_VMS_COMMON_API void QnUserRolesManager::usersAndRoles(
     const QSet<QnUuid>& ids, QnUserResourceList& users, QList<QnUuid>& roles);

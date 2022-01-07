@@ -8,7 +8,6 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/singleton.h>
 
-class QStringList;
 
 namespace nx::vms::client::desktop {
 
