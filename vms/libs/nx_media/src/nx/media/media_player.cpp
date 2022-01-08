@@ -9,8 +9,8 @@
 #include <QtCore/QList>
 #include <QtCore/QMutex>
 #include <QtCore/QTimer>
-#include <QtMultimedia/QAbstractVideoSurface>
-#include <QtMultimedia/QVideoSurfaceFormat>
+#include <QtMultimedia/QVideoSink>
+#include <QtMultimedia/private/qabstractvideobuffer_p.h>
 
 #include <common/common_module.h>
 #include <core/resource/avi/avi_archive_delegate.h>
@@ -20,6 +20,7 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/kit/debug.h>
+#include <nx/media/image_video_buffer.h>
 #include <nx/media/ini.h>
 #include <nx/media/quick_sync/qsv_supported.h>
 #include <nx/streaming/archive_stream_reader.h>
@@ -166,7 +167,7 @@ public:
     double speed = 1.0;
 
     // Video surface list to render. Holds QT property value.
-    QMap<int, QAbstractVideoSurface*> videoSurfaces;
+    QMap<int, QVideoSink*> videoSurfaces;
 
     // Media URL to play. Holds QT property value.
     QUrl url;
@@ -554,20 +555,21 @@ void PlayerPrivate::presentNextFrameDelayed()
 
 QVideoFramePtr PlayerPrivate::scaleFrame(const QVideoFramePtr& videoFrame)
 {
-    if (videoFrame->handleType() != QAbstractVideoBuffer::NoHandle)
+    if (videoFrame->handleType() != QVideoFrame::NoHandle)
         return videoFrame; //< Do not scale any hardware video frames.
 
     if (videoFrame->width() <= maxTextureSize && videoFrame->height() <= maxTextureSize)
         return videoFrame; //< Scale is not required.
 
-    const QImage image = videoFrame->image().scaled(
+    const QImage image = videoFrame->toImage().scaled(
         maxTextureSize, maxTextureSize, Qt::KeepAspectRatio);
 
     NX_ASSERT(!image.isNull());
 
-    const QVideoFramePtr scaledFrame(new QVideoFrame(image));
-    scaledFrame->setStartTime(videoFrame->startTime());
-    return scaledFrame;
+    if (auto scaledFrame = videoFrameFromImage(image))
+        return scaledFrame;
+
+    return videoFrame;
 }
 
 void PlayerPrivate::presentNextFrame()
@@ -595,36 +597,16 @@ void PlayerPrivate::presentNextFrame()
 
     auto videoSurface = videoSurfaces.value(metadata.videoChannel);
 
-    // Update video surface's pixel format if needed.
-    if (videoSurface)
-    {
-        if (videoSurface->isActive() &&
-            (videoSurface->surfaceFormat().pixelFormat() != videoFrameToRender->pixelFormat()
-                || videoSurface->surfaceFormat().frameSize() != videoFrameToRender->size()))
-        {
-            videoSurface->stop();
-        }
-
-        if (!videoSurface->isActive())
-        {
-            QVideoSurfaceFormat format(
-                videoFrameToRender->size(),
-                videoFrameToRender->pixelFormat(),
-                videoFrameToRender->handleType());
-            videoSurface->start(format);
-        }
-    }
-
     bool isLivePacket = metadata.flags.testFlag(QnAbstractMediaData::MediaFlags_LIVE);
     bool skipFrame = (isLivePacket != liveMode && !isLocalFile)
         || (state != Player::State::Previewing
             && metadata.displayHint == DisplayHint::obsolete);
 
-    if (videoSurface && videoSurface->isActive() && !skipFrame)
+    if (videoSurface && !skipFrame)
     {
         setMediaStatus(Player::MediaStatus::Loaded);
         isHwAccelerated = metadata.flags.testFlag(QnAbstractMediaData::MediaFlags_HWDecodingUsed);
-        videoSurface->present(*scaleFrame(videoFrameToRender));
+        videoSurface->setVideoFrame(*scaleFrame(videoFrameToRender));
         if (dataConsumer)
         {
             qint64 timeUs = liveMode ? DATETIME_NOW : videoFrameToRender->startTime() * 1000;
@@ -1009,7 +991,7 @@ QUrl Player::source() const
     return d->url;
 }
 
-QAbstractVideoSurface* Player::videoSurface(int channel) const
+QVideoSink* Player::videoSurface(int channel) const
 {
     Q_D(const Player);
     return d->videoSurfaces.value(channel);
@@ -1193,12 +1175,6 @@ void Player::stop()
     if (d->mediaStatus != MediaStatus::NoVideoStreams) //< Preserve NoVideoStreams state.
         d->setMediaStatus(MediaStatus::NoMedia);
 
-    for (const auto surface: d->videoSurfaces)
-    {
-        if (surface)
-            surface->stop();
-    }
-
     d->log("stop() END");
 }
 
@@ -1248,7 +1224,7 @@ void Player::setSource(const QUrl& url)
     d->log(nx::format("setSource(\"%1\") END").arg(newUrl));
 }
 
-void Player::setVideoSurface(QAbstractVideoSurface* videoSurface, int channel)
+void Player::setVideoSurface(QVideoSink* videoSurface, int channel)
 {
     Q_D(Player);
 
@@ -1261,7 +1237,7 @@ void Player::setVideoSurface(QAbstractVideoSurface* videoSurface, int channel)
         emit videoSurfaceChanged();
 }
 
-void Player::unsetVideoSurface(QAbstractVideoSurface* videoSurface, int channel)
+void Player::unsetVideoSurface(QVideoSink* videoSurface, int channel)
 {
     Q_D(Player);
 

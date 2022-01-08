@@ -4,6 +4,8 @@
 
 #include "jpeg.h"
 
+#include <nx/media/image_video_buffer.h>
+
 namespace nx {
 namespace media {
 
@@ -49,8 +51,13 @@ int JpegDecoder::decode(const QnConstCompressedVideoDataPtr& frame, QVideoFrameP
     if (!frame)
         return 0; //< There is no internal buffer. Nothing to flush.
 
-    QImage image = decompressJpegImage(frame->data(), frame->dataSize());
-    result->reset(new QVideoFrame(image));
+    const QImage image = decompressJpegImage(frame->data(), frame->dataSize());
+
+    *result = videoFrameFromImage(image);
+
+    if (!*result)
+        return 0;
+
     (*result)->setStartTime(frame->timestamp / 1000); //< convert usec to msec
     return d->frameNumber++;
 }

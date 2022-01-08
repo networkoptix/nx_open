@@ -7,12 +7,12 @@
 #include <QtCore/QSize>
 #include <QtCore/QUrl>
 #include <QtMultimedia/QMediaPlayer>
+#include <QtMultimedia/QVideoSink>
 
 #include <nx/media/abstract_metadata_consumer.h>
 #include <nx/media/media_fwd.h>
 #include <nx/reflect/enum_instrument.h>
 
-class QAbstractVideoSurface;
 class QnTimePeriodList;
 
 // for tests
@@ -58,7 +58,7 @@ class Player: public QObject
     /**
      * Video source to render decoded data
      */
-    Q_PROPERTY(QAbstractVideoSurface* videoSurface READ videoSurface WRITE setVideoSurface NOTIFY videoSurfaceChanged)
+    Q_PROPERTY(QVideoSink* videoSurface READ videoSurface WRITE setVideoSurface NOTIFY videoSurfaceChanged)
 
     /**
      * Current playback UTC position at msec.
@@ -200,17 +200,17 @@ public:
      */
     void setSource(const QUrl &source);
 
-    QAbstractVideoSurface *videoSurface(int channel = 0) const;
+    QVideoSink *videoSurface(int channel = 0) const;
 
     /**
      * Set video source to render specified video channel number
      */
-    void setVideoSurface(QAbstractVideoSurface *videoSurface, int channel = 0);
+    void setVideoSurface(QVideoSink *videoSink, int channel = 0);
 
     /**
      * Unset video source to render
      */
-    void unsetVideoSurface(QAbstractVideoSurface* videoSurface, int channel = 0);
+    void unsetVideoSurface(QVideoSink* videoSink, int channel = 0);
 
     qint64 position() const;
     /**

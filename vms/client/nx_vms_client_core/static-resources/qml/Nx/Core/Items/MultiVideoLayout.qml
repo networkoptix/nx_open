@@ -23,7 +23,7 @@ Item
         id: repeaterItem
         model: resourceHelper && resourceHelper.channelCount
 
-        onItemAdded:
+        onItemAdded: (index, item) =>
         {
             item.width = Qt.binding(
                 function() { return cellWidth })

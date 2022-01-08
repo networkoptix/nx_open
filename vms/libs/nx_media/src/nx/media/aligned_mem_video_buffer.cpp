@@ -2,76 +2,35 @@
 
 #include "aligned_mem_video_buffer.h"
 
-#include <QtMultimedia/private/qabstractvideobuffer_p.h>
-#include <nx/utils/log/assert.h>
-QT_BEGIN_NAMESPACE
-/**
- * This definition is needed because we inherit QAbstractVideoBufferPrivate class declared in a private Qt header.
- */
-int QAbstractVideoBufferPrivate::map(
-    QAbstractVideoBuffer::MapMode /*mode*/,
-    int* /*numBytes*/,
-    int /*bytesPerLine*/[4],
-    uchar* /*data*/[4])
-{
-    NX_CRITICAL(false);
-    return 0;
-}
-
-QT_END_NAMESPACE
 
 namespace nx {
 namespace media {
 
-class AlignedMemVideoBufferPrivate: public QAbstractVideoBufferPrivate
+struct AlignedMemVideoBuffer::Private
 {
-    Q_DECLARE_PUBLIC(AlignedMemVideoBuffer)
-
-public:
-    AlignedMemVideoBufferPrivate():
-        QAbstractVideoBufferPrivate(),
-        mapMode(QAbstractVideoBuffer::NotMapped),
-        dataSize(0),
-        planeCount(1),
-        ownBuffer(false)
-    {
-        memset(data, 0, sizeof(data));
-        memset(bytesPerLine, 0, sizeof(bytesPerLine));
-    }
-
-    virtual ~AlignedMemVideoBufferPrivate() = default;
-
-    virtual int map(
-        QAbstractVideoBuffer::MapMode mode,
-        int* numBytes,
-        int bytesPerLine[4],
-        uchar* data[4]) override
-    {
-        Q_Q(AlignedMemVideoBuffer);
-        return q->doMapPlanes(mode, numBytes, bytesPerLine, data);
-    }
-
-    uchar* data[4];
-    int bytesPerLine[4];
-    QAbstractVideoBuffer::MapMode mapMode;
-    int dataSize;
-    int planeCount;
-    bool ownBuffer;
+    uchar* data[4] = {};
+    int bytesPerLine[4] = {};
+    QVideoFrame::MapMode mapMode = QVideoFrame::MapMode::NotMapped;
+    int dataSize = 0;
+    int planeCount = 1;
+    bool ownBuffer = false;
 };
+
 AlignedMemVideoBuffer::AlignedMemVideoBuffer(int size, int alignFactor, int bytesPerLine):
-    QAbstractVideoBuffer(*(new AlignedMemVideoBufferPrivate()), NoHandle)
+    QAbstractVideoBuffer(QVideoFrame::NoHandle),
+    d(new AlignedMemVideoBuffer::Private())
 {
-    Q_D(AlignedMemVideoBuffer);
     d->data[0] = (uchar*) qMallocAligned(size, alignFactor);
     d->bytesPerLine[0] = bytesPerLine;
     d->dataSize = size;
     d->planeCount = 1;
     d->ownBuffer = true;
 }
+
 AlignedMemVideoBuffer::AlignedMemVideoBuffer(uchar* data[4], int bytesPerLine[4], int planeCount):
-    QAbstractVideoBuffer(*(new AlignedMemVideoBufferPrivate()), NoHandle)
+    QAbstractVideoBuffer(QVideoFrame::NoHandle),
+    d(new AlignedMemVideoBuffer::Private())
 {
-    Q_D(AlignedMemVideoBuffer);
     for (int i = 0; i < 4; ++i)
     {
         d->data[i] = data[i];
@@ -83,55 +42,40 @@ AlignedMemVideoBuffer::AlignedMemVideoBuffer(uchar* data[4], int bytesPerLine[4]
 
 AlignedMemVideoBuffer::~AlignedMemVideoBuffer()
 {
-    Q_D(AlignedMemVideoBuffer);
     if (d->ownBuffer)
         qFreeAligned(d->data[0]);
 }
-AlignedMemVideoBuffer::MapMode AlignedMemVideoBuffer::mapMode() const
-{
-    return d_func()->mapMode;
-}
-uchar* AlignedMemVideoBuffer::map(MapMode mode, int* numBytes, int* bytesPerLine)
-{
-    Q_D(AlignedMemVideoBuffer);
 
-    if (d->mapMode == NotMapped && d->data && mode != NotMapped)
+QVideoFrame::MapMode AlignedMemVideoBuffer::mapMode() const
+{
+    return d->mapMode;
+}
+
+QAbstractVideoBuffer::MapData AlignedMemVideoBuffer::map(QVideoFrame::MapMode mode)
+{
+    MapData data;
+
+    if (d->mapMode == QVideoFrame::NotMapped && mode != QVideoFrame::NotMapped)
     {
         d->mapMode = mode;
 
-        if (numBytes)
-            *numBytes = d->dataSize;
+        for (int i = 0; i < 4; ++i)
+        {
+            data.data[i] = d->data[i];
+            data.bytesPerLine[i] = d->bytesPerLine[i];
+        }
 
-        if (bytesPerLine)
-            *bytesPerLine = d->bytesPerLine[0];
+        data.size[0] = d->dataSize;
 
-        return d->data[0];
+        data.nPlanes = d->planeCount;
     }
-    else
-    {
-        return nullptr;
-    }
-}
 
-int AlignedMemVideoBuffer::doMapPlanes(
-    MapMode mode, int* numBytes, int bytesPerLine[4], uchar* data[4])
-{
-    Q_UNUSED(mode);
-    Q_D(AlignedMemVideoBuffer);
-
-    for (int i = 0; i < 4; ++i)
-    {
-        data[i] = d->data[i];
-        bytesPerLine[i] = d->bytesPerLine[i];
-    }
-    *numBytes = d->dataSize;
-    return d->planeCount;
+    return data;
 }
 
 void AlignedMemVideoBuffer::unmap()
 {
-    Q_D(AlignedMemVideoBuffer);
-    d->mapMode = NotMapped;
+    d->mapMode = QVideoFrame::NotMapped;
 }
 
 } // namespace media

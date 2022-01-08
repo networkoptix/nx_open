@@ -3,7 +3,9 @@
 #pragma once
 
 #include <QtCore/QScopedPointer>
-#include <QtMultimedia/QAbstractVideoBuffer>
+#include <QtMultimedia/private/qabstractvideobuffer_p.h>
+
+#include <nx/utils/impl_ptr.h>
 
 namespace nx {
 namespace media {
@@ -15,8 +17,6 @@ namespace media {
 class AlignedMemVideoBufferPrivate;
 class AlignedMemVideoBuffer: public QAbstractVideoBuffer
 {
-    Q_DECLARE_PRIVATE(AlignedMemVideoBuffer)
-
 public:
     AlignedMemVideoBuffer(int size, int alignFactor, int bytesPerLine);
 
@@ -28,20 +28,15 @@ public:
 
     ~AlignedMemVideoBuffer();
 
-    virtual MapMode mapMode() const override;
+    virtual QVideoFrame::MapMode mapMode() const override;
 
-    virtual uchar* map(MapMode mode, int *numBytes, int *bytesPerLine) override;
+    virtual MapData map(QVideoFrame::MapMode mode) override;
 
     virtual void unmap() override;
 
-protected:
-    /**
-     * NOTE: Qt has made QAbstractVideoBuffer::mapPlanes non-virtual, allowing only to override
-     * its impl method QAbstractVideoBufferPrivate::map(). This method fixes this limitation:
-     * it is internally called from AlignedMemVideoBufferPrivate::map() and can be overridden by
-     * derived classes.
-     */
-    virtual int doMapPlanes(MapMode mode, int *numBytes, int bytesPerLine[4], uchar *data[4]);
+private:
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
 };
 
 } // namespace media
