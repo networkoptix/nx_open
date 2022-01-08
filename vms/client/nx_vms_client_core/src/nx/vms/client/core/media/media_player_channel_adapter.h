@@ -16,7 +16,7 @@ class MediaPlayer;
 class MediaPlayerChannelAdapter: public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(QAbstractVideoSurface* videoSurface READ videoSurface WRITE setVideoSurface
+    Q_PROPERTY(QVideoSink* videoSurface READ videoSurface WRITE setVideoSurface
         NOTIFY videoSurfaceChanged)
     Q_PROPERTY(int channel READ channel WRITE setChannel NOTIFY channelChanged)
     Q_PROPERTY(nx::vms::client::core::MediaPlayer* mediaPlayer READ mediaPlayer
@@ -25,8 +25,8 @@ class MediaPlayerChannelAdapter: public QObject
 public:
     MediaPlayerChannelAdapter(QObject* parent = nullptr);
 
-    QAbstractVideoSurface* videoSurface() const;
-    void setVideoSurface(QAbstractVideoSurface* videoSurface);
+    QVideoSink* videoSurface() const;
+    void setVideoSurface(QVideoSink* videoSurface);
 
     int channel() const;
     void setChannel(int channel);
@@ -35,7 +35,7 @@ public:
     void setMediaPlayer(MediaPlayer* mediaPlayer);
 
 signals:
-    void videoSurfaceChanged(QAbstractVideoSurface* videoSurface);
+    void videoSurfaceChanged(QVideoSink* videoSurface);
     void channelChanged(int channel);
     void mediaPlayerChanged(nx::vms::client::core::MediaPlayer* mediaPlayer);
 
@@ -44,7 +44,7 @@ private:
     void applyVideoSurface();
 
 private:
-    QAbstractVideoSurface* m_videoSurface = nullptr;
+    QVideoSink* m_videoSurface = nullptr;
     int m_channel = -1;
     QPointer<MediaPlayer> m_mediaPlayer;
 };

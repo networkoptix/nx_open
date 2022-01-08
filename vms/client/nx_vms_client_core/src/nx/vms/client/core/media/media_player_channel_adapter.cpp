@@ -11,12 +11,12 @@ MediaPlayerChannelAdapter::MediaPlayerChannelAdapter(QObject* parent):
 {
 }
 
-QAbstractVideoSurface* MediaPlayerChannelAdapter::videoSurface() const
+QVideoSink* MediaPlayerChannelAdapter::videoSurface() const
 {
     return m_videoSurface;
 }
 
-void MediaPlayerChannelAdapter::setVideoSurface(QAbstractVideoSurface* videoSurface)
+void MediaPlayerChannelAdapter::setVideoSurface(QVideoSink* videoSurface)
 {
     if (m_videoSurface == videoSurface)
         return;

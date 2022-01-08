@@ -1,7 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick 2.6
-import QtMultimedia 5.14
+import QtMultimedia
 
 import Nx 1.0
 import Nx.Core 1.0
@@ -23,6 +23,7 @@ Rectangle
     {
         id: mediaPlayer
         maxTextureSize: intro.maximumTextureSize
+        videoSurface: videoOutput.videoSink
         onSourceChanged: updatePlayingState()
         Component.onCompleted: updatePlayingState()
 
@@ -47,7 +48,6 @@ Rectangle
         VideoOutput
         {
             id: videoOutput
-            source: mediaPlayer
         }
     }
 

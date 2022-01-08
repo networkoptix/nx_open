@@ -16,7 +16,6 @@ extern "C" {
 #include <nx/utils/thread/mutex.h>
 
 #include "aligned_mem_video_buffer.h"
-#include <QtMultimedia/QAbstractVideoBuffer>
 #include <QtMultimedia/private/qabstractvideobuffer_p.h>
 
 namespace nx {
@@ -26,99 +25,82 @@ namespace {
 
 static const nx::utils::log::Tag kLogTag(QString("FfmpegVideoDecoder"));
 
-QVideoFrame::PixelFormat toQtPixelFormat(AVPixelFormat pixFormat)
+QVideoFrameFormat::PixelFormat toQtPixelFormat(AVPixelFormat pixFormat)
 {
     switch (pixFormat)
     {
         case AV_PIX_FMT_YUV420P:
         case AV_PIX_FMT_YUVJ420P:
-            return QVideoFrame::Format_YUV420P;
+            return QVideoFrameFormat::Format_YUV420P;
         case AV_PIX_FMT_BGRA:
-            return QVideoFrame::Format_BGRA32;
+            return QVideoFrameFormat::Format_BGRA8888;
         case AV_PIX_FMT_NV12:
-            return QVideoFrame::Format_NV12;
+            return QVideoFrameFormat::Format_NV12;
         default:
-            return QVideoFrame::Format_Invalid;
+            return QVideoFrameFormat::Format_Invalid;
     }
 }
 
 } // namespace
 
-class AvFrameMemoryBufferPrivate: public QAbstractVideoBufferPrivate
-{
-public:
-    AVFrame* frame;
-    QAbstractVideoBuffer::MapMode mapMode;
-public:
-    AvFrameMemoryBufferPrivate(AVFrame* _frame):
-        QAbstractVideoBufferPrivate(),
-        frame(_frame),
-        mapMode(QAbstractVideoBuffer::NotMapped)
-    {
-    }
-
-    virtual ~AvFrameMemoryBufferPrivate()
-    {
-        av_frame_free(&frame);
-    }
-
-    virtual int map(
-        QAbstractVideoBuffer::MapMode /*mode*/,
-        int* numBytes,
-        int linesize[4],
-        uchar* data[4]) override
-    {
-        int planes = 0;
-        *numBytes = 0;
-
-        const AVPixFmtDescriptor* descr = av_pix_fmt_desc_get((AVPixelFormat)frame->format);
-
-        for (int i = 0; i < 4 && frame->data[i]; ++i)
-        {
-            ++planes;
-            data[i] = frame->data[i];
-            linesize[i] = frame->linesize[i];
-
-            int bytesPerPlane = linesize[i] * frame->height;
-            if (i > 0)
-            {
-                bytesPerPlane >>= descr->log2_chroma_h + descr->log2_chroma_w;
-                bytesPerPlane *= descr->comp->step;
-            }
-            *numBytes += bytesPerPlane;
-        }
-        return planes;
-    }
-};
 
 class AvFrameMemoryBuffer: public QAbstractVideoBuffer
 {
-    Q_DECLARE_PRIVATE(AvFrameMemoryBuffer)
 public:
     AvFrameMemoryBuffer(AVFrame* frame):
-        QAbstractVideoBuffer(
-            *(new AvFrameMemoryBufferPrivate(frame)),
-            NoHandle)
+        QAbstractVideoBuffer(QVideoFrame::NoHandle),
+        m_frame(frame)
     {
     }
 
-    virtual MapMode mapMode() const override
+    virtual ~AvFrameMemoryBuffer()
     {
-        return d_func()->mapMode;
+        av_frame_free(&m_frame);
     }
 
-    virtual uchar* map(MapMode /*mode*/, int *numBytes, int *bytesPerLine) override
+    virtual QVideoFrame::MapMode mapMode() const override
     {
-        Q_D(AvFrameMemoryBuffer);
-        *bytesPerLine = d->frame->linesize[0];
-        AVPixelFormat pixFmt = (AVPixelFormat)d->frame->format;
-        *numBytes = av_image_get_buffer_size(pixFmt, d->frame->linesize[0], d->frame->height, /*align*/ 1);
-        return d->frame->data[0];
+        return m_mapMode;
+    }
+
+    virtual MapData map(QVideoFrame::MapMode mode) override
+    {
+        MapData data;
+
+        if (mode != QVideoFrame::ReadOnly)
+            return data;
+
+        m_mapMode = mode;
+
+        const auto pixelFormat = toQtPixelFormat((AVPixelFormat) m_frame->format);
+
+        int planes = 0;
+
+        for (int i = 0; i < 4 && m_frame->data[i]; ++i)
+        {
+            ++planes;
+            data.data[i] = m_frame->data[i];
+            data.bytesPerLine[i] = m_frame->linesize[i];
+            int bytesPerPlane = data.bytesPerLine[i] * m_frame->height;
+
+            if (i > 0 && pixelFormat == QVideoFrameFormat::Format_YUV420P)
+                bytesPerPlane /= 2;
+
+            data.size[i] = bytesPerPlane;
+        }
+        data.nPlanes = planes;
+
+        return data;
     }
 
     virtual void unmap() override
     {
+        m_mapMode = QVideoFrame::NotMapped;
     }
+
+private:
+    AVFrame* m_frame = nullptr;
+    QVideoFrame::MapMode m_mapMode = QVideoFrame::NotMapped;
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -328,7 +310,7 @@ int FfmpegVideoDecoder::decode(
 
     // Frame moved to the buffer. buffer keeps reference to a frame.
     QAbstractVideoBuffer* buffer;
-    if (qtPixelFormat != QVideoFrame::Format_Invalid)
+    if (qtPixelFormat != QVideoFrameFormat::Format_Invalid)
     {
         buffer = new AvFrameMemoryBuffer(d->frame);
         d->frame = av_frame_alloc();
@@ -342,7 +324,7 @@ int FfmpegVideoDecoder::decode(
         buffer = new AvFrameMemoryBuffer(newFrame);
     }
 
-    QVideoFrame* videoFrame = new QVideoFrame(buffer, frameSize, qtPixelFormat);
+    QVideoFrame* videoFrame = new QVideoFrame(buffer, {frameSize, qtPixelFormat});
     videoFrame->setStartTime(startTimeMs);
 
     outDecodedFrame->reset(videoFrame);
