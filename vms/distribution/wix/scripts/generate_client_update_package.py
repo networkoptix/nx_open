@@ -67,6 +67,7 @@ nx_libraries = [
     'nx_branding',
     'nx_build_info',
     'nx_monitoring',
+    'nx_vms_json_rpc',
     'vms_gateway_core',
     'udt',
     'qtkeychain'

@@ -1,5 +1,6 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
+add_subdirectory(nx_vms_json_rpc)
 add_subdirectory(nx_vms_update)
 
 if(withMediaServer OR withDesktopClient)

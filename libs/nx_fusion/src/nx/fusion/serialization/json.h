@@ -155,9 +155,9 @@ void serialize(
 {
     NX_ASSERT(outTarget);
 
-    QJsonValue jsonValue;
+    QJsonValue jsonValue(QJsonValue::Undefined);
     QJson::serialize(ctx, value, &jsonValue);
-    if (!jsonValue.isNull())
+    if (!jsonValue.isUndefined())
         (*outTarget)[key] = jsonValue;
 }
 

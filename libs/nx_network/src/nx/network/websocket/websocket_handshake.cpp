@@ -32,8 +32,12 @@ static nx::Buffer makeClientKey()
 
 static Error validateRequestLine(const nx::network::http::RequestLine& requestLine)
 {
-    if (requestLine.method != "GET" || requestLine.version < nx::network::http::http_1_1)
+    if ((requestLine.method != nx::network::http::Method::get
+            && requestLine.method != nx::network::http::Method::options)
+        || requestLine.version < nx::network::http::http_1_1)
+    {
         return Error::handshakeError;
+    }
 
     return Error::noError;
 }
