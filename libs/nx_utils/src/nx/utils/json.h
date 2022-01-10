@@ -116,13 +116,8 @@ inline bool getBool(
 inline QJsonObject optObject(
     const QJsonObject& object, const QString& key, const QString& assertMessage = {})
 {
-    if (const auto it = object.find(key); it != object.end())
-    {
-        QJsonObject result = asObject(it.value());
-        NX_ASSERT(!result.isEmpty(), "'%1' in %2 is empty (%3)", key, object, assertMessage);
-        return result;
-    }
-    return QJsonObject();
+    const auto it = object.find(key);
+    return it != object.end() ? asObject(it.value(), assertMessage) : QJsonObject();
 }
 
 inline QJsonObject optObject(
@@ -134,19 +129,27 @@ inline QJsonObject optObject(
 inline QJsonArray optArray(
     const QJsonObject& object, const QString& key, const QString& assertMessage = {})
 {
-    if (const auto it = object.find(key); it != object.end())
-    {
-        QJsonArray result = asArray(it.value());
-        NX_ASSERT(!result.isEmpty(), "'%1' in %2 is empty (%3)", key, object, assertMessage);
-        return result;
-    }
-    return QJsonArray();
+    const auto it = object.find(key);
+    return it != object.end() ? asArray(it.value(), assertMessage) : QJsonArray();
 }
 
 inline QJsonArray optArray(
     const QJsonValue& value, const QString& key, const QString& assertMessage = {})
 {
     return optArray(asObject(value, assertMessage), key, assertMessage);
+}
+
+inline QString optString(
+    const QJsonObject& object, const QString& key, const QString& assertMessage = {})
+{
+    const auto it = object.find(key);
+    return it != object.end() ? asString(it.value(), assertMessage) : QString();
+}
+
+inline QString optString(
+    const QJsonValue& value, const QString& key, const QString& assertMessage = {})
+{
+    return optString(asObject(value, assertMessage), key, assertMessage);
 }
 
 } // namespace json

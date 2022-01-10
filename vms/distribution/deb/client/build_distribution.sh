@@ -137,6 +137,7 @@ copyLibs()
         nx_vms_client_core
         nx_vms_client_desktop
         nx_vms_common
+        nx_vms_json_rpc
         nx_vms_rules
         nx_vms_update
         nx_vms_utils

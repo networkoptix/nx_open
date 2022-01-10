@@ -737,6 +737,12 @@ struct TestDataWithOptionalField
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(TestDataWithOptionalField, (json), (optionalField))
 
+struct OptionalJsonValue
+{
+    std::optional<QJsonValue> field;
+};
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(OptionalJsonValue, (json), (field))
+
 } // namespace
 
 class QnJsonBoostOptionalField:
@@ -774,6 +780,13 @@ TEST_F(QnJsonBoostOptionalField, deserialize_optional_field_not_present)
     const auto deserializedValue = QJson::deserialized<TestDataWithOptionalField>(json);
 
     ASSERT_FALSE(static_cast<bool>(deserializedValue.optionalField));
+}
+
+TEST_F(QnJsonBoostOptionalField, serialize_optional_json_value)
+{
+    ASSERT_EQ("{}", QJson::serialized(OptionalJsonValue{}).toStdString());
+    ASSERT_EQ(
+        "{\"field\":null}", QJson::serialized(OptionalJsonValue{QJsonValue()}).toStdString());
 }
 
 //-------------------------------------------------------------------------------------------------
