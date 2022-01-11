@@ -12,12 +12,11 @@
 namespace nx {
 namespace media {
 
-enum class DisplayHint
-{
+NX_REFLECTION_ENUM_CLASS(DisplayHint,
     regular, //< Regular frame.
     obsolete, //< Frame is obsolete because of seek or it's coarse frame.
     firstRegular //< First regular frame. No need to sleep before display it.
-};
+)
 
 /**
  * Contains addition information associated with every decoded frame.
@@ -41,6 +40,9 @@ struct FrameMetadata
 private:
     bool isNull() const;
 };
+
+#define FrameMetadata_Fields (flags)(displayHint)(frameNum)(sar)(videoChannel)(sequence)(dataType)
+NX_REFLECTION_INSTRUMENT(FrameMetadata, FrameMetadata_Fields)
 
 } // namespace media
 } // namespace nx

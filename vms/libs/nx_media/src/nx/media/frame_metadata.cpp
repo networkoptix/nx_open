@@ -2,6 +2,8 @@
 
 #include "frame_metadata.h"
 
+#include <nx/reflect/json.h>
+
 namespace nx {
 namespace media {
 
@@ -41,7 +43,7 @@ FrameMetadata::FrameMetadata(const QnEmptyMediaDataPtr& frame):
 void FrameMetadata::serialize(const QVideoFramePtr& frame) const
 {
     if (!isNull())
-        frame->setMetaData(kMetadataFlagsKey, QVariant::fromValue(*this));
+        frame->setSubtitleText(QString::fromStdString(nx::reflect::json::serialize(*this)));
 }
 
 FrameMetadata FrameMetadata::deserialize(const QnConstVideoFramePtr& frame)
@@ -49,8 +51,10 @@ FrameMetadata FrameMetadata::deserialize(const QnConstVideoFramePtr& frame)
     if (!frame)
         return FrameMetadata();
 
-    auto data = frame->metaData(kMetadataFlagsKey);
-    return data.canConvert<FrameMetadata>() ? data.value<FrameMetadata>() : FrameMetadata();
+    FrameMetadata metadata;
+    return nx::reflect::json::deserialize(frame->subtitleText().toStdString(), &metadata)
+        ? metadata
+        : FrameMetadata();
 }
 
 bool FrameMetadata::isNull() const

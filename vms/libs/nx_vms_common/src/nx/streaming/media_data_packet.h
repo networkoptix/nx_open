@@ -88,8 +88,7 @@ struct NX_VMS_COMMON_API QnAbstractMediaData: public QnAbstractDataPacket
 {
 
 public:
-    enum MediaFlag
-    {
+    NX_REFLECTION_ENUM_IN_CLASS(MediaFlag,
         MediaFlags_None                 = 0x00000,
         // KeyFrame, must be equal to AV_PKT_FLAG_KEY from avcodec.h,
         // checked via static_assert below.
@@ -128,21 +127,20 @@ public:
         MediaFlags_LiveOnly             = 0x40000,
 
         // Packets that can be pipelined with some delay from live
-        MediaFlags_Delayed              = 0x80000,
-    };
+        MediaFlags_Delayed              = 0x80000
+    )
 
     Q_DECLARE_FLAGS(MediaFlags, MediaFlag)
 
-    enum DataType
-    {
+    NX_REFLECTION_ENUM_IN_CLASS(DataType,
         UNKNOWN = -1,
         VIDEO = 0,
         AUDIO,
         CONTAINER,
         EMPTY_DATA,
         META_V1, //< Deprecated. Don't use it. Use MetadataType instead.
-        GENERIC_METADATA,
-    };
+        GENERIC_METADATA
+    )
 
 public:
     QnAbstractMediaData(DataType _dataType);
