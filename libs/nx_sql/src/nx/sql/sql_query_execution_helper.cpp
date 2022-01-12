@@ -41,7 +41,8 @@ QList<QByteArray> quotedSplit(const QByteArray& data)
 
 static bool validateParams(const QSqlQuery& query)
 {
-    for (const auto& value: query.boundValues().values())
+    const auto values = query.boundValues();
+    for (const auto& value: values)
     {
         if (!value.isValid())
             return false;
