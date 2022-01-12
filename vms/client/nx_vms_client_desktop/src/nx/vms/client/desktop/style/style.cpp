@@ -2457,10 +2457,10 @@ void Style::drawControl(ControlElement element,
                     int pos = sliderPositionFromValue(progressBar->minimum,
                         progressBar->maximum,
                         progressBar->progress,
-                        progressBar->orientation == Qt::Horizontal ? rect.width() : rect.height(),
+                        progressBar->state.testFlag(QStyle::State_Horizontal) ? rect.width() : rect.height(),
                         progressBar->invertedAppearance);
 
-                    if (progressBar->orientation == Qt::Horizontal)
+                    if (progressBar->state.testFlag(QStyle::State_Horizontal))
                     {
                         pos += rect.left();
                         if (progressBar->invertedAppearance)
@@ -3168,7 +3168,7 @@ QRect Style::subElementRect(
             {
                 if (qobject_cast<const QnDialog*>(buttonBox->parentWidget()))
                 {
-                    int margin = proxy()->pixelMetric(PM_DefaultTopLevelMargin);
+                    int margin = Metrics::kDefaultTopLevelMargin;
                     return Geometry::dilated(option->rect, margin);
                 }
             }
@@ -3189,7 +3189,7 @@ QRect Style::subElementRect(
                 const int kProgressBarWidth = 4;
                 QSize size = progressBar->rect.size();
 
-                if (progressBar->orientation == Qt::Horizontal)
+                if (progressBar->state.testFlag(QStyle::State_Horizontal))
                 {
                     size.setHeight(kProgressBarWidth);
                     return alignedRect(progressBar->direction,
@@ -3225,7 +3225,7 @@ QRect Style::subElementRect(
                 if (!progressBar->textVisible)
                     break;
 
-                if (progressBar->orientation == Qt::Horizontal)
+                if (progressBar->state.testFlag(QStyle::State_Horizontal))
                     return progressBar->rect.adjusted(0, 0, 0, -8);
                 else
                     return progressBar->rect.adjusted(8, 0, 0, 0);
@@ -3723,10 +3723,11 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption* option, const QWi
         case PM_DefaultFrameWidth:
             return 0;
 
-        case PM_DefaultTopLevelMargin:
-            return Metrics::kDefaultTopLevelMargin;
-        case PM_DefaultChildMargin:
-            return Metrics::kDefaultChildMargin;
+        // TODO: Qt6 replacement values for PM_DefaultTopLevelMargin and PM_DefaultChildMargin are the same.
+        // case PM_DefaultTopLevelMargin:
+        //     return Metrics::kDefaultTopLevelMargin;
+        // case PM_DefaultChildMargin:
+        //     return Metrics::kDefaultChildMargin;
 
         case PM_ExclusiveIndicatorWidth:
         case PM_ExclusiveIndicatorHeight:
@@ -3752,7 +3753,7 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption* option, const QWi
         case PM_LayoutTopMargin:
         {
             if (!widget)
-                return proxy()->pixelMetric(PM_DefaultChildMargin);
+                return Metrics::kDefaultChildMargin;
 
             if (qobject_cast<const QnDialog*>(widget)
                 || qobject_cast<const QDialogButtonBox*>(widget)) // button box has outer margins
@@ -3764,10 +3765,10 @@ int Style::pixelMetric(PixelMetric metric, const QStyleOption* option, const QWi
                 || qobject_cast<const QnDialog*>(widget->parentWidget())
                 || widget->isWindow() /*but not dialog*/)
             {
-                return proxy()->pixelMetric(PM_DefaultTopLevelMargin);
+                return Metrics::kDefaultTopLevelMargin;
             }
 
-            return proxy()->pixelMetric(PM_DefaultChildMargin);
+            return Metrics::kDefaultChildMargin;
         }
 
         case PM_LayoutHorizontalSpacing:
@@ -4186,7 +4187,7 @@ void Style::polish(QWidget* widget)
     if (qobject_cast<QMenu*>(widget))
     {
         widget->setAttribute(Qt::WA_TranslucentBackground);
-#ifdef Q_OS_WIN
+#if defined(Q_OS_WIN) || defined(Q_OS_MACOS)
         widget->setWindowFlags(widget->windowFlags() | Qt::FramelessWindowHint);
 #endif
         popupToCustomizeShadow = widget;

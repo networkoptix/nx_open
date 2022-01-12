@@ -88,9 +88,10 @@ QnUserRolesDialog::QnUserRolesDialog(QWidget* parent):
     scrollBar->setUseMaximumSpace(true);
     ui->userRolesTreeView->setVerticalScrollBar(scrollBar->proxyScrollBar());
 
-    int margin = style()->pixelMetric(QStyle::PM_DefaultTopLevelMargin);
+    const int leftMargin = style()->pixelMetric(QStyle::PM_LayoutLeftMargin);
+    const int rightMargin = style()->pixelMetric(QStyle::PM_LayoutRightMargin);
     ui->userRolesTreeView->setProperty(nx::style::Properties::kSideIndentation,
-        QVariant::fromValue(QnIndents(margin, margin)));
+        QVariant::fromValue(QnIndents(leftMargin, rightMargin)));
 
     m_model->setUserRoles(userRolesManager()->userRoles());
     ui->userRolesTreeView->setModel(m_model);
