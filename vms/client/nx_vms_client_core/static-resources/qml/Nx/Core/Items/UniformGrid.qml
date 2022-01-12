@@ -22,42 +22,6 @@ ShaderEffect
         lineSize / cellSize.x,
         lineSize / cellSize.y)
 
-    readonly property string precisionString:
-        OpenGLInfo.renderableType == OpenGLInfo.OpenGLES ? "precision highp float;" : ""
-
-    vertexShader: ShaderHelper.processSource(
-        precisionString + "
-
-        uniform vec2 cellSize;
-        uniform mat4 qt_Matrix;
-
-        attribute vec4 qt_Vertex;
-
-        varying vec2 cellCoords;
-
-        void main()
-        {
-            gl_Position = qt_Matrix * qt_Vertex;
-            cellCoords = qt_Vertex.xy / cellSize;
-        }")
-
-    fragmentShader: ShaderHelper.processSource(
-        precisionString + "
-
-        uniform vec4 color;
-        uniform vec2 lineSizeInCellCoords;
-        uniform float qt_Opacity;
-
-        varying vec2 cellCoords;
-
-        void main()
-        {
-            vec2 thisCell = floor(cellCoords);
-            vec2 prevCell = floor(cellCoords - lineSizeInCellCoords);
-
-            if (thisCell == prevCell)
-                discard;
-
-            gl_FragColor = color * qt_Opacity;
-        }")
+    vertexShader: "qrc:/qml/Nx/Core/Items/UniformGrid.vert.qsb"
+    fragmentShader: "qrc:/qml/Nx/Core/Items/UniformGrid.frag.qsb"
 }
