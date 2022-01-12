@@ -2,23 +2,49 @@
 
 import QtQuick 2.14
 
+import "tiles"
+
 Loader
 {
     id: loader
 
     property TileController tileController: null
 
-    source:
+    Component
+    {
+        id: separatorTile
+        SeparatorTile { }
+    }
+
+    Component
+    {
+        id: progressTile
+        ProgressTile { }
+    }
+
+    Component
+    {
+        id: briefTile
+        BriefTile { }
+    }
+
+    Component
+    {
+        id: infoTile
+        InfoTile { }
+    }
+
+    sourceComponent:
     {
         if (!model || !model.display)
-            return "tiles/SeparatorTile.qml"
+            return separatorTile
 
         if (model.progressValue !== undefined)
-            return "tiles/ProgressTile.qml"
+            return progressTile
 
         return brief
-            ? "tiles/BriefTile.qml"
-            : "tiles/InfoTile.qml"
+            ? briefTile
+            : infoTile
     }
 
     onVisibleChanged: model.visible = visible

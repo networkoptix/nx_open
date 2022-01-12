@@ -232,7 +232,7 @@ Item
             {
                 anchors.fill: parent
 
-                onPressed:
+                onPressed: mouse =>
                 {
                     scrollBar.focus = true
                     mouse.accepted = false

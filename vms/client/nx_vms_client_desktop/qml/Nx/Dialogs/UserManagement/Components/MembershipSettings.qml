@@ -6,7 +6,7 @@ import QtQuick.Layouts 1.15
 import QtQuick.Window 2.15
 import QtQuick.Shapes 1.15
 
-import QtGraphicalEffects 1.0
+import Qt5Compat.GraphicalEffects
 
 import Nx 1.0
 import Nx.Controls 1.0
@@ -74,49 +74,61 @@ Item
             anchors.leftMargin: 10
             anchors.right: parent.right
 
-            CheckBox
+            Item
             {
-                id: groupCheckbox
+                width: groupCheckbox.width
+                height: groupCheckbox.height
 
-                checked: model[control.editableProperty]
+                CheckBox
+                {
+                    id: groupCheckbox
 
-                baselineOffset: checkboxText.baselineOffset + checkboxText.y
+                    checked: model[control.editableProperty]
 
-                // Setting 'hovered' property leads to QML crash.
+                    baselineOffset: checkboxText.baselineOffset + checkboxText.y
+                }
+
+                // Setting 'hovered' property of groupCheckbox leads to QML crash.
                 ColorOverlay
                 {
-                    anchors.fill: parent
-                    source: parent
+                    anchors.fill: groupCheckbox
+                    source: groupCheckbox
                     color: checkableItem.selectedColor
                 }
             }
 
-            Image
+            Item
             {
-                id: groupImage
-
                 Layout.alignment: Qt.AlignVCenter
 
-                width: 20
-                height: 20
+                width: groupImage.width
+                height: groupImage.height
 
-                source:
+                Image
                 {
-                    if (model.isUser)
-                        return "image://svg/skin/user_settings/user_local.svg"
+                    id: groupImage
 
-                    if (model.groupSection == "B")
-                        return "image://svg/skin/user_settings/group_built_in.svg"
-                    else
-                        return "image://svg/skin/user_settings/group_custom.svg"
+                    width: 20
+                    height: 20
+
+                    source:
+                    {
+                        if (model.isUser)
+                            return "image://svg/skin/user_settings/user_local.svg"
+
+                        if (model.groupSection == "B")
+                            return "image://svg/skin/user_settings/group_built_in.svg"
+                        else
+                            return "image://svg/skin/user_settings/group_custom.svg"
+                    }
+
+                    sourceSize: Qt.size(width, height)
                 }
-
-                sourceSize: Qt.size(width, height)
 
                 ColorOverlay
                 {
-                    anchors.fill: parent
-                    source: parent
+                    anchors.fill: groupImage
+                    source: groupImage
                     color: checkableItem.selectedColor
                 }
             }

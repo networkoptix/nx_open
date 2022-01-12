@@ -231,7 +231,7 @@ FocusScope
             readonly property var optimizedSelectedIndexes: Array.prototype.map.call(
                 // Convert selectedIndexes to QVariantList to avoid huge performance loss.
                 NxGlobals.toVariantList(selectedIndexes),
-                NxGlobals.toPersistent)
+                index => NxGlobals.toPersistent(index))
 
             onOptimizedSelectedIndexesChanged:
             {
@@ -523,7 +523,7 @@ FocusScope
                         }
                     }
 
-                    onPressed:
+                    onPressed: (mouse) =>
                     {
                         listView.justGotFocus = !treeView.focus
                         treeView.focus = true
@@ -574,7 +574,7 @@ FocusScope
                         }
                     }
 
-                    onReleased:
+                    onReleased: (mouse) =>
                     {
                         const justGotFocus = listView.justGotFocus
                         listView.justGotFocus = false

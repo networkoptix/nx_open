@@ -83,7 +83,7 @@ Item
     {
         target: d
         property: "relevantChildren"
-        value: Array.prototype.filter.call(visibleChildren, NxGlobals.isRelevantForPositioners)
+        value: Array.prototype.filter.call(visibleChildren, child => NxGlobals.isRelevantForPositioners(child))
         when: column.visible
         restoreMode: Binding.RestoreNone
     }

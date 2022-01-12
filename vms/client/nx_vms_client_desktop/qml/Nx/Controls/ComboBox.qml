@@ -66,7 +66,8 @@ ComboBox
 
     background: backgroundLoader.item
 
-    pressed: hoverArea.pressed
+    // TODO: Qt6 'pressed' is readonly
+    //pressed: hoverArea.pressed
 
     // Cancel current edit if an item is re-selected from the popup.
     onActivated: editText = textAt(index)

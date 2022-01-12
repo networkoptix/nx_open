@@ -407,7 +407,7 @@ Item
             id: authDataAccessor
             model: openedTileItem.authenticationDataModel
 
-            onDataChanged:
+            onDataChanged: (startRow, endRow) =>
             {
                 if (startRow !== loginChooseItem.currentIndex)
                     return //< Do not update if it is not current item.
