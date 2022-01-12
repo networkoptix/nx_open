@@ -76,7 +76,7 @@ WidgetTable::Private::Private(WidgetTable* q):
     m_container(new QWidget(q)),
     m_layoutTimer(new QTimer(this)),
     m_headerProxyView(new HeaderProxyView(this, q)),
-    m_headerPadding(q->style()->pixelMetric(QStyle::PM_DefaultLayoutSpacing)),
+    m_headerPadding(q->style()->pixelMetric(QStyle::PM_LayoutVerticalSpacing)),
     m_rowSpacing(m_headerPadding)
 {
     q->setWidget(m_container);
