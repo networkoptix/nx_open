@@ -10,8 +10,8 @@ TabBar
 {
     id: tabBar
 
-    property alias bottomBorderColor: tabBar.palette.dark
-    property alias color: tabBar.palette.base
+    property color bottomBorderColor: ColorTheme.colors.dark10
+    property color color: "transparent"
 
     readonly property var fullWidth: tabBar.contentWidth + tabBar.leftPadding + tabBar.rightPadding
 
@@ -94,8 +94,8 @@ TabBar
         buttonText: ColorTheme.colors.light12
         brightText: ColorTheme.colors.light10
         highlightedText: ColorTheme.colors.brand_core
-        base: "transparent"
-        dark: ColorTheme.colors.dark10
+        base: tabBar.color
+        dark: bottomBorderColor
         mid: ColorTheme.colors.dark12
     }
 
