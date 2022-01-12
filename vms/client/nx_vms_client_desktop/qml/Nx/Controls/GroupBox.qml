@@ -2,7 +2,7 @@
 
 import QtQuick 2.11
 import QtQuick.Controls 2.0
-import QtGraphicalEffects 1.0
+import Qt5Compat.GraphicalEffects
 import Nx 1.0
 
 GroupBox

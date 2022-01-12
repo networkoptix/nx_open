@@ -291,7 +291,7 @@ Rectangle
         alignToCenter: !welcomeScreen.complexVisibilityMode
         hideActionEnabled: welcomeScreen.complexVisibilityMode
         onTileClicked: context.setGlobalPreloaderEnabled(false)
-        onLockInterface: globalInterfaceLock.enabled = locked
+        onLockInterface: locked => { globalInterfaceLock.enabled = locked }
 
         TileGridPlaceholder
         {

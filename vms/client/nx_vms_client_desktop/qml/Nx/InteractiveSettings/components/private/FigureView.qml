@@ -1,7 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick 2.6
-import QtGraphicalEffects 1.0
+import Qt5Compat.GraphicalEffects
 
 import Nx 1.0
 import Nx.Controls 1.0

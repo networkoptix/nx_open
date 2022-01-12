@@ -3,7 +3,7 @@
 import QtQuick 2.15
 import QtQuick.Layouts 1.15
 
-import QtGraphicalEffects 1.0
+import Qt5Compat.GraphicalEffects
 
 import Nx 1.0
 import Nx.Controls 1.0
@@ -64,21 +64,27 @@ Item
             visible: !treeItem.isTopLevel
         }
 
-        Image
+        Item
         {
             Layout.alignment: Qt.AlignVCenter
 
-            id: groupImage
-            width: 20
-            height: 20
+            width: groupImage.width
+            height: groupImage.height
 
-            source: treeItem.iconSource
-            sourceSize: Qt.size(width, height)
+            Image
+            {
+                id: groupImage
+                width: 20
+                height: 20
+
+                source: treeItem.iconSource
+                sourceSize: Qt.size(width, height)
+            }
 
             ColorOverlay
             {
-                anchors.fill: parent
-                source: parent
+                anchors.fill: groupImage
+                source: groupImage
                 color: treeItem.textColor
             }
         }

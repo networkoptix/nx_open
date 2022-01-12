@@ -2,7 +2,7 @@
 
 import QtQuick 2.11
 import QtQuick.Controls 2.4
-import QtGraphicalEffects 1.0
+import Qt5Compat.GraphicalEffects
 
 import Nx 1.0
 import Nx.Models 1.0
@@ -533,7 +533,7 @@ Button
 
             onCustomHostTextChanged: updateOutputProperties()
             onIndexChanged: updateOutputProperties()
-            onDataChanged:
+            onDataChanged: (startRow, endRow) =>
             {
                 if (startRow == 0)
                     index = 0
@@ -659,7 +659,6 @@ Button
 
         visible: opacity > 0
         radius: 24
-        samples: 24
         color: ColorTheme.shadow
         source: background
     }

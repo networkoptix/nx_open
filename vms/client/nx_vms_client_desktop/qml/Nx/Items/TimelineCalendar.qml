@@ -1,8 +1,7 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 import QtQuick 2.15
-import QtQuick.Controls 2.0
-import Qt.labs.calendar 1.0
+import QtQuick.Controls
 
 import Nx 1.0
 import Nx.Controls 1.0

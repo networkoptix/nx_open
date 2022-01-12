@@ -63,10 +63,10 @@ TreeView
             || filterType == ResourceTree.FilterType.localFiles
     }
 
-    onContextMenuRequested:
+    onContextMenuRequested: (globalPos, modelIndex, selection) =>
         resourceTreeModel.showContextMenu(globalPos, modelIndex, selection)
 
-    onActivated:
+    onActivated: (modelIndex, selection, activationType, modifiers) =>
         resourceTreeModel.activateItem(modelIndex, selection, activationType, modifiers)
 
     model: ResourceTreeModel

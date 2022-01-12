@@ -41,5 +41,9 @@ NavigationMenu
     }
 
     signal currentIndexChanged(int idx)
-    onItemClicked: currentIndexChanged(item.idx)
-}
+
+    function onItemClicked(item)
+    {
+        currentIndexChanged(item.idx)
+    }
+} 

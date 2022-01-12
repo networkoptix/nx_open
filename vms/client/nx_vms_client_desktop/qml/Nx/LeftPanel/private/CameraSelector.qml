@@ -112,7 +112,7 @@ SelectableTextButton
         PlatformMenuSeparator {}
         MenuAction { id: defaultAction; data: RightPanel.CameraSelection.all }
 
-        onTriggered:
+        onTriggered: action =>
         {
             if (!setup)
                 return

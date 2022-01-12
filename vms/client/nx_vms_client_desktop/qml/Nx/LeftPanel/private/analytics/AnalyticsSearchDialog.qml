@@ -360,7 +360,7 @@ Window
                         ? RightPanelGlobals.VideoPreviewMode.none
                         : RightPanelGlobals.VideoPreviewMode.selection
 
-                    onClicked:
+                    onClicked: row =>
                     {
                         eventGrid.forceActiveFocus()
 
