@@ -31,6 +31,7 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QNetworkRequest>
 #include <QtOpenGLWidgets/QOpenGLWidget>
+#include <QtQuickControls2/QQuickStyle>
 #include <QtWidgets/QApplication>
 
 #if defined(Q_OS_WIN)
@@ -332,6 +333,10 @@ int runApplication(int argc, char** argv)
     win32_exception::installGlobalUnhandledExceptionHandler();
 #endif
 
+    // TODO: Qt6 workaround for broken macOS style of QuickControls2.
+    // https://forum.qt.io/topic/131823/lots-of-typeerrors-in-console-when-migrating-to-qt6/5
+    // https://bugreports.qt.io/browse/QTBUG-98098
+    QQuickStyle::setStyle("Basic");
     initQmlGlyphCacheWorkaround();
 
     nx::utils::rlimit::setMaxFileDescriptors(8000);
