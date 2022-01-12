@@ -9,7 +9,8 @@
 
 #include <QtGui/QImage>
 
-#include <QtQuick/QSGSimpleMaterialShader>
+#include <QtQuick/QSGMaterial>
+#include <QtQuick/QSGMaterialShader>
 
 #include <nx/vms/client/core/motion/motion_grid.h>
 
@@ -67,24 +68,46 @@ private:
     {
         QSize resolution;
         QColor borderColor = Qt::black;
-        qreal fillOpacity = 0.1;
+        float fillOpacity = 0.1;
         QSharedPointer<QSGTexture> texture;
+
+        bool dirty = true;
 
         bool operator==(const State& other) const;
         bool operator!=(const State& other) const;
     };
 
-    class Shader: public QSGSimpleMaterialShader<State>
+    class Shader: public QSGMaterialShader
     {
-        QSG_DECLARE_SIMPLE_SHADER(Shader, State)
-
     public:
-        virtual const char* vertexShader() const override;
-        virtual const char* fragmentShader() const override;
+        Shader();
 
-        virtual QList<QByteArray> attributes() const override;
-        virtual void updateState(const State* newState, const State* oldState) override;
-        virtual void resolveUniforms() override;
+        bool updateUniformData(
+            RenderState& state,
+            QSGMaterial* newMaterial,
+            QSGMaterial* oldMaterial) override;
+
+        void updateSampledImage(
+            QSGMaterialShader::RenderState& state,
+            int binding,
+            QSGTexture** texture,
+            QSGMaterial* newMaterial,
+            QSGMaterial* oldMaterial) override;
+    };
+
+    class Material: public QSGMaterial
+    {
+    public:
+        Material();
+        QSGMaterialType* type() const override;
+        int compare(const QSGMaterial *other) const override;
+
+        QSGMaterialShader* createShader(QSGRendererInterface::RenderMode) const override
+        {
+            return new Shader();
+        }
+
+        State uniforms;
     };
 
     struct LabelData
