@@ -194,7 +194,7 @@ QSGNode* MotionRegionsItem::Private::updatePaintNode(QSGNode* node)
             new QSGGeometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 4));
         geometryNode->geometry()->setDrawingMode(GL_TRIANGLE_STRIP);
         geometryNode->setFlags(QSGNode::OwnsGeometry | QSGNode::OwnsMaterial);
-        geometryNode->setMaterial(Shader::createMaterial());
+        geometryNode->setMaterial(new Material());
         geometryNode->material()->setFlag(QSGMaterial::Blending);
         node = geometryNode;
     }
@@ -223,10 +223,11 @@ QSGNode* MotionRegionsItem::Private::updatePaintNode(QSGNode* node)
 
     updateLabelsNode(geometryNode, resized || m_labelsDirty);
 
-    auto& currentState = *static_cast<QSGSimpleMaterial<State>*>(geometryNode->material())->state();
+    auto& currentState = static_cast<Material*>(geometryNode->material())->uniforms;
     if (currentState != m_currentState)
     {
         currentState = m_currentState;
+        currentState.dirty = true;
         geometryNode->markDirty(QSGNode::DirtyMaterial);
     }
 
@@ -591,82 +592,123 @@ bool MotionRegionsItem::Private::State::operator!=(const State& other) const
 //-------------------------------------------------------------------------------------------------
 // MotionRegionsItem::Private::Shader
 
-const char* MotionRegionsItem::Private::Shader::vertexShader() const
+MotionRegionsItem::Private::Shader::Shader()
 {
-    static const QByteArray shader(core::graphics::ShaderHelper::modernizeShaderSource(R"GLSL(
-        attribute vec4 vertex;
-        attribute vec2 texCoord;
-
-        uniform mat4 qt_Matrix;
-
-        varying vec2 uv;
-
-        void main()
-        {
-            gl_Position = qt_Matrix * vertex;
-            uv = texCoord;
-        }
-    )GLSL"));
-    return shader.constData();
+    setShaderFileName(VertexStage, QLatin1String(":/shaders/qsb/motion_regions.vert.qsb"));
+    setShaderFileName(FragmentStage, QLatin1String(":/shaders/qsb/motion_regions.frag.qsb"));
 }
 
-const char* MotionRegionsItem::Private::Shader::fragmentShader() const
+static inline QVector4D colorToVec4(const QColor& c)
 {
-    static const QByteArray shader(core::graphics::ShaderHelper::modernizeShaderSource(R"GLSL(
-        uniform float qt_Opacity;
-        uniform float fillOpacity;
-        uniform sampler2D sourceTexture;
-        uniform vec4 borderColor;
-        uniform vec2 step;
-
-        varying vec2 uv;
-
-        void main()
-        {
-            vec4 colors[4];
-            colors[0] = texture2D(sourceTexture, uv);
-            colors[1] = texture2D(sourceTexture, uv - vec2(step.x, 0.0));
-            colors[2] = texture2D(sourceTexture, uv - step);
-            colors[3] = texture2D(sourceTexture, uv - vec2(0.0, step.y));
-
-            bool same = distance(colors[0], colors[1]) + distance(colors[0], colors[2])
-                + distance(colors[0], colors[3]) == 0.0;
-
-            bool boundary = (any(lessThan(uv, step)) || any(greaterThan(uv, vec2(1.0))))
-                && colors[0].a != 0.0;
-
-            gl_FragColor = ((same && !boundary) ? (colors[0] * fillOpacity) : vec4(borderColor))
-                * qt_Opacity;
-        }
-
-    )GLSL"));
-    return shader.constData();
+    return QVector4D(c.redF(), c.greenF(), c.blueF(), c.alphaF());
 }
 
-QList<QByteArray> MotionRegionsItem::Private::Shader::attributes() const
+bool MotionRegionsItem::Private::Shader::updateUniformData(
+    RenderState& state,
+    QSGMaterial* newMaterial,
+    QSGMaterial* oldMaterial)
 {
-    return {"vertex", "texCoord"};
+    bool changed = false;
+    QByteArray* buf = state.uniformData();
+    NX_ASSERT(buf->size() >= 96);
+
+    if (state.isMatrixDirty())
+    {
+        const QMatrix4x4 m = state.combinedMatrix();
+        memcpy(buf->data(), m.constData(), 64);
+        changed = true;
+    }
+
+    if (state.isOpacityDirty())
+    {
+        const float opacity = state.opacity();
+        memcpy(buf->data() + 64, &opacity, 4);
+        changed = true;
+    }
+
+    auto* material = static_cast<Material*>(newMaterial);
+
+    if (oldMaterial != newMaterial || material->uniforms.dirty)
+    {
+        memcpy(buf->data() + 68, &material->uniforms.fillOpacity, 4);
+
+        const QVector2D step(
+            1.0 / material->uniforms.resolution.width(),
+            1.0 / material->uniforms.resolution.height());
+        memcpy(buf->data() + 72, &step, 8);
+
+        const QVector4D borderColor = colorToVec4(material->uniforms.borderColor);
+        memcpy(buf->data() + 80, &borderColor, 16);
+
+        material->uniforms.dirty = false;
+        changed = true;
+    }
+
+    return changed;
 }
 
-void MotionRegionsItem::Private::Shader::updateState(
-    const State* newState, const State* /*oldState*/)
+void MotionRegionsItem::Private::Shader::updateSampledImage(
+    QSGMaterialShader::RenderState& state,
+    int binding,
+    QSGTexture** texture,
+    QSGMaterial* newMaterial,
+    QSGMaterial* oldMaterial)
 {
-    if (!newState->texture || !program()->isLinked())
+    if (binding != 1)
         return;
 
-    QOpenGLContext::currentContext()->functions()->glActiveTexture(GL_TEXTURE0);
-    newState->texture->bind();
+    NX_ASSERT(oldMaterial == nullptr || newMaterial->type() == oldMaterial->type());
 
-    program()->setUniformValue("borderColor", newState->borderColor);
-    program()->setUniformValue("fillOpacity", GLfloat(newState->fillOpacity));
-    program()->setUniformValue("step",
-        QVector2D(1.0 / newState->resolution.width(), 1.0 / newState->resolution.height()));
+    Material* tx = static_cast<Material*>(newMaterial);
+    QSGTexture* t = tx->uniforms.texture.get();
+
+    t->setHorizontalWrapMode(QSGTexture::ClampToEdge);
+    t->setVerticalWrapMode(QSGTexture::ClampToEdge);
+    t->setFiltering(QSGTexture::Nearest);
+
+    t->commitTextureOperations(state.rhi(), state.resourceUpdateBatch());
+    *texture = t;
 }
 
-void MotionRegionsItem::Private::Shader::resolveUniforms()
+MotionRegionsItem::Private::Material::Material()
 {
-    if (program()->isLinked())
-        program()->setUniformValue("sourceTexture", 0); //< GL_TEXTURE0.
+}
+
+QSGMaterialType* MotionRegionsItem::Private::Material::type() const
+{
+    static QSGMaterialType type;
+    return &type;
+}
+
+int MotionRegionsItem::Private::Material::compare(const QSGMaterial *other) const
+{
+    if (!other || type() != other->type())
+        return 0;
+
+    const auto otherMaterial = static_cast<const Material*>(other);
+
+    const qint64 diff =
+        uniforms.texture->comparisonKey() - otherMaterial->uniforms.texture->comparisonKey();
+
+    if (diff != 0)
+        return diff < 0 ? -1 : 1;
+
+    const QSize resolutionDiff = uniforms.resolution  - otherMaterial->uniforms.resolution;
+    if (!resolutionDiff.isNull())
+        return resolutionDiff.width() <= 0 ? -1 : 1;
+
+    const float opacityDiff = uniforms.fillOpacity - otherMaterial->uniforms.fillOpacity;
+    if (qFuzzyIsNull(opacityDiff) != 0.0)
+        return opacityDiff < 0 ? -1 : 1;
+
+    if (uniforms.borderColor != otherMaterial->uniforms.borderColor)
+    {
+        return otherMaterial->uniforms.borderColor.rgba() > uniforms.borderColor.rgba()
+            ? -1
+            : 1;
+    }
+
+    return otherMaterial == this ? 0 : 1;
 }
 
 } // namespace nx::vms::client::desktop
