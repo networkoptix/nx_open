@@ -10,7 +10,8 @@ find_package(Qt6
         QuickTemplates2
         WebEngineQuick
         WebEngineWidgets
-        Test)
+        Test
+        ShaderTools)
 
 find_package(hidapi REQUIRED)
 
@@ -143,6 +144,22 @@ nx_add_target(nx_vms_client_desktop LIBRARY
 nx_make_target_translatable(nx_vms_client_desktop)
 add_dependencies(nx_vms_client_desktop nx_vms_client_desktop_external_resources)
 add_dependencies(nx_vms_client_desktop bytedance_iconpark)
+
+file(GLOB_RECURSE shader_sources CONFIGURE_DEPENDS
+    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+    "qml/*.vert"
+    "qml/*.frag"
+    "shaders/qsb/*.vert"
+    "shaders/qsb/*.frag"
+)
+
+qt6_add_shaders(nx_vms_client_desktop "nx_vms_client_desktop_shaders"
+    BATCHABLE
+    PREFIX
+        "/"
+    FILES
+        ${shader_sources}
+)
 
 target_compile_definitions(nx_vms_client_desktop
     PRIVATE NX_VMS_CLIENT_DESKTOP_API=${API_EXPORT_MACRO}

@@ -1,6 +1,6 @@
 ## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-find_package(Qt6 COMPONENTS Multimedia Quick)
+find_package(Qt6 COMPONENTS Multimedia Quick ShaderTools)
 
 set(qt_helpers_root "${open_source_root}/artifacts/qt_helpers/src")
 file(GLOB_RECURSE qt_helpers_sources "${qt_helpers_root}/qt_helpers/*")
@@ -33,6 +33,21 @@ nx_make_target_translatable(nx_vms_client_core)
 target_compile_definitions(nx_vms_client_core
     PRIVATE NX_VMS_CLIENT_CORE_API=${API_EXPORT_MACRO}
     INTERFACE NX_VMS_CLIENT_CORE_API=${API_IMPORT_MACRO})
+
+file(GLOB_RECURSE shader_sources CONFIGURE_DEPENDS
+    RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+    "static-resources/qml/*.vert"
+    "static-resources/qml/*.frag"
+)
+qt6_add_shaders(nx_vms_client_core "nx_vms_client_core_shaders"
+    BATCHABLE
+    PREFIX
+        "/"
+    BASE
+        "static-resources"
+    FILES
+        ${shader_sources}
+)
 
 if(TARGET qtkeychain)
     target_link_libraries(nx_vms_client_core PRIVATE qtkeychain)
