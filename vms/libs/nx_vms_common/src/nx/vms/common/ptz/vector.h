@@ -199,9 +199,9 @@ inline nx::vms::common::ptz::Vector qBound(
 
     return nx::vms::common::ptz::Vector(
         pan,
-        qBound<float>(limits.minTilt, position.tilt, limits.maxTilt),
-        qBound<float>(limits.minRotation, position.rotation, limits.maxRotation),
-        qBound<float>(limits.minFov, position.zoom, limits.maxFov));
+        qBound((float) limits.minTilt, (float) position.tilt, (float) limits.maxTilt),
+        qBound((float) limits.minRotation, (float) position.rotation, (float) limits.maxRotation),
+        qBound((float) limits.minFov, (float) position.zoom, (float) limits.maxFov));
 }
 
 NX_VMS_COMMON_API nx::vms::common::ptz::Vector linearCombine(
