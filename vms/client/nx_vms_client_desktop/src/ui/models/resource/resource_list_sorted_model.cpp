@@ -26,17 +26,3 @@ bool QnResourceListSortedModel::lessThan(const QModelIndex& left, const QModelIn
 {
     return QnResourceCompareHelper::resourceLessThan(left, right, m_collator);
 }
-
-bool QnResourceListSortedModel::filterAcceptsRow(
-    int sourceRow,
-    const QModelIndex& sourceParent) const
-{
-    if (filterRegExp().patternSyntax() == QRegExp::FixedString
-        && resources::search_helper::isSearchStringValid(filterRegExp().pattern()))
-    {
-        const auto sourceIndex = sourceModel()->index(sourceRow, filterKeyColumn(), sourceParent);
-        if (const auto resource = sourceIndex.data(Qn::ResourceRole).value<QnResourcePtr>())
-            return resources::search_helper::matches(filterRegExp().pattern(), resource);
-    }
-    return base_type::filterAcceptsRow(sourceRow, sourceParent);
-}
