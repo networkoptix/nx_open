@@ -16,7 +16,6 @@ public:
 
 protected:
     virtual bool lessThan(const QModelIndex& left, const QModelIndex& right) const override;
-    virtual bool filterAcceptsRow(int sourceRow, const QModelIndex& sourceParent) const override;
 
 private:
     QCollator m_collator;
