@@ -869,8 +869,14 @@ void QnWorkbenchController::at_scene_keyReleased(QGraphicsScene* /*scene*/, QEve
 void QnWorkbenchController::at_scene_focusIn(QGraphicsScene* /*scene*/, QEvent* event)
 {
     // Prevent focus jumps when scene is focused.
-    QFocusEvent *focusEvent = static_cast<QFocusEvent *>(event);
-    *focusEvent = QFocusEvent(focusEvent->type(), Qt::OtherFocusReason);
+
+    // In Qt6 the copy operator is deleted for QFocusEvent.
+    struct MutableFocusEvent: QEvent
+    {
+        Qt::FocusReason m_reason;
+    };
+    static_assert(sizeof(QFocusEvent) == sizeof(MutableFocusEvent), "Wrong size of utility access class");
+    reinterpret_cast<MutableFocusEvent *>(event)->m_reason = Qt::OtherFocusReason;
 }
 
 void QnWorkbenchController::at_resizingStarted(QGraphicsView *, QGraphicsWidget *item, ResizingInfo *info) {
