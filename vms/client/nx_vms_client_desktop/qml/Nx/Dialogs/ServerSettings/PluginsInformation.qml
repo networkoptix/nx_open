@@ -29,7 +29,7 @@ Item
         {
             target: store
 
-            function onStateChanged()
+            function onStateModified()
             {
                 if (store.resourceId().isNull())
                     return
