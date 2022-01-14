@@ -106,6 +106,8 @@ struct NX_VMS_API BackupBitrateKey
             return day < other.day;
         return hour < other.hour;
     }
+
+    bool operator==(const BackupBitrateKey&) const = default;
 };
 #define BackupBitrateKey_Fields \
     (day) \
