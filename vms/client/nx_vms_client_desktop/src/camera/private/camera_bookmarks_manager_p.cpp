@@ -116,7 +116,6 @@ QnCameraBookmarksManagerPrivate::QueryInfo::QueryInfo()
     , requestTimer()
     , requestId(kInvalidRequestId)
 {
-    NX_ASSERT(false, "This functions is not to be used directly");
 }
 
 QnCameraBookmarksManagerPrivate::QueryInfo::QueryInfo(const QnCameraBookmarksQueryPtr &query)
