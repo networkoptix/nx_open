@@ -303,7 +303,6 @@ void WelcomeScreen::setMessage(const QString& message)
     update();
     repaint();
 
-    qApp->flush();
     qApp->sendPostedEvents();
 }
 
