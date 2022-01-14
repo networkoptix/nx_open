@@ -235,6 +235,7 @@ public:
 
 signals:
     void stateChanged(const CameraSettingsDialogState& state);
+    void stateModified(); //< Same as stateChanged() but without parameters.
 
 private:
     struct Private;

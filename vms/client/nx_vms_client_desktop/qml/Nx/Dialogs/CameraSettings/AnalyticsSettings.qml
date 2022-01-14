@@ -36,7 +36,7 @@ Item
     {
         target: store
 
-        function onStateChanged()
+        function onStateModified()
         {
             const resourceId = store.resourceId()
             if (resourceId.isNull())

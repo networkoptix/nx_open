@@ -28,7 +28,7 @@ Control
         {
             target: control.store
 
-            function onStateChanged()
+            function onStateModified()
             {
                 if (control.store.resourceId().isNull())
                     return

@@ -61,6 +61,10 @@ CameraSettingsDialogStore::CameraSettingsDialogStore(QObject* parent):
         {
             NX_VERBOSE(this, "State changed to: %1", nx::reflect::json::serialize(d->state));
         });
+
+    // Qt6 workaround for QML crash when passing a reference to move-only in signal parameter.
+    connect(this, &CameraSettingsDialogStore::stateChanged,
+        this, &CameraSettingsDialogStore::stateModified);
 }
 
 CameraSettingsDialogStore::~CameraSettingsDialogStore() = default;
