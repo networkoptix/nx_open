@@ -36,6 +36,7 @@
 #include <nx/vms/client/desktop/resource/resource_access_manager.h>
 #include <nx/vms/client/desktop/resource/resource_descriptor.h>
 #include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_target_provider.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
@@ -489,6 +490,8 @@ bool QnWorkbenchController::eventFilter(QObject* watched, QEvent* event)
             if (!widget->isSelected())
                 display()->scene()->clearSelection();
 
+            // Explicitely disabled actions cannot be triggered in Qt6.
+            menu()->action(action::RemoveLayoutItemFromSceneAction)->setEnabled(true);
             menu()->trigger(action::RemoveLayoutItemFromSceneAction, widget);
             event->ignore();
             return true;
