@@ -238,4 +238,9 @@ QString NxGlobalsObject::escapeRegExp(const QString& value) const
     return QRegularExpression::escape(value);
 }
 
+void NxGlobalsObject::invokeMethod(QObject* obj, const QString& methodName)
+{
+    QMetaObject::invokeMethod(obj, methodName.toLatin1().constData(), Qt::DirectConnection);
+}
+
 } // namespace nx::vms::client::core
