@@ -46,6 +46,9 @@ public:
 
     static const OutputRedirector& getInstance();
 
+    bool isStdoutRedirected() const { return m_isStdoutRedirected; }
+    bool isStderrRedirected() const { return m_isStderrRedirected; }
+
     /**
      * Call from anywhere in the code of the executable that links with this library.
      *
@@ -65,9 +68,11 @@ public:
      static void ensureOutputRedirection();
 
 protected: //< Intended for unit tests.
-    OutputRedirector();
-
-    static void redirectStdoutAndStderrIfNeeded(const char* overridingLogFilesDir = nullptr);
+    OutputRedirector(const char* overridingLogFilesDir = nullptr);
+    
+private:    
+    bool m_isStdoutRedirected = false;
+    bool m_isStderrRedirected = false;
 };
 
 } // namespace kit

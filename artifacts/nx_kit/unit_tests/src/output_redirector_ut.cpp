@@ -12,9 +12,11 @@
 
     #include <unistd.h>
 #endif
+
 #include <fstream>
 #include <string>
 #include <cstring>
+#include <memory>
 
 #include <nx/kit/utils.h>
 #include <nx/kit/test.h>
@@ -25,9 +27,9 @@ using namespace nx::kit;
 class OutputRedirectorAdapter: public OutputRedirector
 {
 public:
-    static void redirectStdoutAndStderrIfNeeded(const char *overridingLogFilesDir)
+    OutputRedirectorAdapter(const char* overridingLogFilesDir):
+        OutputRedirector(overridingLogFilesDir)
     {
-        OutputRedirector::redirectStdoutAndStderrIfNeeded(overridingLogFilesDir);
     }
 };
 
@@ -47,7 +49,7 @@ public:
         int stdoutFilenoBak = (stdoutFileno == -1) ? -1 : dup(stdoutFileno);
         int stderrFilenoBak = (stderrFileno == -1) ? -1 : dup(stderrFileno);
 
-        OutputRedirectorAdapter::redirectStdoutAndStderrIfNeeded(testDir.c_str());
+        outputRedirectorAdapter.reset(new OutputRedirectorAdapter(testDir.c_str()));
 
         nx::kit::test::verbose = true;
 
@@ -68,6 +70,8 @@ public:
     const std::string processName = nx::kit::utils::getProcessName();
     const std::string stdoutFilePath = testDir + processName + std::string("_stdout.log");
     const std::string stderrFilePath = testDir + processName + std::string("_stderr.log");
+    
+    std::unique_ptr<const OutputRedirectorAdapter> outputRedirectorAdapter;
 };
 
 /**
@@ -79,8 +83,12 @@ static OutputRedirectorTest outputRedirectorTest;
 
 TEST(outputRedirector, check)
 {
-    //< Test output already performed during static initialization, so we need only to check its consequences.
+    ASSERT_TRUE(outputRedirectorTest.outputRedirectorAdapter->isStdoutRedirected());
+    ASSERT_TRUE(outputRedirectorTest.outputRedirectorAdapter->isStderrRedirected());
 
+    // Test output already performed during the static initialization in the constructor of
+    // OutputRedirectorTest, so we need only to check its consequences.
+    
     std::ifstream stdoutLogStream(outputRedirectorTest.stdoutFilePath);
     std::ifstream stderrLogStream(outputRedirectorTest.stderrFilePath);
 
