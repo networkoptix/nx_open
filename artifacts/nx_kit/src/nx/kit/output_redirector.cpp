@@ -18,14 +18,9 @@
 namespace nx {
 namespace kit {
 
-static void redirectOutput(FILE* stream, const char* streamName, const std::string& filename);
+static bool redirectOutput(FILE* stream, const char* streamName, const std::string& filename);
 
 static bool fileExists(const std::string& filePath);
-
-OutputRedirector::OutputRedirector()
-{
-    redirectStdoutAndStderrIfNeeded();
-}
 
 /*static*/ void OutputRedirector::ensureOutputRedirection()
 {
@@ -33,43 +28,42 @@ OutputRedirector::OutputRedirector()
     // static initialization for this library.
 }
 
-/*static*/ const OutputRedirector& OutputRedirector::getInstance()
+const OutputRedirector& OutputRedirector::getInstance()
 {
     static const OutputRedirector redirector;
 
     return redirector;
 }
 
-/*static*/ void OutputRedirector::redirectStdoutAndStderrIfNeeded(
-    const char* overridingLogFilesDir /*= nullptr*/)
+OutputRedirector::OutputRedirector(const char* overridingLogFilesDir /*= nullptr*/)
 {
-    const std::string logFilesDir =
-        overridingLogFilesDir ? overridingLogFilesDir : nx::kit::IniConfig::iniFilesDir();
+    #if !defined(NX_OUTPUT_REDIRECTOR_DISABLED)
+        const std::string logFilesDir =
+            overridingLogFilesDir ? overridingLogFilesDir : nx::kit::IniConfig::iniFilesDir();
 
-    const std::string processName = nx::kit::utils::getProcessName();
+        const std::string processName = nx::kit::utils::getProcessName();
 
-    static const std::string kStdoutFilename = processName + "_stdout.log";
-    static const std::string kStderrFilename = processName + "_stderr.log";
+        static const std::string kStdoutFilename = processName + "_stdout.log";
+        static const std::string kStderrFilename = processName + "_stderr.log";
 
-    if (fileExists(logFilesDir + kStdoutFilename))
-        redirectOutput(stdout, "stdout", logFilesDir + kStdoutFilename);
+        if (fileExists(logFilesDir + kStdoutFilename))
+            m_isStdoutRedirected = redirectOutput(stdout, "stdout", logFilesDir + kStdoutFilename);
 
-    if (fileExists(logFilesDir + kStderrFilename))
-        redirectOutput(stderr, "stderr", logFilesDir + kStderrFilename);
+        if (fileExists(logFilesDir + kStderrFilename))
+            m_isStderrRedirected = redirectOutput(stderr, "stderr", logFilesDir + kStderrFilename);
+    #endif
 }
 
-#if !defined(NX_OUTPUT_REDIRECTOR_DISABLED)
-    /** The redirection is performed by this static initialization. */
-    const OutputRedirector& unused_OutputRedirector = OutputRedirector::getInstance();
-#endif
+/** The redirection is performed by this static initialization. */
+const OutputRedirector& unused_OutputRedirector = OutputRedirector::getInstance();
 
-static void redirectOutput(FILE* stream, const char* streamName, const std::string& filename)
+static bool redirectOutput(FILE* stream, const char* streamName, const std::string& filename)
 {
     if (!freopen(filename.c_str(), "w", stream))
     {
         fprintf(stderr, "ERROR: Unable to perform redirection of %s to %s\n",
             streamName, filename.c_str());
-        return;
+        return false;
     }
 
     const std::string processName = nx::kit::utils::getProcessName();
@@ -78,6 +72,8 @@ static void redirectOutput(FILE* stream, const char* streamName, const std::stri
         streamName,
         nx::kit::utils::toString(processName).c_str(),
         nx::kit::utils::toString(filename).c_str());
+        
+    return true;
 }
 
 static bool fileExists(const std::string& filePath)
