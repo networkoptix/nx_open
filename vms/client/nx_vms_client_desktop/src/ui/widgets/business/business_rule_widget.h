@@ -17,7 +17,6 @@
 #include <ui/workbench/workbench_context_aware.h>
 
 
-class QStateMachine;
 class QStandardItemModel;
 
 namespace nx::vms::client::desktop {
