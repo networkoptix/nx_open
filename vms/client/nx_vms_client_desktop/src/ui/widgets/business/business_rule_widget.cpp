@@ -4,8 +4,6 @@
 #include "ui_business_rule_widget.h"
 
 #include <QtCore/QScopedValueRollback>
-#include <QtStateMachine/QStateMachine>
-#include <QtStateMachine/QState>
 #include <QtCore/QPropertyAnimation>
 #include <QtCore/QParallelAnimationGroup>
 
