@@ -130,7 +130,9 @@ void DirectorWebserver::processRequest(QtHttpRequest* request, QtHttpReply* repl
 {
     static QMimeDatabase mimeDatabase;
 
-    auto requestPath = request->getUrl().path();
+    const auto url = request->getUrl();
+
+    auto requestPath = url.path();
     if (requestPath == "/")
         requestPath = "/director/index.html";
 
@@ -144,7 +146,8 @@ void DirectorWebserver::processRequest(QtHttpRequest* request, QtHttpReply* repl
         return;
     }
 
-    if (request->getRawData().isEmpty())
+    // If there is neither GET nor POST query data then just serve a file from resources.
+    if (!url.hasQuery() && request->getRawData().isEmpty())
     {
         const QString filePath = ":" + requestPath;
         QFile file(filePath);
