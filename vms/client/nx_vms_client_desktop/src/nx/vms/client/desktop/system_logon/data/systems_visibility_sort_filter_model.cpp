@@ -185,11 +185,11 @@ bool SystemsVisibilitySortFilterModel::filterAcceptsRow(
     if (d->systemIsForgotten(sourceIndex.data(QnSystemsModel::SystemIdRoleId).toString()))
         return false;
 
-    if (filterRegExp().pattern().isEmpty())
+    if (filterRegularExpression().pattern().isEmpty())
         return !isHidden(sourceIndex);
 
     const auto fieldData = sourceModel()->index(sourceRow, 0).data(filterRole()).toString();
-    return fieldData.contains(filterRegExp().pattern(), filterCaseSensitivity());
+    return filterRegularExpression().match(fieldData).hasMatch();
 }
 
 bool SystemsVisibilitySortFilterModel::lessThan(
