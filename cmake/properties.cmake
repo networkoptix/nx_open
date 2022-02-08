@@ -17,11 +17,6 @@ if(customization.mobile.enabled)
     set(build_mobile ON)
 endif()
 
-if(customization.desktop.supportsVmax)
-    # Temporary solution until generic one is implemented.
-    set(include_dw_edge_analytics_plugin true)
-endif()
-
 # shortCloudName can be overridden with full name in the customization package.
 set(shortCloudName "Cloud")
 if(customization.advanced.useFullCloudNameEverywhere)
