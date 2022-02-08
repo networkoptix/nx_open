@@ -3,8 +3,10 @@
 #pragma once
 
 #include <fstream>
+#include <future>
+
+#include <nx/utils/log/log_level.h>
 #include <nx/utils/thread/mutex.h>
-#include "log_level.h"
 
 namespace nx {
 namespace utils {
@@ -38,7 +40,13 @@ private:
 class NX_UTILS_API File: public AbstractWriter
 {
 public:
+    static constexpr char kExtensionWithSeparator[] = ".log";
+    static constexpr char kTmpExtensionWithSeparator[] = ".log.tmp";
+    static constexpr char kRotateExtensionWithSeparator[] = ".log.zip";
+    static constexpr char kRotateTmpExtensionWithSeparator[] = ".log.zip.tmp";
+
     static QString makeFileName(QString fileName, size_t backupNumber);
+    static QString makeBaseFileName(QString path);
 
     struct Settings
     {
@@ -55,12 +63,17 @@ public:
 
 private:
     bool openFile();
-    void rotateIfNeeded();
+    void rotateIfNeeded(nx::Locker<nx::Mutex>* lock);
+    void archiveLeftOvers(nx::Locker<nx::Mutex>* lock);
+    bool needToArchive(nx::Locker<nx::Mutex>* lock);
+    void archive(QString fileName, QString archiveName);
 
 private:
     Settings m_settings;
     nx::Mutex m_mutex;
     std::fstream m_file;
+    std::future<void> m_archive;
+    int m_archiveQueue = 0;
 };
 
 /**

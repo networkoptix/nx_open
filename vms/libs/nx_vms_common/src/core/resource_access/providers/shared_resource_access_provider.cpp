@@ -47,14 +47,14 @@ bool SharedResourceAccessProvider::calculateAccess(const QnResourceAccessSubject
     {
         if (!layout->isShared())
         {
-            NX_VERBOSE(nx::log::kPermissionsTag.join(this), "%1 is not shared, ignore it",
+            NX_VERBOSE(this, "%1 is not shared, ignore it",
                 layout->getName());
             return false;
         }
     }
     else if (!isMediaResource(resource))
     {
-        NX_VERBOSE(nx::log::kPermissionsTag.join(this), "%1 has invalid type, ignore it",
+        NX_VERBOSE(this, "%1 has invalid type, ignore it",
             resource->getName());
         return false;
     }
@@ -62,7 +62,7 @@ bool SharedResourceAccessProvider::calculateAccess(const QnResourceAccessSubject
     bool result =
         m_context->sharedResourcesManager()->hasSharedResource(subject, resource->getId());
 
-    NX_VERBOSE(nx::log::kPermissionsTag.join(this), "update access %1 to %2: %3",
+    NX_VERBOSE(this, "update access %1 to %2: %3",
         subject.name(), resource->getName(), result);
 
     return result;
@@ -101,12 +101,12 @@ void SharedResourceAccessProvider::handleSharedResourcesChanged(
     {
         if (newValues.contains(resource->getId()))
         {
-            NX_VERBOSE(nx::log::kPermissionsTag.join(this), "%1 shared to %2",
+            NX_VERBOSE(this, "%1 shared to %2",
                 resource->getName(), subjectName);
         }
         else
         {
-            NX_VERBOSE(nx::log::kPermissionsTag.join(this), "%1 no more shared to %2",
+            NX_VERBOSE(this, "%1 no more shared to %2",
                 resource->getName(),
                 subjectName);
         }

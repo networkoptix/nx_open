@@ -10,16 +10,12 @@ namespace nx::log {
 NX_REFLECTION_ENUM_CLASS(LogName,
     main,
     http,
-    transaction,
-    system,
-    permissions
+    system
 );
 
 extern const NX_UTILS_API nx::utils::log::Tag kMainTag;
 extern const NX_UTILS_API nx::utils::log::Tag kHttpTag;
-extern const NX_UTILS_API nx::utils::log::Tag kTransactionTag;
 extern const NX_UTILS_API nx::utils::log::Tag kSystemTag;
-extern const NX_UTILS_API nx::utils::log::Tag kPermissionsTag;
 
 constexpr size_t kLogNamesCount =
     nx::reflect::enumeration::visitAllItems<LogName>(

@@ -7,7 +7,11 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/test_support/test_options.h>
 
+#include <QtCore/QDir>
 #include <QtCore/QFile>
+
+#include <quazip/quazip.h>
+#include <quazip/quazipfile.h>
 
 namespace nx {
 namespace utils {
@@ -41,7 +45,9 @@ public:
 
     void checkFile(const std::vector<QByteArray>& messages = {}, const QByteArray& suffix = {})
     {
-        const auto fileName = m_basePath + QString::fromUtf8(suffix + ".log");
+        const auto fileName = m_basePath + QString::fromUtf8(suffix.isEmpty()
+            ? QByteArray(File::kExtensionWithSeparator) : (suffix + File::kRotateExtensionWithSeparator));
+        const auto fileNameInsideArchive = File::makeBaseFileName(m_basePath);
         if (messages.empty())
         {
             EXPECT_TRUE(!QFile::exists(fileName));
@@ -52,10 +58,20 @@ public:
         for (const auto& m: messages)
             expectedContent += m + kLineSplit;
 
-        QFile file(fileName);
-        file.open(QFile::ReadOnly);
+        QByteArray actualContent;
+        if (suffix.isEmpty())
+        {
+            QFile file(fileName);
+            file.open(QFile::ReadOnly);
+            actualContent = file.readAll();
+        }
+        else
+        {
+            QuaZipFile file(fileName, fileNameInsideArchive);
+            file.open(QIODevice::ReadOnly);
+            actualContent = file.readAll();
+        }
 
-        auto actualContent = file.readAll();
         EXPECT_EQ(expectedContent, actualContent);
     }
 

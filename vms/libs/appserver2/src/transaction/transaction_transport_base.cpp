@@ -259,7 +259,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
     m_readBuffer.reserve(DEFAULT_READ_BUFFER_SIZE);
     m_lastReceiveTimer.invalidate();
 
-    NX_VERBOSE(nx::log::kTransactionTag.join(this), "Constructor");
+    NX_VERBOSE(this, "Constructor");
 
     //creating parser sequence: multipart_parser -> ext_headers_processor -> transaction handler
     m_multipartContentParser = std::make_shared<nx::network::http::MultipartContentParser>();
@@ -281,7 +281,7 @@ QnTransactionTransportBase::QnTransactionTransportBase(
 
 QnTransactionTransportBase::~QnTransactionTransportBase()
 {
-    NX_VERBOSE(nx::log::kTransactionTag.join(this), "Destructor");
+    NX_VERBOSE(this, "Destructor");
 
     stopWhileInAioThread();
 
@@ -349,7 +349,7 @@ void QnTransactionTransportBase::setOutgoingConnection(
             duration_cast<milliseconds>(kSocketSendTimeout).count()))
     {
         const auto osErrorCode = SystemError::getLastOSErrorCode();
-        NX_DEBUG(nx::log::kTransactionTag.join(this),
+        NX_DEBUG(this,
             "Error setting socket write timeout for transaction connection %1 received from %2: %3",
             m_connectionGuid,
             m_outgoingDataSocket->getForeignAddress().toString(),
@@ -551,7 +551,7 @@ void QnTransactionTransportBase::removeEventHandler(int eventHandlerID)
 void QnTransactionTransportBase::doOutgoingConnect(
     const nx::utils::Url& remotePeerUrl)
 {
-    NX_VERBOSE(nx::log::kTransactionTag.join(this),
+    NX_VERBOSE(this,
         "doOutgoingConnect. remotePeerUrl = %1", remotePeerUrl);
 
     setState(ConnectingStage1);
@@ -680,7 +680,7 @@ void QnTransactionTransportBase::repeatDoGet()
 
 void QnTransactionTransportBase::cancelConnecting()
 {
-    NX_DEBUG(nx::log::kTransactionTag.join(this),
+    NX_DEBUG(this,
         "Connection to peer %1 canceled from state %2",
         m_remotePeer.id.toString(), toString(getState()));
     setState(Error);
@@ -689,7 +689,7 @@ void QnTransactionTransportBase::cancelConnecting()
 void QnTransactionTransportBase::onSomeBytesRead(
     SystemError::ErrorCode errorCode, size_t bytesRead)
 {
-    NX_VERBOSE(nx::log::kTransactionTag.join(this),
+    NX_VERBOSE(this,
         "onSomeBytesRead. errorCode = %1, bytesRead = %2",
         SystemError::toString(errorCode), bytesRead);
 
@@ -704,7 +704,7 @@ void QnTransactionTransportBase::onSomeBytesRead(
     {
         if (errorCode == SystemError::timedOut)
         {
-            NX_DEBUG(nx::log::kTransactionTag.join(this), "Peer %1 timed out. Disconnecting...",
+            NX_DEBUG(this, "Peer %1 timed out. Disconnecting...",
                 m_remotePeer.id.toString());
         }
         NX_VERBOSE(this, nx::format("Closing connection due to error %1").args(SystemError::toString(
@@ -716,7 +716,7 @@ void QnTransactionTransportBase::onSomeBytesRead(
 
     if (m_state >= QnTransactionTransportBase::Closed)
     {
-        NX_VERBOSE(nx::log::kTransactionTag.join(this),
+        NX_VERBOSE(this,
             "Connection to %1 is closed. Not reading anymore",
             m_remotePeer.id.toString());
         return;
@@ -727,7 +727,7 @@ void QnTransactionTransportBase::onSomeBytesRead(
     //parsing and processing input data
     if (!m_incomingTransactionStreamParser->processData(m_readBuffer))
     {
-        NX_DEBUG(nx::log::kTransactionTag.join(this),
+        NX_DEBUG(this,
             "Error parsing data from peer %1. Disconnecting...", m_remotePeer.id.toString());
         return setStateNoLock(State::Error);
     }
@@ -768,7 +768,7 @@ void QnTransactionTransportBase::receivedTransactionNonSafe(
                     serializedTran))
             {
                 NX_ASSERT(false);
-                NX_WARNING(nx::log::kTransactionTag.join(this),
+                NX_WARNING(this,
                     "Error deserializing JSON data from peer %1. Disconnecting...",
                     m_remotePeer.id.toString());
                 setStateNoLock(State::Error);
@@ -784,7 +784,7 @@ void QnTransactionTransportBase::receivedTransactionNonSafe(
                     serializedTran))
             {
                 NX_ASSERT(false);
-                NX_WARNING(nx::log::kTransactionTag.join(this),
+                NX_WARNING(this,
                     "Error deserializing Ubjson data from peer %1. Disconnecting...",
                     m_remotePeer.id.toString());
                 setStateNoLock(State::Error);
@@ -793,7 +793,7 @@ void QnTransactionTransportBase::receivedTransactionNonSafe(
             break;
 
         default:
-            NX_WARNING(nx::log::kTransactionTag.join(this),
+            NX_WARNING(this,
                 "Received unkown format from peer %1. Disconnecting...",
                 m_remotePeer.id.toString());
             setStateNoLock(State::Error);
@@ -803,7 +803,7 @@ void QnTransactionTransportBase::receivedTransactionNonSafe(
     if (!transportHeader.isNull())
     {
         NX_ASSERT(!transportHeader.processedPeers.empty());
-        NX_DEBUG(nx::log::kTransactionTag.join(this),
+        NX_DEBUG(this,
             "receivedTransactionNonSafe. Got transaction with seq %1 from %2",
             transportHeader.sequence, m_remotePeer.id.toString());
     }
@@ -847,7 +847,7 @@ void QnTransactionTransportBase::receivedTransaction(
         }
         if (!m_sizedDecoder->processData(decodedTranData))
         {
-            NX_WARNING(nx::log::kTransactionTag.join(this),
+            NX_WARNING(this,
                 "Error parsing data (2) from peer %1. Disconnecting...",
                 m_remotePeer.id.toString());
             return setStateNoLock(State::Error);
@@ -907,7 +907,7 @@ void QnTransactionTransportBase::setIncomingTransactionChannelSocket(
     //checking transactions format
     if (!m_incomingTransactionStreamParser->processData(nx::toBufferView(requestBuf)))
     {
-        NX_WARNING(nx::log::kTransactionTag.join(this),
+        NX_WARNING(this,
             "Error parsing incoming data (3) from peer %1. Disconnecting...",
             m_remotePeer.id.toString());
         return setStateNoLock(State::Error);
@@ -952,7 +952,7 @@ void QnTransactionTransportBase::waitForNewTransactionsReady()
 
 void QnTransactionTransportBase::connectionFailure()
 {
-    NX_DEBUG(nx::log::kTransactionTag.join(this),
+    NX_DEBUG(this,
         "Connection to peer %1 failure. Disconnecting...", m_remotePeer.id.toString());
     setState(Error);
 }
@@ -1005,7 +1005,7 @@ void QnTransactionTransportBase::onMonitorConnectionForClosure(
 
     if (errorCode != SystemError::noError && errorCode != SystemError::timedOut)
     {
-        NX_DEBUG(nx::log::kTransactionTag.join(this),
+        NX_DEBUG(this,
             "transaction connection %1 received from %2 failed: %3",
             m_connectionGuid, m_outgoingDataSocket->getForeignAddress().toString(),
             SystemError::toString(errorCode));
@@ -1014,7 +1014,7 @@ void QnTransactionTransportBase::onMonitorConnectionForClosure(
 
     if (bytesRead == 0)
     {
-        NX_DEBUG(nx::log::kTransactionTag.join(this),
+        NX_DEBUG(this,
             "transaction connection %1 received from %2 has been closed by remote peer",
             m_connectionGuid, m_outgoingDataSocket->getForeignAddress().toString());
         return setStateNoLock(State::Error);
@@ -1123,7 +1123,7 @@ void QnTransactionTransportBase::serializeAndSendNextDataBuffer()
         }
     }
 
-    NX_VERBOSE(nx::log::kTransactionTag.join(this), "Sending data buffer (%1 bytes) to the peer %2",
+    NX_VERBOSE(this, "Sending data buffer (%1 bytes) to the peer %2",
         dataCtx.encodedSourceData.size(), m_remotePeer.id.toString());
 
     if (m_outgoingDataSocket)
@@ -1214,7 +1214,7 @@ void QnTransactionTransportBase::onDataSent(
 
     if (errorCode)
     {
-        NX_DEBUG(nx::log::kTransactionTag.join(this), "Failed to send %1 bytes to %2. %3",
+        NX_DEBUG(this, "Failed to send %1 bytes to %2. %3",
             m_dataToSend.front().encodedSourceData.size(),
             m_remotePeer.id.toString(), SystemError::toString(errorCode));
         m_dataToSend.pop_front();
@@ -1234,7 +1234,7 @@ void QnTransactionTransportBase::at_responseReceived(
 {
     const int statusCode = client->response()->statusLine.statusCode;
 
-    NX_VERBOSE(nx::log::kTransactionTag.join(this),
+    NX_VERBOSE(this,
         "at_responseReceived. statusCode = %1", statusCode);
 
     if (statusCode == nx::network::http::StatusCode::unauthorized)
@@ -1466,7 +1466,7 @@ void QnTransactionTransportBase::at_responseReceived(
 
 void QnTransactionTransportBase::at_httpClientDone(const nx::network::http::AsyncHttpClientPtr& client)
 {
-    NX_VERBOSE(nx::log::kTransactionTag.join(this), "at_httpClientDone");
+    NX_VERBOSE(this, "at_httpClientDone");
 
     if (client->failed())
     {
@@ -1480,7 +1480,7 @@ void QnTransactionTransportBase::processTransactionData(const nx::Buffer& data)
     NX_ASSERT(m_peerRole == prOriginating);
     if (!m_incomingTransactionStreamParser->processData(data))
     {
-        NX_WARNING(nx::log::kTransactionTag.join(this),
+        NX_WARNING(this,
             "Error processing incoming data (4) from peer %1. Disconnecting...",
             m_remotePeer.id.toString());
         return setStateNoLock(State::Error);
@@ -1618,7 +1618,7 @@ void QnTransactionTransportBase::postTransactionDone(const nx::network::http::As
 
     if (client->failed() || !client->response())
     {
-        NX_WARNING(nx::log::kTransactionTag.join(this),
+        NX_WARNING(this,
             "Network error posting transaction to %1. system result code: %2",
             m_postTranBaseUrl.toString(), SystemError::toString(client->lastSysErrorCode()));
         setStateNoLock(Error);
@@ -1630,7 +1630,7 @@ void QnTransactionTransportBase::postTransactionDone(const nx::network::http::As
     if (client->response()->statusLine.statusCode == nx::network::http::StatusCode::unauthorized &&
         m_authOutgoingConnectionByServerKey)
     {
-        NX_VERBOSE(nx::log::kTransactionTag.join(this),
+        NX_VERBOSE(this,
             "Failed to authenticate on peer %1 by key. Retrying using admin credentials...",
             m_postTranBaseUrl.toString());
         m_authOutgoingConnectionByServerKey = false;
@@ -1646,7 +1646,7 @@ void QnTransactionTransportBase::postTransactionDone(const nx::network::http::As
 
     if (client->response()->statusLine.statusCode != nx::network::http::StatusCode::ok)
     {
-        NX_WARNING(nx::log::kTransactionTag.join(this),
+        NX_WARNING(this,
             "Server %1 returned %2 (%3) response while posting transaction",
             m_postTranBaseUrl.toString(), client->response()->statusLine.statusCode,
             client->response()->statusLine.reasonPhrase);

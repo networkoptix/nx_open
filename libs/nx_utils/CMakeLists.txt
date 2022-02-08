@@ -15,6 +15,7 @@ nx_add_target(nx_utils LIBRARY
         Boost::headers
         OpenSSL::OpenSSL
         Qt5::Core Qt5::Xml
+        quazip
         nx_branding
         nx_build_info
         nx_kit
