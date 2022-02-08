@@ -76,6 +76,12 @@ void AbstractCommunicatingSocket::readAsyncAtLeast(
         buffer->capacity() >= buffer->size() + static_cast<int>(minimalSize),
         "Not enough space in the buffer!");
 
+    if (minimalSize == 0)
+    {
+        handler(SystemError::noError, 0);
+        return;
+    }
+
     readAsyncAtLeastImpl(
         buffer, minimalSize, std::move(handler),
         static_cast<size_t>(buffer->size()));
