@@ -69,14 +69,8 @@ struct NX_VMS_API ServerLogSettings
     /**%apidoc HTTP log settings. */
     LogSettings httpLog;
 
-    /**%apidoc EC2 Transactions log settings. */
-    LogSettings transactionLog;
-
     /**%apidoc HWID log settings. */
     LogSettings systemLog;
-
-    /**%apidoc PERMISSIONS log settings. */
-    LogSettings permissionsLog;
 
     QnUuid getId() const { return id; }
 
@@ -88,20 +82,15 @@ struct NX_VMS_API ServerLogSettings
                 return mainLog;
             case nx::log::LogName::http:
                 return httpLog;
-            case nx::log::LogName::transaction:
-                return transactionLog;
             case nx::log::LogName::system:
                 return systemLog;
-            case nx::log::LogName::permissions:
-                return permissionsLog;
         }
         NX_ASSERT(false);
         return mainLog;
     }
 };
 #define ServerLogSettings_Fields \
-    (id)(maxFileSize)(maxBackupCount)(directory)\
-    (mainLog)(httpLog)(transactionLog)(systemLog)(permissionsLog)
+    (id)(maxFileSize)(maxBackupCount)(directory)(mainLog)(httpLog)(systemLog)
 QN_FUSION_DECLARE_FUNCTIONS(ServerLogSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ServerLogSettings, ServerLogSettings_Fields)
 

@@ -164,7 +164,7 @@ void QnResourceAccessManager::setPermissionsInternal(const QnResourceAccessSubje
         }
     }
 
-    NX_DEBUG(nx::log::kPermissionsTag.join(this), "%1 -> %2: %3",
+    NX_DEBUG(this, "%1 -> %2: %3",
         subject.name(), resource->getName(), permissions);
     emit permissionsChanged(subject, resource, permissions);
 }

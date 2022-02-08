@@ -8,14 +8,11 @@ static const QString kCompatMainLogName = QString("MAIN");
 
 const nx::utils::log::Tag kMainTag(QString(""));
 const nx::utils::log::Tag kHttpTag(QString("HTTP"));
-const nx::utils::log::Tag kTransactionTag(QString("TRANSACTION"));
 const nx::utils::log::Tag kSystemTag(QString("SYSTEM"));
-const nx::utils::log::Tag kPermissionsTag(QString("PERMISSIONS"));
 
 std::array<QString, kLogNamesCount> getCompatLoggerNames()
 {
-    return {kCompatMainLogName, kHttpTag.toString(), kTransactionTag.toString(),
-        kSystemTag.toString(), kPermissionsTag.toString()};
+    return {kCompatMainLogName, kHttpTag.toString(), kSystemTag.toString()};
 }
 
 std::shared_ptr<nx::utils::log::AbstractLogger> getLogger(const LogName id)
@@ -27,12 +24,8 @@ std::shared_ptr<nx::utils::log::AbstractLogger> getLogger(const LogName id)
             return nx::utils::log::mainLogger();
         case LogName::http:
             return nx::utils::log::getExactLogger(kHttpTag);
-        case LogName::transaction:
-            return nx::utils::log::getExactLogger(kTransactionTag);
         case LogName::system:
             return nx::utils::log::getExactLogger(kSystemTag);
-        case LogName::permissions:
-            return nx::utils::log::getExactLogger(kPermissionsTag);
     }
     NX_ASSERT(false);
     return nullptr;
