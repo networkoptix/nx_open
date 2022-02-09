@@ -107,7 +107,8 @@ ServerCertificateWarning::ServerCertificateWarning(
         QDialogButtonBox::AcceptRole,
         Qn::ButtonAccent::Warning);
 
-    if (reason == core::CertificateWarning::Reason::invalidCertificate)
+    if (reason == core::CertificateWarning::Reason::invalidCertificate
+        || reason == core::CertificateWarning::Reason::serverCertificateChanged)
     {
         // Create mandatory checkbox for additional safety.
         auto checkbox = new QCheckBox(tr("I trust this server"));
