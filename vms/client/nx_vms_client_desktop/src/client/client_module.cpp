@@ -61,6 +61,7 @@
 #include <nx/utils/crash_dump/systemexcept.h>
 #include <nx/utils/log/log_initializer.h>
 #include <nx/vms/api/protocol_version.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/core/settings/systems_visibility_manager.h>
 #include <nx/vms/client/core/utils/font_loader.h>
 #include <nx/vms/client/core/watchers/known_server_connections.h>
@@ -543,7 +544,7 @@ void QnClientModule::initSingletons()
         m_clientCoreModule->initializeNetworking(
             clientPeerType,
             serializationFormat(),
-            qnSettings->certificateValidationLevel());
+            nx::vms::client::core::settings()->certificateValidationLevel());
     }
 
     const auto qmlEngine = m_clientCoreModule->mainQmlEngine();

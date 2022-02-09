@@ -4,6 +4,7 @@
 
 #include <client/client_settings.h>
 #include <nx/reflect/to_string.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 
 namespace {
 
@@ -22,7 +23,8 @@ QnStatisticValuesHash QnGenericStatisticsModule::values() const
     const auto locale = settingsLocale.isEmpty() ? QLocale::system().name() : settingsLocale;
     const QString certificateValidation =
         QString::fromStdString(
-            nx::reflect::enumeration::toString(qnSettings->certificateValidationLevel()));
+            nx::reflect::enumeration::toString(
+                nx::vms::client::core::settings()->certificateValidationLevel()));
 
     return {
         {kLocaleTag, locale},

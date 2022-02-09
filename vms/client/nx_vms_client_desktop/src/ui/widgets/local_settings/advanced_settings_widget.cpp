@@ -21,6 +21,7 @@
 #include <nx/utils/app_info.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/vms/client/core/network/network_module.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/desktop/common/widgets/busy_indicator_button.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/state/shared_memory_manager.h>
@@ -147,8 +148,10 @@ void QnAdvancedSettingsWidget::applyChanges()
     qnSettings->setGlBlurEnabled(isBlurEnabled());
     qnSettings->setHardwareDecodingEnabled(isHardwareDecodingEnabled());
 
-    const auto oldCertificateValidationLevel = qnSettings->certificateValidationLevel();
+    const auto oldCertificateValidationLevel =
+        nx::vms::client::core::settings()->certificateValidationLevel();
     const auto newCertificateValidationLevel = certificateValidationLevel();
+
     if (oldCertificateValidationLevel != newCertificateValidationLevel)
     {
         const auto checkConnection =
@@ -169,7 +172,7 @@ void QnAdvancedSettingsWidget::applyChanges()
             [this, level=newCertificateValidationLevel]()
             {
                 qnClientCoreModule->networkModule()->reinitializeCertificateStorage(level);
-                qnSettings->setCertificateValidationLevel(level);
+                nx::vms::client::core::settings()->certificateValidationLevel.setValue(level);
             };
 
         if (connected || otherWindowsExist)
@@ -247,7 +250,7 @@ void QnAdvancedSettingsWidget::loadDataToUi()
     setMaximumLiveBufferMs(qnSettings->maximumLiveBufferMs());
     setBlurEnabled(qnSettings->isGlBlurEnabled());
     setHardwareDecodingEnabled(qnSettings->isHardwareDecodingEnabled());
-    setCertificateValidationLevel(qnSettings->certificateValidationLevel());
+    setCertificateValidationLevel(nx::vms::client::core::settings()->certificateValidationLevel());
     updateCertificateValidationLevelDescription();
 }
 
@@ -259,7 +262,7 @@ bool QnAdvancedSettingsWidget::hasChanges() const
         || qnSettings->maximumLiveBufferMs() != maximumLiveBufferMs()
         || qnSettings->isGlBlurEnabled() != isBlurEnabled()
         || qnSettings->isHardwareDecodingEnabled() != isHardwareDecodingEnabled()
-        || qnSettings->certificateValidationLevel() != certificateValidationLevel();
+        || nx::vms::client::core::settings()->certificateValidationLevel() != certificateValidationLevel();
 }
 
 bool QnAdvancedSettingsWidget::isRestartRequired() const

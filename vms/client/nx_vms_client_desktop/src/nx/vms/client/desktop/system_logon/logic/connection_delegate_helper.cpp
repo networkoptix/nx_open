@@ -2,10 +2,9 @@
 
 #include "connection_delegate_helper.h"
 
-#include <client/client_settings.h>
-#include <client_core/client_core_module.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_session.h>
+#include <nx/vms/client/core/settings/client_core_settings.h>
 #include <nx/vms/client/desktop/system_logon/ui/oauth_login_dialog.h>
 #include <nx/vms/client/desktop/system_logon/ui/server_certificate_error.h>
 #include <nx/vms/client/desktop/system_logon/ui/server_certificate_warning.h>
@@ -18,7 +17,7 @@ std::unique_ptr<core::RemoteConnectionUserInteractionDelegate>
     const auto certificateValidationLevel =
         []()
         {
-            return qnSettings->certificateValidationLevel();
+            return nx::vms::client::core::settings()->certificateValidationLevel();
         };
 
     const auto validateToken =
