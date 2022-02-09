@@ -319,13 +319,6 @@ private:
         QN_DECLARE_RW_PROPERTY(int, maxHardwareDecoders, setMaxHardwareDecoders, MAX_HARDWARE_DECODERS, 8)
         QN_DECLARE_R_PROPERTY(bool, isBrowseLogsVisible, BROWSE_LOGS_VISIBLE, true)
 
-        QN_DECLARE_RW_PROPERTY(
-            nx::vms::client::core::network::server_certificate::ValidationLevel,
-            certificateValidationLevel,
-            setCertificateValidationLevel,
-            SERVER_CERTIFICATE_VALIDATION_LEVEL,
-            nx::vms::client::core::network::server_certificate::ValidationLevel::recommended)
-
         QN_DECLARE_RW_PROPERTY(bool, muteOnAudioTransmit, setMuteOnAudioTransmit,
             MUTE_ON_AUDIO_TRANSMIT, true)
 

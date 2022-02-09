@@ -242,15 +242,6 @@ QVariant QnClientSettings::readValueFromSettings(QSettings* settings, int id,
                 defaultValue.value<UpdateDeliveryInfo>()));
         }
 
-        case SERVER_CERTIFICATE_VALIDATION_LEVEL:
-        {
-            const QVariant value = base_type::readValueFromSettings(settings, id, QVariant());
-            const auto defaultLevel = defaultValue.value<CertificateValidationLevel>();
-
-            return QVariant::fromValue(
-                nx::reflect::fromString(value.toString().toStdString(), defaultLevel));
-        }
-
         default:
             return base_type::readValueFromSettings(settings, id, defaultValue);
             break;
@@ -337,14 +328,6 @@ void QnClientSettings::writeValueToSettings(QSettings *settings, int id, const Q
             const auto& updateInfo = value.value<UpdateDeliveryInfo>();
             QString asJson = QString::fromUtf8(QJson::serialized(updateInfo));
             base_type::writeValueToSettings(settings, id, asJson);
-            break;
-        }
-
-        case SERVER_CERTIFICATE_VALIDATION_LEVEL:
-        {
-            const auto& level = value.value<CertificateValidationLevel>();
-            base_type::writeValueToSettings(
-                settings, id, QString::fromStdString(nx::reflect::toString(level)));
             break;
         }
 
