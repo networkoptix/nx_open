@@ -7,6 +7,7 @@
 #include <QtCore/QDateTime>
 #include <QtCore/QDir>
 #include <QtCore/QFile>
+#include <QtCore/QRegularExpression>
 #include <QtCore/QTemporaryFile>
 
 #include <quazip/quazip.h>
@@ -301,10 +302,11 @@ void File::archiveLeftOvers(nx::Locker<nx::Mutex>* /*lock*/)
     for (const auto& name: dir.entryList(QStringList{stem + "_*"
         + kTmpExtensionWithSeparator}, QDir::Files))
     {
-        QRegExp rx(stem + "_(\\d+)" + kTmpExtensionWithSeparator);
-        if (rx.exactMatch(name))
+        const QRegularExpression rx(
+            QRegularExpression::anchoredPattern(stem + "_(\\d+)" + kTmpExtensionWithSeparator));
+        if (const auto match = rx.match(name); match.hasMatch())
         {
-            const auto rotation = rx.cap(1).toInt();
+            const auto rotation = match.capturedView(1).toInt();
             const auto archiveName = getFileName(rotation);
             const auto tmpName = getFileName(rotation).replace(kRotateExtensionWithSeparator,
                 kTmpExtensionWithSeparator);
