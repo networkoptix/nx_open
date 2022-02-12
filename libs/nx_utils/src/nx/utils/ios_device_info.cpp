@@ -7,7 +7,7 @@
 #if defined(Q_OS_IOS)
 
 #include <sys/utsname.h>
-#include <QtCore/QRegExp>
+#include <QtCore/QRegularExpression>
 
 #endif // if defined (Q_OS_IOS)
 
@@ -28,21 +28,24 @@ IosDeviceInformation IosDeviceInformation::currentInformation()
 
         const auto& infoString = QString::fromLatin1(systemInfo.machine);
 
-        QRegExp infoRegExp("([^\\d]+)(\\d+),(\\d+)");
+        const QRegularExpression infoRegExp(
+            QRegularExpression::anchoredPattern("([^\\d]+)(\\d+),(\\d+)"));
 
-        if (!infoRegExp.exactMatch(infoString))
+        const auto match = infoRegExp.match(infoString);
+
+        if (!match.hasMatch())
             return IosDeviceInformation();
 
         IosDeviceInformation info;
 
-        const auto& type = infoRegExp.cap(1);
-        if (type == "iPhone")
+        const auto& type = match.capturedView(1);
+        if (type == QLatin1String("iPhone"))
             info.type = IosDeviceInformation::Type::iPhone;
-        else if (type == "iPad")
+        else if (type == QLatin1String("iPad"))
             info.type = IosDeviceInformation::Type::iPad;
 
-        info.majorVersion = infoRegExp.cap(2).toInt();
-        info.minorVersion = infoRegExp.cap(3).toInt();
+        info.majorVersion = match.capturedView(2).toInt();
+        info.minorVersion = match.capturedView(3).toInt();
 
         return info;
     #else
