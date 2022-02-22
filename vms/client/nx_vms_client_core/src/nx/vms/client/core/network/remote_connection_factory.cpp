@@ -451,6 +451,7 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
         {
             const auto& serverId = info.serverId;
             const auto& serverInfo = info.serverInfo;
+            const auto& serverUrl = info.serverUrl;
 
             auto storeCertificate =
                 [&](const nx::network::ssl::CertificateChain& chain, CertificateType type)
@@ -472,11 +473,11 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
                     }
 
                     auto accept =
-                        [this, serverInfo, chain]
+                        [this, serverInfo, serverUrl, chain]
                         {
                             return userInteractionDelegate->acceptCertificateOfServerInTargetSystem(
                                 serverInfo,
-                                {},
+                                nx::network::SocketAddress::fromUrl(serverUrl),
                                 chain);
                         };
                     if (const auto accepted = context->info.userInteractionAllowed
