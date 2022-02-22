@@ -72,7 +72,6 @@ DeviceModel::DbUpdateTypes DeviceModel::toDbTypes() &&
     attributes.cameraName = name;
     attributes.logicalId = logicalId;
     attributes.backupQuality = backupQuality;
-    attributes.licenseUsed = isLicenseUsed;
     if (group)
         attributes.userDefinedGroupName = group->name;
 
@@ -130,7 +129,7 @@ std::vector<DeviceModel> DeviceModel::fromDbTypes(DbListTypes all)
                     model.name = attributes->cameraName;
                 model.logicalId = attributes->logicalId;
                 model.backupQuality = attributes->backupQuality;
-                model.isLicenseUsed = attributes->licenseUsed;
+                model.isLicenseUsed = attributes->scheduleEnabled;
                 if (!attributes->userDefinedGroupName.isEmpty())
                 {
                     if (model.group)

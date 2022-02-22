@@ -203,6 +203,8 @@ NX_REFLECTION_ENUM_CLASS(DeviceCapability,
 )
 Q_DECLARE_FLAGS(DeviceCapabilities, DeviceCapability)
 
+
+// TODO #lbusygin: Remove 'isLicenseUsed' field in v2, it is duplicated by 'schedule.enabled'.
 /**%apidoc Device information object.
  * %param[opt]:object parameters Device specific key-value parameters.
  */
