@@ -111,9 +111,6 @@ struct NX_VMS_API CameraAttributesData
     /**%apidoc[opt] Whether recording to the archive is enabled for the device. */
     bool scheduleEnabled = false;
 
-    /**%apidoc[opt] Whether the license is used for the device. */
-    bool licenseUsed = false; //< TODO: #sivanov Field is not used.
-
     /**%apidoc[opt] Type of motion detection method. */
     MotionType motionType = MotionType::default_;
 
@@ -185,7 +182,6 @@ struct NX_VMS_API CameraAttributesData
 #define CameraAttributesData_Fields_Short \
     (userDefinedGroupName) \
     (scheduleEnabled) \
-    (licenseUsed) \
     (motionType) \
     (motionMask) \
     (scheduleTasks) \
@@ -209,6 +205,11 @@ struct NX_VMS_API CameraAttributesData
 
 NX_VMS_API_DECLARE_STRUCT(ScheduleTaskData)
 NX_VMS_API_DECLARE_STRUCT_AND_LIST(CameraAttributesData)
+
+NX_VMS_API void serialize(
+    QnJsonContext* ctx, const CameraAttributesData& value, QJsonValue* target);
+NX_VMS_API bool deserialize(
+    QnJsonContext* ctx, const QJsonValue& value, CameraAttributesData* target);
 
 } // namespace api
 } // namespace vms
