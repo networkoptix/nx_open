@@ -7,6 +7,7 @@
 #include <nx/network/ssl/helpers.h>
 #include <nx/reflect/instrument.h>
 #include <nx/utils/impl_ptr.h>
+#include <nx/utils/url.h>
 #include <nx/vms/api/data/login.h>
 #include <nx/vms/api/data/module_information.h>
 
@@ -35,6 +36,7 @@ public:
 
         // A stub struct used to show certificate warning dialog. Will be removed later.
         nx::vms::api::ModuleInformation serverInfo;
+        nx::utils::Url serverUrl;
 
         std::optional<std::string> certificate;
         std::optional<std::string> userProvidedCertificate;

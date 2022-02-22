@@ -488,6 +488,7 @@ std::vector<RemoteConnectionFactoryRequestsManager::ServerCertificatesInfo>
         // These fields are used by the current certificate warning dialog.
         info.serverInfo.id = serverModel.id;
         info.serverInfo.name = serverModel.name;
+        info.serverUrl = serverModel.url;
 
         if (auto v = serverModel.parameter(ResourcePropertyKey::Server::kCertificate))
             info.certificate = v->toString().toStdString();
