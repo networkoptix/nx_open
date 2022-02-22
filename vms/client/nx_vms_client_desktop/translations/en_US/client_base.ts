@@ -1582,6 +1582,33 @@
     </message>
 </context>
 <context>
+    <name>PtzOverlayWidget</name>
+    <message>
+        <source>Zoom In</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Zoom Out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Focus Far</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Focus Near</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auto Focus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Change Dewarping Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>QWebEnginePage</name>
     <message>
         <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
@@ -7542,6 +7569,10 @@ We recommend you not to open this web page. If you understand the risks, you can
         <source>Select Camera</source>
         <translation></translation>
     </message>
+    <message>
+        <source>You do not have any cameras</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>nx::vms::client::desktop::CameraSettingsDialog</name>
@@ -10017,10 +10048,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
         <translation></translation>
     </message>
     <message>
-        <source>You attempted to connect to %1 but the server presented a certificate, that cannot be verified automatically.</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
         <translation></translation>
     </message>
@@ -10035,6 +10062,10 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
         <source>Do not connect to this server unless instructed by your VMS administrator.</source>
         <translation></translation>
+    </message>
+    <message>
+        <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

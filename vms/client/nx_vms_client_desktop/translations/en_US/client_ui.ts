@@ -563,10 +563,6 @@
         <translation></translation>
     </message>
     <message>
-        <source>Force motion detection for stream</source>
-        <translation></translation>
-    </message>
-    <message>
         <source>Trust camera timestamp</source>
         <translation></translation>
     </message>

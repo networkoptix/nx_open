@@ -64,8 +64,8 @@ ServerCertificateWarning::ServerCertificateWarning(
             icon = QnMessageBox::Icon::Question;
             header = tr("Trust this server?");
             details = tr(
-                "You attempted to connect to %1 "
-                "but the server presented a certificate, that cannot be verified automatically.");
+                "You attempted to connect to: %1 "
+                "but the Server presented a certificate that is unable to be automatically verified.");
 
             advice = tr(
                 "Review the certificate's details to make sure "
