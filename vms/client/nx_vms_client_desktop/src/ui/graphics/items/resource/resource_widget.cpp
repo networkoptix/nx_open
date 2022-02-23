@@ -281,10 +281,10 @@ void QnResourceWidget::setupSelectionOverlay()
 QIcon QnResourceWidget::loadSvgIcon(const QString& name) const
 {
     static const QMap<QIcon::Mode, QColor> colors = {
-        {QIcon::Normal, colorTheme()->color("light1")},
-        {QIcon::Active, colorTheme()->color("light4")},
+        {QIcon::Normal, colorTheme()->color("light4")},
+        {QIcon::Active, colorTheme()->color("light1")},
         {QnIcon::Pressed, colorTheme()->color("light7")},
-        {QIcon::Disabled, colorTheme()->color("light1", /*alpha*/ 77)}};
+        {QIcon::Disabled, colorTheme()->color("light4", /*alpha*/ 77)}};
 
     static const QColor checkedBgColor = colorTheme()->color("brand_core");
 
