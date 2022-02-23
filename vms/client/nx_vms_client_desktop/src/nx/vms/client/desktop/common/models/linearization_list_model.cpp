@@ -145,6 +145,8 @@ private:
         Node() = default;
         Node(const NodePtr& parent, int sourceRow, int row):
             parent(parent), sourceRow(sourceRow), row(row) {}
+
+        int childCount() const { return (int) children.size(); }
     };
 
     void reset();
@@ -580,10 +582,10 @@ void LinearizationListModel::Private::sourceRowsAboutToBeInserted(
         return;
     }
 
-    if (!NX_ASSERT(first >= 0 && first <= node->children.size() && last >= first))
+    if (!NX_ASSERT(first >= 0 && first <= node->childCount() && last >= first))
         return;
 
-    const int linearPos = first < node->children.size()
+    const int linearPos = first < node->childCount()
         ? node->children[first]->row
         : nextRow(node);
 
@@ -654,7 +656,7 @@ void LinearizationListModel::Private::sourceRowsAboutToBeRemoved(
         return;
     }
 
-    if (!NX_ASSERT(first >= 0 && last >= first && last < node->children.size()))
+    if (!NX_ASSERT(first >= 0 && last >= first && last < node->childCount()))
         return;
 
     const int linearBegin = node->children[first]->row;
@@ -750,7 +752,7 @@ void LinearizationListModel::Private::sourceRowsAboutToBeMoved(const QModelIndex
 
     if (hasSourceItems)
     {
-        if (!NX_ASSERT(first >= 0 && last >= first && last < m_moveSourceParent->children.size()))
+        if (!NX_ASSERT(first >= 0 && last >= first && last < m_moveSourceParent->childCount()))
             return;
 
         const int linearBegin = m_moveSourceParent->children[first]->row;
@@ -759,7 +761,7 @@ void LinearizationListModel::Private::sourceRowsAboutToBeMoved(const QModelIndex
         if (hasDestination)
         {
             // Moving.
-            const int linearPos = destination < m_moveDestinationParent->children.size()
+            const int linearPos = destination < m_moveDestinationParent->childCount()
                 ? m_moveDestinationParent->children[destination]->row
                 : nextRow(m_moveDestinationParent);
 
@@ -795,7 +797,7 @@ void LinearizationListModel::Private::sourceRowsAboutToBeMoved(const QModelIndex
         NX_VERBOSE(q, "Moving from an invisible part: insertion");
 
         // Insertion.
-        const int linearPos = destination < m_moveDestinationParent->children.size()
+        const int linearPos = destination < m_moveDestinationParent->childCount()
             ? m_moveDestinationParent->children[destination]->row
             : nextRow(m_moveDestinationParent);
 
@@ -1043,7 +1045,7 @@ void LinearizationListModel::Private::sourceLayoutAboutToBeChanged(
 }
 
 void LinearizationListModel::Private::sourceLayoutChanged(
-    const QList<QPersistentModelIndex>& parents, QAbstractItemModel::LayoutChangeHint hint)
+    const QList<QPersistentModelIndex>& /*parents*/, QAbstractItemModel::LayoutChangeHint hint)
 {
     NX_VERBOSE(q, "Source layout changed");
 
@@ -1110,7 +1112,7 @@ void LinearizationListModel::Private::sourceLayoutChanged(
 
     NX_VERBOSE(q, "Finished changing layout");
 
-    for (const auto range: affectedRanges)
+    for (const auto range: std::as_const(affectedRanges))
     {
         // Emitting dataChanged for all affected nodes for all possibly changed roles.
         // This must be the fastest way to do it, instead of notifying about every actual change.
@@ -1163,7 +1165,7 @@ int LinearizationListModel::Private::level(const QModelIndex& index) const
 
 int LinearizationListModel::Private::rowCount() const
 {
-    return int(m_nodeList.size());
+    return (int) m_nodeList.size();
 }
 
 bool LinearizationListModel::Private::isSourceExpanded(const QModelIndex& sourceIndex) const
@@ -1443,12 +1445,12 @@ void LinearizationListModel::Private::reset()
 
 void LinearizationListModel::Private::insertChildren(NodePtr node, int position, int count)
 {
-    NX_CRITICAL(node && position >= 0 && position <= node->children.size());
+    NX_CRITICAL(node && position >= 0 && position <= node->childCount());
 
     NX_VERBOSE(q, "Inserting children to node at row=%1, position=%2, count=%3",
         node->row, position, count);
 
-    const int linearPos = position < node->children.size()
+    const int linearPos = position < node->childCount()
         ? node->children[position]->row
         : nextRow(node);
 
@@ -1487,13 +1489,12 @@ void LinearizationListModel::Private::removeChildren(NodePtr node, int first, in
 
     NX_CRITICAL(node && first >= 0);
 
-    const int childrenCount = int(node->children.size());
-    const int end = count >= 0 ? (first + count) : childrenCount;
+    const int end = count >= 0 ? (first + count) : node->childCount();
 
     NX_VERBOSE(q, "Removing children from node at row=%1, first=%2, count=%3",
         node->row, first, end - first);
 
-    NX_CRITICAL(end <= childrenCount);
+    NX_CRITICAL(end <= node->childCount());
 
     const int linearBegin = node->children[first]->row;
     const int linearEnd = nextRow(node->children[end - 1]);
@@ -1524,9 +1525,9 @@ std::pair<int, int> LinearizationListModel::Private::moveChildren(
 
     NX_CRITICAL(m_operationInProgress);
 
-    NX_CRITICAL(sourceNode && first >= 0 && (first + count) <= sourceNode->children.size());
+    NX_CRITICAL(sourceNode && first >= 0 && (first + count) <= sourceNode->childCount());
     NX_CRITICAL(destinationNode && destination >= 0
-        && destination <= destinationNode->children.size());
+        && destination <= destinationNode->childCount());
 
     NX_VERBOSE(q, "Moving children from node at row=%1, first=%2, count=%3, to node at row=%4, "
         "destination=%5", sourceNode->row, first, count, destinationNode->row, destination);
@@ -1537,11 +1538,11 @@ std::pair<int, int> LinearizationListModel::Private::moveChildren(
     const int linearEnd = nextRow(sourceNode->children[end - 1]);
     const int linearCount = linearEnd - linearBegin;
 
-    const int linearDestination = destination < destinationNode->children.size()
+    const int linearDestination = destination < destinationNode->childCount()
         ? destinationNode->children[destination]->row
         : nextRow(destinationNode);
 
-    NX_CRITICAL(linearDestination >= 0 && linearDestination <= m_nodeList.size()
+    NX_CRITICAL(linearDestination >= 0 && linearDestination <= rowCount()
         && (linearDestination <= linearBegin || linearDestination >= linearEnd));
 
     const bool moveWithoutReorder = linearDestination == linearBegin
@@ -1693,7 +1694,7 @@ LinearizationListModel::Private::NodePtr LinearizationListModel::Private::getNod
     if (!parentNode || parentNode->children.empty())
         return {};
 
-    if (!NX_ASSERT(sourceIndex.row() < parentNode->children.size()))
+    if (!NX_ASSERT(sourceIndex.row() < parentNode->childCount()))
         return {};
 
     return parentNode->children[sourceIndex.row()];
@@ -1723,7 +1724,7 @@ bool LinearizationListModel::Private::debugCheckIntegrity() const
 {
     int currentLinearIndex = 0;
     return debugCheckTreeIntegrity(m_rootNode, currentLinearIndex)
-        && NX_ASSERT(currentLinearIndex == m_nodeList.size())
+        && NX_ASSERT(currentLinearIndex == rowCount())
         && debugCheckLinearIntegrity();
 }
 
