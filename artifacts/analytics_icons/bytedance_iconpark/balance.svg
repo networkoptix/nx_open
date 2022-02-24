@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>balance</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="balance">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M14.5833333,10.4166667 C11.6208333,9.34166667 8.37916667,9.34166667 5.41666667,10.4166667 L5,5.83333333 C7.91666667,4.58333333 12.0833333,4.58333333 15,5.83333333 L14.5833333,10.4166667 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="10" y1="9.58333333" x2="8.75" y2="7.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M17.5,16.25 C17.5,16.940375 16.940375,17.5 16.25,17.5 L3.75,17.5 C3.05964583,17.5 2.5,16.940375 2.5,16.25 L2.5,3.75 C2.5,3.05964583 3.05964583,2.5 3.75,2.5 L16.25,2.5 C16.940375,2.5 17.5,3.05964583 17.5,3.75 L17.5,16.25 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M12.0833333,9.77304167 C10.702875,9.55620833 9.297125,9.55620833 7.91666667,9.77304167" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

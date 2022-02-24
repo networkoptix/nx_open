@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>water-rate</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="water-rate">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <path d="M10,18.3333333 C13.6818983,18.3333333 16.6666667,15.6198184 16.6666667,12.2727273 C16.6666667,8.989899 14.4444445,5.45454546 10,1.66666667 C5.55555554,5.45454546 3.33333333,8.989899 3.33333333,12.2727273 C3.33333333,15.6199076 6.31810167,18.3333333 10,18.3333333 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <g id="Group" transform="translate(7.500000, 7.916667)" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round">
+                <polyline id="Path" points="0.357142857 0 2.5 2.2368421 4.64285712 0"></polyline>
+                <line x1="0" y1="2.98245614" x2="5" y2="2.98245614" id="Path"></line>
+                <line x1="0" y1="5.21929825" x2="5" y2="5.21929825" id="Path"></line>
+                <line x1="2.5" y1="2.98245614" x2="2.5" y2="7.08333333" id="Path"></line>
+            </g>
+        </g>
+    </g>
+</svg>

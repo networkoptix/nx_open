@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>skating</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="skating">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="18.3333333 1.66666667 11.6666667 1.66666667 11.6666667 5 18.3333333 5"></polygon>
+            <path d="M18.3333333,5 L18.3333333,14.1666667 C18.3333333,14.6291667 17.9625,15 17.5,15 L3.33333333,15 C2.4125,15 1.66666667,14.2541667 1.66666667,13.3333333 L1.66666667,10.8333333 C1.66666667,8.99166667 3.15833333,7.5 5,7.5 L11.6666667,7.5 L11.6666667,5 L18.3333333,5 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="5.83333333" y1="10" x2="5.83333333" y2="7.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="8.75" y1="10" x2="8.75" y2="7.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="5.83333333" y1="18.3333333" x2="5.83333333" y2="15" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="15" y1="18.3333333" x2="15" y2="15" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="9.58333333" y1="7.5" x2="5" y2="7.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M18.3333333,18.3333333 L2.5,18.3333333 C2.0375,18.3333333 1.66666667,17.9583333 1.66666667,17.5 L1.66666667,16.9291667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

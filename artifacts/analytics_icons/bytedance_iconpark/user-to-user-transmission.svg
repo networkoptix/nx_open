@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>user-to-user-transmission</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="user-to-user-transmission">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M5.83333333,7.5 C7.44416667,7.5 8.75,6.19416667 8.75,4.58333333 C8.75,2.97250417 7.44416667,1.66666667 5.83333333,1.66666667 C4.2225,1.66666667 2.91666667,2.97250417 2.91666667,4.58333333 C2.91666667,6.19416667 4.2225,7.5 5.83333333,7.5 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M14.1666667,7.5 C15.7775,7.5 17.0833333,6.19416667 17.0833333,4.58333333 C17.0833333,2.97250417 15.7775,1.66666667 14.1666667,1.66666667 C12.5558333,1.66666667 11.25,2.97250417 11.25,4.58333333 C11.25,6.19416667 12.5558333,7.5 14.1666667,7.5 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M1.66666667,18.3333333 C1.66666667,17.9629583 1.66666667,16.7129583 1.66666667,14.5833333 C1.66666667,12.2821667 3.23759583,10.4166667 5.17545833,10.4166667 C6.111125,10.4166667 6.812875,10.4166667 7.28070833,10.4166667 C8.98279167,10.4166667 10.0000417,12.0945417 10.0000417,12.0945417" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M18.33325,18.3333333 C18.33325,17.9629583 18.33325,16.7129583 18.33325,14.5833333 C18.33325,12.2821667 16.743625,10.4166667 14.7827083,10.4166667 C13.8359167,10.4166667 13.1258333,10.4166667 12.6524167,10.4166667 C11.0019167,10.4166667 9.99666667,12.0945417 9.99986734,12.0945417" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="4.58333333" y1="16.6666667" x2="15.8333333" y2="16.6666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="14.28975 15.107625 14.80625 15.6272917 15.8392083 16.6665833 14.80625 17.733875 14.28975 18.2675417"></polyline>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="5.970625 15.0967083 5.44595833 15.6190417 4.396625 16.6636667 5.44595833 17.725625 5.970625 18.256625"></polyline>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>reduce-decimal-places</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="reduce-decimal-places">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M11.25,3.75 C11.25,2.59940833 10.31725,1.66666667 9.16666667,1.66666667 C8.01608333,1.66666667 7.08333333,2.59940833 7.08333333,3.75 L7.08333333,7.91666667 C7.08333333,9.06725 8.01608333,10 9.16666667,10 C10.31725,10 11.25,9.06725 11.25,7.91666667 L11.25,3.75 Z" id="Path" stroke="#A5B7C0"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="10.4166667 13.3333333 7.91666667 15.8333333 10.4166667 18.3333333"></polyline>
+            <line x1="3.33333333" y1="10" x2="3.75" y2="10" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="16.6666667" y1="15.8333333" x2="7.91666667" y2="15.8333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

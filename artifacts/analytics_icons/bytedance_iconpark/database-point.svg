@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>database-point</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="database-point">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <line x1="10" y1="15" x2="10" y2="12.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="8.33333333" y1="16.6666667" x2="2.5" y2="16.6666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="11.6666667" y1="16.6666667" x2="17.5" y2="16.6666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M11.6666667,16.6666667 C11.6666667,17.587125 10.9204583,18.3333333 10,18.3333333 C9.07954167,18.3333333 8.33333333,17.587125 8.33333333,16.6666667 C8.33333333,15.7462083 9.07954167,15 10,15 C10.9204583,15 11.6666667,15.7462083 11.6666667,16.6666667 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M16.25,3.75 L16.25,10.4166667 C16.25,11.56725 13.4517917,12.5 10,12.5 C6.54820833,12.5 3.75,11.56725 3.75,10.4166667 L3.75,3.75" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M16.25,7.08333333 C16.25,8.23391667 13.4517917,9.16666667 10,9.16666667 C6.54820833,9.16666667 3.75,8.23391667 3.75,7.08333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M16.25,3.75 C16.25,4.90058333 13.4517917,5.83333333 10,5.83333333 C6.54820833,5.83333333 3.75,4.90058333 3.75,3.75 C3.75,2.59940833 6.54820833,1.66666667 10,1.66666667 C13.4517917,1.66666667 16.25,2.59940833 16.25,3.75 Z" id="Path"></path>
+            <path d="M16.25,3.75 C16.25,4.90058333 13.4517917,5.83333333 10,5.83333333 C6.54820833,5.83333333 3.75,4.90058333 3.75,3.75 C3.75,2.59940833 6.54820833,1.66666667 10,1.66666667 C13.4517917,1.66666667 16.25,2.59940833 16.25,3.75 Z" id="Path"></path>
+            <path d="M16.25,3.75 C16.25,4.90058333 13.4517917,5.83333333 10,5.83333333 C6.54820833,5.83333333 3.75,4.90058333 3.75,3.75 C3.75,2.59940833 6.54820833,1.66666667 10,1.66666667 C13.4517917,1.66666667 16.25,2.59940833 16.25,3.75 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M16.25,3.75 C16.25,4.90058333 13.4517917,5.83333333 10,5.83333333 C6.54820833,5.83333333 3.75,4.90058333 3.75,3.75 C3.75,2.59940833 6.54820833,1.66666667 10,1.66666667 C13.4517917,1.66666667 16.25,2.59940833 16.25,3.75 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

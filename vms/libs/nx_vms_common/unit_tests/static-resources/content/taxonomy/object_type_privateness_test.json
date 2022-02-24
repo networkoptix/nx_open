@@ -1,0 +1,45 @@
+{
+    "descriptors": {
+        "objectTypeDescriptors": {
+            "object.base": {
+                "id": "object.base",
+                "name": "Base"
+            },
+            "object.derived1": {
+                "id": "object.derived1",
+                "name": "Derived 1",
+                "base": "object.base"
+            },
+            "object.derived2": {
+                "id": "object.derived2",
+                "name": "Derived 2",
+                "base": "object.base"
+            },
+            "object.derived3": {
+                "id": "object.derived3",
+                "name": "Derived 3",
+                "base": "object.base",
+                "flags": "hiddenDerivedType",
+                "hasEverBeenSupported": true
+            },
+            "object.derived4": {
+                "id": "object.derived4",
+                "name": "Derived 4",
+                "base": "object.base",
+                "flags": "hiddenDerivedType"
+            },
+            "object.derived1.derived1": {
+                "id": "object.derived1.derived1",
+                "name": "Derived 1",
+                "base": "object.derived1",
+                "hasEverBeenSupported": true
+            },
+            "object.derived1.derived2": {
+                "id": "object.derived1.derived2",
+                "name": "Derived 1",
+                "base": "object.derived1"
+            }
+        }
+    },
+    "privateTypes": ["object.derived2", "object.derived3", "object.derived4", "object.derived1.derived2"]
+}

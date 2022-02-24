@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>cherry</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="cherry">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <circle id="Oval" stroke="#A5B7C0" fill-rule="nonzero" cx="5.83333333" cy="14.1666667" r="3.33333333"></circle>
+            <circle id="Oval" stroke="#A5B7C0" fill-rule="nonzero" cx="14.5833333" cy="15.4166667" r="2.91666667"></circle>
+            <path d="M15.4166667,4.16666667 C14.312,4.50483333 11.9282917,5.42270833 10.5329583,6.775375 C8.43991667,8.80433333 7.91666667,10.2083333 7.5,11.25" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <path d="M15.416625,4.16666667 C14.951375,4.716 14.048,6.08166667 13.76825,7.66216667 C13.348625,10.032875 13.75,11.4583333 14.166625,12.5" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <line x1="12.5" y1="1.66666667" x2="18.3333333" y2="6.66666667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
+    <Bundle
+            Name="${customization.vmsName} Client"
+            Manufacturer="${customization.companyName}"
+            Version="${full_release_version}"
+            IconSourceFile="${installerIcon}"
+            UpgradeCode="${customization.desktop.windows.clientBundleUpgradeCode}"
+            DisableModify="yes">
+        <util:RegistrySearchRef Id='ArchRegistrySearch' />
+
+        <Variable Name="InstallClientOnly" Type="numeric" Value="1" />
+
+        <BootstrapperApplicationRef Id="WixStandardBootstrapperApplication.HyperlinkLicense">
+            <Payload SourceFile="${customization.dir}/license.html" />
+            <Payload SourceFile="${customization.dir}/icons/windows/installer_bg.png" />
+            <Payload SourceFile="${customization.dir}/icons/windows/logo-102x102.png" />
+            <Payload SourceFile="${customization.dir}/icons/windows/logo-64x64.png" />
+
+            <bal:WixStandardBootstrapperApplication
+                SuppressOptionsUI="yes"
+                LicenseUrl="license.html"
+                ShowFilesInUse="yes"
+                SuppressRepair="yes"
+                ThemeFile="${wix_theme_file}"
+                LocalizationFile="${localization_file}"
+                SuppressDowngradeFailure="yes"
+                LaunchTarget="${client_launch_target}"/>
+        </BootstrapperApplicationRef>
+
+        <Variable Name="InstallerTitle" Value="!(loc.ClientOnly)" />
+
+        <Chain DisableSystemRestore="no">
+            <PackageGroupRef Id="ClientPackageGroup"/>
+        </Chain>
+    </Bundle>
+</Wix>

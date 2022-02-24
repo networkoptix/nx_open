@@ -1,0 +1,208 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+#include "state.h"
+
+#include <type_traits>
+
+#include <nx/analytics/taxonomy/plugin.h>
+#include <nx/analytics/taxonomy/engine.h>
+#include <nx/analytics/taxonomy/group.h>
+#include <nx/analytics/taxonomy/enum_type.h>
+#include <nx/analytics/taxonomy/color_type.h>
+#include <nx/analytics/taxonomy/event_type.h>
+#include <nx/analytics/taxonomy/object_type.h>
+
+using namespace nx::vms::api::analytics;
+
+namespace nx::analytics::taxonomy {
+
+template<typename ResultMap, typename EntityMap>
+ResultMap serializeEntityMap(const EntityMap& entityMap)
+{
+    ResultMap result;
+
+    for (const auto& [id, entity]: entityMap)
+    {
+        using KeyType =
+            typename std::remove_cv_t<std::remove_reference_t<typename ResultMap::key_type>>;
+
+        if constexpr (std::is_same_v<KeyType, QString>)
+            result[id] = entity->serialize();
+        else
+            result[QnUuid::fromStringSafe(id)] = entity->serialize();
+    }
+
+    return result;
+}
+
+template<typename Map>
+void assignParent(Map* inOutMap, QObject* parent)
+{
+    for (auto& [_, item]: *inOutMap)
+        item->setParent(parent);
+}
+
+State::State(InternalState state):
+    m_internalState(std::move(state))
+{
+    assignParent(&m_internalState.pluginById, this);
+    assignParent(&m_internalState.engineById, this);
+    assignParent(&m_internalState.groupById, this);
+    assignParent(&m_internalState.eventTypeById, this);
+    assignParent(&m_internalState.objectTypeById, this);
+    assignParent(&m_internalState.enumTypeById, this);
+    assignParent(&m_internalState.colorTypeById, this);
+}
+
+void State::refillCache() const
+{
+    m_cachedPlugins.clear();
+    m_cachedEngines.clear();
+    m_cachedGroups.clear();
+    m_cachedObjectType.clear();
+    m_cachedRootObjectType.clear();
+    m_cachedEnumTypes.clear();
+    m_cachedColorTypes.clear();
+
+    for (const auto& [pluginId, plugin]: m_internalState.pluginById)
+        m_cachedPlugins.push_back(plugin);
+
+    for (const auto& [engineId, engine]: m_internalState.engineById)
+        m_cachedEngines.push_back(engine);
+
+    for (const auto& [groupId, group]: m_internalState.groupById)
+        m_cachedGroups.push_back(group);
+
+    for (const auto& [objectTypeId, objectType]: m_internalState.objectTypeById)
+    {
+        m_cachedObjectType.push_back(objectType);
+        if (!objectType->base())
+            m_cachedRootObjectType.push_back(objectType);
+    }
+
+    for (const auto& [enumTypeId, enumType]: m_internalState.enumTypeById)
+        m_cachedEnumTypes.push_back(enumType);
+
+    for (const auto& [colorTypeId, colorType]: m_internalState.colorTypeById)
+        m_cachedColorTypes.push_back(colorType);
+}
+
+std::vector<AbstractPlugin*> State::plugins() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (m_cachedPlugins.empty())
+        refillCache();
+
+    return m_cachedPlugins;
+}
+
+std::vector<AbstractEngine*> State::engines() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (m_cachedEngines.empty())
+        refillCache();
+
+    return m_cachedEngines;
+}
+
+std::vector<AbstractGroup*> State::groups() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (m_cachedGroups.empty())
+        refillCache();
+
+    return m_cachedGroups;
+}
+
+std::vector<AbstractObjectType*> State::objectTypes() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (m_cachedObjectType.empty())
+        refillCache();
+
+    return m_cachedObjectType;
+}
+
+std::vector<AbstractEnumType*> State::enumTypes() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (m_cachedEnumTypes.empty())
+        refillCache();
+
+    return m_cachedEnumTypes;
+}
+
+std::vector<AbstractColorType*> State::colorTypes() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (m_cachedColorTypes.empty())
+        refillCache();
+
+    return m_cachedColorTypes;
+}
+
+std::vector<AbstractObjectType*> State::rootObjectTypes() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (m_cachedRootObjectType.empty())
+        refillCache();
+
+    return m_cachedRootObjectType;
+}
+
+AbstractObjectType* State::objectTypeById(const QString& objectTypeId) const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_internalState.getTypeById<ObjectType>(objectTypeId);
+}
+
+AbstractPlugin* State::pluginById(const QString& pluginId) const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_internalState.getTypeById<Plugin>(pluginId);
+}
+
+AbstractEngine* State::engineById(const QString& engineId) const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_internalState.getTypeById<Engine>(engineId);
+}
+
+AbstractGroup* State::groupById(const QString& groupId) const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_internalState.getTypeById<Group>(groupId);
+}
+
+AbstractEnumType* State::enumTypeById(const QString& enumTypeId) const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_internalState.getTypeById<EnumType>(enumTypeId);
+}
+
+AbstractColorType* State::colorTypeById(const QString& colorTypeId) const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_internalState.getTypeById<ColorType>(colorTypeId);
+}
+
+Descriptors State::serialize() const
+{
+    Descriptors result;
+
+    result.pluginDescriptors = serializeEntityMap<PluginDescriptorMap>(m_internalState.pluginById);
+    result.engineDescriptors = serializeEntityMap<EngineDescriptorMap>(m_internalState.engineById);
+    result.groupDescriptors = serializeEntityMap<GroupDescriptorMap>(m_internalState.groupById);
+    result.enumTypeDescriptors =
+        serializeEntityMap<EnumTypeDescriptorMap>(m_internalState.enumTypeById);
+    result.colorTypeDescriptors =
+        serializeEntityMap<ColorTypeDescriptorMap>(m_internalState.colorTypeById);
+    result.eventTypeDescriptors =
+        serializeEntityMap<EventTypeDescriptorMap>(m_internalState.eventTypeById);
+    result.objectTypeDescriptors =
+        serializeEntityMap<ObjectTypeDescriptorMap>(m_internalState.objectTypeById);
+
+    return result;
+}
+
+} // namespace nx::analytics::taxonomy

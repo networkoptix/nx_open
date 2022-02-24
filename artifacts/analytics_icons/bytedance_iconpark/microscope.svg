@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>microscope</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="microscope">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M10.8333333,18.3333333 C12.64425,17.0799583 13.6094583,15.8130417 13.728875,14.5325833 C13.8482917,13.2520833 13.4616667,12.2967917 12.5690417,11.6666667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <path d="M11.5230417,11.7594583 C12.5585833,11.7594583 13.3980417,10.9199583 13.3980417,9.88445833 C13.3980417,8.84891667 12.5585833,8.00945833 11.5230417,8.00945833 C10.4875,8.00945833 9.64804167,8.84891667 9.64804167,9.88445833 C9.64804167,10.9199583 10.4875,11.7594583 11.5230417,11.7594583 Z" id="Path" stroke="#A5B7C0"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="10.1200833 11.25 7.82429167 13.5738333 3.99414167 9.74366667 11.6544583 2.08332917 15.484625 5.9135 12.9068333 8.49129167"></polyline>
+            <line x1="2.73234167" y1="11.7232083" x2="6.008125" y2="14.9225417" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="2.5" y1="18.3333333" x2="17.5" y2="18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+        </g>
+    </g>
+</svg>

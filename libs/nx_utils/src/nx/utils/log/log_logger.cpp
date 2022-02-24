@@ -1,0 +1,205 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+#include "log_logger.h"
+
+#include <QtCore/QDateTime>
+
+#if defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID)
+    #include <sys/types.h>
+    #include <sys/syscall.h>
+    #include <unistd.h>
+    static QString thisThreadId() { return QString::number(syscall(__NR_gettid)); }
+#else
+    #include <QtCore/QThread>
+    static QString thisThreadId() { return QString::number((qint64) QThread::currentThreadId(), 16); }
+#endif
+
+#include <nx/utils/string.h>
+#include <nx/utils/thread/mutex_delegate_factory.h>
+
+#include <nx/build_info.h>
+
+namespace nx {
+namespace utils {
+namespace log {
+
+Logger::Logger(
+    std::set<Filter> filters,
+    Level defaultLevel,
+    std::unique_ptr<AbstractWriter> writer)
+    :
+    m_mutex(nx::Mutex::Recursive),
+    m_hardFilters(std::move(filters))
+{
+    if (writer)
+        m_writer = std::move(writer);
+
+    setDefaultLevel(defaultLevel);
+}
+
+std::set<Filter> Logger::filters() const
+{
+    return m_hardFilters;
+}
+
+void Logger::log(Level level, const Tag& tag, const QString& message)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (!isToBeLogged(level, tag))
+        return;
+
+    logForced(level, tag, message);
+}
+
+void Logger::logForced(Level level, const Tag& tag, const QString& message)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    static const QString kTemplate = QLatin1String("%1 %2 %3 %4: %5");
+    const auto output = kTemplate
+        .arg(QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss.zzz")).arg(thisThreadId(), 6)
+        .arg(toString(level).toUpper(), 7, QLatin1Char(' ')).arg(tag.toString()).arg(message);
+
+    if (m_writer)
+    {
+        m_writer->write(level, output);
+    }
+    else
+    {
+        static StdOut stdOut;
+        stdOut.write(level, output);
+    }
+}
+
+bool Logger::isToBeLogged(Level level, const Tag& tag)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    for (const auto& filter: m_levelFilters)
+    {
+        if (filter.first.accepts(tag))
+            return level <= filter.second;
+    }
+
+    return level <= m_defaultLevel;
+}
+
+Level Logger::defaultLevel() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_defaultLevel;
+}
+
+void Logger::setDefaultLevel(Level level)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (level == Level::trace)
+        level = Level::verbose;
+    m_defaultLevel = level;
+    handleLevelChange(&lock);
+}
+
+LevelFilters Logger::levelFilters() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_levelFilters;
+}
+
+void Logger::setLevelFilters(LevelFilters filters)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_levelFilters = std::move(filters);
+    handleLevelChange(&lock);
+}
+
+Level Logger::maxLevel() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    Level maxLevel = m_defaultLevel;
+    for (const auto& element: m_levelFilters)
+         maxLevel = std::max(maxLevel, element.second);
+    return maxLevel;
+}
+
+void Logger::setSettings(const LoggerSettings& loggerSettings)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    m_settings = loggerSettings;
+
+    if (auto file = dynamic_cast<File*>(m_writer.get()); file)
+    {
+        File::Settings fileSettings;
+        fileSettings.size = m_settings.maxFileSize;
+        fileSettings.count = m_settings.maxBackupCount;
+        file->setSettings(fileSettings);
+    }
+    setDefaultLevel(m_settings.level.primary);
+    setLevelFilters(m_settings.level.filters);
+}
+
+void Logger::setApplicationName(const QString& applicationName)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_applicationName = applicationName;
+}
+
+void Logger::setBinaryPath(const QString& binaryPath)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_binaryPath = binaryPath;
+}
+
+void Logger::setWriter(std::unique_ptr<AbstractWriter> writer)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_writer = std::move(writer);
+}
+
+void Logger::setOnLevelChanged(OnLevelChanged onLevelChanged)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_onLevelChanged = std::move(onLevelChanged);
+}
+
+std::optional<QString> Logger::filePath() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+
+    if (const auto file = dynamic_cast<File*>(m_writer.get()); file)
+        return file->getFileName();
+
+    return std::nullopt;
+}
+
+void Logger::writeLogHeader()
+{
+    const nx::utils::log::Tag kStart(QLatin1String("START"));
+    const auto write = [&](const QString& message) { log(Level::info, kStart, message); };
+    write(QByteArray(80, '='));
+    write(nx::format("%1 started, version: %2, revision: %3").args(
+        m_applicationName,
+        nx::build_info::vmsVersion(),
+        build_info::revision()));
+
+    if (!m_binaryPath.isEmpty())
+        write(nx::format("Binary path: %1").arg(m_binaryPath));
+
+    const auto filePath = this->filePath();
+    write(nx::format("Log level: %1").arg(m_settings.level));
+    write(nx::format("Log file size: %2, backup count: %3, file: %4").args(
+        nx::utils::bytesToString(m_settings.maxFileSize), m_settings.maxBackupCount,
+        filePath ? *filePath : QString("-")));
+
+    write(nx::format("Mutex implementation: %1").args(mutexImplementation()));
+}
+
+void Logger::handleLevelChange(nx::Locker<nx::Mutex>* lock) const
+{
+    decltype(m_onLevelChanged) onLevelChanged = m_onLevelChanged;
+    nx::Unlocker<nx::Mutex> unlock(lock);
+    if (onLevelChanged)
+        onLevelChanged();
+}
+
+} // namespace log
+} // namespace utils
+} // namespace nx

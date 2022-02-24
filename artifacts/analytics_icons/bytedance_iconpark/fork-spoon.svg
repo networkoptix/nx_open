@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>fork-spoon</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="fork-spoon">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <line x1="5.83333333" y1="1.66666667" x2="5.83333333" y2="18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M3.33333333,2.08333333 L3.33333333,6.25 C3.33333333,8.33333333 5.83333333,8.33333333 5.83333333,8.33333333 C5.83333333,8.33333333 8.33333333,8.33333333 8.33333333,6.25 L8.33333333,2.08333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="14.1666667" y1="8.33333333" x2="14.1666667" y2="18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M16.6666667,5 C16.6666667,6.84095833 15.547375,8.33333333 14.1666667,8.33333333 C12.7859583,8.33333333 11.6666667,6.84095833 11.6666667,5 C11.6666667,3.15905 12.7859583,1.66666667 14.1666667,1.66666667 C15.547375,1.66666667 16.6666667,3.15905 16.6666667,5 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

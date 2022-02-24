@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>xiaodu-home</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="xiaodu-home">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="1.66666667 8.33333333 10 2.5 18.3333333 8.33333333 18.3333333 17.5 1.66666667 17.5"></polygon>
+            <path d="M5.28595833,11.1192917 C5.905,10.50025 6.63991667,10.0091667 7.44879167,9.674125 C8.257625,9.339125 9.1245,9.16666667 10,9.16666667 C10.8754583,9.16666667 11.742375,9.339125 12.5512083,9.674125 C13.3600417,10.0091667 14.095,10.50025 14.7140417,11.1192917" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M7.64295833,13.4762917 C7.9525,13.1667917 8.31995833,12.92125 8.724375,12.75375 C9.12879167,12.5862083 9.56225,12.5 10,12.5 C10.43775,12.5 10.8712083,12.5862083 11.275625,12.75375 C11.6800417,12.92125 12.0475,13.1667917 12.3570417,13.4762917" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

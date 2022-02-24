@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>certificate</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="certificate">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M17.5,2.5 L2.5,2.5 C2.0397625,2.5 1.66666667,2.87309583 1.66666667,3.33333333 L1.66666667,14.1666667 C1.66666667,14.6269167 2.0397625,15 2.5,15 L17.5,15 C17.96025,15 18.3333333,14.6269167 18.3333333,14.1666667 L18.3333333,3.33333333 C18.3333333,2.87309583 17.96025,2.5 17.5,2.5 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="5" y1="5.83333333" x2="15" y2="5.83333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="5" y1="8.75" x2="7.5" y2="8.75" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="5" y1="11.6666667" x2="6.66666667" y2="11.6666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <circle id="Oval" stroke="#A5B7C0" cx="12.5" cy="11.25" r="2.5"></circle>
+            <path d="M12.5,16.6666667 L14.1666667,17.5 L14.1666667,13.1134167 C14.1666667,13.1134167 13.6914167,13.75 12.5,13.75 C11.3085833,13.75 10.8333333,13.125 10.8333333,13.125 L10.8333333,17.5 L12.5,16.6666667 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

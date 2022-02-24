@@ -1,0 +1,44 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+#pragma once
+
+#include <QtCore/QStringList>
+
+#include <analytics/common/object_metadata.h>
+
+#include <nx/utils/impl_ptr.h>
+#include <nx/vms/client/desktop/common/widgets/async_image_widget.h>
+
+#include "bubble_tooltip.h"
+
+namespace nx::vms::client::desktop {
+
+class ImageProvider;
+
+class ThumbnailTooltip: public BubbleToolTip
+{
+    Q_OBJECT
+
+public:
+    ThumbnailTooltip(QnWorkbenchContext* context);
+    virtual ~ThumbnailTooltip() override;
+
+    QString text() const;
+    void setText(const QString& text);
+
+    void setImageProvider(nx::vms::client::desktop::ImageProvider* value);
+    void setHighlightRect(const QRectF& rect);
+
+    using GroupedAttributes = nx::common::metadata::GroupedAttributes;
+    const GroupedAttributes& attributes() const;
+    void setAttributes(const GroupedAttributes& value);
+
+    void setMaximumContentSize(const QSize& size);
+    void adjustMaximumContentSize(const QModelIndex &index);
+
+private:
+    struct Private;
+    nx::utils::ImplPtr<Private> d;
+};
+
+} // namespace nx::vms::client::desktop

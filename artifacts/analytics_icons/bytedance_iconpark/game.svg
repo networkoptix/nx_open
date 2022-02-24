@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>game</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="game">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(1.666667, 1.666667)" stroke="#A5B7C0" stroke-linejoin="round">
+                <path d="M14.380022,2.30675159 C12.8527506,0.876036133 10.7995132,0 8.54166667,0 C3.82423443,0 8.28966525e-14,3.82423443 8.28966525e-14,8.54166667 C8.28966525e-14,13.2590989 3.82423443,17.0833333 8.54166667,17.0833333 C10.8811701,17.0833333 13.000997,16.1427862 14.543648,14.6191915 L8.33333333,8.33333333 L14.380022,2.30675159 Z" id="Path"></path>
+                <circle id="Oval" cx="15" cy="8.33333333" r="1.66666667"></circle>
+                <line x1="5.41666667" y1="3.75" x2="5.41666667" y2="7.08333333" id="Path" stroke-linecap="round"></line>
+                <line x1="3.75" y1="5.41666667" x2="7.08333333" y2="5.41666667" id="Path" stroke-linecap="round"></line>
+            </g>
+        </g>
+    </g>
+</svg>

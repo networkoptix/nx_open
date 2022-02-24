@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>report</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="report">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(1.564313, 1.594836)" stroke="#A5B7C0" stroke-linejoin="round">
+                <path d="M13.435687,12.9884973 L3.43568698,12.9884973 L3.43568698,7.15516396 C3.43568698,4.39374021 5.67426325,2.15516396 8.43568698,2.15516396 C11.1971107,2.15516396 13.435687,4.39374021 13.435687,7.15516396 L13.435687,12.9884973 Z" id="Path"></path>
+                <line x1="1.76902032" y1="15.905164" x2="15.1023537" y2="15.905164" id="Path" stroke-linecap="round"></line>
+                <line x1="0.412340494" y1="3.45154966" x2="1.04236664" y2="4.60877833" id="Path" stroke-linecap="round" transform="translate(0.727354, 4.030164) rotate(-43.000000) translate(-0.727354, -4.030164) "></line>
+                <line x1="4.33457062" y1="0.0976516051" x2="3.78680337" y2="1.29600971" id="Path" stroke-linecap="round" transform="translate(4.060687, 0.696831) rotate(-43.000000) translate(-4.060687, -0.696831) "></line>
+                <line x1="1.09400841" y1="1.97767763" x2="2.86069849" y2="1.91598346" id="Path" stroke-linecap="round" transform="translate(1.977353, 1.946831) scale(-1, 1) rotate(-43.000000) translate(-1.977353, -1.946831) "></line>
+            </g>
+        </g>
+    </g>
+</svg>

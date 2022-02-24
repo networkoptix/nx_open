@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>volume-mute</title>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="5.41666667" height="5.41666667"></rect>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="volume-mute">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <g id="Clipped" transform="translate(12.500000, 7.500000)">
+                <mask id="mask-2" fill="white">
+                    <use xlink:href="#path-1"></use>
+                </mask>
+                <g id="Rectangle"></g>
+                <g id="Group" mask="url(#mask-2)" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round">
+                    <g transform="translate(0.833333, 0.833333)" id="Path">
+                        <line x1="3.639625" y1="0.119083333" x2="0.104083333" y2="3.654625"></line>
+                        <line x1="0.104083333" y1="0.119083333" x2="3.63958333" y2="3.654625"></line>
+                    </g>
+                </g>
+            </g>
+            <path d="M10,2.5 L10,17.5 C7.08333333,17.5 4.91604167,13.6829583 4.91604167,13.6829583 L2.5,13.6829583 C2.0397625,13.6829583 1.66666667,13.309875 1.66666667,12.849625 L1.66666667,7.08783333 C1.66666667,6.62758333 2.0397625,6.2545 2.5,6.2545 L4.91604167,6.2545 C4.91604167,6.2545 7.08333333,2.5 10,2.5 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

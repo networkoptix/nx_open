@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>three-triangles</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="three-triangles">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" points="7.083375 2.91666667 10.0000417 7.9685 12.4960417 12.2916667 1.6707375 12.2916667"></polygon>
+            <polygon id="Path" points="12.9167083 2.91666667 18.329375 12.2916667 7.50408333 12.2916667 10.0000417 7.9685"></polygon>
+            <polygon id="Path" points="4.58741667 17.2916667 15.4127083 17.2916667 12.4960417 12.2916667 7.50408333 12.2916667"></polygon>
+            <path d="M7.50408333,12.2916667 L4.58741667,17.2916667 L15.4127083,17.2916667 L12.4960417,12.2916667 M7.50408333,12.2916667 L18.329375,12.2916667 L12.9167083,2.91666667 L10.0000417,7.9685 M7.50408333,12.2916667 L10.0000417,7.9685 M7.50408333,12.2916667 L12.4960417,12.2916667 M12.4960417,12.2916667 L1.6707375,12.2916667 L7.083375,2.91666667 L10.0000417,7.9685 M12.4960417,12.2916667 L10.0000417,7.9685" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

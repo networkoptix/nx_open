@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>popcorn</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="popcorn">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M14.0400417,17.0282083 L16.25,7.08333333 L2.91666667,7.08333333 L5.126625,17.0282083 C5.26566667,17.6539167 5.33520833,17.96675 5.56370833,18.1500417 C5.79220833,18.3333333 6.11266667,18.3333333 6.753625,18.3333333 L12.4130417,18.3333333 C13.054,18.3333333 13.3744583,18.3333333 13.6029583,18.1500417 C13.8314583,17.96675 13.901,17.6539167 14.0400417,17.0282083 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="11.25" y1="18.3333333" x2="11.6666667" y2="7.08333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="7.91666667" y1="18.3333333" x2="7.5" y2="7.08333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="12.9166667" y1="18.3333333" x2="6.25" y2="18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="12.9166667" y1="7.08333333" x2="6.25" y2="7.08333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M4.58333333,7.08333333 C4.58333333,7.08333333 4.1666625,5.83333333 4.79166667,5.20833333 C5.41666667,4.58333333 6.66666667,4.79166667 6.66666667,4.79166667 C6.66666667,4.79166667 6.66666667,3.54165 7.5,3.12498333 C8.33333333,2.70831667 9.58333333,3.33330833 9.58333333,3.33330833 C9.58333333,3.33330833 10.4166667,1.93449167 11.6666667,2.29165833 C12.9166667,2.64882917 12.9166667,4.16666667 12.9166667,4.16666667 C12.9166667,4.16666667 13.9583333,4.16666667 14.5833333,5 C15.2083333,5.83333333 14.5833333,7.08333333 14.5833333,7.08333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

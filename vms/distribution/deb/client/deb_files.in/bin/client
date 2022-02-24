@@ -1,0 +1,20 @@
+#!/bin/bash
+
+## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+export QT_IM_MODULE=ibus
+
+STDCPP_DIR="$("$DIR/choose_newer_stdcpp.sh" "$DIR/../lib/stdcpp")"
+if [ -n "$STDCPP_DIR" ]
+then
+    echo "Using bundled libstdc++."
+    export LD_LIBRARY_PATH="$STDCPP_DIR:$LD_LIBRARY_PATH"
+else
+    echo "Using system libstdc++."
+fi
+
+ulimit -c unlimited
+
+"$DIR/@client.binary.name@" "$@"

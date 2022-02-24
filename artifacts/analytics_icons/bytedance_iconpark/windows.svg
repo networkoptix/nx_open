@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>windows</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="windows">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="2.8125 4.609375 8.203125 3.89062083 8.203125 8.921875 2.8125 8.921875"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="10.359375 3.68526667 17.1875 2.8125 17.1875 8.921875 10.359375 8.921875"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="10.359375 11.4375 17.1875 11.5972083 17.1875 17.1875 10.359375 16.0694583"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="2.8125 11.078125 8.203125 11.2079167 8.203125 15.75 2.8125 14.8415833"></polygon>
+        </g>
+    </g>
+</svg>

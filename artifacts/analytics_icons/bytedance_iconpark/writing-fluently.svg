@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>writing-fluently</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="writing-fluently">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="10 10 10 7.91666667 16.25 1.66666667 18.3333333 3.75 12.0833333 10"></polygon>
+            <path d="M6.66666667,10 L3.75,10 C2.59940833,10 1.66666667,10.93275 1.66666667,12.0833333 C1.66666667,13.2339167 2.59940833,14.1666667 3.75,14.1666667 L16.25,14.1666667 C17.4005833,14.1666667 18.3333333,15.0994167 18.3333333,16.25 C18.3333333,17.4005833 17.4005833,18.3333333 16.25,18.3333333 L7.5,18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

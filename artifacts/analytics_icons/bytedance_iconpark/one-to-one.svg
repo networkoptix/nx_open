@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>one-to-one</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="one-to-one">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M17.5,2.91666667 L2.5,2.91666667 C2.0397625,2.91666667 1.66666667,3.2897625 1.66666667,3.75 L1.66666667,16.25 C1.66666667,16.71025 2.0397625,17.0833333 2.5,17.0833333 L17.5,17.0833333 C17.96025,17.0833333 18.3333333,16.71025 18.3333333,16.25 L18.3333333,3.75 C18.3333333,3.2897625 17.96025,2.91666667 17.5,2.91666667 Z" id="Path" stroke="#A5B7C0"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="5 8.57495833 6.66666667 7.5 6.66666667 12.5"></polyline>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="12.9166667 8.57495833 14.5833333 7.5 14.5833333 12.5"></polyline>
+            <line x1="10" y1="8.33333333" x2="10" y2="8.75" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="10" y1="11.25" x2="10" y2="11.6666667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>moon</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="moon">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M11.688625,1.83785417 C9.4095,2.4320625 7.72729167,4.50441667 7.72729167,6.96970833 C7.72729167,9.8985 10.1015,12.2727083 13.0302917,12.2727083 C15.4955833,12.2727083 17.5679583,10.5905 18.162125,8.311375 C18.274375,8.85666667 18.3333333,9.42145833 18.3333333,10 C18.3333333,14.602375 14.602375,18.3333333 10,18.3333333 C5.397625,18.3333333 1.66666667,14.602375 1.66666667,10 C1.66666667,5.397625 5.397625,1.66666667 10,1.66666667 C10.5785417,1.66666667 11.1433333,1.72562083 11.688625,1.83785417 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

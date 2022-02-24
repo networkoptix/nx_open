@@ -1,0 +1,794 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+#include "tab_api_backend.h"
+
+#include <QtCore/QCoreApplication>
+
+#include <core/resource/layout_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_runtime_data.h>
+#include <core/resource/resource.h>
+#include <nx/utils/guarded_callback.h>
+#include <nx/utils/pending_operation.h>
+#include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+#include <ui/graphics/items/controls/time_slider.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/workbench/extensions/workbench_stream_synchronizer.h>
+#include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_item.h>
+#include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_navigator.h>
+#include <utils/common/delayed.h>
+
+#include "resources_structures.h"
+
+namespace nx::vms::client::desktop::jsapi::detail {
+
+using namespace std::chrono;
+
+namespace {
+
+LayoutProperties propertiesState(QnWorkbenchLayout* layout)
+{
+    const auto layoutResource = layout->resource();
+    if (!layoutResource)
+        return LayoutProperties();
+
+    LayoutProperties result;
+    const auto minimumSize = layoutResource->fixedSize();
+    if (!minimumSize.isEmpty())
+    {
+        result.minimumSize = Size{minimumSize.width(), minimumSize.height()};
+    }
+    return result;
+}
+
+QnTimePeriod periodFromTimeWindow(const TimePeriod& window)
+{
+    return QnTimePeriod{window.startTimeMs, window.durationMs};
+}
+
+TimePeriod TimeWindowFromPeriod(const QnTimePeriod& period)
+{
+    return TimePeriod{period.startTime(), period.duration()};
+}
+
+Error cantFindItemResult()
+{
+    return Error::invalidArguments(QCoreApplication::translate(
+        "nx::vms::client::desktop::jsapi::detail::TabApiBackend",
+        "Cannot find an item with the specified id"));
+}
+
+} // namespace
+
+struct TabApiBackend::Private: public QObject
+{
+    TabApiBackend* const q;
+    QnWorkbenchContext* const context;
+    QnWorkbenchLayout* const layout;
+    QnWorkbenchDisplay* const display;
+    QnWorkbenchNavigator* const navigator;
+
+    QnUuidSet selectedItems;
+    QnUuid focusedItem;
+
+    QSet<QnUuid> availableItems;
+
+    Private(
+        TabApiBackend* q,
+        QnWorkbenchContext* context,
+        QnWorkbenchLayout* layout);
+
+    void updateLayoutItemData(
+        const QUuid& itemId,
+        const ItemParams& params);
+
+    void updateItemParams(
+        const QUuid& itemId,
+        const ItemParams& params);
+
+    void handleItemChanged(QnWorkbenchItem* item) const;
+
+    Item itemState(QnWorkbenchItem* item) const;
+
+    std::optional<MediaParams> itemMediaParams(QnWorkbenchItem* item) const;
+    bool isFocusedWidget(const QnResourceWidget* widget) const;
+    QnResourceWidget* focusedMediaWidget() const;
+
+    bool isSyncedLayout() const;
+
+    template<typename Ids>
+    ItemVector itemStatesFromIds(const Ids& ids) const;
+
+    ItemVector allItemStates() const;
+
+    ItemResult itemOperationResult(
+        const Error& result,
+        const QUuid& itemId = QUuid()) const;
+
+    void handleResourceWidgetAdded(QnResourceWidget* widget);
+
+    bool hasPermission(
+        const QnResourcePtr& resource,
+        const Qn::Permission permission);
+
+    void handleSliderChanged();
+};
+
+TabApiBackend::Private::Private(
+    TabApiBackend* q,
+    QnWorkbenchContext* context,
+    QnWorkbenchLayout* layout)
+    :
+    q(q),
+    context(context),
+    layout(layout),
+    display(context->display()),
+    navigator(context->navigator())
+{
+    const auto handleItemAdded =
+        [this, q](QnWorkbenchItem* item)
+        {
+            connect(item, &QnWorkbenchItem::geometryChanged, q,
+                [this, item]() { handleItemChanged(item); });
+            connect(item, &QnWorkbenchItem::dataChanged, q,
+                [this, item](Qn::ItemDataRole role)
+                {
+                    if (role == Qn::ItemSliderSelectionRole || role == Qn::ItemSliderWindowRole)
+                        handleItemChanged(item);
+                });
+        };
+
+    connect(layout, &QnWorkbenchLayout::itemAdded, this,
+        [this, q, handleItemAdded](QnWorkbenchItem* addedItem)
+        {
+            handleItemAdded(addedItem);
+            emit q->itemAdded(itemState(addedItem));
+        });
+
+    for (const auto& item: layout->items())
+        handleItemAdded(item);
+
+    connect(layout, &QnWorkbenchLayout::itemRemoved, this,
+        [this, q](QnWorkbenchItem* removedItem)
+        {
+            if (!this->layout)
+                return;
+
+            availableItems.remove(removedItem->uuid());
+            emit q->itemRemoved(removedItem->uuid());
+        });
+
+    connect(display, &QnWorkbenchDisplay::widgetAdded,
+        this, &Private::handleResourceWidgetAdded);
+
+    for (const auto& widget: display->widgets())
+        handleResourceWidgetAdded(widget);
+
+    const auto timeSlider = navigator->timeSlider();
+    connect(timeSlider, &QnTimeSlider::windowChanged, this, &Private::handleSliderChanged);
+    connect(timeSlider, &QnTimeSlider::selectionChanged, this, &Private::handleSliderChanged);
+}
+
+void TabApiBackend::Private::handleSliderChanged()
+{
+    if (isSyncedLayout())
+    {
+        // Windows for all items of synced layout are changed simultaneously.
+        for (const auto item: layout->items())
+            handleItemChanged(item);
+    }
+    else if (const auto focused = focusedMediaWidget())
+    {
+        handleItemChanged(focused->item());
+    }
+}
+
+void TabApiBackend::Private::updateLayoutItemData(
+    const QUuid& itemId,
+    const ItemParams& params)
+{
+    const auto manager = qnResourceRuntimeDataManager;
+
+    // We always skip focuse state for newly added items to preserve selection on layout.
+    manager->setLayoutItemData(itemId, Qn::ItemSkipFocusOnAdditionRole, true);
+
+    if (!params.media)
+        return;
+
+    if (params.media->speed.has_value())
+    {
+        const qreal speed = params.media->speed.value();
+        manager->setLayoutItemData(itemId, Qn::ItemPausedRole, qFuzzyEquals(speed, 0));
+        manager->setLayoutItemData(itemId, Qn::ItemSpeedRole, speed);
+    }
+
+    if (params.media->timestampMs.has_value())
+    {
+        manager->setLayoutItemData(itemId, Qn::ItemTimeRole,
+            params.media->timestampMs->count());
+    }
+
+    if (params.media->timelineWindow.has_value())
+    {
+        manager->setLayoutItemData(itemId, Qn::ItemSliderWindowRole,
+            periodFromTimeWindow(params.media->timelineWindow.value()));
+    }
+
+    if (params.media->timelineSelection.has_value())
+    {
+        manager->setLayoutItemData(itemId, Qn::ItemSliderSelectionRole,
+            periodFromTimeWindow(params.media->timelineSelection.value()));
+    }
+}
+
+void TabApiBackend::Private::updateItemParams(
+    const QUuid& itemId,
+    const ItemParams& params)
+{
+    const auto item = layout->item(itemId);
+    if (!item)
+        return;
+
+    const auto setParametersLater = nx::utils::guarded(item,
+        [this, item, params]()
+        {
+            if (params.geometry.has_value())
+            {
+                const QRectF geometry(
+                    params.geometry->pos.x, params.geometry->pos.y,
+                    params.geometry->size.width, params.geometry->size.height);
+                item->setCombinedGeometry(geometry);
+            }
+
+            if (params.selected.has_value())
+                display->widget(item)->setSelected(params.selected.value());
+
+            if (params.focused.has_value())
+            {
+                const auto workbench = context->workbench();
+                if (params.focused.value())
+                {
+                    workbench->setItem(Qn::ActiveRole, item);
+                    workbench->setItem(Qn::CentralRole, item);
+                }
+                else
+                {
+                    for (int role = Qn::RaisedRole; role != Qn::ItemRoleCount; ++role)
+                    {
+                        const Qn::ItemRole itemRole = static_cast<Qn::ItemRole>(role);
+                        if (workbench->item(itemRole) == item)
+                            workbench->setItem(itemRole, nullptr);
+                    }
+                }
+            }
+
+            if (!params.media)
+                return;
+
+            const auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(display->widget(item));
+            if (!mediaWidget)
+                return;
+
+            if (params.media->speed.has_value())
+                mediaWidget->setSpeed(params.media->speed.value());
+
+            if (params.media->timestampMs.has_value())
+                mediaWidget->setPosition(params.media->timestampMs.value().count());
+
+            if (!isFocusedWidget(mediaWidget))
+                return; //< Do all timeline changes only if item is current one.
+
+            if (context->workbench()->currentLayout() != layout)
+                return; //< Do not change timeline appearance for the other layout.
+
+            const auto timeSlider = navigator->timeSlider();
+            if (params.media->timelineWindow.has_value())
+            {
+                const bool stillPosition = timeSlider->options().testFlag(QnTimeSlider::StillPosition);
+                if (stillPosition)
+                    timeSlider->setOption(QnTimeSlider::StillPosition, false);
+
+                const auto window = params.media->timelineWindow.value();
+                const auto endTime = window.durationMs.count() == QnTimePeriod::kInfiniteDuration
+                    ? window.startTimeMs + window.durationMs
+                    : timeSlider->maximum();
+                timeSlider->setWindow(window.startTimeMs, endTime, /*animate*/ false,
+                    /*forceResize*/ true);
+            }
+
+            if (params.media->timelineSelection.has_value())
+            {
+                const auto selection = params.media->timelineSelection.value();
+                timeSlider->setSelectionValid(selection.durationMs.count() > 0);
+                if (selection.durationMs.count() > 0)
+                    timeSlider->setSelection(selection.startTimeMs, selection.startTimeMs + selection.durationMs);
+            }
+        });
+
+    // We update parameters later to give some time to the the item to be added on the scene.
+    executeDelayedParented(setParametersLater, milliseconds(1), this);
+}
+
+void TabApiBackend::Private::handleItemChanged(QnWorkbenchItem* item) const
+{
+    if (item && availableItems.contains(item->uuid()))
+        emit q->itemChanged(itemState(item));
+}
+
+Item TabApiBackend::Private::itemState(QnWorkbenchItem* item) const
+{
+    if (!item)
+        return Item();
+
+    const auto& itemId = item->uuid();
+
+    Item result;
+    result.id = itemId.toQUuid();
+    result.resource = Resource::from(item->resource());
+
+    result.params =
+        [this, item, itemId, geometry = item->combinedGeometry()]()
+        {
+            ItemParams result;
+            result.focused = itemId == focusedItem;
+            result.selected = selectedItems.contains(itemId);
+            result.geometry = Rect::from(geometry);
+            result.media = itemMediaParams(item);
+            return result;
+        }();
+
+    return result;
+}
+
+std::optional<MediaParams> TabApiBackend::Private::itemMediaParams(QnWorkbenchItem* item) const
+{
+    const auto type = resourceType(item->resource());
+    if (!detail::hasMediaStream(type))
+        return {};
+
+    const auto widget = display->widget(item);
+    const auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget);
+    if (!mediaWidget) //< This may be when we remove item from the scene.
+        return {};
+
+    MediaParams result;
+    result.timestampMs = mediaWidget->position();
+    result.speed = mediaWidget->speed();
+
+    const bool isCurrentLayout = context->workbench()->currentLayout() == layout;
+    const bool synced = isSyncedLayout();
+
+    const auto fillFromTimeSlider =
+        [&result, this]()
+        {
+            const auto timeSlider = navigator->timeSlider();
+            result.timelineSelection = TimeWindowFromPeriod(timeSlider->selection());
+
+            const auto timeSliderMaximum = timeSlider->maximum();
+            const auto timeSliderWindowEnd = timeSlider->windowEnd();
+            const auto timeSliderWindowStart = timeSlider->windowStart();
+            const qint64 duration = (timeSliderMaximum - timeSliderWindowEnd) < milliseconds(300)
+                ? QnTimePeriod::kInfiniteDuration
+                : (timeSliderWindowEnd - timeSliderWindowStart).count();
+
+            result.timelineWindow = TimeWindowFromPeriod(
+                QnTimePeriod(timeSliderWindowStart.count(), duration));
+        };
+
+    const auto tryFillFromItemData =
+        [&result](const QnUuid& itemId)
+        {
+            const auto selectionValue = qnResourceRuntimeDataManager->layoutItemData(
+                itemId, Qn::ItemSliderSelectionRole);
+            const auto windowValue = qnResourceRuntimeDataManager->layoutItemData(
+                itemId, Qn::ItemSliderWindowRole);
+            if (!selectionValue.isValid() || !windowValue.isValid())
+                return false; //< We suppose these values should be set simultaniously.
+
+            const auto selection = selectionValue.value<QnTimePeriod>();
+            result.timelineSelection = TimeWindowFromPeriod(selection);
+
+            const auto window = windowValue.value<QnTimePeriod>();
+            result.timelineWindow = TimeWindowFromPeriod(window);
+            return true;
+        };
+
+    const auto tryFillFromAnyLayoutItemData =
+        [&]()
+        {
+            for (const auto anyLayoutItem: layout->items())
+            {
+                const auto type = resourceType(anyLayoutItem->resource());
+                if (detail::hasMediaStream(type) && tryFillFromItemData(anyLayoutItem->uuid()))
+                    break;
+            }
+        };
+
+    if (isCurrentLayout)
+    {
+        const auto focused = focusedMediaWidget();
+
+        if (synced)
+        {
+            // Slider window and selection are the same for the all items on a synced layout.
+            if (focused)
+            {
+                // We have a foused media widget so time slider has correct
+                // representation (not null) for all items on a synced layout.
+                fillFromTimeSlider();
+            }
+            else
+            {
+                // If we don't have any media widget selected, as we have layout synced, we just
+                // look for the stored item data for slider values.
+                tryFillFromAnyLayoutItemData();
+            }
+        }
+        else //< Not synced.
+        {
+            if (focused == mediaWidget)
+            {
+                // If current item is focused and layout is current then just update from the time
+                // slider values.
+                fillFromTimeSlider();
+            }
+            else
+            {
+                // If current item is not focused then just try to update from the item's data.
+                tryFillFromItemData(item->uuid());
+            }
+        }
+    }
+    else //< Not a current layout
+    {
+        // For an invisible layout all we may to do is to try updating from the item's data.
+        if (synced)
+        {
+            // On synced inactive layout any selection/window data from media item is acceptable.
+            tryFillFromAnyLayoutItemData();
+        }
+        else
+        {
+            // No matter if item is focused or not, we just take all results from the item's data.
+            tryFillFromItemData(item->uuid());
+        }
+    }
+
+    return result;
+}
+
+QnResourceWidget* TabApiBackend::Private::focusedMediaWidget() const
+{
+    const auto widgets = context->display()->widgets();
+    const auto it = std::find_if(widgets.cbegin(), widgets.cend(),
+        [this](const QnResourceWidget* widget)
+        {
+            return widget->item()->layout() == layout && isFocusedWidget(widget);
+        });
+    return it == widgets.cend() ? nullptr : *it;
+}
+
+bool TabApiBackend::Private::isFocusedWidget(const QnResourceWidget* widget) const
+{
+    if (!layout || !widget)
+        return false;
+
+    const auto state = widget->selectionState();
+    switch (state)
+    {
+        case QnResourceWidget::SelectionState::focused:
+        case QnResourceWidget::SelectionState::focusedAndSelected:
+            return true;
+        case QnResourceWidget::SelectionState::inactiveFocused:
+        {
+            // We suppose item is focused in the inactive state only if
+            // there is no other active and focused item.
+            const auto widgets = context->display()->widgets();
+            return !std::any_of(widgets.cbegin(), widgets.cend(),
+                [this](const QnResourceWidget* widget)
+                {
+                    const auto item = widget->item();
+                    return item
+                        && item->layout() == layout
+                        && widget->selectionState() == QnResourceWidget::SelectionState::focused;
+                });
+        }
+        default:
+            return false;
+    };
+}
+
+bool TabApiBackend::Private::isSyncedLayout() const
+{
+    const auto currentLayout = context->workbench()->currentLayout();
+    const auto state = currentLayout == layout
+        ? context->instance<QnWorkbenchStreamSynchronizer>()->state()
+        : layout->data(Qn::LayoutSyncStateRole).value<QnStreamSynchronizationState>();
+    return state.isSyncOn;
+}
+
+template<typename Ids>
+ItemVector TabApiBackend::Private::itemStatesFromIds(const Ids& ids) const
+{
+    ItemVector result;
+    for (const auto& id: ids)
+    {
+        if (const auto item = layout->item(id))
+            result.push_back(itemState(item));
+    }
+    return result;
+}
+
+ItemVector TabApiBackend::Private::allItemStates() const
+{
+    if (!layout)
+        return detail::ItemVector();
+
+    QnUuidList itemIds;
+    for (const auto& item: layout->items())
+        itemIds.append(item->uuid());
+    return itemStatesFromIds(itemIds);
+}
+
+ItemResult TabApiBackend::Private::itemOperationResult(
+    const Error& error,
+    const QUuid& itemId) const
+{
+    ItemResult itemResult;
+    itemResult.error = error;
+
+    if (!itemId.isNull())
+        itemResult.item = itemState(layout->item(itemId));
+
+    return itemResult;
+}
+
+void TabApiBackend::Private::handleResourceWidgetAdded(QnResourceWidget* widget)
+{
+    const auto item = widget->item();
+    if (!item)
+        return;
+
+    if (item->layout() != layout)
+        return;
+
+    const auto itemId = item->uuid();
+    if (const auto mediaWidget = qobject_cast<QnMediaResourceWidget*>(widget))
+    {
+        const auto processItemChanged = [this, item]() { handleItemChanged(item); };
+        connect(mediaWidget, &QnMediaResourceWidget::positionChanged, this, processItemChanged);
+        connect(mediaWidget, &QnMediaResourceWidget::speedChanged, this, processItemChanged);
+    }
+
+    const auto handleSelectedStateChanged =
+        [this, item, itemId](QnResourceWidget* widget)
+        {
+            if (!layout || !widget || context->workbench()->isInLayoutChangeProcess())
+                return;
+
+            const auto state = widget->selectionState();
+            const bool selected = state >= QnResourceWidget::SelectionState::selected;
+            const bool focused = isFocusedWidget(widget);
+
+            bool hasChanges = false;
+            if (selectedItems.contains(itemId) != selected)
+            {
+                hasChanges = true;
+                if (selected)
+                    selectedItems.insert(itemId);
+                else
+                    selectedItems.remove(itemId);
+            }
+
+            if ((focusedItem == itemId) != focused)
+            {
+                hasChanges = true;
+                focusedItem = focused
+                    ? itemId
+                    : QnUuid();
+            }
+
+            if (hasChanges)
+                handleItemChanged(item);
+        };
+
+    connect(widget, &QnResourceWidget::selectionStateChanged, this,
+        [handleSelectedStateChanged, widget]() { handleSelectedStateChanged(widget); });
+
+    // Do not handle selection state change for widgets which were added after layout switch.
+    // Since we destroy all widgets on layout switch, widget addition signal is not to be
+    // processed as we already store correct state of selection for layout.
+    if (availableItems.contains(itemId))
+        return;
+
+    availableItems.insert(itemId);
+    handleSelectedStateChanged(widget);
+}
+
+bool TabApiBackend::Private::hasPermission(
+    const QnResourcePtr& resource,
+    const Qn::Permission permission)
+{
+    return context->accessController()->hasPermissions(resource, permission);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+TabApiBackend::TabApiBackend(
+    QnWorkbenchContext* context,
+    QnWorkbenchLayout* layout,
+    QObject* parent)
+    :
+    base_type(parent),
+    d(new Private(this, context, layout))
+{
+}
+
+TabApiBackend::~TabApiBackend()
+{
+}
+
+State TabApiBackend::state() const
+{
+    detail::State result;
+    result.items = d->allItemStates();
+    result.sync = d->isSyncedLayout();
+    result.selection = ItemSelection{
+        d->itemState(d->layout->item(d->focusedItem)),
+        d->itemStatesFromIds(d->selectedItems)
+    };
+
+    result.properties = propertiesState(d->layout);
+    return result;
+}
+
+ItemResult TabApiBackend::item(const QUuid& itemId) const
+{
+    if (!d->layout)
+        return {Error::failed(), {}};
+
+    const auto item = d->layout->item(itemId);
+    return item
+        ? ItemResult{Error::success(), d->itemState(item)}
+        : ItemResult{cantFindItemResult(), {}};
+}
+
+ItemResult TabApiBackend::addItem(
+    const QUuid& resourceId,
+    const ItemParams& params)
+{
+    const auto pool = d->context->resourcePool();
+    const auto resource = pool->getResourceById(resourceId);
+    if (!resource)
+    {
+        return d->itemOperationResult(
+            Error::invalidArguments(tr("Cannot find a resource with the specified id.")));
+    }
+
+    if (params.media && !hasMediaStream(resourceType(resource)))
+    {
+        return d->itemOperationResult(Error::invalidArguments(
+            tr("Cannot specify a media parameters for the resource without media stream.")));
+    }
+
+    if (!d->hasPermission(resource, Qn::ViewContentPermission))
+        return d->itemOperationResult(Error::denied());
+
+    const auto actionParams = ui::action::Parameters(resource);
+    if (!d->context->menu()->canTrigger(ui::action::OpenInCurrentLayoutAction, actionParams))
+    {
+        return d->itemOperationResult(
+            Error::failed(tr("Cannot add the resource to the layout")));
+    }
+
+    QnLayoutItemData itemData = layout::itemFromResource(resource);
+    itemData.flags = Qn::PendingGeometryAdjustment;
+
+    const auto itemId = itemData.uuid.toQUuid();
+    d->updateLayoutItemData(itemId, params);
+    d->layout->resource()->addItem(itemData);
+    d->updateItemParams(itemId, params);
+
+    return d->itemOperationResult(Error::success(), itemId);
+}
+
+Error TabApiBackend::setItemParams(
+    const QUuid& itemId,
+    const ItemParams& params)
+{
+    if (!d->layout)
+        return Error::failed();
+
+    const auto item = d->layout->item(itemId);
+    if (!item)
+        return cantFindItemResult();
+
+    d->updateLayoutItemData(itemId, params);
+    d->updateItemParams(itemId, params);
+    return Error::success();
+}
+
+Error TabApiBackend::removeItem(const QUuid& itemId)
+{
+    if (!d->layout)
+        return Error::failed();
+
+    const auto item = d->layout->item(itemId);
+    if (!item)
+        return cantFindItemResult();
+
+    d->layout->removeItem(item);
+    return Error::success();
+}
+
+Error TabApiBackend::syncWith(const QUuid& itemId)
+{
+    if (itemId.isNull())
+        return Error::invalidArguments(tr(""));
+
+    const auto item = d->layout->item(itemId);
+    if (!item)
+        return cantFindItemResult();
+
+    const auto widget = d->context->display()->widget(item);
+    if (!widget)
+        return Error::failed(tr("Cannot find a widget corresponding to the specified item."));
+
+    const auto streamSynchronizer = d->context->instance<QnWorkbenchStreamSynchronizer>();
+    streamSynchronizer->setState(widget, /*useWidgetPausedState*/true);
+    return Error::success();
+}
+
+Error TabApiBackend::stopSyncPlay()
+{
+    static const QnStreamSynchronizationState kSyncDisabledState;
+    static const auto kDisabledData = QVariant::fromValue(kSyncDisabledState);
+
+    if (d->context->workbench()->currentLayout() == d->layout)
+    {
+        const auto streamSynchronizer = d->context->instance<QnWorkbenchStreamSynchronizer>();
+        streamSynchronizer->setState(kSyncDisabledState);
+    }
+
+    d->layout->setData(Qn::LayoutSyncStateRole, kDisabledData);
+    return Error::success();
+}
+
+Error TabApiBackend::setLayoutProperties(const LayoutProperties& properties)
+{
+    if (!d->layout)
+        return Error::failed();
+
+    if (!d->hasPermission(d->layout->resource(), Qn::WritePermission))
+        return Error::denied();
+
+    const auto layoutResource = d->layout->resource();
+    const auto size = properties.minimumSize.value_or(Size{0, 0});
+    layoutResource->setFixedSize(QSize(size.width, size.height));
+    return Error::success();
+}
+
+Error TabApiBackend::saveLayout()
+{
+    if (!d->layout)
+        return Error::failed();
+
+    if (!d->hasPermission(d->layout->resource(), Qn::SavePermission))
+        return Error::denied();
+
+    const auto layoutResource = d->layout->resource();
+    const auto menu = d->context->menu();
+    const bool success = menu->triggerIfPossible(ui::action::SaveLayoutAction, layoutResource);
+    return success
+        ? Error::success()
+        : Error::failed();
+}
+
+} // namespace nx::vms::client::desktop::jsapi::detail

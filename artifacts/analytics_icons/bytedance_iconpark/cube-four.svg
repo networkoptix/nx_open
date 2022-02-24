@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>cube-four</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="cube-four">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="6.391625 3.75 2.78320417 5.83333333 2.78320417 10 2.78320417 14.1666667 6.391625 16.25 10.0000833 18.3333333 13.6085417 16.25 17.2169583 14.1666667 17.2169583 10 17.2169583 5.83333333 13.6085417 3.75 10.0000833 1.66666667"></polygon>
+            <path d="M10.0000833,10 L10.0000833,4.58333333 M10.0000833,10 L14.3302083,12.5 M10.0000833,10 L5.66995833,12.5" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M13.51825,6.61458333 L14.691,7.29166667 L14.691,8.64583333 M11.17275,14.7395833 L10,15.4166667 L8.82725,14.7395833 M5.30904167,8.64583333 L5.30904167,7.29166667 L6.48179167,6.61458333" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

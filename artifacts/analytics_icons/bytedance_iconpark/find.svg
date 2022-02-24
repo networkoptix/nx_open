@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>find</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="find">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <line x1="1.66666667" y1="2.91671667" x2="18.3333333" y2="2.91671667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="1.66666667" y1="9.583375" x2="6.25" y2="9.583375" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="1.66666667" y1="16.2500417" x2="6.25" y2="16.2500417" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <path d="M13.125,14.1667083 C15.081,14.1667083 16.6666667,12.5810417 16.6666667,10.6250417 C16.6666667,8.66904167 15.081,7.083375 13.125,7.083375 C11.169,7.083375 9.58333333,8.66904167 9.58333333,10.6250417 C9.58333333,12.5810417 11.169,14.1667083 13.125,14.1667083 Z" id="Path" stroke="#A5B7C0"></path>
+            <line x1="15.4166667" y1="13.333375" x2="18.3333333" y2="16.2710833" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+        </g>
+    </g>
+</svg>

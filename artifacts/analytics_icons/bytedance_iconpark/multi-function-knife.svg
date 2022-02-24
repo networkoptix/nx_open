@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>multi-function-knife</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="multi-function-knife">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linejoin="round" x="7.5" y="1.66666667" width="5" height="16.6666667" rx="2.5"></rect>
+            <path d="M12.5,8.46404167 L15.51775,11.4817917 C16.168625,12.1326667 17.2239167,12.1326667 17.8747917,11.4817917 C18.5256667,10.8309583 18.5256667,9.77566667 17.8747917,9.12479167 L12.5,3.75 L12.5,8.46404167 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M7.529625,11.4225833 L4.51183333,8.40483333 C3.86097083,7.75395833 2.80569583,7.75395833 2.15482083,8.40483333 C1.50395,9.05570833 1.50395,10.1109583 2.15482083,10.7618333 L7.529625,16.136625 L7.529625,11.4225833 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <line x1="10" y1="4.16666667" x2="10" y2="4.58333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="10" y1="15.4166667" x2="10" y2="15.8333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

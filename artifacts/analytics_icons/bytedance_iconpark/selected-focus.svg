@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>selected-focus</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="selected-focus">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="5 1.66666667 1.66666667 1.66666667 1.66666667 5 5 5"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="18.3333333 15 15 15 15 18.3333333 18.3333333 18.3333333"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="5 15 1.66666667 15 1.66666667 18.3333333 5 18.3333333"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="18.3333333 1.66666667 15 1.66666667 15 5 18.3333333 5"></polygon>
+            <line x1="3.33333333" y1="15" x2="3.33333333" y2="5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0.5"></line>
+            <line x1="16.6666667" y1="15" x2="16.6666667" y2="5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0.5"></line>
+            <line x1="5" y1="3.33333333" x2="15" y2="3.33333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0.5"></line>
+            <line x1="5" y1="16.6666667" x2="15" y2="16.6666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="0.5"></line>
+        </g>
+    </g>
+</svg>

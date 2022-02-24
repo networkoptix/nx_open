@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>coronavirus</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="coronavirus">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M3.18115417,14.7916667 C3.47411667,15.2077917 3.8042125,15.5959167 4.16662083,15.9512083 C4.54916667,16.3262083 4.96770833,16.664625 5.416625,16.9608333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M11.6117917,18.1775833 C11.0902917,18.27975 10.551375,18.3333333 9.99991667,18.3333333 C9.4485,18.3333333 8.90954167,18.27975 8.38804167,18.1775833" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M18.1454583,11.7678333 C18.2685417,11.1980833 18.3333333,10.6065833 18.3333333,10 C18.3333333,9.40604167 18.2712083,8.82658333 18.1530833,8.26779167" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M16.8187917,5.20833333 C16.5258333,4.79220833 16.19575,4.40408333 15.8333333,4.04881667 C15.4507917,3.67379583 15.0322083,3.33536667 14.5833333,3.03919583" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M8.39804167,1.8205125 C8.91645833,1.71955833 9.45208333,1.66666667 10.0000417,1.66666667 C10.5480417,1.66666667 11.0836667,1.71955833 11.6020833,1.8205125" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M3.18115417,5.20833333 C3.47411667,4.79220833 3.8042125,4.40408333 4.16662083,4.04881667 C4.54916667,3.67379583 4.96770833,3.33536667 5.416625,3.03919583" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M16.875,14.7058333 C16.5820417,15.122 16.2519583,15.510125 15.8895417,15.865375 C15.507,16.2404167 15.0884167,16.5788333 14.6395417,16.875" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="6.66666667" y1="10" x2="1.66666667" y2="10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="4.16666667" y1="15.8333333" x2="7.64295833" y2="12.3570417" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="10" y1="13.3333333" x2="10" y2="18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="15.8332917" y1="15.8333333" x2="12.3569583" y2="12.3570417" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="13.3333333" y1="10" x2="18.3333333" y2="10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="15.8332917" y1="4.16666667" x2="12.3569583" y2="7.64295833" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="10" y1="6.66666667" x2="10" y2="1.66666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="4.16666667" y1="4.16666667" x2="7.64295833" y2="7.64295833" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M1.84694167,8.26779167 C1.72880833,8.82658333 1.66666667,9.40604167 1.66666667,10 C1.66666667,10.5939583 1.72880833,11.1734167 1.84694167,11.7322083" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <circle id="Oval" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" cx="10" cy="10" r="3.33333333"></circle>
+        </g>
+    </g>
+</svg>

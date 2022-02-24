@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>face-recognition</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="face-recognition">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M14.1666667,1.66656667 L18.3333333,1.66656667 L18.3333333,5.83325 M18.3333333,14.1665833 L18.3333333,18.33325 L14.1666667,18.33325 M5.83333333,18.33325 L1.66666667,18.33325 L1.66666667,14.1665833 M1.66666667,5.83325 L1.66666667,1.66656667 L5.83333333,1.66656667" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M10,16.6665833 C13.2216667,16.6665833 15.8333333,13.6817917 15.8333333,9.99991667 C15.8333333,6.318 13.2216667,3.33323333 10,3.33323333 C6.77833333,3.33323333 4.16666667,6.318 4.16666667,9.99991667 C4.16666667,13.6817917 6.77833333,16.6665833 10,16.6665833 Z" id="Path" stroke="#A5B7C0"></path>
+            <line x1="2.5" y1="10.003375" x2="17.5" y2="9.99991667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <path d="M8.362375,13.377375 C8.890625,13.767875 9.4365,13.963125 10,13.963125 C10.5634583,13.963125 11.1242917,13.767875 11.6825417,13.377375" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+        </g>
+    </g>
+</svg>

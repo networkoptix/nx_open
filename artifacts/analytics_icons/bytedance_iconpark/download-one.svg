@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>download-one</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="download-one">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M4.86570833,8.44625 C3.03115,8.88254167 1.66666667,10.5319167 1.66666667,12.5 C1.66666667,14.8011667 3.53214583,16.6666667 5.83333333,16.6666667 L5.83333333,16.6666667 C6.22808333,16.6666667 6.61,16.6117917 6.971875,16.5092083" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M15.0227917,8.44625 C16.857375,8.88254167 18.2218333,10.5319167 18.2218333,12.5 C18.2218333,14.8011667 16.356375,16.6666667 14.0551667,16.6666667 L14.0551667,16.6666667 C13.6604167,16.6666667 13.2785,16.6117917 12.916625,16.5092083" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M15,8.33333333 C15,5.57191667 12.7614167,3.33333333 10,3.33333333 C7.23858333,3.33333333 5,5.57191667 5,8.33333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="7.11058333 12.5495833 9.99995833 15.4485 12.9715833 12.5"></polyline>
+            <line x1="10" y1="8.33333333" x2="10" y2="13.97425" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

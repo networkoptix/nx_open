@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>shield</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="shield">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <path d="M2.5,3.4398516 L10.0036008,1.25 L17.5,3.4398516 L17.5,7.93069992 C17.5,12.6509097 14.4792593,16.8414264 10.0010935,18.3335431 L10.0010935,18.3335431 C5.52169967,16.8414523 2.5,12.6499917 2.5,7.92862496 L2.5,3.4398516 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="21px" height="21px" viewBox="0 0 21 21" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>goblet-one</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="goblet-one" transform="translate(1.000000, 1.000000)">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M2.80690417,10.1603042 L4.86929167,12.2227208 C6.98466667,14.3380542 10.4142917,14.3380542 12.529625,12.2227208 L12.529625,12.2227208 C14.6449583,10.1073875 14.6449583,6.67772083 12.529625,4.5623875 L10.4672083,2.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="12.91675" y1="12.6097625" x2="15.4166667" y2="15.1098042" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <ellipse id="Oval" stroke="#A5B7C0" transform="translate(6.250000, 5.943096) rotate(-45.000000) translate(-6.250000, -5.943096) " cx="6.25" cy="5.94309583" rx="5.41666667" ry="2.91666667"></ellipse>
+            <ellipse id="Oval" stroke="#A5B7C0" transform="translate(16.250083, 15.943096) rotate(-45.000000) translate(-16.250083, -15.943096) " cx="16.2500833" cy="15.9430958" rx="2.5" ry="1.25"></ellipse>
+        </g>
+    </g>
+</svg>

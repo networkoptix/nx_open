@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>diving-bottle</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="diving-bottle">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M1.66666667,17.5 L2.70833333,18.0630833 C3.375,18.4234167 4.125,18.4234167 4.79166667,18.0630833 C5.45833333,17.7027083 6.20833333,17.7027083 6.875,18.0630833 C7.54166667,18.4234167 8.29166667,18.4234167 8.95833333,18.0630833 C9.625,17.7027083 10.375,17.7027083 11.0416667,18.0630833 C11.7083333,18.4234167 12.4583333,18.4234167 13.125,18.0630833 C13.7916667,17.7027083 14.5416667,17.7027083 15.2083333,18.0630833 C15.875,18.4234167 16.625,18.4234167 17.2916667,18.0630833 L18.3333333,17.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="5.83333333" y1="5.41666667" x2="5.83333333" y2="2.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="12.9166667" y1="5.41666667" x2="12.9166667" y2="2.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="8.75" y1="4.16666667" x2="8.75" y2="2.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="15.8333333" y1="4.16666667" x2="15.8333333" y2="2.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="5" y1="3.33333333" x2="8.33333333" y2="3.33333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="12.0833333" y1="3.33333333" x2="15.4166667" y2="3.33333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" x="4.16666667" y="5.41666667" width="3.33333333" height="10" rx="1.66666667"></rect>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" x="11.25" y="5.41666667" width="3.33333333" height="10" rx="1.66666667"></rect>
+            <path d="M11.25,7.08333333 C11.25,6.162875 11.9962083,5.41666667 12.9166667,5.41666667 C13.837125,5.41666667 14.5833333,6.162875 14.5833333,7.08333333 L14.5833333,8.75 L11.25,8.75 L11.25,7.08333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M4.16666667,7.08333333 C4.16666667,6.162875 4.912875,5.41666667 5.83333333,5.41666667 C6.75379167,5.41666667 7.5,6.162875 7.5,7.08333333 L7.5,8.75 L4.16666667,8.75 L4.16666667,7.08333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

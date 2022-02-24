@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>maslow-pyramids</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="maslow-pyramids">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="10 1.66666667 6.25 8.325125 13.75 8.325125"></polygon>
+            <line x1="10" y1="8.32520833" x2="10.0034583" y2="18.333375" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="4.72775 10.82275 0.833333333 17.5000417 7.08525 17.5000417"></polyline>
+            <line x1="3.7919125" y1="12.914625" x2="7.085375" y2="12.914625" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="15.3117083 10.82275 19.206125 17.5000417 12.9168333 17.5000417"></polyline>
+            <line x1="16.2894583" y1="12.914625" x2="12.958625" y2="12.914625" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,37 @@
+# This file is filtered by cmake; intended to be sourced into build_distribution.sh.
+
+CUSTOMIZATION="@customization.companyId@"
+CUSTOMIZATION_DIR="@customization_dir@"
+CUSTOMIZATION_NAME="@customization@" #< E.g. for "networkoptix", the value is "default".
+CUSTOMIZATION_VMS_NAME="@customization.vmsName@"
+VERSION="@releaseVersion@.@buildNumber@"
+RELEASE_VERSION="@releaseVersion@"
+
+CURRENT_BUILD_DIR="@CMAKE_CURRENT_BINARY_DIR@"
+BUILD_DIR="@CMAKE_BINARY_DIR@"
+LOGS_DIR="@CMAKE_BINARY_DIR@/build_logs"
+DISTRIBUTION_OUTPUT_DIR="@distribution_output_dir@"
+QT_DIR="@QT_DIR@"
+OPEN_SOURCE_DIR="@open_source_root@"
+PYTHON="@PYTHON_EXECUTABLE@"
+
+COMPILER="@CMAKE_CXX_COMPILER@"
+CFLAGS="@CMAKE_C_FLAGS@"
+LDFLAGS="@CMAKE_EXE_LINKER_FLAGS@"
+ARCH="@arch@"
+CPP_RUNTIME_LIBS=( @cpp_runtime_libs_string@ )
+ICU_RUNTIME_LIBS=( @icu_runtime_libs_string@ )
+
+URI_PROTOCOL="@customization.uriProtocol@"
+INSTALLER_NAME="@customization.installerName@"
+LAUNCHER_VERSION_FILE="@launcher.version.file@"
+APPLAUNCHER_BINARY_NAME="@applauncher.binary.name@"
+CLIENT_BINARY_NAME="@client.binary.name@"
+CLIENT_HELP_PATH="@help_directory@/bin/help"
+DISTRIBUTION_NAME="@client_distribution_name@"
+UPDATE_ZIP="@client_update_distribution_name@.zip"
+
+QUICK_START_GUIDE_FILE="@quick_start_guide_directory@/@quick_start_guide_file_name@"
+
+DEB_COMPRESSION_LEVEL=@deb_compression_level@
+ZIP_COMPRESSION_LEVEL=@zip_compression_level@

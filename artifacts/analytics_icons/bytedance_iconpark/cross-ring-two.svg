@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>cross-ring-two</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="cross-ring-two">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M8.10604167,11.0185 C7.3485,11.75925 6.59091667,12.5 5.07575,12.5 C3.56060417,12.5 1.66666667,11.388875 1.66666667,9.16666667 C1.66666667,6.94445833 3.56060417,5.83333333 5.07575,5.83333333 C7.3485,5.83333333 8.48483333,7.31483333 10,9.16666667 C11.5151667,11.0185 12.6515,12.5 14.92425,12.5 C16.439375,12.5 18.3333333,11.388875 18.3333333,9.16666667 C18.3333333,6.94445833 16.439375,5.83333333 14.92425,5.83333333 C13.4090833,5.83333333 12.2727083,6.94445833 11.8939583,7.31483333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>redo</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="redo">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M15.3032917,15.3032917 C13.9460833,16.6605417 12.0710833,17.5 10,17.5 C5.857875,17.5 2.5,14.142125 2.5,10 C2.5,5.857875 5.857875,2.5 10,2.5 C12.0710833,2.5 13.9460833,3.33946667 15.3032917,4.69670833 C15.994125,5.38754167 17.5,7.08333333 17.5,7.08333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="17.5 3.33333333 17.5 7.08333333 13.75 7.08333333"></polyline>
+        </g>
+    </g>
+</svg>

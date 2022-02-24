@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>oval-love</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="oval-love">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" points="20 0 0 0 0 20 20 20"></polygon>
+            <path d="M12.2985,7.29175 C14.5997083,11.2775 14.3649583,15.7211667 11.7742083,17.2169583 C9.18345833,18.7127083 5.21775,16.6941667 2.91656667,12.7084167 C0.615379167,8.722625 0.850120833,4.27895833 3.44087083,2.7832 C6.031625,1.28742917 9.99733333,3.305975 12.2985,7.29175 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M7.60754167,7.29175 C5.306375,11.2775 5.54108333,15.7211667 8.13183333,17.2169583 C10.7225833,18.7127083 14.6882917,16.6941667 16.9895,12.7084167 C19.2906667,8.722625 19.0559167,4.27895833 16.4651667,2.7832 C13.8744167,1.28742917 9.90870833,3.305975 7.60754167,7.29175 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M9.897,4.31016667 C10.79075,5.10504167 11.6175,6.11225 12.2984583,7.29175 C14.5996667,11.2775 14.3649167,15.7211667 11.7741667,17.2169583 C11.2332917,17.52925 10.6324583,17.6883333 9.999375,17.7083333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

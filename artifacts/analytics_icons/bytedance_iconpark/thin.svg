@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>thin</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="thin">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M13.4830739,10.4166667 L5.98307389,10.4166667 C5.32057389,10.4166667 4.41224056,10.3208333 3.89974056,10 C2.37890722,9.0375 2.09142389,6.92916667 3.06642389,5.41666667 L5.56644889,1.66666667 C7.20394889,5.17916667 12.2497406,5.175 13.8997406,1.66666667 L16.3997406,5.41666667 C17.3747406,6.92916667 17.0830739,9.0375 15.5664072,10 C15.0539072,10.325 14.1455739,10.4166667 13.4830739,10.4166667 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M4.73307389,10.4166667 L5.78307389,14.3958333 C6.14557389,15.8041667 5.75807389,17.3 4.73307389,18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M14.7330739,10.4166667 L13.6831156,14.4083333 C13.3206156,15.8166667 13.7080739,17.3 14.7330739,18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="9.73307389" y1="17.5" x2="9.73307389" y2="16.6666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

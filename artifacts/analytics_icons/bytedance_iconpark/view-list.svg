@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>view-list</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="view-list">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linejoin="round" x="3.33333333" y="1.66666667" width="13.3333333" height="16.6666667" rx="1"></rect>
+            <line x1="8.75" y1="5.83333333" x2="13.75" y2="5.83333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="8.75" y1="10" x2="13.75" y2="10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="8.75" y1="14.1666667" x2="13.75" y2="14.1666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M6.25,6.66666667 C6.71025,6.66666667 7.08333333,6.29358333 7.08333333,5.83333333 C7.08333333,5.37308333 6.71025,5 6.25,5 C5.78975,5 5.41666667,5.37308333 5.41666667,5.83333333 C5.41666667,6.29358333 5.78975,6.66666667 6.25,6.66666667 Z" id="Path" fill="#A5B7C0"></path>
+            <path d="M6.25,10.8333333 C6.71025,10.8333333 7.08333333,10.46025 7.08333333,10 C7.08333333,9.53975 6.71025,9.16666667 6.25,9.16666667 C5.78975,9.16666667 5.41666667,9.53975 5.41666667,10 C5.41666667,10.46025 5.78975,10.8333333 6.25,10.8333333 Z" id="Path" fill="#A5B7C0"></path>
+            <path d="M6.25,15 C6.71025,15 7.08333333,14.6269167 7.08333333,14.1666667 C7.08333333,13.7064167 6.71025,13.3333333 6.25,13.3333333 C5.78975,13.3333333 5.41666667,13.7064167 5.41666667,14.1666667 C5.41666667,14.6269167 5.78975,15 6.25,15 Z" id="Path" fill="#A5B7C0"></path>
+        </g>
+    </g>
+</svg>

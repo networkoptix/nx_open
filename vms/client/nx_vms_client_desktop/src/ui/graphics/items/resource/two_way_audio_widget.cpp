@@ -1,0 +1,57 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+#include "two_way_audio_widget.h"
+#include "private/two_way_audio_widget_p.h"
+
+#include <QtWidgets/QGraphicsLinearLayout>
+#include <QtWidgets/QStyleOptionGraphicsItem>
+
+#include <core/resource/camera_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <ui/common/palette.h>
+#include <qt_graphics_items/graphics_label.h>
+#include <ui/graphics/items/generic/image_button_widget.h>
+#include <ui/common/palette.h>
+
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+
+using namespace nx::vms::client::desktop;
+
+QnTwoWayAudioWidget::QnTwoWayAudioWidget(const QString& sourceId, QGraphicsWidget* parent):
+    base_type(parent),
+    d(new Private(sourceId, this))
+{
+    auto audioLayout = new QGraphicsLinearLayout(Qt::Horizontal);
+    audioLayout->setContentsMargins(0.0, 0.0, 0.0, 0.0);
+    audioLayout->addItem(d->hint);
+    audioLayout->addItem(d->button);
+
+    setLayout(audioLayout);
+    setAcceptedMouseButtons(Qt::NoButton);
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    setPaletteColor(this, QPalette::Window,
+        colorTheme()->color("camera.twoWayAudio.background.default"));
+    setPaletteColor(this, QPalette::WindowText,
+        colorTheme()->color("camera.twoWayAudio.text"));
+}
+
+QnTwoWayAudioWidget::~QnTwoWayAudioWidget()
+{
+}
+
+void QnTwoWayAudioWidget::setCamera(const QnVirtualCameraResourcePtr &camera)
+{
+    d->updateCamera(camera);
+}
+
+void QnTwoWayAudioWidget::setFixedHeight(qreal height)
+{
+    d->setFixedHeight(height);
+}
+
+void QnTwoWayAudioWidget::paint(
+    QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+{
+    base_type::paint(painter, option, widget);
+    d->paint(painter, option->rect);
+}

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Module
+        Id="client_help_module"
+        Language="0"
+        Version="1.0.0">
+
+        <Package
+            Id="C88BDBAA-5321-422D-9E2D-4BC0D5F773CB"
+            InstallerVersion="405"
+            Languages="1033"
+            Manufacturer="${customization.companyName}"/>
+
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory
+                Name="help"
+                Id="HelpDirectoryReference"
+                ComponentGuidGenerationSeed="237AA116-F06A-49CE-86B2-D4DD2E4AF7AC"/>
+        </Directory>
+
+        <ComponentGroupRef Id="HelpComponentGroup"/>
+    </Module>
+</Wix>

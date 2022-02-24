@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>game-ps</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="game-ps">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linejoin="round" x="11.6666667" y="11.6666667" width="6.66666667" height="6.66666667"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="5.41666667 1.66666667 9.16666667 8.33333333 1.66666667 8.33333333"></polygon>
+            <path d="M15,8.33333333 C16.8409583,8.33333333 18.3333333,6.84095833 18.3333333,5 C18.3333333,3.15905 16.8409583,1.66666667 15,1.66666667 C13.1590417,1.66666667 11.6666667,3.15905 11.6666667,5 C11.6666667,6.84095833 13.1590417,8.33333333 15,8.33333333 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <line x1="1.66666667" y1="11.6666667" x2="8.33333333" y2="18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="8.33333333" y1="11.6666667" x2="1.66666667" y2="18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

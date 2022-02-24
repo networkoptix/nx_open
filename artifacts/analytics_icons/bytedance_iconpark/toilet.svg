@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>toilet</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="toilet">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="8.332875 4.16666667 11.6662083 4.16666667 11.6662083 9.16666667 8.332875 9.16666667"></polygon>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="7.08333333 14.5833333 5 18.3333333 4.99954167 18.3333333 14.9995417 18.3333333 12.9166667 14.5833333"></polyline>
+            <path d="M14.1662083,9.16666667 L14.1662083,2.08333333 C14.1662083,1.85321667 13.9796667,1.66666667 13.7495417,1.66666667 L6.24954167,1.66666667 C6.01941667,1.66666667 5.832875,1.85321667 5.832875,2.08333333 L5.832875,9.16666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M2.53325,9.31833333 C2.51595,9.2405 2.57518333,9.16666667 2.65492083,9.16666667 L17.344125,9.16666667 C17.423875,9.16666667 17.483125,9.2405 17.4658333,9.318375 L17.4658333,9.318375 C16.9558333,11.6134583 15.53475,13.67325 13.299375,14.4017083 C12.2644583,14.7389583 11.1061667,15 10,15 C8.89366667,15 7.73504167,14.738875 6.69979167,14.4015417 C4.46445833,13.6730833 3.0432625,11.6134167 2.53325,9.31833333 L2.53325,9.31833333 Z" id="Path" stroke="#A5B7C0"></path>
+        </g>
+    </g>
+</svg>

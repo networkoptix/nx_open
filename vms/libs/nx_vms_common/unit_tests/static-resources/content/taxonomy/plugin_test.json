@@ -1,0 +1,24 @@
+{
+    "descriptors": {
+        "pluginDescriptors": {
+            "plugin.1": {
+                "id": "plugin.1",
+                "name": "Plugin 1"
+            },
+            "plugin.2": {
+                "id": "plugin.2",
+                "name": "Plugin 2"
+            }
+        }
+    },
+    "result": {
+        "plugin.1": {
+            "id": "plugin.1",
+            "name": "Plugin 1"
+        },
+        "plugin.2": {
+            "id": "plugin.2",
+            "name": "Plugin 2"
+        }
+    }
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>rotation-horizontal</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="rotation-horizontal">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="8.33333333 12.9166667 10 14.5833333 8.33333333 16.25"></polyline>
+            <path d="M13.3333333,14.236625 C16.2765,13.5936667 18.3333333,12.12525 18.3333333,10.4166667 C18.3333333,8.1155 14.602375,6.25 10,6.25 C5.397625,6.25 1.66666667,8.1155 1.66666667,10.4166667 C1.66666667,12.7178333 5.397625,14.5833333 10,14.5833333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

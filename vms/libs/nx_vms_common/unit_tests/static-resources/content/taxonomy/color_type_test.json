@@ -1,0 +1,313 @@
+{
+    "descriptors": {
+        "colorTypeDescriptors": {
+            "$colorWithInvalidId": {
+                "id": "$colorWithInvalidId",
+                "name": "Color with invalid id",
+                "items": [
+                    {
+                        "name": "color",
+                        "rgb": "#fff"
+                    }
+                ]
+            },
+
+            "colorType.1": {
+                "id": "colorType.1",
+                "name": "Color Type 1",
+                "items": [
+                    {
+                        "name": "color 1",
+                        "rgb": "#a0a0a0"
+                    },
+                    {
+                        "name": "color 2",
+                        "rgb": "#b0b0b0"
+                    },
+                    {
+                        "name": "color 3",
+                        "rgb": "#c0c0c0"
+                    }
+                ]
+            },
+            "colorType.2": {
+                "id": "colorType.2",
+                "name": "Color Type 2",
+                "base": "colorType.1",
+                "baseItems": [ "color 1" ],
+                "items": [
+                    {
+                        "name": "own color 1",
+                        "rgb": "#dddccc"
+                    },
+                    {
+                        "name": "own color 2",
+                        "rgb": "#ddf"
+                    }
+                ]
+            },
+            "colorType.3": {
+                "id": "colorType.3",
+                "name": "Color Type 3",
+                "base": "colorType.1",
+                "baseItems": [ "invalid base item" ],
+                "items": [
+                    {
+                        "name": "proper own color 1",
+                        "rgb": "#a0a0a0"
+                    }
+                ]
+            },
+            "colorType.4": {
+                "id": "colorType.4",
+                "name": "Color Type 4",
+                "base": "invalid.base",
+                "baseItems": [ "some base color" ],
+                "items": [
+                    {
+                        "name": "proper own color 2",
+                        "rgb": "#acaca0"
+                    }
+                ]
+            },
+            "colorType.5": {
+                "id": "colorType.5",
+                "name": "Color Type 5",
+                "base": "colorType.2",
+                "items": [
+                    {
+                        "name": "proper own color level 2",
+                        "rgb": "#acaca0"
+                    }
+                ],
+                "baseItems": [ "color 1", "own color 2" ]
+            },
+            "colorType.6": {
+                "id": "colorType.6",
+                "name": "Color Type 6",
+                "items": [
+                    {
+                        "name": "valid color",
+                        "rgb": "#e1e1e1"
+                    },
+                    {
+                        "name": "invalid color 1",
+                        "rgb": "not a color code"
+                    },
+                    {
+                        "name": "invalid color 2",
+                        "rgb": "fff"
+                    },
+                    {
+                        "name": "invalid color 3",
+                        "rgb": "#adedjj"
+                    },
+                    {
+                        "name": "invalid color 4",
+                        "rgb":  "#aaaaa"
+                    }
+                ]
+            },
+
+            "cycleInheritanceColorType.1": {
+                "id": "cycleInheritanceColorType.1",
+                "name": "Cycle Inheritance Color Type",
+                "base": "cycleInheritanceColorType.2",
+                "items": [
+                    {
+                        "name": "cycle color 1",
+                        "rgb": "#acaca1"
+                    }
+                ],
+                "baseItems": [ "cycle color 2" ]
+            },
+            "cycleInheritanceColorType.2": {
+                "id": "cycleInheritanceColorType.2",
+                "name": "Cycle Inheritance Color Type",
+                "base": "cycleInheritanceColorType.1",
+                "items": [
+                    {
+                        "name": "cycle color 2",
+                        "rgb": "#acaca2"
+                    }
+                ],
+                "baseItems": [ "cycle color 1" ]
+            }
+        }
+    },
+    "result": {
+        "colorType.1": {
+            "id": "colorType.1",
+            "name": "Color Type 1",
+            "items": [
+                {
+                    "name": "color 1",
+                    "rgb": "#a0a0a0"
+                },
+                {
+                    "name": "color 2",
+                    "rgb": "#b0b0b0"
+                },
+                {
+                    "name": "color 3",
+                    "rgb": "#c0c0c0"
+                }
+            ],
+            "ownItems": [
+                {
+                    "name": "color 1",
+                    "rgb": "#a0a0a0"
+                },
+                {
+                    "name": "color 2",
+                    "rgb": "#b0b0b0"
+                },
+                {
+                    "name": "color 3",
+                    "rgb": "#c0c0c0"
+                }
+            ]
+        },
+        "colorType.2": {
+            "id": "colorType.2",
+            "name": "Color Type 2",
+            "base": "colorType.1",
+            "items": [
+                {
+                    "name": "color 1",
+                    "rgb": "#a0a0a0"
+                },
+                {
+                    "name": "own color 1",
+                    "rgb": "#dddccc"
+                },
+                {
+                    "name": "own color 2",
+                    "rgb": "#ddf"
+                }
+            ],
+            "ownItems": [
+                {
+                    "name": "own color 1",
+                    "rgb": "#dddccc"
+                },
+                {
+                    "name": "own color 2",
+                    "rgb": "#ddf"
+                }
+            ]
+        },
+        "colorType.3": {
+            "id": "colorType.3",
+            "name": "Color Type 3",
+            "base": "colorType.1",
+            "items": [
+                {
+                    "name": "proper own color 1",
+                    "rgb": "#a0a0a0"
+                }
+            ],
+            "ownItems": [
+                {
+                    "name": "proper own color 1",
+                    "rgb": "#a0a0a0"
+                }
+            ]
+        },
+        "colorType.4": {
+            "id": "colorType.4",
+            "name": "Color Type 4",
+            "items": [
+                {
+                    "name": "proper own color 2",
+                    "rgb": "#acaca0"
+                }
+            ],
+            "ownItems": [
+                {
+                    "name": "proper own color 2",
+                    "rgb": "#acaca0"
+                }
+            ]
+        },
+        "colorType.5": {
+            "id": "colorType.5",
+            "name": "Color Type 5",
+            "base": "colorType.2",
+            "items": [
+                {
+                    "name": "color 1",
+                    "rgb": "#a0a0a0"
+                },
+                {
+                    "name": "own color 2",
+                    "rgb": "#ddf"
+                },
+                {
+                    "name": "proper own color level 2",
+                    "rgb": "#acaca0"
+                }
+            ],
+            "ownItems": [
+                {
+                    "name": "proper own color level 2",
+                    "rgb": "#acaca0"
+                }
+            ]
+        },
+        "colorType.6": {
+            "id": "colorType.6",
+            "name": "Color Type 6",
+            "items": [
+                {
+                    "name": "valid color",
+                    "rgb": "#e1e1e1"
+                }
+            ],
+            "ownItems": [
+                {
+                    "name": "valid color",
+                    "rgb": "#e1e1e1"
+                }
+            ]
+        },
+
+        "cycleInheritanceColorType.1": {
+            "id": "cycleInheritanceColorType.1",
+            "name": "Cycle Inheritance Color Type",
+            "base": "cycleInheritanceColorType.2",
+            "items": [
+                {
+                    "name": "cycle color 2",
+                    "rgb": "#acaca2"
+                },
+                {
+                    "name": "cycle color 1",
+                    "rgb": "#acaca1"
+                }
+            ],
+            "ownItems": [
+                {
+                    "name": "cycle color 1",
+                    "rgb": "#acaca1"
+                }
+            ]
+        },
+        "cycleInheritanceColorType.2": {
+            "id": "cycleInheritanceColorType.2",
+            "name": "Cycle Inheritance Color Type",
+            "items": [
+                {
+                    "name": "cycle color 2",
+                    "rgb": "#acaca2"
+                }
+            ],
+            "ownItems": [
+                {
+                    "name": "cycle color 2",
+                    "rgb": "#acaca2"
+                }
+            ]
+        }
+    }
+}

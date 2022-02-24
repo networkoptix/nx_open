@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>basketball</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="basketball">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(1.666667, 1.666667)" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round">
+                <circle id="Oval" cx="8.33333333" cy="8.33333333" r="8.33333333"></circle>
+                <path d="M1.8939394,3.03030303 C3.66161616,4.54545454 4.54545454,6.31313133 4.54545454,8.33333333 C4.54545454,10.3535353 3.66161616,12.1212121 1.8939394,13.6363636" id="Path"></path>
+                <path d="M14.7727273,13.6363636 C13.0050505,12.1212121 12.1212121,10.3535353 12.1212121,8.33333333 C12.1212121,6.31313133 13.0050505,4.54545454 14.7727273,3.03030303 L14.7727273,3.03030303" id="Path"></path>
+                <line x1="0" y1="8.33333333" x2="16.6666667" y2="8.33333333" id="Path"></line>
+                <line x1="8.33333333" y1="0" x2="8.33333333" y2="16.6666667" id="Path"></line>
+            </g>
+        </g>
+    </g>
+</svg>

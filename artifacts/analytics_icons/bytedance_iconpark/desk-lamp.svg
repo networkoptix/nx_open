@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>desk-lamp</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="desk-lamp">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M3.33333333,10.2482083 C3.33333333,10.571375 3.59529583,10.8333333 3.91844167,10.8333333 L16.0815417,10.8333333 C16.4047083,10.8333333 16.6666667,10.571375 16.6666667,10.2482083 L16.6666667,8.33333333 C16.6666667,4.65141667 13.6819167,1.66666667 10,1.66666667 C6.31808333,1.66666667 3.33333333,4.65141667 3.33333333,8.33333333 L3.33333333,10.2482083 Z" id="Path" stroke="#A5B7C0"></path>
+            <line x1="10" y1="17.5" x2="10" y2="10.8333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="6.25" y1="13.3333333" x2="6.25" y2="10.8333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="13.75" y1="17.5" x2="6.25" y2="17.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

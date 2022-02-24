@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>unlink</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="unlink">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M10.788625,6.67941667 L7.54770833,3.43849167 C6.35441667,2.245225 4.459625,2.205375 3.3155,3.34949167 C2.17138333,4.49358333 2.21123333,6.38841667 3.4045,7.58170833 L6.64541667,10.8225833" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M13.298375,9.19608333 L16.5392917,12.437 C17.7325417,13.63025 17.887125,15.4679583 16.6282917,16.6692083 C15.3694583,17.8704167 13.5893333,17.7734583 12.3960833,16.5802083 L9.15516667,13.3392917" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="8.84933333" y1="8.78158333" x2="7.228875" y2="7.161125" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="12.6304583" y1="12.5625833" x2="11.01" y2="10.9421667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

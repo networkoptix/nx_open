@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>link-two</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="link-two">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M12.5,7.91666667 L8.33333333,7.91666667 C6.492375,7.91666667 5,9.40904167 5,11.25 C5,13.0909583 6.492375,14.5833333 8.33333333,14.5833333 L15,14.5833333 C16.8409583,14.5833333 18.3333333,13.0909583 18.3333333,11.25 C18.3333333,10.404625 18.018625,9.63275 17.5,9.04516667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M2.5,10.1215 C1.9813625,9.53391667 1.66666667,8.76204167 1.66666667,7.91666667 C1.66666667,6.07570833 3.15905,4.58333333 5,4.58333333 L11.6666667,4.58333333 C13.507625,4.58333333 15,6.07570833 15,7.91666667 C15,9.757625 13.507625,11.25 11.6666667,11.25 L7.5,11.25" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

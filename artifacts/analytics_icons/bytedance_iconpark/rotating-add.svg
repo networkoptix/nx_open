@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>rotating-add</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="rotating-add">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M2.781525,5.83333333 C4.22241667,3.34249583 6.9155,1.66666667 10,1.66666667 M2.781525,5.83333333 L5.83333333,5.83333333 M2.781525,5.83333333 L2.781525,2.78151667" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M5.83333333,17.2185 C3.34249583,15.777625 1.66666667,13.0845 1.66666667,10 M5.83333333,17.2185 L5.83333333,14.1666667 M5.83333333,17.2185 L2.78151667,17.2185" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M17.2185,14.1666667 C15.777625,16.6575 13.0845,18.3333333 10,18.3333333 M17.2185,14.1666667 L14.1666667,14.1666667 M17.2185,14.1666667 L17.2185,17.2185" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M14.1666667,2.781575 C16.6575,4.22245833 18.3333333,6.91554167 18.3333333,10.0000417 M14.1666667,2.781575 L14.1666667,5.833375 M14.1666667,2.781575 L17.2185,2.781575" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="7.5" y1="10" x2="12.5" y2="10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="10" y1="12.5" x2="10" y2="7.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

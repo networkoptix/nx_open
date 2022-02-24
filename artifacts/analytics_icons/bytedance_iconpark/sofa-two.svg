@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>sofa-two</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="sofa-two">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="18.3333333 15.8333333 18.3333333 7.5 15 7.5 15 12.9166667 5 12.9166667 5 7.5 1.66666667 7.5 1.66666667 15.8333333"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="15 2.5 5 2.5 5 12.9166667 15 12.9166667"></polygon>
+            <path d="M4.16666667,18.3333333 C5.087125,18.3333333 5.83333333,17.587125 5.83333333,16.6666667 C5.37616667,16.6685 2.79179167,16.6666667 2.5,16.6666667 C2.5,17.587125 3.24619167,18.3333333 4.16666667,18.3333333 Z" id="Path" fill="#A5B7C0"></path>
+            <path d="M15.8333333,18.3333333 C16.7537917,18.3333333 17.5,17.587125 17.5,16.6666667 C16.7064167,16.6639167 14.526125,16.6666667 14.1666667,16.6666667 C14.1666667,17.587125 14.912875,18.3333333 15.8333333,18.3333333 Z" id="Path" fill="#A5B7C0"></path>
+        </g>
+    </g>
+</svg>

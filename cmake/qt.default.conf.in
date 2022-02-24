@@ -1,0 +1,5 @@
+[Paths]
+Prefix = ${qt_prefix}
+
+[Platforms]
+WindowsArguments = fontengine=freetype

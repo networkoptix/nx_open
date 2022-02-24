@@ -1,0 +1,31 @@
+## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+qt_directory: '${qt.dir}'
+icu_directory: '${icu_directory}'
+
+distribution_output_dir: '${distribution_output_dir}'
+
+# Source directories
+bin_source_dir: '${bin_source_dir}'
+current_binary_dir: '${CMAKE_CURRENT_BINARY_DIR}'
+cmake_binary_dir: '${CMAKE_BINARY_DIR}'
+ucrt_directory: '${ucrt_directory}'
+vcrt_directory: '${vcrt_directory}'
+client_qml_dir: '${client_qml_directory}'
+help_directory: '${help_directory}'
+fonts_directory: '${CONAN_ROBOTO-FONTS_ROOT}'
+client_update_files_directory: '${client_update_files_directory}'
+server_update_files_directory: '${server_update_files_directory}'
+quick_start_guide_source_file_path: '${quick_start_guide_directory}/${quick_start_guide_file_name}'
+quick_start_guide_destination_file_name: '${quick_start_guide_file_name}'
+
+# Source binaries
+client_binary_name: '${client.binary.name}'
+minilauncher_binary_name: '${minilauncher.binary.name}'
+launcher_version_file: '${launcher.version.file}'
+
+# Distrib names
+server_distribution_name: '${server_distribution_name}'
+
+# ASan required library
+asan_library_name: '${asan_library_name}'

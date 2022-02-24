@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>scan-code</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="scan-code">
+            <polygon id="Path" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" points="0 0 20 0 20 20 0 20"></polygon>
+            <g id="Group" transform="translate(2.500000, 2.500000)" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11.25,0 L15,0 L15,3.75 M15,11.25 L15,15 L11.25,15 M3.75,15 L0,15 L0,11.25 M0,3.75 L0,0 L3.75,0" id="Shape"></path>
+                <line x1="1.66666667" y1="7.5" x2="13.3333333" y2="7.5" id="Path"></line>
+            </g>
+        </g>
+    </g>
+</svg>

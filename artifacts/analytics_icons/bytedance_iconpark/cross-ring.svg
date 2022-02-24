@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>cross-ring</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="cross-ring">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(1.666667, 1.666667)" stroke="#A5B7C0" stroke-linejoin="round">
+                <circle id="Oval" cx="8.33333333" cy="1.66666667" r="1.66666667"></circle>
+                <circle id="Oval" cx="8.33333333" cy="15" r="1.66666667"></circle>
+                <circle id="Oval" cx="1.66666667" cy="8.33333333" r="1.66666667"></circle>
+                <circle id="Oval" cx="15" cy="8.33333333" r="1.66666667"></circle>
+                <line x1="3.33333333" y1="8.33333333" x2="13.3333333" y2="8.33333333" id="Path" stroke-linecap="round"></line>
+                <line x1="3.33333333" y1="8.33333333" x2="13.3333333" y2="8.33333333" id="Path" stroke-linecap="round" transform="translate(8.333333, 8.333333) rotate(90.000000) translate(-8.333333, -8.333333) "></line>
+                <path d="M4.62936075,2.78947559 C4.265806,3.03285695 3.92752539,3.31105086 3.61928812,3.61928812 C3.31105086,3.92752539 3.03285695,4.265806 2.78947559,4.62936075 M2.78947559,12.0373059 C3.03285695,12.4008607 3.31105086,12.7391413 3.61928812,13.0473785 C3.92752539,13.3556158 4.265806,13.6338097 4.62936075,13.8771911 M12.0373059,13.8771911 C12.4008607,13.6338097 12.7391413,13.3556158 13.0473785,13.0473785 C13.3556158,12.7391413 13.6338097,12.4008607 13.8771911,12.0373059 M13.8771911,4.62936075 C13.6338097,4.265806 13.3556158,3.92752539 13.0473785,3.61928812 C12.7391413,3.31105086 12.4008607,3.03285695 12.0373059,2.78947559" id="Shape" stroke-linecap="round"></path>
+            </g>
+        </g>
+    </g>
+</svg>

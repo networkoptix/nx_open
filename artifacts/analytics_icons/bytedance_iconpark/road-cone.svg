@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>road-cone</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="road-cone">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" points="11.25 2.5 8.75 2.5 8.22916667 4.375 7.70833333 6.25 6.66666667 10 5.625 13.75 5.10416667 15.625 4.58333333 17.5 15.4166667 17.5 14.7916667 15.25 13.3333333 10 12.2916667 6.25 11.7708333 4.375"></polygon>
+            <path d="M15.4166667,17.5 L4.58333333,17.5 M15.4166667,17.5 L2.5,17.5 L4.58333333,17.5 M15.4166667,17.5 L17.5,17.5 M15.4166667,17.5 L14.7916667,15.25 L13.3333333,10 L12.2916667,6.25 L11.7708333,4.375 L11.25,2.5 L8.75,2.5 L8.22916667,4.375 L7.70833333,6.25 L6.66666667,10 L5.625,13.75 L5.10416667,15.625 L4.58333333,17.5" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="5.625" y1="13.75" x2="14.375" y2="13.75" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="13.3333333" y1="10" x2="6.66666667" y2="10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="12.2916667" y1="6.25" x2="7.70833333" y2="6.25" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="11.7708333" y1="4.375" x2="14.7916667" y2="15.25" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="5.10416667" y1="15.625" x2="8.22916667" y2="4.375" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

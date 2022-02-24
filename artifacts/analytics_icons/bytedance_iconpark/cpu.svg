@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>cpu</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="cpu">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" points="20 0 0 0 0 20 20 20"></polygon>
+            <path d="M15.8333333,3.33333333 L4.16666667,3.33333333 C3.70642917,3.33333333 3.33333333,3.70642917 3.33333333,4.16666667 L3.33333333,15.8333333 C3.33333333,16.2935833 3.70642917,16.6666667 4.16666667,16.6666667 L15.8333333,16.6666667 C16.2935833,16.6666667 16.6666667,16.2935833 16.6666667,15.8333333 L16.6666667,4.16666667 C16.6666667,3.70642917 16.2935833,3.33333333 15.8333333,3.33333333 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="12.5 7.5 7.5 7.5 7.5 12.5 12.5 12.5"></polygon>
+            <path d="M6.21216667,0.833333333 L6.21216667,3.33333333 L6.21216667,0.833333333 Z" id="Path"></path>
+            <line x1="6.21216667" y1="0.833333333" x2="6.21216667" y2="3.33333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M6.21216667,16.6666667 L6.21216667,19.1666667 L6.21216667,16.6666667 Z" id="Path"></path>
+            <line x1="6.21216667" y1="16.6666667" x2="6.21216667" y2="19.1666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M10,0.833333333 L10,3.33333333 L10,0.833333333 Z" id="Path"></path>
+            <line x1="10" y1="0.833333333" x2="10" y2="3.33333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M10,16.6666667 L10,19.1666667 L10,16.6666667 Z" id="Path"></path>
+            <line x1="10" y1="16.6666667" x2="10" y2="19.1666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M13.7878333,0.833333333 L13.7878333,3.33333333 L13.7878333,0.833333333 Z" id="Path"></path>
+            <line x1="13.7878333" y1="0.833333333" x2="13.7878333" y2="3.33333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M13.7878333,16.6666667 L13.7878333,19.1666667 L13.7878333,16.6666667 Z" id="Path"></path>
+            <line x1="13.7878333" y1="16.6666667" x2="13.7878333" y2="19.1666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M0.833333333,6.212125 L3.33333333,6.212125 L0.833333333,6.212125 Z" id="Path"></path>
+            <line x1="0.833333333" y1="6.212125" x2="3.33333333" y2="6.212125" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M16.6666667,6.212125 L19.1666667,6.212125 L16.6666667,6.212125 Z" id="Path"></path>
+            <line x1="16.6666667" y1="6.212125" x2="19.1666667" y2="6.212125" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M0.833333333,10 L3.33333333,10 L0.833333333,10 Z" id="Path"></path>
+            <line x1="0.833333333" y1="10" x2="3.33333333" y2="10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M16.6666667,10 L19.1666667,10 L16.6666667,10 Z" id="Path"></path>
+            <line x1="16.6666667" y1="10" x2="19.1666667" y2="10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M0.833333333,13.787875 L3.33333333,13.787875 L0.833333333,13.787875 Z" id="Path"></path>
+            <line x1="0.833333333" y1="13.787875" x2="3.33333333" y2="13.787875" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M16.6666667,13.787875 L19.1666667,13.787875 L16.6666667,13.787875 Z" id="Path"></path>
+            <line x1="16.6666667" y1="13.787875" x2="19.1666667" y2="13.787875" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

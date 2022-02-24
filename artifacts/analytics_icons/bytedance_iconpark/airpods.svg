@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>airpods</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="airpods">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M15,1.66666667 C12.9289167,1.66666667 11.25,3.3456 11.25,5.41666667 L11.25,18.3333333 L13.75,18.3333333 L13.75,8.95329167 C14.1409583,9.09145833 14.5617083,9.16666667 15,9.16666667 C16.4512083,9.16666667 17.7099167,8.34233333 18.3333333,7.13633333 L18.3333333,3.697 C17.7099167,2.49101667 16.4512083,1.66666667 15,1.66666667 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M5,1.66666667 C7.07108333,1.66666667 8.75,3.3456 8.75,5.41666667 L8.75,18.3333333 L6.25,18.3333333 L6.25,8.95329167 C5.85904167,9.09145833 5.43829167,9.16666667 5,9.16666667 C3.54877917,9.16666667 2.29009583,8.34233333 1.66666667,7.13633333 L1.66666667,3.697 C2.29009583,2.49101667 3.54877917,1.66666667 5,1.66666667 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="6.25" y1="5.41666667" x2="5.83333333" y2="5.41666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="13.75" y1="5.41666667" x2="14.1666667" y2="5.41666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

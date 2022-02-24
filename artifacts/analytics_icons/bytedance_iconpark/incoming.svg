@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>incoming</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="incoming">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M7.5,5.41666667 C7.5,4.49620833 6.75379167,3.75 5.83333333,3.75 C4.912875,3.75 4.16666667,4.49620833 4.16666667,5.41666667 C4.16666667,6.337125 4.912875,7.08333333 5.83333333,7.08333333 C6.75379167,7.08333333 7.5,6.337125 7.5,5.41666667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M15.4166667,5.41666667 C15.4166667,4.49620833 14.6704583,3.75 13.75,3.75 C12.8295417,3.75 12.0833333,4.49620833 12.0833333,5.41666667 C12.0833333,6.337125 12.8295417,7.08333333 13.75,7.08333333 C14.6704583,7.08333333 15.4166667,6.337125 15.4166667,5.41666667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <line x1="1.66666667" y1="5.41666667" x2="4.16666667" y2="5.41666667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="7.5" y1="5.41666667" x2="12.0833333" y2="5.41666667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="15.4166667" y1="5.41666667" x2="18.3333333" y2="5.41666667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="4.16666667 12.0833333 1.66666667 14.5833333 4.16666667 17.0833333"></polyline>
+            <line x1="1.66666667" y1="14.5833333" x2="18.3333333" y2="14.5833333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

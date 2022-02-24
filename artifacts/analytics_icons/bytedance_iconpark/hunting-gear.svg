@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>hunting-gear</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="hunting-gear">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="18.3333333 12.0833333 1.66666667 12.0833333 1.66666667 17.5 18.3333333 17.5"></polygon>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="1.66666667 12.08325 3.7659875 2.082925 16.2585417 2.082925 18.3333333 12.08325"></polyline>
+            <path d="M7.91666667,5 C6.76608333,5 5.83333333,5.93275 5.83333333,7.08333333 C5.83333333,8.23391667 6.76608333,9.16666667 7.91666667,9.16666667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <path d="M12.0833333,9.16666667 C13.2339167,9.16666667 14.1666667,8.23391667 14.1666667,7.08333333 C14.1666667,5.93275 13.2339167,5 12.0833333,5" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <line x1="8.33333333" y1="7.08333333" x2="11.6666667" y2="7.08333333" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+        </g>
+    </g>
+</svg>

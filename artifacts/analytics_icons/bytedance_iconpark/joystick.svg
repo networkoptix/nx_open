@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>joystick</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="joystick">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(1.666667, 1.666667)" stroke="#A5B7C0" stroke-linejoin="round">
+                <rect id="Rectangle" x="0" y="12.0833333" width="16.6666667" height="4.16666667"></rect>
+                <rect id="Rectangle" stroke-linecap="round" x="9.16666667" y="9.16666667" width="5" height="2.91666667"></rect>
+                <circle id="Oval" cx="5.83333333" cy="2.08333333" r="2.08333333"></circle>
+                <line x1="5" y1="4.16666667" x2="2.08333333" y2="12.0833333" id="Path" stroke-linecap="round"></line>
+            </g>
+        </g>
+    </g>
+</svg>

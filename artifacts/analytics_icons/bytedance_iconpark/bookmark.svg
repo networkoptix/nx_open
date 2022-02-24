@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>bookmark</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="bookmark">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M4.16666667,18.3333333 C3.70642917,18.3333333 3.33333333,17.96025 3.33333333,17.5 L3.33333333,2.5 C3.33333333,2.0397625 3.70642917,1.66666667 4.16666667,1.66666667 L15.8333333,1.66666667 C16.2935833,1.66666667 16.6666667,2.0397625 16.6666667,2.5 L16.6666667,17.5 C16.6666667,17.96025 16.2935833,18.3333333 15.8333333,18.3333333 L4.16666667,18.3333333 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="8.75 9.16666667 8.75 1.66666667 13.75 1.66666667 13.75 9.16666667 11.25 6.55304167"></polygon>
+            <line x1="4.16666667" y1="1.66666667" x2="15.8333333" y2="1.66666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

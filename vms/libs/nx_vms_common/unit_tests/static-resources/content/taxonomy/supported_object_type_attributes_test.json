@@ -1,0 +1,86 @@
+{
+    "objectTypeDescriptors": {
+        "test.objectType1": {
+            "id": "test.objectType1",
+            "name": "Test Object Type 1",
+            "attributes": [
+                {
+                    "name": "simpleAttribute",
+                    "type": "String"
+                },
+                {
+                    "name": "attribute",
+                    "type": "String"
+                },
+                {
+                    "name": "attribute with spaces",
+                    "type": "String"
+                },
+                {
+                    "name": "attribute.withDot",
+                    "type": "String"
+                },
+                {
+                    "name": "attribute with spaces dot at the end.",
+                    "type": "String"
+                },
+                {
+                    "name": "object",
+                    "type": "Object",
+                    "subtype": "test.objectType2"
+                },
+                {
+                    "name": "object.attribute",
+                    "type": "Object",
+                    "subtype": "test.objectType3"
+                },
+                {
+                    "name": "object.attribute.ofObjectType1",
+                    "type": "String"
+                }
+                
+            ],
+            
+            "attributeSupportInfo": {
+                "attribute": [],
+                "attribute with spaces": [],
+                "attribute.withDot": [],
+                "attribute with spaces dot at the end.": [],
+                "object.attribute.ofObjectType2": [],
+                "object.attribute.ofObjectType3": [],
+                "object.attribute": [],
+                "object": []
+            }
+        },
+        
+        "test.objectType2": {
+            "id": "test.objectType2",
+            "name": "Test Object Type 2",
+            "attributes": [
+                {
+                    "name": "attribute.ofObjectType2",
+                    "type": "String"
+                },
+                {
+                    "name": "someAttribute",
+                    "type": "String"
+                }
+            ]
+        },
+        
+        "test.objectType3": {
+            "id": "test.objectType3",
+            "name": "Test Object Type 3",
+            "attributes": [
+                {
+                    "name": "ofObjectType3",
+                    "type": "String"
+                },
+                {
+                    "name": "someOtherAttribute",
+                    "type": "String"
+                }
+            ]
+        }
+    }
+}

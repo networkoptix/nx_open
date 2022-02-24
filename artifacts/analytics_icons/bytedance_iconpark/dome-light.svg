@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>dome-light</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="dome-light">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M10,3.33333333 C5.397625,3.33333333 1.66666667,7.06429167 1.66666667,11.6666667 L18.3333333,11.6666667 C18.3333333,7.06429167 14.602375,3.33333333 10,3.33333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="10" y1="1.66666667" x2="10" y2="3.33333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M10,15.8333333 C7.69883333,15.8333333 5.83333333,13.9678333 5.83333333,11.6666667 L14.1666667,11.6666667 C14.1666667,13.9678333 12.3011667,15.8333333 10,15.8333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="16.6808333" y1="16.2402917" x2="15.8191667" y2="15.0097083" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="4.28116667" y1="15.093875" x2="3.21885417" y2="16.1561667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="14.1666667" y1="17.5" x2="13.6886667" y2="16.817375" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="6.305625" y1="16.8640833" x2="5.716375" y2="17.4533333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

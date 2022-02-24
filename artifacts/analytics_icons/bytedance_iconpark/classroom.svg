@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>classroom</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="classroom">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <circle id="Oval" stroke="#A5B7C0" stroke-linejoin="round" cx="10" cy="5.41666667" r="3.75"></circle>
+            <path d="M2.08333333,18.3333333 C2.08333333,14.8177083 4.65625,11.5364583 6.83333333,10.8333333 C6.83333333,10.8333333 8.8125,12.9427083 10,14.3489583 L13.1666667,10.8333333 C14.9479167,11.0677083 17.9166667,14.8177083 17.9166667,18.3333333" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <line x1="0.833333333" y1="18.3333333" x2="19.1666667" y2="18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

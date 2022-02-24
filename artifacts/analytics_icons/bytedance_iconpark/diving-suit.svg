@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>diving-suit</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="diving-suit">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M7.08333333,10 L5.87083333,10 C3.55,10 1.66666667,8.13345833 1.66666667,5.83333333 C1.66666667,3.5332 3.55,1.66666667 5.87083333,1.66666667 L8.33333333,3.75 L10.7958333,1.66666667 C13.1166667,1.66666667 15,3.5332 15,5.83333333 C15,8.13345833 13.1166667,10 10.7958333,10 L9.58333333,10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="10.8333333 15 5.83333333 15 5.83333333 18.3333333 10.8333333 18.3333333"></polygon>
+            <path d="M10.8333333,16.6666667 L15,16.6666667 C16.8416667,16.6666667 18.3333333,15.175 18.3333333,13.3333333 L18.3333333,5.83333333 L15,5.83333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M8.84166667,12.5 L8.33333333,12.5 L7.825,12.5 C7.21666667,12.5 6.75416667,11.9541667 6.85416667,11.3583333 L7.3625,8.32083333 C7.44166667,7.84583333 7.85,7.5 8.33333333,7.5 C8.8125,7.5 9.225,7.84583333 9.30416667,8.32083333 L9.8125,11.3583333 C9.90833333,11.9541667 9.44583333,12.5 8.84166667,12.5 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>printer-two</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="printer-two">
+            <g id="Group-6" transform="translate(2.500000, 2.500000)" stroke="#A5B7C0" stroke-width="0.833333333">
+                <path d="M13.3333333,5.83333333 L13.3333333,0.833333333 C13.3333333,0.373095833 12.96025,0 12.5,0 L2.5,0 C2.03975,0 1.66666667,0.373095833 1.66666667,0.833333333 L1.66666667,5.83333333" id="Path" stroke-linecap="round"></path>
+                <rect id="Rectangle" x="0" y="5.83333333" width="15" height="9.16666667" rx="0.833333333"></rect>
+                <polygon id="Path" stroke-linecap="round" stroke-linejoin="round" points="5.83333333 11.6666667 12.0833333 11.6666667 12.0833333 15 5.83333333 15"></polygon>
+                <line x1="2.5" y1="8.33333333" x2="3.75" y2="8.33333333" id="Path" stroke-linecap="round" stroke-linejoin="round"></line>
+            </g>
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+        </g>
+    </g>
+</svg>

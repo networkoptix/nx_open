@@ -1,0 +1,157 @@
+{
+    "descriptors": {
+        "pluginDescriptors": {
+            "plugin.1": {
+                "id": "plugin.1",
+                "name": "Plugin 1"
+            },
+            "plugin.2": {
+                "id": "plugin.2",
+                "name": "Plugin 2"
+            }
+        },
+        "engineDescriptors": {
+            "{98e15400-ba22-4fba-8fe4-5c2802f2f7dc}": {
+                "id": "{98e15400-ba22-4fba-8fe4-5c2802f2f7dc}",
+                "name": "Engine 1",
+                "pluginId": "plugin.1"
+            },
+            "{c20e64c1-cc0c-46f5-b36a-f5b3416cc769}": {
+                "id": "{c20e64c1-cc0c-46f5-b36a-f5b3416cc769}",
+                "name": "Engine 2",
+                "pluginId": "plugin.2"
+            },
+            "{3e0a7591-db80-4bc1-be2a-c2d8c2feb688}": {
+                "id": "{3e0a7591-db80-4bc1-be2a-c2d8c2feb688}",
+                "name": "Engine 3",
+                "pluginId": "plugin.2"
+            }
+        },
+        "groupDescriptors": {
+            "group.1": {
+                "id": "group.1",
+                "name": "Group 1"
+            },
+            "group.2": {
+                "id": "group.2",
+                "name": "Group 2"
+            },
+            "group.3": {
+                "id": "group.3",
+                "name": "Group 3"
+            }
+        },
+        "objectTypeDescriptors": {
+            "objectType.1": {
+                "id": "objectType.1",
+                "name": "Object Type 1",
+                "scopes": [
+                    {
+                        "engineId": "{98e15400-ba22-4fba-8fe4-5c2802f2f7dc}",
+                        "groupId": "group.1"
+                    },
+                    {
+                        "engineId": "{c20e64c1-cc0c-46f5-b36a-f5b3416cc769}",
+                        "groupId": "group.2"
+                    }
+                ]
+            },
+            "objectType.2": {
+                "id": "objectType.2",
+                "name": "Object Type 2",
+                "scopes": [
+                    {
+                        "engineId": "{98e15400-ba22-4fba-8fe4-5c2802f2f7dc}",
+                        "groupId": "group.3"
+                    }
+                ]
+            },
+            "objectType.3": {
+                "id": "objectType.3",
+                "name": "Object Type 3",
+                "scopes": [
+                    {
+                        "engineId": "{3e0a7591-db80-4bc1-be2a-c2d8c2feb688}"
+                    }
+                ]
+            },
+            "objectType.4": {
+                "id": "objectType.4",
+                "name": "Object Type 4",
+                "scopes": [
+                    {
+                        "engineId": "{44444444-4444-4444-4444-444444444444}"
+                    }
+                ]
+            },
+            "objectType.5": {
+                "id": "objectType.5",
+                "name": "Object Type 5",
+                "scopes": [
+                    {
+                        "engineId": "{3e0a7591-db80-4bc1-be2a-c2d8c2feb688}",
+                        "groupId": "invalid.group.id"
+                    }
+                ]
+            }
+        }
+    },
+    "result": {
+        "objectType.1": {
+            "id": "objectType.1",
+            "name": "Object Type 1",
+            "scopeInfo": [
+                {
+                    "engineId": "{98e15400-ba22-4fba-8fe4-5c2802f2f7dc}",
+                    "engineName": "Engine 1",
+                    "groupId": "group.1",
+                    "groupName": "Group 1",
+                    "pluginId": "plugin.1",
+                    "pluginName": "Plugin 1"
+                },
+                {
+                    "engineId": "{c20e64c1-cc0c-46f5-b36a-f5b3416cc769}",
+                    "engineName": "Engine 2",
+                    "groupId": "group.2",
+                    "groupName": "Group 2",
+                    "pluginId": "plugin.2",
+                    "pluginName": "Plugin 2"
+                }
+            ]
+        },
+        "objectType.2": {
+            "id": "objectType.2",
+            "name": "Object Type 2",
+            "scopeInfo": [
+                {
+                    "engineId": "{98e15400-ba22-4fba-8fe4-5c2802f2f7dc}",
+                    "engineName": "Engine 1",
+                    "groupId": "group.3",
+                    "groupName": "Group 3",
+                    "pluginId": "plugin.1",
+                    "pluginName": "Plugin 1"
+                }
+            ]
+        },
+        "objectType.3": {
+            "id": "objectType.3",
+            "name": "Object Type 3",
+            "scopeInfo": [
+                {
+                    "engineId": "{3e0a7591-db80-4bc1-be2a-c2d8c2feb688}",
+                    "engineName": "Engine 3",
+                    "pluginId": "plugin.2",
+                    "pluginName": "Plugin 2"
+                }
+            ]
+        },
+        "objectType.4": {
+            "id": "objectType.4",
+            "name": "Object Type 4"
+        },
+        "objectType.5": {
+            "id": "objectType.5",
+            "name": "Object Type 5"
+        }
+    }
+}

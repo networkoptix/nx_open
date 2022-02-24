@@ -1,0 +1,75 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+#pragma once
+
+#include <optional>
+
+#include <QtCore/QObject>
+
+#include <core/resource/resource_fwd.h>
+#include <ui/workbench/workbench_context_aware.h>
+
+#include <nx/utils/uuid.h>
+
+namespace nx::vms::client::desktop {
+
+class AbstractResourceContainer: public QObject
+{
+    Q_OBJECT
+public:
+    explicit AbstractResourceContainer(QObject* parent = nullptr): QObject(parent) {}
+    Q_INVOKABLE virtual bool containsResource(QnResource* resource) const = 0;
+};
+
+class WorkbenchLayoutInfo:
+    public QObject,
+    public QnWorkbenchContextAware
+{
+    Q_OBJECT
+    Q_PROPERTY(QnLayoutResource* currentLayout READ currentLayout NOTIFY currentLayoutChanged)
+    Q_PROPERTY(QnResource* currentResource READ currentResource NOTIFY currentResourceChanged)
+    Q_PROPERTY(AbstractResourceContainer* resources READ resources NOTIFY resourcesChanged)
+    Q_PROPERTY(QnVideoWallResource* reviewedVideoWall READ reviewedVideoWall
+        NOTIFY currentLayoutChanged)
+    Q_PROPERTY(QnVideoWallResource* controlledVideoWall READ controlledVideoWall
+        NOTIFY currentLayoutChanged)
+    Q_PROPERTY(QnUuid controlledVideoWallItemId READ controlledVideoWallItemId
+        NOTIFY currentLayoutChanged)
+    Q_PROPERTY(QnUuid reviewedShowreelId READ reviewedShowreelId NOTIFY currentLayoutChanged)
+    Q_PROPERTY(int itemCount READ itemCount NOTIFY itemCountChanged)
+    Q_PROPERTY(int maximumItemCount READ maximumItemCount CONSTANT)
+    Q_PROPERTY(bool isLocked READ isLocked NOTIFY isLockedChanged)
+    Q_PROPERTY(bool isSearchLayout READ isSearchLayout NOTIFY currentLayoutChanged)
+    Q_PROPERTY(bool isLayoutTourReview READ isLayoutTourReview NOTIFY currentLayoutChanged)
+
+public:
+    WorkbenchLayoutInfo(QnWorkbenchContext* context, QObject* parent = nullptr);
+
+    QnLayoutResource* currentLayout() const;
+    QnResource* currentResource() const;
+    AbstractResourceContainer* resources() const;
+    QnUuid reviewedShowreelId() const;
+    QnVideoWallResource* reviewedVideoWall() const;
+    QnVideoWallResource* controlledVideoWall() const;
+    QnUuid controlledVideoWallItemId() const;
+
+    int itemCount() const;
+    int maximumItemCount() const;
+    bool isLocked() const;
+    bool isSearchLayout() const;
+    bool isLayoutTourReview() const;
+
+signals:
+    void currentLayoutChanged();
+    void currentResourceChanged();
+    void resourcesChanged();
+    void itemCountChanged();
+    void isLockedChanged();
+
+private:
+    class ResourceContainer;
+    ResourceContainer* const m_resources;
+    mutable std::optional<QnVideoWallResourcePtr> m_controlledVideoWall;
+};
+
+} // namespace nx::vms::client::desktop

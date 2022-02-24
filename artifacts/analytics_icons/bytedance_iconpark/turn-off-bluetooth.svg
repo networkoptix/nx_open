@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>turn-off-bluetooth</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="turn-off-bluetooth">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M8.61325,4.90741667 L8.61325,1.66666667 L14.6900833,6.29629167 L11.69875,8.14816667 M13.5414583,14.9893333 L8.61458333,18.3333333 L8.61458333,12.3447917 L13.5414583,14.9893333 Z" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="1.66666667" y1="5.20833333" x2="18.3333333" y2="14.7916667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="3.10175417" y1="14.166625" x2="8.61454167" y2="12.34475" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

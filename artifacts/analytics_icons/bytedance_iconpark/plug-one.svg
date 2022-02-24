@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>plug-one</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="plug-one">
+            <g id="Group-10" transform="translate(4.166667, 1.666667)" stroke="#A5B7C0" stroke-width="0.833333333">
+                <rect id="Rectangle" x="1.66666667" y="3.33333333" width="10" height="10" rx="1.25"></rect>
+                <path d="M6.66666667,13.3333333 L6.66666667,15.4166667 C6.66666667,16.1070417 6.10704167,16.6666667 5.41666667,16.6666667 L0,16.6666667" id="Path" stroke-linecap="round" stroke-linejoin="round"></path>
+                <line x1="5" y1="3.33333333" x2="5" y2="0" id="Path" stroke-linecap="round" stroke-linejoin="round"></line>
+                <line x1="8.33333333" y1="3.33333333" x2="8.33333333" y2="0" id="Path" stroke-linecap="round" stroke-linejoin="round"></line>
+                <line x1="5.83333333" y1="8.33333333" x2="7.5" y2="8.33333333" id="Path" stroke-linecap="round" stroke-linejoin="round"></line>
+            </g>
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+        </g>
+    </g>
+</svg>

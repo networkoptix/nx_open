@@ -1,0 +1,109 @@
+{
+    "descriptors": {
+        "enumTypeDescriptors": {
+            "$enumWithInvalidId": {
+                "id": "$enumWithInvalidId",
+                "name": "Enum with invalid id",
+                "items": [ "some item" ]
+            },
+
+            "enumType.1": {
+                "id": "enumType.1",
+                "name": "EnumType 1",
+                "items": [ "item 1", "item 2", "item 3" ]
+            },
+            "enumType.2": {
+                "id": "enumType.2",
+                "name": "EnumType 2",
+                "base": "enumType.1",
+                "baseItems": [ "item 1" ],
+                "items": [ "own item 1", "own item 2" ]
+            },
+            "enumType.3": {
+                "id": "enumType.3",
+                "name": "Enum Type 3",
+                "base": "enumType.1",
+                "baseItems": [ "invalid base item" ],
+                "items": [ "item 4" ]
+            },
+            "enumType.4": {
+                "id": "enumType.4",
+                "name": "Enum Type 4",
+                "base": "invalid.base",
+                "baseItems": [ "some base item" ],
+                "items": [ "item 5" ]
+            },
+            "enumType.5": {
+                "id": "enumType.5",
+                "name": "Enum Type 5",
+                "base": "enumType.2",
+                "items": [ "own item level 2" ],
+                "baseItems": ["item 1", "own item 2"]
+            },
+
+            "cycleInheritanceEnumType.1": {
+                "id": "cycleInheritanceEnumType.1",
+                "name": "Cycle Inheritance EnumType",
+                "base": "cycleInheritanceEnumType.2",
+                "items": [ "1" ],
+                "baseItems": [ "2" ]
+            },
+            "cycleInheritanceEnumType.2": {
+                "id": "cycleInheritanceEnumType.2",
+                "name": "Cycle Inheritance EnumType",
+                "base": "cycleInheritanceEnumType.1",
+                "items": [ "2" ],
+                "baseItems": [ "1" ]
+            }
+        }
+    },
+    "result": {
+        "enumType.1": {
+            "id": "enumType.1",
+            "name": "EnumType 1",
+            "items": [ "item 1", "item 2", "item 3" ],
+            "ownItems": [ "item 1", "item 2", "item 3" ]
+        },
+        "enumType.2": {
+            "id": "enumType.2",
+            "name": "EnumType 2",
+            "base": "enumType.1",
+            "items": [ "item 1", "own item 1", "own item 2" ],
+            "ownItems": [ "own item 1", "own item 2" ]
+        },
+        "enumType.3": {
+            "id": "enumType.3",
+            "name": "Enum Type 3",
+            "base": "enumType.1",
+            "items": [ "item 4" ],
+            "ownItems": [ "item 4" ]
+        },
+        "enumType.4": {
+            "id": "enumType.4",
+            "name": "Enum Type 4",
+            "items": [ "item 5" ],
+            "ownItems": [ "item 5" ]
+        },
+        "enumType.5": {
+            "id": "enumType.5",
+            "name": "Enum Type 5",
+            "base": "enumType.2",
+            "items": [ "item 1", "own item 2", "own item level 2" ],
+            "ownItems": [ "own item level 2" ]
+        },
+
+        "cycleInheritanceEnumType.1": {
+            "id": "cycleInheritanceEnumType.1",
+            "name": "Cycle Inheritance EnumType",
+            "base": "cycleInheritanceEnumType.2",
+            "items": [ "2", "1" ],
+            "ownItems": [ "1" ]
+        },
+        "cycleInheritanceEnumType.2": {
+            "id": "cycleInheritanceEnumType.2",
+            "name": "Cycle Inheritance EnumType",
+            "items": [ "2" ],
+            "ownItems": [ "2" ]
+        }
+    }
+}

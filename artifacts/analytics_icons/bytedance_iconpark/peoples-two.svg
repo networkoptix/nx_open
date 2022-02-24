@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>peoples-two</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="peoples-two">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M10,8.33333333 C11.6108333,8.33333333 12.9166667,7.0275 12.9166667,5.41666667 C12.9166667,3.8058375 11.6108333,2.5 10,2.5 C8.38916667,2.5 7.08333333,3.8058375 7.08333333,5.41666667 C7.08333333,7.0275 8.38916667,8.33333333 10,8.33333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M5,3.02278333 C4.244375,3.54984583 3.75,4.4255 3.75,5.41666667 C3.75,6.477625 4.3165,7.40629167 5.1635,7.91666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M15,3.02278333 C15.755625,3.54984583 16.25,4.4255 16.25,5.41666667 C16.25,6.40779167 15.755625,7.2835 15,7.81054167" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M5,16.6666667 L5,17.5 L15,17.5 L15,16.6666667 C15,15.1135417 15,14.3369583 14.74625,13.724375 C14.4079583,12.907625 13.7590417,12.2587083 12.9422917,11.9204167 C12.3297083,11.6666667 11.553125,11.6666667 10,11.6666667 C8.446875,11.6666667 7.67029167,11.6666667 7.05770833,11.9204167 C6.24095833,12.2587083 5.59204167,12.907625 5.25375,13.724375 C5,14.3369583 5,15.1135417 5,16.6666667 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M18.3332917,17.5 L18.3332917,17 C18.3332917,15.1331667 18.3332917,14.19975 17.97,13.4867083 C17.6504167,12.8595 17.1404583,12.3495417 16.51325,12.0299583" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M1.66670417,17.5 L1.66670417,17 C1.66670417,15.1331667 1.66670417,14.19975 2.03001667,13.4867083 C2.34959167,12.8595 2.85952917,12.3495417 3.48673333,12.0299583" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

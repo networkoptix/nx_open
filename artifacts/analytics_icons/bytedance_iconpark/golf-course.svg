@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>golf-course</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="golf-course">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <ellipse id="Oval" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" cx="10" cy="14.1666667" rx="8.33333333" ry="4.16666667"></ellipse>
+            <circle id="Oval" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" cx="13.3333333" cy="14.1666667" r="1"></circle>
+            <polygon id="Path" points="10 3.75 5.41666667 1.66666667 5.41666667 5.83333333"></polygon>
+            <path d="M5.41666667,14.1666667 L5.41666667,5.83333333 M5.41666667,5.83333333 L5.41666667,1.66666667 L10,3.75 L5.41666667,5.83333333 Z" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

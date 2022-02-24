@@ -1,0 +1,68 @@
+{
+    "initial": {
+        "enumTypeDescriptors": {
+            "test.enumType1": {
+                "id": "test.enumType1",
+                "name": "Test Enum Type 1",
+                "items": ["item1", "item2", "item3"]
+            },
+            "test.enumType2": {
+                "id": "test.enumType2",
+                "name": "Test Enum Type 2",
+                "items": ["ab", "cd", "ef", "gh"]
+            },
+            "test.enumType3": {
+                "id": "test.enumType3",
+                "name": "Test Enum Type 3",
+                "items": ["meow", "wuff", "mee", "mooo"]
+            }
+        }
+    },
+    "additional": {
+        "enumTypeDescriptors": {
+            "test.enumType2": {
+                "id": "test.enumType2",
+                "name": "Test Enum Type 2",
+                "base": "test.enumType3",
+                "items": ["ab", "cd", "ef", "gh"],
+                "baseItems": ["meow", "mooo"]
+            },
+            "test.enumType3": {
+                "id": "test.enumType3",
+                "name": "Overridden Test Enum Type 3",
+                "items": ["meow", "wuff", "mooo"]
+            },
+            "test.enumType4": {
+                "id": "test.enumType4",
+                "name": "Test Enum Type 4",
+                "items": ["some", "other", "enum", "type"]
+            }
+        }
+    },
+    "expected": {
+        "enumTypeDescriptors": {
+            "test.enumType1": {
+                "id": "test.enumType1",
+                "name": "Test Enum Type 1",
+                "items": ["item1", "item2", "item3"]
+            },
+            "test.enumType2": {
+                "id": "test.enumType2",
+                "name": "Test Enum Type 2",
+                "base": "test.enumType3",
+                "items": ["ab", "cd", "ef", "gh"],
+                "baseItems": ["meow", "mooo"]
+            },
+            "test.enumType3": {
+                "id": "test.enumType3",
+                "name": "Overridden Test Enum Type 3",
+                "items": ["meow", "wuff", "mooo"]
+            },
+            "test.enumType4": {
+                "id": "test.enumType4",
+                "name": "Test Enum Type 4",
+                "items": ["some", "other", "enum", "type"]
+            }
+        }
+    }
+}

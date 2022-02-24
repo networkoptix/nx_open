@@ -1,0 +1,63 @@
+{
+    "descriptors":
+    {
+        "objectTypeDescriptors":
+        {
+            "objectType.1":
+            {
+                "id": "objectType.1",
+                "name": "Object Type 1",
+                "flags": "liveOnly"
+            },
+            "objectType.2":
+            {
+                "id": "objectType.2",
+                "name": "Object Type 2",
+                "flags": "nonIndexable"
+            },
+            "objectType.3":
+            {
+                "id": "objectType.3",
+                "name": "Object Type 3",
+                "flags": "liveOnly|nonIndexable"
+            },
+            "objectType.4":
+            {
+                "id": "objectType.4",
+                "name": "Object Type 4",
+                "base": "objectType.3"
+            }
+        }
+    },
+    "result":
+    {
+        "objectType.1":
+        {
+            "id": "objectType.1",
+            "name": "Object Type 1",
+            "liveOnly": true,
+            "nonIndexable": true
+        },
+        "objectType.2":
+        {
+            "id": "objectType.2",
+            "name": "Object Type 2",
+            "liveOnly": false,
+            "nonIndexable": true
+        },
+        "objectType.3":
+        {
+            "id": "objectType.3",
+            "name": "Object Type 3",
+            "liveOnly": true,
+            "nonIndexable": true
+        },
+        "objectType.4":
+        {
+            "id": "objectType.4",
+            "name": "Object Type 4",
+            "liveOnly": false,
+            "nonIndexable": false
+        }
+    }
+}

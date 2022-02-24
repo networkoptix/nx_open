@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>water-level</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="water-level">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M10,18.3333333 C13.4517917,18.3333333 16.25,15.535125 16.25,12.0833333 C16.25,6.25 10,1.66666667 10,1.66666667 C10,1.66666667 3.75,6.25 3.75,12.0833333 C3.75,15.535125 6.54820833,18.3333333 10,18.3333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M3.75,12.0833333 C3.75,15.535125 6.54820833,18.3333333 10,18.3333333 C13.4517917,18.3333333 16.25,15.535125 16.25,12.0833333 C16.25,12.0833333 12.5,13.3333333 10,12.0833333 C7.5,10.8333333 3.75,12.0833333 3.75,12.0833333 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

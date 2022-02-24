@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>thumbs-up</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="thumbs-up">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M11.5,7.75 L11.5,4.75 C11.5,3.50735833 10.492625,2.5 9.25,2.5 L6.25,9.25 L6.25,17.5000973 L14.965,17.5000973 C15.7129583,17.5084583 16.3528333,16.9645417 16.465,16.225 L17.5,9.475 C17.5660417,9.039875 17.4376667,8.59775 17.148875,8.265625 C16.860125,7.93354167 16.4400417,7.745 16,7.75 L11.5,7.75 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M6.25,9.16675 L4.2475,9.16675 C3.36888333,9.15120833 2.61779167,9.879 2.5,10.7498333 L2.5,15.9998333 C2.61779167,16.8706667 3.36888333,17.515375 4.2475,17.4998333 L6.25,17.4998333 L6.25,9.16675 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

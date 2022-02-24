@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>glasses</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="glasses">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <circle id="Oval" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" cx="5" cy="14.5833333" r="2.91666667"></circle>
+            <circle id="Oval" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" cx="15" cy="14.5833333" r="2.91666667"></circle>
+            <path d="M2.08333333,14.1666667 L2.08333333,4.53458333 C2.08333333,3.95482917 2.08333333,3.66494583 2.24063333,3.44670833 C2.39792917,3.22846667 2.6729375,3.1368 3.22295417,2.95345833 L4.58333333,2.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M17.9166667,14.1666667 L17.9166667,4.53458333 C17.9166667,3.95482917 17.9166667,3.66494583 17.759375,3.44670833 C17.6020833,3.22846667 17.3270417,3.1368 16.7770417,2.95345833 L15.4166667,2.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M12.0833333,14.1666667 C12.0833333,13.0160833 11.1505833,12.0833333 10,12.0833333 C8.84941667,12.0833333 7.91666667,13.0160833 7.91666667,14.1666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

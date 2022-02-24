@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>stapler</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="stapler">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="2.5 14.5833333 17.5 14.5833333 17.5 17.9166667 2.5 17.9166667"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="3.46400417 4.52575 15.99325 9.086 14.8531667 12.2183333 2.3239375 7.65804167"></polygon>
+            <path d="M3.48733333,4.491 L9.53420833,6.73270833 C9.54083333,6.73516667 9.54820833,6.73179167 9.55066667,6.72516667 L9.55066667,6.72516667 C9.97341667,5.58483333 9.39170833,4.31770833 8.251375,3.89497917 L4.29225,2.42724167 C4.27291667,2.42007083 4.25141667,2.4299375 4.24425,2.44927917 L3.48733333,4.491 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M6.981125,9.46666667 L6.41108333,11.0328333 C6.332375,11.2490417 6.09325,11.3605417 5.87704167,11.2818333 L3.13625417,10.2842917 C2.92001667,10.2055833 2.80852083,9.9665 2.887225,9.75025 L3.45725833,8.18408333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <circle id="Oval" stroke="#A5B7C0" cx="15" cy="12.5" r="2.91666667"></circle>
+        </g>
+    </g>
+</svg>

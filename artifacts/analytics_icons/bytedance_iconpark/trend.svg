@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>trend</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="trend">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linejoin="round" x="2.5" y="2.5" width="15" height="15" rx="1.5"></rect>
+            <g id="Group" transform="translate(5.416667, 5.416667)" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round">
+                <polyline id="Path" transform="translate(4.470801, 4.553044) rotate(-135.000000) translate(-4.470801, -4.553044) " points="5.762117 -0.219155668 5.762117 3.11417767 3.17948556 3.11721763 3.19130016 9.32524386"></polyline>
+                <polyline id="Path" points="5.41666667 2.08333333 8.75 2.08333333 8.75 5.41666667"></polyline>
+            </g>
+        </g>
+    </g>
+</svg>

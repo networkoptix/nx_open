@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>usb</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="usb">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <path d="M5,9.16666667 C5.92047458,9.16666667 6.66666667,8.42047458 6.66666667,7.5 C6.66666667,6.57952542 5.92047458,5.83333333 5,5.83333333 C4.07952542,5.83333333 3.33333333,6.57952542 3.33333333,7.5 C3.33333333,8.42047458 4.07952542,9.16666667 5,9.16666667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M15,11.6666667 C15.9204746,11.6666667 16.6666667,10.9204746 16.6666667,10 C16.6666667,9.07952542 15.9204746,8.33333333 15,8.33333333 C14.0795254,8.33333333 13.3333333,9.07952542 13.3333333,10 C13.3333333,10.9204746 14.0795254,11.6666667 15,11.6666667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="7.91666667 3.75 10 1.66666667 12.0833333 3.75"></polyline>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="10.4166667 16.25 5 11.7763158 5 9.16666667"></polyline>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="15 11.6666667 15 13.6622807 10 17.0833333"></polyline>
+            <line x1="10" y1="1.66666667" x2="10" y2="17.9166667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="8.75" y1="18.3333333" x2="11.25" y2="18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

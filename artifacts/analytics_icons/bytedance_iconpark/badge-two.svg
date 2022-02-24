@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>badge-two</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="badge-two">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M6.66666667,18.3333333 L10,16.6666667 L13.3333333,18.3333333 L13.3333333,10.3935 C12.44875,11.18525 11.2805833,11.6666667 10,11.6666667 C8.71941667,11.6666667 7.55125,11.18525 6.66666667,10.3935 L6.66666667,18.3333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M15,6.66666667 C15,8.1475 14.35625,9.47795833 13.3333333,10.3935 C12.44875,11.18525 11.2805833,11.6666667 10,11.6666667 C8.71941667,11.6666667 7.55125,11.18525 6.66666667,10.3935 C5.64375,9.47795833 5,8.1475 5,6.66666667 C5,3.90524167 7.23858333,1.66666667 10,1.66666667 C12.7614167,1.66666667 15,3.90524167 15,6.66666667 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M10,8.75 L10,4.58333333 L9.16666667,5 M10,8.75 L10.8333333,8.75 M10,8.75 L9.16666667,8.75" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>poker</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="poker">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(1.666667, 1.666667)" stroke="#A5B7C0" stroke-linejoin="round">
+                <rect id="Rectangle" x="3.33333333" y="0" width="12.5" height="16.6666667"></rect>
+                <polygon id="Path" stroke-linecap="round" points="0 3.24561403 3.33333333 2.5 3.33333333 16.6666667"></polygon>
+                <polygon id="Path" points="9.58333333 5.83333333 7.5 8.33333333 9.58333333 10.8333333 11.6666667 8.33333333"></polygon>
+                <line x1="5.83333333" y1="2.5" x2="5.83333333" y2="4.16666667" id="Path" stroke-linecap="round"></line>
+                <line x1="13.3333333" y1="12.5" x2="13.3333333" y2="14.1666667" id="Path" stroke-linecap="round"></line>
+            </g>
+        </g>
+    </g>
+</svg>

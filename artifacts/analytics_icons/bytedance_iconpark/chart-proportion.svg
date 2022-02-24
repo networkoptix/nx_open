@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>chart-proportion</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="chart-proportion">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M6.81025,2.29894167 C5.79166667,2.72129583 4.87504167,3.33984167 4.10744167,4.1074375 C2.59940833,5.61545833 1.66666667,7.69879167 1.66666667,10 C1.66666667,14.602375 5.397625,18.3333333 10,18.3333333 L10,18.3333333 C12.3011667,18.3333333 14.3845,17.4005833 15.8925417,15.8925417 C16.6601667,15.1249583 17.2787083,14.2082917 17.7010417,13.18975" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M10,10 L18.3333333,10 C18.3333333,5.397625 14.602375,1.66666667 10,1.66666667 L10,10 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

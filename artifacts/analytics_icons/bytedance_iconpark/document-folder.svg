@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>document-folder</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="document-folder">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(2.083333, 2.083333)" stroke="#A5B7C0" stroke-linejoin="round">
+                <rect id="Rectangle" x="7.5" y="0.416666667" width="4.16666667" height="15"></rect>
+                <rect id="Rectangle" x="11.6666667" y="0.416666667" width="4.16666667" height="15"></rect>
+                <polygon id="Path" points="1.45833333 0 5.83333333 0.350378788 4.375 15.4166667 0 15.0662879"></polygon>
+                <line x1="13.75" y1="5.41666667" x2="13.75" y2="4.16666667" id="Path" stroke-linecap="round"></line>
+                <line x1="9.58333333" y1="5.41666667" x2="9.58333333" y2="4.16666667" id="Path" stroke-linecap="round"></line>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,54 @@
+{
+    "initial": {
+        "pluginDescriptors": {
+            "test.plugin1": {
+                "id": "test.plugin1",
+                "name": "Test Plugin 1"
+            },
+            "test.plugin2": {
+                "id": "test.plugin2",
+                "name": "Test Plugin 2"
+            },
+            "test.plugin3": {
+                "id": "test.plugin3",
+                "name": "Test Plugin 3"
+            }
+        }
+    },
+    "additional": {
+        "pluginDescriptors": {
+            "test.plugin1": {
+                "id": "test.plugin1",
+                "name": "Overridden Test Plugin 1"
+            },
+            "test.plugin2": {
+                "id": "test.plugin2",
+                "name": "Overridden Test Plugin 2"
+            },
+            "test.plugin4": {
+                "id": "test.plugin4",
+                "name": "Test Plugin 4"
+            }
+        }
+    },
+    "expected": {
+        "pluginDescriptors": {
+            "test.plugin1": {
+                "id": "test.plugin1",
+                "name": "Overridden Test Plugin 1"
+            },
+            "test.plugin2": {
+                "id": "test.plugin2",
+                "name": "Overridden Test Plugin 2"
+            },
+            "test.plugin3": {
+                "id": "test.plugin3",
+                "name": "Test Plugin 3"
+            },
+            "test.plugin4": {
+                "id": "test.plugin4",
+                "name": "Test Plugin 4"
+            }
+        }
+    }
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>hanger</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="hanger">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M8.63754167,11.3022917 C9.46604167,10.76375 10.5339583,10.76375 11.3624583,11.3022917 L17.84175,15.5137917 C18.1483333,15.7130833 18.3333333,16.0539583 18.3333333,16.419625 C18.3333333,17.0162917 17.849625,17.5 17.2529583,17.5 L2.74703333,17.5 C2.1503625,17.5 1.66666667,17.0162917 1.66666667,16.419625 C1.66666667,16.0539583 1.85164583,15.7130833 2.15824583,15.5137917 L8.63754167,11.3022917 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M10,10.4166667 C10,10.4166667 12.5,6.797375 12.5,5.41666667 C12.5,4.03595417 11.3807083,2.91666667 10,2.91666667 C8.61929167,2.91666667 7.5,4.03595417 7.5,5.41666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

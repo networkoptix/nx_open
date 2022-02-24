@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>download-two</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="download-two">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M16.8824167,14.298375 C18.2518333,13.3354167 18.839,11.5959167 18.333375,10 C17.82775,8.40408333 16.279375,7.52975 14.6052917,7.53104167 L13.6382083,7.53104167 C13.006,5.06720833 10.9200833,3.24821667 8.393125,2.95716667 C5.866125,2.66611667 3.4213375,3.96325 2.24554583,6.218875 C1.06975417,8.4745 1.4064375,11.2215417 3.09214583,13.1264583" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="10.0035833" y1="17.0833333" x2="10.0000833" y2="9.58333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="12.6515833 14.4316667 9.99991667 17.0833333 7.34825 14.4316667"></polyline>
+        </g>
+    </g>
+</svg>

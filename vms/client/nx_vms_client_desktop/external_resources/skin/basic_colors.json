@@ -1,0 +1,316 @@
+{
+    "dark1":        "#000000",
+    "dark2":        "#080707",
+    "dark3":        "#0d0e0f",
+    "dark4":        "#121517",
+    "dark5":        "#171c1f",
+    "dark6":        "#1c2327",
+    "dark7":        "#212a2f",
+    "dark8":        "#263137",
+    "dark9":        "#2b383f",
+    "dark10":       "#303f47",
+    "dark11":       "#35464f",
+    "dark12":       "#3a4d57",
+    "dark13":       "#3f545f",
+    "dark14":       "#445b67",
+    "dark15":       "#49626f",
+    "dark16":       "#4e6977",
+    "dark17":       "#53707f",
+
+    "light1":       "#ffffff",
+    "light2":       "#f5f7f8",
+    "light3":       "#ebeff1",
+    "light4":       "#e1e7ea",
+    "light5":       "#d7dfe3",
+    "light6":       "#cdd7dc",
+    "light7":       "#c3cfd5",
+    "light8":       "#b9c7ce",
+    "light9":       "#afbfc7",
+    "light10":      "#a5b7c0",
+    "light11":      "#9bafb9",
+    "light12":      "#91a7b2",
+    "light13":      "#879fab",
+    "light14":      "#7d97a4",
+    "light15":      "#738f9d",
+    "light16":      "#698796",
+    "light17":      "#5f7f8f",
+
+    "blue8":        "#43c2ff",
+    "blue9":        "#39b2ef",
+    "blue10":       "#2fa2db",
+    "blue11":       "#2592c3",
+    "blue12":       "#1b82ad",
+    "blue13":       "#117297",
+    "blue14":       "#076281",
+
+    "green_l4":     "#56e829",
+    "green_l3":     "#51d22a",
+    "green_l2":     "#4cbc28",
+    "green_l1":     "#44a624",
+    "green_core":   "#3a911e",
+    "green_d1":     "#32731e",
+    "green_d2":     "#2a551e",
+    "green_d3":     "#22391e",
+
+    "yellow_core":  "#fbbc05",
+    "yellow_d1":    "#e1a700",
+    "yellow_d2":    "#c79200",
+
+    "red_l3":       "#ff2e2e",
+    "red_l2":       "#f02c2c",
+    "red_l1":       "#d92a2a",
+    "red_core":     "#c22626",
+    "red_d1":       "#aa1e1e",
+    "red_d2":       "#8e1717",
+    "red_d3":       "#741414",
+    "red_d4":       "#5e1010",
+    "red_d5":       "#480d0d",
+    "red_d6":       "#330909",
+    "red_d7":       "#1d0505",
+
+    "brand_l4":     "#77d2ff",
+    "brand_l3":     "#5ecbff",
+    "brand_l2":     "#43c2ff",
+    "brand_l1":     "#39b2ef",
+    "brand_core":   "#2fa2db",
+    "brand_d1":     "#2592c3",
+    "brand_d2":     "#1b82ad",
+    "brand_d3":     "#117297",
+    "brand_d4":     "#076281",
+    "brand_d5":     "#045773",
+    "brand_d6":     "#054A61",
+    "brand_d7":     "#043E51",
+
+    "brand_contrast":   "#ffffff",
+
+    "orange_l2":    "#f4663a",
+    "orange_main":  "#d65029",
+    "orange_d3":    "#743320",
+
+    "pink_core":    "#f38282",
+
+    "dialog": {
+        "alertBar": "#61282b",
+        "infoBar": "brand_d5"
+    },
+
+    "detectedObject": [
+        "#65991c",
+        "#994998",
+        "#029eb0",
+        "#5d82bf",
+        "#f38282",
+        "#b13016",
+        "#dcb428",
+        "#9c6b50",
+        "#cbcbcb"
+    ],
+
+    "roi": {
+        "palette": [
+            "#e040fb",
+            "#536dfe",
+            "#64ffda",
+            "#ffff00",
+            "#ffab40",
+            "#b2ff59",
+            "#7c4dff",
+            "#ff4081"
+        ],
+
+        "minBox": "#536dfe",
+        "maxBox": "#ff4081"
+    },
+
+    "tooltip": {
+        "background": "dark13",
+        "text": "brand_contrast"
+    },
+
+    "timeline": {
+        "clockText": "brand_d2",
+        "tooltip": {
+            "background": "light4",
+            "text": "dark4"
+        },
+        "bookmark": {
+            "background": "#295e87",
+            "more_items_label": "#94aec3",
+            "label": "#ffffff",
+            "thick_line": "#154163",
+            "thin_line": "#3e6e93",
+            "button": {
+                "background": "#3e6e93",
+                "text": "#d8e2e9",
+                "background_hover": "#547e9f",
+                "text_hover": "#ffffff",
+                "background_pressed": "#1d5177",
+                "text_pressed": "#d8e2e9"
+            }
+        }
+    },
+
+    "calendar": {
+        "pin_button": {
+            "hovered": "dark8",
+            "pressed": "dark6"
+        },
+        "cell": {
+            "selection": "#2fa2db.setAlpha(192)",
+            "separator": "#121517",
+            "primaryRecording": "#208020",
+            "secondaryRecording":"#20ff20",
+            "primaryMotion": "#800000",
+            "secondaryMotion": "#ff0000",
+            "primaryBookmark": "#3775c4",
+            "secondaryBookmark": "#69a4f0"
+        }
+    },
+
+   "resourceTree": {
+        "mainText":          "light10",
+        "mainTextSelected":  "light4",
+        "mainTextAccented":  "brand_core",
+        "extraText":         "dark17",
+        "extraTextSelected": "light10",
+        "extraTextAccented": "brand_d3",
+        "tooltip": {
+            "background": "dark13",
+            "previewBackground": "dark12",
+            "previewFrame": "dark11",
+            "foreground": "light16",
+            "obsolescenceDimmer": "dark5.setAlpha(179)",
+            "obsolescenceText": "light10"
+        }
+   },
+
+   "scene": {
+       "curtain": "dark1",
+       "customLayoutBackground": "#1d2327",
+       "panelEdgeShadow": "dark1.setAlpha(38)",
+       "grid": {
+            "allowedCell": "#00ff00.setAlpha(64)",
+            "disallowedCell": "#ff0000.setAlpha(64)"
+       },
+       "banner": {
+            "_": "Over-scene graphics message boxes",
+            "frame": "brand_d2",
+            "window": "brand_d2.setAlpha(204)",
+            "text": "brand_contrast"
+       }
+   },
+
+   "camera": {
+        "_": "Scene media item",
+        "bookmarkBackground": "#2e6996",
+        "hudElementsBackground": "dark1.setAlpha(128)",
+        "motion": "#c80000.setAlpha(51)",
+        "titleGradient": {
+            "top": "#000000.setAlpha(178)",
+            "bottom": "#000000.setAlpha(0)"
+        },
+        "motionSelection": {
+            "pen": "#980000",
+            "brush": "#c80000.setAlpha(128)"
+        },
+        "twoWayAudio": {
+            "background": {
+                "default": "dark1.setAlpha(128)",
+                "hovered": "brand_core.setAlpha(179)",
+                "pressed": "dark7"
+            },
+            "visualizer": "red_core",
+            "text": "light1"
+        },
+        "sensitivityColors": [
+            "light16",
+            "#627cd6",
+            "#23a4cb",
+            "#31baa2",
+            "#79bc66",
+            "#b8bc37",
+            "#fba405",
+            "#e97119",
+            "#d24729",
+            "#c22626"
+        ]
+   },
+
+   "server": {
+        "_": "Scene server statistics item",
+        "statistics": {
+            "cpu": "#428ced",
+            "ram": "#db3ba9",
+            "hdds": ["#ededed","#edc842","#67ed42","#ff8330","#b200ff","#00ffff","#267f00","#ff7f7f","#c90000"],
+            "network": ["#ff3434", "#f0ff34", "#8484ff", "#34ff84"]
+        }
+   },
+
+   "imageEnhancement": {
+        "background": "dark4",
+        "border": "dark8",
+        "histogram": "#c0c0c0ff",
+        "selection": "brand_core.setAlpha(110)",
+        "grid": "#00800080",
+        "text": "#ffffffff"
+   },
+
+   "ptz": {
+        "_": "All PTZ-related colors",
+        "main": "brand_core",
+        "fill": "brand_l1",
+
+        "manage":
+        {
+            "_": "Manage PTZ dialog",
+            "title": "#404040",
+            "invalid": "#401010",
+            "warning": "#404010"
+        }
+   },
+
+   "auditLog": {
+        "actions": {
+            "login": "#65991c",
+            "failedLogin": "#cf2727",
+            "updateUser": "#994998",
+            "updateCamera": "#bf6565",
+            "updateServer": "#dcb428",
+            "watchingLive": "#029eb0",
+            "watchingArchive": "#029eb0",
+            "exportVideo": "#5d82bf",
+            "system": "#b13016",
+            "rules": "#9c6b50",
+            "emailSettings": "#cbcbcb"
+        },
+        "httpLink": "brand_d2",
+        "chart": "brand_d3"
+   },
+
+   "failoverPriority": {
+        "never": "#808080",
+        "low":  "#9eb236",
+        "medium": "#cc853d",
+        "high": "#ff5500"
+    },
+
+    "videoWall": {
+        "attach": {
+            "_": "Attach screen dialog",
+            "text": "#ffffff",
+            "error": "#ff0000",
+            "desktop": "#808080",
+            "freeSpace": "#c0c0c0",
+            "item": "#4082b4"
+        },
+        "itemFrame": {
+            "_": "Overview mode",
+            "normal": "#808080.setAlpha(196)",
+            "selected": "#4082b4.setAlpha(128)"
+        }
+    },
+
+    "layoutBackgroundSettings": {
+        "frameColor": "#808080.setAlpha(196)"
+    }
+}

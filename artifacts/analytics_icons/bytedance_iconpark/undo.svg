@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>undo</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="undo">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M4.69670833,15.3032917 C6.05391667,16.6605417 7.92891667,17.5 10,17.5 C14.142125,17.5 17.5,14.142125 17.5,10 C17.5,5.857875 14.142125,2.5 10,2.5 C7.92891667,2.5 6.05391667,3.33946667 4.69670833,4.69670833 C4.0058625,5.38754167 2.5,7.08333333 2.5,7.08333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="2.5 3.75 2.5 7.08333333 5.83333333 7.08333333"></polyline>
+        </g>
+    </g>
+</svg>
