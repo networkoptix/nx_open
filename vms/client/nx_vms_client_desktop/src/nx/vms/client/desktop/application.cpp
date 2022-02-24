@@ -2,12 +2,6 @@
 
 #include "application.h"
 
-//#define QN_USE_VLD
-
-#ifdef QN_USE_VLD
-#   include <vld.h>
-#endif
-
 #include <qglobal.h>
 
 #ifdef Q_OS_LINUX
