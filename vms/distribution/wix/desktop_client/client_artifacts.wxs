@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <ComponentGroup
+                Id="openal_libraries"
+                Source="${CONAN_OPENAL_ROOT}/bin"
+                Directory="InstallDirRoot">
+            <Component><File Name="OpenAL32.dll" KeyPath="yes" DiskId="3"/></Component>
+        </ComponentGroup>
+        <ComponentGroup
+                Id="hidapi_libraries"
+                Source="${bin_source_dir}"
+                Directory="InstallDirRoot">
+            <Component><File Name="hidapi.dll" KeyPath="yes" DiskId="3"/></Component>
+        </ComponentGroup>
+
+        <ComponentGroup
+                Id="client_qt_libraries"
+                Source="${qt.dir}/bin"
+                Directory="InstallDirRoot">
+            <Component><File Name="Qt5OpenGL.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="Qt5WebChannel.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="Qt5PrintSupport.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="Qt5MultimediaWidgets.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="Qt5MultimediaQuick.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="Qt5Svg.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="Qt5QmlModels.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="Qt5QmlWorkerScript.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="Qt5Quick.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="Qt5QuickWidgets.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="Qt5QuickControls2.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="Qt5QuickTemplates2.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="Qt5QuickShapes.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="Qt5WebEngine.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="Qt5WebEngineCore.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="Qt5WebEngineWidgets.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="QtWebEngineProcess.exe" KeyPath="yes" DiskId="3"/></Component>
+        </ComponentGroup>
+
+        <ComponentGroup
+                Id="client_qt_imageformats"
+                Source="${qt.dir}/plugins/imageformats"
+                Directory="imageformats">
+            <Component><File Name="qgif.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="qjpeg.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="qtiff.dll" KeyPath="yes" DiskId="3"/></Component>
+        </ComponentGroup>
+
+        <ComponentGroup
+                Id="client_qt_mediaservice"
+                Source="${qt.dir}/plugins/mediaservice"
+                Directory="mediaservice">
+            <Component><File Name="dsengine.dll" KeyPath="yes" DiskId="3"/></Component>
+            <Component><File Name="qtmedia_audioengine.dll" KeyPath="yes" DiskId="3"/></Component>
+        </ComponentGroup>
+
+        <ComponentGroup
+                Id="client_qt_audio"
+                Source="${qt.dir}/plugins/audio"
+                Directory="audio">
+            <Component><File Name="qtaudio_windows.dll" KeyPath="yes" DiskId="3"/></Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

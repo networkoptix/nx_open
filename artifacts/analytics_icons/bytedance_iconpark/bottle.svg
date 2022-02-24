@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>bottle</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="bottle">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="15 7.5 5 7.5 5 18.3333333 15 18.3333333"></polygon>
+            <path d="M8.28929167,4.58333333 L11.7107083,4.58333333 C12.430375,4.58333333 13.06875,5.04525 13.2937917,5.72883333 L13.876875,7.5 L6.12304167,7.5 L6.70620833,5.72879167 C6.93125,5.04525 7.569625,4.58333333 8.28929167,4.58333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M8.75,4.58333333 L8.75,2.91666667 C8.75,2.2263125 9.309625,1.66666667 10,1.66666667 C10.690375,1.66666667 11.25,2.2263125 11.25,2.91666667 L11.25,4.58333333" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <line x1="7.70833333" y1="10.8333333" x2="7.70833333" y2="15" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+        </g>
+    </g>
+</svg>

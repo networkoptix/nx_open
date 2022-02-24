@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>file-txt</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="file-txt">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" points="20 0 0 0 0 20 20 20"></polygon>
+            <path d="M4.16666667,1.66666667 L12.5,1.66666667 L16.6666667,5.83333333 L16.6666667,17.5 C16.6666667,17.96025 16.2935833,18.3333333 15.8333333,18.3333333 L4.16666667,18.3333333 C3.70642917,18.3333333 3.33333333,17.96025 3.33333333,17.5 L3.33333333,2.5 C3.33333333,2.0397625 3.70642917,1.66666667 4.16666667,1.66666667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <line x1="7.5" y1="7.50345833" x2="12.5" y2="7.50345833" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="10.0034583" y1="7.50345833" x2="10.0034583" y2="14.1666667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+        </g>
+    </g>
+</svg>

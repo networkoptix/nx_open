@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>hourglass-full</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="hourglass-full">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(2.916667, 1.458333)" stroke="#A5B7C0" stroke-linejoin="round">
+                <line x1="0" y1="0.208333333" x2="14.1666667" y2="0.208333333" id="Path" stroke-linecap="round"></line>
+                <line x1="0" y1="16.875" x2="14.1666667" y2="16.875" id="Path" stroke-linecap="round"></line>
+                <path d="M12.5,8.54166501 C11.3888889,14.0995362 9.58333333,16.877314 7.08333333,16.8749998 C4.58333333,16.8726827 2.77777778,14.0949049 1.66666667,8.54166501 L12.5,8.54166501 Z" id="Path" transform="translate(7.083333, 12.708332) rotate(180.000000) translate(-7.083333, -12.708332) "></path>
+                <path d="M12.5,0.208333333 C11.3888889,5.76620454 9.58333333,8.54398229 7.08333333,8.54166811 C4.58333333,8.53935104 2.77777778,5.76157325 1.66666667,0.208333333 L12.5,0.208333333 Z" id="Path"></path>
+                <line x1="5.83333333" y1="4.79166667" x2="8.33333333" y2="4.79166667" id="Path" stroke-linecap="round"></line>
+                <line x1="5" y1="14.375" x2="9.16666667" y2="14.375" id="Path" stroke-linecap="round"></line>
+            </g>
+        </g>
+    </g>
+</svg>

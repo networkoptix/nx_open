@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>red-envelopes</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="red-envelopes">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(3.333333, 1.666667)" stroke="#A5B7C0" stroke-linejoin="round">
+                <rect id="Rectangle" stroke-linecap="round" x="0" y="0" width="13.3333333" height="16.6666667"></rect>
+                <path d="M4.89036892,6.99063117 C3.22370225,6.336114 1.66666667,4.90103837 0,2.5 M13.3333333,2.5 C11.6666667,4.90103837 10.1329571,6.38361387 8.46629042,7.03813104" id="Shape" stroke-linecap="round"></path>
+                <circle id="Oval" cx="6.66666667" cy="7.70833333" r="1.875"></circle>
+            </g>
+        </g>
+    </g>
+</svg>

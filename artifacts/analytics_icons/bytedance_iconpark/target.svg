@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>target</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="target">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M8.92383333,7.74283333 C8.08175,8.14504167 7.5,9.00454167 7.5,9.99995833 C7.5,11.3806667 8.61929167,12.4999583 10,12.4999583 C10.9954167,12.4999583 11.8549583,11.9182083 12.2571667,11.0761667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M11.7830417,4.883625 C11.2246667,4.68908333 10.6246667,4.58333333 10,4.58333333 C7.00845833,4.58333333 4.58333333,7.00845833 4.58333333,10 C4.58333333,12.9915417 7.00845833,15.4166667 10,15.4166667 C12.9915417,15.4166667 15.4166667,12.9915417 15.4166667,10 C15.4166667,9.37533333 15.3109167,8.77533333 15.116375,8.21695833" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M13.9864583,2.68022917 C12.8022917,2.0339625 11.4440417,1.66666667 10,1.66666667 C5.397625,1.66666667 1.66666667,5.397625 1.66666667,10 C1.66666667,14.602375 5.397625,18.3333333 10,18.3333333 C14.602375,18.3333333 18.3333333,14.602375 18.3333333,10 C18.3333333,8.55595833 17.9660417,7.19770833 17.3197917,6.01354167" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="18.3333333" y1="1.66666667" x2="10" y2="10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

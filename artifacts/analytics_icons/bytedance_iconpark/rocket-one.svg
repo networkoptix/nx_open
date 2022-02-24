@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>rocket-one</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="rocket-one">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M8.71083333,2.5261125 L9.306625,2.12891667 C9.7265,1.849 10.2735,1.849 10.693375,2.12891667 L11.2891667,2.5261125 C13.6075,4.0716625 15,6.67358333 15,9.459875 L15,13.75 L5,13.75 L5,9.459875 C5,6.67358333 6.3925,4.0716625 8.71083333,2.5261125 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <circle id="Oval" stroke="#A5B7C0" cx="10" cy="8.33333333" r="2.5"></circle>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="5 9.16666667 2.5 11.75725 2.5 13.75 17.5 13.75 17.5 11.75725 15 9.16666667"></polyline>
+            <line x1="10" y1="15.8333333" x2="10" y2="18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="6.66666667" y1="16.6666667" x2="6.66666667" y2="17.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="13.3333333" y1="16.6666667" x2="13.3333333" y2="17.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 23.0.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 20 20" style="enable-background:new 0 0 20 20;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:#A5B7C0;}
+	.st1{fill:#E1E7EA;}
+</style>
+<path class="st0" d="M2,16V4h15v4.62c0.35,0.08,0.68,0.21,1,0.37V4c0-0.55-0.45-1-1-1H2C1.45,3,1,3.45,1,4v12c0,0.55,0.45,1,1,1h8.5
+	v-1H2z"/>
+<rect x="3" y="5" class="st0" width="8.33" height="6.33"/>
+<rect x="12.33" y="5" class="st0" width="3.77" height="2.67"/>
+<path class="st0" d="M12.33,10.41c0.6-0.85,1.48-1.47,2.51-1.74h-2.51V10.41z"/>
+<path class="st0" d="M7.67,12.33V15h3.05c0.14-0.33,0.36-0.61,0.62-0.85v-1.82H7.67z"/>
+<rect x="3" y="12.33" class="st0" width="3.67" height="2.67"/>
+<path class="st1" d="M19,19c0.55,0,1-0.45,1-1v-2c0-0.55-0.45-1-1-1v-2c0-1.65-1.35-3-3-3s-3,1.35-3,3v2c-0.55,0-1,0.45-1,1v2
+	c0,0.55,0.45,1,1,1H19z M15,13c0-0.55,0.45-1,1-1c0.55,0,1,0.45,1,1v2h-1h-1V13z"/>
+</svg>

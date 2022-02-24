@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>browser-safari</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="browser-safari">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M10,18.3333333 C14.602375,18.3333333 18.3333333,14.602375 18.3333333,10 C18.3333333,5.397625 14.602375,1.66666667 10,1.66666667 C5.397625,1.66666667 1.66666667,5.397625 1.66666667,10 C1.66666667,14.602375 5.397625,18.3333333 10,18.3333333 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="6.25 13.75 8.125 8.125 13.75 6.25 11.875 11.875"></polygon>
+            <path d="M10,10.8333333 C10.46025,10.8333333 10.8333333,10.46025 10.8333333,10 C10.8333333,9.53975 10.46025,9.16666667 10,9.16666667 C9.53975,9.16666667 9.16666667,9.53975 9.16666667,10 C9.16666667,10.46025 9.53975,10.8333333 10,10.8333333 Z" id="Path" fill="#A5B7C0"></path>
+        </g>
+    </g>
+</svg>

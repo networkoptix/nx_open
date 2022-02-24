@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>table-report</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="table-report">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M2.08333333,2.91666667 C2.08333333,2.2263125 2.64297917,1.66666667 3.33333333,1.66666667 L13.3333333,1.66666667 C14.0237083,1.66666667 14.5833333,2.2263125 14.5833333,2.91666667 L14.5833333,18.3333333 L3.33333333,18.3333333 C2.64297917,18.3333333 2.08333333,17.7737083 2.08333333,17.0833333 L2.08333333,2.91666667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M14.5833333,10 C14.5833333,9.53975 14.9564167,9.16666667 15.4166667,9.16666667 L17.0833333,9.16666667 C17.5435833,9.16666667 17.9166667,9.53975 17.9166667,10 L17.9166667,17.0833333 C17.9166667,17.7737083 17.3570417,18.3333333 16.6666667,18.3333333 L14.5833333,18.3333333 L14.5833333,10 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <line x1="4.58333333" y1="5" x2="7.91666667" y2="5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="4.58333333" y1="7.91666667" x2="9.58333333" y2="7.91666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

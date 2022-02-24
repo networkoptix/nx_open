@@ -1,0 +1,10 @@
+{
+    "version" : "@release.version@.@buildNumber@",
+    "variantVersion": "@variantVersion@",
+    "platform" : "@platform@",
+    "arch" : "@arch@",
+    "modification" : "@modification@",
+    "cloudHost" : "@cloudHost@",
+    "client" : true,
+    "minimalVersion" : "2.3.0.0"
+}

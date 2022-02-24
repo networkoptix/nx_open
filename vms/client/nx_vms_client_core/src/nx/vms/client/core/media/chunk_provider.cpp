@@ -1,0 +1,254 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+#include "chunk_provider.h"
+
+#include <common/common_module.h>
+
+#include <camera/loaders/flat_camera_data_loader.h>
+#include <camera/data/abstract_camera_data.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource/camera_history.h>
+
+namespace nx::vms::client::core {
+
+class ChunkProvider::ChunkProviderInternal: public Connective<QObject>
+{
+public:
+    ChunkProviderInternal(
+        Qn::TimePeriodContent contentType,
+        ChunkProvider* owner);
+
+    QnUuid resourceId() const;
+    void setResourceId(const QnUuid& id);
+
+    const QString& filter() const;
+    void setFilter(const QString& filter);
+
+    bool loading() const;
+
+    void update();
+
+private:
+    void updateInternal();
+
+    void cleanLoader();
+    void setLoading(bool value);
+    void setTimePeriods(const QnTimePeriodList& periods);
+    QnVirtualCameraResourcePtr getCamera(const QnUuid& id);
+
+private:
+    ChunkProvider* const q;
+    const Qn::TimePeriodContent m_contentType;
+    QScopedPointer<QnFlatCameraDataLoader> m_loader;
+    QString m_filter;
+    bool m_loading = false;
+    int updateTriesCount = 0;
+};
+
+ChunkProvider::ChunkProviderInternal::ChunkProviderInternal(
+    Qn::TimePeriodContent contentType,
+    ChunkProvider* owner)
+    :
+    q(owner),
+    m_contentType(contentType)
+{
+}
+
+QnUuid ChunkProvider::ChunkProviderInternal::resourceId() const
+{
+    return m_loader ? m_loader->resource()->getId() : QnUuid();
+}
+
+void ChunkProvider::ChunkProviderInternal::cleanLoader()
+{
+    if (!m_loader)
+        return;
+
+    m_loader->disconnect(this);
+    q->cameraHistoryPool()->disconnect(m_loader.data());
+    m_loader.reset();
+}
+
+void ChunkProvider::ChunkProviderInternal::setResourceId(const QnUuid& id)
+{
+    if (id == resourceId())
+        return;
+
+    cleanLoader();
+    setTimePeriods(QnTimePeriodList());
+
+    const auto camera = getCamera(id);
+    if (!camera)
+        return;
+
+    setLoading(true);
+    m_loader.reset(new QnFlatCameraDataLoader(camera, m_contentType));
+
+    connect(m_loader, &QnFlatCameraDataLoader::ready, this,
+        [this](const QnAbstractCameraDataPtr& data) { setTimePeriods(data->dataSource()); });
+    connect(m_loader, &QnFlatCameraDataLoader::failed, this,
+        [this]()
+        {
+            if (--updateTriesCount > 0)
+                updateInternal();
+            else
+                setLoading(false);
+        });
+
+    const auto historyPool = q->cameraHistoryPool();
+    connect(historyPool, &QnCameraHistoryPool::cameraFootageChanged, m_loader,
+        [this](){ m_loader->discardCachedData(); });
+    connect(historyPool, &QnCameraHistoryPool::cameraHistoryInvalidated, this,
+        [this]() { update(); });
+
+    update();
+}
+
+bool ChunkProvider::ChunkProviderInternal::loading() const
+{
+    return m_loading;
+}
+
+const QString& ChunkProvider::ChunkProviderInternal::filter() const
+{
+    return m_filter;
+}
+
+void ChunkProvider::ChunkProviderInternal::setFilter(const QString& filter)
+{
+    if (m_filter == filter)
+        return;
+
+    m_filter = filter;
+    emit q->motionFilterChanged();
+
+    setLoading(true);
+    update();
+}
+
+void ChunkProvider::ChunkProviderInternal::update()
+{
+    updateTriesCount = 3;
+    updateInternal();
+}
+
+void ChunkProvider::ChunkProviderInternal::updateInternal()
+{
+    if (!m_loader)
+        return;
+
+    m_loader->load(m_filter, 1);
+
+    const auto camera = getCamera(m_loader->resource()->getId());
+    q->cameraHistoryPool()->updateCameraHistoryAsync(camera, nullptr);
+}
+
+void ChunkProvider::ChunkProviderInternal::setLoading(bool value)
+{
+    if (m_loading == value)
+        return;
+
+    m_loading = value;
+    q->handleLoadingChanged(m_contentType);
+}
+
+void ChunkProvider::ChunkProviderInternal::setTimePeriods(const QnTimePeriodList& periods)
+{
+    q->setPeriods(m_contentType, periods);
+    emit q->bottomBoundChanged();
+
+    setLoading(false);
+}
+
+QnVirtualCameraResourcePtr ChunkProvider::ChunkProviderInternal::getCamera(const QnUuid& id)
+{
+    return q->resourcePool()->getResourceById<QnVirtualCameraResource>(id);
+}
+
+//--------------------------------------------------------------------------------------------------
+
+ChunkProvider::ChunkProvider(QObject* parent):
+    base_type(parent),
+    m_providers(
+        [this]()
+        {
+            ProvidersHash result;
+            result.insert(Qn::RecordingContent,
+                ChunkProviderPtr(new ChunkProviderInternal(Qn::RecordingContent, this)));
+            result.insert(Qn::MotionContent,
+                ChunkProviderPtr(new ChunkProviderInternal(Qn::MotionContent, this)));
+            return result;
+        }())
+{
+}
+
+bool ChunkProvider::hasChunks() const
+{
+    return hasPeriods(Qn::RecordingContent);
+}
+
+bool ChunkProvider::hasMotionChunks() const
+{
+    return hasPeriods(Qn::MotionContent);
+}
+
+QnUuid ChunkProvider::resourceId() const
+{
+    return m_providers[Qn::RecordingContent]->resourceId();
+}
+
+void ChunkProvider::setResourceId(const QnUuid& id)
+{
+    for (const auto& provider: m_providers)
+        provider->setResourceId(id);
+}
+
+qint64 ChunkProvider::bottomBound() const
+{
+    const auto boundingPeriod = periods(Qn::RecordingContent).boundingPeriod();
+    return boundingPeriod.startTimeMs > 0 ? boundingPeriod.startTimeMs : -1;
+}
+
+bool ChunkProvider::isLoading() const
+{
+    return m_providers[Qn::RecordingContent]->loading();
+}
+
+bool ChunkProvider::isLoadingMotion() const
+{
+    return m_providers[Qn::MotionContent]->loading();
+}
+
+void ChunkProvider::handleLoadingChanged(Qn::TimePeriodContent contentType)
+{
+    if (contentType == Qn::RecordingContent)
+        emit loadingChanged();
+    else
+        emit loadingMotionChanged();
+}
+
+qint64 ChunkProvider::closestChunkEndMs(qint64 position, bool forward) const
+{
+    const auto data = periods(Qn::RecordingContent);
+    auto it = data.findNearestPeriod(position, forward);
+    return it == data.end() ? -1 : it->endTimeMs();
+}
+
+void ChunkProvider::update()
+{
+    for (const auto& provider: m_providers)
+        provider->update();
+}
+
+QString ChunkProvider::motionFilter() const
+{
+    return m_providers[Qn::MotionContent]->filter();
+}
+
+void ChunkProvider::setMotionFilter(const QString& value)
+{
+    m_providers[Qn::MotionContent]->setFilter(value);
+}
+
+} // namespace nx::vms::client::core

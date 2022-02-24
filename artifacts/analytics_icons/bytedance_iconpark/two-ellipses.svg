@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>two-ellipses</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="two-ellipses">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M16.9079167,3.0619625 C18.4765,4.63054167 16.6485833,9.00170833 12.825125,12.8251667 C9.00166667,16.648625 4.63054167,18.4765417 3.06192917,16.9079583 C1.49332917,15.3393333 3.32125417,10.9682083 7.14470833,7.14475 C10.9681667,3.3212875 15.3392917,1.4933625 16.9079167,3.0619625 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M3.11888333,3.0619625 C1.55028333,4.63054167 3.37820833,9.00170833 7.20166667,12.8251667 C11.025125,16.648625 15.39625,18.4765417 16.964875,16.9079583 C18.5334583,15.3393333 16.7055417,10.9682083 12.8820833,7.14475 C9.058625,3.3212875 4.6875,1.4933625 3.11888333,3.0619625 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>trace</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="trace">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M10,2.5 C5.857875,2.5 2.5,5.857875 2.5,10 C2.5,14.142125 5.857875,17.5 10,17.5 L10,17.5 C14.142125,17.5 17.5,14.142125 17.5,10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M10,6.25 C7.92891667,6.25 6.25,7.92891667 6.25,10 C6.25,12.0710833 7.92891667,13.75 10,13.75 C12.0710833,13.75 13.75,12.0710833 13.75,10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="10" y1="10.0000417" x2="12.625" y2="7.372625" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="12.625 4.761 12.625 7.375 15.2604583 7.375 17.5000417 5.12508333 14.876375 5.12508333 14.876375 2.5"></polygon>
+        </g>
+    </g>
+</svg>

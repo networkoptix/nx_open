@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>thermometer</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="thermometer">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(5.833333, 1.666667)" stroke="#A5B7C0" stroke-linejoin="round">
+                <path d="M1.66666667,9.1663615 L1.66666667,2.5 C1.66666667,1.11928813 2.78595479,0 4.16666667,0 C5.54737854,0 6.66666667,1.11928813 6.66666667,2.5 L6.66666667,9.1663615 C7.67870558,9.92653346 8.33333333,11.1368185 8.33333333,12.5 C8.33333333,14.8011865 6.46785312,16.6666667 4.16666667,16.6666667 C1.86548021,16.6666667 0,14.8011865 0,12.5 C0,11.1368185 0.65462775,9.92653346 1.66666667,9.1663615 Z" id="Path"></path>
+                <line x1="4.16666667" y1="5.41666667" x2="4.16666667" y2="10.8333333" id="Path" stroke-linecap="round"></line>
+                <circle id="Oval" cx="4.16666667" cy="12.5" r="1.66666667"></circle>
+            </g>
+        </g>
+    </g>
+</svg>

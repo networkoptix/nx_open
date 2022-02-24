@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>vial</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="vial">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <path d="M12.5,13.75 C12.5,11.0648148 12.5,7.03703704 12.5,1.66666667 L7.5,1.66666667 C7.5,7.03119233 7.5,11.0545866 7.5,13.7368495" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="12.5" y1="5.83333333" x2="10.4166667" y2="5.83333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="12.5" y1="8.33333333" x2="10.4166667" y2="8.33333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M7.5,13.75 C7.5,14.1850471 7.5,14.8376178 7.5,15.707712 C7.5,17.1578026 8.61928813,18.3333333 10,18.3333333 C11.3807119,18.3333333 12.5,17.1578026 12.5,15.707712 C12.5,14.84943 12.5,14.2057185 12.5,13.7765775 L7.5,13.75 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>flashlight</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="flashlight">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M7.08333333,9.248375 C7.08333333,9.19691667 7.059125,9.1485 7.01795833,9.11766667 C4.96075,7.57470833 3.75,5.15325 3.75,2.5817 L3.75,1.66666667 L16.25,1.66666667 L16.25,2.5817 C16.25,5.15325 15.03925,7.57470833 12.9820417,9.11766667 C12.940875,9.1485 12.9166667,9.19691667 12.9166667,9.248375 L12.9166667,18.3333333 L7.08333333,18.3333333 L7.08333333,9.248375 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <line x1="15.8333333" y1="4.58333333" x2="4.16666667" y2="4.58333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="10" y1="11.6701667" x2="10" y2="13.3368333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M7.08333333,9.16666667 L7.08333333,9.16666667 C4.98495833,7.592875 3.75,5.12295833 3.75,2.5 L3.75,1.66666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M16.25,1.66666667 L16.25,2.5 C16.25,5.12295833 15.0150417,7.592875 12.9166667,9.16666667 L12.9166667,9.16666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>cuvette</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="cuvette">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="7.5 4.16666667 12.5 4.16666667 12.5 11.25 18.3333333 17.0833333 18.3333333 18.3333333 1.66666667 18.3333333 1.66666667 17.0833333 7.5 11.25"></polygon>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="16.875 15.625 15.4166667 14.1666667 13.9583333 12.7083333"></polyline>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="16.875 15.625 15.4166667 14.1666667 13.9583333 12.7083333"></polyline>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="6.04166667 12.7083333 4.58333333 14.1666667 3.125 15.625"></polyline>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="6.04166667 12.7083333 4.58333333 14.1666667 3.125 15.625"></polyline>
+            <line x1="7.5" y1="1.66666667" x2="12.5" y2="1.66666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="10" y1="11.25" x2="10" y2="11.6666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="10" y1="7.5" x2="10" y2="8.75" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="4.16666667" y1="14.5833333" x2="15.8333333" y2="14.5833333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

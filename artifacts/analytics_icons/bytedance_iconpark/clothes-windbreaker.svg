@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>clothes-windbreaker</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="clothes-windbreaker">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M15.4166667,10.4166667 L15.4166667,15.4166667 M4.58333333,15.4166667 L4.58333333,18.3333333 L15.4166667,18.3333333 L15.4166667,15.4166667 M4.58333333,15.4166667 L1.66666667,15.4166667 L1.66666667,7.5 L4.21875,5.41666667 L7.08333333,7.5 L10,4.16666667 L12.9166667,7.5 L15.78125,5.41666667 L18.3333333,7.5 L18.3333333,15.4166667 L15.4166667,15.4166667 M4.58333333,15.4166667 L4.58333333,10.4166667" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <polygon id="Path" points="7.08333333 7.5 10 4.16666667 12.9166667 7.5 17.5 4.16666667 16.4583333 1.66666667 3.75 1.66666667 2.5 4.16666667"></polygon>
+            <path d="M7.91666667,4.16666667 L10,4.16666667 M12.0833333,4.16666667 L10,4.16666667 M10,4.16666667 L7.08333333,7.5 L2.5,4.16666667 L3.75,1.66666667 L16.4583333,1.66666667 L17.5,4.16666667 L12.9166667,7.5 L10,4.16666667 Z" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

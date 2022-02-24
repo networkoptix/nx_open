@@ -1,0 +1,96 @@
+{
+    "descriptors": {
+        "objectTypeDescriptors": {
+            "objectType.1": {
+                "id": "objectType.1",
+                "name": "Object Type 1"
+            },
+            "objectType.2": {
+                "id": "objectType.2",
+                "name": "Object Type 2",
+                "base": "objectType.1"
+            },
+            "objectType.3": {
+                "id": "objectType.3",
+                "name": "Object Type 3",
+                "base": "objectType.1"
+            },
+            "objectType.4": {
+                "id": "objectType.4",
+                "name": "Object Type 4",
+                "base": "objectType.2"
+            },
+            "objectType.5": {
+                "id": "objectType.5",
+                "name": "Object Type 5",
+                "base": "invalid.object.type"
+            },
+
+            "cycleInheritanceObjectType.1": {
+                "id": "cycleInheritanceObjectType.1",
+                "name": "Cycle Inheritance Object Type 1",
+                "base": "cycleInheritanceObjectType.2"
+            },
+            "cycleInheritanceObjectType.2": {
+                "id": "cycleInheritanceObjectType.2",
+                "name": "Cycle Inheritance Object Type 2",
+                "base": "cycleInheritanceObjectType.1"
+            }
+        }
+    },
+    "result": {
+        "objectType.1": {
+            "id": "objectType.1",
+            "name": "Object Type 1",
+            "directDerivedTypes": [
+                "objectType.2",
+                "objectType.3"
+            ],
+            "derivedTypes": [
+                "objectType.2",
+                "objectType.3",
+                "objectType.4"
+            ]
+        },
+        "objectType.2": {
+            "id": "objectType.2",
+            "name": "Object Type 2",
+            "base": "objectType.1",
+            "directDerivedTypes": [
+                "objectType.4"
+            ],
+            "derivedTypes": [
+                "objectType.4"
+            ]
+        },
+        "objectType.3": {
+            "id": "objectType.3",
+            "name": "Object Type 3",
+            "base": "objectType.1"
+        },
+        "objectType.4": {
+            "id": "objectType.4",
+            "name": "Object Type 4",
+            "base": "objectType.2"
+        },
+        "objectType.5": {
+            "id": "objectType.5",
+            "name": "Object Type 5"
+        },
+        "cycleInheritanceObjectType.1": {
+            "id": "cycleInheritanceObjectType.1",
+            "name": "Cycle Inheritance Object Type 1",
+            "base": "cycleInheritanceObjectType.2"
+        },
+        "cycleInheritanceObjectType.2": {
+            "id": "cycleInheritanceObjectType.2",
+            "name": "Cycle Inheritance Object Type 2",
+            "directDerivedTypes": [
+                "cycleInheritanceObjectType.1"
+            ],
+            "derivedTypes": [
+                "cycleInheritanceObjectType.1"
+            ]
+        }
+    }
+}

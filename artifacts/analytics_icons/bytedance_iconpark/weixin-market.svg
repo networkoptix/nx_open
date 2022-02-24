@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>weixin-market</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="weixin-market">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" x="3.33333333" y="5.83333333" width="13.3333333" height="12.5" rx="1"></rect>
+            <path d="M7.08333333,7.5 L7.08333333,4.58333333 C7.08333333,2.97250417 8.38916667,1.66666667 10,1.66666667 C11.6108333,1.66666667 12.9166667,2.97250417 12.9166667,4.58333333 L12.9166667,7.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>windmill</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="windmill">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="10 9.99654167 9.98779167 5.83158333 9.975625 1.66666667 5 5.83333333 5 10"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="10.0034583 10 14.1684167 9.98779167 18.3333333 9.975625 14.1666667 5 10 5"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="10 10.0034583 10.0122083 14.1684167 10.024375 18.3333333 15 14.1666667 15 10"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="9.99654167 10 5.83158333 10.0122083 1.66666667 10.024375 5.83333333 15 10 15"></polygon>
+        </g>
+    </g>
+</svg>

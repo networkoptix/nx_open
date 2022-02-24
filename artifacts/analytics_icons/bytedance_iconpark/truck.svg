@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>truck</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="truck">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" points="20 0 0 0 0 20 20 20"></polygon>
+            <path d="M5,16.25 C5.92045833,16.25 6.66666667,15.5037917 6.66666667,14.5833333 C6.66666667,13.662875 5.92045833,12.9166667 5,12.9166667 C4.079525,12.9166667 3.33333333,13.662875 3.33333333,14.5833333 C3.33333333,15.5037917 4.079525,16.25 5,16.25 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M14.5833333,16.25 C15.5037917,16.25 16.25,15.5037917 16.25,14.5833333 C16.25,13.662875 15.5037917,12.9166667 14.5833333,12.9166667 C13.662875,12.9166667 12.9166667,13.662875 12.9166667,14.5833333 C12.9166667,15.5037917 13.662875,16.25 14.5833333,16.25 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="3.33333333 14.5833333 0.833333333 14.5833333 0.833333333 4.58333333 12.9166667 4.58333333 12.9166667 14.5833333 6.66666667 14.5833333"></polyline>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="12.9166667 14.5833333 12.9166667 7.5 16.4880833 7.5 19.1666667 11.0416667 19.1666667 14.5833333 16.588 14.5833333"></polyline>
+        </g>
+    </g>
+</svg>

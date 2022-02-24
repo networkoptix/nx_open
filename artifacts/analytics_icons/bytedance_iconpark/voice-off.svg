@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>voice-off</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="voice-off">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M12.9166667,10 L12.9166667,4.58333333 C12.9166667,2.97250417 11.6108333,1.66666667 10,1.66666667 C8.38916667,1.66666667 7.08333333,2.97250417 7.08333333,4.58333333 L7.08333333,10 C7.08333333,11.6108333 8.38916667,12.9166667 10,12.9166667 C11.6108333,12.9166667 12.9166667,11.6108333 12.9166667,10 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M3.75,9.58333333 C3.75,13.035125 6.54820833,15.8333333 10,15.8333333 C10.7305,15.8333333 11.4317083,15.708 12.0833333,15.4777083 M16.25,9.58333333 C16.25,10.4722083 16.0644583,11.31775 15.7299583,12.0833333" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="10" y1="15.8333333" x2="10" y2="18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="17.5" y1="17.5" x2="2.5" y2="2.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

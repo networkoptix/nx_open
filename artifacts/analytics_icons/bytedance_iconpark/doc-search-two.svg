@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>doc-search-two</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="doc-search-two">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M16.6666667,11.25 L16.6666667,2.5 C16.6666667,2.0397625 16.2935833,1.66666667 15.8333333,1.66666667 L4.16666667,1.66666667 C3.70642917,1.66666667 3.33333333,2.0397625 3.33333333,2.5 L3.33333333,17.5 C3.33333333,17.96025 3.70642917,18.3333333 4.16666667,18.3333333 L8.75,18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="7.08333333" y1="5" x2="12.9166667" y2="5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="7.08333333" y1="8.33333333" x2="12.9166667" y2="8.33333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="7.08333333" y1="11.6666667" x2="9.58333333" y2="11.6666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M15.4166667,15.4166667 C15.4166667,15.9919583 15.1835,16.5127917 14.8064583,16.8897917 C14.4294583,17.2668333 13.908625,17.5 13.3333333,17.5 C12.18275,17.5 11.25,16.56725 11.25,15.4166667 C11.25,14.2660833 12.18275,13.3333333 13.3333333,13.3333333 C14.4839167,13.3333333 15.4166667,14.2660833 15.4166667,15.4166667 Z" id="Path"></path>
+            <path d="M16.25,18.3333333 L14.8064583,16.8897917 M14.8064583,16.8897917 C15.1835,16.5127917 15.4166667,15.9919583 15.4166667,15.4166667 C15.4166667,14.2660833 14.4839167,13.3333333 13.3333333,13.3333333 C12.18275,13.3333333 11.25,14.2660833 11.25,15.4166667 C11.25,16.56725 12.18275,17.5 13.3333333,17.5 C13.908625,17.5 14.4294583,17.2668333 14.8064583,16.8897917 Z" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

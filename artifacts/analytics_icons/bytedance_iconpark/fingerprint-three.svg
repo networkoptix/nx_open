@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>fingerprint-three</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="fingerprint-three">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M17.6795417,5.01629167 C15.7092917,3.07607083 12.9809167,1.875 9.966125,1.875 C6.96904167,1.875 4.25504167,3.06198333 2.28749583,4.982125" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M2.7778125,12.2809583 L2.7778125,12.2569583 C2.7778125,8.26820833 6.01129167,5.03470833 10.0000417,5.03470833" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M12.98725,5.67954167 C15.485375,6.81591667 17.2222083,9.33358333 17.2222083,12.2569583 L17.2222083,12.2623333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M5.9375,15.4166667 L5.9375,12.2569583 C5.9375,10.0132917 7.75633333,8.19445833 10,8.19445833 C12.2436667,8.19445833 14.0625,10.0132917 14.0625,12.2569583 L14.0625,15.4166667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M7.30254167,18.125 C8.12041667,17.9230833 8.64583333,17.0606667 8.64583333,16.3316667 C8.64583333,15.5564167 8.64583333,14.348625 8.64583333,12.7083333 C8.64583333,11.9604583 9.252125,11.3541667 10,11.3541667 C10.7479167,11.3541667 11.3541667,11.9604583 11.3541667,12.7083333 L11.3541667,16.3316667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

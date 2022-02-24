@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>graphic-design-two</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="graphic-design-two">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M6.52066667,11.765875 C5.09208333,10.702625 4.16666667,9.00104167 4.16666667,7.08333333 C4.16666667,3.86167083 6.77833333,1.25 10,1.25 C13.2216667,1.25 15.8333333,3.86167083 15.8333333,7.08333333 C15.8333333,8.973 14.9347917,10.6528333 13.5416667,11.7188333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="10 7.08333333 18.3333333 18.3333333 1.66666667 18.3333333"></polygon>
+        </g>
+    </g>
+</svg>

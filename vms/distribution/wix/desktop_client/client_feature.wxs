@@ -1,0 +1,227 @@
+<?xml version='1.0' encoding='windows-1252'?>
+<Wix xmlns='http://schemas.microsoft.com/wix/2006/wi'
+     xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension">
+
+    <Fragment Id='FragmentClient'>
+        <DirectoryRef Id="INSTALLDIR">
+
+            <Component Id="ClientEulaVersion">
+                <RegistryKey
+                        Root="HKCU"
+                        Key="${client_registry_path}">
+                    <RegistryValue
+                        Type="integer"
+                        Name="acceptedEulaVersion"
+                        Value="${customization.eulaVersion}"/>
+                </RegistryKey>
+            </Component>
+
+            <Component Id="ClientUriHandler">
+                <RegistryKey Root="HKCR" Key="${customization.uriProtocol}">
+                    <RegistryValue Type="string" Value="${clientDisplayName}"/>
+                    <RegistryValue Type="string" Name="URL Protocol" Value=""/>
+                    <RegistryValue Type="string" Name="version" Value="${full_release_version}"/>
+                    <RegistryKey Key="DefaultIcon">
+                        <RegistryValue
+                            Type="string"
+                            Value='"[INSTALLDIR]Client\${full_release_version}\${client.binary.name}" ,0'/>
+                    </RegistryKey>
+                    <RegistryKey Key="shell">
+                        <RegistryValue Type="string" Value="open"/>
+                        <RegistryKey Key="open">
+                            <RegistryKey Key="command">
+                                <RegistryValue
+                                    Type="string"
+                                    Value='"[INSTALLDIR]Client\${full_release_version}\${client.binary.name}" -- "%1"' />
+                            </RegistryKey>
+                        </RegistryKey>
+                    </RegistryKey>
+                </RegistryKey>
+            </Component>
+
+            <Directory Id="ClientDir" Name="Client">
+                <Merge
+                    Id="client_help_module"
+                    Language="0"
+                    SourceFile="${modules_output_path}/client_help.msm"
+                    DiskId="3"/>
+
+                <Directory Id="InstallDirRoot" Name="${full_release_version}">
+
+                    <Merge
+                        Id="client_qml_module"
+                        Language="0"
+                        SourceFile="${modules_output_path}/client_qml.msm"
+                        DiskId="3"/>
+
+                    <Component Id="MiniLauncherExecutable">
+                        <File
+                            Id="minilauncher_binary"
+                            Name="${minilauncher.binary.name}"
+                            Source="${bin_source_dir}/${minilauncher.binary.name}"
+                            KeyPath="yes">
+
+                            <Shortcut
+                                Id="StartmenuAppLauncher"
+                                Directory="ProgramMenuDir"
+                                Name="${customization.vmsName}"
+                                WorkingDirectory='InstallDirRoot'
+                                Icon="application_icon"/>
+                            <Shortcut
+                                Id="DesktopClient"
+                                Directory="DesktopFolder"
+                                Name="${customization.vmsName}"
+                                WorkingDirectory='InstallDirRoot'
+                                Icon="application_icon"/>
+                        </File>
+                    </Component>
+
+                    <Component Id="QtConf">
+                        <File
+                            Id="qt.conf"
+                            Name="qt.conf"
+                            Source="${qt_conf_path}"
+                            KeyPath="yes"/>
+                    </Component>
+
+                    <Component Id="AppLauncherExecutable">
+                        <File
+                            Id="applauncher_binary"
+                            Name="${applauncher.binary.name}"
+                            Source="${bin_source_dir}/${applauncher.binary.name}"
+                            KeyPath="yes"/>
+                    </Component>
+
+                    <Directory Id="imageformats" Name="imageformats"/>
+                    <Directory Id="plugins" Name="plugins"/>
+                    <Directory Id="mediaservice" Name="mediaservice"/>
+                    <Directory Id="audio" Name="audio"/>
+
+                    <Directory Name="fonts" Id="FontsDirectoryReference"/>
+                    <Directory Name="platforms" Id="QtPlatformsDirectory"/>
+                    <Directory Name="resources" Id="WebEngineResourcesDirectoryReference"/>
+                    <Directory Name="translations" Id="translations">
+                        <Directory
+                            Name="qtwebengine_locales"
+                            Id="WebEngineLocalesDirectoryReference"/>
+                    </Directory>
+
+                    <Component Id="ClientExecutable">
+                        <File Id="client.exe"
+                            Name="${client.binary.name}"
+                            Source="${bin_source_dir}/${client.binary.name}"
+                            KeyPath="yes">
+                            <fire:FirewallException Id="FirewallExceptionClient"
+                                Name="${customization.vmsName}"
+                                Scope="any"
+                                IgnoreFailure="yes"/>
+                        </File>
+                        <File Id="launcherVersionFile"
+                            Name="${launcher.version.file}"
+                            Source="${bin_source_dir}/${launcher.version.file}"/>
+                    </Component>
+
+                    <Component Id="QuickStartGuide">
+                        <File
+                            Id="quickstartguide"
+                            Name="${quick_start_guide_file_name}"
+                            Source="${quick_start_guide_directory}/${quick_start_guide_file_name}"
+                            KeyPath="yes">
+
+                            <Shortcut
+                                Id="DesktopQuickStartGuideShortcut"
+                                Directory="DesktopFolder"
+                                Name="${quick_start_guide_shortcut_name}"
+                                WorkingDirectory='InstallDirRoot'/>
+                            <Shortcut
+                                Id="StartMenuQuickStartGuideShortcut"
+                                Directory="ProgramMenuDir"
+                                Name="${quick_start_guide_shortcut_name}"
+                                WorkingDirectory='InstallDirRoot'/>
+                        </File>
+                    </Component>
+
+                </Directory>
+            </Directory>
+        </DirectoryRef>
+
+        <ComponentGroup Id="client_translations"
+                Directory="translations"
+                Source="${bin_source_dir}/translations">
+            <Component><File Name="nx_vms_client_core.dat" KeyPath="yes"/></Component>
+            <Component><File Name="nx_vms_client_desktop.dat" KeyPath="yes"/></Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="external_resources"
+                Directory="InstallDirRoot"
+                Source="${bin_source_dir}">
+            <Component><File Name="client_external.dat" KeyPath="yes"/></Component>
+            <Component><File Name="bytedance_iconpark.dat" KeyPath="yes"/></Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="nx_log_viewer"
+                Directory="InstallDirRoot"
+                Source="${CMAKE_BINARY_DIR}">
+            <Component><File Name="nx_log_viewer.html" KeyPath="yes"/></Component>
+        </ComponentGroup>
+
+        <ComponentGroup Id="build_info_files"
+                Directory="InstallDirRoot"
+                Source="${distribution_output_dir}">
+            <Component><File Name="build_info.txt" KeyPath="yes"/></Component>
+            <Component><File Name="build_info.json" KeyPath="yes"/></Component>
+        </ComponentGroup>
+
+        <Feature
+                Id="ClientFeature"
+                Title="${customization.vmsName} Client"
+                Level="1"
+                ConfigurableDirectory="INSTALLDIR"
+                Absent="allow"
+                InstallDefault="local"
+                AllowAdvertise="no"
+                Display="expand">
+
+            <ComponentGroupRef Id="client_nx_libraries"/>
+            <ComponentGroupRef Id="openal_libraries"/>
+            <ComponentGroupRef Id="hidapi_libraries"/>
+            <ComponentGroupRef Id="client_qt_libraries"/>
+            <ComponentGroupRef Id="client_qt_imageformats"/>
+            <ComponentGroupRef Id="client_qt_mediaservice"/>
+            <ComponentGroupRef Id="client_qt_audio"/>
+
+            <ComponentGroupRef Id="CommonNxLibrariesComponentGroup"/>
+            <ComponentGroupRef Id="CommonQtLibrariesComponentGroup"/>
+            <ComponentGroupRef Id="CommonQtPlatformsComponentGroup"/>
+            <ComponentGroupRef Id="IcuLibrariesComponentGroup"/>
+            <ComponentGroupRef Id="UcrtLibrariesComponentGroup"/>
+            <ComponentGroupRef Id="VcrtLibrariesComponentGroup"/>
+            <ComponentGroupRef Id="OpenSslLibrariesComponentGroup"/>
+            <ComponentGroupRef Id="FfmpegLibrariesComponentGroup"/>
+            <ComponentGroupRef Id="AsanLibrariesComponentGroup"/>
+            <ComponentGroupRef Id="WebEngineResourcesComponentGroup"/>
+            <ComponentGroupRef Id="WebEngineLocalesComponentGroup"/>
+            <ComponentGroupRef Id="FontsComponentGroup"/>
+            <ComponentGroupRef Id="BackgroundsComponentGroup"/>
+
+            <ComponentRef Id="NovFileAssociation"/>
+
+            <ComponentRef Id="MiniLauncherExecutable" />
+            <ComponentRef Id="QuickStartGuide" />
+            <ComponentRef Id="AppLauncherExecutable" />
+            <ComponentRef Id="ClientExecutable" />
+            <ComponentRef Id="ClientUriHandler"/>
+            <ComponentRef Id="ClientEulaVersion"/>
+            <ComponentRef Id="QtConf"/>
+
+            <ComponentGroupRef Id="nx_log_viewer"/>
+            <ComponentGroupRef Id="build_info_files"/>
+            <ComponentGroupRef Id="external_resources"/>
+            <ComponentGroupRef Id="client_translations"/>
+            <ComponentGroupRef Id="common_translations"/>
+
+            <MergeRef Id="client_help_module"/>
+            <MergeRef Id="client_qml_module"/>
+        </Feature>
+    </Fragment>
+</Wix>

@@ -1,0 +1,17 @@
+module Nx.Items
+
+AnalyticsSettingsMenu 1.0 AnalyticsSettingsMenu.qml
+CameraDisplay 1.0 CameraDisplay.qml
+DewarpingSettings 1.0 DewarpingSettings.qml
+FigureEditor 1.0 FigureEditor.qml
+FigurePreview 1.0 FigurePreview.qml
+Line 1.0 Line.qml
+RecordingStatusIndicator 1.0 RecordingStatusIndicator.qml
+ResourceBrowser 1.0 ResourceBrowser.qml
+ResourcePreview 1.0 ResourcePreview.qml
+SelectionMouseArea 1.0 SelectionMouseArea.qml
+Timeline 1.0 Timeline.qml
+InteractiveGrid 1.0 InteractiveGrid.qml
+IntervalPreview 1.0 IntervalPreview.qml
+IntervalPreviewControls 1.0 IntervalPreviewControls.qml
+NameValueTable 1.0 NameValueTable.qml

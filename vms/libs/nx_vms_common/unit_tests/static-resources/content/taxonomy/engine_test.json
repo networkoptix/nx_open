@@ -1,0 +1,70 @@
+{
+    "descriptors": {
+        "pluginDescriptors": {
+            "plugin.1": {
+                "id": "plugin.1",
+                "name": "Plugin 1"
+            },
+            "plugin.2": {
+                "id": "plugin.2",
+                "name": "Plugin 2"
+            }
+        },
+        "engineDescriptors": {
+            "{a3136416-a199-47b2-8bf4-278e25f4c486}": {
+                "id": "{a3136416-a199-47b2-8bf4-278e25f4c486}",
+                "name": "Engine 1",
+                "pluginId": "plugin.1"
+            },
+            "{2799bf92-6266-4564-8c72-10206cdb9298}": {
+                "id": "{2799bf92-6266-4564-8c72-10206cdb9298}",
+                "name": "Engine 2",
+                "pluginId": "plugin.2"
+            },
+            "{dad2d040-cc09-4c48-8048-93d63006b8ba}": {
+                "id": "{dad2d040-cc09-4c48-8048-93d63006b8ba}",
+                "name": "Engine 3",
+                "pluginId": "invalid.plugin.id",
+                "capabilities": "deviceDependent|noAutoBestShots"
+            },
+            "{b95109c2-1b32-48dc-9306-59bad708c2c9}": {
+                "id": "{b95109c2-1b32-48dc-9306-59bad708c2c9}",
+                "name": "Engine 4",
+                "pluginId": "plugin.1",
+                "capabilities": "deviceDependent|noAutoBestShots"
+            }
+        }
+    },
+    "result": {
+        "{a3136416-a199-47b2-8bf4-278e25f4c486}": {
+            "id": "{a3136416-a199-47b2-8bf4-278e25f4c486}",
+            "name": "Engine 1",
+            "plugin": {
+                "id": "plugin.1",
+                "name": "Plugin 1"
+            }
+        },
+        "{2799bf92-6266-4564-8c72-10206cdb9298}": {
+            "id": "{2799bf92-6266-4564-8c72-10206cdb9298}",
+            "name": "Engine 2",
+            "plugin": {
+                "id": "plugin.2",
+                "name": "Plugin 2"
+            }
+        },
+        "{dad2d040-cc09-4c48-8048-93d63006b8ba}": {
+            "id": "{dad2d040-cc09-4c48-8048-93d63006b8ba}",
+            "name": "Engine 3",
+            "capabilities": "deviceDependent|noAutoBestShots"
+        },
+        "{b95109c2-1b32-48dc-9306-59bad708c2c9}": {
+            "id": "{b95109c2-1b32-48dc-9306-59bad708c2c9}",
+            "name": "Engine 4",
+            "capabilities": "deviceDependent|noAutoBestShots",
+            "plugin": {
+                "id": "plugin.1",
+                "name": "Plugin 1"
+            }
+        }
+    }
+}

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>cooking-pot</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="cooking-pot">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(1.666667, 1.250000)" stroke="#A5B7C0" stroke-linejoin="round">
+                <path d="M2.5,17.0833333 L14.1666667,17.0833333 L14.1666667,7.47807017 C14.1666667,4.95887658 11.5549944,2.91666667 8.33333333,2.91666667 C5.11167229,2.91666667 2.5,4.95887658 2.5,7.47807017 L2.5,17.0833333 Z" id="Path" stroke-linecap="round"></path>
+                <path d="M14.1666667,7.93486571 C14.1666667,7.83335558 14.1666667,7.68109042 14.1666667,7.47807017 C14.1666667,4.95887658 11.5549944,2.91666667 8.33333333,2.91666667 C5.11167229,2.91666667 2.5,4.95887658 2.5,7.47807017 C2.5,7.68048342 2.5,7.83229329 2.5,7.93349992 L14.1666667,7.93486571 Z" id="Path"></path>
+                <line x1="0" y1="7.91666667" x2="16.6666667" y2="7.91666667" id="Path" stroke-linecap="round"></line>
+                <line x1="7.08333333" y1="0.416666667" x2="9.58333333" y2="0.416666667" id="Path" stroke-linecap="round"></line>
+            </g>
+        </g>
+    </g>
+</svg>

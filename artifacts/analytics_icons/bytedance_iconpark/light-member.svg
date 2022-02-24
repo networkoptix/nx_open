@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>light-member</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="light-member">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M14.6068333,6.25008333 L7.69283333,3.19378333 C7.32866667,3.0328125 6.9015,3.15192083 6.67320833,3.47810417 L4.73291667,6.25008333" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <path d="M17.9166667,6.25 L2.08333333,6.25 C1.85321667,6.25 1.66666667,6.43654167 1.66666667,6.66666667 L1.66666667,16.6666667 C1.66666667,16.8967917 1.85321667,17.0833333 2.08333333,17.0833333 L17.9166667,17.0833333 C18.1467917,17.0833333 18.3333333,16.8967917 18.3333333,16.6666667 L18.3333333,6.66666667 C18.3333333,6.43654167 18.1467917,6.25 17.9166667,6.25 Z" id="Path" stroke="#A5B7C0"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="7.91666667 9.58333333 10.04275 13.75 12.0833333 9.58333333"></polyline>
+        </g>
+    </g>
+</svg>

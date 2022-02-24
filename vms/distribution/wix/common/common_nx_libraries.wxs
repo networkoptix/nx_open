@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <!--
+            These libraries may be shared between different installers, therefore they must
+            contain 'DiskId="2"' descriptor, so bundle will strip duplicated copies.
+         -->
+        <ComponentGroup Id="CommonNxLibrariesComponentGroup"
+                Source="${bin_source_dir}"
+                Directory="InstallDirRoot">
+            <Component><File Name="nx_utils.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_fusion.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_reflect.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_vms_common.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_vms_utils.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_network.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_kit.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_zip.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_vms_api.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_vms_update.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_vms_rules.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_branding.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_build_info.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="nx_monitoring.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="quazip.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="udt.dll" KeyPath="yes" DiskId="2"/></Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>heavy-metal</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="heavy-metal">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="9.25779167 3.07434167 14.1195 6.92566667 15.0740833 9.99991667 10.5260417 10.8688333 5.245375 6.05466667 6.36708333 3.75061667"></polygon>
+            <line x1="6.367" y1="3.75060833" x2="11.0359167" y2="7.75066667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="10.5260417 10.8688333 11.036 7.55516667 14.1194583 6.92566667"></polyline>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="10.41375 12.9261667 11.3663333 15.8763333 6.50041667 16.824375 1.66666667 12.0891667 2.73771667 9.42720833 5.011875 8.89729167"></polyline>
+            <line x1="2.73773333" y1="9.42708333" x2="7.20166667" y2="13.6490417" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="6.50045833 16.6103333 7.28604167 13.3885 10.4128333 12.9347917"></polyline>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="14.5361667 12.3365417 14.1666667 15.3332917 18.015 14.5827083 17.2005417 11.7447917"></polygon>
+        </g>
+    </g>
+</svg>

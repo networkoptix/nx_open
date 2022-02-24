@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>four-arrows</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="four-arrows">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M10,3.33333333 L10,10 M10,10 L12.0833333,7.91666667 M10,10 L7.91666667,7.91666667" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M10,16.6666667 L10,10 M10,10 L12.0833333,12.0833333 M10,10 L7.91666667,12.0833333" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <circle id="Oval" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" cx="8.33333333" cy="3.33333333" r="1.66666667"></circle>
+            <circle id="Oval" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" cx="3.33333333" cy="11.6666667" r="1.66666667"></circle>
+            <line x1="3.33333333" y1="10" x2="16.6666667" y2="10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <circle id="Oval" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" cx="16.6666667" cy="8.33333333" r="1.66666667"></circle>
+            <circle id="Oval" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" cx="11.6666667" cy="16.6666667" r="1.66666667"></circle>
+        </g>
+    </g>
+</svg>

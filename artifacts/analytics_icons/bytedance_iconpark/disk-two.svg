@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>disk-two</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="disk-two">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <rect id="Rectangle" stroke="#A5B7C0" x="1.66666667" y="5.41666667" width="13.3333333" height="9.16666667" rx="1"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="1.66666667 5.41666667 5.83333333 5.41666667 5.83333333 14.5833333 1.66666667 14.5833333"></polygon>
+            <path d="M15,7.08333333 C14.53975,7.08333333 14.1666667,7.45641667 14.1666667,7.91666667 C14.1666667,8.37691667 14.53975,8.75 15,8.75 L15,7.08333333 Z M18.3333333,7.91666667 L19.1666667,7.91666667 C19.1666667,7.45641667 18.7935833,7.08333333 18.3333333,7.08333333 L18.3333333,7.91666667 Z M18.3333333,12.0833333 L18.3333333,12.9166667 C18.7935833,12.9166667 19.1666667,12.5435833 19.1666667,12.0833333 L18.3333333,12.0833333 Z M15,11.25 C14.53975,11.25 14.1666667,11.6230833 14.1666667,12.0833333 C14.1666667,12.5435833 14.53975,12.9166667 15,12.9166667 L15,11.25 Z M15,8.75 L18.3333333,8.75 L18.3333333,7.08333333 L15,7.08333333 L15,8.75 Z M17.5,7.91666667 L17.5,12.0833333 L19.1666667,12.0833333 L19.1666667,7.91666667 L17.5,7.91666667 Z M18.3333333,11.25 L15,11.25 L15,12.9166667 L18.3333333,12.9166667 L18.3333333,11.25 Z" id="Shape" fill="#A5B7C0" fill-rule="nonzero"></path>
+            <circle id="Oval" fill="#A5B7C0" fill-rule="nonzero" cx="12.5" cy="8.75" r="1"></circle>
+            <circle id="Oval" fill="#A5B7C0" fill-rule="nonzero" cx="12.5" cy="11.25" r="1"></circle>
+        </g>
+    </g>
+</svg>

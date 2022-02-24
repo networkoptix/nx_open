@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>pills</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pills">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M4.15547917,9.192625 L7.18775,6.64825 L10.22,4.10387083 C12.0709583,2.5507375 14.8305,2.79216667 16.383625,4.643125 C17.9367917,6.49408333 17.6953333,9.253625 15.844375,10.80675 L12.812125,13.351125 L9.779875,15.8955 C7.92891667,17.448625 5.169375,17.2072083 3.61623333,15.35625 C2.0631,13.5052917 2.30452917,10.74575 4.15547917,9.192625 Z" id="Path" stroke="#A5B7C0"></path>
+            <line x1="8.20354167" y1="9.108875" x2="10.5942083" y2="11.958" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>guide-board</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="guide-board">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(2.500000, 1.666667)" stroke="#A5B7C0" stroke-linejoin="round">
+                <line x1="7.5" y1="0" x2="7.5" y2="15.4166667" id="Path" stroke-linecap="round"></line>
+                <polygon id="Path" points="7.5 1.66666667 13.9772727 1.66666667 15 3.33333333 13.9772727 5 7.5 5"></polygon>
+                <polygon id="Path" transform="translate(3.750000, 9.166667) scale(-1, 1) translate(-3.750000, -9.166667) " points="0 7.5 6.47727271 7.5 7.5 9.16666667 6.47727271 10.8333333 0 10.8333333"></polygon>
+                <line x1="4.16666667" y1="15.8333333" x2="10.8333333" y2="15.8333333" id="Path" stroke-linecap="round"></line>
+            </g>
+        </g>
+    </g>
+</svg>

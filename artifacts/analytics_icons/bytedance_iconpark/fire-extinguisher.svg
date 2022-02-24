@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>fire-extinguisher</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="fire-extinguisher">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M2.5,8.33333333 C2.5,6.492375 3.99238333,5 5.83333333,5 C7.67429167,5 9.16666667,6.492375 9.16666667,8.33333333 L9.16666667,18.3333333 L2.5,18.3333333 L2.5,8.33333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <polygon id="Path" points="12.5 18.3333333 17.5 18.3333333 15 10.8333333"></polygon>
+            <path d="M15,10.8333333 L12.5,18.3333333 L17.5,18.3333333 L15,10.8333333 Z M15,10.8333333 L15,10 C15,6.85729167 15,5.28595833 14.0237083,4.309625 C13.047375,3.33333333 11.4760417,3.33333333 8.33333333,3.33333333 L7.5,3.33333333 M4.16666667,3.33333333 L2.5,3.33333333" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <circle id="Oval" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" cx="5.83333333" cy="3.33333333" r="1.66666667"></circle>
+        </g>
+    </g>
+</svg>

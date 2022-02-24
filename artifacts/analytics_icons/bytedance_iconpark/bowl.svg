@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>bowl</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="bowl">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M13.3333333,18.3333333 C13.3333333,18.3333333 13.3333333,16.723125 13.3339583,16.7200833 C13.6244583,16.5757083 13.90425,16.4130417 14.1718333,16.2335833 C14.579,15.9605417 14.9579167,15.6487083 15.3032917,15.3032917 C16.6605417,13.9460833 17.5,12.0710833 17.5,10 L2.5,10 C2.5,12.0710833 3.33946667,13.9460833 4.69670833,15.3032917 C5.04525,15.651875 5.42795833,15.96625 5.839375,16.2410833 C6.10541667,16.4187917 6.3835,16.58 6.672125,16.723125 L6.66666667,18.3333333 L13.3333333,18.3333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="10" y1="7.50345833" x2="10" y2="3.33333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="15" y1="7.50345833" x2="15" y2="5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="5" y1="7.50345833" x2="5" y2="5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M16.6666667,3.33333333 C15.7462083,3.33333333 15,4.079525 15,5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M11.6666667,1.66666667 C10.7462083,1.66666667 10,2.41285833 10,3.33333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M6.66666667,3.33333333 C5.74620833,3.33333333 5,4.079525 5,5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

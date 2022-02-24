@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>hanger-two</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="hanger-two">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M15.4166667,13.3333333 L17.04575,13.3333333 C17.756875,13.3333333 18.3333333,12.756875 18.3333333,12.04575 C18.3333333,11.5580833 18.0577917,11.1122083 17.6215833,10.894125 L10,7.08333333 L2.37841667,10.894125 C1.94220833,11.1122083 1.66666667,11.5580833 1.66666667,12.04575 C1.66666667,12.756875 2.24313333,13.3333333 2.9542375,13.3333333 L4.58333333,13.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="4.58333333 12.5 15.4166667 12.5 15.4166667 13.3333333 15.4166667 18.3333333 4.58333333 18.3333333 4.58333333 13.3333333"></polygon>
+            <path d="M10,7.08333333 C10,7.08333333 11.6666667,4.25379167 11.6666667,3.33333333 C11.6666667,2.41285833 10.9204583,1.66666667 10,1.66666667 C9.07954167,1.66666667 8.33333333,2.41285833 8.33333333,3.33333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

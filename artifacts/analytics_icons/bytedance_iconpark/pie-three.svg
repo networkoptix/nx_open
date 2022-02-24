@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>pie-three</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pie-three">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <circle id="Oval" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" cx="10" cy="10" r="8.33333333"></circle>
+            <path d="M10,1.66666667 C11.625875,1.66666667 13.21625,2.1422875 14.5752083,3.0349375 C15.934125,3.9275875 17.00225,5.19825 17.6479583,6.69041667 C18.2936667,8.18258333 18.4887917,9.83108333 18.20925,11.43275 C17.9297083,13.0344167 17.18775,14.5193333 16.07475,15.7045417 L10,10 L10,1.66666667 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

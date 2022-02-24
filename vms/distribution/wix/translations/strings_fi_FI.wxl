@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WixLocalization xmlns="http://schemas.microsoft.com/wix/2006/localization" Codepage="1252" Language="1035" Culture="fi-fi">
+  <String Id="Caption">[WixBundleName] Asetukset - [WixBundleVersion]</String>
+  <String Id="Title">[WixBundleName] - [WixBundleVersion]</String>
+  <String Id="Components">[InstallerTitle]</String>
+  <String Id="HelpText">/install | /repair | /uninstall | /layout [directory] - installs, repairs, uninstalls or
+   creates a complete local copy of the bundle in directory. Install is the default.
+
+/passive | /quiet -  displays minimal UI with no prompts or displays no UI and
+   no prompts. By default UI and all prompts are displayed.
+
+/norestart   - suppress any attempts to restart. By default UI will prompt before restart.
+/log log.txt - logs to a specific file. By default a log file is created in %TEMP%.</String>
+  <String Id="ConfirmCancelMessage">Haluatko varmasti peruuttaa?</String>
+  <String Id="ClientAndServer">Client-sovellus ja palvelin</String>
+  <String Id="ClientOnly">Vain Client-sovellus</String>
+  <String Id="ClientOnlyDesc">Client-sovellusta käytetään videon katseluun ja järjestelmän hallintaan</String>
+  <String Id="ServerOnly">Vain palvelin</String>
+  <String Id="ServerOnlyDesc">Palvelinsovellusta käytetään tallentamaan järjestelmätietoja ja arkistoja</String>
+  <String Id="HelpHeader">Asennusohje</String>
+  <String Id="HelpCloseButton">Sulje</String>
+  <String Id="InstallOptionsButton">Valinnat</String>
+  <String Id="InstallInstallButton">Asenna</String>
+  <String Id="InstallCloseButton">Sulje</String>
+  <String Id="InstallAcceptCheckbox">Hyväksyn</String>
+  <String Id="InstallLicenseLinkText">Loppukäyttäjän lisenssisopimus</String>
+  <String Id="OptionsHeader">Asennuksen valinnat</String>
+  <String Id="OptionsLocationLabel">Asennuksen sijainti:</String>
+  <String Id="OptionsBrowseButton">Selaa</String>
+  <String Id="OptionsOkButton">OK</String>
+  <String Id="OptionsCancelButton">Peruuta</String>
+  <String Id="ProgressHeader">Asennuksen eteneminen</String>
+  <String Id="ProgressLabel">Käsitellään...</String>
+  <String Id="OverallProgressPackageText">Valmistellaan...</String>
+  <String Id="ProgressCancelButton">Peruuta</String>
+  <String Id="ModifyHeader">Muokkaa asetuksia</String>
+  <String Id="ModifyRepairButton">Korjaa</String>
+  <String Id="ModifyUninstallButton">Poista asennus</String>
+  <String Id="ModifyCloseButton">Sulje</String>
+  <String Id="SuccessHeader">Asennus onnistui</String>
+  <String Id="SuccessUninstallHeader">Ohjelmiston poisto suoritettu onnistuneesti</String>
+  <String Id="SuccessInstallHeader">Asennus onnistui</String>
+  <String Id="SuccessLaunchButton">Käynnistä</String>
+  <String Id="SuccessRestartText">Sinun on käynnistettävä tietokone uudelleen, ennen kuin voit käyttää ohjelmistoa</String>
+  <String Id="SuccessRestartButton">Käynnistä uudelleen</String>
+  <String Id="SuccessCloseButton">Sulje</String>
+  <String Id="FailureHeader">Asennus epäonnistui</String>
+  <String Id="FailureHyperlinkLogText">Yksi tai useampi ongelma aiheutti asennuksen epäonnistumisen. Korjaa ongelmat ja yritä sitten uudelleen. Lisätietoja on kohdassa</String>
+  <String Id="FailureHyperlinkLogTextLink">lokitiedosto</String>
+  <String Id="FailureRestartText">Sinun on käynnistettävä tietokone uudelleen käynnistääksesi ohjelmiston palautuksen</String>
+  <String Id="FailureRestartButton">Käynnistä uudelleen</String>
+  <String Id="FailureCloseButton">Sulje</String>
+  <String Id="WillInstall">[WixBundleName] asennetaan laitteeseesi</String>
+  <String Id="FilesInUseHeader">Käytetyt tiedostot</String>
+  <String Id="FilesInUseLabel">Seuraavat sovellukset on suljettava asennuksen jatkamiseksi:</String>
+  <String Id="FilesInUseCloseRadioButton">Sulje sovellukset ja yritä käynnistää ne uudelleen</String>
+  <String Id="FilesInUseDontCloseRadioButton">Älä sulje sovelluksia. Uudelleenkäynnistys vaaditaan</String>
+  <String Id="FilesInUseOkButton">OK</String>
+  <String Id="FilesInUseCancelButton">Peruuta</String>
+  <String Id="Options">Valinnat</String>
+  <String Id="SelectApps">Valitse asennettavat sovellukset:</String>
+  <String Id="msierrFirewallCannotConnect">Yhteyden muodostaminen Windowsin palomuuriin ei onnistu. ([2]   [3]   [4]   [5])</String>
+  <String Id="WixSchedFirewallExceptionsInstall">Windowsin palomuurin määrittäminen</String>
+  <String Id="WixSchedFirewallExceptionsUninstall">Windowsin palomuurin määrittäminen</String>
+  <String Id="WixRollbackFirewallExceptionsInstall">Windowsin palomuurin kokoonpanon palauttaminen</String>
+  <String Id="WixExecFirewallExceptionsInstall">Windowsin palomuurin kokoonpanon asentaminen</String>
+  <String Id="WixRollbackFirewallExceptionsUninstall">Windowsin palomuurin kokoonpanon palauttaminen</String>
+  <String Id="WixExecFirewallExceptionsUninstall">Windowsin palomuurin määrityksen poistaminen</String>
+  <String Id="Product_ArchMismatch_x86">Tämä paketti on suunniteltu 32-bittiselle käyttöjärjestelmälle. Asennus lopetetaan nyt.</String>
+  <String Id="Product_ArchMismatch_x64">Tämä paketti on suunniteltu 64-bittiselle käyttöjärjestelmälle. Asennus lopetetaan nyt.</String>
+</WixLocalization>

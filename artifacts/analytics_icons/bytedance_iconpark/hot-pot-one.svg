@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>hot-pot-one</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="hot-pot-one">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M10.4166667,15 C15.4166667,15 17.5,11.642125 17.5,7.5 L3.33333333,7.5 C3.33333333,11.642125 5.41666667,15 10.4166667,15 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="7.5 14.5833333 6.25 18.3333333 14.5833333 18.3333333 13.3333333 14.5833333"></polyline>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="12.5 7.5 12.0370417 1.66666667 8.79629167 1.66666667 8.33333333 7.5"></polyline>
+            <path d="M6.66666667,10.4166667 C6.66666667,10.4166667 6.69595833,10.862625 7.08333333,11.25 C7.47070833,11.637375 7.91666667,11.6666667 7.91666667,11.6666667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Module
+        Id="client_qml_module"
+        Language="0"
+        Version="1.0.0">
+
+        <Package
+            Id="AFB797C4-2D55-4906-9E67-C3919FB8D7C6"
+            InstallerVersion="405"
+            Languages="1033"
+            Manufacturer="Network Optix"/>
+
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory
+                Name="qml"
+                Id="QmlDirectoryReference"
+                ComponentGuidGenerationSeed="8EFC1DDA-9125-4A89-A054-37D4E6EBBD52"/>
+        </Directory>
+
+        <ComponentGroupRef Id="QmlComponentGroup"/>
+    </Module>
+</Wix>

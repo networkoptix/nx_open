@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>click-tap-two</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="click-tap-two">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M4.58333333,18.3333333 L4.58333333,6.25 C4.58333333,5.32954167 5.32954167,4.58333333 6.25,4.58333333 C7.17045833,4.58333333 7.91666667,5.32954167 7.91666667,6.25 L7.91666667,14.5833333 L17.5,16.6666667 L17.5,18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M4.58333333,10.520875 L4.58333333,10.520875 C2.8761,9.85416667 1.66666667,8.19333333 1.66666667,6.25 C1.66666667,3.71869583 3.71869583,1.66666667 6.25,1.66666667 C8.78129167,1.66666667 10.8333333,3.71869583 10.8333333,6.25 C10.8333333,8.19333333 9.62391667,9.85416667 7.91666667,10.520875" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <!--
+            These libraries may be shared between different installers, therefore they must
+            contain 'DiskId="2"' descriptor, so bundle will strip duplicated copies.
+         -->
+        <ComponentGroup Id="FfmpegLibrariesComponentGroup"
+                Source="${CMAKE_BINARY_DIR}/bin"
+                Directory="InstallDirRoot">
+            <Component><File Name="avcodec-58.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="avdevice-58.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="avfilter-7.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="avformat-58.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="avutil-56.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="swscale-5.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="swresample-3.dll" KeyPath="yes" DiskId="2"/></Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

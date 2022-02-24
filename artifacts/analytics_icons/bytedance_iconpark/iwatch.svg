@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>iwatch</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="iwatch">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="15 5.00004167 4.16666667 5.00004167 4.16666667 15.0000417 15 15.0000417"></polygon>
+            <path d="M11.25,10.0000417 C11.25,9.07958333 10.5037917,8.333375 9.58333333,8.333375 C8.662875,8.333375 7.91666667,9.07958333 7.91666667,10.0000417 C7.91666667,10.9205417 8.662875,11.6667083 9.58333333,11.6667083 C10.5037917,11.6667083 11.25,10.9205417 11.25,10.0000417 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M6.25,5.00004167 C6.25,4.96966667 6.25345833,4.93933333 6.26025,4.90966667 L6.93004167,1.99299583 C6.97383333,1.80235417 7.14854167,1.66671667 7.350375,1.66671667 L11.8265417,1.66671667 C12.028375,1.66671667 12.2030833,1.80235417 12.246875,1.99299583 L12.9166667,4.90966667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <path d="M6.25,15.0000417 C6.25,15.0304583 6.25345833,15.06075 6.26025,15.0904583 L6.93004167,18.007125 C6.97383333,18.19775 7.14854167,18.333375 7.350375,18.333375 L11.8265417,18.333375 C12.028375,18.333375 12.2030833,18.19775 12.246875,18.007125 L12.9166667,15.0904583" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <line x1="16.25" y1="6.66670833" x2="16.25" y2="8.333375" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+        </g>
+    </g>
+</svg>

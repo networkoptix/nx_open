@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>freezing-line-column</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="freezing-line-column">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="17.5 2.5 2.5 2.5 2.5 17.5 17.5 17.5"></polygon>
+            <line x1="6.71795833" y1="2.5" x2="2.5" y2="6.25" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="10.8344583" y1="2.5" x2="2.5" y2="10" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="14.5833333" y1="2.5" x2="2.5" y2="13.75" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="7.91666667" y1="12.5" x2="2.5" y2="17.5" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="17.0833333" y1="4.16666667" x2="12.1846667" y2="8.68854167" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="7.91666667" y1="8.75" x2="7.91666667" y2="17.5" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="7.91666667" y1="8.75" x2="17.5" y2="8.75" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+        </g>
+    </g>
+</svg>

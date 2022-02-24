@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>webcam</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="webcam">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" points="20 0 0 0 0 20 20 20"></polygon>
+            <path d="M3.26044583,12.4022917 C4.77570833,14.4818333 7.23,15.8333333 10,15.8333333 C12.77,15.8333333 15.2242917,14.4818333 16.7395417,12.4022917 C18.2462917,13.9615417 19.1666667,16.0448333 19.1666667,18.3333333 L0.833333333,18.3333333 C0.833333333,16.0448333 1.753725,13.9615417 3.26044583,12.4022917 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M10,12.5 C12.9915417,12.5 15.4166667,10.074875 15.4166667,7.08333333 C15.4166667,4.09179167 12.9915417,1.66666667 10,1.66666667 C7.00845833,1.66666667 4.58333333,4.09179167 4.58333333,7.08333333 C4.58333333,10.074875 7.00845833,12.5 10,12.5 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M10,9.16666667 C11.1505833,9.16666667 12.0833333,8.23391667 12.0833333,7.08333333 C12.0833333,5.93275 11.1505833,5 10,5 C8.84941667,5 7.91666667,5.93275 7.91666667,7.08333333 C7.91666667,8.23391667 8.84941667,9.16666667 10,9.16666667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

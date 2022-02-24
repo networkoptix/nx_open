@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>general-branch</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="general-branch">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M16.6667083,3.75 L3.33333333,3.75 C2.87309583,3.75 2.5,4.12309583 2.5,4.58333333 L2.5,17.0833333 C2.5,17.5435833 2.87310833,17.9166667 3.33334583,17.9166667 L16.6667083,17.9166667 C17.1269583,17.9166667 17.5000417,17.5435833 17.5000417,17.0833333 L17.5000417,4.58333333 C17.5000417,4.12309583 17.1269583,3.75 16.6667083,3.75 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <line x1="6.25" y1="2.08333333" x2="6.25" y2="3.75" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="13.75" y1="2.08333333" x2="13.75" y2="3.75" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="2.5" y1="7.08333333" x2="17.5" y2="7.08333333" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="7.5" y1="12.5" x2="12.5" y2="12.5" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="10" y1="10" x2="10" y2="15" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="2.5" y1="4.58333333" x2="2.5" y2="9.58333333" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="17.5" y1="4.58333333" x2="17.5" y2="9.58333333" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+        </g>
+    </g>
+</svg>

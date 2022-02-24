@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>telescope</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="telescope">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linejoin="round" x="2.5" y="1.66666667" width="5" height="16.6666667" rx="2.5"></rect>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linejoin="round" x="12.5" y="1.66666667" width="5" height="16.6666667" rx="2.5"></rect>
+            <path d="M5,18.3333333 C6.38070833,18.3333333 7.5,17.2140417 7.5,15.8333333 C7.5,14.452625 6.38070833,13.3333333 5,13.3333333 C3.6192875,13.3333333 2.5,14.452625 2.5,15.8333333 C2.5,17.2140417 3.6192875,18.3333333 5,18.3333333 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M15,18.3333333 C16.3807083,18.3333333 17.5,17.2140417 17.5,15.8333333 C17.5,14.452625 16.3807083,13.3333333 15,13.3333333 C13.6192917,13.3333333 12.5,14.452625 12.5,15.8333333 C12.5,17.2140417 13.6192917,18.3333333 15,18.3333333 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M12.5,8.75 C12.5,7.36929167 11.3807083,6.25 10,6.25 C8.61929167,6.25 7.5,7.36929167 7.5,8.75" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M12.5,12.9166667 C12.5,11.5359583 11.3807083,10.4166667 10,10.4166667 C8.61929167,10.4166667 7.5,11.5359583 7.5,12.9166667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

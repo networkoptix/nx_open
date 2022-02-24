@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>basketball-stand</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="basketball-stand">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" x="1.66666667" y="2.08333333" width="16.6666667" height="11.6666667" rx="1"></rect>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="12.9166667 9.16666667 12.9166667 6.25 7.08333333 6.25 7.08333333 9.16666667"></polyline>
+            <line x1="7.5" y1="16.25" x2="12.5" y2="16.25" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="7.08333333" y1="13.75" x2="12.9166667" y2="13.75" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="13.3333333 11.25 12.5 16.25 12.9166667 17.9166667"></polyline>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="6.66666667 11.25 7.5 16.25 7.08333333 17.9166667"></polyline>
+            <line x1="10" y1="11.25" x2="10" y2="17.9166667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="14.1666667" y1="11.25" x2="5.83333333" y2="11.25" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

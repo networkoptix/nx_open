@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>radar-chart</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="radar-chart">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="10 1.25 14.5626667 4.55333333 19.1142917 7.87191667 17.3825833 13.2320833 15.6329583 18.5864167 10 18.5958333 4.36704167 18.5864167 2.617425 13.2320833 0.885708333 7.87191667 5.43733333 4.55333333"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="10 1.25 10.005625 10.8255833 19.1142917 7.87191667 10.009125 10.8362917 15.6329583 18.5864167 10 10.8429167 4.36704167 18.5864167 9.990875 10.8362917 0.885708333 7.87191667 9.994375 10.8255833"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="10 5.41666667 12.5789167 7.28379167 15.1515417 9.1595 14.17275 12.189125 13.1838333 15.2155 10 15.2208333 6.81616667 15.2155 5.82725 12.189125 4.84845833 9.1595 7.42108333 7.28379167"></polygon>
+        </g>
+    </g>
+</svg>

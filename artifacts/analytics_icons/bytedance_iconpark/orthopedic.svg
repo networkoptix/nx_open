@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>orthopedic</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="orthopedic">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M9.595125,15 L14.16775,17.916125 L14.16775,10 C17.365375,7.829 18.54,5.82429167 17.6915417,3.98580833 C16.4189167,1.22810833 14.3585,1.409925 12.9195,2.08405833 C11.9601667,2.53347917 11.26475,3.78889167 10.83325,5.85029167 C9.56733333,3.1561125 7.789625,1.80902083 5.50008333,1.80902083 C2.06578333,1.80902083 1.78917083,5.86033333 2.28125417,6.8525 C2.77333333,7.84470833 3.23865833,8.38008333 5.41695833,10 C5.385625,14.818 5.585875,17.4090833 6.01775,17.7732083 C6.80979167,18.3868333 8.00225,17.4624167 9.595125,15 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <line x1="11.25" y1="10.4166667" x2="11.25" y2="12.9166667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+        </g>
+    </g>
+</svg>

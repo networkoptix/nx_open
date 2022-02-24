@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>equal-ratio</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="equal-ratio">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linejoin="round" x="2.5" y="2.5" width="15" height="15" rx="1.5"></rect>
+            <path d="M10,9.375 C10.5752917,9.375 11.0416667,8.908625 11.0416667,8.33333333 C11.0416667,7.75804167 10.5752917,7.29166667 10,7.29166667 C9.42470833,7.29166667 8.95833333,7.75804167 8.95833333,8.33333333 C8.95833333,8.908625 9.42470833,9.375 10,9.375 Z" id="Path" fill="#A5B7C0"></path>
+            <path d="M10,12.7083333 C10.5752917,12.7083333 11.0416667,12.2419583 11.0416667,11.6666667 C11.0416667,11.091375 10.5752917,10.625 10,10.625 C9.42470833,10.625 8.95833333,11.091375 8.95833333,11.6666667 C8.95833333,12.2419583 9.42470833,12.7083333 10,12.7083333 Z" id="Path" fill="#A5B7C0"></path>
+            <line x1="6.45833333" y1="7.08333333" x2="6.45833333" y2="12.9166667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="13.5416667" y1="7.08333333" x2="13.5416667" y2="12.9166667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

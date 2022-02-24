@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>sport</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="sport">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M15,6.25 C16.1505833,6.25 17.0833333,5.31725 17.0833333,4.16666667 C17.0833333,3.016075 16.1505833,2.08333333 15,2.08333333 C13.8494167,2.08333333 12.9166667,3.016075 12.9166667,4.16666667 C12.9166667,5.31725 13.8494167,6.25 15,6.25 Z" id="Path" stroke="#A5B7C0"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="5 6.987125 8.334625 5.8325 12.9166667 8.01941667 8.334625 11.4350833 12.9166667 14.4514167 10.0034583 18.3325"></polyline>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="14.7165833 9.01808333 15.8339583 9.62575 18.33325 7.27741667"></polyline>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="7.02041667 13.1439167 5.78304167 14.7738333 1.66829583 17.0818333"></polyline>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,13 @@
+BUILD_DIR = "@CMAKE_BINARY_DIR@"
+CURRENT_BUILD_DIR = "@CMAKE_CURRENT_BINARY_DIR@"
+CTEST_EXECUTABLE = "@CMAKE_CTEST_COMMAND@"
+CMAKE_SYSTEM_NAME = "@CMAKE_SYSTEM_NAME@"
+QT_DIR = "@QT_DIR@"
+PACKAGE_FILE = "@package_file@"
+LOG_FILE = "@CMAKE_BINARY_DIR@/build_logs/unit_tests_build_distribution.log"
+WITH_CLIENT = "@withDesktopClient@"
+ZIP_COMPRESSION_LEVEL = @zip_compression_level@
+GZIP_COMPRESSION_LEVEL = @gzip_compression_level@
+AFFECTED_TARGETS_LIST_FILE_NAME = "@NX_AFFECTED_TARGETS_LIST_FILE_NAME@"
+METADATA_SDK_BUILD_DIR = "@nx_metadata_sdk_build_dir@"
+IS_OPEN_SOURCE="@openSourceBuild@"

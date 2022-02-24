@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>surveillance-cameras-two</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="surveillance-cameras-two">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" points="3.59314167 3.75 16.874625 7.30875 16.148625 8.40833333 14.4809583 11.4124167 13.7549583 12.5119583 7.91916667 10.94825 2.0833625 9.38458333"></polygon>
+            <path d="M16.148625,8.40833333 L17.7585,8.83970833 L16.8957917,12.0594583 L14.4809583,11.4124167 M16.148625,8.40833333 L16.874625,7.30875 L3.59314167,3.75 L2.0833625,9.38458333 L7.91916667,10.94825 M16.148625,8.40833333 L14.4809583,11.4124167 M14.4809583,11.4124167 L13.7549583,12.5119583 L7.91916667,10.94825 M7.91916667,10.94825 L7.91916667,15.4166667 L2.0833625,15.4166667" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

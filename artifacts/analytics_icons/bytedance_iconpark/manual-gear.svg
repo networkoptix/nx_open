@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>manual-gear</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="manual-gear">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="16.6666667 5 16.6666667 10 3.33333333 10"></polyline>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="10 5 10 10 10 15"></polyline>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="3.33333333 5 3.33333333 10 3.33333333 15"></polyline>
+            <path d="M18.3333333,3.33333333 C18.3333333,4.25379167 17.587125,5 16.6666667,5 C15.7462083,5 15,4.25379167 15,3.33333333 C15,2.41285833 15.7462083,1.66666667 16.6666667,1.66666667 C17.587125,1.66666667 18.3333333,2.41285833 18.3333333,3.33333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M11.6666667,3.33333333 C11.6666667,4.25379167 10.9204583,5 10,5 C9.07954167,5 8.33333333,4.25379167 8.33333333,3.33333333 C8.33333333,2.41285833 9.07954167,1.66666667 10,1.66666667 C10.9204583,1.66666667 11.6666667,2.41285833 11.6666667,3.33333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M5,3.33333333 C5,4.25379167 4.25379167,5 3.33333333,5 C2.41285833,5 1.66666667,4.25379167 1.66666667,3.33333333 C1.66666667,2.41285833 2.41285833,1.66666667 3.33333333,1.66666667 C4.25379167,1.66666667 5,2.41285833 5,3.33333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M11.6666667,16.6666667 C11.6666667,17.587125 10.9204583,18.3333333 10,18.3333333 C9.07954167,18.3333333 8.33333333,17.587125 8.33333333,16.6666667 C8.33333333,15.7462083 9.07954167,15 10,15 C10.9204583,15 11.6666667,15.7462083 11.6666667,16.6666667 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M5,16.6666667 C5,17.587125 4.25379167,18.3333333 3.33333333,18.3333333 C2.41285833,18.3333333 1.66666667,17.587125 1.66666667,16.6666667 C1.66666667,15.7462083 2.41285833,15 3.33333333,15 C4.25379167,15 5,15.7462083 5,16.6666667 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <circle id="Oval" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" cx="16.6666667" cy="16.6666667" r="1.66666667"></circle>
+        </g>
+    </g>
+</svg>

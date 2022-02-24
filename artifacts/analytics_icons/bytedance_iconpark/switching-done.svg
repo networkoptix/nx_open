@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>switching-done</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="switching-done">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="12.346875 1.66666667 9.16383333 1.66666667 9.16383333 11.25 18.3305 11.25 18.3305 8.734625"></polyline>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="12.0839583 5.41791667 13.985375 7.26854167 18.7500417 2.5"></polyline>
+            <path d="M12.5020417,18.33325 C9.86466667,18.33325 8.14979167,18.33325 7.35745833,18.33325 C6.64820833,18.33325 5.79829167,18.0965833 5.228125,17.3385833 C4.842875,16.8263333 4.585375,16.0760833 4.585375,14.9999167 C4.585375,13.22075 4.585375,11.6929167 4.585375,10.4164583" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="1.25 13.7499167 4.58525 10.4164583 7.92241667 13.7499167"></polyline>
+        </g>
+    </g>
+</svg>

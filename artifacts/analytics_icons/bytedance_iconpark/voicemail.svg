@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>voicemail</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="voicemail">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M4.58333333,12.9166667 C6.19416667,12.9166667 7.5,11.6108333 7.5,10 C7.5,8.38916667 6.19416667,7.08333333 4.58333333,7.08333333 C2.97250417,7.08333333 1.66666667,8.38916667 1.66666667,10 C1.66666667,11.6108333 2.97250417,12.9166667 4.58333333,12.9166667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M15.4166667,12.9166667 C17.0275,12.9166667 18.3333333,11.6108333 18.3333333,10 C18.3333333,8.38916667 17.0275,7.08333333 15.4166667,7.08333333 C13.8058333,7.08333333 12.5,8.38916667 12.5,10 C12.5,11.6108333 13.8058333,12.9166667 15.4166667,12.9166667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <line x1="5" y1="12.9166667" x2="15" y2="12.9166667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

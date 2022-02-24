@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>translate</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="translate">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M17.5,17.5 L16.547625,15.4166667 M10.8333333,17.5 L11.7857083,15.4166667 M11.7857083,15.4166667 L14.1666667,10 L16.547625,15.4166667 M11.7857083,15.4166667 L16.547625,15.4166667" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="6.66666667" y1="2.5" x2="7.08333333" y2="3.75" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="2.5" y1="4.58333333" x2="11.6666667" y2="4.58333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M4.16666667,6.66666667 C4.16666667,6.66666667 4.91229167,9.275375 6.77633333,10.724625 C8.64033333,12.1739167 11.6666667,13.3333333 11.6666667,13.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M10,4.58333333 C10,4.58333333 9.254375,8.00725 7.39033333,9.90941667 C5.52633333,11.8115833 2.5,13.3333333 2.5,13.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

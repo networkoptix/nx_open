@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WixLocalization xmlns="http://schemas.microsoft.com/wix/2006/localization" Codepage="1252" Language="1046" Culture="pt-br">
+  <String Id="Caption">[WixBundleName] Configuração - [WixBundleVersion]</String>
+  <String Id="Title">[WixBundleName] - [WixBundleVersion]</String>
+  <String Id="Components">[InstallerTitle]</String>
+  <String Id="HelpText">/ install | / reparo | / desinstalar | / layout [directory] - instala, repara, desinstala ou
+   cria uma cópia local completa do pacote no diretório. Instalar é o padrão.
+
+/ passivo | / quiet - exibe UI mínima sem prompts ou não exibe UI e
+   sem prompts. Por padrão, a IU e todos os prompts são exibidos.
+
+/ norestart - suprime todas as tentativas de reinicialização. Por padrão, a IU avisará antes de reiniciar.
+/ log log.txt - registra em um arquivo específico. Por padrão, um arquivo de registro é criado em %TEMP%.</String>
+  <String Id="ConfirmCancelMessage">Você tem certeza que deseja cancelar?</String>
+  <String Id="ClientAndServer">Cliente e Servidor</String>
+  <String Id="ClientOnly">Apenas cliente</String>
+  <String Id="ClientOnlyDesc">A aplicação Cliente é usada para visualizar o vídeo e gerenciar o Sistema</String>
+  <String Id="ServerOnly">Apenas servidor</String>
+  <String Id="ServerOnlyDesc">A aplicação Servidor é usada para armazenar informações e arquivos do sistema</String>
+  <String Id="HelpHeader">Ajuda de configuração</String>
+  <String Id="HelpCloseButton">Fechar</String>
+  <String Id="InstallOptionsButton">Opções</String>
+  <String Id="InstallInstallButton">Instalar</String>
+  <String Id="InstallCloseButton">Fechar</String>
+  <String Id="InstallAcceptCheckbox">Eu concordo com</String>
+  <String Id="InstallLicenseLinkText">Acordo de Licença de Usuário Final</String>
+  <String Id="OptionsHeader">Opções de configuração</String>
+  <String Id="OptionsLocationLabel">Local de instalação:</String>
+  <String Id="OptionsBrowseButton">Navegar</String>
+  <String Id="OptionsOkButton">OK</String>
+  <String Id="OptionsCancelButton">Cancelar</String>
+  <String Id="ProgressHeader">Progresso da Instalação</String>
+  <String Id="ProgressLabel">Em processamento...</String>
+  <String Id="OverallProgressPackageText">Inicializando...</String>
+  <String Id="ProgressCancelButton">Cancelar</String>
+  <String Id="ModifyHeader">Modificar configuração</String>
+  <String Id="ModifyRepairButton">Reparar</String>
+  <String Id="ModifyUninstallButton">Desinstalar</String>
+  <String Id="ModifyCloseButton">Fechar</String>
+  <String Id="SuccessHeader">Configuração bem sucedida</String>
+  <String Id="SuccessUninstallHeader">Desinstalação concluída com sucesso</String>
+  <String Id="SuccessInstallHeader">Instalação concluída com sucesso</String>
+  <String Id="SuccessLaunchButton">Iniciar</String>
+  <String Id="SuccessRestartText">Você deve reiniciar seu computador antes de usar o software</String>
+  <String Id="SuccessRestartButton">Reiniciar</String>
+  <String Id="SuccessCloseButton">Fechar</String>
+  <String Id="FailureHeader">Falha na instalação</String>
+  <String Id="FailureHyperlinkLogText">Um ou mais problemas causaram falha na configuração. Corrija os problemas e tente configurar novamente. Para obter mais informações, consulte o</String>
+  <String Id="FailureHyperlinkLogTextLink">arquivo de log</String>
+  <String Id="FailureRestartText">Você deve reiniciar o computador para concluir a reversão do software</String>
+  <String Id="FailureRestartButton">Reiniciar</String>
+  <String Id="FailureCloseButton">Fechar</String>
+  <String Id="WillInstall">[WixBundleName] será instalado no seu dispositivo</String>
+  <String Id="FilesInUseHeader">Arquivos em uso</String>
+  <String Id="FilesInUseLabel">As seguintes aplicações devem ser interrompidas para continuar a instalação:</String>
+  <String Id="FilesInUseCloseRadioButton">Feche as aplicações e tente reiniciá-las</String>
+  <String Id="FilesInUseDontCloseRadioButton">Não feche as aplicações. Uma reinicialização será necessária</String>
+  <String Id="FilesInUseOkButton">OK</String>
+  <String Id="FilesInUseCancelButton">Cancelar</String>
+  <String Id="Options">Opções</String>
+  <String Id="SelectApps">Seleccione as aplicações a serem instaladas:</String>
+  <String Id="msierrFirewallCannotConnect">Não é possível conectar ao Firewall do Windows. ([2]   [3]   [4]   [5])</String>
+  <String Id="WixSchedFirewallExceptionsInstall">Configurando o Firewall do Windows</String>
+  <String Id="WixSchedFirewallExceptionsUninstall">Configurando o Firewall do Windows</String>
+  <String Id="WixRollbackFirewallExceptionsInstall">Revertendo a configuração do Firewall do Windows</String>
+  <String Id="WixExecFirewallExceptionsInstall">Instalando a configuração do Firewall do Windows</String>
+  <String Id="WixRollbackFirewallExceptionsUninstall">Revertendo a configuração do Firewall do Windows</String>
+  <String Id="WixExecFirewallExceptionsUninstall">Desinstalando a configuração do Firewall do Windows</String>
+  <String Id="Product_ArchMismatch_x86">Este pacote é projetado para sistemas operacionais de 32 bits. A instalação será encerrada agora.</String>
+  <String Id="Product_ArchMismatch_x64">Este pacote é projetado para sistemas operacionais de 64 bits. A instalação será encerrada agora.</String>
+</WixLocalization>

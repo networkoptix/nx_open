@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="22px" height="22px" viewBox="0 0 22 22" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>geometric-flowers</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="geometric-flowers" transform="translate(1.000000, 1.000000)">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0.8" y="0.8" width="19.2" height="19.2"></rect>
+            <ellipse id="Oval" stroke="#A5B7C0" stroke-width="0.979591837" stroke-linecap="round" stroke-linejoin="round" transform="translate(7.526532, 7.069390) rotate(-45.000000) translate(-7.526532, -7.069390) " cx="7.5265317" cy="7.0693897" rx="3.52653061" ry="6.26938776"></ellipse>
+            <ellipse id="Oval" stroke="#A5B7C0" stroke-width="0.97959214" stroke-linecap="round" stroke-linejoin="round" transform="translate(7.526532, 12.437788) scale(-1, 1) rotate(135.000000) translate(-7.526532, -12.437788) " cx="7.5265317" cy="12.4377881" rx="3.5265317" ry="6.2693897"></ellipse>
+            <ellipse id="Oval" stroke="#A5B7C0" stroke-width="0.97959214" stroke-linecap="round" stroke-linejoin="round" transform="translate(12.872987, 7.069390) scale(-1, 1) rotate(-45.000000) translate(-12.872987, -7.069390) " cx="12.8729872" cy="7.0693897" rx="3.5265317" ry="6.2693897"></ellipse>
+            <ellipse id="Oval" stroke="#A5B7C0" stroke-width="0.979591837" stroke-linecap="round" stroke-linejoin="round" transform="translate(12.872987, 12.437788) rotate(135.000000) translate(-12.872987, -12.437788) " cx="12.8729872" cy="12.4377881" rx="3.52653061" ry="6.26938776"></ellipse>
+        </g>
+    </g>
+</svg>

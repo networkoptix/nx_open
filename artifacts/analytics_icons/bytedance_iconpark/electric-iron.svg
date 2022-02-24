@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>electric-iron</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="electric-iron">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M2.08333333,7.796875 C2.08333333,7.63291667 2.21625,7.5 2.38020833,7.5 L7.97995833,7.5 C13.4678333,7.5 17.9166667,11.9488333 17.9166667,17.4367083 L17.9166667,17.4367083 C17.9166667,17.4716667 17.8883333,17.5 17.853375,17.5 L2.08333333,17.5 L2.08333333,7.796875 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="2.08333333 7.5 2.08333333 3.33333333 10.4166667 3.33333333"></polyline>
+            <circle id="Oval" stroke="#A5B7C0" cx="6.25" cy="11.25" r="1.66666667"></circle>
+            <line x1="2.08333333" y1="15" x2="17.5" y2="15" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <path d="M12.0833333,8.33333333 C12.638875,7.5 14.3333333,5.66666667 15.8333333,6.66666667 C17.2916667,7.638875 16.0416667,10 15.4166667,10.8333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

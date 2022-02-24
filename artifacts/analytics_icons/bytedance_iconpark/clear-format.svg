@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>clear-format</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="clear-format">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="18.6590833 10.0709167 13.2991667 2.958075 5.8895 8.54166667 11.4583333 15.4166667 12.8565 14.4435"></polygon>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="11.45825 15.4166667 9.858875 16.6978333 5.45741667 16.6975 4.373875 15.259625 1.69392917 11.7031667 6.04158333 8.427"></polyline>
+            <line x1="5.50233333" y1="16.6967083" x2="18.568875" y2="16.6966667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+        </g>
+    </g>
+</svg>

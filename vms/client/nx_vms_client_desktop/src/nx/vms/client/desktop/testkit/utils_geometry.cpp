@@ -1,0 +1,148 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+#include "utils.h"
+
+#include <QtWidgets/QAction>
+#include <QtWidgets/QMenu>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QGraphicsObject>
+#include <QtWidgets/QGraphicsView>
+#include <QtQuick/QQuickItem>
+#include <QtQuick/QQuickWindow>
+#include <QtWidgets/QAbstractItemView>
+
+#include "model_index_wrapper.h"
+
+namespace nx::vms::client::desktop::testkit::utils {
+
+QRect globalRect(QVariant object, QWindow** window)
+{
+    // Avoid multiple `if (window)` conditions below.
+    QWindow* dummyStorage;
+    if (!window)
+        window = &dummyStorage;
+    *window = nullptr;
+
+    // If we already got the rectangle, just pass it through.
+    const QMetaType::Type objectType = (QMetaType::Type)object.type();
+    if (objectType == QMetaType::QRect || objectType == QMetaType::QRectF)
+        return object.toRect();
+
+    auto qobj = qvariant_cast<QObject*>(object);
+
+    // Map object rectangle to global, each type has it's own way of mapping the coordinates.
+    if (const auto w = qobject_cast<const QWidget*>(qobj))
+    {
+        const QRect r = w->rect();
+        *window = w->window()->windowHandle();
+        return QRect(w->mapToGlobal(r.topLeft()), w->mapToGlobal(r.bottomRight()));
+    }
+    else if (const auto action = qobject_cast<QAction*>(qobj))
+    {
+        if (auto menu = qobject_cast<QMenu*>(action->parentWidget()))
+        {
+            const auto r = menu->actionGeometry(action);
+            *window = menu->window()->windowHandle();
+            return QRect(menu->mapToGlobal(r.topLeft()), menu->mapToGlobal(r.bottomRight()));
+        }
+    }
+    else if (const auto go = qobject_cast<const QGraphicsObject*>(qobj))
+    {
+        const QGraphicsView* v = go->scene()->views().first();
+        const QRectF sceneRect = go->mapRectToScene(go->boundingRect());
+        const QRect viewRect = v->mapFromScene(sceneRect).boundingRect();
+        const QPoint topLeft = v->viewport()->mapToGlobal(viewRect.topLeft());
+        const QPoint bottomRight = v->viewport()->mapToGlobal(viewRect.bottomRight());
+        *window = v->window()->windowHandle();
+        return QRect(topLeft, bottomRight);
+    }
+    else if (auto qi = qobject_cast<QQuickItem*>(qobj))
+    {
+        *window = qi->window();
+        const QPointF topLeft = qi->mapToGlobal(qi->boundingRect().topLeft());
+        const QPointF bottomRight = qi->mapToGlobal(qi->boundingRect().bottomRight());
+        return QRect(topLeft.toPoint(), bottomRight.toPoint());
+    }
+    else if (auto w = qobject_cast<QWindow*>(qobj))
+    {
+        const QPointF topLeft = w->mapToGlobal(QPoint(0, 0));
+        const QPointF bottomRight = w->mapToGlobal(QPoint(w->width(), w->height()));
+        *window = w;
+        return QRect(topLeft.toPoint(), bottomRight.toPoint());
+    }
+    else if (object.isValid())
+    {
+        auto wrap = object.value<ModelIndexWrapper>();
+        if (!wrap.isValid())
+            return QRect();
+
+        auto view = qobject_cast<QAbstractItemView*>(wrap.container());
+        if (!view)
+            return QRect();
+
+        const QRect rect = view->visualRect(wrap.index());
+        *window = view->window()->windowHandle();
+        return QRect(view->mapToGlobal(rect.topLeft()), view->mapToGlobal(rect.bottomRight()));
+    }
+    return QRect();
+}
+
+qreal sideIntersect(QRect widgetRect, QRect sideRect, Qt::Alignment align)
+{
+    const int area = sideRect.width() * sideRect.height();
+    if (area == 0)
+        return 0.0;
+
+    // Compute aligned rect
+    QRect testRect;
+    switch (align)
+    {
+        case Qt::AlignLeft:
+        {
+            int left = std::min(sideRect.left(), widgetRect.left());
+            testRect = QRect(
+                left,
+                widgetRect.top(),
+                widgetRect.left() - left,
+                widgetRect.height());
+            break;
+        }
+        case Qt::AlignRight:
+        {
+            int right = std::max(sideRect.right(), widgetRect.right());
+            testRect = QRect(
+                widgetRect.right(),
+                widgetRect.top(),
+                right - widgetRect.right(),
+                widgetRect.height());
+            break;
+        }
+        case Qt::AlignTop:
+        {
+            int top = std::min(sideRect.top(), widgetRect.top());
+            testRect = QRect(
+                widgetRect.left(),
+                top,
+                widgetRect.width(),
+                widgetRect.top() - top);
+            break;
+        }
+        case Qt::AlignBottom:
+        {
+            int bottom = std::max(sideRect.bottom(), widgetRect.bottom());
+            testRect = QRect(
+                widgetRect.left(),
+                widgetRect.bottom(),
+                widgetRect.width(),
+                bottom - widgetRect.bottom());
+        }
+    }
+
+    if (testRect.width() == 0 || testRect.height() == 0)
+        return 0.0;
+
+    auto r = sideRect.intersected(testRect);
+    return (r.width() * r.height()) / (qreal) area;
+}
+
+} // namespace nx::vms::client::desktop::testkit::utils

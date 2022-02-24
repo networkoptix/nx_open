@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>rectangular-circular-separation</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="rectangular-circular-separation">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M5,7.91666667 C6.38070833,7.91666667 7.5,6.797375 7.5,5.41666667 C7.5,4.03595417 6.38070833,2.91666667 5,2.91666667 C3.6192875,2.91666667 2.5,4.03595417 2.5,5.41666667 C2.5,6.797375 3.6192875,7.91666667 5,7.91666667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linejoin="round" x="13.3333333" y="12.9166667" width="4.16666667" height="4.16666667"></rect>
+            <path d="M1.66666667,10.4166667 L18.3333333,10.4166667 L1.66666667,10.4166667 Z" id="Path"></path>
+            <line x1="1.66666667" y1="10.4166667" x2="18.3333333" y2="10.4166667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

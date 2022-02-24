@@ -1,0 +1,24 @@
+{
+    "descriptors": {
+        "groupDescriptors": {
+            "group.1": {
+                "id": "group.1",
+                "name": "Group 1"
+            },
+            "group.2": {
+                "id": "group.2",
+                "name":  "Group 2"
+            }
+        }
+    },
+    "result": {
+        "group.1": {
+            "id": "group.1",
+            "name": "Group 1"
+        },
+        "group.2": {
+            "id": "group.2",
+            "name": "Group 2"
+        }
+    }
+}

@@ -1,0 +1,124 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+#pragma once
+
+#include "id_data.h"
+#include "resource_data.h"
+
+#include <vector>
+#include <map>
+
+#include <QtCore/QString>
+
+namespace nx {
+namespace vms {
+namespace api {
+
+struct NX_VMS_API VideowallItemData
+{
+    QnUuid guid;
+    QnUuid pcGuid;
+    QnUuid layoutGuid;
+    QString name;
+    int snapLeft = 0;
+    int snapTop = 0;
+    int snapRight = 0;
+    int snapBottom = 0;
+
+    bool operator==(const VideowallItemData& other) const = default;
+};
+#define VideowallItemData_Fields \
+    (guid)(pcGuid)(layoutGuid)(name)(snapLeft)(snapTop)(snapRight)(snapBottom)
+NX_VMS_API_DECLARE_STRUCT_AND_LIST(VideowallItemData)
+
+struct NX_VMS_API VideowallScreenData
+{
+    QnUuid pcGuid;
+    int pcIndex = 0;
+    int desktopLeft = 0;
+    int desktopTop = 0;
+    int desktopWidth = 0;
+    int desktopHeight = 0;
+    int layoutLeft = 0;
+    int layoutTop = 0;
+    int layoutWidth = 0;
+    int layoutHeight = 0;
+
+    bool operator==(const VideowallScreenData& other) const = default;
+};
+#define VideowallScreenData_Fields \
+    (pcGuid)(pcIndex)(desktopLeft)(desktopTop)(desktopWidth)(desktopHeight) \
+    (layoutLeft)(layoutTop)(layoutWidth)(layoutHeight)
+NX_VMS_API_DECLARE_STRUCT_AND_LIST(VideowallScreenData)
+
+struct NX_VMS_API VideowallMatrixItemData
+{
+    QnUuid itemGuid;
+    QnUuid layoutGuid;
+
+    bool operator==(const VideowallMatrixItemData& other) const = default;
+};
+#define VideowallMatrixItemData_Fields (itemGuid)(layoutGuid)
+NX_VMS_API_DECLARE_STRUCT_AND_LIST(VideowallMatrixItemData)
+
+struct NX_VMS_API VideowallMatrixData: IdData
+{
+    QString name;
+    VideowallMatrixItemDataList items;
+
+    bool operator==(const VideowallMatrixData& other) const = default;
+};
+#define VideowallMatrixData_Fields IdData_Fields (name)(items)
+NX_VMS_API_DECLARE_STRUCT_AND_LIST(VideowallMatrixData)
+
+/**%apidoc Video wall information object.
+ * %param[proprietary] typeId
+ * %param[opt] parentId Id of a User who created this video wall.
+ * %param[readonly] id Video wall unique id.
+ * %param name Video wall name.
+ * %param[unused] url
+ */
+struct NX_VMS_API VideowallData: ResourceData
+{
+    VideowallData(): ResourceData(kResourceTypeId) {}
+
+    bool operator==(const VideowallData& other) const = default;
+
+    static const QString kResourceTypeName;
+    static const QnUuid kResourceTypeId;
+
+    bool autorun = false;
+    bool timeline = false;
+
+    VideowallItemDataList items;
+    VideowallScreenDataList screens;
+    VideowallMatrixDataList matrices;
+};
+#define VideowallData_Fields ResourceData_Fields (autorun)(items)(screens)(matrices)(timeline)
+NX_VMS_API_DECLARE_STRUCT_AND_LIST(VideowallData)
+
+struct NX_VMS_API VideowallControlMessageData
+{
+    int operation = 0;
+    QnUuid videowallGuid;
+    QnUuid instanceGuid;
+    std::map<QString, QString> params;
+};
+#define VideowallControlMessageData_Fields (operation)(videowallGuid)(instanceGuid)(params)
+NX_VMS_API_DECLARE_STRUCT(VideowallControlMessageData)
+
+} // namespace api
+} // namespace vms
+} // namespace nx
+
+Q_DECLARE_METATYPE(nx::vms::api::VideowallData)
+Q_DECLARE_METATYPE(nx::vms::api::VideowallDataList)
+Q_DECLARE_METATYPE(nx::vms::api::VideowallItemData)
+Q_DECLARE_METATYPE(nx::vms::api::VideowallItemDataList)
+Q_DECLARE_METATYPE(nx::vms::api::VideowallScreenData)
+Q_DECLARE_METATYPE(nx::vms::api::VideowallScreenDataList)
+Q_DECLARE_METATYPE(nx::vms::api::VideowallMatrixData)
+Q_DECLARE_METATYPE(nx::vms::api::VideowallMatrixDataList)
+Q_DECLARE_METATYPE(nx::vms::api::VideowallMatrixItemData)
+Q_DECLARE_METATYPE(nx::vms::api::VideowallMatrixItemDataList)
+Q_DECLARE_METATYPE(nx::vms::api::VideowallControlMessageData)

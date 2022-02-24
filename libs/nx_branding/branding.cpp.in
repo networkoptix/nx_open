@@ -1,0 +1,228 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+#include <nx/branding.h>
+
+namespace nx::branding {
+
+QString customization()
+{
+    return R"(${customization})";
+}
+
+QString brand()
+{
+    return R"(${customization.brand})";
+}
+
+QString company()
+{
+    return R"(${customization.companyName})";
+}
+
+QString companyId()
+{
+    return R"(${customization.companyId})";
+}
+
+QString vmsName()
+{
+    return R"(${customization.vmsName})";
+}
+
+QString cloudName()
+{
+    return R"(${customization.cloudName})";
+}
+
+QString shortCloudName()
+{
+    return R"(${shortCloudName})";
+}
+
+QString cloudHost()
+{
+    return R"(${cloudHost})";
+}
+
+bool isDevCloudHost()
+{
+    static const bool result = QStringLiteral(R"(${isDevCloudHost})").toLower() == "true";
+    return result;
+}
+
+QStringList compatibleCustomizations()
+{
+    static const QString value = R"(${customization.mobile.compatibleCustomizations})";
+    return value.split(';');
+}
+
+QStringList compatibleCloudHosts()
+{
+    static const QString value = R"(${compatibleCloudHosts})";
+    return value.split(';');
+}
+
+QStringList compatibleUriProtocols()
+{
+    static const QString value = R"(${customization.mobile.compatibleUriProtocols})";
+    return value.split(';');
+}
+
+QString defaultLocale()
+{
+    return R"(${customization.defaultLanguage})";
+}
+
+QString nativeUriProtocol()
+{
+    return R"(${customization.uriProtocol})";
+}
+
+int eulaVersion()
+{
+    return ${customization.eulaVersion};
+}
+
+QString supportAddress()
+{
+    return R"(${customization.contact.supportAddress})";
+}
+
+QString licensingAddress()
+{
+    return R"(${customization.contact.licensingAddress})";
+}
+
+QString homePage()
+{
+    return R"(${customization.contact.systemWebPages.homePage})";
+}
+
+QString supportPage()
+{
+    return R"(${customization.contact.systemWebPages.supportPage})";
+}
+
+QString installationRoot()
+{
+    return R"(${installation_root})";
+}
+
+QString mediaFolderName()
+{
+    return R"(${mediaFolderName})";
+}
+
+QString companyUrl()
+{
+    return R"(${customization.contact.companyUrl})";
+}
+
+QString launcherVersionFile()
+{
+    return R"(${launcher.version.file})";
+}
+
+QString freeLicenseKey()
+{
+    return R"(${customization.desktop.trialLicenseKey})";
+}
+
+QString minilauncherBinaryName()
+{
+    return R"(${minilauncher.binary.name})";
+}
+
+QString applauncherBinaryName()
+{
+    return R"(${applauncher.binary.name})";
+}
+
+QString applauncherInternalName()
+{
+    return R"(${applauncher.name})";
+}
+
+QString desktopClientLauncherName()
+{
+    return R"(${client_launcher_name})";
+}
+
+QString desktopClientInternalName()
+{
+    return R"(${desktopClientInternalName})";
+}
+
+QString desktopClientDisplayName()
+{
+    return R"(${clientDisplayName})";
+}
+
+QString quickStartGuideShortcutName()
+{
+    return R"(${quick_start_guide_shortcut_name})";
+}
+
+QString quickStartGuideFileName()
+{
+    return R"(${quick_start_guide_file_name})";
+}
+
+QString mobileClientInternalName()
+{
+    return R"(${mobileClientInternalName})";
+}
+
+QString mobileClientDisplayName()
+{
+    return R"(${customization.mobile.displayName})";
+}
+
+QString mobileClientAndroidCompatibilityPackage()
+{
+    return R"(${customization.mobile.android.compatibilityPackage})";
+}
+
+QString mobileClientIosCompatibilityPackage()
+{
+    return R"(${customization.mobile.ios.compatibilityPackage})";
+}
+
+QString traytoolInternalName()
+{
+    return R"(${traytool.name})";
+}
+
+QString mediaserverInternalName()
+{
+    return R"(${mediaserver_application_name})";
+}
+
+QString mediaserverServiceName()
+{
+    return R"(${mediaserver_service_name})";
+}
+
+QString installerName()
+{
+    return R"(${customization.installerName})";
+}
+
+bool isDesktopClientCustomized()
+{
+    return QString(R"(${customization.desktop.customClient})").toLower() == "true";
+}
+
+bool clientAutoUpdateEnabledByDefault()
+{
+    static const bool result =
+        QString(R"(${customization.desktop.clientAutoUpdates})").toLower() == "true";
+    return result;
+}
+
+QString customOpenSourceLibrariesUrl()
+{
+    return R"(${customization.customOpenSourceLibrariesUrl})";
+}
+
+} // namespace nx::branding

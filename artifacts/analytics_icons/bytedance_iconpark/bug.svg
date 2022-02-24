@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>bug</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="bug">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(1.666667, 1.666667)" stroke="#A5B7C0" stroke-linejoin="round">
+                <path d="M8.33333333,15.8333333 C13.3333333,15.8333333 14.1666667,11.471818 14.1666667,10 C14.1666667,8.6824425 14.1666667,6.73799804 14.1666667,4.16666667 L2.5,4.16666667 C2.5,5.60095667 2.5,7.54540112 2.5,10 C2.5,11.4377483 3.33333333,15.8333333 8.33333333,15.8333333 Z" id="Path"></path>
+                <line x1="1.48029737e-15" y1="1.66666667" x2="2.5" y2="4.16666667" id="Path" stroke-linecap="round"></line>
+                <line x1="16.6666667" y1="1.66666667" x2="14.1666667" y2="4.16666667" id="Path" stroke-linecap="round"></line>
+                <line x1="0" y1="9.58333333" x2="2.5" y2="9.58333333" id="Path" stroke-linecap="round"></line>
+                <line x1="16.6666667" y1="9.58333333" x2="14.1666667" y2="9.58333333" id="Path" stroke-linecap="round"></line>
+                <line x1="1.25" y1="16.6666667" x2="3.75" y2="14.1666667" id="Path" stroke-linecap="round"></line>
+                <line x1="15.4166667" y1="16.6666667" x2="12.9166667" y2="14.1666667" id="Path" stroke-linecap="round"></line>
+                <line x1="8.33333333" y1="15.8333333" x2="8.33333333" y2="4.16666667" id="Path" stroke-linecap="round"></line>
+                <path d="M4.55019792,14.6003735 C5.41769333,15.3263262 6.635212,15.8333333 8.33333333,15.8333333 L8.33333333,15.8333333 C10.0463556,15.8333333 11.2703036,15.3213882 12.1392247,14.5890994" id="Path" stroke-linecap="round"></path>
+                <path d="M11.6666667,3.47222222 C11.6666667,1.55456684 10.1742825,0 8.33333333,0 C6.49238417,0 5,1.55456684 5,3.47222222 L5,4.16666667 L11.6666667,4.16666667 L11.6666667,3.47222222 Z" id="Path"></path>
+            </g>
+        </g>
+    </g>
+</svg>

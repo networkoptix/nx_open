@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>share-sys</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="share-sys">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M4.31891667,17.34675 C2.68709167,15.8255 1.66666667,13.6569167 1.66666667,11.25 C1.66666667,6.647625 5.397625,2.91666667 10,2.91666667 C14.602375,2.91666667 18.3333333,6.647625 18.3333333,11.25 C18.3333333,13.6569167 17.3129167,15.8255 15.6810833,17.34675" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M6.30729167,15.212875 C5.246625,14.2240833 4.58333333,12.8145 4.58333333,11.25 C4.58333333,8.25845833 7.00845833,5.83333333 10,5.83333333 C12.9915417,5.83333333 15.4166667,8.25845833 15.4166667,11.25 C15.4166667,12.8145 14.753375,14.2240833 13.6927083,15.212875" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M8.29566667,13.0790417 C7.806125,12.6226667 7.5,11.9720833 7.5,11.25 C7.5,9.86929167 8.61929167,8.75 10,8.75 C11.3807083,8.75 12.5,9.86929167 12.5,11.25 C12.5,11.9720833 12.193875,12.6226667 11.7043333,13.0790417" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

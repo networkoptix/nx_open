@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>VmsRuleEditorWindow</class>
+ <widget class="QDialog" name="VmsRuleEditorWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>720</width>
+    <height>800</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>720</width>
+    <height>720</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Alarm/Event Rules</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="nx::vms::client::desktop::Panel" name="widget" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout_3" stretch="1,0,0">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>6</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QWidget" name="panelsWidget" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>220</height>
+         </size>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
+        </property>
+        <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0,1">
+         <property name="spacing">
+          <number>16</number>
+         </property>
+         <property name="leftMargin">
+          <number>16</number>
+         </property>
+         <property name="topMargin">
+          <number>16</number>
+         </property>
+         <property name="rightMargin">
+          <number>16</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QWidget" name="eventWidget" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>220</height>
+            </size>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,0,0,1">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="nx::vms::client::desktop::vms_rules::EventTypePickerWidget" name="eventTypePicker" native="true"/>
+            </item>
+            <item>
+             <spacer name="verticalSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>0</width>
+                <height>16</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="nx::vms::client::desktop::vms_rules::GenericEventParamsWidget" name="genericEventParams" native="true"/>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="Line" name="panelsSplitter">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="actionWidget" native="true">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>220</height>
+            </size>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,0,0,1">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="nx::vms::client::desktop::vms_rules::ActionTypePickerWidget" name="actionTypePicker" native="true"/>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>0</width>
+                <height>16</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="nx::vms::client::desktop::vms_rules::HttpActionParamsWidget" name="httpActionParams" native="true"/>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="footerSplitter">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="nx::vms::client::desktop::vms_rules::VmsRulesFooterWidget" name="footerWidget" native="true"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="buttomBoxLine">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="leftMargin">
+      <number>16</number>
+     </property>
+     <property name="topMargin">
+      <number>16</number>
+     </property>
+     <property name="rightMargin">
+      <number>16</number>
+     </property>
+     <property name="bottomMargin">
+      <number>16</number>
+     </property>
+     <item>
+      <widget class="QPushButton" name="deleteRuleButton">
+       <property name="text">
+        <string>Delete Rule</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDialogButtonBox" name="buttonBox">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="standardButtons">
+        <set>QDialogButtonBox::NoButton</set>
+       </property>
+       <property name="centerButtons">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>nx::vms::client::desktop::Panel</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/panel.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::vms_rules::VmsRulesFooterWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/vms_rules/dialog_details/vms_rules_footer_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::vms_rules::EventTypePickerWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/vms_rules/dialog_details/event_type_picker_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::vms_rules::ActionTypePickerWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/vms_rules/dialog_details/action_type_picker_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::vms_rules::GenericEventParamsWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/vms_rules/dialog_action_event_editors/generic_event_params_widget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::vms_rules::HttpActionParamsWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/vms_rules/dialog_action_event_editors/http_action_params_widget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

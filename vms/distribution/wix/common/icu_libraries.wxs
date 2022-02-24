@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <!--
+            These libraries may be shared between different installers, therefore they must
+            contain 'DiskId="2"' descriptor, so bundle will strip duplicated copies.
+         -->
+        <ComponentGroup Id="IcuLibrariesComponentGroup"
+                Source="${icu_directory}/bin"
+                Directory="InstallDirRoot">
+            <Component><File Name="icudt70.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="icuin70.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="icuuc70.dll" KeyPath="yes" DiskId="2"/></Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

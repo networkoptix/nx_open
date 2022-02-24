@@ -1,0 +1,328 @@
+{
+    "initial": {
+        "eventTypeDescriptors": {
+            "test.eventType1": {
+                "id": "test.eventType1",
+                "name": "Test Event Type 1",
+                "icon": "test.icon1",
+                "hasEverBeenSupported": false,
+                "attributes": [
+                    {
+                        "name": "Test Attribute1",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Test Attribute2",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Test Attribute3",
+                        "type": "String"
+                    }
+                ],
+                "attributeSupportInfo": {
+                    "Test Attribute1": ["{d07e25b9-499e-400c-ab05-7779d461bc3c}"],
+                    "Test Attribute2": ["{d07e25b9-499e-400c-ab05-7779d461bc3c}"]
+                },
+                "scopes": [
+                    {
+                        "engineId": "{d07e25b9-499e-400c-ab05-7779d461bc3c}",
+                        "group": "test.group1",
+                        "provider": "test.provider1"
+                    }
+                ]
+            },
+            "test.eventType2": {
+                "id": "test.eventType2",
+                "name": "Test Event Type 2",
+                "icon": "test.icon2",
+                "base": "test.base",
+                "hasEverBeenSupported": true,
+                "attributes": [
+                    {
+                        "name": "Test Attribuite",
+                        "type": "String"
+                    }
+                ],
+                "omittedBaseAttributes": [
+                    "attr1", "attr2", "attr3"
+                ],
+                "attributeSupportInfo": {
+                    "Test Attribute": ["{627c5cea-9d40-4375-9fdc-708cbda0690d}"]
+                },
+                "scopes": [
+                    {
+                        "engineId": "{627c5cea-9d40-4375-9fdc-708cbda0690d}"
+                    }
+                ]
+            },
+            "test.eventType3": {
+                "id": "test.eventType3",
+                "name": "Test Event Type 3",
+                "icon": "test.icon3",
+                "attributes": [
+                    {
+                        "name": "Test Attribute",
+                        "type": "String"
+                    }
+                ],
+                "attributeSupportInfo": {
+                    "Test Attribute": ["{d031d41a-4c35-4543-ba36-dd334e2d4fab}"]
+                },
+                "scopes": [
+                    {
+                        "engineId": "{d031d41a-4c35-4543-ba36-dd334e2d4fab}"
+                    }
+                ]
+            }
+        }
+    },
+    "additional": {
+        "eventTypeDescriptors": {
+            "test.eventType1": {
+                "id": "test.eventType1",
+                "name": "Overridden Test Event Type 1",
+                "icon": "Overridden.test.icon1",
+                "hasEverBeenSupported": true,
+                "attributes": [
+                    {
+                        "name": "Overridden Test Attribute1",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Overridden Test Attribute2",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Overridden Test Attribute3",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Overridden Test Attribute4",
+                        "type": "String"
+                    }
+                ],
+                "attributeSupportInfo": {
+                    "Overridden Test Attribute1": ["{fd16040c-fcfc-41a7-88d7-ece2272a4114}"],
+                    "Overridden Test Attribute2": ["{fd16040c-fcfc-41a7-88d7-ece2272a4114}"]
+                },
+                "scopes": [
+                    {
+                        "engineId": "{fd16040c-fcfc-41a7-88d7-ece2272a4114}",
+                        "group": "test.group2",
+                        "provider": "test.provider2"
+                    }
+                ]
+            },
+            "test.eventType2": {
+                "id": "test.eventType2",
+                "name": "Test Event Type 2",
+                "icon": "test.icon2",
+                "hasEverBeenSupported": false,
+                "base": "test.base.other",
+                "flags": "stateDependent|regionDependent|hidden|useTrackBestShotAsPreview",
+                "attributes": [
+                    {
+                        "name": "Test Attribute",
+                        "type": "String"
+                    }
+                ],
+                "omittedBaseAttributes": [
+                    "attr4", "attr5"
+                ],
+                "attributeSupportInfo": {
+                    "Test Attribute": ["{d031d41a-4c35-4543-ba36-dd334e2d4fab}"]
+                },
+                "scopes": [
+                    {
+                        "engineId": "{d031d41a-4c35-4543-ba36-dd334e2d4fab}"
+                    }
+                ]
+            },
+            "test.eventType4": {
+                "id": "test.eventType4",
+                "name": "Test Event Type 4",
+                "icon": "test.icon4",
+                "attributes": [
+                    {
+                        "name": "Some Test Attribute1",
+                        "type": "Number",
+                        "subtype": "Integer",
+                        "minValue": 1,
+                        "maxValue": 2,
+                        "unit": "kg"
+                    },
+                    {
+                        "name": "Some Test Attribute2",
+                        "type": "Object",
+                        "subtype": "test.objectType1"
+                    },
+                    {
+                        "name": "Some Test Attribute3",
+                        "type": "Boolean"
+                    },
+                    {
+                        "name": "Some Test Attribute4",
+                        "type": "Enum",
+                        "subtype": "test.colorType1"
+                    },
+                    {
+                        "name": "Some Test Attribute5",
+                        "type": "Color",
+                        "subtype": "test.colorType1"
+                    }
+                ],
+                "attributeSupportInfo": {
+                    "Some Test Attribute1": ["{99e9eded-70c5-4455-a69a-7820c9b60e53}"],
+                    "Some Test Attribute2": ["{99e9eded-70c5-4455-a69a-7820c9b60e53}"],
+                    "Some Test Attribute3": ["{99e9eded-70c5-4455-a69a-7820c9b60e53}"]
+                },
+                "scopes": [
+                    {
+                        "engineId": "{99e9eded-70c5-4455-a69a-7820c9b60e53}",
+                        "group": "test.group4",
+                        "provider": "test.provider4"
+                    }
+                ]
+            }
+        }
+    },
+    "expected": {
+        "eventTypeDescriptors": {
+            "test.eventType1": {
+                "id": "test.eventType1",
+                "name": "Overridden Test Event Type 1",
+                "icon": "Overridden.test.icon1",
+                "hasEverBeenSupported": true,
+                "attributes": [
+                    {
+                        "name": "Overridden Test Attribute1",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Overridden Test Attribute2",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Overridden Test Attribute3",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Overridden Test Attribute4",
+                        "type": "String"
+                    }
+                ],
+                "attributeSupportInfo": {
+                    "Test Attribute1": ["{d07e25b9-499e-400c-ab05-7779d461bc3c}"],
+                    "Test Attribute2": ["{d07e25b9-499e-400c-ab05-7779d461bc3c}"],
+                    "Overridden Test Attribute1": ["{fd16040c-fcfc-41a7-88d7-ece2272a4114}"],
+                    "Overridden Test Attribute2": ["{fd16040c-fcfc-41a7-88d7-ece2272a4114}"]
+                },
+                "scopes": [
+                    {
+                        "engineId": "{d07e25b9-499e-400c-ab05-7779d461bc3c}",
+                        "group": "test.group1",
+                        "provider": "test.provider1"
+                    },
+                    {
+                        "engineId": "{fd16040c-fcfc-41a7-88d7-ece2272a4114}",
+                        "provider": "test.provider2"
+                    }
+                ]
+            },
+            "test.eventType2": {
+                "id": "test.eventType2",
+                "name": "Test Event Type 2",
+                "icon": "test.icon2",
+                "hasEverBeenSupported": true,
+                "base": "test.base.other",
+                "flags": "stateDependent|regionDependent|hidden|useTrackBestShotAsPreview",
+                "attributes": [
+                    {
+                        "name": "Test Attribute",
+                        "type": "String"
+                    }
+                ],
+                "omittedBaseAttributes": [
+                    "attr4", "attr5"
+                ],
+                "attributeSupportInfo": {
+                    "Test Attribute": ["{d031d41a-4c35-4543-ba36-dd334e2d4fab}", "{627c5cea-9d40-4375-9fdc-708cbda0690d}"]
+                },
+                "scopes": [
+                    {
+                        "engineId": "{d031d41a-4c35-4543-ba36-dd334e2d4fab}"
+                    },
+                    {
+                        "engineId": "{627c5cea-9d40-4375-9fdc-708cbda0690d}"
+                    }
+                ]
+            },
+            "test.eventType3": {
+                "id": "test.eventType3",
+                "name": "Test Event Type 3",
+                "icon": "test.icon3",
+                "attributes": [
+                    {
+                        "name": "Test Attribute",
+                        "type": "String"
+                    }
+                ],
+                "attributeSupportInfo": {
+                    "Test Attribute": ["{d031d41a-4c35-4543-ba36-dd334e2d4fab}"]
+                },
+                "scopes": [
+                    {
+                        "engineId": "{d031d41a-4c35-4543-ba36-dd334e2d4fab}"
+                    }
+                ]
+            },
+            "test.eventType4": {
+                "id": "test.eventType4",
+                "name": "Test Event Type 4",
+                "icon": "test.icon4",
+                "attributes": [
+                    {
+                        "name": "Some Test Attribute1",
+                        "type": "Number",
+                        "subtype": "Integer",
+                        "minValue": 1,
+                        "maxValue": 2,
+                        "unit": "kg"
+                    },
+                    {
+                        "name": "Some Test Attribute2",
+                        "type": "Object",
+                        "subtype": "test.objectType1"
+                    },
+                    {
+                        "name": "Some Test Attribute3",
+                        "type": "Boolean"
+                    },
+                    {
+                        "name": "Some Test Attribute4",
+                        "type": "Enum",
+                        "subtype": "test.colorType1"
+                    },
+                    {
+                        "name": "Some Test Attribute5",
+                        "type": "Color",
+                        "subtype": "test.colorType1"
+                    }
+                ],
+                "attributeSupportInfo": {
+                    "Some Test Attribute1": ["{99e9eded-70c5-4455-a69a-7820c9b60e53}"],
+                    "Some Test Attribute2": ["{99e9eded-70c5-4455-a69a-7820c9b60e53}"],
+                    "Some Test Attribute3": ["{99e9eded-70c5-4455-a69a-7820c9b60e53}"]
+                },
+                "scopes": [
+                    {
+                        "engineId": "{99e9eded-70c5-4455-a69a-7820c9b60e53}",
+                        "group": "test.group4",
+                        "provider": "test.provider4"
+                    }
+                ]
+            }
+        }
+    }
+}

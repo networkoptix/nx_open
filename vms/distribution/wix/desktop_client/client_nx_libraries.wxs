@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <ComponentGroup Id="client_nx_libraries" Source="${bin_source_dir}" Directory="InstallDirRoot">
+            <Component><File Name="nx_vms_client_desktop.dll" KeyPath="yes"/></Component>
+            <Component><File Name="nx_vms_applauncher_api.dll" KeyPath="yes"/></Component>
+            <Component><File Name="vms_gateway_core.dll" KeyPath="yes"/></Component>
+            <Component><File Name="qtkeychain.dll" KeyPath="yes"/></Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

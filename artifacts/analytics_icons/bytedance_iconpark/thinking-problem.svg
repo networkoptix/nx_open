@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>thinking-problem</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="thinking-problem">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M15.8333333,8.75 L17.9166667,12.5 L15.8333333,12.9166667 L15.8333333,15.4166667 L14.5833333,15.4166667 L12.0833333,15 L11.6666667,17.9166667 L5.41666667,17.9166667 L4.58333333,13.59125 C3.30032083,12.3761667 2.5,10.6565417 2.5,8.75 C2.5,5.06808333 5.48475,2.08333333 9.16666667,2.08333333 C12.8485833,2.08333333 15.8333333,5.06808333 15.8333333,8.75 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M7.08333333,7.91666667 C7.08333333,6.76608333 8.01608333,5.83333333 9.16666667,5.83333333 C10.31725,5.83333333 11.25,6.76608333 11.25,7.91666667 C11.25,9.06725 10.31725,10 9.16666667,10 L9.16666667,11.25" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="9.16666667" y1="13.75" x2="9.16666667" y2="14.1666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

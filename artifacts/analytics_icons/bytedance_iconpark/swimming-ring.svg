@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>swimming-ring</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="swimming-ring">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M11.6666667,13.8199583 C12.627875,13.4 13.4,12.627875 13.8199583,11.6666667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <path d="M6.18,11.6666667 C6.6,12.627875 7.372125,13.4 8.33329167,13.8199583" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <path d="M8.33329167,6.18004167 C7.372125,6.6 6.6,7.372125 6.18,8.33333333" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <path d="M11.6666667,6.18004167 C12.627875,6.6 13.4,7.372125 13.8199583,8.33333333" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <path d="M12.5,17.07325 C14.6310417,16.3200417 16.3200417,14.6310417 17.07325,12.5" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <path d="M2.9267875,12.5 C3.68,14.6310417 5.369,16.3200417 7.50004167,17.07325" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <path d="M7.50004167,2.9267625 C5.369,3.679975 3.68,5.36895833 2.9267875,7.5" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <path d="M12.5,2.9267625 C14.6310417,3.679975 16.3200417,5.36895833 17.07325,7.5" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="11.25 7.08333333 8.75 7.08333333 7.5 2.91666667 8.33333333 1.66666667 11.6666667 1.66666667 12.5 2.91666667"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="7.08333333 8.75 7.08333333 11.25 2.91666667 12.5 1.66666667 11.6666667 1.66666667 8.33333333 2.91666667 7.5"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="8.75 12.9166667 11.25 12.9166667 12.5 17.0833333 11.6666667 18.3333333 8.33333333 18.3333333 7.5 17.0833333"></polygon>
+            <path d="M12.9166667,11.25 L12.9166667,8.75 L17.0833333,7.5 C17.5333333,7.83333333 17.8833333,8 18.3333333,8.33333333 L18.3333333,11.6666667 C17.8833333,12 17.5333333,12.1666667 17.0833333,12.5 L12.9166667,11.25 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

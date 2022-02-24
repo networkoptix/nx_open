@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>entertainment</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="entertainment">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" points="20 0 0 0 0 20 20 20"></polygon>
+            <path d="M6.66666667,10 C8.96783333,10 10.8333333,8.1345 10.8333333,5.83333333 C10.8333333,3.53214583 8.96783333,1.66666667 6.66666667,1.66666667 C4.3655,1.66666667 2.5,3.53214583 2.5,5.83333333 C2.5,8.1345 4.3655,10 6.66666667,10 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M10.8333333,6.33416667 C10.8393333,6.340125 12.8012083,8.80733333 16.719,13.7356667 C16.85675,13.90125 16.845625,14.1445 16.6933333,14.2968333 L14.991875,15.9982917 C14.8395833,16.1505833 14.5962917,16.1617083 14.43075,16.0239583 L7.42591667,10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="11.0291667" y1="10.195875" x2="12.2076667" y2="11.374375" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M7.08333333,18.3693333 C7.88191667,17.328375 8.85283333,16.807875 9.99608333,16.807875 C11.7109583,16.807875 13.7345417,18.962375 15.4609583,18.6658333 C17.1873333,18.3693333 17.6814583,16.6666667 16.6187917,15.7239583" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

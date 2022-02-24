@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>shake</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="shake">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(1.666667, 2.500000)" stroke="#A5B7C0" stroke-linejoin="round">
+                <polyline id="Path" stroke-linecap="round" points="0 1.66666667 1.66666667 3.61111111 0 5.55555554 1.66666667 7.5 0 9.44444446 1.66666667 11.3888889 0 13.3333333"></polyline>
+                <polyline id="Path" stroke-linecap="round" transform="translate(15.833333, 7.500000) scale(-1, 1) translate(-15.833333, -7.500000) " points="15 1.66666667 16.6666667 3.61111111 15 5.55555554 16.6666667 7.5 15 9.44444446 16.6666667 11.3888889 15 13.3333333"></polyline>
+                <rect id="Rectangle" x="4.16666667" y="0" width="8.33333333" height="15"></rect>
+                <line x1="7.5" y1="12.0833333" x2="9.16666667" y2="12.0833333" id="Path" stroke-linecap="round"></line>
+            </g>
+        </g>
+    </g>
+</svg>

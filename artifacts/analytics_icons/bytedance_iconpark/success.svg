@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>success</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="success">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="10 1.66666667 12.188875 3.26335 14.8982083 3.25819167 15.7305417 5.83654167 17.9254583 7.424875 17.0833333 10 17.9254583 12.575125 15.7305417 14.1634583 14.8982083 16.7417917 12.188875 16.7366667 10 18.3333333 7.811125 16.7366667 5.10179167 16.7417917 4.26945833 14.1634583 2.07452917 12.575125 2.91666667 10 2.07452917 7.424875 4.26945833 5.83654167 5.10179167 3.25819167 7.811125 3.26335"></polygon>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="7.08333333 10 9.16666667 12.0833333 13.3333333 7.91666667"></polyline>
+        </g>
+    </g>
+</svg>

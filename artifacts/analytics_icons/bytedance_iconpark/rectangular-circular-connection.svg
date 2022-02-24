@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>rectangular-circular-connection</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="rectangular-circular-connection">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M5,7.91666667 C6.38070833,7.91666667 7.5,6.797375 7.5,5.41666667 C7.5,4.03595417 6.38070833,2.91666667 5,2.91666667 C3.6192875,2.91666667 2.5,4.03595417 2.5,5.41666667 C2.5,6.797375 3.6192875,7.91666667 5,7.91666667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linejoin="round" x="2.91666667" y="12.9166667" width="4.16666667" height="4.16666667"></rect>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="10.7 5.41666667 17.5 5.41666667 17.5 15 10.4166667 15"></polyline>
+        </g>
+    </g>
+</svg>

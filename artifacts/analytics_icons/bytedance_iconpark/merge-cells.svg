@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>merge-cells</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="merge-cells">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M8.33333333,5.83333333 L8.33333333,2.08333333 C8.33333333,1.85321667 8.14679167,1.66666667 7.91666667,1.66666667 L2.08333333,1.66666667 C1.85321667,1.66666667 1.66666667,1.85321667 1.66666667,2.08333333 L1.66666667,17.9166667 C1.66666667,18.1467917 1.85321667,18.3333333 2.08333333,18.3333333 L7.91666667,18.3333333 C8.14679167,18.3333333 8.33333333,18.1467917 8.33333333,17.9166667 L8.33333333,14.1666667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <path d="M11.6666667,14.1666667 L11.6666667,17.9166667 C11.6666667,18.1467917 11.8532083,18.3333333 12.0833333,18.3333333 L17.9166667,18.3333333 C18.1467917,18.3333333 18.3333333,18.1467917 18.3333333,17.9166667 L18.3333333,2.08333333 C18.3333333,1.85321667 18.1467917,1.66666667 17.9166667,1.66666667 L12.0833333,1.66666667 C11.8532083,1.66666667 11.6666667,1.85321667 11.6666667,2.08333333 L11.6666667,5.83333333" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <line x1="11.6666667" y1="10" x2="18.3333333" y2="10" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="2.08333333" y1="10" x2="8.33333333" y2="10" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="13.6452083 12.007625 12.9822917 11.34475 11.6565 10.0189167 12.9822917 8.69308333 13.6452083 8.03016667"></polyline>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="6.40625 12.007625 7.06916667 11.34475 8.395 10.0189167 7.06916667 8.69308333 6.40625 8.03016667"></polyline>
+        </g>
+    </g>
+</svg>

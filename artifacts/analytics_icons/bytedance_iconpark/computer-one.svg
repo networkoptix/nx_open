@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>computer-one</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="computer-one">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M4.16666667,2.5 C4.16666667,2.0397625 4.53975,1.66666667 5,1.66666667 L15,1.66666667 C15.46025,1.66666667 15.8333333,2.0397625 15.8333333,2.5 L15.8333333,17.5 C15.8333333,17.96025 15.46025,18.3333333 15,18.3333333 L5,18.3333333 C4.53975,18.3333333 4.16666667,17.96025 4.16666667,17.5 L4.16666667,2.5 Z" id="Path" stroke="#A5B7C0"></path>
+            <line x1="7.08333333" y1="5" x2="12.9166667" y2="5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <circle id="Oval" fill="#A5B7C0" fill-rule="nonzero" cx="7.08333333" cy="8.75" r="1"></circle>
+            <circle id="Oval" fill="#A5B7C0" fill-rule="nonzero" cx="7.08333333" cy="11.25" r="1"></circle>
+            <circle id="Oval" fill="#A5B7C0" fill-rule="nonzero" cx="7.08333333" cy="13.75" r="1"></circle>
+            <circle id="Oval" fill="#A5B7C0" fill-rule="nonzero" cx="10" cy="8.75" r="1"></circle>
+            <circle id="Oval" fill="#A5B7C0" fill-rule="nonzero" cx="10" cy="11.25" r="1"></circle>
+            <circle id="Oval" fill="#A5B7C0" fill-rule="nonzero" cx="10" cy="13.75" r="1"></circle>
+            <circle id="Oval" fill="#A5B7C0" fill-rule="nonzero" cx="12.9166667" cy="8.75" r="1"></circle>
+            <circle id="Oval" fill="#A5B7C0" fill-rule="nonzero" cx="12.9166667" cy="11.25" r="1"></circle>
+            <circle id="Oval" fill="#A5B7C0" fill-rule="nonzero" cx="12.9166667" cy="13.75" r="1"></circle>
+        </g>
+    </g>
+</svg>

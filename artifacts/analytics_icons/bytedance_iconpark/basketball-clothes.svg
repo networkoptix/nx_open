@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>basketball-clothes</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="basketball-clothes">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M12.5,1.66666667 C12.5,3.04737917 11.3807083,4.16666667 10,4.16666667 C8.61929167,4.16666667 7.5,3.04737917 7.5,1.66666667 L6.25,1.66666667 C5.78975,1.66666667 5.41566667,2.039225 5.403375,2.4993 C5.37479167,3.57097917 5.28454167,5.39633333 5,6.25 C4.682875,7.20133333 3.40042917,8.394 2.80567083,8.909625 C2.61439167,9.07545833 2.5,9.31404167 2.5,9.56720833 L2.5,17.5 C2.5,17.96025 2.87309583,18.3333333 3.33333333,18.3333333 L16.6666667,18.3333333 C17.1269167,18.3333333 17.5,17.96025 17.5,17.5 L17.5,9.56720833 C17.5,9.31404167 17.385625,9.07545833 17.1943333,8.909625 C16.5995833,8.394 15.317125,7.20133333 15,6.25 C14.7154583,5.39633333 14.6252083,3.57097917 14.596625,2.4993 C14.5843333,2.039225 14.21025,1.66666667 13.75,1.66666667 L12.5,1.66666667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linejoin="round" x="11.25" y="10" width="2.5" height="5"></rect>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="6.25 10 8.75 10 8.75 15 6.25 15"></polyline>
+            <line x1="8.75" y1="12.5" x2="6.25" y2="12.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

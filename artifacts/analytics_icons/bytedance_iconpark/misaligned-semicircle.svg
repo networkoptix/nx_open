@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>misaligned-semicircle</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="misaligned-semicircle">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M8.33333333,12.5 C5.57191667,12.5 3.33333333,10.2614167 3.33333333,7.5 C3.33333333,4.73858333 5.57191667,2.5 8.33333333,2.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M8.33333333,9.16666667 C7.412875,9.16666667 6.66666667,8.42045833 6.66666667,7.5 C6.66666667,6.57954167 7.412875,5.83333333 8.33333333,5.83333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M11.6666667,14.1666667 C12.587125,14.1666667 13.3333333,13.4204583 13.3333333,12.5 C13.3333333,11.5795417 12.587125,10.8333333 11.6666667,10.8333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M11.6666667,17.5 C14.4280833,17.5 16.6666667,15.2614167 16.6666667,12.5 C16.6666667,9.73858333 14.4280833,7.5 11.6666667,7.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

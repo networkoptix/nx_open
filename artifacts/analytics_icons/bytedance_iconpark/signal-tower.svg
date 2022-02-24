@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>signal-tower</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="signal-tower">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M7.11720833,2.49999583 C4.56720833,4.28554167 3.9474625,7.80016667 5.733,10.3502083 C7.51854167,12.9002083 11.0331667,13.5199167 13.5832083,11.734375 L7.11720833,2.49999583 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="9.16666667" y1="12.9166667" x2="9.16666667" y2="17.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="5.41666667 10.2083333 2.5 17.5 17.5 17.5"></polyline>
+            <line x1="16.6666667" y1="2.5" x2="10.4166667" y2="7.08333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M17.4607917,2.75267083 C17.6003333,2.31409583 17.3579167,1.84544167 16.9193333,1.70589583 C16.48075,1.56635 16.012125,1.80875833 15.8725833,2.24732917 L17.4607917,2.75267083 Z M12.9559167,11.414 C12.8163333,11.8525833 13.05875,12.3212083 13.4973333,12.4607917 C13.9359167,12.6003333 14.4045417,12.3579167 14.544125,11.9193333 L12.9559167,11.414 Z M15.8725833,2.24732917 L12.9559167,11.414 L14.544125,11.9193333 L17.4607917,2.75267083 L15.8725833,2.24732917 Z" id="Shape" fill="#A5B7C0" fill-rule="nonzero"></path>
+            <path d="M7.08333333,1.66666667 C6.62308333,1.66666667 6.25,2.0397625 6.25,2.5 C6.25,2.9602375 6.62308333,3.33333333 7.08333333,3.33333333 L7.08333333,1.66666667 Z M16.6666667,3.33333333 C17.1269167,3.33333333 17.5,2.9602375 17.5,2.5 C17.5,2.0397625 17.1269167,1.66666667 16.6666667,1.66666667 L16.6666667,3.33333333 Z M7.08333333,3.33333333 L16.6666667,3.33333333 L16.6666667,1.66666667 L7.08333333,1.66666667 L7.08333333,3.33333333 Z" id="Shape" fill="#A5B7C0" fill-rule="nonzero"></path>
+        </g>
+    </g>
+</svg>

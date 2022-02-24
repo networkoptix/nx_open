@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>concept-sharing</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="concept-sharing">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M11.8195417,15 L10,15 L6.25,12.9331667 L1.67032917,14.6174167 L2.92111667,17.0940417 L5.86804167,15.8637083 C8.625,17.510125 10.303,18.3333333 10.902125,18.3333333 C11.50125,18.3333333 13.9782917,17.22225 18.3333333,15" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M12.080125,11.2449167 C12.080125,10.0404167 12.080125,9.39175 12.080125,9.29879167 C12.5384583,9.10875 13.1395833,8.83041667 13.485,8.485 C14.1635833,7.806375 14.5833333,6.868875 14.5833333,5.83333333 C14.5833333,3.76226667 12.9044167,2.08333333 10.8333333,2.08333333 C8.76225,2.08333333 7.08333333,3.76226667 7.08333333,5.83333333 C7.08333333,6.868875 7.50308333,7.806375 8.18166667,8.485 C8.52708333,8.83041667 9.125,9.10875 9.58333333,9.29879167 C9.58566667,9.43854167 9.58566667,10.08725 9.58333333,11.2449167 L12.080125,11.2449167 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <line x1="5" y1="8.75" x2="5.41666667" y2="8.33333333" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="16.6666667" y1="8.75" x2="16.25" y2="8.33333333" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="6.25" y1="2.08333333" x2="5.83333333" y2="1.66666667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="15.4166667" y1="2.08333333" x2="15.8333333" y2="1.66666667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="17.0833333" y1="5" x2="16.6666667" y2="5" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="5" y1="5" x2="4.58333333" y2="5" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+        </g>
+    </g>
+</svg>

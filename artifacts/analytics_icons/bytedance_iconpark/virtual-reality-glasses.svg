@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>virtual-reality-glasses</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="virtual-reality-glasses">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M2.08333333,6.66666667 L17.9166667,6.66666667 C18.1467917,6.66666667 18.3333333,6.85320833 18.3333333,7.08333333 L18.3333333,16.25 C18.3333333,16.480125 18.1467917,16.6666667 17.9166667,16.6666667 L12.5,16.6666667 L10.0034583,14.1672083 L7.5,16.6666667 L2.08333333,16.6666667 C1.85321667,16.6666667 1.66666667,16.480125 1.66666667,16.25 L1.66666667,7.08333333 C1.66666667,6.85320833 1.85321667,6.66666667 2.08333333,6.66666667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M5.83333333,13.3333333 C6.75379167,13.3333333 7.5,12.587125 7.5,11.6666667 C7.5,10.7462083 6.75379167,10 5.83333333,10 C4.912875,10 4.16666667,10.7462083 4.16666667,11.6666667 C4.16666667,12.587125 4.912875,13.3333333 5.83333333,13.3333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M14.1666667,13.3333333 C15.087125,13.3333333 15.8333333,12.587125 15.8333333,11.6666667 C15.8333333,10.7462083 15.087125,10 14.1666667,10 C13.2462083,10 12.5,10.7462083 12.5,11.6666667 C12.5,12.587125 13.2462083,13.3333333 14.1666667,13.3333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M2.5,4.16666667 L17.5,4.16666667 L2.5,4.16666667 Z" id="Path"></path>
+            <line x1="2.5" y1="4.16666667" x2="17.5" y2="4.16666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

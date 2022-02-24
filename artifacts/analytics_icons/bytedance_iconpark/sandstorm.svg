@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>sandstorm</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="sandstorm">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M1.66666667,9.16666667 L15,9.16666667 C16.8409583,9.16666667 18.3333333,7.67429167 18.3333333,5.83333333 C18.3333333,3.99238333 16.8409583,2.5 15,2.5 C13.1590417,2.5 11.6666667,3.99238333 11.6666667,5.83333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="4.16666667" y1="12.0833333" x2="1.66666667" y2="12.0833333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="11.25" y1="12.0833333" x2="8.75" y2="12.0833333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="18.3333333" y1="12.0833333" x2="15.8333333" y2="12.0833333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="4.16666667" y1="14.5833333" x2="1.66666667" y2="14.5833333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="11.25" y1="14.5833333" x2="8.75" y2="14.5833333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="18.3333333" y1="14.5833333" x2="15.8333333" y2="14.5833333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="6.66666667" y1="17.5" x2="1.66666667" y2="17.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="18.3333333" y1="17.5" x2="13.3333333" y2="17.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

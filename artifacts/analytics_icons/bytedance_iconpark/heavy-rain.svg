@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>heavy-rain</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="heavy-rain">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M3.93939583,12.91425 C2.55934167,11.85875 1.66666667,10.17825 1.66666667,8.28545833 C1.66666667,5.09025 4.2105,2.5 7.3485,2.5 C9.97225,2.5 12.1806667,4.31091667 12.8339583,6.77220833 C13.3480417,6.506625 13.9295833,6.35695833 14.5454583,6.35695833 C16.6374583,6.35695833 18.3333333,8.08379167 18.3333333,10.2139583 C18.3333333,11.7955833 17.3984167,13.1548333 16.060625,13.75" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="6.66666667" y1="11.6666667" x2="6.66666667" y2="15.8333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="10" y1="13.3333333" x2="10" y2="17.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="13.3333333" y1="11.6666667" x2="13.3333333" y2="15.8333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

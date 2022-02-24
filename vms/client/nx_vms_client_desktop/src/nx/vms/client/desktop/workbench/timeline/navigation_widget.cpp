@@ -1,0 +1,372 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+#include "navigation_widget.h"
+
+#include <QtCore/QScopedValueRollback>
+#include <QtWidgets/QAction>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QHBoxLayout>
+
+#include <nx/vms/client/desktop/style/skin.h>
+#include <nx/vms/client/desktop/style/icon.h>
+
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
+
+#include <ui/workbench/workbench_display.h>
+#include <ui/workbench/workbench_navigator.h>
+#include <ui/workbench/workbench_context.h>
+#include <ui/graphics/instruments/instrument_manager.h>
+#include <ui/statistics/modules/controls_statistics_module.h>
+#include <utils/common/event_processors.h>
+
+#include "speed_slider.h"
+#include "clock_label.h"
+
+namespace nx::vms::client::desktop::workbench::timeline {
+
+namespace {
+
+bool paintButtonFunction(QPainter* painter, const QStyleOption* /*option*/, const QWidget* widget)
+{
+    const QPushButton* thisButton = qobject_cast<const QPushButton*>(widget);
+
+    QIcon::Mode mode = QnIcon::Normal;
+
+    if (!thisButton->isEnabled())
+        mode = QnIcon::Disabled;
+    else if (thisButton->isDown())
+        mode = QnIcon::Pressed;
+    else if (thisButton->underMouse())
+        mode = QnIcon::Active;
+
+    thisButton->icon().paint(painter, thisButton->rect(), Qt::AlignCenter,
+        mode, thisButton->isChecked() ? QIcon::On : QIcon::Off);
+
+    return true;
+};
+
+} // namespace
+
+NavigationWidget::NavigationWidget(QnWorkbenchContext* context, QWidget* parent):
+    QWidget(parent),
+    QnWorkbenchContextAware(context),
+    m_speedSlider(new SpeedSlider(context, this)),
+    m_jumpBackwardButton(new CustomPaintedButton(this)),
+    m_stepBackwardButton(new CustomPaintedButton(this)),
+    m_playButton(new CustomPaintedButton(this)),
+    m_stepForwardButton(new CustomPaintedButton(this)),
+    m_jumpForwardButton(new CustomPaintedButton(this))
+{
+    installEventHandler({this}, {QEvent::Resize, QEvent::Move},
+        this, &NavigationWidget::geometryChanged);
+
+    initButton(m_jumpBackwardButton, ui::action::JumpToStartAction,
+        "slider/navigation/rewind_backward.png");
+    initButton(m_stepBackwardButton, ui::action::PreviousFrameAction,
+        "slider/navigation/step_backward.png");
+    initButton(m_playButton, ui::action::PlayPauseAction,
+        "slider/navigation/play.png", "slider/navigation/pause.png");
+    initButton(m_stepForwardButton, ui::action::NextFrameAction,
+        "slider/navigation/step_forward.png");
+    initButton(m_jumpForwardButton, ui::action::JumpToEndAction,
+        "slider/navigation/rewind_forward.png");
+
+    auto mainLayout = new QVBoxLayout();
+    mainLayout->setSpacing(3);
+    setLayout(mainLayout);
+
+    this->context()->statisticsModule()->registerSlider(lit("speed_slider"), m_speedSlider);
+    mainLayout->addWidget(m_speedSlider);
+
+    auto buttonsLayout = new QHBoxLayout();
+    mainLayout->addLayout(buttonsLayout);
+
+    buttonsLayout->setSpacing(1);
+
+    buttonsLayout->addWidget(m_jumpBackwardButton);
+    buttonsLayout->addWidget(m_stepBackwardButton);
+    buttonsLayout->addWidget(m_playButton);
+    buttonsLayout->addWidget(m_stepForwardButton);
+    buttonsLayout->addWidget(m_jumpForwardButton);
+
+    mainLayout->addWidget(new ClockLabel(this));
+
+    /* Set up handlers. */
+    connect(m_speedSlider, &SpeedSlider::roundedSpeedChanged,
+        this, &NavigationWidget::updateNavigatorSpeedFromSpeedSlider);
+    connect(m_speedSlider, &SpeedSlider::wheelMoved, this,
+        [this](bool forwardDirection)
+        {
+            if (forwardDirection)
+                m_stepForwardButton->click();
+            else
+                m_stepBackwardButton->click();
+        });
+
+    connect(action(ui::action::PreviousFrameAction), &QAction::triggered,
+        this, &NavigationWidget::at_stepBackwardButton_clicked);
+    connect(action(ui::action::NextFrameAction), &QAction::triggered,
+        this, &NavigationWidget::at_stepForwardButton_clicked);
+    connect(action(ui::action::JumpToStartAction), &QAction::triggered,
+        navigator(), &QnWorkbenchNavigator::jumpBackward);
+    connect(action(ui::action::JumpToEndAction), &QAction::triggered,
+        navigator(), &QnWorkbenchNavigator::jumpForward);
+    connect(action(ui::action::PlayPauseAction), &QAction::toggled,
+        navigator(), &QnWorkbenchNavigator::setPlaying);
+    connect(action(ui::action::PlayPauseAction), &QAction::toggled,
+        this, &NavigationWidget::updateSpeedSliderParametersFromNavigator);
+    connect(action(ui::action::PlayPauseAction), &QAction::toggled,
+        this, &NavigationWidget::updatePlaybackButtonsIcons);
+
+    /* Play button is not synced with the actual playing state, so we update it only when current widget changes. */
+    connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,
+        this, &NavigationWidget::updatePlayButtonChecked, Qt::QueuedConnection);
+
+    connect(navigator(), &QnWorkbenchNavigator::currentWidgetAboutToBeChanged,
+        m_speedSlider, &SpeedSlider::finishAnimations);
+
+    connect(navigator(), &QnWorkbenchNavigator::currentWidgetChanged,
+        this, &NavigationWidget::updateJumpButtonsTooltips);
+    connect(navigator(), &QnWorkbenchNavigator::liveChanged,
+        this, &NavigationWidget::updatePlaybackButtonsEnabled);
+    connect(navigator(), &QnWorkbenchNavigator::playingSupportedChanged,
+        this, &NavigationWidget::updatePlaybackButtonsEnabled);
+    connect(navigator(), &QnWorkbenchNavigator::hasArchiveChanged,
+        this, &NavigationWidget::updatePlaybackButtonsEnabled);
+    connect(navigator(), &QnWorkbenchNavigator::timelineRelevancyChanged,
+        this, &NavigationWidget::updatePlaybackButtonsEnabled);
+    connect(navigator(), &QnWorkbenchNavigator::speedChanged,
+        this, &NavigationWidget::updateSpeedSliderSpeedFromNavigator);
+    connect(navigator(), &QnWorkbenchNavigator::speedRangeChanged,
+        this, &NavigationWidget::updateSpeedSliderParametersFromNavigator);
+    connect(navigator(), &QnWorkbenchNavigator::hasArchiveChanged,
+        this, &NavigationWidget::updateSpeedSliderParametersFromNavigator);
+
+    updatePlaybackButtonsEnabled();
+    updatePlaybackButtonsIcons();
+    updateSpeedSliderParametersFromNavigator();
+    updateSpeedSliderSpeedFromNavigator();
+}
+
+void NavigationWidget::setTooltipsVisible(bool enabled)
+{
+    m_speedSlider->setTooltipsVisible(enabled);
+}
+
+void NavigationWidget::initButton(
+    CustomPaintedButton* button,
+    ui::action::IDType actionType,
+    const QString& iconPath,
+    const QString& checkedIconPath)
+{
+    const bool isCheckable = !checkedIconPath.isEmpty();
+    QAction* buttonAction = action(actionType);
+
+    button->setCustomPaintFunction(paintButtonFunction);
+    button->setIcon(isCheckable
+        ? qnSkin->icon(iconPath, checkedIconPath)
+        : qnSkin->icon(iconPath));
+    button->setFixedSize({32, 32});
+    button->setToolTip(buttonAction->toolTip());
+    button->setCheckable(isCheckable);
+    button->setObjectName(buttonAction->text());
+
+    if (isCheckable)
+    {
+        connect(button, &QPushButton::toggled, buttonAction, &QAction::setChecked);
+        connect(
+            buttonAction,
+            &QAction::toggled,
+            [button, buttonAction](bool isChecked)
+            {
+                button->setChecked(isChecked);
+                button->setToolTip(buttonAction->toolTip());
+            }
+        );
+    }
+    else
+    {
+        connect(button, &QPushButton::clicked, buttonAction, &QAction::trigger);
+    }
+}
+
+void NavigationWidget::updatePlaybackButtonsIcons()
+{
+    bool playing = m_playButton->isChecked();
+
+    action(ui::action::PreviousFrameAction)->setText(playing ? tr("Speed Down") : tr("Previous Frame"));
+    m_stepBackwardButton->setToolTip(action(ui::action::PreviousFrameAction)->toolTip());
+    action(ui::action::NextFrameAction)->setText(playing ? tr("Speed Up") : tr("Next Frame"));
+    m_stepForwardButton->setToolTip(action(ui::action::NextFrameAction)->toolTip());
+
+    m_stepBackwardButton->setIcon(playing
+        ? qnSkin->icon("slider/navigation/backward.png")
+        : qnSkin->icon("slider/navigation/step_backward.png"));
+    m_stepForwardButton->setIcon(playing
+        ? qnSkin->icon("slider/navigation/forward.png")
+        : qnSkin->icon("slider/navigation/step_forward.png"));
+
+    // TODO: #sivanov Remove this once buttonwidget <-> action enabled sync is implemented. OR when
+    // we disable actions and not buttons.
+    updatePlaybackButtonsEnabled();
+}
+
+void NavigationWidget::updatePlaybackButtonsEnabled()
+{
+    /*
+     * Method logic: enable the following buttons if current widget is:
+     * - local image: no buttons
+     * - local audio file or exported audio: play/pause, jump forward and backward
+     * - local video file or exported video: all buttons
+     * - camera: play button and:
+     * - - if has footage: jump backward, step backward
+     * - - if NOT on the live (has footage by default): jump forward, step forward
+     * - I/O module: play button and:
+     * - - if has footage: jump backward
+     * - - if NOT on the live (has footage by default): jump forward
+     */
+
+    /* If not playable, it is a local image, all buttons must be disabled. */
+    bool playable = navigator()->isPlayingSupported();
+
+    /* Makes sense only for cameras. Local files are never live. */
+    bool forwardable = !navigator()->isLive();
+
+    /* Side effects are Evil! */
+    bool isLocalFile = !navigator()->isLiveSupported();
+
+    /* Will return true if there is at least one camera with archive on the scene, even is local file is selected. */
+    bool hasCameraFootage = navigator()->hasArchive();
+
+    /* Check if current widget has real video (not image, not audio file, not I/O module). */
+    bool hasVideo = navigator()->currentWidgetHasVideo();
+
+    /* All options except local image. */
+    m_playButton->setEnabled(playable);
+
+    /* Local/exported video, camera with footage. */
+    bool canStepBackwardOrSpeedDown = playable && (hasCameraFootage || isLocalFile ) && hasVideo;
+    m_stepBackwardButton->setEnabled(canStepBackwardOrSpeedDown);
+
+    /* Local/exported video, camera with footage but not on live. */
+    bool canStepForwardOrSpeedUp = playable && ((hasCameraFootage && forwardable) || isLocalFile) && hasVideo;
+    m_stepForwardButton->setEnabled(canStepForwardOrSpeedUp);
+
+    /* Local/exported file (not image), camera or I/O module with footage. */
+    bool canJumpBackward = playable && (hasCameraFootage || isLocalFile);
+    m_jumpBackwardButton->setEnabled(canJumpBackward);
+
+    /* Local/exported file (not image), camera or I/O module with footage but not on live. */
+    bool canJumpForward = playable && ((hasCameraFootage && forwardable) || isLocalFile);
+    m_jumpForwardButton->setEnabled(canJumpForward);
+
+    /*
+     * For now, there is a bug when I/O module is placed on the scene together with camera (synced).
+     * If we select camera, we can change speed to -16x, but when we select I/O module,
+     * client will be in strange state: speed slider allows only 0x and 1x, but current speed is -16x.
+     * So we making the slider enabled for I/O module to do not make the situation even stranger.
+     */
+    m_speedSlider->setEnabled(playable && navigator()->isTimelineRelevant());
+}
+
+void NavigationWidget::updateJumpButtonsTooltips()
+{
+    bool hasPeriods = navigator()->currentWidgetFlags() & QnWorkbenchNavigator::WidgetSupportsPeriods;
+
+    action(ui::action::JumpToStartAction)->setText(hasPeriods ? tr("Previous Chunk") : tr("To Start"));
+    m_jumpBackwardButton->setToolTip(action(ui::action::JumpToStartAction)->toolTip());
+    action(ui::action::JumpToEndAction)->setText(hasPeriods ? tr("Next Chunk") : tr("To End"));
+    m_jumpForwardButton->setToolTip(action(ui::action::JumpToEndAction)->toolTip());
+
+    // TODO: #sivanov Remove this once buttonwidget <-> action enabled sync is implemented. OR when
+    // we disable actions and not buttons.
+    updatePlaybackButtonsEnabled();
+}
+
+void NavigationWidget::updatePlayButtonChecked()
+{
+    m_playButton->setChecked(navigator()->isPlaying());
+}
+
+void NavigationWidget::updateNavigatorSpeedFromSpeedSlider()
+{
+    if (m_updatingSpeedSliderFromNavigator)
+        return;
+
+    QScopedValueRollback<bool> guard(m_updatingNavigatorFromSpeedSlider, true);
+    navigator()->setSpeed(m_speedSlider->roundedSpeed());
+}
+
+void NavigationWidget::updateSpeedSliderSpeedFromNavigator()
+{
+    if (m_updatingNavigatorFromSpeedSlider)
+        return;
+
+    QScopedValueRollback<bool> guard(m_updatingSpeedSliderFromNavigator, true);
+    m_speedSlider->setSpeed(navigator()->speed());
+    updatePlayButtonChecked();
+}
+
+void NavigationWidget::updateSpeedSliderParametersFromNavigator()
+{
+    qreal minimalSpeed = navigator()->minimalSpeed();
+    qreal maximalSpeed = navigator()->maximalSpeed();
+
+    qreal speedStep, defaultSpeed;
+    if (m_playButton->isChecked())
+    {
+        speedStep = 1.0;
+        defaultSpeed = 1.0;
+    }
+    else
+    {
+        speedStep = 0.25;
+        defaultSpeed = 0.0;
+        maximalSpeed = qMin(qMax(1.0, maximalSpeed * speedStep), maximalSpeed);
+        minimalSpeed = qMax(qMin(-1.0, minimalSpeed * speedStep), minimalSpeed);
+    }
+
+    /* The calls that follow may change speed */
+    QScopedValueRollback<bool> guard(m_updatingSpeedSliderFromNavigator, true);
+
+    m_speedSlider->setSpeedRange(minimalSpeed, maximalSpeed);
+    m_speedSlider->setMinimalSpeedStep(speedStep);
+    m_speedSlider->setDefaultSpeed(defaultSpeed);
+}
+
+void NavigationWidget::at_stepBackwardButton_clicked()
+{
+    if (!m_stepBackwardButton->isEnabled())
+        return;
+
+    if (m_playButton->isChecked())
+    {
+        m_speedSlider->speedDown();
+        if (qFuzzyIsNull(m_speedSlider->speed()))
+            m_speedSlider->speedDown(); /* Skip 'pause'. */
+    }
+    else
+    {
+        navigator()->stepBackward();
+    }
+}
+
+void NavigationWidget::at_stepForwardButton_clicked()
+{
+    if (!m_stepForwardButton->isEnabled())
+        return;
+
+    if (m_playButton->isChecked())
+    {
+        m_speedSlider->speedUp();
+        if (qFuzzyIsNull(m_speedSlider->speed()))
+            m_speedSlider->speedUp(); /* Skip 'pause'. */
+    }
+    else
+    {
+        navigator()->stepForward();
+    }
+}
+
+} // nx::vms::client::desktop::workbench::timeline

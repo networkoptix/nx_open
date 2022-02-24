@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>road</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="road">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(2.500000, 2.121610)" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="2.08333333" y1="0.378390267" x2="0" y2="15.3783903" id="Path"></line>
+                <line x1="14.9851547" y1="0.378390267" x2="12.9166669" y2="15.3597393" id="Path" transform="translate(13.950911, 7.869065) scale(-1, 1) translate(-13.950911, -7.869065) "></line>
+                <line x1="7.5" y1="0.378390267" x2="7.5" y2="2.87839027" id="Path"></line>
+                <line x1="7.5" y1="12.4617236" x2="7.5" y2="15.3783902" id="Path"></line>
+                <line x1="7.5" y1="6.21172358" x2="7.5" y2="9.12839025" id="Path"></line>
+            </g>
+        </g>
+    </g>
+</svg>

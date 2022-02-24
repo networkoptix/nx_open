@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>mind-mapping</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="mind-mapping">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M3.33333333,11.6666667 C4.25379167,11.6666667 5,10.9204583 5,10 C5,9.07954167 4.25379167,8.33333333 3.33333333,8.33333333 C2.41285833,8.33333333 1.66666667,9.07954167 1.66666667,10 C1.66666667,10.9204583 2.41285833,11.6666667 3.33333333,11.6666667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M17.5,3.33333333 C17.96025,3.33333333 18.3333333,2.9602375 18.3333333,2.5 C18.3333333,2.0397625 17.96025,1.66666667 17.5,1.66666667 C17.03975,1.66666667 16.6666667,2.0397625 16.6666667,2.5 C16.6666667,2.9602375 17.03975,3.33333333 17.5,3.33333333 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M17.5,10.8333333 C17.96025,10.8333333 18.3333333,10.46025 18.3333333,10 C18.3333333,9.53975 17.96025,9.16666667 17.5,9.16666667 C17.03975,9.16666667 16.6666667,9.53975 16.6666667,10 C16.6666667,10.46025 17.03975,10.8333333 17.5,10.8333333 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M17.5,18.3333333 C17.96025,18.3333333 18.3333333,17.96025 18.3333333,17.5 C18.3333333,17.03975 17.96025,16.6666667 17.5,16.6666667 C17.03975,16.6666667 16.6666667,17.03975 16.6666667,17.5 C16.6666667,17.96025 17.03975,18.3333333 17.5,18.3333333 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="13.3333333 2.5 8.33333333 2.5 8.33333333 17.5 13.3333333 17.5"></polyline>
+            <line x1="5" y1="10" x2="13.3333333" y2="10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

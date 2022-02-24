@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>towel</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="towel">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="15 7.5 1.66666667 7.5 1.66666667 10.8333333 15 10.8333333"></polygon>
+            <path d="M15,5 L15,13.3333333 C15,14.2537917 14.2537917,15 13.3333333,15 L5,15 M5,15 L3.33333333,15 C2.41285833,15 1.66666667,14.2537917 1.66666667,13.3333333 L1.66666667,3.33333333 C1.66666667,2.41285833 2.41285833,1.66666667 3.33333333,1.66666667 L16.6666667,1.66666667 C17.587125,1.66666667 18.3333333,2.41285833 18.3333333,3.33333333 L18.3333333,16.6666667 C18.3333333,17.5875 17.5875,18.3333333 16.6666667,18.3333333 L6.66666667,18.3333333 C5.74583333,18.3333333 5,17.5875 5,16.6666667 L5,15 Z" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

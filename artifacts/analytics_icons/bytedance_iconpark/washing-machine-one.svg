@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>washing-machine-one</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="washing-machine-one">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <rect id="Rectangle" stroke="#A5B7C0" x="3.33333333" y="1.66666667" width="13.3333333" height="16.6666667" rx="1"></rect>
+            <path d="M3.33333333,5 C3.33333333,5.46025 3.70642917,5.83333333 4.16666667,5.83333333 L15.8333333,5.83333333 C16.2935833,5.83333333 16.6666667,5.46025 16.6666667,5 L16.6666667,2.5 C16.6666667,2.0397625 16.2935833,1.66666667 15.8333333,1.66666667 L4.16666667,1.66666667 C3.70642917,1.66666667 3.33333333,2.0397625 3.33333333,2.5 L3.33333333,5 Z" id="Path" stroke="#A5B7C0"></path>
+            <circle id="Oval" fill="#A5B7C0" fill-rule="nonzero" cx="5.83333333" cy="3.75" r="1"></circle>
+            <circle id="Oval" fill="#A5B7C0" fill-rule="nonzero" cx="8.33333333" cy="3.75" r="1"></circle>
+            <circle id="Oval" stroke="#A5B7C0" cx="10" cy="12.0833333" r="2.91666667"></circle>
+        </g>
+    </g>
+</svg>

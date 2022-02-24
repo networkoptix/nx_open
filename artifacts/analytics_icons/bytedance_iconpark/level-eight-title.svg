@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>level-eight-title</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="level-eight-title">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <line x1="2.5" y1="3.33333333" x2="2.5" y2="16.6666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="10" y1="3.33333333" x2="10" y2="16.6666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="2.91666667" y1="10" x2="9.58333333" y2="10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M15.4166667,12.0833333 C16.337125,12.0833333 17.0833333,11.337125 17.0833333,10.4166667 C17.0833333,9.49620833 16.337125,8.75 15.4166667,8.75 C14.4962083,8.75 13.75,9.49620833 13.75,10.4166667 C13.75,11.337125 14.4962083,12.0833333 15.4166667,12.0833333 Z" id="Path" stroke="#A5B7C0"></path>
+            <path d="M15.4166667,16.6666667 C16.56725,16.6666667 17.5,15.7339167 17.5,14.5833333 C17.5,13.43275 16.56725,12.5 15.4166667,12.5 C14.2660833,12.5 13.3333333,13.43275 13.3333333,14.5833333 C13.3333333,15.7339167 14.2660833,16.6666667 15.4166667,16.6666667 Z" id="Path" stroke="#A5B7C0"></path>
+        </g>
+    </g>
+</svg>

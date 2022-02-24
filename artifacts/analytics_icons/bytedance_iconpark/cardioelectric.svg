@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>cardioelectric</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="cardioelectric">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M2.31445417,9.66416667 C2.23741667,9.50129167 2.1658125,9.33616667 2.10045,9.169 C1.83026667,8.47804167 1.66666667,7.75175 1.66666667,7 C1.66666667,4.51470833 3.7017375,2.5 6.212125,2.5 C7.79316667,2.5 9.18566667,3.29913333 10,4.51166667 C10.8143333,3.29913333 12.2068333,2.5 13.787875,2.5 C16.29825,2.5 18.3333333,4.51470833 18.3333333,7 C18.3333333,10.2352917 15.3030417,13 13.787875,14.5 C12.7777917,15.5 11.5151667,16.5 10,17.5 C8.48483333,16.5 7.22220833,15.5 6.212125,14.5 C6.05958333,14.349 5.89170833,14.1851667 5.71308333,14.0093333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="3.33333333 12.4889167 7.96408333 7.93316667 10.6575417 10.7107917 14.6924583 6.59116667"></polyline>
+        </g>
+    </g>
+</svg>

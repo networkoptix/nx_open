@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>broadcast</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="broadcast">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group-12" transform="translate(1.500000, 4.000000)" stroke="#A5B7C0" stroke-linejoin="round">
+                <ellipse id="Oval" cx="8.33333333" cy="5.87414225" rx="1.8939394" ry="1.88802083"></ellipse>
+                <path d="M5,2.08333333 C2.77777778,4.15440115 2.77777778,7.51226554 5,9.58333333 M11.6666667,9.58333333 C13.8888889,7.51226554 13.8888889,4.15440115 11.6666667,2.08333333" id="Shape" stroke-linecap="round"></path>
+                <path d="M2.44077683,-1.0658141e-14 C-0.813592275,3.2441992 -0.813592275,8.50408533 2.44077683,11.7482845 M14.2258898,11.7482845 C17.480259,8.50408533 17.480259,3.2441992 14.2258898,-1.24344979e-14" id="Shape" stroke-linecap="round"></path>
+            </g>
+        </g>
+    </g>
+</svg>

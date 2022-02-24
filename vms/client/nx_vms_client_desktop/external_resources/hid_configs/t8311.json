@@ -1,0 +1,96 @@
+{
+	"id": "07c0_1131",
+	"manufacturer": "Code Mercenaries",
+	"model": "AXIS T8311",
+	"reportSize": "32",
+	"xAxis":
+	{
+		"bits": "0-7",
+		"min": "0x0",
+		"max": "0xff",
+		"bounce": "5",
+		"sensitivity": "1"
+	},
+	"yAxis":
+	{
+		"bits": "8-15",
+		"min": "0x0",
+		"max": "0xff",
+		"bounce": "5",
+		"sensitivity": "1"
+	},
+	"zAxis":
+	{
+		"bits": "16-23",
+		"min": "0x0",
+		"max": "0xff",
+		"bounce": "5",
+		"sensitivity": "1"
+	},
+	"buttons":
+	[
+		{
+			"bits": "24",
+			"name": "J1",
+			"actions":
+			[
+				{
+					"id": "PtzActivateByHotkeyAction",
+					"parameters": {"hotkey": "1"}
+				}
+			]
+		},
+		{
+			"bits": "25",
+			"name": "J2",
+			"actions":
+			[
+				{
+					"id": "PtzActivateByHotkeyAction",
+					"parameters": {"hotkey": "2"}
+				}
+			]
+		},
+		{
+			"bits": "26",
+			"name": "J3",
+			"actions":
+			[
+				{
+					"id": "PtzActivateByHotkeyAction",
+					"parameters": {"hotkey": "3"}
+				}
+			]
+		},
+		{
+			"bits": "27",
+			"name": "J4",
+			"actions":
+			[
+				{
+					"id": "FullscreenResourceAction"
+				}
+			]
+		},
+		{
+			"bits": "28",
+			"name": "L",
+			"actions":
+			[
+				{
+					"id": "GoToPreviousItemAction"
+				}
+			]
+		},
+		{
+			"bits": "29",
+			"name": "R",
+			"actions":
+			[
+				{
+					"id": "GoToNextItemAction"
+				}
+			]
+		}
+	]
+}

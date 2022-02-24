@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>wheelchair</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="wheelchair">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M12.3424583,14.583375 C11.7874167,16.739875 9.82979167,18.3333333 7.5,18.3333333 C4.73858333,18.3333333 2.5,16.0947917 2.5,13.333375 C2.5,11.3154583 3.69539167,9.57670833 5.41666667,8.78670833" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="7.5 5 8.33333333 12.5 14.5833333 12.0833333 15.8333333 16.6666667 17.0833333 16.6666667"></polyline>
+            <path d="M9.16666667,3.33333333 C9.16666667,4.25379167 8.42045833,5 7.5,5 C6.57954167,5 5.83333333,4.25379167 5.83333333,3.33333333 C5.83333333,2.41285833 6.57954167,1.66666667 7.5,1.66666667 C8.42045833,1.66666667 9.16666667,2.41285833 9.16666667,3.33333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="10.4166667" y1="8.33333333" x2="13.75" y2="8.33333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

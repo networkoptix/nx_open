@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>RewindForWidget</class>
+ <widget class="QWidget" name="RewindForWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>381</width>
+    <height>30</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>30</height>
+   </size>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QCheckBox" name="enabledCheckBox"/>
+   </item>
+   <item>
+    <widget class="QLabel" name="longLabel">
+     <property name="text">
+      <string>Playback time :</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="rewindForLabel">
+     <property name="text">
+      <string>rewind for</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QSpinBox" name="secondsSpinBox">
+     <property name="minimum">
+      <number>1</number>
+     </property>
+     <property name="maximum">
+      <number>300</number>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="liveLabel">
+     <property name="text">
+      <string>Live</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="horizontalSpacer">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>199</width>
+       <height>27</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

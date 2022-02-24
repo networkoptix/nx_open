@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>paper-money-two</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="paper-money-two">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="1.66666667 5.41666667 18.3333333 5.41666667 18.3333333 15.4166667 1.66666667 15.4166667"></polygon>
+            <path d="M1.66666667,8.75 C3.50761667,8.75 5,7.257625 5,5.41666667 L1.66666667,5.41666667 L1.66666667,8.75 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M1.66666667,12.0833333 C3.50761667,12.0833333 5,13.5757083 5,15.4166667 L1.66666667,15.4166667 L1.66666667,12.0833333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M18.3333333,12.0833333 L18.3333333,15.4166667 L15,15.4166667 C15,13.5757083 16.492375,12.0833333 18.3333333,12.0833333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M18.3333333,8.75 C16.492375,8.75 15,7.257625 15,5.41666667 L18.3333333,5.41666667 L18.3333333,8.75 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M10,12.9166667 C11.1505833,12.9166667 12.0833333,11.797375 12.0833333,10.4166667 C12.0833333,9.03595833 11.1505833,7.91666667 10,7.91666667 C8.84941667,7.91666667 7.91666667,9.03595833 7.91666667,10.4166667 C7.91666667,11.797375 8.84941667,12.9166667 10,12.9166667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

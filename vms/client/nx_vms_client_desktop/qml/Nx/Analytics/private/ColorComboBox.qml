@@ -1,0 +1,36 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+import QtQuick 2.14
+
+import Nx 1.0
+import Nx.Controls 1.0
+
+import nx.vms.client.desktop.analytics 1.0 as Analytics
+
+ComboBox
+{
+    id: control
+
+    property Analytics.Attribute attribute
+
+    property var selectedValue
+
+    displayText: Utils.getValue(selectedValue, "")
+    displayedColor: selectedValue !== undefined ? currentValue : "transparent"
+
+    model:
+    {
+        if (!attribute || !attribute.colorType)
+            return []
+
+        return Array.prototype.map.call(attribute.colorType.items,
+            name => ({"name": name, "color": attribute.colorType.color(name)}))
+    }
+
+    withColorSection: true
+    textRole: "name"
+    valueRole: "color"
+
+    onActivated:
+        selectedValue = currentText
+}

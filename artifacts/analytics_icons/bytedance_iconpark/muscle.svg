@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>muscle</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="muscle">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M9.00595881,15 C9.61012548,12.8125 11.7226255,11.25 14.1559588,11.5083333 C16.4726255,11.7541667 18.3142921,13.7083333 18.4309588,16.0333333 C18.4601255,16.6458333 18.3767921,17.2333333 18.1976255,17.7791667 C18.0892921,18.1125 17.7642921,18.3333333 17.4101255,18.3333333 L5.00112548,18.3333333 C2.89764215,18.3333333 1.32000465,16.4089167 1.73252965,14.3462917 L4.26843381,1.66666667 L9.26841715,1.66666667 L10.9350838,4.58333333 L7.36429215,7.1375 L6.35175048,5.83333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="7.36841715" y1="7.1375" x2="9.26845881" y2="14.1666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

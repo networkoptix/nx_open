@@ -1,0 +1,72 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+#pragma once
+
+#include <tuple>
+#include <optional>
+#include <type_traits>
+
+#include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/instrument.h>
+
+#include "media_server_data.h"
+#include "resource_data.h"
+#include "type_traits.h"
+
+namespace nx::vms::api {
+
+/**%apidoc
+ * Storage information object.
+ * %param[opt]:object parameters Storage-specific key-value parameters.
+ */
+struct NX_VMS_API StorageModel: ResourceWithParameters
+{
+    QnUuid id;
+    QnUuid serverId;
+    QString name;
+    QString path;
+
+    /**%apidoc[opt]
+     * Type of the method to access the Storage.
+     *     %value "local"
+     *     %value "network" Manually mounted NAS.
+     *     %value "smb" Auto mounted NAS.
+     */
+    QString type;
+
+    /**%apidoc:integer
+     * Free space to maintain on the Storage, in bytes. Recommended value is 10 gigabytes for local
+     * Storage, and 100 gigabytes for NAS.
+     */
+    std::optional<double> spaceLimitB;
+
+    /**%apidoc[opt] Whether writing to the Storage is allowed. */
+    bool isUsedForWriting = false;
+
+    /**%apidoc[opt] Whether the Storage is used for backup. */
+    bool isBackup = false;
+
+    std::optional<ResourceStatus> status;
+
+    using DbReadTypes = std::tuple<StorageData>;
+    using DbListTypes = std::tuple<StorageDataList>;
+    using DbUpdateTypes =
+        std::tuple<StorageData, std::optional<ResourceStatusData>, ResourceParamWithRefDataList>;
+
+    QnUuid getId() const { return id; }
+    void setId(QnUuid id_) { id = std::move(id_); }
+    static_assert(isCreateModelV<StorageModel>);
+    static_assert(isUpdateModelV<StorageModel>);
+
+    DbUpdateTypes toDbTypes() &&;
+    static std::vector<StorageModel> fromDbTypes(DbListTypes data);
+    static StorageModel fromDb(StorageData data);
+};
+#define StorageModel_Fields \
+    (id)(serverId)(name)(path)(type)(spaceLimitB)(isUsedForWriting)(isBackup)(status)(parameters)
+
+#define StorageModel_Funcs (csv_record)(json)(ubjson)(xml)
+QN_FUSION_DECLARE_FUNCTIONS(StorageModel, StorageModel_Funcs, NX_VMS_API)
+NX_REFLECTION_INSTRUMENT(StorageModel, StorageModel_Fields);
+
+} // namespace nx::vms::api

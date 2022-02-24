@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>magic</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="magic">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(2.083333, 1.666667)" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.4166667,0 L10.4166667,2.5 M14.5414562,1.70854378 L12.7736893,3.47631073 M16.25,5.83333333 L13.75,5.83333333 M14.5414562,9.95812287 L12.7736893,8.19035592 M10.4166667,11.6666667 L10.4166667,9.16666667 M6.29187713,9.95812287 L8.05964408,8.19035592 M4.58333333,5.83333333 L7.08333333,5.83333333 M6.29187713,1.70854378 L8.05964408,3.47631073" id="Shape"></path>
+                <line x1="10.2440777" y1="6.00592233" x2="0.226731615" y2="16.0232684" id="Path"></line>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>shaver</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="shaver">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M8.02915938,8.15545469 C8.14607604,8.03849635 8.33570104,8.03849635 8.45265937,8.15545469 L11.5646594,11.2674547 C11.6816177,11.384413 11.6816177,11.574038 11.5646594,11.6909964 L6.76778438,16.487913 C5.79145104,17.4642047 4.20853438,17.4642047 3.23223438,16.487913 C2.25592188,15.5116214 2.25592188,13.9287047 3.23223438,12.9523714 L8.02915938,8.15545469 Z" id="Path" stroke="#A5B7C0"></path>
+            <path d="M17.111076,9.68012135 C17.2564927,9.53470469 17.2564927,9.29895469 17.111076,9.15353802 L10.566576,2.60905469 C10.4211594,2.46364635 10.1854094,2.46365052 10.0400344,2.60905469 L9.71403438,2.93502969 C7.76140938,4.88766302 7.76140938,8.05345469 9.71403438,10.0060797 C11.6666594,11.9587047 14.8324927,11.9587047 16.7851177,10.0060797 L17.111076,9.68012135 Z" id="Path" stroke="#A5B7C0" fill-rule="nonzero"></path>
+            <line x1="7.65165938" y1="12.0684547" x2="7.06240938" y2="12.6577047" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="10.892576" y1="7.64903802" x2="12.071076" y2="8.82757969" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

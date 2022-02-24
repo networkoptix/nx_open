@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>background-color</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="background-color">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M15.4166667,15.4166667 C16.337125,15.4166667 17.0833333,14.6704583 17.0833333,13.75 C17.0833333,13.1363333 16.5277917,12.303 15.4166667,11.25 C14.3055417,12.303 13.75,13.1363333 13.75,13.75 C13.75,14.6704583 14.4962083,15.4166667 15.4166667,15.4166667 Z" id="Path" fill="#A5B7C0"></path>
+            <line x1="8.68895833" y1="2.29349583" x2="10.1620833" y2="3.7666375" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="9.86741667 3.47200417 3.38562083 9.95383333 8.09966667 14.667875 14.5814583 8.18604167"></polygon>
+            <line x1="5" y1="8.36383333" x2="12.0670833" y2="10.6873333" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="1.66666667" y1="17.9166667" x2="18.3333333" y2="17.9166667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+        </g>
+    </g>
+</svg>

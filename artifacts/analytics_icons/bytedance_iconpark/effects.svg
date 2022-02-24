@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>effects</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="effects">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="10.3960417 17.6501667 12.673375 12.6539583 17.9601667 11.1042083 13.890875 7.404125 14.0440417 1.91974583 9.25170833 4.629125 4.05960417 2.78935417 5.16708333 8.16395833 1.80501667 12.5112917 7.28179167 13.1235833"></polygon>
+            <line x1="15.074" y1="15.022375" x2="18.4073333" y2="18.3407917" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

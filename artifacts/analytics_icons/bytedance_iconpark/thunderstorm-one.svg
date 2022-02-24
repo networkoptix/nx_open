@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>thunderstorm-one</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="thunderstorm-one">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="8.55391667 8.33333333 7.08333333 13.125 9.656875 13.4935833 8.55391667 17.9166667 13.3333333 12.3878333 10.3921667 11.650625 12.5980417 8.33333333"></polygon>
+            <path d="M3.93939583,12.4975833 C2.55934167,11.4420833 1.66666667,9.76158333 1.66666667,7.86879167 C1.66666667,4.67358333 4.2105,2.08333333 7.3485,2.08333333 C9.97225,2.08333333 12.1806667,3.89424167 12.8339583,6.35554167 C13.3480417,6.08995833 13.9295833,5.94029167 14.5454583,5.94029167 C16.6374583,5.94029167 18.3333333,7.667125 18.3333333,9.79729167 C18.3333333,11.3789167 17.3984167,12.7381667 16.060625,13.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

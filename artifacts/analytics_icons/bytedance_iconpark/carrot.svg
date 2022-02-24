@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>carrot</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="carrot">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M6.77216125,8.617625 C6.21582792,6.353125 7.93011958,4.16666667 10.2619946,4.16666667 L10.2619946,4.16666667 C12.5938696,4.16666667 14.3081612,6.353125 13.7518279,8.61766667 L11.6280779,17.26225 C11.4735779,17.8911667 10.9096196,18.3333333 10.2619946,18.3333333 L10.2619946,18.3333333 C9.61436958,18.3333333 9.05041125,17.8911667 8.89591125,17.26225 L6.77216125,8.617625 Z" id="Path" stroke="#A5B7C0"></path>
+            <line x1="10.2619946" y1="1.66666667" x2="10.2619946" y2="3.95833333" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="12.8042029" y1="2.32987917" x2="11.6679112" y2="3.68406667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="7.76199458" y1="2.32989167" x2="8.89828625" y2="3.68407917" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="6.92866125" y1="7.91666667" x2="9.42866125" y2="7.91666667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="10.6786612" y1="10.8333333" x2="13.1786612" y2="10.8333333" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="8.17866125" y1="14.1666667" x2="9.84532792" y2="14.1666667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+        </g>
+    </g>
+</svg>
