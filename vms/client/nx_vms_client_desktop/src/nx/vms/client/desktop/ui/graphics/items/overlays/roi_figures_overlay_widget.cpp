@@ -217,7 +217,7 @@ void RoiFiguresOverlayWidget::Private::paintLabel(
 {
     static constexpr qreal kTopMargin = 3;
     static constexpr qreal kBottomMargin = 4;
-    static const QFont kFigureLabelFont("Roboto", 10, QFont::Medium);
+    static const QFont kFigureLabelFont("Roboto", 12, QFont::Medium);
 
     const auto glWidget = qobject_cast<QOpenGLWidget*>(widget);
 
