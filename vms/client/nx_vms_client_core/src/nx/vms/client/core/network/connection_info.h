@@ -18,4 +18,6 @@ struct ConnectionInfo
     std::optional<QnUuid> expectedServerId;
 };
 
+using OptionalConnectionInfo = std::optional<ConnectionInfo>;
+
 } // namespace nx::vms::client::core

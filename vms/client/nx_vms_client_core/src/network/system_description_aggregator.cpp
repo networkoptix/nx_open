@@ -121,6 +121,8 @@ void QnSystemDescriptionAggregator::mergeSystem(int priority,
         this, &QnSystemDescriptionAggregator::onOnlineStateChanged);
     connect(system, &QnBaseSystemDescription::reachableStateChanged,
         this, &QnBaseSystemDescription::reachableStateChanged);
+    connect(system, &QnBaseSystemDescription::oauthSupportedChanged,
+        this, &QnBaseSystemDescription::oauthSupportedChanged);
 
     updateServers();
     emitSystemChanged();
@@ -396,4 +398,16 @@ QnSystemCompatibility QnSystemDescriptionAggregator::systemCompatibility() const
     }
 
     return QnSystemCompatibility::requireCompatibilityMode;
+}
+
+bool QnSystemDescriptionAggregator::isOauthSupported() const
+{
+    if (isEmptyAggregator())
+        return true;
+
+    return std::all_of(m_systems.begin(), m_systems.end(),
+        [](const QnSystemDescriptionPtr& system)
+        {
+            return system->isOauthSupported();
+        });
 }

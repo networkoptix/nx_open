@@ -53,6 +53,8 @@ public: // overrides
 
     QnSystemCompatibility systemCompatibility() const override;
 
+    virtual bool isOauthSupported() const override;
+
     static QString extractSystemName(const QString& systemName);
 
 public:

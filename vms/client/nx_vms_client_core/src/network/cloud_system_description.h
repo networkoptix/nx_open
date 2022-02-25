@@ -26,6 +26,8 @@ public:
 
     void setOnline(bool online);
 
+    void updateLastKnownVersion(const nx::utils::SoftwareVersion& version);
+
 public: // Overrides
     virtual bool isCloudSystem() const override;
 
@@ -36,6 +38,8 @@ public: // Overrides
     virtual QString ownerAccountEmail() const override;
 
     virtual QString ownerFullName() const override;
+
+    virtual bool isOauthSupported() const override;
 
 private:
     QnCloudSystemDescription(
@@ -49,5 +53,7 @@ private:
 private:
     const QString m_ownerEmail;
     const QString m_ownerFullName;
+    nx::utils::SoftwareVersion m_lastKnownVersion;
+
     bool m_online;
 };

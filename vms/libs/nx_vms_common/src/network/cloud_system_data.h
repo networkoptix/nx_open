@@ -18,6 +18,7 @@ struct NX_VMS_COMMON_API QnCloudSystem
     qreal weight;
     qint64 lastLoginTimeUtcMs;
     bool online = false;
+    std::string newestServerVersion;
 
     bool operator==(const QnCloudSystem &other) const;
 

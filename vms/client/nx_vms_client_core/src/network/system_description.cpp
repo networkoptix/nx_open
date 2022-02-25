@@ -216,6 +216,11 @@ QnSystemCompatibility QnSystemDescription::systemCompatibility() const
     return QnSystemCompatibility::requireCompatibilityMode;
 }
 
+bool QnSystemDescription::isOauthSupported() const
+{
+    return true; //< We suppose that OAuth is supported by default.
+}
+
 void QnSystemDescription::handleReachableServerAdded(const QnUuid& serverId)
 {
     const bool containsAlready = m_reachableServers.contains(serverId);

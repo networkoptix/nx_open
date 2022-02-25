@@ -63,6 +63,8 @@ public: // overrides
 
     QnSystemCompatibility systemCompatibility() const override;
 
+    virtual bool isOauthSupported() const override;
+
 private:
     void emitSystemChanged();
 

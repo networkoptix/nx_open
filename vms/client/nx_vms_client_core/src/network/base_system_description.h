@@ -87,6 +87,8 @@ public:
 
     virtual QnSystemCompatibility systemCompatibility() const = 0;
 
+    virtual bool isOauthSupported() const = 0;
+
 signals:
     void isCloudSystemChanged();
 
@@ -105,4 +107,6 @@ signals:
     void newSystemStateChanged();
 
     void serverChanged(const QnUuid& serverId, QnServerFields flags);
+
+    void oauthSupportedChanged();
 };

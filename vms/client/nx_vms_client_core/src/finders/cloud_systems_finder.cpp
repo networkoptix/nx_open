@@ -158,13 +158,18 @@ void QnCloudSystemsFinder::updateOnlineStateUnsafe(const QnCloudSystemList& targ
     for (const auto system: targetSystems)
     {
         const auto itCurrent = m_systems.find(system.cloudId);
-        if (itCurrent != m_systems.end())
-        {
-            const auto systemDescription = itCurrent.value();
-            NX_DEBUG(this, "Set online state for the system \"%1\" <%2> to [%3]",
-                systemDescription->name(), systemDescription->id(), system.online);
-            itCurrent.value()->setOnline(system.online);
-        }
+        if (itCurrent == m_systems.end())
+            continue;
+
+        const auto systemDescription = itCurrent.value();
+        NX_DEBUG(this, "Set online state for the system \"%1\" <%2> to [%3]",
+            systemDescription->name(), systemDescription->id(), system.online);
+        systemDescription->setOnline(system.online);
+
+        NX_DEBUG(this, "Update last known system version for the system \"%1\" <%2> to [%3]",
+            systemDescription->name(), systemDescription->id(), system.newestServerVersion);
+        const auto version = nx::utils::SoftwareVersion(system.newestServerVersion);
+        systemDescription->updateLastKnownVersion(version);
     }
 }
 
