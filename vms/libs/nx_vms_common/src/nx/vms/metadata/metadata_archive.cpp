@@ -587,4 +587,9 @@ int MetadataArchive::getChannel() const
     return m_channel;
 }
 
+QString MetadataArchive::physicalId() const
+{
+    return m_physicalId;
+}
+
 } // namespace nx::vms::metadata

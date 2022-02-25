@@ -16,6 +16,8 @@
 
 using namespace nx::core;
 
+const QString QnTourPtzController::kTourPropertyName = "ptzTours";
+
 bool deserialize(const QString& /*value*/, QnPtzTourHash* /*target*/)
 {
     NX_ASSERT(0, "Not implemented");
@@ -28,7 +30,7 @@ QnTourPtzController::QnTourPtzController(
     QThread* executorThread)
     :
     base_type(baseController),
-    m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzTourHash>("ptzTours", QnPtzTourHash(), this)),
+    m_adaptor(new QnJsonResourcePropertyAdaptor<QnPtzTourHash>(kTourPropertyName, QnPtzTourHash(), this)),
     m_executor(new QnTourPtzExecutor(baseController, threadPool))
 {
     NX_ASSERT(!baseController->hasCapabilities(Ptz::AsynchronousPtzCapability));
