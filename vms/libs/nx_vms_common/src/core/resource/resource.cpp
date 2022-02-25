@@ -413,8 +413,16 @@ bool QnResource::setProperty(const QString& key, const QString& value, bool mark
         NX_MUTEX_LOCKER lk(&m_mutex);
         if (useLocalProperties())
         {
-            m_locallySavedProperties[key] = value;
-            return false;
+            auto itr = m_locallySavedProperties.find(key);
+            if (itr == m_locallySavedProperties.end())
+            {
+                m_locallySavedProperties.emplace(key, value);
+                return true;
+            }
+            if (value == itr->second)
+                return false;
+            itr->second = value;
+            return true;
         }
     }
 

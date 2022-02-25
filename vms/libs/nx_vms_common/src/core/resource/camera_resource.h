@@ -123,6 +123,14 @@ public:
     void setUserEnabledAnalyticsEngines(const QSet<QnUuid>& engines);
 
     /**
+     * Set ids of Analytics Engines which are explicitly enabled by the user.
+     * This is the same function like 'setUserEnabledAnalyticsEngines' but it returns serialized data instead of storing
+     * it to the resource properties.
+     */
+    nx::vms::api::ResourceParamData serializeUserEnabledAnalyticsEngines(
+        const QSet<QnUuid>& engines);
+
+    /**
      * @return Ids of Analytics Engines which can be potentially used with the Device. Only active
      *     (running on the current server) Engines are included.
      */

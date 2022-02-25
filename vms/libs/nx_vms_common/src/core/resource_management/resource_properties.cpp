@@ -234,6 +234,24 @@ bool QnResourcePropertyDictionary::hasProperty(const QString& key, const QString
     return false;
 }
 
+nx::vms::api::ResourceParamWithRefDataList QnResourcePropertyDictionary::allProperties() const
+{
+    using namespace nx::vms::api;
+    ResourceParamWithRefDataList result;
+
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    for (auto resourceItr = m_items.cbegin(); resourceItr != m_items.cend(); ++resourceItr)
+    {
+        const auto& resProperties = resourceItr.value();
+        for (auto itr = resProperties.begin(); itr != resProperties.end(); ++itr)
+        {
+            result.push_back(ResourceParamWithRefData(
+                resourceItr.key(), itr.key(), itr.value()));
+        }
+    }
+    return result;
+}
+
 namespace
 {
     bool removePropertyFromDictionary(

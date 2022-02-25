@@ -106,6 +106,8 @@ public:
     qint64 maxTime() const;
     int aggregationIntervalSeconds() const;
 
+    QString physicalId() const;
+
     static constexpr quint32 kMinimalDurationMs = 125;
 protected:
     friend struct Index;

@@ -325,9 +325,7 @@ public:
      * Properties are stored in a separate dictionary. If the Resource for some reason has no id
      * set, the properties are stored locally instead.
      *
-     * @return Whether the stored property value has been modified by this call. Used to check if
-     *     saveProperties() should be called afterwards. Always returns `false` for the locally-
-     *     stored properties, as they should never be saved remotely.
+     * @return Whether the stored property value has been modified by this call. Return `true` if property is modified.
      */
     virtual bool setProperty(
         const QString& key,

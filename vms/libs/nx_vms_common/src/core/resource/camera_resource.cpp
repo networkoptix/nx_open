@@ -552,9 +552,17 @@ QSet<QnUuid> QnVirtualCameraResource::userEnabledAnalyticsEngines() const
 
 void QnVirtualCameraResource::setUserEnabledAnalyticsEngines(const QSet<QnUuid>& engines)
 {
-    setProperty(
+    const auto p = serializeUserEnabledAnalyticsEngines(engines);
+    setProperty(p.name, p.value);
+}
+
+nx::vms::api::ResourceParamData QnVirtualCameraResource::serializeUserEnabledAnalyticsEngines(
+    const QSet<QnUuid>& engines)
+{
+    return nx::vms::api::ResourceParamData(
         kUserEnabledAnalyticsEnginesProperty,
-        QString::fromUtf8(QJson::serialized(engines)));
+        QString::fromUtf8(QJson::serialized(engines))
+    );
 }
 
 const QSet<QnUuid> QnVirtualCameraResource::compatibleAnalyticsEngines() const

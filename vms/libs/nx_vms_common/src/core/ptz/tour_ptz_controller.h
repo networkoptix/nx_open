@@ -53,6 +53,8 @@ public:
     virtual bool activateTour(const QString& tourId) override;
     virtual bool getTours(QnPtzTourList* tours) const override;
 
+    static const QString kTourPropertyName;
+
 private:
     void clearActiveTour();
 

@@ -24,7 +24,7 @@ signals:
 /*!
 \note All methods are asynchronous if other not specified
 */
-class AbstractLayoutTourManager
+class NX_VMS_COMMON_API AbstractLayoutTourManager
 {
 public:
     virtual ~AbstractLayoutTourManager() = default;
