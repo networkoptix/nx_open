@@ -2,6 +2,8 @@
 
 #include "cloud_system_description.h"
 
+#include <nx/utils/software_version.h>
+
 QnCloudSystemDescription::PointerType QnCloudSystemDescription::create(
     const QString& systemId,
     const QnUuid& localSystemId,
@@ -38,6 +40,15 @@ void QnCloudSystemDescription::setOnline(bool online)
     emit onlineStateChanged();
 }
 
+void QnCloudSystemDescription::updateLastKnownVersion(const nx::utils::SoftwareVersion& version)
+{
+    if (version == m_lastKnownVersion)
+        return;
+
+    m_lastKnownVersion = version;
+    emit oauthSupportedChanged();
+}
+
 bool QnCloudSystemDescription::isCloudSystem() const
 {
     return true;
@@ -61,4 +72,10 @@ QString QnCloudSystemDescription::ownerAccountEmail() const
 QString QnCloudSystemDescription::ownerFullName() const
 {
     return m_ownerFullName;
+}
+
+bool QnCloudSystemDescription::isOauthSupported() const
+{
+    static const auto kOauthStartSupportVersion = nx::utils::SoftwareVersion(5, 0);
+    return m_lastKnownVersion.isNull() || m_lastKnownVersion >= kOauthStartSupportVersion;
 }

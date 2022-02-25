@@ -49,7 +49,10 @@ public:
     Property<PreferredCloudServers> preferredCloudServers{
         this, "PreferredCloudServers"};
 
-    Property<ConnectionData> lastConnection{this, "LastConnection"};
+    SecureProperty<ConnectionData> lastConnection{this, "LastConnection"};
+
+    // Password for cloud connections to the old systems. Needed for the compatibility.
+    SecureProperty<std::string> digestCloudPassword{this, "DigestCloudPassword"};
 
     using ValidationLevel = network::server_certificate::ValidationLevel;
     Property<ValidationLevel> certificateValidationLevel{

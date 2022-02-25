@@ -37,13 +37,13 @@ namespace
         {QnSystemsModel::IsOnlineRoleId, "isOnline"},
         {QnSystemsModel::IsReachableRoleId, "isReachable"},
         {QnSystemsModel::IsCompatibleToMobileClient, "isCompatibleToMobileClient"},
-        {QnSystemsModel::IsCompatibleVersionRoleId, "isCompatibleVersion"},
         {QnSystemsModel::IsCompatibleToDesktopClient, "isCompatibleToDesktopClient"},
 
         {QnSystemsModel::WrongVersionRoleId, "wrongVersion"},
         {QnSystemsModel::WrongCustomizationRoleId, "wrongCustomization"},
         {QnSystemsModel::CompatibleVersionRoleId, "compatibleVersion"},
-        {QnSystemsModel::VisibilityScopeRoleId, "visibilityScope"}};
+        {QnSystemsModel::VisibilityScopeRoleId, "visibilityScope"},
+        {QnSystemsModel::IsCloudOauthSupportedRoleId, "isOauthSupported"}};
 }
 
 class QnSystemsModelPrivate: public Connective<QObject>
@@ -88,7 +88,6 @@ public:
         const QnSystemDescriptionPtr& systemDescription) const;
     nx::vms::api::SoftwareVersion getCompatibleVersion(
         const QnSystemDescriptionPtr& systemDescription) const;
-    bool isCompatibleVersion(const QnSystemDescriptionPtr& systemDescription) const;
     bool isCompatibleSystem(const QnSystemDescriptionPtr& sysemDescription) const;
     bool isCompatibleCustomization(const QnSystemDescriptionPtr& systemDescription) const;
 
@@ -248,8 +247,6 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
             return d->isCompatibleSystem(system);
         case IsCompatibleToDesktopClient:
             return d->isCompatibleCustomization(system);
-        case IsCompatibleVersionRoleId:
-            return d->isCompatibleVersion(system);
         case WrongCustomizationRoleId:
             return !d->isCompatibleCustomization(system);
         case WrongVersionRoleId:
@@ -264,9 +261,9 @@ QVariant QnSystemsModel::data(const QModelIndex &index, int role) const
             return !version.isNull() ? QVariant::fromValue(version) : QVariant();
         }
         case VisibilityScopeRoleId:
-        {
             return d->controller->visibilityScope(system->localId());
-        }
+        case IsCloudOauthSupportedRoleId:
+            return system->isOauthSupported();
 
         default:
             return QVariant();
@@ -412,6 +409,13 @@ void QnSystemsModelPrivate::addSystem(const QnSystemDescriptionPtr& systemDescri
             {
                 emitDataChanged(systemDescription, QnSystemsModel::IsOnlineRoleId);
             });
+
+    data->connections
+        << connect(systemDescription, &QnBaseSystemDescription::oauthSupportedChanged, this,
+           [this, systemDescription]()
+           {
+               emitDataChanged(systemDescription, QnSystemsModel::IsCloudOauthSupportedRoleId);
+           });
 
     data->connections
         << connect(systemDescription, &QnBaseSystemDescription::isCloudSystemChanged, this,
@@ -562,12 +566,6 @@ nx::vms::api::SoftwareVersion QnSystemsModelPrivate::getIncompatibleVersion(
         return {};
 
     return incompatibleIt->version;
-}
-
-bool QnSystemsModelPrivate::isCompatibleVersion(
-    const QnSystemDescriptionPtr& systemDescription) const
-{
-    return getIncompatibleVersion(systemDescription).isNull();
 }
 
 bool QnSystemsModelPrivate::isCompatibleSystem(

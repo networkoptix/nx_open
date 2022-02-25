@@ -12,14 +12,14 @@
 
 namespace nx::vms::client::core {
 
-std::optional<ConnectionInfo> getCloudConnectionInfo(const QString& systemId)
+OptionalConnectionInfo getCloudConnectionInfo(const QString& systemId)
 {
     static const auto kLogTag = nx::utils::log::Tag(typeid(ConnectionInfo));
     if (!NX_ASSERT(qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut))
         return std::nullopt;
 
     const auto system = qnSystemsFinder->getSystem(systemId);
-    if (!system || !system->isReachable())
+    if (!system || !system->isCloudSystem() || !system->isReachable())
     {
         NX_WARNING(kLogTag, "System %1 is no longer accessible", systemId);
         return std::nullopt;
@@ -104,7 +104,7 @@ std::optional<ConnectionInfo> getCloudConnectionInfo(const QString& systemId)
     return result;
 }
 
-std::optional<ConnectionInfo> getLocalConnectionInfo(
+OptionalConnectionInfo getLocalConnectionInfo(
     const nx::utils::Url& url,
     const nx::network::http::Credentials& credentials)
 {

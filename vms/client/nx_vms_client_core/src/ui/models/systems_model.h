@@ -33,7 +33,6 @@ public:
         IsOnlineRoleId,
         IsReachableRoleId,
         IsCompatibleToMobileClient,
-        IsCompatibleVersionRoleId,
         IsCompatibleToDesktopClient,
 
         WrongCustomizationRoleId,
@@ -41,6 +40,8 @@ public:
         CompatibleVersionRoleId,
 
         VisibilityScopeRoleId,
+
+        IsCloudOauthSupportedRoleId,
 
         RolesCount
     };
