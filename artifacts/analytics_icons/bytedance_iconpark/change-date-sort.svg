@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>change-date-sort</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="change-date-sort">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="2.5 2.08333333 2.5 12.5015 17.5 12.5015 17.5 2.08333333"></polyline>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="6.25004167 9.58333333 7.91733333 9.58333333 13.6880833 3.690475 12.0809583 2.08333333 6.25 7.97625"></polygon>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="12.5 15.4166667 10 17.9166667 7.5 15.4166667"></polyline>
+            <line x1="10" y1="12.5" x2="10" y2="17.9166667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

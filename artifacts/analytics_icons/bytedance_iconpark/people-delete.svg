@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>people-delete</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="people-delete">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M7.91666667,8.33333333 C9.5275,8.33333333 10.8333333,7.0275 10.8333333,5.41666667 C10.8333333,3.8058375 9.5275,2.5 7.91666667,2.5 C6.30583333,2.5 5,3.8058375 5,5.41666667 C5,7.0275 6.30583333,8.33333333 7.91666667,8.33333333 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <line x1="13.75" y1="12.9166667" x2="17.0833333" y2="16.25" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="13.75" y1="16.25" x2="17.0833333" y2="12.9166667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M11.25,11.6666667 L7.83333333,11.6666667 C5.9665,11.6666667 5.03308333,11.6666667 4.32004167,12.0299583 C3.692825,12.3495417 3.1828875,12.8595 2.8633125,13.4867083 C2.5,14.19975 2.5,15.1331667 2.5,17 L2.5,17.5 L11.25,17.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

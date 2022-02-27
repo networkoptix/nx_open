@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>view-grid-list</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="view-grid-list">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linejoin="round" x="1.66666667" y="1.66666667" width="16.6666667" height="16.6666667" rx="1.5"></rect>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linejoin="round" x="5" y="5" width="3.33333333" height="3.33333333"></rect>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linejoin="round" x="5" y="11.6666667" width="3.33333333" height="3.33333333"></rect>
+            <line x1="11.6666667" y1="11.6666667" x2="15" y2="11.6666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="11.6666667" y1="15" x2="15" y2="15" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="11.6666667" y1="5" x2="15" y2="5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="11.6666667" y1="8.33333333" x2="15" y2="8.33333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

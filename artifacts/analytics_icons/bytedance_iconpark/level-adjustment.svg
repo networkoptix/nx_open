@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>level-adjustment</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="level-adjustment">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M4.63079167,7.5 L6.19875,1.64825417 L17.467875,4.66779167 L16.709,7.5 M3.29103333,12.5 L2.53214583,15.3322083 L13.8012917,18.35175 L15.36925,12.5" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="1.66666667" y1="10" x2="18.3333333" y2="10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1"></line>
+        </g>
+    </g>
+</svg>

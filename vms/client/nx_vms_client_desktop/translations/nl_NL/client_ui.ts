@@ -1,0 +1,3060 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="nl_NL" sourcelanguage="en">
+  <context>
+    <name>AboutDialog</name>
+    <message>
+      <source>About</source>
+      <translation>Over</translation>
+    </message>
+    <message>
+      <source>Information</source>
+      <translation>Informatie</translation>
+    </message>
+    <message>
+      <source>Credits</source>
+      <translation>Bijdragen</translation>
+    </message>
+    <message>
+      <source>GPU Information</source>
+      <translation>GPU informatie</translation>
+    </message>
+    <message>
+      <source>Support</source>
+      <translation>Support</translation>
+    </message>
+    <message>
+      <source>System Servers</source>
+      <translation>Systeem Servers</translation>
+    </message>
+    <message>
+      <source>Developer</source>
+      <translation>Ontwikkelaar</translation>
+    </message>
+    <message>
+      <source>Open source libraries</source>
+      <translation type="unfinished">Open source libraries</translation>
+    </message>
+  </context>
+  <context>
+    <name>AdjustVideoDialog</name>
+    <message>
+      <source>Image Enhancement</source>
+      <translation>Beeldverbetering</translation>
+    </message>
+    <message>
+      <source>Enable image enhancement</source>
+      <translation>Schakel beeldverbetering in</translation>
+    </message>
+    <message>
+      <source>Gamma</source>
+      <translation>Gamma</translation>
+    </message>
+    <message>
+      <source>Auto</source>
+      <translation>Automatisch</translation>
+    </message>
+    <message>
+      <source>Black level</source>
+      <translation>Zwart niveau</translation>
+    </message>
+    <message>
+      <source>White level</source>
+      <translation>Wit niveau</translation>
+    </message>
+  </context>
+  <context>
+    <name>AdvancedSettingsWidget</name>
+    <message>
+      <source>Downmix Audio from 5.1 to 2.1</source>
+      <translation>Audio aanpassen van 5.1 tot 2.1</translation>
+    </message>
+    <message>
+      <source>Double Buffering</source>
+      <translation>Dubbele buffering</translation>
+    </message>
+    <message>
+      <source>Maximum Live Buffer Length</source>
+      <translation>Maximale live bufferlengte</translation>
+    </message>
+    <message>
+      <source>Browse Logs</source>
+      <translation>Blader door logboeken</translation>
+    </message>
+    <message>
+      <source>Clear Local Cache</source>
+      <translation>Lokale cache wissen</translation>
+    </message>
+    <message>
+      <source>Reset All Warnings</source>
+      <translation>Reset alle waarschuwingen</translation>
+    </message>
+    <message>
+      <source>Intel HD Graphics display might face issues if blur is enabled. We strongly recommend to leave option as is.</source>
+      <translation>Intel HD grafisch display kan worden geconfronteerd met fouten als vervagen is ingeschakeld. Wij raden aan deze optie ongewijzigd te laten.</translation>
+    </message>
+    <message>
+      <source>Disable blur</source>
+      <translation>Vervagen uitschakelen</translation>
+    </message>
+    <message>
+      <source>Limit Frame Rate to save CPU</source>
+      <translation>Beperk de frame rate om de CPU te besparen</translation>
+    </message>
+    <message>
+      <source>Use Hardware Video Decoding</source>
+      <translation>Gebruik Hardware Video Decodering</translation>
+    </message>
+    <message>
+      <source>Server certificate validation</source>
+      <translation type="unfinished">Server certificate validation</translation>
+    </message>
+  </context>
+  <context>
+    <name>AggregationWidget</name>
+    <message>
+      <source>Check to set aggregation period</source>
+      <translation>Check to set aggregation period</translation>
+    </message>
+    <message>
+      <source>Interval of action :</source>
+      <translation>Interval voor actie:</translation>
+    </message>
+    <message>
+      <source>No more than once per</source>
+      <translation>Niet meer dan een keer per</translation>
+    </message>
+    <message>
+      <source>Instant</source>
+      <translation>Instant</translation>
+    </message>
+  </context>
+  <context>
+    <name>AnalyticsSdkEventWidget</name>
+    <message>
+      <source>Keywords separated by space</source>
+      <translation>Trefwoorden scheiden met een spatie</translation>
+    </message>
+    <message>
+      <source>Caption contains:</source>
+      <translation>Onderschrift bevat:</translation>
+    </message>
+    <message>
+      <source>Description contains:</source>
+      <translation>Beschrijving bevat:</translation>
+    </message>
+    <message>
+      <source>Event Type:</source>
+      <translation>Event Type:</translation>
+    </message>
+  </context>
+  <context>
+    <name>AnalyticsSdkObjectDetectedWidget</name>
+    <message>
+      <source>Attributes:</source>
+      <translation type="unfinished">Attributes:</translation>
+    </message>
+    <message>
+      <source>Object Type:</source>
+      <translation type="unfinished">Object Type:</translation>
+    </message>
+  </context>
+  <context>
+    <name>ArchiveLengthWidget</name>
+    <message>
+      <source>Auto</source>
+      <translation>Automatisch</translation>
+    </message>
+    <message>
+      <source>Keep Archive For...</source>
+      <translation type="unfinished">Keep Archive For...</translation>
+    </message>
+    <message>
+      <source>Max</source>
+      <translation type="unfinished">Max</translation>
+    </message>
+    <message>
+      <source>Min</source>
+      <translation type="unfinished">Min</translation>
+    </message>
+  </context>
+  <context>
+    <name>AudioRedirectPickerWidget</name>
+    <message>
+      <source>Form</source>
+      <translation>Formulier</translation>
+    </message>
+  </context>
+  <context>
+    <name>AuditLogDialog</name>
+    <message>
+      <source>Refresh</source>
+      <translation>Verversen</translation>
+    </message>
+    <message>
+      <source>User actions</source>
+      <translation>Gebruikersacties</translation>
+    </message>
+    <message>
+      <source>Watching archive</source>
+      <translation>Archief bekijken</translation>
+    </message>
+    <message>
+      <source>Exporting video</source>
+      <translation>Video exporteren</translation>
+    </message>
+    <message>
+      <source>Watching live</source>
+      <translation>Live kijken</translation>
+    </message>
+    <message>
+      <source>Login/logout</source>
+      <translation>Inloggen/uitloggen</translation>
+    </message>
+    <message>
+      <source>Event rules</source>
+      <translation>Gebeurtnisregels</translation>
+    </message>
+    <message>
+      <source>Server actions</source>
+      <translation>Server acties</translation>
+    </message>
+    <message>
+      <source>System actions</source>
+      <translation>Systeemacties</translation>
+    </message>
+    <message>
+      <source>Select all</source>
+      <translation>Alles selecteren</translation>
+    </message>
+    <message>
+      <source>Sessions</source>
+      <translation>Sessies</translation>
+    </message>
+    <message>
+      <source>Details</source>
+      <translation>Details</translation>
+    </message>
+    <message>
+      <source>Audit Trail</source>
+      <translation>Systeemrapportage</translation>
+    </message>
+    <message>
+      <source>Clear Filter</source>
+      <translation>Filter wissen</translation>
+    </message>
+    <message>
+      <source>Email settings</source>
+      <translation>Email instellingen</translation>
+    </message>
+    <message>
+      <source>All servers are offline. Audit data is not available.</source>
+      <translation>Alle servers zijn offline. Auditgegevens zijn niet beschikbaar.</translation>
+    </message>
+  </context>
+  <context>
+    <name>BackupBandwidthSettingsWidget</name>
+    <message>
+      <source>No Limit</source>
+      <translation type="unfinished">No Limit</translation>
+    </message>
+    <message>
+      <source>Fixed</source>
+      <translation type="unfinished">Fixed</translation>
+    </message>
+    <message>
+      <source>Scheduled</source>
+      <translation type="unfinished">Scheduled</translation>
+    </message>
+    <message>
+      <source>Fix bandwidth to</source>
+      <translation type="unfinished">Fix bandwidth to</translation>
+    </message>
+    <message>
+      <source>Mbit/s</source>
+      <translation>Mbit/s</translation>
+    </message>
+    <message>
+      <source>Unlimited</source>
+      <translation type="unfinished">Unlimited</translation>
+    </message>
+    <message>
+      <source>Limited to</source>
+      <translation type="unfinished">Limited to</translation>
+    </message>
+    <message>
+      <source>No backup</source>
+      <translation type="unfinished">No backup</translation>
+    </message>
+  </context>
+  <context>
+    <name>BackupSettingsWidget</name>
+    <message>
+      <source>Server is offline. Backup settings are not available.</source>
+      <translation type="unfinished">Server is offline. Backup settings are not available.</translation>
+    </message>
+  </context>
+  <context>
+    <name>BackupStatusWidget</name>
+    <message>
+      <source>Backup is not configured yet.</source>
+      <translation type="unfinished">Backup is not configured yet.</translation>
+    </message>
+    <message>
+      <source>To start backup enable it for some cameras and apply settings.</source>
+      <translation type="unfinished">To start backup enable it for some cameras and apply settings.</translation>
+    </message>
+    <message>
+      <source>Refresh</source>
+      <translation>Verversen</translation>
+    </message>
+    <message>
+      <source>Skip Current Queue</source>
+      <translation type="unfinished">Skip Current Queue</translation>
+    </message>
+    <message>
+      <source>Maximum backup queue size</source>
+      <translation type="unfinished">Maximum backup queue size</translation>
+    </message>
+    <message>
+      <source>All files are successfully backed up! New files will be backed up automatically</source>
+      <translation type="unfinished">All files are successfully backed up! New files will be backed up automatically</translation>
+    </message>
+    <message>
+      <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
+      <translation type="unfinished">Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</translation>
+    </message>
+  </context>
+  <context>
+    <name>BookmarkBusinessActionWidget</name>
+    <message>
+      <source>Fixed duration:</source>
+      <translation>Vaste duur:</translation>
+    </message>
+    <message>
+      <source>seconds</source>
+      <translation>seconden</translation>
+    </message>
+    <message>
+      <source>Tags:</source>
+      <translation>Tags:</translation>
+    </message>
+    <message>
+      <source>Pre-recording:</source>
+      <translation>Voor-opname:</translation>
+    </message>
+    <message>
+      <source>Post-recording:</source>
+      <translation>Na-opname:</translation>
+    </message>
+  </context>
+  <context>
+    <name>BookmarkOverlaySettingsWidget</name>
+    <message>
+      <source>Bookmark Info</source>
+      <translation>Bladwijzerinfo</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Verwijder</translation>
+    </message>
+    <message>
+      <source>Area Width</source>
+      <translation>Breedte van het veld</translation>
+    </message>
+    <message>
+      <source>Font Size</source>
+      <translation>Tekstgrootte</translation>
+    </message>
+    <message>
+      <source>Include description</source>
+      <translation>Voeg een beschrijving toe</translation>
+    </message>
+  </context>
+  <context>
+    <name>BookmarkWidget</name>
+    <message>
+      <source>Popular tags</source>
+      <translation>Populaire tags</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Naam</translation>
+    </message>
+    <message>
+      <source>Description</source>
+      <translation>Omschrijving</translation>
+    </message>
+    <message>
+      <source>Timeout</source>
+      <translation>Time-out</translation>
+    </message>
+    <message>
+      <source>Tags</source>
+      <translation>Tags</translation>
+    </message>
+    <message>
+      <source>List of tags divided by commas</source>
+      <translation>Lijst met tags gescheiden door komma's</translation>
+    </message>
+  </context>
+  <context>
+    <name>BookmarksLog</name>
+    <message>
+      <source>Refresh</source>
+      <translation>Verversen</translation>
+    </message>
+    <message>
+      <source>Bookmark Log</source>
+      <translation>Bladwijzer log</translation>
+    </message>
+    <message>
+      <source>Clear Filter</source>
+      <translation>Filter wissen</translation>
+    </message>
+  </context>
+  <context>
+    <name>BusinessRuleWidget</name>
+    <message>
+      <source>Event</source>
+      <translation>Event</translation>
+    </message>
+    <message>
+      <source>Schedule...</source>
+      <translation>Schema...</translation>
+    </message>
+    <message>
+      <source>Action</source>
+      <translation>Actie</translation>
+    </message>
+    <message>
+      <source>Comments:</source>
+      <translation>Reacties:</translation>
+    </message>
+    <message>
+      <source>When</source>
+      <translation>Wanneer</translation>
+    </message>
+    <message>
+      <source>Do</source>
+      <translation>Actie</translation>
+    </message>
+    <message>
+      <source>At</source>
+      <translation>Bron</translation>
+    </message>
+    <message>
+      <source>Use event source server</source>
+      <translation>Gebeurtenisbronserver gebruiken</translation>
+    </message>
+  </context>
+  <context>
+    <name>BusinessRulesDialog</name>
+    <message>
+      <source>Add</source>
+      <translation>Toevoegen</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Verwijder</translation>
+    </message>
+    <message>
+      <source>Event Rules</source>
+      <translation>Gebeurtnisregels</translation>
+    </message>
+    <message>
+      <source>Event Log...</source>
+      <translation>Logboek...</translation>
+    </message>
+    <message>
+      <source>Test</source>
+      <translation>Test</translation>
+    </message>
+  </context>
+  <context>
+    <name>BuzzerBusinessActionWidget</name>
+    <message>
+      <source>Fixed duration:</source>
+      <translation>Vaste duur:</translation>
+    </message>
+    <message>
+      <source>seconds</source>
+      <translation>seconden</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraAdvancedParamsWidget</name>
+    <message>
+      <source>Category</source>
+      <translation>Categorie</translation>
+    </message>
+    <message>
+      <source>Refresh</source>
+      <translation>Verversen</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraCredentialsDialog</name>
+    <message>
+      <source>Authentication credentials</source>
+      <translation>Verificatiegegevens</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraExpertSettingsWidget</name>
+    <message>
+      <source>Do not archive primary stream</source>
+      <translation>Primaire stream niet archiveren</translation>
+    </message>
+    <message>
+      <source>Do not archive secondary stream</source>
+      <translation>Secundaire stream niet archiveren</translation>
+    </message>
+    <message>
+      <source>Auto</source>
+      <translation>Automatisch</translation>
+    </message>
+    <message>
+      <source>Restore Defaults</source>
+      <translation>Herstel standaardwaarden</translation>
+    </message>
+    <message>
+      <source>Do not change these settings unless you are absolutely sure of their potential impact on your system performance.</source>
+      <translation>Wijzig deze instellingen alleen als u absoluut zeker bent van de mogelijke invloed op de systeemprestaties.</translation>
+    </message>
+    <message>
+      <source>Keep camera stream and profile settings</source>
+      <translation>Behoud de camera stream- en profielinstellingen</translation>
+    </message>
+    <message>
+      <source>Calculate bitrate per GOP instead of bitrate per second</source>
+      <translation>Bereken bitrate per GOP in plaats van bitrate per seconde</translation>
+    </message>
+    <message>
+      <source>It will increase bitrate for camera.</source>
+      <translation>Hierdoor wordt de bitrate voor de camera verhoogd.</translation>
+    </message>
+    <message>
+      <source>Disable secondary stream</source>
+      <translation>Schakel de secundaire stream uit</translation>
+    </message>
+    <message>
+      <source>Motion Detection</source>
+      <translation>Bewegingsdetectie</translation>
+    </message>
+    <message>
+      <source>Media Streaming</source>
+      <translation>Mediastreaming</translation>
+    </message>
+    <message>
+      <source>PTZ</source>
+      <translation>PTZ</translation>
+    </message>
+    <message>
+      <source>Generate</source>
+      <translation>Genereer</translation>
+    </message>
+    <message>
+      <source>Reset</source>
+      <translation>Reset</translation>
+    </message>
+    <message>
+      <source>Logical ID</source>
+      <translation>Logische ID</translation>
+    </message>
+    <message>
+      <source>Force motion detection for stream</source>
+      <translation>Forceer bewegingsdetectie voor stream</translation>
+    </message>
+    <message>
+      <source>Trust camera timestamp</source>
+      <translation>Tijdstempel van camera vertrouwen</translation>
+    </message>
+    <message>
+      <source>Native camera presets will not be avaliable.</source>
+      <translation>Native camera-presets zijn niet beschikbaar.</translation>
+    </message>
+    <message>
+      <source>This camera supports pan and tilt</source>
+      <translation>Deze camera ondersteunt draaien en kantelen</translation>
+    </message>
+    <message>
+      <source>This camera supports zoom</source>
+      <translation>Deze camera ondersteunt zoomen</translation>
+    </message>
+    <message>
+      <source>Detect motion during archive import</source>
+      <translation>Beweging detecteren tijdens het importeren van archieven</translation>
+    </message>
+    <message>
+      <source>Stream Settings</source>
+      <translation type="unfinished">Stream Settings</translation>
+    </message>
+    <message>
+      <source>Initialization Settings</source>
+      <translation type="unfinished">Initialization Settings</translation>
+    </message>
+    <message>
+      <source>Use Media2 to fetch profiles</source>
+      <translation type="unfinished">Use Media2 to fetch profiles</translation>
+    </message>
+    <message>
+      <source>Use different values for pan and tilt</source>
+      <translation type="unfinished">Use different values for pan and tilt</translation>
+    </message>
+    <message>
+      <source>Tilt</source>
+      <translation type="unfinished">Tilt</translation>
+    </message>
+    <message>
+      <source>Media Port</source>
+      <translation type="unfinished">Media Port</translation>
+    </message>
+    <message>
+      <source>Use system presets</source>
+      <translation type="unfinished">Use system presets</translation>
+    </message>
+    <message>
+      <source>PTZ Speed</source>
+      <translation type="unfinished">PTZ Speed</translation>
+    </message>
+    <message>
+      <source>RTP Transport</source>
+      <translation type="unfinished">RTP Transport</translation>
+    </message>
+    <message>
+      <source>Use camera native presets</source>
+      <translation type="unfinished">Use camera native presets</translation>
+    </message>
+    <message>
+      <source>Time Settings</source>
+      <translation type="unfinished">Time Settings</translation>
+    </message>
+    <message>
+      <source>Keep camera time settings</source>
+      <translation type="unfinished">Keep camera time settings</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraInfoWidget</name>
+    <message>
+      <source>Model</source>
+      <translation>Model</translation>
+    </message>
+    <message>
+      <source>Vendor</source>
+      <translation>Fabrikant</translation>
+    </message>
+    <message>
+      <source>IP Address</source>
+      <translation>IP Adres</translation>
+    </message>
+    <message>
+      <source>Ping</source>
+      <translation>Ping</translation>
+    </message>
+    <message>
+      <source>Firmware</source>
+      <translation>Firmware</translation>
+    </message>
+    <message>
+      <source>Camera ID</source>
+      <translation>Camera ID</translation>
+    </message>
+    <message>
+      <source>Web Page</source>
+      <translation>Webpagina</translation>
+    </message>
+    <message>
+      <source>Primary Stream</source>
+      <translation>Primaire stream</translation>
+    </message>
+    <message>
+      <source>Secondary Stream</source>
+      <translation>Secundaire stream</translation>
+    </message>
+    <message>
+      <source>MAC Address</source>
+      <translation>Mac adres</translation>
+    </message>
+    <message>
+      <source>Show on layout</source>
+      <translation>Toon op de schermindeling</translation>
+    </message>
+    <message>
+      <source>Event Log</source>
+      <translation>Logboek</translation>
+    </message>
+    <message>
+      <source>Camera rules</source>
+      <translation>Cameraregels</translation>
+    </message>
+    <message>
+      <source>Logical ID</source>
+      <translation>Logische ID</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraInputBusinessEventWidget</name>
+    <message>
+      <source>Input ID</source>
+      <translation>Input ID</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraLicensePanelWidget</name>
+    <message>
+      <source>Activate License...</source>
+      <translation>Licentie activeren...</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraListDialog</name>
+    <message>
+      <source>Add Device...</source>
+      <translation>Apparaat toevoegen...</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraMotionSettingsWidget</name>
+    <message>
+      <source>Motion Detection</source>
+      <translation>Bewegingsdetectie</translation>
+    </message>
+    <message>
+      <source>Sensitivity</source>
+      <translation>Gevoeligheid</translation>
+    </message>
+    <message>
+      <source>Reset</source>
+      <translation>Reset</translation>
+    </message>
+    <message>
+      <source>in</source>
+      <comment>e.g. &quot;in Primary Stream&quot;</comment>
+      <translation type="unfinished">in</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraOutputBusinessActionWidget</name>
+    <message>
+      <source>Fixed duration:</source>
+      <translation>Vaste duur:</translation>
+    </message>
+    <message>
+      <source>Output ID:</source>
+      <translation>Uitgang ID:</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraScheduleWidget</name>
+    <message>
+      <source>Recording</source>
+      <translation>Opname</translation>
+    </message>
+    <message>
+      <source>Activate License...</source>
+      <translation>Licentie activeren...</translation>
+    </message>
+    <message>
+      <source>Copying Schedule</source>
+      <translation>Schema kopiëren</translation>
+    </message>
+    <message>
+      <source>Copy Schedule to...</source>
+      <translation>Schema kopiëren naar...</translation>
+    </message>
+    <message>
+      <source>Motion &amp;&amp; Objects Recording</source>
+      <translation type="unfinished">Motion &amp;&amp; Objects Recording</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraSelectionDialog</name>
+    <message>
+      <source>All Cameras</source>
+      <translation>Alle camera 's</translation>
+    </message>
+    <message>
+      <source>Select Cameras</source>
+      <translation>Selecteer camera's</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraSettingsGeneralTabWidget</name>
+    <message>
+      <source>Authentication</source>
+      <translation>Authenticatie</translation>
+    </message>
+    <message>
+      <source>Edit Credentials</source>
+      <translation>Verificatiegegevens aanpassen</translation>
+    </message>
+    <message>
+      <source>Audio</source>
+      <translation>Audio</translation>
+    </message>
+    <message>
+      <source>Enable audio</source>
+      <translation>Geluid inschakelen</translation>
+    </message>
+    <message>
+      <source>Edit Streams...</source>
+      <translation>Streams bewerken...</translation>
+    </message>
+    <message>
+      <source>Enable 2-way audio</source>
+      <translation type="unfinished">Enable 2-way audio</translation>
+    </message>
+  </context>
+  <context>
+    <name>CameraStreamsDialog</name>
+    <message>
+      <source>Streams Addresses</source>
+      <translation>Stream Adressen</translation>
+    </message>
+  </context>
+  <context>
+    <name>CertificateSelectionDialog</name>
+    <message>
+      <source>Web site requires a certificate</source>
+      <translation type="unfinished">Web site requires a certificate</translation>
+    </message>
+  </context>
+  <context>
+    <name>ChangeUserPasswordDialog</name>
+    <message>
+      <source>Change password</source>
+      <translation>Wachtwoord wijzigen</translation>
+    </message>
+  </context>
+  <context>
+    <name>ConnectingToServerDialog</name>
+    <message>
+      <source>Connecting...</source>
+      <translation>Verbinden...</translation>
+    </message>
+  </context>
+  <context>
+    <name>ConnectionTestingDialog</name>
+    <message>
+      <source>Connection Test</source>
+      <translation>Verbindingstest</translation>
+    </message>
+    <message>
+      <source>Testing connection...</source>
+      <translation>Verbinding testen...</translation>
+    </message>
+  </context>
+  <context>
+    <name>CustomBusinessEventWidget</name>
+    <message>
+      <source>Source contains:</source>
+      <translation>Bron bevat:</translation>
+    </message>
+    <message>
+      <source>Keywords separated by space</source>
+      <translation>Trefwoorden scheiden met een spatie</translation>
+    </message>
+    <message>
+      <source>Caption contains:</source>
+      <translation>Onderschrift bevat:</translation>
+    </message>
+    <message>
+      <source>Description contains:</source>
+      <translation>Beschrijving bevat:</translation>
+    </message>
+    <message>
+      <source>Omit Logging</source>
+      <translation>Logging weglaten</translation>
+    </message>
+  </context>
+  <context>
+    <name>CustomSettingsWidget</name>
+    <message>
+      <source>Category</source>
+      <translation>Categorie</translation>
+    </message>
+  </context>
+  <context>
+    <name>DatabaseManagementWidget</name>
+    <message>
+      <source>Create Backup...</source>
+      <translation>Creëer backup...</translation>
+    </message>
+    <message>
+      <source>Restore from Backup...</source>
+      <translation>Herstellen van backup...</translation>
+    </message>
+  </context>
+  <context>
+    <name>DeviceAdditionDialog</name>
+    <message>
+      <source>to</source>
+      <translation>aan</translation>
+    </message>
+    <message>
+      <source>SELECT SERVER</source>
+      <translation>SELECTEER SERVER</translation>
+    </message>
+    <message>
+      <source>Known Address</source>
+      <translation>Bekend adres</translation>
+    </message>
+    <message>
+      <source>Subnet Scan</source>
+      <translation>Subnet scan</translation>
+    </message>
+    <message>
+      <source>Address</source>
+      <translation>Adres</translation>
+    </message>
+    <message>
+      <source>Hint</source>
+      <translation>Hint</translation>
+    </message>
+    <message>
+      <source>Port</source>
+      <translation>Poort</translation>
+    </message>
+    <message>
+      <source>End IP</source>
+      <translation>Eind IP</translation>
+    </message>
+    <message>
+      <source>Start IP</source>
+      <translation>Start IP</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Wachtwoord</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Login</translation>
+    </message>
+    <message>
+      <source>Search</source>
+      <translation>Zoeken</translation>
+    </message>
+    <message>
+      <source>Stop</source>
+      <translation>Stop</translation>
+    </message>
+    <message>
+      <source>Add all Devices</source>
+      <translation>Voeg alle Apparaten toe</translation>
+    </message>
+    <message>
+      <source>Add Devices</source>
+      <translation>Apparaten toevoegen</translation>
+    </message>
+    <message>
+      <source>Default</source>
+      <translation>Standaard</translation>
+    </message>
+  </context>
+  <context>
+    <name>EncryptedArchivePasswordDialog</name>
+    <message>
+      <source>Encrypted archive</source>
+      <translation type="unfinished">Encrypted archive</translation>
+    </message>
+    <message>
+      <source>Enter your encryption password to view the archive</source>
+      <translation type="unfinished">Enter your encryption password to view the archive</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Wachtwoord</translation>
+    </message>
+  </context>
+  <context>
+    <name>EulaDialog</name>
+    <message>
+      <source>Copy to Clipboard</source>
+      <translation>Kopiëren naar klembord</translation>
+    </message>
+    <message>
+      <source>I Do Not Agree</source>
+      <translation>Ik ga niet akkoord</translation>
+    </message>
+    <message>
+      <source>I Agree</source>
+      <translation>Ik ga Akkoord</translation>
+    </message>
+  </context>
+  <context>
+    <name>EventLogDialog</name>
+    <message>
+      <source>Event Log</source>
+      <translation>Logboek</translation>
+    </message>
+    <message>
+      <source>Clear Filter</source>
+      <translation>Filter wissen</translation>
+    </message>
+    <message>
+      <source>Refresh</source>
+      <translation>Verversen</translation>
+    </message>
+    <message>
+      <source>All Servers are offline. Logs are not available.</source>
+      <translation>Alle servers zijn offline. Logboeken zijn niet beschikbaar.</translation>
+    </message>
+    <message>
+      <source>Event Rules...</source>
+      <translation>Gebeurtenisregels...</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExecHttpRequestActionWidget</name>
+    <message>
+      <source>HTTP content</source>
+      <translation>HTTP content</translation>
+    </message>
+    <message>
+      <source>Login to authenticate (optional)</source>
+      <translation>Log in om te verifiëren (optioneel)</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Login</translation>
+    </message>
+    <message>
+      <source>Password to authenticate (optional)</source>
+      <translation>Wachtwoord voor verificatie (optioneel)</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Wachtwoord</translation>
+    </message>
+    <message>
+      <source>Content type</source>
+      <translation>Content type</translation>
+    </message>
+    <message>
+      <source>HTTP URL</source>
+      <translation>HTTP URL</translation>
+    </message>
+    <message>
+      <source>Authentication type</source>
+      <translation>Authenticatietype</translation>
+    </message>
+    <message>
+      <source>Request type</source>
+      <translation>Type aanvraag</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExecPtzPresetBusinessActionWidget</name>
+    <message>
+      <source>PTZ preset:</source>
+      <translation>PTZ preset:</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExitFullscreenActionWidget</name>
+    <message>
+      <source>On layout</source>
+      <translation>Op schermindeling</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportLayoutSettingsWidget</name>
+    <message>
+      <source>Export Settings</source>
+      <translation>Exportinstellingen</translation>
+    </message>
+    <message>
+      <source>Make read-only</source>
+      <translation>Maak alleen-lezen</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportMediaSettingsWidget</name>
+    <message>
+      <source>Export Settings</source>
+      <translation>Exportinstellingen</translation>
+    </message>
+    <message>
+      <source>Apply Filters</source>
+      <translation>Filters toepassen</translation>
+    </message>
+    <message>
+      <source>Rotation, Dewarping, Image Enhancement etc.</source>
+      <translation>Rotatie, Dewarping, Beeldverbetering etc.</translation>
+    </message>
+    <message>
+      <source>Applying filters and adding overlays require transcoding which will increase CPU usage and may take significant time.</source>
+      <translation>Het toepassen van filters en het toevoegen vereist transcoderen en zal de CPU belasting verhogen en ken veel tijd in beslag nemen.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportPasswordWidget</name>
+    <message>
+      <source>Protect with password</source>
+      <translation>Bescherm met wachtwoord</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Wachtwoord</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExportSettingsDialog</name>
+    <message>
+      <source>Export Video</source>
+      <translation>Video exporteren</translation>
+    </message>
+    <message>
+      <source>Single Camera</source>
+      <translation>Enkele camera</translation>
+    </message>
+    <message>
+      <source>Export Settings</source>
+      <translation>Exportinstellingen</translation>
+    </message>
+    <message>
+      <source>Multi Video</source>
+      <translation>Multi Video</translation>
+    </message>
+  </context>
+  <context>
+    <name>FailoverPriorityDialog</name>
+    <message>
+      <source>Failover Priority</source>
+      <translation>Failover-prioriteit</translation>
+    </message>
+  </context>
+  <context>
+    <name>FailoverPriorityPickerWidget</name>
+    <message>
+      <source>Set priority:</source>
+      <translation type="unfinished">Set priority:</translation>
+    </message>
+    <message>
+      <source>No failover</source>
+      <translation type="unfinished">No failover</translation>
+    </message>
+    <message>
+      <source>Low</source>
+      <translation>Lage</translation>
+    </message>
+    <message>
+      <source>Medium</source>
+      <translation>Middelgroot</translation>
+    </message>
+    <message>
+      <source>High</source>
+      <translation>Hoog</translation>
+    </message>
+    <message>
+      <source>Select some devices to setup failover priority</source>
+      <translation type="unfinished">Select some devices to setup failover priority</translation>
+    </message>
+  </context>
+  <context>
+    <name>FilenamePanel</name>
+    <message>
+      <source>Browse...</source>
+      <translation>Bladeren...</translation>
+    </message>
+  </context>
+  <context>
+    <name>FilteredResourceViewWidget</name>
+    <message>
+      <source>Nothing found</source>
+      <translation>Niets gevonden</translation>
+    </message>
+  </context>
+  <context>
+    <name>FullscreenCameraActionWidget</name>
+    <message>
+      <source>On layout</source>
+      <translation>Op schermindeling</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>Camera</translation>
+    </message>
+    <message>
+      <source>Source camera</source>
+      <translation>Bron camera</translation>
+    </message>
+  </context>
+  <context>
+    <name>GeneralPreferencesWidget</name>
+    <message>
+      <source>Misc</source>
+      <translation>Diversen</translation>
+    </message>
+    <message>
+      <source>Auto Pause Video</source>
+      <translation>Video automatisch pauzeren</translation>
+    </message>
+    <message>
+      <source>after</source>
+      <translation>na</translation>
+    </message>
+    <message>
+      <source>Minutes of Inactivity</source>
+      <translation>Minuten van inactiviteit</translation>
+    </message>
+    <message>
+      <source>Add...</source>
+      <translation>Toevoegen...</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Verwijderen</translation>
+    </message>
+    <message>
+      <source>Local Media Folders</source>
+      <translation>Lokale mediamappen</translation>
+    </message>
+    <message>
+      <source>Audio Input</source>
+      <translation>Audio-ingang</translation>
+    </message>
+    <message>
+      <source>First Source</source>
+      <translation>Eerste bron</translation>
+    </message>
+    <message>
+      <source>Second Source</source>
+      <translation>Tweede bron</translation>
+    </message>
+    <message>
+      <source>Run Application when PC Boots up</source>
+      <translation>Toepassing uitvoeren wanneer de PC is opgestart</translation>
+    </message>
+    <message>
+      <source>Startup</source>
+      <translation type="unfinished">Startup</translation>
+    </message>
+    <message>
+      <source>Connect to the previous system on startup</source>
+      <translation type="unfinished">Connect to the previous system on startup</translation>
+    </message>
+    <message>
+      <source>Automatically restore saved windows configuration</source>
+      <translation type="unfinished">Automatically restore saved windows configuration</translation>
+    </message>
+    <message>
+      <source>Play audio from all cameras on layout</source>
+      <translation>Speel audio van alle camera's af op de schermindeling</translation>
+    </message>
+    <message>
+      <source>Mute audio when the mic is active</source>
+      <translation type="unfinished">Mute audio when the mic is active</translation>
+    </message>
+  </context>
+  <context>
+    <name>GeneralSystemAdministrationWidget</name>
+    <message>
+      <source>System Settings</source>
+      <translation>Systeeminstellingen</translation>
+    </message>
+    <message>
+      <source>Backup and Restore</source>
+      <translation>Backup en herstellen</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImageControlWidget</name>
+    <message>
+      <source>Image Control</source>
+      <translation>Beeldbeheer</translation>
+    </message>
+    <message>
+      <source>Aspect ratio</source>
+      <translation>Beeldverhouding</translation>
+    </message>
+    <message>
+      <source>Default rotation</source>
+      <translation>Standaard rotatie</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImageOverlaySettingsWidget</name>
+    <message>
+      <source>Image</source>
+      <translation>Afbeelding</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Verwijder</translation>
+    </message>
+    <message>
+      <source>Size</source>
+      <translation>Grootte</translation>
+    </message>
+    <message>
+      <source>Opacity</source>
+      <translation>Transparantie</translation>
+    </message>
+    <message>
+      <source>Default</source>
+      <translation>Standaard</translation>
+    </message>
+    <message>
+      <source>Browse...</source>
+      <translation>Bladeren...</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImagePreviewDialog</name>
+    <message>
+      <source>Image View</source>
+      <translation>Beeldweergave</translation>
+    </message>
+    <message>
+      <source>Loading Image...Please Wait.</source>
+      <translation>Afbeelding laden... Een ogenblik geduld.</translation>
+    </message>
+    <message>
+      <source>No image</source>
+      <translation>Geen afbeelding</translation>
+    </message>
+  </context>
+  <context>
+    <name>InfoOverlaySettingsWidget</name>
+    <message>
+      <source>Info</source>
+      <translation>Info</translation>
+    </message>
+    <message>
+      <source>Camera name</source>
+      <translation>Cameranaam</translation>
+    </message>
+    <message>
+      <source>Export date</source>
+      <translation>Exportdatum</translation>
+    </message>
+    <message>
+      <source>Font Size</source>
+      <translation>Tekstgrootte</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Verwijder</translation>
+    </message>
+  </context>
+  <context>
+    <name>IoModuleSettingsWidget</name>
+    <message>
+      <source>Form</source>
+      <translation>Formulier</translation>
+    </message>
+    <message>
+      <source>Enable tile interface</source>
+      <translation>Schakel de tegel-interface in</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutBackgroundSettingsWidget</name>
+    <message>
+      <source>Processing Image...Please Wait.</source>
+      <translation>Beeld verwerken... Een ogenblik geduld.</translation>
+    </message>
+    <message>
+      <source>Browse...</source>
+      <translation>Bladeren...</translation>
+    </message>
+    <message>
+      <source>Clear</source>
+      <translation>Wissen</translation>
+    </message>
+    <message>
+      <source>View...</source>
+      <translation>Weergave...</translation>
+    </message>
+    <message>
+      <source>Width:</source>
+      <translation>Breedte:</translation>
+    </message>
+    <message>
+      <source>Keep Aspect Ratio</source>
+      <translation>Beeldverhouding behouden</translation>
+    </message>
+    <message>
+      <source>Opacity:</source>
+      <translation>Transparantie:</translation>
+    </message>
+    <message>
+      <source>Height:</source>
+      <translation>Hoogte:</translation>
+    </message>
+    <message>
+      <source>Crop to monitor aspect ratio</source>
+      <translation>Aanpassen aan de monitor aspect ratio</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutGeneralSettingsWidget</name>
+    <message>
+      <source>Locked</source>
+      <translation>Geblokkeerd</translation>
+    </message>
+    <message>
+      <source>Width</source>
+      <translation>Breedte</translation>
+    </message>
+    <message>
+      <source>Height</source>
+      <translation>Hoogte</translation>
+    </message>
+    <message>
+      <source>Logical ID</source>
+      <translation>Logische ID</translation>
+    </message>
+    <message>
+      <source>Generate</source>
+      <translation>Genereer</translation>
+    </message>
+    <message>
+      <source>Reset</source>
+      <translation>Reset</translation>
+    </message>
+    <message>
+      <source>Minimum Grid Size</source>
+      <translation>Minimale rastergrootte</translation>
+    </message>
+  </context>
+  <context>
+    <name>LayoutSelectionDialog</name>
+    <message>
+      <source>Select layout</source>
+      <translation>Selecteer schermindeling</translation>
+    </message>
+    <message>
+      <source>Shared layouts</source>
+      <translation>Gedeelde schermindelingen</translation>
+    </message>
+    <message>
+      <source>Select some single user in &quot;Show to&quot; line to display his local layouts in this list</source>
+      <translation>Selecteer een gebruiker in de regel &quot;tot&quot; om zijn lokale schermindeling in deze lijst weer te geven</translation>
+    </message>
+  </context>
+  <context>
+    <name>LdapSettingsDialog</name>
+    <message>
+      <source>Optional</source>
+      <translation>Optioneel</translation>
+    </message>
+    <message>
+      <source>Testing...</source>
+      <translation>Testen...</translation>
+    </message>
+    <message>
+      <source>LDAP Settings</source>
+      <translation>LDAP instellingen</translation>
+    </message>
+    <message>
+      <source>Server URL</source>
+      <translation>Server URL</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Wachtwoord</translation>
+    </message>
+    <message>
+      <source>Search Base</source>
+      <translation>Zoekbasis</translation>
+    </message>
+    <message>
+      <source>Search Filter</source>
+      <translation>Zoekfilter</translation>
+    </message>
+    <message>
+      <source>Search Timeout (s)</source>
+      <translation>Zoek time-out(s)</translation>
+    </message>
+    <message>
+      <source>Admin DN or CN</source>
+      <translation>Admin DN of CN</translation>
+    </message>
+  </context>
+  <context>
+    <name>LdapUsersDialog</name>
+    <message>
+      <source>Fetch Users from LDAP...</source>
+      <translation>Gebruikers ophalen van LDAP...</translation>
+    </message>
+    <message>
+      <source>Loading...</source>
+      <translation>Laden...</translation>
+    </message>
+    <message>
+      <source>Connection error</source>
+      <translation>Netwerkfout</translation>
+    </message>
+    <message>
+      <source>Role to assign to imported users</source>
+      <translation>Profiel om toe te wijzen aan geïmporteerde gebruikers</translation>
+    </message>
+    <message>
+      <source>Disable imported users</source>
+      <translation>Geïmporteerde gebruikers uitschakelen</translation>
+    </message>
+    <message>
+      <source>Allow digest authentication for imported user</source>
+      <translation type="unfinished">Allow digest authentication for imported user</translation>
+    </message>
+  </context>
+  <context>
+    <name>LicenseDetailsDialog</name>
+    <message>
+      <source>License Details</source>
+      <translation>Licentiedetails</translation>
+    </message>
+    <message>
+      <source>Generic</source>
+      <translation>Generiek</translation>
+    </message>
+    <message>
+      <source>Features</source>
+      <translation>Functies</translation>
+    </message>
+  </context>
+  <context>
+    <name>LicenseManagerWidget</name>
+    <message>
+      <source>Active Licenses</source>
+      <translation>Actieve licenties</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Verwijder</translation>
+    </message>
+    <message>
+      <source>New License</source>
+      <translation>Nieuwe licentie</translation>
+    </message>
+    <message>
+      <source>Details...</source>
+      <translation>Details...</translation>
+    </message>
+    <message>
+      <source>The software is licensed to</source>
+      <translation>De software is gelicenseerd aan</translation>
+    </message>
+  </context>
+  <context>
+    <name>LicenseNotificationDialog</name>
+    <message>
+      <source>Warning</source>
+      <translation>Waarschuwing</translation>
+    </message>
+    <message>
+      <source>License issues:</source>
+      <translation>Licentie problemen:</translation>
+    </message>
+  </context>
+  <context>
+    <name>LicenseWidget</name>
+    <message>
+      <source>Manual Activation</source>
+      <translation>Handmatige activering</translation>
+    </message>
+    <message>
+      <source>Select License File...</source>
+      <translation>Selecteer activatiebestand...</translation>
+    </message>
+    <message>
+      <source>Browse...</source>
+      <translation>Bladeren...</translation>
+    </message>
+    <message>
+      <source>License will be bound to the current server</source>
+      <translation>Licentie wordt gebonden aan de huidige server</translation>
+    </message>
+    <message>
+      <source>Activate Free License</source>
+      <translation>Activeer gratis licentie</translation>
+    </message>
+    <message>
+      <source>Activate License</source>
+      <translation>Activeer licentie</translation>
+    </message>
+    <message>
+      <source>Internet Activation</source>
+      <translation>Internet Activering</translation>
+    </message>
+    <message>
+      <source>License Key</source>
+      <translation>Licentiesleutel</translation>
+    </message>
+    <message>
+      <source>Invalid License Key</source>
+      <translation>Ongeldige licentiesleutel</translation>
+    </message>
+    <message>
+      <source>Activation Key File</source>
+      <translation>Activatiebestand</translation>
+    </message>
+    <message>
+      <source>Hardware ID</source>
+      <translation>Hardware ID</translation>
+    </message>
+  </context>
+  <context>
+    <name>LocalSettingsDialog</name>
+    <message>
+      <source>Local Settings</source>
+      <translation>Lokale instellingen</translation>
+    </message>
+  </context>
+  <context>
+    <name>LoginDialog</name>
+    <message>
+      <source>Host</source>
+      <translation>Host</translation>
+    </message>
+    <message>
+      <source>Port</source>
+      <translation>Poort</translation>
+    </message>
+    <message>
+      <source>Login</source>
+      <translation>Login</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Wachtwoord</translation>
+    </message>
+    <message>
+      <source>Test</source>
+      <translation>Test</translation>
+    </message>
+  </context>
+  <context>
+    <name>LookAndFeelPreferencesWidget</name>
+    <message>
+      <source>Look and Feel</source>
+      <translation>Persoonlijke instellingen</translation>
+    </message>
+    <message>
+      <source>Background Image</source>
+      <translation>Achtergrondafbeelding</translation>
+    </message>
+    <message>
+      <source>Browse...</source>
+      <translation>Bladeren...</translation>
+    </message>
+    <message>
+      <source>Language</source>
+      <translation>Taal</translation>
+    </message>
+    <message>
+      <source>Time Mode</source>
+      <translation>Tijdmodus</translation>
+    </message>
+    <message>
+      <source>Image</source>
+      <translation>Afbeelding</translation>
+    </message>
+    <message>
+      <source>Mode</source>
+      <translation>Mode</translation>
+    </message>
+    <message>
+      <source>Intensity</source>
+      <translation>Intensiteit</translation>
+    </message>
+    <message>
+      <source>Show additional info in tree</source>
+      <translation>Toon extra informatie in de boom</translation>
+    </message>
+    <message>
+      <source>seconds</source>
+      <translation>seconden</translation>
+    </message>
+    <message>
+      <source>Tour cycle</source>
+      <translation>Tour cyclus</translation>
+    </message>
+    <message>
+      <source>IP addresses for cameras, and servers, groups for users, etc.</source>
+      <translation>IP-adressen voor camera's en servers, groepen voor gebruikers, etc.</translation>
+    </message>
+    <message>
+      <source>Show aim overlay for PTZ cameras</source>
+      <translation>Toon overlay voor PTZ-camera's</translation>
+    </message>
+  </context>
+  <context>
+    <name>MergeSystemsDialog</name>
+    <message>
+      <source>Merge Systems...</source>
+      <translation>Systemen samenvoegen...</translation>
+    </message>
+    <message>
+      <source>Server URL:</source>
+      <translation>Server URL:</translation>
+    </message>
+    <message>
+      <source>Password:</source>
+      <translation>Wachtwoord:</translation>
+    </message>
+    <message>
+      <source>Login:</source>
+      <translation>Aanmelden:</translation>
+    </message>
+    <message>
+      <source>Check</source>
+      <translation>Controleer</translation>
+    </message>
+    <message>
+      <source>Take system name and settings from:</source>
+      <translation>Gebruik de systeemnaam en instellingen over van:</translation>
+    </message>
+  </context>
+  <context>
+    <name>MultiServerUpdatesWidget</name>
+    <message>
+      <source>Updating to...</source>
+      <translation>Bijwerken naar...</translation>
+    </message>
+    <message>
+      <source>You have the latest version installed</source>
+      <translation>U hebt de nieuwste versie geïnstalleerd</translation>
+    </message>
+    <message>
+      <source>Download</source>
+      <translation>Download</translation>
+    </message>
+    <message>
+      <source>Browse</source>
+      <translation>Doorzoeken</translation>
+    </message>
+    <message>
+      <source>Download &amp;&amp; Install</source>
+      <translation>Download &amp;&amp; Installeren</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Annuleren</translation>
+    </message>
+    <message>
+      <source>Link copied</source>
+      <translation>Link gekopieerd</translation>
+    </message>
+    <message>
+      <source>Advanced Update Settings</source>
+      <translation>Geavanceerde Update instellingen</translation>
+    </message>
+    <message>
+      <source>It looks like the update process is taking more time than usual. Please keep waiting.</source>
+      <translation>Het lijkt er op dat het updateproces meer tijd kost dan normaal. Blijf alsjeblieft wachten.</translation>
+    </message>
+    <message>
+      <source>Advanced settings</source>
+      <translation type="unfinished">Advanced settings</translation>
+    </message>
+  </context>
+  <context>
+    <name>MultipleLayoutSelectionDialog</name>
+    <message>
+      <source>Select Layouts</source>
+      <translation>Selecteer schermindelingen</translation>
+    </message>
+  </context>
+  <context>
+    <name>NewVirtualCameraDialog</name>
+    <message>
+      <source>New Virtual Camera...</source>
+      <translation>Nieuwe virtuele camera...</translation>
+    </message>
+    <message>
+      <source>To server</source>
+      <translation>Naar server</translation>
+    </message>
+  </context>
+  <context>
+    <name>OauthLoginPlaceholder</name>
+    <message>
+      <source>Try Again</source>
+      <translation type="unfinished">Try Again</translation>
+    </message>
+  </context>
+  <context>
+    <name>OpenLayoutActionWidget</name>
+    <message>
+      <source>Layout</source>
+      <translation>Schermindeling</translation>
+    </message>
+    <message>
+      <source>Show to</source>
+      <translation>Tonen aan</translation>
+    </message>
+    <message>
+      <source>Select layout...</source>
+      <translation>Selecteer schermindeling...</translation>
+    </message>
+  </context>
+  <context>
+    <name>PasswordDialog</name>
+    <message>
+      <source>Sign in</source>
+      <translation>Log in</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Wachtwoord</translation>
+    </message>
+    <message>
+      <source>Username</source>
+      <translation>Gebruikersnaam</translation>
+    </message>
+  </context>
+  <context>
+    <name>PlaySoundBusinessActionWidget</name>
+    <message>
+      <source>Manage...</source>
+      <translation>Beheren...</translation>
+    </message>
+    <message>
+      <source>Volume:</source>
+      <translation>Volume:</translation>
+    </message>
+    <message>
+      <source>Test...</source>
+      <translation>Test...</translation>
+    </message>
+    <message>
+      <source>Play to users</source>
+      <translation>Speel af naar gebruikers</translation>
+    </message>
+  </context>
+  <context>
+    <name>PluginDiagnosticEventWidget</name>
+    <message>
+      <source>Source:</source>
+      <translation>Bron:</translation>
+    </message>
+    <message>
+      <source>Caption contains:</source>
+      <translation>Onderschrift bevat:</translation>
+    </message>
+    <message>
+      <source>Keywords separated by space</source>
+      <translation>Trefwoorden scheiden met een spatie</translation>
+    </message>
+    <message>
+      <source>Description contains:</source>
+      <translation>Beschrijving bevat:</translation>
+    </message>
+    <message>
+      <source>Level:</source>
+      <translation>Niveau:</translation>
+    </message>
+    <message>
+      <source>ERROR</source>
+      <translation>FOUT</translation>
+    </message>
+    <message>
+      <source>WARNING</source>
+      <translation>WAARSCHUWING</translation>
+    </message>
+    <message>
+      <source>INFO</source>
+      <translation>INFO</translation>
+    </message>
+  </context>
+  <context>
+    <name>PoeSettingsWidget</name>
+    <message>
+      <source>Attention! Power limit exceeded</source>
+      <translation>Opgelet! Vermogenslimiet overschreden</translation>
+    </message>
+  </context>
+  <context>
+    <name>PopupBusinessActionWidget</name>
+    <message>
+      <source>Force Acknowledgment</source>
+      <translation>Forceer bevestiging</translation>
+    </message>
+    <message>
+      <source>Use custom text:</source>
+      <translation>Gebruik aangepaste tekst:</translation>
+    </message>
+    <message>
+      <source>to</source>
+      <translation>aan</translation>
+    </message>
+  </context>
+  <context>
+    <name>PopupSettingsWidget</name>
+    <message>
+      <source>Show all notifications</source>
+      <translation>Toon alle notificaties</translation>
+    </message>
+    <message>
+      <source>System Notifications</source>
+      <translation>Systeemnotificaties</translation>
+    </message>
+    <message>
+      <source>Events</source>
+      <translation>Events</translation>
+    </message>
+  </context>
+  <context>
+    <name>PtzManageDialog</name>
+    <message>
+      <source>Save Current Position</source>
+      <translation>Huidige positie opslaan</translation>
+    </message>
+    <message>
+      <source>Go To Position</source>
+      <translation>Ga naar positie</translation>
+    </message>
+    <message>
+      <source>Create Tour</source>
+      <translation>Tour aanmaken</translation>
+    </message>
+    <message>
+      <source>Start Tour</source>
+      <translation>Start tour</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Verwijder</translation>
+    </message>
+    <message>
+      <source>Details</source>
+      <translation>Details</translation>
+    </message>
+    <message>
+      <source>No Tour Selected</source>
+      <translation>Geen tour geselecteerd</translation>
+    </message>
+    <message>
+      <source>Preview</source>
+      <translation>Voorbeeld</translation>
+    </message>
+    <message>
+      <source>No preview available</source>
+      <translation>Geen voorbeeld beschikbaar</translation>
+    </message>
+    <message>
+      <source>Get Preview</source>
+      <translation>Krijg voorbeeld</translation>
+    </message>
+  </context>
+  <context>
+    <name>PtzPresetDialog</name>
+    <message>
+      <source>Save Position</source>
+      <translation>Positie opslaan</translation>
+    </message>
+    <message>
+      <source>Name:</source>
+      <translation>Naam:</translation>
+    </message>
+    <message>
+      <source>Hotkey:</source>
+      <translation>Sneltoets:</translation>
+    </message>
+  </context>
+  <context>
+    <name>PushNotificationBusinessActionWidget</name>
+    <message>
+      <source>To</source>
+      <translation>Aan</translation>
+    </message>
+    <message>
+      <source>Language Settings</source>
+      <translation>Taalinstellingen</translation>
+    </message>
+    <message>
+      <source>Custom notification content</source>
+      <translation>Aangepaste inhoud van meldingen</translation>
+    </message>
+    <message>
+      <source>Header</source>
+      <translation>Koptekst</translation>
+    </message>
+    <message>
+      <source>Default notification title will be used if left empty</source>
+      <translation>Standaard notificatie titel zal gebruikt worden als het leeg gelaten wordt</translation>
+    </message>
+    <message>
+      <source>Body</source>
+      <translation>Berichttekst</translation>
+    </message>
+    <message>
+      <source>Default text will be used if this field is empty</source>
+      <translation>Standaardtekst wordt gebruikt als dit veld leeg is</translation>
+    </message>
+    <message>
+      <source>Add source device name in body</source>
+      <translation>Voeg de naam van het bronapparaat toe aan de berichttekst</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnAttachToVideowallDialog</name>
+    <message>
+      <source>Attach to Video Wall...</source>
+      <translation>Toevoegen aan de videowall...</translation>
+    </message>
+    <message>
+      <source>Preview</source>
+      <translation>Voorbeeld</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraBookmarkDialog</name>
+    <message>
+      <source>Bookmark</source>
+      <translation>Bladwijzer</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCompatibilityVersionInstallationDialog</name>
+    <message>
+      <source>Installing Compatibility Version...</source>
+      <translation>Installeren compatibiliteitsversie...</translation>
+    </message>
+    <message>
+      <source>Restart to the updated version when ready</source>
+      <translation>Herstart de bijgewerkte versie wanneer gereed</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnMessageBox</name>
+    <message>
+      <source>Do not show this message again</source>
+      <translation>Toon dit bericht niet opnieuw</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnNotificationSoundManagerDialog</name>
+    <message>
+      <source>Notification Sounds</source>
+      <translation>Notificatie geluid</translation>
+    </message>
+    <message>
+      <source>Play</source>
+      <translation>Afspelen</translation>
+    </message>
+    <message>
+      <source>Add...</source>
+      <translation>Voeg toe...</translation>
+    </message>
+    <message>
+      <source>Rename...</source>
+      <translation>Naam wijzigen...</translation>
+    </message>
+    <message>
+      <source>Delete...</source>
+      <translation>Verwijder...</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnRoutingManagementWidget</name>
+    <message>
+      <source>Add URL</source>
+      <translation>Voeg URL toe</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>Verwijder</translation>
+    </message>
+    <message>
+      <source>Add</source>
+      <translation>Toevoegen</translation>
+    </message>
+    <message>
+      <source>Removing this connection option could lead to System malfunction.</source>
+      <translation>Het verwijderen van deze verbindingsoptie kan leiden tot storingen in het systeem.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnSystemAdministrationDialog</name>
+    <message>
+      <source>System Administration</source>
+      <translation>Systeembeheer</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnUserManagementWidget</name>
+    <message>
+      <source>LDAP Settings...</source>
+      <translation>LDAP-instellingen...</translation>
+    </message>
+    <message>
+      <source>New User...</source>
+      <translation>Nieuwe gebruiker...</translation>
+    </message>
+    <message>
+      <source>Fetch Users from LDAP...</source>
+      <translation>Gebruikers ophalen via LDAP...</translation>
+    </message>
+    <message>
+      <source>Search users</source>
+      <translation>Zoek gebruikers</translation>
+    </message>
+    <message>
+      <source>Enable</source>
+      <translation>Inschakelen</translation>
+    </message>
+    <message>
+      <source>Disable</source>
+      <translation>Uitschakelen</translation>
+    </message>
+    <message>
+      <source>Delete...</source>
+      <translation>Verwijder...</translation>
+    </message>
+    <message>
+      <source>Edit Roles...</source>
+      <translation>Profielen bewerken...</translation>
+    </message>
+    <message>
+      <source>Force Secure Authentication</source>
+      <translation type="unfinished">Force Secure Authentication</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Niets gevonden</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnVideowallSettingsDialog</name>
+    <message>
+      <source>Video Wall Settings</source>
+      <translation>Videowall instellingen</translation>
+    </message>
+    <message>
+      <source>Launch video wall when Windows starts.</source>
+      <translation>Start de videowall wanneer het besturingssysteem start.</translation>
+    </message>
+    <message>
+      <source>Place shortcut on desktop.</source>
+      <translation>Plaats de snelkoppeling op het bureaublad.</translation>
+    </message>
+    <message>
+      <source>Enable timeline on video wall</source>
+      <translation>Schakel tijdlijn op de videowall in</translation>
+    </message>
+  </context>
+  <context>
+    <name>RapidReviewSettingsWidget</name>
+    <message>
+      <source>Rapid Review</source>
+      <translation>Rapid Review</translation>
+    </message>
+    <message>
+      <source>Initial video length</source>
+      <translation>Oorspronkelijke videolengte</translation>
+    </message>
+    <message>
+      <source>Exported video length</source>
+      <translation>Geëxporteerde videolengte</translation>
+    </message>
+    <message>
+      <source>Speed</source>
+      <translation>Snelheid</translation>
+    </message>
+    <message>
+      <source>Frames interval</source>
+      <translation>Frame interval</translation>
+    </message>
+    <message>
+      <source>Reset Speed</source>
+      <translation>Herstel de snelheid</translation>
+    </message>
+  </context>
+  <context>
+    <name>ReconnectInfoDialog</name>
+    <message>
+      <source>Reconnecting...</source>
+      <translation>Opnieuw verbinden...</translation>
+    </message>
+    <message>
+      <source>Please wait while the connection is being restored...</source>
+      <translation>Een moment geduld a. u. b., de verbinding wordt hersteld...</translation>
+    </message>
+    <message>
+      <source>Server name</source>
+      <translation>Servernaam</translation>
+    </message>
+  </context>
+  <context>
+    <name>RecordingBusinessActionWidget</name>
+    <message>
+      <source>Quality:</source>
+      <translation>Kwaliteit:</translation>
+    </message>
+    <message>
+      <source>FPS</source>
+      <translation>FPS</translation>
+    </message>
+    <message>
+      <source>s</source>
+      <translation>s</translation>
+    </message>
+    <message>
+      <source>Pre-Recording:</source>
+      <translation>Voor-opname:</translation>
+    </message>
+    <message>
+      <source>Post-Recording:</source>
+      <translation>Na-opname:</translation>
+    </message>
+    <message>
+      <source>Fixed duration:</source>
+      <translation>Vaste duur:</translation>
+    </message>
+  </context>
+  <context>
+    <name>RecordingSettings</name>
+    <message>
+      <source>Temporary Folder</source>
+      <translation>Tijdelijke map</translation>
+    </message>
+    <message>
+      <source>Additional Options</source>
+      <translation>Extra opties</translation>
+    </message>
+    <message>
+      <source>Disable Aero</source>
+      <translation>Schakel Aero uit</translation>
+    </message>
+    <message>
+      <source>Capture Cursor</source>
+      <translation>Cursor opnemen</translation>
+    </message>
+    <message>
+      <source>A powerful computer is recommended for &quot;Best&quot; quality and resolution.</source>
+      <translation>Wij adviseren een krachtige computer te gebruiken voor de &quot;Beste&quot; kwaliteit en resolutie.</translation>
+    </message>
+    <message>
+      <source>Browse...</source>
+      <translation>Bladeren...</translation>
+    </message>
+    <message>
+      <source>Resolution</source>
+      <translation>Resolutie</translation>
+    </message>
+    <message>
+      <source>Recording Quality</source>
+      <translation>Opnamekwaliteit</translation>
+    </message>
+    <message>
+      <source>Source</source>
+      <translation>Bron</translation>
+    </message>
+    <message>
+      <source>Screen</source>
+      <translation>Scherm</translation>
+    </message>
+  </context>
+  <context>
+    <name>RecordingThresholdWidget</name>
+    <message>
+      <source>Pre-Recording</source>
+      <translation>Voor-opname</translation>
+    </message>
+    <message>
+      <source>Post-Recording</source>
+      <translation>Na-opname</translation>
+    </message>
+  </context>
+  <context>
+    <name>RepeatedPasswordDialog</name>
+    <message>
+      <source>Repeat Password</source>
+      <translation>Herhaal het wachtwoord</translation>
+    </message>
+    <message>
+      <source>Passwords do not match</source>
+      <translation>De wachtwoorden komen niet overeen</translation>
+    </message>
+    <message>
+      <source>Password</source>
+      <translation>Wachtwoord</translation>
+    </message>
+  </context>
+  <context>
+    <name>ResourceBrowserWidget</name>
+    <message>
+      <source>Resources</source>
+      <translation>Systeemoverzicht</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Niets gevonden</translation>
+    </message>
+    <message>
+      <source>Drag any image or video file to the application window to play them</source>
+      <translation>Sleep een afbeelding of videobestand naar het toepassingsvenster om ze af te spelen</translation>
+    </message>
+  </context>
+  <context>
+    <name>RewindForWidget</name>
+    <message>
+      <source>Playback time :</source>
+      <translation type="unfinished">Playback time :</translation>
+    </message>
+    <message>
+      <source>rewind for</source>
+      <translation type="unfinished">rewind for</translation>
+    </message>
+    <message>
+      <source>Live</source>
+      <translation>Live</translation>
+    </message>
+  </context>
+  <context>
+    <name>SayTextBusinessActionWidget</name>
+    <message>
+      <source>Speak the following:</source>
+      <translation>Spreek het volgende uit:</translation>
+    </message>
+    <message>
+      <source>Type any text here</source>
+      <translation>Typ de gewenste tekst hier</translation>
+    </message>
+    <message>
+      <source>Volume:</source>
+      <translation>Volume:</translation>
+    </message>
+    <message>
+      <source>Test...</source>
+      <translation>Test...</translation>
+    </message>
+    <message>
+      <source>Speak to users</source>
+      <translation>Spreek met gebruikers</translation>
+    </message>
+  </context>
+  <context>
+    <name>ScheduleSettingsWidget</name>
+    <message>
+      <source>Schedule Settings</source>
+      <translation>Schema Instellingen</translation>
+    </message>
+    <message>
+      <source>Record Always</source>
+      <translation>Altijd opnemen</translation>
+    </message>
+    <message>
+      <source>Motion Only</source>
+      <translation>Alleen beweging</translation>
+    </message>
+    <message>
+      <source>Motion + Lo-Res</source>
+      <translation>Beweging + Lo-Res</translation>
+    </message>
+    <message>
+      <source>Do Not Record</source>
+      <translation>Niet opnemen</translation>
+    </message>
+    <message>
+      <source>Bitrate</source>
+      <translation>Bitrate</translation>
+    </message>
+    <message>
+      <source>FPS</source>
+      <translation>FPS</translation>
+    </message>
+    <message>
+      <source>Quality</source>
+      <translation>Kwaliteit</translation>
+    </message>
+    <message>
+      <source>Motion</source>
+      <translation>Beweging</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>Objecten</translation>
+    </message>
+    <message>
+      <source>Motion &amp;&amp; Objects</source>
+      <translation type="unfinished">Motion &amp;&amp; Objects</translation>
+    </message>
+  </context>
+  <context>
+    <name>SecuritySettingsWidget</name>
+    <message>
+      <source>Enable audit trail</source>
+      <translation>Systeemrapportage inschakelen</translation>
+    </message>
+    <message>
+      <source>Display watermark with username over video</source>
+      <translation>Toon watermerk met gebruikersnaam over het videobeeld</translation>
+    </message>
+    <message>
+      <source>Watermark Preview</source>
+      <translation>Voorbeeld watermerk</translation>
+    </message>
+    <message>
+      <source>to</source>
+      <translation>aan</translation>
+    </message>
+    <message>
+      <source>Limit session duration</source>
+      <translation>Beperk de duur van de sessie</translation>
+    </message>
+    <message>
+      <source>Data protection</source>
+      <translation type="unfinished">Data protection</translation>
+    </message>
+    <message>
+      <source>Use only HTTPS to connect to cameras</source>
+      <translation type="unfinished">Use only HTTPS to connect to cameras</translation>
+    </message>
+    <message>
+      <source>User Activity</source>
+      <translation type="unfinished">User Activity</translation>
+    </message>
+    <message>
+      <source>Display servers in tree for non-administrator users</source>
+      <translation type="unfinished">Display servers in tree for non-administrator users</translation>
+    </message>
+    <message>
+      <source>Archive encryption</source>
+      <translation type="unfinished">Archive encryption</translation>
+    </message>
+    <message>
+      <source>Archive encryption increases CPU usage</source>
+      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+    </message>
+    <message>
+      <source>Change Password...</source>
+      <translation>Wachtwoord wijzigen...</translation>
+    </message>
+    <message>
+      <source>Encrypting video traffic will significantly increase CPU usage.</source>
+      <translation>De encryptie van het videoverkeer zal het CPU-gebruik aanzienlijk verhogen.</translation>
+    </message>
+    <message>
+      <source>Connection with cameras that do not support HTTPS will be lost.</source>
+      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost.</translation>
+    </message>
+    <message>
+      <source>Force servers to accept only encrypted connections</source>
+      <translation type="unfinished">Force servers to accept only encrypted connections</translation>
+    </message>
+    <message>
+      <source>Encrypt video traffic to desktop and mobile clients</source>
+      <translation type="unfinished">Encrypt video traffic to desktop and mobile clients</translation>
+    </message>
+    <message>
+      <source>Manage Users</source>
+      <translation type="unfinished">Manage Users</translation>
+    </message>
+  </context>
+  <context>
+    <name>SendmailBusinessActionWidget</name>
+    <message>
+      <source>Additional Recipients:</source>
+      <translation>Aanvullende Ontvangers:</translation>
+    </message>
+    <message>
+      <source>Global Email Settings...</source>
+      <translation>Algemene e-mailinstellingen...</translation>
+    </message>
+  </context>
+  <context>
+    <name>ServerCertificateViewer</name>
+    <message>
+      <source>Server certificate</source>
+      <translation type="unfinished">Server certificate</translation>
+    </message>
+    <message>
+      <source>General</source>
+      <translation>Algemeen</translation>
+    </message>
+    <message>
+      <source>Issued by</source>
+      <translation type="unfinished">Issued by</translation>
+    </message>
+    <message>
+      <source>Self-signed root certificate</source>
+      <translation type="unfinished">Self-signed root certificate</translation>
+    </message>
+    <message>
+      <source>Expires</source>
+      <translation>Verloopt</translation>
+    </message>
+    <message>
+      <source>Certificate is expired</source>
+      <translation type="unfinished">Certificate is expired</translation>
+    </message>
+    <message>
+      <source>Fingerprints</source>
+      <translation type="unfinished">Fingerprints</translation>
+    </message>
+    <message>
+      <source>Details</source>
+      <translation>Details</translation>
+    </message>
+    <message>
+      <source>Pin to this certificate</source>
+      <translation type="unfinished">Pin to this certificate</translation>
+    </message>
+    <message>
+      <source>View pinned certificate</source>
+      <translation type="unfinished">View pinned certificate</translation>
+    </message>
+  </context>
+  <context>
+    <name>ServerSelectionDialog</name>
+    <message>
+      <source>Select Servers</source>
+      <translation>Selecteer servers</translation>
+    </message>
+  </context>
+  <context>
+    <name>ServerSettingsWidget</name>
+    <message>
+      <source>Ping</source>
+      <translation>Ping</translation>
+    </message>
+    <message>
+      <source>Failover</source>
+      <translation>Failover</translation>
+    </message>
+    <message>
+      <source>Failover Priority...</source>
+      <translation>Failover-prioriteit...</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Naam</translation>
+    </message>
+    <message>
+      <source>IP Address</source>
+      <translation>IP Adres</translation>
+    </message>
+    <message>
+      <source>Port</source>
+      <translation>Poort</translation>
+    </message>
+    <message>
+      <source>Autodetect built-in and USB webcams</source>
+      <translation type="unfinished">Autodetect built-in and USB webcams</translation>
+    </message>
+  </context>
+  <context>
+    <name>ShowOnAlarmLayoutActionWidget</name>
+    <message>
+      <source>for</source>
+      <translation>voor</translation>
+    </message>
+    <message>
+      <source>Force Alarm Layout opening</source>
+      <translation>Forceer het openen van een alarm scherm</translation>
+    </message>
+    <message>
+      <source>Also show source camera</source>
+      <translation>Toon ook de broncamera</translation>
+    </message>
+  </context>
+  <context>
+    <name>ShowTextOverlayActionWidget</name>
+    <message>
+      <source>seconds</source>
+      <translation>seconden</translation>
+    </message>
+    <message>
+      <source>Display text for:</source>
+      <translation>Toon tekst voor:</translation>
+    </message>
+    <message>
+      <source>Use custom text:</source>
+      <translation>Gebruik aangepaste tekst:</translation>
+    </message>
+    <message>
+      <source>Rule will work only for prolonged events</source>
+      <translation>Regel werkt alleen voor langdurige evenementen</translation>
+    </message>
+    <message>
+      <source>Also show on source camera</source>
+      <translation>Toon ook op broncamera</translation>
+    </message>
+  </context>
+  <context>
+    <name>SignDialog</name>
+    <message>
+      <source>Watermark Check</source>
+      <translation>Watermerkcontrole</translation>
+    </message>
+    <message>
+      <source>Checked File:</source>
+      <translation>Gecontroleerd bestand:</translation>
+    </message>
+    <message>
+      <source>Check Result:</source>
+      <translation>Controle resultaat:</translation>
+    </message>
+  </context>
+  <context>
+    <name>SmtpAdvancedSettingsWidget</name>
+    <message>
+      <source>Unsecure Connection</source>
+      <translation>Niet-beveiligde verbinding</translation>
+    </message>
+    <message>
+      <source>(recommended)</source>
+      <translation>(aanbevolen)</translation>
+    </message>
+    <message>
+      <source>Secure connection using TLS.</source>
+      <translation>Beveiligde verbinding via TLS.</translation>
+    </message>
+    <message>
+      <source>Secure connection using SSL.</source>
+      <translation>Beveiligde verbinding via SSL.</translation>
+    </message>
+    <message>
+      <source>Port:</source>
+      <translation>Poort:</translation>
+    </message>
+  </context>
+  <context>
+    <name>SmtpSettingsWidget</name>
+    <message>
+      <source>Outgoing Email Settings</source>
+      <translation>Uitgaande e-mailinstellingen</translation>
+    </message>
+    <message>
+      <source>Advanced settings...</source>
+      <translation>Geavanceerde instellingen...</translation>
+    </message>
+    <message>
+      <source>Test</source>
+      <translation>Test</translation>
+    </message>
+  </context>
+  <context>
+    <name>SmtpTestConnectionWidget</name>
+    <message>
+      <source>Server:</source>
+      <translation>Server:</translation>
+    </message>
+    <message>
+      <source>Port:</source>
+      <translation>Poort:</translation>
+    </message>
+    <message>
+      <source>User:</source>
+      <translation>Gebruiker:</translation>
+    </message>
+    <message>
+      <source>Security:</source>
+      <translation>Beveiliging:</translation>
+    </message>
+    <message>
+      <source>Progress:</source>
+      <translation>Voortgang:</translation>
+    </message>
+    <message>
+      <source>Result:</source>
+      <translation>Resultaat:</translation>
+    </message>
+    <message>
+      <source>OK</source>
+      <translation>Oké</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Annuleren</translation>
+    </message>
+  </context>
+  <context>
+    <name>SoftwareTriggerBusinessEventWidget</name>
+    <message>
+      <source>Available to</source>
+      <translation>Beschikbaar voor</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>Naam</translation>
+    </message>
+    <message>
+      <source>Icon</source>
+      <translation>Icoon</translation>
+    </message>
+  </context>
+  <context>
+    <name>StorageAnalyticsWidget</name>
+    <message>
+      <source>Current Statistics</source>
+      <translation>Huidige statistieken</translation>
+    </message>
+    <message>
+      <source>Forecast for Full Storage Usage</source>
+      <translation>Voorspelling voor volledige opslaggebruik</translation>
+    </message>
+    <message>
+      <source>Server is offline. Statistics are not available.</source>
+      <translation>Server is offline. Statistieken zijn niet beschikbaar.</translation>
+    </message>
+    <message>
+      <source>Additional storage</source>
+      <translation>Extra opslagruimte</translation>
+    </message>
+    <message>
+      <source>Base forecast on data recorded during</source>
+      <translation>Baseer de voorspelling op de data gedurende</translation>
+    </message>
+  </context>
+  <context>
+    <name>StorageConfigWidget</name>
+    <message>
+      <source>Add External Storage...</source>
+      <translation>Externe opslag toevoegen...</translation>
+    </message>
+    <message>
+      <source>Storage Locations</source>
+      <translation>Opslaglocaties</translation>
+    </message>
+    <message>
+      <source>Reindex Archive</source>
+      <translation>Archief herindexeren</translation>
+    </message>
+    <message>
+      <source>Reindex Backup</source>
+      <translation>Backup herindexeren</translation>
+    </message>
+    <message>
+      <source>Analytics data will continue to be stored on the disabled storage.</source>
+      <translation>Analytics gegevens zullen blijven opgeslagen worden op de uitgeschakelde opslagmedia.</translation>
+    </message>
+    <message>
+      <source>Recording to disabled storage location will stop. However, deleting outdated footage from it will continue.</source>
+      <translation>Opnames naar de uitgeschakelde opslagmedia zal stoppen. Echter, het overschrijven dan de oudste beelden gaat gewoon door.</translation>
+    </message>
+    <message>
+      <source>Recording was enabled on the USB storage</source>
+      <translation>Opname is ingeschakeld op de USB-opslag</translation>
+    </message>
+    <message>
+      <source>Analytics data can take up large amounts of space. We recommend to choose another location for it instead of the system partition.</source>
+      <translation>Analytics gegevens kunnen grote hoeveelheden ruimte gebruiken. We raden aan om een andere locatie voor te kiezen in plaats van de systeem partitie.</translation>
+    </message>
+  </context>
+  <context>
+    <name>StorageRebuildWidget</name>
+    <message>
+      <source>Cancel</source>
+      <translation>Annuleren</translation>
+    </message>
+  </context>
+  <context>
+    <name>StorageUrlDialog</name>
+    <message>
+      <source>Add External Storage...</source>
+      <translation>Externe opslag toevoegen...</translation>
+    </message>
+    <message>
+      <source>Protocol:</source>
+      <translation>Protocol:</translation>
+    </message>
+    <message>
+      <source>URL:</source>
+      <translation>URL:</translation>
+    </message>
+    <message>
+      <source>Login:</source>
+      <translation>Login:</translation>
+    </message>
+    <message>
+      <source>Password:</source>
+      <translation>Wachtwoord:</translation>
+    </message>
+  </context>
+  <context>
+    <name>SubjectSelectionDialog</name>
+    <message>
+      <source>Roles</source>
+      <translation>Profielen</translation>
+    </message>
+    <message>
+      <source>Show all users</source>
+      <translation>Toon alle gebruikers</translation>
+    </message>
+    <message>
+      <source>Select Users</source>
+      <translation>Selecteer gebruikers</translation>
+    </message>
+    <message>
+      <source>Nothing matches your search.</source>
+      <translation>Geen resultaten overeenkomstig met uw zoekopdracht.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SystemSettingsWidget</name>
+    <message>
+      <source>(recommended)</source>
+      <translation>(aanbevolen)</translation>
+    </message>
+    <message>
+      <source>Send anonymous usage and crash statistics to software developers</source>
+      <translation>Stuur anonieme gebruiks- en crashstatistieken naar onze softwareontwikkelaars</translation>
+    </message>
+    <message>
+      <source>Warning! This will make the Quality and Frame Rate (FPS) settings in the Recording Schedule irrelevant.</source>
+      <translation>Waarschuwing! Hierdoor worden de kwaliteit en de framerate (FPS) instellingen in het opnameschema irrelevant.</translation>
+    </message>
+    <message>
+      <source>Custom language for mobile notifications</source>
+      <translation>Aangepaste taal voor mobiele meldingen</translation>
+    </message>
+  </context>
+  <context>
+    <name>TextOverlaySettingsWidget</name>
+    <message>
+      <source>Text</source>
+      <translation>Tekst</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Verwijder</translation>
+    </message>
+    <message>
+      <source>Font Size</source>
+      <translation>Tekstgrootte</translation>
+    </message>
+    <message>
+      <source>Enter plain text or HTML</source>
+      <translation>Voer platte tekst of HTML in</translation>
+    </message>
+    <message>
+      <source>Area Width</source>
+      <translation>Breedte van het veld</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimeSynchronizationWidget</name>
+    <message>
+      <source>Sync Time with the Internet</source>
+      <translation>Synchroniseer tijd met internet</translation>
+    </message>
+    <message>
+      <source>VMS Time</source>
+      <translation>VMS tijd</translation>
+    </message>
+    <message>
+      <source>Do not sync time among servers</source>
+      <translation>Synchroniseer geen tijd tussen servers</translation>
+    </message>
+  </context>
+  <context>
+    <name>TimestampOverlaySettingsWidget</name>
+    <message>
+      <source>Timestamp</source>
+      <translation>Tijdstempel</translation>
+    </message>
+    <message>
+      <source>Font Size</source>
+      <translation>Tekstgrootte</translation>
+    </message>
+    <message>
+      <source>Format</source>
+      <translation>Formaat</translation>
+    </message>
+    <message>
+      <source>Delete</source>
+      <translation>Verwijder</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserProfileWidget</name>
+    <message>
+      <source>Change Password...</source>
+      <translation>Wachtwoord wijzigen...</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserRoleSettingsWidget</name>
+    <message>
+      <source>Name</source>
+      <translation>Naam</translation>
+    </message>
+    <message>
+      <source>Users</source>
+      <translation>Gebruikers</translation>
+    </message>
+    <message>
+      <source>Delete Role</source>
+      <translation>Profiel verwijderen</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserRolesDialog</name>
+    <message>
+      <source>User Roles</source>
+      <translation>Gebruikersprofielen</translation>
+    </message>
+    <message>
+      <source>New role</source>
+      <translation>Nieuwe profiel</translation>
+    </message>
+    <message>
+      <source>There are no custom user roles yet.</source>
+      <translation>Er zijn nog geen aangepaste gebruikersprofielen.</translation>
+    </message>
+    <message>
+      <source>Click &quot;New role&quot; button to create one.</source>
+      <translation>Klik op de &quot;Nieuw profiel&quot; -knop om een nieuw profiel aan te maken.</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserSettingsDialog</name>
+    <message>
+      <source>This user can use digest authentication.</source>
+      <translation type="unfinished">This user can use digest authentication.</translation>
+    </message>
+    <message>
+      <source>Force Secure Authentication</source>
+      <translation type="unfinished">Force Secure Authentication</translation>
+    </message>
+  </context>
+  <context>
+    <name>UserSettingsWidget</name>
+    <message>
+      <source>User Type</source>
+      <translation>Gebruikerstype</translation>
+    </message>
+    <message>
+      <source>Role</source>
+      <translation>Profiel</translation>
+    </message>
+    <message>
+      <source>Edit Roles...</source>
+      <translation>Profielen bewerken...</translation>
+    </message>
+  </context>
+  <context>
+    <name>VersionSelectionDialog</name>
+    <message>
+      <source>Choose a specific build</source>
+      <translation>Kies een specifieke versie</translation>
+    </message>
+  </context>
+  <context>
+    <name>VirtualCameraMotionWidget</name>
+    <message>
+      <source>Motion Detection</source>
+      <translation>Bewegingsdetectie</translation>
+    </message>
+    <message>
+      <source>Detect motion</source>
+      <translation>Detecteer beweging</translation>
+    </message>
+    <message>
+      <source>Sensitivity</source>
+      <translation>Gevoeligheid</translation>
+    </message>
+  </context>
+  <context>
+    <name>VirtualCameraTimeZoneWidget</name>
+    <message>
+      <source>Form</source>
+      <translation>Formulier</translation>
+    </message>
+    <message>
+      <source>Time</source>
+      <translation>Tijd</translation>
+    </message>
+    <message>
+      <source>Ignore timezone in uploaded files</source>
+      <translation>Negeer de tijdzone in de geüploade bestanden</translation>
+    </message>
+  </context>
+  <context>
+    <name>VirtualCameraUploadWidget</name>
+    <message>
+      <source>Cancel</source>
+      <translation>Annuleren</translation>
+    </message>
+    <message>
+      <source>Upload Footage</source>
+      <translation>Beeldmateriaal Uploaden</translation>
+    </message>
+    <message>
+      <source>Upload File...</source>
+      <translation>Upload bestand...</translation>
+    </message>
+    <message>
+      <source>Upload Folder...</source>
+      <translation>Upload map...</translation>
+    </message>
+  </context>
+  <context>
+    <name>WebpageDialog</name>
+    <message>
+      <source>General</source>
+      <translation>Algemeen</translation>
+    </message>
+    <message>
+      <source>Proxy this webpage via server</source>
+      <translation type="unfinished">Proxy this webpage via server</translation>
+    </message>
+    <message>
+      <source>SELECT SERVER</source>
+      <translation>SELECTEER SERVER</translation>
+    </message>
+    <message>
+      <source>Advanced</source>
+      <translation>Geavanceerd</translation>
+    </message>
+    <message>
+      <source>Allow using Client API</source>
+      <translation type="unfinished">Allow using Client API</translation>
+    </message>
+    <message>
+      <source>Proxy all requested contents</source>
+      <translation type="unfinished">Proxy all requested contents</translation>
+    </message>
+    <message>
+      <source>Allow opening web page without SSL certificate checking</source>
+      <translation type="unfinished">Allow opening web page without SSL certificate checking</translation>
+    </message>
+  </context>
+  <context>
+    <name>WeekTimeScheduleDialog</name>
+    <message>
+      <source>Schedule Settings</source>
+      <translation>Schema Instellingen</translation>
+    </message>
+    <message>
+      <source>On</source>
+      <translation>Aan</translation>
+    </message>
+    <message>
+      <source>Off</source>
+      <translation>Uit</translation>
+    </message>
+    <message>
+      <source>Schedule</source>
+      <translation>Schema</translation>
+    </message>
+    <message>
+      <source>Note: Schedule is based on server time.</source>
+      <translation>Opmerking: Schema is gebaseerd op de servertijd.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::WatermarkPreviewDialog</name>
+    <message>
+      <source>Watermark preview</source>
+      <translation>Voorbeeld watermerk</translation>
+    </message>
+    <message>
+      <source>Opacity</source>
+      <translation>Transparantie</translation>
+    </message>
+    <message>
+      <source>Frequency</source>
+      <translation>Frequentie</translation>
+    </message>
+  </context>
+</TS>

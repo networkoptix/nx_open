@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>cooperative-handshake</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="cooperative-handshake">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M15,11.6666667 L10,16.6666667 M15,11.6666667 L13.3333333,13.3333333 M15,11.6666667 L18.3333333,8.33333333 L13.3333333,3.33333333 L7.08333333,9.58333333 M15,11.6666667 L11.6666667,8.33333333 L9.16666667,10.8333333 L7.08333333,9.58333333 M10,16.6666667 L1.66666667,8.33333333 L6.66666667,3.33333333 L10,6.66666667 L7.08333333,9.58333333 M10,16.6666667 L11.6666667,15 M13.3333333,13.3333333 L12.0833333,12.0833333 M13.3333333,13.3333333 L11.6666667,15 M11.6666667,15 L10.4166667,13.75" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

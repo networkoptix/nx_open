@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>power-supply</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="power-supply">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M13.456875,2.5 L6.543125,2.5 C6.36729167,2.5 6.210375,2.6103875 6.15095833,2.77589167 L3.37175417,10.5179583 C3.3466,10.5880417 3.34067917,10.6635833 3.3546125,10.7367083 L4.10215,14.6612917 C4.13958333,14.8578333 4.31141667,15 4.51145833,15 L15.4885417,15 C15.6885833,15 15.8604167,14.8578333 15.8978333,14.6612917 L16.645375,10.7367083 C16.6593333,10.6635833 16.6534167,10.5880417 16.62825,10.5179583 L13.8490417,2.77589167 C13.789625,2.6103875 13.6327083,2.5 13.456875,2.5 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="10" y1="5" x2="10" y2="7.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="10" y1="15" x2="10" y2="18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="6.875" y1="9.75079167" x2="8.125" y2="11.915875" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="13.125" y1="9.75079167" x2="11.875" y2="11.915875" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

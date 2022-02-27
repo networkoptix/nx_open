@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>speed-one</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="speed-one">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M12.6238333,7.82441667 C12.6238333,7.82441667 11.2782917,11.617 10.6389167,12.279125 C9.9995,12.9412917 8.944375,12.9597083 8.28225,12.3202917 C7.62008333,11.680875 7.60166667,10.62575 8.24108333,9.963625 C8.8805,9.3015 12.6238333,7.82441667 12.6238333,7.82441667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M16.1871667,16.1871667 C17.770625,14.60375 18.75,12.41625 18.75,10 C18.75,5.1675 14.8325,1.25 10,1.25 C5.1675,1.25 1.25,5.1675 1.25,10 C1.25,12.41625 2.22937917,14.60375 3.81281667,16.1871667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="10" y1="1.66666667" x2="10" y2="3.33333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="16.1855833" y1="4.64254167" x2="14.8903333" y2="5.691375" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="17.7177083" y1="11.347" x2="16.0937917" y2="10.9720833" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="2.2822875" y1="11.347" x2="3.9062375" y2="10.9720833" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="3.81442917" y1="4.64254167" x2="5.10966667" y2="5.691375" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

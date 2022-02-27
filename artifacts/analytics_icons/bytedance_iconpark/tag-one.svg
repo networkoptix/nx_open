@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>tag-one</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="tag-one">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M17.5704583,12.1854583 L12.1929583,17.5629583 C11.911625,17.844625 11.5298333,18.002875 11.1317083,18.002875 C10.7335833,18.002875 10.3518333,17.844625 10.0704583,17.5629583 L3.33333333,10.8333333 L3.33333333,3.33333333 L10.8333333,3.33333333 L17.5704583,10.0704583 C18.1520417,10.6555 18.1520417,11.6004167 17.5704583,12.1854583 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M7.70833333,8.75 C8.283625,8.75 8.75,8.283625 8.75,7.70833333 C8.75,7.13304167 8.283625,6.66666667 7.70833333,6.66666667 C7.13304167,6.66666667 6.66666667,7.13304167 6.66666667,7.70833333 C6.66666667,8.283625 7.13304167,8.75 7.70833333,8.75 Z" id="Path" fill="#A5B7C0"></path>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>nmr</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="nmr">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M10,18.3333333 C14.602375,18.3333333 18.3333333,14.602375 18.3333333,10 C18.3333333,5.397625 14.602375,1.66666667 10,1.66666667 C5.397625,1.66666667 1.66666667,5.397625 1.66666667,10 C1.66666667,14.602375 5.397625,18.3333333 10,18.3333333 Z" id="Path" stroke="#A5B7C0"></path>
+            <path d="M13.5355,6.46445833 C12.6306667,5.559625 11.3806667,5 9.99995833,5 C8.61925,5 7.36925,5.559625 6.46441667,6.46445833" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="14.1666667 10 5.83333333 10 5.83333333 13.3333333 14.1666667 13.3333333"></polygon>
+            <line x1="7.10225" y1="13.3333333" x2="7.08333333" y2="17.7977917" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="12.935625" y1="13.3333333" x2="12.9166667" y2="17.7977917" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+        </g>
+    </g>
+</svg>

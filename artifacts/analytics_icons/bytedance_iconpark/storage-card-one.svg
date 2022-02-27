@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>storage-card-one</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="storage-card-one">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group-14">
+                <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="13.6 2 6.4 2 6.4 5.2 13.6 5.2"></polygon>
+                <path d="M6.23528,2 L4.4,2 C3.958172,2 3.6,2.358172 3.6,2.8 L3.6,17.2 C3.6,17.64184 3.958172,18 4.4,18 L15.6,18 C16.04184,18 16.4,17.64184 16.4,17.2 L16.4,2.8 C16.4,2.358172 16.04184,2 15.6,2 L13.76472,2" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+                <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="11.19984 8.4 8 11.60048 12.0016 11.60048 8.80012 14.80072"></polyline>
+                <path d="M0.4,0.4 L0.4,0 L0,0 L0,0.4 L0.4,0.4 Z M19.6,0.4 L20,0.4 L20,0 L19.6,0 L19.6,0.4 Z M19.6,19.6 L19.6,20 L20,20 L20,19.6 L19.6,19.6 Z M0.4,19.6 L0,19.6 L0,20 L0.4,20 L0.4,19.6 Z M0.4,0.8 L19.6,0.8 L19.6,0 L0.4,0 L0.4,0.8 Z M19.2,0.4 L19.2,19.6 L20,19.6 L20,0.4 L19.2,0.4 Z M19.6,19.2 L0.4,19.2 L0.4,20 L19.6,20 L19.6,19.2 Z M0.8,19.6 L0.8,0.4 L0,0.4 L0,19.6 L0.8,19.6 Z" id="Shape" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero"></path>
+            </g>
+        </g>
+    </g>
+</svg>

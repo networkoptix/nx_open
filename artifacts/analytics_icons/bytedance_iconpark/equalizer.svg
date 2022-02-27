@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>equalizer</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="equalizer">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <line x1="4.58333333" y1="6.66666667" x2="4.58333333" y2="17.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="10" y1="12.0833333" x2="10" y2="17.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="10" y1="7.91666667" x2="10" y2="2.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="15.4166667" y1="2.5" x2="15.4166667" y2="13.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M4.58333333,6.66666667 C5.73391667,6.66666667 6.66666667,5.73391667 6.66666667,4.58333333 C6.66666667,3.43274167 5.73391667,2.5 4.58333333,2.5 C3.43274167,2.5 2.5,3.43274167 2.5,4.58333333 C2.5,5.73391667 3.43274167,6.66666667 4.58333333,6.66666667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M10,12.0833333 C11.1505833,12.0833333 12.0833333,11.1505833 12.0833333,10 C12.0833333,8.84941667 11.1505833,7.91666667 10,7.91666667 C8.84941667,7.91666667 7.91666667,8.84941667 7.91666667,10 C7.91666667,11.1505833 8.84941667,12.0833333 10,12.0833333 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M15.4166667,17.5 C16.56725,17.5 17.5,16.56725 17.5,15.4166667 C17.5,14.2660833 16.56725,13.3333333 15.4166667,13.3333333 C14.2660833,13.3333333 13.3333333,14.2660833 13.3333333,15.4166667 C13.3333333,16.56725 14.2660833,17.5 15.4166667,17.5 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

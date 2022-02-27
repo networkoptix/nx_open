@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>watermelon</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="watermelon">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M9.58333333,14.1666667 C14.1857083,14.1666667 17.9166667,10.4357083 17.9166667,5.83333333 L1.25,5.83333333 C1.25,10.4357083 4.98095833,14.1666667 9.58333333,14.1666667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <line x1="9.58333333" y1="9.58333333" x2="9.58333333" y2="10.8333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="6.93166667" y1="8.485" x2="6.04779167" y2="9.368875" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="12.2349583" y1="8.485" x2="13.1188333" y2="9.368875" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

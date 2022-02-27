@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>pic</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pic">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(2.083333, 3.333333)" stroke="#A5B7C0" stroke-linejoin="round">
+                <path d="M0.833333333,0 L15,0 C15.4602373,0 15.8333333,0.373096042 15.8333333,0.833333333 L15.8333333,12.5 C15.8333333,12.9602373 15.4602373,13.3333333 15,13.3333333 L0.833333333,13.3333333 C0.373096042,13.3333333 0,12.9602373 0,12.5 L0,0.833333333 C0,0.373096042 0.373096042,0 0.833333333,0 Z" id="Path" stroke-linecap="round"></path>
+                <circle id="Oval" stroke-linecap="round" cx="3.95833333" cy="3.54166667" r="1"></circle>
+                <path d="M4.16666667,6.66666667 L6.25,8.33333333 L8.75,5.41666667 L15.8333333,10.8333333 L15.8333333,12.5 C15.8333333,12.9602373 15.4602373,13.3333333 15,13.3333333 L0.833333333,13.3333333 C0.373096042,13.3333333 9.47390312e-14,12.9602373 9.47390312e-14,12.5 L9.47390312e-14,10.8333333 L4.16666667,6.66666667 Z" id="Path"></path>
+            </g>
+        </g>
+    </g>
+</svg>

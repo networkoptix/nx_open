@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>power</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="power">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M6.04166667,3.33333333 C5.76691667,3.49021667 5.50258333,3.66292917 5.25,3.8502125 C4.81770833,4.17070833 4.41975,4.53391667 4.0625,4.93341667 C2.8307375,6.31095833 2.08333333,8.12045833 2.08333333,10.1022917 C2.08333333,14.4180417 5.62775,17.9166667 10,17.9166667 C14.37225,17.9166667 17.9166667,14.4180417 17.9166667,10.1022917 C17.9166667,8.12045833 17.16925,6.31095833 15.9375,4.93341667 C15.58025,4.53391667 15.1822917,4.17070833 14.75,3.8502125 C14.4974167,3.66292917 14.2330833,3.49021667 13.9583333,3.33333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="10" y1="1.66666667" x2="10" y2="10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

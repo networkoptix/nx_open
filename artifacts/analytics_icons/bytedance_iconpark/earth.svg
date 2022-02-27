@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>earth</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="earth">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M10,18.3333333 C14.602375,18.3333333 18.3333333,14.602375 18.3333333,10 C18.3333333,5.397625 14.602375,1.66666667 10,1.66666667 C5.397625,1.66666667 1.66666667,5.397625 1.66666667,10 C1.66666667,14.602375 5.397625,18.3333333 10,18.3333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="1.66666667" y1="10" x2="18.3333333" y2="10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M10,18.3333333 C11.8409583,18.3333333 13.3333333,14.602375 13.3333333,10 C13.3333333,5.397625 11.8409583,1.66666667 10,1.66666667 C8.15904167,1.66666667 6.66666667,5.397625 6.66666667,10 C6.66666667,14.602375 8.15904167,18.3333333 10,18.3333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M4.1074625,4.225875 C5.6155,5.73391667 7.69883333,6.66666667 10,6.66666667 L10,6.66666667 C12.3012083,6.66666667 14.3845417,5.73391667 15.8925833,4.225875" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M15.8925833,15.774125 C14.3845417,14.2660833 12.3012083,13.3333333 10,13.3333333 C7.69883333,13.3333333 5.6155,14.2660833 4.1074625,15.774125" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

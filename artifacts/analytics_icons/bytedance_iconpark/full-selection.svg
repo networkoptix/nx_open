@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>full-selection</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="full-selection">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" points="20 0 0 0 0 20 20 20"></polygon>
+            <path d="M14.1666667,2.08333333 L3.33333333,2.08333333 C2.64297917,2.08333333 2.08333333,2.64297917 2.08333333,3.33333333 L2.08333333,14.1666667 C2.08333333,14.8570417 2.64297917,15.4166667 3.33333333,15.4166667 L14.1666667,15.4166667 C14.8570417,15.4166667 15.4166667,14.8570417 15.4166667,14.1666667 L15.4166667,3.33333333 C15.4166667,2.64297917 14.8570417,2.08333333 14.1666667,2.08333333 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M18.33325,5.4175 L18.33325,17.5000417 C18.33325,17.96025 17.9601667,18.333375 17.4999167,18.333375 L5.41808333,18.333375" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="5.41666667 8.53575 7.91654167 10.837875 12.0833333 6.54966667"></polyline>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,159 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+#include <nx/build_info.h>
+#include <nx/build_info/ini.h>
+#include <nx/reflect/string_conversion.h>
+
+namespace nx::build_info {
+
+QString publicationTypeSuffix()
+{
+    return "${publication_type_suffix}";
+}
+
+PublicationType publicationType()
+{
+    static const PublicationType publicationType =
+        []()
+        {
+            return nx::reflect::fromString(R"(${publicationType})", PublicationType::local);
+        }();
+
+    std::string overridenValue = ini().publicationType;
+    if (!overridenValue.empty())
+        return nx::reflect::fromString(overridenValue, publicationType);
+
+    return publicationType;
+}
+
+QString revision()
+{
+    return "${changeSet}";
+}
+
+QString vmsVersion()
+{
+    return
+        "${parsedVersion.majorVersion}"
+        ".${parsedVersion.minorVersion}"
+        ".${parsedVersion.incrementalVersion}"
+        ".${buildNumber}";
+}
+
+QString mobileClientVersion()
+{
+    return "${mobileClientVersion}";
+}
+
+int buildNumber()
+{
+    return ${buildNumber};
+}
+
+QString applicationCompiler()
+{
+    #if defined(__clang__)
+        return "clang";
+    #elif defined(__GNUC__)
+        return "gcc";
+    #elif defined(_MSC_VER)
+        return "msvc";
+    #else
+        return QString();
+    #endif
+}
+
+QString applicationArch()
+{
+    return "${arch}";
+}
+
+QString applicationPlatform()
+{
+    return "${platform}";
+}
+
+QString applicationPlatformNew()
+{
+    return "${platform_new}";
+}
+
+QString applicationPlatformModification()
+ {
+    return "${modification}";
+}
+
+QString applicationArmBox()
+{
+    // TODO: #akolesnikov For now, the value of `box` has sense on ARM devices only.
+    //     On other platforms it is used by the build system for internal purposes.
+    if (isArm())
+        return "${box}";
+    return QString();
+}
+
+QString ffmpegVersion()
+ {
+    return "${ffmpeg.version}";
+}
+
+QString boostVersion()
+{
+    return "${boost.version}";
+}
+
+QString usedMetaVersion()
+{
+    return "${usedMetaVersion}";
+}
+
+bool isEdgeServer()
+{
+    return ${isEdgeServer};
+}
+
+bool isArm()
+{
+    #if defined(__arm__) || defined(__aarch64__)
+        return true;
+    #else
+        return false;
+    #endif
+}
+
+bool isNx1()
+{
+    return applicationArmBox() == "bpi";
+}
+
+bool isAndroid()
+{
+    return applicationPlatform() == "android";
+}
+
+bool isIos()
+{
+    return applicationPlatform() == "ios";
+}
+
+bool isMobile()
+{
+    return isAndroid() || isIos();
+}
+
+bool isLinux()
+{
+    return applicationPlatform() == "linux";
+}
+
+bool isWindows()
+{
+    return applicationPlatform() == "windows";
+}
+
+bool isMacOsX()
+{
+    return applicationPlatform() == "macosx";
+}
+
+} // namespace nx::build_info

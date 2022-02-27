@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>tips</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="tips">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M16.6666667,8.33333333 C16.6666667,11.169875 14.8951667,13.5926667 12.398125,14.5556667 L10,14.5556667 L7.601875,14.5556667 C5.10483333,13.5926667 3.33333333,11.169875 3.33333333,8.33333333 C3.33333333,4.65141667 6.31808333,1.66666667 10,1.66666667 C13.6819167,1.66666667 16.6666667,4.65141667 16.6666667,8.33333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M12.398125,14.5556667 L12.1151667,17.95125 C12.0971667,18.1672083 11.916625,18.3333333 11.6999167,18.3333333 L8.30004167,18.3333333 C8.08333333,18.3333333 7.90283333,18.1672083 7.88483333,17.95125 L7.60183333,14.5556667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="7.5 7.08333333 7.5 9.58333333 10 8.33333333 12.5 9.58333333 12.5 7.08333333"></polyline>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>chicken-leg</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="chicken-leg">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M13.9100665,13.9100549 C15.6778165,12.1422632 14.4993165,6.24972157 11.8476498,3.59806741 C10.6691081,2.41952574 7.28094148,-0.0847842612 3.59805398,3.59803824 C-0.0848193501,7.28084657 2.41957065,10.6691382 3.59805398,11.8475966 C6.24973315,14.4993049 12.1422748,15.6778049 13.9100665,13.9100549 Z" id="Path" stroke="#A5B7C0"></path>
+            <path d="M17.0873998,16.8790966 C16.7762748,16.5679716 15.0133165,14.8050132 14.1706915,13.9623882" id="Path" stroke="#A5B7C0"></path>
+            <circle id="Oval" fill="#A5B7C0" fill-rule="nonzero" transform="translate(17.584275, 16.492055) rotate(135.000000) translate(-17.584275, -16.492055) " cx="17.5842748" cy="16.4920549" r="1.04166667"></circle>
+            <circle id="Oval" fill="#A5B7C0" fill-rule="nonzero" transform="translate(16.700400, 17.375930) rotate(135.000000) translate(-16.700400, -17.375930) " cx="16.7003998" cy="17.3759299" r="1.04166667"></circle>
+            <circle id="Oval" fill="#A5B7C0" fill-rule="nonzero" cx="7.08739982" cy="7.29572157" r="1"></circle>
+            <circle id="Oval" fill="#A5B7C0" fill-rule="nonzero" cx="5.00406648" cy="8.54572157" r="1"></circle>
+            <circle id="Oval" fill="#A5B7C0" fill-rule="nonzero" cx="7.08739982" cy="9.79572157" r="1"></circle>
+        </g>
+    </g>
+</svg>

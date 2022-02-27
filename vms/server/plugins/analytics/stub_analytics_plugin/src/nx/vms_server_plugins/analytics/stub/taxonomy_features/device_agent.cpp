@@ -1,0 +1,183 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+#include "device_agent.h"
+
+#include <chrono>
+
+#define NX_PRINT_PREFIX (this->logUtils.printPrefix)
+#include <nx/kit/debug.h>
+
+#include <nx/sdk/analytics/helpers/object_metadata.h>
+#include <nx/sdk/analytics/helpers/object_metadata_packet.h>
+#include <nx/sdk//helpers/settings_response.h>
+
+#include "device_agent_manifest.h"
+#include "object_generators.h"
+#include "../utils.h"
+
+namespace nx {
+namespace vms_server_plugins {
+namespace analytics {
+namespace stub {
+namespace taxonomy_features {
+
+using namespace nx::sdk;
+using namespace nx::sdk::analytics;
+
+static constexpr int kTrackLength = 200;
+static constexpr float kMaxBoundingBoxWidth = 0.5F;
+static constexpr float kMaxBoundingBoxHeight = 0.5F;
+static constexpr float kFreeSpace = 0.1F;
+
+static Rect generateBoundingBox(int frameIndex, int trackIndex, int trackCount)
+{
+    Rect boundingBox;
+    boundingBox.width = std::min((1.0F - kFreeSpace) / trackCount, kMaxBoundingBoxWidth);
+    boundingBox.height = std::min(boundingBox.width, kMaxBoundingBoxHeight);
+    boundingBox.x = 1.0F / trackCount * trackIndex + kFreeSpace / (trackCount + 1);
+    boundingBox.y = 1.0F - boundingBox.height - (1.0F / kTrackLength) * (frameIndex % kTrackLength);
+
+    return boundingBox;
+}
+
+Ptr<IMetadataPacket> DeviceAgent::generateObjectMetadataPacket(int64_t frameTimestampUs)
+{
+    auto metadataPacket = makePtr<ObjectMetadataPacket>();
+    metadataPacket->setTimestampUs(frameTimestampUs);
+
+    std::vector<Ptr<ObjectMetadata>> objects;
+
+    if (m_settings.generateInstanceOfBaseObjectType)
+        objects.push_back(generateInstanceOfBaseObjectType());
+    if (m_settings.generateInstanceOfDerivedObjectType)
+        objects.push_back(generateInstanceOfDerivedObjectType());
+    if (m_settings.generateInstanceOfDerivedObjectTypeWithOmittedAttributes)
+        objects.push_back(generateInstanceOfDerivedObjectTypeWithOmittedAttributes());
+    if (m_settings.generateInstanceOfHiddenDerivedObjectType)
+        objects.push_back(generateInstanceOfHiddenDerivedObjectType());
+    if (m_settings. generateInstanceOfHiddenDerivedObjectTypeWithOwnAttributes)
+        objects.push_back(generateInstanceOfHiddenDerivedObjectTypeWithOwnAttributes());
+    if (m_settings.generateInstanceOfDerivedObjectTypeWithUnsupportedBase)
+        objects.push_back(generateInstanceOfDerivedObjectTypeWithUnsupportedBase());
+    if (m_settings.generateInstanceOfObjectTypeWithNumericAttibutes)
+        objects.push_back(generateInstanceOfObjectTypeWithNumericAttibutes());
+    if (m_settings. generateInstanceOfObjectTypeWithBooleanAttibutes)
+        objects.push_back(generateInstanceOfObjectTypeWithBooleanAttibutes());
+    if (m_settings.generateInstanceOfObjectTypeWithIcon)
+        objects.push_back(generateInstanceOfObjectTypeWithIcon());
+    if (m_settings. generateInstanceOfObjectTypeInheritedFromBaseLibraryType)
+        objects.push_back(generateInstanceOfObjectTypeInheritedFromBaseLibraryType());
+    if (m_settings.generateInstanceOfObjectTypeUsingBaseLibraryEnumType)
+        objects.push_back(generateInstanceOfObjectTypeUsingBaseLibraryEnumType());
+    if (m_settings.generateInstanceOfObjectTypeUsingBaseLibraryColorType)
+        objects.push_back(generateInstanceOfObjectTypeUsingBaseLibraryColorType());
+    if (m_settings.generateInstanceOfObjectTypeUsingBaseLibraryObjectType)
+        objects.push_back(generateInstanceOfObjectTypeUsingBaseLibraryObjectType());
+    if (m_settings. generateInstanceOfOfBaseLibraryObjectType)
+        objects.push_back(generateInstanceOfOfBaseLibraryObjectType());
+    if (m_settings. generateInstanceOfObjectTypeDeclaredInEngineManifest)
+        objects.push_back(generateInstanceOfObjectTypeDeclaredInEngineManifest());
+    if (m_settings.generateInstanceOfLiveOnlyObjectType)
+        objects.push_back(generateInstanceOfLiveOnlyObjectType());
+    if (m_settings. generateInstanceOfNonIndexableObjectType)
+        objects.push_back(generateInstanceOfNonIndexableObjectType());
+
+    for (int i = 0; i < (int) objects.size(); ++i)
+    {
+        objects[i]->setBoundingBox(generateBoundingBox(m_frameIndex, i, (int) objects.size()));
+        objects[i]->setTrackId(trackIdByTrackIndex(i));
+
+        metadataPacket->addItem(objects[i].get());
+    }
+
+    return metadataPacket;
+}
+
+DeviceAgent::DeviceAgent(Engine* engine, const nx::sdk::IDeviceInfo* deviceInfo):
+    ConsumingDeviceAgent(deviceInfo, /*enableOutput*/ true, engine->plugin()->instanceId()),
+    m_engine(engine)
+{
+}
+
+DeviceAgent::~DeviceAgent()
+{
+}
+
+std::string DeviceAgent::manifestString() const
+{
+    return kDeviceAgentManifest;
+}
+
+bool DeviceAgent::pushCompressedVideoFrame(const ICompressedVideoPacket* videoFrame)
+{
+    ++m_frameIndex;
+    if ((m_frameIndex % kTrackLength) == 0)
+        m_trackIds.clear();
+
+    Ptr<IMetadataPacket> objectMetadataPacket = generateObjectMetadataPacket(
+        videoFrame->timestampUs());
+
+    pushMetadataPacket(objectMetadataPacket.releasePtr());
+
+    return true;
+}
+
+void DeviceAgent::doSetNeededMetadataTypes(
+    nx::sdk::Result<void>* /*outValue*/,
+    const nx::sdk::analytics::IMetadataTypes* /*neededMetadataTypes*/)
+{
+}
+
+Result<const nx::sdk::ISettingsResponse*> DeviceAgent::settingsReceived()
+{
+    m_settings.generateInstanceOfBaseObjectType =
+        toBool(settingValue("generateInstanceOfBaseObjectType"));
+    m_settings.generateInstanceOfDerivedObjectType =
+        toBool(settingValue("generateInstanceOfDerivedObjectType"));
+    m_settings.generateInstanceOfDerivedObjectTypeWithOmittedAttributes =
+        toBool(settingValue("generateInstanceOfDerivedObjectTypeWithOmittedAttributes"));
+    m_settings.generateInstanceOfHiddenDerivedObjectType =
+        toBool(settingValue("generateInstanceOfHiddenDerivedObjectType"));
+    m_settings.generateInstanceOfHiddenDerivedObjectTypeWithOwnAttributes =
+        toBool(settingValue("generateInstanceOfHiddenDerivedObjectTypeWithOwnAttributes"));
+    m_settings.generateInstanceOfDerivedObjectTypeWithUnsupportedBase =
+        toBool(settingValue("generateInstanceOfDerivedObjectTypeWithUnsupportedBase"));
+    m_settings.generateInstanceOfObjectTypeWithNumericAttibutes =
+        toBool(settingValue("generateInstanceOfObjectTypeWithNumericAttibutes"));
+    m_settings.generateInstanceOfObjectTypeWithBooleanAttibutes =
+        toBool(settingValue("generateInstanceOfObjectTypeWithBooleanAttibutes"));
+    m_settings.generateInstanceOfObjectTypeWithIcon =
+        toBool(settingValue("generateInstanceOfObjectTypeWithIcon"));
+    m_settings.generateInstanceOfObjectTypeInheritedFromBaseLibraryType =
+        toBool(settingValue("generateInstanceOfObjectTypeInheritedFromBaseLibraryType"));
+    m_settings.generateInstanceOfObjectTypeUsingBaseLibraryEnumType =
+        toBool(settingValue("generateInstanceOfObjectTypeUsingBaseLibraryEnumType"));
+    m_settings.generateInstanceOfObjectTypeUsingBaseLibraryColorType =
+        toBool(settingValue("generateInstanceOfObjectTypeUsingBaseLibraryColorType"));
+    m_settings.generateInstanceOfObjectTypeUsingBaseLibraryObjectType =
+        toBool(settingValue("generateInstanceOfObjectTypeUsingBaseLibraryObjectType"));
+    m_settings.generateInstanceOfOfBaseLibraryObjectType =
+        toBool(settingValue("generateInstanceOfOfBaseLibraryObjectType"));
+    m_settings.generateInstanceOfObjectTypeDeclaredInEngineManifest =
+        toBool(settingValue("generateInstanceOfObjectTypeDeclaredInEngineManifest"));
+    m_settings.generateInstanceOfLiveOnlyObjectType =
+        toBool(settingValue("generateInstanceOfLiveOnlyObjectType"));
+    m_settings.generateInstanceOfNonIndexableObjectType =
+        toBool(settingValue("generateInstanceOfNonIndexableObjectType"));
+
+    return nullptr;
+}
+
+Uuid DeviceAgent::trackIdByTrackIndex(int trackIndex)
+{
+    while (trackIndex >= (int) m_trackIds.size())
+        m_trackIds.push_back(UuidHelper::randomUuid());
+
+    return m_trackIds[trackIndex];
+}
+
+} // namespace taxonomy_features
+} // namespace stub
+} // namespace analytics
+} // namespace vms_server_plugins
+} // namespace nx

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>bezier-curve</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="bezier-curve">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linejoin="round" x="1.66666667" y="12.5" width="3.33333333" height="3.33333333"></rect>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linejoin="round" x="15" y="12.5" width="3.33333333" height="3.33333333"></rect>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linejoin="round" x="8.33333333" y="4.16666667" width="3.33333333" height="3.33333333"></rect>
+            <line x1="8.33333333" y1="5.83333333" x2="1.66666667" y2="5.83333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="18.3333333" y1="5.83333333" x2="11.6666667" y2="5.83333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M3.33333333,12.5000417 C3.33333333,9.393625 5.45795833,6.78345833 8.33333333,6.04341667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M11.6666667,6.04341667 C14.5420417,6.78345833 16.6666667,9.393625 16.6666667,12.5000417" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

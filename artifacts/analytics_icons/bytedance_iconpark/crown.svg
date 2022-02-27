@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>crown</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="crown">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="3.75 16.6666667 1.66666667 7.08333333 5.83333333 9.16666667 10 3.33333333 14.1666667 9.16666667 18.3333333 7.08333333 16.25 16.6666667"></polygon>
+            <path d="M10,13.75 C10.9204583,13.75 11.6666667,13.0037917 11.6666667,12.0833333 C11.6666667,11.162875 10.9204583,10.4166667 10,10.4166667 C9.07954167,10.4166667 8.33333333,11.162875 8.33333333,12.0833333 C8.33333333,13.0037917 9.07954167,13.75 10,13.75 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

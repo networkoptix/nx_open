@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>dribble</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="dribble">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M18.3333333,10 C18.3333333,12.30775 17.39525,14.396375 15.8796667,15.9054167 C14.372625,17.4059167 12.294625,18.3333333 10,18.3333333 C5.397625,18.3333333 1.66666667,14.602375 1.66666667,10 C1.66666667,7.775625 2.5381625,5.75483333 3.95833333,4.26041667 C5.476625,2.66272917 7.622,1.66666667 10,1.66666667 C12.294625,1.66666667 14.372625,2.59409583 15.8796667,4.0945625 C17.39525,5.603625 18.3333333,7.69225 18.3333333,10 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M18.333375,10 C17.117375,10 13.763,9.541375 10.7610833,10.8596667 C7.50004167,12.29175 5.1385,14.513125 4.1096,15.8946667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M6.875,2.27241667 C8.17933333,3.47612083 11.025125,6.54104167 12.0833333,9.58333333 C13.1415417,12.625625 13.5337083,16.3662917 13.77525,17.431125" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M1.7311625,8.95833333 C3.30523333,9.05320833 7.47225,9.13883333 10.1389167,7.99995833 C12.8055833,6.86108333 15.1002917,4.7665 15.8873333,4.10217083" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M10,18.3333333 C5.397625,18.3333333 1.66666667,14.602375 1.66666667,10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M1.66666667,10 C1.66666667,7.77566667 2.5381625,5.75483333 3.95833333,4.26041667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M10,1.66666667 C7.622,1.66666667 5.476625,2.66272917 3.95833333,4.26041667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M10,1.66666667 C12.294625,1.66666667 14.372625,2.59409583 15.8796667,4.0945625 C17.39525,5.603625 18.3333333,7.69225 18.3333333,10 C18.3333333,12.30775 17.39525,14.396375 15.8796667,15.9054167" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

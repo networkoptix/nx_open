@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>maximum</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="maximum">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" points="20 0 0 0 0 20 20 20"></polygon>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="1.66666667 1.66666667 1.66666667 18.3333333 18.3333333 18.3333333"></polyline>
+            <path d="M4.16666667,15.8333333 C4.16666667,15.8333333 6.38020833,1.66666667 11.25,1.66666667 C16.1197917,1.66666667 18.3333333,15.8333333 18.3333333,15.8333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="4.16666667" y1="1.66666667" x2="18.3333333" y2="1.66666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1"></line>
+        </g>
+    </g>
+</svg>

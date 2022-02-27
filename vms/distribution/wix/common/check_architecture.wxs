@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:bal="http://schemas.microsoft.com/wix/BalExtension"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension">
+
+    <Fragment Id='FragmentArchCheck'>
+        <!-- Stupid, stupid wix... -->
+        <util:RegistrySearch
+          Id='ArchRegistrySearch'
+          Variable="CloudHost"
+          Result="exists"
+          Root="HKLM"
+          Key="Software"
+          Win64="yes"/>
+
+        <bal:Condition Message="!(loc.Product_ArchMismatch_x64)">
+            <![CDATA[ VersionNT64 OR WixBundleAction = 3 ]]>
+        </bal:Condition>
+    </Fragment>
+</Wix>

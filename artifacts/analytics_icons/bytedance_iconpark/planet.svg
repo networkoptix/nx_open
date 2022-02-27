@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>planet</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="planet">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M10,16.6666667 C13.6819167,16.6666667 16.6666667,13.6819167 16.6666667,10 C16.6666667,6.31808333 13.6819167,3.33333333 10,3.33333333 C6.31808333,3.33333333 3.33333333,6.31808333 3.33333333,10 C3.33333333,13.6819167 6.31808333,16.6666667 10,16.6666667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M15.6517083,6.46241667 L15.6517083,6.46241667 C17.4097083,6.61583333 18.616125,7.15516667 18.8543333,8.04416667 C19.3307917,9.822375 15.7528333,12.326125 10.8627083,13.6364167 C5.972625,14.9467083 1.62215,14.567375 1.14567917,12.7891667 C0.896041667,11.8575 1.75935417,10.7266667 3.341225,9.67270833 L3.341225,9.67270833" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

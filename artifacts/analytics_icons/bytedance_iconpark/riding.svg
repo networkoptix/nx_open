@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>riding</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="riding">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M13.75,5.83333333 C14.9005833,5.83333333 15.8333333,4.90058333 15.8333333,3.75 C15.8333333,2.59940833 14.9005833,1.66666667 13.75,1.66666667 C12.5994167,1.66666667 11.6666667,2.59940833 11.6666667,3.75 C11.6666667,4.90058333 12.5994167,5.83333333 13.75,5.83333333 Z" id="Path" stroke="#A5B7C0"></path>
+            <path d="M16.6666667,9.58333333 L13.4875,9.58333333 C13.2541667,9.58333333 13.0291667,9.48333333 12.8708333,9.3125 L10.6458333,6.90416667 C10.375,6.60833333 9.93333333,6.54583333 9.59166667,6.75416667 L6.4875,8.6625 C6.225,8.825 6.225,9.20833333 6.4875,9.37083333 L9.59583333,11.275 C9.84166667,11.425 9.99583333,11.6958333 9.99583333,11.9875 L10,15.8333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <circle id="Oval" stroke="#A5B7C0" cx="15.2083333" cy="15.2083333" r="3.125"></circle>
+            <circle id="Oval" stroke="#A5B7C0" cx="4.79166667" cy="15.2083333" r="3.125"></circle>
+        </g>
+    </g>
+</svg>

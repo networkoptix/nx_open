@@ -1,0 +1,3 @@
+module Nx.Effects
+
+EdgeOpacityGradient 1.0 EdgeOpacityGradient.qml

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>wifi</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="wifi">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M1.66667083,7.90220833 C1.91200417,7.66970833 2.16467917,7.44941667 2.42392083,7.24133333 C7.09879167,3.4892625 13.9092083,3.70955 18.3333333,7.90220833" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M15.8333333,10.7495833 C12.6116667,7.52791667 7.38833333,7.52791667 4.16666667,10.7495833" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M13.3333333,13.4640417 C11.492375,11.6230833 8.507625,11.6230833 6.66666667,13.4640417" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M10,16.6666667 C10.5752917,16.6666667 11.0416667,16.2002917 11.0416667,15.625 C11.0416667,15.0497083 10.5752917,14.5833333 10,14.5833333 C9.42470833,14.5833333 8.95833333,15.0497083 8.95833333,15.625 C8.95833333,16.2002917 9.42470833,16.6666667 10,16.6666667 Z" id="Path" fill="#A5B7C0"></path>
+        </g>
+    </g>
+</svg>

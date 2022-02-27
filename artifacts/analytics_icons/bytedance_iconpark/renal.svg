@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>renal</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="renal">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M6.66683333,18.33325 C6.057625,16.52125 5.86104167,14.9934583 6.07704167,13.7499167 C6.29304167,12.5063333 6.96475,11.6935417 8.092125,11.3114583 C7.25325,13.856 7.597,15.7150417 9.12341667,16.888625 C11.413,18.6489583 16.9306667,17.8394167 17.229625,11.8845417 C17.5285833,5.92970833 14.6645,1.6302 10.42925,1.6302 C6.194,1.6302 5.56091667,6.214 8.54375,7.76958333 C5.904625,8.34479167 4.22991667,9.52541667 3.51960833,11.3114583 C2.8092875,13.0975417 2.75399167,15.438125 3.3537125,18.33325" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M12.749875,6.24995833 C11.542625,6.96966667 11.1050833,7.62883333 11.43725,8.22745833 C11.7694167,8.826125 12.5227917,8.826125 13.697375,8.22745833" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M13.8527917,10.9334583 C12.29425,10.6159167 11.3570833,10.730875 11.0412917,11.2783333 C10.5675833,12.0995 12.654,13.2892083 13.4103333,13.437875" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

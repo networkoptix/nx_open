@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>pure-natural</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pure-natural">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M4.58333333,17.083375 C6.31975,16.3372083 7.95508333,15.934625 9.48941667,15.875625 C11.02375,15.8165833 12.9995,16.0802917 15.4166667,16.6667083" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <path d="M9.60216667,18.3333333 C9.282625,14.3999583 9.41516667,11.3444167 9.999875,9.16666667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <path d="M10,9.65666667 C10.6625,7.14920833 11.8290833,5.65383333 13.4996667,5.170625 C15.17025,4.687375 16.7814583,4.90883333 18.3333016,5.835 C18.3410833,7.87329167 17.4563333,9.3665 15.679,10.3145833 C13.9016667,11.2627083 12.0086667,11.043375 10,9.65666667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M9.91329167,9.21420833 C10.2605417,6.21970833 9.56475,4.11064167 7.82591667,2.88694167 C6.08704167,1.66324167 4.07349167,1.39 1.78519583,2.06722083 C1.3855625,4.82945833 1.99647083,6.91816667 3.6179125,8.33333333 C5.239375,9.7485 7.33783333,10.042125 9.91329167,9.21420833 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

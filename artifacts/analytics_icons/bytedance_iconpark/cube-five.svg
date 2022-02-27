@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>cube-five</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="cube-five">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" points="20 0 0 0 0 20 20 20"></polygon>
+            <line x1="12.5" y1="11.25" x2="10" y2="18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="7.5" y1="11.25" x2="10" y2="18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="7.5" y1="11.25" x2="12.5" y2="11.25" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="17.0833333" y1="14.1666667" x2="12.5" y2="11.25" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="17.0833333" y1="5.83333333" x2="12.5" y2="11.25" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="17.0833333" y1="5.83333333" x2="10" y2="7.08333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="12.5" y1="11.25" x2="10" y2="7.08333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="10" y1="1.66666667" x2="10" y2="7.08333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="2.91666667" y1="5.83333333" x2="10" y2="7.08333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="7.5" y1="11.25" x2="10" y2="7.08333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="7.5" y1="11.25" x2="2.91666667" y2="5.83333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="7.5" y1="11.25" x2="2.91666667" y2="14.1666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="17.2169583 5.83333333 10.0000833 1.66666667 2.78320417 5.83333333 2.78320417 14.1666667 10.0000833 18.3333333 17.2169583 14.1666667"></polygon>
+        </g>
+    </g>
+</svg>

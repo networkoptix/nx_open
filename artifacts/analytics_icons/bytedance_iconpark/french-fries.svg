@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>french-fries</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="french-fries">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M8.33333333,9.16666667 L8.33333333,5 C8.33333333,4.53975 7.96025,4.16666667 7.5,4.16666667 L6.25,4.16666667 C5.78975,4.16666667 5.41666667,4.53975 5.41666667,5 L5.41666667,8.75" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M14.1666667,8.75 L14.1666667,5.83333333 C14.1666667,5.37308333 13.7935833,5 13.3333333,5 L12.0833333,5 C11.6230833,5 11.25,5.37308333 11.25,5.83333333 L11.25,9.16666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M11.25,9.16666667 L11.25,2.5 C11.25,2.0397625 10.8769167,1.66666667 10.4166667,1.66666667 L9.16666667,1.66666667 C8.70641667,1.66666667 8.33333333,2.0397625 8.33333333,2.5 L8.33333333,9.16666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M2.5,7.5 C2.5,7.5 5.41666667,9.58333333 9.58333333,9.58333333 C13.75,9.58333333 16.6666667,7.5 16.6666667,7.5 L14.659125,18.3333333 L4.50758333,18.3333333 L2.5,7.5 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" fill-rule="nonzero"></path>
+            <ellipse id="Oval" stroke="#A5B7C0" cx="9.58333333" cy="13.75" rx="2.5" ry="1.25"></ellipse>
+        </g>
+    </g>
+</svg>

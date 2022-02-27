@@ -1,0 +1,85 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+#pragma once
+
+#include <QtWidgets/QDialog>
+
+#include <nx/utils/software_version.h>
+#include <nx/vms/api/data/software_version.h>
+#include <nx/vms/client/desktop/system_update/client_update_tool.h>
+#include <ui/dialogs/common/dialog.h>
+#include <utils/common/connective.h>
+
+class QnMediaServerUpdateTool;
+
+namespace Ui {
+class QnCompatibilityVersionInstallationDialog;
+}
+
+namespace nx::vms::api { struct ModuleInformation; }
+namespace nx::vms::client::core { struct ConnectionInfo; }
+namespace nx::vms::client::desktop { struct UpdateContents; }
+
+// TODO: #dklychkov rename class in 2.4
+class CompatibilityVersionInstallationDialog:
+    public Connective<QnDialog>
+{
+    Q_OBJECT
+    using base_type = Connective<QnDialog>;
+
+public:
+    CompatibilityVersionInstallationDialog(
+        const nx::vms::api::ModuleInformation& moduleInformation,
+        const nx::vms::client::core::ConnectionInfo& connectionInfo,
+        const nx::vms::api::SoftwareVersion& engineVersion,
+        QWidget* parent);
+    virtual ~CompatibilityVersionInstallationDialog();
+
+    // Mirroring some states from ClientUpdateTool.
+    enum class InstallResult
+    {
+        initial,
+        downloading,
+        verifying,
+        installing,
+        complete,
+        failedInstall,
+        failedDownload,
+    };
+
+    InstallResult installationResult() const;
+    bool shouldAutoRestart() const;
+
+    virtual void reject() override;
+    virtual int exec() override;
+    QString errorString() const;
+
+protected:
+    int startUpdate();
+    void processUpdateContents(const nx::vms::client::desktop::UpdateContents& contents);
+    void setMessage(const QString& message);
+
+protected:
+    // Event handlers
+    void atUpdateCurrentState();
+    void atUpdateStateChanged(nx::vms::client::desktop::ClientUpdateTool::State state,
+        int progress,
+        const nx::vms::client::desktop::ClientUpdateTool::Error& error);
+    void atAutoRestartChanged(int state);
+
+protected:
+    QScopedPointer<Ui::QnCompatibilityVersionInstallationDialog> ui;
+
+    nx::utils::SoftwareVersion m_versionToInstall;
+    // Timer for checking current status and timeouts.
+    std::unique_ptr<QTimer> m_statusCheckTimer;
+
+    InstallResult m_installationResult = InstallResult::initial;
+    bool m_autoInstall = true;
+    const nx::vms::api::SoftwareVersion m_engineVersion;
+    QString m_errorMessage;
+
+private:
+    struct Private;
+    std::unique_ptr<Private> m_private;
+};

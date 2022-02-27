@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>local-two</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="local-two">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M10,18.3333333 C10,18.3333333 16.25,13.3333333 16.25,7.91666667 C16.25,4.464875 13.4517917,1.66666667 10,1.66666667 C6.54820833,1.66666667 3.75,4.464875 3.75,7.91666667 C3.75,13.3333333 10,18.3333333 10,18.3333333 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M10,10.4166667 C11.3807083,10.4166667 12.5,9.297375 12.5,7.91666667 C12.5,6.53595833 11.3807083,5.41666667 10,5.41666667 C8.61929167,5.41666667 7.5,6.53595833 7.5,7.91666667 C7.5,9.297375 8.61929167,10.4166667 10,10.4166667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

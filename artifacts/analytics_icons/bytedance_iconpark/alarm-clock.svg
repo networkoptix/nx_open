@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>alarm-clock</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="alarm-clock">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M10,18.4722083 C14.2188333,18.4722083 17.638875,15.0521667 17.638875,10.8333333 C17.638875,6.61445833 14.2188333,3.19442917 10,3.19442917 C5.781125,3.19442917 2.36109583,6.61445833 2.36109583,10.8333333 C2.36109583,15.0521667 5.781125,18.4722083 10,18.4722083 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="9.89975 6.39729167 9.89925 10.9842917 13.1377083 14.22275"></polyline>
+            <line x1="1.66666667" y1="3.74997917" x2="4.58333333" y2="1.66664583" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="18.3333333" y1="3.74997917" x2="15.4166667" y2="1.66664583" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

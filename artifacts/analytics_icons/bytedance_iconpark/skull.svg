@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>skull</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="skull">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <path d="M4.69298246,18.3333333 L6.09461517,14.8688345 C4.17959504,13.580564 2.91666667,11.3719527 2.91666667,8.86363637 C2.91666667,4.88885975 6.08798304,1.66666667 10,1.66666667 C13.912017,1.66666667 17.0833333,4.88885975 17.0833333,8.86363637 C17.0833333,11.3719527 15.820405,13.580564 13.9053848,14.8688345 L15.3070175,18.3333333 L4.69298246,18.3333333 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <line x1="8.33333333" y1="15.8333333" x2="8.33333333" y2="18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="11.6666667" y1="15.8333333" x2="11.6666667" y2="18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <circle id="Oval" stroke="#A5B7C0" stroke-linejoin="round" cx="7.08333333" cy="8.33333333" r="1.25"></circle>
+            <circle id="Oval" stroke="#A5B7C0" stroke-linejoin="round" cx="12.9166667" cy="8.33333333" r="1.25"></circle>
+        </g>
+    </g>
+</svg>

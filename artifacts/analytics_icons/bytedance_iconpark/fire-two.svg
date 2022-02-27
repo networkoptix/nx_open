@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>fire-two</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="fire-two">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M15,8.75 C15,11.7415417 12.574875,14.1666667 9.58333333,14.1666667 C6.59179167,14.1666667 4.16666667,11.7415417 4.16666667,8.75 C4.16666667,5.75845833 6.25,4.58333333 7.08333333,1.66666667 C10.4166667,3.12495417 10.4166667,7.5 10.4166667,7.5 C10.4166667,7.5 11.25,5 13.75,4.375 C13.9583333,6.66666667 15,7.47258333 15,8.75 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="2.91666667" y1="15" x2="16.25" y2="18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="2.91666667" y1="18.3333333" x2="16.25" y2="15" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

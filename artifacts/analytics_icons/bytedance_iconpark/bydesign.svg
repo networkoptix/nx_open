@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>bydesign</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="bydesign">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="3.33334167 3.03419167 8.14816667 1.66666667 8.148125 6.96579167 3.33333333 8.33333333"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="3.33334167 10.698 8.14816667 9.3305 8.148125 14.629625 3.33333333 15.9971667"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="10.3704167 8.781625 15.1852083 7.59258333 15.1852083 17.1442917 10.3704167 18.3333333"></polygon>
+        </g>
+    </g>
+</svg>

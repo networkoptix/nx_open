@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>rocket</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="rocket">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(2.916667, 1.666667)" stroke="#A5B7C0" stroke-linejoin="round">
+                <path d="M4.87708337,1.62270484 L7.08333333,0 L9.28958329,1.62270484 C10.7841364,2.7219541 11.6666667,4.46659279 11.6666667,6.32186583 L11.6666667,13.75 L2.5,13.75 L2.5,6.32186583 C2.5,4.46659279 3.38253023,2.7219541 4.87708337,1.62270484 Z" id="Path"></path>
+                <polygon id="Path" stroke-linecap="round" points="2.5 5.41666667 -1.17961196e-14 7.91666667 -1.17961196e-14 11.25 2.5 10"></polygon>
+                <polygon id="Path" stroke-linecap="round" points="11.6666667 5.41666667 14.1666667 7.91666667 14.1666667 11.25 11.6666667 10"></polygon>
+                <line x1="4.58333333" y1="14.5833333" x2="4.58333333" y2="15.8333333" id="Path" stroke-linecap="round"></line>
+                <line x1="7.08333333" y1="14.5833333" x2="7.08333333" y2="16.6666667" id="Path" stroke-linecap="round"></line>
+                <line x1="9.58333333" y1="14.5833333" x2="9.58333333" y2="15.8333333" id="Path" stroke-linecap="round"></line>
+            </g>
+        </g>
+    </g>
+</svg>

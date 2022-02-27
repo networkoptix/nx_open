@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>gold-medal</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="gold-medal">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M18.3333333,1.66666667 L12.9166667,1.66666667 L11.25,5.958375 C13.1089167,6.33570833 14.66825,7.53808333 15.529125,9.16666667 L18.3333333,1.66666667 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M7.08333333,1.66666667 L1.66666667,1.66666667 L4.470875,9.16666667 C5.33175,7.53808333 6.89108333,6.33570833 8.75,5.958375 L7.08333333,1.66666667 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M16.25,12.0833333 C16.25,15.535125 13.4517917,18.3333333 10,18.3333333 C6.54820833,18.3333333 3.75,15.535125 3.75,12.0833333 C3.75,11.0299167 4.01060833,10.037375 4.470875,9.16666667 C5.33175,7.53808333 6.89108333,6.33570833 8.75,5.958375 C9.153875,5.876375 9.57191667,5.83333333 10,5.83333333 C10.4280833,5.83333333 10.846125,5.876375 11.25,5.958375 C13.1089167,6.33570833 14.66825,7.53808333 15.529125,9.16666667 C15.989375,10.037375 16.25,11.0299167 16.25,12.0833333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M10,14.5833333 L10,9.16666667 L8.75,9.58333333 M10,14.5833333 L11.6666667,14.5833333 M10,14.5833333 L8.33333333,14.5833333" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

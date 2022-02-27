@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>keyhole</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="keyhole">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M10,18.3333333 C14.602375,18.3333333 18.3333333,14.602375 18.3333333,10 C18.3333333,5.397625 14.602375,1.66666667 10,1.66666667 C5.397625,1.66666667 1.66666667,5.397625 1.66666667,10 C1.66666667,14.602375 5.397625,18.3333333 10,18.3333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M10,6.25 C8.84941667,6.25 7.91666667,7.18275 7.91666667,8.33333333 C7.91666667,9.01491667 8.244,9.62008333 8.75,10.0001667 L8.33333333,13.3333333 L11.6666667,13.3333333 L11.2502083,10 C11.756125,9.61991667 12.0833333,9.01483333 12.0833333,8.33333333 C12.0833333,7.18275 11.1505833,6.25 10,6.25 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

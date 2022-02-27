@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>disk-one</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="disk-one">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M5,7.08833333 C5,6.85545833 5.18879167,6.66666667 5.42166667,6.66666667 L14.5783333,6.66666667 C14.8112083,6.66666667 15,6.85545833 15,7.08833333 L15,13.3333333 C15,16.09475 12.7614167,18.3333333 10,18.3333333 L10,18.3333333 C7.23858333,18.3333333 5,16.09475 5,13.3333333 L5,7.08833333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linejoin="round" x="6.25" y="1.66666667" width="7.5" height="5"></rect>
+            <line x1="8.75" y1="3.75" x2="8.75" y2="4.58333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="11.25" y1="3.75" x2="11.25" y2="4.58333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="5" y1="13.3333333" x2="15" y2="13.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

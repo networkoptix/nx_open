@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>smart-optimization</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="smart-optimization">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M10.0000833,18.75 C11.342,18.75 13.6364583,17 13.6364583,10 C13.6364583,3 11.342,1.25 10.0000833,1.25 C8.65820833,1.25 6.36370833,3.117925 6.36370833,10 C6.36370833,16.8820833 8.65820833,18.75 10.0000833,18.75 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M2.12708333,14.5833333 C2.79804167,15.755125 5.519875,16.8420833 11.81825,13.1754167 C18.1165833,9.50875 18.5439583,6.58845833 17.873,5.41666667 C17.2020417,4.244875 14.374125,3.219675 8.181875,6.82458333 C1.98960833,10.4294583 1.45614167,13.4115417 2.12708333,14.5833333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M2.1270375,5.41666667 C1.45609583,6.58845833 1.88345417,9.50875 8.18183333,13.1754167 C14.4802083,16.8420833 17.202,15.755125 17.8729583,14.5833333 C18.5439167,13.4115417 18.0104583,10.4294583 11.8181667,6.82458333 C5.62591667,3.219675 2.798,4.244875 2.1270375,5.41666667 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

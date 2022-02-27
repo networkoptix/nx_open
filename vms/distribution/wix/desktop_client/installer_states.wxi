@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Include>
+    <?ifndef installerStatesIncludeGuard?>
+        <?define installerStatesIncludeGuard = "installer_states.wxi"?>
+
+        <!--
+            While running different scenarios, MSI framework sets a number of different properties.
+            Possible scenarios are:
+                * Clean install: no important properties are set.
+                * Uninstall:
+                * * "Installed" property equal to "00:00:00" string
+                * * "REMOVE" property equal to "ALL"
+                * Update:
+                * * "Installed" property equal to "00:00:00" string
+                * * "REMOVE" property equal to "ALL"
+                * * "UPGRADINGPRODUCTCODE" property contains some GUID
+                * * "PREVIOUSVERSIONSINSTALLED" property contains some another GUID
+        -->
+
+        <!-- First time product installation. -->
+        <?define msiFirstTimeInstall = "(NOT Installed)"?>
+
+        <!-- Upgrading one installer version to another (uninstalling old before). -->
+        <?define msiUpgrade = "(UPGRADINGPRODUCTCODE)"?>
+
+        <!-- Full and the last uninstall. Do not count uninstall while upgrade. -->
+        <?define msiFullUninstall = "(REMOVE = "ALL") AND (NOT UPGRADINGPRODUCTCODE)"?>
+
+     <?endif?>
+</Include>

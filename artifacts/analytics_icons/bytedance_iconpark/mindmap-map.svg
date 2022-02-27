@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>mindmap-map</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="mindmap-map">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <line x1="10.8333333" y1="10" x2="17.5" y2="10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="10.8333333" y1="15.8333333" x2="17.5" y2="15.8333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="10.8333333" y1="4.16666667" x2="17.5" y2="4.16666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M7.5,10 L2.5,10 C2.5,10 3.19035417,10 4.16666667,10 M7.5,15.8333333 C5,15 6.66666667,10 4.16666667,10 M7.5,4.16666667 C5,5 6.66666667,10 4.16666667,10" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

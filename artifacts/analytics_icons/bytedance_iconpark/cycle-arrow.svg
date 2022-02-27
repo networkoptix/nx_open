@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>cycle-arrow</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="cycle-arrow">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" points="20 0 0 0 0 20 20 20"></polygon>
+            <path d="M7.08333333,6.66666667 L5.41666667,6.66666667 C3.3456,6.66666667 1.66666667,8.34558333 1.66666667,10.4166667 C1.66666667,12.48775 3.3456,14.1666667 5.41666667,14.1666667 C6.44825,14.1666667 7.38254167,13.750125 8.06054167,13.0760833 C8.74370833,12.396875 10,10.4166667 10,10.4166667 C10,10.4166667 11.252375,8.44520833 11.93,7.76670833 C12.60875,7.08708333 13.5469583,6.66666667 14.5833333,6.66666667 C16.6544167,6.66666667 18.3333333,8.34558333 18.3333333,10.4166667 C18.3333333,12.48775 16.6544167,14.1666667 14.5833333,14.1666667 L12.9166667,14.1666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="14.5833333 12.5 12.9166667 14.1666667 14.5833333 15.8333333"></polyline>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="5.41666667 5 7.08333333 6.66666667 5.41666667 8.33333333"></polyline>
+        </g>
+    </g>
+</svg>

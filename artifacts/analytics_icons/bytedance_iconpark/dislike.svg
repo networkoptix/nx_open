@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>dislike</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="dislike">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M10,12.9166667 L8.75,10.8333333 L11.6666667,8.33333333 L7.91666667,6.25 L8.33333333,3.83309167 C7.70829167,3.51356667 7.00016667,3.33333333 6.25,3.33333333 C3.71869583,3.33333333 1.66666667,5.385375 1.66666667,7.91666667 C1.66666667,12.5 7.08333333,16.6666667 10,17.5 C12.9166667,16.6666667 18.3333333,12.5 18.3333333,7.91666667 C18.3333333,5.385375 16.2812917,3.33333333 13.75,3.33333333 C12.9998333,3.33333333 12.2917083,3.51356667 11.6666667,3.83309167" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

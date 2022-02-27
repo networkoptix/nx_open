@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>bytedance-mini-app</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="bytedance-mini-app">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <circle id="Oval" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" cx="10" cy="10" r="8.33333333"></circle>
+            <line x1="10.883875" y1="9.11620833" x2="9.116125" y2="10.8839583" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M13.5354583,11.1785833 L14.1247083,10.5893333 C14.7755833,9.93845833 14.7755833,8.88316667 14.1247083,8.23229167 L11.7677083,5.87525 C11.1168333,5.224375 10.0615417,5.224375 9.41066667,5.87525 L8.82141667,6.46454167" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M11.1784583,13.5355833 L10.5892083,14.1248333 C9.93833333,14.7757083 8.88308333,14.7757083 8.23220833,14.1248333 L5.87516667,11.7678333 C5.22429167,11.1169583 5.22429167,10.0616667 5.87516667,9.41079167 L6.46441667,8.82154167" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>ungroup</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="ungroup">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="4.69695833 1.66666667 1.66666667 1.66666667 1.66666667 4.69695833 4.69695833 4.69695833"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="18.33325 15.3030417 15.3029583 15.3030417 15.3029583 18.3333333 18.33325 18.3333333"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="4.69695833 10 1.66666667 10 1.66666667 13.0302917 4.69695833 13.0302917"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="9.99991667 15.3030417 6.969625 15.3030417 6.969625 18.3333333 9.99991667 18.3333333"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="13.0302917 1.66666667 10 1.66666667 10 4.69695833 13.0302917 4.69695833"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="18.33325 6.96970833 15.3029583 6.96970833 15.3029583 10 18.33325 10"></polygon>
+            <line x1="4.69704167" y1="3.18181667" x2="10.0000833" y2="3.18181667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="10" y1="16.8181667" x2="15.3030417" y2="16.8181667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="4.69704167 11.5151667 11.51525 11.5151667 11.51525 4.69695833"></polyline>
+            <path d="M12.0116667,8.48483333 L15.3030833,8.48483333 M8.48491667,15.3030417 L8.48491667,11.5119167 L8.48491667,15.3030417 Z" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="3.1817625" y1="4.69695833" x2="3.1817625" y2="10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="16.81825" y1="10" x2="16.81825" y2="15.3030417" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

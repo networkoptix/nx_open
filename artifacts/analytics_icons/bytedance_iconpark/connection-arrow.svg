@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>connection-arrow</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="connection-arrow">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(1.666667, 1.647392)" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round">
+                <g transform="translate(0.000000, 1.685941)" id="Path">
+                    <path d="M15.412417,0.0110313566 L3.40909091,0.0110313566 C2.27272727,0.0110313566 0,0.64608 0,3.31969111 C0,5.99330221 2.27272727,6.66666667 3.40909091,6.66666667 L13.3307732,6.66666667 C14.4671368,6.66666667 16.6666667,7.31997892 16.6666667,9.99359004 C16.6666667,12.6672012 14.4671368,13.3345505 13.3307732,13.3345505 L0.860413487,13.3345505"></path>
+                    <polyline points="1.68570414 11.6635875 0.0280826329 13.3579735 1.68570414 15"></polyline>
+                </g>
+                <polyline id="Path" transform="translate(15.013354, 1.668206) scale(-1, 1) translate(-15.013354, -1.668206) " points="15.8421648 2.22044605e-15 14.1845433 1.69438605 15.8421648 3.33641251"></polyline>
+            </g>
+        </g>
+    </g>
+</svg>

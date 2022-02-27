@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>speed</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="speed">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M14.1764167,2.78717083 C12.9485,2.07463333 11.521875,1.66666667 10,1.66666667 C5.397625,1.66666667 1.66666667,5.397625 1.66666667,10 C1.66666667,14.602375 5.397625,18.3333333 10,18.3333333 C14.602375,18.3333333 18.3333333,14.602375 18.3333333,10 C18.3333333,8.488625 17.931,7.07120833 17.2275417,5.84904167" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M13.3124167,6.68758333 C13.3124167,6.68758333 11.900875,10.456125 11.2500417,11.107 C10.5991667,11.757875 9.543875,11.757875 8.893,11.107 C8.242125,10.456125 8.242125,9.40083333 8.893,8.74995833 C9.543875,8.09908333 13.3124167,6.68758333 13.3124167,6.68758333 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

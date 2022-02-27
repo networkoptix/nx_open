@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>switch-themes</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="switch-themes">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="9.58333333 1.66666667 9.58333333 11.25 18.3305417 11.25 18.3333333 1.66666667"></polygon>
+            <path d="M12.9187083,18.33325 C10.2813333,18.33325 8.56645833,18.33325 7.774125,18.33325 C7.064875,18.33325 6.21495833,18.0965833 5.64479167,17.3385833 C5.25954167,16.8263333 5.00204167,16.0760833 5.00204167,14.9999167 C5.00204167,13.22075 5.00204167,11.6929167 5.00204167,10.4164583" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="1.66666667 13.7499167 5.00191667 10.4164583 8.33908333 13.7499167"></polyline>
+            <line x1="12.5" y1="7.91666667" x2="15.4166667" y2="7.91666667" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="12.5" y1="5" x2="15.4166667" y2="5" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+        </g>
+    </g>
+</svg>

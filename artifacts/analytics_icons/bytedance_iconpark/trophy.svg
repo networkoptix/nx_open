@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>trophy</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="trophy">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(1.666667, 1.666667)" stroke="#A5B7C0" stroke-linejoin="round">
+                <path d="M8.33333333,10.8333333 C11.0947571,10.8333333 13.3333333,8.52891662 13.3333333,5.6862745 L13.3333333,0 L3.33333333,0 L3.33333333,5.6862745 C3.33333333,8.52891662 5.57190958,10.8333333 8.33333333,10.8333333 Z" id="Path"></path>
+                <path d="M3.33333333,7.08333333 L3.33333333,2.91666667 L0,2.91666667 C0,5.69444446 1.66666667,7.08333333 3.33333333,7.08333333 Z" id="Path" stroke-linecap="round"></path>
+                <path d="M13.3333333,7.08333333 L13.3333333,2.91666667 L16.6666667,2.91666667 C16.6666667,5.69444446 15,7.08333333 13.3333333,7.08333333 Z" id="Path" stroke-linecap="round"></path>
+                <line x1="8.33333333" y1="11.6666667" x2="8.33333333" y2="13.3333333" id="Path" stroke-linecap="round"></line>
+                <polygon id="Path" points="4.58333333 15.8333333 6.12084833 13.3333333 10.4343816 13.3333333 12.0833333 15.8333333"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

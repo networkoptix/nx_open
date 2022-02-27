@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="21px" height="21px" viewBox="0 0 21 21" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>female</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="female" transform="translate(0.000000, 1.000000)">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0.952380952" width="19.047619" height="19.047619"></rect>
+            <path d="M11.5363384,13.4920635 C14.6045871,13.4920635 17.091894,11.0047565 17.091894,7.93650794 C17.091894,6.40238365 16.4700673,5.01349476 15.4647094,4.00813694 C14.4593516,3.00277913 13.0704627,2.38095238 11.5363384,2.38095238 C8.46808983,2.38095238 5.98078289,4.86825933 5.98078289,7.93650794 C5.98078289,11.0047565 8.46808983,13.4920635 11.5363384,13.4920635 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round" transform="translate(11.536338, 7.936508) rotate(-135.000000) translate(-11.536338, -7.936508) "></path>
+            <line x1="5.03686239" y1="17.9159652" x2="5.03686239" y2="10.773108" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" transform="translate(5.036862, 14.344537) rotate(-135.000000) translate(-5.036862, -14.344537) "></line>
+            <line x1="1.74603175" y1="14.0639387" x2="8.88888889" y2="14.0639387" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" transform="translate(5.317460, 14.063939) rotate(-135.000000) translate(-5.317460, -14.063939) "></line>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>update-rotation</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="update-rotation">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" points="20 0 0 0 0 20 20 20"></polygon>
+            <path d="M10,18.3333333 C14.602375,18.3333333 18.3333333,14.602375 18.3333333,10 C18.3333333,5.397625 14.602375,1.66666667 10,1.66666667 C5.397625,1.66666667 1.66666667,5.397625 1.66666667,10 C1.66666667,14.602375 5.397625,18.3333333 10,18.3333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M13.976,11.25 C13.4450417,12.9404583 11.86575,14.1666667 10.0000833,14.1666667 C8.13441667,14.1666667 6.555125,12.9404583 6.02416667,11.25 L6.02416667,13.75" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M13.976,6.25 L13.976,8.75 C13.4450417,7.05954167 11.86575,5.83333333 10.0000833,5.83333333 C8.13441667,5.83333333 6.555125,7.05954167 6.02416667,8.75" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>injection</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="injection">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polyline id="Path" points="15.9035 9.27583333 7.94858333 17.2307917 2.6452625 11.9274583 10.6002083 3.972525"></polyline>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="15.9035 9.27583333 7.94858333 17.2307917 2.6452625 11.9274583 10.6002083 3.972525"></polyline>
+            <line x1="9.12720833" y1="2.49939167" x2="17.3767917" y2="10.7489583" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="6.18083333" y1="11.9274583" x2="7.94858333" y2="13.69525" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="2.64567083" y1="17.2304167" x2="5.297" y2="14.5790833" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="13.2519583" y1="6.624125" x2="14.72475" y2="5.15133333" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+        </g>
+    </g>
+</svg>

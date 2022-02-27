@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>watch</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="watch">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="14.565125 12.9166667 12.916625 18.3333333 7.08329167 18.3333333 5.43483333 12.9166667"></polyline>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="5.43483333 7.08333333 7.08329167 1.66666667 12.916625 1.66666667 14.565125 7.08333333"></polyline>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="10 7.08333333 10 10 11.6666667 11.6666667"></polyline>
+            <path d="M15.4166667,10 C15.4166667,11.073875 15.1041667,12.07475 14.5651667,12.9166667 C13.6025833,14.420125 11.9176667,15.4166667 10,15.4166667 C8.08233333,15.4166667 6.39741667,14.420125 5.43483333,12.9166667 C4.89583333,12.07475 4.58333333,11.073875 4.58333333,10 C4.58333333,8.926125 4.89583333,7.92525 5.43483333,7.08333333 C6.39741667,5.579875 8.08233333,4.58333333 10,4.58333333 C11.9176667,4.58333333 13.6025833,5.579875 14.5651667,7.08333333 C15.1041667,7.92525 15.4166667,8.926125 15.4166667,10 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>beach-umbrella</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="beach-umbrella">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M5.97533333,8.92158333 L10,10 L14.0247083,11.0784167 L18.0494167,12.1567917 C19.0235833,8.52104167 17.4364583,4.802375 14.3940833,2.91666667 C13.7164583,2.4966625 12.966625,2.16758333 12.1568333,1.9506 C11.22425,1.7007125 10.2861667,1.61934583 9.375,1.68784583 C5.94275,1.94585833 2.891925,4.33020833 1.95063333,7.84316667 L5.97533333,8.92158333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M12.1568333,1.95058333 C12.1568333,1.95058333 9.8065,3.47764167 8.462375,5.27429167 C7.11820833,7.07095833 6.78025,9.13725 6.78025,9.13725" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M12.1568333,1.95058333 C12.1568333,1.95058333 13.42875,4.44820833 13.6944583,6.67625 C13.9602083,8.90425 13.21975,10.8627083 13.21975,10.8627083" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="1.95063333 7.84316667 5.97533333 8.92158333 10 10 14.0247083 11.0784167 18.0494167 12.1568333"></polyline>
+            <line x1="1.66666667" y1="18.3333333" x2="18.3333333" y2="18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="10" y1="10" x2="7.70833333" y2="18.3332917" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M9.375,1.68784583 C10.2861667,1.61934583 11.22425,1.7007125 12.1568333,1.9506 C12.966625,2.16758333 13.7164583,2.4966625 14.3940833,2.91666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

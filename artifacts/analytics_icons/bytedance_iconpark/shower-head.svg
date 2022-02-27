@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>shower-head</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="shower-head">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M11.25,8.33333333 L11.25,9.16666667 L3.75,9.16666667 L3.75,8.33333333 C3.75,6.952625 5.42891667,5.83333333 7.5,5.83333333 C9.57108333,5.83333333 11.25,6.952625 11.25,8.33333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M17.5,18.3333333 L17.5,5.20833333 C17.5,3.252325 15.2614167,1.66666667 12.5,1.66666667 C9.73858333,1.66666667 7.5,3.252325 7.5,5.20833333 L7.5,5.83333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="7.5" y1="12.0833333" x2="7.5" y2="11.6666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="4.237875" y1="11.6792917" x2="4.09538333" y2="12.0708333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="1.73789167" y1="17.9292917" x2="1.59538333" y2="18.3208333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="7.5" y1="18.3333333" x2="7.5" y2="17.9166667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="7.5" y1="15.4166667" x2="7.5" y2="14.5833333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="3.05916667" y1="14.6084583" x2="2.77415" y2="15.3915417" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

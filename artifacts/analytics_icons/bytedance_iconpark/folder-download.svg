@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>folder-download</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="folder-download">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M1.66666667,3.75 C1.66666667,3.2897625 2.0397625,2.91666667 2.5,2.91666667 L7.91666667,2.91666667 L10,5.41666667 L17.5,5.41666667 C17.96025,5.41666667 18.3333333,5.78975 18.3333333,6.25 L18.3333333,16.25 C18.3333333,16.71025 17.96025,17.0833333 17.5,17.0833333 L2.5,17.0833333 C2.0397625,17.0833333 1.66666667,16.71025 1.66666667,16.25 L1.66666667,3.75 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="12.9282083 11.2385 10 14.1667083 7.07833333 11.2450417"></polyline>
+            <line x1="10" y1="8.33333333" x2="10" y2="13.9583333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

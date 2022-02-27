@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Fragment>
+        <!--
+            These libraries may be shared between different installers, therefore they must
+            contain 'DiskId="2"' descriptor, so bundle will strip duplicated copies.
+         -->
+        <ComponentGroup Id="CommonQtPlatformsComponentGroup"
+                Source="${qt.dir}/plugins/platforms"
+                Directory="QtPlatformsDirectory">
+            <Component><File Name="qwindows.dll" KeyPath="yes" DiskId="2"/></Component>
+        </ComponentGroup>
+    </Fragment>
+</Wix>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WixLocalization xmlns="http://schemas.microsoft.com/wix/2006/localization" Codepage="1252" Language="2068" Culture="no-no">
+  <String Id="Caption">[WixBundleName] Oppsett - [WixBundleVersion]</String>
+  <String Id="Title">[WixBundleName] - [WixBundleVersion]</String>
+  <String Id="Components">[InstallerTitle]</String>
+  <String Id="HelpText">/ installer | / reparasjon | / avinstallere | / layout [directory] - installerer, reparerer, avinstallerer eller
+   lager en komplett lokal kopi av pakken i katalogen. Installasjon er standard.
+
+/ passiv | / stille - viser minimal brukergrensesnitt uten instruksjoner eller viser ingen brukergrensesnitt og
+   uten instruksjoner. Standard brukergrensesnitt og alle ledetekster vises.
+
+/ norestart - undertrykk eventuelle forsøk på å starte på nytt. Som standard vil brukergrensesnittet be deg om før omstart.
+/ log log.txt - logger til en bestemt fil. Som standard opprettes en loggfil i %TEMP%.</String>
+  <String Id="ConfirmCancelMessage">Er du sikker på at du vil avbryte?</String>
+  <String Id="ClientAndServer">Klient og server</String>
+  <String Id="ClientOnly">Kun klient</String>
+  <String Id="ClientOnlyDesc">Klientapplikasjonen brukes til å vise video og administrere systemet</String>
+  <String Id="ServerOnly">Kun Server</String>
+  <String Id="ServerOnlyDesc">Server-applikasjonen brukes til å lagre systeminformasjon og arkiver</String>
+  <String Id="HelpHeader">Installasjonshjelp</String>
+  <String Id="HelpCloseButton">Lukk</String>
+  <String Id="InstallOptionsButton">Alternativer</String>
+  <String Id="InstallInstallButton">Accept and Install</String>
+  <String Id="InstallCloseButton">Lukk</String>
+  <String Id="InstallAcceptCheckbox">I agree to the license terms and conditions</String>
+  <String Id="InstallLicenseLinkText">Sluttbrukerlisensavtale</String>
+  <String Id="OptionsHeader">Installasjonsalternativer</String>
+  <String Id="OptionsLocationLabel">Installasjons plassering:</String>
+  <String Id="OptionsBrowseButton">Bla gjennom</String>
+  <String Id="OptionsOkButton">OK</String>
+  <String Id="OptionsCancelButton">Avbryt</String>
+  <String Id="ProgressHeader">Fremdrift</String>
+  <String Id="ProgressLabel">Behandler...</String>
+  <String Id="OverallProgressPackageText">Initialiserer...</String>
+  <String Id="ProgressCancelButton">Avbryt</String>
+  <String Id="ModifyHeader">Endre oppsett</String>
+  <String Id="ModifyRepairButton">Reparer</String>
+  <String Id="ModifyUninstallButton">Avinstaller</String>
+  <String Id="ModifyCloseButton">Lukk</String>
+  <String Id="SuccessHeader">Installasjon vellykket</String>
+  <String Id="SuccessUninstallHeader">Avinstallasjon fullført</String>
+  <String Id="SuccessInstallHeader">Installasjonen ble fullført</String>
+  <String Id="SuccessLaunchButton">Start</String>
+  <String Id="SuccessRestartText">Du må starte datamaskinen på nytt før du kan bruke programvaren</String>
+  <String Id="SuccessRestartButton">Omstart</String>
+  <String Id="SuccessCloseButton">Lukk</String>
+  <String Id="FailureHeader">Installasjon mislyktes</String>
+  <String Id="FailureHyperlinkLogText">Ett eller flere problemer fikk installasjonen til å mislykkes. Løs problemene og prøv deretter oppsettet på nytt. For mer informasjon se</String>
+  <String Id="FailureHyperlinkLogTextLink">loggfil</String>
+  <String Id="FailureRestartText">Du må starte datamaskinen på nytt for å fullføre tilbakestillingen av programvaren</String>
+  <String Id="FailureRestartButton">Omstart</String>
+  <String Id="FailureCloseButton">Lukk</String>
+  <String Id="WillInstall">[WixBundleName] vil bli installert på enheten din</String>
+  <String Id="FilesInUseHeader">Filer i bruk</String>
+  <String Id="FilesInUseLabel">Følgende programmer bør stoppes for å fortsette installasjonen:</String>
+  <String Id="FilesInUseCloseRadioButton">Lukk programmene og prøv å starte dem på nytt</String>
+  <String Id="FilesInUseDontCloseRadioButton">Ikke lukk applikasjoner. En omstart vil være nødvendig</String>
+  <String Id="FilesInUseOkButton">OK</String>
+  <String Id="FilesInUseCancelButton">Avbryt</String>
+  <String Id="Options">Alternativer</String>
+  <String Id="SelectApps">Velg applikasjoner som skal installeres:</String>
+  <String Id="msierrFirewallCannotConnect">Kan ikke koble til Windows-brannmuren. ([2]   [3]   [4]   [5])</String>
+  <String Id="WixSchedFirewallExceptionsInstall">Konfigurerer Windows-brannmuren</String>
+  <String Id="WixSchedFirewallExceptionsUninstall">Konfigurerer Windows-brannmuren</String>
+  <String Id="WixRollbackFirewallExceptionsInstall">Ruller tilbake Windows-brannmurkonfigurasjonen</String>
+  <String Id="WixExecFirewallExceptionsInstall">Installerer Windows-brannmurkonfigurasjonen</String>
+  <String Id="WixRollbackFirewallExceptionsUninstall">Ruller tilbake Windows-brannmurkonfigurasjonen</String>
+  <String Id="WixExecFirewallExceptionsUninstall">Avinstallerer Windows-brannmurkonfigurasjonen</String>
+  <String Id="Product_ArchMismatch_x86">Denne pakken er designet for 32-biters OS. Installasjonen vil nå avslutte.</String>
+  <String Id="Product_ArchMismatch_x64">Denne pakken er designet for 64-biters OS. Installasjonen vil nå avslutte.</String>
+</WixLocalization>

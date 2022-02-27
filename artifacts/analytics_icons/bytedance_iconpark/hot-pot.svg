@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>hot-pot</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="hot-pot">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <line x1="10" y1="4.58333333" x2="10" y2="1.66666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="13.3333333" y1="4.58333333" x2="13.3333333" y2="2.91666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="6.66666667" y1="4.58333333" x2="6.66666667" y2="2.91666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M18.3333333,7.08333333 L1.66666667,7.08333333 C1.66666667,9.41066667 3.15740833,11.4595 5.41666667,12.652 C6.73158333,13.3460417 8.30683333,13.75 10,13.75 C11.6931667,13.75 13.2684167,13.3460417 14.5833333,12.652 C16.8425833,11.4595 18.3333333,9.41066667 18.3333333,7.08333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="4.36116667" y1="16.25" x2="15.6388333" y2="16.25" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="5.41666667" y1="12.6519583" x2="3.75" y2="18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="14.5833333" y1="12.6519583" x2="16.25" y2="18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="8.33333333" y1="10.4166667" x2="11.6666667" y2="10.4166667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

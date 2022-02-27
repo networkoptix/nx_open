@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>GeneralPreferencesWidget</class>
+ <widget class="QWidget" name="GeneralPreferencesWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>435</width>
+    <height>424</height>
+   </rect>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0,1">
+   <item>
+    <widget class="QGroupBox" name="mediaFoldersGroupBox">
+     <property name="title">
+      <string>Local Media Folders</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QListWidget" name="mediaFoldersList">
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>80</height>
+         </size>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::Box</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <item>
+         <widget class="QPushButton" name="addMediaFolderButton">
+          <property name="text">
+           <string>Add...</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="removeMediaFolderButton">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>Remove</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>10</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="audioGroupBox">
+     <property name="title">
+      <string>Audio Input</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="primaryDeviceTextLabel">
+        <property name="text">
+         <string>First Source</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="primaryAudioDeviceComboBox"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="secondaryDeviceTextLabel">
+        <property name="text">
+         <string>Second Source</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="secondaryAudioDeviceComboBox"/>
+      </item>
+      <item row="2" column="1">
+       <widget class="QCheckBox" name="muteOnAudioTransmitCheckBox">
+        <property name="text">
+         <string>Mute audio when the mic is active</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="startupSettingsGroup">
+     <property name="title">
+      <string>Startup</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <item>
+       <widget class="QCheckBox" name="autoStartCheckBox">
+        <property name="text">
+         <string>Run Application when PC Boots up</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="autoLoginCheckBox">
+        <property name="text">
+         <string>Connect to the previous system on startup</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="miscGroupBox">
+     <property name="title">
+      <string>Misc</string>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="restoreSessionCheckBox">
+        <property name="text">
+         <string>Automatically restore saved windows configuration</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2">
+       <layout class="QHBoxLayout" name="pauseOnInactivityLayout" stretch="0,0,0">
+        <item>
+         <widget class="QCheckBox" name="pauseOnInactivityCheckBox">
+          <property name="text">
+           <string>Auto Pause Video</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="idleTimeoutWidget" native="true">
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="idleTimeoutLabel1">
+             <property name="text">
+              <string>after</string>
+             </property>
+             <property name="buddy">
+              <cstring>idleTimeoutSpinBox</cstring>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="idleTimeoutSpinBox">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>60</number>
+             </property>
+             <property name="value">
+              <number>15</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="idleTimeoutLabel2">
+             <property name="text">
+              <string>Minutes of Inactivity</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_7">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>10</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <widget class="QCheckBox" name="playAudioForAllCamerasCheckbox">
+        <property name="text">
+         <string>Play audio from all cameras on layout</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>mediaFoldersList</tabstop>
+  <tabstop>addMediaFolderButton</tabstop>
+  <tabstop>removeMediaFolderButton</tabstop>
+  <tabstop>idleTimeoutSpinBox</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

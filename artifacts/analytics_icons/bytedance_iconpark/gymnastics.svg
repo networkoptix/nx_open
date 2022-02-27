@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>gymnastics</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="gymnastics">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group-16" transform="translate(2.000000, 1.000000)" stroke="#A5B7C0">
+                <path d="M7.69047619,8.37118686 C8.93968095,8.37118686 9.95238095,7.35848686 9.95238095,6.1092821 C9.95238095,4.86007734 8.93968095,3.84737734 7.69047619,3.84737734 C6.44127143,3.84737734 5.42857143,4.86007734 5.42857143,6.1092821 C5.42857143,7.35848686 6.44127143,8.37118686 7.69047619,8.37118686 Z" id="Path"></path>
+                <polyline id="Path" stroke-linecap="round" stroke-linejoin="round" points="7.23809524 11.5378535 6.33333333 14.7045202 2.26190476 13.7997583 0 18.3235678"></polyline>
+                <polyline id="Path" stroke-linecap="round" stroke-linejoin="round" points="6.33333333 14.7045202 7.23809524 18.3235678 12.2142857 18.3235678"></polyline>
+                <polyline id="Path" stroke-linecap="round" stroke-linejoin="round" points="-8.03589999e-15 8.82356781 7.23809524 11.5378535 12.6666667 10.6330916 15.3990476 8.38475829"></polyline>
+                <path d="M2.26190476,0.228329718 C8.5952381,-0.676432187 13.1190476,1.13309162 16.7380952,5.20452019" id="Path" stroke-linecap="round" stroke-linejoin="round"></path>
+            </g>
+        </g>
+    </g>
+</svg>

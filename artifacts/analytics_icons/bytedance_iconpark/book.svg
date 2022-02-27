@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>book</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="book">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M3.33333333,16.6666667 C3.33333333,15 3.33333333,4.16666667 3.33333333,4.16666667 C3.33333333,2.78595417 4.52725,1.66666667 6,1.66666667 L16.6666667,1.66666667 L16.6666667,15 C16.6666667,15 8.325625,15 6,15 C3.9009375,15 3.33333333,15.2850833 3.33333333,16.6666667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M5,18.3333333 L16.6666667,18.3333333 L16.6666667,15 L5,15 C4.079525,15 3.33333333,15.7462083 3.33333333,16.6666667 C3.33333333,17.587125 4.079525,18.3333333 5,18.3333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

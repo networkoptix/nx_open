@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>degree-hat</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="degree-hat">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="0.833333333 7.25 9.59258333 3.75 18.3518333 7.25 9.59258333 10.75"></polygon>
+            <line x1="18.3518333" y1="7.295875" x2="18.3518333" y2="11.138875" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M4.81479167,9.093875 L4.81479167,14.2777917 C4.81479167,14.2777917 6.819,16.25 9.59258333,16.25 C12.3661667,16.25 14.370375,14.2777917 14.370375,14.2777917 L14.370375,9.093875" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

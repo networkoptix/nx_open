@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>funds</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="funds">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <ellipse id="Oval" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" cx="5.83333333" cy="4.16666667" rx="4.16666667" ry="2.08333333"></ellipse>
+            <path d="M1.66666667,4.16666667 C1.66666667,4.16666667 1.66666667,5.93275 1.66666667,7.08333333 C1.66666667,8.23391667 3.53214583,9.16666667 5.83333333,9.16666667 C8.1345,9.16666667 10,8.23391667 10,7.08333333 C10,6.40183333 10,4.16666667 10,4.16666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M1.66666667,7.08333333 C1.66666667,7.08333333 1.66666667,8.84941667 1.66666667,10 C1.66666667,11.1505833 3.53214583,12.0833333 5.83333333,12.0833333 C8.1345,12.0833333 10,11.1505833 10,10 C10,9.3185 10,7.08333333 10,7.08333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M1.66666667,10 C1.66666667,10 1.66666667,11.7660833 1.66666667,12.9166667 C1.66666667,14.06725 3.53214583,15 5.83333333,15 C8.1345,15 10,14.06725 10,12.9166667 C10,12.2351667 10,10 10,10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M1.66666667,12.9166667 C1.66666667,12.9166667 1.66666667,14.68275 1.66666667,15.8333333 C1.66666667,16.9839167 3.53214583,17.9166667 5.83333333,17.9166667 C8.1345,17.9166667 10,16.9839167 10,15.8333333 C10,15.1518333 10,12.9166667 10,12.9166667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <ellipse id="Oval" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" cx="14.1666667" cy="10" rx="4.16666667" ry="2.08333333"></ellipse>
+            <path d="M10,10 C10,10 10,11.7660833 10,12.9166667 C10,14.06725 11.8655,15 14.1666667,15 C16.4678333,15 18.3333333,14.06725 18.3333333,12.9166667 C18.3333333,12.2351667 18.3333333,10 18.3333333,10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M10,12.9166667 C10,12.9166667 10,14.68275 10,15.8333333 C10,16.9839167 11.8655,17.9166667 14.1666667,17.9166667 C16.4678333,17.9166667 18.3333333,16.9839167 18.3333333,15.8333333 C18.3333333,15.1518333 18.3333333,12.9166667 18.3333333,12.9166667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

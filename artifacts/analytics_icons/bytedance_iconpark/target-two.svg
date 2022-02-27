@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>target-two</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="target-two">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M10,17.0833333 C13.9125,17.0833333 17.0833333,13.9125 17.0833333,10 C17.0833333,6.0875 13.9125,2.91666667 10,2.91666667 C6.0875,2.91666667 2.91666667,6.0875 2.91666667,10 C2.91666667,13.9125 6.0875,17.0833333 10,17.0833333 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M10,13.3333333 C11.8416667,13.3333333 13.3333333,11.8416667 13.3333333,10 C13.3333333,8.15833333 11.8416667,6.66666667 10,6.66666667 C8.15833333,6.66666667 6.66666667,8.15833333 6.66666667,10 C6.66666667,11.8416667 8.15833333,13.3333333 10,13.3333333 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <line x1="1.66666667" y1="10" x2="18.3333333" y2="10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="10" y1="1.66666667" x2="10" y2="18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

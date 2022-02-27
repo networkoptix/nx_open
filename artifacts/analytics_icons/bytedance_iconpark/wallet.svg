@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>wallet</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="wallet">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="7.49254167 4.98704167 13.243625 1.66666667 15.1654583 4.995375"></polygon>
+            <path d="M1.66666667,5.83333333 C1.66666667,5.37308333 2.0397625,5 2.5,5 L17.5,5 C17.96025,5 18.3333333,5.37308333 18.3333333,5.83333333 L18.3333333,17.5 C18.3333333,17.96025 17.96025,18.3333333 17.5,18.3333333 L2.5,18.3333333 C2.0397625,18.3333333 1.66666667,17.96025 1.66666667,17.5 L1.66666667,5.83333333 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M14.6875,13.75 L18.3333333,13.75 L18.3333333,9.58333333 L14.6875,9.58333333 C13.479375,9.58333333 12.5,10.5160833 12.5,11.6666667 C12.5,12.81725 13.479375,13.75 14.6875,13.75 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <line x1="18.3333333" y1="6.875" x2="18.3333333" y2="16.875" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+        </g>
+    </g>
+</svg>

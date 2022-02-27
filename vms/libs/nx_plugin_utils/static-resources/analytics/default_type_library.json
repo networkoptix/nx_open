@@ -1,0 +1,1207 @@
+{
+  "objectTypes": [
+    {
+      "id": "nx.base.Vehicle",
+      "name": "Vehicle",
+      "icon": "nx.base.vehicle",
+      "attributes": [
+        {
+          "name": "Color",
+          "type": "Color",
+          "subtype": "nx.base.Color"
+        },
+        {
+          "name": "Speed",
+          "type": "Number",
+          "subtype": "integer",
+          "minValue": 0,
+          "unit": "kph"
+        },
+        {
+          "name": "Brand",
+          "type": "String"
+        },
+        {
+          "name": "Model",
+          "type": "String"
+        },
+        {
+          "name": "Size",
+          "type": "Enum",
+          "subtype": "nx.base.Size"
+        },
+        {
+          "name": "License Plate",
+          "type": "Object",
+          "subtype": "nx.base.LicensePlate"
+        },
+        {
+          "name": "Driver buckled up",
+          "type": "Boolean"
+        },
+        {
+          "name": "Lane",
+          "type": "Number",
+          "subtype": "integer",
+          "minValue": 1,
+          "unit": ""
+        }
+      ]
+    },
+    {
+      "id": "nx.base.Person",
+      "name": "Person",
+      "icon": "nx.base.person",
+      "attributes": [
+        {
+          "name": "Gender",
+          "type": "Enum",
+          "subtype": "nx.base.Gender"
+        },
+        {
+          "name": "Age",
+          "type": "Enum",
+          "subtype": "nx.base.Age"
+        },
+        {
+          "name": "Height",
+          "type": "Number",
+          "subtype": "integer",
+          "minValue": 0,
+          "unit": "cm"
+        },
+        {
+          "name": "Activity",
+          "type": "Enum",
+          "subtype": "nx.base.Activity"
+        },
+        {
+          "name": "Hat",
+          "type": "Object",
+          "subtype": "nx.base.Hat"
+        },
+        {
+          "name": "Scarf",
+          "type": "Object",
+          "subtype": "nx.base.Scarf"
+        },
+        {
+          "name": "Body Shape",
+          "type": "Enum",
+          "subtype": "nx.base.BodyShape"
+        },
+        {
+          "name": "Top Clothing Color",
+          "type": "Color",
+          "subtype": "nx.base.Color"
+        },
+        {
+          "name": "Top Clothing Length",
+          "type": "Enum",
+          "subtype": "nx.base.Length"
+        },
+        {
+          "name": "Top Clothing Grain",
+          "type": "Enum",
+          "subtype": "nx.base.Grain"
+        },
+        {
+          "name": "Top Clothing Type",
+          "type": "Enum",
+          "subtype": "nx.base.TopClothingType"
+        },
+        {
+          "name": "Bottom Clothing Color",
+          "type": "Color",
+          "subtype": "nx.base.Color"
+        },
+        {
+          "name": "Bottom Clothing Length",
+          "type": "Enum",
+          "subtype": "nx.base.Length"
+        },
+        {
+          "name": "Bottom Clothing Grain",
+          "type": "Enum",
+          "subtype": "nx.base.Grain"
+        },
+        {
+          "name": "Bottom Clothing Type",
+          "type": "Enum",
+          "subtype": "nx.base.BottomClothingType"
+        },
+        {
+          "name": "Gloves",
+          "type": "Object",
+          "subtype": "nx.base.Gloves"
+        },
+        {
+          "name": "Shoes",
+          "type": "Object",
+          "subtype": "nx.base.Shoes"
+        },
+        {
+          "name": "Name",
+          "type": "String"
+        },
+        {
+          "name": "Temperature",
+          "type": "Number",
+          "subtype": "integer",
+          "minValue": 0,
+          "unit": "°C"
+        },
+        {
+          "name": "Tattoo",
+          "type": "Boolean"
+        },
+        {
+          "name": "Bag",
+          "type": "Object",
+          "subtype": "nx.base.Bag"
+        },
+        {
+          "name": "Weapon",
+          "type": "Object",
+          "subtype": "nx.base.Weapon"
+        },
+        {
+          "name": "Cigarette",
+          "type": "Object",
+          "subtype": "nx.base.Cigarette"
+        },
+        {
+          "name": "Mobile Phone",
+          "type": "Object",
+          "subtype": "nx.base.MobilePhone"
+        },
+        {
+          "name": "Cart",
+          "type": "Object",
+          "subtype": "nx.base.Cart"
+        },
+        {
+          "name": "Bottle",
+          "type": "Object",
+          "subtype": "nx.base.Bottle"
+        },
+        {
+          "name": "Umbrella",
+          "type": "Object",
+          "subtype": "nx.base.Umbrella"
+        },
+        {
+          "name": "Box",
+          "type": "Object",
+          "subtype": "nx.base.Box"
+        },
+        {
+          "name": "Mask",
+          "type": "Object",
+          "subtype": "nx.base.Mask"
+        },
+        {
+          "name": "Glasses",
+          "type": "Object",
+          "subtype": "nx.base.Glasses"
+        },
+        {
+          "name": "Helmet",
+          "type": "Object",
+          "subtype": "nx.base.Helmet"
+        }
+      ]
+    },
+    {
+      "id": "nx.base.Face",
+      "name": "Face",
+      "icon": "nx.base.face",
+      "attributes": [
+        {
+          "name": "Gender",
+          "type": "Enum",
+          "subtype": "nx.base.Gender"
+        },
+        {
+          "name": "Complexion",
+          "type": "Enum",
+          "subtype": "nx.base.Complexion"
+        },
+        {
+          "name": "Age",
+          "type": "Enum",
+          "subtype": "nx.base.Age"
+        },
+        {
+          "name": "Shape",
+          "type": "Enum",
+          "subtype": "nx.base.FaceShape"
+        },
+        {
+          "name": "Length",
+          "type": "Enum",
+          "subtype": "nx.base.Length"
+        },
+        {
+          "name": "Emotion",
+          "type": "Enum",
+          "subtype": "nx.base.Emotion"
+        },
+        {
+          "name": "Hat",
+          "type": "Object",
+          "subtype": "nx.base.Hat"
+        },
+        {
+          "name": "Hair Color",
+          "type": "Color",
+          "subtype": "nx.base.Color"
+        },
+        {
+          "name": "Hair Type",
+          "type": "Enum",
+          "subtype": "nx.base.HairType"
+        },
+        {
+          "name": "Eyelid",
+          "type": "Enum",
+          "subtype": "nx.base.Eyelid"
+        },
+        {
+          "name": "Eyebrow Width",
+          "type": "Enum",
+          "subtype": "nx.base.Width"
+        },
+        {
+          "name": "Eyebrow Space",
+          "type": "Enum",
+          "subtype": "nx.base.EyebrowSpace"
+        },
+        {
+          "name": "Eyebrow Color",
+          "type": "Color",
+          "subtype": "nx.base.Color"
+        },
+        {
+          "name": "Eyes",
+          "type": "Enum",
+          "subtype": "nx.base.OpenClosed"
+        },
+        {
+          "name": "Mouth",
+          "type": "Enum",
+          "subtype": "nx.base.OpenClosed"
+        },
+        {
+          "name": "Eyes Shape",
+          "type": "Enum",
+          "subtype": "nx.base.EyesShape"
+        },
+        {
+          "name": "Eyes Color",
+          "type": "Color",
+          "subtype": "nx.base.Color"
+        },
+        {
+          "name": "Nose Length",
+          "type": "Enum",
+          "subtype": "nx.base.Length"
+        },
+        {
+          "name": "Nose Bridge",
+          "type": "Enum",
+          "subtype": "nx.base.NoseBridge"
+        },
+        {
+          "name": "Nose Wing",
+          "type": "Enum",
+          "subtype": "nx.base.NoseWing"
+        },
+        {
+          "name": "Nose End",
+          "type": "Enum",
+          "subtype": "nx.base.NoseEnd"
+        },
+        {
+          "name": "Facial Hair",
+          "type": "Object",
+          "subtype": "nx.base.FacialHair"
+        },
+        {
+          "name": "Ear Type",
+          "type": "Enum",
+          "subtype": "nx.base.EarType"
+        },
+        {
+          "name": "Lip Type",
+          "type": "Enum",
+          "subtype": "nx.base.LipType"
+        },
+        {
+          "name": "Chin Type",
+          "type": "Enum",
+          "subtype": "nx.base.ChinType"
+        },
+        {
+          "name": "Freckles",
+          "type": "Boolean"
+        },
+        {
+          "name": "Tattoo",
+          "type": "Boolean"
+        },
+        {
+          "name": "Mole",
+          "type": "Boolean"
+        },
+        {
+          "name": "Scar",
+          "type": "Boolean"
+        },
+        {
+          "name": "Temperature",
+          "type": "Number",
+          "subtype": "integer",
+          "minValue": 0,
+          "unit": "°C"
+        },
+        {
+          "name": "Name",
+          "type": "String"
+        },
+        {
+          "name": "Cigarette",
+          "type": "Object",
+          "subtype": "nx.base.Cigarette"
+        },
+        {
+          "name": "Mask",
+          "type": "Object",
+          "subtype": "nx.base.Mask"
+        },
+        {
+          "name": "Glasses",
+          "type": "Object",
+          "subtype": "nx.base.Glasses"
+        },
+        {
+          "name": "Helmet",
+          "type": "Object",
+          "subtype": "nx.base.Helmet"
+        }
+      ]
+    },
+    {
+      "id": "nx.base.LicensePlate",
+      "name": "License Plate",
+      "icon": "nx.base.license",
+      "attributes": [
+        {
+          "name": "Number",
+          "type": "String"
+        },
+        {
+          "name": "Country",
+          "type": "String"
+        },
+        {
+          "name": "State/Province",
+          "type": "String"
+        },
+        {
+          "name": "Size",
+          "type": "String"
+        },
+        {
+          "name": "Color",
+          "type": "Color",
+          "subtype": "nx.base.Color"
+        }
+      ]
+    },
+    {
+      "id": "nx.base.Animal",
+      "name": "Animal",
+      "icon": "nx.base.animal",
+      "attributes": [
+        {
+          "name": "Size",
+          "type": "Enum",
+          "subtype": "nx.base.Size"
+        },
+        {
+          "name": "Color",
+          "type": "Color",
+          "subtype": "nx.base.Color"
+        }
+      ]
+    },
+    {
+      "id": "nx.base.Unknown",
+      "name": "Unknown",
+      "icon": "nx.base.unknown"
+    },
+    {
+      "id": "nx.base.Car",
+      "name": "Car",
+      "icon": "nx.base.car",
+      "base": "nx.base.Vehicle",
+      "attributes": [
+        {
+          "name": "Type",
+          "type": "Enum",
+          "subtype": "nx.base.CarType"
+        }
+      ]
+    },
+    {
+      "id": "nx.base.Truck",
+      "name": "Truck",
+      "icon": "nx.base.truck",
+      "base": "nx.base.Vehicle",
+      "attributes": [
+        {
+          "name": "Type",
+          "type": "Enum",
+          "subtype": "nx.base.TruckType"
+        }
+      ]
+    },
+    {
+      "id": "nx.base.Bus",
+      "icon": "nx.base.bus",
+      "name": "Bus",
+      "base": "nx.base.Vehicle",
+      "attributes": [
+        {
+          "name": "Type",
+          "type": "Enum",
+          "subtype": "nx.base.BusType"
+        }
+      ]
+    },
+    {
+      "id": "nx.base.Train",
+      "icon": "nx.base.train",
+      "name": "Train",
+      "base": "nx.base.Vehicle"
+    },
+    {
+      "id": "nx.base.Tram",
+      "icon": "nx.base.tram",
+      "name": "Tram",
+      "base": "nx.base.Vehicle"
+    },
+    {
+      "id": "nx.base.Bike",
+      "icon": "nx.base.bike",
+      "name": "Bike",
+      "base": "nx.base.Vehicle",
+      "attributes": [
+        {
+          "name": "Type",
+          "type": "Enum",
+          "subtype": "nx.base.BikeType"
+        }
+      ]
+    },
+    {
+      "id": "nx.base.Special",
+      "icon": "nx.base.emergency",
+      "name": "Special",
+      "base": "nx.base.Vehicle",
+      "attributes": [
+        {
+          "name": "Type",
+          "type": "Enum",
+          "subtype": "nx.base.SpecialType"
+        }
+      ]
+    },
+    {
+      "id": "nx.base.WaterTransport",
+      "icon": "nx.base.watertransport",
+      "name": "Water Transport",
+      "base": "nx.base.Vehicle"
+    },
+    {
+      "id": "nx.base.AirTransport",
+      "icon": "nx.base.airtransport",
+      "name": "Air Transport",
+      "base": "nx.base.Vehicle"
+    },
+    {
+      "id": "nx.base.Cat",
+      "name": "Cat",
+      "icon": "nx.base.cat",
+      "base": "nx.base.Animal"
+    },
+    {
+      "id": "nx.base.Dog",
+      "name": "Dog",
+      "icon": "nx.base.dog",
+      "base": "nx.base.Animal"
+    },
+    {
+      "id": "nx.base.Fish",
+      "name": "Fish",
+      "icon": "nx.base.fish",
+      "base": "nx.base.Animal"
+    },
+    {
+      "id": "nx.base.Snake",
+      "name": "Snake",
+      "icon": "nx.base.snake",
+      "base": "nx.base.Animal"
+    },
+    {
+      "id": "nx.base.Bird",
+      "name": "Bird",
+      "icon": "nx.base.bird",
+      "base": "nx.base.Animal"
+    },
+    {
+      "id": "nx.base.FacialHair",
+      "name": "Facial Hair",
+      "attributes": [
+        {
+          "name": "Type",
+          "type": "Enum",
+          "subtype": "nx.base.FacialHairType"
+        }
+      ]
+    },
+    {
+      "id": "nx.base.Hat",
+      "name": "Hat",
+      "attributes": [
+        {
+          "name": "Color",
+          "type": "Color",
+          "subtype": "nx.base.Color"
+        },
+        {
+          "name": "Type",
+          "type": "Enum",
+          "subtype": "nx.base.HatType"
+        }
+      ]
+    },
+    {
+      "id": "nx.base.Scarf",
+      "name": "Scarf",
+      "attributes": [
+        {
+          "name": "Color",
+          "type": "Color",
+          "subtype": "nx.base.Color"
+        }
+      ]
+    },
+    {
+      "id": "nx.base.Gloves",
+      "name": "Gloves",
+      "attributes": [
+        {
+          "name": "Color",
+          "type": "Color",
+          "subtype": "nx.base.Color"
+        }
+      ]
+    },
+    {
+      "id": "nx.base.Shoes",
+      "name": "Shoes",
+      "attributes": [
+        {
+          "name": "Color",
+          "type": "Color",
+          "subtype": "nx.base.Color"
+        },
+        {
+          "name": "Type",
+          "type": "Enum",
+          "subtype": "nx.base.ShoesType"
+        }
+      ]
+    },
+    {
+      "id": "nx.base.Glasses",
+      "name": "Glasses",
+      "attributes": [
+        {
+          "name": "Type",
+          "type": "Enum",
+          "subtype": "nx.base.GlassesType"
+        }
+      ]
+    },
+    {
+      "id": "nx.base.Mask",
+      "name": "Mask"
+    },
+    {
+      "id": "nx.base.Helmet",
+      "name": "Helmet"
+    },
+    {
+      "id": "nx.base.Umbrella",
+      "name": "Umbrella",
+      "attributes": [
+        {
+          "name": "Color",
+          "type": "Color",
+          "subtype": "nx.base.Color"
+        },
+        {
+          "name": "Open",
+          "type": "Boolean"
+        }
+      ]
+    },
+    {
+      "id": "nx.base.Box",
+      "name": "Box",
+      "attributes": [
+        {
+          "name": "Color",
+          "type": "Color",
+          "subtype": "nx.base.Color"
+        },
+        {
+          "name": "Lug",
+          "type": "Boolean"
+        }
+      ]
+    },
+    {
+      "id": "nx.base.Weapon",
+      "name": "Weapon"
+    },
+    {
+      "id": "nx.base.Cigarette",
+      "name": "Cigarette",
+      "attributes": [
+        {
+          "name": "Type",
+          "type": "Enum",
+          "subtype": "nx.base.CigaretteType"
+        }
+      ]
+    },
+    {
+      "id": "nx.base.MobilePhone",
+      "name": "Mobile Phone",
+      "attributes": [
+        {
+          "name": "Position",
+          "type": "Enum",
+          "subtype": "nx.base.MobilePhonePosition"
+        }
+      ]
+    },
+    {
+      "id": "nx.base.Cart",
+      "name": "Cart",
+      "attributes": [
+        {
+          "name": "Type",
+          "type": "Enum",
+          "subtype": "nx.base.CartType"
+        }
+      ]
+    },
+    {
+      "id": "nx.base.Bottle",
+      "name": "Bottle"
+    },
+    {
+      "id": "nx.base.Bag",
+      "name": "Bag",
+      "attributes": [
+        {
+          "name": "Size",
+          "type": "Enum",
+          "subtype": "nx.base.Size"
+        },
+        {
+          "name": "Color",
+          "type": "Color",
+          "subtype": "nx.base.Color"
+        },
+        {
+          "name": "Type",
+          "type": "Enum",
+          "subtype": "nx.base.BagType"
+        }
+      ]
+    }
+  ],
+  "enumTypes": [
+    {
+      "id": "nx.base.GlassesType",
+      "name": "Glasses Type",
+      "items": [
+        "Sunglasses",
+        "Transparent",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.CarType",
+      "name": "Car Type",
+      "items": [
+        "Subcompact",
+        "Sedan",
+        "Hatchback",
+        "Coupe",
+        "Station Wagon",
+        "Convertible",
+        "Limousine",
+        "Crossover",
+        "Pickup",
+        "SUV",
+        "Minivan",
+        "Taxi",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.BikeType",
+      "name": "Bike Type",
+      "items": [
+        "Bicycle",
+        "Tricycle",
+        "Motorcycle",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.TruckType",
+      "name": "Truck Type",
+      "items": [
+        "Van",
+        "Campervan",
+        "Mini Truck",
+        "Truck",
+        "Light Truck",
+        "Medium Truck",
+        "Heavy Truck",
+        "Semi Truck",
+        "Flatbed Truck",
+        "Tank Truck",
+        "Box Truck",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.SpecialType",
+      "name": "Special Type",
+      "items": [
+        "Fire Truck",
+        "Ambulance",
+        "Police",
+        "Garbage Truck",
+        "School Bus",
+        "Sprinkling Truck",
+        "Engineering Truck",
+        "Concrete Mixer",
+        "Construction Truck",
+        "Tow Truck",
+        "Tractor",
+        "Suction Sewage Truck",
+        "Oil Tank Truck",
+        "Pump Truck",
+        "Crane",
+        "Bulldozer",
+        "Excavator",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.BusType",
+      "name": "Bus Type",
+      "items": [
+        "Microbus",
+        "Medium Bus",
+        "Large Bus",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.Length",
+      "name": "Length",
+      "items": [
+        "Short",
+        "Medium",
+        "Long",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.Width",
+      "name": "Width",
+      "items": [
+        "Narrow",
+        "Medium",
+        "Wide"
+      ]
+    },
+    {
+      "id": "nx.base.Grain",
+      "name": "Grain",
+      "items": [
+        "Stria",
+        "Plaid",
+        "Pure Colour",
+        "Decal",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.TopClothingType",
+      "name": "Top Clothing Type",
+      "items": [
+        "Tailor",
+        "Jacket",
+        "Sweater",
+        "Overcoat",
+        "Dress",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.BottomClothingType",
+      "name": "Bottom Clothing Type",
+      "items": [
+        "Trousers",
+        "Jeans",
+        "Shorts",
+        "Skirt",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.ShoesType",
+      "name": "Shoes Type",
+      "items": [
+        "Leather Shoes",
+        "Sneakers",
+        "Sandal",
+        "Slipper",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.HatType",
+      "name": "Hat Type",
+      "items": [
+        "Cap",
+        "Kerchief",
+        "Hitjab",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.BagType",
+      "name": "Bag Type",
+      "items": [
+        "Single Shoulder Bag",
+        "Backpack",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.CigaretteType",
+      "name": "Cigarette Type",
+      "items": [
+        "Electronic",
+        "Combustible",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.MobilePhonePosition",
+      "name": "Mobile Phone Position",
+      "items": [
+        "Left Hand",
+        "Right Hand",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.CartType",
+      "name": "Cart Type",
+      "items": [
+        "Baby Carriage",
+        "Two Wheel Vehicle",
+        "Tricyle",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.FacialHairType",
+      "name": "Facial Hair Type",
+      "items": [
+        "Mustache",
+        "Beard",
+        "Sideburn",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.Age",
+      "name": "Age",
+      "items": [
+        "Child",
+        "Teenager",
+        "Adult",
+        "Middle-aged",
+        "Senior",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.Gender",
+      "name": "Gender",
+      "items": [
+        "Man",
+        "Woman",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.Complexion",
+      "name": "Complexion",
+      "items": [
+        "White",
+        "Black",
+        "Asian",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.Activity",
+      "name": "Activity",
+      "items": [
+        "Walking",
+        "Running",
+        "Lying",
+        "Squatting",
+        "Sitting",
+        "Standing",
+        "Driving",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.Size",
+      "name": "Size",
+      "items": [
+        "Small",
+        "Medium",
+        "Large",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.BodyShape",
+      "name": "Body Shape",
+      "items": [
+        "Fat",
+        "Normal",
+        "Thin",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.FaceShape",
+      "name": "Shape",
+      "items": [
+        "Long",
+        "Round",
+        "Oval",
+        "Square",
+        "Heart",
+        "Diamond",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.Emotion",
+      "name": "Emotion",
+      "items": [
+        "Smile",
+        "Anger",
+        "Sadness",
+        "Disgust",
+        "Fear",
+        "Surprise",
+        "Neutral",
+        "Laugh",
+        "Happy",
+        "Confused",
+        "Scream",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.HairType",
+      "name": "Hair Type",
+      "items": [
+        "Straight",
+        "Wave",
+        "Curly",
+        "Crew Cut",
+        "Bald",
+        "Ponytail",
+        "Pigtail",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.Eyelid",
+      "name": "Eyelid",
+      "items": [
+        "Single",
+        "Double",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.EyebrowSpace",
+      "name": "Eyebrow Space",
+      "items": [
+        "Joint",
+        "Separate",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.EyesShape",
+      "name": "Eyes Shape",
+      "items": [
+        "Almond",
+        "Slitty",
+        "Round",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.NoseBridge",
+      "name": "Nose Bridge",
+      "items": [
+        "Straight",
+        "Arch",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.NoseWing",
+      "name": "Nose Wing",
+      "items": [
+        "Narrow",
+        "Broad",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.NoseEnd",
+      "name": "Nose End",
+      "items": [
+        "Snub",
+        "Turned Up",
+        "Flat",
+        "Hooked",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.EarType",
+      "name": "Ear Type",
+      "items": [
+        "Round",
+        "Pointed",
+        "Narrow",
+        "Broad Lobe",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.LipType",
+      "name": "Lip Type",
+      "items": [
+        "Full",
+        "Medium",
+        "Thin",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.ChinType",
+      "name": "Chin Type",
+      "items": [
+        "Double",
+        "Pointed",
+        "Round",
+        "Other"
+      ]
+    },
+    {
+      "id": "nx.base.OpenClosed",
+      "name": "Open/Closed",
+      "items": [
+        "Open",
+        "Closed"
+      ]
+    }
+  ],
+  "colorTypes": [
+    {
+      "id": "nx.base.Color",
+      "name": "Color",
+      "items": [
+        {
+          "name": "Black",
+          "rgb": "#000000"
+        },
+        {
+          "name": "White",
+          "rgb": "#FFFFFF"
+        },
+        {
+          "name": "Gray",
+          "rgb": "#808080"
+        },
+        {
+          "name": "Red",
+          "rgb": "#FF0000"
+        },
+        {
+          "name": "Orange",
+          "rgb": "#FFA500"
+        },
+        {
+          "name": "Yellow",
+          "rgb": "#FFFF00"
+        },
+        {
+          "name": "Violet",
+          "rgb": "#800080"
+        },
+        {
+          "name": "Green",
+          "rgb": "#008000"
+        },
+        {
+          "name": "Blue",
+          "rgb": "#0000FF"
+        },
+        {
+          "name": "Brown",
+          "rgb": "#A52A2A"
+        }
+      ]
+    }
+  ]
+}

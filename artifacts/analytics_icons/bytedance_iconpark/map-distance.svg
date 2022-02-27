@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>map-distance</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="map-distance">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linejoin="round" x="1.66666667" y="1.66666667" width="16.6666667" height="16.6666667" rx="1.5"></rect>
+            <line x1="5" y1="15.8333333" x2="15.4166667" y2="11.6666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="1,3"></line>
+            <path d="M5.83333333,12.9166667 C6.94444446,11.3080942 7.5,10.196983 7.5,9.58333333 C7.5,8.66285875 6.75380792,7.91666667 5.83333333,7.91666667 C4.91285875,7.91666667 4.16666667,8.66285875 4.16666667,9.58333333 C4.16666667,10.196983 4.72222221,11.3080942 5.83333333,12.9166667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M14.1666667,9.16666667 C15.2777778,7.55809417 15.8333333,6.44698304 15.8333333,5.83333333 C15.8333333,4.91285875 15.0871412,4.16666667 14.1666667,4.16666667 C13.2461921,4.16666667 12.5,4.91285875 12.5,5.83333333 C12.5,6.44698304 13.0555555,7.55809417 14.1666667,9.16666667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

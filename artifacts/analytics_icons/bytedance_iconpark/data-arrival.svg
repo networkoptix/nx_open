@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>data-arrival</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="data-arrival">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M2.5,17.5 L17.5,17.5 L17.5,2.5 L13.3333333,2.5 L12.5,2.5 C11.94825,3.81605833 11.1149167,4.47408333 10,4.47408333 C8.88508333,4.47408333 8.05175,3.81605833 7.5,2.5 L6.66666667,2.5 L2.5,2.5 L2.5,17.5 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="6.25 10 8.75 12.5 13.75 7.5"></polyline>
+        </g>
+    </g>
+</svg>

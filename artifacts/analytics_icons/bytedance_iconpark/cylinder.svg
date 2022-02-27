@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>cylinder</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="cylinder">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M18.3333333,4.16666667 C18.3333333,5.547375 14.602375,6.66666667 10,6.66666667 C5.397625,6.66666667 1.66666667,5.547375 1.66666667,4.16666667 C1.66666667,2.78595417 5.397625,1.66666667 10,1.66666667 C14.602375,1.66666667 18.3333333,2.78595417 18.3333333,4.16666667 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M18.3333333,15.8333333 C18.3333333,17.2140417 14.602375,18.3333333 10,18.3333333 C5.397625,18.3333333 1.66666667,17.2140417 1.66666667,15.8333333 C1.66666667,14.452625 5.397625,13.3333333 10,13.3333333 C14.602375,13.3333333 18.3333333,14.452625 18.3333333,15.8333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="18.3333333" y1="4.16666667" x2="18.3333333" y2="15.8333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="1.66666667" y1="4.16666667" x2="1.66666667" y2="15.8333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

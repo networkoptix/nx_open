@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>football</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="football">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(1.666667, 1.666667)" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round">
+                <circle id="Oval" cx="8.33333333" cy="8.33333333" r="8.33333333"></circle>
+                <g transform="translate(0.833333, 0.833333)" id="Path">
+                    <g transform="translate(0.000000, 0.208333)">
+                        <polyline points="10.0387597 -3.70074342e-16 7.52906975 1.81623932 7.52906975 3.63247863 10.755814 6.17521367 12.5484496 5.44871796 13.624031 2.54273504"></polyline>
+                        <polyline points="5.01937983 -3.70074342e-16 7.52906975 1.81623932 7.52906975 3.63247863 4.30232558 6.17521367 2.50968992 5.44871796 1.43410853 2.54273504"></polyline>
+                        <polyline points="4.44089208e-15 6.53846154 2.50968992 5.44871796 4.30232558 6.17521367 5.37790696 10.1709402 4.30232558 11.6239316 1.0755814 11.6239316"></polyline>
+                        <polyline points="4.30232558 14.1666667 4.30232558 11.6239316 5.37790696 10.1709402 9.68023254 10.1709402 10.755814 11.6239316 10.755814 14.1666667"></polyline>
+                        <polyline points="13.9825581 11.6239316 10.755814 11.6239316 9.68023254 10.1709402 10.755814 6.17521367 12.5484496 5.44871796 15.4166667 6.90170942"></polyline>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>ship</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="ship">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="2.5 8.49033817 10 5.83333333 17.5 8.49033817 15.2777778 14.1666667 4.72222221 14.1666667"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="5.41666667 3.33333333 14.5833333 3.33333333 14.5823292 7.45670275 10 5.83333333 5.41666667 7.456601"></polygon>
+            <line x1="10" y1="3.33333333" x2="10" y2="1.66666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="10" y1="10" x2="10" y2="6.66666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="4.16666667 16.6666667 5.625 18.3333333 7.08333333 16.6666667 8.54166667 18.3333333 10 16.6666667 11.4583333 18.3333333 12.9166667 16.6666667 14.375 18.3333333 15.8333333 16.6666667"></polyline>
+        </g>
+    </g>
+</svg>

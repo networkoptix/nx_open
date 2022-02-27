@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>text-rotation-left</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="text-rotation-left">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M5.41666667,12.0833333 L6.94445833,8.75 M14.5833333,12.0833333 L13.0555417,8.75 M13.0555417,8.75 L12.2916667,7.08333333 L10,2.08333333 L7.70833333,7.08333333 L6.94445833,8.75 M13.0555417,8.75 L6.94445833,8.75" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="17.5 15.4166667 2.5 15.4166667 5 17.9166667"></polyline>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>WebpageDialog</class>
+ <widget class="QDialog" name="WebpageDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>660</width>
+    <height>249</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2">
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="generalTab">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <attribute name="title">
+       <string>General</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>16</number>
+       </property>
+       <property name="leftMargin">
+        <number>8</number>
+       </property>
+       <property name="topMargin">
+        <number>16</number>
+       </property>
+       <property name="rightMargin">
+        <number>16</number>
+       </property>
+       <property name="bottomMargin">
+        <number>16</number>
+       </property>
+       <item>
+        <layout class="QVBoxLayout" name="generalInputVerticalLayout">
+         <property name="spacing">
+          <number>8</number>
+         </property>
+         <item>
+          <widget class="nx::vms::client::desktop::InputField" name="urlInputField" native="true"/>
+         </item>
+         <item>
+          <widget class="nx::vms::client::desktop::InputField" name="nameInputField" native="true"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <property name="spacing">
+          <number>8</number>
+         </property>
+         <item>
+          <widget class="QWidget" name="clientApiCheckBoxSpacerWidget" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>20</width>
+             <height>0</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_3">
+           <property name="spacing">
+            <number>8</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QCheckBox" name="proxyViaServerCheckBox">
+             <property name="text">
+              <string>Proxy this webpage via server</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout">
+             <item>
+              <widget class="QnChooseServerButton" name="selectServerMenuButton">
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
+               <property name="visible">
+                <bool>false</bool>
+               </property>
+               <property name="text">
+                <string>SELECT SERVER</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer_1">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="generalVerticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="advancedTab">
+      <attribute name="title">
+       <string>Advanced</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="advancedVerticalLayout">
+       <property name="spacing">
+        <number>8</number>
+       </property>
+       <property name="leftMargin">
+        <number>16</number>
+       </property>
+       <property name="topMargin">
+        <number>16</number>
+       </property>
+       <property name="rightMargin">
+        <number>16</number>
+       </property>
+       <property name="bottomMargin">
+        <number>16</number>
+       </property>
+       <item>
+        <widget class="QCheckBox" name="disableCertificateCheckBox">
+         <property name="text">
+          <string>Allow opening web page without SSL certificate checking</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="clientApiCheckBox">
+         <property name="text">
+          <string>Allow using Client API</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="proxyAllContentsCheckBox">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>Proxy all requested contents</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="nx::vms::client::desktop::AlertLabel" name="proxyAlertLabel" native="true"/>
+       </item>
+       <item>
+        <widget class="nx::vms::client::desktop::InputField" name="allowListField" native="true">
+         <property name="visible">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="advancedVerticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>nx::vms::client::desktop::InputField</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/input_field.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QnChooseServerButton</class>
+   <extends>QPushButton</extends>
+   <header location="global">nx/vms/client/desktop/manual_device_addition/dialog/private/choose_server_button.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>nx::vms::client::desktop::AlertLabel</class>
+   <extends>QWidget</extends>
+   <header location="global">nx/vms/client/desktop/common/widgets/alert_label.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>buttonBox</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

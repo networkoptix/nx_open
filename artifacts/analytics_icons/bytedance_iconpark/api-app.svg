@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>api-app</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="api-app">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M7.5,9.97383333 L7.5,4.16666667 C7.5,2.78595417 8.61929167,1.66666667 10,1.66666667 C11.3807083,1.66666667 12.5,2.78595417 12.5,4.16666667 L12.5,5.002375" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <path d="M12.5,10.0014583 L12.5,15.8333333 C12.5,17.2140417 11.3807083,18.3333333 10,18.3333333 C8.61929167,18.3333333 7.5,17.2140417 7.5,15.8333333 L7.5,14.9875" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <path d="M10,12.5 L4.1600625,12.5 C2.78299583,12.5 1.66666667,11.3807083 1.66666667,10 C1.66666667,8.61929167 2.78299583,7.5 4.1600625,7.5 L4.99525,7.5" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <path d="M10,7.5 L15.8286667,7.5 C17.2119583,7.5 18.3333333,8.61929167 18.3333333,10 C18.3333333,11.3807083 17.2119583,12.5 15.8286667,12.5 L15.027625,12.5" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+        </g>
+    </g>
+</svg>

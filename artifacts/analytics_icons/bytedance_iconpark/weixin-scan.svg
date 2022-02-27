@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>weixin-scan</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="weixin-scan">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M15.4166667,12.5 L5,12.5 L5.83333333,14.5833333 L10.8333333,14.5833333 L11.7034583,17.1937083 C11.9303333,17.8742917 12.5672083,18.3333333 13.2845833,18.3333333 L15.8333333,18.3333333 C16.7537917,18.3333333 17.5,17.587125 17.5,16.6666667 L17.5,12.5 L17.9166667,9.58333333 L16.3973333,9.88720833 C16.0578333,9.95508333 15.7957083,10.2258333 15.7387917,10.5673333 L15.4166667,12.5 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M4.58333333,7.5 L15,7.5 L14.1666667,5.41666667 L9.16666667,5.41666667 L8.29654167,2.8062875 C8.06966667,2.12571667 7.43279167,1.66666667 6.71541667,1.66666667 L4.16666667,1.66666667 C3.24619167,1.66666667 2.5,2.41285833 2.5,3.33333333 L2.5,7.5 L2.08333333,10.4166667 L3.6026625,10.1127917 C3.94215833,10.0449167 4.20429167,9.77416667 4.26120833,9.43266667 L4.58333333,7.5 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>form</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="form">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linejoin="round" x="1.66666667" y="3.33333333" width="16.6666667" height="13.3333333" rx="1"></rect>
+            <path d="M1.66666667,12.0833333 L18.3333333,12.0833333 L1.66666667,12.0833333 Z" id="Path"></path>
+            <line x1="1.66666667" y1="12.0833333" x2="18.3333333" y2="12.0833333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M1.66666667,7.91666667 L18.3333333,7.91666667 L1.66666667,7.91666667 Z" id="Path"></path>
+            <line x1="1.66666667" y1="7.91666667" x2="18.3333333" y2="7.91666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M7.08333333,16.6666667 L7.08333333,7.91666667 L7.08333333,16.6666667 Z" id="Path"></path>
+            <line x1="7.08333333" y1="16.6666667" x2="7.08333333" y2="7.91666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M1.66666667,15.8333333 L1.66666667,7.08333333 L1.66666667,15.8333333 Z" id="Path"></path>
+            <line x1="1.66666667" y1="15.8333333" x2="1.66666667" y2="7.08333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M18.3333333,15.8333333 L18.3333333,7.08333333 L18.3333333,15.8333333 Z" id="Path"></path>
+            <line x1="18.3333333" y1="15.8333333" x2="18.3333333" y2="7.08333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M12.9166667,16.6666667 L12.9166667,7.91666667 L12.9166667,16.6666667 Z" id="Path"></path>
+            <line x1="12.9166667" y1="16.6666667" x2="12.9166667" y2="7.91666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="3.75" y1="16.6666667" x2="16.25" y2="16.6666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

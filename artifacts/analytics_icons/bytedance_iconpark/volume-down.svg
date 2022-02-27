@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>volume-down</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="volume-down">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M10,2.5 L10,17.5 C7.08333333,17.5 4.91604167,13.6829583 4.91604167,13.6829583 L2.5,13.6829583 C2.0397625,13.6829583 1.66666667,13.309875 1.66666667,12.849625 L1.66666667,7.08783333 C1.66666667,6.62758333 2.0397625,6.2545 2.5,6.2545 L4.91604167,6.2545 C4.91604167,6.2545 7.08333333,2.5 10,2.5 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <line x1="13.3333333" y1="10" x2="18.3333333" y2="10" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

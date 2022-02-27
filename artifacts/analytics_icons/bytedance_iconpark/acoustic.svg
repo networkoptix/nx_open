@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>acoustic</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="acoustic">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <line x1="10" y1="1.66656667" x2="10" y2="18.33325" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="14.1666667" y1="4.99991667" x2="14.1666667" y2="14.9999167" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="1.66666667" y1="7.49991667" x2="1.66666667" y2="12.4999167" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="18.3333333" y1="7.49991667" x2="18.3333333" y2="12.4999167" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="5.83333333" y1="4.99991667" x2="5.83333333" y2="14.9999167" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+        </g>
+    </g>
+</svg>

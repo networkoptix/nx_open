@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WixLocalization xmlns="http://schemas.microsoft.com/wix/2006/localization" Codepage="1252" Language="1053" Culture="sv-se">
+  <String Id="Caption">[WixBundleName] Inställning - [WixBundleVersion]</String>
+  <String Id="Title">[WixBundleName] - [WixBundleVersion]</String>
+  <String Id="Components">[InstallerTitle]</String>
+  <String Id="HelpText">/ installera | / reparation | / avinstallera | / layout [directory] - installerar, reparerar, avinstallerar eller
+   skapar en komplett lokal kopia av paketet i katalogen. Installationen är standard.
+
+/ passiv | / tyst - visar minimal UI utan anvisningar eller visar ingen UI och
+   inga anvisningar. Som standard visas UI och alla instruktioner.
+
+/ norestart - undertrycka alla försök att starta om. Som standard kommer UI att fråga innan omstart.
+/ log log.txt - loggar till en specifik fil. Som standard skapas en loggfil i %TEMP%.</String>
+  <String Id="ConfirmCancelMessage">Är du säker på att du vill avbryta?</String>
+  <String Id="ClientAndServer">Klient och Server</String>
+  <String Id="ClientOnly">Endast klient</String>
+  <String Id="ClientOnlyDesc">Klientprogrammet används för att visa video och hantera systemet</String>
+  <String Id="ServerOnly">Endast server</String>
+  <String Id="ServerOnlyDesc">Serverprogrammet används för att lagra systeminformation och arkiv</String>
+  <String Id="HelpHeader">Installationshjälp</String>
+  <String Id="HelpCloseButton">Stäng</String>
+  <String Id="InstallOptionsButton">Alternativ</String>
+  <String Id="InstallInstallButton">Installera</String>
+  <String Id="InstallCloseButton">Stäng</String>
+  <String Id="InstallAcceptCheckbox">Jag godkänner till</String>
+  <String Id="InstallLicenseLinkText">Licensavtal för slutanvändare</String>
+  <String Id="OptionsHeader">Installationsinställningar</String>
+  <String Id="OptionsLocationLabel">Installationsplats:</String>
+  <String Id="OptionsBrowseButton">Bläddra</String>
+  <String Id="OptionsOkButton">OK</String>
+  <String Id="OptionsCancelButton">Avbryt</String>
+  <String Id="ProgressHeader">Installationsframsteg</String>
+  <String Id="ProgressLabel">Arbetar...</String>
+  <String Id="OverallProgressPackageText">Initialiserar...</String>
+  <String Id="ProgressCancelButton">Avbryt</String>
+  <String Id="ModifyHeader">Ändra inställningen</String>
+  <String Id="ModifyRepairButton">Reparera</String>
+  <String Id="ModifyUninstallButton">Avinstallera</String>
+  <String Id="ModifyCloseButton">Stäng</String>
+  <String Id="SuccessHeader">Inställning Framgångsrik</String>
+  <String Id="SuccessUninstallHeader">Avinstallation framgångsrikt slutförd</String>
+  <String Id="SuccessInstallHeader">Installation avslutad</String>
+  <String Id="SuccessLaunchButton">Starta</String>
+  <String Id="SuccessRestartText">Du måste starta om datorn innan du kan använda programvaran</String>
+  <String Id="SuccessRestartButton">Starta om</String>
+  <String Id="SuccessCloseButton">Stäng</String>
+  <String Id="FailureHeader">Inställningen misslyckades</String>
+  <String Id="FailureHyperlinkLogText">Ett eller flera problem orsakade att installationen misslyckades. Var snäll och lösa problemen och försök sedan om installationen. För mer information se</String>
+  <String Id="FailureHyperlinkLogTextLink">loggfil</String>
+  <String Id="FailureRestartText">Du måste starta om datorn för att slutföra programvarans återgång</String>
+  <String Id="FailureRestartButton">Starta om</String>
+  <String Id="FailureCloseButton">Stäng</String>
+  <String Id="WillInstall">[WixBundleName] installeras på din enhet</String>
+  <String Id="FilesInUseHeader">Filer i bruk</String>
+  <String Id="FilesInUseLabel">Följande program bör stoppas för att fortsätta installationen:</String>
+  <String Id="FilesInUseCloseRadioButton">Stäng programmen och försök att starta om dem</String>
+  <String Id="FilesInUseDontCloseRadioButton">Stäng inte applikationer. En omstart kommer att krävas</String>
+  <String Id="FilesInUseOkButton">OK</String>
+  <String Id="FilesInUseCancelButton">Avbryt</String>
+  <String Id="Options">Alternativ</String>
+  <String Id="SelectApps">Välj program som ska installeras:</String>
+  <String Id="msierrFirewallCannotConnect">Kan inte ansluta till Windows brandvägg. ([2]   [3]   [4]   [5])</String>
+  <String Id="WixSchedFirewallExceptionsInstall">Konfigurerar Windows Brandvägg</String>
+  <String Id="WixSchedFirewallExceptionsUninstall">Konfigurerar Windows Brandvägg</String>
+  <String Id="WixRollbackFirewallExceptionsInstall">Återgå med konfigurationen av Windows-brandväggen</String>
+  <String Id="WixExecFirewallExceptionsInstall">Installera Windows brandväggskonfiguration</String>
+  <String Id="WixRollbackFirewallExceptionsUninstall">Återgå med konfigurationen av Windowsbrandväggen</String>
+  <String Id="WixExecFirewallExceptionsUninstall">Avinstallera Windows brandväggskonfiguration</String>
+  <String Id="Product_ArchMismatch_x86">Detta paket är utformat för 32-bitars OS. Installationen avslutas nu.</String>
+  <String Id="Product_ArchMismatch_x64">Detta paket är utformat för 64-bitars OS. Installationen avslutas nu.</String>
+</WixLocalization>

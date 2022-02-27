@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>brightness</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="brightness">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M10.0085417,14.730625 C12.5398333,14.730625 14.591875,12.6785833 14.591875,10.1472917 C14.591875,7.616 12.5398333,5.56395833 10.0085417,5.56395833 C7.47725,5.56395833 5.42520833,7.616 5.42520833,10.1472917 C5.42520833,12.6785833 7.47725,14.730625 10.0085417,14.730625 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <line x1="16.2334583" y1="3.75407083" x2="15.2083333" y2="4.78508333" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="4.61141667" y1="15.3104583" x2="3.75854583" y2="16.1682083" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="10" y1="17.2305417" x2="10" y2="18.4805417" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="18.33325" y1="9.730625" x2="16.6665833" y2="9.730625" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="15.6385" y1="15.1400417" x2="16.6665833" y2="16.168125" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <path d="M10.0085417,7.230625 C8.39770833,7.230625 7.091875,8.53645833 7.091875,10.1472917 C7.091875,11.758125 8.39770833,13.0639583 10.0085417,13.0639583" id="Path" fill="#A5B7C0"></path>
+            <line x1="1.66674583" y1="10.1472917" x2="3.3334125" y2="10.1472917" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="4.18516667" y1="3.75405833" x2="5.0405" y2="4.609375" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="10" y1="1.39737917" x2="10" y2="3.06404583" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+        </g>
+    </g>
+</svg>

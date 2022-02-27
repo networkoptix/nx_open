@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>sleep</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="sleep">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M7.027375,3.112175 C6.79316667,3.83824583 6.66666667,4.61266667 6.66666667,5.41666667 C6.66666667,9.55879167 10.0245417,12.9166667 14.1666667,12.9166667 C15.22275,12.9166667 16.2278333,12.698375 17.1392917,12.3045 C16.1669167,15.3191667 13.3381667,17.5 10,17.5 C5.857875,17.5 2.5,14.142125 2.5,10 C2.5,6.91395833 4.36391667,4.26320833 7.027375,3.112175 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="13.191875 4.16666667 17.0833333 4.16666667 12.9166667 7.5 17.0833333 7.5"></polyline>
+        </g>
+    </g>
+</svg>

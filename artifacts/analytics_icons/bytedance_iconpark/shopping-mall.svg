@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>shopping-mall</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="shopping-mall">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M3.33333333,18.3333333 L3.33333333,2.5 C3.33333333,2.26988333 3.51988333,2.08333333 3.75,2.08333333 L12.0833333,2.08333333 C12.3134583,2.08333333 12.5,2.26988333 12.5,2.5 L12.5,18.3333333" id="Path"></path>
+            <path d="M3.33333333,18.3333333 L3.33333333,2.5 C3.33333333,2.26988333 3.51988333,2.08333333 3.75,2.08333333 L12.0833333,2.08333333 C12.3134583,2.08333333 12.5,2.26988333 12.5,2.5 L12.5,18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="12.5 6.25 16.6666667 8.74970833 16.6666667 18.3333333"></polyline>
+            <line x1="1.66666667" y1="18.3333333" x2="18.3333333" y2="18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+        </g>
+    </g>
+</svg>

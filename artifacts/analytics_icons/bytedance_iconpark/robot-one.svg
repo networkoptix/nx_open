@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>robot-one</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="robot-one">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <rect id="Rectangle" stroke="#A5B7C0" x="3.75" y="7.5" width="12.5" height="10" rx="1"></rect>
+            <circle id="Oval" fill="#A5B7C0" fill-rule="nonzero" cx="7.08333333" cy="10.8333333" r="1"></circle>
+            <circle id="Oval" fill="#A5B7C0" fill-rule="nonzero" cx="12.9166667" cy="10.8333333" r="1"></circle>
+            <path d="M8.33333333,13.3333333 C7.87308333,13.3333333 7.5,13.7064167 7.5,14.1666667 C7.5,14.6269167 7.87308333,15 8.33333333,15 L8.33333333,13.3333333 Z M11.6666667,15 C12.1269167,15 12.5,14.6269167 12.5,14.1666667 C12.5,13.7064167 12.1269167,13.3333333 11.6666667,13.3333333 L11.6666667,15 Z M8.33333333,15 L11.6666667,15 L11.6666667,13.3333333 L8.33333333,13.3333333 L8.33333333,15 Z" id="Shape" fill="#A5B7C0" fill-rule="nonzero"></path>
+            <line x1="10" y1="4.16666667" x2="10" y2="7.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="1.66666667" y1="10.8333333" x2="1.66666667" y2="14.1666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="18.3333333" y1="10.8333333" x2="18.3333333" y2="14.1666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <circle id="Oval" stroke="#A5B7C0" cx="10" cy="3.33333333" r="1"></circle>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>chart-ring</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="chart-ring">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M18.2398333,8.74745833 C17.6972917,5.14816667 14.852625,2.30327083 11.2535,1.76031667 M8.739875,1.76132083 C4.73545833,2.368725 1.66666667,5.826 1.66666667,10 C1.66666667,14.1755417 4.73770833,17.6338333 8.74429167,18.2393333 C9.15383333,18.30125 9.57316667,18.3333333 10,18.3333333 C10.425375,18.3333333 10.8433333,18.3014583 11.2515833,18.2399583 C14.8524167,17.697625 17.6984167,14.8512083 18.2401667,11.2501667" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M10,6.66666667 C8.15904167,6.66666667 6.66666667,8.15904167 6.66666667,10 C6.66666667,11.8409583 8.15904167,13.3333333 10,13.3333333 C11.8409583,13.3333333 13.3333333,11.8409583 13.3333333,10 C13.3333333,8.15904167 11.8409583,6.66666667 10,6.66666667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

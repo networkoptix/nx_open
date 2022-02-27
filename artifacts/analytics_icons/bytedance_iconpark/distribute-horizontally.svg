@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>distribute-horizontally</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="distribute-horizontally">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Rectangle" stroke="#A5B7C0" stroke-linejoin="round" transform="translate(10.000000, 10.000000) rotate(90.000000) translate(-10.000000, -10.000000) " points="4.16666667 7.5 15.8333333 7.5 15.8333333 12.5 4.16666667 12.5"></polygon>
+            <line x1="16.6666667" y1="2.5" x2="16.6666667" y2="17.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="3.33333333" y1="2.5" x2="3.33333333" y2="17.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

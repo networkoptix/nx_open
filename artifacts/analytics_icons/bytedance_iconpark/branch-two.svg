@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>branch-two</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="branch-two">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M15,5 C15.9204583,5 16.6666667,4.25379167 16.6666667,3.33333333 C16.6666667,2.41285833 15.9204583,1.66666667 15,1.66666667 C14.0795417,1.66666667 13.3333333,2.41285833 13.3333333,3.33333333 C13.3333333,4.25379167 14.0795417,5 15,5 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M5.83333333,5 C6.75379167,5 7.5,4.25379167 7.5,3.33333333 C7.5,2.41285833 6.75379167,1.66666667 5.83333333,1.66666667 C4.912875,1.66666667 4.16666667,2.41285833 4.16666667,3.33333333 C4.16666667,4.25379167 4.912875,5 5.83333333,5 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M5.83333333,18.3333333 C6.75379167,18.3333333 7.5,17.587125 7.5,16.6666667 C7.5,15.7462083 6.75379167,15 5.83333333,15 C4.912875,15 4.16666667,15.7462083 4.16666667,16.6666667 C4.16666667,17.587125 4.912875,18.3333333 5.83333333,18.3333333 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M5.83333333,5 L5.83333333,15 L5.83333333,13.75 C5.83333333,10.4166667 15,10 15,6.66666667 L15,5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

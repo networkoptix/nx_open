@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>unicast</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="unicast">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M10,6.25 C11.1505833,6.25 12.0833333,5.31725 12.0833333,4.16666667 C12.0833333,3.016075 11.1505833,2.08333333 10,2.08333333 C8.84941667,2.08333333 7.91666667,3.016075 7.91666667,4.16666667 C7.91666667,5.31725 8.84941667,6.25 10,6.25 Z" id="Path" stroke="#A5B7C0"></path>
+            <line x1="10" y1="6.25" x2="10" y2="9.58333333" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="7.5 13.75 7.5 9.58333333 10 9.58475"></polyline>
+            <line x1="17.0833333" y1="17.0833333" x2="17.0833333" y2="17.5" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="2.91666667" y1="17.0833333" x2="2.91666667" y2="17.5" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="7.5" y1="17.0833333" x2="7.5" y2="17.5" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+            <line x1="12.5" y1="17.0833333" x2="12.5" y2="17.5" id="Path" stroke="#A5B7C0" stroke-linecap="round"></line>
+        </g>
+    </g>
+</svg>

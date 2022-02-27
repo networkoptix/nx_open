@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>pull-requests</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pull-requests">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(2.916667, 1.666667)" stroke="#A5B7C0" stroke-linejoin="round">
+                <circle id="Oval" cx="12.5" cy="15" r="1.66666667"></circle>
+                <circle id="Oval" cx="1.66666667" cy="1.66666667" r="1.66666667"></circle>
+                <circle id="Oval" cx="1.66666667" cy="15" r="1.66666667"></circle>
+                <line x1="1.66666667" y1="3.33333333" x2="1.66666667" y2="13.3333333" id="Path" stroke-linecap="round"></line>
+                <path d="M7.08333333,2.5 L10.8333333,2.5 C11.7538079,2.5 12.5,3.24619208 12.5,4.16666667 L12.5,13.3333333" id="Path" stroke-linecap="round"></path>
+                <polyline id="Path" stroke-linecap="round" transform="translate(8.333333, 2.500000) rotate(180.000000) translate(-8.333333, -2.500000) " points="7.08333333 -3.70074342e-16 9.58333333 2.5 7.08333333 5"></polyline>
+            </g>
+        </g>
+    </g>
+</svg>

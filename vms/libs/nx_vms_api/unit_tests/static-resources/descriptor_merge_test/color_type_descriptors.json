@@ -1,0 +1,158 @@
+{
+    "initial": {
+        "colorTypeDescriptors": {
+            "test.colorType1": {
+                "id": "test.colorType1",
+                "name": "Test Color Type 1",
+                "items": [
+                    {
+                        "name": "black",
+                        "rgb": "#000000"
+                    },
+                    {
+                        "name": "red",
+                        "rgb": "#FF0000"
+                    },
+                    {
+                        "name": "green",
+                        "rgb": "#00FF00"
+                    },
+                    {
+                        "name": "blue",
+                        "rgb": "#0000FF"
+                    }
+                ]
+            },
+            "test.colorType2": {
+                "id": "test.colorType2",
+                "name": "Test Color Type 2",
+                "items": [
+                    {
+                        "name": "white",
+                        "rgb": "#000000"
+                    },
+                    {
+                        "name": "cyan",
+                        "rgb": "#00FFFF"
+                    }
+                ]
+            },
+            "test.colorType3": {
+                "id": "test.colorType3",
+                "name": "Test Color Type 3",
+                "items": [
+                    {
+                        "name": "yellow",
+                        "rgb": "#FFFF00"
+                    }
+                ]
+            }
+        }
+    },
+    "additional": {
+        "colorTypeDescriptors": {
+            "test.colorType2": {
+                "id": "test.colorType2",
+                "name": "Test Color Type 2",
+                "items": [
+                    {
+                        "name": "white as snow in Alps",
+                        "rgb": "#000000"
+                    },
+                    {
+                        "name": "almost cyan",
+                        "rgb": "#00FFFE"
+                    }
+                ]
+            },
+            "test.colorType3": {
+                "id": "test.colorType3",
+                "name": "Overridden Test Color Type 3",
+                "base": "test.colorType2",
+                "items": [
+                    {
+                        "name": "yellow",
+                        "rgb": "#FFFF00"
+                    }
+                ],
+                "baseItems": [
+                    "almost cyan"
+                ]
+            },
+            "test.colorType4": {
+                "id": "test.colorType4",
+                "name": "Test Color Type 4",
+                "items": [
+                    {
+                        "name": "silver",
+                        "rgb": "#c0c0c0"
+                    }
+                ]
+            }
+        }
+    },
+    "expected": {
+        "colorTypeDescriptors": {
+            "test.colorType1": {
+                "id": "test.colorType1",
+                "name": "Test Color Type 1",
+                "items": [
+                    {
+                        "name": "black",
+                        "rgb": "#000000"
+                    },
+                    {
+                        "name": "red",
+                        "rgb": "#FF0000"
+                    },
+                    {
+                        "name": "green",
+                        "rgb": "#00FF00"
+                    },
+                    {
+                        "name": "blue",
+                        "rgb": "#0000FF"
+                    }
+                ]
+            },
+            "test.colorType2": {
+                "id": "test.colorType2",
+                "name": "Test Color Type 2",
+                "items": [
+                    {
+                        "name": "white as snow in Alps",
+                        "rgb": "#000000"
+                    },
+                    {
+                        "name": "almost cyan",
+                        "rgb": "#00FFFE"
+                    }
+                ]
+            },
+            "test.colorType3": {
+                "id": "test.colorType3",
+                "name": "Overridden Test Color Type 3",
+                "base": "test.colorType2",
+                "items": [
+                    {
+                        "name": "yellow",
+                        "rgb": "#FFFF00"
+                    }
+                ],
+                "baseItems": [
+                    "almost cyan"
+                ]
+            },
+            "test.colorType4": {
+                "id": "test.colorType4",
+                "name": "Test Color Type 4",
+                "items": [
+                    {
+                        "name": "silver",
+                        "rgb": "#c0c0c0"
+                    }
+                ]
+            }
+        }
+    }
+}

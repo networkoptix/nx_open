@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>one-third-rotation</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="one-third-rotation">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" points="20 0 0 0 0 20 20 20"></polygon>
+            <path d="M15,16.6729167 C13.60725,17.7134167 11.876,18.3333333 10,18.3333333 C6.9155,18.3333333 4.222375,16.6575 2.781525,14.1666667 L6.25,14.1666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M13.3333333,2.360075 C16.2765,3.64600417 18.3333333,6.58279167 18.3333333,10 C18.3333333,11.517875 17.9275417,12.9409583 17.2185,14.1666667 L15.5341667,11.25" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M1.7078125,10.8333333 C1.6806,10.55925 1.66666667,10.28125 1.66666667,10 C1.66666667,5.397625 5.397625,1.66666667 10,1.66666667 L8.31570833,4.58333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M10,12.5 C11.3807083,12.5 12.5,11.3807083 12.5,10 C12.5,8.61929167 11.3807083,7.5 10,7.5 C8.61929167,7.5 7.5,8.61929167 7.5,10 C7.5,11.3807083 8.61929167,12.5 10,12.5 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

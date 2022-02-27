@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>game-two</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="game-two">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="8.33333333 6.25 10 7.91666667 11.6666667 6.25 11.6666667 1.66666667 8.33333333 1.66666667"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="8.33333333 13.75 10 12.0833333 11.6666667 13.75 11.6666667 18.3333333 8.33333333 18.3333333"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="13.75 11.6666667 12.0833333 10 13.75 8.33333333 18.3333333 8.33333333 18.3333333 11.6666667"></polygon>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="6.25 8.33333333 7.91666667 10 6.25 11.6666667 1.66666667 11.6666667 1.66666667 8.33333333"></polygon>
+        </g>
+    </g>
+</svg>

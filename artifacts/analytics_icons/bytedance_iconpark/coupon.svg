@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>coupon</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="coupon">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(1.666667, 3.333333)" stroke="#A5B7C0" stroke-linejoin="round">
+                <path d="M0,4.71373354 L0,0 L16.6666667,0 L16.6666667,4.71373354 C15.7839452,5.02833079 15.1515152,5.87719396 15.1515152,6.875 C15.1515152,7.87280604 15.7839452,8.72166921 16.6666667,9.03626646 L16.6666667,13.75 L0,13.75 L0,9.03626646 C0.882721496,8.72166921 1.51515152,7.87280604 1.51515152,6.875 C1.51515152,5.87719396 0.882721496,5.02833079 0,4.71373354 Z" id="Path"></path>
+                <polyline id="Path" stroke-linecap="round" points="6.06060604 2.67361111 8.33333333 4.96527779 10.6060606 2.67361111"></polyline>
+                <line x1="5.68181817" y1="5.72916667" x2="10.9848485" y2="5.72916667" id="Path" stroke-linecap="round"></line>
+                <line x1="5.68181817" y1="8.40277779" x2="10.9848485" y2="8.40277779" id="Path" stroke-linecap="round"></line>
+                <line x1="8.33333333" y1="5.72916667" x2="8.33333333" y2="11.0763889" id="Path" stroke-linecap="round"></line>
+            </g>
+        </g>
+    </g>
+</svg>

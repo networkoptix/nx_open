@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>align-text-center</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="align-text-center">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(2.500000, 3.333333)" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12.5" y1="4.58333333" x2="2.5" y2="4.58333333" id="Path"></line>
+                <line x1="15" y1="0.416666667" x2="0" y2="0.416666667" id="Path"></line>
+                <line x1="15" y1="8.75" x2="0" y2="8.75" id="Path"></line>
+                <line x1="12.5" y1="12.9166667" x2="2.5" y2="12.9166667" id="Path"></line>
+            </g>
+        </g>
+    </g>
+</svg>

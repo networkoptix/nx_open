@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>clipboard</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="clipboard">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M7.08333333,2.91666667 L6.66666667,2.91666667 L4.16666667,2.91666667 C3.70642917,2.91666667 3.33333333,3.2897625 3.33333333,3.75 L3.33333333,17.5 C3.33333333,17.96025 3.70642917,18.3333333 4.16666667,18.3333333 L15.8333333,18.3333333 C16.2935833,18.3333333 16.6666667,17.96025 16.6666667,17.5 L16.6666667,3.75 C16.6666667,3.2897625 16.2935833,2.91666667 15.8333333,2.91666667 L13.7707917,2.91666667 L12.9166667,2.91666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linejoin="round" x="7.08333333" y="1.66666667" width="5.83333333" height="2.5"></rect>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>music</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="music">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M12.5,14.375 C12.5,13.5695833 13.1529167,12.9166667 13.9583333,12.9166667 L17.0833333,12.9166667 L17.0833333,14.3333333 C17.0833333,15.16175 16.41175,15.8333333 15.5833333,15.8333333 L13.9583333,15.8333333 C13.1529167,15.8333333 12.5,15.1804167 12.5,14.375 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <path d="M2.5,16.0416667 C2.5,15.23625 3.15291667,14.5833333 3.95833333,14.5833333 L6.66666667,14.5833333 L6.66666667,16 C6.66666667,16.8284167 5.99508333,17.5 5.16666667,17.5 L3.95833333,17.5 C3.15291667,17.5 2.5,16.8470833 2.5,16.0416667 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="6.66666667 7.51833333 6.66666667 7.51833333 17.0833333 5.05208333"></polyline>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="6.66666667 15.8333333 6.66666667 4.16666667 17.0833333 1.66666667 17.0833333 14.0385"></polyline>
+        </g>
+    </g>
+</svg>

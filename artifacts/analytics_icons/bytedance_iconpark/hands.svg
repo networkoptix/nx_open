@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>hands</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="hands">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <circle id="Oval" stroke="#A5B7C0" stroke-linejoin="round" cx="10" cy="5.41666667" r="3.75"></circle>
+            <path d="M1.875,18.3330833 C1.875,15.8333333 4.79166667,11.6664167 10,11.6664167 C10,11.6664167 10,11.6664167 10,11.6664167 C10,11.6664167 11.1495,11.6664167 12.4092083,12.1210833 C13.64325,12.5665 15.2083333,12.978375 15.2083333,11.6664167 L15.2083333,11.6664167 L15.2083333,3.22896667 C15.2083333,2.36602083 15.907875,1.6664625 16.7708333,1.6664625 L16.7708333,1.6664625 C17.6337917,1.6664625 18.3333333,2.36601667 18.3333333,3.2289625 L18.3333333,18.3330833" id="Path" stroke="#A5B7C0"></path>
+            <line x1="0.833333333" y1="18.3333333" x2="19.1666667" y2="18.3333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>camera-four</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="camera-four">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M3.33333333,3.54166667 L3.33333333,9.375 C3.33333333,13.0569167 6.31808333,16.0416667 10,16.0416667 L10,16.0416667 C13.6819167,16.0416667 16.6666667,13.0569167 16.6666667,9.375 L16.6666667,3.54166667" id="Path" stroke="#A5B7C0"></path>
+            <line x1="1.66666667" y1="3.54166667" x2="18.3333333" y2="3.54166667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M10,11.875 C11.3807083,11.875 12.5,10.7557083 12.5,9.375 C12.5,7.99429167 11.3807083,6.875 10,6.875 C8.61929167,6.875 7.5,7.99429167 7.5,9.375 C7.5,10.7557083 8.61929167,11.875 10,11.875 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

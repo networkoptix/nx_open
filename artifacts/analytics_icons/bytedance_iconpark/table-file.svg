@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>table-file</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="table-file">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" x="0" y="0" width="20" height="20"></rect>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linejoin="round" x="1.66666667" y="2.5" width="16.6666667" height="15" rx="1"></rect>
+            <line x1="1.66666667" y1="7.5" x2="18.3333333" y2="7.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="7.29166667" y1="7.5" x2="7.29166667" y2="17.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="12.7083333" y1="7.5" x2="12.7083333" y2="17.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="1.66666667" y1="12.5" x2="18.3333333" y2="12.5" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <path d="M18.3333333,3.33333333 L18.3333333,16.6666667 C18.3333333,17.126904 17.9602373,17.5 17.5,17.5 L2.5,17.5 C2.03976271,17.5 1.66666667,17.126904 1.66666667,16.6666667 L1.66666667,3.33333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

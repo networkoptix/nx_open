@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>woman</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="woman">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M13.5355417,10.2022083 C14.440375,9.297375 15,8.047375 15,6.66666667 C15,3.90524167 12.7614167,1.66666667 10,1.66666667 C7.23858333,1.66666667 5,3.90524167 5,6.66666667 C5,8.047375 5.559625,9.297375 6.46445833,10.2022083" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="2.5 18.3333333 2.91666667 16.25 7.5 12.9166667 10 15.4166667 12.5 12.9166667 17.0833333 16.25 17.5 18.3333333"></polyline>
+            <path d="M5.41391667,8.75295833 C5.41920833,7.04020833 5.697875,5.78920833 6.25,4.99995833 C7.07820833,3.81612917 7.66125,3.90314583 8.08558333,4.0875375 C8.50991667,4.27191667 8.75941667,5.47675 9.46816667,5.82404167 C10.1769167,6.17133333 11.9907083,6.21420833 12.6119583,6.63195833 C13.2332083,7.04975 14.654,7.82683333 14.2997917,9.1535" id="Path" stroke="#A5B7C0"></path>
+        </g>
+    </g>
+</svg>

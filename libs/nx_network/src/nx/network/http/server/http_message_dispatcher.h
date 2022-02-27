@@ -1,0 +1,379 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+#pragma once
+
+#include <atomic>
+#include <chrono>
+#include <memory>
+#include <optional>
+
+#include <nx/network/connection_server/message_dispatcher.h>
+#include <nx/utils/counter.h>
+#include <nx/utils/std/cpp14.h>
+#include <nx/utils/string.h>
+
+#include "abstract_http_request_handler.h"
+#include "handler/http_server_handler_custom.h"
+#include "handler/http_server_handler_redirect.h"
+#include "http_server_exact_path_matcher.h"
+#include "http_server_connection.h"
+#include "http_statistics.h"
+
+namespace nx::network::http {
+
+static constexpr std::string_view kAnyMethod = "";
+static constexpr char kAnyPath[] = "";
+
+template<typename Value>
+const std::pair<const std::string, Value>* findByMaxPrefix(
+    const std::map<std::string, Value>& map, const std::string& key)
+{
+    auto it = map.upper_bound(key);
+    if (it == map.begin())
+        return nullptr;
+
+    --it;
+    if (!nx::utils::startsWith(key, it->first))
+        return nullptr;
+
+    return &(*it);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Dispatches HTTP requests to a proper message processor.
+ * Provides a pure virtual AbstractMessageDispatcher::getHandler method that must be implemented by
+ * a descendant.
+ */
+class NX_NETWORK_API AbstractMessageDispatcher
+{
+public:
+    using HandlerFactoryFunc = std::function<std::unique_ptr<AbstractHttpRequestHandler>()>;
+
+    AbstractMessageDispatcher();
+    virtual ~AbstractMessageDispatcher();
+
+    /**
+     * @return false if some handler is already registered for path.
+     */
+    virtual bool registerRequestProcessor(
+        const std::string_view& path,
+        HandlerFactoryFunc factoryFunc,
+        const Method& method = kAnyMethod) = 0;
+
+    template<typename Func>
+    bool registerRequestProcessorFunc(
+        const Method& method,
+        const std::string& path,
+        Func func,
+        MessageBodyDeliveryType requestBodyDeliveryType = MessageBodyDeliveryType::buffer)
+    {
+        using RequestHandlerType =
+            nx::network::http::server::handler::CustomRequestHandler<const Func&>;
+
+        return registerRequestProcessor(
+            path,
+            [func = std::move(func), requestBodyDeliveryType]()
+            {
+                auto handler = std::make_unique<RequestHandlerType>(func);
+                handler->setRequestBodyDeliveryType(requestBodyDeliveryType);
+                return handler;
+            },
+            method);
+    }
+
+    bool registerRedirect(
+        const std::string& sourcePath,
+        const std::string& destinationPath,
+        const Method& method = kAnyMethod);
+
+    /**
+     * Pass message to corresponding processor.
+     *
+     *  @param message This object is not moved in case of failure to find processor.
+     *  @return true if request processing passed to corresponding processor and async processing
+     *      has been started, false otherwise.
+     */
+    template<class CompletionFuncRefType>
+    bool dispatchRequest(
+        RequestContext requestContext,
+        CompletionFuncRefType completionFunc) const
+    {
+        applyModRewrite(&requestContext.request.requestLine.url);
+
+        auto handlerContext = getHandler(
+            requestContext.request.requestLine.method,
+            requestContext.request.requestLine.url.path().toStdString());
+        if (!handlerContext)
+        {
+            incrementDispatchFailures();
+            return false;
+        }
+
+        const auto statisticsKey = requestContext.request.requestLine.method.toString() + " " +
+            handlerContext->pathTemplate;
+        startUpdatingRequestPathStatistics(statisticsKey);
+
+        // NOTE: Cannot capture scoped increment in lambda since the capture variable
+        // destruction order is unspecified.
+        m_runningRequestCounter->increment();
+
+        const auto handlerPtr = handlerContext->handler.get();
+        auto requestProcessStartTime = std::chrono::steady_clock::now();
+
+        const int seq = ++m_requestSeq;
+        {
+            NX_MUTEX_LOCKER lock(&m_mutex);
+            m_activeRequests.emplace(seq, requestContext.request.requestLine.toString());
+        }
+
+        handlerPtr->handleRequest(
+            std::move(requestContext),
+            [this, handler = std::move(handlerContext->handler), seq,
+                completionFunc = std::move(completionFunc), counter = m_runningRequestCounter,
+                requestProcessStartTime, statisticsKey = std::move(statisticsKey)](
+                    nx::network::http::Message message,
+                    std::unique_ptr<nx::network::http::AbstractMsgBodySource> bodySource,
+                    ConnectionEvents connectionEvents) mutable
+            {
+                using namespace std::chrono;
+                finishUpdatingRequestPathStatistics(
+                    statisticsKey,
+                    duration_cast<microseconds>(steady_clock::now() - requestProcessStartTime));
+
+                {
+                    NX_MUTEX_LOCKER lock(&m_mutex);
+                    m_activeRequests.erase(seq);
+                }
+
+                completionFunc(
+                    std::move(message),
+                    std::move(bodySource),
+                    std::move(connectionEvents));
+
+                // Creating copy of counter since this lambda is destroyed by handler.reset().
+                auto localCounter = counter;
+                handler.reset();
+                localCounter->decrement();
+            });
+
+        return true;
+    }
+
+    bool waitUntilAllRequestsCompleted(
+        std::optional<std::chrono::milliseconds> timeout = std::nullopt);
+
+    int dispatchFailures() const;
+    std::map<std::string, server::RequestPathStatistics> requestPathStatistics() const;
+
+    static constexpr auto kDefaultLinger = std::chrono::seconds(17);
+
+    /**
+     * Linger specifies whether the object waits for all requests to be completed during
+     * the destruction.
+     * By default, kDefaultLinger is used.
+     */
+    void setLinger(std::optional<std::chrono::milliseconds> timeout);
+
+protected:
+    struct HandlerContext
+    {
+        std::unique_ptr<AbstractHttpRequestHandler> handler;
+        std::string pathTemplate;
+    };
+
+protected:
+    virtual void applyModRewrite(nx::utils::Url* url) const = 0;
+
+    /**
+     * @return HTTP message handler functor that corresponds to the given HTTP method and path.
+     */
+    virtual std::optional<HandlerContext> getHandler(
+        const Method& method,
+        const std::string& path) const = 0;
+
+private:
+    void incrementDispatchFailures() const;
+    void startUpdatingRequestPathStatistics(const std::string& requestPathTemplate) const;
+
+    void finishUpdatingRequestPathStatistics(
+        const std::string& requestPathTemplate,
+        std::chrono::microseconds processingTime) const;
+
+private:
+    /**
+     * Using shared_ptr here since some dispatcher usages may destroy the dispatcher
+     * before all requests have completed. This was fine before introduction of this counter.
+     */
+    std::shared_ptr<nx::utils::Counter> m_runningRequestCounter;
+
+    mutable nx::Mutex m_mutex;
+    nx::utils::math::SumPerMinute<int> m_dispatchFailures;
+    std::map<std::string, server::RequestPathStatisticsCalculator> m_requestPathStatsCalculators;
+    mutable std::map<int /*sequence*/, std::string> m_activeRequests;
+    mutable std::atomic<int> m_requestSeq{0};
+    std::optional<std::chrono::milliseconds> m_linger = kDefaultLinger;
+};
+
+//-------------------------------------------------------------------------------------------------
+
+// TODO: #akolesnikov Make it a concept.
+template<typename Mapped>
+class AbstractPathMatcher
+{
+public:
+    virtual bool add(const std::string_view& path, Mapped mapped) = 0;
+
+    virtual std::optional<std::reference_wrapper<const Mapped>> match(
+        const std::string_view& path,
+        RequestPathParams* /*pathParams*/,
+        std::string* /*pathTemplate*/) const = 0;
+};
+
+/**
+ * Implements AbstractMessageDispatcher.
+ * Uses PathMatcherType to choose a handler for a given method/path.
+ * PathMatcherType must satisfy AbstractPathMatcher. Inheriting it is not required.
+ */
+template<template<typename> class PathMatcherType>
+class BasicMessageDispatcher:
+    public AbstractMessageDispatcher
+{
+public:
+    virtual ~BasicMessageDispatcher() = default;
+
+    virtual bool registerRequestProcessor(
+        const std::string_view& path,
+        HandlerFactoryFunc factoryFunc,
+        const Method& method = kAnyMethod) override
+    {
+        NX_ASSERT(factoryFunc);
+        auto handlerFactory = HandlerFactory{std::move(factoryFunc)};
+
+        PathMatchContext& pathMatchContext = m_factories[method];
+        if (path == kAnyPath)
+        {
+            if (pathMatchContext.defaultHandlerFactory)
+                return false;
+            pathMatchContext.defaultHandlerFactory = std::move(handlerFactory);
+            return true;
+        }
+
+        return pathMatchContext.pathToFactory.add(path, std::move(handlerFactory));
+    }
+
+    template<typename RequestHandlerType>
+    bool registerRequestProcessor(
+        const std::string_view& path = kAnyPath,
+        const Method& method = kAnyMethod)
+    {
+        return registerRequestProcessor(
+            path,
+            []() { return std::make_unique<RequestHandlerType>(); },
+            method);
+    }
+
+    void addModRewriteRule(std::string oldPrefix, std::string newPrefix)
+    {
+        NX_DEBUG(this, nx::format("New rewrite rule '%1*' to '%2*'").args(oldPrefix, newPrefix));
+        m_rewritePrefixes.emplace(std::move(oldPrefix), std::move(newPrefix));
+    }
+
+    void clear()
+    {
+        m_factories.clear();
+        m_rewritePrefixes.clear();
+    }
+
+private:
+    using FactoryFunc = std::function<std::unique_ptr<AbstractHttpRequestHandler>()>;
+
+    struct HandlerFactory
+    {
+        FactoryFunc func;
+
+        operator bool() const { return static_cast<bool>(func); }
+
+        std::optional<HandlerContext> instantiate(
+            RequestPathParams pathParams,
+            std::string pathTemplate) const
+        {
+            HandlerContext handlerContext{
+                func(),
+                std::move(pathTemplate)
+            };
+            handlerContext.handler->setRequestPathParams(std::move(pathParams));
+            return handlerContext;
+        }
+    };
+
+    struct PathMatchContext
+    {
+        HandlerFactory defaultHandlerFactory;
+        PathMatcherType<HandlerFactory> pathToFactory;
+    };
+
+    std::map<std::string, std::string> m_rewritePrefixes;
+    std::map<Method, PathMatchContext> m_factories;
+
+    virtual void applyModRewrite(nx::utils::Url* url) const override
+    {
+        if (const auto it = findByMaxPrefix(m_rewritePrefixes, url->path().toStdString()))
+        {
+            const auto newPath = url->path().replace(it->first.c_str(), it->second.c_str());
+            NX_VERBOSE(this, "Rewriting url '%1' to '%2'", url->path(), newPath);
+            url->setPath(newPath);
+        }
+    }
+
+    virtual std::optional<HandlerContext> getHandler(
+        const Method& method,
+        const std::string& path) const override
+    {
+        auto methodFactory = m_factories.find(method);
+        if (methodFactory != m_factories.end())
+        {
+            auto handlerContext = matchPath(methodFactory->second, path);
+            if (handlerContext)
+                return handlerContext;
+        }
+
+        auto anyMethodFactory = m_factories.find(Method(kAnyMethod));
+        if (anyMethodFactory != m_factories.end())
+            return matchPath(anyMethodFactory->second, path);
+
+        return std::nullopt;
+    }
+
+    std::optional<HandlerContext> matchPath(
+        const PathMatchContext& pathMatchContext,
+        const std::string& path) const
+    {
+        RequestPathParams pathParams;
+        std::string pathTemplate;
+
+        std::optional<std::reference_wrapper<const HandlerFactory>> handlerFactory =
+            pathMatchContext.pathToFactory.match(path, &pathParams, &pathTemplate);
+        if (handlerFactory)
+            return handlerFactory->get().instantiate(std::move(pathParams), std::move(pathTemplate));
+
+        if (pathMatchContext.defaultHandlerFactory)
+        {
+            return pathMatchContext.defaultHandlerFactory.instantiate(
+                std::move(pathParams),
+                std::move(pathTemplate));
+        }
+
+        return std::nullopt;
+    }
+};
+
+//-------------------------------------------------------------------------------------------------
+
+class MessageDispatcher:
+    public BasicMessageDispatcher<ExactPathMatcher>
+{
+};
+
+} // namespace nx::network::http

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>copyright</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="copyright">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <circle id="Oval" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" cx="10" cy="10" r="8.33333333"></circle>
+            <path d="M10,7.08333333 L8.33333333,7.08333333 L8.33333333,10 L9.58333333,10 L10,10 C11.25,10 11.6666667,9.16666667 11.6666667,8.54166667 C11.6666667,7.91666667 11.25,7.08333333 10,7.08333333 Z" id="Path"></path>
+            <path d="M8.33333333,12.9166667 L8.33333333,10 M8.33333333,10 L8.33333333,7.08333333 L10,7.08333333 C11.25,7.08333333 11.6666667,7.91666667 11.6666667,8.54166667 C11.6666667,9.16666667 11.25,10 10,10 L9.58333333,10 M8.33333333,10 L9.58333333,10 M11.6666667,12.9166667 L9.58333333,10" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

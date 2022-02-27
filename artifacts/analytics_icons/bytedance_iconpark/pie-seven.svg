@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>pie-seven</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pie-seven">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <circle id="Oval" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" cx="10" cy="10" r="8.33333333"></circle>
+            <path d="M10,1.66666667 C11.9167083,1.66666667 13.774875,2.32740417 15.2612917,3.5375375 C16.7476667,4.74766667 17.7715,6.43320833 18.1602083,8.310125 C18.548875,10.187 18.2786667,12.1405417 17.395125,13.8414583 C16.5115417,15.542375 15.0686667,16.88675 13.3095833,17.6479583 C11.5505,18.4091667 9.58275,18.54075 7.738,18.0204583 C5.89325,17.5001667 4.28420833,16.359875 3.18208333,14.7917083 C2.07995833,13.2235417 1.55210417,11.323375 1.687475,9.41145833 C1.82285,7.4995 2.613175,5.69266667 3.9252625,4.29545833 L10,10 L10,1.66666667 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

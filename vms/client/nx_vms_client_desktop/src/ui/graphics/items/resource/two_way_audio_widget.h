@@ -1,0 +1,34 @@
+// Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+#pragma once
+
+#include <core/resource/resource_fwd.h>
+#include <qt_graphics_items/graphics_widget.h>
+
+#include <nx/utils/impl_ptr.h>
+
+class QnTwoWayAudioWidget: public GraphicsWidget
+{
+    Q_OBJECT
+    using base_type = GraphicsWidget;
+
+public:
+    QnTwoWayAudioWidget(const QString& sourceId, QGraphicsWidget* parent = nullptr);
+    virtual ~QnTwoWayAudioWidget() override;
+
+    void setCamera(const QnVirtualCameraResourcePtr& camera);
+
+    void setFixedHeight(qreal height);
+
+signals:
+    void pressed();
+    void released();
+
+protected:
+    virtual void paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
+        override;
+
+private:
+    class Private;
+    nx::utils::ImplPtr<Private> d;
+};

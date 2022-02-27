@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>hotel-do-not-clean</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="hotel-do-not-clean">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M5.41666667,11.25 C5.41666667,11.25 13.75,11.25 13.75,6.25 L13.75,18.3333333 L5.41666667,18.3333333 L5.41666667,11.25 Z" id="Path"></path>
+            <path d="M13.75,6.25 L13.75,5.83333333 C13.75,3.53214583 11.8845,1.66666667 9.58333333,1.66666667 C7.28216667,1.66666667 5.41666667,3.53214583 5.41666667,5.83333333 M13.75,6.25 C13.75,11.25 5.41666667,11.25 5.41666667,11.25 L5.41666667,18.3333333 L13.75,18.3333333 L13.75,6.25 Z" id="Shape" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="8.33333333" y1="13.3333333" x2="10.8333333" y2="15.8333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="10.8333333" y1="13.3333333" x2="8.33333333" y2="15.8333333" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

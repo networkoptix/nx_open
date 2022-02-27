@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>road-sign-both</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="road-sign-both">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <g id="Group" transform="translate(2.500000, 1.666667)" stroke="#A5B7C0" stroke-linejoin="round">
+                <polygon id="Path" points="1.66666667 1.66666667 1.66666667 5 13.3333333 5 15 3.33333333 13.3333333 1.66666667"></polygon>
+                <polygon id="Path" points="13.3333333 7.91666667 13.3333333 11.25 1.66666667 11.25 0 9.58333333 1.66666667 7.91666667"></polygon>
+                <line x1="7.5" y1="11.25" x2="7.5" y2="16.6666667" id="Path" stroke-linecap="round"></line>
+                <line x1="7.5" y1="5" x2="7.5" y2="7.91666667" id="Path" stroke-linecap="round"></line>
+                <line x1="7.5" y1="0" x2="7.5" y2="1.66666667" id="Path" stroke-linecap="round"></line>
+                <line x1="5.41666667" y1="16.6666667" x2="9.58333333" y2="16.6666667" id="Path" stroke-linecap="round"></line>
+            </g>
+        </g>
+    </g>
+</svg>

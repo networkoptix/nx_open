@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>cloud-storage</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="cloud-storage">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="18.3333333 12.0833333 1.66666667 12.0833333 1.66666667 17.5 18.3333333 17.5"></polygon>
+            <path d="M14.7916667,15.8333333 C15.3669583,15.8333333 15.8333333,15.3669583 15.8333333,14.7916667 C15.8333333,14.216375 15.3669583,13.75 14.7916667,13.75 C14.216375,13.75 13.75,14.216375 13.75,14.7916667 C13.75,15.3669583 14.216375,15.8333333 14.7916667,15.8333333 Z" id="Path" fill="#A5B7C0" fill-rule="nonzero"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="1.66666667 12.08325 3.7659875 2.082925 16.2585417 2.082925 18.3333333 12.08325"></polyline>
+            <path d="M7.91916667,6.67745833 C7.02645833,6.67745833 6.25,7.29683333 6.25,8.13033333 C6.25,9.16658333 7.12279167,9.58325 8.20720833,9.58325 C8.39320833,9.58325 8.56529167,9.58325 8.74033333,9.58325" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M12.08625,6.67745833 C12.9599583,6.67745833 13.75,7.08308333 13.75,8.13033333 C13.75,9.16658333 12.8709167,9.58325 11.7865417,9.58325 C11.6005,9.58325 11.4172083,9.58325 11.244625,9.58325" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M12.0862083,6.67754167 C12.0862083,5.43429167 11.259625,4.58333333 9.99991667,4.58333333 C8.74025,4.58333333 7.919125,5.413625 7.919125,6.67754167" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <line x1="8.33333333" y1="9.58333333" x2="11.6666667" y2="9.58333333" id="Path" stroke="#A5B7C0"></line>
+        </g>
+    </g>
+</svg>

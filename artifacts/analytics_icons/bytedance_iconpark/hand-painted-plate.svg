@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>hand-painted-plate</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="hand-painted-plate">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M7.5,3.33333333 L17.5,3.33333333 C17.96025,3.33333333 18.3333333,3.70641667 18.3333333,4.16666667 L18.3333333,15 C18.3333333,15.46025 17.96025,15.8333333 17.5,15.8333333 L7.5,15.8333333" id="Path" stroke="#A5B7C0"></path>
+            <path d="M1.66666667,4.16666667 C1.66666667,3.70641667 2.0397625,3.33333333 2.5,3.33333333 L7.5,3.33333333 L7.5,15.8333333 L2.5,15.8333333 C2.0397625,15.8333333 1.66666667,15.46025 1.66666667,15 L1.66666667,4.16666667 Z" id="Path" stroke="#A5B7C0"></path>
+            <line x1="4.58333333" y1="6.25" x2="4.58333333" y2="7.91666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="15.4166667" y1="5.83333333" x2="10.4166667" y2="12.9166667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <rect id="Rectangle" fill="#A5B7C0" fill-rule="nonzero" x="3.75" y="9.58333333" width="1.66666667" height="1.66666667" rx="0.833333333"></rect>
+            <rect id="Rectangle" fill="#A5B7C0" fill-rule="nonzero" x="3.75" y="12.0833333" width="1.66666667" height="1.66666667" rx="0.833333333"></rect>
+        </g>
+    </g>
+</svg>

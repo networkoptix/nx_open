@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>recycling</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="recycling">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M13.9693333,8.125 L10.7470833,2.54393333 C10.4208333,1.978825 9.60104167,1.99097917 9.29166667,2.5655125 L7.08333333,6.66666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M10.4166667,16.6666667 L17.2587083,16.6666667 C17.910625,16.6666667 18.3100833,15.9517917 17.9684167,15.3965833 L15.4166667,11.25" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M5.41666667,9.58333333 L1.9887375,15.4108333 C1.66195417,15.9663333 2.06250417,16.6666667 2.70701667,16.6666667 L7.08333333,16.6666667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="12.0833333 15 10.4166667 16.6666667 12.0833333 18.3333333"></polyline>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="11.6666667 7.5835 13.943375 8.19358333 14.5534167 5.91683333"></polyline>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="3.125 10.193375 5.40170833 9.58333333 6.01175 11.8600417"></polyline>
+        </g>
+    </g>
+</svg>

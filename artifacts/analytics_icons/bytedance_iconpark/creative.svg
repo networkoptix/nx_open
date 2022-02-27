@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>creative</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="creative">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M17.5000042,16.25 L17.5000042,3.7500125 C17.5000042,3.05965417 16.940375,2.5 16.25,2.5 L3.75000417,2.5 C3.05964583,2.5 2.50000417,3.05964583 2.50000417,3.75000417 L2.50000417,16.25 C2.50000417,16.940375 3.05967083,17.5 3.750025,17.5 L16.25,17.5 C16.940375,17.5 17.5000042,16.940375 17.5000042,16.25 Z" id="Path" stroke="#A5B7C0" stroke-linejoin="round"></path>
+            <polygon id="Path" stroke="#A5B7C0" stroke-linejoin="round" points="9.99975 7.63158333 8.79325 10.0942917 6.05266667 10.4916667 8.03795833 12.4325833 7.563375 15.1315833 9.99975 13.83275 12.436625 15.1315833 11.9655417 12.4325833 13.947375 10.4916667 11.222 10.0942917"></polygon>
+            <line x1="7.63158333" y1="5.26316667" x2="12.3684167" y2="5.26316667" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+        </g>
+    </g>
+</svg>

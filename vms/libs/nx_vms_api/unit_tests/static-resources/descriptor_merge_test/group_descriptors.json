@@ -1,0 +1,96 @@
+{
+    "initial": {
+        "groupDescriptors": {
+            "test.group1": {
+                "id": "test.group1",
+                "name": "Test Group 1",
+                "scopes": [
+                    {
+                        "engineId": "{944e8e68-2858-4ada-aef5-9ff566996f12}",
+                        "provider": "test.provider1"
+                    }
+                ]
+            },
+            "test.group2": {
+                "id": "test.group2",
+                "name": "Test Group 2"
+            },
+            "test.group3": {
+                "id": "test.group3",
+                "name": "Test Group 3"
+            }
+        }
+    },
+    "additional": {
+        "groupDescriptors": {
+            "test.group1": {
+                "id": "test.group1",
+                "name": "Overridden Test Group 1",
+                "scopes": [
+                    {
+                        "engineId": "{2e71537b-17b3-4698-851e-0b17c346f7dd}",
+                        "provider": "test.provider2"
+                    }
+                ]
+            },
+            "test.group3": {
+                "id": "test.group3",
+                "name": "Overridden Test Group 3",
+                "scopes": [
+                    {
+                        "engineId": "{64513925-dd6b-4697-9fa4-f54190d707fa}",
+                        "provider": "test.provider1"
+                    },
+                    {
+                        "engineId": "{4fc386d3-d175-42eb-8d17-afa69c437243}",
+                        "provider": "test.provider2"
+                    }
+                ]
+            },
+            "test.group4": {
+                "id": "test.group4",
+                "name": "Overridden Test Group 4"
+            }
+        }
+    },
+    "expected": {
+        "groupDescriptors": {
+            "test.group1": {
+                "id": "test.group1",
+                "name": "Overridden Test Group 1",
+                "scopes": [
+                    {
+                        "engineId": "{944e8e68-2858-4ada-aef5-9ff566996f12}",
+                        "provider": "test.provider1"
+                    },
+                    {
+                        "engineId": "{2e71537b-17b3-4698-851e-0b17c346f7dd}",
+                        "provider": "test.provider2"
+                    }
+                ]
+            },
+            "test.group2": {
+                "id": "test.group2",
+                "name": "Test Group 2"
+            },
+            "test.group3": {
+                "id": "test.group3",
+                "name": "Overridden Test Group 3",
+                "scopes": [
+                    {
+                        "engineId": "{64513925-dd6b-4697-9fa4-f54190d707fa}",
+                        "provider": "test.provider1"
+                    },
+                    {
+                        "engineId": "{4fc386d3-d175-42eb-8d17-afa69c437243}",
+                        "provider": "test.provider2"
+                    }
+                ]
+            },
+            "test.group4": {
+                "id": "test.group4",
+                "name": "Overridden Test Group 4"
+            }
+        }
+    }
+}

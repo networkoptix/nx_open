@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>tool</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="tool">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M18.3333333,6.66666667 C18.3333333,9.42808333 16.09475,11.6666667 13.3333333,11.6666667 C12.488875,11.6666667 11.6932917,11.4572917 10.9956667,11.0876667 L3.75,18.3333333 L1.66666667,16.25 L8.91233333,9.00433333 C8.54270833,8.30670833 8.33333333,7.511125 8.33333333,6.66666667 C8.33333333,3.90524167 10.5719167,1.66666667 13.3333333,1.66666667 C14.1777917,1.66666667 14.973375,1.87602083 15.671,2.2456625 L12.5,5.41666667 L14.5833333,7.5 L17.7543333,4.329 C18.1239583,5.026625 18.3333333,5.82220833 18.3333333,6.66666667 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+        </g>
+    </g>
+</svg>

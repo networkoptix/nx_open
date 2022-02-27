@@ -1,0 +1,1768 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE TS>
+<TS version="2.1" language="hu_HU" sourcelanguage="en">
+  <context>
+    <name>ArchiveDuration</name>
+    <message>
+      <source>no data for forecast</source>
+      <translation>nincs adat az előrejelzéshez</translation>
+    </message>
+    <message>
+      <source>empty</source>
+      <translation>üres</translation>
+    </message>
+    <message>
+      <source>less than an hour</source>
+      <translation>kevesebb mint egy óra</translation>
+    </message>
+  </context>
+  <context>
+    <name>AuthResultTranslations</name>
+    <message>
+      <source>This user does not exist.</source>
+      <translation type="unfinished">This user does not exist.</translation>
+    </message>
+    <message>
+      <source>Wrong password.</source>
+      <translation>Hibás jelszó.</translation>
+    </message>
+    <message>
+      <source>The password is expired. Please contact your system administrator.</source>
+      <translation type="unfinished">The password is expired. Please contact your system administrator.</translation>
+    </message>
+    <message>
+      <source>The LDAP server is not accessible. Please try again later.</source>
+      <translation type="unfinished">The LDAP server is not accessible. Please try again later.</translation>
+    </message>
+    <message>
+      <source>%1 is not accessible yet. Please try again later.</source>
+      <translation type="unfinished">%1 is not accessible yet. Please try again later.</translation>
+    </message>
+    <message>
+      <source>The user is locked out due to several failed attempts. Please try again later.</source>
+      <translation type="unfinished">The user is locked out due to several failed attempts. Please try again later.</translation>
+    </message>
+    <message>
+      <source>This authorization method is forbidden. Please contact your system administrator.</source>
+      <translation type="unfinished">This authorization method is forbidden. Please contact your system administrator.</translation>
+    </message>
+    <message>
+      <source>The session key is invalid or expired.</source>
+      <translation type="unfinished">The session key is invalid or expired.</translation>
+    </message>
+    <message>
+      <source>Internal server error (%1). Please contact your system administrator.</source>
+      <translation type="unfinished">Internal server error (%1). Please contact your system administrator.</translation>
+    </message>
+    <message>
+      <source>This user has been disabled by a system administrator.</source>
+      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+    </message>
+  </context>
+  <context>
+    <name>HumanReadable</name>
+    <message>
+      <source>B</source>
+      <comment>Suffix for displaying bytes</comment>
+      <translation>B</translation>
+    </message>
+    <message>
+      <source>KB</source>
+      <comment>Suffix for displaying kilobytes</comment>
+      <translation>KB</translation>
+    </message>
+    <message>
+      <source>MB</source>
+      <comment>Suffix for displaying megabytes</comment>
+      <translation>MB</translation>
+    </message>
+    <message>
+      <source>GB</source>
+      <comment>Suffix for displaying gigabytes</comment>
+      <translation>GB</translation>
+    </message>
+    <message>
+      <source>TB</source>
+      <comment>Suffix for displaying terabytes</comment>
+      <translation>TB</translation>
+    </message>
+    <message>
+      <source>PB</source>
+      <comment>Suffix for displaying petabytes</comment>
+      <translation>PB</translation>
+    </message>
+    <message numerus="yes">
+      <source>Byte(s)</source>
+      <comment>Full suffix for displaying bytes</comment>
+      <translation>
+        <numerusform>Bájt</numerusform>
+        <numerusform>Bájt</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Kilobyte(s)</source>
+      <comment>Full suffix for displaying kilobytes</comment>
+      <translation>
+        <numerusform>Kilobájt</numerusform>
+        <numerusform>Kilobájt</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Megabyte(s)</source>
+      <comment>Full suffix for displaying megabytes</comment>
+      <translation>
+        <numerusform>Megabájt</numerusform>
+        <numerusform>Megabájt</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Gigabyte(s)</source>
+      <comment>Full suffix for displaying gigabytes</comment>
+      <translation>
+        <numerusform>Gigabájt</numerusform>
+        <numerusform>Gigabájt</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Terabyte(s)</source>
+      <comment>Full suffix for displaying terabytes</comment>
+      <translation>
+        <numerusform>Terabájt</numerusform>
+        <numerusform>Terabájt</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Petabyte(s)</source>
+      <comment>Full suffix for displaying petabytes</comment>
+      <translation>
+        <numerusform>Petabájt</numerusform>
+        <numerusform>Petabájt</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QObject</name>
+    <message>
+      <source>System Event</source>
+      <comment>Shows that the bookmark was created by a system event</comment>
+      <translation>Rendszereseménye</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnCameraDiagnosticsErrorCodeStrings</name>
+    <message>
+      <source>OK</source>
+      <translation>OK</translation>
+    </message>
+    <message>
+      <source>Server has been stopped.</source>
+      <translation>A szerver leállíva.</translation>
+    </message>
+    <message>
+      <source>Media stream is opened but no media data was received.</source>
+      <translation>Media stream nyitva, de nem érkezett media adat.</translation>
+    </message>
+    <message>
+      <source>Unknown error. Please contact support.</source>
+      <translation>Ismeretlen hiba. Kérem keresse fel technikai segítségnyújtóját.</translation>
+    </message>
+    <message>
+      <source>(unknown)</source>
+      <translation>(ismeretlen)</translation>
+    </message>
+    <message>
+      <source>Server %1 is not available.</source>
+      <translation>%1 szerver nem elérhető.</translation>
+    </message>
+    <message>
+      <source>Check that Server is up and running.</source>
+      <translation>Ellenőrizze, hogy a szerver megfelelően működik.</translation>
+    </message>
+    <message>
+      <source>Received bad response from Server %1: &quot;%2&quot;.</source>
+      <translation>Rossz válasz érkezett: %1: &quot;%2&quot; szervertől.</translation>
+    </message>
+    <message>
+      <source>Check if Server is up and has the proper version.</source>
+      <translation>Ellenőrizze, hogy a szerver működik és a megfelelő verzió fut.</translation>
+    </message>
+    <message>
+      <source>Cannot connect to http port %1.</source>
+      <translation>Nem lehet csatlakozni a %1 http porthoz.</translation>
+    </message>
+    <message>
+      <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
+      <translation>Végül, próbálja meg frissíteni a firmware-t. Ha a probléma továbbra is fennáll, lépjen kapcsolatba a technikai segítségnyújtóval.</translation>
+    </message>
+    <message>
+      <source>Failed to configure parameter %1.</source>
+      <translation>Nem lehet konfigurálni a %1 paramétert.</translation>
+    </message>
+    <message>
+      <source>Please contact support.</source>
+      <translation>Kérem keresse fel technikai segítségnyújtóját.</translation>
+    </message>
+    <message>
+      <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
+      <translation>Egy bemeneti/kimeneti hiba történt. OS üzenete: &quot;%1&quot;.</translation>
+    </message>
+    <message>
+      <source>Parameters:</source>
+      <translation>Paraméterek:</translation>
+    </message>
+    <message>
+      <source>Please try to reboot the device, then restore factory defaults on the web-page.</source>
+      <translation>Kérem, próbálja meg úraindítani az eszközt, majd a weboldalán visszaállítani a gyári alapértelmezett beállításokra.</translation>
+    </message>
+    <message>
+      <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
+      <translation>Kérem, próbálja meg úraindítani a kamerát, majd a weboldalán visszaállítani a gyári alapértelmezett beállításokra.</translation>
+    </message>
+    <message>
+      <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
+      <translation>Győződjön meg róla, hogy az eszköz csatlakoztatva van a hálózathoz. Próbálja meg újraindítani az eszközt.</translation>
+    </message>
+    <message>
+      <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
+      <translation>Győződjön meg róla, hogy akamera csatlakoztatva van a hálózathoz. Próbálja meg újraindítani a kamerát.</translation>
+    </message>
+    <message>
+      <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+      <translation>Eszközkérelem &quot;%1&quot; hiba miatt sikertelen &quot;%2&quot;.</translation>
+    </message>
+    <message>
+      <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+      <translation>Kamerakérelem &quot;%1&quot; hiba miatt sikertelen &quot;%2&quot;.</translation>
+    </message>
+    <message>
+      <source>Unknown device issue.</source>
+      <translation>Ismeretlen eszköz probléma.</translation>
+    </message>
+    <message>
+      <source>Unknown camera issue.</source>
+      <translation>Ismeretlen kamera probléma.</translation>
+    </message>
+    <message>
+      <source>Invalid data was received from the device %1.</source>
+      <translation>Érvénytelen adat érkezett %1 eszköztől.</translation>
+    </message>
+    <message>
+      <source>Invalid data was received from the camera %1.</source>
+      <translation>Érvénytelen adat érkezett %1 kamerától.</translation>
+    </message>
+    <message>
+      <source>Too many media errors. Please open device issues dialog for more details.</source>
+      <translation>Ismeretlen media hiba. Kérem nyissa meg az eszköz probléma ablakot a további részletekért.</translation>
+    </message>
+    <message>
+      <source>Too many media errors. Please open camera issues dialog for more details.</source>
+      <translation>Ismeretlen media hiba. Kérem nyissa meg a kamera probléma ablakot a további részletekért.</translation>
+    </message>
+    <message>
+      <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
+      <translation>Indítsa újra az I/O modult, majd állítsa vissza az I/O modul weboldalán gyári alapértelmezett beállításokat.</translation>
+    </message>
+    <message>
+      <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
+      <translation>Ellenőrizze, hogy az I/O modul csatlakoztatva van a rendszerre. Próbálja újraindítani az I/O modult.</translation>
+    </message>
+    <message>
+      <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
+      <translation>I/O modul kérelem &quot;%1&quot; hiba miatt sikertelen &quot;%2&quot;.</translation>
+    </message>
+    <message>
+      <source>Unknown I/O module issue.</source>
+      <translation>Ismeretlen I/O modul probléma.</translation>
+    </message>
+    <message>
+      <source>Invalid data was received from the I/O module %1.</source>
+      <translation>Érvénytelen adat %1 I/O modultól.</translation>
+    </message>
+    <message>
+      <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
+      <translation>Túl sok média hiba. Nyissa meg I/O modul beállításokat további információkért.</translation>
+    </message>
+    <message>
+      <source>Device initialization process is in progress.</source>
+      <translation>Eszközinicializálás folyamatban.</translation>
+    </message>
+    <message>
+      <source>Camera initialization process is in progress.</source>
+      <translation>Kamerainicializálás folyamatban.</translation>
+    </message>
+    <message>
+      <source>I/O Module initialization process is in progress.</source>
+      <translation>I/O modul inicializálás folyamatban.</translation>
+    </message>
+    <message>
+      <source>Make sure port %1 is accessible (e.g. forwarded).</source>
+      <translation>Győződjön meg róla, hogy a %1 port elérhető (pl. át van irányítva).</translation>
+    </message>
+    <message>
+      <source>If it does not help, restore factory defaults on the device web-page.</source>
+      <translation>Ha ez nem segít, állítsa vissza a gyári alapbeállításokat az eszköz web-felületén.</translation>
+    </message>
+    <message>
+      <source>If it does not help, restore factory defaults on the camera web-page.</source>
+      <translation>Ha ez nem segít, állítsa vissza a gyári alapbeállításokat a kamera web-felületén.</translation>
+    </message>
+    <message>
+      <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
+      <translation>Ha ez nem segít, állítsa vissza a gyári alapbeállításokat az I/O modul web-felületén.</translation>
+    </message>
+    <message>
+      <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
+      <translation>%1 média URL nem nyitható meg. Csatlakozás a %2 számú média portra sikertelen.</translation>
+    </message>
+    <message>
+      <source>Cannot open media URL %1. Connection to port %2 was closed unexpectedly.</source>
+      <translation>%1 média URL nem nyitható meg. Kapcsolat a %2 számú porttal váratlanul lezárult.</translation>
+    </message>
+    <message>
+      <source>Could not parse device response. URL %1, request name %2.</source>
+      <translation>Az eszköz válasza nem értelmezhető. URL %1, %2 néven.</translation>
+    </message>
+    <message>
+      <source>Could not parse camera response. URL %1, request name %2.</source>
+      <translation>A kamera válasza nem értelmezhető. URL %1, %2 néven.</translation>
+    </message>
+    <message>
+      <source>Could not parse I/O module response. URL %1, request name %2.</source>
+      <translation>Az I/O modul válasza nem értelmezhető. URL %1, %2 néven.</translation>
+    </message>
+    <message>
+      <source>No supported media tracks at URL %1.</source>
+      <translation>Nem támogatott média %1 URL-ben.</translation>
+    </message>
+    <message>
+      <source>Not authorized. URL %1.</source>
+      <translation>Azonosítatlan. URL %1.</translation>
+    </message>
+    <message>
+      <source>Cannot open media URL %1. Unsupported media protocol %2.</source>
+      <translation>Média URL %1 nem nyitható meg. %2 média protokoll nem támogatott.</translation>
+    </message>
+    <message>
+      <source>Camera was restored from archive. Delete the camera and add it again to view Live video.</source>
+      <translation>Kamera archívból helyreállítva. Törölje a kamerát, és adja hozzá újra az élő videó megtekintéséhez.</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in device settings (error &quot;%1&quot;).</source>
+      <translation>Először próbálja bekapcsolni a rögzítést (ha ki van kapcsolva) és csökkentse az fps beállításokat az eszköz menüjében (hiba &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in camera settings (error &quot;%1&quot;).</source>
+      <translation>Először próbálja bekapcsolni a rögzítést (ha ki van kapcsolva) és csökkentse az fps beállításokat a kamera menüjében (hiba &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
+      <translation>Először próbálja bekapcsolni a rögzítést (ha ki van kapcsolva) és csökkentse az fps beállításokat az I/O modul menüjében (hiba &quot;%1&quot;).</translation>
+    </message>
+    <message>
+      <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
+      <translation>Frissítse a firmware-t. A minimális támogatott verzió %1. A jelenlegi verzió %2</translation>
+    </message>
+    <message>
+      <source>Plugin error. %1</source>
+      <translation>Plugin hiba. %1</translation>
+    </message>
+    <message>
+      <source>Plugin is unavailable</source>
+      <translation>A plugin nem érhető el</translation>
+    </message>
+    <message>
+      <source>Internal server error. %1</source>
+      <translation>Belső Szerverhiba. %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFfmpegAudioTranscoder</name>
+    <message>
+      <source>Audio context was not specified.</source>
+      <translation>Nincs audió tartalom megadva.</translation>
+    </message>
+    <message>
+      <source>Could not find encoder for codec %1.</source>
+      <translation>Nem található enkóder a %1 codec-hez.</translation>
+    </message>
+    <message>
+      <source>Could not initialize audio encoder.</source>
+      <translation>Audió enkóder nem inicializálható.</translation>
+    </message>
+    <message>
+      <source>Could not initialize audio decoder.</source>
+      <translation>Audió dekóder nem inicializálható.</translation>
+    </message>
+    <message>
+      <source>Could not find decoder for codec %1.</source>
+      <translation>Nem található enkóder a %1 codec-hez.</translation>
+    </message>
+    <message>
+      <source>Could not send audio frame to encoder, Error code: %1.</source>
+      <translation>Audio küldése encoder felé sikertelen. Hibakód: %1.</translation>
+    </message>
+    <message>
+      <source>Could not receive audio packet from encoder, Error code: %1.</source>
+      <translation>Audiocsomag fogadása az encodertől sikertelen. Hibakód: %1.</translation>
+    </message>
+    <message>
+      <source>Could not receive audio frame from decoder, Error code: %1.</source>
+      <translation>Audiokeret fogadása encoder-től siikertelen. Hibakód: %1.</translation>
+    </message>
+    <message>
+      <source>Could not allocate sample buffers</source>
+      <translation>Mintapufferek felszabadítása sikertelen</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFfmpegTranscoder</name>
+    <message>
+      <source>Container %1 was not found in FFMPEG library.</source>
+      <translation>%1 tároló nem található az FFMPEG mappában.</translation>
+    </message>
+    <message>
+      <source>Could not create output context for format %1.</source>
+      <translation>Nem hozható léttre a kimenti formátum %1.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>Nem lehet lefoglalni a kimeneti stream-et a rogzítéshez.</translation>
+    </message>
+    <message>
+      <source>Could not perform direct stream copy because frame size is undefined.</source>
+      <translation>Nem lehet a közvetlen stream másolást végrehajtani, mert a képkocka méret nincs definiálva.</translation>
+    </message>
+    <message>
+      <source>Could not find codec %1.</source>
+      <translation>Nem található %1 codec.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with container %1.</source>
+      <translation>Videó vagy audió kodek nem kompatibilis %1 tárolóval.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnFfmpegVideoTranscoder</name>
+    <message>
+      <source>Could not find encoder for codec %1.</source>
+      <translation>Nem található enkóder %1 kodekhez.</translation>
+    </message>
+    <message>
+      <source>Could not initialize video encoder.</source>
+      <translation>Videó enkóder nem inicializálható.</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnLicense</name>
+    <message>
+      <source>Analog</source>
+      <translation>Analóg</translation>
+    </message>
+    <message>
+      <source>Professional</source>
+      <translation>Professzionális</translation>
+    </message>
+    <message>
+      <source>Edge</source>
+      <translation>Edge</translation>
+    </message>
+    <message>
+      <source>Vmax</source>
+      <translation>Vmax</translation>
+    </message>
+    <message>
+      <source>Video Wall</source>
+      <translation>Video fal</translation>
+    </message>
+    <message>
+      <source>I/O Module</source>
+      <translation>I/O modul</translation>
+    </message>
+    <message>
+      <source>Start</source>
+      <translation>Kezdés</translation>
+    </message>
+    <message>
+      <source>Analog Encoder</source>
+      <translation>Analóg enkóder</translation>
+    </message>
+    <message>
+      <source>Analog Licenses</source>
+      <translation>Analóg licencek</translation>
+    </message>
+    <message>
+      <source>Professional Licenses</source>
+      <translation>Professional licencek</translation>
+    </message>
+    <message>
+      <source>Edge Licenses</source>
+      <translation>Edge licencek</translation>
+    </message>
+    <message>
+      <source>Vmax Licenses</source>
+      <translation>Vmax licencek</translation>
+    </message>
+    <message>
+      <source>Analog Encoder Licenses</source>
+      <translation>Analóg enkóder licencek</translation>
+    </message>
+    <message>
+      <source>Video Wall Licenses</source>
+      <translation>Video fal licencek</translation>
+    </message>
+    <message>
+      <source>I/O Module Licenses</source>
+      <translation>I/O modul licencek</translation>
+    </message>
+    <message>
+      <source>Start Licenses</source>
+      <translation>Licencek indítása</translation>
+    </message>
+    <message>
+      <source>Invalid</source>
+      <translation>Érvénytelen</translation>
+    </message>
+    <message>
+      <source>Invalid Licenses</source>
+      <translation>Érvénytelen licencek</translation>
+    </message>
+    <message>
+      <source>Free</source>
+      <translation>Szabad</translation>
+    </message>
+    <message>
+      <source>Time</source>
+      <translation>Idő</translation>
+    </message>
+    <message>
+      <source>Time Licenses</source>
+      <translation>Idő licencek</translation>
+    </message>
+    <message>
+      <source>Bridge</source>
+      <translation>Bridge</translation>
+    </message>
+    <message>
+      <source>Bridge Licenses</source>
+      <translation>Bridge licenc</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Time Licenses</source>
+      <translation>
+        <numerusform>%n Idő licencek</numerusform>
+        <numerusform>%n Idő licencek</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Analog Licenses</source>
+      <translation>
+        <numerusform>%n Analóg licencek</numerusform>
+        <numerusform>%n Analóg licencek</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Professional Licenses</source>
+      <translation>
+        <numerusform>%n Professzionális licencek</numerusform>
+        <numerusform>%n Professzionális licencek</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Edge Licenses</source>
+      <translation>
+        <numerusform>%n Végponti licencek</numerusform>
+        <numerusform>%n Határ licencek</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Vmax Licenses</source>
+      <translation>
+        <numerusform>%n Vmax licencek</numerusform>
+        <numerusform>%n Vmax licencek</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Analog Encoder Licenses</source>
+      <translation>
+        <numerusform>%n Analóg enkóder licencek</numerusform>
+        <numerusform>%n Analóg enkóder licencek</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Video Wall Licenses</source>
+      <translation>
+        <numerusform>%n Videofal licencek</numerusform>
+        <numerusform>%n Videofal licencek</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O Module Licenses</source>
+      <translation>
+        <numerusform>%n I/O modul licencek</numerusform>
+        <numerusform>%n I/O modul licencek</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Start Licenses</source>
+      <translation>
+        <numerusform>%n Induló licencek</numerusform>
+        <numerusform>%n Induló licencek</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Bridge Licenses</source>
+      <translation>
+        <numerusform>%n Áthidaló licencek</numerusform>
+        <numerusform>%n Áthidaló licencek</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Invalid Licenses</source>
+      <translation>
+        <numerusform>%n Érvénytelen licencek</numerusform>
+        <numerusform>%n Érvénytelen licencek</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Free Licenses</source>
+      <translation>Szabad licencek</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Free Licenses</source>
+      <translation>
+        <numerusform>%n Szabad licenc</numerusform>
+        <numerusform>%n Szabad licenc</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Time Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Idő licencek</numerusform>
+        <numerusform>%n/%1 Idő licencek</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Analog Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Analóg licencek</numerusform>
+        <numerusform>%n/%1 Analóg licencek</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Professional Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Professzionális licencek</numerusform>
+        <numerusform>%n/%1 Professzionális licencek</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Edge Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Végponti licencek</numerusform>
+        <numerusform>%n/%1 Végponti licencek</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Vmax Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Vmax licencek</numerusform>
+        <numerusform>%n/%1 Vmax licencek</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Analog Encoder Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Analóg enkóder licencek</numerusform>
+        <numerusform>%n/%1 Analóg enkóder licencek</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Video Wall Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 videofal licencek</numerusform>
+        <numerusform>%n/%1 videofal licencek</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 I/O Module Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 I/O modul licencek</numerusform>
+        <numerusform>%n/%1 I/O modul licencek</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Start Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Induló licencek</numerusform>
+        <numerusform>%n/%1 Induló licencek</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Free Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Szabad licencek</numerusform>
+        <numerusform>%n/%1 Szabad licenc</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Bridge Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Áthidaló licencek</numerusform>
+        <numerusform>%n/%1 Áthidaló licencek</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 Invalid Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation>
+        <numerusform>%n/%1 Érvénytelen licencek</numerusform>
+        <numerusform>%n/%1 Érvénytelen licencek</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>NVR</source>
+      <translation type="unfinished">NVR</translation>
+    </message>
+    <message>
+      <source>NVR Licenses</source>
+      <translation type="unfinished">NVR Licenses</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n NVR Licenses</source>
+      <translation type="unfinished">
+        <numerusform>%n NVR Licenses</numerusform>
+        <numerusform>%n NVR Licenses</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n/%1 NVR Licenses</source>
+      <comment>%n will be replaced by the total count</comment>
+      <translation type="unfinished">
+        <numerusform>%n/%1 NVR Licenses</numerusform>
+        <numerusform>%n/%1 NVR Licenses</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnResourceNameStrings</name>
+    <message>
+      <source>Cameras</source>
+      <translation>Kamerák</translation>
+    </message>
+    <message>
+      <source>cameras</source>
+      <translation>kamerák</translation>
+    </message>
+    <message>
+      <source>Camera</source>
+      <translation>Kamera</translation>
+    </message>
+    <message>
+      <source>camera</source>
+      <translation>kamera</translation>
+    </message>
+    <message>
+      <source>Devices</source>
+      <translation>Eszközök</translation>
+    </message>
+    <message>
+      <source>devices</source>
+      <translation>eszközök</translation>
+    </message>
+    <message>
+      <source>Device</source>
+      <translation>Eszköz</translation>
+    </message>
+    <message>
+      <source>device</source>
+      <translation>eszköz</translation>
+    </message>
+    <message>
+      <source>I/O Modules</source>
+      <translation>I/O modulok</translation>
+    </message>
+    <message>
+      <source>I/O modules</source>
+      <translation>I/O modulok</translation>
+    </message>
+    <message>
+      <source>I/O Module</source>
+      <translation>I/O modul</translation>
+    </message>
+    <message>
+      <source>I/O module</source>
+      <translation>I/O modul</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Cameras</source>
+      <translation>
+        <numerusform>%n Kamerák</numerusform>
+        <numerusform>%n Kamerák</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n cameras</source>
+      <translation>
+        <numerusform>%n kamerák</numerusform>
+        <numerusform>%n kamerák</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O Modules</source>
+      <translation>
+        <numerusform>%n I/O modulok</numerusform>
+        <numerusform>%n I/O modul</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n I/O modules</source>
+      <translation>
+        <numerusform>%n I/O modul</numerusform>
+        <numerusform>%n I/O modul</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Devices</source>
+      <translation>
+        <numerusform>%n Eszközök</numerusform>
+        <numerusform>%n Eszközök</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n devices</source>
+      <translation>
+        <numerusform>%n eszközök</numerusform>
+        <numerusform>%n eszközök</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnSignHelper</name>
+    <message>
+      <source>Unknown</source>
+      <translation>Ismeretlen</translation>
+    </message>
+    <message>
+      <source>FREE License</source>
+      <translation>Ingyenes licenc</translation>
+    </message>
+    <message>
+      <source>Licensed To: %1</source>
+      <translation>Licencelve: %1</translation>
+    </message>
+    <message>
+      <source>Watermark: %1</source>
+      <translation>Vízjel: %1</translation>
+    </message>
+    <message>
+      <source>Hardware ID: %1</source>
+      <translation>Hardver ID: %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnTimeStrings</name>
+    <message>
+      <source>ms</source>
+      <comment>Suffix for displaying milliseconds</comment>
+      <translation>ezredmásodperc</translation>
+    </message>
+    <message>
+      <source>s</source>
+      <comment>Suffix for displaying seconds</comment>
+      <translation>s</translation>
+    </message>
+    <message>
+      <source>m</source>
+      <comment>Suffix for displaying minutes</comment>
+      <translation>p</translation>
+    </message>
+    <message>
+      <source>h</source>
+      <comment>Suffix for displaying hours</comment>
+      <translation>óra</translation>
+    </message>
+    <message>
+      <source>d</source>
+      <comment>Suffix for displaying days</comment>
+      <translation>nap</translation>
+    </message>
+    <message>
+      <source>w</source>
+      <comment>Suffix for displaying weeks</comment>
+      <translation>h</translation>
+    </message>
+    <message>
+      <source>M</source>
+      <comment>Suffix for displaying months</comment>
+      <translation>hó</translation>
+    </message>
+    <message>
+      <source>y</source>
+      <comment>Suffix for displaying years</comment>
+      <translation>év</translation>
+    </message>
+    <message>
+      <source>msec</source>
+      <comment>Long suffix for displaying milliseconds</comment>
+      <translation>milimp</translation>
+    </message>
+    <message>
+      <source>sec</source>
+      <comment>Long suffix for displaying seconds</comment>
+      <translation>mp</translation>
+    </message>
+    <message>
+      <source>min</source>
+      <comment>Long suffix for displaying minutes</comment>
+      <translation>perc</translation>
+    </message>
+    <message>
+      <source>hrs</source>
+      <comment>Long suffix for displaying hours</comment>
+      <translation>óra</translation>
+    </message>
+    <message>
+      <source>days</source>
+      <comment>Long suffix for displaying days</comment>
+      <translation>nap</translation>
+    </message>
+    <message>
+      <source>wks</source>
+      <comment>Long suffix for displaying weeks</comment>
+      <translation>hét</translation>
+    </message>
+    <message>
+      <source>mos</source>
+      <comment>Long suffix for displaying months</comment>
+      <translation>hó</translation>
+    </message>
+    <message>
+      <source>yrs</source>
+      <comment>Long suffix for displaying years</comment>
+      <translation>év</translation>
+    </message>
+    <message numerus="yes">
+      <source>milliseconds</source>
+      <comment>Full suffix for displaying milliseconds</comment>
+      <translation>
+        <numerusform>milliszekundumok</numerusform>
+        <numerusform>milliszekundumok</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>seconds</source>
+      <comment>Full suffix for displaying seconds</comment>
+      <translation>
+        <numerusform>másodpercek</numerusform>
+        <numerusform>másodpercek</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>minutes</source>
+      <comment>Full suffix for displaying minutes</comment>
+      <translation>
+        <numerusform>percek</numerusform>
+        <numerusform>percek</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>hours</source>
+      <comment>Full suffix for displaying hours</comment>
+      <translation>
+        <numerusform>órák</numerusform>
+        <numerusform>órák</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>days</source>
+      <comment>Full suffix for displaying days</comment>
+      <translation>
+        <numerusform>napok</numerusform>
+        <numerusform>napok</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>weeks</source>
+      <comment>Full suffix for displaying weeks</comment>
+      <translation>
+        <numerusform>hetek</numerusform>
+        <numerusform>hetek</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>months</source>
+      <comment>Full suffix for displaying months</comment>
+      <translation>
+        <numerusform>hónapok</numerusform>
+        <numerusform>hónapok</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>years</source>
+      <comment>Full suffix for displaying years</comment>
+      <translation>
+        <numerusform>évek</numerusform>
+        <numerusform>évek</numerusform>
+      </translation>
+    </message>
+  </context>
+  <context>
+    <name>QnTranscoder</name>
+    <message>
+      <source>OpenCL transcoding is not implemented.</source>
+      <translation>OpenCL átkódolás nincs megvalósítva.</translation>
+    </message>
+    <message>
+      <source>Unknown transcoding method.</source>
+      <translation>Ismeretlen átkódolási metódus.</translation>
+    </message>
+    <message>
+      <source>OpenCLTranscode is not implemented.</source>
+      <translation>OpenCL átkódolás nincs megvalósítva.</translation>
+    </message>
+    <message>
+      <source>Unknown transcode method</source>
+      <translation>Ismeretlen átkódolási metódus</translation>
+    </message>
+  </context>
+  <context>
+    <name>QnUserRolesManager</name>
+    <message>
+      <source>Owner</source>
+      <translation>Tulajdonos</translation>
+    </message>
+    <message>
+      <source>Administrator</source>
+      <translation>Adminisztrátor</translation>
+    </message>
+    <message>
+      <source>Advanced Viewer</source>
+      <translation>Speciális felhasználó</translation>
+    </message>
+    <message>
+      <source>Viewer</source>
+      <translation>Felhasználó</translation>
+    </message>
+    <message>
+      <source>Live Viewer</source>
+      <translation>Felhasználó (élő)</translation>
+    </message>
+    <message>
+      <source>Custom Role</source>
+      <translation>Egyéni szerepkör</translation>
+    </message>
+    <message>
+      <source>Custom</source>
+      <translation>Egyéni</translation>
+    </message>
+    <message>
+      <source>Can manage all cameras and bookmarks.</source>
+      <translation>Kamerák és könyvjelzők kezelése.</translation>
+    </message>
+    <message>
+      <source>Can view all cameras and export video.</source>
+      <translation>Kamerák megtekintése és videóexportálás.</translation>
+    </message>
+    <message>
+      <source>Can view live video from all cameras.</source>
+      <translation>Élő kameraképek megtekintése.</translation>
+    </message>
+    <message>
+      <source>Custom user role.</source>
+      <translation>Egyéni felhasználói szerepkör.</translation>
+    </message>
+    <message>
+      <source>Custom permissions.</source>
+      <translation>Egyéni engedélyek.</translation>
+    </message>
+    <message>
+      <source>Has access to whole System and can do everything.</source>
+      <translation>Teljes körű, mindenre kiterjedő hozzáférés az egész rendszerhez.</translation>
+    </message>
+    <message>
+      <source>Has access to whole System and can manage it. Can create users.</source>
+      <translation>Teljes körű hozzáférés az egész rendszerhez. Felhasználók létrehozása.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SystemHelpers</name>
+    <message>
+      <source>New System</source>
+      <translation>Új rendszer</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::recording::Error</name>
+    <message>
+      <source>Internal error</source>
+      <translation>Belső hiba</translation>
+    </message>
+    <message>
+      <source>Corresponding container in FFMPEG library was not found.</source>
+      <translation>A vonatkozó rész az FFMPEG mappában nem található.</translation>
+    </message>
+    <message>
+      <source>Could not create output file for video recording.</source>
+      <translation>Nem lehet létrehozni kimeneti fájlt a video rögzítéshez.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output stream for recording.</source>
+      <translation>Nem lehet lefoglalni a kimeneti stream-et a rogzítéshez.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output audio stream.</source>
+      <translation>Nem lehet lefoglalni a kimeneti audio streamet.</translation>
+    </message>
+    <message>
+      <source>Could not allocate output metadata stream.</source>
+      <translation type="unfinished">Could not allocate output metadata stream.</translation>
+    </message>
+    <message>
+      <source>Invalid audio codec information.</source>
+      <translation>Érvénytelen audio kodek információ.</translation>
+    </message>
+    <message>
+      <source>Video or audio codec is incompatible with the selected format.</source>
+      <translation>Video vagy audio kodek nem kompatibilis a választott formátummal.</translation>
+    </message>
+    <message>
+      <source>Video transcoding required.</source>
+      <translation>Videokódolás szükséges.</translation>
+    </message>
+    <message>
+      <source>File write error. Not enough free space.</source>
+      <translation>Íráshiba. Nincs elég tárhely.</translation>
+    </message>
+    <message>
+      <source>Invalid resource type for data export.</source>
+      <translation>Érvénytelen forrástípus lett megadva az adat exportáláshoz.</translation>
+    </message>
+    <message>
+      <source>No data exported.</source>
+      <translation>Nincs exportált adat.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::utils::CryptedFileStream</name>
+    <message>
+      <source>Wrong crypted stream size.</source>
+      <translation>Rossz titkosított adatfolyam méret.</translation>
+    </message>
+    <message>
+      <source>Damaged crypted stream header.</source>
+      <translation>Sérült titkosított adatfolyam fejléc.</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::event::StringsHelper</name>
+    <message>
+      <source>Bookmark</source>
+      <translation>Könyvjeltő</translation>
+    </message>
+    <message>
+      <source>Panic recording</source>
+      <translation>Pánik rögzítés</translation>
+    </message>
+    <message>
+      <source>Write to log</source>
+      <translation>Írás naplóba</translation>
+    </message>
+    <message>
+      <source>Repeat sound</source>
+      <translation>Hang ismétlése</translation>
+    </message>
+    <message>
+      <source>Play sound</source>
+      <translation>Hang lejátszása</translation>
+    </message>
+    <message>
+      <source>Speak</source>
+      <translation>Beszéd</translation>
+    </message>
+    <message>
+      <source>Execute PTZ preset</source>
+      <translation>PTZ preset indítás</translation>
+    </message>
+    <message>
+      <source>Show text overlay</source>
+      <translation>Felirat fólia megjelenítése</translation>
+    </message>
+    <message>
+      <source>Show on Alarm Layout</source>
+      <translation>Megjelenítés a riasztás elrendezésen</translation>
+    </message>
+    <message>
+      <source>Do HTTP request</source>
+      <translation>HTTP kérés</translation>
+    </message>
+    <message>
+      <source>Device output</source>
+      <translation>Eszköz kimenet</translation>
+    </message>
+    <message>
+      <source>Camera output</source>
+      <translation>Kamera kimenet</translation>
+    </message>
+    <message>
+      <source>Device recording</source>
+      <translation>Eszköz rögzítés</translation>
+    </message>
+    <message>
+      <source>Camera recording</source>
+      <translation>Kamera rögzítés</translation>
+    </message>
+    <message>
+      <source>Generic Event</source>
+      <translation>Általános esemény</translation>
+    </message>
+    <message numerus="yes">
+      <source>Motion on Cameras</source>
+      <translation>
+        <numerusform>Mozgás a kamerákon</numerusform>
+        <numerusform>Mozgás a kamerákon</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Network Issue</source>
+      <translation>Hálózati probléma</translation>
+    </message>
+    <message>
+      <source>Server Failure</source>
+      <translation>Szerver hiba</translation>
+    </message>
+    <message>
+      <source>Server Conflict</source>
+      <translation>Szerver ütközés</translation>
+    </message>
+    <message>
+      <source>Server Started</source>
+      <translation>Szerver elindult</translation>
+    </message>
+    <message>
+      <source>License Issue</source>
+      <translation>Licence probléma</translation>
+    </message>
+    <message>
+      <source>Any Server Issue</source>
+      <translation>Bármilyen szerver hiba</translation>
+    </message>
+    <message>
+      <source>Any Event</source>
+      <translation>Bármilyen esemény</translation>
+    </message>
+    <message numerus="yes">
+      <source>Input Signal on Devices</source>
+      <translation>
+        <numerusform>Bemeneti jel az eszközökön</numerusform>
+        <numerusform>Bemeneti jel az eszközökön</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Input Signal on Cameras</source>
+      <translation>
+        <numerusform>Bemeneti jel a kamerákon</numerusform>
+        <numerusform>Bemeneti jel a kamerákon</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Devices Disconnected</source>
+      <translation>
+        <numerusform>Eszközök lekapcsolódva</numerusform>
+        <numerusform>Eszközök lekapcsolódva</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cameras Disconnected</source>
+      <translation>
+        <numerusform>Kamerák lekapcsolódva</numerusform>
+        <numerusform>Kamerák lekapcsolódva</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Devices IP Conflict</source>
+      <translation>
+        <numerusform>IP ütközés az eszközöknél</numerusform>
+        <numerusform>IP ütközés az eszközöknél</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>Cameras IP Conflict</source>
+      <translation>
+        <numerusform>IP ütközés a kameráknál</numerusform>
+        <numerusform>IP ütközés a kameráknál</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Any Device Issue</source>
+      <translation>Bármilyen eszköz hiba</translation>
+    </message>
+    <message>
+      <source>Any Camera Issue</source>
+      <translation>Bármilyen kamera hiba</translation>
+    </message>
+    <message>
+      <source>Undefined event has occurred on %1</source>
+      <translation>Nem definiált esemény történ itt: %1</translation>
+    </message>
+    <message>
+      <source>Device %1 was disconnected</source>
+      <translation>%1 eszköz szétkapcsolt</translation>
+    </message>
+    <message>
+      <source>Camera %1 was disconnected</source>
+      <translation>%1 kamera szétkapcsolt</translation>
+    </message>
+    <message>
+      <source>I/O Module %1 was disconnected</source>
+      <translation>%1 I/O modul szétkapcsolt</translation>
+    </message>
+    <message>
+      <source>Input on %1</source>
+      <translation>Bemenet: %1</translation>
+    </message>
+    <message>
+      <source>Motion on %1</source>
+      <translation>Mozgás: %1</translation>
+    </message>
+    <message>
+      <source>Network Issue at %1</source>
+      <translation>Hálózati probléma: %1</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Failure</source>
+      <translation>&quot;%1&quot; szerver hiba</translation>
+    </message>
+    <message>
+      <source>Device IP Conflict at %1</source>
+      <comment>Device IP Conflict at &lt;server_name&gt;</comment>
+      <translation>Eszköz IP ütközés %1 szerveren</translation>
+    </message>
+    <message>
+      <source>Camera IP Conflict at %1</source>
+      <comment>Camera IP Conflict at &lt;server_name&gt;</comment>
+      <translation>Kamera IP ütközés %1 szerveren</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Conflict</source>
+      <translation>&quot;%1&quot; szerver ütközés</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; Started</source>
+      <translation>&quot;%1&quot; szerver elindult</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has a license problem</source>
+      <translation>&quot;%1&quot; szervernek licencproblémája van</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; has finished an archive backup</source>
+      <translation>&quot;%1&quot; szerver befejezte az archív biztonsági másolatot</translation>
+    </message>
+    <message>
+      <source>Generic Event at %1</source>
+      <translation>%1 - általános esemény</translation>
+    </message>
+    <message>
+      <source>An unknown event has occurred</source>
+      <translation>Ismeretlen esemény történt</translation>
+    </message>
+    <message>
+      <source>Event: %1</source>
+      <translation>Esemény %1</translation>
+    </message>
+    <message>
+      <source>Source: %1</source>
+      <translation>Forrás: %1</translation>
+    </message>
+    <message>
+      <source>Caption: %1</source>
+      <translation>Felirat: %1</translation>
+    </message>
+    <message>
+      <source>Input Port: %1</source>
+      <translation>Bemeneti port: %1</translation>
+    </message>
+    <message>
+      <source>Reason: %1</source>
+      <translation>Ok: %1</translation>
+    </message>
+    <message>
+      <source>Conflicting Address: %1</source>
+      <translation>Címütközés: %1</translation>
+    </message>
+    <message>
+      <source>MAC #%1: %2</source>
+      <extracomment>MAC #2: D0-50-99-38-1E-12</extracomment>
+      <translation>MAC #%1: %2</translation>
+    </message>
+    <message>
+      <source>Conflicting Server #%1: %2</source>
+      <extracomment>Conflicting Server #5: 10.0.2.1</extracomment>
+      <translation>Ütköző szerver: #%1: %2</translation>
+    </message>
+    <message>
+      <source>Conflicting Server: %1</source>
+      <translation>Ütköző szerver: %1</translation>
+    </message>
+    <message>
+      <source>Trigger: %1</source>
+      <translation>Eseményindító: %1</translation>
+    </message>
+    <message>
+      <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>
+        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+        <numerusform>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Time: %1 on %2</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>Alkalom: %1/%2</translation>
+    </message>
+    <message numerus="yes">
+      <source>First occurrence: %1 on %2 (%n times total)</source>
+      <comment>%1 means time, %2 means date</comment>
+      <translation>
+        <numerusform>Első előfordulás: %1/%2(%n alkalomból)</numerusform>
+        <numerusform>Első előfordulás: %1/%2(%n alkalomból)</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>No data received during last %n seconds.</source>
+      <translation>
+        <numerusform>Nincs fogadott adat az elmúlt %n másodpercben.</numerusform>
+        <numerusform>Nincs fogadott adat az elmúlt %n másodpercben.</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Connection to device was unexpectedly closed.</source>
+      <translation>A kapcsolat az eszközzel váratlanul bezárult.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (primary stream) was unexpectedly closed.</source>
+      <translation>A kapcsolat a kamerával (elsődleges adatfolyam) váratlanul bezárult.</translation>
+    </message>
+    <message>
+      <source>Connection to camera (secondary stream) was unexpectedly closed.</source>
+      <translation>A kapcsolat a kamerával (másodlagos adatfolyam) váratlanul bezárult.</translation>
+    </message>
+    <message>
+      <source>RTP packet loss detected.</source>
+      <translation>RTP csomag vesztés észlelve.</translation>
+    </message>
+    <message>
+      <source>Device does not respond to network requests.</source>
+      <translation>A berendezés nem válaszol a hálózati kérésre.</translation>
+    </message>
+    <message>
+      <source>Connection to server is lost.</source>
+      <translation>A kapcsolat a szerverrrel megszakadt.</translation>
+    </message>
+    <message>
+      <source>Server stopped unexpectedly.</source>
+      <translation>A szerver váratlanul leállt.</translation>
+    </message>
+    <message>
+      <source>I/O error has occurred at %1.</source>
+      <translation>I/O hiba történt: %1.</translation>
+    </message>
+    <message>
+      <source>Not enough HDD/SSD speed for recording to %1.</source>
+      <translation>Nincs elegendő HDD/SDD sebesség a rögzítéshez: %1.</translation>
+    </message>
+    <message>
+      <source>HDD/SSD disk &quot;%1&quot; is full. Disk contains too much data that is not managed by VMS.</source>
+      <translation>&quot;%1&quot; HDD/SDD lemez megtelt. A lemez túl sok adatot tartalmaz amit a VMS nem menedzsel.</translation>
+    </message>
+    <message>
+      <source>System disk &quot;%1&quot; is almost full.</source>
+      <translation>&quot;%1&quot; rendszerlemez majdnem megtelt.</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following devices:</source>
+      <translation>Nincs elég licenc. A felvétel a következő eszközökre le van állítva:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following cameras:</source>
+      <translation>Nincs elég licenc. A felvétel a következő kamerákon le van állítva:</translation>
+    </message>
+    <message>
+      <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
+      <translation>Nincs elég licenc. A felvétel a következő I/O modulokon le van állítva:</translation>
+    </message>
+    <message>
+      <source>start</source>
+      <translation>indítás</translation>
+    </message>
+    <message>
+      <source>stop</source>
+      <translation>megállítás</translation>
+    </message>
+    <message>
+      <source>While %1</source>
+      <translation>%1 alatt</translation>
+    </message>
+    <message>
+      <source>On %1 %2</source>
+      <translation>Itt: %1 %2</translation>
+    </message>
+    <message>
+      <source>Trigger Name</source>
+      <translation>Eseményindító neve</translation>
+    </message>
+    <message>
+      <source>Role</source>
+      <translation>Szerepkör</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Users</source>
+      <translation>
+        <numerusform>%n felhasználó</numerusform>
+        <numerusform>%n felhasználó</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>%n Roles</source>
+      <translation>
+        <numerusform>%n szerepkör</numerusform>
+        <numerusform>%n szerepkör</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>All Administrators</source>
+      <translation>Minden adminisztrátor</translation>
+    </message>
+    <message>
+      <source>All Users</source>
+      <translation>Minden felhasználó</translation>
+    </message>
+    <message>
+      <source>Select at least one user</source>
+      <translation>Válasszon legalább egy felhasználót</translation>
+    </message>
+    <message>
+      <source>Soft Trigger</source>
+      <translation>Szoft eseményindítás</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 at %2</source>
+      <translation>Soft Trigger %1:%2</translation>
+    </message>
+    <message>
+      <source>Soft Trigger %1 has been activated multiple times</source>
+      <translation>%1 soft eseményindító többször is aktiválódott</translation>
+    </message>
+    <message>
+      <source>Send email</source>
+      <translation>E-mail küldése</translation>
+    </message>
+    <message>
+      <source>Acknowledge</source>
+      <translation>Nyugtázás</translation>
+    </message>
+    <message>
+      <source>Analytics Event</source>
+      <translation>Analitikai esemény</translation>
+    </message>
+    <message>
+      <source>%1 at %2</source>
+      <comment>Analytics Event at some camera</comment>
+      <translation>%1 ezen %2</translation>
+    </message>
+    <message>
+      <source>Storage Issue</source>
+      <translation>Tároló hiba</translation>
+    </message>
+    <message>
+      <source>Storage Issue at %1</source>
+      <translation>Tárhely hiba: %1</translation>
+    </message>
+    <message>
+      <source>Set to fullscreen</source>
+      <translation>Váltás teljesképernyőre</translation>
+    </message>
+    <message>
+      <source>Exit fullscreen</source>
+      <translation>Kilépés teljesképernyős módból</translation>
+    </message>
+    <message>
+      <source>Open layout</source>
+      <translation>Elrendezés megnyitása</translation>
+    </message>
+    <message>
+      <source>Failed to force using camera time, it lags too much, system time will be used</source>
+      <translation>Nem sikerült a kamera idejét beállítani, túlságosan laggol, a rendszeridő lesz használva</translation>
+    </message>
+    <message>
+      <source>Camera time is back to normal</source>
+      <translation>A kameraidő visszaállt alaphelyzetbe</translation>
+    </message>
+    <message>
+      <source>Multiple %1 events have occurred</source>
+      <translation>Több %1 esemény történt</translation>
+    </message>
+    <message>
+      <source>Multicast address conflict detected. Address %1 is already in use by %2 on %3 stream</source>
+      <translation>Multicast címütközés észlelve. Cím %1 már használatban van az %2 a %3 -streamen</translation>
+    </message>
+    <message>
+      <source>Network address %1 is not a multicast address</source>
+      <translation>A %1 hálózati cím nem multicast-cím</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is offline.</source>
+      <translation>Az Analytics tárhely &quot;%1&quot; offline állapotban van.</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; is almost full.</source>
+      <translation>Az Analytics &quot;%1&quot; tárhelye majdnem tele van.</translation>
+    </message>
+    <message>
+      <source>Plugin Diagnostic Event</source>
+      <translation>Plugin diagnosztikai esemény</translation>
+    </message>
+    <message>
+      <source>Unknown Plugin Diagnostic Event</source>
+      <translation>Ismeretlen plugin diagnosztikai esemény</translation>
+    </message>
+    <message>
+      <source>RAID error. %1.</source>
+      <translation>RAID hiba. %1.</translation>
+    </message>
+    <message>
+      <source>Buzzer</source>
+      <translation>Berregő</translation>
+    </message>
+    <message>
+      <source>Archive Backup Finished</source>
+      <translation>Az archívum biztonsági mentése kész</translation>
+    </message>
+    <message>
+      <source>PoE over Budget</source>
+      <translation>PoE a "Budget" felett</translation>
+    </message>
+    <message>
+      <source>Fan Error</source>
+      <translation>Ventilátor hiba</translation>
+    </message>
+    <message>
+      <source>PoE over budget at %1</source>
+      <translation>PoE a "Budget" felett %1</translation>
+    </message>
+    <message>
+      <source>Fan error at %1</source>
+      <translation>Ventilátor hiba %1</translation>
+    </message>
+    <message>
+      <source>Reason: Power limit exceeded (%1)</source>
+      <comment>%1 is consumption</comment>
+      <translation>Ok: Túllépte a teljesítménykorlátot (%1)</translation>
+    </message>
+    <message>
+      <source>Show desktop notification</source>
+      <translation>Az asztali értesítés megjelenítése</translation>
+    </message>
+    <message>
+      <source>Send mobile notification</source>
+      <translation>Küldjön mobil értesítést</translation>
+    </message>
+    <message>
+      <source>Consumption</source>
+      <translation>Fogyasztás</translation>
+    </message>
+    <message>
+      <source>Device was disconnected</source>
+      <translation>Az eszköz lecsatlakozott</translation>
+    </message>
+    <message>
+      <source>Camera was disconnected</source>
+      <translation>A kamera lecsatlakozott</translation>
+    </message>
+    <message>
+      <source>I/O Module was disconnected</source>
+      <translation>I/O modul szétkapcsolt</translation>
+    </message>
+    <message>
+      <source>RTP error in primary stream (%1)</source>
+      <translation>RTP hiba az elsődleges adatfolyamban (%1)</translation>
+    </message>
+    <message>
+      <source>RTP error in secondary stream (%1)</source>
+      <translation>RTP hiba a másodlagos adatfolyamban (%1)</translation>
+    </message>
+    <message>
+      <source>Analytics Object Detected</source>
+      <translation type="unfinished">Analytics Object Detected</translation>
+    </message>
+    <message>
+      <source>%1 at camera &apos;%2&apos;</source>
+      <comment> is detected</comment>
+      <translation type="unfinished">%1 at camera &apos;%2&apos;</translation>
+    </message>
+    <message>
+      <source>Plugin: %1</source>
+      <translation type="unfinished">Plugin: %1</translation>
+    </message>
+    <message>
+      <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
+      <translation>Analytics-tárhely &quot;%1&quot; adatbázis hiba: Nincs engedély a csatlakozási ponthoz.</translation>
+    </message>
+    <message>
+      <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
+      <translation type="unfinished">Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</translation>
+    </message>
+    <message>
+      <source>Archive backup failed.</source>
+      <translation>Az archívum biztonsági mentése nem sikerült.</translation>
+    </message>
+    <message>
+      <source>Object detected</source>
+      <translation type="unfinished">Object detected</translation>
+    </message>
+    <message>
+      <source>Archive backup failed</source>
+      <translation>Az archívum biztonsági mentése nem sikerült</translation>
+    </message>
+    <message>
+      <source>Data is backed up to %1</source>
+      <translation type="unfinished">Data is backed up to %1</translation>
+    </message>
+    <message>
+      <source>Failed to backup file </source>
+      <translation type="unfinished">Failed to backup file </translation>
+    </message>
+    <message>
+      <source>Server Certificate Error</source>
+      <translation type="unfinished">Server Certificate Error</translation>
+    </message>
+    <message>
+      <source>Server &quot;%1&quot; certificate error</source>
+      <translation type="unfinished">Server &quot;%1&quot; certificate error</translation>
+    </message>
+  </context>
+  <context>
+    <name>utils::QnCameraNamesWatcher</name>
+    <message>
+      <source>Removed camera</source>
+      <translation>Eltávolított kamera</translation>
+    </message>
+  </context>
+</TS>

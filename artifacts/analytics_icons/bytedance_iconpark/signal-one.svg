@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>signal-one</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="signal-one">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M15.8925417,15.8925417 C17.4005833,14.3845 18.3333333,12.3011667 18.3333333,9.99995833 C18.3333333,7.69879167 17.4005833,5.61545833 15.8925417,4.1074125" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <path d="M4.10744167,4.1074125 C2.59940833,5.61545833 1.66666667,7.69879167 1.66666667,9.99995833 C1.66666667,12.3011667 2.59940833,14.3845 4.10744167,15.8925417" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <path d="M6.291875,5.87520833 C5.23625,6.93083333 4.58333333,8.38916667 4.58333333,10 C4.58333333,11.6108333 5.23625,13.0691667 6.291875,14.1247917" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <path d="M13.708125,14.1247917 C14.76375,13.0691667 15.4166667,11.6108333 15.4166667,10 C15.4166667,8.38916667 14.76375,6.93083333 13.708125,5.87520833" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <line x1="10" y1="18.3332917" x2="10" y2="14.166625" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <line x1="10" y1="1.66661667" x2="10" y2="5.83329167" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></line>
+            <circle id="Oval" fill="#A5B7C0" fill-rule="nonzero" cx="10" cy="9.99995833" r="1.25"></circle>
+        </g>
+    </g>
+</svg>

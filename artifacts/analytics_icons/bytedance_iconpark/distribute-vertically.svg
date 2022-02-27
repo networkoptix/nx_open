@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>distribute-vertically</title>
+    <defs>
+        <rect id="path-1" x="0" y="0" width="20" height="20"></rect>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="distribute-vertically">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <g id="Clipped">
+                <mask id="mask-2" fill="white">
+                    <use xlink:href="#path-1"></use>
+                </mask>
+                <g id="Rectangle"></g>
+                <g id="Group" mask="url(#mask-2)" stroke="#A5B7C0" stroke-linejoin="round">
+                    <g transform="translate(2.500000, 2.916667)">
+                        <rect id="Rectangle" transform="translate(7.500000, 7.083333) rotate(180.000000) translate(-7.500000, -7.083333) " x="1.66666667" y="4.58333333" width="11.6666667" height="5"></rect>
+                        <line x1="15" y1="13.75" x2="0" y2="13.75" id="Path" stroke-linecap="round"></line>
+                        <line x1="15" y1="0.416666667" x2="0" y2="0.416666667" id="Path" stroke-linecap="round"></line>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

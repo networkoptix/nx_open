@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>pregnant-women</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="pregnant-women">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M13.75,1.66671667 L13.75,4.79945833 C16.7968333,6.54716667 18.1726667,8.8725 17.8775833,11.7754583 C17.5824583,14.6784167 16.206625,16.8644167 13.75,18.333375" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M5.73841667,1.66671667 C4.84758333,1.82061667 4.20641667,2.34249167 3.81497083,3.23234583 C3.22779583,4.567125 2.08333333,9.15158333 2.08333333,9.88579167 C2.08333333,10.6200417 3.5698625,12.597875 7.10491667,15.5982083 C8.74295833,16.9885 9.71104167,16.9175833 10.2353333,15.9849583 C10.759625,15.052375 10.0660417,14.4543333 9.18733333,13.765375 C7.57779167,12.5035 5.45916667,10.5062917 5.45916667,9.629625 C5.45916667,9.04516667 6.00775,7.26404167 7.10491667,4.28629167" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <path d="M3.41715417,12.05875 C3.63144583,14.1337917 4.0201875,16.217125 4.583375,18.30875" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+            <path d="M13.75,8.31020833 C14.3945417,8.73841667 14.8112083,9.295625 15,9.98191667 C15.1887917,10.6681667 15.2438333,11.294 15.165125,11.8594167" id="Path" stroke="#A5B7C0" stroke-linecap="round"></path>
+        </g>
+    </g>
+</svg>

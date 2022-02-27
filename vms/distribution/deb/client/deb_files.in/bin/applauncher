@@ -1,0 +1,21 @@
+#!/bin/bash
+
+## Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
+
+export QT_IM_MODULE=ibus
+
+USER_APPLAUNCHER_DIR="$HOME/.local/share/@customization.companyName@/applauncher/@customization@"
+
+if [ -x "$USER_APPLAUNCHER_DIR/bin/applauncher-bin" ]
+then
+    APPLAUNCHER_DIR="$USER_APPLAUNCHER_DIR/bin"
+else
+    APPLAUNCHER_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+    if [ ! -x "$APPLAUNCHER_DIR/applauncher-bin" ]
+    then
+        echo "Error: applauncher-bin is not found."
+        exit 1
+    fi
+fi
+
+"$APPLAUNCHER_DIR/applauncher-bin" "$@"

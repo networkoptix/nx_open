@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>hamburger</title>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="hamburger">
+            <rect id="Rectangle" fill-opacity="0.01" fill="#FFFFFF" fill-rule="nonzero" x="0" y="0" width="20" height="20"></rect>
+            <path d="M18.3333333,9.16666667 C18.3333333,5.02454167 14.602375,1.66666667 10,1.66666667 C5.397625,1.66666667 1.66666667,5.02454167 1.66666667,9.16666667 L18.3333333,9.16666667 Z" id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round"></path>
+            <rect id="Rectangle" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" x="1.66666667" y="15.8333333" width="16.6666667" height="2.5"></rect>
+            <polyline id="Path" stroke="#A5B7C0" stroke-linecap="round" stroke-linejoin="round" points="1.66666667 11.6666667 3.93939583 13.3333333 6.96970833 11.6666667 10 13.3333333 13.0302917 11.6666667 16.060625 13.3333333 18.3333333 11.6666667"></polyline>
+        </g>
+    </g>
+</svg>
