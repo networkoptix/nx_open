@@ -53,6 +53,12 @@ bool QnResourceType::isCamera() const
     return m_isCamera;
 }
 
+void QnResourceType::setIsCamera()
+{
+    m_isCamera = true;
+    m_isCameraSet = true;
+}
+
 void QnResourceType::addAdditionalParent(const QnUuid& parent)
 {
     if (parent.isNull())
