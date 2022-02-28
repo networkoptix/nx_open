@@ -20,7 +20,7 @@ struct NX_VMS_COMMON_API QnLdapSettings
     int searchTimeoutS = 0;
 
     QString toString() const;
-    bool isValid() const;
+    bool isValid(bool checkPassword = true) const;
 
     static int defaultPort(bool ssl = false);
 };
