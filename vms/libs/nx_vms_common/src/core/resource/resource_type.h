@@ -31,6 +31,7 @@ public:
     const QString& getManufacturer() const { return m_manufacture;}
 
     bool isCamera() const;
+    void setIsCamera(); //< For tests.
 
     void addAdditionalParent(const QnUuid& parent);
     QList<QnUuid> allParentList() const;
