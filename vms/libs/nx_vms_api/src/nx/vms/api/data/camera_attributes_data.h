@@ -93,6 +93,7 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(BackupContentTypes)
 struct NX_VMS_API CameraAttributesData
 {
     QnUuid getIdForMerging() const { return cameraId; } //< See IdData::getIdForMerging().
+    QnUuid getId() const { return cameraId; }
     bool operator==(const CameraAttributesData& other) const = default;
 
     static DeprecatedFieldNames* getDeprecatedFieldNames();

@@ -170,6 +170,7 @@ struct NX_VMS_API MediaServerUserAttributesData
     CheckResourceExists checkResourceExists = CheckResourceExists::yes; /**<%apidoc[unused] */
 
     QnUuid getIdForMerging() const { return serverId; } //< See IdData::getIdForMerging().
+    QnUuid getId() const { return serverId; }
 
     bool operator==(const MediaServerUserAttributesData& other) const = default;
 

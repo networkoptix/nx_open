@@ -246,7 +246,7 @@ private:
                     [&id](const auto& item)
                     {
                         return item.checkResourceExists == nx::vms::api::CheckResourceExists::yes
-                            || item.getIdForMerging() != id;
+                            || item.getId() != id;
                     }) == value.end(),
                     "%1 toDbTypes() must fill %2 with resource id %3 and checkResourceExists != yes",
                     typeid(Model), typeid(DbType), id);
@@ -254,7 +254,7 @@ private:
             else
             {
                 NX_ASSERT(value.checkResourceExists != nx::vms::api::CheckResourceExists::yes
-                        && value.getIdForMerging() == id,
+                        && value.getId() == id,
                     "%1 toDbTypes() must fill %2 with resource id %3 and checkResourceExists != yes",
                     typeid(Model), typeid(DbType), id);
             }
