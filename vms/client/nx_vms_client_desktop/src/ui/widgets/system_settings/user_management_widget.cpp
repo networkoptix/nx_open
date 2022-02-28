@@ -330,7 +330,7 @@ void QnUserManagementWidget::loadDataToUi()
 void QnUserManagementWidget::updateLdapState()
 {
     ui->ldapSettingsButton->setEnabled(true);
-    ui->fetchButton->setEnabled(qnGlobalSettings->ldapSettings().isValid());
+    ui->fetchButton->setEnabled(qnGlobalSettings->ldapSettings().isValid(/*checkPassword*/ false));
 }
 
 void QnUserManagementWidget::applyChanges()
@@ -525,7 +525,7 @@ void QnUserManagementWidget::fetchUsers()
     if (!context()->user())
         return;
 
-    if (!qnGlobalSettings->ldapSettings().isValid())
+    if (!qnGlobalSettings->ldapSettings().isValid(/*checkPassword*/ false))
         return;
 
     QScopedPointer<QnLdapUsersDialog> dialog(new QnLdapUsersDialog(this));

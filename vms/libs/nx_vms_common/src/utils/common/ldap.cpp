@@ -9,11 +9,11 @@ QString QnLdapSettings::toString() const
     return QJson::serialized(*this);
 }
 
-bool QnLdapSettings::isValid() const
+bool QnLdapSettings::isValid(bool checkPassword) const
 {
     return !uri.isEmpty()
         && !adminDn.isEmpty()
-        && !adminPassword.isEmpty();
+        && !(checkPassword && adminPassword.isEmpty());
 }
 
 int QnLdapSettings::defaultPort(bool ssl)

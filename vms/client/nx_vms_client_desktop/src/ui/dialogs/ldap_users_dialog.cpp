@@ -4,30 +4,28 @@
 #include "ui_ldap_users_dialog.h"
 
 #include <QtCore/QTimer>
-
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QTableView>
 
+#include <api/server_rest_connection.h>
+#include <api/global_settings.h>
+#include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
-
-#include <api/server_rest_connection.h>
-#include <api/global_settings.h>
-
+#include <nx/utils/guarded_callback.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
+#include <nx/vms/client/desktop/common/widgets/checkable_header_view.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/ldap_user_list_model.h>
 #include <ui/models/user_roles_model.h>
-#include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
-#include <nx/vms/client/desktop/common/widgets/checkable_header_view.h>
-#include <nx/utils/guarded_callback.h>
-
 #include <utils/common/ldap.h>
-#include <common/common_module.h>
+
 using namespace nx;
 using namespace nx::vms::client::desktop;
 
@@ -53,8 +51,10 @@ QnLdapUsersDialog::QnLdapUsersDialog(QWidget* parent):
 
     const QnLdapSettings &settings = qnGlobalSettings->ldapSettings();
 
-    if (!settings.isValid()) {
-        stopTesting(tr("The provided settings are not valid.") + lit("\n") + tr("Could not perform a test."));
+    if (!settings.isValid(/*checkPassword*/ false))
+    {
+        stopTesting(nx::format("%1\n%2").args(tr("The provided settings are not valid."),
+            tr("Could not perform a test.")));
         return;
     }
 
@@ -256,7 +256,7 @@ QnLdapUsers QnLdapUsersDialog::visibleUsers() const
 QnLdapUsers QnLdapUsersDialog::selectedUsers(bool onlyVisible) const
 {
     QnLdapUsers result;
-    const auto model = onlyVisible 
+    const auto model = onlyVisible
         ? static_cast<QAbstractItemModel*>(m_sortModel.get())
         : static_cast<QAbstractItemModel*>(m_usersModel.get());
 
