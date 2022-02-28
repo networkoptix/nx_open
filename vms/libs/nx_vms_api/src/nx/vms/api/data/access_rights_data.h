@@ -20,7 +20,7 @@ struct NX_VMS_API AccessRightsData
     CheckResourceExists checkResourceExists = CheckResourceExists::yes; /**<%apidoc[unused] */
 
     bool operator==(const AccessRightsData& other) const = default;
-    const QnUuid& getIdForMerging() const { return userId; }
+    QnUuid getId() const { return userId; }
 };
 #define AccessRightsData_Fields \
     (userId) \
