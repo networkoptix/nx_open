@@ -82,7 +82,7 @@ struct NX_VMS_API ResourceParamWithRefData: ResourceParamData
     }
 
     bool operator==(const ResourceParamWithRefData& other) const = default;
-    const QnUuid& getIdForMerging() const { return resourceId; }
+    QnUuid getId() const { return resourceId; }
 
     QnUuid resourceId;
 
