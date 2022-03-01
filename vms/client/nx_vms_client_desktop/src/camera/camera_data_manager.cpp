@@ -8,6 +8,9 @@
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/ini.h>
+
+using namespace nx::vms::client::desktop;
 
 QnCameraDataManager::QnCameraDataManager(QnCommonModule* commonModule, QObject* parent):
     QObject(parent),
@@ -33,6 +36,9 @@ QnCachingCameraDataLoaderPtr QnCameraDataManager::loader(
     auto pos = m_loaderByResource.find(resource);
     if(pos != m_loaderByResource.end())
         return *pos;
+
+    if (ini().disableChunksLoading)
+        return {};
 
     if (!createIfNotExists)
         return QnCachingCameraDataLoaderPtr();

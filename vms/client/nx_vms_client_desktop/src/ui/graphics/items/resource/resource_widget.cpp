@@ -24,6 +24,7 @@
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/desktop/common/utils/painter_transform_scale_stripper.h>
+#include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/style/style.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
@@ -1064,6 +1065,9 @@ void QnResourceWidget::setInfoVisible(bool visible, bool animate)
 Qn::ResourceStatusOverlay QnResourceWidget::calculateStatusOverlay(
     nx::vms::api::ResourceStatus resourceStatus, bool hasVideo) const
 {
+    if (ini().disableVideoRendering)
+        return Qn::EmptyOverlay;
+
     if (resourceStatus == nx::vms::api::ResourceStatus::offline)
         return Qn::OfflineOverlay;
 

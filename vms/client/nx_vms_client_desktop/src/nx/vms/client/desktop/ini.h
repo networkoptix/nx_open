@@ -128,6 +128,12 @@ struct Ini: nx::kit::IniConfig
     NX_INI_FLAG(false, grayscaleDecoding,
         "[Dev] Use grayscale video decoding.");
 
+    NX_INI_FLAG(0, disableVideoRendering,
+        "[Dev] Completely disable video rendering to simplify memory leaks detection.");
+
+    NX_INI_FLAG(0, disableChunksLoading,
+        "[Dev] Completely disable camera chunks loading to simplify memory leaks detection.");
+
     // ---------------------------------------------------------------------------------------------
     // Design section
     // Flags here can be removed when designers approve the resulting approach.
