@@ -8,6 +8,9 @@
 #include <core/resource/media_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
+#include <nx/vms/client/desktop/ini.h>
+
+using namespace nx::vms::client::desktop;
 
 using StorageLocation = nx::vms::api::StorageLocation;
 
@@ -42,6 +45,9 @@ QnCachingCameraDataLoaderPtr QnCameraDataManager::loader(
     auto pos = d->loaderByResource.find(resource);
     if(pos != d->loaderByResource.end())
         return *pos;
+
+    if (ini().disableChunksLoading)
+        return {};
 
     if (!createIfNotExists)
         return QnCachingCameraDataLoaderPtr();
