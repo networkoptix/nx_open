@@ -167,7 +167,7 @@ void CalendarModel::Private::updateArchiveInfo()
     for (int i = firstMonthDayPosition; i != days.size();)
     {
         const auto it = timePeriods.findNearestPeriod(days[i].startTime, true);
-        if (it == timePeriods.constEnd())
+        if (it == timePeriods.cend())
         {
             // No chinks at the right of the first day of month.
             clearArchiveMarks(i);
