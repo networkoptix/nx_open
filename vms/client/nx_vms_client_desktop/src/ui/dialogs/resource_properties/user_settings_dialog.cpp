@@ -528,7 +528,7 @@ void QnUserSettingsDialog::setUser(const QnUserResourcePtr &user)
     if (m_user == user)
         return;
 
-    if (!tryClose(false))
+    if (!tryToApplyOrDiscardChanges())
         return;
 
     if (m_user)
@@ -762,9 +762,9 @@ void QnUserSettingsDialog::updateControlsVisibility()
 
     const bool canEditUser =
         m_user && accessController()->hasPermissions(m_user, Qn::WriteAccessRightsPermission);
-    
+
     m_userEnabledButton->setVisible(settingsPageVisible && canEditUser);
-        
+
     const bool digestEnabled = m_model->digestAuthorizationEnabled();
     const bool canChangeDigestMode =
         m_user && accessController()->hasPermissions(m_user, Qn::WriteDigestPermission);
