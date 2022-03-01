@@ -320,8 +320,8 @@ QJSValue TestKit::wrap(QJSValue object)
 
 void TestKit::mouse(QJSValue object, QJSValue parameters)
 {
-    const bool selectCenter =
-        !parameters.property("x").isNumber() || !parameters.property("y").isNumber();
+    const bool hasCoordinates =
+        parameters.property("x").isNumber() && parameters.property("y").isNumber();
 
     QPointF eventPos(parameters.property("x").toNumber(), parameters.property("y").toNumber());
     QWindow* window = nullptr;
@@ -329,12 +329,12 @@ void TestKit::mouse(QJSValue object, QJSValue parameters)
 
     if (object.isNull()) //< Screen.
     {
-        screenPos = eventPos.toPoint();
+        screenPos = hasCoordinates ? eventPos.toPoint() : QCursor::pos();
     }
     else
     {
         const auto rect = utils::globalRect(object.toVariant(), &window);
-        screenPos = selectCenter ? rect.center() : (rect.topLeft() + eventPos.toPoint());
+        screenPos = hasCoordinates ? (rect.topLeft() + eventPos.toPoint()) : rect.center();
     }
 
     const auto buttonProp = parameters.property("button");
