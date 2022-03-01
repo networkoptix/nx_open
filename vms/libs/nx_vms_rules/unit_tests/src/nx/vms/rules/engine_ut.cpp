@@ -61,8 +61,8 @@ TEST_F(EngineTest, rulesUpdatedSuccessfully)
 TEST_F(EngineTest, engineCreatedWithoutEventsAndActions)
 {
     // No actions and events are registered at the moment the engine is just created.
-    ASSERT_TRUE(engine->registeredEvents().empty());
-    ASSERT_TRUE(engine->registeredActions().empty());
+    ASSERT_TRUE(engine->events().empty());
+    ASSERT_TRUE(engine->actions().empty());
 
     // An attempt to get a non-registered action or event descriptor must return nullopt.
     ASSERT_EQ(engine->eventDescriptor(kTestEventId), std::nullopt);
@@ -76,8 +76,8 @@ TEST_F(EngineTest, invalidDescriptorMustNotBeRegistered)
     ASSERT_FALSE(engine->registerEvent(emptyDescriptor));
     ASSERT_FALSE(engine->registerAction(emptyDescriptor));
 
-    ASSERT_TRUE(engine->registeredEvents().empty());
-    ASSERT_TRUE(engine->registeredActions().empty());
+    ASSERT_TRUE(engine->events().empty());
+    ASSERT_TRUE(engine->actions().empty());
 }
 
 TEST_F(EngineTest, invalidConstructorMustNotBeRegistered)
@@ -92,8 +92,8 @@ TEST_F(EngineTest, descriptionWithoutIdMustNotBeRegistered)
     ASSERT_FALSE(engine->registerEvent(descriptorWithoutId));
     ASSERT_FALSE(engine->registerAction(descriptorWithoutId));
 
-    ASSERT_TRUE(engine->registeredEvents().empty());
-    ASSERT_TRUE(engine->registeredActions().empty());
+    ASSERT_TRUE(engine->events().empty());
+    ASSERT_TRUE(engine->actions().empty());
 }
 
 TEST_F(EngineTest, descriptionWithoutNameMustNotBeRegistered)
@@ -103,8 +103,8 @@ TEST_F(EngineTest, descriptionWithoutNameMustNotBeRegistered)
     ASSERT_FALSE(engine->registerEvent(descriptorWithoutName));
     ASSERT_FALSE(engine->registerAction(descriptorWithoutName));
 
-    ASSERT_TRUE(engine->registeredEvents().empty());
-    ASSERT_TRUE(engine->registeredActions().empty());
+    ASSERT_TRUE(engine->events().empty());
+    ASSERT_TRUE(engine->actions().empty());
 }
 
 TEST_F(EngineTest, validDescriptorMustBeRegistered)
@@ -116,11 +116,11 @@ TEST_F(EngineTest, validDescriptorMustBeRegistered)
 
     ASSERT_TRUE(engine->registerEvent(eventDescriptor));
 
-    ASSERT_EQ(engine->registeredEvents().size(), 1);
+    ASSERT_EQ(engine->events().size(), 1);
 
-    ASSERT_EQ(engine->registeredEvents().first().id, kTestEventId);
-    ASSERT_EQ(engine->registeredEvents().first().displayName, eventDescriptor.displayName);
-    ASSERT_EQ(engine->registeredEvents().first().description, eventDescriptor.description);
+    ASSERT_EQ(engine->events().first().id, kTestEventId);
+    ASSERT_EQ(engine->events().first().displayName, eventDescriptor.displayName);
+    ASSERT_EQ(engine->events().first().description, eventDescriptor.description);
 
     ItemDescriptor actionDescriptor{
         .id = kTestActionId,
@@ -129,11 +129,11 @@ TEST_F(EngineTest, validDescriptorMustBeRegistered)
 
     ASSERT_TRUE(engine->registerAction(actionDescriptor));
 
-    ASSERT_EQ(engine->registeredActions().size(), 1);
+    ASSERT_EQ(engine->actions().size(), 1);
 
-    ASSERT_EQ(engine->registeredActions().first().id, kTestActionId);
-    ASSERT_EQ(engine->registeredActions().first().displayName, actionDescriptor.displayName);
-    ASSERT_EQ(engine->registeredActions().first().description, actionDescriptor.description);
+    ASSERT_EQ(engine->actions().first().id, kTestActionId);
+    ASSERT_EQ(engine->actions().first().displayName, actionDescriptor.displayName);
+    ASSERT_EQ(engine->actions().first().description, actionDescriptor.description);
 }
 
 TEST_F(EngineTest, descriptorMustNotBeRegisteredIfSomeOfTheFieldsNotRegistered)

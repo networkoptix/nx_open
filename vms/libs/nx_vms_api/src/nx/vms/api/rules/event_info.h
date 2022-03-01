@@ -32,3 +32,5 @@ NX_VMS_API_DECLARE_STRUCT(EventInfo)
 QN_FUSION_DECLARE_FUNCTIONS(EventInfo, (json)(ubjson), NX_VMS_API)
 
 } // namespace nx::vms::api::rules
+
+Q_DECLARE_METATYPE(nx::vms::api::rules::EventInfo::State)

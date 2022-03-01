@@ -9,4 +9,14 @@ FilterManifest ServerFailureEvent::filterManifest()
     return {};
 }
 
+const ItemDescriptor& ServerFailureEvent::manifest()
+{
+    static const auto kDescriptor = ItemDescriptor{
+        .id = "nx.events.serverFailure",
+        .displayName = tr("Server Failure"),
+        .description = "",
+    };
+    return kDescriptor;
+}
+
 } // namespace nx::vms::rules

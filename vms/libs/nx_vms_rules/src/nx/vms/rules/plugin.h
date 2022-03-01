@@ -57,13 +57,11 @@ protected:
     }
 
     template<class A>
-    bool registerAction() const
+    bool registerAction(const Engine::ActionConstructor& constructor = [] { return new A(); }) const
     {
         const auto& manifest = A::manifest();
 
-        // TODO: Decide on simultanious manifest and constructor registration.
-        // Action instance may be created by executor.
-        return m_engine->registerAction(manifest, [] { return new A(); });
+        return m_engine->registerAction(manifest, constructor);
     }
 
 protected:

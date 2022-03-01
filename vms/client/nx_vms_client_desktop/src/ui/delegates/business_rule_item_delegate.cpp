@@ -36,8 +36,8 @@
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <nx/vms/client/desktop/utils/server_notification_cache.h>
-#include <nx/vms/client/desktop/vms_rules/event_action_subtype.h>
-#include <nx/vms/client/desktop/vms_rules/nvr_events_actions_access.h>
+#include <nx/vms/client/desktop/rules/event_action_subtype.h>
+#include <nx/vms/client/desktop/rules/nvr_events_actions_access.h>
 
 #include <ui/delegates/select_servers_delegate_editor_button.h>
 #include <ui/delegates/select_cameras_delegate_editor_button.h>

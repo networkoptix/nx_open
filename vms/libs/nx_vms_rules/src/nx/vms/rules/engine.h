@@ -8,6 +8,7 @@
 #include <QList>
 #include <QObject>
 #include <QPointer>
+#include <QSet>
 
 #include <nx/utils/singleton.h>
 
@@ -103,7 +104,7 @@ public:
     bool registerEvent(const ItemDescriptor& descriptor);
 
     /** Map of all the registered events. */
-    const QMap<QString, ItemDescriptor>& registeredEvents() const;
+    const QMap<QString, ItemDescriptor>& events() const;
 
     /**
      * @return Event description by event id if the event is registered, std::nullopt otherwise.
@@ -123,7 +124,7 @@ public:
     bool registerActionConstructor(const QString& id, const ActionConstructor& constructor);
 
     /** Map of all the registered actions. */
-    const QMap<QString, ItemDescriptor>& registeredActions() const;
+    const QMap<QString, ItemDescriptor>& actions() const;
 
     /**
      * @return Action description by event id if the event is registered, std::nullopt otherwise.

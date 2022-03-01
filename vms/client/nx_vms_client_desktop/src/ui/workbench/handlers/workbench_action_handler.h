@@ -54,7 +54,7 @@ class AdvancedUpdateSettingsDialog;
 class SceneBanner;
 class AdvancedSearchDialog;
 
-namespace vms_rules { class VmsRulesDialog; }
+namespace rules { class RulesDialog; }
 
 namespace ui {
 
@@ -295,7 +295,7 @@ private:
     QPointer<QnSystemAdministrationDialog> m_systemAdministrationDialog;
     QPointer<AdvancedUpdateSettingsDialog> m_advancedUpdateSettingsDialog;
     QPointer<AdvancedSearchDialog> m_advancedSearchDialog;
-    QPointer<nx::vms::client::desktop::vms_rules::VmsRulesDialog> m_vmsRulesDialog;
+    QPointer<nx::vms::client::desktop::rules::RulesDialog> m_rulesDialog;
     QPointer<experimental::MainWindow> m_mainWindow;
 
     QQueue<QnMediaResourcePtr> m_layoutExportResources;

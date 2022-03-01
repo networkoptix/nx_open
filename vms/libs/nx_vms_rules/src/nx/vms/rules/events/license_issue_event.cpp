@@ -9,4 +9,14 @@ FilterManifest LicenseIssueEvent::filterManifest()
     return {};
 }
 
+const ItemDescriptor& LicenseIssueEvent::manifest()
+{
+    static const auto kDescriptor = ItemDescriptor{
+        .id = "nx.events.licenseIssue",
+        .displayName = tr("License Issue"),
+        .description = "",
+    };
+    return kDescriptor;
+}
+
 } // namespace nx::vms::rules

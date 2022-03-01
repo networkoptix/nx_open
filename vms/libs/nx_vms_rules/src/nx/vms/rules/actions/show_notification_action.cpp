@@ -2,6 +2,8 @@
 
 #include "show_notification_action.h"
 
+#include "../action_fields/text_with_fields.h"
+
 namespace nx::vms::rules {
 
 QString NotificationAction::caption() const
@@ -22,6 +24,20 @@ QString NotificationAction::description() const
 void NotificationAction::setDescription(const QString& description)
 {
     m_description = description;
+}
+
+const ItemDescriptor& NotificationAction::manifest()
+{
+    static const auto kDescriptor = ItemDescriptor{
+        .id = "nx.actions.desktopNotification",
+        .displayName = tr("Show Notification"),
+        .description = "",
+        .fields = {
+            makeFieldDescriptor<TextWithFields>("caption", tr("Caption")),
+            makeFieldDescriptor<TextWithFields>("description", tr("Description"))
+        }
+    };
+    return kDescriptor;
 }
 
 } // namespace nx::vms::rules

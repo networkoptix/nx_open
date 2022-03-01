@@ -28,6 +28,7 @@ public:
     }
 
     static FilterManifest filterManifest();
+    static const ItemDescriptor& manifest();
 };
 
 } // namespace nx::vms::rules
