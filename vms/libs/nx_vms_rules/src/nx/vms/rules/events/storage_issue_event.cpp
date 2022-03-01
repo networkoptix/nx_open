@@ -9,4 +9,14 @@ FilterManifest StorageIssueEvent::filterManifest()
     return {};
 }
 
+const ItemDescriptor& StorageIssueEvent::manifest()
+{
+    static const auto kDescriptor = ItemDescriptor{
+        .id = "nx.events.storageIssue",
+        .displayName = tr("Storage Issue"),
+        .description = "",
+    };
+    return kDescriptor;
+}
+
 } // namespace nx::vms::rules

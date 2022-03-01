@@ -111,7 +111,7 @@
 #include <nx/vms/client/desktop/utils/mime_data.h>
 #include <nx/vms/client/desktop/utils/parameter_helper.h>
 #include <nx/vms/client/desktop/utils/server_image_cache.h>
-#include <nx/vms/client/desktop/vms_rules/vms_rules_dialog.h>
+#include <nx/vms/client/desktop/rules/rules_dialog.h>
 #include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
 #include <nx/vms/common/html/html.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
@@ -1746,7 +1746,8 @@ void ActionHandler::at_openBusinessRulesAction_triggered()
 
 void ActionHandler::openVmsRulesDialog()
 {
-    QnNonModalDialogConstructor<vms_rules::VmsRulesDialog> dialogConstructor(m_vmsRulesDialog,
+    QnNonModalDialogConstructor<rules::RulesDialog> dialogConstructor(
+        m_rulesDialog,
         mainWindowWidget());
 }
 

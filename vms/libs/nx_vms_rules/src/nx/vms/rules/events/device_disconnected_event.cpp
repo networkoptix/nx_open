@@ -2,11 +2,26 @@
 
 #include "device_disconnected_event.h"
 
+#include "../event_fields/source_camera_field.h"
+
 namespace nx::vms::rules {
 
 FilterManifest DeviceDisconnectedEvent::filterManifest()
 {
     return {};
+}
+
+const ItemDescriptor& DeviceDisconnectedEvent::manifest()
+{
+    static const auto kDescriptor = ItemDescriptor{
+        .id = "nx.events.deviceDisconnected",
+        .displayName = tr("Device Disconnected"),
+        .description = "",
+        .fields = {
+            makeFieldDescriptor<SourceCameraField>("cameraId", tr("Camera ID")),
+        }
+    };
+    return kDescriptor;
 }
 
 } // namespace nx::vms::rules

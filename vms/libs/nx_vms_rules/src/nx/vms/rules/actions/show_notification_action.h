@@ -15,7 +15,7 @@ class NX_VMS_RULES_API NotificationAction: public nx::vms::rules::BasicAction
 
     FIELD(UuidSelection, users, setUsers)
     FIELD(int, interval, setInterval)
-    FIELD(bool, acknowlede, setAcknowledge)
+    FIELD(bool, acknowledge, setAcknowledge)
     Q_PROPERTY(QString caption READ caption WRITE setCaption)
     Q_PROPERTY(QString description READ description WRITE setDescription)
 
@@ -25,6 +25,8 @@ public:
 
     QString description() const;
     void setDescription(const QString& caption);
+
+    static const ItemDescriptor& manifest();
 
 private:
     QString m_caption;

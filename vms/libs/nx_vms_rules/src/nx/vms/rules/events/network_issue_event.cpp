@@ -9,4 +9,14 @@ FilterManifest NetworkIssueEvent::filterManifest()
     return {};
 }
 
+const ItemDescriptor& NetworkIssueEvent::manifest()
+{
+    static const auto kDescriptor = ItemDescriptor{
+        .id = "nx.events.networkIssue",
+        .displayName = tr("Network Issue"),
+        .description = "",
+    };
+    return kDescriptor;
+}
+
 } // namespace nx::vms::rules

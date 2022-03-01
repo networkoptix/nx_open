@@ -9,4 +9,14 @@ FilterManifest DeviceIpConflictEvent::filterManifest()
     return {};
 }
 
+const ItemDescriptor& DeviceIpConflictEvent::manifest()
+{
+    static const auto kDescriptor = ItemDescriptor{
+        .id = "nx.events.deviceIpConflict",
+        .displayName = tr("Device IP Conflict"),
+        .description = "",
+    };
+    return kDescriptor;
+}
+
 } // namespace nx::vms::rules

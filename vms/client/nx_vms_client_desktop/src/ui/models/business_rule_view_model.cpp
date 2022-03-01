@@ -28,10 +28,10 @@
 #include <nx/vms/event/strings_helper.h>
 #include <nx/vms/event/events/events.h>
 #include <nx/vms/event/actions/actions.h>
-#include <nx/vms/client/desktop/vms_rules/helpers/fullscreen_action_helper.h>
-#include <nx/vms/client/desktop/vms_rules/helpers/exit_fullscreen_action_helper.h>
-#include <nx/vms/client/desktop/vms_rules/event_action_subtype.h>
-#include <nx/vms/client/desktop/vms_rules/nvr_events_actions_access.h>
+#include <nx/vms/client/desktop/rules/helpers/fullscreen_action_helper.h>
+#include <nx/vms/client/desktop/rules/helpers/exit_fullscreen_action_helper.h>
+#include <nx/vms/client/desktop/rules/event_action_subtype.h>
+#include <nx/vms/client/desktop/rules/nvr_events_actions_access.h>
 
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 

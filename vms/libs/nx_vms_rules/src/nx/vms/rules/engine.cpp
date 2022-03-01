@@ -170,7 +170,7 @@ bool Engine::registerEvent(const ItemDescriptor& descriptor)
     return true;
 }
 
-const QMap<QString, ItemDescriptor>& Engine::registeredEvents() const
+const QMap<QString, ItemDescriptor>& Engine::events() const
 {
     return m_eventDescriptors;
 }
@@ -245,7 +245,7 @@ bool Engine::registerActionConstructor(const QString& id, const ActionConstructo
     return true;
 }
 
-const QMap<QString, ItemDescriptor>& Engine::registeredActions() const
+const QMap<QString, ItemDescriptor>& Engine::actions() const
 {
     return m_actionDescriptors;
 }
@@ -351,6 +351,8 @@ api::Rule Engine::serialize(const Rule* rule) const
     NX_ASSERT(rule);
 
     api::Rule result;
+
+    result.id = rule->id();
 
     for (auto filter: rule->eventFilters())
     {

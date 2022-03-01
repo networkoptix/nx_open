@@ -35,7 +35,7 @@
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
-#include <nx/vms/client/desktop/vms_rules/nvr_events_actions_access.h>
+#include <nx/vms/client/desktop/rules/nvr_events_actions_access.h>
 
 #include <ui/utils/table_export_helper.h>
 #include <ui/help/help_topic_accessor.h>

@@ -27,7 +27,7 @@
 #include <nx/vms/client/desktop/event_search/models/event_search_list_model.h>
 #include <nx/vms/client/desktop/event_search/utils/common_object_search_setup.h>
 #include <nx/vms/client/desktop/utils/widget_utils.h>
-#include <nx/vms/client/desktop/vms_rules/nvr_events_actions_access.h>
+#include <nx/vms/client/desktop/rules/nvr_events_actions_access.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/strings_helper.h>
 
