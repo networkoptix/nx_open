@@ -35,7 +35,7 @@ QString filterRepresentation(const QString& filter, Qn::TimePeriodContent dataTy
 QString periodsLogString(const QnTimePeriodList& periodList, int count = 100)
 {
     QStringList result;
-    int index = std::max(periodList.size() - count, 0);
+    int index = std::max((int) periodList.size() - count, 0);
     for (int i = index; i < periodList.size(); ++i)
         result.append(
             nx::format(

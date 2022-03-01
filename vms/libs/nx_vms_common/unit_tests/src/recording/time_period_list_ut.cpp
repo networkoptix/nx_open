@@ -30,6 +30,12 @@ static const  int kBigListIterations = 1000;
 
 } // namespace
 
+QnTimePeriodList& operator<<(QnTimePeriodList& list, const QnTimePeriod& period)
+{
+    list.push_back(period);
+    return list;
+}
+
 void PrintTo(const QnTimePeriodList& periodList, ::std::ostream* os)
 {
     const QString fmt = "{%1 - %2} ";

@@ -3,7 +3,7 @@
 #ifndef QN_TIME_PERIOD_LIST_H
 #define QN_TIME_PERIOD_LIST_H
 
-//#define QN_TIME_PERIODS_STD
+#define QN_TIME_PERIODS_STD
 
 #ifdef QN_TIME_PERIODS_STD
 #include <vector>
@@ -14,8 +14,6 @@
 #include "time_period.h"
 #include <nx/utils/uuid.h>
 #include <nx/utils/log/assert.h>
-
-class QnTimePeriodListTimeIterator;
 
 /**
  * A sorted list of time periods that basically is an implementation of
@@ -262,7 +260,7 @@ QnTimePeriodList timePeriodListFromRange(
     if (sortOrder == Qt::DescendingOrder)
         std::reverse(result.begin(), result.end());
 
-    while (result.size() > limit)
+    while ((int) result.size() > limit)
         result.pop_back();
 
     return result;

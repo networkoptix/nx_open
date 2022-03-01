@@ -6,7 +6,7 @@
 #include <utils/math/math.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/compressed_time_functions.h>
-#include <nx/network/socket_common.h>
+#include <nx/network/socket_common.h> //< For htonll().
 #include <nx/utils/datetime.h>
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(MultiServerPeriodData,
@@ -19,7 +19,7 @@ static const qint64 InvalidValue = std::numeric_limits<qint64>::max();
 } // namespace
 
 QnTimePeriodList::QnTimePeriodList(const QnTimePeriod &singlePeriod):
-    base_type()
+    QnTimePeriodList()
 {
     push_back(singlePeriod);
 }
@@ -133,7 +133,7 @@ QnTimePeriodList QnTimePeriodList::intersected(const QnTimePeriodList& other) co
             continue;
         }
 
-        result.append(intersection);
+        result.push_back(intersection);
         if (first->endTime() < second->endTime())
             ++first;
         else if (second->endTime() < first->endTime())
@@ -400,7 +400,7 @@ QnTimePeriodList QnTimePeriodList::intersection(
         }
         else
         {
-            result << intersected;
+            result.push_back(intersected);
             if (firstIt->endTime() < secondIt->endTime())
                 ++firstIt;
             else
@@ -500,7 +500,7 @@ void QnTimePeriodList::excludeTimePeriods(const QnTimePeriodList& periodList)
     {
         if (subtrahendItr == periodList.cend())
         {
-            result << *srcItr;
+            result.push_back(*srcItr);
             ++srcItr;
             continue;
         }
@@ -526,22 +526,22 @@ void QnTimePeriodList::excludeTimePeriods(const QnTimePeriodList& periodList)
                 ++subtrahendItr;
 
                 if (subtrahendItr == periodList.cend())
-                    result << current;
+                    result.push_back(current);
 
                 continue;
             }
 
             if (current.isRightIntersection(*subtrahendItr))
             {
-                result << current.truncated(subtrahendItr->startTimeMs);
+                result.push_back(current.truncated(subtrahendItr->startTimeMs));
                 break;
             }
 
             if (current.contains(*subtrahendItr))
             {
-                result << QnTimePeriod::fromInterval(
+                result.push_back(QnTimePeriod::fromInterval(
                     current.startTimeMs,
-                    subtrahendItr->startTimeMs);
+                    subtrahendItr->startTimeMs));
 
                 current = QnTimePeriod::fromInterval(
                     subtrahendItr->endTimeMs(),
@@ -550,12 +550,12 @@ void QnTimePeriodList::excludeTimePeriods(const QnTimePeriodList& periodList)
                 ++subtrahendItr;
 
                 if (subtrahendItr == periodList.cend())
-                    result << current;
+                    result.push_back(current);
 
                 continue;
             }
 
-            result << current;
+            result.push_back(current);
             break;
         }
 
