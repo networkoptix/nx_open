@@ -34,6 +34,7 @@ extern "C" {
 #include "gl_renderer.h"
 
 using namespace std::chrono;
+using namespace nx::vms::client::desktop;
 
 
 static const double FPS_EPS = 1e-6;
@@ -441,6 +442,9 @@ void QnVideoStreamDisplay::flushReverseBlock(
 QnVideoStreamDisplay::FrameDisplayStatus QnVideoStreamDisplay::display(
     QnCompressedVideoDataPtr data, bool draw, QnFrameScaler::DownscaleFactor forceScaleFactor)
 {
+    if (ini().disableVideoRendering)
+        return Status_Displayed;
+
     {
         //  Clear previos frame, since decoder clear it on decode call
         NX_MUTEX_LOCKER lock(&m_mtx);
