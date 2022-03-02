@@ -841,7 +841,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createCloudOtherSystemsEntity() con
             return m_itemFactory->createCloudSystemItem(systemId);
         };
 
-    auto cameraListCreator = 
+    auto cameraListCreator =
         [this](const QString& systemId) -> AbstractEntityPtr
         {
             return createCloudSystemCamerasEntity(systemId);
@@ -851,7 +851,7 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createCloudOtherSystemsEntity() con
     {
         auto cloudSystemsEntity =
             makeUniqueKeyGroupList<QString>(systemItemCreator, cameraListCreator, numericOrder());
-        
+
         cloudSystemsEntity->installItemSource(m_itemKeySourcePool->cloudSystemsSource());
         return cloudSystemsEntity;
     }
@@ -865,8 +865,8 @@ AbstractEntityPtr ResourceTreeEntityBuilder::createCloudOtherSystemsEntity() con
 
 AbstractEntityPtr ResourceTreeEntityBuilder::createCloudSystemCamerasEntity(
     const QString& systemId) const
-{      
-    auto itemCreator = 
+{
+    auto itemCreator =
         [this](const QString& camera)
         {
             return m_itemFactory->createCloudCameraItem(camera);

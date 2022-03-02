@@ -120,6 +120,49 @@ InvalidatorPtr userRoleNameInvalidator(QnUserRolesManager* rolesManager, const Q
     return result;
 }
 
+//-------------------------------------------------------------------------------------------------
+// Icon data provider / invalidator and flags provider factory functions for the cloud system item.
+//-------------------------------------------------------------------------------------------------
+GenericItem::DataProvider cloudSystemIconProvider(const QnSystemDescriptionPtr& systemDescription)
+{
+    return
+        [weakSystemDescription = systemDescription.toWeakRef()]
+        {
+            if (auto systemDescription = weakSystemDescription.lock())
+            {
+                if (systemDescription->isReachable() && systemDescription->isOnline())
+                    return static_cast<int>(QnResourceIconCache::CloudSystem);
+            }
+            return static_cast<int>(QnResourceIconCache::CloudSystem | QnResourceIconCache::ReadOnly);
+        };
+}
+
+InvalidatorPtr cloudSystemIconInvalidator(const QnSystemDescriptionPtr& systemDescription)
+{
+    auto result = std::make_shared<Invalidator>();
+
+    result->connections()->add(systemDescription->connect(
+        systemDescription.get(),
+        &QnBaseSystemDescription::onlineStateChanged,
+        [invalidator = result.get()] { invalidator->invalidate(); }));
+
+    return result;
+}
+
+GenericItem::FlagsProvider cloudSystemFlagsProvider(const QnSystemDescriptionPtr& systemDescription)
+{
+    return
+        [weakSystemDescription = systemDescription.toWeakRef()]
+        {
+            if (auto systemDescription = weakSystemDescription.lock())
+            {
+                if (systemDescription->isReachable() && systemDescription->isOnline())
+                    return Qt::ItemIsSelectable, Qt::ItemIsEnabled;
+            }
+            return Qt::ItemIsSelectable;
+        };
+}
+
 } // namespace
 
 namespace nx::vms::client::desktop {
@@ -365,12 +408,16 @@ AbstractItemPtr ResourceTreeItemFactory::createCloudSystemItem(const QString& sy
     if (!NX_ASSERT(systemDescription && systemDescription->isCloudSystem()))
         return {};
 
+    const auto iconProvider = cloudSystemIconProvider(systemDescription);
+    const auto iconInvalidator = cloudSystemIconInvalidator(systemDescription);
+
     return GenericItemBuilder()
         .withRole(Qt::DisplayRole, systemDescription->name())
-        .withRole(Qn::ResourceIconKeyRole, static_cast<int>(IconCache::CloudSystem))
+        .withRole(Qn::ResourceIconKeyRole, iconProvider, iconInvalidator)
         .withRole(Qn::CloudSystemIdRole, systemId)
         .withRole(Qn::NodeTypeRole, QVariant::fromValue(NodeType::cloudSystem))
-        .withRole(Qn::HelpTopicIdRole, static_cast<int>(Qn::OtherSystems_Help));
+        .withRole(Qn::HelpTopicIdRole, static_cast<int>(Qn::OtherSystems_Help))
+        .withFlags(cloudSystemFlagsProvider(systemDescription));
 }
 
 AbstractItemPtr ResourceTreeItemFactory::createCloudCameraItem(const QString& id)
