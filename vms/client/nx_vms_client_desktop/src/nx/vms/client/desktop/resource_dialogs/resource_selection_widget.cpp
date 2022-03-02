@@ -162,9 +162,7 @@ ResourceSelectionWidget::ResourceSelectionWidget(
 {
     const auto checkboxColumn = columnCount - 1;
 
-    resourceViewWidget()->setItemDelegateForColumn(
-        resource_selection_view::ResourceColumn, new ResourceDialogItemDelegate(this));
-
+    resourceViewWidget()->setItemDelegate(new ResourceDialogItemDelegate(this));
     resourceViewWidget()->setItemDelegateForColumn(checkboxColumn,
         new CheckBoxColumnItemDelegate(this));
 
