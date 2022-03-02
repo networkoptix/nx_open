@@ -1202,21 +1202,124 @@ std::string join(
 //-------------------------------------------------------------------------------------------------
 
 /**
- * E.g., reverseWords("test.example.com", '.') returns "com.example.test".
+ * Reverses words separated by the given separator.
+ * No empty words (trailing or inside) are omitted.
+ */
+template<typename CharType, typename Separator>
+void reverseWordsInplace(
+    CharType* str,
+    std::size_t size,
+    Separator separator)
+{
+    std::reverse(str, str + size);
+    std::size_t prevWordStart = 0;
+    for (std::size_t i = 0; i < size; ++i)
+    {
+        if (str[i] == separator)
+        {
+            if (i > prevWordStart)
+                std::reverse(str + prevWordStart, str + i);
+            prevWordStart = i + 1;
+        }
+    }
+
+    if (prevWordStart < size)
+        std::reverse(str + prevWordStart, str + size);
+}
+
+/**
+ * Reverses words separated by the given separator.
+ * No empty words (trailing or inside) are omitted.
  */
 template<
     template<typename...> class String, typename CharType,
-    typename Separator>
-std::basic_string<CharType> reverseWords(
-    const String<CharType>& str,
-    Separator separator)
+    typename Separator
+>
+requires std::is_same_v<CharType*, decltype(std::declval<String<CharType>>().data())>
+void reverseWordsInplace(String<CharType>& str, Separator separator)
 {
-    std::vector<std::basic_string_view<CharType>> tokens;
-    split(str, separator, std::back_inserter(tokens), GroupToken::none, SplitterFlag::noFlags);
-    return join(tokens.rbegin(), tokens.rend(), separator);
+    reverseWordsInplace(str.data(), str.size(), separator);
 }
 
-// TODO: #akolesnikov Provide inplace version of reverseWords since output has the same size as input.
+/**
+ * E.g., reverseWords("test.example.com", '.') returns "com.example.test".
+ * Note: empty words are not removed.
+ * E.g., reverseWords(".test.example...com", '.') produces "com...example.test."
+ */
+template<
+    template<typename...> class String, typename CharType,
+    typename Separator
+>
+std::basic_string<CharType> reverseWords(String<CharType> str, Separator separator)
+{
+    std::basic_string<CharType> reversed(std::move(str));
+    reverseWordsInplace(reversed, separator);
+    return reversed;
+}
+
+//-------------------------------------------------------------------------------------------------
+
+/**
+ * Remove excess separators between words in the string. This includes preceding, trailing
+ * and embedded separators.
+ * E.g., removeExcessSeparators("   Hello  world ", ' ') is turned into "Hello world".
+ * @return New str size.
+ */
+template<typename CharType, typename Separator>
+std::size_t removeExcessSeparatorsInplace(
+    CharType* s,
+    std::size_t size,
+    Separator separator)
+{
+    std::size_t newSize = 0;
+    CharType prevCh = separator;
+    for (std::size_t i = 0; i < size; ++i)
+    {
+        if (s[i] == separator && prevCh == separator)
+            continue; // Skipping extra separator.
+        prevCh = s[i];
+        s[newSize++] = s[i];
+    }
+    if (s[newSize - 1] == separator)
+        --newSize;
+
+    return newSize;
+}
+
+/**
+ * Remove excess separators between words in the string. This includes preceding, trailing
+ * and embedded separators.
+ * E.g., removeExcessSeparators("   Hello  world ", ' ') is turned into "Hello world".
+ */
+template<
+    template<typename...> class String, typename CharType,
+    typename Separator
+>
+requires std::is_same_v<CharType*, decltype(std::declval<String<CharType>>().data())>
+void removeExcessSeparatorsInplace(String<CharType>& str, Separator separator)
+{
+    auto newSize = removeExcessSeparatorsInplace(str.data(), str.size(), separator);
+    str.resize(newSize);
+}
+
+template<template<typename...> class String, typename CharType, typename Separator>
+void removeExcessSeparatorsInplace(String<CharType>&&, Separator separator) = delete;
+
+/**
+ * Remove excess separators between words in the string. This includes preceding, trailing
+ * and embedded separators.
+ * E.g., removeExcessSeparators("   Hello  world ", ' ') is turned into "Hello world".
+ */
+template<
+    template<typename...> class String, typename CharType,
+    typename Separator
+>
+std::basic_string<CharType> removeExcessSeparators(String<CharType> str, Separator separator)
+{
+    std::basic_string<CharType> result(std::move(str));
+    removeExcessSeparatorsInplace(result, separator);
+    return result;
+}
 
 //-------------------------------------------------------------------------------------------------
 

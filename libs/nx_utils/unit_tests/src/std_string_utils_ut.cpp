@@ -509,8 +509,11 @@ TEST(String, stricmp)
 TEST(StringReverseWords, common)
 {
     ASSERT_EQ("com.domain.test", reverseWords(std::string_view("test.domain.com"), '.'));
+    ASSERT_EQ(".com...example.test.", reverseWords(std::string_view(".test.example...com."), '.'));
     ASSERT_EQ(".com", reverseWords(std::string_view("com."), '.'));
     ASSERT_EQ("com.", reverseWords(std::string_view(".com"), '.'));
+    ASSERT_EQ(".", reverseWords(std::string_view("."), '.'));
+    ASSERT_EQ("", reverseWords(std::string_view(""), '.'));
 }
 
 TEST(StringReverseWords, empty_string)
@@ -527,6 +530,18 @@ TEST(StringReverseWords, only_separators)
 {
     ASSERT_EQ("...", reverseWords(std::string_view("..."), '.'));
     ASSERT_EQ(".", reverseWords(std::string_view("."), '.'));
+}
+
+//-------------------------------------------------------------------------------------------------
+// reverseWords
+
+TEST(StringRemoveExcessSeparators, common)
+{
+    ASSERT_EQ("Hello world", removeExcessSeparators(std::string_view("   Hello  world "), ' '));
+    ASSERT_EQ("Hello world", removeExcessSeparators(std::string_view("Hello world"), ' '));
+    ASSERT_EQ("", removeExcessSeparators(std::string_view(""), ' '));
+    ASSERT_EQ("", removeExcessSeparators(std::string_view(" "), ' '));
+    ASSERT_EQ("", removeExcessSeparators(std::string_view("  "), ' '));
 }
 
 //-------------------------------------------------------------------------------------------------

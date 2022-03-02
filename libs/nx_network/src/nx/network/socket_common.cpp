@@ -481,20 +481,10 @@ SocketAddress::SocketAddress(const HostAddress& address, quint16 port):
 
 SocketAddress::SocketAddress(const std::string_view& str)
 {
-    const auto [tokens, count] = nx::utils::split_n<3>(
-        str, ':',
-        nx::utils::GroupToken::squareBrackets, nx::utils::SplitterFlag::noFlags);
-    if (count > 2)
-    {
-        // IPv6 address with no brackets.
-        address = HostAddress(str);
-        return;
-    }
-
-    if (count >= 1)
-        address = HostAddress(trimIpV6(tokens[0]));
-    if (count >= 2)
-        port = nx::utils::stoi(tokens[1]);
+    const auto [hostStr, parsedPort] = split(str);
+    address = HostAddress(hostStr);
+    if (parsedPort)
+        port = *parsedPort;
 
     NX_ASSERT_HEAVY_CONDITION(!toString().empty());
 }
@@ -593,6 +583,30 @@ SocketAddress SocketAddress::fromUrl(const nx::utils::Url& url)
         return {};
 
     return {url.host().toStdString(), quint16(url.port(0))};
+}
+
+std::pair<std::string_view, std::optional<int>> SocketAddress::split(
+    const std::string_view& str)
+{
+    const auto [tokens, count] = nx::utils::split_n<3>(
+        str, ':',
+        nx::utils::GroupToken::squareBrackets, nx::utils::SplitterFlag::noFlags);
+    if (count > 2) // IPv6 address with no brackets?
+        return {str, std::nullopt};
+
+    std::pair<std::string_view, std::optional<int>> result;
+    if (count >= 1)
+        result.first = trimIpV6(tokens[0]);
+    if (count >= 2)
+        result.second = nx::utils::stoi(tokens[1]);
+
+    return result;
+}
+
+std::pair<std::string_view, std::optional<int>> SocketAddress::split(const std::string& str)
+{
+    const std::string_view view(str.data(), str.size());
+    return split(view);
 }
 
 void PrintTo(const SocketAddress& val, ::std::ostream* os)
