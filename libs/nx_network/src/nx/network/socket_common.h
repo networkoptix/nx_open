@@ -243,6 +243,19 @@ public:
     static std::string_view trimIpV6(const std::string_view& str);
     static SocketAddress fromString(const std::string_view& str);
     static SocketAddress fromUrl(const nx::utils::Url& url);
+
+    /**
+     * Split host:port string to host and port. Port is optional.
+     * host may be a domain name or a IPv4/IPv6 address.
+     * Ipv6 address MUST be enclosed in squeare brackets if port is specified.
+     * E.g., [ipv6]:port.
+     * @return pair<host, port (if present)>.
+     */
+    static std::pair<std::string_view, std::optional<int>> split(const std::string_view& str);
+    static std::pair<std::string_view, std::optional<int>> split(std::string_view&& str) = delete;
+
+    static std::pair<std::string_view, std::optional<int>> split(const std::string& str);
+    static std::pair<std::string_view, std::optional<int>> split(std::string&& str) = delete;
 };
 
 // TODO: #akolesnikov Remove this function.
