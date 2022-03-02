@@ -140,11 +140,14 @@ void QnAccessibleMediaWidget::applyChanges()
         accessibleResources);
     auto newFiltered = checkedResources();
 
-    accessibleResources.subtract(oldFiltered);
-    accessibleResources.unite(newFiltered);
-    m_permissionsModel->setAccessibleResources(accessibleResources);
-
     GlobalPermissions permissions = m_permissionsModel->rawPermissions();
     permissions.setFlag(GlobalPermission::accessAllMedia, allCamerasItemChecked());
     m_permissionsModel->setRawPermissions(permissions);
+
+    if (!allCamerasItemChecked())
+    {
+        accessibleResources.subtract(oldFiltered);
+        accessibleResources.unite(newFiltered);
+        m_permissionsModel->setAccessibleResources(accessibleResources);
+    }
 }
