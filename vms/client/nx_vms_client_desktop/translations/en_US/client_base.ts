@@ -1582,33 +1582,6 @@
     </message>
 </context>
 <context>
-    <name>PtzOverlayWidget</name>
-    <message>
-        <source>Zoom In</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Zoom Out</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Focus Far</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Focus Near</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Auto Focus</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Change Dewarping Mode</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>QWebEnginePage</name>
     <message>
         <source>Are you sure you want to leave this page? Changes that you made may not be saved.</source>
@@ -7568,10 +7541,6 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
         <source>Select Camera</source>
         <translation></translation>
-    </message>
-    <message>
-        <source>You do not have any cameras</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
