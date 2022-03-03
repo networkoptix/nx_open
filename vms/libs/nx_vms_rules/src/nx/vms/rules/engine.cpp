@@ -422,6 +422,8 @@ std::unique_ptr<EventFilter> Engine::buildEventFilter(const ItemDescriptor& desc
             return nullptr;
         }
 
+        field->setProperties(fieldDescriptor.properties);
+
         filter->addField(fieldDescriptor.fieldName, std::move(field));
     }
 
@@ -534,6 +536,8 @@ std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const ItemDescriptor& 
 
             return nullptr;
         }
+
+        field->setProperties(fieldDescriptor.properties);
 
         builder->addField(fieldDescriptor.fieldName, std::move(field));
     }

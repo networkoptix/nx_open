@@ -29,6 +29,12 @@ public:
 
     QMap<QString, QJsonValue> serializedProperties() const;
 
+    /**
+     * Set field properties.
+     * @return Whether all the properties is set successfully.
+     */
+    bool setProperties(const QVariantMap& properties);
+
     bool event(QEvent* ev) override;
 
 signals:

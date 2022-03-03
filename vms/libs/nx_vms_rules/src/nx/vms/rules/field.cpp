@@ -85,6 +85,21 @@ QMap<QString, QJsonValue> Field::serializedProperties() const
     return serialized;
 }
 
+bool Field::setProperties(const QVariantMap& properties)
+{
+    bool isAllPropertiesSet = true;
+    std::for_each(properties.constKeyValueBegin(), properties.constKeyValueEnd(),
+        [this, &isAllPropertiesSet](const std::pair<QString, QVariant>& p){
+            if (!setProperty(p.first.toUtf8(), p.second))
+            {
+                NX_ERROR(this, "Failed to set property %1 for the %2 field", p.first, metatype());
+                isAllPropertiesSet = false;
+            }
+        });
+
+    return isAllPropertiesSet;
+}
+
 bool Field::event(QEvent* ev)
 {
     if (m_connected && ev->type() == QEvent::DynamicPropertyChange)
