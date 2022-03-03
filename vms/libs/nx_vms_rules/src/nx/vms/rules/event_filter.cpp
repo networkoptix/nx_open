@@ -9,6 +9,7 @@
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QVariant>
 
+#include "basic_event.h"
 #include "event_field.h"
 
 namespace nx::vms::rules {

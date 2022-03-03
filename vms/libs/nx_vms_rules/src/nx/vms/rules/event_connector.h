@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include <QObject>
+#include <QtCore/QObject>
 
-#include "basic_event.h"
+#include "rules_fwd.h"
 
 namespace nx::vms::rules {
 

@@ -6,6 +6,7 @@
 
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/manifest.h>
 #include <ui/common/palette.h>
 
 namespace nx::vms::client::desktop::rules {

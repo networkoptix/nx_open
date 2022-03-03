@@ -7,6 +7,7 @@
 #include <nx/utils/log/assert.h>
 
 #include "engine.h"
+#include "field.h"
 
 namespace nx::vms::rules {
 

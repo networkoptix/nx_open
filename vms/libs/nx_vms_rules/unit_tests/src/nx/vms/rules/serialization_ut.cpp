@@ -26,6 +26,7 @@ TEST(VmsRulesSerialization, EventField)
     field->string = "test string";
     field->strings << "string 1" << "string 2";
     field->flag = true;
+    field->number = 42;
 
     static const auto kFieldName = "test";
     nx::vms::rules::EventFilter filter(QnUuid::createUuid(), "nx.events.test");
@@ -53,6 +54,7 @@ TEST(VmsRulesSerialization, EventField)
     EXPECT_EQ(sourceField->string, resultField->string);
     EXPECT_EQ(sourceField->strings, resultField->strings);
     EXPECT_EQ(sourceField->flag, resultField->flag);
+    EXPECT_EQ(sourceField->number, resultField->number);
 }
 
 } // namespace nx::vms::rules::test

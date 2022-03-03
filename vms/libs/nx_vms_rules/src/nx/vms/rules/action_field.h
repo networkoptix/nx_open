@@ -4,9 +4,6 @@
 
 #include <QtCore/QSet>
 
-#include <nx/utils/uuid.h>
-
-#include "basic_event.h" // EventPtr
 #include "field.h"
 
 namespace nx::vms::rules {

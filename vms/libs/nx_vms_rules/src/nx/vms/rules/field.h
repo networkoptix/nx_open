@@ -6,6 +6,7 @@
 #include <QtCore/QObject>
 
 #include "field_types.h"
+#include "rules_fwd.h"
 
 namespace nx::vms::rules {
 

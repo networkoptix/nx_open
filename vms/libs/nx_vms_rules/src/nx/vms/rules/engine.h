@@ -5,17 +5,15 @@
 #include <memory>
 #include <unordered_map>
 
-#include <QList>
-#include <QObject>
-#include <QPointer>
-#include <QSet>
+#include <QtCore/QList>
+#include <QtCore/QMap>
+#include <QtCore/QObject>
+#include <QtCore/QPointer>
 
 #include <nx/utils/singleton.h>
+#include <nx/utils/uuid.h>
 
-#include "basic_event.h"
-#include "basic_action.h"
-#include "router.h"
-#include "rule.h"
+#include "rules_fwd.h"
 
 namespace nx::vms::api::rules {
     struct ActionBuilder;
@@ -25,20 +23,6 @@ namespace nx::vms::api::rules {
 } // namespace nx::vms::api::rules
 
 namespace nx::vms::rules {
-
-class EventField;
-class ActionField;
-
-class EventConnector;
-class ActionExecutor;
-
-class BasicAction;
-
-class ActionBuilder;
-class EventFilter;
-
-struct FieldDescriptor;
-struct ItemDescriptor;
 
 namespace api = ::nx::vms::api::rules;
 

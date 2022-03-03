@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <nx/utils/uuid.h>
-
 #include "field.h"
 
 namespace nx::vms::rules {
