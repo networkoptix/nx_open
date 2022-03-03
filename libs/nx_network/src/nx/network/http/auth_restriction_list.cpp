@@ -73,6 +73,18 @@ void AuthMethodRestrictionList::deny(
     deny(filter, method);
 }
 
+void AuthMethodRestrictionList::backupDeniedRulesForTests()
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_deniedBackup = m_denied;
+}
+
+void AuthMethodRestrictionList::restoreDeniedRulesForTests()
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    m_denied = std::move(m_deniedBackup);
+}
+
 //-------------------------------------------------------------------------------------------------
 
 AuthMethodRestrictionList::Rule::Rule(

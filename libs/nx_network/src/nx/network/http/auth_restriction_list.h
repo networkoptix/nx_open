@@ -98,6 +98,9 @@ public:
      */
     void deny(const std::string& pathMask, AuthMethod::Values method);
 
+    void backupDeniedRulesForTests();
+    void restoreDeniedRulesForTests();
+
 private:
     struct Rule
     {
@@ -115,6 +118,7 @@ private:
     mutable nx::Mutex m_mutex;
     std::vector<Rule> m_allowed;
     std::vector<Rule> m_denied;
+    std::vector<Rule> m_deniedBackup;
 };
 
 } // namespace nx::network::http
