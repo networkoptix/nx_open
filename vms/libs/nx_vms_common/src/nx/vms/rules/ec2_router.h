@@ -6,6 +6,8 @@
 
 class QnCommonModule;
 
+namespace nx::vms::api::rules { struct EventInfo; }
+
 namespace nx::vms::rules {
 
 class Ec2Router: public Router

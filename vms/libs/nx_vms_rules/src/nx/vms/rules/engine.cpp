@@ -12,11 +12,15 @@
 #include "action_builder.h"
 #include "action_executor.h"
 #include "action_field.h"
+#include "basic_action.h"
+#include "basic_event.h"
 #include "event_connector.h"
 #include "event_field.h"
 #include "event_filter.h"
 #include "manifest.h"
 #include "router.h"
+#include "rule.h"
+#include "utils/serialization.h"
 
 template<> nx::vms::rules::Engine* Singleton<nx::vms::rules::Engine>::s_instance = nullptr;
 
@@ -547,47 +551,11 @@ std::unique_ptr<ActionBuilder> Engine::buildActionBuilder(const ItemDescriptor& 
 
 std::unique_ptr<EventField> Engine::buildEventField(const api::Field& serialized) const
 {
-    const auto& type = serialized.metatype;
-    const auto& ctor = m_eventFields.value(type);
-    if (!ctor)
-        return nullptr; // TODO: #spanasenko Default field type
+    auto field = buildEventField(serialized.metatype);
+    if (!field)
+        return nullptr;
 
-    std::unique_ptr<EventField> field(ctor());
-    if (!NX_ASSERT(field))
-        return nullptr; // Should be unreachable.
-
-    auto meta = field->metaObject();
-    for (auto it = serialized.props.begin(); it != serialized.props.end(); ++it)
-    {
-        const auto& propName = it.key();
-        const auto& propValue = it.value();
-        auto propIndex = meta->indexOfProperty(propName.toUtf8());
-        if (!NX_ASSERT(propIndex >= 0, "Absent property %1", propName))
-            continue;
-
-        auto prop = meta->property(propIndex);
-        auto userType = prop.userType();
-        if (!NX_ASSERT(
-            userType != QMetaType::UnknownType,
-            "Unregistered prop type: %1",
-            prop.typeName()))
-        {
-            continue;
-        }
-
-        auto serializer = QnJsonSerializer::serializer(userType);
-        if (!NX_ASSERT(serializer, "Unregistered serializer for prop type: %1", prop.typeName()))
-            continue;
-
-        QnJsonContext ctx;
-        QVariant propVariant;
-
-        serializer->deserialize(&ctx, propValue, &propVariant);
-
-        // TODO: #spanasenko Check manifested names.
-        if (NX_ASSERT(propVariant.isValid()))
-            prop.write(field.get(), propVariant);
-    }
+    deserializeProperties(serialized.props, field.get());
 
     return field;
 }
@@ -614,14 +582,7 @@ std::unique_ptr<EventField> Engine::buildEventField(const QString& fieldType) co
 
 std::unique_ptr<ActionField> Engine::buildActionField(const api::Field& serialized) const
 {
-    const auto& type = serialized.metatype;
-    const auto& ctor = m_actionFields.value(type);
-    if (!ctor)
-        return nullptr; // TODO: #spanasenko Default field type
-
-    std::unique_ptr<ActionField> field(ctor());
-    if (!field)
-        return nullptr; // Should be unreachable.
+    auto field = buildActionField(serialized.metatype);
 
     for (auto it = serialized.props.begin(); it != serialized.props.end(); ++it)
     {

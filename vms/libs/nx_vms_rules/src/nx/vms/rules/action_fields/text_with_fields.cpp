@@ -2,7 +2,10 @@
 
 #include "text_with_fields.h"
 
+#include <nx/utils/log/assert.h>
+
 #include "../engine.h"
+#include "../manifest.h"
 
 namespace nx::vms::rules {
 

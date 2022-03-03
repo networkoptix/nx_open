@@ -2,10 +2,10 @@
 
 #pragma once
 
+#include <chrono>
+
 #include <QtCore/QObject>
 #include <QtCore/QSharedPointer>
-
-#include <chrono>
 
 #include <nx/vms/api/rules/event_info.h>
 
@@ -40,7 +40,5 @@ protected:
 private:
     //QString m_type;
 };
-
-using ActionPtr = QSharedPointer<BasicAction>;
 
 } // namespace nx::vms::rules

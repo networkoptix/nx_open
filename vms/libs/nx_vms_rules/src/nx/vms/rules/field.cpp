@@ -4,11 +4,12 @@
 
 #include <QDebug>
 #include <QEvent>
-#include <QJsonValue>
 #include <QMetaProperty>
 #include <QScopedValueRollback>
 
 #include <nx/fusion/serialization/json.h>
+
+#include "utils/serialization.h"
 
 namespace nx::vms::rules {
 
@@ -48,41 +49,7 @@ void Field::connectSignals()
 
 QMap<QString, QJsonValue> Field::serializedProperties() const
 {
-    QMap<QString, QJsonValue> serialized;
-    auto meta = metaObject();
-
-    for (int i = base_type::staticMetaObject.propertyCount(); i < meta->propertyCount(); ++i)
-    {
-        auto prop = meta->property(i);
-        auto userType = prop.userType();
-
-        if (!NX_ASSERT(
-            userType != QMetaType::UnknownType,
-            "Unregistered prop type: %1",
-            prop.typeName()))
-        {
-            continue;
-        }
-
-        auto serializer = QnJsonSerializer::serializer(prop.userType());
-        if (!NX_ASSERT(serializer, "Unregistered serializer for prop type: %1", prop.typeName()))
-            continue;
-
-        QJsonValue jsonValue;
-        QnJsonContext ctx;
-
-        serializer->serialize(&ctx, prop.read(this), &jsonValue);
-
-        if (NX_ASSERT(!jsonValue.isUndefined()))
-            serialized.insert(prop.name(), std::move(jsonValue));
-    }
-
-    for (const auto& propName: this->dynamicPropertyNames())
-    {
-        serialized.insert(propName, this->property(propName).toJsonValue());
-    }
-
-    return serialized;
+    return serializeProperties(this);
 }
 
 bool Field::setProperties(const QVariantMap& properties)

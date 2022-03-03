@@ -5,13 +5,12 @@
 #include <map>
 #include <memory>
 
-#include <QObject>
-#include <QTimer>
+#include <QtCore/QObject>
+#include <QtCore/QTimer>
 
 #include <nx/utils/uuid.h>
 
-#include "basic_action.h"
-#include "basic_event.h" // EventPtr
+#include "rules_fwd.h"
 
 namespace nx::vms::rules {
 

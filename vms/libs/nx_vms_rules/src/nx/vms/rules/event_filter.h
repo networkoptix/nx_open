@@ -5,9 +5,11 @@
 #include <map>
 #include <memory>
 
-#include <QObject>
+#include <QtCore/QObject>
 
-#include "basic_event.h"
+#include <nx/utils/uuid.h>
+
+#include "rules_fwd.h"
 
 namespace nx::vms::rules {
 

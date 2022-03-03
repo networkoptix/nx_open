@@ -7,6 +7,7 @@
 #include <QtCore/QVariant>
 
 #include "action_field.h"
+#include "basic_action.h"
 
 namespace nx::vms::rules {
 

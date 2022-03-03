@@ -18,6 +18,7 @@ class TestEventField: public nx::vms::rules::EventField
     Q_PROPERTY(QString string MEMBER string)
     Q_PROPERTY(QStringList strings MEMBER strings)
     Q_PROPERTY(bool flag MEMBER flag)
+    Q_PROPERTY(int number MEMBER number)
 
 public:
     virtual bool match(const QVariant&) const override { return false; };
@@ -30,6 +31,7 @@ public:
     QStringList strings;
 
     bool flag = false;
+    int number = 0;
 };
 
 class TestActionField: public nx::vms::rules::ActionField

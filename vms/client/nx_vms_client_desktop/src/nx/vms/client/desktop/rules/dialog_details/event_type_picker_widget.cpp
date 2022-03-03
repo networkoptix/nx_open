@@ -5,6 +5,7 @@
 #include "ui_event_type_picker_widget.h"
 
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/manifest.h>
 #include <ui/common/palette.h>
 
 namespace nx::vms::client::desktop::rules {

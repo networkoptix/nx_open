@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "basic_action.h"
+#include "rules_fwd.h"
 
 namespace nx::vms::rules {
 

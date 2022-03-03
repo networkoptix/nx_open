@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <nx/vms/rules/event_field.h>
+#include <nx/vms/rules/router.h>
 
 namespace nx::vms::rules::test {
 

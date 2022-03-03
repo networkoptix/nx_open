@@ -48,11 +48,6 @@ private:
     QStringList m_source;
 };
 
-using EventPtr = QSharedPointer<BasicEvent>;
-using EventData = QHash<QString, QVariant>; // TODO: #spanasenko Move to separate class?
-
-using FilterManifest = QMap<QString, QString>; //< Field name to field type mapping.
-
 } // namespace nx::vms::rules
 
 Q_DECLARE_METATYPE(nx::vms::rules::EventPtr)
