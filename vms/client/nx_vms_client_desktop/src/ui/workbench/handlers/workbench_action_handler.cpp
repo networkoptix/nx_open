@@ -3115,7 +3115,7 @@ void ActionHandler::openInBrowser(
     targetUrl = proxyFactory.urlToResource(targetUrl, server);
 
     const auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
-    const nx::network::SocketAddress targetAddress{targetUrl.host(), (uint16_t) targetUrl.port()};
+    nx::network::SocketAddress targetAddress{targetUrl.host(), (uint16_t) targetUrl.port()};
     switch (authMethod)
     {
         case AuthMethod::queryParam:
@@ -3128,6 +3128,11 @@ void ActionHandler::openInBrowser(
         }
         case AuthMethod::bearerToken:
         {
+            if (nx::network::SocketGlobals::addressResolver().isCloudHostname(
+                targetAddress.address.toString()))
+            {
+                targetAddress.port = 0; //< The same as in ProxyHandler::detectProxyTarget.
+            }
             nx::network::http::header::BearerAuthorization header(auth);
             gateway->enforceHeadersFor(targetAddress, {{header.NAME, header.toString()}});
             break;
