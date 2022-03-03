@@ -467,9 +467,9 @@ void* ThirdPartyMediaDataPacket::queryInterface(const nxpl::NX_GUID& interfaceID
     return nullptr;
 }
 
-const char* ThirdPartyMediaDataPacket::encryptionData() const
+const uint8_t* ThirdPartyMediaDataPacket::encryptionData() const
 {
-    return (const char*) m_mediaData->encryptionData.data();
+    return m_mediaData->encryptionData.data();
 }
 
 int ThirdPartyMediaDataPacket::encryptionDataSize() const

@@ -6,8 +6,8 @@
 #include <QtCore/QSize>
 
 #include <common/common_globals.h>
-
 #include <nx/fusion/model_functions_fwd.h>
+#include <nx/reflect/enum_instrument.h>
 #include <nx/vms/api/data/dewarping_data.h>
 
 struct AVFormatContext;
@@ -17,12 +17,11 @@ struct AVFormatContext;
  */
 struct NX_VMS_COMMON_API QnAviArchiveMetadata
 {
-    enum class Format
-    {
+    NX_REFLECTION_ENUM_CLASS(Format,
         avi,
         mp4,
         custom //< Allows to setup any fields
-    };
+    );
 
     /** This version is set if no metadata is found. */
     static const int kDefaultVersion = 0;
@@ -49,6 +48,9 @@ struct NX_VMS_COMMON_API QnAviArchiveMetadata
     static Format formatFromExtension(const QString& extension);
     bool saveToFile(AVFormatContext* context, Format format);
 };
+
 #define QnAviArchiveMetadata_Fields (version)(signature)(timeZoneOffset)(startTimeMs) \
     (videoLayoutChannels)(videoLayoutSize)(dewarpingParams)(overridenAr)(integrityHash)\
     (metadataStreamVersion)(encryptionData)(rotation)
+
+QN_FUSION_DECLARE_FUNCTIONS(QnAviArchiveMetadata, (json), NX_VMS_COMMON_API)

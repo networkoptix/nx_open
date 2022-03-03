@@ -46,19 +46,23 @@ public:
         nxcip::MediaStreamQuality quality,
         int64_t startTimeUs,
         const IList<ICodecInfo>* codecList,
+        const char* opaqueMetadata,
         Result<IStreamWriter*>* outResult) = 0;
 
     /**
+     * Creates a StreamWriter object.
      * @param codecList Codec description list, one per stream.
-     * ArchiveReader later.
+     * @param opaqueMetadata Arbitrary null terminated string that should be returned unchanged by
+     * StreamReader2::opaqueMetadata() for the corresponding chunk of media data.
      */
     public: Result<IStreamWriter*> createStreamWriter(
         nxcip::MediaStreamQuality quality,
         int64_t startTimeUs,
-        const IList<ICodecInfo>* codecList)
+        const IList<ICodecInfo>* codecList,
+        const char* opaqueMetadata)
     {
         Result<IStreamWriter*> result;
-        doCreateStreamWriter(quality, startTimeUs, codecList, &result);
+        doCreateStreamWriter(quality, startTimeUs, codecList, opaqueMetadata, &result);
         return result;
     }
 

@@ -1104,7 +1104,7 @@ namespace nxcip
     class Encryptable
     {
     public:
-        virtual const char* encryptionData() const = 0;
+        virtual const uint8_t* encryptionData() const = 0;
         virtual int encryptionDataSize() const = 0;
     };
 
