@@ -9,6 +9,7 @@
 #include <QtCore/QVector>
 #include <QtGui/QRegion>
 
+#include <core/resource/avi/avi_archive_metadata.h>
 #include <core/resource/motion_window.h>
 #include <core/resource/resource_fwd.h>
 #include <core/resource/resource_media_layout.h>
@@ -181,6 +182,8 @@ public:
     virtual void pleaseStop() {}
 
     virtual bool providesMotionPackets() const { return false; }
+
+    virtual std::optional<QnAviArchiveMetadata> metadata() const { return std::nullopt; };
 
 protected:
     Flags m_flags = {};

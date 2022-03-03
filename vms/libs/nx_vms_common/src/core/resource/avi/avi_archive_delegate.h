@@ -91,7 +91,7 @@ public:
 
     const char* getTagValue( const char* tagName );
 
-    QnAviArchiveMetadata metadata() const;
+    virtual std::optional<QnAviArchiveMetadata> metadata() const override;
 
     QIODevice* ioDevice() const;
     bool readFailed() const;

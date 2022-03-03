@@ -31,7 +31,7 @@ void QnSignDialogDisplay::finalizeSign()
         QnAviArchiveDelegate* aviFile = dynamic_cast<QnAviArchiveDelegate*> (m_reader->getArchiveDelegate());
         if (aviFile)
         {
-            auto signPattern = aviFile->metadata().signature;
+            auto signPattern = aviFile->metadata()->signature;
             if (signPattern.isEmpty())
                 signPattern = QnSignHelper::loadSignatureFromFileEnd(m_reader->getResource()->getUrl());
             if (!signPattern.isEmpty())

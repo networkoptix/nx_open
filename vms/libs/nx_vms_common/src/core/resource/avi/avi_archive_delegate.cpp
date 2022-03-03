@@ -508,7 +508,7 @@ const char* QnAviArchiveDelegate::getTagValue( const char* tagName )
     return entry ? entry->value : 0;
 }
 
-QnAviArchiveMetadata QnAviArchiveDelegate::metadata() const
+std::optional<QnAviArchiveMetadata> QnAviArchiveDelegate::metadata() const
 {
     return m_metadata;
 }

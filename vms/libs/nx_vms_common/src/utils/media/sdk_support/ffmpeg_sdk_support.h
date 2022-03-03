@@ -91,7 +91,7 @@ public:
     virtual void* queryInterface(const nxpl::NX_GUID& interfaceID) override;
 
     // Encryptable
-    virtual const char* encryptionData() const override;
+    virtual const uint8_t* encryptionData() const override;
     virtual int encryptionDataSize() const override;
 
 private:

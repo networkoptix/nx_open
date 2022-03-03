@@ -19,8 +19,8 @@ class StreamReader2: public nxcip::StreamReader
     protected: virtual const IList<ICodecInfo>* getCodecList() const = 0;
     public: Ptr<const IList<ICodecInfo>> codecList() const { return toPtr(getCodecList()); }
 
-public:
-    virtual bool providesMotionPackets() const = 0;
+    public: virtual bool providesMotionPackets() const = 0;
+    public: virtual const char* opaqueMetadata() const = 0;
 };
 
 } // namespace archive
