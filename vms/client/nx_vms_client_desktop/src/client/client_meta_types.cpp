@@ -7,7 +7,6 @@
 #include <QtQml/QtQml>
 
 #include <api/server_rest_connection.h>
-#include <camera/data/abstract_camera_data.h>
 #include <client/client_globals.h>
 #include <client/client_model_types.h>
 #include <client/client_settings.h>
@@ -182,8 +181,6 @@ void QnClientMetaTypes::initialize()
     qRegisterMetaType<WeakGraphicsItemPointerList>();
     qRegisterMetaType<QnPingUtility::PingResponse>();
     qRegisterMetaType<nx::vms::client::desktop::ServerFileCache::OperationResult>();
-
-    qRegisterMetaType<QnAbstractCameraDataPtr>();
 
     qRegisterMetaType<UploadState>();
     qRegisterMetaType<VirtualCameraState>();

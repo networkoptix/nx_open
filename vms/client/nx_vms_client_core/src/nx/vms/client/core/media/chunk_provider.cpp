@@ -5,7 +5,6 @@
 #include <common/common_module.h>
 
 #include <camera/loaders/flat_camera_data_loader.h>
-#include <camera/data/abstract_camera_data.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_history.h>
@@ -22,6 +21,8 @@ public:
     QnUuid resourceId() const;
     void setResourceId(const QnUuid& id);
 
+    const QnTimePeriodList& periods() const;
+
     const QString& filter() const;
     void setFilter(const QString& filter);
 
@@ -34,7 +35,7 @@ private:
 
     void cleanLoader();
     void setLoading(bool value);
-    void setTimePeriods(const QnTimePeriodList& periods);
+    void notifyAboutTimePeriodsChange();
     QnVirtualCameraResourcePtr getCamera(const QnUuid& id);
 
 private:
@@ -76,7 +77,8 @@ void ChunkProvider::ChunkProviderInternal::setResourceId(const QnUuid& id)
         return;
 
     cleanLoader();
-    setTimePeriods(QnTimePeriodList());
+    notifyAboutTimePeriodsChange();
+    setLoading(false);
 
     const auto camera = getCamera(id);
     if (!camera)
@@ -86,7 +88,11 @@ void ChunkProvider::ChunkProviderInternal::setResourceId(const QnUuid& id)
     m_loader.reset(new QnFlatCameraDataLoader(camera, m_contentType));
 
     connect(m_loader, &QnFlatCameraDataLoader::ready, this,
-        [this](const QnAbstractCameraDataPtr& data) { setTimePeriods(data->dataSource()); });
+        [this](qint64 /*startTimeMs*/)
+        {
+            notifyAboutTimePeriodsChange();
+            setLoading(false);
+        });
     connect(m_loader, &QnFlatCameraDataLoader::failed, this,
         [this]()
         {
@@ -103,6 +109,11 @@ void ChunkProvider::ChunkProviderInternal::setResourceId(const QnUuid& id)
         [this]() { update(); });
 
     update();
+}
+
+const QnTimePeriodList& ChunkProvider::ChunkProviderInternal::periods() const
+{
+    return m_loader ? m_loader->periods() : QnTimePeriodList();
 }
 
 bool ChunkProvider::ChunkProviderInternal::loading() const
@@ -153,12 +164,10 @@ void ChunkProvider::ChunkProviderInternal::setLoading(bool value)
     q->handleLoadingChanged(m_contentType);
 }
 
-void ChunkProvider::ChunkProviderInternal::setTimePeriods(const QnTimePeriodList& periods)
+void ChunkProvider::ChunkProviderInternal::notifyAboutTimePeriodsChange()
 {
-    q->setPeriods(m_contentType, periods);
+    emit q->periodsUpdated(m_contentType);
     emit q->bottomBoundChanged();
-
-    setLoading(false);
 }
 
 QnVirtualCameraResourcePtr ChunkProvider::ChunkProviderInternal::getCamera(const QnUuid& id)
@@ -208,6 +217,11 @@ qint64 ChunkProvider::bottomBound() const
 {
     const auto boundingPeriod = periods(Qn::RecordingContent).boundingPeriod();
     return boundingPeriod.startTimeMs > 0 ? boundingPeriod.startTimeMs : -1;
+}
+
+const QnTimePeriodList& ChunkProvider::periods(Qn::TimePeriodContent type) const
+{
+    return m_providers[type]->periods();
 }
 
 bool ChunkProvider::isLoading() const

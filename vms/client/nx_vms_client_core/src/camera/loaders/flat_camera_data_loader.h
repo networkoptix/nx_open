@@ -5,7 +5,6 @@
 #include <QtCore/QObject>
 #include <QtGui/QRegion>
 
-#include <camera/data/camera_data_fwd.h>
 #include <camera/loaders/abstract_camera_data_loader.h>
 #include <core/resource/camera_bookmark_fwd.h>
 #include <core/resource/resource_fwd.h>
@@ -35,7 +34,7 @@ public:
         QObject* parent = nullptr);
     virtual ~QnFlatCameraDataLoader();
 
-    virtual int load(const QString &filter = QString(), const qint64 resolutionMs = 1) override;
+    virtual void load(const QString &filter = QString(), const qint64 resolutionMs = 1) override;
 
     virtual void discardCachedData(const qint64 resolutionMs = 0) override;
 
@@ -49,31 +48,17 @@ private:
 
 private:
     int sendRequest(qint64 startTimeMs, qint64 resolutionMs);
-    void handleDataLoaded(bool success, int requestHandle, const QnAbstractCameraDataPtr &data);
+    void handleDataLoaded(bool success, QnTimePeriodList&& periods, int requestHandle);
 
 private:
     struct LoadingInfo
     {
-        /** Real loading handle, provided by the server connection object. */
-        int handle;
-
         /** Starting time of the request. */
-        qint64 startTimeMs;
-
-        /** List of local (fake) handles for requests to this time period loader
-         * that are waiting for the same time period to be loaded. */
-        QList<int> waitingHandles;
-
-        LoadingInfo();
-
-        void clear();
+        qint64 startTimeMs = 0;
     };
 
     QString m_filter;
     nx::vms::api::StorageLocation m_storageLocation = nx::vms::api::StorageLocation::both;
 
     LoadingInfo m_loading;
-
-    /** Loaded data. */
-    QnAbstractCameraDataPtr m_loadedData;
 };

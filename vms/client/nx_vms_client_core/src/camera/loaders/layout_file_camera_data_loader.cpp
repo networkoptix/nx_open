@@ -2,57 +2,51 @@
 
 #include "layout_file_camera_data_loader.h"
 
-#include <camera/data/abstract_camera_data.h>
-#include <camera/data/time_period_camera_data.h>
-
 #include <core/resource/avi/avi_resource.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
-
-#include <recording/time_period_list.h>
-
 #include <nx/vms/client/core/motion/motion_grid.h>
 #include <nx/fusion/serialization/json.h>
 #include <nx/fusion/serialization/json_functions.h>
 #include <nx/streaming/config.h>
+#include <utils/common/delayed.h>
 
 using namespace nx::vms::client::core;
 
-namespace {
-    QAtomicInt qn_fakeHandle(INT_MAX / 2);
-}
-
-QnLayoutFileCameraDataLoader::QnLayoutFileCameraDataLoader(const QnAviResourcePtr &resource, Qn::TimePeriodContent dataType, QObject *parent):
+QnLayoutFileCameraDataLoader::QnLayoutFileCameraDataLoader(
+    const QnAviResourcePtr& resource,
+    Qn::TimePeriodContent dataType,
+    QObject* parent)
+    :
     QnAbstractCameraDataLoader(resource, dataType, parent),
     m_aviResource(resource)
 {
     NX_ASSERT(m_aviResource, "Resource must exist");
 
-    /* Preload recording data. */
-    if (dataType != Qn::RecordingContent)
-        return;
+    // Preload recording data.
+    if (dataType == Qn::RecordingContent)
+    {
+        auto storage = resource->getStorage().dynamicCast<QnLayoutFileStorageResource>();
+        if (!storage)
+            return;
 
-    QnLayoutFileStorageResourcePtr storage = resource->getStorage().dynamicCast<QnLayoutFileStorageResource>();
-    if (!storage)
-        return;
-
-    QnTimePeriodList chunks = storage->getTimePeriods(resource);
-    m_data = QnAbstractCameraDataPtr(new QnTimePeriodCameraData(chunks));
+        m_loadedData = storage->getTimePeriods(resource);
+    }
 }
 
 QnLayoutFileCameraDataLoader::~QnLayoutFileCameraDataLoader()
-{}
-
-
-int QnLayoutFileCameraDataLoader::sendDataDelayed(const QnAbstractCameraDataPtr& data) {
-    int handle = qn_fakeHandle.fetchAndAddAcquire(1);
-    emit delayedReady(data, QnTimePeriod::anytime(), handle);
-    return handle;
+{
 }
 
-int QnLayoutFileCameraDataLoader::loadMotion(const MotionSelection& motionRegions)
+void QnLayoutFileCameraDataLoader::sendDataDelayed()
 {
-    if (!m_aviResource)
-        return -1;
+    executeDelayedParented([this]() { emit ready(0); }, this);
+}
+
+QnTimePeriodList QnLayoutFileCameraDataLoader::loadMotion(
+    const MotionSelection& motionRegions) const
+{
+    if (!NX_ASSERT(m_aviResource))
+        return QnTimePeriodList();
 
     QVector<MotionGridBitMask> masks;
     masks.resize(motionRegions.size());
@@ -79,44 +73,23 @@ int QnLayoutFileCameraDataLoader::loadMotion(const MotionSelection& motionRegion
             }
         }
     }
-    QnTimePeriodList merged = QnTimePeriodList::mergeTimePeriods(periods);
-    QnAbstractCameraDataPtr result(new QnTimePeriodCameraData(merged));
-
-    return sendDataDelayed(result);
+    return QnTimePeriodList::mergeTimePeriods(periods);
 }
 
-int QnLayoutFileCameraDataLoader::load(const QString& filter, const qint64 /*resolutionMs*/)
+void QnLayoutFileCameraDataLoader::load(const QString& filter, const qint64 /*resolutionMs*/)
 {
-    using namespace nx::vms::client::core;
-
-    switch (m_dataType)
+    if (m_dataType == Qn::MotionContent)
     {
-        case Qn::RecordingContent:
+        // Empty motion filter is treated as a full area selection.
+        if (filter.isEmpty())
         {
-            return sendDataDelayed(m_data);
+            m_loadedData = loadMotion({{QRect(0, 0, MotionGrid::kWidth, MotionGrid::kHeight)}});
         }
-        case Qn::MotionContent:
+        else
         {
-            // Empty motion filter is treated as a full area selection.
-            if (filter.isEmpty())
-                return loadMotion({{QRect(0, 0, MotionGrid::kWidth, MotionGrid::kHeight)}});
-
             const auto motionRegions = QJson::deserialized<MotionSelection>(filter.toUtf8());
-            for (const auto& region: motionRegions)
-            {
-                if (!region.isEmpty())
-                    return loadMotion(motionRegions);
-            }
-            NX_ASSERT(false, "Empty motion region in exported video.");
-            return 0;
+            m_loadedData = loadMotion(motionRegions);
         }
-        case Qn::AnalyticsContent:
-        {
-            // Analytics export is not supported yet.
-            return 0;
-        }
-        default:
-            NX_ASSERT(false, "Should never get here");
-            return 0;
     }
+    sendDataDelayed();
 }
