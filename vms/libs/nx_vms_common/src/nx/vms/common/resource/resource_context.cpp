@@ -8,7 +8,6 @@
 #include <api/global_settings.h>
 #include <api/runtime_info_manager.h>
 #include <core/resource/camera_history.h>
-#include <core/resource/media_server_user_attributes.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/providers/permissions_resource_access_provider.h>
 #include <core/resource_access/providers/resource_access_provider.h>
@@ -54,7 +53,6 @@ struct ResourceContext::Private
     std::unique_ptr<QnResourceStatusDictionary> resourceStatusDictionary;
     std::unique_ptr<QnResourcePropertyDictionary> resourcePropertyDictionary;
     std::unique_ptr<QnCameraHistoryPool> cameraHistoryPool;
-    std::unique_ptr<QnMediaServerUserAttributesPool> mediaServerUserAttributesPool;
     std::unique_ptr<QnServerAdditionalAddressesDictionary> serverAdditionalAddressesDictionary;
     std::unique_ptr<QnRuntimeInfoManager> runtimeInfoManager;
     std::unique_ptr<QnGlobalSettings> globalSettings;
@@ -89,7 +87,6 @@ ResourceContext::ResourceContext(
     d->resourceStatusDictionary = std::make_unique<QnResourceStatusDictionary>();
     d->resourcePropertyDictionary = std::make_unique<QnResourcePropertyDictionary>(this);
     d->cameraHistoryPool = std::make_unique<QnCameraHistoryPool>(this);
-    d->mediaServerUserAttributesPool = std::make_unique<QnMediaServerUserAttributesPool>();
     d->serverAdditionalAddressesDictionary =
         std::make_unique<QnServerAdditionalAddressesDictionary>();
     d->runtimeInfoManager = std::make_unique<QnRuntimeInfoManager>(this);
@@ -221,11 +218,6 @@ QnResourcePropertyDictionary* ResourceContext::resourcePropertyDictionary() cons
 QnCameraHistoryPool* ResourceContext::cameraHistoryPool() const
 {
     return d->cameraHistoryPool.get();
-}
-
-QnMediaServerUserAttributesPool* ResourceContext::mediaServerUserAttributesPool() const
-{
-    return d->mediaServerUserAttributesPool.get();
 }
 
 QnServerAdditionalAddressesDictionary* ResourceContext::serverAdditionalAddressesDictionary() const

@@ -9,7 +9,6 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/media_server_user_attributes.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
@@ -181,6 +180,16 @@ vms::api::UserData fromResourceToApi(
         apiUser.digest.clear();
 
     return apiUser;
+}
+
+template<class ResourcePtrType>
+QList<QnUuid> idListFromResList(const QList<ResourcePtrType>& resList)
+{
+    QList<QnUuid> idList;
+    idList.reserve(resList.size());
+    for (const ResourcePtrType& resPtr : resList)
+        idList.push_back(resPtr->getId());
+    return idList;
 }
 
 } // namespace
@@ -397,8 +406,9 @@ void QnResourcesChangesManager::saveServers(const QnMediaServerResourceList &ser
     saveServersBatch(servers, batchFunction);
 }
 
-void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList &servers,
-                                                 GenericChangesFunction applyChanges)
+void QnResourcesChangesManager::saveServersBatch(
+    const QnMediaServerResourceList &servers,
+    GenericChangesFunction applyChanges)
 {
     if (!applyChanges)
         return;
@@ -410,19 +420,12 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
     if (!connection)
         return;
 
-    auto idList = idListFromResList(servers);
-
-    QPointer<QnMediaServerUserAttributesPool> pool(mediaServerUserAttributesPool());
-
-    QList<QnMediaServerUserAttributes> backup;
-    for(const auto& serverAttrs: pool->getAttributesList(idList))
-    {
-        QnMediaServerUserAttributesPool::ScopedLock userAttributesLock(pool, serverAttrs->serverId());
-        backup << *(*userAttributesLock);
-    }
+    QList<std::pair<QnMediaServerResourcePtr, nx::vms::api::MediaServerUserAttributesData>> backup;
+    for(const auto& server: servers)
+        backup << std::pair(server, server->userAttributes());
 
     auto handler =
-        [this, servers, pool, backup] (int /*reqID*/, ec2::ErrorCode errorCode)
+        [this, servers, backup] (int /*reqID*/, ec2::ErrorCode errorCode)
         {
             // Check if everithing is OK.
             if (errorCode == ec2::ErrorCode::ok)
@@ -432,26 +435,8 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
             bool somethingWasChanged = false;
             for (const auto& serverAttrs: backup)
             {
-                QnMediaServerUserAttributes::Notifiers notifiers;
-                {
-                    QnMediaServerUserAttributesPool::ScopedLock userAttributesLock(pool,
-                        serverAttrs.serverId());
-                    (*userAttributesLock)->assign(serverAttrs, notifiers);
-                }
-
-                if (!notifiers.isEmpty())
-                {
-                    // It is OK if the Server is missing.
-                    if (auto server = resourcePool()->getResourceById<QnMediaServerResource>(
-                        serverAttrs.serverId()))
-                    {
-                        emit server->resourceChanged(server);
-                        for (const auto& notifier: notifiers)
-                            notifier(server);
-
-                        somethingWasChanged = true;
-                    }
-                }
+                somethingWasChanged = somethingWasChanged
+                    || serverAttrs.first->setUserAttributesAndNotify(serverAttrs.second);
             }
 
             // Silently exit if nothing was changed.
@@ -462,13 +447,16 @@ void QnResourcesChangesManager::saveServersBatch(const QnMediaServerResourceList
         };
 
     applyChanges();
-    auto changes = pool->getAttributesList(idList);
-    vms::api::MediaServerUserAttributesDataList attributes;
-    ec2::fromResourceListToApi(changes, attributes);
+
+    nx::vms::api::MediaServerUserAttributesDataList changes;
+    for(const auto& server: servers)
+        changes.push_back(server->userAttributes());
+
     connection->getMediaServerManager(Qn::kSystemAccess)->saveUserAttributes(
-        attributes, makeReplyProcessor(this, handler), this);
+        changes, makeReplyProcessor(this, handler), this);
 
     // TODO: #sivanov Values are not rolled back in case of failure.
+    auto idList = idListFromResList(servers);
     resourcePropertyDictionary()->saveParamsAsync(idList);
 }
 

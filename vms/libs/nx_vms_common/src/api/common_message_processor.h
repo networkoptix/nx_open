@@ -189,4 +189,5 @@ protected:
 
 private:
     std::unordered_map<QnUuid, nx::vms::api::CameraAttributesData> m_cameraUserAttributesCache;
+    std::unordered_map<QnUuid, nx::vms::api::MediaServerUserAttributesData> m_serverUserAttributesCache;
 };

@@ -16,7 +16,6 @@ class QnSharedResourcesManager;
 class QnUserRolesManager;
 class QnCameraHistoryPool;
 class QnResourcePropertyDictionary;
-class QnMediaServerUserAttributesPool;
 class QnResourceStatusDictionary;
 class QnGlobalSettings;
 class QnLayoutTourManager;
@@ -53,7 +52,6 @@ public:
     QnUserRolesManager* userRolesManager() const;
     QnCameraHistoryPool* cameraHistoryPool() const;
     QnResourcePropertyDictionary* resourcePropertyDictionary() const;
-    QnMediaServerUserAttributesPool* mediaServerUserAttributesPool() const;
     QnResourceStatusDictionary* statusDictionary() const;
     QnGlobalSettings* globalSettings() const;
     QnLayoutTourManager* layoutTourManager() const;

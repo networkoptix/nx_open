@@ -14,7 +14,6 @@ class QnGlobalPermissionsManager;
 class QnGlobalSettings;
 class QnLayoutTourManager;
 class QnLicensePool;
-class QnMediaServerUserAttributesPool;
 class QnResourceAccessManager;
 class QnResourceAccessSubjectsCache;
 class QnResourceDataPool;
@@ -132,11 +131,6 @@ public:
      * Information about Servers, storing Device footage.
      */
     QnCameraHistoryPool* cameraHistoryPool() const;
-
-    /**
-     * Resource external data: Server attributes, set by a User.
-     */
-    QnMediaServerUserAttributesPool* mediaServerUserAttributesPool() const;
 
     /**
      * Resource external data: Server additional addresses.

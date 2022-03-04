@@ -10,7 +10,6 @@
 #include <api/model/api_model_fwd.h>
 
 #include <core/resource/resource_fwd.h>
-#include <core/resource/media_server_user_attributes.h>
 
 #include <server/server_storage_manager_fwd.h>
 

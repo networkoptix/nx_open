@@ -6,7 +6,6 @@
 #include <api/model/api_ioport_data.h>
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/media_server_user_attributes.h>
 #include <core/resource/resource_data.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_data_pool.h>
