@@ -563,10 +563,6 @@
       <translation>自定義ID</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation>強制的にモーション検知を行う</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation>カメラのタイムスタンプを使う</translation>
     </message>

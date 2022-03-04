@@ -10036,10 +10036,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>Deseja confiar neste servidor?</translation>
     </message>
     <message>
-      <source>You attempted to connect to %1 but the server presented a certificate, that cannot be verified automatically.</source>
-      <translation type="unfinished">You attempted to connect to %1 but the server presented a certificate, that cannot be verified automatically.</translation>
-    </message>
-    <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
       <translation>Revise os&apos;s para certificar-se de que está se conectando ao servidor correto.</translation>
     </message>
@@ -10054,6 +10050,10 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
       <source>Do not connect to this server unless instructed by your VMS administrator.</source>
       <translation>Não conecte a este servidor a menos que instruído pelo administrador do VMS.</translation>
+    </message>
+    <message>
+      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
+      <translation type="unfinished">You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</translation>
     </message>
   </context>
   <context>

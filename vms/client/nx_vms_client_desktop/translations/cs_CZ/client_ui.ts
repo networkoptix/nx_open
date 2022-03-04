@@ -563,10 +563,6 @@
       <translation>Logické ID</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation>Vynutit detekci pohybu pro stream</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation>Věřit časové značce kamery</translation>
     </message>

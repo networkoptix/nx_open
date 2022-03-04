@@ -563,10 +563,6 @@
       <translation>ID hợp lý</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation>Phát hiện chuyển động cho luồng</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation>Tin cậy dấu thời gian máy ảnh</translation>
     </message>

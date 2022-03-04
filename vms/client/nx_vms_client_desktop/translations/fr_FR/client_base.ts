@@ -10036,10 +10036,6 @@ N'utilisez pas ce certificat si vous n'avez pas modifié le certificat SSL du se
       <translation>Faire confiance à ce serveur ?</translation>
     </message>
     <message>
-      <source>You attempted to connect to %1 but the server presented a certificate, that cannot be verified automatically.</source>
-      <translation>Vous avez tenté de vous connecter à %1 mais le serveur a présenté un certificat, qui ne peut pas être vérifié automatiquement.</translation>
-    </message>
-    <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
       <translation>Examinez les détails du certificat pour vous assurer que vous vous connectez au bon serveur.</translation>
     </message>
@@ -10054,6 +10050,10 @@ N'utilisez pas ce certificat si vous n'avez pas modifié le certificat SSL du se
     <message>
       <source>Do not connect to this server unless instructed by your VMS administrator.</source>
       <translation>Ne vous connectez pas à ce serveur à moins que votre administrateur VMS ne l'ait demandé.</translation>
+    </message>
+    <message>
+      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
+      <translation type="unfinished">You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</translation>
     </message>
   </context>
   <context>

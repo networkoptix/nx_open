@@ -2706,11 +2706,11 @@ till %1</translation>
     </message>
     <message>
       <source>You will be logged out.</source>
-      <translation type="unfinished">You will be logged out.</translation>
+      <translation>Du kommer att loggas ut.</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
-      <translation type="unfinished">System will be accessible through local network with a local administrator account.</translation>
+      <translation>Systemet kommer att vara tillgängligt via lokalt nätverk med lokalt administratörskonto.</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -2719,7 +2719,7 @@ till %1</translation>
     <message>
       <source>Cannot disconnect the System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the System from %1</translation>
+      <translation>Det går inte att koppla bort systemet från %1</translation>
     </message>
   </context>
   <context>
@@ -3432,7 +3432,7 @@ till %1</translation>
     </message>
     <message>
       <source>Please enter a password.</source>
-      <translation type="unfinished">Please enter a password.</translation>
+      <translation>Du måste skriva in lösenord.</translation>
     </message>
   </context>
   <context>
@@ -3900,11 +3900,11 @@ till %1</translation>
     </message>
     <message>
       <source>Motion Search</source>
-      <translation type="unfinished">Motion Search</translation>
+      <translation>Rörelsesökning</translation>
     </message>
     <message>
       <source>Object Search</source>
-      <translation type="unfinished">Object Search</translation>
+      <translation>Objektsökning</translation>
     </message>
   </context>
   <context>
@@ -4480,7 +4480,7 @@ till %1</translation>
     </message>
     <message>
       <source>Enter Fullscreen</source>
-      <translation type="unfinished">Enter Fullscreen</translation>
+      <translation>Öppna Fullskärmsläge</translation>
     </message>
   </context>
   <context>
@@ -5531,7 +5531,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>Camera recording schedule is invalid</source>
-      <translation type="unfinished">Camera recording schedule is invalid</translation>
+      <translation>Kamerainspelningsschemat är ogiltigt</translation>
     </message>
   </context>
   <context>
@@ -5705,7 +5705,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message>
       <source>With enabled digest authentication</source>
-      <translation type="unfinished">With enabled digest authentication</translation>
+      <translation>Med aktiverad digestautentisering</translation>
     </message>
   </context>
   <context>
@@ -6002,19 +6002,19 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <name>QnWebResourceWidget</name>
     <message>
       <source>Open this web page?</source>
-      <translation type="unfinished">Open this web page?</translation>
+      <translation>Öppna den här webbsidan?</translation>
     </message>
     <message>
       <source>Web page</source>
-      <translation type="unfinished">Web page</translation>
+      <translation>Webbsida</translation>
     </message>
     <message>
       <source>Connect anyway</source>
-      <translation type="unfinished">Connect anyway</translation>
+      <translation>Anslut ändå</translation>
     </message>
     <message>
       <source>Web page settings...</source>
-      <translation type="unfinished">Web page settings...</translation>
+      <translation>Inställningar för webbsidan...</translation>
     </message>
     <message>
       <source>You try to open the
@@ -6022,10 +6022,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
 but this web page presented an untrusted certificate auth.
 We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
       <comment>%1 is the web page address</comment>
-      <translation type="unfinished">You try to open the
+      <translation>Du försöker öppna
 %1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</translation>
+men den här webbsidan presenterade en opålitlig certifikatautentisering.
+Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskerna kan du öppna webbsidan.</translation>
     </message>
   </context>
   <context>
@@ -6095,7 +6095,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Camera %1 does not support PTZ</source>
-      <translation type="unfinished">Camera %1 does not support PTZ</translation>
+      <translation>Kamera %1 stöder inte PTZ</translation>
     </message>
   </context>
   <context>
@@ -7183,11 +7183,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Not supported</source>
-      <translation type="unfinished">Not supported</translation>
+      <translation>Stöds inte</translation>
     </message>
     <message>
       <source>Backup is not supported for this device</source>
-      <translation type="unfinished">Backup is not supported for this device</translation>
+      <translation>Säkerhetskopiering stöds inte för den här enheten</translation>
     </message>
   </context>
   <context>
@@ -7252,12 +7252,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</translation>
+      <translation>För att aktivera backup ändra &quot;Main&quot; till &quot;Backup&quot; från några av lagringarna i %1</translation>
     </message>
     <message>
       <source>To enable backup add more drives to use them as backup storage in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup add more drives to use them as backup storage in %1</translation>
+      <translation>För att aktivera säkerhetskopiering lägg till fler enheter för att använda dem som backuplagring i %1</translation>
     </message>
   </context>
   <context>
@@ -7333,11 +7333,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
       <source>Heater</source>
-      <translation type="unfinished">Heater</translation>
+      <translation>Värmare</translation>
     </message>
     <message>
       <source>Wiper</source>
-      <translation type="unfinished">Wiper</translation>
+      <translation>Torkare</translation>
     </message>
   </context>
   <context>
@@ -7411,7 +7411,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Server will not push time settings to the camera.</source>
-      <translation type="unfinished">Server will not push time settings to the camera.</translation>
+      <translation>Servern skickar inte tidsinställningar till kameran.</translation>
     </message>
   </context>
   <context>
@@ -7641,11 +7641,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>
-      <translation type="unfinished">Change invalid schedule to &quot;Record Always&quot;</translation>
+      <translation>Ändra ogiltigt schema till &quot;Spela in alltid&quot;</translation>
     </message>
     <message>
       <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
-      <translation type="unfinished">Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</translation>
+      <translation>Vissa celler i inspelningsschemat är inställda på ett ogiltigt inspelningsläge: %1. Under de timmar som är inställda på ett ogiltigt inspelningsläge kommer kameran att spela in i läget &quot;Spela in Alltid&quot;.</translation>
     </message>
     <message>
       <source>Motion Only</source>
@@ -7657,7 +7657,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Motion &amp; Objects Only</source>
-      <translation type="unfinished">Motion &amp; Objects Only</translation>
+      <translation>Endast rörelse och objekt</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
@@ -7665,11 +7665,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Objekt + Lågupplöst</translation>
     </message>
     <message>
       <source>Motion &amp; Objects + Lo-Res</source>
-      <translation type="unfinished">Motion &amp; Objects + Lo-Res</translation>
+      <translation>Rörelse, Objekt + Låg-Res</translation>
     </message>
   </context>
   <context>
@@ -7683,9 +7683,9 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>These devices do not have audio inputs or are not configured correctly.</source>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+      <translation>
+        <numerusform>Dessa enheter har ingen ljudingång eller är inte korrekt konfigurerad.</numerusform>
+        <numerusform>Dessa enheter har ingen ljudingång eller är inte korrekt konfigurerad.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -7697,9 +7697,9 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>These devices do not have audio outputs or are not configured correctly.</source>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+      <translation>
+        <numerusform>Dessa enheter har ingen ljudingång eller är inte korrekt konfigurerad.</numerusform>
+        <numerusform>Dessa enheter har ingen ljudingång eller är inte korrekt konfigurerad.</numerusform>
       </translation>
     </message>
     <message>
@@ -8016,7 +8016,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
-      <translation type="unfinished">Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</translation>
+      <translation>Inspelningsschemat innehåller inspelningslägen som inte stöds av de valda kamerorna. Inspelningslägen som inte stöds kommer att ändras till &quot;Spela in alltid&quot;.</translation>
     </message>
   </context>
   <context>
@@ -8135,11 +8135,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
-      <translation type="unfinished">Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</translation>
+      <translation>Sökning efter enheter i nätverket är begränsad till kameror som stöder HTTPS-anslutningar. Detta kan ändras i %1 -inställningar.</translation>
     </message>
     <message>
       <source>System Administration</source>
-      <translation type="unfinished">System Administration</translation>
+      <translation>Systemadministration</translation>
     </message>
   </context>
   <context>
@@ -8483,7 +8483,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Klicka på ikonen för att läsa mer</translation>
     </message>
   </context>
   <context>
@@ -8854,7 +8854,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>%1 systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 systems have different owners. Merge is not allowed.</translation>
+      <translation>%1 system har olika ägare. Sammanfogning är inte tillåtet.</translation>
     </message>
   </context>
   <context>
@@ -9506,7 +9506,7 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</translation>
+      <translation>Proxy av allt innehåll exponerar alla tjänster eller enheter i serverns&apos; nätverk för användare av denna webbsida</translation>
     </message>
   </context>
   <context>
@@ -9577,19 +9577,19 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     </message>
     <message>
       <source>Recording motion and objects</source>
-      <translation type="unfinished">Recording motion and objects</translation>
+      <translation>Inspelning av rörelse och objekt</translation>
     </message>
     <message>
       <source>Recording objects only</source>
-      <translation type="unfinished">Recording objects only</translation>
+      <translation>Endast inspelning av objekt</translation>
     </message>
     <message>
       <source>Recording motion, objects and low quality</source>
-      <translation type="unfinished">Recording motion, objects and low quality</translation>
+      <translation>Inspelning rörelse, objekt och låg kvalitet</translation>
     </message>
     <message>
       <source>Recording objects and low quality</source>
-      <translation type="unfinished">Recording objects and low quality</translation>
+      <translation>Inspelning av objekt och låg kvalitet</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
@@ -9597,15 +9597,15 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     </message>
     <message>
       <source>Objects only</source>
-      <translation type="unfinished">Objects only</translation>
+      <translation>Endast objekt</translation>
     </message>
     <message>
       <source>Motion, Objects + Lo-Res</source>
-      <translation type="unfinished">Motion, Objects + Lo-Res</translation>
+      <translation>Rörelse, Objekt + Låg-Res</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Objekt + Lågupplöst</translation>
     </message>
   </context>
   <context>
@@ -9780,51 +9780,51 @@ Du kan fortfarande ändra kvalitet och FPS direkt på kameran.</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected devices</translation>
+      <translation>Rörelsedetektering är inaktiverat för vissa av de valda enheterna</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this camera</source>
-      <translation type="unfinished">Motion detection is disabled for this camera</translation>
+      <translation>Rörelsedetektering är inaktiverad för den här kameran</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected cameras</translation>
+      <translation>Rörelsedetektering är inaktiverat för vissa av de valda kamerorna</translation>
     </message>
     <message>
       <source>Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Vissa av de valda enheterna har bara en stream. Inspelningar med och utan rörelse har samma upplösning eller kvalitet.</translation>
     </message>
     <message>
       <source>This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Den här kameran har bara en stream. Inspelningar med och utan rörelse har samma upplösning eller kvalitet.</translation>
     </message>
     <message>
       <source>Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Vissa av de valda enheterna har bara en stream. Inspelningar med och utan rörelse har samma upplösning eller kvalitet.</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected devices</translation>
+      <translation>Rörelsedetektering är inaktiverat för vissa av de valda enheterna</translation>
     </message>
     <message>
       <source>Object detection is disabled for this camera</source>
-      <translation type="unfinished">Object detection is disabled for this camera</translation>
+      <translation>Rörelsedetektering är inaktiverad för den här kameran</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected cameras</translation>
+      <translation>Rörelsedetektering är inaktiverat för vissa av de valda kamerorna</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected devices</translation>
+      <translation>Rörelse- och objektdetektering är inaktiverat för vissa av de valda enheterna</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for this camera</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for this camera</translation>
+      <translation>Rörelse- och objektdetektering är inaktiverat för den här kameran</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected cameras</translation>
+      <translation>Rörelse- och objektdetektering är inaktiverat för några av de valda kamerorna</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this I/O module</source>
@@ -9916,27 +9916,27 @@ Varning: Det här lösenordet kan inte återställas. Om du tappar det blir arki
     </message>
     <message>
       <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation type="unfinished">Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</translation>
+      <translation>Lokala användare och LDAP-användare loggas automatiskt ut om deras session överskrider den angivna varaktigheten.</translation>
     </message>
     <message>
       <source>Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</source>
-      <translation type="unfinished">Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</translation>
+      <translation>Obegränsad livstid för användarsessioner hotar den övergripande systemsäkerheten och kan leda till försämring av systemprestandan</translation>
     </message>
     <message>
       <source>It is recommended to have user session lifetime not greater than %1</source>
       <comment>%1 is the time span with time units</comment>
-      <translation type="unfinished">It is recommended to have user session lifetime not greater than %1</translation>
+      <translation>Det rekommenderas att användarens sessionslivslängd inte är större än %1</translation>
     </message>
     <message>
       <source>Learn more.</source>
-      <translation type="unfinished">Learn more.</translation>
+      <translation>Läs mer.</translation>
     </message>
     <message numerus="yes">
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
       <comment>%n is digest user count, %1 is total user count</comment>
-      <translation type="unfinished">
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
+      <translation>
+        <numerusform>%n av %1 användare får använda digest-autentisering (inte säker).</numerusform>
+        <numerusform>%n av %1 användare får använda digest-autentisering (inte säker).</numerusform>
       </translation>
     </message>
   </context>
@@ -9991,13 +9991,13 @@ Varning: Det här lösenordet kan inte återställas. Om du tappar det blir arki
     </message>
     <message>
       <source>Pin this certificate to %1?</source>
-      <translation type="unfinished">Pin this certificate to %1?</translation>
+      <translation>Fäst detta certifikat till %1?</translation>
     </message>
     <message>
       <source>Someone may be impersonating %1 to steel your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steel your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
+      <translation>Någon kan efterlikna %1 för att stjäla dina personuppgifter.
+Fäst inte detta certifikat om du gjorde&apos;t ändra %2 server SSL-certifikat.</translation>
     </message>
     <message>
       <source>Pin</source>
@@ -10035,10 +10035,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>Lita på den här servern?</translation>
     </message>
     <message>
-      <source>You attempted to connect to %1 but the server presented a certificate, that cannot be verified automatically.</source>
-      <translation type="unfinished">You attempted to connect to %1 but the server presented a certificate, that cannot be verified automatically.</translation>
-    </message>
-    <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
       <translation>Granska certifikatets detaljer för att se till att du ansluter till rätt server.</translation>
     </message>
@@ -10053,6 +10049,10 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
       <source>Do not connect to this server unless instructed by your VMS administrator.</source>
       <translation>Anslut inte till den här servern om du inte har instruerats av din VMS administratör.</translation>
+    </message>
+    <message>
+      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
+      <translation>Du försökte ansluta till: %1 men servern presenterade ett certifikat som inte kan verifieras automatiskt.</translation>
     </message>
   </context>
   <context>
@@ -10271,14 +10271,14 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message numerus="yes">
       <source>Recording schedule is invalid for %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
+      <translation>
+        <numerusform>Inspelningsschemat är ogiltigt för %n kameror</numerusform>
+        <numerusform>Inspelningsschemat är ogiltigt för %n kameror</numerusform>
       </translation>
     </message>
     <message>
       <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
-      <translation type="unfinished">Recording schedule on some cameras contains recording modes that are not supported.</translation>
+      <translation>Inspelningsschemat på vissa kameror innehåller inspelningslägen som inte stöds.</translation>
     </message>
   </context>
   <context>
@@ -10768,11 +10768,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
     <message>
       <source>Intercom Alarm Layout</source>
-      <translation type="unfinished">Intercom Alarm Layout</translation>
+      <translation>Intercom larm layout</translation>
     </message>
     <message>
       <source>Intercom Open Door</source>
-      <translation type="unfinished">Intercom Open Door</translation>
+      <translation>Intercom öppna dörr</translation>
     </message>
     <message>
       <source>Open door</source>
@@ -10852,37 +10852,37 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Selected Layout</source>
-      <translation type="unfinished">Selected Layout</translation>
+      <translation>Vald layout</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::jsapi::detail::ResourcesApiBackend</name>
     <message>
       <source>Resource is not available for the usage with JS API</source>
-      <translation type="unfinished">Resource is not available for the usage with JS API</translation>
+      <translation>Resursen är inte tillgänglig för användning med JS API</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
     <message>
       <source>Cannot find an item with the specified id</source>
-      <translation type="unfinished">Cannot find an item with the specified id</translation>
+      <translation>Kan inte hitta ett objekt med angivet Id</translation>
     </message>
     <message>
       <source>Cannot find a resource with the specified id.</source>
-      <translation type="unfinished">Cannot find a resource with the specified id.</translation>
+      <translation>Kan inte hitta ett objekt med angivet Id.</translation>
     </message>
     <message>
       <source>Cannot specify a media parameters for the resource without media stream.</source>
-      <translation type="unfinished">Cannot specify a media parameters for the resource without media stream.</translation>
+      <translation>Det går inte att ange mediaparametrar för resursen utan mediaström.</translation>
     </message>
     <message>
       <source>Cannot add the resource to the layout</source>
-      <translation type="unfinished">Cannot add the resource to the layout</translation>
+      <translation>Det går inte att lägga till resursen i layouten</translation>
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item.</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item.</translation>
+      <translation>Kan inte hitta en widget som motsvarar det angivna objektet.</translation>
     </message>
   </context>
   <context>
@@ -11309,21 +11309,21 @@ Du kan välja en annan lagringsplats på fliken &quot;Storage Management&quot; i
     </message>
     <message>
       <source>This build is for demo purposes only.</source>
-      <translation type="unfinished">This build is for demo purposes only.</translation>
+      <translation>Varning! Denna version är endast för teständamål.</translation>
     </message>
     <message>
       <source>It cannot be upgraded to subsequent builds as they become available.</source>
-      <translation type="unfinished">It cannot be upgraded to subsequent builds as they become available.</translation>
+      <translation>Det kan inte uppgraderas till efterföljande versioner när de blir tillgängliga.</translation>
     </message>
     <message>
       <source>To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</source>
       <comment>%1 is the product name</comment>
-      <translation type="unfinished">To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</translation>
+      <translation>För att uppgradera, avinstallera %1 innan du installerar en uppdaterad version (all data kommer att gå förlorad).</translation>
     </message>
     <message>
       <source>%1 Beta</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 Beta</translation>
+      <translation>%1 Beta</translation>
     </message>
   </context>
   <context>
@@ -11334,7 +11334,7 @@ Du kan välja en annan lagringsplats på fliken &quot;Storage Management&quot; i
     </message>
     <message>
       <source>Press Esc to stop the tour.</source>
-      <translation type="unfinished">Press Esc to stop the tour.</translation>
+      <translation>Tryck på Esc för att stoppa turen.</translation>
     </message>
   </context>
   <context>
@@ -11566,7 +11566,7 @@ om du vill visa fler bokmärken</translation>
     </message>
     <message>
       <source>Can&apos;t check client update availability. Check your internet connection and try again.</source>
-      <translation type="unfinished">Can&apos;t check client update availability. Check your internet connection and try again.</translation>
+      <translation>Kan&apos;t kontrollera klientuppdateringens tillgänglighet. Kontrollera din internetanslutning och försök igen.</translation>
     </message>
   </context>
 </TS>

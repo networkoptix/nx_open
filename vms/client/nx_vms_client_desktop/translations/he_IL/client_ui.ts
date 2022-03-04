@@ -563,10 +563,6 @@
       <translation>זיהוי ID לוגי</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation>אלץ זיהוי תנועה עבור תזרים</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation>בטח בשעת המצלמה</translation>
     </message>

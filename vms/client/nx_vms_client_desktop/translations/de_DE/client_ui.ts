@@ -563,10 +563,6 @@
       <translation>Logical-ID</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation>Erzwinge Bewegungserkennung für Stream</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation>Kamerazeitstempel vertrauen</translation>
     </message>

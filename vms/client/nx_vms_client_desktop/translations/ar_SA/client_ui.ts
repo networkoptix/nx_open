@@ -563,10 +563,6 @@
       <translation>معرف منطقي ID</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation>Force motion detection for stream</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation>إعتمد الطابع الزمني للكاميرا</translation>
     </message>

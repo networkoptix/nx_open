@@ -563,10 +563,6 @@
       <translation>Looginen tunnus</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation>Pakota liiketunnistus streamille</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation>Luota kameran aikaleimaan</translation>
     </message>

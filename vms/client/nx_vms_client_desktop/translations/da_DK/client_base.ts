@@ -1005,15 +1005,15 @@
     </message>
     <message>
       <source>Copy Bookmark Text</source>
-      <translation type="unfinished">Copy Bookmark Text</translation>
+      <translation>Kopiér Bogmærketekst</translation>
     </message>
     <message>
       <source>Copy Bookmarks Text</source>
-      <translation type="unfinished">Copy Bookmarks Text</translation>
+      <translation>Kopiér Bogmærketekst</translation>
     </message>
     <message>
       <source>Web Page Settings...</source>
-      <translation type="unfinished">Web Page Settings...</translation>
+      <translation>Websideindstillinger...</translation>
     </message>
   </context>
   <context>
@@ -2706,7 +2706,7 @@ to %1</translation>
     </message>
     <message>
       <source>You will be logged out.</source>
-      <translation type="unfinished">You will be logged out.</translation>
+      <translation>Du er blevet logget ud</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
@@ -2719,7 +2719,7 @@ to %1</translation>
     <message>
       <source>Cannot disconnect the System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the System from %1</translation>
+      <translation>Kan ikke afbryde systemet fra %1</translation>
     </message>
   </context>
   <context>
@@ -3432,7 +3432,7 @@ to %1</translation>
     </message>
     <message>
       <source>Please enter a password.</source>
-      <translation type="unfinished">Please enter a password.</translation>
+      <translation>Indtast adgangskode.</translation>
     </message>
   </context>
   <context>
@@ -3900,11 +3900,11 @@ to %1</translation>
     </message>
     <message>
       <source>Motion Search</source>
-      <translation type="unfinished">Motion Search</translation>
+      <translation>Bevægelsessøgning</translation>
     </message>
     <message>
       <source>Object Search</source>
-      <translation type="unfinished">Object Search</translation>
+      <translation>Objektsøgning</translation>
     </message>
   </context>
   <context>
@@ -4480,7 +4480,7 @@ to %1</translation>
     </message>
     <message>
       <source>Enter Fullscreen</source>
-      <translation type="unfinished">Enter Fullscreen</translation>
+      <translation>Gå til fuldskærmsvisning</translation>
     </message>
   </context>
   <context>
@@ -5531,7 +5531,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Camera recording schedule is invalid</source>
-      <translation type="unfinished">Camera recording schedule is invalid</translation>
+      <translation>Kameraets optagelsesplan er ugyldig</translation>
     </message>
   </context>
   <context>
@@ -6006,15 +6006,15 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Web page</source>
-      <translation type="unfinished">Web page</translation>
+      <translation>Webside</translation>
     </message>
     <message>
       <source>Connect anyway</source>
-      <translation type="unfinished">Connect anyway</translation>
+      <translation>Tilslut alligevel</translation>
     </message>
     <message>
       <source>Web page settings...</source>
-      <translation type="unfinished">Web page settings...</translation>
+      <translation>Webside indstillinger...</translation>
     </message>
     <message>
       <source>You try to open the
@@ -7183,11 +7183,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Not supported</source>
-      <translation type="unfinished">Not supported</translation>
+      <translation>Ikke understøttet</translation>
     </message>
     <message>
       <source>Backup is not supported for this device</source>
-      <translation type="unfinished">Backup is not supported for this device</translation>
+      <translation>Sikkerhedskopiering er ikke understøttet for denne enhed</translation>
     </message>
   </context>
   <context>
@@ -9577,19 +9577,19 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Recording motion and objects</source>
-      <translation type="unfinished">Recording motion and objects</translation>
+      <translation>Optagelse af bevægelse og objekter</translation>
     </message>
     <message>
       <source>Recording objects only</source>
-      <translation type="unfinished">Recording objects only</translation>
+      <translation>Kun optagelse af objekter</translation>
     </message>
     <message>
       <source>Recording motion, objects and low quality</source>
-      <translation type="unfinished">Recording motion, objects and low quality</translation>
+      <translation>Optagelse af bevægelse, objekter og lav kvalitet</translation>
     </message>
     <message>
       <source>Recording objects and low quality</source>
-      <translation type="unfinished">Recording objects and low quality</translation>
+      <translation>Optagelse af objekter og lav kvalitet</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
@@ -9597,15 +9597,15 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Objects only</source>
-      <translation type="unfinished">Objects only</translation>
+      <translation>Kun objekter</translation>
     </message>
     <message>
       <source>Motion, Objects + Lo-Res</source>
-      <translation type="unfinished">Motion, Objects + Lo-Res</translation>
+      <translation>Bevægelse, Objekter + Lav opløsning</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Objekter + Lav opløsning</translation>
     </message>
   </context>
   <context>
@@ -10036,10 +10036,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation type="unfinished">Trust this server?</translation>
     </message>
     <message>
-      <source>You attempted to connect to %1 but the server presented a certificate, that cannot be verified automatically.</source>
-      <translation type="unfinished">You attempted to connect to %1 but the server presented a certificate, that cannot be verified automatically.</translation>
-    </message>
-    <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
       <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct server.</translation>
     </message>
@@ -10054,6 +10050,10 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
       <source>Do not connect to this server unless instructed by your VMS administrator.</source>
       <translation type="unfinished">Do not connect to this server unless instructed by your VMS administrator.</translation>
+    </message>
+    <message>
+      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
+      <translation type="unfinished">You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</translation>
     </message>
   </context>
   <context>

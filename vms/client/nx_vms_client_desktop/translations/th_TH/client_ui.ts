@@ -563,10 +563,6 @@
       <translation>รหัสตรรกะ</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation>บังคับให้ตรวจจับการเคลื่อนไหวสำหรับสตรีม</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation>ประทับเวลาของกล้อง</translation>
     </message>

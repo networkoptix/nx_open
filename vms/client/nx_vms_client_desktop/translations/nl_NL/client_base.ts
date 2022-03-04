@@ -21,7 +21,7 @@
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>Elke Plugin</translation>
     </message>
     <message numerus="yes">
       <source>%1 with %n attributes</source>
@@ -32,7 +32,7 @@
     </message>
     <message>
       <source>Any subtype</source>
-      <translation type="unfinished">Any subtype</translation>
+      <translation>Elk subtype</translation>
     </message>
   </context>
   <context>
@@ -50,7 +50,7 @@
     </message>
     <message>
       <source>Issuer</source>
-      <translation type="unfinished">Issuer</translation>
+      <translation>Verstrekker</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -894,11 +894,11 @@
     </message>
     <message>
       <source>Switch to Cameras &amp; Resources tab</source>
-      <translation type="unfinished">Switch to Cameras &amp; Resources tab</translation>
+      <translation>Overschakelen naar het tabblad Camera's en bronnen</translation>
     </message>
     <message>
       <source>Search Cameras &amp; Resources</source>
-      <translation type="unfinished">Search Cameras &amp; Resources</translation>
+      <translation>Camera's en bronnen zoeken</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
@@ -906,55 +906,55 @@
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>Nieuw</translation>
     </message>
     <message>
       <source>Welcome Screen</source>
-      <translation type="unfinished">Welcome Screen</translation>
+      <translation>Welkomstscherm</translation>
     </message>
     <message>
       <source>Add Web Page...</source>
-      <translation type="unfinished">Add Web Page...</translation>
+      <translation>Nieuwe webpagina...</translation>
     </message>
     <message>
       <source>Show Servers</source>
-      <translation type="unfinished">Show Servers</translation>
+      <translation>Servers tonen</translation>
     </message>
     <message>
       <source>Save Window Configuration</source>
-      <translation type="unfinished">Save Window Configuration</translation>
+      <translation>Vensterconfiguratie opslaan</translation>
     </message>
     <message>
       <source>Save Windows Configuration</source>
-      <translation type="unfinished">Save Windows Configuration</translation>
+      <translation>Vensterconfiguratie opslaan</translation>
     </message>
     <message>
       <source>Windows Configuration</source>
-      <translation type="unfinished">Windows Configuration</translation>
+      <translation>Vensterconfiguratie</translation>
     </message>
     <message>
       <source>Save Current State</source>
-      <translation type="unfinished">Save Current State</translation>
+      <translation>Huidige status opslaan</translation>
     </message>
     <message>
       <source>Restore Saved State</source>
-      <translation type="unfinished">Restore Saved State</translation>
+      <translation>Opgeslagen staat herstellen</translation>
     </message>
     <message>
       <source>Delete Saved State</source>
-      <translation type="unfinished">Delete Saved State</translation>
+      <translation>Opgeslagen status verwijderen</translation>
     </message>
     <message>
       <source>Close all Windows</source>
-      <translation type="unfinished">Close all Windows</translation>
+      <translation>Sluit alle vensters</translation>
     </message>
     <message>
       <source>Delete Bookmark...</source>
-      <translation type="unfinished">Delete Bookmark...</translation>
+      <translation>Bladwijzer verwijderen...</translation>
     </message>
     <message>
       <source>Delete Bookmarks...</source>
-      <translation type="unfinished">Delete Bookmarks...</translation>
+      <translation>Bladwijzer verwijderen...</translation>
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
@@ -969,39 +969,39 @@
     </message>
     <message>
       <source>Rotate to</source>
-      <translation type="unfinished">Rotate to</translation>
+      <translation>Draai naar</translation>
     </message>
     <message>
       <source>Create Group</source>
-      <translation type="unfinished">Create Group</translation>
+      <translation>Groep aanmaken</translation>
     </message>
     <message>
       <source>Remove Group</source>
-      <translation type="unfinished">Remove Group</translation>
+      <translation>Groep verwijderen</translation>
     </message>
     <message>
       <source>Add Proxied Web Page...</source>
-      <translation type="unfinished">Add Proxied Web Page...</translation>
+      <translation>Proxied webpagina toevoegen...</translation>
     </message>
     <message>
       <source>Cell Spacing</source>
-      <translation type="unfinished">Cell Spacing</translation>
+      <translation>Celafstand</translation>
     </message>
     <message>
       <source>Show Panel</source>
-      <translation type="unfinished">Show Panel</translation>
+      <translation>Paneel tonen</translation>
     </message>
     <message>
       <source>Hide Panel</source>
-      <translation type="unfinished">Hide Panel</translation>
+      <translation>Paneel verbergen</translation>
     </message>
     <message>
       <source>Joystick Settings...</source>
-      <translation type="unfinished">Joystick Settings...</translation>
+      <translation>Joystick-instellingen...</translation>
     </message>
     <message>
       <source>Advanced...</source>
-      <translation type="unfinished">Advanced...</translation>
+      <translation>Geavanceerd...</translation>
     </message>
     <message>
       <source>Copy Bookmark Text</source>
@@ -1166,7 +1166,7 @@
     </message>
     <message>
       <source>Executable %1 Media File</source>
-      <translation type="unfinished">Executable %1 Media File</translation>
+      <translation>Uitvoerbaar %1 Mediabestand</translation>
     </message>
   </context>
   <context>
@@ -1672,35 +1672,35 @@
     </message>
     <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Aanbevolen</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>Strikt</translation>
     </message>
     <message>
       <source>May lead to privacy issues</source>
-      <translation type="unfinished">May lead to privacy issues</translation>
+      <translation>Kan leiden tot privacyproblemen</translation>
     </message>
     <message>
       <source>Connect only servers with public certificate</source>
-      <translation type="unfinished">Connect only servers with public certificate</translation>
+      <translation>Verbind alleen servers met een openbaar certificaat</translation>
     </message>
     <message>
       <source>Certificate storage will be cleared.</source>
-      <translation type="unfinished">Certificate storage will be cleared.</translation>
+      <translation>Certificaatopslag wordt gewist.</translation>
     </message>
     <message>
       <source>Current client instance will be disconnected.</source>
-      <translation type="unfinished">Current client instance will be disconnected.</translation>
+      <translation>De huidige clientinstantie wordt losgekoppeld.</translation>
     </message>
     <message>
       <source>All other client windows will be closed.</source>
-      <translation type="unfinished">All other client windows will be closed.</translation>
+      <translation>Alle andere clientvensters worden gesloten.</translation>
     </message>
     <message>
       <source>Security settings changed</source>
-      <translation type="unfinished">Security settings changed</translation>
+      <translation>Beveiligingsinstellingen gewijzigd</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -2015,11 +2015,11 @@
     </message>
     <message>
       <source>MitM Attack</source>
-      <translation type="unfinished">MitM Attack</translation>
+      <translation>MitM Aanval</translation>
     </message>
     <message>
       <source>MitM attack from server %1</source>
-      <translation type="unfinished">MitM attack from server %1</translation>
+      <translation>MitM-aanval vanaf server %1</translation>
     </message>
   </context>
   <context>
@@ -2296,7 +2296,7 @@
     </message>
     <message>
       <source>Some rules are not valid and may not work</source>
-      <translation type="unfinished">Some rules are not valid and may not work</translation>
+      <translation>Sommige regels zijn niet geldig en werken mogelijk niet</translation>
     </message>
   </context>
   <context>
@@ -2679,7 +2679,7 @@ to %1</source>
     <message>
       <source>Enter your account password to disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect System from %1</translation>
+      <translation>Voer uw accountwachtwoord in om het systeem van %1 los te koppelen</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -2688,7 +2688,7 @@ to %1</source>
     <message>
       <source>System disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">System disconnected from %1</translation>
+      <translation>Systeem losgekoppeld van %1</translation>
     </message>
     <message>
       <source>You are about to disconnect System from %1</source>
@@ -2981,23 +2981,23 @@ to %1</source>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation type="unfinished">Save Database Backup</translation>
+      <translation>Database back-up opslaan</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
-      <translation type="unfinished">Enter your account password to create backup</translation>
+      <translation>Voer uw accountwachtwoord in om een back-up te maken</translation>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Creëer</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
-      <translation type="unfinished">Restore from Database Backup</translation>
+      <translation>Herstellen vanuit Database Backup</translation>
     </message>
     <message>
       <source>Enter your account password to restore System from backup</source>
-      <translation type="unfinished">Enter your account password to restore System from backup</translation>
+      <translation>Voer uw accountwachtwoord in om het systeem vanaf een back-up te herstellen</translation>
     </message>
     <message>
       <source>Restore</source>
@@ -7035,107 +7035,107 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Use audio stream from another device</source>
-      <translation type="unfinished">Use audio stream from another device</translation>
+      <translation>Audiostream van een ander apparaat gebruiken</translation>
     </message>
     <message>
       <source>Use audio stream from another camera</source>
-      <translation type="unfinished">Use audio stream from another camera</translation>
+      <translation>Gebruik audio stream van een andere camera</translation>
     </message>
     <message>
       <source>Transmit audio stream to another device</source>
-      <translation type="unfinished">Transmit audio stream to another device</translation>
+      <translation>Stuur audio stream naar een ander apparaat</translation>
     </message>
     <message>
       <source>Transmit audio stream to another camera</source>
-      <translation type="unfinished">Transmit audio stream to another camera</translation>
+      <translation>Stuur audio stream naar een andere camera</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</translation>
+      <translation>Het geselecteerde apparaat heeft geen audio-ingang of is niet geconfigureerd. Audiostream is niet beschikbaar.</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</translation>
+      <translation>Geselecteerde apparaat heeft geen audio-uitvoer of het is niet geconfigureerd. Audio-stream is niet beschikbaar.</translation>
     </message>
     <message>
       <source>The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+      <translation>Het geselecteerde apparaat heeft geen audio-ingang of is niet geconfigureerd. Audiostream is niet beschikbaar.</translation>
     </message>
     <message>
       <source>The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+      <translation>De geselecteerde camera heeft geen audio-invoer of het is niet goed geconfigureerd. De audio-stream is niet beschikbaar.</translation>
     </message>
     <message>
       <source>The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+      <translation>Het geselecteerde apparaat heeft geen audio-output, of het is niet correct geconfigureerd. 2-weg audio is niet beschikbaar.</translation>
     </message>
     <message>
       <source>The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+      <translation>De geselecteerde camera heeft geen audio-uitgang of is niet correct geconfigureerd. 2-weg audio is niet beschikbaar.</translation>
     </message>
     <message>
       <source>Use audio stream from this device</source>
-      <translation type="unfinished">Use audio stream from this device</translation>
+      <translation>Audiostream van dit apparaat gebruiken</translation>
     </message>
     <message>
       <source>Use audio stream from this camera</source>
-      <translation type="unfinished">Use audio stream from this camera</translation>
+      <translation>Audiostream van deze camera gebruiken</translation>
     </message>
     <message>
       <source>%1 is connected to another server. Audio stream is not available</source>
-      <translation type="unfinished">%1 is connected to another server. Audio stream is not available</translation>
+      <translation>%1 is verbonden met een andere server. Audio stream is niet beschikbaar</translation>
     </message>
     <message>
       <source>Selected device is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device is connected to another server. Audio stream is not available.</translation>
+      <translation>Het geselecteerde apparaat is verbonden met een andere server. Audiostream is niet beschikbaar.</translation>
     </message>
     <message>
       <source>Selected camera is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected camera is connected to another server. Audio stream is not available.</translation>
+      <translation>De geselecteerde camera is verbonden met een andere server. Audiostream is niet beschikbaar.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupBandwidthSettingsWidget</name>
     <message>
       <source>Select an area on the schedule to apply chosen settings.</source>
-      <translation type="unfinished">Select an area on the schedule to apply chosen settings.</translation>
+      <translation>Selecteer een gebied in het schema om de gekozen instellingen toe te passen.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupQueueSize</name>
     <message numerus="yes">
       <source>%n weeks</source>
-      <translation type="unfinished">
-        <numerusform>%n weeks</numerusform>
-        <numerusform>%n weeks</numerusform>
+      <translation>
+        <numerusform>%n weken</numerusform>
+        <numerusform>%n weken</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n days</source>
-      <translation type="unfinished">
-        <numerusform>%n days</numerusform>
-        <numerusform>%n days</numerusform>
+      <translation>
+        <numerusform>%n dagen</numerusform>
+        <numerusform>%n dagen</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hours</source>
-      <translation type="unfinished">
-        <numerusform>%n hours</numerusform>
-        <numerusform>%n hours</numerusform>
+      <translation>
+        <numerusform>%n uren</numerusform>
+        <numerusform>%n uren</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n minutes</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
+      <translation>
+        <numerusform>%n minuten</numerusform>
+        <numerusform>%n minuten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n seconds</source>
-      <translation type="unfinished">
-        <numerusform>%n seconds</numerusform>
-        <numerusform>%n seconds</numerusform>
+      <translation>
+        <numerusform>%n seconden</numerusform>
+        <numerusform>%n seconden</numerusform>
       </translation>
     </message>
   </context>
@@ -7143,7 +7143,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
     <message>
       <source>The camera has neither recorded footage nor recording scheduled</source>
-      <translation type="unfinished">The camera has neither recorded footage nor recording scheduled</translation>
+      <translation>De camera heeft geen opgenomen beelden en ook geen opname gepland</translation>
     </message>
     <message>
       <source>Motion detection is disabled</source>
@@ -7151,7 +7151,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>No analytics plugins</source>
-      <translation type="unfinished">No analytics plugins</translation>
+      <translation>Geen analytics plug-ins</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -7159,7 +7159,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>Wat te back-uppen?</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -7167,15 +7167,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot be modified for new added cameras</source>
-      <translation type="unfinished">Cannot be modified for new added cameras</translation>
+      <translation>Kan niet worden gewijzigd voor nieuwe toegevoegde camera's</translation>
     </message>
     <message>
       <source>This device provides only one data stream</source>
-      <translation type="unfinished">This device provides only one data stream</translation>
+      <translation>Dit apparaat biedt slechts één gegevensstream aan</translation>
     </message>
     <message>
       <source>Stream setting is not applicable to this device type</source>
-      <translation type="unfinished">Stream setting is not applicable to this device type</translation>
+      <translation>Stream instelling is niet van toepassing op dit apparaat type</translation>
     </message>
     <message>
       <source>Not supported</source>
@@ -7190,11 +7190,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
     <message>
       <source>Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</source>
-      <translation type="unfinished">Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</translation>
+      <translation>Gebruik %1 of %2 om meerdere apparaten te selecteren voor batchbewerking. Gebruik %3 om alle apparaten te selecteren.</translation>
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>Wat te back-uppen?</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -7202,9 +7202,9 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message numerus="yes">
       <source>Set for %n selected devices</source>
-      <translation type="unfinished">
-        <numerusform>Set for %n selected devices</numerusform>
-        <numerusform>Set for %n selected devices</numerusform>
+      <translation>
+        <numerusform>Instellen voor %n geselecteerde apparaten</numerusform>
+        <numerusform>Instellen voor %n geselecteerde apparaten</numerusform>
       </translation>
     </message>
   </context>
@@ -7212,7 +7212,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
     <message>
       <source>Nothing to backup</source>
-      <translation type="unfinished">Nothing to backup</translation>
+      <translation>Niets te backuppen</translation>
     </message>
   </context>
   <context>
@@ -7223,23 +7223,23 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Bandwidth Limit</source>
-      <translation type="unfinished">Bandwidth Limit</translation>
+      <translation>Bandbreedte limiet</translation>
     </message>
     <message>
       <source>New added cameras</source>
-      <translation type="unfinished">New added cameras</translation>
+      <translation>Nieuw toegevoegde camera's</translation>
     </message>
     <message>
       <source>New added cameras settings will apply to all servers in the system.</source>
-      <translation type="unfinished">New added cameras settings will apply to all servers in the system.</translation>
+      <translation>Nieuw toegevoegde camera-instellingen zijn van toepassing op alle servers in het systeem.</translation>
     </message>
     <message>
       <source>Backup will be turned on for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned on for new added cameras on all servers in the system.</translation>
+      <translation>Back-up wordt ingeschakeld voor nieuw toegevoegde camera's op alle servers in het systeem.</translation>
     </message>
     <message>
       <source>Backup will be turned off for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned off for new added cameras on all servers in the system.</translation>
+      <translation>Back-up wordt uitgeschakeld voor nieuw toegevoegde camera's op alle servers in het systeem.</translation>
     </message>
     <message>
       <source>Storage Management</source>
@@ -7260,11 +7260,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupStatusWidget</name>
     <message>
       <source>Backup process will ignore existing footage. Only further recording will be backed up.</source>
-      <translation type="unfinished">Backup process will ignore existing footage. Only further recording will be backed up.</translation>
+      <translation>Het back-upproces negeert bestaande beelden. Er wordt alleen een back-up gemaakt van nieuwe opnames.</translation>
     </message>
     <message>
       <source>Skip backup for existing footage?</source>
-      <translation type="unfinished">Skip backup for existing footage?</translation>
+      <translation>Back-up voor bestaand beeldmateriaal overslaan?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
@@ -7272,20 +7272,20 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Applies only to the cameras connected to current server.</source>
-      <translation type="unfinished">Applies only to the cameras connected to current server.</translation>
+      <translation>Geldt alleen voor de camera's die zijn aangesloten op de huidige server.</translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Backup is enabled for %n devices</numerusform>
-        <numerusform>Backup is enabled for %n devices</numerusform>
+      <translation>
+        <numerusform>Back-up is ingeschakeld voor %n apparaten</numerusform>
+        <numerusform>Back-up is ingeschakeld voor %n apparaten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Backup is enabled for %n cameras</numerusform>
-        <numerusform>Backup is enabled for %n cameras</numerusform>
+      <translation>
+        <numerusform>Back-up is ingeschakeld voor %n camera's</numerusform>
+        <numerusform>Back-up is ingeschakeld voor %n camera's</numerusform>
       </translation>
     </message>
   </context>
@@ -7311,7 +7311,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>Selecteer een tijdspanne op de tijdlijn en klik met de rechtermuisknop op het gemarkeerde gedeelte om een bladwijzer te maken</translation>
     </message>
   </context>
   <context>
@@ -7379,11 +7379,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Automatic selection</source>
-      <translation type="unfinished">Automatic selection</translation>
+      <translation>Automatische selectie</translation>
     </message>
     <message>
       <source>Use if supported</source>
-      <translation type="unfinished">Use if supported</translation>
+      <translation>Gebruiken indien ondersteund</translation>
     </message>
     <message>
       <source>Never</source>
@@ -7391,15 +7391,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Force Motion Detection</source>
-      <translation type="unfinished">Force Motion Detection</translation>
+      <translation>Bewegingsdetectie forceren</translation>
     </message>
     <message>
       <source>Pan</source>
-      <translation type="unfinished">Pan</translation>
+      <translation>Pan</translation>
     </message>
     <message>
       <source>Pan &amp; Tilt</source>
-      <translation type="unfinished">Pan &amp; Tilt</translation>
+      <translation>Pan &amp; Tilt</translation>
     </message>
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
@@ -7479,15 +7479,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Force Motion Detection</source>
-      <translation type="unfinished">Force Motion Detection</translation>
+      <translation>Bewegingsdetectie forceren</translation>
     </message>
     <message>
       <source>Select areas on the preview to set chosen sensitivity for.</source>
-      <translation type="unfinished">Select areas on the preview to set chosen sensitivity for.</translation>
+      <translation>Selecteer gebieden in de voorvertoning om de gekozen gevoeligheid voor in te stellen.</translation>
     </message>
     <message>
       <source>Choose a motion detection sensitivity and select some areas on the preview to set it for.</source>
-      <translation type="unfinished">Choose a motion detection sensitivity and select some areas on the preview to set it for.</translation>
+      <translation>Kies een gevoeligheid voor bewegingsdetectie en selecteer enkele gebieden in het voorbeeld om deze voor in te stellen.</translation>
     </message>
   </context>
   <context>
@@ -7649,7 +7649,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
+      <translation>Alleen objecten</translation>
     </message>
     <message>
       <source>Motion &amp; Objects Only</source>
@@ -9212,7 +9212,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Notifications Settings</source>
-      <translation type="unfinished">Notifications Settings</translation>
+      <translation>Notificatie instellingen</translation>
     </message>
   </context>
   <context>
@@ -9482,15 +9482,15 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Add Proxied Web Page</source>
-      <translation type="unfinished">Add Proxied Web Page</translation>
+      <translation>Proxied webpagina toevoegen</translation>
     </message>
     <message>
       <source>Add Web Page</source>
-      <translation type="unfinished">Add Web Page</translation>
+      <translation>Webpagina toevoegen</translation>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>
-      <translation type="unfinished">Edit Proxied Web Page</translation>
+      <translation>Proxied webpagina bewerken</translation>
     </message>
     <message>
       <source>Edit Web Page</source>
@@ -9498,7 +9498,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
-      <translation type="unfinished">Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</translation>
+      <translation>Webpagina proxy inschakelen op &lt;b&gt;Algemeen&lt;/b&gt; tab.</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
@@ -9589,7 +9589,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>Beweging, objecten</translation>
     </message>
     <message>
       <source>Objects only</source>
@@ -9662,7 +9662,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Analytic</source>
-      <translation type="unfinished">Analytic</translation>
+      <translation>Analytics</translation>
     </message>
     <message>
       <source>Generic</source>
@@ -9670,7 +9670,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Input Signal</source>
-      <translation type="unfinished">Input Signal</translation>
+      <translation>Ingangssignaal</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
@@ -9678,11 +9678,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Stream Issue</source>
-      <translation type="unfinished">Stream Issue</translation>
+      <translation>Streamprobleem</translation>
     </message>
     <message>
       <source>Device Disconnect</source>
-      <translation type="unfinished">Device Disconnect</translation>
+      <translation>Apparaat loskoppelen</translation>
     </message>
     <message>
       <source>Device IP Conflict</source>
@@ -9732,38 +9732,38 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Allow system to optimize camera settings&quot; option in the &quot;System Administration&quot; dialog.
 You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Allow system to optimize camera settings&quot; option in the &quot;System Administration&quot; dialog.
-You can still change quality and FPS directly on the camera.</translation>
+      <translation>Instellingen voor kwaliteit en FPS zijn uitgeschakeld vanwege de &quot;Toestaan om camera-instellingen&quot; optie in het &quot;Systeembeheer&quot; dialoogvenster te optimaliseren.
+U kunt de kwaliteit en FPS nog steeds rechtstreeks wijzigen op de camera.</translation>
     </message>
     <message>
       <source>Quality and FPS settings are disabled for some of the selected cameras.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled for some of the selected cameras.</translation>
+      <translation>Instellingen voor kwaliteit en FPS zijn uitgeschakeld voor sommige van de geselecteerde camera's.</translation>
     </message>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Keep camera stream and profile settings&quot; option on the &quot;Expert&quot; tab.
 You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Keep camera stream and profile settings&quot; option on the &quot;Expert&quot; tab.
-You can still change quality and FPS directly on the camera.</translation>
+      <translation>Instellingen voor kwaliteit en FPS zijn uitgeschakeld vanwege de &quot;Toestaan om camera-instellingen&quot; optie in het &quot;Systeembeheer&quot; dialoogvenster te optimaliseren.
+U kunt de kwaliteit en FPS nog steeds rechtstreeks wijzigen op de camera.</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>Beweging, objecten</translation>
     </message>
     <message>
       <source>Motion, Objects
  + Low-Res</source>
-      <translation type="unfinished">Motion, Objects
- + Low-Res</translation>
+      <translation>Beweging, Objecten
+ + Lage Resolutie</translation>
     </message>
     <message>
       <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
+      <translation>Alleen objecten</translation>
     </message>
     <message>
       <source>Objects
  + Low-Res</source>
-      <translation type="unfinished">Objects
- + Low-Res</translation>
+      <translation>Objecten
+ + Lage Resolutie</translation>
     </message>
     <message>
       <source>Motion Only</source>
@@ -9772,8 +9772,8 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>Motion
  + Low-Res</source>
-      <translation type="unfinished">Motion
- + Low-Res</translation>
+      <translation>Beweging
+ + Lage Resolutie</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected devices</source>
@@ -9883,21 +9883,21 @@ You can still change quality and FPS directly on the camera.</translation>
     </message>
     <message>
       <source>Archive encryption password</source>
-      <translation type="unfinished">Archive encryption password</translation>
+      <translation>Wachtwoord voor de archiefversleuteling</translation>
     </message>
     <message>
       <source>The encryption password will be required to restore the archive on another system.
 Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
-      <translation type="unfinished">The encryption password will be required to restore the archive on another system.
-Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</translation>
+      <translation>Het versleutelingswachtwoord is vereist om het archief op een ander systeem te herstellen.
+Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is het archief niet meer te herstellen.</translation>
     </message>
     <message>
       <source>Encrypts archive data to prevent it from being viewed outside of the system. You will not be required to enter the encryption password to view the video archive within this system.</source>
-      <translation type="unfinished">Encrypts archive data to prevent it from being viewed outside of the system. You will not be required to enter the encryption password to view the video archive within this system.</translation>
+      <translation>Versleutelt archiefgegevens om te voorkomen dat deze buiten het systeem kunnen worden bekeken. U hoeft het coderingswachtwoord niet in te voeren om het videoarchief in dit systeem te bekijken.</translation>
     </message>
     <message>
       <source>Failed to set archive encryption password</source>
-      <translation type="unfinished">Failed to set archive encryption password</translation>
+      <translation>Kan wachtwoord voor archiefversleuteling niet instellen</translation>
     </message>
     <message>
       <source>Does not affect the connections established by server.</source>
@@ -10032,10 +10032,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation type="unfinished">Trust this server?</translation>
     </message>
     <message>
-      <source>You attempted to connect to %1 but the server presented a certificate, that cannot be verified automatically.</source>
-      <translation type="unfinished">You attempted to connect to %1 but the server presented a certificate, that cannot be verified automatically.</translation>
-    </message>
-    <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
       <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct server.</translation>
     </message>
@@ -10050,6 +10046,10 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
       <source>Do not connect to this server unless instructed by your VMS administrator.</source>
       <translation type="unfinished">Do not connect to this server unless instructed by your VMS administrator.</translation>
+    </message>
+    <message>
+      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
+      <translation type="unfinished">You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</translation>
     </message>
   </context>
   <context>

@@ -537,7 +537,7 @@
     </message>
     <message>
       <source>Toggle Repeat</source>
-      <translation type="unfinished">Toggle Repeat</translation>
+      <translation>Växla Upprepa</translation>
     </message>
   </context>
   <context>
@@ -734,7 +734,7 @@
     </message>
     <message>
       <source>Remember me</source>
-      <translation type="unfinished">Remember me</translation>
+      <translation>Kom ihåg mig</translation>
     </message>
   </context>
   <context>
@@ -803,7 +803,7 @@
     </message>
     <message>
       <source>preview is not available for the selected object</source>
-      <translation type="unfinished">preview is not available for the selected object</translation>
+      <translation>förhandsgranskning är inte tillgänglig för det valda objektet</translation>
     </message>
   </context>
   <context>
@@ -873,7 +873,7 @@ att aktivera PTZ</translation>
     </message>
     <message>
       <source>Subtype</source>
-      <translation type="unfinished">Subtype</translation>
+      <translation>Undertyp</translation>
     </message>
   </context>
   <context>
@@ -1029,7 +1029,7 @@ att aktivera PTZ</translation>
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Välj</translation>
     </message>
     <message>
       <source>Cancel</source>

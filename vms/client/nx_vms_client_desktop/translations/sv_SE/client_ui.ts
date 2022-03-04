@@ -291,7 +291,7 @@
     <name>BackupSettingsWidget</name>
     <message>
       <source>Server is offline. Backup settings are not available.</source>
-      <translation type="unfinished">Server is offline. Backup settings are not available.</translation>
+      <translation>Servern är offline. Säkerhetskopieringsinställningar är inte tillgängliga.</translation>
     </message>
   </context>
   <context>
@@ -318,11 +318,11 @@
     </message>
     <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
-      <translation type="unfinished">All files are successfully backed up! New files will be backed up automatically</translation>
+      <translation>Alla filer har säkerhetskopierats framgångsrikt! Nya filer kommer att säkerhetskopieras automatiskt</translation>
     </message>
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
-      <translation type="unfinished">Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</translation>
+      <translation>Säkerhetskopieringen stoppas på grund av lagringsproblem. Säkerhetskopieringen återupptas automatiskt efter att lagringsproblemet har lösts</translation>
     </message>
   </context>
   <context>
@@ -563,10 +563,6 @@
       <translation>Logiskt ID</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation>Kör rörelsedetektering för ström</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation>Lita på kameratidsstämpeln</translation>
     </message>
@@ -620,19 +616,19 @@
     </message>
     <message>
       <source>RTP Transport</source>
-      <translation type="unfinished">RTP Transport</translation>
+      <translation>RTP Transport</translation>
     </message>
     <message>
       <source>Use camera native presets</source>
-      <translation type="unfinished">Use camera native presets</translation>
+      <translation>Använd kamerans inbyggda förinställningar</translation>
     </message>
     <message>
       <source>Time Settings</source>
-      <translation type="unfinished">Time Settings</translation>
+      <translation>Tidsinställningar</translation>
     </message>
     <message>
       <source>Keep camera time settings</source>
-      <translation type="unfinished">Keep camera time settings</translation>
+      <translation>Behåll kamerans tidsinställningar</translation>
     </message>
   </context>
   <context>
@@ -766,7 +762,7 @@
     </message>
     <message>
       <source>Motion &amp;&amp; Objects Recording</source>
-      <translation type="unfinished">Motion &amp;&amp; Objects Recording</translation>
+      <translation>Rörelse &amp;&amp; Objektinspelning</translation>
     </message>
   </context>
   <context>
@@ -1500,7 +1496,7 @@
     </message>
     <message>
       <source>Allow digest authentication for imported user</source>
-      <translation type="unfinished">Allow digest authentication for imported user</translation>
+      <translation>Tillåt digest -autentisering för importerade användare</translation>
     </message>
   </context>
   <context>
@@ -1776,7 +1772,7 @@
     <name>OauthLoginPlaceholder</name>
     <message>
       <source>Try Again</source>
-      <translation type="unfinished">Try Again</translation>
+      <translation>Försök Igen</translation>
     </message>
   </context>
   <context>
@@ -2446,7 +2442,7 @@
     </message>
     <message>
       <source>Manage Users</source>
-      <translation type="unfinished">Manage Users</translation>
+      <translation>Hantera användare</translation>
     </message>
   </context>
   <context>
@@ -2538,7 +2534,7 @@
     </message>
     <message>
       <source>Autodetect built-in and USB webcams</source>
-      <translation type="unfinished">Autodetect built-in and USB webcams</translation>
+      <translation>Upptäck automatiskt inbyggda webbkameror och USB-webbkameror</translation>
     </message>
   </context>
   <context>
@@ -3016,7 +3012,7 @@
     </message>
     <message>
       <source>Allow opening web page without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening web page without SSL certificate checking</translation>
+      <translation>Tillåt öppning av webbsida utan kontroll av SSL-certifikat</translation>
     </message>
   </context>
   <context>

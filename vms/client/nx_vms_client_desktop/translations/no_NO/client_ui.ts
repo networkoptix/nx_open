@@ -563,10 +563,6 @@
       <translation>Logisk ID</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation>Lås bevegelsesdeteksjon til strøm</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation>Stol på kameraets tidsstempel</translation>
     </message>

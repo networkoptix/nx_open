@@ -563,10 +563,6 @@
       <translation>邏輯 ID</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation>強制由以下串流判斷位移偵測</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation>信任攝影機的時間戳記</translation>
     </message>

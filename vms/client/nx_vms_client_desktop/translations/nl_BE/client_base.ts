@@ -10031,10 +10031,6 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
       <translation>Vertrouw deze server?</translation>
     </message>
     <message>
-      <source>You attempted to connect to %1 but the server presented a certificate, that cannot be verified automatically.</source>
-      <translation type="unfinished">You attempted to connect to %1 but the server presented a certificate, that cannot be verified automatically.</translation>
-    </message>
-    <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
       <translation>Controleer het certificaat&apos;s details om er zeker van te zijn dat u verbinding maakt met de juiste server.</translation>
     </message>
@@ -10049,6 +10045,10 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <message>
       <source>Do not connect to this server unless instructed by your VMS administrator.</source>
       <translation>Maak geen verbinding met deze server tenzij uw VMS-beheerder u dat heeft gevraagd.</translation>
+    </message>
+    <message>
+      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
+      <translation type="unfinished">You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</translation>
     </message>
   </context>
   <context>

@@ -563,10 +563,6 @@
       <translation>ID lógico</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation>Forçar detecção de movimento para o fluxo</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation>Confiar no timestamp da câmera</translation>
     </message>

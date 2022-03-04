@@ -563,10 +563,6 @@
       <translation>Logische ID</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation>Forceer bewegingsdetectie voor stream</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation>Vertrouw camera tijdstempel</translation>
     </message>

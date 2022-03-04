@@ -563,10 +563,6 @@
       <translation>Логический ID</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation>Жестко задать обнаружение движения по потоку</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation>Доверять меткам времени камеры</translation>
     </message>

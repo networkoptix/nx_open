@@ -563,10 +563,6 @@
       <translation>논리 ID</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation>스트림에 대한 강제 모션 감지</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation>트러스트 카메라 타임 스탬프</translation>
     </message>

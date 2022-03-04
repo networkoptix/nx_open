@@ -563,10 +563,6 @@
       <translation type="unfinished">Logical ID</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation>Force motion detection for stream</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation type="unfinished">Trust camera timestamp</translation>
     </message>

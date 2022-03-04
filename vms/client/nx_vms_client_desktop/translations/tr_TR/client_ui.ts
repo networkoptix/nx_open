@@ -563,10 +563,6 @@
       <translation>Mantıksal Kimlik</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation>Hareket algılamayı bu akış için zorla</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation>Kamera saat damgasına güven</translation>
     </message>

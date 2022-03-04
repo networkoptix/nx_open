@@ -10032,10 +10032,6 @@ Pinnen Sie dieses Zertifikat nicht an, wenn Sie das SSL-Zertifikat des %2-Server
       <translation>Diesem Server vertrauen?</translation>
     </message>
     <message>
-      <source>You attempted to connect to %1 but the server presented a certificate, that cannot be verified automatically.</source>
-      <translation>Sie haben versucht, eine Verbindung zu %1 herzustellen, aber der Server hat ein Zertifikat vorgelegt, das nicht automatisch überprüft werden kann.</translation>
-    </message>
-    <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
       <translation>Überprüfen Sie die Details des Zertifikats, um sicherzustellen, dass Sie sich mit dem richtigen Server verbinden.</translation>
     </message>
@@ -10050,6 +10046,10 @@ Pinnen Sie dieses Zertifikat nicht an, wenn Sie das SSL-Zertifikat des %2-Server
     <message>
       <source>Do not connect to this server unless instructed by your VMS administrator.</source>
       <translation>Stellen Sie keine Verbindung zu diesem Server her, es sei denn, Sie werden von Ihrem VMS-Administrator dazu aufgefordert.</translation>
+    </message>
+    <message>
+      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
+      <translation type="unfinished">You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</translation>
     </message>
   </context>
   <context>

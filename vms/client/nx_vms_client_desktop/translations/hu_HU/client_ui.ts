@@ -563,10 +563,6 @@
       <translation>Logikai azonosító</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation>Mozgásérzékelés kényszerítése ezen a streamen</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation>Bízzon a kamera időbélyegzőjében</translation>
     </message>
