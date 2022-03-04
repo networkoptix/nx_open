@@ -21,7 +21,7 @@ LicenseHealthWatcher::LicenseHealthWatcher(
 
 void LicenseHealthWatcher::at_timer()
 {
-    nx::vms::license::Validator validator(m_licensePool->commonModule());
+    nx::vms::license::Validator validator(m_licensePool->context());
     for (const auto& license: m_licensePool->getLicenses())
     {
         if (validator.validate(license) == nx::vms::license::QnLicenseErrorCode::Expired)

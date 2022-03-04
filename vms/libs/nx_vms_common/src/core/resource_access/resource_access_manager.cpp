@@ -2,7 +2,6 @@
 
 #include "resource_access_manager.h"
 
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -34,6 +33,7 @@
 #include <nx/vms/api/data/webpage_data.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/common/resource/resource_context.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/scoped_timer.h>
 
@@ -92,23 +92,26 @@ bool verifyDesktopCameraOnLayout(
 
 } // namespace
 
-QnResourceAccessManager::QnResourceAccessManager(Mode mode, QObject* parent /*= nullptr*/):
+QnResourceAccessManager::QnResourceAccessManager(
+    Mode mode,
+    nx::vms::common::ResourceContext* context,
+    QObject* parent)
+    :
     base_type(parent),
-    QnUpdatable(),
-    QnCommonModuleAware(parent),
+    nx::vms::common::ResourceContextAware(context),
     m_mode(mode),
     m_permissionsCache(std::make_unique<PermissionsCache>())
 {
     if (m_mode == Mode::cached)
     {
-        const auto& resPool = commonModule()->resourcePool();
+        const auto& resPool = m_context->resourcePool();
 
-        connect(commonModule()->resourceAccessProvider(),
+        connect(m_context->resourceAccessProvider(),
             &ResourceAccessProvider::accessChanged,
             this,
             &QnResourceAccessManager::updatePermissions);
 
-        connect(globalPermissionsManager(),
+        connect(m_context->globalPermissionsManager(),
             &QnGlobalPermissionsManager::globalPermissionsChanged,
             this,
             &QnResourceAccessManager::updatePermissionsBySubject);
@@ -118,7 +121,7 @@ QnResourceAccessManager::QnResourceAccessManager(Mode mode, QObject* parent /*= 
         connect(resPool, &QnResourcePool::resourceRemoved, this,
             &QnResourceAccessManager::handleResourceRemoved);
 
-        connect(userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
+        connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
             &QnResourceAccessManager::handleUserRoleRemoved);
 
         recalculateAllPermissions();
@@ -139,7 +142,7 @@ void QnResourceAccessManager::setPermissionsInternal(const QnResourceAccessSubje
             if (subject.user())
                 return subject.user()->resourcePool() != nullptr;
 
-            return userRolesManager()->hasRole(subject.effectiveId());
+            return m_context->userRolesManager()->hasRole(subject.effectiveId());
         };
 
     if (isValid())
@@ -169,21 +172,22 @@ void QnResourceAccessManager::setPermissionsInternal(const QnResourceAccessSubje
 GlobalPermissions QnResourceAccessManager::globalPermissions(
     const QnResourceAccessSubject& subject) const
 {
-    return globalPermissionsManager()->globalPermissions(subject);
+    return m_context->globalPermissionsManager()->globalPermissions(subject);
 }
 
 bool QnResourceAccessManager::hasGlobalPermission(
     const Qn::UserAccessData& accessRights,
     GlobalPermission requiredPermission) const
 {
-    return globalPermissionsManager()->hasGlobalPermission(accessRights, requiredPermission);
+    return m_context->globalPermissionsManager()->hasGlobalPermission(
+        accessRights, requiredPermission);
 }
 
 bool QnResourceAccessManager::hasGlobalPermission(
     const QnResourceAccessSubject& subject,
     GlobalPermission requiredPermission) const
 {
-    return globalPermissionsManager()->hasGlobalPermission(subject, requiredPermission);
+    return m_context->globalPermissionsManager()->hasGlobalPermission(subject, requiredPermission);
 }
 
 Qn::Permissions QnResourceAccessManager::permissions(const QnResourceAccessSubject& subject,
@@ -263,7 +267,7 @@ bool QnResourceAccessManager::hasPermission(
         return true;
     }
 
-    const auto& resPool = commonModule()->resourcePool();
+    const auto& resPool = m_context->resourcePool();
     auto userResource = resPool->getResourceById<QnUserResource>(accessRights.userId);
     if (!userResource)
         return false;
@@ -328,9 +332,9 @@ void QnResourceAccessManager::recalculateAllPermissions()
     if (isUpdating())
         return;
 
-    const auto& resPool = commonModule()->resourcePool();
+    const auto& resPool = m_context->resourcePool();
     auto resources = resPool->getResources();
-    auto subjects = resourceAccessSubjectsCache()->allSubjects();
+    auto subjects = m_context->resourceAccessSubjectsCache()->allSubjects();
 
     nx::utils::remove_if(resources,
         [this](const auto& resource)
@@ -343,16 +347,16 @@ void QnResourceAccessManager::recalculateAllPermissions()
         {
             if (subject.user())
                 return !subject.user()->isEnabled() || subject.user()->resourcePool() == nullptr;
-            return !userRolesManager()->hasRole(subject.effectiveId());
+            return !m_context->userRolesManager()->hasRole(subject.effectiveId());
 
         });
 
     auto permissionsCache = std::make_unique<PermissionsCache>();
     for (const auto& subject: std::as_const(subjects))
     {
-        auto globalPermissions = globalPermissionsManager()->globalPermissions(subject);
+        auto globalPermissions = m_context->globalPermissionsManager()->globalPermissions(subject);
         auto accessibleResources =
-            commonModule()->resourceAccessProvider()->accessibleResources(subject);
+            m_context->resourceAccessProvider()->accessibleResources(subject);
         for (const QnResourcePtr& resource: std::as_const(resources))
         {
             bool hasAccessToResoure = accessibleResources.contains(resource->getId());
@@ -383,7 +387,7 @@ void QnResourceAccessManager::updatePermissionsToResource(const QnResourcePtr& r
     if (isUpdating())
         return;
 
-    for (const auto& subject : resourceAccessSubjectsCache()->allSubjects())
+    for (const auto& subject: m_context->resourceAccessSubjectsCache()->allSubjects())
         updatePermissions(subject, resource);
 }
 
@@ -392,7 +396,7 @@ void QnResourceAccessManager::updatePermissionsBySubject(const QnResourceAccessS
     if (isUpdating())
         return;
 
-    const auto& resPool = commonModule()->resourcePool();
+    const auto& resPool = m_context->resourcePool();
     for (const QnResourcePtr& resource : resPool->getResources())
         updatePermissions(subject, resource);
 }
@@ -439,7 +443,7 @@ void QnResourceAccessManager::handleResourceRemoved(const QnResourcePtr& resourc
     if (isUpdating())
         return;
 
-    const auto resourcePool = commonModule()->resourcePool();
+    const auto resourcePool = m_context->resourcePool();
     const auto resourceId = resource->getId();
 
     if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
@@ -465,7 +469,7 @@ void QnResourceAccessManager::handleResourceRemoved(const QnResourcePtr& resourc
         m_permissionsCache->removeResource(resourceId);
     }
 
-    for (const auto& subject: resourceAccessSubjectsCache()->allSubjects())
+    for (const auto& subject: m_context->resourceAccessSubjectsCache()->allSubjects())
         emit permissionsChanged(subject, resource, Qn::NoPermissions);
 }
 
@@ -476,7 +480,7 @@ void QnResourceAccessManager::handleUserRoleRemoved(const QnResourceAccessSubjec
         return;
 
     NX_ASSERT(subject.isRole());
-    const auto resourcePool = commonModule()->resourcePool();
+    const auto resourcePool = m_context->resourcePool();
     const auto subjectId = subject.id();
 
     PermissionsCache::ResourceIdsWithPermissions resourcesWithPermissions;
@@ -512,11 +516,11 @@ Qn::Permissions QnResourceAccessManager::calculatePermissions(
 
     auto globalPermissions = globalPermissionsHint
         ? *globalPermissionsHint
-        : globalPermissionsManager()->globalPermissions(subject);
+        : m_context->globalPermissionsManager()->globalPermissions(subject);
 
     bool hasAccessToResource = hasAccessToResourceHint
         ? *hasAccessToResourceHint
-        : commonModule()->resourceAccessProvider()->hasAccess(subject, target);
+        : m_context->resourceAccessProvider()->hasAccess(subject, target);
 
     const auto flags = target->flags();
 
@@ -762,7 +766,8 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
     const auto items = layout->getItems();
     for (auto item: items)
     {
-        if (const auto& resource = resourcePool()->getResourceByDescriptor(item.resource))
+        if (const auto& resource =
+                m_context->resourcePool()->getResourceByDescriptor(item.resource))
         {
             if (resource->hasFlags(Qn::desktop_camera))
                 return Qn::ReadPermission | Qn::RemovePermission;
@@ -792,7 +797,8 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
             QnUuid ownerId = layout->getParentId();
 
             /* Access to videowall layouts. */
-            const auto videowall = resourcePool()->getResourceById<QnVideoWallResource>(ownerId);
+            const auto videowall =
+                m_context->resourcePool()->getResourceById<QnVideoWallResource>(ownerId);
             if (videowall)
             {
                 /* Videowall layout. */
@@ -806,10 +812,11 @@ Qn::Permissions QnResourceAccessManager::calculatePermissionsInternal(
             {
                 if (ownerId != user->getId())
                 {
-                    const auto owner = resourcePool()->getResourceById<QnUserResource>(ownerId);
+                    const auto owner =
+                        m_context->resourcePool()->getResourceById<QnUserResource>(ownerId);
                     if (!owner)
                     {
-                        const auto tour = commonModule()->layoutTourManager()->tour(ownerId);
+                        const auto tour = m_context->layoutTourManager()->tour(ownerId);
                         if (tour.isValid())
                         {
                             return tour.parentId == user->getId()
@@ -926,7 +933,7 @@ bool QnResourceAccessManager::canCreateLayout(
     if (!subject.isValid())
         return false;
 
-    const auto& resourcePool = commonModule()->resourcePool();
+    const auto& resourcePool = m_context->resourcePool();
 
     // Check if there is a desktop camera on a layout and if it is allowed to be there.
     if (!verifyDesktopCameraOnLayout(resourcePool, subject, data))
@@ -945,7 +952,7 @@ bool QnResourceAccessManager::canCreateLayout(
         return hasGlobalPermission(subject, GlobalPermission::controlVideowall);
 
     // Tour owner can create layouts in it.
-    const auto tour = layoutTourManager()->tour(data.parentId);
+    const auto tour = m_context->layoutTourManager()->tour(data.parentId);
     if (tour.isValid())
         return tour.parentId == subject.id();
 
@@ -980,7 +987,7 @@ bool QnResourceAccessManager::canModifyLayout(
         return canCreateLayout(subject, update);
 
     // Check if there is a desktop camera on a layout and if it is allowed to be there.
-    if (!verifyDesktopCameraOnLayout(commonModule()->resourcePool(), subject, update))
+    if (!verifyDesktopCameraOnLayout(m_context->resourcePool(), subject, update))
         return false;
 
     // Otherwise - default behavior.
@@ -1002,7 +1009,7 @@ bool QnResourceAccessManager::canCreateStorage(const QnResourceAccessSubject& su
     if (!subject.isValid())
         return false;
 
-    const auto& resPool = commonModule()->resourcePool();
+    const auto& resPool = m_context->resourcePool();
     auto server = resPool->getResourceById<QnMediaServerResource>(storageParentId);
     return hasPermission(subject, server, Qn::SavePermission);
 }
@@ -1029,7 +1036,7 @@ bool QnResourceAccessManager::canModifyStorage(
 bool QnResourceAccessManager::canCreateUser(const QnResourceAccessSubject& subject,
     const nx::vms::api::UserData& data) const
 {
-    if (!data.userRoleId.isNull() && !userRolesManager()->hasRole(data.userRoleId))
+    if (!data.userRoleId.isNull() && !m_context->userRolesManager()->hasRole(data.userRoleId))
         return false;
 
     if (data.isCloud && !data.fullName.isEmpty())
@@ -1069,7 +1076,7 @@ bool QnResourceAccessManager::canModifyUser(
     const QnResourcePtr& target,
     const nx::vms::api::UserData& update) const
 {
-    if (!update.userRoleId.isNull() && !userRolesManager()->hasRole(update.userRoleId))
+    if (!update.userRoleId.isNull() && !m_context->userRolesManager()->hasRole(update.userRoleId))
         return false;
 
     auto userResource = target.dynamicCast<QnUserResource>();

@@ -41,13 +41,15 @@ void ResourceTreeModelTest::SetUp()
 {
     m_clientRuntimeSettings.reset(new QnClientRuntimeSettings(QnStartupParameters()));
     m_staticCommonModule.reset(new QnStaticCommonModule());
-    m_clientCoreModule.reset(new QnClientCoreModule(QnClientCoreModule::Mode::unitTests));
+    m_clientCoreModule.reset(new QnClientCoreModule(
+        QnClientCoreModule::Mode::unitTests,
+        /*peerId*/ QnUuid::createUuid()));
 
     QnCommonModule* commonModule = m_clientCoreModule->commonModule();
     commonModule->createMessageProcessor<QnDesktopClientMessageProcessor>();
 
     // Should be not null for correct Videowall Item node display.
-    commonModule->setModuleGUID(QnUuid::createUuid());
+    ASSERT_FALSE(commonModule->peerId().isNull());
 
     m_accessController.reset(new QnWorkbenchAccessController(commonModule));
     m_layoutSnapshotManager.reset(new QnWorkbenchLayoutSnapshotManager(commonModule));

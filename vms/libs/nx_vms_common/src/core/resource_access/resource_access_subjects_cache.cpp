@@ -2,23 +2,28 @@
 
 #include "resource_access_subjects_cache.h"
 
+#include <core/resource/user_resource.h>
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <nx/vms/common/resource/resource_context.h>
 
-#include <core/resource/user_resource.h>
-
-QnResourceAccessSubjectsCache::QnResourceAccessSubjectsCache(QObject* parent):
+QnResourceAccessSubjectsCache::QnResourceAccessSubjectsCache(
+    nx::vms::common::ResourceContext* context,
+    QObject* parent)
+    :
     base_type(parent),
-    QnCommonModuleAware(parent),
+    nx::vms::common::ResourceContextAware(context),
     m_mutex(nx::Mutex::NonRecursive)
 {
-    NX_ASSERT(resourcePool() && userRolesManager() && globalPermissionsManager());
+    NX_CRITICAL(m_context->resourcePool()
+        && m_context->userRolesManager()
+        && m_context->globalPermissionsManager());
 
     // TODO: #vkutin #sivanov Don't connect to users directly.
     // Add required signals to globalPermissionsManager add use it.
 
-    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
+    connect(m_context->resourcePool(), &QnResourcePool::resourceAdded, this,
         [this](const QnResourcePtr& resource)
         {
             /* Quick check */
@@ -31,7 +36,7 @@ QnResourceAccessSubjectsCache::QnResourceAccessSubjectsCache(QObject* parent):
                 handleUserAdded(user);
         });
 
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
+    connect(m_context->resourcePool(), &QnResourcePool::resourceRemoved, this,
         [this](const QnResourcePtr& resource)
         {
             /* Quick check */
@@ -44,22 +49,22 @@ QnResourceAccessSubjectsCache::QnResourceAccessSubjectsCache(QObject* parent):
                 handleUserRemoved(user);
         });
 
-    connect(userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
+    connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
         &QnResourceAccessSubjectsCache::handleRoleAdded);
-    connect(userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
+    connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
         &QnResourceAccessSubjectsCache::handleRoleRemoved);
 
-    connect(globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged, this,
+    connect(m_context->globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged, this,
         [this](const QnResourceAccessSubject& subject)
         {
             if (const auto user = subject.user())
                 updateUserRole(user);
         });
 
-    for (const auto& user: resourcePool()->getResources<QnUserResource>())
+    for (const auto& user: m_context->resourcePool()->getResources<QnUserResource>())
         handleUserAdded(user);
 
-    for (const auto& role: userRolesManager()->userRoles())
+    for (const auto& role: m_context->userRolesManager()->userRoles())
         handleRoleAdded(role);
 }
 
@@ -84,7 +89,7 @@ void QnResourceAccessSubjectsCache::handleUserAdded(const QnUserResourcePtr& use
         m_subjects << subject;
     }
 
-    connect(user, &QnUserResource::userRoleChanged, this,
+    connect(user.get(), &QnUserResource::userRoleChanged, this,
         &QnResourceAccessSubjectsCache::updateUserRole);
 
     updateUserRole(user);

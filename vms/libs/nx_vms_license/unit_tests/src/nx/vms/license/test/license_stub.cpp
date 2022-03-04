@@ -42,8 +42,11 @@ QnFutureLicenseStub::QnFutureLicenseStub(int count)
     setCameraCount(count);
 }
 
-QLicenseStubValidator::QLicenseStubValidator(QnCommonModule* commonModule, QObject* parent):
-    base_type(commonModule, parent)
+QLicenseStubValidator::QLicenseStubValidator(
+    nx::vms::common::ResourceContext* context,
+    QObject* parent)
+    :
+    base_type(context, parent)
 {
 }
 

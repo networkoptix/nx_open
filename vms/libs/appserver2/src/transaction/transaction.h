@@ -1685,7 +1685,7 @@ struct QnAbstractTransaction
     static QnUuid makeHash(const QByteArray& extraData, const nx::vms::api::DiscoveryData& data);
 
     /**
-     * Sets QnAbstractTransaction::peerID to commonModule()->moduleGUID().
+     * Sets QnAbstractTransaction::peerID to commonModule()->peerId().
      */
     QnAbstractTransaction():
         command(ApiCommand::NotDefined),

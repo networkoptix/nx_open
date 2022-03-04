@@ -12,7 +12,9 @@
 
 namespace {
 
-QnResourceIconCache::Key calculateKey(QnCommonModule* commonModule, const QnVideoWallItem& item)
+QnResourceIconCache::Key calculateKey(
+    nx::vms::common::ResourceContext* context,
+    const QnVideoWallItem& item)
 {
     QnResourceIconCache::Key result = QnResourceIconCache::VideoWallItem;
 
@@ -22,7 +24,7 @@ QnResourceIconCache::Key calculateKey(QnCommonModule* commonModule, const QnVide
     if (item.runtimeStatus.controlledBy.isNull())
         return result;
 
-    if (item.runtimeStatus.controlledBy == commonModule->moduleGUID())
+    if (item.runtimeStatus.controlledBy == context->peerId())
         return result | QnResourceIconCache::Control;
 
     return result | QnResourceIconCache::Locked;
@@ -60,7 +62,7 @@ QVariant VideoWallScreenItem::data(int role) const
             return m_screen.name;
 
         case Qn::ResourceIconKeyRole:
-            return QVariant::fromValue<int>(calculateKey(m_videoWall->commonModule(), m_screen));
+            return QVariant::fromValue<int>(calculateKey(m_videoWall->context(), m_screen));
 
         case Qn::NodeTypeRole:
             return QVariant::fromValue(ResourceTree::NodeType::videoWallItem);

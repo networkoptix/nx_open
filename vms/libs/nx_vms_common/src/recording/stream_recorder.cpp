@@ -34,7 +34,6 @@ QnStreamRecorder::QnStreamRecorder(const QnResourcePtr& dev)
 :
     QnAbstractDataConsumer(STORE_QUEUE_SIZE),
     QnResourceConsumer(dev),
-    QnCommonModuleAware(dev->commonModule()),
     m_mediaDevice(m_resource.dynamicCast<QnMediaResource>())
 {
     memset(m_gotKeyFrame, 0, sizeof(m_gotKeyFrame)); // false

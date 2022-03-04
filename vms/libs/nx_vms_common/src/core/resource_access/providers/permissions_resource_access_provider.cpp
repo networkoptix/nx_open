@@ -2,27 +2,29 @@
 
 #include "permissions_resource_access_provider.h"
 
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_access/global_permissions_manager.h>
-#include <core/resource_management/user_roles_manager.h>
-
 #include <core/resource/camera_resource.h>
 #include <core/resource/user_resource.h>
-#include <common/common_module.h>
+#include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_subject.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
+#include <nx/vms/common/resource/resource_context.h>
 
 namespace nx::core::access {
 
 PermissionsResourceAccessProvider::PermissionsResourceAccessProvider(
     Mode mode,
+    nx::vms::common::ResourceContext* context,
     QObject* parent)
     :
-    base_type(mode, parent)
+    base_type(mode, context, parent)
 {
     if (mode == Mode::cached)
     {
-        connect(globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged,
-            this, &PermissionsResourceAccessProvider::updateAccessBySubject);
+        connect(m_context->globalPermissionsManager(),
+            &QnGlobalPermissionsManager::globalPermissionsChanged,
+            this,
+            &PermissionsResourceAccessProvider::updateAccessBySubject);
     }
 }
 

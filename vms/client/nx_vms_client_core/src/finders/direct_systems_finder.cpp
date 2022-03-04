@@ -3,16 +3,15 @@
 #include "direct_systems_finder.h"
 
 #include <common/common_module.h>
-
-#include <nx/vms/discovery/manager.h>
-#include <network/system_helpers.h>
 #include <network/local_system_description.h>
-
+#include <network/system_helpers.h>
 #include <nx/network/address_resolver.h>
-#include <nx/network/socket_global.h>
+#include <nx/network/http/http_types.h>
 #include <nx/network/socket_common.h>
+#include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/network/url/url_parse_helper.h>
+#include <nx/vms/discovery/manager.h>
 
 #include "search_address_manager.h"
 

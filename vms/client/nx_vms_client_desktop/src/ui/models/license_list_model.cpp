@@ -4,23 +4,19 @@
 
 #include <QtGui/QBrush>
 
-#include <nx/vms/time/formatter.h>
-
-#include <core/resource/media_server_resource.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/resource_display_info.h>
-
 #include <client/client_settings.h>
-
-#include <nx/vms/license/validator.h>
-
-#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <common/common_module.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/resource_display_info.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/utils/qset.h>
+#include <nx/utils/string.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
-
+#include <nx/vms/client/desktop/ui/common/color_theme.h>
+#include <nx/vms/license/validator.h>
+#include <nx/vms/time/formatter.h>
 #include <utils/common/synctime.h>
 #include <utils/math/math.h>
-#include <nx/utils/string.h>
-#include <nx/utils/qset.h>
 
 namespace {
 

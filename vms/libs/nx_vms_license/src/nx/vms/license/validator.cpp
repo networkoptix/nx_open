@@ -3,19 +3,18 @@
 #include "validator.h"
 
 #include <api/runtime_info_manager.h>
-#include <common/common_module.h>
 #include <licensing/license.h>
-#include <nx/vms/api/types/connection_types.h>
-#include <utils/common/synctime.h>
 #include <nx_ec/abstract_ec_connection.h>
+#include <nx/vms/api/types/connection_types.h>
+#include <nx/vms/common/resource/resource_context.h>
+#include <utils/common/synctime.h>
 
 namespace nx::vms::license {
 
-Validator::Validator(QnCommonModule* commonModule, QObject* parent):
+Validator::Validator(nx::vms::common::ResourceContext* context, QObject* parent):
     base_type(parent),
-    QnCommonModuleAware(commonModule)
+    nx::vms::common::ResourceContextAware(context)
 {
-
 }
 
 Validator::~Validator()
@@ -44,11 +43,11 @@ QnLicenseErrorCode Validator::validate(const QnLicensePtr& license, ValidationMo
         return QnLicenseErrorCode::InvalidSignature;
 
     QnUuid currentServerId;
-    auto connection = commonModule()->ec2Connection();
+    auto connection = m_context->ec2Connection();
     if (connection)
         currentServerId = connection->moduleInformation().id;
 
-    const auto& manager = runtimeInfoManager();
+    const auto& manager = m_context->runtimeInfoManager();
     QnPeerRuntimeInfo info =
         manager->items()->getItem(mode == VM_Regular ? serverId(license) : currentServerId);
 
@@ -125,7 +124,7 @@ QString Validator::errorMessage(QnLicenseErrorCode errCode, Qn::LicenseType lice
 
 QnUuid Validator::serverId(const QnLicensePtr& license) const
 {
-    const auto items = runtimeInfoManager()->items()->getItems();
+    const auto items = m_context->runtimeInfoManager()->items()->getItems();
     for (const QnPeerRuntimeInfo& info: items)
     {
         if (info.data.peer.peerType != vms::api::PeerType::server)
@@ -143,7 +142,7 @@ QnLicenseErrorCode Validator::isValidUniqueLicense(const QnLicensePtr& license,
     ValidationMode mode) const
 {
     // Only single license of this type per system is allowed.
-    for (const QnLicensePtr& otherLicense: licensePool()->getLicenses())
+    for (const QnLicensePtr& otherLicense: m_context->licensePool()->getLicenses())
     {
         // Skip other license types and current license itself.
         if (otherLicense->type() != license->type() || otherLicense->key() == license->key())

@@ -12,12 +12,15 @@ using namespace nx::vms::api::analytics;
 
 namespace nx::analytics::taxonomy {
 
-StateWatcher::StateWatcher(QnCommonModule* commonModule):
-    Connective<AbstractStateWatcher>(commonModule),
-    QnCommonModuleAware(commonModule),
+StateWatcher::StateWatcher(
+    DescriptorContainer* taxonomyDescriptorContainer,
+    QObject* parent)
+    :
+    AbstractStateWatcher(parent),
+    m_taxonomyDescriptorContainer(taxonomyDescriptorContainer),
     m_state(std::make_shared<State>())
 {
-    connect(commonModule->descriptorContainer(), &DescriptorContainer::descriptorsUpdated,
+    connect(m_taxonomyDescriptorContainer, &DescriptorContainer::descriptorsUpdated,
         this, &StateWatcher::at_descriptorsUpdated);
 }
 
@@ -35,7 +38,7 @@ std::shared_ptr<AbstractState> StateWatcher::state() const
 
 Descriptors StateWatcher::currentDescriptors() const
 {
-    return commonModule()->descriptorContainer()->descriptors();
+    return m_taxonomyDescriptorContainer->descriptors();
 }
 
 void StateWatcher::at_descriptorsUpdated()

@@ -2,27 +2,28 @@
 
 #include "shared_layout_item_access_provider.h"
 
-#include <core/resource_management/resource_pool.h>
-
+#include <core/resource/layout_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource_access/helpers/layout_item_aggregator.h>
 #include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_access/shared_resources_manager.h>
-
-#include <core/resource/layout_resource.h>
-#include <core/resource/user_resource.h>
-#include <common/common_module.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/common/resource/resource_context.h>
 
 namespace nx::core::access {
 
 SharedLayoutItemAccessProvider::SharedLayoutItemAccessProvider(
     Mode mode,
+    nx::vms::common::ResourceContext* context,
     QObject* parent)
     :
-    base_type(mode, parent)
+    base_type(mode, context, parent)
 {
     if (mode == Mode::cached)
     {
-        connect(sharedResourcesManager(), &QnSharedResourcesManager::sharedResourcesChanged, this,
+        connect(m_context->sharedResourcesManager(),
+            &QnSharedResourcesManager::sharedResourcesChanged,
+            this,
             &SharedLayoutItemAccessProvider::handleSharedResourcesChanged);
     }
 }
@@ -45,9 +46,9 @@ bool SharedLayoutItemAccessProvider::calculateAccess(const QnResourceAccessSubje
 
     if (mode() == Mode::direct)
     {
-        const auto resourcePool = commonModule()->resourcePool();
+        const auto resourcePool = m_context->resourcePool();
         const auto sharedLayouts = resourcePool->getResourcesByIds<QnLayoutResource>(
-            sharedResourcesManager()->sharedResources(subject));
+            m_context->sharedResourcesManager()->sharedResources(subject));
 
         const auto resourceId = resource->getId();
         for (const auto& layout: sharedLayouts)
@@ -95,8 +96,8 @@ void SharedLayoutItemAccessProvider::fillProviders(
     if (!isMediaResource(resource))
         return;
 
-    const auto sharedLayouts = commonModule()->resourcePool()->
-        getResourcesByIds<QnLayoutResource>(sharedResourcesManager()->sharedResources(subject));
+    const auto sharedLayouts = m_context->resourcePool()->getResourcesByIds<QnLayoutResource>(
+        m_context->sharedResourcesManager()->sharedResources(subject));
 
     const auto resourceId = resource->getId();
     for (const auto& layout: sharedLayouts)
@@ -167,8 +168,8 @@ void SharedLayoutItemAccessProvider::handleSubjectAdded(const QnResourceAccessSu
 
     auto aggregator = ensureAggregatorForSubject(subject);
 
-    const auto sharedLayouts = commonModule()->resourcePool()->
-        getResourcesByIds<QnLayoutResource>(sharedResourcesManager()->sharedResources(subject));
+    const auto sharedLayouts = m_context->resourcePool()->getResourcesByIds<QnLayoutResource>(
+        m_context->sharedResourcesManager()->sharedResources(subject));
     for (const auto& layout: sharedLayouts)
         aggregator->addWatchedLayout(layout);
 
@@ -204,7 +205,7 @@ void SharedLayoutItemAccessProvider::handleSharedResourcesChanged(
     const auto added = (newValues - oldValues);
     const auto removed = (oldValues - newValues);
 
-    const auto resourcePool = commonModule()->resourcePool();
+    const auto resourcePool = m_context->resourcePool();
 
     const auto addedLayouts = resourcePool->getResourcesByIds<QnLayoutResource>(added);
     for (const auto& layout: addedLayouts)
@@ -229,10 +230,10 @@ void SharedLayoutItemAccessProvider::updateAccessToLayout(const QnLayoutResource
         return;
 
     const auto layoutId = layout->getId();
-    const auto allSubjects = resourceAccessSubjectsCache()->allSubjects();
+    const auto allSubjects = m_context->resourceAccessSubjectsCache()->allSubjects();
     for (const auto& subject: allSubjects)
     {
-        const auto sharedResources = sharedResourcesManager()->sharedResources(subject);
+        const auto sharedResources = m_context->sharedResourcesManager()->sharedResources(subject);
         if (!sharedResources.contains(layoutId))
             continue;
 
@@ -270,7 +271,7 @@ QnLayoutItemAggregatorPtr SharedLayoutItemAccessProvider::ensureAggregatorForSub
             if (isUpdating())
                 return;
 
-            auto resource = commonModule()->resourcePool()->getResourceById(resourceId);
+            auto resource = m_context->resourcePool()->getResourceById(resourceId);
             if (!resource || !isMediaResource(resource))
                 return;
 

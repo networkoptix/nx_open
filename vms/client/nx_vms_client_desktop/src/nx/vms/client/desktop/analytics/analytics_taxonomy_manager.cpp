@@ -104,7 +104,9 @@ TaxonomyManager::TaxonomyManager(QnCommonModule* commonModule, QObject* parent):
     QnCommonModuleAware(commonModule),
     d(new Private())
 {
-    const auto taxonomyStateWatcher = commonModule ? commonModule->taxonomyStateWatcher() : nullptr;
+    const auto taxonomyStateWatcher = commonModule
+        ? commonModule->analyticsTaxonomyStateWatcher()
+        : nullptr;
     if (!NX_CRITICAL(taxonomyStateWatcher, "Common module singletons must be initialized"))
         return;
 
@@ -124,7 +126,7 @@ TaxonomyManager::~TaxonomyManager()
 
 Taxonomy* TaxonomyManager::currentTaxonomy() const
 {
-    d->ensureTaxonomy(commonModule()->taxonomyStateWatcher());
+    d->ensureTaxonomy(commonModule()->analyticsTaxonomyStateWatcher());
     return d->currentTaxonomy.value().get();
 }
 
@@ -141,7 +143,7 @@ bool TaxonomyManager::isEngineRelevant(AbstractEngine* engine) const
     if (!NX_ASSERT(engine))
         return false;
 
-    d->ensureRelevancyInfo(commonModule()->taxonomyStateWatcher());
+    d->ensureRelevancyInfo(commonModule()->analyticsTaxonomyStateWatcher());
     return d->relevantEngines.contains(engine);
 }
 
@@ -150,19 +152,19 @@ bool TaxonomyManager::isRelevantForEngine(AbstractObjectType* type, AbstractEngi
     if (!NX_ASSERT(type))
         return false;
 
-    d->ensureRelevancyInfo(commonModule()->taxonomyStateWatcher());
+    d->ensureRelevancyInfo(commonModule()->analyticsTaxonomyStateWatcher());
     return d->relevantObjectTypes->value(engine).contains(type);
 }
 
 QSet<nx::analytics::taxonomy::AbstractEngine*> TaxonomyManager::relevantEngines() const
 {
-    d->ensureRelevancyInfo(commonModule()->taxonomyStateWatcher());
+    d->ensureRelevancyInfo(commonModule()->analyticsTaxonomyStateWatcher());
     return d->relevantEngines;
 }
 
 QSet<AbstractObjectType*> TaxonomyManager::relevantObjectTypes(AbstractEngine* engine) const
 {
-    d->ensureRelevancyInfo(commonModule()->taxonomyStateWatcher());
+    d->ensureRelevancyInfo(commonModule()->analyticsTaxonomyStateWatcher());
     return d->relevantObjectTypes->value(engine);
 }
 

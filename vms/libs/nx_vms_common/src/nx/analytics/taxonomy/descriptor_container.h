@@ -6,23 +6,26 @@
 
 #include <QtCore/QObject>
 
-#include <nx/vms/api/analytics/descriptors.h>
 #include <nx/analytics/taxonomy/property_watcher.h>
-
 #include <nx/utils/thread/mutex.h>
-#include <common/common_module_aware.h>
-#include <utils/common/connective.h>
+#include <nx/vms/api/analytics/descriptors.h>
+#include <nx/vms/common/resource/resource_context_aware.h>
 
 namespace nx::analytics::taxonomy {
 
-class NX_VMS_COMMON_API DescriptorContainer: public Connective<QObject>, public QnCommonModuleAware
+class NX_VMS_COMMON_API DescriptorContainer:
+    public QObject,
+    public nx::vms::common::ResourceContextAware
 {
     Q_OBJECT
+    using base_type = QObject;
+
 public:
-    DescriptorContainer(QnCommonModule* commonModule);
+    DescriptorContainer(nx::vms::common::ResourceContext* context, QObject* parent = nullptr);
 
     nx::vms::api::analytics::Descriptors descriptors(const QnUuid& serverId = QnUuid());
 
+    // Server-only method.
     void updateDescriptors(nx::vms::api::analytics::Descriptors descriptors);
 
 signals:

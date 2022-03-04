@@ -2,20 +2,21 @@
 
 #pragma once
 
+#include <nx/vms/common/resource/resource_context_aware.h>
 #include <nx/vms/rules/router.h>
-
-class QnCommonModule;
 
 namespace nx::vms::api::rules { struct EventInfo; }
 
 namespace nx::vms::rules {
 
-class Ec2Router: public Router
+class Ec2Router:
+    public Router,
+    public nx::vms::common::ResourceContextAware
 {
     Q_OBJECT
 
 public:
-    Ec2Router(QnCommonModule* common);
+    Ec2Router(nx::vms::common::ResourceContext* context);
     virtual ~Ec2Router();
 
     virtual void init(const QnUuid& id) override;
@@ -30,7 +31,6 @@ public:
 private:
     QnUuid m_id;
     bool m_connected = false;
-    QnCommonModule* m_common;
 };
 
 } // namespace nx::vms::rules

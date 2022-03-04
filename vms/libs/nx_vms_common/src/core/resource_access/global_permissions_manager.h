@@ -3,29 +3,27 @@
 #pragma once
 
 #include <common/common_globals.h>
-
-#include <nx/core/core_fwd.h>
 #include <core/resource_access/user_access_data.h>
-
+#include <nx/core/core_fwd.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
-
-#include <utils/common/connective.h>
-#include <common/common_module_aware.h>
+#include <nx/vms/common/resource/resource_context_aware.h>
 
 class QnResourceAccessSubject;
-
 namespace nx::vms::api { struct UserRoleData; }
 
 class NX_VMS_COMMON_API QnGlobalPermissionsManager:
-    public Connective<QObject>,
-    public /*mixin*/ QnCommonModuleAware
+    public QObject,
+    public nx::vms::common::ResourceContextAware
 {
     Q_OBJECT
+    using base_type = QObject;
 
-    using base_type = Connective<QObject>;
 public:
-    QnGlobalPermissionsManager(nx::core::access::Mode mode, QObject* parent);
+    QnGlobalPermissionsManager(
+        nx::core::access::Mode mode,
+        nx::vms::common::ResourceContext* context,
+        QObject* parent = nullptr);
     virtual ~QnGlobalPermissionsManager();
 
     /** Get a set of global permissions that will not work without the given one. */
@@ -79,6 +77,7 @@ private:
     void handleRoleAddedOrUpdated(const nx::vms::api::UserRoleData& userRole);
     void handleRoleRemoved(const nx::vms::api::UserRoleData& userRole);
     void handleSubjectRemoved(const QnResourceAccessSubject& subject);
+
 private:
     const nx::core::access::Mode m_mode;
     mutable nx::Mutex m_mutex;

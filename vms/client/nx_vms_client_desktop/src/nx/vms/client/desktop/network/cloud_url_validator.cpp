@@ -2,14 +2,13 @@
 
 #include "cloud_url_validator.h"
 
+#include <api/network_proxy_factory.h>
+#include <client_core/client_core_module.h>
+#include <core/resource/media_server_resource.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 
-#include <api/network_proxy_factory.h>
-#include <core/resource/media_server_resource.h>
-
-namespace nx {
-namespace network {
+namespace nx::vms::client::desktop {
 
 bool isCloudServer(const QnMediaServerResourcePtr& server)
 {
@@ -20,13 +19,11 @@ bool isCloudServer(const QnMediaServerResourcePtr& server)
     if (nx::network::SocketGlobals::addressResolver().isCloudHostname(url.host()))
         return true;
 
-    QnNetworkProxyFactory proxyFactory(server->commonModule());
-    const QNetworkProxy &proxy = proxyFactory.proxyToResource(server);
+    const QNetworkProxy &proxy = QnNetworkProxyFactory::proxyToResource(server);
     if (proxy.type() == QNetworkProxy::HttpProxy)
         return nx::network::SocketGlobals::addressResolver().isCloudHostname(proxy.hostName());
 
     return false;
 }
 
-} // namespace network
-} // namespace nx
+} // namespace nx::vms::client::desktop

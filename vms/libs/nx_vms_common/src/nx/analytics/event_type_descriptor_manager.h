@@ -4,24 +4,24 @@
 
 #include <QtCore/QObject>
 
-#include <nx/vms/api/analytics/descriptors.h>
-#include <nx/vms/api/analytics/engine_manifest.h>
-#include <nx/vms/api/analytics/device_agent_manifest.h>
-
 #include <core/resource/resource_fwd.h>
-#include <common/common_module_aware.h>
+#include <nx/vms/api/analytics/descriptors.h>
+#include <nx/vms/api/analytics/device_agent_manifest.h>
+#include <nx/vms/api/analytics/engine_manifest.h>
 
 namespace nx::analytics {
 
-class NX_VMS_COMMON_API EventTypeDescriptorManager:
-        public QObject,
-        public /*mixin*/ QnCommonModuleAware
+namespace taxonomy { class DescriptorContainer; }
+
+class NX_VMS_COMMON_API EventTypeDescriptorManager: public QObject
 {
     using base_type = QObject;
     Q_OBJECT
 
 public:
-    explicit EventTypeDescriptorManager(QObject* parent = nullptr);
+    explicit EventTypeDescriptorManager(
+        taxonomy::DescriptorContainer* taxonomyDescriptorContainer,
+        QObject* parent = nullptr);
 
     std::optional<nx::vms::api::analytics::EventTypeDescriptor> descriptor(
         const nx::vms::api::analytics::EventTypeId& id) const;
@@ -64,6 +64,9 @@ private:
     nx::vms::api::analytics::ScopedEventTypeIds eventTypeGroupsByEngines(
         const std::set<nx::vms::api::analytics::EngineId>& engineIds,
         const std::set<nx::vms::api::analytics::EventTypeId>& eventTypeIds) const;
+
+private:
+    taxonomy::DescriptorContainer* const m_taxonomyDescriptorContainer;
 };
 
 } // namespace nx::analytics

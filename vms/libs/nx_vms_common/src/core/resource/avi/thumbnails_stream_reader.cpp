@@ -19,9 +19,11 @@
 //static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
 //static const qint64 LIVE_SEEK_OFFSET = 1000000ll * 10;
 
-QnThumbnailsStreamReader::QnThumbnailsStreamReader(const QnResourcePtr& dev, QnAbstractArchiveDelegate* archiveDelegate)
-:
-    QnAbstractMediaStreamDataProvider(dev),
+QnThumbnailsStreamReader::QnThumbnailsStreamReader(
+    const QnResourcePtr& resource,
+    QnAbstractArchiveDelegate* archiveDelegate)
+    :
+    QnAbstractMediaStreamDataProvider(resource),
     m_archiveDelegate(archiveDelegate),
     m_delegate(new QnThumbnailsArchiveDelegate(QnAbstractArchiveDelegatePtr(archiveDelegate)))
 {

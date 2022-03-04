@@ -2,16 +2,13 @@
 
 #include "remote_licenses.h"
 
-#include <nx_ec/data/api_conversion_functions.h>
-
 #include <nx/fusion/model_functions.h>
-
 #include <nx/network/http/http_client.h>
 #include <nx/network/url/url_builder.h>
-
 #include <nx/vms/api/data/license_data.h>
 #include <nx/vms/license/list_helper.h>
 #include <nx/vms/license/validator.h>
+#include <nx_ec/data/api_conversion_functions.h>
 
 namespace {
 
@@ -62,7 +59,7 @@ QnLicenseList remoteLicenses(
 bool hasUniqueLicenses(QnLicensePool* localLicensesPool)
 {
     const auto localLicenses = ListHelper(localLicensesPool->getLicenses());
-    Validator validator(localLicensesPool->commonModule());
+    Validator validator(localLicensesPool->context());
 
     for (const auto& [licenseType, errorCode]: kUniqueLicenseTypes)
     {
@@ -78,7 +75,7 @@ MergeSystemsStatus remoteLicensesConflict(
 {
     const auto localLicenses = ListHelper(localLicensesPool->getLicenses());
     const auto remoteLicenses = ListHelper(remoteLicenseList);
-    Validator validator(localLicensesPool->commonModule());
+    Validator validator(localLicensesPool->context());
 
     for (const auto& [licenseType, errorCode]: kUniqueLicenseTypes)
     {
@@ -101,7 +98,7 @@ MergeSystemsStatus remoteLicensesConflict(
 {
     const auto localLicenses = ListHelper(localLicensesPool->getLicenses());
     std::optional<ListHelper> remoteLicensesList;
-    Validator validator(localLicensesPool->commonModule());
+    Validator validator(localLicensesPool->context());
     for (const auto& [licenseType, errorCode]: kUniqueLicenseTypes)
     {
         const bool localSystemHasLicenses =

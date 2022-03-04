@@ -3,9 +3,7 @@
 #pragma once
 
 #include <api/common_message_processor.h>
-
 #include <client/client_connection_status.h>
-
 #include <core/resource/camera_history.h>
 #include <core/resource/resource_fwd.h>
 
@@ -16,7 +14,9 @@ class QnClientMessageProcessor: public QnCommonMessageProcessor
     typedef QnCommonMessageProcessor base_type;
 
 public:
-    explicit QnClientMessageProcessor(QObject* parent = nullptr);
+    explicit QnClientMessageProcessor(
+        nx::vms::common::ResourceContext* context,
+        QObject* parent = nullptr);
     virtual void init(const ec2::AbstractECConnectionPtr& connection) override;
 
     const QnClientConnectionStatus* connectionStatus() const;

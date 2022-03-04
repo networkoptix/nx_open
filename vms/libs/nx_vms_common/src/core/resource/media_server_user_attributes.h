@@ -42,6 +42,6 @@ class NX_VMS_COMMON_API QnMediaServerUserAttributesPool:
 {
     Q_OBJECT
 public:
-    QnMediaServerUserAttributesPool(QObject *parent);
+    QnMediaServerUserAttributesPool(QObject* parent = nullptr);
     QnMediaServerUserAttributesList getAttributesList( const QList<QnUuid>& idList );
 };

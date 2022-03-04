@@ -129,7 +129,7 @@ public:
      */
     QnMediaServerResourcePtr getServer(QnUuid id) const;
 
-    QnUuid getClientPeerId(QnCommonModule* commonModule) const;
+    QnUuid getClientPeerId(nx::vms::common::ResourceContext* context) const;
 
     nx::utils::SoftwareVersion lowestInstalledVersion();
     void setUpdateTarget(const nx::utils::SoftwareVersion& version);
@@ -275,7 +275,7 @@ protected:
 
 protected:
     UpdateItemPtr addItemForServer(QnMediaServerResourcePtr server);
-    UpdateItemPtr addItemForClient(QnCommonModule* commonModule);
+    UpdateItemPtr addItemForClient(nx::vms::common::ResourceContext* context);
     /** Reads data from resource to UpdateItem. */
     bool updateServerData(QnMediaServerResourcePtr server, UpdateItemPtr item);
     bool updateClientData();

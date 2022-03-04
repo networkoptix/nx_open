@@ -2,25 +2,36 @@
 
 #pragma once
 
-#include "deprecated_multicast_finder.h"
-#include "module_connector.h"
-#include "udp_multicast_finder.h"
+#include <map>
+#include <memory>
+#include <optional>
 
-#include <nx/utils/std/optional.h>
+#include <QtCore/QObject>
+
+#include <nx/network/retry_timer.h>
+#include <nx/network/socket_common.h>
+#include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
-
+#include <nx/vms/api/data/module_information.h>
 
 class QnMediaServerResource;
+class QnResourcePool;
 
 namespace nx {
 namespace vms {
 namespace discovery {
 
+class DeprecatedMulticastFinder;
+class ModuleConnector;
+class UdpMulticastFinder;
+
 struct NX_VMS_COMMON_API ModuleEndpoint: api::ModuleInformationWithAddresses
 {
     nx::network::SocketAddress endpoint;
 
-    ModuleEndpoint(api::ModuleInformationWithAddresses old = {}, nx::network::SocketAddress endpoint = {});
+    ModuleEndpoint(
+        api::ModuleInformationWithAddresses old = {},
+        nx::network::SocketAddress endpoint = {});
     bool operator==(const ModuleEndpoint& rhs) const;
 };
 
@@ -29,22 +40,51 @@ struct NX_VMS_COMMON_API ModuleEndpoint: api::ModuleInformationWithAddresses
  *
  * - Searches server for endpoints by multicasts, resource pool and interface methods.
  * - Tries to maintain connection to each module and access up-to-date module information.
- * - Notifies about availability or module information changes.
+ * - Notifies about availability or module information changes (in server mode).
  */
 class NX_VMS_COMMON_API Manager:
-    public QObject,
-    public /*mixin*/ QnCommonModuleAware
+    public QObject
 {
     Q_OBJECT
     using base_type = QObject;
 
 public:
-    Manager(bool clientMode, QObject* parent = nullptr);
+    struct ServerModeInfo
+    {
+        QnUuid peerId;
+        QnUuid sessionId;
+        bool multicastDiscoveryAllowed = true;
+    };
+
+    /**
+     * Create client-mode manager, which only discovers media servers.
+     */
+    Manager(QObject* parent = nullptr);
+
+    /**
+     * Create server-mode manager, which discovers other servers and also broadcasts info about
+     * itself if allowed.
+     */
+    Manager(ServerModeInfo serverModeInfo, QObject* parent = nullptr);
+
     virtual ~Manager() override;
+
+    /**
+     * Server-mode control, defining if multicasts can be sent.
+     */
+    void setMulticastDiscoveryAllowed(bool value);
+
+    /** Sets moduleInformation to multicast, starts multicast process if not running yet. */
+    void setMulticastInformation(const api::ModuleInformationWithAddresses& information);
 
     void setReconnectPolicy(nx::network::RetryPolicy value);
     void setUpdateInterfacesInterval(std::chrono::milliseconds value);
     void setMulticastInterval(std::chrono::milliseconds value);
+
+    /**
+     * Listen for the urls changes for all servers in the provided Resource Pool.
+     */
+    void monitorServerUrls(QnResourcePool* resourcePool);
 
     void start();
     void stop();
@@ -78,6 +118,7 @@ public:
     }
 
     void beforeDestroy();
+
 signals:
     /** New reachable module is found. */
     void found(nx::vms::discovery::ModuleEndpoint module);
@@ -92,12 +133,14 @@ signals:
     void conflict(nx::vms::discovery::ModuleEndpoint module);
 
 private:
+    void initialize();
     void initializeConnector();
-    void initializeMulticastFinders(bool clientMode);
-    void monitorServerUrls();
+    void initializeMulticastFinders();
     void updateEndpoints(const QnMediaServerResource* server);
 
 private:
+    std::optional<ServerModeInfo> m_serverModeInfo;
+
     std::atomic<bool> isRunning;
 
     mutable nx::Mutex m_mutex;

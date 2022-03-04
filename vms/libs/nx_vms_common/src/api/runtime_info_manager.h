@@ -5,11 +5,10 @@
 #include <QtCore/QMap>
 #include <QtCore/QList>
 
-#include <nx/vms/api/data/runtime_data.h>
-
 #include <nx/utils/singleton.h>
+#include <nx/vms/api/data/runtime_data.h>
+#include <nx/vms/common/resource/resource_context_aware.h>
 #include <utils/common/threadsafe_item_storage.h>
-#include <common/common_module_aware.h>
 
 class QnCommonMessageProcessor;
 
@@ -48,13 +47,13 @@ Q_DECLARE_METATYPE(QnPeerRuntimeInfoMap)
 
 class NX_VMS_COMMON_API QnRuntimeInfoManager:
     public QObject,
-    public /*mixin*/ QnCommonModuleAware,
-    private QnThreadsafeItemStorageNotifier<QnPeerRuntimeInfo>
+    private QnThreadsafeItemStorageNotifier<QnPeerRuntimeInfo>,
+    public nx::vms::common::ResourceContextAware
 {
     Q_OBJECT
 
 public:
-    QnRuntimeInfoManager(QObject* parent);
+    QnRuntimeInfoManager(nx::vms::common::ResourceContext* context, QObject* parent = nullptr);
 
     const QnThreadsafeItemStorage<QnPeerRuntimeInfo>* items() const;
 
@@ -82,6 +81,7 @@ private:
     /** Mutex that is to be used when accessing items. */
     mutable nx::Mutex m_mutex;
     mutable nx::Mutex m_updateMutex;
+    QnPeerRuntimeInfo m_localInfo;
     QScopedPointer<QnThreadsafeItemStorage<QnPeerRuntimeInfo>> m_items;
     QnCommonMessageProcessor* m_messageProcessor = nullptr;
 };

@@ -19,23 +19,26 @@ namespace nx::analytics {
 using namespace nx::vms::api::analytics;
 using namespace nx::utils::data_structures;
 
-ObjectTypeDescriptorManager::ObjectTypeDescriptorManager(QObject* parent) :
+ObjectTypeDescriptorManager::ObjectTypeDescriptorManager(
+    taxonomy::DescriptorContainer* taxonomyDescriptorContainer,
+    QObject* parent)
+    :
     base_type(parent),
-    QnCommonModuleAware(parent)
+    m_taxonomyDescriptorContainer(taxonomyDescriptorContainer)
 {
 }
 
 std::optional<ObjectTypeDescriptor> ObjectTypeDescriptorManager::descriptor(
     const ObjectTypeId& id) const
 {
-    return fetchDescriptor<ObjectTypeDescriptor>(commonModule()->descriptorContainer(), id);
+    return fetchDescriptor<ObjectTypeDescriptor>(m_taxonomyDescriptorContainer, id);
 }
 
 ObjectTypeDescriptorMap ObjectTypeDescriptorManager::descriptors(
     const std::set<ObjectTypeId>& objectTypeIds) const
 {
     return fetchDescriptors<ObjectTypeDescriptor>(
-        commonModule()->descriptorContainer(), objectTypeIds);
+        m_taxonomyDescriptorContainer, objectTypeIds);
 }
 
 ScopedObjectTypeIds ObjectTypeDescriptorManager::supportedObjectTypeIds(
@@ -151,7 +154,7 @@ GroupId ObjectTypeDescriptorManager::objectTypeGroupForEngine(
     const ObjectTypeId& objectTypeId) const
 {
     const auto descriptor = fetchDescriptor<ObjectTypeDescriptor>(
-        commonModule()->descriptorContainer(), objectTypeId);
+        m_taxonomyDescriptorContainer, objectTypeId);
 
     if (!descriptor)
         return GroupId();

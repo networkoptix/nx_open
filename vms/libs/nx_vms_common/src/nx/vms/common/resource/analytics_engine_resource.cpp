@@ -59,11 +59,11 @@ QString AnalyticsEngineResource::idForToStringFromPtr() const
 
 AnalyticsPluginResourcePtr AnalyticsEngineResource::plugin() const
 {
-    auto common = commonModule();
-    if (!NX_ASSERT(common, "Can't access common module"))
+    auto context = this->context();
+    if (!NX_ASSERT(context, "Can't access resource context"))
         return AnalyticsPluginResourcePtr();
 
-    return common->resourcePool()->getResourceById(getParentId())
+    return context->resourcePool()->getResourceById(getParentId())
         .dynamicCast<AnalyticsPluginResource>();
 }
 

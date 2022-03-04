@@ -18,7 +18,10 @@ class NX_VMS_COMMON_API SharedLayoutItemAccessProvider: public BaseResourceAcces
     using base_type = BaseResourceAccessProvider;
 
 public:
-    SharedLayoutItemAccessProvider(Mode mode, QObject* parent = nullptr);
+    SharedLayoutItemAccessProvider(
+        Mode mode,
+        nx::vms::common::ResourceContext* context,
+        QObject* parent = nullptr);
     virtual ~SharedLayoutItemAccessProvider();
 
 protected:

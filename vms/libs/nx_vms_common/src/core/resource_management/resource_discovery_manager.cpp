@@ -328,12 +328,12 @@ bool QnResourceDiscoveryManager::canTakeForeignCamera(const QnSecurityCamResourc
         return false;
 
     if (camera->hasCameraCapabilities(nx::vms::api::DeviceCapability::boundToServer)
-        && camera->getParentId() != commonModule()->moduleGUID())
+        && camera->getParentId() != commonModule()->peerId())
     {
         return false;
     }
 
-    QnUuid ownGuid = commonModule()->moduleGUID();
+    QnUuid ownGuid = commonModule()->peerId();
     QnMediaServerResourcePtr mServer = camera->getParentServer();
     const auto& resPool = commonModule()->resourcePool();
     auto rpCamera = resPool->getResourceByPhysicalId<QnSecurityCamResource>(camera->getPhysicalId());

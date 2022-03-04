@@ -4,12 +4,10 @@
 
 #include <QtCore/QObject>
 
-#include <licensing/license_fwd.h>
-
-#include <common/common_module_aware.h>
 #include <common/common_globals.h>
-
+#include <licensing/license_fwd.h>
 #include <nx/utils/uuid.h>
+#include <nx/vms/common/resource/resource_context_aware.h>
 
 struct QnPeerRuntimeInfo;
 
@@ -27,9 +25,10 @@ enum class QnLicenseErrorCode
     FutureLicense               /**< License type is unknown, may be license from future version. */
 };
 
+// TODO: #sivanov Store Context pointer in the License itself and use it.
 class Validator:
     public QObject,
-    public /*mixin*/ QnCommonModuleAware
+    public nx::vms::common::ResourceContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -42,7 +41,7 @@ public:
         VM_JustCreated
     };
 
-    Validator(QnCommonModule* commonModule, QObject* parent = nullptr);
+    Validator(nx::vms::common::ResourceContext* context, QObject* parent = nullptr);
     virtual ~Validator();
 
     /**

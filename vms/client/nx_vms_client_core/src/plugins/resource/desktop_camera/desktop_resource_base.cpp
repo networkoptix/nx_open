@@ -4,7 +4,7 @@
 
 #include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
+#include <nx_ec/abstract_ec_connection.h>
 #include <utils/common/long_runable_cleanup.h>
 
 #include "desktop_camera_connection.h"
@@ -48,15 +48,12 @@ void QnDesktopResource::initializeConnection(
     NX_ASSERT(!m_connection, "Double initialization");
     disconnectFromServer();
 
-    nx::vms::client::core::RemoteConnectionAware credentialsAccessor;
-    NX_ASSERT(credentialsAccessor.connection());
-
     m_connection.reset(new QnDesktopCameraConnection(
         toSharedPointer(this),
         server,
         userId,
-        commonModule()->moduleGUID(),
-        credentialsAccessor.connectionCredentials()));
+        context()->peerId(),
+        context()->ec2Connection()->credentials()));
     m_connection->start();
 }
 

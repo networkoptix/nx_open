@@ -2,23 +2,21 @@
 
 #pragma once
 
-#include <common/common_module_aware.h>
-
 #include <core/resource_access/resource_access_subject.h>
-
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
-
-#include <utils/common/connective.h>
+#include <nx/vms/common/resource/resource_context_aware.h>
 
 class NX_VMS_COMMON_API QnResourceAccessSubjectsCache:
-    public Connective<QObject>,
-    public /*mixin*/ QnCommonModuleAware
+    public QObject,
+    public nx::vms::common::ResourceContextAware
 {
     Q_OBJECT
-    using base_type = Connective<QObject>;
+    using base_type = QObject;
 public:
-    QnResourceAccessSubjectsCache(QObject* parent);
+    QnResourceAccessSubjectsCache(
+        nx::vms::common::ResourceContext* context,
+        QObject* parent = nullptr);
 
     /** List of all subjects of the resources access: users and roles (excl. predefined). */
     QList<QnResourceAccessSubject> allSubjects() const;
@@ -35,6 +33,7 @@ private:
     void handleRoleRemoved(const nx::vms::api::UserRoleData& userRole);
 
     void removeUserFromRole(const QnUserResourcePtr& user, const QnUuid& roleId);
+
 private:
     mutable nx::Mutex m_mutex;
 

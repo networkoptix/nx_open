@@ -4,8 +4,6 @@
 
 #include <nx/vms/rules/plugin.h>
 
-class QnCommonModule;
-
 namespace nx::vms::rules {
 
 class NX_VMS_COMMON_API Initializer: public Plugin

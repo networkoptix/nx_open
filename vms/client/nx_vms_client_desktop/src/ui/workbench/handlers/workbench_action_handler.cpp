@@ -26,21 +26,14 @@
 #include <camera/cam_display.h>
 #include <camera/camera_data_manager.h>
 #include <camera/resource_display.h>
-#include <client_core/client_core_module.h>
 #include <client/client_message_processor.h>
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_show_once_settings.h>
 #include <client/client_startup_parameters.h>
 #include <client/desktop_client_message_processor.h>
+#include <client_core/client_core_module.h>
 #include <common/common_module.h>
-#include <core/resource_access/resource_access_filter.h>
-#include <core/resource_management/layout_tour_manager.h>
-#include <core/resource_management/resource_discovery_manager.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_properties.h>
-#include <core/resource_management/resource_runtime_data.h>
-#include <core/resource_management/resources_changes_manager.h>
 #include <core/resource/avi/avi_resource.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
@@ -51,30 +44,35 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/media_server_user_attributes.h>
-#include <core/resource/resource_directory_browser.h>
 #include <core/resource/resource.h>
+#include <core/resource/resource_directory_browser.h>
 #include <core/resource/user_resource.h>
-#include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_item.h>
+#include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
+#include <core/resource_access/resource_access_filter.h>
+#include <core/resource_management/layout_tour_manager.h>
+#include <core/resource_management/resource_discovery_manager.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
+#include <core/resource_management/resource_runtime_data.h>
+#include <core/resource_management/resources_changes_manager.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
 #include <network/authutil.h>
-#include <network/cloud_url_validator.h>
 #include <nx/analytics/utils.h>
 #include <nx/build_info.h>
 #include <nx/cloud/vms_gateway/vms_gateway_embeddable.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/http/http_types.h>
-#include <nx/network/http/http_types.h>
 #include <nx/network/socket_global.h>
 #include <nx/streaming/archive_stream_reader.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/platform/process.h>
+#include <nx/utils/qset.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
-#include <nx/utils/qset.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
@@ -83,6 +81,7 @@
 #include <nx/vms/client/desktop/event_search/widgets/advanced_search_dialog.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
+#include <nx/vms/client/desktop/network/cloud_url_validator.h>
 #include <nx/vms/client/desktop/resource_dialogs/failover_priority_dialog.h>
 #include <nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
@@ -136,8 +135,8 @@
 #include <ui/graphics/instruments/signaling_instrument.h>
 #include <ui/graphics/items/controls/time_slider.h>
 #include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/graphics/items/resource/resource_widget.h>
+#include <ui/graphics/items/resource/resource_widget_renderer.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/models/resource/resource_list_model.h>
@@ -146,16 +145,16 @@
 #include <ui/workbench/handlers/workbench_layouts_handler.h> //< TODO: #sivanov Fix dependencies.
 #include <ui/workbench/watchers/workbench_bookmarks_watcher.h>
 #include <ui/workbench/watchers/workbench_version_mismatch_watcher.h>
+#include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
 #include <ui/workbench/workbench_item.h>
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_layout.h>
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_navigator.h>
 #include <ui/workbench/workbench_state_manager.h>
 #include <ui/workbench/workbench_synchronizer.h>
-#include <ui/workbench/workbench.h>
 #include <utils/applauncher_utils.h>
 #include <utils/common/delayed.h>
 #include <utils/common/delete_later.h>
@@ -1762,7 +1761,7 @@ void ActionHandler::at_webClientAction_triggered()
     openInBrowser(server, kPath, kFragment);
 #endif
 
-    if (nx::network::isCloudServer(server))
+    if (isCloudServer(server))
     {
         menu()->trigger(action::OpenCloudViewSystemUrl);
     }
@@ -3036,7 +3035,7 @@ void ActionHandler::openInBrowserDirectly(const QnMediaServerResourcePtr& server
 {
     // TODO: #akolesnikov #3.1 VMS-2806 deprecate this method, always use openInBrowser()
 
-    if (nx::network::isCloudServer(server))
+    if (isCloudServer(server))
         return;
 
     nx::utils::Url url(server->getApiUrl());
@@ -3045,8 +3044,7 @@ void ActionHandler::openInBrowserDirectly(const QnMediaServerResourcePtr& server
     url.setPath(path);
     url.setFragment(fragment);
 
-    QnNetworkProxyFactory proxyFactory(commonModule());
-    url = proxyFactory.urlToResource(url, server, "proxy");
+    url = QnNetworkProxyFactory::urlToResource(url, server, "proxy");
     QDesktopServices::openUrl(url.toQUrl());
 }
 
@@ -3066,8 +3064,7 @@ void ActionHandler::openInBrowser(const QnMediaServerResourcePtr& server,
         return openInBrowser(server, serverUrl, token.value, AuthMethod::bearerToken);
     }
 
-    QnNetworkProxyFactory proxyFactory(commonModule());
-    nx::utils::Url proxyUrl = proxyFactory.urlToResource(serverUrl, server);
+    nx::utils::Url proxyUrl = QnNetworkProxyFactory::urlToResource(serverUrl, server);
     proxyUrl.setPath(lit("/api/getNonce"));
 
     if (m_serverRequests.find(proxyUrl) == m_serverRequests.end())
@@ -3128,8 +3125,7 @@ void ActionHandler::openInBrowser(
     const QnMediaServerResourcePtr& server, nx::utils::Url targetUrl,
     std::string auth, AuthMethod authMethod) const
 {
-    QnNetworkProxyFactory proxyFactory(commonModule());
-    targetUrl = proxyFactory.urlToResource(targetUrl, server);
+    targetUrl = QnNetworkProxyFactory::urlToResource(targetUrl, server);
 
     const auto gateway = nx::cloud::gateway::VmsGatewayEmbeddable::instance();
     nx::network::SocketAddress targetAddress{targetUrl.host(), (uint16_t) targetUrl.port()};

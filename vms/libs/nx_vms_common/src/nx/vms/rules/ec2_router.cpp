@@ -5,9 +5,9 @@
 #include <QDataStream>
 
 #include <api/common_message_processor.h>
-#include <common/common_module.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/vms/common/resource/resource_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_vms_rules_manager.h>
 
@@ -22,7 +22,8 @@ const auto kFakeHandler = [](int /*handle*/, ec2::ErrorCode errorCode)
 
 namespace nx::vms::rules {
 
-Ec2Router::Ec2Router(QnCommonModule* common): m_common(common)
+Ec2Router::Ec2Router(nx::vms::common::ResourceContext* context):
+    nx::vms::common::ResourceContextAware(context)
 {
 }
 
@@ -37,7 +38,7 @@ void Ec2Router::init(const QnUuid& id)
     if (!m_connected)
     {
         connect(
-            m_common->messageProcessor(),
+            m_context->messageProcessor(),
             &QnCommonMessageProcessor::vmsEventReceived,
             this,
             &Ec2Router::onEventReceived);
@@ -53,7 +54,7 @@ void Ec2Router::routeEvent(
     QSet<QnUuid> peers;
     for (const auto& id: affectedResources)
     {
-        const auto& ptr = m_common->resourcePool()->getResourceById(id);
+        const auto& ptr = m_context->resourcePool()->getResourceById(id);
         if (!ptr)
             continue;
 
@@ -77,7 +78,7 @@ void Ec2Router::routeEvent(
             info.props[it.key()] = data.toBase64(); //< TODO: #spanasenko Refactor.
         }
 
-        m_common->ec2Connection()->getVmsRulesManager(Qn::kSystemAccess)->broadcastEvent(
+        m_context->ec2Connection()->getVmsRulesManager(Qn::kSystemAccess)->broadcastEvent(
             info, kFakeHandler);
     }
 }

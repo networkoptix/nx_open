@@ -3,17 +3,19 @@
 #include "resource_access_provider.h"
 
 #include <core/resource_access/resource_access_subjects_cache.h>
-
 #include <core/resource_management/resource_pool.h>
-
 #include <nx/utils/log/assert.h>
-#include <common/common_module.h>
+#include <nx/vms/common/resource/resource_context.h>
 
 namespace nx::core::access {
 
-ResourceAccessProvider::ResourceAccessProvider(Mode mode, QObject* parent):
+ResourceAccessProvider::ResourceAccessProvider(
+    Mode mode,
+    nx::vms::common::ResourceContext* context,
+    QObject* parent)
+    :
     base_type(mode, parent),
-    QnCommonModuleAware(parent)
+    nx::vms::common::ResourceContextAware(context)
 {
 }
 
@@ -151,8 +153,8 @@ void ResourceAccessProvider::afterUpdate()
 
     // This check assures client will receive all required notifications if something was modified
     // on the server while it was in the 'Reconnecting' state.
-    const auto allSubjects = resourceAccessSubjectsCache()->allSubjects();
-    const auto resources = commonModule()->resourcePool()->getResources();
+    const auto allSubjects = m_context->resourceAccessSubjectsCache()->allSubjects();
+    const auto resources = m_context->resourcePool()->getResources();
     for (const auto& subject: allSubjects)
     {
         for (const QnResourcePtr& resource: resources)

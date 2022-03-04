@@ -55,7 +55,7 @@ public:
 
         QList<PeerInformation> result;
 
-        const auto& selfId = q->commonModule()->moduleGUID();
+        const auto& selfId = q->commonModule()->peerId();
 
         for (const auto& server:
             q->commonModule()->resourcePool()->getAllServers(nx::vms::api::ResourceStatus::online))

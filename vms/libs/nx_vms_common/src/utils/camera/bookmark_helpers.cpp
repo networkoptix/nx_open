@@ -54,7 +54,7 @@ QnCameraBookmark helpers::bookmarkFromAction(
     const vms::event::AbstractActionPtr& action,
     const QnSecurityCamResourcePtr& camera)
 {
-    if (!camera || !camera->commonModule())
+    if (!camera || !camera->context())
     {
         NX_ASSERT(false, "Camera is invalid");
         return QnCameraBookmark();

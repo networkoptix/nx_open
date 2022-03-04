@@ -9,21 +9,24 @@ namespace nx::analytics {
 
 using namespace nx::vms::api::analytics;
 
-PluginDescriptorManager::PluginDescriptorManager(QObject* parent) :
+PluginDescriptorManager::PluginDescriptorManager(
+    taxonomy::DescriptorContainer* taxonomyDescriptorContainer,
+    QObject* parent)
+    :
     base_type(parent),
-    QnCommonModuleAware(parent)
+    m_taxonomyDescriptorContainer(taxonomyDescriptorContainer)
 {
 }
 
 std::optional<PluginDescriptor> PluginDescriptorManager::descriptor(const PluginId& pluginId) const
 {
-    return fetchDescriptor<PluginDescriptor>(commonModule()->descriptorContainer(), pluginId);
+    return fetchDescriptor<PluginDescriptor>(m_taxonomyDescriptorContainer, pluginId);
 }
 
 PluginDescriptorMap PluginDescriptorManager::descriptors(const std::set<PluginId>& pluginIds) const
 {
     return fetchDescriptors<PluginDescriptor>(
-        commonModule()->descriptorContainer(),
+        m_taxonomyDescriptorContainer,
         pluginIds);
 }
 

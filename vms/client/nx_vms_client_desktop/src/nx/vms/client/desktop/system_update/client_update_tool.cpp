@@ -254,7 +254,7 @@ void ClientUpdateTool::setServerUrl(
     m_serverConnection.reset(
         new rest::ServerConnection(
             serverId,
-            /*auditId*/ commonModule()->runningInstanceGUID(),
+            /*auditId*/ commonModule()->sessionId(),
             qnClientCoreModule->networkModule()->certificateVerifier(),
             connectionInfo.address,
             connectionInfo.credentials));

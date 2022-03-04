@@ -14,7 +14,10 @@ class NX_VMS_COMMON_API PermissionsResourceAccessProvider: public BaseResourceAc
     using base_type = BaseResourceAccessProvider;
 
 public:
-    PermissionsResourceAccessProvider(Mode mode, QObject* parent = nullptr);
+    PermissionsResourceAccessProvider(
+        Mode mode,
+        nx::vms::common::ResourceContext* context,
+        QObject* parent = nullptr);
     virtual ~PermissionsResourceAccessProvider();
 
 protected:

@@ -75,7 +75,7 @@ bool AnalyticsSdkObjectDetected::checkEventParams(const EventParameters& params)
 
     const bool isObjectTypeMatched = ruleTypeId == m_objectTypeId
         || nx::analytics::taxonomy::isBaseType(
-            getResource()->commonModule()->taxonomyStateWatcher()->state().get(),
+            getResource()->context()->analyticsTaxonomyStateWatcher()->state().get(),
             ruleTypeId, m_objectTypeId);
     if (!isObjectTypeMatched)
         return false;

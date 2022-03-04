@@ -5,11 +5,11 @@
 #include <QtCore/QCoreApplication>
 
 #include <api/global_settings.h>
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <network/cloud_system_data.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/module_information.h>
+#include <nx/vms/common/resource/resource_context.h>
 #include <utils/common/id.h>
 
 namespace {
@@ -89,29 +89,29 @@ QString getSystemName(const nx::vms::api::ModuleInformation& info)
         : info.systemName;
 }
 
-QnUuid currentSystemLocalId(const QnCommonModule* commonModule)
+QnUuid currentSystemLocalId(const nx::vms::common::ResourceContext* context)
 {
-    if (!commonModule)
+    if (!context)
         return QnUuid();
 
-    return commonModule->globalSettings()->localSystemId();
+    return context->globalSettings()->localSystemId();
 }
 
 bool serverBelongsToCurrentSystem(
-    const nx::vms::api::ModuleInformation& info, const QnCommonModule* commonModule)
+    const nx::vms::api::ModuleInformation& info, const nx::vms::common::ResourceContext* context)
 {
     return !isNewSystem(info)
-        && (getLocalSystemId(info) == currentSystemLocalId(commonModule));
+        && (getLocalSystemId(info) == currentSystemLocalId(context));
 }
 
 bool serverBelongsToCurrentSystem(const QnMediaServerResourcePtr& server)
 {
-    return serverBelongsToCurrentSystem(server->getModuleInformation(), server->commonModule());
+    return serverBelongsToCurrentSystem(server->getModuleInformation(), server->context());
 }
 
-bool currentSystemIsNew(const QnCommonModule* commonModule)
+bool currentSystemIsNew(const nx::vms::common::ResourceContext* context)
 {
-    const auto& settings = commonModule->globalSettings();
+    const auto& settings = context->globalSettings();
     return settings->localSystemId().isNull();
 }
 

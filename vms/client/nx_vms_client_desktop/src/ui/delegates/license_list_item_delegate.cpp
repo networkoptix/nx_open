@@ -3,13 +3,11 @@
 #include "license_list_item_delegate.h"
 
 #include <client/client_globals.h>
+#include <common/common_module.h>
 #include <core/resource/resource.h>
-
-#include <nx/vms/license/validator.h>
-
-#include <ui/models/license_list_model.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
-
+#include <nx/vms/license/validator.h>
+#include <ui/models/license_list_model.h>
 
 QnLicenseListItemDelegate::QnLicenseListItemDelegate(QObject* parent, bool invalidLicensesDimmed):
     base_type(parent),

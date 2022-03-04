@@ -154,14 +154,12 @@ bool DeprecatedMulticastFinder::RevealResponse::deserialize(
 // DeprecatedMulticastFinder
 
 DeprecatedMulticastFinder::DeprecatedMulticastFinder(
-    QObject* parent,
     Options options,
     const QHostAddress &multicastGroupAddress,
     const quint16 multicastGroupPort,
     const unsigned int pingTimeoutMillis,
     const unsigned int keepAliveMultiply)
     :
-    QnCommonModuleAware(parent),
     m_options(options),
     m_serverSocket(nullptr),
     m_pingTimeoutMillis(pingTimeoutMillis == 0 ? defaultPingTimeoutMs : pingTimeoutMillis),
@@ -173,7 +171,6 @@ DeprecatedMulticastFinder::DeprecatedMulticastFinder(
     m_multicastGroupPort(multicastGroupPort == 0 ? defaultModuleRevealMulticastGroupPort : multicastGroupPort),
     m_cachedResponse(MAX_CACHE_SIZE_BYTES)
 {
-    connect(commonModule(), &QnCommonModule::moduleInformationChanged, this, &DeprecatedMulticastFinder::at_moduleInformationChanged, Qt::DirectConnection);
 }
 
 DeprecatedMulticastFinder::~DeprecatedMulticastFinder()
@@ -193,6 +190,15 @@ bool DeprecatedMulticastFinder::isDisabled(false);
 void DeprecatedMulticastFinder::setCheckInterfacesTimeout(unsigned int checkInterfacesTimeoutMs)
 {
     m_checkInterfacesTimeoutMs = checkInterfacesTimeoutMs;
+}
+
+void DeprecatedMulticastFinder::setMulticastInformation(
+    const nx::vms::api::ModuleInformation& information)
+{
+    //TODO #akolesnikov RevealResponse class is excess here. Should send/receive
+    // nx::vms::api::ModuleInformation.
+    NX_MUTEX_LOCKER lock(&m_moduleInfoMutex);
+    m_serializedModuleInfo = RevealResponse(information).serialize();
 }
 
 void DeprecatedMulticastFinder::updateInterfaces()
@@ -329,13 +335,13 @@ bool DeprecatedMulticastFinder::processDiscoveryRequest(UDPSocket *udpSocket)
         return true;
     }
 
-    //TODO #akolesnikov RevealResponse class is excess here. Should send/receive nx::vms::api::ModuleInformation
+    QByteArray serializedModuleInfo;
     {
         NX_MUTEX_LOCKER lock(&m_moduleInfoMutex);
-        if (m_serializedModuleInfo.isEmpty())
-            m_serializedModuleInfo = RevealResponse(commonModule()->moduleInformation()).serialize();
+        serializedModuleInfo = m_serializedModuleInfo;
     }
-    if (!udpSocket->sendTo(m_serializedModuleInfo.data(), m_serializedModuleInfo.size(), remoteEndpoint))
+
+    if (!udpSocket->sendTo(serializedModuleInfo.data(), serializedModuleInfo.size(), remoteEndpoint))
     {
         NX_DEBUG(this, "Can't send response to address (%1)", remoteEndpoint);
         return false;
@@ -343,12 +349,6 @@ bool DeprecatedMulticastFinder::processDiscoveryRequest(UDPSocket *udpSocket)
 
     NX_VERBOSE(this, "Reveal respose is sent to address (%1)", remoteEndpoint);
     return true;
-}
-
-void DeprecatedMulticastFinder::at_moduleInformationChanged()
-{
-    NX_MUTEX_LOCKER lock(&m_moduleInfoMutex);
-    m_serializedModuleInfo.clear(); // clear cached value
 }
 
 DeprecatedMulticastFinder::RevealResponse* DeprecatedMulticastFinder::getCachedValue(
@@ -438,7 +438,7 @@ void DeprecatedMulticastFinder::run()
     NX_DEBUG(this, "Has started");
 
     QByteArray revealRequest = RevealRequest(
-        commonModule()->moduleGUID(),
+        m_options.peerId,
         qnStaticCommon->localPeerType()).serialize();
 
     if (m_options.listenAndRespond)

@@ -9,21 +9,24 @@ namespace nx::analytics {
 
 using namespace nx::vms::api::analytics;
 
-EngineDescriptorManager::EngineDescriptorManager(QObject* parent):
+EngineDescriptorManager::EngineDescriptorManager(
+    taxonomy::DescriptorContainer* taxonomyDescriptorContainer,
+    QObject* parent)
+    :
     base_type(parent),
-    QnCommonModuleAware(parent)
+    m_taxonomyDescriptorContainer(taxonomyDescriptorContainer)
 {
 }
 
 std::optional<EngineDescriptor> EngineDescriptorManager::descriptor(const EngineId& engineId) const
 {
-    return fetchDescriptor<EngineDescriptor>(commonModule()->descriptorContainer(), engineId);
+    return fetchDescriptor<EngineDescriptor>(m_taxonomyDescriptorContainer, engineId);
 }
 
 EngineDescriptorMap EngineDescriptorManager::descriptors(const std::set<EngineId>& engineIds) const
 {
     return fetchDescriptors<EngineDescriptor>(
-        commonModule()->descriptorContainer(),
+        m_taxonomyDescriptorContainer,
         engineIds);
 }
 

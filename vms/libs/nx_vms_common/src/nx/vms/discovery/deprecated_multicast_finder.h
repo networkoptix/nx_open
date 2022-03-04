@@ -7,7 +7,6 @@
 #include <QtCore/QCache>
 #include <QtNetwork/QHostAddress>
 
-#include <common/common_module_aware.h>
 #include <nx/network/aio/pollset.h>
 #include <nx/utils/thread/long_runnable.h>
 #include <nx/utils/thread/mutex.h>
@@ -37,7 +36,7 @@ namespace discovery {
  *
  * Requests are sent via all available local network interfaces.
  */
-class DeprecatedMulticastFinder: public QnLongRunnable, public /*mixin*/ QnCommonModuleAware
+class DeprecatedMulticastFinder: public QnLongRunnable
 {
     Q_OBJECT
 
@@ -47,6 +46,7 @@ public:
         bool listenAndRespond = false;
         size_t multicastCount = 0;
         std::function<bool()> responseEnabled;
+        QnUuid peerId;
 
         static const size_t kUnlimited;
     };
@@ -61,7 +61,6 @@ public:
         \param keepAliveMultiply if 0, default value is used
     */
     DeprecatedMulticastFinder(
-        QObject* parent,
         Options options,
         const QHostAddress &multicastGroupAddress = QHostAddress(),
         const quint16 multicastGroupPort = 0,
@@ -75,15 +74,14 @@ public:
 
     void setCheckInterfacesTimeout(unsigned int checkInterfacesTimeoutMs);
 
+    void setMulticastInformation(const nx::vms::api::ModuleInformation& information);
+
     // TODO: #muskov Fix the comment.
     //! Returns \fn run (DEBUG ONLY!)
     static bool isDisabled;
 
 public slots:
     virtual void pleaseStop() override;
-
-private slots:
-    void at_moduleInformationChanged();
 
 signals:
     void responseReceived(

@@ -2,36 +2,37 @@
 
 #include "base_resource_access_provider.h"
 
-#include <core/resource_access/resource_access_manager.h>
+#include <core/resource/user_resource.h>
+#include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_access/resource_access_filter.h>
+#include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/resource_access_subjects_cache.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-
-#include <core/resource/user_resource.h>
-#include <common/common_module.h>
-#include <core/resource_access/global_permissions_manager.h>
 #include <nx/vms/api/data/user_role_data.h>
+#include <nx/vms/common/resource/resource_context.h>
 
 namespace nx::core::access {
 
-BaseResourceAccessProvider::BaseResourceAccessProvider(Mode mode, QObject* parent):
+BaseResourceAccessProvider::BaseResourceAccessProvider(
+    Mode mode,
+    nx::vms::common::ResourceContext* context,
+    QObject* parent)
+    :
     base_type(mode, parent),
-    QnCommonModuleAware(parent),
-    m_mutex(nx::Mutex::NonRecursive),
-    m_accessibleResources()
+    nx::vms::common::ResourceContextAware(context),
+    m_mutex(nx::Mutex::NonRecursive)
 {
     if (mode == Mode::cached)
     {
-        connect(commonModule()->resourcePool(), &QnResourcePool::resourceAdded, this,
+        connect(m_context->resourcePool(), &QnResourcePool::resourceAdded, this,
             &BaseResourceAccessProvider::handleResourceAdded);
-        connect(commonModule()->resourcePool(), &QnResourcePool::resourceRemoved, this,
+        connect(m_context->resourcePool(), &QnResourcePool::resourceRemoved, this,
             &BaseResourceAccessProvider::handleResourceRemoved);
 
-        connect(userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
+        connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
             &BaseResourceAccessProvider::handleRoleAddedOrUpdated);
-        connect(userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
+        connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
             &BaseResourceAccessProvider::handleRoleRemoved);
     }
 }
@@ -50,7 +51,7 @@ bool BaseResourceAccessProvider::hasAccess(const QnResourceAccessSubject& subjec
     {
         return isSubjectEnabled(subject)
             && calculateAccess(subject, resource,
-                globalPermissionsManager()->globalPermissions(subject));
+                m_context->globalPermissionsManager()->globalPermissions(subject));
     }
 
     /**
@@ -102,15 +103,16 @@ void BaseResourceAccessProvider::afterUpdate()
     if (mode() == Mode::direct)
         return;
 
-    const auto resources = commonModule()->resourcePool()->getResources();
-    const auto subjects = resourceAccessSubjectsCache()->allSubjects();
+    const auto resources = m_context->resourcePool()->getResources();
+    const auto subjects = m_context->resourceAccessSubjectsCache()->allSubjects();
 
     NX_MUTEX_LOCKER lk(&m_mutex);
     for (const auto& subject: subjects)
     {
         if (!isSubjectEnabled(subject))
             continue;
-        const auto globalPermissions = globalPermissionsManager()->globalPermissions(subject);
+        const auto globalPermissions =
+            m_context->globalPermissionsManager()->globalPermissions(subject);
         auto& accessible = m_accessibleResources[subject.id()];
         for (const auto& resource: resources)
         {
@@ -146,7 +148,7 @@ void BaseResourceAccessProvider::updateAccessToResource(const QnResourcePtr& res
     if (isUpdating())
         return;
 
-    const auto allSubjects = resourceAccessSubjectsCache()->allSubjects();
+    const auto allSubjects = m_context->resourceAccessSubjectsCache()->allSubjects();
     for (const auto& subject: allSubjects)
         updateAccess(subject, resource);
 }
@@ -158,7 +160,7 @@ void BaseResourceAccessProvider::updateAccessBySubject(const QnResourceAccessSub
     if (isUpdating())
         return;
 
-    const auto resources = commonModule()->resourcePool()->getResources();
+    const auto resources = m_context->resourcePool()->getResources();
     for (const auto& resource: resources)
         updateAccess(subject, resource);
 }
@@ -183,7 +185,7 @@ void BaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& sub
 
         bool oldValue = accessible.contains(targetId);
         newValue = isSubjectEnabled(subject) && calculateAccess(
-            subject, resource, globalPermissionsManager()->globalPermissions(subject));
+            subject, resource, m_context->globalPermissionsManager()->globalPermissions(subject));
         if (oldValue == newValue)
             return;
 
@@ -197,7 +199,8 @@ void BaseResourceAccessProvider::updateAccess(const QnResourceAccessSubject& sub
 
     if (subject.isRole())
     {
-        const auto usersInRole = resourceAccessSubjectsCache()->usersInRole(subject.effectiveId());
+        const auto usersInRole =
+            m_context->resourceAccessSubjectsCache()->usersInRole(subject.effectiveId());
         for (const auto& dependent: usersInRole)
             updateAccess(dependent, resource);
     }
@@ -243,7 +246,7 @@ void BaseResourceAccessProvider::handleResourceRemoved(const QnResourcePtr& reso
         return;
 
     const auto resourceId = resource->getId();
-    const auto allSubjects = resourceAccessSubjectsCache()->allSubjects();
+    const auto allSubjects = m_context->resourceAccessSubjectsCache()->allSubjects();
     for (const auto& subject: allSubjects)
     {
         if (subject.id() == resourceId)
@@ -278,7 +281,7 @@ void BaseResourceAccessProvider::handleRoleRemoved(const nx::vms::api::UserRoleD
     if (isUpdating())
         return;
 
-    const auto usersInRole = resourceAccessSubjectsCache()->usersInRole(userRole.id);
+    const auto usersInRole = m_context->resourceAccessSubjectsCache()->usersInRole(userRole.id);
     for (const auto& subject: usersInRole)
         updateAccessBySubject(subject);
 }
@@ -306,7 +309,7 @@ void BaseResourceAccessProvider::handleSubjectRemoved(const QnResourceAccessSubj
         resourceIds = m_accessibleResources.take(id);
     }
 
-    const auto resources = commonModule()->resourcePool()->getResourcesByIds(resourceIds);
+    const auto resources = m_context->resourcePool()->getResourcesByIds(resourceIds);
     for (const auto& targetResource: resources)
         emit accessChanged(subject, targetResource, Source::none);
 }

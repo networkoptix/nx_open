@@ -10,6 +10,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/backup_settings.h>
 #include <nx/vms/api/data/resource_data.h>
+#include <nx/vms/common/resource/resource_context.h>
 #include <utils/common/ldap.h>
 #include <utils/common/watermark_settings.h>
 #include <utils/email/email.h>
@@ -134,12 +135,10 @@ const bool kKeepIoPortStateIntactOnInitializationDefault(false);
 
 using namespace nx::settings_names;
 
-QnGlobalSettings::QnGlobalSettings(QObject* parent):
+QnGlobalSettings::QnGlobalSettings(nx::vms::common::ResourceContext* context, QObject* parent):
     base_type(parent),
-    QnCommonModuleAware(parent)
+    nx::vms::common::ResourceContextAware(context)
 {
-    NX_ASSERT(commonModule()->resourcePool());
-
     m_allAdaptors
         << initEmailAdaptors()
         << initLdapAdaptors()
@@ -158,14 +157,14 @@ QnGlobalSettings::QnGlobalSettings(QObject* parent):
             adapter->markWriteOnly();
     }
 
-    connect(commonModule()->resourcePool(), &QnResourcePool::resourceAdded, this,
+    connect(m_context->resourcePool(), &QnResourcePool::resourceAdded, this,
         [this](const QnResourcePtr& resource)
         {
             if (resource->getId() == QnUserResource::kAdminGuid)
                 at_adminUserAdded(resource);
         }, Qt::DirectConnection);
 
-    connect(commonModule()->resourcePool(), &QnResourcePool::resourceRemoved, this,
+    connect(m_context->resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnGlobalSettings::at_resourcePool_resourceRemoved, Qt::DirectConnection);
 
     initialize();
@@ -180,7 +179,7 @@ void QnGlobalSettings::initialize()
     if (isInitialized())
         return;
 
-    const auto& resource = commonModule()->resourcePool()->getResourceById(
+    const auto& resource = m_context->resourcePool()->getResourceById(
         QnUserResource::kAdminGuid);
 
     if (resource)
@@ -1438,7 +1437,7 @@ void QnGlobalSettings::synchronizeNow()
     if (!m_admin)
         return;
 
-    resourcePropertyDictionary()->saveParamsAsync(m_admin->getId());
+    m_context->resourcePropertyDictionary()->saveParamsAsync(m_admin->getId());
 }
 
 bool QnGlobalSettings::resynchronizeNowSync()
@@ -1448,7 +1447,7 @@ bool QnGlobalSettings::resynchronizeNowSync()
         NX_ASSERT(m_admin, "Invalid sync state");
         if (!m_admin)
             return false;
-        resourcePropertyDictionary()->markAllParamsDirty(m_admin->getId());
+        m_context->resourcePropertyDictionary()->markAllParamsDirty(m_admin->getId());
     }
     return synchronizeNowSync();
 }
@@ -1462,7 +1461,7 @@ bool QnGlobalSettings::synchronizeNowSync()
     NX_ASSERT(m_admin, "Invalid sync state");
     if (!m_admin)
         return false;
-    return resourcePropertyDictionary()->saveParams(m_admin->getId());
+    return m_context->resourcePropertyDictionary()->saveParams(m_admin->getId());
 }
 
 bool QnGlobalSettings::takeFromSettings(QSettings* settings, const QnResourcePtr& mediaServer)

@@ -256,10 +256,12 @@ private:
     {
         std::unique_ptr<QnStaticCommonModule> staticCommon =
             std::make_unique<QnStaticCommonModule>();
-        std::unique_ptr<QnCommonModule> commonModule =
-            std::make_unique<QnCommonModule>(true, nx::core::access::Mode::cached);
+        std::unique_ptr<QnCommonModule> commonModule = std::make_unique<QnCommonModule>(
+            /*clientMode*/ true,
+            nx::core::access::Mode::cached);
+        // TODO: #sivanov Message Processor should be created and destroyed using Context methods.
         std::unique_ptr<common::test_support::MessageProcessorMock> messageProcessor =
-            std::make_unique<common::test_support::MessageProcessorMock>();
+            std::make_unique<common::test_support::MessageProcessorMock>(commonModule.get());
     };
 
 private:

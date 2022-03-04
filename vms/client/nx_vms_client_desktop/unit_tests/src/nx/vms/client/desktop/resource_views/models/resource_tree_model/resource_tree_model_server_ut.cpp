@@ -143,8 +143,8 @@ TEST_F(ResourceTreeModelTest, serverIconStatus)
         uniqueMatchingIndex(kUniqueServerNameCondition)));
 }
 
-// After removing RemoteGUIDE from CommonModule, this test stopped working.
-// TODO: #sivanov It needs to be repaired after adding  ResourceContext class.
+// TODO: #sivanov To correctly test this behavior we should emulate established connection, so for
+// example create mock message processor and use it's remote guid here.
 TEST_F(ResourceTreeModelTest, DISABLED_serverControlIconStatus)
 {
     // When server resource with certain unique name is added to the resource pool.

@@ -91,7 +91,8 @@ struct AnalyticsSettingsTestFixture::Environment
     Environment():
         commonModule(
             /*clientMode*/ false,
-            /*resourceAccessMode*/ nx::core::access::Mode::direct)
+            /*resourceAccessMode*/ nx::core::access::Mode::direct),
+        messageProcessor(&commonModule)
     {
     }
 

@@ -879,8 +879,8 @@ QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
     const auto source = eventSource(params);
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();
 
-    const auto eventTypeDescriptor = camera && camera->commonModule()
-        ? camera->commonModule()->analyticsEventTypeDescriptorManager()->descriptor(eventTypeId)
+    const auto eventTypeDescriptor = camera && camera->context()
+        ? camera->context()->analyticsEventTypeDescriptorManager()->descriptor(eventTypeId)
         : std::nullopt;
 
     return eventTypeDescriptor ? eventTypeDescriptor->name : tr("Analytics Event");
@@ -897,8 +897,8 @@ QString StringsHelper::getAnalyticsSdkObjectName(const EventParameters& params,
     const auto source = eventSource(params);
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();
 
-    const auto objectType = camera && camera->commonModule()
-        ? camera->commonModule()->taxonomyStateWatcher()->state()->objectTypeById(objectTypeId)
+    const auto objectType = camera && camera->context()
+        ? camera->context()->analyticsTaxonomyStateWatcher()->state()->objectTypeById(objectTypeId)
         : nullptr;
 
     return objectType ? objectType->name() : tr("Object detected");

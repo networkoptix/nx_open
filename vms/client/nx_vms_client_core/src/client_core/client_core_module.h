@@ -10,6 +10,7 @@
 #include <nx/fusion/serialization_format.h>
 #include <nx/utils/impl_ptr.h>
 #include <nx/utils/singleton.h>
+#include <nx/utils/uuid.h>
 #include <nx/vms/client/core/network/server_certificate_validation_level.h>
 
 class QQmlEngine;
@@ -39,6 +40,7 @@ public:
 
     QnClientCoreModule(
         Mode mode,
+        QnUuid peerId = QnUuid(),
         nx::core::access::Mode resourceAccessMode = nx::core::access::Mode::cached);
     virtual ~QnClientCoreModule() override;
 

@@ -29,8 +29,6 @@
 
 namespace nx { namespace network { class SocketAddress; }}
 
-class QnCommonModule;
-
 namespace ec2 {
 
 NX_VMS_COMMON_API void fromApiToResource(
@@ -155,8 +153,7 @@ NX_VMS_COMMON_API void fromApiToResourceList(
     QnResourceTypeList& dst);
 
 NX_VMS_COMMON_API QnUserResourcePtr fromApiToResource(
-    const nx::vms::api::UserData& src,
-    QnCommonModule* commonModule = nullptr);
+    const nx::vms::api::UserData& src);
 NX_VMS_COMMON_API void fromApiToResource(const nx::vms::api::UserData& src, QnUserResourcePtr& dst);
 NX_VMS_COMMON_API void fromResourceToApi(
     const QnUserResourcePtr& resource,

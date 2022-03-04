@@ -4,17 +4,11 @@
 
 #include <nx/utils/uuid.h>
 #include <nx/utils/thread/mutex.h>
-#include <common/common_globals.h>
-#include <common/common_module_aware.h>
+#include <nx/vms/api/types/resource_types.h>
 
-class NX_VMS_COMMON_API QnResourceStatusDictionary:
-    public QObject,
-    public /*mixin*/ QnCommonModuleAware
+class NX_VMS_COMMON_API QnResourceStatusDictionary
 {
-    Q_OBJECT
 public:
-    QnResourceStatusDictionary(QObject* parent);
-
     nx::vms::api::ResourceStatus value(const QnUuid& resourceId) const;
     void setValue(const QnUuid& resourceId, nx::vms::api::ResourceStatus status);
     void clear();

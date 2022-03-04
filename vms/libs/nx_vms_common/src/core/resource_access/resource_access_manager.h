@@ -12,6 +12,7 @@
 #include <core/resource_access/permissions_cache.h>
 #include <core/resource_access/user_access_data.h>
 #include <nx/core/core_fwd.h>
+#include <nx/vms/common/resource/resource_context_aware.h>
 #include <utils/common/connective.h>
 #include <utils/common/updatable.h>
 
@@ -34,13 +35,16 @@ struct WebPageData;
 class NX_VMS_COMMON_API QnResourceAccessManager:
     public Connective<QObject>,
     public QnUpdatable,
-    public /*mixin*/ QnCommonModuleAware
+    public nx::vms::common::ResourceContextAware
 {
     Q_OBJECT
     typedef Connective<QObject> base_type;
 
 public:
-    QnResourceAccessManager(nx::core::access::Mode mode, QObject* parent = nullptr);
+    QnResourceAccessManager(
+        nx::core::access::Mode mode,
+        nx::vms::common::ResourceContext* context,
+        QObject* parent = nullptr);
 
     /**
      * @param subject User or role to get global permissions for.

@@ -2,12 +2,12 @@
 
 #include "shared_resources_manager.h"
 
+#include <core/resource/user_resource.h>
 #include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <core/resource/user_resource.h>
-
 #include <nx/vms/api/data/access_rights_data.h>
+#include <nx/vms/common/resource/resource_context.h>
 
 namespace {
 
@@ -17,20 +17,23 @@ static const QSet<QnUuid> kEmpty;
 
 using namespace nx;
 
-QnSharedResourcesManager::QnSharedResourcesManager(QObject* parent):
+QnSharedResourcesManager::QnSharedResourcesManager(
+    nx::vms::common::ResourceContext* context,
+    QObject* parent)
+    :
     base_type(parent),
-    QnCommonModuleAware(parent),
+    nx::vms::common::ResourceContextAware(context),
     m_mutex(nx::Mutex::NonRecursive),
     m_sharedResources()
 {
-    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
+    connect(m_context->resourcePool(), &QnResourcePool::resourceAdded, this,
         &QnSharedResourcesManager::handleResourceAdded);
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
+    connect(m_context->resourcePool(), &QnResourcePool::resourceRemoved, this,
         &QnSharedResourcesManager::handleResourceRemoved);
 
-    connect(userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
+    connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
         &QnSharedResourcesManager::handleRoleAddedOrUpdated);
-    connect(userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
+    connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
         &QnSharedResourcesManager::handleRoleRemoved);
 }
 
@@ -53,7 +56,7 @@ void QnSharedResourcesManager::reset(const vms::api::AccessRightsDataList& acces
         }
     }
 
-    for (const auto& subject: resourceAccessSubjectsCache()->allSubjects())
+    for (const auto& subject: m_context->resourceAccessSubjectsCache()->allSubjects())
     {
         auto oldValues = oldValuesMap.value(subject.id());
         auto newValues = sharedResources(subject);
@@ -141,7 +144,7 @@ void QnSharedResourcesManager::handleRoleAddedOrUpdated(const nx::vms::api::User
 void QnSharedResourcesManager::handleRoleRemoved(const nx::vms::api::UserRoleData& userRole)
 {
     handleSubjectRemoved(userRole);
-    for (auto subject: resourceAccessSubjectsCache()->usersInRole(userRole.id))
+    for (auto subject: m_context->resourceAccessSubjectsCache()->usersInRole(userRole.id))
         setSharedResourcesInternal(subject, kEmpty);
 }
 
@@ -160,4 +163,3 @@ void QnSharedResourcesManager::handleSubjectRemoved(const QnResourceAccessSubjec
     if (!oldValue.isEmpty())
         emit sharedResourcesChanged(subject, oldValue, kEmpty);
 }
-

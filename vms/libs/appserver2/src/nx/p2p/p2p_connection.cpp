@@ -60,13 +60,6 @@ Connection::Connection(
             localInfo.data.videoWallInstanceGuid.toSimpleString()});
     }
 
-    if (!localInfo.data.videoWallControlSession.isNull())
-    {
-        queryParams.push_back({
-            "videoWallControlSession",
-            localInfo.data.videoWallControlSession.toSimpleString()});
-    }
-
     addRequestQueryParams(std::move(queryParams));
 }
 

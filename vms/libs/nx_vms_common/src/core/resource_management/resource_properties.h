@@ -2,18 +2,20 @@
 
 #pragma once
 
-#include "utils/common/threadsafe_item_storage.h"
-#include <common/common_module_aware.h>
 #include <nx/vms/api/data/resource_data.h>
+#include <nx/vms/common/resource/resource_context_aware.h>
 #include <nx_ec/ec_api_fwd.h>
+#include <utils/common/threadsafe_item_storage.h>
 
 class NX_VMS_COMMON_API QnResourcePropertyDictionary:
     public QObject,
-    public /*mixin*/ QnCommonModuleAware
+    public nx::vms::common::ResourceContextAware
 {
     Q_OBJECT
 public:
-    QnResourcePropertyDictionary(QObject* parent);
+    QnResourcePropertyDictionary(
+        nx::vms::common::ResourceContext* context,
+        QObject* parent = nullptr);
 
     bool saveParams(const QnUuid& resourceId);
     int saveParamsAsync(const QnUuid& resourceId);

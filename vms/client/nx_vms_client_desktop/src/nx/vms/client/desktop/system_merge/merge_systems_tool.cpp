@@ -263,7 +263,7 @@ void MergeSystemsTool::at_sessionCreated(
         NX_ASSERT(!loginSession->token.empty());
         ctx.mergeData.remoteSessionToken = std::move(loginSession->token);
 
-        if (!nx::vms::license::hasUniqueLicenses(ctx.proxy->commonModule()->licensePool()))
+        if (!nx::vms::license::hasUniqueLicenses(ctx.proxy->context()->licensePool()))
         {
             reportSystemFound(ctx, MergeSystemsStatus::ok, {}, false);
             return;
@@ -303,7 +303,7 @@ void MergeSystemsTool::at_licensesReceived(
     {
         ec2::fromApiToResourceList(*licenseDataList, ctx.targetLicenses);
         auto status = nx::vms::license::remoteLicensesConflict(
-            ctx.proxy->commonModule()->licensePool(),
+            ctx.proxy->context()->licensePool(),
             ctx.targetLicenses);
 
         reportSystemFound(ctx, status, {}, false);

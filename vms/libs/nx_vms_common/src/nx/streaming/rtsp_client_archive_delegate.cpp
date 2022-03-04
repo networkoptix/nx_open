@@ -129,54 +129,54 @@ void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr& came
     if (m_camera == camera)
         return;
 
-    if (m_camera)
-        disconnect(m_camera->commonModule()->cameraHistoryPool(), nullptr, this, nullptr);
+    if (m_camera && m_camera->context())
+        m_camera->context()->cameraHistoryPool()->disconnect(this);
 
     m_camera = camera;
 
-    NX_ASSERT(camera);
-    if (!m_camera)
+    if (!NX_ASSERT(m_camera && m_camera->context()))
         return;
 
     m_server = camera->getParentServer();
 
-    auto commonModule = camera->commonModule();
-    auto maxSessionDuration = commonModule->globalSettings()->maxRtspConnectDuration();
+    auto context = camera->context();
+    auto maxSessionDuration = context->globalSettings()->maxRtspConnectDuration();
     if (maxSessionDuration.count() > 0)
         m_maxSessionDurationMs = maxSessionDuration;
     else
         m_maxSessionDurationMs = std::chrono::milliseconds::max();
 
-    connect(commonModule->cameraHistoryPool(),
+    connect(context->cameraHistoryPool(),
         &QnCameraHistoryPool::cameraHistoryChanged,
         this,
-        [this](const QnSecurityCamResourcePtr &camera)
-    {
-        /* Ignore camera history if fixed server is set. */
-        if (m_fixedServer || !m_isMultiserverAllowed)
-            return;
+        [this](const QnSecurityCamResourcePtr& camera)
+        {
+            /* Ignore camera history if fixed server is set. */
+            if (m_fixedServer || !m_isMultiserverAllowed)
+                return;
 
-        /* Ignore other cameras changes. */
-        if (camera != m_camera)
-            return;
+            /* Ignore other cameras changes. */
+            if (camera != m_camera)
+                return;
 
-        if (m_server != getServerOnTime(m_position))
-            m_currentServerUpToDate.clear();
-    });
+            if (m_server != getServerOnTime(m_position))
+                m_currentServerUpToDate.clear();
+        });
 
-    connect(commonModule->cameraHistoryPool(),
+    connect(context->cameraHistoryPool(),
         &QnCameraHistoryPool::cameraFootageChanged,
         this,
-        [this](const QnSecurityCamResourcePtr &camera) {
-        /* Ignore camera history if fixed server is set. */
-        if (m_fixedServer || !m_isMultiserverAllowed)
-            return;
+        [this](const QnSecurityCamResourcePtr& camera)
+        {
+            /* Ignore camera history if fixed server is set. */
+            if (m_fixedServer || !m_isMultiserverAllowed)
+                return;
 
-        /* Ignore other cameras changes. */
-        if (camera != m_camera)
-            return;
-        m_footageUpToDate.clear();
-    });
+            /* Ignore other cameras changes. */
+            if (camera != m_camera)
+                return;
+            m_footageUpToDate.clear();
+        });
 
     setupRtspSession(camera, m_server, m_rtspSession.get());
 }
@@ -206,7 +206,12 @@ QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getNextMediaServerFromTime
         return QnMediaServerResourcePtr();
     if (m_fixedServer)
         return QnMediaServerResourcePtr();
-    return camera->commonModule()->cameraHistoryPool()->getNextMediaServerAndPeriodOnTime(camera, time, m_rtspSession->getScale() >= 0, &m_serverTimePeriod);
+
+    return camera->context()->cameraHistoryPool()->getNextMediaServerAndPeriodOnTime(
+        camera,
+        time,
+        m_rtspSession->getScale() >= 0,
+        &m_serverTimePeriod);
 }
 
 QString QnRtspClientArchiveDelegate::getUrl(const QnSecurityCamResourcePtr &camera, const QnMediaServerResourcePtr &_server) const {
@@ -259,7 +264,8 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnSecurityCa
         return;
     }
 
-    QnMediaServerResourceList mediaServerList = camera->commonModule()->cameraHistoryPool()->getCameraFootageData(camera, true);
+    QnMediaServerResourceList mediaServerList =
+        camera->context()->cameraHistoryPool()->getCameraFootageData(camera, true);
 
     /* Check if no archive available on any server. */
     /* Or check if archive belong to the current server only */
@@ -296,7 +302,12 @@ QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getServerOnTime(qint64 tim
 
     qint64 timeMs = timeUsec / 1000;
 
-    QnMediaServerResourcePtr mediaServer = m_camera->commonModule()->cameraHistoryPool()->getMediaServerOnTime(m_camera, timeMs, &m_serverTimePeriod);
+    QnMediaServerResourcePtr mediaServer =
+        m_camera->context()->cameraHistoryPool()->getMediaServerOnTime(
+            m_camera,
+            timeMs,
+            &m_serverTimePeriod);
+
     if (!mediaServer)
         return currentServer;
 
@@ -1054,7 +1065,7 @@ void QnRtspClientArchiveDelegate::setupRtspSession(
 {
     session->setCredentials(m_credentials, nx::network::http::header::AuthScheme::digest);
     session->setAdditionAttribute(Qn::EC2_RUNTIME_GUID_HEADER_NAME,
-        camera->commonModule()->runningInstanceGUID().toByteArray());
+        camera->context()->sessionId().toByteArray());
     session->setAdditionAttribute(Qn::EC2_INTERNAL_RTP_FORMAT, "1" );
     session->setAdditionAttribute(Qn::CUSTOM_USERNAME_HEADER_NAME,
         QString::fromStdString(m_credentials.username).toUtf8());
@@ -1062,15 +1073,14 @@ void QnRtspClientArchiveDelegate::setupRtspSession(
     /* We can get here while client is already closing. */
     if (server)
     {
-        QnNetworkProxyFactory factory(server->commonModule());
-        QNetworkProxy proxy = factory.proxyToResource(server);
+        QNetworkProxy proxy = QnNetworkProxyFactory::proxyToResource(server);
         if (proxy.type() != QNetworkProxy::NoProxy)
             session->setProxyAddr(proxy.hostName(), proxy.port());
         session->setAdditionAttribute(Qn::SERVER_GUID_HEADER_NAME, server->getId().toByteArray());
     }
 
     session->setTransport(nx::vms::api::RtpTransportType::tcp);
-    const auto settings = m_camera->commonModule()->globalSettings();
+    const auto settings = m_camera->context()->globalSettings();
     session->setTcpRecvBufferSize(settings->mediaBufferSizeKb() * 1024);
 
 }

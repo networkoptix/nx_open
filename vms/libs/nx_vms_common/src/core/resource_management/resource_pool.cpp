@@ -4,25 +4,23 @@
 
 #include <QtCore/QThreadPool>
 
+#include <api/helpers/camera_id_helper.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/network_resource.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/user_resource.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_item.h>
 #include <core/resource/videowall_item_index.h>
 #include <core/resource/videowall_matrix_index.h>
-
-#include <utils/common/checked_cast.h>
-
+#include <core/resource/videowall_resource.h>
+#include <core/resource_access/resource_access_filter.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
-#include <core/resource_access/resource_access_filter.h>
-#include <api/helpers/camera_id_helper.h>
+#include <nx/vms/common/resource/resource_context.h>
+#include <utils/common/checked_cast.h>
 
 #include "private/resource_pool_p.h"
-#include <common/common_module.h>
 
 namespace {
 
@@ -43,10 +41,9 @@ std::function<void()> insertOrUpdateResource(const T& resource, QHash<QnUuid, T>
 
 } // namespace
 
-QnResourcePool::QnResourcePool(QObject* parent):
+QnResourcePool::QnResourcePool(nx::vms::common::ResourceContext* context, QObject* parent):
     base_type(parent),
-    QnCommonModuleAware(parent),
-    d(new Private(this)),
+    d(new Private(this, context)),
     m_tranInProgress(false)
 {
     m_threadPool.reset(new QThreadPool());
@@ -57,6 +54,11 @@ QnResourcePool::~QnResourcePool()
 {
     clear();
     NX_DEBUG(this, "Removing");
+}
+
+nx::vms::common::ResourceContext* QnResourcePool::context() const
+{
+    return d->context;
 }
 
  QThreadPool* QnResourcePool::threadPool() const

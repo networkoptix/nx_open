@@ -2,17 +2,19 @@
 
 #include "runtime_info_manager.h"
 
-#include <nx/utils/log/log.h>
-
 #include <api/common_message_processor.h>
-
 #include <common/common_module.h>
+#include <nx/utils/log/log.h>
+#include <nx/vms/common/resource/resource_context.h>
 
 //#define RUNTIME_INFO_DEBUG
 
-QnRuntimeInfoManager::QnRuntimeInfoManager(QObject* parent):
+QnRuntimeInfoManager::QnRuntimeInfoManager(
+    nx::vms::common::ResourceContext* context,
+    QObject* parent)
+    :
     QObject(parent),
-    QnCommonModuleAware(parent),
+    nx::vms::common::ResourceContextAware(context),
     m_items(new QnThreadsafeItemStorage<QnPeerRuntimeInfo>(&m_mutex, this))
 {
 }
@@ -52,15 +54,6 @@ void QnRuntimeInfoManager::setMessageProcessor(QnCommonMessageProcessor* message
             {
                 m_items->setItems(QnPeerRuntimeInfoList() << localInfo());
             });
-
-        /* Client updates running instance guid on each connect to server */
-        connect(commonModule(), &QnCommonModule::runningInstanceGUIDChanged, this,
-            [this]()
-            {
-                nx::vms::api::RuntimeData item = localInfo().data;
-                item.peer.instanceId = commonModule()->runningInstanceGUID();
-                updateLocalItem(item);
-            }, Qt::DirectConnection);
     }
     m_messageProcessor = messageProcessor;
 }
@@ -96,8 +89,8 @@ Qn::Notifier QnRuntimeInfoManager::storedItemChanged(const QnPeerRuntimeInfo& it
 
 QnPeerRuntimeInfo QnRuntimeInfoManager::localInfo() const
 {
-    NX_ASSERT(m_items->hasItem(commonModule()->moduleGUID()));
-    return m_items->getItem(commonModule()->moduleGUID());
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_localInfo;
 }
 
 QnPeerRuntimeInfo QnRuntimeInfoManager::item(const QnUuid& id) const
@@ -112,10 +105,15 @@ bool QnRuntimeInfoManager::hasItem(const QnUuid& id)
 
 void QnRuntimeInfoManager::updateLocalItem(const QnPeerRuntimeInfo& value)
 {
-    NX_MUTEX_LOCKER lock( &m_updateMutex );
+    {
+        NX_MUTEX_LOCKER lock(&m_mutex);
+        m_localInfo = value;
+    }
 
-    NX_ASSERT(value.uuid == commonModule()->moduleGUID());
-    updateItem(value);
+    {
+        NX_MUTEX_LOCKER lock( &m_updateMutex );
+        updateItem(value);
+    }
 }
 
 void QnRuntimeInfoManager::updateRemoteItem(const QnPeerRuntimeInfo& value)

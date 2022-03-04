@@ -2,7 +2,6 @@
 
 #include <gtest/gtest.h>
 
-#include <common/common_module.h>
 #include <nx/core/access/access_types.h>
 
 #include <nx/utils/test_support/test_with_temporary_directory.h>
@@ -23,8 +22,6 @@ TEST(QnLayoutFileStorageResource, Basic)
     char buffer[kBufferSize];
     for (int i = 0; i < kBufferSize; i++)
         (unsigned char&) buffer[i] = (i + 5) % 255;
-
-    QSharedPointer<QnCommonModule> module(new QnCommonModule(false, nx::core::access::Mode::direct));
 
     nx::utils::test::TestWithTemporaryDirectory TestDir;
 
@@ -63,4 +60,3 @@ TEST(QnLayoutFileStorageResource, Basic)
         }
     }
 }
-

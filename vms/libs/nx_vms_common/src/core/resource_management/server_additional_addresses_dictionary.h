@@ -6,12 +6,9 @@
 #include <nx/utils/uuid.h>
 #include <nx/utils/url.h>
 
-class NX_VMS_COMMON_API QnServerAdditionalAddressesDictionary: public QObject
+class NX_VMS_COMMON_API QnServerAdditionalAddressesDictionary
 {
-    Q_OBJECT
 public:
-    QnServerAdditionalAddressesDictionary(QObject *parent = NULL);
-
     QList<nx::utils::Url> additionalUrls(const QnUuid &serverId) const;
     QList<nx::utils::Url> ignoredUrls(const QnUuid &serverId) const;
     void setAdditionalUrls(const QnUuid &serverId, const QList<nx::utils::Url> &additionalUrls);

@@ -10,12 +10,12 @@
 #include <QtCore/QString>
 
 #include <common/common_globals.h>
-#include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
 #include <nx/vms/common/api/client_update_settings.h>
+#include <nx/vms/common/resource/resource_context_aware.h>
 #include <nx/vms/common/update/persistent_update_storage.h>
 #include <utils/common/connective.h>
 #include <utils/common/ldap_fwd.h>
@@ -31,8 +31,8 @@ class QSettings;
 struct QnWatermarkSettings;
 
 namespace nx::vms::api {
-    struct ResourceParamWithRefData;
-    struct BackupSettings;
+struct ResourceParamWithRefData;
+struct BackupSettings;
 } // namespace nx::vms::api
 
 namespace nx::settings_names {
@@ -154,13 +154,13 @@ using FileToPeerList = QMap<QString, QList<QnUuid>>;
 
 class NX_VMS_COMMON_API QnGlobalSettings:
     public Connective<QObject>,
-    public /*mixin*/ QnCommonModuleAware
+    public nx::vms::common::ResourceContextAware
 {
     Q_OBJECT
     typedef Connective<QObject> base_type;
 
 public:
-    QnGlobalSettings(QObject* parent = nullptr);
+    QnGlobalSettings(nx::vms::common::ResourceContext* context, QObject* parent = nullptr);
     virtual ~QnGlobalSettings();
 
     void initialize();

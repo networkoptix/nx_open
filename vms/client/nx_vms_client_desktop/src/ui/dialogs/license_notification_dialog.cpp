@@ -5,6 +5,7 @@
 
 #include <QtCore/QSortFilterProxyModel>
 
+#include <common/common_module.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/license/validator.h>

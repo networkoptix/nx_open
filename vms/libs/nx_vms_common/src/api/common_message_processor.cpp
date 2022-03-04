@@ -1,84 +1,79 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "common_message_processor.h"
-#include "runtime_info_manager.h"
 
 #include <QtCore/QElapsedTimer>
 
-#include <nx/fusion/serialization/json.h>
-
-#include <common/common_module.h>
-#include <core/resource_access/user_access_data.h>
-#include <core/resource_access/shared_resources_manager.h>
-#include <core/resource_access/resource_access_manager.h>
-#include <core/resource_access/providers/resource_access_provider.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
-#include <core/resource_management/server_additional_addresses_dictionary.h>
-#include <core/resource_management/resource_properties.h>
-#include <core/resource_management/status_dictionary.h>
-#include <core/resource_management/layout_tour_manager.h>
 #include <core/resource/camera_history.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource/user_resource.h>
-#include <core/resource/layout_resource.h>
 #include <core/resource/camera_resource.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/media_server_user_attributes.h>
+#include <core/resource/resource_factory.h>
+#include <core/resource/storage_resource.h>
+#include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/webpage_resource.h>
-#include <core/resource/media_server_user_attributes.h>
-#include <core/resource/storage_resource.h>
-#include <core/resource/resource_factory.h>
-
-#include <nx/vms/common/resource/analytics_plugin_resource.h>
-#include <nx/vms/common/resource/analytics_engine_resource.h>
-
-#include <utils/common/synctime.h>
-
-#include <nx_ec/abstract_ec_connection.h>
-#include <nx_ec/managers/abstract_resource_manager.h>
-#include <nx_ec/managers/abstract_license_manager.h>
-#include <nx_ec/managers/abstract_event_rules_manager.h>
-#include <nx_ec/managers/abstract_vms_rules_manager.h>
-#include <nx_ec/managers/abstract_user_manager.h>
-#include <nx_ec/managers/abstract_layout_manager.h>
-#include <nx_ec/managers/abstract_layout_tour_manager.h>
-#include <nx_ec/managers/abstract_videowall_manager.h>
-#include <nx_ec/managers/abstract_webpage_manager.h>
-#include <nx_ec/managers/abstract_camera_manager.h>
-#include <nx_ec/managers/abstract_media_server_manager.h>
-#include <nx_ec/managers/abstract_analytics_manager.h>
-#include <nx_ec/managers/abstract_stored_file_manager.h>
-#include <nx_ec/managers/abstract_time_manager.h>
-#include <nx_ec/managers/abstract_discovery_manager.h>
-#include <nx_ec/managers/abstract_misc_manager.h>
-#include <nx_ec/data/api_conversion_functions.h>
-
+#include <core/resource_access/providers/resource_access_provider.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/shared_resources_manager.h>
+#include <core/resource_access/user_access_data.h>
+#include <core/resource_management/layout_tour_manager.h>
+#include <core/resource_management/resource_data_pool.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_properties.h>
+#include <core/resource_management/server_additional_addresses_dictionary.h>
+#include <core/resource_management/status_dictionary.h>
+#include <core/resource_management/user_roles_manager.h>
+#include <licensing/license.h>
+#include <nx/fusion/serialization/json.h>
 #include <nx/network/socket_common.h>
-#include <nx/vms/time/abstract_time_sync_manager.h>
+#include <nx/network/url/url_parse_helper.h>
+#include <nx/utils/log/log.h>
 #include <nx/vms/api/data/access_rights_data.h>
 #include <nx/vms/api/data/discovery_data.h>
 #include <nx/vms/api/data/event_rule_data.h>
 #include <nx/vms/api/data/full_info_data.h>
 #include <nx/vms/api/data/license_data.h>
 #include <nx/vms/api/data/resource_type_data.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/common/resource/resource_context.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
-#include <nx/utils/log/log.h>
-#include <core/resource_management/resource_data_pool.h>
-#include <core/resource_management/resource_pool.h>
-
-#include <licensing/license.h>
-#include <common/common_module.h>
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/time/abstract_time_sync_manager.h>
+#include <nx_ec/abstract_ec_connection.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/managers/abstract_analytics_manager.h>
+#include <nx_ec/managers/abstract_camera_manager.h>
+#include <nx_ec/managers/abstract_discovery_manager.h>
+#include <nx_ec/managers/abstract_event_rules_manager.h>
+#include <nx_ec/managers/abstract_layout_manager.h>
+#include <nx_ec/managers/abstract_layout_tour_manager.h>
+#include <nx_ec/managers/abstract_license_manager.h>
+#include <nx_ec/managers/abstract_media_server_manager.h>
+#include <nx_ec/managers/abstract_misc_manager.h>
+#include <nx_ec/managers/abstract_resource_manager.h>
+#include <nx_ec/managers/abstract_stored_file_manager.h>
+#include <nx_ec/managers/abstract_time_manager.h>
+#include <nx_ec/managers/abstract_user_manager.h>
+#include <nx_ec/managers/abstract_videowall_manager.h>
+#include <nx_ec/managers/abstract_vms_rules_manager.h>
+#include <nx_ec/managers/abstract_webpage_manager.h>
+#include <utils/common/synctime.h>
 
-#include <nx/network/url/url_parse_helper.h>
+#include "runtime_info_manager.h"
 
 using namespace nx;
 using namespace nx::vms::api;
 
-QnCommonMessageProcessor::QnCommonMessageProcessor(QObject *parent):
+QnCommonMessageProcessor::QnCommonMessageProcessor(
+    nx::vms::common::ResourceContext* context,
+    QObject *parent)
+    :
     base_type(parent),
-    QnCommonModuleAware(parent)
+    nx::vms::common::ResourceContextAware(context)
 {
 }
 
@@ -444,7 +439,7 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
     connect(
         layoutTourManager,
         &ec2::AbstractLayoutTourNotificationManager::removed,
-        this->layoutTourManager(),
+        m_context->layoutTourManager(),
         &QnLayoutTourManager::removeTour,
         connectionType);
 
@@ -491,7 +486,7 @@ void QnCommonMessageProcessor::disconnectFromConnection(const ec2::AbstractECCon
     connection->miscNotificationManager()->disconnect(this);
     connection->layoutTourNotificationManager()->disconnect(this);
 
-    layoutTourManager()->resetTours();
+    m_context->layoutTourManager()->resetTours();
 }
 
 void QnCommonMessageProcessor::on_gotInitialNotification(const FullInfoData& fullData)
@@ -511,16 +506,22 @@ void QnCommonMessageProcessor::on_gotDiscoveryData(
 
     nx::utils::Url url(data.url);
 
-    QnMediaServerResourcePtr server = resourcePool()->getResourceById<QnMediaServerResource>(data.id);
-    if (!server) {
-        if (!data.ignore) {
-            QList<nx::utils::Url> urls = commonModule()->serverAdditionalAddressesDictionary()->additionalUrls(data.id);
+    auto server = m_context->resourcePool()->getResourceById<QnMediaServerResource>(data.id);
+    if (!server)
+    {
+        if (!data.ignore)
+        {
+            QList<nx::utils::Url> urls =
+                m_context->serverAdditionalAddressesDictionary()->additionalUrls(data.id);
             urls.append(url);
-            commonModule()->serverAdditionalAddressesDictionary()->setAdditionalUrls(data.id, urls);
-        } else {
-            QList<nx::utils::Url> urls = commonModule()->serverAdditionalAddressesDictionary()->ignoredUrls(data.id);
+            m_context->serverAdditionalAddressesDictionary()->setAdditionalUrls(data.id, urls);
+        }
+        else
+        {
+            QList<nx::utils::Url> urls =
+                m_context->serverAdditionalAddressesDictionary()->ignoredUrls(data.id);
             urls.append(url);
-            commonModule()->serverAdditionalAddressesDictionary()->setIgnoredUrls(data.id, urls);
+            m_context->serverAdditionalAddressesDictionary()->setIgnoredUrls(data.id, urls);
         }
         return;
     }
@@ -568,11 +569,11 @@ void QnCommonMessageProcessor::on_resourceStatusChanged(
         return; //< ignore local setStatus call. Data already in the resourcePool
 
     const auto localStatus = static_cast<nx::vms::api::ResourceStatus>(status);
-    QnResourcePtr resource = resourcePool()->getResourceById(resourceId);
+    QnResourcePtr resource = m_context->resourcePool()->getResourceById(resourceId);
     if (resource)
         onResourceStatusChanged(resource, localStatus, source);
     else
-        statusDictionary()->setValue(resourceId, localStatus);
+        m_context->resourceStatusDictionary()->setValue(resourceId, localStatus);
 }
 
 void QnCommonMessageProcessor::on_resourceParamChanged(
@@ -582,14 +583,14 @@ void QnCommonMessageProcessor::on_resourceParamChanged(
     if (handleRemoteAnalyticsNotification(param, source))
         return;
 
-    QnResourcePtr resource = resourcePool()->getResourceById(param.resourceId);
+    QnResourcePtr resource = m_context->resourcePool()->getResourceById(param.resourceId);
     if (resource)
     {
         resource->setProperty(param.name, param.value, /*markDirty*/ false);
     }
     else
     {
-        resourcePropertyDictionary()->setValue(
+        m_context->resourcePropertyDictionary()->setValue(
             param.resourceId,
             param.name,
             param.value,
@@ -599,7 +600,7 @@ void QnCommonMessageProcessor::on_resourceParamChanged(
     if (param.name == Qn::kResourceDataParamName)
     {
         const bool loaded = param.value.isEmpty()
-            || commonModule()->resourceDataPool()->loadData(param.value.toUtf8());
+            || m_context->resourceDataPool()->loadData(param.value.toUtf8());
         NX_ASSERT(loaded, "Invalid json received");
     }
 }
@@ -614,22 +615,23 @@ bool QnCommonMessageProcessor::handleRemoteAnalyticsNotification(
         return false;
     }
 
-    const auto resource = resourcePool()->getResourceById(param.resourceId);
+    const auto resource = m_context->resourcePool()->getResourceById(param.resourceId);
     if (!resource)
         return false;
 
     const auto parentServer = resource->getParentResource();
-    if (!parentServer || parentServer->getId() != commonModule()->moduleGUID())
+    if (!parentServer || parentServer->getId() != m_context->peerId())
         return false;
 
     nx::vms::api::ResourceParamWithRefDataList kvPairs;
-    const auto ownData = resourcePropertyDictionary()->value(param.resourceId, param.name);
+    const auto ownData =
+        m_context->resourcePropertyDictionary()->value(param.resourceId, param.name);
     if (ownData != param.value)
     {
         kvPairs.push_back(nx::vms::api::ResourceParamWithRefData(
             param.resourceId, param.name, ownData));
 
-        commonModule()->ec2Connection()->getResourceManager(Qn::kSystemAccess)->save(
+        m_context->ec2Connection()->getResourceManager(Qn::kSystemAccess)->save(
             kvPairs, [](int /*requestId*/, ec2::ErrorCode) {});
     }
     return true;
@@ -639,18 +641,24 @@ void QnCommonMessageProcessor::on_resourceParamRemoved(
     const ResourceParamWithRefData& param)
 {
     if (canRemoveResourceProperty(param.resourceId, param.name))
-        resourcePropertyDictionary()->on_resourceParamRemoved(param.resourceId, param.name);
+    {
+        m_context->resourcePropertyDictionary()->on_resourceParamRemoved(
+            param.resourceId,
+            param.name);
+    }
     else
+    {
         refreshIgnoredResourceProperty(param.resourceId, param.name);
+    }
 }
 
 void QnCommonMessageProcessor::on_resourceRemoved( const QnUuid& resourceId )
 {
     if (canRemoveResource(resourceId))
     {
-        if (QnResourcePtr ownResource = resourcePool()->getResourceById(resourceId))
-            resourcePool()->removeResource(ownResource);
-        statusDictionary()->remove(resourceId);
+        if (QnResourcePtr ownResource = m_context->resourcePool()->getResourceById(resourceId))
+            m_context->resourcePool()->removeResource(ownResource);
+        m_context->resourceStatusDictionary()->remove(resourceId);
     }
     else
         removeResourceIgnored(resourceId);
@@ -660,9 +668,9 @@ void QnCommonMessageProcessor::on_resourceStatusRemoved(const QnUuid& resourceId
 {
     if (!canRemoveResource(resourceId))
     {
-        if (auto res = resourcePool()->getResourceById(resourceId))
+        if (auto res = m_context->resourcePool()->getResourceById(resourceId))
         {
-            if (auto connection = commonModule()->ec2Connection())
+            if (auto connection = m_context->ec2Connection())
             {
                 connection->getResourceManager(Qn::kSystemAccess)->setResourceStatus(
                     resourceId, res->getStatus(), [](int /*requestId*/, ec2::ErrorCode) {});
@@ -677,29 +685,32 @@ void QnCommonMessageProcessor::on_accessRightsChanged(const AccessRightsData& ac
     for (const QnUuid& id : accessRights.resourceIds)
         accessibleResources << id;
 
-    if (auto user = resourcePool()->getResourceById<QnUserResource>(accessRights.userId))
+    if (auto user =
+            m_context->resourcePool()->getResourceById<QnUserResource>(accessRights.userId))
     {
-        sharedResourcesManager()->setSharedResources(user, accessibleResources);
+        m_context->sharedResourcesManager()->setSharedResources(user, accessibleResources);
     }
-    else if (auto role = userRolesManager()->userRole(accessRights.userId); !role.id.isNull())
+    else if (auto role = m_context->userRolesManager()->userRole(accessRights.userId);
+             !role.id.isNull())
     {
-        sharedResourcesManager()->setSharedResources(role, accessibleResources);
+        m_context->sharedResourcesManager()->setSharedResources(role, accessibleResources);
     }
     else
     {
-        sharedResourcesManager()->setSharedResourcesById(accessRights.userId, accessibleResources);
+        m_context->sharedResourcesManager()->setSharedResourcesById(
+            accessRights.userId, accessibleResources);
     }
 }
 
 void QnCommonMessageProcessor::on_userRoleChanged(const UserRoleData& userRole)
 {
-    userRolesManager()->addOrUpdateUserRole(userRole);
+    m_context->userRolesManager()->addOrUpdateUserRole(userRole);
 }
 
 void QnCommonMessageProcessor::on_userRoleRemoved(const QnUuid& userRoleId)
 {
-    userRolesManager()->removeUserRole(userRoleId);
-    for (const auto& user : resourcePool()->getResources<QnUserResource>())
+    m_context->userRolesManager()->removeUserRole(userRoleId);
+    for (const auto& user: m_context->resourcePool()->getResources<QnUserResource>())
     {
         if (user->userRoleId() == userRoleId)
             user->setUserRoleId(QnUuid());
@@ -709,7 +720,7 @@ void QnCommonMessageProcessor::on_userRoleRemoved(const QnUuid& userRoleId)
 void QnCommonMessageProcessor::on_cameraUserAttributesChanged(
     const CameraAttributesData& userAttributes)
 {
-    if (auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(
+    if (auto camera = m_context->resourcePool()->getResourceById<QnVirtualCameraResource>(
         userAttributes.cameraId))
     {
         if (camera->isScheduleEnabled() && !userAttributes.scheduleEnabled)
@@ -728,7 +739,8 @@ void QnCommonMessageProcessor::on_cameraUserAttributesChanged(
 void QnCommonMessageProcessor::on_cameraUserAttributesRemoved(const QnUuid& cameraId)
 {
     // It is OK if the Camera is missing.
-    if (auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId))
+    if (auto camera =
+        m_context->resourcePool()->getResourceById<QnVirtualCameraResource>(cameraId))
     {
         nx::vms::api::CameraAttributesData emptyAttributes;
         emptyAttributes.cameraId = cameraId;
@@ -745,13 +757,13 @@ void QnCommonMessageProcessor::on_mediaServerUserAttributesChanged(
     QnMediaServerUserAttributes::Notifiers notifiers;
     {
         QnMediaServerUserAttributesPool::ScopedLock lk(
-            mediaServerUserAttributesPool(),
+            m_context->mediaServerUserAttributesPool(),
             userAttributes->serverId() );
         lk->assign(*userAttributes, notifiers);
     }
 
     // It is OK if the Server is missing.
-    if (auto server = resourcePool()->getResourceById<QnMediaServerResource>(
+    if (auto server = m_context->resourcePool()->getResourceById<QnMediaServerResource>(
         userAttributes->serverId()))
     {
         emit server->resourceChanged(server);
@@ -764,14 +776,15 @@ void QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved(const QnUuid&
 {
     QnMediaServerUserAttributes::Notifiers notifiers;
     {
-        QnMediaServerUserAttributesPool::ScopedLock lk(mediaServerUserAttributesPool(), serverId );
+        QnMediaServerUserAttributesPool::ScopedLock lk(
+            m_context->mediaServerUserAttributesPool(), serverId);
         // TODO: #akolesnikov For now, never remove this structure, just reset to an empty value.
         lk->assign(QnMediaServerUserAttributes(), notifiers);
         lk->setServerId(serverId);
     }
 
     // It is OK if the Server is missing.
-    if (auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId))
+    if (auto server = m_context->resourcePool()->getResourceById<QnMediaServerResource>(serverId))
     {
         emit server->resourceChanged(server);
         for (const auto& notifier: notifiers)
@@ -782,27 +795,29 @@ void QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved(const QnUuid&
 void QnCommonMessageProcessor::on_cameraHistoryChanged(
     const ServerFootageData& serverFootageData)
 {
-    cameraHistoryPool()->setServerFootageData(serverFootageData);
+    m_context->cameraHistoryPool()->setServerFootageData(serverFootageData);
 }
 
-void QnCommonMessageProcessor::on_licenseChanged(const QnLicensePtr &license) {
-    licensePool()->addLicense(license);
+void QnCommonMessageProcessor::on_licenseChanged(const QnLicensePtr& license)
+{
+    m_context->licensePool()->addLicense(license);
 }
 
-void QnCommonMessageProcessor::on_licenseRemoved(const QnLicensePtr &license) {
-    licensePool()->removeLicense(license);
+void QnCommonMessageProcessor::on_licenseRemoved(const QnLicensePtr& license)
+{
+    m_context->licensePool()->removeLicense(license);
 }
 
 void QnCommonMessageProcessor::on_eventRuleAddedOrUpdated(const nx::vms::api::EventRuleData& data)
 {
     nx::vms::event::RulePtr eventRule(new nx::vms::event::Rule());
     ec2::fromApiToResource(data, eventRule);
-    eventRuleManager()->addOrUpdateRule(eventRule);
+    m_context->eventRuleManager()->addOrUpdateRule(eventRule);
 }
 
 void QnCommonMessageProcessor::on_businessEventRemoved(const QnUuid& id)
 {
-    eventRuleManager()->removeRule(id);
+    m_context->eventRuleManager()->removeRule(id);
 }
 
 void QnCommonMessageProcessor::on_broadcastBusinessAction( const vms::event::AbstractActionPtr& action )
@@ -811,7 +826,7 @@ void QnCommonMessageProcessor::on_broadcastBusinessAction( const vms::event::Abs
 }
 void QnCommonMessageProcessor::handleTourAddedOrUpdated(const nx::vms::api::LayoutTourData& tour)
 {
-    layoutTourManager()->addOrUpdateTour(tour);
+    m_context->layoutTourManager()->addOrUpdateTour(tour);
 }
 
 void QnCommonMessageProcessor::resetResourceTypes(const ResourceTypeDataList& resTypes)
@@ -825,8 +840,11 @@ void QnCommonMessageProcessor::resetResources(const FullInfoData& fullData)
 {
     // Store all remote resources id to clean them if they are not in the list anymore.
     QHash<QnUuid, QnResourcePtr> remoteResources;
-    for (const QnResourcePtr &resource: resourcePool()->getResourcesWithFlag(Qn::remote))
+    for (const QnResourcePtr& resource:
+        m_context->resourcePool()->getResourcesWithFlag(Qn::remote))
+    {
         remoteResources.insert(resource->getId(), resource);
+    }
 
     const auto updateResources = [this, &remoteResources](const auto& source)
         {
@@ -838,7 +856,7 @@ void QnCommonMessageProcessor::resetResources(const FullInfoData& fullData)
         };
 
     // Packet adding.
-    resourcePool()->beginTran();
+    m_context->resourcePool()->beginTran();
 
     updateResources(fullData.users);
     updateResources(fullData.cameras);
@@ -850,44 +868,44 @@ void QnCommonMessageProcessor::resetResources(const FullInfoData& fullData)
     updateResources(fullData.analyticsPlugins);
     updateResources(fullData.analyticsEngines);
 
-    resourcePool()->commit();
+    m_context->resourcePool()->commit();
 
     // Remove absent resources.
     for (const QnResourcePtr& resource: remoteResources)
-        resourcePool()->removeResource(resource);
+        m_context->resourcePool()->removeResource(resource);
 }
 
 void QnCommonMessageProcessor::resetLicenses(const LicenseDataList& licenses)
 {
-    licensePool()->replaceLicenses(licenses);
+    m_context->licensePool()->replaceLicenses(licenses);
 }
 
 void QnCommonMessageProcessor::resetCamerasWithArchiveList(
     const ServerFootageDataList& cameraHistoryList)
 {
-    cameraHistoryPool()->resetServerFootageData(cameraHistoryList);
+    m_context->cameraHistoryPool()->resetServerFootageData(cameraHistoryList);
 }
 
 void QnCommonMessageProcessor::resetEventRules(const nx::vms::api::EventRuleDataList& eventRules)
 {
     vms::event::RuleList ruleList;
     ec2::fromApiToResourceList(eventRules, ruleList);
-    eventRuleManager()->resetRules(ruleList);
+    m_context->eventRuleManager()->resetRules(ruleList);
 }
 
 void QnCommonMessageProcessor::resetVmsRules(const nx::vms::api::rules::RuleList& vmsRules)
 {
-    vmsRulesEngine()->init(commonModule()->moduleGUID(), vmsRules);
+    m_context->vmsRulesEngine()->init(m_context->peerId(), vmsRules);
 }
 
 void QnCommonMessageProcessor::resetAccessRights(const AccessRightsDataList& accessRights)
 {
-    sharedResourcesManager()->reset(accessRights);
+    m_context->sharedResourcesManager()->reset(accessRights);
 }
 
 void QnCommonMessageProcessor::resetUserRoles(const UserRoleDataList& roles)
 {
-    userRolesManager()->resetUserRoles(roles);
+    m_context->userRolesManager()->resetUserRoles(roles);
 }
 
 bool QnCommonMessageProcessor::canRemoveResource(const QnUuid &)
@@ -921,14 +939,14 @@ void QnCommonMessageProcessor::handleRemotePeerLost(QnUuid /*data*/, PeerType /*
 void QnCommonMessageProcessor::resetServerUserAttributesList(
     const MediaServerUserAttributesDataList& serverUserAttributesList)
 {
-    mediaServerUserAttributesPool()->clear();
+    m_context->mediaServerUserAttributesPool()->clear();
     for( const auto& serverAttrs: serverUserAttributesList )
     {
         QnMediaServerUserAttributesPtr dstElement(new QnMediaServerUserAttributes());
         ec2::fromApiToResource(serverAttrs, dstElement);
 
         QnMediaServerUserAttributesPool::ScopedLock userAttributesLock(
-            mediaServerUserAttributesPool(), serverAttrs.serverId);
+            m_context->mediaServerUserAttributesPool(), serverAttrs.serverId);
         userAttributesLock = dstElement;
     }
 }
@@ -943,7 +961,7 @@ void QnCommonMessageProcessor::resetCameraUserAttributesList(
 void QnCommonMessageProcessor::resetPropertyList(const ResourceParamWithRefDataList& params)
 {
     // Store existing parameter keys.
-    auto existingProperties = resourcePropertyDictionary()->allPropertyNamesByResource();
+    auto existingProperties = m_context->resourcePropertyDictionary()->allPropertyNamesByResource();
 
     // Update changed values.
     for (const auto& param: params)
@@ -968,10 +986,10 @@ void QnCommonMessageProcessor::resetPropertyList(const ResourceParamWithRefDataL
 
 void QnCommonMessageProcessor::resetStatusList(const ResourceStatusDataList& params)
 {
-    auto keys = statusDictionary()->values().keys();
-    statusDictionary()->clear();
+    auto keys = m_context->resourceStatusDictionary()->values().keys();
+    m_context->resourceStatusDictionary()->clear();
     for(const QnUuid& id: keys) {
-        if (QnResourcePtr resource = resourcePool()->getResourceById(id))
+        if (QnResourcePtr resource = m_context->resourcePool()->getResourceById(id))
         {
             NX_VERBOSE(this, lit("%1 Emit statusChanged signal for resource %2, %3, %4")
                     .arg(QString::fromLatin1(Q_FUNC_INFO))
@@ -993,10 +1011,10 @@ void QnCommonMessageProcessor::resetStatusList(const ResourceStatusDataList& par
 
 void QnCommonMessageProcessor::onGotInitialNotification(const FullInfoData& fullData)
 {
-    resourceAccessManager()->beginUpdate();
-    resourceAccessProvider()->beginUpdate();
+    m_context->resourceAccessManager()->beginUpdate();
+    m_context->resourceAccessProvider()->beginUpdate();
 
-    commonModule()->serverAdditionalAddressesDictionary()->clear();
+    m_context->serverAdditionalAddressesDictionary()->clear();
 
     resetResourceTypes(fullData.resourceTypes);
     resetServerUserAttributesList(fullData.serversUserAttributesList);
@@ -1008,10 +1026,10 @@ void QnCommonMessageProcessor::onGotInitialNotification(const FullInfoData& full
     resetAccessRights(fullData.accessRights);
     resetUserRoles(fullData.userRoles);
     resetLicenses(fullData.licenses);
-    layoutTourManager()->resetTours(fullData.layoutTours);
+    m_context->layoutTourManager()->resetTours(fullData.layoutTours);
 
-    resourceAccessProvider()->endUpdate();
-    resourceAccessManager()->endUpdate();
+    m_context->resourceAccessProvider()->endUpdate();
+    m_context->resourceAccessManager()->endUpdate();
 
     emit initialResourcesReceived();
 }
@@ -1026,7 +1044,7 @@ void QnCommonMessageProcessor::updateResource(
     const nx::vms::api::UserData& user,
     ec2::NotificationSource source)
 {
-    QnUserResourcePtr qnUser(ec2::fromApiToResource(user, commonModule()));
+    QnUserResourcePtr qnUser(ec2::fromApiToResource(user));
     updateResource(qnUser, source);
 }
 

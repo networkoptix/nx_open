@@ -3,11 +3,9 @@
 #pragma once
 
 #include <core/resource_access/providers/abstract_resource_access_provider.h>
-
-#include <nx/vms/api/types/access_rights_types.h>
-
 #include <nx/utils/thread/mutex.h>
-#include <common/common_module_aware.h>
+#include <nx/vms/api/types/access_rights_types.h>
+#include <nx/vms/common/resource/resource_context_aware.h>
 
 namespace nx::vms::api { struct UserRoleData; }
 
@@ -19,12 +17,15 @@ namespace nx::core::access {
  */
 class NX_VMS_COMMON_API BaseResourceAccessProvider:
     public AbstractResourceAccessProvider,
-    public /*mixin*/ QnCommonModuleAware
+    public nx::vms::common::ResourceContextAware
 {
     using base_type = AbstractResourceAccessProvider;
 
 public:
-    BaseResourceAccessProvider(Mode mode, QObject* parent = nullptr);
+    BaseResourceAccessProvider(
+        Mode mode,
+        nx::vms::common::ResourceContext* context,
+        QObject* parent = nullptr);
     virtual ~BaseResourceAccessProvider();
 
     virtual bool hasAccess(const QnResourceAccessSubject& subject,

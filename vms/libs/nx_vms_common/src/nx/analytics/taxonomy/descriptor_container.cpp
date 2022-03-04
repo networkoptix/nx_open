@@ -2,20 +2,23 @@
 
 #include "descriptor_container.h"
 
-#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/fusion/model_functions.h>
 #include <nx/analytics/properties.h>
+#include <nx/fusion/model_functions.h>
+#include <nx/vms/common/resource/resource_context.h>
 
 using namespace nx::vms::api::analytics;
 
 namespace nx::analytics::taxonomy {
 
-DescriptorContainer::DescriptorContainer(QnCommonModule* commonModule):
-    Connective<QObject>(commonModule),
-    QnCommonModuleAware(commonModule),
-    m_propertyWatcher(commonModule->resourcePool())
+DescriptorContainer::DescriptorContainer(
+    nx::vms::common::ResourceContext* context,
+    QObject* parent)
+    :
+    base_type(parent),
+    nx::vms::common::ResourceContextAware(context),
+    m_propertyWatcher(context->resourcePool())
 {
     connect(&m_propertyWatcher, &PropertyWatcher::propertyChanged,
         this, &DescriptorContainer::at_descriptorsUpdated);
@@ -37,7 +40,7 @@ Descriptors DescriptorContainer::descriptors(const QnUuid& serverId)
             return *m_cachedDescriptors;
     }
 
-    QnResourcePool* resourcePool = commonModule()->resourcePool();
+    QnResourcePool* resourcePool = m_context->resourcePool();
     if (serverId.isNull())
     {
         const auto servers = resourcePool->servers();
@@ -71,10 +74,10 @@ Descriptors DescriptorContainer::descriptors(const QnUuid& serverId)
 
 void DescriptorContainer::updateDescriptors(Descriptors descriptors)
 {
-    QnResourcePool* resourcePool = commonModule()->resourcePool();
+    QnResourcePool* resourcePool = m_context->resourcePool();
 
     QnMediaServerResourcePtr ownServer = resourcePool->getResourceById<QnMediaServerResource>(
-        commonModule()->moduleGUID());
+        m_context->peerId());
 
     if (!NX_ASSERT(ownServer, "Unable to find own mediaserver"))
         return;

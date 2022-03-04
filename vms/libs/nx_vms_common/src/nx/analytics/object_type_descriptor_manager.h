@@ -4,24 +4,25 @@
 
 #include <QtCore/QObject>
 
-#include <nx/vms/api/analytics/descriptors.h>
-#include <nx/vms/api/analytics/engine_manifest.h>
-#include <nx/vms/api/analytics/device_agent_manifest.h>
-
-#include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/api/analytics/descriptors.h>
+#include <nx/vms/api/analytics/device_agent_manifest.h>
+#include <nx/vms/api/analytics/engine_manifest.h>
 
 namespace nx::analytics {
 
+namespace taxonomy { class DescriptorContainer; }
+
 class NX_VMS_COMMON_API ObjectTypeDescriptorManager:
-    public QObject,
-    public /*mixin*/ QnCommonModuleAware
+    public QObject
 {
     using base_type = QObject;
     Q_OBJECT
 
 public:
-    explicit ObjectTypeDescriptorManager(QObject* parent = nullptr);
+    explicit ObjectTypeDescriptorManager(
+        taxonomy::DescriptorContainer* taxonomyDescriptorContainer,
+        QObject* parent = nullptr);
 
     std::optional<nx::vms::api::analytics::ObjectTypeDescriptor> descriptor(
         const nx::vms::api::analytics::ObjectTypeId& id) const;
@@ -51,6 +52,9 @@ private:
     nx::vms::api::analytics::GroupId objectTypeGroupForEngine(
         const nx::vms::api::analytics::EngineId& engineId,
         const nx::vms::api::analytics::ObjectTypeId& objectTypeId) const;
+
+private:
+    taxonomy::DescriptorContainer* const m_taxonomyDescriptorContainer;
 };
 
 } // namespace nx::analytics

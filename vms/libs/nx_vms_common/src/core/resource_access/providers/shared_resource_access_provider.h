@@ -15,7 +15,10 @@ class NX_VMS_COMMON_API SharedResourceAccessProvider: public BaseResourceAccessP
     using base_type = BaseResourceAccessProvider;
 
 public:
-    SharedResourceAccessProvider(Mode mode, QObject* parent = nullptr);
+    SharedResourceAccessProvider(
+        Mode mode,
+        nx::vms::common::ResourceContext* context,
+        QObject* parent = nullptr);
     virtual ~SharedResourceAccessProvider();
 
 protected:

@@ -2,24 +2,22 @@
 
 #pragma once
 
-#include <common/common_module.h>
-
 #include <core/resource_access/resource_access_subject.h>
-
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/access_rights_data.h>
+#include <nx/vms/common/resource/resource_context_aware.h>
 
 /** Manager class for shared resources: layouts, cameras, web pages and server statistics. */
 class NX_VMS_COMMON_API QnSharedResourcesManager:
     public QObject,
-    public /*mixin*/ QnCommonModuleAware
+    public nx::vms::common::ResourceContextAware
 {
     Q_OBJECT
 
     using base_type = QObject;
 public:
-    QnSharedResourcesManager(QObject* parent = nullptr);
+    QnSharedResourcesManager(nx::vms::common::ResourceContext* context, QObject* parent = nullptr);
     virtual ~QnSharedResourcesManager();
 
     void reset(const nx::vms::api::AccessRightsDataList& accessibleResourcesList);
@@ -55,4 +53,3 @@ private:
     mutable nx::Mutex m_mutex;
     QHash<QnUuid, QSet<QnUuid> > m_sharedResources;
 };
-

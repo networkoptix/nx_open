@@ -18,6 +18,8 @@ class QnResourceConsumer;
 class QnResourcePool;
 class QnCommonModule;
 
+namespace nx::vms::common { class ResourceContext; }
+
 namespace nx::vms::api {
 
 struct ResourceParamData;
@@ -143,6 +145,12 @@ public:
      * Resource and to some tightly bound classes.
      */
     QnCommonModule* commonModule() const;
+
+    /**
+     * Context this resource belongs to. Used to get access to external properties of the resource
+     * and to some tightly bound classes.
+     */
+    nx::vms::common::ResourceContext* context() const;
 
     /**
      * Debug helper for NX_LOG implementation. Used by toString(const T*).

@@ -31,7 +31,7 @@ void TimeSyncManager::resync()
 
 void TimeSyncManager::updateTime()
 {
-    auto route = commonModule()->router()->routeTo(m_serverId);
+    auto route = commonModule()->router()->routeTo(m_serverId, commonModule());
     auto networkTimeSyncInterval = commonModule()->globalSettings()->syncTimeExchangePeriod();
     if (route.isValid())
     {

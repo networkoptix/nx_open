@@ -1280,7 +1280,7 @@ struct ModifyAccessRightsChecker
         }
         else
         {
-            auto role = accessManager->userRolesManager()->userRole(param.userId);
+            auto role = commonModule->userRolesManager()->userRole(param.userId);
             if (role.id.isNull())
             {
                 // We can clear shared Resources even after the User or Role is deleted.

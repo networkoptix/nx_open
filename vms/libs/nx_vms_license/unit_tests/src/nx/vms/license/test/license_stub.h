@@ -34,7 +34,7 @@ class QLicenseStubValidator: public Validator
 {
     using base_type = Validator;
 public:
-    QLicenseStubValidator(QnCommonModule* commonModule, QObject* parent = nullptr);
+    QLicenseStubValidator(nx::vms::common::ResourceContext* context, QObject* parent = nullptr);
 
     virtual QnLicenseErrorCode validate(const QnLicensePtr& license, ValidationMode mode = VM_Regular) const;
 };

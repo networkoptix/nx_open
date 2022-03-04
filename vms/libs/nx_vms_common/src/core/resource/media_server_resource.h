@@ -113,8 +113,6 @@ public:
     nx::vms::api::BackupBitrateBytesPerSecond getBackupBitrateLimitsBps() const;
     void setBackupBitrateLimitsBps(const nx::vms::api::BackupBitrateBytesPerSecond& bitrateLimits);
 
-    virtual void setResourcePool(QnResourcePool* resourcePool) override;
-
     /** @return Realm to use in HTTP authentication. */
     QString realm() const;
 
@@ -184,6 +182,9 @@ signals:
     void backupBitrateLimitsChanged(const QnResourcePtr& resource);
     void webCamerasDiscoveryChanged();
     void analyticsDescriptorsChanged();
+
+protected:
+    virtual void setCommonModule(QnCommonModule* commonModule) override;
 
 private:
     Qn::PanicMode calculatePanicMode() const;

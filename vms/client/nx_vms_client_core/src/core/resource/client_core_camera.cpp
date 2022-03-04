@@ -41,7 +41,7 @@ Qn::ResourceFlags Camera::flags() const {
 
 nx::vms::api::ResourceStatus Camera::getStatus() const
 {
-    if (auto context = commonModule())
+    if (auto context = this->context())
     {
         const auto serverStatus = context->resourceStatusDictionary()->value(getParentId());
         if (serverStatus == nx::vms::api::ResourceStatus::offline
