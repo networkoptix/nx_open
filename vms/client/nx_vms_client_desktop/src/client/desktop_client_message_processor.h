@@ -9,8 +9,7 @@ class NX_VMS_CLIENT_DESKTOP_API QnDesktopClientMessageProcessor: public QnClient
     Q_OBJECT
     using base_type = QnClientMessageProcessor;
 public:
-    explicit QnDesktopClientMessageProcessor(QObject* parent = nullptr);
-    virtual ~QnDesktopClientMessageProcessor() override;
+    using QnClientMessageProcessor::QnClientMessageProcessor;
 
 protected:
     virtual QnResourceFactory* getResourceFactory() const override;

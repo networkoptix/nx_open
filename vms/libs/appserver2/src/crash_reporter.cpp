@@ -286,7 +286,7 @@ nx::network::http::HttpHeaders ReportData::makeHttpHeaders() const
     const auto binName = fileName.split(QChar('_')).first();
 #endif
 
-    const auto uuidHash = m_host.commonModule()->moduleGUID().toSimpleString().replace(lit("-"), lit(""));
+    const auto uuidHash = m_host.commonModule()->peerId().toSimpleString().replace(lit("-"), lit(""));
     const auto version = nx::utils::AppInfo::applicationFullVersion();
     const auto systemInfo = nx::vms::api::OsInformation::fromBuildInfo().toString();
     const auto systemRuntime = nx::vms::api::OsInformation::currentSystemRuntime();

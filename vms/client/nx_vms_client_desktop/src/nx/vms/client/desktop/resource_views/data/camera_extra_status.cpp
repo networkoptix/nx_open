@@ -28,9 +28,9 @@ CameraExtraStatus getCameraExtraStatus(const QnVirtualCameraResourcePtr& camera)
         result.setFlag(CameraExtraStatusFlag::buggy);
     }
 
-    if (const auto commonModule = camera->commonModule())
+    if (const auto context = camera->context())
     {
-        if (!commonModule->cameraHistoryPool()->getCameraFootageData(camera->getId()).empty())
+        if (!context->cameraHistoryPool()->getCameraFootageData(camera->getId()).empty())
             result.setFlag(CameraExtraStatusFlag::hasArchive);
     }
 

@@ -208,7 +208,7 @@ TEST_F(ResourceTreeModelTest, videoWallScreenIconStatus)
         (uniqueMatchingIndex(kUniqueVideoWallScreenNameCondition)));
 
     // When video wall screen is online and have "controlled by" UUID same as common module GUID.
-    setVideoWallScreenRuntimeStatus(videoWall, videoWallScreen, true, commonModule()->moduleGUID());
+    setVideoWallScreenRuntimeStatus(videoWall, videoWallScreen, true, commonModule()->peerId());
 
     // Then icon has Control decoration.
     ASSERT_TRUE(iconStatusMatch(QnResourceIconCache::Control)

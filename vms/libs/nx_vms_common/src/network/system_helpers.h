@@ -3,16 +3,12 @@
 #pragma once
 
 #include <core/resource/resource_fwd.h>
+#include <nx/utils/uuid.h>
 
 struct QnCloudSystem;
-class QnCommonModule;
-class QnUuid;
 
-namespace nx::vms::api {
-
-struct ModuleInformation;
-
-} // namespace nx::vms::api
+namespace nx::vms::api { struct ModuleInformation; }
+namespace nx::vms::common { class ResourceContext; }
 
 namespace helpers {
 
@@ -38,13 +34,13 @@ NX_VMS_COMMON_API bool isCloudSystem(const nx::vms::api::ModuleInformation& info
 
 NX_VMS_COMMON_API QString getSystemName(const nx::vms::api::ModuleInformation& info);
 
-NX_VMS_COMMON_API QnUuid currentSystemLocalId(const QnCommonModule* commonModule);
+NX_VMS_COMMON_API QnUuid currentSystemLocalId(const nx::vms::common::ResourceContext* context);
 
-NX_VMS_COMMON_API bool currentSystemIsNew(const QnCommonModule* commonModule);
+NX_VMS_COMMON_API bool currentSystemIsNew(const nx::vms::common::ResourceContext* context);
 
 NX_VMS_COMMON_API bool serverBelongsToCurrentSystem(
     const nx::vms::api::ModuleInformation& info,
-    const QnCommonModule* commonModule);
+    const nx::vms::common::ResourceContext* context);
 
 NX_VMS_COMMON_API bool serverBelongsToCurrentSystem(const QnMediaServerResourcePtr& server);
 

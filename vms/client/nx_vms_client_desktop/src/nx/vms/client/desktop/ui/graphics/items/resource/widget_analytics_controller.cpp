@@ -301,7 +301,7 @@ AnalyticsOverlayWidget::AreaInfo WidgetAnalyticsController::Private::areaInfoFro
 WidgetAnalyticsController::Private::Private(WidgetAnalyticsController* parent)
     :
     QnCommonModuleAware(parent),
-    objectTypeDictionary(commonModule()->taxonomyStateWatcher())
+    objectTypeDictionary(commonModule()->analyticsTaxonomyStateWatcher())
 {
 }
 
@@ -321,7 +321,7 @@ ObjectInfo& WidgetAnalyticsController::Private::addOrUpdateObject(
 
     objectInfo.rectangle = objectMetadata.boundingBox;
 
-    const auto watcher = commonModule()->taxonomyStateWatcher();
+    const auto watcher = commonModule()->analyticsTaxonomyStateWatcher();
     const auto state = NX_ASSERT(watcher) ? watcher->state() : nullptr;
     const auto objectType = state ? state->objectTypeById(objectMetadata.typeId) : nullptr;
     const QString title = objectType ? objectType->name() : QString();

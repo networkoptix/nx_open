@@ -155,7 +155,7 @@ RemoteSession::RemoteSession(RemoteConnectionPtr connection, QObject* parent):
     d->remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
 
     d->messageProcessor = static_cast<QnClientMessageProcessor*>(
-        qnClientCoreModule->commonModule()->messageProcessor());
+        commonModule->messageProcessor());
 
     connect(d->messageProcessor.data(), &QnCommonMessageProcessor::connectionOpened, this,
         &RemoteSession::onMessageBusConnectionOpened);
@@ -328,7 +328,7 @@ void RemoteSession::establishConnection(RemoteConnectionPtr connection)
     // TODO: #sivanov Remove global singleton storage, use session id as audit id everywhere.
     // Setup audit id.
     QnCommonModule* commonModule = qnClientCoreModule->commonModule();
-    connection->updateSessionId(commonModule->runningInstanceGUID());
+    connection->updateSessionId(commonModule->sessionId());
 
     // Setup message bus connection.
     connection->initializeMessageBusConnection(commonModule);

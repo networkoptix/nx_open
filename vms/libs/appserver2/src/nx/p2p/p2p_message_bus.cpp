@@ -138,7 +138,7 @@ void MessageBus::printTran(
     const ec2::QnAbstractTransaction& tran,
     Connection::Direction direction) const
 {
-    auto localPeerName = peerName(commonModule()->moduleGUID());
+    auto localPeerName = peerName(commonModule()->peerId());
     QString msgName;
     QString directionName;
     if (direction == Connection::Direction::outgoing)
@@ -336,7 +336,7 @@ void MessageBus::createOutgoingConnections(
             }
 
             ConnectionLockGuard connectionLockGuard(
-                commonModule()->moduleGUID(),
+                commonModule()->peerId(),
                 connectionGuardSharedState(),
                 remoteConnection.peerId,
                 ConnectionLockGuard::Direction::Outgoing);
@@ -447,34 +447,13 @@ void MessageBus::doPeriodicTasks()
 
 vms::api::PeerData MessageBus::localPeer() const
 {
-    const auto localPeerData = commonModule()->runtimeInfoManager()->localInfo().data.peer;
-
-    const auto result = vms::api::PeerData(
-        commonModule()->moduleGUID(),
-        commonModule()->runningInstanceGUID(),
-        commonModule()->dbId(),
-        m_localPeerType,
-        localPeerData.dataFormat);
-
-    // TODO: Simplify logic, use localPeerData directly, remove m_localPeerType.
-    NX_ASSERT(localPeerData == result);
-    return result;
+    return commonModule()->runtimeInfoManager()->localInfo().data.peer;
 }
 
 vms::api::PeerDataEx MessageBus::localPeerEx() const
 {
-    const auto localPeerData = commonModule()->runtimeInfoManager()->localInfo().data.peer;
-
-    using namespace vms::api;
-    PeerDataEx result;
-    result.id = commonModule()->moduleGUID();
-    result.persistentId = commonModule()->dbId();
-    result.instanceId = commonModule()->runningInstanceGUID();
-    result.peerType = m_localPeerType;
-    result.dataFormat = localPeerData.dataFormat;
-
-    // TODO: Simplify logic, use localPeerData directly, remove m_localPeerType.
-    NX_ASSERT(static_cast<PeerData>(result) == localPeerData);
+    nx::vms::api::PeerDataEx result;
+    result.assign(localPeer());
 
     result.systemId = commonModule()->globalSettings()->localSystemId();
     result.cloudHost = nx::network::SocketGlobals::cloud().cloudHost().c_str();
@@ -649,7 +628,7 @@ void MessageBus::at_gotMessage(
         messageType != MessageType::pushTransactionData &&
         messageType != MessageType::pushTransactionList)
     {
-        auto localPeerName = peerName(commonModule()->moduleGUID());
+        auto localPeerName = peerName(commonModule()->peerId());
 
         NX_VERBOSE(
             this,

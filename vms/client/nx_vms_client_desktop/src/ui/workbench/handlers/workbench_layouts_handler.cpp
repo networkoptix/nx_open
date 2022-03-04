@@ -8,62 +8,53 @@
 #include <boost/algorithm/cxx11/any_of.hpp>
 
 #include <api/global_settings.h>
-
 #include <client/client_globals.h>
-#include <client/client_settings.h>
 #include <client/client_message_processor.h>
-
-#include <core/resource/resource.h>
+#include <client/client_settings.h>
+#include <common/common_module.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/layout_reader.h>
 #include <core/resource/layout_resource.h>
+#include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
-
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
-#include <core/resource_management/resources_changes_manager.h>
-
-#include <core/resource_access/resource_access_filter.h>
-#include <core/resource_access/shared_resources_manager.h>
-#include <core/resource_access/resource_access_manager.h>
 #include <core/resource_access/providers/resource_access_provider.h>
+#include <core/resource_access/resource_access_filter.h>
+#include <core/resource_access/resource_access_manager.h>
+#include <core/resource_access/shared_resources_manager.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resources_changes_manager.h>
+#include <core/resource_management/user_roles_manager.h>
+#include <nx/utils/counter.h>
+#include <nx/utils/log/log.h>
+#include <nx/utils/string.h>
 #include <nx/vms/client/desktop/radass/radass_resource_manager.h>
-
-#include <nx_ec/managers/abstract_layout_manager.h>
-
-#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/resources/layout_password_management.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameter_types.h>
-
+#include <nx/vms/client/desktop/ui/actions/action_parameters.h>
+#include <nx/vms/client/desktop/ui/actions/actions.h>
+#include <nx/vms/client/desktop/ui/messages/resources_messages.h>
+#include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
 #include <nx/vms/event/actions/abstract_action.h>
-
+#include <nx_ec/managers/abstract_layout_manager.h>
 #include <ui/dialogs/layout_name_dialog.h>
 #include <ui/help/help_topic_accessor.h>
 #include <ui/help/help_topics.h>
 #include <ui/widgets/views/resource_list_view.h>
+#include <ui/workbench/extensions/workbench_layout_change_validator.h>
+#include <ui/workbench/extensions/workbench_stream_synchronizer.h>
+#include <ui/workbench/handlers/workbench_videowall_handler.h> //< TODO: #sivanov Dependencies.
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
-#include <ui/workbench/handlers/workbench_videowall_handler.h>  //< TODO: #sivanov Dependencies.
 #include <ui/workbench/workbench_state_manager.h>
-#include <ui/workbench/extensions/workbench_layout_change_validator.h>
-#include <ui/workbench/extensions/workbench_stream_synchronizer.h>
-#include <nx/vms/client/desktop/ui/messages/resources_messages.h>
-#include <nx/vms/client/desktop/resources/layout_password_management.h>
-
-#include <nx/utils/log/log.h>
-#include <nx/utils/string.h>
-
-#include <nx/utils/counter.h>
 #include <utils/common/delete_later.h>
 #include <utils/common/event_processors.h>
 #include <utils/common/synctime.h>
-#include <nx/vms/client/desktop/workbench/layouts/layout_factory.h>
 
 using boost::algorithm::any_of;
 using boost::algorithm::all_of;
@@ -125,7 +116,7 @@ QnResourceList calculateResourcesToShare(const QnResourceList& resources,
             if (!QnResourceAccessFilter::isShareableMedia(resource))
                 return false;
 
-            auto accessProvider = resource->commonModule()->resourceAccessProvider();
+            auto accessProvider = resource->context()->resourceAccessProvider();
             return !accessProvider->hasAccess(user, resource);
         };
     return resources.filtered(sharingRequired);

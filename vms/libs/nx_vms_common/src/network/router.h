@@ -4,40 +4,45 @@
 
 #include <QtCore/QObject>
 
-#include <common/common_module_aware.h>
+#include <core/resource/resource_fwd.h>
 #include <nx/network/http/http_types.h>
 #include <nx/network/socket_common.h>
 #include <nx/utils/uuid.h>
 
-namespace nx { namespace vms { namespace discovery { class Manager; } } }
+namespace nx::vms::common { class ResourceContext; }
+namespace nx::vms::discovery { class Manager; }
 
 struct NX_VMS_COMMON_API QnRoute
 {
+    /** Address for the connect. */
+    nx::network::SocketAddress addr;
 
-    nx::network::SocketAddress addr; // address for physical connect
-    QnUuid id;          // requested server ID
-    QnUuid gatewayId;   // proxy server ID. May be null
-    bool reverseConnect;// if target server should connect to this one
-    int distance;
+    /** Target Server Id. */
+    QnUuid id;
 
-    QnRoute(): reverseConnect(false), distance(0) {}
+    /** Proxy Server Id. */
+    QnUuid gatewayId;
+
+    /** Whether direct connection is not available. */
+    bool reverseConnect = false;
+
+    /** Distance in peers. */
+    int distance = 0;
+
     bool isValid() const { return !addr.isNull(); }
     QString toString() const;
 };
 
-class NX_VMS_COMMON_API QnRouter:
-    public QObject,
-    public /*mixin*/ QnCommonModuleAware
+class NX_VMS_COMMON_API QnRouter: public QObject
 {
     Q_OBJECT
 public:
     explicit QnRouter(
-        QObject* parent,
-        nx::vms::discovery::Manager* moduleManager);
-    ~QnRouter();
+        nx::vms::discovery::Manager* moduleManager,
+        QObject* parent = nullptr);
 
-    // todo: new routing functions below. We have to delete above functions
-    QnRoute routeTo(const QnUuid &id);
+    QnRoute routeTo(const QnUuid& serverId, nx::vms::common::ResourceContext* context);
+    QnRoute routeTo(const QnMediaServerResourcePtr& server);
 
 private:
     const nx::vms::discovery::Manager* m_moduleManager;

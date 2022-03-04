@@ -2,7 +2,6 @@
 
 #include "initializer.h"
 
-#include <common/common_module.h>
 #include <nx/vms/rules/action_fields/flag_field.h>
 #include <nx/vms/rules/action_fields/optional_time_field.h>
 #include <nx/vms/rules/action_fields/substitution.h>

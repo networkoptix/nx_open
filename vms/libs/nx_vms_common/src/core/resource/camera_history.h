@@ -12,6 +12,7 @@
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/camera_history_data.h>
+#include <nx/vms/common/resource/resource_context_aware.h>
 #include <recording/time_period.h>
 
 class QnCommonMessageProcessor;
@@ -36,12 +37,12 @@ class QnCommonMessageProcessor;
  */
 class NX_VMS_COMMON_API QnCameraHistoryPool:
     public QObject,
-    public /*mixin*/ QnCommonModuleAware
+    public nx::vms::common::ResourceContextAware
 {
     Q_OBJECT
 
 public:
-    QnCameraHistoryPool(QObject* parent = nullptr);
+    QnCameraHistoryPool(nx::vms::common::ResourceContext* context, QObject* parent = nullptr);
     virtual ~QnCameraHistoryPool();
 
     /** Reset information about camera footage presence on different servers. */
@@ -135,7 +136,7 @@ public:
         const nx::vms::api::CameraHistoryItemDataList& historyDetails);
 
     void setHistoryCheckDelay(int value);
-    void setMessageProcessor(const QnCommonMessageProcessor* messageProcessor);
+    void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);
 signals:
     /**
      * \brief                       Notify that camera footage is changed - a server was added or removed or changed its status.
@@ -206,5 +207,5 @@ private:
     mutable nx::Mutex m_syncLoadMutex;
     nx::WaitCondition m_syncLoadWaitCond;
     QSet<QnUuid> m_camerasToCheck;
-    const QnCommonMessageProcessor* m_messageProcessor = nullptr;
+    QnCommonMessageProcessor* m_messageProcessor = nullptr;
 };

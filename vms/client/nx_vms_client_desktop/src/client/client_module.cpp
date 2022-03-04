@@ -522,21 +522,23 @@ void QnClientModule::initSingletons()
         clientPeerType,
         isAutoCloudHostDeductionMode() ? QString() : ini().cloudHost));
 
-    m_clientCoreModule.reset(new QnClientCoreModule(QnClientCoreModule::Mode::desktopClient));
+    QnUuid peerId = d->runningInstancesManager
+        ? d->runningInstancesManager->currentInstanceGuid()
+        : QnUuid();
+    m_clientCoreModule.reset(new QnClientCoreModule(
+        QnClientCoreModule::Mode::desktopClient,
+        std::move(peerId)));
     QnCommonModule* commonModule = m_clientCoreModule->commonModule();
 
     // In self-update mode we do not have runningInstancesManager.
     if (!d->startupParameters.selfUpdateMode)
     {
-        commonModule->setModuleGUID(d->runningInstancesManager->currentInstanceGuid());
-
         // Message processor should exist before networking is initialized.
-        auto messageProcessor =
-            commonModule->createMessageProcessor<QnDesktopClientMessageProcessor>(this);
+        commonModule->createMessageProcessor<QnDesktopClientMessageProcessor>(this);
 
-        // Must be called when moduleGUID is set.
+        // Must be called when peerId is set.
         nx::network::SocketGlobals::cloud().outgoingTunnelPool().assignOwnPeerId(
-            "dc", commonModule->moduleGUID());
+            "dc", commonModule->peerId());
 
         m_clientCoreModule->initializeNetworking(
             clientPeerType,
@@ -629,7 +631,8 @@ void QnClientModule::initSingletons()
         commonModule->messageProcessor());
 
     d->analyticsAttributeHelper = std::make_unique<
-        nx::vms::client::desktop::analytics::AttributeHelper>(commonModule->taxonomyStateWatcher());
+        nx::vms::client::desktop::analytics::AttributeHelper>(
+            commonModule->analyticsTaxonomyStateWatcher());
 
     m_analyticsMetadataProviderFactory.reset(new AnalyticsMetadataProviderFactory());
     m_analyticsMetadataProviderFactory->registerMetadataProviders();
@@ -987,8 +990,8 @@ void QnClientModule::initLocalInfo(nx::vms::api::PeerType peerType)
     auto commonModule = m_clientCoreModule->commonModule();
 
     nx::vms::api::RuntimeData runtimeData;
-    runtimeData.peer.id = commonModule->moduleGUID();
-    runtimeData.peer.instanceId = commonModule->runningInstanceGUID();
+    runtimeData.peer.id = commonModule->peerId();
+    runtimeData.peer.instanceId = commonModule->sessionId();
     runtimeData.peer.peerType = peerType;
     runtimeData.peer.dataFormat = serializationFormat();
     runtimeData.brand = ini().developerMode ? QString() : nx::branding::brand();

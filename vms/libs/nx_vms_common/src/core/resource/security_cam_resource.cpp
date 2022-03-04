@@ -89,9 +89,16 @@ QnUuid QnSecurityCamResource::makeCameraIdFromPhysicalId(const QString& physical
 
 void QnSecurityCamResource::setCommonModule(QnCommonModule* commonModule)
 {
+    if (auto ctx = this->context())
+        ctx->resourceDataPool()->disconnect(this);
+
     base_type::setCommonModule(commonModule);
-    connect(commonModule->resourceDataPool(), &QnResourceDataPool::changed, this,
-        &QnSecurityCamResource::resetCachedValues, Qt::DirectConnection);
+
+    if (auto ctx = this->context())
+    {
+        connect(ctx->resourceDataPool(), &QnResourceDataPool::changed, this,
+            &QnSecurityCamResource::resetCachedValues, Qt::DirectConnection);
+    }
 }
 
 QnSecurityCamResource::QnSecurityCamResource():
@@ -103,8 +110,14 @@ QnSecurityCamResource::QnSecurityCamResource():
             if (isAudioEnabled())
                 return true;
 
-            return this->commonModule()->resourcePropertyDictionary()->hasProperty(
-                ResourcePropertyKey::kAudioInputDeviceId, getId().toString());
+            if (auto ctx = this->context())
+            {
+                return ctx->resourcePropertyDictionary()->hasProperty(
+                    ResourcePropertyKey::kAudioInputDeviceId,
+                    getId().toString());
+            }
+
+            return false;
         }),
     m_cachedLicenseType([this] { return calculateLicenseType(); }),
     m_cachedHasDualStreaming(
@@ -314,7 +327,7 @@ void QnSecurityCamResource::updateAudioRequiredOnDevice(const QString& deviceId)
     auto prevDevice = QnUuid(deviceId);
     if (!prevDevice.isNull())
     {
-        auto resource = commonModule()->resourcePool()->getResourceById<QnSecurityCamResource>(
+        auto resource = context()->resourcePool()->getResourceById<QnSecurityCamResource>(
             prevDevice);
         if (resource)
             resource->updateAudioRequired();
@@ -839,7 +852,7 @@ bool QnSecurityCamResource::isBackupEnabled() const
     using namespace nx::vms::api;
     const auto backupPolicy = getBackupPolicy();
     return backupPolicy == BackupPolicy::byDefault
-        ? commonModule()->globalSettings()->backupSettings().backupNewCameras
+        ? context()->globalSettings()->backupSettings().backupNewCameras
         : backupPolicy == BackupPolicy::on;
 }
 
@@ -1356,7 +1369,7 @@ nx::vms::api::CameraBackupQuality QnSecurityCamResource::getActualBackupQualitie
         return result;
 
     /* If backup is not configured on this camera, use 'Backup newly added cameras' value */
-    return commonModule()->globalSettings()->backupSettings().quality;
+    return context()->globalSettings()->backupSettings().quality;
 }
 
 bool QnSecurityCamResource::isDualStreamingDisabled() const
@@ -1419,7 +1432,7 @@ void QnSecurityCamResource::setCameraControlDisabled(bool value)
 
 bool QnSecurityCamResource::isCameraControlDisabled() const
 {
-    if (const auto commonModule = this->commonModule())
+    if (const auto commonModule = this->context())
     {
         const auto& settings = commonModule->globalSettings();
         if (settings && !settings->isCameraSettingsOptimizationEnabled())
@@ -1848,7 +1861,7 @@ nx::vms::common::MediaStreamEvent QnSecurityCamResource::checkForErrors() const
 
 QnResourceData QnSecurityCamResource::resourceData() const
 {
-    if (const auto commonModule = this->commonModule())
+    if (const auto commonModule = this->context())
         return commonModule->resourceDataPool()->data(toSharedPointer(this));
     return {};
 }

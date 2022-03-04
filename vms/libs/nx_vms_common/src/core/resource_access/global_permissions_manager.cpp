@@ -2,36 +2,37 @@
 
 #include "global_permissions_manager.h"
 
-#include <nx/core/access/access_types.h>
+#include <common/common_module.h>
+#include <core/resource/user_resource.h>
+#include <core/resource_access/resource_access_subject.h>
 #include <core/resource_access/resource_access_subjects_cache.h>
-
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-
-#include <core/resource/user_resource.h>
-#include <common/common_module.h>
-#include <core/resource_access/resource_access_subject.h>
-
+#include <nx/core/access/access_types.h>
+#include <nx/vms/common/resource/resource_context.h>
 
 using namespace nx::core::access;
 
-QnGlobalPermissionsManager::QnGlobalPermissionsManager(Mode mode, QObject* parent):
+QnGlobalPermissionsManager::QnGlobalPermissionsManager(
+    Mode mode,
+    nx::vms::common::ResourceContext* context,
+    QObject* parent)
+    :
     base_type(parent),
-    QnCommonModuleAware(parent),
+    nx::vms::common::ResourceContextAware(context),
     m_mode(mode),
-    m_mutex(nx::Mutex::NonRecursive),
-    m_cache()
+    m_mutex(nx::Mutex::NonRecursive)
 {
     if (mode == Mode::cached)
     {
-        connect(resourcePool(), &QnResourcePool::resourceAdded, this,
+        connect(m_context->resourcePool(), &QnResourcePool::resourceAdded, this,
             &QnGlobalPermissionsManager::handleResourceAdded);
-        connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
+        connect(m_context->resourcePool(), &QnResourcePool::resourceRemoved, this,
             &QnGlobalPermissionsManager::handleResourceRemoved);
 
-        connect(userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
+        connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleAddedOrUpdated, this,
             &QnGlobalPermissionsManager::handleRoleAddedOrUpdated);
-        connect(userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
+        connect(m_context->userRolesManager(), &QnUserRolesManager::userRoleRemoved, this,
             &QnGlobalPermissionsManager::handleRoleRemoved);
     }
 }
@@ -95,7 +96,7 @@ bool QnGlobalPermissionsManager::hasGlobalPermission(const Qn::UserAccessData& a
     if (accessRights == Qn::kSystemAccess)
         return true;
 
-    const auto& resPool = commonModule()->resourcePool();
+    const auto& resPool = m_context->resourcePool();
     auto user = resPool->getResourceById<QnUserResource>(accessRights.userId);
     if (!user)
         return false;
@@ -147,7 +148,8 @@ GlobalPermissions QnGlobalPermissionsManager::calculateGlobalPermissions(
         switch (user->userRole())
         {
             case Qn::UserRole::customUserRole:
-                result = globalPermissions(userRolesManager()->userRole(user->userRoleId()));
+                result =
+                    globalPermissions(m_context->userRolesManager()->userRole(user->userRoleId()));
                 break;
             case Qn::UserRole::owner:
             case Qn::UserRole::administrator:
@@ -190,18 +192,18 @@ void QnGlobalPermissionsManager::handleResourceAdded(const QnResourcePtr& resour
     {
         updateGlobalPermissions(user);
 
-        connect(user, &QnUserResource::permissionsChanged, this,
+        connect(user.get(), &QnUserResource::permissionsChanged, this,
             &QnGlobalPermissionsManager::updateGlobalPermissions);
-        connect(user, &QnUserResource::userRoleChanged, this,
+        connect(user.get(), &QnUserResource::userRoleChanged, this,
             &QnGlobalPermissionsManager::updateGlobalPermissions);
-        connect(user, &QnUserResource::enabledChanged, this,
+        connect(user.get(), &QnUserResource::enabledChanged, this,
             &QnGlobalPermissionsManager::updateGlobalPermissions);
     }
 }
 
 void QnGlobalPermissionsManager::handleResourceRemoved(const QnResourcePtr& resource)
 {
-    disconnect(resource, nullptr, this, nullptr);
+    resource->disconnect(this);
     if (QnUserResourcePtr user = resource.dynamicCast<QnUserResource>())
         handleSubjectRemoved(user);
 }
@@ -209,14 +211,14 @@ void QnGlobalPermissionsManager::handleResourceRemoved(const QnResourcePtr& reso
 void QnGlobalPermissionsManager::handleRoleAddedOrUpdated(const nx::vms::api::UserRoleData& userRole)
 {
     updateGlobalPermissions(userRole);
-    for (auto subject: resourceAccessSubjectsCache()->usersInRole(userRole.id))
+    for (auto subject: m_context->resourceAccessSubjectsCache()->usersInRole(userRole.id))
         updateGlobalPermissions(subject);
 }
 
 void QnGlobalPermissionsManager::handleRoleRemoved(const nx::vms::api::UserRoleData& userRole)
 {
     handleSubjectRemoved(userRole);
-    for (auto subject: resourceAccessSubjectsCache()->usersInRole(userRole.id))
+    for (auto subject: m_context->resourceAccessSubjectsCache()->usersInRole(userRole.id))
         updateGlobalPermissions(subject);
 }
 

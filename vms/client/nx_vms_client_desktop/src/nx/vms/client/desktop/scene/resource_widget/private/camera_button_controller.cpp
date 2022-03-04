@@ -110,7 +110,7 @@ void CameraButtonController::createTwoAudioButton()
     if (!m_twoWayAudioWidget)
     {
         const QString desktopResourceUniqueId = QnDesktopResource::calculateUniqueId(
-            commonModule()->moduleGUID(), context()->user()->getId());
+            commonModule()->peerId(), context()->user()->getId());
         m_twoWayAudioWidget =
             new QnTwoWayAudioWidget(desktopResourceUniqueId, m_parentWidget);
         m_twoWayAudioWidget->setCamera(getAudioOutputDevice());

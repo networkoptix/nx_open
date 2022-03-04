@@ -3,7 +3,7 @@
 #pragma once
 
 #include <core/resource_access/providers/abstract_resource_access_provider.h>
-#include <common/common_module_aware.h>
+#include <nx/vms/common/resource/resource_context_aware.h>
 
 namespace nx::core::access {
 
@@ -13,12 +13,15 @@ namespace nx::core::access {
  */
 class NX_VMS_COMMON_API ResourceAccessProvider:
     public AbstractResourceAccessProvider,
-    public /*mixin*/ QnCommonModuleAware
+    public nx::vms::common::ResourceContextAware
 {
     using base_type = AbstractResourceAccessProvider;
 
 public:
-    ResourceAccessProvider(Mode mode, QObject* parent = nullptr);
+    ResourceAccessProvider(
+        Mode mode,
+        nx::vms::common::ResourceContext* context,
+        QObject* parent = nullptr);
     virtual ~ResourceAccessProvider();
 
     virtual bool hasAccess(const QnResourceAccessSubject& subject,

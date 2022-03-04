@@ -394,9 +394,9 @@ bool QnDesktopDataProvider::initVideoCapturing()
 
     QString videoCodecName;
     if (m_encodeQualuty <= 0.5)
-        videoCodecName = getResource()->commonModule()->globalSettings()->lowQualityScreenVideoCodec();
+        videoCodecName = getResource()->context()->globalSettings()->lowQualityScreenVideoCodec();
     else
-        videoCodecName = getResource()->commonModule()->globalSettings()->defaultExportVideoCodec();
+        videoCodecName = getResource()->context()->globalSettings()->defaultExportVideoCodec();
 
     AVCodec* videoCodec = avcodec_find_encoder_by_name(videoCodecName.toLatin1().data());
     if (!videoCodec)

@@ -20,7 +20,9 @@ class NX_VMS_COMMON_API QnThumbnailsStreamReader: public QnAbstractMediaStreamDa
     Q_OBJECT;
 
 public:
-    QnThumbnailsStreamReader(const QnResourcePtr& dev, QnAbstractArchiveDelegate* archiveDelegate);
+    QnThumbnailsStreamReader(
+        const QnResourcePtr& resource,
+        QnAbstractArchiveDelegate* archiveDelegate);
     virtual ~QnThumbnailsStreamReader();
 
     /*

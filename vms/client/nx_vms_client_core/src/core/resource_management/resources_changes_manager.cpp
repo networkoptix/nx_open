@@ -59,7 +59,7 @@ ReplyProcessorFunction makeReplyProcessor(QnResourcesChangesManager* manager,
     ReplyProcessorFunction handler)
 {
     QPointer<QnResourcesChangesManager> guard(manager);
-    const auto sessionGuid = manager->commonModule()->runningInstanceGUID();
+    const auto sessionGuid = manager->commonModule()->sessionId();
     QPointer<QThread> thread(QThread::currentThread());
     return
         [thread, guard, sessionGuid, handler](int reqID, ec2::ErrorCode errorCode)
@@ -74,7 +74,7 @@ ReplyProcessorFunction makeReplyProcessor(QnResourcesChangesManager* manager,
                         return;
 
                     // Check if we have already changed session.
-                    if (guard->commonModule()->runningInstanceGUID() != sessionGuid)
+                    if (guard->commonModule()->sessionId() != sessionGuid)
                         return;
 
                     handler(reqID, errorCode);

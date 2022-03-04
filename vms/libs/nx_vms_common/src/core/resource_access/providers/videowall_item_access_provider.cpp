@@ -49,16 +49,19 @@ namespace nx::core::access {
 
 VideoWallItemAccessProvider::VideoWallItemAccessProvider(
     Mode mode,
+    nx::vms::common::ResourceContext* context,
     QObject* parent)
     :
-    base_type(mode, parent)
+    base_type(mode, context, parent)
 {
     if (mode == Mode::cached)
     {
         m_itemAggregator.reset(new QnLayoutItemAggregator());
 
-        connect(globalPermissionsManager(), &QnGlobalPermissionsManager::globalPermissionsChanged,
-            this, &VideoWallItemAccessProvider::updateAccessBySubject);
+        connect(m_context->globalPermissionsManager(),
+            &QnGlobalPermissionsManager::globalPermissionsChanged,
+            this,
+            &VideoWallItemAccessProvider::updateAccessBySubject);
 
         connect(m_itemAggregator, &QnLayoutItemAggregator::itemAdded,
             this, &VideoWallItemAccessProvider::handleItemAdded);
@@ -94,7 +97,7 @@ bool VideoWallItemAccessProvider::calculateAccess(const QnResourceAccessSubject&
 
         // TODO: #sivanov Resource splitting may help a lot: take all videowalls before, then
         // go over all layouts, checking only if parent id is in set.
-        const auto resourcePool = commonModule()->resourcePool();
+        const auto resourcePool = m_context->resourcePool();
         const auto resourceId = resource->getId();
         const auto layoutResources = resourcePool->getResourcesWithFlag(Qn::layout);
 
@@ -139,8 +142,11 @@ void VideoWallItemAccessProvider::fillProviders(
     const QnResourcePtr& resource,
     QnResourceList& providers) const
 {
-    if (!globalPermissionsManager()->hasGlobalPermission(subject, GlobalPermission::controlVideowall))
+    if (!m_context->globalPermissionsManager()->hasGlobalPermission(
+            subject, GlobalPermission::controlVideowall))
+    {
         return;
+    }
 
     if (resource->hasFlags(Qn::layout))
     {
@@ -157,7 +163,7 @@ void VideoWallItemAccessProvider::fillProviders(
 
     if (mode() == Mode::direct)
     {
-        const auto resourcePool = commonModule()->resourcePool();
+        const auto resourcePool = m_context->resourcePool();
         const auto layoutResources = resourcePool->getResourcesWithFlag(Qn::layout);
 
         for (const auto& resource: layoutResources)
@@ -231,7 +237,7 @@ void VideoWallItemAccessProvider::handleResourceAdded(const QnResourcePtr& resou
 QnLayoutResourceList VideoWallItemAccessProvider::getLayoutsForVideoWall(
     const QnVideoWallResourcePtr& videoWall) const
 {
-    return commonModule()->resourcePool()->getResourcesByParentId(videoWall->getId())
+    return m_context->resourcePool()->getResourcesByParentId(videoWall->getId())
         .filtered<QnLayoutResource>();
 }
 
@@ -243,7 +249,7 @@ void VideoWallItemAccessProvider::handleVideowallItemAdded(
         return;
 
     // Layouts can be added to the pool after the videowall.
-    const auto layout = resourcePool()->getResourceById<QnLayoutResource>(item.layout);
+    const auto layout = m_context->resourcePool()->getResourceById<QnLayoutResource>(item.layout);
     if (!layout || layout->getParentId() != videowall->getId())
         return;
 
@@ -271,7 +277,7 @@ void VideoWallItemAccessProvider::handleVideowallItemRemoved(
         return;
 
     // Layouts can be deleted before they are removed from the videowall.
-    const auto layout = resourcePool()->getResourceById<QnLayoutResource>(item.layout);
+    const auto layout = m_context->resourcePool()->getResourceById<QnLayoutResource>(item.layout);
     if (!layout)
         return;
 
@@ -307,7 +313,7 @@ void VideoWallItemAccessProvider::afterUpdate()
     if (mode() == Mode::direct)
         return;
 
-    const auto resourcePool = commonModule()->resourcePool();
+    const auto resourcePool = m_context->resourcePool();
     const auto layouts = resourcePool->getResources<QnLayoutResource>();
 
     for (const auto& layout: layouts)
@@ -355,7 +361,7 @@ void VideoWallItemAccessProvider::handleItemAdded(const QnUuid& resourceId)
     if (isUpdating())
         return;
 
-    const auto resourcePool = commonModule()->resourcePool();
+    const auto resourcePool = m_context->resourcePool();
     if (auto resource = resourcePool->getResourceById(resourceId))
         updateAccessToResource(resource);
 }
@@ -367,7 +373,7 @@ void VideoWallItemAccessProvider::handleItemRemoved(const QnUuid& resourceId)
     if (isUpdating())
         return;
 
-    const auto resourcePool = commonModule()->resourcePool();
+    const auto resourcePool = m_context->resourcePool();
     if (auto resource = resourcePool->getResourceById(resourceId))
         updateAccessToResource(resource);
 }

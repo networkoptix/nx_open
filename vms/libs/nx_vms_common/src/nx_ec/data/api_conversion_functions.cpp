@@ -613,7 +613,7 @@ void fromApiToResourceList(const ResourceTypeDataList& src, QnResourceTypeList& 
     }
 }
 
-QnUserResourcePtr fromApiToResource(const UserData& src, QnCommonModule* commonModule)
+QnUserResourcePtr fromApiToResource(const UserData& src)
 {
     QnUserResourcePtr dst(new QnUserResource(nx::vms::api::type(src)));
     fromApiToResource(src, dst);

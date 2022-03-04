@@ -4,15 +4,18 @@
 
 #include <api/global_settings.h>
 #include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/media_server_resource.h>
-#include <nx_ec/data/api_conversion_functions.h>
-
+#include <core/resource_management/resource_pool.h>
+#include <nx/fusion/serialization/json.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/utils/log/log.h>
-#include <nx/fusion/serialization/json.h>
+#include <nx_ec/data/api_conversion_functions.h>
+
+#include "deprecated_multicast_finder.h"
+#include "module_connector.h"
+#include "udp_multicast_finder.h"
 
 namespace nx {
 namespace vms {
@@ -33,19 +36,33 @@ bool ModuleEndpoint::operator==(const ModuleEndpoint& rhs) const
     return BaseRef(*this) == BaseRef(rhs) && endpoint == rhs.endpoint;
 }
 
-Manager::Manager(bool clientMode, QObject* parent):
-    base_type(parent),
-    QnCommonModuleAware(parent)
+Manager::Manager(QObject* parent):
+    base_type(parent)
 {
-    qRegisterMetaType<nx::vms::discovery::ModuleEndpoint>();
-    initializeConnector();
-    initializeMulticastFinders(clientMode);
-    monitorServerUrls();
+    initialize();
+}
+
+Manager::Manager(ServerModeInfo serverModeInfo, QObject* parent):
+    base_type(parent),
+    m_serverModeInfo(serverModeInfo)
+{
+    initialize();
 }
 
 Manager::~Manager()
 {
     beforeDestroy();
+}
+
+void Manager::setMulticastDiscoveryAllowed(bool value)
+{
+    if (NX_ASSERT(m_serverModeInfo))
+        m_serverModeInfo->multicastDiscoveryAllowed = value;
+}
+
+void Manager::setMulticastInformation(const api::ModuleInformationWithAddresses& information)
+{
+    m_multicastFinder->multicastInformation(information);
 }
 
 void Manager::beforeDestroy()
@@ -146,6 +163,13 @@ void Manager::checkEndpoint(const nx::utils::Url& url, QnUuid expectedId)
         std::move(expectedId));
 }
 
+void Manager::initialize()
+{
+    qRegisterMetaType<nx::vms::discovery::ModuleEndpoint>();
+    initializeConnector();
+    initializeMulticastFinders();
+}
+
 void Manager::initializeConnector()
 {
     m_moduleConnector = std::make_unique<ModuleConnector>();
@@ -155,14 +179,12 @@ void Manager::initializeConnector()
         {
             NX_VERBOSE(this, nx::format("Received module info: %1").arg(QJson::serialized(information)));
 
-            if (!commonModule())
-                return;
-
             NX_ASSERT(!requestedEndpoint.address.toString().empty());
             ModuleEndpoint module(std::move(information), std::move(requestedEndpoint));
-            if (commonModule()->moduleGUID() == module.id)
+
+            if (m_serverModeInfo && m_serverModeInfo->peerId == module.id)
             {
-                const auto runtimeId = commonModule()->runningInstanceGUID();
+                const auto runtimeId = m_serverModeInfo->sessionId;
                 if (module.runtimeId == runtimeId)
                     return; // Ignore own record.
 
@@ -234,7 +256,7 @@ void Manager::initializeConnector()
         });
 }
 
-void Manager::initializeMulticastFinders(bool clientMode)
+void Manager::initializeMulticastFinders()
 {
     m_multicastFinder = std::make_unique<UdpMulticastFinder>(m_moduleConnector->getAioThread());
     m_multicastFinder->listen(
@@ -242,46 +264,33 @@ void Manager::initializeMulticastFinders(bool clientMode)
             nx::network::SocketAddress /*endpoint*/)
         {
             const auto endpoints = ec2::moduleInformationEndpoints(module);
-            if (module.id != commonModule()->moduleGUID() && endpoints.size() != 0)
+            const bool isOwnServer = m_serverModeInfo && (module.id == m_serverModeInfo->peerId);
+
+            if (!isOwnServer && endpoints.size() != 0)
                 m_moduleConnector->newEndpoints({endpoints.cbegin(), endpoints.cend()}, module.id);
         });
 
-    if (!clientMode)
+    DeprecatedMulticastFinder::Options deprecatedMulticastOptions;
+
+    if (m_serverModeInfo)
     {
-        connect(commonModule(), &QnCommonModule::moduleInformationChanged,
-            [this]()
-            {
-                const auto id = commonModule()->moduleGUID();
-                if (const auto s = resourcePool()->getResourceById<QnMediaServerResource>(id))
-                    m_multicastFinder->multicastInformation(s->getModuleInformationWithAddresses());
-            });
+        auto isMulticastEnabledFunction =
+            [this] { return m_serverModeInfo->multicastDiscoveryAllowed; };
+
+        m_multicastFinder->setIsMulticastEnabledFunction(isMulticastEnabledFunction);
+        deprecatedMulticastOptions.responseEnabled = isMulticastEnabledFunction;
+        deprecatedMulticastOptions.listenAndRespond = true;
+        deprecatedMulticastOptions.peerId = m_serverModeInfo->peerId;
+    }
+    else //< Client mode.
+    {
+        m_multicastFinder->setIsMulticastEnabledFunction([]() { return false; });
+        deprecatedMulticastOptions.multicastCount = 5;
+        deprecatedMulticastOptions.listenAndRespond = false;
     }
 
-    m_multicastFinder->setIsMulticastEnabledFunction(
-        [common = commonModule()]()
-        {
-            if (const auto settings = common->globalSettings())
-                return !settings->isInitialized() || settings->isAutoDiscoveryEnabled();
-
-            return false;
-        });
-
-    DeprecatedMulticastFinder::Options options;
-    if (clientMode)
-        options.multicastCount = 5;
-    else
-        options.listenAndRespond = true;
-
-    options.responseEnabled =
-        [common = commonModule()]()
-        {
-            if (const auto settings = common->globalSettings())
-                return !settings->isInitialized() || settings->isAutoDiscoveryResponseEnabled();
-
-            return false;
-        };
-
-    m_legacyMulticastFinder = std::make_unique<DeprecatedMulticastFinder>(this, options);
+    m_legacyMulticastFinder = std::make_unique<DeprecatedMulticastFinder>(
+        deprecatedMulticastOptions);
     connect(m_legacyMulticastFinder.get(), &DeprecatedMulticastFinder::responseReceived,
         [this](const nx::vms::api::ModuleInformation& module,
             const nx::network::SocketAddress &endpoint, const nx::network::HostAddress& ip)
@@ -291,10 +300,10 @@ void Manager::initializeMulticastFinders(bool clientMode)
         });
 }
 
-void Manager::monitorServerUrls()
+void Manager::monitorServerUrls(QnResourcePool* resourcePool)
 {
-    connect(resourcePool(), &QnResourcePool::resourceAdded, this,
-        [this](const QnResourcePtr &resource)
+    connect(resourcePool, &QnResourcePool::resourceAdded, this,
+        [this](const QnResourcePtr& resource)
         {
             if (const auto server = resource.dynamicCast<QnMediaServerResource>())
             {
@@ -308,8 +317,8 @@ void Manager::monitorServerUrls()
             }
         });
 
-    connect(resourcePool(), &QnResourcePool::resourceRemoved, this,
-        [this](const QnResourcePtr &resource)
+    connect(resourcePool, &QnResourcePool::resourceRemoved, this,
+        [this](const QnResourcePtr& resource)
         {
             if (const auto server = resource.dynamicCast<QnMediaServerResource>())
                 server->disconnect(this);
@@ -318,13 +327,17 @@ void Manager::monitorServerUrls()
 
 void Manager::updateEndpoints(const QnMediaServerResource* server)
 {
-    if (server->getId() == commonModule()->moduleGUID())
+    const bool isOwnServer = m_serverModeInfo && (server->getId() == m_serverModeInfo->peerId);
+
+    if (isOwnServer)
     {
-        return m_moduleConnector->post(
+        m_moduleConnector->post(
             [this, module = server->getModuleInformationWithAddresses()]()
             {
                 m_multicastFinder->multicastInformation(module);
             });
+
+        return;
     }
 
     auto port = (uint16_t) server->getPort();

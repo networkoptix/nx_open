@@ -2,14 +2,17 @@
 
 #include "resource_properties.h"
 
-#include <common/common_module.h>
+#include <nx/utils/qset.h>
+#include <nx/vms/common/resource/resource_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_resource_manager.h>
-#include <nx/utils/qset.h>
 
-QnResourcePropertyDictionary::QnResourcePropertyDictionary(QObject *parent):
+QnResourcePropertyDictionary::QnResourcePropertyDictionary(
+    nx::vms::common::ResourceContext* context,
+    QObject* parent)
+    :
     QObject(parent),
-    QnCommonModuleAware(parent)
+    nx::vms::common::ResourceContextAware(context)
 {
 }
 
@@ -30,7 +33,7 @@ bool QnResourcePropertyDictionary::saveParams(const QnUuid& resourceId)
     if( params.empty() )
         return true;
 
-    ec2::AbstractECConnectionPtr conn = commonModule()->ec2Connection();
+    ec2::AbstractECConnectionPtr conn = m_context->ec2Connection();
     ec2::ErrorCode rez = conn->getResourceManager(Qn::kSystemAccess)->saveSync(params);
 
     if (rez != ec2::ErrorCode::ok)
@@ -61,7 +64,7 @@ int QnResourcePropertyDictionary::saveData(const nx::vms::api::ResourceParamWith
 {
     if (data.empty())
         return -1; // nothing to save
-    ec2::AbstractECConnectionPtr conn = commonModule()->ec2Connection();
+    ec2::AbstractECConnectionPtr conn = m_context->ec2Connection();
     if (!conn)
         return -1; // not connected to ec2
     NX_MUTEX_LOCKER lock(&m_requestMutex);

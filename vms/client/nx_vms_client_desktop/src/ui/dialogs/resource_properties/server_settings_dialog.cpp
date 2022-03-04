@@ -11,10 +11,10 @@
 #include <core/resource/fake_media_server.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <network/cloud_url_validator.h>
 #include <nx/network/http/http_types.h>
 #include <nx/vms/client/desktop/common/utils/widget_anchor.h>
 #include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/network/cloud_url_validator.h>
 #include <nx/vms/client/desktop/resource_properties/server/flux/server_settings_dialog_state.h>
 #include <nx/vms/client/desktop/resource_properties/server/flux/server_settings_dialog_store.h>
 #include <nx/vms/client/desktop/resource_properties/server/poe/poe_settings_widget.h>
@@ -265,7 +265,7 @@ bool QnServerSettingsDialog::event(QEvent* e)
 
 void QnServerSettingsDialog::updateWebPageLink()
 {
-    bool allowed = d->server && !nx::network::isCloudServer(d->server);
+    bool allowed = d->server && !isCloudServer(d->server);
 
     d->webPageLink->setVisible(allowed);
     d->webPageLink->setEnabled(allowed

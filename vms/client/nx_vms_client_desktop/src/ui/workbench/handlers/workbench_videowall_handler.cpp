@@ -377,7 +377,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
         [this](const QnPeerRuntimeInfo &info)
         {
             /* Ignore own info change. */
-            if (info.uuid == commonModule()->moduleGUID())
+            if (info.uuid == commonModule()->peerId())
                 return;
 
             bool isControlled = !info.data.videoWallControlSession.isNull();
@@ -395,7 +395,7 @@ QnWorkbenchVideoWallHandler::QnWorkbenchVideoWallHandler(QObject *parent):
                 return;
 
             /* Order by guid. */
-            if (info.uuid < commonModule()->moduleGUID())
+            if (info.uuid < commonModule()->peerId())
             {
                 setControlMode(false);
                 showControlledByAnotherUserMessage();
@@ -1256,7 +1256,7 @@ void QnWorkbenchVideoWallHandler::updateMode()
         auto item = index.item();
         if (item.runtimeStatus.online
             && (item.runtimeStatus.controlledBy.isNull()
-                || item.runtimeStatus.controlledBy == commonModule()->moduleGUID())
+                || item.runtimeStatus.controlledBy == commonModule()->peerId())
             && layout->resource()
             && item.layout == layout->resource()->getId())
         {
@@ -2089,7 +2089,7 @@ void QnWorkbenchVideoWallHandler::at_pushMyScreenToVideowallAction_triggered()
         return;
 
     const auto desktopCameraId = QnDesktopResource::calculateUniqueId(
-        commonModule()->moduleGUID(), user->getId());
+        commonModule()->peerId(), user->getId());
 
     const auto desktopCamera = resourcePool()->getResourceByPhysicalId<QnVirtualCameraResource>(
         desktopCameraId);
@@ -3133,7 +3133,7 @@ void QnWorkbenchVideoWallHandler::setItemControlledBy(
     }
 
     /* Ignore local changes. */
-    if (controllerId != commonModule()->moduleGUID() && needUpdate)
+    if (controllerId != commonModule()->peerId() && needUpdate)
         updateMode();
 }
 

@@ -3,16 +3,14 @@
 #pragma once
 
 #include <common/common_globals.h>
-#include <common/common_module_aware.h>
-
 #include <core/resource/resource_fwd.h>
-
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/user_role_data.h>
+#include <nx/vms/common/resource/resource_context_aware.h>
 
 class NX_VMS_COMMON_API QnUserRolesManager:
     public QObject,
-    public /*mixin*/ QnCommonModuleAware
+    public nx::vms::common::ResourceContextAware
 {
     Q_OBJECT
     using base_type = QObject;
@@ -24,7 +22,7 @@ public:
     using PredefinedRoleDataList = nx::vms::api::PredefinedRoleDataList;
 
 public:
-    QnUserRolesManager(QObject* parent);
+    QnUserRolesManager(nx::vms::common::ResourceContext* context, QObject* parent = nullptr);
     virtual ~QnUserRolesManager();
 
     // Returns list of information structures for all custom user roles.

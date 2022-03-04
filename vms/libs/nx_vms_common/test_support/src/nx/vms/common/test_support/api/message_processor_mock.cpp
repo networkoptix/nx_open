@@ -6,8 +6,11 @@
 
 namespace nx::vms::common::test_support {
 
-MessageProcessorMock::MessageProcessorMock(QObject* parent):
-    base_type(parent),
+MessageProcessorMock::MessageProcessorMock(
+    nx::vms::common::ResourceContext* context,
+    QObject* parent)
+    :
+    base_type(context, parent),
     m_resourceFactory(std::make_unique<TestResourceFactory>())
 {
 }

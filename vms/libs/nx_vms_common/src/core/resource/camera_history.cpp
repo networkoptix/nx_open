@@ -16,8 +16,10 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/api/data/camera_history_data.h>
+#include <nx/vms/common/resource/resource_context.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/actions/abstract_action.h>
+#include <nx_ec/abstract_ec_connection.h>
 #include <utils/common/delayed.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
@@ -55,6 +57,47 @@ nx::vms::api::CameraHistoryItemDataList::const_iterator getMediaServerOnTimeInte
 
 // ------------------- CameraHistory Pool ------------------------
 
+QnCameraHistoryPool::QnCameraHistoryPool(
+    nx::vms::common::ResourceContext* context,
+    QObject *parent)
+    :
+    QObject(parent),
+    nx::vms::common::ResourceContextAware(context),
+    m_historyCheckDelay(kDefaultHistoryCheckDelay),
+    m_mutex(nx::Mutex::Recursive)
+{
+    connect(m_context->resourcePool(), &QnResourcePool::statusChanged, this, [this](const QnResourcePtr &resource)
+    {
+
+        NX_VERBOSE(this, lit("%1 statusChanged signal received for resource %2, %3, %4")
+                .arg(QString::fromLatin1(Q_FUNC_INFO))
+                .arg(resource->getId().toString())
+                .arg(resource->getName())
+                .arg(nx::utils::url::hidePassword(resource->getUrl())));
+
+        QnSecurityCamResourcePtr cam = resource.dynamicCast<QnSecurityCamResource>();
+        if (cam)
+            checkCameraHistoryDelayed(cam);
+
+        /* Fast check. */
+        if (!resource->hasFlags(Qn::remote_server))
+            return;
+
+        auto cameras = getServerFootageData(resource->getId());
+
+        /* Do not invalidate history if server goes offline. */
+        if (resource->getStatus() == nx::vms::api::ResourceStatus::online)
+        {
+            for (const auto& cameraId: cameras)
+                invalidateCameraHistory(cameraId);
+        }
+
+        for (const auto &cameraId: cameras)
+            if (QnSecurityCamResourcePtr camera = toCamera(cameraId))
+                emit cameraFootageChanged(camera);
+    });
+}
+
 void QnCameraHistoryPool::setHistoryCheckDelay(int value)
 {
     m_historyCheckDelay = value;
@@ -91,7 +134,7 @@ void QnCameraHistoryPool::checkCameraHistoryDelayed(QnSecurityCamResourcePtr cam
 
             m_camerasToCheck.remove(id);
 
-            QnSecurityCamResourcePtr cam = commonModule()->resourcePool()->getResourceById<QnSecurityCamResource>(id);
+            auto cam = m_context->resourcePool()->getResourceById<QnSecurityCamResource>(id);
             if (!cam)
                 return;
 
@@ -103,48 +146,10 @@ void QnCameraHistoryPool::checkCameraHistoryDelayed(QnSecurityCamResourcePtr cam
     executeDelayedParented(timerCallback, m_historyCheckDelay, this);
 }
 
-QnCameraHistoryPool::QnCameraHistoryPool(QObject *parent):
-    QObject(parent),
-    QnCommonModuleAware(parent),
-    m_historyCheckDelay(kDefaultHistoryCheckDelay),
-    m_mutex(nx::Mutex::Recursive)
-{
-    connect(commonModule()->resourcePool(), &QnResourcePool::statusChanged, this, [this](const QnResourcePtr &resource)
-    {
-
-        NX_VERBOSE(this, lit("%1 statusChanged signal received for resource %2, %3, %4")
-                .arg(QString::fromLatin1(Q_FUNC_INFO))
-                .arg(resource->getId().toString())
-                .arg(resource->getName())
-                .arg(nx::utils::url::hidePassword(resource->getUrl())));
-
-        QnSecurityCamResourcePtr cam = resource.dynamicCast<QnSecurityCamResource>();
-        if (cam)
-            checkCameraHistoryDelayed(cam);
-
-        /* Fast check. */
-        if (!resource->hasFlags(Qn::remote_server))
-            return;
-
-        auto cameras = getServerFootageData(resource->getId());
-
-        /* Do not invalidate history if server goes offline. */
-        if (resource->getStatus() == nx::vms::api::ResourceStatus::online)
-        {
-            for (const auto& cameraId: cameras)
-                invalidateCameraHistory(cameraId);
-        }
-
-        for (const auto &cameraId: cameras)
-            if (QnSecurityCamResourcePtr camera = toCamera(cameraId))
-                emit cameraFootageChanged(camera);
-    });
-}
-
-void QnCameraHistoryPool::setMessageProcessor(const QnCommonMessageProcessor* messageProcessor)
+void QnCameraHistoryPool::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)
 {
     if (m_messageProcessor)
-        disconnect(m_messageProcessor, nullptr, this, nullptr);
+        m_messageProcessor->disconnect(this);
 
     if (messageProcessor)
     {
@@ -173,8 +178,8 @@ void QnCameraHistoryPool::setMessageProcessor(const QnCommonMessageProcessor* me
 
                             for (const auto& flexibleId: eventParams.metadata.cameraRefs)
                             {
-                                auto camera =
-                                    camera_id_helper::findCameraByFlexibleId(resourcePool(), flexibleId);
+                                auto camera = camera_id_helper::findCameraByFlexibleId(
+                                    m_context->resourcePool(), flexibleId);
                                 if (camera)
                                     cameras.insert(camera->getId());
                             }
@@ -229,7 +234,7 @@ void QnCameraHistoryPool::invalidateCameraHistory(const QnUuid &cameraId) {
 
     if (requestToTerminate)
     {
-        auto server = resourcePool()->getResourceById<QnMediaServerResource>(
+        auto server = m_context->resourcePool()->getResourceById<QnMediaServerResource>(
             requestToTerminate->serverId);
         if (NX_ASSERT(server))
             server->restConnection()->cancelRequest(requestToTerminate->handle);
@@ -252,8 +257,8 @@ QnCameraHistoryPool::StartResult QnCameraHistoryPool::updateCameraHistoryAsync(
         return StartResult::ommited;
 
     // TODO: #sivanov Resource context should have access to the corresponding rest connection.
-    const QnUuid serverId = commonModule()->ec2Connection()->moduleInformation().id;
-    auto server = resourcePool()->getResourceById<QnMediaServerResource>(serverId);
+    const QnUuid serverId = m_context->ec2Connection()->moduleInformation().id;
+    auto server = m_context->resourcePool()->getResourceById<QnMediaServerResource>(serverId);
     if (!NX_ASSERT(server))
         return StartResult::failed;
 
@@ -455,12 +460,12 @@ nx::vms::api::CameraHistoryItemDataList QnCameraHistoryPool::filterOnlineServers
 
 QnSecurityCamResourcePtr QnCameraHistoryPool::toCamera(const QnUuid& guid) const
 {
-    return commonModule()->resourcePool()->getResourceById(guid).dynamicCast<QnSecurityCamResource>();
+    return m_context->resourcePool()->getResourceById<QnSecurityCamResource>(guid);
 }
 
 QnMediaServerResourcePtr QnCameraHistoryPool::toMediaServer(const QnUuid& guid) const
 {
-    return commonModule()->resourcePool()->getResourceById(guid).dynamicCast<QnMediaServerResource>();
+    return m_context->resourcePool()->getResourceById<QnMediaServerResource>(guid);
 }
 
 QnMediaServerResourcePtr QnCameraHistoryPool::getMediaServerOnTime(const QnSecurityCamResourcePtr &camera, qint64 timestamp, QnTimePeriod* foundPeriod) const

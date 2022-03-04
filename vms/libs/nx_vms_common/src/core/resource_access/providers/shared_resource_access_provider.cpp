@@ -2,26 +2,26 @@
 
 #include "shared_resource_access_provider.h"
 
-#include <core/resource_access/shared_resources_manager.h>
-
-#include <core/resource_management/resource_pool.h>
-
 #include <core/resource/layout_resource.h>
-
+#include <core/resource_access/shared_resources_manager.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/utils/log/log.h>
-#include <common/common_module.h>
+#include <nx/vms/common/resource/resource_context.h>
 
 namespace nx::core::access {
 
 SharedResourceAccessProvider::SharedResourceAccessProvider(
     Mode mode,
+    nx::vms::common::ResourceContext* context,
     QObject* parent)
     :
-    base_type(mode, parent)
+    base_type(mode, context, parent)
 {
     if (mode == Mode::cached)
     {
-        connect(sharedResourcesManager(), &QnSharedResourcesManager::sharedResourcesChanged, this,
+        connect(m_context->sharedResourcesManager(),
+            &QnSharedResourcesManager::sharedResourcesChanged,
+            this,
             &SharedResourceAccessProvider::handleSharedResourcesChanged);
     }
 }
@@ -59,7 +59,8 @@ bool SharedResourceAccessProvider::calculateAccess(const QnResourceAccessSubject
         return false;
     }
 
-    bool result = sharedResourcesManager()->hasSharedResource(subject, resource->getId());
+    bool result =
+        m_context->sharedResourcesManager()->hasSharedResource(subject, resource->getId());
 
     NX_VERBOSE(nx::log::kPermissionsTag.join(this), "update access %1 to %2: %3",
         subject.name(), resource->getName(), result);
@@ -95,7 +96,7 @@ void SharedResourceAccessProvider::handleSharedResourcesChanged(
 
     QString subjectName = subject.name();
 
-    const auto changedResources = commonModule()->resourcePool()->getResourcesByIds(changed);
+    const auto changedResources = m_context->resourcePool()->getResourcesByIds(changed);
     for (const auto& resource: changedResources)
     {
         if (newValues.contains(resource->getId()))

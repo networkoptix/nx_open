@@ -4,16 +4,6 @@
 
 #include <core/resource/client_camera_factory.h>
 
-QnDesktopClientMessageProcessor::QnDesktopClientMessageProcessor(QObject* parent):
-    base_type(parent)
-{
-
-}
-
-QnDesktopClientMessageProcessor::~QnDesktopClientMessageProcessor()
-{
-}
-
 QnResourceFactory* QnDesktopClientMessageProcessor::getResourceFactory() const
 {
     return QnClientResourceFactory::instance();

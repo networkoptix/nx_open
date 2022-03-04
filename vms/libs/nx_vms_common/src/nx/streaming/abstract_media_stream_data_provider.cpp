@@ -2,22 +2,39 @@
 
 #include "abstract_media_stream_data_provider.h"
 
-#include <core/resource/resource_media_layout.h>
-#include <nx/streaming/media_data_packet.h>
-#include <nx/streaming/video_data_packet.h>
-#include <nx/streaming/config.h>
-#include <utils/common/sleep.h>
-#include <utils/common/util.h>
-#include <nx/utils/log/log.h>
+#include <chrono>
+
 #include <core/resource/camera_resource.h>
+#include <core/resource/resource_media_layout.h>
+#include <nx/streaming/config.h>
+#include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/nx_streaming_ini.h>
-#include <utils/common/synctime.h>
+#include <nx/streaming/video_data_packet.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/time_helper.h>
-#include <common/common_module.h>
+#include <utils/common/sleep.h>
+#include <utils/common/synctime.h>
+#include <utils/common/util.h>
+
+using namespace std::chrono_literals;
 
 static const qint64 TIME_RESYNC_THRESHOLD = 1000000ll * 15;
 static const qint64 kMinFrameDurationUsec = 1000;
 static const int kMaxErrorsToReportIssue = 2;
+
+static std::chrono::microseconds sMediaStatisticsWindowSize = 2s;
+static int sMediaStatisticsMaxDurationInFrames = 0;
+
+void QnAbstractMediaStreamDataProvider::setMediaStatisticsWindowSize(
+    std::chrono::microseconds value)
+{
+    sMediaStatisticsWindowSize = value;
+}
+
+void QnAbstractMediaStreamDataProvider::setMediaStatisticsMaxDurationInFrames(int value)
+{
+    sMediaStatisticsMaxDurationInFrames = value;
+}
 
 bool QnAbstractMediaStreamDataProvider::isConnectionLost() const
 {
@@ -32,9 +49,10 @@ void QnAbstractMediaStreamDataProvider::onEvent(CameraDiagnostics::Result event)
         ++m_numberOfErrors;
 }
 
-QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(const QnResourcePtr& res)
+QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(
+    const QnResourcePtr& resource)
     :
-    QnAbstractStreamDataProvider(res),
+    QnAbstractStreamDataProvider(resource),
     m_numberOfChannels(
         [this]
         {
@@ -42,11 +60,11 @@ QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(const QnRes
         })
 {
     std::fill(m_gotKeyFrame.begin(), m_gotKeyFrame.end(), 0);
-    m_mediaResource = res.dynamicCast<QnMediaResource>();
+    m_mediaResource = resource.dynamicCast<QnMediaResource>();
     NX_ASSERT(m_mediaResource);
     resetTimeCheck();
-    m_isCamera = dynamic_cast<const QnSecurityCamResource*>(res.data()) != nullptr;
-    connect(res.data(), &QnResource::propertyChanged, this,
+    m_isCamera = resource.dynamicCast<QnSecurityCamResource>();
+    connect(resource.data(), &QnResource::propertyChanged, this,
         [this](const QnResourcePtr& /*resource*/, const QString& propertyName)
         {
             if (propertyName == ResourcePropertyKey::kVideoLayout)
@@ -97,14 +115,10 @@ void QnAbstractMediaStreamDataProvider::beforeRun()
 
 void QnAbstractMediaStreamDataProvider::resetMediaStatistics()
 {
-    auto commonModule = m_resource->commonModule();
     for (int i = 0; i < CL_MAX_CHANNEL_NUMBER; ++i)
     {
-        if (commonModule)
-        {
-            m_stat[i].setWindowSize(commonModule->mediaStatisticsWindowSize());
-            m_stat[i].setMaxDurationInFrames(commonModule->mediaStatisticsMaxDurationInFrames());
-        }
+        m_stat[i].setWindowSize(sMediaStatisticsWindowSize);
+        m_stat[i].setMaxDurationInFrames(sMediaStatisticsMaxDurationInFrames);
         m_stat[i].reset();
     }
 }

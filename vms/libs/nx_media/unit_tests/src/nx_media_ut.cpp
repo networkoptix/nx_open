@@ -513,7 +513,6 @@ protected:
         m_staticCommon.reset(new QnStaticCommonModule());
         // Init singletons.
         m_common.reset(new QnCommonModule(false, nx::core::access::Mode::direct));
-        m_common->setModuleGUID(QnUuid::createUuid());
         m_common->store(new QnFfmpegInitializer());
 
         VideoDecoderRegistry::instance()->reinitialize(); //< Just in case.

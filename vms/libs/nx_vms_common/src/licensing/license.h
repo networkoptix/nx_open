@@ -4,24 +4,23 @@
 
 #include <QtCore/QByteArray>
 #include <QtCore/QCoreApplication>
-#include <QtCore/QMetaType>
-#include <QtCore/QSharedPointer>
-#include <QtCore/QString>
 #include <QtCore/QList>
 #include <QtCore/QMap>
+#include <QtCore/QMetaType>
 #include <QtCore/QSet>
+#include <QtCore/QSharedPointer>
+#include <QtCore/QString>
 #include <QtCore/QTextStream>
-#include <QTimer>
+#include <QtCore/QTimer>
 
 #include <common/common_globals.h>
-#include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
 #include <licensing/license_fwd.h>
-#include <utils/common/id.h>
-
 #include <nx/utils/latin1_array.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/license_data.h>
+#include <nx/vms/common/resource/resource_context_aware.h>
+#include <utils/common/id.h>
 
 #ifdef __APPLE__
 #undef verify
@@ -182,12 +181,14 @@ Q_DECLARE_METATYPE(QnLicenseList)
  */
 class NX_VMS_COMMON_API QnLicensePool:
     public QObject,
-    public /*mixin*/ QnCommonModuleAware
+    public nx::vms::common::ResourceContextAware
 {
     Q_OBJECT
 
 public:
-    QnLicensePool(QObject* parent);
+    QnLicensePool(nx::vms::common::ResourceContext* context, QObject* parent = nullptr);
+
+    nx::vms::common::ResourceContext* context() const { return m_context; }
 
     static int hardwareIdVersion(const QString& hwId);
 

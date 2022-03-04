@@ -62,10 +62,10 @@ constexpr auto kDelayedLogonTimeout = 30s;
  */
 QnLayoutResourcePtr findAvailableLayoutByName(const QnUserResourcePtr& user, QString layoutName)
 {
-    if (!user->commonModule() || !user->resourcePool())
+    if (!NX_ASSERT(user->context()))
         return {};
 
-    const auto accessProvider = user->commonModule()->resourceAccessProvider();
+    const auto accessProvider = user->context()->resourceAccessProvider();
 
     const auto filter =
         [&](const QnLayoutResourcePtr& layout)

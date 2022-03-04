@@ -5,22 +5,17 @@
 #include <unordered_map>
 
 #include <QtCore/QObject>
-
 #include <QtCore/QSharedPointer>
 
-#include <nx/vms/event/event_fwd.h>
-
-#include <nx_ec/ec_api_fwd.h>
-
 #include <core/resource/resource_fwd.h>
-
-#include <nx/vms/api/data/runtime_data.h>
-#include <nx/vms/api/data/full_info_data.h>
-#include <nx/vms/api/rules/event_info.h>
-
 #include <nx/utils/singleton.h>
+#include <nx/vms/api/data/full_info_data.h>
+#include <nx/vms/api/data/runtime_data.h>
+#include <nx/vms/api/rules/event_info.h>
+#include <nx/vms/common/resource/resource_context_aware.h>
+#include <nx/vms/event/event_fwd.h>
+#include <nx_ec/ec_api_fwd.h>
 #include <utils/common/connective.h>
-#include <common/common_module_aware.h>
 
 namespace nx::vms::api { struct ServerRuntimeEventData; }
 
@@ -28,13 +23,15 @@ class QnResourceFactory;
 
 class NX_VMS_COMMON_API QnCommonMessageProcessor:
     public Connective<QObject>,
-    public /*mixin*/ QnCommonModuleAware
+    public nx::vms::common::ResourceContextAware
 {
     Q_OBJECT
 
     typedef Connective<QObject> base_type;
 public:
-    explicit QnCommonMessageProcessor(QObject* parent = nullptr);
+    explicit QnCommonMessageProcessor(
+        nx::vms::common::ResourceContext* context,
+        QObject* parent = nullptr);
     virtual ~QnCommonMessageProcessor() {}
 
     virtual void init(const ec2::AbstractECConnectionPtr& connection);

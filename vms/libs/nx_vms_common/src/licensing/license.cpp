@@ -15,15 +15,12 @@
 
 #include <api/runtime_info_manager.h>
 #include <common/common_globals.h>
-#include <common/common_module.h>
-#include <utils/common/synctime.h>
-
-#include <nx_ec/data/api_conversion_functions.h>
-
+#include <nx/branding.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/license_data.h>
-
-#include <nx/branding.h>
+#include <nx/vms/common/resource/resource_context.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <utils/common/synctime.h>
 
 using namespace nx::vms;
 
@@ -619,9 +616,9 @@ bool QnLicense::isSaas() const
 //-------------------------------------------------------------------------------------------------
 // QnLicensePool
 
-QnLicensePool::QnLicensePool(QObject* parent):
+QnLicensePool::QnLicensePool(nx::vms::common::ResourceContext* context, QObject* parent):
     QObject(parent),
-    QnCommonModuleAware(parent),
+    nx::vms::common::ResourceContextAware(context),
     m_mutex(nx::Mutex::Recursive)
 {
     if (!qApp)
@@ -710,7 +707,7 @@ bool QnLicensePool::isEmpty() const
 
 QVector<QString> QnLicensePool::hardwareIds(const QnUuid& serverId) const
 {
-    return remoteInfo(commonModule()->runtimeInfoManager(), serverId).data.hardwareIds;
+    return remoteInfo(m_context->runtimeInfoManager(), serverId).data.hardwareIds;
 }
 
 QString QnLicensePool::currentHardwareId(const QnUuid& serverId) const

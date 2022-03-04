@@ -4,136 +4,114 @@
 
 #include <QtCore/QUrlQuery>
 
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/resource.h>
+#include <common/common_module.h>
 #include <core/resource/media_server_resource.h>
+#include <core/resource/resource.h>
 #include <core/resource/security_cam_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <network/authutil.h>
 #include <network/router.h>
-#include <nx/utils/log/log.h>
 #include <nx/network/http/custom_headers.h>
 #include <nx/network/url/url_parse_helper.h>
-#include "utils/common/synctime.h"
-#include "network/authutil.h"
-#include <common/common_module.h>
+#include <nx/utils/log/log.h>
 #include <nx_ec/abstract_ec_connection.h>
-
-
-// -------------------------------------------------------------------------- //
-// QnNetworkProxyFactory
-// -------------------------------------------------------------------------- //
-QnNetworkProxyFactory::QnNetworkProxyFactory(QnCommonModule* commonModule):
-    QnCommonModuleAware(commonModule)
-{
-}
-
-QnNetworkProxyFactory::~QnNetworkProxyFactory()
-{
-}
+#include <utils/common/synctime.h>
 
 nx::utils::Url QnNetworkProxyFactory::urlToResource(
-    const nx::utils::Url &baseUrl,
-    const QnResourcePtr &resource,
-    const QString &proxyQueryParameterName) const
+    const nx::utils::Url& baseUrl,
+    const QnResourcePtr& resource,
+    const QString& proxyQueryParameterName)
 {
     QnMediaServerResourcePtr via;
-    const QNetworkProxy &proxy = proxyToResource(resource, &via);
+    const QNetworkProxy& proxy = proxyToResource(resource, &via);
 
-    switch (proxy.type()) {
-    case QNetworkProxy::NoProxy:
-        break;
-    case QNetworkProxy::HttpProxy: {
-        nx::utils::Url url(baseUrl);
-        QUrlQuery query(url.query());
-        if (proxyQueryParameterName.isEmpty())
-            url.setPath(lit("/proxy/%1%2").arg(resource->getId().toString()).arg(url.path()));
-        else
-            query.addQueryItem(proxyQueryParameterName, resource->getId().toString());
+    switch (proxy.type())
+    {
+        case QNetworkProxy::NoProxy:
+            break;
+        case QNetworkProxy::HttpProxy:
+        {
+            nx::utils::Url url(baseUrl);
+            QUrlQuery query(url.query());
+            if (proxyQueryParameterName.isEmpty())
+                url.setPath(lit("/proxy/%1%2").arg(resource->getId().toString()).arg(url.path()));
+            else
+                query.addQueryItem(proxyQueryParameterName, resource->getId().toString());
 
-        url.setQuery(query);
-        url.setHost(proxy.hostName());
-        url.setPort(proxy.port());
+            url.setQuery(query);
+            url.setHost(proxy.hostName());
+            url.setPort(proxy.port());
 
-        if (!proxy.user().isEmpty()) {
-            NX_ASSERT( via );
-            QUrlQuery urlQuery(url.toQUrl());
-            auto nonce = QByteArray::number( qnSyncTime->currentUSecsSinceEpoch(), 16 );
-            urlQuery.addQueryItem(
-                lit("proxy_auth"),
-                QLatin1String(createHttpQueryAuthParam(
-                    proxy.user(),
-                    proxy.password(),
-                    via->realm(),
-                    nx::network::http::Method::get,
-                    nonce)));
-            url.setQuery(urlQuery);
+            if (!proxy.user().isEmpty())
+            {
+                NX_ASSERT(via);
+                QUrlQuery urlQuery(url.toQUrl());
+                auto nonce = QByteArray::number(qnSyncTime->currentUSecsSinceEpoch(), 16);
+                urlQuery.addQueryItem(lit("proxy_auth"),
+                    QLatin1String(createHttpQueryAuthParam(proxy.user(),
+                        proxy.password(),
+                        via->realm(),
+                        nx::network::http::Method::get,
+                        nonce)));
+                url.setQuery(urlQuery);
+            }
+
+            return url;
         }
-
-        return url;
-    }
-    default:
-        NX_ASSERT(0);
+        default:
+            NX_ASSERT(false);
     }
 
     return baseUrl;
 }
 
-QList<QNetworkProxy> QnNetworkProxyFactory::queryProxy(const QNetworkProxyQuery &query)
-{
-    if (nx::network::url::normalizedPath(query.url().path()) == QString("api/ping"))
-        return QList<QNetworkProxy>() << QNetworkProxy(QNetworkProxy::NoProxy);
-
-    QUrlQuery urlQuery(query.url());
-
-    QnUuid resourceGuid = QnUuid(urlQuery.queryItemValue(QString::fromLatin1(Qn::CAMERA_GUID_HEADER_NAME)));
-    if (resourceGuid.isNull())
-        resourceGuid = QnUuid(urlQuery.queryItemValue(QString::fromLatin1(Qn::SERVER_GUID_HEADER_NAME)));
-
-    if (resourceGuid.isNull())
-        return QList<QNetworkProxy>() << QNetworkProxy(QNetworkProxy::NoProxy);
-
-    return QList<QNetworkProxy>() << proxyToResource(
-        commonModule()->resourcePool()->getIncompatibleServerById(resourceGuid, true));
-}
-
 QNetworkProxy QnNetworkProxyFactory::proxyToResource(
-    const QnResourcePtr &resource,
-    QnMediaServerResourcePtr* const via ) const
+    const QnResourcePtr& resource,
+    QnMediaServerResourcePtr* const via)
 {
-    if (!commonModule()->router())
+    auto context = resource->context();
+    if (!context)
+        return QNetworkProxy(QNetworkProxy::NoProxy);
+
+    auto router = resource->commonModule()->router();
+    if (!NX_ASSERT(router))
         return QNetworkProxy(QNetworkProxy::NoProxy);
 
     QnMediaServerResourcePtr server;
-    QnSecurityCamResourcePtr camera = resource.dynamicCast<QnSecurityCamResource>();
-    if (camera) {
+    auto camera = resource.dynamicCast<QnSecurityCamResource>();
+    if (camera)
+    {
         QnResourcePtr parent = resource->getParentResource();
 
         while (parent && !parent->hasFlags(Qn::server))
             parent = parent->getParentResource();
 
         server = parent.dynamicCast<QnMediaServerResource>();
-    } else {
+    }
+    else
+    {
         server = resource.dynamicCast<QnMediaServerResource>();
     }
 
-    const auto& connection = commonModule()->ec2Connection();
+    const auto& connection = context->ec2Connection();
     if (server && connection)
     {
-        QnUuid id = server->getOriginalGuid();
-        QnRoute route = commonModule()->router()->routeTo(id);
+        const QnUuid id = server->getOriginalGuid();
+        QnRoute route = router->routeTo(id, context);
         if (!route.gatewayId.isNull() || camera)
         {
             if (route.addr.isNull() && !route.reverseConnect)
             {
-                NX_WARNING(this, "No route to server %1, is connection lost?", id);
+                NX_WARNING(NX_SCOPE_TAG, "No route to server %1, is connection lost?", id);
                 return QNetworkProxy(QNetworkProxy::NoProxy);
             }
 
+            // Reverse connection is not supported for a client.
             if (route.reverseConnect)
-                // reverse connection is not supported for a client
                 return QNetworkProxy(QNetworkProxy::NoProxy);
 
-            if( via )
-                *via = server->resourcePool()->getResourceById<QnMediaServerResource>( route.id );
+            if (via)
+                *via = context->resourcePool()->getResourceById<QnMediaServerResource>(route.id);
 
             // TODO: #sivanov Credentials are actual on the client side only.
             const auto credentials = connection->credentials();

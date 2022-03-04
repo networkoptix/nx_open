@@ -313,7 +313,7 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
     connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoChanged, this,
         [this](const QnPeerRuntimeInfo &info)
         {
-            if (info.uuid != commonModule()->moduleGUID())
+            if (info.uuid != commonModule()->peerId())
                 return;
 
             if (auto connection = messageBusConnection())

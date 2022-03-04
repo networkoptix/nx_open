@@ -14,7 +14,6 @@
 #include <core/resource/resource_fwd.h>
 
 #include <common/common_globals.h>
-#include <common/common_module_aware.h>
 
 #include <utils/common/connective.h>
 
@@ -24,6 +23,7 @@
 #include <nx/string.h>
 
 class QThreadPool;
+namespace nx::vms::common { class ResourceContext; }
 
 /**
  * This class holds all resources in the system that are READY TO BE USED (as long as resource is
@@ -35,8 +35,7 @@ class QThreadPool;
  * resources.
  */
 class NX_VMS_COMMON_API QnResourcePool:
-    public Connective<QObject>,
-    public /*mixin*/ QnCommonModuleAware
+    public Connective<QObject>
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
@@ -50,8 +49,10 @@ public:
         AllResources
     };
 
-    explicit QnResourcePool(QObject* parent = nullptr);
+    explicit QnResourcePool(nx::vms::common::ResourceContext* context, QObject* parent = nullptr);
     ~QnResourcePool();
+
+    nx::vms::common::ResourceContext* context() const;
 
     enum AddResourceFlag
     {

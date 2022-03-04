@@ -4,11 +4,6 @@
 
 #include <nx/utils/log/assert.h>
 
-QnServerAdditionalAddressesDictionary::QnServerAdditionalAddressesDictionary(QObject *parent):
-        QObject(parent)
-{
-}
-
 QList<nx::utils::Url> QnServerAdditionalAddressesDictionary::additionalUrls(const QnUuid &serverId) const {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_discoveryInfoById.value(serverId).additionalUrls;

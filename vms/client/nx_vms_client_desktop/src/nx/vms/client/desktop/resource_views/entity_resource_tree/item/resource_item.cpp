@@ -255,11 +255,11 @@ QVariant ResourceItem::cameraExtraStatusData() const
             m_connectionsGuard.add(camera->connect(
                 camera, &QnVirtualCameraResource::statusFlagsChanged, discardExtraStatusCache));
 
-            const auto commonModule = camera->commonModule();
-            if (!commonModule)
+            const auto context = camera->context();
+            if (!context)
                 return;
 
-            const auto historyPool = commonModule->cameraHistoryPool();
+            const auto historyPool = context->cameraHistoryPool();
             m_connectionsGuard.add(
                 camera->connect(historyPool, &QnCameraHistoryPool::cameraFootageChanged,
                     [this, camera](const QnSecurityCamResourcePtr& securityCamera)
@@ -378,7 +378,7 @@ QVariant ResourceItem::globalPermissionsData() const
         using namespace nx::vms::api;
 
         const auto user = m_resource.staticCast<QnUserResource>();
-        const auto permissionsManager = user->commonModule()->globalPermissionsManager();
+        const auto permissionsManager = user->context()->globalPermissionsManager();
         m_globalPermissionsCache =
             QVariant::fromValue<GlobalPermissions>(permissionsManager->globalPermissions(user));
     }

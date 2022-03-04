@@ -5,8 +5,12 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 
-QnResourcePool::Private::Private(QnResourcePool* owner):
-    q(owner)
+QnResourcePool::Private::Private(
+    QnResourcePool* owner,
+    nx::vms::common::ResourceContext* context)
+    :
+    q(owner),
+    context(context)
 {
 }
 

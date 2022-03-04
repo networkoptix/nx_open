@@ -937,7 +937,7 @@ bool RightPanelModelsAdapter::Private::isAllowed() const
             if (!hasPermissions)
                 return false;
 
-            const auto taxonomyWatcher = m_context->commonModule()->taxonomyStateWatcher();
+            const auto taxonomyWatcher = m_context->commonModule()->analyticsTaxonomyStateWatcher();
             const auto objectTypes = taxonomyWatcher->state()->rootObjectTypes();
 
             return std::any_of(objectTypes.cbegin(), objectTypes.cend(),
@@ -1056,7 +1056,7 @@ void RightPanelModelsAdapter::Private::recreateSourceModel()
             q->setSourceModel(analyticsModel);
 
             m_modelConnections << connect(
-                m_context->commonModule()->taxonomyStateWatcher(),
+                m_context->commonModule()->analyticsTaxonomyStateWatcher(),
                 qOverload<>(&nx::analytics::taxonomy::AbstractStateWatcher::stateChanged),
                 q,
                 &RightPanelModelsAdapter::allowanceChanged);

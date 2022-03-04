@@ -11,21 +11,22 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/address_resolver.h>
 #include <nx/network/socket_global.h>
+#include <nx/utils/log/log.h>
 #include <nx/vms/api/data/peer_alive_data.h>
 #include <nx/vms/client/core/network/remote_connection.h>
+#include <nx/vms/common/resource/resource_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_layout_tour_manager.h>
 #include <nx_ec/managers/abstract_misc_manager.h>
-
-#include "utils/common/synctime.h"
-#include "common/common_module.h"
-
-#include <nx/utils/log/log.h>
+#include <utils/common/synctime.h>
 
 using namespace nx::vms::client::core;
 
-QnClientMessageProcessor::QnClientMessageProcessor(QObject* parent):
-    base_type(parent),
+QnClientMessageProcessor::QnClientMessageProcessor(
+    nx::vms::common::ResourceContext* context,
+    QObject* parent)
+    :
+    base_type(context, parent),
     m_status(),
     m_connected(false),
     m_holdConnection(false)
@@ -136,7 +137,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource, ec2
         return layout && layout->isFile();
     };
 
-    QnResourcePtr ownResource = resourcePool()->getResourceById(resource->getId());
+    QnResourcePtr ownResource = m_context->resourcePool()->getResourceById(resource->getId());
 
     /* Security check. Local layouts must not be overridden by server's.
     * Really that means GUID conflict, caused by saving of local layouts to server. */
@@ -149,7 +150,7 @@ void QnClientMessageProcessor::updateResource(const QnResourcePtr &resource, ec2
     QnCommonMessageProcessor::updateResource(resource, source);
     if (!ownResource)
     {
-        resourcePool()->addResource(resource);
+        m_context->resourcePool()->addResource(resource);
     }
     else
     {
@@ -215,7 +216,7 @@ void QnClientMessageProcessor::handleRemotePeerLost(QnUuid peer, nx::vms::api::P
     NX_DEBUG(this, lit("peer lost, state -> Reconnecting"));
     m_status.setState(QnConnectionState::Reconnecting);
 
-    auto currentServer = resourcePool()->getResourceById<QnMediaServerResource>(
+    auto currentServer = m_context->resourcePool()->getResourceById<QnMediaServerResource>(
         connection()->moduleInformation().id);
 
     /* Mark server as offline, so user will understand why is he reconnecting. */
@@ -251,7 +252,7 @@ void QnClientMessageProcessor::onGotInitialNotification(const nx::vms::api::Full
     NX_DEBUG(this, lit("Received initial notification while connected to %1")
             .arg(connection()->moduleInformation().id.toString()));
 
-    auto currentServer = resourcePool()->getResourceById<QnMediaServerResource>(
+    auto currentServer = m_context->resourcePool()->getResourceById<QnMediaServerResource>(
         connection()->moduleInformation().id);
 
     NX_ASSERT(currentServer);

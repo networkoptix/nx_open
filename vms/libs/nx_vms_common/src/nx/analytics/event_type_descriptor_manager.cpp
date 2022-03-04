@@ -1,40 +1,40 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include "event_type_descriptor_manager.h"
-#include <nx/analytics/utils.h>
-#include <nx/analytics/properties.h>
 
-#include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
-
-#include <nx/vms/common/resource/analytics_engine_resource.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/analytics/helpers.h>
-
+#include <nx/analytics/properties.h>
+#include <nx/analytics/utils.h>
 #include <nx/utils/data_structures/map_helper.h>
+#include <nx/vms/common/resource/analytics_engine_resource.h>
 
 namespace nx::analytics {
 
 using namespace nx::vms::api::analytics;
 using namespace nx::utils::data_structures;
 
-EventTypeDescriptorManager::EventTypeDescriptorManager(QObject* parent):
+EventTypeDescriptorManager::EventTypeDescriptorManager(
+    taxonomy::DescriptorContainer* taxonomyDescriptorContainer,
+    QObject* parent)
+    :
     base_type(parent),
-    QnCommonModuleAware(parent)
+    m_taxonomyDescriptorContainer(taxonomyDescriptorContainer)
 {
 }
 
 std::optional<EventTypeDescriptor> EventTypeDescriptorManager::descriptor(
     const EventTypeId& id) const
 {
-    return fetchDescriptor<EventTypeDescriptor>(commonModule()->descriptorContainer(), id);
+    return fetchDescriptor<EventTypeDescriptor>(m_taxonomyDescriptorContainer, id);
 }
 
 EventTypeDescriptorMap EventTypeDescriptorManager::descriptors(
     const std::set<EventTypeId>& eventTypeIds) const
 {
     return fetchDescriptors<EventTypeDescriptor>(
-        commonModule()->descriptorContainer(),
+        m_taxonomyDescriptorContainer,
         eventTypeIds);
 }
 

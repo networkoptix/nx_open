@@ -33,7 +33,6 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
-#include <network/cloud_url_validator.h>
 #include <network/router.h>
 #include <network/system_helpers.h>
 #include <nx/build_info.h>
@@ -43,6 +42,7 @@
 #include <nx/vms/client/core/network/remote_session.h>
 #include <nx/vms/client/desktop/condition/generic_condition.h>
 #include <nx/vms/client/desktop/joystick/settings/manager.h>
+#include <nx/vms/client/desktop/network/cloud_url_validator.h>
 #include <nx/vms/client/desktop/radass/radass_support.h>
 #include <nx/vms/client/desktop/resource_views/data/resource_tree_globals.h>
 #include <nx/vms/client/desktop/resource_views/entity_resource_tree/resource_grouping/resource_grouping.h>
@@ -1297,7 +1297,7 @@ ActionVisibility PtzCondition::check(const QnResourceList& resources, QnWorkbenc
 {
     foreach(const QnResourcePtr &resource, resources)
     {
-        auto ptzPool = resource->commonModule()->findInstance<QnPtzControllerPool>();
+        auto ptzPool = qnClientCoreModule->commonModule()->findInstance<QnPtzControllerPool>();
         if (!check(ptzPool->controller(resource)))
             return InvisibleAction;
     }
@@ -1592,7 +1592,7 @@ ActionVisibility DesktopCameraCondition::check(const Parameters& /*parameters*/,
             return InvisibleAction;
 
         const auto desktopCameraId = QnDesktopResource::calculateUniqueId(
-            context->commonModule()->moduleGUID(), user->getId());
+            context->commonModule()->peerId(), user->getId());
 
         /* Do not check real pointer type to speed up check. */
         const auto desktopCamera = context->resourcePool()->getNetworkResourceByPhysicalId(
@@ -1693,12 +1693,12 @@ CloudServerCondition::CloudServerCondition(MatchMode matchMode):
 
 ActionVisibility CloudServerCondition::check(const QnResourceList& resources, QnWorkbenchContext* /*context*/)
 {
-    auto isCloudServer = [](const QnResourcePtr& resource)
+    auto isCloudResource = [](const QnResourcePtr& resource)
         {
-            return nx::network::isCloudServer(resource.dynamicCast<QnMediaServerResource>());
+            return isCloudServer(resource.dynamicCast<QnMediaServerResource>());
         };
 
-    bool success = GenericCondition::check<QnResourcePtr>(resources, m_matchMode, isCloudServer);
+    bool success = GenericCondition::check<QnResourcePtr>(resources, m_matchMode, isCloudResource);
     return success ? EnabledAction : InvisibleAction;
 }
 

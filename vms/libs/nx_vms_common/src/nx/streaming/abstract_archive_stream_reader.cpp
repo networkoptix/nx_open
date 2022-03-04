@@ -16,8 +16,8 @@
 #include <media/filters/abstract_media_data_filter.h>
 
 
-QnAbstractArchiveStreamReader::QnAbstractArchiveStreamReader(const QnResourcePtr &dev):
-    QnAbstractMediaStreamDataProvider(dev)
+QnAbstractArchiveStreamReader::QnAbstractArchiveStreamReader(const QnResourcePtr& resource):
+    QnAbstractMediaStreamDataProvider(resource)
 {
 }
 

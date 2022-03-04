@@ -145,8 +145,8 @@ protected:
     {
         m_commonModule = std::make_unique<QnCommonModule>(
             /*clientMode*/ false,
-            nx::core::access::Mode::direct);
-        m_commonModule->setModuleGUID(QnUuid::createUuid());
+            nx::core::access::Mode::direct,
+            /*peerId*/ QnUuid::createUuid());
 
         m_camera.reset(new nx::CameraResourceStub());
         m_camera->setName("BigBro");
@@ -154,7 +154,7 @@ protected:
 
         // We need a whole Server just to make analytics descriptors work.
         QnMediaServerResourcePtr server(new nx::core::resource::ServerMock());
-        server->setIdUnsafe(m_commonModule->moduleGUID());
+        server->setIdUnsafe(m_commonModule->peerId());
         m_commonModule->resourcePool()->addResource(server);
 
         server->setProperty(nx::analytics::kDescriptorsProperty, QString(kSerializedDescriptors));

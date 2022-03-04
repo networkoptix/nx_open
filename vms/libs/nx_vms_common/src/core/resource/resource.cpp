@@ -65,8 +65,9 @@ void QnResource::setResourcePool(QnResourcePool* resourcePool)
 {
     m_resourcePool = resourcePool;
     setCommonModule(resourcePool
-        ? resourcePool->commonModule()
+        ? dynamic_cast<QnCommonModule*>(resourcePool->context())
         : nullptr);
+    NX_ASSERT(!resourcePool || context());
 }
 
 QnResourcePtr QnResource::toSharedPointer() const
@@ -255,9 +256,9 @@ void QnResource::setTypeId(const QnUuid& id)
 
 nx::vms::api::ResourceStatus QnResource::getStatus() const
 {
-    if (auto commonModule = this->commonModule())
+    if (auto context = this->context())
     {
-        const auto statusDictionary = commonModule->resourceStatusDictionary();
+        const auto statusDictionary = context->resourceStatusDictionary();
         if (statusDictionary)
             return statusDictionary->value(getId());
     }
@@ -277,11 +278,11 @@ void QnResource::setStatus(ResourceStatus newStatus, Qn::StatusChangeReason reas
     if (hasFlags(Qn::removed))
         return;
 
-    if (!commonModule())
+    if (!context())
         return;
 
     QnUuid id = getId();
-    ResourceStatus oldStatus = commonModule()->resourceStatusDictionary()->value(id);
+    ResourceStatus oldStatus = context()->resourceStatusDictionary()->value(id);
     if (oldStatus == newStatus)
         return;
 
@@ -293,13 +294,7 @@ void QnResource::setStatus(ResourceStatus newStatus, Qn::StatusChangeReason reas
         getName(),
         nx::utils::url::hidePassword(getUrl()));
     m_previousStatus = oldStatus;
-    commonModule()->resourceStatusDictionary()->setValue(id, newStatus);
-    if ((oldStatus != ResourceStatus::undefined)
-        && (oldStatus != ResourceStatus::mismatchedCertificate)
-        && (newStatus == ResourceStatus::offline))
-    {
-        commonModule()->metrics()->offlineStatus()++;
-    }
+    context()->resourceStatusDictionary()->setValue(id, newStatus);
 
     // Null pointer if we are changing status in constructor. Signal is not needed in this case.
     if (auto sharedThis = toSharedPointer(this))
@@ -392,9 +387,9 @@ QString QnResource::getProperty(const QString& key) const
             if (itr != m_locallySavedProperties.end())
                 value = itr->second;
         }
-        else if (auto module = commonModule(); module && module->resourcePropertyDictionary())
+        else if (auto context = this->context(); context && context->resourcePropertyDictionary())
         {
-            value = module->resourcePropertyDictionary()->value(m_id, key);
+            value = context->resourcePropertyDictionary()->value(m_id, key);
         }
     }
 
@@ -427,11 +422,11 @@ bool QnResource::setProperty(const QString& key, const QString& value, bool mark
     }
 
     NX_ASSERT(!getId().isNull());
-    NX_ASSERT(commonModule());
+    NX_ASSERT(context());
 
     auto prevValue = getProperty(key);
-    const bool isModified = commonModule()
-        && commonModule()->resourcePropertyDictionary()->setValue(getId(), key, value, markDirty);
+    const bool isModified = context()
+        && context()->resourcePropertyDictionary()->setValue(getId(), key, value, markDirty);
 
     if (isModified)
         emitPropertyChanged(key, prevValue, value);
@@ -471,24 +466,25 @@ nx::vms::api::ResourceParamDataList QnResource::getProperties() const
         return result;
     }
 
-    if (const auto module = commonModule())
-        return module->resourcePropertyDictionary()->allProperties(getId());
+    if (const auto context = this->context())
+        return context->resourcePropertyDictionary()->allProperties(getId());
 
     return {};
 }
 
 bool QnResource::saveProperties()
 {
-    NX_ASSERT(commonModule() && !getId().isNull());
-    if (auto module = commonModule())
-        return module->resourcePropertyDictionary()->saveParams(getId());
+    NX_ASSERT(context() && !getId().isNull());
+    if (auto context = this->context())
+        return context->resourcePropertyDictionary()->saveParams(getId());
     return false;
 }
 
 void QnResource::savePropertiesAsync()
 {
-    if (NX_ASSERT(commonModule() && !getId().isNull()))
-        commonModule()->resourcePropertyDictionary()->saveParamsAsync(getId());
+    NX_ASSERT(context() && !getId().isNull());
+    if (auto context = this->context())
+        context->resourcePropertyDictionary()->saveParamsAsync(getId());
 }
 
 // -----------------------------------------------------------------------------
@@ -503,8 +499,13 @@ QnCommonModule* QnResource::commonModule() const
     if (auto commonModule = m_commonModule.load())
         return commonModule;
 
-    if (const auto pool = resourcePool())
-        return pool->commonModule();
+    return nullptr;
+}
+
+nx::vms::common::ResourceContext* QnResource::context() const
+{
+    if (auto commonModule = m_commonModule.load())
+        return commonModule;
 
     return nullptr;
 }

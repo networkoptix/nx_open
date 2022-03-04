@@ -44,10 +44,10 @@ CameraResourceSource::CameraResourceSource(
                     emit resourceRemoved(camera);
             });
 
-        NX_CRITICAL(m_server->commonModule());
+        NX_CRITICAL(m_server->context());
         auto serverWatcher = new core::SessionResourcesSignalListener<QnMediaServerResource>(
-            m_server->commonModule()->resourcePool(),
-            m_server->commonModule()->messageProcessor(),
+            m_server->context()->resourcePool(),
+            m_server->context()->messageProcessor(),
             this);
         serverWatcher->setOnRemovedHandler(
             [this](const QnMediaServerResourceList& servers)

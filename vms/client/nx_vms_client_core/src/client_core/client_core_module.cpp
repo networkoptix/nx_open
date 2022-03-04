@@ -49,14 +49,17 @@ struct QnClientCoreModule::Private
 
 QnClientCoreModule::QnClientCoreModule(
     Mode mode,
+    QnUuid peerId,
     nx::core::access::Mode resourceAccessMode)
     :
     base_type(),
     d(new Private())
 {
+    NX_ASSERT(!peerId.isNull() || mode == Mode::unitTests, "Production usage must have peer id.");
     d->commonModule = std::make_unique<QnCommonModule>(
         /*clientMode*/ true,
-        resourceAccessMode);
+        resourceAccessMode,
+        std::move(peerId));
 
     ini().reload();
 

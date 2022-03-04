@@ -21,7 +21,7 @@ class NX_VMS_COMMON_API QnAbstractArchiveStreamReader:
     Q_OBJECT
 
 public:
-    QnAbstractArchiveStreamReader(const QnResourcePtr& dev);
+    QnAbstractArchiveStreamReader(const QnResourcePtr& resource);
     virtual ~QnAbstractArchiveStreamReader() override;
 
     QnAbstractNavigator *navDelegate() const;

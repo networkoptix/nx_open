@@ -23,13 +23,13 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
-#include <network/cloud_url_validator.h>
 #include <nx/network/rest/result.h>
 #include <nx/network/ssl/certificate.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log_main.h>
 #include <nx/vms/client/core/network/helpers.h>
 #include <nx/vms/client/desktop/common/widgets/hint_button.h>
+#include <nx/vms/client/desktop/network/cloud_url_validator.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/skin.h>
 #include <nx/vms/client/desktop/system_logon/ui/server_certificate_viewer.h>
@@ -415,7 +415,7 @@ void QnServerSettingsWidget::updateUrl()
     ui->ipAddressLineEdit->setText(displayInfo.host());
     ui->portLineEdit->setText(QString::number(displayInfo.port()));
 
-    ui->pingButton->setVisible(!nx::network::isCloudServer(m_server));
+    ui->pingButton->setVisible(!isCloudServer(m_server));
 }
 
 void QnServerSettingsWidget::updateWebCamerasDiscoveryEnabled()

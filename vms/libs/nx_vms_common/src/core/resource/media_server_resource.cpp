@@ -114,7 +114,7 @@ void QnMediaServerResource::resetCachedValues()
 
 QSet<QnUuid> QnMediaServerResource::activeAnalyticsEngineIds() const
 {
-    const auto commonModule = this->commonModule();
+    const auto commonModule = this->context();
     if (!NX_ASSERT(commonModule))
         return {};
 
@@ -128,7 +128,7 @@ QSet<QnUuid> QnMediaServerResource::activeAnalyticsEngineIds() const
 
 QString QnMediaServerResource::getName() const
 {
-    if (!commonModule())
+    if (!context())
         return QnResource::getName();
 
     if (getServerFlags().testFlag(vms::api::SF_Edge) && !m_edgeServerStateTracker.isNull())
@@ -139,7 +139,7 @@ QString QnMediaServerResource::getName() const
 
     {
         QnMediaServerUserAttributesPool::ScopedLock lk(
-            commonModule()->mediaServerUserAttributesPool(), getId());
+            context()->mediaServerUserAttributesPool(), getId());
 
         if (!lk->name().isEmpty())
             return lk->name();
@@ -149,7 +149,7 @@ QString QnMediaServerResource::getName() const
 
 void QnMediaServerResource::setName( const QString& name )
 {
-    if (getId().isNull() || !commonModule())
+    if (getId().isNull() || !context())
     {
         base_type::setName(name);
         return;
@@ -159,7 +159,7 @@ void QnMediaServerResource::setName( const QString& name )
         return;
 
     {
-        QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId() );
+        QnMediaServerUserAttributesPool::ScopedLock lk(context()->mediaServerUserAttributesPool(), getId() );
         if (lk->name() == name)
             return;
         lk->setName(name);
@@ -187,33 +187,33 @@ QList<nx::network::SocketAddress> QnMediaServerResource::getNetAddrList() const
 void QnMediaServerResource::setAdditionalUrls(const QList<nx::utils::Url> &urls)
 {
     QnUuid id = getId();
-    QList<nx::utils::Url> oldUrls = commonModule()->serverAdditionalAddressesDictionary()->additionalUrls(id);
+    QList<nx::utils::Url> oldUrls = context()->serverAdditionalAddressesDictionary()->additionalUrls(id);
     if (oldUrls == urls)
         return;
 
-    commonModule()->serverAdditionalAddressesDictionary()->setAdditionalUrls(id, urls);
+    context()->serverAdditionalAddressesDictionary()->setAdditionalUrls(id, urls);
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
 QList<nx::utils::Url> QnMediaServerResource::getAdditionalUrls() const
 {
-    return commonModule()->serverAdditionalAddressesDictionary()->additionalUrls(getId());
+    return context()->serverAdditionalAddressesDictionary()->additionalUrls(getId());
 }
 
 void QnMediaServerResource::setIgnoredUrls(const QList<nx::utils::Url> &urls)
 {
     QnUuid id = getId();
-    QList<nx::utils::Url> oldUrls = commonModule()->serverAdditionalAddressesDictionary()->ignoredUrls(id);
+    QList<nx::utils::Url> oldUrls = context()->serverAdditionalAddressesDictionary()->ignoredUrls(id);
     if (oldUrls == urls)
         return;
 
-    commonModule()->serverAdditionalAddressesDictionary()->setIgnoredUrls(id, urls);
+    context()->serverAdditionalAddressesDictionary()->setIgnoredUrls(id, urls);
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
 QList<nx::utils::Url> QnMediaServerResource::getIgnoredUrls() const
 {
-    return commonModule()->serverAdditionalAddressesDictionary()->ignoredUrls(getId());
+    return context()->serverAdditionalAddressesDictionary()->ignoredUrls(getId());
 }
 
 std::optional<nx::network::SocketAddress> QnMediaServerResource::getCloudAddress() const
@@ -282,7 +282,7 @@ rest::ServerConnectionPtr QnMediaServerResource::restConnection()
 
     if (!m_restConnection)
         m_restConnection = rest::ServerConnectionPtr(new rest::ServerConnection(
-            resourcePool()->commonModule(),
+            commonModule(),
             getId()));
 
     return m_restConnection;
@@ -330,9 +330,14 @@ void QnMediaServerResource::setGuidConflictDetected(bool value)
 
 QString QnMediaServerResource::rtspUrl() const
 {
-    auto connection = commonModule()->ec2Connection();
-    const auto isSecure = commonModule()->globalSettings()->isVideoTrafficEncryptionForced()
-        || (connection && connection->credentials().authToken.isBearerToken());
+    bool isSecure = true;
+
+    if (auto context = this->context())
+    {
+        auto connection = context->ec2Connection();
+        isSecure = context->globalSettings()->isVideoTrafficEncryptionForced()
+            || (connection && connection->credentials().authToken.isBearerToken());
+    }
 
     nx::network::url::Builder urlBuilder(getUrl());
     urlBuilder.setScheme(nx::network::rtsp::urlScheme(isSecure));
@@ -463,19 +468,19 @@ nx::utils::SoftwareVersion QnMediaServerResource::getVersion() const
 
 void QnMediaServerResource::setMaxCameras(int value)
 {
-    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId() );
+    QnMediaServerUserAttributesPool::ScopedLock lk(context()->mediaServerUserAttributesPool(), getId() );
     lk->setMaxCameras(value);
 }
 
 int QnMediaServerResource::getMaxCameras() const
 {
-    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId() );
+    QnMediaServerUserAttributesPool::ScopedLock lk(context()->mediaServerUserAttributesPool(), getId() );
     return lk->maxCameras();
 }
 
 QnMediaServerUserAttributesPtr QnMediaServerResource::userAttributes() const
 {
-    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId());
+    QnMediaServerUserAttributesPool::ScopedLock lk(context()->mediaServerUserAttributesPool(), getId());
     return *lk;
 }
 
@@ -492,7 +497,7 @@ void QnMediaServerResource::setMetadataStorageId(const QnUuid& value)
 void QnMediaServerResource::setRedundancy(bool value)
 {
     {
-        QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId() );
+        QnMediaServerUserAttributesPool::ScopedLock lk(context()->mediaServerUserAttributesPool(), getId() );
         if (lk->isRedundancyEnabled() == value)
             return;
         lk->setIsRedundancyEnabled(value);
@@ -502,7 +507,7 @@ void QnMediaServerResource::setRedundancy(bool value)
 
 bool QnMediaServerResource::isRedundancy() const
 {
-    QnMediaServerUserAttributesPool::ScopedLock lk(commonModule()->mediaServerUserAttributesPool(), getId() );
+    QnMediaServerUserAttributesPool::ScopedLock lk(context()->mediaServerUserAttributesPool(), getId() );
     return lk->isRedundancyEnabled();
 }
 
@@ -545,10 +550,10 @@ void QnMediaServerResource::setOsInfo(const utils::OsInfo& osInfo)
 
 nx::vms::api::ModuleInformation QnMediaServerResource::getModuleInformation() const
 {
-    if (auto module = commonModule())
+    if (auto context = this->context())
     {
-        if (getId() == module->moduleGUID())
-            return module->moduleInformation();
+        if (getId() == context->peerId())
+            return commonModule()->moduleInformation();
     }
 
     // build module information for other server
@@ -563,7 +568,7 @@ nx::vms::api::ModuleInformation QnMediaServerResource::getModuleInformation() co
     if (moduleInformation.protoVersion == 0)
         moduleInformation.protoVersion = nx::vms::api::protocolVersion();
 
-    if (auto module = commonModule())
+    if (auto module = context())
     {
         const auto& settings = module->globalSettings();
         moduleInformation.localSystemId = settings->localSystemId();
@@ -706,7 +711,7 @@ void QnMediaServerResource::setAuthKey(const QString& authKey)
 nx::vms::api::BackupBitrateBytesPerSecond QnMediaServerResource::getBackupBitrateLimitsBps() const
 {
     QnMediaServerUserAttributesPool::ScopedLock lock(
-        commonModule()->mediaServerUserAttributesPool(), getId());
+        context()->mediaServerUserAttributesPool(), getId());
     return lock->backupBitrateBytesPerSecond();
 }
 
@@ -715,7 +720,7 @@ void QnMediaServerResource::setBackupBitrateLimitsBps(
 {
     {
         QnMediaServerUserAttributesPool::ScopedLock lock(
-            commonModule()->mediaServerUserAttributesPool(), getId());
+            context()->mediaServerUserAttributesPool(), getId());
 
         if (lock->backupBitrateBytesPerSecond() == bitrateLimits)
             return;
@@ -730,34 +735,41 @@ QString QnMediaServerResource::realm() const
     return nx::network::AppInfo::realm().c_str();
 }
 
-void QnMediaServerResource::setResourcePool(QnResourcePool* resourcePool)
+void QnMediaServerResource::setCommonModule(QnCommonModule* commonModule)
 {
-    if (auto oldPool = this->resourcePool())
+    if (auto ctx = this->context())
     {
-        oldPool->disconnect(this);
-        oldPool->commonModule()->globalSettings()->disconnect(this);
+        ctx->resourcePool()->disconnect(this);
+        ctx->globalSettings()->disconnect(this);
     }
 
-    base_type::setResourcePool(resourcePool);
+    base_type::setCommonModule(commonModule);
 
-    if (!resourcePool)
-        return;
-
-    if (getServerFlags().testFlag(vms::api::SF_Edge))
+    if (auto ctx = this->context())
     {
-        using namespace nx::core::resource::edge;
-        m_edgeServerStateTracker.reset(new EdgeServerStateTracker(this));
+        if (getServerFlags().testFlag(vms::api::SF_Edge))
+        {
+            using namespace nx::core::resource::edge;
+            m_edgeServerStateTracker.reset(new EdgeServerStateTracker(this));
 
-        connect(edgeServerStateTracker(), &EdgeServerStateTracker::hasCoupledCameraChanged,
-            this, [this] { emit this->nameChanged(toSharedPointer(this)); });
+            connect(edgeServerStateTracker(),
+                &EdgeServerStateTracker::hasCoupledCameraChanged,
+                this,
+                [this] { emit this->nameChanged(toSharedPointer(this)); });
 
-        connect(edgeServerStateTracker(), &EdgeServerStateTracker::hasCanonicalStateChanged,
-            this, [this] { emit this->edgeServerCanonicalStateChanged(toSharedPointer(this)); });
+            connect(edgeServerStateTracker(),
+                &EdgeServerStateTracker::hasCanonicalStateChanged,
+                this,
+                [this] { emit this->edgeServerCanonicalStateChanged(toSharedPointer(this)); });
+        }
+
+        const auto& settings = ctx->globalSettings();
+        connect(settings,
+            &QnGlobalSettings::cloudSettingsChanged,
+            this,
+            &QnMediaServerResource::at_cloudSettingsChanged,
+            Qt::DirectConnection);
     }
-
-    const auto& settings = resourcePool->commonModule()->globalSettings();
-    connect(settings, &QnGlobalSettings::cloudSettingsChanged,
-        this, &QnMediaServerResource::at_cloudSettingsChanged, Qt::DirectConnection);
 }
 
 std::string QnMediaServerResource::certificate() const

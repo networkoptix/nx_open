@@ -3,20 +3,20 @@
 #pragma once
 
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
-
 #include <nx/utils/thread/mutex.h>
-#include <common/common_module_aware.h>
-#include <utils/common/connective.h>
 
 namespace nx::analytics::taxonomy {
 
 class State;
+class DescriptorContainer;
 
-class StateWatcher: public Connective<AbstractStateWatcher>, public QnCommonModuleAware
+class StateWatcher: public AbstractStateWatcher
 {
     Q_OBJECT
 public:
-    StateWatcher(QnCommonModule* commonModule);
+    StateWatcher(
+        DescriptorContainer* taxonomyDescriptorContainer,
+        QObject* parent = nullptr);
 
     virtual std::shared_ptr<AbstractState> state() const override;
 
@@ -26,6 +26,7 @@ private:
     void at_descriptorsUpdated();
 
 private:
+    DescriptorContainer* const m_taxonomyDescriptorContainer;
     mutable nx::Mutex m_mutex;
     mutable std::shared_ptr<AbstractState> m_state;
 };

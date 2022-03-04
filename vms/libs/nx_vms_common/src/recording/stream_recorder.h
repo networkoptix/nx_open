@@ -39,7 +39,6 @@ extern "C"
 class NX_VMS_COMMON_API QnStreamRecorder:
     public QnAbstractDataConsumer,
     public QnResourceConsumer,
-    public /*mix-in*/ QnCommonModuleAware,
     // Public, because private breaks clang build.
     public virtual /*mix-in*/ nx::AbstractRecordingContext, //< Uses.
     public virtual nx::AbstractRecordingContextCallback //< Implements.

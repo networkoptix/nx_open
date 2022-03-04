@@ -3,21 +3,26 @@
 #pragma once
 
 #include <QtCore/QSharedPointer>
+
 #include <nx/streaming/abstract_stream_data_provider.h>
-#include <utils/camera/camera_diagnostics.h>
 #include <nx/streaming/media_data_packet.h>
 #include <nx/streaming/media_stream_statistics.h>
 #include <nx/utils/value_cache.h>
+#include <utils/camera/camera_diagnostics.h>
 
 class QnResourceVideoLayout;
 class QnResourceAudioLayout;
 
-class NX_VMS_COMMON_API QnAbstractMediaStreamDataProvider: public QnAbstractStreamDataProvider
+class NX_VMS_COMMON_API QnAbstractMediaStreamDataProvider:
+    public QnAbstractStreamDataProvider
 {
     Q_OBJECT
 
 public:
-    explicit QnAbstractMediaStreamDataProvider(const QnResourcePtr& res);
+    static void setMediaStatisticsWindowSize(std::chrono::microseconds value);
+    static void setMediaStatisticsMaxDurationInFrames(int value);
+
+    explicit QnAbstractMediaStreamDataProvider(const QnResourcePtr& resource);
     virtual ~QnAbstractMediaStreamDataProvider();
 
     const QnMediaStreamStatistics* getStatistics(int channel) const;

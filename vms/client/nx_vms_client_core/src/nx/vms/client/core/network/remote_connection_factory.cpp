@@ -129,7 +129,7 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
             certificateVerifier,
             context->certificateCache,
             serializationFormat,
-            /*auditId*/ commonModule()->runningInstanceGUID());
+            /*auditId*/ commonModule()->sessionId());
     }
 
     bool executeInUiThreadSync(std::function<bool()> handler)

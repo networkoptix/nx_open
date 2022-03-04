@@ -4,13 +4,6 @@
 
 #include <nx/utils/log/assert.h>
 
-QnResourceStatusDictionary::QnResourceStatusDictionary(QObject* parent):
-    QObject(parent),
-    QnCommonModuleAware(parent)
-{
-
-}
-
 nx::vms::api::ResourceStatus QnResourceStatusDictionary::value(const QnUuid& resourceId) const
 {
     NX_MUTEX_LOCKER lock( &m_mutex );

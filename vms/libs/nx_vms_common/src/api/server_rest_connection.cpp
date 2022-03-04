@@ -1846,10 +1846,10 @@ bool setupAuth(
 
     // This header is used by the server to identify the client login session for audit.
     request.headers.emplace(
-        Qn::EC2_RUNTIME_GUID_HEADER_NAME, commonModule->runningInstanceGUID().toByteArray());
+        Qn::EC2_RUNTIME_GUID_HEADER_NAME, commonModule->sessionId().toByteArray());
 
     const auto& router = commonModule->router();
-    QnRoute route = router->routeTo(server->getId());
+    QnRoute route = router->routeTo(server);
 
     if (route.reverseConnect)
     {
