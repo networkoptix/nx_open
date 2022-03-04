@@ -21,7 +21,6 @@
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/media_server_user_attributes.h>
 #include <core/resource/resource.h>
 #include <core/resource/user_resource.h>
 #include <core/resource_access/providers/resource_access_provider.h>
@@ -1201,7 +1200,6 @@ void ConnectActionsHandler::clearConnection()
 
     resourcePool()->removeResources(resourcesToRemove);
 
-    mediaServerUserAttributesPool()->clear();
     resourcePropertyDictionary()->clear(idList);
     statusDictionary()->clear(idList);
 

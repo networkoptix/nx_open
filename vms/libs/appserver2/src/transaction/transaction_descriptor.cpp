@@ -1145,10 +1145,7 @@ struct ModifyServerAttributesAccess
         {
             // CRUD API PATCH merges with existing attributes represented as JSON object so they
             // can be not changed.
-            nx::vms::api::MediaServerUserAttributesData origin;
-            auto attributesPool = commonModule->mediaServerUserAttributesPool();
-            ec2::fromResourceToApi(attributesPool->getAttributesList({param.serverId})[0], origin);
-            if (origin == param)
+            if (server->userAttributes() == param)
                 return Result();
         }
         else if (param.checkResourceExists != nx::vms::api::CheckResourceExists::yes)

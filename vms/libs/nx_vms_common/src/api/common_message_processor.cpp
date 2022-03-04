@@ -8,7 +8,6 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/media_server_user_attributes.h>
 #include <core/resource/resource_factory.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/user_resource.h>
@@ -751,44 +750,21 @@ void QnCommonMessageProcessor::on_cameraUserAttributesRemoved(const QnUuid& came
 void QnCommonMessageProcessor::on_mediaServerUserAttributesChanged(
     const MediaServerUserAttributesData& attrs)
 {
-    QnMediaServerUserAttributesPtr userAttributes(new QnMediaServerUserAttributes());
-    ec2::fromApiToResource(attrs, userAttributes);
-
-    QnMediaServerUserAttributes::Notifiers notifiers;
-    {
-        QnMediaServerUserAttributesPool::ScopedLock lk(
-            m_context->mediaServerUserAttributesPool(),
-            userAttributes->serverId() );
-        lk->assign(*userAttributes, notifiers);
-    }
-
-    // It is OK if the Server is missing.
-    if (auto server = m_context->resourcePool()->getResourceById<QnMediaServerResource>(
-        userAttributes->serverId()))
-    {
-        emit server->resourceChanged(server);
-        for (const auto& notifier: notifiers)
-            notifier(server);
-    }
+    auto server = m_context->resourcePool()->getResourceById<QnMediaServerResource>(attrs.serverId);
+    if (server)
+        server->setUserAttributesAndNotify(attrs);
+    else
+        m_serverUserAttributesCache[attrs.serverId] = attrs;
 }
 
 void QnCommonMessageProcessor::on_mediaServerUserAttributesRemoved(const QnUuid& serverId)
 {
-    QnMediaServerUserAttributes::Notifiers notifiers;
-    {
-        QnMediaServerUserAttributesPool::ScopedLock lk(
-            m_context->mediaServerUserAttributesPool(), serverId);
-        // TODO: #akolesnikov For now, never remove this structure, just reset to an empty value.
-        lk->assign(QnMediaServerUserAttributes(), notifiers);
-        lk->setServerId(serverId);
-    }
-
     // It is OK if the Server is missing.
     if (auto server = m_context->resourcePool()->getResourceById<QnMediaServerResource>(serverId))
     {
-        emit server->resourceChanged(server);
-        for (const auto& notifier: notifiers)
-            notifier(server);
+        nx::vms::api::MediaServerUserAttributesData emptyAttributes;
+        emptyAttributes.serverId = serverId;
+        server->setUserAttributesAndNotify(emptyAttributes);
     }
 }
 
@@ -939,23 +915,28 @@ void QnCommonMessageProcessor::handleRemotePeerLost(QnUuid /*data*/, PeerType /*
 void QnCommonMessageProcessor::resetServerUserAttributesList(
     const MediaServerUserAttributesDataList& serverUserAttributesList)
 {
-    m_context->mediaServerUserAttributesPool()->clear();
-    for( const auto& serverAttrs: serverUserAttributesList )
+    auto pool = m_context->resourcePool();
+    for (const auto& serverAttrs: serverUserAttributesList)
     {
-        QnMediaServerUserAttributesPtr dstElement(new QnMediaServerUserAttributes());
-        ec2::fromApiToResource(serverAttrs, dstElement);
-
-        QnMediaServerUserAttributesPool::ScopedLock userAttributesLock(
-            m_context->mediaServerUserAttributesPool(), serverAttrs.serverId);
-        userAttributesLock = dstElement;
+        auto server = pool->getResourceById<QnMediaServerResource>(serverAttrs.serverId);
+        if (server)
+            server->setUserAttributes(serverAttrs);
+        else
+            m_serverUserAttributesCache[serverAttrs.serverId] = serverAttrs;
     }
 }
 
 void QnCommonMessageProcessor::resetCameraUserAttributesList(
     const CameraAttributesDataList& cameraUserAttributesList)
 {
+    auto pool = m_context->resourcePool();
     for (const auto& cameraAttrs: cameraUserAttributesList)
-        m_cameraUserAttributesCache[cameraAttrs.cameraId] = cameraAttrs;
+    {
+        if (auto camera = pool->getResourceById<QnVirtualCameraResource>(cameraAttrs.cameraId))
+            camera->setUserAttributes(cameraAttrs);
+        else
+            m_cameraUserAttributesCache[cameraAttrs.cameraId] = cameraAttrs;
+    }
 }
 
 void QnCommonMessageProcessor::resetPropertyList(const ResourceParamWithRefDataList& params)
@@ -1162,6 +1143,12 @@ void QnCommonMessageProcessor::updateResource(
 {
     QnMediaServerResourcePtr qnServer(new QnMediaServerResource());
     ec2::fromApiToResource(server, qnServer);
+    auto iter = m_serverUserAttributesCache.find(server.id);
+    if (iter != m_serverUserAttributesCache.cend())
+    {
+        qnServer->setUserAttributes(iter->second);
+        m_serverUserAttributesCache.erase(iter);
+    }
     updateResource(qnServer, source);
 }
 

@@ -14,7 +14,6 @@
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/edge/edge_server_state_tracker.h>
-#include <core/resource/media_server_user_attributes.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
@@ -138,11 +137,9 @@ QString QnMediaServerResource::getName() const
     }
 
     {
-        QnMediaServerUserAttributesPool::ScopedLock lk(
-            context()->mediaServerUserAttributesPool(), getId());
-
-        if (!lk->name().isEmpty())
-            return lk->name();
+        NX_MUTEX_LOCKER lock(&m_attributesMutex);
+        if (!m_userAttributes.serverName.isEmpty())
+            return m_userAttributes.serverName;
     }
     return QnResource::getName();
 }
@@ -159,10 +156,11 @@ void QnMediaServerResource::setName( const QString& name )
         return;
 
     {
-        QnMediaServerUserAttributesPool::ScopedLock lk(context()->mediaServerUserAttributesPool(), getId() );
-        if (lk->name() == name)
+        NX_MUTEX_LOCKER lock(&m_attributesMutex);
+        if (m_userAttributes.serverName == name)
             return;
-        lk->setName(name);
+
+        m_userAttributes.serverName = name;
     }
     emit nameChanged(toSharedPointer(this));
 }
@@ -468,20 +466,58 @@ nx::utils::SoftwareVersion QnMediaServerResource::getVersion() const
 
 void QnMediaServerResource::setMaxCameras(int value)
 {
-    QnMediaServerUserAttributesPool::ScopedLock lk(context()->mediaServerUserAttributesPool(), getId() );
-    lk->setMaxCameras(value);
+    NX_MUTEX_LOCKER lock(&m_attributesMutex);
+    m_userAttributes.maxCameras = value;
 }
 
 int QnMediaServerResource::getMaxCameras() const
 {
-    QnMediaServerUserAttributesPool::ScopedLock lk(context()->mediaServerUserAttributesPool(), getId() );
-    return lk->maxCameras();
+    NX_MUTEX_LOCKER lock(&m_attributesMutex);
+    return m_userAttributes.maxCameras;
 }
 
-QnMediaServerUserAttributesPtr QnMediaServerResource::userAttributes() const
+nx::vms::api::MediaServerUserAttributesData QnMediaServerResource::userAttributes() const
 {
-    QnMediaServerUserAttributesPool::ScopedLock lk(context()->mediaServerUserAttributesPool(), getId());
-    return *lk;
+    NX_MUTEX_LOCKER lock(&m_attributesMutex);
+    auto result = m_userAttributes;
+    result.serverId = getId();
+    return result;
+}
+
+void QnMediaServerResource::setUserAttributes(
+    const nx::vms::api::MediaServerUserAttributesData& attributes)
+{
+    NX_MUTEX_LOCKER lock(&m_attributesMutex);
+    m_userAttributes = attributes;
+}
+
+bool QnMediaServerResource::setUserAttributesAndNotify(
+    const nx::vms::api::MediaServerUserAttributesData& attributes)
+{
+    bool hasChanges = false;
+    auto originalAttributes = userAttributes();
+    setUserAttributes(attributes);
+
+    emit resourceChanged(::toSharedPointer(this));
+
+    if (originalAttributes.allowAutoRedundancy != attributes.allowAutoRedundancy)
+    {
+        hasChanges = true;
+        emit redundancyChanged(::toSharedPointer(this));
+    }
+
+    if (originalAttributes.serverName != attributes.serverName)
+    {
+        hasChanges = true;
+        emit nameChanged(::toSharedPointer(this));
+    }
+
+    if (originalAttributes.backupBitrateBytesPerSecond != attributes.backupBitrateBytesPerSecond)
+    {
+        hasChanges = true;
+        emit backupBitrateLimitsChanged(::toSharedPointer(this));
+    }
+    return hasChanges;
 }
 
 QnUuid QnMediaServerResource::metadataStorageId() const
@@ -497,18 +533,19 @@ void QnMediaServerResource::setMetadataStorageId(const QnUuid& value)
 void QnMediaServerResource::setRedundancy(bool value)
 {
     {
-        QnMediaServerUserAttributesPool::ScopedLock lk(context()->mediaServerUserAttributesPool(), getId() );
-        if (lk->isRedundancyEnabled() == value)
+        NX_MUTEX_LOCKER lock(&m_attributesMutex);
+        if (m_userAttributes.allowAutoRedundancy == value)
             return;
-        lk->setIsRedundancyEnabled(value);
+
+        m_userAttributes.allowAutoRedundancy = value;
     }
     emit redundancyChanged(::toSharedPointer(this));
 }
 
 bool QnMediaServerResource::isRedundancy() const
 {
-    QnMediaServerUserAttributesPool::ScopedLock lk(context()->mediaServerUserAttributesPool(), getId() );
-    return lk->isRedundancyEnabled();
+    NX_MUTEX_LOCKER lock(&m_attributesMutex);
+    return m_userAttributes.allowAutoRedundancy;
 }
 
 void QnMediaServerResource::setCompatible(bool value)
@@ -710,22 +747,19 @@ void QnMediaServerResource::setAuthKey(const QString& authKey)
 
 nx::vms::api::BackupBitrateBytesPerSecond QnMediaServerResource::getBackupBitrateLimitsBps() const
 {
-    QnMediaServerUserAttributesPool::ScopedLock lock(
-        context()->mediaServerUserAttributesPool(), getId());
-    return lock->backupBitrateBytesPerSecond();
+    NX_MUTEX_LOCKER lock(&m_attributesMutex);
+    return m_userAttributes.backupBitrateBytesPerSecond;
 }
 
 void QnMediaServerResource::setBackupBitrateLimitsBps(
     const nx::vms::api::BackupBitrateBytesPerSecond& bitrateLimits)
 {
     {
-        QnMediaServerUserAttributesPool::ScopedLock lock(
-            context()->mediaServerUserAttributesPool(), getId());
-
-        if (lock->backupBitrateBytesPerSecond() == bitrateLimits)
+        NX_MUTEX_LOCKER lock(&m_attributesMutex);
+        if (m_userAttributes.backupBitrateBytesPerSecond == bitrateLimits)
             return;
 
-        lock->setBackupBitrateBytesPerSecond(bitrateLimits);
+        m_userAttributes.backupBitrateBytesPerSecond = bitrateLimits;
     }
     emit backupBitrateLimitsChanged(::toSharedPointer(this));
 }

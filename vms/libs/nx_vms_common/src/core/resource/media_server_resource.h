@@ -8,7 +8,6 @@
 
 #include <api/server_rest_connection_fwd.h>
 #include <core/resource/resource.h>
-#include <core/resource/media_server_user_attributes.h>
 #include <nx/utils/value_cache.h>
 
 #include <nx/network/socket_common.h>
@@ -19,6 +18,7 @@
 #include <nx/utils/os_info.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/os_information.h>
+#include <nx/vms/api/data/media_server_data.h>
 
 namespace nx::network::http { class AsyncHttpClientPtr; }
 namespace nx::core::resource::edge { class EdgeServerStateTracker; }
@@ -36,10 +36,12 @@ public:
     QnMediaServerResource();
     virtual ~QnMediaServerResource();
 
-    /** Overrides QnResource::getName. Returns camera name from QnMediaServerUserAttributes. */
+    /** Overrides QnResource::getName. Returns server name from
+     *  nx::vms::api::MediaServerUserAttributesData.
+     * */
     virtual QString getName() const override;
 
-    /** Overrides QnResource::setName. Writes name to QnMediaServerUserAttributes. */
+    /** Overrides QnResource::setName. Writes name to nx::vms::api::MediaServerUserAttributesData.*/
     virtual void setName( const QString& name ) override;
 
     void setNetAddrList(const QList<nx::network::SocketAddress>& value);
@@ -151,7 +153,9 @@ public:
     void setMetadataStorageId(const QnUuid& value);
 
     static constexpr qint64 kMinFailoverTimeoutMs = 1000 * 3;
-    QnMediaServerUserAttributesPtr userAttributes() const;
+    nx::vms::api::MediaServerUserAttributesData userAttributes() const;
+    void setUserAttributes(const nx::vms::api::MediaServerUserAttributesData& attributes);
+    bool setUserAttributesAndNotify(const nx::vms::api::MediaServerUserAttributesData& attributes);
 
     std::string certificate() const;
     std::string userProvidedCertificate() const;
@@ -202,6 +206,8 @@ private:
     QElapsedTimer m_statusTimer;
     QString m_authKey;
     bool m_isCompatible = true;
+    mutable nx::Mutex m_attributesMutex;
+    nx::vms::api::MediaServerUserAttributesData m_userAttributes;
 
     nx::utils::CachedValue<Qn::PanicMode> m_panicModeCache;
 

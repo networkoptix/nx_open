@@ -121,12 +121,6 @@ QnResourcePropertyDictionary* QnCommonModuleAware::resourcePropertyDictionary() 
     return m_commonModule ? m_commonModule->resourcePropertyDictionary() : nullptr;
 }
 
-QnMediaServerUserAttributesPool* QnCommonModuleAware::mediaServerUserAttributesPool() const
-{
-    NX_ASSERT(m_initialized);
-    return m_commonModule ? m_commonModule->mediaServerUserAttributesPool() : nullptr;
-}
-
 QnResourceStatusDictionary* QnCommonModuleAware::statusDictionary() const
 {
     NX_ASSERT(m_initialized);

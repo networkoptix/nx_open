@@ -8,7 +8,6 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/storage_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/media_server_user_attributes.h>
 #include <core/resource/user_resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource/videowall_control_message.h>
@@ -525,39 +524,6 @@ void fromApiToResource(const MediaServerData& src, QnMediaServerResourcePtr& dst
     dst->setAuthKey(src.authKey);
 }
 
-////////////////////////////////////////////////////////////
-//// MediaServerUserAttributesData
-////////////////////////////////////////////////////////////
-void fromResourceToApi(const QnMediaServerUserAttributesPtr& src, MediaServerUserAttributesData& dst)
-{
-    dst = src->data();
-}
-
-void fromApiToResource(const MediaServerUserAttributesData& src, QnMediaServerUserAttributesPtr& dst)
-{
-    dst->setData(src);
-}
-
-void fromApiToResourceList(const MediaServerUserAttributesDataList& src, QnMediaServerUserAttributesList& dst)
-{
-    dst.reserve(dst.size() + static_cast<int>(src.size()));
-    for (const MediaServerUserAttributesData& serverAttrs: src)
-    {
-        QnMediaServerUserAttributesPtr dstElement(new QnMediaServerUserAttributes());
-        fromApiToResource(serverAttrs, dstElement);
-        dst.push_back(std::move(dstElement));
-    }
-}
-
-void fromResourceListToApi(const QnMediaServerUserAttributesList& src, MediaServerUserAttributesDataList& dst)
-{
-    dst.reserve(dst.size() + src.size());
-    for (const QnMediaServerUserAttributesPtr& attr: src)
-    {
-        dst.push_back(MediaServerUserAttributesData());
-        fromResourceToApi(attr, dst.back());
-    }
-}
 
 ////////////////////////////////////////////////////////////
 //// ResourceData

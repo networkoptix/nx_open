@@ -129,18 +129,6 @@ NX_VMS_COMMON_API void fromResourceToApi(
 NX_VMS_COMMON_API void fromApiToResource(
     const nx::vms::api::MediaServerData& src,
     QnMediaServerResourcePtr& dst);
-NX_VMS_COMMON_API void fromResourceToApi(
-    const QnMediaServerUserAttributesPtr& src,
-    nx::vms::api::MediaServerUserAttributesData& dst);
-NX_VMS_COMMON_API void fromApiToResource(
-    const nx::vms::api::MediaServerUserAttributesData& src,
-    QnMediaServerUserAttributesPtr& dst);
-NX_VMS_COMMON_API void fromApiToResourceList(
-    const nx::vms::api::MediaServerUserAttributesDataList& src,
-    QnMediaServerUserAttributesList& dst);
-NX_VMS_COMMON_API void fromResourceListToApi(
-    const QnMediaServerUserAttributesList& src,
-    nx::vms::api::MediaServerUserAttributesDataList& dst);
 
 NX_VMS_COMMON_API void fromResourceToApi(const QnResourcePtr& src, nx::vms::api::ResourceData& dst);
 NX_VMS_COMMON_API void fromApiToResource(const nx::vms::api::ResourceData& src, QnResource* dst);

@@ -43,7 +43,6 @@
 #include <core/resource/layout_item_data.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
-#include <core/resource/media_server_user_attributes.h>
 #include <core/resource/resource.h>
 #include <core/resource/resource_directory_browser.h>
 #include <core/resource/user_resource.h>
