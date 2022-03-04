@@ -18,18 +18,13 @@ TimePeriodsStore::TimePeriodsStore(QObject* parent):
 
 bool TimePeriodsStore::hasPeriods(Qn::TimePeriodContent type) const
 {
-    return !m_periods[type].isEmpty();
+    return !periods(type).isEmpty();
 }
 
-void TimePeriodsStore::setPeriods(Qn::TimePeriodContent type, const QnTimePeriodList& periods)
+const QnTimePeriodList& TimePeriodsStore::periods(Qn::TimePeriodContent type) const
 {
-    m_periods.insert(type, periods);
-    emit periodsUpdated(type);
-}
-
-QnTimePeriodList TimePeriodsStore::periods(Qn::TimePeriodContent type) const
-{
-    return m_periods[type];
+    NX_ASSERT(false, "Not implemented. Method cannot be pure virtual as class is used in QML");
+    return QnTimePeriodList();
 }
 
 } // namespace nx::vms::client::core

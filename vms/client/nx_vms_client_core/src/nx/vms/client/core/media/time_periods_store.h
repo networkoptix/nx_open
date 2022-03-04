@@ -22,15 +22,11 @@ public:
     TimePeriodsStore(QObject* parent = nullptr);
 
     bool hasPeriods(Qn::TimePeriodContent type) const;
-    void setPeriods(Qn::TimePeriodContent type, const QnTimePeriodList& periods);
-    QnTimePeriodList periods(Qn::TimePeriodContent type) const;
+    virtual const QnTimePeriodList& periods(Qn::TimePeriodContent type) const;
 
 signals:
     void periodsUpdated(Qn::TimePeriodContent type);
 
-private:
-    using Periods = QHash<Qn::TimePeriodContent, QnTimePeriodList>;
-    Periods m_periods;
 };
 
 } // namespace nx::vms::client::core

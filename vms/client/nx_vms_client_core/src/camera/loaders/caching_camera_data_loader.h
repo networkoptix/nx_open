@@ -9,7 +9,6 @@
 #include <QtCore/QObject>
 
 #include <analytics/db/analytics_db_types.h>
-#include <camera/data/time_period_camera_data.h>
 #include <camera/loaders/camera_data_loader_fwd.h>
 #include <common/common_globals.h>
 #include <core/resource/camera_bookmark_fwd.h>
@@ -43,7 +42,7 @@ public:
     /** Limit chunks loading to only main or backup storage - or allow both (default). */
     void setStorageLocation(nx::vms::api::StorageLocation value);
 
-    QnTimePeriodList periods(Qn::TimePeriodContent periodType) const;
+    const QnTimePeriodList& periods(Qn::TimePeriodContent periodType) const;
 
     void load(bool forced = false);
 
@@ -66,12 +65,6 @@ public slots:
     void discardCachedDataType(Qn::TimePeriodContent type);
     void invalidateCachedData();
 
-private slots:
-    void at_loader_ready(
-        const QnAbstractCameraDataPtr& timePeriods,
-        qint64 startTimeMs,
-        Qn::TimePeriodContent dataType);
-
 protected:
     bool loadInternal(Qn::TimePeriodContent periodType);
 
@@ -84,10 +77,9 @@ private:
     AllowedContent m_allowedContent;
 
     const QnMediaResourcePtr m_resource;
+    QnMediaServerResourcePtr m_server;
 
     QElapsedTimer m_previousRequestTime[Qn::TimePeriodContentCount];
-
-    QnTimePeriodList m_cameraChunks[Qn::TimePeriodContentCount];
 
     std::array<QnAbstractCameraDataLoaderPtr, Qn::TimePeriodContentCount> m_loaders;
 
