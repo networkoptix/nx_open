@@ -5,8 +5,6 @@
 #include <analytics/db/analytics_db_types.h>
 #include <api/helpers/chunks_request_data.h>
 #include <api/server_rest_connection.h>
-#include <camera/data/abstract_camera_data.h>
-#include <camera/data/time_period_camera_data.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -18,9 +16,6 @@
 #include <utils/common/synctime.h>
 
 namespace {
-
-/** Fake handle for simultaneous load request. Initial value is big enough to not conflict with real request handles. */
-QAtomicInt qn_fakeHandle(INT_MAX / 2);
 
 /** Minimum time (in milliseconds) for overlapping time periods requests.  */
 const int minOverlapDuration = 120 * 1000;
@@ -69,7 +64,7 @@ QnFlatCameraDataLoader::~QnFlatCameraDataLoader()
 {
 }
 
-int QnFlatCameraDataLoader::load(const QString &filter, const qint64 resolutionMs)
+void QnFlatCameraDataLoader::load(const QString &filter, const qint64 resolutionMs)
 {
     if (filter != m_filter)
     {
@@ -79,19 +74,17 @@ int QnFlatCameraDataLoader::load(const QString &filter, const qint64 resolutionM
     m_filter = filter;
 
     /* Check whether data is currently being loaded. */
-    if (m_loading.handle > 0)
+    if (m_loading.startTimeMs > 0)
     {
         NX_VERBOSE(this, "Data is already being loaded");
-        auto handle = qn_fakeHandle.fetchAndAddAcquire(1);
-        m_loading.waitingHandles << handle;
-        return handle;
+        return;
     }
 
     /* We need to load all data after the already loaded piece, assuming there were no periods before already loaded. */
     qint64 startTimeMs = 0;
-    if (m_loadedData && !m_loadedData->dataSource().isEmpty())
+    if (!m_loadedData.empty())
     {
-        const auto last = (m_loadedData->dataSource().cend() - 1);
+        const auto last = (m_loadedData.cend() - 1);
         if (last->isInfinite())
             startTimeMs = last->startTimeMs;
         else
@@ -103,21 +96,18 @@ int QnFlatCameraDataLoader::load(const QString &filter, const qint64 resolutionM
             startTimeMs = currentSystemTime - minOverlapDuration;
     }
 
-    m_loading.clear(); /* Just in case. */
     m_loading.startTimeMs = startTimeMs;
-    m_loading.handle = sendRequest(startTimeMs, resolutionMs);
-    NX_VERBOSE(this, "Loading period since %1 (%2), request %3, filter %4",
+    sendRequest(startTimeMs, resolutionMs);
+    NX_VERBOSE(this, "Loading period since %1 (%2), filter %3",
         startTimeMs,
         nx::utils::timestampToDebugString(startTimeMs),
-        m_loading.handle,
         filterRepresentation(m_filter, m_dataType));
-    return m_loading.handle;
 }
 
 void QnFlatCameraDataLoader::discardCachedData(const qint64 /*resolutionMs*/)
 {
     NX_VERBOSE(this, "Discarding cached data");
-    m_loading.clear();
+    m_loading = LoadingInfo();
     m_loadedData.clear();
 }
 
@@ -159,18 +149,18 @@ void QnFlatCameraDataLoader::at_timePeriodsReceived(bool success,
         NX_VERBOSE(this, "Received\n%1", periodsLogString(period.periods));
     }
 
-    QnAbstractCameraDataPtr data(new QnTimePeriodCameraData(QnTimePeriodList::mergeTimePeriods(rawPeriods)));
+    QnTimePeriodList periods(QnTimePeriodList::mergeTimePeriods(rawPeriods));
 
-    NX_VERBOSE(this, "Merged\n%1", periodsLogString(data->dataSource()));
+    NX_VERBOSE(this, "Merged\n%1", periodsLogString(periods));
 
-    handleDataLoaded(success, requestHandle, data);
+    handleDataLoaded(success, std::move(periods), requestHandle);
 }
 
-void QnFlatCameraDataLoader::handleDataLoaded(bool success, int requestHandle, const QnAbstractCameraDataPtr &data)
+void QnFlatCameraDataLoader::handleDataLoaded(
+    bool success,
+    QnTimePeriodList&& periods,
+    int requestHandle)
 {
-    if (m_loading.handle != requestHandle)
-        return;
-
     NX_VERBOSE(this, "Loaded data for %1 (%2), actual filter %3",
         m_loading.startTimeMs,
         nx::utils::timestampToDebugString(m_loading.startTimeMs),
@@ -179,54 +169,27 @@ void QnFlatCameraDataLoader::handleDataLoaded(bool success, int requestHandle, c
     if (!success)
     {
         NX_VERBOSE(this, "Load Failed");
-        for(auto handle: m_loading.waitingHandles)
-            emit failed(handle);
         emit failed(requestHandle);
-        m_loading.clear();
+        m_loading = LoadingInfo();
         return;
     }
 
-    QnTimePeriod loadedPeriod(m_loading.startTimeMs, QnTimePeriod::kInfiniteDuration);
-
-    if (data)
+    if (m_loadedData.empty())
     {
-        if (!m_loadedData)
-        {
-            m_loadedData = data;
-            NX_VERBOSE(this, "First dataset received, size %1", data->dataSource().size());
-        }
-        else if (!data->isEmpty())
-        {
-            NX_VERBOSE(this, "New dataset received (size %1), merging with existing (size %2).",
-                data->dataSource().size(),
-                m_loadedData->dataSource().size());
-
-            m_loadedData->update(data, loadedPeriod);
-
-            NX_VERBOSE(this, "Merging finished, size %1.", m_loadedData->dataSource().size());
-            NX_VERBOSE(this,
-                "Updated\n%1",
-                periodsLogString(m_loadedData->dataSource(), data->dataSource().size() + 1));
-        }
+        m_loadedData = periods;
+        NX_VERBOSE(this, "First dataset received, size %1", periods.size());
     }
-    else
+    else if (!periods.empty())
     {
-        NX_VERBOSE(this, "Empty data received");
+        NX_VERBOSE(this,
+            "New dataset received (size %1), merging with existing (size %2).",
+            periods.size(),
+            m_loadedData.size());
+
+        QnTimePeriodList::overwriteTail(m_loadedData, periods, m_loading.startTimeMs);
+        NX_VERBOSE(this, "Merging finished, size %1.", m_loadedData.size());
     }
 
-    for(auto handle: m_loading.waitingHandles)
-        emit ready(m_loadedData, loadedPeriod, handle);
-    emit ready(m_loadedData, loadedPeriod, requestHandle);
-    m_loading.clear();
-}
-
-QnFlatCameraDataLoader::LoadingInfo::LoadingInfo():
-    handle(0),
-    startTimeMs(0)
-{}
-
-void QnFlatCameraDataLoader::LoadingInfo::clear() {
-    handle = 0;
-    startTimeMs = 0;
-    waitingHandles.clear();
+    emit ready(m_loading.startTimeMs);
+    m_loading = LoadingInfo();
 }

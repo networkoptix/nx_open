@@ -10,7 +10,6 @@
 #include <QtCore/QObject>
 
 #include <analytics/db/analytics_db_types.h>
-#include <camera/data/time_period_camera_data.h>
 #include <camera/loaders/camera_data_loader_fwd.h>
 #include <common/common_globals.h>
 #include <core/resource/camera_bookmark_fwd.h>
@@ -41,7 +40,7 @@ public:
     const AnalyticsFilter& analyticsFilter() const;
     void setAnalyticsFilter(const AnalyticsFilter& value);
 
-    QnTimePeriodList periods(Qn::TimePeriodContent periodType) const;
+    const QnTimePeriodList& periods(Qn::TimePeriodContent periodType) const;
 
     void load(bool forced = false);
 
@@ -64,12 +63,6 @@ public slots:
     void discardCachedDataType(Qn::TimePeriodContent type);
     void invalidateCachedData();
 
-private slots:
-    void at_loader_ready(
-        const QnAbstractCameraDataPtr& timePeriods,
-        qint64 startTimeMs,
-        Qn::TimePeriodContent dataType);
-
 protected:
     bool loadInternal(Qn::TimePeriodContent periodType);
 
@@ -84,8 +77,6 @@ private:
     const QnMediaResourcePtr m_resource;
 
     QElapsedTimer m_previousRequestTime[Qn::TimePeriodContentCount];
-
-    QnTimePeriodList m_cameraChunks[Qn::TimePeriodContentCount];
 
     std::array<QnAbstractCameraDataLoaderPtr, Qn::TimePeriodContentCount> m_loaders;
 

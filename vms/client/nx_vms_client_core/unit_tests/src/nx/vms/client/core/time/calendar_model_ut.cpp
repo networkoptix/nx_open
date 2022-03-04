@@ -257,13 +257,31 @@ enum ChunkDuration
     milliseconds = 2
 };
 
+class TimePeriodsStoreMock: public TimePeriodsStore
+{
+public:
+    virtual const QnTimePeriodList& periods(Qn::TimePeriodContent type) const override
+    {
+        return m_periods[type];
+    }
+
+    void setPeriods(Qn::TimePeriodContent type, QnTimePeriodList value)
+    {
+        m_periods[type] = std::move(value);
+        emit periodsUpdated(type);
+    }
+
+private:
+    std::array<QnTimePeriodList, Qn::TimePeriodContentCount> m_periods;
+};
+
 struct ChunkHighlightTestFixture: public HighlightTestFixture
 {
     using base_type = HighlightTestFixture;
 
     virtual void SetUp() override;
     void setSingleRecordingPeriod(qint64 position, qint64 duration);
-    TimePeriodsStore periodsStore;
+    TimePeriodsStoreMock periodsStore;
 };
 
 void ChunkHighlightTestFixture::SetUp()

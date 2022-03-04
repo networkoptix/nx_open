@@ -1,19 +1,14 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#ifndef __QN_ABSTRACT_CAMERA_DATA_LOADER_H__
-#define __QN_ABSTRACT_CAMERA_DATA_LOADER_H__
+#pragma once
 
+#include <QtCore/QList>
 #include <QtCore/QObject>
 #include <QtGui/QRegion>
-#include <QtCore/QList>
-
-#include <camera/data/camera_data_fwd.h>
 
 #include <common/common_globals.h>
-
 #include <core/resource/resource_fwd.h>
-
-struct QnTimePeriod;
+#include <recording/time_period_list.h>
 
 /** Base class for loading custom camera archive-related data. */
 class QnAbstractCameraDataLoader: public QObject
@@ -26,14 +21,18 @@ public:
     /**
      * \param filter                    Custom data filter.
      * \param resolutionMs              Minimal length of the data period that should be loaded, in milliseconds.
-     * \returns                         Request handle.
      */
-    virtual int load(const QString &filter = QString(), const qint64 resolutionMs = 1) = 0;
+    virtual void load(const QString& filter = QString(), const qint64 resolutionMs = 1) = 0;
 
     /**
      * \returns                         Resource that this loader works with (camera or archive).
      */
     QnResourcePtr resource() const;
+
+    /**
+     * Loaded time periods.
+     */
+    const QnTimePeriodList& periods() const;
 
     /**
      * Discards cached data, if any.
@@ -49,13 +48,11 @@ public:
 
 signals:
     /**
-     * This signal is emitted whenever motion periods were successfully loaded.
+     * Emitted whenever motion periods were successfully loaded.
      *
-     * \param data                      Full data loaded.
-     * \param updatedPeriod             Source time period for the updated piece of data.
-     * \param handle                    Request handle.
+     * @param startTimeMs Start of the time period for the updated piece of data.
      */
-    void ready(const QnAbstractCameraDataPtr &data, const QnTimePeriod &updatedPeriod, int handle);
+    void ready(qint64 startTimeMs);
 
     /**
      * This signal is emitted whenever the reader was unable to load motion periods.
@@ -70,10 +67,8 @@ protected:
 
     const Qn::TimePeriodContent m_dataType;
 
-signals:
-    void delayedReady(const QnAbstractCameraDataPtr &data, const QnTimePeriod &updatedPeriod, int handle);
+    /** Loaded data. */
+    QnTimePeriodList m_loadedData;
 };
 
-typedef QSharedPointer<QnAbstractCameraDataLoader> QnAbstractCameraDataLoaderPtr;
-
-#endif // __QN_ABSTRACT_CAMERA_DATA_LOADER_H__
+using QnAbstractCameraDataLoaderPtr = QSharedPointer<QnAbstractCameraDataLoader>;

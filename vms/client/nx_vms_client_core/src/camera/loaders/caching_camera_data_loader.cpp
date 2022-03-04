@@ -89,20 +89,18 @@ void QnCachingCameraDataLoader::initLoaders() {
 
         m_loaders[i].reset(loader);
 
-        if (loader) {
+        if (loader)
+        {
             connect(loader, &QnAbstractCameraDataLoader::ready, this,
                 [this, dataType]
-                (const QnAbstractCameraDataPtr &data,
-                    const QnTimePeriod &updatedPeriod, int handle)
+                (qint64 startTimeMs)
                 {
-                    NX_VERBOSE(this, "Handling %1 reply %2 for period %3 (%4)",
+                    NX_VERBOSE(this, "Handling %1 reply for period %2 (%3)",
                         dataType,
-                        handle,
-                        updatedPeriod.startTimeMs,
-                        nx::utils::timestampToDebugString(updatedPeriod.startTimeMs));
+                        startTimeMs,
+                        nx::utils::timestampToDebugString(startTimeMs));
 
-                    NX_ASSERT(updatedPeriod.isInfinite(), "We are always loading till very end.");
-                    at_loader_ready(data, updatedPeriod.startTimeMs, dataType);
+                    emit periodsChanged(dataType, startTimeMs);
                 });
 
             connect(loader, &QnAbstractCameraDataLoader::failed, this,
@@ -193,8 +191,13 @@ void QnCachingCameraDataLoader::setAnalyticsFilter(const AnalyticsFilter& value)
     discardCachedDataType(Qn::AnalyticsContent);
 }
 
-QnTimePeriodList QnCachingCameraDataLoader::periods(Qn::TimePeriodContent timePeriodType) const {
-    return m_cameraChunks[timePeriodType];
+const QnTimePeriodList& QnCachingCameraDataLoader::periods(
+    Qn::TimePeriodContent timePeriodType) const
+{
+    if (auto loader = m_loaders[timePeriodType])
+        return loader->periods();
+
+    return {};
 }
 
 bool QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType)
@@ -208,13 +211,12 @@ bool QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType)
         return false;
     }
 
-    int handle = 0;
     switch (periodType)
     {
         case Qn::RecordingContent:
         {
-            handle = loader->load();
-            break;
+            loader->load();
+            return true;
         }
 
         case Qn::MotionContent:
@@ -228,8 +230,8 @@ bool QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType)
                 ? QString() //< Treat empty selection as whole area selection.
                 : QJson::serialized(m_motionSelection);
 
-            handle = loader->load(filter);
-            break;
+            loader->load(filter);
+            return true;
         }
 
         case Qn::AnalyticsContent:
@@ -237,8 +239,8 @@ bool QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType)
             // Minimum required value to provide continuous display on the timeline.
             const qint64 analyticsDetailLevelMs = 1000;
             const auto filter = QString::fromUtf8(QJson::serialized(m_analyticsFilter));
-            handle = loader->load(filter, analyticsDetailLevelMs);
-            break;
+            loader->load(filter, analyticsDetailLevelMs);
+            return true;
         }
 
         default:
@@ -247,32 +249,12 @@ bool QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType)
             break;
         }
     }
-
-    if (handle <= 0)
-        NX_VERBOSE(this, "Loading of %1 failed", periodType);
-
-    return handle > 0;
+    return false;
 }
 
 // -------------------------------------------------------------------------- //
 // Handlers
 // -------------------------------------------------------------------------- //
-void QnCachingCameraDataLoader::at_loader_ready(
-    const QnAbstractCameraDataPtr& data,
-    qint64 startTimeMs,
-    Qn::TimePeriodContent dataType)
-{
-    m_cameraChunks[dataType] = data
-        ? data->dataSource()
-        : QnTimePeriodList();
-    NX_VERBOSE(this, "Received %1 chunks update. Total size: %2 for period %3 (%4)",
-        dataType,
-        m_cameraChunks[dataType].size(),
-        startTimeMs,
-        nx::utils::timestampToDebugString(startTimeMs));
-    emit periodsChanged(dataType, startTimeMs);
-}
-
 void QnCachingCameraDataLoader::invalidateCachedData()
 {
     NX_VERBOSE(this, "Mark local cache as dirty");
@@ -287,7 +269,6 @@ void QnCachingCameraDataLoader::discardCachedDataType(Qn::TimePeriodContent type
     if (auto loader = m_loaders[type])
         loader->discardCachedData();
 
-    m_cameraChunks[type].clear();
     if (isContentAllowed(type))
     {
         updateTimePeriods(type, true);

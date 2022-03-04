@@ -28,6 +28,7 @@ public:
     QnUuid resourceId() const;
     void setResourceId(const QnUuid& id);
 
+    virtual const QnTimePeriodList& periods(Qn::TimePeriodContent type) const override;
     qint64 bottomBound() const;
 
     QString motionFilter() const;
