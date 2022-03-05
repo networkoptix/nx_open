@@ -16,10 +16,13 @@
 #include <nx/vms/rules/event_fields/customizable_text_field.h>
 #include <nx/vms/rules/event_fields/expected_string_field.h>
 #include <nx/vms/rules/event_fields/expected_uuid_field.h>
+#include <nx/vms/rules/event_fields/int_field.h>
 #include <nx/vms/rules/event_fields/keywords_field.h>
 #include <nx/vms/rules/event_fields/source_camera_field.h>
 #include <nx/vms/rules/event_fields/source_server_field.h>
 #include <nx/vms/rules/event_fields/source_user_field.h>
+#include <nx/vms/rules/event_fields/text_field.h>
+#include <nx/vms/rules/events/debug_event.h>
 #include <nx/vms/rules/events/device_disconnected_event.h>
 #include <nx/vms/rules/events/device_ip_conflict_event.h>
 #include <nx/vms/rules/events/generic_event.h>
@@ -45,6 +48,7 @@ void Initializer::registerEvents() const
 {
     // Register built-in events.
     registerEvent<DeviceIpConflictEvent>();
+    registerEvent<DebugEvent>();
     registerEvent<StorageIssueEvent>();
     registerEvent<DeviceDisconnectedEvent>();
     registerEvent<LicenseIssueEvent>();
@@ -68,17 +72,19 @@ void Initializer::registerFields() const
     registerEventField<AnalyticsObjectTypeField>();
     registerEventField<CustomizableIconField>();
     registerEventField<CustomizableTextField>();
+    registerEventField<EventTextField>();
     registerEventField<ExpectedStringField>();
     registerEventField<ExpectedUuidField>();
+    registerEventField<IntField>();
     registerEventField<KeywordsField>();
     registerEventField<SourceCameraField>();
     registerEventField<SourceServerField>();
     registerEventField<SourceUserField>();
 
+    registerActionField<ActionTextField>();
     registerActionField<FlagField>();
     registerActionField<OptionalTimeField>();
     registerActionField<TargetUserField>();
-    registerActionField<TextField>();
     registerActionField<TextWithFields>();
     registerActionField<Substitution>();
 }

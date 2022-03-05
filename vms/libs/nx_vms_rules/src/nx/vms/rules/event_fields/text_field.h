@@ -7,15 +7,15 @@
 namespace nx::vms::rules {
 
 /** Store simple text string w/o validation. Email list or comment. */
-class NX_VMS_RULES_API ActionTextField: public SimpleTypeActionField<QString>
+class NX_VMS_RULES_API EventTextField: public SimpleTypeEventField<QString>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.actions.fields.text")
+    Q_CLASSINFO("metatype", "nx.events.fields.text")
 
     Q_PROPERTY(QString value READ value WRITE setValue)
 
 public:
-    ActionTextField() = default;
+    EventTextField() = default;
 };
 
 } // namespace nx::vms::rules

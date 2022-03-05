@@ -2,12 +2,12 @@
 
 #pragma once
 
-#include "simple_type_field.h"
+#include "../simple_type_field.h"
 
 namespace nx::vms::rules {
 
 /** Stores boolean flag. Typically displayed as a checkbox. */
-class NX_VMS_RULES_API FlagField: public SimpleTypeField<bool>
+class NX_VMS_RULES_API FlagField: public SimpleTypeActionField<bool>
 {
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.actions.fields.flag")
