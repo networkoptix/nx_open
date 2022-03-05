@@ -34,10 +34,6 @@
 #include <QtQuickControls2/QQuickStyle>
 #include <QtWidgets/QApplication>
 
-#if defined(Q_OS_WIN)
-    #include <QtPlatformHeaders/QWindowsWindowFunctions>
-#endif
-
 #include <client/client_module.h>
 #include <client/client_runtime_settings.h>
 #include <client/client_settings.h>
@@ -83,6 +79,10 @@
 
 #if defined(Q_OS_MACOS)
     #include <ui/workaround/mac_utils.h>
+#endif
+
+#if defined(Q_OS_WIN)
+    #include <QtGui/qpa/qplatformwindow_p.h>
 #endif
 
 namespace {
@@ -294,7 +294,11 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
 
     #if defined(Q_OS_WIN)
         if (qnRuntime->isVideoWallMode())
-            QWindowsWindowFunctions::setHasBorderInFullScreen(mainWindow->windowHandle(), true);
+        {
+            mainWindow->windowHandle()
+                ->nativeInterface<QNativeInterface::Private::QWindowsWindow>()
+                ->setHasBorderInFullScreen(true);
+        }
     #endif
 
     mainWindow->show();
