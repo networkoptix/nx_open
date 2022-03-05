@@ -10,6 +10,7 @@
 #include <nx/vms/rules/event_fields/customizable_text_field.h>
 #include <nx/vms/rules/event_fields/expected_string_field.h>
 #include <nx/vms/rules/event_fields/keywords_field.h>
+#include <nx/vms/rules/event_fields/text_field.h>
 
 namespace nx::vms::client::desktop::rules {
 
@@ -66,13 +67,19 @@ private:
     }
 
     template<typename T>
-    QString text();
+    QString text() const
+    {
+        return field->value();
+    }
 
     template<typename T>
-    void setText(const QString& text);
+    void setText(const QString& text)
+    {
+        field->setValue(text);
+    }
 
     template<>
-    QString text<vms::rules::CustomizableTextField>()
+    QString text<vms::rules::CustomizableTextField>() const
     {
         return field->text();
     }
@@ -84,7 +91,7 @@ private:
     }
 
     template<>
-    QString text<vms::rules::ExpectedStringField>()
+    QString text<vms::rules::ExpectedStringField>() const
     {
         return field->expected();
     }
@@ -96,7 +103,7 @@ private:
     }
 
     template<>
-    QString text<vms::rules::KeywordsField>()
+    QString text<vms::rules::KeywordsField>() const
     {
         return field->string();
     }
@@ -105,18 +112,6 @@ private:
     void setText<vms::rules::KeywordsField>(const QString& text)
     {
         field->setString(text);
-    }
-
-    template<>
-    QString text<vms::rules::TextField>()
-    {
-        return field->value();
-    }
-
-    template<>
-    void setText<vms::rules::TextField>(const QString& text)
-    {
-        field->setValue(text);
     }
 };
 

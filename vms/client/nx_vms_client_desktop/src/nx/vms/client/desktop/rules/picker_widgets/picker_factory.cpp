@@ -14,6 +14,7 @@
 #include <nx/vms/rules/event_fields/customizable_text_field.h>
 #include <nx/vms/rules/event_fields/expected_string_field.h>
 #include <nx/vms/rules/event_fields/expected_uuid_field.h>
+#include <nx/vms/rules/event_fields/int_field.h>
 #include <nx/vms/rules/event_fields/keywords_field.h>
 #include <nx/vms/rules/event_fields/source_camera_field.h>
 #include <nx/vms/rules/event_fields/source_server_field.h>
@@ -22,6 +23,7 @@
 #include "blank_picker_widget.h"
 #include "oneline_text_picker_widget.h"
 #include "multiline_text_picker_widget.h"
+#include "number_picker_widget.h"
 #include "state_picker_widget.h"
 #include "source_picker_widget.h"
 
@@ -41,8 +43,10 @@ PickerWidget* PickerFactory::createWidget(
         pickerWidget = new OnelineTextPickerWidget<nx::vms::rules::ExpectedStringField>(parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::KeywordsField>())
         pickerWidget = new OnelineTextPickerWidget<nx::vms::rules::KeywordsField>(parent);
-    else if (descriptor.id == fieldMetatype<nx::vms::rules::TextField>())
-        pickerWidget = new OnelineTextPickerWidget<nx::vms::rules::TextField>(parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::ActionTextField>())
+        pickerWidget = new OnelineTextPickerWidget<nx::vms::rules::ActionTextField>(parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::EventTextField>())
+        pickerWidget = new OnelineTextPickerWidget<nx::vms::rules::EventTextField>(parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::TextWithFields>())
         pickerWidget = new MultilineTextPickerWidget<nx::vms::rules::TextWithFields>(parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::FlagField>())
@@ -53,6 +57,8 @@ PickerWidget* PickerFactory::createWidget(
         pickerWidget = new SourcePickerWidget<nx::vms::rules::SourceServerField>(parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::SourceUserField>())
         pickerWidget = new SourcePickerWidget<nx::vms::rules::SourceUserField>(parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::IntField>())
+        pickerWidget = new NumberPickerWidget<nx::vms::rules::IntField>(parent);
     else
         pickerWidget = new BlankPickerWidget(parent);
 

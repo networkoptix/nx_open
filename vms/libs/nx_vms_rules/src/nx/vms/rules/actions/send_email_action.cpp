@@ -18,7 +18,7 @@ const ItemDescriptor& SendEmailAction::manifest()
         .fields = {
             makeFieldDescriptor<TargetUserField>("users", tr("to")),
             makeFieldDescriptor<OptionalTimeField>("interval", tr("Interval of action")),
-            makeFieldDescriptor<TextField>("emails", tr("Additional recipients")),
+            makeFieldDescriptor<ActionTextField>("emails", tr("Additional recipients")),
             makeFieldDescriptor<TextWithFields>(
                 "caption",
                 tr("Caption"),

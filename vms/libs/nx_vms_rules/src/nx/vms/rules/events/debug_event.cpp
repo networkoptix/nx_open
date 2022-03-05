@@ -2,11 +2,28 @@
 
 #include "debug_event.h"
 
+#include "../event_fields/int_field.h"
+#include "../event_fields/text_field.h"
+
 namespace nx::vms::rules {
 
 FilterManifest DebugEvent::filterManifest()
 {
     return {};
+}
+
+const ItemDescriptor& DebugEvent::manifest()
+{
+    static const auto kDescriptor = ItemDescriptor{
+        .id = "nx.events.debug",
+        .displayName = tr("Debug Event"),
+        .description = "",
+        .fields = {
+            makeFieldDescriptor<EventTextField>("action", tr("Action")),
+            makeFieldDescriptor<IntField>("value", tr("Value"))
+        }
+    };
+    return kDescriptor;
 }
 
 } // namespace nx::vms::rules
