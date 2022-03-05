@@ -15,7 +15,6 @@ endif()
 if(withDesktopClient)
     if(WINDOWS)
         add_subdirectory(detours)
-        add_subdirectory(stackwalker)
     endif()
 
     add_subdirectory(qthttpserver)

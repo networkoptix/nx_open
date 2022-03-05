@@ -156,7 +156,6 @@ target_include_directories(nx_vms_client_desktop
 
 if(WINDOWS)
     add_dependencies(nx_vms_client_desktop nov_file_launcher)
-    target_link_libraries(nx_vms_client_desktop PUBLIC nx_gdi_tracer)
 endif()
 
 target_include_directories(nx_vms_client_desktop

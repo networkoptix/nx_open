@@ -101,12 +101,6 @@ struct Ini: nx::kit::IniConfig
     NX_INI_STRING("", dumpGeneratedIconsTo,
         "[Dev] Dump icons, generated from svg, to a given folder.");
 
-    NX_INI_FLAG(false, enableGdiTrace,
-        "[Dev] Enable tracing of GDI object allocation.");
-
-    NX_INI_INT(5000, gdiTraceLimit,
-        "[Dev] Number of GDI handles in use which triggers report creation.");
-
     NX_INI_FLAG(false, alwaysShowGetUpdateFileButton,
         "[Dev] Always show Get Update File button.");
 
