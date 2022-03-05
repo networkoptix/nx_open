@@ -18,7 +18,3 @@ add_subdirectory(nx_zip)
 if(withMediaServer OR withDesktopClient OR openSourceBuild)
     add_subdirectory(nx_monitoring)
 endif()
-
-if(WINDOWS)
-    add_subdirectory(nx_gdi_tracer)
-endif()

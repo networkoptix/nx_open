@@ -95,8 +95,6 @@
 
 #include <nx/vms/client/desktop/ini.h>
 #if defined(Q_OS_WIN)
-    #include <nx/gdi_tracer/gdi_handle_tracer.h>
-    #include <nx/vms/client/desktop/debug_utils/instruments/widget_profiler.h>
     #include <QtPlatformHeaders/QWindowsWindowFunctions>
 #endif
 
@@ -335,45 +333,9 @@ int runApplicationInternal(QApplication* application, const QnStartupParameters&
 
     context->handleStartupParameters(startupParams);
 
-    #if defined(Q_OS_WIN)
-        if (ini().enableGdiTrace)
-        {
-            const auto traceLimitCallback =
-                []()
-                {
-                    const auto reportFileName = lit("/log/gdi_handles_report_%1.txt")
-                        .arg(QDateTime::currentDateTime().toString("dd.MM.yyyy_hh.mm.ss"));
-
-                    const auto reportPathString =
-                        QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation)
-                        + reportFileName;
-
-                    QFile reportFile(reportPathString);
-                    if (reportFile.open(QFile::WriteOnly | QFile::Truncate))
-                    {
-                        const auto gdiTracer = gdi_tracer::GdiHandleTracer::getInstance();
-                        QTextStream textStream(&reportFile);
-                        textStream.setCodec("UTF-8");
-                        textStream << QString::fromStdString(gdiTracer->getReport());
-                        textStream << WidgetProfiler::getWidgetHierarchy();
-                    }
-                };
-
-            auto gdiTracer = gdi_tracer::GdiHandleTracer::getInstance();
-            gdiTracer->setGdiTraceLimit(ini().gdiTraceLimit);
-            gdiTracer->setGdiTraceLimitCallback(traceLimitCallback);
-            gdiTracer->attachGdiDetours();
-        }
-    #endif
-
     int result = application->exec();
 
     client.clientStateHandler()->unregisterDelegate(kWindowGeometryData);
-
-    #if defined(Q_OS_WIN)
-        if (ini().enableGdiTrace)
-            gdi_tracer::GdiHandleTracer::getInstance()->detachGdiDetours();
-    #endif
 
     /* Write out settings. */
     qnSettings->setAudioVolume(nx::audio::AudioDevice::instance()->volume());
