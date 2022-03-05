@@ -9903,7 +9903,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
-      <translation type="unfinished">You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</translation>
+      <translation>%1 に接続しようとしましたが、自動的に検証できない証明書がサーバーによって提示されました。</translation>
     </message>
   </context>
   <context>

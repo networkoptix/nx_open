@@ -10833,18 +10833,18 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Multiple</source>
-      <translation type="unfinished">Multiple</translation>
+      <translation>Meerdere</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::joystick::JoystickButtonSettingsModel</name>
     <message>
       <source>Select Layout...</source>
-      <translation type="unfinished">Select Layout...</translation>
+      <translation>Selecteer schermindeling...</translation>
     </message>
     <message>
       <source>Button</source>
-      <translation type="unfinished">Button</translation>
+      <translation>Knop</translation>
     </message>
     <message>
       <source>Selected Layout</source>
@@ -11549,11 +11549,11 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot check for update.</source>
-      <translation type="unfinished">Cannot check for update.</translation>
+      <translation>Kan niet controleren op updates.</translation>
     </message>
     <message>
       <source>Client update package is broken.</source>
-      <translation type="unfinished">Client update package is broken.</translation>
+      <translation>Client-updatepakket werkt niet.</translation>
     </message>
     <message>
       <source>Client update package is missing for current platform.</source>

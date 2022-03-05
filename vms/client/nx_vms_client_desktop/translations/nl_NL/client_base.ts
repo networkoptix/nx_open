@@ -3699,7 +3699,7 @@ to %1</source>
     </message>
     <message>
       <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
-      <translation type="unfinished">You do not have a valid license installed. Please activate your commercial or trial license.</translation>
+      <translation>U heeft geen geldige licentie geïnstalleerd. Activeer uw commerciële of proeflicentie.</translation>
     </message>
   </context>
   <context>
@@ -4783,21 +4783,21 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Certificates</source>
-      <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
+      <translation>
+        <numerusform>Certificaten</numerusform>
+        <numerusform>Certificaten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
-      <translation type="unfinished">
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
+      <translation>
+        <numerusform>Server gebruikt deze %n SSL-certificaten om diens identiteit te verifiëren</numerusform>
+        <numerusform>Server gebruikt deze %n SSL-certificaten om diens identiteit te verifiëren</numerusform>
       </translation>
     </message>
     <message>
       <source>Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</source>
-      <translation type="unfinished">Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</translation>
+      <translation>Het certificaat van de server komt niet overeen met het certificaat dat aan deze server is toegewezen.</translation>
     </message>
     <message>
       <source>Details</source>
@@ -5057,15 +5057,15 @@ to %1</source>
     </message>
     <message>
       <source>ARCHIVE ENCRYPTED</source>
-      <translation type="unfinished">ARCHIVE ENCRYPTED</translation>
+      <translation>ARCHIEF VERSLEUTELD</translation>
     </message>
     <message>
       <source>Ask your system administrator to enter the encryption password to decrypt this archive</source>
-      <translation type="unfinished">Ask your system administrator to enter the encryption password to decrypt this archive</translation>
+      <translation>Vraag uw systeembeheerder om het wachtwoord voor het versleutelen in te voeren om dit archief te decoderen</translation>
     </message>
     <message>
       <source>Unlock</source>
-      <translation type="unfinished">Unlock</translation>
+      <translation>Ontgrendelen</translation>
     </message>
   </context>
   <context>
@@ -5339,7 +5339,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Storage is available but will not be writable because it is too small in comparison to the already present storages</source>
-      <translation type="unfinished">Storage is available but will not be writable because it is too small in comparison to the already present storages</translation>
+      <translation>Opslag is beschikbaar, maar kan niet worden gebruikt, omdat het te klein is in vergelijking met de al aanwezige opslag</translation>
     </message>
   </context>
   <context>
@@ -5523,7 +5523,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Backup storage is not configured</source>
-      <translation type="unfinished">Backup storage is not configured</translation>
+      <translation>Back-upopslag is niet geconfigureerd</translation>
     </message>
     <message>
       <source>Camera recording schedule is invalid</source>
@@ -5724,7 +5724,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>To enable digest authentication password reset is required</source>
-      <translation type="unfinished">To enable digest authentication password reset is required</translation>
+      <translation>Om de digest-verificatie in te schakelen, is het opnieuw instellen van het wachtwoord vereist</translation>
     </message>
   </context>
   <context>
@@ -5844,11 +5844,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Allow digest authentication for this user</source>
-      <translation type="unfinished">Allow digest authentication for this user</translation>
+      <translation>Sta digest-authenticatie toe voor deze gebruiker</translation>
     </message>
     <message>
       <source>Learn More</source>
-      <translation type="unfinished">Learn More</translation>
+      <translation>Meer informatie</translation>
     </message>
   </context>
   <context>
@@ -5923,11 +5923,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Password reset is required</source>
-      <translation type="unfinished">Password reset is required</translation>
+      <translation>Wachtwoord reset is vereist</translation>
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed.</source>
-      <translation type="unfinished">Only letters, numbers and symbols %1 are allowed.</translation>
+      <translation>Alleen letters, cijfers en symbolen %1 zijn toegestaan.</translation>
     </message>
   </context>
   <context>
@@ -6143,7 +6143,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Could not open file &apos;%1&apos;. Please check if the folder is accessible</source>
-      <translation type="unfinished">Could not open file &apos;%1&apos;. Please check if the folder is accessible</translation>
+      <translation>Bestand &apos;%1&apos; kon niet worden geopend. Controleer of de map toegankelijk is</translation>
     </message>
   </context>
   <context>
@@ -6634,11 +6634,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Merge this group with %1?</source>
-      <translation type="unfinished">Merge this group with %1?</translation>
+      <translation>Deze groep samenvoegen met %1?</translation>
     </message>
     <message>
       <source>Two groups with the same name cannot exist.</source>
-      <translation type="unfinished">Two groups with the same name cannot exist.</translation>
+      <translation>Er mogen geen twee groepen met dezelfde naam bestaan.</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -6646,19 +6646,19 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</translation>
+      <translation>Je bent bezig met het verplaatsen van deze webpagina's naar server &quot;%1&quot;. Deze webpagina's proxien alle gevraagde inhoud, en hun proxyserver verandert naar server &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>You are about to move this webpage to server &quot;%1&quot;. This webpage proxies all requested contents, and its proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">You are about to move this webpage to server &quot;%1&quot;. This webpage proxies all requested contents, and its proxy server will change to server &quot;%1&quot;.</translation>
+      <translation>Je bent bezig met het verplaatsen van deze webpagina naar server &quot;%1&quot;. Deze webpagina proxied alle gevraagde inhoud, en de proxyserver verandert naar server &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</translation>
+      <translation>Door alle inhoud te proxien, wordt elke service of elk apparaat op het server-netwerk blootgesteld aan de gebruikers van deze webpagina.</translation>
     </message>
     <message>
       <source>Move anyway?</source>
-      <translation type="unfinished">Move anyway?</translation>
+      <translation>Toch verplaatsen?</translation>
     </message>
     <message>
       <source>Move</source>
@@ -6670,47 +6670,47 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Some devices from %1 will not be moved to %2. Move anyways?</source>
-      <translation type="unfinished">Some devices from %1 will not be moved to %2. Move anyways?</translation>
+      <translation>Sommige apparaten van %1 worden niet verplaatst naar %2. Toch verhuizen?</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>Virtuele camera's, USB- of webcamera's kunnen niet tussen servers worden verplaatst. Deze apparaten blijven op %1 staan:</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>USB of webcamera's kunnen niet tussen servers worden verplaatst. Deze apparaten blijven op %1 staan:</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>Virtuele camera's kunnen niet worden verplaatst tussen servers. Deze apparaten blijven op %1 staan:</translation>
     </message>
     <message>
       <source>Move Group without Them</source>
-      <translation type="unfinished">Move Group without Them</translation>
+      <translation>Groep verplaatsen zonder hen</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers</translation>
+      <translation>Virtuele camera's, USB of web camera's kunnen niet worden verplaatst tussen de servers</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</translation>
+      <translation>%1 kan niet worden verplaatst tussen servers omdat het virtuele camera's, USB of webcamera's bevat</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers</translation>
+      <translation>Virtuele camera's kunnen niet tussen servers worden verplaatst</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains virtual cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains virtual cameras</translation>
+      <translation>%1 kan niet worden verplaatst tussen servers omdat het virtuele camera's bevat</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers</translation>
+      <translation>USB of webcamera's kunnen niet tussen servers worden verplaatst</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains USB or web cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains USB or web cameras</translation>
+      <translation>%1 kan niet worden verplaatst tussen servers, omdat het USB of webcamera's bevat</translation>
     </message>
   </context>
   <context>
@@ -6919,33 +6919,33 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
+      <translation>Kies apparaten...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
+      <translation>Kies camera's...</translation>
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
+      <translation>
+        <numerusform>%n gekozen apparaten</numerusform>
+        <numerusform>%n gekozen apparaten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
+      <translation>
+        <numerusform>%n gekozen camera's</numerusform>
+        <numerusform>%n gekozen camera's</numerusform>
       </translation>
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>Gekozen camera</translation>
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>Gekozen apparaat</translation>
     </message>
   </context>
   <context>
@@ -6981,7 +6981,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Probeer de filters te wijzigen of configureer objectdetectie in de camera plugin instellingen</translation>
     </message>
   </context>
   <context>
@@ -6999,39 +6999,39 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::AudioRedirectPickerWidget</name>
     <message>
       <source>Select Device...</source>
-      <translation type="unfinished">Select Device...</translation>
+      <translation>Selecteer apparaat...</translation>
     </message>
     <message>
       <source>Use audio stream from</source>
-      <translation type="unfinished">Use audio stream from</translation>
+      <translation>Gebruik de audio stream van</translation>
     </message>
     <message>
       <source>Transmit audio stream to</source>
-      <translation type="unfinished">Transmit audio stream to</translation>
+      <translation>Audio-stream verzenden naar</translation>
     </message>
     <message>
       <source>This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</source>
-      <translation type="unfinished">This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</translation>
+      <translation>Dit apparaat heeft geen audio-input, of het is niet goed geconfigureerd. Selecteer een ander apparaat als audiobron.</translation>
     </message>
     <message>
       <source>This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</source>
-      <translation type="unfinished">This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</translation>
+      <translation>Deze camera heeft geen audio-input, of is niet goed geconfigureerd. Selecteer een andere camera als audiobron.</translation>
     </message>
     <message>
       <source>This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</source>
-      <translation type="unfinished">This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</translation>
+      <translation>Dit apparaat heeft geen audio output, of het is niet correct geconfigureerd. Selecteer een ander apparaat om audio af te spelen.</translation>
     </message>
     <message>
       <source>This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</source>
-      <translation type="unfinished">This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</translation>
+      <translation>Deze camera heeft geen audio output, of is niet goed geconfigureerd. Selecteer een andere camera om audio af te spelen.</translation>
     </message>
     <message>
       <source>Use this device for audio output</source>
-      <translation type="unfinished">Use this device for audio output</translation>
+      <translation>Dit apparaat gebruiken voor audio output</translation>
     </message>
     <message>
       <source>Use this camera for audio output</source>
-      <translation type="unfinished">Use this camera for audio output</translation>
+      <translation>Gebruik deze camera voor audio output</translation>
     </message>
     <message>
       <source>Use audio stream from another device</source>
@@ -8431,11 +8431,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ForceSecureAuthDialog</name>
     <message>
       <source>Force secure authentication?</source>
-      <translation type="unfinished">Force secure authentication?</translation>
+      <translation>Veilige authenticatie afdwingen?</translation>
     </message>
     <message>
       <source>To revert this change user password reset will be required.</source>
-      <translation type="unfinished">To revert this change user password reset will be required.</translation>
+      <translation>Om deze wijziging ongedaan te maken, is een reset van het gebruikerswachtwoord vereist.</translation>
     </message>
     <message>
       <source>Do not show this message again</source>
@@ -9901,11 +9901,11 @@ Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is he
     </message>
     <message>
       <source>Does not affect the connections established by server.</source>
-      <translation type="unfinished">Does not affect the connections established by server.</translation>
+      <translation>Heeft geen invloed op de verbindingen die tot stand gebracht zijn door de server.</translation>
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>
-      <translation type="unfinished">Enables RTSP traffic encryption.</translation>
+      <translation>Schakelt RTSP encryptie in.</translation>
     </message>
     <message>
       <source>days</source>
@@ -9941,50 +9941,50 @@ Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is he
     <name>nx::vms::client::desktop::ServerCertificateError</name>
     <message>
       <source>Failed to connect to server</source>
-      <translation type="unfinished">Failed to connect to server</translation>
+      <translation>Kan geen verbinding maken met de server</translation>
     </message>
     <message>
       <source>View certificate</source>
-      <translation type="unfinished">View certificate</translation>
+      <translation>Certificaat bekijken</translation>
     </message>
     <message>
       <source>Server certificate is invalid.</source>
-      <translation type="unfinished">Server certificate is invalid.</translation>
+      <translation>Servercertificaat is ongeldig.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
       <source>The certificate is pinned to %1</source>
-      <translation type="unfinished">The certificate is pinned to %1</translation>
+      <translation>Het certificaat is vastgezet aan %1</translation>
     </message>
     <message>
       <source>The certificate was presented by %1</source>
-      <translation type="unfinished">The certificate was presented by %1</translation>
+      <translation>Het certificaat werd uitgereikt door %1</translation>
     </message>
     <message>
       <source>Server Id: %1</source>
-      <translation type="unfinished">Server Id: %1</translation>
+      <translation>Server-ID: %1</translation>
     </message>
     <message>
       <source>This certificate does not match the certificate %1 is pinned to.</source>
-      <translation type="unfinished">This certificate does not match the certificate %1 is pinned to.</translation>
+      <translation>Dit certificaat komt niet overeen met het certificaat waaraan %1 is vastgemaakt.</translation>
     </message>
     <message>
       <source>Custom certificate</source>
-      <translation type="unfinished">Custom certificate</translation>
+      <translation>Aangepast certificaat</translation>
     </message>
     <message>
       <source>Pinned certificate</source>
-      <translation type="unfinished">Pinned certificate</translation>
+      <translation>Vastgezet certificaat</translation>
     </message>
     <message>
       <source>Unknown certificate</source>
-      <translation type="unfinished">Unknown certificate</translation>
+      <translation>Onbekend certificaat</translation>
     </message>
     <message>
       <source>This is a custom certificate installed on %1</source>
-      <translation type="unfinished">This is a custom certificate installed on %1</translation>
+      <translation>Dit is een aangepast certificaat geïnstalleerd op %1</translation>
     </message>
     <message>
       <source>Pin this certificate to %1?</source>
@@ -10005,15 +10005,15 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
     <message>
       <source>View certificate</source>
-      <translation type="unfinished">View certificate</translation>
+      <translation>Certificaat bekijken</translation>
     </message>
     <message>
       <source>Connect Anyway</source>
-      <translation type="unfinished">Connect Anyway</translation>
+      <translation>Toch verbinden</translation>
     </message>
     <message>
       <source>I trust this server</source>
-      <translation type="unfinished">I trust this server</translation>
+      <translation>Ik vertrouw deze server</translation>
     </message>
     <message>
       <source>System:</source>
@@ -10025,27 +10025,27 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Server ID:</source>
-      <translation type="unfinished">Server ID:</translation>
+      <translation>Server ID:</translation>
     </message>
     <message>
       <source>Trust this server?</source>
-      <translation type="unfinished">Trust this server?</translation>
+      <translation>Deze server vertrouwen?</translation>
     </message>
     <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
-      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct server.</translation>
+      <translation>Bekijk de details van het certificaat om er zeker van te zijn dat u verbinding maakt met de juiste server.</translation>
     </message>
     <message>
       <source>Cannot verify the identity of %1</source>
-      <translation type="unfinished">Cannot verify the identity of %1</translation>
+      <translation>Kan de identiteit van %1 niet verifiëren</translation>
     </message>
     <message>
       <source>Someone may be impersonating %1 to steal your personal information.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.</translation>
+      <translation>Iemand kan zich voordoen als %1 om uw persoonlijke gegevens te stelen.</translation>
     </message>
     <message>
       <source>Do not connect to this server unless instructed by your VMS administrator.</source>
-      <translation type="unfinished">Do not connect to this server unless instructed by your VMS administrator.</translation>
+      <translation>Maak geen verbinding met deze server, tenzij deze wordt geïnstrueerd door uw VMS-beheerder.</translation>
     </message>
     <message>
       <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
@@ -10063,7 +10063,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>There are no suitable servers</source>
-      <translation type="unfinished">There are no suitable servers</translation>
+      <translation>Er zijn geen geschikte servers</translation>
     </message>
   </context>
   <context>
@@ -10134,7 +10134,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>unknown status</source>
-      <translation type="unfinished">unknown status</translation>
+      <translation>onbekende status</translation>
     </message>
   </context>
   <context>
@@ -10243,7 +10243,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>Probeer de filters te wijzigen of activeer beweging opname</translation>
     </message>
   </context>
   <context>
@@ -10455,7 +10455,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::VersionSelectionDialog</name>
     <message>
       <source>Select Version</source>
-      <translation type="unfinished">Select Version</translation>
+      <translation>Selecteer versie</translation>
     </message>
     <message>
       <source>Version</source>
@@ -10463,7 +10463,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Invalid version.</source>
-      <translation type="unfinished">Invalid version.</translation>
+      <translation>Ongeldige versie.</translation>
     </message>
     <message>
       <source>Password</source>
@@ -10533,11 +10533,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::WelcomeScreen</name>
     <message>
       <source>Are you sure you want to hide this tile?</source>
-      <translation type="unfinished">Are you sure you want to hide this tile?</translation>
+      <translation>Weet je zeker dat je deze tegel wilt verbergen?</translation>
     </message>
     <message>
       <source>You will be able to access the %1 login menu at any time by clicking the cloud icon on the navigation panel.</source>
-      <translation type="unfinished">You will be able to access the %1 login menu at any time by clicking the cloud icon on the navigation panel.</translation>
+      <translation>U heeft op elk moment toegang tot het login menu van %1 door te klikken op het cloud icoon in het navigatie paneel.</translation>
     </message>
     <message>
       <source>Hide</source>
@@ -10545,7 +10545,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Unable to connect to the system because it has become offline</source>
-      <translation type="unfinished">Unable to connect to the system because it has become offline</translation>
+      <translation>Kan geen verbinding maken met het systeem omdat het offline is </translation>
     </message>
   </context>
   <context>
@@ -10658,7 +10658,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::backup_settings_view::BackupSettingsViewStrings</name>
     <message>
       <source>All archive</source>
-      <translation type="unfinished">All archive</translation>
+      <translation>Alle archieven</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -10674,15 +10674,15 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>High-Res</source>
-      <translation type="unfinished">High-Res</translation>
+      <translation>Hi-Res</translation>
     </message>
     <message>
       <source>Low-Res</source>
-      <translation type="unfinished">Low-Res</translation>
+      <translation>Low-Res</translation>
     </message>
     <message>
       <source>All streams</source>
-      <translation type="unfinished">All streams</translation>
+      <translation>Alle streams</translation>
     </message>
   </context>
   <context>
@@ -10754,11 +10754,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
     <message>
       <source>New Group</source>
-      <translation type="unfinished">New Group</translation>
+      <translation>Nieuwe groep</translation>
     </message>
     <message>
       <source>New Group %1</source>
-      <translation type="unfinished">New Group %1</translation>
+      <translation>Nieuwe groep %1</translation>
     </message>
   </context>
   <context>
@@ -10794,7 +10794,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::joystick::JoystickButtonActionChoiceModel</name>
     <message>
       <source>No Action</source>
-      <translation type="unfinished">No Action</translation>
+      <translation>Geen actie</translation>
     </message>
     <message>
       <source>Focus Near</source>
@@ -10806,46 +10806,46 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Autofocus</source>
-      <translation type="unfinished">Autofocus</translation>
+      <translation>Autofocus</translation>
     </message>
     <message>
       <source>Go to PTZ Position</source>
-      <translation type="unfinished">Go to PTZ Position</translation>
+      <translation>Ga naar PTZ Positie</translation>
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation type="unfinished">Set to Fullscreen</translation>
+      <translation>Schakelen naar volledige schermweergave</translation>
     </message>
     <message>
       <source>Next Camera on Layout</source>
-      <translation type="unfinished">Next Camera on Layout</translation>
+      <translation>Volgende camera op de schermindeling</translation>
     </message>
     <message>
       <source>Previous Camera on Layout</source>
-      <translation type="unfinished">Previous Camera on Layout</translation>
+      <translation>Vorige camera op de schermindeling</translation>
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>Open schermindeling</translation>
     </message>
     <message>
       <source>Modifier</source>
-      <translation type="unfinished">Modifier</translation>
+      <translation>Bewerker</translation>
     </message>
     <message>
       <source>Multiple</source>
-      <translation type="unfinished">Multiple</translation>
+      <translation>Meerdere</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::joystick::JoystickButtonSettingsModel</name>
     <message>
       <source>Select Layout...</source>
-      <translation type="unfinished">Select Layout...</translation>
+      <translation>Selecteer schermindeling...</translation>
     </message>
     <message>
       <source>Button</source>
-      <translation type="unfinished">Button</translation>
+      <translation>Knop</translation>
     </message>
     <message>
       <source>Selected Layout</source>
@@ -10913,7 +10913,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::ui::AnalyticsSdkObjectDetectedWidget</name>
     <message>
       <source>Analytics object detection can be set up on a certain cameras.</source>
-      <translation type="unfinished">Analytics object detection can be set up on a certain cameras.</translation>
+      <translation>Analytics-object detectie kan worden ingesteld op bepaalde camera's.</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
@@ -10921,7 +10921,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</source>
-      <translation type="unfinished">Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</translation>
+      <translation>Gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn met een van de kenmerken. U kunt de namen van de attributen en hun waarden zien op het tabblad Objecten.</translation>
     </message>
   </context>
   <context>
@@ -11302,7 +11302,7 @@ U kunt een andere opslaglocatie selecteren in het tabblad &quot;Opslagbeheer&quo
     </message>
     <message>
       <source>Window configuration saved</source>
-      <translation type="unfinished">Window configuration saved</translation>
+      <translation>Vensterconfiguratie opgeslagen</translation>
     </message>
     <message>
       <source>This build is for demo purposes only.</source>
@@ -11394,7 +11394,7 @@ U kunt een andere opslaglocatie selecteren in het tabblad &quot;Opslagbeheer&quo
     <name>nx::vms::client::desktop::ui::workbench::ResourceGroupingActionHandler</name>
     <message>
       <source>Maximum level of nesting is reached</source>
-      <translation type="unfinished">Maximum level of nesting is reached</translation>
+      <translation>Maximaal nestniveau is bereikt</translation>
     </message>
   </context>
   <context>
@@ -11525,40 +11525,40 @@ to view more bookmarks</source>
     <name>nx::vms::update::desktop::ClientUpdateManager</name>
     <message>
       <source>Restart Client</source>
-      <translation type="unfinished">Restart Client</translation>
+      <translation>Cliënt herstarten</translation>
     </message>
     <message>
       <source>Updates Settings</source>
-      <translation type="unfinished">Updates Settings</translation>
+      <translation>Updates instellingen</translation>
     </message>
     <message>
       <source>Client update is installed</source>
-      <translation type="unfinished">Client update is installed</translation>
+      <translation>Client update is geïnstalleerd</translation>
     </message>
     <message>
       <source>Client is updated to version %1. Restart %2 to finish update.</source>
       <comment>%1 is a version like &apos;4.3.0&apos;, %2 is a VMS name like &apos;Nx Witness&apos;</comment>
-      <translation type="unfinished">Client is updated to version %1. Restart %2 to finish update.</translation>
+      <translation>Client is bijgewerkt naar versie %1. Start %2 opnieuw om de update af te ronden.</translation>
     </message>
     <message>
       <source>Automatic client updates</source>
-      <translation type="unfinished">Automatic client updates</translation>
+      <translation>Automatische client updates</translation>
     </message>
     <message>
       <source>New client-only updates will be installed automatically. You can change this in the settings.</source>
-      <translation type="unfinished">New client-only updates will be installed automatically. You can change this in the settings.</translation>
+      <translation>Nieuwe 'Client' updates worden automatisch geïnstalleerd. U kunt dit wijzigen in de instellingen.</translation>
     </message>
     <message>
       <source>Cannot check for update.</source>
-      <translation type="unfinished">Cannot check for update.</translation>
+      <translation>Kan niet controleren op updates.</translation>
     </message>
     <message>
       <source>Client update package is broken.</source>
-      <translation type="unfinished">Client update package is broken.</translation>
+      <translation>Client-updatepakket werkt niet.</translation>
     </message>
     <message>
       <source>Client update package is missing for current platform.</source>
-      <translation type="unfinished">Client update package is missing for current platform.</translation>
+      <translation>Client-updatepakket ontbreekt voor het huidige platform.</translation>
     </message>
     <message>
       <source>Can&apos;t check client update availability. Check your internet connection and try again.</source>

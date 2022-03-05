@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Open source libraries</source>
-      <translation type="unfinished">Open source libraries</translation>
+      <translation>Open source libraries</translation>
     </message>
   </context>
   <context>
@@ -107,7 +107,7 @@
     </message>
     <message>
       <source>Server certificate validation</source>
-      <translation type="unfinished">Server certificate validation</translation>
+      <translation>Server certificaat validatie</translation>
     </message>
   </context>
   <context>
@@ -152,7 +152,7 @@
     <name>AnalyticsSdkObjectDetectedWidget</name>
     <message>
       <source>Attributes:</source>
-      <translation type="unfinished">Attributes:</translation>
+      <translation>Attributen:</translation>
     </message>
     <message>
       <source>Object Type:</source>
@@ -167,15 +167,15 @@
     </message>
     <message>
       <source>Keep Archive For...</source>
-      <translation type="unfinished">Keep Archive For...</translation>
+      <translation>Bewaar archief voor...</translation>
     </message>
     <message>
       <source>Max</source>
-      <translation type="unfinished">Max</translation>
+      <translation>Max</translation>
     </message>
     <message>
       <source>Min</source>
-      <translation type="unfinished">Min</translation>
+      <translation>Min</translation>
     </message>
   </context>
   <context>
@@ -256,19 +256,19 @@
     <name>BackupBandwidthSettingsWidget</name>
     <message>
       <source>No Limit</source>
-      <translation type="unfinished">No Limit</translation>
+      <translation>Onbeperkt</translation>
     </message>
     <message>
       <source>Fixed</source>
-      <translation type="unfinished">Fixed</translation>
+      <translation>Vast</translation>
     </message>
     <message>
       <source>Scheduled</source>
-      <translation type="unfinished">Scheduled</translation>
+      <translation>Gepland</translation>
     </message>
     <message>
       <source>Fix bandwidth to</source>
-      <translation type="unfinished">Fix bandwidth to</translation>
+      <translation>Beperk bandbreedte tot</translation>
     </message>
     <message>
       <source>Mbit/s</source>
@@ -276,15 +276,15 @@
     </message>
     <message>
       <source>Unlimited</source>
-      <translation type="unfinished">Unlimited</translation>
+      <translation>Onbeperkt</translation>
     </message>
     <message>
       <source>Limited to</source>
-      <translation type="unfinished">Limited to</translation>
+      <translation>Beperkt tot</translation>
     </message>
     <message>
       <source>No backup</source>
-      <translation type="unfinished">No backup</translation>
+      <translation>Geen back-up</translation>
     </message>
   </context>
   <context>
@@ -298,11 +298,11 @@
     <name>BackupStatusWidget</name>
     <message>
       <source>Backup is not configured yet.</source>
-      <translation type="unfinished">Backup is not configured yet.</translation>
+      <translation>Back-up is nog niet geconfigureerd.</translation>
     </message>
     <message>
       <source>To start backup enable it for some cameras and apply settings.</source>
-      <translation type="unfinished">To start backup enable it for some cameras and apply settings.</translation>
+      <translation>Om back-up te starten, moet u deze inschakelen voor sommige camera's en de instellingen toepassen.</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -310,7 +310,7 @@
     </message>
     <message>
       <source>Skip Current Queue</source>
-      <translation type="unfinished">Skip Current Queue</translation>
+      <translation>Huidige wachtrij overslaan</translation>
     </message>
     <message>
       <source>Maximum backup queue size</source>
@@ -584,23 +584,23 @@
     </message>
     <message>
       <source>Stream Settings</source>
-      <translation type="unfinished">Stream Settings</translation>
+      <translation>Stream Instellingen</translation>
     </message>
     <message>
       <source>Initialization Settings</source>
-      <translation type="unfinished">Initialization Settings</translation>
+      <translation>Initialisatie instellingen</translation>
     </message>
     <message>
       <source>Use Media2 to fetch profiles</source>
-      <translation type="unfinished">Use Media2 to fetch profiles</translation>
+      <translation>Gebruik Media2 om profielen op te halen</translation>
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
-      <translation type="unfinished">Use different values for pan and tilt</translation>
+      <translation>Gebruik verschillende waarden voor pan en tilt</translation>
     </message>
     <message>
       <source>Tilt</source>
-      <translation type="unfinished">Tilt</translation>
+      <translation>Tilt</translation>
     </message>
     <message>
       <source>Media Port</source>
@@ -728,7 +728,7 @@
     <message>
       <source>in</source>
       <comment>e.g. &quot;in Primary Stream&quot;</comment>
-      <translation type="unfinished">in</translation>
+      <translation>in</translation>
     </message>
   </context>
   <context>
@@ -800,7 +800,7 @@
     </message>
     <message>
       <source>Enable 2-way audio</source>
-      <translation type="unfinished">Enable 2-way audio</translation>
+      <translation>2-weg audio inschakelen</translation>
     </message>
   </context>
   <context>
@@ -814,7 +814,7 @@
     <name>CertificateSelectionDialog</name>
     <message>
       <source>Web site requires a certificate</source>
-      <translation type="unfinished">Web site requires a certificate</translation>
+      <translation>Website vereist een certificaat</translation>
     </message>
   </context>
   <context>
@@ -954,11 +954,11 @@
     <name>EncryptedArchivePasswordDialog</name>
     <message>
       <source>Encrypted archive</source>
-      <translation type="unfinished">Encrypted archive</translation>
+      <translation>Versleuteld archief</translation>
     </message>
     <message>
       <source>Enter your encryption password to view the archive</source>
-      <translation type="unfinished">Enter your encryption password to view the archive</translation>
+      <translation>Voer uw wachtwoord voor versleuteling in om het archief te bekijken</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1127,7 +1127,7 @@
     <name>FailoverPriorityPickerWidget</name>
     <message>
       <source>Set priority:</source>
-      <translation type="unfinished">Set priority:</translation>
+      <translation>Prioriteit Instellen:</translation>
     </message>
     <message>
       <source>No failover</source>
@@ -1147,7 +1147,7 @@
     </message>
     <message>
       <source>Select some devices to setup failover priority</source>
-      <translation type="unfinished">Select some devices to setup failover priority</translation>
+      <translation>Selecteer apparaten om de failover-prioriteit op te stellen</translation>
     </message>
   </context>
   <context>
@@ -1227,15 +1227,15 @@
     </message>
     <message>
       <source>Startup</source>
-      <translation type="unfinished">Startup</translation>
+      <translation>Opstarten</translation>
     </message>
     <message>
       <source>Connect to the previous system on startup</source>
-      <translation type="unfinished">Connect to the previous system on startup</translation>
+      <translation>Bij het opstarten verbinding maken met het vorige systeem</translation>
     </message>
     <message>
       <source>Automatically restore saved windows configuration</source>
-      <translation type="unfinished">Automatically restore saved windows configuration</translation>
+      <translation>Automatisch opgeslagen vensterconfiguratie herstellen</translation>
     </message>
     <message>
       <source>Play audio from all cameras on layout</source>
@@ -1747,7 +1747,7 @@
     </message>
     <message>
       <source>Advanced settings</source>
-      <translation type="unfinished">Advanced settings</translation>
+      <translation>Geavanceerde instellingen</translation>
     </message>
   </context>
   <context>
@@ -2293,11 +2293,11 @@
     <name>RewindForWidget</name>
     <message>
       <source>Playback time :</source>
-      <translation type="unfinished">Playback time :</translation>
+      <translation>Afspeeltijd:</translation>
     </message>
     <message>
       <source>rewind for</source>
-      <translation type="unfinished">rewind for</translation>
+      <translation>terugspoelen voor</translation>
     </message>
     <message>
       <source>Live</source>
@@ -2371,7 +2371,7 @@
     </message>
     <message>
       <source>Motion &amp;&amp; Objects</source>
-      <translation type="unfinished">Motion &amp;&amp; Objects</translation>
+      <translation>Beweging &amp;&amp; Objecten</translation>
     </message>
   </context>
   <context>
@@ -2398,19 +2398,19 @@
     </message>
     <message>
       <source>Data protection</source>
-      <translation type="unfinished">Data protection</translation>
+      <translation>Databeveiliging</translation>
     </message>
     <message>
       <source>Use only HTTPS to connect to cameras</source>
-      <translation type="unfinished">Use only HTTPS to connect to cameras</translation>
+      <translation>Gebruik alleen HTTPS om verbinding te maken met camera's</translation>
     </message>
     <message>
       <source>User Activity</source>
-      <translation type="unfinished">User Activity</translation>
+      <translation>Gebruikersactiviteit</translation>
     </message>
     <message>
       <source>Display servers in tree for non-administrator users</source>
-      <translation type="unfinished">Display servers in tree for non-administrator users</translation>
+      <translation>Servers in boomstructuur weergeven voor niet-beheerders</translation>
     </message>
     <message>
       <source>Archive encryption</source>

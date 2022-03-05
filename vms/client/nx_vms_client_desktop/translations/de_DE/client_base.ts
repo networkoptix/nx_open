@@ -10049,7 +10049,7 @@ Pinnen Sie dieses Zertifikat nicht an, wenn Sie das SSL-Zertifikat des %2-Server
     </message>
     <message>
       <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
-      <translation type="unfinished">You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</translation>
+      <translation>Sie haben versucht, eine Verbindung zu: %1 aufzubauen, aber der Server hat ein Zertifikat vorgelegt, das nicht automatisch überprüft werden kann.</translation>
     </message>
   </context>
   <context>

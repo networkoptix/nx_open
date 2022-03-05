@@ -13,27 +13,27 @@
     </message>
     <message>
       <source>Notify about available updates</source>
-      <translation type="unfinished">Notify about available updates</translation>
+      <translation>Op de hoogte houden van beschikbare updates</translation>
     </message>
     <message>
       <source>Automatic client updates</source>
-      <translation type="unfinished">Automatic client updates</translation>
+      <translation>Automatische client-updates</translation>
     </message>
     <message>
       <source>Turn this option on to make connected clients update automatically to the latest compatible version.</source>
-      <translation type="unfinished">Turn this option on to make connected clients update automatically to the latest compatible version.</translation>
+      <translation>Schakel deze optie in om verbonden clients automatisch te laten updaten naar de nieuwste compatibele versie.</translation>
     </message>
     <message>
       <source>Connecting clients will be automatically updated to the new version when it’s available.</source>
-      <translation type="unfinished">Connecting clients will be automatically updated to the new version when it’s available.</translation>
+      <translation>Verbindende clients worden automatisch bijgewerkt naar de nieuwe versie wanneer deze beschikbaar is.</translation>
     </message>
     <message>
       <source>All connecting clients are updating to version %1.</source>
-      <translation type="unfinished">All connecting clients are updating to version %1.</translation>
+      <translation>Alle verbindende clients worden bijgewerkt naar versie %1.</translation>
     </message>
     <message>
       <source>Connecting clients will be updated to version %1 on %2.</source>
-      <translation type="unfinished">Connecting clients will be updated to version %1 on %2.</translation>
+      <translation>Clients die verbinding maken zullen worden bijgewerkt naar versie %1 op %2.</translation>
     </message>
     <message>
       <source>Check for updates</source>
@@ -41,11 +41,11 @@
     </message>
     <message>
       <source>Speed up this update</source>
-      <translation type="unfinished">Speed up this update</translation>
+      <translation>Versnel deze update</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+      <translation>U gebruikt een aangepaste client. Neem contact op met %1 om de update-instructies te krijgen.</translation>
     </message>
   </context>
   <context>
@@ -63,7 +63,7 @@
     <name>AnalyticsFilters</name>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Object type</translation>
     </message>
   </context>
   <context>
@@ -86,7 +86,7 @@
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Probeer de filters te wijzigen of configureer objectdetectie in de camera plugin instellingen</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
@@ -108,7 +108,7 @@
     <name>AnalyticsSearchDialog</name>
     <message>
       <source>Advanced Object Search</source>
-      <translation type="unfinished">Advanced Object Search</translation>
+      <translation>Geavanceerd object zoeken</translation>
     </message>
     <message>
       <source>Select area</source>
@@ -128,7 +128,7 @@
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Probeer de filters te wijzigen of configureer objectdetectie in de camera plugin instellingen</translation>
     </message>
     <message>
       <source>Any plugin</source>
@@ -175,7 +175,7 @@
     <name>ButtonSettingsDelegate</name>
     <message>
       <source>Hotkey %1</source>
-      <translation type="unfinished">Hotkey %1</translation>
+      <translation>Sneltoets %1</translation>
     </message>
   </context>
   <context>
@@ -206,11 +206,11 @@
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
+      <translation>Kies apparaten...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
+      <translation>Kies camera's...</translation>
     </message>
     <message>
       <source>none</source>
@@ -218,25 +218,25 @@
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
+      <translation>
+        <numerusform>%n gekozen apparaten</numerusform>
+        <numerusform>%n gekozen apparaten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
+      <translation>
+        <numerusform>%n gekozen camera's</numerusform>
+        <numerusform>%n gekozen camera's</numerusform>
       </translation>
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>Gekozen apparaat</translation>
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>Gekozen camera</translation>
     </message>
   </context>
   <context>
@@ -247,22 +247,22 @@
     </message>
     <message>
       <source>Unreachable</source>
-      <translation type="unfinished">Unreachable</translation>
+      <translation>Onbereikbaar</translation>
     </message>
     <message>
       <source>Incompatible</source>
-      <translation type="unfinished">Incompatible</translation>
+      <translation>Incompatibel</translation>
     </message>
     <message>
       <source>Pending</source>
-      <translation type="unfinished">Pending</translation>
+      <translation>In behandeling</translation>
     </message>
   </context>
   <context>
     <name>CloudTile</name>
     <message>
       <source>Log in to </source>
-      <translation type="unfinished">Log in to </translation>
+      <translation>Log in op </translation>
     </message>
   </context>
   <context>
@@ -290,11 +290,11 @@
     <name>CounterBlock</name>
     <message>
       <source>Remove column</source>
-      <translation type="unfinished">Remove column</translation>
+      <translation>Kolom verwijderen</translation>
     </message>
     <message>
       <source>Add column</source>
-      <translation type="unfinished">Add column</translation>
+      <translation>Kolom toevoegen</translation>
     </message>
     <message>
       <source>Hide information</source>
@@ -329,7 +329,7 @@
     </message>
     <message>
       <source>360° Equirectangular</source>
-      <translation type="unfinished">360° Equirectangular</translation>
+      <translation>360° Equirechthoekig</translation>
     </message>
   </context>
   <context>
@@ -340,7 +340,7 @@
     </message>
     <message>
       <source>See %1 for other events</source>
-      <translation type="unfinished">See %1 for other events</translation>
+      <translation>Bekijk %1 voor andere evenementen</translation>
     </message>
     <message>
       <source>No events</source>
@@ -348,7 +348,7 @@
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>Probeer de filters te veranderen of maak een Event regel</translation>
     </message>
     <message>
       <source>Event Log</source>
@@ -428,7 +428,7 @@
     </message>
     <message>
       <source>Floor/table</source>
-      <translation type="unfinished">Floor/table</translation>
+      <translation>Vloer/tafel</translation>
     </message>
     <message>
       <source>Angle</source>
@@ -436,7 +436,7 @@
     </message>
     <message>
       <source>Camera roll correction</source>
-      <translation type="unfinished">Camera roll correction</translation>
+      <translation>Camera rol correctie</translation>
     </message>
     <message>
       <source>Lens projection</source>
@@ -476,7 +476,7 @@
     <message>
       <source>Hold %1 to activate actions</source>
       <comment>Leave %1 as is. It will be replaced to button name.</comment>
-      <translation type="unfinished">Hold %1 to activate actions</translation>
+      <translation>Houd %1 ingedrukt om acties te activeren</translation>
     </message>
   </context>
   <context>
@@ -544,46 +544,46 @@
     <name>JoystickSettingsDialog</name>
     <message>
       <source>Joystick Settings</source>
-      <translation type="unfinished">Joystick Settings</translation>
+      <translation>Joystick instellingen</translation>
     </message>
     <message>
       <source>joystick</source>
-      <translation type="unfinished">joystick</translation>
+      <translation>joystick</translation>
     </message>
     <message>
       <source>Basic Actions</source>
-      <translation type="unfinished">Basic Actions</translation>
+      <translation>Basis Acties</translation>
     </message>
     <message>
       <source>With Modifier</source>
-      <translation type="unfinished">With Modifier</translation>
+      <translation>Met modificatie</translation>
     </message>
     <message>
       <source>This model is not supported</source>
-      <translation type="unfinished">This model is not supported</translation>
+      <translation>Dit model wordt niet ondersteund</translation>
     </message>
     <message>
       <source>Reset to Default</source>
-      <translation type="unfinished">Reset to Default</translation>
+      <translation>Standaardinstellingen herstellen</translation>
     </message>
   </context>
   <context>
     <name>JoystickSettingsTab</name>
     <message>
       <source>Pan and Tilt</source>
-      <translation type="unfinished">Pan and Tilt</translation>
+      <translation>Pan en Tilt</translation>
     </message>
     <message>
       <source>Zoom In / Zoom Out</source>
-      <translation type="unfinished">Zoom In / Zoom Out</translation>
+      <translation>Zoom in /uit</translation>
     </message>
     <message>
       <source>Select Camera on Layout</source>
-      <translation type="unfinished">Select Camera on Layout</translation>
+      <translation>Selecteer Camera op de schermindeling</translation>
     </message>
     <message>
       <source>Log in to the system to configure how to open layouts</source>
-      <translation type="unfinished">Log in to the system to configure how to open layouts</translation>
+      <translation>Log in op het systeem om te configureren hoe de schermindelingen moeten worden geopend</translation>
     </message>
   </context>
   <context>
@@ -629,7 +629,7 @@
     </message>
     <message>
       <source>Select a camera to see its motion events</source>
-      <translation type="unfinished">Select a camera to see its motion events</translation>
+      <translation>Selecteer een camera om de bewegingsgebeurtenissen te bekijken</translation>
     </message>
     <message>
       <source>No motion detected</source>
@@ -637,11 +637,11 @@
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>Probeer de filters te wijzigen of activeer beweging opname</translation>
     </message>
     <message>
       <source>Select Camera...</source>
-      <translation type="unfinished">Select Camera...</translation>
+      <translation>Selecteer camera...</translation>
     </message>
     <message>
       <source>No bookmarks</source>
@@ -649,7 +649,7 @@
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>Selecteer een tijdspanne op de tijdlijn en klik met de rechtermuisknop op het gemarkeerde gedeelte om een bladwijzer te maken</translation>
     </message>
   </context>
   <context>
@@ -689,18 +689,18 @@
     </message>
     <message>
       <source>Select an area on the video to filter results</source>
-      <translation type="unfinished">Select an area on the video to filter results</translation>
+      <translation>Selecteer een gebied op de video om resultaten te filteren</translation>
     </message>
   </context>
   <context>
     <name>ObjectEditor</name>
     <message>
       <source>Present</source>
-      <translation type="unfinished">Present</translation>
+      <translation>Aanwezig</translation>
     </message>
     <message>
       <source>Absent</source>
-      <translation type="unfinished">Absent</translation>
+      <translation>Afwezig</translation>
     </message>
   </context>
   <context>
@@ -718,7 +718,7 @@
     </message>
     <message>
       <source>URL or Host:Port</source>
-      <translation type="unfinished">URL or Host:Port</translation>
+      <translation>URL of Host:Poort</translation>
     </message>
     <message>
       <source>Login</source>
@@ -791,11 +791,11 @@
     <name>PreviewPanel</name>
     <message>
       <source>No Preview</source>
-      <translation type="unfinished">No Preview</translation>
+      <translation>Geen voorvertoning</translation>
     </message>
     <message>
       <source>Select the object to display the preview</source>
-      <translation type="unfinished">Select the object to display the preview</translation>
+      <translation>Selecteer het object om het voorbeeld weer te geven</translation>
     </message>
     <message>
       <source>Show on Layout</source>
@@ -858,7 +858,7 @@ to activate PTZ</translation>
     <name>RangeEditor</name>
     <message>
       <source>from</source>
-      <translation type="unfinished">from</translation>
+      <translation>van</translation>
     </message>
     <message>
       <source>to</source>
@@ -869,7 +869,7 @@ to activate PTZ</translation>
     <name>RecursiveObjectTypeSelector</name>
     <message>
       <source>Object Type</source>
-      <translation type="unfinished">Object Type</translation>
+      <translation>Object type</translation>
     </message>
     <message>
       <source>Subtype</source>
@@ -895,11 +895,11 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Drag video files or images to the client window, or add local media folder through the Local Settings dialog</source>
-      <translation type="unfinished">Drag video files or images to the client window, or add local media folder through the Local Settings dialog</translation>
+      <translation>Sleep videobestanden of afbeeldingen naar het clientvenster of voeg een lokale mediamap toe via het dialoogvenster Lokale instellingen</translation>
     </message>
     <message>
       <source>Try searching for something else</source>
-      <translation type="unfinished">Try searching for something else</translation>
+      <translation>Probeer naar iets anders te zoeken</translation>
     </message>
   </context>
   <context>
@@ -920,7 +920,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>OUTDATED</source>
-      <translation type="unfinished">OUTDATED</translation>
+      <translation>VEROUDERD</translation>
     </message>
   </context>
   <context>
@@ -931,7 +931,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>All Types</source>
-      <translation type="unfinished">All Types</translation>
+      <translation>Alle Typen</translation>
     </message>
     <message>
       <source>Servers</source>
@@ -970,11 +970,11 @@ to activate PTZ</translation>
     <name>ResourceToolTip</name>
     <message>
       <source>Cannot load preview</source>
-      <translation type="unfinished">Cannot load preview</translation>
+      <translation>Kan de voorvertoning niet laden</translation>
     </message>
     <message>
       <source>Preview is outdated</source>
-      <translation type="unfinished">Preview is outdated</translation>
+      <translation>Voorvetoning is verouderd</translation>
     </message>
   </context>
   <context>
@@ -1066,7 +1066,7 @@ to activate PTZ</translation>
     <name>SphereDewarpingSettings</name>
     <message>
       <source>Horizon correction</source>
-      <translation type="unfinished">Horizon correction</translation>
+      <translation>Horizon correctie</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -1124,7 +1124,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>No signal</source>
-      <translation type="unfinished">No signal</translation>
+      <translation>Geen signaal</translation>
     </message>
     <message>
       <source>Not enough licenses</source>
@@ -1132,15 +1132,15 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Server unavailable</source>
-      <translation type="unfinished">Server unavailable</translation>
+      <translation>Server niet beschikbaar</translation>
     </message>
     <message>
       <source>No access</source>
-      <translation type="unfinished">No access</translation>
+      <translation>Geen toegang</translation>
     </message>
     <message>
       <source>Device disabled</source>
-      <translation type="unfinished">Device disabled</translation>
+      <translation>Apparaat uitgeschakeld</translation>
     </message>
     <message>
       <source>Too many connections</source>
@@ -1148,7 +1148,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Cannot decrypt media</source>
-      <translation type="unfinished">Cannot decrypt media</translation>
+      <translation>Kan media niet ontsleutelen</translation>
     </message>
     <message>
       <source>Password required</source>
@@ -1178,19 +1178,19 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>No Favorite Systems</source>
-      <translation type="unfinished">No Favorite Systems</translation>
+      <translation>Geen favoriete systemen</translation>
     </message>
     <message>
       <source>No Hidden Systems</source>
-      <translation type="unfinished">No Hidden Systems</translation>
+      <translation>Geen verborgen systemen</translation>
     </message>
     <message>
       <source>You can add system to the favorites from the context menu</source>
-      <translation type="unfinished">You can add system to the favorites from the context menu</translation>
+      <translation>U kunt systeem toevoegen aan de favorieten vanuit het contextmenu</translation>
     </message>
     <message>
       <source>You can hide systems from the main list from the context menu</source>
-      <translation type="unfinished">You can hide systems from the main list from the context menu</translation>
+      <translation>U kunt systemen verbergen van de hoofdlijst in het contextmenu</translation>
     </message>
   </context>
   <context>
@@ -1213,11 +1213,11 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Add to Favorites</source>
-      <translation type="unfinished">Add to Favorites</translation>
+      <translation>Toevoegen aan favorieten</translation>
     </message>
     <message>
       <source>Remove from Favorites</source>
-      <translation type="unfinished">Remove from Favorites</translation>
+      <translation>Verwijderen uit favorieten</translation>
     </message>
   </context>
   <context>
@@ -1257,7 +1257,7 @@ to activate PTZ</translation>
     <name>VisibilityMenu</name>
     <message>
       <source>Hidden</source>
-      <translation type="unfinished">Hidden</translation>
+      <translation>Verborgen</translation>
     </message>
     <message>
       <source>All Systems</source>
@@ -1265,22 +1265,22 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Favorites</source>
-      <translation type="unfinished">Favorites</translation>
+      <translation>Favorieten</translation>
     </message>
   </context>
   <context>
     <name>WelcomeScreen</name>
     <message>
       <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
-      <translation type="unfinished">You don&apos;t have access to the %1. Please check your internet connection.</translation>
+      <translation>U heeft geen toegang tot de %1. Controleer uw internetverbinding.</translation>
     </message>
     <message>
       <source>Official Website</source>
-      <translation type="unfinished">Official Website</translation>
+      <translation>Officiële Website</translation>
     </message>
     <message>
       <source>Help &amp; User Manual</source>
-      <translation type="unfinished">Help &amp; User Manual</translation>
+      <translation>Hulp &amp; Gebruikershandleiding</translation>
     </message>
     <message>
       <source>Support</source>
