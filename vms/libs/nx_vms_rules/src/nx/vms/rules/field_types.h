@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QSet>
+
 #include <nx/utils/uuid.h>
 
 namespace nx::vms::rules {
@@ -12,7 +14,7 @@ namespace nx::vms::rules {
 struct UuidSelection
 {
     /** Manually selected ids.*/
-    QnUuidList ids;
+    QSet<QnUuid> ids;
 
     /** Accept/target all flag. */
     bool all = false;

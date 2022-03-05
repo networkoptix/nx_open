@@ -14,7 +14,8 @@ class TestEventField: public nx::vms::rules::EventField
     Q_CLASSINFO("metatype", "nx.events.field.test")
 
     Q_PROPERTY(QnUuid id MEMBER id)
-    Q_PROPERTY(QnUuidList ids MEMBER ids)
+    Q_PROPERTY(QnUuidList idsList MEMBER idsList)
+    Q_PROPERTY(QSet<QnUuid> idsSet MEMBER idsSet)
     Q_PROPERTY(QString string MEMBER string)
     Q_PROPERTY(QStringList strings MEMBER strings)
     Q_PROPERTY(bool flag MEMBER flag)
@@ -25,7 +26,8 @@ public:
 
 public:
     QnUuid id;
-    QnUuidList ids;
+    QnUuidList idsList;
+    QSet<QnUuid> idsSet;
 
     QString string;
     QStringList strings;

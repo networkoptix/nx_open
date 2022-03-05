@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <QtCore/QSet>
+
 #include "../event_field.h"
 
 namespace nx::vms::rules {
@@ -11,7 +13,7 @@ class NX_VMS_RULES_API ResourceFilterField: public EventField
     Q_OBJECT
 
     Q_PROPERTY(bool acceptAll READ acceptAll WRITE setAcceptAll)
-    Q_PROPERTY(QnUuidList ids READ ids WRITE setIds)
+    Q_PROPERTY(QSet<QnUuid> ids READ ids WRITE setIds)
 
 public:
     virtual bool match(const QVariant& value) const override;
@@ -19,8 +21,8 @@ public:
     bool acceptAll() const;
     void setAcceptAll(bool anyCamera);
 
-    QnUuidList ids() const;
-    void setIds(const QnUuidList& ids);
+    QSet<QnUuid> ids() const;
+    void setIds(const QSet<QnUuid>& ids);
 
 protected:
     // This field type should be used as base class only.
@@ -28,7 +30,7 @@ protected:
 
 private:
     bool m_acceptAll;
-    QnUuidList m_ids;
+    QSet<QnUuid> m_ids;
 };
 
 } // namespace nx::vms::rules

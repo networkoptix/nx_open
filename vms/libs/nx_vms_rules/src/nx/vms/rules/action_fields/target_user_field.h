@@ -13,7 +13,7 @@ class NX_VMS_RULES_API TargetUserField: public ActionField
     Q_CLASSINFO("metatype", "nx.actions.fields.targetUser")
 
     FIELD(bool, targetAll, setTargetAll)
-    FIELD(QnUuidList, ids, setIds)
+    FIELD(QSet<QnUuid>, ids, setIds)
 
 public:
     TargetUserField() = default;
