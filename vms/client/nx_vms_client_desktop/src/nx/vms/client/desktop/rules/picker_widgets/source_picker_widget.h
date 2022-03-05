@@ -6,13 +6,16 @@
 
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/vms/client/desktop/resource_dialogs/camera_selection_dialog.h>
+#include <nx/vms/client/desktop/resource_dialogs/server_selection_dialog.h>
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
 #include <nx/vms/rules/event_fields/source_camera_field.h>
 #include <nx/vms/rules/event_fields/source_server_field.h>
 #include <nx/vms/rules/event_fields/source_user_field.h>
@@ -42,7 +45,7 @@ public:
         mainLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
 
         label = new QnElidedLabel;
-        label->setAlignment(Qt::AlignRight);
+        label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
         mainLayout->addWidget(label);
 
         {
@@ -50,11 +53,27 @@ public:
             selectButtonLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
 
             selectResourceButton = createSelectButton<F>();
+            selectResourceButton->setSizePolicy(
+                QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
             selectButtonLayout->addWidget(selectResourceButton);
 
-            alertLabel = new QnElidedLabel;
-            setWarningStyle(alertLabel);
-            selectButtonLayout->addWidget(alertLabel);
+            {
+                auto alertWidget = new QWidget;
+                alertWidget->setSizePolicy(
+                    QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
+
+                auto alertLayout = new QHBoxLayout;
+                alertLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
+
+                alertLabel = new QnElidedLabel;
+                setWarningStyle(alertLabel);
+                alertLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+                alertLayout->addWidget(alertLabel);
+
+                alertWidget->setLayout(alertLayout);
+
+                selectButtonLayout->addWidget(alertWidget);
+            }
 
             selectButtonLayout->setStretch(0, 5);
             selectButtonLayout->setStretch(1, 3);
@@ -92,12 +111,13 @@ private:
 
     virtual void onFieldSet() override
     {
-        setIds<F>(field->ids());
+        updateUi<F>();
 
         connect(selectResourceButton, &QPushButton::clicked, this,
             [this]
             {
-                // TODO: Open appropriate dialog.
+                select<F>();
+                updateUi<F>();
             });
     }
 
@@ -123,21 +143,21 @@ private:
     }
 
     template<typename T>
-    void setIds(const QnUuidList& ids);
+    void updateUi();
 
     template<>
-    void setIds<vms::rules::SourceCameraField>(const QnUuidList& ids)
+    void updateUi<vms::rules::SourceCameraField>()
     {
         auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
 
-        auto resourceList = resourcePool->getResourcesByIds<QnVirtualCameraResource>(ids);
+        auto resourceList = resourcePool->getResourcesByIds<QnVirtualCameraResource>(field->ids());
 
         auto selectDeviceButtonPtr = static_cast<QnSelectDevicesButton*>(selectResourceButton);
         selectDeviceButtonPtr->selectDevices(resourceList);
 
         if (resourceList.isEmpty())
         {
-            const QnCameraDeviceStringSet deviceStringSet{
+            static const QnCameraDeviceStringSet deviceStringSet{
                 tr("Select at least one Device"),
                 tr("Select at least one Camera"),
                 tr("Select at least one I/O module")
@@ -157,15 +177,14 @@ private:
     }
 
     template<>
-    void setIds<vms::rules::SourceServerField>(const QnUuidList& ids)
+    void updateUi<vms::rules::SourceServerField>()
     {
         auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
 
-        auto resourceList = resourcePool->getResourcesByIds<QnMediaServerResource>(ids);
+        auto resourceList = resourcePool->getResourcesByIds<QnMediaServerResource>(field->ids());
 
         auto selectServersButtonPtr = static_cast<QnSelectServersButton*>(selectResourceButton);
-        selectServersButtonPtr->selectServers(
-            resourcePool->getResourcesByIds<QnMediaServerResource>(ids));
+        selectServersButtonPtr->selectServers(resourceList);
 
         if (resourceList.isEmpty())
         {
@@ -179,15 +198,14 @@ private:
     }
 
     template<>
-    void setIds<vms::rules::SourceUserField>(const QnUuidList& ids)
+    void updateUi<vms::rules::SourceUserField>()
     {
         auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
 
-        auto resourceList = resourcePool->getResourcesByIds<QnUserResource>(ids);
+        auto resourceList = resourcePool->getResourcesByIds<QnUserResource>(field->ids());
 
         auto selectUsersButtonPtr = static_cast<QnSelectUsersButton*>(selectResourceButton);
-        selectUsersButtonPtr->selectUsers(
-            resourcePool->getResourcesByIds<QnUserResource>(ids));
+        selectUsersButtonPtr->selectUsers(resourceList);
 
         if (resourceList.isEmpty())
         {
@@ -200,6 +218,45 @@ private:
         }
     }
 
+    template<typename T>
+    void select();
+
+    template<>
+    void select<vms::rules::SourceCameraField>()
+    {
+        auto selectedCameras = field->ids();
+
+        CameraSelectionDialog::selectCameras<CameraSelectionDialog::DummyPolicy>(
+            selectedCameras,
+            this);
+
+        field->setIds(selectedCameras);
+    }
+
+    template<>
+    void select<vms::rules::SourceServerField>()
+    {
+        auto selectedServers = field->ids();
+
+        const auto serverFilter = [](const QnMediaServerResourcePtr&){ return true; };
+        ServerSelectionDialog::selectServers(selectedServers, serverFilter, QString{}, this);
+
+        field->setIds(selectedServers);
+    }
+
+    template<>
+    void select<vms::rules::SourceUserField>()
+    {
+        auto selectedUsers = field->ids();
+
+        ui::SubjectSelectionDialog dialog(this);
+        dialog.setAllUsers(field->acceptAll());
+        dialog.setCheckedSubjects(selectedUsers);
+        dialog.exec();
+
+        field->setAcceptAll(dialog.allUsers());
+        field->setIds(dialog.totalCheckedUsers());
+    }
 };
 
 } // namespace nx::vms::client::desktop::rules

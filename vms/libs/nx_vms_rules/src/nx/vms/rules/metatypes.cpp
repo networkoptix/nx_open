@@ -19,6 +19,8 @@ void Metatypes::initialize()
     qRegisterMetaType<QnUuidList>("QnUuidList");
     QnJsonSerializer::registerSerializer<QnUuidList>();
 
+    QnJsonSerializer::registerSerializer<QSet<QnUuid>>();
+
     // qRegisterMetaType<UuidSelection>();
     // QnJsonSerializer::registerSerializer<UuidSelection>();
 };

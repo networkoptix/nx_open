@@ -22,7 +22,8 @@ TEST(VmsRulesSerialization, EventField)
 
     auto field = std::make_unique<TestEventField>();
     field->id = QnUuid::createUuid();
-    field->ids << QnUuid::createUuid() << QnUuid::createUuid();
+    field->idsList << QnUuid::createUuid() << QnUuid::createUuid();
+    field->idsSet << QnUuid::createUuid() << QnUuid::createUuid();
     field->string = "test string";
     field->strings << "string 1" << "string 2";
     field->flag = true;
@@ -50,7 +51,8 @@ TEST(VmsRulesSerialization, EventField)
     ASSERT_TRUE(resultField);
 
     EXPECT_EQ(sourceField->id, resultField->id);
-    EXPECT_EQ(sourceField->ids, resultField->ids);
+    EXPECT_EQ(sourceField->idsList, resultField->idsList);
+    EXPECT_EQ(sourceField->idsSet, resultField->idsSet);
     EXPECT_EQ(sourceField->string, resultField->string);
     EXPECT_EQ(sourceField->strings, resultField->strings);
     EXPECT_EQ(sourceField->flag, resultField->flag);

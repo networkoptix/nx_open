@@ -27,12 +27,12 @@ void ResourceFilterField::setAcceptAll(bool acceptAll)
     m_acceptAll = acceptAll;
 }
 
-QList<QnUuid> ResourceFilterField::ids() const
+QSet<QnUuid> ResourceFilterField::ids() const
 {
     return m_ids;
 }
 
-void ResourceFilterField::setIds(const QList<QnUuid>& ids)
+void ResourceFilterField::setIds(const QSet<QnUuid>& ids)
 {
     m_ids = ids;
 }
