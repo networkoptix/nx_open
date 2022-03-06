@@ -3,6 +3,9 @@
 #include "item_order.h"
 
 #include <QtCore/QCollator>
+
+#include <client/client_globals.h>
+#include <core/resource/resource.h>
 #include <nx/vms/client/desktop/resource_views/entity_item_model/item/abstract_item.h>
 
 namespace nx::vms::client::desktop {
@@ -28,7 +31,20 @@ ItemOrder numericOrder(
                 lhs->data(Qt::DisplayRole).toString(), rhs->data(Qt::DisplayRole).toString());
 
             if (collatorCompareResult == 0)
+            {
+                const auto lResourceData = lhs->data(Qn::ResourceRole);
+                const auto rResourceData = rhs->data(Qn::ResourceRole);
+                if (!lResourceData.isNull() && !rResourceData.isNull())
+                {
+                    const auto lResourceId = lResourceData.value<QnResourcePtr>()->getId();
+                    const auto rResourceId = rResourceData.value<QnResourcePtr>()->getId();
+                    if (lResourceId != rResourceId)
+                        return sortOrder == Qt::AscendingOrder
+                            ? (lResourceId < rResourceId)
+                            : (lResourceId > rResourceId);
+                }
                 return sortOrder == Qt::AscendingOrder ? (lhs < rhs) : (lhs > rhs);
+            }
 
             return sortOrder == Qt::AscendingOrder
                 ? (collatorCompareResult < 0)
