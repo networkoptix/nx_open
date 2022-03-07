@@ -318,11 +318,11 @@
     </message>
     <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
-      <translation type="unfinished">All files are successfully backed up! New files will be backed up automatically</translation>
+      <translation>Alle filer er sikkerhedskopieret! Nye filer sikkerhedskopieres automatisk</translation>
     </message>
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
-      <translation type="unfinished">Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</translation>
+      <translation>Sikkerhedskopiering er stoppet på grund af lagringsproblem. Sikkerhedskopieringen genoptages automatisk, når lagringsproblemet er løst</translation>
     </message>
   </context>
   <context>
@@ -616,7 +616,7 @@
     </message>
     <message>
       <source>RTP Transport</source>
-      <translation type="unfinished">RTP Transport</translation>
+      <translation>RTP Transport</translation>
     </message>
     <message>
       <source>Use camera native presets</source>
@@ -624,11 +624,11 @@
     </message>
     <message>
       <source>Time Settings</source>
-      <translation type="unfinished">Time Settings</translation>
+      <translation>Tidsindstillinger</translation>
     </message>
     <message>
       <source>Keep camera time settings</source>
-      <translation type="unfinished">Keep camera time settings</translation>
+      <translation>Behold kameraets tidsindstillinger</translation>
     </message>
   </context>
   <context>
@@ -762,7 +762,7 @@
     </message>
     <message>
       <source>Motion &amp;&amp; Objects Recording</source>
-      <translation type="unfinished">Motion &amp;&amp; Objects Recording</translation>
+      <translation>Bevægelses &amp; Objekt Optagelse</translation>
     </message>
   </context>
   <context>
@@ -1772,7 +1772,7 @@
     <name>OauthLoginPlaceholder</name>
     <message>
       <source>Try Again</source>
-      <translation type="unfinished">Try Again</translation>
+      <translation>Prøv igen</translation>
     </message>
   </context>
   <context>
@@ -2442,7 +2442,7 @@
     </message>
     <message>
       <source>Manage Users</source>
-      <translation type="unfinished">Manage Users</translation>
+      <translation>Administrer brugere</translation>
     </message>
   </context>
   <context>
@@ -2534,7 +2534,7 @@
     </message>
     <message>
       <source>Autodetect built-in and USB webcams</source>
-      <translation type="unfinished">Autodetect built-in and USB webcams</translation>
+      <translation>Registrer automatisk indbyggede og USB-webcams</translation>
     </message>
   </context>
   <context>
@@ -3012,7 +3012,7 @@
     </message>
     <message>
       <source>Allow opening web page without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening web page without SSL certificate checking</translation>
+      <translation>Tillad åbning af webside uden kontrol af SSL-certifikat</translation>
     </message>
   </context>
   <context>
