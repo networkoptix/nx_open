@@ -25,6 +25,12 @@ AuthenticationDataModel::AuthenticationDataModel(QObject* parent):
 
     connect(m_credentialsManager.get(), &CredentialsManager::storedCredentialsChanged,
         this, &AuthenticationDataModel::updateData);
+
+    connect(this, &AuthenticationDataModel::modelReset,
+        this, &AuthenticationDataModel::updateHasSavedCredentials);
+
+    connect(this, &AuthenticationDataModel::currentUserChanged,
+        this, &AuthenticationDataModel::updateHasSavedCredentials);
 }
 
 AuthenticationDataModel::~AuthenticationDataModel()
@@ -53,6 +59,40 @@ CredentialsTileModel AuthenticationDataModel::defaultCredentials() const
         return {};
 
     return m_credentialsList.first();
+}
+
+QString AuthenticationDataModel::currentUser() const
+{
+    return m_currentUser;
+}
+
+void AuthenticationDataModel::setCurrentUser(const QString& value)
+{
+    if (value == m_currentUser)
+        return;
+
+    m_currentUser = value;
+    emit currentUserChanged();
+}
+
+bool AuthenticationDataModel::hasSavedCredentials() const
+{
+    return m_hasSavedCredentials;
+}
+
+void AuthenticationDataModel::updateHasSavedCredentials()
+{
+    const auto value = std::any_of(m_credentialsList.begin(), m_credentialsList.end(),
+        [this](const CredentialsTileModel& value)
+        {
+            return value.user == m_currentUser && value.isPasswordSaved;
+        });
+
+    if (value == m_hasSavedCredentials)
+        return;
+
+    m_hasSavedCredentials = value;
+    emit hasSavedCredentialsChanged();
 }
 
 void AuthenticationDataModel::updateData()
