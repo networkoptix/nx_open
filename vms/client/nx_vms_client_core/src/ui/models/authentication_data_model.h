@@ -35,6 +35,13 @@ class AuthenticationDataModel: public QAbstractListModel
         NOTIFY localSystemIdChanged)
     Q_PROPERTY(nx::vms::client::core::CredentialsTileModel defaultCredentials
         READ defaultCredentials NOTIFY defaultCredentialsChanged)
+    Q_PROPERTY(QString currentUser
+        READ currentUser
+        WRITE setCurrentUser
+        NOTIFY currentUserChanged)
+    Q_PROPERTY(bool hasSavedCredentials
+        READ hasSavedCredentials
+        NOTIFY hasSavedCredentialsChanged)
 
 public:
     enum Roles
@@ -52,21 +59,31 @@ public:
 
     CredentialsTileModel defaultCredentials() const;
 
+    QString currentUser() const;
+    void setCurrentUser(const QString& value);
+
+    Q_INVOKABLE bool hasSavedCredentials() const;
+
 public:
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
     QHash<int, QByteArray> roleNames() const override;
 
     void updateData();
+    void updateHasSavedCredentials();
 
 signals:
     void localSystemIdChanged();
     void defaultCredentialsChanged();
+    void currentUserChanged();
+    void hasSavedCredentialsChanged();
 
 private:
     QUuid m_localSystemId;
     QList<CredentialsTileModel> m_credentialsList;
     std::unique_ptr<CredentialsManager> m_credentialsManager;
+    QString m_currentUser;
+    bool m_hasSavedCredentials;
 };
 
 } // namespace nx::vms::client::core
