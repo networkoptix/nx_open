@@ -1681,6 +1681,7 @@ void WorkbenchUi::createFpsWidget()
     m_fpsItem->setAcceptHoverEvents(false);
     m_fpsItem->setText(lit("...."));
     m_fpsItem->setTextFormat(Qt::RichText);
+    m_fpsItem->setVisible(false); // Visibility is controlled via setFpsVisible() method.
     updateFpsGeometry();
     setPaletteColor(m_fpsItem, QPalette::Window, Qt::transparent);
     setPaletteColor(m_fpsItem, QPalette::WindowText, QColor(63, 159, 216));
@@ -1688,7 +1689,7 @@ void WorkbenchUi::createFpsWidget()
 
     connect(action(action::ShowFpsAction), &QAction::toggled, this, &WorkbenchUi::setFpsVisible);
     connect(m_fpsItem, &QGraphicsWidget::geometryChanged, this, &WorkbenchUi::updateFpsGeometry);
-    setFpsVisible(ini().profilerMode);
+
     setDebugInfoVisible(ini().developerMode);
 
     const auto performanceInfo = new PerformanceInfo(m_fpsItem);
