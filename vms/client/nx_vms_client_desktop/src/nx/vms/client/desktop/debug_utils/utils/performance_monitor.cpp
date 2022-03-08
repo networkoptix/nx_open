@@ -51,19 +51,24 @@ bool PerformanceMonitor::isDebugInfoVisible() const
 
 void PerformanceMonitor::setVisible(bool visible)
 {
+    if (isEnabled() != visible)
+        setEnabled(nx::utils::trace::Log::isEnabled() || visible);
+
     if (d->visible == visible)
         return;
-
-    setEnabled(nx::utils::trace::Log::isEnabled() || visible);
 
     d->visible = visible;
     emit visibleChanged(visible);
 }
 
+bool PerformanceMonitor::isEnabled() const
+{
+    return d->workerThread && d->workerThread->isRunning();
+}
+
 void PerformanceMonitor::setEnabled(bool enabled)
 {
-    const bool isRunning = d->workerThread && d->workerThread->isRunning();
-    if (isRunning == enabled)
+    if (isEnabled() == enabled)
         return;
 
     if (enabled)
