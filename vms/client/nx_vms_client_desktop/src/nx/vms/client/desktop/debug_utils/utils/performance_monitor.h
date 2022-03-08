@@ -22,6 +22,7 @@ public:
 
     QVariantMap values() const;
     bool isVisible() const;
+    bool isEnabled() const;
     void setDebugInfoVisible(bool visible);
     bool isDebugInfoVisible() const;
 
