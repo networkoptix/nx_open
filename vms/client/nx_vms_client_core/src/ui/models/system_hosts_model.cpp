@@ -29,7 +29,7 @@ QSet<nx::utils::Url> formAdditionalUrlsSet(
     const auto mainServerUrl = systemDescription->getServerHost(serverId);
 
     // Only connection url is valid for localhost determination.
-    if (qnLocalNetworkInterfacesManager->containsHost(mainServerUrl.host()))
+    if (QnSystemHostsModel::isLocalhost(mainServerUrl.host(), true))
     {
         nx::utils::Url localhostUrl;
         localhostUrl.setScheme("https");
@@ -153,7 +153,12 @@ void QnSystemHostsModel::HostsModel::forceResort()
         auto serverDataIter = std::find_if(m_serversUrlData.begin(), m_serversUrlData.end(),
             [recentUrl](const ServerUrlData& serverData)
             {
-                return serverData.additionalUrls.contains(recentUrl);
+                return std::any_of(
+                    serverData.additionalUrls.begin(), serverData.additionalUrls.end(),
+                    [recentUrl](const nx::utils::Url& url)
+                    {
+                        return recentUrl.host() == url.host();
+                    });
             });
 
         if (serverDataIter != m_serversUrlData.end()
