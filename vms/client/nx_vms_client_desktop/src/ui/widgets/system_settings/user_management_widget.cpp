@@ -5,6 +5,7 @@
 
 #include <boost/algorithm/cxx11/any_of.hpp>
 
+#include <QtCore/QMap>
 #include <QtCore/QSortFilterProxyModel>
 #include <QtGui/QKeyEvent>
 #include <QtWidgets/QMenu>
@@ -17,6 +18,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resources_changes_manager.h>
 #include <nx/utils/guarded_callback.h>
+#include <nx/utils/range_adapters.h>
 #include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
 #include <nx/vms/client/desktop/common/utils/item_view_hover_tracker.h>
 #include <nx/vms/client/desktop/common/widgets/checkable_header_view.h>
@@ -335,18 +337,25 @@ void QnUserManagementWidget::updateLdapState()
 
 void QnUserManagementWidget::applyChanges()
 {
-    auto modelUsers = m_usersModel->users();
-    QSet<QnUserResourcePtr> enableDigestUsers;
-    QSet<QnUserResourcePtr> disableDigestUsers;
+    const auto modelUsers = m_usersModel->users();
+    QMap<QnUserResource::DigestSupport, QSet<QnUserResourcePtr>> usersToSave;
     QnUserResourceList usersToDelete;
 
-    auto userModified =
+    const auto digestSupport =
         [&](const QnUserResourcePtr& user)
         {
-            if (m_usersModel->isDigestEnabled(user))
-                enableDigestUsers.insert(user);
-            else
-                disableDigestUsers.insert(user);
+            if (user->isCloud())
+                return QnUserResource::DigestSupport::keep;
+
+            return m_usersModel->isDigestEnabled(user)
+                ? QnUserResource::DigestSupport::enable
+                : QnUserResource::DigestSupport::disable;
+        };
+
+    const auto userModified =
+        [&](const QnUserResourcePtr& user)
+        {
+            usersToSave[digestSupport(user)].insert(user);
         };
 
     for (auto user: resourcePool()->getResources<QnUserResource>())
@@ -368,17 +377,8 @@ void QnUserManagementWidget::applyChanges()
             userModified(user);
     }
 
-    if (!enableDigestUsers.empty())
-    {
-        qnResourcesChangesManager->saveUsers(
-            enableDigestUsers.values(), QnUserResource::DigestSupport::enable);
-    }
-
-    if (!disableDigestUsers.empty())
-    {
-        qnResourcesChangesManager->saveUsers(
-            disableDigestUsers.values(), QnUserResource::DigestSupport::disable);
-    }
+    for (const auto& [digestSupport, userSet]: nx::utils::constKeyValueRange(usersToSave))
+        qnResourcesChangesManager->saveUsers(userSet.values(), digestSupport);
 
     /* User still can press cancel on 'Confirm Remove' dialog. */
     if (!usersToDelete.empty())
