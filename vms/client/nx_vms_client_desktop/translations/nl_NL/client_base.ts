@@ -25,9 +25,9 @@
     </message>
     <message numerus="yes">
       <source>%1 with %n attributes</source>
-      <translation type="unfinished">
-        <numerusform>%1 with %n attributes</numerusform>
-        <numerusform>%1 with %n attributes</numerusform>
+      <translation>
+        <numerusform>%1 met %n attributen</numerusform>
+        <numerusform>%1 met %n attributen</numerusform>
       </translation>
     </message>
     <message>
@@ -1005,15 +1005,15 @@
     </message>
     <message>
       <source>Copy Bookmark Text</source>
-      <translation type="unfinished">Copy Bookmark Text</translation>
+      <translation>Bladwijzertekst kopiëren</translation>
     </message>
     <message>
       <source>Copy Bookmarks Text</source>
-      <translation type="unfinished">Copy Bookmarks Text</translation>
+      <translation>Bladwijzerteksten kopiëren</translation>
     </message>
     <message>
       <source>Web Page Settings...</source>
-      <translation type="unfinished">Web Page Settings...</translation>
+      <translation>Webpagina instellingen...</translation>
     </message>
   </context>
   <context>
@@ -1708,7 +1708,7 @@
     </message>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
-      <translation type="unfinished">On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</translation>
+      <translation>Bij de eerste verbinding met de server wordt om uw bevestiging gevraagd om het certificaat te accepteren als het fouten bevat</translation>
     </message>
   </context>
   <context>
@@ -2693,7 +2693,7 @@ to %1</source>
     <message>
       <source>You are about to disconnect System from %1</source>
       <comment>%1 is the cloud name, like Nx Cloud</comment>
-      <translation type="unfinished">You are about to disconnect System from %1</translation>
+      <translation>U staat op het punt om het systeem te verbreken van %1</translation>
     </message>
     <message>
       <source>All %1 users will be deleted.</source>
@@ -2702,11 +2702,11 @@ to %1</source>
     </message>
     <message>
       <source>You will be logged out.</source>
-      <translation type="unfinished">You will be logged out.</translation>
+      <translation>U wordt uitgelogd.</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
-      <translation type="unfinished">System will be accessible through local network with a local administrator account.</translation>
+      <translation>Het systeem zal toegankelijk zijn via het lokale netwerk met een lokaal beheerdersaccount.</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -2715,7 +2715,7 @@ to %1</source>
     <message>
       <source>Cannot disconnect the System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot disconnect the System from %1</translation>
+      <translation>Kan de verbinding voor het systeem niet verbreken van %1</translation>
     </message>
   </context>
   <context>
@@ -3428,7 +3428,7 @@ to %1</source>
     </message>
     <message>
       <source>Please enter a password.</source>
-      <translation type="unfinished">Please enter a password.</translation>
+      <translation>Voer een wachtwoord in alstublieft.</translation>
     </message>
   </context>
   <context>
@@ -3896,11 +3896,11 @@ to %1</source>
     </message>
     <message>
       <source>Motion Search</source>
-      <translation type="unfinished">Motion Search</translation>
+      <translation>Zoeken op beweging</translation>
     </message>
     <message>
       <source>Object Search</source>
-      <translation type="unfinished">Object Search</translation>
+      <translation>Zoeken op Object</translation>
     </message>
   </context>
   <context>
@@ -4476,7 +4476,7 @@ to %1</source>
     </message>
     <message>
       <source>Enter Fullscreen</source>
-      <translation type="unfinished">Enter Fullscreen</translation>
+      <translation>Ga naar volledig scherm</translation>
     </message>
   </context>
   <context>
@@ -5527,7 +5527,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Camera recording schedule is invalid</source>
-      <translation type="unfinished">Camera recording schedule is invalid</translation>
+      <translation>Camera-opnameschema is ongeldig</translation>
     </message>
   </context>
   <context>
@@ -5701,7 +5701,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>With enabled digest authentication</source>
-      <translation type="unfinished">With enabled digest authentication</translation>
+      <translation>Met ingeschakelde digest authenticatie</translation>
     </message>
   </context>
   <context>
@@ -5998,19 +5998,19 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <name>QnWebResourceWidget</name>
     <message>
       <source>Open this web page?</source>
-      <translation type="unfinished">Open this web page?</translation>
+      <translation>Deze webpagina openen?</translation>
     </message>
     <message>
       <source>Web page</source>
-      <translation type="unfinished">Web page</translation>
+      <translation>Web pagina</translation>
     </message>
     <message>
       <source>Connect anyway</source>
-      <translation type="unfinished">Connect anyway</translation>
+      <translation>Toch verbinden</translation>
     </message>
     <message>
       <source>Web page settings...</source>
-      <translation type="unfinished">Web page settings...</translation>
+      <translation>Webpagina instellingen...</translation>
     </message>
     <message>
       <source>You try to open the
@@ -6018,10 +6018,10 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
 but this web page presented an untrusted certificate auth.
 We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
       <comment>%1 is the web page address</comment>
-      <translation type="unfinished">You try to open the
+      <translation>U probeert de
 %1
-but this web page presented an untrusted certificate auth.
-We recommend you not to open this web page. If you understand the risks, you can open the web page.</translation>
+te openen, maar deze webpagina bevatte een niet-vertrouwde certificaatverificatie.
+We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u de webpagina openen.</translation>
     </message>
   </context>
   <context>
@@ -6091,7 +6091,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Camera %1 does not support PTZ</source>
-      <translation type="unfinished">Camera %1 does not support PTZ</translation>
+      <translation>Camera %1 ondersteunt geen PTZ</translation>
     </message>
   </context>
   <context>
@@ -7179,11 +7179,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Not supported</source>
-      <translation type="unfinished">Not supported</translation>
+      <translation>Niet ondersteund</translation>
     </message>
     <message>
       <source>Backup is not supported for this device</source>
-      <translation type="unfinished">Backup is not supported for this device</translation>
+      <translation>Back-up wordt niet ondersteund voor dit apparaat</translation>
     </message>
   </context>
   <context>
@@ -7248,12 +7248,12 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</translation>
+      <translation>Om back-up te wijzigen &quot;Hoofd&quot; tot &quot;back-up&quot; op sommige opslagplaatsen in %1</translation>
     </message>
     <message>
       <source>To enable backup add more drives to use them as backup storage in %1</source>
       <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
-      <translation type="unfinished">To enable backup add more drives to use them as backup storage in %1</translation>
+      <translation>Om back-up te activeren voeg je meer schijven toe om ze te gebruiken als back-up opslag in %1</translation>
     </message>
   </context>
   <context>
@@ -7329,11 +7329,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraButtonController</name>
     <message>
       <source>Heater</source>
-      <translation type="unfinished">Heater</translation>
+      <translation>Verwarming</translation>
     </message>
     <message>
       <source>Wiper</source>
-      <translation type="unfinished">Wiper</translation>
+      <translation>Ruitenwissers</translation>
     </message>
   </context>
   <context>
@@ -7407,7 +7407,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Server will not push time settings to the camera.</source>
-      <translation type="unfinished">Server will not push time settings to the camera.</translation>
+      <translation>De server zal geen tijdinstellingen naar de camera pushen.</translation>
     </message>
   </context>
   <context>
@@ -7525,7 +7525,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message>
       <source>Show all devices</source>
-      <translation type="unfinished">Show all devices</translation>
+      <translation>Toon alle apparaten</translation>
     </message>
     <message>
       <source>Show all cameras</source>
@@ -7533,7 +7533,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select Devices</source>
-      <translation type="unfinished">Select Devices</translation>
+      <translation>Selecteer apparaten</translation>
     </message>
     <message>
       <source>Select Cameras</source>
@@ -7541,11 +7541,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Select Device</source>
-      <translation type="unfinished">Select Device</translation>
+      <translation>Selecteer apparaat</translation>
     </message>
     <message>
       <source>Select Camera</source>
-      <translation type="unfinished">Select Camera</translation>
+      <translation>Selecteer Camera</translation>
     </message>
   </context>
   <context>
@@ -7637,11 +7637,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Change invalid schedule to &quot;Record Always&quot;</source>
-      <translation type="unfinished">Change invalid schedule to &quot;Record Always&quot;</translation>
+      <translation>Wijzig ongeldig schema naar &quot;Altijd opnemen&quot;</translation>
     </message>
     <message>
       <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
-      <translation type="unfinished">Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</translation>
+      <translation>Sommige cellen van het opnameschema zijn ingesteld op een ongeldige opnamemodus: %1. Wanneer u de uren instelt op een ongeldige opnamemodus neemt de camera op in &quot;Altijd opnemen&quot; modus.</translation>
     </message>
     <message>
       <source>Motion Only</source>
@@ -7653,7 +7653,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Motion &amp; Objects Only</source>
-      <translation type="unfinished">Motion &amp; Objects Only</translation>
+      <translation>Alleen beweging &amp; objecten</translation>
     </message>
     <message>
       <source>Motion + Lo-Res</source>
@@ -7661,58 +7661,58 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Objecten + Lo-Res</translation>
     </message>
     <message>
       <source>Motion &amp; Objects + Lo-Res</source>
-      <translation type="unfinished">Motion &amp; Objects + Lo-Res</translation>
+      <translation>Beweging &amp; objecten + Lo-Res</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSettingsDialogStateConversionFunctions</name>
     <message numerus="yes">
       <source>Failed to enable audio on %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to enable audio on %n devices</numerusform>
-        <numerusform>Failed to enable audio on %n devices</numerusform>
+      <translation>
+        <numerusform>Fout bij het inschakelen van audio op %n apparaten</numerusform>
+        <numerusform>Fout bij het inschakelen van audio op %n apparaten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These devices do not have audio inputs or are not configured correctly.</source>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+      <translation>
+        <numerusform>Deze apparaten hebben geen audio-ingangen of zijn niet correct geconfigureerd.</numerusform>
+        <numerusform>Deze apparaten hebben geen audio-ingangen of zijn niet correct geconfigureerd.</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Failed to enable 2-way audio on %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
+      <translation>
+        <numerusform>2-weg audio op %n apparaten inschakelen mislukt</numerusform>
+        <numerusform>2-weg audio op %n apparaten inschakelen mislukt</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>These devices do not have audio outputs or are not configured correctly.</source>
-      <translation type="unfinished">
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+      <translation>
+        <numerusform>Deze apparaten hebben geen audio-uitgangen of zijn niet correct geconfigureerd.</numerusform>
+        <numerusform>Deze apparaten hebben geen audio-uitgangen of zijn niet correct geconfigureerd.</numerusform>
       </translation>
     </message>
     <message>
       <source>Audio will be disabled</source>
-      <translation type="unfinished">Audio will be disabled</translation>
+      <translation>Audio wordt uitgeschakeld</translation>
     </message>
     <message>
       <source>You need to select a device that will provide audio.</source>
-      <translation type="unfinished">You need to select a device that will provide audio.</translation>
+      <translation>Je moet een apparaat selecteren dat audio geeft.</translation>
     </message>
     <message>
       <source>2-way audio will be disabled</source>
-      <translation type="unfinished">2-way audio will be disabled</translation>
+      <translation>2-weg audio wordt uitgeschakeld</translation>
     </message>
     <message>
       <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
-      <translation type="unfinished">You need to select a device to transmit the audio stream to and use for audio playback.</translation>
+      <translation>Je moet een apparaat selecteren om de audio stream naar en te sturen voor het afspelen van audio.</translation>
     </message>
   </context>
   <context>
@@ -7728,9 +7728,9 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>%1 are required</source>
       <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
-        <numerusform>%1 are required</numerusform>
+      <translation>
+        <numerusform>%1 zijn verplicht</numerusform>
+        <numerusform>%1 zijn verplicht</numerusform>
       </translation>
     </message>
   </context>
@@ -7750,11 +7750,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Invalid stream address</source>
-      <translation type="unfinished">Invalid stream address</translation>
+      <translation>Ongeldig stream adres</translation>
     </message>
     <message>
       <source>Streaming protocol mismatch</source>
-      <translation type="unfinished">Streaming protocol mismatch</translation>
+      <translation>Streaming protocol komt niet overeen</translation>
     </message>
   </context>
   <context>
@@ -7762,11 +7762,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Select a certificate to authenticate yourself to %1:</source>
       <extracomment>%1 here is a host name for which you provide a certificate.</extracomment>
-      <translation type="unfinished">Select a certificate to authenticate yourself to %1:</translation>
+      <translation>Selecteer een certificaat om jezelf te verifiëren naar %1:</translation>
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Selecteer</translation>
     </message>
   </context>
   <context>
@@ -7809,11 +7809,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot download update file</source>
-      <translation type="unfinished">Cannot download update file</translation>
+      <translation>Kan updatebestand niet downloaden</translation>
     </message>
     <message>
       <source>There is no enough space to download update file</source>
-      <translation type="unfinished">There is no enough space to download update file</translation>
+      <translation>Er is niet genoeg ruimte om het updatebestand te downloaden</translation>
     </message>
   </context>
   <context>
@@ -7852,7 +7852,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Login to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Login to %1</translation>
+      <translation>Inloggen op %1</translation>
     </message>
   </context>
   <context>
@@ -7867,7 +7867,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Could not connect to server. Application will be closed.</source>
-      <translation type="unfinished">Could not connect to server. Application will be closed.</translation>
+      <translation>Kan geen verbinding maken met de server. De applicatie zal worden afgesloten.</translation>
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
@@ -7875,15 +7875,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Re-authentication required</source>
-      <translation type="unfinished">Re-authentication required</translation>
+      <translation>Herauthenticatie vereist</translation>
     </message>
     <message>
       <source>Enter password to continue your session</source>
-      <translation type="unfinished">Enter password to continue your session</translation>
+      <translation>Voer wachtwoord in om door te gaan met uw sessie</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again to continue.</source>
-      <translation type="unfinished">Your session has expired. Please sign in again to continue.</translation>
+      <translation>Uw sessie is verlopen. Log opnieuw in om door te gaan.</translation>
     </message>
     <message>
       <source>OK</source>
@@ -7895,11 +7895,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ConnectToCloudTool</name>
     <message>
       <source>Local System owner is absent or disabled.</source>
-      <translation type="unfinished">Local System owner is absent or disabled.</translation>
+      <translation>Lokale systeemeigenaar is afwezig of uitgeschakeld.</translation>
     </message>
     <message>
       <source>None of your Servers is connected to the Internet.</source>
-      <translation type="unfinished">None of your Servers is connected to the Internet.</translation>
+      <translation>Geen van uw servers is verbonden met internet.</translation>
     </message>
     <message>
       <source>System connected to %1</source>
@@ -7924,7 +7924,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Enter your account password to connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to connect System to %1</translation>
+      <translation>Voer het wachtwoord van uw account in om te verbinden met het systeem met %1</translation>
     </message>
     <message>
       <source>Connect</source>
@@ -7957,11 +7957,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Merge Server to the System</source>
       <comment>Dialog title</comment>
-      <translation type="unfinished">Merge Server to the System</translation>
+      <translation>Server samenvoegen met het systeem</translation>
     </message>
     <message>
       <source>Enter your account password to merge Server to the System</source>
-      <translation type="unfinished">Enter your account password to merge Server to the System</translation>
+      <translation>Voer het wachtwoord van uw account in om de server samen te voegen met het systeem</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -8012,7 +8012,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
-      <translation type="unfinished">Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</translation>
+      <translation>Opnameschema bevat opnamemodi die niet worden ondersteund door de geselecteerde camera's. Niet-ondersteunde opnamemodi worden gewijzigd in &quot;Altijd opnemen&quot;.</translation>
     </message>
   </context>
   <context>
@@ -8131,18 +8131,18 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
-      <translation type="unfinished">Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</translation>
+      <translation>Zoeken naar apparaten op het netwerk is beperkt tot camera's die HTTPS-verbindingen ondersteunen. Dit kan worden gewijzigd in %1 instellingen.</translation>
     </message>
     <message>
       <source>System Administration</source>
-      <translation type="unfinished">System Administration</translation>
+      <translation>Systeembeheer</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EncryptedArchivePasswordDialog</name>
     <message>
       <source>Decrypt</source>
-      <translation type="unfinished">Decrypt</translation>
+      <translation>Ontsleutelen</translation>
     </message>
     <message>
       <source>Invalid password</source>
@@ -8203,7 +8203,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>Probeer de filters te veranderen of maak een Event regel</translation>
     </message>
   </context>
   <context>
@@ -8259,11 +8259,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Archive is encrypted.</source>
-      <translation type="unfinished">Archive is encrypted.</translation>
+      <translation>Archief is versleuteld.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
-      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+      <translation>Archief is nu niet beschikbaar. Probeer het later opnieuw.</translation>
     </message>
   </context>
   <context>
@@ -8378,7 +8378,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Export is not available: This camera does not have a video archive for the selected time period.</source>
-      <translation type="unfinished">Export is not available: This camera does not have a video archive for the selected time period.</translation>
+      <translation>Export is niet beschikbaar: deze camera heeft geen video-archief voor de geselecteerde periode.</translation>
     </message>
   </context>
   <context>
@@ -8386,14 +8386,14 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Exported: %1</source>
       <comment>Duration will be substituted</comment>
-      <translation type="unfinished">Exported: %1</translation>
+      <translation>Geexporteerd: %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::FailoverPriorityDialogItemDelegate</name>
     <message>
       <source>No failover</source>
-      <translation type="unfinished">No failover</translation>
+      <translation>Geen failover</translation>
     </message>
     <message>
       <source>Low</source>
@@ -8479,7 +8479,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Klik op het icoon om meer te lezen</translation>
     </message>
   </context>
   <context>
@@ -8630,21 +8630,21 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::LocalSessionTokenExpirationWatcher</name>
     <message>
       <source>Your session expires soon</source>
-      <translation type="unfinished">Your session expires soon</translation>
+      <translation>Uw sessie verloopt binnenkort</translation>
     </message>
     <message>
       <source>Re-Authenticate Now</source>
-      <translation type="unfinished">Re-Authenticate Now</translation>
+      <translation>Opnieuw authenticeren</translation>
     </message>
     <message>
       <source>Less than a minute left</source>
-      <translation type="unfinished">Less than a minute left</translation>
+      <translation>Nog minder dan een minuut resterend</translation>
     </message>
     <message numerus="yes">
       <source>%n minutes left</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes left</numerusform>
-        <numerusform>%n minutes left</numerusform>
+      <translation>
+        <numerusform>%n minuten resterend</numerusform>
+        <numerusform>%n minuten resterend</numerusform>
       </translation>
     </message>
   </context>
@@ -8721,7 +8721,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Enter your account password to merge Systems</source>
-      <translation type="unfinished">Enter your account password to merge Systems</translation>
+      <translation>Voer het wachtwoord van uw account in om systemen samen te voegen</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -8778,7 +8778,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</source>
-      <translation type="unfinished">Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</translation>
+      <translation>Geselecteerd systeem heeft een oudere softwareversie die niet compatibel is met het huidige systeem. Werk het geselecteerde systeem bij naar de laatste build om het samen te voegen met de huidige versie.</translation>
     </message>
     <message>
       <source>The password or user name is invalid.</source>
@@ -8837,11 +8837,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate is invalid.</source>
-      <translation type="unfinished">Connection to Server could not be established. The Server&apos;s certificate is invalid.</translation>
+      <translation>Verbinding met de server kon niet worden gemaakt. Het Server certificaat is ongeldig.</translation>
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate was rejected.</source>
-      <translation type="unfinished">Connection to Server could not be established. The Server&apos;s certificate was rejected.</translation>
+      <translation>Verbinding met de server kon niet worden gemaakt. Het certificaat van de server is geweigerd.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
@@ -8850,7 +8850,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>%1 systems have different owners. Merge is not allowed.</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 systems have different owners. Merge is not allowed.</translation>
+      <translation>%1 systemen hebben verschillende eigenaren. Samenvoegen is niet toegestaan.</translation>
     </message>
   </context>
   <context>
@@ -8872,31 +8872,31 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::MotionStreamAlerts</name>
     <message>
       <source>Current stream has high resolution. Analyzing it for motion increases CPU load.</source>
-      <translation type="unfinished">Current stream has high resolution. Analyzing it for motion increases CPU load.</translation>
+      <translation>De huidige stream heeft een hoge resolutie. Het analyseren op beweging verhoogt de CPU-belasting.</translation>
     </message>
     <message>
       <source>Motion detection for this camera is not currently working because of changed stream resolution.
 You can force it, but it may significantly increase CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for this camera is not currently working because of changed stream resolution.
-You can force it, but it may significantly increase CPU load.</translation>
+      <translation>Bewegingsdetectie van deze camera werkt momenteel niet vanwege de gewijzigde stream resolutie.
+Je kunt het forceren, maar het kan de CPU-belasting aanzienlijk verhogen.</translation>
     </message>
     <message>
       <source>Motion detection for some cameras will not be working because the remaining stream has too high resolution.
 You can force it, but it may significantly increase CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for some cameras will not be working because the remaining stream has too high resolution.
-You can force it, but it may significantly increase CPU load.</translation>
+      <translation>Bewegingsdetectie voor sommige camera's zal niet werken, omdat de resterende stream een te hoge resolutie heeft.
+Je kunt het forceren, maar het kan de CPU-belasting aanzienlijk verhogen.</translation>
     </message>
     <message>
       <source>Motion detection for this camera will not be working because the remaining stream has too high resolution.
 You can force it, but it may significantly increase CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for this camera will not be working because the remaining stream has too high resolution.
-You can force it, but it may significantly increase CPU load.</translation>
+      <translation>Bewegingsdetectie van deze camera werkt niet omdat de resterende stream een te hoge resolutie heeft.
+Je kunt het forceren, maar het kan de CPU-belasting aanzienlijk verhogen.</translation>
     </message>
   </context>
   <context>
@@ -9183,7 +9183,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+      <translation>U gebruikt een aangepaste client. Neem contact op met %1 om de update-instructies te krijgen.</translation>
     </message>
   </context>
   <context>
@@ -9502,7 +9502,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</translation>
+      <translation>Door alle inhoud te proxien, wordt elke service of elk apparaat op het server-netwerk blootgesteld aan de gebruikers van deze webpagina</translation>
     </message>
   </context>
   <context>
@@ -9573,19 +9573,19 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Recording motion and objects</source>
-      <translation type="unfinished">Recording motion and objects</translation>
+      <translation>Beweging en objecten opnemen</translation>
     </message>
     <message>
       <source>Recording objects only</source>
-      <translation type="unfinished">Recording objects only</translation>
+      <translation>Alleen objecten opnemen</translation>
     </message>
     <message>
       <source>Recording motion, objects and low quality</source>
-      <translation type="unfinished">Recording motion, objects and low quality</translation>
+      <translation>Opname beweging, objecten en lage kwaliteit</translation>
     </message>
     <message>
       <source>Recording objects and low quality</source>
-      <translation type="unfinished">Recording objects and low quality</translation>
+      <translation>Opname objecten en lage kwaliteit</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
@@ -9593,15 +9593,15 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Objects only</source>
-      <translation type="unfinished">Objects only</translation>
+      <translation>Alleen objecten</translation>
     </message>
     <message>
       <source>Motion, Objects + Lo-Res</source>
-      <translation type="unfinished">Motion, Objects + Lo-Res</translation>
+      <translation>Beweging, objecten + Lo-Res</translation>
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Objecten + Lo-Res</translation>
     </message>
   </context>
   <context>
@@ -9777,11 +9777,11 @@ U kunt de kwaliteit en FPS nog steeds rechtstreeks wijzigen op de camera.</trans
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected devices</translation>
+      <translation>Bewegingsdetectie is uitgeschakeld voor sommige van de geselecteerde apparaten</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this camera</source>
-      <translation type="unfinished">Motion detection is disabled for this camera</translation>
+      <translation>Bewegingsdetectie is uitgeschakeld voor deze camera</translation>
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected cameras</source>
@@ -10787,7 +10787,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::integrations::OverlappedIdIntegration</name>
     <message>
       <source>Overlapped ID...</source>
-      <translation type="unfinished">Overlapped ID...</translation>
+      <translation>Overlappende ID...</translation>
     </message>
   </context>
   <context>
@@ -11032,7 +11032,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Regions of Interest</source>
-      <translation type="unfinished">Regions of Interest</translation>
+      <translation>Regio's van belang</translation>
     </message>
   </context>
   <context>
