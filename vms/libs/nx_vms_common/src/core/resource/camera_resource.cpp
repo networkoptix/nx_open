@@ -861,6 +861,9 @@ bool QnVirtualCameraResource::isMotionDetectionActive() const
     if (!isMotionDetectionEnabled())
         return false;
 
+    if (getStatus() == nx::vms::api::ResourceStatus::unauthorized)
+        return false;
+
     if (getMotionType() != MotionType::software)
         return true;
 
