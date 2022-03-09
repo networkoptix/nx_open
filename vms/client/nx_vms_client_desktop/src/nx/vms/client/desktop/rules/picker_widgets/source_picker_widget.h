@@ -52,7 +52,7 @@ public:
             auto selectButtonLayout = new QHBoxLayout;
             selectButtonLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
 
-            selectResourceButton = createSelectButton<F>();
+            selectResourceButton = createSelectButton();
             selectResourceButton->setSizePolicy(
                 QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
             selectButtonLayout->addWidget(selectResourceButton);
@@ -111,152 +111,151 @@ private:
 
     virtual void onFieldSet() override
     {
-        updateUi<F>();
+        updateUi();
 
         connect(selectResourceButton, &QPushButton::clicked, this,
             [this]
             {
-                select<F>();
-                updateUi<F>();
+                select();
+                updateUi();
             });
     }
 
-    template<typename T>
     QnSelectResourcesButton* createSelectButton();
-
-    template<>
-    QnSelectResourcesButton* createSelectButton<vms::rules::SourceCameraField>()
-    {
-        return new QnSelectDevicesButton;
-    }
-
-    template<>
-    QnSelectResourcesButton* createSelectButton<vms::rules::SourceServerField>()
-    {
-        return new QnSelectServersButton;
-    }
-
-    template<>
-    QnSelectResourcesButton* createSelectButton<vms::rules::SourceUserField>()
-    {
-        return new QnSelectUsersButton;
-    }
-
-    template<typename T>
     void updateUi();
-
-    template<>
-    void updateUi<vms::rules::SourceCameraField>()
-    {
-        auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-
-        auto resourceList = resourcePool->getResourcesByIds<QnVirtualCameraResource>(field->ids());
-
-        auto selectDeviceButtonPtr = static_cast<QnSelectDevicesButton*>(selectResourceButton);
-        selectDeviceButtonPtr->selectDevices(resourceList);
-
-        if (resourceList.isEmpty())
-        {
-            static const QnCameraDeviceStringSet deviceStringSet{
-                tr("Select at least one Device"),
-                tr("Select at least one Camera"),
-                tr("Select at least one I/O module")
-            };
-
-            const auto allCameras = resourcePool->getAllCameras();
-            const auto deviceType
-                = QnDeviceDependentStrings::calculateDeviceType(resourcePool, allCameras);
-
-            alertLabel->setText(deviceStringSet.getString(deviceType));
-            alertLabel->setVisible(true);
-        }
-        else
-        {
-            alertLabel->setVisible(false);
-        }
-    }
-
-    template<>
-    void updateUi<vms::rules::SourceServerField>()
-    {
-        auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-
-        auto resourceList = resourcePool->getResourcesByIds<QnMediaServerResource>(field->ids());
-
-        auto selectServersButtonPtr = static_cast<QnSelectServersButton*>(selectResourceButton);
-        selectServersButtonPtr->selectServers(resourceList);
-
-        if (resourceList.isEmpty())
-        {
-            alertLabel->setText(tr("Select at least one Server"));
-            alertLabel->setVisible(true);
-        }
-        else
-        {
-            alertLabel->setVisible(false);
-        }
-    }
-
-    template<>
-    void updateUi<vms::rules::SourceUserField>()
-    {
-        auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-
-        auto resourceList = resourcePool->getResourcesByIds<QnUserResource>(field->ids());
-
-        auto selectUsersButtonPtr = static_cast<QnSelectUsersButton*>(selectResourceButton);
-        selectUsersButtonPtr->selectUsers(resourceList);
-
-        if (resourceList.isEmpty())
-        {
-            alertLabel->setText(tr("Select at least one User"));
-            alertLabel->setVisible(true);
-        }
-        else
-        {
-            alertLabel->setVisible(false);
-        }
-    }
-
-    template<typename T>
     void select();
-
-    template<>
-    void select<vms::rules::SourceCameraField>()
-    {
-        auto selectedCameras = field->ids();
-
-        CameraSelectionDialog::selectCameras<CameraSelectionDialog::DummyPolicy>(
-            selectedCameras,
-            this);
-
-        field->setIds(selectedCameras);
-    }
-
-    template<>
-    void select<vms::rules::SourceServerField>()
-    {
-        auto selectedServers = field->ids();
-
-        const auto serverFilter = [](const QnMediaServerResourcePtr&){ return true; };
-        ServerSelectionDialog::selectServers(selectedServers, serverFilter, QString{}, this);
-
-        field->setIds(selectedServers);
-    }
-
-    template<>
-    void select<vms::rules::SourceUserField>()
-    {
-        auto selectedUsers = field->ids();
-
-        ui::SubjectSelectionDialog dialog(this);
-        dialog.setAllUsers(field->acceptAll());
-        dialog.setCheckedSubjects(selectedUsers);
-        dialog.exec();
-
-        field->setAcceptAll(dialog.allUsers());
-        field->setIds(dialog.totalCheckedUsers());
-    }
 };
+
+using CameraPicker = SourcePickerWidget<vms::rules::SourceCameraField>;
+using ServerPicker = SourcePickerWidget<vms::rules::SourceServerField>;
+using UserPicker = SourcePickerWidget<vms::rules::SourceUserField>;
+
+template<>
+QnSelectResourcesButton* CameraPicker::createSelectButton()
+{
+    return new QnSelectDevicesButton;
+}
+
+template<>
+QnSelectResourcesButton* ServerPicker::createSelectButton()
+{
+    return new QnSelectServersButton;
+}
+
+template<>
+QnSelectResourcesButton* UserPicker::createSelectButton()
+{
+    return new QnSelectUsersButton;
+}
+
+template<>
+void CameraPicker::updateUi()
+{
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+
+    auto resourceList = resourcePool->getResourcesByIds<QnVirtualCameraResource>(field->ids());
+
+    auto selectDeviceButtonPtr = static_cast<QnSelectDevicesButton*>(selectResourceButton);
+    selectDeviceButtonPtr->selectDevices(resourceList);
+
+    if (resourceList.isEmpty())
+    {
+        static const QnCameraDeviceStringSet deviceStringSet{
+            tr("Select at least one Device"),
+            tr("Select at least one Camera"),
+            tr("Select at least one I/O module")
+        };
+
+        const auto allCameras = resourcePool->getAllCameras();
+        const auto deviceType
+            = QnDeviceDependentStrings::calculateDeviceType(resourcePool, allCameras);
+
+        alertLabel->setText(deviceStringSet.getString(deviceType));
+        alertLabel->setVisible(true);
+    }
+    else
+    {
+        alertLabel->setVisible(false);
+    }
+}
+
+template<>
+void ServerPicker::updateUi()
+{
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+
+    auto resourceList = resourcePool->getResourcesByIds<QnMediaServerResource>(field->ids());
+
+    auto selectServersButtonPtr = static_cast<QnSelectServersButton*>(selectResourceButton);
+    selectServersButtonPtr->selectServers(resourceList);
+
+    if (resourceList.isEmpty())
+    {
+        alertLabel->setText(tr("Select at least one Server"));
+        alertLabel->setVisible(true);
+    }
+    else
+    {
+        alertLabel->setVisible(false);
+    }
+}
+
+template<>
+void UserPicker::updateUi()
+{
+    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+
+    auto resourceList = resourcePool->getResourcesByIds<QnUserResource>(field->ids());
+
+    auto selectUsersButtonPtr = static_cast<QnSelectUsersButton*>(selectResourceButton);
+    selectUsersButtonPtr->selectUsers(resourceList);
+
+    if (resourceList.isEmpty())
+    {
+        alertLabel->setText(tr("Select at least one User"));
+        alertLabel->setVisible(true);
+    }
+    else
+    {
+        alertLabel->setVisible(false);
+    }
+}
+
+template<>
+void CameraPicker::select()
+{
+    auto selectedCameras = field->ids();
+
+    CameraSelectionDialog::selectCameras<CameraSelectionDialog::DummyPolicy>(
+        selectedCameras,
+        this);
+
+    field->setIds(selectedCameras);
+}
+
+template<>
+void ServerPicker::select()
+{
+    auto selectedServers = field->ids();
+
+    const auto serverFilter = [](const QnMediaServerResourcePtr&){ return true; };
+    ServerSelectionDialog::selectServers(selectedServers, serverFilter, QString{}, this);
+
+    field->setIds(selectedServers);
+}
+
+template<>
+void UserPicker::select()
+{
+    auto selectedUsers = field->ids();
+
+    ui::SubjectSelectionDialog dialog(this);
+    dialog.setAllUsers(field->acceptAll());
+    dialog.setCheckedSubjects(selectedUsers);
+    dialog.exec();
+
+    field->setAcceptAll(dialog.allUsers());
+    field->setIds(dialog.totalCheckedUsers());
+}
 
 } // namespace nx::vms::client::desktop::rules

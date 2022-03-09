@@ -48,33 +48,32 @@ private:
 
     virtual void onFieldSet() override
     {
-        ui->textEdit->setText(text<F>());
+        ui->textEdit->setText(text());
 
         connect(ui->textEdit, &QTextEdit::textChanged, this,
             [this]
             {
-                setText<F>(ui->textEdit->toPlainText());
+                setText(ui->textEdit->toPlainText());
                 emit edited();
             });
     }
 
-    template<typename T>
     QString text();
-
-    template<typename T>
     void setText(const QString& text);
-
-    template<>
-    QString text<vms::rules::TextWithFields>()
-    {
-        return field->text();
-    }
-
-    template<>
-    void setText<vms::rules::TextWithFields>(const QString& text)
-    {
-        field->setText(text);
-    }
 };
+
+using TextWithFieldsPicker = MultilineTextPickerWidget<vms::rules::TextWithFields>;
+
+template<>
+QString TextWithFieldsPicker::text()
+{
+    return field->text();
+}
+
+template<>
+void TextWithFieldsPicker::setText(const QString& text)
+{
+    field->setText(text);
+}
 
 } // namespace nx::vms::client::desktop::rules
