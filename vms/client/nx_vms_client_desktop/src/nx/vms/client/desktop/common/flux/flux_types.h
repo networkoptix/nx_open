@@ -4,6 +4,8 @@
 
 #include <optional>
 
+#include <nx/reflect/enum_instrument.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/log/assert.h>
 
 namespace nx::vms::client::desktop {
@@ -26,20 +28,28 @@ enum class ModificationSource
 template<class T>
 struct UserEditable
 {
-    T get() const { return m_user.value_or(m_base); }
+    /**
+     * Base stored value.
+     */
+    T base = T{};
+
+    /**
+     * User-defined value, overriding base value.
+     */
+    std::optional<T> user;
+
+    T get() const { return user.value_or(base); }
     T operator()() const { return get(); }
 
-    T getBase() const { return m_base; }
-    void setBase(T value) { m_base = value; }
+     T getBase() const { return base; }
+    void setBase(T value) { base = value; }
 
-    bool hasUser() const { return m_user.has_value(); }
-    void setUser(T value) { m_user = value; }
-    void resetUser() { m_user = std::nullopt; }
-
-private:
-    T m_base = T{};
-    std::optional<T> m_user;
+    bool hasUser() const { return user.has_value(); }
+    void setUser(T value) { user = value; }
+    void resetUser() { user = std::nullopt; }
 };
+
+NX_REFLECTION_INSTRUMENT_TEMPLATE(UserEditable, (base)(user))
 
 /**
  * Utility class to implement state properties, which can be modified both locally end remotely.
@@ -55,27 +65,37 @@ private:
 template<class T>
 struct UserEditableMultiple
 {
-    bool hasValue() const { return m_user || m_base; }
-    T valueOr(T value) const { return m_user.value_or(m_base.value_or(value)); }
+    /**
+     * Base stored value. Filled if it is the same for all sources.
+     */
+    std::optional<T> base;
+
+    /**
+     * User-defined value, overriding base value.
+     */
+    std::optional<T> user;
+
+    bool hasValue() const { return user || base; }
+    T valueOr(T value) const { return user.value_or(base.value_or(value)); }
     T get() const
     {
         NX_ASSERT(hasValue());
         return valueOr(T{});
     }
     T operator()() const { return get(); }
-    operator std::optional<T>() const { return m_user ? m_user : m_base; }
+    operator std::optional<T>() const { return user ? user : base; }
 
     bool equals(T value) const { return hasValue() && get() == value; }
     bool operator==(T value) const { return equals(value); }
     bool operator==(std::optional<T> value) const { return value ? equals(*value) : !hasValue(); }
 
-    std::optional<T> getBase() const { return m_base; }
-    void setBase(T value) { m_base = value; }
-    void resetBase() { m_base = {}; }
+    std::optional<T> getBase() const { return base; }
+    void setBase(T value) { base = value; }
+    void resetBase() { base = {}; }
 
-    bool hasUser() const { return m_user.has_value(); }
-    void setUser(T value) { m_user = value; }
-    void resetUser() { m_user = {}; }
+    bool hasUser() const { return user.has_value(); }
+    void setUser(T value) { user = value; }
+    void resetUser() { user = {}; }
 
     static UserEditableMultiple<T> fromValue(const T& value)
     {
@@ -83,17 +103,14 @@ struct UserEditableMultiple
         result.setBase(value);
         return result;
     }
-
-private:
-    std::optional<T> m_base;
-    std::optional<T> m_user;
 };
 
-enum class CombinedValue
-{
+NX_REFLECTION_INSTRUMENT_TEMPLATE(UserEditableMultiple, (base)(user))
+
+NX_REFLECTION_ENUM_CLASS(CombinedValue,
     None,
     Some,
     All
-};
+);
 
 } // namespace nx::vms::client::desktop

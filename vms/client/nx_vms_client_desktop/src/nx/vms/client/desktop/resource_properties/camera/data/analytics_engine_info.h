@@ -5,6 +5,7 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QVariantMap>
 
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 
 namespace nx::vms::client::desktop {
@@ -18,6 +19,8 @@ struct AnalyticsEngineInfo
     QString vendor;
     QJsonObject settingsModel;
     bool isDeviceDependent = false;
+
+    bool operator==(const AnalyticsEngineInfo& other) const = default;
 
     // TODO: Use fusion to serialize to QJsonObject instead.
     QVariantMap toVariantMap() const
@@ -33,5 +36,9 @@ struct AnalyticsEngineInfo
         };
     }
 };
+
+// TODO: #sivanov Add settingsModel when QJsonObject is supported in the nx_reflect.
+NX_REFLECTION_INSTRUMENT(AnalyticsEngineInfo,
+    (id)(name)(description)(version)(vendor)(isDeviceDependent))
 
 } // namespace nx::vms::client::desktop

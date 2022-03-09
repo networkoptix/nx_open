@@ -65,6 +65,8 @@ struct NX_VMS_API ScheduleTaskData
     (bitrateKbps) \
     (metadataTypes)
 
+NX_REFLECTION_INSTRUMENT(ScheduleTaskData, ScheduleTaskData_Fields)
+
 //-------------------------------------------------------------------------------------------------
 
 static constexpr int kDefaultMinArchiveDays = 1;

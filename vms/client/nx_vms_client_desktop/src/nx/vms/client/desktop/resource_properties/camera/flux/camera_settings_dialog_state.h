@@ -16,6 +16,7 @@
 #include <core/resource/motion_window.h>
 #include <nx/core/resource/using_media2_type.h>
 #include <nx/reflect/enum_instrument.h>
+#include <nx/reflect/instrument.h>
 #include <nx/vms/api/data/camera_attributes_data.h>
 #include <nx/vms/api/data/dewarping_data.h>
 #include <nx/vms/api/types/rtp_types.h>
@@ -34,9 +35,120 @@
 
 namespace nx::vms::client::desktop {
 
+namespace camera_settings_detail {
+
+struct SingleCameraProperties
+{
+    QnUuid id;
+    UserEditable<QString> name;
+    QString firmware;
+    QString model;
+    QString vendor;
+    QString macAddress;
+    QString ipAddress;
+    QString webPageLabelText;
+    QString settingsUrl;
+    int overrideXmlHttpRequestTimeout = 0;
+    QString overrideHttpUserAgent;
+    bool isOnline = false;
+    bool fixupRequestUrls = false;
+    bool hasVideo = true;
+    bool editableStreamUrls = false;
+    bool networkLink = false;
+    bool usbDevice = false;
+
+    int maxFpsWithoutMotion = 0;
+
+    QSize primaryStreamResolution;
+    QSize secondaryStreamResolution;
+
+    std::optional<QnCameraAdvancedParams> advancedSettingsManifest;
+
+    /** Camera's supported object types, not filtered by engines. */
+    std::map<QnUuid, std::set<QString>> supportedAnalyicsObjectTypes;
+};
+
+NX_REFLECTION_INSTRUMENT(SingleCameraProperties,
+    (id)(name)(firmware)(model)(vendor)(macAddress)(ipAddress)(webPageLabelText)(settingsUrl)
+    (overrideXmlHttpRequestTimeout)(overrideHttpUserAgent)(isOnline)(fixupRequestUrls)(hasVideo)
+    (editableStreamUrls)(networkLink)(usbDevice)(maxFpsWithoutMotion)(primaryStreamResolution)
+    (secondaryStreamResolution))
+
+struct CombinedProperties
+{
+    CombinedValue isDtsBased = CombinedValue::None;
+    CombinedValue isVirtualCamera = CombinedValue::None;
+    CombinedValue isIoModule = CombinedValue::None;
+    CombinedValue isArecontCamera = CombinedValue::None;
+    CombinedValue supportsAudio = CombinedValue::None;
+    CombinedValue supportsVideo = CombinedValue::None;
+    CombinedValue isAudioForced = CombinedValue::None;
+    CombinedValue supportsAudioOutput = CombinedValue::None;
+    CombinedValue hasMotion = CombinedValue::None;
+    CombinedValue hasObjectDetection = CombinedValue::None;
+    CombinedValue hasDualStreamingCapability = CombinedValue::None;
+    CombinedValue hasRemoteArchiveCapability = CombinedValue::None;
+    CombinedValue canSwitchPtzPresetTypes = CombinedValue::None;
+    CombinedValue canForcePanTiltCapabilities = CombinedValue::None;
+    CombinedValue canForceZoomCapability = CombinedValue::None;
+    CombinedValue canAdjustPtzSensitivity = CombinedValue::None;
+    CombinedValue hasCustomMediaPortCapability = CombinedValue::None;
+    CombinedValue hasCustomMediaPort = CombinedValue::None;
+    CombinedValue supportsSchedule = CombinedValue::None;
+    CombinedValue isUdpMulticastTransportAllowed = CombinedValue::None;
+
+    int maxFps = 0;
+    int maxDualStreamingFps = 0;
+};
+NX_REFLECTION_INSTRUMENT(CombinedProperties,
+    (isDtsBased)(isVirtualCamera)(isIoModule)(isArecontCamera)(supportsAudio)(supportsVideo)
+    (isAudioForced)(supportsAudioOutput)(hasMotion)(hasObjectDetection)(hasDualStreamingCapability)
+    (hasRemoteArchiveCapability)(canSwitchPtzPresetTypes)(canForcePanTiltCapabilities)
+    (canForceZoomCapability)(canAdjustPtzSensitivity)(hasCustomMediaPortCapability)
+    (hasCustomMediaPort)(supportsSchedule)(isUdpMulticastTransportAllowed)(maxFps)
+    (maxDualStreamingFps))
+
+struct MotionConstraints
+{
+    int maxTotalRects = 0;
+    int maxSensitiveRects = 0;
+    int maxMaskRects = 0;
+};
+NX_REFLECTION_INSTRUMENT(MotionConstraints, (maxTotalRects)(maxSensitiveRects)(maxMaskRects))
+
+NX_REFLECTION_ENUM_CLASS(MotionStreamAlert,
+    resolutionTooHigh,
+    implicitlyDisabled,
+    willBeImplicitlyDisabled
+);
+
+struct Motion
+{
+    UserEditableMultiple<bool> enabled;
+
+    bool supportsSoftwareDetection = false;
+    std::optional<MotionConstraints> constraints;
+
+    std::optional<MotionStreamAlert> streamAlert;
+
+    int currentSensitivity = 0;
+
+    UserEditable<QList<QnMotionRegion>> regionList;
+    UserEditable<nx::vms::api::StreamIndex> stream;
+    UserEditable<bool> forced;
+
+    CombinedValue dependingOnDualStreaming = CombinedValue::All;
+};
+NX_REFLECTION_INSTRUMENT(Motion,
+    (enabled)(supportsSoftwareDetection)(constraints)(streamAlert)(currentSensitivity)(stream)
+    (forced)(dependingOnDualStreaming))
+
+} // namespace camera_settings_detail
+
 struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
 {
     using StreamIndex = nx::vms::api::StreamIndex;
+    using MotionStreamAlert = camera_settings_detail::MotionStreamAlert;
 
     enum class RecordingHint
     {
@@ -94,12 +206,11 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
     };
     Q_DECLARE_FLAGS(ExpertAlerts, ExpertAlert)
 
-    enum class MetadataRadioButton
-    {
+    NX_REFLECTION_ENUM_CLASS_IN_CLASS(MetadataRadioButton,
         motion,
         objects,
         both
-    };
+    );
 
     bool hasChanges = false;
     bool readOnly = true;
@@ -112,43 +223,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
     int devicesCount = 0;
     QnCameraDeviceType deviceType = QnCameraDeviceType::Mixed;
 
-    struct MotionConstraints
-    {
-        int maxTotalRects = 0;
-        int maxSensitiveRects = 0;
-        int maxMaskRects = 0;
-    };
-
-    struct SingleCameraProperties
-    {
-        QnUuid id;
-        UserEditable<QString> name;
-        QString firmware;
-        QString model;
-        QString vendor;
-        QString macAddress;
-        QString ipAddress;
-        QString webPageLabelText;
-        QString settingsUrl;
-        int overrideXmlHttpRequestTimeout = 0;
-        QString overrideHttpUserAgent;
-        bool isOnline = false;
-        bool fixupRequestUrls = false;
-        bool hasVideo = true;
-        bool editableStreamUrls = false;
-        bool networkLink = false;
-        bool usbDevice = false;
-
-        int maxFpsWithoutMotion = 0;
-
-        QSize primaryStreamResolution;
-        QSize secondaryStreamResolution;
-
-        std::optional<QnCameraAdvancedParams> advancedSettingsManifest;
-
-        /** Camera's supported object types, not filtered by engines. */
-        std::map<QnUuid, std::set<QString>> supportedAnalyicsObjectTypes;
-    };
+    using SingleCameraProperties = camera_settings_detail::SingleCameraProperties;
     SingleCameraProperties singleCameraProperties;
 
     VirtualCameraState singleVirtualCameraState;
@@ -170,46 +245,9 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
     };
     SingleCameraSettings singleCameraSettings;
 
-    enum class MotionStreamAlert
-    {
-        resolutionTooHigh,
-        implicitlyDisabled,
-        willBeImplicitlyDisabled
-    };
 
-    struct Motion
-    {
-        bool supportsSoftwareDetection = false;
-        std::optional<MotionConstraints> constraints;
 
-        std::optional<MotionStreamAlert> streamAlert;
-
-        UserEditableMultiple<bool> enabled;
-        int currentSensitivity = 0;
-
-        UserEditable<QList<QnMotionRegion>> regionList;
-        UserEditable<StreamIndex> stream;
-        UserEditable<bool> forced;
-
-        CombinedValue dependingOnDualStreaming = CombinedValue::All;
-    };
-    Motion motion;
-
-    StreamIndex effectiveMotionStream() const
-    {
-        if (!isSingleCamera())
-            return StreamIndex::undefined;
-
-        return expert.dualStreamingDisabled()
-            ? StreamIndex::primary
-            : motion.stream();
-    }
-
-    bool isMotionImplicitlyDisabled() const
-    {
-        return motion.streamAlert == MotionStreamAlert::willBeImplicitlyDisabled
-            || motion.streamAlert == MotionStreamAlert::implicitlyDisabled;
-    }
+    camera_settings_detail::Motion motion;
 
     struct IoModuleSettings
     {
@@ -218,33 +256,7 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
     };
     IoModuleSettings singleIoModuleSettings;
 
-    struct CombinedProperties
-    {
-        CombinedValue isDtsBased = CombinedValue::None;
-        CombinedValue isVirtualCamera = CombinedValue::None;
-        CombinedValue isIoModule = CombinedValue::None;
-        CombinedValue isArecontCamera = CombinedValue::None;
-        CombinedValue supportsAudio = CombinedValue::None;
-        CombinedValue supportsVideo = CombinedValue::None;
-        CombinedValue isAudioForced = CombinedValue::None;
-        CombinedValue supportsAudioOutput = CombinedValue::None;
-        CombinedValue hasMotion = CombinedValue::None;
-        CombinedValue hasObjectDetection = CombinedValue::None;
-        CombinedValue hasDualStreamingCapability = CombinedValue::None;
-        CombinedValue hasRemoteArchiveCapability = CombinedValue::None;
-        CombinedValue canSwitchPtzPresetTypes = CombinedValue::None;
-        CombinedValue canForcePanTiltCapabilities = CombinedValue::None;
-        CombinedValue canForceZoomCapability = CombinedValue::None;
-        CombinedValue canAdjustPtzSensitivity = CombinedValue::None;
-        CombinedValue hasCustomMediaPortCapability = CombinedValue::None;
-        CombinedValue hasCustomMediaPort = CombinedValue::None;
-        CombinedValue supportsSchedule = CombinedValue::None;
-        CombinedValue isUdpMulticastTransportAllowed = CombinedValue::None;
-
-        int maxFps = 0;
-        int maxDualStreamingFps = 0;
-    };
-    CombinedProperties devicesDescription;
+    camera_settings_detail::CombinedProperties devicesDescription;
 
     struct Credentials
     {
@@ -405,214 +417,52 @@ struct NX_VMS_CLIENT_DESKTOP_API CameraSettingsDialogState: AbstractFluxState
 
     // Helper methods.
 
-    bool isSingleCamera() const { return devicesCount == 1; }
-
-    bool isSingleVirtualCamera() const
-    {
-        return isSingleCamera() && devicesDescription.isVirtualCamera == CombinedValue::All;
-    }
-
-    QnUuid singleCameraId() const
-    {
-        return isSingleCamera() ? singleCameraProperties.id : QnUuid();
-    }
-
-    int maxRecordingBrushFps() const
-    {
-        if (isSingleCamera() && !isMotionDetectionEnabled() && !isObjectDetectionSupported())
-            return singleCameraProperties.maxFpsWithoutMotion;
-
-        return recording.brush.recordingType == Qn::RecordingType::metadataAndLowQuality
-            ? devicesDescription.maxDualStreamingFps
-            : devicesDescription.maxFps;
-    }
-
-    bool isMotionDetectionEnabled() const
-    {
-        return devicesDescription.hasMotion == CombinedValue::All && motion.enabled.equals(true);
-    }
+    bool isSingleCamera() const;
+    bool isSingleVirtualCamera() const;
+    QnUuid singleCameraId() const;
+    int maxRecordingBrushFps() const;
+    bool isMotionDetectionEnabled() const;
 
     /**
      * Checks if motion detection is enabled and actually can work (hardware, or not exceeding
      * resolution limit or is forced).
      */
-    bool isMotionDetectionActive() const
-    {
-        return isMotionDetectionEnabled() && !isMotionImplicitlyDisabled();
-    }
-
-    bool isObjectDetectionSupported() const
-    {
-        return devicesDescription.hasObjectDetection == CombinedValue::All;
-    }
-
-    bool supportsRecordingByEvents() const
-    {
-        return isMotionDetectionEnabled() || isObjectDetectionSupported();
-    }
+    bool isMotionDetectionActive() const;
+    bool isObjectDetectionSupported() const;
+    bool supportsRecordingByEvents() const;
 
     /** Metadata types for recording, based on radiobutton state. */
     static nx::vms::api::RecordingMetadataTypes radioButtonToMetadataTypes(
-        MetadataRadioButton value)
-    {
-        using namespace nx::vms::api;
+        MetadataRadioButton value);
 
-        switch (value)
-        {
-            case MetadataRadioButton::objects:
-                return RecordingMetadataType::objects;
-
-            case MetadataRadioButton::both:
-                return {RecordingMetadataType::motion | RecordingMetadataType::objects};
-
-            case MetadataRadioButton::motion:
-                return RecordingMetadataType::motion;
-        }
-
-        NX_ASSERT(false, "Unreachable");
-        return RecordingMetadataType::motion;
-    }
-
-    bool isDualStreamingEnabled() const
-    {
-        return devicesDescription.hasDualStreamingCapability == CombinedValue::All
-            && expert.dualStreamingDisabled.equals(false)
-            && expert.secondaryRecordingDisabled.equals(false);
-    }
-
-    bool supportsSchedule() const
-    {
-        return devicesDescription.supportsSchedule == CombinedValue::All;
-    }
-
-    bool supportsVideoStreamControl() const
-    {
-        return devicesDescription.isVirtualCamera == CombinedValue::None
-            && devicesDescription.isDtsBased == CombinedValue::None
-            && devicesDescription.supportsVideo == CombinedValue::All;
-    }
-
-    bool analyticsStreamSelectionEnabled(const QnUuid& engineId) const
-    {
-        return analytics.streamByEngineId.value(engineId)() != StreamIndex::undefined;
-    }
-
-    bool canSwitchPtzPresetTypes() const
-    {
-        return devicesDescription.canSwitchPtzPresetTypes != CombinedValue::None;
-    }
-
-    bool canSwitchPtzPresetTypesAll() const
-    {
-        return devicesDescription.canSwitchPtzPresetTypes == CombinedValue::All;
-    }
-
-    bool autoExclusivePtzPresets() const
-    {
-        return isSystemPtzPreset() || isNativePtzPreset();
-    }
-
-    bool isSystemPtzPreset() const
-    {
-        return expert.preferredPtzPresetType.equals(nx::core::ptz::PresetType::system);
-    }
-
-    bool isNativePtzPreset() const
-    {
-        return canSwitchPtzPresetTypesAll()
-            && expert.preferredPtzPresetType.equals(nx::core::ptz::PresetType::native);
-    }
-
-    bool canForcePanTiltCapabilities() const
-    {
-        return devicesDescription.canForcePanTiltCapabilities == CombinedValue::All;
-    }
-
-    bool canForceZoomCapability() const
-    {
-        return devicesDescription.canForceZoomCapability == CombinedValue::All;
-    }
-
-    bool canShowWebPage() const
-    {
-        return isSingleCamera()
-            && !singleCameraProperties.networkLink
-            && !singleCameraProperties.usbDevice
-            && devicesDescription.isVirtualCamera == CombinedValue::None;
-    }
-
-    bool canAdjustPtzSensitivity() const
-    {
-        return devicesDescription.canAdjustPtzSensitivity != CombinedValue::None;
-    }
-
-    bool cameraControlEnabled() const
-    {
-        return settingsOptimizationEnabled && !expert.cameraControlDisabled.valueOr(true);
-    }
+    bool isDualStreamingEnabled() const;
+    bool supportsSchedule() const;
+    bool supportsVideoStreamControl() const;
+    bool analyticsStreamSelectionEnabled(const QnUuid& engineId) const;
+    bool canSwitchPtzPresetTypes() const;
+    bool canForcePanTiltCapabilities() const;
+    bool canForceZoomCapability() const;
+    bool canShowWebPage() const;
+    bool canAdjustPtzSensitivity() const;
+    bool cameraControlEnabled() const;
 
     /**
      * Advanced settings should be displayed for a single camera when manifest is already loaded and
      * it is not empty. Most properties are available only when camera is online, but some cameras
      * may have 'Advanced' page when offline also (e.g. with 'Reboot' button).
      */
-    bool canShowAdvancedPage() const
-    {
-        const auto& manifest = singleCameraProperties.advancedSettingsManifest;
-        return isSingleCamera()
-            && manifest
-            && !manifest->groups.empty()
-            && (singleCameraProperties.isOnline || manifest->hasItemsAvailableInOffline());
-    }
-
-    bool isPageVisible(CameraSettingsTab page) const
-    {
-        switch (page)
-        {
-            case CameraSettingsTab::general:
-                return true;
-
-            case CameraSettingsTab::recording:
-                return supportsSchedule();
-
-            case CameraSettingsTab::io:
-                return isSingleCamera()
-                    && devicesDescription.isVirtualCamera == CombinedValue::None
-                    && devicesDescription.isIoModule == CombinedValue::All;
-
-            case CameraSettingsTab::motion:
-                return isSingleCamera()
-                    && devicesDescription.isVirtualCamera == CombinedValue::None
-                    && devicesDescription.isDtsBased == CombinedValue::None
-                    && devicesDescription.supportsVideo == CombinedValue::All
-                    && devicesDescription.hasMotion == CombinedValue::All;
-
-            case CameraSettingsTab::dewarping:
-                return isSingleCamera() && singleCameraProperties.hasVideo;
-
-            case CameraSettingsTab::advanced:
-                return canShowAdvancedPage();
-
-            case CameraSettingsTab::web:
-                return canShowWebPage();
-
-            case CameraSettingsTab::analytics:
-                return isSingleCamera() && !analytics.engines.empty();
-
-            // Always displaying for single camera as it contains Logical Id setup.
-            case CameraSettingsTab::expert:
-                return supportsVideoStreamControl() || isSingleCamera();
-
-            default:
-                NX_ASSERT(false, "Should never be here");
-                return true;
-        }
-    }
+    bool canShowAdvancedPage() const;
+    bool isPageVisible(CameraSettingsTab page) const;
+    StreamIndex effectiveMotionStream() const;
+    bool isMotionImplicitlyDisabled() const;
 };
 
 inline std::ostream& operator<<(std::ostream& os, CameraSettingsDialogState::ScheduleAlerts value)
 {
     return os << nx::reflect::toString(value);
 }
+
+NX_REFLECTION_INSTRUMENT(CameraSettingsDialogState,
+    (hasChanges)(singleCameraProperties)(devicesDescription)(motion))
 
 } // namespace nx::vms::client::desktop
