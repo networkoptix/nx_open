@@ -34,4 +34,5 @@ find_package(Qt6
         Multimedia
         Qml
         Core5Compat
+    REQUIRED
 )

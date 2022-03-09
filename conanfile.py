@@ -91,6 +91,9 @@ class NxOpenConan(ConanFile):
                 self.requires("libva/2.6" "#55e3df61de15ccd0bed0848ee65e2e72")
                 self.requires("intel-media-sdk/19.4" "#860f17b9422f0baaa3c7a31163d408eb")
 
+                self.requires("libmysqlclient/8.0.17" "#87d0d0dca416ff91ff910c66b57eab1a")
+                self.requires("libpq/13.4" "#3c130555eda25ad50be3824716b0ce4d")
+
             if not self.isArm32:
                 self.requires("os_deps_for_desktop_linux/ubuntu_bionic"
                     "#213024de424e791691f2005f614a6aa4")

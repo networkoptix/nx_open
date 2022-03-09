@@ -18,8 +18,8 @@
 
 #include <nx/utils/thread/mutex.h>
 
-#include <QAndroidJniObject>
-#include <QAndroidJniEnvironment>
+#include <QtCore/QJniObject>
+#include <QtCore/QJniEnvironment>
 
 #include "abstract_render_context_synchronizer.h"
 
@@ -100,7 +100,7 @@ public:
 
 private:
     bool initialized;
-    QAndroidJniObject javaDecoder;
+    QJniObject javaDecoder;
     AudioFramePtr audioFrame;
 };
 
@@ -141,7 +141,7 @@ AndroidAudioDecoder::~AndroidAudioDecoder()
 
 bool AndroidAudioDecoder::isDecoderCompatibleToPlatform()
 {
-    return QAndroidJniObject::callStaticMethod<jboolean>(
+    return QJniObject::callStaticMethod<jboolean>(
         "com/networkoptix/nxwitness/media/QnAudioDecoder",
         "isDecoderCompatibleToPlatform");
 }
@@ -174,7 +174,7 @@ bool AndroidAudioDecoder::decode(const QnConstCompressedAudioDataPtr& frame, dou
     {
         QnCodecAudioFormat audioFormat(frame->context);
         QString codecName = codecToString(frame->compressionType);
-        QAndroidJniObject jCodecName = QAndroidJniObject::fromString(codecName);
+        QJniObject jCodecName = QJniObject::fromString(codecName);
 
         d->initialized = d->javaDecoder.callMethod<jboolean>(
             "init", "(Ljava/lang/String;IIJI)Z",

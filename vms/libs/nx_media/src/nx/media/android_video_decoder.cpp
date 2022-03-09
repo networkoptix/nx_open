@@ -6,24 +6,25 @@
 #include <deque>
 #include <queue>
 
+#include <QtCore/QCache>
 #include <QtCore/QElapsedTimer>
+#include <QtCore/QJniEnvironment>
+#include <QtCore/QJniObject>
+#include <QtCore/QMap>
 #include <QtCore/QMutex>
-
+#include <QtGui/QOffscreenSurface>
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFunctions>
-#include <QtGui/QOpenGLShaderProgram>
+#include <QtMultimedia/private/qabstractvideobuffer_p.h>
+#include <QtMultimedia/QVideoFrame>
+#include <QtMultimedia/QVideoFrameFormat>
 #include <QtOpenGL/QOpenGLFramebufferObject>
+#include <QtOpenGL/QOpenGLShaderProgram>
 
-#include <QtGui/QOffscreenSurface>
-#include <QtCore/QCache>
-#include <QtCore/QMap>
-
+#include <nx/utils/log/log.h>
 #include <nx/utils/thread/mutex.h>
 #include <utils/media/h264_utils.h>
 #include <utils/media/utils.h>
-#include <nx/utils/log/log.h>
-#include <QAndroidJniObject>
-#include <QAndroidJniEnvironment>
 
 #include <media/filters/h264_mp4_to_annexb.h>
 
@@ -166,27 +167,27 @@ public:
         FboManager::FboPtr&& fbo,
         std::shared_ptr<AndroidVideoDecoderPrivate> owner)
         :
-        QAbstractVideoBuffer(GLTextureHandle),
+        QAbstractVideoBuffer(QVideoFrame::RhiTextureHandle),
         m_fbo(std::move(fbo)),
         m_owner(owner)
     {
     }
 
-    virtual MapMode mapMode() const override
+    virtual QVideoFrame::MapMode mapMode() const override
     {
-        return NotMapped;
+        return QVideoFrame::NotMapped;
     }
 
-    virtual uchar* map(MapMode, int*, int*) override
+    virtual MapData map(QVideoFrame::MapMode) override
     {
-        return 0;
+        return {};
     }
 
     virtual void unmap() override
     {
     }
 
-    virtual QVariant handle() const override;
+    virtual quint64 textureHandle(int plane) const override;
 
 private:
     mutable FboManager::FboPtr m_fbo;
@@ -226,7 +227,7 @@ public:
     {
         QMatrix4x4 matrix;
 
-        QAndroidJniEnvironment env;
+        QJniEnvironment env;
         jfloatArray array = env->NewFloatArray(16);
         javaDecoder.callMethod<void>("getTransformMatrix", "([F)V", array);
         env->GetFloatArrayRegion(array, 0, 16, matrix.data());
@@ -242,7 +243,7 @@ public:
                 reinterpret_cast<void*>(nx::media::fillInputBuffer)}
         };
 
-        QAndroidJniEnvironment env;
+        QJniEnvironment env;
         jclass objectClass = env->GetObjectClass(javaDecoder.object<jobject>());
         env->RegisterNatives(
             objectClass,
@@ -262,7 +263,7 @@ private:
 
     qint64 frameNumber;
     bool initialized;
-    QAndroidJniObject javaDecoder;
+    QJniObject javaDecoder;
     RenderContextSynchronizerPtr synchronizer;
     QSize frameSize;
 
@@ -456,8 +457,8 @@ void AndroidVideoDecoderPrivate::addMaxResolutionIfNeeded(const AVCodecID codec)
 
     if (!maxResolutions.contains(codec))
     {
-        QAndroidJniObject jCodecName = QAndroidJniObject::fromString(codecMimeType);
-        QAndroidJniObject javaDecoder("com/networkoptix/nxwitness/media/QnVideoDecoder");
+        QJniObject jCodecName = QJniObject::fromString(codecMimeType);
+        QJniObject javaDecoder("com/networkoptix/nxwitness/media/QnVideoDecoder");
         jint maxWidth = javaDecoder.callMethod<jint>(
             "maxDecoderWidth", "(Ljava/lang/String;)I", jCodecName.object<jstring>());
         jint maxHeight = javaDecoder.callMethod<jint>(
@@ -553,7 +554,7 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, Q
             return 0; //< Wait for I frame to be able to extract data from the binary stream.
 
         QString codecName = codecToString(frame->compressionType);
-        QAndroidJniObject jCodecName = QAndroidJniObject::fromString(codecName);
+        QJniObject jCodecName = QJniObject::fromString(codecName);
         d->initialized = d->javaDecoder.callMethod<jboolean>(
             "init", "(Ljava/lang/String;II)Z",
             jCodecName.object<jstring>(),
@@ -625,8 +626,7 @@ int AndroidVideoDecoder::decode(const QnConstCompressedVideoDataPtr& frameSrc, Q
 
     auto videoFrame = new QVideoFrame(
         new TextureBuffer(std::move(fboToRender), d),
-        d->frameSize,
-        QVideoFrame::Format_BGR32);
+        QVideoFrameFormat(d->frameSize, QVideoFrameFormat::Format_BGRX8888));
 
     while (!d->frameNumToPtsCache.empty() && d->frameNumToPtsCache.front().first < outFrameNum)
         d->frameNumToPtsCache.pop_front(); //< In case of decoder skipped some input frames
@@ -646,7 +646,7 @@ AbstractVideoDecoder::Capabilities AndroidVideoDecoder::capabilities() const
     return Capability::hardwareAccelerated;
 }
 
-QVariant TextureBuffer::handle() const
+quint64 TextureBuffer::textureHandle(int /*plane*/) const
 {
     if (m_fbo)
     {

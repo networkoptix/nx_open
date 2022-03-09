@@ -8,6 +8,8 @@ string(APPEND CMAKE_C_FLAGS " ${compile_options}")
 string(APPEND CMAKE_CXX_FLAGS " ${compile_options}")
 set_directory_properties(PROPERTIES COMPILE_OPTIONS "")
 
+find_package(Qt6 COMPONENTS OpenGL)
+
 set(additional_sources)
 set(additional_sources_include_dirs)
 set(additional_libraries)
@@ -83,6 +85,8 @@ nx_add_target(nx_media
         nx_fusion
         nx_utils
         ${additional_libraries}
+    PRIVATE_LIBS
+        Qt6::OpenGL
     ADDITIONAL_SOURCES
         ${additional_sources}
     FOLDER client/libs
@@ -116,10 +120,6 @@ if(hardware_decoders_x64)
 else()
     nx_exclude_sources_from_target(nx_media src/nx/media/nvidia)
     nx_exclude_sources_from_target(nx_media src/nx/media/quick_sync)
-endif()
-
-if(ANDROID)
-    target_link_libraries(nx_media PRIVATE Qt6::AndroidExtras)
 endif()
 
 if(withTests)
