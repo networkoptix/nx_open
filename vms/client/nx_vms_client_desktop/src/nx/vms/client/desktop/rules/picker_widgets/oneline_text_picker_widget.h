@@ -56,63 +56,67 @@ private:
 
     virtual void onFieldSet() override
     {
-        ui->lineEdit->setText(text<F>());
+        ui->lineEdit->setText(text());
 
         connect(ui->lineEdit, &QLineEdit::textEdited, this,
             [this](const QString& text)
             {
-                setText<F>(text);
+                setText(text);
                 emit edited();
             });
     }
 
-    template<typename T>
     QString text() const
     {
         return field->value();
     }
 
-    template<typename T>
     void setText(const QString& text)
     {
         field->setValue(text);
     }
-
-    template<>
-    QString text<vms::rules::CustomizableTextField>() const
-    {
-        return field->text();
-    }
-
-    template<>
-    void setText<vms::rules::CustomizableTextField>(const QString& text)
-    {
-        field->setText(text);
-    }
-
-    template<>
-    QString text<vms::rules::ExpectedStringField>() const
-    {
-        return field->expected();
-    }
-
-    template<>
-    void setText<vms::rules::ExpectedStringField>(const QString& text)
-    {
-        field->setExpected(text);
-    }
-
-    template<>
-    QString text<vms::rules::KeywordsField>() const
-    {
-        return field->string();
-    }
-
-    template<>
-    void setText<vms::rules::KeywordsField>(const QString& text)
-    {
-        field->setString(text);
-    }
 };
+
+using ActionTextPicker = OnelineTextPickerWidget<vms::rules::ActionTextField>;
+using CustomizableTextPicker = OnelineTextPickerWidget<vms::rules::CustomizableTextField>;
+using EventTextPicker = OnelineTextPickerWidget<vms::rules::EventTextField>;
+using ExpectedStringPicker = OnelineTextPickerWidget<vms::rules::ExpectedStringField>;
+using KeywordsPicker = OnelineTextPickerWidget<vms::rules::KeywordsField>;
+
+template<>
+QString CustomizableTextPicker::text() const
+{
+    return field->text();
+}
+
+template<>
+void CustomizableTextPicker::setText(const QString& text)
+{
+    field->setText(text);
+}
+
+template<>
+QString ExpectedStringPicker::text() const
+{
+    return field->expected();
+}
+
+template<>
+void ExpectedStringPicker::setText(const QString& text)
+{
+    field->setExpected(text);
+}
+
+template<>
+QString KeywordsPicker::text() const
+{
+    return field->string();
+}
+
+template<>
+void KeywordsPicker::setText(const QString& text)
+{
+    field->setString(text);
+}
 
 } // namespace nx::vms::client::desktop::rules

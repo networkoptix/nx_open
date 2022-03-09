@@ -38,25 +38,25 @@ PickerWidget* PickerFactory::createWidget(
     PickerWidget* pickerWidget{};
 
     if (descriptor.id == fieldMetatype<nx::vms::rules::CustomizableTextField>())
-        pickerWidget = new OnelineTextPickerWidget<nx::vms::rules::CustomizableTextField>(parent);
+        pickerWidget = new CustomizableTextPicker(parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::ExpectedStringField>())
-        pickerWidget = new OnelineTextPickerWidget<nx::vms::rules::ExpectedStringField>(parent);
+        pickerWidget = new ExpectedStringPicker(parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::KeywordsField>())
-        pickerWidget = new OnelineTextPickerWidget<nx::vms::rules::KeywordsField>(parent);
+        pickerWidget = new KeywordsPicker(parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::ActionTextField>())
-        pickerWidget = new OnelineTextPickerWidget<nx::vms::rules::ActionTextField>(parent);
+        pickerWidget = new ActionTextPicker(parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::EventTextField>())
-        pickerWidget = new OnelineTextPickerWidget<nx::vms::rules::EventTextField>(parent);
+        pickerWidget = new EventTextPicker(parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::TextWithFields>())
-        pickerWidget = new MultilineTextPickerWidget<nx::vms::rules::TextWithFields>(parent);
+        pickerWidget = new TextWithFieldsPicker(parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::FlagField>())
         pickerWidget = new StatePickerWidget<nx::vms::rules::FlagField>(parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::SourceCameraField>())
-        pickerWidget = new SourcePickerWidget<nx::vms::rules::SourceCameraField>(parent);
+        pickerWidget = new CameraPicker(parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::SourceServerField>())
-        pickerWidget = new SourcePickerWidget<nx::vms::rules::SourceServerField>(parent);
+        pickerWidget = new ServerPicker(parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::SourceUserField>())
-        pickerWidget = new SourcePickerWidget<nx::vms::rules::SourceUserField>(parent);
+        pickerWidget = new UserPicker(parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::IntField>())
         pickerWidget = new NumberPickerWidget<nx::vms::rules::IntField>(parent);
     else
