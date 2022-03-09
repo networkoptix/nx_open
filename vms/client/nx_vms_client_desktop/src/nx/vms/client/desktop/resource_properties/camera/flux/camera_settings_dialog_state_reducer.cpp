@@ -5,34 +5,32 @@
 #include <chrono>
 #include <limits>
 
-#include <api/global_settings.h>
+#include <QtCore/QUrlQuery>
 
+#include <api/global_settings.h>
 #include <camera/fps_calculator.h>
 #include <client/client_module.h>
 #include <client_core/client_core_module.h>
 #include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/resource_display_info.h>
-#include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_data_pool.h>
-#include <utils/camera/camera_bitrate_calculator.h>
+#include <core/resource_management/resource_pool.h>
 #include <nx/analytics/utils.h>
-
 #include <nx/network/http/http_types.h>
+#include <nx/reflect/json/serializer.h>
 #include <nx/reflect/string_conversion.h>
 #include <nx/utils/algorithm/same.h>
+#include <nx/utils/log/log.h>
 #include <nx/utils/math/fuzzy.h>
-#include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/api/types/motion_types.h>
+#include <nx/vms/api/types/rtp_types.h>
 #include <nx/vms/client/desktop/analytics/analytics_settings_manager.h>
+#include <utils/camera/camera_bitrate_calculator.h>
 
-#include <QtCore/QUrlQuery>
-
+#include "../camera_advanced_parameters_manifest_manager.h"
 #include "../utils/device_agent_settings_adapter.h"
 #include "../watchers/camera_settings_analytics_engines_watcher.h"
-#include "../camera_advanced_parameters_manifest_manager.h"
-
-#include <nx/utils/log/log.h>
 
 namespace nx::vms::client::desktop {
 
@@ -805,7 +803,7 @@ State loadSingleCameraProperties(
 
     if (singleCamera->getDefaultMotionType() == MotionType::hardware)
     {
-        state.motion.constraints = State::MotionConstraints();
+        state.motion.constraints = {};
         state.motion.constraints->maxTotalRects = singleCamera->motionWindowCount();
         state.motion.constraints->maxMaskRects = singleCamera->motionMaskWindowCount();
         state.motion.constraints->maxSensitiveRects
@@ -863,7 +861,8 @@ State loadSingleCameraProperties(
 
     if (analyticsEnginesWatcher)
     {
-        state = CameraSettingsDialogStateReducer::setAnalyticsEngines(
+        bool changed = false;
+        std::tie(changed, state) = CameraSettingsDialogStateReducer::setAnalyticsEngines(
             std::move(state),
             analyticsEnginesWatcher->engineInfoList());
 
@@ -904,18 +903,24 @@ State loadSingleCameraProperties(
 
 State CameraSettingsDialogStateReducer::setSelectedTab(State state, CameraSettingsTab value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     state.selectedTab = value;
     return state;
 }
 
 State CameraSettingsDialogStateReducer::setReadOnly(State state, bool value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     state.readOnly = value;
     return state;
 }
 
 State CameraSettingsDialogStateReducer::setSettingsOptimizationEnabled(State state, bool value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     state.settingsOptimizationEnabled = value;
     state = fixupRecordingBrush(std::move(state));
     state.scheduleAlerts = calculateScheduleAlerts(state);
@@ -925,6 +930,8 @@ State CameraSettingsDialogStateReducer::setSettingsOptimizationEnabled(State sta
 State CameraSettingsDialogStateReducer::setGlobalPermissions(
     State state, GlobalPermissions value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     state.globalPermissions = value;
     return state;
 }
@@ -932,6 +939,8 @@ State CameraSettingsDialogStateReducer::setGlobalPermissions(
 State CameraSettingsDialogStateReducer::setSingleVirtualCameraState(
     State state, const VirtualCameraState& value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, nx::reflect::json::serialize(value));
+
     state.singleVirtualCameraState = value;
     state.virtualCameraUploaderName = QString();
 
@@ -951,6 +960,8 @@ State CameraSettingsDialogStateReducer::updatePtzSettings(
     State state,
     const Cameras& cameras)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 for cameras %2", __func__, cameras);
+
     state.devicesDescription.canSwitchPtzPresetTypes =
         combinedValue(cameras, canSwitchPtzPresetTypes);
 
@@ -1019,7 +1030,8 @@ State CameraSettingsDialogStateReducer::loadCameras(
     CameraSettingsAnalyticsEnginesWatcherInterface* analyticsEnginesWatcher,
     CameraAdvancedParametersManifestManager* advancedParametersManifestManager)
 {
-    NX_VERBOSE(NX_SCOPE_TAG, "Reset state, loading %1 cameras", cameras.size());
+    NX_VERBOSE(NX_SCOPE_TAG, "Reset state, loading cameras %1", cameras);
+
     const auto singleCamera = (cameras.size() == 1)
         ? cameras.first()
         : Camera();
@@ -1329,6 +1341,8 @@ State CameraSettingsDialogStateReducer::handleMotionTypeChanged(
     State state,
     const QnVirtualCameraResourceList& cameras)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 for cameras %2", __func__, cameras);
+
     state.motion.dependingOnDualStreaming = combinedValue(cameras,
         &isMotionDetectionDependingOnDualStreaming);
     fetchFromCameras<bool>(state.motion.enabled, cameras, &isMotionDetectionEnabled);
@@ -1341,6 +1355,8 @@ State CameraSettingsDialogStateReducer::handleMotionForcedChanged(
     State state,
     const QnVirtualCameraResourceList& cameras)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 for cameras %2", __func__, cameras);
+
     state.motion.dependingOnDualStreaming = combinedValue(cameras,
         &isMotionDetectionDependingOnDualStreaming);
 
@@ -1357,6 +1373,8 @@ State CameraSettingsDialogStateReducer::handleDualStreamingChanged(
     State state,
     const QnVirtualCameraResourceList& cameras)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 for cameras %2", __func__, cameras);
+
     fetchFromCameras<bool>(state.expert.dualStreamingDisabled, cameras,
         [](const Camera& camera) { return camera->isDualStreamingDisabled(); });
 
@@ -1378,6 +1396,8 @@ State CameraSettingsDialogStateReducer::handleMediaStreamsChanged(
     State state,
     const QnVirtualCameraResourceList& cameras)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 for cameras %2", __func__, cameras);
+
     state.motion.dependingOnDualStreaming = combinedValue(cameras,
         &isMotionDetectionDependingOnDualStreaming);
 
@@ -1399,6 +1419,8 @@ State CameraSettingsDialogStateReducer::handleMotionStreamChanged(
     State state,
     const QnVirtualCameraResourceList& cameras)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 for cameras %2", __func__, cameras);
+
     state.motion.dependingOnDualStreaming = combinedValue(cameras,
         &isMotionDetectionDependingOnDualStreaming);
 
@@ -1416,6 +1438,8 @@ State CameraSettingsDialogStateReducer::handleMotionRegionsChanged(
     State state,
     const QnVirtualCameraResourceList& cameras)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 for cameras %2", __func__, cameras);
+
     if (state.isSingleCamera() && NX_ASSERT(cameras.size() == 1))
         state.motion.regionList.setBase(calculateMotionRegionList(state, cameras.front()));
     else
@@ -1427,6 +1451,8 @@ State CameraSettingsDialogStateReducer::handleStreamUrlsChanged(
     State state,
     const QnVirtualCameraResourceList& cameras)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 for cameras %2", __func__, cameras);
+
     if (state.isSingleCamera() && NX_ASSERT(cameras.size() == 1))
         state = loadStreamUrls(std::move(state), cameras.front());
 
@@ -1437,6 +1463,8 @@ State CameraSettingsDialogStateReducer::handleCompatibleObjectTypesMaybeChanged(
     State state,
     const QnVirtualCameraResourceList& cameras)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 for cameras %2", __func__, cameras);
+
     if (state.isSingleCamera() && NX_ASSERT(cameras.size() == 1))
     {
         state.singleCameraProperties.supportedAnalyicsObjectTypes =
@@ -1460,6 +1488,8 @@ State CameraSettingsDialogStateReducer::handleStatusChanged(
     State state,
     const QnVirtualCameraResourceList& cameras)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 for cameras %2", __func__, cameras);
+
     state.devicesDescription.hasMotion = combinedValue(cameras, &hasMotion);
     fetchFromCameras<ScheduleTasks>(state.recording.schedule, cameras,
         [](const auto& camera)
@@ -1473,6 +1503,8 @@ State CameraSettingsDialogStateReducer::handleStatusChanged(
 
 State CameraSettingsDialogStateReducer::setSingleCameraUserName(State state, const QString& text)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, text);
+
     const auto trimmedName = text.trimmed().remove('\n');
     if (trimmedName.isEmpty())
         return state;
@@ -1486,6 +1518,8 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setSingleCameraIsOnline
     State state,
     bool isOnline)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, isOnline);
+
     NX_ASSERT(state.isSingleCamera());
     if (state.singleCameraProperties.isOnline == isOnline)
         return {false, std::move(state)};
@@ -1498,6 +1532,8 @@ State CameraSettingsDialogStateReducer::setScheduleBrush(
     State state,
     const RecordScheduleCellData& brush)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, nx::reflect::json::serialize(brush));
+
     state.recording.brush = brush;
     const auto fps = qBound(
         kMinFps,
@@ -1518,6 +1554,8 @@ State CameraSettingsDialogStateReducer::setScheduleBrushRecordingType(
     State state,
     RecordingType value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     const bool isAllowed =
         [&]()
         {
@@ -1567,6 +1605,8 @@ State CameraSettingsDialogStateReducer::setScheduleBrushRecordingType(
 State CameraSettingsDialogStateReducer::setRecordingMetadataRadioButton(State state,
     State::MetadataRadioButton value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     if (!NX_ASSERT(isMetadataRadioButtonAllowed(state, value)))
         return state;
 
@@ -1582,6 +1622,8 @@ State CameraSettingsDialogStateReducer::setRecordingMetadataRadioButton(State st
 
 State CameraSettingsDialogStateReducer::setScheduleBrushFps(State state, int value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     NX_ASSERT(qBound(kMinFps, value, state.maxRecordingBrushFps()) == value);
     state.recording.brush.fps = value;
     if (state.recording.brush.isAutoBitrate() || !state.recording.customBitrateAvailable)
@@ -1606,6 +1648,8 @@ State CameraSettingsDialogStateReducer::setScheduleBrushQuality(
     State state,
     Qn::StreamQuality value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     state.recording.brush.streamQuality = value;
     state = fillBitrateFromFixedQuality(std::move(state));
     state.recordingHint = State::RecordingHint::brushChanged;
@@ -1615,6 +1659,8 @@ State CameraSettingsDialogStateReducer::setScheduleBrushQuality(
 
 State CameraSettingsDialogStateReducer::setSchedule(State state, const ScheduleTasks& schedule)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, nx::reflect::json::serialize(schedule));
+
     state.hasChanges = true;
 
     ScheduleTasks processed = schedule;
@@ -1634,6 +1680,8 @@ State CameraSettingsDialogStateReducer::setSchedule(State state, const ScheduleT
 
 State CameraSettingsDialogStateReducer::fixupSchedule(State state)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, __func__);
+
     if (!NX_ASSERT(state.supportsSchedule()))
         return state;
 
@@ -1659,18 +1707,21 @@ State CameraSettingsDialogStateReducer::fixupSchedule(State state)
 
 State CameraSettingsDialogStateReducer::setRecordingShowFps(State state, bool value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
     state.recording.showFps = value;
     return state;
 }
 
 State CameraSettingsDialogStateReducer::setRecordingShowQuality(State state, bool value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
     state.recording.showQuality = value;
     return state;
 }
 
 State CameraSettingsDialogStateReducer::toggleCustomBitrateVisible(State state)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, __func__);
     NX_ASSERT(state.recording.customBitrateAvailable);
     state.recording.customBitrateVisible = !state.recording.customBitrateVisible;
     return state;
@@ -1678,6 +1729,8 @@ State CameraSettingsDialogStateReducer::toggleCustomBitrateVisible(State state)
 
 State CameraSettingsDialogStateReducer::setRecordingBitrateMbps(State state, float mbps)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, mbps);
+
     NX_ASSERT(state.recording.customBitrateAvailable && state.recording.customBitrateVisible);
     state.recording.brush.bitrateMbitPerSec = mbps;
     state.recording.brush.streamQuality = calculateQualityForBitrateMbps(state, mbps);
@@ -1690,6 +1743,8 @@ State CameraSettingsDialogStateReducer::setRecordingBitrateMbps(State state, flo
 State CameraSettingsDialogStateReducer::setRecordingBitrateNormalized(
     State state, float value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     NX_ASSERT(state.recording.customBitrateAvailable && state.recording.customBitrateVisible);
     const auto spread = state.recording.maxBitrateMpbs - state.recording.minBitrateMbps;
     const auto mbps = state.recording.minBitrateMbps + value * spread;
@@ -1698,6 +1753,8 @@ State CameraSettingsDialogStateReducer::setRecordingBitrateNormalized(
 
 State CameraSettingsDialogStateReducer::setMinRecordingDaysAutomatic(State state, bool value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     auto& minDays = state.recording.minDays;
     state.hasChanges = true;
 
@@ -1719,6 +1776,8 @@ State CameraSettingsDialogStateReducer::setMinRecordingDaysAutomatic(State state
 
 State CameraSettingsDialogStateReducer::setMinRecordingDaysValue(State state, int value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     auto& minDays = state.recording.minDays;
     NX_ASSERT(minDays.isManualMode());
 
@@ -1735,6 +1794,8 @@ State CameraSettingsDialogStateReducer::setMinRecordingDaysValue(State state, in
 
 State CameraSettingsDialogStateReducer::setMaxRecordingDaysAutomatic(State state, bool value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     auto& maxDays = state.recording.maxDays;
     state.hasChanges = true;
 
@@ -1756,6 +1817,8 @@ State CameraSettingsDialogStateReducer::setMaxRecordingDaysAutomatic(State state
 
 State CameraSettingsDialogStateReducer::setMaxRecordingDaysValue(State state, int value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     auto& maxDays = state.recording.maxDays;
     NX_ASSERT(maxDays.isManualMode());
 
@@ -1771,6 +1834,8 @@ State CameraSettingsDialogStateReducer::setMaxRecordingDaysValue(State state, in
 
 State CameraSettingsDialogStateReducer::setRecordingBeforeThresholdSec(State state, int value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     NX_ASSERT(state.isMotionDetectionActive() || state.isObjectDetectionSupported());
     state.hasChanges = true;
     state.recording.thresholds.beforeSec.setUser(value);
@@ -1780,6 +1845,8 @@ State CameraSettingsDialogStateReducer::setRecordingBeforeThresholdSec(State sta
 
 State CameraSettingsDialogStateReducer::setRecordingAfterThresholdSec(State state, int value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     NX_ASSERT(state.isMotionDetectionActive() || state.isObjectDetectionSupported());
     state.hasChanges = true;
     state.recording.thresholds.afterSec.setUser(value);
@@ -1790,6 +1857,8 @@ State CameraSettingsDialogStateReducer::setCustomAspectRatio(
     State state,
     const QnAspectRatio& value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     NX_ASSERT(state.imageControl.aspectRatioAvailable);
     state.hasChanges = true;
     state.imageControl.aspectRatio.setUser(value);
@@ -1798,6 +1867,8 @@ State CameraSettingsDialogStateReducer::setCustomAspectRatio(
 
 State CameraSettingsDialogStateReducer::setCustomRotation(State state, StandardRotation value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     NX_ASSERT(state.imageControl.rotationAvailable);
     state.hasChanges = true;
     state.imageControl.rotation.setUser(value);
@@ -1808,6 +1879,8 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setRecordingEnabled(
     State state,
     bool value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     if (state.recording.enabled.equals(value))
         return {false, std::move(state)};
 
@@ -1846,6 +1919,8 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setRecordingEnabled(
 
 State CameraSettingsDialogStateReducer::setAudioEnabled(State state, bool value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     state.audioEnabled.setUser(value);
     state.hasChanges = true;
     return state;
@@ -1853,6 +1928,8 @@ State CameraSettingsDialogStateReducer::setAudioEnabled(State state, bool value)
 
 State CameraSettingsDialogStateReducer::setAudioInputDeviceId(State state, const QnUuid& deviceId)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, deviceId);
+
     if (!state.isSingleCamera())
         return state;
 
@@ -1863,6 +1940,8 @@ State CameraSettingsDialogStateReducer::setAudioInputDeviceId(State state, const
 
 State CameraSettingsDialogStateReducer::setTwoWayAudioEnabled(State state, bool value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     state.twoWayAudioEnabled.setUser(value);
     state.hasChanges = true;
     return state;
@@ -1870,6 +1949,8 @@ State CameraSettingsDialogStateReducer::setTwoWayAudioEnabled(State state, bool 
 
 State CameraSettingsDialogStateReducer::setAudioOutputDeviceId(State state, const QnUuid& deviceId)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, deviceId);
+
     if (!state.isSingleCamera())
         return state;
 
@@ -1880,6 +1961,8 @@ State CameraSettingsDialogStateReducer::setAudioOutputDeviceId(State state, cons
 
 State CameraSettingsDialogStateReducer::setMotionDetectionEnabled(State state, bool value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     if (!NX_ASSERT(state.isSingleCamera()))
         return state;
 
@@ -1901,6 +1984,8 @@ State CameraSettingsDialogStateReducer::setMotionDetectionEnabled(State state, b
 
 State CameraSettingsDialogStateReducer::forceMotionDetection(State state)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, __func__);
+
     state.hasChanges = true;
     state.motion.forced.setUser(true);
     state = handleStreamParametersChange(std::move(state));
@@ -1909,6 +1994,8 @@ State CameraSettingsDialogStateReducer::forceMotionDetection(State state)
 
 State CameraSettingsDialogStateReducer::setCurrentMotionSensitivity(State state, int value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     if (state.motion.currentSensitivity == value)
         return state;
 
@@ -1927,6 +2014,8 @@ State CameraSettingsDialogStateReducer::setMotionRegionList(
     State state,
     const QList<QnMotionRegion>& value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     const auto errorCode = validateMotionRegionList(state, value);
     switch (errorCode)
     {
@@ -1954,6 +2043,8 @@ State CameraSettingsDialogStateReducer::setMotionRegionList(
 std::pair<bool, State> CameraSettingsDialogStateReducer::setMotionDependingOnDualStreaming(
     State state, CombinedValue value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     if (state.motion.dependingOnDualStreaming == value)
         return {false, std::move(state)};
 
@@ -1964,6 +2055,8 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setMotionDependingOnDua
 State CameraSettingsDialogStateReducer::setDewarpingParams(
     State state, const nx::vms::api::dewarping::MediaData& value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to value %2", __func__, nx::reflect::json::serialize(value));
+
     state.singleCameraSettings.dewarpingParams.setUser(value);
     state.hasChanges = true;
     return state;
@@ -1972,6 +2065,8 @@ State CameraSettingsDialogStateReducer::setDewarpingParams(
 State CameraSettingsDialogStateReducer::setIoPortDataList(
     State state, const QnIOPortDataList& value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to value %2", __func__, nx::reflect::json::serialize(value));
+
     if (!state.isSingleCamera() || state.devicesDescription.isIoModule != CombinedValue::All)
         return state;
 
@@ -1983,6 +2078,8 @@ State CameraSettingsDialogStateReducer::setIoPortDataList(
 State CameraSettingsDialogStateReducer::setIoModuleVisualStyle(
     State state, vms::api::IoModuleVisualStyle value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     if (!state.isSingleCamera() || state.devicesDescription.isIoModule != CombinedValue::All)
         return state;
 
@@ -1993,6 +2090,8 @@ State CameraSettingsDialogStateReducer::setIoModuleVisualStyle(
 
 State CameraSettingsDialogStateReducer::setCameraControlDisabled(State state, bool value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     const bool hasArecontCameras =
         state.devicesDescription.isArecontCamera != CombinedValue::None;
 
@@ -2012,6 +2111,8 @@ State CameraSettingsDialogStateReducer::setCameraControlDisabled(State state, bo
 CameraSettingsDialogStateReducer::State
     CameraSettingsDialogStateReducer::setKeepCameraTimeSettings(State state, bool value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     if (!state.settingsOptimizationEnabled)
         return state;
 
@@ -2024,6 +2125,8 @@ CameraSettingsDialogStateReducer::State
 
 State CameraSettingsDialogStateReducer::setDualStreamingDisabled(State state, bool value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     state.hasChanges = true;
     state.expert.dualStreamingDisabled.setUser(value);
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
@@ -2033,6 +2136,8 @@ State CameraSettingsDialogStateReducer::setDualStreamingDisabled(State state, bo
 
 State CameraSettingsDialogStateReducer::setUseBitratePerGOP(State state, bool value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     if (!state.settingsOptimizationEnabled)
         return state;
 
@@ -2045,6 +2150,8 @@ State CameraSettingsDialogStateReducer::setUseBitratePerGOP(State state, bool va
 State CameraSettingsDialogStateReducer::setUseMedia2ToFetchProfiles(State state,
     UsingOnvifMedia2Type value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     state.expert.useMedia2ToFetchProfiles.setUser(value);
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
     state.hasChanges = true;
@@ -2053,6 +2160,8 @@ State CameraSettingsDialogStateReducer::setUseMedia2ToFetchProfiles(State state,
 
 State CameraSettingsDialogStateReducer::setPrimaryRecordingDisabled(State state, bool value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     state.hasChanges = true;
     state.expert.primaryRecordingDisabled.setUser(value);
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
@@ -2063,6 +2172,8 @@ State CameraSettingsDialogStateReducer::setPrimaryRecordingDisabled(State state,
 
 State CameraSettingsDialogStateReducer::setSecondaryRecordingDisabled(State state, bool value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     if (state.devicesDescription.hasDualStreamingCapability == CombinedValue::None)
         return state;
 
@@ -2077,6 +2188,8 @@ State CameraSettingsDialogStateReducer::setSecondaryRecordingDisabled(State stat
 State CameraSettingsDialogStateReducer::setPreferredPtzPresetType(
     State state, nx::core::ptz::PresetType value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     if (!state.canSwitchPtzPresetTypes())
         return state;
 
@@ -2088,6 +2201,8 @@ State CameraSettingsDialogStateReducer::setPreferredPtzPresetType(
 
 State CameraSettingsDialogStateReducer::setForcedPtzPanTiltCapability(State state, bool value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     if (state.devicesDescription.canForcePanTiltCapabilities != CombinedValue::All)
         return state;
 
@@ -2099,6 +2214,8 @@ State CameraSettingsDialogStateReducer::setForcedPtzPanTiltCapability(State stat
 
 State CameraSettingsDialogStateReducer::setForcedPtzZoomCapability(State state, bool value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     if (state.devicesDescription.canForceZoomCapability != CombinedValue::All)
         return state;
 
@@ -2111,6 +2228,8 @@ State CameraSettingsDialogStateReducer::setForcedPtzZoomCapability(State state, 
 State CameraSettingsDialogStateReducer::setRtpTransportType(
     State state, vms::api::RtpTransportType value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     state.expert.rtpTransportType.setUser(value);
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
     state.hasChanges = true;
@@ -2119,6 +2238,8 @@ State CameraSettingsDialogStateReducer::setRtpTransportType(
 
 State CameraSettingsDialogStateReducer::setMotionStream(State state, StreamIndex value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     if (!NX_ASSERT(state.isSingleCamera()) || !state.motion.supportsSoftwareDetection)
         return state;
 
@@ -2130,6 +2251,8 @@ State CameraSettingsDialogStateReducer::setMotionStream(State state, StreamIndex
 
 State CameraSettingsDialogStateReducer::setCustomMediaPortUsed(State state, bool value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     if (state.devicesDescription.hasCustomMediaPortCapability != CombinedValue::All)
         return state;
 
@@ -2143,6 +2266,8 @@ State CameraSettingsDialogStateReducer::setCustomMediaPortUsed(State state, bool
 
 State CameraSettingsDialogStateReducer::setCustomMediaPort(State state, int value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     NX_ASSERT(value > 0);
     if (state.devicesDescription.hasCustomMediaPortCapability != CombinedValue::All)
         return state;
@@ -2156,6 +2281,8 @@ State CameraSettingsDialogStateReducer::setCustomMediaPort(State state, int valu
 
 State CameraSettingsDialogStateReducer::setTrustCameraTime(State state, bool value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     state.expert.trustCameraTime.setUser(value);
     state.isDefaultExpertSettings = isDefaultExpertSettings(state);
     state.hasChanges = true;
@@ -2164,6 +2291,8 @@ State CameraSettingsDialogStateReducer::setTrustCameraTime(State state, bool val
 
 State CameraSettingsDialogStateReducer::setLogicalId(State state, int value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     if (!state.isSingleCamera())
         return state;
 
@@ -2176,6 +2305,8 @@ State CameraSettingsDialogStateReducer::setLogicalId(State state, int value)
 
 State CameraSettingsDialogStateReducer::generateLogicalId(State state)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, __func__);
+
     if (!state.isSingleCamera())
         return state;
 
@@ -2206,6 +2337,8 @@ State CameraSettingsDialogStateReducer::generateLogicalId(State state)
 
 State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, __func__);
+
     if (state.isDefaultExpertSettings)
         return state;
 
@@ -2228,24 +2361,38 @@ State CameraSettingsDialogStateReducer::resetExpertSettings(State state)
     return state;
 }
 
-State CameraSettingsDialogStateReducer::setAnalyticsEngines(
+std::pair<bool, State> CameraSettingsDialogStateReducer::setAnalyticsEngines(
     State state, const QList<AnalyticsEngineInfo>& value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, nx::reflect::json::serialize(value));
+
+    if (state.analytics.engines == value)
+        return {false, std::move(state)};
+
     // If no engine is currently selected, select the first available.
     state.analytics.engines = value;
-    if (value.empty())
-        state.analytics.currentEngineId = {};
-    else if (!analyticsEngineIsPresentInList(state.analytics.currentEngineId, state))
-        state.analytics.currentEngineId = state.analytics.engines[0].id;
 
-    NX_VERBOSE(NX_SCOPE_TAG, "Current analytics engine reset to %1",
-        state.analytics.currentEngineId);
-    return state;
+    QnUuid currentEngineId = state.analytics.currentEngineId;
+    if (value.empty())
+        currentEngineId = {};
+    else if (!analyticsEngineIsPresentInList(state.analytics.currentEngineId, state))
+        currentEngineId = state.analytics.engines[0].id;
+
+    if (currentEngineId != state.analytics.currentEngineId)
+    {
+        state.analytics.currentEngineId = currentEngineId;
+        NX_VERBOSE(NX_SCOPE_TAG, "Current analytics engine reset to %1",
+            state.analytics.currentEngineId);
+    }
+
+    return {true, std::move(state)};
 }
 
 std::pair<bool, State> CameraSettingsDialogStateReducer::setCurrentAnalyticsEngineId(
     State state, const QnUuid& value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     if (state.analytics.currentEngineId == value)
         return {false, std::move(state)};
 
@@ -2262,6 +2409,8 @@ std::pair<bool, State> CameraSettingsDialogStateReducer::setCurrentAnalyticsEngi
 State CameraSettingsDialogStateReducer::setUserEnabledAnalyticsEngines(
     State state, const QSet<QnUuid>& value)
 {
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 to %2", __func__, value);
+
     NX_ASSERT(state.isSingleCamera());
 
     // Filter out engines which are not available anymore.

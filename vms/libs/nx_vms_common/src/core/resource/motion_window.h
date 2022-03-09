@@ -99,6 +99,8 @@ public:
     int getMotionSensCount() const;
 
     void removeDefaultMotion();
+
+    QString toString() const;
 private:
     void updatePathCache() const;
 private:

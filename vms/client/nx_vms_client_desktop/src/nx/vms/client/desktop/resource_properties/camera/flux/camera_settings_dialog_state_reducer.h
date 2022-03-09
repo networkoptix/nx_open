@@ -140,7 +140,8 @@ public:
     static State setLogicalId(State state, int value);
     static State generateLogicalId(State state);
     static State resetExpertSettings(State state);
-    static State setAnalyticsEngines(State state, const QList<AnalyticsEngineInfo>& value);
+    static std::pair<bool, State> setAnalyticsEngines(State state,
+        const QList<AnalyticsEngineInfo>& value);
     static std::pair<bool, State> setCurrentAnalyticsEngineId(State state, const QnUuid& engineId);
 
     static State setUserEnabledAnalyticsEngines(State state, const QSet<QnUuid>& value);

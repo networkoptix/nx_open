@@ -6,7 +6,9 @@
 
 #include <QtCore/QScopedValueRollback>
 
+#include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/common/flux/private_flux_store.h>
+#include <nx/reflect/json/serializer.h>
 
 #include "camera_settings_dialog_state_reducer.h"
 
@@ -51,6 +53,12 @@ CameraSettingsDialogStore::CameraSettingsDialogStore(QObject* parent):
     base_type(parent),
     d(new Private(this))
 {
+    connect(this, &CameraSettingsDialogStore::stateChanged,
+        this,
+        [this]
+        {
+            NX_VERBOSE(this, "State changed to: %1", nx::reflect::json::serialize(d->state));
+        });
 }
 
 CameraSettingsDialogStore::~CameraSettingsDialogStore() = default;

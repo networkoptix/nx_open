@@ -4,10 +4,11 @@
 
 #include <QtCore/QMetaType>
 
+#include <nx/reflect/enum_instrument.h>
+
 namespace nx::vms::client::desktop {
 
-enum class CameraSettingsTab
-{
+NX_REFLECTION_ENUM_CLASS(CameraSettingsTab,
     general,
     recording,
     io,
@@ -16,8 +17,8 @@ enum class CameraSettingsTab
     advanced,
     web,
     analytics,
-    expert,
-};
+    expert
+);
 
 } // namespace nx::vms::client::desktop
 

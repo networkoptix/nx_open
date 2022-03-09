@@ -4,15 +4,16 @@
 
 #include <QtCore/QMetaType>
 
+#include <nx/reflect/enum_instrument.h>
+
 namespace nx::vms::client::core {
 
-enum class StandardRotation
-{
+NX_REFLECTION_ENUM_CLASS(StandardRotation,
     rotate0 = 0,
     rotate90 = 90,
     rotate180 = 180,
     rotate270 = 270
-};
+);
 
 class Rotation
 {
