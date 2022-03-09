@@ -4,6 +4,7 @@
 
 #include <QtCore/QMetaType>
 
+#include <nx/reflect/instrument.h>
 #include <nx/vms/api/types/resource_types.h>
 
 namespace nx::vms::client::desktop {
@@ -31,6 +32,9 @@ struct NX_VMS_CLIENT_DESKTOP_API RecordScheduleCellData
     bool operator==(const RecordScheduleCellData& other) const;
     bool operator<(const RecordScheduleCellData& other) const;
 };
+
+NX_REFLECTION_INSTRUMENT(RecordScheduleCellData,
+    (fps)(streamQuality)(recordingType)(metadataTypes)(bitrateMbitPerSec))
 
 } // namespace nx::vms::client::desktop
 

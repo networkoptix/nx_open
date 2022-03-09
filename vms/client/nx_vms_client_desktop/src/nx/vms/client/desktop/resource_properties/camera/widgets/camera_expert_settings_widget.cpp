@@ -55,6 +55,27 @@ int ptzSensitivityToSliderValue(qreal sensitivity)
     return int(std::round(log10(sensitivity) * kSensitivitySliderResolution));
 }
 
+bool canSwitchPtzPresetTypesAll(const CameraSettingsDialogState& state)
+{
+    return state.devicesDescription.canSwitchPtzPresetTypes == CombinedValue::All;
+}
+
+bool isSystemPtzPreset(const CameraSettingsDialogState& state)
+{
+    return state.expert.preferredPtzPresetType.equals(nx::core::ptz::PresetType::system);
+}
+
+bool isNativePtzPreset(const CameraSettingsDialogState& state)
+{
+    return canSwitchPtzPresetTypesAll(state)
+        && state.expert.preferredPtzPresetType.equals(nx::core::ptz::PresetType::native);
+}
+
+bool autoExclusivePtzPresets(const CameraSettingsDialogState& state)
+{
+    return isSystemPtzPreset(state) || isNativePtzPreset(state);
+}
+
 } // namespace
 
 CameraExpertSettingsWidget::CameraExpertSettingsWidget(
@@ -458,13 +479,13 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     ui->forcedZoomCheckBox->setVisible(state.canForceZoomCapability());
 
     ui->presetTypeLimitationsLabel->setVisible(state.canSwitchPtzPresetTypes()
-        && state.isSystemPtzPreset());
+        && isSystemPtzPreset(state));
 
-    ui->prefferedPtzPresetTypeSystemRadioButton->setAutoExclusive(state.autoExclusivePtzPresets());
-    ui->prefferedPtzPresetTypeNativeRadioButton->setAutoExclusive(state.autoExclusivePtzPresets());
-    ui->prefferedPtzPresetTypeSystemRadioButton->setChecked(state.isSystemPtzPreset());
-    ui->prefferedPtzPresetTypeNativeRadioButton->setChecked(state.isNativePtzPreset());
-    ui->prefferedPtzPresetTypeNativeRadioButton->setEnabled(state.canSwitchPtzPresetTypesAll());
+    ui->prefferedPtzPresetTypeSystemRadioButton->setAutoExclusive(autoExclusivePtzPresets(state));
+    ui->prefferedPtzPresetTypeNativeRadioButton->setAutoExclusive(autoExclusivePtzPresets(state));
+    ui->prefferedPtzPresetTypeSystemRadioButton->setChecked(isSystemPtzPreset(state));
+    ui->prefferedPtzPresetTypeNativeRadioButton->setChecked(isNativePtzPreset(state));
+    ui->prefferedPtzPresetTypeNativeRadioButton->setEnabled(canSwitchPtzPresetTypesAll(state));
 
     if (state.canForcePanTiltCapabilities())
     {

@@ -1,14 +1,12 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-
 #include "motion_window.h"
 
 #include <motion/motion_detection.h>
-
-#include <nx/utils/thread/mutex.h>
-
+#include <nx/reflect/json/serializer.h>
 #include <nx/streaming/config.h>
 #include <nx/utils/log/log.h>
+#include <nx/utils/thread/mutex.h>
 
 ////////////////////////////////////////////////////////////
 //// QnRegion class
@@ -102,6 +100,11 @@ void QnMotionRegion::removeDefaultMotion()
     for (int i = 0; i < kSensitivityLevelCount; ++i)
         m_data[i] = QnRegion();
      m_dirty = true;
+}
+
+QString QnMotionRegion::toString() const
+{
+    return QString::fromStdString(nx::reflect::json::serialize(getAllMotionRects()));
 }
 
 QnRegion QnMotionRegion::getMotionMask() const

@@ -54,6 +54,8 @@ QString toString(const QnIOPortData& portData);
 typedef std::vector<QnIOPortData> QnIOPortDataList;
 #define QnIOPortData_Fields (id)(portType)(supportedPortTypes)(inputName)(outputName)(iDefaultState)(oDefaultState)(autoResetTimeoutMs)
 
+NX_REFLECTION_INSTRUMENT(QnIOPortData, QnIOPortData_Fields)
+
 Q_DECLARE_METATYPE(QnIOPortData)
 
 struct NX_VMS_COMMON_API QnCameraPortsData

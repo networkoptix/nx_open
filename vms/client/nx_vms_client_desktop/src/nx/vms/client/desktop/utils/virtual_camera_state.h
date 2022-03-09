@@ -4,6 +4,8 @@
 
 #include <QtCore/QString>
 
+#include <nx/reflect/enum_instrument.h>
+#include <nx/reflect/instrument.h>
 #include <nx/utils/uuid.h>
 #include <recording/time_period.h>
 
@@ -15,22 +17,21 @@ namespace nx::vms::client::desktop {
 
 struct VirtualCameraState
 {
-    enum Status
-    {
+    NX_REFLECTION_ENUM_IN_CLASS(Status,
         Unlocked,
         LockedByOtherClient,
         Locked,
         Uploading,
-        Consuming,
-    };
+        Consuming
+    );
 
-    enum Error {
+    NX_REFLECTION_ENUM_IN_CLASS(Error,
         NoError,
         LockRequestFailed,
         CameraSnatched,
         UploadFailed,
-        ConsumeRequestFailed,
-    };
+        ConsumeRequestFailed
+    );
 
     struct EnqueuedFile
     {
@@ -93,6 +94,12 @@ struct VirtualCameraState
      */
     QnTimePeriodList periods() const;
 };
+
+NX_REFLECTION_INSTRUMENT(VirtualCameraState::EnqueuedFile, (path)(startTimeMs)(uploadPeriod))
+
+// TODO: #sivanov Add `currentUpload` field.
+NX_REFLECTION_INSTRUMENT(VirtualCameraState,
+    (status)(error)(cameraId)(lockUserId)(queue)(currentIndex)(consumeProgress))
 
 } // namespace nx::vms::client::desktop
 
