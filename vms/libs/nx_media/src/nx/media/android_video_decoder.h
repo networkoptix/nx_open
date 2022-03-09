@@ -5,7 +5,6 @@
 #if defined(Q_OS_ANDROID)
 
 #include <QtCore/QObject>
-#include <QtMultimedia/QVideoFrame>
 
 #include <nx/streaming/video_data_packet.h>
 
