@@ -64,6 +64,12 @@ QString relativeUrlForTopic(Qn::HelpTopic topic)
             return "setting_camera_orientation.html";
         case Qn::HelpTopic::CameraSettings_SecondStream_Help:
             return "dual_streaming.html";
+        case Qn::HelpTopic::ConnectToCamerasOverOnlyHttps_Help:
+            return "to-connect-to-cameras-over-onl.html";
+        case Qn::HelpTopic::EnableArchiveEncryption_Help:
+            return "to-enable-archive-encryption.html";
+        case Qn::HelpTopic::EnableEncryptedVideoTraffic_Help:
+            return "to-enable-encrypted-video-traf.html";
         case Qn::HelpTopic::EventLog_Help:
             return "viewing_events_log.html";
         case Qn::HelpTopic::EventsActions_BackupFinished_Help:
@@ -140,6 +146,8 @@ QString relativeUrlForTopic(Qn::HelpTopic topic)
             return "analytics_event.html";
         case Qn::HelpTopic::Exporting_Help:
             return "exporting.html";
+        case Qn::HelpTopic::ForceSecureConnections_Help:
+            return "to-force-secure-connections.html";
         case Qn::HelpTopic::IOModules_Help:
             return "setting_up_i_o_modules.html";
         case Qn::HelpTopic::ImageEnhancement_Help:
@@ -275,7 +283,7 @@ QString relativeUrlForTopic(Qn::HelpTopic topic)
         case Qn::HelpTopic::ServerSettings_WebClient_Help:
             return "using_media_servers_web_interf.html";
         case Qn::HelpTopic::SessionAndDigestAuth_Help:
-            return "session_and_digest_authentication.html";
+            return "session-and-digest-authentication.html";
         case Qn::HelpTopic::Setup_Wizard_Help:
             return "vms_quick_start.html";
         case Qn::HelpTopic::Showreel_Help:

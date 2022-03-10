@@ -48,6 +48,9 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
         "The encryption password will be required to restore the archive on another system."
         "\nCaution: This password cannot be reset. If you lose it, the archive will be unrecoverable."));
 
+    setHelpTopic(ui->useHttpsOnlyCamerasCheckBox, Qn::ConnectToCamerasOverOnlyHttps_Help);
+    ui->useHttpsOnlyCamerasCheckBox->setHint(ui->useHttpsOnlyCamerasCheckBox->text());
+
     setHelpTopic(ui->displayWatermarkCheckBox, Qn::UserWatermark_Help);
     ui->displayWatermarkCheckBox->setHint(tr(
         "Watermarks will be displayed over live, archive and exported videos for non-admin users"
@@ -63,12 +66,13 @@ SecuritySettingsWidget::SecuritySettingsWidget(QWidget* parent):
 
     ui->forceTrafficEncryptionCheckBox->setHint(
         tr("Does not affect the connections established by server."));
-    setHelpTopic(ui->forceTrafficEncryptionCheckBox, Qn::SecureConnection_Help);
+    setHelpTopic(ui->forceTrafficEncryptionCheckBox, Qn::ForceSecureConnections_Help);
 
-    setHelpTopic(ui->forceVideoTrafficEncryptionCheckBox, Qn::SecureConnection_Help);
+    setHelpTopic(ui->forceVideoTrafficEncryptionCheckBox, Qn::EnableEncryptedVideoTraffic_Help);
     ui->forceVideoTrafficEncryptionCheckBox->setHint(tr(
         "Enables RTSP traffic encryption."));
 
+    setHelpTopic(ui->archiveEncryptionGroupBox, Qn::EnableArchiveEncryption_Help);
     const auto archiveEncryptionHint = HintButton::createGroupBoxHint(ui->archiveEncryptionGroupBox);
     archiveEncryptionHint->setHintText(tr(
         "Encrypts archive data to prevent it from being viewed outside of the system. "

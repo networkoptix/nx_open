@@ -81,7 +81,7 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QCheckBox" name="useHttpsOnlyCamerasCheckBox">
+          <widget class="nx::vms::client::desktop::CheckBoxWithHint" name="useHttpsOnlyCamerasCheckBox">
            <property name="text">
             <string>Use only HTTPS to connect to cameras</string>
            </property>
