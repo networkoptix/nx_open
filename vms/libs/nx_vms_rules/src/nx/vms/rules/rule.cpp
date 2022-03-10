@@ -2,10 +2,10 @@
 
 #include "rule.h"
 
-#include <QScopedValueRollback>
+#include <QtCore/QScopedValueRollback>
 
-#include "event_filter.h"
 #include "action_builder.h"
+#include "event_filter.h"
 
 namespace nx::vms::rules {
 

@@ -1,13 +1,16 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
 #include <gtest/gtest.h>
+#include <gmock/gmock.h>
 
+#include <nx/vms/api/rules/rule.h>
 #include <nx/vms/rules/action_builder.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/manifest.h>
 #include <nx/vms/rules/rule.h>
 
+#include "mock_engine_events.h"
 #include "test_action.h"
 #include "test_field.h"
 #include "test_router.h"
@@ -20,6 +23,13 @@ const QString kTestEventId = "nx.events.testEvent";
 const QString kTestActionId = "nx.actions.testAction";
 const QString kTestEventFieldId = "nx.actions.field.test";
 const QString kTestActionFieldId = "nx.events.field.test";
+
+api::Rule makeEmptyRuleData()
+{
+    return api::Rule{
+        .id = QnUuid::createUuid(),
+    };
+}
 
 } // namespace
 
@@ -277,6 +287,46 @@ TEST_F(EngineTest, buildActionBuilderMustFailIfActionNotRegistered)
     auto actionBuilder = engine->buildActionBuilder(kTestActionId);
 
     ASSERT_FALSE(actionBuilder);
+}
+
+TEST_F(EngineTest, updateRule)
+{
+    MockEngineEvents mockEvents(engine.get());
+    auto ruleData1 = makeEmptyRuleData();
+
+    EXPECT_CALL(mockEvents, onRuleUpdated(ruleData1.id, true));
+    EXPECT_CALL(mockEvents, onRuleUpdated(ruleData1.id, false));
+    EXPECT_TRUE(engine->updateRule(ruleData1));
+    EXPECT_FALSE(engine->updateRule(ruleData1));
+    EXPECT_TRUE(engine->cloneRules()[ruleData1.id]);
+}
+
+TEST_F(EngineTest, removeRule)
+{
+    MockEngineEvents mockEvents(engine.get());
+    auto ruleData1 = makeEmptyRuleData();
+
+    EXPECT_CALL(mockEvents, onRuleUpdated(ruleData1.id, true));
+    EXPECT_CALL(mockEvents, onRuleRemoved(ruleData1.id));
+    EXPECT_TRUE(engine->updateRule(ruleData1));
+    engine->removeRule(ruleData1.id);
+    EXPECT_TRUE(engine->cloneRules().empty());
+    engine->removeRule(ruleData1.id);
+}
+
+TEST_F(EngineTest, resetRules)
+{
+    MockEngineEvents mockEvents(engine.get());
+    auto ruleData1 = makeEmptyRuleData();
+
+    EXPECT_CALL(mockEvents, onRulesReset());
+    EXPECT_TRUE(engine->cloneRules().empty());
+    engine->setRules({});
+
+    EXPECT_CALL(mockEvents, onRuleUpdated(ruleData1.id, true));
+    EXPECT_CALL(mockEvents, onRulesReset());
+    EXPECT_TRUE(engine->updateRule(ruleData1));
+    engine->setRules({});
 }
 
 } // nx::vms::rules::test

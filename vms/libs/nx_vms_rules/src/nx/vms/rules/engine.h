@@ -60,9 +60,6 @@ public:
     /** Returns all the rules engine contains. */
     const std::unordered_map<QnUuid, const Rule*> rules() const;
 
-    /** Returns rule with the given id or nullptr. */
-    const Rule* rule(const QnUuid& id) const;
-
     /**
      * Creates a copy of Rules stored inside the Engine.
      * This cloned state may be used to edit rules and to update Engine state later.
@@ -71,11 +68,18 @@ public:
 
     void setRules(RuleSet&& rules);
 
-    //template<class T>
-    //inline bool registerEventField()
-    //{
-    //    return registerEventField(T::manifest(), T::checker());
-    //}
+    /** Returns rule with the given id or nullptr. */
+    const Rule* rule(const QnUuid& id) const;
+
+    /** Returns true if rule was added, false otherwise. */
+    bool updateRule(const api::Rule& ruleData);
+    bool updateRule(std::unique_ptr<Rule> rule);
+    void removeRule(QnUuid ruleId);
+
+signals:
+    void ruleUpdated(QnUuid ruleId, bool added);
+    void ruleRemoved(QnUuid ruleId);
+    void rulesReset();
 
 public:
     using EventConstructor = std::function<BasicEvent*()>;
@@ -144,7 +148,7 @@ private: //< ?
 
 public:
     // Declare following methods public for testing purposes.
-    std::unique_ptr<Rule> buildRule(const api::Rule& serialized, bool embed) const;
+    std::unique_ptr<Rule> buildRule(const api::Rule& serialized) const;
     api::Rule serialize(const Rule* rule) const;
 
     std::unique_ptr<EventFilter> buildEventFilter(const api::EventFilter& serialized) const;

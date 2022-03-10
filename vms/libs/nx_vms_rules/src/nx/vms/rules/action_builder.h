@@ -64,7 +64,7 @@ public:
     QSet<QString> requiredEventFields() const;
     QSet<QnUuid> affectedResources(const EventData& eventData) const;
 
-    void process(const EventData& eventData);
+    ActionPtr process(const EventData& eventData);
 
     void setAggregationInterval(std::chrono::seconds interval);
     std::chrono::seconds aggregationInterval() const;
@@ -72,7 +72,6 @@ public:
     void connectSignals();
 
 signals:
-    void action(const ActionPtr& action);
     void stateChanged();
 
 private:
