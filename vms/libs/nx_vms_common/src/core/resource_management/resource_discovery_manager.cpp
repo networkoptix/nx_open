@@ -270,18 +270,16 @@ void QnResourceDiscoveryManager::setLastDiscoveredResources(const QnResourceList
 {
     NX_MUTEX_LOCKER lock(&m_resListMutex);
     m_lastDiscoveredResources[m_discoveryUpdateIdx] = resources;
-    int sz = sizeof(m_lastDiscoveredResources) / sizeof(QnResourceList);
-    m_discoveryUpdateIdx = (m_discoveryUpdateIdx + 1) % sz;
+    m_discoveryUpdateIdx = (m_discoveryUpdateIdx + 1) % m_lastDiscoveredResources.size();
 }
 
 QnResourceList QnResourceDiscoveryManager::lastDiscoveredResources() const
 {
     NX_MUTEX_LOCKER lock(&m_resListMutex);
-    int sz = sizeof(m_lastDiscoveredResources) / sizeof(QnResourceList);
     QMap<QString, QnResourcePtr> result;
-    for (int i = 0; i < sz; ++i)
+    for (const QnResourceList& resList: m_lastDiscoveredResources)
     {
-        for (const QnResourcePtr& res : m_lastDiscoveredResources[i])
+        for (const QnResourcePtr& res: resList)
         {
             QString key;
             if (auto networkResource = res.dynamicCast<QnNetworkResource>())
