@@ -13,6 +13,7 @@
 #include <nx/network/address_resolver.h>
 #include <nx/network/nx_network_ini.h>
 #include <nx/network/socket_global.h>
+#include <nx/network/http/auth_tools.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/thread/thread_util.h>
 #include <nx/vms/client/core/ini.h>
@@ -395,10 +396,14 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
             {
                 if (*response.error == nx::cloud::db::api::OauthManager::k2faRequiredError)
                 {
+                    auto credentials = context->info.credentials;
+                    credentials.authToken =
+                        nx::network::http::BearerAuthToken(response.access_token);
+
                     auto validate =
-                        [this, token = response.access_token]
+                        [this, credentials = std::move(credentials)]
                         {
-                            return userInteractionDelegate->request2FaValidation(token);
+                            return userInteractionDelegate->request2FaValidation(credentials);
                         };
 
                     const bool validated = executeInUiThreadSync(validate);

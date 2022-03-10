@@ -18,7 +18,8 @@ class RemoteConnectionUserInteractionDelegate:
 public:
     using CertificateValidationLevelGetter =
         std::function<network::server_certificate::ValidationLevel ()>;
-    using TokenValidator = std::function<bool (const std::string& token)>;
+    using TokenValidator =
+        std::function<bool (const nx::network::http::Credentials& credentials)>;
     using AskUserToAcceptCertificate = std::function<bool (
         const nx::vms::api::ModuleInformation& target,
         const nx::network::SocketAddress& primaryAddress,
@@ -53,7 +54,7 @@ public:
         const nx::network::SocketAddress& primaryAddress,
         const nx::network::ssl::CertificateChain& chain) override;
 
-    virtual bool request2FaValidation(const std::string& token) override;
+    virtual bool request2FaValidation(const nx::network::http::Credentials& credentials) override;
 
 private:
     struct Private;

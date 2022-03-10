@@ -89,8 +89,8 @@ bool RemoteConnectionUserInteractionDelegate::acceptNewCertificate(
             return true;
 
         case CertificateValidationLevel::recommended:
-            return d->askToAcceptCertificate(target, primaryAddress, chain, 
-				CertificateWarning::Reason::unknownServer);
+            return d->askToAcceptCertificate(target, primaryAddress, chain,
+                CertificateWarning::Reason::unknownServer);
 
         case CertificateValidationLevel::strict:
             d->tryShowCertificateError(target, primaryAddress, chain);
@@ -154,9 +154,10 @@ bool RemoteConnectionUserInteractionDelegate::acceptCertificateOfServerInTargetS
     }
 }
 
-bool RemoteConnectionUserInteractionDelegate::request2FaValidation(const std::string& token)
+bool RemoteConnectionUserInteractionDelegate::request2FaValidation(
+    const nx::network::http::Credentials& credentials)
 {
-    return d->validateToken(token);
+    return d->validateToken(credentials);
 }
 
 } // namespace nx::vms::client::core

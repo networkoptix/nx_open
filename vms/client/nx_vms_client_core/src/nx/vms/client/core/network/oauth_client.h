@@ -8,7 +8,7 @@
 #include <nx/utils/impl_ptr.h>
 #include <nx/vms/client/core/network/oauth_client_constants.h>
 
-namespace nx::network::http { class AuthToken; }
+namespace nx::network::http { class Credentials; }
 
 namespace nx::vms::client::core {
 
@@ -42,7 +42,6 @@ public:
     OauthClient(
         OauthClientType clientType,
         OauthViewType viewType,
-        const QString& user = QString(),
         const QString& cloudSystem = QString(),
         const QString& clientId = QString(),
         QObject* parent = nullptr);
@@ -52,8 +51,8 @@ public:
     /** Constructed URL to request cloud web page. */
     QUrl url() const;
 
-    /** Set token for 2FA validation. */
-    void setAuthToken(const nx::network::http::AuthToken& token);
+    /** Set token and username for 2FA validation. */
+    void setCredentials(const nx::network::http::Credentials& credentials);
 
     /** Final authetication data. */
     const CloudAuthData& authData() const;

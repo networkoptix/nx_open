@@ -6,6 +6,7 @@
 #include <nx/vms/client/core/network/oauth_client_constants.h>
 #include <ui/dialogs/common/dialog.h>
 
+namespace nx::network::http { class Credentials; }
 namespace nx::vms::client::core { struct CloudAuthData; }
 
 namespace nx::vms::client::desktop {
@@ -30,7 +31,7 @@ public:
     static bool validateToken(
         QWidget* parent,
         const QString& title,
-        const std::string& token);
+        const nx::network::http::Credentials& credentials);
 
     OauthLoginDialog(
         QWidget* parent,

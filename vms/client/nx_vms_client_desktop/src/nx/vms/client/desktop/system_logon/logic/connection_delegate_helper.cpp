@@ -22,13 +22,13 @@ std::unique_ptr<core::RemoteConnectionUserInteractionDelegate>
         };
 
     const auto validateToken =
-        [mainWindow](const std::string& token)
+        [mainWindow](const nx::network::http::Credentials& credentials)
         {
             if (!mainWindow)
                 return false;
 
             return OauthLoginDialog::validateToken(
-                mainWindow, OauthLoginDialog::tr("Connect to System"), token);
+                mainWindow, OauthLoginDialog::tr("Connect to System"), credentials);
         };
 
     const auto askToAcceptCertificate =

@@ -14,7 +14,8 @@ NX_REFLECTION_ENUM_CLASS(OauthClientType,
     passwordDisconnect,
     passwordBackup,
     passwordRestore,
-    passwordMerge)
+    passwordMerge,
+    system2faAuth)
 
 NX_REFLECTION_ENUM_CLASS(OauthViewType,
     desktop,

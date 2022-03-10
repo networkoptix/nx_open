@@ -45,7 +45,6 @@ OauthLoginDialogPrivate::OauthLoginDialogPrivate(
     m_oauthClient(new OauthClient(
         clientType,
         OauthViewType::desktop,
-        /*user*/ {},
         cloudSystem,
         kDesktopClientId))
 {
@@ -123,7 +122,7 @@ void OauthLoginDialogPrivate::startCheck()
         {
             if (!stopCheck())
                 return;
-                
+
             NX_DEBUG(this, "Ping result: %1, url: %2", success, m_requestedUrl);
 
             if (success)
