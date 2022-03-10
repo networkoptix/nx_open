@@ -39,6 +39,11 @@ QString MetadataHelper::getBaseDir() const
     return base + QString("metadata");
 }
 
+QString MetadataHelper::dataDir() const
+{
+    return m_dataDir;
+}
+
 QList<QDate> MetadataHelper::recordedMonth(const QString& cameraUniqueId) const
 {
     QList<QDate> rez;
@@ -77,7 +82,8 @@ void cleanupMetadataDir(const QString& _dirName)
     }
 }
 
-void MetadataHelper::deleteUnusedFiles(const QList<QDate>& monthList, const QString& cameraUniqueId) const
+void MetadataHelper::deleteUnusedFiles(
+    const QList<QDate>& monthList, const QString& cameraUniqueId) const
 {
     QList<QDate> existsData = recordedMonth(cameraUniqueId);
     for (const QDate& date : existsData) {
@@ -86,7 +92,7 @@ void MetadataHelper::deleteUnusedFiles(const QList<QDate>& monthList, const QStr
     }
 }
 
-QList<QRegion> MetadataHelper::regionsFromFilter(const QString& filter, int channelCount) const
+QList<QRegion> MetadataHelper::regionsFromFilter(const QString& filter, int channelCount)
 {
     if (filter.isEmpty())
         return QList<QRegion>();
