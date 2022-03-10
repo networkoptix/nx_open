@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include <memory>
+#include <array>
 #include <atomic>
+#include <memory>
 
 #include <QThreadPool>
 
@@ -189,7 +190,7 @@ protected:
     QHash<QnUuid, QnManualResourceSearchEntryList> m_searchProcessResults; // TODO: #virtualCamera unused!!!
 
     mutable nx::Mutex m_resListMutex;
-    QnResourceList m_lastDiscoveredResources[6];
+    std::array<QnResourceList, 6> m_lastDiscoveredResources;
     int m_discoveryUpdateIdx;
 
 protected:
