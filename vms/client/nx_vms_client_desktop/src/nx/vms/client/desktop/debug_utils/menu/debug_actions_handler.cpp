@@ -174,7 +174,7 @@ void DebugActionsHandler::registerDebugCounterActions()
     auto connector = new DebugEventConnector(); // initialize instance
     auto executor = new DebugActionExecutor(commonModule()); // initialize instance
     engine->addEventConnector(connector);
-    engine->addActionExecutor("nx.showNotification", executor);
+    engine->addActionExecutor(rules::NotificationAction::manifest().id, executor);
 
     registerDebugAction(
         "Debug counter ++",

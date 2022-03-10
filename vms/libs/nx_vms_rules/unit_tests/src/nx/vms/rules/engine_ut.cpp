@@ -52,20 +52,27 @@ protected:
     Engine::ActionFieldConstructor testActionFieldConstructor = [] { return new TestActionField; };
 };
 
-TEST_F(EngineTest, rulesUpdatedSuccessfully)
+TEST_F(EngineTest, ruleAddedSuccessfully)
 {
     // No rules at the moment the engine is just created.
     ASSERT_TRUE(engine->rules().empty());
 
-    auto newRuleId = QnUuid::createUuid();
-
-    Engine::RuleSet newRuleSet;
-    newRuleSet.emplace(newRuleId, new Rule{newRuleId});
-    engine->setRules(std::move(newRuleSet));
+    auto rule = std::make_unique<Rule>(QnUuid::createUuid());
+    engine->addRule(engine->serialize(rule.get()));
 
     ASSERT_EQ(engine->rules().size(), 1);
-    ASSERT_TRUE(engine->rules().contains(newRuleId));
-    ASSERT_EQ(engine->rules().at(newRuleId)->id(), newRuleId);
+    ASSERT_TRUE(engine->rules().contains(rule->id()));
+}
+
+TEST_F(EngineTest, ruleClonedSuccessfully)
+{
+    auto rule = std::make_unique<Rule>(QnUuid::createUuid());
+    engine->addRule(engine->serialize(rule.get()));
+
+    auto clonedRule = engine->cloneRule(rule->id());
+
+    ASSERT_TRUE(clonedRule);
+    ASSERT_EQ(rule->id(), clonedRule->id());
 }
 
 TEST_F(EngineTest, engineCreatedWithoutEventsAndActions)
