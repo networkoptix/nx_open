@@ -84,7 +84,7 @@ bool OauthLoginDialog::validateToken(
     const std::string& token)
 {
     std::unique_ptr<OauthLoginDialog> dialog =
-        std::make_unique<OauthLoginDialog>(parent, "renewDesktop");
+        std::make_unique<OauthLoginDialog>(parent, "system2faAuth");
 
     dialog->setWindowTitle(title);
     dialog->d->setAuthToken(nx::network::http::BearerAuthToken(token));
