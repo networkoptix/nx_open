@@ -8,6 +8,7 @@
 
 namespace nx::vms::api { struct ModuleInformation; }
 namespace nx::network { class SocketAddress; }
+namespace nx::network::http { class Credentials; }
 
 namespace nx::vms::client::core {
 
@@ -54,7 +55,7 @@ public:
      * Should be executed in the delegate's thread.
      * @return Validation success.
      */
-    virtual bool request2FaValidation(const std::string& token) = 0;
+    virtual bool request2FaValidation(const nx::network::http::Credentials& credentials) = 0;
 };
 
 } // namespace nx::vms::client::core

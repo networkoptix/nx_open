@@ -87,13 +87,13 @@ nx::vms::client::core::CloudAuthData OauthLoginDialog::login(
 bool OauthLoginDialog::validateToken(
     QWidget* parent,
     const QString& title,
-    const std::string& token)
+    const nx::network::http::Credentials& credentials)
 {
     std::unique_ptr<OauthLoginDialog> dialog =
-        std::make_unique<OauthLoginDialog>(parent, core::OauthClientType::renewDesktop);
+        std::make_unique<OauthLoginDialog>(parent, core::OauthClientType::system2faAuth);
 
     dialog->setWindowTitle(title);
-    dialog->d->oauthClient()->setAuthToken(nx::network::http::BearerAuthToken(token));
+    dialog->d->oauthClient()->setCredentials(credentials);
     connect(
         dialog.get(),
         &OauthLoginDialog::authDataReady,

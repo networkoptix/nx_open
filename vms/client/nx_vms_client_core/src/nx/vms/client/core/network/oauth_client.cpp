@@ -26,7 +26,6 @@ struct OauthClient::Private: public QObject
 
     const OauthClientType clientType = OauthClientType::undefined;
     const OauthViewType viewType = OauthViewType::desktop;
-    const QString user;
     const QString cloudSystem;
     const QString clientId;
     CloudAuthData authData;
@@ -37,7 +36,6 @@ struct OauthClient::Private: public QObject
         OauthClient* q,
         OauthClientType clientType,
         OauthViewType viewType,
-        const QString& user,
         const QString& cloudSystem,
         const QString& clientId);
 
@@ -48,14 +46,12 @@ OauthClient::Private::Private(
     OauthClient* q,
     OauthClientType clientType,
     OauthViewType viewType,
-    const QString& user,
     const QString& cloudSystem,
     const QString& clientId)
     :
     q(q),
     clientType(clientType),
     viewType(viewType),
-    user(user),
     cloudSystem(cloudSystem),
     clientId(clientId),
     m_cloudConnectionFactory(std::make_unique<core::CloudConnectionFactory>())
@@ -111,7 +107,7 @@ void OauthClient::registerQmlType()
 }
 
 OauthClient::OauthClient(QObject* parent):
-    OauthClient(OauthClientType::undefined, OauthViewType::desktop, /*user*/ {},
+    OauthClient(OauthClientType::undefined, OauthViewType::desktop,
         /*cloudSystem*/ {}, /*clienId*/ {}, parent)
 {
 }
@@ -119,13 +115,12 @@ OauthClient::OauthClient(QObject* parent):
 OauthClient::OauthClient(
     OauthClientType clientType,
     OauthViewType viewType,
-    const QString& user,
     const QString& cloudSystem,
     const QString& clientId,
     QObject* parent)
     :
     base_type(parent),
-    d(new Private(this, clientType, viewType, user, cloudSystem, clientId))
+    d(new Private(this, clientType, viewType, cloudSystem, clientId))
 {
 }
 
@@ -158,11 +153,7 @@ QUrl OauthClient::url() const
         RemoteConnectionAware connectionHelper;
         auto remoteConnection = connectionHelper.connection();
 
-        if (!d->user.isEmpty())
-        {
-            builder.addQueryItem("email", d->user);
-        }
-        else if (remoteConnection
+        if (remoteConnection
             && remoteConnection->connectionInfo().userType == nx::vms::api::UserType::cloud)
         {
             builder.addQueryItem("email", remoteConnection->credentials().username);
@@ -170,16 +161,19 @@ QUrl OauthClient::url() const
     }
     else if (!d->authData.credentials.authToken.empty()) //< Request 2FA validation.
     {
+        if (!d->authData.credentials.username.empty())
+            builder.addQueryItem("email", d->authData.credentials.username);
+
         builder.addQueryItem("access_token", d->authData.credentials.authToken.value);
     }
 
     return builder.toUrl().toQUrl();
 }
 
-void OauthClient::setAuthToken(const nx::network::http::AuthToken& token)
+void OauthClient::setCredentials(const nx::network::http::Credentials& credentials)
 {
     CloudAuthData authData;
-    authData.credentials.authToken = token;
+    authData.credentials = credentials;
     d->authData = std::move(authData);
 }
 
