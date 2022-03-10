@@ -2,7 +2,7 @@
 
 #include "basic_action.h"
 
-#include <QMetaProperty>
+#include <QtCore/QMetaProperty>
 
 namespace nx::vms::rules {
 

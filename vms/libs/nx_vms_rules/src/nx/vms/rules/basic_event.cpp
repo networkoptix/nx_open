@@ -2,8 +2,8 @@
 
 #include "basic_event.h"
 
-#include <QDateTime>
-#include <QMetaProperty>
+#include <QtCore/QDateTime>
+#include <QtCore/QMetaProperty>
 
 namespace nx::vms::rules {
 

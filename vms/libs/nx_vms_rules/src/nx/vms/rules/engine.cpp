@@ -126,7 +126,7 @@ Engine::RuleSet Engine::cloneRules() const
     RuleSet result;
     for (const auto& [id, rule]: m_rules)
     {
-        auto cloned = buildRule(serialize(rule.get()), /*embed*/ false);
+        auto cloned = buildRule(serialize(rule.get()));
         if (NX_ASSERT(cloned, "Failed to clone existing rule"))
             result[id] = std::move(cloned);
     }
@@ -136,6 +136,34 @@ Engine::RuleSet Engine::cloneRules() const
 void Engine::setRules(RuleSet&& rules)
 {
     m_rules = std::move(rules);
+    emit rulesReset();
+}
+
+bool Engine::updateRule(const api::Rule& ruleData)
+{
+    if (auto rule = buildRule(ruleData))
+        return updateRule(std::move(rule));
+
+    return false;
+}
+
+bool Engine::updateRule(std::unique_ptr<Rule> rule)
+{
+    auto ruleId = rule->id();
+    auto result = m_rules.insert_or_assign(ruleId, std::move(rule));
+
+    emit ruleUpdated(ruleId, result.second);
+    return result.second;
+}
+
+void Engine::removeRule(QnUuid ruleId)
+{
+    auto it = m_rules.find(ruleId);
+    if (it == m_rules.end())
+        return;
+
+    m_rules.erase(it);
+    emit ruleRemoved(ruleId);
 }
 
 bool Engine::registerEvent(const ItemDescriptor& descriptor)
@@ -310,7 +338,7 @@ bool Engine::registerActionType(
 
 bool Engine::addRule(const api::Rule& serialized)
 {
-    if (auto rule = buildRule(serialized, /*embed*/ true))
+    if (auto rule = buildRule(serialized))
     {
         m_rules[serialized.id] = std::move(rule);
         return true;
@@ -319,7 +347,7 @@ bool Engine::addRule(const api::Rule& serialized)
     return false;
 }
 
-std::unique_ptr<Rule> Engine::buildRule(const api::Rule& serialized, bool embed) const
+std::unique_ptr<Rule> Engine::buildRule(const api::Rule& serialized) const
 {
     std::unique_ptr<Rule> rule(new Rule(serialized.id));
 
@@ -338,8 +366,6 @@ std::unique_ptr<Rule> Engine::buildRule(const api::Rule& serialized, bool embed)
         if (!builder)
             return nullptr;
 
-        if (embed) // TODO: Move out.
-            connect(builder.get(), &ActionBuilder::action, this, &Engine::processAction);
         rule->addActionBuilder(std::move(builder));
     }
 
@@ -678,7 +704,7 @@ void Engine::processEvent(const EventPtr& event)
 // TODO: #spanasenko Use a wrapper with additional checks instead of QHash.
 void Engine::processAcceptedEvent(const QnUuid& ruleId, const EventData& eventData)
 {
-    qDebug() << "Processing accepted event";
+    NX_DEBUG(this, "Processing accepted event");
 
     const auto it = m_rules.find(ruleId);
     if (it == m_rules.end()) // Assert?
@@ -688,13 +714,14 @@ void Engine::processAcceptedEvent(const QnUuid& ruleId, const EventData& eventDa
 
     for (const auto builder: rule->actionBuilders())
     {
-        builder->process(eventData);
+        if (auto action = builder->process(eventData))
+            processAction(action);
     }
 }
 
 void Engine::processAction(const ActionPtr& action)
 {
-    qDebug() << "Processing Action " << action->type();
+    NX_DEBUG(this, "Processing Action %1", action->type());
 
     if (auto executor = m_executors.value(action->type()))
         executor->execute(action);

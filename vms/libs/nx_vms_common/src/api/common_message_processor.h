@@ -183,7 +183,10 @@ private slots:
 
     void on_eventRuleAddedOrUpdated(const nx::vms::api::EventRuleData& data);
 
-    // void on_vmsEventReceived(const nx::vms::api::rules::EventInfo& eventInfo);
+    void on_vmsRuleUpdated(const nx::vms::api::rules::Rule& rule, ec2::NotificationSource source);
+    void on_vmsRuleRemoved(QnUuid id);
+    void on_vmsRulesReset();
+
 protected:
     ec2::AbstractECConnectionPtr m_connection;
 

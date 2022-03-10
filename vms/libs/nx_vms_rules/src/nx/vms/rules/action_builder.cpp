@@ -125,31 +125,32 @@ QSet<QnUuid> ActionBuilder::affectedResources(const EventData& eventData) const
     return result;
 }
 
-void ActionBuilder::process(const EventData& eventData)
+ActionPtr ActionBuilder::process(const EventData& eventData)
 {
     if (m_interval.count())
     {
         if (!m_timer.isActive())
             m_timer.start();
 
-        // Aggregate the event.
+        // TODO: #amalov Aggregate the event.
+        return {};
     }
     else
     {
-        if (!m_constructor)
-            return;
+        if (!NX_ASSERT(m_constructor))
+            return {};
 
-        ActionPtr ptr(m_constructor());
-        if (!ptr)
-            return;
+        ActionPtr action(m_constructor());
+        if (!action)
+            return {};
 
         for (const auto& [name, field]: m_fields)
         {
             const auto value = field->build(eventData);
-            ptr->setProperty(name.toUtf8().data(), value);
+            action->setProperty(name.toUtf8().data(), value);
         }
 
-        emit action(ptr);
+        return action;
     }
 }
 

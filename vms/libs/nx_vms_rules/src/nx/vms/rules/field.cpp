@@ -2,10 +2,9 @@
 
 #include "field.h"
 
-#include <QDebug>
-#include <QEvent>
-#include <QMetaProperty>
-#include <QScopedValueRollback>
+#include <QtCore/QEvent>
+#include <QtCore/QMetaProperty>
+#include <QtCore/QScopedValueRollback>
 
 #include <nx/fusion/serialization/json.h>
 
@@ -36,9 +35,12 @@ void Field::connectSignals()
         const auto& prop = meta->property(i);
         if (!prop.hasNotifySignal())
         {
-            qDebug() << "Property" << prop.name()
-                << "of an" << meta->className() << "instance has no notify signal";
-                //< TODO: #spanasenko Improve diagnostics.
+            // TODO: #spanasenko Improve diagnostics.
+            NX_DEBUG(
+                this,
+                "Property %1 of an %2 instance has no notify signal",
+                prop.name(),
+                meta->className());
         }
 
         connect(this, prop.notifySignal().methodSignature().data(), this, SLOT(notifyParent()));

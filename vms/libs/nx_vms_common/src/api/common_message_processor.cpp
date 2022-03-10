@@ -41,6 +41,7 @@
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
 #include <nx/vms/rules/engine.h>
+#include <nx/vms/rules/rule.h>
 #include <nx/vms/time/abstract_time_sync_manager.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/data/api_conversion_functions.h>
@@ -381,6 +382,24 @@ void QnCommonMessageProcessor::connectToConnection(const ec2::AbstractECConnecti
         connectionType);
 
     const auto vmsRulesManager = connection->vmsRulesNotificationManager();
+    connect(
+        vmsRulesManager,
+        &ec2::AbstractVmsRulesNotificationManager::ruleUpdated,
+        this,
+        &QnCommonMessageProcessor::on_vmsRuleUpdated,
+        connectionType);
+    connect(
+        vmsRulesManager,
+        &ec2::AbstractVmsRulesNotificationManager::ruleRemoved,
+        this,
+        &QnCommonMessageProcessor::on_vmsRuleRemoved,
+        connectionType);
+    connect(
+        vmsRulesManager,
+        &ec2::AbstractVmsRulesNotificationManager::reset,
+        this,
+        &QnCommonMessageProcessor::on_vmsRulesReset,
+        connectionType);
     connect(
         vmsRulesManager,
         &ec2::AbstractVmsRulesNotificationManager::eventReceived,
@@ -796,10 +815,30 @@ void QnCommonMessageProcessor::on_businessEventRemoved(const QnUuid& id)
     m_context->eventRuleManager()->removeRule(id);
 }
 
-void QnCommonMessageProcessor::on_broadcastBusinessAction( const vms::event::AbstractActionPtr& action )
+void QnCommonMessageProcessor::on_broadcastBusinessAction(const vms::event::AbstractActionPtr& action)
 {
     emit businessActionReceived(action);
 }
+
+void QnCommonMessageProcessor::on_vmsRuleUpdated(
+    const nx::vms::api::rules::Rule& ruleData,
+    ec2::NotificationSource source)
+{
+    auto engine = m_context->vmsRulesEngine();
+    if (auto rule = engine->buildRule(ruleData))
+        engine->updateRule(std::move(rule));
+}
+
+void QnCommonMessageProcessor::on_vmsRuleRemoved(QnUuid id)
+{
+    m_context->vmsRulesEngine()->removeRule(id);
+}
+
+void QnCommonMessageProcessor::on_vmsRulesReset()
+{
+    resetVmsRules({});
+}
+
 void QnCommonMessageProcessor::handleTourAddedOrUpdated(const nx::vms::api::LayoutTourData& tour)
 {
     m_context->layoutTourManager()->addOrUpdateTour(tour);
