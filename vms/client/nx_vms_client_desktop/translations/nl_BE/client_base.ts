@@ -958,7 +958,7 @@
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Show on Items</numerusform>
         <numerusform>Show on Items</numerusform>
       </translation>
@@ -9784,43 +9784,43 @@ U kunt de kwaliteit en FPS nog steeds rechtstreeks wijzigen op de camera.</trans
     </message>
     <message>
       <source>Motion detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion detection is disabled for some of the selected cameras</translation>
+      <translation>Bewegingsdetectie is uitgeschakeld voor sommige van de geselecteerde camera's</translation>
     </message>
     <message>
       <source>Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Sommige van de geselecteerde apparaten hebben slechts één stream. Opnames met en zonder beweging delen dezelfde resolutie of kwaliteit.</translation>
     </message>
     <message>
       <source>This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Deze camera heeft slechts één stream. Opnames met en zonder beweging delen dezelfde resolutie of kwaliteit.</translation>
     </message>
     <message>
       <source>Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
-      <translation type="unfinished">Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+      <translation>Sommige van de geselecteerde camera's hebben slechts één stream. Opnames met en zonder beweging delen dezelfde resolutie of kwaliteit.</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected devices</translation>
+      <translation>Object detectie is uitgeschakeld voor sommige van de geselecteerde apparaten</translation>
     </message>
     <message>
       <source>Object detection is disabled for this camera</source>
-      <translation type="unfinished">Object detection is disabled for this camera</translation>
+      <translation>Object detectie is uitgeschakeld voor deze camera</translation>
     </message>
     <message>
       <source>Object detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Object detection is disabled for some of the selected cameras</translation>
+      <translation>Object detectie is uitgeschakeld voor sommige van de geselecteerde camera's</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected devices</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected devices</translation>
+      <translation>Beweging &amp; object detectie is uitgeschakeld voor sommige van de geselecteerde apparaten</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for this camera</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for this camera</translation>
+      <translation>Beweging &amp; object detectie is uitgeschakeld voor deze camera</translation>
     </message>
     <message>
       <source>Motion &amp; object detection is disabled for some of the selected cameras</source>
-      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected cameras</translation>
+      <translation>Beweging &amp; object detectie is uitgeschakeld voor sommige van de geselecteerde camera's</translation>
     </message>
     <message>
       <source>Motion detection is disabled for this I/O module</source>
@@ -9912,27 +9912,27 @@ Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is he
     </message>
     <message>
       <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation type="unfinished">Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</translation>
+      <translation>Lokale en LDAP-gebruikers worden automatisch uitgelogd als hun sessie de opgegeven duur overschrijdt.</translation>
     </message>
     <message>
       <source>Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</source>
-      <translation type="unfinished">Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</translation>
+      <translation>Onbeperkte levensduur van de gebruikerssessie bedreigt de algehele systeembeveiliging en kan leiden tot degradatie in de systeemprestaties</translation>
     </message>
     <message>
       <source>It is recommended to have user session lifetime not greater than %1</source>
       <comment>%1 is the time span with time units</comment>
-      <translation type="unfinished">It is recommended to have user session lifetime not greater than %1</translation>
+      <translation>Het wordt aanbevolen om de levensduur van de gebruikerssessie niet te overschrijden met %1</translation>
     </message>
     <message>
       <source>Learn more.</source>
-      <translation type="unfinished">Learn more.</translation>
+      <translation>Meer informatie.</translation>
     </message>
     <message numerus="yes">
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
       <comment>%n is digest user count, %1 is total user count</comment>
-      <translation type="unfinished">
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
-        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
+      <translation>
+        <numerusform>%n van de %1 gebruikers mogen digest authenticatie gebruiken (niet beveiligd).</numerusform>
+        <numerusform>%n van de %1 gebruikers mogen digest authenticatie gebruiken (niet beveiligd).</numerusform>
       </translation>
     </message>
   </context>
@@ -9987,13 +9987,13 @@ Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is he
     </message>
     <message>
       <source>Pin this certificate to %1?</source>
-      <translation type="unfinished">Pin this certificate to %1?</translation>
+      <translation>Dit certificaat aan %1 vastmaken?</translation>
     </message>
     <message>
       <source>Someone may be impersonating %1 to steel your personal information.
 Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steel your personal information.
-Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
+      <translation>Iemand kan zich voordoen als %1 om uw persoonlijke gegevens te stelen.
+Pin dit certificaat niet vast als u het %2 server SSL-certificaat niet hebt gewijzigd.</translation>
     </message>
     <message>
       <source>Pin</source>
@@ -10048,7 +10048,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
-      <translation type="unfinished">You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</translation>
+      <translation>U hebt geprobeerd te verbinden met: %1, maar de server heeft een certificaat gepresenteerd dat niet automatisch kan worden geverifieerd.</translation>
     </message>
   </context>
   <context>
@@ -10267,14 +10267,14 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message numerus="yes">
       <source>Recording schedule is invalid for %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
-        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
+      <translation>
+        <numerusform>Het opnameschema is ongeldig voor %n camera's</numerusform>
+        <numerusform>Het opnameschema is ongeldig voor %n camera's</numerusform>
       </translation>
     </message>
     <message>
       <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
-      <translation type="unfinished">Recording schedule on some cameras contains recording modes that are not supported.</translation>
+      <translation>Opnameschema op sommige camera's bevat opnamemodi die niet worden ondersteund.</translation>
     </message>
   </context>
   <context>
@@ -10764,11 +10764,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
     <message>
       <source>Intercom Alarm Layout</source>
-      <translation type="unfinished">Intercom Alarm Layout</translation>
+      <translation>Intercom Alarmlayschermindeling</translation>
     </message>
     <message>
       <source>Intercom Open Door</source>
-      <translation type="unfinished">Intercom Open Door</translation>
+      <translation>Intercom Open deur</translation>
     </message>
     <message>
       <source>Open door</source>
@@ -10848,37 +10848,37 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Selected Layout</source>
-      <translation type="unfinished">Selected Layout</translation>
+      <translation>Geselecteerde schermindeling</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::jsapi::detail::ResourcesApiBackend</name>
     <message>
       <source>Resource is not available for the usage with JS API</source>
-      <translation type="unfinished">Resource is not available for the usage with JS API</translation>
+      <translation>Bron is niet beschikbaar voor gebruik met de JS API</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
     <message>
       <source>Cannot find an item with the specified id</source>
-      <translation type="unfinished">Cannot find an item with the specified id</translation>
+      <translation>Kan geen item vinden met de opgegeven id</translation>
     </message>
     <message>
       <source>Cannot find a resource with the specified id.</source>
-      <translation type="unfinished">Cannot find a resource with the specified id.</translation>
+      <translation>Kan geen bron vinden met het opgegeven id.</translation>
     </message>
     <message>
       <source>Cannot specify a media parameters for the resource without media stream.</source>
-      <translation type="unfinished">Cannot specify a media parameters for the resource without media stream.</translation>
+      <translation>Kan geen mediaparameters opgeven voor de bron zonder mediastream.</translation>
     </message>
     <message>
       <source>Cannot add the resource to the layout</source>
-      <translation type="unfinished">Cannot add the resource to the layout</translation>
+      <translation>Kan de bron niet toevoegen aan de schermindeling</translation>
     </message>
     <message>
       <source>Cannot find a widget corresponding to the specified item.</source>
-      <translation type="unfinished">Cannot find a widget corresponding to the specified item.</translation>
+      <translation>Kan geen widget vinden die overeenkomt met het opgegeven item.</translation>
     </message>
   </context>
   <context>
@@ -11305,21 +11305,21 @@ U kunt een andere opslaglocatie selecteren in het tabblad &quot;Opslagbeheer&quo
     </message>
     <message>
       <source>This build is for demo purposes only.</source>
-      <translation type="unfinished">This build is for demo purposes only.</translation>
+      <translation>Deze build is alleen voor demo-doeleinden.</translation>
     </message>
     <message>
       <source>It cannot be upgraded to subsequent builds as they become available.</source>
-      <translation type="unfinished">It cannot be upgraded to subsequent builds as they become available.</translation>
+      <translation>Het kan niet worden geüpgraded naar volgende builds zodra deze beschikbaar komen.</translation>
     </message>
     <message>
       <source>To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</source>
       <comment>%1 is the product name</comment>
-      <translation type="unfinished">To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</translation>
+      <translation>Om te upgraden, verwijdert u %1 voordat u een bijgewerkte build installeert (alle gegevens gaan verloren).</translation>
     </message>
     <message>
       <source>%1 Beta</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">%1 Beta</translation>
+      <translation>%1 Beta</translation>
     </message>
   </context>
   <context>
@@ -11330,7 +11330,7 @@ U kunt een andere opslaglocatie selecteren in het tabblad &quot;Opslagbeheer&quo
     </message>
     <message>
       <source>Press Esc to stop the tour.</source>
-      <translation type="unfinished">Press Esc to stop the tour.</translation>
+      <translation>Druk op Esc om de tour te stoppen.</translation>
     </message>
   </context>
   <context>
@@ -11561,7 +11561,7 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Can&apos;t check client update availability. Check your internet connection and try again.</source>
-      <translation type="unfinished">Can&apos;t check client update availability. Check your internet connection and try again.</translation>
+      <translation>Kan de beschikbaarheid van de client updates niet controleren. Controleer uw internetverbinding en probeer het opnieuw.</translation>
     </message>
   </context>
 </TS>
