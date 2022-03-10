@@ -66,6 +66,9 @@ public:
      */
     RuleSet cloneRules() const;
 
+    /** Returns a copy of the rule with the given id or nullptr. */
+    std::unique_ptr<Rule> cloneRule(const QnUuid& id) const;
+
     void setRules(RuleSet&& rules);
 
     /** Returns rule with the given id or nullptr. */
@@ -74,6 +77,8 @@ public:
     /** Returns true if rule was added, false otherwise. */
     bool updateRule(const api::Rule& ruleData);
     bool updateRule(std::unique_ptr<Rule> rule);
+
+    /** Remove rule from the engine. If there is no rule with such id nothing happens. */
     void removeRule(QnUuid ruleId);
 
 signals:
@@ -126,6 +131,12 @@ public:
     bool registerEventField(const QString& type, const EventFieldConstructor& ctor);
     bool registerActionField(const QString& type, const ActionFieldConstructor& ctor);
 
+    /**
+     * Add rule to the engine or overwrite the existing one.
+     * @return Whether rule added or overwritten successfully.
+     */
+    bool addRule(const api::Rule& serialized);
+
 private: //< ?
     bool registerEventField(
         const QJsonObject& manifest,
@@ -143,8 +154,6 @@ private: //< ?
         const QJsonObject& manifest,
         const std::function<EventPtr()>& constructor,
         QObject* executor);
-
-    bool addRule(const api::Rule& serialized);
 
 public:
     // Declare following methods public for testing purposes.

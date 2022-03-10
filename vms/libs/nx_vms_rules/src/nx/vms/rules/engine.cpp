@@ -124,19 +124,26 @@ const Rule* Engine::rule(const QnUuid& id) const
 Engine::RuleSet Engine::cloneRules() const
 {
     RuleSet result;
-    for (const auto& [id, rule]: m_rules)
+
+    for (const auto& rule: m_rules)
     {
-        auto cloned = buildRule(serialize(rule.get()));
-        if (NX_ASSERT(cloned, "Failed to clone existing rule"))
-            result[id] = std::move(cloned);
+        if (auto cloned = cloneRule(rule.first))
+            result[rule.first] = std::move(cloned);
     }
+
     return result;
 }
 
-void Engine::setRules(RuleSet&& rules)
+std::unique_ptr<Rule> Engine::cloneRule(const QnUuid& id) const
 {
-    m_rules = std::move(rules);
-    emit rulesReset();
+    if (!m_rules.contains(id))
+        return {};
+
+    auto cloned = buildRule(serialize(m_rules.at(id).get()));
+
+    NX_ASSERT(cloned, "Failed to clone existing rule");
+
+    return cloned;
 }
 
 bool Engine::updateRule(const api::Rule& ruleData)
@@ -164,6 +171,12 @@ void Engine::removeRule(QnUuid ruleId)
 
     m_rules.erase(it);
     emit ruleRemoved(ruleId);
+}
+
+void Engine::setRules(RuleSet&& rules)
+{
+    m_rules = std::move(rules);
+    emit rulesReset();
 }
 
 bool Engine::registerEvent(const ItemDescriptor& descriptor)

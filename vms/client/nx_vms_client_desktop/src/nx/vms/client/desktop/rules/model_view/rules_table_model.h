@@ -3,6 +3,7 @@
 #pragma once
 
 #include <memory>
+#include <set>
 #include <vector>
 
 #include <QtCore/QAbstractTableModel>
@@ -84,12 +85,14 @@ public:
     private:
         QPersistentModelIndex index;
         vms::rules::Engine* engine{};
-        vms::rules::Rule* rule{};
+        std::unique_ptr<vms::rules::Rule> actualRule;
 
         /** Only RulesTableModel must has an ability to create SimplifiedRule instances. */
         friend class RulesTableModel;
 
-        SimplifiedRule(vms::rules::Engine* engine, vms::rules::Rule* rule);
+        SimplifiedRule(vms::rules::Engine* engine, std::unique_ptr<vms::rules::Rule>&& rule);
+        void setRule(std::unique_ptr<vms::rules::Rule>&& rule);
+        const vms::rules::Rule* rule() const;
         void setModelIndex(const QPersistentModelIndex& modelIndex);
     };
 
@@ -110,11 +113,12 @@ public:
 
 private:
     std::vector<std::shared_ptr<SimplifiedRule>> rules;
+    std::set<QnUuid> removedRules;
     vms::rules::Engine* engine{};
-    vms::rules::Engine::RuleSet ruleSet;
 
     void initialise();
     bool isIndexValid(const QModelIndex &index) const;
+    bool isRuleModified(const SimplifiedRule* rule) const;
 
     QVariant idColumnData(const QModelIndex& index, int role) const;
     QVariant eventColumnData(const QModelIndex& index, int role) const;
