@@ -808,7 +808,7 @@ void QnTCPConnectionProcessor::sendUnauthorizedResponse(
     }
     else if (messageBody.isEmpty())
     {
-        if (getHeaderValue(d->request.headers, nx::network::http::header::kAccept)
+        if (nx::network::http::getHeaderValue(d->request.headers, nx::network::http::header::kAccept)
             == nx::network::http::header::ContentType::kJson)
         {
             d->response.messageBody =

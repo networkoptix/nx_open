@@ -226,7 +226,7 @@ void proxyRequestUsingServer(
     const QnUuid& proxyServerId)
 {
     nx::network::http::HttpHeader header(Qn::SERVER_GUID_HEADER_NAME, proxyServerId.toByteArray());
-    insertOrReplaceHeader(&request.headers, header);
+    nx::network::http::insertOrReplaceHeader(&request.headers, header);
 }
 
 template<typename T>

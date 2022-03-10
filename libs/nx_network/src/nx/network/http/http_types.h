@@ -50,42 +50,12 @@ bool isUrlScheme(const S& s)
 NX_NETWORK_API int defaultPortForScheme(const std::string_view& scheme);
 NX_NETWORK_API int defaultPort(bool isSecure);
 
-/**
- * Comparator for case-insensitive comparison in STL associative containers.
- */
-struct ci_less
-{
-    using is_transparent = std::true_type;
-
-    /** Case-independent (ci) compare_less binary function. */
-    bool operator() (const std::string& c1, const std::string& c2) const
-    { return nx::utils::stricmp(c1, c2) < 0; }
-
-    //---------------------------------------------------------------------------------------------
-    // std::string_view support for lookup.
-
-    bool operator() (const std::string& c1, const std::string_view& c2) const
-    { return nx::utils::stricmp(c1, c2) < 0; }
-
-    bool operator() (const std::string_view& c1, const std::string& c2) const
-    { return nx::utils::stricmp(c1, c2) < 0; }
-
-    //---------------------------------------------------------------------------------------------
-    // const char* support for lookup.
-
-    bool operator() (const std::string& c1, const char* c2) const
-    { return nx::utils::stricmp(c1, c2) < 0; }
-
-    bool operator() (const char* c1, const std::string& c2) const
-    { return nx::utils::stricmp(c1, c2) < 0; }
-};
-
 /** HTTP header container.
  * WARNING: This is multimap(!) to allow same header be present multiple times in a
  * single http message.
  * To insert or replace use nx::network::http::insertOrReplaceHeader
  */
-using HttpHeaders = std::multimap<std::string, std::string, ci_less>;
+using HttpHeaders = std::multimap<std::string, std::string, nx::utils::ci_less>;
 using HttpHeader = HttpHeaders::value_type;
 
 /** map<name, value>. */
