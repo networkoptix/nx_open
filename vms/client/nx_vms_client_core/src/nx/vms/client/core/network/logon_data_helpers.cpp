@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "connection_info_helpers.h"
+#include "logon_data_helpers.h"
 
 #include <finders/systems_finder.h>
 #include <helpers/system_helpers.h>
@@ -12,9 +12,9 @@
 
 namespace nx::vms::client::core {
 
-OptionalConnectionInfo getCloudConnectionInfo(const QString& systemId)
+std::optional<LogonData> cloudLogonData(const QString& systemId)
 {
-    static const auto kLogTag = nx::utils::log::Tag(typeid(ConnectionInfo));
+    static const auto kLogTag = nx::utils::log::Tag(typeid(LogonData));
     if (!NX_ASSERT(qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut))
         return std::nullopt;
 
@@ -25,7 +25,7 @@ OptionalConnectionInfo getCloudConnectionInfo(const QString& systemId)
         return std::nullopt;
     }
 
-    ConnectionInfo result;
+    LogonData result;
     nx::utils::Url url;
 
     result.expectedServerId = helpers::preferredCloudServer(systemId);
@@ -104,15 +104,15 @@ OptionalConnectionInfo getCloudConnectionInfo(const QString& systemId)
     return result;
 }
 
-OptionalConnectionInfo getLocalConnectionInfo(
+LogonData localLogonData(
     const nx::utils::Url& url,
     const nx::network::http::Credentials& credentials)
 {
-    ConnectionInfo result;
+    LogonData result;
     result.address = nx::network::SocketAddress(
-        url.host(), url.port(::helpers::kDefaultConnectionPort));
+        url.host(),
+        url.port(::helpers::kDefaultConnectionPort));
     result.credentials = credentials;
-    result.userType = nx::vms::api::UserType::local;
     return result;
 }
 

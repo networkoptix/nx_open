@@ -5,7 +5,7 @@
 #include <QtCore/QRect>
 #include <QtCore/QString>
 
-#include <nx/vms/client/core/network/connection_info.h>
+#include <nx/vms/client/core/network/logon_data.h>
 
 #include "session_id.h"
 
@@ -25,7 +25,7 @@ struct StartupParameters
     Mode mode = Mode::cleanStartup;
     SessionId sessionId;
     QString key;
-    core::ConnectionInfo connectionInfo;
+    core::LogonData logonData;
 
     QString instantDrop;
     QString delayedDrop;

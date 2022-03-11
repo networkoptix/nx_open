@@ -16,6 +16,7 @@
 #include <nx_ec/ec_api_fwd.h>
 
 #include "connection_info.h"
+#include "logon_data.h"
 
 class QnCommonModule;
 
@@ -59,6 +60,9 @@ public:
 
     /** Address and credentials of the server we are currently connected to. */
     ConnectionInfo connectionInfo() const;
+
+    /** Data to login to this System. */
+    LogonData createLogonData() const;
 
     /** Address of the server we are currently connected to. */
     nx::network::SocketAddress address() const;

@@ -16,13 +16,13 @@ StartupParameters StartupParameters::fromCommandLineParams(const QnStartupParame
         result.mode = Mode::loadSession;
         result.sessionId = SessionId::fromString(params.sessionId);
         result.key = params.stateFileName;
-        result.connectionInfo = params.parseAuthenticationString();
+        result.logonData = params.parseAuthenticationString();
     }
     else if (!params.stateFileName.isEmpty())
     {
         result.mode = Mode::inheritState;
         result.key = params.stateFileName;
-        result.connectionInfo = params.parseAuthenticationString();
+        result.logonData = params.parseAuthenticationString();
     }
 
     result.noFullScreen = params.fullScreenDisabled;
@@ -48,10 +48,10 @@ QStringList StartupParameters::toCommandLineParams() const
             result << QnStartupParameters::kStateFileKey;
             result << key;
 
-            if (!connectionInfo.address.isNull())
+            if (!logonData.address.isNull())
             {
                 result << QnStartupParameters::kAuthenticationStringKey;
-                result << QnStartupParameters::createAuthenticationString(connectionInfo);
+                result << QnStartupParameters::createAuthenticationString(logonData);
             }
             if (!instantDrop.isEmpty())
             {
@@ -73,7 +73,7 @@ QStringList StartupParameters::toCommandLineParams() const
             result << QnStartupParameters::kStateFileKey;
             result << key;
             result << QnStartupParameters::kAuthenticationStringKey;
-            result << QnStartupParameters::createAuthenticationString(connectionInfo);
+            result << QnStartupParameters::createAuthenticationString(logonData);
             break;
         }
         default:

@@ -236,10 +236,9 @@ void RemoteSession::updatePassword(const QString& newPassword)
                 d->messageProcessor->setHoldConnection(false);
         };
 
-    ConnectionInfo info = d->connection->connectionInfo();
-    info.credentials = credentials;
-    info.expectedServerId = d->connection->moduleInformation().id;
-    d->currentConnectionProcess = d->remoteConnectionFactory->connect(info, callback);
+    LogonData logonData = d->connection->createLogonData();
+    logonData.credentials = credentials;
+    d->currentConnectionProcess = d->remoteConnectionFactory->connect(logonData, callback);
 }
 
 void RemoteSession::updateBearerToken(std::string token)
@@ -366,8 +365,7 @@ void RemoteSession::establishConnection(RemoteConnectionPtr connection)
             auto connection = this->connection();
             if (connection->credentials().authToken.isBearerToken())
             {
-                errorCode =
-                    (connection->connectionInfo().userType == nx::vms::api::UserType::cloud)
+                errorCode = connection->connectionInfo().isCloud()
                     ? RemoteConnectionErrorCode::cloudSessionExpired
                     : RemoteConnectionErrorCode::sessionExpired;
             }
@@ -490,11 +488,15 @@ void RemoteSession::reconnectStep()
     // send additional request. Reconnect helper returns empty address in this case.
     if (auto address = d->reconnectHelper->currentAddress())
     {
-        ConnectionInfo info = d->connection->connectionInfo();
-        info.address = *address;
-        info.expectedServerId = d->reconnectHelper->currentServer()->getId();
+        LogonData logonData{
+            .address = *address,
+            .credentials = d->connection->credentials(),
+            .userType = d->connection->userType(),
+            .expectedServerId = d->reconnectHelper->currentServer()->getId()};
+
         d->currentConnectionProcess = d->remoteConnectionFactory->connect(
-            info, reconnectRequestCallback);
+            logonData,
+            reconnectRequestCallback);
     }
     else
     {
@@ -535,7 +537,7 @@ void RemoteSession::onCloudSessionTokenExpiring()
         };
 
     auto connection = this->connection();
-    if (!connection || !(connection->connectionInfo().userType == nx::vms::api::UserType::cloud))
+    if (!connection || !connection->connectionInfo().isCloud())
         return;
 
     IssueTokenRequest request;

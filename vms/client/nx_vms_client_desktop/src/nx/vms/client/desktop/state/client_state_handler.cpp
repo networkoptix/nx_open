@@ -160,7 +160,10 @@ void ClientStateHandler::clientClosed()
     d->clientStateStorage.writeCommonSubstate(state);
 }
 
-void ClientStateHandler::clientConnected(bool fullRestoreIsEnabled, SessionId sessionId)
+void ClientStateHandler::clientConnected(
+    bool fullRestoreIsEnabled,
+    SessionId sessionId,
+    core::LogonData logonData)
 {
     if (!qnRuntime->isDesktopMode())
         return;
@@ -178,7 +181,7 @@ void ClientStateHandler::clientConnected(bool fullRestoreIsEnabled, SessionId se
 
                 if (!sessionIsRunningAlready && hasSavedConfiguration())
                 {
-                    restoreWindowsConfiguration();
+                    restoreWindowsConfiguration(logonData);
                     break; //< We are done.
                 }
             }
@@ -231,7 +234,9 @@ void ClientStateHandler::clientDisconnected()
     d->sessionId = {};
 }
 
-void ClientStateHandler::createNewWindow(bool logIn, const QStringList& args)
+void ClientStateHandler::createNewWindow(
+    std::optional<core::LogonData> logonData,
+    const QStringList& args)
 {
     SessionState state;
     for (const auto& [delegateId, delegate]: d->delegates)
@@ -239,7 +244,7 @@ void ClientStateHandler::createNewWindow(bool logIn, const QStringList& args)
         DelegateState value;
         delegate->createInheritedState(
             &value,
-            logIn
+            logonData
                 ? ClientStateDelegate::Substate::allParameters
                 : ClientStateDelegate::Substate::systemIndependentParameters,
             {});
@@ -253,15 +258,17 @@ void ClientStateHandler::createNewWindow(bool logIn, const QStringList& args)
         .mode = StartupParameters::Mode::inheritState,
         .key = temporaryName
     };
-    if (logIn)
+
+    if (logonData)
     {
+        params.logonData = *logonData;
         params.sessionId = d->sessionId;
-        params.connectionInfo = connectionInfo();
     }
+
     if (!args.isEmpty())
     {
         const auto& mime = args.first();
-        if (logIn)
+        if (logonData)
             params.delayedDrop = mime;
         else
             params.instantDrop = mime;
@@ -285,7 +292,7 @@ void ClientStateHandler::saveWindowsConfiguration()
     d->sharedMemoryManager->requestToSaveState();
 }
 
-void ClientStateHandler::restoreWindowsConfiguration()
+void ClientStateHandler::restoreWindowsConfiguration(core::LogonData logonData)
 {
     if (!NX_ASSERT(d->sessionId != SessionId()))
         return;
@@ -315,7 +322,7 @@ void ClientStateHandler::restoreWindowsConfiguration()
             StartupParameters::Mode::loadSession,
             d->sessionId,
             filename,
-            connectionInfo()};
+            logonData};
 
         if (NX_ASSERT(d->processExecutionInterface))
             d->processExecutionInterface->runClient(parameters);

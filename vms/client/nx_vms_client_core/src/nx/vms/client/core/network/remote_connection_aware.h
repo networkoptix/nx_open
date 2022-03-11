@@ -43,9 +43,6 @@ public:
     /** Credentials we are using to authorize the connection. */
     nx::network::http::Credentials connectionCredentials() const;
 
-    /** Information about current connection. */
-    ConnectionInfo connectionInfo() const;
-
     /** API interface of the currently connected server. */
     rest::ServerConnectionPtr connectedServerApi() const;
 

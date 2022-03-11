@@ -36,7 +36,7 @@
 #include <nx/vms/client/core/settings/systems_visibility_manager.h>
 #include <nx/vms/client/desktop/common/utils/connection_url_parser.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/system_logon/data/logon_parameters.h>
+#include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/actions.h>
 #include <nx/vms/client/desktop/ui/common/color_theme.h>
@@ -533,19 +533,19 @@ void WelcomeScreen::connectToSystemInternal(
 
     NX_DEBUG(this, "Delayed connect to the system %1 after click on tile", address);
 
-    LogonParameters logonParameters({address, credentials, nx::vms::api::UserType::local, serverId});
-    logonParameters.storePassword = storePassword;
+    LogonData logonData({address, credentials, nx::vms::api::UserType::local, serverId});
+    logonData.storePassword = storePassword;
 
     // TODO: #ynikitenkov add look after connection process
     // and don't allow to connect to two or more servers simultaneously
     const auto connectFunction =
-        [this, systemId, logonParameters, completionTracker]()
+        [this, systemId, logonData, completionTracker]()
         {
             setConnectingToSystem(systemId);
             NX_DEBUG(this, "Connecting to the system %1 after click on tile",
-                logonParameters.connectionInfo.address);
+                logonData.address);
             menu()->trigger(ui::action::ConnectAction,
-                ui::action::Parameters().withArgument(Qn::LogonParametersRole, logonParameters));
+                ui::action::Parameters().withArgument(Qn::LogonDataRole, logonData));
         };
 
     // We have to use delayed execution to prevent client crash when stopping server that we are

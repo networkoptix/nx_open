@@ -28,7 +28,7 @@
 #include <ui/workaround/widgets_signals_workaround.h>
 #include <utils/connection_diagnostics_helper.h>
 
-#include "../data/logon_parameters.h"
+#include "../data/logon_data.h"
 #include "connection_testing_dialog.h"
 
 using namespace nx::vms::client::core;
@@ -228,7 +228,7 @@ void LoginDialog::sendTestConnectionRequest(const nx::utils::Url& url)
                         if (QnConnectionDiagnosticsHelper::downloadAndRunCompatibleVersion(
                                 this,
                                 d->connectionProcess->context->moduleInformation,
-                                d->connectionProcess->context->info,
+                                d->connectionProcess->context->logonData,
                                 commonModule()->engineVersion()))
                         {
                             menu()->trigger(ui::action::DelayedForcedExitAction);
@@ -237,13 +237,12 @@ void LoginDialog::sendTestConnectionRequest(const nx::utils::Url& url)
                     }
                     case RemoteConnectionErrorCode::factoryServer:
                     {
-                        LogonParameters parameters(d->connectionProcess->context->info);
-                        parameters.connectionInfo.expectedServerId =
+                        LogonData logonData(d->connectionProcess->context->logonData);
+                        logonData.expectedServerId =
                             d->connectionProcess->context->moduleInformation.id;
 
                         menu()->trigger(ui::action::SetupFactoryServerAction,
-                            ui::action::Parameters()
-                                .withArgument(Qn::LogonParametersRole, parameters));
+                            ui::action::Parameters().withArgument(Qn::LogonDataRole, logonData));
                         base_type::accept();
                         break;
                     }
@@ -269,8 +268,11 @@ void LoginDialog::sendTestConnectionRequest(const nx::utils::Url& url)
         });
 
     auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
-    const core::ConnectionInfo info{address, credentials, nx::vms::api::UserType::local, std::nullopt};
-    d->connectionProcess = remoteConnectionFactory->connect(info, callback);
+    const core::LogonData logonData{
+        .address = address,
+        .credentials = credentials,
+        .userType = nx::vms::api::UserType::local};
+    d->connectionProcess = remoteConnectionFactory->connect(logonData, callback);
 
     updateUsability();
 }
@@ -381,12 +383,11 @@ void LoginDialog::at_testButton_clicked()
     }
     else if (setupNewServerRequested)
     {
-        LogonParameters parameters(
+        LogonData logonData(
             {address, credentials, nx::vms::api::UserType::local, expectedNewServerId});
 
         menu()->trigger(ui::action::SetupFactoryServerAction,
-            ui::action::Parameters()
-                .withArgument(Qn::LogonParametersRole, parameters));
+            ui::action::Parameters().withArgument(Qn::LogonDataRole, logonData));
         base_type::accept();
     }
 }

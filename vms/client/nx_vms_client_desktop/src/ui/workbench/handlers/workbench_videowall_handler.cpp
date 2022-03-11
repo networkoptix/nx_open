@@ -697,8 +697,8 @@ void QnWorkbenchVideoWallHandler::openNewWindow(QnUuid videoWallId, QnUuid video
     if (!NX_ASSERT(connection(), "Client must be connected while we are running the video wall"))
         return;
 
-    nx::vms::client::core::ConnectionInfo connectionInfo;
-    connectionInfo.address = connectionAddress();
+    nx::vms::client::core::LogonData logonData;
+    logonData.address = connectionAddress();
     // Connection credentials will be constructed by callee from videowall IDs.
 
     QStringList arguments;
@@ -708,7 +708,7 @@ void QnWorkbenchVideoWallHandler::openNewWindow(QnUuid videoWallId, QnUuid video
         << "--videowall-instance"
         << videoWallInstanceId.toString()
         << "--auth"
-        << QnStartupParameters::createAuthenticationString(connectionInfo);
+        << QnStartupParameters::createAuthenticationString(logonData);
 
     ClientProcessRunner().runClient(arguments);
 }

@@ -12,7 +12,7 @@
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/module_information.h>
-#include <nx/vms/client/core/network/connection_info.h>
+#include <nx/vms/client/core/network/logon_data.h>
 #include <nx/vms/common/update/tools.h>
 #include <nx/vms/update/update_check.h>
 
@@ -46,7 +46,7 @@ struct CompatibilityVersionInstallationDialog::Private
 
 CompatibilityVersionInstallationDialog::CompatibilityVersionInstallationDialog(
     const nx::vms::api::ModuleInformation& moduleInformation,
-    const nx::vms::client::core::ConnectionInfo& connectionInfo,
+    const nx::vms::client::core::LogonData& logonData,
     const nx::vms::api::SoftwareVersion& engineVersion,
     QWidget* parent)
     :
@@ -62,7 +62,9 @@ CompatibilityVersionInstallationDialog::CompatibilityVersionInstallationDialog(
         this, &CompatibilityVersionInstallationDialog::atAutoRestartChanged);
 
     m_private->clientUpdateTool.reset(new nx::vms::client::desktop::ClientUpdateTool(this));
-    m_private->clientUpdateTool->setServerUrl(moduleInformation.id, connectionInfo);
+    m_private->clientUpdateTool->setServerUrl(
+        moduleInformation.id,
+        {logonData.address, logonData.credentials});
 }
 
 CompatibilityVersionInstallationDialog::~CompatibilityVersionInstallationDialog()

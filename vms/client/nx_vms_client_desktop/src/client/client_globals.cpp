@@ -140,8 +140,8 @@ constexpr auto nxReflectVisitAllEnumItems(ItemDataRole*, Visitor&& visitor)
         /** Role for target url. Used in BrowseUrlAction. */
         IDR_ITEM(UrlRole),
 
-        /** LogonParameters structure. Used in the ConnectAction. */
-        IDR_ITEM(LogonParametersRole),
+        /** LogonData structure. Used in the ConnectAction. */
+        IDR_ITEM(LogonDataRole),
 
         /**
          * Role for cloud system id (QString). Used in cloud system nodes in the resources tree and

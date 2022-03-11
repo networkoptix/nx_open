@@ -14,7 +14,7 @@
 #include <nx_ec/ec_api_common.h>
 #include <nx_ec/ec_api_fwd.h>
 
-#include "connection_info.h"
+#include "logon_data.h"
 #include "remote_connection_error.h"
 #include "remote_connection_factory_context.h"
 #include "remote_connection_fwd.h"
@@ -66,16 +66,14 @@ public:
 
     /**
      * Create connection to the target VMS server.
-     * @param connectionInfo Server endpoint address and authentication information.
-     * @param callback Function which is called when connect process is finished. Accepts connection
-     *     object or error code as a single parameter.
+     * @param logonData Server endpoint address, authentication information and other logon data.
+     * @param callback Function which is called when connect process is finished. Accepts
+     *     connection object or error code as a single parameter.
      * @return context object, which guards the process. If it is destroyed, no callback will be
      *     called.
      */
     [[nodiscard]]
-    ProcessPtr connect(
-        ConnectionInfo connectionInfo,
-        Callback callback);
+    ProcessPtr connect(LogonData logonData, Callback callback);
 
     virtual void shutdown() override;
 

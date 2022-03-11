@@ -17,7 +17,7 @@ class QnCompatibilityVersionInstallationDialog;
 }
 
 namespace nx::vms::api { struct ModuleInformation; }
-namespace nx::vms::client::core { struct ConnectionInfo; }
+namespace nx::vms::client::core { struct LogonData; }
 namespace nx::vms::client::desktop { struct UpdateContents; }
 
 // TODO: #dklychkov rename class in 2.4
@@ -30,7 +30,7 @@ class CompatibilityVersionInstallationDialog:
 public:
     CompatibilityVersionInstallationDialog(
         const nx::vms::api::ModuleInformation& moduleInformation,
-        const nx::vms::client::core::ConnectionInfo& connectionInfo,
+        const nx::vms::client::core::LogonData& logonData,
         const nx::vms::api::SoftwareVersion& engineVersion,
         QWidget* parent);
     virtual ~CompatibilityVersionInstallationDialog();

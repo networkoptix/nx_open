@@ -32,7 +32,7 @@ enum IDType
 
     /**
      * Setup New System.
-     * Requires LogonParameters data in the LogonParametersRole.
+     * Requires LogonData data in the LogonDataRole.
      */
     SetupFactoryServerAction,
 

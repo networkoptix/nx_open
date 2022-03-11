@@ -169,8 +169,8 @@ namespace Qn
         /** Role for target url. Used in BrowseUrlAction. */
         UrlRole,
 
-        /** LogonParameters structure. Used in the ConnectAction and SetupFactoryServerAction. */
-        LogonParametersRole,
+        /** LogonData structure. Used in the ConnectAction and SetupFactoryServerAction. */
+        LogonDataRole,
 
         /**
          * Role for cloud system id (QString). Used in cloud system nodes in the resources tree and

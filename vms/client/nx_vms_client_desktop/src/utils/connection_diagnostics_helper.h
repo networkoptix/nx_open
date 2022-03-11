@@ -5,6 +5,7 @@
 #include <QtCore/QObject>
 
 #include <nx/utils/software_version.h>
+#include <nx/vms/client/core/network/logon_data.h>
 #include <nx/vms/client/core/network/remote_connection_error.h>
 #include <nx_ec/ec_api_fwd.h>
 
@@ -14,8 +15,6 @@ class SoftwareVersion;
 struct ModuleInformation;
 
 } // namespace nx::vms::api
-
-namespace nx::vms::client::core { struct ConnectionInfo; }
 
 class QnWorkbenchContext;
 
@@ -30,7 +29,7 @@ public:
     static bool downloadAndRunCompatibleVersion(
         QWidget* parentWidget,
         const nx::vms::api::ModuleInformation& moduleInformation,
-        nx::vms::client::core::ConnectionInfo connectionInfo,
+        nx::vms::client::core::LogonData logonData,
         const nx::vms::api::SoftwareVersion& engineVersion);
 
     /**
@@ -53,7 +52,7 @@ public:
 private:
     static bool getInstalledVersions(QList<nx::utils::SoftwareVersion>* versions);
     /** Pass cloud password when connecting to an older (up to 4.2) system. */
-    static void fixConnectionInfo(
+    static void fixLogonData(
         const nx::vms::api::ModuleInformation& moduleInformation,
-        nx::vms::client::core::ConnectionInfo* connectionInfo);
+        nx::vms::client::core::LogonData* logonData);
 };
