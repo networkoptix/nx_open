@@ -292,9 +292,4 @@ QnUuid transactionHash(ApiCommand::Value command, const Param &param)
     return td->getHashFunc(param);
 }
 
-bool canModifyResourceParam(
-    QnCommonModule* commonModule,
-    const Qn::UserAccessData& accessData,
-    const nx::vms::api::ResourceParamWithRefData& param);
-
 } //namespace ec2
