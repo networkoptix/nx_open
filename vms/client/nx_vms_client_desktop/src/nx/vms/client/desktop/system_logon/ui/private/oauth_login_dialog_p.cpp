@@ -201,13 +201,17 @@ void OauthLoginDialogPrivate::twoFaVerified(const QString& code)
 
 void OauthLoginDialogPrivate::openUrlInBrowser(const QString &path)
 {
-    const QUrl currentUrl = m_webViewWidget->controller()->url();
-    const auto externalUrl = nx::network::url::Builder()
-        .setScheme(currentUrl.scheme())
-        .setHost(currentUrl.host())
-        .setPort(currentUrl.port())
-        .setPath(path)
-        .toUrl();
+    nx::utils::Url externalUrl(path);
+    if (!externalUrl.isValid())
+    {
+        const QUrl currentUrl = m_webViewWidget->controller()->url();
+        externalUrl = nx::network::url::Builder()
+            .setScheme(currentUrl.scheme())
+            .setHost(currentUrl.host())
+            .setPort(currentUrl.port())
+            .setPath(path)
+            .toUrl();
+    }
 
     NX_INFO(this, "External URL requested: %1", externalUrl);
 
