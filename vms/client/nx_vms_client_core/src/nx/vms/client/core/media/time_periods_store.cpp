@@ -24,7 +24,8 @@ bool TimePeriodsStore::hasPeriods(Qn::TimePeriodContent type) const
 const QnTimePeriodList& TimePeriodsStore::periods(Qn::TimePeriodContent type) const
 {
     NX_ASSERT(false, "Not implemented. Method cannot be pure virtual as class is used in QML");
-    return QnTimePeriodList();
+    static QnTimePeriodList kEmptyPeriods;
+    return kEmptyPeriods;
 }
 
 } // namespace nx::vms::client::core

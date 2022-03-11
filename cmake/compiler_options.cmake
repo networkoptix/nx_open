@@ -215,6 +215,9 @@ if(MSVC)
         # Deletion of pointer to incomplete type 'X'; no destructor called.
         /we4150
 
+        # Returning address of local variable or temporary.
+        /we4172
+
         # Not all control paths return a value.
         /we4715
 
