@@ -113,7 +113,8 @@ void ChunkProvider::ChunkProviderInternal::setResourceId(const QnUuid& id)
 
 const QnTimePeriodList& ChunkProvider::ChunkProviderInternal::periods() const
 {
-    return m_loader ? m_loader->periods() : QnTimePeriodList();
+    static QnTimePeriodList kEmptyPeriods;
+    return m_loader ? m_loader->periods() : kEmptyPeriods;
 }
 
 bool ChunkProvider::ChunkProviderInternal::loading() const

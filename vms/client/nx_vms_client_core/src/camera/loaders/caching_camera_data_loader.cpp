@@ -197,7 +197,8 @@ const QnTimePeriodList& QnCachingCameraDataLoader::periods(
     if (auto loader = m_loaders[timePeriodType])
         return loader->periods();
 
-    return {};
+    static QnTimePeriodList kEmptyPeriods;
+    return kEmptyPeriods;
 }
 
 bool QnCachingCameraDataLoader::loadInternal(Qn::TimePeriodContent periodType)
