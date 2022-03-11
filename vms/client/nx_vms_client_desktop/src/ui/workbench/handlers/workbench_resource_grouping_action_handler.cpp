@@ -235,29 +235,29 @@ void ResourceGroupingActionHandler::removeCustomResourceTreeGroup() const
     const auto parameters = menu()->currentParameters(sender());
     const auto resources = parameters.resources();
 
-    const auto compositeGroupId =
-        parameters.argument(Qn::ResourceTreeCustomGroupIdRole).toString();
-    const auto groupOrderToRemove = compositeIdDimension(compositeGroupId) - 1;
-    const auto subIdToRemove = extractSubId(compositeGroupId, groupOrderToRemove);
+    const auto currentGroupId = parameters.argument(Qn::ResourceTreeCustomGroupIdRole).toString();
+    const auto currentGroupIdDimension = compositeIdDimension(currentGroupId);
 
+    if (!NX_ASSERT(!currentGroupId.isEmpty(), "Invalid parameter"))
+        return;
+
+    QnResourceList modifiedResources;
     for (const auto& resource: resources)
     {
-        auto resourceCompositeGroupId = resourceCustomGroupId(resource);
-        if (resourceCompositeGroupId.isEmpty())
-            continue;
-
-        if (extractSubId(resourceCompositeGroupId, groupOrderToRemove).compare(
-            subIdToRemove, Qt::CaseInsensitive) != 0)
+        const auto resourceGroupId = resourceCustomGroupId(resource);
+        if (trimCompositeId(resourceGroupId, currentGroupIdDimension)
+            .compare(currentGroupId, Qt::CaseInsensitive) != 0)
         {
             continue;
         }
 
-        resourceCompositeGroupId = removeSubId(resourceCompositeGroupId, groupOrderToRemove);
-        setResourceCustomGroupId(resource, resourceCompositeGroupId);
+        modifiedResources.push_back(resource);
+        const auto newResourceGroupId = removeSubId(resourceGroupId, currentGroupIdDimension - 1);
+        setResourceCustomGroupId(resource, newResourceGroupId);
     }
 
-    for (const auto& resource: resources)
-        resource->savePropertiesAsync();
+    for (const auto& modifiedResource: modifiedResources)
+        modifiedResource->savePropertiesAsync();
 
     menu()->trigger(action::CustomGroupRemovedEvent);
 }
