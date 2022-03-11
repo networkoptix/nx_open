@@ -897,15 +897,6 @@ struct ModifyResourceParamAccess
             return Result(ErrorCode::forbidden, std::move(errorMessage));
         }
 
-        if (isRemove)
-        {
-            const auto& resPool = commonModule->resourcePool();
-            commonModule->resourceAccessManager()->hasPermission(
-                resPool->getResourceById<QnUserResource>(accessData.userId),
-                resPool->getResourceById(param.resourceId),
-                Qn::RemovePermission);
-        }
-
         return checkSaveResourceParamAccess(commonModule, accessData, param);
     }
 
@@ -1581,14 +1572,6 @@ detail::TransactionDescriptorBase *getTransactionDescriptorByName(const QString&
     auto it = detail::transactionDescriptors.get<1>().find(s);
     bool isEnd = it == detail::transactionDescriptors.get<1>().end();
     return isEnd ? nullptr : (*it).get();
-}
-
-bool canModifyResourceParam(
-    QnCommonModule* commonModule,
-    const Qn::UserAccessData& accessData,
-    const nx::vms::api::ResourceParamWithRefData& param)
-{
-    return detail::ModifyResourceParamAccess(/*isRemove*/ false)(commonModule, accessData, param);
 }
 
 } // namespace ec2
