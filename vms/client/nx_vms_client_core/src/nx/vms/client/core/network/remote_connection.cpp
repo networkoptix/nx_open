@@ -208,7 +208,7 @@ RemoteConnection::RemoteConnection(
     QObject(parent),
     d(new Private(
         peerType,
-        std::move(moduleInformation),
+        moduleInformation,
         std::move(connectionInfo),
         sessionTokenExpirationTime,
         certificateVerifier,

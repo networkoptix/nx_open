@@ -15,6 +15,11 @@ struct ConnectionInfo
     nx::network::SocketAddress address;
     nx::network::http::Credentials credentials;
     UserType userType = UserType::local;
+
+    /**
+     * Allow user interaction in the UI thread (like displaying dialog about certifcate mismatch).
+     */
+    bool userInteractionAllowed = true;
 };
 
 } // namespace nx::vms::client::core

@@ -121,10 +121,13 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
 
     RemoteConnectionPtr makeRemoteConnectionInstance(ContextPtr context)
     {
+        ConnectionInfo connectionInfo(context->info);
+        connectionInfo.userInteractionAllowed = true;
+
         return std::make_shared<RemoteConnection>(
             peerType,
             context->moduleInformation,
-            context->info,
+            connectionInfo,
             context->sessionTokenExpirationTime,
             certificateVerifier,
             context->certificateCache,
@@ -271,7 +274,8 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
                 return false;
             };
 
-        if (auto accepted = executeInUiThreadSync(accept))
+        if (auto accepted = context->info.userInteractionAllowed
+            && executeInUiThreadSync(accept))
         {
             pinTargetServerCertificate();
         }
@@ -397,7 +401,9 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
                             return userInteractionDelegate->request2FaValidation(token);
                         };
 
-                    const bool validated = executeInUiThreadSync(validate);
+                    const bool validated = context->info.userInteractionAllowed
+                        && executeInUiThreadSync(validate);
+
                     if (!validated)
                         context->error = RemoteConnectionErrorCode::unauthorized;
                 }
@@ -473,7 +479,8 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
                                 {},
                                 chain);
                         };
-                    if (const auto accepted = executeInUiThreadSync(accept))
+                    if (const auto accepted = context->info.userInteractionAllowed
+                        && executeInUiThreadSync(accept))
                     {
                         certificateVerifier->pinCertificate(serverId, currentKey, type);
                         return true;
