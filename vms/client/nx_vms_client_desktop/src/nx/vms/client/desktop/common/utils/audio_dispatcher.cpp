@@ -6,6 +6,7 @@
 
 #include <QtCore/QPointer>
 #include <QtCore/QSet>
+#include <QtGui/QGuiApplication>
 #include <QtGui/QWindow>
 #include <QtQml/QtQml>
 
@@ -34,6 +35,12 @@ AudioDispatcher::AudioDispatcher(QObject* parent):
     QObject(parent),
     d(new Private())
 {
+    connect(qGuiApp, &QGuiApplication::focusWindowChanged, d.get(),
+        [this]()
+        {
+            if (d->updateCurrentAudioSource())
+                emit currentAudioSourceChanged();
+        });
 }
 
 AudioDispatcher::~AudioDispatcher()
@@ -59,13 +66,6 @@ void AudioDispatcher::requestAudio(QWindow* window)
             d->audioSources.remove(window);
 
             if (d->currentAudioSource == window && d->updateCurrentAudioSource())
-                emit currentAudioSourceChanged();
-        });
-
-    connect(window, &QWindow::activeChanged, d.get(),
-        [this, window]()
-        {
-            if (d->updateCurrentAudioSource())
                 emit currentAudioSourceChanged();
         });
 
@@ -147,11 +147,13 @@ bool AudioDispatcher::Private::updateCurrentAudioSource()
 
 QWindow* AudioDispatcher::Private::calculateCurrentAudioSource() const
 {
-    const auto it = std::find_if(audioSources.cbegin(), audioSources.cend(),
-        [](QWindow* window) { return window->isActive(); });
-
-    if (it != audioSources.cend())
-        return *it;
+    for (auto window = QGuiApplication::focusWindow();
+        window != nullptr;
+        window = window->parent(QWindow::AncestorMode::IncludeTransients))
+    {
+        if (audioSources.contains(window))
+            return window;
+    }
 
     return primaryAudioSource && audioSources.contains(primaryAudioSource)
         ? primaryAudioSource
