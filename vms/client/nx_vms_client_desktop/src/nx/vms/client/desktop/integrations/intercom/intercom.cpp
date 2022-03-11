@@ -25,6 +25,13 @@ using namespace std::chrono;
 
 namespace {
 
+const QString kCreateLayoutRuleIsInitializedPropertyName =
+    "intercomDemoCreateLayoutRuleIsInitialized";
+const QString kCreateLayoutRuleIsInitializedPropertyValue = "true";
+
+const QString kOpenDoorRuleIsInitializedPropertyName = "intercomDemoOpenDoorRuleIsInitialized";
+const QString kOpenDoorRuleIsInitializedPropertyValue = "true";
+
 const QString kCallEvent = "nx.sys.CallRequest";
 const QnUuid kOpenLayoutRuleId = QnUuid::fromArbitraryData(
     std::string("nx.sys.IntercomIntegrationOpenLayout"));
@@ -158,34 +165,49 @@ struct IntercomIntegration::Private: public QObject
         const QnVirtualCameraResourceList& cameras,
         const nx::vms::api::EventRuleDataList& rules) const
     {
+        QnVirtualCameraResourceList newCameras;
+        std::copy_if(cameras.begin(), cameras.end(), std::back_inserter(newCameras),
+            [](const QnVirtualCameraResourcePtr& camera)
+            {
+                return camera->getProperty(kCreateLayoutRuleIsInitializedPropertyName)
+                    != kCreateLayoutRuleIsInitializedPropertyValue;
+            });
+
+        if (newCameras.isEmpty())
+            return;
+
         const nx::vms::event::RuleManager* localRuleManager =
             qnClientCoreModule->commonModule()->eventRuleManager();
         const nx::vms::event::RulePtr rule = localRuleManager->rule(kOpenLayoutRuleId);
 
+        for (const auto& camera: newCameras)
+        {
+            camera->setProperty(
+                kCreateLayoutRuleIsInitializedPropertyName,
+                kCreateLayoutRuleIsInitializedPropertyValue);
+            camera->savePropertiesAsync();
+        }
+
         if (!rule)
         {
-            manager->save(createOpenAlarmLayoutRule(cameras),
+            manager->save(createOpenAlarmLayoutRule(newCameras),
                 [this](int /*reqId*/, ec2::ErrorCode result) { responseHandler(result); });
             return;
         }
 
-        QSet<QnUuid> eventCameraIds;
-        for (const auto& eventResourceId: rule->eventResources())
-            eventCameraIds.insert(eventResourceId);
+        const auto eventResources = rule->eventResources();
+        const QSet<QnUuid> eventCameraIds(eventResources.begin(), eventResources.end());
 
-        QSet<QnUuid> supportedCameraIds;
-        for (const auto& camera: cameras)
-            supportedCameraIds.insert(camera->getId());
+        QSet<QnUuid> newCameraIds;
+        for (const auto& camera: newCameras)
+            newCameraIds.insert(camera->getId());
 
-        supportedCameraIds.unite(eventCameraIds);
-
-        if (supportedCameraIds.size() == eventCameraIds.size())
-            return;
+        const QSet<QnUuid> finalCameraIds = eventCameraIds + newCameraIds;
 
         nx::vms::api::EventRuleData updatedRuleData;
         ec2::fromResourceToApi(rule, updatedRuleData);
         updatedRuleData.eventResourceIds =
-            std::vector<QnUuid>(supportedCameraIds.begin(), supportedCameraIds.end());
+            std::vector<QnUuid>(finalCameraIds.begin(), finalCameraIds.end());
         manager->save(updatedRuleData,
             [this](int /*reqId*/, ec2::Result result) { responseHandler(result); });
     }
@@ -249,11 +271,22 @@ struct IntercomIntegration::Private: public QObject
 
         for (const auto& camera: cameras)
         {
+            if (camera->getProperty(kOpenDoorRuleIsInitializedPropertyName)
+                == kOpenDoorRuleIsInitializedPropertyValue)
+            {
+                continue;
+            }
+
             const QnUuid openDoorRuleId = getOpenDoorRuleId(camera);
             nx::vms::event::RulePtr rule = localRuleManager->rule(openDoorRuleId);
 
             if (!rule)
             {
+                camera->setProperty(
+                    kOpenDoorRuleIsInitializedPropertyName,
+                    kOpenDoorRuleIsInitializedPropertyValue);
+                camera->savePropertiesAsync();
+
                 manager->save(createOpenDoorRule(camera),
                     [this](int /*reqId*/, ec2::ErrorCode result) { responseHandler(result); });
             }
