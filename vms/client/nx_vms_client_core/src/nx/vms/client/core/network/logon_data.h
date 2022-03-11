@@ -33,6 +33,11 @@ struct LogonData
      * Server on the same endpoint.
      */
     std::optional<QnUuid> expectedServerId;
+
+    /**
+     * Allow user interaction in the UI thread (like displaying dialog about certifcate mismatch).
+     */
+    bool userInteractionAllowed = true;
 };
 
 } // namespace nx::vms::client::core

@@ -238,6 +238,7 @@ void RemoteSession::updatePassword(const QString& newPassword)
 
     LogonData logonData = d->connection->createLogonData();
     logonData.credentials = credentials;
+    logonData.userInteractionAllowed = false; //< We do not expect any errors here.
     d->currentConnectionProcess = d->remoteConnectionFactory->connect(logonData, callback);
 }
 
@@ -492,7 +493,9 @@ void RemoteSession::reconnectStep()
             .address = *address,
             .credentials = d->connection->credentials(),
             .userType = d->connection->userType(),
-            .expectedServerId = d->reconnectHelper->currentServer()->getId()};
+            .expectedServerId = d->reconnectHelper->currentServer()->getId(),
+            .userInteractionAllowed = false
+        };
 
         d->currentConnectionProcess = d->remoteConnectionFactory->connect(
             logonData,

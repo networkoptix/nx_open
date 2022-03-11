@@ -280,7 +280,8 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
                 return false;
             };
 
-        if (auto accepted = executeInUiThreadSync(accept))
+        if (auto accepted = context->logonData.userInteractionAllowed
+            && executeInUiThreadSync(accept))
         {
             pinTargetServerCertificate();
         }
@@ -411,7 +412,9 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
                             return userInteractionDelegate->request2FaValidation(credentials);
                         };
 
-                    const bool validated = executeInUiThreadSync(validate);
+                    const bool validated = context->logonData.userInteractionAllowed
+                        && executeInUiThreadSync(validate);
+
                     if (!validated)
                         context->error = RemoteConnectionErrorCode::unauthorized;
                 }
@@ -488,7 +491,8 @@ struct RemoteConnectionFactory::Private: public /*mixin*/ QnCommonModuleAware
                                 {},
                                 chain);
                         };
-                    if (const auto accepted = executeInUiThreadSync(accept))
+                    if (const auto accepted = context->logonData.userInteractionAllowed
+                        && executeInUiThreadSync(accept))
                     {
                         certificateVerifier->pinCertificate(serverId, currentKey, type);
                         return true;
