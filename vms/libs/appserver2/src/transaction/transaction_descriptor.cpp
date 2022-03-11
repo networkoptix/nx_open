@@ -520,57 +520,6 @@ static Result checkReadResourceParamAccess(
     return checkReadResourceAccess(commonModule, accessData, resourceId);
 }
 
-static Result checkSaveResourceParamAccess(
-    QnCommonModule* commonModule,
-    const Qn::UserAccessData& accessData,
-    const nx::vms::api::ResourceParamWithRefData& param)
-{
-    const auto& resPool = commonModule->resourcePool();
-    auto userResource = resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
-
-    // System properties are stored in resource unrelated places and should be handler differently.
-    if (userResource->userRole() == Qn::UserRole::owner
-        || userResource->userRole() == Qn::UserRole::administrator)
-    {
-        // Null resource Id can not be handled by permissions engine, since there is no such resource.
-        if (param.resourceId.isNull())
-            return Result();
-
-        // System settings are stored as admin user properties. Admin user is an owner and can not
-        // be modified by anyone else.
-        // TODO: Remove this check once global system settings are not admin properties.
-        if (param.resourceId == QnUserResource::kAdminGuid)
-            return Result();
-    }
-
-    auto accessManager = commonModule->resourceAccessManager();
-    auto target = resPool->getResourceById(param.resourceId);
-    if (target)
-    {
-        // CRUD API PATCH merges with existing values represented as JSON object so some of them
-        // are not changed.
-        if (target->getProperty(param.name) == param.value)
-            return Result();
-    }
-    else if (param.checkResourceExists != nx::vms::api::CheckResourceExists::yes)
-    {
-        if (accessManager->hasGlobalPermission(userResource, GlobalPermission::admin))
-            return Result();
-    }
-
-    Qn::Permissions permissions = Qn::SavePermission;
-    if (param.name == Qn::USER_FULL_NAME)
-        permissions |= Qn::WriteFullNamePermission;
-
-    return accessManager->hasPermission(userResource, target, permissions)
-        ? Result()
-        : Result(ErrorCode::forbidden, NX_FMT(
-            "User %1 with %2 permissions does not have permissions to save %3 Resource parameter",
-            userResource ? userResource->getName() : accessData.userId.toString(),
-            accessData.access,
-            param.resourceId));
-}
-
 struct ModifyResourceAccess
 {
     ModifyResourceAccess() {}
@@ -868,6 +817,31 @@ struct ModifyResourceParamAccess
 {
     static const std::set<QString> kSystemAccessOnlyProperties;
 
+    static QString userNameOrId(const QnUserResourcePtr& user, const Qn::UserAccessData& accessData)
+    {
+        return user ? user->getName() : accessData.userId.toString();
+    }
+
+    static QString userNameOrId(const Qn::UserAccessData& accessData, QnCommonModule* commonModule)
+    {
+        auto user = commonModule->resourcePool()->getResourceById<QnUserResource>(accessData.userId);
+        return userNameOrId(user, accessData);
+    }
+
+    static bool hasSameProperty(
+        const QnResourcePtr& target, const nx::vms::api::ResourceParamWithRefData& param)
+    {
+        auto value = target->getProperty(param.name);
+        return !value.isNull() && value == param.value;
+    }
+
+    static bool hasSameProperty(
+        QnCommonModule* commonModule, const nx::vms::api::ResourceParamWithRefData& param)
+    {
+        auto target = commonModule->resourcePool()->getResourceById(param.resourceId);
+        return target && hasSameProperty(target, param);
+    }
+
     ModifyResourceParamAccess(bool isRemove): isRemove(isRemove) {}
 
     Result operator()(
@@ -880,24 +854,68 @@ struct ModifyResourceParamAccess
 
         if (kSystemAccessOnlyProperties.find(param.name) != kSystemAccessOnlyProperties.cend())
         {
-            if (!isRemove)
+            if (!isRemove
+                && param.checkResourceExists != nx::vms::api::CheckResourceExists::yes
+                && hasSameProperty(commonModule, param))
             {
-                if (auto target = commonModule->resourcePool()->getResourceById(param.resourceId);
-                    target && target->getProperty(param.name) == param.value)
-                {
-                    return Result();
-                }
+                // CRUD API PATCH merges with existing values represented as JSON object so some of
+                // them are not changed.
+                return Result();
             }
 
-            QString errorMessage = NX_FMT(
-                "User %1 with %2 permissions is asking for modifying Resource parameter %3 and fails",
-                accessData.userId,
-                accessData.access,
-                param.name);
-            return Result(ErrorCode::forbidden, std::move(errorMessage));
+            return Result(ErrorCode::forbidden, NX_FMT(
+                "User '%1' with %2 permissions can not modify resource parameter '%3'",
+                userNameOrId(accessData, commonModule), accessData.access, param.name));
         }
 
-        return checkSaveResourceParamAccess(commonModule, accessData, param);
+        const auto& resPool = commonModule->resourcePool();
+        auto userResource =
+            resPool->getResourceById(accessData.userId).dynamicCast<QnUserResource>();
+
+        // System properties are stored in resource unrelated places and should be handled
+        // differently.
+        if (userResource
+            && (userResource->userRole() == Qn::UserRole::owner
+                || userResource->userRole() == Qn::UserRole::administrator))
+        {
+            // Null resource Id can not be handled by permissions engine, since there is no such resource.
+            if (param.resourceId.isNull())
+                return Result();
+
+            // System settings are stored as admin user properties. Admin user is an owner and can not
+            // be modified by anyone else.
+            // TODO: Remove this check once global system settings are not admin properties.
+            if (param.resourceId == QnUserResource::kAdminGuid)
+                return Result();
+        }
+
+        auto accessManager = commonModule->resourceAccessManager();
+        auto target = resPool->getResourceById(param.resourceId);
+        if (param.checkResourceExists != nx::vms::api::CheckResourceExists::yes)
+        {
+            if (target)
+            {
+                // CRUD API PATCH merges with existing values represented as JSON object so some of
+                // them are not changed.
+                if (hasSameProperty(target, param))
+                    return Result();
+            }
+            else
+            {
+                if (accessManager->hasGlobalPermission(userResource, GlobalPermission::admin))
+                    return Result();
+            }
+        }
+
+        Qn::Permissions permissions = Qn::SavePermission;
+        if (param.name == Qn::USER_FULL_NAME)
+            permissions |= Qn::WriteFullNamePermission;
+
+        return accessManager->hasPermission(userResource, target, permissions)
+            ? Result()
+            : Result(ErrorCode::forbidden, NX_FMT(
+                "User '%1' with %2 permissions can not modify resource parameter of %3",
+                userNameOrId(userResource, accessData), accessData.access, param.resourceId));
     }
 
     bool isRemove;
