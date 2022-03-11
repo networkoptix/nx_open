@@ -53,6 +53,11 @@ bool MediaResourceHelper::audioSupported() const
     return d->camera && d->camera->isAudioSupported();
 }
 
+bool MediaResourceHelper::audioEnabled() const
+{
+    return d->camera && d->camera->isAudioEnabled();
+}
+
 MediaPlayer::VideoQuality MediaResourceHelper::livePreviewVideoQuality() const
 {
     if (!d->camera)
@@ -210,6 +215,8 @@ void MediaResourceHelper::Private::handleResourceChanged()
             q, &MediaResourceHelper::analogCameraWithoutLicenseChanged);
         connect(camera, &QnResource::rotationChanged,
             q, &MediaResourceHelper::customRotationChanged);
+        connect(camera, &QnVirtualCameraResource::audioEnabledChanged,
+            q, &MediaResourceHelper::audioEnabledChanged);
 
         updateServer();
     }
@@ -222,6 +229,7 @@ void MediaResourceHelper::Private::handleResourceChanged()
     emit q->analogCameraWithoutLicenseChanged();
     emit q->virtualCameraChanged();
     emit q->audioSupportedChanged();
+    emit q->audioEnabledChanged();
     emit q->livePreviewVideoQualityChanged();
 }
 

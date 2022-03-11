@@ -16,7 +16,7 @@ Rectangle
     color: ColorTheme.window
 
     property alias cameraResourceId: player.resourceId
-    property alias audioEnabled: player.audioEnabled
+    property bool audioEnabled: true
 
     property alias videoOverlayComponent: videoOverlayLoader.sourceComponent
     property alias channelOverlayComponent: multiVideoOutput.channelOverlay
@@ -47,6 +47,7 @@ Rectangle
     MediaPlayer
     {
         id: player
+        audioEnabled: cameraDisplay.audioEnabled && mediaResourceHelper.audioEnabled
         maxTextureSize: textureSizeHelper.maxTextureSize
     }
 
