@@ -163,7 +163,7 @@ struct RemoteConnection::Private
 
     Private(
         nx::vms::api::PeerType peerType,
-        nx::vms::api::ModuleInformation moduleInformation,
+        const nx::vms::api::ModuleInformation& moduleInformation,
         ConnectionInfo connectionInfo,
         std::optional<std::chrono::microseconds> sessionTokenExpirationTime,
         CertificateVerifier* certificateVerifier,
@@ -208,7 +208,7 @@ RemoteConnection::RemoteConnection(
     QObject(parent),
     d(new Private(
         peerType,
-        std::move(moduleInformation),
+        moduleInformation,
         std::move(connectionInfo),
         sessionTokenExpirationTime,
         certificateVerifier,
@@ -258,6 +258,17 @@ ConnectionInfo RemoteConnection::connectionInfo() const
 {
     NX_MUTEX_LOCKER lk(&d->mutex);
     return d->connectionInfo;
+}
+
+LogonData RemoteConnection::createLogonData() const
+{
+    NX_MUTEX_LOCKER lk(&d->mutex);
+    LogonData logonData{
+        .address = d->connectionInfo.address,
+        .credentials = d->connectionInfo.credentials,
+        .userType = d->connectionInfo.userType,
+        .expectedServerId = d->moduleInformation.id};
+    return logonData;
 }
 
 nx::network::SocketAddress RemoteConnection::address() const

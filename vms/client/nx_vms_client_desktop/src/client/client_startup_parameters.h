@@ -8,7 +8,7 @@
 #include <nx/utils/url.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/software_version.h>
-#include <nx/vms/client/core/network/connection_info.h>
+#include <nx/vms/client/core/network/logon_data.h>
 #include <nx/vms/utils/system_uri.h>
 
 struct QnStartupParameters
@@ -19,11 +19,11 @@ struct QnStartupParameters
     static QnStartupParameters fromCommandLineArg(int argc, char **argv);
 
     static QString createAuthenticationString(
-        const nx::vms::client::core::ConnectionInfo& connectionInfo,
+        const nx::vms::client::core::LogonData& logonData,
         std::optional<nx::vms::api::SoftwareVersion> version = std::nullopt);
 
-    static nx::vms::client::core::ConnectionInfo parseAuthenticationString(QString string);
-    nx::vms::client::core::ConnectionInfo parseAuthenticationString() const;
+    static nx::vms::client::core::LogonData parseAuthenticationString(QString string);
+    nx::vms::client::core::LogonData parseAuthenticationString() const;
 
     bool isVideoWallMode() const;
 

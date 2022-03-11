@@ -2,20 +2,14 @@
 
 #pragma once
 
-#include <optional>
-
 #include <QtCore/QMetaType>
 
-#include <nx/vms/client/core/network/connection_info.h>
-#include <nx/utils/uuid.h>
+#include <nx/vms/client/core/network/logon_data.h>
 
 namespace nx::vms::client::desktop {
 
-struct LogonParameters
+struct LogonData: core::LogonData
 {
-    /** Target server address and credentials. */
-    core::ConnectionInfo connectionInfo;
-
     /** The session should be stored into recent list and as a tile. */
     bool storeSession = true;
 
@@ -25,14 +19,14 @@ struct LogonParameters
     /** The client was run as a secondary instance - using "Open in New Window" action. */
     bool secondaryInstance = false;
 
-    LogonParameters() = default;
+    LogonData() = default;
 
-    LogonParameters(core::ConnectionInfo connectionInfo):
-        connectionInfo(std::move(connectionInfo))
+    LogonData(const core::LogonData& logonData):
+        core::LogonData(logonData)
     {
     }
 };
 
 } // namespace nx::vms::client::desktop
 
-Q_DECLARE_METATYPE(nx::vms::client::desktop::LogonParameters)
+Q_DECLARE_METATYPE(nx::vms::client::desktop::LogonData)

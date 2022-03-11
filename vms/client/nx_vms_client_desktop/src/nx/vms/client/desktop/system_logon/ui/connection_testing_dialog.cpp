@@ -167,7 +167,7 @@ void ConnectionTestingDialog::testConnection(
         });
 
     auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
-    const core::ConnectionInfo info{address, credentials, nx::vms::api::UserType::local};
+    const core::LogonData info{address, credentials, nx::vms::api::UserType::local};
     d->connectionProcess = remoteConnectionFactory->connect(info, callback);
 
     d->timeoutTimer->start();

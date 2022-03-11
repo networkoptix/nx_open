@@ -2,11 +2,13 @@
 
 #pragma once
 
+#include <optional>
+
 #include <QtCore/QString>
 #include <QtCore/QJsonValue>
 
+#include <nx/vms/client/core/network/logon_data.h>
 #include <nx/utils/impl_ptr.h>
-#include <nx/vms/client/core/network/remote_connection_aware.h>
 
 #include "session_id.h"
 #include "session_state.h"
@@ -80,8 +82,7 @@ using ClientStateDelegatePtr = std::shared_ptr<ClientStateDelegate>;
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(ClientStateDelegate::SubstateFlags)
 
-class NX_VMS_CLIENT_DESKTOP_API ClientStateHandler:
-    public nx::vms::client::core::RemoteConnectionAware
+class NX_VMS_CLIENT_DESKTOP_API ClientStateHandler
 {
 public:
     explicit ClientStateHandler(const QString& storageDirectory);
@@ -136,8 +137,13 @@ public:
      *
      * If the client was run with the state provided, it must apply system-specific parameters from
      * this state.
+     *
+     * @param logonData Logon data to run new client instances to connect to the same System.
      */
-    void clientConnected(bool fullRestoreIsEnabled, SessionId sessionId);
+    void clientConnected(
+        bool fullRestoreIsEnabled,
+        SessionId sessionId,
+        core::LogonData logonData);
 
     /**
      * Handle state saving on explicit disconnect. System-specific state will be updated.
@@ -147,12 +153,14 @@ public:
     /**
      * Starts new Client instance, whose state is derived from the current client state.
      *
-     * @param logIn If set, the new instance will connect to the same system using existing
+     * @param logonData If set, the new instance will connect to the same system using existing
      * credentials. Otherwise, new WelcomeScreen would be opened.
      * @param args Specifies additional arguments used for the new state generation. Right now
      * may contain only one item with serialized MimeData.
      */
-    void createNewWindow(bool logIn, const QStringList& args);
+    void createNewWindow(
+        std::optional<core::LogonData> logonData = std::nullopt,
+        const QStringList& args = {});
 
     /**
      * Save window(s) configuration of the current session.
@@ -162,8 +170,10 @@ public:
     /**
      * Restore previously saved window(s) configuration: start new clients if necessary,
      * request existing client instances in the current session to update their state.
+     *
+     * @param logonData Logon data to run new client instances to connect to the same System.
      */
-    void restoreWindowsConfiguration();
+    void restoreWindowsConfiguration(core::LogonData logonData);
 
     /**
      * Delete window(s) configuration of the current session.

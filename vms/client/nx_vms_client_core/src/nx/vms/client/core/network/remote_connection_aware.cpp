@@ -67,17 +67,6 @@ nx::network::http::Credentials RemoteConnectionAware::connectionCredentials() co
     return {};
 }
 
-ConnectionInfo RemoteConnectionAware::connectionInfo() const
-{
-    if (m_mockImplementation)
-        return {};
-
-    if (auto connection = this->connection())
-        return connection->connectionInfo();
-
-    return {};
-}
-
 rest::ServerConnectionPtr RemoteConnectionAware::connectedServerApi() const
 {
     if (m_mockImplementation)

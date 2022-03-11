@@ -9,18 +9,30 @@
 namespace nx::vms::client::core {
 
 /**
- * Information about an established client-server connection.
+ * Parameters to establish client-server connection.
  */
-struct ConnectionInfo
+struct LogonData
 {
+    /**
+     * Address of the Server.
+     */
     nx::network::SocketAddress address;
+
+    /**
+     * User credentials. In case of cloud login password may be empty.
+     */
     nx::network::http::Credentials credentials;
+
+    /**
+     * Type of the user.
+     */
     nx::vms::api::UserType userType = nx::vms::api::UserType::local;
 
-    bool isCloud() const
-    {
-        return userType == nx::vms::api::UserType::cloud;
-    }
+    /**
+     * Id of the Server we expect to connect. Reqired to avoid passing stored credentials to another
+     * Server on the same endpoint.
+     */
+    std::optional<QnUuid> expectedServerId;
 };
 
 } // namespace nx::vms::client::core

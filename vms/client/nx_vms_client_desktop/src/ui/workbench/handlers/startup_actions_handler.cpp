@@ -33,7 +33,7 @@
 #include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
 #include <nx/vms/client/desktop/director/director.h>
 #include <nx/vms/client/desktop/ini.h>
-#include <nx/vms/client/desktop/system_logon/data/logon_parameters.h>
+#include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/system_logon/ui/welcome_screen.h>
 #include <nx/vms/client/desktop/testkit/testkit.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
@@ -104,7 +104,7 @@ struct StartupActionsHandler::Private
         }
     } delayedDrops;
 
-    std::unique_ptr<LogonParameters> delayedLogonParameters;
+    std::unique_ptr<LogonData> delayedLogonParameters;
     std::unique_ptr<QTimer> delayedLogonTimer;
 
     Private(QnWorkbenchContext* context):
@@ -121,7 +121,7 @@ struct StartupActionsHandler::Private
         {
             context->menu()->trigger(
                 ConnectAction,
-                Parameters().withArgument(Qn::LogonParametersRole, *delayedLogonParameters));
+                Parameters().withArgument(Qn::LogonDataRole, *delayedLogonParameters));
 
             // Preloader will be hidden by connect action.
             resetDelayedLogon(/*hidePreloader*/ false);
@@ -133,7 +133,7 @@ struct StartupActionsHandler::Private
         }
     }
 
-    void setDelayedLogon(std::unique_ptr<LogonParameters> logonParameters)
+    void setDelayedLogon(std::unique_ptr<LogonData> logonParameters)
     {
         delayedLogonParameters = std::move(logonParameters);
 
@@ -466,22 +466,21 @@ bool StartupActionsHandler::connectUsingCustomUri(const nx::vms::utils::SystemUr
         auth.user.toStdString(),
         nx::network::http::PasswordAuthToken(auth.password.toStdString()));
 
-    LogonParameters parameters({address, credentials});
-    parameters.storeSession = false;
-    parameters.secondaryInstance = true;
+    LogonData logonData({address, credentials});
+    logonData.storeSession = false;
+    logonData.secondaryInstance = true;
 
     if (uri.hasCloudSystemId())
-        parameters.connectionInfo.userType = nx::vms::api::UserType::cloud;
+        logonData.userType = nx::vms::api::UserType::cloud;
 
-    if (parameters.connectionInfo.userType == nx::vms::api::UserType::cloud
-        && parameters.connectionInfo.credentials.authToken.empty())
+    if (logonData.userType == nx::vms::api::UserType::cloud
+        && logonData.credentials.authToken.empty())
     {
-        d->setDelayedLogon(std::make_unique<LogonParameters>(std::move(parameters)));
+        d->setDelayedLogon(std::make_unique<LogonData>(std::move(logonData)));
     }
     else
     {
-        menu()->trigger(
-            ConnectAction, Parameters().withArgument(Qn::LogonParametersRole, parameters));
+        menu()->trigger(ConnectAction, Parameters().withArgument(Qn::LogonDataRole, logonData));
     }
     return true;
 }
@@ -490,35 +489,34 @@ bool StartupActionsHandler::connectUsingCommandLineAuth(
     const QnStartupParameters& startupParameters)
 {
     // Set authentication parameters from the command line.
-    core::ConnectionInfo connectionInfo = startupParameters.parseAuthenticationString();
-    if (connectionInfo.address.isNull())
+    LogonData logonData(startupParameters.parseAuthenticationString());
+    if (logonData.address.isNull())
         return false;
 
     // Fix compatibility mode command line from old versions.
     const bool isCloudSystem = nx::network::SocketGlobals::addressResolver().isCloudHostname(
-        connectionInfo.address.toString());
-    if (isCloudSystem && connectionInfo.credentials.authToken.isPassword())
-        connectionInfo.userType = nx::vms::api::UserType::cloud;
+        logonData.address.toString());
+    if (isCloudSystem && logonData.credentials.authToken.isPassword())
+        logonData.userType = nx::vms::api::UserType::cloud;
 
-    NX_DEBUG(this, "Connecting to %1 using command line auth", connectionInfo.address);
+    NX_DEBUG(this, "Connecting to %1 using command line auth", logonData.address);
 
-    LogonParameters parameters(std::move(connectionInfo));
-    parameters.storeSession = false;
-    parameters.secondaryInstance = true;
+    logonData.storeSession = false;
+    logonData.secondaryInstance = true;
 
-    if (parameters.connectionInfo.userType == nx::vms::api::UserType::cloud)
+    if (logonData.userType == nx::vms::api::UserType::cloud)
     {
-        d->setDelayedLogon(std::make_unique<LogonParameters>(std::move(parameters)));
+        d->setDelayedLogon(std::make_unique<LogonData>(std::move(logonData)));
         return true;
     }
 
     if (!startupParameters.videoWallGuid.isNull())
     {
-        parameters.connectionInfo.credentials.authToken =
+        logonData.credentials.authToken =
             nx::network::http::VideoWallAuthToken(startupParameters.videoWallGuid);
     }
 
-    menu()->trigger(ConnectAction, Parameters().withArgument(Qn::LogonParametersRole, parameters));
+    menu()->trigger(ConnectAction, Parameters().withArgument(Qn::LogonDataRole, logonData));
     return true;
 }
 
@@ -562,9 +560,9 @@ bool StartupActionsHandler::connectToSystemIfNeeded(
 
             NX_DEBUG(this, "Auto-login to the server %1", address);
 
-            LogonParameters parameters({address, *storedCredentials});
+            LogonData logonData({address, *storedCredentials});
             menu()->trigger(ConnectAction,
-                Parameters().withArgument(Qn::LogonParametersRole, parameters));
+                Parameters().withArgument(Qn::LogonDataRole, logonData));
             return true;
         }
         else if (qnCloudStatusWatcher->status() != QnCloudStatusWatcher::LoggedOut)

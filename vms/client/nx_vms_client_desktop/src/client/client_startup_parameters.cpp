@@ -187,21 +187,21 @@ QnStartupParameters QnStartupParameters::fromCommandLineArg(int argc, char** arg
 }
 
 QString QnStartupParameters::createAuthenticationString(
-    const nx::vms::client::core::ConnectionInfo& connectionInfo,
+    const nx::vms::client::core::LogonData& logonData,
     std::optional<nx::vms::api::SoftwareVersion> version)
 {
     auto builder = nx::network::url::Builder()
         .setScheme(nx::network::http::kSecureUrlSchemeName)
-        .setEndpoint(connectionInfo.address)
-        .addQueryItem(kUserTypeParam, connectionInfo.userType);
+        .setEndpoint(logonData.address)
+        .addQueryItem(kUserTypeParam, logonData.userType);
 
     // Login to cloud is allowed using bearer token only.
-    const bool isCloudLogin = (connectionInfo.userType == nx::vms::api::UserType::cloud)
-        && connectionInfo.credentials.authToken.isBearerToken();
+    const bool isCloudLogin = (logonData.userType == nx::vms::api::UserType::cloud)
+        && logonData.credentials.authToken.isBearerToken();
     if (!isCloudLogin)
     {
-        builder.setUserName(QString::fromStdString(connectionInfo.credentials.username));
-        builder.setPassword(QString::fromStdString(connectionInfo.credentials.authToken.value));
+        builder.setUserName(QString::fromStdString(logonData.credentials.username));
+        builder.setPassword(QString::fromStdString(logonData.credentials.authToken.value));
     }
 
     const auto logonInformation = QString::fromUtf8(builder.toUrl().toEncoded());
@@ -209,7 +209,7 @@ QString QnStartupParameters::createAuthenticationString(
         nx::vms::client::core::EncodedString::fromDecoded(logonInformation).encoded();
 
     if ((version && *version < kTokenSupportVersion)
-        || connectionInfo.credentials.authToken.isPassword())
+        || logonData.credentials.authToken.isPassword())
     {
         return kEncodeAuthMagic_v30 + encoded;
     }
@@ -217,7 +217,7 @@ QString QnStartupParameters::createAuthenticationString(
     return kEncodeAuthMagic_v50_token + encoded;
 }
 
-nx::vms::client::core::ConnectionInfo QnStartupParameters::parseAuthenticationString(QString string)
+nx::vms::client::core::LogonData QnStartupParameters::parseAuthenticationString(QString string)
 {
     if (string.isEmpty())
         return {};
@@ -239,7 +239,7 @@ nx::vms::client::core::ConnectionInfo QnStartupParameters::parseAuthenticationSt
     const nx::utils::Url url = nx::utils::Url::fromUserInput(string);
     const auto query = nx::utils::UrlQuery(url.query());
 
-    nx::vms::client::core::ConnectionInfo result;
+    nx::vms::client::core::LogonData result;
     result.address = nx::network::SocketAddress::fromUrl(url);
     result.credentials.username = url.userName().toStdString();
     result.credentials.authToken.type = authTokenType;
@@ -249,7 +249,7 @@ nx::vms::client::core::ConnectionInfo QnStartupParameters::parseAuthenticationSt
     return result;
 }
 
-nx::vms::client::core::ConnectionInfo QnStartupParameters::parseAuthenticationString() const
+nx::vms::client::core::LogonData QnStartupParameters::parseAuthenticationString() const
 {
     return parseAuthenticationString(authenticationString);
 }

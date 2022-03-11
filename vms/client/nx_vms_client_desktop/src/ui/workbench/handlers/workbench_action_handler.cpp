@@ -73,6 +73,7 @@
 #include <nx/utils/std/cpp14.h>
 #include <nx/utils/string.h>
 #include <nx/vms/client/core/network/network_module.h>
+#include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/utils/geometry.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/common/delegates/customizable_item_delegate.h>
@@ -568,8 +569,12 @@ void ActionHandler::openResourcesInNewWindow(const QnResourceList &resources)
         MimeData data;
         data.setResources(resources);
 
+        std::optional<core::LogonData> logonData;
+        if (auto connection = this->connection())
+            logonData = connection->createLogonData();
+
         qnClientModule->clientStateHandler()->createNewWindow(
-            /*logIn*/ (bool) context()->user(),
+            logonData,
             {data.serialized()});
     }
 }
@@ -1140,23 +1145,33 @@ void ActionHandler::at_openCurrentLayoutInNewWindowAction_triggered()
 
 void ActionHandler::at_openNewWindowAction_triggered()
 {
-    qnClientModule->clientStateHandler()->createNewWindow(/*logIn*/ (bool) context()->user(), {});
+    std::optional<core::LogonData> logonData;
+    if (auto connection = this->connection())
+        logonData = connection->createLogonData();
+
+    qnClientModule->clientStateHandler()->createNewWindow(logonData);
 }
 
 void ActionHandler::at_openWelcomeScreenAction_triggered()
 {
-    qnClientModule->clientStateHandler()->createNewWindow(/*logIn*/ false, {});
+    qnClientModule->clientStateHandler()->createNewWindow();
 }
 
 void ActionHandler::at_reviewLayoutTourInNewWindowAction_triggered()
 {
+    auto connection = this->connection();
+    if (!NX_ASSERT(connection, "Client must be logged in"))
+        return;
+
     // For now place method here until openNewWindow code would be shared.
     const auto parameters = menu()->currentParameters(sender());
     auto id = parameters.argument<QnUuid>(Qn::UuidRole);
 
     MimeData data;
     data.setEntities({id});
-    qnClientModule->clientStateHandler()->createNewWindow(/*logIn*/ true, {data.serialized()});
+    qnClientModule->clientStateHandler()->createNewWindow(
+        connection->createLogonData(),
+        {data.serialized()});
 }
 
 std::optional<QnVirtualCameraResourceList> ActionHandler::checkCameraList(
@@ -2470,7 +2485,11 @@ void ActionHandler::at_saveSessionState_triggered()
 
 void ActionHandler::at_restoreSessionState_triggered()
 {
-    qnClientModule->clientStateHandler()->restoreWindowsConfiguration();
+    core::LogonData logonData;
+    if (auto connection = this->connection())
+        logonData = connection->createLogonData();
+
+    qnClientModule->clientStateHandler()->restoreWindowsConfiguration(logonData);
 }
 
 void ActionHandler::at_deleteSessionState_triggered()

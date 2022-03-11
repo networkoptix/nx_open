@@ -209,7 +209,7 @@ void QnCloudManagementWidget::disconnectFromCloud()
 
 void QnCloudManagementWidget::onDisconnectSuccess()
 {
-    const bool isCloudUser = (connectionInfo().userType == nx::vms::api::UserType::cloud);
+    const bool isCloudUser = connection() ? connection()->connectionInfo().isCloud() : false;
 
     // Disconnect may follow, but dialog should stay.
     auto messageBox = new QnMessageBox(isCloudUser ? mainWindowWidget() : this);
@@ -241,7 +241,7 @@ bool QnCloudManagementWidget::confirmCloudDisconnect()
     ).arg(nx::branding::shortCloudName()));
     infoText.append("\n");
 
-    if (connection()->connectionInfo().userType == nx::vms::api::UserType::cloud)
+    if (connection()->connectionInfo().isCloud())
     {
         infoText.append(tr("You will be logged out."))
             .append("\n")

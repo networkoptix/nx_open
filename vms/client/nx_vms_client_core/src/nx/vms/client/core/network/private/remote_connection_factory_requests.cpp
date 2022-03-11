@@ -292,7 +292,7 @@ void RemoteConnectionFactoryRequestsManager::fillModuleInformationAndCertificate
         };
 
     NX_DEBUG(this, "Requesting module information and certificate from %1", context);
-    const auto url = makeUrl(context->info.address, "/api/moduleInformation");
+    const auto url = makeUrl(context->address(), "/api/moduleInformation");
 
     // Create a custom client that accepts any certificate and stores its data.
     auto request = std::make_unique<AsyncClient>(nx::network::ini().verifyVmsSslCertificates
@@ -314,11 +314,11 @@ nx::vms::api::LoginUser RemoteConnectionFactoryRequestsManager::getUserType(
     static constexpr int kUserTypeRequestRetryCount = 30;
 
     const auto encodedUsername =
-        QUrl::toPercentEncoding(QString::fromStdString(context->info.credentials.username))
+        QUrl::toPercentEncoding(QString::fromStdString(context->credentials().username))
             .toStdString();
 
-    NX_DEBUG(this, "Requesting user %1 info from %2", context->info.credentials.username, context);
-    const auto url = makeUrl(context->info.address, "/rest/v1/login/users/" + encodedUsername);
+    NX_DEBUG(this, "Requesting user %1 info from %2", context->credentials().username, context);
+    const auto url = makeUrl(context->address(), "/rest/v1/login/users/" + encodedUsername);
 
     nx::vms::api::LoginUser result;
     int retryCount = 0;
@@ -359,13 +359,13 @@ nx::vms::api::LoginSession RemoteConnectionFactoryRequestsManager::createLocalSe
     ContextPtr context)
 {
     NX_DEBUG(this, "Creating session for user %1 on %2",
-        context->info.credentials.username,
+        context->credentials().username,
         context);
-    const auto url = makeUrl(context->info.address, "/rest/v1/login/sessions");
+    const auto url = makeUrl(context->address(), "/rest/v1/login/sessions");
 
     nx::vms::api::LoginSessionRequest request;
-    request.username = QString::fromStdString(context->info.credentials.username);
-    request.password = QString::fromStdString(context->info.credentials.authToken.value);
+    request.username = QString::fromStdString(context->credentials().username);
+    request.password = QString::fromStdString(context->credentials().authToken.value);
     return d->doPost<nx::vms::api::LoginSession>(
         url,
         context,
@@ -379,9 +379,9 @@ nx::vms::api::LoginSession RemoteConnectionFactoryRequestsManager::getCurrentSes
     ContextPtr context)
 {
     NX_DEBUG(this, "Requesting username from %1", context);
-    const auto url = makeUrl(context->info.address, "/rest/v1/login/sessions/current");
+    const auto url = makeUrl(context->address(), "/rest/v1/login/sessions/current");
     auto request = d->makeRequestWithCertificateValidation(publicKey(context->certificateChain));
-    request->setCredentials(context->info.credentials);
+    request->setCredentials(context->credentials());
     return d->doGet<nx::vms::api::LoginSession>(
         url,
         context,
@@ -394,18 +394,18 @@ nx::vms::api::LoginSession RemoteConnectionFactoryRequestsManager::getCurrentSes
 void RemoteConnectionFactoryRequestsManager::checkDigestAuthentication(ContextPtr context)
 {
     NX_DEBUG(this, "Checking digest authentication as %1 in %2",
-        context->info.credentials.username, context);
+        context->credentials().username, context);
 
-    if (context->info.credentials.authToken.type != AuthTokenType::password)
+    if (context->credentials().authToken.type != AuthTokenType::password)
     {
-        NX_DEBUG(this, "Unexpected auth token type %1", context->info.credentials.authToken.type);
+        NX_DEBUG(this, "Unexpected auth token type %1", context->credentials().authToken.type);
         context->error = RemoteConnectionErrorCode::unauthorized;
         return;
     }
 
-    const auto url = makeUrl(context->info.address, "/api/moduleInformationAuthenticated");
+    const auto url = makeUrl(context->address(), "/api/moduleInformationAuthenticated");
     auto request = d->makeRequestWithCertificateValidation(publicKey(context->certificateChain));
-    request->setCredentials(context->info.credentials);
+    request->setCredentials(context->credentials());
     d->doGet<ModuleInformationWrapper>(url, context, std::move(request));
 }
 
@@ -413,7 +413,7 @@ nx::cloud::db::api::IssueTokenResponse RemoteConnectionFactoryRequestsManager::i
     ContextPtr context,
     nx::cloud::db::api::Connection* cloudConnection)
 {
-    NX_DEBUG(this, "Issue cloud token for %1 in %2", context->info.credentials.username, context);
+    NX_DEBUG(this, "Issue cloud token for %1 in %2", context->credentials().username, context);
     using namespace nx::cloud::db::api;
 
     if (!NX_ASSERT(cloudConnection))
@@ -426,7 +426,7 @@ nx::cloud::db::api::IssueTokenResponse RemoteConnectionFactoryRequestsManager::i
     request.grant_type = GrantType::refreshToken;
     request.scope =
         nx::format("cloudSystemId=%1", context->moduleInformation.cloudSystemId).toStdString();
-    request.refresh_token = context->info.credentials.authToken.value;
+    request.refresh_token = context->credentials().authToken.value;
 
     std::promise<IssueTokenResponse> promise;
     auto future = promise.get_future();
@@ -448,7 +448,7 @@ RemoteConnectionFactoryRequestsManager::ServerCertificatesInfo
 {
     NX_DEBUG(this, "Retrieving target server certificates from %1", context);
 
-    const auto url = makeUrl(context->info.address, "/rest/v1/servers/this/info");
+    const auto url = makeUrl(context->address(), "/rest/v1/servers/this/info");
     auto request = d->makeRequestWithCertificateValidation(publicKey(context->certificateChain));
     auto info = d->doGet<nx::vms::api::ServerInformation>(
         url,
@@ -470,9 +470,9 @@ std::vector<RemoteConnectionFactoryRequestsManager::ServerCertificatesInfo>
     NX_DEBUG(this, "Pulling server certificates from %1", context);
 
     // Request full servers data, since /servers/*/info returns only online servers information.
-    const auto url = makeUrl(context->info.address, "/rest/v1/servers");
+    const auto url = makeUrl(context->address(), "/rest/v1/servers");
     auto request = d->makeRequestWithCertificateValidation(publicKey(context->certificateChain));
-    request->setCredentials(context->info.credentials);
+    request->setCredentials(context->credentials());
     auto list = d->doGet<std::vector<nx::vms::api::ServerModel>>(
         url,
         context,

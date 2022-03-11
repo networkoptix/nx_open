@@ -125,13 +125,13 @@ bool agreeToDownloadVersion(
 
 std::pair<bool /*success*/, bool /*confirmRestart*/> downloadCompatibleVersion(
     const nx::vms::api::ModuleInformation& moduleInformation,
-    const nx::vms::client::core::ConnectionInfo& connectionInfo,
+    const nx::vms::client::core::LogonData& logonData,
     const nx::vms::api::SoftwareVersion& engineVersion,
     QWidget* parentWidget)
 {
     QScopedPointer<CompatibilityVersionInstallationDialog> installationDialog(
         new CompatibilityVersionInstallationDialog(
-            moduleInformation, connectionInfo, engineVersion, parentWidget));
+            moduleInformation, logonData, engineVersion, parentWidget));
 
     // Starting installation
     if (installationDialog->exec() == QDialog::Rejected)
@@ -219,7 +219,7 @@ bool agreeToTryAgain(
 bool QnConnectionDiagnosticsHelper::downloadAndRunCompatibleVersion(
     QWidget* parentWidget,
     const nx::vms::api::ModuleInformation& moduleInformation,
-    nx::vms::client::core::ConnectionInfo connectionInfo,
+    nx::vms::client::core::LogonData logonData,
     const nx::vms::api::SoftwareVersion& engineVersion)
 {
     using namespace nx::vms::applauncher::api;
@@ -242,9 +242,9 @@ bool QnConnectionDiagnosticsHelper::downloadAndRunCompatibleVersion(
     if (!isInstalled && !agreeToDownloadVersion(moduleInformation, engineVersion, parentWidget))
         return false;
 
-    fixConnectionInfo(moduleInformation, &connectionInfo);
+    fixLogonData(moduleInformation, &logonData);
     const QString authString = QnStartupParameters::createAuthenticationString(
-        connectionInfo, moduleInformation.version);
+        logonData, moduleInformation.version);
 
     // Version is installed, trying to run.
     while (true)
@@ -252,7 +252,7 @@ bool QnConnectionDiagnosticsHelper::downloadAndRunCompatibleVersion(
         if (!isInstalled)
         {
             auto [success, confirmRestart] = downloadCompatibleVersion(
-                moduleInformation, connectionInfo, engineVersion, parentWidget);
+                moduleInformation, logonData, engineVersion, parentWidget);
             if (!success)
                 return false;
 
@@ -290,16 +290,16 @@ bool QnConnectionDiagnosticsHelper::downloadAndRunCompatibleVersion(
     return false;
 }
 
-void QnConnectionDiagnosticsHelper::fixConnectionInfo(
+void QnConnectionDiagnosticsHelper::fixLogonData(
     const nx::vms::api::ModuleInformation& moduleInformation,
-    nx::vms::client::core::ConnectionInfo* connectionInfo)
+    nx::vms::client::core::LogonData* logonData)
 {
-    const auto& authToken = connectionInfo->credentials.authToken;
-    if (connectionInfo->userType == nx::vms::api::UserType::cloud
+    const auto& authToken = logonData->credentials.authToken;
+    if (logonData->userType == nx::vms::api::UserType::cloud
         && moduleInformation.version < kCloudTokenVersion
         && (authToken.empty() || !authToken.isPassword()))
     {
-        connectionInfo->credentials =
+        logonData->credentials =
             nx::vms::client::core::helpers::loadCloudPasswordCredentials();
     }
 }

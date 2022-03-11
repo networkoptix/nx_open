@@ -119,7 +119,7 @@ void RemoteSessionTimeoutWatcher::tick()
     if (!NX_ASSERT(connection))
         return;
 
-    if (connection->connectionInfo().userType == nx::vms::api::UserType::cloud)
+    if (connection->connectionInfo().isCloud())
         return;
 
     const std::optional<seconds> timeLeft = d->calculateSessionRemainingTime(connection);

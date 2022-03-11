@@ -6,7 +6,7 @@ namespace nx::vms::client::core {
 
 QString RemoteConnectionFactoryContext::toString() const
 {
-    return nx::format("ConnectionContext to %1", info.address);
+    return nx::format("ConnectionContext to %1", logonData.address);
 }
 
 } // namespace nx::vms::client::core

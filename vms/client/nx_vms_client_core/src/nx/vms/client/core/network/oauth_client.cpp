@@ -153,11 +153,8 @@ QUrl OauthClient::url() const
         RemoteConnectionAware connectionHelper;
         auto remoteConnection = connectionHelper.connection();
 
-        if (remoteConnection
-            && remoteConnection->connectionInfo().userType == nx::vms::api::UserType::cloud)
-        {
+        if (remoteConnection && remoteConnection->connectionInfo().isCloud())
             builder.addQueryItem("email", remoteConnection->credentials().username);
-        }
     }
     else if (!d->authData.credentials.authToken.empty()) //< Request 2FA validation.
     {

@@ -15,7 +15,7 @@
 #include <nx/vms/client/core/network/remote_connection_fwd.h>
 #include <nx/vms/client/core/network/remote_connection_factory.h>
 #include <nx/vms/client/core/network/remote_session.h>
-#include <nx/vms/client/desktop/system_logon/data/logon_parameters.h>
+#include <nx/vms/client/desktop/system_logon/data/logon_data.h>
 #include <nx/vms/client/desktop/system_update/client_update_tool.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <ui/workbench/workbench_context_aware.h>
@@ -84,10 +84,11 @@ private:
     /** Clear all local data structures. */
     void clearConnection();
 
-    /// @brief Connects to server and stores successful connection data
-    /// according to specified settings.
+    /**
+     * Establish Server connection and stores connection data in case of success
+     */
     void connectToServer(
-        core::ConnectionInfo connectionInfo,
+        core::LogonData logonData,
         ConnectionOptions options);
 
     /**
@@ -121,8 +122,7 @@ private:
     /**
      * Handle connection in the videowall or ACS mode.
      */
-    void connectToServerInNonDesktopMode(
-        const nx::vms::client::desktop::LogonParameters& parameters);
+    void connectToServerInNonDesktopMode(const LogonData& logonData);
 
     void updatePreloaderVisibility();
 

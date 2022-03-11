@@ -16,7 +16,7 @@
 #include <nx/vms/api/data/login.h>
 #include <nx/vms/api/data/module_information.h>
 
-#include "connection_info.h"
+#include "logon_data.h"
 #include "remote_connection_error.h"
 
 namespace nx::vms::client::core {
@@ -25,7 +25,7 @@ class CertificateCache;
 
 struct RemoteConnectionFactoryContext: public QObject
 {
-    ConnectionInfo info;
+    LogonData logonData;
     std::optional<std::chrono::microseconds> sessionTokenExpirationTime;
     nx::vms::api::ModuleInformation moduleInformation;
     nx::network::ssl::CertificateChain certificateChain;
@@ -33,6 +33,10 @@ struct RemoteConnectionFactoryContext: public QObject
     std::shared_ptr<CertificateCache> certificateCache;
 
     std::optional<RemoteConnectionError> error;
+
+    const nx::network::SocketAddress& address() const { return logonData.address; }
+    const nx::network::http::Credentials& credentials() const { return logonData.credentials; }
+    nx::vms::api::UserType userType() const { return logonData.userType; }
 
     bool failed() const { return error.has_value(); }
 

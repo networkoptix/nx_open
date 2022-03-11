@@ -48,8 +48,8 @@
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/os_information.h>
 #include <nx/vms/client/core/network/certificate_verifier.h>
-#include <nx/vms/client/core/network/connection_info_helpers.h>
 #include <nx/vms/client/core/network/cloud_system_endpoint.h>
+#include <nx/vms/client/core/network/logon_data_helpers.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session_timeout_watcher.h>
@@ -104,9 +104,9 @@ static const int kMessagesDelayMs = 5000;
 
 static constexpr auto kSelectCurrentServerShowDialogDelay = 250ms;
 
-bool isConnectionToCloud(const ConnectionInfo& connectionInfo)
+bool isConnectionToCloud(const LogonData& logonData)
 {
-    return connectionInfo.userType == nx::vms::api::UserType::cloud;
+    return logonData.userType == nx::vms::api::UserType::cloud;
 }
 
 } // namespace
@@ -240,18 +240,17 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
         [this]()
         {
             const auto actionParameters = menu()->currentParameters(sender());
-            if (NX_ASSERT(actionParameters.hasArgument(Qn::LogonParametersRole)))
+            if (NX_ASSERT(actionParameters.hasArgument(Qn::LogonDataRole)))
             {
-                const auto parameters =
-                    actionParameters.argument<LogonParameters>(Qn::LogonParametersRole);
+                const auto logonData =
+                    actionParameters.argument<LogonData>(Qn::LogonDataRole);
                 const auto welcomeScreen = mainWindow()->welcomeScreen();
                 if (NX_ASSERT(welcomeScreen)
-                    && NX_ASSERT(parameters.connectionInfo.expectedServerId)
-                    && NX_ASSERT(parameters.connectionInfo.expectedServerId.has_value()))
+                    && NX_ASSERT(logonData.expectedServerId))
                 {
                     welcomeScreen->setupFactorySystem(
-                        parameters.connectionInfo.address,
-                        parameters.connectionInfo.expectedServerId.value());
+                        logonData.address,
+                        logonData.expectedServerId.value());
                 }
             }
         });
@@ -285,7 +284,7 @@ ConnectActionsHandler::ConnectActionsHandler(QObject* parent):
                 case LogicalState::disconnected:
                 case LogicalState::connecting:
                     if (d->currentConnectionProcess &&
-                        isConnectionToCloud(d->currentConnectionProcess->context->info))
+                        isConnectionToCloud(d->currentConnectionProcess->context->logonData))
                     {
                         /**
                          * TODO: #ynikitenkov Get rid of this static cast (here and below).
@@ -429,8 +428,8 @@ void ConnectActionsHandler::handleConnectionError(RemoteConnectionError error)
         return;
 
     auto welcomeScreen = mainWindow()->welcomeScreen();
-    const bool isCloudConnection =
-        d->currentConnectionProcess->context->info.userType == nx::vms::api::UserType::cloud;
+    const bool isCloudConnection = isConnectionToCloud(
+        d->currentConnectionProcess->context->logonData);
     const bool connectingTileExists = welcomeScreen
         && welcomeScreen->connectingTileExists();
     if (connectingTileExists)
@@ -445,7 +444,7 @@ void ConnectActionsHandler::handleConnectionError(RemoteConnectionError error)
     {
         CredentialsManager::forgetStoredPassword(
             d->currentConnectionProcess->context->moduleInformation.localSystemId,
-            d->currentConnectionProcess->context->info.credentials.username);
+            d->currentConnectionProcess->context->logonData.credentials.username);
     }
 
     switch (error.code)
@@ -456,7 +455,7 @@ void ConnectActionsHandler::handleConnectionError(RemoteConnectionError error)
             if (NX_ASSERT(welcomeScreen, "Welcome screen must exist in the desktop mode"))
             {
                 welcomeScreen->setupFactorySystem(
-                    d->currentConnectionProcess->context->info.address,
+                    d->currentConnectionProcess->context->logonData.address,
                     d->currentConnectionProcess->context->moduleInformation.id);
             }
             return;
@@ -468,11 +467,17 @@ void ConnectActionsHandler::handleConnectionError(RemoteConnectionError error)
             if (QnConnectionDiagnosticsHelper::downloadAndRunCompatibleVersion(
                 mainWindowWidget(),
                 d->currentConnectionProcess->context->moduleInformation,
-                d->currentConnectionProcess->context->info,
+                d->currentConnectionProcess->context->logonData,
                 commonModule()->engineVersion()))
             {
+                ConnectionInfo compatibilityInfo{
+                    .address = d->currentConnectionProcess->context->logonData.address,
+                    .credentials = d->currentConnectionProcess->context->logonData.credentials,
+                    .userType = d->currentConnectionProcess->context->logonData.userType
+                };
+                // TODO: #sivanov Why are we doing this?
                 storeConnectionRecord(
-                    d->currentConnectionProcess->context->info,
+                    compatibilityInfo,
                     /*moduleInformation*/ {}, //< TODO: #sivanov Make sure it is not needed.
                     /*options*/ {});
                 menu()->trigger(ui::action::DelayedForcedExitAction);
@@ -594,7 +599,8 @@ void ConnectActionsHandler::establishConnection(
     // TODO: #sivanov Implement separate address and credentials handling.
     qnClientModule->clientStateHandler()->clientConnected(
         qnSettings->restoreUserSessionData(),
-        session->sessionId());
+        session->sessionId(),
+        connection->createLogonData());
 }
 
 void ConnectActionsHandler::storeConnectionRecord(
@@ -621,7 +627,7 @@ void ConnectActionsHandler::storeConnectionRecord(
 
     const nx::network::http::Credentials& credentials = connectionInfo.credentials;
 
-    const bool cloudConnection = isConnectionToCloud(connectionInfo);
+    const bool cloudConnection = connectionInfo.isCloud();
 
     // Stores local credentials after successful connection.
     if (!cloudConnection && options.testFlag(StoreSession))
@@ -734,14 +740,14 @@ void ConnectActionsHandler::setState(LogicalState logicalValue)
     emit stateChanged(d->logicalState, {});
 }
 
-void ConnectActionsHandler::connectToServerInNonDesktopMode(const LogonParameters& parameters)
+void ConnectActionsHandler::connectToServerInNonDesktopMode(const LogonData& logonData)
 {
     static constexpr auto kCloseTimeout = 10s;
 
-    NX_VERBOSE(this, "Directly connecting to the server %1", parameters.connectionInfo.address);
+    NX_VERBOSE(this, "Directly connecting to the server %1", logonData.address);
 
     auto callback = d->makeSingleConnectionCallback(
-        [this, parameters](RemoteConnectionFactory::ConnectionOrError result)
+        [this, logonData](RemoteConnectionFactory::ConnectionOrError result)
         {
             if (const auto error = std::get_if<RemoteConnectionError>(&result))
             {
@@ -753,7 +759,7 @@ void ConnectActionsHandler::connectToServerInNonDesktopMode(const LogonParameter
                             tr("Video Wall is removed on the server and will be closed."),
                             kCloseTimeout);
                         const QnUuid videoWallId(
-                            QString::fromStdString(parameters.connectionInfo.credentials.username));
+                            QString::fromStdString(logonData.credentials.username));
                         VideoWallShortcutHelper::setVideoWallAutorunEnabled(videoWallId, false);
                     }
                     else
@@ -781,10 +787,9 @@ void ConnectActionsHandler::connectToServerInNonDesktopMode(const LogonParameter
             }
         });
 
-    NX_VERBOSE(this, "Executing connect to the %1", parameters.connectionInfo.address);
+    NX_VERBOSE(this, "Executing connect to the %1", logonData.address);
     auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
-    d->currentConnectionProcess = remoteConnectionFactory->connect(
-        parameters.connectionInfo, callback);
+    d->currentConnectionProcess = remoteConnectionFactory->connect(logonData, callback);
 }
 
 void ConnectActionsHandler::updatePreloaderVisibility()
@@ -836,8 +841,7 @@ void ConnectActionsHandler::at_connectAction_triggered()
 
     if (!qnRuntime->isDesktopMode())
     {
-        connectToServerInNonDesktopMode(
-            actionParameters.argument<LogonParameters>(Qn::LogonParametersRole));
+        connectToServerInNonDesktopMode(actionParameters.argument<LogonData>(Qn::LogonDataRole));
         return;
     }
 
@@ -860,35 +864,35 @@ void ConnectActionsHandler::at_connectAction_triggered()
         disconnectFromServer(DisconnectFlag::Force);
     }
 
-    if (actionParameters.hasArgument(Qn::LogonParametersRole))
+    if (actionParameters.hasArgument(Qn::LogonDataRole))
     {
-        const auto parameters = actionParameters.argument<LogonParameters>(Qn::LogonParametersRole);
-        NX_DEBUG(this, "Connecting to the server %1", parameters.connectionInfo.address);
+        const auto logonData = actionParameters.argument<LogonData>(Qn::LogonDataRole);
+        NX_DEBUG(this, "Connecting to the server %1", logonData.address);
         NX_VERBOSE(this,
             "Connection flags: storeSession %1, storePassword %2, secondary %3",
-            parameters.storeSession,
-            parameters.storePassword,
-            parameters.secondaryInstance);
+            logonData.storeSession,
+            logonData.storePassword,
+            logonData.secondaryInstance);
 
-        if (!parameters.connectionInfo.address.isNull())
+        if (!logonData.address.isNull())
         {
             ConnectionOptions options(UpdateSystemWeight);
-            if (parameters.storeSession)
+            if (logonData.storeSession)
                 options |= StoreSession;
 
-            if ((parameters.storePassword || qnSettings->autoLogin())
+            if ((logonData.storePassword || qnSettings->autoLogin())
                 && NX_ASSERT(qnSettings->saveCredentialsAllowed()))
             {
                 options |= StorePassword;
             }
 
             // Ignore warning messages for now if one client instance is opened already.
-            if (parameters.secondaryInstance)
+            if (logonData.secondaryInstance)
                 d->warnMessagesDisplayed = true;
 
             NX_VERBOSE(this, "Connecting to the server %1 with testing before",
-                parameters.connectionInfo.address);
-            connectToServer(parameters.connectionInfo, options);
+                logonData.address);
+            connectToServer(logonData, options);
         }
     }
     else if (NX_ASSERT(actionParameters.hasArgument(Qn::RemoteConnectionRole)))
@@ -934,7 +938,7 @@ void ConnectActionsHandler::at_connectToCloudSystemAction_triggered()
     const auto parameters = menu()->currentParameters(sender());
     QString systemId = parameters.argument(Qn::CloudSystemIdRole).toString();
 
-    const auto connectionInfo = core::getCloudConnectionInfo(systemId);
+    const auto connectionInfo = core::cloudLogonData(systemId);
 
     if (!connectionInfo)
         return;
@@ -984,13 +988,12 @@ void ConnectActionsHandler::at_reconnectAction_triggered()
     // Try to login with the same address and credentials. Main reasons for the reconnect action
     // are user permissions change and/os system merge, so connection either will be successful or
     // correct diagnostic will be displayed.
-    ConnectionInfo connectionInfo(currentConnection->connectionInfo());
-    const QnUuid currentServerId = currentConnection->moduleInformation().id;
+    LogonData logonData(currentConnection->createLogonData());
 
     disconnectFromServer(DisconnectFlag::Force);
 
     // Do not store connections in case of reconnection
-    NX_VERBOSE(this, "Reconnecting to the server %1", connectionInfo.address);
+    NX_VERBOSE(this, "Reconnecting to the server %1", logonData.address);
 
     auto callback = d->makeSingleConnectionCallback(
         [this](RemoteConnectionFactory::ConnectionOrError result)
@@ -1008,8 +1011,7 @@ void ConnectActionsHandler::at_reconnectAction_triggered()
         });
 
     auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
-    connectionInfo.expectedServerId = currentServerId;
-    d->currentConnectionProcess = remoteConnectionFactory->connect(connectionInfo, callback);
+    d->currentConnectionProcess = remoteConnectionFactory->connect(logonData, callback);
 }
 
 void ConnectActionsHandler::at_disconnectAction_triggered()
@@ -1055,13 +1057,15 @@ void ConnectActionsHandler::at_selectCurrentServerAction_triggered()
     const auto systemId = globalSettings()->cloudSystemId();
     const auto currentUser = context()->user();
 
-    ConnectionInfo connectionInfo(currentConnection->connectionInfo());
-    connectionInfo.address = *endpoint;
-    connectionInfo.expectedServerId = serverId;
+    core::LogonData logonData{
+        .address = *endpoint,
+        .credentials = currentConnection->credentials(),
+        .userType = currentConnection->userType(),
+        .expectedServerId = serverId};
 
-    if (isConnectionToCloud(connectionInfo) && server->hasInternetAccess())
+    if (isConnectionToCloud(logonData) && server->hasInternetAccess())
     {
-        connectionInfo.address.address = nx::vms::client::core::helpers::serverCloudHost(
+        logonData.address.address = nx::vms::client::core::helpers::serverCloudHost(
             systemId, serverId);
     }
 
@@ -1106,7 +1110,7 @@ void ConnectActionsHandler::at_selectCurrentServerAction_triggered()
             }
         }));
 
-    d->currentConnectionProcess = remoteConnectionFactory->connect(connectionInfo, callback);
+    d->currentConnectionProcess = remoteConnectionFactory->connect(logonData, callback);
 
     const auto showModalDialog =
         [this, dialog = d->switchServerDialog]()
@@ -1210,7 +1214,7 @@ void ConnectActionsHandler::clearConnection()
 }
 
 void ConnectActionsHandler::connectToServer(
-    core::ConnectionInfo connectionInfo,
+    core::LogonData logonData,
     ConnectionOptions options)
 {
     auto callback = d->makeSingleConnectionCallback(
@@ -1238,7 +1242,7 @@ void ConnectActionsHandler::connectToServer(
         });
 
     auto remoteConnectionFactory = qnClientCoreModule->networkModule()->connectionFactory();
-    d->currentConnectionProcess = remoteConnectionFactory->connect(connectionInfo, callback);
+    d->currentConnectionProcess = remoteConnectionFactory->connect(logonData, callback);
 }
 
 void ConnectActionsHandler::reportServerSelectionFailure()

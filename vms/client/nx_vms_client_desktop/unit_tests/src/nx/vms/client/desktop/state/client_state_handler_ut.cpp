@@ -35,7 +35,7 @@ static const SessionId kSessionId(kExampleSystemId, kExampleUserName);
 static const QString kDelegateId = "unit_test_" + QnUuid::createUuid().toSimpleString();
 static const int kNumberOfDelegates = 2;
 static const QString kRandomFilenameBase = QnUuid::createUuid().toSimpleString();
-
+static const core::LogonData kLogonData;
 
 /**
  * Some data structure, representing arbitrary stateful element.
@@ -177,8 +177,6 @@ public:
         m_processesMap = makeMockProcessesMap();
 
         m_clientStateHandler = std::make_unique<ClientStateHandler>(testDataDir());
-        m_clientStateHandler->mockImplementation(
-            nx::vms::client::core::RemoteConnectionAwareMock{});
 
         m_sharedMemoryManager = makeMockSharedMemoryManager(m_sharedMemory, m_processesMap);
         m_clientStateHandler->setSharedMemoryManager(m_sharedMemoryManager.get());
@@ -406,7 +404,7 @@ protected:
 
     QnClientRuntimeSettings* clientRuntimeSettings()
     {
-        return m_clientRuntimeSettings.get(); 
+        return m_clientRuntimeSettings.get();
     }
 
 private:
@@ -479,7 +477,7 @@ TEST_F(ClientStateHandlerTest, DISABLED_noSystemSubstate)
     randomizeCurrentSession();
     const auto lastSession = currentSession();
 
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId);
+    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
 
     // Data were not changed.
     ASSERT_EQ(currentSession(), lastSession);
@@ -492,7 +490,7 @@ TEST_F(ClientStateHandlerTest, loadSystemSubstate)
     randomizeCurrentSession();
 
     clientStateHandler()->clientStarted(kEmptyStartupParameters);
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId);
+    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
 
     for (int i = 0; i < kNumberOfDelegates; ++i)
     {
@@ -503,12 +501,12 @@ TEST_F(ClientStateHandlerTest, loadSystemSubstate)
 
 TEST_F(ClientStateHandlerTest, saveSystemSubstateOnDisconnect)
 {
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId);
+    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
     const auto lastSession = currentSession();
     clientStateHandler()->clientDisconnected();
     randomizeCurrentSession();
 
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId);
+    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
     for (int i = 0; i < kNumberOfDelegates; ++i)
     {
         ASSERT_EQ(currentSession().data[i].specific, lastSession.data[i].specific);
@@ -518,12 +516,12 @@ TEST_F(ClientStateHandlerTest, saveSystemSubstateOnDisconnect)
 TEST_F(ClientStateHandlerTest, systemSubstateIsNotSavedOnDisconnectInVideoWallMode)
 {
     clientRuntimeSettings()->setVideoWallMode(true);
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId);
+    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
     const auto lastSession = currentSession();
     clientStateHandler()->clientDisconnected();
     randomizeCurrentSession();
 
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId);
+    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
     for (int i = 0; i < kNumberOfDelegates; ++i)
     {
         ASSERT_NE(currentSession().data[i].specific, lastSession.data[i].specific);
@@ -543,7 +541,7 @@ TEST_F(ClientStateHandlerTest, loadTemporaryState)
     };
 
     clientStateHandler()->clientStarted(startupParameters);
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId);
+    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
 
     ASSERT_EQ(currentSession(), temporaryState());
     ASSERT_FALSE(QFile::exists(temporaryState().path));
@@ -551,11 +549,11 @@ TEST_F(ClientStateHandlerTest, loadTemporaryState)
 
 TEST_F(ClientStateHandlerTest, createNewWindow)
 {
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId);
+    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
 
-    clientStateHandler()->createNewWindow(false, {});
-    clientStateHandler()->createNewWindow(true, {});
-    clientStateHandler()->createNewWindow(true, {""});
+    clientStateHandler()->createNewWindow();
+    clientStateHandler()->createNewWindow(kLogonData);
+    clientStateHandler()->createNewWindow(kLogonData, {""});
     ASSERT_EQ(runningProcessesCount(), 4);
     ASSERT_EQ(runningProcessesCountBySession(kSessionId), 2); //< The current one doesn't count.
 }
@@ -567,7 +565,7 @@ TEST_F(ClientStateHandlerTest, fullRestoreOnConnect)
     givenSavedSession(1);
     randomizeCurrentSession();
 
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ true, kSessionId);
+    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ true, kSessionId, kLogonData);
 
     ASSERT_EQ(currentSession(), savedSession(0));
 
@@ -579,7 +577,7 @@ TEST_F(ClientStateHandlerTest, skipFullRestoreWhenStateIsNotSaved)
 {
     givenSystemSubstate();
 
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ true, kSessionId);
+    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ true, kSessionId, kLogonData);
 
     for (int i = 0; i < kNumberOfDelegates; ++i)
     {
@@ -593,7 +591,7 @@ TEST_F(ClientStateHandlerTest, skipFullRestoreWhenItIsDisabled)
     givenSavedSession(0);
     givenSavedSession(1);
 
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId);
+    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
 
     for (int i = 0; i < kNumberOfDelegates; ++i)
     {
@@ -608,7 +606,7 @@ TEST_F(ClientStateHandlerTest, skipFullRestoreWhenSessionIsStartedAlready)
     givenSavedSession();
 
     givenAnotherRunningInstance(kSessionId);
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ true, kSessionId);
+    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ true, kSessionId, kLogonData);
 
     for (int i = 0; i < kNumberOfDelegates; ++i)
     {
@@ -619,7 +617,7 @@ TEST_F(ClientStateHandlerTest, skipFullRestoreWhenSessionIsStartedAlready)
 TEST_F(ClientStateHandlerTest, saveWindowsConfiguration)
 {
     givenAnotherRunningInstance(kSessionId);
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ true, kSessionId);
+    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ true, kSessionId, kLogonData);
 
     clientStateHandler()->saveWindowsConfiguration();
 
@@ -633,9 +631,9 @@ TEST_F(ClientStateHandlerTest, restoreWindowsConfiguration1)
     const auto firstId = givenAnotherRunningInstance(kSessionId);
     const auto secondId = givenAnotherRunningInstance(kSessionId);
 
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId);
+    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
 
-    clientStateHandler()->restoreWindowsConfiguration();
+    clientStateHandler()->restoreWindowsConfiguration(kLogonData);
 
     ASSERT_EQ(currentSession(), savedSession(0));
     ASSERT_EQ(runningProcessesCount(), 3);
@@ -648,9 +646,9 @@ TEST_F(ClientStateHandlerTest, restoreWindowsConfiguration2)
     givenSavedSession(0);
     givenSavedSession(1);
 
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId);
+    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ false, kSessionId, kLogonData);
 
-    clientStateHandler()->restoreWindowsConfiguration();
+    clientStateHandler()->restoreWindowsConfiguration(kLogonData);
 
     ASSERT_EQ(currentSession(), savedSession(0));
     ASSERT_EQ(runningProcessesCount(), 2);
@@ -660,7 +658,7 @@ TEST_F(ClientStateHandlerTest, restoreWindowsConfiguration2)
 TEST_F(ClientStateHandlerTest, deleteWindowsConfiguration)
 {
     givenSavedSession();
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ true, kSessionId);
+    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ true, kSessionId, kLogonData);
 
     ASSERT_TRUE(clientStateHandler()->hasSavedConfiguration());
 
@@ -670,7 +668,7 @@ TEST_F(ClientStateHandlerTest, deleteWindowsConfiguration)
 
 TEST_F(ClientStateHandlerTest, requestedToSaveState)
 {
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ true, kSessionId);
+    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ true, kSessionId, kLogonData);
 
     ASSERT_FALSE(clientStateHandler()->hasSavedConfiguration());
 
@@ -681,7 +679,7 @@ TEST_F(ClientStateHandlerTest, requestedToSaveState)
 TEST_F(ClientStateHandlerTest, requestToLoadState)
 {
     givenSavedSession();
-    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ true, kSessionId);
+    clientStateHandler()->clientConnected(/*fullRestoreEnabled*/ true, kSessionId, kLogonData);
 
     clientStateHandler()->clientRequestedToRestoreState(savedSession(0).filename);
     ASSERT_EQ(currentSession(), savedSession(0));
