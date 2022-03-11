@@ -145,30 +145,30 @@ class PlayerPrivate: public Connective<QObject>
 
 public:
     // Holds QT property value.
-    Player::State state;
+    Player::State state = Player::State::Stopped;
 
     Player::AutoJumpPolicy autoJumpPolicy = Player::AutoJumpPolicy::DefaultJumpPolicy;
 
     // Holds QT property value.
-    Player::MediaStatus mediaStatus;
+    Player::MediaStatus mediaStatus = Player::MediaStatus::NoMedia;
 
     // Either media is on live or archive position. Holds QT property value.
-    bool liveMode;
+    bool liveMode = true;
 
     nx::vms::common::MediaStreamEvent lastMediaEvent =
         nx::vms::common::MediaStreamEvent::noEvent;
 
     // Video aspect ratio
-    double aspectRatio;
+    double aspectRatio = 1.0;
 
     // Auto reconnect if network error
-    bool reconnectOnPlay;
+    bool reconnectOnPlay = false;
 
     // UTC Playback position at msec. Holds QT property value.
-    qint64 positionMs;
+    qint64 positionMs = 0;
 
     // Playback speed.
-    double speed;
+    double speed = 1.0;
 
     // Video surface list to render. Holds QT property value.
     QMap<int, QAbstractVideoSurface*> videoSurfaces;
@@ -177,12 +177,12 @@ public:
     QUrl url;
 
     // Whether the current Media URL refers to a local file.
-    bool isLocalFile;
+    bool isLocalFile = false;
 
     // Resource obtained for the current Media URL.
     QnResourcePtr resource;
 
-    int maxTextureSize;
+    int maxTextureSize = kDefaultMaxTextureSize;
 
     // Main AV timer for playback.
     QElapsedTimer ptsTimer;
@@ -191,7 +191,7 @@ public:
     std::optional<qint64> lastVideoPtsMs;
 
     // Timestamp when the PTS timer was started.
-    qint64 ptsTimerBaseMs;
+    qint64 ptsTimerBaseMs = 0;
 
     // Decoded video which is awaiting to be rendered.
     QVideoFramePtr videoFrameToRender;
@@ -203,16 +203,16 @@ public:
     std::unique_ptr<PlayerDataConsumer> dataConsumer;
 
     // Timer for delayed call to presentNextFrame().
-    QTimer* execTimer;
+    QTimer* const execTimer;
 
     // Timer for miscs periodic tasks
-    QTimer* miscTimer;
+    QTimer* const miscTimer;
 
     // Last seek position. UTC time in msec.
-    qint64 lastSeekTimeMs;
+    qint64 lastSeekTimeMs = AV_NOPTS_VALUE;
 
-    // Current duration of live buffer in range [kInitialLiveBufferMs.. kMaxLiveBufferMs].
-    int liveBufferMs;
+    // Current duration of live buffer in range [kInitialBufferMs .. kMaxLiveBufferMs].
+    int liveBufferMs = kInitialBufferMs;
 
     enum class BufferState
     {
@@ -222,18 +222,18 @@ public:
     };
 
     // Live buffer state for the last frame.
-    BufferState liveBufferState;
+    BufferState liveBufferState = BufferState::NoIssue;
 
     // Live buffer underflow counter.
-    int underflowCounter;
+    int underflowCounter = 0;
 
     // Live buffer overflow counter.
-    int overflowCounter;
+    int overflowCounter = 0;
 
     // See property comment.
-    int videoQuality;
+    int videoQuality = Player::VideoQuality::HighVideoQuality;
 
-    bool allowOverlay;
+    bool allowOverlay = true;
 
     // Video geometry inside the application window.
     QRect videoGeometry;
@@ -248,7 +248,7 @@ public:
     QElapsedTimer gotDataTimer;
 
     // Turn on / turn off audio.
-    bool isAudioEnabled;
+    bool isAudioEnabled = true;
 
     RenderContextSynchronizerPtr renderContextSynchronizer;
 
@@ -256,7 +256,7 @@ public:
     QHash<MetadataType, MetadataConsumerList> m_metadataConsumerByType;
 
     // Hardware decoding has been used for the last presented frame.
-    bool isHwAccelerated;
+    bool isHwAccelerated = false;
 
     // Human-readable tag for logging and debugging purposes.
     QString tag = "MediaPlayer";
@@ -301,32 +301,16 @@ private:
     void clearCurrentFrame();
 
     void configureMetadataForReader();
+
+    void updateAudio();
 };
 
 PlayerPrivate::PlayerPrivate(Player *parent):
     base_type(parent),
     q_ptr(parent),
-    state(Player::State::Stopped),
-    mediaStatus(Player::MediaStatus::NoMedia),
-    liveMode(true),
-    aspectRatio(1.0),
-    reconnectOnPlay(false),
-    positionMs(0),
-    speed(1.0),
-    maxTextureSize(kDefaultMaxTextureSize),
-    ptsTimerBaseMs(0),
     execTimer(new QTimer(this)),
     miscTimer(new QTimer(this)),
-    lastSeekTimeMs(AV_NOPTS_VALUE),
-    liveBufferMs(kInitialBufferMs),
-    liveBufferState(BufferState::NoIssue),
-    underflowCounter(0),
-    overflowCounter(0),
-    videoQuality(Player::HighVideoQuality),
-    allowOverlay(true),
-    isAudioEnabled(true),
-    renderContextSynchronizer(VideoDecoderRegistry::instance()->defaultRenderContextSynchronizer()),
-    isHwAccelerated(false)
+    renderContextSynchronizer(VideoDecoderRegistry::instance()->defaultRenderContextSynchronizer())
 {
     connect(execTimer, &QTimer::timeout, this, &PlayerPrivate::presentNextFrame);
     execTimer->setSingleShot(true);
@@ -842,8 +826,8 @@ bool PlayerPrivate::initDataProvider()
 
     dataConsumer.reset(new PlayerDataConsumer(archiveReader, renderContextSynchronizer));
     dataConsumer->setPlaySpeed(speed);
-    dataConsumer->setAudioEnabled(isAudioEnabled && speed <= 2);
     dataConsumer->setAllowOverlay(allowOverlay);
+    updateAudio();
 
     dataConsumer->setVideoGeometryAccessor(
         [guardedThis = QPointer<PlayerPrivate>(this)]()
@@ -930,6 +914,16 @@ void PlayerPrivate::configureMetadataForReader()
     filter.setFlag(StreamDataFilter::motion, hasMotionConsumer);
     filter.setFlag(StreamDataFilter::objects, hasAnalyticsConsumer);
     archiveReader->setStreamDataFilter(filter);
+}
+
+void PlayerPrivate::updateAudio()
+{
+    if (dataConsumer)
+    {
+        dataConsumer->setAudioEnabled(isAudioEnabled
+            && speed <= 2
+            && state == Player::State::Playing);
+    }
 }
 
 void PlayerPrivate::at_gotMetadata(const QnAbstractCompressedMetadataPtr& metadata)
@@ -1065,7 +1059,7 @@ void Player::setSpeed(double value)
     if (d->dataConsumer)
     {
         d->dataConsumer->setPlaySpeed(value);
-        d->dataConsumer->setAudioEnabled(value > 2 ? false : d->isAudioEnabled);
+        d->updateAudio();
     }
 
     emit speedChanged();
@@ -1110,7 +1104,7 @@ void Player::play()
 
     d->setState(State::Playing);
     d->setMediaStatus(MediaStatus::Loading);
-    d->dataConsumer->setAudioEnabled(d->isAudioEnabled && d->speed <= 2);
+    d->updateAudio();
 
     d->lastVideoPtsMs.reset();
     d->at_hurryUp(); //< renew receiving frames
@@ -1125,8 +1119,7 @@ void Player::pause()
     d->log("pause()");
     d->setState(State::Paused);
     d->execTimer->stop(); //< stop next frame displaying
-    if (d->dataConsumer)
-        d->dataConsumer->setAudioEnabled(false);
+    d->updateAudio();
 }
 
 void Player::preview()
@@ -1138,7 +1131,7 @@ void Player::preview()
         return;
 
     d->setState(State::Previewing);
-    d->dataConsumer->setAudioEnabled(false);
+    d->updateAudio();
 }
 
 void Player::stop()
@@ -1258,8 +1251,7 @@ void Player::setAudioEnabled(bool value)
     if (d->isAudioEnabled != value)
     {
         d->isAudioEnabled = value;
-        if (d->dataConsumer)
-            d->dataConsumer->setAudioEnabled(value);
+        d->updateAudio();
         emit audioEnabledChanged();
     }
 }

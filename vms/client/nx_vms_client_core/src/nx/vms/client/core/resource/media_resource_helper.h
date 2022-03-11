@@ -30,6 +30,7 @@ class MediaResourceHelper: public ResourceHelper
         NOTIFY analogCameraWithoutLicenseChanged)
     Q_PROPERTY(bool isVirtualCamera READ isVirtualCamera NOTIFY virtualCameraChanged)
     Q_PROPERTY(bool audioSupported READ audioSupported NOTIFY audioSupportedChanged)
+    Q_PROPERTY(bool audioEnabled READ audioEnabled NOTIFY audioEnabledChanged)
     Q_PROPERTY(int livePreviewVideoQuality READ livePreviewVideoQuality
         NOTIFY livePreviewVideoQualityChanged)
 
@@ -50,6 +51,7 @@ public:
     Q_INVOKABLE QPoint channelPosition(int channel) const;
     bool isVirtualCamera() const;
     bool audioSupported() const;
+    bool audioEnabled() const;
     MediaPlayer::VideoQuality livePreviewVideoQuality() const;
 
 signals:
@@ -62,6 +64,7 @@ signals:
     void analogCameraWithoutLicenseChanged();
     void virtualCameraChanged();
     void audioSupportedChanged();
+    void audioEnabledChanged();
     void livePreviewVideoQualityChanged();
 
 private:
