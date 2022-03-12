@@ -89,7 +89,8 @@ CameraWebPageWidget::Private::Private(CameraWebPageWidget* parent):
             if (!camera || camera->getStatus() == nx::vms::api::ResourceStatus::unauthorized)
                 return std::nullopt;
 
-            return WebViewController::Credentials(credentials.login(), credentials.password());
+            // Camera password on the client is masked, so just provide login for password dialog.
+            return WebViewController::Credentials{credentials.login()};
         });
 
     // We don't have any info about cameras certificates right now.
