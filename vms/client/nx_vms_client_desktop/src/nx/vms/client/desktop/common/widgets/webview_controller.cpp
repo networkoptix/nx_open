@@ -902,6 +902,7 @@ void WebViewController::requestAuthenticationDialog(QObject* request)
     };
 
     std::optional<Credentials> credentials;
+    bool requestUserInput = true;
 
     QString text;
     if (request->property("type").toInt() == AuthenticationTypeProxy)
@@ -915,22 +916,26 @@ void WebViewController::requestAuthenticationDialog(QObject* request)
         if (d->authCallback)
             credentials = d->authCallback(url);
 
-        if (!credentials)
+        requestUserInput = !credentials || credentials->password.isNull();
+        if (requestUserInput)
             text = url.toString(QUrl::RemovePassword | QUrl::RemovePath);
     }
 
     // We didn't get credentials from authorization callback, so just show a dialog to the user.
-    if (!credentials)
+    if (requestUserInput)
     {
         PasswordDialog dialog(d->widget());
         dialog.setText(text);
+        if (credentials)
+            dialog.setUsername(credentials->username);
+
         if (dialog.exec() != QDialog::Accepted)
         {
             QMetaObject::invokeMethod(request, "dialogReject");
             return;
         }
 
-        credentials = Credentials(dialog.username(), dialog.password());
+        credentials = Credentials{dialog.username(), dialog.password()};
     }
 
     QMetaObject::invokeMethod(
