@@ -31,13 +31,8 @@ public:
     /** Credentials for web page authentication. */
     struct Credentials
     {
-        QString username;
-        QString password;
-
-        Credentials(const QString& username, const QString& password):
-            username(username),
-            password(password)
-        {}
+        QString username = {};
+        QString password = {};
     };
 
     // Should be mapped to non-public QQuickWebEngineView::LoadStatus.

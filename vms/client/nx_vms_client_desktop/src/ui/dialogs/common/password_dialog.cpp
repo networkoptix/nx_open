@@ -49,6 +49,20 @@ void PasswordDialog::setText(const QString& text)
     ui->textLabel->setText(text);
 }
 
+void PasswordDialog::setUsername(const QString& username, bool updateFocus)
+{
+    ui->usernameLineEdit->setText(username);
+
+    if (!updateFocus)
+        return;
+
+    // Focus the password input when username is not empty.
+    if (username.isEmpty())
+        ui->usernameLineEdit->setFocus(Qt::OtherFocusReason);
+    else
+        ui->passwordLineEdit->setFocus(Qt::OtherFocusReason);
+}
+
 QString PasswordDialog::username() const
 {
     return ui->usernameLineEdit->text();

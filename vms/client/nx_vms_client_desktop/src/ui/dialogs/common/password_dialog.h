@@ -30,6 +30,8 @@ public:
     QString text() const;
     void setText(const QString& text);
 
+    void setUsername(const QString& username, bool updateFocus = true);
+
     QString username() const;
     QString password() const;
 
