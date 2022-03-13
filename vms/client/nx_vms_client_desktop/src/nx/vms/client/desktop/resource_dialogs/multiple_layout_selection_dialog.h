@@ -11,28 +11,23 @@ namespace Ui { class MultipleLayoutSelectionDialog; }
 
 namespace nx::vms::client::desktop {
 
+class ResourceSelectionWidget;
+
 class MultipleLayoutSelectionDialog: public QnSessionAwareButtonBoxDialog
 {
     Q_OBJECT
     using base_type = QnSessionAwareButtonBoxDialog;
 
 public:
-    static bool selectLayouts(
-        QnUuidSet& selectedLayouts,
-        QWidget* parent);
+    static bool selectLayouts(QnUuidSet& selectedLayoutsIds, QWidget* parent);
 
 private:
-    MultipleLayoutSelectionDialog(
-        const QnUuidSet& selectedLayouts,
-        QWidget* parent = nullptr);
-
+    MultipleLayoutSelectionDialog(const QnUuidSet& selectedLayoutsIds, QWidget* parent = nullptr);
     virtual ~MultipleLayoutSelectionDialog() override;
 
 private:
-    struct Private;
-    const std::unique_ptr<Private> d;
     const std::unique_ptr<Ui::MultipleLayoutSelectionDialog> ui;
+    ResourceSelectionWidget* m_resourceSelectionWidget;
 };
 
 } // namespace nx::vms::client::desktop
-
