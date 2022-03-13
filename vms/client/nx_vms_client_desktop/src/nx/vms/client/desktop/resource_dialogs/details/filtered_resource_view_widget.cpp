@@ -432,8 +432,8 @@ void FilteredResourceViewWidget::makeRequiredItemsVisible() const
 
     QSet<QModelIndex> indexesToExpand;
 
-    const auto leafItemIndexes = item_model::getLeafIndexes(treeView()->model());
-    for (const auto& index: leafItemIndexes)
+    const auto allIndexes = item_model::getAllIndexes(treeView()->model());
+    for (const auto& index: allIndexes)
     {
         if (!m_visibleItemPredicate(index))
             continue;
