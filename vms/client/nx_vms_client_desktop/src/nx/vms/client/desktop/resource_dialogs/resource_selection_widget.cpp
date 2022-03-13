@@ -167,7 +167,7 @@ ResourceSelectionWidget::ResourceSelectionWidget(
         new CheckBoxColumnItemDelegate(this));
 
     resourceViewWidget()->setVisibleItemPredicate(
-        [](const QModelIndex& index)
+        [checkboxColumn](const QModelIndex& index)
         {
             if (const auto parentIndex = index.parent(); parentIndex.isValid())
             {
@@ -177,7 +177,8 @@ ResourceSelectionWidget::ResourceSelectionWidget(
                     return true;
             }
 
-            const auto checkStateData = index.data(Qt::CheckStateRole);
+            const auto checkStateData =
+                index.siblingAtColumn(checkboxColumn).data(Qt::CheckStateRole);
             return !checkStateData.isNull()
                 && checkStateData.value<Qt::CheckState>() == Qt::Checked;
         });
