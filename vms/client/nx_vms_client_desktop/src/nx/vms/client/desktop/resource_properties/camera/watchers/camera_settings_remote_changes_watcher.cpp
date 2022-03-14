@@ -95,6 +95,8 @@ private:
             store->handleMotionStreamChanged(cameras);
         else if (key == ResourcePropertyKey::kForcedMotionDetectionKey)
             store->handleMotionForcedChanged(cameras);
+        else if (key == ResourcePropertyKey::kMediaCapabilities)
+            store->handleMediaCapabilitiesChanged(cameras);
     }
 
     void handleStatusChanged(const QnResourcePtr& /*resource*/, Qn::StatusChangeReason /*reason*/)
