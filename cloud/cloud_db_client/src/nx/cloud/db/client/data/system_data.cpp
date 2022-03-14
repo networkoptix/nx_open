@@ -184,6 +184,7 @@ MAKE_FIELD_NAME_STR_CONST(SystemAttributesUpdate, name)
 MAKE_FIELD_NAME_STR_CONST(SystemAttributesUpdate, opaque)
 MAKE_FIELD_NAME_STR_CONST(SystemAttributesUpdate, system2faEnabled)
 MAKE_FIELD_NAME_STR_CONST(SystemAttributesUpdate, totp)
+MAKE_FIELD_NAME_STR_CONST(SystemAttributesUpdate, mfaCode)
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemAttributesUpdate* const data)
 {
@@ -193,6 +194,9 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, SystemAttributesUpdate* const d
     if (urlQuery.hasQueryItem(SystemAttributesUpdate_totp_field))
         data->totp =
             urlQuery.queryItemValue(SystemAttributesUpdate_totp_field).toStdString();
+    if (urlQuery.hasQueryItem(SystemAttributesUpdate_mfaCode_field))
+        data->mfaCode =
+            urlQuery.queryItemValue(SystemAttributesUpdate_mfaCode_field).toStdString();
 
     return url::deserializeField(urlQuery, SystemAttributesUpdate_systemId_field, &data->systemId)
         && url::deserializeField(urlQuery, SystemAttributesUpdate_name_field, &data->name)
@@ -209,6 +213,7 @@ void serializeToUrlQuery(const SystemAttributesUpdate& data, QUrlQuery* const ur
             QString::number(*data.system2faEnabled));
     url::serializeField(urlQuery, SystemAttributesUpdate_opaque_field, data.opaque);
     url::serializeField(urlQuery, SystemAttributesUpdate_totp_field, data.totp);
+    url::serializeField(urlQuery, SystemAttributesUpdate_mfaCode_field, data.mfaCode);
 }
 
 void serialize(QnJsonContext*, const SystemAttributesUpdate& data, QJsonValue* jsonValue)
@@ -244,6 +249,12 @@ void serialize(QnJsonContext*, const SystemAttributesUpdate& data, QJsonValue* j
         jsonObject.insert(SystemAttributesUpdate_totp_field, QString::fromStdString(*data.totp));
     }
 
+    if (data.mfaCode)
+    {
+        jsonObject.insert(
+            SystemAttributesUpdate_mfaCode_field, QString::fromStdString(*data.mfaCode));
+    }
+
     *jsonValue = jsonObject;
 }
 
@@ -270,6 +281,9 @@ bool deserialize(QnJsonContext*, const QJsonValue& value, SystemAttributesUpdate
     auto totpIter = map.find(SystemAttributesUpdate_totp_field);
     if (totpIter != map.constEnd())
         data->totp = totpIter.value().toString().toStdString();
+    auto mfaCodeIter = map.find(SystemAttributesUpdate_mfaCode_field);
+    if (mfaCodeIter != map.constEnd())
+        data->mfaCode = mfaCodeIter.value().toString().toStdString();
 
     return data->name || data->opaque;
 }

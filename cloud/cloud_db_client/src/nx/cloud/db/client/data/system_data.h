@@ -91,7 +91,7 @@ void serializeToUrlQuery(const SystemAttributesUpdate& data, QUrlQuery* const ur
 void serialize(QnJsonContext*, const SystemAttributesUpdate&, QJsonValue*);
 bool deserialize(QnJsonContext*, const QJsonValue&, SystemAttributesUpdate*);
 
-#define SystemAttributesUpdate_Fields (systemId)(name)(opaque)(system2faEnabled)(totp)
+#define SystemAttributesUpdate_Fields (systemId)(name)(opaque)(system2faEnabled)(totp)(mfaCode)
 
 NX_REFLECTION_INSTRUMENT(SystemAttributesUpdate, SystemAttributesUpdate_Fields)
 

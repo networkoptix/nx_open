@@ -97,6 +97,7 @@ MAKE_FIELD_NAME_STR_CONST(AccountUpdateData, currentPassword)
 MAKE_FIELD_NAME_STR_CONST(AccountUpdateData, fullName)
 MAKE_FIELD_NAME_STR_CONST(AccountUpdateData, customization)
 MAKE_FIELD_NAME_STR_CONST(AccountUpdateData, totp)
+MAKE_FIELD_NAME_STR_CONST(AccountUpdateData, mfaCode)
 
 bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountUpdateData* const data)
 {
@@ -112,6 +113,8 @@ bool loadFromUrlQuery(const QUrlQuery& urlQuery, AccountUpdateData* const data)
         urlQuery, AccountUpdateData_customization_field, &data->customization);
     url::deserializeField(
         urlQuery, AccountUpdateData_totp_field, &data->totp);
+    url::deserializeField(
+        urlQuery, AccountUpdateData_mfaCode_field, &data->mfaCode);
     return true;
 }
 
@@ -129,6 +132,8 @@ void serializeToUrlQuery(const AccountUpdateData& data, QUrlQuery* const urlQuer
         urlQuery, AccountUpdateData_customization_field, data.customization);
     url::serializeField(
         urlQuery, AccountUpdateData_totp_field, data.totp);
+    url::serializeField(
+        urlQuery, AccountUpdateData_mfaCode_field, data.mfaCode);
 }
 
 void serialize(QnJsonContext*, const AccountUpdateData& data, QJsonValue* jsonValue)
@@ -158,6 +163,11 @@ void serialize(QnJsonContext*, const AccountUpdateData& data, QJsonValue* jsonVa
     {
         jsonObject.insert(AccountUpdateData_totp_field,
             QString::fromStdString(*data.totp));
+    }
+
+    if (data.mfaCode)
+    {
+        jsonObject.insert(AccountUpdateData_mfaCode_field, QString::fromStdString(*data.mfaCode));
     }
 
     if (data.fullName)
@@ -198,6 +208,10 @@ bool deserialize(QnJsonContext*, const QJsonValue& value, AccountUpdateData* dat
     auto totpIter = map.find(AccountUpdateData_totp_field);
     if (totpIter != map.constEnd())
         data->totp = totpIter.value().toString().toStdString();
+
+    auto mfaCodeIter = map.find(AccountUpdateData_mfaCode_field);
+    if (mfaCodeIter != map.constEnd())
+        data->mfaCode = totpIter.value().toString().toStdString();
 
     auto fullNameIter = map.find(AccountUpdateData_fullName_field);
     if (fullNameIter != map.constEnd())
