@@ -1491,6 +1491,9 @@ State CameraSettingsDialogStateReducer::handleStatusChanged(
     NX_VERBOSE(NX_SCOPE_TAG, "%1 for cameras %2", __func__, cameras);
 
     state.devicesDescription.hasMotion = combinedValue(cameras, &hasMotion);
+    if (!state.isPageVisible(state.selectedTab)) //< Motion tab can become hidden.
+        state.selectedTab = CameraSettingsTab::general;
+
     fetchFromCameras<ScheduleTasks>(state.recording.schedule, cameras,
         [](const auto& camera)
         {
@@ -1498,6 +1501,16 @@ State CameraSettingsDialogStateReducer::handleStatusChanged(
         });
     state = handleStreamParametersChange(std::move(state));
 
+    return state;
+}
+
+State CameraSettingsDialogStateReducer::handleMediaCapabilitiesChanged(
+    State state,
+    const QnVirtualCameraResourceList& cameras)
+{
+    NX_VERBOSE(NX_SCOPE_TAG, "%1 for cameras %2", __func__, cameras);
+
+    state = handleMotionStreamChanged(std::move(state), cameras);
     return state;
 }
 
