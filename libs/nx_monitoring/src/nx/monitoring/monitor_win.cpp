@@ -373,18 +373,17 @@ QList<nx::monitoring::ActivityMonitor::NetworkLoad> WindowsMonitor::totalNetwork
 
 int WindowsMonitor::thisProcessThreads()
 {
-    const auto pid = GetCurrentProcessId();
-    const auto handle = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
-    if (handle == INVALID_HANDLE_VALUE)
-        return 0;
+    const auto currentProcessId = GetCurrentProcessId();
+    const auto snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    PROCESSENTRY32 entry = {};
 
-    THREADENTRY32 entry{sizeof(THREADENTRY32)};
-    int counter = 0;
-    for (auto rez = Thread32First(handle, &entry); rez; rez = Thread32Next(handle, &entry))
-        counter += entry.th32OwnerProcessID == pid ? 1 : 0;
+    entry.dwSize = sizeof(entry);
+    auto isOk = Process32First(snapshot, &entry);
+    while (isOk && entry.th32ProcessID != currentProcessId)
+        isOk = Process32Next(snapshot, &entry);
+    CloseHandle(snapshot);
 
-    CloseHandle(handle);
-    return counter;
+    return isOk ? entry.cntThreads : 0;
 }
 
 quint64 WindowsMonitor::thisProcessRamUsageBytes()
