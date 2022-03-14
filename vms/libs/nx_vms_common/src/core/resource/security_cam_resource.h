@@ -590,6 +590,7 @@ signals:
     void audioOutputDeviceIdChanged(const QnResourcePtr& resource);
     void backupContentTypeChanged(const QnResourcePtr& resource);
     void backupPolicyChanged(const QnResourcePtr& resource);
+    void mediaCapabilitiesChanged(const QnSecurityCamResourcePtr& camera);
     void dataAccessIdChanged(const QnSecurityCamResourcePtr& resource);
 
     void networkIssue(const QnResourcePtr&, qint64 timeStamp, nx::vms::api::EventReason reasonCode, const QString& reasonParamsEncoded);

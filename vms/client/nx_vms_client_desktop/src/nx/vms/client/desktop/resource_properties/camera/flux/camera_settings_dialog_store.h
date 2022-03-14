@@ -80,6 +80,9 @@ public:
     /** Status of one of the cameras was changed. */
     void handleStatusChanged(const QnVirtualCameraResourceList& cameras);
 
+    /** Media capabilities were changed on one of the cameras. */
+    void handleMediaCapabilitiesChanged(const QnVirtualCameraResourceList& cameras);
+
     void updatePtzSettings(const QnVirtualCameraResourceList& cameras);
     void setReadOnly(bool value);
     void setSelectedTab(CameraSettingsTab value);

@@ -229,6 +229,11 @@ QnSecurityCamResource::QnSecurityCamResource():
             {
                 emit rotationChanged();
             }
+            else if (key == ResourcePropertyKey::kMediaCapabilities)
+            {
+                m_cachedCameraMediaCapabilities.reset();
+                emit mediaCapabilitiesChanged(toSharedPointer(this));
+            }
         });
 
     QnMediaResource::initMediaResource();

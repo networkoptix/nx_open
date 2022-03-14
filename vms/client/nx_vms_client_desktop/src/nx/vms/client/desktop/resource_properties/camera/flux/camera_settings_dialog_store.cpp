@@ -169,6 +169,16 @@ void CameraSettingsDialogStore::handleStatusChanged(const QnVirtualCameraResourc
         [&](State state) { return Reducer::handleStatusChanged(std::move(state), cameras); });
 }
 
+void CameraSettingsDialogStore::handleMediaCapabilitiesChanged(
+    const QnVirtualCameraResourceList& cameras)
+{
+    d->executeAction(
+        [&](State state)
+        {
+            return Reducer::handleMediaCapabilitiesChanged(std::move(state), cameras);
+        });
+}
+
 void CameraSettingsDialogStore::updatePtzSettings(const QnVirtualCameraResourceList& cameras)
 {
     d->executeAction(
