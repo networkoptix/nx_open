@@ -129,7 +129,7 @@ if(enableCoverage)
     elseif(CMAKE_CXX_COMPILER_ID MATCHES "GNU")
         add_compile_options(--coverage)
         add_link_options(--coverage)
-    elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+    elseif(MSVC)
         add_link_options(/Profile)
     endif()
 endif()
@@ -138,6 +138,8 @@ if(WINDOWS)
     add_definitions(
         -D_CRT_RAND_S
         -D_WINSOCKAPI_=
+        -DNOMINMAX=
+        -DUNICODE
     )
 endif()
 
@@ -153,7 +155,7 @@ if(targetDevice STREQUAL "edge1")
     set(enableSpeechSynthesizer "false")
 endif()
 
-if(WINDOWS)
+if(MSVC)
     set(API_IMPORT_MACRO "__declspec(dllimport)")
     set(API_EXPORT_MACRO "__declspec(dllexport)")
 else()
@@ -198,11 +200,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     endif()
 endif()
 
-if(WINDOWS)
-    add_definitions(
-        -DNOMINMAX=
-        -DUNICODE)
-
+if(MSVC)
     add_compile_options(
         /MP
         /bigobj
