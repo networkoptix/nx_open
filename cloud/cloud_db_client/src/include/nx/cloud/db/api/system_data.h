@@ -43,8 +43,16 @@ struct SystemAttributesUpdate
      */
     std::optional<bool> system2faEnabled = std::nullopt;
 
-    /**%apidoc A correct users totp key. Required only if changing system2faEnabled setting. */
-    std::optional<std::string> totp = std::nullopt;
+    /**%apidoc
+     * %deprecated Replaced by `mfaCode` attribute.
+     * One-time password from the authenticator app.
+     */
+    std::optional<std::string> totp = std::nullopt;;
+
+    /**%apidoc One-time password from the authenicator app.
+     * Required and MUST be valid if changing system2faEnabled setting.
+     */
+    std::optional<std::string> mfaCode = std::nullopt;
 };
 
 enum class SystemStatus

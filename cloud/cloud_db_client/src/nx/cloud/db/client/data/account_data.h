@@ -81,7 +81,7 @@ void serialize(QnJsonContext*, const AccountUpdateData&, QJsonValue*);
 bool deserialize(QnJsonContext*, const QJsonValue&, AccountUpdateData*);
 
 #define AccountUpdateData_Fields \
-    (passwordHa1)(password)(fullName)(customization)(currentPassword)(totp)
+    (passwordHa1)(password)(fullName)(customization)(currentPassword)(totp)(mfaCode)
 
 NX_REFLECTION_INSTRUMENT(AccountUpdateData, AccountUpdateData_Fields)
 
@@ -128,7 +128,7 @@ QN_FUSION_DECLARE_FUNCTIONS(AccountSecuritySettings, (json))
 
 #define AccountSecuritySettings_Fields \
     (httpDigestAuthEnabled)(password)(account2faEnabled)(totp)(totpExistsForAccount)\
-    (authSessionLifetime)
+    (authSessionLifetime)(mfaCode)
 
 NX_REFLECTION_INSTRUMENT(AccountSecuritySettings, AccountSecuritySettings_Fields)
 

@@ -126,8 +126,14 @@ struct AccountUpdateData
      */
     std::optional<std::string> passwordHa1;
 
-    /**%apidoc One-time password from the authenticator app. */
+    /**%apidoc
+     * %deprecated Replaced by `mfaCode` attribute.
+     * One-time password from the authenticator app.
+     */
     std::optional<std::string> totp;
+
+    /**%apidoc One-time password from the authenicator app or any other source. */
+    std::optional<std::string> mfaCode;
 };
 
 // Holder structure to send just email in a response.
@@ -200,10 +206,16 @@ struct AccountSecuritySettings
      */
     std::optional<bool> account2faEnabled;
 
+    /**%apidoc
+     * %deprecated Replaced by `mfaCode` attribute.
+     * One-time password from the authenticator app.
+     */
+    std::optional<std::string> totp;
+
     /**%apidoc One-time password from the authenicator app.
      * Required and MUST be valid if account2faEnabled is specified.
      */
-    std::optional<std::string> totp;
+    std::optional<std::string> mfaCode;
 
     /**%apidoc Account password. Always required except updating 2fa settings. */
     std::optional<std::string> password;
