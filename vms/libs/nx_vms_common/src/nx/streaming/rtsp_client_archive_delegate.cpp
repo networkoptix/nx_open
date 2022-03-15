@@ -1,11 +1,10 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-
 #include "rtsp_client_archive_delegate.h"
 
+#include <QtConcurrent/QtConcurrentFilter>
 #include <QtCore/QBuffer>
 #include <QtCore/QUrl>
-
 #include <QtNetwork/QNetworkCookie>
 
 extern "C"
@@ -14,30 +13,27 @@ extern "C"
 #include <libavcodec/avcodec.h>
 }
 
+#include <api/global_settings.h>
 #include <api/network_proxy_factory.h>
-
 #include <common/common_module.h>
-
-#include <core/resource_management/resource_pool.h>
-#include <core/resource/camera_resource.h>
 #include <core/resource/camera_history.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource/resource_media_layout.h>
-#include <utils/common/util.h>
+#include <core/resource_management/resource_pool.h>
+#include <nx/network/http/custom_headers.h>
+#include <nx/reflect/string_conversion.h>
+#include <nx/streaming/archive_stream_reader.h>
+#include <nx/streaming/av_codec_media_context.h>
+#include <nx/streaming/media_data_packet.h>
+#include <nx/streaming/rtp/parsers/nx_rtp_parser.h>
+#include <nx/streaming/rtp/rtp.h>
+#include <nx/streaming/rtsp_client.h>
+#include <nx/utils/suppress_exceptions.h>
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
+#include <utils/common/util.h>
 #include <utils/media/av_codec_helper.h>
-#include <QtConcurrent/QtConcurrentFilter>
-#include <nx/network/http/custom_headers.h>
-
-#include <nx/streaming/rtp/rtp.h>
-#include <nx/streaming/archive_stream_reader.h>
-#include <nx/streaming/rtsp_client.h>
-#include <nx/streaming/rtp/parsers/nx_rtp_parser.h>
-#include <nx/streaming/media_data_packet.h>
-#include <nx/streaming/av_codec_media_context.h>
-#include <nx/reflect/string_conversion.h>
-#include <api/global_settings.h>
 
 static const int MAX_RTP_BUFFER_SIZE = 65536;
 static const int REOPEN_TIMEOUT = 1000;
@@ -214,13 +210,15 @@ QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getNextMediaServerFromTime
         &m_serverTimePeriod);
 }
 
-QString QnRtspClientArchiveDelegate::getUrl(const QnSecurityCamResourcePtr &camera, const QnMediaServerResourcePtr &_server) const {
+namespace {
+
+QString getUrl(const QnSecurityCamResourcePtr& camera, const QnMediaServerResourcePtr& _server)
+{
     // if camera is null we can't get its parent in any case
-    QnMediaServerResourcePtr server = (_server || (!camera))
-        ? _server
-        : camera->getParentServer();
+    auto server = (_server || (!camera)) ? _server : camera->getParentServer();
     if (!server)
         return QString();
+
     QString url = server->rtspUrl() + QLatin1Char('/');
     if (camera)
         url += camera->getPhysicalId();
@@ -231,24 +229,40 @@ QString QnRtspClientArchiveDelegate::getUrl(const QnSecurityCamResourcePtr &came
 
 struct ArchiveTimeCheckInfo
 {
-    ArchiveTimeCheckInfo(): owner(0), result(0) {}
-    ArchiveTimeCheckInfo(const QnSecurityCamResourcePtr& camera, const QnMediaServerResourcePtr& server, QnRtspClientArchiveDelegate* owner, qint64* result):
-        camera(camera), server(server), owner(owner), result(result) {}
+    ArchiveTimeCheckInfo(
+        const QnSecurityCamResourcePtr& camera,
+        const QnMediaServerResourcePtr& server,
+        qint64* result)
+        :
+        camera(camera),
+        server(server),
+        result(result)
+    {
+    }
+
     QnSecurityCamResourcePtr camera;
     QnMediaServerResourcePtr server;
-    QnRtspClientArchiveDelegate* owner;
-    qint64* result;
+    qint64* result = nullptr;
 };
 
-void QnRtspClientArchiveDelegate::checkGlobalTimeAsync(const QnSecurityCamResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64* result)
-{
-    QnRtspClient otherRtspSession(
-        QnRtspClient::Config{/*shouldGuessAuthDigest*/ true, /*backChannelAudioOnly*/ false});
-    QnRtspClientArchiveDelegate::setupRtspSession(camera, server,  &otherRtspSession);
-    if (otherRtspSession.open(QnRtspClientArchiveDelegate::getUrl(camera, server)).errorCode != CameraDiagnostics::ErrorCode::noError)
-        return;
+} // namespace
 
-    qint64 startTime = otherRtspSession.startTime();
+void QnRtspClientArchiveDelegate::checkGlobalTimeAsync(
+    const QnSecurityCamResourcePtr& camera, const QnMediaServerResourcePtr& server, qint64* result)
+{
+    QnRtspClient client(
+        QnRtspClient::Config{/*shouldGuessAuthDigest*/ true, /*backChannelAudioOnly*/ false});
+    QnRtspClientArchiveDelegate::setupRtspSession(camera, server, &client);
+    const auto url = getUrl(camera, server);
+    const auto error = client.open(url).errorCode;
+    if (error != CameraDiagnostics::ErrorCode::noError)
+    {
+        NX_DEBUG(this, "%1(%2, %3) failed to open RTSP session to %4 with error %5",
+            __func__, camera, server, url, error);
+        return;
+    }
+
+    qint64 startTime = client.startTime();
     if (startTime != qint64(AV_NOPTS_VALUE) && startTime != DATETIME_NOW)
     {
         if (startTime < *result || *result == qint64(AV_NOPTS_VALUE))
@@ -277,15 +291,25 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnSecurityCa
     }
 
     QList<ArchiveTimeCheckInfo> checkList;
-    qint64 currentMinTime  = qint64(AV_NOPTS_VALUE);
-    qint64 otherMinTime  = qint64(AV_NOPTS_VALUE);
-    for (const auto &server: mediaServerList)
-        checkList << ArchiveTimeCheckInfo(camera, server, this, server == m_server ? &currentMinTime : &otherMinTime);
-    QtConcurrent::blockingFilter(checkList, [](const ArchiveTimeCheckInfo& checkInfo)
+    qint64 currentMinTime = qint64(AV_NOPTS_VALUE);
+    qint64 otherMinTime = qint64(AV_NOPTS_VALUE);
+    for (const auto& server: mediaServerList)
     {
-            checkInfo.owner->checkGlobalTimeAsync(checkInfo.camera, checkInfo.server, checkInfo.result);
+        checkList << ArchiveTimeCheckInfo(
+            camera, server, server == m_server ? &currentMinTime : &otherMinTime);
+    }
+    QtConcurrent::blockingFilter(checkList, nx::suppressExceptions(
+        [this](const ArchiveTimeCheckInfo& checkInfo)
+        {
+            checkGlobalTimeAsync(checkInfo.camera, checkInfo.server, checkInfo.result);
             return true;
-    });
+        },
+        this,
+        [](auto item)
+        {
+            return NX_FMT("checkGlobalTimeAsync(%1, %2) opening RTSP session to %3",
+                item.camera, item.server, nx::suppressExceptions(&getUrl)(item.camera, item.server));
+        }));
     if ((otherMinTime != qint64(AV_NOPTS_VALUE)) && (currentMinTime == qint64(AV_NOPTS_VALUE) || otherMinTime < currentMinTime))
         m_globalMinArchiveTime = otherMinTime;
     else

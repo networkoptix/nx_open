@@ -5,7 +5,6 @@
 #include <sstream>
 #include <memory>
 
-#include <QtConcurrent/QtConcurrentMap>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QElapsedTimer>
 #include <QtCore/QStringList>
