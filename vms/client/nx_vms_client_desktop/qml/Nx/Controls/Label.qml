@@ -4,6 +4,8 @@ import QtQuick 2.6
 
 import Nx 1.0
 
+import nx.vms.client.desktop 1.0
+
 Text
 {
     color: ColorTheme.windowText
@@ -15,5 +17,8 @@ Text
         anchors.fill: parent
         cursorShape: parent.hoveredLink ? Qt.PointingHandCursor : Qt.ArrowCursor
         acceptedButtons: Qt.NoButton
+        hoverEnabled: true
+        CursorOverride.shape: cursorShape
+        CursorOverride.active: containsMouse
     }
 }

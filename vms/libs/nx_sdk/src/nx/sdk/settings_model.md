@@ -267,6 +267,25 @@ Boolean data field, alternative visual representation.
     "switch1": true
 
 ---------------------------------------------------------------------------------------------------
+## Link
+
+A clickable hyperlink.
+
+[proprietary]
+
+![](doc/images/link.png)
+
+[/proprietary]
+
+### Setting Model
+
+    {
+        "type": "Link",
+        "caption": "Customer Support",
+        "url": "https://example.com/"
+    }
+
+---------------------------------------------------------------------------------------------------
 ## PolygonFigure
 
 Polygon figure field. Supports maximum points limitation.
