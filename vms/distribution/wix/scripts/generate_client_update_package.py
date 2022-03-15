@@ -43,9 +43,6 @@ qt_plugins = [
     'imageformats/qgif.dll',
     'imageformats/qjpeg.dll',
     'imageformats/qtiff.dll',
-    'mediaservice/dsengine.dll',
-    'mediaservice/qtmedia_audioengine.dll',
-    'audio/qtaudio_windows.dll',
     'platforms/qwindows.dll']
 
 nx_libraries = [

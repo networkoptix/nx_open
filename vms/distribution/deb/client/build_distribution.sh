@@ -260,7 +260,6 @@ copyQtPlugins()
     local QT_PLUGINS=(
         platforminputcontexts
         imageformats
-        mediaservice
         xcbglintegrations
         platforms
     )

@@ -88,8 +88,6 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/qml
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/plugins/imageformats
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/plugins/platforms
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/plugins/audio
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/plugins/mediaservice
 
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${QT_DIR}/qml ${CMAKE_BINARY_DIR}/bin/qml
@@ -97,10 +95,6 @@ add_custom_command(
         ${QT_DIR}/plugins/imageformats ${CMAKE_BINARY_DIR}/bin/imageformats
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${QT_DIR}/plugins/platforms ${CMAKE_BINARY_DIR}/bin/platforms
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${QT_DIR}/plugins/audio ${CMAKE_BINARY_DIR}/bin/audio
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${QT_DIR}/plugins/mediaservice ${CMAKE_BINARY_DIR}/bin/mediaservice
     COMMAND ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_BINARY_DIR}/${launcher.version.file} ${CMAKE_BINARY_DIR}/bin
 
@@ -109,8 +103,6 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/qml
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/plugins/imageformats
     COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/plugins/platforms
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/plugins/audio
-    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/plugins/mediaservice
     COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/bin/${launcher.version.file}
 )
 add_custom_target(distribution_dmg_client ALL
