@@ -8,12 +8,17 @@
 #include <nx/utils/log/log_level.h>
 #include <nx/utils/thread/mutex.h>
 
+#include <QtCore/QFileInfo>
+#include <QtCore/QLockFile>
+
 namespace nx {
 namespace utils {
 namespace log {
 
-static constexpr int kDefaultLogArchiveCount = 25;
-static constexpr int kDefaultMaxLogFileSize = 10 * 1024 * 1024;
+static constexpr int kMaxLogRotation = 999;
+static constexpr qint64 kDefaultMaxLogVolumeSizeB = 500 * 1024 * 1024;
+static constexpr qint64 kDefaultMaxLogFileSizeB = 10 * 1024 * 1024;
+static constexpr std::chrono::seconds kDefaultMaxLogFileTimePeriodS = std::chrono::seconds::zero();
 
 class NX_UTILS_API AbstractWriter
 {
@@ -51,8 +56,9 @@ public:
     struct Settings
     {
         QString name; /**< Base file name with path. */
-        size_t size = kDefaultMaxLogFileSize; /**< Maximum file size. */
-        size_t count = kDefaultLogArchiveCount; /**< Maximum backup files count. */
+        qint64 maxVolumeSizeB = kDefaultMaxLogVolumeSizeB; /**< Maximum volume size. */
+        qint64 maxFileSizeB = kDefaultMaxLogFileSizeB; /**< Maximum file size. */
+        std::chrono::seconds maxFileTimePeriodS = kDefaultMaxLogFileTimePeriodS; /**< Maximum file duration in time. */
     };
 
     File(Settings settings);
@@ -65,13 +71,17 @@ private:
     bool openFile();
     void rotateIfNeeded(nx::Locker<nx::Mutex>* lock);
     void archiveLeftOvers(nx::Locker<nx::Mutex>* lock);
-    bool needToArchive(nx::Locker<nx::Mutex>* lock);
+    bool queueToArchive(nx::Locker<nx::Mutex>* lock);
+    bool isCurrentLimitReached(nx::Locker<nx::Mutex>* lock);
     void archive(QString fileName, QString archiveName);
+    qint64 totalVolumeSize();
 
 private:
     Settings m_settings;
     nx::Mutex m_mutex;
     std::fstream m_file;
+    QFileInfo m_fileInfo;
+    QLockFile m_volumeLock;
     std::future<void> m_archive;
     int m_archiveQueue = 0;
 };

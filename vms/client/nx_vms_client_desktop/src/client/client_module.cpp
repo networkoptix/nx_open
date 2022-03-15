@@ -705,8 +705,8 @@ void QnClientModule::initLog()
 
     NX_INFO(this, "Log is initialized from the settings");
     QSettings rawSettings;
-    const auto maxBackupCount = rawSettings.value("logArchiveSize", 10).toUInt();
-    const auto maxFileSize = rawSettings.value("maxLogFileSize", 10 * 1024 * 1024).toUInt();
+    const auto maxVolumeSize = rawSettings.value(kMaxLogVolumeSizeSymbolicName, 100 * 1024 * 1024).toUInt();
+    const auto maxFileSize = rawSettings.value(kMaxLogFileSizeSymbolicName, 10 * 1024 * 1024).toUInt();
 
     auto logLevel = d->startupParameters.logLevel;
     auto logFile = d->startupParameters.logFile;
@@ -724,8 +724,8 @@ void QnClientModule::initLog()
     Settings logSettings;
     logSettings.loggers.resize(1);
     auto& logger = logSettings.loggers.front();
-    logger.maxBackupCount = maxBackupCount;
-    logger.maxFileSize = maxFileSize;
+    logger.maxVolumeSizeB = maxVolumeSize;
+    logger.maxFileSizeB = maxFileSize;
     logger.level.parse(logLevel);
     logger.logBaseName = logFile.isEmpty()
         ? ("client_log" + logFileNameSuffix)

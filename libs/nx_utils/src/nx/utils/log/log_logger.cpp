@@ -128,9 +128,17 @@ void Logger::setSettings(const LoggerSettings& loggerSettings)
     if (auto file = dynamic_cast<File*>(m_writer.get()); file)
     {
         File::Settings fileSettings;
-        fileSettings.size = m_settings.maxFileSize;
-        fileSettings.count = m_settings.maxBackupCount;
+        fileSettings.maxFileTimePeriodS = m_settings.maxFileTimePeriodS;
+        fileSettings.maxFileSizeB = m_settings.maxFileSizeB;
+        fileSettings.maxVolumeSizeB = m_settings.maxVolumeSizeB;
         file->setSettings(fileSettings);
+
+        log(Level::info, this,
+            nx::format("Log file size: %1, log volume size: %2, time period: %3, file: %4").args(
+                nx::utils::bytesToString(m_settings.maxFileSizeB),
+                nx::utils::bytesToString(m_settings.maxVolumeSizeB),
+                m_settings.maxFileTimePeriodS,
+                file->getFileName()));
     }
     setDefaultLevel(m_settings.level.primary);
     setLevelFilters(m_settings.level.filters);
@@ -185,8 +193,10 @@ void Logger::writeLogHeader()
 
     const auto filePath = this->filePath();
     write(nx::format("Log level: %1").arg(m_settings.level));
-    write(nx::format("Log file size: %2, backup count: %3, file: %4").args(
-        nx::utils::bytesToString(m_settings.maxFileSize), m_settings.maxBackupCount,
+    write(nx::format("Log file size: %1, log volume size: %2, time period: %3, file: %4").args(
+        nx::utils::bytesToString(m_settings.maxFileSizeB),
+        nx::utils::bytesToString(m_settings.maxVolumeSizeB),
+        m_settings.maxFileTimePeriodS,
         filePath ? *filePath : QString("-")));
 
     write(nx::format("Mutex implementation: %1").args(mutexImplementation()));

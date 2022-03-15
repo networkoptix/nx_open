@@ -40,8 +40,8 @@ static void initLogFromArgs(const QString& logLevel, const QString& logFileBaseN
     nx::utils::log::Settings settings;
     settings.loggers.resize(1);
     settings.loggers.front().level.parse(logLevel);
-    settings.loggers.front().maxFileSize = 1024 * 1024 * 10;
-    settings.loggers.front().maxBackupCount = 5;
+    settings.loggers.front().maxFileSizeB = 1024 * 1024 * 10;
+    settings.loggers.front().maxVolumeSizeB = 1024 * 1024 * 50;
     settings.loggers.front().logBaseName = logFileBaseName;
 
     nx::utils::log::setMainLogger(

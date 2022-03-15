@@ -90,8 +90,9 @@ std::unique_ptr<Logger> LoggerBuilder::buildLogger(
         if (baseName != QLatin1String("-"))
         {
             File::Settings fileSettings;
-            fileSettings.size = settings.maxFileSize;
-            fileSettings.count = settings.maxBackupCount;
+            fileSettings.maxVolumeSizeB = settings.maxVolumeSizeB;
+            fileSettings.maxFileSizeB = settings.maxFileSizeB;
+            fileSettings.maxFileTimePeriodS = settings.maxFileTimePeriodS;
             fileSettings.name = settings.directory.isEmpty()
                 ? baseName
                 : (settings.directory + "/" + baseName);

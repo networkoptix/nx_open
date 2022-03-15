@@ -34,12 +34,12 @@ public:
     {
     }
 
-    std::unique_ptr<AbstractWriter> makeWriter(size_t size, size_t count = 0)
+    std::unique_ptr<AbstractWriter> makeWriter(size_t file, size_t volume = kDefaultMaxLogVolumeSizeB)
     {
         File::Settings settings;
         settings.name = m_basePath;
-        settings.size = size;
-        settings.count = count;
+        settings.maxFileSizeB = file;
+        settings.maxVolumeSizeB = volume;
         return std::make_unique<File>(settings);
     }
 
@@ -75,27 +75,41 @@ public:
         EXPECT_EQ(expectedContent, actualContent);
     }
 
+    virtual void SetUp() override
+    {
+        auto dir = QFileInfo(m_basePath).dir();
+        const auto logs = dir.entryList(
+            {
+                QString("*") + File::kExtensionWithSeparator,
+                QString("*") + File::kRotateExtensionWithSeparator
+            },
+            QDir::Files, QDir::Name);
+        for (auto log: logs)
+            dir.remove(log);
+    }
+
 private:
     QString m_basePath;
 };
 
 TEST_F(LogFile, Single)
 {
+    static constexpr size_t kLogSize = 20;
     {
-        auto w = makeWriter(20);
+        auto w = makeWriter(kLogSize);
         w->write(Level::undefined, "1234567890");
         w->write(Level::undefined, "1");
     }
     checkFile({"1234567890", "1"});
 
     {
-        auto w = makeWriter(20);
+        auto w = makeWriter(kLogSize);
         w->write(Level::undefined, "7777777"); //<< Overflow.
     }
     checkFile();
 
     {
-        auto w = makeWriter(20);
+        auto w = makeWriter(kLogSize);
         w->write(Level::undefined, "12345");
         w->write(Level::undefined, "aaa");
     }
@@ -104,21 +118,23 @@ TEST_F(LogFile, Single)
 
 TEST_F(LogFile, Rotation)
 {
+    static constexpr size_t kLogSize = 20;
+    static constexpr size_t kVolumeSize = 500;
     {
-        auto w = makeWriter(20, 3);
+        auto w = makeWriter(kLogSize, kVolumeSize);
         w->write(Level::undefined, "1234567890");
     }
     checkFile({"1234567890"});
 
     {
-        auto w = makeWriter(20, 3);
+        auto w = makeWriter(kLogSize, kVolumeSize);
         w->write(Level::undefined, "1234567890"); //< Overflow
     }
     checkFile({"1234567890", "1234567890"}, "_001");
     checkFile();
 
     {
-        auto w = makeWriter(20, 3);
+        auto w = makeWriter(kLogSize, kVolumeSize);
         w->write(Level::undefined, "xxx");
         w->write(Level::undefined, "yyy");
     }
@@ -126,7 +142,7 @@ TEST_F(LogFile, Rotation)
     checkFile({"xxx", "yyy"});
 
     {
-        auto w = makeWriter(20, 3);
+        auto w = makeWriter(kLogSize, kVolumeSize);
         w->write(Level::undefined, "12345678901234567890"); // Overflow
         w->write(Level::undefined, "1234567890");
     }
@@ -135,7 +151,7 @@ TEST_F(LogFile, Rotation)
     checkFile({"1234567890"});
 
     {
-        auto w = makeWriter(20, 3);
+        auto w = makeWriter(kLogSize, kVolumeSize);
         w->write(Level::undefined, "7777777777"); //< Overflow
         w->write(Level::undefined, "a");
         w->write(Level::undefined, "b");
@@ -146,7 +162,7 @@ TEST_F(LogFile, Rotation)
     checkFile({"a", "b"});
 
     {
-        auto w = makeWriter(20, 3);
+        auto w = makeWriter(kLogSize, kVolumeSize);
         w->write(Level::undefined, "12345678901234567890"); //< Overflow + Rotation
     }
     checkFile({"xxx", "yyy", "12345678901234567890"}, "_001");
@@ -155,9 +171,9 @@ TEST_F(LogFile, Rotation)
     checkFile();
 
     {
-        auto w = makeWriter(20, 3);
+        auto w = makeWriter(kLogSize, kVolumeSize);
         w->write(Level::undefined, "6666666666");
-        w->write(Level::undefined, "1234567890"); //< Overflow
+        w->write(Level::undefined, "1234567890"); //< Overflow + Rotation
         w->write(Level::undefined, "zzz");
     }
     checkFile({"1234567890", "7777777777"}, "_001");
