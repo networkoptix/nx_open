@@ -227,6 +227,10 @@ struct Ini: nx::kit::IniConfig
     // VMS-30447
     NX_INI_FLAG(false, crossSystemLayouts, "[Feature] Enables cross-system layouts.");
 
+    // VMS-30701
+    NX_INI_FLAG(false, enableCameraReplacementFeature,
+        "[Feature] Makes Camera Replacement feature available in the client.");
+
     // ---------------------------------------------------------------------------------------------
     // Support section.
     // Flags here can be removed when support engineers decide whether to discard the flag or move

@@ -1470,6 +1470,45 @@ Handle ServerConnection::getCameras(Result<Cameras>::type&& callback, QThread* t
         targetThread);
 }
 
+Handle ServerConnection::replaceDevice(
+    const QnUuid& deviceToBeReplacedId,
+    const QString& replacementDevicePhysicalId,
+    bool returnReportOnly,
+    Result<nx::vms::api::DeviceReplacementResponse>::type&& callback,
+    QThread* targetThread)
+{
+    if (!NX_ASSERT(
+        !deviceToBeReplacedId.isNull() && !replacementDevicePhysicalId.isEmpty(),
+        "Invalid parameters"))
+    {
+        return Handle();
+    }
+
+    nx::vms::api::DeviceReplacementRequest requestData;
+    requestData.id = deviceToBeReplacedId;
+    requestData.replaceWithDeviceId = replacementDevicePhysicalId;
+    requestData.dryRun = returnReportOnly;
+
+    auto internal_callback =
+        [callback = std::move(callback)]
+        (bool success, Handle handle, QByteArray responce,
+            const nx::network::http::HttpHeaders& headers)
+        {
+            nx::vms::api::DeviceReplacementResponse response;
+            if (success)
+                success = nx::reflect::json::deserialize(responce.toStdString(), &response).success;
+            callback(success, handle, response);
+        };
+
+    auto request = prepareRequest(
+        nx::network::http::Method::post,
+        prepareUrl(nx::format("/rest/v1/devices/%1/replace", deviceToBeReplacedId), /*params*/ {}),
+        Qn::serializationFormatToHttpContentType(Qn::JsonFormat),
+        QJson::serialized(requestData));
+
+    return executeRequest(request, std::move(internal_callback), targetThread);
+}
+
 Handle ServerConnection::recordedTimePeriods(
     const QnChunksRequestData& request,
     Result<MultiServerPeriodDataList>::type&& callback,

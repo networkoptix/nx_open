@@ -72,6 +72,7 @@
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_layout_snapshot_manager.h>
 #include <ui/workbench/workbench_navigator.h>
+#include <utils/camera/camera_replacement.h>
 
 using boost::algorithm::any_of;
 using boost::algorithm::all_of;
@@ -1748,25 +1749,19 @@ ActionVisibility HideServersInTreeCondition::check(
     return InvisibleAction;
 }
 
-ActionVisibility ReplaceCameraCondition::check(
-    const Parameters& parameters,
-    QnWorkbenchContext*)
+ActionVisibility ReplaceCameraCondition::check(const Parameters& parameters, QnWorkbenchContext*)
 {
-    const auto camera = parameters.resource().dynamicCast<QnVirtualCameraResource>();
-    if (!camera
-        || camera->isOnline()
-        || camera->flags().testFlag(Qn::virtual_camera)
-        || camera->isMultiSensorCamera()
-        || camera->isNvr()
-        || camera->isIOModule())
-    {
+    using namespace nx::vms::common::utils;
+
+    const auto resource = parameters.resource();
+
+    if (!camera_replacement::cameraSupportsReplacement(resource))
         return InvisibleAction;
-    }
 
-   if (!camera->getParentServer()->isOnline())
-       return DisabledAction;
+    if (!camera_replacement::cameraCanBeReplaced(resource))
+        return DisabledAction;
 
-   return EnabledAction;
+    return EnabledAction;
 }
 
 //-------------------------------------------------------------------------------------------------
