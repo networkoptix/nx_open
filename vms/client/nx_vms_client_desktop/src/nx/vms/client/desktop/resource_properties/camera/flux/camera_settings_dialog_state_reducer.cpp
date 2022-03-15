@@ -1265,10 +1265,10 @@ State CameraSettingsDialogStateReducer::loadCameras(
     state.recording.parametersAvailable = calculateRecordingParametersAvailable(cameras);
 
     Qn::calculateMaxFps(
-            cameras,
-            &state.devicesDescription.maxFps,
-            &state.devicesDescription.maxDualStreamingFps,
-            false);
+        cameras,
+        &state.devicesDescription.maxFps,
+        &state.devicesDescription.maxDualStreamingFps,
+        /*motionDetectionAllowed*/ false);
 
     state.imageControl = calculateImageControlSettings(cameras);
 
@@ -1347,6 +1347,12 @@ State CameraSettingsDialogStateReducer::handleMotionTypeChanged(
         &isMotionDetectionDependingOnDualStreaming);
     fetchFromCameras<bool>(state.motion.enabled, cameras, &isMotionDetectionEnabled);
     state = handleStreamParametersChange(std::move(state));
+
+    Qn::calculateMaxFps(
+        cameras,
+        &state.devicesDescription.maxFps,
+        &state.devicesDescription.maxDualStreamingFps,
+        /*motionDetectionAllowed*/ false);
 
     return state;
 }
@@ -1500,6 +1506,12 @@ State CameraSettingsDialogStateReducer::handleStatusChanged(
             return calculateRecordingSchedule(camera);
         });
     state = handleStreamParametersChange(std::move(state));
+
+    Qn::calculateMaxFps(
+        cameras,
+        &state.devicesDescription.maxFps,
+        &state.devicesDescription.maxDualStreamingFps,
+        /*motionDetectionAllowed*/ false);
 
     return state;
 }
