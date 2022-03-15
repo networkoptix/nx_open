@@ -43,10 +43,10 @@ list(FILTER copied_nx_sdk_src_nx_sdk_files
 set(copied_nx_sdk_unit_tests_origin ${open_source_root}/vms/libs/nx_sdk/unit_tests)
 file(GLOB_RECURSE copied_nx_sdk_unit_tests_files CONFIGURE_DEPENDS
     ${copied_nx_sdk_unit_tests_origin}/*)
-set(copied_nx_sdk_resources_origin
+set(copied_nx_sdk_analytics_resources_origin
     ${open_source_root}/vms/libs/nx_plugin_utils/static-resources/analytics)
-file(GLOB_RECURSE copied_nx_sdk_resources_files CONFIGURE_DEPENDS
-    ${copied_nx_sdk_resources_origin}/*)
+file(GLOB_RECURSE copied_nx_sdk_analytics_resources_files CONFIGURE_DEPENDS
+    ${copied_nx_sdk_analytics_resources_origin}/*)
 
 # Exclude settings_model.md and SDK documentation binary files (images) from SDK source files.
 set(nx_sdk_src_settings_model_file ${copied_nx_sdk_src_nx_sdk_origin}/settings_model.md)
