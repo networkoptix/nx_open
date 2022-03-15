@@ -84,6 +84,11 @@ std::string Plugin::manifestString() const
                         "name": "testCheckBox",
                         "caption": "Check Box",
                         "defaultValue": true
+                    },
+                    {
+                        "type": "Link",
+                        "caption": "Customer Support",
+                        "url": "https://example.com/"
                     }
                 ]
             }

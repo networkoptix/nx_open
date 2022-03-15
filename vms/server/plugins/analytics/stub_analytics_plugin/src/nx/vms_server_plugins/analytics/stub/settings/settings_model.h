@@ -234,6 +234,11 @@ static const std::string kRegularSettingsModelPart2 = /*suppress newline*/ 1 + R
                     "name": "hiddenTestCheckBox",
                     "defaultValue": false,
                     "visible": false
+                },
+                {
+                    "type": "Link",
+                    "caption": "Customer Support",
+                    "url": "https://example.com/"
                 }
             ]
         }
