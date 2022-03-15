@@ -1527,6 +1527,7 @@ void initialize(Manager* manager, Action* root)
         .requiredGlobalPermission(GlobalPermission::admin)
         .text(ContextMenu::tr("Replace Camera With..."))
         .condition(ConditionWrapper(new ReplaceCameraCondition())
+            && condition::isTrue(ini().enableCameraReplacementFeature)
             && condition::scoped(SceneScope,
                 !condition::isLayoutTourReviewMode()
                 && !condition::isPreviewSearchMode()));

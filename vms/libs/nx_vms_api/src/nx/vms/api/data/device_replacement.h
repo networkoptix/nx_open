@@ -36,7 +36,7 @@ struct NX_VMS_API DeviceReplacementRequest
 
 QN_FUSION_DECLARE_FUNCTIONS(DeviceReplacementRequest, (json), NX_VMS_API)
 
-struct DeviceReplacementResponse
+struct NX_VMS_API DeviceReplacementResponse
 {
     /**%apidoc:object
      * A list of warnings during camera replacement. Map key is the warning group name, map value

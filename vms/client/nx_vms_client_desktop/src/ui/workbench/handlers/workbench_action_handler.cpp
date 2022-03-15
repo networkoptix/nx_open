@@ -81,6 +81,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/layout/layout_data_helper.h>
 #include <nx/vms/client/desktop/network/cloud_url_validator.h>
+#include <nx/vms/client/desktop/resource_dialogs/camera_replacement_dialog.h>
 #include <nx/vms/client/desktop/resource_dialogs/failover_priority_dialog.h>
 #include <nx/vms/client/desktop/resource_dialogs/multiple_layout_selection_dialog.h>
 #include <nx/vms/client/desktop/resource_properties/camera/camera_settings_tab.h>
@@ -2177,7 +2178,26 @@ void ActionHandler::at_mediaFileSettingsAction_triggered() {
 
 void ActionHandler::replaceCameraActionTriggered()
 {
-    // TODO #vbreus Open Replace Camera dialog.
+    const auto cameraToBeReplaced =
+        menu()->currentParameters(sender()).resource().dynamicCast<QnVirtualCameraResource>();
+
+    if (!NX_ASSERT(cameraToBeReplaced, "Expected parameter is missing"))
+        return;
+
+    CameraReplacementDialog replaceCameraDialog(
+        CameraReplacementDialog::ReplacementCamera,
+        cameraToBeReplaced,
+        mainWindowWidget());
+
+    if (replaceCameraDialog.isEmpty())
+    {
+        QnMessageBox::warning(
+            mainWindowWidget(),
+            tr("There are no suitable cameras for replacement"));
+        return;
+    }
+
+    replaceCameraDialog.exec();
 }
 
 void ActionHandler::at_cameraIssuesAction_triggered()
