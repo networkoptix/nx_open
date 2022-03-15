@@ -134,7 +134,6 @@ private:
     QnMediaServerResourcePtr getServerOnTime(qint64 time);
     QnMediaServerResourcePtr getNextMediaServerFromTime(const QnSecurityCamResourcePtr &camera, qint64 time);
     QnAbstractMediaDataPtr getNextDataInternal();
-    QString getUrl(const QnSecurityCamResourcePtr &camera, const QnMediaServerResourcePtr &server = QnMediaServerResourcePtr()) const;
     void checkGlobalTimeAsync(const QnSecurityCamResourcePtr &camera, const QnMediaServerResourcePtr &server, qint64* result);
     void checkMinTimeFromOtherServer(const QnSecurityCamResourcePtr &camera);
     void setupRtspSession(const QnSecurityCamResourcePtr &camera, const QnMediaServerResourcePtr &server, QnRtspClient* session) const;

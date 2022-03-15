@@ -2,15 +2,16 @@
 
 #include "storage.h"
 
+#include <QtConcurrent/QtConcurrent>
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
-#include <QtConcurrent/QtConcurrent>
 
 #include <nx/fusion/model_functions.h>
 #include <nx/fusion/serialization/json.h>
-#include <nx/utils/scope_guard.h>
 #include <nx/utils/file_system.h>
+#include <nx/utils/scope_guard.h>
+#include <nx/utils/suppress_exceptions.h>
 
 using namespace std::chrono;
 
@@ -670,8 +671,10 @@ void Storage::loadExistingDownloads(bool waitForFinished)
     m_loadDownloadsWatcher.setFuture(QtConcurrent::run(
         [this]()
         {
-            findDownloadsImpl();
-            cleanupExpiredFiles();
+            nx::suppressExceptions(
+                [this]() { findDownloadsImpl(); }, this, "at findDownloadsImpl()")();
+            nx::suppressExceptions(
+                [this]() { cleanupExpiredFiles(); }, this, "at cleanupExpiredFiles()")();
         }));
 
     if (waitForFinished)
