@@ -2710,7 +2710,7 @@ to %1</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
-      <translation type="unfinished">System will be accessible through local network with a local administrator account.</translation>
+      <translation>Systemet vil være tilgængeligt via lokalt netværk med en lokal administratorkonto.</translation>
     </message>
     <message>
       <source>Continue</source>
@@ -6002,7 +6002,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnWebResourceWidget</name>
     <message>
       <source>Open this web page?</source>
-      <translation type="unfinished">Open this web page?</translation>
+      <translation>Åbn denne webside?</translation>
     </message>
     <message>
       <source>Web page</source>
@@ -7698,7 +7698,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>These devices do not have audio outputs or are not configured correctly.</source>
       <translation type="unfinished">
-        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+        <numerusform>Disse enheder har ikke lydudgange eller er ikke konfigureret korrekt.</numerusform>
         <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
       </translation>
     </message>
@@ -8139,7 +8139,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>System Administration</source>
-      <translation type="unfinished">System Administration</translation>
+      <translation>Systemadministration</translation>
     </message>
   </context>
   <context>
@@ -8483,7 +8483,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Klik på ikonet for at læse mere</translation>
     </message>
   </context>
   <context>
