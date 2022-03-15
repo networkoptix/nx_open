@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
     <Fragment>
         <ComponentGroup
@@ -44,21 +44,6 @@
             <Component><File Name="qgif.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="qjpeg.dll" KeyPath="yes" DiskId="3"/></Component>
             <Component><File Name="qtiff.dll" KeyPath="yes" DiskId="3"/></Component>
-        </ComponentGroup>
-
-        <ComponentGroup
-                Id="client_qt_mediaservice"
-                Source="${qt.dir}/plugins/mediaservice"
-                Directory="mediaservice">
-            <Component><File Name="dsengine.dll" KeyPath="yes" DiskId="3"/></Component>
-            <Component><File Name="qtmedia_audioengine.dll" KeyPath="yes" DiskId="3"/></Component>
-        </ComponentGroup>
-
-        <ComponentGroup
-                Id="client_qt_audio"
-                Source="${qt.dir}/plugins/audio"
-                Directory="audio">
-            <Component><File Name="qtaudio_windows.dll" KeyPath="yes" DiskId="3"/></Component>
         </ComponentGroup>
     </Fragment>
 </Wix>

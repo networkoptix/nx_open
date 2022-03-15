@@ -21,9 +21,7 @@ import build_distribution_conf as conf
 from cmake_parser import parse_boolean
 
 WINDOWS_QT_PLUGINS = [
-    "audio",
     "imageformats",
-    "mediaservice",
     "platforms"
 ]
 

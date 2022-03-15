@@ -94,8 +94,6 @@
 
                     <Directory Id="imageformats" Name="imageformats"/>
                     <Directory Id="plugins" Name="plugins"/>
-                    <Directory Id="mediaservice" Name="mediaservice"/>
-                    <Directory Id="audio" Name="audio"/>
 
                     <Directory Name="fonts" Id="FontsDirectoryReference"/>
                     <Directory Name="platforms" Id="QtPlatformsDirectory"/>
@@ -209,8 +207,6 @@
             <ComponentGroupRef Id="hidapi_libraries"/>
             <ComponentGroupRef Id="client_qt_libraries"/>
             <ComponentGroupRef Id="client_qt_imageformats"/>
-            <ComponentGroupRef Id="client_qt_mediaservice"/>
-            <ComponentGroupRef Id="client_qt_audio"/>
 
             <ComponentGroupRef Id="CommonNxLibrariesComponentGroup"/>
             <ComponentGroupRef Id="CommonQtLibrariesComponentGroup"/>

@@ -38,7 +38,7 @@ def prepare(qt_dir, build_dir, binary, sbindir, tlibdir):
     ignore = shutil.ignore_patterns('*debug*', '.*')
     src_plugins_dir = join(qt_dir, "plugins")
     plugins_dir = join(tcontentsdir, "PlugIns")
-    for group in 'platforms', 'imageformats', 'audio', 'mediaservice':
+    for group in 'platforms', 'imageformats':
         target_dir = join(plugins_dir, group)
         shutil.copytree(join(src_plugins_dir, group), target_dir, ignore=ignore)
         for f in os.listdir(target_dir):

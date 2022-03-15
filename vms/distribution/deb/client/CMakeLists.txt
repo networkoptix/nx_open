@@ -19,8 +19,6 @@ nx_copy(${vms_distribution_common_dir}/desktop_client/backgrounds
 
 set(plugins
     imageformats
-    mediaservice
-    audio
     xcbglintegrations
     platforminputcontexts
     platforms
