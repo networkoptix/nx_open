@@ -57,11 +57,14 @@ struct NX_VMS_API ServerLogSettings
     /**%apidoc[readonly] Log directory on the filesystem. */
     QString directory;
 
-    /**%apidoc Maximum size (in bytes) of a single log file. */
-    int maxFileSize = nx::utils::log::kDefaultMaxLogFileSize;
+    /**%apidoc:integer Maximum size (in bytes) of all log files on the filesystem. */
+    double maxVolumeSizeB = nx::utils::log::kDefaultMaxLogVolumeSizeB;
 
-    /**%apidoc Maximum number of rotated log files to keep. */
-    int maxBackupCount = nx::utils::log::kDefaultLogArchiveCount;
+    /**%apidoc:integer Maximum size (in bytes) of a single log file. */
+    double maxFileSizeB = nx::utils::log::kDefaultMaxLogFileSizeB;
+
+    /**%apidoc Maximum time duration of a single log file. */
+    std::chrono::seconds maxFileTimePeriodS = nx::utils::log::kDefaultMaxLogFileTimePeriodS;
 
     /**%apidoc MAIN log settings. */
     LogSettings mainLog;
@@ -90,7 +93,7 @@ struct NX_VMS_API ServerLogSettings
     }
 };
 #define ServerLogSettings_Fields \
-    (id)(maxFileSize)(maxBackupCount)(directory)(mainLog)(httpLog)(systemLog)
+    (id)(maxFileSizeB)(maxVolumeSizeB)(maxFileTimePeriodS)(directory)(mainLog)(httpLog)(systemLog)
 QN_FUSION_DECLARE_FUNCTIONS(ServerLogSettings, (json), NX_VMS_API)
 NX_REFLECTION_INSTRUMENT(ServerLogSettings, ServerLogSettings_Fields)
 

@@ -200,9 +200,9 @@ The following parameters are supported:
     For full description of LOGGER_SETTINGS and more examples see `LoggerSettings::parse`.
 - log-file=path/to/file
 - log-level=LogLevel (log/logLevel=LogLevel)
-- log/maxFileSize={Maximum log file size in bytes}.
+- log/maxLogFileSizeB={Maximum log file size in bytes}.
     When this size is reached, log file is archived and new file is created.
-- log/maxBackupCount={Maximum number of log files to keep}
+- log/maxLogVolumeSizeB={Maximum total size of log files to keep, in bytes}
 
 When using as command-line argument each parameter is prefixed with --. E.g., --log/logger=...
 When using a configuration file (`nx::utils::log::Settings::load(...) `) , then log/logger value should be specified as:

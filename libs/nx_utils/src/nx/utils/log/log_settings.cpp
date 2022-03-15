@@ -7,6 +7,7 @@
 #include <nx/utils/deprecated_settings.h>
 #include <nx/utils/string.h>
 #include <nx/utils/std/filesystem.h>
+#include <nx/utils/time.h>
 
 #include "format.h"
 #include "assert.h"
@@ -42,20 +43,29 @@ bool LoggerSettings::parse(const QString& str)
         {
             directory = param.second.c_str();
         }
-        else if (param.first == "maxBackupCount")
-        {
-            std::size_t pos = 0;
-            maxBackupCount = nx::utils::stoi(param.second, &pos);
-            if (pos == 0)
-                parseSucceeded = false;
-        }
-        else if (param.first == "maxFileSize")
+        else if (param.first == kMaxLogVolumeSizeSymbolicName)
         {
             bool ok = false;
-            maxFileSize = stringToBytes(param.second, &ok);
+            maxVolumeSizeB = stringToBytes(param.second, &ok);
             parseSucceeded = parseSucceeded && ok;
         }
+        else if (param.first == kMaxLogFileSizeSymbolicName)
+        {
+            bool ok = false;
+            maxFileSizeB = stringToBytes(param.second, &ok);
+            parseSucceeded = parseSucceeded && ok;
+        }
+        else if (param.first == kMaxLogFileTimePeriodSymbolicName)
+        {
+            const auto duration = nx::utils::parseDuration(param.second);
+            if (duration)
+                maxFileTimePeriodS = std::chrono::duration_cast<std::chrono::seconds>(duration.value());
+            parseSucceeded = parseSucceeded && duration;
+        }
     }
+
+    if (!NX_ASSERT(maxVolumeSizeB >= maxFileSizeB))
+        maxVolumeSizeB = maxFileSizeB;
 
     return parseSucceeded;
 }
@@ -70,8 +80,9 @@ bool LoggerSettings::operator==(const LoggerSettings& right) const
 {
     return level == right.level
         && directory == right.directory
-        && maxFileSize == right.maxFileSize
-        && maxBackupCount == right.maxBackupCount
+        && maxFileSizeB == right.maxFileSizeB
+        && maxVolumeSizeB == right.maxVolumeSizeB
+        && maxFileTimePeriodS == right.maxFileTimePeriodS
         && logBaseName == right.logBaseName;
 }
 
@@ -83,15 +94,21 @@ Settings::Settings(QSettings* settings)
     if (!settings)
         return;
 
-    const auto maxBackupCount = settings->value("logArchiveSize", 10).toUInt();
-    const auto maxFileSize = settings->value("maxLogFileSize", 10 * 1024 * 1024).toUInt();
+    auto maxLogVolumeSizeB = settings->value(kMaxLogVolumeSizeSymbolicName, kDefaultMaxLogVolumeSizeB).toLongLong();
+    const auto maxLogFileSizeB = settings->value(kMaxLogFileSizeSymbolicName, kDefaultMaxLogFileSizeB).toLongLong();
+    const auto maxLogFileTimePeriodS = std::chrono::seconds(
+        settings->value(kMaxLogFileTimePeriodSymbolicName, (uint)kDefaultMaxLogFileTimePeriodS.count()).toUInt());
+
+    if (!NX_ASSERT(maxLogVolumeSizeB >= maxLogFileSizeB))
+        maxLogVolumeSizeB = maxLogFileSizeB;
 
     for (const auto& group: settings->childGroups())
     {
         LoggerSettings logger;
         logger.logBaseName = group;
-        logger.maxBackupCount = maxBackupCount;
-        logger.maxFileSize = maxFileSize;
+        logger.maxVolumeSizeB = maxLogVolumeSizeB;
+        logger.maxFileSizeB = maxLogFileSizeB;
+        logger.maxFileTimePeriodS = maxLogFileTimePeriodS;
         logger.level.primary = Level::none;
 
         settings->beginGroup(group);
@@ -175,12 +192,20 @@ void Settings::loadCompatibilityLogger(
     loggerSettings.level.parse(logLevelStr);
 
     loggerSettings.directory = settings.value(makeKey("logDir")).toString();
-    loggerSettings.maxBackupCount = nx::utils::stringToBytes(
-        settings.value(makeKey("maxBackupCount")).toString().toStdString(),
-        loggerSettings.maxBackupCount);
-    loggerSettings.maxFileSize = nx::utils::stringToBytes(
-        settings.value(makeKey("maxFileSize")).toString().toStdString(),
-        loggerSettings.maxFileSize);
+    loggerSettings.maxVolumeSizeB = nx::utils::stringToBytes(
+        settings.value(makeKey(kMaxLogVolumeSizeSymbolicName)).toString().toStdString(),
+        loggerSettings.maxVolumeSizeB);
+    loggerSettings.maxFileSizeB = nx::utils::stringToBytes(
+        settings.value(makeKey(kMaxLogFileSizeSymbolicName)).toString().toStdString(),
+        loggerSettings.maxFileSizeB);
+
+    if (!NX_ASSERT(loggerSettings.maxVolumeSizeB >= loggerSettings.maxFileSizeB))
+        loggerSettings.maxVolumeSizeB = loggerSettings.maxFileSizeB;
+
+    const auto duration = nx::utils::parseDuration(
+        settings.value(makeKey(kMaxLogFileTimePeriodSymbolicName)).toString().toStdString());
+    if (duration)
+        loggerSettings.maxFileTimePeriodS = std::chrono::duration_cast<std::chrono::seconds>(duration.value());
 
     loggerSettings.logBaseName = settings.value(makeKey("baseName")).toString();
     if (loggerSettings.logBaseName.isEmpty())

@@ -14,6 +14,10 @@ namespace nx {
 namespace utils {
 namespace log {
 
+static constexpr char kMaxLogVolumeSizeSymbolicName[] = "maxLogVolumeSizeB";
+static constexpr char kMaxLogFileSizeSymbolicName[] = "maxLogFileSizeB";
+static constexpr char kMaxLogFileTimePeriodSymbolicName[] = "maxLogFileTimePeriodS";
+
 /**
  * Specifies configuration of a logger.
  *
@@ -22,7 +26,7 @@ namespace log {
  * LOGGER_SETTINGS = param (";" param)*
  * param = key [= value]
  * value = TEXT
- * param = file | dir | maxBackupCount | maxFileSize | level
+ * param = file | dir | maxLogVolumeSizeB | maxLogFileSizeB | maxLogFileTimePeriodS | level
  * level = LogLevel ["[" messageTagPrefixes "]"]
  * messageTagPrefixes = messageTagPrefix (", " messageTagPrefix)*
  * file = - | fileName
@@ -47,7 +51,7 @@ namespace log {
  *
  * Log nx::network* with <= WARNING level and nx::network::http* with <= DEBUG level to a file:
  * <pre><code>
- * dir=/var/log/;level=WARNING[nx::network];level=DEBUG[nx::network::http];level=none;maxBackupCount=11;maxFileSize=100M
+ * dir=/var/log/;level=WARNING[nx::network];level=DEBUG[nx::network::http];level=none;maxLogVolumeSizeB=110M;maxLogFileSizeB=100M
  * </code></pre>
  *
  * Generally, `level=none` means "ignore everything else".
@@ -57,8 +61,9 @@ class NX_UTILS_API LoggerSettings
 public:
     LevelSettings level;
     QString directory = QString(); //< dataDir/log
-    uint64_t maxFileSize = kDefaultMaxLogFileSize; //< 10 MB.
-    int maxBackupCount = kDefaultLogArchiveCount;
+    qint64 maxVolumeSizeB = kDefaultMaxLogVolumeSizeB; //< 500 MB.
+    qint64 maxFileSizeB = kDefaultMaxLogFileSizeB; //< 10 MB.
+    std::chrono::seconds maxFileTimePeriodS = kDefaultMaxLogFileTimePeriodS; //< 0.
     QString logBaseName;
 
     LoggerSettings() = default;
