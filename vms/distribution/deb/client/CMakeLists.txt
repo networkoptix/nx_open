@@ -22,6 +22,8 @@ set(plugins
     xcbglintegrations
     platforminputcontexts
     platforms
+    tls
+    multimedia
 )
 foreach(plugin ${plugins})
     nx_copy(${QT_DIR}/plugins/${plugin} DESTINATION ${CMAKE_BINARY_DIR}/bin)

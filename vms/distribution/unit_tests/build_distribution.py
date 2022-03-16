@@ -22,7 +22,9 @@ from cmake_parser import parse_boolean
 
 WINDOWS_QT_PLUGINS = [
     "imageformats",
-    "platforms"
+    "platforms",
+    "tls",
+    "multimedia"
 ]
 
 
@@ -208,8 +210,9 @@ def main():
         logging.info("Archiving Go unit tests")
         archiveFiles(a, bin_dir, src_bin_dir, get_go_unit_tests_list(src_bin_dir))
 
-        logging.info("Archiving standalone metadata_sdk unit tests")
-        archiveSdkUnitTests(a, conf, src_bin_dir)
+        if not isMac:
+            logging.info("Archiving standalone metadata_sdk unit tests")
+            archiveSdkUnitTests(a, conf, src_bin_dir)
 
         logging.info("Archiving unit test executables")
         if not archiveFiles(a, bin_dir, src_bin_dir, get_unit_tests_list()):
@@ -231,7 +234,7 @@ def main():
                 join(conf.BUILD_DIR, plugins_dir), lib_glob)
             archiveByGlob(a, "mediaserver optional plugins", target_plugins_optional_dir,
                 join(conf.BUILD_DIR, plugins_optional_dir), lib_glob, recursive=True)
-            for plugin_group in ["sqldrivers", "platforms", "webview"]:
+            for plugin_group in ["sqldrivers", "platforms", "webview", "tls", "multimedia"]:
                 archiveByGlob(a, f"Qt plugins from {plugin_group}", join(bin_dir, plugin_group),
                     join(conf.QT_DIR, "plugins", plugin_group), lib_glob)
 

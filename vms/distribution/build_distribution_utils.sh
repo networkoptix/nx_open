@@ -413,10 +413,11 @@ distrib_copyQtLibs() # additional_libs_to_copy...
     echo "Copying Qt libs"
 
     local qt_libs_to_copy=(
-        Concurrent
         Core
+        Core5Compat
         Gui
         Xml
+        Concurrent
         Network
         Sql
         WebSockets
@@ -427,7 +428,7 @@ distrib_copyQtLibs() # additional_libs_to_copy...
 
     local qt_lib
     for qt_lib in "${qt_libs_to_copy[@]}"; do
-        local lib_filename="libQt5${qt_lib}.so"
+        local lib_filename="libQt6${qt_lib}.so"
         echo "  Copying (Qt) ${lib_filename}"
         local file
         for file in "${QT_DIR}/lib/${lib_filename}"*; do

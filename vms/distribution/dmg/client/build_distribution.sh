@@ -41,7 +41,7 @@ copyMacOsSpecificApplauncherStuff()
 copyWebEngineFiles()
 {
     local -r FRAMEWORK="QtWebEngineCore.framework"
-    local -r VERSION_DIR="Versions/5"
+    local -r VERSION_DIR="Versions/A"
     local -r APP_FRAMEWORK_DIR="$APP_DIR/Contents/Frameworks/$FRAMEWORK"
 
     cp -r "$QT_DIR/lib/$FRAMEWORK/$VERSION_DIR/Helpers" "$APP_FRAMEWORK_DIR/$VERSION_DIR/"

@@ -124,15 +124,15 @@ bool isDeveloperBuildOnWindows()
         return false;
 
     const QString binaryPath = qApp->applicationDirPath();
-    const QString qt5LibFile =
+    const QString qtLibFile =
         #if defined(_DEBUG)
-            "Qt5Cored.dll";
+            "Qt6Cored.dll";
         #else
-            "Qt5Core.dll";
+            "Qt6Core.dll";
         #endif
 
-    // Detecting by checking if Qt5Core exists. It will give us 99% correctness.
-    return !QFileInfo::exists(QDir(binaryPath).absoluteFilePath(qt5LibFile));
+    // Detecting by checking if Qt6Core exists. It will give us 99% correctness.
+    return !QFileInfo::exists(QDir(binaryPath).absoluteFilePath(qtLibFile));
 }
 
 } // namespace

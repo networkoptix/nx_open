@@ -100,22 +100,22 @@ def fix_binary(binary, bindir, libdir, qlibdir, tlibdir, qtver):
             # QtCore.framework
             framework_name = '{name}.framework'.format(name=name)
             if framework_name in qframeworks:
-                # QtCore.framework/Versions/5
+                # QtCore.framework/Versions/A
                 folder = path[path.find(framework_name):]
                 if not os.path.exists(join(tlibdir, folder)):
                     os.makedirs(join(tlibdir, folder))
 
                 if not os.path.exists(join(tlibdir, folder, name)):
-                    # <source>/QtCore.framework/Versions/5/QtCore
+                    # <source>/QtCore.framework/Versions/A/QtCore
                     fpath = join(qlibdir, folder, name)
 
                     # <target>/QtCore.framework
                     troot = join(tlibdir, framework_name)
 
-                    # <target>/QtCore.framework/Versions/5
+                    # <target>/QtCore.framework/Versions/A
                     tfolder = join(tlibdir, folder)
 
-                    # <target>/QtCore.framework/Versions/5/QtCore
+                    # <target>/QtCore.framework/Versions/A/QtCore
                     tpath = join(tfolder, name)
 
                     # Copy framework binary
@@ -136,6 +136,6 @@ def fix_binary(binary, bindir, libdir, qlibdir, tlibdir, qtver):
 
                     os.symlink(join('Versions/Current', name), join(troot, name))
                     os.symlink('Versions/Current/Resources', join(troot, 'Resources'))
-                    os.symlink('5', join(troot, 'Versions/Current'))
+                    os.symlink('A', join(troot, 'Versions/Current'))
 
                     fix_binary(tpath, bindir, libdir, qlibdir, tlibdir, qtver)

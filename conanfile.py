@@ -115,6 +115,7 @@ class NxOpenConan(ConanFile):
             self.requires("intel-media-sdk-bin/2019R1" "#0a123266dd20b84b16a4cc60b752fc4b")
             self.requires("msvc-redist/14.29.30133" "#9f10aa59e4671ce0669d6181e6b0a269")
             self.requires("winsdk-redist/10.0.19041.0" "#acf550438d5c5d7c1be638c7ac9662e3")
+            self.requires("icu-win/70.1" "#1c50009a7165b74563ba149c315737f1")
 
         if self.isArm32 or self.isArm64:
             self.requires("sse2neon/efcbd5" "#57aba3f11ce3af714a328146c08e5171")

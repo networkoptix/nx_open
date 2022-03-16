@@ -108,7 +108,7 @@ else()
 endif()
 
 if(targetDevice STREQUAL "windows_x64")
-    set(compilingOptions "-Tv141") #< Use MSVC 2017 compiler.
+    set(compilingOptions "-Tv142") #< Use MSVC 2019 compiler.
 else()
     if(targetDevice STREQUAL "linux_arm32"
         OR targetDevice STREQUAL "edge1"

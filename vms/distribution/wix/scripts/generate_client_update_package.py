@@ -9,6 +9,7 @@ import distribution_tools as tools
 
 qt_libraries = [
     'Core',
+    'Core5Compat',
     'Gui',
     'Multimedia',
     'Network',
@@ -18,8 +19,11 @@ qt_libraries = [
     'Sql',
     'Widgets',
     'OpenGL',
+    'OpenGLWidgets',
     'WebChannel',
     'PrintSupport',
+    'Positioning',
+    'PositioningQuick',
     'MultimediaWidgets',
     'MultimediaQuick',
     'Qml',
@@ -29,9 +33,12 @@ qt_libraries = [
     'QuickWidgets',
     'QuickTemplates2',
     'QuickControls2',
+    'QuickControls2Impl',
+    'QuickLayouts',
     'QuickShapes',
-    'WebEngine',
+    'ShaderTools',
     'WebEngineCore',
+    'WebEngineQuick',
     'WebEngineWidgets',
 ]
 
@@ -43,7 +50,9 @@ qt_plugins = [
     'imageformats/qgif.dll',
     'imageformats/qjpeg.dll',
     'imageformats/qtiff.dll',
-    'platforms/qwindows.dll']
+    'platforms/qwindows.dll',
+    'tls/qopensslbackend.dll',
+    'multimedia/windowsmediaplugin.dll']
 
 nx_libraries = [
     'nx_vms_common',
