@@ -324,14 +324,14 @@ QAbstractItemModel* ResourceSelectionWidget::model() const
 
 void ResourceSelectionWidget::setupHeader()
 {
-    static constexpr int kCheckboxColumnWidth =
-        nx::style::Metrics::kDefaultTopLevelMargin + nx::style::Metrics::kViewRowHeight;
+    const auto checkboxColumnWidth =
+        nx::style::Metrics::kCheckIndicatorSize + resourceViewWidget()->sideIndentation().right();
 
     const auto header = resourceViewWidget()->treeHeaderView();
     const auto checkboxColumn = d->columnCount - 1;
 
     header->setStretchLastSection(false);
-    header->resizeSection(checkboxColumn, kCheckboxColumnWidth);
+    header->resizeSection(checkboxColumn, checkboxColumnWidth);
     header->setSectionResizeMode(resource_selection_view::ResourceColumn,
         QHeaderView::ResizeMode::Stretch);
     header->setSectionResizeMode(checkboxColumn, QHeaderView::ResizeMode::Fixed);

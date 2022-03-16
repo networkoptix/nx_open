@@ -28,10 +28,6 @@ namespace {
 using namespace nx::vms::client::desktop;
 using namespace backup_settings_view;
 
-static const auto kViewItemIndents = QnIndents(
-    nx::style::Metrics::kDefaultTopLevelMargin,
-    nx::style::Metrics::kDefaultTopLevelMargin);
-
 using AbstractEntityPtr = entity_item_model::AbstractEntityPtr;
 using ResourceTreeEntityBuilder = entity_resource_tree::ResourceTreeEntityBuilder;
 
@@ -91,7 +87,6 @@ BackupSettingsViewWidget::BackupSettingsViewWidget(QWidget* parent):
     m_viewItemDelegate->setShowRecordingIndicator(true);
     resourceViewWidget()->setSelectionMode(QAbstractItemView::ExtendedSelection);
     resourceViewWidget()->setItemDelegate(m_viewItemDelegate.get());
-    resourceViewWidget()->setSideIndentation(kViewItemIndents);
     resourceViewWidget()->setUniformRowHeights(false);
     resourceViewWidget()->setVisibleItemPredicate(
         [](const QModelIndex& index) { return index.isValid(); }); //< Expand all.

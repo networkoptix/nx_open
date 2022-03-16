@@ -8,10 +8,11 @@
 #include <QtCore/QModelIndexList>
 #include <QtWidgets/QAbstractItemView>
 
+#include <ui/common/indents.h>
+
 class QAbstractItemModel;
 class QAbstractItemDelegate;
 class QHeaderView;
-class QnIndents;
 
 namespace Ui { class FilteredResourceViewWidget; }
 
@@ -88,11 +89,11 @@ public:
     void setUseTreeIndentation(bool useTreeIndentation);
 
     /**
-     * Allows to alter item contents side margins. Default indentation is
-     * <tt>style::Metrics::kDefaultTopLevelMargin</tt> both for left and right side.
-     * @param indents New value for indents.
+     * @return Content side margins of the leftmost the rightmost column items. Indents size are
+     *     slightly vary depending on whether tree indentation is used or not and cannot be altered
+     *     in any other way.
      */
-    void setSideIndentation(const QnIndents& indents);
+    QnIndents sideIndentation() const;
 
     /**
      * Accessor for the same named method of the encapsulated tree view.
@@ -142,12 +143,6 @@ public:
      * @return True if source model contains no data or source model hasn't been set.
      */
     bool isEmpty() const;
-
-    /**
-     * @param enabled Enabled state which will be applied both to the encapsulated tree view
-     *     and filter line edit.
-     */
-    void setItemViewEnabled(bool enabled);
 
     /**
      * @return Pointer to the header widget which will be located above filter input (not be

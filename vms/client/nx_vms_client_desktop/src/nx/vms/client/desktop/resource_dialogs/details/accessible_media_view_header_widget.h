@@ -10,6 +10,7 @@ namespace Ui { class AccessibleMediaViewHeaderWidget; }
 
 class QStandardItemModel;
 class QStandardItem;
+class QnIndents;
 
 namespace nx::vms::client::desktop {
 

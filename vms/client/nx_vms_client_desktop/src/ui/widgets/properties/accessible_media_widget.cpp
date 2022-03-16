@@ -62,8 +62,7 @@ QnAccessibleMediaWidget::QnAccessibleMediaWidget(
             const bool newAllMediaCheckedValue = !m_headerWidget->allMediaCheked();
 
             m_headerWidget->setAllMediaCheked(newAllMediaCheckedValue);
-            m_mediaSelectionWidget->resourceViewWidget()->setItemViewEnabled(
-                !newAllMediaCheckedValue);
+            m_mediaSelectionWidget->setAccessAllMedia(newAllMediaCheckedValue);
 
             emit hasChangesChanged();
         });
@@ -113,7 +112,7 @@ void QnAccessibleMediaWidget::loadDataToUi()
     }
 
     m_headerWidget->setAllMediaCheked(accessAllMedia);
-    m_mediaSelectionWidget->resourceViewWidget()->setItemViewEnabled(!accessAllMedia);
+    m_mediaSelectionWidget->setAccessAllMedia(accessAllMedia);
 }
 
 bool QnAccessibleMediaWidget::allCamerasItemChecked() const

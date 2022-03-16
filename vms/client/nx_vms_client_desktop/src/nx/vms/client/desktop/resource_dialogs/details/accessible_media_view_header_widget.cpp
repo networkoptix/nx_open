@@ -12,6 +12,16 @@
 #include <nx/vms/client/desktop/resource_dialogs/resource_dialogs_constants.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <ui/common/indents.h>
+
+namespace {
+
+static constexpr auto kHeaderViewExtraLeftIndent = 8;
+static constexpr auto kHeaderViewSideIndents = QnIndents(
+    nx::style::Metrics::kDefaultTopLevelMargin + kHeaderViewExtraLeftIndent,
+    nx::style::Metrics::kDefaultTopLevelMargin);
+
+} // namespace
 
 namespace nx::vms::client::desktop {
 
@@ -35,6 +45,8 @@ AccessibleMediaViewHeaderWidget::AccessibleMediaViewHeaderWidget(QWidget* parent
 
     m_allMediaCheckableItemModel->appendRow({allMediaTextItem, m_allMediaCheckableItem});
 
+    ui->allCamerasCheckboxView->setProperty(style::Properties::kSideIndentation,
+        QVariant::fromValue(kHeaderViewSideIndents));
     ui->allCamerasCheckboxView->setFixedHeight(nx::style::Metrics::kViewRowHeight);
     ui->allCamerasCheckboxView->setModel(m_allMediaCheckableItemModel.get());
     ui->allCamerasCheckboxView->setItemDelegateForColumn(
@@ -42,11 +54,12 @@ AccessibleMediaViewHeaderWidget::AccessibleMediaViewHeaderWidget(QWidget* parent
     ui->allCamerasCheckboxView->setItemDelegateForColumn(
         CheckboxColumn, new CheckBoxColumnItemDelegate(this));
 
-    static constexpr int kCheckboxColumnWidth = nx::style::Metrics::kViewRowHeight;
+    const auto checkboxColumnWidth =
+        nx::style::Metrics::kCheckIndicatorSize + kHeaderViewSideIndents.right();
 
     const auto header = ui->allCamerasCheckboxView->header();
     header->setStretchLastSection(false);
-    header->resizeSection(CheckboxColumn, kCheckboxColumnWidth);
+    header->resizeSection(CheckboxColumn, checkboxColumnWidth);
     header->setSectionResizeMode(ResourceColumn, QHeaderView::ResizeMode::Stretch);
     header->setSectionResizeMode(CheckboxColumn, QHeaderView::ResizeMode::Fixed);
 

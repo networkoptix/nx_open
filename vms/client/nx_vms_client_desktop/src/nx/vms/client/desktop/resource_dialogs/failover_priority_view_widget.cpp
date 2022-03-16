@@ -16,8 +16,6 @@
 
 namespace {
 
-static constexpr auto kViewItemIndents = QnIndents(nx::style::Metrics::kDefaultTopLevelMargin);
-
 using AbstractEntityPtr = nx::vms::client::desktop::entity_item_model::AbstractEntityPtr;
 using ResourceTreeEntityBuilder =
     nx::vms::client::desktop::entity_resource_tree::ResourceTreeEntityBuilder;
@@ -63,7 +61,6 @@ FailoverPriorityViewWidget::FailoverPriorityViewWidget(QWidget* parent):
     resourceViewWidget()->setItemDelegate(new ResourceDialogItemDelegate(this));
     resourceViewWidget()->setItemDelegateForColumn(failover_priority_view::FailoverPriorityColumn,
         new FailoverPriorityColumnItemDelegate(this));
-    resourceViewWidget()->setSideIndentation(kViewItemIndents);
     resourceViewWidget()->setVisibleItemPredicate(
         [](const QModelIndex& index)
         {
