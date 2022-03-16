@@ -753,7 +753,7 @@ bool QnVideoStreamDisplay::processDecodedFrame(
     if (outFrame->isEmpty())
         return false;
 
-    if (m_isLive)
+    if (m_isLive && outFrame->memoryType() != MemoryType::VideoMemory)
         qnClientModule->videoCache()->add(m_resource->toResource()->getId(), outFrame);
 
     if (enableFrameQueue)
