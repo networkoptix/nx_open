@@ -1,7 +1,5 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#pragma once
-
 #include "rules_table_model.h"
 
 #include <nx/vms/api/rules/rule.h>
@@ -11,6 +9,8 @@
 #include <nx/vms/rules/event_field.h>
 #include <nx/vms/rules/event_filter.h>
 #include <nx/vms/rules/events/generic_event.h>
+#include <nx_ec/abstract_ec_connection.h>
+#include <nx_ec/managers/abstract_vms_rules_manager.h>
 
 namespace nx::vms::client::desktop::rules {
 
@@ -82,8 +82,12 @@ RulesTableModel::SimplifiedRule::~SimplifiedRule()
 
 void RulesTableModel::SimplifiedRule::setRule(std::unique_ptr<vms::rules::Rule>&& rule)
 {
-    actualRule = std::move(rule);
-    update();
+    // As users of the class use raw pointers to the fields owned by the actualRule and got by
+    // users with eventFields() and actionFields() methods it is required to prolong lifetime of
+    // the fields and delete them only after users is notified about changes.
+    actualRule.swap(rule);
+
+    update({Qt::DisplayRole, Qt::CheckStateRole, FieldRole});
 }
 
 const vms::rules::Rule* RulesTableModel::SimplifiedRule::rule() const
@@ -96,17 +100,14 @@ void RulesTableModel::SimplifiedRule::setModelIndex(const QPersistentModelIndex&
     index = modelIndex;
 }
 
+QPersistentModelIndex RulesTableModel::SimplifiedRule::modelIndex() const
+{
+    return index;
+}
+
 void RulesTableModel::SimplifiedRule::update()
 {
-    if (index.isValid())
-    {
-        auto model = dynamic_cast<const RulesTableModel*>(index.model());
-        if (!model)
-            return;
-
-        // It is save cast case updateRule() method doesn't invalidate index.
-        const_cast<RulesTableModel*>(model)->updateRule(index);
-    }
+    update({Qt::CheckStateRole});
 }
 
 QnUuid RulesTableModel::SimplifiedRule::id() const
@@ -128,7 +129,7 @@ void RulesTableModel::SimplifiedRule::setEventType(const QString& eventType)
         actualRule->takeEventFilter(0);
 
     actualRule->addEventFilter(engine->buildEventFilter(eventType));
-    update();
+    update({Qt::DisplayRole, Qt::CheckStateRole, FieldRole});
 }
 
 QHash<QString, Field*> RulesTableModel::SimplifiedRule::eventFields() const
@@ -159,7 +160,7 @@ void RulesTableModel::SimplifiedRule::setActionType(const QString& actionType)
         actualRule->takeActionBuilder(0);
 
     actualRule->addActionBuilder(engine->buildActionBuilder(actionType));
-    update();
+    update({Qt::DisplayRole, Qt::CheckStateRole, FieldRole});
 }
 
 QHash<QString, Field*> RulesTableModel::SimplifiedRule::actionFields() const
@@ -184,7 +185,7 @@ QString RulesTableModel::SimplifiedRule::comment() const
 void RulesTableModel::SimplifiedRule::setComment(const QString& comment)
 {
     actualRule->setComment(comment);
-    update();
+    update({Qt::DisplayRole, Qt::CheckStateRole});
 }
 
 bool RulesTableModel::SimplifiedRule::enabled() const
@@ -195,25 +196,73 @@ bool RulesTableModel::SimplifiedRule::enabled() const
 void RulesTableModel::SimplifiedRule::setEnabled(bool value)
 {
     actualRule->setEnabled(value);
-    update();
+    update({Qt::CheckStateRole});
+}
+
+void RulesTableModel::SimplifiedRule::update(const QVector<int>& roles)
+{
+    if (index.isValid())
+    {
+        auto model = dynamic_cast<const RulesTableModel*>(index.model());
+        if (!model)
+            return;
+
+        // It is save cast case updateRule() method doesn't invalidate index.
+        const_cast<RulesTableModel*>(model)->updateRule(index, roles);
+    }
 }
 
 RulesTableModel::RulesTableModel(QObject* parent):
-    QAbstractTableModel(parent), engine(Engine::instance())
+    QAbstractTableModel(parent),
+    QnWorkbenchContextAware(parent),
+    engine(vmsRulesEngine())
 {
     initialise();
+
+    connect(engine, &vms::rules::Engine::ruleUpdated, this,
+        [this](QnUuid ruleId)
+        {
+            modifiedRules.erase(ruleId);
+
+            if (auto simplifiedRule = rule(ruleId).lock())
+            {
+                simplifiedRule->setRule(engine->cloneRule(ruleId));
+                return;
+            }
+
+            beginInsertRows({}, simplifiedRules.size(), simplifiedRules.size());
+
+            simplifiedRules.emplace_back(new SimplifiedRule(engine, engine->cloneRule(ruleId)));
+            simplifiedRules.back()->setModelIndex(index(simplifiedRules.size() - 1, IdColumn));
+
+            endInsertRows();
+        });
+
+    connect(engine, &vms::rules::Engine::ruleRemoved, this,
+        [this](QnUuid ruleId)
+        {
+            removedRules.erase(ruleId);
+
+            removeRule(ruleId);
+        });
+
+    connect(engine, &vms::rules::Engine::rulesReset, this,
+        [this]
+        {
+            rejectChanges();
+        });
 }
 
 RulesTableModel::~RulesTableModel()
 {
 }
 
-int RulesTableModel::rowCount(const QModelIndex& parent) const
+int RulesTableModel::rowCount(const QModelIndex& /*parent*/) const
 {
-    return rules.size();
+    return simplifiedRules.size();
 }
 
-int RulesTableModel::columnCount(const QModelIndex& parent) const
+int RulesTableModel::columnCount(const QModelIndex& /*parent*/) const
 {
     return ColumnsCount;
 }
@@ -283,7 +332,7 @@ QVariant RulesTableModel::headerData(int section, Qt::Orientation orientation, i
 
 QModelIndex RulesTableModel::addRule()
 {
-    beginInsertRows({}, rules.size(), rules.size());
+    beginInsertRows({}, simplifiedRules.size(), simplifiedRules.size());
 
     auto newRuleId = QnUuid::createUuid();
 
@@ -300,12 +349,12 @@ QModelIndex RulesTableModel::addRule()
     newRule->addEventFilter(std::move(eventFilter));
     newRule->addActionBuilder(std::move(actionBuilder));
 
-    rules.push_back(std::shared_ptr<SimplifiedRule>{new SimplifiedRule(engine, std::move(newRule))});
-    rules.back()->setModelIndex(index(rules.size() - 1, IdColumn));
+    simplifiedRules.emplace_back(new SimplifiedRule(engine, std::move(newRule)));
+    simplifiedRules.back()->setModelIndex(index(simplifiedRules.size() - 1, IdColumn));
 
     endInsertRows();
 
-    return index(rules.size() - 1, IdColumn);
+    return index(simplifiedRules.size() - 1, IdColumn);
 }
 
 bool RulesTableModel::removeRule(const QModelIndex& ruleIndex)
@@ -317,23 +366,48 @@ bool RulesTableModel::removeRule(const QModelIndex& ruleIndex)
 
     beginRemoveRows({}, row, row);
 
-    removedRules.insert(rules[row]->id());
-    rules.erase(rules.begin() + row);
+    removedRules.insert(simplifiedRules[row]->id());
+    simplifiedRules.erase(simplifiedRules.begin() + row);
 
     endRemoveRows();
 
     return true;
 }
 
-std::weak_ptr<RulesTableModel::SimplifiedRule> RulesTableModel::rule(const QModelIndex& ruleIndex)
+bool RulesTableModel::removeRule(const QnUuid& id)
+{
+    if (auto simplifiedRule = rule(id).lock())
+        return removeRule(simplifiedRule->modelIndex());
+
+    return false;
+}
+
+std::weak_ptr<RulesTableModel::SimplifiedRule> RulesTableModel::rule(
+    const QModelIndex& ruleIndex) const
 {
     if (!isIndexValid(ruleIndex))
         return {};
 
-    return std::weak_ptr<SimplifiedRule>(rules[ruleIndex.row()]);
+    return std::weak_ptr<SimplifiedRule>(simplifiedRules[ruleIndex.row()]);
 }
 
-void RulesTableModel::updateRule(const QModelIndex& ruleIndex)
+std::weak_ptr<RulesTableModel::SimplifiedRule> RulesTableModel::rule(const QnUuid& id) const
+{
+    auto simplifiedRule = std::find_if(
+        simplifiedRules.cbegin(),
+        simplifiedRules.cend(),
+        [&id](const std::shared_ptr<SimplifiedRule>& r)
+        {
+            return r->id() == id;
+        });
+
+    if (simplifiedRule == simplifiedRules.cend())
+        return {};
+
+    return std::weak_ptr<RulesTableModel::SimplifiedRule>(*simplifiedRule);
+}
+
+void RulesTableModel::updateRule(const QModelIndex& ruleIndex, const QVector<int>& roles)
 {
     if (!isIndexValid(ruleIndex))
         return;
@@ -342,23 +416,61 @@ void RulesTableModel::updateRule(const QModelIndex& ruleIndex)
 
     auto eventIndex = index(row, EventColumn);
     auto editedIndex = index(row, EditedStateColumn);
-    emit dataChanged(eventIndex, editedIndex, {Qt::DisplayRole, Qt::CheckStateRole});
+    emit dataChanged(eventIndex, editedIndex, roles);
 }
 
-void RulesTableModel::applyChanges()
+void RulesTableModel::applyChanges(std::function<void(const QString&)> errorHandler)
 {
-    // Handle added and changed rules.
-    for (const auto& simplifiedRule: rules)
+    auto connection = messageBusConnection();
+    if (!connection)
+        return;
+
+    auto rulesManager = connection->getVmsRulesManager(Qn::kSystemAccess);
+
+    // Send save rule transactions.
+    for (const auto& simplifiedRule: simplifiedRules)
     {
-        if (isRuleModified(simplifiedRule.get()))
-            engine->addRule(engine->serialize(simplifiedRule->rule()));
+        if (!isRuleModified(simplifiedRule.get()))
+            continue;
+
+        auto id = simplifiedRule->id();
+        modifiedRules.insert(id);
+
+        auto serializedRule = engine->serialize(simplifiedRule->rule());
+        rulesManager->save(
+            serializedRule,
+            [this, errorHandler, id](int /*requestId*/, ec2::ErrorCode errorCode)
+            {
+                if (!modifiedRules.contains(id))
+                    return;
+
+                if (errorCode == ec2::ErrorCode::ok)
+                    return;
+
+                if (errorHandler)
+                    errorHandler(ec2::toString(errorCode));
+            }
+        );
     }
 
-    // Handle removed rules.
+    // Send remove rule transactions.
     for (const auto& id: removedRules)
-        engine->removeRule(id);
+    {
+        rulesManager->deleteRule(
+            id,
+            [this, id, errorHandler](int /*requestId*/, ec2::ErrorCode errorCode)
+            {
+                if (!removedRules.contains(id))
+                    return;
 
-    removedRules.clear();
+                if (errorCode == ec2::ErrorCode::ok)
+                    return;
+
+                if (errorHandler)
+                    errorHandler(ec2::toString(errorCode));
+            }
+        );
+    }
 }
 
 void RulesTableModel::rejectChanges()
@@ -375,8 +487,8 @@ void RulesTableModel::initialise()
     auto clonedRules = engine->cloneRules();
 
     removedRules.clear();
-    rules.clear();
-    rules.reserve(clonedRules.size());
+    simplifiedRules.clear();
+    simplifiedRules.reserve(clonedRules.size());
 
     for (auto& [id, rule]: clonedRules)
     {
@@ -387,8 +499,8 @@ void RulesTableModel::initialise()
         if (!eventDescriptor || !actionDescriptor)
             continue;
 
-        rules.emplace_back(new SimplifiedRule(engine, std::move(rule)));
-        rules.back()->setModelIndex(index(rules.size() - 1, IdColumn));
+        simplifiedRules.emplace_back(new SimplifiedRule(engine, std::move(rule)));
+        simplifiedRules.back()->setModelIndex(index(simplifiedRules.size() - 1, IdColumn));
     }
 }
 
@@ -415,7 +527,7 @@ QVariant RulesTableModel::idColumnData(const QModelIndex& index, int role) const
     switch (role)
     {
         case Qt::DisplayRole:
-            return rules[index.row()]->id().toString();
+            return simplifiedRules[index.row()]->id().toString();
         case FilterRole:
             return QString("%1 %2")
                 .arg(eventColumnData(index, Qt::DisplayRole).toString())
@@ -428,7 +540,7 @@ QVariant RulesTableModel::idColumnData(const QModelIndex& index, int role) const
 QVariant RulesTableModel::eventColumnData(const QModelIndex& index, int role) const
 {
     if (role == Qt::DisplayRole)
-        return rules[index.row()]->eventDescriptor()->displayName;
+        return simplifiedRules[index.row()]->eventDescriptor()->displayName;
 
     return {};
 }
@@ -438,7 +550,7 @@ QVariant RulesTableModel::actionColumnData(const QModelIndex& index, int role) c
     switch (role)
     {
         case Qt::DisplayRole:
-            return rules[index.row()]->actionDescriptor()->displayName;
+            return simplifiedRules[index.row()]->actionDescriptor()->displayName;
     }
 
     return {};
@@ -447,7 +559,7 @@ QVariant RulesTableModel::actionColumnData(const QModelIndex& index, int role) c
 QVariant RulesTableModel::editedStateColumnData(const QModelIndex& index, int role) const
 {
     if (role == Qt::CheckStateRole)
-        return isRuleModified(rules[index.row()].get()) ? Qt::Checked : Qt::Unchecked;
+        return isRuleModified(simplifiedRules[index.row()].get()) ? Qt::Checked : Qt::Unchecked;
 
     return {};
 }
@@ -455,7 +567,7 @@ QVariant RulesTableModel::editedStateColumnData(const QModelIndex& index, int ro
 QVariant RulesTableModel::enabledStateColumnData(const QModelIndex& index, int role) const
 {
     if (role == Qt::CheckStateRole)
-        return rules[index.row()]->enabled() ? Qt::Checked : Qt::Unchecked;
+        return simplifiedRules[index.row()]->enabled() ? Qt::Checked : Qt::Unchecked;
 
     return {};
 }
@@ -465,7 +577,7 @@ bool RulesTableModel::setEnabledStateColumnData(
 {
     if (role == Qt::CheckStateRole)
     {
-        rules[index.row()]->setEnabled(value.toInt() == Qt::Checked ? true : false);
+        simplifiedRules[index.row()]->setEnabled(value.toInt() == Qt::Checked ? true : false);
         return true;
     }
 
@@ -475,7 +587,7 @@ bool RulesTableModel::setEnabledStateColumnData(
 QVariant RulesTableModel::commentColumnData(const QModelIndex& index, int role) const
 {
     if (role == Qt::DisplayRole)
-        return rules[index.row()]->comment();
+        return simplifiedRules[index.row()]->comment();
 
     return {};
 }

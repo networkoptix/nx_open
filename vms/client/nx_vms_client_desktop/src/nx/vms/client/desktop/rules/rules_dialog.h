@@ -34,11 +34,18 @@ private:
     void updateReadOnlyState();
     void showTipPanel(bool show);
     void displayRule();
-    void createEventEditor();
-    void createActionEditor();
+    void displayEvent(const RulesTableModel::SimplifiedRule& rule);
+    void displayAction(const RulesTableModel::SimplifiedRule& rule);
+    void displayComment(const RulesTableModel::SimplifiedRule& rule);
+    void createEventEditor(const vms::rules::ItemDescriptor& descriptor);
+    void createActionEditor(const vms::rules::ItemDescriptor& descriptor);
     void resetFilter();
     void resetSelection();
     void updateRule();
+    void onModelDataChanged(
+        const QModelIndex& topLeft,
+        const QModelIndex& bottomRight,
+        const QVector<int>& roles);
 
 private:
     std::unique_ptr<Ui::RulesDialog> ui;
@@ -46,8 +53,8 @@ private:
     bool readOnly{};
     ParamsWidget* eventEditorWidget{};
     ParamsWidget* actionEditorWidget{};
-    std::unique_ptr<RulesTableModel> rulesTableModel;
-    std::unique_ptr<QSortFilterProxyModel> rulesFilterModel;
+    RulesTableModel* rulesTableModel{};
+    QSortFilterProxyModel* rulesFilterModel{};
     std::weak_ptr<RulesTableModel::SimplifiedRule> displayedRule;
 };
 

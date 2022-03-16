@@ -20,7 +20,7 @@ void CommonParamsWidget::onDescriptorSet()
     layout->setSpacing(style::Metrics::kDefaultLayoutSpacing.height());
     layout->setContentsMargins(0, 0, 0, 0);
 
-    for (const auto& fieldDescriptor: descriptor.fields)
+    for (const auto& fieldDescriptor: descriptor().fields)
     {
         PickerWidget* picker = PickerFactory::createWidget(fieldDescriptor);
         layout->addWidget(picker);

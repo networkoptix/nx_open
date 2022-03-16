@@ -56,14 +56,18 @@ private:
 
     virtual void onFieldSet() override
     {
-        ui->lineEdit->setText(text());
+        {
+            const QSignalBlocker blocker{ui->lineEdit};
+            ui->lineEdit->setText(text());
+        }
 
         connect(ui->lineEdit, &QLineEdit::textEdited, this,
             [this](const QString& text)
             {
                 setText(text);
                 emit edited();
-            });
+            },
+            Qt::UniqueConnection);
     }
 
     QString text() const

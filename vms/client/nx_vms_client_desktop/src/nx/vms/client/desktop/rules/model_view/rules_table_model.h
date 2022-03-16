@@ -11,10 +11,13 @@
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/field.h>
 #include <nx/vms/rules/rule.h>
+#include <ui/workbench/workbench_context_aware.h>
 
 namespace nx::vms::client::desktop::rules {
 
-class RulesTableModel: public QAbstractTableModel
+class RulesTableModel:
+    public QAbstractTableModel,
+    public QnWorkbenchContextAware
 {
     Q_OBJECT
 
@@ -32,7 +35,8 @@ public:
 
     enum Roles
     {
-        FilterRole = Qt::UserRole
+        FilterRole = Qt::UserRole,
+        FieldRole
     };
 
     explicit RulesTableModel(QObject* parent = nullptr);
@@ -82,6 +86,8 @@ public:
          */
         void update();
 
+        QPersistentModelIndex modelIndex() const;
+
     private:
         QPersistentModelIndex index;
         vms::rules::Engine* engine{};
@@ -91,9 +97,11 @@ public:
         friend class RulesTableModel;
 
         SimplifiedRule(vms::rules::Engine* engine, std::unique_ptr<vms::rules::Rule>&& rule);
+
         void setRule(std::unique_ptr<vms::rules::Rule>&& rule);
         const vms::rules::Rule* rule() const;
         void setModelIndex(const QPersistentModelIndex& modelIndex);
+        void update(const QVector<int>& roles);
     };
 
     /** Add new rule and return its index. Returns invalid index if rule was not added. */
@@ -102,17 +110,24 @@ public:
     /** Remove rule under the index. Returns true if removed, false otherwise. */
     bool removeRule(const QModelIndex& ruleIndex);
 
+    /** Remove rule under the id. Returns true if removed, false otherwise. */
+    bool removeRule(const QnUuid& id);
+
     /** Returns simplified rule under the index. Returns nullptr if there is no such a rule. */
-    std::weak_ptr<SimplifiedRule> rule(const QModelIndex& ruleIndex);
+    std::weak_ptr<SimplifiedRule> rule(const QModelIndex& ruleIndex) const;
+
+    /** Returns simplified rule under the id. Returns nullptr if there is no such a rule. */
+    std::weak_ptr<SimplifiedRule> rule(const QnUuid& id) const;
 
     /** If the rule was edited required to call this method to notify the model. */
-    void updateRule(const QModelIndex& ruleIndex);
+    void updateRule(const QModelIndex& ruleIndex, const QVector<int>& roles);
 
-    void applyChanges();
+    void applyChanges(std::function<void(const QString&)> errorHandler = {});
     void rejectChanges();
 
 private:
-    std::vector<std::shared_ptr<SimplifiedRule>> rules;
+    std::vector<std::shared_ptr<SimplifiedRule>> simplifiedRules;
+    std::set<QnUuid> modifiedRules;
     std::set<QnUuid> removedRules;
     vms::rules::Engine* engine{};
 

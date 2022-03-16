@@ -118,7 +118,8 @@ private:
             {
                 select();
                 updateUi();
-            });
+            },
+            Qt::UniqueConnection);
     }
 
     QnSelectResourcesButton* createSelectButton();
