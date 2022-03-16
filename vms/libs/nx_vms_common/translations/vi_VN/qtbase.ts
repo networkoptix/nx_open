@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="vi" sourcelanguage="en">
+<TS version="2.1" language="vi_VN" sourcelanguage="en_US">
   <context>
     <name>CloseButton</name>
     <message>
@@ -20,7 +20,7 @@
     </message>
     <message>
       <source>Hide Others</source>
-      <translation>Án khác</translation>
+      <translation>Giấu khác</translation>
     </message>
     <message>
       <source>Show All</source>
@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>Preferences...</source>
-      <translation>Áở thích...</translation>
+      <translation>Tùy chỉnh...</translation>
     </message>
     <message>
       <source>Quit %1</source>
@@ -43,11 +43,11 @@
     <name>QAbstractSpinBox</name>
     <message>
       <source>&amp;Select All</source>
-      <translation>&amp;chọn tất cả</translation>
+      <translation>&amp;Chọn tất cả</translation>
     </message>
     <message>
       <source>&amp;Step up</source>
-      <translation>&amp;bước lên</translation>
+      <translation>&amp;Bước lên</translation>
     </message>
     <message>
       <source>Step &amp;down</source>
@@ -58,11 +58,11 @@
     <name>QAccessibleActionInterface</name>
     <message>
       <source>Press</source>
-      <translation>Báo chí</translation>
+      <translation>Nhấn</translation>
     </message>
     <message>
       <source>Increase</source>
-      <translation>Tăng lên</translation>
+      <translation>Tăng</translation>
     </message>
     <message>
       <source>Decrease</source>
@@ -78,19 +78,19 @@
     </message>
     <message>
       <source>Toggle</source>
-      <translation>Chuyển</translation>
+      <translation>Thay đổi</translation>
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation>Di chuyển sang trái</translation>
+      <translation>Cuộn sang trái</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Di chuyển sang phải</translation>
+      <translation>Cuộn sang phải</translation>
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation>Di chuyển lên</translation>
+      <translation>Cuộn lên</translation>
     </message>
     <message>
       <source>Scroll Down</source>
@@ -106,7 +106,7 @@
     </message>
     <message>
       <source>Triggers the action</source>
-      <translation>Gây nên những hành động</translation>
+      <translation>Kích hoạt hành động</translation>
     </message>
     <message>
       <source>Increase the value</source>
@@ -126,11 +126,11 @@
     </message>
     <message>
       <source>Toggles the state</source>
-      <translation>Bập bênh nhà nước</translation>
+      <translation>Thay đổi trạng thái</translation>
     </message>
     <message>
       <source>Scrolls to the left</source>
-      <translation>Cuộn trái</translation>
+      <translation>Cuộn sang trái</translation>
     </message>
     <message>
       <source>Scrolls to the right</source>
@@ -146,7 +146,7 @@
     </message>
     <message>
       <source>Goes back a page</source>
-      <translation>Đi trở lại trang</translation>
+      <translation>Quay lại một trang</translation>
     </message>
     <message>
       <source>Goes to the next page</source>
@@ -157,19 +157,19 @@
     <name>QAndroidPlatformTheme</name>
     <message>
       <source>Yes</source>
-      <translation>Có</translation>
+      <translation>Đồng ý</translation>
     </message>
     <message>
       <source>Yes to All</source>
-      <translation>Có Cho Tất cả</translation>
+      <translation>Đồng ý tất cả</translation>
     </message>
     <message>
       <source>No</source>
-      <translation>Không</translation>
+      <translation>Từ chối</translation>
     </message>
     <message>
       <source>No to All</source>
-      <translation>Không Cho Tất cả</translation>
+      <translation>Từ chối tất cả</translation>
     </message>
   </context>
   <context>
@@ -188,7 +188,7 @@
     </message>
     <message>
       <source>Preference</source>
-      <translation>Sự ưa thích</translation>
+      <translation>Tuỳ chỉnh</translation>
     </message>
     <message>
       <source>Options</source>
@@ -196,11 +196,11 @@
     </message>
     <message>
       <source>Setting</source>
-      <translation>Thiết lập</translation>
+      <translation>Cài đặt</translation>
     </message>
     <message>
       <source>Setup</source>
-      <translation>Thiết lập</translation>
+      <translation>Cài đặt</translation>
     </message>
     <message>
       <source>Quit</source>
@@ -208,7 +208,7 @@
     </message>
     <message>
       <source>Exit</source>
-      <translation>Lối ra</translation>
+      <translation>Thoát</translation>
     </message>
     <message>
       <source>Cut</source>
@@ -216,7 +216,7 @@
     </message>
     <message>
       <source>Copy</source>
-      <translation>Bản sao</translation>
+      <translation>Sao chép</translation>
     </message>
     <message>
       <source>Paste</source>
@@ -250,7 +250,7 @@
     </message>
     <message>
       <source>&amp;Red:</source>
-      <translation>&amp;Red:</translation>
+      <translation>&amp;Đỏ:</translation>
     </message>
     <message>
       <source>&amp;Green:</source>
@@ -266,7 +266,7 @@
     </message>
     <message>
       <source>&amp;HTML:</source>
-      <translation type="unfinished">&amp;HTML:</translation>
+      <translation>&amp;HTML:</translation>
     </message>
     <message>
       <source>Cursor at %1, %2
@@ -283,15 +283,15 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>&amp;Basic colors</source>
-      <translation>&amp;màu sắc cơ bản</translation>
+      <translation>&amp;Màu cơ bản</translation>
     </message>
     <message>
       <source>&amp;Custom colors</source>
-      <translation>&amp;tuỳ chỉnh màu sắc</translation>
+      <translation>&amp;Màu tùy chỉnh</translation>
     </message>
     <message>
       <source>&amp;Add to Custom Colors</source>
-      <translation>&amp;thêm để tùy chỉnh màu sắc</translation>
+      <translation>&amp;Thêm vào màu tùy chỉnh</translation>
     </message>
   </context>
   <context>
@@ -302,11 +302,11 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>True</source>
-      <translation>Thật</translation>
+      <translation>Đúng</translation>
     </message>
     <message>
       <source>Open the combo box selection popup</source>
-      <translation>Mở lựa chọn combo box sổ bật lên</translation>
+      <translation>Mở cửa sổ bật lên các gói lựa chọn</translation>
     </message>
   </context>
   <context>
@@ -339,7 +339,7 @@ Press ESC to cancel</source>
     <name>QDialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation>Xác định</translation>
+      <translation>Đồng ý</translation>
     </message>
   </context>
   <context>
@@ -371,15 +371,15 @@ Press ESC to cancel</source>
     <name>QFile</name>
     <message>
       <source>Destination file is the same file.</source>
-      <translation>File đích là cùng một tập tin.</translation>
+      <translation>Tệp đích là cùng một tệp.</translation>
     </message>
     <message>
       <source>Source file does not exist.</source>
-      <translation>Nguồn tập tin không tồn tại.</translation>
+      <translation>Nguồn tệp không tồn tại.</translation>
     </message>
     <message>
       <source>Destination file exists</source>
-      <translation>Tập tin đích tồn tại</translation>
+      <translation>Tệp đích tồn tại</translation>
     </message>
     <message>
       <source>Error while renaming.</source>
@@ -391,11 +391,11 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Will not rename sequential file using block copy</source>
-      <translation>Không đổi tên tập tin tuần tự sử dụng khối copy</translation>
+      <translation>Sẽ không đổi tên tệp tuần tự bằng cách sử dụng bản sao khối</translation>
     </message>
     <message>
       <source>Cannot remove source file</source>
-      <translation>Không thể xoá tập tin nguồn</translation>
+      <translation>Không thể xóa tệp nguồn</translation>
     </message>
     <message>
       <source>Cannot open %1 for input</source>
