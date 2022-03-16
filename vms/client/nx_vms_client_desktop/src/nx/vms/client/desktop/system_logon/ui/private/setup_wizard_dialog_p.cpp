@@ -6,11 +6,13 @@
 #include <QtQuick/QQuickItem>
 
 #include <client_core/client_core_module.h>
+#include <network/system_helpers.h>
 #include <nx/reflect/instrument.h>
 #include <nx/reflect/json.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/client/desktop/common/widgets/webview_widget.h>
 #include <ui/graphics/items/standard/graphics_web_view.h>
+#include <watchers/cloud_status_watcher.h>
 
 #include "../setup_wizard_dialog.h"
 
@@ -90,6 +92,26 @@ void SetupWizardDialogPrivate::openUrlInBrowser(const QString &urlString)
     }
 
     QDesktopServices::openUrl(url);
+}
+
+QString SetupWizardDialogPrivate::refreshToken() const
+{
+    if (auto watcher = qnCloudStatusWatcher; NX_ASSERT(watcher))
+        return QString::fromStdString(watcher->remoteConnectionCredentials().authToken.value);
+
+    return QString();
+}
+
+void SetupWizardDialogPrivate::connectUsingLocalAdmin(const QString& password)
+{
+    loginInfo.localLogin = helpers::kFactorySystemUser;
+    loginInfo.localPassword = password;
+    loginInfo.savePassword = false;
+}
+
+void SetupWizardDialogPrivate::connectUsingCloud()
+{
+    // TODO: #GDM To be implemented.
 }
 
 } // namespace nx::vms::client::desktop
