@@ -70,13 +70,6 @@ struct TokenInfo
 
     TokenType token_type;
 
-    /**%apidoc Seconds. Each token usage prolongates the token expiration period beyond
-     * its initial expiration period plus this value at max.
-     * So, if the token expires_in is 1day and this value is 10 minutes, then the token
-     * may be valid for up to 1 day + 10 minutes if it is being actively used.
-     */
-    std::optional<std::chrono::seconds> prolongation_period;
-
     /**%apidoc Token access scope. It is applied to any token (access token, refresh token,
      * authorization code).
      */

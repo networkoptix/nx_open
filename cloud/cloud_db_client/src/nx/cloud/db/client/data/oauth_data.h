@@ -39,12 +39,11 @@ QN_FUSION_DECLARE_FUNCTIONS(ValidateTokenResponse, (json))
 QN_FUSION_DECLARE_FUNCTIONS(IssueCodeResponse, (json))
 
 #define Issue_token_response_Fields \
-    (access_token)(refresh_token)(expires_in)(expires_at)(token_type)(prolongation_period)(scope)\
-        (error)
+    (access_token)(refresh_token)(expires_in)(expires_at)(token_type)(scope)(error)
 
 #define Validate_token_response_Fields \
-    (access_token)(expires_in)(expires_at)(token_type)(prolongation_period)( \
-        scope)(username)(vms_user_id)(time_since_password)
+    (access_token)(expires_in)(expires_at)(token_type)(scope)(username)(vms_user_id)( \
+        time_since_password)
 
 #define Issue_code_response_Fields (access_code)(code)(error)
 
