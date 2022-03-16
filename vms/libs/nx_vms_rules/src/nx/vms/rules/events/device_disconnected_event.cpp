@@ -18,7 +18,7 @@ const ItemDescriptor& DeviceDisconnectedEvent::manifest()
         .displayName = tr("Device Disconnected"),
         .description = "",
         .fields = {
-            makeFieldDescriptor<SourceCameraField>("cameraId", tr("Camera ID")),
+            makeFieldDescriptor<SourceCameraField>("deviceId", tr("Device ID")),
         }
     };
     return kDescriptor;

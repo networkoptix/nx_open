@@ -6,16 +6,16 @@
 
 namespace nx::vms::rules {
 
-/** Stores simple text string w/o validation, e.g. email or login. */
-class NX_VMS_RULES_API EventTextField: public SimpleTypeEventField<QString>
+/** Stores HTTP method as a string. */
+class NX_VMS_RULES_API HttpMethodField: public SimpleTypeActionField<QString>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.events.fields.text")
+    Q_CLASSINFO("metatype", "nx.actions.fields.httpMethod")
 
     Q_PROPERTY(QString value READ value WRITE setValue)
 
 public:
-    EventTextField() = default;
+    HttpMethodField() = default;
 };
 
 } // namespace nx::vms::rules

@@ -241,20 +241,17 @@ bool Engine::registerAction(const ItemDescriptor& descriptor, const ActionConstr
         return false;
     }
 
-    bool hasUnregisteredFields = !std::all_of(
-        descriptor.fields.cbegin(),
-        descriptor.fields.cend(),
-        [this](const FieldDescriptor& fieldDescriptor)
-        {
-            return isActionFieldRegistered(fieldDescriptor.id);
-        });
-
-    if (hasUnregisteredFields)
+    for (const auto& field: descriptor.fields)
     {
+        if (isActionFieldRegistered(field.id))
+            continue;
+
         NX_ERROR(
             this,
-            "Register action failed: %1 descriptor has unregistered fields",
-            descriptor.id);
+            "Register action failed: %1, descriptor has unregistered field: %2",
+            descriptor.id,
+            field.id);
+
         return false;
     }
 

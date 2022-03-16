@@ -2,7 +2,34 @@
 
 #include "http_action.h"
 
+#include "../action_fields/content_type_field.h"
+#include "../action_fields/http_method_field.h"
+#include "../action_fields/optional_time_field.h"
+#include "../action_fields/password_field.h"
+#include "../action_fields/text_field.h"
+#include "../action_fields/text_with_fields.h"
+
 namespace nx::vms::rules {
+
+const ItemDescriptor& HttpAction::manifest()
+{
+    static const auto kDescriptor = ItemDescriptor{
+        .id = actionType<HttpAction>(),
+        .displayName = tr("Do HTTP request"),
+        .description = "",
+        .fields = {
+            makeFieldDescriptor<OptionalTimeField>("interval", tr("Interval of action")),
+            makeFieldDescriptor<TextWithFields>("url", tr("HTTP Url")),
+            makeFieldDescriptor<TextWithFields>("content", tr("HTTP Content")),
+            makeFieldDescriptor<ContentTypeField>("contentType", tr("Content type")),
+            makeFieldDescriptor<ActionTextField>("login", tr("Login")),
+            makeFieldDescriptor<PasswordField>("password", tr("Password")),
+            makeFieldDescriptor<HttpMethodField>("method", tr("Request method")),
+            // TODO: #amalov Add auth type field.
+        }
+    };
+    return kDescriptor;
+}
 
 QString HttpAction::url() const
 {
@@ -22,16 +49,6 @@ QString HttpAction::content() const
 void HttpAction::setContent(const QString& content)
 {
     m_content = content;
-}
-
-HttpAction::ContentType HttpAction::contentType() const
-{
-    return m_contentType;
-}
-
-void HttpAction::setContentType(ContentType contentType)
-{
-    m_contentType = contentType;
 }
 
 QString HttpAction::login() const
