@@ -8,15 +8,16 @@
         <ComponentGroup Id="CommonQtLibrariesComponentGroup"
                 Source="${qt.dir}/bin"
                 Directory="InstallDirRoot">
-            <Component><File Name="Qt5Core.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="Qt5Gui.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="Qt5Widgets.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="Qt5Multimedia.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="Qt5Network.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="Qt5Concurrent.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="Qt5Xml.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="Qt5Sql.dll" KeyPath="yes" DiskId="2"/></Component>
-            <Component><File Name="Qt5Qml.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="Qt6Core.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="Qt6Gui.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="Qt6Widgets.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="Qt6Multimedia.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="Qt6Network.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="Qt6Core5Compat.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="Qt6Concurrent.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="Qt6Xml.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="Qt6Sql.dll" KeyPath="yes" DiskId="2"/></Component>
+            <Component><File Name="Qt6Qml.dll" KeyPath="yes" DiskId="2"/></Component>
         </ComponentGroup>
     </Fragment>
 </Wix>

@@ -20,10 +20,6 @@ execute_process(
 file(GLOB_RECURSE client_qml_files CONFIGURE_DEPENDS "${client_qml_directory}/*")
 nx_store_known_files(${client_qml_files})
 
-if(EXISTS ${client_qml_directory}/QtQuick/Controls)
-    message(FATAL_ERROR "QuickControls1 dependency was added to the desktop client.")
-endif()
-
 nx_wix_heat(${CMAKE_CURRENT_BINARY_DIR}/client_qml.wixobj
     SOURCE_DIR ${client_qml_directory}
     TARGET_DIR_ALIAS QmlDirectoryReference

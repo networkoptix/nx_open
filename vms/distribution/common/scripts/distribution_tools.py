@@ -174,7 +174,7 @@ def qt_libraries(dir, libs, extension=None):
     for lib in libs:
         for file in find_files_by_template(
                 dir,
-                dynamic_library_filename(f'Qt5{lib}', extension=extension) + '*'
+                dynamic_library_filename(f'Qt6{lib}', extension=extension) + '*'
         ):
             yield file
 

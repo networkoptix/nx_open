@@ -16,5 +16,3 @@ if(EXISTS "${customInstallerIcon}")
 else()
    set(installerIcon "${customization.dir}/icons/all/favicon.ico")
 endif()
-
-set(icu_directory ${QT_DIR})

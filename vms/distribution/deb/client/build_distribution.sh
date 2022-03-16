@@ -262,13 +262,9 @@ copyQtPlugins()
         imageformats
         xcbglintegrations
         platforms
+        tls
+        multimedia
     )
-    if [ "$ARCH" != "arm" ]
-    then
-        QT_PLUGINS+=(
-            audio
-        )
-    fi
 
     local QT_PLUGIN
     for QT_PLUGIN in "${QT_PLUGINS[@]}"
@@ -286,16 +282,19 @@ copyQtLibs()
 
     local QT_LIBS=(
         Core
+        Core5Compat
         Gui
         Widgets
         WebChannel
         WebEngineCore
-        WebEngine
+        WebEngineQuick
         WebEngineWidgets
         WebView
         OpenGL
+        OpenGLWidgets
         Multimedia
         MultimediaQuick
+        Positioning
         Qml
         QmlModels
         QmlWorkerScript
@@ -303,7 +302,10 @@ copyQtLibs()
         QuickWidgets
         QuickTemplates2
         QuickControls2
+        QuickControls2Impl
+        QuickLayouts
         QuickShapes
+        ShaderTools
         XcbQpa
         DBus
         Xml
@@ -311,7 +313,6 @@ copyQtLibs()
         Network
         Sql
         Svg
-        PrintSupport
     )
     if [ "$ARCH" == "arm" ]
     then
@@ -324,7 +325,7 @@ copyQtLibs()
     local FILE
     for QT_LIB in "${QT_LIBS[@]}"
     do
-        FILE="libQt5$QT_LIB.so"
+        FILE="libQt6$QT_LIB.so"
         echo "  Copying (Qt) $FILE"
         cp -P "$QT_DIR/lib/$FILE"* "$STAGE_LIB/"
     done
@@ -344,12 +345,11 @@ copyAdditionalQtFiles()
     echo "Copying additional Qt files"
 
     echo "  Copying qt.conf"
-    cp qt.conf "$STAGE_BIN/"
+    cp "$QT_DIR/bin/target_qt.conf" "$STAGE_BIN/"
 
     echo "  Copying (Qt) libexec"
     mkdir "$STAGE_LIBEXEC"
     cp "$QT_DIR/libexec/QtWebEngineProcess" "$STAGE_LIBEXEC"
-    cp "$QT_DIR/libexec/qt.conf" "$STAGE_LIBEXEC"
 
     echo "  Copying (Qt) resources"
     cp -r "$QT_DIR/resources" "$STAGE_MODULE/resources"
