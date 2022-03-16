@@ -32,6 +32,9 @@ class NX_VMS_RULES_API BasicAction: public QObject
     Q_OBJECT
 
 public:
+    static constexpr auto kType = "type";
+
+public:
     QString type() const;
 
 protected:
@@ -40,5 +43,15 @@ protected:
 private:
     //QString m_type;
 };
+
+// TODO: #sapa Unify with event and field. Choose name between type & metatype.
+template<class T>
+QString actionType()
+{
+    const auto& meta = T::staticMetaObject;
+    int idx = meta.indexOfClassInfo(BasicAction::kType);
+
+    return (idx < 0) ? QString() : meta.classInfo(idx).value();
+}
 
 } // namespace nx::vms::rules

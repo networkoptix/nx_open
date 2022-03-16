@@ -6,7 +6,7 @@
 
 namespace nx::vms::rules {
 
-/** Store simple text string w/o validation. Email list or comment. */
+/** Stores simple text string w/o validation, e.g. email, login or comment. */
 class NX_VMS_RULES_API ActionTextField: public SimpleTypeActionField<QString>
 {
     Q_OBJECT

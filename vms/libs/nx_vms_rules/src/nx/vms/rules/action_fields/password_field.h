@@ -6,16 +6,16 @@
 
 namespace nx::vms::rules {
 
-/** Stores simple text string w/o validation, e.g. email or login. */
-class NX_VMS_RULES_API EventTextField: public SimpleTypeEventField<QString>
+/** Stores password text. Should be displayed by password edit widget. */
+class NX_VMS_RULES_API PasswordField: public SimpleTypeActionField<QString>
 {
     Q_OBJECT
-    Q_CLASSINFO("metatype", "nx.events.fields.text")
+    Q_CLASSINFO("metatype", "nx.actions.fields.password")
 
     Q_PROPERTY(QString value READ value WRITE setValue)
 
 public:
-    EventTextField() = default;
+    PasswordField() = default;
 };
 
 } // namespace nx::vms::rules

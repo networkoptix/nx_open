@@ -17,4 +17,16 @@ public:
     }
 };
 
+
+/** May be used for test fixture inheritance. */
+struct TestEngineHolder
+{
+    std::unique_ptr<Engine> engine;
+
+    TestEngineHolder():
+        engine(std::make_unique<Engine>(std::make_unique<TestRouter>()))
+    {
+    }
+};
+
 } // namespace nx::vms::rules::test

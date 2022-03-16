@@ -11,7 +11,7 @@ QString BasicAction::type() const
     //if (!m_type.isEmpty())
     //    return m_type;
 
-    if (auto index = metaObject()->indexOfClassInfo("type"); index != -1)
+    if (auto index = metaObject()->indexOfClassInfo(kType); index != -1)
         return metaObject()->classInfo(index).value();
 
     return {}; //< Assert?
