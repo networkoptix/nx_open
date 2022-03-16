@@ -18,15 +18,20 @@ ParamsWidget::ParamsWidget(QWidget* parent):
 {
 }
 
-void ParamsWidget::setDescriptor(const ItemDescriptor& itemDescriptor)
+void ParamsWidget::setDescriptor(const ItemDescriptor& value)
 {
-    descriptor = itemDescriptor;
+    itemDescriptor = value;
 
     onDescriptorSet();
 
     // At the moment all pickers must be instantiated.
     watchOnDataEdited();
     setupLineEditsPlaceholderColor();
+}
+
+const vms::rules::ItemDescriptor& ParamsWidget::descriptor() const
+{
+    return itemDescriptor;
 }
 
 void ParamsWidget::setInstant(bool /*value*/)
@@ -62,7 +67,7 @@ void ParamsWidget::setFields(const QHash<QString, Field*>& fields)
 
 std::optional<rules::FieldDescriptor> ParamsWidget::fieldDescriptor(const QString& fieldName)
 {
-    for (auto field = descriptor.fields.cbegin(); field != descriptor.fields.cend(); ++field)
+    for (auto field = itemDescriptor.fields.cbegin(); field != itemDescriptor.fields.cend(); ++field)
     {
         if (field->fieldName == fieldName)
             return *field;

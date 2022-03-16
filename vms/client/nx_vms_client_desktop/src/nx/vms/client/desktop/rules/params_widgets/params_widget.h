@@ -23,7 +23,9 @@ public:
     ParamsWidget(QWidget* parent = nullptr);
 
     /** Sets descriptor the widget customization is depends on. */
-    void setDescriptor(const vms::rules::ItemDescriptor& itemDescriptor);
+    void setDescriptor(const vms::rules::ItemDescriptor& value);
+
+    const vms::rules::ItemDescriptor& descriptor() const;
 
     /**
      * Sets fields the widget will interacts with. The fields name and type must correspond
@@ -57,11 +59,12 @@ protected:
      */
     std::optional<vms::rules::FieldDescriptor> fieldDescriptor(const QString& fieldName);
 
-    vms::rules::ItemDescriptor descriptor;
 
 private:
     void setupLineEditsPlaceholderColor();
     void watchOnDataEdited();
+
+    vms::rules::ItemDescriptor itemDescriptor;
 };
 
 } // namespace nx::vms::client::desktop::rules
