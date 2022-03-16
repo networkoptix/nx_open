@@ -14,14 +14,16 @@
 #include <nx/vms/client/desktop/resource_dialogs/details/resource_dialog_item_selection_model.h>
 #include <nx/vms/client/desktop/resource_dialogs/filtering/filtered_resource_proxy_model.h>
 #include <nx/vms/client/desktop/style/helper.h>
-#include <ui/common/indents.h>
 #include <utils/common/event_processors.h>
 
 namespace {
 
-static const auto kViewItemIndents = QnIndents(
-    nx::style::Metrics::kDefaultTopLevelMargin,
+static constexpr auto kListViewExtraLeftIndent = 4;
+static constexpr auto kTreeViewSideIndents = QnIndents(nx::style::Metrics::kDefaultTopLevelMargin);
+static constexpr auto kListViewSideIndents = QnIndents(
+    nx::style::Metrics::kDefaultTopLevelMargin + kListViewExtraLeftIndent,
     nx::style::Metrics::kDefaultTopLevelMargin);
+
 static constexpr auto kNothingFoundLabelFontSize = 16;
 
 QFont nothingFoundLabelFont()
@@ -46,7 +48,7 @@ FilteredResourceViewWidget::FilteredResourceViewWidget(QWidget* parent):
 
     treeView()->setModel(m_filterProxyModel.get());
 
-    ui->headerBar->setVisible(false);
+    ui->headerContainer->setVisible(false);
     ui->footerContainer->setVisible(false);
 
     const auto scrollBar = new SnappedScrollBar(this);
@@ -67,7 +69,8 @@ FilteredResourceViewWidget::FilteredResourceViewWidget(QWidget* parent):
     treeView()->setSelectionBehavior(QAbstractItemView::SelectRows);
     treeView()->setSelectionMode(QAbstractItemView::NoSelection);
     treeView()->setMouseTracking(true);
-    setSideIndentation(kViewItemIndents);
+    treeView()->setProperty(style::Properties::kSideIndentation,
+        QVariant::fromValue(kTreeViewSideIndents));
 
     setupSignals();
     setupFilter();
@@ -139,12 +142,6 @@ QModelIndex FilteredResourceViewWidget::currentIndex() const
     return m_filterProxyModel->mapToSource(treeView()->selectionModel()->currentIndex());
 }
 
-void FilteredResourceViewWidget::setItemViewEnabled(bool enabled)
-{
-    ui->treeView->setEnabled(enabled);
-    ui->searchLineEdit->setEnabled(enabled);
-}
-
 QWidget* FilteredResourceViewWidget::headerWidget() const
 {
     return m_headerWidget;
@@ -166,7 +163,7 @@ void FilteredResourceViewWidget::setHeaderWidget(QWidget* widget)
     if (m_headerWidget)
         ui->headerContainerLayout->addWidget(widget); //< Ownership is transferred to layout.
 
-    ui->headerBar->setVisible(m_headerWidget != nullptr);
+    ui->headerContainer->setVisible(m_headerWidget != nullptr);
 }
 
 bool FilteredResourceViewWidget::headerWidgetVisible() const
@@ -174,7 +171,7 @@ bool FilteredResourceViewWidget::headerWidgetVisible() const
     if (!NX_ASSERT(m_headerWidget, "Header widget hasn't been set"));
         return false;
 
-    return ui->headerBar->isVisible();
+    return ui->headerContainer->isVisible();
 }
 
 void FilteredResourceViewWidget::setHeaderWidgetVisible(bool visible)
@@ -182,7 +179,7 @@ void FilteredResourceViewWidget::setHeaderWidgetVisible(bool visible)
     if (!NX_ASSERT(m_headerWidget, "Header widget hasn't been set"))
         return;
 
-    ui->headerBar->setVisible(visible);
+    ui->headerContainer->setVisible(visible);
 }
 
 QWidget* FilteredResourceViewWidget::footerWidget() const
@@ -410,14 +407,25 @@ void FilteredResourceViewWidget::setUseTreeIndentation(bool useTreeIndentation)
         return;
 
     if (useTreeIndentation)
+    {
         treeView()->resetIndentation();
+        treeView()->setProperty(style::Properties::kSideIndentation,
+            QVariant::fromValue(kTreeViewSideIndents));
+    }
     else
+    {
         treeView()->setIndentation(0);
+        treeView()->setProperty(style::Properties::kSideIndentation,
+            QVariant::fromValue(kListViewSideIndents));
+    }
 }
 
-void FilteredResourceViewWidget::setSideIndentation(const QnIndents& indents)
+QnIndents FilteredResourceViewWidget::sideIndentation() const
 {
-    treeView()->setProperty(style::Properties::kSideIndentation, QVariant::fromValue(indents));
+    const auto sideIndentationProperty = treeView()->property(style::Properties::kSideIndentation);
+    return sideIndentationProperty.isNull()
+        ? QnIndents()
+        : sideIndentationProperty.value<QnIndents>();
 }
 
 void FilteredResourceViewWidget::setUniformRowHeights(bool uniform)

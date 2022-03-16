@@ -5,6 +5,7 @@
 #include <QtWidgets/QHeaderView>
 
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
+#include <nx/vms/client/desktop/resource_dialogs/item_delegates/indirect_access_column_item_delegate.h>
 #include <nx/vms/client/desktop/resource_dialogs/item_delegates/resource_dialog_item_delegate.h>
 #include <nx/vms/client/desktop/resource_dialogs/models/indirect_access_decorator_model.h>
 #include <nx/vms/client/desktop/resource_dialogs/models/resource_selection_decorator_model.h>
@@ -20,7 +21,7 @@ AccessibleMediaSelectionWidget::AccessibleMediaSelectionWidget(QWidget* parent):
 {
     resourceViewWidget()->setItemDelegateForColumn(
         accessible_media_selection_view::IndirectResourceAccessIconColumn,
-        new ResourceDialogItemDelegateBase(this));
+        new IndirectAccessColumnItemDelegate(this));
 }
 
 QAbstractItemModel* AccessibleMediaSelectionWidget::model() const
@@ -35,16 +36,16 @@ void AccessibleMediaSelectionWidget::setupHeader()
 {
     using namespace accessible_media_selection_view;
 
-    static constexpr int kCheckboxColumnWidth =
-        nx::style::Metrics::kDefaultTopLevelMargin + nx::style::Metrics::kViewRowHeight;
+    const auto checkboxColumnWidth =
+        nx::style::Metrics::kCheckIndicatorSize + resourceViewWidget()->sideIndentation().right();
 
     static constexpr int kIndirectAccessColumnWidth =
-        nx::style::Metrics::kDefaultTopLevelMargin + nx::style::Metrics::kViewRowHeight;
+        nx::style::Metrics::kDefaultIconSize + nx::style::Metrics::kDefaultTopLevelMargin;
 
     const auto header = resourceViewWidget()->treeHeaderView();
 
     header->setStretchLastSection(false);
-    header->resizeSection(CheckboxColumn, kCheckboxColumnWidth);
+    header->resizeSection(CheckboxColumn, checkboxColumnWidth);
     header->resizeSection(IndirectResourceAccessIconColumn, kIndirectAccessColumnWidth);
 
     header->setSectionResizeMode(ResourceColumn, QHeaderView::ResizeMode::Stretch);
@@ -59,6 +60,11 @@ AccessibleMediaSelectionWidget::~AccessibleMediaSelectionWidget()
 void AccessibleMediaSelectionWidget::setSubject(const QnResourceAccessSubject& subject)
 {
     m_indirectAccessDecoratorModel->setSubject(subject);
+}
+
+void AccessibleMediaSelectionWidget::setAccessAllMedia(bool value)
+{
+    m_indirectAccessDecoratorModel->setAccessAllMedia(value);
 }
 
 } // namespace nx::vms::client::desktop

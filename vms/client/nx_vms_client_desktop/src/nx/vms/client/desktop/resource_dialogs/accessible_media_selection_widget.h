@@ -24,6 +24,7 @@ public:
     virtual ~AccessibleMediaSelectionWidget() override;
 
     void setSubject(const QnResourceAccessSubject& subject);
+    void setAccessAllMedia(bool value);
 
 protected:
     virtual QAbstractItemModel* model() const override final;

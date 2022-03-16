@@ -2,6 +2,10 @@
 
 #include "indirect_access_decorator_model.h"
 
+#include <algorithm>
+
+#include <QtCore/QCollator>
+
 #include <core/resource/layout_resource.h>
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <nx/utils/log/assert.h>
@@ -14,17 +18,60 @@ namespace {
 
 static const int kMaxTooltipResourceLines = 10;
 
+using namespace nx::vms::client::desktop;
+using namespace nx::vms::common;
+
+QString indirectAccessTooltipRichText(const QnResourceList& providers)
+{
+    if (providers.empty())
+        return {};
+
+    QStringList providerNames;
+    for (const auto& provider: providers)
+    {
+        if (provider->hasFlags(Qn::layout)
+            && provider.staticCast<QnLayoutResource>()->isServiceLayout())
+        {
+            continue;
+        }
+        providerNames.push_back(provider->getName());
+    }
+    providerNames.removeDuplicates();
+
+    QCollator collator;
+    collator.setNumericMode(true);
+    std::sort(providerNames.begin(), providerNames.end(),
+        [collator = std::move(collator)](const QString& lhs, const QString& rhs)
+        {
+            return collator.compare(lhs, rhs) < 0;
+        });
+
+    QStringList tooltipLines;
+    tooltipLines.push_back(IndirectAccessDecoratorModel::tr("Access granted by:"));
+
+    for (int i = 0; i < std::min(kMaxTooltipResourceLines, providerNames.size()); ++i)
+        tooltipLines.push_back(html::bold(providerNames.at(i)));
+
+    if (providerNames.size() > kMaxTooltipResourceLines)
+    {
+        tooltipLines.push_back(IndirectAccessDecoratorModel::tr(
+            "and %n more", "", providerNames.size() - kMaxTooltipResourceLines));
+    }
+
+    return tooltipLines.join("<br>");
+}
+
 } // namespace
 
 namespace nx::vms::client::desktop {
 
 IndirectAccessDecoratorModel::IndirectAccessDecoratorModel(
-    nx::core::access::ResourceAccessProvider* accessProvider,
+    nx::core::access::ResourceAccessProvider* resourceAccessProvider,
     int indirectAccessIconColumn,
     QObject* parent)
     :
     base_type(parent),
-    m_resourceAccessProvider(accessProvider),
+    m_resourceAccessProvider(resourceAccessProvider),
     m_indirectAccessIconColumn(indirectAccessIconColumn)
 {
     NX_ASSERT(m_resourceAccessProvider);
@@ -37,77 +84,80 @@ void IndirectAccessDecoratorModel::setSubject(const QnResourceAccessSubject& sub
 
     m_subject = subject;
 
-    emit dataChanged(
-        index(0, m_indirectAccessIconColumn),
-        index(rowCount() - 1, m_indirectAccessIconColumn));
+    if (rowCount() > 0)
+    {
+        emit dataChanged(
+            index(0, m_indirectAccessIconColumn),
+            index(rowCount() - 1, m_indirectAccessIconColumn));
+    }
 }
 
 QVariant IndirectAccessDecoratorModel::data(const QModelIndex& index, int role) const
 {
-    if (!index.isValid() || !m_resourceAccessProvider || !m_subject.isValid()
-        || index.column() != m_indirectAccessIconColumn)
-    {
+    if (!index.isValid() || !m_resourceAccessProvider || !m_subject.isValid())
         return base_type::data(index, role);
-    }
 
     const auto sourceIndex = mapToSource(index);
     const auto sourceResourceIndex = sourceIndex.siblingAtColumn(
         accessible_media_selection_view::ResourceColumn);
 
-    const auto resource = sourceResourceIndex.data(Qn::ResourceRole).value<QnResourcePtr>();
-    if (!resource)
-        return base_type::data(index, role);
-
-    if (role == Qt::DecorationRole)
+    if (index.column() != m_indirectAccessIconColumn)
     {
-        const auto accessLevels = m_resourceAccessProvider->accessLevels(m_subject, resource);
-        if (accessLevels.contains(nx::core::access::Source::layout))
-            return qnResIconCache->icon(QnResourceIconCache::SharedLayout);
+        if (m_accessAllMedia)
+        {
+            if (role == Qt::CheckStateRole && !sourceIndex.data(Qt::CheckStateRole).isNull())
+                return Qt::Checked;
 
-        if (accessLevels.contains(nx::core::access::Source::videowall))
-            return qnResIconCache->icon(QnResourceIconCache::VideoWall);
+            if (role == ResourceDialogItemRole::IsItemHighlightedRole)
+                return true;
+        }
+        return base_type::data(index, role);
     }
 
-    if (role == Qt::ToolTipRole)
+    if (const auto resource = sourceResourceIndex.data(Qn::ResourceRole).value<QnResourcePtr>())
     {
-        QnResourceList providers;
-        m_resourceAccessProvider->accessibleVia(m_subject, resource, &providers);
-        return getTooltipRichText(providers);
+        if (role == Qt::DecorationRole)
+        {
+            const auto accessLevels =
+                m_resourceAccessProvider->accessLevels(m_subject, resource);
+
+            if (accessLevels.contains(nx::core::access::Source::layout))
+                return qnResIconCache->icon(QnResourceIconCache::SharedLayout);
+
+            if (accessLevels.contains(nx::core::access::Source::videowall))
+                return qnResIconCache->icon(QnResourceIconCache::VideoWall);
+        }
+
+        if (role == Qt::ToolTipRole)
+        {
+            QnResourceList providers;
+            m_resourceAccessProvider->accessibleVia(m_subject, resource, &providers);
+            return indirectAccessTooltipRichText(providers);
+        }
     }
 
     return base_type::data(index, role);
 }
 
-QString IndirectAccessDecoratorModel::getTooltipRichText(const QnResourceList& providers) const
+Qt::ItemFlags IndirectAccessDecoratorModel::flags(const QModelIndex& index) const
 {
-    if (providers.empty())
-        return {};
+    auto result = base_type::flags(index);
 
-    QStringList providerNames;
-    for (const auto& provider: providers)
-    {
-        if (auto layout = provider.dynamicCast<QnLayoutResource>())
-        {
-            if (layout->isServiceLayout())
-                continue;
-        }
-        providerNames.push_back(provider->getName());
-    }
-    providerNames.removeDuplicates();
+    if (m_accessAllMedia)
+        result.setFlag(Qt::ItemIsEnabled, false);
 
-    QStringList tooltipLines;
-    tooltipLines.push_back(tr("Access granted by:"));
+    return result;
+}
 
-    for (int i = 0; i < std::min(kMaxTooltipResourceLines, providerNames.size()); ++i)
-        tooltipLines.push_back(nx::vms::common::html::bold(providerNames.at(i)));
+void IndirectAccessDecoratorModel::setAccessAllMedia(bool value)
+{
+    if (m_accessAllMedia == value)
+        return;
 
-    if (providerNames.size() > kMaxTooltipResourceLines)
-    {
-        tooltipLines.push_back(
-            tr("...and %n more", "", providerNames.size() - kMaxTooltipResourceLines));
-    }
+    m_accessAllMedia = value;
 
-    return tooltipLines.join("<br>");
+    if (rowCount() > 0)
+        emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1));
 }
 
 } // namespace nx::vms::client::desktop
