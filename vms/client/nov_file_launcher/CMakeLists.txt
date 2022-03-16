@@ -18,7 +18,7 @@ nx_add_target(nov_file_launcher EXECUTABLE SIGNED
 
 set_target_properties(nov_file_launcher PROPERTIES
     OUTPUT_NAME "launcher"
-    WIN32_EXECUTABLE ON
+    WIN32_EXECUTABLE ON #< On Windows, build a GUI (non-console) app.
 )
 
 target_include_directories(nov_file_launcher PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
