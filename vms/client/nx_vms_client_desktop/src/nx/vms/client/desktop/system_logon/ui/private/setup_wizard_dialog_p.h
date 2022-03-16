@@ -20,18 +20,52 @@ class SetupWizardDialogPrivate: public QObject
 public:
     SetupWizardDialogPrivate(SetupWizardDialog* parent);
 
+// Public API to be used in the web page.
 public slots:
-    void openUrlInBrowser(const QString &urlString);
+    /**
+     * Open external url in the browser.
+     */
+    void openUrlInBrowser(const QString& urlString);
 
+    /**
+     * Cloud refresh token if user is logged in to cloud, empty string otherwise.
+     */
+    QString refreshToken() const;
+
+    /**
+     * Connect to the System using local administrator with the provided password.
+     */
+    void connectUsingLocalAdmin(const QString& password);
+
+    /**
+     * Connect to the System using Cloud account.
+     */
+    void connectUsingCloud();
+
+    /**
+     * Json object with the LoginInfo structure.
+     * Method is deprecated and will be removed as soon as it is not needed.
+     */
     QString getCredentials() const;
 
-    void updateCredentials(const QString& login,
+    /**
+     * Fill LoginInfo structure with the provided values. Third parameter is ignored.
+     * Method is deprecated and will be removed in favor of `connect...` methods.
+     */
+    void updateCredentials(
+        const QString& login,
         const QString& password,
         bool /*isCloud*/ alwaysFalse,
         bool savePassword);
 
+    /**
+     * Close dialog.
+     */
     void cancel();
 
+    /**
+     * Open url in the dialog.
+     */
     void load(const QUrl& url);
 
 public:
