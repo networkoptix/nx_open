@@ -135,10 +135,16 @@ void StorageRecordingContext::writeHeader(StorageContext& context)
 {
     if (int rez = avformat_write_header(context.formatCtx, 0); rez < 0)
     {
+        QString codecs;
+        for (int i = 0; i < context.formatCtx->nb_streams; ++i)
+        {
+            if (context.formatCtx->streams[i] && context.formatCtx->streams[i]->codecpar)
+                codecs += QString::number(context.formatCtx->streams[i]->codecpar->codec_id) + " ";
+        }
         throw ErrorEx(
             Error::Code::incompatibleCodec,
-            NX_FMT("Video or audio codec is incompatible with '%1' format. Try another format. Ffmpeg error: %2",
-                m_container, QnFfmpegHelper::avErrorToString(rez)));
+            NX_FMT("Video or audio codec is incompatible with '%1' format. Try another format. Ffmpeg error: %1, codecs: %3",
+                m_container, QnFfmpegHelper::avErrorToString(rez), codecs));
     }
 }
 
