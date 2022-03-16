@@ -292,7 +292,7 @@ void OauthLoginDialogPrivate::issueAccessToken()
 void OauthLoginDialogPrivate::openUrlInBrowser(const QString &path)
 {
     nx::utils::Url externalUrl(path);
-    if (!externalUrl.isValid())
+    if (!externalUrl.isValid() || externalUrl.scheme().isEmpty())
     {
         const QUrl currentUrl = m_webViewWidget->controller()->url();
         externalUrl = nx::network::url::Builder()
