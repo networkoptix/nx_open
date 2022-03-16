@@ -201,9 +201,11 @@ Qn::Permissions QnWorkbenchAccessController::calculatePermissions(
         /* Check if we are creating new user */
         if (!user->resourcePool())
         {
-            return hasGlobalPermission(GlobalPermission::admin)
-                ? Qn::FullUserPermissions
-                : Qn::NoPermissions;
+            Qn::Permissions permissions = Qn::FullUserPermissions;
+            if (user->isCloud())
+                permissions = permissions & ~Qn::WriteDigestPermission;
+
+            return hasGlobalPermission(GlobalPermission::admin) ? permissions : Qn::NoPermissions;
         }
     }
 
