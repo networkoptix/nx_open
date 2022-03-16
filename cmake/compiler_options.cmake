@@ -29,9 +29,9 @@ if(CMAKE_BUILD_TYPE MATCHES "Release|RelWithDebInfo")
 endif()
 
 if(developerBuild)
-    set(CMAKE_WIN32_EXECUTABLE OFF)
+    set(CMAKE_WIN32_EXECUTABLE OFF) #< On Windows, build executables as console apps.
 else()
-    set(CMAKE_WIN32_EXECUTABLE ON)
+    set(CMAKE_WIN32_EXECUTABLE ON) #< On Windows, build executables as GUI (non-console) apps.
 endif()
 
 add_definitions(

@@ -15,7 +15,7 @@ nx_add_target(minilauncher EXECUTABLE SIGNED
 string(REPLACE ".exe" "" binary_name ${minilauncher.binary.name})
 set_target_properties(minilauncher PROPERTIES
     OUTPUT_NAME ${binary_name}
-    WIN32_EXECUTABLE ON
+    WIN32_EXECUTABLE ON #< On Windows, build a GUI (non-console) app.
 )
 
 target_include_directories(minilauncher PRIVATE ${CMAKE_CURRENT_BINARY_DIR})

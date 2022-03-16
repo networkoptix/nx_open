@@ -65,7 +65,7 @@ add_executable(nx_kit_ut
 )
 
 if(WIN32)
-    set_target_properties(nx_kit_ut PROPERTIES WIN32_EXECUTABLE OFF)
+    set_target_properties(nx_kit_ut PROPERTIES WIN32_EXECUTABLE OFF) #< Build a console app.
 endif()
 
 target_link_libraries(nx_kit_ut

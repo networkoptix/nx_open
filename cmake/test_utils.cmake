@@ -59,7 +59,7 @@ function(nx_add_test target) # [NO_GTEST] [NO_QT] [NO_NX_UTILS] ...
         set(new_path "${CMAKE_MSVCIDE_RUN_PATH};$ENV{PATH}")
         string(REPLACE ";" "\;" new_path "${new_path}")
         set_tests_properties(${target} PROPERTIES ENVIRONMENT "PATH=${new_path}")
-        set_target_properties(${target} PROPERTIES WIN32_EXECUTABLE OFF)
+        set_target_properties(${target} PROPERTIES WIN32_EXECUTABLE OFF) #< Build a console app.
     endif()
 
     add_dependencies(unit_tests ${target})
