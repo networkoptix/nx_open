@@ -269,3 +269,14 @@ TEST_F(QnWorkbenchAccessControllerTest, checkLockedLocalLayoutsLoggedIn)
     loginAsOwner();
     checkPermissions(layout, desired, forbidden);
 }
+
+/** Check Qn::WriteDigestPermission permission for a new cloud user (should be missing). */
+TEST_F(QnWorkbenchAccessControllerTest, checkPermissionForNewCloudUser)
+{
+    loginAs(GlobalPermission::adminPermissions);
+
+    QnUserResourcePtr newCloudUser(new QnUserResource(nx::vms::api::UserType::cloud));
+    newCloudUser->setIdUnsafe(QnUuid::createUuid());
+
+    checkForbiddenPermissions(newCloudUser, Qn::WriteDigestPermission);
+}
