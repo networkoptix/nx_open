@@ -653,8 +653,7 @@ QnUserResourceList QnUserManagementWidget::visibleSelectedUsers() const
 
 bool QnUserManagementWidget::canDisableDigest(const QnUserResourcePtr& user) const
 {
-    return accessController()->hasPermissions(user, Qn::WriteDigestPermission)
-        && !user->isCloud();
+    return accessController()->hasPermissions(user, Qn::WriteDigestPermission);
 }
 
 void QnUserManagementWidget::filterDigestUsers()
