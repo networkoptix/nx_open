@@ -26,7 +26,7 @@ Item
 
     function updateFigure()
     {
-        if (!figure)
+        if (!figure || !figure.points)
         {
             loader.source = ""
             return
