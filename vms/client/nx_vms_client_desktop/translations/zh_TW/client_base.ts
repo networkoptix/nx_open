@@ -4738,7 +4738,7 @@ to %1</source>
     </message>
     <message>
       <source>Details</source>
-      <translation>細節</translation>
+      <translation>詳細</translation>
     </message>
   </context>
   <context>
@@ -6215,7 +6215,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation>停止上傳?</translation>
+      <translation>是否停止上傳?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
@@ -7766,7 +7766,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>OK</source>
       <comment>Dialog button text.</comment>
-      <translation>確定</translation>
+      <translation>確認</translation>
     </message>
   </context>
   <context>
@@ -8010,7 +8010,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>System Administration</source>
-      <translation type="unfinished">System Administration</translation>
+      <translation>系統管理</translation>
     </message>
   </context>
   <context>
@@ -9762,7 +9762,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Does not affect the connections established by server.</source>
-      <translation type="unfinished">Does not affect the connections established by server.</translation>
+      <translation>不影響透過伺服器建立的連線</translation>
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>
@@ -9787,7 +9787,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Learn more.</source>
-      <translation type="unfinished">Learn more.</translation>
+      <translation>了解更多.</translation>
     </message>
     <message numerus="yes">
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
@@ -10065,7 +10065,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::SessionRefreshDialog</name>
     <message>
       <source>Login</source>
-      <translation>登入帳號</translation>
+      <translation>登入</translation>
     </message>
     <message>
       <source>Password</source>

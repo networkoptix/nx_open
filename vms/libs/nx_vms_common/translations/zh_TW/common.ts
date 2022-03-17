@@ -5,11 +5,11 @@
     <name>ArchiveDuration</name>
     <message>
       <source>no data for forecast</source>
-      <translation>沒有預測數據</translation>
+      <translation>尚未有足夠資料以提供預測結果</translation>
     </message>
     <message>
       <source>empty</source>
-      <translation>空</translation>
+      <translation>尚無資料</translation>
     </message>
     <message>
       <source>less than an hour</source>
@@ -1060,11 +1060,11 @@
     <name>nx::recording::Error</name>
     <message>
       <source>Internal error</source>
-      <translation>內部錯誤</translation>
+      <translation>內部發生錯誤</translation>
     </message>
     <message>
       <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>找不到相對應的 FFMPEG 函式庫。</translation>
+      <translation>在 FFMPEG 函式庫中並未找到相對應的影像容器(container)</translation>
     </message>
     <message>
       <source>Could not create output file for video recording.</source>
@@ -1076,7 +1076,7 @@
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
-      <translation>無法分配聲音輸出串流。</translation>
+      <translation>無法配置所需的音訊輸出串流。</translation>
     </message>
     <message>
       <source>Could not allocate output metadata stream.</source>
@@ -1096,7 +1096,7 @@
     </message>
     <message>
       <source>File write error. Not enough free space.</source>
-      <translation>檔案寫入錯誤. 無足夠空間.</translation>
+      <translation>檔案寫入錯誤(磁碟可用空間不足)</translation>
     </message>
     <message>
       <source>Invalid resource type for data export.</source>

@@ -174,7 +174,7 @@
     </message>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>세션이 만료되었습니다.</translation>
     </message>
     <message>
       <source>Please log in to %1 again.</source>

@@ -1772,7 +1772,7 @@
     <name>OauthLoginPlaceholder</name>
     <message>
       <source>Try Again</source>
-      <translation type="unfinished">Try Again</translation>
+      <translation>다시 시도</translation>
     </message>
   </context>
   <context>

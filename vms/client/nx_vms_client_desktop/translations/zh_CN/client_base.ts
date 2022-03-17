@@ -4734,7 +4734,7 @@ to %1</source>
     </message>
     <message>
       <source>Details</source>
-      <translation>配置信息</translation>
+      <translation>详细内容</translation>
     </message>
   </context>
   <context>
@@ -7762,7 +7762,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>OK</source>
       <comment>Dialog button text.</comment>
-      <translation>确定</translation>
+      <translation>好</translation>
     </message>
   </context>
   <context>
@@ -8006,7 +8006,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>System Administration</source>
-      <translation type="unfinished">System Administration</translation>
+      <translation>系统管理</translation>
     </message>
   </context>
   <context>
@@ -9783,7 +9783,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Learn more.</source>
-      <translation type="unfinished">Learn more.</translation>
+      <translation>进一步了解.</translation>
     </message>
     <message numerus="yes">
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>

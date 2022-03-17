@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>Notifications</source>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Notifikationer</translation>
     </message>
     <message>
       <source>Notify about available updates</source>
@@ -164,11 +164,11 @@
     <name>BooleanRadioGroup</name>
     <message>
       <source>Yes</source>
-      <translation type="unfinished">Yes</translation>
+      <translation>Ja</translation>
     </message>
     <message>
       <source>No</source>
-      <translation type="unfinished">No</translation>
+      <translation>Nej</translation>
     </message>
   </context>
   <context>
@@ -243,7 +243,7 @@
     <name>ClosedTileItem</name>
     <message>
       <source>Offline</source>
-      <translation type="unfinished">Offline</translation>
+      <translation>Offline</translation>
     </message>
     <message>
       <source>Unreachable</source>
@@ -269,21 +269,21 @@
     <name>ConnectButton</name>
     <message>
       <source>Connect to Server</source>
-      <translation type="unfinished">Connect to Server</translation>
+      <translation>Opret forbindelse til serveren</translation>
     </message>
   </context>
   <context>
     <name>ConnectTile</name>
     <message>
       <source>Connect to Server</source>
-      <translation type="unfinished">Connect to Server</translation>
+      <translation>Opret forbindelse til serveren</translation>
     </message>
   </context>
   <context>
     <name>ContextHintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Klik på ikonet for at læse mere</translation>
     </message>
   </context>
   <context>
@@ -378,11 +378,11 @@
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Annuller</translation>
     </message>
   </context>
   <context>
@@ -726,11 +726,11 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Adgangskode</translation>
     </message>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Opret forbindelse</translation>
     </message>
     <message>
       <source>Remember me</source>
@@ -752,7 +752,7 @@
     <name>PolyFigure</name>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slet</translation>
     </message>
   </context>
   <context>
@@ -810,7 +810,7 @@
     <name>PromoPageButtons</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Next</source>
@@ -959,7 +959,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Brugere</translation>
     </message>
     <message>
       <source>Local Files</source>
@@ -981,7 +981,7 @@ to activate PTZ</translation>
     <name>RightPanel</name>
     <message>
       <source>Notifications</source>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Notifikationer</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -1033,7 +1033,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Annuller</translation>
     </message>
   </context>
   <context>
@@ -1209,7 +1209,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slet</translation>
     </message>
     <message>
       <source>Add to Favorites</source>
@@ -1261,7 +1261,7 @@ to activate PTZ</translation>
     </message>
     <message>
       <source>All Systems</source>
-      <translation type="unfinished">All Systems</translation>
+      <translation>Alle systemer</translation>
     </message>
     <message>
       <source>Favorites</source>

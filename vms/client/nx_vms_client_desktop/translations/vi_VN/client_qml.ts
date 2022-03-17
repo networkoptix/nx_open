@@ -348,7 +348,7 @@
     </message>
     <message>
       <source>Event Log</source>
-      <translation type="unfinished">Event Log</translation>
+      <translation>Ghi sự kiện</translation>
     </message>
   </context>
   <context>
@@ -513,7 +513,7 @@
     <name>IntervalPreviewControls</name>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Chuyển chế độ im lặng</translation>
     </message>
     <message>
       <source>Previous Object</source>
@@ -521,11 +521,11 @@
     </message>
     <message>
       <source>Pause</source>
-      <translation type="unfinished">Pause</translation>
+      <translation>giờ nghĩ giảo lao</translation>
     </message>
     <message>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>Broadcast</translation>
     </message>
     <message>
       <source>Next Object</source>
@@ -728,7 +728,7 @@
     </message>
     <message>
       <source>Remember me</source>
-      <translation type="unfinished">Remember me</translation>
+      <translation>Nhớ mật khẩu</translation>
     </message>
   </context>
   <context>
@@ -806,7 +806,7 @@
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Tiếp tục</translation>
     </message>
   </context>
   <context>

@@ -82,11 +82,11 @@
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation>往左捲軸</translation>
+      <translation>向左滾動</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>往右捲軸</translation>
+      <translation>向右滾動</translation>
     </message>
     <message>
       <source>Scroll Up</source>
@@ -118,7 +118,7 @@
     </message>
     <message>
       <source>Shows the menu</source>
-      <translation>顯示功能表</translation>
+      <translation>顯示功能選單</translation>
     </message>
     <message>
       <source>Sets the focus</source>
@@ -188,7 +188,7 @@
     </message>
     <message>
       <source>Preference</source>
-      <translation>喜好設定</translation>
+      <translation>偏好選項</translation>
     </message>
     <message>
       <source>Options</source>
@@ -204,7 +204,7 @@
     </message>
     <message>
       <source>Quit</source>
-      <translation>離開</translation>
+      <translation>退出</translation>
     </message>
     <message>
       <source>Exit</source>
@@ -224,14 +224,14 @@
     </message>
     <message>
       <source>Select All</source>
-      <translation>全部選擇</translation>
+      <translation>選擇全部</translation>
     </message>
   </context>
   <context>
     <name>QCocoaTheme</name>
     <message>
       <source>Don&apos;t Save</source>
-      <translation>不保存</translation>
+      <translation>不要儲存</translation>
     </message>
   </context>
   <context>
@@ -266,7 +266,7 @@
     </message>
     <message>
       <source>&amp;HTML:</source>
-      <translation type="unfinished">&amp;HTML:</translation>
+      <translation>%HTML</translation>
     </message>
     <message>
       <source>Cursor at %1, %2
@@ -299,11 +299,11 @@ Press ESC to cancel</source>
     <name>QComboBox</name>
     <message>
       <source>False</source>
-      <translation>假</translation>
+      <translation>否</translation>
     </message>
     <message>
       <source>True</source>
-      <translation>真</translation>
+      <translation>是</translation>
     </message>
     <message>
       <source>Open the combo box selection popup</source>
@@ -372,7 +372,7 @@ Press ESC to cancel</source>
     <name>QFile</name>
     <message>
       <source>Destination file is the same file.</source>
-      <translation>目的檔案為相同的檔案.</translation>
+      <translation>目標檔案為相同的檔案.</translation>
     </message>
     <message>
       <source>Source file does not exist.</source>
@@ -380,7 +380,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Destination file exists</source>
-      <translation>目標檔已存在</translation>
+      <translation>目標檔案已存在</translation>
     </message>
     <message>
       <source>Error while renaming.</source>
@@ -396,11 +396,11 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Cannot remove source file</source>
-      <translation>無法移除原始檔</translation>
+      <translation>無法移除來源檔案</translation>
     </message>
     <message>
       <source>Cannot open %1 for input</source>
-      <translation>無法開啟 %1 以輸入</translation>
+      <translation>無法開啟 %1 用以寫入</translation>
     </message>
     <message>
       <source>Cannot open for output</source>
@@ -412,46 +412,46 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Cannot create %1 for output</source>
-      <translation>無法建立 %1 以輸出</translation>
+      <translation>無法新增 %1 以輸出</translation>
     </message>
   </context>
   <context>
     <name>QFileDialog</name>
     <message>
       <source>Look in:</source>
-      <translation>尋找於:</translation>
+      <translation>現在位置:</translation>
     </message>
     <message>
       <source>Back</source>
-      <translation>返回</translation>
+      <translation>上一步</translation>
     </message>
     <message>
       <source>Go back</source>
-      <translation>返回</translation>
+      <translation>返回至上一步</translation>
     </message>
     <message>
       <source>Forward</source>
-      <translation>往前</translation>
+      <translation>下一步</translation>
     </message>
     <message>
       <source>Go forward</source>
-      <translation>前進</translation>
+      <translation>前進至下一步</translation>
     </message>
     <message>
       <source>Parent Directory</source>
-      <translation>主目錄</translation>
+      <translation>上一層目錄</translation>
     </message>
     <message>
       <source>Go to the parent directory</source>
-      <translation>移至主目錄</translation>
+      <translation>切換至上一層目錄</translation>
     </message>
     <message>
       <source>Create New Folder</source>
-      <translation>建立新資料夾</translation>
+      <translation>新增資料夾</translation>
     </message>
     <message>
       <source>Create a New Folder</source>
-      <translation>新建資料夾</translation>
+      <translation>新增資料夾</translation>
     </message>
     <message>
       <source>List View</source>
@@ -459,7 +459,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Change to list view mode</source>
-      <translation>切換至清單預覽模式</translation>
+      <translation>切換至列表檢視</translation>
     </message>
     <message>
       <source>Detail View</source>
@@ -467,7 +467,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Change to detail view mode</source>
-      <translation>切換至詳細瀏覽模式</translation>
+      <translation>切換至詳細檢視</translation>
     </message>
     <message>
       <source>Files of type:</source>
@@ -491,7 +491,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>File &amp;name:</source>
-      <translation>檔名(&amp;N):</translation>
+      <translation>檔案名稱(&amp;N)：</translation>
     </message>
     <message>
       <source>&amp;Open</source>
@@ -523,7 +523,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Show &amp;hidden files</source>
-      <translation>顯示隱藏檔(&amp;H)</translation>
+      <translation>顯示隱藏檔案 (&amp;H)</translation>
     </message>
     <message>
       <source>&amp;New Folder</source>
@@ -548,8 +548,8 @@ Please verify the correct directory name was given.</source>
     <message>
       <source>%1 already exists.
 Do you want to replace it?</source>
-      <translation>%1 已存在
-您要取代它嗎?</translation>
+      <translation>%1 已經存在
+您確定要取代它嗎?</translation>
     </message>
     <message>
       <source>%1
@@ -582,7 +582,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Recent Places</source>
-      <translation>最近的地方</translation>
+      <translation>最近使用</translation>
     </message>
     <message>
       <source>Remove</source>
@@ -613,7 +613,7 @@ Do you want to delete it anyway?</source>
     <message>
       <source>Folder</source>
       <comment>All other platforms</comment>
-      <translation>檔案夾</translation>
+      <translation>資料夾</translation>
     </message>
     <message>
       <source>Alias</source>
@@ -635,7 +635,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>List of places and bookmarks</source>
-      <translation>位罝和書籤的清單</translation>
+      <translation>快速存取</translation>
     </message>
     <message>
       <source>Files</source>
@@ -643,15 +643,15 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Alt+Left</source>
-      <translation>Alt + 左鍵</translation>
+      <translation>Alt + 方向鍵左</translation>
     </message>
     <message>
       <source>Alt+Right</source>
-      <translation>Alt + 右鍵</translation>
+      <translation>Alt + 方向鍵右</translation>
     </message>
     <message>
       <source>Alt+Up</source>
-      <translation>Alt + 向上鍵</translation>
+      <translation>Alt + 方向鍵上</translation>
     </message>
   </context>
   <context>
@@ -662,7 +662,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 Gb</translation>
+      <translation>%1 GB</translation>
     </message>
     <message>
       <source>%1 MB</source>
@@ -674,11 +674,11 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>%1 bytes</source>
-      <translation>%1 位元組</translation>
+      <translation>%1 Bytes</translation>
     </message>
     <message>
       <source>Invalid filename</source>
-      <translation>不合法的檔名</translation>
+      <translation>無效的檔案名稱</translation>
     </message>
     <message>
       <source>&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
@@ -704,7 +704,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Date Modified</source>
-      <translation>變更日期</translation>
+      <translation>最近一次修改</translation>
     </message>
     <message>
       <source>My Computer</source>
@@ -716,7 +716,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>%1 byte(s)</source>
-      <translation>%1 位元組</translation>
+      <translation>%1 Byte(s)</translation>
     </message>
   </context>
   <context>
@@ -739,7 +739,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Close without Saving</source>
-      <translation>關閉而不儲存</translation>
+      <translation>放棄儲存並關閉</translation>
     </message>
   </context>
   <context>
@@ -766,7 +766,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>No space left on device</source>
-      <translation>裝置上已無空間</translation>
+      <translation>裝置上可用空間不足</translation>
     </message>
     <message>
       <source>Unknown error</source>
@@ -774,7 +774,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>file to open is a directory</source>
-      <translation>要開啟的檔是一個目錄</translation>
+      <translation>指定開啟的位址為目錄而非檔案</translation>
     </message>
   </context>
   <context>
@@ -808,11 +808,11 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Device is not set</source>
-      <translation>設備未設定</translation>
+      <translation>設備尚未就緒或設定不正確</translation>
     </message>
     <message>
       <source>Device not writable</source>
-      <translation>設備不可寫入</translation>
+      <translation>設備有寫入保護或不可寫入</translation>
     </message>
     <message>
       <source>Unsupported image format</source>
@@ -835,7 +835,7 @@ Do you want to delete it anyway?</source>
     <message>
       <source>%1, ...</source>
       <extracomment>This text is an &quot;unfinished&quot; shortcut, expands like &quot;Ctrl+A, ...&quot;</extracomment>
-      <translation type="unfinished">%1, ...</translation>
+      <translation>%1, ...</translation>
     </message>
   </context>
   <context>
@@ -846,7 +846,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>&amp;Redo</source>
-      <translation>重做(&amp;R)</translation>
+      <translation>取消復原(&amp;R)</translation>
     </message>
     <message>
       <source>Cu&amp;t</source>
@@ -866,18 +866,18 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>全部選擇</translation>
+      <translation>選擇全部</translation>
     </message>
   </context>
   <context>
     <name>QMessageBox</name>
     <message>
       <source>Show Details...</source>
-      <translation>顯示詳情...</translation>
+      <translation>顯示詳細資訊</translation>
     </message>
     <message>
       <source>Hide Details...</source>
-      <translation>隱藏詳情...</translation>
+      <translation>隱藏詳細資訊</translation>
     </message>
     <message>
       <source>OK</source>
@@ -912,7 +912,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Yes to &amp;All</source>
-      <translation>全部回答是(&amp;A)</translation>
+      <translation>全部皆是(&amp;A)</translation>
     </message>
     <message>
       <source>&amp;No</source>
@@ -920,7 +920,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>N&amp;o to All</source>
-      <translation>全部回答否(&amp;O)</translation>
+      <translation>全部皆否(&amp;O)</translation>
     </message>
     <message>
       <source>Abort</source>
@@ -944,7 +944,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Discard</source>
-      <translation>丟棄</translation>
+      <translation>捨棄</translation>
     </message>
     <message>
       <source>Help</source>
@@ -956,7 +956,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Reset</source>
-      <translation>重置</translation>
+      <translation>重設</translation>
     </message>
     <message>
       <source>Restore Defaults</source>
@@ -981,26 +981,26 @@ Do you want to delete it anyway?</source>
     <name>QSaveFile</name>
     <message>
       <source>Existing file %1 is not writable</source>
-      <translation>既有檔案 %1 為不可寫入</translation>
+      <translation>既有檔案 %1有寫入保護或不可寫入</translation>
     </message>
     <message>
       <source>Filename refers to a directory</source>
-      <translation>此檔名是一個目錄</translation>
+      <translation>此檔案名稱為目錄(非檔案)</translation>
     </message>
     <message>
       <source>Writing canceled by application</source>
-      <translation>寫入被應用程式取消</translation>
+      <translation>寫入動作被應用程式取消</translation>
     </message>
   </context>
   <context>
     <name>QScrollBar</name>
     <message>
       <source>Scroll here</source>
-      <translation>在此捲軸</translation>
+      <translation>滾動至此處</translation>
     </message>
     <message>
       <source>Left edge</source>
-      <translation>左邊緣</translation>
+      <translation>左邊邊界</translation>
     </message>
     <message>
       <source>Top</source>
@@ -1008,7 +1008,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Right edge</source>
-      <translation>右邊緣</translation>
+      <translation>右邊邊界</translation>
     </message>
     <message>
       <source>Bottom</source>
@@ -1032,19 +1032,19 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Scroll left</source>
-      <translation>往左捲軸</translation>
+      <translation>向左滾動</translation>
     </message>
     <message>
       <source>Scroll up</source>
-      <translation>往上捲軸</translation>
+      <translation>向上滾動</translation>
     </message>
     <message>
       <source>Scroll right</source>
-      <translation>往右捲軸</translation>
+      <translation>向右滾動</translation>
     </message>
     <message>
       <source>Scroll down</source>
-      <translation>往下捲軸</translation>
+      <translation>向下滾動</translation>
     </message>
   </context>
   <context>
@@ -1099,11 +1099,11 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Shared Data</source>
-      <translation>共用的資料</translation>
+      <translation>共用資料</translation>
     </message>
     <message>
       <source>Runtime</source>
-      <translation>Runtime</translation>
+      <translation>執行環境</translation>
     </message>
     <message>
       <source>Configuration</source>
@@ -1111,11 +1111,11 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Shared Configuration</source>
-      <translation>共用的配置</translation>
+      <translation>共用設定</translation>
     </message>
     <message>
       <source>Shared Cache</source>
-      <translation>共用的快取</translation>
+      <translation>共用快取</translation>
     </message>
     <message>
       <source>Download</source>
@@ -1126,11 +1126,11 @@ Do you want to delete it anyway?</source>
     <name>QTabBar</name>
     <message>
       <source>Scroll Left</source>
-      <translation>往左捲軸</translation>
+      <translation>向左滾動</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>往右捲軸</translation>
+      <translation>向右滾動</translation>
     </message>
   </context>
   <context>
@@ -1148,7 +1148,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>&amp;Redo</source>
-      <translation>重做(&amp;R)</translation>
+      <translation>取消復原(&amp;R)</translation>
     </message>
     <message>
       <source>Cu&amp;t</source>
@@ -1172,7 +1172,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Select All</source>
-      <translation>全部選擇</translation>
+      <translation>選擇全部</translation>
     </message>
   </context>
 </TS>

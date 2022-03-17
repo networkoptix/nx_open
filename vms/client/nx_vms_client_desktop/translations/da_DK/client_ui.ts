@@ -356,7 +356,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slet</translation>
     </message>
     <message>
       <source>Area Width</source>
@@ -379,7 +379,7 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Navn</translation>
     </message>
     <message>
       <source>Description</source>
@@ -456,7 +456,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slet</translation>
     </message>
     <message>
       <source>Event Rules</source>
@@ -769,7 +769,7 @@
     <name>CameraSelectionDialog</name>
     <message>
       <source>All Cameras</source>
-      <translation type="unfinished">All Cameras</translation>
+      <translation>Alle kameraer</translation>
     </message>
     <message>
       <source>Select Cameras</source>
@@ -923,7 +923,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Adgangskode</translation>
     </message>
     <message>
       <source>Login</source>
@@ -962,7 +962,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Adgangskode</translation>
     </message>
   </context>
   <context>
@@ -1023,7 +1023,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Adgangskode</translation>
     </message>
     <message>
       <source>Content type</source>
@@ -1094,7 +1094,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Adgangskode</translation>
     </message>
   </context>
   <context>
@@ -1280,7 +1280,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slet</translation>
     </message>
     <message>
       <source>Size</source>
@@ -1334,7 +1334,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slet</translation>
     </message>
   </context>
   <context>
@@ -1453,7 +1453,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Adgangskode</translation>
     </message>
     <message>
       <source>Search Base</source>
@@ -1618,7 +1618,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Adgangskode</translation>
     </message>
     <message>
       <source>Test</source>
@@ -1692,7 +1692,7 @@
     </message>
     <message>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Adgangskode:</translation>
     </message>
     <message>
       <source>Login:</source>
@@ -1719,7 +1719,7 @@
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Download</translation>
     </message>
     <message>
       <source>Browse</source>
@@ -1731,7 +1731,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Annuller</translation>
     </message>
     <message>
       <source>Link copied</source>
@@ -1798,7 +1798,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Adgangskode</translation>
     </message>
     <message>
       <source>Username</source>
@@ -1916,7 +1916,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slet</translation>
     </message>
     <message>
       <source>Details</source>
@@ -1947,7 +1947,7 @@
     </message>
     <message>
       <source>Name:</source>
-      <translation type="unfinished">Name:</translation>
+      <translation>Navn:</translation>
     </message>
     <message>
       <source>Hotkey:</source>
@@ -2071,7 +2071,7 @@
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>System Administration</source>
-      <translation type="unfinished">System Administration</translation>
+      <translation>Systemadministration</translation>
     </message>
   </context>
   <context>
@@ -2098,7 +2098,7 @@
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Deaktivér</translation>
     </message>
     <message>
       <source>Delete...</source>
@@ -2271,7 +2271,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Adgangskode</translation>
     </message>
   </context>
   <context>
@@ -2522,7 +2522,7 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Navn</translation>
     </message>
     <message>
       <source>IP Address</source>
@@ -2656,11 +2656,11 @@
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Annuller</translation>
     </message>
   </context>
   <context>
@@ -2671,7 +2671,7 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Navn</translation>
     </message>
     <message>
       <source>Icon</source>
@@ -2740,7 +2740,7 @@
     <name>StorageRebuildWidget</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Annuller</translation>
     </message>
   </context>
   <context>
@@ -2763,7 +2763,7 @@
     </message>
     <message>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Adgangskode:</translation>
     </message>
   </context>
   <context>
@@ -2812,7 +2812,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slet</translation>
     </message>
     <message>
       <source>Font Size</source>
@@ -2858,7 +2858,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slet</translation>
     </message>
   </context>
   <context>
@@ -2872,11 +2872,11 @@
     <name>UserRoleSettingsWidget</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Navn</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Brugere</translation>
     </message>
     <message>
       <source>Delete Role</source>
@@ -2958,7 +2958,7 @@
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Tid</translation>
     </message>
     <message>
       <source>Ignore timezone in uploaded files</source>
@@ -2969,7 +2969,7 @@
     <name>VirtualCameraUploadWidget</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Annuller</translation>
     </message>
     <message>
       <source>Upload Footage</source>

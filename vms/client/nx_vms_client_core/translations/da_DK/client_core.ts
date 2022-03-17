@@ -78,7 +78,7 @@
     </message>
     <message>
       <source>Incompatible server</source>
-      <translation type="unfinished">Incompatible server</translation>
+      <translation>Inkompatibel server</translation>
     </message>
     <message>
       <source>Server has a different version:</source>
@@ -116,7 +116,7 @@
     </message>
     <message>
       <source>Connect to this server from web browser or through desktop client to set it up</source>
-      <translation type="unfinished">Connect to this server from web browser or through desktop client to set it up</translation>
+      <translation>Opret forbindelse til denne server fra webbrowser eller via desktop-klient for at konfigurere den</translation>
     </message>
     <message>
       <source>LDAP Server connection timed out</source>
@@ -132,7 +132,7 @@
     </message>
     <message>
       <source>Invalid login or password</source>
-      <translation type="unfinished">Invalid login or password</translation>
+      <translation>Ugyldig brugernavn eller adgangskode.</translation>
     </message>
     <message>
       <source>Incorrect username or password.</source>
@@ -144,7 +144,7 @@
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>For mange forsøg. Prøv igen senere.</translation>
     </message>
     <message>
       <source>Compatibility mode for versions lower than %1 is not supported.</source>
@@ -174,7 +174,7 @@
     </message>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>Din session er udløbet</translation>
     </message>
     <message>
       <source>Please log in to %1 again.</source>
@@ -192,7 +192,7 @@
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
-      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+      <translation>Denne bruger er blevet deaktiveret af en systemadministrator.</translation>
     </message>
     <message>
       <source>Too many login attempts. Try again in a minute.</source>

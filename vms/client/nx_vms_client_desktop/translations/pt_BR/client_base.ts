@@ -54,7 +54,7 @@
     </message>
     <message>
       <source>Expires</source>
-      <translation>Expirado</translation>
+      <translation>Expira</translation>
     </message>
   </context>
   <context>
@@ -2706,7 +2706,7 @@ a %1</translation>
     </message>
     <message>
       <source>You will be logged out.</source>
-      <translation type="unfinished">You will be logged out.</translation>
+      <translation>Você será desconectado.</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
@@ -4476,7 +4476,7 @@ a %1</translation>
     </message>
     <message>
       <source>Exit Fullscreen</source>
-      <translation>Sair do modo Tela Cheia</translation>
+      <translation>Sair de "FullScreen"</translation>
     </message>
     <message>
       <source>Enter Fullscreen</source>
@@ -8139,7 +8139,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>System Administration</source>
-      <translation type="unfinished">System Administration</translation>
+      <translation>Administração do Sistema</translation>
     </message>
   </context>
   <context>
@@ -8401,7 +8401,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Low</source>
-      <translation>Baixa</translation>
+      <translation>Baixo</translation>
     </message>
     <message>
       <source>Medium</source>
@@ -8409,7 +8409,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>High</source>
-      <translation>Alta</translation>
+      <translation>Alto</translation>
     </message>
   </context>
   <context>
@@ -9506,7 +9506,7 @@ Você pode forçá-lo, mas pode aumentar significativamente a carga da CPU.</tra
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</translation>
+      <translation>Proxying todo o conteúdo expõe qualquer serviço ou dispositivo na rede do servidor&apos;s aos usuários desta página</translation>
     </message>
   </context>
   <context>
@@ -9646,8 +9646,8 @@ Você pode forçá-lo, mas pode aumentar significativamente a carga da CPU.</tra
     <message numerus="yes">
       <source>%n bookmarks</source>
       <translation>
-        <numerusform>%n marcadores</numerusform>
-        <numerusform>%n marcadores</numerusform>
+        <numerusform>%n Marcadores</numerusform>
+        <numerusform>%n Marcadores</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -9930,7 +9930,7 @@ Cuidado: Esta senha não pode ser redefinida. Se você perdê-lo, o arquivo ser�
     </message>
     <message>
       <source>Learn more.</source>
-      <translation type="unfinished">Learn more.</translation>
+      <translation>Saiba mais.</translation>
     </message>
     <message numerus="yes">
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
@@ -10711,7 +10711,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Cameras &amp; Devices</source>
-      <translation>Câmeras e dispositivos</translation>
+      <translation>Câmaras e Dispositivos</translation>
     </message>
     <message>
       <source>Layouts</source>
@@ -10719,7 +10719,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Showreels</source>
-      <translation>Exibições</translation>
+      <translation>Showreels</translation>
     </message>
     <message>
       <source>Web Pages</source>

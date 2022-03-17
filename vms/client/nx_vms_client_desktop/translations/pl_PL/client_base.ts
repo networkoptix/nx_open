@@ -2774,7 +2774,7 @@ to %1</source>
     </message>
     <message>
       <source>You will be logged out.</source>
-      <translation type="unfinished">You will be logged out.</translation>
+      <translation>Zostaniesz wylogowany.</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
@@ -4914,7 +4914,7 @@ to %1</source>
     <message numerus="yes">
       <source>Certificates</source>
       <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
+        <numerusform>Certyfikaty</numerusform>
         <numerusform>Certificates</numerusform>
         <numerusform>Certificates</numerusform>
         <numerusform>Certificates</numerusform>
@@ -4923,7 +4923,7 @@ to %1</source>
     <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
       <translation type="unfinished">
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
+        <numerusform>Serwer wykorzystuje %n certyfikatów SSL do uwierzytelniania tożsamości</numerusform>
         <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
         <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
         <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
@@ -7317,7 +7317,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>%n weeks</source>
       <translation type="unfinished">
-        <numerusform>%n weeks</numerusform>
+        <numerusform>%n tygodni</numerusform>
         <numerusform>%n weeks</numerusform>
         <numerusform>%n weeks</numerusform>
         <numerusform>%n weeks</numerusform>
@@ -7326,7 +7326,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>%n days</source>
       <translation type="unfinished">
-        <numerusform>%n days</numerusform>
+        <numerusform>%n dni</numerusform>
         <numerusform>%n days</numerusform>
         <numerusform>%n days</numerusform>
         <numerusform>%n days</numerusform>
@@ -7335,7 +7335,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>%n hours</source>
       <translation type="unfinished">
-        <numerusform>%n hours</numerusform>
+        <numerusform>%n godzin</numerusform>
         <numerusform>%n hours</numerusform>
         <numerusform>%n hours</numerusform>
         <numerusform>%n hours</numerusform>
@@ -7344,7 +7344,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>%n minutes</source>
       <translation type="unfinished">
-        <numerusform>%n minutes</numerusform>
+        <numerusform>%n minut</numerusform>
         <numerusform>%n minutes</numerusform>
         <numerusform>%n minutes</numerusform>
         <numerusform>%n minutes</numerusform>
@@ -7353,7 +7353,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>%n seconds</source>
       <translation type="unfinished">
-        <numerusform>%n seconds</numerusform>
+        <numerusform>%n sekund</numerusform>
         <numerusform>%n seconds</numerusform>
         <numerusform>%n seconds</numerusform>
         <numerusform>%n seconds</numerusform>
@@ -7424,7 +7424,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Set for %n selected devices</source>
       <translation type="unfinished">
-        <numerusform>Set for %n selected devices</numerusform>
+        <numerusform>Ustaw dla %n wybranych urządzeń</numerusform>
         <numerusform>Set for %n selected devices</numerusform>
         <numerusform>Set for %n selected devices</numerusform>
         <numerusform>Set for %n selected devices</numerusform>
@@ -7500,7 +7500,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Backup is enabled for %n devices</source>
       <translation type="unfinished">
-        <numerusform>Backup is enabled for %n devices</numerusform>
+        <numerusform>Kopia zapasowa jest włączona dla %n urządzeń</numerusform>
         <numerusform>Backup is enabled for %n devices</numerusform>
         <numerusform>Backup is enabled for %n devices</numerusform>
         <numerusform>Backup is enabled for %n devices</numerusform>
@@ -7509,7 +7509,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Backup is enabled for %n cameras</source>
       <translation type="unfinished">
-        <numerusform>Backup is enabled for %n cameras</numerusform>
+        <numerusform>Kopia zapasowa jest włączona dla %n kamer</numerusform>
         <numerusform>Backup is enabled for %n cameras</numerusform>
         <numerusform>Backup is enabled for %n cameras</numerusform>
         <numerusform>Backup is enabled for %n cameras</numerusform>
@@ -7912,8 +7912,8 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Failed to enable audio on %n devices</source>
       <translation type="unfinished">
-        <numerusform>Failed to enable audio on %n devices</numerusform>
-        <numerusform>Failed to enable audio on %n devices</numerusform>
+        <numerusform>Nie udało się włączyć dźwięku na %n urządzeniach</numerusform>
+        <numerusform>Nie udało się włączyć dźwięku na %n urządzeniach</numerusform>
         <numerusform>Failed to enable audio on %n devices</numerusform>
         <numerusform>Failed to enable audio on %n devices</numerusform>
       </translation>
@@ -7930,9 +7930,9 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Failed to enable 2-way audio on %n devices</source>
       <translation type="unfinished">
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
+        <numerusform>Nie udało się włączyć dwukierunkowego dźwięku na %n urządzeniach</numerusform>
+        <numerusform>Nie udało się włączyć 2-kierunkowego dźwięku na %n urządzeniach</numerusform>
+        <numerusform>Nie udało się włączyć 2-kierunkowego dźwięku na %n urządzeniach</numerusform>
         <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
       </translation>
     </message>
@@ -7978,7 +7978,7 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>%1 are required</source>
       <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
       <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
+        <numerusform>%1 jest wymagane</numerusform>
         <numerusform>%1 are required</numerusform>
         <numerusform>%1 are required</numerusform>
         <numerusform>%1 are required</numerusform>
@@ -8392,7 +8392,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>System Administration</source>
-      <translation type="unfinished">System Administration</translation>
+      <translation>Administracja systemem</translation>
     </message>
   </context>
   <context>
@@ -8908,7 +8908,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>%n minutes left</source>
       <translation type="unfinished">
-        <numerusform>%n minutes left</numerusform>
+        <numerusform>Pozostało %n minut</numerusform>
         <numerusform>%n minutes left</numerusform>
         <numerusform>%n minutes left</numerusform>
         <numerusform>%n minutes left</numerusform>
@@ -10210,7 +10210,7 @@ Uwaga: To hasło nie może zostać zresetowane. Jeśli je zgubisz, archiwum nie 
     </message>
     <message>
       <source>Learn more.</source>
-      <translation type="unfinished">Learn more.</translation>
+      <translation>Więcej informacji.</translation>
     </message>
     <message numerus="yes">
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
@@ -10494,7 +10494,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::SessionRefreshDialog</name>
     <message>
       <source>Login</source>
-      <translation>Login</translation>
+      <translation>Zalogowanie</translation>
     </message>
     <message>
       <source>Password</source>

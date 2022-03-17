@@ -135,7 +135,7 @@
     </message>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Opret forbindelse til serveren...</translation>
     </message>
     <message>
       <source>Disconnect from Server</source>
@@ -318,7 +318,7 @@
     </message>
     <message>
       <source>Exit</source>
-      <translation type="unfinished">Exit</translation>
+      <translation>Afslut</translation>
     </message>
     <message>
       <source>Mark Selection Start</source>
@@ -414,7 +414,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slet</translation>
     </message>
     <message>
       <source>Stop Video Wall</source>
@@ -502,7 +502,7 @@
     </message>
     <message>
       <source>Rename</source>
-      <translation type="unfinished">Rename</translation>
+      <translation>Omdøb</translation>
     </message>
     <message>
       <source>Delete from Disk</source>
@@ -662,7 +662,7 @@
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Luk</translation>
     </message>
     <message>
       <source>Close All But This</source>
@@ -902,7 +902,7 @@
     </message>
     <message>
       <source>Connect to Another Server...</source>
-      <translation type="unfinished">Connect to Another Server...</translation>
+      <translation>Opret forbindelse til en anden server...</translation>
     </message>
     <message>
       <source>New</source>
@@ -1742,7 +1742,7 @@
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Vælg alt</translation>
     </message>
     <message>
       <source>Export selected records to a file</source>
@@ -1844,7 +1844,7 @@
     <name>QnAuditLogModel</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Ukendt</translation>
     </message>
     <message>
       <source>Unsuccessful login</source>
@@ -1928,7 +1928,7 @@
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Tid</translation>
     </message>
     <message>
       <source>Description</source>
@@ -2252,7 +2252,7 @@
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation type="unfinished">&amp;Delete</translation>
+      <translation>&amp;Slet</translation>
     </message>
     <message>
       <source>&amp;Schedule...</source>
@@ -2362,7 +2362,7 @@
     <name>QnCameraDiagnosticsDialog</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>FAILED: %1</source>
@@ -2458,7 +2458,7 @@
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Vælg alt</translation>
     </message>
     <message>
       <source>Devices List</source>
@@ -2520,7 +2520,7 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Navn</translation>
     </message>
     <message>
       <source>Vendor</source>
@@ -2678,7 +2678,7 @@ to %1</translation>
     <message>
       <source>Learn more about %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Learn more about %1</translation>
+      <translation>Få mere at vide om %1</translation>
     </message>
     <message>
       <source>Enter your account password to disconnect System from %1</source>
@@ -2742,7 +2742,7 @@ to %1</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>For mange forsøg. Prøv igen senere.</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
@@ -2771,7 +2771,7 @@ to %1</translation>
     <name>QnCloudResultMessages</name>
     <message>
       <source>Account not found</source>
-      <translation type="unfinished">Account not found</translation>
+      <translation>Konto ikke fundet</translation>
     </message>
     <message>
       <source>Account is not activated.</source>
@@ -2788,7 +2788,7 @@ to %1</translation>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation type="unfinished">Too many attempts. Try again in a minute.</translation>
+      <translation>For mange forsøg. Prøv igen senere.</translation>
     </message>
   </context>
   <context>
@@ -2800,11 +2800,11 @@ to %1</translation>
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>Kan ikke oprette forbindelse til %1</translation>
     </message>
     <message>
       <source>Connect to Server</source>
-      <translation type="unfinished">Connect to Server</translation>
+      <translation>Opret forbindelse til serveren</translation>
     </message>
   </context>
   <context>
@@ -2863,7 +2863,7 @@ to %1</translation>
     </message>
     <message>
       <source>Try Again</source>
-      <translation type="unfinished">Try Again</translation>
+      <translation>Prøv igen</translation>
     </message>
     <message>
       <source>Failed to restart %1 in compatibility mode</source>
@@ -2899,7 +2899,7 @@ to %1</translation>
     </message>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>Din session er udløbet</translation>
     </message>
   </context>
   <context>
@@ -2993,7 +2993,7 @@ to %1</translation>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Opret</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
@@ -3074,7 +3074,7 @@ to %1</translation>
     </message>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Vælg alt</translation>
     </message>
     <message>
       <source>Clear Filter</source>
@@ -3351,7 +3351,7 @@ to %1</translation>
     <name>QnIOPortsViewModel</name>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Type</translation>
     </message>
     <message>
       <source>Default state</source>
@@ -3359,12 +3359,12 @@ to %1</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Navn</translation>
     </message>
     <message>
       <source>Unknown</source>
       <comment>IO Port Type</comment>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Ukendt</translation>
     </message>
     <message>
       <source>Disabled</source>
@@ -3491,7 +3491,7 @@ to %1</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>E-mail</translation>
     </message>
     <message>
       <source>DN</source>
@@ -3499,7 +3499,7 @@ to %1</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Navn</translation>
     </message>
   </context>
   <context>
@@ -3576,7 +3576,7 @@ to %1</translation>
     <name>QnLicenseListModel</name>
     <message>
       <source>Type</source>
-      <translation type="unfinished">Type</translation>
+      <translation>Type</translation>
     </message>
     <message>
       <source>License Key</source>
@@ -3600,7 +3600,7 @@ to %1</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Error</source>
@@ -3710,7 +3710,7 @@ to %1</translation>
     <name>QnLicenseWidget</name>
     <message>
       <source>Activate Trial License</source>
-      <translation type="unfinished">Activate Trial License</translation>
+      <translation>Aktiver prøvelicens</translation>
     </message>
     <message>
       <source>Open License File</source>
@@ -3750,7 +3750,7 @@ to %1</translation>
     </message>
     <message>
       <source>Notifications</source>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Notifikationer</translation>
     </message>
     <message>
       <source>Advanced</source>
@@ -3860,7 +3860,7 @@ to %1</translation>
     </message>
     <message>
       <source>LIVE</source>
-      <translation type="unfinished">LIVE</translation>
+      <translation>LIVE</translation>
     </message>
     <message>
       <source>%1 (Tour &quot;%2&quot; is active)</source>
@@ -3915,7 +3915,7 @@ to %1</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slet</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -3927,7 +3927,7 @@ to %1</translation>
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Luk</translation>
     </message>
     <message>
       <source>Stop</source>
@@ -3950,7 +3950,7 @@ to %1</translation>
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Navn</translation>
     </message>
     <message>
       <source>Name cannot be empty</source>
@@ -4113,7 +4113,7 @@ to %1</translation>
     <name>QnPtzManageModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Navn</translation>
     </message>
     <message>
       <source>Hotkey</source>
@@ -4336,7 +4336,7 @@ to %1</translation>
     </message>
     <message>
       <source>%1 Mbps</source>
-      <translation type="unfinished">%1 Mbps</translation>
+      <translation>%1 Mbps</translation>
     </message>
     <message>
       <source>Device</source>
@@ -4438,7 +4438,7 @@ to %1</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Brugere</translation>
     </message>
     <message>
       <source>Local Files</source>
@@ -4464,7 +4464,7 @@ to %1</translation>
     <name>QnResourceWidget</name>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Luk</translation>
     </message>
     <message>
       <source>Information</source>
@@ -4540,7 +4540,7 @@ to %1</translation>
     <name>QnSearchBookmarksModel</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Navn</translation>
     </message>
     <message>
       <source>Start time</source>
@@ -4587,7 +4587,7 @@ to %1</translation>
     </message>
     <message>
       <source>All Cameras</source>
-      <translation type="unfinished">All Cameras</translation>
+      <translation>Alle kameraer</translation>
     </message>
     <message>
       <source>Select devices...</source>
@@ -4732,7 +4732,7 @@ to %1</translation>
     </message>
     <message>
       <source>Server Web Page</source>
-      <translation type="unfinished">Server Web Page</translation>
+      <translation>Server webside</translation>
     </message>
     <message>
       <source>Plugins</source>
@@ -4857,7 +4857,7 @@ to %1</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>E-mail</translation>
     </message>
     <message>
       <source>SMTP Server</source>
@@ -4873,7 +4873,7 @@ to %1</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Adgangskode</translation>
     </message>
     <message>
       <source>System Signature</source>
@@ -4892,7 +4892,7 @@ to %1</translation>
     <name>QnSmtpSimpleSettingsWidget</name>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>E-mail</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -4900,11 +4900,11 @@ to %1</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Adgangskode</translation>
     </message>
     <message>
       <source>Password cannot be empty.</source>
-      <translation type="unfinished">Password cannot be empty.</translation>
+      <translation>Adgangskoden skal angives.</translation>
     </message>
     <message>
       <source>System Signature</source>
@@ -5057,7 +5057,7 @@ to %1</translation>
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>OFFLINE</translation>
     </message>
     <message>
       <source>ARCHIVE ENCRYPTED</source>
@@ -5076,7 +5076,7 @@ to %1</translation>
     <name>QnStorageAnalyticsWidget</name>
     <message>
       <source>Select All</source>
-      <translation type="unfinished">Select All</translation>
+      <translation>Vælg alt</translation>
     </message>
     <message>
       <source>Export Selection to File...</source>
@@ -5176,7 +5176,7 @@ to %1</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slet</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -5184,7 +5184,7 @@ to %1</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Annuller</translation>
     </message>
     <message>
       <source>Current analytics data will not be automatically moved to another location and will become inaccessible. You can keep it and manually move later, or delete permanently.
@@ -5327,7 +5327,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Add this storage anyway?</source>
-      <translation type="unfinished">Add this storage anyway?</translation>
+      <translation>Vil du tilføje denne lagerplads alligevel?</translation>
     </message>
     <message>
       <source>Storage path used by another server</source>
@@ -5335,7 +5335,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Add Storage</source>
-      <translation type="unfinished">Add Storage</translation>
+      <translation>Tilføj Lagerplads</translation>
     </message>
     <message>
       <source>It is not recommended to use one recording location for different servers.</source>
@@ -5358,7 +5358,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>E-mail</translation>
     </message>
     <message>
       <source>Updates</source>
@@ -5374,7 +5374,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Brugere</translation>
     </message>
     <message>
       <source>Plugins</source>
@@ -5445,7 +5445,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Opret forbindelse</translation>
     </message>
     <message>
       <source>Some users have not set their email addresses</source>
@@ -5630,7 +5630,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Navn</translation>
     </message>
     <message>
       <source>Local user</source>
@@ -5716,7 +5716,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Navn</translation>
     </message>
     <message>
       <source>Role</source>
@@ -5724,7 +5724,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>E-mail</translation>
     </message>
     <message>
       <source>To enable digest authentication password reset is required</source>
@@ -5879,19 +5879,19 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Navn</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>E-mail</translation>
     </message>
     <message>
       <source>Email cannot be empty.</source>
-      <translation type="unfinished">Email cannot be empty.</translation>
+      <translation>Emailadresse må ikke være tom.</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Adgangskode</translation>
     </message>
     <message>
       <source>Confirm Password</source>
@@ -5938,7 +5938,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnValidatorStrings</name>
     <message>
       <source>Email cannot be empty.</source>
-      <translation type="unfinished">Email cannot be empty.</translation>
+      <translation>Emailadresse må ikke være tom.</translation>
     </message>
     <message>
       <source>Email is not valid.</source>
@@ -5946,7 +5946,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message>
       <source>Password cannot be empty.</source>
-      <translation type="unfinished">Password cannot be empty.</translation>
+      <translation>Adgangskoden skal angives.</translation>
     </message>
     <message>
       <source>Avoid leading and trailing spaces.</source>
@@ -6201,7 +6201,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>QnWorkbenchVideoWallHandler</name>
     <message>
       <source>Video Wall</source>
-      <translation type="unfinished">Video Wall</translation>
+      <translation>Videovæg</translation>
     </message>
     <message>
       <source>Video Wall %1</source>
@@ -6670,7 +6670,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Annuller</translation>
     </message>
     <message>
       <source>Some devices from %1 will not be moved to %2. Move anyways?</source>
@@ -6839,7 +6839,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Close</source>
-      <translation type="unfinished">Close</translation>
+      <translation>Luk</translation>
     </message>
     <message>
       <source>Keep</source>
@@ -7348,7 +7348,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Adgangskode</translation>
     </message>
   </context>
   <context>
@@ -7665,7 +7665,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Objects + Lo-Res</source>
-      <translation type="unfinished">Objects + Lo-Res</translation>
+      <translation>Objekter + Lav opløsning</translation>
     </message>
     <message>
       <source>Motion &amp; Objects + Lo-Res</source>
@@ -7825,7 +7825,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Copy</source>
       <comment>to Clipboard</comment>
-      <translation type="unfinished">Copy</translation>
+      <translation>Kopier</translation>
     </message>
     <message>
       <source>Copy to Clipboard</source>
@@ -7834,7 +7834,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Paste</source>
       <comment>from Clipboard</comment>
-      <translation type="unfinished">Paste</translation>
+      <translation>Indsæt</translation>
     </message>
     <message>
       <source>Paste from Clipboard</source>
@@ -7892,7 +7892,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>OK</source>
       <comment>Dialog button text.</comment>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
   </context>
   <context>
@@ -7933,7 +7933,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Connect</source>
       <comment>Connect current System to cloud</comment>
-      <translation type="unfinished">Connect</translation>
+      <translation>Opret forbindelse</translation>
     </message>
     <message>
       <source>Internal server error. Please try again later.</source>
@@ -7977,7 +7977,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ConnectionTestingDialog</name>
     <message>
       <source>Connect</source>
-      <translation type="unfinished">Connect</translation>
+      <translation>Opret forbindelse</translation>
     </message>
     <message>
       <source>Setup</source>
@@ -8169,7 +8169,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Notifications</source>
       <comment>Notifications tab title</comment>
-      <translation type="unfinished">Notifications</translation>
+      <translation>Notifikationer</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -8420,7 +8420,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Navn</translation>
     </message>
     <message>
       <source>Name cannot be empty.</source>
@@ -8543,7 +8543,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::LabelSelectionManager</name>
     <message>
       <source>Copy</source>
-      <translation type="unfinished">Copy</translation>
+      <translation>Kopier</translation>
     </message>
     <message>
       <source>Copy Link Location</source>
@@ -8627,7 +8627,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>OFFLINE</source>
-      <translation type="unfinished">OFFLINE</translation>
+      <translation>OFFLINE</translation>
     </message>
   </context>
   <context>
@@ -8656,7 +8656,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::LoginDialog</name>
     <message>
       <source>Connect to Server...</source>
-      <translation type="unfinished">Connect to Server...</translation>
+      <translation>Opret forbindelse til serveren...</translation>
     </message>
     <message>
       <source>Version %1</source>
@@ -9047,7 +9047,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>There was an error while installing updates:</source>
@@ -9063,7 +9063,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Annuller</translation>
     </message>
     <message>
       <source>The latest version is already installed</source>
@@ -9087,7 +9087,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Download</translation>
     </message>
     <message>
       <source>Download &amp;&amp; Install</source>
@@ -9224,7 +9224,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>Cannot connect to %1</source>
       <comment>%1 is the cloud name like Nx Cloud</comment>
-      <translation type="unfinished">Cannot connect to %1</translation>
+      <translation>Kan ikke oprette forbindelse til %1</translation>
     </message>
   </context>
   <context>
@@ -9392,7 +9392,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>Empty</source>
       <comment>In meaning &apos;There is no camera physically connected now&apos;</comment>
-      <translation type="unfinished">Empty</translation>
+      <translation>Intet indhold</translation>
     </message>
     <message>
       <source>Port</source>
@@ -9466,7 +9466,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     <name>nx::vms::client::desktop::QnWebpageDialog</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Navn</translation>
     </message>
     <message>
       <source>URL</source>
@@ -10214,7 +10214,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Adgangskode</translation>
     </message>
     <message>
       <source>Unknown error</source>
@@ -10308,7 +10308,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Navn</translation>
     </message>
     <message>
       <source>Camera</source>
@@ -10471,7 +10471,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Adgangskode</translation>
     </message>
     <message>
       <source>The password is incorrect.</source>
@@ -10727,7 +10727,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Brugere</translation>
     </message>
     <message>
       <source>Other Systems</source>
@@ -10969,7 +10969,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Brugere</translation>
     </message>
     <message>
       <source>Custom Users</source>
@@ -11055,11 +11055,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Navn</translation>
     </message>
     <message>
       <source>Email</source>
-      <translation type="unfinished">Email</translation>
+      <translation>E-mail</translation>
     </message>
     <message>
       <source>Reason for deactivation</source>
@@ -11284,7 +11284,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Confirm storage location for the analytics data on &quot;%1&quot;</source>

@@ -132,7 +132,7 @@
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>Qualsiasi plugin</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
@@ -352,7 +352,7 @@
     </message>
     <message>
       <source>Event Log</source>
-      <translation type="unfinished">Event Log</translation>
+      <translation>Registro eventi</translation>
     </message>
   </context>
   <context>
@@ -517,7 +517,7 @@
     <name>IntervalPreviewControls</name>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Attiva / disattiva audio</translation>
     </message>
     <message>
       <source>Previous Object</source>
@@ -734,7 +734,7 @@
     </message>
     <message>
       <source>Remember me</source>
-      <translation type="unfinished">Remember me</translation>
+      <translation>Ricordami su questo computer</translation>
     </message>
   </context>
   <context>

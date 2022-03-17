@@ -174,7 +174,7 @@
     </message>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>您的登入已過期。</translation>
     </message>
     <message>
       <source>Please log in to %1 again.</source>

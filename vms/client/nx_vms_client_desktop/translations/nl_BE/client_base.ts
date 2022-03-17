@@ -959,8 +959,8 @@
     <message numerus="yes">
       <source>Show on Items</source>
       <translation>
-        <numerusform>Show on Items</numerusform>
-        <numerusform>Show on Items</numerusform>
+        <numerusform>Weergeven op items</numerusform>
+        <numerusform>Weergeven op items</numerusform>
       </translation>
     </message>
     <message>
@@ -2702,7 +2702,7 @@ to %1</source>
     </message>
     <message>
       <source>You will be logged out.</source>
-      <translation>U wordt uitgelogd.</translation>
+      <translation>U bent afgemeld.</translation>
     </message>
     <message>
       <source>System will be accessible through local network with a local administrator account.</source>
@@ -7929,7 +7929,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     <message>
       <source>Connect</source>
       <comment>Connect current System to cloud</comment>
-      <translation>Verbinden</translation>
+      <translation>Verbind</translation>
     </message>
     <message>
       <source>Internal server error. Please try again later.</source>
@@ -7973,7 +7973,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     <name>nx::vms::client::desktop::ConnectionTestingDialog</name>
     <message>
       <source>Connect</source>
-      <translation>Verbinden</translation>
+      <translation>Verbind</translation>
     </message>
     <message>
       <source>Setup</source>
@@ -7981,7 +7981,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     </message>
     <message>
       <source>Success</source>
-      <translation>Gelukt</translation>
+      <translation>Succes</translation>
     </message>
     <message>
       <source>Test Failed</source>
@@ -8135,7 +8135,7 @@ We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u
     </message>
     <message>
       <source>System Administration</source>
-      <translation>Systeembeheer</translation>
+      <translation>Systeem Administratie</translation>
     </message>
   </context>
   <context>
@@ -9502,7 +9502,7 @@ Je kunt het forceren, maar het kan de CPU-belasting aanzienlijk verhogen.</trans
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation>Door alle inhoud te proxien, wordt elke service of elk apparaat op het server-netwerk blootgesteld aan de gebruikers van deze webpagina</translation>
+      <translation>Alle inhoud uitsluiten stelt elke service of apparaat op de server&apos;s netwerk bloot aan de gebruikers van deze webpagina</translation>
     </message>
   </context>
   <context>

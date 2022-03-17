@@ -318,7 +318,7 @@
     </message>
     <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
-      <translation type="unfinished">All files are successfully backed up! New files will be backed up automatically</translation>
+      <translation>Kopia zapasowa wszystkich plików została pomyślnie utworzona! Kopie zapasowe nowych plików będą tworzone automatycznie</translation>
     </message>
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
@@ -762,7 +762,7 @@
     </message>
     <message>
       <source>Motion &amp;&amp; Objects Recording</source>
-      <translation type="unfinished">Motion &amp;&amp; Objects Recording</translation>
+      <translation>Nagrywanie ruchu i obiektów</translation>
     </message>
   </context>
   <context>
@@ -1772,7 +1772,7 @@
     <name>OauthLoginPlaceholder</name>
     <message>
       <source>Try Again</source>
-      <translation type="unfinished">Try Again</translation>
+      <translation>Spróbuj ponownie</translation>
     </message>
   </context>
   <context>
@@ -2438,7 +2438,7 @@
     </message>
     <message>
       <source>Encrypt video traffic to desktop and mobile clients</source>
-      <translation type="unfinished">Encrypt video traffic to desktop and mobile clients</translation>
+      <translation>Szyfruj ruch wideo do klientów stacjonarnych i mobilnych</translation>
     </message>
     <message>
       <source>Manage Users</source>

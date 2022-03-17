@@ -352,7 +352,7 @@
     </message>
     <message>
       <source>Event Log</source>
-      <translation type="unfinished">Event Log</translation>
+      <translation>Eseménynapló</translation>
     </message>
   </context>
   <context>
@@ -517,7 +517,7 @@
     <name>IntervalPreviewControls</name>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Némitás váltása</translation>
     </message>
     <message>
       <source>Previous Object</source>
@@ -525,11 +525,11 @@
     </message>
     <message>
       <source>Pause</source>
-      <translation type="unfinished">Pause</translation>
+      <translation>Szünet</translation>
     </message>
     <message>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>Letjátszás</translation>
     </message>
     <message>
       <source>Next Object</source>
@@ -734,7 +734,7 @@
     </message>
     <message>
       <source>Remember me</source>
-      <translation type="unfinished">Remember me</translation>
+      <translation>Emlékezzen rám</translation>
     </message>
   </context>
   <context>
@@ -814,7 +814,7 @@
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>Következő</translation>
     </message>
   </context>
   <context>

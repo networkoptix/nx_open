@@ -348,7 +348,7 @@
     </message>
     <message>
       <source>Event Log</source>
-      <translation type="unfinished">Event Log</translation>
+      <translation>이벤트 로그</translation>
     </message>
   </context>
   <context>
@@ -513,7 +513,7 @@
     <name>IntervalPreviewControls</name>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>음소거</translation>
     </message>
     <message>
       <source>Previous Object</source>
@@ -521,11 +521,11 @@
     </message>
     <message>
       <source>Pause</source>
-      <translation type="unfinished">Pause</translation>
+      <translation>일시정지</translation>
     </message>
     <message>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>재생</translation>
     </message>
     <message>
       <source>Next Object</source>
@@ -728,7 +728,7 @@
     </message>
     <message>
       <source>Remember me</source>
-      <translation type="unfinished">Remember me</translation>
+      <translation>기억하기</translation>
     </message>
   </context>
   <context>

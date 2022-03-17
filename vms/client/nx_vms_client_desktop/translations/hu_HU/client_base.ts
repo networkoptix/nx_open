@@ -2740,7 +2740,7 @@ to %1</source>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation>Túl sok próbálkozás. Próbálkozzon újra egy perc múlva.</translation>
+      <translation>Túl sok próbálkozás. Próbálja újra később.</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
@@ -6192,7 +6192,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Camera name:</source>
-      <translation type="unfinished">Camera name:</translation>
+      <translation>Kamera név:</translation>
     </message>
   </context>
   <context>
@@ -7975,7 +7975,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ConnectionTestingDialog</name>
     <message>
       <source>Connect</source>
-      <translation>Csatlakozás</translation>
+      <translation>Kapcsolódás</translation>
     </message>
     <message>
       <source>Setup</source>
@@ -8137,7 +8137,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>System Administration</source>
-      <translation type="unfinished">System Administration</translation>
+      <translation>Rendszer Adminisztrátor</translation>
     </message>
   </context>
   <context>
@@ -8372,7 +8372,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Info</translation>
     </message>
     <message>
       <source>AVI format is not recommended to export a recording with audio track.</source>
@@ -9692,9 +9692,9 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message numerus="yes">
       <source>+%n values</source>
-      <translation type="unfinished">
-        <numerusform>+%n values</numerusform>
-        <numerusform>+%n values</numerusform>
+      <translation>
+        <numerusform>+%n értékek</numerusform>
+        <numerusform>+%n értékek</numerusform>
       </translation>
     </message>
   </context>
@@ -9928,7 +9928,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Learn more.</source>
-      <translation type="unfinished">Learn more.</translation>
+      <translation>További info.</translation>
     </message>
     <message numerus="yes">
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
@@ -10208,7 +10208,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::SessionRefreshDialog</name>
     <message>
       <source>Login</source>
-      <translation>Felhasználónév</translation>
+      <translation>Bejelentkezés</translation>
     </message>
     <message>
       <source>Password</source>
@@ -11026,7 +11026,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::ui::action::ShowOnItemsFactory</name>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Info</translation>
     </message>
     <message>
       <source>Objects</source>

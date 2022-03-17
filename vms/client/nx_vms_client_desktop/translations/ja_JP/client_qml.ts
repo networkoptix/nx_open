@@ -652,12 +652,12 @@
     <name>Line</name>
     <message>
       <source>Line is not valid. Remove self-intersections to proceed.</source>
-      <translation>行が無効です。続行するには自己交差を削除してください。</translation>
+      <translation>線が無効です。続行するには自己交差を削除してください。</translation>
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
       <translation>
-        <numerusform>この行は少なくとも %n ポイント必要です。</numerusform>
+        <numerusform>この線は少なくとも %n ポイント必要です。</numerusform>
       </translation>
     </message>
     <message>

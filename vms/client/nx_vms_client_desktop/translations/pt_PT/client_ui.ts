@@ -1318,11 +1318,11 @@
     <name>InfoOverlaySettingsWidget</name>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Info</translation>
     </message>
     <message>
       <source>Camera name</source>
-      <translation type="unfinished">Camera name</translation>
+      <translation>Nome da Câmara</translation>
     </message>
     <message>
       <source>Export date</source>
@@ -1696,7 +1696,7 @@
     </message>
     <message>
       <source>Login:</source>
-      <translation>Login:</translation>
+      <translation>Entrar:</translation>
     </message>
     <message>
       <source>Check</source>
@@ -1772,7 +1772,7 @@
     <name>OauthLoginPlaceholder</name>
     <message>
       <source>Try Again</source>
-      <translation type="unfinished">Try Again</translation>
+      <translation>Tente novamente</translation>
     </message>
   </context>
   <context>

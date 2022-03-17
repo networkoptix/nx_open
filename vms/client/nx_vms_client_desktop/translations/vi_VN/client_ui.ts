@@ -1318,11 +1318,11 @@
     <name>InfoOverlaySettingsWidget</name>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>Thông tin</translation>
     </message>
     <message>
       <source>Camera name</source>
-      <translation type="unfinished">Camera name</translation>
+      <translation>Tên máy ảnh</translation>
     </message>
     <message>
       <source>Export date</source>
@@ -1692,7 +1692,7 @@
     </message>
     <message>
       <source>Password:</source>
-      <translation>mật khẩu:</translation>
+      <translation>Mật khẩu:</translation>
     </message>
     <message>
       <source>Login:</source>
@@ -1772,7 +1772,7 @@
     <name>OauthLoginPlaceholder</name>
     <message>
       <source>Try Again</source>
-      <translation type="unfinished">Try Again</translation>
+      <translation>Thử lại</translation>
     </message>
   </context>
   <context>

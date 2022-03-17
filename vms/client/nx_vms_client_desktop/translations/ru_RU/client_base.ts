@@ -8144,7 +8144,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>OK</source>
       <comment>Dialog button text.</comment>
-      <translation>OK</translation>
+      <translation>ОК</translation>
     </message>
   </context>
   <context>
@@ -8229,7 +8229,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ConnectionTestingDialog</name>
     <message>
       <source>Connect</source>
-      <translation>Соединиться</translation>
+      <translation>Соединение</translation>
     </message>
     <message>
       <source>Setup</source>
@@ -8237,7 +8237,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Success</source>
-      <translation>Соединение установлено</translation>
+      <translation>Успешно</translation>
     </message>
     <message>
       <source>Test Failed</source>
@@ -8397,7 +8397,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>System Administration</source>
-      <translation type="unfinished">System Administration</translation>
+      <translation>Администрирование системы</translation>
     </message>
   </context>
   <context>
@@ -8663,7 +8663,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Low</source>
-      <translation>Низкий</translation>
+      <translation>Низкая</translation>
     </message>
     <message>
       <source>Medium</source>
@@ -8671,7 +8671,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>High</source>
-      <translation>Высокий</translation>
+      <translation>Высокая</translation>
     </message>
   </context>
   <context>
@@ -9078,11 +9078,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>You are about to merge Systems with NVR licenses.</source>
-      <translation type="unfinished">You are about to merge Systems with NVR licenses.</translation>
+      <translation>Будут объедины системы с лицензиями NVR.</translation>
     </message>
     <message>
       <source>Only one NVR license is allowed per System, so the second license will be deactivated.</source>
-      <translation type="unfinished">Only one NVR license is allowed per System, so the second license will be deactivated.</translation>
+      <translation>В системе разрешается использовать только одну NVR лицензию, поэтому вторая лицензия будет деактивирована.</translation>
     </message>
     <message>
       <source>Could not configure the remote System %1.</source>
@@ -10216,7 +10216,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Learn more.</source>
-      <translation type="unfinished">Learn more.</translation>
+      <translation>Подробнее.</translation>
     </message>
     <message numerus="yes">
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
@@ -10500,7 +10500,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::SessionRefreshDialog</name>
     <message>
       <source>Login</source>
-      <translation>Имя пользователя</translation>
+      <translation>Логин</translation>
     </message>
     <message>
       <source>Password</source>

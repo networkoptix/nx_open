@@ -6337,7 +6337,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Camera name:</source>
-      <translation type="unfinished">Camera name:</translation>
+      <translation>שם מצלמה:</translation>
     </message>
   </context>
   <context>
@@ -6437,7 +6437,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Stop uploading?</source>
-      <translation>להפסיק את העלאה?</translation>
+      <translation>להפסיק את ההעלאה?</translation>
     </message>
     <message>
       <source>Already uploaded files will be kept.</source>
@@ -8226,7 +8226,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ConnectionTestingDialog</name>
     <message>
       <source>Connect</source>
-      <translation>התחבר</translation>
+      <translation>חיבור</translation>
     </message>
     <message>
       <source>Setup</source>
@@ -8394,7 +8394,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>System Administration</source>
-      <translation type="unfinished">System Administration</translation>
+      <translation>ניהול המערכת</translation>
     </message>
   </context>
   <context>
@@ -8633,7 +8633,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>מידע</translation>
     </message>
     <message>
       <source>AVI format is not recommended to export a recording with audio track.</source>
@@ -10213,7 +10213,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Learn more.</source>
-      <translation type="unfinished">Learn more.</translation>
+      <translation>למד עוד.</translation>
     </message>
     <message numerus="yes">
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
@@ -10497,11 +10497,11 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::SessionRefreshDialog</name>
     <message>
       <source>Login</source>
-      <translation>שם משתמש</translation>
+      <translation>הכנס</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>סיסמא</translation>
+      <translation>סיסמה</translation>
     </message>
     <message>
       <source>Unknown error</source>
@@ -11327,7 +11327,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::ui::action::ShowOnItemsFactory</name>
     <message>
       <source>Info</source>
-      <translation type="unfinished">Info</translation>
+      <translation>מידע</translation>
     </message>
     <message>
       <source>Objects</source>

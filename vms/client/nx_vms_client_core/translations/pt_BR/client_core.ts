@@ -174,7 +174,7 @@
     </message>
     <message>
       <source>Your session has expired</source>
-      <translation type="unfinished">Your session has expired</translation>
+      <translation>Sua sessão expirou</translation>
     </message>
     <message>
       <source>Please log in to %1 again.</source>
@@ -192,7 +192,7 @@
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
-      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+      <translation>Este usuário foi desabilitado por um administrador do sistema.</translation>
     </message>
     <message>
       <source>Too many login attempts. Try again in a minute.</source>

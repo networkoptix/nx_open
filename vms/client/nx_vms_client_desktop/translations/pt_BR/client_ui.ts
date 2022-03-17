@@ -318,7 +318,7 @@
     </message>
     <message>
       <source>All files are successfully backed up! New files will be backed up automatically</source>
-      <translation type="unfinished">All files are successfully backed up! New files will be backed up automatically</translation>
+      <translation>Todos os arquivos foram copiados com sucesso! Novos arquivos serão copiados automaticamente</translation>
     </message>
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
@@ -762,7 +762,7 @@
     </message>
     <message>
       <source>Motion &amp;&amp; Objects Recording</source>
-      <translation type="unfinished">Motion &amp;&amp; Objects Recording</translation>
+      <translation>Gravação de movimento e objetos</translation>
     </message>
   </context>
   <context>
@@ -1696,7 +1696,7 @@
     </message>
     <message>
       <source>Login:</source>
-      <translation>Login:</translation>
+      <translation>Entrar:</translation>
     </message>
     <message>
       <source>Check</source>
@@ -1772,7 +1772,7 @@
     <name>OauthLoginPlaceholder</name>
     <message>
       <source>Try Again</source>
-      <translation type="unfinished">Try Again</translation>
+      <translation>Tente novamente</translation>
     </message>
   </context>
   <context>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="km" sourcelanguage="en">
+<TS version="2.1" language="km_KH" sourcelanguage="en_US">
   <context>
     <name>CloseButton</name>
     <message>

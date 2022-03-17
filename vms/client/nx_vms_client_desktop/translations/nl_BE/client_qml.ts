@@ -132,7 +132,7 @@
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>Elke plugin</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
@@ -283,7 +283,7 @@
     <name>ContextHintButton</name>
     <message>
       <source>Click on the icon to read more</source>
-      <translation type="unfinished">Click on the icon to read more</translation>
+      <translation>Klik op het icoon om meer te lezen</translation>
     </message>
   </context>
   <context>
@@ -352,7 +352,7 @@
     </message>
     <message>
       <source>Event Log</source>
-      <translation type="unfinished">Event Log</translation>
+      <translation>Gebeurtenissenlog</translation>
     </message>
   </context>
   <context>
@@ -517,7 +517,7 @@
     <name>IntervalPreviewControls</name>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Dempen</translation>
     </message>
     <message>
       <source>Previous Object</source>
@@ -525,11 +525,11 @@
     </message>
     <message>
       <source>Pause</source>
-      <translation type="unfinished">Pause</translation>
+      <translation>Pauseren</translation>
     </message>
     <message>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>Afspelen</translation>
     </message>
     <message>
       <source>Next Object</source>
@@ -734,7 +734,7 @@
     </message>
     <message>
       <source>Remember me</source>
-      <translation type="unfinished">Remember me</translation>
+      <translation>Onthoud mijn gegevens</translation>
     </message>
   </context>
   <context>
@@ -1029,7 +1029,7 @@ om PTZ te activeren</translation>
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Selecteren</translation>
     </message>
     <message>
       <source>Cancel</source>

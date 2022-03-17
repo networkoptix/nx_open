@@ -7977,7 +7977,7 @@ Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les ri
     <name>nx::vms::client::desktop::ConnectionTestingDialog</name>
     <message>
       <source>Connect</source>
-      <translation>Connecter</translation>
+      <translation>Connexion</translation>
     </message>
     <message>
       <source>Setup</source>
@@ -10053,7 +10053,7 @@ N'utilisez pas ce certificat si vous n'avez pas modifié le certificat SSL du se
     </message>
     <message>
       <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
-      <translation type="unfinished">You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</translation>
+      <translation>Vous avez tenté de vous connecter à : %1 mais le serveur a présenté un certificat qui ne peut pas être vérifié automatiquement.</translation>
     </message>
   </context>
   <context>

@@ -131,7 +131,7 @@
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>任何擴充套件</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
@@ -348,7 +348,7 @@
     </message>
     <message>
       <source>Event Log</source>
-      <translation type="unfinished">Event Log</translation>
+      <translation>事件日誌</translation>
     </message>
   </context>
   <context>
@@ -513,7 +513,7 @@
     <name>IntervalPreviewControls</name>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>靜音模式切換</translation>
     </message>
     <message>
       <source>Previous Object</source>
@@ -521,11 +521,11 @@
     </message>
     <message>
       <source>Pause</source>
-      <translation type="unfinished">Pause</translation>
+      <translation>暫停</translation>
     </message>
     <message>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>播放</translation>
     </message>
     <message>
       <source>Next Object</source>
@@ -728,7 +728,7 @@
     </message>
     <message>
       <source>Remember me</source>
-      <translation type="unfinished">Remember me</translation>
+      <translation>記住登入資訊</translation>
     </message>
   </context>
   <context>

@@ -1322,7 +1322,7 @@
     </message>
     <message>
       <source>Camera name</source>
-      <translation type="unfinished">Camera name</translation>
+      <translation>Camera name</translation>
     </message>
     <message>
       <source>Export date</source>
@@ -1772,7 +1772,7 @@
     <name>OauthLoginPlaceholder</name>
     <message>
       <source>Try Again</source>
-      <translation type="unfinished">Try Again</translation>
+      <translation>Try Again</translation>
     </message>
   </context>
   <context>

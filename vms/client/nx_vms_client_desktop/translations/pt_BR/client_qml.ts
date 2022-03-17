@@ -132,7 +132,7 @@
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>Qualquer plugin</translation>
     </message>
     <message numerus="yes">
       <source>%n new results</source>
@@ -352,7 +352,7 @@
     </message>
     <message>
       <source>Event Log</source>
-      <translation type="unfinished">Event Log</translation>
+      <translation>Log de Eventos</translation>
     </message>
   </context>
   <context>
@@ -517,7 +517,7 @@
     <name>IntervalPreviewControls</name>
     <message>
       <source>Toggle Mute</source>
-      <translation type="unfinished">Toggle Mute</translation>
+      <translation>Alternar Mudo</translation>
     </message>
     <message>
       <source>Previous Object</source>
@@ -525,11 +525,11 @@
     </message>
     <message>
       <source>Pause</source>
-      <translation type="unfinished">Pause</translation>
+      <translation>Pausa</translation>
     </message>
     <message>
       <source>Play</source>
-      <translation type="unfinished">Play</translation>
+      <translation>Reproduzir</translation>
     </message>
     <message>
       <source>Next Object</source>
@@ -734,7 +734,7 @@
     </message>
     <message>
       <source>Remember me</source>
-      <translation type="unfinished">Remember me</translation>
+      <translation>Lembrar de mim</translation>
     </message>
   </context>
   <context>
@@ -1029,7 +1029,7 @@ para ativar PTZ</translation>
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Selecione</translation>
     </message>
     <message>
       <source>Cancel</source>

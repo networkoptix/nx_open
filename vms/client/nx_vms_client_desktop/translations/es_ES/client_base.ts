@@ -4787,14 +4787,14 @@ a %1</translation>
     <message numerus="yes">
       <source>Certificates</source>
       <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
+        <numerusform>Certificados</numerusform>
         <numerusform>Certificates</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
       <translation type="unfinished">
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
+        <numerusform>El servidor utiliza estos certificados %n SSL para autenticar su identidad</numerusform>
         <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
       </translation>
     </message>
@@ -7108,35 +7108,35 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>%n weeks</source>
       <translation type="unfinished">
-        <numerusform>%n weeks</numerusform>
+        <numerusform>%n semanas</numerusform>
         <numerusform>%n weeks</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n days</source>
       <translation type="unfinished">
-        <numerusform>%n days</numerusform>
+        <numerusform>%n días</numerusform>
         <numerusform>%n days</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hours</source>
       <translation type="unfinished">
-        <numerusform>%n hours</numerusform>
+        <numerusform>%n horas</numerusform>
         <numerusform>%n hours</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n minutes</source>
       <translation type="unfinished">
-        <numerusform>%n minutes</numerusform>
+        <numerusform>%n minutos</numerusform>
         <numerusform>%n minutes</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n seconds</source>
       <translation type="unfinished">
-        <numerusform>%n seconds</numerusform>
+        <numerusform>%n segundos</numerusform>
         <numerusform>%n seconds</numerusform>
       </translation>
     </message>
@@ -7279,14 +7279,14 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Backup is enabled for %n devices</source>
       <translation type="unfinished">
-        <numerusform>Backup is enabled for %n devices</numerusform>
+        <numerusform>La copia de seguridad está habilitada para %n dispositivos</numerusform>
         <numerusform>Backup is enabled for %n devices</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n cameras</source>
       <translation type="unfinished">
-        <numerusform>Backup is enabled for %n cameras</numerusform>
+        <numerusform>La copia de seguridad está habilitada para %n cámaras</numerusform>
         <numerusform>Backup is enabled for %n cameras</numerusform>
       </translation>
     </message>
@@ -7675,7 +7675,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Failed to enable audio on %n devices</source>
       <translation type="unfinished">
-        <numerusform>Failed to enable audio on %n devices</numerusform>
+        <numerusform>No se pudo habilitar el audio en %n dispositivos</numerusform>
         <numerusform>Failed to enable audio on %n devices</numerusform>
       </translation>
     </message>
@@ -7689,7 +7689,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message numerus="yes">
       <source>Failed to enable 2-way audio on %n devices</source>
       <translation type="unfinished">
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
+        <numerusform>No se pudo habilitar el audio bidireccional en %n dispositivos</numerusform>
         <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
       </translation>
     </message>
@@ -7731,7 +7731,7 @@ We recommend you not to open this web page. If you understand the risks, you can
       <source>%1 are required</source>
       <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
       <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
+        <numerusform>Se requiere %1</numerusform>
         <numerusform>%1 are required</numerusform>
       </translation>
     </message>
@@ -7890,7 +7890,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>OK</source>
       <comment>Dialog button text.</comment>
-      <translation>Aceptar</translation>
+      <translation>OK</translation>
     </message>
   </context>
   <context>
@@ -7975,7 +7975,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::ConnectionTestingDialog</name>
     <message>
       <source>Connect</source>
-      <translation>Conectar</translation>
+      <translation>Conexión</translation>
     </message>
     <message>
       <source>Setup</source>
@@ -7983,7 +7983,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Success</source>
-      <translation>Exito</translation>
+      <translation>­Éxito</translation>
     </message>
     <message>
       <source>Test Failed</source>
@@ -8137,7 +8137,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>System Administration</source>
-      <translation type="unfinished">System Administration</translation>
+      <translation>Administración del sistema</translation>
     </message>
   </context>
   <context>
@@ -8407,7 +8407,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>High</source>
-      <translation>Alto</translation>
+      <translation>Elevado</translation>
     </message>
   </context>
   <context>
@@ -9504,7 +9504,7 @@ Puede forzarlo, pero puede aumentar significativamente la carga de la CPU.</tran
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</translation>
+      <translation>Proxy a todos los contenidos expone a cualquier servicio o dispositivo en el servidor a los usuarios en la red de esta página web</translation>
     </message>
   </context>
   <context>
@@ -9927,7 +9927,7 @@ Atención: Esta contraseña no se puede resetear. Si la pierde, el archivo será
     </message>
     <message>
       <source>Learn more.</source>
-      <translation type="unfinished">Learn more.</translation>
+      <translation>Aprenda más.</translation>
     </message>
     <message numerus="yes">
       <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
@@ -10207,7 +10207,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::SessionRefreshDialog</name>
     <message>
       <source>Login</source>
-      <translation>Usuario</translation>
+      <translation>Iniciar Sesión</translation>
     </message>
     <message>
       <source>Password</source>

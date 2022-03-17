@@ -56,7 +56,7 @@
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
-      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+      <translation>Deze gebruiker is uitgeschakeld door een systeembeheerder.</translation>
     </message>
   </context>
   <context>
