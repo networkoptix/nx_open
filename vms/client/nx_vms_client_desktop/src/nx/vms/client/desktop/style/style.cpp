@@ -1350,7 +1350,7 @@ void Style::drawPrimitive(PrimitiveElement element,
         case PE_PanelMenu:
         {
             QBrush backgroundBrush = option->palette.window();
-            QnScopedPainterPenRollback penRollback(painter, backgroundBrush.color());
+            QnScopedPainterPenRollback penRollback(painter, option->palette.midlight().color());
             QnScopedPainterBrushRollback brushRollback(painter, backgroundBrush);
             QnScopedPainterAntialiasingRollback aaRollback(painter, true);
             QColor shadowRoundingColor = option->palette.shadow().color();
