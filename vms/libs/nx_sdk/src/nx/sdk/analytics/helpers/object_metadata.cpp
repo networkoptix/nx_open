@@ -82,6 +82,12 @@ void ObjectMetadata::addAttributes(const std::vector<nx::sdk::Ptr<Attribute>>& v
         addAttribute(newAttribute);
 }
 
+void ObjectMetadata::addAttributes(std::vector<nx::sdk::Ptr<Attribute>>&& value)
+{
+    for (auto& newAttribute: value)
+        addAttribute(std::move(newAttribute));
+}
+
 void ObjectMetadata::setBoundingBox(const Rect& rect)
 {
     m_rect = rect;

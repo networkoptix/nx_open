@@ -31,6 +31,7 @@ public:
     void setSubtype(const std::string& value);
     void addAttribute(nx::sdk::Ptr<Attribute> attribute);
     void addAttributes(const std::vector<nx::sdk::Ptr<Attribute>>& value);
+    void addAttributes(std::vector<nx::sdk::Ptr<Attribute>>&& value);
     void setBoundingBox(const Rect& rect);
 
 protected:
