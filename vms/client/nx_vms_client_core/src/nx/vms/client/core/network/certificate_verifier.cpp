@@ -30,7 +30,7 @@ struct CertificateVerifier::Private
     Status verifyCertificateByStorage(
         const QnUuid& serverId,
         const Chain& chain,
-        bool treatMismatchAsWarning) const
+        bool acceptExpired) const
     {
         // Normally both storages should be avaliable. If not, return an error.
         if (!NX_ASSERT(connectionCertificatesStorage)
@@ -61,7 +61,7 @@ struct CertificateVerifier::Private
             certificate.notAfter().time_since_epoch());
         // Current spec says that we should not report a severe error when the certificate is shown
         // to user for the first time. Therefore we check expiration time only at this point.
-        if (expiresAt.count() < QDateTime::currentSecsSinceEpoch())
+        if (expiresAt.count() < QDateTime::currentSecsSinceEpoch() && !acceptExpired)
         {
             NX_VERBOSE(this, "Certificate has expired");
             return Status::mismatch;
@@ -82,11 +82,7 @@ struct CertificateVerifier::Private
             return Status::ok;
         }
 
-        const auto level = treatMismatchAsWarning
-            ? nx::utils::log::Level::warning
-            : nx::utils::log::Level::verbose;
-
-        NX_UTILS_LOG(level, this,
+        NX_VERBOSE(this,
             "Certificate mismatch for the server %1. Pinned: %2 and %3, actual: %4",
             serverId,
             connectionCertificatePublicKey,
@@ -282,10 +278,10 @@ nx::network::ssl::AdapterFunc CertificateVerifier::makeAdapterFunc(const QnUuid&
 CertificateVerifier::Status CertificateVerifier::verifyCertificate(
     const QnUuid& serverId,
     const nx::network::ssl::CertificateChain& chain,
-    bool treatMismatchAsWarning) const
+    bool acceptExpired) const
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
-    return d->verifyCertificateByStorage(serverId, chain, treatMismatchAsWarning);
+    return d->verifyCertificateByStorage(serverId, chain, acceptExpired);
 }
 
 void CertificateVerifier::pinCertificate(

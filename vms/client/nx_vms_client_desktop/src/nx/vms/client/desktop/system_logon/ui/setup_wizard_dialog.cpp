@@ -56,10 +56,11 @@ SetupWizardDialog::SetupWizardDialog(
     d->webViewWidget->controller()->setCertificateValidator(
         [serverId](const QString& certificateChain, const QUrl& url)
         {
+            // We accept expired certificate on the first connection to a system.
             return qnClientCoreModule->networkModule()->certificateVerifier()->verifyCertificate(
                 serverId,
                 nx::network::ssl::Certificate::parse(certificateChain.toStdString()),
-                /*treatMismatchAsWarning*/ true
+                /*acceptExpired*/ true
             ) == nx::vms::client::core::CertificateVerifier::Status::ok;
         });
 

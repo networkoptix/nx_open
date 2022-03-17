@@ -74,7 +74,7 @@ public:
     Status verifyCertificate(
         const QnUuid& serverId,
         const nx::network::ssl::CertificateChain& chain,
-        bool treatMismatchAsWarning = false) const;
+        bool acceptExpired = false) const;
 
     /**
      * Store given certificate's public key, replacing existing if present.
