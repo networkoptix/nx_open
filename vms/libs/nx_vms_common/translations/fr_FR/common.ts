@@ -39,10 +39,6 @@
       <translation>%1 n'est pas encore accessible. Veuillez réessayer plus tard.</translation>
     </message>
     <message>
-      <source>The user is disabled. Please contact your system administrator.</source>
-      <translation>L'utilisateur est désactivé. Veuillez contacter votre administrateur système.</translation>
-    </message>
-    <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
       <translation>L'utilisateur est verrouillé en raison de plusieurs tentatives infructueuses. Veuillez réessayer plus tard.</translation>
     </message>
@@ -57,6 +53,10 @@
     <message>
       <source>Internal server error (%1). Please contact your system administrator.</source>
       <translation>Erreur interne du serveur (%1). Veuillez contacter votre administrateur système.</translation>
+    </message>
+    <message>
+      <source>This user has been disabled by a system administrator.</source>
+      <translation>Cet utilisateur a été désactivé par un administrateur système.</translation>
     </message>
   </context>
   <context>
@@ -1422,7 +1422,7 @@
     <message>
       <source>%2 &lt;b&gt;%1&lt;/b&gt;</source>
       <comment>%1 means time, %2 means date</comment>
-      <translation>%2 &lt;b&gt;%1&lt;/b&gt;</translation>
+      <translation type="unfinished">%2 &lt;b&gt;%1&lt;/b&gt;</translation>
     </message>
     <message numerus="yes">
       <source>%n times, first: %2 &lt;b&gt;%1&lt;/b&gt;</source>

@@ -39,10 +39,6 @@
       <translation>%1 is nog niet toegankelijk. Probeer het later opnieuw.</translation>
     </message>
     <message>
-      <source>The user is disabled. Please contact your system administrator.</source>
-      <translation>De gebruiker is uitgeschakeld. Neem contact op met uw systeembeheerder.</translation>
-    </message>
-    <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
       <translation>De gebruiker is vergrendeld vanwege verschillende mislukte pogingen. Probeer het later opnieuw.</translation>
     </message>
@@ -57,6 +53,10 @@
     <message>
       <source>Internal server error (%1). Please contact your system administrator.</source>
       <translation>Interne server fout (%1). Neem contact op met uw systeembeheerder.</translation>
+    </message>
+    <message>
+      <source>This user has been disabled by a system administrator.</source>
+      <translation>Deze gebruiker is uitgeschakeld door een systeembeheerder.</translation>
     </message>
   </context>
   <context>

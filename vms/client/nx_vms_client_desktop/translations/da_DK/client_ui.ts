@@ -290,16 +290,8 @@
   <context>
     <name>BackupSettingsWidget</name>
     <message>
-      <source>To enable backup add more drives to use them as backup </source>
-      <translation type="unfinished">To enable backup add more drives to use them as backup </translation>
-    </message>
-    <message>
-      <source>storage in</source>
-      <translation type="unfinished">storage in</translation>
-    </message>
-    <message>
-      <source>Storage Management</source>
-      <translation type="unfinished">Storage Management</translation>
+      <source>Server is offline. Backup settings are not available.</source>
+      <translation type="unfinished">Server is offline. Backup settings are not available.</translation>
     </message>
   </context>
   <context>
@@ -325,8 +317,12 @@
       <translation type="unfinished">Maximum backup queue size</translation>
     </message>
     <message>
-      <source>All files are successfully backed up! New files will be backed up automatically.</source>
-      <translation type="unfinished">All files are successfully backed up! New files will be backed up automatically.</translation>
+      <source>All files are successfully backed up! New files will be backed up automatically</source>
+      <translation>Alle filer er sikkerhedskopieret! Nye filer sikkerhedskopieres automatisk</translation>
+    </message>
+    <message>
+      <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
+      <translation>Sikkerhedskopiering er stoppet på grund af lagringsproblem. Sikkerhedskopieringen genoptages automatisk, når lagringsproblemet er løst</translation>
     </message>
   </context>
   <context>
@@ -360,7 +356,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slet</translation>
     </message>
     <message>
       <source>Area Width</source>
@@ -383,7 +379,7 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Navn</translation>
     </message>
     <message>
       <source>Description</source>
@@ -460,7 +456,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slet</translation>
     </message>
     <message>
       <source>Event Rules</source>
@@ -567,14 +563,6 @@
       <translation type="unfinished">Logical ID</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation type="unfinished">Force motion detection for stream</translation>
-    </message>
-    <message>
-      <source>RTP transport</source>
-      <translation type="unfinished">RTP transport</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation type="unfinished">Trust camera timestamp</translation>
     </message>
@@ -623,12 +611,24 @@
       <translation type="unfinished">Use system presets</translation>
     </message>
     <message>
-      <source>Use camera native preset</source>
-      <translation type="unfinished">Use camera native preset</translation>
-    </message>
-    <message>
       <source>PTZ Speed</source>
       <translation type="unfinished">PTZ Speed</translation>
+    </message>
+    <message>
+      <source>RTP Transport</source>
+      <translation>RTP Transport</translation>
+    </message>
+    <message>
+      <source>Use camera native presets</source>
+      <translation type="unfinished">Use camera native presets</translation>
+    </message>
+    <message>
+      <source>Time Settings</source>
+      <translation>Tidsindstillinger</translation>
+    </message>
+    <message>
+      <source>Keep camera time settings</source>
+      <translation>Behold kameraets tidsindstillinger</translation>
     </message>
   </context>
   <context>
@@ -745,10 +745,6 @@
   <context>
     <name>CameraScheduleWidget</name>
     <message>
-      <source>Motion Recording</source>
-      <translation type="unfinished">Motion Recording</translation>
-    </message>
-    <message>
       <source>Recording</source>
       <translation type="unfinished">Recording</translation>
     </message>
@@ -761,19 +757,19 @@
       <translation type="unfinished">Copying Schedule</translation>
     </message>
     <message>
-      <source>Apply changes before copying schedule.</source>
-      <translation type="unfinished">Apply changes before copying schedule.</translation>
-    </message>
-    <message>
       <source>Copy Schedule to...</source>
       <translation type="unfinished">Copy Schedule to...</translation>
+    </message>
+    <message>
+      <source>Motion &amp;&amp; Objects Recording</source>
+      <translation>Bevægelses &amp; Objekt Optagelse</translation>
     </message>
   </context>
   <context>
     <name>CameraSelectionDialog</name>
     <message>
       <source>All Cameras</source>
-      <translation type="unfinished">All Cameras</translation>
+      <translation>Alle kameraer</translation>
     </message>
     <message>
       <source>Select Cameras</source>
@@ -927,7 +923,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Adgangskode</translation>
     </message>
     <message>
       <source>Login</source>
@@ -966,7 +962,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Adgangskode</translation>
     </message>
   </context>
   <context>
@@ -1027,7 +1023,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Adgangskode</translation>
     </message>
     <message>
       <source>Content type</source>
@@ -1098,7 +1094,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Adgangskode</translation>
     </message>
   </context>
   <context>
@@ -1284,7 +1280,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slet</translation>
     </message>
     <message>
       <source>Size</source>
@@ -1338,7 +1334,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slet</translation>
     </message>
   </context>
   <context>
@@ -1457,7 +1453,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Adgangskode</translation>
     </message>
     <message>
       <source>Search Base</source>
@@ -1497,6 +1493,10 @@
     <message>
       <source>Disable imported users</source>
       <translation type="unfinished">Disable imported users</translation>
+    </message>
+    <message>
+      <source>Allow digest authentication for imported user</source>
+      <translation type="unfinished">Allow digest authentication for imported user</translation>
     </message>
   </context>
   <context>
@@ -1618,7 +1618,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Adgangskode</translation>
     </message>
     <message>
       <source>Test</source>
@@ -1692,7 +1692,7 @@
     </message>
     <message>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Adgangskode:</translation>
     </message>
     <message>
       <source>Login:</source>
@@ -1719,7 +1719,7 @@
     </message>
     <message>
       <source>Download</source>
-      <translation type="unfinished">Download</translation>
+      <translation>Download</translation>
     </message>
     <message>
       <source>Browse</source>
@@ -1731,7 +1731,7 @@
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Annuller</translation>
     </message>
     <message>
       <source>Link copied</source>
@@ -1769,6 +1769,13 @@
     </message>
   </context>
   <context>
+    <name>OauthLoginPlaceholder</name>
+    <message>
+      <source>Try Again</source>
+      <translation>Prøv igen</translation>
+    </message>
+  </context>
+  <context>
     <name>OpenLayoutActionWidget</name>
     <message>
       <source>Layout</source>
@@ -1791,7 +1798,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Adgangskode</translation>
     </message>
     <message>
       <source>Username</source>
@@ -1909,7 +1916,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slet</translation>
     </message>
     <message>
       <source>Details</source>
@@ -1940,7 +1947,7 @@
     </message>
     <message>
       <source>Name:</source>
-      <translation type="unfinished">Name:</translation>
+      <translation>Navn:</translation>
     </message>
     <message>
       <source>Hotkey:</source>
@@ -2064,7 +2071,7 @@
     <name>QnSystemAdministrationDialog</name>
     <message>
       <source>System Administration</source>
-      <translation type="unfinished">System Administration</translation>
+      <translation>Systemadministration</translation>
     </message>
   </context>
   <context>
@@ -2082,10 +2089,6 @@
       <translation type="unfinished">Fetch Users from LDAP...</translation>
     </message>
     <message>
-      <source>Clear Selection</source>
-      <translation type="unfinished">Clear Selection</translation>
-    </message>
-    <message>
       <source>Search users</source>
       <translation type="unfinished">Search users</translation>
     </message>
@@ -2095,7 +2098,7 @@
     </message>
     <message>
       <source>Disable</source>
-      <translation type="unfinished">Disable</translation>
+      <translation>Deaktivér</translation>
     </message>
     <message>
       <source>Delete...</source>
@@ -2104,6 +2107,14 @@
     <message>
       <source>Edit Roles...</source>
       <translation type="unfinished">Edit Roles...</translation>
+    </message>
+    <message>
+      <source>Force Secure Authentication</source>
+      <translation type="unfinished">Force Secure Authentication</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation type="unfinished">Nothing found</translation>
     </message>
   </context>
   <context>
@@ -2260,7 +2271,7 @@
     </message>
     <message>
       <source>Password</source>
-      <translation type="unfinished">Password</translation>
+      <translation>Adgangskode</translation>
     </message>
   </context>
   <context>
@@ -2429,6 +2440,10 @@
       <source>Encrypt video traffic to desktop and mobile clients</source>
       <translation type="unfinished">Encrypt video traffic to desktop and mobile clients</translation>
     </message>
+    <message>
+      <source>Manage Users</source>
+      <translation>Administrer brugere</translation>
+    </message>
   </context>
   <context>
     <name>SendmailBusinessActionWidget</name>
@@ -2507,7 +2522,7 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Navn</translation>
     </message>
     <message>
       <source>IP Address</source>
@@ -2518,8 +2533,8 @@
       <translation type="unfinished">Port</translation>
     </message>
     <message>
-      <source>Autodetect USB and web cameras</source>
-      <translation type="unfinished">Autodetect USB and web cameras</translation>
+      <source>Autodetect built-in and USB webcams</source>
+      <translation>Registrer automatisk indbyggede og USB-webcams</translation>
     </message>
   </context>
   <context>
@@ -2641,11 +2656,11 @@
     </message>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Annuller</translation>
     </message>
   </context>
   <context>
@@ -2656,7 +2671,7 @@
     </message>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Navn</translation>
     </message>
     <message>
       <source>Icon</source>
@@ -2725,7 +2740,7 @@
     <name>StorageRebuildWidget</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Annuller</translation>
     </message>
   </context>
   <context>
@@ -2748,7 +2763,7 @@
     </message>
     <message>
       <source>Password:</source>
-      <translation type="unfinished">Password:</translation>
+      <translation>Adgangskode:</translation>
     </message>
   </context>
   <context>
@@ -2797,7 +2812,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slet</translation>
     </message>
     <message>
       <source>Font Size</source>
@@ -2843,7 +2858,7 @@
     </message>
     <message>
       <source>Delete</source>
-      <translation type="unfinished">Delete</translation>
+      <translation>Slet</translation>
     </message>
   </context>
   <context>
@@ -2857,11 +2872,11 @@
     <name>UserRoleSettingsWidget</name>
     <message>
       <source>Name</source>
-      <translation type="unfinished">Name</translation>
+      <translation>Navn</translation>
     </message>
     <message>
       <source>Users</source>
-      <translation type="unfinished">Users</translation>
+      <translation>Brugere</translation>
     </message>
     <message>
       <source>Delete Role</source>
@@ -2943,7 +2958,7 @@
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Tid</translation>
     </message>
     <message>
       <source>Ignore timezone in uploaded files</source>
@@ -2954,7 +2969,7 @@
     <name>VirtualCameraUploadWidget</name>
     <message>
       <source>Cancel</source>
-      <translation type="unfinished">Cancel</translation>
+      <translation>Annuller</translation>
     </message>
     <message>
       <source>Upload Footage</source>
@@ -2996,8 +3011,8 @@
       <translation type="unfinished">Proxy all requested contents</translation>
     </message>
     <message>
-      <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</translation>
+      <source>Allow opening web page without SSL certificate checking</source>
+      <translation>Tillad åbning af webside uden kontrol af SSL-certifikat</translation>
     </message>
   </context>
   <context>

@@ -33,7 +33,7 @@
     </message>
     <message>
       <source>Open source libraries</source>
-      <translation type="unfinished">Open source libraries</translation>
+      <translation>Open source libraries</translation>
     </message>
   </context>
   <context>
@@ -107,7 +107,7 @@
     </message>
     <message>
       <source>Server certificate validation</source>
-      <translation type="unfinished">Server certificate validation</translation>
+      <translation>Server certificaat validatie</translation>
     </message>
   </context>
   <context>
@@ -152,11 +152,11 @@
     <name>AnalyticsSdkObjectDetectedWidget</name>
     <message>
       <source>Attributes:</source>
-      <translation type="unfinished">Attributes:</translation>
+      <translation>Attributen:</translation>
     </message>
     <message>
       <source>Object Type:</source>
-      <translation type="unfinished">Object Type:</translation>
+      <translation>Object type:</translation>
     </message>
   </context>
   <context>
@@ -167,15 +167,15 @@
     </message>
     <message>
       <source>Keep Archive For...</source>
-      <translation type="unfinished">Keep Archive For...</translation>
+      <translation>Bewaar archief voor...</translation>
     </message>
     <message>
       <source>Max</source>
-      <translation type="unfinished">Max</translation>
+      <translation>Max</translation>
     </message>
     <message>
       <source>Min</source>
-      <translation type="unfinished">Min</translation>
+      <translation>Min</translation>
     </message>
   </context>
   <context>
@@ -256,19 +256,19 @@
     <name>BackupBandwidthSettingsWidget</name>
     <message>
       <source>No Limit</source>
-      <translation type="unfinished">No Limit</translation>
+      <translation>Onbeperkt</translation>
     </message>
     <message>
       <source>Fixed</source>
-      <translation type="unfinished">Fixed</translation>
+      <translation>Vast</translation>
     </message>
     <message>
       <source>Scheduled</source>
-      <translation type="unfinished">Scheduled</translation>
+      <translation>Gepland</translation>
     </message>
     <message>
       <source>Fix bandwidth to</source>
-      <translation type="unfinished">Fix bandwidth to</translation>
+      <translation>Beperk bandbreedte tot</translation>
     </message>
     <message>
       <source>Mbit/s</source>
@@ -276,41 +276,33 @@
     </message>
     <message>
       <source>Unlimited</source>
-      <translation type="unfinished">Unlimited</translation>
+      <translation>Onbeperkt</translation>
     </message>
     <message>
       <source>Limited to</source>
-      <translation type="unfinished">Limited to</translation>
+      <translation>Beperkt tot</translation>
     </message>
     <message>
       <source>No backup</source>
-      <translation type="unfinished">No backup</translation>
+      <translation>Geen back-up</translation>
     </message>
   </context>
   <context>
     <name>BackupSettingsWidget</name>
     <message>
-      <source>To enable backup add more drives to use them as backup </source>
-      <translation type="unfinished">To enable backup add more drives to use them as backup </translation>
-    </message>
-    <message>
-      <source>storage in</source>
-      <translation type="unfinished">storage in</translation>
-    </message>
-    <message>
-      <source>Storage Management</source>
-      <translation>Opslagbeheer</translation>
+      <source>Server is offline. Backup settings are not available.</source>
+      <translation type="unfinished">Server is offline. Backup settings are not available.</translation>
     </message>
   </context>
   <context>
     <name>BackupStatusWidget</name>
     <message>
       <source>Backup is not configured yet.</source>
-      <translation type="unfinished">Backup is not configured yet.</translation>
+      <translation>Back-up is nog niet geconfigureerd.</translation>
     </message>
     <message>
       <source>To start backup enable it for some cameras and apply settings.</source>
-      <translation type="unfinished">To start backup enable it for some cameras and apply settings.</translation>
+      <translation>Om back-up te starten, moet u deze inschakelen voor sommige camera's en de instellingen toepassen.</translation>
     </message>
     <message>
       <source>Refresh</source>
@@ -318,15 +310,19 @@
     </message>
     <message>
       <source>Skip Current Queue</source>
-      <translation type="unfinished">Skip Current Queue</translation>
+      <translation>Huidige wachtrij overslaan</translation>
     </message>
     <message>
       <source>Maximum backup queue size</source>
-      <translation type="unfinished">Maximum backup queue size</translation>
+      <translation>Maximale grootte van de back-upwachtrij</translation>
     </message>
     <message>
-      <source>All files are successfully backed up! New files will be backed up automatically.</source>
-      <translation type="unfinished">All files are successfully backed up! New files will be backed up automatically.</translation>
+      <source>All files are successfully backed up! New files will be backed up automatically</source>
+      <translation>Alle bestanden zijn succesvol geback-upt! Van nieuwe bestanden wordt automatisch een back-up gemaakt</translation>
+    </message>
+    <message>
+      <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
+      <translation type="unfinished">Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</translation>
     </message>
   </context>
   <context>
@@ -567,14 +563,6 @@
       <translation>Logische ID</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation>Forceer bewegingsdetectie voor stream</translation>
-    </message>
-    <message>
-      <source>RTP transport</source>
-      <translation>RTP transport</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation>Tijdstempel van camera vertrouwen</translation>
     </message>
@@ -596,39 +584,51 @@
     </message>
     <message>
       <source>Stream Settings</source>
-      <translation type="unfinished">Stream Settings</translation>
+      <translation>Stream Instellingen</translation>
     </message>
     <message>
       <source>Initialization Settings</source>
-      <translation type="unfinished">Initialization Settings</translation>
+      <translation>Initialisatie instellingen</translation>
     </message>
     <message>
       <source>Use Media2 to fetch profiles</source>
-      <translation type="unfinished">Use Media2 to fetch profiles</translation>
+      <translation>Gebruik Media2 om profielen op te halen</translation>
     </message>
     <message>
       <source>Use different values for pan and tilt</source>
-      <translation type="unfinished">Use different values for pan and tilt</translation>
+      <translation>Gebruik verschillende waarden voor pan en tilt</translation>
     </message>
     <message>
       <source>Tilt</source>
-      <translation type="unfinished">Tilt</translation>
+      <translation>Tilt</translation>
     </message>
     <message>
       <source>Media Port</source>
-      <translation type="unfinished">Media Port</translation>
+      <translation>Media poort</translation>
     </message>
     <message>
       <source>Use system presets</source>
-      <translation type="unfinished">Use system presets</translation>
-    </message>
-    <message>
-      <source>Use camera native preset</source>
-      <translation type="unfinished">Use camera native preset</translation>
+      <translation>Gebruik systeem presets</translation>
     </message>
     <message>
       <source>PTZ Speed</source>
-      <translation type="unfinished">PTZ Speed</translation>
+      <translation>PTZ snelheid</translation>
+    </message>
+    <message>
+      <source>RTP Transport</source>
+      <translation type="unfinished">RTP Transport</translation>
+    </message>
+    <message>
+      <source>Use camera native presets</source>
+      <translation type="unfinished">Use camera native presets</translation>
+    </message>
+    <message>
+      <source>Time Settings</source>
+      <translation type="unfinished">Time Settings</translation>
+    </message>
+    <message>
+      <source>Keep camera time settings</source>
+      <translation type="unfinished">Keep camera time settings</translation>
     </message>
   </context>
   <context>
@@ -728,7 +728,7 @@
     <message>
       <source>in</source>
       <comment>e.g. &quot;in Primary Stream&quot;</comment>
-      <translation type="unfinished">in</translation>
+      <translation>in</translation>
     </message>
   </context>
   <context>
@@ -745,10 +745,6 @@
   <context>
     <name>CameraScheduleWidget</name>
     <message>
-      <source>Motion Recording</source>
-      <translation>Bewegingsopname</translation>
-    </message>
-    <message>
       <source>Recording</source>
       <translation>Opname</translation>
     </message>
@@ -761,12 +757,12 @@
       <translation>Schema kopiëren</translation>
     </message>
     <message>
-      <source>Apply changes before copying schedule.</source>
-      <translation>Voer de wijzigingen door voordat u het schema gaat kopiëren.</translation>
-    </message>
-    <message>
       <source>Copy Schedule to...</source>
       <translation>Schema kopiëren naar...</translation>
+    </message>
+    <message>
+      <source>Motion &amp;&amp; Objects Recording</source>
+      <translation>Beweging &amp;&amp; Objecten Opname</translation>
     </message>
   </context>
   <context>
@@ -804,7 +800,7 @@
     </message>
     <message>
       <source>Enable 2-way audio</source>
-      <translation type="unfinished">Enable 2-way audio</translation>
+      <translation>2-weg audio inschakelen</translation>
     </message>
   </context>
   <context>
@@ -818,7 +814,7 @@
     <name>CertificateSelectionDialog</name>
     <message>
       <source>Web site requires a certificate</source>
-      <translation type="unfinished">Web site requires a certificate</translation>
+      <translation>Website vereist een certificaat</translation>
     </message>
   </context>
   <context>
@@ -958,11 +954,11 @@
     <name>EncryptedArchivePasswordDialog</name>
     <message>
       <source>Encrypted archive</source>
-      <translation type="unfinished">Encrypted archive</translation>
+      <translation>Versleuteld archief</translation>
     </message>
     <message>
       <source>Enter your encryption password to view the archive</source>
-      <translation type="unfinished">Enter your encryption password to view the archive</translation>
+      <translation>Voer uw wachtwoord voor versleuteling in om het archief te bekijken</translation>
     </message>
     <message>
       <source>Password</source>
@@ -1131,11 +1127,11 @@
     <name>FailoverPriorityPickerWidget</name>
     <message>
       <source>Set priority:</source>
-      <translation type="unfinished">Set priority:</translation>
+      <translation>Prioriteit Instellen:</translation>
     </message>
     <message>
       <source>No failover</source>
-      <translation type="unfinished">No failover</translation>
+      <translation>Geen failover</translation>
     </message>
     <message>
       <source>Low</source>
@@ -1151,7 +1147,7 @@
     </message>
     <message>
       <source>Select some devices to setup failover priority</source>
-      <translation type="unfinished">Select some devices to setup failover priority</translation>
+      <translation>Selecteer apparaten om de failover-prioriteit op te stellen</translation>
     </message>
   </context>
   <context>
@@ -1231,15 +1227,15 @@
     </message>
     <message>
       <source>Startup</source>
-      <translation type="unfinished">Startup</translation>
+      <translation>Opstarten</translation>
     </message>
     <message>
       <source>Connect to the previous system on startup</source>
-      <translation type="unfinished">Connect to the previous system on startup</translation>
+      <translation>Bij het opstarten verbinding maken met het vorige systeem</translation>
     </message>
     <message>
       <source>Automatically restore saved windows configuration</source>
-      <translation type="unfinished">Automatically restore saved windows configuration</translation>
+      <translation>Automatisch opgeslagen vensterconfiguratie herstellen</translation>
     </message>
     <message>
       <source>Play audio from all cameras on layout</source>
@@ -1247,7 +1243,7 @@
     </message>
     <message>
       <source>Mute audio when the mic is active</source>
-      <translation type="unfinished">Mute audio when the mic is active</translation>
+      <translation>Geluid dempen wanneer de microfoon actief is</translation>
     </message>
   </context>
   <context>
@@ -1498,6 +1494,10 @@
       <source>Disable imported users</source>
       <translation>Geïmporteerde gebruikers uitschakelen</translation>
     </message>
+    <message>
+      <source>Allow digest authentication for imported user</source>
+      <translation type="unfinished">Allow digest authentication for imported user</translation>
+    </message>
   </context>
   <context>
     <name>LicenseDetailsDialog</name>
@@ -1696,7 +1696,7 @@
     </message>
     <message>
       <source>Login:</source>
-      <translation>Aanmelden:</translation>
+      <translation>Login:</translation>
     </message>
     <message>
       <source>Check</source>
@@ -1747,7 +1747,7 @@
     </message>
     <message>
       <source>Advanced settings</source>
-      <translation type="unfinished">Advanced settings</translation>
+      <translation>Geavanceerde instellingen</translation>
     </message>
   </context>
   <context>
@@ -1766,6 +1766,13 @@
     <message>
       <source>To server</source>
       <translation>Naar server</translation>
+    </message>
+  </context>
+  <context>
+    <name>OauthLoginPlaceholder</name>
+    <message>
+      <source>Try Again</source>
+      <translation>Opnieuw proberen</translation>
     </message>
   </context>
   <context>
@@ -2082,10 +2089,6 @@
       <translation>Gebruikers ophalen via LDAP...</translation>
     </message>
     <message>
-      <source>Clear Selection</source>
-      <translation>Selectie wissen</translation>
-    </message>
-    <message>
       <source>Search users</source>
       <translation>Zoek gebruikers</translation>
     </message>
@@ -2104,6 +2107,14 @@
     <message>
       <source>Edit Roles...</source>
       <translation>Profielen bewerken...</translation>
+    </message>
+    <message>
+      <source>Force Secure Authentication</source>
+      <translation>Beveiligde authenticatie forceren</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Niets gevonden</translation>
     </message>
   </context>
   <context>
@@ -2282,11 +2293,11 @@
     <name>RewindForWidget</name>
     <message>
       <source>Playback time :</source>
-      <translation type="unfinished">Playback time :</translation>
+      <translation>Afspeeltijd:</translation>
     </message>
     <message>
       <source>rewind for</source>
-      <translation type="unfinished">rewind for</translation>
+      <translation>terugspoelen voor</translation>
     </message>
     <message>
       <source>Live</source>
@@ -2360,7 +2371,7 @@
     </message>
     <message>
       <source>Motion &amp;&amp; Objects</source>
-      <translation type="unfinished">Motion &amp;&amp; Objects</translation>
+      <translation>Beweging &amp;&amp; Objecten</translation>
     </message>
   </context>
   <context>
@@ -2387,27 +2398,27 @@
     </message>
     <message>
       <source>Data protection</source>
-      <translation type="unfinished">Data protection</translation>
+      <translation>Databeveiliging</translation>
     </message>
     <message>
       <source>Use only HTTPS to connect to cameras</source>
-      <translation type="unfinished">Use only HTTPS to connect to cameras</translation>
+      <translation>Gebruik alleen HTTPS om verbinding te maken met camera's</translation>
     </message>
     <message>
       <source>User Activity</source>
-      <translation type="unfinished">User Activity</translation>
+      <translation>Gebruikersactiviteit</translation>
     </message>
     <message>
       <source>Display servers in tree for non-administrator users</source>
-      <translation type="unfinished">Display servers in tree for non-administrator users</translation>
+      <translation>Servers in boomstructuur weergeven voor niet-beheerders</translation>
     </message>
     <message>
       <source>Archive encryption</source>
-      <translation type="unfinished">Archive encryption</translation>
+      <translation>Archiefversleuteling</translation>
     </message>
     <message>
       <source>Archive encryption increases CPU usage</source>
-      <translation type="unfinished">Archive encryption increases CPU usage</translation>
+      <translation>Archiefversleuteling verhoogt het CPU-gebruik</translation>
     </message>
     <message>
       <source>Change Password...</source>
@@ -2419,15 +2430,19 @@
     </message>
     <message>
       <source>Connection with cameras that do not support HTTPS will be lost.</source>
-      <translation type="unfinished">Connection with cameras that do not support HTTPS will be lost.</translation>
+      <translation>Verbindingen met camera's die geen HTTPS ondersteunen, worden verbroken.</translation>
     </message>
     <message>
       <source>Force servers to accept only encrypted connections</source>
-      <translation type="unfinished">Force servers to accept only encrypted connections</translation>
+      <translation>Forceer servers alleen versleutelde verbindingen te accepteren</translation>
     </message>
     <message>
       <source>Encrypt video traffic to desktop and mobile clients</source>
-      <translation type="unfinished">Encrypt video traffic to desktop and mobile clients</translation>
+      <translation>Versleutel videoverkeer naar desktop- en mobiele clients</translation>
+    </message>
+    <message>
+      <source>Manage Users</source>
+      <translation type="unfinished">Manage Users</translation>
     </message>
   </context>
   <context>
@@ -2445,7 +2460,7 @@
     <name>ServerCertificateViewer</name>
     <message>
       <source>Server certificate</source>
-      <translation type="unfinished">Server certificate</translation>
+      <translation>Servercertificaat</translation>
     </message>
     <message>
       <source>General</source>
@@ -2453,11 +2468,11 @@
     </message>
     <message>
       <source>Issued by</source>
-      <translation type="unfinished">Issued by</translation>
+      <translation>Uitgegeven door</translation>
     </message>
     <message>
       <source>Self-signed root certificate</source>
-      <translation type="unfinished">Self-signed root certificate</translation>
+      <translation>Zelfondertekend root certificaat</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -2465,11 +2480,11 @@
     </message>
     <message>
       <source>Certificate is expired</source>
-      <translation type="unfinished">Certificate is expired</translation>
+      <translation>Certificaat is verlopen</translation>
     </message>
     <message>
       <source>Fingerprints</source>
-      <translation type="unfinished">Fingerprints</translation>
+      <translation>Vingerafdrukken</translation>
     </message>
     <message>
       <source>Details</source>
@@ -2477,11 +2492,11 @@
     </message>
     <message>
       <source>Pin to this certificate</source>
-      <translation type="unfinished">Pin to this certificate</translation>
+      <translation>Dit certificaat vastmaken</translation>
     </message>
     <message>
       <source>View pinned certificate</source>
-      <translation type="unfinished">View pinned certificate</translation>
+      <translation>Vastgezet certificaat weergeven</translation>
     </message>
   </context>
   <context>
@@ -2518,8 +2533,8 @@
       <translation>Poort</translation>
     </message>
     <message>
-      <source>Autodetect USB and web cameras</source>
-      <translation type="unfinished">Autodetect USB and web cameras</translation>
+      <source>Autodetect built-in and USB webcams</source>
+      <translation type="unfinished">Autodetect built-in and USB webcams</translation>
     </message>
   </context>
   <context>
@@ -2891,11 +2906,11 @@
     <name>UserSettingsDialog</name>
     <message>
       <source>This user can use digest authentication.</source>
-      <translation type="unfinished">This user can use digest authentication.</translation>
+      <translation>Deze gebruiker kan digest authenticatie gebruiken.</translation>
     </message>
     <message>
       <source>Force Secure Authentication</source>
-      <translation type="unfinished">Force Secure Authentication</translation>
+      <translation>Beveiligde authenticatie forceren</translation>
     </message>
   </context>
   <context>
@@ -2977,7 +2992,7 @@
     </message>
     <message>
       <source>Proxy this webpage via server</source>
-      <translation type="unfinished">Proxy this webpage via server</translation>
+      <translation>Proxy deze webpagina via de server</translation>
     </message>
     <message>
       <source>SELECT SERVER</source>
@@ -2989,15 +3004,15 @@
     </message>
     <message>
       <source>Allow using Client API</source>
-      <translation type="unfinished">Allow using Client API</translation>
+      <translation>Sta het gebruik van de Client API toe</translation>
     </message>
     <message>
       <source>Proxy all requested contents</source>
-      <translation type="unfinished">Proxy all requested contents</translation>
+      <translation>Proxy alle gevraagde inhoud</translation>
     </message>
     <message>
-      <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</translation>
+      <source>Allow opening web page without SSL certificate checking</source>
+      <translation type="unfinished">Allow opening web page without SSL certificate checking</translation>
     </message>
   </context>
   <context>

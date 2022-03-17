@@ -23,6 +23,13 @@
       <source>Any plugin</source>
       <translation>Varje plugin</translation>
     </message>
+    <message numerus="yes">
+      <source>%1 with %n attributes</source>
+      <translation>
+        <numerusform>%1 med %n attribut</numerusform>
+        <numerusform>%1 med %n attribut</numerusform>
+      </translation>
+    </message>
     <message>
       <source>Any subtype</source>
       <translation>Valfri undertyp</translation>
@@ -494,10 +501,6 @@
       <translation>Sluta dela Layout</translation>
     </message>
     <message>
-      <source>Edit...</source>
-      <translation>Redigera...</translation>
-    </message>
-    <message>
       <source>Rename</source>
       <translation>Döp om</translation>
     </message>
@@ -810,10 +813,6 @@
       <translation>Avbryt Uppladdning...</translation>
     </message>
     <message>
-      <source>Copy Schedule...</source>
-      <translation>Kopiera schema...</translation>
-    </message>
-    <message>
       <source>Analytics Engine Settings...</source>
       <translation>Analysinställningar...</translation>
     </message>
@@ -957,14 +956,6 @@
       <source>Delete Bookmarks...</source>
       <translation>Ta bort bokmärke...</translation>
     </message>
-    <message>
-      <source>Copy Bookmark Text...</source>
-      <translation>Kopiera bokmärkestext...</translation>
-    </message>
-    <message>
-      <source>Copy Bookmarks Text...</source>
-      <translation>Kopiera bokmärkestext...</translation>
-    </message>
     <message numerus="yes">
       <source>Show on Items</source>
       <translation>
@@ -1011,6 +1002,18 @@
     <message>
       <source>Advanced...</source>
       <translation>Avancerad...</translation>
+    </message>
+    <message>
+      <source>Copy Bookmark Text</source>
+      <translation>Kopiera bokmärkestext</translation>
+    </message>
+    <message>
+      <source>Copy Bookmarks Text</source>
+      <translation>Kopiera bokmärkestext</translation>
+    </message>
+    <message>
+      <source>Web Page Settings...</source>
+      <translation>Inställningar för webbsidan...</translation>
     </message>
   </context>
   <context>
@@ -1507,13 +1510,13 @@
       <translation>Delade vyer</translation>
     </message>
     <message>
-      <source>All</source>
-      <extracomment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</extracomment>
-      <translation>Alla</translation>
-    </message>
-    <message>
       <source>Permissions</source>
       <translation>Behörigheter</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <comment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</comment>
+      <translation>Alla</translation>
     </message>
   </context>
   <context>
@@ -1668,10 +1671,6 @@
       <translation>Avaktiverad</translation>
     </message>
     <message>
-      <source>Basic</source>
-      <translation>Grundläggande</translation>
-    </message>
-    <message>
       <source>Recommended</source>
       <translation>Rekommenderad</translation>
     </message>
@@ -1682,14 +1681,6 @@
     <message>
       <source>May lead to privacy issues</source>
       <translation>Kan leda till sekretessproblem</translation>
-    </message>
-    <message>
-      <source>On first connection self-signed certificate is pinned automatically</source>
-      <translation>På första anslutningen är självsignerat certifikat fäst automatiskt</translation>
-    </message>
-    <message>
-      <source>Your confirmation will be requested to pin self-signed certificate</source>
-      <translation>Din bekräftelse kommer att krävas för att fästa självsignerat certifikat</translation>
     </message>
     <message>
       <source>Connect only servers with public certificate</source>
@@ -1714,6 +1705,10 @@
     <message>
       <source>Continue</source>
       <translation>Fortsätt</translation>
+    </message>
+    <message>
+      <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
+      <translation>Vid den första anslutningen till servern kommer din bekräftelse att bli ombedd att acceptera certifikatet om det innehåller fel</translation>
     </message>
   </context>
   <context>
@@ -2699,6 +2694,33 @@ till %1</translation>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Systemet är frånkopplat från %1</translation>
     </message>
+    <message>
+      <source>You are about to disconnect System from %1</source>
+      <comment>%1 is the cloud name, like Nx Cloud</comment>
+      <translation>Du håller på att koppla bort systemet från %1</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>Alla %1 användare kommer att raderas.</translation>
+    </message>
+    <message>
+      <source>You will be logged out.</source>
+      <translation>Du kommer att loggas ut.</translation>
+    </message>
+    <message>
+      <source>System will be accessible through local network with a local administrator account.</source>
+      <translation>Systemet kommer att vara tillgängligt via lokalt nätverk med lokalt administratörskonto.</translation>
+    </message>
+    <message>
+      <source>Continue</source>
+      <translation>Fortsätt</translation>
+    </message>
+    <message>
+      <source>Cannot disconnect the System from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Det går inte att koppla bort systemet från %1</translation>
+    </message>
   </context>
   <context>
     <name>QnCloudResultInfo</name>
@@ -2984,6 +3006,14 @@ till %1</translation>
     <message>
       <source>Restore</source>
       <translation>Återställ</translation>
+    </message>
+    <message>
+      <source>Restore database?</source>
+      <translation>Återställ databas?</translation>
+    </message>
+    <message>
+      <source>System configuration will be restored from backup, Server application will be restarted.</source>
+      <translation>Systemkonfigurationen kommer att återställas från säkerhetskopiering, Serverprogram startas om.</translation>
     </message>
   </context>
   <context>
@@ -3399,6 +3429,10 @@ till %1</translation>
     <message>
       <source>Please enter a value.</source>
       <translation>Vänligen ange ett värde.</translation>
+    </message>
+    <message>
+      <source>Please enter a password.</source>
+      <translation>Du måste skriva in lösenord.</translation>
     </message>
   </context>
   <context>
@@ -3821,10 +3855,6 @@ till %1</translation>
       <translation>Skapa zoomfönster</translation>
     </message>
     <message>
-      <source>Image Enhancement</source>
-      <translation>Bildförbättring</translation>
-    </message>
-    <message>
       <source>Hi-Res</source>
       <translation>Hög-Upl</translation>
     </message>
@@ -3869,8 +3899,12 @@ till %1</translation>
       <translation>Områdeszoom</translation>
     </message>
     <message>
-      <source>Motion</source>
-      <translation>Rörelse</translation>
+      <source>Motion Search</source>
+      <translation>Rörelsesökning</translation>
+    </message>
+    <message>
+      <source>Object Search</source>
+      <translation>Objektsökning</translation>
     </message>
   </context>
   <context>
@@ -4443,6 +4477,10 @@ till %1</translation>
     <message>
       <source>Exit Fullscreen</source>
       <translation>Avsluta Helskärmsläge</translation>
+    </message>
+    <message>
+      <source>Enter Fullscreen</source>
+      <translation>Öppna Fullskärmsläge</translation>
     </message>
   </context>
   <context>
@@ -5491,6 +5529,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>Backup storage is not configured</source>
       <translation>Backuplagring är inte konfigurerad</translation>
     </message>
+    <message>
+      <source>Camera recording schedule is invalid</source>
+      <translation>Kamerainspelningsschemat är ogiltigt</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -5657,6 +5699,14 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
       <translation>Användare kan importeras från en LDAP-server. De kommer endast kunna logga in om LDAP-servern är online och deras konton är aktiva på den.</translation>
     </message>
+    <message>
+      <source>All users</source>
+      <translation>Alla användare</translation>
+    </message>
+    <message>
+      <source>With enabled digest authentication</source>
+      <translation>Med aktiverad digestautentisering</translation>
+    </message>
   </context>
   <context>
     <name>QnUserProfileWidget</name>
@@ -5799,22 +5849,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Allow digest authentication for this user</source>
       <translation>Tillåt digest -autentisering för den här användaren</translation>
-    </message>
-    <message>
-      <source>Force secure authentication?</source>
-      <translation>Tvinga fram säker autentisering?</translation>
-    </message>
-    <message>
-      <source>To revert this change user password reset will be required.</source>
-      <translation>För att återställa denna ändring krävs återställning av användarlösenord.</translation>
-    </message>
-    <message>
-      <source>Do not show this message again</source>
-      <translation>Visa inte detta meddelande igen</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>Aktivera</translation>
     </message>
     <message>
       <source>Learn More</source>
@@ -5965,6 +5999,36 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
   </context>
   <context>
+    <name>QnWebResourceWidget</name>
+    <message>
+      <source>Open this web page?</source>
+      <translation>Öppna den här webbsidan?</translation>
+    </message>
+    <message>
+      <source>Web page</source>
+      <translation>Webbsida</translation>
+    </message>
+    <message>
+      <source>Connect anyway</source>
+      <translation>Anslut ändå</translation>
+    </message>
+    <message>
+      <source>Web page settings...</source>
+      <translation>Inställningar för webbsidan...</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this web page presented an untrusted certificate auth.
+We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
+      <comment>%1 is the web page address</comment>
+      <translation>Du försöker öppna
+%1
+men den här webbsidan presenterade en opålitlig certifikatautentisering.
+Vi rekommenderar att du inte öppnar den här webbsidan. Om du förstår riskerna kan du öppna webbsidan.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWorkbenchAlarmLayoutHandler</name>
     <message>
       <source>Alarms</source>
@@ -6028,6 +6092,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Focusing...</source>
       <translation>Fokuserar...</translation>
+    </message>
+    <message>
+      <source>Camera %1 does not support PTZ</source>
+      <translation>Kamera %1 stöder inte PTZ</translation>
     </message>
   </context>
   <context>
@@ -7113,6 +7181,14 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <source>Stream setting is not applicable to this device type</source>
       <translation>Videoström inställningen är inte tillämplig på den här enhetstypen</translation>
     </message>
+    <message>
+      <source>Not supported</source>
+      <translation>Stöds inte</translation>
+    </message>
+    <message>
+      <source>Backup is not supported for this device</source>
+      <translation>Säkerhetskopiering stöds inte för den här enheten</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
@@ -7168,6 +7244,20 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Backup will be turned off for new added cameras on all servers in the system.</source>
       <translation>Säkerhetskopiering kommer att stängas av för nya tillagda kameror på alla servrar i systemet.</translation>
+    </message>
+    <message>
+      <source>Storage Management</source>
+      <translation>Lagringshantering</translation>
+    </message>
+    <message>
+      <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
+      <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
+      <translation>För att aktivera backup ändra &quot;Main&quot; till &quot;Backup&quot; från några av lagringarna i %1</translation>
+    </message>
+    <message>
+      <source>To enable backup add more drives to use them as backup storage in %1</source>
+      <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
+      <translation>För att aktivera säkerhetskopiering lägg till fler enheter för att använda dem som backuplagring i %1</translation>
     </message>
   </context>
   <context>
@@ -7240,6 +7330,17 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::CameraButtonController</name>
+    <message>
+      <source>Heater</source>
+      <translation>Värmare</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>Torkare</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>
@@ -7307,6 +7408,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
       <translation>Inställningar för kvalitet och bildfrekvens (FPS) i inspelningsplanen blir irrelevanta.</translation>
+    </message>
+    <message>
+      <source>Server will not push time settings to the camera.</source>
+      <translation>Servern skickar inte tidsinställningar till kameran.</translation>
     </message>
   </context>
   <context>
@@ -7414,14 +7519,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>Hög minimivärde kan leda till att arkivlängden minskar på andra enheter.</translation>
-    </message>
-    <message>
-      <source>Motion &amp;&amp; Objects Recording</source>
-      <translation>Inspelning av rörelse och objekt</translation>
-    </message>
-    <message>
-      <source>Motion Recording</source>
-      <translation>Rörelseinspelning</translation>
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
@@ -7539,16 +7636,40 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Plugins</translation>
     </message>
     <message>
-      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation>Rörelsedetektering är inaktiverad, alla schemalagda poster &quot;Rörelse&quot; och &quot;Rörelse + Lo-Res&quot; kommer att ändras till &quot;Alltid&quot;</translation>
-    </message>
-    <message>
-      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation>Dubbelströmning är inaktiverad, alla schemalagda poster &quot;Rörelse + Lo-Res&quot; kommer att ändras till &quot;Alltid&quot;</translation>
-    </message>
-    <message>
       <source>Dewarping</source>
       <translation>Dewarping</translation>
+    </message>
+    <message>
+      <source>Change invalid schedule to &quot;Record Always&quot;</source>
+      <translation>Ändra ogiltigt schema till &quot;Spela in alltid&quot;</translation>
+    </message>
+    <message>
+      <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
+      <translation>Vissa celler i inspelningsschemat är inställda på ett ogiltigt inspelningsläge: %1. Under de timmar som är inställda på ett ogiltigt inspelningsläge kommer kameran att spela in i läget &quot;Spela in Alltid&quot;.</translation>
+    </message>
+    <message>
+      <source>Motion Only</source>
+      <translation>Endast rörelse</translation>
+    </message>
+    <message>
+      <source>Objects Only</source>
+      <translation>Endast objekt</translation>
+    </message>
+    <message>
+      <source>Motion &amp; Objects Only</source>
+      <translation>Endast rörelse och objekt</translation>
+    </message>
+    <message>
+      <source>Motion + Lo-Res</source>
+      <translation>Rörelse + Låg uppl</translation>
+    </message>
+    <message>
+      <source>Objects + Lo-Res</source>
+      <translation>Objekt + Lågupplöst</translation>
+    </message>
+    <message>
+      <source>Motion &amp; Objects + Lo-Res</source>
+      <translation>Rörelse, Objekt + Låg-Res</translation>
     </message>
   </context>
   <context>
@@ -7560,9 +7681,12 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
         <numerusform>Det gick inte att aktivera ljud på %n enheter</numerusform>
       </translation>
     </message>
-    <message>
-      <source>These devices do not have an audio input, or it is not configured correctly.</source>
-      <translation>Dessa enheter har ingen ljudingång eller är inte korrekt konfigurerad.</translation>
+    <message numerus="yes">
+      <source>These devices do not have audio inputs or are not configured correctly.</source>
+      <translation>
+        <numerusform>Dessa enheter har ingen ljudingång eller är inte korrekt konfigurerad.</numerusform>
+        <numerusform>Dessa enheter har ingen ljudingång eller är inte korrekt konfigurerad.</numerusform>
+      </translation>
     </message>
     <message numerus="yes">
       <source>Failed to enable 2-way audio on %n devices</source>
@@ -7571,9 +7695,12 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
         <numerusform>Det gick inte att aktivera 2-vägs ljud på %n enheter</numerusform>
       </translation>
     </message>
-    <message>
-      <source>These devices do not have an audio output, or it is not configured correctly.</source>
-      <translation>Dessa enheter har ingen ljudutgång, eller så är de inte korrekt konfigurerade.</translation>
+    <message numerus="yes">
+      <source>These devices do not have audio outputs or are not configured correctly.</source>
+      <translation>
+        <numerusform>Dessa enheter har ingen ljudingång eller är inte korrekt konfigurerad.</numerusform>
+        <numerusform>Dessa enheter har ingen ljudingång eller är inte korrekt konfigurerad.</numerusform>
+      </translation>
     </message>
     <message>
       <source>Audio will be disabled</source>
@@ -7604,7 +7731,7 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
     <message numerus="yes">
       <source>%1 are required</source>
-      <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
+      <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
       <translation>
         <numerusform>%1 krävs</numerusform>
         <numerusform>%1 krävs</numerusform>
@@ -7876,10 +8003,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
   <context>
     <name>nx::vms::client::desktop::CopyScheduleCameraSelectionDialog</name>
     <message>
-      <source>Schedule motion type is not supported by some cameras.</source>
-      <translation>Schemaläggningstypen rörelse stöds inte av vissa kameror.</translation>
-    </message>
-    <message>
       <source>Recording cannot be enabled for some cameras.</source>
       <translation>Inspelning kan inte aktiveras för vissa kameror.</translation>
     </message>
@@ -7890,6 +8013,10 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Copy archive length settings</source>
       <translation>Kopiera arkivets storleksinställningar</translation>
+    </message>
+    <message>
+      <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
+      <translation>Inspelningsschemat innehåller inspelningslägen som inte stöds av de valda kamerorna. Inspelningslägen som inte stöds kommer att ändras till &quot;Spela in alltid&quot;.</translation>
     </message>
   </context>
   <context>
@@ -8005,6 +8132,14 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Address field cannot be empty</source>
       <translation>Adressfältet kan inte vara tomt</translation>
+    </message>
+    <message>
+      <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
+      <translation>Sökning efter enheter i nätverket är begränsad till kameror som stöder HTTPS-anslutningar. Detta kan ändras i %1 -inställningar.</translation>
+    </message>
+    <message>
+      <source>System Administration</source>
+      <translation>Systemadministration</translation>
     </message>
   </context>
   <context>
@@ -8297,6 +8432,25 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ForceSecureAuthDialog</name>
+    <message>
+      <source>Force secure authentication?</source>
+      <translation>Tvinga fram säker autentisering?</translation>
+    </message>
+    <message>
+      <source>To revert this change user password reset will be required.</source>
+      <translation>För att återställa denna ändring krävs återställning av användarlösenord.</translation>
+    </message>
+    <message>
+      <source>Do not show this message again</source>
+      <translation>Visa inte detta meddelande igen</translation>
+    </message>
+    <message>
+      <source>Enable</source>
+      <translation>Aktivera</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
     <message>
       <source>Brand</source>
@@ -8328,8 +8482,8 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
   <context>
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
-      <source>Click to read more</source>
-      <translation>Klicka för att läsa mer</translation>
+      <source>Click on the icon to read more</source>
+      <translation>Klicka på ikonen för att läsa mer</translation>
     </message>
   </context>
   <context>
@@ -8678,11 +8832,6 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
       <translation>Båda systemen är anslutna till %1. Sammanfogning är inte tillåtet.</translation>
     </message>
     <message>
-      <source>Cloud systems have different owners. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Cloud system har olika ägare. Sammanfoga är inte tillåtet.</translation>
-    </message>
-    <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
       <translation>Kan inte slå samman system eftersom de har minst en server med samma ID. Ta bort den här servern och försök igen.</translation>
     </message>
@@ -8701,6 +8850,11 @@ Om du tänkte flytta analysdata till en annan lagringsplats, vänligen kontakta 
     <message>
       <source>Unknown error.</source>
       <translation>Okänt fel.</translation>
+    </message>
+    <message>
+      <source>%1 systems have different owners. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 system har olika ägare. Sammanfogning är inte tillåtet.</translation>
     </message>
   </context>
   <context>
@@ -9066,6 +9220,21 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::OauthLoginPlaceholder</name>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the cloud name like Nx Cloud</comment>
+      <translation>Kan inte ansluta till %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ObjectTrackingButton</name>
+    <message>
+      <source>Object tracking is ON</source>
+      <translation>Objektspårning är PÅ</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
@@ -9335,6 +9504,10 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
       <translation>Aktivera webbsideproxy på &lt;b&gt;Allmänt&lt;/b&gt; -fliken.</translation>
     </message>
+    <message>
+      <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
+      <translation>Proxy av allt innehåll exponerar alla tjänster eller enheter i serverns&apos; nätverk för användare av denna webbsida</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::RadassActionFactory</name>
@@ -9401,6 +9574,45 @@ Du kan tvinga det, men det kan avsevärt öka CPU-belastning.</translation>
     <message>
       <source>Motion + Lo-Res</source>
       <translation>Rörelse + Låg uppl</translation>
+    </message>
+    <message>
+      <source>Recording motion and objects</source>
+      <translation>Inspelning av rörelse och objekt</translation>
+    </message>
+    <message>
+      <source>Recording objects only</source>
+      <translation>Endast inspelning av objekt</translation>
+    </message>
+    <message>
+      <source>Recording motion, objects and low quality</source>
+      <translation>Inspelning rörelse, objekt och låg kvalitet</translation>
+    </message>
+    <message>
+      <source>Recording objects and low quality</source>
+      <translation>Inspelning av objekt och låg kvalitet</translation>
+    </message>
+    <message>
+      <source>Motion, Objects</source>
+      <translation>Rörelse, Objekt</translation>
+    </message>
+    <message>
+      <source>Objects only</source>
+      <translation>Endast objekt</translation>
+    </message>
+    <message>
+      <source>Motion, Objects + Lo-Res</source>
+      <translation>Rörelse, Objekt + Låg-Res</translation>
+    </message>
+    <message>
+      <source>Objects + Lo-Res</source>
+      <translation>Objekt + Lågupplöst</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RemoteConnectionUserInteractionDelegate</name>
+    <message>
+      <source>Connect to System</source>
+      <translation>Anslut till systemet</translation>
     </message>
   </context>
   <context>
@@ -9566,6 +9778,86 @@ Du kan fortfarande ändra kvalitet och FPS direkt på kameran.</translation>
  + Low-Res</source>
       <translation>Rörelse + Låg uppl</translation>
     </message>
+    <message>
+      <source>Motion detection is disabled for some of the selected devices</source>
+      <translation>Rörelsedetektering är inaktiverat för vissa av de valda enheterna</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for this camera</source>
+      <translation>Rörelsedetektering är inaktiverad för den här kameran</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for some of the selected cameras</source>
+      <translation>Rörelsedetektering är inaktiverat för vissa av de valda kamerorna</translation>
+    </message>
+    <message>
+      <source>Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>Vissa av de valda enheterna har bara en stream. Inspelningar med och utan rörelse har samma upplösning eller kvalitet.</translation>
+    </message>
+    <message>
+      <source>This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>Den här kameran har bara en stream. Inspelningar med och utan rörelse har samma upplösning eller kvalitet.</translation>
+    </message>
+    <message>
+      <source>Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>Vissa av de valda enheterna har bara en stream. Inspelningar med och utan rörelse har samma upplösning eller kvalitet.</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for some of the selected devices</source>
+      <translation>Rörelsedetektering är inaktiverat för vissa av de valda enheterna</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for this camera</source>
+      <translation>Rörelsedetektering är inaktiverad för den här kameran</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for some of the selected cameras</source>
+      <translation>Rörelsedetektering är inaktiverat för vissa av de valda kamerorna</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for some of the selected devices</source>
+      <translation>Rörelse- och objektdetektering är inaktiverat för vissa av de valda enheterna</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for this camera</source>
+      <translation>Rörelse- och objektdetektering är inaktiverat för den här kameran</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for some of the selected cameras</source>
+      <translation>Rörelse- och objektdetektering är inaktiverat för några av de valda kamerorna</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for this I/O module</source>
+      <translation>Rörelsedetektering är inaktiverad för denna I/O-modul</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for some of the selected I/O modules</source>
+      <translation>Rörelsedetektering är inaktiverad för vissa av de valda I/O-modulerna</translation>
+    </message>
+    <message>
+      <source>This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>Denna I/O-modul har bara en ström. Inspelningar med och utan rörelse kommer att dela samma upplösning eller kvalitet.</translation>
+    </message>
+    <message>
+      <source>Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>Vissa av de valda I/O-modulerna har bara en ström. Inspelningar med och utan rörelse har samma upplösning eller kvalitet.</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for this I/O module</source>
+      <translation>Objektdetektering är inaktiverad för denna I/O-modul</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for some of the selected I/O modules</source>
+      <translation>Objektdetektering är inaktiverat för vissa av de valda I/O-modulerna</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for this I/O module</source>
+      <translation>Rörelse- och objektdetektering är inaktiverat för denna I/O-modul</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for some of the selected I/O modules</source>
+      <translation>Rörelse- och objektdetektering är inaktiverat för vissa av de valda I/O-modulerna</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SearchLineEdit</name>
@@ -9587,10 +9879,6 @@ Du kan fortfarande ändra kvalitet och FPS direkt på kameran.</translation>
     <message>
       <source>hours</source>
       <translation>timmar</translation>
-    </message>
-    <message>
-      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation>Användare kommer automatiskt att loggas ut om deras session överstiger den angivna varaktigheten.</translation>
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
@@ -9626,6 +9914,31 @@ Varning: Det här lösenordet kan inte återställas. Om du tappar det blir arki
       <source>days</source>
       <translation>dagar</translation>
     </message>
+    <message>
+      <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation>Lokala användare och LDAP-användare loggas automatiskt ut om deras session överskrider den angivna varaktigheten.</translation>
+    </message>
+    <message>
+      <source>Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</source>
+      <translation>Obegränsad livstid för användarsessioner hotar den övergripande systemsäkerheten och kan leda till försämring av systemprestandan</translation>
+    </message>
+    <message>
+      <source>It is recommended to have user session lifetime not greater than %1</source>
+      <comment>%1 is the time span with time units</comment>
+      <translation>Det rekommenderas att användarens sessionslivslängd inte är större än %1</translation>
+    </message>
+    <message>
+      <source>Learn more.</source>
+      <translation>Läs mer.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
+      <comment>%n is digest user count, %1 is total user count</comment>
+      <translation>
+        <numerusform>%n av %1 användare får använda digest-autentisering (inte säker).</numerusform>
+        <numerusform>%n av %1 användare får använda digest-autentisering (inte säker).</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateError</name>
@@ -9634,12 +9947,12 @@ Varning: Det här lösenordet kan inte återställas. Om du tappar det blir arki
       <translation>Misslyckades att ansluta till server</translation>
     </message>
     <message>
-      <source>Server certificate is invalid.</source>
-      <translation>Serverns certifikat är ogiltigt.</translation>
-    </message>
-    <message>
       <source>View certificate</source>
       <translation>Visa certifikat</translation>
+    </message>
+    <message>
+      <source>Server certificate is invalid.</source>
+      <translation>Serverns certifikat är ogiltigt.</translation>
     </message>
   </context>
   <context>
@@ -9676,9 +9989,35 @@ Varning: Det här lösenordet kan inte återställas. Om du tappar det blir arki
       <source>This is a custom certificate installed on %1</source>
       <translation>Detta är ett anpassat certifikat installerat på %1</translation>
     </message>
+    <message>
+      <source>Pin this certificate to %1?</source>
+      <translation>Fäst detta certifikat till %1?</translation>
+    </message>
+    <message>
+      <source>Someone may be impersonating %1 to steel your personal information.
+Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
+      <translation>Någon kan efterlikna %1 för att stjäla dina personuppgifter.
+Fäst inte detta certifikat om du gjorde&apos;t ändra %2 server SSL-certifikat.</translation>
+    </message>
+    <message>
+      <source>Pin</source>
+      <translation>Fäst</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
+    <message>
+      <source>View certificate</source>
+      <translation>Visa certifikat</translation>
+    </message>
+    <message>
+      <source>Connect Anyway</source>
+      <translation>Anslut ändå</translation>
+    </message>
+    <message>
+      <source>I trust this server</source>
+      <translation>Jag litar på den här servern</translation>
+    </message>
     <message>
       <source>System:</source>
       <translation>Systemet:</translation>
@@ -9696,10 +10035,6 @@ Varning: Det här lösenordet kan inte återställas. Om du tappar det blir arki
       <translation>Lita på den här servern?</translation>
     </message>
     <message>
-      <source>You attempted to connect to %1 but the server presented an untrusted self-signed certificate.</source>
-      <translation>Du försökte ansluta till %1 men servern presenterade ett opålitligt självsignerat certifikat.</translation>
-    </message>
-    <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
       <translation>Granska certifikatets detaljer för att se till att du ansluter till rätt server.</translation>
     </message>
@@ -9712,20 +10047,12 @@ Varning: Det här lösenordet kan inte återställas. Om du tappar det blir arki
       <translation>Någon kan efterlikna %1 för att stjäla dina personuppgifter.</translation>
     </message>
     <message>
-      <source>View certificate</source>
-      <translation>Visa certifikat</translation>
-    </message>
-    <message>
-      <source>Connect Anyway</source>
-      <translation>Anslut ändå</translation>
-    </message>
-    <message>
-      <source>I trust this server</source>
-      <translation>Jag litar på den här servern</translation>
-    </message>
-    <message>
       <source>Do not connect to this server unless instructed by your VMS administrator.</source>
       <translation>Anslut inte till den här servern om du inte har instruerats av din VMS administratör.</translation>
+    </message>
+    <message>
+      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
+      <translation>Du försökte ansluta till: %1 men servern presenterade ett certifikat som inte kan verifieras automatiskt.</translation>
     </message>
   </context>
   <context>
@@ -9941,6 +10268,17 @@ Varning: Det här lösenordet kan inte återställas. Om du tappar det blir arki
     <message>
       <source>Set Passwords</source>
       <translation>Sätt lösenord</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording schedule is invalid for %n cameras</source>
+      <translation>
+        <numerusform>Inspelningsschemat är ogiltigt för %n kameror</numerusform>
+        <numerusform>Inspelningsschemat är ogiltigt för %n kameror</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
+      <translation>Inspelningsschemat på vissa kameror innehåller inspelningslägen som inte stöds.</translation>
     </message>
   </context>
   <context>
@@ -10427,6 +10765,35 @@ Varning: Det här lösenordet kan inte återställas. Om du tappar det blir arki
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
+    <message>
+      <source>Intercom Alarm Layout</source>
+      <translation>Intercom larm layout</translation>
+    </message>
+    <message>
+      <source>Intercom Open Door</source>
+      <translation>Intercom öppna dörr</translation>
+    </message>
+    <message>
+      <source>Open door</source>
+      <translation>Öppna dörr</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::OverlappedIdDialogModel</name>
+    <message>
+      <source>Latest</source>
+      <translation>Senaste</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::OverlappedIdIntegration</name>
+    <message>
+      <source>Overlapped ID...</source>
+      <translation>Överlappande ID...</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::joystick::JoystickButtonActionChoiceModel</name>
     <message>
       <source>No Action</source>
@@ -10482,6 +10849,40 @@ Varning: Det här lösenordet kan inte återställas. Om du tappar det blir arki
     <message>
       <source>Button</source>
       <translation>Knapp</translation>
+    </message>
+    <message>
+      <source>Selected Layout</source>
+      <translation>Vald layout</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::jsapi::detail::ResourcesApiBackend</name>
+    <message>
+      <source>Resource is not available for the usage with JS API</source>
+      <translation>Resursen är inte tillgänglig för användning med JS API</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
+    <message>
+      <source>Cannot find an item with the specified id</source>
+      <translation>Kan inte hitta ett objekt med angivet Id</translation>
+    </message>
+    <message>
+      <source>Cannot find a resource with the specified id.</source>
+      <translation>Kan inte hitta ett objekt med angivet Id.</translation>
+    </message>
+    <message>
+      <source>Cannot specify a media parameters for the resource without media stream.</source>
+      <translation>Det går inte att ange mediaparametrar för resursen utan mediaström.</translation>
+    </message>
+    <message>
+      <source>Cannot add the resource to the layout</source>
+      <translation>Det går inte att lägga till resursen i layouten</translation>
+    </message>
+    <message>
+      <source>Cannot find a widget corresponding to the specified item.</source>
+      <translation>Kan inte hitta en widget som motsvarar det angivna objektet.</translation>
     </message>
   </context>
   <context>
@@ -10906,6 +11307,24 @@ Du kan välja en annan lagringsplats på fliken &quot;Storage Management&quot; i
       <source>Window configuration saved</source>
       <translation>Fönsterkonfiguration sparad</translation>
     </message>
+    <message>
+      <source>This build is for demo purposes only.</source>
+      <translation>Varning! Denna version är endast för teständamål.</translation>
+    </message>
+    <message>
+      <source>It cannot be upgraded to subsequent builds as they become available.</source>
+      <translation>Det kan inte uppgraderas till efterföljande versioner när de blir tillgängliga.</translation>
+    </message>
+    <message>
+      <source>To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</source>
+      <comment>%1 is the product name</comment>
+      <translation>För att uppgradera, avinstallera %1 innan du installerar en uppdaterad version (all data kommer att gå förlorad).</translation>
+    </message>
+    <message>
+      <source>%1 Beta</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 Beta</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::workbench::LayoutTourExecutor</name>
@@ -10914,8 +11333,8 @@ Du kan välja en annan lagringsplats på fliken &quot;Storage Management&quot; i
       <translation>Använd tangentpilen för att byta vyer. För att lämna showreel trycker du på Esc.</translation>
     </message>
     <message>
-      <source>Press any key to stop the tour.</source>
-      <translation>Tryck på valfri knapp för att stoppa turen.</translation>
+      <source>Press Esc to stop the tour.</source>
+      <translation>Tryck på Esc för att stoppa turen.</translation>
     </message>
   </context>
   <context>
@@ -11100,13 +11519,6 @@ om du vill visa fler bokmärken</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::workbench::timeline::TimelineSliderTooltip</name>
-    <message>
-      <source>Local File</source>
-      <translation>Lokal fil</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::workbench::timeline::VolumeSlider</name>
     <message>
       <source>Muted</source>
@@ -11151,6 +11563,10 @@ om du vill visa fler bokmärken</translation>
     <message>
       <source>Client update package is missing for current platform.</source>
       <translation>Klientuppdateringspaket saknas för nuvarande plattform.</translation>
+    </message>
+    <message>
+      <source>Can&apos;t check client update availability. Check your internet connection and try again.</source>
+      <translation>Kan&apos;t kontrollera klientuppdateringens tillgänglighet. Kontrollera din internetanslutning och försök igen.</translation>
     </message>
   </context>
 </TS>

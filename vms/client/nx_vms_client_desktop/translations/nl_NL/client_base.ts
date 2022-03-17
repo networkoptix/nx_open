@@ -21,11 +21,18 @@
     </message>
     <message>
       <source>Any plugin</source>
-      <translation type="unfinished">Any plugin</translation>
+      <translation>Elke Plugin</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 with %n attributes</source>
+      <translation>
+        <numerusform>%1 met %n attributen</numerusform>
+        <numerusform>%1 met %n attributen</numerusform>
+      </translation>
     </message>
     <message>
       <source>Any subtype</source>
-      <translation type="unfinished">Any subtype</translation>
+      <translation>Elk subtype</translation>
     </message>
   </context>
   <context>
@@ -43,7 +50,7 @@
     </message>
     <message>
       <source>Issuer</source>
-      <translation type="unfinished">Issuer</translation>
+      <translation>Verstrekker</translation>
     </message>
     <message>
       <source>Expires</source>
@@ -494,10 +501,6 @@
       <translation>Delen van de schermindeling beëindigen</translation>
     </message>
     <message>
-      <source>Edit...</source>
-      <translation>Bewerken...</translation>
-    </message>
-    <message>
       <source>Rename</source>
       <translation>Naam wijzigen</translation>
     </message>
@@ -810,10 +813,6 @@
       <translation>Upload annuleren...</translation>
     </message>
     <message>
-      <source>Copy Schedule...</source>
-      <translation>Schema kopiëren...</translation>
-    </message>
-    <message>
       <source>Analytics Engine Settings...</source>
       <translation>Analytics Engine instellingen...</translation>
     </message>
@@ -895,11 +894,11 @@
     </message>
     <message>
       <source>Switch to Cameras &amp; Resources tab</source>
-      <translation type="unfinished">Switch to Cameras &amp; Resources tab</translation>
+      <translation>Overschakelen naar het tabblad Camera's en bronnen</translation>
     </message>
     <message>
       <source>Search Cameras &amp; Resources</source>
-      <translation type="unfinished">Search Cameras &amp; Resources</translation>
+      <translation>Camera's en bronnen zoeken</translation>
     </message>
     <message>
       <source>Connect to Another Server...</source>
@@ -907,67 +906,59 @@
     </message>
     <message>
       <source>New</source>
-      <translation type="unfinished">New</translation>
+      <translation>Nieuw</translation>
     </message>
     <message>
       <source>Welcome Screen</source>
-      <translation type="unfinished">Welcome Screen</translation>
+      <translation>Welkomstscherm</translation>
     </message>
     <message>
       <source>Add Web Page...</source>
-      <translation type="unfinished">Add Web Page...</translation>
+      <translation>Nieuwe webpagina...</translation>
     </message>
     <message>
       <source>Show Servers</source>
-      <translation type="unfinished">Show Servers</translation>
+      <translation>Servers tonen</translation>
     </message>
     <message>
       <source>Save Window Configuration</source>
-      <translation type="unfinished">Save Window Configuration</translation>
+      <translation>Vensterconfiguratie opslaan</translation>
     </message>
     <message>
       <source>Save Windows Configuration</source>
-      <translation type="unfinished">Save Windows Configuration</translation>
+      <translation>Vensterconfiguratie opslaan</translation>
     </message>
     <message>
       <source>Windows Configuration</source>
-      <translation type="unfinished">Windows Configuration</translation>
+      <translation>Vensterconfiguratie</translation>
     </message>
     <message>
       <source>Save Current State</source>
-      <translation type="unfinished">Save Current State</translation>
+      <translation>Huidige status opslaan</translation>
     </message>
     <message>
       <source>Restore Saved State</source>
-      <translation type="unfinished">Restore Saved State</translation>
+      <translation>Opgeslagen staat herstellen</translation>
     </message>
     <message>
       <source>Delete Saved State</source>
-      <translation type="unfinished">Delete Saved State</translation>
+      <translation>Opgeslagen status verwijderen</translation>
     </message>
     <message>
       <source>Close all Windows</source>
-      <translation type="unfinished">Close all Windows</translation>
+      <translation>Sluit alle vensters</translation>
     </message>
     <message>
       <source>Delete Bookmark...</source>
-      <translation type="unfinished">Delete Bookmark...</translation>
+      <translation>Bladwijzer verwijderen...</translation>
     </message>
     <message>
       <source>Delete Bookmarks...</source>
-      <translation type="unfinished">Delete Bookmarks...</translation>
-    </message>
-    <message>
-      <source>Copy Bookmark Text...</source>
-      <translation type="unfinished">Copy Bookmark Text...</translation>
-    </message>
-    <message>
-      <source>Copy Bookmarks Text...</source>
-      <translation type="unfinished">Copy Bookmarks Text...</translation>
+      <translation>Bladwijzer verwijderen...</translation>
     </message>
     <message numerus="yes">
       <source>Show on Items</source>
-      <translation type="unfinished">
+      <translation>
         <numerusform>Show on Items</numerusform>
         <numerusform>Show on Items</numerusform>
       </translation>
@@ -978,39 +969,51 @@
     </message>
     <message>
       <source>Rotate to</source>
-      <translation type="unfinished">Rotate to</translation>
+      <translation>Draai naar</translation>
     </message>
     <message>
       <source>Create Group</source>
-      <translation type="unfinished">Create Group</translation>
+      <translation>Groep aanmaken</translation>
     </message>
     <message>
       <source>Remove Group</source>
-      <translation type="unfinished">Remove Group</translation>
+      <translation>Groep verwijderen</translation>
     </message>
     <message>
       <source>Add Proxied Web Page...</source>
-      <translation type="unfinished">Add Proxied Web Page...</translation>
+      <translation>Proxied webpagina toevoegen...</translation>
     </message>
     <message>
       <source>Cell Spacing</source>
-      <translation type="unfinished">Cell Spacing</translation>
+      <translation>Celafstand</translation>
     </message>
     <message>
       <source>Show Panel</source>
-      <translation type="unfinished">Show Panel</translation>
+      <translation>Paneel tonen</translation>
     </message>
     <message>
       <source>Hide Panel</source>
-      <translation type="unfinished">Hide Panel</translation>
+      <translation>Paneel verbergen</translation>
     </message>
     <message>
       <source>Joystick Settings...</source>
-      <translation type="unfinished">Joystick Settings...</translation>
+      <translation>Joystick-instellingen...</translation>
     </message>
     <message>
       <source>Advanced...</source>
-      <translation type="unfinished">Advanced...</translation>
+      <translation>Geavanceerd...</translation>
+    </message>
+    <message>
+      <source>Copy Bookmark Text</source>
+      <translation>Bladwijzertekst kopiëren</translation>
+    </message>
+    <message>
+      <source>Copy Bookmarks Text</source>
+      <translation>Bladwijzerteksten kopiëren</translation>
+    </message>
+    <message>
+      <source>Web Page Settings...</source>
+      <translation>Webpagina instellingen...</translation>
     </message>
   </context>
   <context>
@@ -1163,7 +1166,7 @@
     </message>
     <message>
       <source>Executable %1 Media File</source>
-      <translation type="unfinished">Executable %1 Media File</translation>
+      <translation>Uitvoerbaar %1 Mediabestand</translation>
     </message>
   </context>
   <context>
@@ -1507,13 +1510,13 @@
       <translation>Gedeelde schermindelingen</translation>
     </message>
     <message>
-      <source>All</source>
-      <extracomment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</extracomment>
-      <translation>Alle</translation>
-    </message>
-    <message>
       <source>Permissions</source>
       <translation>Machtigingen</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <comment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</comment>
+      <translation>Alle</translation>
     </message>
   </context>
   <context>
@@ -1575,7 +1578,7 @@
     </message>
     <message>
       <source>PTZ can only be used in the live mode</source>
-      <translation type="unfinished">PTZ can only be used in the live mode</translation>
+      <translation>PTZ can only be used in the live mode</translation>
     </message>
   </context>
   <context>
@@ -1668,52 +1671,44 @@
       <translation>Uitgeschakeld</translation>
     </message>
     <message>
-      <source>Basic</source>
-      <translation>Basis</translation>
-    </message>
-    <message>
       <source>Recommended</source>
-      <translation type="unfinished">Recommended</translation>
+      <translation>Aanbevolen</translation>
     </message>
     <message>
       <source>Strict</source>
-      <translation type="unfinished">Strict</translation>
+      <translation>Strikt</translation>
     </message>
     <message>
       <source>May lead to privacy issues</source>
-      <translation type="unfinished">May lead to privacy issues</translation>
-    </message>
-    <message>
-      <source>On first connection self-signed certificate is pinned automatically</source>
-      <translation type="unfinished">On first connection self-signed certificate is pinned automatically</translation>
-    </message>
-    <message>
-      <source>Your confirmation will be requested to pin self-signed certificate</source>
-      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificate</translation>
+      <translation>Kan leiden tot privacyproblemen</translation>
     </message>
     <message>
       <source>Connect only servers with public certificate</source>
-      <translation type="unfinished">Connect only servers with public certificate</translation>
+      <translation>Verbind alleen servers met een openbaar certificaat</translation>
     </message>
     <message>
       <source>Certificate storage will be cleared.</source>
-      <translation type="unfinished">Certificate storage will be cleared.</translation>
+      <translation>Certificaatopslag wordt gewist.</translation>
     </message>
     <message>
       <source>Current client instance will be disconnected.</source>
-      <translation type="unfinished">Current client instance will be disconnected.</translation>
+      <translation>De huidige clientinstantie wordt losgekoppeld.</translation>
     </message>
     <message>
       <source>All other client windows will be closed.</source>
-      <translation type="unfinished">All other client windows will be closed.</translation>
+      <translation>Alle andere clientvensters worden gesloten.</translation>
     </message>
     <message>
       <source>Security settings changed</source>
-      <translation type="unfinished">Security settings changed</translation>
+      <translation>Beveiligingsinstellingen gewijzigd</translation>
     </message>
     <message>
       <source>Continue</source>
       <translation>Doorgaan</translation>
+    </message>
+    <message>
+      <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
+      <translation>Bij de eerste verbinding met de server wordt om uw bevestiging gevraagd om het certificaat te accepteren als het fouten bevat</translation>
     </message>
   </context>
   <context>
@@ -2020,11 +2015,11 @@
     </message>
     <message>
       <source>MitM Attack</source>
-      <translation type="unfinished">MitM Attack</translation>
+      <translation>MitM Aanval</translation>
     </message>
     <message>
       <source>MitM attack from server %1</source>
-      <translation type="unfinished">MitM attack from server %1</translation>
+      <translation>MitM-aanval vanaf server %1</translation>
     </message>
   </context>
   <context>
@@ -2301,7 +2296,7 @@
     </message>
     <message>
       <source>Some rules are not valid and may not work</source>
-      <translation type="unfinished">Some rules are not valid and may not work</translation>
+      <translation>Sommige regels zijn niet geldig en werken mogelijk niet</translation>
     </message>
   </context>
   <context>
@@ -2684,7 +2679,7 @@ to %1</source>
     <message>
       <source>Enter your account password to disconnect System from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to disconnect System from %1</translation>
+      <translation>Voer uw accountwachtwoord in om het systeem van %1 los te koppelen</translation>
     </message>
     <message>
       <source>Disconnect</source>
@@ -2693,7 +2688,34 @@ to %1</source>
     <message>
       <source>System disconnected from %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">System disconnected from %1</translation>
+      <translation>Systeem losgekoppeld van %1</translation>
+    </message>
+    <message>
+      <source>You are about to disconnect System from %1</source>
+      <comment>%1 is the cloud name, like Nx Cloud</comment>
+      <translation>U staat op het punt om het systeem te verbreken van %1</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>Alle %1 gebruikers worden verwijderd.</translation>
+    </message>
+    <message>
+      <source>You will be logged out.</source>
+      <translation>U wordt uitgelogd.</translation>
+    </message>
+    <message>
+      <source>System will be accessible through local network with a local administrator account.</source>
+      <translation>Het systeem zal toegankelijk zijn via het lokale netwerk met een lokaal beheerdersaccount.</translation>
+    </message>
+    <message>
+      <source>Continue</source>
+      <translation>Doorgaan</translation>
+    </message>
+    <message>
+      <source>Cannot disconnect the System from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Kan de verbinding voor het systeem niet verbreken van %1</translation>
     </message>
   </context>
   <context>
@@ -2959,27 +2981,35 @@ to %1</source>
     </message>
     <message>
       <source>Save Database Backup</source>
-      <translation type="unfinished">Save Database Backup</translation>
+      <translation>Database back-up opslaan</translation>
     </message>
     <message>
       <source>Enter your account password to create backup</source>
-      <translation type="unfinished">Enter your account password to create backup</translation>
+      <translation>Voer uw accountwachtwoord in om een back-up te maken</translation>
     </message>
     <message>
       <source>Create</source>
-      <translation type="unfinished">Create</translation>
+      <translation>Creëer</translation>
     </message>
     <message>
       <source>Restore from Database Backup</source>
-      <translation type="unfinished">Restore from Database Backup</translation>
+      <translation>Herstellen vanuit Database Backup</translation>
     </message>
     <message>
       <source>Enter your account password to restore System from backup</source>
-      <translation type="unfinished">Enter your account password to restore System from backup</translation>
+      <translation>Voer uw accountwachtwoord in om het systeem vanaf een back-up te herstellen</translation>
     </message>
     <message>
       <source>Restore</source>
       <translation>Herstel</translation>
+    </message>
+    <message>
+      <source>Restore database?</source>
+      <translation>Database herstellen?</translation>
+    </message>
+    <message>
+      <source>System configuration will be restored from backup, Server application will be restarted.</source>
+      <translation>De systeemconfiguratie zal worden hersteld van de backup, de server applicatie wordt opnieuw gestart.</translation>
     </message>
   </context>
   <context>
@@ -3396,6 +3426,10 @@ to %1</source>
       <source>Please enter a value.</source>
       <translation>Voer een waarde in.</translation>
     </message>
+    <message>
+      <source>Please enter a password.</source>
+      <translation>Voer een wachtwoord in alstublieft.</translation>
+    </message>
   </context>
   <context>
     <name>QnIoModuleOverlayWidgetPrivate</name>
@@ -3665,7 +3699,7 @@ to %1</source>
     </message>
     <message>
       <source>You do not have a valid license installed. Please activate your commercial or trial license.</source>
-      <translation type="unfinished">You do not have a valid license installed. Please activate your commercial or trial license.</translation>
+      <translation>U heeft geen geldige licentie geïnstalleerd. Activeer uw commerciële of proeflicentie.</translation>
     </message>
   </context>
   <context>
@@ -3817,10 +3851,6 @@ to %1</source>
       <translation>Zoom-venster maken</translation>
     </message>
     <message>
-      <source>Image Enhancement</source>
-      <translation>Beeldverbetering</translation>
-    </message>
-    <message>
       <source>Hi-Res</source>
       <translation>Hi-Res</translation>
     </message>
@@ -3865,8 +3895,12 @@ to %1</source>
       <translation>Gebiedszoom</translation>
     </message>
     <message>
-      <source>Motion</source>
-      <translation>Beweging</translation>
+      <source>Motion Search</source>
+      <translation>Zoeken op beweging</translation>
+    </message>
+    <message>
+      <source>Object Search</source>
+      <translation>Zoeken op Object</translation>
     </message>
   </context>
   <context>
@@ -4440,6 +4474,10 @@ to %1</source>
       <source>Exit Fullscreen</source>
       <translation>Volledige schermweergave afsluiten</translation>
     </message>
+    <message>
+      <source>Enter Fullscreen</source>
+      <translation>Ga naar volledig scherm</translation>
+    </message>
   </context>
   <context>
     <name>QnRoutingManagementWidget</name>
@@ -4745,21 +4783,21 @@ to %1</source>
     </message>
     <message numerus="yes">
       <source>Certificates</source>
-      <translation type="unfinished">
-        <numerusform>Certificates</numerusform>
-        <numerusform>Certificates</numerusform>
+      <translation>
+        <numerusform>Certificaten</numerusform>
+        <numerusform>Certificaten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Server utilizes these %n SSL certificates to authenticate its identity</source>
-      <translation type="unfinished">
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
-        <numerusform>Server utilizes these %n SSL certificates to authenticate its identity</numerusform>
+      <translation>
+        <numerusform>Server gebruikt deze %n SSL-certificaten om diens identiteit te verifiëren</numerusform>
+        <numerusform>Server gebruikt deze %n SSL-certificaten om diens identiteit te verifiëren</numerusform>
       </translation>
     </message>
     <message>
       <source>Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</source>
-      <translation type="unfinished">Certificate received from the server doesn&apos;t match the certificate this server is pinned to.</translation>
+      <translation>Het certificaat van de server komt niet overeen met het certificaat dat aan deze server is toegewezen.</translation>
     </message>
     <message>
       <source>Details</source>
@@ -5019,15 +5057,15 @@ to %1</source>
     </message>
     <message>
       <source>ARCHIVE ENCRYPTED</source>
-      <translation type="unfinished">ARCHIVE ENCRYPTED</translation>
+      <translation>ARCHIEF VERSLEUTELD</translation>
     </message>
     <message>
       <source>Ask your system administrator to enter the encryption password to decrypt this archive</source>
-      <translation type="unfinished">Ask your system administrator to enter the encryption password to decrypt this archive</translation>
+      <translation>Vraag uw systeembeheerder om het wachtwoord voor het versleutelen in te voeren om dit archief te decoderen</translation>
     </message>
     <message>
       <source>Unlock</source>
-      <translation type="unfinished">Unlock</translation>
+      <translation>Ontgrendelen</translation>
     </message>
   </context>
   <context>
@@ -5152,7 +5190,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Insufficient permissions to store analytics data.</source>
-      <translation type="unfinished">Insufficient permissions to store analytics data.</translation>
+      <translation>Insufficient permissions to store analytics data.</translation>
     </message>
   </context>
   <context>
@@ -5301,7 +5339,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Storage is available but will not be writable because it is too small in comparison to the already present storages</source>
-      <translation type="unfinished">Storage is available but will not be writable because it is too small in comparison to the already present storages</translation>
+      <translation>Opslag is beschikbaar, maar kan niet worden gebruikt, omdat het te klein is in vergelijking met de al aanwezige opslag</translation>
     </message>
   </context>
   <context>
@@ -5485,7 +5523,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Backup storage is not configured</source>
-      <translation type="unfinished">Backup storage is not configured</translation>
+      <translation>Back-upopslag is niet geconfigureerd</translation>
+    </message>
+    <message>
+      <source>Camera recording schedule is invalid</source>
+      <translation>Camera-opnameschema is ongeldig</translation>
     </message>
   </context>
   <context>
@@ -5653,6 +5695,14 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
       <translation>Gebruikers kunnen vanaf een LDAP-server worden geïmporteerd. Ze kunnen alleen inloggen als de LDAP-server online is en hun accounts actief zijn.</translation>
     </message>
+    <message>
+      <source>All users</source>
+      <translation>Alle gebruikers</translation>
+    </message>
+    <message>
+      <source>With enabled digest authentication</source>
+      <translation>Met ingeschakelde digest authenticatie</translation>
+    </message>
   </context>
   <context>
     <name>QnUserProfileWidget</name>
@@ -5674,7 +5724,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>To enable digest authentication password reset is required</source>
-      <translation type="unfinished">To enable digest authentication password reset is required</translation>
+      <translation>Om de digest-verificatie in te schakelen, is het opnieuw instellen van het wachtwoord vereist</translation>
     </message>
   </context>
   <context>
@@ -5794,27 +5844,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Allow digest authentication for this user</source>
-      <translation type="unfinished">Allow digest authentication for this user</translation>
-    </message>
-    <message>
-      <source>Force secure authentication?</source>
-      <translation type="unfinished">Force secure authentication?</translation>
-    </message>
-    <message>
-      <source>To revert this change user password reset will be required.</source>
-      <translation type="unfinished">To revert this change user password reset will be required.</translation>
-    </message>
-    <message>
-      <source>Do not show this message again</source>
-      <translation>Toon dit bericht niet opnieuw</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>Inschakelen</translation>
+      <translation>Sta digest-authenticatie toe voor deze gebruiker</translation>
     </message>
     <message>
       <source>Learn More</source>
-      <translation type="unfinished">Learn More</translation>
+      <translation>Meer informatie</translation>
     </message>
   </context>
   <context>
@@ -5889,11 +5923,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Password reset is required</source>
-      <translation type="unfinished">Password reset is required</translation>
+      <translation>Wachtwoord reset is vereist</translation>
     </message>
     <message>
       <source>Only letters, numbers and symbols %1 are allowed.</source>
-      <translation type="unfinished">Only letters, numbers and symbols %1 are allowed.</translation>
+      <translation>Alleen letters, cijfers en symbolen %1 zijn toegestaan.</translation>
     </message>
   </context>
   <context>
@@ -5961,6 +5995,36 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
   </context>
   <context>
+    <name>QnWebResourceWidget</name>
+    <message>
+      <source>Open this web page?</source>
+      <translation>Deze webpagina openen?</translation>
+    </message>
+    <message>
+      <source>Web page</source>
+      <translation>Web pagina</translation>
+    </message>
+    <message>
+      <source>Connect anyway</source>
+      <translation>Toch verbinden</translation>
+    </message>
+    <message>
+      <source>Web page settings...</source>
+      <translation>Webpagina instellingen...</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this web page presented an untrusted certificate auth.
+We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
+      <comment>%1 is the web page address</comment>
+      <translation>U probeert de
+%1
+te openen, maar deze webpagina bevatte een niet-vertrouwde certificaatverificatie.
+We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u de webpagina openen.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWorkbenchAlarmLayoutHandler</name>
     <message>
       <source>Alarms</source>
@@ -6025,6 +6089,10 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <source>Focusing...</source>
       <translation>Scherpstellen...</translation>
     </message>
+    <message>
+      <source>Camera %1 does not support PTZ</source>
+      <translation>Camera %1 ondersteunt geen PTZ</translation>
+    </message>
   </context>
   <context>
     <name>QnWorkbenchResourcesChangesWatcher</name>
@@ -6075,7 +6143,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Could not open file &apos;%1&apos;. Please check if the folder is accessible</source>
-      <translation type="unfinished">Could not open file &apos;%1&apos;. Please check if the folder is accessible</translation>
+      <translation>Bestand &apos;%1&apos; kon niet worden geopend. Controleer of de map toegankelijk is</translation>
     </message>
   </context>
   <context>
@@ -6566,11 +6634,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Merge this group with %1?</source>
-      <translation type="unfinished">Merge this group with %1?</translation>
+      <translation>Deze groep samenvoegen met %1?</translation>
     </message>
     <message>
       <source>Two groups with the same name cannot exist.</source>
-      <translation type="unfinished">Two groups with the same name cannot exist.</translation>
+      <translation>Er mogen geen twee groepen met dezelfde naam bestaan.</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -6578,19 +6646,19 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">You are about to move these webpages to server &quot;%1&quot;. These webpages proxy all requested contents, and their proxy server will change to server &quot;%1&quot;.</translation>
+      <translation>Je bent bezig met het verplaatsen van deze webpagina's naar server &quot;%1&quot;. Deze webpagina's proxien alle gevraagde inhoud, en hun proxyserver verandert naar server &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>You are about to move this webpage to server &quot;%1&quot;. This webpage proxies all requested contents, and its proxy server will change to server &quot;%1&quot;.</source>
-      <translation type="unfinished">You are about to move this webpage to server &quot;%1&quot;. This webpage proxies all requested contents, and its proxy server will change to server &quot;%1&quot;.</translation>
+      <translation>Je bent bezig met het verplaatsen van deze webpagina naar server &quot;%1&quot;. Deze webpagina proxied alle gevraagde inhoud, en de proxyserver verandert naar server &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage.</translation>
+      <translation>Door alle inhoud te proxien, wordt elke service of elk apparaat op het server-netwerk blootgesteld aan de gebruikers van deze webpagina.</translation>
     </message>
     <message>
       <source>Move anyway?</source>
-      <translation type="unfinished">Move anyway?</translation>
+      <translation>Toch verplaatsen?</translation>
     </message>
     <message>
       <source>Move</source>
@@ -6602,47 +6670,47 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Some devices from %1 will not be moved to %2. Move anyways?</source>
-      <translation type="unfinished">Some devices from %1 will not be moved to %2. Move anyways?</translation>
+      <translation>Sommige apparaten van %1 worden niet verplaatst naar %2. Toch verhuizen?</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>Virtuele camera's, USB- of webcamera's kunnen niet tussen servers worden verplaatst. Deze apparaten blijven op %1 staan:</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>USB of webcamera's kunnen niet tussen servers worden verplaatst. Deze apparaten blijven op %1 staan:</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers. These devices will remain on %1:</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers. These devices will remain on %1:</translation>
+      <translation>Virtuele camera's kunnen niet worden verplaatst tussen servers. Deze apparaten blijven op %1 staan:</translation>
     </message>
     <message>
       <source>Move Group without Them</source>
-      <translation type="unfinished">Move Group without Them</translation>
+      <translation>Groep verplaatsen zonder hen</translation>
     </message>
     <message>
       <source>Virtual cameras, USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras, USB or web cameras cannot be moved between servers</translation>
+      <translation>Virtuele camera's, USB of web camera's kunnen niet worden verplaatst tussen de servers</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains virtual cameras, USB or web cameras</translation>
+      <translation>%1 kan niet worden verplaatst tussen servers omdat het virtuele camera's, USB of webcamera's bevat</translation>
     </message>
     <message>
       <source>Virtual cameras cannot be moved between servers</source>
-      <translation type="unfinished">Virtual cameras cannot be moved between servers</translation>
+      <translation>Virtuele camera's kunnen niet tussen servers worden verplaatst</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains virtual cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains virtual cameras</translation>
+      <translation>%1 kan niet worden verplaatst tussen servers omdat het virtuele camera's bevat</translation>
     </message>
     <message>
       <source>USB or web cameras cannot be moved between servers</source>
-      <translation type="unfinished">USB or web cameras cannot be moved between servers</translation>
+      <translation>USB of webcamera's kunnen niet tussen servers worden verplaatst</translation>
     </message>
     <message>
       <source>%1 cannot be moved between servers as it contains USB or web cameras</source>
-      <translation type="unfinished">%1 cannot be moved between servers as it contains USB or web cameras</translation>
+      <translation>%1 kan niet worden verplaatst tussen servers, omdat het USB of webcamera's bevat</translation>
     </message>
   </context>
   <context>
@@ -6851,33 +6919,33 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Choose devices...</source>
-      <translation type="unfinished">Choose devices...</translation>
+      <translation>Kies apparaten...</translation>
     </message>
     <message>
       <source>Choose cameras...</source>
-      <translation type="unfinished">Choose cameras...</translation>
+      <translation>Kies camera's...</translation>
     </message>
     <message numerus="yes">
       <source>%n chosen devices</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen devices</numerusform>
-        <numerusform>%n chosen devices</numerusform>
+      <translation>
+        <numerusform>%n gekozen apparaten</numerusform>
+        <numerusform>%n gekozen apparaten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n chosen cameras</source>
-      <translation type="unfinished">
-        <numerusform>%n chosen cameras</numerusform>
-        <numerusform>%n chosen cameras</numerusform>
+      <translation>
+        <numerusform>%n gekozen camera's</numerusform>
+        <numerusform>%n gekozen camera's</numerusform>
       </translation>
     </message>
     <message>
       <source>Chosen camera</source>
-      <translation type="unfinished">Chosen camera</translation>
+      <translation>Gekozen camera</translation>
     </message>
     <message>
       <source>Chosen device</source>
-      <translation type="unfinished">Chosen device</translation>
+      <translation>Gekozen apparaat</translation>
     </message>
   </context>
   <context>
@@ -6913,7 +6981,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
-      <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+      <translation>Probeer de filters te wijzigen of configureer objectdetectie in de camera plugin instellingen</translation>
     </message>
   </context>
   <context>
@@ -6931,143 +6999,143 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <name>nx::vms::client::desktop::AudioRedirectPickerWidget</name>
     <message>
       <source>Select Device...</source>
-      <translation type="unfinished">Select Device...</translation>
+      <translation>Selecteer apparaat...</translation>
     </message>
     <message>
       <source>Use audio stream from</source>
-      <translation type="unfinished">Use audio stream from</translation>
+      <translation>Gebruik de audio stream van</translation>
     </message>
     <message>
       <source>Transmit audio stream to</source>
-      <translation type="unfinished">Transmit audio stream to</translation>
+      <translation>Audio-stream verzenden naar</translation>
     </message>
     <message>
       <source>This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</source>
-      <translation type="unfinished">This device does not have an audio input, or it is not configured correctly. Select another device as an audio source.</translation>
+      <translation>Dit apparaat heeft geen audio-input, of het is niet goed geconfigureerd. Selecteer een ander apparaat als audiobron.</translation>
     </message>
     <message>
       <source>This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</source>
-      <translation type="unfinished">This camera does not have an audio input, or it is not configured correctly. Select another camera as an audio source.</translation>
+      <translation>Deze camera heeft geen audio-input, of is niet goed geconfigureerd. Selecteer een andere camera als audiobron.</translation>
     </message>
     <message>
       <source>This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</source>
-      <translation type="unfinished">This device does not have an audio output, or it is not configured correctly. Select another device for audio playback.</translation>
+      <translation>Dit apparaat heeft geen audio output, of het is niet correct geconfigureerd. Selecteer een ander apparaat om audio af te spelen.</translation>
     </message>
     <message>
       <source>This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</source>
-      <translation type="unfinished">This camera does not have an audio output, or it is not configured correctly. Select another camera for audio playback.</translation>
+      <translation>Deze camera heeft geen audio output, of is niet goed geconfigureerd. Selecteer een andere camera om audio af te spelen.</translation>
     </message>
     <message>
       <source>Use this device for audio output</source>
-      <translation type="unfinished">Use this device for audio output</translation>
+      <translation>Dit apparaat gebruiken voor audio output</translation>
     </message>
     <message>
       <source>Use this camera for audio output</source>
-      <translation type="unfinished">Use this camera for audio output</translation>
+      <translation>Gebruik deze camera voor audio output</translation>
     </message>
     <message>
       <source>Use audio stream from another device</source>
-      <translation type="unfinished">Use audio stream from another device</translation>
+      <translation>Audiostream van een ander apparaat gebruiken</translation>
     </message>
     <message>
       <source>Use audio stream from another camera</source>
-      <translation type="unfinished">Use audio stream from another camera</translation>
+      <translation>Gebruik audio stream van een andere camera</translation>
     </message>
     <message>
       <source>Transmit audio stream to another device</source>
-      <translation type="unfinished">Transmit audio stream to another device</translation>
+      <translation>Stuur audio stream naar een ander apparaat</translation>
     </message>
     <message>
       <source>Transmit audio stream to another camera</source>
-      <translation type="unfinished">Transmit audio stream to another camera</translation>
+      <translation>Stuur audio stream naar een andere camera</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio input or it&apos;s not configured. Audio stream is not available.</translation>
+      <translation>Het geselecteerde apparaat heeft geen audio-ingang of is niet geconfigureerd. Audiostream is niet beschikbaar.</translation>
     </message>
     <message>
       <source>Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device doesn&apos;t have audio output or it&apos;s not configured. Audio stream is not available.</translation>
+      <translation>Geselecteerde apparaat heeft geen audio-uitvoer of het is niet geconfigureerd. Audio-stream is niet beschikbaar.</translation>
     </message>
     <message>
       <source>The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected device doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+      <translation>Het geselecteerde apparaat heeft geen audio-ingang of is niet geconfigureerd. Audiostream is niet beschikbaar.</translation>
     </message>
     <message>
       <source>The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</source>
-      <translation type="unfinished">The selected camera doesn&apos;t have an audio input, or it is not configured correctly. The audio stream is not available.</translation>
+      <translation>De geselecteerde camera heeft geen audio-invoer of het is niet goed geconfigureerd. De audio-stream is niet beschikbaar.</translation>
     </message>
     <message>
       <source>The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected device does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+      <translation>Het geselecteerde apparaat heeft geen audio-output, of het is niet correct geconfigureerd. 2-weg audio is niet beschikbaar.</translation>
     </message>
     <message>
       <source>The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</source>
-      <translation type="unfinished">The selected camera does not have an audio output, or it is not configured correctly. 2-way audio is not available.</translation>
+      <translation>De geselecteerde camera heeft geen audio-uitgang of is niet correct geconfigureerd. 2-weg audio is niet beschikbaar.</translation>
     </message>
     <message>
       <source>Use audio stream from this device</source>
-      <translation type="unfinished">Use audio stream from this device</translation>
+      <translation>Audiostream van dit apparaat gebruiken</translation>
     </message>
     <message>
       <source>Use audio stream from this camera</source>
-      <translation type="unfinished">Use audio stream from this camera</translation>
+      <translation>Audiostream van deze camera gebruiken</translation>
     </message>
     <message>
       <source>%1 is connected to another server. Audio stream is not available</source>
-      <translation type="unfinished">%1 is connected to another server. Audio stream is not available</translation>
+      <translation>%1 is verbonden met een andere server. Audio stream is niet beschikbaar</translation>
     </message>
     <message>
       <source>Selected device is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected device is connected to another server. Audio stream is not available.</translation>
+      <translation>Het geselecteerde apparaat is verbonden met een andere server. Audiostream is niet beschikbaar.</translation>
     </message>
     <message>
       <source>Selected camera is connected to another server. Audio stream is not available.</source>
-      <translation type="unfinished">Selected camera is connected to another server. Audio stream is not available.</translation>
+      <translation>De geselecteerde camera is verbonden met een andere server. Audiostream is niet beschikbaar.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupBandwidthSettingsWidget</name>
     <message>
       <source>Select an area on the schedule to apply chosen settings.</source>
-      <translation type="unfinished">Select an area on the schedule to apply chosen settings.</translation>
+      <translation>Selecteer een gebied in het schema om de gekozen instellingen toe te passen.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupQueueSize</name>
     <message numerus="yes">
       <source>%n weeks</source>
-      <translation type="unfinished">
-        <numerusform>%n weeks</numerusform>
-        <numerusform>%n weeks</numerusform>
+      <translation>
+        <numerusform>%n weken</numerusform>
+        <numerusform>%n weken</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n days</source>
-      <translation type="unfinished">
-        <numerusform>%n days</numerusform>
-        <numerusform>%n days</numerusform>
+      <translation>
+        <numerusform>%n dagen</numerusform>
+        <numerusform>%n dagen</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n hours</source>
-      <translation type="unfinished">
-        <numerusform>%n hours</numerusform>
-        <numerusform>%n hours</numerusform>
+      <translation>
+        <numerusform>%n uren</numerusform>
+        <numerusform>%n uren</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n minutes</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes</numerusform>
-        <numerusform>%n minutes</numerusform>
+      <translation>
+        <numerusform>%n minuten</numerusform>
+        <numerusform>%n minuten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n seconds</source>
-      <translation type="unfinished">
-        <numerusform>%n seconds</numerusform>
-        <numerusform>%n seconds</numerusform>
+      <translation>
+        <numerusform>%n seconden</numerusform>
+        <numerusform>%n seconden</numerusform>
       </translation>
     </message>
   </context>
@@ -7075,7 +7143,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
     <message>
       <source>The camera has neither recorded footage nor recording scheduled</source>
-      <translation type="unfinished">The camera has neither recorded footage nor recording scheduled</translation>
+      <translation>De camera heeft geen opgenomen beelden en ook geen opname gepland</translation>
     </message>
     <message>
       <source>Motion detection is disabled</source>
@@ -7083,7 +7151,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>No analytics plugins</source>
-      <translation type="unfinished">No analytics plugins</translation>
+      <translation>Geen analytics plug-ins</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -7091,7 +7159,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>Wat te back-uppen?</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -7099,26 +7167,34 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Cannot be modified for new added cameras</source>
-      <translation type="unfinished">Cannot be modified for new added cameras</translation>
+      <translation>Kan niet worden gewijzigd voor nieuwe toegevoegde camera's</translation>
     </message>
     <message>
       <source>This device provides only one data stream</source>
-      <translation type="unfinished">This device provides only one data stream</translation>
+      <translation>Dit apparaat biedt slechts één gegevensstream aan</translation>
     </message>
     <message>
       <source>Stream setting is not applicable to this device type</source>
-      <translation type="unfinished">Stream setting is not applicable to this device type</translation>
+      <translation>Stream instelling is niet van toepassing op dit apparaat type</translation>
+    </message>
+    <message>
+      <source>Not supported</source>
+      <translation>Niet ondersteund</translation>
+    </message>
+    <message>
+      <source>Backup is not supported for this device</source>
+      <translation>Back-up wordt niet ondersteund voor dit apparaat</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
     <message>
       <source>Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</source>
-      <translation type="unfinished">Use %1 or %2 to select multiple devices for batch edit. Use %3 to select all devices.</translation>
+      <translation>Gebruik %1 of %2 om meerdere apparaten te selecteren voor batchbewerking. Gebruik %3 om alle apparaten te selecteren.</translation>
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>Wat te back-uppen?</translation>
     </message>
     <message>
       <source>Quality</source>
@@ -7126,9 +7202,9 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message numerus="yes">
       <source>Set for %n selected devices</source>
-      <translation type="unfinished">
-        <numerusform>Set for %n selected devices</numerusform>
-        <numerusform>Set for %n selected devices</numerusform>
+      <translation>
+        <numerusform>Instellen voor %n geselecteerde apparaten</numerusform>
+        <numerusform>Instellen voor %n geselecteerde apparaten</numerusform>
       </translation>
     </message>
   </context>
@@ -7136,7 +7212,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <name>nx::vms::client::desktop::BackupSettingsViewWidget</name>
     <message>
       <source>Nothing to backup</source>
-      <translation type="unfinished">Nothing to backup</translation>
+      <translation>Niets te backuppen</translation>
     </message>
   </context>
   <context>
@@ -7147,34 +7223,48 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Bandwidth Limit</source>
-      <translation type="unfinished">Bandwidth Limit</translation>
+      <translation>Bandbreedte limiet</translation>
     </message>
     <message>
       <source>New added cameras</source>
-      <translation type="unfinished">New added cameras</translation>
+      <translation>Nieuw toegevoegde camera's</translation>
     </message>
     <message>
       <source>New added cameras settings will apply to all servers in the system.</source>
-      <translation type="unfinished">New added cameras settings will apply to all servers in the system.</translation>
+      <translation>Nieuw toegevoegde camera-instellingen zijn van toepassing op alle servers in het systeem.</translation>
     </message>
     <message>
       <source>Backup will be turned on for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned on for new added cameras on all servers in the system.</translation>
+      <translation>Back-up wordt ingeschakeld voor nieuw toegevoegde camera's op alle servers in het systeem.</translation>
     </message>
     <message>
       <source>Backup will be turned off for new added cameras on all servers in the system.</source>
-      <translation type="unfinished">Backup will be turned off for new added cameras on all servers in the system.</translation>
+      <translation>Back-up wordt uitgeschakeld voor nieuw toegevoegde camera's op alle servers in het systeem.</translation>
+    </message>
+    <message>
+      <source>Storage Management</source>
+      <translation>Opslagbeheer</translation>
+    </message>
+    <message>
+      <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
+      <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
+      <translation>Om back-up te wijzigen &quot;Hoofd&quot; tot &quot;back-up&quot; op sommige opslagplaatsen in %1</translation>
+    </message>
+    <message>
+      <source>To enable backup add more drives to use them as backup storage in %1</source>
+      <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
+      <translation>Om back-up te activeren voeg je meer schijven toe om ze te gebruiken als back-up opslag in %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupStatusWidget</name>
     <message>
       <source>Backup process will ignore existing footage. Only further recording will be backed up.</source>
-      <translation type="unfinished">Backup process will ignore existing footage. Only further recording will be backed up.</translation>
+      <translation>Het back-upproces negeert bestaande beelden. Er wordt alleen een back-up gemaakt van nieuwe opnames.</translation>
     </message>
     <message>
       <source>Skip backup for existing footage?</source>
-      <translation type="unfinished">Skip backup for existing footage?</translation>
+      <translation>Back-up voor bestaand beeldmateriaal overslaan?</translation>
     </message>
     <message>
       <source>This action cannot be undone.</source>
@@ -7182,20 +7272,20 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Applies only to the cameras connected to current server.</source>
-      <translation type="unfinished">Applies only to the cameras connected to current server.</translation>
+      <translation>Geldt alleen voor de camera's die zijn aangesloten op de huidige server.</translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Backup is enabled for %n devices</numerusform>
-        <numerusform>Backup is enabled for %n devices</numerusform>
+      <translation>
+        <numerusform>Back-up is ingeschakeld voor %n apparaten</numerusform>
+        <numerusform>Back-up is ingeschakeld voor %n apparaten</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>Backup is enabled for %n cameras</source>
-      <translation type="unfinished">
-        <numerusform>Backup is enabled for %n cameras</numerusform>
-        <numerusform>Backup is enabled for %n cameras</numerusform>
+      <translation>
+        <numerusform>Back-up is ingeschakeld voor %n camera's</numerusform>
+        <numerusform>Back-up is ingeschakeld voor %n camera's</numerusform>
       </translation>
     </message>
   </context>
@@ -7221,7 +7311,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Select a time span on the timeline and right-click the highlighted section to create a bookmark</source>
-      <translation type="unfinished">Select a time span on the timeline and right-click the highlighted section to create a bookmark</translation>
+      <translation>Selecteer een tijdspanne op de tijdlijn en klik met de rechtermuisknop op het gemarkeerde gedeelte om een bladwijzer te maken</translation>
     </message>
   </context>
   <context>
@@ -7233,6 +7323,17 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Applying changes...</source>
       <translation>Wijzigingen toepassen...</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::CameraButtonController</name>
+    <message>
+      <source>Heater</source>
+      <translation>Verwarming</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>Ruitenwissers</translation>
     </message>
   </context>
   <context>
@@ -7278,11 +7379,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Automatic selection</source>
-      <translation type="unfinished">Automatic selection</translation>
+      <translation>Automatische selectie</translation>
     </message>
     <message>
       <source>Use if supported</source>
-      <translation type="unfinished">Use if supported</translation>
+      <translation>Gebruiken indien ondersteund</translation>
     </message>
     <message>
       <source>Never</source>
@@ -7290,19 +7391,23 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Force Motion Detection</source>
-      <translation type="unfinished">Force Motion Detection</translation>
+      <translation>Bewegingsdetectie forceren</translation>
     </message>
     <message>
       <source>Pan</source>
-      <translation type="unfinished">Pan</translation>
+      <translation>Pan</translation>
     </message>
     <message>
       <source>Pan &amp; Tilt</source>
-      <translation type="unfinished">Pan &amp; Tilt</translation>
+      <translation>Pan &amp; Tilt</translation>
     </message>
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
       <translation>Instellingen voor de kwaliteit en beeldsnelheid (FPS) in het opnameschema worden niet meer relevant.</translation>
+    </message>
+    <message>
+      <source>Server will not push time settings to the camera.</source>
+      <translation>De server zal geen tijdinstellingen naar de camera pushen.</translation>
     </message>
   </context>
   <context>
@@ -7374,15 +7479,15 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Force Motion Detection</source>
-      <translation type="unfinished">Force Motion Detection</translation>
+      <translation>Bewegingsdetectie forceren</translation>
     </message>
     <message>
       <source>Select areas on the preview to set chosen sensitivity for.</source>
-      <translation type="unfinished">Select areas on the preview to set chosen sensitivity for.</translation>
+      <translation>Selecteer gebieden in de voorvertoning om de gekozen gevoeligheid voor in te stellen.</translation>
     </message>
     <message>
       <source>Choose a motion detection sensitivity and select some areas on the preview to set it for.</source>
-      <translation type="unfinished">Choose a motion detection sensitivity and select some areas on the preview to set it for.</translation>
+      <translation>Kies een gevoeligheid voor bewegingsdetectie en selecteer enkele gebieden in het voorbeeld om deze voor in te stellen.</translation>
     </message>
   </context>
   <context>
@@ -7412,14 +7517,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <translation>Hoge minimumwaarde kan ertoe leiden dat archieflengte afneemt op andere apparaten.</translation>
     </message>
     <message>
-      <source>Motion &amp;&amp; Objects Recording</source>
-      <translation type="unfinished">Motion &amp;&amp; Objects Recording</translation>
-    </message>
-    <message>
-      <source>Motion Recording</source>
-      <translation>Bewegingsopname</translation>
-    </message>
-    <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
       <translation>Een hoge voor-opnametijd verhoogt het RAM-gebruik op de server</translation>
     </message>
@@ -7428,7 +7525,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message>
       <source>Show all devices</source>
-      <translation type="unfinished">Show all devices</translation>
+      <translation>Toon alle apparaten</translation>
     </message>
     <message>
       <source>Show all cameras</source>
@@ -7436,7 +7533,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Select Devices</source>
-      <translation type="unfinished">Select Devices</translation>
+      <translation>Selecteer apparaten</translation>
     </message>
     <message>
       <source>Select Cameras</source>
@@ -7444,11 +7541,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Select Device</source>
-      <translation type="unfinished">Select Device</translation>
+      <translation>Selecteer apparaat</translation>
     </message>
     <message>
       <source>Select Camera</source>
-      <translation type="unfinished">Select Camera</translation>
+      <translation>Selecteer Camera</translation>
     </message>
   </context>
   <context>
@@ -7535,57 +7632,87 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <translation>Plugins</translation>
     </message>
     <message>
-      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation>Bewegingsdetectie is uitgeschakeld, alle opnameschemas &quot;Beweging&quot; en &quot;Motion + Lo-Res&quot; worden gewijzigd in &quot;Altijd&quot;</translation>
-    </message>
-    <message>
-      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation>Dual streaming is uitgeschakeld, alle opnameschemas &quot;Motion + Lo-Res&quot; zullen worden gewijzigd naar &quot;Altijd&quot;</translation>
-    </message>
-    <message>
       <source>Dewarping</source>
       <translation>Dewarping</translation>
+    </message>
+    <message>
+      <source>Change invalid schedule to &quot;Record Always&quot;</source>
+      <translation>Wijzig ongeldig schema naar &quot;Altijd opnemen&quot;</translation>
+    </message>
+    <message>
+      <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
+      <translation>Sommige cellen van het opnameschema zijn ingesteld op een ongeldige opnamemodus: %1. Wanneer u de uren instelt op een ongeldige opnamemodus neemt de camera op in &quot;Altijd opnemen&quot; modus.</translation>
+    </message>
+    <message>
+      <source>Motion Only</source>
+      <translation>Alleen beweging</translation>
+    </message>
+    <message>
+      <source>Objects Only</source>
+      <translation>Alleen objecten</translation>
+    </message>
+    <message>
+      <source>Motion &amp; Objects Only</source>
+      <translation>Alleen beweging &amp; objecten</translation>
+    </message>
+    <message>
+      <source>Motion + Lo-Res</source>
+      <translation>Beweging + Lo-Res</translation>
+    </message>
+    <message>
+      <source>Objects + Lo-Res</source>
+      <translation>Objecten + Lo-Res</translation>
+    </message>
+    <message>
+      <source>Motion &amp; Objects + Lo-Res</source>
+      <translation>Beweging &amp; objecten + Lo-Res</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::CameraSettingsDialogStateConversionFunctions</name>
     <message numerus="yes">
       <source>Failed to enable audio on %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to enable audio on %n devices</numerusform>
-        <numerusform>Failed to enable audio on %n devices</numerusform>
+      <translation>
+        <numerusform>Fout bij het inschakelen van audio op %n apparaten</numerusform>
+        <numerusform>Fout bij het inschakelen van audio op %n apparaten</numerusform>
       </translation>
     </message>
-    <message>
-      <source>These devices do not have an audio input, or it is not configured correctly.</source>
-      <translation type="unfinished">These devices do not have an audio input, or it is not configured correctly.</translation>
+    <message numerus="yes">
+      <source>These devices do not have audio inputs or are not configured correctly.</source>
+      <translation>
+        <numerusform>Deze apparaten hebben geen audio-ingangen of zijn niet correct geconfigureerd.</numerusform>
+        <numerusform>Deze apparaten hebben geen audio-ingangen of zijn niet correct geconfigureerd.</numerusform>
+      </translation>
     </message>
     <message numerus="yes">
       <source>Failed to enable 2-way audio on %n devices</source>
-      <translation type="unfinished">
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
-        <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
+      <translation>
+        <numerusform>2-weg audio op %n apparaten inschakelen mislukt</numerusform>
+        <numerusform>2-weg audio op %n apparaten inschakelen mislukt</numerusform>
+      </translation>
+    </message>
+    <message numerus="yes">
+      <source>These devices do not have audio outputs or are not configured correctly.</source>
+      <translation>
+        <numerusform>Deze apparaten hebben geen audio-uitgangen of zijn niet correct geconfigureerd.</numerusform>
+        <numerusform>Deze apparaten hebben geen audio-uitgangen of zijn niet correct geconfigureerd.</numerusform>
       </translation>
     </message>
     <message>
-      <source>These devices do not have an audio output, or it is not configured correctly.</source>
-      <translation type="unfinished">These devices do not have an audio output, or it is not configured correctly.</translation>
-    </message>
-    <message>
       <source>Audio will be disabled</source>
-      <translation type="unfinished">Audio will be disabled</translation>
+      <translation>Audio wordt uitgeschakeld</translation>
     </message>
     <message>
       <source>You need to select a device that will provide audio.</source>
-      <translation type="unfinished">You need to select a device that will provide audio.</translation>
+      <translation>Je moet een apparaat selecteren dat audio geeft.</translation>
     </message>
     <message>
       <source>2-way audio will be disabled</source>
-      <translation type="unfinished">2-way audio will be disabled</translation>
+      <translation>2-weg audio wordt uitgeschakeld</translation>
     </message>
     <message>
       <source>You need to select a device to transmit the audio stream to and use for audio playback.</source>
-      <translation type="unfinished">You need to select a device to transmit the audio stream to and use for audio playback.</translation>
+      <translation>Je moet een apparaat selecteren om de audio stream naar en te sturen voor het afspelen van audio.</translation>
     </message>
   </context>
   <context>
@@ -7600,10 +7727,10 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message numerus="yes">
       <source>%1 are required</source>
-      <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
-      <translation type="unfinished">
-        <numerusform>%1 are required</numerusform>
-        <numerusform>%1 are required</numerusform>
+      <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
+      <translation>
+        <numerusform>%1 zijn verplicht</numerusform>
+        <numerusform>%1 zijn verplicht</numerusform>
       </translation>
     </message>
   </context>
@@ -7623,11 +7750,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Invalid stream address</source>
-      <translation type="unfinished">Invalid stream address</translation>
+      <translation>Ongeldig stream adres</translation>
     </message>
     <message>
       <source>Streaming protocol mismatch</source>
-      <translation type="unfinished">Streaming protocol mismatch</translation>
+      <translation>Streaming protocol komt niet overeen</translation>
     </message>
   </context>
   <context>
@@ -7635,11 +7762,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Select a certificate to authenticate yourself to %1:</source>
       <extracomment>%1 here is a host name for which you provide a certificate.</extracomment>
-      <translation type="unfinished">Select a certificate to authenticate yourself to %1:</translation>
+      <translation>Selecteer een certificaat om jezelf te verifiëren naar %1:</translation>
     </message>
     <message>
       <source>Select</source>
-      <translation type="unfinished">Select</translation>
+      <translation>Selecteer</translation>
     </message>
   </context>
   <context>
@@ -7682,11 +7809,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Cannot download update file</source>
-      <translation type="unfinished">Cannot download update file</translation>
+      <translation>Kan updatebestand niet downloaden</translation>
     </message>
     <message>
       <source>There is no enough space to download update file</source>
-      <translation type="unfinished">There is no enough space to download update file</translation>
+      <translation>Er is niet genoeg ruimte om het updatebestand te downloaden</translation>
     </message>
   </context>
   <context>
@@ -7725,7 +7852,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Login to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Login to %1</translation>
+      <translation>Inloggen op %1</translation>
     </message>
   </context>
   <context>
@@ -7740,7 +7867,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Could not connect to server. Application will be closed.</source>
-      <translation type="unfinished">Could not connect to server. Application will be closed.</translation>
+      <translation>Kan geen verbinding maken met de server. De applicatie zal worden afgesloten.</translation>
     </message>
     <message>
       <source>Failed to connect to the selected server</source>
@@ -7748,15 +7875,15 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Re-authentication required</source>
-      <translation type="unfinished">Re-authentication required</translation>
+      <translation>Herauthenticatie vereist</translation>
     </message>
     <message>
       <source>Enter password to continue your session</source>
-      <translation type="unfinished">Enter password to continue your session</translation>
+      <translation>Voer wachtwoord in om door te gaan met uw sessie</translation>
     </message>
     <message>
       <source>Your session has expired. Please sign in again to continue.</source>
-      <translation type="unfinished">Your session has expired. Please sign in again to continue.</translation>
+      <translation>Uw sessie is verlopen. Log opnieuw in om door te gaan.</translation>
     </message>
     <message>
       <source>OK</source>
@@ -7768,11 +7895,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <name>nx::vms::client::desktop::ConnectToCloudTool</name>
     <message>
       <source>Local System owner is absent or disabled.</source>
-      <translation type="unfinished">Local System owner is absent or disabled.</translation>
+      <translation>Lokale systeemeigenaar is afwezig of uitgeschakeld.</translation>
     </message>
     <message>
       <source>None of your Servers is connected to the Internet.</source>
-      <translation type="unfinished">None of your Servers is connected to the Internet.</translation>
+      <translation>Geen van uw servers is verbonden met internet.</translation>
     </message>
     <message>
       <source>System connected to %1</source>
@@ -7797,12 +7924,12 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Enter your account password to connect System to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Enter your account password to connect System to %1</translation>
+      <translation>Voer het wachtwoord van uw account in om te verbinden met het systeem met %1</translation>
     </message>
     <message>
       <source>Connect</source>
       <comment>Connect current System to cloud</comment>
-      <translation>Verbinden</translation>
+      <translation>Verbind</translation>
     </message>
     <message>
       <source>Internal server error. Please try again later.</source>
@@ -7830,11 +7957,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Merge Server to the System</source>
       <comment>Dialog title</comment>
-      <translation type="unfinished">Merge Server to the System</translation>
+      <translation>Server samenvoegen met het systeem</translation>
     </message>
     <message>
       <source>Enter your account password to merge Server to the System</source>
-      <translation type="unfinished">Enter your account password to merge Server to the System</translation>
+      <translation>Voer het wachtwoord van uw account in om de server samen te voegen met het systeem</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -7854,7 +7981,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Success</source>
-      <translation>Gelukt</translation>
+      <translation>Succes</translation>
     </message>
     <message>
       <source>Test Failed</source>
@@ -7872,10 +7999,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
   <context>
     <name>nx::vms::client::desktop::CopyScheduleCameraSelectionDialog</name>
     <message>
-      <source>Schedule motion type is not supported by some cameras.</source>
-      <translation>Schema motiondetectie type wordt niet ondersteund door sommige camera's.</translation>
-    </message>
-    <message>
       <source>Recording cannot be enabled for some cameras.</source>
       <translation>Opname kan niet worden ingeschakeld voor sommige camera's.</translation>
     </message>
@@ -7886,6 +8009,10 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Copy archive length settings</source>
       <translation>Kopieer archief lengte-instellingen</translation>
+    </message>
+    <message>
+      <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
+      <translation>Opnameschema bevat opnamemodi die niet worden ondersteund door de geselecteerde camera's. Niet-ondersteunde opnamemodi worden gewijzigd in &quot;Altijd opnemen&quot;.</translation>
     </message>
   </context>
   <context>
@@ -8002,12 +8129,20 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <source>Address field cannot be empty</source>
       <translation>Adresveld mag niet leeg zijn</translation>
     </message>
+    <message>
+      <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
+      <translation>Zoeken naar apparaten op het netwerk is beperkt tot camera's die HTTPS-verbindingen ondersteunen. Dit kan worden gewijzigd in %1 instellingen.</translation>
+    </message>
+    <message>
+      <source>System Administration</source>
+      <translation>Systeembeheer</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::EncryptedArchivePasswordDialog</name>
     <message>
       <source>Decrypt</source>
-      <translation type="unfinished">Decrypt</translation>
+      <translation>Ontsleutelen</translation>
     </message>
     <message>
       <source>Invalid password</source>
@@ -8068,7 +8203,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>Probeer de filters te veranderen of maak een Event regel</translation>
     </message>
   </context>
   <context>
@@ -8124,11 +8259,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Archive is encrypted.</source>
-      <translation type="unfinished">Archive is encrypted.</translation>
+      <translation>Archief is versleuteld.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
-      <translation type="unfinished">Archive is unavailable now. Please try again later.</translation>
+      <translation>Archief is nu niet beschikbaar. Probeer het later opnieuw.</translation>
     </message>
   </context>
   <context>
@@ -8239,11 +8374,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>AVI format is not recommended to export a recording with audio track.</source>
-      <translation type="unfinished">AVI format is not recommended to export a recording with audio track.</translation>
+      <translation>AVI format is not recommended to export a recording with audio track.</translation>
     </message>
     <message>
       <source>Export is not available: This camera does not have a video archive for the selected time period.</source>
-      <translation type="unfinished">Export is not available: This camera does not have a video archive for the selected time period.</translation>
+      <translation>Export is niet beschikbaar: deze camera heeft geen video-archief voor de geselecteerde periode.</translation>
     </message>
   </context>
   <context>
@@ -8251,14 +8386,14 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Exported: %1</source>
       <comment>Duration will be substituted</comment>
-      <translation type="unfinished">Exported: %1</translation>
+      <translation>Geexporteerd: %1</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::FailoverPriorityDialogItemDelegate</name>
     <message>
       <source>No failover</source>
-      <translation type="unfinished">No failover</translation>
+      <translation>Geen failover</translation>
     </message>
     <message>
       <source>Low</source>
@@ -8293,6 +8428,25 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ForceSecureAuthDialog</name>
+    <message>
+      <source>Force secure authentication?</source>
+      <translation>Veilige authenticatie afdwingen?</translation>
+    </message>
+    <message>
+      <source>To revert this change user password reset will be required.</source>
+      <translation>Om deze wijziging ongedaan te maken, is een reset van het gebruikerswachtwoord vereist.</translation>
+    </message>
+    <message>
+      <source>Do not show this message again</source>
+      <translation>Toon dit bericht niet opnieuw</translation>
+    </message>
+    <message>
+      <source>Enable</source>
+      <translation>Inschakelen</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
     <message>
       <source>Brand</source>
@@ -8324,8 +8478,8 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
   <context>
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
-      <source>Click to read more</source>
-      <translation>Klik om meer te lezen</translation>
+      <source>Click on the icon to read more</source>
+      <translation>Klik op het icoon om meer te lezen</translation>
     </message>
   </context>
   <context>
@@ -8476,21 +8630,21 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <name>nx::vms::client::desktop::LocalSessionTokenExpirationWatcher</name>
     <message>
       <source>Your session expires soon</source>
-      <translation type="unfinished">Your session expires soon</translation>
+      <translation>Uw sessie verloopt binnenkort</translation>
     </message>
     <message>
       <source>Re-Authenticate Now</source>
-      <translation type="unfinished">Re-Authenticate Now</translation>
+      <translation>Opnieuw authenticeren</translation>
     </message>
     <message>
       <source>Less than a minute left</source>
-      <translation type="unfinished">Less than a minute left</translation>
+      <translation>Nog minder dan een minuut resterend</translation>
     </message>
     <message numerus="yes">
       <source>%n minutes left</source>
-      <translation type="unfinished">
-        <numerusform>%n minutes left</numerusform>
-        <numerusform>%n minutes left</numerusform>
+      <translation>
+        <numerusform>%n minuten resterend</numerusform>
+        <numerusform>%n minuten resterend</numerusform>
       </translation>
     </message>
   </context>
@@ -8567,7 +8721,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Enter your account password to merge Systems</source>
-      <translation type="unfinished">Enter your account password to merge Systems</translation>
+      <translation>Voer het wachtwoord van uw account in om systemen samen te voegen</translation>
     </message>
     <message>
       <source>Merge</source>
@@ -8624,7 +8778,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</source>
-      <translation type="unfinished">Selected System has an older software version that is incompatible with the current System. Update selected System to the latest build to merge it with the current one.</translation>
+      <translation>Geselecteerd systeem heeft een oudere softwareversie die niet compatibel is met het huidige systeem. Werk het geselecteerde systeem bij naar de laatste build om het samen te voegen met de huidige versie.</translation>
     </message>
     <message>
       <source>The password or user name is invalid.</source>
@@ -8674,11 +8828,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <translation>Beide systemen zijn verbonden met %1. Samenvoegen is niet toegestaan.</translation>
     </message>
     <message>
-      <source>Cloud systems have different owners. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>De cloudsystemen hebben verschillende eigenaren. Samenvoegen is niet toegestaan.</translation>
-    </message>
-    <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
       <translation>Kan de systemen niet samenvoegen, omdat er tenminste één server met hetzelfde ID is. Verwijder deze server en probeer het opnieuw.</translation>
     </message>
@@ -8688,15 +8837,20 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate is invalid.</source>
-      <translation type="unfinished">Connection to Server could not be established. The Server&apos;s certificate is invalid.</translation>
+      <translation>Verbinding met de server kon niet worden gemaakt. Het Server certificaat is ongeldig.</translation>
     </message>
     <message>
       <source>Connection to Server could not be established. The Server&apos;s certificate was rejected.</source>
-      <translation type="unfinished">Connection to Server could not be established. The Server&apos;s certificate was rejected.</translation>
+      <translation>Verbinding met de server kon niet worden gemaakt. Het certificaat van de server is geweigerd.</translation>
     </message>
     <message>
       <source>Unknown error.</source>
       <translation>Onbekende fout.</translation>
+    </message>
+    <message>
+      <source>%1 systems have different owners. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 systemen hebben verschillende eigenaren. Samenvoegen is niet toegestaan.</translation>
     </message>
   </context>
   <context>
@@ -8718,31 +8872,31 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <name>nx::vms::client::desktop::MotionStreamAlerts</name>
     <message>
       <source>Current stream has high resolution. Analyzing it for motion increases CPU load.</source>
-      <translation type="unfinished">Current stream has high resolution. Analyzing it for motion increases CPU load.</translation>
+      <translation>De huidige stream heeft een hoge resolutie. Het analyseren op beweging verhoogt de CPU-belasting.</translation>
     </message>
     <message>
       <source>Motion detection for this camera is not currently working because of changed stream resolution.
 You can force it, but it may significantly increase CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for this camera is not currently working because of changed stream resolution.
-You can force it, but it may significantly increase CPU load.</translation>
+      <translation>Bewegingsdetectie van deze camera werkt momenteel niet vanwege de gewijzigde stream resolutie.
+Je kunt het forceren, maar het kan de CPU-belasting aanzienlijk verhogen.</translation>
     </message>
     <message>
       <source>Motion detection for some cameras will not be working because the remaining stream has too high resolution.
 You can force it, but it may significantly increase CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for some cameras will not be working because the remaining stream has too high resolution.
-You can force it, but it may significantly increase CPU load.</translation>
+      <translation>Bewegingsdetectie voor sommige camera's zal niet werken, omdat de resterende stream een te hoge resolutie heeft.
+Je kunt het forceren, maar het kan de CPU-belasting aanzienlijk verhogen.</translation>
     </message>
     <message>
       <source>Motion detection for this camera will not be working because the remaining stream has too high resolution.
 You can force it, but it may significantly increase CPU load.</source>
       <comment>&quot;
 &quot; is a line break, don&apos;t change it.</comment>
-      <translation type="unfinished">Motion detection for this camera will not be working because the remaining stream has too high resolution.
-You can force it, but it may significantly increase CPU load.</translation>
+      <translation>Bewegingsdetectie van deze camera werkt niet omdat de resterende stream een te hoge resolutie heeft.
+Je kunt het forceren, maar het kan de CPU-belasting aanzienlijk verhogen.</translation>
     </message>
   </context>
   <context>
@@ -9029,7 +9183,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>You are using a custom client. Please contact %1 to get the update instructions.</source>
-      <translation type="unfinished">You are using a custom client. Please contact %1 to get the update instructions.</translation>
+      <translation>U gebruikt een aangepaste client. Neem contact op met %1 om de update-instructies te krijgen.</translation>
     </message>
   </context>
   <context>
@@ -9058,7 +9212,22 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Notifications Settings</source>
-      <translation type="unfinished">Notifications Settings</translation>
+      <translation>Notificatie instellingen</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::OauthLoginPlaceholder</name>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the cloud name like Nx Cloud</comment>
+      <translation>Kan niet verbinden met %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ObjectTrackingButton</name>
+    <message>
+      <source>Object tracking is ON</source>
+      <translation>Object tracking is ON</translation>
     </message>
   </context>
   <context>
@@ -9313,15 +9482,15 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Add Proxied Web Page</source>
-      <translation type="unfinished">Add Proxied Web Page</translation>
+      <translation>Proxied webpagina toevoegen</translation>
     </message>
     <message>
       <source>Add Web Page</source>
-      <translation type="unfinished">Add Web Page</translation>
+      <translation>Webpagina toevoegen</translation>
     </message>
     <message>
       <source>Edit Proxied Web Page</source>
-      <translation type="unfinished">Edit Proxied Web Page</translation>
+      <translation>Proxied webpagina bewerken</translation>
     </message>
     <message>
       <source>Edit Web Page</source>
@@ -9329,7 +9498,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
-      <translation type="unfinished">Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</translation>
+      <translation>Webpagina proxy inschakelen op &lt;b&gt;Algemeen&lt;/b&gt; tab.</translation>
+    </message>
+    <message>
+      <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
+      <translation>Door alle inhoud te proxien, wordt elke service of elk apparaat op het server-netwerk blootgesteld aan de gebruikers van deze webpagina</translation>
     </message>
   </context>
   <context>
@@ -9398,6 +9571,45 @@ You can force it, but it may significantly increase CPU load.</translation>
       <source>Motion + Lo-Res</source>
       <translation>Beweging + Lo-Res</translation>
     </message>
+    <message>
+      <source>Recording motion and objects</source>
+      <translation>Beweging en objecten opnemen</translation>
+    </message>
+    <message>
+      <source>Recording objects only</source>
+      <translation>Alleen objecten opnemen</translation>
+    </message>
+    <message>
+      <source>Recording motion, objects and low quality</source>
+      <translation>Opname beweging, objecten en lage kwaliteit</translation>
+    </message>
+    <message>
+      <source>Recording objects and low quality</source>
+      <translation>Opname objecten en lage kwaliteit</translation>
+    </message>
+    <message>
+      <source>Motion, Objects</source>
+      <translation>Beweging, objecten</translation>
+    </message>
+    <message>
+      <source>Objects only</source>
+      <translation>Alleen objecten</translation>
+    </message>
+    <message>
+      <source>Motion, Objects + Lo-Res</source>
+      <translation>Beweging, objecten + Lo-Res</translation>
+    </message>
+    <message>
+      <source>Objects + Lo-Res</source>
+      <translation>Objecten + Lo-Res</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RemoteConnectionUserInteractionDelegate</name>
+    <message>
+      <source>Connect to System</source>
+      <translation>Verbinden met systeem</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ResourceTreeModelAdapter</name>
@@ -9450,7 +9662,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Analytic</source>
-      <translation type="unfinished">Analytic</translation>
+      <translation>Analytics</translation>
     </message>
     <message>
       <source>Generic</source>
@@ -9458,7 +9670,7 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Input Signal</source>
-      <translation type="unfinished">Input Signal</translation>
+      <translation>Ingangssignaal</translation>
     </message>
     <message>
       <source>Soft Trigger</source>
@@ -9466,11 +9678,11 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
     <message>
       <source>Stream Issue</source>
-      <translation type="unfinished">Stream Issue</translation>
+      <translation>Streamprobleem</translation>
     </message>
     <message>
       <source>Device Disconnect</source>
-      <translation type="unfinished">Device Disconnect</translation>
+      <translation>Apparaat loskoppelen</translation>
     </message>
     <message>
       <source>Device IP Conflict</source>
@@ -9520,38 +9732,38 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Allow system to optimize camera settings&quot; option in the &quot;System Administration&quot; dialog.
 You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Allow system to optimize camera settings&quot; option in the &quot;System Administration&quot; dialog.
-You can still change quality and FPS directly on the camera.</translation>
+      <translation>Instellingen voor kwaliteit en FPS zijn uitgeschakeld vanwege de &quot;Toestaan om camera-instellingen&quot; optie in het &quot;Systeembeheer&quot; dialoogvenster te optimaliseren.
+U kunt de kwaliteit en FPS nog steeds rechtstreeks wijzigen op de camera.</translation>
     </message>
     <message>
       <source>Quality and FPS settings are disabled for some of the selected cameras.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled for some of the selected cameras.</translation>
+      <translation>Instellingen voor kwaliteit en FPS zijn uitgeschakeld voor sommige van de geselecteerde camera's.</translation>
     </message>
     <message>
       <source>Quality and FPS settings are disabled because of the &quot;Keep camera stream and profile settings&quot; option on the &quot;Expert&quot; tab.
 You can still change quality and FPS directly on the camera.</source>
-      <translation type="unfinished">Quality and FPS settings are disabled because of the &quot;Keep camera stream and profile settings&quot; option on the &quot;Expert&quot; tab.
-You can still change quality and FPS directly on the camera.</translation>
+      <translation>Instellingen voor kwaliteit en FPS zijn uitgeschakeld vanwege de &quot;Toestaan om camera-instellingen&quot; optie in het &quot;Systeembeheer&quot; dialoogvenster te optimaliseren.
+U kunt de kwaliteit en FPS nog steeds rechtstreeks wijzigen op de camera.</translation>
     </message>
     <message>
       <source>Motion, Objects</source>
-      <translation type="unfinished">Motion, Objects</translation>
+      <translation>Beweging, objecten</translation>
     </message>
     <message>
       <source>Motion, Objects
  + Low-Res</source>
-      <translation type="unfinished">Motion, Objects
- + Low-Res</translation>
+      <translation>Beweging, Objecten
+ + Lage Resolutie</translation>
     </message>
     <message>
       <source>Objects Only</source>
-      <translation type="unfinished">Objects Only</translation>
+      <translation>Alleen objecten</translation>
     </message>
     <message>
       <source>Objects
  + Low-Res</source>
-      <translation type="unfinished">Objects
- + Low-Res</translation>
+      <translation>Objecten
+ + Lage Resolutie</translation>
     </message>
     <message>
       <source>Motion Only</source>
@@ -9560,8 +9772,88 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>Motion
  + Low-Res</source>
-      <translation type="unfinished">Motion
- + Low-Res</translation>
+      <translation>Beweging
+ + Lage Resolutie</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for some of the selected devices</source>
+      <translation>Bewegingsdetectie is uitgeschakeld voor sommige van de geselecteerde apparaten</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for this camera</source>
+      <translation>Bewegingsdetectie is uitgeschakeld voor deze camera</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for some of the selected cameras</source>
+      <translation>Bewegingsdetectie is uitgeschakeld voor sommige van de geselecteerde camera's</translation>
+    </message>
+    <message>
+      <source>Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>Sommige van de geselecteerde apparaten hebben slechts één stream. Opnames met en zonder beweging delen dezelfde resolutie of kwaliteit.</translation>
+    </message>
+    <message>
+      <source>This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>Deze camera heeft slechts één stream. Opnames met en zonder beweging delen dezelfde resolutie of kwaliteit.</translation>
+    </message>
+    <message>
+      <source>Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>Sommige van de geselecteerde camera's hebben slechts één stream. Opnames met en zonder beweging delen dezelfde resolutie of kwaliteit.</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for some of the selected devices</source>
+      <translation>Object detectie is uitgeschakeld voor sommige van de geselecteerde apparaten</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for this camera</source>
+      <translation>Object detectie is uitgeschakeld voor deze camera</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for some of the selected cameras</source>
+      <translation>Object detectie is uitgeschakeld voor sommige van de geselecteerde camera's</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for some of the selected devices</source>
+      <translation>Beweging &amp; object detectie is uitgeschakeld voor sommige van de geselecteerde apparaten</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for this camera</source>
+      <translation>Beweging &amp; object detectie is uitgeschakeld voor deze camera</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for some of the selected cameras</source>
+      <translation>Beweging &amp; object detectie is uitgeschakeld voor sommige van de geselecteerde camera's</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for this I/O module</source>
+      <translation>Bewegingsdetectie is uitgeschakeld voor deze I/O-module</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for some of the selected I/O modules</source>
+      <translation>Bewegingsdetectie is uitgeschakeld voor sommige van de geselecteerde I/O-modules</translation>
+    </message>
+    <message>
+      <source>This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>Deze I/O-module heeft slechts één stream. Opnames met en zonder beweging delen dezelfde resolutie of kwaliteit.</translation>
+    </message>
+    <message>
+      <source>Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>Sommige van de geselecteerde I/O-modules hebben slechts één stream. Opnames met en zonder beweging delen dezelfde resolutie of kwaliteit.</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for this I/O module</source>
+      <translation>Object detectie is uitgeschakeld voor deze I/O module</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for some of the selected I/O modules</source>
+      <translation>Object detectie is uitgeschakeld voor enkele van de geselecteerde I/O-modules</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for this I/O module</source>
+      <translation>Beweging &amp; object detectie is uitgeschakeld voor deze I/O module</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for some of the selected I/O modules</source>
+      <translation>Beweging &amp; object detectie is uitgeschakeld voor sommige van de geselecteerde I/O-modules</translation>
     </message>
   </context>
   <context>
@@ -9586,96 +9878,143 @@ You can still change quality and FPS directly on the camera.</translation>
       <translation>uur</translation>
     </message>
     <message>
-      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation>Gebruikers worden automatisch uitgelogd als hun sessie de opgegeven duur overschrijdt.</translation>
-    </message>
-    <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
       <translation>Watermerken worden alleen weergegeven voor live, gearchiveerde en geëxporteerde video's voor niet-beheerders. U en andere beheerders zullen ze niet zien.</translation>
     </message>
     <message>
       <source>Archive encryption password</source>
-      <translation type="unfinished">Archive encryption password</translation>
+      <translation>Wachtwoord voor de archiefversleuteling</translation>
     </message>
     <message>
       <source>The encryption password will be required to restore the archive on another system.
 Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</source>
-      <translation type="unfinished">The encryption password will be required to restore the archive on another system.
-Caution: This password cannot be reset. If you lose it, the archive will be unrecoverable.</translation>
+      <translation>Het versleutelingswachtwoord is vereist om het archief op een ander systeem te herstellen.
+Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is het archief niet meer te herstellen.</translation>
     </message>
     <message>
       <source>Encrypts archive data to prevent it from being viewed outside of the system. You will not be required to enter the encryption password to view the video archive within this system.</source>
-      <translation type="unfinished">Encrypts archive data to prevent it from being viewed outside of the system. You will not be required to enter the encryption password to view the video archive within this system.</translation>
+      <translation>Versleutelt archiefgegevens om te voorkomen dat deze buiten het systeem kunnen worden bekeken. U hoeft het coderingswachtwoord niet in te voeren om het videoarchief in dit systeem te bekijken.</translation>
     </message>
     <message>
       <source>Failed to set archive encryption password</source>
-      <translation type="unfinished">Failed to set archive encryption password</translation>
+      <translation>Kan wachtwoord voor archiefversleuteling niet instellen</translation>
     </message>
     <message>
       <source>Does not affect the connections established by server.</source>
-      <translation type="unfinished">Does not affect the connections established by server.</translation>
+      <translation>Heeft geen invloed op de verbindingen die tot stand gebracht zijn door de server.</translation>
     </message>
     <message>
       <source>Enables RTSP traffic encryption.</source>
-      <translation type="unfinished">Enables RTSP traffic encryption.</translation>
+      <translation>Schakelt RTSP encryptie in.</translation>
     </message>
     <message>
       <source>days</source>
       <translation>dagen</translation>
+    </message>
+    <message>
+      <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation>Lokale en LDAP-gebruikers worden automatisch uitgelogd als hun sessie de opgegeven duur overschrijdt.</translation>
+    </message>
+    <message>
+      <source>Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</source>
+      <translation>Onbeperkte levensduur van de gebruikerssessie bedreigt de algehele systeembeveiliging en kan leiden tot degradatie in de systeemprestaties</translation>
+    </message>
+    <message>
+      <source>It is recommended to have user session lifetime not greater than %1</source>
+      <comment>%1 is the time span with time units</comment>
+      <translation>Het wordt aanbevolen om de levensduur van de gebruikerssessie niet te overschrijden met %1</translation>
+    </message>
+    <message>
+      <source>Learn more.</source>
+      <translation>Meer informatie.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
+      <comment>%n is digest user count, %1 is total user count</comment>
+      <translation>
+        <numerusform>%n van de %1 gebruikers mogen digest authenticatie gebruiken (niet beveiligd).</numerusform>
+        <numerusform>%n van de %1 gebruikers mogen digest authenticatie gebruiken (niet beveiligd).</numerusform>
+      </translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateError</name>
     <message>
       <source>Failed to connect to server</source>
-      <translation type="unfinished">Failed to connect to server</translation>
-    </message>
-    <message>
-      <source>Server certificate is invalid.</source>
-      <translation type="unfinished">Server certificate is invalid.</translation>
+      <translation>Kan geen verbinding maken met de server</translation>
     </message>
     <message>
       <source>View certificate</source>
-      <translation type="unfinished">View certificate</translation>
+      <translation>Certificaat bekijken</translation>
+    </message>
+    <message>
+      <source>Server certificate is invalid.</source>
+      <translation>Servercertificaat is ongeldig.</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateViewer</name>
     <message>
       <source>The certificate is pinned to %1</source>
-      <translation type="unfinished">The certificate is pinned to %1</translation>
+      <translation>Het certificaat is vastgezet aan %1</translation>
     </message>
     <message>
       <source>The certificate was presented by %1</source>
-      <translation type="unfinished">The certificate was presented by %1</translation>
+      <translation>Het certificaat werd uitgereikt door %1</translation>
     </message>
     <message>
       <source>Server Id: %1</source>
-      <translation type="unfinished">Server Id: %1</translation>
+      <translation>Server-ID: %1</translation>
     </message>
     <message>
       <source>This certificate does not match the certificate %1 is pinned to.</source>
-      <translation type="unfinished">This certificate does not match the certificate %1 is pinned to.</translation>
+      <translation>Dit certificaat komt niet overeen met het certificaat waaraan %1 is vastgemaakt.</translation>
     </message>
     <message>
       <source>Custom certificate</source>
-      <translation type="unfinished">Custom certificate</translation>
+      <translation>Aangepast certificaat</translation>
     </message>
     <message>
       <source>Pinned certificate</source>
-      <translation type="unfinished">Pinned certificate</translation>
+      <translation>Vastgezet certificaat</translation>
     </message>
     <message>
       <source>Unknown certificate</source>
-      <translation type="unfinished">Unknown certificate</translation>
+      <translation>Onbekend certificaat</translation>
     </message>
     <message>
       <source>This is a custom certificate installed on %1</source>
-      <translation type="unfinished">This is a custom certificate installed on %1</translation>
+      <translation>Dit is een aangepast certificaat geïnstalleerd op %1</translation>
+    </message>
+    <message>
+      <source>Pin this certificate to %1?</source>
+      <translation>Dit certificaat aan %1 vastmaken?</translation>
+    </message>
+    <message>
+      <source>Someone may be impersonating %1 to steel your personal information.
+Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
+      <translation>Iemand kan zich voordoen als %1 om uw persoonlijke gegevens te stelen.
+Pin dit certificaat niet vast als u het %2 server SSL-certificaat niet hebt gewijzigd.</translation>
+    </message>
+    <message>
+      <source>Pin</source>
+      <translation>Vastzetten</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
+    <message>
+      <source>View certificate</source>
+      <translation>Certificaat bekijken</translation>
+    </message>
+    <message>
+      <source>Connect Anyway</source>
+      <translation>Toch verbinden</translation>
+    </message>
+    <message>
+      <source>I trust this server</source>
+      <translation>Ik vertrouw deze server</translation>
+    </message>
     <message>
       <source>System:</source>
       <translation>Systeem:</translation>
@@ -9686,43 +10025,31 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Server ID:</source>
-      <translation type="unfinished">Server ID:</translation>
+      <translation>Server ID:</translation>
     </message>
     <message>
       <source>Trust this server?</source>
-      <translation type="unfinished">Trust this server?</translation>
-    </message>
-    <message>
-      <source>You attempted to connect to %1 but the server presented an untrusted self-signed certificate.</source>
-      <translation type="unfinished">You attempted to connect to %1 but the server presented an untrusted self-signed certificate.</translation>
+      <translation>Deze server vertrouwen?</translation>
     </message>
     <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
-      <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct server.</translation>
+      <translation>Bekijk de details van het certificaat om er zeker van te zijn dat u verbinding maakt met de juiste server.</translation>
     </message>
     <message>
       <source>Cannot verify the identity of %1</source>
-      <translation type="unfinished">Cannot verify the identity of %1</translation>
+      <translation>Kan de identiteit van %1 niet verifiëren</translation>
     </message>
     <message>
       <source>Someone may be impersonating %1 to steal your personal information.</source>
-      <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.</translation>
-    </message>
-    <message>
-      <source>View certificate</source>
-      <translation type="unfinished">View certificate</translation>
-    </message>
-    <message>
-      <source>Connect Anyway</source>
-      <translation type="unfinished">Connect Anyway</translation>
-    </message>
-    <message>
-      <source>I trust this server</source>
-      <translation type="unfinished">I trust this server</translation>
+      <translation>Iemand kan zich voordoen als %1 om uw persoonlijke gegevens te stelen.</translation>
     </message>
     <message>
       <source>Do not connect to this server unless instructed by your VMS administrator.</source>
-      <translation type="unfinished">Do not connect to this server unless instructed by your VMS administrator.</translation>
+      <translation>Maak geen verbinding met deze server, tenzij deze wordt geïnstrueerd door uw VMS-beheerder.</translation>
+    </message>
+    <message>
+      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
+      <translation>U hebt geprobeerd te verbinden met: %1, maar de server heeft een certificaat gepresenteerd dat niet automatisch kan worden geverifieerd.</translation>
     </message>
   </context>
   <context>
@@ -9736,7 +10063,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>There are no suitable servers</source>
-      <translation type="unfinished">There are no suitable servers</translation>
+      <translation>Er zijn geen geschikte servers</translation>
     </message>
   </context>
   <context>
@@ -9807,7 +10134,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>unknown status</source>
-      <translation type="unfinished">unknown status</translation>
+      <translation>onbekende status</translation>
     </message>
   </context>
   <context>
@@ -9879,11 +10206,11 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <name>nx::vms::client::desktop::SessionRefreshDialog</name>
     <message>
       <source>Login</source>
-      <translation>Gebruikersnaam</translation>
+      <translation>Login</translation>
     </message>
     <message>
       <source>Password</source>
-      <translation>Password</translation>
+      <translation>Wachtwoord</translation>
     </message>
     <message>
       <source>Unknown error</source>
@@ -9916,7 +10243,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>Probeer de filters te wijzigen of activeer beweging opname</translation>
     </message>
   </context>
   <context>
@@ -9938,6 +10265,17 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message>
       <source>Set Passwords</source>
       <translation>Wachtwoorden instellen</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording schedule is invalid for %n cameras</source>
+      <translation>
+        <numerusform>Het opnameschema is ongeldig voor %n camera's</numerusform>
+        <numerusform>Het opnameschema is ongeldig voor %n camera's</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
+      <translation>Opnameschema op sommige camera's bevat opnamemodi die niet worden ondersteund.</translation>
     </message>
   </context>
   <context>
@@ -10117,7 +10455,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <name>nx::vms::client::desktop::VersionSelectionDialog</name>
     <message>
       <source>Select Version</source>
-      <translation type="unfinished">Select Version</translation>
+      <translation>Selecteer versie</translation>
     </message>
     <message>
       <source>Version</source>
@@ -10125,7 +10463,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Invalid version.</source>
-      <translation type="unfinished">Invalid version.</translation>
+      <translation>Ongeldige versie.</translation>
     </message>
     <message>
       <source>Password</source>
@@ -10195,11 +10533,11 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <name>nx::vms::client::desktop::WelcomeScreen</name>
     <message>
       <source>Are you sure you want to hide this tile?</source>
-      <translation type="unfinished">Are you sure you want to hide this tile?</translation>
+      <translation>Weet je zeker dat je deze tegel wilt verbergen?</translation>
     </message>
     <message>
       <source>You will be able to access the %1 login menu at any time by clicking the cloud icon on the navigation panel.</source>
-      <translation type="unfinished">You will be able to access the %1 login menu at any time by clicking the cloud icon on the navigation panel.</translation>
+      <translation>U heeft op elk moment toegang tot het login menu van %1 door te klikken op het cloud icoon in het navigatie paneel.</translation>
     </message>
     <message>
       <source>Hide</source>
@@ -10207,7 +10545,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Unable to connect to the system because it has become offline</source>
-      <translation type="unfinished">Unable to connect to the system because it has become offline</translation>
+      <translation>Kan geen verbinding maken met het systeem omdat het offline is </translation>
     </message>
   </context>
   <context>
@@ -10320,7 +10658,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <name>nx::vms::client::desktop::backup_settings_view::BackupSettingsViewStrings</name>
     <message>
       <source>All archive</source>
-      <translation type="unfinished">All archive</translation>
+      <translation>Alle archieven</translation>
     </message>
     <message>
       <source>Motion</source>
@@ -10336,15 +10674,15 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>High-Res</source>
-      <translation type="unfinished">High-Res</translation>
+      <translation>Hi-Res</translation>
     </message>
     <message>
       <source>Low-Res</source>
-      <translation type="unfinished">Low-Res</translation>
+      <translation>Low-Res</translation>
     </message>
     <message>
       <source>All streams</source>
-      <translation type="unfinished">All streams</translation>
+      <translation>Alle streams</translation>
     </message>
   </context>
   <context>
@@ -10416,18 +10754,47 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <name>nx::vms::client::desktop::entity_resource_tree::resource_grouping::ResourceGroupingStrings</name>
     <message>
       <source>New Group</source>
-      <translation type="unfinished">New Group</translation>
+      <translation>Nieuwe groep</translation>
     </message>
     <message>
       <source>New Group %1</source>
-      <translation type="unfinished">New Group %1</translation>
+      <translation>Nieuwe groep %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
+    <message>
+      <source>Intercom Alarm Layout</source>
+      <translation>Intercom Alarmlayschermindeling</translation>
+    </message>
+    <message>
+      <source>Intercom Open Door</source>
+      <translation>Intercom Open deur</translation>
+    </message>
+    <message>
+      <source>Open door</source>
+      <translation>Open door</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::OverlappedIdDialogModel</name>
+    <message>
+      <source>Latest</source>
+      <translation>Latest</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::OverlappedIdIntegration</name>
+    <message>
+      <source>Overlapped ID...</source>
+      <translation>Overlappende ID...</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::joystick::JoystickButtonActionChoiceModel</name>
     <message>
       <source>No Action</source>
-      <translation type="unfinished">No Action</translation>
+      <translation>Geen actie</translation>
     </message>
     <message>
       <source>Focus Near</source>
@@ -10439,46 +10806,80 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Autofocus</source>
-      <translation type="unfinished">Autofocus</translation>
+      <translation>Autofocus</translation>
     </message>
     <message>
       <source>Go to PTZ Position</source>
-      <translation type="unfinished">Go to PTZ Position</translation>
+      <translation>Ga naar PTZ Positie</translation>
     </message>
     <message>
       <source>Set to Fullscreen</source>
-      <translation type="unfinished">Set to Fullscreen</translation>
+      <translation>Schakelen naar volledige schermweergave</translation>
     </message>
     <message>
       <source>Next Camera on Layout</source>
-      <translation type="unfinished">Next Camera on Layout</translation>
+      <translation>Volgende camera op de schermindeling</translation>
     </message>
     <message>
       <source>Previous Camera on Layout</source>
-      <translation type="unfinished">Previous Camera on Layout</translation>
+      <translation>Vorige camera op de schermindeling</translation>
     </message>
     <message>
       <source>Open Layout</source>
-      <translation type="unfinished">Open Layout</translation>
+      <translation>Open schermindeling</translation>
     </message>
     <message>
       <source>Modifier</source>
-      <translation type="unfinished">Modifier</translation>
+      <translation>Bewerker</translation>
     </message>
     <message>
       <source>Multiple</source>
-      <translation type="unfinished">Multiple</translation>
+      <translation>Meerdere</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::joystick::JoystickButtonSettingsModel</name>
     <message>
       <source>Select Layout...</source>
-      <translation type="unfinished">Select Layout...</translation>
+      <translation>Selecteer schermindeling...</translation>
     </message>
     <message>
       <source>Button</source>
-      <translation type="unfinished">Button</translation>
+      <translation>Knop</translation>
+    </message>
+    <message>
+      <source>Selected Layout</source>
+      <translation>Geselecteerde schermindeling</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::jsapi::detail::ResourcesApiBackend</name>
+    <message>
+      <source>Resource is not available for the usage with JS API</source>
+      <translation>Bron is niet beschikbaar voor gebruik met de JS API</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
+    <message>
+      <source>Cannot find an item with the specified id</source>
+      <translation>Kan geen item vinden met de opgegeven id</translation>
+    </message>
+    <message>
+      <source>Cannot find a resource with the specified id.</source>
+      <translation>Kan geen bron vinden met het opgegeven id.</translation>
+    </message>
+    <message>
+      <source>Cannot specify a media parameters for the resource without media stream.</source>
+      <translation>Kan geen mediaparameters opgeven voor de bron zonder mediastream.</translation>
+    </message>
+    <message>
+      <source>Cannot add the resource to the layout</source>
+      <translation>Kan de bron niet toevoegen aan de schermindeling</translation>
+    </message>
+    <message>
+      <source>Cannot find a widget corresponding to the specified item.</source>
+      <translation>Kan geen widget vinden die overeenkomt met het opgegeven item.</translation>
     </message>
   </context>
   <context>
@@ -10512,7 +10913,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <name>nx::vms::client::desktop::ui::AnalyticsSdkObjectDetectedWidget</name>
     <message>
       <source>Analytics object detection can be set up on a certain cameras.</source>
-      <translation type="unfinished">Analytics object detection can be set up on a certain cameras.</translation>
+      <translation>Analytics-object detectie kan worden ingesteld op bepaalde camera's.</translation>
     </message>
     <message>
       <source>Choose cameras using the button above to see the list of supported events.</source>
@@ -10520,7 +10921,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</source>
-      <translation type="unfinished">Event will trigger only if there are matches any of attributes. You can see the names of the attributes and their values on the Objects tab.</translation>
+      <translation>Gebeurtenis wordt alleen geactiveerd als er overeenkomsten zijn met een van de kenmerken. U kunt de namen van de attributen en hun waarden zien op het tabblad Objecten.</translation>
     </message>
   </context>
   <context>
@@ -10631,7 +11032,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>Regions of Interest</source>
-      <translation type="unfinished">Regions of Interest</translation>
+      <translation>Regio's van belang</translation>
     </message>
   </context>
   <context>
@@ -10901,7 +11302,25 @@ U kunt een andere opslaglocatie selecteren in het tabblad &quot;Opslagbeheer&quo
     </message>
     <message>
       <source>Window configuration saved</source>
-      <translation type="unfinished">Window configuration saved</translation>
+      <translation>Vensterconfiguratie opgeslagen</translation>
+    </message>
+    <message>
+      <source>This build is for demo purposes only.</source>
+      <translation>Deze build is alleen voor demo-doeleinden.</translation>
+    </message>
+    <message>
+      <source>It cannot be upgraded to subsequent builds as they become available.</source>
+      <translation>Het kan niet worden geüpgraded naar volgende builds zodra deze beschikbaar komen.</translation>
+    </message>
+    <message>
+      <source>To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</source>
+      <comment>%1 is the product name</comment>
+      <translation>Om te upgraden, verwijdert u %1 voordat u een bijgewerkte build installeert (alle gegevens gaan verloren).</translation>
+    </message>
+    <message>
+      <source>%1 Beta</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 Beta</translation>
     </message>
   </context>
   <context>
@@ -10911,8 +11330,8 @@ U kunt een andere opslaglocatie selecteren in het tabblad &quot;Opslagbeheer&quo
       <translation>Gebruik de toetsenbordpijlen om te wisselen van schermindeling. Druk op Esc om de showreel te verlaten.</translation>
     </message>
     <message>
-      <source>Press any key to stop the tour.</source>
-      <translation>Druk op een willekeurige toets om de tour te stoppen.</translation>
+      <source>Press Esc to stop the tour.</source>
+      <translation>Druk op Esc om de tour te stoppen.</translation>
     </message>
   </context>
   <context>
@@ -10975,7 +11394,7 @@ U kunt een andere opslaglocatie selecteren in het tabblad &quot;Opslagbeheer&quo
     <name>nx::vms::client::desktop::ui::workbench::ResourceGroupingActionHandler</name>
     <message>
       <source>Maximum level of nesting is reached</source>
-      <translation type="unfinished">Maximum level of nesting is reached</translation>
+      <translation>Maximaal nestniveau is bereikt</translation>
     </message>
   </context>
   <context>
@@ -11096,13 +11515,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::workbench::timeline::TimelineSliderTooltip</name>
-    <message>
-      <source>Local File</source>
-      <translation type="unfinished">Local File</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::workbench::timeline::VolumeSlider</name>
     <message>
       <source>Muted</source>
@@ -11113,40 +11525,44 @@ to view more bookmarks</source>
     <name>nx::vms::update::desktop::ClientUpdateManager</name>
     <message>
       <source>Restart Client</source>
-      <translation type="unfinished">Restart Client</translation>
+      <translation>Cliënt herstarten</translation>
     </message>
     <message>
       <source>Updates Settings</source>
-      <translation type="unfinished">Updates Settings</translation>
+      <translation>Updates instellingen</translation>
     </message>
     <message>
       <source>Client update is installed</source>
-      <translation type="unfinished">Client update is installed</translation>
+      <translation>Client update is geïnstalleerd</translation>
     </message>
     <message>
       <source>Client is updated to version %1. Restart %2 to finish update.</source>
       <comment>%1 is a version like &apos;4.3.0&apos;, %2 is a VMS name like &apos;Nx Witness&apos;</comment>
-      <translation type="unfinished">Client is updated to version %1. Restart %2 to finish update.</translation>
+      <translation>Client is bijgewerkt naar versie %1. Start %2 opnieuw om de update af te ronden.</translation>
     </message>
     <message>
       <source>Automatic client updates</source>
-      <translation type="unfinished">Automatic client updates</translation>
+      <translation>Automatische client updates</translation>
     </message>
     <message>
       <source>New client-only updates will be installed automatically. You can change this in the settings.</source>
-      <translation type="unfinished">New client-only updates will be installed automatically. You can change this in the settings.</translation>
+      <translation>Nieuwe 'Client' updates worden automatisch geïnstalleerd. U kunt dit wijzigen in de instellingen.</translation>
     </message>
     <message>
       <source>Cannot check for update.</source>
-      <translation type="unfinished">Cannot check for update.</translation>
+      <translation>Kan niet controleren op updates.</translation>
     </message>
     <message>
       <source>Client update package is broken.</source>
-      <translation type="unfinished">Client update package is broken.</translation>
+      <translation>Client-updatepakket werkt niet.</translation>
     </message>
     <message>
       <source>Client update package is missing for current platform.</source>
-      <translation type="unfinished">Client update package is missing for current platform.</translation>
+      <translation>Client-updatepakket ontbreekt voor het huidige platform.</translation>
+    </message>
+    <message>
+      <source>Can&apos;t check client update availability. Check your internet connection and try again.</source>
+      <translation>Kan de beschikbaarheid van de client updates niet controleren. Controleer uw internetverbinding en probeer het opnieuw.</translation>
     </message>
   </context>
 </TS>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="sr" sourcelanguage="en">
+<TS version="2.1" language="sr_SP" sourcelanguage="en">
   <context>
     <name>AnalyticsSearchWidget::Private</name>
     <message>
@@ -22,6 +22,14 @@
     <message>
       <source>Any plugin</source>
       <translation type="unfinished">Any plugin</translation>
+    </message>
+    <message numerus="yes">
+      <source>%1 with %n attributes</source>
+      <translation type="unfinished">
+        <numerusform>%1 with %n attributes</numerusform>
+        <numerusform>%1 with %n attributes</numerusform>
+        <numerusform>%1 with %n attributes</numerusform>
+      </translation>
     </message>
     <message>
       <source>Any subtype</source>
@@ -494,10 +502,6 @@
       <translation type="unfinished">Stop Sharing Layout</translation>
     </message>
     <message>
-      <source>Edit...</source>
-      <translation type="unfinished">Edit...</translation>
-    </message>
-    <message>
       <source>Rename</source>
       <translation type="unfinished">Rename</translation>
     </message>
@@ -810,10 +814,6 @@
       <translation type="unfinished">Cancel Upload...</translation>
     </message>
     <message>
-      <source>Copy Schedule...</source>
-      <translation type="unfinished">Copy Schedule...</translation>
-    </message>
-    <message>
       <source>Analytics Engine Settings...</source>
       <translation type="unfinished">Analytics Engine Settings...</translation>
     </message>
@@ -957,14 +957,6 @@
       <source>Delete Bookmarks...</source>
       <translation type="unfinished">Delete Bookmarks...</translation>
     </message>
-    <message>
-      <source>Copy Bookmark Text...</source>
-      <translation type="unfinished">Copy Bookmark Text...</translation>
-    </message>
-    <message>
-      <source>Copy Bookmarks Text...</source>
-      <translation type="unfinished">Copy Bookmarks Text...</translation>
-    </message>
     <message numerus="yes">
       <source>Show on Items</source>
       <translation type="unfinished">
@@ -1012,6 +1004,18 @@
     <message>
       <source>Advanced...</source>
       <translation type="unfinished">Advanced...</translation>
+    </message>
+    <message>
+      <source>Copy Bookmark Text</source>
+      <translation type="unfinished">Copy Bookmark Text</translation>
+    </message>
+    <message>
+      <source>Copy Bookmarks Text</source>
+      <translation type="unfinished">Copy Bookmarks Text</translation>
+    </message>
+    <message>
+      <source>Web Page Settings...</source>
+      <translation type="unfinished">Web Page Settings...</translation>
     </message>
   </context>
   <context>
@@ -1522,13 +1526,13 @@
       <translation type="unfinished">Shared Layouts</translation>
     </message>
     <message>
-      <source>All</source>
-      <extracomment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</extracomment>
-      <translation type="unfinished">All</translation>
-    </message>
-    <message>
       <source>Permissions</source>
       <translation type="unfinished">Permissions</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <comment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</comment>
+      <translation type="unfinished">All</translation>
     </message>
   </context>
   <context>
@@ -1683,10 +1687,6 @@
       <translation type="unfinished">Disabled</translation>
     </message>
     <message>
-      <source>Basic</source>
-      <translation type="unfinished">Basic</translation>
-    </message>
-    <message>
       <source>Recommended</source>
       <translation type="unfinished">Recommended</translation>
     </message>
@@ -1697,14 +1697,6 @@
     <message>
       <source>May lead to privacy issues</source>
       <translation type="unfinished">May lead to privacy issues</translation>
-    </message>
-    <message>
-      <source>On first connection self-signed certificate is pinned automatically</source>
-      <translation type="unfinished">On first connection self-signed certificate is pinned automatically</translation>
-    </message>
-    <message>
-      <source>Your confirmation will be requested to pin self-signed certificate</source>
-      <translation type="unfinished">Your confirmation will be requested to pin self-signed certificate</translation>
     </message>
     <message>
       <source>Connect only servers with public certificate</source>
@@ -1729,6 +1721,10 @@
     <message>
       <source>Continue</source>
       <translation type="unfinished">Continue</translation>
+    </message>
+    <message>
+      <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
+      <translation type="unfinished">On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</translation>
     </message>
   </context>
   <context>
@@ -2734,6 +2730,33 @@ to %1</translation>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation type="unfinished">System disconnected from %1</translation>
     </message>
+    <message>
+      <source>You are about to disconnect System from %1</source>
+      <comment>%1 is the cloud name, like Nx Cloud</comment>
+      <translation type="unfinished">You are about to disconnect System from %1</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">All %1 users will be deleted.</translation>
+    </message>
+    <message>
+      <source>You will be logged out.</source>
+      <translation type="unfinished">You will be logged out.</translation>
+    </message>
+    <message>
+      <source>System will be accessible through local network with a local administrator account.</source>
+      <translation type="unfinished">System will be accessible through local network with a local administrator account.</translation>
+    </message>
+    <message>
+      <source>Continue</source>
+      <translation type="unfinished">Continue</translation>
+    </message>
+    <message>
+      <source>Cannot disconnect the System from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Cannot disconnect the System from %1</translation>
+    </message>
   </context>
   <context>
     <name>QnCloudResultInfo</name>
@@ -3020,6 +3043,14 @@ to %1</translation>
     <message>
       <source>Restore</source>
       <translation type="unfinished">Restore</translation>
+    </message>
+    <message>
+      <source>Restore database?</source>
+      <translation type="unfinished">Restore database?</translation>
+    </message>
+    <message>
+      <source>System configuration will be restored from backup, Server application will be restarted.</source>
+      <translation type="unfinished">System configuration will be restored from backup, Server application will be restarted.</translation>
     </message>
   </context>
   <context>
@@ -3442,6 +3473,10 @@ to %1</translation>
     <message>
       <source>Please enter a value.</source>
       <translation type="unfinished">Please enter a value.</translation>
+    </message>
+    <message>
+      <source>Please enter a password.</source>
+      <translation type="unfinished">Please enter a password.</translation>
     </message>
   </context>
   <context>
@@ -3871,10 +3906,6 @@ to %1</translation>
       <translation type="unfinished">Create Zoom Window</translation>
     </message>
     <message>
-      <source>Image Enhancement</source>
-      <translation type="unfinished">Image Enhancement</translation>
-    </message>
-    <message>
       <source>Hi-Res</source>
       <translation type="unfinished">Hi-Res</translation>
     </message>
@@ -3920,8 +3951,12 @@ to %1</translation>
       <translation type="unfinished">Area Zoom</translation>
     </message>
     <message>
-      <source>Motion</source>
-      <translation type="unfinished">Motion</translation>
+      <source>Motion Search</source>
+      <translation type="unfinished">Motion Search</translation>
+    </message>
+    <message>
+      <source>Object Search</source>
+      <translation type="unfinished">Object Search</translation>
     </message>
   </context>
   <context>
@@ -4502,6 +4537,10 @@ to %1</translation>
     <message>
       <source>Exit Fullscreen</source>
       <translation type="unfinished">Exit Fullscreen</translation>
+    </message>
+    <message>
+      <source>Enter Fullscreen</source>
+      <translation type="unfinished">Enter Fullscreen</translation>
     </message>
   </context>
   <context>
@@ -5558,6 +5597,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Backup storage is not configured</source>
       <translation type="unfinished">Backup storage is not configured</translation>
     </message>
+    <message>
+      <source>Camera recording schedule is invalid</source>
+      <translation type="unfinished">Camera recording schedule is invalid</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -5724,6 +5767,14 @@ If you intended to move analytics data to another storage location, please conta
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
       <translation type="unfinished">Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</translation>
     </message>
+    <message>
+      <source>All users</source>
+      <translation type="unfinished">All users</translation>
+    </message>
+    <message>
+      <source>With enabled digest authentication</source>
+      <translation type="unfinished">With enabled digest authentication</translation>
+    </message>
   </context>
   <context>
     <name>QnUserProfileWidget</name>
@@ -5867,22 +5918,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Allow digest authentication for this user</source>
       <translation type="unfinished">Allow digest authentication for this user</translation>
-    </message>
-    <message>
-      <source>Force secure authentication?</source>
-      <translation type="unfinished">Force secure authentication?</translation>
-    </message>
-    <message>
-      <source>To revert this change user password reset will be required.</source>
-      <translation type="unfinished">To revert this change user password reset will be required.</translation>
-    </message>
-    <message>
-      <source>Do not show this message again</source>
-      <translation type="unfinished">Do not show this message again</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation type="unfinished">Enable</translation>
     </message>
     <message>
       <source>Learn More</source>
@@ -6034,6 +6069,36 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>QnWebResourceWidget</name>
+    <message>
+      <source>Open this web page?</source>
+      <translation type="unfinished">Open this web page?</translation>
+    </message>
+    <message>
+      <source>Web page</source>
+      <translation type="unfinished">Web page</translation>
+    </message>
+    <message>
+      <source>Connect anyway</source>
+      <translation type="unfinished">Connect anyway</translation>
+    </message>
+    <message>
+      <source>Web page settings...</source>
+      <translation type="unfinished">Web page settings...</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this web page presented an untrusted certificate auth.
+We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
+      <comment>%1 is the web page address</comment>
+      <translation type="unfinished">You try to open the
+%1
+but this web page presented an untrusted certificate auth.
+We recommend you not to open this web page. If you understand the risks, you can open the web page.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWorkbenchAlarmLayoutHandler</name>
     <message>
       <source>Alarms</source>
@@ -6098,6 +6163,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Focusing...</source>
       <translation type="unfinished">Focusing...</translation>
+    </message>
+    <message>
+      <source>Camera %1 does not support PTZ</source>
+      <translation type="unfinished">Camera %1 does not support PTZ</translation>
     </message>
   </context>
   <context>
@@ -7223,6 +7292,14 @@ If you intended to move analytics data to another storage location, please conta
       <source>Stream setting is not applicable to this device type</source>
       <translation type="unfinished">Stream setting is not applicable to this device type</translation>
     </message>
+    <message>
+      <source>Not supported</source>
+      <translation type="unfinished">Not supported</translation>
+    </message>
+    <message>
+      <source>Backup is not supported for this device</source>
+      <translation type="unfinished">Backup is not supported for this device</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
@@ -7279,6 +7356,20 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Backup will be turned off for new added cameras on all servers in the system.</source>
       <translation type="unfinished">Backup will be turned off for new added cameras on all servers in the system.</translation>
+    </message>
+    <message>
+      <source>Storage Management</source>
+      <translation type="unfinished">Storage Management</translation>
+    </message>
+    <message>
+      <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
+      <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
+      <translation type="unfinished">To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</translation>
+    </message>
+    <message>
+      <source>To enable backup add more drives to use them as backup storage in %1</source>
+      <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
+      <translation type="unfinished">To enable backup add more drives to use them as backup storage in %1</translation>
     </message>
   </context>
   <context>
@@ -7354,6 +7445,17 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::CameraButtonController</name>
+    <message>
+      <source>Heater</source>
+      <translation type="unfinished">Heater</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation type="unfinished">Wiper</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>
@@ -7422,6 +7524,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
       <translation type="unfinished">Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</translation>
+    </message>
+    <message>
+      <source>Server will not push time settings to the camera.</source>
+      <translation type="unfinished">Server will not push time settings to the camera.</translation>
     </message>
   </context>
   <context>
@@ -7530,14 +7636,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation type="unfinished">High minimum value can lead to archive length decrease on other cameras.</translation>
-    </message>
-    <message>
-      <source>Motion &amp;&amp; Objects Recording</source>
-      <translation type="unfinished">Motion &amp;&amp; Objects Recording</translation>
-    </message>
-    <message>
-      <source>Motion Recording</source>
-      <translation type="unfinished">Motion Recording</translation>
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
@@ -7658,16 +7756,40 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Plugins</translation>
     </message>
     <message>
-      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation type="unfinished">Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
-    </message>
-    <message>
-      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation type="unfinished">Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</translation>
-    </message>
-    <message>
       <source>Dewarping</source>
       <translation type="unfinished">Dewarping</translation>
+    </message>
+    <message>
+      <source>Change invalid schedule to &quot;Record Always&quot;</source>
+      <translation type="unfinished">Change invalid schedule to &quot;Record Always&quot;</translation>
+    </message>
+    <message>
+      <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
+      <translation type="unfinished">Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</translation>
+    </message>
+    <message>
+      <source>Motion Only</source>
+      <translation type="unfinished">Motion Only</translation>
+    </message>
+    <message>
+      <source>Objects Only</source>
+      <translation type="unfinished">Objects Only</translation>
+    </message>
+    <message>
+      <source>Motion &amp; Objects Only</source>
+      <translation type="unfinished">Motion &amp; Objects Only</translation>
+    </message>
+    <message>
+      <source>Motion + Lo-Res</source>
+      <translation type="unfinished">Motion + Lo-Res</translation>
+    </message>
+    <message>
+      <source>Objects + Lo-Res</source>
+      <translation type="unfinished">Objects + Lo-Res</translation>
+    </message>
+    <message>
+      <source>Motion &amp; Objects + Lo-Res</source>
+      <translation type="unfinished">Motion &amp; Objects + Lo-Res</translation>
     </message>
   </context>
   <context>
@@ -7680,9 +7802,13 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>Failed to enable audio on %n devices</numerusform>
       </translation>
     </message>
-    <message>
-      <source>These devices do not have an audio input, or it is not configured correctly.</source>
-      <translation type="unfinished">These devices do not have an audio input, or it is not configured correctly.</translation>
+    <message numerus="yes">
+      <source>These devices do not have audio inputs or are not configured correctly.</source>
+      <translation type="unfinished">
+        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+        <numerusform>These devices do not have audio inputs or are not configured correctly.</numerusform>
+      </translation>
     </message>
     <message numerus="yes">
       <source>Failed to enable 2-way audio on %n devices</source>
@@ -7692,9 +7818,13 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>Failed to enable 2-way audio on %n devices</numerusform>
       </translation>
     </message>
-    <message>
-      <source>These devices do not have an audio output, or it is not configured correctly.</source>
-      <translation type="unfinished">These devices do not have an audio output, or it is not configured correctly.</translation>
+    <message numerus="yes">
+      <source>These devices do not have audio outputs or are not configured correctly.</source>
+      <translation type="unfinished">
+        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+        <numerusform>These devices do not have audio outputs or are not configured correctly.</numerusform>
+      </translation>
     </message>
     <message>
       <source>Audio will be disabled</source>
@@ -7726,7 +7856,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%1 are required</source>
-      <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
+      <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
       <translation type="unfinished">
         <numerusform>%1 are required</numerusform>
         <numerusform>%1 are required</numerusform>
@@ -7999,10 +8129,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::CopyScheduleCameraSelectionDialog</name>
     <message>
-      <source>Schedule motion type is not supported by some cameras.</source>
-      <translation type="unfinished">Schedule motion type is not supported by some cameras.</translation>
-    </message>
-    <message>
       <source>Recording cannot be enabled for some cameras.</source>
       <translation type="unfinished">Recording cannot be enabled for some cameras.</translation>
     </message>
@@ -8013,6 +8139,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Copy archive length settings</source>
       <translation type="unfinished">Copy archive length settings</translation>
+    </message>
+    <message>
+      <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
+      <translation type="unfinished">Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</translation>
     </message>
   </context>
   <context>
@@ -8131,6 +8261,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Address field cannot be empty</source>
       <translation type="unfinished">Address field cannot be empty</translation>
+    </message>
+    <message>
+      <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
+      <translation type="unfinished">Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</translation>
+    </message>
+    <message>
+      <source>System Administration</source>
+      <translation type="unfinished">System Administration</translation>
     </message>
   </context>
   <context>
@@ -8425,6 +8563,25 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ForceSecureAuthDialog</name>
+    <message>
+      <source>Force secure authentication?</source>
+      <translation type="unfinished">Force secure authentication?</translation>
+    </message>
+    <message>
+      <source>To revert this change user password reset will be required.</source>
+      <translation type="unfinished">To revert this change user password reset will be required.</translation>
+    </message>
+    <message>
+      <source>Do not show this message again</source>
+      <translation type="unfinished">Do not show this message again</translation>
+    </message>
+    <message>
+      <source>Enable</source>
+      <translation type="unfinished">Enable</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
     <message>
       <source>Brand</source>
@@ -8458,8 +8615,8 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
-      <source>Click to read more</source>
-      <translation type="unfinished">Click to read more</translation>
+      <source>Click on the icon to read more</source>
+      <translation type="unfinished">Click on the icon to read more</translation>
     </message>
   </context>
   <context>
@@ -8809,11 +8966,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation type="unfinished">Both Systems are connected to %1. Merge is not allowed.</translation>
     </message>
     <message>
-      <source>Cloud systems have different owners. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Cloud systems have different owners. Merge is not allowed.</translation>
-    </message>
-    <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
       <translation type="unfinished">Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</translation>
     </message>
@@ -8832,6 +8984,11 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Unknown error.</source>
       <translation type="unfinished">Unknown error.</translation>
+    </message>
+    <message>
+      <source>%1 systems have different owners. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">%1 systems have different owners. Merge is not allowed.</translation>
     </message>
   </context>
   <context>
@@ -9198,6 +9355,21 @@ You can force it, but it may significantly increase CPU load.</translation>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::OauthLoginPlaceholder</name>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the cloud name like Nx Cloud</comment>
+      <translation type="unfinished">Cannot connect to %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ObjectTrackingButton</name>
+    <message>
+      <source>Object tracking is ON</source>
+      <translation type="unfinished">Object tracking is ON</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
@@ -9469,6 +9641,10 @@ You can force it, but it may significantly increase CPU load.</translation>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
       <translation type="unfinished">Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</translation>
     </message>
+    <message>
+      <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
+      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::RadassActionFactory</name>
@@ -9536,6 +9712,45 @@ You can force it, but it may significantly increase CPU load.</translation>
     <message>
       <source>Motion + Lo-Res</source>
       <translation type="unfinished">Motion + Lo-Res</translation>
+    </message>
+    <message>
+      <source>Recording motion and objects</source>
+      <translation type="unfinished">Recording motion and objects</translation>
+    </message>
+    <message>
+      <source>Recording objects only</source>
+      <translation type="unfinished">Recording objects only</translation>
+    </message>
+    <message>
+      <source>Recording motion, objects and low quality</source>
+      <translation type="unfinished">Recording motion, objects and low quality</translation>
+    </message>
+    <message>
+      <source>Recording objects and low quality</source>
+      <translation type="unfinished">Recording objects and low quality</translation>
+    </message>
+    <message>
+      <source>Motion, Objects</source>
+      <translation type="unfinished">Motion, Objects</translation>
+    </message>
+    <message>
+      <source>Objects only</source>
+      <translation type="unfinished">Objects only</translation>
+    </message>
+    <message>
+      <source>Motion, Objects + Lo-Res</source>
+      <translation type="unfinished">Motion, Objects + Lo-Res</translation>
+    </message>
+    <message>
+      <source>Objects + Lo-Res</source>
+      <translation type="unfinished">Objects + Lo-Res</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RemoteConnectionUserInteractionDelegate</name>
+    <message>
+      <source>Connect to System</source>
+      <translation type="unfinished">Connect to System</translation>
     </message>
   </context>
   <context>
@@ -9707,6 +9922,86 @@ You can still change quality and FPS directly on the camera.</translation>
       <translation type="unfinished">Motion
  + Low-Res</translation>
     </message>
+    <message>
+      <source>Motion detection is disabled for some of the selected devices</source>
+      <translation type="unfinished">Motion detection is disabled for some of the selected devices</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for this camera</source>
+      <translation type="unfinished">Motion detection is disabled for this camera</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for some of the selected cameras</source>
+      <translation type="unfinished">Motion detection is disabled for some of the selected cameras</translation>
+    </message>
+    <message>
+      <source>Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation type="unfinished">Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+    </message>
+    <message>
+      <source>This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation type="unfinished">This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+    </message>
+    <message>
+      <source>Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation type="unfinished">Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for some of the selected devices</source>
+      <translation type="unfinished">Object detection is disabled for some of the selected devices</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for this camera</source>
+      <translation type="unfinished">Object detection is disabled for this camera</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for some of the selected cameras</source>
+      <translation type="unfinished">Object detection is disabled for some of the selected cameras</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for some of the selected devices</source>
+      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected devices</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for this camera</source>
+      <translation type="unfinished">Motion &amp; object detection is disabled for this camera</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for some of the selected cameras</source>
+      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected cameras</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for this I/O module</source>
+      <translation type="unfinished">Motion detection is disabled for this I/O module</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for some of the selected I/O modules</source>
+      <translation type="unfinished">Motion detection is disabled for some of the selected I/O modules</translation>
+    </message>
+    <message>
+      <source>This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation type="unfinished">This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+    </message>
+    <message>
+      <source>Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation type="unfinished">Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for this I/O module</source>
+      <translation type="unfinished">Object detection is disabled for this I/O module</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for some of the selected I/O modules</source>
+      <translation type="unfinished">Object detection is disabled for some of the selected I/O modules</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for this I/O module</source>
+      <translation type="unfinished">Motion &amp; object detection is disabled for this I/O module</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for some of the selected I/O modules</source>
+      <translation type="unfinished">Motion &amp; object detection is disabled for some of the selected I/O modules</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SearchLineEdit</name>
@@ -9728,10 +10023,6 @@ You can still change quality and FPS directly on the camera.</translation>
     <message>
       <source>hours</source>
       <translation type="unfinished">hours</translation>
-    </message>
-    <message>
-      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation type="unfinished">Users will be automatically logged out if their session exceeds the specified duration.</translation>
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
@@ -9767,6 +10058,32 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <source>days</source>
       <translation type="unfinished">days</translation>
     </message>
+    <message>
+      <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation type="unfinished">Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</translation>
+    </message>
+    <message>
+      <source>Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</source>
+      <translation type="unfinished">Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</translation>
+    </message>
+    <message>
+      <source>It is recommended to have user session lifetime not greater than %1</source>
+      <comment>%1 is the time span with time units</comment>
+      <translation type="unfinished">It is recommended to have user session lifetime not greater than %1</translation>
+    </message>
+    <message>
+      <source>Learn more.</source>
+      <translation type="unfinished">Learn more.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
+      <comment>%n is digest user count, %1 is total user count</comment>
+      <translation type="unfinished">
+        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
+        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
+        <numerusform>%n out of %1 users are allowed to use digest authentication (not secure).</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateError</name>
@@ -9775,12 +10092,12 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <translation type="unfinished">Failed to connect to server</translation>
     </message>
     <message>
-      <source>Server certificate is invalid.</source>
-      <translation type="unfinished">Server certificate is invalid.</translation>
-    </message>
-    <message>
       <source>View certificate</source>
       <translation type="unfinished">View certificate</translation>
+    </message>
+    <message>
+      <source>Server certificate is invalid.</source>
+      <translation type="unfinished">Server certificate is invalid.</translation>
     </message>
   </context>
   <context>
@@ -9817,9 +10134,35 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <source>This is a custom certificate installed on %1</source>
       <translation type="unfinished">This is a custom certificate installed on %1</translation>
     </message>
+    <message>
+      <source>Pin this certificate to %1?</source>
+      <translation type="unfinished">Pin this certificate to %1?</translation>
+    </message>
+    <message>
+      <source>Someone may be impersonating %1 to steel your personal information.
+Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
+      <translation type="unfinished">Someone may be impersonating %1 to steel your personal information.
+Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</translation>
+    </message>
+    <message>
+      <source>Pin</source>
+      <translation type="unfinished">Pin</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
+    <message>
+      <source>View certificate</source>
+      <translation type="unfinished">View certificate</translation>
+    </message>
+    <message>
+      <source>Connect Anyway</source>
+      <translation type="unfinished">Connect Anyway</translation>
+    </message>
+    <message>
+      <source>I trust this server</source>
+      <translation type="unfinished">I trust this server</translation>
+    </message>
     <message>
       <source>System:</source>
       <translation type="unfinished">System:</translation>
@@ -9837,10 +10180,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <translation type="unfinished">Trust this server?</translation>
     </message>
     <message>
-      <source>You attempted to connect to %1 but the server presented an untrusted self-signed certificate.</source>
-      <translation type="unfinished">You attempted to connect to %1 but the server presented an untrusted self-signed certificate.</translation>
-    </message>
-    <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
       <translation type="unfinished">Review the certificate&apos;s details to make sure you are connecting to the correct server.</translation>
     </message>
@@ -9853,20 +10192,12 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <translation type="unfinished">Someone may be impersonating %1 to steal your personal information.</translation>
     </message>
     <message>
-      <source>View certificate</source>
-      <translation type="unfinished">View certificate</translation>
-    </message>
-    <message>
-      <source>Connect Anyway</source>
-      <translation type="unfinished">Connect Anyway</translation>
-    </message>
-    <message>
-      <source>I trust this server</source>
-      <translation type="unfinished">I trust this server</translation>
-    </message>
-    <message>
       <source>Do not connect to this server unless instructed by your VMS administrator.</source>
       <translation type="unfinished">Do not connect to this server unless instructed by your VMS administrator.</translation>
+    </message>
+    <message>
+      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
+      <translation type="unfinished">You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</translation>
     </message>
   </context>
   <context>
@@ -10085,6 +10416,18 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message>
       <source>Set Passwords</source>
       <translation type="unfinished">Set Passwords</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording schedule is invalid for %n cameras</source>
+      <translation type="unfinished">
+        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
+        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
+        <numerusform>Recording schedule is invalid for %n cameras</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
+      <translation type="unfinished">Recording schedule on some cameras contains recording modes that are not supported.</translation>
     </message>
   </context>
   <context>
@@ -10574,6 +10917,35 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
+    <message>
+      <source>Intercom Alarm Layout</source>
+      <translation type="unfinished">Intercom Alarm Layout</translation>
+    </message>
+    <message>
+      <source>Intercom Open Door</source>
+      <translation type="unfinished">Intercom Open Door</translation>
+    </message>
+    <message>
+      <source>Open door</source>
+      <translation type="unfinished">Open door</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::OverlappedIdDialogModel</name>
+    <message>
+      <source>Latest</source>
+      <translation type="unfinished">Latest</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::OverlappedIdIntegration</name>
+    <message>
+      <source>Overlapped ID...</source>
+      <translation type="unfinished">Overlapped ID...</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::joystick::JoystickButtonActionChoiceModel</name>
     <message>
       <source>No Action</source>
@@ -10629,6 +11001,40 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message>
       <source>Button</source>
       <translation type="unfinished">Button</translation>
+    </message>
+    <message>
+      <source>Selected Layout</source>
+      <translation type="unfinished">Selected Layout</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::jsapi::detail::ResourcesApiBackend</name>
+    <message>
+      <source>Resource is not available for the usage with JS API</source>
+      <translation type="unfinished">Resource is not available for the usage with JS API</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
+    <message>
+      <source>Cannot find an item with the specified id</source>
+      <translation type="unfinished">Cannot find an item with the specified id</translation>
+    </message>
+    <message>
+      <source>Cannot find a resource with the specified id.</source>
+      <translation type="unfinished">Cannot find a resource with the specified id.</translation>
+    </message>
+    <message>
+      <source>Cannot specify a media parameters for the resource without media stream.</source>
+      <translation type="unfinished">Cannot specify a media parameters for the resource without media stream.</translation>
+    </message>
+    <message>
+      <source>Cannot add the resource to the layout</source>
+      <translation type="unfinished">Cannot add the resource to the layout</translation>
+    </message>
+    <message>
+      <source>Cannot find a widget corresponding to the specified item.</source>
+      <translation type="unfinished">Cannot find a widget corresponding to the specified item.</translation>
     </message>
   </context>
   <context>
@@ -11063,6 +11469,24 @@ You can select another storage location in the &quot;Storage Management&quot; ta
       <source>Window configuration saved</source>
       <translation type="unfinished">Window configuration saved</translation>
     </message>
+    <message>
+      <source>This build is for demo purposes only.</source>
+      <translation type="unfinished">This build is for demo purposes only.</translation>
+    </message>
+    <message>
+      <source>It cannot be upgraded to subsequent builds as they become available.</source>
+      <translation type="unfinished">It cannot be upgraded to subsequent builds as they become available.</translation>
+    </message>
+    <message>
+      <source>To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</source>
+      <comment>%1 is the product name</comment>
+      <translation type="unfinished">To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</translation>
+    </message>
+    <message>
+      <source>%1 Beta</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">%1 Beta</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::workbench::LayoutTourExecutor</name>
@@ -11071,8 +11495,8 @@ You can select another storage location in the &quot;Storage Management&quot; ta
       <translation type="unfinished">Use keyboard arrows to switch layouts. To exit the showreel press Esc.</translation>
     </message>
     <message>
-      <source>Press any key to stop the tour.</source>
-      <translation type="unfinished">Press any key to stop the tour.</translation>
+      <source>Press Esc to stop the tour.</source>
+      <translation type="unfinished">Press Esc to stop the tour.</translation>
     </message>
   </context>
   <context>
@@ -11257,13 +11681,6 @@ to view more bookmarks</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::workbench::timeline::TimelineSliderTooltip</name>
-    <message>
-      <source>Local File</source>
-      <translation type="unfinished">Local File</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::workbench::timeline::VolumeSlider</name>
     <message>
       <source>Muted</source>
@@ -11308,6 +11725,10 @@ to view more bookmarks</translation>
     <message>
       <source>Client update package is missing for current platform.</source>
       <translation type="unfinished">Client update package is missing for current platform.</translation>
+    </message>
+    <message>
+      <source>Can&apos;t check client update availability. Check your internet connection and try again.</source>
+      <translation type="unfinished">Can&apos;t check client update availability. Check your internet connection and try again.</translation>
     </message>
   </context>
 </TS>

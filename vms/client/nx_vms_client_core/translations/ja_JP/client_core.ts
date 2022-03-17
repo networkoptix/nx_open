@@ -69,19 +69,6 @@
   <context>
     <name>RemoteConnectionErrorStrings</name>
     <message>
-      <source>If this error persists, please contact your VMS administrator.</source>
-      <translation>このエラーが解決しない場合は、VMS管理者にお問い合わせください。</translation>
-    </message>
-    <message>
-      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1 への接続はまだできていません。サーバーのインターネット接続を確認するか、後でもう一度お試しください。</translation>
-    </message>
-    <message>
-      <source>Connection to Server could not be established. Try again later.</source>
-      <translation>サーバーへの接続を確立できませんでした。後でもう一度お試しください。</translation>
-    </message>
-    <message>
       <source>Client version: %1</source>
       <translation>クライアントのバージョン: %1</translation>
     </message>
@@ -140,17 +127,8 @@
       <translation>LDAPサーバーとの接続がタイムアウトしました。</translation>
     </message>
     <message>
-      <source>Log in to %1 to log in to this system with cloud user</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>クラウドユーザーでこのシステムにログインするには、 %1 にログインしてください</translation>
-    </message>
-    <message>
       <source>Session expired. Re-enter your password.</source>
       <translation>セッションの有効期限が切れました。パスワードを再入力してください。</translation>
-    </message>
-    <message>
-      <source>Session duration limit can be changed by the system administrators</source>
-      <translation>セッション期間の制限はシステム管理者が変更できます</translation>
     </message>
     <message>
       <source>Invalid login or password</source>
@@ -165,10 +143,6 @@
       <translation>ユーザーは無効になっています</translation>
     </message>
     <message>
-      <source>This user is disabled by VMS administrator.</source>
-      <translation>このユーザーはVMS管理者によって無効にされています。</translation>
-    </message>
-    <message>
       <source>Too many attempts. Try again in a minute.</source>
       <translation>試行回数が多すぎます。しばらくしてからもう一度お試しください。</translation>
     </message>
@@ -179,6 +153,50 @@
     <message>
       <source>Internal error. Please try again later.</source>
       <translation>内部エラーが発生しました。後でもう一度お試しください。</translation>
+    </message>
+    <message>
+      <source>If this error persists, please contact your system administrator.</source>
+      <translation>このエラーが解決しない場合は、システム管理者にお問い合わせください。</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check your internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 への接続はまだ準備ができていません。インターネット接続を確認するか、後でもう一度お試しください。</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 への接続はまだ準備ができていません。サーバーのインターネット接続を確認するか、後でもう一度お試しください。</translation>
+    </message>
+    <message>
+      <source>Connection to the server could not be established. Try again later.</source>
+      <translation>サーバーへの接続を確立できませんでした。後でもう一度お試しください。</translation>
+    </message>
+    <message>
+      <source>Your session has expired</source>
+      <translation>セッションの有効期限が切れました</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 again.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 に再度ログインしてください。</translation>
+    </message>
+    <message>
+      <source>Log in to %1 to log in to this system with %2 user</source>
+      <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
+      <translation>%2 ユーザーとしてこのシステムにログインするには、 %1 にログインしてください</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by a system administrator.</source>
+      <translation>セッションの有効期限は、システム管理者が変更できます。</translation>
+    </message>
+    <message>
+      <source>This user has been disabled by a system administrator.</source>
+      <translation>このユーザーはシステム管理者によって無効にされています。</translation>
+    </message>
+    <message>
+      <source>Too many login attempts. Try again in a minute.</source>
+      <translation>ログイン試行回数が多すぎます。しばらくしてからもう一度お試しください。</translation>
     </message>
   </context>
 </TS>

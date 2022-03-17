@@ -39,10 +39,6 @@
       <translation>%1 är inte tillgänglig ännu. Försök igen senare.</translation>
     </message>
     <message>
-      <source>The user is disabled. Please contact your system administrator.</source>
-      <translation>Användaren är inaktiverad. Kontakta din systemadministratör.</translation>
-    </message>
-    <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
       <translation>Användaren är utelåst på grund av flera misslyckade försök. Vänligen försök igen senare.</translation>
     </message>
@@ -57,6 +53,10 @@
     <message>
       <source>Internal server error (%1). Please contact your system administrator.</source>
       <translation>Internt serverfel (%1). Kontakta din systemadministratör.</translation>
+    </message>
+    <message>
+      <source>This user has been disabled by a system administrator.</source>
+      <translation>Den här användaren är inaktiverad av systemadministratören.</translation>
     </message>
   </context>
   <context>

@@ -69,19 +69,6 @@
   <context>
     <name>RemoteConnectionErrorStrings</name>
     <message>
-      <source>If this error persists, please contact your VMS administrator.</source>
-      <translation>Si este error persiste, por favor póngase en contacto con su administrador de VMS.</translation>
-    </message>
-    <message>
-      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>La conexión con %1 aún no está lista. Compruebe la conexión a internet del servidor o intente otra vez más tarde.</translation>
-    </message>
-    <message>
-      <source>Connection to Server could not be established. Try again later.</source>
-      <translation>No se pudo establecer la conexión con el servidor. Inténtalo de nuevo más tarde.</translation>
-    </message>
-    <message>
       <source>Client version: %1</source>
       <translation>Versión del cliente: %1</translation>
     </message>
@@ -140,17 +127,8 @@
       <translation>Conexión del servidor LDAP ha excedido el tiempo de espera.</translation>
     </message>
     <message>
-      <source>Log in to %1 to log in to this system with cloud user</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Inicie sesión en %1 para iniciar sesión en este sistema con el usuario de la nube</translation>
-    </message>
-    <message>
       <source>Session expired. Re-enter your password.</source>
       <translation>Sesión caducada. Vuelva a introducir su contraseña.</translation>
-    </message>
-    <message>
-      <source>Session duration limit can be changed by the system administrators</source>
-      <translation>El límite de duración de la sesión puede ser cambiado por los administradores del sistema</translation>
     </message>
     <message>
       <source>Invalid login or password</source>
@@ -165,10 +143,6 @@
       <translation>Usuario está deshabilitado</translation>
     </message>
     <message>
-      <source>This user is disabled by VMS administrator.</source>
-      <translation>Este usuario está deshabilitado por el administrador del sistema.</translation>
-    </message>
-    <message>
       <source>Too many attempts. Try again in a minute.</source>
       <translation>Demasiados intentos. Inténtalo de nuevo en un minuto.</translation>
     </message>
@@ -179,6 +153,50 @@
     <message>
       <source>Internal error. Please try again later.</source>
       <translation>Error interno. Por favor Inténtalo más tarde.</translation>
+    </message>
+    <message>
+      <source>If this error persists, please contact your system administrator.</source>
+      <translation type="unfinished">If this error persists, please contact your system administrator.</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check your internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Connection to %1 is not ready yet. Check your internet connection or try again later.</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</translation>
+    </message>
+    <message>
+      <source>Connection to the server could not be established. Try again later.</source>
+      <translation type="unfinished">Connection to the server could not be established. Try again later.</translation>
+    </message>
+    <message>
+      <source>Your session has expired</source>
+      <translation>Su sesión ha expirado</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 again.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Please log in to %1 again.</translation>
+    </message>
+    <message>
+      <source>Log in to %1 to log in to this system with %2 user</source>
+      <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">Log in to %1 to log in to this system with %2 user</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by a system administrator.</source>
+      <translation type="unfinished">Session duration limit can be changed by a system administrator.</translation>
+    </message>
+    <message>
+      <source>This user has been disabled by a system administrator.</source>
+      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+    </message>
+    <message>
+      <source>Too many login attempts. Try again in a minute.</source>
+      <translation type="unfinished">Too many login attempts. Try again in a minute.</translation>
     </message>
   </context>
 </TS>

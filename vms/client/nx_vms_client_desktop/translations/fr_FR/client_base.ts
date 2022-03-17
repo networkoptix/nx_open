@@ -23,6 +23,13 @@
       <source>Any plugin</source>
       <translation>N'importe quel plugin</translation>
     </message>
+    <message numerus="yes">
+      <source>%1 with %n attributes</source>
+      <translation>
+        <numerusform>%1 avec %n attribut</numerusform>
+        <numerusform>%1 avec %n attributs</numerusform>
+      </translation>
+    </message>
     <message>
       <source>Any subtype</source>
       <translation>Tout sous-type</translation>
@@ -494,10 +501,6 @@
       <translation>Arrêter partage de mise en page</translation>
     </message>
     <message>
-      <source>Edit...</source>
-      <translation>Modifier...</translation>
-    </message>
-    <message>
       <source>Rename</source>
       <translation>Renommer</translation>
     </message>
@@ -810,10 +813,6 @@
       <translation>Annuler le téléchargement...</translation>
     </message>
     <message>
-      <source>Copy Schedule...</source>
-      <translation>Copier la planification...</translation>
-    </message>
-    <message>
       <source>Analytics Engine Settings...</source>
       <translation>Paramètres du moteur d'analyse...</translation>
     </message>
@@ -957,14 +956,6 @@
       <source>Delete Bookmarks...</source>
       <translation>Supprimer les signets...</translation>
     </message>
-    <message>
-      <source>Copy Bookmark Text...</source>
-      <translation>Copier le texte du signet...</translation>
-    </message>
-    <message>
-      <source>Copy Bookmarks Text...</source>
-      <translation>Copier le texte des signets...</translation>
-    </message>
     <message numerus="yes">
       <source>Show on Items</source>
       <translation>
@@ -1011,6 +1002,18 @@
     <message>
       <source>Advanced...</source>
       <translation>Avancé...</translation>
+    </message>
+    <message>
+      <source>Copy Bookmark Text</source>
+      <translation>Copier le texte du Signet</translation>
+    </message>
+    <message>
+      <source>Copy Bookmarks Text</source>
+      <translation>Copier le texte des Signets</translation>
+    </message>
+    <message>
+      <source>Web Page Settings...</source>
+      <translation>Paramètres de la page Web...</translation>
     </message>
   </context>
   <context>
@@ -1507,13 +1510,13 @@
       <translation>Mises en page partagées</translation>
     </message>
     <message>
-      <source>All</source>
-      <extracomment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</extracomment>
-      <translation>Tous</translation>
-    </message>
-    <message>
       <source>Permissions</source>
       <translation>Autorisations</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <comment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</comment>
+      <translation>Tous</translation>
     </message>
   </context>
   <context>
@@ -1668,10 +1671,6 @@
       <translation>Désactivé</translation>
     </message>
     <message>
-      <source>Basic</source>
-      <translation>De base</translation>
-    </message>
-    <message>
       <source>Recommended</source>
       <translation>Recommandé</translation>
     </message>
@@ -1682,14 +1681,6 @@
     <message>
       <source>May lead to privacy issues</source>
       <translation>Peut conduire à des problèmes de confidentialité</translation>
-    </message>
-    <message>
-      <source>On first connection self-signed certificate is pinned automatically</source>
-      <translation>Lors de la première connexion, le certificat auto-signé est épinglé automatiquement</translation>
-    </message>
-    <message>
-      <source>Your confirmation will be requested to pin self-signed certificate</source>
-      <translation>Votre confirmation sera demandée pour épingler le certificat auto-signé</translation>
     </message>
     <message>
       <source>Connect only servers with public certificate</source>
@@ -1714,6 +1705,10 @@
     <message>
       <source>Continue</source>
       <translation>Continuer</translation>
+    </message>
+    <message>
+      <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
+      <translation>Lors de la première connexion au serveur, votre confirmation sera demandée pour accepter le certificat s'il contient des erreurs</translation>
     </message>
   </context>
   <context>
@@ -2699,6 +2694,33 @@ to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Système déconnecté de %1</translation>
     </message>
+    <message>
+      <source>You are about to disconnect System from %1</source>
+      <comment>%1 is the cloud name, like Nx Cloud</comment>
+      <translation>Vous êtes sur le point de déconnecter le système de %1</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>Tous les utilisateurs %1 seront supprimés.</translation>
+    </message>
+    <message>
+      <source>You will be logged out.</source>
+      <translation>Vous serez déconnecté.</translation>
+    </message>
+    <message>
+      <source>System will be accessible through local network with a local administrator account.</source>
+      <translation>Le système sera accessible par le réseau local avec un compte administrateur local.</translation>
+    </message>
+    <message>
+      <source>Continue</source>
+      <translation>Continuer</translation>
+    </message>
+    <message>
+      <source>Cannot disconnect the System from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Impossible de déconnecter le système de %1</translation>
+    </message>
   </context>
   <context>
     <name>QnCloudResultInfo</name>
@@ -2984,6 +3006,14 @@ to %1</source>
     <message>
       <source>Restore</source>
       <translation>Restaurer</translation>
+    </message>
+    <message>
+      <source>Restore database?</source>
+      <translation>Restaurer base de données?</translation>
+    </message>
+    <message>
+      <source>System configuration will be restored from backup, Server application will be restarted.</source>
+      <translation>Configuration système va être restaurée à partir de la sauvegarde, application serveur sera redémarrée.</translation>
     </message>
   </context>
   <context>
@@ -3399,6 +3429,10 @@ to %1</source>
     <message>
       <source>Please enter a value.</source>
       <translation>Veuillez entrer une valeur.</translation>
+    </message>
+    <message>
+      <source>Please enter a password.</source>
+      <translation>Veuillez entrer un mot de passe.</translation>
     </message>
   </context>
   <context>
@@ -3821,10 +3855,6 @@ to %1</source>
       <translation>Créer une fenêtre de zoom</translation>
     </message>
     <message>
-      <source>Image Enhancement</source>
-      <translation>Amélioration de l'image</translation>
-    </message>
-    <message>
       <source>Hi-Res</source>
       <translation>Haute-Res</translation>
     </message>
@@ -3869,8 +3899,12 @@ to %1</source>
       <translation>Zoom de la zone</translation>
     </message>
     <message>
-      <source>Motion</source>
-      <translation>Mouvement</translation>
+      <source>Motion Search</source>
+      <translation>Recherche de mouvement</translation>
+    </message>
+    <message>
+      <source>Object Search</source>
+      <translation>Recherche d'objet</translation>
     </message>
   </context>
   <context>
@@ -4443,6 +4477,10 @@ to %1</source>
     <message>
       <source>Exit Fullscreen</source>
       <translation>Quitter plein écran</translation>
+    </message>
+    <message>
+      <source>Enter Fullscreen</source>
+      <translation>Passer en mode plein écran</translation>
     </message>
   </context>
   <context>
@@ -5491,6 +5529,10 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <source>Backup storage is not configured</source>
       <translation>Le stockage de sauvegarde n'est pas configuré</translation>
     </message>
+    <message>
+      <source>Camera recording schedule is invalid</source>
+      <translation>Le calendrier d'enregistrement de la caméra n'est pas valide</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -5657,6 +5699,14 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
       <translation>Les utilisateurs peuvent être importés depuis un serveur LDAP. Ils ne pourront se connecter que si le serveur LDAP est en ligne et que leurs comptes y sont actifs.</translation>
     </message>
+    <message>
+      <source>All users</source>
+      <translation>Tous les usagers</translation>
+    </message>
+    <message>
+      <source>With enabled digest authentication</source>
+      <translation>Avec l'authentification Digest activée</translation>
+    </message>
   </context>
   <context>
     <name>QnUserProfileWidget</name>
@@ -5799,22 +5849,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Allow digest authentication for this user</source>
       <translation>Autoriser l'authentification digest pour cet utilisateur</translation>
-    </message>
-    <message>
-      <source>Force secure authentication?</source>
-      <translation>Forcer l'authentification sécurisée ?</translation>
-    </message>
-    <message>
-      <source>To revert this change user password reset will be required.</source>
-      <translation>Pour annuler cette modification, la réinitialisation du mot de passe utilisateur sera requise.</translation>
-    </message>
-    <message>
-      <source>Do not show this message again</source>
-      <translation>Ne plus afficher ce message</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>Activer</translation>
     </message>
     <message>
       <source>Learn More</source>
@@ -5965,6 +5999,36 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
   </context>
   <context>
+    <name>QnWebResourceWidget</name>
+    <message>
+      <source>Open this web page?</source>
+      <translation>Ouvrir cette page web ?</translation>
+    </message>
+    <message>
+      <source>Web page</source>
+      <translation>Page Web</translation>
+    </message>
+    <message>
+      <source>Connect anyway</source>
+      <translation>Se connecter quand même</translation>
+    </message>
+    <message>
+      <source>Web page settings...</source>
+      <translation>Paramètres de la page Web...</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this web page presented an untrusted certificate auth.
+We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
+      <comment>%1 is the web page address</comment>
+      <translation>Vous essayez d'ouvrir le
+%1
+mais cette page Web a présenté un certificat d'authentification non approuvé.
+Nous vous recommandons de ne pas ouvrir cette page Web. Si vous comprenez les risques, vous pouvez ouvrir la page Web.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWorkbenchAlarmLayoutHandler</name>
     <message>
       <source>Alarms</source>
@@ -6028,6 +6092,10 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Focusing...</source>
       <translation>Mise au point...</translation>
+    </message>
+    <message>
+      <source>Camera %1 does not support PTZ</source>
+      <translation>La caméra %1 ne prend pas en charge PTZ</translation>
     </message>
   </context>
   <context>
@@ -7113,6 +7181,14 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <source>Stream setting is not applicable to this device type</source>
       <translation>Le réglage du flux n'est pas applicable à ce type d'appareil</translation>
     </message>
+    <message>
+      <source>Not supported</source>
+      <translation>Non pris en charge</translation>
+    </message>
+    <message>
+      <source>Backup is not supported for this device</source>
+      <translation>La sauvegarde n'est pas prise en charge pour cet appareil</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
@@ -7168,6 +7244,20 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Backup will be turned off for new added cameras on all servers in the system.</source>
       <translation>La sauvegarde sera désactivée pour les nouvelles caméras ajoutées sur tous les serveurs du système.</translation>
+    </message>
+    <message>
+      <source>Storage Management</source>
+      <translation>Gestion Stockage</translation>
+    </message>
+    <message>
+      <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
+      <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
+      <translation>Pour activer la sauvegarde, changez &quot;Principal&quot; en &quot;Sauvegarde&quot; depuis certains des stockages de %1</translation>
+    </message>
+    <message>
+      <source>To enable backup add more drives to use them as backup storage in %1</source>
+      <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
+      <translation>Pour activer la sauvegarde, ajoutez plus de lecteurs pour les utiliser comme stockage de sauvegarde dans %1</translation>
     </message>
   </context>
   <context>
@@ -7240,6 +7330,17 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::CameraButtonController</name>
+    <message>
+      <source>Heater</source>
+      <translation>Chauffage</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>Essuie-glaces</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>
@@ -7307,6 +7408,10 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
       <translation>Les paramètres de qualité et de fréquence d'images (FPS) dans le calendrier d'enregistrement ne seront plus pertinents.</translation>
+    </message>
+    <message>
+      <source>Server will not push time settings to the camera.</source>
+      <translation>Le serveur ne poussera pas les paramètres de l'heure à la caméra.</translation>
     </message>
   </context>
   <context>
@@ -7414,14 +7519,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>Haute valeur minimale peut conduire à la diminution de la longueur d'archive sur d'autre caméras.</translation>
-    </message>
-    <message>
-      <source>Motion &amp;&amp; Objects Recording</source>
-      <translation>Enregistrement de mouvement &amp;&amp; objets</translation>
-    </message>
-    <message>
-      <source>Motion Recording</source>
-      <translation>Enregistrement sur mouvement</translation>
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
@@ -7539,16 +7636,40 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <translation>Plugins</translation>
     </message>
     <message>
-      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation>La détection de mouvement est désactivée, tous les enregistrements programmés &quot;Mouv. Seul&quot; et &quot;Mouv. + Basse Réso&quot; seront remplacés par &quot;Toujours&quot;</translation>
-    </message>
-    <message>
-      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation>Double flux désactivée, tous les enregistrements programmés &quot;Mouv. + Basse réso&quot; seront changés en &quot;Toujours&quot;</translation>
-    </message>
-    <message>
       <source>Dewarping</source>
       <translation>Dérouler</translation>
+    </message>
+    <message>
+      <source>Change invalid schedule to &quot;Record Always&quot;</source>
+      <translation>Changer l'horaire non valide à &quot;Enregistrer Toujours&quot;</translation>
+    </message>
+    <message>
+      <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
+      <translation>Certaines cellules du calendrier d'enregistrement sont définies à un mode d'enregistrement invalide : %1. Pendant les heures réglées sur un mode d'enregistrement invalide, la caméra enregistrera en mode &quot;Enregistrer Toujours&quot;.</translation>
+    </message>
+    <message>
+      <source>Motion Only</source>
+      <translation>Mouv. Seul</translation>
+    </message>
+    <message>
+      <source>Objects Only</source>
+      <translation>Objets uniquement</translation>
+    </message>
+    <message>
+      <source>Motion &amp; Objects Only</source>
+      <translation>Mouvement &amp; Objets uniquement</translation>
+    </message>
+    <message>
+      <source>Motion + Lo-Res</source>
+      <translation>Mouv. + Basse réso</translation>
+    </message>
+    <message>
+      <source>Objects + Lo-Res</source>
+      <translation>Objets + Lo-Res</translation>
+    </message>
+    <message>
+      <source>Motion &amp; Objects + Lo-Res</source>
+      <translation>Mouvement &amp; Objets + Lo-Res</translation>
     </message>
   </context>
   <context>
@@ -7560,9 +7681,12 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
         <numerusform>Impossible d'activer l'audio sur %n appareils</numerusform>
       </translation>
     </message>
-    <message>
-      <source>These devices do not have an audio input, or it is not configured correctly.</source>
-      <translation>Ces appareils n'ont pas d'entrée audio, ou ils ne sont pas configurés correctement.</translation>
+    <message numerus="yes">
+      <source>These devices do not have audio inputs or are not configured correctly.</source>
+      <translation>
+        <numerusform>Ce périphérique n'a pas d'entrée audio ou n'est pas configuré correctement.</numerusform>
+        <numerusform>Ces périphériques n'ont pas d'entrée audio ou ne sont pas configurés correctement.</numerusform>
+      </translation>
     </message>
     <message numerus="yes">
       <source>Failed to enable 2-way audio on %n devices</source>
@@ -7571,9 +7695,12 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
         <numerusform>Impossible d'activer l'audio bidirectionnel sur %n appareils</numerusform>
       </translation>
     </message>
-    <message>
-      <source>These devices do not have an audio output, or it is not configured correctly.</source>
-      <translation>Ces appareils n'ont pas de sortie audio, ou ils ne sont pas configurés correctement.</translation>
+    <message numerus="yes">
+      <source>These devices do not have audio outputs or are not configured correctly.</source>
+      <translation>
+        <numerusform>Ce périphérique n'a pas de sortie audio ou n'est pas configuré correctement.</numerusform>
+        <numerusform>Ces périphériques n'ont pas de sorties audio ou ne sont pas configurés correctement.</numerusform>
+      </translation>
     </message>
     <message>
       <source>Audio will be disabled</source>
@@ -7604,7 +7731,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
     <message numerus="yes">
       <source>%1 are required</source>
-      <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
+      <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
       <translation>
         <numerusform>%1 est requis</numerusform>
         <numerusform>%1 sont requis</numerusform>
@@ -7850,7 +7977,7 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <name>nx::vms::client::desktop::ConnectionTestingDialog</name>
     <message>
       <source>Connect</source>
-      <translation>Connecter</translation>
+      <translation>Connexion</translation>
     </message>
     <message>
       <source>Setup</source>
@@ -7876,10 +8003,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
   <context>
     <name>nx::vms::client::desktop::CopyScheduleCameraSelectionDialog</name>
     <message>
-      <source>Schedule motion type is not supported by some cameras.</source>
-      <translation>Type d'horaire mouvement n'est pas supporté par certaines caméras.</translation>
-    </message>
-    <message>
       <source>Recording cannot be enabled for some cameras.</source>
       <translation>Enregistrement ne peut pas être activé sur certaines caméras.</translation>
     </message>
@@ -7890,6 +8013,10 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Copy archive length settings</source>
       <translation>Copier paramètres longeur d'archive</translation>
+    </message>
+    <message>
+      <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
+      <translation>Le calendrier d’enregistrement contient des modes d’enregistrement qui ne sont pas pris en charge par les caméras sélectionnées. Les modes d’enregistrement non pris en charge seront changés en &quot;Enregistrer Toujours&quot;.</translation>
     </message>
   </context>
   <context>
@@ -8005,6 +8132,14 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Address field cannot be empty</source>
       <translation>Champ d'adresse ne peut pas être vide</translation>
+    </message>
+    <message>
+      <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
+      <translation>La recherche de périphériques sur le réseau est limitée aux caméras qui prennent en charge les connexions HTTPS. Cela peut être modifié dans les paramètres de %1.</translation>
+    </message>
+    <message>
+      <source>System Administration</source>
+      <translation>Administration du système</translation>
     </message>
   </context>
   <context>
@@ -8297,6 +8432,25 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ForceSecureAuthDialog</name>
+    <message>
+      <source>Force secure authentication?</source>
+      <translation>Forcer l'authentification sécurisée ?</translation>
+    </message>
+    <message>
+      <source>To revert this change user password reset will be required.</source>
+      <translation>Pour annuler cette modification, la réinitialisation du mot de passe utilisateur sera requise.</translation>
+    </message>
+    <message>
+      <source>Do not show this message again</source>
+      <translation>Ne plus afficher ce message</translation>
+    </message>
+    <message>
+      <source>Enable</source>
+      <translation>Activer</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
     <message>
       <source>Brand</source>
@@ -8328,8 +8482,8 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
   <context>
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
-      <source>Click to read more</source>
-      <translation>Cliquez pour lire plus</translation>
+      <source>Click on the icon to read more</source>
+      <translation>Cliquez sur l'icône pour en savoir plus</translation>
     </message>
   </context>
   <context>
@@ -8678,11 +8832,6 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
       <translation>Les deux systèmes sont connectés au %1. Fusion non autorisée.</translation>
     </message>
     <message>
-      <source>Cloud systems have different owners. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Les systèmes cloud ont des propriétaires différents. La fusion n'est pas autorisée.</translation>
-    </message>
-    <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
       <translation>Impossible de fusionner des systèmes car ils ont au moins un serveur avec le même ID. Supprimez ce serveur et réessayez.</translation>
     </message>
@@ -8701,6 +8850,11 @@ Si vous avez l'intention de déplacer les données d'analyse vers un autre empla
     <message>
       <source>Unknown error.</source>
       <translation>Erreur inconnue.</translation>
+    </message>
+    <message>
+      <source>%1 systems have different owners. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Les systèmes %1 ont des propriétaires différents. La fusion n'est pas autorisée.</translation>
     </message>
   </context>
   <context>
@@ -9066,6 +9220,21 @@ Vous pouvez le forcer, mais il peut augmenter significativement la charge du pro
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::OauthLoginPlaceholder</name>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the cloud name like Nx Cloud</comment>
+      <translation>Impossible de connecter à %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ObjectTrackingButton</name>
+    <message>
+      <source>Object tracking is ON</source>
+      <translation>Le suivi des objets est activé</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
@@ -9335,6 +9504,10 @@ Vous pouvez le forcer, mais il peut augmenter significativement la charge du pro
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
       <translation>Activer le proxy de la page Web dans l'onglet &lt;b&gt;Général&lt;/b&gt;.</translation>
     </message>
+    <message>
+      <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
+      <translation>La transmission par proxy de tous les contenus expose tout service ou dispositif du réseau du serveur aux utilisateurs de cette page web</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::RadassActionFactory</name>
@@ -9401,6 +9574,45 @@ Vous pouvez le forcer, mais il peut augmenter significativement la charge du pro
     <message>
       <source>Motion + Lo-Res</source>
       <translation>Mouv. + Basse réso</translation>
+    </message>
+    <message>
+      <source>Recording motion and objects</source>
+      <translation>Enregistrement sur mouvements et objets</translation>
+    </message>
+    <message>
+      <source>Recording objects only</source>
+      <translation>Enregistrement d'objets uniquement</translation>
+    </message>
+    <message>
+      <source>Recording motion, objects and low quality</source>
+      <translation>Enregistrement sur mouvement, objets et basse qualité</translation>
+    </message>
+    <message>
+      <source>Recording objects and low quality</source>
+      <translation>Enregistrement sur objets et basse qualité</translation>
+    </message>
+    <message>
+      <source>Motion, Objects</source>
+      <translation>Mouvement, objets</translation>
+    </message>
+    <message>
+      <source>Objects only</source>
+      <translation>Objets uniquement</translation>
+    </message>
+    <message>
+      <source>Motion, Objects + Lo-Res</source>
+      <translation>Mouvement, Objets + Bas Res</translation>
+    </message>
+    <message>
+      <source>Objects + Lo-Res</source>
+      <translation>Objets + Bas-Res</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RemoteConnectionUserInteractionDelegate</name>
+    <message>
+      <source>Connect to System</source>
+      <translation>Connecter au système</translation>
     </message>
   </context>
   <context>
@@ -9567,6 +9779,86 @@ Vous pouvez toujours changer la qualité et le FPS directement sur la caméra.</
       <translation>Mouvement
  + Bas Res</translation>
     </message>
+    <message>
+      <source>Motion detection is disabled for some of the selected devices</source>
+      <translation>La détection de mouvement est désactivée pour certains des appareils sélectionnés</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for this camera</source>
+      <translation>La détection de mouvement est désactivée pour cette caméra</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for some of the selected cameras</source>
+      <translation>La détection de mouvement est désactivée pour certaines des caméras sélectionnées</translation>
+    </message>
+    <message>
+      <source>Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>Certains appareils sélectionnés n'ont qu'un seul flux vidéo. Les enregistrements avec et sans mouvement partageront la même résolution ou la même qualité.</translation>
+    </message>
+    <message>
+      <source>This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>Cette caméra n'a qu'un seul flux vidéo. Les enregistrements avec et sans mouvement partageront la même résolution ou la même qualité.</translation>
+    </message>
+    <message>
+      <source>Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>Certaines des caméras sélectionnées n'ont qu'un seul flux vidéo. Les enregistrements avec et sans mouvement partageront la même résolution ou la même qualité.</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for some of the selected devices</source>
+      <translation>La détection d'objets est désactivée pour certains des périphériques sélectionnés</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for this camera</source>
+      <translation>La détection d'objets est désactivée pour cette caméra</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for some of the selected cameras</source>
+      <translation>La détection d'objets est désactivée pour certaines des caméras sélectionnées</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for some of the selected devices</source>
+      <translation>La détection de mouvement et d'objets est désactivée pour certains des périphériques sélectionnés</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for this camera</source>
+      <translation>La détection de mouvement et d'objets est désactivée pour cette caméra</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for some of the selected cameras</source>
+      <translation>La détection de mouvement et d'objets est désactivée pour certaines des caméras sélectionnées</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for this I/O module</source>
+      <translation>La détection de mouvements est désactivée pour ce module d'E/S</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for some of the selected I/O modules</source>
+      <translation>La détection de mouvement est désactivée pour certains des modules d'E/S sélectionnés</translation>
+    </message>
+    <message>
+      <source>This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>Ce module d'E/S n'a qu'un seul flux. Les enregistrements avec et sans mouvement partageront la même résolution ou la même qualité.</translation>
+    </message>
+    <message>
+      <source>Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>Certains modules d'E/S sélectionnés n'ont qu'un seul flux. Les enregistrements avec ou sans mouvement partageront la même résolution ou la même qualité.</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for this I/O module</source>
+      <translation>La détection des objets est désactivée pour ce module E/S</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for some of the selected I/O modules</source>
+      <translation>La détection des objets est désactivée pour certains des modules d'E/S sélectionnés</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for this I/O module</source>
+      <translation>La détection de mouvement et d'objets est désactivée pour ce module d'E/S</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for some of the selected I/O modules</source>
+      <translation>La détection de mouvement et d'objets est désactivée pour certains des modules d'E/S sélectionnés</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SearchLineEdit</name>
@@ -9588,10 +9880,6 @@ Vous pouvez toujours changer la qualité et le FPS directement sur la caméra.</
     <message>
       <source>hours</source>
       <translation>heures</translation>
-    </message>
-    <message>
-      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation>Les utilisateurs seront automatiquement déconnectés si leur session dépasse la durée spécifiée.</translation>
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
@@ -9627,6 +9915,31 @@ Attention : Ce mot de passe ne peut pas être réinitialisé. Si vous le perdez,
       <source>days</source>
       <translation>jour</translation>
     </message>
+    <message>
+      <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation>Les utilisateurs locaux et LDAP seront automatiquement déconnectés si leur session dépasse la durée spécifiée.</translation>
+    </message>
+    <message>
+      <source>Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</source>
+      <translation>La durée de vie illimitée de la session utilisateur menace la sécurité globale du système et peut entraîner une dégradation des performances du système</translation>
+    </message>
+    <message>
+      <source>It is recommended to have user session lifetime not greater than %1</source>
+      <comment>%1 is the time span with time units</comment>
+      <translation>Il est recommandé d'avoir une durée de vie de session utilisateur pas supérieure à %1</translation>
+    </message>
+    <message>
+      <source>Learn more.</source>
+      <translation>En savoir plus.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
+      <comment>%n is digest user count, %1 is total user count</comment>
+      <translation>
+        <numerusform>%n utilisateurs sur %1 est autorisé à utiliser l'authentification "digest" (non sécurisé).</numerusform>
+        <numerusform>%n utilisateurs sur %1 sont autorisés à utiliser l'authentification "digest" (non sécurisé).</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateError</name>
@@ -9635,12 +9948,12 @@ Attention : Ce mot de passe ne peut pas être réinitialisé. Si vous le perdez,
       <translation>Échec de la connexion au serveur</translation>
     </message>
     <message>
-      <source>Server certificate is invalid.</source>
-      <translation>Le certificat du serveur est invalide.</translation>
-    </message>
-    <message>
       <source>View certificate</source>
       <translation>Afficher le certificat</translation>
+    </message>
+    <message>
+      <source>Server certificate is invalid.</source>
+      <translation>Le certificat du serveur est invalide.</translation>
     </message>
   </context>
   <context>
@@ -9677,9 +9990,35 @@ Attention : Ce mot de passe ne peut pas être réinitialisé. Si vous le perdez,
       <source>This is a custom certificate installed on %1</source>
       <translation>Ceci est un certificat personnalisé installé sur %1</translation>
     </message>
+    <message>
+      <source>Pin this certificate to %1?</source>
+      <translation>Épingler ce certificat à %1?</translation>
+    </message>
+    <message>
+      <source>Someone may be impersonating %1 to steel your personal information.
+Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
+      <translation>Quelqu'un peut se faire passer pour %1 afin de voler vos informations personnelles.
+N'utilisez pas ce certificat si vous n'avez pas modifié le certificat SSL du serveur %2.</translation>
+    </message>
+    <message>
+      <source>Pin</source>
+      <translation>Épingler</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
+    <message>
+      <source>View certificate</source>
+      <translation>Voir le certificat</translation>
+    </message>
+    <message>
+      <source>Connect Anyway</source>
+      <translation>Se connecter quand même</translation>
+    </message>
+    <message>
+      <source>I trust this server</source>
+      <translation>Je fais confiance à ce serveur</translation>
+    </message>
     <message>
       <source>System:</source>
       <translation>Système:</translation>
@@ -9697,10 +10036,6 @@ Attention : Ce mot de passe ne peut pas être réinitialisé. Si vous le perdez,
       <translation>Faire confiance à ce serveur ?</translation>
     </message>
     <message>
-      <source>You attempted to connect to %1 but the server presented an untrusted self-signed certificate.</source>
-      <translation>Vous avez tenté de vous connecter à %1 mais le serveur a présenté un certificat auto-signé non approuvé.</translation>
-    </message>
-    <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
       <translation>Examinez les détails du certificat pour vous assurer que vous vous connectez au bon serveur.</translation>
     </message>
@@ -9713,20 +10048,12 @@ Attention : Ce mot de passe ne peut pas être réinitialisé. Si vous le perdez,
       <translation>Quelqu'un peut usurper l'identité de %1 pour voler vos informations personnelles.</translation>
     </message>
     <message>
-      <source>View certificate</source>
-      <translation>Voir le certificat</translation>
-    </message>
-    <message>
-      <source>Connect Anyway</source>
-      <translation>Se connecter quand même</translation>
-    </message>
-    <message>
-      <source>I trust this server</source>
-      <translation>Je fais confiance à ce serveur</translation>
-    </message>
-    <message>
       <source>Do not connect to this server unless instructed by your VMS administrator.</source>
       <translation>Ne vous connectez pas à ce serveur à moins que votre administrateur VMS ne l'ait demandé.</translation>
+    </message>
+    <message>
+      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
+      <translation>Vous avez tenté de vous connecter à : %1 mais le serveur a présenté un certificat qui ne peut pas être vérifié automatiquement.</translation>
     </message>
   </context>
   <context>
@@ -9942,6 +10269,17 @@ Attention : Ce mot de passe ne peut pas être réinitialisé. Si vous le perdez,
     <message>
       <source>Set Passwords</source>
       <translation>Définir les mots de passe</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording schedule is invalid for %n cameras</source>
+      <translation>
+        <numerusform>L'horaire d'enregistrement n'est pas valide pour %n caméra</numerusform>
+        <numerusform>L'horaire d'enregistrement n'est pas valide pour %n caméras</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
+      <translation>Le calendrier d'enregistrement sur certaines caméras contient des modes d'enregistrement qui ne sont pas pris en charge.</translation>
     </message>
   </context>
   <context>
@@ -10428,6 +10766,35 @@ Attention : Ce mot de passe ne peut pas être réinitialisé. Si vous le perdez,
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
+    <message>
+      <source>Intercom Alarm Layout</source>
+      <translation>Interphone Mise en page de l'alarme</translation>
+    </message>
+    <message>
+      <source>Intercom Open Door</source>
+      <translation>Interphone porte ouverte</translation>
+    </message>
+    <message>
+      <source>Open door</source>
+      <translation>Ouvrir la porte</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::OverlappedIdDialogModel</name>
+    <message>
+      <source>Latest</source>
+      <translation>Dernier</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::OverlappedIdIntegration</name>
+    <message>
+      <source>Overlapped ID...</source>
+      <translation>Chevauchement des ID...</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::joystick::JoystickButtonActionChoiceModel</name>
     <message>
       <source>No Action</source>
@@ -10483,6 +10850,40 @@ Attention : Ce mot de passe ne peut pas être réinitialisé. Si vous le perdez,
     <message>
       <source>Button</source>
       <translation>Bouton</translation>
+    </message>
+    <message>
+      <source>Selected Layout</source>
+      <translation>Mise en page sélectionnée</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::jsapi::detail::ResourcesApiBackend</name>
+    <message>
+      <source>Resource is not available for the usage with JS API</source>
+      <translation>La ressource n'est pas disponible pour l'utilisation avec l'API JS</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
+    <message>
+      <source>Cannot find an item with the specified id</source>
+      <translation>Impossible de trouver un élément avec l'id spécifié</translation>
+    </message>
+    <message>
+      <source>Cannot find a resource with the specified id.</source>
+      <translation>Impossible de trouver une ressource avec l'id spécifié.</translation>
+    </message>
+    <message>
+      <source>Cannot specify a media parameters for the resource without media stream.</source>
+      <translation>Impossible de spécifier un paramètre média pour la ressource sans flux multimédia.</translation>
+    </message>
+    <message>
+      <source>Cannot add the resource to the layout</source>
+      <translation>Impossible d'ajouter la ressource à la mise en page</translation>
+    </message>
+    <message>
+      <source>Cannot find a widget corresponding to the specified item.</source>
+      <translation>Impossible de trouver un widget correspondant à l'élément spécifié.</translation>
     </message>
   </context>
   <context>
@@ -10907,6 +11308,24 @@ Vous pouvez sélectionner un autre emplacement de stockage dans l'onglet &quot;G
       <source>Window configuration saved</source>
       <translation>Configuration de la fenêtre sauvegardée</translation>
     </message>
+    <message>
+      <source>This build is for demo purposes only.</source>
+      <translation>Cette version est uniquement à des fins de démonstration.</translation>
+    </message>
+    <message>
+      <source>It cannot be upgraded to subsequent builds as they become available.</source>
+      <translation>Il ne peut pas être mis à jour vers des versions ultérieures dès qu'elles sont disponibles.</translation>
+    </message>
+    <message>
+      <source>To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</source>
+      <comment>%1 is the product name</comment>
+      <translation>Pour mettre à jour, veuillez désinstaller %1 avant d'installer une version mise à jour (toutes les données seront perdues).</translation>
+    </message>
+    <message>
+      <source>%1 Beta</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 Bêta</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::workbench::LayoutTourExecutor</name>
@@ -10915,8 +11334,8 @@ Vous pouvez sélectionner un autre emplacement de stockage dans l'onglet &quot;G
       <translation>Utilisez les flèches du clavier pour changer les mises en page. Pour quitter le showreel appuyez sur Echap(Esc).</translation>
     </message>
     <message>
-      <source>Press any key to stop the tour.</source>
-      <translation>Appuyez sur n'importe quelle touche pour arrêter le tour.</translation>
+      <source>Press Esc to stop the tour.</source>
+      <translation>Appuyez sur Échap pour arrêter le tour.</translation>
     </message>
   </context>
   <context>
@@ -11101,13 +11520,6 @@ pour afficher plus de signets</translation>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::workbench::timeline::TimelineSliderTooltip</name>
-    <message>
-      <source>Local File</source>
-      <translation>Fichier local</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::workbench::timeline::VolumeSlider</name>
     <message>
       <source>Muted</source>
@@ -11152,6 +11564,10 @@ pour afficher plus de signets</translation>
     <message>
       <source>Client update package is missing for current platform.</source>
       <translation>Le paquet de mise à jour du client est manquant pour la plateforme actuelle.</translation>
+    </message>
+    <message>
+      <source>Can&apos;t check client update availability. Check your internet connection and try again.</source>
+      <translation>Impossible de vérifier la disponibilité des mises à jour du client. Vérifiez votre connexion internet et réessayez.</translation>
     </message>
   </context>
 </TS>

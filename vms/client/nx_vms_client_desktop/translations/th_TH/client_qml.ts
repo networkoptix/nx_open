@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="th" sourcelanguage="en">
+<TS version="2.1" language="th_TH" sourcelanguage="en">
   <context>
     <name>AdvancedUpdateSettings</name>
     <message>
@@ -88,16 +88,26 @@
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
       <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
     </message>
+    <message numerus="yes">
+      <source>%n new results</source>
+      <translation type="unfinished">
+        <numerusform>%n new results</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>new results</source>
+      <translation type="unfinished">new results</translation>
+    </message>
+    <message>
+      <source>Detected by</source>
+      <translation type="unfinished">Detected by</translation>
+    </message>
   </context>
   <context>
     <name>AnalyticsSearchDialog</name>
     <message>
       <source>Advanced Object Search</source>
       <translation type="unfinished">Advanced Object Search</translation>
-    </message>
-    <message>
-      <source>Any Plugin</source>
-      <translation>ปลั๊กอินใด ๆ</translation>
     </message>
     <message>
       <source>Select area</source>
@@ -118,6 +128,20 @@
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
       <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+    </message>
+    <message>
+      <source>Any plugin</source>
+      <translation type="unfinished">Any plugin</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n new results</source>
+      <translation type="unfinished">
+        <numerusform>%n new results</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>new results</source>
+      <translation type="unfinished">new results</translation>
     </message>
   </context>
   <context>
@@ -254,8 +278,8 @@
   <context>
     <name>ContextHintButton</name>
     <message>
-      <source>Click to read more</source>
-      <translation>คลิกเพื่ออ่านรายละเอียดเพิ่มเติม</translation>
+      <source>Click on the icon to read more</source>
+      <translation type="unfinished">Click on the icon to read more</translation>
     </message>
   </context>
   <context>
@@ -321,6 +345,10 @@
     <message>
       <source>Try changing the filters or create an Event Rule</source>
       <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+    </message>
+    <message>
+      <source>Event Log</source>
+      <translation>เหตุการณ์บันทึก</translation>
     </message>
   </context>
   <context>
@@ -448,6 +476,13 @@
     </message>
   </context>
   <context>
+    <name>InformationBubble</name>
+    <message>
+      <source>Detected by</source>
+      <translation type="unfinished">Detected by</translation>
+    </message>
+  </context>
+  <context>
     <name>InformationPanel</name>
     <message>
       <source>Version</source>
@@ -472,6 +507,33 @@
     <message>
       <source>Refreshing...</source>
       <translation>กำลังรีเฟรช...</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntervalPreviewControls</name>
+    <message>
+      <source>Toggle Mute</source>
+      <translation>สลับเสียง</translation>
+    </message>
+    <message>
+      <source>Previous Object</source>
+      <translation type="unfinished">Previous Object</translation>
+    </message>
+    <message>
+      <source>Pause</source>
+      <translation>หยุด</translation>
+    </message>
+    <message>
+      <source>Play</source>
+      <translation>เล่น</translation>
+    </message>
+    <message>
+      <source>Next Object</source>
+      <translation type="unfinished">Next Object</translation>
+    </message>
+    <message>
+      <source>Toggle Repeat</source>
+      <translation type="unfinished">Toggle Repeat</translation>
     </message>
   </context>
   <context>
@@ -661,12 +723,12 @@
       <translation>รหัสผ่าน</translation>
     </message>
     <message>
-      <source>Save Password</source>
-      <translation type="unfinished">Save Password</translation>
-    </message>
-    <message>
       <source>Connect</source>
       <translation>เชื่อมต่อ</translation>
+    </message>
+    <message>
+      <source>Remember me</source>
+      <translation>จดจำ</translation>
     </message>
   </context>
   <context>
@@ -731,6 +793,10 @@
       <source>Show on Layout</source>
       <translation>แสดงบนเค้าโครงการเตือนภัย</translation>
     </message>
+    <message>
+      <source>preview is not available for the selected object</source>
+      <translation type="unfinished">preview is not available for the selected object</translation>
+    </message>
   </context>
   <context>
     <name>PromoPageButtons</name>
@@ -740,7 +806,7 @@
     </message>
     <message>
       <source>Next</source>
-      <translation type="unfinished">Next</translation>
+      <translation>ถัดไป</translation>
     </message>
   </context>
   <context>
@@ -796,6 +862,10 @@ to activate PTZ</translation>
     <message>
       <source>Object Type</source>
       <translation type="unfinished">Object Type</translation>
+    </message>
+    <message>
+      <source>Subtype</source>
+      <translation type="unfinished">Subtype</translation>
     </message>
   </context>
   <context>
@@ -940,6 +1010,21 @@ to activate PTZ</translation>
     <message>
       <source>Select layout</source>
       <translation>เลือกเค้าโครง</translation>
+    </message>
+  </context>
+  <context>
+    <name>SelectOverlappedIdDialog</name>
+    <message>
+      <source>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</source>
+      <translation type="unfinished">Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</translation>
+    </message>
+    <message>
+      <source>Select</source>
+      <translation type="unfinished">Select</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>ยกเลิก</translation>
     </message>
   </context>
   <context>
@@ -1175,10 +1260,6 @@ to activate PTZ</translation>
   <context>
     <name>WelcomeScreen</name>
     <message>
-      <source>Loading...</source>
-      <translation>กำลังโหลด...</translation>
-    </message>
-    <message>
       <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
       <translation type="unfinished">You don&apos;t have access to the %1. Please check your internet connection.</translation>
     </message>
@@ -1193,6 +1274,10 @@ to activate PTZ</translation>
     <message>
       <source>Support</source>
       <translation>ทีมช่วยเหลือ</translation>
+    </message>
+    <message>
+      <source>Loading...</source>
+      <translation>กำลังโหลด...</translation>
     </message>
   </context>
 </TS>

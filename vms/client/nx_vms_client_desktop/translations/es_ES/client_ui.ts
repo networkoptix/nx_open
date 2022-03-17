@@ -290,16 +290,8 @@
   <context>
     <name>BackupSettingsWidget</name>
     <message>
-      <source>To enable backup add more drives to use them as backup </source>
-      <translation>Para habilitar la copia de seguridad, agregue más unidades para usarlas como copia de seguridad </translation>
-    </message>
-    <message>
-      <source>storage in</source>
-      <translation>almacenamiento en</translation>
-    </message>
-    <message>
-      <source>Storage Management</source>
-      <translation>Administración de Almacenamiento</translation>
+      <source>Server is offline. Backup settings are not available.</source>
+      <translation type="unfinished">Server is offline. Backup settings are not available.</translation>
     </message>
   </context>
   <context>
@@ -325,8 +317,12 @@
       <translation type="unfinished">Maximum backup queue size</translation>
     </message>
     <message>
-      <source>All files are successfully backed up! New files will be backed up automatically.</source>
-      <translation type="unfinished">All files are successfully backed up! New files will be backed up automatically.</translation>
+      <source>All files are successfully backed up! New files will be backed up automatically</source>
+      <translation type="unfinished">All files are successfully backed up! New files will be backed up automatically</translation>
+    </message>
+    <message>
+      <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
+      <translation type="unfinished">Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</translation>
     </message>
   </context>
   <context>
@@ -567,14 +563,6 @@
       <translation>ID Lógico</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation>Forzar el detección de movimiento para la secuencia</translation>
-    </message>
-    <message>
-      <source>RTP transport</source>
-      <translation>Transporte RTP</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation>Confiar en la marca de tiempo de la cámara</translation>
     </message>
@@ -623,12 +611,24 @@
       <translation type="unfinished">Use system presets</translation>
     </message>
     <message>
-      <source>Use camera native preset</source>
-      <translation type="unfinished">Use camera native preset</translation>
-    </message>
-    <message>
       <source>PTZ Speed</source>
       <translation type="unfinished">PTZ Speed</translation>
+    </message>
+    <message>
+      <source>RTP Transport</source>
+      <translation type="unfinished">RTP Transport</translation>
+    </message>
+    <message>
+      <source>Use camera native presets</source>
+      <translation type="unfinished">Use camera native presets</translation>
+    </message>
+    <message>
+      <source>Time Settings</source>
+      <translation type="unfinished">Time Settings</translation>
+    </message>
+    <message>
+      <source>Keep camera time settings</source>
+      <translation type="unfinished">Keep camera time settings</translation>
     </message>
   </context>
   <context>
@@ -745,10 +745,6 @@
   <context>
     <name>CameraScheduleWidget</name>
     <message>
-      <source>Motion Recording</source>
-      <translation>Grabación de movimiento</translation>
-    </message>
-    <message>
       <source>Recording</source>
       <translation>Grabación</translation>
     </message>
@@ -761,12 +757,12 @@
       <translation>Copiar Horario</translation>
     </message>
     <message>
-      <source>Apply changes before copying schedule.</source>
-      <translation>Aplicar cambios antes de programar la copia.</translation>
-    </message>
-    <message>
       <source>Copy Schedule to...</source>
       <translation>Copiar el Horario a...</translation>
+    </message>
+    <message>
+      <source>Motion &amp;&amp; Objects Recording</source>
+      <translation>Grabación de movimiento y objetos</translation>
     </message>
   </context>
   <context>
@@ -1498,6 +1494,10 @@
       <source>Disable imported users</source>
       <translation>Deshabilitar a los usuarios importados</translation>
     </message>
+    <message>
+      <source>Allow digest authentication for imported user</source>
+      <translation type="unfinished">Allow digest authentication for imported user</translation>
+    </message>
   </context>
   <context>
     <name>LicenseDetailsDialog</name>
@@ -1766,6 +1766,13 @@
     <message>
       <source>To server</source>
       <translation>Al servidor</translation>
+    </message>
+  </context>
+  <context>
+    <name>OauthLoginPlaceholder</name>
+    <message>
+      <source>Try Again</source>
+      <translation>Intentar de nuevo</translation>
     </message>
   </context>
   <context>
@@ -2082,10 +2089,6 @@
       <translation>Buscar usuarios de LDAP...</translation>
     </message>
     <message>
-      <source>Clear Selection</source>
-      <translation>Borrar selección</translation>
-    </message>
-    <message>
       <source>Search users</source>
       <translation>Buscar usuarios</translation>
     </message>
@@ -2104,6 +2107,14 @@
     <message>
       <source>Edit Roles...</source>
       <translation>Editar funciones...</translation>
+    </message>
+    <message>
+      <source>Force Secure Authentication</source>
+      <translation>Forzar autenticación segura</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>No hubo resultado</translation>
     </message>
   </context>
   <context>
@@ -2429,6 +2440,10 @@
       <source>Encrypt video traffic to desktop and mobile clients</source>
       <translation type="unfinished">Encrypt video traffic to desktop and mobile clients</translation>
     </message>
+    <message>
+      <source>Manage Users</source>
+      <translation type="unfinished">Manage Users</translation>
+    </message>
   </context>
   <context>
     <name>SendmailBusinessActionWidget</name>
@@ -2518,8 +2533,8 @@
       <translation>Puerto</translation>
     </message>
     <message>
-      <source>Autodetect USB and web cameras</source>
-      <translation>Detección automática de cámaras web y USB</translation>
+      <source>Autodetect built-in and USB webcams</source>
+      <translation type="unfinished">Autodetect built-in and USB webcams</translation>
     </message>
   </context>
   <context>
@@ -2996,8 +3011,8 @@
       <translation>Proxy de todo el contenido solicitado</translation>
     </message>
     <message>
-      <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation>Proxy a todos los contenidos expone a cualquier servicio o dispositivo en el servidor a los usuarios en la red de esta página web</translation>
+      <source>Allow opening web page without SSL certificate checking</source>
+      <translation type="unfinished">Allow opening web page without SSL certificate checking</translation>
     </message>
   </context>
   <context>

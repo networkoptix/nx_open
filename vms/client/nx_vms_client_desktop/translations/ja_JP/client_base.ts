@@ -23,6 +23,12 @@
       <source>Any plugin</source>
       <translation>すべてのプラグイン</translation>
     </message>
+    <message numerus="yes">
+      <source>%1 with %n attributes</source>
+      <translation>
+        <numerusform>%n 属性を持つ %1</numerusform>
+      </translation>
+    </message>
     <message>
       <source>Any subtype</source>
       <translation>すべてのサブタイプ</translation>
@@ -494,10 +500,6 @@
       <translation>レイアウト共有を停止</translation>
     </message>
     <message>
-      <source>Edit...</source>
-      <translation>編集...</translation>
-    </message>
-    <message>
       <source>Rename</source>
       <translation>名前の変更</translation>
     </message>
@@ -810,10 +812,6 @@
       <translation>アップロードのキャンセル...</translation>
     </message>
     <message>
-      <source>Copy Schedule...</source>
-      <translation>スケジュールをコピー...</translation>
-    </message>
-    <message>
       <source>Analytics Engine Settings...</source>
       <translation>分析エンジンの設定...</translation>
     </message>
@@ -957,14 +955,6 @@
       <source>Delete Bookmarks...</source>
       <translation>ブックマークを削除...</translation>
     </message>
-    <message>
-      <source>Copy Bookmark Text...</source>
-      <translation>ブックマークテキストをコピー...</translation>
-    </message>
-    <message>
-      <source>Copy Bookmarks Text...</source>
-      <translation>ブックマークテキストをコピー...</translation>
-    </message>
     <message numerus="yes">
       <source>Show on Items</source>
       <translation>
@@ -1010,6 +1000,18 @@
     <message>
       <source>Advanced...</source>
       <translation>詳細設定...</translation>
+    </message>
+    <message>
+      <source>Copy Bookmark Text</source>
+      <translation>ブックマークのテキストをコピー</translation>
+    </message>
+    <message>
+      <source>Copy Bookmarks Text</source>
+      <translation>ブックマークのテキストをコピー</translation>
+    </message>
+    <message>
+      <source>Web Page Settings...</source>
+      <translation>Webページ設定...</translation>
     </message>
   </context>
   <context>
@@ -1492,13 +1494,13 @@
       <translation>共有レイアウト</translation>
     </message>
     <message>
-      <source>All</source>
-      <extracomment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</extracomment>
-      <translation>すべて</translation>
-    </message>
-    <message>
       <source>Permissions</source>
       <translation>権限</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <comment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</comment>
+      <translation>すべて</translation>
     </message>
   </context>
   <context>
@@ -1653,10 +1655,6 @@
       <translation>無効</translation>
     </message>
     <message>
-      <source>Basic</source>
-      <translation>ベーシック</translation>
-    </message>
-    <message>
       <source>Recommended</source>
       <translation>推奨</translation>
     </message>
@@ -1667,14 +1665,6 @@
     <message>
       <source>May lead to privacy issues</source>
       <translation>プライバシーの問題につながる可能性があります</translation>
-    </message>
-    <message>
-      <source>On first connection self-signed certificate is pinned automatically</source>
-      <translation>最初の接続時に、自動的に自己署名証明書のピン留めが行われます</translation>
-    </message>
-    <message>
-      <source>Your confirmation will be requested to pin self-signed certificate</source>
-      <translation>自己署名証明書をピン留めするために確認が求められます</translation>
     </message>
     <message>
       <source>Connect only servers with public certificate</source>
@@ -1699,6 +1689,10 @@
     <message>
       <source>Continue</source>
       <translation>続行</translation>
+    </message>
+    <message>
+      <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
+      <translation>サーバーへの最初の接続時に、証明書にエラーが含まれている場合は、証明書を受け入れるように確認が求められます</translation>
     </message>
   </context>
   <context>
@@ -2660,6 +2654,33 @@ to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>%1 からシステムが切断されました</translation>
     </message>
+    <message>
+      <source>You are about to disconnect System from %1</source>
+      <comment>%1 is the cloud name, like Nx Cloud</comment>
+      <translation>システムを %1 から切断しようとしています</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>すべての %1 ユーザーが削除されます。</translation>
+    </message>
+    <message>
+      <source>You will be logged out.</source>
+      <translation>ログアウトします。</translation>
+    </message>
+    <message>
+      <source>System will be accessible through local network with a local administrator account.</source>
+      <translation>システムには、ローカル管理者アカウントを使用してローカルネットワーク経由でアクセスできます。</translation>
+    </message>
+    <message>
+      <source>Continue</source>
+      <translation>続行</translation>
+    </message>
+    <message>
+      <source>Cannot disconnect the System from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>システムを %1から切断できません</translation>
+    </message>
   </context>
   <context>
     <name>QnCloudResultInfo</name>
@@ -2681,7 +2702,7 @@ to %1</source>
     </message>
     <message>
       <source>Too many attempts. Try again in a minute.</source>
-      <translation>試行回数が多すぎます。しばらくしてからもう一度お試しください。</translation>
+      <translation>試行回数が多すぎます。しばらくしてからもう一度お試しください</translation>
     </message>
     <message>
       <source>Network error. Please check your Internet connection and try again.</source>
@@ -2944,6 +2965,14 @@ to %1</source>
     <message>
       <source>Restore</source>
       <translation>復元</translation>
+    </message>
+    <message>
+      <source>Restore database?</source>
+      <translation>データベースを復元しますか？</translation>
+    </message>
+    <message>
+      <source>System configuration will be restored from backup, Server application will be restarted.</source>
+      <translation>システム構成をバックアップから復元するとサーバー アプリケーションが再起動されます</translation>
     </message>
   </context>
   <context>
@@ -3352,6 +3381,10 @@ to %1</source>
     <message>
       <source>Please enter a value.</source>
       <translation>値を入力してください</translation>
+    </message>
+    <message>
+      <source>Please enter a password.</source>
+      <translation>パスワードを入力してください。</translation>
     </message>
   </context>
   <context>
@@ -3767,10 +3800,6 @@ to %1</source>
       <translation>ズーム画面作成</translation>
     </message>
     <message>
-      <source>Image Enhancement</source>
-      <translation>画像補正</translation>
-    </message>
-    <message>
       <source>Hi-Res</source>
       <translation>高解像度</translation>
     </message>
@@ -3814,8 +3843,12 @@ to %1</source>
       <translation>エリアズーム</translation>
     </message>
     <message>
-      <source>Motion</source>
-      <translation>モーション</translation>
+      <source>Motion Search</source>
+      <translation>モーション検索</translation>
+    </message>
+    <message>
+      <source>Object Search</source>
+      <translation>オブジェクト検索</translation>
     </message>
   </context>
   <context>
@@ -4380,6 +4413,10 @@ to %1</source>
     <message>
       <source>Exit Fullscreen</source>
       <translation>フルスクリーン表示終了</translation>
+    </message>
+    <message>
+      <source>Enter Fullscreen</source>
+      <translation>フルスクリーン表示</translation>
     </message>
   </context>
   <context>
@@ -5420,6 +5457,10 @@ If you intended to move analytics data to another storage location, please conta
       <source>Backup storage is not configured</source>
       <translation>バックアップストレージが設定されていません</translation>
     </message>
+    <message>
+      <source>Camera recording schedule is invalid</source>
+      <translation>カメラの録画スケジュールが無効です</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -5586,6 +5627,14 @@ If you intended to move analytics data to another storage location, please conta
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
       <translation>LDAPサーバーからユーザーをインポートできます。インポートされたユーザーは、 LDAPサーバーがオンラインかつアカウントが有効な場合のみログインできます。</translation>
     </message>
+    <message>
+      <source>All users</source>
+      <translation>全ユーザー</translation>
+    </message>
+    <message>
+      <source>With enabled digest authentication</source>
+      <translation>Digest認証有効</translation>
+    </message>
   </context>
   <context>
     <name>QnUserProfileWidget</name>
@@ -5727,22 +5776,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Allow digest authentication for this user</source>
       <translation>このユーザーのダイジェスト認証を許可する</translation>
-    </message>
-    <message>
-      <source>Force secure authentication?</source>
-      <translation>安全な認証を強制しますか？</translation>
-    </message>
-    <message>
-      <source>To revert this change user password reset will be required.</source>
-      <translation>この変更を元に戻すには、ユーザーパスワードのリセットが必要です。</translation>
-    </message>
-    <message>
-      <source>Do not show this message again</source>
-      <translation>今後このメッセージを表示しない</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>有効化</translation>
     </message>
     <message>
       <source>Learn More</source>
@@ -5892,6 +5925,35 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>QnWebResourceWidget</name>
+    <message>
+      <source>Open this web page?</source>
+      <translation>このWebページを開きますか？</translation>
+    </message>
+    <message>
+      <source>Web page</source>
+      <translation>Webページ</translation>
+    </message>
+    <message>
+      <source>Connect anyway</source>
+      <translation>理解した上で接続</translation>
+    </message>
+    <message>
+      <source>Web page settings...</source>
+      <translation>Webページ設定...</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this web page presented an untrusted certificate auth.
+We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
+      <comment>%1 is the web page address</comment>
+      <translation>%1
+を開こうとしましたが、このWebページは信頼できない証明書認証を提示しました。
+このWebページを開かないことをお勧めします。リスクを理解していれば、Webページを開いても構いません。</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWorkbenchAlarmLayoutHandler</name>
     <message>
       <source>Alarms</source>
@@ -5954,6 +6016,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Focusing...</source>
       <translation>フォーカス中...</translation>
+    </message>
+    <message>
+      <source>Camera %1 does not support PTZ</source>
+      <translation>カメラ %1 は PTZ をサポートしていません</translation>
     </message>
   </context>
   <context>
@@ -6999,6 +7065,14 @@ If you intended to move analytics data to another storage location, please conta
       <source>Stream setting is not applicable to this device type</source>
       <translation>ストリーム設定はこのデバイスタイプには適用できません</translation>
     </message>
+    <message>
+      <source>Not supported</source>
+      <translation>サポートされていません</translation>
+    </message>
+    <message>
+      <source>Backup is not supported for this device</source>
+      <translation>このデバイスではバックアップはサポートされていません</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
@@ -7053,6 +7127,20 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Backup will be turned off for new added cameras on all servers in the system.</source>
       <translation>システム内いずれかのサーバーに新しく追加されたカメラのバックアップはオフになります。</translation>
+    </message>
+    <message>
+      <source>Storage Management</source>
+      <translation>ストレージ管理</translation>
+    </message>
+    <message>
+      <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
+      <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
+      <translation>バックアップを有効にするには、 %1のストレージの一部を &quot;メイン&quot; から &quot;バックアップ&quot; に変更してください</translation>
+    </message>
+    <message>
+      <source>To enable backup add more drives to use them as backup storage in %1</source>
+      <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
+      <translation>バックアップを有効にするには、%1 にドライブを追加してバックアップ用に設定してください</translation>
     </message>
   </context>
   <context>
@@ -7122,6 +7210,17 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::CameraButtonController</name>
+    <message>
+      <source>Heater</source>
+      <translation>ヒーター</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>ワイパー</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>
@@ -7188,6 +7287,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
       <translation>録画スケジュールの画質 (ビットレート) とフレームレート (FPS) はカメラに設定されなくなります。</translation>
+    </message>
+    <message>
+      <source>Server will not push time settings to the camera.</source>
+      <translation>サーバーは時刻設定をカメラに通知しません。</translation>
     </message>
   </context>
   <context>
@@ -7294,14 +7397,6 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>高い最小値は、他のカメラのアーカイブ期間を減少させる可能性があります</translation>
-    </message>
-    <message>
-      <source>Motion &amp;&amp; Objects Recording</source>
-      <translation>モーション &amp; オブジェクト検知録画</translation>
-    </message>
-    <message>
-      <source>Motion Recording</source>
-      <translation>モーション録画</translation>
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
@@ -7416,16 +7511,40 @@ If you intended to move analytics data to another storage location, please conta
       <translation>プラグイン</translation>
     </message>
     <message>
-      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation>モーション検知が無効になっています。スケジュール録画の &quot;モーションのみ&quot; と &quot;常時低 ＋ モーション高解像度&quot; は &quot;常時録画&quot; に変更されます。</translation>
-    </message>
-    <message>
-      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation>デュアルストリーミングが無効です。すべての&quot;常時低 ＋ モーション高解像度&quot;録画は&quot;常時録画&quot;に変更されます。</translation>
-    </message>
-    <message>
       <source>Dewarping</source>
       <translation>歪み補正</translation>
+    </message>
+    <message>
+      <source>Change invalid schedule to &quot;Record Always&quot;</source>
+      <translation>無効なスケジュールを &quot;常時録画&quot; に変更</translation>
+    </message>
+    <message>
+      <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
+      <translation>録画スケジュールの一部のセルに、無効な録画モード (%1) が設定されています。無効な録画モードが設定された時間帯では、カメラは &quot;常時録画&quot; モードで動作します。</translation>
+    </message>
+    <message>
+      <source>Motion Only</source>
+      <translation>モーションのみ</translation>
+    </message>
+    <message>
+      <source>Objects Only</source>
+      <translation>オブジェクトのみ</translation>
+    </message>
+    <message>
+      <source>Motion &amp; Objects Only</source>
+      <translation>モーション &amp; オブジェクトのみ</translation>
+    </message>
+    <message>
+      <source>Motion + Lo-Res</source>
+      <translation>常時低 ＋ モーション高解像度</translation>
+    </message>
+    <message>
+      <source>Objects + Lo-Res</source>
+      <translation>オブジェクト + 低解像度</translation>
+    </message>
+    <message>
+      <source>Motion &amp; Objects + Lo-Res</source>
+      <translation>モーション &amp; オブジェクト + 低解像度</translation>
     </message>
   </context>
   <context>
@@ -7436,9 +7555,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n デバイスで音声を有効にできませんでした</numerusform>
       </translation>
     </message>
-    <message>
-      <source>These devices do not have an audio input, or it is not configured correctly.</source>
-      <translation>これらのデバイスには音声入力がないか、正しく構成されていません。</translation>
+    <message numerus="yes">
+      <source>These devices do not have audio inputs or are not configured correctly.</source>
+      <translation>
+        <numerusform>これらのデバイスには音声入力が存在しないか、または正しく構成されていません。</numerusform>
+      </translation>
     </message>
     <message numerus="yes">
       <source>Failed to enable 2-way audio on %n devices</source>
@@ -7446,9 +7567,11 @@ If you intended to move analytics data to another storage location, please conta
         <numerusform>%n デバイスで双方向音声を有効にできませんでした</numerusform>
       </translation>
     </message>
-    <message>
-      <source>These devices do not have an audio output, or it is not configured correctly.</source>
-      <translation>これらのデバイスには音声出力がないか、正しく構成されていません。</translation>
+    <message numerus="yes">
+      <source>These devices do not have audio outputs or are not configured correctly.</source>
+      <translation>
+        <numerusform>これらのデバイスには音声出力が存在しないか、または正しく構成されていません。</numerusform>
+      </translation>
     </message>
     <message>
       <source>Audio will be disabled</source>
@@ -7478,7 +7601,7 @@ If you intended to move analytics data to another storage location, please conta
     </message>
     <message numerus="yes">
       <source>%1 are required</source>
-      <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
+      <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
       <translation>
         <numerusform>%1 が必要です</numerusform>
       </translation>
@@ -7749,10 +7872,6 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::CopyScheduleCameraSelectionDialog</name>
     <message>
-      <source>Schedule motion type is not supported by some cameras.</source>
-      <translation>モーションタイプのスケジュールは一部カメラではサポートされません。</translation>
-    </message>
-    <message>
       <source>Recording cannot be enabled for some cameras.</source>
       <translation>幾つかのカメラで録画を有効にできません.</translation>
     </message>
@@ -7763,6 +7882,10 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Copy archive length settings</source>
       <translation>アーカイブ設定のコピー</translation>
+    </message>
+    <message>
+      <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
+      <translation>録画スケジュールには、選択したカメラでサポートされていない録画モードが含まれています。サポートされていない録画モードは &quot;常時録画&quot; に変更されます。</translation>
     </message>
   </context>
   <context>
@@ -7875,6 +7998,14 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Address field cannot be empty</source>
       <translation>アドレス フィールドは空にできません</translation>
+    </message>
+    <message>
+      <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
+      <translation>ネットワーク上デバイスの検索は、HTTPS 接続をサポートするカメラに制限されています。これは、 %1 設定で変更できます。</translation>
+    </message>
+    <message>
+      <source>System Administration</source>
+      <translation>システム管理</translation>
     </message>
   </context>
   <context>
@@ -8165,6 +8296,25 @@ If you intended to move analytics data to another storage location, please conta
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ForceSecureAuthDialog</name>
+    <message>
+      <source>Force secure authentication?</source>
+      <translation>安全な認証を強制しますか？</translation>
+    </message>
+    <message>
+      <source>To revert this change user password reset will be required.</source>
+      <translation>この変更を元に戻すには、ユーザーパスワードのリセットが必要です。</translation>
+    </message>
+    <message>
+      <source>Do not show this message again</source>
+      <translation>今後このメッセージを表示しない</translation>
+    </message>
+    <message>
+      <source>Enable</source>
+      <translation>有効</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
     <message>
       <source>Brand</source>
@@ -8194,8 +8344,8 @@ If you intended to move analytics data to another storage location, please conta
   <context>
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
-      <source>Click to read more</source>
-      <translation>クリックして詳細を表示</translation>
+      <source>Click on the icon to read more</source>
+      <translation>詳細を確認するにはアイコンをクリックしてください</translation>
     </message>
   </context>
   <context>
@@ -8543,11 +8693,6 @@ If you intended to move analytics data to another storage location, please conta
       <translation>両方のシステムが %1 に接続されています。統合は許容されません。</translation>
     </message>
     <message>
-      <source>Cloud systems have different owners. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>クラウドシステムのオーナーが異なります。統合は許容されません。</translation>
-    </message>
-    <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
       <translation>同じServer GUIDを持つサーバーが1つ以上存在するため、システムを統合できません。このサーバーを削除してやり直してください。</translation>
     </message>
@@ -8566,6 +8711,11 @@ If you intended to move analytics data to another storage location, please conta
     <message>
       <source>Unknown error.</source>
       <translation>不明なエラー</translation>
+    </message>
+    <message>
+      <source>%1 systems have different owners. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 システムのオーナーが異なります。統合は許容されません。</translation>
     </message>
   </context>
   <context>
@@ -8930,6 +9080,21 @@ You can force it, but it may significantly increase CPU load.</source>
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::OauthLoginPlaceholder</name>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the cloud name like Nx Cloud</comment>
+      <translation>%1 に接続できません</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ObjectTrackingButton</name>
+    <message>
+      <source>Object tracking is ON</source>
+      <translation>オブジェクトトラッキング有効</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
@@ -9197,6 +9362,10 @@ You can force it, but it may significantly increase CPU load.</source>
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
       <translation>&lt;b&gt;一般&lt;/b&gt; タブでウェブページプロキシをオンにしてください。</translation>
     </message>
+    <message>
+      <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
+      <translation>すべてのコンテンツをプロキシすると、サーバーが所属するネットワーク内のすべてのサービスやデバイスがこのWebページのユーザーに公開されます。</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::RadassActionFactory</name>
@@ -9262,6 +9431,45 @@ You can force it, but it may significantly increase CPU load.</source>
     <message>
       <source>Motion + Lo-Res</source>
       <translation>常時低 ＋ モーション高解像度</translation>
+    </message>
+    <message>
+      <source>Recording motion and objects</source>
+      <translation>モーションとオブジェクトを録画</translation>
+    </message>
+    <message>
+      <source>Recording objects only</source>
+      <translation>オブジェクトのみ録画</translation>
+    </message>
+    <message>
+      <source>Recording motion, objects and low quality</source>
+      <translation>モーション、オブジェクト、低解像度を録画</translation>
+    </message>
+    <message>
+      <source>Recording objects and low quality</source>
+      <translation>オブジェクトと低解像度を録画</translation>
+    </message>
+    <message>
+      <source>Motion, Objects</source>
+      <translation>モーション、オブジェクト</translation>
+    </message>
+    <message>
+      <source>Objects only</source>
+      <translation>オブジェクトのみ</translation>
+    </message>
+    <message>
+      <source>Motion, Objects + Lo-Res</source>
+      <translation>モーション、オブジェクト + 低解像度</translation>
+    </message>
+    <message>
+      <source>Objects + Lo-Res</source>
+      <translation>オブジェクト + 低解像度</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RemoteConnectionUserInteractionDelegate</name>
+    <message>
+      <source>Connect to System</source>
+      <translation>システムへ接続</translation>
     </message>
   </context>
   <context>
@@ -9422,6 +9630,86 @@ You can still change quality and FPS directly on the camera.</source>
  + Low-Res</source>
       <translation>モーション + 低解像度</translation>
     </message>
+    <message>
+      <source>Motion detection is disabled for some of the selected devices</source>
+      <translation>選択したデバイスの一部でモーション検知が無効になっています</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for this camera</source>
+      <translation>このカメラではモーション検知が無効になっています</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for some of the selected cameras</source>
+      <translation>選択したカメラの一部でモーション検知が無効になっています</translation>
+    </message>
+    <message>
+      <source>Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>選択したデバイスの一部は、ストリームが1つしかありません。モーションの有無にかかわらず、同じ解像度または品質となります。</translation>
+    </message>
+    <message>
+      <source>This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>このカメラは、ストリームが1つしかありません。モーションの有無にかかわらず、同じ解像度または品質となります。</translation>
+    </message>
+    <message>
+      <source>Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>選択したカメラの一部は、ストリームが1つしかありません。モーションの有無にかかわらず、同じ解像度または品質となります。</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for some of the selected devices</source>
+      <translation>選択したデバイスの一部でオブジェクト検出が無効になっています</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for this camera</source>
+      <translation>このカメラではオブジェクト検出が無効になっています</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for some of the selected cameras</source>
+      <translation>選択したカメラの一部でオブジェクト検出が無効になっています</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for some of the selected devices</source>
+      <translation>選択したデバイスの一部で、モーションとオブジェクトの検出が無効になっています</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for this camera</source>
+      <translation>このカメラではモーションとオブジェクトの検出が無効になっています</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for some of the selected cameras</source>
+      <translation>選択したカメラの一部でモーションとオブジェクトの検出が無効になっています</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for this I/O module</source>
+      <translation>このI / Oモジュールではモーション検知が無効になっています</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for some of the selected I/O modules</source>
+      <translation>選択したI/Oモジュールの一部でモーション検知が無効になっています</translation>
+    </message>
+    <message>
+      <source>This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>このI/Oモジュールは、ストリームが1つしかありません。モーションの有無にかかわらず、同じ解像度または品質となります。</translation>
+    </message>
+    <message>
+      <source>Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>選択したI/Oモジュールの一部は、ストリームが1つしかありません。モーションの有無にかかわらず、同じ解像度または品質となります。</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for this I/O module</source>
+      <translation>このI / Oモジュールではオブジェクト検出が無効になっています</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for some of the selected I/O modules</source>
+      <translation>選択したI / Oモジュールの一部でオブジェクト検出が無効になっています</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for this I/O module</source>
+      <translation>このI/Oモジュールではモーションとオブジェクトの検出が無効になっています</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for some of the selected I/O modules</source>
+      <translation>選択したI / Oモジュールの一部で、モーションとオブジェクトの検出が無効になっています</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SearchLineEdit</name>
@@ -9443,10 +9731,6 @@ You can still change quality and FPS directly on the camera.</source>
     <message>
       <source>hours</source>
       <translation>時間</translation>
-    </message>
-    <message>
-      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation>セッションが指定された期間を超えると、ユーザーは自動的にログアウトされます。</translation>
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
@@ -9482,6 +9766,30 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <source>days</source>
       <translation> 日</translation>
     </message>
+    <message>
+      <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation>セッションが指定期間を超えると、ローカルおよびLDAPユーザーは自動的にログアウトされます。</translation>
+    </message>
+    <message>
+      <source>Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</source>
+      <translation>ユーザーセッション期間を無制限にするとシステム全体のセキュリティが損なわれるほか、システムのパフォーマンスが低下する可能性があります</translation>
+    </message>
+    <message>
+      <source>It is recommended to have user session lifetime not greater than %1</source>
+      <comment>%1 is the time span with time units</comment>
+      <translation>ユーザーセッションの有効期間は %1 以下にすることをお勧めします</translation>
+    </message>
+    <message>
+      <source>Learn more.</source>
+      <translation>詳細</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
+      <comment>%n is digest user count, %1 is total user count</comment>
+      <translation>
+        <numerusform>%1 ユーザー中 %n 名が Digest認証 (安全ではない) を利用できる設定です。</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateError</name>
@@ -9490,12 +9798,12 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <translation>サーバーへの接続に失敗しました</translation>
     </message>
     <message>
-      <source>Server certificate is invalid.</source>
-      <translation>証明書が無効です。</translation>
-    </message>
-    <message>
       <source>View certificate</source>
       <translation>証明書を表示</translation>
+    </message>
+    <message>
+      <source>Server certificate is invalid.</source>
+      <translation>証明書が無効です。</translation>
     </message>
   </context>
   <context>
@@ -9532,9 +9840,35 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <source>This is a custom certificate installed on %1</source>
       <translation>%1 にインストールされたカスタム証明書です</translation>
     </message>
+    <message>
+      <source>Pin this certificate to %1?</source>
+      <translation>この証明書を %1 にピン留めしますか？</translation>
+    </message>
+    <message>
+      <source>Someone may be impersonating %1 to steel your personal information.
+Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
+      <translation>誰かがあなたの個人情報を盗むために %1 になりすましている可能性があります。
+%2 サーバーのSSL証明書を変更していない場合は、この証明書を固定しないでください。</translation>
+    </message>
+    <message>
+      <source>Pin</source>
+      <translation>ピン留めする</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
+    <message>
+      <source>View certificate</source>
+      <translation>証明書を表示</translation>
+    </message>
+    <message>
+      <source>Connect Anyway</source>
+      <translation>理解した上で接続</translation>
+    </message>
+    <message>
+      <source>I trust this server</source>
+      <translation>このサーバーを信頼しています</translation>
+    </message>
     <message>
       <source>System:</source>
       <translation>システム:</translation>
@@ -9552,10 +9886,6 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <translation>このサーバーを信頼しますか？</translation>
     </message>
     <message>
-      <source>You attempted to connect to %1 but the server presented an untrusted self-signed certificate.</source>
-      <translation>%1 に接続しようとしましたが、サーバーは信頼できない自己署名証明書を提示しました。</translation>
-    </message>
-    <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
       <translation>証明書の詳細を確認して、正しいサーバーに接続していることを確認してください。</translation>
     </message>
@@ -9568,20 +9898,12 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
       <translation>誰かがあなたの個人情報を盗むために %1 になりすましている可能性があります。</translation>
     </message>
     <message>
-      <source>View certificate</source>
-      <translation>証明書を表示</translation>
-    </message>
-    <message>
-      <source>Connect Anyway</source>
-      <translation>理解した上で接続</translation>
-    </message>
-    <message>
-      <source>I trust this server</source>
-      <translation>このサーバーを信頼しています</translation>
-    </message>
-    <message>
       <source>Do not connect to this server unless instructed by your VMS administrator.</source>
       <translation>VMS管理者の指示がない限り、このサーバーに接続しないでください。</translation>
+    </message>
+    <message>
+      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
+      <translation>%1 に接続しようとしましたが、自動的に検証できない証明書がサーバーによって提示されました。</translation>
     </message>
   </context>
   <context>
@@ -9794,6 +10116,16 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message>
       <source>Set Passwords</source>
       <translation>パスワードの設定</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording schedule is invalid for %n cameras</source>
+      <translation>
+        <numerusform>%n カメラの録画スケジュールが無効です</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
+      <translation>一部のカメラの録画スケジュールには、サポートされていない録画モードが含まれています。</translation>
     </message>
   </context>
   <context>
@@ -10277,6 +10609,35 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
+    <message>
+      <source>Intercom Alarm Layout</source>
+      <translation>インターホン アラームレイアウト</translation>
+    </message>
+    <message>
+      <source>Intercom Open Door</source>
+      <translation>インターホン ドア開放</translation>
+    </message>
+    <message>
+      <source>Open door</source>
+      <translation>ドアを開く</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::OverlappedIdDialogModel</name>
+    <message>
+      <source>Latest</source>
+      <translation>最新</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::OverlappedIdIntegration</name>
+    <message>
+      <source>Overlapped ID...</source>
+      <translation>重複ID...</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::joystick::JoystickButtonActionChoiceModel</name>
     <message>
       <source>No Action</source>
@@ -10332,6 +10693,40 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     <message>
       <source>Button</source>
       <translation>ボタン</translation>
+    </message>
+    <message>
+      <source>Selected Layout</source>
+      <translation>選択したレイアウト</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::jsapi::detail::ResourcesApiBackend</name>
+    <message>
+      <source>Resource is not available for the usage with JS API</source>
+      <translation>JS APIで使用する場合、リソースは利用できません</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
+    <message>
+      <source>Cannot find an item with the specified id</source>
+      <translation>指定されたIDのアイテムが見つかりません。</translation>
+    </message>
+    <message>
+      <source>Cannot find a resource with the specified id.</source>
+      <translation>指定されたIDのリソースが見つかりません。</translation>
+    </message>
+    <message>
+      <source>Cannot specify a media parameters for the resource without media stream.</source>
+      <translation>メディアストリームが存在しないリソースのメディアパラメータは指定できません。</translation>
+    </message>
+    <message>
+      <source>Cannot add the resource to the layout</source>
+      <translation>レイアウトにリソースを追加できません</translation>
+    </message>
+    <message>
+      <source>Cannot find a widget corresponding to the specified item.</source>
+      <translation>指定されたアイテムに対応するウィジェットが見つかりません。</translation>
     </message>
   </context>
   <context>
@@ -10746,6 +11141,24 @@ You can select another storage location in the &quot;Storage Management&quot; ta
       <source>Window configuration saved</source>
       <translation>ウィンドウ設定を保存しました</translation>
     </message>
+    <message>
+      <source>This build is for demo purposes only.</source>
+      <translation>このビルドはデモ専用です。</translation>
+    </message>
+    <message>
+      <source>It cannot be upgraded to subsequent builds as they become available.</source>
+      <translation>後続のビルドが利用可能になったときにアップグレードすることはできません。</translation>
+    </message>
+    <message>
+      <source>To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</source>
+      <comment>%1 is the product name</comment>
+      <translation>アップグレードするには、更新ビルドをインストールする前に %1 をアンインストールしてください (すべてのデータが失われます)。</translation>
+    </message>
+    <message>
+      <source>%1 Beta</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 Beta</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::workbench::LayoutTourExecutor</name>
@@ -10754,8 +11167,8 @@ You can select another storage location in the &quot;Storage Management&quot; ta
       <translation>キーボードの矢印キーでレイアウトの切替え　シーケンス表示を終了するには、Escキーを押します</translation>
     </message>
     <message>
-      <source>Press any key to stop the tour.</source>
-      <translation>ツアーを停止するには、いずれかのキーを押してください。</translation>
+      <source>Press Esc to stop the tour.</source>
+      <translation>Escキー押下でツアーを停止します。</translation>
     </message>
   </context>
   <context>
@@ -10939,13 +11352,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::workbench::timeline::TimelineSliderTooltip</name>
-    <message>
-      <source>Local File</source>
-      <translation>ローカルファイル</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::workbench::timeline::VolumeSlider</name>
     <message>
       <source>Muted</source>
@@ -10990,6 +11396,10 @@ to view more bookmarks</source>
     <message>
       <source>Client update package is missing for current platform.</source>
       <translation>現在のプラットフォームのクライアント更新パッケージがありません。</translation>
+    </message>
+    <message>
+      <source>Can&apos;t check client update availability. Check your internet connection and try again.</source>
+      <translation>クライアントのアップデートが利用可能か確認できません。インターネット接続を確認して、もう一度お試しください。</translation>
     </message>
   </context>
 </TS>
