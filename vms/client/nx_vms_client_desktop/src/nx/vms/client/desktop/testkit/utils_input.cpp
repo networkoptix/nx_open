@@ -99,6 +99,10 @@ Qt::KeyboardModifiers sendKey(
 Q_INVOKABLE void sendKeys(QJSValue object, QString keys)
 {
     QObject* receiver = object.toQObject();
+
+    if (!receiver)
+        receiver = qGuiApp->focusWindow();
+
     if (!receiver)
         return;
 
