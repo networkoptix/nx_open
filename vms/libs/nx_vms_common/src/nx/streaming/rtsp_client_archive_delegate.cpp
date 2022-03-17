@@ -1092,6 +1092,7 @@ void QnRtspClientArchiveDelegate::setupRtspSession(
 
 void QnRtspClientArchiveDelegate::setPlayNowModeAllowed(bool value)
 {
+    m_playNowModeAllowed = value;
     m_rtspSession->setPlayNowModeAllowed(value);
 }
 
