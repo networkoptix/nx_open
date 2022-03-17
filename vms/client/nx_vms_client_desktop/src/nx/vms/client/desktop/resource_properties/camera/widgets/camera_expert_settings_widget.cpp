@@ -348,18 +348,15 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
 
     // Secondary Stream.
 
-    const bool dualStreamingDisabledForAll = state.settingsOptimizationEnabled
-        && state.expert.dualStreamingDisabled.valueOr(false);
-
     ui->secondStreamDisableCheckBox->setVisible(hasDualStreaming);
     if (hasDualStreaming)
     {
         check_box_utils::setupTristateCheckbox(
             ui->secondStreamDisableCheckBox,
-            state.expert.dualStreamingDisabled.hasValue() || !state.settingsOptimizationEnabled,
-            dualStreamingDisabledForAll);
+            state.expert.dualStreamingDisabled.hasValue(),
+            state.expert.dualStreamingDisabled.valueOr(false));
     }
-
+    ui->secondStreamDisableCheckBox->setEnabled(state.settingsOptimizationEnabled);
     ::setReadOnly(ui->secondStreamDisableCheckBox, state.readOnly);
 
     // Motion detection.
@@ -387,7 +384,8 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
         ui->checkBoxSecondaryRecorder, state.expert.secondaryRecordingDisabled);
 
     ui->checkBoxSecondaryRecorder->setVisible(hasDualStreaming);
-    ui->checkBoxSecondaryRecorder->setEnabled(!dualStreamingDisabledForAll);
+    ui->checkBoxSecondaryRecorder->setEnabled(!state.expert.dualStreamingDisabled.valueOr(false)
+        || !state.settingsOptimizationEnabled);
 
     ::setReadOnly(ui->checkBoxPrimaryRecorder, state.readOnly);
     ::setReadOnly(ui->checkBoxSecondaryRecorder, state.readOnly);
