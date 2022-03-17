@@ -96,7 +96,10 @@ public:
     /** Sends mouse event to the object. If the object is null the whole screen is used. */
     Q_INVOKABLE void mouse(QJSValue object, QJSValue parameters);
 
-    /** Sends sequence of keyboard events to the object. */
+    /**
+     * Sends sequence of keyboard events to the object. If object is null the events are sent to
+     * the active window.
+     */
     Q_INVOKABLE void keys(QJSValue object, QString keys);
 
     /** Dumps QObject into JSON object */
