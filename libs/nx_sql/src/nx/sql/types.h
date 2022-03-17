@@ -67,6 +67,7 @@ public:
      */
     std::chrono::milliseconds maxPeriodQueryWaitsForAvailableConnection;
     int maxErrorsInARowBeforeClosingConnection;
+    bool failOnDbTuneError = false;
 
     ConnectionOptions();
 

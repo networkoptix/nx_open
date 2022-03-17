@@ -97,6 +97,8 @@ const QLatin1String kDbInactivityTimeout("inactivityTimeout");
 const QLatin1String kDbMaxPeriodQueryWaitsForAvailableConnection(
     "maxPeriodQueryWaitsForAvailableConnection");
 
+const QLatin1String kDbFailOnDbTuneError("failOnDbTuneError");
+
 } // namespace
 
 ConnectionOptions::ConnectionOptions():
@@ -156,14 +158,15 @@ void ConnectionOptions::loadFromSettings(const QnSettings& settings, const QStri
                 settings.value(str).toString()));
     }
 
-    if (
-        auto str = nx::format("%1/%2").arg(groupName).arg(kDbMaxPeriodQueryWaitsForAvailableConnection);
+    if (auto str = nx::format("%1/%2").arg(groupName).arg(kDbMaxPeriodQueryWaitsForAvailableConnection);
         settings.contains(str))
     {
         maxPeriodQueryWaitsForAvailableConnection = duration_cast<seconds>(
-            nx::utils::parseTimerDuration(
-                settings.value(str).toString()));
+            nx::utils::parseTimerDuration(settings.value(str).toString()));
     }
+
+    if (auto str = nx::format("%1/%2").arg(groupName).arg(kDbFailOnDbTuneError); settings.contains(str))
+        failOnDbTuneError = settings.value(str).toBool();
 }
 
 bool ConnectionOptions::operator==(const ConnectionOptions& rhs) const
