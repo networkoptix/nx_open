@@ -88,16 +88,26 @@
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
       <translation>フィルターを変更するか、カメラプラグイン設定でオブジェクト検出を設定してください</translation>
     </message>
+    <message numerus="yes">
+      <source>%n new results</source>
+      <translation>
+        <numerusform>%n 件の新しい結果</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>new results</source>
+      <translation>新しい結果</translation>
+    </message>
+    <message>
+      <source>Detected by</source>
+      <translation>検出:</translation>
+    </message>
   </context>
   <context>
     <name>AnalyticsSearchDialog</name>
     <message>
       <source>Advanced Object Search</source>
       <translation>高度なオブジェクト検索</translation>
-    </message>
-    <message>
-      <source>Any Plugin</source>
-      <translation>すべてのプラグイン</translation>
     </message>
     <message>
       <source>Select area</source>
@@ -118,6 +128,20 @@
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
       <translation>フィルターを変更するか、カメラプラグイン設定でオブジェクト検出を設定してください</translation>
+    </message>
+    <message>
+      <source>Any plugin</source>
+      <translation>すべてのプラグイン</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n new results</source>
+      <translation>
+        <numerusform>%n 件の新しい結果</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>new results</source>
+      <translation>新しい結果</translation>
     </message>
   </context>
   <context>
@@ -254,8 +278,8 @@
   <context>
     <name>ContextHintButton</name>
     <message>
-      <source>Click to read more</source>
-      <translation>クリックして詳細を表示</translation>
+      <source>Click on the icon to read more</source>
+      <translation>詳細を読むにはアイコンをクリックしてください</translation>
     </message>
   </context>
   <context>
@@ -321,6 +345,10 @@
     <message>
       <source>Try changing the filters or create an Event Rule</source>
       <translation>フィルターを変更するか、イベントルールを作成してください</translation>
+    </message>
+    <message>
+      <source>Event Log</source>
+      <translation>イベントログ</translation>
     </message>
   </context>
   <context>
@@ -448,6 +476,13 @@
     </message>
   </context>
   <context>
+    <name>InformationBubble</name>
+    <message>
+      <source>Detected by</source>
+      <translation>検出:</translation>
+    </message>
+  </context>
+  <context>
     <name>InformationPanel</name>
     <message>
       <source>Version</source>
@@ -472,6 +507,33 @@
     <message>
       <source>Refreshing...</source>
       <translation>更新中...</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntervalPreviewControls</name>
+    <message>
+      <source>Toggle Mute</source>
+      <translation>ミュート切換え</translation>
+    </message>
+    <message>
+      <source>Previous Object</source>
+      <translation>前のオブジェクト</translation>
+    </message>
+    <message>
+      <source>Pause</source>
+      <translation>一時停止</translation>
+    </message>
+    <message>
+      <source>Play</source>
+      <translation>再生</translation>
+    </message>
+    <message>
+      <source>Next Object</source>
+      <translation>次のオブジェクト</translation>
+    </message>
+    <message>
+      <source>Toggle Repeat</source>
+      <translation>リピート切り替え</translation>
     </message>
   </context>
   <context>
@@ -590,12 +652,12 @@
     <name>Line</name>
     <message>
       <source>Line is not valid. Remove self-intersections to proceed.</source>
-      <translation>行が無効です。続行するには自己交差を削除してください。</translation>
+      <translation>線が無効です。続行するには自己交差を削除してください。</translation>
     </message>
     <message numerus="yes">
       <source>This line requires at least %n points.</source>
       <translation>
-        <numerusform>この行は少なくとも %n ポイント必要です。</numerusform>
+        <numerusform>この線は少なくとも %n ポイント必要です。</numerusform>
       </translation>
     </message>
     <message>
@@ -661,12 +723,12 @@
       <translation>パスワード</translation>
     </message>
     <message>
-      <source>Save Password</source>
-      <translation>パスワードを保存</translation>
-    </message>
-    <message>
       <source>Connect</source>
       <translation>接続</translation>
+    </message>
+    <message>
+      <source>Remember me</source>
+      <translation>ログイン情報を保持</translation>
     </message>
   </context>
   <context>
@@ -731,6 +793,10 @@
       <source>Show on Layout</source>
       <translation>レイアウトに表示</translation>
     </message>
+    <message>
+      <source>preview is not available for the selected object</source>
+      <translation>選択したオブジェクトのプレビューは使用できません</translation>
+    </message>
   </context>
   <context>
     <name>PromoPageButtons</name>
@@ -794,6 +860,10 @@ PTZを行います</translation>
     <message>
       <source>Object Type</source>
       <translation>オブジェクトタイプ</translation>
+    </message>
+    <message>
+      <source>Subtype</source>
+      <translation>サブタイプ</translation>
     </message>
   </context>
   <context>
@@ -938,6 +1008,21 @@ PTZを行います</translation>
     <message>
       <source>Select layout</source>
       <translation>レイアウトを選択</translation>
+    </message>
+  </context>
+  <context>
+    <name>SelectOverlappedIdDialog</name>
+    <message>
+      <source>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</source>
+      <translation>タイムライン識別子、リモートNVRの内部時刻が過去方向に変更されたときに作成されます。新しいタイムラインは、既存のタイムラインと重複する可能性があります。</translation>
+    </message>
+    <message>
+      <source>Select</source>
+      <translation>選択</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>キャンセル</translation>
     </message>
   </context>
   <context>
@@ -1173,10 +1258,6 @@ PTZを行います</translation>
   <context>
     <name>WelcomeScreen</name>
     <message>
-      <source>Loading...</source>
-      <translation>ロード中...</translation>
-    </message>
-    <message>
       <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
       <translation>%1 にアクセスできません。インターネット接続を確認してください。</translation>
     </message>
@@ -1191,6 +1272,10 @@ PTZを行います</translation>
     <message>
       <source>Support</source>
       <translation>サポート</translation>
+    </message>
+    <message>
+      <source>Loading...</source>
+      <translation>ロード中...</translation>
     </message>
   </context>
 </TS>

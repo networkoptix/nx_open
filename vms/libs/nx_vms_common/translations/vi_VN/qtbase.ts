@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="vi" sourcelanguage="en">
+<TS version="2.1" language="vi_VN" sourcelanguage="en_US">
   <context>
     <name>CloseButton</name>
     <message>
@@ -16,11 +16,11 @@
     </message>
     <message>
       <source>Hide %1</source>
-      <translation>Giấu %1</translation>
+      <translation>Ẩn%1</translation>
     </message>
     <message>
       <source>Hide Others</source>
-      <translation>Án khác</translation>
+      <translation>Ẩn khác</translation>
     </message>
     <message>
       <source>Show All</source>
@@ -28,7 +28,7 @@
     </message>
     <message>
       <source>Preferences...</source>
-      <translation>Áở thích...</translation>
+      <translation>Tùy chỉnh...</translation>
     </message>
     <message>
       <source>Quit %1</source>
@@ -43,11 +43,11 @@
     <name>QAbstractSpinBox</name>
     <message>
       <source>&amp;Select All</source>
-      <translation>&amp;chọn tất cả</translation>
+      <translation>&amp;Chọn tất cả</translation>
     </message>
     <message>
       <source>&amp;Step up</source>
-      <translation>&amp;bước lên</translation>
+      <translation>&amp;Bước lên</translation>
     </message>
     <message>
       <source>Step &amp;down</source>
@@ -58,11 +58,11 @@
     <name>QAccessibleActionInterface</name>
     <message>
       <source>Press</source>
-      <translation>Báo chí</translation>
+      <translation>Nhấn</translation>
     </message>
     <message>
       <source>Increase</source>
-      <translation>Tăng lên</translation>
+      <translation>Tăng</translation>
     </message>
     <message>
       <source>Decrease</source>
@@ -78,19 +78,19 @@
     </message>
     <message>
       <source>Toggle</source>
-      <translation>Chuyển</translation>
+      <translation>Thay đổi</translation>
     </message>
     <message>
       <source>Scroll Left</source>
-      <translation>Di chuyển sang trái</translation>
+      <translation>Cuộn sang trái</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Di chuyển sang phải</translation>
+      <translation>Cuộn sang phải</translation>
     </message>
     <message>
       <source>Scroll Up</source>
-      <translation>Di chuyển lên</translation>
+      <translation>Cuộn lên</translation>
     </message>
     <message>
       <source>Scroll Down</source>
@@ -106,7 +106,7 @@
     </message>
     <message>
       <source>Triggers the action</source>
-      <translation>Gây nên những hành động</translation>
+      <translation>Kích hoạt hành động</translation>
     </message>
     <message>
       <source>Increase the value</source>
@@ -126,11 +126,11 @@
     </message>
     <message>
       <source>Toggles the state</source>
-      <translation>Bập bênh nhà nước</translation>
+      <translation>Thay đổi trạng thái</translation>
     </message>
     <message>
       <source>Scrolls to the left</source>
-      <translation>Cuộn trái</translation>
+      <translation>Cuộn sang trái</translation>
     </message>
     <message>
       <source>Scrolls to the right</source>
@@ -146,7 +146,7 @@
     </message>
     <message>
       <source>Goes back a page</source>
-      <translation>Đi trở lại trang</translation>
+      <translation>Quay lại một trang</translation>
     </message>
     <message>
       <source>Goes to the next page</source>
@@ -157,19 +157,19 @@
     <name>QAndroidPlatformTheme</name>
     <message>
       <source>Yes</source>
-      <translation>Có</translation>
+      <translation>Đồng ý</translation>
     </message>
     <message>
       <source>Yes to All</source>
-      <translation>Có Cho Tất cả</translation>
+      <translation>Đồng ý tất cả</translation>
     </message>
     <message>
       <source>No</source>
-      <translation>Không</translation>
+      <translation>Từ chối</translation>
     </message>
     <message>
       <source>No to All</source>
-      <translation>Không Cho Tất cả</translation>
+      <translation>Từ chối tất cả</translation>
     </message>
   </context>
   <context>
@@ -188,7 +188,7 @@
     </message>
     <message>
       <source>Preference</source>
-      <translation>Sự ưa thích</translation>
+      <translation>Tuỳ chỉnh</translation>
     </message>
     <message>
       <source>Options</source>
@@ -196,11 +196,11 @@
     </message>
     <message>
       <source>Setting</source>
-      <translation>Thiết lập</translation>
+      <translation>Cài đặt</translation>
     </message>
     <message>
       <source>Setup</source>
-      <translation>Thiết lập</translation>
+      <translation>Cài đặt</translation>
     </message>
     <message>
       <source>Quit</source>
@@ -208,7 +208,7 @@
     </message>
     <message>
       <source>Exit</source>
-      <translation>Lối ra</translation>
+      <translation>Thoát</translation>
     </message>
     <message>
       <source>Cut</source>
@@ -216,7 +216,7 @@
     </message>
     <message>
       <source>Copy</source>
-      <translation>Bản sao</translation>
+      <translation>Sao chép</translation>
     </message>
     <message>
       <source>Paste</source>
@@ -250,7 +250,7 @@
     </message>
     <message>
       <source>&amp;Red:</source>
-      <translation>&amp;Red:</translation>
+      <translation>&amp;Đỏ:</translation>
     </message>
     <message>
       <source>&amp;Green:</source>
@@ -266,7 +266,7 @@
     </message>
     <message>
       <source>&amp;HTML:</source>
-      <translation type="unfinished">&amp;HTML:</translation>
+      <translation>&amp;HTML:</translation>
     </message>
     <message>
       <source>Cursor at %1, %2
@@ -283,15 +283,15 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>&amp;Basic colors</source>
-      <translation>&amp;màu sắc cơ bản</translation>
+      <translation>&amp;Màu cơ bản</translation>
     </message>
     <message>
       <source>&amp;Custom colors</source>
-      <translation>&amp;tuỳ chỉnh màu sắc</translation>
+      <translation>&amp;Màu tùy chỉnh</translation>
     </message>
     <message>
       <source>&amp;Add to Custom Colors</source>
-      <translation>&amp;thêm để tùy chỉnh màu sắc</translation>
+      <translation>&amp;Thêm vào màu tùy chỉnh</translation>
     </message>
   </context>
   <context>
@@ -302,11 +302,11 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>True</source>
-      <translation>Thật</translation>
+      <translation>Đúng</translation>
     </message>
     <message>
       <source>Open the combo box selection popup</source>
-      <translation>Mở lựa chọn combo box sổ bật lên</translation>
+      <translation>Mở cửa sổ bật lên các gói lựa chọn</translation>
     </message>
   </context>
   <context>
@@ -332,14 +332,14 @@ Press ESC to cancel</source>
     <name>QDialog</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation>What&apos;s This?</translation>
+      <translation>Đây là gì?</translation>
     </message>
   </context>
   <context>
     <name>QDialogButtonBox</name>
     <message>
       <source>OK</source>
-      <translation>Xác định</translation>
+      <translation>Đồng ý</translation>
     </message>
   </context>
   <context>
@@ -371,7 +371,7 @@ Press ESC to cancel</source>
     <name>QFile</name>
     <message>
       <source>Destination file is the same file.</source>
-      <translation>File đích là cùng một tập tin.</translation>
+      <translation>Tập tin đích là cùng một tệp.</translation>
     </message>
     <message>
       <source>Source file does not exist.</source>
@@ -391,11 +391,11 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Will not rename sequential file using block copy</source>
-      <translation>Không đổi tên tập tin tuần tự sử dụng khối copy</translation>
+      <translation>Sẽ không đổi tên tập tin tuần tự bằng cách sử dụng bản sao khối</translation>
     </message>
     <message>
       <source>Cannot remove source file</source>
-      <translation>Không thể xoá tập tin nguồn</translation>
+      <translation>Không thể xóa tập tin nguồn</translation>
     </message>
     <message>
       <source>Cannot open %1 for input</source>
@@ -422,27 +422,27 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Back</source>
-      <translation>Trở lại</translation>
+      <translation>Quay lại</translation>
     </message>
     <message>
       <source>Go back</source>
-      <translation>Trở lại</translation>
+      <translation>Quay lại</translation>
     </message>
     <message>
       <source>Forward</source>
-      <translation>Phía trước</translation>
+      <translation>Đi tới</translation>
     </message>
     <message>
       <source>Go forward</source>
-      <translation>Đi về phía trước</translation>
+      <translation>Đi tới</translation>
     </message>
     <message>
       <source>Parent Directory</source>
-      <translation>Thư mục cha</translation>
+      <translation>Thư mục gốc</translation>
     </message>
     <message>
       <source>Go to the parent directory</source>
-      <translation>Tới thư mục mẹ</translation>
+      <translation>Đi tới thư mục gốc</translation>
     </message>
     <message>
       <source>Create New Folder</source>
@@ -450,7 +450,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Create a New Folder</source>
-      <translation>Tạo ra một thư mục mới</translation>
+      <translation>Tạo một thư mục mới</translation>
     </message>
     <message>
       <source>List View</source>
@@ -458,19 +458,19 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Change to list view mode</source>
-      <translation>Thay đổi danh sách chế độ xem</translation>
+      <translation>Đổi sang chế độ xem danh sách</translation>
     </message>
     <message>
       <source>Detail View</source>
-      <translation>Chi tiết</translation>
+      <translation>Xem chi tiết</translation>
     </message>
     <message>
       <source>Change to detail view mode</source>
-      <translation>Thay đổi chế độ xem chi tiết</translation>
+      <translation>Đổi sang chế độ xem chi tiết</translation>
     </message>
     <message>
       <source>Files of type:</source>
-      <translation>Các file kiểu:</translation>
+      <translation>Các tập tin kiểu:</translation>
     </message>
     <message>
       <source>Find Directory</source>
@@ -482,7 +482,7 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>Save As</source>
-      <translation>Tiết kiệm như</translation>
+      <translation>Lưu như</translation>
     </message>
     <message>
       <source>Directory:</source>
@@ -502,35 +502,35 @@ Press ESC to cancel</source>
     </message>
     <message>
       <source>&amp;Save</source>
-      <translation>&amp;Tiết kiệm</translation>
+      <translation>&amp;Lưu</translation>
     </message>
     <message>
       <source>All Files (*)</source>
-      <translation>Tất cả các file (*)</translation>
+      <translation>Tất cả các tập tin (*)</translation>
     </message>
     <message>
       <source>Show </source>
-      <translation>Buổi diễn </translation>
+      <translation>Hiển thị </translation>
     </message>
     <message>
       <source>&amp;Rename</source>
-      <translation>&amp;đổi tên</translation>
+      <translation>&amp;Đổi tên</translation>
     </message>
     <message>
       <source>&amp;Delete</source>
-      <translation>&amp;Xóa bỏ</translation>
+      <translation>&amp;Xóa</translation>
     </message>
     <message>
       <source>Show &amp;hidden files</source>
-      <translation>Hiện &amp;tập tin ẩn</translation>
+      <translation>Hiện &amp;các tập tin ẩn</translation>
     </message>
     <message>
       <source>&amp;New Folder</source>
-      <translation>&amp;thư mục mới</translation>
+      <translation>&amp;Thư mục mới</translation>
     </message>
     <message>
       <source>All files (*)</source>
-      <translation>Tất cả các tệp (*)</translation>
+      <translation>Tất cả các tập tin (*)</translation>
     </message>
     <message>
       <source>Directories</source>
@@ -541,22 +541,22 @@ Press ESC to cancel</source>
 Directory not found.
 Please verify the correct directory name was given.</source>
       <translation>%1
-Thư mục không được tìm thấy.
-Hãy kiểm tra tên thư mục chính xác đã được đưa ra.</translation>
+Không tìm thấy thư mục.
+Vui lòng kiểm tra lại đường dẫn.</translation>
     </message>
     <message>
       <source>%1 already exists.
 Do you want to replace it?</source>
-      <translation>%1 đã tồn tại.
-Bạn có muốn thay thế nó?</translation>
+      <translation>%1 Đã tồn tại.
+Bạn có muốn thay thế?</translation>
     </message>
     <message>
       <source>%1
 File not found.
 Please verify the correct file name was given.</source>
       <translation>%1
-File không tìm thấy.
-Hãy kiểm tra tên tập tin chính xác đã được đưa ra.</translation>
+Không tìm thấy tập tin.
+Vui lòng kiểm tra lại tên tệp.</translation>
     </message>
     <message>
       <source>New Folder</source>
@@ -564,12 +564,12 @@ Hãy kiểm tra tên tập tin chính xác đã được đưa ra.</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Xóa bỏ</translation>
+      <translation>Xóa</translation>
     </message>
     <message>
       <source>&apos;%1&apos; is write protected.
 Do you want to delete it anyway?</source>
-      <translation>&apos;%1&apos; Chống ghi. Bạn có muốn xóa nó không?</translation>
+      <translation>&apos;%1&apos; được bảo vệ. Bạn vẫn muốn xóa?</translation>
     </message>
     <message>
       <source>Are you sure you want to delete &apos;%1&apos;?</source>
@@ -581,11 +581,11 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Recent Places</source>
-      <translation>Địa điểm gần đây</translation>
+      <translation>Các thư mục gần đây</translation>
     </message>
     <message>
       <source>Remove</source>
-      <translation>Tẩy</translation>
+      <translation>Xóa</translation>
     </message>
     <message>
       <source>My Computer</source>
@@ -593,16 +593,16 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Drive</source>
-      <translation>Lái xe</translation>
+      <translation>Ổ cứng</translation>
     </message>
     <message>
       <source>%1 File</source>
       <extracomment>%1 is a file name suffix, for example txt</extracomment>
-      <translation>%1 Tệp</translation>
+      <translation>%1 Tập tin</translation>
     </message>
     <message>
       <source>File</source>
-      <translation>Hồ sơ</translation>
+      <translation>Tập tin</translation>
     </message>
     <message>
       <source>File Folder</source>
@@ -617,51 +617,51 @@ Do you want to delete it anyway?</source>
     <message>
       <source>Alias</source>
       <comment>OS X Finder</comment>
-      <translation>Tên giả</translation>
+      <translation>Tên ghi chú</translation>
     </message>
     <message>
       <source>Shortcut</source>
       <comment>All other platforms</comment>
-      <translation>Shortcut</translation>
+      <translation>Lối tắt</translation>
     </message>
     <message>
       <source>Unknown</source>
-      <translation>Không biết</translation>
+      <translation>Không xác định</translation>
     </message>
     <message>
       <source>Sidebar</source>
-      <translation>Thanh bên</translation>
+      <translation>Thanh công cụ bên</translation>
     </message>
     <message>
       <source>List of places and bookmarks</source>
-      <translation>Danh sách các địa điểm và các chỉ mục</translation>
+      <translation>Danh sách thư mục và dấu trang</translation>
     </message>
     <message>
       <source>Files</source>
-      <translation>Văn khố</translation>
+      <translation>Tập tin</translation>
     </message>
     <message>
       <source>Alt+Left</source>
-      <translation>Alt + Trái</translation>
+      <translation>Alt+Trái</translation>
     </message>
     <message>
       <source>Alt+Right</source>
-      <translation>Alt + Phải</translation>
+      <translation>Alt+Phải</translation>
     </message>
     <message>
       <source>Alt+Up</source>
-      <translation>Alt + Up</translation>
+      <translation>Alt+Lên</translation>
     </message>
   </context>
   <context>
     <name>QFileSystemModel</name>
     <message>
       <source>%1 TB</source>
-      <translation>%1 Tb</translation>
+      <translation>%1 TB</translation>
     </message>
     <message>
       <source>%1 GB</source>
-      <translation>%1 Gb</translation>
+      <translation>%1 GB</translation>
     </message>
     <message>
       <source>%1 MB</source>
@@ -673,7 +673,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>%1 bytes</source>
-      <translation>%1 byte</translation>
+      <translation>%1 bytes</translation>
     </message>
     <message>
       <source>Invalid filename</source>
@@ -681,7 +681,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>&lt;b&gt;The name &quot;%1&quot; can not be used.&lt;/b&gt;&lt;p&gt;Try using another name, with fewer characters or no punctuations marks.</source>
-      <translation>&lt;b&gt;Tên &quot;%1&quot; không thể sử dụng.&lt;/b&gt;&lt;p&gt;Hãy thử sử dụng tên khác, có ít ký tự hoặc không có dấu chấm câu.</translation>
+      <translation>&lt;b&gt;Tên &quot;%1&quot; không thể sử dụng.&lt;/b&gt;&lt;p&gt;Hãy thử sử dụng tên khác, ít ký tự hơn hoặc không có dấu chấm câu.</translation>
     </message>
     <message>
       <source>Name</source>
@@ -730,15 +730,15 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>&amp;Cancel</source>
-      <translation>&amp;Hủy bỏ</translation>
+      <translation>&amp;Hủy</translation>
     </message>
     <message>
       <source>&amp;Close</source>
-      <translation>&amp;gần</translation>
+      <translation>&amp;Đóng</translation>
     </message>
     <message>
       <source>Close without Saving</source>
-      <translation>Gần mà không lưu</translation>
+      <translation>Đóng mà không lưu</translation>
     </message>
   </context>
   <context>
@@ -757,15 +757,15 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Too many open files</source>
-      <translation>Quá nhiều tập tin mở</translation>
+      <translation>Quá nhiều tập tin đang mở</translation>
     </message>
     <message>
       <source>No such file or directory</source>
-      <translation>Không có tập tin hoặc thư mục</translation>
+      <translation>Không có tập tin hoặc thư mục này</translation>
     </message>
     <message>
       <source>No space left on device</source>
-      <translation>Không có không gian còn lại trên thiết bị</translation>
+      <translation>Không còn chỗ trống trên thiết bị</translation>
     </message>
     <message>
       <source>Unknown error</source>
@@ -784,7 +784,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>File not found</source>
-      <translation>Không tìm thấy tệp</translation>
+      <translation>Không tìm thấy tập tin</translation>
     </message>
     <message>
       <source>Unsupported image format</source>
@@ -807,11 +807,11 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Device is not set</source>
-      <translation>Thiết bị chưa được đặt</translation>
+      <translation>Thiết bị chưa được cài đặt</translation>
     </message>
     <message>
       <source>Device not writable</source>
-      <translation>Thiết bị không ghi được</translation>
+      <translation>Thiết bị không thể ghi</translation>
     </message>
     <message>
       <source>Unsupported image format</source>
@@ -822,7 +822,7 @@ Do you want to delete it anyway?</source>
     <name>QInputDialog</name>
     <message>
       <source>Enter a value:</source>
-      <translation>Nhập một giá trị:</translation>
+      <translation>Nhập giá trị:</translation>
     </message>
   </context>
   <context>
@@ -834,14 +834,14 @@ Do you want to delete it anyway?</source>
     <message>
       <source>%1, ...</source>
       <extracomment>This text is an &quot;unfinished&quot; shortcut, expands like &quot;Ctrl+A, ...&quot;</extracomment>
-      <translation type="unfinished">%1, ...</translation>
+      <translation>%1, ...</translation>
     </message>
   </context>
   <context>
     <name>QLineEdit</name>
     <message>
       <source>&amp;Undo</source>
-      <translation>&amp;hủy bỏ</translation>
+      <translation>&amp;Hoàn tác</translation>
     </message>
     <message>
       <source>&amp;Redo</source>
@@ -849,19 +849,19 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Cu&amp;t</source>
-      <translation>Cu&amp;t</translation>
+      <translation>Cắ&amp;t</translation>
     </message>
     <message>
       <source>&amp;Copy</source>
-      <translation>&amp;bản sao</translation>
+      <translation>Sao chép</translation>
     </message>
     <message>
       <source>&amp;Paste</source>
-      <translation>&amp;dán</translation>
+      <translation>Dán</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Xóa bỏ</translation>
+      <translation>Xoá</translation>
     </message>
     <message>
       <source>Select All</source>
@@ -880,22 +880,22 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>OK</source>
-      <translation>Xác định</translation>
+      <translation>Xác nhận</translation>
     </message>
     <message>
       <source>Help</source>
-      <translation>Giúp</translation>
+      <translation>Trợ giúp</translation>
     </message>
   </context>
   <context>
     <name>QPlatformTheme</name>
     <message>
       <source>OK</source>
-      <translation>Xác định</translation>
+      <translation>Xác nhận</translation>
     </message>
     <message>
       <source>Save</source>
-      <translation>Tiết kiệm</translation>
+      <translation>Lưu</translation>
     </message>
     <message>
       <source>Save All</source>
@@ -907,19 +907,19 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>&amp;Yes</source>
-      <translation>&amp;Có</translation>
+      <translation>Đồng ý</translation>
     </message>
     <message>
       <source>Yes to &amp;All</source>
-      <translation>Có Cho &amp;Tất cả</translation>
+      <translation>Đồng ý tất cả</translation>
     </message>
     <message>
       <source>&amp;No</source>
-      <translation>&amp;Không</translation>
+      <translation>Từ chối</translation>
     </message>
     <message>
       <source>N&amp;o to All</source>
-      <translation>Không Cho Tất cả</translation>
+      <translation>Từ chối tất cả</translation>
     </message>
     <message>
       <source>Abort</source>
@@ -935,11 +935,11 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Close</source>
-      <translation>Gần</translation>
+      <translation>Đóng</translation>
     </message>
     <message>
       <source>Cancel</source>
-      <translation>Hủy bỏ</translation>
+      <translation>Hủy</translation>
     </message>
     <message>
       <source>Discard</source>
@@ -947,11 +947,11 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Help</source>
-      <translation>Giúp</translation>
+      <translation>Trợ giúp</translation>
     </message>
     <message>
       <source>Apply</source>
-      <translation>Ủng dụng</translation>
+      <translation>Áp dụng</translation>
     </message>
     <message>
       <source>Reset</source>
@@ -966,25 +966,25 @@ Do you want to delete it anyway?</source>
     <name>QProgressDialog</name>
     <message>
       <source>Cancel</source>
-      <translation>Hủy bỏ</translation>
+      <translation>Hủy</translation>
     </message>
   </context>
   <context>
     <name>QQnxFileDialogHelper</name>
     <message>
       <source>All files (*.*)</source>
-      <translation>Tất cả các file (*.*)</translation>
+      <translation>Tất cả các tập tin (*.*)</translation>
     </message>
   </context>
   <context>
     <name>QSaveFile</name>
     <message>
       <source>Existing file %1 is not writable</source>
-      <translation>Hiện tập tin %1 không cho phép ghi</translation>
+      <translation>Tập tin hiện tại %1 không thể chỉnh sửa</translation>
     </message>
     <message>
       <source>Filename refers to a directory</source>
-      <translation>Tên tệp dùng để chỉ một thư mục</translation>
+      <translation>Tên tập tin dẫn đến thư mục</translation>
     </message>
     <message>
       <source>Writing canceled by application</source>
@@ -1136,7 +1136,7 @@ Do you want to delete it anyway?</source>
     <name>QWhatsThisAction</name>
     <message>
       <source>What&apos;s This?</source>
-      <translation>What&apos;s This?</translation>
+      <translation>Đây là gì?</translation>
     </message>
   </context>
   <context>

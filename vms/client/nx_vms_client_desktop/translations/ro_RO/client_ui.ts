@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="ro" sourcelanguage="en">
+<TS version="2.1" language="ro_RO" sourcelanguage="en">
   <context>
     <name>AboutDialog</name>
     <message>
@@ -290,16 +290,8 @@
   <context>
     <name>BackupSettingsWidget</name>
     <message>
-      <source>To enable backup add more drives to use them as backup </source>
-      <translation type="unfinished">To enable backup add more drives to use them as backup </translation>
-    </message>
-    <message>
-      <source>storage in</source>
-      <translation type="unfinished">storage in</translation>
-    </message>
-    <message>
-      <source>Storage Management</source>
-      <translation type="unfinished">Storage Management</translation>
+      <source>Server is offline. Backup settings are not available.</source>
+      <translation type="unfinished">Server is offline. Backup settings are not available.</translation>
     </message>
   </context>
   <context>
@@ -325,8 +317,12 @@
       <translation type="unfinished">Maximum backup queue size</translation>
     </message>
     <message>
-      <source>All files are successfully backed up! New files will be backed up automatically.</source>
-      <translation type="unfinished">All files are successfully backed up! New files will be backed up automatically.</translation>
+      <source>All files are successfully backed up! New files will be backed up automatically</source>
+      <translation type="unfinished">All files are successfully backed up! New files will be backed up automatically</translation>
+    </message>
+    <message>
+      <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
+      <translation type="unfinished">Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</translation>
     </message>
   </context>
   <context>
@@ -567,14 +563,6 @@
       <translation type="unfinished">Logical ID</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation type="unfinished">Force motion detection for stream</translation>
-    </message>
-    <message>
-      <source>RTP transport</source>
-      <translation type="unfinished">RTP transport</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation type="unfinished">Trust camera timestamp</translation>
     </message>
@@ -623,12 +611,24 @@
       <translation type="unfinished">Use system presets</translation>
     </message>
     <message>
-      <source>Use camera native preset</source>
-      <translation type="unfinished">Use camera native preset</translation>
-    </message>
-    <message>
       <source>PTZ Speed</source>
       <translation type="unfinished">PTZ Speed</translation>
+    </message>
+    <message>
+      <source>RTP Transport</source>
+      <translation type="unfinished">RTP Transport</translation>
+    </message>
+    <message>
+      <source>Use camera native presets</source>
+      <translation type="unfinished">Use camera native presets</translation>
+    </message>
+    <message>
+      <source>Time Settings</source>
+      <translation type="unfinished">Time Settings</translation>
+    </message>
+    <message>
+      <source>Keep camera time settings</source>
+      <translation type="unfinished">Keep camera time settings</translation>
     </message>
   </context>
   <context>
@@ -745,10 +745,6 @@
   <context>
     <name>CameraScheduleWidget</name>
     <message>
-      <source>Motion Recording</source>
-      <translation type="unfinished">Motion Recording</translation>
-    </message>
-    <message>
       <source>Recording</source>
       <translation type="unfinished">Recording</translation>
     </message>
@@ -761,12 +757,12 @@
       <translation type="unfinished">Copying Schedule</translation>
     </message>
     <message>
-      <source>Apply changes before copying schedule.</source>
-      <translation type="unfinished">Apply changes before copying schedule.</translation>
-    </message>
-    <message>
       <source>Copy Schedule to...</source>
       <translation type="unfinished">Copy Schedule to...</translation>
+    </message>
+    <message>
+      <source>Motion &amp;&amp; Objects Recording</source>
+      <translation type="unfinished">Motion &amp;&amp; Objects Recording</translation>
     </message>
   </context>
   <context>
@@ -1498,6 +1494,10 @@
       <source>Disable imported users</source>
       <translation type="unfinished">Disable imported users</translation>
     </message>
+    <message>
+      <source>Allow digest authentication for imported user</source>
+      <translation type="unfinished">Allow digest authentication for imported user</translation>
+    </message>
   </context>
   <context>
     <name>LicenseDetailsDialog</name>
@@ -1766,6 +1766,13 @@
     <message>
       <source>To server</source>
       <translation type="unfinished">To server</translation>
+    </message>
+  </context>
+  <context>
+    <name>OauthLoginPlaceholder</name>
+    <message>
+      <source>Try Again</source>
+      <translation type="unfinished">Try Again</translation>
     </message>
   </context>
   <context>
@@ -2082,10 +2089,6 @@
       <translation type="unfinished">Fetch Users from LDAP...</translation>
     </message>
     <message>
-      <source>Clear Selection</source>
-      <translation type="unfinished">Clear Selection</translation>
-    </message>
-    <message>
       <source>Search users</source>
       <translation type="unfinished">Search users</translation>
     </message>
@@ -2104,6 +2107,14 @@
     <message>
       <source>Edit Roles...</source>
       <translation type="unfinished">Edit Roles...</translation>
+    </message>
+    <message>
+      <source>Force Secure Authentication</source>
+      <translation type="unfinished">Force Secure Authentication</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation type="unfinished">Nothing found</translation>
     </message>
   </context>
   <context>
@@ -2429,6 +2440,10 @@
       <source>Encrypt video traffic to desktop and mobile clients</source>
       <translation type="unfinished">Encrypt video traffic to desktop and mobile clients</translation>
     </message>
+    <message>
+      <source>Manage Users</source>
+      <translation type="unfinished">Manage Users</translation>
+    </message>
   </context>
   <context>
     <name>SendmailBusinessActionWidget</name>
@@ -2518,8 +2533,8 @@
       <translation type="unfinished">Port</translation>
     </message>
     <message>
-      <source>Autodetect USB and web cameras</source>
-      <translation type="unfinished">Autodetect USB and web cameras</translation>
+      <source>Autodetect built-in and USB webcams</source>
+      <translation type="unfinished">Autodetect built-in and USB webcams</translation>
     </message>
   </context>
   <context>
@@ -2996,8 +3011,8 @@
       <translation type="unfinished">Proxy all requested contents</translation>
     </message>
     <message>
-      <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation type="unfinished">Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</translation>
+      <source>Allow opening web page without SSL certificate checking</source>
+      <translation type="unfinished">Allow opening web page without SSL certificate checking</translation>
     </message>
   </context>
   <context>

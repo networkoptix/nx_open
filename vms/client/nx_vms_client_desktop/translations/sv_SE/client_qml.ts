@@ -88,16 +88,27 @@
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
       <translation>Prova att ändra filtren eller konfigurera objektdetektering i kamerans plugin-inställningar</translation>
     </message>
+    <message numerus="yes">
+      <source>%n new results</source>
+      <translation>
+        <numerusform>%n nya resultat</numerusform>
+        <numerusform>%n nya resultat</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>new results</source>
+      <translation>nya resultat</translation>
+    </message>
+    <message>
+      <source>Detected by</source>
+      <translation>Upptäckt av</translation>
+    </message>
   </context>
   <context>
     <name>AnalyticsSearchDialog</name>
     <message>
       <source>Advanced Object Search</source>
       <translation>Avancerad objektsökning</translation>
-    </message>
-    <message>
-      <source>Any Plugin</source>
-      <translation>Varje plugin</translation>
     </message>
     <message>
       <source>Select area</source>
@@ -118,6 +129,21 @@
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
       <translation>Prova att ändra filtren eller konfigurera objektdetektering i kamerans plugin-inställningar</translation>
+    </message>
+    <message>
+      <source>Any plugin</source>
+      <translation>Någon plugin</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n new results</source>
+      <translation>
+        <numerusform>%n nya resultat</numerusform>
+        <numerusform>%n nya resultat</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>new results</source>
+      <translation>nya resultat</translation>
     </message>
   </context>
   <context>
@@ -256,8 +282,8 @@
   <context>
     <name>ContextHintButton</name>
     <message>
-      <source>Click to read more</source>
-      <translation>Klicka för att läsa mer</translation>
+      <source>Click on the icon to read more</source>
+      <translation>Klicka på ikonen för att läsa mer</translation>
     </message>
   </context>
   <context>
@@ -323,6 +349,10 @@
     <message>
       <source>Try changing the filters or create an Event Rule</source>
       <translation>Försök att ändra filtren eller skapa en händelseregel</translation>
+    </message>
+    <message>
+      <source>Event Log</source>
+      <translation>Händelselogg</translation>
     </message>
   </context>
   <context>
@@ -450,6 +480,13 @@
     </message>
   </context>
   <context>
+    <name>InformationBubble</name>
+    <message>
+      <source>Detected by</source>
+      <translation>Upptäckt av</translation>
+    </message>
+  </context>
+  <context>
     <name>InformationPanel</name>
     <message>
       <source>Version</source>
@@ -474,6 +511,33 @@
     <message>
       <source>Refreshing...</source>
       <translation>Uppdaterar...</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntervalPreviewControls</name>
+    <message>
+      <source>Toggle Mute</source>
+      <translation>Växla mute</translation>
+    </message>
+    <message>
+      <source>Previous Object</source>
+      <translation>Föregående objekt</translation>
+    </message>
+    <message>
+      <source>Pause</source>
+      <translation>Paus</translation>
+    </message>
+    <message>
+      <source>Play</source>
+      <translation>Spela</translation>
+    </message>
+    <message>
+      <source>Next Object</source>
+      <translation>Nästa objekt</translation>
+    </message>
+    <message>
+      <source>Toggle Repeat</source>
+      <translation>Växla Upprepa</translation>
     </message>
   </context>
   <context>
@@ -665,12 +729,12 @@
       <translation>Lösenord</translation>
     </message>
     <message>
-      <source>Save Password</source>
-      <translation>Spara lösenord</translation>
-    </message>
-    <message>
       <source>Connect</source>
       <translation>Anslut</translation>
+    </message>
+    <message>
+      <source>Remember me</source>
+      <translation>Kom ihåg mig</translation>
     </message>
   </context>
   <context>
@@ -737,6 +801,10 @@
       <source>Show on Layout</source>
       <translation>Visa på Layout</translation>
     </message>
+    <message>
+      <source>preview is not available for the selected object</source>
+      <translation>förhandsgranskning är inte tillgänglig för det valda objektet</translation>
+    </message>
   </context>
   <context>
     <name>PromoPageButtons</name>
@@ -802,6 +870,10 @@ att aktivera PTZ</translation>
     <message>
       <source>Object Type</source>
       <translation>Objekttyp</translation>
+    </message>
+    <message>
+      <source>Subtype</source>
+      <translation>Undertyp</translation>
     </message>
   </context>
   <context>
@@ -947,6 +1019,21 @@ att aktivera PTZ</translation>
     <message>
       <source>Select layout</source>
       <translation>Välj vy</translation>
+    </message>
+  </context>
+  <context>
+    <name>SelectOverlappedIdDialog</name>
+    <message>
+      <source>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</source>
+      <translation>Tidslinjeidentifierare, som skapas när tiden ändras bakåt på en NVR. Den nya tidslinjen kan överlappa den befintliga.</translation>
+    </message>
+    <message>
+      <source>Select</source>
+      <translation>Välj</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Avbryt</translation>
     </message>
   </context>
   <context>
@@ -1184,10 +1271,6 @@ att aktivera PTZ</translation>
   <context>
     <name>WelcomeScreen</name>
     <message>
-      <source>Loading...</source>
-      <translation>Laddar ...</translation>
-    </message>
-    <message>
       <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
       <translation>Du don&apos;t har tillgång till %1. Kontrollera din internetanslutning.</translation>
     </message>
@@ -1202,6 +1285,10 @@ att aktivera PTZ</translation>
     <message>
       <source>Support</source>
       <translation>Support</translation>
+    </message>
+    <message>
+      <source>Loading...</source>
+      <translation>Laddar ...</translation>
     </message>
   </context>
 </TS>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="zh-CN" sourcelanguage="en">
+<TS version="2.1" language="zh_CN" sourcelanguage="en">
   <context>
     <name>ArchiveDuration</name>
     <message>
@@ -39,10 +39,6 @@
       <translation>%1 无回应，请稍后再试</translation>
     </message>
     <message>
-      <source>The user is disabled. Please contact your system administrator.</source>
-      <translation>此用户為未激活状态。请联系系统管理员。</translation>
-    </message>
-    <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
       <translation>由于多次尝试失败，用户已被锁定。请稍后再试。</translation>
     </message>
@@ -57,6 +53,10 @@
     <message>
       <source>Internal server error (%1). Please contact your system administrator.</source>
       <translation>内部服务器错误 (%1)。请联系系统管理员。</translation>
+    </message>
+    <message>
+      <source>This user has been disabled by a system administrator.</source>
+      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
     </message>
   </context>
   <context>

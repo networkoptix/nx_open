@@ -39,10 +39,6 @@
       <translation>%1 ist noch nicht verfügbar. Bitte versuchen Sie es später erneut.</translation>
     </message>
     <message>
-      <source>The user is disabled. Please contact your system administrator.</source>
-      <translation>Der Benutzer ist deaktiviert. Bitte kontaktieren Sie Ihren Systemadministrator.</translation>
-    </message>
-    <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
       <translation>Der Benutzer wird aufgrund mehrerer fehlgeschlagener Versuche gesperrt. Bitte versuchen Sie es später erneut.</translation>
     </message>
@@ -57,6 +53,10 @@
     <message>
       <source>Internal server error (%1). Please contact your system administrator.</source>
       <translation>Interner Serverfehler (%1). Bitte kontaktieren Sie Ihren Systemadministrator.</translation>
+    </message>
+    <message>
+      <source>This user has been disabled by a system administrator.</source>
+      <translation>Dieser Benutzer wurde von einem Systemadministrator deaktiviert.</translation>
     </message>
   </context>
   <context>

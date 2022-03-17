@@ -20,7 +20,7 @@
     <name>AuthResultTranslations</name>
     <message>
       <source>This user does not exist.</source>
-      <translation type="unfinished">This user does not exist.</translation>
+      <translation>Deze gebruiker bestaat niet.</translation>
     </message>
     <message>
       <source>Wrong password.</source>
@@ -28,35 +28,35 @@
     </message>
     <message>
       <source>The password is expired. Please contact your system administrator.</source>
-      <translation type="unfinished">The password is expired. Please contact your system administrator.</translation>
+      <translation>Het wachtwoord is verlopen. Neem contact op met uw systeembeheerder.</translation>
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
-      <translation type="unfinished">The LDAP server is not accessible. Please try again later.</translation>
+      <translation>De LDAP-server is niet toegankelijk. Probeer het later opnieuw.</translation>
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
-      <translation type="unfinished">%1 is not accessible yet. Please try again later.</translation>
-    </message>
-    <message>
-      <source>The user is disabled. Please contact your system administrator.</source>
-      <translation type="unfinished">The user is disabled. Please contact your system administrator.</translation>
+      <translation>%1 is nog niet toegankelijk. Probeer het later opnieuw.</translation>
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
-      <translation type="unfinished">The user is locked out due to several failed attempts. Please try again later.</translation>
+      <translation>De gebruiker is vergrendeld vanwege verschillende mislukte pogingen. Probeer het later opnieuw.</translation>
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your system administrator.</source>
-      <translation type="unfinished">This authorization method is forbidden. Please contact your system administrator.</translation>
+      <translation>Deze autorisatie methode is verboden. Neem contact op met uw systeembeheerder.</translation>
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
-      <translation type="unfinished">The session key is invalid or expired.</translation>
+      <translation>De sessiesleutel is ongeldig of verlopen.</translation>
     </message>
     <message>
       <source>Internal server error (%1). Please contact your system administrator.</source>
-      <translation type="unfinished">Internal server error (%1). Please contact your system administrator.</translation>
+      <translation>Interne server fout (%1). Neem contact op met uw systeembeheerder.</translation>
+    </message>
+    <message>
+      <source>This user has been disabled by a system administrator.</source>
+      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
     </message>
   </context>
   <context>
@@ -1126,7 +1126,7 @@
     </message>
     <message>
       <source>Could not allocate output metadata stream.</source>
-      <translation type="unfinished">Could not allocate output metadata stream.</translation>
+      <translation>Kan de uitvoer metadata stream niet toewijzen.</translation>
     </message>
     <message>
       <source>Invalid audio codec information.</source>
@@ -1710,16 +1710,16 @@
     </message>
     <message>
       <source>Analytics Object Detected</source>
-      <translation type="unfinished">Analytics Object Detected</translation>
+      <translation>Analytics-object gedetecteerd</translation>
     </message>
     <message>
       <source>%1 at camera &apos;%2&apos;</source>
       <comment> is detected</comment>
-      <translation type="unfinished">%1 at camera &apos;%2&apos;</translation>
+      <translation>%1 bij de camera &apos;%2&apos;</translation>
     </message>
     <message>
       <source>Plugin: %1</source>
-      <translation type="unfinished">Plugin: %1</translation>
+      <translation>Plugin: %1</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
@@ -1727,7 +1727,7 @@
     </message>
     <message>
       <source>Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</source>
-      <translation type="unfinished">Can&apos;t initialize AES encryption while recording media archive. Data is written unencrypted.</translation>
+      <translation>Kan de AES-encryptie niet starten tijdens het opnemen van media-archief. Gegevens worden niet versleuteld.</translation>
     </message>
     <message>
       <source>Archive backup failed.</source>
@@ -1735,7 +1735,7 @@
     </message>
     <message>
       <source>Object detected</source>
-      <translation type="unfinished">Object detected</translation>
+      <translation>Object gedetecteerd</translation>
     </message>
     <message>
       <source>Archive backup failed</source>
@@ -1743,19 +1743,19 @@
     </message>
     <message>
       <source>Data is backed up to %1</source>
-      <translation type="unfinished">Data is backed up to %1</translation>
+      <translation>Gegevens zijn geback-upte naar %1</translation>
     </message>
     <message>
       <source>Failed to backup file </source>
-      <translation type="unfinished">Failed to backup file </translation>
+      <translation>Back-up bestand mislukt </translation>
     </message>
     <message>
       <source>Server Certificate Error</source>
-      <translation type="unfinished">Server Certificate Error</translation>
+      <translation>Server Certificaat Fout</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
-      <translation type="unfinished">Server &quot;%1&quot; certificate error</translation>
+      <translation>Server &quot;%1&quot; certificaatfout</translation>
     </message>
   </context>
   <context>

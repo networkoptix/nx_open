@@ -290,16 +290,8 @@
   <context>
     <name>BackupSettingsWidget</name>
     <message>
-      <source>To enable backup add more drives to use them as backup </source>
-      <translation>バックアップを有効にするには、ドライブを追加してバックアップ用に設定してください </translation>
-    </message>
-    <message>
-      <source>storage in</source>
-      <translation>ストレージ</translation>
-    </message>
-    <message>
-      <source>Storage Management</source>
-      <translation>ストレージ管理</translation>
+      <source>Server is offline. Backup settings are not available.</source>
+      <translation>サーバーがオフラインです。バックアップ設定は利用できません。</translation>
     </message>
   </context>
   <context>
@@ -325,8 +317,12 @@
       <translation>バックアップキューの最大サイズ</translation>
     </message>
     <message>
-      <source>All files are successfully backed up! New files will be backed up automatically.</source>
+      <source>All files are successfully backed up! New files will be backed up automatically</source>
       <translation>すべてのファイルが正常にバックアップされました。新しいファイルは自動的にバックアップされます。</translation>
+    </message>
+    <message>
+      <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
+      <translation>ストレージの問題が発生したため、バックアップは停止しています。ストレージの問題が解決された後、バックアップは自動的に再開されます。</translation>
     </message>
   </context>
   <context>
@@ -567,14 +563,6 @@
       <translation>自定義ID</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation>強制的にモーション検知を行う</translation>
-    </message>
-    <message>
-      <source>RTP transport</source>
-      <translation>RTPトランスポート</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation>カメラのタイムスタンプを使う</translation>
     </message>
@@ -623,12 +611,24 @@
       <translation>システムプリセットを使用</translation>
     </message>
     <message>
-      <source>Use camera native preset</source>
+      <source>PTZ Speed</source>
+      <translation>PTZ速度</translation>
+    </message>
+    <message>
+      <source>RTP Transport</source>
+      <translation>RTPトランスポート</translation>
+    </message>
+    <message>
+      <source>Use camera native presets</source>
       <translation>カメラのネイティブプリセットを使用</translation>
     </message>
     <message>
-      <source>PTZ Speed</source>
-      <translation>PTZ速度</translation>
+      <source>Time Settings</source>
+      <translation>時刻設定</translation>
+    </message>
+    <message>
+      <source>Keep camera time settings</source>
+      <translation>カメラの時刻設定を保持する</translation>
     </message>
   </context>
   <context>
@@ -745,10 +745,6 @@
   <context>
     <name>CameraScheduleWidget</name>
     <message>
-      <source>Motion Recording</source>
-      <translation>モーション録画</translation>
-    </message>
-    <message>
       <source>Recording</source>
       <translation>録画</translation>
     </message>
@@ -761,12 +757,12 @@
       <translation>スケジュールのコピー</translation>
     </message>
     <message>
-      <source>Apply changes before copying schedule.</source>
-      <translation>スケジュールをコピーする前に変更を適用してください。</translation>
-    </message>
-    <message>
       <source>Copy Schedule to...</source>
       <translation>スケジュールをコピー...</translation>
+    </message>
+    <message>
+      <source>Motion &amp;&amp; Objects Recording</source>
+      <translation>モーション &amp;&amp; オブジェクト検知録画</translation>
     </message>
   </context>
   <context>
@@ -1498,6 +1494,10 @@
       <source>Disable imported users</source>
       <translation>インポートしたユーザーを無効</translation>
     </message>
+    <message>
+      <source>Allow digest authentication for imported user</source>
+      <translation>インポートされたユーザーのダイジェスト認証を許可する</translation>
+    </message>
   </context>
   <context>
     <name>LicenseDetailsDialog</name>
@@ -1766,6 +1766,13 @@
     <message>
       <source>To server</source>
       <translation>サーバー</translation>
+    </message>
+  </context>
+  <context>
+    <name>OauthLoginPlaceholder</name>
+    <message>
+      <source>Try Again</source>
+      <translation>再試行</translation>
     </message>
   </context>
   <context>
@@ -2082,10 +2089,6 @@
       <translation>LDAPからユーザー登録...</translation>
     </message>
     <message>
-      <source>Clear Selection</source>
-      <translation>選択クリア</translation>
-    </message>
-    <message>
       <source>Search users</source>
       <translation>ユーザーを検索</translation>
     </message>
@@ -2104,6 +2107,14 @@
     <message>
       <source>Edit Roles...</source>
       <translation>役割を編集...</translation>
+    </message>
+    <message>
+      <source>Force Secure Authentication</source>
+      <translation>安全な認証を強制する</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>何も見つかりませんでした</translation>
     </message>
   </context>
   <context>
@@ -2429,6 +2440,10 @@
       <source>Encrypt video traffic to desktop and mobile clients</source>
       <translation>デスクトップおよびモバイルクライアントへの映像トラフィックを暗号化</translation>
     </message>
+    <message>
+      <source>Manage Users</source>
+      <translation>ユーザー管理</translation>
+    </message>
   </context>
   <context>
     <name>SendmailBusinessActionWidget</name>
@@ -2518,8 +2533,8 @@
       <translation>ポート</translation>
     </message>
     <message>
-      <source>Autodetect USB and web cameras</source>
-      <translation>USBとWebカメラを自動検出</translation>
+      <source>Autodetect built-in and USB webcams</source>
+      <translation>内蔵およびUSB Webカメラの自動検出</translation>
     </message>
   </context>
   <context>
@@ -2996,8 +3011,8 @@
       <translation>要求されたすべてのコンテンツをプロキシする</translation>
     </message>
     <message>
-      <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation>すべてのコンテンツをプロキシすると、サーバーネットワーク上のすべてのサービスやデバイスがこのWebページのユーザーに公開されます。</translation>
+      <source>Allow opening web page without SSL certificate checking</source>
+      <translation>SSL証明書を確認せずWebページを開くことを許可する</translation>
     </message>
   </context>
   <context>

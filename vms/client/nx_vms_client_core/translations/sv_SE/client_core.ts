@@ -69,19 +69,6 @@
   <context>
     <name>RemoteConnectionErrorStrings</name>
     <message>
-      <source>If this error persists, please contact your VMS administrator.</source>
-      <translation>Om det här felet kvarstår, kontakta din VMS-administratör.</translation>
-    </message>
-    <message>
-      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Anslutning till %1 är inte klar än. Kontrollera serverns Internetanslutning eller försök igen senare.</translation>
-    </message>
-    <message>
-      <source>Connection to Server could not be established. Try again later.</source>
-      <translation>Det gick inte att upprätta anslutningen till servern. Försök igen senare.</translation>
-    </message>
-    <message>
       <source>Client version: %1</source>
       <translation>Klientversion: %1</translation>
     </message>
@@ -140,17 +127,8 @@
       <translation>LDAP-serverns anslutning avbröts.</translation>
     </message>
     <message>
-      <source>Log in to %1 to log in to this system with cloud user</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Logga in på %1 för att logga in i detta system med molnanvändaren</translation>
-    </message>
-    <message>
       <source>Session expired. Re-enter your password.</source>
       <translation>Sessionen löpte ut. Ange ditt lösenord igen.</translation>
-    </message>
-    <message>
-      <source>Session duration limit can be changed by the system administrators</source>
-      <translation>Tidsgränsen för varaktighet kan ändras av systemadministratörer</translation>
     </message>
     <message>
       <source>Invalid login or password</source>
@@ -165,10 +143,6 @@
       <translation>Användaren har inaktiverats</translation>
     </message>
     <message>
-      <source>This user is disabled by VMS administrator.</source>
-      <translation>Den här användaren är inaktiverad av VMS administratör.</translation>
-    </message>
-    <message>
       <source>Too many attempts. Try again in a minute.</source>
       <translation>Alltför många försök. Försök igen om någon minut.</translation>
     </message>
@@ -179,6 +153,50 @@
     <message>
       <source>Internal error. Please try again later.</source>
       <translation>Internt fel. Vänligen försök igen.</translation>
+    </message>
+    <message>
+      <source>If this error persists, please contact your system administrator.</source>
+      <translation>Om detta fel kvarstår, kontakta din systemadministratör.</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check your internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Anslutningen till %1 är inte klar ännu. Kontrollera din internetanslutning eller försök igen senare.</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Anslutningen till %1 är inte klar ännu. Kontrollera serverns internetanslutning eller försök igen senare.</translation>
+    </message>
+    <message>
+      <source>Connection to the server could not be established. Try again later.</source>
+      <translation>Anslutning till servern kunde inte upprättas. Försök igen senare.</translation>
+    </message>
+    <message>
+      <source>Your session has expired</source>
+      <translation>Din session har gått ut</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 again.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Logga in på %1 igen.</translation>
+    </message>
+    <message>
+      <source>Log in to %1 to log in to this system with %2 user</source>
+      <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
+      <translation>Logga in på %1 för att logga in på detta system med %2 användare</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by a system administrator.</source>
+      <translation>Sessionens varaktighetsgräns kan ändras av en systemadministratör.</translation>
+    </message>
+    <message>
+      <source>This user has been disabled by a system administrator.</source>
+      <translation>Den här användaren är inaktiverad av systemadministratören.</translation>
+    </message>
+    <message>
+      <source>Too many login attempts. Try again in a minute.</source>
+      <translation>Alltför många försök. Försök igen om någon minut.</translation>
     </message>
   </context>
 </TS>

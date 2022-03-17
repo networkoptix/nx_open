@@ -290,16 +290,8 @@
   <context>
     <name>BackupSettingsWidget</name>
     <message>
-      <source>To enable backup add more drives to use them as backup </source>
-      <translation>Um die Sicherung zu aktivieren, fügen Sie weitere Laufwerke hinzu, um sie als Sicherung zu verwenden </translation>
-    </message>
-    <message>
-      <source>storage in</source>
-      <translation>speicher in</translation>
-    </message>
-    <message>
-      <source>Storage Management</source>
-      <translation>Speicherverwaltung</translation>
+      <source>Server is offline. Backup settings are not available.</source>
+      <translation>Der Server ist offline. Die Backup-Einstellungen sind nicht verfügbar.</translation>
     </message>
   </context>
   <context>
@@ -325,8 +317,12 @@
       <translation>Maximale Größe der Backup-Warteschlange</translation>
     </message>
     <message>
-      <source>All files are successfully backed up! New files will be backed up automatically.</source>
-      <translation>Alle Dateien wurden erfolgreich gesichert! Neue Dateien werden automatisch gesichert.</translation>
+      <source>All files are successfully backed up! New files will be backed up automatically</source>
+      <translation>Alle Dateien werden erfolgreich gesichert! Neue Dateien werden automatisch gesichert</translation>
+    </message>
+    <message>
+      <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
+      <translation>Die Sicherung wird aufgrund eines Speicherproblems angehalten. Die Sicherung wird automatisch fortgesetzt, sobald das Speicherproblem behoben ist</translation>
     </message>
   </context>
   <context>
@@ -567,14 +563,6 @@
       <translation>Logical-ID</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation>Erzwinge Bewegungserkennung für Stream</translation>
-    </message>
-    <message>
-      <source>RTP transport</source>
-      <translation>RTP-Transport</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation>Kamerazeitstempel vertrauen</translation>
     </message>
@@ -623,12 +611,24 @@
       <translation>Systemvoreinstellungen verwenden</translation>
     </message>
     <message>
-      <source>Use camera native preset</source>
-      <translation>Native Voreinstellung der Kamera verwenden</translation>
-    </message>
-    <message>
       <source>PTZ Speed</source>
       <translation>PTZ-Geschwindigkeit</translation>
+    </message>
+    <message>
+      <source>RTP Transport</source>
+      <translation>RTP-Transport</translation>
+    </message>
+    <message>
+      <source>Use camera native presets</source>
+      <translation>Native Voreinstellungen der Kamera verwenden</translation>
+    </message>
+    <message>
+      <source>Time Settings</source>
+      <translation>Zeiteinstellungen</translation>
+    </message>
+    <message>
+      <source>Keep camera time settings</source>
+      <translation>Kamerazeiteinstellungen beibehalten</translation>
     </message>
   </context>
   <context>
@@ -745,10 +745,6 @@
   <context>
     <name>CameraScheduleWidget</name>
     <message>
-      <source>Motion Recording</source>
-      <translation>Bewegungsaufnahme</translation>
-    </message>
-    <message>
       <source>Recording</source>
       <translation>Aufnahme</translation>
     </message>
@@ -761,12 +757,12 @@
       <translation>Zeitplan kopieren</translation>
     </message>
     <message>
-      <source>Apply changes before copying schedule.</source>
-      <translation>Änderungen vor dem Kopieren anwenden</translation>
-    </message>
-    <message>
       <source>Copy Schedule to...</source>
       <translation>Zeitplan kopieren nach...</translation>
+    </message>
+    <message>
+      <source>Motion &amp;&amp; Objects Recording</source>
+      <translation>Bewegungs- &amp;&amp; Objekt-Aufnahme</translation>
     </message>
   </context>
   <context>
@@ -1498,6 +1494,10 @@
       <source>Disable imported users</source>
       <translation>Importierte Benutzer deaktivieren</translation>
     </message>
+    <message>
+      <source>Allow digest authentication for imported user</source>
+      <translation>Digest-Authentifizierung für importierte Benutzer zulassen</translation>
+    </message>
   </context>
   <context>
     <name>LicenseDetailsDialog</name>
@@ -1766,6 +1766,13 @@
     <message>
       <source>To server</source>
       <translation>Zum Server</translation>
+    </message>
+  </context>
+  <context>
+    <name>OauthLoginPlaceholder</name>
+    <message>
+      <source>Try Again</source>
+      <translation>Erneut versuchen</translation>
     </message>
   </context>
   <context>
@@ -2082,10 +2089,6 @@
       <translation>Benutzer von LDAP abrufen...</translation>
     </message>
     <message>
-      <source>Clear Selection</source>
-      <translation>Auswahl aufheben</translation>
-    </message>
-    <message>
       <source>Search users</source>
       <translation>Suche Benutzer</translation>
     </message>
@@ -2104,6 +2107,14 @@
     <message>
       <source>Edit Roles...</source>
       <translation>Rollen bearbeiten...</translation>
+    </message>
+    <message>
+      <source>Force Secure Authentication</source>
+      <translation>Sichere Authentifizierung erzwingen</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Nichts gefunden</translation>
     </message>
   </context>
   <context>
@@ -2429,6 +2440,10 @@
       <source>Encrypt video traffic to desktop and mobile clients</source>
       <translation>Verschlüsseln Sie den Videoverkehr zu Desktop- und mobilen Clients</translation>
     </message>
+    <message>
+      <source>Manage Users</source>
+      <translation>Benutzer verwalten</translation>
+    </message>
   </context>
   <context>
     <name>SendmailBusinessActionWidget</name>
@@ -2518,8 +2533,8 @@
       <translation>Port</translation>
     </message>
     <message>
-      <source>Autodetect USB and web cameras</source>
-      <translation>USB- und Webkameras automatisch erkennen</translation>
+      <source>Autodetect built-in and USB webcams</source>
+      <translation>Automatische Erkennung von integrierten und USB-Webcams</translation>
     </message>
   </context>
   <context>
@@ -2996,8 +3011,8 @@
       <translation>Proxy alle angeforderten Inhalte</translation>
     </message>
     <message>
-      <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation>Das Proxying aller Inhalte macht jeden Dienst oder jedes Gerät im Netzwerk des Servers für die Benutzer dieser Webseite sichtbar</translation>
+      <source>Allow opening web page without SSL certificate checking</source>
+      <translation>Öffnen von Webseiten ohne Prüfung des SSL-Zertifikats zulassen</translation>
     </message>
   </context>
   <context>

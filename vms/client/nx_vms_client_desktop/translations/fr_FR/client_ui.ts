@@ -290,16 +290,8 @@
   <context>
     <name>BackupSettingsWidget</name>
     <message>
-      <source>To enable backup add more drives to use them as backup </source>
-      <translation>Pour activer la sauvegarde, ajoutez plus de lecteurs pour les utiliser comme sauvegarde </translation>
-    </message>
-    <message>
-      <source>storage in</source>
-      <translation>stockage dans</translation>
-    </message>
-    <message>
-      <source>Storage Management</source>
-      <translation>Gestion Stockage</translation>
+      <source>Server is offline. Backup settings are not available.</source>
+      <translation>Le serveur est hors ligne. Les paramètres de sauvegarde ne sont pas disponibles.</translation>
     </message>
   </context>
   <context>
@@ -325,8 +317,12 @@
       <translation>Taille maximale de la file d'attente de sauvegarde</translation>
     </message>
     <message>
-      <source>All files are successfully backed up! New files will be backed up automatically.</source>
-      <translation>Tous les fichiers sont sauvegardés avec succès ! Les nouveaux fichiers seront sauvegardés automatiquement.</translation>
+      <source>All files are successfully backed up! New files will be backed up automatically</source>
+      <translation>Tous les fichiers sont sauvegardés avec succès ! Les nouveaux fichiers seront sauvegardés automatiquement</translation>
+    </message>
+    <message>
+      <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
+      <translation>La sauvegarde est arrêtée en raison d'un problème de stockage. La sauvegarde reprendra automatiquement une fois que le problème de stockage sera résolu</translation>
     </message>
   </context>
   <context>
@@ -567,14 +563,6 @@
       <translation>ID logique</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation>Forcer détection de mouvement du flux</translation>
-    </message>
-    <message>
-      <source>RTP transport</source>
-      <translation>Transport RTP</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation>Faire confiance à l'horodatage de la caméra</translation>
     </message>
@@ -623,12 +611,24 @@
       <translation>Utiliser les préréglages du système</translation>
     </message>
     <message>
-      <source>Use camera native preset</source>
-      <translation>Utiliser le préréglage natif de la caméra</translation>
-    </message>
-    <message>
       <source>PTZ Speed</source>
       <translation>Vitesse PTZ</translation>
+    </message>
+    <message>
+      <source>RTP Transport</source>
+      <translation>Transport RTP</translation>
+    </message>
+    <message>
+      <source>Use camera native presets</source>
+      <translation>Utiliser les préréglages natifs de la caméra</translation>
+    </message>
+    <message>
+      <source>Time Settings</source>
+      <translation>Réglages de l'heure</translation>
+    </message>
+    <message>
+      <source>Keep camera time settings</source>
+      <translation>Conserver les paramètres d'heure de la caméra</translation>
     </message>
   </context>
   <context>
@@ -745,10 +745,6 @@
   <context>
     <name>CameraScheduleWidget</name>
     <message>
-      <source>Motion Recording</source>
-      <translation>Enregist. sur mouvement</translation>
-    </message>
-    <message>
       <source>Recording</source>
       <translation>Enregistrement</translation>
     </message>
@@ -761,12 +757,12 @@
       <translation>Copier Horaire</translation>
     </message>
     <message>
-      <source>Apply changes before copying schedule.</source>
-      <translation>Appliquer les modifications avant de copier l'horaire.</translation>
-    </message>
-    <message>
       <source>Copy Schedule to...</source>
       <translation>Copier le calendrier vers...</translation>
+    </message>
+    <message>
+      <source>Motion &amp;&amp; Objects Recording</source>
+      <translation>Enregistrement de mouvement &amp;&amp; objets</translation>
     </message>
   </context>
   <context>
@@ -1498,6 +1494,10 @@
       <source>Disable imported users</source>
       <translation>Désactiver les utilisateurs importés</translation>
     </message>
+    <message>
+      <source>Allow digest authentication for imported user</source>
+      <translation>Autoriser l'authentification Digest pour l'utilisateur importé</translation>
+    </message>
   </context>
   <context>
     <name>LicenseDetailsDialog</name>
@@ -1766,6 +1766,13 @@
     <message>
       <source>To server</source>
       <translation>Vers le serveur</translation>
+    </message>
+  </context>
+  <context>
+    <name>OauthLoginPlaceholder</name>
+    <message>
+      <source>Try Again</source>
+      <translation>Réessayez</translation>
     </message>
   </context>
   <context>
@@ -2082,10 +2089,6 @@
       <translation>Récupérer les utilisateurs depuis LDAP...</translation>
     </message>
     <message>
-      <source>Clear Selection</source>
-      <translation>Effacer la sélection</translation>
-    </message>
-    <message>
       <source>Search users</source>
       <translation>Rechercher des utilisateurs</translation>
     </message>
@@ -2104,6 +2107,14 @@
     <message>
       <source>Edit Roles...</source>
       <translation>Modifier Rôles...</translation>
+    </message>
+    <message>
+      <source>Force Secure Authentication</source>
+      <translation>Forcer l'authentification sécurisée</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Rien trouvé</translation>
     </message>
   </context>
   <context>
@@ -2429,6 +2440,10 @@
       <source>Encrypt video traffic to desktop and mobile clients</source>
       <translation>Chiffrer le trafic vidéo vers les clients de bureau et mobiles</translation>
     </message>
+    <message>
+      <source>Manage Users</source>
+      <translation>Gérer les utilisateurs</translation>
+    </message>
   </context>
   <context>
     <name>SendmailBusinessActionWidget</name>
@@ -2518,8 +2533,8 @@
       <translation>Port</translation>
     </message>
     <message>
-      <source>Autodetect USB and web cameras</source>
-      <translation>Détection automatique des caméras USB et web</translation>
+      <source>Autodetect built-in and USB webcams</source>
+      <translation>Détection automatique des webcams intégrés et USB</translation>
     </message>
   </context>
   <context>
@@ -2996,8 +3011,8 @@
       <translation>Proxy de tous les contenus demandés</translation>
     </message>
     <message>
-      <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation>La transmission par proxy de tous les contenus expose tout service ou dispositif du réseau du serveur &apos;aux utilisateurs de cette page Web</translation>
+      <source>Allow opening web page without SSL certificate checking</source>
+      <translation>Autoriser l'ouverture d'une page Web sans vérification de certificat SSL</translation>
     </message>
   </context>
   <context>

@@ -9,7 +9,7 @@
     </message>
     <message>
       <source>empty</source>
-      <translation type="unfinished">empty</translation>
+      <translation>intet indhold</translation>
     </message>
     <message>
       <source>less than an hour</source>
@@ -20,11 +20,11 @@
     <name>AuthResultTranslations</name>
     <message>
       <source>This user does not exist.</source>
-      <translation type="unfinished">This user does not exist.</translation>
+      <translation>Denne bruger eksisterer ikke.</translation>
     </message>
     <message>
       <source>Wrong password.</source>
-      <translation type="unfinished">Wrong password.</translation>
+      <translation>Forkert adgangskode.</translation>
     </message>
     <message>
       <source>The password is expired. Please contact your system administrator.</source>
@@ -37,10 +37,6 @@
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
       <translation type="unfinished">%1 is not accessible yet. Please try again later.</translation>
-    </message>
-    <message>
-      <source>The user is disabled. Please contact your system administrator.</source>
-      <translation type="unfinished">The user is disabled. Please contact your system administrator.</translation>
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
@@ -57,6 +53,10 @@
     <message>
       <source>Internal server error (%1). Please contact your system administrator.</source>
       <translation type="unfinished">Internal server error (%1). Please contact your system administrator.</translation>
+    </message>
+    <message>
+      <source>This user has been disabled by a system administrator.</source>
+      <translation>Denne bruger er blevet deaktiveret af en systemadministrator.</translation>
     </message>
   </context>
   <context>
@@ -152,11 +152,11 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation type="unfinished">OK</translation>
+      <translation>OK</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
-      <translation type="unfinished">Server has been stopped.</translation>
+      <translation>Serveren er blevet stoppet.</translation>
     </message>
     <message>
       <source>Media stream is opened but no media data was received.</source>
@@ -456,15 +456,15 @@
     <name>QnLicense</name>
     <message>
       <source>Analog</source>
-      <translation type="unfinished">Analog</translation>
+      <translation>Analog</translation>
     </message>
     <message>
       <source>Professional</source>
-      <translation type="unfinished">Professional</translation>
+      <translation>Professionel</translation>
     </message>
     <message>
       <source>Edge</source>
-      <translation type="unfinished">Edge</translation>
+      <translation>Edge</translation>
     </message>
     <message>
       <source>Vmax</source>
@@ -472,7 +472,7 @@
     </message>
     <message>
       <source>Video Wall</source>
-      <translation type="unfinished">Video Wall</translation>
+      <translation>Videovæg</translation>
     </message>
     <message>
       <source>I/O Module</source>
@@ -484,7 +484,7 @@
     </message>
     <message>
       <source>Analog Encoder</source>
-      <translation type="unfinished">Analog Encoder</translation>
+      <translation>Analog encoder</translation>
     </message>
     <message>
       <source>Analog Licenses</source>
@@ -532,7 +532,7 @@
     </message>
     <message>
       <source>Time</source>
-      <translation type="unfinished">Time</translation>
+      <translation>Tid</translation>
     </message>
     <message>
       <source>Time Licenses</source>
@@ -758,51 +758,51 @@
     <name>QnResourceNameStrings</name>
     <message>
       <source>Cameras</source>
-      <translation type="unfinished">Cameras</translation>
+      <translation>Kameraer</translation>
     </message>
     <message>
       <source>cameras</source>
-      <translation type="unfinished">cameras</translation>
+      <translation>kameraer</translation>
     </message>
     <message>
       <source>Camera</source>
-      <translation type="unfinished">Camera</translation>
+      <translation>Kamera</translation>
     </message>
     <message>
       <source>camera</source>
-      <translation type="unfinished">camera</translation>
+      <translation>kamera</translation>
     </message>
     <message>
       <source>Devices</source>
-      <translation type="unfinished">Devices</translation>
+      <translation>Enheder</translation>
     </message>
     <message>
       <source>devices</source>
-      <translation type="unfinished">devices</translation>
+      <translation>enheder</translation>
     </message>
     <message>
       <source>Device</source>
-      <translation type="unfinished">Device</translation>
+      <translation>Enhed</translation>
     </message>
     <message>
       <source>device</source>
-      <translation type="unfinished">device</translation>
+      <translation>enhed</translation>
     </message>
     <message>
       <source>I/O Modules</source>
-      <translation type="unfinished">I/O Modules</translation>
+      <translation>I/O Moduler</translation>
     </message>
     <message>
       <source>I/O modules</source>
-      <translation type="unfinished">I/O modules</translation>
+      <translation>I/O moduler</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation type="unfinished">I/O Module</translation>
+      <translation>I/O Modul</translation>
     </message>
     <message>
       <source>I/O module</source>
-      <translation type="unfinished">I/O module</translation>
+      <translation>I/O modul</translation>
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
@@ -851,23 +851,23 @@
     <name>QnSignHelper</name>
     <message>
       <source>Unknown</source>
-      <translation type="unfinished">Unknown</translation>
+      <translation>Ukendt</translation>
     </message>
     <message>
       <source>FREE License</source>
-      <translation type="unfinished">FREE License</translation>
+      <translation>GRATIS licens</translation>
     </message>
     <message>
       <source>Licensed To: %1</source>
-      <translation type="unfinished">Licensed To: %1</translation>
+      <translation>Licenseret til: %1</translation>
     </message>
     <message>
       <source>Watermark: %1</source>
-      <translation type="unfinished">Watermark: %1</translation>
+      <translation>Vandmærke: %1</translation>
     </message>
     <message>
       <source>Hardware ID: %1</source>
-      <translation type="unfinished">Hardware ID: %1</translation>
+      <translation>Hardware ID: %1</translation>
     </message>
   </context>
   <context>
@@ -875,72 +875,72 @@
     <message>
       <source>ms</source>
       <comment>Suffix for displaying milliseconds</comment>
-      <translation type="unfinished">ms</translation>
+      <translation>ms</translation>
     </message>
     <message>
       <source>s</source>
       <comment>Suffix for displaying seconds</comment>
-      <translation type="unfinished">s</translation>
+      <translation>s</translation>
     </message>
     <message>
       <source>m</source>
       <comment>Suffix for displaying minutes</comment>
-      <translation type="unfinished">m</translation>
+      <translation>m</translation>
     </message>
     <message>
       <source>h</source>
       <comment>Suffix for displaying hours</comment>
-      <translation type="unfinished">h</translation>
+      <translation>t</translation>
     </message>
     <message>
       <source>d</source>
       <comment>Suffix for displaying days</comment>
-      <translation type="unfinished">d</translation>
+      <translation>d</translation>
     </message>
     <message>
       <source>w</source>
       <comment>Suffix for displaying weeks</comment>
-      <translation type="unfinished">w</translation>
+      <translation>u</translation>
     </message>
     <message>
       <source>M</source>
       <comment>Suffix for displaying months</comment>
-      <translation type="unfinished">M</translation>
+      <translation>M</translation>
     </message>
     <message>
       <source>y</source>
       <comment>Suffix for displaying years</comment>
-      <translation type="unfinished">y</translation>
+      <translation>år</translation>
     </message>
     <message>
       <source>msec</source>
       <comment>Long suffix for displaying milliseconds</comment>
-      <translation type="unfinished">msec</translation>
+      <translation>msek</translation>
     </message>
     <message>
       <source>sec</source>
       <comment>Long suffix for displaying seconds</comment>
-      <translation type="unfinished">sec</translation>
+      <translation>sek</translation>
     </message>
     <message>
       <source>min</source>
       <comment>Long suffix for displaying minutes</comment>
-      <translation type="unfinished">min</translation>
+      <translation>min</translation>
     </message>
     <message>
       <source>hrs</source>
       <comment>Long suffix for displaying hours</comment>
-      <translation type="unfinished">hrs</translation>
+      <translation>time</translation>
     </message>
     <message>
       <source>days</source>
       <comment>Long suffix for displaying days</comment>
-      <translation type="unfinished">days</translation>
+      <translation>dage</translation>
     </message>
     <message>
       <source>wks</source>
       <comment>Long suffix for displaying weeks</comment>
-      <translation type="unfinished">wks</translation>
+      <translation>uge</translation>
     </message>
     <message>
       <source>mos</source>

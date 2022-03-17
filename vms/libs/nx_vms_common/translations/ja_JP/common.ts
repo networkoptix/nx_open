@@ -39,10 +39,6 @@
       <translation>%1 にアクセスできません。後でもう一度お試しください。</translation>
     </message>
     <message>
-      <source>The user is disabled. Please contact your system administrator.</source>
-      <translation>ユーザーは無効になっています。システム管理者に問い合わせてください。</translation>
-    </message>
-    <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
       <translation>複数回の試行に失敗したため、ユーザーはロックされています。後でもう一度お試しください。</translation>
     </message>
@@ -57,6 +53,10 @@
     <message>
       <source>Internal server error (%1). Please contact your system administrator.</source>
       <translation>内部サーバーエラー (%1) 。システム管理者に連絡してください。</translation>
+    </message>
+    <message>
+      <source>This user has been disabled by a system administrator.</source>
+      <translation>このユーザーはシステム管理者によって無効にされています。</translation>
     </message>
   </context>
   <context>

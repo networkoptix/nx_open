@@ -88,16 +88,27 @@
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
       <translation>Versuchen Sie, die Filter zu ändern oder die Objekterkennung in den Kameraplugineinstellungen zu konfigurieren</translation>
     </message>
+    <message numerus="yes">
+      <source>%n new results</source>
+      <translation>
+        <numerusform>%n neues Ergebnis</numerusform>
+        <numerusform>%n neue Ergebnisse</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>new results</source>
+      <translation>neue Ergebnisse</translation>
+    </message>
+    <message>
+      <source>Detected by</source>
+      <translation>Erkannt von</translation>
+    </message>
   </context>
   <context>
     <name>AnalyticsSearchDialog</name>
     <message>
       <source>Advanced Object Search</source>
       <translation>Erweiterte Objektsuche</translation>
-    </message>
-    <message>
-      <source>Any Plugin</source>
-      <translation>Jedes Plugin</translation>
     </message>
     <message>
       <source>Select area</source>
@@ -118,6 +129,21 @@
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
       <translation>Versuchen Sie, die Filter zu ändern oder die Objekterkennung in den Kameraplugineinstellungen zu konfigurieren</translation>
+    </message>
+    <message>
+      <source>Any plugin</source>
+      <translation>Jedes Plugin</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n new results</source>
+      <translation>
+        <numerusform>%n neues Ergebnis</numerusform>
+        <numerusform>%n neue Ergebnisse</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>new results</source>
+      <translation>neue Ergebnisse</translation>
     </message>
   </context>
   <context>
@@ -256,8 +282,8 @@
   <context>
     <name>ContextHintButton</name>
     <message>
-      <source>Click to read more</source>
-      <translation>Klicken Sie hier, um mehr zu erfahren</translation>
+      <source>Click on the icon to read more</source>
+      <translation>Klicken Sie auf das Symbol, um mehr zu erfahren</translation>
     </message>
   </context>
   <context>
@@ -323,6 +349,10 @@
     <message>
       <source>Try changing the filters or create an Event Rule</source>
       <translation>Versuchen Sie, die Filter zu ändern oder eine Ereignisregel zu erstellen</translation>
+    </message>
+    <message>
+      <source>Event Log</source>
+      <translation>Ereignislog</translation>
     </message>
   </context>
   <context>
@@ -450,6 +480,13 @@
     </message>
   </context>
   <context>
+    <name>InformationBubble</name>
+    <message>
+      <source>Detected by</source>
+      <translation>Erkannt von</translation>
+    </message>
+  </context>
+  <context>
     <name>InformationPanel</name>
     <message>
       <source>Version</source>
@@ -474,6 +511,33 @@
     <message>
       <source>Refreshing...</source>
       <translation>Aktualisieren...</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntervalPreviewControls</name>
+    <message>
+      <source>Toggle Mute</source>
+      <translation>Stummschaltung umschalten</translation>
+    </message>
+    <message>
+      <source>Previous Object</source>
+      <translation>Vorheriges Objekt</translation>
+    </message>
+    <message>
+      <source>Pause</source>
+      <translation>Pause</translation>
+    </message>
+    <message>
+      <source>Play</source>
+      <translation>Abspielen</translation>
+    </message>
+    <message>
+      <source>Next Object</source>
+      <translation>Nächstes Objekt</translation>
+    </message>
+    <message>
+      <source>Toggle Repeat</source>
+      <translation>Wiederholung umschalten</translation>
     </message>
   </context>
   <context>
@@ -665,12 +729,12 @@
       <translation>Passwort</translation>
     </message>
     <message>
-      <source>Save Password</source>
-      <translation>Passwort speichern</translation>
-    </message>
-    <message>
       <source>Connect</source>
       <translation>Verbinden</translation>
+    </message>
+    <message>
+      <source>Remember me</source>
+      <translation>Erinnere mich</translation>
     </message>
   </context>
   <context>
@@ -737,6 +801,10 @@
       <source>Show on Layout</source>
       <translation>Im Layout anzeigen</translation>
     </message>
+    <message>
+      <source>preview is not available for the selected object</source>
+      <translation>Vorschau ist für das ausgewählte Objekt nicht verfügbar</translation>
+    </message>
   </context>
   <context>
     <name>PromoPageButtons</name>
@@ -802,6 +870,10 @@ to activate PTZ</source>
     <message>
       <source>Object Type</source>
       <translation>Objekttyp</translation>
+    </message>
+    <message>
+      <source>Subtype</source>
+      <translation>Subtyp</translation>
     </message>
   </context>
   <context>
@@ -947,6 +1019,21 @@ to activate PTZ</source>
     <message>
       <source>Select layout</source>
       <translation>Layout auswählen</translation>
+    </message>
+  </context>
+  <context>
+    <name>SelectOverlappedIdDialog</name>
+    <message>
+      <source>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</source>
+      <translation>Kennung der Zeitleiste, die erstellt wird, wenn die Zeit auf einem entfernten NVR rückwärts geändert wird. Die neue Zeitleiste kann sich mit der bestehenden überschneiden.</translation>
+    </message>
+    <message>
+      <source>Select</source>
+      <translation>Auswählen</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Abbrechen</translation>
     </message>
   </context>
   <context>
@@ -1184,10 +1271,6 @@ to activate PTZ</source>
   <context>
     <name>WelcomeScreen</name>
     <message>
-      <source>Loading...</source>
-      <translation>Wird geladen...</translation>
-    </message>
-    <message>
       <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
       <translation>Sie haben keinen Zugriff auf die %1. Bitte überprüfe deine Internetverbindung.</translation>
     </message>
@@ -1202,6 +1285,10 @@ to activate PTZ</source>
     <message>
       <source>Support</source>
       <translation>Support</translation>
+    </message>
+    <message>
+      <source>Loading...</source>
+      <translation>Wird geladen...</translation>
     </message>
   </context>
 </TS>

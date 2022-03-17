@@ -39,10 +39,6 @@
       <translation>%1 пока недоступен. Пожалуйста, попробуйте позже.</translation>
     </message>
     <message>
-      <source>The user is disabled. Please contact your system administrator.</source>
-      <translation>Пользователь отключен. Пожалуйста, обратитесь к системному администратору.</translation>
-    </message>
-    <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
       <translation>Пользователь заблокирован из-за нескольких неудачных попыток. Пожалуйста, попробуйте позже.</translation>
     </message>
@@ -57,6 +53,10 @@
     <message>
       <source>Internal server error (%1). Please contact your system administrator.</source>
       <translation>Внутренняя ошибка сервера (%1). Пожалуйста, обратитесь к системному администратору.</translation>
+    </message>
+    <message>
+      <source>This user has been disabled by a system administrator.</source>
+      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
     </message>
   </context>
   <context>

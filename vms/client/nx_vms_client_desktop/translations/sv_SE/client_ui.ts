@@ -290,16 +290,8 @@
   <context>
     <name>BackupSettingsWidget</name>
     <message>
-      <source>To enable backup add more drives to use them as backup </source>
-      <translation>För att aktivera säkerhetskopiering lägg till fler diskar för att använda dem som säkerhetskopiering </translation>
-    </message>
-    <message>
-      <source>storage in</source>
-      <translation>lagring i</translation>
-    </message>
-    <message>
-      <source>Storage Management</source>
-      <translation>Lagringshantering</translation>
+      <source>Server is offline. Backup settings are not available.</source>
+      <translation>Servern är offline. Säkerhetskopieringsinställningar är inte tillgängliga.</translation>
     </message>
   </context>
   <context>
@@ -325,8 +317,12 @@
       <translation>Maximal storlek på säkerhetskopieringskö</translation>
     </message>
     <message>
-      <source>All files are successfully backed up! New files will be backed up automatically.</source>
-      <translation>Alla filer har säkerhetskopierats! Nya filer säkerhetskopieras automatiskt.</translation>
+      <source>All files are successfully backed up! New files will be backed up automatically</source>
+      <translation>Alla filer har säkerhetskopierats framgångsrikt! Nya filer kommer att säkerhetskopieras automatiskt</translation>
+    </message>
+    <message>
+      <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
+      <translation>Säkerhetskopieringen stoppas på grund av lagringsproblem. Säkerhetskopieringen återupptas automatiskt efter att lagringsproblemet har lösts</translation>
     </message>
   </context>
   <context>
@@ -567,14 +563,6 @@
       <translation>Logiskt ID</translation>
     </message>
     <message>
-      <source>Force motion detection for stream</source>
-      <translation>Kör rörelsedetektering för ström</translation>
-    </message>
-    <message>
-      <source>RTP transport</source>
-      <translation>RTP transport</translation>
-    </message>
-    <message>
       <source>Trust camera timestamp</source>
       <translation>Lita på kameratidsstämpeln</translation>
     </message>
@@ -623,12 +611,24 @@
       <translation>Använd systemets förinställningar</translation>
     </message>
     <message>
-      <source>Use camera native preset</source>
-      <translation>Använd kamerans förinställning</translation>
-    </message>
-    <message>
       <source>PTZ Speed</source>
       <translation>PTZ hastighet</translation>
+    </message>
+    <message>
+      <source>RTP Transport</source>
+      <translation>RTP Transport</translation>
+    </message>
+    <message>
+      <source>Use camera native presets</source>
+      <translation>Använd kamerans inbyggda förinställningar</translation>
+    </message>
+    <message>
+      <source>Time Settings</source>
+      <translation>Tidsinställningar</translation>
+    </message>
+    <message>
+      <source>Keep camera time settings</source>
+      <translation>Behåll kamerans tidsinställningar</translation>
     </message>
   </context>
   <context>
@@ -745,10 +745,6 @@
   <context>
     <name>CameraScheduleWidget</name>
     <message>
-      <source>Motion Recording</source>
-      <translation>Rörelseinspelning</translation>
-    </message>
-    <message>
       <source>Recording</source>
       <translation>Inspelning</translation>
     </message>
@@ -761,12 +757,12 @@
       <translation>Kopiera schema</translation>
     </message>
     <message>
-      <source>Apply changes before copying schedule.</source>
-      <translation>Tillämpa ändringar innan du kopierar schema.</translation>
-    </message>
-    <message>
       <source>Copy Schedule to...</source>
       <translation>Kopiera schema till...</translation>
+    </message>
+    <message>
+      <source>Motion &amp;&amp; Objects Recording</source>
+      <translation>Rörelse &amp;&amp; Objektinspelning</translation>
     </message>
   </context>
   <context>
@@ -1498,6 +1494,10 @@
       <source>Disable imported users</source>
       <translation>Inaktivera importerade användare</translation>
     </message>
+    <message>
+      <source>Allow digest authentication for imported user</source>
+      <translation>Tillåt digest -autentisering för importerade användare</translation>
+    </message>
   </context>
   <context>
     <name>LicenseDetailsDialog</name>
@@ -1766,6 +1766,13 @@
     <message>
       <source>To server</source>
       <translation>Till server</translation>
+    </message>
+  </context>
+  <context>
+    <name>OauthLoginPlaceholder</name>
+    <message>
+      <source>Try Again</source>
+      <translation>Försök Igen</translation>
     </message>
   </context>
   <context>
@@ -2082,10 +2089,6 @@
       <translation>Hämta användare från LDAP...</translation>
     </message>
     <message>
-      <source>Clear Selection</source>
-      <translation>Rensa markering</translation>
-    </message>
-    <message>
       <source>Search users</source>
       <translation>Sök användare</translation>
     </message>
@@ -2104,6 +2107,14 @@
     <message>
       <source>Edit Roles...</source>
       <translation>Redigera roller...</translation>
+    </message>
+    <message>
+      <source>Force Secure Authentication</source>
+      <translation>Tvinga fram säker autentisering</translation>
+    </message>
+    <message>
+      <source>Nothing found</source>
+      <translation>Ingenting hittades</translation>
     </message>
   </context>
   <context>
@@ -2429,6 +2440,10 @@
       <source>Encrypt video traffic to desktop and mobile clients</source>
       <translation>Kryptera videotrafik till stationära och mobila klienter</translation>
     </message>
+    <message>
+      <source>Manage Users</source>
+      <translation>Hantera användare</translation>
+    </message>
   </context>
   <context>
     <name>SendmailBusinessActionWidget</name>
@@ -2518,8 +2533,8 @@
       <translation>Port</translation>
     </message>
     <message>
-      <source>Autodetect USB and web cameras</source>
-      <translation>Autodetektera USB- och webbkameror</translation>
+      <source>Autodetect built-in and USB webcams</source>
+      <translation>Upptäck automatiskt inbyggda webbkameror och USB-webbkameror</translation>
     </message>
   </context>
   <context>
@@ -2996,8 +3011,8 @@
       <translation>Proxy allt begärt innehåll</translation>
     </message>
     <message>
-      <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
-      <translation>Proxy av allt innehåll exponerar alla tjänster eller enheter i serverns nätverk för användare av denna webbsida</translation>
+      <source>Allow opening web page without SSL certificate checking</source>
+      <translation>Tillåt öppning av webbsida utan kontroll av SSL-certifikat</translation>
     </message>
   </context>
   <context>

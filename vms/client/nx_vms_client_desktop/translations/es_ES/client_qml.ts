@@ -88,16 +88,27 @@
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
       <translation>Intente cambiar los filtros o configure la detección de objetos en la configuración del complemento de la cámara</translation>
     </message>
+    <message numerus="yes">
+      <source>%n new results</source>
+      <translation type="unfinished">
+        <numerusform>%n new results</numerusform>
+        <numerusform>%n new results</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>new results</source>
+      <translation type="unfinished">new results</translation>
+    </message>
+    <message>
+      <source>Detected by</source>
+      <translation type="unfinished">Detected by</translation>
+    </message>
   </context>
   <context>
     <name>AnalyticsSearchDialog</name>
     <message>
       <source>Advanced Object Search</source>
       <translation>Búsqueda avanzada de objetos</translation>
-    </message>
-    <message>
-      <source>Any Plugin</source>
-      <translation>Cualquier Plugin</translation>
     </message>
     <message>
       <source>Select area</source>
@@ -118,6 +129,21 @@
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
       <translation>Intente cambiar los filtros o configure la detección de objetos en la configuración del complemento de la cámara</translation>
+    </message>
+    <message>
+      <source>Any plugin</source>
+      <translation>Cualquier complemento</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n new results</source>
+      <translation type="unfinished">
+        <numerusform>%n new results</numerusform>
+        <numerusform>%n new results</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>new results</source>
+      <translation type="unfinished">new results</translation>
     </message>
   </context>
   <context>
@@ -256,8 +282,8 @@
   <context>
     <name>ContextHintButton</name>
     <message>
-      <source>Click to read more</source>
-      <translation>Haga clic para leer más</translation>
+      <source>Click on the icon to read more</source>
+      <translation type="unfinished">Click on the icon to read more</translation>
     </message>
   </context>
   <context>
@@ -323,6 +349,10 @@
     <message>
       <source>Try changing the filters or create an Event Rule</source>
       <translation>Intenta cambiar los filtros o crea una regla de evento</translation>
+    </message>
+    <message>
+      <source>Event Log</source>
+      <translation>Registro de eventos</translation>
     </message>
   </context>
   <context>
@@ -450,6 +480,13 @@
     </message>
   </context>
   <context>
+    <name>InformationBubble</name>
+    <message>
+      <source>Detected by</source>
+      <translation type="unfinished">Detected by</translation>
+    </message>
+  </context>
+  <context>
     <name>InformationPanel</name>
     <message>
       <source>Version</source>
@@ -474,6 +511,33 @@
     <message>
       <source>Refreshing...</source>
       <translation>Actualizando...</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntervalPreviewControls</name>
+    <message>
+      <source>Toggle Mute</source>
+      <translation>Activar silencio</translation>
+    </message>
+    <message>
+      <source>Previous Object</source>
+      <translation type="unfinished">Previous Object</translation>
+    </message>
+    <message>
+      <source>Pause</source>
+      <translation>Pausa</translation>
+    </message>
+    <message>
+      <source>Play</source>
+      <translation>Reproducir</translation>
+    </message>
+    <message>
+      <source>Next Object</source>
+      <translation type="unfinished">Next Object</translation>
+    </message>
+    <message>
+      <source>Toggle Repeat</source>
+      <translation type="unfinished">Toggle Repeat</translation>
     </message>
   </context>
   <context>
@@ -665,12 +729,12 @@
       <translation>Contraseña</translation>
     </message>
     <message>
-      <source>Save Password</source>
-      <translation>Guardar contraseña</translation>
-    </message>
-    <message>
       <source>Connect</source>
       <translation>Conexión</translation>
+    </message>
+    <message>
+      <source>Remember me</source>
+      <translation>Recuérdame</translation>
     </message>
   </context>
   <context>
@@ -737,6 +801,10 @@
       <source>Show on Layout</source>
       <translation>Muestre en diseño</translation>
     </message>
+    <message>
+      <source>preview is not available for the selected object</source>
+      <translation type="unfinished">preview is not available for the selected object</translation>
+    </message>
   </context>
   <context>
     <name>PromoPageButtons</name>
@@ -802,6 +870,10 @@ para activar PTZ</translation>
     <message>
       <source>Object Type</source>
       <translation>Tipo de objeto</translation>
+    </message>
+    <message>
+      <source>Subtype</source>
+      <translation type="unfinished">Subtype</translation>
     </message>
   </context>
   <context>
@@ -947,6 +1019,21 @@ para activar PTZ</translation>
     <message>
       <source>Select layout</source>
       <translation>Seleccionar diseño</translation>
+    </message>
+  </context>
+  <context>
+    <name>SelectOverlappedIdDialog</name>
+    <message>
+      <source>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</source>
+      <translation type="unfinished">Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</translation>
+    </message>
+    <message>
+      <source>Select</source>
+      <translation>Seleccionar</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>Cancelar</translation>
     </message>
   </context>
   <context>
@@ -1184,10 +1271,6 @@ para activar PTZ</translation>
   <context>
     <name>WelcomeScreen</name>
     <message>
-      <source>Loading...</source>
-      <translation>Cargando...</translation>
-    </message>
-    <message>
       <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
       <translation>Usted no tiene acceso a la %1. Por favor revise su conexión a internet.</translation>
     </message>
@@ -1202,6 +1285,10 @@ para activar PTZ</translation>
     <message>
       <source>Support</source>
       <translation>Asistencia</translation>
+    </message>
+    <message>
+      <source>Loading...</source>
+      <translation>Cargando...</translation>
     </message>
   </context>
 </TS>

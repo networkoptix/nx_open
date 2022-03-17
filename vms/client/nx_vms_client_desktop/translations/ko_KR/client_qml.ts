@@ -88,16 +88,26 @@
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
       <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
     </message>
+    <message numerus="yes">
+      <source>%n new results</source>
+      <translation type="unfinished">
+        <numerusform>%n new results</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>new results</source>
+      <translation type="unfinished">new results</translation>
+    </message>
+    <message>
+      <source>Detected by</source>
+      <translation type="unfinished">Detected by</translation>
+    </message>
   </context>
   <context>
     <name>AnalyticsSearchDialog</name>
     <message>
       <source>Advanced Object Search</source>
       <translation type="unfinished">Advanced Object Search</translation>
-    </message>
-    <message>
-      <source>Any Plugin</source>
-      <translation>모든 플러그인</translation>
     </message>
     <message>
       <source>Select area</source>
@@ -118,6 +128,20 @@
     <message>
       <source>Try changing the filters or configure object detection in the camera plugin settings</source>
       <translation type="unfinished">Try changing the filters or configure object detection in the camera plugin settings</translation>
+    </message>
+    <message>
+      <source>Any plugin</source>
+      <translation type="unfinished">Any plugin</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n new results</source>
+      <translation type="unfinished">
+        <numerusform>%n new results</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>new results</source>
+      <translation type="unfinished">new results</translation>
     </message>
   </context>
   <context>
@@ -254,8 +278,8 @@
   <context>
     <name>ContextHintButton</name>
     <message>
-      <source>Click to read more</source>
-      <translation>자세한 내용을 보려면 클릭하세요.</translation>
+      <source>Click on the icon to read more</source>
+      <translation type="unfinished">Click on the icon to read more</translation>
     </message>
   </context>
   <context>
@@ -321,6 +345,10 @@
     <message>
       <source>Try changing the filters or create an Event Rule</source>
       <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+    </message>
+    <message>
+      <source>Event Log</source>
+      <translation>이벤트 로그</translation>
     </message>
   </context>
   <context>
@@ -448,6 +476,13 @@
     </message>
   </context>
   <context>
+    <name>InformationBubble</name>
+    <message>
+      <source>Detected by</source>
+      <translation type="unfinished">Detected by</translation>
+    </message>
+  </context>
+  <context>
     <name>InformationPanel</name>
     <message>
       <source>Version</source>
@@ -472,6 +507,33 @@
     <message>
       <source>Refreshing...</source>
       <translation>새로 고침 중...</translation>
+    </message>
+  </context>
+  <context>
+    <name>IntervalPreviewControls</name>
+    <message>
+      <source>Toggle Mute</source>
+      <translation>음소거</translation>
+    </message>
+    <message>
+      <source>Previous Object</source>
+      <translation type="unfinished">Previous Object</translation>
+    </message>
+    <message>
+      <source>Pause</source>
+      <translation>일시정지</translation>
+    </message>
+    <message>
+      <source>Play</source>
+      <translation>재생</translation>
+    </message>
+    <message>
+      <source>Next Object</source>
+      <translation type="unfinished">Next Object</translation>
+    </message>
+    <message>
+      <source>Toggle Repeat</source>
+      <translation type="unfinished">Toggle Repeat</translation>
     </message>
   </context>
   <context>
@@ -661,12 +723,12 @@
       <translation>비밀번호</translation>
     </message>
     <message>
-      <source>Save Password</source>
-      <translation type="unfinished">Save Password</translation>
-    </message>
-    <message>
       <source>Connect</source>
       <translation>연결</translation>
+    </message>
+    <message>
+      <source>Remember me</source>
+      <translation>기억하기</translation>
     </message>
   </context>
   <context>
@@ -730,6 +792,10 @@
     <message>
       <source>Show on Layout</source>
       <translation>레이아웃에 표시</translation>
+    </message>
+    <message>
+      <source>preview is not available for the selected object</source>
+      <translation type="unfinished">preview is not available for the selected object</translation>
     </message>
   </context>
   <context>
@@ -795,6 +861,10 @@ to activate PTZ</source>
     <message>
       <source>Object Type</source>
       <translation type="unfinished">Object Type</translation>
+    </message>
+    <message>
+      <source>Subtype</source>
+      <translation type="unfinished">Subtype</translation>
     </message>
   </context>
   <context>
@@ -939,6 +1009,21 @@ to activate PTZ</source>
     <message>
       <source>Select layout</source>
       <translation>레이아웃 선택</translation>
+    </message>
+  </context>
+  <context>
+    <name>SelectOverlappedIdDialog</name>
+    <message>
+      <source>Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</source>
+      <translation type="unfinished">Timeline identifier, which is created when time is changed backward on a remote NVR. The new timeline can overlap the existing one.</translation>
+    </message>
+    <message>
+      <source>Select</source>
+      <translation type="unfinished">Select</translation>
+    </message>
+    <message>
+      <source>Cancel</source>
+      <translation>취소</translation>
     </message>
   </context>
   <context>
@@ -1174,10 +1259,6 @@ to activate PTZ</source>
   <context>
     <name>WelcomeScreen</name>
     <message>
-      <source>Loading...</source>
-      <translation>읽는 중...</translation>
-    </message>
-    <message>
       <source>You don&apos;t have access to the %1. Please check your internet connection.</source>
       <translation type="unfinished">You don&apos;t have access to the %1. Please check your internet connection.</translation>
     </message>
@@ -1192,6 +1273,10 @@ to activate PTZ</source>
     <message>
       <source>Support</source>
       <translation>지원</translation>
+    </message>
+    <message>
+      <source>Loading...</source>
+      <translation>읽는 중...</translation>
     </message>
   </context>
 </TS>

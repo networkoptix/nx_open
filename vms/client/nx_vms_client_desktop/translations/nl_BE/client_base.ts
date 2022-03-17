@@ -23,6 +23,13 @@
       <source>Any plugin</source>
       <translation>Elke plugin</translation>
     </message>
+    <message numerus="yes">
+      <source>%1 with %n attributes</source>
+      <translation>
+        <numerusform>%1 met %n attributen</numerusform>
+        <numerusform>%1 met %n attributen</numerusform>
+      </translation>
+    </message>
     <message>
       <source>Any subtype</source>
       <translation>Elk subtype</translation>
@@ -494,10 +501,6 @@
       <translation>Lay-out delen beëindigen</translation>
     </message>
     <message>
-      <source>Edit...</source>
-      <translation>Bewerken...</translation>
-    </message>
-    <message>
       <source>Rename</source>
       <translation>Naam wijzigen</translation>
     </message>
@@ -810,10 +813,6 @@
       <translation>Upload annuleren...</translation>
     </message>
     <message>
-      <source>Copy Schedule...</source>
-      <translation>Schema kopiëren...</translation>
-    </message>
-    <message>
       <source>Analytics Engine Settings...</source>
       <translation>Analytics Engine instellingen...</translation>
     </message>
@@ -957,19 +956,11 @@
       <source>Delete Bookmarks...</source>
       <translation>Bladwijzer verwijderen...</translation>
     </message>
-    <message>
-      <source>Copy Bookmark Text...</source>
-      <translation>Bladwijzer Tekst kopiëren...</translation>
-    </message>
-    <message>
-      <source>Copy Bookmarks Text...</source>
-      <translation>Bladwijzertekst kopiëren...</translation>
-    </message>
     <message numerus="yes">
       <source>Show on Items</source>
-      <translation type="unfinished">
-        <numerusform>Show on Items</numerusform>
-        <numerusform>Show on Items</numerusform>
+      <translation>
+        <numerusform>Weergeven op items</numerusform>
+        <numerusform>Weergeven op items</numerusform>
       </translation>
     </message>
     <message>
@@ -1011,6 +1002,18 @@
     <message>
       <source>Advanced...</source>
       <translation>Geavanceerd...</translation>
+    </message>
+    <message>
+      <source>Copy Bookmark Text</source>
+      <translation>Bladwijzertekst kopiëren</translation>
+    </message>
+    <message>
+      <source>Copy Bookmarks Text</source>
+      <translation>Bladwijzerteksten kopiëren</translation>
+    </message>
+    <message>
+      <source>Web Page Settings...</source>
+      <translation>Webpagina instellingen...</translation>
     </message>
   </context>
   <context>
@@ -1507,13 +1510,13 @@
       <translation>Gedeelde lay-outs</translation>
     </message>
     <message>
-      <source>All</source>
-      <extracomment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</extracomment>
-      <translation>Alle</translation>
-    </message>
-    <message>
       <source>Permissions</source>
       <translation>Machtigingen</translation>
+    </message>
+    <message>
+      <source>All</source>
+      <comment>This will be a part of &quot;All Cameras &amp; Resources&quot; or &quot;All Shared Layouts&quot;</comment>
+      <translation>Alle</translation>
     </message>
   </context>
   <context>
@@ -1668,10 +1671,6 @@
       <translation>Uitgeschakeld</translation>
     </message>
     <message>
-      <source>Basic</source>
-      <translation>Basis</translation>
-    </message>
-    <message>
       <source>Recommended</source>
       <translation>Aanbevolen</translation>
     </message>
@@ -1682,14 +1681,6 @@
     <message>
       <source>May lead to privacy issues</source>
       <translation>Kan leiden tot privacyproblemen</translation>
-    </message>
-    <message>
-      <source>On first connection self-signed certificate is pinned automatically</source>
-      <translation>Bij de eerste verbinding wordt zelfondertekende certificaat automatisch vastgezet</translation>
-    </message>
-    <message>
-      <source>Your confirmation will be requested to pin self-signed certificate</source>
-      <translation>Je bevestiging wordt gevraagd om het zelf ondertekende certificaat te pinnen</translation>
     </message>
     <message>
       <source>Connect only servers with public certificate</source>
@@ -1714,6 +1705,10 @@
     <message>
       <source>Continue</source>
       <translation>Doorgaan</translation>
+    </message>
+    <message>
+      <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
+      <translation>Bij de eerste verbinding met de server wordt om uw bevestiging gevraagd om het certificaat te accepteren als het fouten bevat</translation>
     </message>
   </context>
   <context>
@@ -2695,6 +2690,33 @@ to %1</source>
       <comment>%1 is the cloud name (like Nx Cloud)</comment>
       <translation>Systeem losgekoppeld van %1</translation>
     </message>
+    <message>
+      <source>You are about to disconnect System from %1</source>
+      <comment>%1 is the cloud name, like Nx Cloud</comment>
+      <translation>U staat op het punt om het systeem te verbreken van %1</translation>
+    </message>
+    <message>
+      <source>All %1 users will be deleted.</source>
+      <comment>%1 is the short cloud name (like Cloud)</comment>
+      <translation>Alle %1 gebruikers zullen worden verwijderd.</translation>
+    </message>
+    <message>
+      <source>You will be logged out.</source>
+      <translation>U bent afgemeld.</translation>
+    </message>
+    <message>
+      <source>System will be accessible through local network with a local administrator account.</source>
+      <translation>Het systeem zal toegankelijk zijn via het lokale netwerk met een lokaal beheerdersaccount.</translation>
+    </message>
+    <message>
+      <source>Continue</source>
+      <translation>Doorgaan</translation>
+    </message>
+    <message>
+      <source>Cannot disconnect the System from %1</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>Kan de verbinding voor het systeem niet verbreken van %1</translation>
+    </message>
   </context>
   <context>
     <name>QnCloudResultInfo</name>
@@ -2980,6 +3002,14 @@ to %1</source>
     <message>
       <source>Restore</source>
       <translation>Herstellen</translation>
+    </message>
+    <message>
+      <source>Restore database?</source>
+      <translation>Database herstellen?</translation>
+    </message>
+    <message>
+      <source>System configuration will be restored from backup, Server application will be restarted.</source>
+      <translation>De systeemconfiguratie zal worden hersteld van de backup, de server applicatie wordt opnieuw gestart.</translation>
     </message>
   </context>
   <context>
@@ -3395,6 +3425,10 @@ to %1</source>
     <message>
       <source>Please enter a value.</source>
       <translation>Voer een waarde in.</translation>
+    </message>
+    <message>
+      <source>Please enter a password.</source>
+      <translation>Voer een wachtwoord in alstublieft.</translation>
     </message>
   </context>
   <context>
@@ -3817,10 +3851,6 @@ to %1</source>
       <translation>Zoom-venster maken</translation>
     </message>
     <message>
-      <source>Image Enhancement</source>
-      <translation>Beeldverbetering</translation>
-    </message>
-    <message>
       <source>Hi-Res</source>
       <translation>Hi-Res</translation>
     </message>
@@ -3865,8 +3895,12 @@ to %1</source>
       <translation>Zoom gebied</translation>
     </message>
     <message>
-      <source>Motion</source>
-      <translation>Beweging</translation>
+      <source>Motion Search</source>
+      <translation>Zoeken op beweging</translation>
+    </message>
+    <message>
+      <source>Object Search</source>
+      <translation>Zoeken op Object</translation>
     </message>
   </context>
   <context>
@@ -4439,6 +4473,10 @@ to %1</source>
     <message>
       <source>Exit Fullscreen</source>
       <translation>Volledige schermweergave afsluiten</translation>
+    </message>
+    <message>
+      <source>Enter Fullscreen</source>
+      <translation>Ga naar volledig scherm</translation>
     </message>
   </context>
   <context>
@@ -5487,6 +5525,10 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <source>Backup storage is not configured</source>
       <translation>De back-upopslag is niet geconfigureerd</translation>
     </message>
+    <message>
+      <source>Camera recording schedule is invalid</source>
+      <translation>Camera-opnameschema is ongeldig</translation>
+    </message>
   </context>
   <context>
     <name>QnSystemSettingsWidget</name>
@@ -5653,6 +5695,14 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
       <translation>Gebruikers kunnen vanaf een LDAP-server worden geïmporteerd. Ze kunnen alleen inloggen als de LDAP-server online is en hun accounts actief zijn.</translation>
     </message>
+    <message>
+      <source>All users</source>
+      <translation>Alle gebruikers</translation>
+    </message>
+    <message>
+      <source>With enabled digest authentication</source>
+      <translation>Met ingeschakelde digest authenticatie</translation>
+    </message>
   </context>
   <context>
     <name>QnUserProfileWidget</name>
@@ -5795,22 +5845,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Allow digest authentication for this user</source>
       <translation>Sta digest-authenticatie toe voor deze gebruiker</translation>
-    </message>
-    <message>
-      <source>Force secure authentication?</source>
-      <translation>Forceer beveiligde authenticatie?</translation>
-    </message>
-    <message>
-      <source>To revert this change user password reset will be required.</source>
-      <translation>Om deze wijziging ongedaan te maken, is een reset van het gebruikerswachtwoord vereist.</translation>
-    </message>
-    <message>
-      <source>Do not show this message again</source>
-      <translation>Toon dit bericht niet opnieuw</translation>
-    </message>
-    <message>
-      <source>Enable</source>
-      <translation>Inschakelen</translation>
     </message>
     <message>
       <source>Learn More</source>
@@ -5961,6 +5995,36 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
   </context>
   <context>
+    <name>QnWebResourceWidget</name>
+    <message>
+      <source>Open this web page?</source>
+      <translation>Deze webpagina openen?</translation>
+    </message>
+    <message>
+      <source>Web page</source>
+      <translation>Web pagina</translation>
+    </message>
+    <message>
+      <source>Connect anyway</source>
+      <translation>Toch verbinden</translation>
+    </message>
+    <message>
+      <source>Web page settings...</source>
+      <translation>Webpagina instellingen...</translation>
+    </message>
+    <message>
+      <source>You try to open the
+%1
+but this web page presented an untrusted certificate auth.
+We recommend you not to open this web page. If you understand the risks, you can open the web page.</source>
+      <comment>%1 is the web page address</comment>
+      <translation>U probeert de
+%1
+te openen, maar deze webpagina bevatte een niet-vertrouwde certificaatverificatie.
+We raden u aan deze webpagina niet te openen. Als u de risico's begrijpt, kunt u de webpagina openen.</translation>
+    </message>
+  </context>
+  <context>
     <name>QnWorkbenchAlarmLayoutHandler</name>
     <message>
       <source>Alarms</source>
@@ -6024,6 +6088,10 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Focusing...</source>
       <translation>Focussen...</translation>
+    </message>
+    <message>
+      <source>Camera %1 does not support PTZ</source>
+      <translation>Camera %1 ondersteunt geen PTZ</translation>
     </message>
   </context>
   <context>
@@ -7109,6 +7177,14 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <source>Stream setting is not applicable to this device type</source>
       <translation>Stream instelling is niet van toepassing op dit apparaat type</translation>
     </message>
+    <message>
+      <source>Not supported</source>
+      <translation>Niet ondersteund</translation>
+    </message>
+    <message>
+      <source>Backup is not supported for this device</source>
+      <translation>Back-up wordt niet ondersteund voor dit apparaat</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::BackupSettingsPickerWidget</name>
@@ -7164,6 +7240,20 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Backup will be turned off for new added cameras on all servers in the system.</source>
       <translation>Back-up zal worden uitgeschakeld voor nieuwe toegevoegde camera's op alle servers in het systeem.</translation>
+    </message>
+    <message>
+      <source>Storage Management</source>
+      <translation>Opslagbeheer</translation>
+    </message>
+    <message>
+      <source>To enable backup change &quot;Main&quot; to &quot;Backup&quot; from some of the storages in %1</source>
+      <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
+      <translation>Om back-up te wijzigen &quot;Hoofd&quot; tot &quot;back-up&quot; op sommige opslagplaatsen in %1</translation>
+    </message>
+    <message>
+      <source>To enable backup add more drives to use them as backup storage in %1</source>
+      <extracomment>&quot;Storage Management&quot; link will be substituted as %1.</extracomment>
+      <translation>Om back-up te activeren voeg je meer schijven toe om ze te gebruiken als back-up opslag in %1</translation>
     </message>
   </context>
   <context>
@@ -7236,6 +7326,17 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::CameraButtonController</name>
+    <message>
+      <source>Heater</source>
+      <translation>Verwarming</translation>
+    </message>
+    <message>
+      <source>Wiper</source>
+      <translation>Ruitenwissers</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::CameraCredentialsDialog</name>
     <message>
       <source>Login</source>
@@ -7303,6 +7404,10 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Quality and frame rate (FPS) settings in the Recording Schedule will become irrelevant.</source>
       <translation>Instellingen voor kwaliteit en beeldsnelheid (FPS) in het opnameschema worden niet meer relevant.</translation>
+    </message>
+    <message>
+      <source>Server will not push time settings to the camera.</source>
+      <translation>De server zal geen tijdinstellingen naar de camera pushen.</translation>
     </message>
   </context>
   <context>
@@ -7410,14 +7515,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>High minimum value can lead to archive length decrease on other cameras.</source>
       <translation>Hoge minimumwaarde kan ertoe leiden dat archieflengte afneemt op andere apparaten.</translation>
-    </message>
-    <message>
-      <source>Motion &amp;&amp; Objects Recording</source>
-      <translation>Beweging &amp;&amp; Objecten Opname</translation>
-    </message>
-    <message>
-      <source>Motion Recording</source>
-      <translation>Bewegingsopname</translation>
     </message>
     <message>
       <source>High pre-recording time will increase RAM utilization on the server</source>
@@ -7535,16 +7632,40 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <translation>Plugins</translation>
     </message>
     <message>
-      <source>Motion detection is disabled, all schedule records &quot;Motion&quot; and &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation>Bewegingsdetectie is uitgeschakeld, alle opnameschemas &quot;Beweging&quot; en &quot;Motion + Lo-Res&quot; worden gewijzigd in &quot;Altijd&quot;</translation>
-    </message>
-    <message>
-      <source>Dual streaming is disabled, all schedule records &quot;Motion + Lo-Res&quot; will be changed to &quot;Always&quot;</source>
-      <translation>Dual streaming is uitgeschakeld, alle opnameschemas &quot;Motion + Lo-Res&quot; zullen worden gewijzigd naar &quot;Altijd&quot;</translation>
-    </message>
-    <message>
       <source>Dewarping</source>
       <translation>Dewarping</translation>
+    </message>
+    <message>
+      <source>Change invalid schedule to &quot;Record Always&quot;</source>
+      <translation>Wijzig ongeldig schema naar &quot;Altijd opnemen&quot;</translation>
+    </message>
+    <message>
+      <source>Some cells of the recording schedule are set to an invalid recording mode: %1. During the hours set to an invalid recording mode camera will record in &quot;Record Always&quot; mode.</source>
+      <translation>Sommige cellen van het opnameschema zijn ingesteld op een ongeldige opnamemodus: %1. Wanneer u de uren instelt op een ongeldige opnamemodus neemt de camera op in &quot;Altijd opnemen&quot; modus.</translation>
+    </message>
+    <message>
+      <source>Motion Only</source>
+      <translation>Alleen beweging</translation>
+    </message>
+    <message>
+      <source>Objects Only</source>
+      <translation>Alleen objecten</translation>
+    </message>
+    <message>
+      <source>Motion &amp; Objects Only</source>
+      <translation>Alleen beweging &amp; objecten</translation>
+    </message>
+    <message>
+      <source>Motion + Lo-Res</source>
+      <translation>Beweging + Lo-Res</translation>
+    </message>
+    <message>
+      <source>Objects + Lo-Res</source>
+      <translation>Objecten + Lo-Res</translation>
+    </message>
+    <message>
+      <source>Motion &amp; Objects + Lo-Res</source>
+      <translation>Beweging &amp; objecten + Lo-Res</translation>
     </message>
   </context>
   <context>
@@ -7556,9 +7677,12 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
         <numerusform>Fout bij het inschakelen van audio op %n apparaten</numerusform>
       </translation>
     </message>
-    <message>
-      <source>These devices do not have an audio input, or it is not configured correctly.</source>
-      <translation>Deze apparaten hebben geen audio-input, of ze zijn niet goed geconfigureerd.</translation>
+    <message numerus="yes">
+      <source>These devices do not have audio inputs or are not configured correctly.</source>
+      <translation>
+        <numerusform>Deze apparaten hebben geen audio-ingangen of zijn niet correct geconfigureerd.</numerusform>
+        <numerusform>Deze apparaten hebben geen audio-ingangen of zijn niet correct geconfigureerd.</numerusform>
+      </translation>
     </message>
     <message numerus="yes">
       <source>Failed to enable 2-way audio on %n devices</source>
@@ -7567,9 +7691,12 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
         <numerusform>2-weg audio op %n apparaten inschakelen mislukt</numerusform>
       </translation>
     </message>
-    <message>
-      <source>These devices do not have an audio output, or it is not configured correctly.</source>
-      <translation>Deze apparaten hebben geen audio-output, of ze zijn niet goed geconfigureerd.</translation>
+    <message numerus="yes">
+      <source>These devices do not have audio outputs or are not configured correctly.</source>
+      <translation>
+        <numerusform>Deze apparaten hebben geen audio-uitgangen of zijn niet correct geconfigureerd.</numerusform>
+        <numerusform>Deze apparaten hebben geen audio-uitgangen of zijn niet correct geconfigureerd.</numerusform>
+      </translation>
     </message>
     <message>
       <source>Audio will be disabled</source>
@@ -7600,7 +7727,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message numerus="yes">
       <source>%1 are required</source>
-      <comment>Text like &apos;5/10 Professional Licenses&apos; will be substituted</comment>
+      <comment>Text like &apos;5 Professional Licenses&apos; will be substituted</comment>
       <translation>
         <numerusform>%1 zijn verplicht</numerusform>
         <numerusform>%1 meer vereist</numerusform>
@@ -7802,7 +7929,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Connect</source>
       <comment>Connect current System to cloud</comment>
-      <translation>Verbinden</translation>
+      <translation>Verbind</translation>
     </message>
     <message>
       <source>Internal server error. Please try again later.</source>
@@ -7846,7 +7973,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <name>nx::vms::client::desktop::ConnectionTestingDialog</name>
     <message>
       <source>Connect</source>
-      <translation>Verbinden</translation>
+      <translation>Verbind</translation>
     </message>
     <message>
       <source>Setup</source>
@@ -7854,7 +7981,7 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
     <message>
       <source>Success</source>
-      <translation>Gelukt</translation>
+      <translation>Succes</translation>
     </message>
     <message>
       <source>Test Failed</source>
@@ -7872,10 +7999,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
   <context>
     <name>nx::vms::client::desktop::CopyScheduleCameraSelectionDialog</name>
     <message>
-      <source>Schedule motion type is not supported by some cameras.</source>
-      <translation>Schema motiondetectie type wordt niet ondersteund door sommige camera's.</translation>
-    </message>
-    <message>
       <source>Recording cannot be enabled for some cameras.</source>
       <translation>Opname kan niet worden ingeschakeld voor sommige camera's.</translation>
     </message>
@@ -7886,6 +8009,10 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Copy archive length settings</source>
       <translation>Kopieer archief lengte-instellingen</translation>
+    </message>
+    <message>
+      <source>Recording Schedule contains recording modes that are not supported by the selected cameras. Unsupported recording modes will be changed to &quot;Record Always&quot;.</source>
+      <translation>Opnameschema bevat opnamemodi die niet worden ondersteund door de geselecteerde camera's. Niet-ondersteunde opnamemodi worden gewijzigd in &quot;Altijd opnemen&quot;.</translation>
     </message>
   </context>
   <context>
@@ -8001,6 +8128,14 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Address field cannot be empty</source>
       <translation>Adresveld kan niet leeg zijn</translation>
+    </message>
+    <message>
+      <source>Searching for devices on the network is restricted to cameras that support HTTPS connections. This can be changed in %1 settings.</source>
+      <translation>Zoeken naar apparaten op het netwerk is beperkt tot camera's die HTTPS-verbindingen ondersteunen. Dit kan worden gewijzigd in %1 instellingen.</translation>
+    </message>
+    <message>
+      <source>System Administration</source>
+      <translation>Systeem Administratie</translation>
     </message>
   </context>
   <context>
@@ -8293,6 +8428,25 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::ForceSecureAuthDialog</name>
+    <message>
+      <source>Force secure authentication?</source>
+      <translation>Forceer beveiligde authenticatie?</translation>
+    </message>
+    <message>
+      <source>To revert this change user password reset will be required.</source>
+      <translation>Om deze wijziging ongedaan te maken, is een reset van het gebruikerswachtwoord vereist.</translation>
+    </message>
+    <message>
+      <source>Do not show this message again</source>
+      <translation>Toon dit bericht niet opnieuw</translation>
+    </message>
+    <message>
+      <source>Enable</source>
+      <translation>Inschakelen</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::FoundDevicesModel</name>
     <message>
       <source>Brand</source>
@@ -8324,8 +8478,8 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
   <context>
     <name>nx::vms::client::desktop::HintButton</name>
     <message>
-      <source>Click to read more</source>
-      <translation>Klik om meer te lezen</translation>
+      <source>Click on the icon to read more</source>
+      <translation>Klik op het icoon om meer te lezen</translation>
     </message>
   </context>
   <context>
@@ -8674,11 +8828,6 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
       <translation>Beide systemen zijn verbonden met %1. Samenvoegen is niet toegestaan.</translation>
     </message>
     <message>
-      <source>Cloud systems have different owners. Merge is not allowed.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>Cloudsystemen hebben verschillende eigenaren. Samenvoegen is niet toegestaan.</translation>
-    </message>
-    <message>
       <source>Cannot merge Systems because they have at least one server with the same ID. Please remove this server and try again.</source>
       <translation>Kan systemen niet samenvoegen omdat minstens 2 servers hetzelfde ID hebben. Verwijder deze server en probeer het opnieuw.</translation>
     </message>
@@ -8697,6 +8846,11 @@ Als u de analytics gegevens wilt verplaatsen naar een andere opslaglocatie, neem
     <message>
       <source>Unknown error.</source>
       <translation>Onbekende fout.</translation>
+    </message>
+    <message>
+      <source>%1 systems have different owners. Merge is not allowed.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 systemen hebben verschillende eigenaren. Samenvoegen is niet toegestaan.</translation>
     </message>
   </context>
   <context>
@@ -9062,6 +9216,21 @@ Je kunt het forceren, maar het kan de CPU-belasting aanzienlijk verhogen.</trans
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::OauthLoginPlaceholder</name>
+    <message>
+      <source>Cannot connect to %1</source>
+      <comment>%1 is the cloud name like Nx Cloud</comment>
+      <translation>Kan niet verbinden met %1</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::ObjectTrackingButton</name>
+    <message>
+      <source>Object tracking is ON</source>
+      <translation>Object tracking is AAN</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::OpenLayoutActionWidget</name>
     <message>
       <source>None of selected users have access to the selected layout. Action will not work.</source>
@@ -9331,6 +9500,10 @@ Je kunt het forceren, maar het kan de CPU-belasting aanzienlijk verhogen.</trans
       <source>Turn on webpage proxy on &lt;b&gt;General&lt;/b&gt; tab.</source>
       <translation>Webpagina proxy inschakelen op &lt;b&gt;Algemeen&lt;/b&gt; tab.</translation>
     </message>
+    <message>
+      <source>Proxying all contents exposes any service or device on the server&apos;s network to the users of this webpage</source>
+      <translation>Alle inhoud uitsluiten stelt elke service of apparaat op de server&apos;s netwerk bloot aan de gebruikers van deze webpagina</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::RadassActionFactory</name>
@@ -9397,6 +9570,45 @@ Je kunt het forceren, maar het kan de CPU-belasting aanzienlijk verhogen.</trans
     <message>
       <source>Motion + Lo-Res</source>
       <translation>Beweging + Lo-Res</translation>
+    </message>
+    <message>
+      <source>Recording motion and objects</source>
+      <translation>Beweging en objecten opnemen</translation>
+    </message>
+    <message>
+      <source>Recording objects only</source>
+      <translation>Alleen objecten opnemen</translation>
+    </message>
+    <message>
+      <source>Recording motion, objects and low quality</source>
+      <translation>Opname beweging, objecten en lage kwaliteit</translation>
+    </message>
+    <message>
+      <source>Recording objects and low quality</source>
+      <translation>Opname objecten en lage kwaliteit</translation>
+    </message>
+    <message>
+      <source>Motion, Objects</source>
+      <translation>Beweging, Objecten</translation>
+    </message>
+    <message>
+      <source>Objects only</source>
+      <translation>Alleen objecten</translation>
+    </message>
+    <message>
+      <source>Motion, Objects + Lo-Res</source>
+      <translation>Beweging, objecten + Lo-Res</translation>
+    </message>
+    <message>
+      <source>Objects + Lo-Res</source>
+      <translation>Objecten + Lo-Res</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::RemoteConnectionUserInteractionDelegate</name>
+    <message>
+      <source>Connect to System</source>
+      <translation>Verbinden met systeem</translation>
     </message>
   </context>
   <context>
@@ -9562,6 +9774,86 @@ U kunt de kwaliteit en FPS nog steeds rechtstreeks wijzigen op de camera.</trans
  + Low-Res</source>
       <translation>Beweging + Lage-Res</translation>
     </message>
+    <message>
+      <source>Motion detection is disabled for some of the selected devices</source>
+      <translation>Bewegingsdetectie is uitgeschakeld voor sommige van de geselecteerde apparaten</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for this camera</source>
+      <translation>Bewegingsdetectie is uitgeschakeld voor deze camera</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for some of the selected cameras</source>
+      <translation>Bewegingsdetectie is uitgeschakeld voor sommige van de geselecteerde camera's</translation>
+    </message>
+    <message>
+      <source>Some of the selected devices have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>Sommige van de geselecteerde apparaten hebben slechts één stream. Opnames met en zonder beweging delen dezelfde resolutie of kwaliteit.</translation>
+    </message>
+    <message>
+      <source>This camera has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>Deze camera heeft slechts één stream. Opnames met en zonder beweging delen dezelfde resolutie of kwaliteit.</translation>
+    </message>
+    <message>
+      <source>Some of the selected cameras have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>Sommige van de geselecteerde camera's hebben slechts één stream. Opnames met en zonder beweging delen dezelfde resolutie of kwaliteit.</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for some of the selected devices</source>
+      <translation>Object detectie is uitgeschakeld voor sommige van de geselecteerde apparaten</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for this camera</source>
+      <translation>Object detectie is uitgeschakeld voor deze camera</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for some of the selected cameras</source>
+      <translation>Object detectie is uitgeschakeld voor sommige van de geselecteerde camera's</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for some of the selected devices</source>
+      <translation>Beweging &amp; object detectie is uitgeschakeld voor sommige van de geselecteerde apparaten</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for this camera</source>
+      <translation>Beweging &amp; object detectie is uitgeschakeld voor deze camera</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for some of the selected cameras</source>
+      <translation>Beweging &amp; object detectie is uitgeschakeld voor sommige van de geselecteerde camera's</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for this I/O module</source>
+      <translation>Bewegingsdetectie is uitgeschakeld voor deze I/O-module</translation>
+    </message>
+    <message>
+      <source>Motion detection is disabled for some of the selected I/O modules</source>
+      <translation>Bewegingsdetectie is uitgeschakeld voor sommige van de geselecteerde I/O-modules</translation>
+    </message>
+    <message>
+      <source>This I/O module has only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>Deze I/O-module heeft slechts één stream. Opnamen met en zonder beweging delen dezelfde resolutie of kwaliteit.</translation>
+    </message>
+    <message>
+      <source>Some of the selected I/O modules have only one stream. Recordings with and without motion will share the same resolution or quality.</source>
+      <translation>Sommige van de geselecteerde I/O-modules hebben slechts één stream. Opnamen met en zonder beweging delen dezelfde resolutie of kwaliteit.</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for this I/O module</source>
+      <translation>Objectdetectie is uitgeschakeld voor deze I/O-module</translation>
+    </message>
+    <message>
+      <source>Object detection is disabled for some of the selected I/O modules</source>
+      <translation>Objectdetectie is uitgeschakeld voor sommige van de geselecteerde I/O-modules</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for this I/O module</source>
+      <translation>Bewegings- en objectdetectie is uitgeschakeld voor deze I/O-module</translation>
+    </message>
+    <message>
+      <source>Motion &amp; object detection is disabled for some of the selected I/O modules</source>
+      <translation>Bewegings- en objectdetectie is uitgeschakeld voor sommige van de geselecteerde I/O-modules</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::SearchLineEdit</name>
@@ -9583,10 +9875,6 @@ U kunt de kwaliteit en FPS nog steeds rechtstreeks wijzigen op de camera.</trans
     <message>
       <source>hours</source>
       <translation>uren</translation>
-    </message>
-    <message>
-      <source>Users will be automatically logged out if their session exceeds the specified duration.</source>
-      <translation>Gebruikers worden automatisch afgemeld als hun sessie de opgegeven duur overschrijdt.</translation>
     </message>
     <message>
       <source>Watermarks will be displayed over live, archive and exported videos for non-admin users only. You and other administrators will not see them.</source>
@@ -9622,6 +9910,31 @@ Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is he
       <source>days</source>
       <translation>dagen</translation>
     </message>
+    <message>
+      <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
+      <translation>Lokale en LDAP-gebruikers worden automatisch uitgelogd als hun sessie de opgegeven duur overschrijdt.</translation>
+    </message>
+    <message>
+      <source>Unlimited user session lifetime threatens overall System security and may lead to degradation in System performance</source>
+      <translation>Onbeperkte levensduur van de gebruikerssessie bedreigt de algehele systeembeveiliging en kan leiden tot degradatie in de systeemprestaties</translation>
+    </message>
+    <message>
+      <source>It is recommended to have user session lifetime not greater than %1</source>
+      <comment>%1 is the time span with time units</comment>
+      <translation>Het wordt aanbevolen om de levensduur van de gebruikerssessie niet te overschrijden met %1</translation>
+    </message>
+    <message>
+      <source>Learn more.</source>
+      <translation>Meer informatie.</translation>
+    </message>
+    <message numerus="yes">
+      <source>%n out of %1 users are allowed to use digest authentication (not secure).</source>
+      <comment>%n is digest user count, %1 is total user count</comment>
+      <translation>
+        <numerusform>%n van de %1 gebruikers mogen digest authenticatie gebruiken (niet beveiligd).</numerusform>
+        <numerusform>%n van de %1 gebruikers mogen digest authenticatie gebruiken (niet beveiligd).</numerusform>
+      </translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateError</name>
@@ -9630,12 +9943,12 @@ Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is he
       <translation>Kan geen verbinding maken met de server</translation>
     </message>
     <message>
-      <source>Server certificate is invalid.</source>
-      <translation>Servercertificaat is ongeldig.</translation>
-    </message>
-    <message>
       <source>View certificate</source>
       <translation>Bekijk certificaat</translation>
+    </message>
+    <message>
+      <source>Server certificate is invalid.</source>
+      <translation>Servercertificaat is ongeldig.</translation>
     </message>
   </context>
   <context>
@@ -9672,9 +9985,35 @@ Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is he
       <source>This is a custom certificate installed on %1</source>
       <translation>Dit is een aangepast certificaat geïnstalleerd op %1</translation>
     </message>
+    <message>
+      <source>Pin this certificate to %1?</source>
+      <translation>Dit certificaat aan %1 vastmaken?</translation>
+    </message>
+    <message>
+      <source>Someone may be impersonating %1 to steel your personal information.
+Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.</source>
+      <translation>Iemand kan zich voordoen als %1 om uw persoonlijke gegevens te stelen.
+Pin dit certificaat niet vast als u het %2 server SSL-certificaat niet hebt gewijzigd.</translation>
+    </message>
+    <message>
+      <source>Pin</source>
+      <translation>Vastzetten</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ServerCertificateWarning</name>
+    <message>
+      <source>View certificate</source>
+      <translation>Certificaat bekijken</translation>
+    </message>
+    <message>
+      <source>Connect Anyway</source>
+      <translation>Toch verbinden</translation>
+    </message>
+    <message>
+      <source>I trust this server</source>
+      <translation>Ik vertrouw deze server</translation>
+    </message>
     <message>
       <source>System:</source>
       <translation>Systeem:</translation>
@@ -9692,10 +10031,6 @@ Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is he
       <translation>Vertrouw deze server?</translation>
     </message>
     <message>
-      <source>You attempted to connect to %1 but the server presented an untrusted self-signed certificate.</source>
-      <translation>U hebt geprobeerd om verbinding te maken met %1, maar de server heeft een niet-vertrouwd zelfondertekend certificaat gepresenteerd.</translation>
-    </message>
-    <message>
       <source>Review the certificate&apos;s details to make sure you are connecting to the correct server.</source>
       <translation>Controleer het certificaat&apos;s details om er zeker van te zijn dat u verbinding maakt met de juiste server.</translation>
     </message>
@@ -9708,20 +10043,12 @@ Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is he
       <translation>Iemand doet zich mogelijk voor %1 om uw persoonlijke gegevens te stelen.</translation>
     </message>
     <message>
-      <source>View certificate</source>
-      <translation>Certificaat bekijken</translation>
-    </message>
-    <message>
-      <source>Connect Anyway</source>
-      <translation>Toch verbinden</translation>
-    </message>
-    <message>
-      <source>I trust this server</source>
-      <translation>Ik vertrouw deze server</translation>
-    </message>
-    <message>
       <source>Do not connect to this server unless instructed by your VMS administrator.</source>
       <translation>Maak geen verbinding met deze server tenzij uw VMS-beheerder u dat heeft gevraagd.</translation>
+    </message>
+    <message>
+      <source>You attempted to connect to: %1 but the Server presented a certificate that is unable to be automatically verified.</source>
+      <translation>U hebt geprobeerd te verbinden met: %1, maar de server heeft een certificaat gepresenteerd dat niet automatisch kan worden geverifieerd.</translation>
     </message>
   </context>
   <context>
@@ -9937,6 +10264,17 @@ Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is he
     <message>
       <source>Set Passwords</source>
       <translation>Wachtwoorden instellen</translation>
+    </message>
+    <message numerus="yes">
+      <source>Recording schedule is invalid for %n cameras</source>
+      <translation>
+        <numerusform>Het opnameschema is ongeldig voor %n camera's</numerusform>
+        <numerusform>Het opnameschema is ongeldig voor %n camera's</numerusform>
+      </translation>
+    </message>
+    <message>
+      <source>Recording schedule on some cameras contains recording modes that are not supported.</source>
+      <translation>Opnameschema op sommige camera's bevat opnamemodi die niet worden ondersteund.</translation>
     </message>
   </context>
   <context>
@@ -10423,6 +10761,35 @@ Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is he
     </message>
   </context>
   <context>
+    <name>nx::vms::client::desktop::integrations::IntercomIntegration</name>
+    <message>
+      <source>Intercom Alarm Layout</source>
+      <translation>Intercom Alarmlayschermindeling</translation>
+    </message>
+    <message>
+      <source>Intercom Open Door</source>
+      <translation>Intercom Open deur</translation>
+    </message>
+    <message>
+      <source>Open door</source>
+      <translation>Deur openen</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::OverlappedIdDialogModel</name>
+    <message>
+      <source>Latest</source>
+      <translation>Nieuwste</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::integrations::OverlappedIdIntegration</name>
+    <message>
+      <source>Overlapped ID...</source>
+      <translation>Overlappende ID...</translation>
+    </message>
+  </context>
+  <context>
     <name>nx::vms::client::desktop::joystick::JoystickButtonActionChoiceModel</name>
     <message>
       <source>No Action</source>
@@ -10466,18 +10833,52 @@ Waarschuwing: Dit wachtwoord kan niet worden gereset. Als je het verliest, is he
     </message>
     <message>
       <source>Multiple</source>
-      <translation type="unfinished">Multiple</translation>
+      <translation>Meerdere</translation>
     </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::joystick::JoystickButtonSettingsModel</name>
     <message>
       <source>Select Layout...</source>
-      <translation type="unfinished">Select Layout...</translation>
+      <translation>Selecteer schermindeling...</translation>
     </message>
     <message>
       <source>Button</source>
-      <translation type="unfinished">Button</translation>
+      <translation>Knop</translation>
+    </message>
+    <message>
+      <source>Selected Layout</source>
+      <translation>Geselecteerde schermindeling</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::jsapi::detail::ResourcesApiBackend</name>
+    <message>
+      <source>Resource is not available for the usage with JS API</source>
+      <translation>Bron is niet beschikbaar voor gebruik met de JS API</translation>
+    </message>
+  </context>
+  <context>
+    <name>nx::vms::client::desktop::jsapi::detail::TabApiBackend</name>
+    <message>
+      <source>Cannot find an item with the specified id</source>
+      <translation>Kan geen item vinden met de opgegeven id</translation>
+    </message>
+    <message>
+      <source>Cannot find a resource with the specified id.</source>
+      <translation>Kan geen bron vinden met het opgegeven id.</translation>
+    </message>
+    <message>
+      <source>Cannot specify a media parameters for the resource without media stream.</source>
+      <translation>Kan geen mediaparameters opgeven voor de bron zonder mediastream.</translation>
+    </message>
+    <message>
+      <source>Cannot add the resource to the layout</source>
+      <translation>Kan de bron niet toevoegen aan de schermindeling</translation>
+    </message>
+    <message>
+      <source>Cannot find a widget corresponding to the specified item.</source>
+      <translation>Kan geen widget vinden die overeenkomt met het opgegeven item.</translation>
     </message>
   </context>
   <context>
@@ -10902,6 +11303,24 @@ U kunt een andere opslaglocatie selecteren in het tabblad &quot;Opslagbeheer&quo
       <source>Window configuration saved</source>
       <translation>Venster configuratie opgeslagen</translation>
     </message>
+    <message>
+      <source>This build is for demo purposes only.</source>
+      <translation>Deze build is alleen voor demo-doeleinden.</translation>
+    </message>
+    <message>
+      <source>It cannot be upgraded to subsequent builds as they become available.</source>
+      <translation>Het kan niet worden geüpgraded naar volgende builds zodra deze beschikbaar komen.</translation>
+    </message>
+    <message>
+      <source>To upgrade, please uninstall %1 before installing an updated build (all data will be lost).</source>
+      <comment>%1 is the product name</comment>
+      <translation>Om te upgraden, verwijdert u %1 voordat u een bijgewerkte build installeert (alle gegevens gaan verloren).</translation>
+    </message>
+    <message>
+      <source>%1 Beta</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation>%1 Beta</translation>
+    </message>
   </context>
   <context>
     <name>nx::vms::client::desktop::ui::workbench::LayoutTourExecutor</name>
@@ -10910,8 +11329,8 @@ U kunt een andere opslaglocatie selecteren in het tabblad &quot;Opslagbeheer&quo
       <translation>Gebruik de toetsenbordpijlen om layouts te veranderen. Druk op Esc om de showreel te verlaten.</translation>
     </message>
     <message>
-      <source>Press any key to stop the tour.</source>
-      <translation>Druk op een willekeurige toets om de tour te stoppen.</translation>
+      <source>Press Esc to stop the tour.</source>
+      <translation>Druk op Esc om de tour te stoppen.</translation>
     </message>
   </context>
   <context>
@@ -11095,13 +11514,6 @@ to view more bookmarks</source>
     </message>
   </context>
   <context>
-    <name>nx::vms::client::desktop::workbench::timeline::TimelineSliderTooltip</name>
-    <message>
-      <source>Local File</source>
-      <translation>Lokaal bestand</translation>
-    </message>
-  </context>
-  <context>
     <name>nx::vms::client::desktop::workbench::timeline::VolumeSlider</name>
     <message>
       <source>Muted</source>
@@ -11137,15 +11549,19 @@ to view more bookmarks</source>
     </message>
     <message>
       <source>Cannot check for update.</source>
-      <translation type="unfinished">Cannot check for update.</translation>
+      <translation>Kan niet controleren op updates.</translation>
     </message>
     <message>
       <source>Client update package is broken.</source>
-      <translation type="unfinished">Client update package is broken.</translation>
+      <translation>Client-updatepakket werkt niet.</translation>
     </message>
     <message>
       <source>Client update package is missing for current platform.</source>
       <translation>Het clientupdatepakket ontbreekt voor het huidige platform.</translation>
+    </message>
+    <message>
+      <source>Can&apos;t check client update availability. Check your internet connection and try again.</source>
+      <translation>Kan de beschikbaarheid van de client updates niet controleren. Controleer uw internetverbinding en probeer het opnieuw.</translation>
     </message>
   </context>
 </TS>

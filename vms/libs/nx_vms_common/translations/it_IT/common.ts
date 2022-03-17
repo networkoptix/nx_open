@@ -39,10 +39,6 @@
       <translation type="unfinished">%1 is not accessible yet. Please try again later.</translation>
     </message>
     <message>
-      <source>The user is disabled. Please contact your system administrator.</source>
-      <translation>L'utente è disabilitato. Contatta l'amministratore di sistema.</translation>
-    </message>
-    <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
       <translation type="unfinished">The user is locked out due to several failed attempts. Please try again later.</translation>
     </message>
@@ -57,6 +53,10 @@
     <message>
       <source>Internal server error (%1). Please contact your system administrator.</source>
       <translation type="unfinished">Internal server error (%1). Please contact your system administrator.</translation>
+    </message>
+    <message>
+      <source>This user has been disabled by a system administrator.</source>
+      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
     </message>
   </context>
   <context>

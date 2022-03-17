@@ -69,19 +69,6 @@
   <context>
     <name>RemoteConnectionErrorStrings</name>
     <message>
-      <source>If this error persists, please contact your VMS administrator.</source>
-      <translation>오류가 지속될 경우, 관리자에게 문의하시기 바랍니다.</translation>
-    </message>
-    <message>
-      <source>Connection to %1 is not ready yet. Check server Internet connection or try again later.</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation>%1의 연결이 아직 준비 되지 않습니다. 서버 인터넷 연결을 확인 하거나 나중에 다시 시도 하십시오.</translation>
-    </message>
-    <message>
-      <source>Connection to Server could not be established. Try again later.</source>
-      <translation type="unfinished">Connection to Server could not be established. Try again later.</translation>
-    </message>
-    <message>
       <source>Client version: %1</source>
       <translation>클라이언트 버전: %1</translation>
     </message>
@@ -140,17 +127,8 @@
       <translation>LDAP 서버 연결 타임아웃.</translation>
     </message>
     <message>
-      <source>Log in to %1 to log in to this system with cloud user</source>
-      <comment>%1 is the cloud name (like Nx Cloud)</comment>
-      <translation type="unfinished">Log in to %1 to log in to this system with cloud user</translation>
-    </message>
-    <message>
       <source>Session expired. Re-enter your password.</source>
       <translation type="unfinished">Session expired. Re-enter your password.</translation>
-    </message>
-    <message>
-      <source>Session duration limit can be changed by the system administrators</source>
-      <translation>시스템 관리자가 세션 시간 제한을 변경할 수 있습니다</translation>
     </message>
     <message>
       <source>Invalid login or password</source>
@@ -165,10 +143,6 @@
       <translation>사용자 비활성화</translation>
     </message>
     <message>
-      <source>This user is disabled by VMS administrator.</source>
-      <translation type="unfinished">This user is disabled by VMS administrator.</translation>
-    </message>
-    <message>
       <source>Too many attempts. Try again in a minute.</source>
       <translation>시도 횟수가 너무 많습니다. 1 분 후에 다시 시도하십시오.</translation>
     </message>
@@ -179,6 +153,50 @@
     <message>
       <source>Internal error. Please try again later.</source>
       <translation type="unfinished">Internal error. Please try again later.</translation>
+    </message>
+    <message>
+      <source>If this error persists, please contact your system administrator.</source>
+      <translation type="unfinished">If this error persists, please contact your system administrator.</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check your internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Connection to %1 is not ready yet. Check your internet connection or try again later.</translation>
+    </message>
+    <message>
+      <source>Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Connection to %1 is not ready yet. Check the server’s internet connection or try again later.</translation>
+    </message>
+    <message>
+      <source>Connection to the server could not be established. Try again later.</source>
+      <translation type="unfinished">Connection to the server could not be established. Try again later.</translation>
+    </message>
+    <message>
+      <source>Your session has expired</source>
+      <translation>세션이 만료되었습니다.</translation>
+    </message>
+    <message>
+      <source>Please log in to %1 again.</source>
+      <comment>%1 is the cloud name (like Nx Cloud)</comment>
+      <translation type="unfinished">Please log in to %1 again.</translation>
+    </message>
+    <message>
+      <source>Log in to %1 to log in to this system with %2 user</source>
+      <comment>%1 is the cloud name (like Nx Cloud), %2 is the short cloud name (like Cloud)</comment>
+      <translation type="unfinished">Log in to %1 to log in to this system with %2 user</translation>
+    </message>
+    <message>
+      <source>Session duration limit can be changed by a system administrator.</source>
+      <translation type="unfinished">Session duration limit can be changed by a system administrator.</translation>
+    </message>
+    <message>
+      <source>This user has been disabled by a system administrator.</source>
+      <translation type="unfinished">This user has been disabled by a system administrator.</translation>
+    </message>
+    <message>
+      <source>Too many login attempts. Try again in a minute.</source>
+      <translation type="unfinished">Too many login attempts. Try again in a minute.</translation>
     </message>
   </context>
 </TS>
