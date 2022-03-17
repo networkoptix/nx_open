@@ -37,7 +37,8 @@ bool InstanceController::initialize()
     if (!configureDb())
     {
         NX_ERROR(this, "Failed to tune DB %1", m_dbConnectionOptions.dbName);
-        return false;
+        if (m_dbConnectionOptions.failOnDbTuneError)
+            return false;
     }
 
     NX_DEBUG(this, "Updating DB structure %1", m_dbConnectionOptions.dbName);
