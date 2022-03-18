@@ -38,7 +38,7 @@ const ItemDescriptor& NotificationAction::manifest()
         .fields = {
             makeFieldDescriptor<TargetUserField>("users", tr("To")),
             makeFieldDescriptor<OptionalTimeField>("interval", tr("Interval of action")),
-            makeFieldDescriptor<FlagField>("acknowledge", tr("Force Acknowdgement")),
+            makeFieldDescriptor<FlagField>("acknowledge", tr("Force Acknowledgement")),
             makeFieldDescriptor<TextWithFields>("caption", tr("Caption")),
             makeFieldDescriptor<TextWithFields>("description", tr("Description"))
         }

@@ -12,7 +12,7 @@ class NX_VMS_RULES_API TargetUserField: public ActionField
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.actions.fields.targetUser")
 
-    FIELD(bool, targetAll, setTargetAll)
+    FIELD(bool, acceptAll, setAcceptAll)
     FIELD(QSet<QnUuid>, ids, setIds)
 
 public:

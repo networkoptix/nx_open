@@ -8,7 +8,7 @@ QVariant TargetUserField::build(const EventData& eventData) const
 {
     return QVariant::fromValue(UuidSelection{
         .ids = m_ids,
-        .all = m_targetAll,
+        .all = m_acceptAll,
     });
 }
 
