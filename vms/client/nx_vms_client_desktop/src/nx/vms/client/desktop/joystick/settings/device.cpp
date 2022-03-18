@@ -4,6 +4,13 @@
 
 #include "descriptors.h"
 
+namespace {
+
+// QString.toInt() could autodetect integer base by their format (0x... for hex numbers, etc.).
+constexpr int kAutoDetectBase = 0;
+
+} // namespace
+
 namespace nx::vms::client::desktop::joystick {
 
 Device::Device(
@@ -42,12 +49,24 @@ QString Device::path() const
 
 void Device::updateStickAxisLimits(const JoystickDescriptor& modelInfo)
 {
-    m_axisLimits.clear();
-    m_axisLimits.push_back(parseAxisLimits(modelInfo.xAxis));
-    m_axisLimits.push_back(parseAxisLimits(modelInfo.yAxis));
-    m_axisLimits.push_back(parseAxisLimits(modelInfo.zAxis));
+    m_axisLimits[xIndex] = parseAxisLimits(modelInfo.xAxis);
+    m_axisLimits[yIndex] = parseAxisLimits(modelInfo.yAxis);
+    m_axisLimits[zIndex] = parseAxisLimits(modelInfo.zAxis);
     // Initialize stick position by zeroes (all three axes are in neutral position).
-    m_stickPosition.assign(3, 0);
+    m_stickPosition.fill(0);
+}
+
+Device::AxisLimits Device::parseAxisLimits(const AxisDescriptor& descriptor)
+{
+    Device::AxisLimits result;
+    result.min = descriptor.min.toInt(/*ok*/ nullptr, kAutoDetectBase);
+    result.max = descriptor.max.toInt(/*ok*/ nullptr, kAutoDetectBase);
+    result.mid = descriptor.mid.toInt(/*ok*/ nullptr, kAutoDetectBase);
+    result.bounce = descriptor.bounce.toInt(/*ok*/ nullptr, kAutoDetectBase);
+    if (result.mid == 0)
+        result.mid = (result.min + result.max) / 2;
+    result.sensitivity = descriptor.sensitivity.toDouble(/*ok*/ nullptr);
+    return result;
 }
 
 double Device::mapAxisState(int rawValue, const AxisLimits& limits)
@@ -74,29 +93,29 @@ void Device::pollData()
     NX_MUTEX_LOCKER lock(&m_mutex);
 
     const auto newState = getNewState();
-    const std::vector<double>& newStickPosition = newState.first;
-    const std::vector<bool>& newButtonStates = newState.second;
 
-    if (newStickPosition.empty() || newButtonStates.empty())
+    if (newState.buttonStates.empty())
         return;
 
     bool deviceStateChanged = false;
 
-    if (newStickPosition != m_stickPosition)
+    if (newState.stickPositions != m_stickPosition)
     {
-        m_stickPosition = newStickPosition;
+        m_stickPosition = newState.stickPositions;
         deviceStateChanged = true;
         emit stickMoved(
-            newStickPosition[0],
-            newStickPosition[1],
-            newStickPosition[2]);
+            newState.stickPositions[xIndex],
+            newState.stickPositions[yIndex],
+            newState.stickPositions[zIndex]);
     }
 
-    if (newButtonStates != m_buttonStates)
+    NX_ASSERT(m_buttonStates.size() == newState.buttonStates.size());
+
+    if (newState.buttonStates != m_buttonStates)
     {
-        for (int i = 0; i < m_buttonStates.size(); ++i)
+        for (int i = 0; i < m_buttonStates.size() && i < newState.buttonStates.size(); ++i)
         {
-            if (m_buttonStates[i] == newButtonStates[i])
+            if (m_buttonStates[i] == newState.buttonStates[i])
                 continue;
 
             if (m_buttonStates[i])
@@ -104,12 +123,13 @@ void Device::pollData()
             else
                 emit buttonPressed(i);
         }
-        m_buttonStates = newButtonStates;
+
+        m_buttonStates = newState.buttonStates;
         deviceStateChanged = true;
     }
 
     if (deviceStateChanged)
-        emit stateChanged(newStickPosition, newButtonStates);
+        emit stateChanged(newState.stickPositions, newState.buttonStates);
 }
 
 } // namespace nx::vms::client::desktop::joystick

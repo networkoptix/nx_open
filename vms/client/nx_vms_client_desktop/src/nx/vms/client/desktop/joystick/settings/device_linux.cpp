@@ -103,20 +103,20 @@ bool DeviceLinux::isValid() const
     return m_dev != kInvalidDeviceId;
 }
 
-QPair<std::vector<double>, std::vector<bool>> DeviceLinux::getNewState()
+Device::State DeviceLinux::getNewState()
 {
-    if (m_dev == kInvalidDeviceId)
+    if (!isValid())
         return {};
 
     JoystickEvent event;
-    std::vector<double> newStickPositions = m_stickPosition;
-    std::vector<bool> newButtonStates = m_buttonStates;
+    Device::StickPositions newStickPositions = m_stickPosition;
+    Device::ButtonStates newButtonStates = m_buttonStates;
 
     while (readData(m_dev, &event.data))
     {
         if (event.isAxis())
         {
-            if (newStickPositions.size() <= event.axisOrButtonIndex())
+            if (!NX_ASSERT(event.axisOrButtonIndex() < newStickPositions.size()))
                 continue;
 
             newStickPositions[event.axisOrButtonIndex()] =
@@ -124,7 +124,7 @@ QPair<std::vector<double>, std::vector<bool>> DeviceLinux::getNewState()
         }
         else if (event.isButton())
         {
-            if (newButtonStates.size() < (event.axisOrButtonIndex() + 1))
+            if (!NX_ASSERT(event.axisOrButtonIndex() < newButtonStates.size()))
                 continue;
 
             newButtonStates[event.axisOrButtonIndex()] = event.axisOrButtonState();

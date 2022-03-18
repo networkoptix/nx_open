@@ -46,8 +46,8 @@ struct ActionFactory::Private
     std::vector<std::vector<std::unique_ptr<ParsedAction>>> assignedActions;
     int modifierIndex = -1;
 
+    Device::StickPositions savedStick;
     std::vector<bool> savedButtons;
-    std::vector<double> savedStick;
     bool actedWithModifier = false;
 
     // Layout focus related variables.
@@ -76,7 +76,7 @@ struct ActionFactory::Private
 
         updataButtonActionsConfig(config);
 
-        savedStick.assign(3, 0);
+        savedStick.fill(0);
 
         modifierIndex = getModifierButtonIndex(config);
     }
@@ -141,11 +141,8 @@ struct ActionFactory::Private
         return -1;
     }
 
-    void handleStateChanged(const std::vector<double>& stick, const std::vector<bool>& buttons)
+    void handleStateChanged(const Device::StickPositions& stick, const Device::ButtonStates& buttons)
     {
-        if (!NX_ASSERT(stick.size() == 3))
-            return;
-
         if (!NX_ASSERT(buttons.size() == savedButtons.size()))
             return;
 
@@ -169,12 +166,12 @@ struct ActionFactory::Private
         {
             if (!modifierIsPressed)
             {
-                setCameraSpeed(stick[0], stick[1], stick[2]);
+                setCameraSpeed(stick[Device::xIndex], stick[Device::yIndex], stick[Device::zIndex]);
             }
             else
             {
-                setLayoutFocusSpeed(stick[0], stick[1], /*reset*/ false);
-                setCameraSpeed(0, 0, stick[2]); //< Should we really zoom camera in this case?
+                setLayoutFocusSpeed(stick[Device::xIndex], stick[Device::yIndex], /*reset*/ false);
+                setCameraSpeed(0, 0, stick[Device::zIndex]); //< Should we really zoom camera in this case?
             }
         }
 
@@ -382,7 +379,7 @@ void ActionFactory::updateConfig(const JoystickDescriptor& config)
     d->updateConfig(config);
 }
 
-void ActionFactory::handleStateChanged(const std::vector<double>& stick, const std::vector<bool>& buttons)
+void ActionFactory::handleStateChanged(const Device::StickPositions& stick, const Device::ButtonStates& buttons)
 {
     d->handleStateChanged(stick, buttons);
 }

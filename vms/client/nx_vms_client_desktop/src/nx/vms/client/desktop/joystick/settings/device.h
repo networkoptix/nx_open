@@ -17,6 +17,24 @@ class Device: public QObject
 {
     Q_OBJECT
 
+public:
+    enum AxisIndexes
+    {
+        xIndex,
+        yIndex,
+        zIndex,
+        axisIndexCount
+    };
+
+    using StickPositions = std::array<double, axisIndexCount>;
+
+    using ButtonStates = std::vector<bool>;
+    struct State
+    {
+        StickPositions stickPositions;
+        ButtonStates buttonStates;
+    };
+
 protected:
     struct AxisLimits
     {
@@ -71,11 +89,11 @@ signals:
      * This signal is necessary for command processing since we need to check modifier state
      * changes before processing any other button state change.
      */
-    void stateChanged(const std::vector<double>& stick, const std::vector<bool>& buttons);
+    void stateChanged(const StickPositions& stick, const ButtonStates& buttons);
 
 protected:
-    virtual QPair<std::vector<double>, std::vector<bool>> getNewState() = 0;
-    virtual AxisLimits parseAxisLimits(const AxisDescriptor& descriptor) = 0;
+    virtual State getNewState() = 0;
+    virtual AxisLimits parseAxisLimits(const AxisDescriptor& descriptor);
     double mapAxisState(int rawValue, const AxisLimits& limits);
     void pollData();
 
@@ -86,10 +104,10 @@ protected:
     QString m_modelName;
     QString m_path;
 
-    std::vector<AxisLimits> m_axisLimits;
+    std::array<AxisLimits, axisIndexCount> m_axisLimits;
 
-    std::vector<double> m_stickPosition;
-    std::vector<bool> m_buttonStates;
+    StickPositions m_stickPosition;
+    ButtonStates m_buttonStates;
 };
 
 using DevicePtr = QSharedPointer<Device>;

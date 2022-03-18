@@ -10,6 +10,8 @@
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
 
+#include "device.h"
+
 namespace nx::vms::client::desktop {
 namespace joystick {
 
@@ -43,7 +45,7 @@ public:
 
     void updateConfig(const JoystickDescriptor& config);
 
-    void handleStateChanged(const std::vector<double>& stick, const std::vector<bool>& buttons);
+    void handleStateChanged(const Device::StickPositions& stick, const Device::ButtonStates& buttons);
 
 signals:
     void actionReady(
