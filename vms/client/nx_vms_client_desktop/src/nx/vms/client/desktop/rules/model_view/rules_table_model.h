@@ -79,6 +79,9 @@ public:
         bool enabled() const;
         void setEnabled(bool value);
 
+        QByteArray schedule() const;
+        void setSchedule(const QByteArray& schedule);
+
         /**
          * Calls model updateRule() method with the stored through the setModelIndex() method
          * model index. Must be called manually only if some of the fields is edited because
@@ -122,14 +125,18 @@ public:
     /** If the rule was edited required to call this method to notify the model. */
     void updateRule(const QModelIndex& ruleIndex, const QVector<int>& roles);
 
+    bool hasChanges() const;
     void applyChanges(std::function<void(const QString&)> errorHandler = {});
     void rejectChanges();
+    void resetToDefaults(std::function<void(const QString&)> errorHandler = {});
 
 private:
     std::vector<std::shared_ptr<SimplifiedRule>> simplifiedRules;
+    vms::rules::Engine* engine{};
+
+    std::set<QnUuid> addedRules;
     std::set<QnUuid> modifiedRules;
     std::set<QnUuid> removedRules;
-    vms::rules::Engine* engine{};
 
     void initialise();
     bool isIndexValid(const QModelIndex &index) const;

@@ -159,7 +159,7 @@ bool Engine::updateRule(std::unique_ptr<Rule> rule)
     auto ruleId = rule->id();
     auto result = m_rules.insert_or_assign(ruleId, std::move(rule));
 
-    emit ruleUpdated(ruleId, result.second);
+    emit ruleAddedOrUpdated(ruleId, result.second);
     return result.second;
 }
 

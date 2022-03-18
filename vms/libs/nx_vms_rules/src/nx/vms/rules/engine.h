@@ -82,7 +82,7 @@ public:
     void removeRule(QnUuid ruleId);
 
 signals:
-    void ruleUpdated(QnUuid ruleId, bool added);
+    void ruleAddedOrUpdated(QnUuid ruleId, bool added);
     void ruleRemoved(QnUuid ruleId);
     void rulesReset();
 

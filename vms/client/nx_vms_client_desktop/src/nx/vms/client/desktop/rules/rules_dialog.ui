@@ -183,7 +183,7 @@
        <height>16777215</height>
       </size>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,1">
+     <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0">
       <property name="spacing">
        <number>12</number>
       </property>
@@ -230,112 +230,114 @@
          </layout>
         </widget>
         <widget class="QWidget" name="ruleEditorsPage">
-         <layout class="QHBoxLayout" name="horizontalLayout_3" stretch="1,0,1">
-          <property name="spacing">
-           <number>16</number>
-          </property>
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
+         <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
-           <widget class="QWidget" name="eventWidget" native="true">
+           <layout class="QHBoxLayout" name="horizontalLayout_6">
+            <item>
+             <widget class="QWidget" name="eventWidget" native="true">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>220</height>
+               </size>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,1">
+               <property name="spacing">
+                <number>16</number>
+               </property>
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="nx::vms::client::desktop::rules::EventTypePickerWidget" name="eventTypePicker" native="true"/>
+               </item>
+               <item>
+                <widget class="QWidget" name="eventEditorContainerWidget" native="true">
+                 <layout class="QVBoxLayout" name="eventEditorLayout"/>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="Line" name="panelsSplitter">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="actionWidget" native="true">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>220</height>
+               </size>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,1">
+               <property name="spacing">
+                <number>16</number>
+               </property>
+               <property name="leftMargin">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>0</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="nx::vms::client::desktop::rules::ActionTypePickerWidget" name="actionTypePicker" native="true"/>
+               </item>
+               <item>
+                <widget class="QWidget" name="actionEditorContainerWidget" native="true">
+                 <layout class="QVBoxLayout" name="actionEditorLayout"/>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="Line" name="footerSplitter">
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>220</height>
+              <height>0</height>
              </size>
             </property>
-            <layout class="QVBoxLayout" name="verticalLayout_5" stretch="0,1">
-             <property name="spacing">
-              <number>16</number>
-             </property>
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="nx::vms::client::desktop::rules::EventTypePickerWidget" name="eventTypePicker" native="true"/>
-             </item>
-             <item>
-              <widget class="QWidget" name="eventEditorContainerWidget" native="true">
-               <layout class="QVBoxLayout" name="eventEditorLayout"/>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="Line" name="panelsSplitter">
             <property name="orientation">
-             <enum>Qt::Vertical</enum>
+             <enum>Qt::Horizontal</enum>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QWidget" name="actionWidget" native="true">
+           <widget class="nx::vms::client::desktop::rules::FooterWidget" name="footerWidget" native="true">
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>220</height>
+              <height>0</height>
              </size>
             </property>
-            <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,1">
-             <property name="spacing">
-              <number>16</number>
-             </property>
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
-              <number>0</number>
-             </property>
-             <item>
-              <widget class="nx::vms::client::desktop::rules::ActionTypePickerWidget" name="actionTypePicker" native="true"/>
-             </item>
-             <item>
-              <widget class="QWidget" name="actionEditorContainerWidget" native="true">
-               <layout class="QVBoxLayout" name="actionEditorLayout"/>
-              </widget>
-             </item>
-            </layout>
            </widget>
           </item>
          </layout>
         </widget>
        </widget>
-      </item>
-      <item>
-       <widget class="Line" name="footerSplitter">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="nx::vms::client::desktop::rules::VmsRulesFooterWidget" name="footerWidget" native="true"/>
       </item>
      </layout>
     </widget>
@@ -384,9 +386,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>nx::vms::client::desktop::rules::VmsRulesFooterWidget</class>
+   <class>nx::vms::client::desktop::rules::FooterWidget</class>
    <extends>QWidget</extends>
-   <header location="global">nx/vms/client/desktop/rules/dialog_details/vms_rules_footer_widget.h</header>
+   <header location="global">nx/vms/client/desktop/rules/dialog_details/footer_widget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
