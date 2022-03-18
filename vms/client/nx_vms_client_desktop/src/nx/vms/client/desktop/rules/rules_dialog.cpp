@@ -5,8 +5,8 @@
 
 #include <QtCore/QSortFilterProxyModel>
 
+#include <nx/vms/client/desktop/common/delegates/switch_item_delegate.h>
 #include <nx/vms/client/desktop/common/widgets/snapped_scroll_bar.h>
-#include <nx/vms/client/desktop/rules/model_view/enabled_state_item_delegate.h>
 #include <nx/vms/client/desktop/rules/model_view/modification_mark_item_delegate.h>
 #include <nx/vms/client/desktop/rules/model_view/rules_table_model.h>
 #include <nx/vms/client/desktop/rules/params_widgets/editor_factory.h>
@@ -15,6 +15,7 @@
 #include <nx/vms/client/desktop/style/skin.h>
 #include <ui/common/indents.h>
 #include <ui/common/palette.h>
+#include <ui/workbench/workbench_access_controller.h>
 
 namespace nx::vms::client::desktop::rules {
 
@@ -33,6 +34,8 @@ RulesDialog::RulesDialog(QWidget* parent):
     ui->deleteRuleButton->setIcon(Skin::colorize(
         qnSkin->pixmap("text_buttons/trash.png"), buttonIconColor));
     ui->deleteRuleButton->setEnabled(false);
+
+    ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(false);
 
     const auto midlightColor = QPalette().color(QPalette::Midlight);
     setPaletteColor(ui->searchLineEdit, QPalette::PlaceholderText, midlightColor);
@@ -56,6 +59,7 @@ RulesDialog::RulesDialog(QWidget* parent):
         {
             rulesTableModel->removeRule(
                 rulesFilterModel->mapToSource(ui->tableView->selectionModel()->currentIndex()));
+            updateControlButtons();
         });
 
     connect(ui->eventTypePicker, &EventTypePickerWidget::eventTypePicked, this,
@@ -79,6 +83,15 @@ RulesDialog::RulesDialog(QWidget* parent):
                 rule->setActionType(actionType);
         });
 
+    connect(ui->buttonBox->button(QDialogButtonBox::Apply), &QPushButton::clicked, this,
+        [this]
+        {
+            applyChanges();
+            updateControlButtons();
+        });
+
+    connect(ui->resetDefaultRulesButton, &QPushButton::clicked, this, &RulesDialog::resetToDefaults);
+
     setupRuleTableView();
 
     readOnly = false; //< TODO: Get real readonly state.
@@ -90,41 +103,64 @@ RulesDialog::~RulesDialog()
 {
 }
 
-void RulesDialog::showEvent(QShowEvent* event)
+bool RulesDialog::tryClose(bool force)
 {
-    displayRule();
-
-    QnSessionAwareButtonBoxDialog::showEvent(event);
-}
-
-void RulesDialog::closeEvent(QCloseEvent* event)
-{
-    resetFilter();
-    resetSelection();
-
-    QnSessionAwareButtonBoxDialog::closeEvent(event);
-}
-
-void RulesDialog::buttonBoxClicked(QDialogButtonBox::StandardButton button)
-{
-    const auto errorHandler =
-        [this](const QString& error)
-        {
-            QnMessageBox::critical(this, error);
-        };
-
-    switch(button)
+    if (force)
     {
-        case QDialogButtonBox::Apply:
-        case QDialogButtonBox::Ok:
-            rulesTableModel->applyChanges(errorHandler);
-            break;
-        case QDialogButtonBox::Cancel:
-            rulesTableModel->rejectChanges();
-            break;
+        rejectChanges();
+        if (!isHidden())
+            hide();
+
+        return true;
     }
 
+    if (!rulesTableModel->hasChanges())
+        return true;
+
+    const auto result = QnMessageBox::question(
+        this,
+        tr("Apply changes before exit?"),
+        QString(),
+        QDialogButtonBox::Apply | QDialogButtonBox::Discard | QDialogButtonBox::Cancel,
+        QDialogButtonBox::Apply);
+
+    switch (result)
+    {
+        case QDialogButtonBox::Apply:
+            applyChanges();
+            break;
+        case QDialogButtonBox::Discard:
+            rejectChanges();
+            break;
+        default:
+            return false; // Cancel was pressed
+    }
+
+    return true;
+}
+
+void RulesDialog::showEvent(QShowEvent* event)
+{
+    QnSessionAwareButtonBoxDialog::showEvent(event);
+
+    resetFilter();
     resetSelection();
+    ui->searchLineEdit->setFocus();
+}
+
+void RulesDialog::accept()
+{
+    applyChanges();
+
+    QnSessionAwareButtonBoxDialog::accept();
+}
+
+void RulesDialog::reject()
+{
+    if (!tryClose(false))
+        return;
+
+    QnSessionAwareButtonBoxDialog::reject();
 }
 
 void RulesDialog::setupRuleTableView()
@@ -140,12 +176,14 @@ void RulesDialog::setupRuleTableView()
     rulesFilterModel->setFilterRole(RulesTableModel::FilterRole);
     rulesFilterModel->setDynamicSortFilter(true);
     rulesFilterModel->setFilterCaseSensitivity(Qt::CaseInsensitive);
+    rulesFilterModel->sort(RulesTableModel::EventColumn);
 
     ui->tableView->setModel(rulesFilterModel);
     ui->tableView->setItemDelegateForColumn(RulesTableModel::EditedStateColumn,
         new ModificationMarkItemDelegate(ui->tableView));
     ui->tableView->setItemDelegateForColumn(RulesTableModel::EnabledStateColumn,
-        new EnabledStateItemDelegate(ui->tableView));
+        new SwitchItemDelegate(ui->tableView));
+    ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     auto horizontalHeader = ui->tableView->horizontalHeader();
     const int kDefaultHorizontalSectionSize = 72;
@@ -166,6 +204,7 @@ void RulesDialog::setupRuleTableView()
         [this, selectionModel](const QModelIndex& current)
         {
             displayedRule = rulesTableModel->rule(rulesFilterModel->mapToSource(current));
+            updateControlButtons();
             displayRule();
         });
 
@@ -174,6 +213,17 @@ void RulesDialog::setupRuleTableView()
         {
             resetSelection();
             rulesFilterModel->setFilterRegularExpression(text);
+        });
+
+    connect(ui->tableView, &QAbstractItemView::clicked, this,
+        [this](const QModelIndex &index)
+        {
+            if (index.column() != RulesTableModel::EnabledStateColumn)
+                return;
+
+            auto clickedRule = rulesTableModel->rule(rulesFilterModel->mapToSource(index)).lock();
+            if (clickedRule)
+                clickedRule->setEnabled(!clickedRule->enabled());
         });
 }
 
@@ -188,9 +238,23 @@ void RulesDialog::updateReadOnlyState()
         paramsWidget->setReadOnly(readOnly);
 }
 
-void RulesDialog::showTipPanel(bool show)
+void RulesDialog::updateControlButtons()
 {
-    ui->panelsStackedWidget->setCurrentIndex(show ? 0 : 1);
+    const bool hasSelection = ui->tableView->currentIndex().isValid();
+    ui->deleteRuleButton->setEnabled(readOnly ? false : hasSelection);
+
+    const bool hasPermissions = accessController()->hasGlobalPermission(GlobalPermission::admin);
+    const bool hasChanges = rulesTableModel->hasChanges();
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(hasPermissions);
+    ui->buttonBox->button(QDialogButtonBox::Apply)->setEnabled(hasChanges && hasPermissions);
+    ui->resetDefaultRulesButton->setEnabled(hasPermissions);
+}
+
+void RulesDialog::updateRuleEditorPanel()
+{
+    const bool hasSelection = ui->tableView->currentIndex().isValid();
+    // Show rule editor if a rule selected, tip panel otherwise.
+    ui->panelsStackedWidget->setCurrentIndex(!hasSelection ? 0 : 1);
 }
 
 void RulesDialog::createEventEditor(const vms::rules::ItemDescriptor& descriptor)
@@ -237,22 +301,16 @@ void RulesDialog::createActionEditor(const vms::rules::ItemDescriptor& descripto
 
 void RulesDialog::displayRule()
 {
+    updateRuleEditorPanel();
+
     auto rule = displayedRule.lock();
     if (!rule)
-    {
-        ui->deleteRuleButton->setEnabled(false);
-        showTipPanel(true);
         return;
-    }
-
-    ui->deleteRuleButton->setEnabled(readOnly ? false : true);
-
-    // Hide tip panel.
-    showTipPanel(false);
 
     displayEvent(*rule);
     displayAction(*rule);
-    displayComment(*rule);
+
+    ui->footerWidget->setRule(displayedRule);
 }
 
 void RulesDialog::displayEvent(const RulesTableModel::SimplifiedRule& rule)
@@ -291,11 +349,6 @@ void RulesDialog::displayAction(const RulesTableModel::SimplifiedRule& rule)
         actionEditorWidget->setFields(rule.actionFields());
 }
 
-void RulesDialog::displayComment(const RulesTableModel::SimplifiedRule& rule)
-{
-    ui->footerWidget->setComment(rule.comment());
-}
-
 void RulesDialog::resetFilter()
 {
     ui->searchLineEdit->clear();
@@ -304,8 +357,9 @@ void RulesDialog::resetFilter()
 
 void RulesDialog::resetSelection()
 {
-    ui->tableView->selectionModel()->clear();
-    displayedRule.reset();
+    ui->tableView->clearSelection();
+    ui->tableView->setCurrentIndex(QModelIndex{});
+    displayRule();
 }
 
 void RulesDialog::updateRule()
@@ -319,6 +373,8 @@ void RulesDialog::onModelDataChanged(
         const QModelIndex& bottomRight,
         const QVector<int>& roles)
 {
+    updateControlButtons();
+
     auto rule = displayedRule.lock();
     if (!rule)
         return;
@@ -332,6 +388,52 @@ void RulesDialog::onModelDataChanged(
 
     if (roles.contains(RulesTableModel::FieldRole))
         displayRule();
+}
+
+void RulesDialog::applyChanges()
+{
+    const auto errorHandler =
+        [this](const QString& error)
+        {
+            QnMessageBox::critical(this, tr("Apply changes failed."), error);
+        };
+
+    rulesTableModel->applyChanges(errorHandler);
+}
+
+void RulesDialog::rejectChanges()
+{
+    rulesTableModel->rejectChanges();
+}
+
+void RulesDialog::resetToDefaults()
+{
+    if (!accessController()->hasGlobalPermission(GlobalPermission::admin))
+        return;
+
+    QnMessageBox dialog(
+        QnMessageBoxIcon::Question,
+        tr("Restore all rules to default?"),
+        tr("This action cannot be undone."),
+        QDialogButtonBox::Cancel,
+        QDialogButtonBox::NoButton,
+        this);
+
+    dialog.addCustomButton(
+        QnMessageBoxCustomButton::Reset,
+        QDialogButtonBox::AcceptRole,
+        Qn::ButtonAccent::Warning);
+
+    if (dialog.exec() == QDialogButtonBox::Cancel)
+        return;
+
+    const auto errorHandler =
+        [this](const QString& error)
+        {
+            QnMessageBox::critical(this, tr("Restore rules failed."), error);
+        };
+
+    rulesTableModel->resetToDefaults(errorHandler);
 }
 
 } // namespace nx::vms::client::desktop::rules

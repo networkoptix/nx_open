@@ -24,19 +24,21 @@ public:
     explicit RulesDialog(QWidget* parent = nullptr);
     virtual ~RulesDialog() override;
 
+    virtual bool tryClose(bool force) override;
+    virtual void accept() override;
+    virtual void reject() override;
+
 protected:
     virtual void showEvent(QShowEvent* event) override;
-    virtual void closeEvent(QCloseEvent* event) override;
-    virtual void buttonBoxClicked(QDialogButtonBox::StandardButton button) override;
 
 private:
     void setupRuleTableView();
     void updateReadOnlyState();
-    void showTipPanel(bool show);
+    void updateControlButtons();
+    void updateRuleEditorPanel();
     void displayRule();
     void displayEvent(const RulesTableModel::SimplifiedRule& rule);
     void displayAction(const RulesTableModel::SimplifiedRule& rule);
-    void displayComment(const RulesTableModel::SimplifiedRule& rule);
     void createEventEditor(const vms::rules::ItemDescriptor& descriptor);
     void createActionEditor(const vms::rules::ItemDescriptor& descriptor);
     void resetFilter();
@@ -46,6 +48,9 @@ private:
         const QModelIndex& topLeft,
         const QModelIndex& bottomRight,
         const QVector<int>& roles);
+    void applyChanges();
+    void rejectChanges();
+    void resetToDefaults();
 
 private:
     std::unique_ptr<Ui::RulesDialog> ui;

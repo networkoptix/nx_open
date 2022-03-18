@@ -13,14 +13,14 @@ class MockEngineEvents: public QObject
     Q_OBJECT
 
 public:
-    MOCK_METHOD(void, onRuleUpdated, (QnUuid ruleId, bool added));
+    MOCK_METHOD(void, onRuleAddedOrUpdated, (QnUuid ruleId, bool added));
     MOCK_METHOD(void, onRuleRemoved, (QnUuid ruleId));
     MOCK_METHOD(void, onRulesReset, ());
 
     MockEngineEvents(Engine* engine):
         m_engine(engine)
     {
-        connect(m_engine, &Engine::ruleUpdated, this, &MockEngineEvents::onRuleUpdated);
+        connect(m_engine, &Engine::ruleAddedOrUpdated, this, &MockEngineEvents::onRuleAddedOrUpdated);
         connect(m_engine, &Engine::ruleRemoved, this, &MockEngineEvents::onRuleRemoved);
         connect(m_engine, &Engine::rulesReset, this, &MockEngineEvents::onRulesReset);
     }

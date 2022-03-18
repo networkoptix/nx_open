@@ -301,8 +301,8 @@ TEST_F(EngineTest, updateRule)
     MockEngineEvents mockEvents(engine.get());
     auto ruleData1 = makeEmptyRuleData();
 
-    EXPECT_CALL(mockEvents, onRuleUpdated(ruleData1.id, true));
-    EXPECT_CALL(mockEvents, onRuleUpdated(ruleData1.id, false));
+    EXPECT_CALL(mockEvents, onRuleAddedOrUpdated(ruleData1.id, true));
+    EXPECT_CALL(mockEvents, onRuleAddedOrUpdated(ruleData1.id, false));
     EXPECT_TRUE(engine->updateRule(ruleData1));
     EXPECT_FALSE(engine->updateRule(ruleData1));
     EXPECT_TRUE(engine->cloneRules()[ruleData1.id]);
@@ -313,7 +313,7 @@ TEST_F(EngineTest, removeRule)
     MockEngineEvents mockEvents(engine.get());
     auto ruleData1 = makeEmptyRuleData();
 
-    EXPECT_CALL(mockEvents, onRuleUpdated(ruleData1.id, true));
+    EXPECT_CALL(mockEvents, onRuleAddedOrUpdated(ruleData1.id, true));
     EXPECT_CALL(mockEvents, onRuleRemoved(ruleData1.id));
     EXPECT_TRUE(engine->updateRule(ruleData1));
     engine->removeRule(ruleData1.id);
@@ -330,7 +330,7 @@ TEST_F(EngineTest, resetRules)
     EXPECT_TRUE(engine->cloneRules().empty());
     engine->setRules({});
 
-    EXPECT_CALL(mockEvents, onRuleUpdated(ruleData1.id, true));
+    EXPECT_CALL(mockEvents, onRuleAddedOrUpdated(ruleData1.id, true));
     EXPECT_CALL(mockEvents, onRulesReset());
     EXPECT_TRUE(engine->updateRule(ruleData1));
     engine->setRules({});

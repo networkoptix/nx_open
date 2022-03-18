@@ -185,7 +185,7 @@ QString RulesTableModel::SimplifiedRule::comment() const
 void RulesTableModel::SimplifiedRule::setComment(const QString& comment)
 {
     actualRule->setComment(comment);
-    update({Qt::DisplayRole, Qt::CheckStateRole});
+    update({Qt::CheckStateRole});
 }
 
 bool RulesTableModel::SimplifiedRule::enabled() const
@@ -196,6 +196,17 @@ bool RulesTableModel::SimplifiedRule::enabled() const
 void RulesTableModel::SimplifiedRule::setEnabled(bool value)
 {
     actualRule->setEnabled(value);
+    update({Qt::CheckStateRole});
+}
+
+QByteArray RulesTableModel::SimplifiedRule::schedule() const
+{
+    return actualRule->schedule();
+}
+
+void RulesTableModel::SimplifiedRule::setSchedule(const QByteArray& schedule)
+{
+    actualRule->setSchedule(schedule);
     update({Qt::CheckStateRole});
 }
 
@@ -219,10 +230,18 @@ RulesTableModel::RulesTableModel(QObject* parent):
 {
     initialise();
 
-    connect(engine, &vms::rules::Engine::ruleUpdated, this,
-        [this](QnUuid ruleId)
+    connect(engine, &vms::rules::Engine::ruleAddedOrUpdated, this,
+        [this](QnUuid ruleId, bool added)
         {
-            modifiedRules.erase(ruleId);
+            // If the current user has an intention to remove a rule with such id, it's changes
+            // should be ignored.
+            if (removedRules.contains(ruleId))
+                return;
+
+            if (added)
+                addedRules.erase(ruleId);
+            else
+                modifiedRules.erase(ruleId);
 
             if (auto simplifiedRule = rule(ruleId).lock())
             {
@@ -243,7 +262,17 @@ RulesTableModel::RulesTableModel(QObject* parent):
         {
             removedRules.erase(ruleId);
 
-            removeRule(ruleId);
+            auto simplifiedRule = rule(ruleId).lock();
+            if (!simplifiedRule)
+                return;
+
+            const int row = simplifiedRule->modelIndex().row();
+
+            beginRemoveRows({}, row, row);
+
+            simplifiedRules.erase(simplifiedRules.begin() + row);
+
+            endRemoveRows();
         });
 
     connect(engine, &vms::rules::Engine::rulesReset, this,
@@ -332,10 +361,7 @@ QVariant RulesTableModel::headerData(int section, Qt::Orientation orientation, i
 
 QModelIndex RulesTableModel::addRule()
 {
-    beginInsertRows({}, simplifiedRules.size(), simplifiedRules.size());
-
     auto newRuleId = QnUuid::createUuid();
-
     auto newRule = std::make_unique<Rule>(newRuleId);
 
     // TODO: Choose default type for the event and action.
@@ -348,6 +374,10 @@ QModelIndex RulesTableModel::addRule()
 
     newRule->addEventFilter(std::move(eventFilter));
     newRule->addActionBuilder(std::move(actionBuilder));
+
+    beginInsertRows({}, simplifiedRules.size(), simplifiedRules.size());
+
+    addedRules.insert(newRule->id());
 
     simplifiedRules.emplace_back(new SimplifiedRule(engine, std::move(newRule)));
     simplifiedRules.back()->setModelIndex(index(simplifiedRules.size() - 1, IdColumn));
@@ -362,11 +392,16 @@ bool RulesTableModel::removeRule(const QModelIndex& ruleIndex)
     if (!isIndexValid(ruleIndex))
         return false;
 
-    int row = ruleIndex.row();
+    const int row = ruleIndex.row();
+    const auto ruleId = simplifiedRules[row]->id();
 
     beginRemoveRows({}, row, row);
 
-    removedRules.insert(simplifiedRules[row]->id());
+    if (addedRules.contains(ruleId))
+        addedRules.erase(ruleId);
+    else
+        removedRules.insert(ruleId);
+
     simplifiedRules.erase(simplifiedRules.begin() + row);
 
     endRemoveRows();
@@ -412,7 +447,16 @@ void RulesTableModel::updateRule(const QModelIndex& ruleIndex, const QVector<int
     if (!isIndexValid(ruleIndex))
         return;
 
-    int row = ruleIndex.row();
+    const int row = ruleIndex.row();
+    const auto ruleId = simplifiedRules.at(row)->id();
+
+    if (!addedRules.contains(ruleId))
+    {
+        if (isRuleModified(simplifiedRules.at(row).get()))
+            modifiedRules.insert(ruleId);
+        else
+            modifiedRules.erase(ruleId);
+    }
 
     auto eventIndex = index(row, EventColumn);
     auto editedIndex = index(row, EditedStateColumn);
@@ -427,21 +471,23 @@ void RulesTableModel::applyChanges(std::function<void(const QString&)> errorHand
 
     auto rulesManager = connection->getVmsRulesManager(Qn::kSystemAccess);
 
-    // Send save rule transactions.
-    for (const auto& simplifiedRule: simplifiedRules)
-    {
-        if (!isRuleModified(simplifiedRule.get()))
-            continue;
+    std::set<QnUuid> addedAndModifiedRules;
+    addedAndModifiedRules.insert(addedRules.cbegin(), addedRules.cend());
+    addedAndModifiedRules.insert(modifiedRules.cbegin(), modifiedRules.cend());
 
-        auto id = simplifiedRule->id();
-        modifiedRules.insert(id);
+    // Send save rule transactions.
+    for (const auto& id: addedAndModifiedRules)
+    {
+        auto simplifiedRule = rule(id).lock();
+        if (!simplifiedRule)
+            continue;
 
         auto serializedRule = engine->serialize(simplifiedRule->rule());
         rulesManager->save(
             serializedRule,
             [this, errorHandler, id](int /*requestId*/, ec2::ErrorCode errorCode)
             {
-                if (!modifiedRules.contains(id))
+                if (!addedRules.contains(id) && !modifiedRules.contains(id))
                     return;
 
                 if (errorCode == ec2::ErrorCode::ok)
@@ -449,7 +495,8 @@ void RulesTableModel::applyChanges(std::function<void(const QString&)> errorHand
 
                 if (errorHandler)
                     errorHandler(ec2::toString(errorCode));
-            }
+            },
+            this
         );
     }
 
@@ -468,7 +515,8 @@ void RulesTableModel::applyChanges(std::function<void(const QString&)> errorHand
 
                 if (errorHandler)
                     errorHandler(ec2::toString(errorCode));
-            }
+            },
+            this
         );
     }
 }
@@ -482,11 +530,36 @@ void RulesTableModel::rejectChanges()
     endResetModel();
 }
 
+void RulesTableModel::resetToDefaults(std::function<void(const QString&)> errorHandler)
+{
+    if (auto connection = messageBusConnection())
+    {
+        connection->getVmsRulesManager(Qn::kSystemAccess)->resetVmsRules(
+            [errorHandler](int /*requestId*/, ec2::ErrorCode errorCode)
+            {
+                if (errorCode == ec2::ErrorCode::ok)
+                    return;
+
+                if (errorHandler)
+                    errorHandler(ec2::toString(errorCode));
+            },
+            this);
+    }
+}
+
+bool RulesTableModel::hasChanges() const
+{
+    return !addedRules.empty() || !modifiedRules.empty() || !removedRules.empty();
+}
+
 void RulesTableModel::initialise()
 {
     auto clonedRules = engine->cloneRules();
 
+    addedRules.clear();
+    modifiedRules.clear();
     removedRules.clear();
+
     simplifiedRules.clear();
     simplifiedRules.reserve(clonedRules.size());
 
