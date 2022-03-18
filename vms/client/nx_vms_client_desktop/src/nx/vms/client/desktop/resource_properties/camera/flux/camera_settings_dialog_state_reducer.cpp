@@ -803,7 +803,7 @@ State loadSingleCameraProperties(
 
     if (singleCamera->getDefaultMotionType() == MotionType::hardware)
     {
-        state.motion.constraints = {};
+        state.motion.constraints = camera_settings_detail::MotionConstraints();
         state.motion.constraints->maxTotalRects = singleCamera->motionWindowCount();
         state.motion.constraints->maxMaskRects = singleCamera->motionMaskWindowCount();
         state.motion.constraints->maxSensitiveRects
