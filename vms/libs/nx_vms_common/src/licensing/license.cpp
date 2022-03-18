@@ -603,6 +603,11 @@ LicenseTypeInfo QnLicense::licenseTypeInfo(Qn::LicenseType licenseType)
     return ::licenseTypeInfo[licenseType];
 }
 
+LicenseTypeInfo QnLicense::licenseTypeInfo() const
+{
+    return licenseTypeInfo(type());
+}
+
 QString QnLicense::orderType() const
 {
     return m_orderType;
