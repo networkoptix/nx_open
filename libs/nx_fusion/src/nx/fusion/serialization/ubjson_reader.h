@@ -3,14 +3,14 @@
 #ifndef QN_UBJSON_READER_H
 #define QN_UBJSON_READER_H
 
-#include <cassert>
-
 #include <algorithm> //< For std::min.
 #include <array>
 
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonValue>
 #include <QtCore/QtGlobal>
 #include <QtCore/QVarLengthArray>
-#include <QtCore/QJsonValue>
 
 #include <nx/utils/log/assert.h>
 
@@ -18,7 +18,6 @@
 #include "ubjson_fwd.h"
 #include "ubjson_marker.h"
 #include "ubjson_detail.h"
-
 
 template<class Input>
 class QnUbjsonReader: private QnUbjsonDetail::ReaderWriterBase
@@ -216,6 +215,12 @@ public:
 
         auto marker = peekMarker();
         switch (marker) {
+        case QnUbjson::NullMarker:
+        {
+            readNull();
+            *target = QJsonValue();
+            break;
+        }
         case QnUbjson::TrueMarker:
         case QnUbjson::FalseMarker:
         {
@@ -280,8 +285,23 @@ public:
             *target = tmp;
             break;
         }
+        case QnUbjson::ArrayStartMarker:
+        {
+            QJsonArray tmp;
+            readJsonArray(&tmp);
+            *target = tmp;
+            break;
+        }
+        case QnUbjson::ObjectStartMarker:
+        {
+            QJsonObject tmp;
+            readJsonObject(&tmp);
+            *target = tmp;
+            break;
+        }
+
         default:
-            NX_ASSERT(false, "Unsupported QJsonValue type?");
+            NX_ASSERT(false, "Unexpected ubjson marker: %1", marker);
             *target = {};
             return false;
         }
@@ -583,6 +603,52 @@ private:
 
         *target = static_cast<int>(tmp);
         if(*target < 0)
+            return false;
+
+        return true;
+    }
+
+    bool readJsonArray(QJsonArray* target)
+    {
+        int size;
+        if (!readArrayStart(&size))
+            return false;
+
+        while (peekMarker() != QnUbjson::ArrayEndMarker)
+        {
+            QJsonValue value;
+            if (!readJsonValue(&value))
+                return false;
+
+            target->push_back(std::move(value));
+        }
+
+        if (!readArrayEnd())
+            return false;
+
+        return true;
+    }
+
+    bool readJsonObject(QJsonObject* target)
+    {
+        int size;
+        if (!readObjectStart(&size))
+            return false;
+
+        while (peekMarker() != QnUbjson::ObjectEndMarker)
+        {
+            QString key;
+            if (!readUtf8String(&key))
+                return false;
+
+            QJsonValue value;
+            if (!readJsonValue(&value))
+                return false;
+
+            (*target)[key] = std::move(value);
+        }
+
+        if (!readObjectEnd())
             return false;
 
         return true;

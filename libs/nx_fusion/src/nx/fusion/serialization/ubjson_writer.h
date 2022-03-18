@@ -3,9 +3,11 @@
 #ifndef QN_UBJSON_WRITER_H
 #define QN_UBJSON_WRITER_H
 
-#include <cassert>
 #include <string>
 
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonObject>
+#include <QtCore/QJsonValue>
 #include <QtCore/QtGlobal>
 #include <QtCore/QVarLengthArray>
 
@@ -138,9 +140,13 @@ public:
             writeUtf8String(value.toString());
             break;
         case QJsonValue::Array:
+            writeJsonArray(value.toArray());
+            break;
         case QJsonValue::Object:
+            writeJsonObject(value.toObject());
+            break;
         default:
-            NX_ASSERT(false, "Unsupported QJsonValue type");
+            NX_ASSERT(false, "Unsupported QJsonValue type: %1", value.type());
             writeNull();
             break;
         }
@@ -325,6 +331,27 @@ private:
             m_stream.writeMarker(QnUbjson::Int32Marker);
             m_stream.writeNumber(static_cast<qint32>(value));
         }
+    }
+
+    void writeJsonArray(const QJsonArray& jsonArray)
+    {
+        writeArrayStart(jsonArray.size());
+        for (const auto& elem: jsonArray)
+            writeJsonValue(elem);
+        writeArrayEnd();
+    }
+
+    void writeJsonObject(const QJsonObject& jsonObject)
+    {
+        writeObjectStart(jsonObject.size());
+
+        for (auto it = jsonObject.begin(); it != jsonObject.end(); ++it)
+        {
+            writeUtf8String(it.key());
+            writeJsonValue(it.value());
+        }
+
+        writeObjectEnd();
     }
 
 private:

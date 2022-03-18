@@ -36,26 +36,16 @@ struct BriefMockDataWithQJsonValue
     QString s = "Hello world";
     QJsonValue sVal;
     int post = 999;
+    QJsonValue arrVal;
+    QJsonValue objVal;
 
-    bool operator==(const BriefMockDataWithQJsonValue& other) const
-    {
-        return pre == other.pre
-            && nullVal == other.nullVal
-            && t == other.t
-            && tVal == other.tVal
-            && f == other.f
-            && fVal == other.fVal
-            && d == other.d
-            && dVal == other.dVal
-            && s == other.s
-            && sVal == other.sVal
-            && post == other.post;
-    }
+    bool operator==(const BriefMockDataWithQJsonValue& other) const = default;
 };
-#define BriefMockDataWithQJsonValue_Fields (pre)(nullVal)(t)(tVal)(f)(fVal)(d)(dVal)(s)(sVal)(post)
+#define BriefMockDataWithQJsonValue_Fields (pre)(nullVal)(t)(tVal)(f)(fVal)(d)(dVal)(s)(sVal) \
+    (post)(arrVal)(objVal)
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
-    BriefMockDataWithQJsonValue, (json), BriefMockDataWithQJsonValue_Fields)
+    BriefMockDataWithQJsonValue, (ubjson), BriefMockDataWithQJsonValue_Fields)
 
 TEST(UbJsonTest, qint8)
 {
@@ -122,11 +112,47 @@ TEST(UbJsonTest, qJsonValue)
     value.fVal = value.f;
     value.dVal = value.d;
     value.sVal = value.s;
+    value.arrVal = QJsonArray({ 1, 2 });
+    value.objVal = QJsonObject({ {"key", "val"} });
 
-    BriefMockDataWithQJsonValue result = QJson::deserialized<BriefMockDataWithQJsonValue>(
-        QJson::serialized(value));
+    BriefMockDataWithQJsonValue result = QnUbjson::deserialized<BriefMockDataWithQJsonValue>(
+        QnUbjson::serialized(value));
 
     ASSERT_EQ(value, result);
+}
+
+TEST(UbJsonTest, qJsonValueComplex)
+{
+    const QJsonArray jsonArray = {
+        QJsonValue(), QJsonValue(true), 3, "hi", 1.01
+    };
+
+    const QJsonObject jsonObject = {
+        {"nul", QJsonValue()},
+        {"bool", true},
+        {"int", 3},
+        {"double", 1.01},
+        {"str", "hi"}
+    };
+
+    auto jsonArrayComplex = jsonArray;
+    jsonArrayComplex.push_back(jsonArray);
+    jsonArrayComplex.push_back(jsonObject);
+
+    auto jsonObjectComplex = jsonObject;
+    jsonObjectComplex["arr"] = jsonArrayComplex;
+    jsonObjectComplex["obj"] = jsonObject;
+
+    const auto expected = QJsonValue(jsonObjectComplex);
+    SCOPED_TRACE(QJson::serialized(expected).toStdString());
+
+    const auto ubody = QnUbjson::serialized(expected);
+    ASSERT_GT(ubody.size(), 0);
+
+    bool ok = false;
+    const auto actual = QnUbjson::deserialized(ubody, QJsonValue(), &ok);
+    EXPECT_TRUE(ok);
+    EXPECT_EQ(expected, actual);
 }
 
 TEST(UbJsonTest, customStructDescendantFromAncestor)
