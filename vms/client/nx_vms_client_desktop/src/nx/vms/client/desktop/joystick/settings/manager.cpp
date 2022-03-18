@@ -16,6 +16,8 @@
 
 #if defined(Q_OS_LINUX)
     #include "manager_linux.h"
+#elif defined(Q_OS_WINDOWS)
+    #include "manager_win.h"
 #else
     #include "manager_hid.h"
 #endif
@@ -38,6 +40,8 @@ Manager* Manager::create(QObject* parent)
 {
 #if defined(Q_OS_LINUX)
     return new ManagerLinux(parent);
+#elif defined(Q_OS_WINDOWS)
+    return new ManagerWindows(parent);
 #else
     return new ManagerHid(parent);
 #endif
@@ -187,30 +191,6 @@ void Manager::loadConfig(
     }
 }
 
-DevicePtr Manager::initializeDeviceUnsafe(
-    const JoystickDescriptor& deviceConfig,
-    const QString& path)
-{
-    auto device = createDevice(deviceConfig, path);
-    auto factory = ActionFactoryPtr(new ActionFactory(deviceConfig, this));
-
-    connect(device.get(), &Device::stateChanged, this,
-        [this, factory](const std::vector<double>& stick, const std::vector<bool>& buttons)
-        {
-            if (m_deviceActionsEnabled)
-                factory->handleStateChanged(stick, buttons);
-        });
-
-    connect(factory.get(), &ActionFactory::actionReady, menu(),
-        [this](ui::action::IDType id, const ui::action::Parameters& parameters)
-        {
-            menu()->triggerIfPossible(id, parameters);
-        });
-
-    m_actionFactories[path] = factory;
-    return device;
-}
-
 void Manager::removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths)
 {
     for (auto it = m_devices.begin(); it != m_devices.end(); )
@@ -233,16 +213,31 @@ void Manager::removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths)
     }
 }
 
-void Manager::tryInitializeDevice(const JoystickDescriptor& description, const QString& devicePath)
+void Manager::initializeDevice(
+    DevicePtr& device,
+    const JoystickDescriptor& description,
+    const QString& devicePath)
 {
-    DevicePtr device(initializeDeviceUnsafe(description, devicePath));
+    auto factory = ActionFactoryPtr(new ActionFactory(description, this));
 
-    if (device && device->isValid())
-    {
-        m_devices[devicePath] = device;
+    connect(device.get(), &Device::stateChanged, this,
+        [this, factory](const Device::StickPositions& stick, const Device::ButtonStates& buttons)
+        {
+            if (m_deviceActionsEnabled)
+                factory->handleStateChanged(stick, buttons);
+        });
 
-        emit deviceConnected(device);
-    }
+    connect(factory.get(), &ActionFactory::actionReady, menu(),
+        [this](ui::action::IDType id, const ui::action::Parameters& parameters)
+        {
+            menu()->triggerIfPossible(id, parameters);
+        });
+
+    m_actionFactories[devicePath] = factory;
+
+    m_devices[devicePath] = device;
+
+    emit deviceConnected(device);
 }
 
 } // namespace nx::vms::client::desktop::joystick

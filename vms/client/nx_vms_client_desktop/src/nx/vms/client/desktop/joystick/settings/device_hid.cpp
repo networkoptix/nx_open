@@ -55,9 +55,9 @@ bool DeviceHid::isValid() const
     return m_dev;
 }
 
-QPair<std::vector<double>, std::vector<bool>> DeviceHid::getNewState()
+Device::State DeviceHid::getNewState()
 {
-    if (!m_dev)
+    if (!isValid())
         return {};
 
     int bytesRead = hid_read(m_dev, m_buffer.data(), m_bufferSize);
@@ -69,8 +69,9 @@ QPair<std::vector<double>, std::vector<bool>> DeviceHid::getNewState()
         return {};
     m_reportData = newReportData;
 
-    std::vector<double> newStickPositions;
-    for (int i = 0; i < m_axisLocations.size(); ++i)
+    StickPositions newStickPositions;
+    newStickPositions.fill(0);
+    for (int i = 0; i < m_axisLocations.size() && i < newStickPositions.max_size(); ++i)
     {
         const auto state = parseData(m_reportData, m_axisLocations[i]);
 
@@ -81,7 +82,7 @@ QPair<std::vector<double>, std::vector<bool>> DeviceHid::getNewState()
                 rawValue |= 1 << i;
         }
 
-        newStickPositions.push_back(mapAxisState(rawValue, m_axisLimits[i]));
+        newStickPositions[i] = mapAxisState(rawValue, m_axisLimits[i]);
     }
 
     std::vector<bool> newButtonStates;
@@ -91,20 +92,6 @@ QPair<std::vector<double>, std::vector<bool>> DeviceHid::getNewState()
     }
 
     return {newStickPositions, newButtonStates};
-}
-
-Device::AxisLimits DeviceHid::parseAxisLimits(
-    const nx::vms::client::desktop::joystick::AxisDescriptor& descriptor)
-{
-    Device::AxisLimits result;
-    result.min = descriptor.min.toInt(/*ok*/ nullptr, kAutoDetectBase);
-    result.max = descriptor.max.toInt(/*ok*/ nullptr, kAutoDetectBase);
-    result.mid = descriptor.mid.toInt(/*ok*/ nullptr, kAutoDetectBase);
-    result.bounce = descriptor.bounce.toInt(/*ok*/ nullptr, kAutoDetectBase);
-    if (result.mid == 0)
-        result.mid = (result.min + result.max) / 2;
-    result.sensitivity = descriptor.sensitivity.toDouble(/*ok*/ nullptr);
-    return result;
 }
 
 DeviceHid::ParsedFieldLocation DeviceHid::parseLocation(const FieldLocation& location)

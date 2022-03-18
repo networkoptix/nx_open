@@ -17,9 +17,6 @@ public:
     virtual ~ManagerHid() override;
 
 private:
-    virtual DevicePtr createDevice(
-        const JoystickDescriptor& deviceConfig,
-        const QString& path) override;
     virtual void enumerateDevices() override;
 };
 

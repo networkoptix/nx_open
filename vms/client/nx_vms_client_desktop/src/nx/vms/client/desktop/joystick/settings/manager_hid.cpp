@@ -34,13 +34,6 @@ ManagerHid::~ManagerHid()
     hid_exit();
 }
 
-DevicePtr ManagerHid::createDevice(
-    const JoystickDescriptor& deviceConfig,
-    const QString& path)
-{
-    return DevicePtr(new DeviceHid(deviceConfig, path, &m_pollTimer));
-}
-
 void ManagerHid::enumerateDevices()
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
@@ -70,7 +63,11 @@ void ManagerHid::enumerateDevices()
 
                 if (iter != m_deviceConfigs.end())
                 {
-                    tryInitializeDevice(*iter, path);
+                    const auto config = *iter;
+
+                    DevicePtr device(new DeviceHid(config, path, &m_pollTimer));
+                    if (device->isValid())
+                        initializeDevice(device, config, path);
                 }
                 else
                 {

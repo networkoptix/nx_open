@@ -19,13 +19,6 @@ ManagerLinux::ManagerLinux(QObject* parent):
 {
 }
 
-DevicePtr ManagerLinux::createDevice(
-    const JoystickDescriptor& deviceConfig,
-    const QString& path)
-{
-    return DevicePtr(new DeviceLinux(deviceConfig, path, &m_pollTimer));
-}
-
 void ManagerLinux::enumerateDevices()
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
@@ -68,7 +61,13 @@ void ManagerLinux::enumerateDevices()
             });
 
         if (iter != m_deviceConfigs.end())
-            tryInitializeDevice(*iter, path);
+        {
+            const auto config = *iter;
+
+            DevicePtr device(new DeviceLinux(config, path, &m_pollTimer));
+            if (device->isValid())
+                initializeDevice(device, config, path);
+        }
         else
             NX_VERBOSE(this, "An unsupported Joystick has been found: %1 (%2)", modelName, path);
     }

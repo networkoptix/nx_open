@@ -40,8 +40,7 @@ public:
     virtual bool isValid() const override;
 
 protected:
-    virtual QPair<std::vector<double>, std::vector<bool>> getNewState() override;
-    virtual AxisLimits parseAxisLimits(const AxisDescriptor& descriptor) override;
+    virtual State getNewState() override;
 
 private:
     ParsedFieldLocation parseLocation(const FieldLocation& location);
