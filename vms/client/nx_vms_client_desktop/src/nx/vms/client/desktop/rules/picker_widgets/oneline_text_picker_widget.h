@@ -2,15 +2,19 @@
 
 #pragma once
 
-#include "picker_widget.h"
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QLineEdit>
 
-#include "ui_oneline_text_picker_widget.h"
-
+#include <nx/vms/client/desktop/style/helper.h>
+#include <nx/vms/rules/action_fields/password_field.h>
 #include <nx/vms/rules/action_fields/text_field.h>
 #include <nx/vms/rules/event_fields/customizable_text_field.h>
 #include <nx/vms/rules/event_fields/expected_string_field.h>
 #include <nx/vms/rules/event_fields/keywords_field.h>
 #include <nx/vms/rules/event_fields/text_field.h>
+#include <ui/widgets/common/elided_label.h>
+
+#include "picker_widget.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -23,45 +27,62 @@ namespace nx::vms::client::desktop::rules {
  * - nx.events.fields.keywords
  *
  * - nx.actions.fields.text
+ * - nx.actions.fields.password
  */
 template<typename F>
 class OnelineTextPickerWidget: public FieldPickerWidget<F>
 {
 public:
     explicit OnelineTextPickerWidget(QWidget* parent = nullptr):
-        FieldPickerWidget<F>(parent),
-        ui(new Ui::OnelineTextPickerWidget)
+        FieldPickerWidget<F>(parent)
     {
-        ui->setupUi(this);
+        auto mainLayout = new QHBoxLayout;
+        mainLayout->setSpacing(style::Metrics::kDefaultLayoutSpacing.width());
+
+        label = new QnElidedLabel;
+        label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        label->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
+        mainLayout->addWidget(label);
+
+        lineEdit = createLineEdit();
+        lineEdit->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
+        mainLayout->addWidget(lineEdit);
+
+        mainLayout->setStretch(0, 1);
+        mainLayout->setStretch(1, 5);
+
+        setLayout(mainLayout);
     }
 
     virtual void setReadOnly(bool value) override
     {
-        ui->lineEdit->setReadOnly(value);
+        lineEdit->setReadOnly(value);
     }
 
 private:
     using FieldPickerWidget<F>::connect;
+    using FieldPickerWidget<F>::setLayout;
     using FieldPickerWidget<F>::edited;
     using FieldPickerWidget<F>::fieldDescriptor;
     using FieldPickerWidget<F>::field;
 
-    QScopedPointer<Ui::OnelineTextPickerWidget> ui;
+    QnElidedLabel* label{};
+    QLineEdit* lineEdit{};
 
     virtual void onDescriptorSet() override
     {
-        ui->label->setText(fieldDescriptor->displayName);
-        ui->lineEdit->setPlaceholderText(fieldDescriptor->description);
+        label->setText(fieldDescriptor->displayName);
+        lineEdit->setPlaceholderText(fieldDescriptor->description);
     };
 
     virtual void onFieldSet() override
     {
         {
-            const QSignalBlocker blocker{ui->lineEdit};
-            ui->lineEdit->setText(text());
+            const QSignalBlocker blocker{lineEdit};
+            lineEdit->setText(text());
         }
 
-        connect(ui->lineEdit, &QLineEdit::textEdited, this,
+        connect(lineEdit, &QLineEdit::textEdited, this,
             [this](const QString& text)
             {
                 setText(text);
@@ -79,6 +100,11 @@ private:
     {
         field->setValue(text);
     }
+
+    QLineEdit* createLineEdit()
+    {
+        return new QLineEdit;
+    }
 };
 
 using ActionTextPicker = OnelineTextPickerWidget<vms::rules::ActionTextField>;
@@ -86,6 +112,16 @@ using CustomizableTextPicker = OnelineTextPickerWidget<vms::rules::CustomizableT
 using EventTextPicker = OnelineTextPickerWidget<vms::rules::EventTextField>;
 using ExpectedStringPicker = OnelineTextPickerWidget<vms::rules::ExpectedStringField>;
 using KeywordsPicker = OnelineTextPickerWidget<vms::rules::KeywordsField>;
+using PasswordPicker = OnelineTextPickerWidget<vms::rules::PasswordField>;
+
+template<>
+QLineEdit* PasswordPicker::createLineEdit()
+{
+    auto passwordLineEdit = new QLineEdit;
+    passwordLineEdit->setEchoMode(QLineEdit::Password);
+
+    return passwordLineEdit;
+}
 
 template<>
 QString CustomizableTextPicker::text() const

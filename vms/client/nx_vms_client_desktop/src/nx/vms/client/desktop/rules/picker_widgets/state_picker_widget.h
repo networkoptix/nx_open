@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "picker_widget.h"
+#include "ui_state_picker_widget.h"
 
 #include <nx/vms/rules/action_fields/flag_field.h>
 
-#include "ui_state_picker_widget.h"
+#include "picker_widget.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -41,14 +41,18 @@ private:
 
     virtual void onFieldSet() override
     {
-        ui->stateCheckBox->setChecked(field->value());
+        {
+            QSignalBlocker blocker{ui->stateCheckBox};
+            ui->stateCheckBox->setChecked(field->value());
+        }
 
         connect(ui->stateCheckBox, &QCheckBox::stateChanged, this,
             [this](int state)
             {
                 field->setValue(state == Qt::Checked);
                 emit edited();
-            });
+            },
+            Qt::UniqueConnection);
     }
 };
 

@@ -17,7 +17,7 @@ class TimeDurationWidget: public QWidget
     typedef QWidget base_type;
 
 public:
-    explicit TimeDurationWidget(QWidget *parent);
+    explicit TimeDurationWidget(QWidget *parent = nullptr);
     virtual ~TimeDurationWidget() override;
 
     // Add duration usffix to dropdown box

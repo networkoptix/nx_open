@@ -16,6 +16,7 @@
 #include <nx/vms/client/desktop/style/custom_style.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/ui/event_rules/subject_selection_dialog.h>
+#include <nx/vms/rules/action_fields/target_user_field.h>
 #include <nx/vms/rules/event_fields/source_camera_field.h>
 #include <nx/vms/rules/event_fields/source_server_field.h>
 #include <nx/vms/rules/event_fields/source_user_field.h>
@@ -33,6 +34,7 @@ namespace nx::vms::client::desktop::rules {
  * - nx.events.fields.sourceCamera
  * - nx.events.fields.sourceServer
  * - nx.events.fields.sourceUser
+ * - nx.actions.fields.targetUser
  */
 template<typename F>
 class SourcePickerWidget: public FieldPickerWidget<F>
@@ -46,6 +48,7 @@ public:
 
         label = new QnElidedLabel;
         label->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        label->setSizePolicy(QSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred));
         mainLayout->addWidget(label);
 
         {
@@ -118,18 +121,55 @@ private:
             {
                 select();
                 updateUi();
+
+                emit edited();
             },
             Qt::UniqueConnection);
     }
 
-    QnSelectResourcesButton* createSelectButton();
-    void updateUi();
-    void select();
+    QnSelectResourcesButton* createSelectButton()
+    {
+        return new QnSelectUsersButton;
+    }
+
+    void updateUi()
+    {
+        auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+
+        auto resourceList = resourcePool->getResourcesByIds<QnUserResource>(field->ids());
+
+        auto selectUsersButtonPtr = static_cast<QnSelectUsersButton*>(selectResourceButton);
+        selectUsersButtonPtr->selectUsers(resourceList);
+
+        if (resourceList.isEmpty())
+        {
+            alertLabel->setText(tr("Select at least one User"));
+            alertLabel->setVisible(true);
+        }
+        else
+        {
+            alertLabel->setVisible(false);
+        }
+    }
+
+    void select()
+    {
+        auto selectedUsers = field->ids();
+
+        ui::SubjectSelectionDialog dialog(this);
+        dialog.setAllUsers(field->acceptAll());
+        dialog.setCheckedSubjects(selectedUsers);
+        dialog.exec();
+
+        field->setAcceptAll(dialog.allUsers());
+        field->setIds(dialog.totalCheckedUsers());
+    }
 };
 
 using CameraPicker = SourcePickerWidget<vms::rules::SourceCameraField>;
 using ServerPicker = SourcePickerWidget<vms::rules::SourceServerField>;
-using UserPicker = SourcePickerWidget<vms::rules::SourceUserField>;
+using SourceUserPicker = SourcePickerWidget<vms::rules::SourceUserField>;
+using TargetUserPicker = SourcePickerWidget<vms::rules::TargetUserField>;
 
 template<>
 QnSelectResourcesButton* CameraPicker::createSelectButton()
@@ -141,12 +181,6 @@ template<>
 QnSelectResourcesButton* ServerPicker::createSelectButton()
 {
     return new QnSelectServersButton;
-}
-
-template<>
-QnSelectResourcesButton* UserPicker::createSelectButton()
-{
-    return new QnSelectUsersButton;
 }
 
 template<>
@@ -202,27 +236,6 @@ void ServerPicker::updateUi()
 }
 
 template<>
-void UserPicker::updateUi()
-{
-    auto resourcePool = qnClientCoreModule->commonModule()->resourcePool();
-
-    auto resourceList = resourcePool->getResourcesByIds<QnUserResource>(field->ids());
-
-    auto selectUsersButtonPtr = static_cast<QnSelectUsersButton*>(selectResourceButton);
-    selectUsersButtonPtr->selectUsers(resourceList);
-
-    if (resourceList.isEmpty())
-    {
-        alertLabel->setText(tr("Select at least one User"));
-        alertLabel->setVisible(true);
-    }
-    else
-    {
-        alertLabel->setVisible(false);
-    }
-}
-
-template<>
 void CameraPicker::select()
 {
     auto selectedCameras = field->ids();
@@ -243,20 +256,6 @@ void ServerPicker::select()
     ServerSelectionDialog::selectServers(selectedServers, serverFilter, QString{}, this);
 
     field->setIds(selectedServers);
-}
-
-template<>
-void UserPicker::select()
-{
-    auto selectedUsers = field->ids();
-
-    ui::SubjectSelectionDialog dialog(this);
-    dialog.setAllUsers(field->acceptAll());
-    dialog.setCheckedSubjects(selectedUsers);
-    dialog.exec();
-
-    field->setAcceptAll(dialog.allUsers());
-    field->setIds(dialog.totalCheckedUsers());
 }
 
 } // namespace nx::vms::client::desktop::rules

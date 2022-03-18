@@ -7,6 +7,7 @@ namespace nx::vms::client::desktop::rules {
 BlankPickerWidget::BlankPickerWidget(QWidget* parent):
     PickerWidget(parent)
 {
+    setVisible(false);
 }
 
 void BlankPickerWidget::setReadOnly(bool /*value*/)

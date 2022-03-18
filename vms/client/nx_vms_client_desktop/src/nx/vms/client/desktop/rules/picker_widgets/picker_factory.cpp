@@ -2,8 +2,11 @@
 
 #include "picker_factory.h"
 
+#include <nx/vms/rules/action_fields/content_type_field.h>
 #include <nx/vms/rules/action_fields/flag_field.h>
+#include <nx/vms/rules/action_fields/http_method_field.h>
 #include <nx/vms/rules/action_fields/optional_time_field.h>
+#include <nx/vms/rules/action_fields/password_field.h>
 #include <nx/vms/rules/action_fields/substitution.h>
 #include <nx/vms/rules/action_fields/target_user_field.h>
 #include <nx/vms/rules/action_fields/text_field.h>
@@ -21,11 +24,13 @@
 #include <nx/vms/rules/event_fields/source_user_field.h>
 
 #include "blank_picker_widget.h"
-#include "oneline_text_picker_widget.h"
+#include "dropdown_text_picker_widget.h"
+#include "duration_picker_widget.h"
 #include "multiline_text_picker_widget.h"
 #include "number_picker_widget.h"
-#include "state_picker_widget.h"
+#include "oneline_text_picker_widget.h"
 #include "source_picker_widget.h"
+#include "state_picker_widget.h"
 
 namespace nx::vms::client::desktop::rules {
 
@@ -56,9 +61,19 @@ PickerWidget* PickerFactory::createWidget(
     else if (descriptor.id == fieldMetatype<nx::vms::rules::SourceServerField>())
         pickerWidget = new ServerPicker(parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::SourceUserField>())
-        pickerWidget = new UserPicker(parent);
+        pickerWidget = new SourceUserPicker(parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::IntField>())
         pickerWidget = new NumberPickerWidget<nx::vms::rules::IntField>(parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::ContentTypeField>())
+        pickerWidget = new HttpContentTypePicker(parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::HttpMethodField>())
+        pickerWidget = new HttpMethodPicker(parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::PasswordField>())
+        pickerWidget = new PasswordPicker(parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::OptionalTimeField>())
+        pickerWidget = new DurationPickerWidget<nx::vms::rules::OptionalTimeField>(parent);
+    else if (descriptor.id == fieldMetatype<nx::vms::rules::TargetUserField>())
+        pickerWidget = new TargetUserPicker(parent);
     else
         pickerWidget = new BlankPickerWidget(parent);
 

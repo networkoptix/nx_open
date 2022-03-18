@@ -182,10 +182,10 @@ TEST(ActionFieldTest, TargetUserField)
 
     TargetUserField field;
     field.setIds(selection.ids);
-    field.setTargetAll(selection.all);
+    field.setAcceptAll(selection.all);
 
     EXPECT_EQ(selection.ids, field.ids());
-    EXPECT_EQ(selection.all, field.targetAll());
+    EXPECT_EQ(selection.all, field.acceptAll());
 
     auto result = field.build(/*eventData*/ {});
     EXPECT_TRUE(result.canConvert<UuidSelection>());
