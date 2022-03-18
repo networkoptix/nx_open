@@ -72,17 +72,16 @@ signals:
     void deviceDisconnected(const DevicePtr& device);
 
 protected:
-    virtual DevicePtr createDevice(
-        const JoystickDescriptor& deviceConfig,
-        const QString& path) = 0;
     virtual void enumerateDevices() = 0;
     void loadConfig(
         const QString& searchDir,
         DeviceConfigs& destConfigs,
         QMap<QString, QString>& destIdToRelativePath) const;
-    DevicePtr initializeDeviceUnsafe(const JoystickDescriptor& deviceConfig, const QString& path);
     void removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths);
-    void tryInitializeDevice(const JoystickDescriptor& description, const QString& devicePath);
+    void initializeDevice(
+        DevicePtr& device,
+        const JoystickDescriptor& description,
+        const QString& devicePath);
 
 protected:
     mutable nx::Mutex m_mutex;

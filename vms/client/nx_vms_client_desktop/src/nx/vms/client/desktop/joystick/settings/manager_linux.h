@@ -16,9 +16,6 @@ public:
     ManagerLinux(QObject* parent = 0);
 
 private:
-    virtual DevicePtr createDevice(
-        const JoystickDescriptor& deviceConfig,
-        const QString& path) override;
     virtual void enumerateDevices() override;
 };
 
