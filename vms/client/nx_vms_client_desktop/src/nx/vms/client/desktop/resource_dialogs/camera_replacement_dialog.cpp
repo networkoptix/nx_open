@@ -35,6 +35,7 @@ using namespace nx::vms::client::desktop;
 
 static constexpr int kDialogFixedWidth = 640;
 static constexpr int kHeaderCaptionTextPixelSize = 24;
+static constexpr auto kHeaderCaptionTextWeight = QFont::ExtraLight;
 static constexpr auto kEmDashChar = QChar(0x2014);
 
 bool showServersInTree(const QnWorkbenchContext* context)
@@ -465,7 +466,7 @@ void CameraReplacementDialog::setupUiContols()
 
     QFont headerCaptionFont;
     headerCaptionFont.setPixelSize(kHeaderCaptionTextPixelSize);
-    headerCaptionFont.setWeight(kHeaderCaptionTextPixelSize);
+    headerCaptionFont.setWeight(kHeaderCaptionTextWeight);
     ui->headerCaptionLabel->setFont(headerCaptionFont);
     setPaletteColor(ui->headerCaptionLabel, QPalette::WindowText, kHeaderCaptionTextColor);
 
