@@ -2,9 +2,10 @@
 
 #include "utils.h"
 
-#include <QtWidgets/QWidget>
-#include <QtQuick/QQuickItem>
 #include <QtCore/QRegularExpression>
+#include <QtQml/QQmlContext>
+#include <QtQuick/QQuickItem>
+#include <QtWidgets/QWidget>
 
 #include "model_index_wrapper.h"
 
@@ -30,6 +31,16 @@ bool sidesWithAny(QVariant object, QVariantList sideWidgets, Qt::Alignment side)
         {
             return sideIntersect(objectRect, globalRect(sideWidget), side) > 0;
         });
+}
+
+bool objectHasId(const QObject* object, const QString& id)
+{
+    for (auto c = qmlContext(object); c; c = c->parentContext())
+    {
+        if (c->nameForObject(const_cast<QObject*>(object)) == id)
+            return true;
+    }
+    return false;
 }
 
 } // namespace
@@ -70,8 +81,7 @@ bool objectMatches(const QObject* object, QJSValue properties)
 
     if (properties.hasOwnProperty("id"))
     {
-        const auto [id, location] = nameAndBaseUrl(object);
-        if (id != properties.property("id").toString())
+        if (!objectHasId(object, properties.property("id").toString()))
             return false;
     }
 
