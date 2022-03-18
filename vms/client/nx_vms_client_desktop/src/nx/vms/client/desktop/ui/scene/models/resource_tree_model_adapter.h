@@ -31,7 +31,8 @@ class ResourceTreeModelAdapter: public ScopedModelOperations<QIdentityProxyModel
         READ shortcutHints NOTIFY shortcutHintsChanged)
     Q_PROPERTY(bool localFilesMode READ localFilesMode NOTIFY localFilesModeChanged)
     Q_PROPERTY(bool extraInfoRequired READ isExtraInfoRequired NOTIFY extraInfoRequiredChanged)
-    Q_PROPERTY(ResourceTreeModelSquishFacade* squishFacade READ squishFacade)
+    Q_PROPERTY(nx::vms::client::desktop::ResourceTreeModelSquishFacade* squishFacade
+        READ squishFacade)
 
     using base_type = ScopedModelOperations<QIdentityProxyModel>;
 
