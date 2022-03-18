@@ -36,11 +36,12 @@ DetailedResourceTreeWidget::DetailedResourceTreeWidget(
     ui->setupUi(this);
 
     connect(accessController(), &QnWorkbenchAccessController::userChanged, this,
-        [this]
+        [this](const QnUserResourcePtr& user)
         {
             if (!m_entityFactoryFunction)
                 return;
 
+            m_treeEntityBuilder->setUser(user);
             auto newTreeEntity = m_entityFactoryFunction(m_treeEntityBuilder.get());
             m_entityModel->setRootEntity(newTreeEntity.get());
             m_treeEntity = std::move(newTreeEntity);
