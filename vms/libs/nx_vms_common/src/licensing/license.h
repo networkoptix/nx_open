@@ -134,6 +134,7 @@ public:
     static QString displayText(Qn::LicenseType licenseType, int count, int total);
 
     static LicenseTypeInfo licenseTypeInfo(Qn::LicenseType licenseType);
+    LicenseTypeInfo licenseTypeInfo() const;
 
 protected:
     void setClass(const QString& xclass);
