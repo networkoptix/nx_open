@@ -1522,6 +1522,11 @@ State CameraSettingsDialogStateReducer::handleMediaCapabilitiesChanged(
 {
     NX_VERBOSE(NX_SCOPE_TAG, "%1 for cameras %2", __func__, cameras);
 
+    state.devicesDescription.hasDualStreamingCapability = combinedValue(cameras,
+        [](const Camera& camera) { return camera->hasDualStreamingInternal(); });
+    fetchFromCameras<bool>(state.expert.secondaryRecordingDisabled, cameras,
+        [](const Camera& camera) { return !camera->isSecondaryStreamRecorded(); });
+    state = handleDualStreamingChanged(std::move(state), cameras);
     state = handleMotionStreamChanged(std::move(state), cameras);
     return state;
 }
