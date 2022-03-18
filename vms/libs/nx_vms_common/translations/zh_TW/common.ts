@@ -154,11 +154,11 @@
     </message>
     <message>
       <source>Media stream is opened but no media data was received.</source>
-      <translation>媒體串流已開啟但沒有接收到媒體資料。</translation>
+      <translation>媒體串流已經建立並開啟但未收到任何媒體資料</translation>
     </message>
     <message>
       <source>Unknown error. Please contact support.</source>
-      <translation>未知錯誤，請尋求您的支援廠商。</translation>
+      <translation>發生未知錯誤，請聯絡您的支援廠商。</translation>
     </message>
     <message>
       <source>(unknown)</source>
@@ -166,11 +166,11 @@
     </message>
     <message>
       <source>Server %1 is not available.</source>
-      <translation>無法取得伺服器 %1.</translation>
+      <translation>無法與伺服器 %1連線</translation>
     </message>
     <message>
       <source>Check that Server is up and running.</source>
-      <translation>請確認伺服器已上線.</translation>
+      <translation>請檢查伺服器是否已啟動並正在運行。</translation>
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
@@ -178,7 +178,7 @@
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
-      <translation>請確認伺服器是否上線並為相容版本.</translation>
+      <translation>請檢查伺服器是否已啟動並為相容版本。</translation>
     </message>
     <message>
       <source>Cannot connect to http port %1.</source>
