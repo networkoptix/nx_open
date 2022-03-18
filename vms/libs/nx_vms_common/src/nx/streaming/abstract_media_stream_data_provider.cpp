@@ -63,7 +63,7 @@ QnAbstractMediaStreamDataProvider::QnAbstractMediaStreamDataProvider(
     m_mediaResource = resource.dynamicCast<QnMediaResource>();
     NX_ASSERT(m_mediaResource);
     resetTimeCheck();
-    m_isCamera = resource.dynamicCast<QnSecurityCamResource>();
+    m_isCamera = (bool) resource.dynamicCast<QnSecurityCamResource>();
     connect(resource.data(), &QnResource::propertyChanged, this,
         [this](const QnResourcePtr& /*resource*/, const QString& propertyName)
         {
