@@ -337,7 +337,7 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(
 {
     bool canShow = true;
 
-    const bool connected = context()->user();
+    const bool connected = (bool) context()->user();
 
     if (!connected)
     {
