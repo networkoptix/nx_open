@@ -73,7 +73,6 @@ NX_VMS_COMMON_API InformationError fetchErrorToInformationError(
 
 struct NX_VMS_COMMON_API Status
 {
-public:
     NX_REFLECTION_ENUM_CLASS_IN_CLASS(Code,
         idle,
         /** Server is loading. **/
@@ -130,6 +129,38 @@ public:
 using StatusList = std::vector<Status>;
 
 QN_FUSION_DECLARE_FUNCTIONS(Status, (json), NX_VMS_COMMON_API)
+
+struct NX_VMS_COMMON_API ClientPackageStatus
+{
+    NX_REFLECTION_ENUM_CLASS_IN_CLASS(Status,
+        downloading,
+        downloaded,
+        error
+    )
+
+    QString file;
+    Status status = Status::downloading;
+    int progress = 0;
+};
+#define ClientPackageStatus_Fields (file)(status)(progress)
+QN_FUSION_DECLARE_FUNCTIONS(ClientPackageStatus, (json), NX_VMS_COMMON_API)
+
+struct NX_VMS_COMMON_API OverallClientPackageStatus
+{
+    NX_REFLECTION_ENUM_CLASS_IN_CLASS(Status,
+        idle,
+        downloading,
+        downloaded,
+        error
+    )
+
+    QnUuid serverId;
+    Status status = Status::idle;
+    std::vector<ClientPackageStatus> packages;
+    int progress = 0;
+};
+#define OverallClientPackageStatus_Fields (serverId)(status)(packages)(progress)
+QN_FUSION_DECLARE_FUNCTIONS(OverallClientPackageStatus, (json), NX_VMS_COMMON_API)
 
 } // namespace nx::vms::common::update
 

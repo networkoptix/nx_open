@@ -782,7 +782,6 @@ void PeerStateTracker::processUnknownStates()
 
 void PeerStateTracker::processDownloadTaskSet()
 {
-    NX_ASSERT(!m_peersIssued.isEmpty());
     NX_MUTEX_LOCKER locker(&m_dataLock);
 
     for (const auto& item: m_items)

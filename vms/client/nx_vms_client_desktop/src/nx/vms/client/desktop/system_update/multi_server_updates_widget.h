@@ -451,6 +451,7 @@ private:
      */
     std::future<UpdateContents> m_offlineUpdateCheck;
     std::future<ServerUpdateTool::RemoteStatus> m_serverStatusCheck;
+    std::future<ServerUpdateTool::ClientPackageStatus> m_clientPackageStatusCheck;
 
     UpdateContents m_updateInfo;
     RevisionStorage<UpdateSourceType> m_updateSourceMode = UpdateSourceType::internet;
