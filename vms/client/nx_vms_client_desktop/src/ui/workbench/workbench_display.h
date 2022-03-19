@@ -35,7 +35,7 @@ class ForwardingInstrument;
 class SignalingInstrument;
 class SelectionOverlayTuneInstrument;
 class FocusListenerInstrument;
-namespace nx::vms::client::desktop { class DebugInfoInstrument; }
+namespace nx::vms::client::desktop { class FrameTimePointsProviderInstrument; }
 
 class QnWorkbench;
 class QnWorkbenchItem;
@@ -145,7 +145,7 @@ public:
 
     SignalingInstrument* afterPaintInstrument() const;
 
-    nx::vms::client::desktop::DebugInfoInstrument* debugInfoInstrument() const;
+    nx::vms::client::desktop::FrameTimePointsProviderInstrument* frameTimePointsInstrument() const;
 
     /**
      * Note that this function never returns nullptr.
@@ -497,8 +497,8 @@ private:
 
     SignalingInstrument *m_afterPaintInstrument;
 
-    /* Debug Instrument*/
-    nx::vms::client::desktop::DebugInfoInstrument* m_debugInfoInstrument;
+    /* Frame time points instrument. */
+    nx::vms::client::desktop::FrameTimePointsProviderInstrument* m_frameTimePointsInstrument;
 
     /* Animation-related stuff. */
 

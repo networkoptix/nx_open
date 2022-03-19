@@ -34,7 +34,7 @@
 #include <nx/vms/client/desktop/camera/storage_location_camera_controller.h>
 #include <nx/vms/client/desktop/common/utils/audio_dispatcher.h>
 #include <nx/vms/client/desktop/common/widgets/webview_controller.h>
-#include <nx/vms/client/desktop/debug_utils/instruments/debug_info_instrument.h>
+#include <nx/vms/client/desktop/debug_utils/instruments/frame_time_points_provider_instrument.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/integrations/integrations.h>
 #include <nx/vms/client/desktop/radass/radass_controller.h>
@@ -240,7 +240,7 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_focusListenerInstrument = new FocusListenerInstrument(this);
     m_paintForwardingInstrument = new ForwardingInstrument(Instrument::Viewport, paintEventTypes, this);
     m_selectionOverlayTuneInstrument = new SelectionOverlayTuneInstrument(this);
-    m_debugInfoInstrument = new DebugInfoInstrument(this);
+    m_frameTimePointsInstrument = new FrameTimePointsProviderInstrument(this);
 
     m_instrumentManager->installInstrument(new StopInstrument(Instrument::Viewport, paintEventTypes, this));
     m_instrumentManager->installInstrument(m_afterPaintInstrument);
@@ -253,7 +253,9 @@ QnWorkbenchDisplay::QnWorkbenchDisplay(QObject *parent):
     m_instrumentManager->installInstrument(m_boundingInstrument);
     m_instrumentManager->installInstrument(m_widgetActivityInstrument);
     m_instrumentManager->installInstrument(m_selectionOverlayTuneInstrument);
-    m_instrumentManager->installInstrument(m_debugInfoInstrument, InstallationMode::InstallBefore,
+    m_instrumentManager->installInstrument(
+        m_frameTimePointsInstrument,
+        InstallationMode::InstallBefore,
         paintForwardingInstrument());
 
     connect(m_transformListenerInstrument, SIGNAL(transformChanged(QGraphicsView *)), this, SLOT(synchronizeRaisedGeometry()));
@@ -430,9 +432,9 @@ SignalingInstrument* QnWorkbenchDisplay::afterPaintInstrument() const
     return m_afterPaintInstrument;
 }
 
-DebugInfoInstrument* QnWorkbenchDisplay::debugInfoInstrument() const
+FrameTimePointsProviderInstrument* QnWorkbenchDisplay::frameTimePointsInstrument() const
 {
-    return m_debugInfoInstrument;
+    return m_frameTimePointsInstrument;
 }
 
 QGraphicsScene* QnWorkbenchDisplay::scene() const

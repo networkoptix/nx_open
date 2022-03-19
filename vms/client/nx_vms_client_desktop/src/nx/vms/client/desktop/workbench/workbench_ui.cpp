@@ -24,7 +24,7 @@
 #include <nx/vms/client/desktop/ui/scene/widgets/scene_banners.h>
 #include <nx/vms/client/desktop/workbench/panels/special_layout_panel.h>
 #include <nx/vms/client/desktop/debug_utils/components/performance_info.h>
-#include <nx/vms/client/desktop/debug_utils/instruments/debug_info_instrument.h>
+#include <nx/vms/client/desktop/debug_utils/instruments/frame_time_points_provider_instrument.h>
 #include <nx/vms/client/desktop/debug_utils/utils/performance_monitor.h>
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/client/desktop/left_panel/left_panel_widget.h>

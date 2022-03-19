@@ -6,20 +6,15 @@
 #include <QtQml/QJSValueIterator>
 #include <QtWidgets/QApplication>
 
-#include <utils/common/delayed.h>
-
 #include <core/resource/resource.h>
-
+#include <core/resource_management/resource_pool.h>
+#include <nx/reflect/from_string.h>
+#include <nx/vms/client/desktop/debug_utils/instruments/frame_time_points_provider_instrument.h>
 #include <nx/vms/client/desktop/ui/actions/action.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_display.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/debug_utils/instruments/debug_info_instrument.h>
-
-#include <nx/reflect/from_string.h>
-
-#include <core/resource_management/resource_pool.h>
+#include <utils/common/delayed.h>
 
 template<>
 nx::vms::client::desktop::Director* Singleton<nx::vms::client::desktop::Director>::s_instance =
@@ -128,7 +123,7 @@ void Director::quit(bool force)
 std::vector<qint64> Director::getFrameTimePoints()
 {
     NX_ASSERT(context());
-    return context()->display()->debugInfoInstrument()->getFrameTimePoints();
+    return context()->display()->frameTimePointsInstrument()->getFrameTimePoints();
 }
 
 void Director::setupJSEngine(QJSEngine* engine)
