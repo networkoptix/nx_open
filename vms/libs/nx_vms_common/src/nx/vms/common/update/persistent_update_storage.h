@@ -13,7 +13,7 @@ namespace nx::vms::common::update {
 struct NX_VMS_COMMON_API PersistentUpdateStorage
 {
     QList<QnUuid> servers;
-    bool autoSelection = false;
+    bool autoSelection = true;
 
     PersistentUpdateStorage(const QList<QnUuid>& servers, bool autoSelection):
         servers(servers),
