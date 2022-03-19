@@ -60,7 +60,7 @@ public:
 
 void UploadWorker::Private::getAvailableChunks()
 {
-    if (!NX_ASSERT(connection()))
+    if (!connection())
         return;
 
     NX_ASSERT(!upload.uploadAllChunks);
@@ -259,7 +259,7 @@ void UploadWorker::emitProgress()
 
 void UploadWorker::createUpload()
 {
-    if (!NX_ASSERT(d->connection()))
+    if (!d->connection())
         return;
 
     d->upload.status = UploadState::CreatingUpload;
@@ -403,7 +403,7 @@ void UploadWorker::handleStop()
     d->md5FutureWatcher.disconnect(this);
     d->requests.cancelAllRequests();
 
-    if (!NX_ASSERT(d->connection()))
+    if (!d->connection())
         return;
 
     UploadState::Status status = d->upload.status;
@@ -497,7 +497,7 @@ void UploadWorker::handleUpload()
         return;
     }
 
-    if (!NX_ASSERT(d->connection()))
+    if (!d->connection())
         return;
 
     emitProgress();
@@ -558,7 +558,7 @@ void UploadWorker::handleAllUploaded()
 {
     NX_INFO(this, "Upload for %1 is done. Checking...", d->upload.destination);
 
-    if (!NX_ASSERT(d->connection()))
+    if (!d->connection())
         return;
 
     d->upload.status = UploadState::Checking;

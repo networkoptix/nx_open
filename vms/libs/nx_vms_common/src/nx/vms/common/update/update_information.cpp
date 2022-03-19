@@ -12,6 +12,9 @@ bool Information::isEmpty() const { return packages.isEmpty(); }
 
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Information, (json), Information_Fields)
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(Status, (json), UpdateStatus_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(ClientPackageStatus, (json), ClientPackageStatus_Fields)
+QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
+    OverallClientPackageStatus, (json), OverallClientPackageStatus_Fields)
 
 InformationError fetchErrorToInformationError(const vms::update::FetchError error)
 {
