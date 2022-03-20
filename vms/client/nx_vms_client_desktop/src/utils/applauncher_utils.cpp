@@ -52,8 +52,6 @@ ResultType restartClient(
         arguments << QLatin1String("--auth");
         arguments << auth;
     }
-    arguments << QnStartupParameters::kScreenKey;
-    arguments << QString::number(qApp->desktop()->screenNumber(qApp->activeWindow()));
 
     Response response;
 
