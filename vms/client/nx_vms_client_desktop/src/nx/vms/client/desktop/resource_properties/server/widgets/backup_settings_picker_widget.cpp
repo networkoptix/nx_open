@@ -182,7 +182,7 @@ void BackupSettingsPickerWidget::setupQualityDropdown()
     ui->qualityDropdown->setMenu(m_qualityDropdownMenu.get());
 }
 
-void BackupSettingsPickerWidget::syncLayoutWithHeaderView(const QHeaderView* headerView)
+void BackupSettingsPickerWidget::setupLayoutSyncWithHeaderView(const QHeaderView* headerView)
 {
     connect(headerView, &QHeaderView::sectionResized, this,
         [this](int logicalIndex, int, int newSize)
