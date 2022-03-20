@@ -230,8 +230,6 @@ void NotificationsWorkbenchPanel::setOpened(bool opened, bool animate)
 {
     using namespace ui::workbench;
 
-    m_panelResizer->setVisible(opened && !ini().newPanelsLayout && !ini().newResourceTree);
-
     ensureAnimationAllowed(&animate);
 
     auto toggleAction = action(action::ToggleNotificationsAction);
@@ -307,7 +305,7 @@ bool NotificationsWorkbenchPanel::isHovered() const
 
 void NotificationsWorkbenchPanel::setPanelSize(qreal size)
 {
-    if (m_panelResizer && !ini().newPanelsLayout && !ini().newResourceTree)
+    if (resizeable())
         m_panelResizer->setWidth(size);
 }
 
@@ -355,6 +353,7 @@ void NotificationsWorkbenchPanel::initEventPanel()
 
     m_panelResizer.reset(new ResizerWidget(m_baseWidget, backgroundItem));
     m_panelResizer->setWidth(narrowWidth());
+    m_panelResizer->setVisible(m_resizeable);
     auto dragProcessor = new DragProcessor(this);
     dragProcessor->setHandler(m_panelResizer.data());
 
@@ -382,7 +381,7 @@ void NotificationsWorkbenchPanel::initEventPanel()
             if (m_widget->isHidden() == shouldBeHidden)
                 return;
 
-            // Visibility changes should not affect scene focus. Qt impementation automatically
+            // Visibility changes should not affect scene focus. Qt implementation automatically
             // focuses newly appeared graphics item.
             const auto currentFocusItem = m_parentWidget->scene()->focusItem();
             m_widget->setHidden(shouldBeHidden);
@@ -405,6 +404,17 @@ void NotificationsWorkbenchPanel::initEventPanel()
             if (tab == EventPanel::Tab::motion && !display()->widget(Qn::ZoomedRole))
                 setOpened();
         });
+}
+
+bool NotificationsWorkbenchPanel::resizeable() const
+{
+    return m_resizeable;
+}
+
+void NotificationsWorkbenchPanel::setResizeable(bool value)
+{
+    m_resizeable = value;
+    m_panelResizer->setVisible(value);
 }
 
 } //namespace nx::vms::client::desktop

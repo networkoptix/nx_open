@@ -108,7 +108,6 @@
 #endif
 
 #include "layout_tab_bar.h"
-#include "resource_browser_widget.h"
 
 using nx::vms::client::core::Geometry;
 

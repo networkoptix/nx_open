@@ -213,9 +213,6 @@ struct Ini: nx::kit::IniConfig
         "[Feature] Enables new layout with Search Panels and Resources Panel grouped\n"
         "into one Left-side Panel");
 
-    NX_INI_FLAG(true, newResourceTree,
-        "[Feature] Enables new QML Resource Tree (not compatible with newPanelsLayout)\n");
-
     // VMS-21806
     NX_INI_STRING("auto", defaultResolution,
         "[Feature] Default behavior of the layout resolution in client.\n"
