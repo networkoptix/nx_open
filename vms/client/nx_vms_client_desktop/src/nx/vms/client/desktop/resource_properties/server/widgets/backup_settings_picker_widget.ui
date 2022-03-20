@@ -128,7 +128,7 @@
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer">
+           <spacer name="contentsTypesDropdownSpacer">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -169,7 +169,7 @@
            </widget>
           </item>
           <item>
-           <spacer name="horizontalSpacer_2">
+           <spacer name="qualityDropdownSpacer">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -185,13 +185,16 @@
         </widget>
        </item>
        <item>
-        <spacer name="horizontalSpacer_3">
+        <spacer name="enableSwitchMarginSpacer">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
          </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
          <property name="sizeHint" stdset="0">
           <size>
-           <width>8</width>
+           <width>4</width>
            <height>0</height>
           </size>
          </property>

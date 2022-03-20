@@ -22,7 +22,6 @@
 namespace {
 
 static constexpr int kDropdownArrowSpacing = 4;
-static constexpr int kWarningIconSpacing = 4;
 
 QString dropdownText(const QModelIndex& index)
 {
@@ -78,44 +77,51 @@ QSize BackupSettingsItemDelegate::sizeHint(
 {
     using namespace nx::style;
 
-    if (isSeparator(index) || isSpacer(index))
+    if (isSeparator(index) || isSpacer(index) || !isDropdownColumn(index))
         return base_type::sizeHint(styleOption, index);
 
-    if (isDropdownColumn(index))
+    QString placeholderText;
+    switch (index.column())
     {
-        QStyleOptionViewItem option = styleOption;
-        initStyleOption(&option, index);
+        case ContentTypesColumn:
+            placeholderText = BackupSettingsPickerWidget::backupContentTypesPlaceholderText();
+            break;
 
-        QString placeholderText;
-        switch (index.column())
-        {
-            case ContentTypesColumn:
-                placeholderText = BackupSettingsPickerWidget::backupContentTypesPlaceholderText();
-                break;
+        case QualityColumn:
+            placeholderText = BackupSettingsPickerWidget::backupQualityPlaceholderText();
+            break;
 
-            case QualityColumn:
-                placeholderText = BackupSettingsPickerWidget::backupQualityPlaceholderText();
-                break;
-
-            default:
-                NX_ASSERT(false, "Unexpected dropdown column");
-                break;
-        }
-
-        const auto contentsWidth =
-            option.fontMetrics.size(Qt::TextSingleLine, dropdownText(index)).width()
-            + Metrics::kStandardPadding * 2
-            + Metrics::kArrowSize + kDropdownArrowSpacing;
-
-        const auto pickerPlaceholderWidth =
-            option.fontMetrics.size(Qt::TextSingleLine, placeholderText).width()
-            + Metrics::kStandardPadding * 2
-            + Metrics::kArrowSize + Metrics::kStandardPadding;
-
-        return QSize(std::max(contentsWidth, pickerPlaceholderWidth), Metrics::kViewRowHeight);
+        default:
+            NX_ASSERT(false, "Unexpected dropdown column");
+            break;
     }
 
-    return base_type::sizeHint(styleOption, index);
+    const auto calcultateTextWidth =
+        [this, styleOption, index](const QString& text)
+        {
+            const auto itr = m_dropdownTextWidthCache.constFind(text);
+            if (itr != m_dropdownTextWidthCache.cend())
+                return itr.value();
+
+            QStyleOptionViewItem dropdownStyleOption = styleOption;
+            initStyleOption(&dropdownStyleOption, index);
+
+            const auto result = styleOption.fontMetrics.size(Qt::TextSingleLine, text).width();
+            m_dropdownTextWidthCache.insert(text, result);
+            return result;
+        };
+
+    const auto style = styleOption.widget ? styleOption.widget->style() : QApplication::style();
+
+    const auto textWidth = std::max(
+        calcultateTextWidth(dropdownText(index)),
+        calcultateTextWidth(placeholderText));
+
+    const auto columnWidth = textWidth
+        + style->pixelMetric(QStyle::PM_MenuButtonIndicator)
+        + Metrics::kStandardPadding * 2;
+
+    return QSize(columnWidth, Metrics::kViewRowHeight);
 }
 
 void BackupSettingsItemDelegate::paintContents(

@@ -119,7 +119,7 @@ bool isBackupSupported(const QnVirtualCameraResourcePtr& camera)
     if (camera.isNull())
         return false;
 
-    if (camera->deviceType() == nx::vms::api::DeviceType::nvr)
+    if (camera->isDtsBased())
         return false;
 
     return true;

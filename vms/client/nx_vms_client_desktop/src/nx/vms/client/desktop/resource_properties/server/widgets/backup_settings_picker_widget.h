@@ -30,7 +30,7 @@ public:
     static QString backupQualityPlaceholderText();
 
     void setupFromSelection(const QModelIndexList& indexes);
-    void syncLayoutWithHeaderView(const QHeaderView* headerView);
+    void setupLayoutSyncWithHeaderView(const QHeaderView* headerView);
 
 signals:
     void backupContentTypesPicked(nx::vms::api::BackupContentTypes contentTypes);
