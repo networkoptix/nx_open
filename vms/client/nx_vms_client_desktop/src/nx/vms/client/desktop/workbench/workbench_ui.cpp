@@ -54,7 +54,6 @@
 #include <ui/graphics/items/standard/graphics_web_view.h>
 #include <ui/widgets/calendar_widget.h>
 #include <ui/widgets/day_time_widget.h>
-#include <ui/widgets/resource_browser_widget.h>
 #include <ui/widgets/layout_tab_bar.h>
 #include <ui/workbench/workbench.h>
 #include <ui/workbench/watchers/workbench_render_watcher.h>
@@ -68,7 +67,6 @@
 
 #include <utils/common/event_processors.h>
 
-#include "panels/deprecated_resources_workbench_panel.h"
 #include "panels/notifications_workbench_panel.h"
 #include "panels/resource_tree_workbench_panel.h"
 #include "panels/timeline_workbench_panel.h"
@@ -489,11 +487,9 @@ action::ActionScope WorkbenchUi::currentScope() const
 {
     if (m_leftPanel && m_leftPanel->isFocused())
     {
-        if (qobject_cast<ResourceTreeWorkbenchPanel*>(m_leftPanel)
-            || qobject_cast<deprecated::ResourceTreeWorkbenchPanel*>(m_leftPanel))
-        {
+        if (qobject_cast<ResourceTreeWorkbenchPanel*>(m_leftPanel))
             return action::TreeScope;
-        }
+
         if (auto lp = qobject_cast<LeftWorkbenchPanel*>(m_leftPanel))
             return lp->currentScope();
     }
@@ -521,8 +517,6 @@ action::Parameters WorkbenchUi::currentParameters(action::ActionScope scope) con
         {
             if (auto tree = qobject_cast<ResourceTreeWorkbenchPanel*>(m_leftPanel))
                 return tree->widget->currentParameters(scope);
-            if (auto oldTree = qobject_cast<deprecated::ResourceTreeWorkbenchPanel*>(m_leftPanel))
-                return oldTree->widget->currentParameters(scope);
             if (auto lp = qobject_cast<LeftWorkbenchPanel*>(m_leftPanel))
                 return lp->currentParameters(scope);
         }
@@ -1098,8 +1092,6 @@ void WorkbenchUi::updateLeftPanelGeometry()
         {
             if (auto tree = qobject_cast<ResourceTreeWorkbenchPanel*>(m_leftPanel))
                 tree->setYAndHeight(y, height);
-            else if (auto oldTree = qobject_cast<deprecated::ResourceTreeWorkbenchPanel*>(m_leftPanel))
-                oldTree->setYAndHeight(y, height);
             else if (auto lp = qobject_cast<LeftWorkbenchPanel*>(m_leftPanel))
                 lp->setYAndHeight(y, height);
             else
@@ -1169,15 +1161,10 @@ void WorkbenchUi::createLeftPanelWidget(const QnPaneSettings& settings)
     {
         m_leftPanel = new LeftWorkbenchPanel(settings, display()->view(), m_controlsWidget, this);
     }
-    else if (ini().newResourceTree)
+    else
     {
         m_leftPanel = new ResourceTreeWorkbenchPanel(settings, display()->view(), m_controlsWidget,
             this);
-    }
-    else
-    {
-        m_leftPanel = new deprecated::ResourceTreeWorkbenchPanel(settings, display()->view(),
-            m_controlsWidget, this);
     }
 
     connect(m_leftPanel, &AbstractWorkbenchPanel::openedChanged, this,

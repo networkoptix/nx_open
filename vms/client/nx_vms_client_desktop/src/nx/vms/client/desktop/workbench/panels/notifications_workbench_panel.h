@@ -76,6 +76,9 @@ public:
 
     virtual void stopAnimations() override;
 
+    bool resizeable() const;
+    void setResizeable(bool value);
+
 private:
     void enableShowButton(bool used);
     void updateControlsGeometry();
@@ -84,6 +87,7 @@ private:
 private:
     bool m_visible = false;
     bool m_blockAction = false;
+    bool m_resizeable = false;
 
     QnControlBackgroundWidget* const backgroundItem;
     VariantAnimator* const xAnimator;
