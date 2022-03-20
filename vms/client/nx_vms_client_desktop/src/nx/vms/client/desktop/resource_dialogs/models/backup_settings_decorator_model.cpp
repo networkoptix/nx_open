@@ -2,6 +2,8 @@
 
 #include "backup_settings_decorator_model.h"
 
+#include <map>
+#include <set>
 #include <utility>
 
 #include <api/global_settings.h>
@@ -20,7 +22,10 @@
 
 namespace {
 
-// TODO: #vbreus Move to utils.
+/**
+ * Scoped guard that calls the given callback at the end of a scope if value returned by the
+ * provided function wrapper at the scope begin differs to the one returned at the end of a scope.
+ */
 template <typename ValueType>
 class [[nodiscard]] ScopedChangeNotifier
 {
@@ -51,6 +56,51 @@ private:
     const ValueGetter m_valueGetter;
     const NotificationCallback m_notificationCallback;
     const ValueType m_initialValue;
+};
+
+/**
+ * Scoped guard that accumulates sequence of single row 'dataChanged' notifications that should be
+ * sent by the given item model. At the end of a scope notifications will be clustered and sent
+ * using range-based notification form whenever it possible. It aims to the minimize number of
+ * notifications even at the cost of some amount of false change notifications. It's expected that
+ * there will be no operations that change the structure or layout of the given model within the
+ * scope.
+ */
+class [[nodiscard]] ModelDataChangeScopedAccumulator
+{
+public:
+    ModelDataChangeScopedAccumulator(QAbstractItemModel* model):
+        m_model(model)
+    {
+    };
+
+    ModelDataChangeScopedAccumulator() = delete;
+    ModelDataChangeScopedAccumulator(const ModelDataChangeScopedAccumulator&) = delete;
+    ModelDataChangeScopedAccumulator& operator=(const ModelDataChangeScopedAccumulator&) = delete;
+    ~ModelDataChangeScopedAccumulator()
+    {
+        for (auto const& [parent, rowsSet]: m_parentsAndChangedRows)
+        {
+            const auto firstRow = *rowsSet.cbegin();
+            const auto lastRow = *rowsSet.crbegin();
+
+            const auto firstColumn = 0;
+            const auto lastColumn = m_model->columnCount() - 1;
+
+            emit m_model->dataChanged(
+                m_model->index(firstRow, firstColumn, parent),
+                m_model->index(lastRow, lastColumn, parent));
+        }
+    };
+
+    void rowDataChanged(const QModelIndex& index)
+    {
+        m_parentsAndChangedRows[index.siblingAtColumn(0).parent()].insert(index.row());
+    };
+
+private:
+    QAbstractItemModel* m_model;
+    std::map<QModelIndex, std::set<int>> m_parentsAndChangedRows;
 };
 
 bool cameraHasDefaultBackupSettings(const QnVirtualCameraResourcePtr& camera)
@@ -278,6 +328,7 @@ void BackupSettingsDecoratorModel::setBackupContentTypes(
     const QModelIndexList& indexes, BackupContentTypes contentTypes)
 {
     auto hasChangesNotifier = makeHasChangesNotifier(this);
+    ModelDataChangeScopedAccumulator dataChangedScopedAccumulator(this);
 
     for (const auto& index: indexes)
     {
@@ -291,8 +342,7 @@ void BackupSettingsDecoratorModel::setBackupContentTypes(
         if (backupContentTypes(camera) != contentTypes)
         {
             m_changedContentTypes.insert(camera, contentTypes);
-            emit dataChanged(
-                index.siblingAtColumn(ResourceColumn), index.siblingAtColumn(SwitchColumn));
+            dataChangedScopedAccumulator.rowDataChanged(index);
         }
     }
 }
@@ -301,6 +351,7 @@ void BackupSettingsDecoratorModel::setBackupQuality(
     const QModelIndexList& indexes, CameraBackupQuality quality)
 {
     auto hasChangesNotifier = makeHasChangesNotifier(this);
+    ModelDataChangeScopedAccumulator dataChangedScopedAccumulator(this);
 
     for (const auto& index: indexes)
     {
@@ -313,8 +364,7 @@ void BackupSettingsDecoratorModel::setBackupQuality(
             {
                 backupSettings.quality = quality;
                 setGlobalBackupSettings(backupSettings);
-                emit dataChanged(
-                    index.siblingAtColumn(ResourceColumn), index.siblingAtColumn(SwitchColumn));
+                dataChangedScopedAccumulator.rowDataChanged(index);
             }
         }
         else if (!camera.isNull())
@@ -328,8 +378,7 @@ void BackupSettingsDecoratorModel::setBackupQuality(
             if (backupQuality(camera) != quality)
             {
                 m_changedQuality.insert(camera, quality);
-                emit dataChanged(
-                    index.siblingAtColumn(ResourceColumn), index.siblingAtColumn(SwitchColumn));
+                dataChangedScopedAccumulator.rowDataChanged(index);
             }
         }
     }
@@ -339,6 +388,7 @@ void BackupSettingsDecoratorModel::setBackupEnabled(
     const QModelIndexList& indexes, bool enabled)
 {
     auto hasChangesNotifier = makeHasChangesNotifier(this);
+    ModelDataChangeScopedAccumulator dataChangedScopedAccumulator(this);
 
     for (const auto& index: indexes)
     {
@@ -351,8 +401,7 @@ void BackupSettingsDecoratorModel::setBackupEnabled(
             {
                 backupSettings.backupNewCameras = enabled;
                 setGlobalBackupSettings(backupSettings);
-                emit dataChanged(
-                    index.siblingAtColumn(ResourceColumn), index.siblingAtColumn(SwitchColumn));
+                dataChangedScopedAccumulator.rowDataChanged(index);
             }
         }
         else if (!camera.isNull())
@@ -363,8 +412,7 @@ void BackupSettingsDecoratorModel::setBackupEnabled(
             if (backupEnabled(camera) != enabled)
             {
                 m_changedEnabledState.insert(camera, enabled);
-                emit dataChanged(
-                    index.siblingAtColumn(ResourceColumn), index.siblingAtColumn(SwitchColumn));
+                dataChangedScopedAccumulator.rowDataChanged(index);
             }
         }
     }

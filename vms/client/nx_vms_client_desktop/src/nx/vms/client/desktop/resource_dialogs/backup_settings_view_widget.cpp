@@ -137,7 +137,7 @@ BackupSettingsViewWidget::BackupSettingsViewWidget(QWidget* parent):
             backupSettingsPicker->setupFromSelection(selectedIndexes);
         });
 
-    backupSettingsPicker->syncLayoutWithHeaderView(resourceViewWidget()->treeHeaderView());
+    backupSettingsPicker->setupLayoutSyncWithHeaderView(resourceViewWidget()->treeHeaderView());
 
     connect(m_backupSettingsDecoratorModel.get(), &BackupSettingsDecoratorModel::hasChangesChanged,
         this, &BackupSettingsViewWidget::hasChangesChanged);
@@ -200,7 +200,7 @@ void BackupSettingsViewWidget::setupHeader()
 {
     using namespace backup_settings_view;
 
-    static constexpr int kWarningIconColumnWidth = style::Metrics::kViewRowHeight;
+    static constexpr int kWarningIconColumnWidth = style::Metrics::kDefaultIconSize;
     static constexpr int kSwitchColumnWidth = style::Metrics::kStandardPadding
         + style::Metrics::kButtonSwitchSize.width()
         + style::Metrics::kDefaultTopLevelMargin;

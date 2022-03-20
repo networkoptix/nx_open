@@ -74,6 +74,7 @@ private:
     QHash<DropdownStateFlags, QColor> m_dropdownColorTable;
     QPixmap m_warningPixmap;
     QModelIndex m_activeDropdownIndex;
+    mutable QHash<QString, int> m_dropdownTextWidthCache;
 };
 
 } // namespace nx::vms::client::desktop

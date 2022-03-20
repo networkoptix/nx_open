@@ -282,6 +282,7 @@ nx::vms::api::DeviceType QnSecurityCamResource::deviceType() const
     if (enforcedDeviceType() != nx::vms::api::DeviceType::unknown)
         return enforcedDeviceType();
 
+    // TODO: #vbreus Seems that all properties should be fetched under the single lock.
     return calculateDeviceType(
         isDtsBased(),
         isIOModule(),
