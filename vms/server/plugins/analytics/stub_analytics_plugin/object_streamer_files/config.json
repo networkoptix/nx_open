@@ -1,0 +1,128 @@
+{
+    "objectCount": 10,
+    "streamDurationInFrames": 300,
+    "typeLibrary":
+    {
+        "objectTypes":
+        [
+            {
+                "id": "stub.objectStreamer.custom.type.1",
+                "name": "Stub OS: Custom Type 1"
+            }
+        ]
+    },
+    "objectTemplates":
+    [
+        {
+            "objectTypeId": "nx.base.Vehicle",
+            "movementPolicy": "random",
+            "minWidth": 0.1,
+            "minHeight": 0.1,
+            "maxWidth": 0.3,
+            "maxHeight": 0.3,
+            "attributes":
+            {
+                "Color": "Red",
+                "Brand": "Lada",
+                "Model": "2106",
+                "LicensePlate.Number": "A001AA",
+                "LicensePlate.State/Province": "77",
+                "LicensePlate.Country": "Russia"
+            }
+        },
+        {
+            "objectTypeId": "nx.base.Car",
+            "movementPolicy": "random",
+            "minWidth": 0.2,
+            "minHeight": 0.2,
+            "maxWidth": 0.4,
+            "maxHeight": 0.4,
+            "attributes":
+            {
+                "Color": "Green",
+                "Brand": "BMW",
+                "Model": "X5",
+                "LicensePlate.Number": "LHD 8448",
+                "LicensePlate.State/Province": "Texas",
+                "LicensePlate.Country": "USA"
+            }
+        },
+        {
+            "objectTypeId": "nx.base.Car",
+            "movementPolicy": "random",
+            "minWidth": 0.1,
+            "minHeight": 0.1,
+            "maxWidth": 0.2,
+            "maxHeight": 0.2,
+            "attributes":
+            {
+                "Color": "Yellow",
+                "Brand": "Fiat",
+                "Model": "124 Spider",
+                "LicensePlate.Number": "BE 288AB",
+                "LicensePlate.State/Province": "Roma",
+                "LicensePlate.Country": "Italia"
+            }
+        },
+        {
+            "objectTypeId": "nx.base.Truck",
+            "movementPolicy": "random",
+            "minWidth": 0.25,
+            "minHeight": 0.4,
+            "maxWidth": 0.25,
+            "maxHeight": 0.4,
+            "attributes":
+            {
+                "Color": "White",
+                "Brand": "Ford",
+                "Model": "F150",
+                "LicensePlate.Number": "FW 2666",
+                "LicensePlate.Country": "Norway"
+            }
+        },
+        {
+            "objectTypeId": "nx.base.Bus",
+            "movementPolicy": "random",
+            "minWidth": 0.1,
+            "minHeight": 0.1,
+            "maxWidth": 0.5,
+            "maxHeight": 0.5,
+            "attributes":
+            {
+                "Color": "Blue",
+                "Brand": "Bogdan",
+                "Model": "A-092",
+                "LicensePlate.Number": "AH 2250 AB",
+                "LicensePlate.Country": "Ukraine"
+            }
+        },
+        {
+            "objectTypeId": "nx.base.Person",
+            "movementPolicy": "random",
+            "minWidth": 0.05,
+            "minHeight": 0.1,
+            "maxWidth": 0.1,
+            "maxHeight": 0.2,
+            "attributes":
+            {
+                "Age": "32",
+                "Gender": "Female",
+                "Body Shape": "Normal",
+                "Height": "170",
+                "Top Clothing Color": "White",
+                "Bottom Clothing Color": "Black"
+            }
+        },
+        {
+            "objectTypeId": "stub.objectStreamer.custom.type.1",
+            "movementPolicy": "random",
+            "attributes":
+            {
+                "string attribute 1": "first string attribute",
+                "string attribute 2": "second string attribute",
+                "number attribute 1": "0.1",
+                "number attribute 2": "300"
+            }
+        }
+    ]
+}

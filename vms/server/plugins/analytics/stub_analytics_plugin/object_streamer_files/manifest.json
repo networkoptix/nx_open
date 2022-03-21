@@ -1,0 +1,94 @@
+{
+    "type_library": {
+        "object_types": [
+            {
+                "id": "stub.objectStreamer.custom.type.1",
+                "name": "Stub OS: Custom Type 1"
+            },
+            {
+                "id": "nx.base.Vehicle",
+                "name": "Nx Base Vehicle"
+            },
+            {
+                "id": "nx.base.Car",
+                "name": "Nx Base Car"
+            },
+            {
+                "id": "nx.base.Truck",
+                "name": "Nx Base Truck"
+            },
+            {
+                "id": "nx.base.Bus",
+                "name": "Nx Base Bus"
+            },
+            {
+                "id": "nx.base.Person",
+                "name": "Nx Base Person"
+            }
+        ]
+    },
+    "supported_types": [
+        {
+            "object_type_id": "nx.base.Vehicle",
+            "attributes": [
+                "Color",
+                "Brand",
+                "Model",
+                "LicensePlate.Number",
+                "LicensePlate.State/Province",
+                "LicensePlate.Country"
+            ]
+        },
+        {
+            "object_type_id": "nx.base.Car",
+            "attributes": [
+                "Color",
+                "Brand",
+                "Model",
+                "LicensePlate.Number",
+                "LicensePlate.State/Province",
+                "LicensePlate.Country"
+            ]
+        },
+        {
+            "object_type_id": "nx.base.Truck",
+            "attributes": [
+                "Color",
+                "Brand",
+                "Model",
+                "LicensePlate.Number",
+                "LicensePlate.Country"
+            ]
+        },
+        {
+            "object_type_id": "nx.base.Bus",
+            "attributes": [
+                "Color",
+                "Brand",
+                "Model",
+                "LicensePlate.Number",
+                "LicensePlate.Country"
+            ]
+        },
+        {
+            "object_type_id": "nx.base.Person",
+            "attributes": [
+                "Age",
+                "Gender",
+                "Body Shape",
+                "Height",
+                "Top Clothing Color",
+                "Bottom Clothing Color"
+            ]
+        },
+        {
+            "object_type_id": "stub.objectStreamer.custom.type.1",
+            "attributes": [
+                "string attribute 1",
+                "string attribute 2",
+                "number attribute 1",
+                "number attribute 2"
+            ]
+        }
+    ]
+}

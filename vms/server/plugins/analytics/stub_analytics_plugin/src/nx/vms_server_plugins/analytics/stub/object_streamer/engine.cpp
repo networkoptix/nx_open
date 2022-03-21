@@ -14,7 +14,12 @@ namespace object_streamer {
 using namespace nx::sdk;
 using namespace nx::sdk::analytics;
 
-Engine::Engine(): nx::sdk::analytics::Engine(/*enableOutput*/ true)
+static const std::string kDefaultManifestFile = "manifest.json";
+static const std::string kDefaultStreamFile = "stream.json";
+
+Engine::Engine(Plugin* plugin):
+    nx::sdk::analytics::Engine(/*enableOutput*/ true),
+    m_plugin(plugin)
 {
 }
 
@@ -29,6 +34,8 @@ void Engine::doObtainDeviceAgent(Result<IDeviceAgent*>* outResult, const IDevice
 
 std::string Engine::manifestString() const
 {
+    const std::string pluginHomeDir = m_plugin->utilityProvider()->homeDir();
+
     return /*suppress newline*/ 1 + (const char*)
 R"json(
 {
@@ -41,12 +48,14 @@ R"json(
             {
                 "type": "TextArea",
                 "name": ")json" + kManifestFileSetting + R"json(",
-                "caption": "Path to Device Agent Manifest file"
+                "caption": "Path to Device Agent Manifest file",
+                "defaultValue": ")json" + pluginHomeDir + "/" + kDefaultManifestFile + R"json("
             },
             {
                 "type": "TextArea",
                 "name": ")json" + kObjectStreamFileSetting + R"json(",
-                "caption": "Path to Object stream file"
+                "caption": "Path to Object stream file",
+                "defaultValue": ")json" + pluginHomeDir + "/" +  kDefaultStreamFile + R"json("
             }
         ]
     }
