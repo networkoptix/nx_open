@@ -15,7 +15,7 @@ using namespace nx::sdk::analytics;
 
 Result<IEngine*> Plugin::doObtainEngine()
 {
-    return new Engine();
+    return new Engine(this);
 }
 
 std::string Plugin::manifestString() const

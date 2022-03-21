@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "plugin.h"
+
 #include <nx/sdk/analytics/helpers/engine.h>
 
 namespace nx {
@@ -13,7 +15,7 @@ namespace object_streamer {
 class Engine: public nx::sdk::analytics::Engine
 {
 public:
-    Engine();
+    Engine(Plugin* plugin);
     virtual ~Engine() override;
 
 protected:
@@ -23,6 +25,9 @@ protected:
     virtual void doObtainDeviceAgent(
         nx::sdk::Result<nx::sdk::analytics::IDeviceAgent*>* outResult,
         const nx::sdk::IDeviceInfo* deviceInfo) override;
+
+private:
+    Plugin* m_plugin = nullptr;
 };
 
 } // namespace object_streamer
