@@ -118,13 +118,13 @@ public:
     virtual void pleaseStop() override;
 
     void setMediaRole(PlaybackMode mode);
+    virtual bool reopen() override;
 signals:
     void dataDropped(QnArchiveStreamReader* reader);
 private:
     std::pair<QnAbstractDataPacketPtr, bool> processFFmpegRtpPayload(quint8* data, int dataSize, int channelNum, qint64* parserPosition);
     void processMetadata(const quint8* data, int dataSize);
     bool openInternal();
-    void reopen();
 
     // determine camera's video server on specified time
     QnMediaServerResourcePtr getServerOnTime(qint64 time);

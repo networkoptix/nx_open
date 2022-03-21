@@ -8,31 +8,16 @@
 
 #include <QtCore/QScopedValueRollback>
 #include <QtCore/QTimer>
-
 #include <QtWidgets/QAction>
-#include <QtWidgets/QCompleter>
-#include <QtWidgets/QMenu>
-#include <QtWidgets/QGraphicsSceneContextMenuEvent>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QCompleter>
+#include <QtWidgets/QGraphicsSceneContextMenuEvent>
+#include <QtWidgets/QMenu>
 
 extern "C"
 {
 #include <libavutil/avutil.h> // TODO: remove
 }
-
-#include <client/client_settings.h>
-#include <client/client_runtime_settings.h>
-#include <client/client_module.h>
-
-#include <core/resource/device_dependent_strings.h>
-#include <core/resource/camera_bookmark.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/layout_resource.h>
-#include <core/resource/media_server_resource.h>
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/resource_runtime_data.h>
-#include <core/resource/camera_history.h>
-#include <core/resource/storage_resource.h>
 
 #include <camera/cam_display.h>
 #include <camera/camera_bookmarks_manager.h>
@@ -41,52 +26,55 @@ extern "C"
 #include <camera/client_video_camera.h>
 #include <camera/loaders/caching_camera_data_loader.h>
 #include <camera/resource_display.h>
-
-#include <nx/streaming/abstract_archive_stream_reader.h>
-#include <nx/streaming/abstract_archive_stream_reader.h>
-
-#include <nx/utils/scope_guard.h>
-#include <nx/utils/pending_operation.h>
-
-#include <core/resource/avi/avi_resource.h>
-#include <common/common_module.h>
-#include <core/resource_management/resource_pool.h>
+#include <client/client_module.h>
+#include <client/client_runtime_settings.h>
+#include <client/client_settings.h>
 #include <client_core/client_core_module.h>
-
-#include <server/server_storage_manager.h>
-
+#include <common/common_module.h>
+#include <core/resource/avi/avi_resource.h>
+#include <core/resource/camera_bookmark.h>
+#include <core/resource/camera_history.h>
+#include <core/resource/camera_resource.h>
+#include <core/resource/device_dependent_strings.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/media_server_resource.h>
+#include <core/resource/storage_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/resource_runtime_data.h>
+#include <nx/streaming/abstract_archive_stream_reader.h>
+#include <nx/streaming/archive_stream_reader.h>
+#include <nx/utils/pending_operation.h>
+#include <nx/utils/scope_guard.h>
+#include <nx/utils/string.h>
+#include <nx/vms/client/core/watchers/server_time_watcher.h>
+#include <nx/vms/client/desktop/ini.h>
+#include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/workbench/timeline/thumbnail_loading_manager.h>
+#include <server/server_storage_manager.h>
 #include <ui/animation/variant_animator.h>
-#include <ui/graphics/items/resource/resource_widget.h>
-#include <ui/graphics/items/resource/media_resource_widget.h>
-#include <ui/graphics/items/controls/time_slider.h>
-#include <ui/graphics/items/controls/time_scroll_bar.h>
-#include <ui/graphics/items/controls/bookmarks_viewer.h>
 #include <ui/graphics/instruments/instrument_manager.h>
 #include <ui/graphics/instruments/signaling_instrument.h>
+#include <ui/graphics/items/controls/bookmarks_viewer.h>
+#include <ui/graphics/items/controls/time_scroll_bar.h>
+#include <ui/graphics/items/controls/time_slider.h>
+#include <ui/graphics/items/resource/media_resource_widget.h>
+#include <ui/graphics/items/resource/resource_widget.h>
 #include <ui/widgets/calendar_widget.h>
 #include <ui/widgets/day_time_widget.h>
-#include <ui/workbench/workbench_access_controller.h>
-#include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
 #include <ui/workaround/hidpi_workarounds.h>
-
+#include <ui/workbench/watchers/timeline_bookmarks_watcher.h>
+#include <ui/workbench/workbench_access_controller.h>
 #include <utils/common/checked_cast.h>
 #include <utils/common/delayed.h>
-#include <nx/utils/string.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
 
-#include <nx/vms/client/desktop/server_runtime_events/server_runtime_event_connector.h>
-
-#include <nx/vms/client/desktop/ini.h>
-
 #include "extensions/workbench_stream_synchronizer.h"
 #include "watchers/workbench_user_inactivity_watcher.h"
-#include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include "workbench.h"
-#include "workbench_display.h"
 #include "workbench_context.h"
+#include "workbench_display.h"
 #include "workbench_item.h"
 #include "workbench_layout.h"
 
@@ -123,6 +111,16 @@ bool isLivePosition(const QPointer<QnResourceWidget> widget)
 {
     const auto time = widget->item()->data(Qn::ItemTimeRole, -1);
     return time == -1 || time == DATETIME_NOW;
+}
+
+QnArchiveStreamReader* getReader(QnResourceWidget* widget)
+{
+    auto mediaWidget = dynamic_cast<QnMediaResourceWidget*>(widget);
+    if (!mediaWidget)
+        return nullptr;
+
+    auto reader = mediaWidget->display()->archiveReader();
+    return dynamic_cast<QnArchiveStreamReader*>(reader);
 }
 
 } //namespace
@@ -2430,6 +2428,37 @@ void QnWorkbenchNavigator::clearTimelineSelection()
 {
     if (m_timeSlider)
         m_timeSlider->setSelectionValid(false);
+}
+
+void QnWorkbenchNavigator::reopenPlaybackConnection(const QnVirtualCameraResourceList& cameras)
+{
+    QSet<QnVirtualCameraResourcePtr> uniqueCameras(cameras.begin(), cameras.end());
+    for (auto camera: uniqueCameras)
+    {
+        auto widgets = display()->widgets(camera);
+        for (auto widget: widgets)
+        {
+            auto reader = getReader(widget);
+            if (!reader)
+                continue;
+
+            if (reader->isPaused())
+                reader->resume();
+
+            auto pauseSignalConnection = std::make_shared<QMetaObject::Connection>();
+            *pauseSignalConnection = QObject::connect(reader, &nx::utils::Thread::paused, this,
+                [=]
+                {
+                    QObject::disconnect(*pauseSignalConnection);
+                    
+                    reader->reopen();
+                    reader->resume();
+                },
+                Qt::DirectConnection); //< Reopen in the reader thread.
+
+            reader->pause();
+        }
+    }
 }
 
 void QnWorkbenchNavigator::at_timeSlider_valueChanged(milliseconds value)

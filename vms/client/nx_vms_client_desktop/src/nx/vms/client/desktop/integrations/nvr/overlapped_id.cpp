@@ -12,6 +12,7 @@
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/menu_factory.h>
 #include <ui/workbench/workbench_context.h>
+#include <ui/workbench/workbench_navigator.h>
 
 #include "overlapped_id_store.h"
 #include "overlapped_id_state.h"
@@ -74,20 +75,22 @@ void OverlappedIdIntegration::openOverlappedIdDialog(QnWorkbenchContext* context
     const auto groupId = cameras.first()->getGroupId();
 
     connect(dialog.get(), &OverlappedIdDialog::accepted,
-        [this, context, groupId]()
+        [this, context, groupId, cameras]()
         {
             auto connection = connectedServerApi();
             if (!connection)
                 return;
 
             auto callback = nx::utils::guarded(this,
-                [this](
+                [this, context, cameras](
                     bool success,
                     rest::Handle /*requestId*/,
                     nx::vms::api::OverlappedIdResponse /*result*/)
                 {
                     if (!success)
                         NX_WARNING(this, "Overlapped id is not set.");
+
+                    context->navigator()->reopenPlaybackConnection(cameras);
                 });
 
             connection->setOverlappedId(

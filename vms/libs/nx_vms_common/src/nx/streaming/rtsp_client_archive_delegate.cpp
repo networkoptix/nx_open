@@ -499,12 +499,12 @@ qint64 QnRtspClientArchiveDelegate::endTime() const
     return DATETIME_NOW; // LIVE or archive future point as right edge for server video
 }
 
-void QnRtspClientArchiveDelegate::reopen()
+bool QnRtspClientArchiveDelegate::reopen()
 {
     close();
 
     if (m_blockReopening)
-        return;
+        return false;
 
     if (m_reopenTimer.isValid() && m_reopenTimer.elapsed() < REOPEN_TIMEOUT)
     {
@@ -514,7 +514,9 @@ void QnRtspClientArchiveDelegate::reopen()
     m_reopenTimer.restart();
 
     if (m_camera)
-        openInternal();
+        return openInternal();
+
+    return false;
 }
 
 bool QnRtspClientArchiveDelegate::isConnectionExpired() const

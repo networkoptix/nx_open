@@ -26,6 +26,8 @@ using namespace nx::vms::api;
 //static const int FFMPEG_PROBE_BUFFER_SIZE = 1024 * 512;
 static const qint64 LIVE_SEEK_OFFSET = 1000000ll * 10;
 
+constexpr auto kSingleShowWaitTimeoutMSec = 100;
+
 QnArchiveStreamReader::QnArchiveStreamReader(const QnResourcePtr& dev ) :
     QnAbstractArchiveStreamReader(dev),
 //protected
@@ -190,6 +192,20 @@ std::chrono::microseconds QnArchiveStreamReader::currentTime() const
 {
     NX_MUTEX_LOCKER mutex( &m_jumpMtx );
     return std::chrono::microseconds(m_skipFramesToTime ? m_skipFramesToTime : m_currentTime);
+}
+
+void QnArchiveStreamReader::reopen()
+{
+    auto currentTime = this->currentTime().count();
+    auto isMediaPaused = this->isMediaPaused();
+    auto speed = this->getSpeed();
+
+    getArchiveDelegate()->reopen();
+
+    setCurrentTime(currentTime);
+    setSpeed(speed);
+    if (isMediaPaused)
+        pauseMedia();
 }
 
 QnConstResourceVideoLayoutPtr QnArchiveStreamReader::getDPVideoLayout() const
@@ -425,8 +441,15 @@ QnAbstractMediaDataPtr QnArchiveStreamReader::getNextData()
     // =================
     {
         NX_MUTEX_LOCKER mutex( &m_jumpMtx );
-        while (m_singleShot && m_skipFramesToTime == 0 && m_singleQuantProcessed && m_requiredJumpTime == qint64(AV_NOPTS_VALUE) && !needToStop())
-            m_singleShowWaitCond.wait(&m_jumpMtx);
+        while (m_singleShot
+            && m_skipFramesToTime == 0
+            && m_singleQuantProcessed
+            && m_requiredJumpTime == qint64(AV_NOPTS_VALUE)
+            && !needToStop()
+            && !isPaused())
+        {
+            m_singleShowWaitCond.wait(&m_jumpMtx, kSingleShowWaitTimeoutMSec);
+        }
         //QnLongRunnable::pause();
     }
 

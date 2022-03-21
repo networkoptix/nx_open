@@ -27,6 +27,7 @@ public:
         const QnResourcePtr &resource,
         AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher) override;
     virtual void close() override;
+    virtual bool reopen() override;
     virtual void beforeClose() override;
     virtual qint64 startTime() const override;
     virtual qint64 endTime() const override;

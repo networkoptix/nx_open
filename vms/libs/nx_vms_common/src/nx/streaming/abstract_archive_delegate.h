@@ -85,6 +85,7 @@ public:
         const QnResourcePtr& resource,
         AbstractArchiveIntegrityWatcher* archiveIntegrityWatcher = nullptr) = 0;
     virtual void close() = 0;
+    virtual bool reopen() { return true; };
     virtual qint64 startTime() const = 0;
     virtual qint64 endTime() const = 0;
     virtual QnAbstractMediaDataPtr getNextData() = 0;
