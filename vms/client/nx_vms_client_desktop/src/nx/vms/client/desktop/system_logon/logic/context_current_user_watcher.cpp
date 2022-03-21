@@ -150,16 +150,31 @@ bool ContextCurrentUserWatcher::isReconnectRequired(const QnUserResourcePtr &use
     if (m_userName.isEmpty())
         return false;   //we are not connected
 
+    // TODO: #sivanov Actually reconnect on renaming is required when using digest auth only. But
+    // some functionality (like desktop camera) can stop working, so it's simplier to reconnect.
     if (user->getName().toLower() != m_userName.toLower())
         return true;
 
+    // TODO: #sivanov This is needed to avoid reconnecting on merging systems. Should be improved.
     if (!m_reconnectOnPasswordChange)
         return false;
+
+    const bool bearerAuthIsUsed =
+        (connectionCredentials().authToken.type == nx::network::http::AuthTokenType::bearer);
+
+    // Reconnect is never needed when token auth is used.
+    if (bearerAuthIsUsed)
+    {
+        m_userDigest = user->getDigest();
+        m_userPassword = QString();
+        return false;
+    }
 
     if (m_userPassword.isEmpty())
         return m_userDigest != user->getDigest();
 
-    // password was just changed by the user
+    // TODO: #sivanov Handle this on the server side: force disconnect users with changed password.
+    // Filled m_userPassword means password was just changed by the user.
     if (!user->getHash().checkPassword(m_userPassword))
         return true;
 
