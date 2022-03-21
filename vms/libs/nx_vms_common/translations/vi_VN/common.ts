@@ -5,7 +5,7 @@
     <name>ArchiveDuration</name>
     <message>
       <source>no data for forecast</source>
-      <translation>không có dữ liệu dự báo</translation>
+      <translation>không có dữ liệu để dự báo</translation>
     </message>
     <message>
       <source>empty</source>
@@ -13,7 +13,7 @@
     </message>
     <message>
       <source>less than an hour</source>
-      <translation>ít hơn một giờ</translation>
+      <translation>dưới một giờ</translation>
     </message>
   </context>
   <context>
@@ -1060,15 +1060,15 @@
     <name>nx::recording::Error</name>
     <message>
       <source>Internal error</source>
-      <translation>Lỗi bên trong</translation>
+      <translation>Lỗi nội bộ</translation>
     </message>
     <message>
       <source>Corresponding container in FFMPEG library was not found.</source>
-      <translation>Không thể tìm thấy tương ứng FFMPEG Thư viện.</translation>
+      <translation>Không tìm thấy thư mục tương ứng trong thư viện FFMPEG.</translation>
     </message>
     <message>
       <source>Could not create output file for video recording.</source>
-      <translation>Không thể tạo ra các tập tin đầu ra với video.</translation>
+      <translation>Không thể tạo tệp đầu ra để ghi hình.</translation>
     </message>
     <message>
       <source>Could not allocate output stream for recording.</source>
@@ -1076,7 +1076,7 @@
     </message>
     <message>
       <source>Could not allocate output audio stream.</source>
-      <translation>Không thể để phân bổ âm thanh dòng sản lượng.</translation>
+      <translation>Không thể phân bổ luồng âm thanh đầu ra.</translation>
     </message>
     <message>
       <source>Could not allocate output metadata stream.</source>
@@ -1084,11 +1084,11 @@
     </message>
     <message>
       <source>Invalid audio codec information.</source>
-      <translation>Audio mã hóa thông tin không hợp lệ.</translation>
+      <translation>Thông tin mã hóa âm thanh không hợp lệ.</translation>
     </message>
     <message>
       <source>Video or audio codec is incompatible with the selected format.</source>
-      <translation>Video hay mã hóa âm thanh không thể tương thích với các định dạng đã chọn.</translation>
+      <translation>Mã hóa hình ảnh hoặc âm thanh không tương thích với định dạng đã chọn.</translation>
     </message>
     <message>
       <source>Video transcoding required.</source>
@@ -1096,7 +1096,7 @@
     </message>
     <message>
       <source>File write error. Not enough free space.</source>
-      <translation>Nộp ghi lỗi. Không đủ không gian trống.</translation>
+      <translation>Lỗi ghi tập tin. Không đủ chỗ trống.</translation>
     </message>
     <message>
       <source>Invalid resource type for data export.</source>
@@ -1104,7 +1104,7 @@
     </message>
     <message>
       <source>No data exported.</source>
-      <translation>Không xuất dữ liệu.</translation>
+      <translation>Không có dữ liệu nào được xuất.</translation>
     </message>
   </context>
   <context>
