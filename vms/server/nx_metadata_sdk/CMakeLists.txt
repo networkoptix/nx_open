@@ -72,7 +72,8 @@ file(GLOB_RECURSE copied_sample_1_files CONFIGURE_DEPENDS
 # Collect source files for the sample 2 - Stub Analytics Plugin.
 set(copied_sample_2_target stub_analytics_plugin)
 set(copied_sample_2_origin ${copied_samples_dir}/${copied_sample_2_target})
-file(GLOB_RECURSE copied_sample_2_files CONFIGURE_DEPENDS ${copied_sample_2_origin}/src/*)
+file(GLOB_RECURSE copied_sample_2_files CONFIGURE_DEPENDS ${copied_sample_2_origin}/src/*
+    ${copied_sample_2_origin}/object_streamer_files/*)
 
 # Collect sample unit test files.
 set(copied_sample_unit_tests_target unit_tests/src)
