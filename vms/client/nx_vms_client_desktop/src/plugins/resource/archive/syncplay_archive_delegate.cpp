@@ -34,6 +34,11 @@ void QnSyncPlayArchiveDelegate::close()
     m_ownerDelegate->close();
 }
 
+bool QnSyncPlayArchiveDelegate::reopen()
+{
+    return m_ownerDelegate->reopen();
+}
+
 void QnSyncPlayArchiveDelegate::beforeClose()
 {
     m_ownerDelegate->beforeClose();

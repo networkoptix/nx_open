@@ -42,6 +42,7 @@ extern "C"
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_runtime_data.h>
 #include <nx/streaming/abstract_archive_stream_reader.h>
+#include <nx/streaming/archive_stream_reader.h>
 #include <nx/utils/pending_operation.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
@@ -110,6 +111,16 @@ bool isLivePosition(const QPointer<QnResourceWidget> widget)
 {
     const auto time = widget->item()->data(Qn::ItemTimeRole, -1);
     return time == -1 || time == DATETIME_NOW;
+}
+
+QnArchiveStreamReader* getReader(QnResourceWidget* widget)
+{
+    auto mediaWidget = dynamic_cast<QnMediaResourceWidget*>(widget);
+    if (!mediaWidget)
+        return nullptr;
+
+    auto reader = mediaWidget->display()->archiveReader();
+    return dynamic_cast<QnArchiveStreamReader*>(reader);
 }
 
 } //namespace
@@ -2417,6 +2428,37 @@ void QnWorkbenchNavigator::clearTimelineSelection()
 {
     if (m_timeSlider)
         m_timeSlider->setSelectionValid(false);
+}
+
+void QnWorkbenchNavigator::reopenPlaybackConnection(const QnVirtualCameraResourceList& cameras)
+{
+    QSet<QnVirtualCameraResourcePtr> uniqueCameras(cameras.begin(), cameras.end());
+    for (auto camera: uniqueCameras)
+    {
+        auto widgets = display()->widgets(camera);
+        for (auto widget: widgets)
+        {
+            auto reader = getReader(widget);
+            if (!reader)
+                continue;
+
+            if (reader->isPaused())
+                reader->resume();
+
+            auto pauseSignalConnection = std::make_shared<QMetaObject::Connection>();
+            *pauseSignalConnection = QObject::connect(reader, &nx::utils::Thread::paused, this,
+                [=]
+                {
+                    QObject::disconnect(*pauseSignalConnection);
+                    
+                    reader->reopen();
+                    reader->resume();
+                },
+                Qt::DirectConnection); //< Reopen in the reader thread.
+
+            reader->pause();
+        }
+    }
 }
 
 void QnWorkbenchNavigator::at_timeSlider_valueChanged(milliseconds value)
