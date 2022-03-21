@@ -923,7 +923,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Abort</source>
-      <translation>Về</translation>
+      <translation>Hủy</translation>
     </message>
     <message>
       <source>Retry</source>
@@ -943,7 +943,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Discard</source>
-      <translation>Loại bỏ</translation>
+      <translation>Hủy</translation>
     </message>
     <message>
       <source>Help</source>
@@ -988,14 +988,14 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Writing canceled by application</source>
-      <translation>Bằng văn bản hủy bỏ bởi ứng dụng</translation>
+      <translation>Chỉnh sửa bị hủy bỏ</translation>
     </message>
   </context>
   <context>
     <name>QScrollBar</name>
     <message>
       <source>Scroll here</source>
-      <translation>Di chuyển ở đây</translation>
+      <translation>Cuộn tại đây</translation>
     </message>
     <message>
       <source>Left edge</source>
@@ -1003,7 +1003,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Top</source>
-      <translation>Đỉnh</translation>
+      <translation>Thanh trên</translation>
     </message>
     <message>
       <source>Right edge</source>
@@ -1011,15 +1011,15 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Bottom</source>
-      <translation>Đáy</translation>
+      <translation>Thanh dưới</translation>
     </message>
     <message>
       <source>Page left</source>
-      <translation>Trang trái</translation>
+      <translation>Trang bên trái</translation>
     </message>
     <message>
       <source>Page up</source>
-      <translation>Trang lên</translation>
+      <translation>Trang trên</translation>
     </message>
     <message>
       <source>Page right</source>
@@ -1027,19 +1027,19 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Page down</source>
-      <translation>Trang xuống</translation>
+      <translation>Trang dưới</translation>
     </message>
     <message>
       <source>Scroll left</source>
-      <translation>Di chuyển sang trái</translation>
+      <translation>Cuộn sang trái</translation>
     </message>
     <message>
       <source>Scroll up</source>
-      <translation>Di chuyển lên</translation>
+      <translation>Cuộn lên</translation>
     </message>
     <message>
       <source>Scroll right</source>
-      <translation>Di chuyển sang phải</translation>
+      <translation>Cuộn sang phải</translation>
     </message>
     <message>
       <source>Scroll down</source>
@@ -1050,7 +1050,7 @@ Do you want to delete it anyway?</source>
     <name>QStandardPaths</name>
     <message>
       <source>Desktop</source>
-      <translation>Máy tính để bàn</translation>
+      <translation>Màn hình chính</translation>
     </message>
     <message>
       <source>Documents</source>
@@ -1062,7 +1062,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Applications</source>
-      <translation>Ủng dụng</translation>
+      <translation>Ứng dụng</translation>
     </message>
     <message>
       <source>Music</source>
@@ -1082,7 +1082,7 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Home</source>
-      <translation>Nhà</translation>
+      <translation>Trang Chủ</translation>
     </message>
     <message>
       <source>Application Data</source>
@@ -1094,11 +1094,11 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Cache</source>
-      <translation>Bộ nhớ cache</translation>
+      <translation>Bộ nhớ đệm</translation>
     </message>
     <message>
       <source>Shared Data</source>
-      <translation>Chia sẻ dữ liệu</translation>
+      <translation>Dữ liệu chung</translation>
     </message>
     <message>
       <source>Runtime</source>
@@ -1110,11 +1110,11 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Shared Configuration</source>
-      <translation>Cấu hình Chia sẻ</translation>
+      <translation>Cấu hình chung</translation>
     </message>
     <message>
       <source>Shared Cache</source>
-      <translation>Chia sẻ bộ nhớ cache</translation>
+      <translation>Bộ nhớ đệm chung</translation>
     </message>
     <message>
       <source>Download</source>
@@ -1125,11 +1125,11 @@ Do you want to delete it anyway?</source>
     <name>QTabBar</name>
     <message>
       <source>Scroll Left</source>
-      <translation>Di chuyển sang trái</translation>
+      <translation>Cuộn sang trái</translation>
     </message>
     <message>
       <source>Scroll Right</source>
-      <translation>Di chuyển sang phải</translation>
+      <translation>Cuộn sang phải</translation>
     </message>
   </context>
   <context>
@@ -1143,7 +1143,7 @@ Do you want to delete it anyway?</source>
     <name>QWidgetTextControl</name>
     <message>
       <source>&amp;Undo</source>
-      <translation>&amp;hủy bỏ</translation>
+      <translation>&amp;Hoàn tác</translation>
     </message>
     <message>
       <source>&amp;Redo</source>
@@ -1151,23 +1151,23 @@ Do you want to delete it anyway?</source>
     </message>
     <message>
       <source>Cu&amp;t</source>
-      <translation>Cu&amp;t</translation>
+      <translation>Cắ&amp;t</translation>
     </message>
     <message>
       <source>&amp;Copy</source>
-      <translation>&amp;bản sao</translation>
+      <translation>&amp;Sao chép</translation>
     </message>
     <message>
       <source>Copy &amp;Link Location</source>
-      <translation>Bản sao &amp;vị trí liên kết</translation>
+      <translation>Sao chép vị trí đường dẫn</translation>
     </message>
     <message>
       <source>&amp;Paste</source>
-      <translation>&amp;dán</translation>
+      <translation>Dán</translation>
     </message>
     <message>
       <source>Delete</source>
-      <translation>Xóa bỏ</translation>
+      <translation>Xóa</translation>
     </message>
     <message>
       <source>Select All</source>
