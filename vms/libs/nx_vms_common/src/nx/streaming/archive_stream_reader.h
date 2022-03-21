@@ -175,6 +175,8 @@ public:
 
     virtual std::chrono::microseconds currentTime() const override;
 
+    void reopen();
+
 protected:
     virtual bool init();
 

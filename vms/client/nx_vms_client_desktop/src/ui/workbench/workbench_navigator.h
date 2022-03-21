@@ -164,6 +164,9 @@ public:
 
     void clearTimelineSelection();
 
+    /** Reopens archive delegates for camera widgets. */
+    void reopenPlaybackConnection(const QnVirtualCameraResourceList& cameras);
+
 signals:
     void currentWidgetAboutToBeChanged();
     void currentWidgetChanged();
