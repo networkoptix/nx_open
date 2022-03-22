@@ -4,10 +4,16 @@
 
 #include "ui_accessible_media_widget.h"
 
-#include <nx/utils/log/assert.h>
+#include <QtCore/QCollator>
+
+#include <core/resource/layout_resource.h>
 #include <core/resource_access/resource_access_filter.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/log/assert.h>
+#include <nx/vms/common/html/html.h>
 #include <ui/models/abstract_permissions_model.h>
+#include <ui/workbench/workbench_context.h>
+#include <core/resource_access/providers/resource_access_provider.h>
 
 #include <nx/vms/client/desktop/resource_dialogs/details/accessible_media_view_header_widget.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>
@@ -80,13 +86,16 @@ QnAccessibleMediaWidget::QnAccessibleMediaWidget(
             const bool newAllMediaCheckedValue = !m_headerWidget->allMediaCheked();
 
             m_headerWidget->setAllMediaCheked(newAllMediaCheckedValue);
-            m_resourceSelectionWidget->resourceViewWidget()->setItemViewEnabled(
+            m_resourceSelectionWidget->setItemsEnabled(
                 !newAllMediaCheckedValue);
 
             emit hasChangesChanged();
         });
 
     m_resourceSelectionWidget->setDisplayResourceStatus(false);
+
+    m_resourceSelectionWidget->setToolTipProvider(
+        [this](const QModelIndex& index) { return tooltipRichText(index); });
 
     connect(m_resourceSelectionWidget, &ResourceSelectionWidget::selectionChanged,
         this, &QnAccessibleMediaWidget::hasChangesChanged);
@@ -132,7 +141,7 @@ void QnAccessibleMediaWidget::loadDataToUi()
     }
 
     m_headerWidget->setAllMediaCheked(accessAllMedia);
-    m_resourceSelectionWidget->resourceViewWidget()->setItemViewEnabled(!accessAllMedia);
+    m_resourceSelectionWidget->setItemsEnabled(!accessAllMedia);
 }
 
 bool QnAccessibleMediaWidget::allCamerasItemChecked() const
@@ -148,6 +157,62 @@ int QnAccessibleMediaWidget::resourcesCount() const
 QSet<QnUuid> QnAccessibleMediaWidget::checkedResources() const
 {
     return m_resourceSelectionWidget->selectedResourcesIds();
+}
+
+QString QnAccessibleMediaWidget::tooltipRichText(const QModelIndex& index) const
+{
+    static const int kMaxTooltipResourceLines = 10;
+
+    if (!index.isValid())
+        return {};
+
+    const auto resource = index.data(Qn::ResourceRole).value<QnResourcePtr>();
+    const auto baseTooltip = index.data(Qt::DisplayRole).toString();
+    const auto accessProvider = context()->resourceAccessProvider();
+    const auto subject = m_permissionsModel->subject();
+
+    if (!resource || !accessProvider || !subject.isValid())
+        return baseTooltip;
+
+    QnResourceList providers;
+    accessProvider->accessibleVia(subject, resource, &providers);
+    if (providers.isEmpty())
+        return baseTooltip;
+
+    QStringList providerNames;
+    for (const auto& provider: std::as_const(providers))
+    {
+        if (provider->hasFlags(Qn::layout)
+            && provider.staticCast<QnLayoutResource>()->isServiceLayout())
+        {
+            continue;
+        }
+        providerNames.push_back(provider->getName());
+    }
+    providerNames.removeDuplicates();
+
+    QCollator collator;
+    collator.setNumericMode(true);
+    std::sort(providerNames.begin(), providerNames.end(),
+        [collator = std::move(collator)](const QString& lhs, const QString& rhs)
+        {
+            return collator.compare(lhs, rhs) < 0;
+        });
+
+    QStringList tooltipLines;
+    tooltipLines.push_back(baseTooltip);
+    tooltipLines.push_back(tr("Access granted by:"));
+
+    for (int i = 0; i < std::min(kMaxTooltipResourceLines, providerNames.size()); ++i)
+        tooltipLines.push_back(nx::vms::common::html::bold(providerNames.at(i)));
+
+    if (providerNames.size() > kMaxTooltipResourceLines)
+    {
+        tooltipLines.push_back(
+            tr("and %n more", "", providerNames.size() - kMaxTooltipResourceLines));
+    }
+
+    return tooltipLines.join("<br>");
 }
 
 void QnAccessibleMediaWidget::applyChanges()

@@ -22,6 +22,7 @@ public:
         ResourceSelectionMode selectionMode = ResourceSelectionMode::MultiSelection);
 
     virtual QVariant data(const QModelIndex& index, int role) const override;
+    virtual Qt::ItemFlags flags(const QModelIndex &index) const override;
 
     bool toggleSelection(const QModelIndex& index);
 
@@ -33,7 +34,10 @@ public:
     ResourceSelectionMode selectionMode() const;
     void setSelectionMode(ResourceSelectionMode mode);
 
+    void setItemsEnabled(bool value);
+
 private:
+    bool m_itemsEnabled = true;
     QSet<QnResourcePtr> m_selectedResources;
     ResourceSelectionMode m_resourceSelectionMode;
     QHash<QnResourcePtr, QPersistentModelIndex> m_resourceMapping;

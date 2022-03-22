@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <optional>
+
 #include <nx/vms/client/desktop/resource_dialogs/item_delegates/resource_dialog_item_delegate.h>
 
 namespace nx::vms::client::desktop {
@@ -28,6 +30,10 @@ public:
         const QModelIndex& index) const override;
 
 protected:
+    virtual std::optional<Qt::CheckState> itemCheckState(
+        const QStyleOptionViewItem& option,
+        const QModelIndex& index) const;
+
     virtual void initStyleOption(
         QStyleOptionViewItem* option,
         const QModelIndex& index) const override;

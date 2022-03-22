@@ -124,12 +124,6 @@ public:
     bool isEmpty() const;
 
     /**
-     * @param enabled Enabled state which will be applied both to the encapsulated tree view
-     *     and filter line edit.
-     */
-    void setItemViewEnabled(bool enabled);
-
-    /**
      * @return Pointer to the header widget which will be located above filter input (not be
      *     confused with tree view header). By default there is no header widget.
      */

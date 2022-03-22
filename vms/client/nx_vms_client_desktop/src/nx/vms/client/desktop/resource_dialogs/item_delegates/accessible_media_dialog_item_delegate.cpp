@@ -8,10 +8,12 @@
 #include <core/resource_access/providers/resource_access_provider.h>
 #include <nx/vms/client/desktop/style/helper.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
+#include <utils/common/scoped_painter_rollback.h>
 
 namespace {
 
-static const int kIndirectAccessColumnWidth = nx::style::Metrics::kViewRowHeight;
+static constexpr auto kIndirectAccessColumnWidth = nx::style::Metrics::kDefaultIconSize;
+static constexpr auto kIndirectAccessIconOpacity = 0.5;
 
 } // namespace
 
@@ -64,7 +66,18 @@ void AccessibleMediaDialogItemDelegate::paint(
     const auto iconTopLeft = itemRect.topLeft()
         + QPoint(itemRect.width() - iconSize.width(), (itemRect.height() - iconSize.height()) / 2);
 
+    QnScopedPainterOpacityRollback opacityRollback(painter, kIndirectAccessIconOpacity);
     painter->drawPixmap(iconTopLeft, pixmap);
+}
+
+std::optional<Qt::CheckState> AccessibleMediaDialogItemDelegate::itemCheckState(
+    const QStyleOptionViewItem& option,
+    const QModelIndex& index) const
+{
+    if (const auto result = base_type::itemCheckState(option, index))
+        return option.state.testFlag(QStyle::State_Enabled) ? result : Qt::Checked;
+
+    return std::nullopt;
 }
 
 int AccessibleMediaDialogItemDelegate::decoratorWidth(const QModelIndex& index) const

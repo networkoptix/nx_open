@@ -53,6 +53,7 @@ struct ResourceSelectionWidget::Private: public QObject
     ResourceSelectionWidget* q;
     const ResourceValidator resourceValidator;
     const AlertTextProvider alertTextProvider;
+    std::unique_ptr<TooltipDecoratorModel> tooltipDecoratorModel;
     std::unique_ptr<InvalidResourceDecoratorModel> invalidResourceDecoratorModel;
     std::unique_ptr<InvalidResourceFilterModel> invalidResourceFilterModel;
     std::unique_ptr<ResourceSelectionDecoratorModel> selectionDecoratorModel;
@@ -66,6 +67,7 @@ ResourceSelectionWidget::Private::Private(
     q(owner),
     resourceValidator(resourceValidator),
     alertTextProvider(alertTextProvider),
+    tooltipDecoratorModel(new TooltipDecoratorModel()),
     invalidResourceDecoratorModel(new InvalidResourceDecoratorModel(resourceValidator)),
     invalidResourceFilterModel(new InvalidResourceFilterModel())
 {
@@ -279,8 +281,11 @@ void ResourceSelectionWidget::setSelectedResourceId(const QnUuid& resourceId)
 
 QAbstractItemModel* ResourceSelectionWidget::model() const
 {
+    if (!d->tooltipDecoratorModel->sourceModel())
+        d->tooltipDecoratorModel->setSourceModel(base_type::model());
+
     if (!d->invalidResourceDecoratorModel->sourceModel())
-        d->invalidResourceDecoratorModel->setSourceModel(base_type::model());
+        d->invalidResourceDecoratorModel->setSourceModel(d->tooltipDecoratorModel.get());
 
     if (!d->invalidResourceFilterModel->sourceModel())
         d->invalidResourceFilterModel->setSourceModel(d->invalidResourceDecoratorModel.get());
@@ -301,6 +306,18 @@ void ResourceSelectionWidget::showEvent(QShowEvent* event)
         d->setShowInvalidResources(true);
     }
     d->updateAlertMessage();
+}
+
+void ResourceSelectionWidget::setToolTipProvider(
+    TooltipDecoratorModel::TooltipProvider tooltipProvider)
+{
+    d->tooltipDecoratorModel->setTooltipProvider(tooltipProvider);
+}
+
+void ResourceSelectionWidget::setItemsEnabled(bool enabled)
+{
+    d->selectionDecoratorModel->setItemsEnabled(enabled);
+    resourceViewWidget()->update();
 }
 
 } // namespace nx::vms::client::desktop

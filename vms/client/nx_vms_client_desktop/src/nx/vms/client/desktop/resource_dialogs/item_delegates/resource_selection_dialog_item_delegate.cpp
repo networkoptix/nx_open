@@ -47,7 +47,8 @@ void ResourceSelectionDialogItemDelegate::paint(
         return;
     }
 
-    const bool checked = index.data(Qt::CheckStateRole).value<Qt::CheckState>() != Qt::Unchecked;
+    const bool checked =
+        itemCheckState(styleOption, index).value_or(Qt::Unchecked) != Qt::Unchecked;
 
     const bool highlighted = checked;
     const auto extraColor = highlighted
@@ -85,8 +86,8 @@ void ResourceSelectionDialogItemDelegate::paintItemCheckMark(
     const QModelIndex& index, const
     QColor& checkedColor) const
 {
-    const auto checkStateData = index.data(Qt::CheckStateRole);
-    if (checkStateData.isNull())
+    const auto checkState = itemCheckState(option, index);
+    if (!checkState)
         return;
 
     QStyleOptionViewItem checkMarkOption(option);
@@ -107,8 +108,7 @@ void ResourceSelectionDialogItemDelegate::paintItemCheckMark(
         }
     }
 
-    const auto checkState = checkStateData.value<Qt::CheckState>();
-    switch (checkState)
+    switch (checkState.value())
     {
         case Qt::Checked:
             checkMarkOption.state.setFlag(QStyle::State_On, true);
@@ -144,6 +144,17 @@ void ResourceSelectionDialogItemDelegate::paintItemCheckMark(
             NX_ASSERT(false);
             break;
     }
+}
+
+std::optional<Qt::CheckState> ResourceSelectionDialogItemDelegate::itemCheckState(
+    const QStyleOptionViewItem&,
+    const QModelIndex& index) const
+{
+    const auto checkStateData = index.data(Qt::CheckStateRole);
+    if (checkStateData.isNull())
+        return std::nullopt;
+
+    return checkStateData.value<Qt::CheckState>();
 }
 
 } // namespace nx::vms::client::desktop

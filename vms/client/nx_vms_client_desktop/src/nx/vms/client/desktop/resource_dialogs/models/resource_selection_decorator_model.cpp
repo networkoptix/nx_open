@@ -121,6 +121,15 @@ QVariant ResourceSelectionDecoratorModel::data(const QModelIndex& index, int rol
     return base_type::data(index, role);
 }
 
+Qt::ItemFlags ResourceSelectionDecoratorModel::flags(const QModelIndex& index) const
+{
+    auto result = base_type::flags(index);
+    if (!m_itemsEnabled)
+        result.setFlag(Qt::ItemIsEnabled, false);
+
+    return result;
+}
+
 QSet<QnResourcePtr> ResourceSelectionDecoratorModel::selectedResources() const
 {
     return m_selectedResources;
@@ -247,6 +256,11 @@ void ResourceSelectionDecoratorModel::setSelectionMode(ResourceSelectionMode mod
         return;
 
     m_resourceSelectionMode = mode;
+}
+
+void ResourceSelectionDecoratorModel::setItemsEnabled(bool value)
+{
+    m_itemsEnabled = value;
 }
 
 } // namespace nx::vms::client::desktop

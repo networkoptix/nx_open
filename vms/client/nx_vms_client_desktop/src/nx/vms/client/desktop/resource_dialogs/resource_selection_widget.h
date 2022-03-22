@@ -8,6 +8,7 @@
 #include <business/business_resource_validation.h>
 
 #include <nx/vms/client/desktop/resource_dialogs/detailed_resource_tree_widget.h>
+#include <nx/vms/client/desktop/resource_dialogs/models/tooltip_decorator_model.h>
 #include <nx/vms/client/desktop/resource_dialogs/resource_selection_dialogs_globals.h>
 
 namespace nx::vms::client::desktop {
@@ -115,6 +116,10 @@ public:
      * <tt>ResourceSelectionMode::ExclusiveSelection</tt> selection mode used.
      */
     void setSelectedResourceId(const QnUuid& resourceId);
+
+    void setToolTipProvider(TooltipDecoratorModel::TooltipProvider tooltipProvider);
+
+    void setItemsEnabled(bool enabled);
 
 signals:
     void selectionModeChanged(ResourceSelectionMode mode);

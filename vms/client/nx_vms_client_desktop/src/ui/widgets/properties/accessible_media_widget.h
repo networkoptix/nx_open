@@ -42,6 +42,9 @@ public:
     QSet<QnUuid> checkedResources() const;
 
 private:
+    QString tooltipRichText(const QModelIndex& index) const;
+
+private:
     QScopedPointer<Ui::AccessibleMediaWidget> ui;
     QnAbstractPermissionsModel* const m_permissionsModel;
     nx::vms::client::desktop::ResourceSelectionWidget* m_resourceSelectionWidget = nullptr;

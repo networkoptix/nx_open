@@ -130,12 +130,6 @@ QModelIndex FilteredResourceViewWidget::currentIndex() const
     return m_filterProxyModel->mapToSource(treeView()->selectionModel()->currentIndex());
 }
 
-void FilteredResourceViewWidget::setItemViewEnabled(bool enabled)
-{
-    ui->treeView->setEnabled(enabled);
-    ui->searchLineEdit->setEnabled(enabled);
-}
-
 QWidget* FilteredResourceViewWidget::headerWidget() const
 {
     return m_headerWidget;

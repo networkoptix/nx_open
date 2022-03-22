@@ -28,6 +28,10 @@ public:
     void setSubject(const QnResourceAccessSubject& subject);
 
 protected:
+    virtual std::optional<Qt::CheckState> itemCheckState(
+        const QStyleOptionViewItem& option,
+        const QModelIndex& index) const override;
+
     virtual int decoratorWidth(const QModelIndex& index) const override;
 
 private:
