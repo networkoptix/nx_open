@@ -6,6 +6,8 @@ import Nx 1.0
 import Nx.Controls 1.0
 import Nx.Items 1.0
 
+import nx.vms.client.desktop 1.0
+
 import "../../../RightPanel/private"
 
 Rectangle
@@ -17,6 +19,8 @@ Rectangle
 
     property alias nextEnabled: intervalPreviewControls.nextEnabled
     property alias prevEnabled: intervalPreviewControls.prevEnabled
+
+    property int loadingIndicatorTimeoutMs: 5000
 
     signal prevClicked()
     signal nextClicked()
@@ -85,52 +89,69 @@ Rectangle
             Rectangle
             {
                 id: previewUnavailablePlaceholder
+
                 anchors.fill: parent
                 color: ColorTheme.colors.dark3
                 radius: 1
 
+                NxDotPreloader
+                {
+                    id: preloader
+
+                    anchors.centerIn: parent
+                    color: ColorTheme.colors.dark11
+
+                    opacity: running ? 1.0 : 0.0
+                    Behavior on opacity { NumberAnimation { duration: 200 }}
+                }
+
                 Text
                 {
+                    id: previewUnavailableText
+
                     anchors.centerIn: parent
+                    width: Math.min(parent.width, 130)
 
                     color: ColorTheme.colors.dark11
                     font: Qt.font({pixelSize: 12, weight: Font.Normal})
 
-                    text: qsTr("preview is not available for the selected object")
+                    text: qsTr("Preview is not available for the selected object")
                     horizontalAlignment: Text.AlignHCenter
                     wrapMode: Text.Wrap
-                    width: Math.min(parent.width, 130)
-                }
 
-                // Avoid blinking the "preview is not available..." text when switching tiles
-                // because preview is not ready for a short period of time.
-                // Show the text after a small delay when preview is not available, but instantly
-                // hide it when preview becomes available.
-                Timer
-                {
-                    id: previewUnavailableShowTimer
-                    interval: 100
-                    repeat: false
-                    onTriggered: previewUnavailablePlaceholder.visible = true
-                }
+                    opacity: preloader.running ? 0.0 : 1.0
+                    visible: !preloader.running
 
-                Connections
-                {
-                    target: intervalPreview
-                    function onIsReadyChanged()
+                    Behavior on opacity { NumberAnimation { duration: 100 }}
+
+                    Timer
                     {
-                        if (intervalPreview.isReady)
-                        {
-                            previewUnavailableShowTimer.stop()
-                            previewUnavailablePlaceholder.visible = false
-                        }
-                        else
-                        {
-                            previewUnavailableShowTimer.start()
-                        }
+                        interval: previewPanel.loadingIndicatorTimeoutMs
+                        running: preloader.running
+                        repeat: false
+
+                        onTriggered:
+                            preloader.running = false
                     }
                 }
+
+                function updateState()
+                {
+                    const loadingOrMissing = previewPanel.selectedItem
+                        && intervalPreview.previewState !== RightPanel.PreviewState.ready
+
+                    preloader.running = loadingOrMissing
+                        && intervalPreview.previewState !== RightPanel.PreviewState.missing
+
+                    visible = loadingOrMissing
+                }
             }
+
+            onResourceIdChanged:
+                previewUnavailablePlaceholder.updateState()
+
+            onPreviewStateChanged:
+                previewUnavailablePlaceholder.updateState()
         }
 
         IntervalPreviewControls
