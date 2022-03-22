@@ -176,24 +176,35 @@ function getValues(rootItem)
     return result
 }
 
+function setValue(item, value)
+{
+    if (item.setValue !== undefined)
+        item.setValue(value)
+    else if (item.hasOwnProperty("value"))
+        item.value = value
+}
+
+function resetValue(item)
+{
+    if (item.resetValue !== undefined)
+        item.resetValue()
+    else
+        setValue(item, item.hasOwnProperty("defaultValue") ? item.defaultValue : null)
+}
+
 function setValues(rootItem, values)
 {
     _processItemsRecursively(rootItem,
         function(item)
         {
             if (values.hasOwnProperty(item.name))
-            {
-                if (item.setValue !== undefined)
-                    item.setValue(values[item.name])
-                else if (item.hasOwnProperty("value"))
-                    item.value = values[item.name]
-            }
+                setValue(item, values[item.name])
             else
-            {
-                if (item.resetValue !== undefined)
-                    item.resetValue()
-                else if (item.hasOwnProperty("value") && item.hasOwnProperty("defaultValue"))
-                    item.value = item.defaultValue
-            }
+                resetValue(item)
         })
+}
+
+function resetValues(rootItem)
+{
+    _processItemsRecursively(rootItem, resetValue)
 }

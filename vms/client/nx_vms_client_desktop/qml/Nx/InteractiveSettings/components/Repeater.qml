@@ -6,10 +6,12 @@ import Nx.Controls 1.0
 
 import "private"
 import "private/utils.js" as Utils
+import "../settings.js" as Settings
 
 Item
 {
     property string addButtonCaption: ""
+    property string deleteButtonCaption: ""
 
     readonly property Item childrenItem: column
 
@@ -37,21 +39,44 @@ Item
         onChildrenChanged: initialVisibilityUpdateTimer.restart()
     }
 
-    Button
+    Row
     {
-        id: addButton
-
         x: column.labelWidth + 8
         y: column.y + column.height + buttonSpacing
-        text: addButtonCaption || qsTr("Add")
+        spacing: 12
 
-        visible: visibleItemsCount < column.children.length
-        iconUrl: "qrc:///skin/buttons/plus.png"
-
-        onClicked:
+        Button
         {
-            if (visibleItemsCount < column.children.length)
-                ++visibleItemsCount
+            id: addButton
+
+            text: addButtonCaption || qsTr("Add")
+            visible: visibleItemsCount < column.children.length
+            iconUrl: "qrc:///skin/buttons/plus.png"
+
+            onClicked:
+            {
+                if (visibleItemsCount < column.children.length)
+                    ++visibleItemsCount
+            }
+        }
+
+        Button
+        {
+            id: removeButton
+
+            text: deleteButtonCaption || qsTr("Delete")
+            visible: visibleItemsCount > 1
+            iconUrl: "qrc:///skin/buttons/minus.png"
+
+            onClicked:
+            {
+                if (!visibleItemsCount)
+                    return
+
+                --visibleItemsCount
+                let itemToReset = column.children[visibleItemsCount]
+                Settings.resetValues(itemToReset)
+            }
         }
     }
 
