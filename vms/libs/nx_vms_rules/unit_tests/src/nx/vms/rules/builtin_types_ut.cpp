@@ -91,7 +91,6 @@ TEST_F(BuiltinTypesTest, BuiltinEvents)
     testEventFieldRegistration<CustomizableIconField>();
     testEventFieldRegistration<CustomizableTextField>();
     testEventFieldRegistration<EventTextField>();
-    testEventFieldRegistration<ExpectedStringField>();
     testEventFieldRegistration<ExpectedUuidField>();
     testEventFieldRegistration<IntField>();
     testEventFieldRegistration<KeywordsField>();

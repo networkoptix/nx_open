@@ -2,25 +2,19 @@
 
 #pragma once
 
-#include "../event_field.h"
+#include "../simple_type_field.h"
 
 namespace nx::vms::rules {
 
-class NX_VMS_RULES_API ExpectedUuidField: public EventField
+class NX_VMS_RULES_API ExpectedUuidField: public SimpleTypeEventField<QnUuid>
 {
     Q_OBJECT
     Q_CLASSINFO("metatype", "nx.events.fields.expectedUuid")
 
-    Q_PROPERTY(QnUuid expected READ expected WRITE setExpected)
+    Q_PROPERTY(QnUuid value READ value WRITE setValue)
 
 public:
-    virtual bool match(const QVariant& value) const override;
-
-    QnUuid expected() const;
-    void setExpected(const QnUuid& value);
-
-private:
-    QnUuid m_expected;
+    ExpectedUuidField() = default;
 };
 
 } // namespace nx::vms::rules
