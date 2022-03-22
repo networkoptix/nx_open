@@ -83,8 +83,8 @@ QnCameraDeviceStringSet::QnCameraDeviceStringSet(
     setString(Camera, false, cameraString);
 
     // I/O Module string can be absent in cases where we are selecting default names.
-    setString(IOModule, true, ioModuleString.isEmpty() ? "<invalid>" : ioModuleString);
-    setString(IOModule, false, ioModuleString.isEmpty() ? "<invalid>" : ioModuleString);
+    setString(IOModule, true, ioModuleString.isEmpty() ? mixedString : ioModuleString);
+    setString(IOModule, false, ioModuleString.isEmpty() ? mixedString : ioModuleString);
 
     NX_ASSERT(isValid(), "Invalid string set");
 }
