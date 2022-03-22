@@ -9,7 +9,6 @@
 #include <nx/vms/rules/action_fields/password_field.h>
 #include <nx/vms/rules/action_fields/text_field.h>
 #include <nx/vms/rules/event_fields/customizable_text_field.h>
-#include <nx/vms/rules/event_fields/expected_string_field.h>
 #include <nx/vms/rules/event_fields/keywords_field.h>
 #include <nx/vms/rules/event_fields/text_field.h>
 #include <ui/widgets/common/elided_label.h>
@@ -110,7 +109,6 @@ private:
 using ActionTextPicker = OnelineTextPickerWidget<vms::rules::ActionTextField>;
 using CustomizableTextPicker = OnelineTextPickerWidget<vms::rules::CustomizableTextField>;
 using EventTextPicker = OnelineTextPickerWidget<vms::rules::EventTextField>;
-using ExpectedStringPicker = OnelineTextPickerWidget<vms::rules::ExpectedStringField>;
 using KeywordsPicker = OnelineTextPickerWidget<vms::rules::KeywordsField>;
 using PasswordPicker = OnelineTextPickerWidget<vms::rules::PasswordField>;
 
@@ -133,18 +131,6 @@ template<>
 void CustomizableTextPicker::setText(const QString& text)
 {
     field->setText(text);
-}
-
-template<>
-QString ExpectedStringPicker::text() const
-{
-    return field->expected();
-}
-
-template<>
-void ExpectedStringPicker::setText(const QString& text)
-{
-    field->setExpected(text);
 }
 
 template<>

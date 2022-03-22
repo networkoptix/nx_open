@@ -2,11 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/vms/rules/action_fields/flag_field.h>
-#include <nx/vms/rules/action_fields/optional_time_field.h>
-#include <nx/vms/rules/action_fields/target_user_field.h>
-#include <nx/vms/rules/action_fields/text_field.h>
-#include <nx/vms/rules/action_fields/text_with_fields.h>
+#include <nx/vms/rules/action_fields/builtin_fields.h>
 #include <nx/vms/rules/engine.h>
 
 #include "test_event.h"

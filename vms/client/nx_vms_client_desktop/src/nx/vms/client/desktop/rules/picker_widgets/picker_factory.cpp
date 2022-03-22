@@ -2,26 +2,8 @@
 
 #include "picker_factory.h"
 
-#include <nx/vms/rules/action_fields/content_type_field.h>
-#include <nx/vms/rules/action_fields/flag_field.h>
-#include <nx/vms/rules/action_fields/http_method_field.h>
-#include <nx/vms/rules/action_fields/optional_time_field.h>
-#include <nx/vms/rules/action_fields/password_field.h>
-#include <nx/vms/rules/action_fields/substitution.h>
-#include <nx/vms/rules/action_fields/target_user_field.h>
-#include <nx/vms/rules/action_fields/text_field.h>
-#include <nx/vms/rules/action_fields/text_with_fields.h>
-#include <nx/vms/rules/event_fields/analytics_event_type_field.h>
-#include <nx/vms/rules/event_fields/analytics_object_type_field.h>
-#include <nx/vms/rules/event_fields/customizable_icon_field.h>
-#include <nx/vms/rules/event_fields/customizable_text_field.h>
-#include <nx/vms/rules/event_fields/expected_string_field.h>
-#include <nx/vms/rules/event_fields/expected_uuid_field.h>
-#include <nx/vms/rules/event_fields/int_field.h>
-#include <nx/vms/rules/event_fields/keywords_field.h>
-#include <nx/vms/rules/event_fields/source_camera_field.h>
-#include <nx/vms/rules/event_fields/source_server_field.h>
-#include <nx/vms/rules/event_fields/source_user_field.h>
+#include <nx/vms/rules/action_fields/builtin_fields.h>
+#include <nx/vms/rules/event_fields/builtin_fields.h>
 
 #include "blank_picker_widget.h"
 #include "dropdown_text_picker_widget.h"
@@ -44,8 +26,6 @@ PickerWidget* PickerFactory::createWidget(
 
     if (descriptor.id == fieldMetatype<nx::vms::rules::CustomizableTextField>())
         pickerWidget = new CustomizableTextPicker(parent);
-    else if (descriptor.id == fieldMetatype<nx::vms::rules::ExpectedStringField>())
-        pickerWidget = new ExpectedStringPicker(parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::KeywordsField>())
         pickerWidget = new KeywordsPicker(parent);
     else if (descriptor.id == fieldMetatype<nx::vms::rules::ActionTextField>())

@@ -59,7 +59,6 @@ void Initializer::registerFields() const
     registerEventField<CustomizableIconField>();
     registerEventField<CustomizableTextField>();
     registerEventField<EventTextField>();
-    registerEventField<ExpectedStringField>();
     registerEventField<ExpectedUuidField>();
     registerEventField<IntField>();
     registerEventField<KeywordsField>();

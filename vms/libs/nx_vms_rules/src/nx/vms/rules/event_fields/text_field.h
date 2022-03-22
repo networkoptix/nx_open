@@ -6,7 +6,10 @@
 
 namespace nx::vms::rules {
 
-/** Stores simple text string w/o validation, e.g. email or login. */
+/**
+ * Stores simple text string w/o validation, e.g. email or login.
+ * Matches any string if value is empty.
+ */
 class NX_VMS_RULES_API EventTextField: public SimpleTypeEventField<QString>
 {
     Q_OBJECT
@@ -16,6 +19,8 @@ class NX_VMS_RULES_API EventTextField: public SimpleTypeEventField<QString>
 
 public:
     EventTextField() = default;
+
+    bool match(const QVariant& value) const override;
 };
 
 } // namespace nx::vms::rules
