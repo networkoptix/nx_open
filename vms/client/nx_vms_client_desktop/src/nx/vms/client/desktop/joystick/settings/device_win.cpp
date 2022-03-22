@@ -122,7 +122,7 @@ void DeviceWindows::formAxisLimits(int min, int max, Device::AxisLimits* limits)
     limits->max = max;
     limits->mid = (max - min) / 2;
 
-    const double minBounce = (max - min) / 100;
+    const int minBounce = (max - min) / 100.0 * 2; //< Minimum 2% central point bounce.
     if (minBounce > limits->bounce)
         limits->bounce = minBounce;
 }

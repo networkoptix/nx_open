@@ -23,9 +23,6 @@ struct JoystickEvent
     /** Maximum value of axes range. */
     static constexpr short MAX_AXES_VALUE = 32767;
 
-    /** Bounce value for axes. */
-    static constexpr short BOUNCE_AXES_VALUE = 100;
-
     js_event data;
 
     /**
@@ -139,7 +136,7 @@ Device::AxisLimits DeviceLinux::parseAxisLimits(const AxisDescriptor& descriptor
     AxisLimits result;
     result.min = JoystickEvent::MIN_AXES_VALUE;
     result.max = JoystickEvent::MAX_AXES_VALUE;
-    result.bounce = JoystickEvent::BOUNCE_AXES_VALUE;
+    result.bounce = (result.max - result.min) / 100.0 * 2; //< 2% central point bounce.
     result.mid = (result.min + result.max) / 2;
     result.sensitivity = descriptor.sensitivity.toDouble(/*ok*/ nullptr);
     return result;
