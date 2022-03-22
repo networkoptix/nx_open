@@ -1292,8 +1292,14 @@ bool QnRtspClient::readTextResponse(QByteArray& response)
         }
         if (m_responseBuffer[0] == '$') {
             // binary data
-            quint8 tmpData[1024*64];
+            quint8 tmpData[RTSP_BUFFER_LEN];
             int bytesRead = readBinaryResponse(tmpData, sizeof(tmpData)); // skip binary data
+            if (bytesRead < 0)
+            {
+                NX_DEBUG(this, "Failed to read data from socket: %1",
+                    m_tcpSock->getForeignAddress());
+                return false;
+            }
 
             int rtpChannelNum = tmpData[1];
             if (isRtcp(rtpChannelNum))
