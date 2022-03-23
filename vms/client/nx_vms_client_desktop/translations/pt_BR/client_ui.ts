@@ -291,7 +291,7 @@
     <name>BackupSettingsWidget</name>
     <message>
       <source>Server is offline. Backup settings are not available.</source>
-      <translation type="unfinished">Server is offline. Backup settings are not available.</translation>
+      <translation>O servidor está off-line. As configurações de backup não estão disponíveis.</translation>
     </message>
   </context>
   <context>
@@ -322,7 +322,7 @@
     </message>
     <message>
       <source>Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</source>
-      <translation type="unfinished">Backup is stopped due to storage issue. Backup will resume automatically after storage issue is resolved</translation>
+      <translation>O backup foi interrompido devido a um problema de armazenamento. O backup será retomado automaticamente após o problema de armazenamento ser resolvido</translation>
     </message>
   </context>
   <context>
@@ -616,19 +616,19 @@
     </message>
     <message>
       <source>RTP Transport</source>
-      <translation type="unfinished">RTP Transport</translation>
+      <translation>Transporte RTP</translation>
     </message>
     <message>
       <source>Use camera native presets</source>
-      <translation type="unfinished">Use camera native presets</translation>
+      <translation>Use predefinições nativas da câmera</translation>
     </message>
     <message>
       <source>Time Settings</source>
-      <translation type="unfinished">Time Settings</translation>
+      <translation>Configurações de Hora</translation>
     </message>
     <message>
       <source>Keep camera time settings</source>
-      <translation type="unfinished">Keep camera time settings</translation>
+      <translation>Manter as configurações de horário da câmera</translation>
     </message>
   </context>
   <context>
@@ -1496,7 +1496,7 @@
     </message>
     <message>
       <source>Allow digest authentication for imported user</source>
-      <translation type="unfinished">Allow digest authentication for imported user</translation>
+      <translation>Permitir autenticação digest para usuário importado</translation>
     </message>
   </context>
   <context>
@@ -2442,7 +2442,7 @@
     </message>
     <message>
       <source>Manage Users</source>
-      <translation type="unfinished">Manage Users</translation>
+      <translation>Gerenciar usuários</translation>
     </message>
   </context>
   <context>
@@ -2534,7 +2534,7 @@
     </message>
     <message>
       <source>Autodetect built-in and USB webcams</source>
-      <translation type="unfinished">Autodetect built-in and USB webcams</translation>
+      <translation>Detecção automática de webcams integradas e USB</translation>
     </message>
   </context>
   <context>
@@ -3012,7 +3012,7 @@
     </message>
     <message>
       <source>Allow opening web page without SSL certificate checking</source>
-      <translation type="unfinished">Allow opening web page without SSL certificate checking</translation>
+      <translation>Permitir a abertura de página da web sem verificação de certificado SSL</translation>
     </message>
   </context>
   <context>
