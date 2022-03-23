@@ -91,6 +91,8 @@ QnCommonModule::QnCommonModule(
 
     d->router = std::make_unique<QnRouter>(d->moduleDiscoveryManager.get());
 
+    initNetworking(d->router.get(), d->certificateVerifier);
+
     /* Init members. */
     m_startupTime = QDateTime::currentDateTime();
 
@@ -255,6 +257,7 @@ QnAuditManager* QnCommonModule::auditManager() const
 void QnCommonModule::setCertificateVerifier(nx::vms::common::AbstractCertificateVerifier* value)
 {
     d->certificateVerifier = value;
+    initNetworking(d->router.get(), d->certificateVerifier);
 }
 
 nx::vms::common::AbstractCertificateVerifier* QnCommonModule::certificateVerifier() const

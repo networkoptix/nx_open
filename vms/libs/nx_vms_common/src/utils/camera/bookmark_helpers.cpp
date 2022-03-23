@@ -80,7 +80,7 @@ QnCameraBookmark helpers::bookmarkFromAction(
     bookmark.cameraId = camera->getId();
     bookmark.creationTimeStampMs = milliseconds(qnSyncTime->currentMSecsSinceEpoch());
 
-    vms::event::StringsHelper helper(camera->commonModule());
+    vms::event::StringsHelper helper(camera->context());
     bookmark.name = helper.eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl);
     bookmark.description = helper.eventDetails(action->getRuntimeParams(),
         nx::vms::event::AttrSerializePolicy::singleLine).join('\n');

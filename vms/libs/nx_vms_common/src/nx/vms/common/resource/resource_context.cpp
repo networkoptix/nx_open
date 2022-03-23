@@ -2,6 +2,7 @@
 
 #include "resource_context.h"
 
+#include <QtCore/QPointer>
 #include <QtCore/QThreadPool>
 
 #include <api/common_message_processor.h>
@@ -25,6 +26,7 @@
 #include <core/resource_management/status_dictionary.h>
 #include <core/resource_management/user_roles_manager.h>
 #include <licensing/license.h>
+#include <network/router.h>
 #include <nx/analytics/engine_descriptor_manager.h>
 #include <nx/analytics/event_type_descriptor_manager.h>
 #include <nx/analytics/group_descriptor_manager.h>
@@ -32,6 +34,7 @@
 #include <nx/analytics/plugin_descriptor_manager.h>
 #include <nx/analytics/taxonomy/descriptor_container.h>
 #include <nx/analytics/taxonomy/state_watcher.h>
+#include <nx/vms/common/network/abstract_certificate_verifier.h>
 #include <nx/vms/event/rule_manager.h>
 #include <nx/vms/rules/ec2_router.h>
 #include <nx/vms/rules/engine.h>
@@ -72,6 +75,9 @@ struct ResourceContext::Private
     std::unique_ptr<EngineDescriptorManager> analyticsEngineDescriptorManager;
     std::unique_ptr<GroupDescriptorManager> analyticsGroupDescriptorManager;
     std::unique_ptr<ObjectTypeDescriptorManager> analyticsObjectTypeDescriptorManager;
+
+    QPointer<QnRouter> router;
+    QPointer<AbstractCertificateVerifier>  certificateVerifier;
 };
 
 ResourceContext::ResourceContext(
@@ -150,6 +156,14 @@ ResourceContext::~ResourceContext()
     d->resourceAccessProvider->clear();
 }
 
+void ResourceContext::initNetworking(
+    QnRouter* router,
+    AbstractCertificateVerifier* certificateVerifier)
+{
+    d->router = router;
+    d->certificateVerifier = certificateVerifier;
+}
+
 const QnUuid& ResourceContext::peerId() const
 {
     return d->peerId;
@@ -163,6 +177,16 @@ const QnUuid& ResourceContext::sessionId() const
 void ResourceContext::updateRunningInstanceGuid()
 {
     d->sessionId = QnUuid::createUuid();
+}
+
+QnRouter* ResourceContext::router() const
+{
+    return d->router;
+}
+
+AbstractCertificateVerifier* ResourceContext::certificateVerifier() const
+{
+    return d->certificateVerifier;
 }
 
 std::shared_ptr<ec2::AbstractECConnection> ResourceContext::ec2Connection() const

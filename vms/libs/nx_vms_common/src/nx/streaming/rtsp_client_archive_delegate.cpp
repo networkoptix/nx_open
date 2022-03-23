@@ -15,7 +15,6 @@ extern "C"
 
 #include <api/global_settings.h>
 #include <api/network_proxy_factory.h>
-#include <common/common_module.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -30,6 +29,7 @@ extern "C"
 #include <nx/streaming/rtp/rtp.h>
 #include <nx/streaming/rtsp_client.h>
 #include <nx/utils/suppress_exceptions.h>
+#include <nx/vms/common/resource/resource_context.h>
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>

@@ -105,8 +105,8 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
         // Getting an NX_ASSERT here? Did you forget to use QnSharedResourcePointer?
         NX_ASSERT(resource->toSharedPointer());
         NX_ASSERT(!resource->getId().isNull());
-        NX_ASSERT(!resource->resourcePool() || resource->resourcePool() == this);
-        resource->setResourcePool(this);
+        NX_ASSERT(!resource->context() || resource->resourcePool() == this);
+        resource->addToContext(d->context);
         resource->moveToThread(thread());
     }
 

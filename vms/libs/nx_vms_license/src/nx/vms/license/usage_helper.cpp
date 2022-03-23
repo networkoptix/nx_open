@@ -16,13 +16,13 @@
 
 #include <api/global_settings.h>
 #include <api/runtime_info_manager.h>
-#include <common/common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
 #include <core/resource/resource.h>
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/types/connection_types.h>
+#include <nx/vms/common/resource/resource_context.h>
 
 #include "validator.h"
 
@@ -50,31 +50,31 @@ QString joinedString(
 
 namespace nx::vms::license {
 
-const QString LicenseServer::baseUrl(QnCommonModule* commonModule)
+const QString LicenseServer::baseUrl(common::ResourceContext* context)
 {
-    auto result = commonModule->globalSettings()->licenseServerUrl();
+    auto result = context->globalSettings()->licenseServerUrl();
     while (result.endsWith('/'))
         result.chop(1);
     return result + "/nxlicensed";
 }
 
-const nx::utils::Url LicenseServer::indexUrl(QnCommonModule* commonModule)
+const nx::utils::Url LicenseServer::indexUrl(common::ResourceContext* context)
 {
-    return baseUrl(commonModule);
+    return baseUrl(context);
 }
 
-const nx::utils::Url LicenseServer::activateUrl(QnCommonModule* commonModule)
+const nx::utils::Url LicenseServer::activateUrl(common::ResourceContext* context)
 {
-    return baseUrl(commonModule) + "/activate.php";
+    return baseUrl(context) + "/activate.php";
 }
 
-const nx::utils::Url LicenseServer::deactivateUrl(QnCommonModule* commonModule)
+const nx::utils::Url LicenseServer::deactivateUrl(common::ResourceContext* context)
 {
-    return baseUrl(commonModule) + "/api/v1/deactivate/";
+    return baseUrl(context) + "/api/v1/deactivate/";
 }
-const nx::utils::Url LicenseServer::validateUrl(QnCommonModule* commonModule)
+const nx::utils::Url LicenseServer::validateUrl(common::ResourceContext* context)
 {
-    return baseUrl(commonModule) + "/api/v1/validate/";
+    return baseUrl(context) + "/api/v1/validate/";
 }
 
 //#define QN_NO_LICENSE_CHECK
@@ -138,11 +138,11 @@ static std::vector<LicenseCompatibility> compatibleLicenseType =
 /* UsageHelper                                                 */
 /************************************************************************/
 
-UsageWatcher::UsageWatcher(QnCommonModule* commonModule, QObject* parent):
+UsageWatcher::UsageWatcher(common::ResourceContext* context, QObject* parent):
     base_type(parent),
-    QnCommonModuleAware(commonModule)
+    common::ResourceContextAware(context)
 {
-    connect(licensePool(), &QnLicensePool::licensesChanged, this,
+    connect(context->licensePool(), &QnLicensePool::licensesChanged, this,
         &UsageWatcher::licenseUsageChanged);
 
     // Call update if server was added or removed or changed its status.
@@ -154,9 +154,9 @@ UsageWatcher::UsageWatcher(QnCommonModule* commonModule, QObject* parent):
         };
 
     // Ignoring runtimeInfoChanged as hardwareIds must not change in runtime.
-    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded, this,
+    connect(context->runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoAdded, this,
         updateIfServerStatusChanged);
-    connect(runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved, this,
+    connect(context->runtimeInfoManager(), &QnRuntimeInfoManager::runtimeInfoRemoved, this,
         updateIfServerStatusChanged);
 }
 
@@ -172,11 +172,11 @@ UsageHelper::Cache::Cache()
     boost::fill(total, 0);
 }
 
-UsageHelper::UsageHelper(QnCommonModule* commonModule, QObject* parent):
+UsageHelper::UsageHelper(common::ResourceContext* context, QObject* parent):
     base_type(parent),
-    QnCommonModuleAware(commonModule),
+    common::ResourceContextAware(context),
     m_dirty(true),
-    m_validator(new Validator(commonModule))
+    m_validator(new Validator(context))
 {
     connect(&m_invalidateTimer, &QTimer::timeout, this, &UsageHelper::invalidate);
     m_invalidateTimer.start(kLicenseRefreshInterval);
@@ -267,7 +267,7 @@ void UsageHelper::updateCache() const
     /* Need to set flag right here as virtual methods may call various cache-dependent getters. */
     m_dirty = false;
 
-    m_cache.licenses.update(licensePool()->getLicenses());
+    m_cache.licenses.update(m_context->licensePool()->getLicenses());
 
     /* How many licenses of each type are borrowed. */
     licensesArray borrowedLicenses;
@@ -368,19 +368,19 @@ QList<Qn::LicenseType> UsageHelper::licenseTypes() const
 /* CamLicenseUsageWatcher                                             */
 /************************************************************************/
 
-CamLicenseUsageWatcher::CamLicenseUsageWatcher(QnCommonModule* commonModule, QObject* parent):
-    CamLicenseUsageWatcher(QnVirtualCameraResourcePtr(), commonModule, parent)
+CamLicenseUsageWatcher::CamLicenseUsageWatcher(common::ResourceContext* context, QObject* parent):
+    CamLicenseUsageWatcher(QnVirtualCameraResourcePtr(), context, parent)
 {
 }
 
 CamLicenseUsageWatcher::CamLicenseUsageWatcher(
     const QnVirtualCameraResourcePtr& camera,
-    QnCommonModule* commonModule,
+    common::ResourceContext* context,
     QObject* parent)
     :
-    base_type(commonModule, parent)
+    base_type(context, parent)
 {
-    const auto& resPool = commonModule->resourcePool();
+    const auto& resPool = context->resourcePool();
 
     /* Listening to all changes that can affect licenses usage. */
     auto connectToCamera =
@@ -436,9 +436,9 @@ CamLicenseUsageWatcher::CamLicenseUsageWatcher(
 /************************************************************************/
 /* CamLicenseUsageHelper                                              */
 /************************************************************************/
-CamLicenseUsageHelper::CamLicenseUsageHelper(QnCommonModule* commonModule, QObject* parent):
-    base_type(commonModule, parent),
-    m_watcher(new CamLicenseUsageWatcher(commonModule, this))
+CamLicenseUsageHelper::CamLicenseUsageHelper(common::ResourceContext* context, QObject* parent):
+    base_type(context, parent),
+    m_watcher(new CamLicenseUsageWatcher(context, this))
 {
     connect(m_watcher, &CamLicenseUsageWatcher::licenseUsageChanged, this,
         [this]()
@@ -451,10 +451,10 @@ CamLicenseUsageHelper::CamLicenseUsageHelper(QnCommonModule* commonModule, QObje
 CamLicenseUsageHelper::CamLicenseUsageHelper(
     const QnVirtualCameraResourceList& proposedCameras,
     bool proposedEnable,
-    QnCommonModule* commonModule,
+    common::ResourceContext* context,
     QObject* parent)
     :
-    CamLicenseUsageHelper(commonModule, parent)
+    CamLicenseUsageHelper(context, parent)
 {
     propose(proposedCameras, proposedEnable);
 }
@@ -462,20 +462,24 @@ CamLicenseUsageHelper::CamLicenseUsageHelper(
 CamLicenseUsageHelper::CamLicenseUsageHelper(
     const QnVirtualCameraResourcePtr& proposedCamera,
     bool proposedEnable,
-    QnCommonModule* commonModule,
+    common::ResourceContext* context,
     QObject* parent)
 :
-    CamLicenseUsageHelper(commonModule, parent)
+    CamLicenseUsageHelper(context, parent)
 {
     propose(proposedCamera, proposedEnable);
 }
 
-void CamLicenseUsageHelper::propose(const QnVirtualCameraResourcePtr& proposedCamera, bool proposedEnable)
+void CamLicenseUsageHelper::propose(
+    const QnVirtualCameraResourcePtr& proposedCamera,
+    bool proposedEnable)
 {
     return propose(QnVirtualCameraResourceList() << proposedCamera, proposedEnable);
 }
 
-void CamLicenseUsageHelper::propose(const QnVirtualCameraResourceList& proposedCameras, bool proposedEnable)
+void CamLicenseUsageHelper::propose(
+    const QnVirtualCameraResourceList& proposedCameras,
+    bool proposedEnable)
 {
     const auto& proposedCamerasSet = QSet(proposedCameras.begin(), proposedCameras.end());
     if (proposedEnable)
@@ -569,7 +573,7 @@ void CamLicenseUsageHelper::calculateUsedLicenses(
 {
     boost::fill(basicUsedLicenses, 0);
     boost::fill(proposedToUse, 0);
-    const auto& resPool = commonModule()->resourcePool();
+    const auto& resPool = m_context->resourcePool();
 
     auto groupId = [](const QnSecurityCamResourcePtr& camera)
     {
@@ -615,7 +619,7 @@ SingleCamLicenseStatusHelper::SingleCamLicenseStatusHelper(
     if (!camera)
         return;
 
-    m_helper.reset(new CamLicenseUsageHelper(camera, true, camera->commonModule()));
+    m_helper.reset(new CamLicenseUsageHelper(camera, true, camera->context()));
     connect(m_helper, &CamLicenseUsageHelper::licenseUsageChanged,
         this, &SingleCamLicenseStatusHelper::licenseStatusChanged);
 }
@@ -645,10 +649,10 @@ UsageStatus SingleCamLicenseStatusHelper::status() const
 /* VideoWallLicenseUsageWatcher                                       */
 /************************************************************************/
 VideoWallLicenseUsageWatcher::VideoWallLicenseUsageWatcher(
-    QnCommonModule* commonModule,
+    common::ResourceContext* context,
     QObject* parent)
     :
-    base_type(commonModule, parent)
+    base_type(context, parent)
 {
     auto connectTo =
         [this](const QnVideoWallResourcePtr& videowall)
@@ -683,7 +687,7 @@ VideoWallLicenseUsageWatcher::VideoWallLicenseUsageWatcher(
             }
         };
 
-    const auto& resPool = commonModule->resourcePool();
+    const auto& resPool = context->resourcePool();
 
     connect(resPool, &QnResourcePool::resourceAdded, this, resourceAdded);
     connect(resPool, &QnResourcePool::resourceRemoved, this, resourceRemoved);
@@ -695,12 +699,12 @@ VideoWallLicenseUsageWatcher::VideoWallLicenseUsageWatcher(
 /* VideoWallLicenseUsageHelper                                        */
 /************************************************************************/
 VideoWallLicenseUsageHelper::VideoWallLicenseUsageHelper(
-    QnCommonModule* commonModule,
+    common::ResourceContext* context,
     QObject* parent)
     :
-    base_type(commonModule, parent)
+    base_type(context, parent)
 {
-    auto usageWatcher = new VideoWallLicenseUsageWatcher(commonModule, this);
+    auto usageWatcher = new VideoWallLicenseUsageWatcher(context, this);
     connect(usageWatcher, &VideoWallLicenseUsageWatcher::licenseUsageChanged, this,
         &UsageHelper::invalidate);
 }
@@ -719,7 +723,7 @@ void VideoWallLicenseUsageHelper::calculateUsedLicenses(licensesArray& basicUsed
     int usedScreens = 0;
 
     // Calculating total screens.
-    for (const auto& videowall: commonModule()->resourcePool()->getResources<QnVideoWallResource>())
+    for (const auto& videowall: m_context->resourcePool()->getResources<QnVideoWallResource>())
         usedScreens += videowall->items()->getItems().size();
 
     basicUsedLicenses[Qn::LC_VideoWall] =
@@ -742,6 +746,7 @@ int VideoWallLicenseUsageHelper::licensesForScreens(int screens)
 /* VideoWallLicenseUsageProposer                                      */
 /************************************************************************/
 VideoWallLicenseUsageProposer::VideoWallLicenseUsageProposer(
+    common::ResourceContext* context,
     VideoWallLicenseUsageHelper* helper,
     int screenCount)
     :
@@ -752,7 +757,7 @@ VideoWallLicenseUsageProposer::VideoWallLicenseUsageProposer(
         return;
 
     int totalScreens = 0;
-    const auto& resPool = helper->commonModule()->resourcePool();
+    const auto& resPool = context->resourcePool();
 
     // Calculate total screens used.
     for (const auto& videowall: resPool->getResources<QnVideoWallResource>())

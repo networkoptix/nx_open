@@ -264,7 +264,9 @@ void LocalResourceProducer::createLocalResources(const QStringList& pathList)
             resource->setIdUnsafe(QnUuid::fromArbitraryData(resourcePath));
         }
 
-        newResources.append(resource);
+        // Some resources can already be added to the Resource Pool.
+        if (!resource->context())
+            newResources.append(resource);
     }
     if (QThread::currentThread()->isInterruptionRequested())
         return;

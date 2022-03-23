@@ -73,7 +73,7 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(
     if (!context)
         return QNetworkProxy(QNetworkProxy::NoProxy);
 
-    auto router = resource->commonModule()->router();
+    auto router = context->router();
     if (!NX_ASSERT(router))
         return QNetworkProxy(QNetworkProxy::NoProxy);
 

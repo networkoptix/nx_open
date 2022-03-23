@@ -78,9 +78,6 @@ private:
     struct Private;
     QScopedPointer<Private> d;
 
-    /** Copy of the provided layout. */
-    QnLayoutResourcePtr m_layout;
-
     /** Stage field, used to show correct progress in multi-video layout. */
     int m_offset = -1;
 

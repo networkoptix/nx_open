@@ -616,7 +616,7 @@ protected slots:
 
 
 protected:
-    virtual void setCommonModule(QnCommonModule* commonModule) override;
+    virtual void setContext(nx::vms::common::ResourceContext* context) override;
 
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
 

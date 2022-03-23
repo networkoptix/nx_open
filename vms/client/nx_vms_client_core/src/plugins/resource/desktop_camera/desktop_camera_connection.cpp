@@ -111,7 +111,7 @@ QnDesktopCameraConnectionProcessor::QnDesktopCameraConnectionProcessor(
     :
     QnTCPConnectionProcessor(new Private(),
         std::move(socket),
-        desktop->commonModule()),
+        qnClientCoreModule->commonModule()),
     d(dynamic_cast<Private*>(d_ptr))
 {
     NX_CRITICAL(d);

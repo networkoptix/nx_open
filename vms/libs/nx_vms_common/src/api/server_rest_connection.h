@@ -46,9 +46,12 @@
 
 #include "server_rest_connection_fwd.h"
 
-class QnCommonModule;
+namespace nx::vms::common {
 
-namespace nx::vms::common { class AbstractCertificateVerifier; }
+class AbstractCertificateVerifier;
+class ResourceContext;
+
+} // namespace nx::vms::common
 
 namespace rest {
 
@@ -114,11 +117,11 @@ public:
     /**
      * Used to send REST requests to the mediaserver. It uses ec2Connection and MediaServerResource
      * to get authentication data.
-     * @param commonModule ServerConnection takes a lot of objects from it.
+     * @param resourceContext ServerConnection takes a lot of objects from it.
      * @param serverId resource Id of the mediaserver.
      */
     ServerConnection(
-        QnCommonModule* commonModule,
+        nx::vms::common::ResourceContext* resourceContext,
         const QnUuid& serverId);
 
     /**

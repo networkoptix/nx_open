@@ -3,7 +3,6 @@
 #include "strings_helper.h"
 
 #include <analytics/common/object_metadata.h>
-#include <common/common_module.h>
 #include <core/resource/camera_history.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/device_dependent_strings.h>
@@ -28,6 +27,7 @@
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/common/html/html.h>
+#include <nx/vms/common/resource/resource_context.h>
 #include <nx/vms/event/aggregation_info.h>
 #include <nx/vms/event/events/events.h>
 #include <nx/vms/event/rule.h>
@@ -92,9 +92,9 @@ QStringList serializeAttributesMultiline(
     return result;
 }
 
-StringsHelper::StringsHelper(QnCommonModule* commonModule):
+StringsHelper::StringsHelper(common::ResourceContext* context):
     QObject(),
-    QnCommonModuleAware(commonModule)
+    common::ResourceContextAware(context)
 {
 }
 
@@ -124,13 +124,13 @@ QString StringsHelper::actionName(ActionType value) const
 
         case ActionType::cameraOutputAction:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
-                resourcePool(),
+                m_context->resourcePool(),
                 tr("Device output"),
                 tr("Camera output"));
 
         case ActionType::cameraRecordingAction:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
-                resourcePool(),
+                m_context->resourcePool(),
                 tr("Device recording"),
                 tr("Camera recording"));
         default:
@@ -175,25 +175,25 @@ QString StringsHelper::eventName(EventType value, int count) const
 
         case EventType::cameraInputEvent:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
-                resourcePool(),
+                m_context->resourcePool(),
                     tr("Input Signal on Devices", "", count),
                     tr("Input Signal on Cameras", "", count));
 
         case EventType::cameraDisconnectEvent:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
-                resourcePool(),
+                m_context->resourcePool(),
                 tr("Devices Disconnected", "", count),
                 tr("Cameras Disconnected", "", count));
 
         case EventType::cameraIpConflictEvent:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
-                resourcePool(),
+                m_context->resourcePool(),
                 tr("Devices IP Conflict", "", count),
                 tr("Cameras IP Conflict", "", count));
 
         case EventType::anyCameraEvent:
             return QnDeviceDependentStrings::getDefaultNameFromSet(
-                resourcePool(),
+                m_context->resourcePool(),
                 tr("Any Device Issue"),
                 tr("Any Camera Issue"));
 
@@ -215,7 +215,7 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
             return tr("Undefined event has occurred on %1").arg(resourceName);
 
         case EventType::cameraDisconnectEvent:
-            return QnDeviceDependentStrings::getNameFromSet(resourcePool(),
+            return QnDeviceDependentStrings::getNameFromSet(m_context->resourcePool(),
                 QnCameraDeviceStringSet(
                     tr("Device %1 was disconnected"),
                     tr("Camera %1 was disconnected"),
@@ -237,7 +237,7 @@ QString StringsHelper::eventAtResource(const EventParameters& params,
             return tr("Server \"%1\" Failure").arg(resourceName);
 
         case EventType::cameraIpConflictEvent:
-            return QnDeviceDependentStrings::getDefaultNameFromSet(resourcePool(),
+            return QnDeviceDependentStrings::getDefaultNameFromSet(m_context->resourcePool(),
                 tr("Device IP Conflict at %1", "Device IP Conflict at <server_name>"),
                 tr("Camera IP Conflict at %1", "Camera IP Conflict at <server_name>"))
                 .arg(resourceName);
@@ -355,7 +355,7 @@ QStringList StringsHelper::eventDescription(const AbstractActionPtr& action,
 
     if (!params.analyticsEngineId.isNull())
     {
-        const auto descriptor = commonModule()->analyticsEngineDescriptorManager()->descriptor(
+        const auto descriptor = m_context->analyticsEngineDescriptorManager()->descriptor(
             params.analyticsEngineId);
 
         if (descriptor)
@@ -559,7 +559,7 @@ QnResourcePtr StringsHelper::eventSource(const EventParameters &params) const
 {
     QnUuid id = params.eventResourceId;
     return !id.isNull()
-        ? resourcePool()->getResourceById(id)
+        ? m_context->resourcePool()->getResourceById(id)
         : QnResourcePtr();
 }
 
@@ -708,14 +708,18 @@ QString StringsHelper::eventReason(const EventParameters& params) const
             QnVirtualCameraResourceList disabledCameras;
             for (const auto& id: reasonParamsEncoded.split(';'))
             {
-                if (const auto& camera = resourcePool()->getResourceById<QnVirtualCameraResource>(QnUuid(id)))
+                if (const auto& camera =
+                        m_context->resourcePool()->getResourceById<QnVirtualCameraResource>(
+                            QnUuid(id)))
+                {
                     disabledCameras << camera;
+                }
             }
 
             NX_ASSERT(!disabledCameras.isEmpty(), "At least one camera should be disabled on this event");
 
             result = QnDeviceDependentStrings::getNameFromSet(
-                resourcePool(),
+                m_context->resourcePool(),
                 QnCameraDeviceStringSet(
                     tr("Not enough licenses. Recording has been disabled on following devices:"),
                     tr("Not enough licenses. Recording has been disabled on following cameras:"),
@@ -769,7 +773,8 @@ QString StringsHelper::urlForCamera(
     }
     else //< Server-side method to form links in emails.
     {
-        const auto camera = resourcePool()->getResourceById<QnVirtualCameraResource>(id);
+        const auto camera =
+            m_context->resourcePool()->getResourceById<QnVirtualCameraResource>(id);
         if (!camera)
             return QString();
 
@@ -777,7 +782,8 @@ QString StringsHelper::urlForCamera(
         if (!server)
             return QString();
 
-        auto newServer = cameraHistoryPool()->getMediaServerOnTime(camera, timestamp.count());
+        auto newServer =
+            m_context->cameraHistoryPool()->getMediaServerOnTime(camera, timestamp.count());
         if (newServer)
             server = newServer;
 
@@ -913,9 +919,16 @@ QString StringsHelper::actionSubjects(const RulePtr& rule, bool showName) const
     QList<QnUuid> roles;
 
     if (requiresUserResource(rule->actionType()))
-        userRolesManager()->usersAndRoles(rule->actionResources(), users, roles);
+    {
+        m_context->userRolesManager()->usersAndRoles(rule->actionResources(), users, roles);
+    }
     else
-        userRolesManager()->usersAndRoles(rule->actionParams().additionalResources, users, roles);
+    {
+        m_context->userRolesManager()->usersAndRoles(
+            rule->actionParams().additionalResources,
+            users,
+            roles);
+    }
 
     users = users.filtered([](const QnUserResourcePtr& user) { return user->isEnabled(); });
     return actionSubjects(users, roles, showName);
@@ -939,7 +952,7 @@ QString StringsHelper::actionSubjects(
             return lit("%1 %2 %3")
                 .arg(tr("Role"))
                 .arg(QChar(L'\x2013')) //< En-dash.
-                .arg(userRolesManager()->userRoleName(roles.front()));
+                .arg(m_context->userRolesManager()->userRoleName(roles.front()));
         }
     }
 
@@ -1048,7 +1061,7 @@ QString StringsHelper::notificationCaption(
                 : parameters.caption;
 
         case EventType::cameraDisconnectEvent:
-            return QnDeviceDependentStrings::getNameFromSet(resourcePool(),
+            return QnDeviceDependentStrings::getNameFromSet(m_context->resourcePool(),
                 QnCameraDeviceStringSet(
                     tr("Device was disconnected"),
                     tr("Camera was disconnected"),

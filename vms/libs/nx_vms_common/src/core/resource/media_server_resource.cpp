@@ -280,7 +280,7 @@ rest::ServerConnectionPtr QnMediaServerResource::restConnection()
 
     if (!m_restConnection)
         m_restConnection = rest::ServerConnectionPtr(new rest::ServerConnection(
-            commonModule(),
+            context(),
             getId()));
 
     return m_restConnection;
@@ -587,14 +587,6 @@ void QnMediaServerResource::setOsInfo(const utils::OsInfo& osInfo)
 
 nx::vms::api::ModuleInformation QnMediaServerResource::getModuleInformation() const
 {
-    if (auto context = this->context())
-    {
-        if (getId() == context->peerId())
-            return commonModule()->moduleInformation();
-    }
-
-    // build module information for other server
-
     nx::vms::api::ModuleInformation moduleInformation;
     moduleInformation.type = nx::vms::api::ModuleInformation::mediaServerId();
     moduleInformation.customization = nx::branding::customization();
@@ -605,9 +597,9 @@ nx::vms::api::ModuleInformation QnMediaServerResource::getModuleInformation() co
     if (moduleInformation.protoVersion == 0)
         moduleInformation.protoVersion = nx::vms::api::protocolVersion();
 
-    if (auto module = context())
+    if (auto context = this->context())
     {
-        const auto& settings = module->globalSettings();
+        const auto& settings = context->globalSettings();
         moduleInformation.localSystemId = settings->localSystemId();
         moduleInformation.systemName = settings->systemName();
         moduleInformation.cloudSystemId = settings->cloudSystemId();
@@ -769,7 +761,7 @@ QString QnMediaServerResource::realm() const
     return nx::network::AppInfo::realm().c_str();
 }
 
-void QnMediaServerResource::setCommonModule(QnCommonModule* commonModule)
+void QnMediaServerResource::setContext(nx::vms::common::ResourceContext* context)
 {
     if (auto ctx = this->context())
     {
@@ -777,7 +769,7 @@ void QnMediaServerResource::setCommonModule(QnCommonModule* commonModule)
         ctx->globalSettings()->disconnect(this);
     }
 
-    base_type::setCommonModule(commonModule);
+    base_type::setContext(context);
 
     if (auto ctx = this->context())
     {

@@ -5,9 +5,6 @@
 #include <nx/vms/license/license_usage_fwd.h>
 #include <common/common_globals.h>
 
-
-class QnCommonModule;
-
 namespace nx::vms::license {
 
 class ListHelper
