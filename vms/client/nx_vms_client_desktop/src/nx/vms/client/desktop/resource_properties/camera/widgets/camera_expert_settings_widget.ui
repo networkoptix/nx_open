@@ -475,12 +475,16 @@
                     <number>1</number>
                    </property>
                    <item>
+                    <widget class="QRadioButton" name="prefferedPtzPresetTypeAutoRadioButton">
+                     <property name="text">
+                      <string>Auto</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
                     <widget class="QRadioButton" name="prefferedPtzPresetTypeSystemRadioButton">
                      <property name="text">
                       <string>Use system presets</string>
-                     </property>
-                     <property name="autoExclusive">
-                      <bool>false</bool>
                      </property>
                     </widget>
                    </item>
@@ -488,9 +492,6 @@
                     <widget class="QRadioButton" name="prefferedPtzPresetTypeNativeRadioButton">
                      <property name="text">
                       <string>Use camera native presets</string>
-                     </property>
-                     <property name="autoExclusive">
-                      <bool>false</bool>
                      </property>
                     </widget>
                    </item>

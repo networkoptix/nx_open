@@ -1646,7 +1646,9 @@ nx::core::ptz::PresetType QnSecurityCamResource::userPreferredPtzPresetType() co
 void QnSecurityCamResource::setUserPreferredPtzPresetType(nx::core::ptz::PresetType presetType)
 {
     setProperty(ResourcePropertyKey::kUserPreferredPtzPresetType,
-        QString::fromStdString(nx::reflect::toString(presetType)));
+        presetType == nx::core::ptz::PresetType::undefined
+            ? QString()
+            : QString::fromStdString(nx::reflect::toString(presetType)));
 }
 
 nx::core::ptz::PresetType QnSecurityCamResource::defaultPreferredPtzPresetType() const
