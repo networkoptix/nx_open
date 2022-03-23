@@ -3,6 +3,7 @@
 #include "utils.h"
 
 #include <QtWidgets/QAction>
+#include <QtWidgets/QApplication>
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QGraphicsObject>
@@ -14,6 +15,32 @@
 #include "model_index_wrapper.h"
 
 namespace nx::vms::client::desktop::testkit::utils {
+
+std::pair<QMenu*, QRect> findActionGeometry(QAction* action)
+{
+    // Try to use direct parent, maybe it's a QMenu and we can get the action geometry.
+    auto menu = qobject_cast<QMenu*>(action->parentWidget());
+    QRect rect;
+    if (menu && menu->isVisible())
+        rect = menu->actionGeometry(action);
+
+    if (rect.isValid())
+        return {menu, rect};
+
+    // Try to find top level QMenu which provides valid geometry for the action.
+    const auto topLevelWidgets = qApp->topLevelWidgets();
+    for (auto widget: topLevelWidgets)
+    {
+        menu = qobject_cast<QMenu*>(widget);
+        if (!menu || !menu->isVisible())
+            continue;
+        rect = menu->actionGeometry(action);
+        if (rect.isValid())
+            return {menu, rect};
+    }
+
+    return {nullptr, {}};
+}
 
 QRect globalRect(QVariant object, QWindow** window)
 {
@@ -39,12 +66,14 @@ QRect globalRect(QVariant object, QWindow** window)
     }
     else if (const auto action = qobject_cast<QAction*>(qobj))
     {
-        if (auto menu = qobject_cast<QMenu*>(action->parentWidget()))
-        {
-            const auto r = menu->actionGeometry(action);
-            *window = menu->window()->windowHandle();
-            return QRect(menu->mapToGlobal(r.topLeft()), menu->mapToGlobal(r.bottomRight()));
-        }
+        auto [menu, rect] = findActionGeometry(action);
+        if (!menu)
+            return {};
+
+        *window = menu->window()->windowHandle();
+        return QRect(
+            menu->mapToGlobal(rect.topLeft()),
+            menu->mapToGlobal(rect.bottomRight()));
     }
     else if (const auto go = qobject_cast<const QGraphicsObject*>(qobj))
     {
