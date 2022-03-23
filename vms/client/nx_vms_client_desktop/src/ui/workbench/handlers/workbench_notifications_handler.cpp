@@ -23,6 +23,7 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
+#include <nx/reflect/json.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/network/remote_connection.h>
 #include <nx/vms/client/core/network/remote_session.h>
@@ -55,6 +56,25 @@ using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 using namespace nx::vms::event;
 
+namespace {
+
+QString toString(vms::event::AbstractActionPtr action)
+{
+    return nx::format(
+        "{actionType: %1, toggleState: %2, receivedFromRemoteHost: %3, resources: %4, params: %5, "
+            "runtimeParams: %6, ruleId: %7, aggregationCount: %8}",
+        action->actionType(),
+        action->getToggleState(),
+        action->isReceivedFromRemoteHost(),
+        action->getResources(),
+        nx::reflect::json::serialize(action->getParams()),
+        nx::reflect::json::serialize(action->getRuntimeParams()),
+        action->getRuleId().toSimpleString(),
+        action->getAggregationCount());
+}
+
+} // namespace
+
 QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent):
     base_type(parent),
     QnSessionAwareDelegate(parent),
@@ -74,6 +94,20 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
 
     connect(action(action::AcknowledgeEventAction), &QAction::triggered,
         this, &QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction);
+
+    connect(this, &QnWorkbenchNotificationsHandler::notificationAdded,
+        this,
+        [this](const nx::vms::event::AbstractActionPtr& action)
+        {
+            NX_VERBOSE(this, "A notification is added: %1", toString(action));
+        });
+
+    connect(this, &QnWorkbenchNotificationsHandler::notificationRemoved,
+        this,
+        [this](const nx::vms::event::AbstractActionPtr& action)
+        {
+            NX_VERBOSE(this, "A notification is removed: %1", toString(action));
+        });
 }
 
 QnWorkbenchNotificationsHandler::~QnWorkbenchNotificationsHandler()
@@ -332,6 +366,11 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(
         canShow &= isAllowedByFilter;
     }
 
+    NX_VERBOSE(this,
+        "A system health event is %1: %2",
+        (visible && canShow) ? "added" : "removed",
+        message);
+
     if (visible && canShow)
         emit systemHealthEventAdded(message, params);
     else
@@ -348,11 +387,23 @@ void QnWorkbenchNotificationsHandler::at_context_userChanged()
 void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
     const vms::event::AbstractActionPtr& action)
 {
+    NX_VERBOSE(this, "An action is received: %1", toString(action));
+
     if (!QnBusiness::actionAllowedForUser(action, context()->user()))
+    {
+        NX_VERBOSE(
+            this, "The action is not allowed for the user %1", context()->user()->getName());
+
         return;
+    }
 
     if (!vms::event::hasAccessToSource(action->getRuntimeParams(), context()->user()))
+    {
+        NX_VERBOSE(
+            this, "User %1 has no access to the action's source", context()->user()->getName());
+
         return;
+    }
 
     switch (action->actionType())
     {
