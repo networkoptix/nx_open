@@ -101,7 +101,7 @@ bool CameraSettingsDialogState::analyticsStreamSelectionEnabled(const QnUuid& en
 
 bool CameraSettingsDialogState::canSwitchPtzPresetTypes() const
 {
-    return devicesDescription.canSwitchPtzPresetTypes != CombinedValue::None;
+    return devicesDescription.canSwitchPtzPresetTypes == CombinedValue::All;
 }
 
 bool CameraSettingsDialogState::canForcePanTiltCapabilities() const
