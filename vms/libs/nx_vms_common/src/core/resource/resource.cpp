@@ -277,10 +277,18 @@ nx::vms::api::ResourceStatus QnResource::getPreviousStatus() const
 void QnResource::setStatus(ResourceStatus newStatus, Qn::StatusChangeReason reason)
 {
     if (newStatus == ResourceStatus::undefined)
+    {
+        NX_VERBOSE(this, "Won't change status of resource %1 (%2) because it is 'undefined'",
+            getId(), nx::utils::url::hidePassword(getUrl()));
         return;
+    }
 
     if (hasFlags(Qn::removed))
+    {
+        NX_VERBOSE(this, "Won't change status of resource %1 (%2) because it has a 'removed' flag",
+            getId(), nx::utils::url::hidePassword(getUrl()));
         return;
+    }
 
     auto context = systemContext();
     if (!NX_ASSERT(context))
@@ -289,7 +297,11 @@ void QnResource::setStatus(ResourceStatus newStatus, Qn::StatusChangeReason reas
     QnUuid id = getId();
     ResourceStatus oldStatus = context->resourceStatusDictionary()->value(id);
     if (oldStatus == newStatus)
+    {
+        NX_VERBOSE(this, "Won't change status of resource %1 (%2) because status (%3) hasn't changed",
+            getId(), nx::utils::url::hidePassword(getUrl()), newStatus);
         return;
+    }
 
     NX_DEBUG(this,
         "Status changed %1 -> %2, reason=%3, name=[%4], url=[%5]",
