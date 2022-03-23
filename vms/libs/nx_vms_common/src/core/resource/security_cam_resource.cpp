@@ -118,6 +118,11 @@ QnSecurityCamResource::QnSecurityCamResource():
 
             return false;
         }),
+    m_cachedRtspMetadataDisabled(
+        [this]()
+        {
+            return resourceData().value(ResourceDataKey::kDisableRtspMetadataStream, false);
+        }),
     m_cachedLicenseType([this] { return calculateLicenseType(); }),
     m_cachedHasDualStreaming(
         [this]()->bool
@@ -1959,4 +1964,9 @@ void QnSecurityCamResource::setUserAttributesAndNotify(
 
     if (originalAttributes.backupPolicy != attributes.backupPolicy)
         emit backupPolicyChanged(::toSharedPointer(this));
+}
+
+bool QnSecurityCamResource::isRtspMetatadaRequired() const
+{
+    return !m_cachedRtspMetadataDisabled.get();
 }

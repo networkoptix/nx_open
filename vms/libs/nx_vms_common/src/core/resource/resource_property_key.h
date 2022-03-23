@@ -263,6 +263,8 @@ static const QString kOnvifSetDateTimeOffset("onvifSetDateTimeOffset");
 
 static const QString kAnalogEncoder("analogEncoder");
 
+static const QString kDisableRtspMetadataStream("disableRtspMetadataStream");
+
 } // namespace ResourceDataKey
 
 //-------------------------------------------------------------------------------------------------
