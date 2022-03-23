@@ -5466,7 +5466,7 @@ If you intended to move analytics data to another storage location, please conta
     <name>QnSystemSettingsWidget</name>
     <message>
       <source>Allow System to optimize device settings</source>
-      <translation>デバイス設定の最適化有効</translation>
+      <translation>システムによるデバイス設定の変更を許可する</translation>
     </message>
     <message>
       <source>Allow System to optimize camera settings</source>
