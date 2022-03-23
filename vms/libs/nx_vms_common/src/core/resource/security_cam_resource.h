@@ -564,6 +564,8 @@ public:
     void setUserAttributes(const nx::vms::api::CameraAttributesData& attributes);
     void setUserAttributesAndNotify(const nx::vms::api::CameraAttributesData& attributes);
 
+    bool isRtspMetatadaRequired() const;
+
 public slots:
     virtual void recordingEventAttached();
     virtual void recordingEventDetached();
@@ -640,6 +642,7 @@ private:
     QString m_model;
     QString m_vendor;
     nx::utils::CachedValue<bool> m_cachedAudioRequired;
+    nx::utils::CachedValue<bool> m_cachedRtspMetadataDisabled;
     nx::utils::CachedValue<Qn::LicenseType> m_cachedLicenseType;
     nx::utils::CachedValue<bool> m_cachedHasDualStreaming;
     nx::utils::CachedValue<MotionTypes> m_cachedSupportedMotionTypes;

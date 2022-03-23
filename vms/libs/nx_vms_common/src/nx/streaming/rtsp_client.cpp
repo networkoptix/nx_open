@@ -321,7 +321,6 @@ QnRtspClient::QnRtspClient(
     m_endTime(AV_NOPTS_VALUE),
     m_scale(1.0),
     m_tcpTimeout(10 * 1000),
-    m_isAudioEnabled(true),
     m_userAgent(nx::network::http::userAgentString()),
     m_defaultAuthScheme(nx::network::http::header::AuthScheme::basic)
 {
@@ -771,9 +770,12 @@ bool QnRtspClient::sendSetup()
         const bool isAdditionalSupportedCodec = codecName == METADATA_STR
             || m_additionalSupportedCodecs.find(codecName) != m_additionalSupportedCodecs.cend();
 
+        if (!isMediaTypeEnabled(track.sdpMedia.mediaType))
+            continue;
+
         if (track.sdpMedia.mediaType == Sdp::MediaType::Audio)
         {
-            if (!m_isAudioEnabled || audioNum++ != m_selectedAudioChannel)
+            if (audioNum++ != m_selectedAudioChannel)
                 continue;
         }
         else if (track.sdpMedia.mediaType != Sdp::MediaType::Video && !isAdditionalSupportedCodec)
@@ -1506,14 +1508,17 @@ nx::utils::Url QnRtspClient::getUrl() const
     return m_url;
 }
 
-void QnRtspClient::setAudioEnabled(bool value)
+void QnRtspClient::setMediaTypeEnabled(nx::streaming::Sdp::MediaType mediaType, bool enabled)
 {
-    m_isAudioEnabled = value;
+    if (enabled)
+        m_disabledMediaTypes.erase(mediaType);
+    else
+        m_disabledMediaTypes.insert(mediaType);
 }
 
-bool QnRtspClient::isAudioEnabled() const
+bool QnRtspClient::isMediaTypeEnabled(nx::streaming::Sdp::MediaType mediaType) const
 {
-    return m_isAudioEnabled;
+    return !m_disabledMediaTypes.contains(mediaType);
 }
 
 void QnRtspClient::setProxyAddr(const nx::String& addr, int port)

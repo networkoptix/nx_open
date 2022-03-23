@@ -264,8 +264,9 @@ public:
     QStringList getSdpByType(nx::streaming::Sdp::MediaType mediaType) const;
     int getTrackCount(nx::streaming::Sdp::MediaType mediaType) const;
 
-    void setAudioEnabled(bool value);
-    bool isAudioEnabled() const;
+    // Control what media streams will be opened during setup. All types enabled by default
+    void setMediaTypeEnabled(nx::streaming::Sdp::MediaType mediaType, bool enabled);
+    bool isMediaTypeEnabled(nx::streaming::Sdp::MediaType mediaType) const;
 
     /*
     * Demuxe RTSP binary data
@@ -345,11 +346,12 @@ private:
     qint64 m_endTime;
     float m_scale;
     std::chrono::milliseconds m_tcpTimeout;
-    bool m_isAudioEnabled;
     int m_numOfPredefinedChannels;
     std::chrono::milliseconds m_keepAliveTimeOut{0};
     bool m_playNowMode = false;
     // end of initialized fields
+
+    std::set<nx::streaming::Sdp::MediaType> m_disabledMediaTypes;
 
     quint8* m_responseBuffer;
     int m_responseBufferLen;
