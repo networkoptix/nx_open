@@ -6,6 +6,8 @@
 #include <QtQml/QJSValue>
 
 class QAbstractItemModel;
+class QAction;
+class QMenu;
 class QWindow;
 
 namespace nx::vms::client::desktop::testkit::utils {
@@ -117,5 +119,8 @@ QVariant dumpQObject(const QObject* object, bool withChildren = false);
 
 /** Returns objectName() for QObject or QML id and source location for QQuickItem. */
 std::pair<QString, QString> nameAndBaseUrl(const QObject* object);
+
+/** Returns top level visible QMenu which contains the QAction with valid geometry. */
+std::pair<QMenu*, QRect> findActionGeometry(QAction* action);
 
 } // namespace nx::vms::client::desktop::testkit::utils

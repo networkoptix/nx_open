@@ -64,13 +64,14 @@ void ObjectWrapper::activate()
         QTimer::singleShot(0, m_object,
             [action]() mutable
             {
-                auto menu = qobject_cast<QMenu*>(action->parent());
-                if (menu && menu->isVisible())
+                QWindow* window = nullptr;
+                const QRect rect = utils::globalRect(QVariant::fromValue(action), &window);
+
+                if (rect.isValid() && window)
                 {
-                    auto rect = menu->actionGeometry(action);
                     utils::sendMouse(
-                        menu->window()->windowHandle(),
-                        menu->mapToGlobal(rect.center()),
+                        window,
+                        rect.center(),
                         "click",
                         Qt::LeftButton,
                         Qt::NoModifier,
