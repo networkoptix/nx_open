@@ -6,6 +6,7 @@
 
 #include <keychain.h>
 
+#include <nx/build_info.h>
 #include <nx/utils/log/log.h>
 
 namespace nx::vms::client::core {
@@ -14,6 +15,12 @@ KeychainBackend::KeychainBackend(const QString& serviceName):
     m_serviceName(serviceName)
 {
     NX_INFO(this, "Created. Service name: \"%1\"", serviceName);
+    if (nx::build_info::isLinux())
+    {
+        // If autologin on Ubuntu is configured, keyring should be initialized manually.
+        writeValue("", ""); //< Force user to enter password.
+    }
+
 }
 
 QString KeychainBackend::readValue(const QString& name, bool* success)
