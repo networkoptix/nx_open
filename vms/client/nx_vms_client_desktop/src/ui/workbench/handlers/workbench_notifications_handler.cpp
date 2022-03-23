@@ -6,50 +6,44 @@
 
 #include <QtCore/QtGlobal>
 #include <QtGui/QGuiApplication>
-
 #include <QtWidgets/QAction>
 
 #include <api/global_settings.h>
 #include <business/business_resource_validation.h>
-#include <client/client_settings.h>
+#include <camera/camera_bookmarks_manager.h>
 #include <client/client_globals.h>
 #include <client/client_message_processor.h>
-
+#include <client/client_settings.h>
 #include <common/common_module.h>
-
-#include <core/resource_management/resource_pool.h>
-#include <core/resource_management/user_roles_manager.h>
-#include <core/resource/user_resource.h>
+#include <core/resource/camera_bookmark.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/layout_resource.h>
-#include <core/resource/camera_bookmark.h>
 #include <core/resource/media_server_resource.h>
-
+#include <core/resource/user_resource.h>
+#include <core/resource_management/resource_pool.h>
+#include <core/resource_management/user_roles_manager.h>
+#include <nx/reflect/json.h>
+#include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/client/desktop/ui/actions/action_parameters.h>
-
+#include <nx/vms/client/desktop/utils/server_notification_cache.h>
+#include <nx/vms/event/actions/common_action.h>
+#include <nx/vms/event/strings_helper.h>
+#include <nx_ec/abstract_ec_connection.h>
+#include <nx_ec/data/api_conversion_functions.h>
+#include <nx_ec/managers/abstract_event_rules_manager.h>
+#include <ui/dialogs/camera_bookmark_dialog.h>
 #include <ui/workbench/workbench.h>
+#include <ui/workbench/workbench_access_controller.h>
+#include <ui/workbench/workbench_context.h>
 #include <ui/workbench/workbench_item.h>
 #include <ui/workbench/workbench_layout.h>
 #include <ui/workbench/workbench_navigator.h>
-#include <ui/workbench/workbench_context.h>
-#include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_state_manager.h>
-
-#include <utils/resource_property_adaptors.h>
+#include <utils/camera/bookmark_helpers.h>
 #include <utils/common/synctime.h>
 #include <utils/email/email.h>
 #include <utils/media/audio_player.h>
-#include <utils/camera/bookmark_helpers.h>
-#include <nx/vms/client/desktop/ui/actions/action_manager.h>
-#include <nx/vms/client/desktop/utils/server_notification_cache.h>
-#include <nx/vms/event/strings_helper.h>
-#include <nx/vms/event/actions/common_action.h>
-#include <ui/dialogs/camera_bookmark_dialog.h>
-#include <camera/camera_bookmarks_manager.h>
-
-#include <nx_ec/abstract_ec_connection.h>
-#include <nx_ec/managers/abstract_event_rules_manager.h>
-#include <nx_ec/data/api_conversion_functions.h>
+#include <utils/resource_property_adaptors.h>
 
 using namespace std::chrono;
 
@@ -57,6 +51,25 @@ using namespace nx;
 using namespace nx::vms::client::desktop;
 using namespace nx::vms::client::desktop::ui;
 using namespace nx::vms::event;
+
+namespace {
+
+QString toString(vms::event::AbstractActionPtr action)
+{
+    return nx::format(
+        "{actionType: %1, toggleState: %2, receivedFromRemoteHost: %3, resources: %4, params: %5, "
+            "runtimeParams: %6, ruleId: %7, aggregationCount: %8}",
+        action->actionType(),
+        action->getToggleState(),
+        action->isReceivedFromRemoteHost(),
+        action->getResources(),
+        nx::reflect::json::serialize(action->getParams()),
+        nx::reflect::json::serialize(action->getRuntimeParams()),
+        action->getRuleId().toSimpleString(),
+        action->getAggregationCount());
+}
+
+} // namespace
 
 QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent):
     base_type(parent),
@@ -77,6 +90,20 @@ QnWorkbenchNotificationsHandler::QnWorkbenchNotificationsHandler(QObject *parent
 
     connect(action(action::AcknowledgeEventAction), &QAction::triggered,
         this, &QnWorkbenchNotificationsHandler::handleAcknowledgeEventAction);
+
+    connect(this, &QnWorkbenchNotificationsHandler::notificationAdded,
+        this,
+        [this](const nx::vms::event::AbstractActionPtr& action)
+        {
+            NX_VERBOSE(this, "A notification is added: %1", toString(action));
+        });
+
+    connect(this, &QnWorkbenchNotificationsHandler::notificationRemoved,
+        this,
+        [this](const nx::vms::event::AbstractActionPtr& action)
+        {
+            NX_VERBOSE(this, "A notification is removed: %1", toString(action));
+        });
 }
 
 QnWorkbenchNotificationsHandler::~QnWorkbenchNotificationsHandler()
@@ -335,6 +362,11 @@ void QnWorkbenchNotificationsHandler::setSystemHealthEventVisibleInternal(
         canShow &= isAllowedByFilter;
     }
 
+    NX_VERBOSE(this,
+        "A system health event is %1: %2",
+        (visible && canShow) ? "added" : "removed",
+        message);
+
     if (visible && canShow)
         emit systemHealthEventAdded(message, params);
     else
@@ -351,11 +383,23 @@ void QnWorkbenchNotificationsHandler::at_context_userChanged()
 void QnWorkbenchNotificationsHandler::at_eventManager_actionReceived(
     const vms::event::AbstractActionPtr& action)
 {
+    NX_VERBOSE(this, "An action is received: %1", toString(action));
+
     if (!QnBusiness::actionAllowedForUser(action, context()->user()))
+    {
+        NX_VERBOSE(
+            this, "The action is not allowed for the user %1", context()->user()->getName());
+
         return;
+    }
 
     if (!vms::event::hasAccessToSource(action->getRuntimeParams(), context()->user()))
+    {
+        NX_VERBOSE(
+            this, "User %1 has no access to the action's source", context()->user()->getName());
+
         return;
+    }
 
     switch (action->actionType())
     {
