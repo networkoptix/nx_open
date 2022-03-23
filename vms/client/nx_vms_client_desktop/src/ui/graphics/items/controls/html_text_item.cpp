@@ -170,7 +170,11 @@ void QnHtmlTextItem::setHtml(const QString &html)
 void QnHtmlTextItem::setIcon(const QPixmap& icon)
 {
     Q_D(QnHtmlTextItem);
-    if (d->icon == icon)
+    // No pixmap comparison here for the early return.
+    // Since QPixmap hasn't operator== defined, pixmaps will be implicitely converted to the
+    // QCursor instances to perform comparison. This is not what was expected in general and also
+    // may lead to a lot of warnings reported which even may cause significant performance drop.
+    if (d->icon.isNull() && icon.isNull())
         return;
     d->icon = icon;
     d->updatePixmap();
