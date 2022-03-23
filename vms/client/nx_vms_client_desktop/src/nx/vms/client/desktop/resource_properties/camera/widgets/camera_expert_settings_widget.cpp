@@ -55,11 +55,6 @@ int ptzSensitivityToSliderValue(qreal sensitivity)
     return int(std::round(log10(sensitivity) * kSensitivitySliderResolution));
 }
 
-bool canSwitchPtzPresetTypesAll(const CameraSettingsDialogState& state)
-{
-    return state.devicesDescription.canSwitchPtzPresetTypes == CombinedValue::All;
-}
-
 bool isSystemPtzPreset(const CameraSettingsDialogState& state)
 {
     return state.expert.preferredPtzPresetType.equals(nx::core::ptz::PresetType::system);
@@ -67,13 +62,12 @@ bool isSystemPtzPreset(const CameraSettingsDialogState& state)
 
 bool isNativePtzPreset(const CameraSettingsDialogState& state)
 {
-    return canSwitchPtzPresetTypesAll(state)
-        && state.expert.preferredPtzPresetType.equals(nx::core::ptz::PresetType::native);
+    return state.expert.preferredPtzPresetType.equals(nx::core::ptz::PresetType::native);
 }
 
-bool autoExclusivePtzPresets(const CameraSettingsDialogState& state)
+bool isAutoPtzPreset(const CameraSettingsDialogState& state)
 {
-    return isSystemPtzPreset(state) || isNativePtzPreset(state);
+    return state.expert.preferredPtzPresetType.equals(nx::core::ptz::PresetType::undefined);
 }
 
 } // namespace
@@ -183,6 +177,14 @@ CameraExpertSettingsWidget::CameraExpertSettingsWidget(
         &QPushButton::clicked,
         store,
         [store]() { store->setLogicalId({}); });
+
+    connect(ui->prefferedPtzPresetTypeAutoRadioButton,
+        &QRadioButton::toggled,
+        [store](bool checked)
+        {
+            if (checked)
+                store->setPreferredPtzPresetType(nx::core::ptz::PresetType::undefined);
+        });
 
     connect(ui->prefferedPtzPresetTypeNativeRadioButton,
         &QRadioButton::toggled,
@@ -460,30 +462,31 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
     check_box_utils::setupTristateCheckbox(ui->trustCameraTimeCheckBox, state.expert.trustCameraTime);
     ::setReadOnly(ui->trustCameraTimeCheckBox, state.readOnly);
 
-    // PTZ.
-
-    // Preset types are now displayed only if they are editable.
-    // Greyed out uneditable preset types are no longer displayed.
-
+    // PTZ control block.
     ui->groupBoxPtzControl->setVisible(state.canSwitchPtzPresetTypes()
         || state.canForcePanTiltCapabilities()
         || state.canForceZoomCapability());
 
-    ui->preferredPtzPresetTypeWidget->setVisible(state.canSwitchPtzPresetTypes());
+    { // PTZ Preset type selector.
+        ui->preferredPtzPresetTypeWidget->setVisible(state.canSwitchPtzPresetTypes());
+        const bool ptzPresetTypeSelected = state.expert.preferredPtzPresetType.hasValue();
+        ui->prefferedPtzPresetTypeAutoRadioButton->setAutoExclusive(ptzPresetTypeSelected);
+        ui->prefferedPtzPresetTypeNativeRadioButton->setAutoExclusive(ptzPresetTypeSelected);
+        ui->prefferedPtzPresetTypeSystemRadioButton->setAutoExclusive(ptzPresetTypeSelected);
+        ui->prefferedPtzPresetTypeAutoRadioButton->setChecked(isAutoPtzPreset(state));
+        ui->prefferedPtzPresetTypeNativeRadioButton->setChecked(isNativePtzPreset(state));
+        ui->prefferedPtzPresetTypeSystemRadioButton->setChecked(isSystemPtzPreset(state));
+        ui->presetTypeLimitationsLabel->setVisible(isSystemPtzPreset(state));
+        ::setReadOnly(ui->prefferedPtzPresetTypeSystemRadioButton, state.readOnly);
+        ::setReadOnly(ui->prefferedPtzPresetTypeNativeRadioButton, state.readOnly);
+        ::setReadOnly(ui->prefferedPtzPresetTypeAutoRadioButton, state.readOnly);
+    }
+
     ui->forcedPtzWidget->setVisible(state.canForcePanTiltCapabilities()
         || state.canForceZoomCapability());
 
     ui->forcedPanTiltCheckBox->setVisible(state.canForcePanTiltCapabilities());
     ui->forcedZoomCheckBox->setVisible(state.canForceZoomCapability());
-
-    ui->presetTypeLimitationsLabel->setVisible(state.canSwitchPtzPresetTypes()
-        && isSystemPtzPreset(state));
-
-    ui->prefferedPtzPresetTypeSystemRadioButton->setAutoExclusive(autoExclusivePtzPresets(state));
-    ui->prefferedPtzPresetTypeNativeRadioButton->setAutoExclusive(autoExclusivePtzPresets(state));
-    ui->prefferedPtzPresetTypeSystemRadioButton->setChecked(isSystemPtzPreset(state));
-    ui->prefferedPtzPresetTypeNativeRadioButton->setChecked(isNativePtzPreset(state));
-    ui->prefferedPtzPresetTypeNativeRadioButton->setEnabled(canSwitchPtzPresetTypesAll(state));
 
     if (state.canForcePanTiltCapabilities())
     {
@@ -497,8 +500,6 @@ void CameraExpertSettingsWidget::loadState(const CameraSettingsDialogState& stat
             state.expert.forcedPtzZoomCapability);
     }
 
-    ::setReadOnly(ui->prefferedPtzPresetTypeSystemRadioButton, state.readOnly);
-    ::setReadOnly(ui->prefferedPtzPresetTypeNativeRadioButton, state.readOnly);
     ::setReadOnly(ui->forcedPanTiltCheckBox, state.readOnly);
     ::setReadOnly(ui->forcedZoomCheckBox, state.readOnly);
 
