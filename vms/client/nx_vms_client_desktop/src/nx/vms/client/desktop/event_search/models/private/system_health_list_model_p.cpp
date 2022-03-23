@@ -427,13 +427,21 @@ void SystemHealthListModel::Private::addItem(
 void SystemHealthListModel::Private::doAddItem(
     QnSystemHealth::MessageType message, const QVariant& params, bool initial)
 {
+    NX_VERBOSE(this, "Adding a system health message %1", message);
+
     if (!QnSystemHealth::isMessageVisible(message))
+    {
+        NX_VERBOSE(this, "The message %1 is not visible", message);
         return;
+    }
 
     if (QnSystemHealth::isMessageVisibleInSettings(message))
     {
         if (!qnSettings->popupSystemHealth().contains(message))
+        {
+            NX_VERBOSE(this, "The message %1 is not allowed by the filter", message);
             return; //< Not allowed by filter.
+        }
     }
 
     QnResourcePtr resource;
@@ -474,6 +482,8 @@ void SystemHealthListModel::Private::removeItem(
     QnSystemHealth::MessageType message,
     const QVariant& params)
 {
+    NX_VERBOSE(this, "Removing a system health message %1", toString(message));
+
     QnResourcePtr resource;
     if (params.canConvert<QnResourcePtr>())
         resource = params.value<QnResourcePtr>();
@@ -494,8 +504,7 @@ void SystemHealthListModel::Private::removeItem(
     }
 }
 
-void SystemHealthListModel::Private::toggleItem(
-    QnSystemHealth::MessageType message, bool isOn)
+void SystemHealthListModel::Private::toggleItem(QnSystemHealth::MessageType message, bool isOn)
 {
     if (isOn)
         addItem(message, {});
