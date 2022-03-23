@@ -5,6 +5,7 @@
 #include <QtWidgets/QCheckBox>
 
 #include <client_core/client_core_module.h>
+#include <common/common_module.h>
 #include <core/misc/schedule_task.h>
 #include <core/resource/camera_resource.h>
 #include <nx/vms/client/desktop/resource_dialogs/details/filtered_resource_view_widget.h>

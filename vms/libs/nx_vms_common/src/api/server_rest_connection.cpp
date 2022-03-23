@@ -12,7 +12,6 @@
 #include <api/helpers/thumbnail_request_data.h>
 #include <api/model/cloud_credentials_data.h>
 #include <api/model/update_information_reply.h>
-#include <common/common_module.h>
 #include <common/static_common_module.h>
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
@@ -42,6 +41,7 @@
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
+#include <nx/vms/common/resource/resource_context.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -252,7 +252,7 @@ struct ServerConnection::Private
     nx::network::http::ClientPool httpClientPool;
 
     QnUuid serverId;
-    QPointer<QnCommonModule> commonModule;
+    nx::vms::common::ResourceContext* resourceContext = nullptr;
 
     struct DirectConnect
     {
@@ -267,13 +267,16 @@ struct ServerConnection::Private
 };
 
 ServerConnection::ServerConnection(
-    QnCommonModule* commonModule,
+    nx::vms::common::ResourceContext* resourceContext,
     const QnUuid& serverId)
     :
     QObject(),
     d(new Private())
 {
-    d->commonModule = commonModule;
+    // TODO: #sivanov Raw pointer is unsafe here as ServerConnection instance may be not deleted
+    // after it's owning server (and context) are destroyed. Need to change
+    // QnMediaServerResource::restConnection() method to return weak pointer instead.
+    d->resourceContext = resourceContext;
     d->serverId = serverId;
     d->logTag = nx::utils::log::Tag(
         QStringLiteral("%1 [%2]").arg(nx::toString(this), serverId.toString()));
@@ -286,7 +289,7 @@ ServerConnection::ServerConnection(
     nx::network::SocketAddress address,
     nx::network::http::Credentials credentials)
     :
-    ServerConnection(/*commonModule*/ nullptr, serverId)
+    ServerConnection(/*resourceContext*/ nullptr, serverId)
 {
     d->directConnect = Private::DirectConnect();
     d->directConnect->sessionId = sessionId;
@@ -1867,14 +1870,15 @@ nx::network::http::Credentials getRequestCredentials(
 }
 
 bool setupAuth(
-    QnCommonModule* commonModule, QnUuid serverId,
+    nx::vms::common::ResourceContext* resourceContext,
+    QnUuid serverId,
     nx::network::http::ClientPool::Request& request,
     const QUrl& url)
 {
-    if (!NX_ASSERT(commonModule))
+    if (!NX_ASSERT(resourceContext))
         return false;
 
-    auto resPool = commonModule->resourcePool();
+    auto resPool = resourceContext->resourcePool();
     const auto server = resPool->getResourceById<QnMediaServerResource>(serverId);
     if (!server)
         return false;
@@ -1885,14 +1889,14 @@ bool setupAuth(
 
     // This header is used by the server to identify the client login session for audit.
     request.headers.emplace(
-        Qn::EC2_RUNTIME_GUID_HEADER_NAME, commonModule->sessionId().toByteArray());
+        Qn::EC2_RUNTIME_GUID_HEADER_NAME, resourceContext->sessionId().toByteArray());
 
-    const auto& router = commonModule->router();
-    QnRoute route = router->routeTo(server);
+    auto router = resourceContext->router();
+    QnRoute route = NX_ASSERT(router) ? router->routeTo(server) : QnRoute();
 
     if (route.reverseConnect)
     {
-        auto connection = commonModule->ec2Connection();
+        auto connection = resourceContext->ec2Connection();
         if (!NX_ASSERT(connection))
             return false;
 
@@ -1918,7 +1922,7 @@ bool setupAuth(
     }
 
     // TODO: #sivanov Only client-side connection is actually used.
-    const auto connection = commonModule->ec2Connection();
+    const auto connection = resourceContext->ec2Connection();
     if (!connection)
         return false;
 
@@ -1975,7 +1979,7 @@ nx::network::http::ClientPool::Request ServerConnection::prepareRequest(
             url.path(),
             url.query());
     }
-    else if (!setupAuth(d->commonModule, d->serverId, request, url))
+    else if (!setupAuth(d->resourceContext, d->serverId, request, url))
     {
         return nx::network::http::ClientPool::Request();
     }
@@ -1994,7 +1998,10 @@ Handle ServerConnection::sendRequest(
 {
     auto certificateVerifier = d->directConnect
         ? d->directConnect->certificateVerifier
-        : d->commonModule->certificateVerifier();
+        : d->resourceContext->certificateVerifier();
+    if (!NX_ASSERT(certificateVerifier))
+        return 0;
+
     ContextPtr context(new nx::network::http::ClientPool::Context(d->serverId,
         certificateVerifier->makeAdapterFunc(request.gatewayId.value_or(d->serverId))));
     context->request = request;

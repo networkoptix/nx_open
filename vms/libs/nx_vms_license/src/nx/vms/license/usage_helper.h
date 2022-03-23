@@ -6,23 +6,24 @@
 
 #include <QtCore/QPointer>
 
-#include <common/common_module_aware.h>
 #include <core/resource/resource_fwd.h>
 #include <licensing/license.h>
 #include <nx/utils/url.h>
+#include <nx/vms/common/resource/resource_context_aware.h>
 #include <utils/common/connective.h>
+
 #include "list_helper.h"
 
 namespace nx::vms::license {
 
 struct LicenseServer
 {
-    static const nx::utils::Url indexUrl(QnCommonModule* commonModule);
-    static const nx::utils::Url activateUrl(QnCommonModule* commonModule);
-    static const nx::utils::Url deactivateUrl(QnCommonModule* commonModule);
-    static const nx::utils::Url validateUrl(QnCommonModule* commonModule);
+    static const nx::utils::Url indexUrl(common::ResourceContext* context);
+    static const nx::utils::Url activateUrl(common::ResourceContext* context);
+    static const nx::utils::Url deactivateUrl(common::ResourceContext* context);
+    static const nx::utils::Url validateUrl(common::ResourceContext* context);
 private:
-    static const QString baseUrl(QnCommonModule* commonModule);
+    static const QString baseUrl(common::ResourceContext* context);
 };
 
 struct LicenseCompatibility;
@@ -37,12 +38,12 @@ enum class UsageStatus
 
 class UsageWatcher:
     public Connective<QObject>,
-    public /*mixin*/ QnCommonModuleAware
+    public /*mixin*/ common::ResourceContextAware
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
 public:
-    UsageWatcher(QnCommonModule* commonModule, QObject* parent = nullptr);
+    UsageWatcher(common::ResourceContext* context, QObject* parent = nullptr);
 
 signals:
     void licenseUsageChanged();
@@ -52,12 +53,12 @@ typedef std::array<int, Qn::LC_Count> licensesArray;
 
 class UsageHelper:
     public Connective<QObject>,
-    public /*mixin*/ QnCommonModuleAware
+    public /*mixin*/ common::ResourceContextAware
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
 public:
-    UsageHelper(QnCommonModule* commonModule, QObject* parent = nullptr);
+    UsageHelper(common::ResourceContext* context, QObject* parent = nullptr);
     virtual ~UsageHelper() override;
 
     bool isValid() const;
@@ -157,9 +158,10 @@ class CamLicenseUsageWatcher: public UsageWatcher
     Q_OBJECT
     using base_type = UsageWatcher;
 public:
-    CamLicenseUsageWatcher(QnCommonModule* commonModule, QObject* parent = nullptr);
-    CamLicenseUsageWatcher(const QnVirtualCameraResourcePtr& camera,
-        QnCommonModule* commonModule,
+    CamLicenseUsageWatcher(common::ResourceContext* context, QObject* parent = nullptr);
+    CamLicenseUsageWatcher(
+        const QnVirtualCameraResourcePtr& camera,
+        common::ResourceContext* context,
         QObject* parent = nullptr);
 };
 
@@ -172,18 +174,18 @@ public:
         Constructors. Each one uses specified watcher or create a new one if parameter is empty.
         With empty watcher parameter creates instance which tracks all cameras.
     */
-    CamLicenseUsageHelper(QnCommonModule* commonModule, QObject* parent = nullptr);
+    CamLicenseUsageHelper(common::ResourceContext* context, QObject* parent = nullptr);
 
     CamLicenseUsageHelper(
-        const QnVirtualCameraResourceList &proposedCameras,
+        const QnVirtualCameraResourceList& proposedCameras,
         bool proposedEnable,
-        QnCommonModule* commonModule,
+        common::ResourceContext* context,
         QObject* parent = nullptr);
 
     CamLicenseUsageHelper(
-        const QnVirtualCameraResourcePtr &proposedCamera,
+        const QnVirtualCameraResourcePtr& proposedCamera,
         bool proposedEnable,
-        QnCommonModule* commonModule,
+        common::ResourceContext* context,
         QObject* parent = nullptr);
 
     void propose(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable);
@@ -213,7 +215,8 @@ class SingleCamLicenseStatusHelper: public Connective<QObject>
     using base_type = Connective<QObject>;
 
 public:
-    explicit SingleCamLicenseStatusHelper(const QnVirtualCameraResourcePtr &camera,
+    explicit SingleCamLicenseStatusHelper(
+        const QnVirtualCameraResourcePtr &camera,
         QObject* parent = nullptr);
     virtual ~SingleCamLicenseStatusHelper();
 
@@ -232,7 +235,7 @@ class VideoWallLicenseUsageWatcher: public UsageWatcher
     Q_OBJECT
     using base_type = UsageWatcher;
 public:
-    VideoWallLicenseUsageWatcher(QnCommonModule* commonModule, QObject* parent = nullptr);
+    VideoWallLicenseUsageWatcher(common::ResourceContext* context, QObject* parent = nullptr);
 };
 
 class VideoWallLicenseUsageHelper: public UsageHelper
@@ -240,7 +243,7 @@ class VideoWallLicenseUsageHelper: public UsageHelper
     Q_OBJECT
     using base_type = UsageHelper;
 public:
-    VideoWallLicenseUsageHelper(QnCommonModule* commonModule, QObject* parent = nullptr);
+    VideoWallLicenseUsageHelper(common::ResourceContext* context, QObject* parent = nullptr);
 
     /** Propose to use some more or less licenses directly (e.g. to start control session). */
     void propose(int count);
@@ -250,7 +253,9 @@ public:
 
 protected:
     virtual QList<Qn::LicenseType> calculateLicenseTypes() const override;
-    virtual void calculateUsedLicenses(licensesArray& basicUsedLicenses, licensesArray& proposedToUse) const override;
+    virtual void calculateUsedLicenses(
+        licensesArray& basicUsedLicenses,
+        licensesArray& proposedToUse) const override;
 
 private:
     int m_proposed = 0;
@@ -261,6 +266,7 @@ class VideoWallLicenseUsageProposer
 {
 public:
     VideoWallLicenseUsageProposer(
+        common::ResourceContext* context,
         VideoWallLicenseUsageHelper* helper,
         int screenCount);
     ~VideoWallLicenseUsageProposer();

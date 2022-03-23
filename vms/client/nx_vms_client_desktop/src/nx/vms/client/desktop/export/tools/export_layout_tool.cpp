@@ -5,45 +5,36 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QEventLoop>
 
-#include <common/common_module.h>
-
-#include <client_core/client_core_module.h>
-
-#include <client/client_settings.h>
-#include <client/client_module.h>
-
 #include <camera/camera_data_manager.h>
-#include <camera/loaders/caching_camera_data_loader.h>
 #include <camera/client_video_camera.h>
-
-#include <core/resource/resource.h>
-#include <core/resource/media_resource.h>
-#include <core/resource/layout_resource.h>
+#include <camera/loaders/caching_camera_data_loader.h>
+#include <client/client_module.h>
+#include <client/client_settings.h>
+#include <common/common_module.h>
+#include <core/resource/avi/avi_resource.h>
+#include <core/resource/camera_resource.h>
 #include <core/resource/file_layout_resource.h>
 #include <core/resource/layout_reader.h>
-#include <core/resource/camera_resource.h>
-#include <core/resource/avi/avi_resource.h>
+#include <core/resource/layout_resource.h>
+#include <core/resource/media_resource.h>
+#include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/storage/file_storage/layout_storage_resource.h>
-
-#include <ui/workbench/workbench_layout_snapshot_manager.h>
-
+#include <nx/build_info.h>
+#include <nx/core/watermark/watermark.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/vms/api/data/layout_data.h>
-#include <nx/vms/client/desktop/utils/server_image_cache.h>
-#include <nx/vms/client/desktop/utils/local_file_cache.h>
-#include <nx/vms/client/desktop/resources/layout_password_management.h>
-#include <nx/core/watermark/watermark.h>
-
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
-
+#include <nx/vms/client/desktop/resources/layout_password_management.h>
+#include <nx/vms/client/desktop/utils/local_file_cache.h>
+#include <nx/vms/client/desktop/utils/server_image_cache.h>
 #include <nx_ec/data/api_conversion_functions.h>
+#include <ui/workbench/workbench_layout_snapshot_manager.h>
 
 #ifdef Q_OS_WIN
-#   include <launcher/nov_launcher_win.h>
+    #include <launcher/nov_launcher_win.h>
 #endif
 
-#include <nx/build_info.h>
 
 namespace {
 
@@ -83,6 +74,12 @@ struct ExportLayoutTool::Private
 
     // Whether any archive has been exported.
     bool exportedAnyData = false;
+
+    /** Source layout. */
+    QnLayoutResourcePtr originalLayout;
+
+    /** Copy of the provided layout. */
+    QnLayoutResourcePtr layout;
 
     explicit Private(ExportLayoutTool* owner, const ExportLayoutSettings& settings):
         q(owner),
@@ -157,17 +154,17 @@ ExportLayoutTool::ExportLayoutTool(
     base_type(parent),
     d(new Private(this, settings))
 {
-    // Make m_layout a deep exact copy of original layout.
-    m_layout.reset(settings.mode == ExportLayoutSettings::Mode::LocalSave
+    d->originalLayout = layout;
+    // Make d->layout a deep exact copy of original layout.
+    d->layout.reset(settings.mode == ExportLayoutSettings::Mode::LocalSave
         ? new QnFileLayoutResource()
         : new QnLayoutResource());
-    m_layout->setResourcePool(layout->resourcePool());
-    m_layout->setIdUnsafe(layout->getId()); //before update() uuid's must be the same
-    m_layout->update(layout);
+    d->layout->setIdUnsafe(layout->getId()); //before update() uuid's must be the same
+    d->layout->update(layout);
 
     // If exporting layout, create new guid. If layout just renamed or saved, keep guid.
     if (d->settings.mode != ExportLayoutSettings::Mode::LocalSave)
-        m_layout->setIdUnsafe(QnUuid::createUuid());
+        d->layout->setIdUnsafe(QnUuid::createUuid());
 
     m_isExportToExe = nx::build_info::isWindows()
         && FileExtensionUtils::isExecutable(d->settings.fileName.extension);
@@ -211,11 +208,11 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
     QnLayoutItemDataMap items;
 
     // Take resource pool from the original layout.
-    auto resourcePool = m_layout->resourcePool();
-    if (!resourcePool)
-        resourcePool = qnClientCoreModule->commonModule()->resourcePool();
+    auto resourcePool = d->originalLayout->resourcePool();
+    if (!NX_ASSERT(resourcePool))
+        return result;
 
-    for (const auto& item: m_layout->getItems())
+    for (const auto& item: d->layout->getItems())
     {
         const auto resource = resourcePool->getResourceByDescriptor(item.resource);
         const auto mediaResource = resource.dynamicCast<QnMediaResource>();
@@ -243,11 +240,11 @@ ExportLayoutTool::ItemInfoList ExportLayoutTool::prepareLayout()
             Qn::InvalidUtcOffset);
         result.append(info);
     }
-    m_layout->setItems(items);
+    d->layout->setItems(items);
 
     // Set up layout watermark, but only if it misses one.
-    if (m_layout->data(Qn::LayoutWatermarkRole).isNull() && d->settings.watermark.visible())
-            m_layout->setData(Qn::LayoutWatermarkRole, QVariant::fromValue(d->settings.watermark));
+    if (d->layout->data(Qn::LayoutWatermarkRole).isNull() && d->settings.watermark.visible())
+        d->layout->setData(Qn::LayoutWatermarkRole, QVariant::fromValue(d->settings.watermark));
 
     return result;
 }
@@ -284,7 +281,7 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items)
     {
         QByteArray layoutData;
         nx::vms::api::LayoutData layoutObject;
-        ec2::fromResourceToApi(m_layout, layoutObject);
+        ec2::fromResourceToApi(d->layout, layoutObject);
         QJson::serialize(layoutObject, &layoutData);
         /* Old name for compatibility issues. */
         if (!writeData(lit("layout.pb"), layoutData))
@@ -322,7 +319,7 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items)
 
     /* Layout id. */
     {
-        if (!writeData(lit("uuid.bin"), m_layout->getId().toByteArray()))
+        if (!writeData(lit("uuid.bin"), d->layout->getId().toByteArray()))
             return false;
     }
 
@@ -354,29 +351,29 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items)
             periods.encode(data);
         }
 
-        
+
         auto fileName = nx::format("chunk_%1.bin", fileNameForResource(resource->toResourcePtr()));
         if (!writeData(fileName, data))
             return false;
     }
 
     /* Layout background */
-    if (!m_layout->backgroundImageFilename().isEmpty())
+    if (!d->layout->backgroundImageFilename().isEmpty())
     {
-        bool exportedLayout = m_layout->isFile();  // we have changed background to an exported layout
+        bool exportedLayout = d->layout->isFile();  // we have changed background to an exported layout
         QScopedPointer<ServerImageCache> cache;
         if (exportedLayout)
             cache.reset(new LocalFileCache(this));
         else
             cache.reset(new ServerImageCache(this));
 
-        QImage background(cache->getFullPath(m_layout->backgroundImageFilename()));
+        QImage background(cache->getFullPath(d->layout->backgroundImageFilename()));
         if (!background.isNull())
         {
 
             if (!tryInLoop([this, background]
             {
-                QScopedPointer<QIODevice> imageFile(d->storage->open(m_layout->backgroundImageFilename(), QIODevice::WriteOnly));
+                QScopedPointer<QIODevice> imageFile(d->storage->open(d->layout->backgroundImageFilename(), QIODevice::WriteOnly));
                 if (!imageFile)
                     return false;
                 background.save(imageFile.data(), "png");
@@ -385,15 +382,15 @@ bool ExportLayoutTool::exportMetadata(const ItemInfoList &items)
                 return false;
 
             LocalFileCache localCache;
-            localCache.storeImageData(m_layout->backgroundImageFilename(), background);
+            localCache.storeImageData(d->layout->backgroundImageFilename(), background);
         }
     }
 
     /* Watermark */
-    if (m_layout->data(Qn::LayoutWatermarkRole).isValid())
+    if (d->layout->data(Qn::LayoutWatermarkRole).isValid())
     {
         if (!writeData(lit("watermark.txt"),
-            QJson::serialized(m_layout->data(Qn::LayoutWatermarkRole).value<nx::core::Watermark>())))
+            QJson::serialized(d->layout->data(Qn::LayoutWatermarkRole).value<nx::core::Watermark>())))
         {
             return false;
         }

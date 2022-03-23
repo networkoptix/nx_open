@@ -84,9 +84,6 @@ public:
 
     void setCameras(const QnVirtualCameraResourceList& cameras)
     {
-        const auto resourcePool = m_clientCoreModule->commonModule()->resourcePool();
-        for (const auto& camera: cameras)
-            resourcePool->addResource(camera);
         m_store->loadCameras(cameras, nullptr, nullptr);
         m_changesWatcher->setCameras(cameras);
     }
@@ -118,6 +115,16 @@ protected:
         m_staticCommonModule.reset();
     }
 
+    CameraResourceStubPtr makeCamera(
+        const QSize& primaryResolution = highResolution1,
+        const QSize& secondaryResolution = lowResolution1)
+    {
+        CameraResourceStubPtr camera(
+            new CameraResourceStub(primaryResolution, secondaryResolution));
+        m_clientCoreModule->commonModule()->resourcePool()->addResource(camera);
+        return camera;
+    }
+
 private:
     std::unique_ptr<QnStaticCommonModule> m_staticCommonModule;
     std::unique_ptr<QnClientCoreModule> m_clientCoreModule;
@@ -128,7 +135,8 @@ private:
 
 TEST_F(CameraSettingsMotionStreamsTest, selectHighResolutionStream)
 {
-    CameraResourceStubPtr camera(new CameraResourceStub(highResolution1, lowResolution1));
+    auto camera = makeCamera();
+
     NX_ASSERT(camera->motionStreamIndex() == makeStreamIndex(StreamIndex::secondary, false));
     NX_ASSERT(camera->getMotionType() == MotionType::software);
     NX_ASSERT(camera->hasDualStreaming());
@@ -163,7 +171,7 @@ TEST_F(CameraSettingsMotionStreamsTest, selectHighResolutionStream)
 
 TEST_F(CameraSettingsMotionStreamsTest, selectLowResolutionStream)
 {
-    CameraResourceStubPtr camera(new CameraResourceStub(lowResolution1, lowResolution2));
+    auto camera = makeCamera(lowResolution1, lowResolution2);
     NX_ASSERT(camera->motionStreamIndex() == makeStreamIndex(StreamIndex::secondary, false));
     NX_ASSERT(camera->getMotionType() == MotionType::software);
     NX_ASSERT(camera->hasDualStreaming());
@@ -198,7 +206,7 @@ TEST_F(CameraSettingsMotionStreamsTest, selectLowResolutionStream)
 
 TEST_F(CameraSettingsMotionStreamsTest, enableMotionWithHighResolutionStream)
 {
-    CameraResourceStubPtr camera(new CameraResourceStub(highResolution1, lowResolution1));
+    auto camera = makeCamera();
     camera->setMotionType(MotionType::none);
     NX_ASSERT(camera->getMotionType() == MotionType::none);
     NX_ASSERT(camera->motionStreamIndex() == makeStreamIndex(StreamIndex::secondary, false));
@@ -252,7 +260,7 @@ TEST_F(CameraSettingsMotionStreamsTest, enableMotionWithHighResolutionStream)
 
 TEST_F(CameraSettingsMotionStreamsTest, enableMotionWithLowResolutionStream)
 {
-    CameraResourceStubPtr camera(new CameraResourceStub(lowResolution1, lowResolution2));
+    auto camera = makeCamera(lowResolution1, lowResolution2);
     camera->setMotionType(MotionType::none);
     NX_ASSERT(camera->getMotionType() == MotionType::none);
     NX_ASSERT(camera->motionStreamIndex() == makeStreamIndex(StreamIndex::secondary, false));
@@ -306,7 +314,7 @@ TEST_F(CameraSettingsMotionStreamsTest, enableMotionWithLowResolutionStream)
 
 TEST_F(CameraSettingsMotionStreamsTest, disableMotionWithForcedHighResolution)
 {
-    CameraResourceStubPtr camera(new CameraResourceStub(highResolution1, lowResolution1));
+    auto camera = makeCamera();
     camera->setMotionStreamIndex({StreamIndex::primary, true});
     NX_ASSERT(camera->getMotionType() == MotionType::software);
     NX_ASSERT(camera->motionStreamIndex() == makeStreamIndex(StreamIndex::primary, true));
@@ -342,7 +350,7 @@ TEST_F(CameraSettingsMotionStreamsTest, disableMotionWithForcedHighResolution)
 
 TEST_F(CameraSettingsMotionStreamsTest, implicitlyDisabledMotionDetection)
 {
-    CameraResourceStubPtr camera(new CameraResourceStub(highResolution1, lowResolution1));
+    auto camera = makeCamera();
     camera->setMotionStreamIndex({StreamIndex::primary, false});
     NX_ASSERT(camera->getMotionType() == MotionType::software);
     NX_ASSERT(camera->motionStreamIndex() == makeStreamIndex(StreamIndex::primary, false));
@@ -360,7 +368,7 @@ TEST_F(CameraSettingsMotionStreamsTest, implicitlyDisabledMotionDetection)
 
 TEST_F(CameraSettingsMotionStreamsTest, forceMotionDetectionWhenImplicitlyDisabled)
 {
-    CameraResourceStubPtr camera(new CameraResourceStub(highResolution1, lowResolution1));
+    auto camera = makeCamera();
     camera->setMotionStreamIndex({StreamIndex::primary, false});
     NX_ASSERT(camera->getMotionType() == MotionType::software);
     NX_ASSERT(camera->motionStreamIndex() == makeStreamIndex(StreamIndex::primary, false));
@@ -389,7 +397,7 @@ TEST_F(CameraSettingsMotionStreamsTest, forceMotionDetectionWhenImplicitlyDisabl
 
 TEST_F(CameraSettingsMotionStreamsTest, selectLowStreamWhenImplicitlyDisabled)
 {
-    CameraResourceStubPtr camera(new CameraResourceStub(highResolution1, lowResolution1));
+    auto camera = makeCamera();
     camera->setMotionStreamIndex({StreamIndex::primary, false});
     NX_ASSERT(camera->getMotionType() == MotionType::software);
     NX_ASSERT(camera->motionStreamIndex() == makeStreamIndex(StreamIndex::primary, false));
@@ -418,7 +426,7 @@ TEST_F(CameraSettingsMotionStreamsTest, selectLowStreamWhenImplicitlyDisabled)
 
 TEST_F(CameraSettingsMotionStreamsTest, disableMotionWhenImplicitlyDisabled)
 {
-    CameraResourceStubPtr camera(new CameraResourceStub(highResolution1, lowResolution1));
+    auto camera = makeCamera();
     camera->setMotionStreamIndex({StreamIndex::primary, false});
     NX_ASSERT(camera->getMotionType() == MotionType::software);
     NX_ASSERT(camera->motionStreamIndex() == makeStreamIndex(StreamIndex::primary, false));
@@ -447,7 +455,7 @@ TEST_F(CameraSettingsMotionStreamsTest, disableMotionWhenImplicitlyDisabled)
 
 TEST_F(CameraSettingsMotionStreamsTest, disableDualStreaming)
 {
-    CameraResourceStubPtr camera(new CameraResourceStub(highResolution1, lowResolution1));
+    auto camera = makeCamera();
     NX_ASSERT(camera->getMotionType() == MotionType::software);
     NX_ASSERT(camera->motionStreamIndex() == makeStreamIndex(StreamIndex::secondary, false));
     NX_ASSERT(camera->hasDualStreaming());
@@ -486,8 +494,8 @@ TEST_F(CameraSettingsMotionStreamsTest, disableDualStreaming)
 
 TEST_F(CameraSettingsMotionStreamsTest, disableDualStreamingMultiple)
 {
-    CameraResourceStubPtr camera1(new CameraResourceStub(highResolution1, lowResolution1));
-    CameraResourceStubPtr camera2(new CameraResourceStub(highResolution1, lowResolution1));
+    auto camera1 = makeCamera();
+    auto camera2 = makeCamera();
     camera1->setMotionType(MotionType::none);
     camera2->setMotionType(MotionType::none);
     NX_ASSERT(camera1->getMotionType() == MotionType::none);
@@ -561,7 +569,7 @@ TEST_F(CameraSettingsMotionStreamsTest, disableDualStreamingMultiple)
 
 TEST_F(CameraSettingsMotionStreamsTest, disableDualStreamingAndForceDetection)
 {
-    CameraResourceStubPtr camera(new CameraResourceStub(highResolution1, lowResolution1));
+    auto camera = makeCamera();
     NX_ASSERT(camera->getMotionType() == MotionType::software);
     NX_ASSERT(camera->motionStreamIndex() == makeStreamIndex(StreamIndex::secondary, false));
     NX_ASSERT(camera->hasDualStreaming());
@@ -594,7 +602,7 @@ TEST_F(CameraSettingsMotionStreamsTest, disableDualStreamingAndForceDetection)
 
 TEST_F(CameraSettingsMotionStreamsTest, reEnableDualStreaming)
 {
-    CameraResourceStubPtr camera(new CameraResourceStub(highResolution1, lowResolution1));
+    auto camera = makeCamera();
     NX_ASSERT(camera->getMotionType() == MotionType::software);
     NX_ASSERT(camera->motionStreamIndex() == makeStreamIndex(StreamIndex::secondary, false));
     NX_ASSERT(camera->hasDualStreaming());
@@ -618,7 +626,7 @@ TEST_F(CameraSettingsMotionStreamsTest, reEnableDualStreaming)
 
 TEST_F(CameraSettingsMotionStreamsTest, reEnableDualStreamingAfterChangingStream)
 {
-    CameraResourceStubPtr camera(new CameraResourceStub(highResolution1, lowResolution1));
+    auto camera = makeCamera();
     NX_ASSERT(camera->getMotionType() == MotionType::software);
     NX_ASSERT(camera->motionStreamIndex() == makeStreamIndex(StreamIndex::secondary, false));
     NX_ASSERT(camera->hasDualStreaming());
@@ -643,7 +651,7 @@ TEST_F(CameraSettingsMotionStreamsTest, reEnableDualStreamingAfterChangingStream
 
 TEST_F(CameraSettingsMotionStreamsTest, resolutionChangesExternally)
 {
-    CameraResourceStubPtr camera(new CameraResourceStub(highResolution1, lowResolution1));
+    auto camera = makeCamera();
     NX_ASSERT(camera->getMotionType() == MotionType::software);
     NX_ASSERT(camera->motionStreamIndex() == makeStreamIndex(StreamIndex::secondary, false));
     NX_ASSERT(camera->hasDualStreaming());
@@ -673,7 +681,7 @@ TEST_F(CameraSettingsMotionStreamsTest, resolutionChangesExternally)
 
 TEST_F(CameraSettingsMotionStreamsTest, motionStreamChangesExternally)
 {
-    CameraResourceStubPtr camera(new CameraResourceStub(highResolution1, lowResolution1));
+    auto camera = makeCamera();
     NX_ASSERT(camera->getMotionType() == MotionType::software);
     NX_ASSERT(camera->motionStreamIndex() == makeStreamIndex(StreamIndex::secondary, false));
     NX_ASSERT(camera->hasDualStreaming());
@@ -697,7 +705,7 @@ TEST_F(CameraSettingsMotionStreamsTest, motionStreamChangesExternally)
 
 TEST_F(CameraSettingsMotionStreamsTest, motionDetectionChangesExternally)
 {
-    CameraResourceStubPtr camera(new CameraResourceStub(highResolution1, lowResolution1));
+    auto camera = makeCamera();
     camera->setMotionType(MotionType::none);
     camera->setMotionStreamIndex({StreamIndex::primary, false});
     NX_ASSERT(camera->getMotionType() == MotionType::none);
@@ -730,7 +738,7 @@ TEST_F(CameraSettingsMotionStreamsTest, motionDetectionChangesExternally)
 
 TEST_F(CameraSettingsMotionStreamsTest, dualStreamingChangesExternally)
 {
-    CameraResourceStubPtr camera(new CameraResourceStub(highResolution1, lowResolution1));
+    auto camera = makeCamera();
     NX_ASSERT(camera->getMotionType() == MotionType::software);
     NX_ASSERT(camera->motionStreamIndex() == makeStreamIndex(StreamIndex::secondary, false));
     NX_ASSERT(camera->hasDualStreaming());

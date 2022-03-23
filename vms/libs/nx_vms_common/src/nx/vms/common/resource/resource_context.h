@@ -20,6 +20,7 @@ class QnResourceDataPool;
 class QnResourcePool;
 class QnResourcePropertyDictionary;
 class QnResourceStatusDictionary;
+class QnRouter;
 class QnRuntimeInfoManager;
 class QnSharedResourcesManager;
 class QnServerAdditionalAddressesDictionary;
@@ -43,6 +44,8 @@ namespace nx::vms::event { class RuleManager; }
 namespace nx::vms::rules { class Engine; }
 
 namespace nx::vms::common {
+
+class AbstractCertificateVerifier;
 
 /**
  * Storage for the application Resource Context classes. One Resource Context corresponds to one
@@ -68,6 +71,11 @@ public:
     virtual ~ResourceContext();
 
     /**
+     * Enable network-related functionality. Can be disabled in unit tests.
+     */
+    void initNetworking(QnRouter* router, AbstractCertificateVerifier* certificateVerifier);
+
+    /**
      * Id of the current peer in the Message Bus. It is persistent and is not changed between the
      * application runs. It is stored in the application settings. VMS Server uses it as a Server
      * Resource id. Desktop Client calculates actual peer id depending on the stored persistent id
@@ -84,6 +92,16 @@ public:
 
     /** Temporary method to simplify refactor. */
     void updateRunningInstanceGuid();
+
+    /**
+     * Helper class to find the shortest route to the VMS Server. Can be null, e.g. in unit tests.
+     */
+    QnRouter* router() const;
+
+    /**
+     * Interface to create SSL certificate validation functors.
+     */
+    AbstractCertificateVerifier* certificateVerifier() const;
 
     /**
      * Interface for the Message Bus connection.

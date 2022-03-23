@@ -16,7 +16,6 @@
 
 class QnResourceConsumer;
 class QnResourcePool;
-class QnCommonModule;
 
 namespace nx::vms::common { class ResourceContext; }
 
@@ -130,21 +129,13 @@ public:
      */
     QnResourcePool* resourcePool() const;
 
-    // TODO: #sivanov Make this method friend-only and non-virtual.
     /**
-     * Assigns the Resource to the corresponding Resource Pool. Normally this is done only by the
-     * Resource Pool itself when the Resource is added. Cleanup on remove is temporary disabled.
+     * Assigns the Resource to the corresponding Resource Context. Normally this is done only by
+     * the Resource Pool when the Resource is added.
      *
-     * A Resource can never be moved from one Resource Pool to another.
+     * A Resource can never be removed from the Resource Context or moved to another one.
      */
-    virtual void setResourcePool(QnResourcePool* resourcePool);
-
-    // TODO: #sivanov Remove common module dependency in favor of Resource context structure.
-    /**
-     * Common Module this Resource belongs to. Used to get access to external properties of the
-     * Resource and to some tightly bound classes.
-     */
-    QnCommonModule* commonModule() const;
+    void addToContext(nx::vms::common::ResourceContext* context);
 
     /**
      * Context this resource belongs to. Used to get access to external properties of the resource
@@ -383,7 +374,11 @@ protected:
     using Notifier = std::function<void(void)>;
     using NotifierList = QList<Notifier>;
 
-    virtual void setCommonModule(QnCommonModule* commonModule);
+    /**
+     * Update the Resource Context. Intended to be overloaded in the descendant classes when some
+     * logic should be called instantly after addition.
+     */
+    virtual void setContext(nx::vms::common::ResourceContext* context);
 
     /**
      * Copies all data from the source Resource and adds the corresponding signal sending to the
@@ -448,9 +443,6 @@ protected:
     QSet<QnResourceConsumer*> m_consumers;
 
 private:
-    /** Resource pool this Resource belongs to. */
-    std::atomic<QnResourcePool*> m_resourcePool{};
-
     /** Identifier of this Resource. */
     QnUuid m_id;
 
@@ -462,7 +454,9 @@ private:
 
     std::map<QString, QString> m_locallySavedProperties;
 
-    std::atomic<QnCommonModule*> m_commonModule{};
+    /** Context this Resource belongs to. */
+    std::atomic<nx::vms::common::ResourceContext*> m_context{};
+
     std::atomic<bool> m_forceUseLocalProperties{false};
     std::atomic<ResourceStatus> m_previousStatus = ResourceStatus::undefined;
 };

@@ -4,11 +4,11 @@
 
 #include <optional>
 
-#include <common/common_module_aware.h>
+#include <nx/vms/common/resource/resource_context_aware.h>
 #include <nx/vms/event/actions/abstract_action.h>
-#include <nx/vms/event/events/abstract_event.h>
 #include <nx/vms/event/aggregation_info.h>
 #include <nx/vms/event/event_fwd.h>
+#include <nx/vms/event/events/abstract_event.h>
 
 namespace nx {
 namespace vms {
@@ -23,13 +23,13 @@ enum class AttrSerializePolicy
 
 class NX_VMS_COMMON_API StringsHelper:
     public QObject,
-    public /*mixin*/ QnCommonModuleAware
+    public /*mixin*/ common::ResourceContextAware
 {
     Q_OBJECT
     using base_type = QObject;
 
 public:
-    StringsHelper(QnCommonModule* commonModule);
+    StringsHelper(common::ResourceContext* context);
 
     QString actionName(ActionType value) const;
 

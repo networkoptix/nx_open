@@ -86,12 +86,12 @@ QnUuid QnSecurityCamResource::makeCameraIdFromPhysicalId(const QString& physical
     return guidFromArbitraryData(physicalId);
 }
 
-void QnSecurityCamResource::setCommonModule(QnCommonModule* commonModule)
+void QnSecurityCamResource::setContext(nx::vms::common::ResourceContext* context)
 {
     if (auto ctx = this->context())
         ctx->resourceDataPool()->disconnect(this);
 
-    base_type::setCommonModule(commonModule);
+    base_type::setContext(context);
 
     if (auto ctx = this->context())
     {

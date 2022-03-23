@@ -203,7 +203,9 @@ QnResourceWidget::QnResourceWidget(QnWorkbenchContext *context, QnWorkbenchItem 
         };
 
     using namespace nx::vms::license;
-    auto videoWallLicenseUsageWatcher = new VideoWallLicenseUsageWatcher(commonModule(), this);
+    auto videoWallLicenseUsageWatcher = new VideoWallLicenseUsageWatcher(
+        m_resource->context(),
+        this);
     connect(videoWallLicenseUsageWatcher, &UsageWatcher::licenseUsageChanged, this, updateOverlay);
 
     if (qnRuntime->isVideoWallMode())

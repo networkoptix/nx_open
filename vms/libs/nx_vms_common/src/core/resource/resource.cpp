@@ -7,13 +7,12 @@
 #include <QtCore/QMetaObject>
 
 #include <api/global_settings.h>
-#include <common/common_module.h>
 #include <core/resource/camera_advanced_param.h>
 #include <core/resource_management/resource_management_ini.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/status_dictionary.h>
-#include <nx/metrics/metrics_storage.h>
+#include <nx/vms/common/resource/resource_context.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/resource_data.h>
@@ -58,16 +57,21 @@ QnResource::~QnResource()
 
 QnResourcePool* QnResource::resourcePool() const
 {
-    return m_resourcePool;
+    if (auto context = this->context())
+        return context->resourcePool();
+
+    return nullptr;
 }
 
-void QnResource::setResourcePool(QnResourcePool* resourcePool)
+void QnResource::addToContext(nx::vms::common::ResourceContext* context)
 {
-    m_resourcePool = resourcePool;
-    setCommonModule(resourcePool
-        ? dynamic_cast<QnCommonModule*>(resourcePool->context())
-        : nullptr);
-    NX_ASSERT(!resourcePool || context());
+    if (!NX_ASSERT(context, "Context must exist here"))
+        return;
+
+    if (!NX_ASSERT(!this->context(), "Resource already belongs to some context"))
+        return;
+
+    setContext(context);
 }
 
 QnResourcePtr QnResource::toSharedPointer() const
@@ -489,23 +493,15 @@ void QnResource::savePropertiesAsync()
 
 // -----------------------------------------------------------------------------
 
-void QnResource::setCommonModule(QnCommonModule* commonModule)
+void QnResource::setContext(nx::vms::common::ResourceContext* context)
 {
-    m_commonModule = commonModule;
-}
-
-QnCommonModule* QnResource::commonModule() const
-{
-    if (auto commonModule = m_commonModule.load())
-        return commonModule;
-
-    return nullptr;
+    m_context = context;
 }
 
 nx::vms::common::ResourceContext* QnResource::context() const
 {
-    if (auto commonModule = m_commonModule.load())
-        return commonModule;
+    if (auto context = m_context.load())
+        return context;
 
     return nullptr;
 }

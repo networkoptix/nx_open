@@ -188,7 +188,7 @@ signals:
     void analyticsDescriptorsChanged();
 
 protected:
-    virtual void setCommonModule(QnCommonModule* commonModule) override;
+    virtual void setContext(nx::vms::common::ResourceContext* context) override;
 
 private:
     Qn::PanicMode calculatePanicMode() const;
