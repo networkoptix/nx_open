@@ -64,9 +64,8 @@ public:
     /** Get the wrapped dialog window. */
     QQuickWindow* window() const;
 
-    /** Whether the dialog should be opened maximized by default. */
-    bool shownMaximized() const;
-    void setShownMaximized(bool value);
+    /** Change dialog maximized state now or when shown if currently it isn't visible. */
+    void setMaximized(bool value);
 
 signals:
     void sourceChanged();

@@ -193,14 +193,12 @@ QQuickWindow* QmlDialogWrapper::window() const
     return d->window.get();
 }
 
-bool QmlDialogWrapper::shownMaximized() const
-{
-    return d->shownMaximized;
-}
-
-void QmlDialogWrapper::setShownMaximized(bool value)
+void QmlDialogWrapper::setMaximized(bool value)
 {
     d->shownMaximized = value;
+
+    if (d->window && d->window->isVisible())
+        d->window->setWindowState(value ? Qt::WindowMaximized : Qt::WindowNoState);
 }
 
 bool QmlDialogWrapper::exec(Qt::WindowModality modality)
