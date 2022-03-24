@@ -399,7 +399,7 @@ void RemoteConnectionFactoryRequestsManager::checkDigestAuthentication(ContextPt
     if (context->credentials().authToken.type != AuthTokenType::password)
     {
         NX_DEBUG(this, "Unexpected auth token type %1", context->credentials().authToken.type);
-        context->error = RemoteConnectionErrorCode::unauthorized;
+        context->error = RemoteConnectionErrorCode::sessionExpired;
         return;
     }
 
