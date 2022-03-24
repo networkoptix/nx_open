@@ -1280,7 +1280,7 @@ std::size_t removeExcessSeparatorsInplace(
         prevCh = s[i];
         s[newSize++] = s[i];
     }
-    if (s[newSize - 1] == separator)
+    if (newSize > 0 && s[newSize - 1] == separator)
         --newSize;
 
     return newSize;
