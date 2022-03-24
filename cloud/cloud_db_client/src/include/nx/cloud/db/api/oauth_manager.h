@@ -14,7 +14,7 @@ namespace nx::cloud::db::api {
 class OauthManager
 {
 public:
-    static constexpr std::string_view kTokenPrefix = "nxcdb-";
+    static constexpr std::string_view kTokenPrefix = "cdb-";
     static constexpr std::string_view k2faRequiredError = "second_factor_required";
 
     virtual ~OauthManager() = default;
