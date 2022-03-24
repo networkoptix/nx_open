@@ -762,7 +762,7 @@ bool SessionManager::saveUnsafe(QJsonObject data, bool detach)
     if (!outputTmpFile.open(QIODevice::WriteOnly))
     {
         NX_ERROR(this, "save() - failed to open temporary file \"%1\"",
-            outputTmpFile.filesystemFileName());
+            outputTmpFile.fileName());
         return false;
     }
 
@@ -777,7 +777,7 @@ bool SessionManager::saveUnsafe(QJsonObject data, bool detach)
 
     if (outputTmpFile.write(rawData) != size)
     {
-        NX_ERROR(this, "save() - failed to write data to temporary file \"%1\"", outputTmpFile.filesystemFileName());
+        NX_ERROR(this, "save() - failed to write data to temporary file \"%1\"", outputTmpFile.fileName());
         return false;
     }
     outputTmpFile.close();
@@ -796,7 +796,7 @@ bool SessionManager::saveUnsafe(QJsonObject data, bool detach)
 
     if (!outputTmpFile.copy(instanceFileName))
     {
-        NX_ERROR(this, "save() - failed to copy data to a final file\"%1\"", outputTmpFile.filesystemFileName());
+        NX_ERROR(this, "save() - failed to copy data to a final file\"%1\"", outputTmpFile.fileName());
         return false;
     }
 
