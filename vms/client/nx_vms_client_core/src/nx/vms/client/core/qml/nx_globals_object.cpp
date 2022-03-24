@@ -134,6 +134,9 @@ bool NxGlobalsObject::ensureFlickableChildVisible(QQuickItem* item)
             qreal startMargin, qreal endMargin,
             qreal itemPosition, qreal itemSize)
         {
+            if (contentSize < flickableSize)
+                return position;
+
             const auto itemEnd = itemPosition + itemSize - position;
             if (itemEnd > flickableSize)
                 position += (itemEnd - flickableSize);
