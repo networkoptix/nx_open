@@ -60,23 +60,24 @@ QList<QnUuid> LocalNotificationsManager::notifications() const
 QnUuid LocalNotificationsManager::add(
     const QString& title, const QString& description, bool cancellable)
 {
-    NX_MUTEX_LOCKER lock(&m_mutex);
-    const auto notificationId = QnUuid::createUuid();
-    m_lookup.insert(
-        notificationId, State(title, description, cancellable, /*progress*/ std::nullopt));
-    m_ids.push_back(notificationId);
-
-    lock.unlock();
-    emit added(notificationId);
-
-    return notificationId;
+    return add(State(title, description, cancellable, /*progress*/ std::nullopt));
 }
 
 QnUuid LocalNotificationsManager::addProgress(
     const QString& title, const QString& description, bool cancellable)
 {
-    const auto notificationId = add(title, description, cancellable);
-    setProgress(notificationId, 0);
+    return add(State(title, description, cancellable, /*progress*/ 0));
+}
+
+QnUuid LocalNotificationsManager::add(State state)
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    const auto notificationId = QnUuid::createUuid();
+    m_lookup.insert(notificationId, std::move(state));
+    m_ids.push_back(notificationId);
+    lock.unlock();
+
+    emit added(notificationId);
     return notificationId;
 }
 
