@@ -9,7 +9,7 @@
  * Base class for RTSP codec. Used for encode data only
  */
 
-class AbstractRtspEncoder
+class NX_VMS_COMMON_API AbstractRtspEncoder
 {
 public:
     virtual ~AbstractRtspEncoder() {}
