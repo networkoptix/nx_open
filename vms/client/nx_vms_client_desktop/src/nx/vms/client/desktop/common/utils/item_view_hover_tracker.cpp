@@ -51,7 +51,7 @@ ItemViewHoverTracker::ItemViewHoverTracker(QAbstractItemView* parent):
         });
 }
 
-const QModelIndex& ItemViewHoverTracker::hoveredIndex() const
+QModelIndex ItemViewHoverTracker::hoveredIndex() const
 {
     return m_hoveredIndex;
 }

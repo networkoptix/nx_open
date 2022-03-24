@@ -14,7 +14,7 @@ class ItemViewHoverTracker: public QObject
 public:
     explicit ItemViewHoverTracker(QAbstractItemView* parent);
 
-    const QModelIndex& hoveredIndex() const;
+    QModelIndex hoveredIndex() const;
 
     int mouseCursorRole() const;
     void setMouseCursorRole(int value);
