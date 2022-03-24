@@ -140,6 +140,8 @@ private:
         }
     };
 
+    QnUuid add(State state);
+
     QList<QnUuid> m_ids; //< Sorted by insertion order.
     QHash<QnUuid, State> m_lookup;
     mutable Mutex m_mutex;

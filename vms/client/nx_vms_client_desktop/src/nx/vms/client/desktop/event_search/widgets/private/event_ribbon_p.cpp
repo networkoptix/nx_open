@@ -314,6 +314,7 @@ void EventRibbon::Private::updateTile(int index)
             else
                 widget->setIndefiniteProgress();
 
+            widget->setTitle({});
             widget->setProgressBarVisible(true);
             widget->setProgressTitle(modelIndex.data(Qt::DisplayRole).toString());
             widget->setProgressFormat(modelIndex.data(Qn::ProgressFormatRole).toString());
