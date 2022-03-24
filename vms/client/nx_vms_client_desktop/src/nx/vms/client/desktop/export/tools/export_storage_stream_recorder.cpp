@@ -140,9 +140,7 @@ bool ExportStorageStreamRecorder::isTranscodingEnabled() const
 
 void ExportStorageStreamRecorder::adjustMetaData(QnAviArchiveMetadata& metaData) const
 {
-    if (m_needCalcSignature)
-        metaData.signature = QnSignHelper::addSignatureFiller(QnSignHelper::getSignMagic());
-
+    metaData.signature = QnSignHelper::addSignatureFiller(QnSignHelper::getSignMagic());
     metaData.timeZoneOffset = m_serverTimeZoneMs;
     if (isTranscodingEnabled())
     {
@@ -150,16 +148,9 @@ void ExportStorageStreamRecorder::adjustMetaData(QnAviArchiveMetadata& metaData)
         return;
     }
 }
-
-void ExportStorageStreamRecorder::setNeedCalcSignature(bool value)
-{
-    m_needCalcSignature = value;
-}
-
 void ExportStorageStreamRecorder::beforeIoClose(StorageContext& context)
 {
-    if (m_needCalcSignature)
-        updateSignatureAttr(&context);
+    updateSignatureAttr(&context);
 }
 
 void ExportStorageStreamRecorder::updateSignatureAttr(StorageContext* context)
@@ -194,14 +185,11 @@ void ExportStorageStreamRecorder::onSuccessfulPacketWrite(
     const QnConstAbstractMediaDataPtr& md, const StorageContext& context,
     const QnFfmpegAvPacket& avPkt, int streamIndex)
 {
-    if (m_needCalcSignature)
-    {
-        if (md->dataType == QnAbstractMediaData::VIDEO && (md->flags & AV_PKT_FLAG_KEY))
-            m_lastIFrame = std::dynamic_pointer_cast<const QnCompressedVideoData>(md);
-        auto avCodecParams = context.formatCtx->streams[streamIndex]->codecpar;
-        NX_VERBOSE(this, "SignVideo: add video packet of size %1", avPkt.size);
-        m_signer.processMedia(avCodecParams, avPkt.data, avPkt.size, md->dataType);
-    }
+    if (md->dataType == QnAbstractMediaData::VIDEO && (md->flags & AV_PKT_FLAG_KEY))
+        m_lastIFrame = std::dynamic_pointer_cast<const QnCompressedVideoData>(md);
+    auto avCodecParams = context.formatCtx->streams[streamIndex]->codecpar;
+    NX_VERBOSE(this, "SignVideo: add video packet of size %1", avPkt.size);
+    m_signer.processMedia(avCodecParams, avPkt.data, avPkt.size, md->dataType);
 }
 
 void ExportStorageStreamRecorder::fileFinished(

@@ -223,7 +223,6 @@ void QnClientVideoCamera::exportMediaPeriodToFile(const QnTimePeriod &timePeriod
 
     m_exportRecorder->setServerTimeZoneMs(serverTimeZoneMs);
     m_exportRecorder->setContainer(format);
-    m_exportRecorder->setNeedCalcSignature(true);
 
     nx::core::transcoding::FilterChain filters(
         transcodingSettings, m_resource->getDewarpingParams(), m_resource->getVideoLayout());
@@ -253,9 +252,6 @@ void QnClientVideoCamera::stopExport()
         bool exportFinishedOk = m_exportRecorder->isFinished();
         if (!exportFinishedOk)
         {
-            // clean signature flag; in other case file will be recreated on writing finish
-            // TODO: #vasilenko get rid of this magic
-            m_exportRecorder->setNeedCalcSignature(false);
             m_exportRecorder->pleaseStop();
             m_exportRecorder->wait(); //< We should wait for recorder to stop.
             // executeLater is used to make it work similar to previous code.

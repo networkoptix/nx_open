@@ -125,7 +125,6 @@ struct ExportMediaTool::Private
         if (!timelapseFrameStepUs)
             exportRecorder->setServerTimeZoneMs(settings.serverTimeZoneMs);
         exportRecorder->setContainer(container(settings.fileName.extension));
-        exportRecorder->setNeedCalcSignature(true);
 
         dataProvider->addDataProcessor(exportRecorder.data());
         if (archiveReader)
@@ -147,9 +146,6 @@ struct ExportMediaTool::Private
         dataProvider->removeDataProcessor(exportRecorder.data());
         //dataProvider->pleaseStop(); //< Will be stoped after export recorder stop.
 
-        // Clean signature flag; in other case file will be recreated on writing finish.
-        // TODO: #vasilenko get rid of this magic
-        exportRecorder->setNeedCalcSignature(false);
         exportRecorder->pleaseStop();
     }
 
