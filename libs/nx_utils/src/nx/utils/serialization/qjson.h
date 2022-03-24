@@ -103,3 +103,10 @@ void serialize(
     NX_ASSERT(false);
     return;
 }
+
+void serialize(
+    nx::reflect::json::SerializationContext* ctx,
+    const QJsonValueConstRef& data)
+{
+    serialize(ctx, (QJsonValue) data);
+}
