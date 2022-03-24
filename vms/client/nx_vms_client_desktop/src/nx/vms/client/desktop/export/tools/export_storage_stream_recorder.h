@@ -27,7 +27,6 @@ public:
 
     void setTranscodeFilters(const nx::core::transcoding::FilterChain& filters);
     void setServerTimeZoneMs(qint64 value);
-    void setNeedCalcSignature(bool value);
     void setTranscoderFixedFrameRate(int value);
     void setTranscoderQuality(Qn::StreamQuality quality);
     void addRecordingContext(const QString& fileName, const QnStorageResourcePtr& storage);
@@ -53,7 +52,6 @@ private:
     std::optional<nx::core::transcoding::FilterChain> m_transcodeFilters;
     qint64 m_serverTimeZoneMs = Qn::InvalidUtcOffset;
     AVCodecID m_dstVideoCodec = AV_CODEC_ID_NONE;
-    bool m_needCalcSignature = false;
     std::unique_ptr<QnFfmpegVideoTranscoder> m_videoTranscoder;
     std::unique_ptr<QnFfmpegAudioTranscoder> m_audioTranscoder;
     Qn::StreamQuality m_transcodeQuality = Qn::StreamQuality::normal;
