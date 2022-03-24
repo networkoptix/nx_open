@@ -6,6 +6,7 @@
 #include <memory>
 
 #include <QtGui/QGuiApplication>
+#include <QtGui/QScreen>
 #include <QtQuick/QQuickItem>
 #include <QtQuick/QQuickWindow>
 #include <QtWidgets/QWidget>
@@ -86,13 +87,32 @@ AdvancedSearchDialog::AdvancedSearchDialog(QWidget* parent) :
                 : defaultScreen();
 
             window()->setScreen(screen);
-            setShownMaximized(state->isMaximized);
+            setMaximized(state->isMaximized);
 
             if (!state->windowSize.isEmpty())
                 window()->resize(state->windowSize);
 
+            // Change default position only if saved position is valid (visible on a screen).
             if (state->windowPosition)
-                window()->setPosition(*state->windowPosition);
+            {
+                const QRect desiredRect(*state->windowPosition, window()->size());
+                const auto screens = screen->virtualSiblings();
+
+                for (auto sibling: screens)
+                {
+                    constexpr int kMinimumExposure = 64;
+                    const QRect intersection = desiredRect.intersected(sibling->geometry());
+
+                    const bool isOnScreen = intersection.width() >= kMinimumExposure
+                        && intersection.height() >= kMinimumExposure;
+
+                    if (isOnScreen)
+                    {
+                        window()->setPosition(*state->windowPosition);
+                        break;
+                    }
+                }
+            }
         };
 
     installEventHandler(window(), QEvent::Hide, this, saveState);
