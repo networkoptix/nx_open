@@ -75,6 +75,12 @@ JoystickSettingsDialog::Private::Private(JoystickSettingsDialog* owner, Manager*
 {
     manager->setDeviceActionsEnabled(false);
 
+    connect(q, &JoystickSettingsDialog::done, 
+        [manager]
+        {
+            manager->setDeviceActionsEnabled(true);
+        });
+
     treeEntityBuilder->setUser(q->context()->accessController()->user());
     layoutsEntity = treeEntityBuilder->createDialogAllLayoutsEntity();
     layoutModel.setRootEntity(layoutsEntity.get());
