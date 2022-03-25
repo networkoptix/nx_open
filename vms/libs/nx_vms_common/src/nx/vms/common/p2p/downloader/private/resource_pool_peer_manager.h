@@ -42,8 +42,7 @@ public:
         int chunkSize) override;
 
     void setServerDirectConnection(const QnUuid& id, const rest::ServerConnectionPtr& connection);
-    QnUuid getServerIdWithInternet() const;
-    void setPeersWithInternetAccess(const QSet<QnUuid>& ids);
+    void clearServerDirectConnections();
 
 protected:
     ResourcePoolPeerManager(

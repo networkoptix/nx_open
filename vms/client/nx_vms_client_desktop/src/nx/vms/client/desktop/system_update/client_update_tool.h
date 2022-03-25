@@ -146,8 +146,6 @@ public:
      */
     void setServerUrl(const nx::vms::client::core::LogonData& logonData);
 
-    void checkServersInSystem();
-
     /**
      * Requests update information from the internet. It can proxy request through mediaserver if
      * client has no internet.
@@ -165,6 +163,21 @@ public:
      * @param includeCurrentVersion Should we include a version of current client instance.
      */
     std::set<nx::utils::SoftwareVersion> getInstalledClientVersions(bool includeCurrentVersion = false) const;
+
+    struct SystemServersInfo
+    {
+        QnUuidList serversWithInternet;
+        QnUuidList persistentStorageServers;
+    };
+
+    /**
+     * Get information about servers in the target system: where update files are stored, which
+     * servers have internet connection.
+     * @param targetVersion Version of servers in the system. Needed to choose proper API calls.
+     */
+    ClientUpdateTool::SystemServersInfo getSystemServersInfo(
+        const nx::utils::SoftwareVersion& targetVersion) const;
+    void setupProxyConnections(const SystemServersInfo& serversInfo);
 
     static QString toString(State state);
 

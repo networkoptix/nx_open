@@ -13,6 +13,7 @@
 #include <nx/network/cloud/cloud_connect_controller.h>
 #include <nx/network/socket_global.h>
 #include <nx/network/url/url_builder.h>
+#include <nx/reflect/json.h>
 #include <nx/utils/app_info.h>
 #include <nx/utils/guarded_callback.h>
 #include <nx/utils/log/log.h>
@@ -23,6 +24,7 @@
 #include <nx/vms/client/desktop/ini.h>
 #include <nx/vms/common/p2p/downloader/private/internet_only_peer_manager.h>
 #include <nx/vms/common/p2p/downloader/private/resource_pool_peer_manager.h>
+#include <nx/vms/common/update/persistent_update_storage.h>
 #include <nx/vms/update/update_check.h>
 #include <utils/applauncher_utils.h>
 
@@ -261,37 +263,6 @@ void ClientUpdateTool::setServerUrl(const core::LogonData& logonData)
             logonData.credentials));
     m_peerManager->setServerDirectConnection(serverId, m_serverConnection);
     m_proxyPeerManager->setServerDirectConnection(serverId, m_serverConnection);
-}
-
-void ClientUpdateTool::checkServersInSystem()
-{
-    if (!m_serverConnection)
-    {
-        NX_WARNING(this, "checkServersInSystem() - No connection to server");
-        return;
-    }
-    m_serverConnection->getMediaServers(nx::utils::guarded(this,
-        [this](bool success, [[maybe_unused]] int handle, const nx::vms::api::MediaServerDataList& mediaservers)
-        {
-            if (!success)
-                return;
-            QSet<QnUuid> withInternet;
-            QSet<QnUuid> withoutInternet;
-
-            for (const auto& server: mediaservers)
-            {
-                bool hasInternet = server.flags.testFlag(nx::vms::api::ServerFlag::SF_HasPublicIP);
-                if (hasInternet)
-                    withInternet.insert(server.id);
-                else
-                    withoutInternet.insert(server.id);
-            }
-
-            NX_VERBOSE(this,
-                "checkServersInSystem() - got %1 servers with internet and %2 servers without",
-                withInternet.size(), withoutInternet.size());
-            m_proxyPeerManager->setPeersWithInternetAccess(withInternet);
-        }), thread());
 }
 
 std::set<nx::utils::SoftwareVersion> ClientUpdateTool::getInstalledClientVersions(
@@ -784,6 +755,8 @@ void ClientUpdateTool::resetState()
     m_updateFile = "";
     m_updateVersion = nx::utils::SoftwareVersion();
     m_clientPackage = nx::vms::update::Package();
+    m_peerManager->clearServerDirectConnections();
+    m_proxyPeerManager->clearServerDirectConnections();
 }
 
 void ClientUpdateTool::clearDownloadFolder()
@@ -884,6 +857,170 @@ QString ClientUpdateTool::downloaderErrorToString(
     }
 
     return {};
+}
+
+struct ServerInfo
+{
+    QnUuid id;
+    nx::vms::api::ServerFlags flags;
+};
+NX_REFLECTION_INSTRUMENT(ServerInfo, (id)(flags))
+
+ClientUpdateTool::SystemServersInfo ClientUpdateTool::getSystemServersInfo(
+    const nx::utils::SoftwareVersion& targetVersion) const
+{
+    const nx::utils::SoftwareVersion kProxyRequestsSupportedVersion{4, 0};
+    const nx::utils::SoftwareVersion kNewRestApiVersion{5, 0};
+    const nx::utils::SoftwareVersion kPersistentStorageIntroducedVersion{5, 0};
+
+    if (!m_serverConnection)
+        return {};
+
+    NX_DEBUG(this,
+        "Requesting information about servers in a system with version %1",
+        targetVersion);
+
+    SystemServersInfo result;
+
+    std::vector<std::future<std::optional<QnUuidList>>*> futureList;
+
+    std::promise<std::optional<QnUuidList>> installedVersionStorageServersPromise;
+    auto installedVersionStorageServersFuture = installedVersionStorageServersPromise.get_future();
+    std::promise<std::optional<QnUuidList>> targetVersionStorageServersPromise;
+    auto targetVersionStorageServersFuture = targetVersionStorageServersPromise.get_future();
+    std::promise<std::optional<QnUuidList>> serversWithInternetPromise;
+    auto serversWithInternetFuture = serversWithInternetPromise.get_future();
+
+    if (targetVersion >= kPersistentStorageIntroducedVersion)
+    {
+        NX_VERBOSE(this, "Requesting info about persistent storage servers.");
+
+        auto handlePersistentStorageInfo =
+            [](bool success, const QByteArray& data) -> std::optional<QnUuidList>
+            {
+                common::update::PersistentUpdateStorage storage;
+                if (success && QJson::deserialize(data, &storage))
+                    return storage.servers;
+                return std::nullopt;
+            };
+
+        rest::Handle handle = m_serverConnection->getRawResult(
+            "/rest/v1/system/settings/installedPersistentUpdateStorage",
+            {},
+            [&](bool success, rest::Handle, const QByteArray& data, nx::network::http::HttpHeaders)
+            {
+                installedVersionStorageServersPromise.set_value(
+                    handlePersistentStorageInfo(success, data));
+            });
+        if (handle > 0)
+            futureList.push_back(&installedVersionStorageServersFuture);
+        else
+            NX_WARNING(this, "Cannot request information about the installed update from server.");
+
+        handle = m_serverConnection->getRawResult(
+            "/rest/v1/system/settings/targetPersistentUpdateStorage",
+            {},
+            [&](bool success, rest::Handle, const QByteArray& data, nx::network::http::HttpHeaders)
+            {
+                targetVersionStorageServersPromise.set_value(
+                    handlePersistentStorageInfo(success, data));
+            });
+        if (handle > 0)
+            futureList.push_back(&targetVersionStorageServersFuture);
+        else
+            NX_WARNING(this, "Cannot request information about the installing update from server.");
+    }
+
+    if (targetVersion >= kProxyRequestsSupportedVersion)
+    {
+        QString path("/rest/v1/servers");
+        network::rest::Params params{{"_with", "id,flags"}};
+        if (targetVersion < kNewRestApiVersion)
+        {
+            path = "/ec2/getMediaServers";
+            params = {};
+        }
+        NX_VERBOSE(this, "Requesting info about servers with internet using URL path %1.", path);
+
+        rest::Handle handle = m_serverConnection->getRawResult(
+            path,
+            params,
+            [&](bool success,
+                rest::Handle,
+                const QByteArray& data,
+                nx::network::http::HttpHeaders)
+            {
+                if (success)
+                {
+                    std::vector<ServerInfo> servers;
+                    if (reflect::json::deserialize(data.data(), &servers))
+                    {
+                        QnUuidList result;
+                        for (const auto& server: servers)
+                        {
+                            if (server.flags.testFlag(vms::api::SF_HasPublicIP))
+                                result.append(server.id);
+                        }
+                        serversWithInternetPromise.set_value(result);
+                        return;
+                    }
+                }
+                serversWithInternetPromise.set_value(std::nullopt);
+            });
+        if (handle > 0)
+            futureList.push_back(&serversWithInternetFuture);
+        else
+            NX_WARNING(this, "Cannot request information about servers connected to Internet.");
+    }
+
+    while (!futureList.empty())
+    {
+        if (futureList.back()->wait_for(30s) == std::future_status::ready)
+            futureList.pop_back();
+    }
+
+    if (targetVersion >= kPersistentStorageIntroducedVersion)
+    {
+        QnUuidSet persistentStorageServers;
+
+        if (auto list = installedVersionStorageServersFuture.get())
+            persistentStorageServers = QnUuidSet(list->begin(), list->end());
+        else
+            NX_WARNING(this, "Failed to get information about the installed update.");
+
+        if (auto list = targetVersionStorageServersFuture.get())
+            persistentStorageServers.unite(QnUuidSet(list->begin(), list->end()));
+        else
+            NX_WARNING(this, "Failed to get information about the installing update.");
+
+        result.persistentStorageServers =
+            QnUuidList(persistentStorageServers.begin(), persistentStorageServers.end());
+    }
+
+    if (targetVersion >= kProxyRequestsSupportedVersion)
+    {
+        if (auto list = serversWithInternetFuture.get())
+            result.serversWithInternet = *list;
+        else
+            NX_WARNING(this, "Failed to get information about servers connected to Internet.");
+    }
+
+    NX_VERBOSE(this,
+        "Received information about system servers. "
+            "Servers with internet: %1, persistent storage servers: %2",
+        result.serversWithInternet,
+        result.persistentStorageServers);
+
+    return result;
+}
+
+void ClientUpdateTool::setupProxyConnections(const SystemServersInfo& serversInfo)
+{
+    for (const auto& id: serversInfo.persistentStorageServers)
+        m_peerManager->setServerDirectConnection(id, m_serverConnection);
+
+    for (const auto& id: serversInfo.serversWithInternet)
+        m_proxyPeerManager->setServerDirectConnection(id, m_serverConnection);
 }
 
 } // namespace nx::vms::client::desktop
