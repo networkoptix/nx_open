@@ -573,7 +573,7 @@ bool AnalyticsSearchListModel::Private::commitInternal(const QnTimePeriod& perio
                 break;
 
             const int index = m_data.indexOf(iter->id);
-            if (index > 0)
+            if (index >= 0)
             {
                 ++updated;
                 m_dataChangedTrackIds.insert(iter->id);
@@ -1206,13 +1206,17 @@ QString AnalyticsSearchListModel::Private::description(
     using namespace std::chrono;
     // Not translatable, debug string.
     return nx::format(
-        "Timestamp: %1 us<br>%2<br>Duration: %3 us<br>%4<br>Best shot: %5 us<br>%6<br>").args(
+        "Timestamp: %1 us<br>%2<br>"
+        "Duration: %3 us<br>%4<br>"
+        "Best shot: %5 us<br>%6<br>"
+        "Track ID: %7<br>").args(
             track.firstAppearanceTimeUs,
             start.toString(Qt::RFC2822Date),
             duration.count(),
             text::HumanReadable::timeSpan(duration_cast<milliseconds>(duration)),
             track.bestShot.timestampUs,
-            timeWatcher->displayTime(track.bestShot.timestampUs / 1000).toString(Qt::RFC2822Date));
+            timeWatcher->displayTime(track.bestShot.timestampUs / 1000).toString(Qt::RFC2822Date),
+            track.id.toSimpleString());
 }
 
 QString AnalyticsSearchListModel::Private::engineName(
