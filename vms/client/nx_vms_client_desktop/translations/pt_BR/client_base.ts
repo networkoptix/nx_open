@@ -3333,7 +3333,7 @@ a %1</translation>
     </message>
     <message>
       <source>Backup includes servers and cameras settings, users, webpages, event rules, etc. Video is not saved.</source>
-      <translation>O backup inclui configurações de servidores e câmeras, usuários, páginas da web, regras de eventos, etc. O vídeo não é salvo.</translation>
+      <translation>O ‘backup’ inclui configurações de servidores e câmeras, usuários, páginas da ‘web’, regras de eventos, etc. O vídeo não é salvo.</translation>
     </message>
     <message>
       <source>Creates a backup of System configuration that can be restored in case of failure.</source>
@@ -3829,7 +3829,7 @@ a %1</translation>
     </message>
     <message>
       <source>Displays IP addresses for cameras and servers and roles for users.</source>
-      <translation>Mostrar endereços IP para as câmaras e servidores e perfis para os utilizadores.</translation>
+      <translation>Exibe endereços IP para câmeras, servidores e funções para usuários.</translation>
     </message>
     <message>
       <source>Length of time each camera on layout will be displayed if you start a Tour.</source>
@@ -5409,7 +5409,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Rebuilding archive index is canceled by user</source>
-      <translation>A reconstrução do índice de arquivo foi cancelada pelo usuário</translation>
+      <translation>A reconstrução do índice dos arquivos foi cancelada pelo usuário</translation>
     </message>
     <message>
       <source>Email address is not set for user %1</source>
@@ -5437,7 +5437,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Rebuilding archive index is canceled by user on the following Server:</source>
-      <translation>A reconstrução do índice de arquivos foi cancelada pelo usuário no seguinte Servidor:</translation>
+      <translation>A reconstrução do índice dos arquivos foi cancelada pelo usuário no seguinte Servidor:</translation>
     </message>
     <message>
       <source>Learn more</source>
@@ -5647,7 +5647,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <message>
       <source>%1 user</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 usuário</translation>
+      <translation>%1 Usuário</translation>
     </message>
   </context>
   <context>
@@ -5697,7 +5697,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>Users can be imported from an LDAP server. They will be able to log in only if LDAP server is online and their accounts are active on it.</source>
-      <translation>Os usuários podem ser importados de um servidor LDAP. Eles poderão fazer login apenas se o servidor LDAP estiver online e suas contas estiverem ativas nele.</translation>
+      <translation>Os usuários podem ser importados de um servidor LDAP. Eles poderão fazer ‘login’ apenas se o servidor LDAP estiver ‘online’ e suas contas estiverem ativas nele.</translation>
     </message>
     <message>
       <source>All users</source>
@@ -5871,7 +5871,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     </message>
     <message>
       <source>User with specified login already exists.</source>
-      <translation>O usuário com login especificado já existe.</translation>
+      <translation>O usuário com ‘login’ especificado já existe.</translation>
     </message>
     <message>
       <source>User has been renamed. Password must be updated.</source>
@@ -5904,7 +5904,7 @@ Se você pretendia transferir dados analíticos para outro local de armazenament
     <message>
       <source>%1 user with specified email already exists.</source>
       <comment>%1 is the short cloud name (like Cloud)</comment>
-      <translation>%1 já existe um usuário com o e-mail especificado.</translation>
+      <translation>%1 Já existe um usuário com o e-mail especificado.</translation>
     </message>
     <message>
       <source>Local users</source>
@@ -6403,7 +6403,7 @@ Recomendamos que você não abra esta página da ‘web’. Se você entender os
     </message>
     <message>
       <source>Could not start upload as another user is currently uploading footage to this camera.</source>
-      <translation>Não foi possível iniciar o upload porque outro usuário está enviando imagens para esta câmera.</translation>
+      <translation>Não foi possível iniciar o ‘upload’ porque outro usuário está enviando imagens para esta câmera.</translation>
     </message>
     <message>
       <source>Could not finish upload to %1</source>
