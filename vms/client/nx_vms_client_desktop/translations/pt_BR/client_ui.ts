@@ -2082,11 +2082,11 @@
     </message>
     <message>
       <source>New User...</source>
-      <translation>Novo Utilizador...</translation>
+      <translation>Novo usuário...</translation>
     </message>
     <message>
       <source>Fetch Users from LDAP...</source>
-      <translation>Obter utilizador a partir do LDAP...</translation>
+      <translation>Obter Usuários do LDAP...</translation>
     </message>
     <message>
       <source>Search users</source>
