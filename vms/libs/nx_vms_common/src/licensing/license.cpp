@@ -642,6 +642,17 @@ QnLicenseList QnLicensePool::getLicenses() const
     return m_licenseDict.values();
 }
 
+QnLicensePtr QnLicensePool::findLicense(const QString& key) const
+{
+    NX_MUTEX_LOCKER locker(&m_mutex);
+    const auto it = m_licenseDict.find(key.toLatin1());
+
+    if (it != m_licenseDict.end())
+        return *it;
+
+    return nullptr;
+}
+
 void QnLicensePool::addLicense_i(const QnLicensePtr& license)
 {
     if (!license)
