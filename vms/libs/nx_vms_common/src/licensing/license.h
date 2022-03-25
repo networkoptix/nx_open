@@ -197,6 +197,7 @@ public:
     static int camerasPerAnalogEncoder();
 
     QnLicenseList getLicenses() const;
+    QnLicensePtr findLicense(const QString& key) const;
 
     void addLicense(const QnLicensePtr& license);
     void addLicenses(const QnLicenseList& licenses);
