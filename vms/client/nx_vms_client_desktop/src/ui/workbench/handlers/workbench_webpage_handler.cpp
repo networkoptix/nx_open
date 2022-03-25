@@ -64,27 +64,17 @@ void QnWorkbenchWebPageHandler::at_newWebPageAction_triggered()
     webPage->setIdUnsafe(QnUuid::createUuid());
     webPage->setUrl(dialog->url().toString());
     webPage->setName(dialog->name());
+    resourcePool()->addResource(webPage);
+
+    // Properties can be set only after Resource is added to the Resource Pool.
     webPage->setSubtype(dialog->subtype());
     webPage->setProxyId(dialog->proxyId());
     webPage->setProxyDomainAllowList(dialog->proxyDomainAllowList());
     webPage->setCertificateCheckEnabled(dialog->isCertificateCheckEnabled());
 
-    // No need to backup newly created webpage.
-    auto applyChangesFunction = QnResourcesChangesManager::WebPageChangesFunction();
-    auto callbackFunction =
-        [this](bool success, const QnWebPageResourcePtr& webPage)
-        {
-            // Cannot capture the resource directly because real resource pointer may differ if the
-            // transaction is received before the request callback.
-            NX_ASSERT(webPage);
-            if (success && webPage)
-            {
-                menu()->trigger(action::SelectNewItemAction, webPage);
-                menu()->trigger(action::DropResourcesAction, webPage);
-            }
-        };
-
-    qnResourcesChangesManager->saveWebPage(webPage, applyChangesFunction, callbackFunction);
+    qnResourcesChangesManager->saveWebPage(webPage);
+    menu()->trigger(action::SelectNewItemAction, webPage);
+    menu()->trigger(action::DropResourcesAction, webPage);
 }
 
 void QnWorkbenchWebPageHandler::at_editWebPageAction_triggered()
