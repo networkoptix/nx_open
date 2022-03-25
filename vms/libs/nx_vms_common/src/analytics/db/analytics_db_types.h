@@ -64,7 +64,7 @@ struct NX_VMS_COMMON_API ObjectRegion
 };
 
 #define ObjectRegion_analytics_storage_Fields (boundingBoxGrid)
-QN_FUSION_DECLARE_FUNCTIONS(ObjectRegion, (json)(ubjson));
+QN_FUSION_DECLARE_FUNCTIONS(ObjectRegion, (json)(ubjson), NX_VMS_COMMON_API);
 NX_REFLECTION_INSTRUMENT(ObjectRegion, ObjectRegion_analytics_storage_Fields)
 
 struct Image
@@ -75,7 +75,7 @@ struct Image
     bool isEmpty() const { return imageData.isEmpty();  }
 };
 #define Image_analytics_storage_Fields (imageDataFormat)(imageData)
-QN_FUSION_DECLARE_FUNCTIONS(Image, (json)(ubjson));
+QN_FUSION_DECLARE_FUNCTIONS(Image, (json)(ubjson), NX_VMS_COMMON_API);
 NX_REFLECTION_INSTRUMENT(Image, Image_analytics_storage_Fields)
 
 struct BestShot
@@ -91,7 +91,7 @@ struct BestShot
 #define BestShot_analytics_storage_Fields \
     (timestampUs)(rect)(streamIndex)(image)
 
-QN_FUSION_DECLARE_FUNCTIONS(BestShot, (json)(ubjson));
+QN_FUSION_DECLARE_FUNCTIONS(BestShot, (json)(ubjson), NX_VMS_COMMON_API);
 NX_REFLECTION_INSTRUMENT(BestShot, BestShot_analytics_storage_Fields)
 
 struct BestShotEx: public BestShot
@@ -138,7 +138,7 @@ struct NX_VMS_COMMON_API ObjectTrackEx: public ObjectTrack
 #define ObjectTrackEx_analytics_storage_Fields \
     ObjectTrack_analytics_storage_Fields(objectPositionSequence)
 
-QN_FUSION_DECLARE_FUNCTIONS(ObjectTrack, (json)(ubjson));
+QN_FUSION_DECLARE_FUNCTIONS(ObjectTrack, (json)(ubjson), NX_VMS_COMMON_API);
 QN_FUSION_DECLARE_FUNCTIONS(ObjectTrackEx, (json)(ubjson), NX_VMS_COMMON_API);
 
 NX_REFLECTION_INSTRUMENT(ObjectTrack, ObjectTrack_analytics_storage_Fields)
