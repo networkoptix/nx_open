@@ -371,7 +371,8 @@ nx::vms::api::LoginSession RemoteConnectionFactoryRequestsManager::createLocalSe
         context,
         nx::reflect::json::serialize(request),
         expectedErrorCodes({
-            {StatusCode::unprocessableEntity, RemoteConnectionErrorCode::unauthorized}
+            {StatusCode::unprocessableEntity, RemoteConnectionErrorCode::unauthorized},
+            {StatusCode::notFound, RemoteConnectionErrorCode::unauthorized} //< LDAP user.
         }));
 }
 
