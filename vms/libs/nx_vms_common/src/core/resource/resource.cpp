@@ -282,7 +282,7 @@ void QnResource::setStatus(ResourceStatus newStatus, Qn::StatusChangeReason reas
     if (hasFlags(Qn::removed))
         return;
 
-    if (!context())
+    if (!NX_ASSERT(context()))
         return;
 
     QnUuid id = getId();
