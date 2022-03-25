@@ -443,17 +443,12 @@ void CameraReplacementDialog::updateDataTransferReportPage()
     }
     else
     {
-        // TODO: #vbreus All messages regarding data transfer, even predefined ones should come
-        // from the server response for the consistency.
-        ui->dataTransferContentsLayout->addLayout(createDataTransferSuccessItem(tr("Name")));
-        ui->dataTransferContentsLayout->addLayout(createDataTransferSuccessItem(tr("Archive")));
-
         const auto report = d->deviceReplacementResponce->report;
         for (auto reportItr = report.cbegin(); reportItr != report.end(); ++reportItr)
         {
-            QStringList warnings(reportItr->second.cbegin(), reportItr->second.cend());
+            QStringList warnings(reportItr->messages.cbegin(), reportItr->messages.cend());
             ui->dataTransferContentsLayout->addLayout(
-                createDataTransferWarningItem(reportItr->first, warnings));
+                createDataTransferWarningItem(reportItr->name, warnings));
         }
     }
 
