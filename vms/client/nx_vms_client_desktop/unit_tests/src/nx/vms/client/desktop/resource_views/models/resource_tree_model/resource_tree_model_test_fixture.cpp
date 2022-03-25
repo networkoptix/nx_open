@@ -127,7 +127,6 @@ QnMediaServerResourcePtr ResourceTreeModelTest::addServer(const QString& name) c
 {
     QnMediaServerResourcePtr server(new QnMediaServerResource());
     server->setIdUnsafe(QnUuid::createUuid());
-    server->setStatus(nx::vms::api::ResourceStatus::offline);
     server->setName(name);
     resourcePool()->addResource(server);
     return server;
@@ -137,7 +136,6 @@ QnMediaServerResourcePtr ResourceTreeModelTest::addEdgeServer(const QString& nam
 {
     QnMediaServerResourcePtr server(new QnMediaServerResource());
     server->setIdUnsafe(QnUuid::createUuid());
-    server->setStatus(nx::vms::api::ResourceStatus::offline);
     server->setName(name);
     server->setServerFlags(server->getServerFlags() | ServerFlag::SF_Edge);
     server->setNetAddrList({nx::network::SocketAddress(address.toStdString())});
