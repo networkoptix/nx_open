@@ -41,7 +41,6 @@ public:
 
     nx::Mutex mutex;
     bool allowIndirectInternetRequests = false;
-    QSet<QnUuid> peersWithInternet;
 
 public:
     Private(ResourcePoolPeerManager* q):
@@ -166,18 +165,10 @@ void ResourcePoolPeerManager::setServerDirectConnection(
         d->directConnectionByServerId.remove(id);
 }
 
-QnUuid ResourcePoolPeerManager::getServerIdWithInternet() const
+void ResourcePoolPeerManager::clearServerDirectConnections()
 {
     NX_MUTEX_LOCKER lock(&d->mutex);
-    if (!d->peersWithInternet.empty())
-        return *d->peersWithInternet.begin();
-    return {};
-}
-
-void ResourcePoolPeerManager::setPeersWithInternetAccess(const QSet<QnUuid>& ids)
-{
-    NX_MUTEX_LOCKER lock(&d->mutex);
-    d->peersWithInternet = ids;
+    d->directConnectionByServerId.clear();
 }
 
 void ResourcePoolPeerManager::setIndirectInternetRequestsAllowed(bool allow)
@@ -288,16 +279,8 @@ AbstractPeerManager::RequestContextPtr<nx::Buffer> ResourcePoolPeerManager::down
     rest::Handle handle = -1;
     if (d->allowIndirectInternetRequests)
     {
-        QnUuid serverId = getServerIdWithInternet();
-        if (serverId.isNull())
-            serverId = peerId;
         handle = connection->downloadFileChunkFromInternet(
-            serverId,
-            fileName,
-            url,
-            chunkIndex,
-            chunkSize,
-            handleReply);
+            peerId, fileName, url, chunkIndex, chunkSize, handleReply);
     }
     else
     {

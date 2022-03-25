@@ -40,6 +40,9 @@ struct CompatibilityVersionInstallationDialog::Private
     std::future<UpdateContents> updateInfoMediaserver;
     // Update info from the internet.
     std::future<UpdateContents> updateInfoInternet;
+    // Information about servers in the system.
+    std::future<ClientUpdateTool::SystemServersInfo> systemServersInfo;
+
     int requestsLeft = 0;
     bool checkingUpdates = false;
 
@@ -239,6 +242,8 @@ QString CompatibilityVersionInstallationDialog::errorString() const
 
 void CompatibilityVersionInstallationDialog::atUpdateCurrentState()
 {
+    ClientUpdateTool::SystemServersInfo serversInfo;
+
     if (m_private->checkingUpdates)
     {
         if (m_private->updateInfoInternet.valid()
@@ -267,11 +272,21 @@ void CompatibilityVersionInstallationDialog::atUpdateCurrentState()
             --m_private->requestsLeft;
         }
 
+        if (m_private->systemServersInfo.valid()
+            && m_private->systemServersInfo.wait_for(kWaitForUpdateInfo)
+                == std::future_status::ready)
+        {
+            --m_private->requestsLeft;
+
+            serversInfo = m_private->systemServersInfo.get();
+        }
+
         // Done waiting for update information
         if (m_private->requestsLeft == 0)
         {
             if (m_private->updateContents.isValidToInstall())
             {
+                m_private->clientUpdateTool->setupProxyConnections(serversInfo);
                 m_private->clientUpdateTool->setUpdateTarget(m_private->updateContents);
             }
             else
@@ -285,7 +300,6 @@ void CompatibilityVersionInstallationDialog::atUpdateCurrentState()
     }
 
     m_private->clientUpdateTool->checkInternalState();
-    m_private->clientUpdateTool->checkServersInSystem();
 }
 
 void CompatibilityVersionInstallationDialog::startUpdate()
@@ -308,6 +322,14 @@ void CompatibilityVersionInstallationDialog::startUpdate()
         nx::vms::common::update::InstalledVersionParams{});
     if (m_private->updateInfoMediaserver.valid())
         ++m_private->requestsLeft;
+
+    m_private->systemServersInfo = std::async(
+        std::launch::async,
+        [this]()
+        {
+            return m_private->clientUpdateTool->getSystemServersInfo(m_versionToInstall);
+        });
+    ++m_private->requestsLeft;
 
     m_private->lastActionStamp = Clock::now();
 
