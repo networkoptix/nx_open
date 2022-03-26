@@ -146,7 +146,7 @@
     <name>QnCameraDiagnosticsErrorCodeStrings</name>
     <message>
       <source>OK</source>
-      <translation>Xác định</translation>
+      <translation>Xác nhận</translation>
     </message>
     <message>
       <source>Server has been stopped.</source>
@@ -154,39 +154,39 @@
     </message>
     <message>
       <source>Media stream is opened but no media data was received.</source>
-      <translation>Phương tiện truyền thông được bật nhưng không nhận được dữ liệu truyền thông.</translation>
+      <translation>Luồng đa phương tiện được bật nhưng không nhận được dữ liệu đa phương tiện nào.</translation>
     </message>
     <message>
       <source>Unknown error. Please contact support.</source>
-      <translation>Lỗi không xác định, hãy tìm mua hàng của bạn các giải pháp nhà cung cấp.</translation>
+      <translation>Lỗi không xác định. Vui lòng liên hệ với hỗ trợ kĩ thuật.</translation>
     </message>
     <message>
       <source>(unknown)</source>
-      <translation>(Vô danh)</translation>
+      <translation>(không xác định)</translation>
     </message>
     <message>
       <source>Server %1 is not available.</source>
-      <translation>Máy chủ %1 là không có sẵn.</translation>
+      <translation>Máy chủ %1 không khả dụng.</translation>
     </message>
     <message>
       <source>Check that Server is up and running.</source>
-      <translation>Kiểm tra máy chủ đó là lên và chạy.</translation>
+      <translation>Kiểm tra Máy chủ đó có đang chạy hay không.</translation>
     </message>
     <message>
       <source>Received bad response from Server %1: &quot;%2&quot;.</source>
-      <translation>Đã nhận phản hồi xấu từ Máy chủ %1: &quot;%2&quot;.</translation>
+      <translation>Đã nhận được phản hồi không tốt từ Máy chủ %1: &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Check if Server is up and has the proper version.</source>
-      <translation>Kiểm tra xem máy chủ đang lên và có các phiên bản thích hợp.</translation>
+      <translation>Kiểm tra xem Máy chủ có đang chạy phiên bản phù hợp hay không.</translation>
     </message>
     <message>
       <source>Cannot connect to http port %1.</source>
-      <translation>Không thể kết nối với http cổng %1.</translation>
+      <translation>Không thể kết nối với cổng http %1.</translation>
     </message>
     <message>
       <source>Finally, try to update firmware. If the problem persists, please contact support.</source>
-      <translation>Cuối cùng, cố gắng cập nhật firmware. Nếu vấn đề vẫn còn tồn tại, xin vui lòng liên hệ với hỗ trợ.</translation>
+      <translation>Cuối cùng, hãy thử cập nhật firmware. Nếu sự cố vẫn tiếp diễn, vui lòng liên hệ với hỗ trợ kĩ thuật.</translation>
     </message>
     <message>
       <source>Failed to configure parameter %1.</source>
@@ -194,11 +194,11 @@
     </message>
     <message>
       <source>Please contact support.</source>
-      <translation>Vui lòng liên hệ hỗ trợ.</translation>
+      <translation>Vui lòng liên hệ hỗ trợ kĩ thuật.</translation>
     </message>
     <message>
       <source>An input/output error has occurred. OS message: &quot;%1&quot;.</source>
-      <translation>Đã xảy ra lỗi đầu vào / đầu ra. Thông điệp của hệ điều hành: &quot;%1&quot;.</translation>
+      <translation>Đã xảy ra lỗi đầu vào/đầu ra. Tin nhắn hệ điều hành: &quot;%1&quot;.</translation>
     </message>
     <message>
       <source>Parameters:</source>
@@ -206,19 +206,19 @@
     </message>
     <message>
       <source>Please try to reboot the device, then restore factory defaults on the web-page.</source>
-      <translation>Hãy cố gắng để khởi động lại thiết bị, sau đó khôi phục mặc định nhà máy trên các trang web.</translation>
+      <translation>Vui lòng thử khởi động lại thiết bị, sau đó khôi phục cài đặt gốc trên trang web.</translation>
     </message>
     <message>
       <source>Please try to reboot the camera, then restore factory defaults on the web-page.</source>
-      <translation>Hãy cố gắng để khởi động lại máy, sau đó khôi phục mặc định nhà máy trên các trang web.</translation>
+      <translation>Vui lòng thử khởi động lại camera, sau đó khôi phục cài đặt gốc trên trang web.</translation>
     </message>
     <message>
       <source>Make sure the device is plugged into the network. Try to reboot the device.</source>
-      <translation>Hãy chắc chắn rằng thiết bị được cắm vào mạng. Hãy thử khởi động lại thiết bị.</translation>
+      <translation>Hãy chắc chắn rằng thiết bị được kết nối mạng. Hãy thử khởi động lại thiết bị.</translation>
     </message>
     <message>
       <source>Make sure the camera is plugged into the network. Try to reboot the camera.</source>
-      <translation>Hãy chắc chắn rằng các camera được cắm vào mạng. Hãy thử khởi động lại máy ảnh.</translation>
+      <translation>Hãy chắc chắn rằng camera được kết nối mạng. Hãy thử khởi động lại camera.</translation>
     </message>
     <message>
       <source>Device request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
@@ -226,55 +226,55 @@
     </message>
     <message>
       <source>Camera request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>Yêu cầu của Camera &quot;%1&quot; không thành công với lỗi &quot;%2&quot;.</translation>
+      <translation>Yêu cầu Camera &quot;%1&quot; không thành công với lỗi &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown device issue.</source>
-      <translation>Không biết vấn đề thiết bị.</translation>
+      <translation>Sự cố thiết bị không xác định.</translation>
     </message>
     <message>
       <source>Unknown camera issue.</source>
-      <translation>Không biết vấn đề camera.</translation>
+      <translation>Sự cố camera không xác định.</translation>
     </message>
     <message>
       <source>Invalid data was received from the device %1.</source>
-      <translation>Dữ liệu không hợp lệ đã nhận được từ các thiết bị %1.</translation>
+      <translation>Nhận được dữ liệu không hợp lệ từ thiết bị %1.</translation>
     </message>
     <message>
       <source>Invalid data was received from the camera %1.</source>
-      <translation>Dữ liệu không hợp lệ đã nhận được từ các camera %1.</translation>
+      <translation>Nhận được dữ liệu không hợp lệ từ camera %1.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open device issues dialog for more details.</source>
-      <translation>Quá nhiều phương tiện truyền thông lỗi. Hãy mở những vấn đề thiết bị thoại để biết thêm chi tiết.</translation>
+      <translation>Quá nhiều lỗi đa phương tiện. Vui lòng mở hộp thoại sự cố thiết bị để biết thêm chi tiết.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open camera issues dialog for more details.</source>
-      <translation>Quá nhiều phương tiện truyền thông lỗi. Hãy mở những vấn đề camera thoại để biết thêm chi tiết.</translation>
+      <translation>Quá nhiều lỗi đa phương tiện. Vui lòng mở hộp thoại sự cố camera để biết thêm chi tiết.</translation>
     </message>
     <message>
       <source>Please try to reboot the I/O module, then restore factory defaults on the web-page.</source>
-      <translation>Hãy cố gắng để khởi động lại các I/O module, sau đó khôi phục mặc định nhà máy trên các trang web.</translation>
+      <translation>Vui lòng thử khởi động lại mô-đun I/O, sau đó khôi phục cài đặt gốc trên trang web.</translation>
     </message>
     <message>
       <source>Make sure the I/O module is plugged into the network. Try to reboot the I/O module.</source>
-      <translation>Hãy chắc chắn rằng các I/O module được cắm vào mạng. Hãy thử khởi động lại các I / O module.</translation>
+      <translation>Hãy chắc chắn rằng mô-đun I/O được kết nối mạng. Hãy thử khởi động lại mô-đun I/O.</translation>
     </message>
     <message>
       <source>I/O Module request &quot;%1&quot; failed with error &quot;%2&quot;.</source>
-      <translation>Yêu cầu mô-đun I/O &quot;%1&quot; không thành công với lỗi &quot;%2&quot;.</translation>
+      <translation>Yêu cầu Mô-đun I/O &quot;%1&quot; không thành công với lỗi &quot;%2&quot;.</translation>
     </message>
     <message>
       <source>Unknown I/O module issue.</source>
-      <translation>Không biết I/O module vấn đề.</translation>
+      <translation>Sự cố mô-đun I/O không xác định.</translation>
     </message>
     <message>
       <source>Invalid data was received from the I/O module %1.</source>
-      <translation>Dữ liệu không hợp lệ đã nhận được từ các I / O module %1.</translation>
+      <translation>Nhận được dữ liệu không hợp lệ từ các mô-đun I/O %1.</translation>
     </message>
     <message>
       <source>Too many media errors. Please open I/O module issues dialog for more details.</source>
-      <translation>Quá nhiều lỗi phương tiện truyền thông. Hãy mở tôi vấn đề I/O module thoại để biết thêm chi tiết.</translation>
+      <translation>Quá nhiều lỗi đa phương tiện. Vui lòng mở hộp thoại sự cố mô-đun I/O để biết thêm chi tiết.</translation>
     </message>
     <message>
       <source>Device initialization process is in progress.</source>
@@ -286,7 +286,7 @@
     </message>
     <message>
       <source>I/O Module initialization process is in progress.</source>
-      <translation>I/O Module khởi tạo quá trình được tiến hành.</translation>
+      <translation>Quá trình khởi tạo mô-đun I/O đang được tiến hành.</translation>
     </message>
     <message>
       <source>Make sure port %1 is accessible (e.g. forwarded).</source>
@@ -302,7 +302,7 @@
     </message>
     <message>
       <source>If it does not help, restore factory defaults on the I/O module web-page.</source>
-      <translation>Nếu nó không hỗ trợ, khôi phục các giá trị mặc định của nhà sản xuất trên trang web I/O module.</translation>
+      <translation>Nếu cách này không hiệu quả, hãy khôi phục cài đặt gốc trên trang web mô-đun I/O.</translation>
     </message>
     <message>
       <source>Cannot open media URL %1. Failed to connect to media port %2.</source>
@@ -322,7 +322,7 @@
     </message>
     <message>
       <source>Could not parse I/O module response. URL %1, request name %2.</source>
-      <translation>Không thể phân tích phản hồi I/O module. URL %1, tên yêu cầu %2.</translation>
+      <translation>Không thể phân tích phản hồi mô-đun I/O. URL %1, tên yêu cầu %2.</translation>
     </message>
     <message>
       <source>No supported media tracks at URL %1.</source>
@@ -350,7 +350,7 @@
     </message>
     <message>
       <source>First, try to turn on recording (if it is off) and decrease fps in I/O module settings (error &quot;%1&quot;).</source>
-      <translation>Trước tiên, bật chức năng "ghi" (nếu chức năng này đang tắt) và giảm số khung hình hiển thị/giây trong mục Cài đặt của module I/O (lỗi &quot;%1&quot;).</translation>
+      <translation>Trước tiên, hãy thử bật chức năng ghi (nếu nó bị tắt) và giảm fps trong cài đặt mô-đun I/O (lỗi &quot;%1&quot;).</translation>
     </message>
     <message>
       <source>Please update firmware. Minimal supported version is %1. Current version is %2</source>
@@ -470,7 +470,7 @@
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I/O Module</translation>
+      <translation>Mô-đun I/O</translation>
     </message>
     <message>
       <source>Start</source>
@@ -482,15 +482,15 @@
     </message>
     <message>
       <source>Analog Licenses</source>
-      <translation>Phép loại suy giấy phép</translation>
+      <translation>Giấy phép Analog</translation>
     </message>
     <message>
       <source>Professional Licenses</source>
-      <translation>Giấy phép chuyên nghiệp</translation>
+      <translation>Giấy phép Chuyên nghiệp</translation>
     </message>
     <message>
       <source>Edge Licenses</source>
-      <translation>Giấy phép cạnh</translation>
+      <translation>Giấy phép Tại biên</translation>
     </message>
     <message>
       <source>Vmax Licenses</source>
@@ -498,19 +498,19 @@
     </message>
     <message>
       <source>Analog Encoder Licenses</source>
-      <translation>Giấy phép phép loại suy encoder</translation>
+      <translation>Giấy phép Mã hóa Analog</translation>
     </message>
     <message>
       <source>Video Wall Licenses</source>
-      <translation>Giấy phép bức tường video</translation>
+      <translation>Giấy phép Bức tường Video</translation>
     </message>
     <message>
       <source>I/O Module Licenses</source>
-      <translation>I/O Module giấy phép</translation>
+      <translation>Giấy phép Mô-đun I/O</translation>
     </message>
     <message>
       <source>Start Licenses</source>
-      <translation>Start giấy phép</translation>
+      <translation>Giấy phép Khởi đầu</translation>
     </message>
     <message>
       <source>Invalid</source>
@@ -530,7 +530,7 @@
     </message>
     <message>
       <source>Time Licenses</source>
-      <translation>Bản quyền theo thời gian</translation>
+      <translation>Giấy phép giới hạn thời gian</translation>
     </message>
     <message>
       <source>Bridge</source>
@@ -538,12 +538,12 @@
     </message>
     <message>
       <source>Bridge Licenses</source>
-      <translation>Giấy phép Cầu</translation>
+      <translation>Giấy phép Cầu nối</translation>
     </message>
     <message numerus="yes">
       <source>%n Time Licenses</source>
       <translation>
-        <numerusform>%n Bản quyền theo thời gian</numerusform>
+        <numerusform>Giấy phép thời gian giới hạn %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -585,7 +585,7 @@
     <message numerus="yes">
       <source>%n I/O Module Licenses</source>
       <translation>
-        <numerusform>%n I/O Module giấy phép</numerusform>
+        <numerusform>Giấy phép Mô-đun I/O %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -669,7 +669,7 @@
       <source>%n/%1 I/O Module Licenses</source>
       <comment>%n will be replaced by the total count</comment>
       <translation>
-        <numerusform>%n%1 I/O Module giấy phép</numerusform>
+        <numerusform>Giấy phép Mô-đun I/O %n/%1</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -758,19 +758,19 @@
     </message>
     <message>
       <source>I/O Modules</source>
-      <translation>I/O Modules</translation>
+      <translation>Mô-đun I/O</translation>
     </message>
     <message>
       <source>I/O modules</source>
-      <translation>I/O Modules</translation>
+      <translation>Mô-đun I/O</translation>
     </message>
     <message>
       <source>I/O Module</source>
-      <translation>I/O Module</translation>
+      <translation>Mô-đun I/O</translation>
     </message>
     <message>
       <source>I/O module</source>
-      <translation>I/O Module</translation>
+      <translation>Mô-đun I/O</translation>
     </message>
     <message numerus="yes">
       <source>%n Cameras</source>
@@ -787,13 +787,13 @@
     <message numerus="yes">
       <source>%n I/O Modules</source>
       <translation>
-        <numerusform>%n Mô-đun I/O</numerusform>
+        <numerusform>Mô-đun I/O %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
       <source>%n I/O modules</source>
       <translation>
-        <numerusform>%n Mô-đun I/O</numerusform>
+        <numerusform>Mô-đun I/O %n</numerusform>
       </translation>
     </message>
     <message numerus="yes">
@@ -1272,7 +1272,7 @@
     </message>
     <message>
       <source>I/O Module %1 was disconnected</source>
-      <translation>I/O Module %1 đã bị ngắt kết nối</translation>
+      <translation>Mô-đun I/O %1 đã bị ngắt kết nối</translation>
     </message>
     <message>
       <source>Input on %1</source>
@@ -1450,7 +1450,7 @@
     </message>
     <message>
       <source>Not enough licenses. Recording has been disabled on following I/O modules:</source>
-      <translation>Bản quyền chưa đủ. Ghi đã bị tắt trên các moudle I/O sau:</translation>
+      <translation>Không đủ khóa giấy phép. Chức năng ghi đã bị tắt trên các Mô-đun I/O sau:</translation>
     </message>
     <message>
       <source>start</source>
