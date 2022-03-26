@@ -7,7 +7,7 @@
 namespace nx::vms::common::test_support {
 
 MessageProcessorMock::MessageProcessorMock(
-    nx::vms::common::ResourceContext* context,
+    nx::vms::common::SystemContext* context,
     QObject* parent)
     :
     base_type(context, parent),

@@ -53,7 +53,7 @@ class NX_VMS_COMMON_API QnRuntimeInfoManager:
     Q_OBJECT
 
 public:
-    QnRuntimeInfoManager(nx::vms::common::ResourceContext* context, QObject* parent = nullptr);
+    QnRuntimeInfoManager(nx::vms::common::SystemContext* context, QObject* parent = nullptr);
 
     const QnThreadsafeItemStorage<QnPeerRuntimeInfo>* items() const;
 

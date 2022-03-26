@@ -37,7 +37,7 @@
 #include <nx/vms/api/data/resource_type_data.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
-#include <nx/vms/common/resource/resource_context.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
 #include <nx/vms/rules/engine.h>
@@ -69,7 +69,7 @@ using namespace nx;
 using namespace nx::vms::api;
 
 QnCommonMessageProcessor::QnCommonMessageProcessor(
-    nx::vms::common::ResourceContext* context,
+    nx::vms::common::SystemContext* context,
     QObject *parent)
     :
     base_type(parent),

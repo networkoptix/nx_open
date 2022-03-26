@@ -17,7 +17,7 @@ class NX_VMS_COMMON_API QnSharedResourcesManager:
 
     using base_type = QObject;
 public:
-    QnSharedResourcesManager(nx::vms::common::ResourceContext* context, QObject* parent = nullptr);
+    QnSharedResourcesManager(nx::vms::common::SystemContext* context, QObject* parent = nullptr);
     virtual ~QnSharedResourcesManager();
 
     void reset(const nx::vms::api::AccessRightsDataList& accessibleResourcesList);

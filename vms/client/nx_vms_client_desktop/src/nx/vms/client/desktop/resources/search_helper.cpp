@@ -110,8 +110,8 @@ Matches matchSearchWords(const QStringList& searchWords, const QnResourcePtr& re
 
         if (const auto& user = resource.dynamicCast<QnUserResource>())
         {
-            const QString roleName = user->context()
-                ? user->context()->userRolesManager()->userRoleName(user)
+            const QString roleName = user->systemContext()
+                ? user->systemContext()->userRolesManager()->userRoleName(user)
                 : QnUserRolesManager::userRoleName(user->userRole());
             checkParameter(Parameter::roleName, roleName);
         }

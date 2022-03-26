@@ -21,7 +21,7 @@ class NX_VMS_COMMON_API DescriptorContainer:
     using base_type = QObject;
 
 public:
-    DescriptorContainer(nx::vms::common::ResourceContext* context, QObject* parent = nullptr);
+    DescriptorContainer(nx::vms::common::SystemContext* context, QObject* parent = nullptr);
 
     nx::vms::api::analytics::Descriptors descriptors(const QnUuid& serverId = QnUuid());
 

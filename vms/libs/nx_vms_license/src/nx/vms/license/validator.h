@@ -41,7 +41,7 @@ public:
         VM_JustCreated
     };
 
-    Validator(nx::vms::common::ResourceContext* context, QObject* parent = nullptr);
+    Validator(nx::vms::common::SystemContext* context, QObject* parent = nullptr);
     virtual ~Validator();
 
     /**

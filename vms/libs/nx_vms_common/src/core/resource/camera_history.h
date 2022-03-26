@@ -42,7 +42,7 @@ class NX_VMS_COMMON_API QnCameraHistoryPool:
     Q_OBJECT
 
 public:
-    QnCameraHistoryPool(nx::vms::common::ResourceContext* context, QObject* parent = nullptr);
+    QnCameraHistoryPool(nx::vms::common::SystemContext* context, QObject* parent = nullptr);
     virtual ~QnCameraHistoryPool();
 
     /** Reset information about camera footage presence on different servers. */

@@ -1,6 +1,6 @@
 // Copyright 2018-present Network Optix, Inc. Licensed under MPL 2.0: www.mozilla.org/MPL/2.0/
 
-#include "resource_context.h"
+#include "system_context.h"
 
 #include <QtCore/QPointer>
 #include <QtCore/QThreadPool>
@@ -44,7 +44,7 @@ namespace nx::vms::common {
 
 using namespace nx::analytics;
 
-struct ResourceContext::Private
+struct SystemContext::Private
 {
     const QnUuid peerId;
     /*const*/ QnUuid sessionId; //< FIXME: #sivanov Make separate sessions with own ids.
@@ -80,7 +80,7 @@ struct ResourceContext::Private
     QPointer<AbstractCertificateVerifier>  certificateVerifier;
 };
 
-ResourceContext::ResourceContext(
+SystemContext::SystemContext(
     QnUuid peerId,
     QnUuid sessionId,
     nx::core::access::Mode resourceAccessMode)
@@ -150,13 +150,13 @@ ResourceContext::ResourceContext(
         d->analyticsDescriptorContainer.get());
 }
 
-ResourceContext::~ResourceContext()
+SystemContext::~SystemContext()
 {
     d->resourcePool->threadPool()->waitForDone();
     d->resourceAccessProvider->clear();
 }
 
-void ResourceContext::initNetworking(
+void SystemContext::initNetworking(
     QnRouter* router,
     AbstractCertificateVerifier* certificateVerifier)
 {
@@ -164,32 +164,32 @@ void ResourceContext::initNetworking(
     d->certificateVerifier = certificateVerifier;
 }
 
-const QnUuid& ResourceContext::peerId() const
+const QnUuid& SystemContext::peerId() const
 {
     return d->peerId;
 }
 
-const QnUuid& ResourceContext::sessionId() const
+const QnUuid& SystemContext::sessionId() const
 {
     return d->sessionId;
 }
 
-void ResourceContext::updateRunningInstanceGuid()
+void SystemContext::updateRunningInstanceGuid()
 {
     d->sessionId = QnUuid::createUuid();
 }
 
-QnRouter* ResourceContext::router() const
+QnRouter* SystemContext::router() const
 {
     return d->router;
 }
 
-AbstractCertificateVerifier* ResourceContext::certificateVerifier() const
+AbstractCertificateVerifier* SystemContext::certificateVerifier() const
 {
     return d->certificateVerifier;
 }
 
-std::shared_ptr<ec2::AbstractECConnection> ResourceContext::ec2Connection() const
+std::shared_ptr<ec2::AbstractECConnection> SystemContext::ec2Connection() const
 {
     if (d->messageProcessor)
         return d->messageProcessor->connection();
@@ -197,12 +197,12 @@ std::shared_ptr<ec2::AbstractECConnection> ResourceContext::ec2Connection() cons
     return nullptr;
 }
 
-QnCommonMessageProcessor* ResourceContext::messageProcessor() const
+QnCommonMessageProcessor* SystemContext::messageProcessor() const
 {
     return d->messageProcessor;
 }
 
-void ResourceContext::deleteMessageProcessor()
+void SystemContext::deleteMessageProcessor()
 {
     if (!NX_ASSERT(d->messageProcessor))
         return;
@@ -214,135 +214,135 @@ void ResourceContext::deleteMessageProcessor()
     d->messageProcessor = nullptr;
 }
 
-QnLicensePool* ResourceContext::licensePool() const
+QnLicensePool* SystemContext::licensePool() const
 {
     return d->licensePool.get();
 }
 
-QnResourcePool* ResourceContext::resourcePool() const
+QnResourcePool* SystemContext::resourcePool() const
 {
     return d->resourcePool.get();
 }
 
-QnResourceDataPool* ResourceContext::resourceDataPool() const
+QnResourceDataPool* SystemContext::resourceDataPool() const
 {
     return d->resourceDataPool.get();
 }
 
-QnResourceStatusDictionary* ResourceContext::resourceStatusDictionary() const
+QnResourceStatusDictionary* SystemContext::resourceStatusDictionary() const
 {
     return d->resourceStatusDictionary.get();
 }
 
-QnResourcePropertyDictionary* ResourceContext::resourcePropertyDictionary() const
+QnResourcePropertyDictionary* SystemContext::resourcePropertyDictionary() const
 {
     return d->resourcePropertyDictionary.get();
 }
 
-QnCameraHistoryPool* ResourceContext::cameraHistoryPool() const
+QnCameraHistoryPool* SystemContext::cameraHistoryPool() const
 {
     return d->cameraHistoryPool.get();
 }
 
-QnServerAdditionalAddressesDictionary* ResourceContext::serverAdditionalAddressesDictionary() const
+QnServerAdditionalAddressesDictionary* SystemContext::serverAdditionalAddressesDictionary() const
 {
     return d->serverAdditionalAddressesDictionary.get();
 }
 
-QnRuntimeInfoManager* ResourceContext::runtimeInfoManager() const
+QnRuntimeInfoManager* SystemContext::runtimeInfoManager() const
 {
     return d->runtimeInfoManager.get();
 }
 
-QnGlobalSettings* ResourceContext::globalSettings() const
+QnGlobalSettings* SystemContext::globalSettings() const
 {
     return d->globalSettings.get();
 }
 
-QnUserRolesManager* ResourceContext::userRolesManager() const
+QnUserRolesManager* SystemContext::userRolesManager() const
 {
     return d->userRolesManager.get();
 }
 
-QnSharedResourcesManager* ResourceContext::sharedResourcesManager() const
+QnSharedResourcesManager* SystemContext::sharedResourcesManager() const
 {
     return d->sharedResourceManager.get();
 }
 
-QnResourceAccessManager* ResourceContext::resourceAccessManager() const
+QnResourceAccessManager* SystemContext::resourceAccessManager() const
 {
     return d->resourceAccessManager.get();
 }
 
-QnGlobalPermissionsManager* ResourceContext::globalPermissionsManager() const
+QnGlobalPermissionsManager* SystemContext::globalPermissionsManager() const
 {
     return d->globalPermissionsManager.get();
 }
 
-QnResourceAccessSubjectsCache* ResourceContext::resourceAccessSubjectsCache() const
+QnResourceAccessSubjectsCache* SystemContext::resourceAccessSubjectsCache() const
 {
     return d->resourceAccessSubjectCache.get();
 }
 
-nx::core::access::ResourceAccessProvider* ResourceContext::resourceAccessProvider() const
+nx::core::access::ResourceAccessProvider* SystemContext::resourceAccessProvider() const
 {
     return d->resourceAccessProvider.get();
 }
 
-QnLayoutTourManager* ResourceContext::layoutTourManager() const
+QnLayoutTourManager* SystemContext::layoutTourManager() const
 {
     return d->layoutTourManager.get();
 }
 
-nx::vms::event::RuleManager* ResourceContext::eventRuleManager() const
+nx::vms::event::RuleManager* SystemContext::eventRuleManager() const
 {
     return d->eventRuleManager.get();
 }
 
-nx::vms::rules::Engine* ResourceContext::vmsRulesEngine() const
+nx::vms::rules::Engine* SystemContext::vmsRulesEngine() const
 {
     return d->vmsRulesEngine.get();
 }
 
-PluginDescriptorManager* ResourceContext::analyticsPluginDescriptorManager() const
+PluginDescriptorManager* SystemContext::analyticsPluginDescriptorManager() const
 {
     return d->analyticsPluginDescriptorManager.get();
 }
 
 EventTypeDescriptorManager*
-    ResourceContext::analyticsEventTypeDescriptorManager() const
+    SystemContext::analyticsEventTypeDescriptorManager() const
 {
     return d->analyticsEventTypeDescriptorManager.get();
 }
 
-EngineDescriptorManager* ResourceContext::analyticsEngineDescriptorManager() const
+EngineDescriptorManager* SystemContext::analyticsEngineDescriptorManager() const
 {
     return d->analyticsEngineDescriptorManager.get();
 }
 
-GroupDescriptorManager* ResourceContext::analyticsGroupDescriptorManager() const
+GroupDescriptorManager* SystemContext::analyticsGroupDescriptorManager() const
 {
     return d->analyticsGroupDescriptorManager.get();
 }
 
 ObjectTypeDescriptorManager*
-    ResourceContext::analyticsObjectTypeDescriptorManager() const
+    SystemContext::analyticsObjectTypeDescriptorManager() const
 {
     return d->analyticsObjectTypeDescriptorManager.get();
 }
 
-taxonomy::DescriptorContainer* ResourceContext::analyticsDescriptorContainer() const
+taxonomy::DescriptorContainer* SystemContext::analyticsDescriptorContainer() const
 {
     return d->analyticsDescriptorContainer.get();
 }
 
 taxonomy::AbstractStateWatcher*
-    ResourceContext::analyticsTaxonomyStateWatcher() const
+    SystemContext::analyticsTaxonomyStateWatcher() const
 {
     return d->analyticsTaxonomyStateWatcher.get();
 }
 
-void ResourceContext::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)
+void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)
 {
     d->messageProcessor = messageProcessor;
     runtimeInfoManager()->setMessageProcessor(messageProcessor);

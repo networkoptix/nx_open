@@ -11,7 +11,7 @@
 
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/common/resource/resource_context.h>
+#include <nx/vms/common/system_context.h>
 
 namespace Qn {
 
@@ -33,7 +33,7 @@ QnUuid predefinedRoleUuid(Qn::UserRole role)
 
 } // namespace
 
-QnUserRolesManager::QnUserRolesManager(nx::vms::common::ResourceContext* context, QObject* parent):
+QnUserRolesManager::QnUserRolesManager(nx::vms::common::SystemContext* context, QObject* parent):
     base_type(parent),
     nx::vms::common::ResourceContextAware(context)
 {

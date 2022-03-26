@@ -321,10 +321,10 @@ std::optional<QnResourceList> sourceResources(
 
 bool hasAccessToSource(const EventParameters& params, const QnUserResourcePtr& user)
 {
-    if (!user || !user->context())
+    if (!user || !user->systemContext())
         return false;
 
-    const auto context = user->context();
+    const auto context = user->systemContext();
 
     if (isSourceCameraRequired(params.eventType))
     {

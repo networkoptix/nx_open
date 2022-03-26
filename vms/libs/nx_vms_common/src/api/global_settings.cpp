@@ -10,7 +10,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/backup_settings.h>
 #include <nx/vms/api/data/resource_data.h>
-#include <nx/vms/common/resource/resource_context.h>
+#include <nx/vms/common/system_context.h>
 #include <utils/common/ldap.h>
 #include <utils/common/watermark_settings.h>
 #include <utils/email/email.h>
@@ -135,7 +135,7 @@ const bool kKeepIoPortStateIntactOnInitializationDefault(false);
 
 using namespace nx::settings_names;
 
-QnGlobalSettings::QnGlobalSettings(nx::vms::common::ResourceContext* context, QObject* parent):
+QnGlobalSettings::QnGlobalSettings(nx::vms::common::SystemContext* context, QObject* parent):
     base_type(parent),
     nx::vms::common::ResourceContextAware(context)
 {

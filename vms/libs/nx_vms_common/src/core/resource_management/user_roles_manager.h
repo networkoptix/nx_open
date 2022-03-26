@@ -22,7 +22,7 @@ public:
     using PredefinedRoleDataList = nx::vms::api::PredefinedRoleDataList;
 
 public:
-    QnUserRolesManager(nx::vms::common::ResourceContext* context, QObject* parent = nullptr);
+    QnUserRolesManager(nx::vms::common::SystemContext* context, QObject* parent = nullptr);
     virtual ~QnUserRolesManager();
 
     // Returns list of information structures for all custom user roles.

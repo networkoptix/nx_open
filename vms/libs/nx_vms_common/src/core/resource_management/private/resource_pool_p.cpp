@@ -7,10 +7,10 @@
 
 QnResourcePool::Private::Private(
     QnResourcePool* owner,
-    nx::vms::common::ResourceContext* context)
+    nx::vms::common::SystemContext* systemContext)
     :
     q(owner),
-    context(context)
+    systemContext(systemContext)
 {
 }
 

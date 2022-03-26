@@ -8,13 +8,13 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <nx/vms/common/resource/resource_context.h>
+#include <nx/vms/common/system_context.h>
 
 namespace nx::core::access {
 
 PermissionsResourceAccessProvider::PermissionsResourceAccessProvider(
     Mode mode,
-    nx::vms::common::ResourceContext* context,
+    nx::vms::common::SystemContext* context,
     QObject* parent)
     :
     base_type(mode, context, parent)

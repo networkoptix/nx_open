@@ -169,8 +169,8 @@ void QnResourceDisplayInfo::ensureConstructed(Qn::ResourceInfoLevel detailLevel)
     {
         if (const auto user = m_resource.dynamicCast<QnUserResource>())
         {
-            if (const auto common = user->context())
-                m_extraInfo = common->userRolesManager()->userRoleName(user);
+            if (const auto systemContext = user->systemContext())
+                m_extraInfo = systemContext->userRolesManager()->userRoleName(user);
         }
     }
     else

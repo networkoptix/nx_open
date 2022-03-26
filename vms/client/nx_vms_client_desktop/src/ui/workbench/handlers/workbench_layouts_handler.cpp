@@ -116,7 +116,7 @@ QnResourceList calculateResourcesToShare(const QnResourceList& resources,
             if (!QnResourceAccessFilter::isShareableMedia(resource))
                 return false;
 
-            auto accessProvider = resource->context()->resourceAccessProvider();
+            auto accessProvider = resource->systemContext()->resourceAccessProvider();
             return !accessProvider->hasAccess(user, resource);
         };
     return resources.filtered(sharingRequired);

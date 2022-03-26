@@ -159,7 +159,7 @@ void QnTourPtzExecutorPrivate::init(const QnPtzControllerPtr &controller, QThrea
         baseController->setParent(q);
     }
     connect(baseController, &QnAbstractPtzController::finished, q, &QnTourPtzExecutor::at_controller_finished);
-    QnResourceData resourceData = controller->resource()->context()->resourceDataPool()
+    QnResourceData resourceData = controller->resource()->systemContext()->resourceDataPool()
         ->data(baseController->resource().dynamicCast<QnSecurityCamResource>());
     tourGetPosWorkaround = resourceData.value<bool>("tourGetPosWorkaround", false);
 }

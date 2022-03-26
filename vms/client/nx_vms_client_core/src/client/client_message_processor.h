@@ -15,7 +15,7 @@ class QnClientMessageProcessor: public QnCommonMessageProcessor
 
 public:
     explicit QnClientMessageProcessor(
-        nx::vms::common::ResourceContext* context,
+        nx::vms::common::SystemContext* context,
         QObject* parent = nullptr);
     virtual void init(const ec2::AbstractECConnectionPtr& connection) override;
 

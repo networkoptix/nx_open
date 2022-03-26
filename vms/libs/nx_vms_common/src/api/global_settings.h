@@ -160,7 +160,7 @@ class NX_VMS_COMMON_API QnGlobalSettings:
     typedef Connective<QObject> base_type;
 
 public:
-    QnGlobalSettings(nx::vms::common::ResourceContext* context, QObject* parent = nullptr);
+    QnGlobalSettings(nx::vms::common::SystemContext* context, QObject* parent = nullptr);
     virtual ~QnGlobalSettings();
 
     void initialize();

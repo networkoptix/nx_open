@@ -187,9 +187,9 @@ class NX_VMS_COMMON_API QnLicensePool:
     Q_OBJECT
 
 public:
-    QnLicensePool(nx::vms::common::ResourceContext* context, QObject* parent = nullptr);
+    QnLicensePool(nx::vms::common::SystemContext* context, QObject* parent = nullptr);
 
-    nx::vms::common::ResourceContext* context() const { return m_context; }
+    nx::vms::common::SystemContext* context() const { return m_context; }
 
     static int hardwareIdVersion(const QString& hwId);
 

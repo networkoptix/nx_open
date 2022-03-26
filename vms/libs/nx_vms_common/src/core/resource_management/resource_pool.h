@@ -23,7 +23,7 @@
 #include <nx/string.h>
 
 class QThreadPool;
-namespace nx::vms::common { class ResourceContext; }
+namespace nx::vms::common { class SystemContext; }
 
 /**
  * This class holds all resources in the system that are READY TO BE USED (as long as resource is
@@ -49,10 +49,13 @@ public:
         AllResources
     };
 
-    explicit QnResourcePool(nx::vms::common::ResourceContext* context, QObject* parent = nullptr);
+    explicit QnResourcePool(nx::vms::common::SystemContext* context, QObject* parent = nullptr);
     ~QnResourcePool();
 
-    nx::vms::common::ResourceContext* context() const;
+    /**
+     * Context of the System this instance belongs to.
+     */
+    nx::vms::common::SystemContext* systemContext() const;
 
     enum AddResourceFlag
     {

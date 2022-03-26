@@ -22,7 +22,7 @@
 #include <core/resource/videowall_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/vms/api/types/connection_types.h>
-#include <nx/vms/common/resource/resource_context.h>
+#include <nx/vms/common/system_context.h>
 
 #include "validator.h"
 
@@ -50,7 +50,7 @@ QString joinedString(
 
 namespace nx::vms::license {
 
-const QString LicenseServer::baseUrl(common::ResourceContext* context)
+const QString LicenseServer::baseUrl(common::SystemContext* context)
 {
     auto result = context->globalSettings()->licenseServerUrl();
     while (result.endsWith('/'))
@@ -58,21 +58,21 @@ const QString LicenseServer::baseUrl(common::ResourceContext* context)
     return result + "/nxlicensed";
 }
 
-const nx::utils::Url LicenseServer::indexUrl(common::ResourceContext* context)
+const nx::utils::Url LicenseServer::indexUrl(common::SystemContext* context)
 {
     return baseUrl(context);
 }
 
-const nx::utils::Url LicenseServer::activateUrl(common::ResourceContext* context)
+const nx::utils::Url LicenseServer::activateUrl(common::SystemContext* context)
 {
     return baseUrl(context) + "/activate.php";
 }
 
-const nx::utils::Url LicenseServer::deactivateUrl(common::ResourceContext* context)
+const nx::utils::Url LicenseServer::deactivateUrl(common::SystemContext* context)
 {
     return baseUrl(context) + "/api/v1/deactivate/";
 }
-const nx::utils::Url LicenseServer::validateUrl(common::ResourceContext* context)
+const nx::utils::Url LicenseServer::validateUrl(common::SystemContext* context)
 {
     return baseUrl(context) + "/api/v1/validate/";
 }
@@ -138,7 +138,7 @@ static std::vector<LicenseCompatibility> compatibleLicenseType =
 /* UsageHelper                                                 */
 /************************************************************************/
 
-UsageWatcher::UsageWatcher(common::ResourceContext* context, QObject* parent):
+UsageWatcher::UsageWatcher(common::SystemContext* context, QObject* parent):
     base_type(parent),
     common::ResourceContextAware(context)
 {
@@ -172,7 +172,7 @@ UsageHelper::Cache::Cache()
     boost::fill(total, 0);
 }
 
-UsageHelper::UsageHelper(common::ResourceContext* context, QObject* parent):
+UsageHelper::UsageHelper(common::SystemContext* context, QObject* parent):
     base_type(parent),
     common::ResourceContextAware(context),
     m_dirty(true),
@@ -368,14 +368,14 @@ QList<Qn::LicenseType> UsageHelper::licenseTypes() const
 /* CamLicenseUsageWatcher                                             */
 /************************************************************************/
 
-CamLicenseUsageWatcher::CamLicenseUsageWatcher(common::ResourceContext* context, QObject* parent):
+CamLicenseUsageWatcher::CamLicenseUsageWatcher(common::SystemContext* context, QObject* parent):
     CamLicenseUsageWatcher(QnVirtualCameraResourcePtr(), context, parent)
 {
 }
 
 CamLicenseUsageWatcher::CamLicenseUsageWatcher(
     const QnVirtualCameraResourcePtr& camera,
-    common::ResourceContext* context,
+    common::SystemContext* context,
     QObject* parent)
     :
     base_type(context, parent)
@@ -436,7 +436,7 @@ CamLicenseUsageWatcher::CamLicenseUsageWatcher(
 /************************************************************************/
 /* CamLicenseUsageHelper                                              */
 /************************************************************************/
-CamLicenseUsageHelper::CamLicenseUsageHelper(common::ResourceContext* context, QObject* parent):
+CamLicenseUsageHelper::CamLicenseUsageHelper(common::SystemContext* context, QObject* parent):
     base_type(context, parent),
     m_watcher(new CamLicenseUsageWatcher(context, this))
 {
@@ -451,7 +451,7 @@ CamLicenseUsageHelper::CamLicenseUsageHelper(common::ResourceContext* context, Q
 CamLicenseUsageHelper::CamLicenseUsageHelper(
     const QnVirtualCameraResourceList& proposedCameras,
     bool proposedEnable,
-    common::ResourceContext* context,
+    common::SystemContext* context,
     QObject* parent)
     :
     CamLicenseUsageHelper(context, parent)
@@ -462,7 +462,7 @@ CamLicenseUsageHelper::CamLicenseUsageHelper(
 CamLicenseUsageHelper::CamLicenseUsageHelper(
     const QnVirtualCameraResourcePtr& proposedCamera,
     bool proposedEnable,
-    common::ResourceContext* context,
+    common::SystemContext* context,
     QObject* parent)
 :
     CamLicenseUsageHelper(context, parent)
@@ -619,7 +619,7 @@ SingleCamLicenseStatusHelper::SingleCamLicenseStatusHelper(
     if (!camera)
         return;
 
-    m_helper.reset(new CamLicenseUsageHelper(camera, true, camera->context()));
+    m_helper.reset(new CamLicenseUsageHelper(camera, true, camera->systemContext()));
     connect(m_helper, &CamLicenseUsageHelper::licenseUsageChanged,
         this, &SingleCamLicenseStatusHelper::licenseStatusChanged);
 }
@@ -649,7 +649,7 @@ UsageStatus SingleCamLicenseStatusHelper::status() const
 /* VideoWallLicenseUsageWatcher                                       */
 /************************************************************************/
 VideoWallLicenseUsageWatcher::VideoWallLicenseUsageWatcher(
-    common::ResourceContext* context,
+    common::SystemContext* context,
     QObject* parent)
     :
     base_type(context, parent)
@@ -699,7 +699,7 @@ VideoWallLicenseUsageWatcher::VideoWallLicenseUsageWatcher(
 /* VideoWallLicenseUsageHelper                                        */
 /************************************************************************/
 VideoWallLicenseUsageHelper::VideoWallLicenseUsageHelper(
-    common::ResourceContext* context,
+    common::SystemContext* context,
     QObject* parent)
     :
     base_type(context, parent)
@@ -746,7 +746,7 @@ int VideoWallLicenseUsageHelper::licensesForScreens(int screens)
 /* VideoWallLicenseUsageProposer                                      */
 /************************************************************************/
 VideoWallLicenseUsageProposer::VideoWallLicenseUsageProposer(
-    common::ResourceContext* context,
+    common::SystemContext* context,
     VideoWallLicenseUsageHelper* helper,
     int screenCount)
     :

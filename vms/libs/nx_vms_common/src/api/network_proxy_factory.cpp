@@ -69,7 +69,7 @@ QNetworkProxy QnNetworkProxyFactory::proxyToResource(
     const QnResourcePtr& resource,
     QnMediaServerResourcePtr* const via)
 {
-    auto context = resource->context();
+    auto context = resource->systemContext();
     if (!context)
         return QNetworkProxy(QNetworkProxy::NoProxy);
 

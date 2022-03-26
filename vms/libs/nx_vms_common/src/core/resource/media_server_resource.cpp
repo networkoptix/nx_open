@@ -113,11 +113,11 @@ void QnMediaServerResource::resetCachedValues()
 
 QSet<QnUuid> QnMediaServerResource::activeAnalyticsEngineIds() const
 {
-    const auto commonModule = this->context();
-    if (!NX_ASSERT(commonModule))
+    const auto context = systemContext();
+    if (!NX_ASSERT(context))
         return {};
 
-    const auto runtimeInfoManager = commonModule->runtimeInfoManager();
+    const auto runtimeInfoManager = context->runtimeInfoManager();
     if (!NX_ASSERT(runtimeInfoManager))
         return {};
 
@@ -127,7 +127,7 @@ QSet<QnUuid> QnMediaServerResource::activeAnalyticsEngineIds() const
 
 QString QnMediaServerResource::getName() const
 {
-    if (!context())
+    if (!systemContext())
         return QnResource::getName();
 
     if (getServerFlags().testFlag(vms::api::SF_Edge) && !m_edgeServerStateTracker.isNull())
@@ -146,7 +146,7 @@ QString QnMediaServerResource::getName() const
 
 void QnMediaServerResource::setName( const QString& name )
 {
-    if (getId().isNull() || !context())
+    if (getId().isNull() || !systemContext())
     {
         base_type::setName(name);
         return;
@@ -185,33 +185,33 @@ QList<nx::network::SocketAddress> QnMediaServerResource::getNetAddrList() const
 void QnMediaServerResource::setAdditionalUrls(const QList<nx::utils::Url> &urls)
 {
     QnUuid id = getId();
-    QList<nx::utils::Url> oldUrls = context()->serverAdditionalAddressesDictionary()->additionalUrls(id);
+    QList<nx::utils::Url> oldUrls = getAdditionalUrls();
     if (oldUrls == urls)
         return;
 
-    context()->serverAdditionalAddressesDictionary()->setAdditionalUrls(id, urls);
+    systemContext()->serverAdditionalAddressesDictionary()->setAdditionalUrls(id, urls);
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
 QList<nx::utils::Url> QnMediaServerResource::getAdditionalUrls() const
 {
-    return context()->serverAdditionalAddressesDictionary()->additionalUrls(getId());
+    return systemContext()->serverAdditionalAddressesDictionary()->additionalUrls(getId());
 }
 
 void QnMediaServerResource::setIgnoredUrls(const QList<nx::utils::Url> &urls)
 {
     QnUuid id = getId();
-    QList<nx::utils::Url> oldUrls = context()->serverAdditionalAddressesDictionary()->ignoredUrls(id);
+    QList<nx::utils::Url> oldUrls = getIgnoredUrls();
     if (oldUrls == urls)
         return;
 
-    context()->serverAdditionalAddressesDictionary()->setIgnoredUrls(id, urls);
+    systemContext()->serverAdditionalAddressesDictionary()->setIgnoredUrls(id, urls);
     emit auxUrlsChanged(::toSharedPointer(this));
 }
 
 QList<nx::utils::Url> QnMediaServerResource::getIgnoredUrls() const
 {
-    return context()->serverAdditionalAddressesDictionary()->ignoredUrls(getId());
+    return systemContext()->serverAdditionalAddressesDictionary()->ignoredUrls(getId());
 }
 
 std::optional<nx::network::SocketAddress> QnMediaServerResource::getCloudAddress() const
@@ -280,7 +280,7 @@ rest::ServerConnectionPtr QnMediaServerResource::restConnection()
 
     if (!m_restConnection)
         m_restConnection = rest::ServerConnectionPtr(new rest::ServerConnection(
-            context(),
+            systemContext(),
             getId()));
 
     return m_restConnection;
@@ -330,7 +330,7 @@ QString QnMediaServerResource::rtspUrl() const
 {
     bool isSecure = true;
 
-    if (auto context = this->context())
+    if (auto context = systemContext())
     {
         auto connection = context->ec2Connection();
         isSecure = context->globalSettings()->isVideoTrafficEncryptionForced()
@@ -597,7 +597,7 @@ nx::vms::api::ModuleInformation QnMediaServerResource::getModuleInformation() co
     if (moduleInformation.protoVersion == 0)
         moduleInformation.protoVersion = nx::vms::api::protocolVersion();
 
-    if (auto context = this->context())
+    if (auto context = systemContext())
     {
         const auto& settings = context->globalSettings();
         moduleInformation.localSystemId = settings->localSystemId();
@@ -761,17 +761,17 @@ QString QnMediaServerResource::realm() const
     return nx::network::AppInfo::realm().c_str();
 }
 
-void QnMediaServerResource::setContext(nx::vms::common::ResourceContext* context)
+void QnMediaServerResource::setSystemContext(nx::vms::common::SystemContext* systemContext)
 {
-    if (auto ctx = this->context())
+    if (auto context = this->systemContext())
     {
-        ctx->resourcePool()->disconnect(this);
-        ctx->globalSettings()->disconnect(this);
+        context->resourcePool()->disconnect(this);
+        context->globalSettings()->disconnect(this);
     }
 
-    base_type::setContext(context);
+    base_type::setSystemContext(systemContext);
 
-    if (auto ctx = this->context())
+    if (auto context = this->systemContext())
     {
         if (getServerFlags().testFlag(vms::api::SF_Edge))
         {
@@ -789,7 +789,7 @@ void QnMediaServerResource::setContext(nx::vms::common::ResourceContext* context
                 [this] { emit this->edgeServerCanonicalStateChanged(toSharedPointer(this)); });
         }
 
-        const auto& settings = ctx->globalSettings();
+        const auto& settings = context->globalSettings();
         connect(settings,
             &QnGlobalSettings::cloudSettingsChanged,
             this,

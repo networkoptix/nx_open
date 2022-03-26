@@ -24,7 +24,7 @@ class NX_VMS_COMMON_API BaseResourceAccessProvider:
 public:
     BaseResourceAccessProvider(
         Mode mode,
-        nx::vms::common::ResourceContext* context,
+        nx::vms::common::SystemContext* context,
         QObject* parent = nullptr);
     virtual ~BaseResourceAccessProvider();
 

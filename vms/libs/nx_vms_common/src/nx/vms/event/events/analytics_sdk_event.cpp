@@ -98,7 +98,7 @@ bool AnalyticsSdkEvent::checkEventParams(const EventParameters& params) const
     if (!getResource() || m_engineId != params.getAnalyticsEngineId())
         return false;
 
-    const auto descriptor = getResource()->context()->analyticsEventTypeDescriptorManager()
+    const auto descriptor = getResource()->systemContext()->analyticsEventTypeDescriptorManager()
         ->descriptor(m_eventTypeId);
 
     if (!descriptor)

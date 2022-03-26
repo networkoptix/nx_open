@@ -49,7 +49,7 @@ namespace nx::core::access {
 
 VideoWallItemAccessProvider::VideoWallItemAccessProvider(
     Mode mode,
-    nx::vms::common::ResourceContext* context,
+    nx::vms::common::SystemContext* context,
     QObject* parent)
     :
     base_type(mode, context, parent)

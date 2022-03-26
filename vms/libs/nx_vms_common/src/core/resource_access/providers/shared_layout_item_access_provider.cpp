@@ -8,13 +8,13 @@
 #include <core/resource_access/resource_access_subjects_cache.h>
 #include <core/resource_access/shared_resources_manager.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/common/resource/resource_context.h>
+#include <nx/vms/common/system_context.h>
 
 namespace nx::core::access {
 
 SharedLayoutItemAccessProvider::SharedLayoutItemAccessProvider(
     Mode mode,
-    nx::vms::common::ResourceContext* context,
+    nx::vms::common::SystemContext* context,
     QObject* parent)
     :
     base_type(mode, context, parent)

@@ -30,7 +30,7 @@ class NX_VMS_COMMON_API QnCommonMessageProcessor:
     typedef Connective<QObject> base_type;
 public:
     explicit QnCommonMessageProcessor(
-        nx::vms::common::ResourceContext* context,
+        nx::vms::common::SystemContext* context,
         QObject* parent = nullptr);
     virtual ~QnCommonMessageProcessor() {}
 

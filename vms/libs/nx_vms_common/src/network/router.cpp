@@ -7,7 +7,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/network/url/url_parse_helper.h>
 #include <nx/vms/api/data/peer_data.h>
-#include <nx/vms/common/resource/resource_context.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/discovery/manager.h>
 #include <nx_ec/abstract_ec_connection.h>
 
@@ -26,7 +26,7 @@ QnRouter::QnRouter(nx::vms::discovery::Manager* moduleManager, QObject* parent):
 {
 }
 
-QnRoute QnRouter::routeTo(const QnUuid& serverId, nx::vms::common::ResourceContext* context)
+QnRoute QnRouter::routeTo(const QnUuid& serverId, nx::vms::common::SystemContext* context)
 {
     if (!NX_ASSERT(context))
         return {};
@@ -44,7 +44,7 @@ QnRoute QnRouter::routeTo(const QnMediaServerResourcePtr& server)
     result.id = server->getId();
 
     // Route to itself (mediaserver-side only).
-    if (server->getId() == server->context()->peerId())
+    if (server->getId() == server->systemContext()->peerId())
     {
         result.addr = nx::network::url::getEndpoint(server->getApiUrl());
         return result;
@@ -57,7 +57,7 @@ QnRoute QnRouter::routeTo(const QnMediaServerResourcePtr& server)
         return result;
     }
 
-    auto connection = server->context()->ec2Connection();
+    auto connection = server->systemContext()->ec2Connection();
     if (!connection)
         return result; //< No connection to the peer network, can't route.
 

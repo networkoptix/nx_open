@@ -53,7 +53,7 @@ QnCommonModule::QnCommonModule(
     QObject* parent)
     :
     QObject(parent),
-    nx::vms::common::ResourceContext(
+    nx::vms::common::SystemContext(
         /*peerId*/ std::move(peerId),
         /*sessionId*/ QnUuid::createUuid(),
         resourceAccessMode),

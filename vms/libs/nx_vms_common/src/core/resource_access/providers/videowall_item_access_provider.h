@@ -18,7 +18,7 @@ class NX_VMS_COMMON_API VideoWallItemAccessProvider: public BaseResourceAccessPr
 public:
     VideoWallItemAccessProvider(
         Mode mode,
-        nx::vms::common::ResourceContext* context,
+        nx::vms::common::SystemContext* context,
         QObject* parent = nullptr);
     virtual ~VideoWallItemAccessProvider();
 

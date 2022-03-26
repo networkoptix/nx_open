@@ -27,7 +27,7 @@
 #include <nx/vms/api/analytics/descriptors.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/common/html/html.h>
-#include <nx/vms/common/resource/resource_context.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/event/aggregation_info.h>
 #include <nx/vms/event/events/events.h>
 #include <nx/vms/event/rule.h>
@@ -92,7 +92,7 @@ QStringList serializeAttributesMultiline(
     return result;
 }
 
-StringsHelper::StringsHelper(common::ResourceContext* context):
+StringsHelper::StringsHelper(common::SystemContext* context):
     QObject(),
     common::ResourceContextAware(context)
 {
@@ -885,8 +885,8 @@ QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
     const auto source = eventSource(params);
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();
 
-    const auto eventTypeDescriptor = camera && camera->context()
-        ? camera->context()->analyticsEventTypeDescriptorManager()->descriptor(eventTypeId)
+    const auto eventTypeDescriptor = camera && camera->systemContext()
+        ? camera->systemContext()->analyticsEventTypeDescriptorManager()->descriptor(eventTypeId)
         : std::nullopt;
 
     return eventTypeDescriptor ? eventTypeDescriptor->name : tr("Analytics Event");
@@ -903,8 +903,8 @@ QString StringsHelper::getAnalyticsSdkObjectName(const EventParameters& params,
     const auto source = eventSource(params);
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();
 
-    const auto objectType = camera && camera->context()
-        ? camera->context()->analyticsTaxonomyStateWatcher()->state()->objectTypeById(objectTypeId)
+    const auto objectType = camera && camera->systemContext()
+        ? camera->systemContext()->analyticsTaxonomyStateWatcher()->state()->objectTypeById(objectTypeId)
         : nullptr;
 
     return objectType ? objectType->name() : tr("Object detected");

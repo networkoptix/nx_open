@@ -7,7 +7,7 @@
 #include <api/common_message_processor.h>
 #include <core/resource/resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/vms/common/resource/resource_context.h>
+#include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_vms_rules_manager.h>
 
@@ -22,7 +22,7 @@ const auto kFakeHandler = [](int /*handle*/, ec2::ErrorCode errorCode)
 
 namespace nx::vms::rules {
 
-Ec2Router::Ec2Router(nx::vms::common::ResourceContext* context):
+Ec2Router::Ec2Router(nx::vms::common::SystemContext* context):
     nx::vms::common::ResourceContextAware(context)
 {
 }

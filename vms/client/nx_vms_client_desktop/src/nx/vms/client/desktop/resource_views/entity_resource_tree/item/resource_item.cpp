@@ -255,7 +255,7 @@ QVariant ResourceItem::cameraExtraStatusData() const
             m_connectionsGuard.add(camera->connect(
                 camera, &QnVirtualCameraResource::statusFlagsChanged, discardExtraStatusCache));
 
-            const auto context = camera->context();
+            const auto context = camera->systemContext();
             if (!context)
                 return;
 
@@ -378,7 +378,7 @@ QVariant ResourceItem::globalPermissionsData() const
         using namespace nx::vms::api;
 
         const auto user = m_resource.staticCast<QnUserResource>();
-        const auto permissionsManager = user->context()->globalPermissionsManager();
+        const auto permissionsManager = user->systemContext()->globalPermissionsManager();
         m_globalPermissionsCache =
             QVariant::fromValue<GlobalPermissions>(permissionsManager->globalPermissions(user));
     }

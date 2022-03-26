@@ -188,7 +188,7 @@ signals:
     void analyticsDescriptorsChanged();
 
 protected:
-    virtual void setContext(nx::vms::common::ResourceContext* context) override;
+    virtual void setSystemContext(nx::vms::common::SystemContext* systemContext) override;
 
 private:
     Qn::PanicMode calculatePanicMode() const;

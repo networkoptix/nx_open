@@ -6,12 +6,12 @@
 #include <licensing/license.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx/vms/api/types/connection_types.h>
-#include <nx/vms/common/resource/resource_context.h>
+#include <nx/vms/common/system_context.h>
 #include <utils/common/synctime.h>
 
 namespace nx::vms::license {
 
-Validator::Validator(nx::vms::common::ResourceContext* context, QObject* parent):
+Validator::Validator(nx::vms::common::SystemContext* context, QObject* parent):
     base_type(parent),
     nx::vms::common::ResourceContextAware(context)
 {
