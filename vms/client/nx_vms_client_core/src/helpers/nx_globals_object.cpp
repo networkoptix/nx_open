@@ -198,9 +198,17 @@ double NxGlobalsObject::toDouble(const QVariant& value) const
     return value.toDouble();
 }
 
-QString NxGlobalsObject::wildcardToRegularExpression(const QString& value) const
+QString NxGlobalsObject::makeSearchRegExp(const QString& value) const
 {
-    return QRegularExpression::wildcardToRegularExpression(value);
+    static const auto kEscapedStar = QRegularExpression::escape("*");
+    static const auto kEscapedQuestionMark = QRegularExpression::escape("?");
+    static const auto kRegExpStar = ".*";
+    static const auto kRegExpQuestionMark = ".";
+
+    auto result = QRegularExpression::escape(value);
+    result.replace(kEscapedStar, kRegExpStar);
+    result.replace(kEscapedQuestionMark, kRegExpQuestionMark);
+    return QRegularExpression::anchoredPattern(result);
 }
 
 } // namespace nx::vms::client::core
