@@ -33,7 +33,7 @@
 #include <nx/vms/api/data/webpage_data.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
-#include <nx/vms/common/resource/resource_context.h>
+#include <nx/vms/common/system_context.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/scoped_timer.h>
 
@@ -94,7 +94,7 @@ bool verifyDesktopCameraOnLayout(
 
 QnResourceAccessManager::QnResourceAccessManager(
     Mode mode,
-    nx::vms::common::ResourceContext* context,
+    nx::vms::common::SystemContext* context,
     QObject* parent)
     :
     base_type(parent),

@@ -59,7 +59,7 @@ QString AnalyticsEngineResource::idForToStringFromPtr() const
 
 AnalyticsPluginResourcePtr AnalyticsEngineResource::plugin() const
 {
-    auto context = this->context();
+    auto context = systemContext();
     if (!NX_ASSERT(context, "Can't access resource context"))
         return AnalyticsPluginResourcePtr();
 

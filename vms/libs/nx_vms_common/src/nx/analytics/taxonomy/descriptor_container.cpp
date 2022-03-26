@@ -6,14 +6,14 @@
 #include <core/resource_management/resource_pool.h>
 #include <nx/analytics/properties.h>
 #include <nx/fusion/model_functions.h>
-#include <nx/vms/common/resource/resource_context.h>
+#include <nx/vms/common/system_context.h>
 
 using namespace nx::vms::api::analytics;
 
 namespace nx::analytics::taxonomy {
 
 DescriptorContainer::DescriptorContainer(
-    nx::vms::common::ResourceContext* context,
+    nx::vms::common::SystemContext* context,
     QObject* parent)
     :
     base_type(parent),

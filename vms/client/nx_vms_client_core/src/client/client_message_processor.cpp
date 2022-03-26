@@ -14,7 +14,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/peer_alive_data.h>
 #include <nx/vms/client/core/network/remote_connection.h>
-#include <nx/vms/common/resource/resource_context.h>
+#include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_layout_tour_manager.h>
 #include <nx_ec/managers/abstract_misc_manager.h>
@@ -23,7 +23,7 @@
 using namespace nx::vms::client::core;
 
 QnClientMessageProcessor::QnClientMessageProcessor(
-    nx::vms::common::ResourceContext* context,
+    nx::vms::common::SystemContext* context,
     QObject* parent)
     :
     base_type(context, parent),

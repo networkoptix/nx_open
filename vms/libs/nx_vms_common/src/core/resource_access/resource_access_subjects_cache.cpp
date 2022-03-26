@@ -6,10 +6,10 @@
 #include <core/resource_access/global_permissions_manager.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <nx/vms/common/resource/resource_context.h>
+#include <nx/vms/common/system_context.h>
 
 QnResourceAccessSubjectsCache::QnResourceAccessSubjectsCache(
-    nx::vms::common::ResourceContext* context,
+    nx::vms::common::SystemContext* context,
     QObject* parent)
     :
     base_type(parent),

@@ -14,7 +14,7 @@ class NX_VMS_COMMON_API QnResourcePropertyDictionary:
     Q_OBJECT
 public:
     QnResourcePropertyDictionary(
-        nx::vms::common::ResourceContext* context,
+        nx::vms::common::SystemContext* context,
         QObject* parent = nullptr);
 
     bool saveParams(const QnUuid& resourceId);

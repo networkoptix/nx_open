@@ -4,15 +4,15 @@
 
 namespace nx::vms::common {
 
-class ResourceContext;
+class SystemContext;
 
 /**
- * Helper class for the ResourceContext-dependent classes. Must be destroyed before the Context is.
+ * Helper class for the SystemContext-dependent classes. Must be destroyed before the Context is.
  */
 class NX_VMS_COMMON_API ResourceContextAware
 {
 public:
-    ResourceContextAware(ResourceContext* context):
+    ResourceContextAware(SystemContext* context):
         m_context(context)
     {
     }
@@ -20,7 +20,7 @@ public:
 protected:
     // TODO: #sivanov After context is moved out of CommonModule, it can be converted to QObject
     // or shared pointer. Then we can store smart pointer here and validate it in the destructor.
-    ResourceContext* const m_context;
+    SystemContext* const m_context;
 };
 
 } // namespace nx::vms::common

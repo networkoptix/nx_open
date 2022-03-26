@@ -94,7 +94,7 @@ bool PeerStateTracker::setResourceFeed(QnResourcePool* pool)
 
     NX_DEBUG(this, "setResourceFeed() attaching to resource pool.");
 
-    addItemForClient(pool->context());
+    addItemForClient(pool->systemContext());
 
     const auto allServers = pool->servers();
     for (const QnMediaServerResourcePtr& server: allServers)
@@ -149,7 +149,7 @@ QnMediaServerResourcePtr PeerStateTracker::getServer(QnUuid id) const
     return getServer(findItemById(id));
 }
 
-QnUuid PeerStateTracker::getClientPeerId(nx::vms::common::ResourceContext* context) const
+QnUuid PeerStateTracker::getClientPeerId(nx::vms::common::SystemContext* context) const
 {
     // This ID is much more easy to distinguish.
     if (ini().massSystemUpdateDebugInfo)
@@ -1315,7 +1315,7 @@ UpdateItemPtr PeerStateTracker::addItemForServer(QnMediaServerResourcePtr server
     return item;
 }
 
-UpdateItemPtr PeerStateTracker::addItemForClient(nx::vms::common::ResourceContext* context)
+UpdateItemPtr PeerStateTracker::addItemForClient(nx::vms::common::SystemContext* context)
 {
     UpdateItemPtr item = std::make_shared<UpdateItem>();
 

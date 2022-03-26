@@ -616,7 +616,7 @@ protected slots:
 
 
 protected:
-    virtual void setContext(nx::vms::common::ResourceContext* context) override;
+    virtual void setSystemContext(nx::vms::common::SystemContext* systemContext) override;
 
     virtual void updateInternal(const QnResourcePtr& source, NotifierList& notifiers) override;
 

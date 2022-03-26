@@ -17,7 +17,7 @@
 class QnResourceConsumer;
 class QnResourcePool;
 
-namespace nx::vms::common { class ResourceContext; }
+namespace nx::vms::common { class SystemContext; }
 
 namespace nx::vms::api {
 
@@ -130,18 +130,18 @@ public:
     QnResourcePool* resourcePool() const;
 
     /**
-     * Assigns the Resource to the corresponding Resource Context. Normally this is done only by
+     * Assigns the Resource to the corresponding System Context. Normally this is done only by
      * the Resource Pool when the Resource is added.
      *
-     * A Resource can never be removed from the Resource Context or moved to another one.
+     * A Resource can never be removed from the System Context or moved to another one.
      */
-    void addToContext(nx::vms::common::ResourceContext* context);
+    void addToSystemContext(nx::vms::common::SystemContext* systemContext);
 
     /**
-     * Context this resource belongs to. Used to get access to external properties of the resource
-     * and to some tightly bound classes.
+     * Context of the System this Resource belongs to. Used to get access to external properties
+     * of the Resource and to some tightly bound classes.
      */
-    nx::vms::common::ResourceContext* context() const;
+    nx::vms::common::SystemContext* systemContext() const;
 
     /**
      * Debug helper for NX_LOG implementation. Used by toString(const T*).
@@ -375,10 +375,10 @@ protected:
     using NotifierList = QList<Notifier>;
 
     /**
-     * Update the Resource Context. Intended to be overloaded in the descendant classes when some
+     * Update the System Context. Intended to be overloaded in the descendant classes when some
      * logic should be called instantly after addition.
      */
-    virtual void setContext(nx::vms::common::ResourceContext* context);
+    virtual void setSystemContext(nx::vms::common::SystemContext* systemContext);
 
     /**
      * Copies all data from the source Resource and adds the corresponding signal sending to the
@@ -454,8 +454,8 @@ private:
 
     std::map<QString, QString> m_locallySavedProperties;
 
-    /** Context this Resource belongs to. */
-    std::atomic<nx::vms::common::ResourceContext*> m_context{};
+    /** System Context this Resource belongs to. */
+    std::atomic<nx::vms::common::SystemContext*> m_systemContext{};
 
     std::atomic<bool> m_forceUseLocalProperties{false};
     std::atomic<ResourceStatus> m_previousStatus = ResourceStatus::undefined;

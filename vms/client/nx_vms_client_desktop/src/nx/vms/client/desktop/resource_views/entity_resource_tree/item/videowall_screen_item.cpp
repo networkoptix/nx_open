@@ -13,7 +13,7 @@
 namespace {
 
 QnResourceIconCache::Key calculateKey(
-    nx::vms::common::ResourceContext* context,
+    nx::vms::common::SystemContext* context,
     const QnVideoWallItem& item)
 {
     QnResourceIconCache::Key result = QnResourceIconCache::VideoWallItem;
@@ -62,7 +62,7 @@ QVariant VideoWallScreenItem::data(int role) const
             return m_screen.name;
 
         case Qn::ResourceIconKeyRole:
-            return QVariant::fromValue<int>(calculateKey(m_videoWall->context(), m_screen));
+            return QVariant::fromValue<int>(calculateKey(m_videoWall->systemContext(), m_screen));
 
         case Qn::NodeTypeRole:
             return QVariant::fromValue(ResourceTree::NodeType::videoWallItem);

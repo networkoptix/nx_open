@@ -18,7 +18,7 @@
 #include <nx/utils/value_cache.h>
 #include <nx/vms/api/data/module_information.h>
 #include <nx/vms/api/data/software_version.h>
-#include <nx/vms/common/resource/resource_context.h>
+#include <nx/vms/common/system_context.h>
 #include <utils/common/instance_storage.h>
 
 class QnStoragePluginFactory;
@@ -45,12 +45,12 @@ namespace nx::utils { class TimerManager; }
  * or VMS Server). Functional tests can create several Common Module instances to emulate complex
  * System of several VMS Servers.
  *
- * As a temporary solution, QnCommonModule inherits ResourceContext for now. This is required to
+ * As a temporary solution, QnCommonModule inherits SystemContext for now. This is required to
  * simplify transition process.
  */
 class NX_VMS_COMMON_API QnCommonModule:
     public QObject,
-    public nx::vms::common::ResourceContext,
+    public nx::vms::common::SystemContext,
     public /*mixin*/ QnInstanceStorage
 {
     Q_OBJECT

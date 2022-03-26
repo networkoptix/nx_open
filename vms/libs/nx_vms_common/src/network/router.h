@@ -9,7 +9,7 @@
 #include <nx/network/socket_common.h>
 #include <nx/utils/uuid.h>
 
-namespace nx::vms::common { class ResourceContext; }
+namespace nx::vms::common { class SystemContext; }
 namespace nx::vms::discovery { class Manager; }
 
 struct NX_VMS_COMMON_API QnRoute
@@ -41,7 +41,7 @@ public:
         nx::vms::discovery::Manager* moduleManager,
         QObject* parent = nullptr);
 
-    QnRoute routeTo(const QnUuid& serverId, nx::vms::common::ResourceContext* context);
+    QnRoute routeTo(const QnUuid& serverId, nx::vms::common::SystemContext* context);
     QnRoute routeTo(const QnMediaServerResourcePtr& server);
 
 private:

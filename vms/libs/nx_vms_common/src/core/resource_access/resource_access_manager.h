@@ -43,7 +43,7 @@ class NX_VMS_COMMON_API QnResourceAccessManager:
 public:
     QnResourceAccessManager(
         nx::core::access::Mode mode,
-        nx::vms::common::ResourceContext* context,
+        nx::vms::common::SystemContext* context,
         QObject* parent = nullptr);
 
     /**

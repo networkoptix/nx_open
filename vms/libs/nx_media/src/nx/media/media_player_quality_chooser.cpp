@@ -379,7 +379,7 @@ Player::TranscodingSupportStatus transcodingSupportStatus(
 
     const QnMediaServerResourcePtr& server = liveMode
         ? camera->getParentServer()
-        : camera->context()->cameraHistoryPool()->getMediaServerOnTime(camera, positionMs);
+        : camera->systemContext()->cameraHistoryPool()->getMediaServerOnTime(camera, positionMs);
 
     if (!server)
         return Player::TranscodingNotSupported;

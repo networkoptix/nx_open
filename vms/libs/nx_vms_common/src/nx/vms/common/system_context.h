@@ -52,7 +52,7 @@ class AbstractCertificateVerifier;
  * client-server connection. Also there can be separate Resource Context for the local files in the
  * Desktop Client. VMS Server has the only one Resource Context for it's own database connection.
  */
-class NX_VMS_COMMON_API ResourceContext
+class NX_VMS_COMMON_API SystemContext
 {
 public:
     /**
@@ -64,11 +64,11 @@ public:
      *     used on the Server side, all calculations occur on the fly. Cached mode is used on the
      *     Client side, where we need to actively listen for the changes and emit signals.
      */
-    ResourceContext(
+    SystemContext(
         QnUuid peerId,
         QnUuid sessionId,
         nx::core::access::Mode resourceAccessMode);
-    virtual ~ResourceContext();
+    virtual ~SystemContext();
 
     /**
      * Enable network-related functionality. Can be disabled in unit tests.

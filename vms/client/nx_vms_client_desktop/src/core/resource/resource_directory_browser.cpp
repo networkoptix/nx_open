@@ -265,7 +265,7 @@ void LocalResourceProducer::createLocalResources(const QStringList& pathList)
         }
 
         // Some resources can already be added to the Resource Pool.
-        if (!resource->context())
+        if (!resource->systemContext())
             newResources.append(resource);
     }
     if (QThread::currentThread()->isInterruptionRequested())

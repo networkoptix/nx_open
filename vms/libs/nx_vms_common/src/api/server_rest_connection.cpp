@@ -41,7 +41,7 @@
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
 #include <nx/vms/common/resource/analytics_engine_resource.h>
 #include <nx/vms/common/resource/analytics_plugin_resource.h>
-#include <nx/vms/common/resource/resource_context.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -252,7 +252,7 @@ struct ServerConnection::Private
     nx::network::http::ClientPool httpClientPool;
 
     QnUuid serverId;
-    nx::vms::common::ResourceContext* resourceContext = nullptr;
+    nx::vms::common::SystemContext* systemContext = nullptr;
 
     struct DirectConnect
     {
@@ -267,7 +267,7 @@ struct ServerConnection::Private
 };
 
 ServerConnection::ServerConnection(
-    nx::vms::common::ResourceContext* resourceContext,
+    nx::vms::common::SystemContext* systemContext,
     const QnUuid& serverId)
     :
     QObject(),
@@ -276,7 +276,7 @@ ServerConnection::ServerConnection(
     // TODO: #sivanov Raw pointer is unsafe here as ServerConnection instance may be not deleted
     // after it's owning server (and context) are destroyed. Need to change
     // QnMediaServerResource::restConnection() method to return weak pointer instead.
-    d->resourceContext = resourceContext;
+    d->systemContext = systemContext;
     d->serverId = serverId;
     d->logTag = nx::utils::log::Tag(
         QStringLiteral("%1 [%2]").arg(nx::toString(this), serverId.toString()));
@@ -289,7 +289,7 @@ ServerConnection::ServerConnection(
     nx::network::SocketAddress address,
     nx::network::http::Credentials credentials)
     :
-    ServerConnection(/*resourceContext*/ nullptr, serverId)
+    ServerConnection(/*systemContext*/ nullptr, serverId)
 {
     d->directConnect = Private::DirectConnect();
     d->directConnect->sessionId = sessionId;
@@ -1870,15 +1870,15 @@ nx::network::http::Credentials getRequestCredentials(
 }
 
 bool setupAuth(
-    nx::vms::common::ResourceContext* resourceContext,
+    nx::vms::common::SystemContext* systemContext,
     QnUuid serverId,
     nx::network::http::ClientPool::Request& request,
     const QUrl& url)
 {
-    if (!NX_ASSERT(resourceContext))
+    if (!NX_ASSERT(systemContext))
         return false;
 
-    auto resPool = resourceContext->resourcePool();
+    auto resPool = systemContext->resourcePool();
     const auto server = resPool->getResourceById<QnMediaServerResource>(serverId);
     if (!server)
         return false;
@@ -1889,14 +1889,14 @@ bool setupAuth(
 
     // This header is used by the server to identify the client login session for audit.
     request.headers.emplace(
-        Qn::EC2_RUNTIME_GUID_HEADER_NAME, resourceContext->sessionId().toByteArray());
+        Qn::EC2_RUNTIME_GUID_HEADER_NAME, systemContext->sessionId().toByteArray());
 
-    auto router = resourceContext->router();
+    auto router = systemContext->router();
     QnRoute route = NX_ASSERT(router) ? router->routeTo(server) : QnRoute();
 
     if (route.reverseConnect)
     {
-        auto connection = resourceContext->ec2Connection();
+        auto connection = systemContext->ec2Connection();
         if (!NX_ASSERT(connection))
             return false;
 
@@ -1922,7 +1922,7 @@ bool setupAuth(
     }
 
     // TODO: #sivanov Only client-side connection is actually used.
-    const auto connection = resourceContext->ec2Connection();
+    const auto connection = systemContext->ec2Connection();
     if (!connection)
         return false;
 
@@ -1979,7 +1979,7 @@ nx::network::http::ClientPool::Request ServerConnection::prepareRequest(
             url.path(),
             url.query());
     }
-    else if (!setupAuth(d->resourceContext, d->serverId, request, url))
+    else if (!setupAuth(d->systemContext, d->serverId, request, url))
     {
         return nx::network::http::ClientPool::Request();
     }
@@ -1998,7 +1998,7 @@ Handle ServerConnection::sendRequest(
 {
     auto certificateVerifier = d->directConnect
         ? d->directConnect->certificateVerifier
-        : d->resourceContext->certificateVerifier();
+        : d->systemContext->certificateVerifier();
     if (!NX_ASSERT(certificateVerifier))
         return 0;
 

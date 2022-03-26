@@ -135,7 +135,7 @@ QString getWebpageAddress(const Camera& camera)
         url.setPort(-1);
 
     // Force HTTP or HTTPS protocol for a webpage.
-    const bool useSecureScheme = camera->context()->globalSettings()->useHttpsOnlyCameras()
+    const bool useSecureScheme = camera->systemContext()->globalSettings()->useHttpsOnlyCameras()
         || (nx::utils::stricmp(scheme, nx::network::http::kSecureUrlSchemeName) == 0);
 
     url.setScheme(nx::network::http::urlScheme(useSecureScheme));

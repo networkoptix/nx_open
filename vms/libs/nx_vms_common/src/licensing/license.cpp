@@ -18,7 +18,7 @@
 #include <nx/branding.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/license_data.h>
-#include <nx/vms/common/resource/resource_context.h>
+#include <nx/vms/common/system_context.h>
 #include <nx_ec/data/api_conversion_functions.h>
 #include <utils/common/synctime.h>
 
@@ -621,7 +621,7 @@ bool QnLicense::isSaas() const
 //-------------------------------------------------------------------------------------------------
 // QnLicensePool
 
-QnLicensePool::QnLicensePool(nx::vms::common::ResourceContext* context, QObject* parent):
+QnLicensePool::QnLicensePool(nx::vms::common::SystemContext* context, QObject* parent):
     QObject(parent),
     nx::vms::common::ResourceContextAware(context),
     m_mutex(nx::Mutex::Recursive)

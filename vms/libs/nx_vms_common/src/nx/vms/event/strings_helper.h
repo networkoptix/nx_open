@@ -29,7 +29,7 @@ class NX_VMS_COMMON_API StringsHelper:
     using base_type = QObject;
 
 public:
-    StringsHelper(common::ResourceContext* context);
+    StringsHelper(common::SystemContext* context);
 
     QString actionName(ActionType value) const;
 

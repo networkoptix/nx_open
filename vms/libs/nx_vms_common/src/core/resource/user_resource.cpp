@@ -462,8 +462,8 @@ void QnUserResource::setEmail(const QString& email)
 QString QnUserResource::fullName() const
 {
     QString result;
-    if (auto ctx = this->context())
-        result = ctx->resourcePropertyDictionary()->value(getId(), Qn::USER_FULL_NAME);
+    if (auto context = systemContext())
+        result = context->resourcePropertyDictionary()->value(getId(), Qn::USER_FULL_NAME);
 
     NX_MUTEX_LOCKER locker(&m_mutex);
     return result.isNull() ? m_fullName : result;

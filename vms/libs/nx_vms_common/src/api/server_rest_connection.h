@@ -49,7 +49,7 @@
 namespace nx::vms::common {
 
 class AbstractCertificateVerifier;
-class ResourceContext;
+class SystemContext;
 
 } // namespace nx::vms::common
 
@@ -117,11 +117,11 @@ public:
     /**
      * Used to send REST requests to the mediaserver. It uses ec2Connection and MediaServerResource
      * to get authentication data.
-     * @param resourceContext ServerConnection takes a lot of objects from it.
+     * @param systemContext ServerConnection takes a lot of objects from it.
      * @param serverId resource Id of the mediaserver.
      */
     ServerConnection(
-        nx::vms::common::ResourceContext* resourceContext,
+        nx::vms::common::SystemContext* systemContext,
         const QnUuid& serverId);
 
     /**

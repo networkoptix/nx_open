@@ -17,7 +17,7 @@
 #include <core/resource_access/resource_access_filter.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
-#include <nx/vms/common/resource/resource_context.h>
+#include <nx/vms/common/system_context.h>
 #include <utils/common/checked_cast.h>
 
 #include "private/resource_pool_p.h"
@@ -41,9 +41,9 @@ std::function<void()> insertOrUpdateResource(const T& resource, QHash<QnUuid, T>
 
 } // namespace
 
-QnResourcePool::QnResourcePool(nx::vms::common::ResourceContext* context, QObject* parent):
+QnResourcePool::QnResourcePool(nx::vms::common::SystemContext* systemContext, QObject* parent):
     base_type(parent),
-    d(new Private(this, context)),
+    d(new Private(this, systemContext)),
     m_tranInProgress(false)
 {
     m_threadPool.reset(new QThreadPool());
@@ -56,9 +56,9 @@ QnResourcePool::~QnResourcePool()
     NX_DEBUG(this, "Removing");
 }
 
-nx::vms::common::ResourceContext* QnResourcePool::context() const
+nx::vms::common::SystemContext* QnResourcePool::systemContext() const
 {
-    return d->context;
+    return d->systemContext;
 }
 
  QThreadPool* QnResourcePool::threadPool() const
@@ -105,8 +105,8 @@ void QnResourcePool::addResources(const QnResourceList& resources, AddResourceFl
         // Getting an NX_ASSERT here? Did you forget to use QnSharedResourcePointer?
         NX_ASSERT(resource->toSharedPointer());
         NX_ASSERT(!resource->getId().isNull());
-        NX_ASSERT(!resource->context() || resource->resourcePool() == this);
-        resource->addToContext(d->context);
+        NX_ASSERT(!resource->systemContext() || resource->resourcePool() == this);
+        resource->addToSystemContext(d->systemContext);
         resource->moveToThread(thread());
     }
 

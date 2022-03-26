@@ -54,7 +54,7 @@ QnCameraBookmark helpers::bookmarkFromAction(
     const vms::event::AbstractActionPtr& action,
     const QnSecurityCamResourcePtr& camera)
 {
-    if (!camera || !camera->context())
+    if (!camera || !camera->systemContext())
     {
         NX_ASSERT(false, "Camera is invalid");
         return QnCameraBookmark();
@@ -80,7 +80,7 @@ QnCameraBookmark helpers::bookmarkFromAction(
     bookmark.cameraId = camera->getId();
     bookmark.creationTimeStampMs = milliseconds(qnSyncTime->currentMSecsSinceEpoch());
 
-    vms::event::StringsHelper helper(camera->context());
+    vms::event::StringsHelper helper(camera->systemContext());
     bookmark.name = helper.eventAtResource(action->getRuntimeParams(), Qn::RI_WithUrl);
     bookmark.description = helper.eventDetails(action->getRuntimeParams(),
         nx::vms::event::AttrSerializePolicy::singleLine).join('\n');

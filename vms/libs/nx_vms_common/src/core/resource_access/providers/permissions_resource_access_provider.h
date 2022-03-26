@@ -16,7 +16,7 @@ class NX_VMS_COMMON_API PermissionsResourceAccessProvider: public BaseResourceAc
 public:
     PermissionsResourceAccessProvider(
         Mode mode,
-        nx::vms::common::ResourceContext* context,
+        nx::vms::common::SystemContext* context,
         QObject* parent = nullptr);
     virtual ~PermissionsResourceAccessProvider();
 

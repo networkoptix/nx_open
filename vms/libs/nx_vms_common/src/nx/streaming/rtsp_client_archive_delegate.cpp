@@ -29,7 +29,7 @@ extern "C"
 #include <nx/streaming/rtp/rtp.h>
 #include <nx/streaming/rtsp_client.h>
 #include <nx/utils/suppress_exceptions.h>
-#include <nx/vms/common/resource/resource_context.h>
+#include <nx/vms/common/system_context.h>
 #include <utils/common/sleep.h>
 #include <utils/common/synctime.h>
 #include <utils/common/util.h>
@@ -125,17 +125,17 @@ void QnRtspClientArchiveDelegate::setCamera(const QnSecurityCamResourcePtr& came
     if (m_camera == camera)
         return;
 
-    if (m_camera && m_camera->context())
-        m_camera->context()->cameraHistoryPool()->disconnect(this);
+    if (m_camera && m_camera->systemContext())
+        m_camera->systemContext()->cameraHistoryPool()->disconnect(this);
 
     m_camera = camera;
 
-    if (!NX_ASSERT(m_camera && m_camera->context()))
+    if (!NX_ASSERT(m_camera && m_camera->systemContext()))
         return;
 
     m_server = camera->getParentServer();
 
-    auto context = camera->context();
+    auto context = camera->systemContext();
     auto maxSessionDuration = context->globalSettings()->maxRtspConnectDuration();
     if (maxSessionDuration.count() > 0)
         m_maxSessionDurationMs = maxSessionDuration;
@@ -203,7 +203,7 @@ QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getNextMediaServerFromTime
     if (m_fixedServer)
         return QnMediaServerResourcePtr();
 
-    return camera->context()->cameraHistoryPool()->getNextMediaServerAndPeriodOnTime(
+    return camera->systemContext()->cameraHistoryPool()->getNextMediaServerAndPeriodOnTime(
         camera,
         time,
         m_rtspSession->getScale() >= 0,
@@ -279,7 +279,7 @@ void QnRtspClientArchiveDelegate::checkMinTimeFromOtherServer(const QnSecurityCa
     }
 
     QnMediaServerResourceList mediaServerList =
-        camera->context()->cameraHistoryPool()->getCameraFootageData(camera, true);
+        camera->systemContext()->cameraHistoryPool()->getCameraFootageData(camera, true);
 
     /* Check if no archive available on any server. */
     /* Or check if archive belong to the current server only */
@@ -327,7 +327,7 @@ QnMediaServerResourcePtr QnRtspClientArchiveDelegate::getServerOnTime(qint64 tim
     qint64 timeMs = timeUsec / 1000;
 
     QnMediaServerResourcePtr mediaServer =
-        m_camera->context()->cameraHistoryPool()->getMediaServerOnTime(
+        m_camera->systemContext()->cameraHistoryPool()->getMediaServerOnTime(
             m_camera,
             timeMs,
             &m_serverTimePeriod);
@@ -1091,7 +1091,7 @@ void QnRtspClientArchiveDelegate::setupRtspSession(
 {
     session->setCredentials(m_credentials, nx::network::http::header::AuthScheme::digest);
     session->setAdditionAttribute(Qn::EC2_RUNTIME_GUID_HEADER_NAME,
-        camera->context()->sessionId().toByteArray());
+        camera->systemContext()->sessionId().toByteArray());
     session->setAdditionAttribute(Qn::EC2_INTERNAL_RTP_FORMAT, "1" );
     session->setAdditionAttribute(Qn::CUSTOM_USERNAME_HEADER_NAME,
         QString::fromStdString(m_credentials.username).toUtf8());
@@ -1106,7 +1106,7 @@ void QnRtspClientArchiveDelegate::setupRtspSession(
     }
 
     session->setTransport(nx::vms::api::RtpTransportType::tcp);
-    const auto settings = m_camera->context()->globalSettings();
+    const auto settings = m_camera->systemContext()->globalSettings();
     session->setTcpRecvBufferSize(settings->mediaBufferSizeKb() * 1024);
 
 }

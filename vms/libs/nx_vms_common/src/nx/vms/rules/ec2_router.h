@@ -16,7 +16,7 @@ class Ec2Router:
     Q_OBJECT
 
 public:
-    Ec2Router(nx::vms::common::ResourceContext* context);
+    Ec2Router(nx::vms::common::SystemContext* context);
     virtual ~Ec2Router();
 
     virtual void init(const QnUuid& id) override;

@@ -10,7 +10,7 @@
 
 struct QnResourcePool::Private
 {
-    explicit Private(QnResourcePool* owner, nx::vms::common::ResourceContext* context);
+    explicit Private(QnResourcePool* owner, nx::vms::common::SystemContext* systemContext);
 
     void handleResourceAdded(const QnResourcePtr& resource);
     void handleResourceRemoved(const QnResourcePtr& resource);
@@ -18,7 +18,7 @@ struct QnResourcePool::Private
     void updateIsIOModule(const QnVirtualCameraResourcePtr& camera);
 
     const QnResourcePool* const q;
-    nx::vms::common::ResourceContext* const context;
+    nx::vms::common::SystemContext* const systemContext;
     QSet<QnVirtualCameraResourcePtr> ioModules;
     std::atomic_bool hasIoModules{false};
     QSet<QnMediaServerResourcePtr> mediaServers;

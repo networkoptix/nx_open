@@ -52,8 +52,8 @@ void QnDesktopResource::initializeConnection(
         toSharedPointer(this),
         server,
         userId,
-        context()->peerId(),
-        context()->ec2Connection()->credentials()));
+        systemContext()->peerId(),
+        systemContext()->ec2Connection()->credentials()));
     m_connection->start();
 }
 

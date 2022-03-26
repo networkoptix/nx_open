@@ -15,7 +15,7 @@ class NX_VMS_COMMON_API QnResourceAccessSubjectsCache:
     using base_type = QObject;
 public:
     QnResourceAccessSubjectsCache(
-        nx::vms::common::ResourceContext* context,
+        nx::vms::common::SystemContext* context,
         QObject* parent = nullptr);
 
     /** List of all subjects of the resources access: users and roles (excl. predefined). */

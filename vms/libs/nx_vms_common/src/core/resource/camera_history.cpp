@@ -16,7 +16,7 @@
 #include <nx/utils/log/log.h>
 #include <nx/utils/range_adapters.h>
 #include <nx/vms/api/data/camera_history_data.h>
-#include <nx/vms/common/resource/resource_context.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx_ec/abstract_ec_connection.h>
@@ -58,7 +58,7 @@ nx::vms::api::CameraHistoryItemDataList::const_iterator getMediaServerOnTimeInte
 // ------------------- CameraHistory Pool ------------------------
 
 QnCameraHistoryPool::QnCameraHistoryPool(
-    nx::vms::common::ResourceContext* context,
+    nx::vms::common::SystemContext* context,
     QObject *parent)
     :
     QObject(parent),

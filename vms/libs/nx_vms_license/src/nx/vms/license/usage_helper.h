@@ -18,12 +18,12 @@ namespace nx::vms::license {
 
 struct LicenseServer
 {
-    static const nx::utils::Url indexUrl(common::ResourceContext* context);
-    static const nx::utils::Url activateUrl(common::ResourceContext* context);
-    static const nx::utils::Url deactivateUrl(common::ResourceContext* context);
-    static const nx::utils::Url validateUrl(common::ResourceContext* context);
+    static const nx::utils::Url indexUrl(common::SystemContext* context);
+    static const nx::utils::Url activateUrl(common::SystemContext* context);
+    static const nx::utils::Url deactivateUrl(common::SystemContext* context);
+    static const nx::utils::Url validateUrl(common::SystemContext* context);
 private:
-    static const QString baseUrl(common::ResourceContext* context);
+    static const QString baseUrl(common::SystemContext* context);
 };
 
 struct LicenseCompatibility;
@@ -43,7 +43,7 @@ class UsageWatcher:
     Q_OBJECT
     using base_type = Connective<QObject>;
 public:
-    UsageWatcher(common::ResourceContext* context, QObject* parent = nullptr);
+    UsageWatcher(common::SystemContext* context, QObject* parent = nullptr);
 
 signals:
     void licenseUsageChanged();
@@ -58,7 +58,7 @@ class UsageHelper:
     Q_OBJECT
     using base_type = Connective<QObject>;
 public:
-    UsageHelper(common::ResourceContext* context, QObject* parent = nullptr);
+    UsageHelper(common::SystemContext* context, QObject* parent = nullptr);
     virtual ~UsageHelper() override;
 
     bool isValid() const;
@@ -158,10 +158,10 @@ class CamLicenseUsageWatcher: public UsageWatcher
     Q_OBJECT
     using base_type = UsageWatcher;
 public:
-    CamLicenseUsageWatcher(common::ResourceContext* context, QObject* parent = nullptr);
+    CamLicenseUsageWatcher(common::SystemContext* context, QObject* parent = nullptr);
     CamLicenseUsageWatcher(
         const QnVirtualCameraResourcePtr& camera,
-        common::ResourceContext* context,
+        common::SystemContext* context,
         QObject* parent = nullptr);
 };
 
@@ -174,18 +174,18 @@ public:
         Constructors. Each one uses specified watcher or create a new one if parameter is empty.
         With empty watcher parameter creates instance which tracks all cameras.
     */
-    CamLicenseUsageHelper(common::ResourceContext* context, QObject* parent = nullptr);
+    CamLicenseUsageHelper(common::SystemContext* context, QObject* parent = nullptr);
 
     CamLicenseUsageHelper(
         const QnVirtualCameraResourceList& proposedCameras,
         bool proposedEnable,
-        common::ResourceContext* context,
+        common::SystemContext* context,
         QObject* parent = nullptr);
 
     CamLicenseUsageHelper(
         const QnVirtualCameraResourcePtr& proposedCamera,
         bool proposedEnable,
-        common::ResourceContext* context,
+        common::SystemContext* context,
         QObject* parent = nullptr);
 
     void propose(const QnVirtualCameraResourcePtr &proposedCamera, bool proposedEnable);
@@ -235,7 +235,7 @@ class VideoWallLicenseUsageWatcher: public UsageWatcher
     Q_OBJECT
     using base_type = UsageWatcher;
 public:
-    VideoWallLicenseUsageWatcher(common::ResourceContext* context, QObject* parent = nullptr);
+    VideoWallLicenseUsageWatcher(common::SystemContext* context, QObject* parent = nullptr);
 };
 
 class VideoWallLicenseUsageHelper: public UsageHelper
@@ -243,7 +243,7 @@ class VideoWallLicenseUsageHelper: public UsageHelper
     Q_OBJECT
     using base_type = UsageHelper;
 public:
-    VideoWallLicenseUsageHelper(common::ResourceContext* context, QObject* parent = nullptr);
+    VideoWallLicenseUsageHelper(common::SystemContext* context, QObject* parent = nullptr);
 
     /** Propose to use some more or less licenses directly (e.g. to start control session). */
     void propose(int count);
@@ -266,7 +266,7 @@ class VideoWallLicenseUsageProposer
 {
 public:
     VideoWallLicenseUsageProposer(
-        common::ResourceContext* context,
+        common::SystemContext* context,
         VideoWallLicenseUsageHelper* helper,
         int screenCount);
     ~VideoWallLicenseUsageProposer();

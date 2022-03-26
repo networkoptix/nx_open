@@ -43,7 +43,7 @@ QnFutureLicenseStub::QnFutureLicenseStub(int count)
 }
 
 QLicenseStubValidator::QLicenseStubValidator(
-    nx::vms::common::ResourceContext* context,
+    nx::vms::common::SystemContext* context,
     QObject* parent)
     :
     base_type(context, parent)

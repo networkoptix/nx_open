@@ -13,7 +13,7 @@ class NX_VMS_COMMON_TEST_SUPPORT_API MessageProcessorMock: public QnCommonMessag
     using base_type = QnCommonMessageProcessor;
 
 public:
-    MessageProcessorMock(nx::vms::common::ResourceContext* context, QObject* parent = nullptr);
+    MessageProcessorMock(nx::vms::common::SystemContext* context, QObject* parent = nullptr);
     virtual ~MessageProcessorMock() override;
 
     void emulateConnectionEstablished();

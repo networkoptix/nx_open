@@ -3,12 +3,12 @@
 #include "resource_properties.h"
 
 #include <nx/utils/qset.h>
-#include <nx/vms/common/resource/resource_context.h>
+#include <nx/vms/common/system_context.h>
 #include <nx_ec/abstract_ec_connection.h>
 #include <nx_ec/managers/abstract_resource_manager.h>
 
 QnResourcePropertyDictionary::QnResourcePropertyDictionary(
-    nx::vms::common::ResourceContext* context,
+    nx::vms::common::SystemContext* context,
     QObject* parent)
     :
     QObject(parent),

@@ -440,7 +440,7 @@ void NotificationListModel::Private::setupAcknowledgeAction(EventData& eventData
         {
             action::Parameters params;
             const auto camera = resourcePool()->getResourceById(cameraId);
-            if (camera && camera->context() && !camera->hasFlags(Qn::removed))
+            if (camera && camera->systemContext() && !camera->hasFlags(Qn::removed))
                 params.setResources({camera});
             params.setArgument(Qn::ActionDataRole, action);
             menu()->trigger(action::AcknowledgeEventAction, params);

@@ -12,7 +12,7 @@
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/resource_properties.h>
 #include <core/resource_management/status_dictionary.h>
-#include <nx/vms/common/resource/resource_context.h>
+#include <nx/vms/common/system_context.h>
 #include <nx/utils/log/assert.h>
 #include <nx/utils/log/log.h>
 #include <nx/vms/api/data/resource_data.h>
@@ -57,21 +57,21 @@ QnResource::~QnResource()
 
 QnResourcePool* QnResource::resourcePool() const
 {
-    if (auto context = this->context())
+    if (auto context = systemContext())
         return context->resourcePool();
 
     return nullptr;
 }
 
-void QnResource::addToContext(nx::vms::common::ResourceContext* context)
+void QnResource::addToSystemContext(nx::vms::common::SystemContext* systemContext)
 {
-    if (!NX_ASSERT(context, "Context must exist here"))
+    if (!NX_ASSERT(systemContext, "Context must exist here"))
         return;
 
-    if (!NX_ASSERT(!this->context(), "Resource already belongs to some context"))
+    if (!NX_ASSERT(!this->systemContext(), "Resource already belongs to some System Context"))
         return;
 
-    setContext(context);
+    setSystemContext(systemContext);
 }
 
 QnResourcePtr QnResource::toSharedPointer() const
@@ -260,7 +260,7 @@ void QnResource::setTypeId(const QnUuid& id)
 
 nx::vms::api::ResourceStatus QnResource::getStatus() const
 {
-    if (auto context = this->context())
+    if (auto context = systemContext())
     {
         const auto statusDictionary = context->resourceStatusDictionary();
         if (statusDictionary)
@@ -282,11 +282,12 @@ void QnResource::setStatus(ResourceStatus newStatus, Qn::StatusChangeReason reas
     if (hasFlags(Qn::removed))
         return;
 
-    if (!NX_ASSERT(context()))
+    auto context = systemContext();
+    if (!NX_ASSERT(context))
         return;
 
     QnUuid id = getId();
-    ResourceStatus oldStatus = context()->resourceStatusDictionary()->value(id);
+    ResourceStatus oldStatus = context->resourceStatusDictionary()->value(id);
     if (oldStatus == newStatus)
         return;
 
@@ -298,7 +299,7 @@ void QnResource::setStatus(ResourceStatus newStatus, Qn::StatusChangeReason reas
         getName(),
         nx::utils::url::hidePassword(getUrl()));
     m_previousStatus = oldStatus;
-    context()->resourceStatusDictionary()->setValue(id, newStatus);
+    context->resourceStatusDictionary()->setValue(id, newStatus);
 
     // Null pointer if we are changing status in constructor. Signal is not needed in this case.
     if (auto sharedThis = toSharedPointer(this))
@@ -391,7 +392,7 @@ QString QnResource::getProperty(const QString& key) const
             if (itr != m_locallySavedProperties.end())
                 value = itr->second;
         }
-        else if (auto context = this->context(); context && context->resourcePropertyDictionary())
+        else if (auto context = systemContext(); context && context->resourcePropertyDictionary())
         {
             value = context->resourcePropertyDictionary()->value(m_id, key);
         }
@@ -426,16 +427,22 @@ bool QnResource::setProperty(const QString& key, const QString& value, bool mark
     }
 
     NX_ASSERT(!getId().isNull());
-    NX_ASSERT(context());
+    if (const auto context = systemContext(); NX_ASSERT(context))
+    {
+        auto prevValue = getProperty(key);
+        const bool isModified = context->resourcePropertyDictionary()->setValue(
+            getId(),
+            key,
+            value,
+            markDirty);
 
-    auto prevValue = getProperty(key);
-    const bool isModified = context()
-        && context()->resourcePropertyDictionary()->setValue(getId(), key, value, markDirty);
+        if (isModified)
+            emitPropertyChanged(key, prevValue, value);
 
-    if (isModified)
-        emitPropertyChanged(key, prevValue, value);
+        return isModified;
+    }
 
-    return isModified;
+    return false;
 }
 
 void QnResource::emitPropertyChanged(
@@ -470,7 +477,7 @@ nx::vms::api::ResourceParamDataList QnResource::getProperties() const
         return result;
     }
 
-    if (const auto context = this->context())
+    if (const auto context = systemContext())
         return context->resourcePropertyDictionary()->allProperties(getId());
 
     return {};
@@ -478,30 +485,30 @@ nx::vms::api::ResourceParamDataList QnResource::getProperties() const
 
 bool QnResource::saveProperties()
 {
-    NX_ASSERT(context() && !getId().isNull());
-    if (auto context = this->context())
+    NX_ASSERT(systemContext() && !getId().isNull());
+    if (auto context = systemContext())
         return context->resourcePropertyDictionary()->saveParams(getId());
     return false;
 }
 
 void QnResource::savePropertiesAsync()
 {
-    NX_ASSERT(context() && !getId().isNull());
-    if (auto context = this->context())
+    NX_ASSERT(systemContext() && !getId().isNull());
+    if (auto context = systemContext())
         context->resourcePropertyDictionary()->saveParamsAsync(getId());
 }
 
 // -----------------------------------------------------------------------------
 
-void QnResource::setContext(nx::vms::common::ResourceContext* context)
+void QnResource::setSystemContext(nx::vms::common::SystemContext* systemContext)
 {
-    m_context = context;
+    m_systemContext = systemContext;
 }
 
-nx::vms::common::ResourceContext* QnResource::context() const
+nx::vms::common::SystemContext* QnResource::systemContext() const
 {
-    if (auto context = m_context.load())
-        return context;
+    if (auto systemContext = m_systemContext.load())
+        return systemContext;
 
     return nullptr;
 }

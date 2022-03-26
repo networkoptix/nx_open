@@ -5,12 +5,12 @@
 #include <api/common_message_processor.h>
 #include <common/common_module.h>
 #include <nx/utils/log/log.h>
-#include <nx/vms/common/resource/resource_context.h>
+#include <nx/vms/common/system_context.h>
 
 //#define RUNTIME_INFO_DEBUG
 
 QnRuntimeInfoManager::QnRuntimeInfoManager(
-    nx::vms::common::ResourceContext* context,
+    nx::vms::common::SystemContext* context,
     QObject* parent)
     :
     QObject(parent),
