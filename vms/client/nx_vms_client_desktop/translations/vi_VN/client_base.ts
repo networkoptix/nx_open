@@ -541,7 +541,7 @@
     </message>
     <message>
       <source>Check I/O Module Issues...</source>
-      <translation>Kiểm tra sự cố I/O Module...</translation>
+      <translation>Kiểm tra sự cố Mô-đun I/O...</translation>
     </message>
     <message>
       <source>Check I/O Modules Issues...</source>
