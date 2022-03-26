@@ -229,7 +229,7 @@ Condition dataMatch(int role, const QVariant& paramData)
 
 Condition nodeTypeDataMatch(ResourceTree::NodeType nodeType)
 {
-    return dataMatch(Qn::NodeTypeRole, static_cast<int>(nodeType));
+    return dataMatch(Qn::NodeTypeRole, QVariant::fromValue(nodeType));
 }
 
 Condition mimeDataContainsResource(const QnResourcePtr& resource)
