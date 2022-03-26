@@ -56,7 +56,13 @@ public:
 
     Q_INVOKABLE double toDouble(const QVariant& value) const;
 
-    Q_INVOKABLE QString wildcardToRegularExpression(const QString& value) const;
+    /**
+     * Makes search expression with some wildcard capabilities. Asterisk symbol and question marks
+     * are supported. All other special symbols are escaped and treated "as is".
+     * QRegularExpresion::wildcardToRegularExpression can't be used to support full set of wildcard
+     * functionality because it processes some special symbols (like slash) in a special way.
+     */
+    Q_INVOKABLE QString makeSearchRegExp(const QString& value) const;
 };
 
 } // namespace nx::vms::client::core
