@@ -20,7 +20,6 @@
 #include <nx/utils/data_structures/map_helper.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
-#include <nx/vms/client/desktop/analytics/analytics_taxonomy_manager.h>
 #include <nx/vms/event/rule.h>
 #include <nx/vms/event/rule_manager.h>
 
@@ -342,11 +341,38 @@ AnalyticsEventsSearchTreeBuilder::AnalyticsEventsSearchTreeBuilder(QObject* pare
     QnCommonModuleAware(parent),
     cachedEventTypesTree(makeNode(NodeType::root, {}))
 {
-    connect(
-        qnClientModule->taxonomyManager(),
-        &analytics::TaxonomyManager::currentTaxonomyChanged,
-        this,
-        &AnalyticsEventsSearchTreeBuilder::onTaxonomyChanged);
+    using RuleManager = nx::vms::event::RuleManager;
+    const auto ruleManager = commonModule()->eventRuleManager();
+    connect(ruleManager, &RuleManager::rulesReset,
+        this, &AnalyticsEventsSearchTreeBuilder::updateEventTypesTree);
+    connect(ruleManager, &RuleManager::ruleAddedOrUpdated,
+        this, &AnalyticsEventsSearchTreeBuilder::updateEventTypesTree);
+    connect(ruleManager, &RuleManager::ruleRemoved,
+        this, &AnalyticsEventsSearchTreeBuilder::updateEventTypesTree);
+
+    auto notifyAboutResourceListChanges =
+        [this](const QnResourceList& resources)
+        {
+            if (std::any_of(resources.cbegin(), resources.cend(), &isManageableResource))
+                updateEventTypesTree();
+        };
+
+    auto genericResourceListener = new core::SessionResourcesSignalListener<QnResource>(this);
+    genericResourceListener->setOnAddedHandler(notifyAboutResourceListChanges);
+    genericResourceListener->setOnRemovedHandler(notifyAboutResourceListChanges);
+    genericResourceListener->start();
+
+    auto camerasListener = new core::SessionResourcesSignalListener<QnVirtualCameraResource>(this);
+    camerasListener->addOnCustomSignalHandler(
+        &QnVirtualCameraResource::compatibleEventTypesMaybeChanged,
+        [this]() { updateEventTypesTree(); });
+    camerasListener->start();
+
+    auto serversListener = new core::SessionResourcesSignalListener<QnMediaServerResource>(this);
+    serversListener->addOnCustomSignalHandler(
+        &QnMediaServerResource::analyticsDescriptorsChanged,
+        [this]() { updateEventTypesTree(); });
+    serversListener->start();
 }
 
 AnalyticsEventsSearchTreeBuilder::~AnalyticsEventsSearchTreeBuilder()
@@ -361,7 +387,7 @@ NodePtr AnalyticsEventsSearchTreeBuilder::eventTypesTree() const
     return cachedEventTypesTree;
 }
 
-void AnalyticsEventsSearchTreeBuilder::onTaxonomyChanged()
+void AnalyticsEventsSearchTreeBuilder::updateEventTypesTree()
 {
     dirty = true;
     if (eventTypesTreeFuture.isFinished())
@@ -374,15 +400,15 @@ void AnalyticsEventsSearchTreeBuilder::onTaxonomyChanged()
                     dirty = false;
                     {
                         QMutexLocker lock(&mutex);
-                        cachedEventTypesTree = getEventTypesTree();
+                        cachedEventTypesTree = calculateEventTypesTree();
                     }
-                    emit eventTypesTreeChanged();
                 }
+                emit eventTypesTreeChanged();
             });
     }
 }
 
-NodePtr AnalyticsEventsSearchTreeBuilder::getEventTypesTree() const
+NodePtr AnalyticsEventsSearchTreeBuilder::calculateEventTypesTree() const
 {
     using namespace nx::vms::event;
 
