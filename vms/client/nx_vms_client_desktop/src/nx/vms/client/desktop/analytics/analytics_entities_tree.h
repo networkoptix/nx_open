@@ -125,14 +125,15 @@ signals:
     void eventTypesTreeChanged();
 
 private:
+    void updateEventTypesTree();
+    AnalyticsEntitiesTreeBuilder::NodePtr calculateEventTypesTree() const;
+
+private:
     std::atomic_bool dirty = false;
     using EventTypesTreeFuture = QFuture<void>;
     EventTypesTreeFuture eventTypesTreeFuture;
     mutable QMutex mutex;
     AnalyticsEntitiesTreeBuilder::NodePtr cachedEventTypesTree;
-
-    Q_INVOKABLE void onTaxonomyChanged();
-    AnalyticsEntitiesTreeBuilder::NodePtr getEventTypesTree() const;
 };
 
 class AnalyticsObjectsSearchTreeBuilder : public QObject, public QnCommonModuleAware
