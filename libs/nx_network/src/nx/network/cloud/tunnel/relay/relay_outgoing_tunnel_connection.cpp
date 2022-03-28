@@ -21,7 +21,7 @@ OutgoingTunnelConnection::OutgoingTunnelConnection(
 {
     bindToAioThread(getAioThread());
 
-    NX_VERBOSE(this, "Created new relay tunnel. Url %1, session %2", m_relayUrl, m_relaySessionId);
+    NX_VERBOSE(this, "%1. Created new relay tunnel. Url %2", m_relaySessionId, m_relayUrl);
 }
 
 void OutgoingTunnelConnection::stopWhileInAioThread()

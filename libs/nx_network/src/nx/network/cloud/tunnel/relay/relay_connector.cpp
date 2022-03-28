@@ -48,6 +48,8 @@ void Connector::connect(
     std::chrono::milliseconds timeout,
     ConnectCompletionHandler handler)
 {
+    NX_VERBOSE(this, "%1. Starting relay connection to %2", m_connectSessionId, m_targetHostAddress);
+
     m_handler = std::move(handler);
 
     dispatch(
@@ -89,6 +91,9 @@ void Connector::onStartRelaySessionResponse(
     SystemError::ErrorCode sysErrorCode,
     nx::cloud::relay::api::CreateClientSessionResponse response)
 {
+    NX_VERBOSE(this, "%1. Received relay start session response %2, %3",
+        m_connectSessionId, resultCode, SystemError::toString(sysErrorCode));
+
     decltype(m_handler) handler;
     handler.swap(m_handler);
 
@@ -103,12 +108,18 @@ void Connector::onStartRelaySessionResponse(
             nullptr);
     }
 
-    m_connectSessionId = response.sessionId;
+    if (response.sessionId != m_connectSessionId)
+    {
+        NX_VERBOSE(this, "%1. Switching to relay session id %2",
+            m_connectSessionId, response.sessionId);
+        m_connectSessionId = response.sessionId;
+    }
 
     auto tunnelConnection = std::make_unique<OutgoingTunnelConnection>(
         nx::utils::Url(response.actualRelayUrl),
         m_connectSessionId,
         std::move(m_relayClient));
+
     handler(
         hpm::api::NatTraversalResultCode::ok,
         SystemError::noError,

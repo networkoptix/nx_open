@@ -39,15 +39,15 @@ void DirectEndpointConnector::connect(
     std::chrono::milliseconds timeout,
     ConnectCompletionHandler handler)
 {
-    NX_VERBOSE(this, "cross-nat %1. Connecting to %2 with timeout %3",
+    NX_VERBOSE(this, "%1. Connecting to %2 with timeout %3",
         m_connectSessionId, m_targetHostAddress, timeout);
 
     NX_ASSERT(!response.forwardedTcpEndpointList.empty());
     if (!s_needVerification)
     {
-        auto endpoint = std::move(response.forwardedTcpEndpointList.front());
+        auto endpoint = response.forwardedTcpEndpointList.front();
 
-        NX_VERBOSE(this, "cross-nat %1. Verification is disabled. Reporting endpoint %2",
+        NX_VERBOSE(this, "%1. Verification is disabled. Reporting endpoint %2",
             m_connectSessionId, endpoint);
 
         return post(
@@ -93,8 +93,8 @@ void DirectEndpointConnector::performEndpointVerification(
 
             if (endpoints.empty())
             {
-                NX_WARNING(this, nx::format("Cloud connect session %1, target %2. Cannot verify empty address list")
-                    .args(m_connectSessionId, m_targetHostAddress.toString()));
+                NX_WARNING(this, "%1. target %2. Cannot verify empty address list",
+                    m_connectSessionId, m_targetHostAddress);
                 handler(
                     nx::hpm::api::NatTraversalResultCode::tcpConnectFailed,
                     SystemError::connectionReset,
@@ -115,8 +115,8 @@ void DirectEndpointConnector::removeInvalidEmptyAddresses(
     {
         if (it->address.toString().empty())
         {
-            NX_WARNING(this, nx::format("Cloud connect session %1, target %2. Received empty address")
-                .args(m_connectSessionId, m_targetHostAddress.toString()));
+            NX_WARNING(this, "%1. target %2. Received empty address",
+                m_connectSessionId, m_targetHostAddress);
             it = endpoints->erase(it);
         }
         else
@@ -134,8 +134,7 @@ void DirectEndpointConnector::launchVerificators(
 
     for (const SocketAddress& endpoint: endpoints)
     {
-        NX_VERBOSE(this, "cross-nat %1. Verifying host %2",
-            m_connectSessionId, endpoint);
+        NX_VERBOSE(this, "%1. Verifying host %2", m_connectSessionId, endpoint);
 
         m_verificators.push_back(
             EndpointVerificatorFactory::instance().create(m_connectSessionId));
@@ -196,8 +195,7 @@ void DirectEndpointConnector::reportSuccessfulVerificationResult(
     SocketAddress endpoint,
     std::unique_ptr<AbstractStreamSocket> streamSocket)
 {
-    NX_VERBOSE(this, "cross-nat %1. Reporting successful connection to %2",
-        m_connectSessionId, endpoint);
+    NX_VERBOSE(this, "%1. Reporting successful connection to %2", m_connectSessionId, endpoint);
 
     m_verificators.clear();
 

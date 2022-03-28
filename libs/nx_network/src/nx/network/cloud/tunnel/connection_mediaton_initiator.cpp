@@ -8,10 +8,12 @@ namespace nx::network::cloud {
 
 ConnectionMediationInitiator::ConnectionMediationInitiator(
     const CloudConnectSettings& settings,
+    const std::string& connectSessionId,
     const hpm::api::MediatorAddress& mediatorAddress,
     std::unique_ptr<nx::hpm::api::MediatorClientUdpConnection> mediatorUdpClient)
     :
     m_settings(settings),
+    m_connectSessionId(connectSessionId),
     m_mediatorAddress(mediatorAddress),
     m_mediatorUdpClient(std::move(mediatorUdpClient))
 {
@@ -47,6 +49,13 @@ void ConnectionMediationInitiator::start(
 {
     m_request = request;
     m_handler = std::move(handler);
+
+    if (!m_settings.isUdpHpEnabled)
+    {
+        NX_VERBOSE(this, "%1. UDP hole punching was disabled. Querying mediator via HTTP",
+            m_connectSessionId);
+        return initiateConnectOverTcp();
+    }
 
     initiateConnectOverUdp();
 
@@ -109,6 +118,8 @@ void ConnectionMediationInitiator::handleResponseOverUdp(
     hpm::api::ResultCode resultCode,
     hpm::api::ConnectResponse response)
 {
+    NX_VERBOSE(this, "%1. Received UDP response %2", m_connectSessionId, resultCode);
+
     if (resultCode == hpm::api::ResultCode::networkError &&
         !m_tcpRequestCompleted)
     {
@@ -131,6 +142,8 @@ void ConnectionMediationInitiator::handleResponse(
     nx::hpm::api::ResultCode resultCode,
     nx::hpm::api::ConnectResponse response)
 {
+    NX_VERBOSE(this, "%1. Received HTTP response %2", m_connectSessionId, resultCode);
+
     m_mediatorUdpClient.reset();
     m_tcpConnectDelayTimer.pleaseStopSync();
     m_mediatorApiClient.reset();

@@ -197,6 +197,7 @@ void CrossNatConnector::issueConnectRequestToMediator()
         m_connectionMediationInitiator =
             std::make_unique<ConnectionMediationInitiator>(
                 m_cloudConnectController->settings(),
+                m_connectSessionId,
                 *m_mediatorAddress,
                 std::move(mediatorUdpClient));
 
@@ -416,19 +417,23 @@ hpm::api::ConnectRequest CrossNatConnector::prepareConnectRequest(
     connectRequest.connectionMethods =
         api::ConnectionMethod::udpHolePunching | api::ConnectionMethod::proxy;
     connectRequest.destinationHostName = m_targetPeerAddress.host.toString();
-    if (m_originatingHostAddressReplacement)
-    {
-        connectRequest.ignoreSourceAddress = true;
-        connectRequest.udpEndpointList.emplace_back(
-            SocketAddress(*m_originatingHostAddressReplacement, 0));
-        //< In case of zero port mediator will take request source port.
-    }
 
-    // Adding local interfaces IP.
-    for (const auto& address: allLocalAddresses(AddressFilter::onlyFirstIpV4))
+    if (m_cloudConnectController->settings().isUdpHpEnabled)
     {
-        connectRequest.udpEndpointList.push_back(
-            SocketAddress(address, udpHolePunchingLocalEndpoint.port));
+        if (m_originatingHostAddressReplacement)
+        {
+            connectRequest.ignoreSourceAddress = true;
+            connectRequest.udpEndpointList.emplace_back(
+                SocketAddress(*m_originatingHostAddressReplacement, 0));
+            //< In case of zero port mediator will take request source port.
+        }
+
+        // Adding local interfaces IP.
+        for (const auto& address: allLocalAddresses(AddressFilter::onlyFirstIpV4))
+        {
+            connectRequest.udpEndpointList.push_back(
+                SocketAddress(address, udpHolePunchingLocalEndpoint.port));
+        }
     }
 
     return connectRequest;

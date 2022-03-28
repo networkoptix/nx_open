@@ -27,6 +27,7 @@ public:
 
     ConnectionMediationInitiator(
         const CloudConnectSettings& settings,
+        const std::string& connectSessionId,
         const hpm::api::MediatorAddress& mediatorAddress,
         std::unique_ptr<nx::hpm::api::MediatorClientUdpConnection> mediatorUdpClient);
 
@@ -55,6 +56,7 @@ protected:
 
 private:
     const CloudConnectSettings& m_settings;
+    const std::string m_connectSessionId;
     hpm::api::MediatorAddress m_mediatorAddress;
     hpm::api::ConnectRequest m_request;
     Handler m_handler;
