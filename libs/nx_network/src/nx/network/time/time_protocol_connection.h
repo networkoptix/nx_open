@@ -5,6 +5,8 @@
 #include <chrono>
 
 #include <nx/network/aio/basic_pollable.h>
+#include <nx/network/connection_server/detail/connection_statistics.h>
+
 #include <nx/utils/interruption_flag.h>
 
 namespace nx {
@@ -14,15 +16,14 @@ class NX_NETWORK_API TimeProtocolConnection:
     public network::aio::BasicPollable
 {
 public:
+    nx::network::server::detail::ConnectionStatistics connectionStatistics;
+
     TimeProtocolConnection(std::unique_ptr<AbstractStreamSocket> _socket);
 
     void startReadingConnection(std::optional<std::chrono::milliseconds> inactivityTimeout);
 
     void registerCloseHandler(
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, bool /*connectionDestroyed*/)> handler);
-
-    std::chrono::milliseconds lifeDuration() const;
-    int messagesReceivedCount() const;
 
 protected:
     virtual void stopWhileInAioThread() override;

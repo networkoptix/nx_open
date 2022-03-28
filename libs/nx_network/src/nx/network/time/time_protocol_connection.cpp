@@ -46,6 +46,8 @@ void TimeProtocolConnection::startReadingConnection(
     if (!m_socket->setNonBlockingMode(true))
         return triggerConnectionClosedEvent(SystemError::getLastOSErrorCode());
 
+    connectionStatistics.messageReceived();
+
     m_socket->sendAsync(
         &m_outputBuffer,
         std::bind(&TimeProtocolConnection::onDataSent, this, _1, _2));
@@ -55,17 +57,6 @@ void TimeProtocolConnection::registerCloseHandler(
     nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, bool)> handler)
 {
     m_connectionClosedHandlers.push_back(std::move(handler));
-}
-
-std::chrono::milliseconds TimeProtocolConnection::lifeDuration() const
-{
-    using namespace std::chrono;
-    return duration_cast<milliseconds>(steady_clock::now() - m_creationTimestamp);
-}
-
-int TimeProtocolConnection::messagesReceivedCount() const
-{
-    return 1;
 }
 
 void TimeProtocolConnection::stopWhileInAioThread()

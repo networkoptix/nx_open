@@ -23,9 +23,7 @@ public:
 
     Statistics statistics(int aliveConnectionCount) const;
 
-    void saveConnectionStatistics(
-        std::chrono::milliseconds lifeDuration,
-        int requestsServed);
+    void messageReceived();
 
     void connectionAccepted();
 

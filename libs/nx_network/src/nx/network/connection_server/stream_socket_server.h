@@ -6,6 +6,7 @@
 #include <memory>
 #include <mutex>
 #include <set>
+#include <type_traits>
 
 #include <nx/network/abstract_socket.h>
 #include <nx/network/abstract_stream_socket_acceptor.h>
@@ -14,13 +15,14 @@
 #include <nx/network/socket_common.h>
 #include <nx/network/socket_factory.h>
 #include <nx/network/stream_server_socket_to_acceptor_wrapper.h>
+#include <nx/reflect/type_utils.h>
 #include <nx/utils/log/log.h>
 #include <nx/utils/std/optional.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/thread/wait_condition.h>
 
 #include "detail/server_statistics_calculator.h"
-#include "server_statistics.h"
+#include "detail/connection_statistics.h"
 
 namespace nx {
 namespace network {
@@ -41,11 +43,26 @@ public:
 
 //-------------------------------------------------------------------------------------------------
 
-template<class ConnectionType>
+template<typename ConnectionType>
 class StreamServerConnectionHolder:
     public StreamConnectionHolder<ConnectionType>,
     public AbstractStatisticsProvider
 {
+private:
+    template <typename T, typename = void>
+    struct HasConnectionStatistics: std::false_type {};
+
+    template<typename T>
+    struct HasConnectionStatistics<
+        T,
+        std::enable_if_t<
+            std::is_same_v<
+                detail::ConnectionStatistics,
+                decltype(std::declval<T>().connectionStatistics)
+            >
+        >
+    >: std::true_type {};
+
 public:
     virtual ~StreamServerConnectionHolder()
     {
@@ -91,7 +108,11 @@ public:
     {
         m_statisticsCalculator.connectionAccepted();
 
-        NX_MUTEX_LOCKER lk(&m_mutex);
+        if constexpr (HasConnectionStatistics<ConnectionType>::value)
+        {
+            connection->connectionStatistics.setMessageReceivedHandler(
+                [this](){ m_statisticsCalculator.messageReceived(); });
+        }
 
         auto connectionPtr = connection.get();
         connection->registerCloseHandler(
@@ -99,6 +120,9 @@ public:
             {
                 closeConnection(closeReason, connectionPtr);
             });
+
+        NX_MUTEX_LOCKER lk(&m_mutex);
+
         m_connections.emplace(connectionPtr, std::move(connection));
     }
 
@@ -137,12 +161,6 @@ public:
             m_cond.wait(lk.mutex());
     }
 
-protected:
-    detail::StatisticsCalculator& statisticsCalculator()
-    {
-        return m_statisticsCalculator;
-    }
-
 private:
     mutable nx::Mutex m_mutex;
     nx::WaitCondition m_cond;
@@ -150,27 +168,6 @@ private:
     //TODO #akolesnikov this map types seems strange. Replace with std::set?
     std::map<ConnectionType*, std::shared_ptr<ConnectionType>> m_connections;
     detail::StatisticsCalculator m_statisticsCalculator;
-};
-
-//-------------------------------------------------------------------------------------------------
-
-template<class ConnectionType>
-class MessageStreamServerConnectionHolder:
-    public StreamServerConnectionHolder<ConnectionType>
-{
-    using base_type = StreamServerConnectionHolder<ConnectionType>;
-
-public:
-    virtual void closeConnection(
-        SystemError::ErrorCode closeReason,
-        ConnectionType* connection) override
-    {
-        this->statisticsCalculator().saveConnectionStatistics(
-            connection->lifeDuration(),
-            connection->messagesReceivedCount());
-
-        base_type::closeConnection(closeReason, connection);
-    }
 };
 
 //-------------------------------------------------------------------------------------------------
@@ -209,10 +206,10 @@ private:
  */
 template<class CustomServerType, class ConnectionType>
 class StreamSocketServer:
-    public MessageStreamServerConnectionHolder<ConnectionType>,
+    public StreamServerConnectionHolder<ConnectionType>,
     public aio::BasicPollable
 {
-    using base_type = MessageStreamServerConnectionHolder<ConnectionType>;
+    using base_type = StreamServerConnectionHolder<ConnectionType>;
     using self_type = StreamSocketServer<CustomServerType, ConnectionType>;
 
 public:

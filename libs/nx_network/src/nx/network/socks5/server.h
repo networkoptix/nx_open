@@ -4,6 +4,8 @@
 
 #include <nx/network/connection_server/stream_socket_server.h>
 #include <nx/network/connection_server/base_server_connection.h>
+#include <nx/network/connection_server/detail/connection_statistics.h>
+
 #include <nx/network/aio/abstract_async_connector.h>
 #include <nx/network/aio/stream_socket_connector.h>
 #include <nx/network/aio/async_channel_bridge.h>
@@ -55,8 +57,7 @@ public:
         base_type(std::move(streamSocket))
     {}
 
-    virtual std::chrono::milliseconds lifeDuration() const = 0;
-    virtual int messagesReceivedCount() const = 0;
+    nx::network::server::detail::ConnectionStatistics connectionStatistics;
 };
 
 /**
