@@ -22,7 +22,7 @@ QnSharedResourcesManager::QnSharedResourcesManager(
     QObject* parent)
     :
     base_type(parent),
-    nx::vms::common::ResourceContextAware(context),
+    nx::vms::common::SystemContextAware(context),
     m_mutex(nx::Mutex::NonRecursive),
     m_sharedResources()
 {

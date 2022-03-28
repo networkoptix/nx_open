@@ -19,7 +19,7 @@
 #include <nx/utils/latin1_array.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/license_data.h>
-#include <nx/vms/common/resource/resource_context_aware.h>
+#include <nx/vms/common/system_context_aware.h>
 #include <utils/common/id.h>
 
 #ifdef __APPLE__
@@ -182,7 +182,7 @@ Q_DECLARE_METATYPE(QnLicenseList)
  */
 class NX_VMS_COMMON_API QnLicensePool:
     public QObject,
-    public nx::vms::common::ResourceContextAware
+    public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
 

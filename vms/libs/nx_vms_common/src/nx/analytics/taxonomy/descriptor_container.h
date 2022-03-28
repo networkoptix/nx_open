@@ -9,13 +9,13 @@
 #include <nx/analytics/taxonomy/property_watcher.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/analytics/descriptors.h>
-#include <nx/vms/common/resource/resource_context_aware.h>
+#include <nx/vms/common/system_context_aware.h>
 
 namespace nx::analytics::taxonomy {
 
 class NX_VMS_COMMON_API DescriptorContainer:
     public QObject,
-    public nx::vms::common::ResourceContextAware
+    public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;

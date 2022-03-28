@@ -13,7 +13,7 @@ QnResourceAccessSubjectsCache::QnResourceAccessSubjectsCache(
     QObject* parent)
     :
     base_type(parent),
-    nx::vms::common::ResourceContextAware(context),
+    nx::vms::common::SystemContextAware(context),
     m_mutex(nx::Mutex::NonRecursive)
 {
     NX_CRITICAL(m_context->resourcePool()

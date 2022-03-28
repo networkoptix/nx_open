@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <nx/vms/common/resource/resource_context_aware.h>
+#include <nx/vms/common/system_context_aware.h>
 #include <nx/vms/rules/router.h>
 
 namespace nx::vms::api::rules { struct EventInfo; }
@@ -11,7 +11,7 @@ namespace nx::vms::rules {
 
 class Ec2Router:
     public Router,
-    public nx::vms::common::ResourceContextAware
+    public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
 

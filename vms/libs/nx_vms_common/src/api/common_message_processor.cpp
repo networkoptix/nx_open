@@ -73,7 +73,7 @@ QnCommonMessageProcessor::QnCommonMessageProcessor(
     QObject *parent)
     :
     base_type(parent),
-    nx::vms::common::ResourceContextAware(context)
+    nx::vms::common::SystemContextAware(context)
 {
 }
 

@@ -14,7 +14,7 @@ QnRuntimeInfoManager::QnRuntimeInfoManager(
     QObject* parent)
     :
     QObject(parent),
-    nx::vms::common::ResourceContextAware(context),
+    nx::vms::common::SystemContextAware(context),
     m_items(new QnThreadsafeItemStorage<QnPeerRuntimeInfo>(&m_mutex, this))
 {
 }

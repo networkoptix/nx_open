@@ -4,7 +4,7 @@
 
 #include <optional>
 
-#include <nx/vms/common/resource/resource_context_aware.h>
+#include <nx/vms/common/system_context_aware.h>
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/aggregation_info.h>
 #include <nx/vms/event/event_fwd.h>
@@ -23,7 +23,7 @@ enum class AttrSerializePolicy
 
 class NX_VMS_COMMON_API StringsHelper:
     public QObject,
-    public /*mixin*/ common::ResourceContextAware
+    public /*mixin*/ common::SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;

@@ -5,7 +5,7 @@
 #include <core/resource_access/providers/abstract_resource_access_provider.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/types/access_rights_types.h>
-#include <nx/vms/common/resource/resource_context_aware.h>
+#include <nx/vms/common/system_context_aware.h>
 
 namespace nx::vms::api { struct UserRoleData; }
 
@@ -17,7 +17,7 @@ namespace nx::core::access {
  */
 class NX_VMS_COMMON_API BaseResourceAccessProvider:
     public AbstractResourceAccessProvider,
-    public nx::vms::common::ResourceContextAware
+    public nx::vms::common::SystemContextAware
 {
     using base_type = AbstractResourceAccessProvider;
 

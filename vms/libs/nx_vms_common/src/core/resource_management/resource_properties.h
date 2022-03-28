@@ -3,13 +3,13 @@
 #pragma once
 
 #include <nx/vms/api/data/resource_data.h>
-#include <nx/vms/common/resource/resource_context_aware.h>
+#include <nx/vms/common/system_context_aware.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <utils/common/threadsafe_item_storage.h>
 
 class NX_VMS_COMMON_API QnResourcePropertyDictionary:
     public QObject,
-    public nx::vms::common::ResourceContextAware
+    public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
 public:

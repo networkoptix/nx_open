@@ -15,7 +15,7 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/url.h>
 #include <nx/vms/common/api/client_update_settings.h>
-#include <nx/vms/common/resource/resource_context_aware.h>
+#include <nx/vms/common/system_context_aware.h>
 #include <nx/vms/common/update/persistent_update_storage.h>
 #include <utils/common/connective.h>
 #include <utils/common/ldap_fwd.h>
@@ -154,7 +154,7 @@ using FileToPeerList = QMap<QString, QList<QnUuid>>;
 
 class NX_VMS_COMMON_API QnGlobalSettings:
     public Connective<QObject>,
-    public nx::vms::common::ResourceContextAware
+    public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
     typedef Connective<QObject> base_type;

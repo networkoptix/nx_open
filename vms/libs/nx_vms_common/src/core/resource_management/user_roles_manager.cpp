@@ -35,7 +35,7 @@ QnUuid predefinedRoleUuid(Qn::UserRole role)
 
 QnUserRolesManager::QnUserRolesManager(nx::vms::common::SystemContext* context, QObject* parent):
     base_type(parent),
-    nx::vms::common::ResourceContextAware(context)
+    nx::vms::common::SystemContextAware(context)
 {
 }
 

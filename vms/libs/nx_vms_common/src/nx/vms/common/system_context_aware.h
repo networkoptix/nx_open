@@ -9,10 +9,10 @@ class SystemContext;
 /**
  * Helper class for the SystemContext-dependent classes. Must be destroyed before the Context is.
  */
-class NX_VMS_COMMON_API ResourceContextAware
+class NX_VMS_COMMON_API SystemContextAware
 {
 public:
-    ResourceContextAware(SystemContext* context):
+    SystemContextAware(SystemContext* context):
         m_context(context)
     {
     }

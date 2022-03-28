@@ -6,11 +6,11 @@
 #include <core/resource/resource_fwd.h>
 #include <nx/utils/thread/mutex.h>
 #include <nx/vms/api/data/user_role_data.h>
-#include <nx/vms/common/resource/resource_context_aware.h>
+#include <nx/vms/common/system_context_aware.h>
 
 class NX_VMS_COMMON_API QnUserRolesManager:
     public QObject,
-    public nx::vms::common::ResourceContextAware
+    public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;
