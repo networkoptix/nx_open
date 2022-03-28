@@ -544,6 +544,13 @@ TEST(StringRemoveExcessSeparators, common)
     ASSERT_EQ("", removeExcessSeparators(std::string_view("  "), ' '));
 }
 
+TEST(StringRemoveExcessSeparatorsInplace, no_out_bounds_access_on_empty_result_string)
+{
+    std::string s(32, ' ');
+    const std::size_t newSize = removeExcessSeparatorsInplace(s.data()+1, s.size()-1, ' ');
+    ASSERT_EQ(0, newSize);
+}
+
 //-------------------------------------------------------------------------------------------------
 // Hex
 
