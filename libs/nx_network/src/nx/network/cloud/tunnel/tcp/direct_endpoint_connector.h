@@ -64,7 +64,7 @@ private:
         std::vector<SocketAddress> endpoints,
         std::chrono::milliseconds timeout,
         ConnectCompletionHandler handler);
-    
+
     void removeInvalidEmptyAddresses(std::vector<SocketAddress>* endpoints);
 
     void launchVerificators(
