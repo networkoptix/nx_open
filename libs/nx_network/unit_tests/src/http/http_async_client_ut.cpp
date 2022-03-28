@@ -1035,7 +1035,7 @@ private:
     struct ClientAuthorization
     {
         header::Authorization header;
-        int requestNumberInConnection = 0;
+        unsigned int requestNumberInConnection = 0;
         bool repeatedNonceIsUsed = false;
     };
 
@@ -1065,7 +1065,7 @@ private:
 
                 m_authorizationReceived.push(ClientAuthorization{
                     authorization,
-                    ctx.connection->messagesReceivedCount() - 1,
+                    ctx.connection->connectionStatistics.messagesReceivedCount() - 1,
                     nonceUseCount > 1});
                 return completionHandler(StatusCode::ok);
             }

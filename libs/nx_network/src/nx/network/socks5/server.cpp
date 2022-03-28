@@ -23,14 +23,6 @@ public:
         m_connector->bindToAioThread(getAioThread());
     }
 
-    virtual std::chrono::milliseconds lifeDuration() const override
-    {
-        using namespace std::chrono;
-        return duration_cast<milliseconds>(steady_clock::now() - m_creationTimestamp);
-    }
-
-    virtual int messagesReceivedCount() const override { return m_messagesReceivedCount; }
-
 protected:
     virtual void bytesReceived(const nx::Buffer& buffer) override;
     virtual void readyToSendData() override;
@@ -109,7 +101,6 @@ private:
     std::chrono::steady_clock::time_point m_creationTimestamp;
 
     State m_state = State::Greet;
-    int m_messagesReceivedCount = 0;
 
     std::unique_ptr<AbstractTunnelConnector> m_connector;
     std::unique_ptr<nx::network::aio::AsyncChannelBridge> m_bridge;
@@ -236,7 +227,7 @@ ServerConnection::State ServerConnection::switchState(
     }
     m_inputBuffer.clear();
 
-    ++m_messagesReceivedCount;
+    connectionStatistics.messageReceived();
 
     return (this->*nextState)(request);
 }

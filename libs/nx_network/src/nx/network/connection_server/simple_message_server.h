@@ -6,6 +6,7 @@
 #include <queue>
 
 #include "stream_socket_server.h"
+#include "detail/connection_statistics.h"
 
 #include <nx/utils/interruption_flag.h>
 
@@ -15,6 +16,8 @@ class NX_NETWORK_API SimpleMessageServerConnection:
     public network::aio::BasicPollable
 {
 public:
+    detail::ConnectionStatistics connectionStatistics;
+
     SimpleMessageServerConnection(
         std::unique_ptr<AbstractStreamSocket> _socket,
         nx::Buffer request,
@@ -27,9 +30,6 @@ public:
         nx::utils::MoveOnlyFunc<void(SystemError::ErrorCode, bool /*connectionDestroyed*/)> handler);
 
     void setKeepConnection(bool val);
-
-    std::chrono::milliseconds lifeDuration() const;
-    int messagesReceivedCount() const;
 
 protected:
     virtual void stopWhileInAioThread() override;

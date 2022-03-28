@@ -9,9 +9,11 @@
 #include <nx/network/http/server/request_processing_types.h>
 #include <nx/network/http/server/rest/http_server_rest_message_dispatcher.h>
 #include <nx/network/http/server/settings.h>
+#include <nx/network/system_socket.h>
 #include <nx/network/url/url_builder.h>
 #include <nx/utils/time.h>
 #include <nx/utils/random.h>
+#include <nx/utils/test_support/utils.h>
 
 namespace nx::network::http::server::test {
 
@@ -230,10 +232,53 @@ public:
         }
     }
 
+    void whenMakeGetRequestWithExistingClient(http::HttpClient* client, std::string path)
+    {
+        ASSERT_TRUE(client->doGet(url::Builder(m_httpServer->preferredUrl()).setPath(path)));
+    }
+
     void whenMakeGetRequest(std::string path)
     {
         http::HttpClient client(ssl::kAcceptAnyCertificate);
-        ASSERT_TRUE(client.doGet(url::Builder(m_httpServer->preferredUrl()).setPath(path)));
+        whenMakeGetRequestWithExistingClient(&client, path);
+    }
+
+    std::unique_ptr<AsyncMessagePipeline> makeHttpClientSocket()
+    {
+        auto socket = std::make_unique<TCPSocket>();
+        NX_GTEST_ASSERT_TRUE(
+            socket->connect(m_httpServer->endpoints().front(), std::chrono::minutes(10)));
+
+        return std::make_unique<AsyncMessagePipeline>(std::move(socket));
+    }
+
+    void doGetRequestsOnOneSocket(AsyncMessagePipeline* socket, std::string path, std::size_t count)
+    {
+        std::atomic_uint responses = 0;
+        socket->setMessageHandler(
+            [&responses](auto message)
+            {
+                ++responses;
+                ASSERT_EQ(StatusCode::ok, message.response->statusLine.statusCode);
+            });
+
+        socket->startReadingConnection();
+
+        http::Request r;
+        r.requestLine.method = Method::get;
+        r.requestLine.url.setPath(path);
+        r.requestLine.version = http_1_1;
+        const auto buffer = r.serialized();
+
+        for (std::size_t i = 0; i < count; ++i)
+        {
+            socket->sendData(
+                buffer,
+                [](auto errorCode){ ASSERT_EQ(SystemError::noError, errorCode); });
+        }
+
+        while (responses < count)
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
     http::server::HttpStatistics whenRequestHttpStatistics()
@@ -276,6 +321,38 @@ TEST_F(MultiEndpointServerHttpStatistics, RequestPathStatistics_present_if_reque
 
     ASSERT_EQ(stats.requests.end(), stats.requests.find("GET /0"));
     ASSERT_EQ(1, stats.requests.find("GET /1")->second.requestsServedPerMinute);
+}
+
+TEST_F(MultiEndpointServerHttpStatistics,
+RequestPathStatistics_requestsServedPerMinute_matches_aggregate_requestsServerPerMinute_while_connections_are_open)
+{
+    givenGetRequestPaths({"/0", "/1"});
+
+    auto socket = makeHttpClientSocket();
+    std::thread t{
+        [this, &socket]()
+        {
+            doGetRequestsOnOneSocket(socket.get(), "/1", 101);
+        }};
+
+    auto socket2 = makeHttpClientSocket();
+    doGetRequestsOnOneSocket(socket2.get(), "/0", 99);
+
+    t.join(); //<Wait for socket to complete its operations in background thread.
+
+    const auto stats = whenRequestHttpStatistics();
+
+    int requestPathStatsRequestsServedPerMinute = 0;
+    for (const auto& requestPathStats: stats.requests)
+        requestPathStatsRequestsServedPerMinute += requestPathStats.second.requestsServedPerMinute;
+
+    ASSERT_EQ(200, stats.requestsServedPerMinute);
+    ASSERT_EQ(stats.requestsServedPerMinute, requestPathStatsRequestsServedPerMinute);
+
+    // Sockets must be closed after statistics are taken, because the must report correct values
+    // while sockets are still alive.
+    socket->pleaseStopSync();
+    socket2->pleaseStopSync();
 }
 
 } // namespace nx::network::http::server::test

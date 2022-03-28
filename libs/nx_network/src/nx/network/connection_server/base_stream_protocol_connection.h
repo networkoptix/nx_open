@@ -13,6 +13,7 @@
 
 #include "base_protocol_message_types.h"
 #include "base_server_connection.h"
+#include "detail/connection_statistics.h"
 
 namespace nx::network::server {
 
@@ -48,6 +49,8 @@ template<
 
 public:
     using MessageType = Message;
+
+    detail::ConnectionStatistics connectionStatistics;
 
     BaseStreamProtocolConnection(
         std::unique_ptr<AbstractStreamSocket> streamSocket)
@@ -126,17 +129,6 @@ public:
                     resultCode == SystemError::noError ? bytesToSend : -1);
             });
         addNewTaskToQueue(std::move(newTask));
-    }
-
-    std::chrono::milliseconds lifeDuration() const
-    {
-        using namespace std::chrono;
-        return duration_cast<milliseconds>(steady_clock::now() - m_creationTimestamp);
-    }
-
-    int messagesReceivedCount() const
-    {
-        return m_messagesReceivedCount;
     }
 
     const Parser& parser() const { return m_parser; }
@@ -249,7 +241,6 @@ private:
     bool m_messageReported = false;
     nx::ConstBufferRefType m_dataToParse;
     std::chrono::steady_clock::time_point m_creationTimestamp;
-    int m_messagesReceivedCount = 0;
 
     /**
      * @param buf Source buffer.
@@ -280,7 +271,7 @@ private:
 
             case ParserState::done:
             {
-                ++m_messagesReceivedCount;
+                connectionStatistics.messageReceived();
 
                 if (!reportMessageIfNeeded())
                     return false;

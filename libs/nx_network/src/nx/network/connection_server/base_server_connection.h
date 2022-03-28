@@ -25,7 +25,7 @@ static constexpr size_t kReadBufferCapacity = 16 * 1024;
  * Contains common logic for server-side connection created by StreamSocketServer.
  *
  * NOTE: This class is not thread-safe. All methods are expected to be executed in aio thread, undelying socket is bound to.
- *     In other case, it is caller's responsibility to syunchronize access to the connection object.
+ *     In other case, it is caller's responsibility to synchronize access to the connection object.
  * NOTE: Despite absence of thread-safety simultaneous read/write operations are allowed in different threads
  * NOTE: This class instance can be safely freed in any event handler (i.e., in internal socket's aio thread)
  * NOTE: It is allowed to free instance within event handler
@@ -74,7 +74,7 @@ public:
     /**
      * Register handler to be executed when connection just about to be destroyed.
      * NOTE: Handler is invoked in socket's aio thread.
-     * WARNING: Handler may be invoked after the connection object is destoryed.
+     * WARNING: Handler may be invoked after the connection object is destroyed.
      * @return Id that may be used to remove the handler.
      */
     int registerCloseHandler(OnConnectionClosedHandler handler);

@@ -29,15 +29,12 @@ Statistics StatisticsCalculator::statistics(int aliveConnectionCount) const
     return result;
 }
 
-void StatisticsCalculator::saveConnectionStatistics(
-    std::chrono::milliseconds lifeDuration,
-    int requestsServed)
+void StatisticsCalculator::messageReceived()
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
 
-    m_requestsServedPerMinuteCalculator.add(
-        requestsServed, lifeDuration);
-    m_requestsAveragePerConnectionCalculator.add(requestsServed);
+    m_requestsServedPerMinuteCalculator.add(1);
+    m_requestsAveragePerConnectionCalculator.add(1);
 }
 
 void StatisticsCalculator::connectionAccepted()

@@ -52,17 +52,6 @@ void SimpleMessageServerConnection::setKeepConnection(bool val)
     m_keepConnection = val;
 }
 
-std::chrono::milliseconds SimpleMessageServerConnection::lifeDuration() const
-{
-    using namespace std::chrono;
-    return duration_cast<milliseconds>(steady_clock::now() - m_creationTimestamp);
-}
-
-int SimpleMessageServerConnection::messagesReceivedCount() const
-{
-    return 1;
-}
-
 void SimpleMessageServerConnection::stopWhileInAioThread()
 {
     m_socket.reset();
@@ -90,6 +79,7 @@ void SimpleMessageServerConnection::onDataRead(
         return;
     }
 
+    connectionStatistics.messageReceived();
     scheduleMessageSend();
 
     if (m_keepConnection)
