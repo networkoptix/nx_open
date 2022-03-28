@@ -2,15 +2,11 @@
 
 #pragma once
 
-#include <QtCore/QByteArray>
-#include <QtCore/QSharedPointer>
-
-#include <common/common_globals.h>
 #include <common/common_module.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/event/action_parameters.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx/vms/event/event_parameters.h>
-#include <nx/vms/event/action_parameters.h>
 
 namespace nx {
 namespace vms {
@@ -101,6 +97,9 @@ public:
      */
     EventState getToggleState()     const { return m_toggleState; }
 
+    /** Event timestamp in microseconds elapsed since start of the epoch. */
+    std::chrono::microseconds getTimestamp() const { return m_timeStamp; };
+
     /**
      * @brief isEventStateMatched Checks if event state matches to a rule. Rule will be terminated if it isn't pass any longer
      * @return                    True if event should be handled, false otherwise.
@@ -141,7 +140,7 @@ private:
     /**
      * @brief m_timeStamp       Event date and time in usec from UTC.
      */
-    const qint64 m_timeStampUsec;
+    const std::chrono::microseconds m_timeStamp;
 
     /**
      * @brief m_resource        Resource that provide this event.

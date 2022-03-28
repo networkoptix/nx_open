@@ -4,11 +4,6 @@
 
 namespace nx::vms::rules {
 
-FilterManifest StorageIssueEvent::filterManifest()
-{
-    return {};
-}
-
 const ItemDescriptor& StorageIssueEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{

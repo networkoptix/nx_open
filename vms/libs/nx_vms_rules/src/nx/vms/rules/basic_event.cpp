@@ -7,11 +7,16 @@
 
 namespace nx::vms::rules {
 
-BasicEvent::BasicEvent(nx::vms::api::rules::EventInfo& info)
+BasicEvent::BasicEvent(const nx::vms::api::rules::EventInfo& info)
     :
     m_type(info.eventType),
     m_state(info.state),
     m_timestamp(QDateTime::currentMSecsSinceEpoch()) //< qnSyncTime?
+{
+}
+
+BasicEvent::BasicEvent(EventTimestamp timestamp):
+    m_timestamp(timestamp)
 {
 }
 

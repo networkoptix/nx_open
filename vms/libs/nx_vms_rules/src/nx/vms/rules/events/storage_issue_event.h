@@ -2,18 +2,19 @@
 
 #pragma once
 
-#include <nx/vms/rules/basic_event.h>
+#include "reasoned_event.h"
 
 namespace nx::vms::rules {
 
-class NX_VMS_RULES_API StorageIssueEvent: public BasicEvent
+class NX_VMS_RULES_API StorageIssueEvent: public ReasonedEvent
 {
     Q_OBJECT
     Q_CLASSINFO("type", "nx.events.storageIssue")
 
 public:
-    static FilterManifest filterManifest();
     static const ItemDescriptor& manifest();
+
+    using ReasonedEvent::ReasonedEvent;
 };
 
 } // namespace nx::vms::rules

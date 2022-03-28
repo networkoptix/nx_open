@@ -6,9 +6,11 @@
 
 namespace nx::vms::rules {
 
-FilterManifest DeviceDisconnectedEvent::filterManifest()
+DeviceDisconnectedEvent::DeviceDisconnectedEvent(QnUuid deviceId, EventTimestamp timestamp)
+    :
+    base_type(timestamp),
+    m_deviceId(deviceId)
 {
-    return {};
 }
 
 const ItemDescriptor& DeviceDisconnectedEvent::manifest()

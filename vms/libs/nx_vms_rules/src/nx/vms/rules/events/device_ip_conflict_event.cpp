@@ -2,12 +2,9 @@
 
 #include "device_ip_conflict_event.h"
 
-namespace nx::vms::rules {
+#include <QtNetwork/QHostAddress>
 
-FilterManifest DeviceIpConflictEvent::filterManifest()
-{
-    return {};
-}
+namespace nx::vms::rules {
 
 const ItemDescriptor& DeviceIpConflictEvent::manifest()
 {
@@ -17,6 +14,19 @@ const ItemDescriptor& DeviceIpConflictEvent::manifest()
         .description = "",
     };
     return kDescriptor;
+}
+
+DeviceIpConflictEvent::DeviceIpConflictEvent(
+    QnUuid serverId,
+    EventTimestamp timestamp,
+    const QHostAddress& address,
+    const QStringList& macAddrList)
+    :
+    base_type(timestamp),
+    m_serverId(serverId),
+    m_ipAddress(address.toString()),
+    m_macAddresses(macAddrList)
+{
 }
 
 } // namespace nx::vms::rules

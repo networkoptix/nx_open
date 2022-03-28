@@ -4,11 +4,6 @@
 
 namespace nx::vms::rules {
 
-FilterManifest LicenseIssueEvent::filterManifest()
-{
-    return {};
-}
-
 const ItemDescriptor& LicenseIssueEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{

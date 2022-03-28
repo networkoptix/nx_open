@@ -7,16 +7,7 @@
 #include <nx/vms/rules/actions/send_email_action.h>
 #include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/rules/event_fields/builtin_fields.h>
-#include <nx/vms/rules/events/debug_event.h>
-#include <nx/vms/rules/events/device_disconnected_event.h>
-#include <nx/vms/rules/events/device_ip_conflict_event.h>
-#include <nx/vms/rules/events/generic_event.h>
-#include <nx/vms/rules/events/license_issue_event.h>
-#include <nx/vms/rules/events/network_issue_event.h>
-#include <nx/vms/rules/events/server_conflict_event.h>
-#include <nx/vms/rules/events/server_failure_event.h>
-#include <nx/vms/rules/events/soft_trigger_event.h>
-#include <nx/vms/rules/events/storage_issue_event.h>
+#include <nx/vms/rules/events/builtin_events.h>
 
 namespace nx::vms::rules {
 
@@ -35,11 +26,15 @@ void Initializer::registerEvents() const
     registerEvent<DeviceDisconnectedEvent>();
     registerEvent<DeviceIpConflictEvent>();
     registerEvent<DebugEvent>();
+    registerEvent<FanErrorEvent>();
     registerEvent<GenericEvent>();
     registerEvent<LicenseIssueEvent>();
     registerEvent<NetworkIssueEvent>();
+    registerEvent<PoeOverBudgetEvent>();
+    registerEvent<ServerCertificateErrorEvent>();
     registerEvent<ServerConflictEvent>();
     registerEvent<ServerFailureEvent>();
+    registerEvent<ServerStartedEvent>();
     registerEvent<SoftTriggerEvent>();
     registerEvent<StorageIssueEvent>();
 }
