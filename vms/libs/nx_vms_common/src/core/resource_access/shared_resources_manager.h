@@ -6,12 +6,12 @@
 #include <nx/utils/thread/mutex.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/access_rights_data.h>
-#include <nx/vms/common/resource/resource_context_aware.h>
+#include <nx/vms/common/system_context_aware.h>
 
 /** Manager class for shared resources: layouts, cameras, web pages and server statistics. */
 class NX_VMS_COMMON_API QnSharedResourcesManager:
     public QObject,
-    public nx::vms::common::ResourceContextAware
+    public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
 

@@ -94,7 +94,7 @@ QStringList serializeAttributesMultiline(
 
 StringsHelper::StringsHelper(common::SystemContext* context):
     QObject(),
-    common::ResourceContextAware(context)
+    common::SystemContextAware(context)
 {
 }
 

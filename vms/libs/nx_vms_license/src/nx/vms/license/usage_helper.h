@@ -9,7 +9,7 @@
 #include <core/resource/resource_fwd.h>
 #include <licensing/license.h>
 #include <nx/utils/url.h>
-#include <nx/vms/common/resource/resource_context_aware.h>
+#include <nx/vms/common/system_context_aware.h>
 #include <utils/common/connective.h>
 
 #include "list_helper.h"
@@ -38,7 +38,7 @@ enum class UsageStatus
 
 class UsageWatcher:
     public Connective<QObject>,
-    public /*mixin*/ common::ResourceContextAware
+    public /*mixin*/ common::SystemContextAware
 {
     Q_OBJECT
     using base_type = Connective<QObject>;
@@ -53,7 +53,7 @@ typedef std::array<int, Qn::LC_Count> licensesArray;
 
 class UsageHelper:
     public Connective<QObject>,
-    public /*mixin*/ common::ResourceContextAware
+    public /*mixin*/ common::SystemContextAware
 {
     Q_OBJECT
     using base_type = Connective<QObject>;

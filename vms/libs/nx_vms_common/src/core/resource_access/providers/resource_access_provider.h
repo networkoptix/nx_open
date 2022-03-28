@@ -3,7 +3,7 @@
 #pragma once
 
 #include <core/resource_access/providers/abstract_resource_access_provider.h>
-#include <nx/vms/common/resource/resource_context_aware.h>
+#include <nx/vms/common/system_context_aware.h>
 
 namespace nx::core::access {
 
@@ -13,7 +13,7 @@ namespace nx::core::access {
  */
 class NX_VMS_COMMON_API ResourceAccessProvider:
     public AbstractResourceAccessProvider,
-    public nx::vms::common::ResourceContextAware
+    public nx::vms::common::SystemContextAware
 {
     using base_type = AbstractResourceAccessProvider;
 

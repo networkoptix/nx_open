@@ -7,7 +7,7 @@
 #include <common/common_globals.h>
 #include <licensing/license_fwd.h>
 #include <nx/utils/uuid.h>
-#include <nx/vms/common/resource/resource_context_aware.h>
+#include <nx/vms/common/system_context_aware.h>
 
 struct QnPeerRuntimeInfo;
 
@@ -28,7 +28,7 @@ enum class QnLicenseErrorCode
 // TODO: #sivanov Store Context pointer in the License itself and use it.
 class Validator:
     public QObject,
-    public nx::vms::common::ResourceContextAware
+    public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;

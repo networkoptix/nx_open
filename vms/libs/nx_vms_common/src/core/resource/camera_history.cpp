@@ -62,7 +62,7 @@ QnCameraHistoryPool::QnCameraHistoryPool(
     QObject *parent)
     :
     QObject(parent),
-    nx::vms::common::ResourceContextAware(context),
+    nx::vms::common::SystemContextAware(context),
     m_historyCheckDelay(kDefaultHistoryCheckDelay),
     m_mutex(nx::Mutex::Recursive)
 {

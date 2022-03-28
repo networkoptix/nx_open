@@ -12,7 +12,7 @@
 #include <nx/utils/thread/wait_condition.h>
 #include <nx/utils/uuid.h>
 #include <nx/vms/api/data/camera_history_data.h>
-#include <nx/vms/common/resource/resource_context_aware.h>
+#include <nx/vms/common/system_context_aware.h>
 #include <recording/time_period.h>
 
 class QnCommonMessageProcessor;
@@ -37,7 +37,7 @@ class QnCommonMessageProcessor;
  */
 class NX_VMS_COMMON_API QnCameraHistoryPool:
     public QObject,
-    public nx::vms::common::ResourceContextAware
+    public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
 

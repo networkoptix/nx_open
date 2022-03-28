@@ -140,7 +140,7 @@ static std::vector<LicenseCompatibility> compatibleLicenseType =
 
 UsageWatcher::UsageWatcher(common::SystemContext* context, QObject* parent):
     base_type(parent),
-    common::ResourceContextAware(context)
+    common::SystemContextAware(context)
 {
     connect(context->licensePool(), &QnLicensePool::licensesChanged, this,
         &UsageWatcher::licenseUsageChanged);
@@ -174,7 +174,7 @@ UsageHelper::Cache::Cache()
 
 UsageHelper::UsageHelper(common::SystemContext* context, QObject* parent):
     base_type(parent),
-    common::ResourceContextAware(context),
+    common::SystemContextAware(context),
     m_dirty(true),
     m_validator(new Validator(context))
 {

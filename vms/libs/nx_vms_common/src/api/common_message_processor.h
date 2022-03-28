@@ -12,7 +12,7 @@
 #include <nx/vms/api/data/full_info_data.h>
 #include <nx/vms/api/data/runtime_data.h>
 #include <nx/vms/api/rules/event_info.h>
-#include <nx/vms/common/resource/resource_context_aware.h>
+#include <nx/vms/common/system_context_aware.h>
 #include <nx/vms/event/event_fwd.h>
 #include <nx_ec/ec_api_fwd.h>
 #include <utils/common/connective.h>
@@ -23,7 +23,7 @@ class QnResourceFactory;
 
 class NX_VMS_COMMON_API QnCommonMessageProcessor:
     public Connective<QObject>,
-    public nx::vms::common::ResourceContextAware
+    public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
 

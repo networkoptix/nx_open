@@ -23,7 +23,7 @@ const auto kFakeHandler = [](int /*handle*/, ec2::ErrorCode errorCode)
 namespace nx::vms::rules {
 
 Ec2Router::Ec2Router(nx::vms::common::SystemContext* context):
-    nx::vms::common::ResourceContextAware(context)
+    nx::vms::common::SystemContextAware(context)
 {
 }
 

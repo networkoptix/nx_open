@@ -137,7 +137,7 @@ using namespace nx::settings_names;
 
 QnGlobalSettings::QnGlobalSettings(nx::vms::common::SystemContext* context, QObject* parent):
     base_type(parent),
-    nx::vms::common::ResourceContextAware(context)
+    nx::vms::common::SystemContextAware(context)
 {
     m_allAdaptors
         << initEmailAdaptors()

@@ -7,14 +7,14 @@
 #include <nx/core/core_fwd.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/vms/common/resource/resource_context_aware.h>
+#include <nx/vms/common/system_context_aware.h>
 
 class QnResourceAccessSubject;
 namespace nx::vms::api { struct UserRoleData; }
 
 class NX_VMS_COMMON_API QnGlobalPermissionsManager:
     public QObject,
-    public nx::vms::common::ResourceContextAware
+    public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;

@@ -5,11 +5,11 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/utils/singleton.h>
 #include <nx/utils/thread/mutex.h>
-#include <nx/vms/common/resource/resource_context_aware.h>
+#include <nx/vms/common/system_context_aware.h>
 
 class NX_VMS_COMMON_API QnResourceAccessSubjectsCache:
     public QObject,
-    public nx::vms::common::ResourceContextAware
+    public nx::vms::common::SystemContextAware
 {
     Q_OBJECT
     using base_type = QObject;

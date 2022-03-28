@@ -19,7 +19,7 @@ QnGlobalPermissionsManager::QnGlobalPermissionsManager(
     QObject* parent)
     :
     base_type(parent),
-    nx::vms::common::ResourceContextAware(context),
+    nx::vms::common::SystemContextAware(context),
     m_mode(mode),
     m_mutex(nx::Mutex::NonRecursive)
 {
