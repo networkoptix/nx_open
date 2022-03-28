@@ -340,6 +340,17 @@ QnNetworkResourcePtr QnResourcePool::getNetworkResourceByPhysicalId(const QStrin
     return d->resourcesByPhysicalId.value(physicalId);
 }
 
+QnSecurityCamResourcePtr QnResourcePool::getCameraByDataAccessId(const QString& id) const
+{
+    return getResource<QnSecurityCamResource>(
+        [&id](const QnSecurityCamResourcePtr& resource)
+        {
+            return resource->dataAccessId() == id;
+        });
+
+    return QnSharedResourcePointer<QnSecurityCamResource>();
+}
+
 QnNetworkResourcePtr QnResourcePool::getResourceByMacAddress(const QString& mac) const
 {
     nx::utils::MacAddress macAddress(mac);
