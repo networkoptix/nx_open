@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include <nx/vms/rules/basic_event.h>
-
+#include "../basic_event.h"
 #include "../data_macros.h"
 
 namespace nx::vms::rules {
@@ -12,16 +11,13 @@ class NX_VMS_RULES_API DeviceDisconnectedEvent: public BasicEvent
 {
     Q_OBJECT
     Q_CLASSINFO("type", "nx.events.deviceDisconnected")
+    using base_type = BasicEvent;
 
     FIELD(QnUuid, deviceId, setDeviceId)
 
 public:
-    DeviceDisconnectedEvent(const QnUuid &deviceId):
-        m_deviceId(deviceId)
-    {
-    }
+    DeviceDisconnectedEvent(QnUuid deviceId, EventTimestamp timestamp);
 
-    static FilterManifest filterManifest();
     static const ItemDescriptor& manifest();
 };
 

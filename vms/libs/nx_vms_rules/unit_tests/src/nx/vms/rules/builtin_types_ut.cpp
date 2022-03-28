@@ -106,17 +106,17 @@ TEST_F(BuiltinTypesTest, BuiltinEvents)
     testEventRegistration<DebugEvent>();
     testEventRegistration<DeviceDisconnectedEvent>();
     testEventRegistration<DeviceIpConflictEvent>();
-    //testEventRegistration<FanErrorEvent>();
+    testEventRegistration<FanErrorEvent>();
     testEventRegistration<GenericEvent>();
     testEventRegistration<LicenseIssueEvent>();
     //testEventRegistration<MotionEvent>();
     testEventRegistration<NetworkIssueEvent>();
     //testEventRegistration<PluginDiagnosticEvent>();
-    //testEventRegistration<PoeOverBudgetEvent>();
-    //testEventRegistration<ServerCertificateErrorEvent>();
+    testEventRegistration<PoeOverBudgetEvent>();
+    testEventRegistration<ServerCertificateErrorEvent>();
     testEventRegistration<ServerConflictEvent>();
     testEventRegistration<ServerFailureEvent>();
-    //testEventRegistration<ServerStartedEvent>();
+    testEventRegistration<ServerStartedEvent>();
     testEventRegistration<SoftTriggerEvent>();
     testEventRegistration<StorageIssueEvent>();
 }

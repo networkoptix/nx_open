@@ -4,11 +4,6 @@
 
 namespace nx::vms::rules {
 
-FilterManifest ServerFailureEvent::filterManifest()
-{
-    return {};
-}
-
 const ItemDescriptor& ServerFailureEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{

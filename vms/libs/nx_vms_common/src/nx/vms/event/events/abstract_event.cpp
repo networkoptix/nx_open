@@ -388,7 +388,7 @@ AbstractEvent::AbstractEvent(
     qint64 timeStampUsec)
     :
     m_eventType(eventType),
-    m_timeStampUsec(timeStampUsec),
+    m_timeStamp(timeStampUsec),
     m_resource(resource),
     m_toggleState(toggleState)
 {
@@ -404,7 +404,7 @@ EventParameters AbstractEvent::getRuntimeParams() const
 {
     EventParameters params;
     params.eventType = m_eventType;
-    params.eventTimestampUsec = m_timeStampUsec;
+    params.eventTimestampUsec = m_timeStamp.count();
     params.eventResourceId = m_resource ? m_resource->getId() : QnUuid();
     return params;
 }

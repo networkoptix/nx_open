@@ -4,11 +4,6 @@
 
 namespace nx::vms::rules {
 
-FilterManifest NetworkIssueEvent::filterManifest()
-{
-    return {};
-}
-
 const ItemDescriptor& NetworkIssueEvent::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{

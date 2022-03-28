@@ -4,9 +4,20 @@
 
 namespace nx::vms::rules {
 
-FilterManifest ServerStartedEvent::filterManifest()
+const ItemDescriptor& ServerStartedEvent::manifest()
 {
-    return {};
+    static const auto kDescriptor = ItemDescriptor{
+        .id = eventType<ServerStartedEvent>(),
+        .displayName = tr("Server Started"),
+        .description = "",
+    };
+    return kDescriptor;
+}
+
+ServerStartedEvent::ServerStartedEvent(QnUuid serverId, EventTimestamp timestamp):
+    base_type(timestamp),
+    m_serverId(serverId)
+{
 }
 
 } // namespace nx::vms::rules

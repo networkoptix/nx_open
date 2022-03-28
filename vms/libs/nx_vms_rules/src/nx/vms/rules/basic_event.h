@@ -11,6 +11,7 @@
 #include <nx/vms/api/rules/event_info.h>
 
 #include "manifest.h"
+#include "rules_fwd.h"
 
 namespace nx::vms::rules {
 
@@ -24,13 +25,17 @@ class NX_VMS_RULES_API BasicEvent: public QObject
     Q_OBJECT
     using base_type = QObject;
 
-    Q_PROPERTY(quint64 timestamp MEMBER m_timestamp)
+    Q_PROPERTY(EventTimestamp timestamp MEMBER m_timestamp)
     Q_PROPERTY(QString type READ type)
 
 public:
+    static constexpr auto kType = "type";
+
     using State = nx::vms::api::rules::EventInfo::State;
 
-    BasicEvent(nx::vms::api::rules::EventInfo& info);
+public:
+    explicit BasicEvent(const nx::vms::api::rules::EventInfo& info);
+    explicit BasicEvent(EventTimestamp timestamp);
 
     QString type() const;
 
@@ -44,9 +49,18 @@ private:
     QString m_type;
     State m_state;
 
-    quint64 m_timestamp;
-    QStringList m_source;
+    EventTimestamp m_timestamp;
 };
+
+// TODO: #sapa Unify with event and field. Choose name between type & metatype.
+template<class T>
+QString eventType()
+{
+    const auto& meta = T::staticMetaObject;
+    int idx = meta.indexOfClassInfo(BasicEvent::kType);
+
+    return (idx < 0) ? QString() : meta.classInfo(idx).value();
+}
 
 } // namespace nx::vms::rules
 
