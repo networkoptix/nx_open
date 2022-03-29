@@ -23,10 +23,12 @@
 #include <nx/vms/event/actions/abstract_action.h>
 #include <nx/vms/event/events/poe_over_budget_event.h>
 #include <nx/vms/event/strings_helper.h>
+#include <nx/vms/rules/actions/show_notification_action.h>
 #include <nx/vms/time/formatter.h>
 #include <ui/common/notification_levels.h>
 #include <ui/dialogs/resource_properties/server_settings_dialog.h>
 #include <ui/help/business_help.h>
+#include <ui/workbench/handlers/workbench_notifications_executor.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/workbench_access_controller.h>
 #include <ui/workbench/workbench_context.h>
@@ -136,6 +138,27 @@ NotificationListModel::Private::Private(NotificationListModel* q):
                 m_players[id] = loopSound(path);
 
             m_itemsByLoadingSound.remove(fileName);
+        });
+
+    connect(context()->instance<QnWorkbenchNotificationsExecutor>(),
+        &QnWorkbenchNotificationsExecutor::notificationActionReceived,
+        this,
+        [this](const QSharedPointer<nx::vms::rules::NotificationAction>& notificationAction)
+        {
+            // #mmalofeev does it need action id?
+
+            EventData eventData;
+            eventData.id = QnUuid::createUuid();
+            eventData.title = notificationAction->caption();
+            eventData.description = notificationAction->description();
+            eventData.lifetime = kDisplayTimeout;
+            eventData.removable = true;
+            eventData.extraData = QVariant::fromValue(ExtraData({}, {}));
+
+            if (!this->q->addEvent(eventData))
+                return;
+
+            truncateToMaximumCount();
         });
 }
 

@@ -81,13 +81,17 @@ private:
             lineEdit->setText(text());
         }
 
-        connect(lineEdit, &QLineEdit::textEdited, this,
-            [this](const QString& text)
-            {
-                setText(text);
-                emit edited();
-            },
+        connect(lineEdit,
+            &QLineEdit::textEdited,
+            this,
+            &OnelineTextPickerWidget<F>::onTextChanged,
             Qt::UniqueConnection);
+    }
+
+    void onTextChanged(const QString& text)
+    {
+        setText(text);
+        emit edited();
     }
 
     QString text() const
