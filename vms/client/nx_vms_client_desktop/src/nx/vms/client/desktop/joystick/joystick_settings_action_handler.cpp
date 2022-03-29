@@ -26,7 +26,15 @@ JoystickSettingsActionHandler::JoystickSettingsActionHandler(
             {
                 m_dialog.reset(new JoystickSettingsDialog(
                     context->joystickManager(), context->mainWindowWidget()));
+
+                connect(m_dialog.get(), &JoystickSettingsDialog::done,
+                    [context]
+                    {
+                        context->joystickManager()->setDeviceActionsEnabled(true);
+                    });
             }
+
+            context->joystickManager()->setDeviceActionsEnabled(false);
 
             m_dialog->open();
             m_dialog->raise();
