@@ -45,6 +45,8 @@ public:
         const nx::network::http::Request& request,
         AuthenticationCompletionHandler completionHandler) override;
 
+    std::string realm();
+
 private:
     AbstractAuthenticationDataProvider* m_authenticationDataProvider;
     nx::utils::Counter m_startedAsyncCallsCounter;
@@ -56,16 +58,21 @@ private:
     std::pair<std::string /*headerName*/, std::string /*headerValue*/>
         generateWwwAuthenticateHeader(bool isProxy);
 
-    void passwordLookupDone(
-        PasswordLookupResult passwordLookupResult,
-        const Method& method,
-        const nx::utils::Url& requestUrl,
-        const header::DigestAuthorization& authorizationHeader,
+    void lookupPassword(
+        const nx::network::http::Request& request,
+        AuthenticationCompletionHandler completionHandler,
+        nx::network::http::header::DigestAuthorization authorizationHeader,
+        bool isSsl);
+
+    void validatePlainTextCredentials(
+        const http::Method& method,
+        const http::header::Authorization& authorizationHeader,
+        const AuthToken& passwordLookupToken,
         AuthenticationCompletionHandler completionHandler);
+
     void reportSuccess(AuthenticationCompletionHandler completionHandler);
 
     std::string generateNonce();
-    std::string realm();
     bool validateNonce(const std::string& nonce);
     bool isProxy(const Method& method) const;
 };

@@ -6,11 +6,13 @@
 
 #include <nx/network/app_info.h>
 #include <nx/utils/random_cryptographic_device.h>
+#include <nx/utils/cryptographic_hash.h>
 #include <nx/utils/random.h>
 #include <nx/utils/scope_guard.h>
 #include <nx/utils/string.h>
 
 #include "../auth_tools.h"
+#include "rest/base_request_handler.h"
 
 namespace nx::network::http::server {
 
@@ -29,7 +31,7 @@ BaseAuthenticationManager::~BaseAuthenticationManager()
 }
 
 void BaseAuthenticationManager::authenticate(
-    const nx::network::http::HttpServerConnection& /*connection*/,
+    const nx::network::http::HttpServerConnection& connection,
     const nx::network::http::Request& request,
     AuthenticationCompletionHandler completionHandler)
 {
@@ -46,34 +48,35 @@ void BaseAuthenticationManager::authenticate(
             authzHeader.reset();
     }
 
-    if (!authzHeader
-        || (authzHeader->authScheme != header::AuthScheme::digest)
-        || (authzHeader->userid().empty()))
-    {
+    if (!authzHeader)
         return reportAuthenticationFailure(std::move(completionHandler), isProxy);
+
+    const bool isSsl = rest::HttpsRequestDetector()(connection, request);
+    if (isSsl && authzHeader->authScheme == header::AuthScheme::basic)
+    {
+        return lookupPassword(
+            request,
+            std::move(completionHandler),
+            std::move(*authzHeader),
+            isSsl);
     }
+
+    if (authzHeader->authScheme != header::AuthScheme::digest || authzHeader->userid().empty())
+        return reportAuthenticationFailure(std::move(completionHandler), isProxy);
 
     if (!validateNonce(authzHeader->digest->params["nonce"]))
         return reportAuthenticationFailure(std::move(completionHandler), isProxy);
 
-    const auto userId = authzHeader->userid();
-    m_authenticationDataProvider->getPasswordByUserName(
-        userId,
-        [this,
-            completionHandler = std::move(completionHandler),
-            method = request.requestLine.method,
-            url = request.requestLine.url,
-            authzHeader = std::move(authzHeader),
-            locker = m_startedAsyncCallsCounter.getScopedIncrement()](
-                PasswordLookupResult passwordLookupResult) mutable
-        {
-            passwordLookupDone(
-                std::move(passwordLookupResult),
-                method,
-                url,
-                std::move(*authzHeader),
-                std::move(completionHandler));
-        });
+    lookupPassword(
+        request,
+        std::move(completionHandler),
+        std::move(*authzHeader),
+        isSsl);
+}
+
+std::string BaseAuthenticationManager::realm()
+{
+    return nx::network::AppInfo::realm();
 }
 
 void BaseAuthenticationManager::reportAuthenticationFailure(
@@ -99,33 +102,83 @@ std::pair<std::string, std::string> BaseAuthenticationManager::generateWwwAuthen
         wwwAuthenticate.toString());
 }
 
-void BaseAuthenticationManager::passwordLookupDone(
-    PasswordLookupResult passwordLookupResult,
-    const Method& method,
-    const nx::utils::Url& requestUrl,
-    const header::DigestAuthorization& authorizationHeader,
+void BaseAuthenticationManager::lookupPassword(
+    const nx::network::http::Request& request,
+    AuthenticationCompletionHandler completionHandler,
+    nx::network::http::header::DigestAuthorization authorizationHeader,
+    bool isSsl)
+{
+    const auto userId = authorizationHeader.userid();
+    m_authenticationDataProvider->getPasswordByUserName(
+        userId,
+        [this,
+            completionHandler = std::move(completionHandler),
+            method = request.requestLine.method,
+            url = request.requestLine.url,
+            authorizationHeader = std::move(authorizationHeader),
+            isSsl,
+            locker = m_startedAsyncCallsCounter.getScopedIncrement()](
+            PasswordLookupResult passwordLookupResult) mutable
+        {
+            if (passwordLookupResult.code != PasswordLookupResult::Code::ok)
+                return reportAuthenticationFailure(std::move(completionHandler), isProxy(method));
+
+            if (isSsl && authorizationHeader.authScheme == header::AuthScheme::basic)
+            {
+                return validatePlainTextCredentials(
+                    method,
+                    authorizationHeader,
+                    passwordLookupResult.authToken,
+                    std::move(completionHandler));
+            }
+
+            const bool authenticationResult = validateAuthorization(method,
+                Credentials(authorizationHeader.userid(), passwordLookupResult.authToken),
+                authorizationHeader);
+            if (!authenticationResult)
+                return reportAuthenticationFailure(std::move(completionHandler), isProxy(method));
+
+            // Validating request URL.
+            if (const auto uriIter = authorizationHeader.digest->params.find("uri");
+                uriIter != authorizationHeader.digest->params.end())
+            {
+                if (digestUri(method, url) != uriIter->second)
+                    return reportAuthenticationFailure(
+                        std::move(completionHandler), isProxy(method));
+            }
+
+            reportSuccess(std::move(completionHandler));
+        });
+}
+
+void BaseAuthenticationManager::validatePlainTextCredentials(
+    const http::Method& method,
+    const http::header::Authorization& authorizationHeader,
+    const AuthToken& passwordLookupToken,
     AuthenticationCompletionHandler completionHandler)
 {
-    if (passwordLookupResult.code != PasswordLookupResult::Code::ok)
-        return reportAuthenticationFailure(std::move(completionHandler), isProxy(method));
-
-    const bool authenticationResult =
-        validateAuthorization(
-            method,
-            Credentials(authorizationHeader.userid(), passwordLookupResult.authToken),
-            authorizationHeader);
-    if (!authenticationResult)
-        return reportAuthenticationFailure(std::move(completionHandler), isProxy(method));
-
-    // Validating request URL.
-    if (const auto uriIter = authorizationHeader.digest->params.find("uri");
-        uriIter != authorizationHeader.digest->params.end())
+    switch (passwordLookupToken.type)
     {
-        if (digestUri(method, requestUrl) != uriIter->second)
-            return reportAuthenticationFailure(std::move(completionHandler), isProxy(method));
+        case AuthTokenType::ha1:
+        {
+            const auto ha1 = calcHa1(
+                authorizationHeader.userid(),
+                realm(),
+                authorizationHeader.basic->password,
+                "MD5");
+            if (ha1 == passwordLookupToken.value)
+                return reportSuccess(std::move(completionHandler));
+            break;
+        }
+        case AuthTokenType::password:
+            if (authorizationHeader.basic->password == passwordLookupToken.value)
+                return reportSuccess(std::move(completionHandler));
+            break;
+        default:
+            NX_ASSERT(false);
     }
 
-    reportSuccess(std::move(completionHandler));
+    return reportAuthenticationFailure(std::move(completionHandler), isProxy(method));
 }
 
 void BaseAuthenticationManager::reportSuccess(
@@ -143,11 +196,6 @@ std::string BaseAuthenticationManager::generateNonce()
     return nx::utils::random::generateName(
         nx::utils::random::CryptographicDevice::instance(),
         nonceLength);
-}
-
-std::string BaseAuthenticationManager::realm()
-{
-    return nx::network::AppInfo::realm();
 }
 
 bool BaseAuthenticationManager::validateNonce(const std::string& /*nonce*/)
