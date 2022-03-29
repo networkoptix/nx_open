@@ -14,9 +14,15 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <nx/vms/api/analytics/engine_manifest.h>
 #include <nx/vms/api/analytics/descriptors.h>
-#include <nx/analytics/event_type_descriptor_manager.h>
+#include <nx/analytics/taxonomy/abstract_state_watcher.h>
+#include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/utils/qset.h>
+
+using nx::analytics::taxonomy::AbstractState;
+using nx::analytics::taxonomy::AbstractEventType;
+using nx::analytics::taxonomy::AbstractGroup;
+using nx::analytics::taxonomy::AbstractScope;
 
 namespace nx {
 namespace vms {
@@ -159,18 +165,22 @@ bool isResourceRequired(EventType eventType)
         || requiresServerResource(eventType);
 }
 
-bool isEventGroupContainsOnlyProlongedEvents(QnCommonModule* commonModule, const QString& groupId)
+bool isEventGroupContainsOnlyProlongedEvents(
+    const std::shared_ptr<AbstractState>& taxonomyState,
+    const QString& groupId)
 {
-    const auto& descriptors = commonModule->analyticsEventTypeDescriptorManager()->descriptors();
-    if (descriptors.empty())
+    const auto& eventTypes = taxonomyState->eventTypes();
+    if (eventTypes.empty())
         return false;
-    for (const auto& [eventTypeId, descriptor]: descriptors)
+
+    for (const auto& eventType: eventTypes)
     {
-        for (const auto& scope: descriptor.scopes)
+        for (const auto& scope: eventType->scopes())
         {
-            if (scope.groupId == groupId)
+            const AbstractGroup* group = scope->group();
+            if (group && (group->id() == groupId))
             {
-                if (!descriptor.flags.testFlag(nx::vms::api::analytics::EventTypeFlag::stateDependent))
+                if (!eventType->isStateDependent())
                     return false;
             }
         }
@@ -197,11 +207,20 @@ bool hasToggleState(
         if (runtimeParams.getAnalyticsEventTypeId().isNull())
             return true;
 
-        const auto descriptor = commonModule->analyticsEventTypeDescriptorManager()->descriptor(
+        const std::shared_ptr<AbstractState> taxonomyState =
+            commonModule->analyticsTaxonomyState();
+
+        if (!NX_ASSERT(taxonomyState))
+            return false;
+
+        const AbstractEventType* eventType = taxonomyState->eventTypeById(
             runtimeParams.getAnalyticsEventTypeId());
-        if (descriptor)
-            return descriptor->flags.testFlag(nx::vms::api::analytics::EventTypeFlag::stateDependent);
-        return isEventGroupContainsOnlyProlongedEvents(commonModule, runtimeParams.getAnalyticsEventTypeId());
+
+        if (eventType)
+            return eventType->isStateDependent();
+
+        return isEventGroupContainsOnlyProlongedEvents(
+            taxonomyState, runtimeParams.getAnalyticsEventTypeId());
     }
     case EventType::analyticsSdkObjectDetected:
         return false;

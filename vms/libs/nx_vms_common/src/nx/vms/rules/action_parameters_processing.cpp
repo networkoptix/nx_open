@@ -4,7 +4,8 @@
 
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/analytics/event_type_descriptor_manager.h>
+#include <nx/analytics/taxonomy/state_watcher.h>
+#include <nx/analytics/taxonomy/state.h>
 #include <core/resource/camera_resource.h>
 #include <nx/vms/event/event_parameters.h>
 #include <nx/utils/string.h>
@@ -23,6 +24,7 @@ void processTextFieldSubstitutions(
 {
     using EventType = nx::vms::api::EventType;
     using Keyword = SubstitutionKeywords::Event;
+    using nx::analytics::taxonomy::AbstractState;
 
     std::vector<std::pair<QString, QString>> substitutions;
 
@@ -44,10 +46,15 @@ void processTextFieldSubstitutions(
         {
             substitutions.push_back({Keyword::cameraName, camera->getUserDefinedName()});
         }
-        if (auto descriptor = commonModule->analyticsEventTypeDescriptorManager()->descriptor(
-            data.getAnalyticsEventTypeId()))
+
+        if (const std::shared_ptr<AbstractState> taxonomyState =
+            commonModule->analyticsTaxonomyState())
         {
-            substitutions.push_back({Keyword::eventName, descriptor->name});
+            if (const auto eventType =
+                taxonomyState->eventTypeById(data.getAnalyticsEventTypeId()))
+            {
+                substitutions.push_back({Keyword::eventName, eventType->name()});
+            }
         }
     }
 

@@ -6,7 +6,6 @@
 
 #include <common/common_module.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/analytics/event_type_descriptor_manager.h>
 #include <nx/analytics/properties.h>
 #include <nx/core/access/access_types.h>
 #include <nx/core/resource/server_mock.h>

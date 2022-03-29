@@ -22,6 +22,11 @@ AbstractGroup* Scope::group() const
     return m_group;
 }
 
+QString Scope::provider() const
+{
+    return m_provider;
+}
+
 bool Scope::isEmpty() const
 {
     return m_engine == nullptr && m_group == nullptr;
@@ -35,6 +40,11 @@ void Scope::setEngine(Engine* engine)
 void Scope::setGroup(Group* group)
 {
     m_group = group;
+}
+
+void Scope::setProvider(const QString& provider)
+{
+    m_provider = provider;
 }
 
 } // namespace nx::analytics::taxonomy

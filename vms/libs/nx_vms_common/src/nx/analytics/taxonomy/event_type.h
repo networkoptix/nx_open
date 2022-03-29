@@ -42,6 +42,14 @@ public:
 
     virtual std::vector<AbstractAttribute*> supportedOwnAttributes() const override;
 
+    virtual bool isStateDependent() const override;
+
+    virtual bool isRegionDependent() const override;
+
+    virtual bool isHidden() const override;
+
+    virtual bool useTrackBestShotAsPreview() const override;
+
     virtual bool hasEverBeenSupported() const override;
 
     virtual bool isPrivate() const override;

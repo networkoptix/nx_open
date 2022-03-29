@@ -26,17 +26,11 @@ class QnSharedResourcesManager;
 class QnServerAdditionalAddressesDictionary;
 class QnUserRolesManager;
 
-namespace nx::analytics {
-class PluginDescriptorManager;
-class EventTypeDescriptorManager;
-class EngineDescriptorManager;
-class GroupDescriptorManager;
-class ObjectTypeDescriptorManager;
-namespace taxonomy {
+namespace nx::analytics::taxonomy {
+class AbstractState;
 class AbstractStateWatcher;
 class DescriptorContainer;
-} // namespace taxonomy
-} // namespace nx::analytics;
+} // namespace nx::analytics::taxonomy;
 
 namespace ec2 { class AbstractECConnection; }
 namespace nx::core::access { class ResourceAccessProvider; }
@@ -215,15 +209,7 @@ public:
 
     nx::analytics::taxonomy::AbstractStateWatcher* analyticsTaxonomyStateWatcher() const;
 
-    nx::analytics::PluginDescriptorManager* analyticsPluginDescriptorManager() const;
-
-    nx::analytics::EventTypeDescriptorManager* analyticsEventTypeDescriptorManager() const;
-
-    nx::analytics::EngineDescriptorManager* analyticsEngineDescriptorManager() const;
-
-    nx::analytics::GroupDescriptorManager* analyticsGroupDescriptorManager() const;
-
-    nx::analytics::ObjectTypeDescriptorManager* analyticsObjectTypeDescriptorManager() const;
+    std::shared_ptr<nx::analytics::taxonomy::AbstractState> analyticsTaxonomyState() const;
 
 private:
     void setMessageProcessor(QnCommonMessageProcessor* messageProcessor);

@@ -1,0 +1,684 @@
+{
+    "inputData":
+    {
+        "analyticsEngines":
+        [
+            {
+                "id": "engine.1",
+                "isDeviceDependent": false,
+                "analyticsEventTypeIds":
+                [
+                    "event.type.1",
+                    "event.type.2",
+                    "event.type.3",
+                    "shared.event.type.1",
+                    "shared.event.type.3"
+                ],
+                "analyticsObjectTypeIds":
+                [
+                    "object.type.1",
+                    "object.type.2",
+                    "object.type.3",
+                    "shared.object.type.2",
+                    "shared.object.type.3"
+                ]
+            },
+            {
+                "id": "engine.2",
+                "isDeviceDependent": false,
+                "analyticsEventTypeIds":
+                [
+                    "event.type.4",
+                    "event.type.5",
+                    "event.type.6",
+                    "shared.event.type.2"
+                ],
+                "analyticsObjectTypeIds":
+                [
+                    "object.type.4",
+                    "object.type.5",
+                    "object.type.6",
+                    "shared.object.type.1",
+                    "shared.object.type.2"
+                ]
+            },
+            {
+                "id": "engine.3",
+                "isDeviceDependent": true,
+                "analyticsEventTypeIds":
+                [
+                    "event.type.7",
+                    "event.type.8",
+                    "event.type.9",
+                    "shared.event.type.1"
+                ],
+                "analyticsObjectTypeIds":
+                [
+                    "object.type.7",
+                    "object.type.8",
+                    "object.type.9",
+                    "shared.object.type.1",
+                    "shared.object.type.3"
+                ]
+            },
+            {
+                "id": "engine.4",
+                "isDeviceDependent": true,
+                "analyticsEventTypeIds":
+                [
+                    "event.type.10",
+                    "event.type.11",
+                    "event.type.12",
+                    "shared.event.type.2",
+                    "shared.event.type.3"
+                ],
+                "analyticsObjectTypeIds":
+                [
+                    "object.type.10",
+                    "object.type.11",
+                    "object.type.12",
+                    "shared.object.type.1",
+                    "shared.object.type.2",
+                    "shared.object.type.3"
+                ]
+            }
+        ],
+
+        "devices":
+        [
+            {
+                "id": "device.1",
+                "enabledAnalyticsEngines": ["engine.1"],
+                "compatibleAnalyticsEngines": ["engine.1", "engine.2"],
+                "supportedEventTypes":
+                {
+                    "engine.1": ["event.type.1", "event.type.2", "shared.event.type.1"]
+                },
+                "supportedObjectTypes":
+                {
+                    "engine.1":
+                    [
+                        "object.type.1",
+                        "object.type.2",
+                        "shared.object.type.2",
+                        "shared.object.type.3"
+                    ]
+                }
+            },
+            {
+                "id": "device.2",
+                "enabledAnalyticsEngines": ["engine.2"],
+                "compatibleAnalyticsEngines": ["engine.2", "engine.3"],
+                "supportedEventTypes":
+                {
+                    "engine.2": ["event.type.4", "event.type.5", "shared.event.type.2"],
+                    "engine.3": ["shared.event.type.1"]
+                },
+                "supportedObjectTypes":
+                {
+                    "engine.2":
+                    [
+                        "object.type.4",
+                        "object.type.5",
+                        "shared.object.type.1",
+                        "shared.object.type.2"
+                    ]
+                }
+            },
+            {
+                "id": "device.3",
+                "enabledAnalyticsEngines": ["engine.3"],
+                "compatibleAnalyticsEngines": ["engine.3", "engine.4"],
+                "supportedEventTypes":
+                {
+                    "engine.3": ["event.type.7", "event.type.8", "shared.event.type.1"]
+                },
+                "supportedObjectTypes":
+                {
+                    "engine.3": ["object.type.7", "object.type.8"],
+                    "engine.4": ["shared.object.type.3"]
+                }
+            },
+            {
+                "id": "device.4",
+                "enabledAnalyticsEngines": [],
+                "compatibleAnalyticsEngines": ["engine.4"],
+                "supportedEventTypes": { "engine.4": ["event.type.10", "event.type.11"] },
+                "supportedObjectTypes": { "engine.4": ["object.type.10", "object.type.11"] }
+            },
+            {
+                "id": "device.5",
+                "enabledAnalyticsEngines": ["engine.2", "engine.3"],
+                "compatibleAnalyticsEngines": ["engine.2", "engine.3", "engine.4"],
+                "supportedEventTypes":
+                {
+                    "engine.2":
+                    [
+                        "event.type.4",
+                        "event.type.5",
+                        "event.type.6",
+                        "shared.event.type.2"
+                    ],
+                    "engine.3": ["event.type.7", "event.type.8"]
+                },
+                "supportedObjectTypes":
+                {
+                    "engine.2": ["object.type.4", "object.type.5", "object.type.6"],
+                    "engine.3":
+                    [
+                        "object.type.7",
+                        "object.type.8",
+                        "shared.object.type.1",
+                        "shared.object.type.3"
+                    ]
+                }
+            },
+            {
+                "id": "device.6",
+                "enabledAnalyticsEngines": ["engine.3", "engine.4"],
+                "compatibleAnalyticsEngines": ["engine.1", "engine.3", "engine.4"],
+                "supportedEventTypes":
+                {
+                    "engine.3": ["event.type.7", "event.type.8", "event.type.9"],
+                    "engine.4": ["event.type.10", "event.type.11", "shared.event.type.3"]
+                },
+                "supportedObjectTypes":
+                {
+                    "engine.3": ["object.type.7", "object.type.8", "object.type.9"],
+                    "engine.4":
+                    [
+                        "object.type.10",
+                        "object.type.11",
+                        "shared.object.type.2",
+                        "shared.object.type.3"
+                    ]
+                }
+            }
+        ],
+
+        "taxonomy":
+        {
+            "eventTypeDescriptors":
+            [
+                {
+                    "id": "event.type.1",
+                    "name": "Event Type 1",
+                    "scopes": [{ "engineId": "engine.1", "groupId": "group.1" }]
+                },
+                {
+                    "id": "event.type.2",
+                    "name": "Event Type 2",
+                    "scopes": [{ "engineId": "engine.1", "groupId": "group.1" }]
+                },
+                {
+                    "id": "event.type.3",
+                    "name": "Event Type 3",
+                    "scopes": [{ "engineId": "engine.1" }]
+                },
+                {
+                    "id": "event.type.4",
+                    "name": "Event Type 4",
+                    "scopes": [{ "engineId": "engine.2" }]
+                },
+                {
+                    "id": "event.type.5",
+                    "name": "Event Type 5",
+                    "scopes": [{ "engineId": "engine.2" }]
+                },
+                {
+                    "id": "event.type.6",
+                    "name": "Event Type 6",
+                    "scopes": [{ "engineId": "engine.2", "groupId": "group.2" }]
+                },
+                {
+                    "id": "event.type.7",
+                    "name": "Event Type 7",
+                    "scopes": [{ "engineId": "engine.3", "groupId": "group.3" }]
+                },
+                {
+                    "id": "event.type.8",
+                    "name": "Event Type 8",
+                    "scopes": [{ "engineId": "engine.3" }]
+                },
+                {
+                    "id": "event.type.9",
+                    "name": "Event Type 9",
+                    "scopes": [{ "engineId": "engine.3", "groupId": "group.1" }]
+                },
+                {
+                    "id": "event.type.10",
+                    "name": "Event Type 10",
+                    "scopes": [{ "engineId": "engine.4", "groupId": "group.4" }]
+                },
+                {
+                    "id": "event.type.11",
+                    "name": "Event Type 11",
+                    "scopes": [{ "engineId": "engine.4", "groupId": "group.4" }]
+                },
+                {
+                    "id": "event.type.12",
+                    "name": "Event Type 12",
+                    "scopes": [{ "engineId": "engine.4" }]
+                },
+                {
+                    "id": "shared.event.type.1",
+                    "name": "Shared Event Type 1",
+                    "scopes":
+                    [
+                        { "engineId": "engine.1" },
+                        { "engineId": "engine.3", "groupId": "group.1" }
+                    ]
+                },
+                {
+                    "id": "shared.event.type.2",
+                    "name": "Shared Event Type 2",
+                    "scopes":
+                    [
+                      { "engineId": "engine.2", "groupId": "group.2" },
+                      { "engineId": "engine.3", "groupId": "group.3" }
+                  ]
+                },
+                {
+                    "id": "shared.event.type.3",
+                    "name": "Shared Event Type 3",
+                    "scopes": [{ "engineId": "engine.1" }, { "engineId": "engine.4" }]
+                }
+            ],
+            "objectTypeDescriptors":
+            [
+                {
+                    "id": "object.type.1",
+                    "name": "Object Type 1",
+                    "scopes": [{ "engineId": "engine.1", "groupId": "group.1" }]
+                },
+                {
+                    "id": "object.type.2",
+                    "name": "Object Type 2",
+                    "scopes": [{ "engineId": "engine.1" }]
+                },
+                {
+                    "id": "object.type.3",
+                    "name": "Object Type 3",
+                    "scopes": [{ "engineId": "engine.1", "groupId": "group.3" }]
+                },
+                {
+                    "id": "object.type.4",
+                    "name": "Object Type 4",
+                    "scopes": [{ "engineId": "engine.2" }]
+                },
+                {
+                    "id": "object.type.5",
+                    "name": "Object Type 5",
+                    "scopes": [{ "engineId": "engine.2" }]
+                },
+                {
+                    "id": "object.type.6",
+                    "name": "Object Type 6",
+                    "scopes": [{ "engineId": "engine.2" }]
+                },
+                {
+                    "id": "object.type.7",
+                    "name": "Object Type 7",
+                    "scopes": [{ "engineId": "engine.3" }]
+                },
+                {
+                    "id": "object.type.8",
+                    "name": "Object Type 8",
+                    "scopes": [{ "engineId": "engine.3" }]
+                },
+                {
+                    "id": "object.type.9",
+                    "name": "Object Type 9",
+                    "scopes": [{ "engineId": "engine.3" }]
+                },
+                {
+                    "id": "object.type.10",
+                    "name": "Object Type 10",
+                    "scopes": [{ "engineId": "engine.4" }]
+                },
+                {
+                    "id": "object.type.11",
+                    "name": "Object Type 11",
+                    "scopes": [{ "engineId": "engine.4" }]
+                },
+                {
+                    "id": "object.type.12",
+                    "name":"Object Type 12",
+                    "scopes": [{ "engineId": "engine.4" }]
+                },
+                {
+                    "id": "shared.object.type.1",
+                    "name": "Shared Object Type 1",
+                    "scopes":
+                    [
+                        { "engineId": "engine.1" },
+                        { "engineId": "engine.2", "groupId": "group.1" }
+                    ]
+                },
+                {
+                    "id": "shared.object.type.2",
+                    "name": "Shared Object Type 2",
+                    "scopes":
+                    [
+                        { "engineId": "engine.3", "groupId": "group.3" },
+                        { "engineId": "engine.4", "groupId": "group.2" }
+                    ]
+                },
+                {
+                    "id": "shared.object.type.3",
+                    "name": "Shared Object Type 3",
+                    "scopes": [{ "engineId": "engine.2" }, { "engineId": "engine.4" }]
+                }
+            ],
+            "groupDescriptors":
+            [
+                { "id": "group.1", "name": "Group 1" },
+                { "id": "group.2", "name": "Group 2" },
+                { "id": "group.3", "name": "Group 3" },
+                { "id": "group.4", "name": "Group 4" }
+            ],
+            "engineDescriptors":
+            [
+                { "id": "engine.1", "name": "Engine 1" },
+                { "id": "engine.2", "name": "Engine 2" },
+                { "id": "engine.3", "name": "Engine 3" },
+                { "id": "engine.4", "name": "Engine 4" }
+            ]
+        },
+
+        "tests":
+        {
+            "supportedEventTypes": { "devices": ["device.1"] },
+            "supportedEventTypeUnion": { "devices": ["device.1", "device.2", "device.3"] },
+            "supportedEventTypeIntersection": { "devices": ["device.5", "device.6"] },
+            "supportedEventTypeTreeUnion": { "devices": ["device.1", "device.2", "device.3"] },
+            "supportedEventTypeTreeIntersection": { "devices": ["device.5", "device.6"] },
+            "compatibleEventTypes": { "devices": ["device.1"] },
+            "compatibleEventTypeUnion": { "devices": ["device.1", "device.2", "device.3"] },
+            "compatibleEventTypeIntersection": { "devices": ["device.5", "device.6"] },
+            "compatibleEventTypeTreeUnion": { "devices": ["device.1", "device.2", "device.3"] },
+            "compatibleEventTypeTreeIntersection": { "devices": ["device.5", "device.6"] },
+            "supportedObjectTypes": { "devices": ["device.2"] },
+            "supportedObjectTypeUnion": { "devices": ["device.2", "device.3", "device.4"] },
+            "supportedObjectTypeIntersection": { "devices": ["device.5", "device.6"] },
+            "supportedObjectTypeTreeUnion": { "devices": ["device.2", "device.3", "device.4"] },
+            "supportedObjectTypeTreeIntersection": { "devices": ["device.5", "device.6"] },
+            "compatibleObjectTypes": { "devices": ["device.6"] },
+            "compatibleObjectTypeUnion": { "devices": ["device.1", "device.2", "device.3"] },
+            "compatibleObjectTypeIntersection": { "devices": ["device.5", "device.6"] },
+            "compatibleObjectTypeTreeUnion": { "devices": ["device.1", "device.2", "device.3"] },
+            "compatibleObjectTypeTreeIntersection": { "devices": ["device.5", "device.6"] }
+        }
+    },
+
+    "expectedData":
+    {
+        "supportedEventTypes": ["event.type.1", "event.type.2", "shared.event.type.1"],
+        "supportedEventTypeUnion":
+        [
+            "event.type.1",
+            "event.type.2",
+            "event.type.4",
+            "event.type.5",
+            "event.type.7",
+            "event.type.8",
+            "shared.event.type.1",
+            "shared.event.type.2"
+        ],
+        "supportedEventTypeIntersection": ["event.type.7", "event.type.8"],
+        "supportedEventTypeTreeUnion":
+        [
+            {
+                "engine": "engine.1",
+                "groups":
+                [
+                    { "group": "", "entities": ["shared.event.type.1"] },
+                    { "group": "group.1", "entities": ["event.type.1", "event.type.2"] }
+                ]
+            },
+            {
+                "engine": "engine.2",
+                "groups":
+                [
+                    { "group": "", "entities": ["event.type.4", "event.type.5"] },
+                    { "group": "group.2", "entities": ["shared.event.type.2"] }
+                ]
+            },
+            {
+                "engine": "engine.3",
+                "groups":
+                [
+                    { "group": "", "entities": ["event.type.8"] },
+                    { "group": "group.1", "entities": ["shared.event.type.1"] },
+                    { "group": "group.3", "entities": ["event.type.7"] }
+                ]
+            }
+        ],
+        "supportedEventTypeTreeIntersection":
+        [
+            {
+                "engine": "engine.3",
+                "groups":
+                [
+                    { "group": "", "entities": ["event.type.8"] },
+                    { "group": "group.3", "entities": ["event.type.7"] }
+                ]
+            }
+        ],
+        "compatibleEventTypes":
+        [
+            "event.type.1",
+            "event.type.2",
+            "event.type.4",
+            "event.type.5",
+            "event.type.6",
+            "shared.event.type.1",
+            "shared.event.type.2"
+        ],
+        "compatibleEventTypeUnion":
+        [
+            "event.type.1",
+            "event.type.2",
+            "event.type.4",
+            "event.type.5",
+            "event.type.6",
+            "event.type.7",
+            "event.type.8",
+            "shared.event.type.1",
+            "shared.event.type.2"
+        ],
+        "compatibleEventTypeIntersection":
+        [
+            "event.type.7",
+            "event.type.8"
+        ],
+        "compatibleEventTypeTreeUnion":
+        [
+            {
+                "engine": "engine.1",
+                "groups":
+                [
+                    { "group": "", "entities": ["shared.event.type.1"] },
+                    { "group": "group.1", "entities": ["event.type.1", "event.type.2"] }
+                ]
+            },
+            {
+                "engine": "engine.2",
+                "groups":
+                [
+                    { "group": "", "entities": ["event.type.4", "event.type.5"] },
+                    { "group": "group.2", "entities": ["event.type.6", "shared.event.type.2"] }
+                ]
+            },
+            {
+                "engine": "engine.3",
+                "groups":
+                [
+                    { "group": "", "entities": ["event.type.8"] },
+                    { "group": "group.1", "entities": ["shared.event.type.1"] },
+                    { "group": "group.3", "entities": ["event.type.7"] }
+                ]
+            }
+        ],
+        "compatibleEventTypeTreeIntersection":
+        [
+            {
+                "engine": "engine.3",
+                "groups":
+                [
+                    { "group": "", "entities": ["event.type.8"] },
+                    { "group": "group.3", "entities": ["event.type.7"] }
+                ]
+            }
+        ],
+
+        "supportedObjectTypes":
+        [
+            "object.type.4",
+            "object.type.5",
+            "shared.object.type.1",
+            "shared.object.type.2"
+        ],
+        "supportedObjectTypeUnion":
+        [
+            "object.type.4",
+            "object.type.5",
+            "object.type.7",
+            "object.type.8",
+            "object.type.10",
+            "object.type.11",
+            "shared.object.type.1",
+            "shared.object.type.2",
+            "shared.object.type.3"
+        ],
+        "supportedObjectTypeIntersection":
+        [
+            "object.type.7",
+            "object.type.8",
+            "shared.object.type.3"
+        ],
+        "supportedObjectTypeTreeUnion":
+        [
+            {
+                "engine": "engine.2",
+                "groups":
+                [
+                    { "group": "", "entities": ["object.type.4", "object.type.5"] },
+                    {
+                        "group": "group.1",
+                        "entities": ["shared.object.type.1", "shared.object.type.2"]
+                    }
+                ]
+            },
+            {
+                "engine": "engine.3",
+                "groups": [{ "group": "", "entities": ["object.type.7", "object.type.8"] }]
+            },
+            {
+                "engine": "engine.4",
+                "groups":
+                [
+                    {
+                        "group": "",
+                        "entities":
+                        [
+                            "object.type.10",
+                            "object.type.11",
+                            "shared.object.type.3"
+                        ]
+                    }
+                ]
+            }
+        ],
+        "supportedObjectTypeTreeIntersection":
+        [
+            {
+                "engine": "engine.3",
+                "groups": [{ "group": "", "entities": ["object.type.7", "object.type.8"] }]
+            }
+        ],
+        "compatibleObjectTypes":
+        [
+            "object.type.1",
+            "object.type.2",
+            "object.type.3",
+            "object.type.7",
+            "object.type.8",
+            "object.type.9",
+            "object.type.10",
+            "object.type.11",
+            "shared.object.type.2",
+            "shared.object.type.3"
+        ],
+        "compatibleObjectTypeUnion":
+        [
+            "object.type.1",
+            "object.type.2",
+            "object.type.4",
+            "object.type.5",
+            "object.type.6",
+            "object.type.7",
+            "object.type.8",
+            "shared.object.type.1",
+            "shared.object.type.2",
+            "shared.object.type.3"
+        ],
+        "compatibleObjectTypeIntersection":
+        [
+            "object.type.7",
+            "object.type.8",
+            "shared.object.type.3"
+        ],
+        "compatibleObjectTypeTreeUnion":
+        [
+            {
+                "engine": "engine.1",
+                "groups":
+                [
+                    {
+                        "group": "",
+                        "entities":
+                        [
+                            "object.type.2",
+                            "shared.object.type.2",
+                            "shared.object.type.3"
+                        ]
+                    },
+                    { "group": "group.1", "entities": ["object.type.1"] }
+                ]
+            },
+            {
+                "engine": "engine.2",
+                "groups":
+                [
+                    {
+                        "group": "",
+                        "entities": ["object.type.4", "object.type.5", "object.type.6"]
+                    },
+                    {
+                        "group": "group.1",
+                        "entities": ["shared.object.type.1", "shared.object.type.2"]
+                    }
+                ]
+            },
+            {
+                "engine": "engine.3",
+                "groups": [{ "group": "", "entities": ["object.type.7", "object.type.8"] }]
+            },
+            {
+                "engine": "engine.4",
+                "groups":
+                [
+                    { "group": "", "entities": ["shared.object.type.3"] }
+                ]
+            }
+        ],
+        "compatibleObjectTypeTreeIntersection":
+        [
+            {
+                "engine": "engine.3",
+                "groups": [{ "group": "", "entities": ["object.type.7", "object.type.8"] }]
+            }
+        ]
+    }
+}

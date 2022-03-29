@@ -134,13 +134,13 @@ public:
      * @return Ids of Analytics Engines which can be potentially used with the Device. Only active
      *     (running on the current server) Engines are included.
      */
-    const QSet<QnUuid> compatibleAnalyticsEngines() const;
+    virtual const QSet<QnUuid> compatibleAnalyticsEngines() const;
 
     /**
      * @return Analytics Engines which can be potentially used with the Device. Only active
      *     (running on the current server) Engines are included.
      */
-    nx::vms::common::AnalyticsEngineResourceList compatibleAnalyticsEngineResources() const;
+    virtual nx::vms::common::AnalyticsEngineResourceList compatibleAnalyticsEngineResources() const;
 
     /**
      * Set ids of Analytics Engines which can be potentially used with the Device. Only active
@@ -161,7 +161,7 @@ public:
      * @return Map of supported Event types by the Engine id. Only actually compatible with the
      *     Device, enabled by the user and active (running on the current Server) Engines are used.
      */
-    AnalyticsEntitiesByEngine supportedEventTypes() const;
+    virtual AnalyticsEntitiesByEngine supportedEventTypes() const;
 
     /**
      * @return Map of the supported Object types by the Engine id.
