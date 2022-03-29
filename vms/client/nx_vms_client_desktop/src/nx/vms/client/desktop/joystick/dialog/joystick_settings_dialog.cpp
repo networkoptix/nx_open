@@ -72,14 +72,6 @@ JoystickSettingsDialog::Private::Private(JoystickSettingsDialog* owner, Manager*
     buttonBaseActionChoiceModel(new JoystickButtonActionChoiceModel(true, owner)),
     buttonModifiedActionChoiceModel(new JoystickButtonActionChoiceModel(false, owner))
 {
-    manager->setDeviceActionsEnabled(false);
-
-    connect(q, &JoystickSettingsDialog::done, 
-        [manager]
-        {
-            manager->setDeviceActionsEnabled(true);
-        });
-
     treeEntityBuilder->setUser(q->context()->accessController()->user());
     layoutsEntity = treeEntityBuilder->createDialogAllLayoutsEntity();
     layoutModel.setRootEntity(layoutsEntity.get());
@@ -176,8 +168,6 @@ JoystickSettingsDialog::Private::~Private()
     layoutModel.setRootEntity(nullptr);
     for (auto connection: connections)
         QObject::disconnect(connection);
-
-    manager->setDeviceActionsEnabled(true);
 }
 
 bool JoystickSettingsDialog::Private::initModel(bool initWithDefaults)
