@@ -1967,6 +1967,9 @@ void QnSecurityCamResource::setUserAttributesAndNotify(
 
     if (originalAttributes.backupPolicy != attributes.backupPolicy)
         emit backupPolicyChanged(::toSharedPointer(this));
+
+    if (originalAttributes.dataAccessId != attributes.dataAccessId)
+        emit dataAccessIdChanged(::toSharedPointer(this));
 }
 
 bool QnSecurityCamResource::isRtspMetatadaRequired() const
