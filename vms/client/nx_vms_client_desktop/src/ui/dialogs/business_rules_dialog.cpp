@@ -274,6 +274,16 @@ namespace {
 
             params.insert("metadata", QString::fromUtf8(QJson::serialized(data)));
         }
+        else if (rule->eventType() == nx::vms::api::EventType::cameraIpConflictEvent)
+        {
+            const auto camera = nx::utils::random::choice(resourcePool->getAllCameras());
+            params.replace("caption", camera->getHostAddress());
+            params.replace("description", camera->getMAC().toString());
+
+            auto metadata = rule->eventParams().metadata;
+            metadata.cameraRefs.push_back(camera->getId().toString());
+            params.insert("metadata", QString::fromUtf8(QJson::serialized(metadata)));
+        }
         else
         {
             params.insert("metadata", QString::fromUtf8(
