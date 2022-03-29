@@ -14,6 +14,19 @@ namespace nx {
 namespace vms {
 namespace event {
 
+/**%apidoc
+ * Additional information associated with the Event.
+ * <br/><br/>
+ * ATTENTION: This field is an enquoted JSON string containing a JSON object. Example:
+ * <code>"{\\"field1\\": \\"value1\\", \\"field2\\": \\"value2\\",]"</code>
+ * <br/><br/>
+ * Currently supported fields (others can be added in the future):
+ * <ul>
+ *     <li>"cameraRefs" - Specifies the list of Devices which are linked to the Event (e.g.
+ *     the Event will appear on their timelines), in the form of a list of Device ids (can
+ *     be obtained from "id" field via /ec2/getCamerasEx).</li>
+ * </ul>
+ */
 struct EventMetaData
 {
     /**
@@ -42,69 +55,82 @@ NX_REFLECTION_INSTRUMENT(EventMetaData, EventMetaData_Fields)
 
 struct NX_VMS_COMMON_API EventParameters
 {
-    /**%apidoc Type of the Event. */
+    /**%apidoc[opt]
+     * Type of the Event to be created. The default value is
+     * <code>userDefinedEvent</code>
+     */
     EventType eventType = EventType::undefinedEvent;
 
-    /**%apidoc When did the Event occur, in microseconds. */
+    /**%apidoc[opt]
+     * Event date and time, as a string containing time in
+     * milliseconds since epoch, or a local time formatted like
+     * <code>"<i>YYYY</i>-<i>MM</i>-<i>DD</i>T<i>HH</i>:<i>mm</i>:<i>ss</i>.<i>zzz</i>"</code> -
+     * the format is auto-detected. If "timestamp" is absent, the current Server date and time
+     * is used.
+     */
     qint64 eventTimestampUsec = 0;
 
-    /**%apidoc Event source - id of a Device, or a Server, or a PIR. */
+    /**%apidoc[opt] Event source - id of a Device, or a Server, or a PIR. */
     QnUuid eventResourceId;
 
-    /**%apidoc
-     * Name of the resource which caused the event. Used if no resource is actually registered in
-     * the system. External custom event can provide some resource name with doesn't match
-     * resourceId in the system. In this case resourceName is filled and resourceId remains empty.
-     * In GUI and API referred as `source`.
+    /**%apidoc[opt]
+     * Name of the Device which has triggered the Event. It can be used
+     * in a filter in Event Rules to assign different actions to different Devices. Also, the
+     * user could see this name in the notification panel. Example: "POS terminal 5".
      */
     QString resourceName;
 
-    /**%apidoc Id of a Server that generated the Event. */
+    /**%apidoc[opt] Id of a Server that generated the Event. */
     QnUuid sourceServerId;
 
-    /**%apidoc Used for Reasoned Events as reason code. */
+    /**%apidoc[opt] Used for Reasoned Events as reason code. */
     EventReason reasonCode = EventReason::none;
 
-    /**%apidoc Used for Input Events only. Identifies the input port.
+    /**%apidoc[opt] Used for Input Events only. Identifies the input port.
      * %// TODO: Refactor: inputPortId should not be used for analytics event type id.
      */
     QString inputPortId;
 
-    /**%apidoc
-     * Short event description. Used for camera/server conflict events as the resource name which
-     * causes the error. Used in custom events as a short description.
+    /**%apidoc[opt]
+     * Short Event description. It can be used in a filter in Event Rules to assign actions
+     * depending on this text.
      */
     QString caption;
 
-    /**%apidoc
-     * Long event description. Used for camera/server conflict as a long description (conflict
-     * list). Used in ReasonedEvents as reason description. Used in custom events as a long
-     * description.
+    /**%apidoc[opt]
+     * Long Event description. It can be used as a filter in Event Rules to assign actions
+     * depending on this text.
      */
     QString description;
 
-    /**%apidoc
-     * Camera list which is associated with the event. EventResourceId may be a POS terminal, but
-     * this is a camera list which should be shown with this event.
-     * %// TODO: Fix the comment - metadata is more than a camera list.
-     */
+    /**%apidoc[opt] */
     EventMetaData metadata;
 
-    /**
+    /**%apidoc[opt]
      * Flag allows to omit event logging to DB on the server.
      * This event still triggers user notifications
      */
     bool omitDbLogging = false;
 
+    /**%apidoc[opt] */
     QString analyticsPluginId; //< #spanasenko: It's unused (?!).
+
+    /**%apidoc[opt] */
     QnUuid analyticsEngineId;
 
-    /** Used for Analytics Events. Takes part in ExternalUniqueKey along with EventTypeId. */
+    /**%apidoc[opt]
+     * Used for Analytics Events.
+     * Takes part in ExternalUniqueKey along with EventTypeId.
+     */
     QnUuid objectTrackId;
 
-    /** Used for Analytics Events. Makes an additional component in ExternalUniqueKey. */
+    /**%apidoc[opt]
+     * Used for Analytics Events.
+     * Makes an additional component in ExternalUniqueKey.
+     */
     QString key;
 
+    /**%apidoc[opt] */
     nx::common::metadata::Attributes attributes;
 
     bool operator==(const EventParameters& other) const = default;
