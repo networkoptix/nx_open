@@ -5,22 +5,31 @@
 #include <QtCore/QStringList>
 #include <QtNetwork/QHostAddress>
 
-namespace nx {
-namespace vms {
-namespace event {
+namespace nx::vms::event {
 
 IpConflictEvent::IpConflictEvent(
     const QnResourcePtr& resource,
     const QHostAddress& address,
     const QStringList& macAddrList,
-    qint64 timeStamp)
+    qint64 timeStamp,
+    const QStringList& cameraRefs)
     :
     base_type(
-        EventType::cameraIpConflictEvent, resource, timeStamp,
-        address.toString(), macAddrList.join(delimiter()))
+        EventType::cameraIpConflictEvent,
+        resource,
+        timeStamp,
+        address.toString(),
+        macAddrList.join(delimiter())),
+    m_cameraRefs(cameraRefs)
 {
 }
 
-} // namespace event
-} // namespace vms
-} // namespace nx
+EventParameters IpConflictEvent::getRuntimeParams() const
+{
+    auto params = base_type::getRuntimeParams();
+    params.metadata.cameraRefs.assign(m_cameraRefs.begin(), m_cameraRefs.end());
+
+    return params;
+}
+
+} // namespace nx::vms::event
