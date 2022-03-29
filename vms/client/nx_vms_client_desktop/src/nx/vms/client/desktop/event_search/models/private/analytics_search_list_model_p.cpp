@@ -19,8 +19,6 @@
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <nx/analytics/action_type_descriptor_manager.h>
-#include <nx/analytics/engine_descriptor_manager.h>
-#include <nx/analytics/object_type_descriptor_manager.h>
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
 #include <nx/analytics/taxonomy/helpers.h>
 #include <nx/analytics/taxonomy/object_type_dictionary.h>
@@ -1222,13 +1220,21 @@ QString AnalyticsSearchListModel::Private::description(
 QString AnalyticsSearchListModel::Private::engineName(
     const ObjectTrack& track) const
 {
+    using nx::analytics::taxonomy::AbstractState;
+
     if (track.analyticsEngineId.isNull())
         return {};
 
-    const auto engineDescriptor =
-        q->commonModule()->analyticsEngineDescriptorManager()->descriptor(track.analyticsEngineId);
+    const std::shared_ptr<AbstractState> taxonomyState =
+        q->commonModule()->analyticsTaxonomyState();
 
-    return engineDescriptor ? engineDescriptor->name : QString();
+    if (!taxonomyState)
+        return QString();
+
+    if (const auto engine = taxonomyState->engineById(track.analyticsEngineId.toString()))
+        return engine->name();
+
+    return QString();
 }
 
 QSharedPointer<QMenu> AnalyticsSearchListModel::Private::contextMenu(

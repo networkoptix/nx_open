@@ -61,6 +61,8 @@ void State::refillCache() const
     m_cachedGroups.clear();
     m_cachedObjectType.clear();
     m_cachedRootObjectType.clear();
+    m_cachedEventType.clear();
+    m_cachedRootEventType.clear();
     m_cachedEnumTypes.clear();
     m_cachedColorTypes.clear();
 
@@ -78,6 +80,13 @@ void State::refillCache() const
         m_cachedObjectType.push_back(objectType);
         if (!objectType->base())
             m_cachedRootObjectType.push_back(objectType);
+    }
+
+    for (const auto& [eventTypeId, eventType]: m_internalState.eventTypeById)
+    {
+        m_cachedEventType.push_back(eventType);
+        if (!eventType->base())
+            m_cachedRootEventType.push_back(eventType);
     }
 
     for (const auto& [enumTypeId, enumType]: m_internalState.enumTypeById)
@@ -123,6 +132,15 @@ std::vector<AbstractObjectType*> State::objectTypes() const
     return m_cachedObjectType;
 }
 
+std::vector<AbstractEventType*> State::eventTypes() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (m_cachedEventType.empty())
+        refillCache();
+
+    return m_cachedEventType;
+}
+
 std::vector<AbstractEnumType*> State::enumTypes() const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
@@ -150,10 +168,25 @@ std::vector<AbstractObjectType*> State::rootObjectTypes() const
     return m_cachedRootObjectType;
 }
 
+std::vector<AbstractEventType*> State::rootEventTypes() const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    if (m_cachedRootEventType.empty())
+        refillCache();
+
+    return m_cachedRootEventType;
+}
+
 AbstractObjectType* State::objectTypeById(const QString& objectTypeId) const
 {
     NX_MUTEX_LOCKER lock(&m_mutex);
     return m_internalState.getTypeById<ObjectType>(objectTypeId);
+}
+
+AbstractEventType* State::eventTypeById(const QString& eventTypeId) const
+{
+    NX_MUTEX_LOCKER lock(&m_mutex);
+    return m_internalState.getTypeById<EventType>(eventTypeId);
 }
 
 AbstractPlugin* State::pluginById(const QString& pluginId) const

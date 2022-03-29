@@ -68,6 +68,26 @@ std::vector<AbstractAttribute*> EventType::supportedOwnAttributes() const
     return m_impl->supportedOwnAttributes();
 }
 
+bool EventType::isStateDependent() const
+{
+    return m_impl->descriptor().flags.testFlag(EventTypeFlag::stateDependent);
+}
+
+bool EventType::isRegionDependent() const
+{
+    return m_impl->descriptor().flags.testFlag(EventTypeFlag::regionDependent);
+}
+
+bool EventType::isHidden() const
+{
+    return m_impl->descriptor().flags.testFlag(EventTypeFlag::hidden);
+}
+
+bool EventType::useTrackBestShotAsPreview() const
+{
+    return m_impl->descriptor().flags.testFlag(EventTypeFlag::useTrackBestShotAsPreview);
+}
+
 bool EventType::hasEverBeenSupported() const
 {
     return m_impl->hasEverBeenSupported();

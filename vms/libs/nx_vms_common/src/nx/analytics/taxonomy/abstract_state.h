@@ -11,6 +11,7 @@
 #include <nx/analytics/taxonomy/abstract_engine.h>
 #include <nx/analytics/taxonomy/abstract_group.h>
 #include <nx/analytics/taxonomy/abstract_object_type.h>
+#include <nx/analytics/taxonomy/abstract_event_type.h>
 #include <nx/analytics/taxonomy/abstract_enum_type.h>
 #include <nx/analytics/taxonomy/abstract_color_type.h>
 
@@ -37,13 +38,19 @@ public:
 
     virtual std::vector<AbstractObjectType*> objectTypes() const = 0;
 
+    virtual std::vector<AbstractEventType*> eventTypes() const = 0;
+
     virtual std::vector<AbstractEnumType*> enumTypes() const = 0;
 
     virtual std::vector<AbstractColorType*> colorTypes() const = 0;
 
     virtual std::vector<AbstractObjectType*> rootObjectTypes() const = 0;
 
+    virtual std::vector<AbstractEventType*> rootEventTypes() const = 0;
+
     virtual AbstractObjectType* objectTypeById(const QString& objectTypeId) const = 0;
+
+    virtual AbstractEventType* eventTypeById(const QString& eventTypeId) const = 0;
 
     virtual AbstractPlugin* pluginById(const QString& pluginId) const = 0;
 

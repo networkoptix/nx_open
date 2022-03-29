@@ -28,6 +28,10 @@ class NX_VMS_COMMON_API AbstractEventType: public QObject
         READ ownAttributes CONSTANT)
     Q_PROPERTY(std::vector<nx::analytics::taxonomy::AbstractAttribute*> supportedOwnAttributes
         READ supportedOwnAttributes CONSTANT)
+    Q_PROPERTY(bool isStateDependent READ isStateDependent CONSTANT)
+    Q_PROPERTY(bool isRegionDependent READ isRegionDependent CONSTANT)
+    Q_PROPERTY(bool isHidden READ isHidden CONSTANT)
+    Q_PROPERTY(bool useTrackBestShotAsPreview READ useTrackBestShotAsPreview CONSTANT)
     Q_PROPERTY(bool hasEverBeenSupported READ hasEverBeenSupported CONSTANT)
     Q_PROPERTY(bool isPrivate READ isPrivate CONSTANT)
     Q_PROPERTY(std::vector<AbstractScope*> scopes READ scopes CONSTANT)
@@ -59,6 +63,14 @@ public:
     virtual std::vector<AbstractAttribute*> supportedAttributes() const = 0;
 
     virtual std::vector<AbstractAttribute*> supportedOwnAttributes() const = 0;
+
+    virtual bool isStateDependent() const = 0;
+
+    virtual bool isRegionDependent() const = 0;
+
+    virtual bool isHidden() const = 0;
+
+    virtual bool useTrackBestShotAsPreview() const = 0;
 
     virtual bool hasEverBeenSupported() const = 0;
 

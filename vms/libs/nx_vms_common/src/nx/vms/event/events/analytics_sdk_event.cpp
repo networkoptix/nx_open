@@ -6,8 +6,8 @@
 #include <nx/utils/uuid.h>
 #include <core/resource/resource.h>
 
-#include <nx/analytics/event_type_descriptor_manager.h>
-#include <nx/vms/api/analytics/descriptors.h>
+#include <nx/analytics/taxonomy/abstract_state_watcher.h>
+#include <nx/analytics/taxonomy/abstract_state.h>
 #include <analytics/db/text_search_utils.h>
 
 namespace nx {
@@ -15,14 +15,22 @@ namespace vms {
 namespace event {
 
 using namespace nx::vms::api::analytics;
+using nx::analytics::taxonomy::AbstractState;
+using nx::analytics::taxonomy::AbstractEventType;
+using nx::analytics::taxonomy::AbstractGroup;
+using nx::analytics::taxonomy::AbstractScope;
 
 namespace {
 
-bool belongsToGroup(const EventTypeDescriptor& descriptor, const QString& groupId)
+bool belongsToGroup(const AbstractEventType* eventType, const QString& groupId)
 {
-    for (const auto& scope: descriptor.scopes)
+    for (const AbstractScope* scope: eventType->scopes())
     {
-        if (scope.groupId == groupId)
+        const AbstractGroup* group = scope->group();
+        if (!group)
+            continue;
+
+        if (group->id() == groupId)
             return true;
     }
 
@@ -98,15 +106,20 @@ bool AnalyticsSdkEvent::checkEventParams(const EventParameters& params) const
     if (!getResource() || m_engineId != params.getAnalyticsEngineId())
         return false;
 
-    const auto descriptor = getResource()->systemContext()->analyticsEventTypeDescriptorManager()
-        ->descriptor(m_eventTypeId);
+    const std::shared_ptr<AbstractState> taxonomyState =
+        getResource()->systemContext()->analyticsTaxonomyState();
 
-    if (!descriptor)
+    if (!taxonomyState)
+        return false;
+
+    const AbstractEventType* eventType = taxonomyState->eventTypeById(m_eventTypeId);
+
+    if (!eventType)
         return false;
 
     const bool isEventTypeMatched =
         m_eventTypeId == params.getAnalyticsEventTypeId()
-        || belongsToGroup(*descriptor, params.getAnalyticsEventTypeId());
+        || belongsToGroup(eventType, params.getAnalyticsEventTypeId());
     if (!isEventTypeMatched || !checkForKeywords(m_caption, params.caption))
         return false;
 

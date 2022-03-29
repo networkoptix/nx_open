@@ -197,11 +197,13 @@ public:
                         ProcessingError{NX_FMT(
                             "%1 %2: unable to find a descriptor "
                             "of Group %3 used in a scope",
-                            m_typeName, m_descriptor.id, scope.groupId) });
+                            m_typeName, m_descriptor.id, scope.groupId)});
 
                     continue;
                 }
             }
+
+            taxonomyScope->setProvider(scope.provider);
 
             if (!taxonomyScope->isEmpty())
             {

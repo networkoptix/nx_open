@@ -6,7 +6,6 @@
 #include <nx/utils/uuid.h>
 #include <core/resource/resource.h>
 
-#include <nx/analytics/object_type_descriptor_manager.h>
 #include <nx/vms/api/analytics/descriptors.h>
 #include <analytics/db/text_search_utils.h>
 #include <analytics/db/analytics_db_types.h>
@@ -75,7 +74,7 @@ bool AnalyticsSdkObjectDetected::checkEventParams(const EventParameters& params)
 
     const bool isObjectTypeMatched = ruleTypeId == m_objectTypeId
         || nx::analytics::taxonomy::isBaseType(
-            getResource()->systemContext()->analyticsTaxonomyStateWatcher()->state().get(),
+            getResource()->systemContext()->analyticsTaxonomyState().get(),
             ruleTypeId, m_objectTypeId);
     if (!isObjectTypeMatched)
         return false;

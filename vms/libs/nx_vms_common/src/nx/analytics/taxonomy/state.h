@@ -27,13 +27,19 @@ public:
 
     virtual std::vector<AbstractObjectType*> objectTypes() const override;
 
+    virtual std::vector<AbstractEventType*> eventTypes() const override;
+
     virtual std::vector<AbstractEnumType*> enumTypes() const override;
 
     virtual std::vector<AbstractColorType*> colorTypes() const override;
 
     virtual std::vector<AbstractObjectType*> rootObjectTypes() const override;
 
+    virtual std::vector<AbstractEventType*> rootEventTypes() const override;
+
     virtual AbstractObjectType* objectTypeById(const QString& objectTypeId) const override;
+
+    virtual AbstractEventType* eventTypeById(const QString& eventTypeById) const override;
 
     virtual AbstractPlugin* pluginById(const QString& pluginId) const override;
 
@@ -61,6 +67,9 @@ private:
 
     mutable std::vector<AbstractObjectType*> m_cachedObjectType;
     mutable std::vector<AbstractObjectType*> m_cachedRootObjectType;
+
+    mutable std::vector<AbstractEventType*> m_cachedEventType;
+    mutable std::vector<AbstractEventType*> m_cachedRootEventType;
 
     mutable std::vector<AbstractEnumType*> m_cachedEnumTypes;
     mutable std::vector<AbstractColorType*> m_cachedColorTypes;

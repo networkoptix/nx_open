@@ -36,15 +36,15 @@ public:
 
     AnalyticsPluginResourcePtr plugin() const;
 
-    nx::vms::api::analytics::EventTypeDescriptorMap analyticsEventTypeDescriptors() const;
-    nx::vms::api::analytics::ObjectTypeDescriptorMap analyticsObjectTypeDescriptors() const;
+    virtual std::set<QString> eventTypeIds() const;
+    virtual std::set<QString> objectTypeIds() const;
 
     QList<nx::vms::api::analytics::EngineManifest::ObjectAction> supportedObjectActions() const;
 
     /**
      * Device-dependent Engines are always running on a Device and cannot be disabled by the user.
      */
-    bool isDeviceDependent() const;
+    virtual bool isDeviceDependent() const;
 
     bool isEnabledForDevice(const QnVirtualCameraResourcePtr& device) const;
 

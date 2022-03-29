@@ -18,15 +18,20 @@ public:
 
     virtual AbstractGroup* group() const override;
 
+    virtual QString provider() const override;
+
     virtual bool isEmpty() const override;
 
     void setEngine(Engine* engine);
 
     void setGroup(Group* group);
 
+    void setProvider(const QString& provider);
+
 private:
     Engine* m_engine = nullptr;
     Group* m_group = nullptr;
+    QString m_provider;
 };
 
 } // namespace nx::analytics::taxonomy

@@ -39,11 +39,20 @@ public:
         bool value = true,
         const QnUuid& engineId = QnUuid::createUuid());
 
-    virtual QSet<QnUuid> enabledAnalyticsEngines() const override;
-
-    virtual std::map<QnUuid, std::set<QString>> supportedObjectTypes(
+    virtual AnalyticsEntitiesByEngine supportedObjectTypes(
         bool filterByEngines = true) const override;
     void setSupportedObjectTypes(const QMap<QnUuid, std::set<QString>>& supportedObjectTypes);
+
+    virtual AnalyticsEntitiesByEngine supportedEventTypes() const override;
+    void setSupportedEventTypes(const QMap<QnUuid, std::set<QString>>& eventTypesByEngine);
+
+    virtual QnUuidSet enabledAnalyticsEngines() const override;
+    void setEnabledAnalyticsEngines(QnUuidSet engines);
+
+    virtual nx::vms::common::AnalyticsEngineResourceList
+        compatibleAnalyticsEngineResources() const override;
+    void setCompatibleAnalyticsEngineResources(
+        nx::vms::common::AnalyticsEngineResourceList engines);
 
 protected:
     virtual QnAbstractStreamDataProvider* createLiveDataProvider() override;

@@ -27,11 +27,6 @@
 #include <core/resource_management/user_roles_manager.h>
 #include <licensing/license.h>
 #include <network/router.h>
-#include <nx/analytics/engine_descriptor_manager.h>
-#include <nx/analytics/event_type_descriptor_manager.h>
-#include <nx/analytics/group_descriptor_manager.h>
-#include <nx/analytics/object_type_descriptor_manager.h>
-#include <nx/analytics/plugin_descriptor_manager.h>
 #include <nx/analytics/taxonomy/descriptor_container.h>
 #include <nx/analytics/taxonomy/state_watcher.h>
 #include <nx/vms/common/network/abstract_certificate_verifier.h>
@@ -70,14 +65,9 @@ struct SystemContext::Private
     std::unique_ptr<nx::vms::rules::Engine> vmsRulesEngine;
     std::unique_ptr<taxonomy::DescriptorContainer> analyticsDescriptorContainer;
     std::unique_ptr<taxonomy::AbstractStateWatcher> analyticsTaxonomyStateWatcher;
-    std::unique_ptr<PluginDescriptorManager> analyticsPluginDescriptorManager;
-    std::unique_ptr<EventTypeDescriptorManager> analyticsEventTypeDescriptorManager;
-    std::unique_ptr<EngineDescriptorManager> analyticsEngineDescriptorManager;
-    std::unique_ptr<GroupDescriptorManager> analyticsGroupDescriptorManager;
-    std::unique_ptr<ObjectTypeDescriptorManager> analyticsObjectTypeDescriptorManager;
 
     QPointer<QnRouter> router;
-    QPointer<AbstractCertificateVerifier>  certificateVerifier;
+    QPointer<AbstractCertificateVerifier> certificateVerifier;
 };
 
 SystemContext::SystemContext(
@@ -137,16 +127,6 @@ SystemContext::SystemContext(
 
     d->analyticsDescriptorContainer = std::make_unique<taxonomy::DescriptorContainer>(this);
     d->analyticsTaxonomyStateWatcher = std::make_unique<taxonomy::StateWatcher>(
-        d->analyticsDescriptorContainer.get());
-    d->analyticsPluginDescriptorManager = std::make_unique<PluginDescriptorManager>(
-        d->analyticsDescriptorContainer.get());
-    d->analyticsEventTypeDescriptorManager = std::make_unique<EventTypeDescriptorManager>(
-        d->analyticsDescriptorContainer.get());
-    d->analyticsEngineDescriptorManager = std::make_unique<EngineDescriptorManager>(
-        d->analyticsDescriptorContainer.get());
-    d->analyticsGroupDescriptorManager = std::make_unique<GroupDescriptorManager>(
-        d->analyticsDescriptorContainer.get());
-    d->analyticsObjectTypeDescriptorManager = std::make_unique<ObjectTypeDescriptorManager>(
         d->analyticsDescriptorContainer.get());
 }
 
@@ -304,42 +284,22 @@ nx::vms::rules::Engine* SystemContext::vmsRulesEngine() const
     return d->vmsRulesEngine.get();
 }
 
-PluginDescriptorManager* SystemContext::analyticsPluginDescriptorManager() const
-{
-    return d->analyticsPluginDescriptorManager.get();
-}
-
-EventTypeDescriptorManager*
-    SystemContext::analyticsEventTypeDescriptorManager() const
-{
-    return d->analyticsEventTypeDescriptorManager.get();
-}
-
-EngineDescriptorManager* SystemContext::analyticsEngineDescriptorManager() const
-{
-    return d->analyticsEngineDescriptorManager.get();
-}
-
-GroupDescriptorManager* SystemContext::analyticsGroupDescriptorManager() const
-{
-    return d->analyticsGroupDescriptorManager.get();
-}
-
-ObjectTypeDescriptorManager*
-    SystemContext::analyticsObjectTypeDescriptorManager() const
-{
-    return d->analyticsObjectTypeDescriptorManager.get();
-}
-
 taxonomy::DescriptorContainer* SystemContext::analyticsDescriptorContainer() const
 {
     return d->analyticsDescriptorContainer.get();
 }
 
-taxonomy::AbstractStateWatcher*
-    SystemContext::analyticsTaxonomyStateWatcher() const
+taxonomy::AbstractStateWatcher* SystemContext::analyticsTaxonomyStateWatcher() const
 {
     return d->analyticsTaxonomyStateWatcher.get();
+}
+
+std::shared_ptr<taxonomy::AbstractState> SystemContext::analyticsTaxonomyState() const
+{
+    if (d->analyticsTaxonomyStateWatcher)
+        return d->analyticsTaxonomyStateWatcher->state();
+
+    return nullptr;
 }
 
 void SystemContext::setMessageProcessor(QnCommonMessageProcessor* messageProcessor)

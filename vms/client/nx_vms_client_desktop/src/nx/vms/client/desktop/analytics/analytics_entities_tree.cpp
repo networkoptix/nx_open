@@ -11,12 +11,9 @@
 #include <core/resource/camera_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
-#include <nx/analytics/engine_descriptor_manager.h>
-#include <nx/analytics/event_type_descriptor_manager.h>
-#include <nx/analytics/group_descriptor_manager.h>
 #include <nx/analytics/helpers.h>
-#include <nx/analytics/object_type_descriptor_manager.h>
-#include <nx/analytics/plugin_descriptor_manager.h>
+#include <nx/analytics/taxonomy/state_helper.h>
+#include <nx/analytics/taxonomy/state_watcher.h>
 #include <nx/utils/data_structures/map_helper.h>
 #include <nx/utils/std/algorithm.h>
 #include <nx/vms/client/core/resource/session_resources_signal_listener.h>
@@ -26,6 +23,7 @@
 namespace nx::vms::client::desktop {
 
 using namespace nx::vms;
+using namespace nx::analytics::taxonomy;
 
 using Node = AnalyticsEntitiesTreeBuilder::Node;
 using NodePtr = AnalyticsEntitiesTreeBuilder::NodePtr;
@@ -39,104 +37,71 @@ NodePtr makeNode(NodeType nodeType, QWeakPointer<Node> parent, const QString& te
     return NodePtr(new Node(nodeType, parent, text));
 }
 
-template<typename Entity>
-auto managerByEntityType(QnCommonModule* commonModule)
-{
-    if constexpr (std::is_same_v<Entity, api::analytics::EventTypeDescriptor>)
-        return commonModule->analyticsEventTypeDescriptorManager();
-    else if constexpr (std::is_same_v<Entity, api::analytics::ObjectTypeDescriptor>)
-        return commonModule->analyticsObjectTypeDescriptorManager();
-    else if constexpr (std::is_same_v<Entity, api::analytics::GroupDescriptor>)
-        return commonModule->analyticsGroupDescriptorManager();
-    else if constexpr (std::is_same_v<Entity, api::analytics::EngineDescriptor>)
-        return commonModule->analyticsEngineDescriptorManager();
-    else if constexpr (std::is_same_v<Entity, api::analytics::PluginDescriptor>)
-        return commonModule->analyticsPluginDescriptorManager();
-    else
-        return nullptr;
-}
-
-template<typename Entity>
-api::analytics::ScopedEntityTypeIds resolveEntities(
-    QnCommonModule* commonModule,
+template<typename EntityType>
+std::vector<ScopedEntity<EntityType>> resolveEntities(
+    const std::shared_ptr<AbstractState>& state,
     const AnalyticsEntitiesTreeBuilder::UnresolvedEntities& entities)
 {
-    const auto manager = managerByEntityType<Entity>(commonModule);
-    if (!NX_ASSERT(manager))
-        return api::analytics::ScopedEntityTypeIds();
-
-    api::analytics::ScopedEventTypeIds result;
+    std::vector<ScopedEntity<EntityType>> result;
     for (const auto& entity: entities)
     {
-        const auto descriptor = manager->descriptor(entity.entityId);
-        if (!descriptor)
+        EntityType* entityType = nullptr;
+        if constexpr (std::is_same_v<AbstractEventType, EntityType>)
+            entityType = state->eventTypeById(entity.entityId);
+
+        if constexpr (std::is_same_v<AbstractObjectType, EntityType>)
+            entityType = state->objectTypeById(entity.entityId);
+
+        if (!entityType)
             continue;
 
-        for (const auto& scope: descriptor->scopes)
+        for (const auto& scope: entityType->scopes())
         {
-            if (scope.engineId == entity.engineId)
-                result[entity.engineId][scope.groupId].insert(descriptor->id);
+            if (scope->engine() && scope->engine()->id() == entity.engineId.toString())
+            {
+                result.push_back(
+                    ScopedEntity<EntityType>(scope->engine(), scope->group(), entityType));
+            }
         }
     }
 
     return result;
 }
 
-NodePtr buildEventTypesTree(
-    QnCommonModule* commonModule,
-    api::analytics::ScopedEventTypeIds scopedEventTypeIds,
-    const AnalyticsEntitiesTreeBuilder::UnresolvedEntities& additionalEntities = {})
+NodePtr buildEventTypesTree(const std::vector<EngineScope<AbstractEventType>>& eventTypeTree)
 {
-    const auto engineDescriptorManager = commonModule->analyticsEngineDescriptorManager();
-    const auto groupDescriptorManager = commonModule->analyticsGroupDescriptorManager();
-    const auto eventTypeDescriptorManager = commonModule->analyticsEventTypeDescriptorManager();
-
     auto root = makeNode(NodeType::root, {});
 
-    const auto resolvedEntities =
-        resolveEntities<api::analytics::EventTypeDescriptor>(commonModule, additionalEntities);
-
-    nx::utils::data_structures::MapHelper::merge(
-        &scopedEventTypeIds, resolvedEntities, nx::analytics::mergeEntityIds);
-
-    for (const auto& [engineId, eventTypeIdsByGroup]: scopedEventTypeIds)
+    for (const EngineScope<AbstractEventType>& engineScope: eventTypeTree)
     {
-        const auto engineDescriptor = engineDescriptorManager->descriptor(engineId);
-        // TODO: #dmishin here must be an assert. Return it back when we are fully moved to the new
-        // Taxononomy engine.
-        if (!engineDescriptor)
-            continue;
-
-        auto engine = makeNode(NodeType::engine, root, engineDescriptor->name);
+        auto engine = makeNode(NodeType::engine, root, engineScope.engine->name());
+        const QnUuid engineId(engineScope.engine->id());
         engine->engineId = engineId;
         root->children.push_back(engine);
 
-        for (const auto& [groupId, eventTypeIds]: eventTypeIdsByGroup)
+        for (const GroupScope<AbstractEventType>& groupScope: engineScope.groups)
         {
             NodePtr parentNode = engine;
 
-            const auto groupDescriptor = groupDescriptorManager->descriptor(groupId);
-            if (groupDescriptor)
+            const AbstractGroup* taxonomyGroup = groupScope.group;
+            if (taxonomyGroup)
             {
-                auto group = makeNode(NodeType::group, parentNode, groupDescriptor->name);
+                auto group = makeNode(NodeType::group, parentNode, taxonomyGroup->name());
                 group->engineId = engineId;
-                group->entityId = groupDescriptor->id;
+                group->entityId = taxonomyGroup->id();
                 engine->children.push_back(group);
                 parentNode = group;
             }
 
-            for (const auto& eventTypeId: eventTypeIds)
+            for (const auto& taxonomyEventType: groupScope.entities)
             {
-                const auto eventTypeDescriptor =
-                    eventTypeDescriptorManager->descriptor(eventTypeId);
-
-                if (!eventTypeDescriptor || eventTypeDescriptor->isHidden())
+                if (taxonomyEventType->isHidden())
                     continue;
 
                 auto eventType = makeNode(
-                    NodeType::eventType, parentNode, eventTypeDescriptor->name);
+                    NodeType::eventType, parentNode, taxonomyEventType->name());
                 eventType->engineId = engineId;
-                eventType->entityId = eventTypeDescriptor->id;
+                eventType->entityId = taxonomyEventType->id();
                 parentNode->children.push_back(eventType);
             }
         }
@@ -145,52 +110,41 @@ NodePtr buildEventTypesTree(
     return AnalyticsEntitiesTreeBuilder::cleanupTree(root);
 }
 
-NodePtr buildObjectTypesTree(QnCommonModule* commonModule, api::analytics::ScopedObjectTypeIds scopedObjectTypeIds)
+NodePtr buildObjectTypesTree(const std::vector<EngineScope<AbstractObjectType>>& objectTypeTree)
 {
-    const auto engineDescriptorManager = commonModule->analyticsEngineDescriptorManager();
-    const auto groupDescriptorManager = commonModule->analyticsGroupDescriptorManager();
-    const auto objectTypeDescriptorManager = commonModule->analyticsObjectTypeDescriptorManager();
-
     auto root = makeNode(NodeType::root, {});
 
-    for (const auto& [engineId, objectTypeIdsByGroup]: scopedObjectTypeIds)
+    for (const EngineScope<AbstractObjectType>& engineScope: objectTypeTree)
     {
-        const auto engineDescriptor = engineDescriptorManager->descriptor(engineId);
-        // TODO: #dmishin here must be an assert. Return it back when we are fully moved to the new
-        // Taxononomy engine.
-        if (!engineDescriptor)
+        const AbstractEngine* taxonomyEngine = engineScope.engine;
+        if (!NX_ASSERT(taxonomyEngine))
             continue;
 
-        auto engine = makeNode(NodeType::engine, root, engineDescriptor->name);
+        const QnUuid engineId = QnUuid::fromStringSafe(taxonomyEngine->id());
+        auto engine = makeNode(NodeType::engine, root, taxonomyEngine->name());
         engine->engineId = engineId;
         root->children.push_back(engine);
 
-        for (const auto& [groupId, objectTypeIds]: objectTypeIdsByGroup)
+        for (const GroupScope<AbstractObjectType>& groupScope: engineScope.groups)
         {
             NodePtr parentNode = engine;
 
-            const auto groupDescriptor = groupDescriptorManager->descriptor(groupId);
-            if (groupDescriptor)
+            const AbstractGroup* taxonomyGroup = groupScope.group;
+            if (taxonomyGroup)
             {
-                auto group = makeNode(NodeType::group, parentNode, groupDescriptor->name);
+                auto group = makeNode(NodeType::group, parentNode, taxonomyGroup->name());
                 group->engineId = engineId;
-                group->entityId = groupDescriptor->id;
+                group->entityId = taxonomyGroup->id();
                 engine->children.push_back(group);
                 parentNode = group;
             }
 
-            for (const auto& objectTypeId: objectTypeIds)
+            for (const AbstractObjectType* taxonomyObjectType: groupScope.entities)
             {
-                const auto objectTypeDescriptor =
-                    objectTypeDescriptorManager->descriptor(objectTypeId);
-
-                if (!objectTypeDescriptor)
-                    continue;
-
                 auto objectType = makeNode(
-                    NodeType::objectType, parentNode, objectTypeDescriptor->name);
+                    NodeType::objectType, parentNode, taxonomyObjectType->name());
                 objectType->engineId = engineId;
-                objectType->entityId = objectTypeDescriptor->id;
+                objectType->entityId = taxonomyObjectType->id();
                 parentNode->children.push_back(objectType);
             }
         }
@@ -326,11 +280,17 @@ NodePtr AnalyticsEntitiesTreeBuilder::eventTypesForRulesPurposes(
     const QnVirtualCameraResourceList& devices,
     const UnresolvedEntities& additionalUnresolvedEventTypes)
 {
+    std::shared_ptr<AbstractState> taxonomyState = commonModule->analyticsTaxonomyState();
+    if (!taxonomyState)
+        return NodePtr();
+
+    std::vector<ScopedEntity<AbstractEventType>> additionalScopedEventTypes =
+        resolveEntities<AbstractEventType>(taxonomyState, additionalUnresolvedEventTypes);
+
+    StateHelper stateHelper(taxonomyState);
+
     return buildEventTypesTree(
-        commonModule,
-        commonModule->analyticsEventTypeDescriptorManager()
-            ->compatibleEventTypeIdsIntersection(devices),
-        additionalUnresolvedEventTypes);
+        stateHelper.compatibleEventTypeTreeIntersection(devices, additionalScopedEventTypes));
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -425,8 +385,14 @@ NodePtr AnalyticsEventsSearchTreeBuilder::calculateEventTypesTree() const
 
     // TODO: #sivanov Shouldn't we filter out cameras here the same way?
     const auto devices = resourcePool()->getAllCameras(QnUuid(), /*ignoreDesktopCameras*/ true);
-    const auto manager = commonModule()->analyticsEventTypeDescriptorManager();
-    auto tree = buildEventTypesTree(commonModule(), manager->compatibleEventTypeIdsUnion(devices));
+
+    const std::shared_ptr<AbstractState> taxonomyState = commonModule()->analyticsTaxonomyState();
+    if (!taxonomyState)
+        return NodePtr();
+
+    const StateHelper stateHelper(taxonomyState);
+    auto tree = buildEventTypesTree(
+        stateHelper.compatibleEventTypeTreeUnion(devices));
 
     return AnalyticsEntitiesTreeBuilder::filterTreeInclusive(tree,
         [actuallyUsedEventTypes](NodePtr node)
@@ -470,8 +436,12 @@ AnalyticsObjectsSearchTreeBuilder::AnalyticsObjectsSearchTreeBuilder(QObject* pa
 AnalyticsEntitiesTreeBuilder::NodePtr AnalyticsObjectsSearchTreeBuilder::objectTypesTree() const
 {
     const auto devices = resourcePool()->getAllCameras(QnUuid(), /*ignoreDesktopCameras*/ true);
-    const auto manager = commonModule()->analyticsObjectTypeDescriptorManager();
-    return buildObjectTypesTree(commonModule(), manager->compatibleObjectTypeIdsUnion(devices));
+    const std::shared_ptr<AbstractState> taxonomyState = commonModule()->analyticsTaxonomyState();
+    if (!taxonomyState)
+        return NodePtr();
+
+    StateHelper stateHelper(taxonomyState);
+    return buildObjectTypesTree(stateHelper.compatibleObjectTypeTreeUnion(devices));
 }
 
 } // namespace nx::vms::client::desktop

@@ -14,7 +14,12 @@ struct CameraResourceStub::Private
 {
     Qn::LicenseType licenseType = Qn::LicenseType::LC_Count; //< TODO: #sivanov Replace with optional.
     std::optional<bool> hasDualStreaming;
+
     QMap<QnUuid, std::set<QString>> supportedObjectTypes;
+    QMap<QnUuid, std::set<QString>> supportedEventTypes;
+
+    std::optional<QnUuidSet> enabledAnalyticsEngines;
+    std::optional<nx::vms::common::AnalyticsEngineResourceList> compatibleAnalyticsEngineResources;
 };
 
 CameraResourceStub::CameraResourceStub(Qn::LicenseType licenseType):
@@ -140,9 +145,22 @@ void CameraResourceStub::setAnalyticsObjectsEnabled(bool value, const QnUuid& en
 
 QSet<QnUuid> CameraResourceStub::enabledAnalyticsEngines() const
 {
-    return !d->supportedObjectTypes.empty()
+    if (d->enabledAnalyticsEngines)
+        return *d->enabledAnalyticsEngines;
+
+    return !d->supportedObjectTypes.empty() || !d->supportedEventTypes.empty()
         ? nx::utils::toQSet(d->supportedObjectTypes.keys())
+              .unite(nx::utils::toQSet(d->supportedEventTypes.keys()))
         : base_type::enabledAnalyticsEngines();
+}
+
+nx::vms::common::AnalyticsEngineResourceList
+    CameraResourceStub::compatibleAnalyticsEngineResources() const
+{
+    if (d->compatibleAnalyticsEngineResources)
+        return *d->compatibleAnalyticsEngineResources;
+
+    return base_type::compatibleAnalyticsEngineResources();
 }
 
 std::map<QnUuid, std::set<QString>> CameraResourceStub::supportedObjectTypes(
@@ -153,10 +171,39 @@ std::map<QnUuid, std::set<QString>> CameraResourceStub::supportedObjectTypes(
         : base_type::supportedObjectTypes(filterByEngines);
 }
 
+std::map<QnUuid, std::set<QString>> CameraResourceStub::supportedEventTypes() const
+{
+    return !d->supportedEventTypes.empty()
+        ? d->supportedEventTypes.toStdMap()
+        : base_type::supportedEventTypes();
+}
+
 void CameraResourceStub::setSupportedObjectTypes(
     const QMap<QnUuid, std::set<QString>>& supportedObjectTypes)
 {
     d->supportedObjectTypes = supportedObjectTypes;
+    emit compatibleObjectTypesMaybeChanged(toSharedPointer(this));
+}
+
+void CameraResourceStub::setSupportedEventTypes(
+    const QMap<QnUuid, std::set<QString>>& supportedObjectTypes)
+{
+    d->supportedEventTypes = supportedObjectTypes;
+    emit compatibleEventTypesMaybeChanged(toSharedPointer(this));
+}
+
+void CameraResourceStub::setEnabledAnalyticsEngines(QnUuidSet engines)
+{
+    d->enabledAnalyticsEngines = std::move(engines);
+    emit compatibleEventTypesMaybeChanged(toSharedPointer(this));
+    emit compatibleObjectTypesMaybeChanged(toSharedPointer(this));
+}
+
+void CameraResourceStub::setCompatibleAnalyticsEngineResources(
+    nx::vms::common::AnalyticsEngineResourceList engines)
+{
+    d->compatibleAnalyticsEngineResources = std::move(engines);
+    emit compatibleEventTypesMaybeChanged(toSharedPointer(this));
     emit compatibleObjectTypesMaybeChanged(toSharedPointer(this));
 }
 

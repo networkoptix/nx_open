@@ -904,6 +904,8 @@ void RightPanelModelsAdapter::Private::setType(Type value)
 
 bool RightPanelModelsAdapter::Private::isAllowed() const
 {
+    using namespace nx::analytics::taxonomy;
+
     if (!m_context)
         return false;
 
@@ -937,8 +939,9 @@ bool RightPanelModelsAdapter::Private::isAllowed() const
             if (!hasPermissions)
                 return false;
 
-            const auto taxonomyWatcher = m_context->commonModule()->analyticsTaxonomyStateWatcher();
-            const auto objectTypes = taxonomyWatcher->state()->rootObjectTypes();
+            std::vector<AbstractObjectType*> objectTypes;
+            if (const auto state = m_context->commonModule()->analyticsTaxonomyState())
+                objectTypes = state->rootObjectTypes();
 
             return std::any_of(objectTypes.cbegin(), objectTypes.cend(),
                 [](nx::analytics::taxonomy::AbstractObjectType* objectType)

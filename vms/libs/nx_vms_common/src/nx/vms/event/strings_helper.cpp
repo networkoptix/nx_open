@@ -13,10 +13,8 @@
 #include <core/resource/user_resource.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <nx/analytics/engine_descriptor_manager.h>
-#include <nx/analytics/event_type_descriptor_manager.h>
-#include <nx/analytics/object_type_descriptor_manager.h>
 #include <nx/analytics/taxonomy/abstract_state_watcher.h>
+#include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/fusion/model_functions.h>
 #include <nx/network/nettools.h> //< For resolveAddress.
 #include <nx/network/url/url_builder.h>
@@ -45,6 +43,11 @@ QString poeConsumptionValue(double value)
 static const int kMaxValuesInGroup = 2;
 
 } // namespace
+
+using nx::analytics::taxonomy::AbstractState;
+using nx::analytics::taxonomy::AbstractEngine;
+using nx::analytics::taxonomy::AbstractEventType;
+using nx::analytics::taxonomy::AbstractObjectType;
 
 namespace nx {
 namespace vms {
@@ -355,11 +358,15 @@ QStringList StringsHelper::eventDescription(const AbstractActionPtr& action,
 
     if (!params.analyticsEngineId.isNull())
     {
-        const auto descriptor = m_context->analyticsEngineDescriptorManager()->descriptor(
-            params.analyticsEngineId);
+        const std::shared_ptr<AbstractState> taxonomyState = m_context->analyticsTaxonomyState();
+        if (taxonomyState)
+        {
+            const AbstractEngine* engineInfo =
+                taxonomyState->engineById(params.analyticsEngineId.toString());
 
-        if (descriptor)
-            result << tr("Plugin: %1").arg(descriptor->name);
+            if (engineInfo)
+                result << tr("Plugin: %1").arg(engineInfo->name());
+        }
     }
 
     if (eventType >= EventType::userDefinedEvent || eventType == EventType::analyticsSdkEvent)
@@ -885,11 +892,16 @@ QString StringsHelper::getAnalyticsSdkEventName(const EventParameters& params,
     const auto source = eventSource(params);
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();
 
-    const auto eventTypeDescriptor = camera && camera->systemContext()
-        ? camera->systemContext()->analyticsEventTypeDescriptorManager()->descriptor(eventTypeId)
-        : std::nullopt;
+    if (const std::shared_ptr<AbstractState> taxonomyState = m_context->analyticsTaxonomyState())
+    {
+        if (const AbstractEventType* eventType = taxonomyState->eventTypeById(eventTypeId);
+            camera && eventType)
+        {
+            return eventType->name();
+        }
+    }
 
-    return eventTypeDescriptor ? eventTypeDescriptor->name : tr("Analytics Event");
+    return tr("Analytics Event");
 }
 
 QString StringsHelper::getAnalyticsSdkObjectName(const EventParameters& params,
@@ -904,7 +916,7 @@ QString StringsHelper::getAnalyticsSdkObjectName(const EventParameters& params,
     const auto camera = source.dynamicCast<QnVirtualCameraResource>();
 
     const auto objectType = camera && camera->systemContext()
-        ? camera->systemContext()->analyticsTaxonomyStateWatcher()->state()->objectTypeById(objectTypeId)
+        ? camera->systemContext()->analyticsTaxonomyState()->objectTypeById(objectTypeId)
         : nullptr;
 
     return objectType ? objectType->name() : tr("Object detected");

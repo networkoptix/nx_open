@@ -35,6 +35,20 @@ std::map<QString, Descriptor> fromManifestItemListsToDescriptorMap(
 }
 
 template<typename Item>
+std::set<QString> fromManifestItemListToIds(
+    const std::vector<const QList<Item>*>& itemLists)
+{
+    std::set<QString> result;
+    for (const QList<Item>* const itemList: itemLists)
+    {
+        for (const auto& item: *itemList)
+            result.insert(item.id);
+    }
+
+    return result;
+}
+
+template<typename Item>
 std::set<QString> calculateSupportedTypeIds(
     const QList<QString>& supportedTypeIds,
     const QList<Item>& freeDeclaredTypes)

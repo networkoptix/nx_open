@@ -21,8 +21,8 @@
 #include <core/resource_access/resource_access_subject.h>
 #include <core/resource_management/resource_pool.h>
 #include <core/resource_management/user_roles_manager.h>
-#include <nx/analytics/event_type_descriptor_manager.h>
-#include <nx/vms/api/analytics/descriptors.h>
+#include <nx/analytics/taxonomy/abstract_state_watcher.h>
+#include <nx/analytics/taxonomy/abstract_state.h>
 #include <nx/vms/client/core/watchers/server_time_watcher.h>
 #include <nx/vms/client/desktop/style/resource_icon_cache.h>
 #include <nx/vms/common/html/html.h>
@@ -392,6 +392,8 @@ bool isAggregationDoneByCameras(const vms::event::ActionData& action)
 
 QString QnEventLogModel::textData(Column column, const vms::event::ActionData& action) const
 {
+    using namespace nx::analytics::taxonomy;
+
     switch (column)
     {
         case DateTimeColumn:
@@ -406,9 +408,15 @@ QString QnEventLogModel::textData(Column column, const vms::event::ActionData& a
         {
             if (action.eventParams.eventType == nx::vms::api::EventType::analyticsSdkEvent)
             {
-                const auto descriptor = commonModule()->analyticsEventTypeDescriptorManager()
-                    ->descriptor(action.eventParams.getAnalyticsEventTypeId());
-                QString eventName = descriptor ? descriptor->name : QString();
+                const std::shared_ptr<AbstractState> taxonomyState =
+                    commonModule()->analyticsTaxonomyState();
+
+                if (!taxonomyState)
+                    m_stringsHelper->eventName(action.eventParams.eventType);
+
+                const AbstractEventType* eventType = taxonomyState->eventTypeById(
+                    action.eventParams.getAnalyticsEventTypeId());
+                QString eventName = eventType ? eventType->name() : QString();
                 if (!eventName.isEmpty())
                     return eventName;
             }
