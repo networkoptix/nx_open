@@ -69,12 +69,17 @@ private:
     {
         valueSpinBox->setValue(field->value());
 
-        connect(valueSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this,
-            [this](int value)
-            {
-                field->setValue(value);
-                emit edited();
-            });
+        connect(valueSpinBox,
+            QOverload<int>::of(&QSpinBox::valueChanged),
+            this,
+            &NumberPickerWidget<F>::onValueChanged,
+            Qt::UniqueConnection);
+    }
+
+    void onValueChanged(int value)
+    {
+        field->setValue(value);
+        emit edited();
     }
 };
 

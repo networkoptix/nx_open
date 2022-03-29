@@ -9,26 +9,6 @@
 
 namespace nx::vms::rules {
 
-QString NotificationAction::caption() const
-{
-    return m_caption;
-}
-
-void NotificationAction::setCaption(const QString& caption)
-{
-    m_caption = caption;
-}
-
-QString NotificationAction::description() const
-{
-    return m_description;
-}
-
-void NotificationAction::setDescription(const QString& description)
-{
-    m_description = description;
-}
-
 const ItemDescriptor& NotificationAction::manifest()
 {
     static const auto kDescriptor = ItemDescriptor{
@@ -39,8 +19,14 @@ const ItemDescriptor& NotificationAction::manifest()
             makeFieldDescriptor<TargetUserField>("users", tr("To")),
             makeFieldDescriptor<OptionalTimeField>("interval", tr("Interval of action")),
             makeFieldDescriptor<FlagField>("acknowledge", tr("Force Acknowledgement")),
-            makeFieldDescriptor<TextWithFields>("caption", tr("Caption")),
-            makeFieldDescriptor<TextWithFields>("description", tr("Description"))
+            makeFieldDescriptor<TextWithFields>("caption", tr("Caption"), QString(),
+                {
+                    { "text", "{@EventName}" }
+                }),
+            makeFieldDescriptor<TextWithFields>("description", tr("Description"), QString(),
+                {
+                    { "text", "{@EventDescription}" }
+                })
         }
     };
     return kDescriptor;

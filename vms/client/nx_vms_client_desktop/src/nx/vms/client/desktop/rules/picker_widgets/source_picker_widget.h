@@ -116,15 +116,19 @@ private:
     {
         updateUi();
 
-        connect(selectResourceButton, &QPushButton::clicked, this,
-            [this]
-            {
-                select();
-                updateUi();
-
-                emit edited();
-            },
+        connect(selectResourceButton,
+            &QPushButton::clicked,
+            this,
+            &SourcePickerWidget<F>::onSelectResourceButtonClicked,
             Qt::UniqueConnection);
+    }
+
+    void onSelectResourceButtonClicked()
+    {
+        select();
+        updateUi();
+
+        emit edited();
     }
 
     QnSelectResourcesButton* createSelectButton()
@@ -139,9 +143,12 @@ private:
         auto resourceList = resourcePool->getResourcesByIds<QnUserResource>(field->ids());
 
         auto selectUsersButtonPtr = static_cast<QnSelectUsersButton*>(selectResourceButton);
-        selectUsersButtonPtr->selectUsers(resourceList);
+        if (field->acceptAll())
+            selectUsersButtonPtr->selectAll();
+        else
+            selectUsersButtonPtr->selectUsers(resourceList);
 
-        if (resourceList.isEmpty())
+        if (resourceList.isEmpty() && !field->acceptAll())
         {
             alertLabel->setText(tr("Select at least one User"));
             alertLabel->setVisible(true);
@@ -159,7 +166,8 @@ private:
         ui::SubjectSelectionDialog dialog(this);
         dialog.setAllUsers(field->acceptAll());
         dialog.setCheckedSubjects(selectedUsers);
-        dialog.exec();
+        if (dialog.exec() == QDialog::Rejected)
+            return;
 
         field->setAcceptAll(dialog.allUsers());
         field->setIds(dialog.totalCheckedUsers());

@@ -13,24 +13,16 @@ class NX_VMS_RULES_API NotificationAction: public nx::vms::rules::BasicAction
     Q_OBJECT
     Q_CLASSINFO("type", "nx.actions.desktopNotification")
 
-    FIELD(UuidSelection, users, setUsers)
+    FIELD(nx::vms::rules::UuidSelection, users, setUsers)
     FIELD(int, interval, setInterval)
     FIELD(bool, acknowledge, setAcknowledge)
-    Q_PROPERTY(QString caption READ caption WRITE setCaption)
-    Q_PROPERTY(QString description READ description WRITE setDescription)
+    FIELD(QString, caption, setCaption)
+    FIELD(QString, description, setDescription)
 
 public:
-    QString caption() const;
-    void setCaption(const QString& caption);
-
-    QString description() const;
-    void setDescription(const QString& caption);
-
     static const ItemDescriptor& manifest();
-
-private:
-    QString m_caption;
-    QString m_description;
 };
 
 } // namespace nx::vms::rules
+
+Q_DECLARE_METATYPE(QSharedPointer<nx::vms::rules::NotificationAction>)

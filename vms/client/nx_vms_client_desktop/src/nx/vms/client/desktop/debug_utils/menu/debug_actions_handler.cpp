@@ -15,7 +15,6 @@
 #include <nx/vms/client/desktop/testkit/testkit.h>
 #include <nx/vms/client/desktop/ui/actions/action_manager.h>
 #include <nx/vms/event/actions/common_action.h>
-#include <nx/vms/rules/action_executor.h>
 #include <nx/vms/rules/action_fields/substitution.h>
 #include <nx/vms/rules/engine.h>
 #include <nx/vms/rules/event_connector.h>
@@ -58,38 +57,9 @@ public:
     }
 };
 
-class DebugActionExecutor:
-    public ActionExecutor,
-    public QnCommonModuleAware,
-    public Singleton<DebugActionExecutor>
-{
-public:
-    DebugActionExecutor(QnCommonModule* commonModule): QnCommonModuleAware(commonModule){}
-
-    virtual void execute(const ActionPtr& action) override
-    {
-        // Assuming that now we have only one action type...
-        auto notif = (NotificationAction*)action.data();
-
-        nx::vms::event::EventParameters runtimeParams;
-        runtimeParams.eventType = nx::vms::api::EventType::userDefinedEvent;
-        runtimeParams.caption = notif->caption();
-        runtimeParams.description = notif->description();
-        nx::vms::event::AbstractActionPtr oldAction(
-            nx::vms::event::CommonAction::create(
-                nx::vms::api::ActionType::showPopupAction, runtimeParams));
-        auto params = oldAction->getParams();
-        params.allUsers = true;
-        oldAction->setParams(params);
-
-        emit commonModule()->messageProcessor()->businessActionReceived(oldAction);
-    }
-};
-
 } // namespace
 
 template<> DebugEventConnector* Singleton<DebugEventConnector>::s_instance = nullptr;
-template<> DebugActionExecutor* Singleton<DebugActionExecutor>::s_instance = nullptr;
 
 namespace nx::vms::client::desktop {
 
@@ -172,9 +142,7 @@ void DebugActionsHandler::registerDebugCounterActions()
 
     auto engine = commonModule()->vmsRulesEngine();
     auto connector = new DebugEventConnector(); // initialize instance
-    auto executor = new DebugActionExecutor(commonModule()); // initialize instance
     engine->addEventConnector(connector);
-    engine->addActionExecutor(rules::NotificationAction::manifest().id, executor);
 
     registerDebugAction(
         "Debug counter ++",

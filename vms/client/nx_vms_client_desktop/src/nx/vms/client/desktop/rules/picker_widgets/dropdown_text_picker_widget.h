@@ -79,17 +79,21 @@ private:
                 comboBox->setCurrentText(currentContentType);
         }
 
-        connect(comboBox, &QComboBox::currentTextChanged, this,
-            [this](const QString &text)
-            {
-                if (auto contentType = text.trimmed(); contentType != kAutoValue)
-                    field->setValue(contentType);
-                else
-                    field->setValue("");
-
-                emit edited();
-            },
+        connect(comboBox,
+            &QComboBox::currentTextChanged,
+            this,
+            &DropdownTextPickerWidget<F>::onCurrentTextChanged,
             Qt::UniqueConnection);
+    }
+
+    void onCurrentTextChanged(const QString& text)
+    {
+        if (auto contentType = text.trimmed(); contentType != kAutoValue)
+            field->setValue(contentType);
+        else
+            field->setValue("");
+
+        emit edited();
     }
 
     QComboBox* createComboBox();

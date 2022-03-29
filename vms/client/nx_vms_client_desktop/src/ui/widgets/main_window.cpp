@@ -67,6 +67,7 @@
 #include <ui/workbench/handlers/workbench_alarm_layout_handler.h>
 #include <ui/workbench/handlers/workbench_bookmarks_handler.h>
 #include <ui/workbench/handlers/workbench_layouts_handler.h>
+#include <ui/workbench/handlers/workbench_notifications_executor.h>
 #include <ui/workbench/handlers/workbench_notifications_handler.h>
 #include <ui/workbench/handlers/workbench_permissions_handler.h>
 #include <ui/workbench/handlers/workbench_ptz_handler.h>
@@ -259,6 +260,7 @@ MainWindow::MainWindow(QnWorkbenchContext *context, QWidget *parent, Qt::WindowF
     context->instance<ui::workbench::ActionHandler>();
     context->instance<ConnectActionsHandler>();
     context->instance<QnWorkbenchNotificationsHandler>();
+    context->instance<QnWorkbenchNotificationsExecutor>();
     context->instance<QnWorkbenchScreenshotHandler>();
     context->instance<WorkbenchExportHandler>();
     context->instance<ui::workbench::LayoutsHandler>();

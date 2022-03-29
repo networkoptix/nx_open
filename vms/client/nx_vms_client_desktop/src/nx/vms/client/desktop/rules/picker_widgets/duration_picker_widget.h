@@ -69,13 +69,17 @@ private:
             timeDurationWidget->setValue(field->value());
         }
 
-        connect(timeDurationWidget, &TimeDurationWidget::valueChanged, this,
-            [this]
-            {
-                field->setValue(timeDurationWidget->value());
-                emit edited();
-            },
+        connect(timeDurationWidget,
+            &TimeDurationWidget::valueChanged,
+            this,
+            &DurationPickerWidget::onValueChanged,
             Qt::UniqueConnection);
+    }
+
+    void onValueChanged()
+    {
+        field->setValue(timeDurationWidget->value());
+        emit edited();
     }
 };
 

@@ -46,13 +46,17 @@ private:
             ui->stateCheckBox->setChecked(field->value());
         }
 
-        connect(ui->stateCheckBox, &QCheckBox::stateChanged, this,
-            [this](int state)
-            {
-                field->setValue(state == Qt::Checked);
-                emit edited();
-            },
+        connect(ui->stateCheckBox,
+            &QCheckBox::stateChanged,
+            this,
+            &StatePickerWidget<F>::onStateChanged,
             Qt::UniqueConnection);
+    }
+
+    void onStateChanged(int state)
+    {
+        field->setValue(state == Qt::Checked);
+        emit edited();
     }
 };
 

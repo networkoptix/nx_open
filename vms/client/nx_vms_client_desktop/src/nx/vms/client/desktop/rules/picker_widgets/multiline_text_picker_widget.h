@@ -53,13 +53,17 @@ private:
             ui->textEdit->setText(text());
         }
 
-        connect(ui->textEdit, &QTextEdit::textChanged, this,
-            [this]
-            {
-                setText(ui->textEdit->toPlainText());
-                emit edited();
-            },
+        connect(ui->textEdit,
+            &QTextEdit::textChanged,
+            this,
+            &MultilineTextPickerWidget<F>::onTextChanged,
             Qt::UniqueConnection);
+    }
+
+    void onTextChanged()
+    {
+        setText(ui->textEdit->toPlainText());
+        emit edited();
     }
 
     QString text();
