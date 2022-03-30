@@ -9,12 +9,7 @@ if(withTests)
     add_subdirectory(googletest)
 endif()
 
-
 if(withDesktopClient)
-    if(WINDOWS)
-        add_subdirectory(detours)
-    endif()
-
     add_subdirectory(qthttpserver)
 endif()
 
