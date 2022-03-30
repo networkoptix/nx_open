@@ -222,6 +222,11 @@ bool QmlDialogWrapper::exec(Qt::WindowModality modality)
     const int result = d->eventLoop.exec();
     d->window->setModality(oldModality);
 
+    // For some reason if a dialog is closed by the [X] button or via the system menu,
+    // MS Windows passes activity to another application. So this workaround is required.
+    if (d->window->transientParent())
+        d->window->transientParent()->requestActivate();
+
     return result == 0;
 }
 
