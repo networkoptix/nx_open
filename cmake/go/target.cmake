@@ -72,15 +72,25 @@ function(nx_go_build target working_dir package_path)
     if(GO_BUILD_FOLDER)
         set_target_properties(${target} PROPERTIES FOLDER ${GO_BUILD_FOLDER})
     endif()
-
-    add_custom_command(
-        OUTPUT ${CMAKE_BINARY_DIR}/bin/${target_exe}
-        WORKING_DIRECTORY ${working_dir}
-        DEPENDS ${GO_BUILD_DEPENDS}
-        COMMAND ${CMAKE_COMMAND} -E env CGO_ENABLED=0 ${NX_GO_COMPILER} build ${package_path}
-        COMMAND ${CMAKE_COMMAND} -E copy ${target_exe} ${CMAKE_BINARY_DIR}/bin
-        COMMAND ${CMAKE_COMMAND} -E remove -f ${target_exe}
-    )
+    if (WIN32)
+        add_custom_command(
+            OUTPUT ${CMAKE_BINARY_DIR}/bin/${target_exe}
+            WORKING_DIRECTORY ${working_dir}
+            DEPENDS ${GO_BUILD_DEPENDS}
+            COMMAND ${CMAKE_COMMAND} -E env PATH="${CONAN_MINGW-W64_ROOT}/bin" ${NX_GO_COMPILER} build ${package_path}
+            COMMAND ${CMAKE_COMMAND} -E copy ${target_exe} ${CMAKE_BINARY_DIR}/bin
+            COMMAND ${CMAKE_COMMAND} -E remove -f ${target_exe}
+        )
+    else()
+        add_custom_command(
+            OUTPUT ${CMAKE_BINARY_DIR}/bin/${target_exe}
+            WORKING_DIRECTORY ${working_dir}
+            DEPENDS ${GO_BUILD_DEPENDS}
+            COMMAND ${NX_GO_COMPILER} build ${package_path}
+            COMMAND ${CMAKE_COMMAND} -E copy ${target_exe} ${CMAKE_BINARY_DIR}/bin
+            COMMAND ${CMAKE_COMMAND} -E remove -f ${target_exe}
+        )
+    endif()
 
     if(GO_BUILD_C_GO_INCLUDE_DIRECTORY)
         file(GLOB_RECURSE all_go_files FOLLOW_SYMLINKS "${working_dir}/*.go")
