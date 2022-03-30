@@ -71,15 +71,34 @@ function(nx_go_build_test target working_dir package_path)
 
     nx_go_fix_target_exe(${target} target_exe)
 
-    add_custom_command(
-        TARGET ${target}
-        WORKING_DIRECTORY ${working_dir}
-        DEPENDS ${GO_BUILD_TEST_DEPENDS}
-        COMMAND ${NX_GO_COMPILER} test -c ${package_path} -o ${target_exe}
-        COMMAND ${CMAKE_COMMAND} -E copy ${target_exe} ${CMAKE_BINARY_DIR}/bin
-        COMMAND ${CMAKE_COMMAND} -E remove -f ${target_exe}
-    )
-
+    if (WIN32)
+        add_custom_command(
+            TARGET ${target}
+            WORKING_DIRECTORY ${working_dir}
+            DEPENDS ${GO_BUILD_TEST_DEPENDS}
+            COMMAND COMMAND ${CMAKE_COMMAND} -E env PATH="${CONAN_MINGW-W64_ROOT}/bin" ${NX_GO_COMPILER} test -c ${package_path} -o ${target_exe}
+            COMMAND ${CMAKE_COMMAND} -E copy ${target_exe} ${CMAKE_BINARY_DIR}/bin
+            COMMAND ${CMAKE_COMMAND} -E remove -f ${target_exe}
+        )    
+    else() 
+        add_custom_command(
+            TARGET ${target}
+            WORKING_DIRECTORY ${working_dir}
+            DEPENDS ${GO_BUILD_TEST_DEPENDS}
+            COMMAND ${NX_GO_COMPILER} test -c ${package_path} -o ${target_exe}
+            COMMAND ${CMAKE_COMMAND} -E copy ${target_exe} ${CMAKE_BINARY_DIR}/bin
+            COMMAND ${CMAKE_COMMAND} -E remove -f ${target_exe}
+        )
+    endif()
+	
+	if (EXISTS "${working_dir}/${package_path}/test_data/${target}")
+	    add_custom_command(
+            TARGET ${target}
+            WORKING_DIRECTORY ${working_dir}
+			COMMAND ${CMAKE_COMMAND} -E copy_directory ${package_path}/test_data/${target} ${CMAKE_BINARY_DIR}/bin/test_data/${target}
+	    )
+    endif()
+	
     add_test(NAME ${target} COMMAND ${CMAKE_BINARY_DIR}/bin/${target_exe})
 
     # NOTE: unit_tests is a custom target set in open/cmake/test_utils.cmake
