@@ -27,16 +27,17 @@
 #include <ui/dialogs/common/message_box.h>
 #include <ui/workbench/workbench_context.h>
 #include <utils/camera/camera_replacement.h>
-#include <utils/common/event_processors.h>
 
 namespace {
 
 using namespace nx::vms::client::desktop;
 
+static constexpr int kDialogFixedWidth = 640;
 static constexpr int kHeaderCaptionTextPixelSize = 24;
 static constexpr auto kHeaderCaptionTextWeight = QFont::ExtraLight;
+static constexpr auto kEmDashChar = QChar(0x2014);
 
-bool showServersInTree(QnWorkbenchContext* context)
+bool showServersInTree(const QnWorkbenchContext* context)
 {
     // No other checks, the dialog is accessible for administrators only.
     return context->resourceTreeSettings()->showServersInTree();
@@ -47,7 +48,7 @@ QString makeCameraNameRichText(const QString& cameraName, const QString& extraIn
     using namespace nx::vms::common;
 
     static const auto kHighlightedNameTextColor = colorTheme()->color("light4");
-    static const auto kExtraInfoTextColor = colorTheme()->color("dark17");
+    static const auto kExtraInfoTextColor = colorTheme()->color("light10");
 
     const auto cameraNameRichText = html::bold(html::colored(cameraName, kHighlightedNameTextColor));
     const auto extraInfoRichText = html::colored(extraInfo, kExtraInfoTextColor);
@@ -74,44 +75,51 @@ void clearLayoutContents(QLayout* layout)
     }
 }
 
-// Creates horizontal layout that contains 'success' icon following by the appropriately stylized
-// caption text.
-QLayout* createDataTransferSuccessItem(const QString& captionText)
-{
-    using namespace nx::vms::common;
-
-    static const auto kCaptionTextColor = colorTheme()->color("light10");
-
-    auto horizontalLayout = new QHBoxLayout();
-    horizontalLayout->setContentsMargins({});
-    horizontalLayout->setSpacing(nx::style::Metrics::kDefaultLayoutSpacing.width());
-
-    auto successIconLabel = new QLabel();
-    successIconLabel->setPixmap(qnSkin->pixmap("camera_replacement/success.svg"));
-
-    auto captionLabel = new QLabel(html::bold(captionText));
-    setPaletteColor(captionLabel, QPalette::WindowText, kCaptionTextColor);
-
-    horizontalLayout->addWidget(successIconLabel, /*stretch*/ 0);
-    horizontalLayout->addWidget(captionLabel, /*stretch*/ 1);
-
-    return horizontalLayout;
-}
-
-// Creates grid layout that contains caption block with 'warning' icon and appropriately stylized
-// caption text optionally following by number of separate lines with description messages.
-QLayout* createDataTransferWarningItem(
+// Creates grid layout that contains:
+// - Caption row with an icon that corresponds to the given item type
+// - Rows with additional description text lines
+// All texts are stylized appropriately depending on the given item type as well.
+QLayout* createDataTransferReportItem(
     const QString& captionText,
-    const QStringList& descriptionLines = QStringList())
+    const QStringList& descriptionTextLines,
+    nx::vms::api::DeviceReplacementInfo::Level itemType)
 {
     using namespace nx::vms::common;
+    using namespace nx::vms::api;
 
     static constexpr auto kIconColumn = 0;
     static constexpr auto kTextColumn = 1;
     static constexpr auto kCaptionRow = 0;
 
-    static const auto kCaptionTextColor = colorTheme()->color("yellow_core");
-    static const auto kDescriptionTextColor = colorTheme()->color("yellow_d2");
+    QColor captionTextColor;
+    QColor descriptionTextColor;
+    QPixmap iconPixmap;
+
+    switch (itemType)
+    {
+        case DeviceReplacementInfo::Level::info:
+            captionTextColor = colorTheme()->color("light10");
+            descriptionTextColor = colorTheme()->color("light10");
+            iconPixmap = qnSkin->pixmap("camera_replacement/success.svg");
+            break;
+
+        case DeviceReplacementInfo::Level::warning:
+            captionTextColor = colorTheme()->color("yellow_core");
+            descriptionTextColor = colorTheme()->color("yellow_d2");
+            iconPixmap = qnSkin->pixmap("camera_replacement/warning.svg");
+            break;
+
+        case DeviceReplacementInfo::Level::error:
+        case DeviceReplacementInfo::Level::critical:
+            captionTextColor = colorTheme()->color("red_l2");
+            descriptionTextColor = colorTheme()->color("red_l1");
+            iconPixmap = qnSkin->pixmap("camera_replacement/error.svg");
+            break;
+
+        default:
+            NX_ASSERT(false);
+            break;
+    }
 
     QGridLayout* gridLayout = new QGridLayout();
     gridLayout->setContentsMargins({});
@@ -119,21 +127,21 @@ QLayout* createDataTransferWarningItem(
     gridLayout->setVerticalSpacing(nx::style::Metrics::kDefaultLayoutSpacing.height() / 2);
 
     auto warningIconLabel = new QLabel();
-    warningIconLabel->setPixmap(qnSkin->pixmap("camera_replacement/warning.svg"));
+    warningIconLabel->setPixmap(iconPixmap);
 
     auto captionLabel = new QLabel(html::bold(captionText));
-    setPaletteColor(captionLabel, QPalette::WindowText, kCaptionTextColor);
+    setPaletteColor(captionLabel, QPalette::WindowText, captionTextColor);
 
     gridLayout->addWidget(warningIconLabel, kCaptionRow, kIconColumn);
     gridLayout->addWidget(captionLabel, kCaptionRow, kTextColumn);
     gridLayout->setColumnStretch(kIconColumn, 0);
     gridLayout->setColumnStretch(kTextColumn, 1);
 
-    for (const auto& descriptionLine: descriptionLines)
+    for (const auto& descriptionLine: descriptionTextLines)
     {
         auto descriptionLabel = new QnWordWrappedLabel();
         descriptionLabel->setText(descriptionLine);
-        setPaletteColor(descriptionLabel, QPalette::WindowText, kDescriptionTextColor);
+        setPaletteColor(descriptionLabel, QPalette::WindowText, descriptionTextColor);
         gridLayout->addWidget(descriptionLabel, gridLayout->rowCount() + 1, kTextColumn);
     }
 
@@ -141,28 +149,16 @@ QLayout* createDataTransferWarningItem(
 }
 
 ResourceSelectionWidget::EntityFactoryFunction treeEntityCreationFunction(
-    CameraReplacementDialog::SelectedCameraPurpose selectedCameraPurpose,
     bool showServersInTree)
 {
     using namespace nx::vms::common::utils;
 
-    DetailedResourceTreeWidget::ResourceFilter resourceFilter;
-    switch (selectedCameraPurpose)
-    {
-        case CameraReplacementDialog::CameraToBeReplaced:
-            resourceFilter = camera_replacement::cameraCanBeReplaced;
-            break;
-
-        case CameraReplacementDialog::ReplacementCamera:
-            resourceFilter = camera_replacement::cameraCanBeUsedAsReplacement;
-            break;
-    };
-
     return
-        [showServersInTree, resourceFilter]
-        (const entity_resource_tree::ResourceTreeEntityBuilder* builder)
+        [showServersInTree](const entity_resource_tree::ResourceTreeEntityBuilder* builder)
         {
-            return builder->createDialogAllCamerasEntity(showServersInTree, resourceFilter);
+            return builder->createDialogAllCamerasEntity(
+                showServersInTree,
+                camera_replacement::cameraCanBeUsedAsReplacement);
         };
 }
 
@@ -174,16 +170,15 @@ struct CameraReplacementDialog::Private
 {
     CameraReplacementDialog* const q;
 
-    SelectedCameraPurpose selectedCameraPurpose;
     QnVirtualCameraResourcePtr cameraToBeReplaced;
     QnVirtualCameraResourcePtr replacementCamera;
     ResourceSelectionWidget* resourceSelectionWidget;
     std::optional<nx::vms::api::DeviceReplacementResponse> deviceReplacementResponce;
+    bool requestInProgress = false;
 };
 
 CameraReplacementDialog::CameraReplacementDialog(
-    SelectedCameraPurpose selectedCameraPurpose,
-    const QnVirtualCameraResourcePtr& otherCamera,
+    const QnVirtualCameraResourcePtr& cameraToBeReplaced,
     QWidget* parent)
     :
     base_type(parent),
@@ -191,18 +186,9 @@ CameraReplacementDialog::CameraReplacementDialog(
     d(new Private{this})
 {
     ui->setupUi(this);
-    d->selectedCameraPurpose = selectedCameraPurpose;
+    setFixedWidth(kDialogFixedWidth);
 
-    switch (d->selectedCameraPurpose)
-    {
-        case CameraToBeReplaced:
-            d->replacementCamera = otherCamera;
-            break;
-
-        case ReplacementCamera:
-            d->cameraToBeReplaced = otherCamera;
-            break;
-    }
+    d->cameraToBeReplaced = cameraToBeReplaced;
 
     d->resourceSelectionWidget =
         new ResourceSelectionWidget(this, resource_selection_view::ColumnCount);
@@ -212,7 +198,7 @@ CameraReplacementDialog::CameraReplacementDialog(
     d->resourceSelectionWidget->setDetailsPanelHidden(true);
     d->resourceSelectionWidget->setSelectionMode(ResourceSelectionMode::ExclusiveSelection);
     d->resourceSelectionWidget->setTreeEntityFactoryFunction(
-        treeEntityCreationFunction(d->selectedCameraPurpose, showServersInTree(context())));
+        treeEntityCreationFunction(showServersInTree(context())));
 
     setupUiContols();
     resize(minimumSizeHint());
@@ -225,16 +211,7 @@ CameraReplacementDialog::CameraReplacementDialog(
             const auto selectedCamera = d->resourceSelectionWidget->selectedResource()
                 .dynamicCast<QnVirtualCameraResource>();
 
-            switch (d->selectedCameraPurpose)
-            {
-                case CameraToBeReplaced:
-                    d->cameraToBeReplaced = selectedCamera;
-                    break;
-
-                case ReplacementCamera:
-                    d->replacementCamera = selectedCamera;
-                    break;
-            };
+            d->replacementCamera = selectedCamera;
 
             updateButtons();
         });
@@ -282,7 +259,17 @@ int CameraReplacementDialog::exec()
 
 void CameraReplacementDialog::closeEvent(QCloseEvent* event)
 {
-    if (dialogState() == ReplacementSummary)
+    const auto failedDryRunRequest =
+        dialogState() == ReplacementApproval
+        && !d->requestInProgress
+        && !d->deviceReplacementResponce;
+
+    const auto incompatibleDryRunResponse =
+        dialogState() == ReplacementApproval
+        && d->deviceReplacementResponce
+        && !d->deviceReplacementResponce->compatible;
+
+    if (dialogState() == ReplacementSummary || failedDryRunRequest || incompatibleDryRunResponse)
     {
         base_type::closeEvent(event);
         return;
@@ -298,46 +285,18 @@ void CameraReplacementDialog::closeEvent(QCloseEvent* event)
     event->setAccepted(pressedButton == QDialogButtonBox::Yes);
 }
 
-void CameraReplacementDialog::setDialogState(DialogState state)
-{
-    switch (state)
-    {
-        case CameraSelection:
-            d->deviceReplacementResponce.reset();
-            clearLayoutContents(ui->dataTransferContentsLayout);
-            ui->stackedWidget->setCurrentWidget(ui->cameraSelectionPage);
-            break;
-
-        case ReplacementApproval:
-            ui->stackedWidget->setCurrentWidget(ui->dataTransferReportPage);
-            makeReplacementRequest(/*getReportOnly*/ true);
-            break;
-
-        case ReplacementSummary:
-            ui->stackedWidget->setCurrentWidget(ui->cameraReplacementSummaryPage);
-            updateReplacementSummaryPage();
-            makeReplacementRequest(/*getReportOnly*/ false);
-            break;
-
-        default:
-            NX_ASSERT(false);
-            break;
-    }
-
-    updateButtons();
-    updateHeader();
-}
-
 void CameraReplacementDialog::onNextButtonClicked()
 {
     switch (dialogState())
     {
         case CameraSelection:
-            setDialogState(ReplacementApproval);
+            ui->stackedWidget->setCurrentWidget(ui->dataTransferReportPage);
+            makeReplacementRequest(/*getReportOnly*/ true);
             break;
 
         case ReplacementApproval:
-            setDialogState(ReplacementSummary);
+            updateReplacementSummaryPage();
+            makeReplacementRequest(/*getReportOnly*/ false);
             break;
 
         case ReplacementSummary:
@@ -352,6 +311,9 @@ void CameraReplacementDialog::onNextButtonClicked()
             NX_ASSERT(false);
             break;
     };
+
+    updateButtons();
+    updateHeader();
 }
 
 void CameraReplacementDialog::onBackButtonClicked()
@@ -359,23 +321,33 @@ void CameraReplacementDialog::onBackButtonClicked()
     switch (dialogState())
     {
         case ReplacementApproval:
-            setDialogState(CameraSelection);
+            d->deviceReplacementResponce.reset();
+            clearLayoutContents(ui->dataTransferContentsLayout);
+            ui->stackedWidget->setCurrentWidget(ui->cameraSelectionPage);
             break;
 
         default:
             NX_ASSERT(false);
             break;
     };
+
+    updateButtons();
+    updateHeader();
 }
 
 void CameraReplacementDialog::makeReplacementRequest(bool getReportOnly)
 {
     using namespace nx::vms::api;
 
+    if (!NX_ASSERT(!d->requestInProgress))
+        return;
+
     const auto callback = nx::utils::guarded(this,
         [this, getReportOnly]
         (bool success, rest::Handle requestId, DeviceReplacementResponse replacementResponce)
         {
+            d->requestInProgress = false;
+
             if (success)
                 d->deviceReplacementResponce = replacementResponce;
             else
@@ -386,7 +358,25 @@ void CameraReplacementDialog::makeReplacementRequest(bool getReportOnly)
                 updateDataTransferReportPage();
                 updateButtons();
             }
+            else
+            {
+                if (d->deviceReplacementResponce && d->deviceReplacementResponce->compatible)
+                {
+                    ui->stackedWidget->setCurrentWidget(ui->cameraReplacementSummaryPage);
+                    updateButtons();
+                    updateHeader();
+                }
+                else
+                {
+                    // TODO: #vbreus Show error description from response if there is any.
+                    QnMessageBox::critical(this, tr("Failed to replace camera"), {},
+                        QDialogButtonBox::Ok, QDialogButtonBox::Ok);
+                    reject();
+                }
+            }
         });
+
+        d->requestInProgress = true;
 
         connectedServerApi()->replaceDevice(
             d->cameraToBeReplaced->getId(),
@@ -401,10 +391,9 @@ void CameraReplacementDialog::setupUiContols()
     // Buttons appearance.
     setAccentStyle(ui->nextButton);
 
-    // Data transfer report scroll area width constraint.
+    // Data transfer report scroll area properties.
     ui->scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    installEventHandler(ui->scrollArea, QEvent::Resize, this,
-        [this] { ui->dataTransferReportWidget->setFixedWidth(ui->scrollArea->width()); });
+    ui->scrollArea->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
     // Header appearance.
     static const auto kHeaderBackgroundColor = colorTheme()->color("dark8");
@@ -428,27 +417,51 @@ void CameraReplacementDialog::setupUiContols()
 
 void CameraReplacementDialog::updateDataTransferReportPage()
 {
+    using namespace nx::vms::api;
+
     clearLayoutContents(ui->dataTransferContentsLayout);
 
     if (!d->deviceReplacementResponce)
     {
-        ui->dataTransferContentsLayout->addLayout(createDataTransferWarningItem(
-            tr("Unable to replace camera")));
+        ui->dataTransferContentsLayout->addLayout(createDataTransferReportItem(
+            tr("Unable to replace camera"), {}, DeviceReplacementInfo::Level::critical));
+        ui->dataTransferContentsLayout->addStretch();
+        return;
     }
 
     if (!d->deviceReplacementResponce->compatible)
     {
-        ui->dataTransferContentsLayout->addLayout(createDataTransferWarningItem(
-            tr("Unable to replace camera"), {tr("Cameras are not compatible")}));
+        // TODO: #vbreus Show error description from response if there is any.
+        ui->dataTransferContentsLayout->addLayout(createDataTransferReportItem(
+            tr("Unable to replace camera"),
+            {tr("Cameras are not compatible")},
+            DeviceReplacementInfo::Level::critical));
     }
     else
     {
-        const auto report = d->deviceReplacementResponce->report;
-        for (auto reportItr = report.cbegin(); reportItr != report.end(); ++reportItr)
+        const auto& report = d->deviceReplacementResponce.value().report;
+        for (const auto& reportItem: report)
         {
-            QStringList warnings(reportItr->messages.cbegin(), reportItr->messages.cend());
-            ui->dataTransferContentsLayout->addLayout(
-                createDataTransferWarningItem(reportItr->name, warnings));
+            QStringList descriptionLines(reportItem.messages.cbegin(), reportItem.messages.cend());
+
+            // Description messages from the report item are prepended with the dash prefix.
+            for (auto& descriptionLine: descriptionLines)
+                descriptionLine = QStringList({{kEmDashChar}, descriptionLine}).join(QChar::Space);
+
+            // Additional sub caption message is added for detailed warning and error report items.
+            if (!descriptionLines.empty())
+            {
+                if (reportItem.level == DeviceReplacementInfo::Level::warning)
+                    descriptionLines.push_front(tr("Will be transferred partially:"));
+
+                if (reportItem.level == DeviceReplacementInfo::Level::error)
+                    descriptionLines.push_front(tr("Will not be transferred:"));
+            }
+
+            ui->dataTransferContentsLayout->addLayout(createDataTransferReportItem(
+                reportItem.name,
+                descriptionLines,
+                reportItem.level));
         }
     }
 
@@ -457,12 +470,6 @@ void CameraReplacementDialog::updateDataTransferReportPage()
 
 void CameraReplacementDialog::updateReplacementSummaryPage()
 {
-    // TODO: #vbreus Actual camera replacement request may be unsuccessful. Update implementation
-    // as specification will be specification will be updated regarding such case.
-
-    if (dialogState() != ReplacementSummary)
-        return;
-
     static const auto kCaptionTextColor = colorTheme()->color("light10");
     static const auto kCameraPixmap = qnResIconCache->icon(QnResourceIconCache::Camera)
         .pixmap(nx::style::Metrics::kDefaultIconSize, QIcon::Selected);
@@ -470,14 +477,13 @@ void CameraReplacementDialog::updateReplacementSummaryPage()
     setPaletteColor(ui->replacedCameraCaptionLabel, QPalette::WindowText, kCaptionTextColor);
     setPaletteColor(ui->replacementCameraCaptionLabel, QPalette::WindowText, kCaptionTextColor);
 
-    ui->replacedCameraIconLabel->setPixmap(kCameraPixmap);
-    ui->replacedCameraNameLabel->setText(makeCameraNameRichText(
-        d->cameraToBeReplaced->getName(),
-        QnResourceDisplayInfo(d->replacementCamera).host()));
-
     ui->replacementCameraIconLabel->setPixmap(kCameraPixmap);
     ui->replacementCameraNameLabel->setText(makeCameraNameRichText(
         d->replacementCamera->getName()));
+
+    ui->replacedCameraNameLabel->setText(makeCameraNameRichText(
+        d->cameraToBeReplaced->getName(),
+        QnResourceDisplayInfo(d->replacementCamera).host()));
 }
 
 void CameraReplacementDialog::updateButtons()
@@ -492,9 +498,11 @@ void CameraReplacementDialog::updateButtons()
             break;
 
         case ReplacementApproval:
-            ui->nextButton->setEnabled(
-                d->deviceReplacementResponce && d->deviceReplacementResponce->compatible);
+            ui->nextButton->setEnabled(d->deviceReplacementResponce
+                && d->deviceReplacementResponce->compatible
+                && !d->requestInProgress);
             ui->nextButton->setText(tr("Next"));
+            ui->backButton->setEnabled(!d->requestInProgress);
             ui->backButton->setHidden(false);
             break;
 
@@ -517,31 +525,23 @@ void CameraReplacementDialog::updateHeader()
     {
         case CameraSelection:
             ui->headerCaptionLabel->setText(tr("Camera for Replacement"));
-            switch (d->selectedCameraPurpose)
-            {
-                case CameraToBeReplaced:
-                    //: %1 will be substituted with the camera's name.
-                    ui->headerDetailsLabel->setText(
-                        tr("Selected camera will be replaced by %1 and removed from the system")
-                            .arg(makeCameraNameRichText(d->replacementCamera->getName())));
-                    break;
 
-                case ReplacementCamera:
-                    //: %1 will be substituted with the camera's name.
-                    ui->headerDetailsLabel->setText(
-                        tr("%1 will be replaced by selected camera and removed from the system")
-                            .arg(makeCameraNameRichText(d->cameraToBeReplaced->getName())));
-                    break;
-            }
+            //: %1 will be substituted with the camera's name.
+            ui->headerDetailsLabel->setText(
+                tr("%1 will be replaced by selected camera and removed from the system")
+                    .arg(makeCameraNameRichText(d->cameraToBeReplaced->getName())));
+
             ui->headerDetailsLabel->setHidden(false);
             ui->headerCheckmarkLabel->setHidden(true);
             break;
 
         case ReplacementApproval:
             ui->headerCaptionLabel->setText(tr("Data for Transfer"));
-            ui->headerDetailsLabel->setText(tr("Checking if the data from the camera can be "
-                "transferred to the new one. Some data and settings may not supported for "
-                "new Camera"));
+            ui->headerDetailsLabel->setText(QStringList({
+                tr("Checking if the data from the camera can be transferred to the new one."),
+                tr("Some data and settings may not supported for new Camera")})
+                    .join(QChar::LineFeed));
+
             ui->headerDetailsLabel->setHidden(false);
             ui->headerCheckmarkLabel->setHidden(true);
             break;

@@ -15,32 +15,23 @@ class CameraReplacementDialog: public QnSessionAwareDialog
     using base_type = QnSessionAwareDialog;
 
 public:
-    enum SelectedCameraPurpose
-    {
-        CameraToBeReplaced,
-        ReplacementCamera,
-    };
 
     /**
-     * @param selectedCameraPurpose Defines which of two cameras involving in the replacement
-     *     operation will be selected interactively by user: the one which will be replaced or
-     *     the one which will be used as replacement.
-     * @param otherCamera One of two cameras involving in the replacement operation that already
-     *     known. It must meet the conditions for the camera to be replaced if
-     *     selectedCameraPurpose has <tt>ReplacementCamera</tt> value and vice versa.
+     * @param cameraToBeReplaced Camera that should be replaced with another one selected by user.
+     *     It must meet the conditions for the camera to be replaced, see
+     *     <tt>nx::vms::common::utils::camera_replacement::cameraCanBeReplaced()</tt>.
      * @param parent Pointer to the parent widget, should be both a window and an instance of class
      *     derived from <tt>QnWorkbenchContextAware</tt>.
      */
     CameraReplacementDialog(
-        SelectedCameraPurpose selectedCameraPurpose,
-        const QnVirtualCameraResourcePtr& otherCamera,
+        const QnVirtualCameraResourcePtr& cameraToBeReplaced,
         QWidget* parent);
 
     virtual ~CameraReplacementDialog() override;
 
     /**
-     * @return True if there are no suitable cameras to choose as replacement devices / devices to
-     *     replace. There is no point to show the dialog in that case.
+     * @return True if there are no suitable cameras to choose as replacement devices. There is no
+     *     point to show the dialog in that case.
      */
     bool isEmpty() const;
 
@@ -59,7 +50,7 @@ public:
      *     on the successfulness of the replacement operation. Fourth case, <tt>InvalidState</tt>
      *     may be returned only if dialog was initialized with invalid data, e.g null pointer to
      *     the camera resource was passed to the constructor, in such case dialog will immediately
-     *     rejected on the show attempt
+     *     rejected on the show attempt.
      */
     DialogState dialogState() const;
 
@@ -70,7 +61,6 @@ protected:
     virtual void closeEvent(QCloseEvent* event) override;
 
 private:
-    void setDialogState(DialogState state);
     void onNextButtonClicked();
     void onBackButtonClicked();
     void makeReplacementRequest(bool getReportOnly);

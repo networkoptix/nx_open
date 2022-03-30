@@ -2200,7 +2200,6 @@ void ActionHandler::replaceCameraActionTriggered()
         return;
 
     CameraReplacementDialog replaceCameraDialog(
-        CameraReplacementDialog::ReplacementCamera,
         cameraToBeReplaced,
         mainWindowWidget());
 
