@@ -16,7 +16,7 @@
 
 #if defined(Q_OS_LINUX)
     #include "manager_linux.h"
-#elif defined(Q_OS_WINDOWS)
+#elif defined(Q_OS_WIN)
     #include "manager_win.h"
 #else
     #include "manager_hid.h"
@@ -40,7 +40,7 @@ Manager* Manager::create(QObject* parent)
 {
 #if defined(Q_OS_LINUX)
     return new ManagerLinux(parent);
-#elif defined(Q_OS_WINDOWS)
+#elif defined(Q_OS_WIN)
     return new ManagerWindows(parent);
 #else
     return new ManagerHid(parent);
