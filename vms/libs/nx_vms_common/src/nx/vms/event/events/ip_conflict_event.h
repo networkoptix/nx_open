@@ -2,27 +2,32 @@
 
 #pragma once
 
-#include <nx/vms/event/events/conflict_event.h>
 #include <core/resource/resource_fwd.h>
+#include <nx/vms/event/events/conflict_event.h>
 
 class QHostAddress;
 class QStringList;
 
-namespace nx {
-namespace vms {
-namespace event {
+namespace nx::vms::event {
 
 class NX_VMS_COMMON_API IpConflictEvent: public ConflictEvent
 {
     using base_type = ConflictEvent;
 
 public:
-    IpConflictEvent(const QnResourcePtr& resource, const QHostAddress& address,
-        const QStringList& macAddrList,  qint64 timeStamp);
+    IpConflictEvent(
+        const QnResourcePtr& resource,
+        const QHostAddress& address,
+        const QStringList& macAddrList,
+        qint64 timeStamp,
+        const QStringList& cameraRefs);
 
     static const QChar delimiter() { return L'\n'; }
+
+    virtual EventParameters getRuntimeParams() const override;
+
+private:
+    QStringList m_cameraRefs;
 };
 
-} // namespace event
-} // namespace vms
-} // namespace nx
+} // namespace nx::vms::event
