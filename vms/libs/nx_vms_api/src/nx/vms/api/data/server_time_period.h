@@ -34,7 +34,9 @@ struct NX_VMS_API ServerTimePeriod
     std::chrono::milliseconds duration() const;
     void resetDuration();
 
-    /** Server id. */
+    /**%apidoc[opt]
+     * %// Appeared starting from /rest/v2/devices/{id}/footage.
+     */
     QnUuid serverId;
 
     /** Start time in milliseconds. */

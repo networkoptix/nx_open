@@ -14,7 +14,7 @@ struct NX_VMS_API SystemMergeData
     /**%apidoc The SocketAddress of remote system server. */
     std::string remoteEndpoint; //< TODO: Is SocketAddress to be used?
 
-    /**%apidoc The token should be fresh obtained from `/rest/v1/login/sessions`. */
+    /**%apidoc The token should be fresh obtained from `/rest/v{1-}/login/sessions`. */
     std::string remoteSessionToken;
 
     /**%apidoc[opt] */
