@@ -33,8 +33,17 @@ struct DeviceFootageRequest: IdData
     bool keepSmallChunks{false};
     bool preciseBounds{false};
     size_t maxCount{INT_MAX};
+
+    /**%apidoc[opt]
+     * %// Appeared starting from /rest/v2/devices/{id}/footage.
+     */
     StorageLocation storageLocation = StorageLocation::both;
+
     TimePeriodContentType periodType = TimePeriodContentType::recording;
+
+    /**%apidoc[opt]
+     * %// Appeared starting from /rest/v2/devices/{id}/footage.
+     */
     bool includeCloudData = false;
 
     bool operator==(const DeviceFootageRequest& other) const = default;

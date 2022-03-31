@@ -40,7 +40,7 @@ struct NX_VMS_API UserModel
     /**%apidoc[opt] */
     GlobalPermissions permissions = GlobalPermission::none;
 
-    /**%apidoc[opt] User role id, can be obtained form /rest/v1/userRoles. */
+    /**%apidoc[opt] User role id, can be obtained from `/rest/v{1-}/userRoles`. */
     QnUuid userRoleId;
 
     /**%apidoc List of accessible resource ids for the user. */

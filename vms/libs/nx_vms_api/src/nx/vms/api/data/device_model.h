@@ -94,7 +94,9 @@ struct DeviceOptions
     /**%apidoc[opt] */
     BackupPolicy backupPolicy = BackupPolicy::byDefault;
 
-    /**%apidoc[readonly] */
+    /**%apidoc[readonly]
+     * %// Appeared starting from /rest/v2/devices.
+     */
     QString dataAccessId;
 };
 #define DeviceOptions_Fields \
@@ -230,7 +232,9 @@ struct NX_VMS_API DeviceModel: DeviceModelGeneral, ResourceWithParameters
     /**%apidoc[opt] */
     CameraBackupQuality backupQuality = CameraBackup_Default;
 
-    /**%apidoc[readonly] */
+    /**%apidoc[readonly]
+     * %// Appeared starting from /rest/v2/devices.
+     */
     std::optional<DeviceType> deviceType;
 
     /**%apidoc[readonly] */

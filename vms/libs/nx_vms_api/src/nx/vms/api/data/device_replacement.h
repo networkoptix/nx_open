@@ -20,8 +20,9 @@ struct NX_VMS_API DeviceReplacementRequest
      */
     QnUuid id;
 
-    /**%apidoc Device id to replace with. Can be obtained from "id", "physicalId" or "logicalId"
-     * field via  GET on /rest/v1/devices.
+    /**%apidoc
+     * Device id to replace with. Can be obtained from "id", "physicalId" or "logicalId" field via
+     * `GET /rest/v{1-}/devices`.
      */
     QString replaceWithDeviceId;
 

@@ -71,7 +71,7 @@ struct NX_VMS_API DeviceSearch
     /**%apidoc
      * If specified, the handler hangs until the search is completed. WARNING: This may take a
      * significant amount of time. `waitResults` just waits for the search and `addFoundDevices`
-     * additionally adds found Devices the same way `POST /rest/v1/devices` does. The search is
+     * additionally adds found Devices the same way `POST /rest/v{1-}/devices` does. The search is
      * removed like after the DELETE call.
      */
     NX_REFLECTION_ENUM_CLASS_IN_CLASS(Mode,
