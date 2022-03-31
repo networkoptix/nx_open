@@ -51,10 +51,13 @@ public:
         nx::vms::license::QnLicenseErrorCode errorCode,
         Qn::LicenseType licenseType);
 
-    /** Warn about a network error while activating a license. */
+    /** Warn about a network error when activating a license. */
     static void networkError(QWidget* parent);
 
-     /** Notify about successful license activation. */
+    /** Warn about a network error when activating the free license. */
+    static void freeLicenseNetworkError(QWidget* parent, const QString& hardwareId);
+
+    /** Notify about successful license activation. */
     static void success(QWidget* parent);
 };
 
