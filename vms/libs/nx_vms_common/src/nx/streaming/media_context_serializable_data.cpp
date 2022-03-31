@@ -8,40 +8,25 @@
 #include <utils/media/av_codec_helper.h>
 
 #define QnMediaContextSerializableData_Fields \
-    (codecId)(codecType)(rcEq_deprecated)(extradata)(intraMatrix_deprecated)(interMatrix_deprecated)(rcOverride_deprecated)\
-    (channels)(sampleRate)(sampleFmt)(bitsPerCodedSample)(codedWidth_deprecated)\
-    (codedHeight_deprecated)(width)(height)(bitRate)(channelLayout)(blockAlign)
+    (codecId)(codecType)(extradata)(channels)(sampleRate)(sampleFmt)(bitsPerCodedSample)\
+    (width)(height)(bitRate)(channelLayout)(blockAlign)
 
 QN_FUSION_DECLARE_FUNCTIONS(QnMediaContextSerializableData, (ubjson))
 
-#define RcOverride_Fields (start_frame)(end_frame)(qscale)(quality_factor)
-QN_FUSION_DECLARE_FUNCTIONS(RcOverride, (ubjson))
-
 QN_FUSION_ADAPT_STRUCT_FUNCTIONS(
     QnMediaContextSerializableData, (ubjson), QnMediaContextSerializableData_Fields)
-QN_FUSION_ADAPT_STRUCT_FUNCTIONS(RcOverride, (ubjson), RcOverride_Fields)
 
 QByteArray QnMediaContextSerializableData::serialize() const
 {
     QByteArray result;
     QnUbjson::serialize(*this, &result);
-
     return result;
 }
 
 bool QnMediaContextSerializableData::deserialize(const QByteArray& data)
 {
     QnUbjsonReader<QByteArray> stream(&data);
-    if (!QnUbjson::deserialize(&stream, this))
-    {
-        static const char* const kWarning =
-            "QnMediaContext deserialization error: Fusion has failed.";
-        //NX_ASSERT(false, kWarning);
-        qWarning() << kWarning;
-        return false;
-    }
-
-    return true;
+    return QnUbjson::deserialize(&stream, this);
 }
 
 void QnMediaContextSerializableData::initializeFrom(const AVCodecParameters* codecParams)

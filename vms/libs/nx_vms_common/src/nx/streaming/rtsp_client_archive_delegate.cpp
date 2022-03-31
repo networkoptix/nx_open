@@ -463,7 +463,7 @@ void QnRtspClientArchiveDelegate::parseAudioSDP(const QStringList& audioSDP)
             {
                 auto data = QByteArray::fromBase64(audioSDP[i].mid(configPos + 7).toUtf8());
                 auto context = std::make_shared<CodecParameters>();
-                if (!context->deserialize(data))
+                if (!context->deserialize(data.data(), data.size()))
                 {
                     NX_DEBUG(this, "Failed to deserialize codec parameters");
                     continue;

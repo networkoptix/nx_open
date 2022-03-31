@@ -18,7 +18,6 @@ extern "C" {
 #include <nx/streaming/config.h>
 #include <nx/streaming/av_codec_media_context.h>
 #include <nx/streaming/media_data_packet.h>
-#include <nx/streaming/media_context_serializable_data.h>
 
 namespace nx::audio { struct Format; }
 
