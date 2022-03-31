@@ -85,7 +85,7 @@ Result QnNxRtpParser::processData(const uint8_t* data, int dataSize, bool& gotDa
     if (isCodecContext)
     {
         auto context = std::make_shared<CodecParameters>();
-        if (!context->deserialize(QByteArray((const char*) payload, dataSize)))
+        if (!context->deserialize((const char*) payload, dataSize))
             return {false, "Failed to parse codec parameters from RTP packet."};
 
         m_context = context;
@@ -107,7 +107,7 @@ Result QnNxRtpParser::processData(const uint8_t* data, int dataSize, bool& gotDa
                     "Expected at least %2 bytes)", dataSize, RTSP_FFMPEG_GENERIC_HEADER_SIZE)};
             }
 
-            const QnAbstractMediaData::DataType dataType =
+            QnAbstractMediaData::DataType dataType =
                 (QnAbstractMediaData::DataType) *(payload++);
             const quint32 timestampHigh = qFromBigEndian(*(quint32*) payload);
             dataSize -= RTSP_FFMPEG_GENERIC_HEADER_SIZE;
@@ -116,6 +116,16 @@ Result QnNxRtpParser::processData(const uint8_t* data, int dataSize, bool& gotDa
             const quint8 cseq = *payload++;
             const quint16 flags = (payload[0]<<8) + payload[1];
             payload += 2;
+
+            // TODO #lbusygin: just for vms_4.2 version, get rid of this code when the mobile client
+            // stops supporting servers < 5.0.
+            if (m_context && m_context->version() == 0)
+            {
+                if (dataType == 3)
+                    dataType = QnAbstractMediaData::GENERIC_METADATA;
+                if (dataType == 4)
+                    dataType = QnAbstractMediaData::EMPTY_DATA;
+            }
 
             if (dataType == QnAbstractMediaData::EMPTY_DATA)
             {

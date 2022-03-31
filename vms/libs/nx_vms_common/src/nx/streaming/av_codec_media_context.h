@@ -6,7 +6,9 @@ extern "C" {
 #include <libavformat/avformat.h>
 } // extern "C"
 
-#include <nx/streaming/media_context_serializable_data.h>
+#include <memory>
+
+#include <QtCore/QByteArray>
 
 /**
  * Class that wraps (and owns) AVCodecParameters
@@ -17,7 +19,7 @@ public:
     virtual ~CodecParameters();
 
     // Deserialize from ubjson format.
-    bool deserialize(const QByteArray& data);
+    bool deserialize(const char* data, int size);
 
     // Serialize to ubjson format.
     QByteArray serialize() const;
@@ -77,11 +79,14 @@ public:
     int getBlockAlign() const;
     int getFrameSize() const;
 
+    int version() const;
+
 private:
     CodecParameters(const CodecParameters&);
     CodecParameters& operator=(const CodecParameters&);
 
     AVCodecParameters* m_codecParams;
+    int m_version = 0;
 };
 
 using CodecParametersPtr = std::shared_ptr<CodecParameters>;

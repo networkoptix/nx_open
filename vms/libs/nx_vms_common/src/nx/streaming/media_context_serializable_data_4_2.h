@@ -11,16 +11,15 @@ extern "C" {
 #include <QtCore/QByteArray>
 
 /**
+ * Copy of Media context struct from vms_4.2 for backward compatiblity.
  * Contains fields of AVCodecParameters (and respectively of CodecParameters) which
  * are transferred from Server to Client with a media stream.
  *
  * Used in implementation of CodecParameters descendants. Can be deep-copied by
  * value. Serializable via Fusion. Does not depend on ffmpeg implementation.
  */
-struct NX_VMS_COMMON_API QnMediaContextSerializableData
+struct NX_VMS_COMMON_API QnMediaContextSerializableData_4_2
 {
-    QByteArray serialize() const;
-
     /**
      * @return Success.
      * All deserialization errors (if any) are logged, and asserted if
@@ -28,6 +27,8 @@ struct NX_VMS_COMMON_API QnMediaContextSerializableData
      * undefined.
      */
     bool deserialize(const QByteArray& data);
+
+    QByteArray serialize() const;
 
     /**
      * Initialize all fields copying data from the specified AVCodecParameters.
@@ -42,7 +43,16 @@ struct NX_VMS_COMMON_API QnMediaContextSerializableData
 
     AVCodecID codecId = AV_CODEC_ID_NONE;
     AVMediaType codecType = AVMEDIA_TYPE_UNKNOWN;
+    QByteArray rcEq_deprecated; ///< Deprecated fields are needed for backward comptibility for mobile client
     QByteArray extradata;
+
+    /// Length is 0 or QnAvCodecHelper::kMatrixLength.
+    std::vector<quint16> intraMatrix_deprecated;
+
+    /// Length is 0 or QnAvCodecHelper::kMatrixLength.
+    std::vector<quint16> interMatrix_deprecated;
+
+    std::vector<RcOverride> rcOverride_deprecated;
 
     int channels = 0;
     int sampleRate = 0;
