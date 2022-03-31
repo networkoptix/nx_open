@@ -29,7 +29,7 @@
     </message>
     <message>
       <source>Developer</source>
-      <translation type="unfinished">Developer</translation>
+      <translation>Udvikler</translation>
     </message>
     <message>
       <source>Open source libraries</source>
@@ -171,11 +171,11 @@
     </message>
     <message>
       <source>Max</source>
-      <translation type="unfinished">Max</translation>
+      <translation>Max</translation>
     </message>
     <message>
       <source>Min</source>
-      <translation type="unfinished">Min</translation>
+      <translation>Min</translation>
     </message>
   </context>
   <context>
@@ -1135,15 +1135,15 @@
     </message>
     <message>
       <source>Low</source>
-      <translation type="unfinished">Low</translation>
+      <translation>Lav</translation>
     </message>
     <message>
       <source>Medium</source>
-      <translation type="unfinished">Medium</translation>
+      <translation>Middel</translation>
     </message>
     <message>
       <source>High</source>
-      <translation type="unfinished">High</translation>
+      <translation>Høj</translation>
     </message>
     <message>
       <source>Select some devices to setup failover priority</source>

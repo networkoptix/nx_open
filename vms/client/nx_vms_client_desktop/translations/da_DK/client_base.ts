@@ -989,11 +989,11 @@
     </message>
     <message>
       <source>Show Panel</source>
-      <translation type="unfinished">Show Panel</translation>
+      <translation>Vis panel</translation>
     </message>
     <message>
       <source>Hide Panel</source>
-      <translation type="unfinished">Hide Panel</translation>
+      <translation>Skjul panel</translation>
     </message>
     <message>
       <source>Joystick Settings...</source>
@@ -1001,7 +1001,7 @@
     </message>
     <message>
       <source>Advanced...</source>
-      <translation type="unfinished">Advanced...</translation>
+      <translation>Avanceret...</translation>
     </message>
     <message>
       <source>Copy Bookmark Text</source>
@@ -1704,7 +1704,7 @@
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>Fortsæt</translation>
     </message>
     <message>
       <source>On the first connection to the server, your confirmation will be requested to accept the certificate if it contains errors</source>
@@ -2714,7 +2714,7 @@ to %1</translation>
     </message>
     <message>
       <source>Continue</source>
-      <translation type="unfinished">Continue</translation>
+      <translation>Fortsæt</translation>
     </message>
     <message>
       <source>Cannot disconnect the System from %1</source>
@@ -2726,11 +2726,11 @@ to %1</translation>
     <name>QnCloudResultInfo</name>
     <message>
       <source>Successful.</source>
-      <translation type="unfinished">Successful.</translation>
+      <translation>Vellykket.</translation>
     </message>
     <message>
       <source>Invalid login or password.</source>
-      <translation type="unfinished">Invalid login or password.</translation>
+      <translation>Ugyldig login eller adgangskode.</translation>
     </message>
     <message>
       <source>Requested operation is not allowed with provided credentials.</source>
@@ -2750,7 +2750,7 @@ to %1</translation>
     </message>
     <message>
       <source>Invalid login.</source>
-      <translation type="unfinished">Invalid login.</translation>
+      <translation>Ugyldigt login.</translation>
     </message>
     <message>
       <source>%1 is temporary unavailable. Please try again later.</source>
@@ -3005,7 +3005,7 @@ to %1</translation>
     </message>
     <message>
       <source>Restore</source>
-      <translation type="unfinished">Restore</translation>
+      <translation>Gendan</translation>
     </message>
     <message>
       <source>Restore database?</source>
@@ -5069,7 +5069,7 @@ to %1</translation>
     </message>
     <message>
       <source>Unlock</source>
-      <translation type="unfinished">Unlock</translation>
+      <translation>Lås op</translation>
     </message>
   </context>
   <context>
@@ -7147,15 +7147,15 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::BackupSettingsDecoratorModel</name>
     <message>
       <source>The camera has neither recorded footage nor recording scheduled</source>
-      <translation type="unfinished">The camera has neither recorded footage nor recording scheduled</translation>
+      <translation>Kameraet har hverken optagelser eller optagelser planlagt</translation>
     </message>
     <message>
       <source>Motion detection is disabled</source>
-      <translation type="unfinished">Motion detection is disabled</translation>
+      <translation>Bevægelsesdetektion er deaktiveret</translation>
     </message>
     <message>
       <source>No analytics plugins</source>
-      <translation type="unfinished">No analytics plugins</translation>
+      <translation>Ingen analyse-plugins</translation>
     </message>
     <message>
       <source>Cameras</source>
@@ -7163,11 +7163,11 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>What to backup</source>
-      <translation type="unfinished">What to backup</translation>
+      <translation>Hvad skal du sikkerhedskopiere</translation>
     </message>
     <message>
       <source>Quality</source>
-      <translation type="unfinished">Quality</translation>
+      <translation>Kvalitet</translation>
     </message>
     <message>
       <source>Cannot be modified for new added cameras</source>
@@ -7202,7 +7202,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Quality</source>
-      <translation type="unfinished">Quality</translation>
+      <translation>Kvalitet</translation>
     </message>
     <message numerus="yes">
       <source>Set for %n selected devices</source>
@@ -7529,27 +7529,27 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::CameraSelectionDialog</name>
     <message>
       <source>Show all devices</source>
-      <translation type="unfinished">Show all devices</translation>
+      <translation>Vis alle enheder</translation>
     </message>
     <message>
       <source>Show all cameras</source>
-      <translation type="unfinished">Show all cameras</translation>
+      <translation>Vis alle kameraer</translation>
     </message>
     <message>
       <source>Select Devices</source>
-      <translation type="unfinished">Select Devices</translation>
+      <translation>Vælg enheder</translation>
     </message>
     <message>
       <source>Select Cameras</source>
-      <translation type="unfinished">Select Cameras</translation>
+      <translation>Vælg Kameraer</translation>
     </message>
     <message>
       <source>Select Device</source>
-      <translation type="unfinished">Select Device</translation>
+      <translation>Vælg enhed</translation>
     </message>
     <message>
       <source>Select Camera</source>
-      <translation type="unfinished">Select Camera</translation>
+      <translation>Vælg Kamera</translation>
     </message>
   </context>
   <context>
@@ -7649,7 +7649,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Motion Only</source>
-      <translation type="unfinished">Motion Only</translation>
+      <translation>Kun bevægelse</translation>
     </message>
     <message>
       <source>Objects Only</source>
@@ -7970,7 +7970,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <message>
       <source>Merge</source>
       <comment>Merge Server to the current System (dialog button text)</comment>
-      <translation type="unfinished">Merge</translation>
+      <translation>Flet</translation>
     </message>
   </context>
   <context>
@@ -7981,7 +7981,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Setup</source>
-      <translation type="unfinished">Setup</translation>
+      <translation>Opsætning</translation>
     </message>
     <message>
       <source>Success</source>
@@ -8146,7 +8146,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     <name>nx::vms::client::desktop::EncryptedArchivePasswordDialog</name>
     <message>
       <source>Decrypt</source>
-      <translation type="unfinished">Decrypt</translation>
+      <translation>Dekrypter</translation>
     </message>
     <message>
       <source>Invalid password</source>
@@ -8207,7 +8207,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Try changing the filters or create an Event Rule</source>
-      <translation type="unfinished">Try changing the filters or create an Event Rule</translation>
+      <translation>Prøv at ændre filtrene eller opret en hændelsesregel</translation>
     </message>
   </context>
   <context>
@@ -8263,7 +8263,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Archive is encrypted.</source>
-      <translation type="unfinished">Archive is encrypted.</translation>
+      <translation>Arkivet er krypteret.</translation>
     </message>
     <message>
       <source>Archive is unavailable now. Please try again later.</source>
@@ -8721,16 +8721,16 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Merge Systems</source>
-      <translation type="unfinished">Merge Systems</translation>
+      <translation>Flet systemer</translation>
     </message>
     <message>
       <source>Enter your account password to merge Systems</source>
-      <translation type="unfinished">Enter your account password to merge Systems</translation>
+      <translation>Indtast adgangskoden til din konto for at flette systemer</translation>
     </message>
     <message>
       <source>Merge</source>
       <comment>Merge two Systems together (dialog button text)</comment>
-      <translation type="unfinished">Merge</translation>
+      <translation>Flet</translation>
     </message>
     <message>
       <source>Merging Systems...</source>
@@ -8773,7 +8773,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>System was not found.</source>
-      <translation type="unfinished">System was not found.</translation>
+      <translation>Systemet blev ikke fundet.</translation>
     </message>
     <message>
       <source>The discovered System %1 has an incompatible version %2.</source>
@@ -8786,7 +8786,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>The password or user name is invalid.</source>
-      <translation type="unfinished">The password or user name is invalid.</translation>
+      <translation>Adgangskoden eller brugernavnet er ugyldigt.</translation>
     </message>
     <message>
       <source>This user does not have permissions for the requested operation.</source>
@@ -8794,7 +8794,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Cannot create database backup.</source>
-      <translation type="unfinished">Cannot create database backup.</translation>
+      <translation>Kan ikke oprette database backup.</translation>
     </message>
     <message>
       <source>You are about to merge Systems with Starter licenses.</source>
@@ -8806,7 +8806,7 @@ We recommend you not to open this web page. If you understand the risks, you can
     </message>
     <message>
       <source>Merge anyway?</source>
-      <translation type="unfinished">Merge anyway?</translation>
+      <translation>Flet alligevel?</translation>
     </message>
     <message>
       <source>You are about to merge Systems with NVR licenses.</source>
@@ -9913,7 +9913,7 @@ Caution: This password cannot be reset. If you lose it, the archive will be unre
     </message>
     <message>
       <source>days</source>
-      <translation type="unfinished">days</translation>
+      <translation>dage</translation>
     </message>
     <message>
       <source>Local and LDAP users will be automatically logged out if their session exceeds the specified duration.</source>
@@ -10021,15 +10021,15 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>System:</source>
-      <translation type="unfinished">System:</translation>
+      <translation>System:</translation>
     </message>
     <message>
       <source>Server:</source>
-      <translation type="unfinished">Server:</translation>
+      <translation>Server:</translation>
     </message>
     <message>
       <source>Server ID:</source>
-      <translation type="unfinished">Server ID:</translation>
+      <translation>Server ID:</translation>
     </message>
     <message>
       <source>Trust this server?</source>
@@ -10138,7 +10138,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>unknown status</source>
-      <translation type="unfinished">unknown status</translation>
+      <translation>ukendt status</translation>
     </message>
   </context>
   <context>
@@ -10218,7 +10218,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Unknown error</source>
-      <translation type="unfinished">Unknown error</translation>
+      <translation>Ukendt fejl</translation>
     </message>
   </context>
   <context>
@@ -10247,7 +10247,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Try changing the filters or enable motion recording</source>
-      <translation type="unfinished">Try changing the filters or enable motion recording</translation>
+      <translation>Prøv at ændre filtre, eller aktivér bevægelsesoptagelse</translation>
     </message>
   </context>
   <context>
@@ -10459,7 +10459,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     <name>nx::vms::client::desktop::VersionSelectionDialog</name>
     <message>
       <source>Select Version</source>
-      <translation type="unfinished">Select Version</translation>
+      <translation>Vælg Version</translation>
     </message>
     <message>
       <source>Version</source>
@@ -10467,7 +10467,7 @@ Do not pin this certificate if you didn&apos;t modify %2 server SSL certificate.
     </message>
     <message>
       <source>Invalid version.</source>
-      <translation type="unfinished">Invalid version.</translation>
+      <translation>Ugyldig version.</translation>
     </message>
     <message>
       <source>Password</source>
