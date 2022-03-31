@@ -1116,6 +1116,9 @@ bool QnRtspClientArchiveDelegate::hasVideo() const
 
 void QnRtspClientArchiveDelegate::pleaseStop()
 {
+    // TODO: #vbreus It should be done atomically under lock. To be fixed in 5.1 since there is no
+    // way to do it right without significant changes.
+    m_blockReopening = true;
     if (m_rtspSession->isOpened())
         m_rtspSession->shutdown();
 }
