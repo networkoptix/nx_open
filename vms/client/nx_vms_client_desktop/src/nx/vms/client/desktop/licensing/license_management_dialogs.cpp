@@ -9,6 +9,7 @@
 
 #include <common/common_module.h>
 #include <licensing/license.h>
+#include <nx/branding.h>
 #include <nx/utils/log/assert.h>
 #include <nx/vms/client/desktop/common/widgets/clipboard_button.h>
 #include <nx/vms/client/desktop/licensing/customer_support.h>
@@ -340,6 +341,78 @@ void LicenseActivationDialogs::networkError(QWidget* parent)
         tr("Network error"),
         supportContactString
     );
+}
+
+void LicenseActivationDialogs::freeLicenseNetworkError(QWidget* parent, const QString& hardwareId)
+{
+    const QString supportContactString = Private::customerSupportMessage(
+        parent,
+        tr("If system doesn't have access to the internet, to get activation file please send "
+           "the provided License Key and Hardware ID to %1."),
+        tr("If system doesn't have access to the internet, to get activation file please send "
+           "the provided License Key and Hardware ID to your Regional / License support:")) +
+        QString(html::kLineBreak);
+
+    QString licenseInfoString;
+    static const auto kLightTextColor = ColorTheme::instance()->color("light10");
+
+    html::Tag tagTable("table", licenseInfoString);
+    {
+        {
+            html::Tag tagRow("tr", licenseInfoString);
+            {
+                html::Tag tagCell("td", licenseInfoString);
+                licenseInfoString.append(tr("Hardware ID"));
+            }
+            {
+                html::Tag tagCell("td", licenseInfoString);
+                licenseInfoString.append("&nbsp;");
+            }
+            {
+                html::Tag tagCell("td", licenseInfoString);
+                licenseInfoString.append(html::colored(hardwareId, kLightTextColor));
+            }
+        }
+
+        {
+            html::Tag tagRow("tr", licenseInfoString);
+            {
+                html::Tag tagCell("td", licenseInfoString);
+                licenseInfoString.append(tr("License Key"));
+            }
+            {
+                html::Tag tagCell("td", licenseInfoString);
+                licenseInfoString.append("&nbsp;");
+            }
+            {
+                html::Tag tagCell("td", licenseInfoString);
+                licenseInfoString.append(
+                    html::colored(nx::branding::freeLicenseKey(), kLightTextColor));
+            }
+        }
+    }
+
+    QnSessionAwareMessageBox messageBox(parent);
+    messageBox.setIcon(QnMessageBoxIcon::Critical);
+    messageBox.setText(tr("Failed to activate free license"));
+    messageBox.setInformativeText(supportContactString + licenseInfoString, /*split*/ false);
+    messageBox.setInformativeTextFormat(Qt::RichText);
+
+    auto copyButton = new ClipboardButton(tr("Copy parameters"), tr("Copied"), &messageBox);
+    messageBox.addButton(copyButton, QDialogButtonBox::HelpRole);
+    QObject::connect(copyButton, &QPushButton::clicked,
+        [hardwareId]
+        {
+            qApp->clipboard()->setText(tr("Hardware ID: %1\nLicense Key: %2")
+                .arg(hardwareId, nx::branding::freeLicenseKey()));
+        });
+
+    messageBox.setStandardButtons(QDialogButtonBox::Ok);
+    messageBox.setEscapeButton(QDialogButtonBox::Ok);
+    messageBox.setDefaultButton(QDialogButtonBox::Ok);
+    messageBox.setSafeMinimumWidth(425);
+
+    messageBox.exec();
 }
 
 void LicenseActivationDialogs::success(QWidget* parent)

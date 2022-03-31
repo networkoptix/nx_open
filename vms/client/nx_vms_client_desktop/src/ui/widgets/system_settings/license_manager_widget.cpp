@@ -814,7 +814,14 @@ void QnLicenseManagerWidget::at_downloadError()
         reply->deleteLater();
 
         // QNetworkReply slots should not start event loop.
-        executeLater([this]{ LicenseActivationDialogs::networkError(this); }, this);
+        executeLater(
+            [this]
+            {
+                LicenseActivationDialogs::freeLicenseNetworkError(
+                    this,
+                    licensePool()->currentHardwareId(serverId()));
+            },
+            this);
 
         ui->licenseWidget->setOnline(false);
     }
