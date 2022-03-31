@@ -132,6 +132,8 @@ QnSystemHostsModel::HostsModel::HostsModel(QnSystemHostsModel* parent):
 {
     connect(m_owner, &QnSystemHostsModel::systemIdChanged, this, &HostsModel::reloadHosts);
     connect(m_owner, &QnSystemHostsModel::localSystemIdChanged, this, &HostsModel::forceResort);
+    connect(qnSystemsFinder, &QnSystemsFinder::destroyed, this,
+        [this] { m_connections.release(); });
 }
 
 void QnSystemHostsModel::HostsModel::forceResort()

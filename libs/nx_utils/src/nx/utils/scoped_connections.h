@@ -72,6 +72,14 @@ public:
 
     void reset() { m_connections.clear(); }
 
+    void release()
+    {
+        for (auto& connection: m_connections)
+            connection.release();
+
+        m_connections.clear();
+    }
+
 private:
     std::vector<ScopedConnection> m_connections;
 };
