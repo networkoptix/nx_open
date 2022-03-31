@@ -87,7 +87,7 @@ TEST(QnMediaDataPacket, serialization)
     ASSERT_TRUE(data.length() > 0);
 
     CodecParameters avCodecMediaContextParsed;
-    ASSERT_EQ(avCodecMediaContextParsed.deserialize(data), true);
+    ASSERT_EQ(avCodecMediaContextParsed.deserialize(data.data(), data.size()), true);
 
     testMediaContextFieldsEqual(
         avCodecMediaContext, avCodecMediaContextParsed);

@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include <nx/streaming/media_context_serializable_data.h>
+#include <nx/streaming/media_context_serializable_data_4_2.h>
 
 #include <nx/kit/debug.h>
 #include <nx/fusion/model_functions.h>
@@ -12,7 +12,7 @@ namespace nx::streaming::test {
 
 TEST(MediaContextSerializableData, main)
 {
-    QnMediaContextSerializableData data;
+    QnMediaContextSerializableData_4_2 data;
     data.codecId = AV_CODEC_ID_H264;
     data.codecType = AVMEDIA_TYPE_VIDEO;
     data.sampleFmt = AV_SAMPLE_FMT_U8;
@@ -42,7 +42,7 @@ TEST(MediaContextSerializableData, main)
         NX_PRINT_HEX_DUMP("Actual", serializedData.constData(), serializedData.size());
     }
 
-    QnMediaContextSerializableData deserialized;
+    QnMediaContextSerializableData_4_2 deserialized;
     deserialized.deserialize(serializedData);
 
     ASSERT_EQ(data.codecId, deserialized.codecId);
