@@ -11,7 +11,7 @@
 
 namespace {
 
-constexpr char kCodecContextVersion = 1;
+constexpr char kCodecContextVersion = 2;
 
 AVCodecID convertCodecIdFromFfmpeg3_1(AVCodecID id)
 {
@@ -84,8 +84,7 @@ int CodecParameters::version() const
 
 QByteArray CodecParameters::serialize() const
 {
-    // TODO #lbusygin: update to new structure in 5.1.
-    QnMediaContextSerializableData_4_2 data;
+    QnMediaContextSerializableData data;
 
     data.initializeFrom(m_codecParams);
 
@@ -117,6 +116,14 @@ bool CodecParameters::deserialize(const char* data, int size)
     else if (m_version == 1)
     {
         if (!::deserialize<QnMediaContextSerializableData_4_2>(*this, data, size))
+        {
+            NX_WARNING(this, "Failed to deserialize codec parameters data");
+            return false;
+        }
+    }
+    else if (m_version == 2)
+    {
+        if (!::deserialize<QnMediaContextSerializableData>(*this, data, size))
         {
             NX_WARNING(this, "Failed to deserialize codec parameters data");
             return false;

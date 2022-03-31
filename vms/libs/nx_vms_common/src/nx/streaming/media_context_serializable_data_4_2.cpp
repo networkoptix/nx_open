@@ -26,30 +26,3 @@ bool QnMediaContextSerializableData_4_2::deserialize(const QByteArray& data)
     QnUbjsonReader<QByteArray> stream(&data);
     return QnUbjson::deserialize(&stream, this);
 }
-
-QByteArray QnMediaContextSerializableData_4_2::serialize() const
-{
-    QByteArray result;
-    QnUbjson::serialize(*this, &result);
-    return result;
-}
-
-void QnMediaContextSerializableData_4_2::initializeFrom(const AVCodecParameters* codecParams)
-{
-    codecId = codecParams->codec_id;
-    codecType = codecParams->codec_type;
-    if (codecParams->extradata)
-    {
-        extradata = QByteArray((const char*) codecParams->extradata,
-            codecParams->extradata_size);
-    }
-    channels = codecParams->channels;
-    sampleRate = codecParams->sample_rate;
-    sampleFmt = (AVSampleFormat)codecParams->format;
-    bitsPerCodedSample = codecParams->bits_per_coded_sample;
-    width = codecParams->width;
-    height = codecParams->height;
-    bitRate = codecParams->bit_rate;
-    channelLayout = codecParams->channel_layout;
-    blockAlign = codecParams->block_align;
-}
