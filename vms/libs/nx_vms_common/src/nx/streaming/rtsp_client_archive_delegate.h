@@ -159,7 +159,7 @@ private:
     quint8 m_sendedCSec;
     qint64 m_lastSeekTime;
     qint64 m_lastReceivedTime;
-    bool m_blockReopening;
+    std::atomic<bool> m_blockReopening;
     MediaQuality m_quality;
     bool m_qualityFastSwitch;
     QSize m_resolution;

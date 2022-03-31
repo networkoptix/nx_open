@@ -393,6 +393,11 @@ ArchiveFrameExtractor::~ArchiveFrameExtractor()
     d->streamWorker.cv.notify_one();
     d->decodeWorker.cv.notify_one();
 
+    // TODO: #vbreus There is still vanishingly small probability of stream reopen due possible
+    // race condition, however this won't lead to unrecoverable erroneous state. To be fixed in
+    // the 5.1.
+    d->streamWorker.archiveDelegate->pleaseStop();
+
     if (d->streamWorker.thread)
         d->streamWorker.thread->join();
 
