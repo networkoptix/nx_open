@@ -49,7 +49,7 @@ static constexpr microseconds kMetadataWindowSize = 2s;
 // When metadata duration is not set, object will live for average period between metadata
 // packets plus this constant. This constant is needed to avoid areas flickering when average
 // metadata period gets a bit lower than a period between two certain metadata packets.
-static constexpr microseconds kMinimalObjectDuration = 50ms;
+static constexpr microseconds kMinimalObjectDuration = 200ms;
 
 milliseconds toMs(microseconds value)
 {
