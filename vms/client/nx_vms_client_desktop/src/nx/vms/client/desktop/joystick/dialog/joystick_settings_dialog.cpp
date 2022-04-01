@@ -12,6 +12,7 @@
 #include <core/resource/layout_resource.h>
 #include <core/resource/media_server_resource.h>
 #include <core/resource_management/resource_pool.h>
+#include <nx/utils/scoped_connections.h>
 #include <nx/vms/client/core/network/network_module.h>
 #include <nx/vms/client/core/utils/qml_property.h>
 #include <nx/vms/client/desktop/resource_dialogs/filtering/filtered_resource_proxy_model.h>
@@ -62,7 +63,9 @@ struct JoystickSettingsDialog::Private
     QString getButtonName(int row) const;
     ui::action::IDType getActionId(int row, int column) const;
 
-    QVector<QMetaObject::Connection> connections;
+    nx::utils::ScopedConnections connections;
+
+    nx::utils::ScopedConnection deviceConnection;
 };
 
 JoystickSettingsDialog::Private::Private(JoystickSettingsDialog* owner, Manager* manager):
@@ -167,8 +170,6 @@ JoystickSettingsDialog::Private::Private(JoystickSettingsDialog* owner, Manager*
 JoystickSettingsDialog::Private::~Private()
 {
     layoutModel.setRootEntity(nullptr);
-    for (auto connection: connections)
-        QObject::disconnect(connection);
 }
 
 bool JoystickSettingsDialog::Private::initModel(bool initWithDefaults)
@@ -184,12 +185,12 @@ bool JoystickSettingsDialog::Private::initModel(bool initWithDefaults)
         : manager->getDeviceDescription(device->id());
     buttonSettingsModel->init(description, device);
 
-    QObject::connect(device.get(), &Device::stickMoved, q,
+    deviceConnection.reset(QObject::connect(device.get(), &Device::stickMoved, q,
         [this](double x, double y, double z)
         {
             QmlProperty<bool>(q->rootObjectHolder(), "panAndTiltHighlighted") = x != 0 || y != 0;
             QmlProperty<bool>(q->rootObjectHolder(), "zoomHighlighted") = z != 0;
-        });
+        }));
 
     const bool openLayoutChoiceEnabled = !q->currentServer().isNull();
     const bool openLayoutChoiceVisible =
@@ -244,7 +245,7 @@ JoystickSettingsDialog::JoystickSettingsDialog(Manager* manager, QWidget* parent
     QmlProperty<bool>(rootObjectHolder(), "connectedToServer") =
         qnClientCoreModule->networkModule()->isConnected();
 
-    d->connections.append(connect(qnClientCoreModule->networkModule(),
+    d->connections << connect(qnClientCoreModule->networkModule(),
         &nx::vms::client::core::NetworkModule::remoteIdChanged,
         [this]
         {
@@ -263,16 +264,16 @@ JoystickSettingsDialog::JoystickSettingsDialog(Manager* manager, QWidget* parent
                 openLayoutChoiceEnabled);
             d->buttonModifiedActionChoiceModel->setOpenLayoutChoiceVisible(
                 openLayoutChoiceVisible);
-        }));
+        });
 
-    d->connections.append(connect(context()->accessController(), &QnWorkbenchAccessController::userChanged,
+    d->connections << connect(context()->accessController(), &QnWorkbenchAccessController::userChanged,
         [this]
         {
             d->treeEntityBuilder->setUser(context()->accessController()->user());
             auto layoutsEntity = d->treeEntityBuilder->createDialogAllLayoutsEntity();
             d->layoutModel.setRootEntity(layoutsEntity.get());
             d->layoutsEntity = std::move(layoutsEntity);
-        }));
+        });
 
     auto handleApply = [this, manager]
         {
@@ -297,6 +298,11 @@ JoystickSettingsDialog::JoystickSettingsDialog(Manager* manager, QWidget* parent
 
 JoystickSettingsDialog::~JoystickSettingsDialog()
 {
+}
+
+void JoystickSettingsDialog::initWithCurrentActiveJoystick()
+{
+    d->initModel(false);
 }
 
 } // namespace nx::vms::client::desktop::joystick

@@ -33,6 +33,10 @@ JoystickSettingsActionHandler::JoystickSettingsActionHandler(
                         context->joystickManager()->setDeviceActionsEnabled(true);
                     });
             }
+            else
+            {
+                m_dialog->initWithCurrentActiveJoystick();
+            }
 
             context->joystickManager()->setDeviceActionsEnabled(false);
 
