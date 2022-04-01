@@ -77,6 +77,13 @@ NX_UTILS_API QDateTime fromOffsetSinceEpoch(const std::chrono::nanoseconds& offs
  */
 NX_UTILS_API std::optional<std::chrono::milliseconds> parseDuration(const std::string_view& str);
 
+/**
+ * Invokes parseDuration(str) and returns its result or defaultValue.
+ */
+NX_UTILS_API std::chrono::milliseconds parseDurationOr(
+    const std::string_view& str,
+    std::chrono::milliseconds defaultValue);
+
 namespace detail {
 
 template<typename D>
@@ -230,7 +237,7 @@ private:
 
 /**
  * Provides a way to fix the result of utcTime() and make it independent of the
- * system time. 
+ * system time.
  * Test-only!
  */
 struct NX_UTILS_API ScopedUtcTimeFix

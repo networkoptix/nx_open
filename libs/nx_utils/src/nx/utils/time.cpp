@@ -242,6 +242,14 @@ std::optional<std::chrono::milliseconds> parseDuration(const std::string_view& s
         return std::nullopt;
 }
 
+std::chrono::milliseconds parseDurationOr(
+    const std::string_view& str,
+    std::chrono::milliseconds defaultValue)
+{
+    auto val = parseDuration(str);
+    return val ? *val : defaultValue;
+}
+
 namespace test {
 
 void ScopedTimeShift::shiftCurrentTime(ClockType clockType, milliseconds diff)

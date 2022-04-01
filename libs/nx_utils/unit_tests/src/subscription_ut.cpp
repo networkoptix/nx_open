@@ -44,6 +44,18 @@ protected:
         m_notifyParam = recursionDepth;
     }
 
+    void installEventHandler(std::function<void()> func)
+    {
+        m_subscription.subscribe(
+            [func = std::move(func)](auto&&...) { func(); },
+            &m_id);
+    }
+
+    void whenNotify()
+    {
+        m_subscription.notify(1);
+    }
+
     // Returns tuple<startedFuture, doneFuture>
     std::tuple<std::future<void>, std::future<void>> whenNotifyConcurrently()
     {
@@ -169,6 +181,23 @@ TEST_F(Subscription, concurrent_removeSubscription_waits_for_all_recursive_notif
 
     // Making sure all notifications were completed by now.
     ASSERT_EQ(std::future_status::ready, doneFuture.wait_for(std::chrono::seconds::zero()));
+}
+
+TEST_F(Subscription, notify_is_exception_safe)
+{
+    installEventHandler([]() { throw std::runtime_error("test"); });
+
+    try
+    {
+        whenNotify();
+        GTEST_FAIL();
+    }
+    catch (const std::exception& e)
+    {
+        GTEST_ASSERT_EQ(std::string("test"), e.what());
+    }
+
+    whenRemoveSubscription();
 }
 
 } // namespace nx::utils::test
