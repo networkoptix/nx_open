@@ -160,7 +160,9 @@ def archiveSdkUnitTests(archiver, conf, src_bin_dir):
     for f in file_list:
         # Analytics Plugin libraries must go to "plugins_optional/" to make analytics_plugin_ut.cfg
         # from the VMS build directory work.
-        if "_analytics_plugin." in f.name:
+        if "stub_analytics_plugin." in f.name:
+            target_file = target_dir / "plugins_optional" / "stub_analytics_plugin" / f.name
+        elif "_analytics_plugin." in f.name:
             target_file = target_dir / "plugins_optional" / f.name
         else:
             target_file = target_dir / f.name

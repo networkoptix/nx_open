@@ -28,7 +28,7 @@ endif()
 set(testConfigFile ${testBinDir}/analytics_plugin_ut.cfg)
 string(JOIN "\n" testConfigContent
     "# Paths to plugin library files which must be unit-tested inside the VMS build directory."
-    "plugins_optional/${libPrefix}stub_analytics_plugin${libSuffix}"
+    "plugins_optional/stub_analytics_plugin/${libPrefix}stub_analytics_plugin${libSuffix}"
     "plugins_optional/${libPrefix}sample_analytics_plugin${libSuffix}"
 )
 file(GENERATE OUTPUT ${testConfigFile} CONTENT ${testConfigContent})
