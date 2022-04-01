@@ -8,6 +8,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/QSharedPointer>
 
+#include <nx/utils/scoped_connections.h>
 #include <nx/utils/thread/mutex.h>
 #include <ui/workbench/workbench_context_aware.h>
 
@@ -67,10 +68,6 @@ public:
      */
     void setDeviceActionsEnabled(bool enabled);
 
-signals:
-    void deviceConnected(const DevicePtr& device);
-    void deviceDisconnected(const DevicePtr& device);
-
 protected:
     virtual void enumerateDevices() = 0;
     void loadConfig(
@@ -89,6 +86,7 @@ protected:
     // Configs for known device models.
     DeviceConfigs m_defaultDeviceConfigs;
     DeviceConfigs m_deviceConfigs;
+    std::map<QString, nx::utils::ScopedConnections> m_deviceConnections;
 
     QMap<QString, QString> m_deviceConfigRelativePath;
 

@@ -22,11 +22,10 @@ public:
     explicit JoystickSettingsDialog(Manager* manager, QWidget* parent = nullptr);
     virtual ~JoystickSettingsDialog() override;
 
+    void initWithCurrentActiveJoystick();
+
 signals:
     void resetToDefault(); //< For connecting labmda to QML item signal.
-
-private:
-    bool initModel(Manager* manager, bool initWithDefaults = false);
 
 private:
     struct Private;
