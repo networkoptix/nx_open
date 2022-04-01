@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <stdint.h>
+#include <cstdint>
 #include <list>
 #include <vector>
 
@@ -16,7 +16,7 @@
 
 namespace nx::utils {
 
-typedef std::size_t SubscriptionId;
+using SubscriptionId = std::size_t;
 
 constexpr static const SubscriptionId kInvalidSubscriptionId = 0;
 
@@ -30,14 +30,7 @@ class Subscription
     typedef Subscription<Data...> SelfType;
 
 public:
-    typedef nx::utils::MoveOnlyFunc<void(Data...)> NotificationCallback;
-
-    Subscription()
-    :
-        m_previousSubscriptionId(kInvalidSubscriptionId),
-        m_eventReportingThread(0)
-    {
-    }
+    using NotificationCallback = nx::utils::MoveOnlyFunc<void(Data...)>;
 
     ~Subscription()
     {
@@ -87,40 +80,43 @@ public:
      */
     void notify(Data... data)
     {
-        NX_MUTEX_LOCKER lk(&m_mutex);
+        NX_MUTEX_LOCKER lock(&m_mutex);
 
         m_eventReportingThread = currentThreadSystemId();
         ++m_recursionDepth;
+        auto guard = makeScopeGuard([this, &lock]()
+        {
+            if ((--m_recursionDepth) == 0)
+                m_eventReportingThread = 0;
+
+            lock.unlock();
+            m_cond.wakeAll();
+        });
 
         for (auto currentSubscriptionIter = m_handlers.begin();
              currentSubscriptionIter != m_handlers.end();
              )
         {
             m_runningSubscriptionIds.push_back(currentSubscriptionIter->first);
+            auto guard = makeScopeGuard([this, &currentSubscriptionIter, &lock]()
+            {
+                lock.relock();
+                currentSubscriptionIter = m_handlers.upper_bound(m_runningSubscriptionIds.back());
+                m_runningSubscriptionIds.pop_back();
+            });
 
-            lk.unlock();
+            lock.unlock();
             m_cond.wakeAll();
             currentSubscriptionIter->second(data...);
-            lk.relock();
-
-            currentSubscriptionIter =
-                m_handlers.upper_bound(m_runningSubscriptionIds.back());
-            m_runningSubscriptionIds.pop_back();
         }
-
-        if ((--m_recursionDepth) == 0)
-            m_eventReportingThread = 0;
-
-        lk.unlock();
-        m_cond.wakeAll();
     }
 
 private:
     nx::Mutex m_mutex;
     nx::WaitCondition m_cond;
     std::map<SubscriptionId, NotificationCallback> m_handlers;
-    SubscriptionId m_previousSubscriptionId;
-    uintptr_t m_eventReportingThread;
+    SubscriptionId m_previousSubscriptionId = kInvalidSubscriptionId;
+    uintptr_t m_eventReportingThread = 0;
     std::vector<SubscriptionId> m_runningSubscriptionIds;
     int m_recursionDepth = 0;
 };
