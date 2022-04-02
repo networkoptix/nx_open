@@ -1423,6 +1423,10 @@ void EventRibbon::Private::fadeOut(EventTile* widget)
     animator->setEasingCurve(qnWorkbenchAnimations->easing(kAnimationId));
     animator->setDuration(qnWorkbenchAnimations->timeLimit(kAnimationId));
 
+    // When animator is destroyed, curtain destrution should be requested before widget->hide(),
+    // otherwise the animator->stop() will be called with partially destroyed animator.
+    createFadeCurtain(widget, animator);
+
     connect(animator, &QObject::destroyed, widget,
         [this, widget]()
         {
@@ -1437,7 +1441,6 @@ void EventRibbon::Private::fadeOut(EventTile* widget)
     connect(m_scrollBar.get(), &QScrollBar::valueChanged, animator, nx::utils::guarded(widget,
         [widget, base](int value) { widget->move(widget->x(), base - value); }));
 
-    createFadeCurtain(widget, animator);
     setReadOnly(widget, true);
 
     animator->start(QAbstractAnimation::DeleteWhenStopped);
