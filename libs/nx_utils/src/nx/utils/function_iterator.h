@@ -11,10 +11,15 @@ namespace utils {
  * STL compatible output iterator which calls specified function object for each item.
  */
 template<typename Item, typename Function>
-class FunctionIterator:
-    public std::iterator<std::output_iterator_tag, void, void, void, void>
+class FunctionIterator
 {
 public:
+    using iterator_category = std::output_iterator_tag;
+    using value_type = void;
+    using difference_type = void;
+    using pointer = void;
+    using reference = void;
+
     FunctionIterator(const Function& function): m_function(&function) {}
     FunctionIterator& operator=(Item item) { (*m_function)(item); return *this; }
     FunctionIterator& operator++() { return *this; }
