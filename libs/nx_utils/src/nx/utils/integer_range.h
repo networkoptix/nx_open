@@ -17,6 +17,8 @@ public:
     IntegerRange(const IntegerRange& other) = default;
     IntegerRange(qint64 first, qint64 count);
 
+    IntegerRange& operator=(const IntegerRange&) = default;
+
     qint64 first() const; //< First element in range.
     qint64 last() const;  //< Last element in range.
     qint64 next() const;  //< Next element past range.
