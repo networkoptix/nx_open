@@ -32,27 +32,27 @@
     </message>
     <message>
       <source>The LDAP server is not accessible. Please try again later.</source>
-      <translation type="unfinished">The LDAP server is not accessible. Please try again later.</translation>
+      <translation>LDAP-serveren er ikke tilgængelig. Prøv igen senere.</translation>
     </message>
     <message>
       <source>%1 is not accessible yet. Please try again later.</source>
-      <translation type="unfinished">%1 is not accessible yet. Please try again later.</translation>
+      <translation>%1 er ikke tilgængelig endnu. Prøv igen senere.</translation>
     </message>
     <message>
       <source>The user is locked out due to several failed attempts. Please try again later.</source>
-      <translation type="unfinished">The user is locked out due to several failed attempts. Please try again later.</translation>
+      <translation>Brugeren er låst på grund af flere mislykkede forsøg. Prøv igen senere.</translation>
     </message>
     <message>
       <source>This authorization method is forbidden. Please contact your system administrator.</source>
-      <translation type="unfinished">This authorization method is forbidden. Please contact your system administrator.</translation>
+      <translation>Denne autorisationsmetode er forbudt. Kontakt venligst din systemadministrator.</translation>
     </message>
     <message>
       <source>The session key is invalid or expired.</source>
-      <translation type="unfinished">The session key is invalid or expired.</translation>
+      <translation>Sessionsnøglen er ugyldig eller udløbet.</translation>
     </message>
     <message>
       <source>Internal server error (%1). Please contact your system administrator.</source>
-      <translation type="unfinished">Internal server error (%1). Please contact your system administrator.</translation>
+      <translation>Intern serverfejl (%1). Kontakt venligst din systemadministrator.</translation>
     </message>
     <message>
       <source>This user has been disabled by a system administrator.</source>
@@ -1710,16 +1710,16 @@
     </message>
     <message>
       <source>Analytics Object Detected</source>
-      <translation type="unfinished">Analytics Object Detected</translation>
+      <translation>Analyse Objekt Fundet</translation>
     </message>
     <message>
       <source>%1 at camera &apos;%2&apos;</source>
       <comment> is detected</comment>
-      <translation type="unfinished">%1 at camera &apos;%2&apos;</translation>
+      <translation>%1 ved kamera &apos;%2&apos;</translation>
     </message>
     <message>
       <source>Plugin: %1</source>
-      <translation type="unfinished">Plugin: %1</translation>
+      <translation>Plugin: %1</translation>
     </message>
     <message>
       <source>Analytics storage &quot;%1&quot; DB error: Insufficient permissions on the mount point.</source>
@@ -1731,11 +1731,11 @@
     </message>
     <message>
       <source>Archive backup failed.</source>
-      <translation type="unfinished">Archive backup failed.</translation>
+      <translation>Arkivbackup mislykkedes.</translation>
     </message>
     <message>
       <source>Object detected</source>
-      <translation type="unfinished">Object detected</translation>
+      <translation>Objekt fundet</translation>
     </message>
     <message>
       <source>Archive backup failed</source>
@@ -1743,15 +1743,15 @@
     </message>
     <message>
       <source>Data is backed up to %1</source>
-      <translation type="unfinished">Data is backed up to %1</translation>
+      <translation>Data sikkerhedskopieres til %1</translation>
     </message>
     <message>
       <source>Failed to backup file </source>
-      <translation type="unfinished">Failed to backup file </translation>
+      <translation>Sikkerhedskopiering af fil mislykkedes </translation>
     </message>
     <message>
       <source>Server Certificate Error</source>
-      <translation type="unfinished">Server Certificate Error</translation>
+      <translation>Servercertifikat fejl</translation>
     </message>
     <message>
       <source>Server &quot;%1&quot; certificate error</source>
