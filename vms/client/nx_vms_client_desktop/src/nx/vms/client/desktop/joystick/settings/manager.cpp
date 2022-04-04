@@ -200,10 +200,10 @@ void Manager::removeUnpluggedJoysticks(const QSet<QString>& foundDevicePaths)
         {
             NX_VERBOSE(this, "Joystick has been removed: %1", path);
 
-            // Shared pointer is used here, so the data wouldn't be invalidated.
-            emit deviceDisconnected(it.value());
-
             it = m_devices.erase(it);
+
+            m_deviceConnections.erase(path);
+
             m_actionFactories.remove(path);
         }
         else
@@ -220,24 +220,24 @@ void Manager::initializeDevice(
 {
     auto factory = ActionFactoryPtr(new ActionFactory(description, this));
 
-    connect(device.get(), &Device::stateChanged, this,
-        [this, factory](const Device::StickPositions& stick, const Device::ButtonStates& buttons)
-        {
-            if (m_deviceActionsEnabled)
-                factory->handleStateChanged(stick, buttons);
-        });
+    m_deviceConnections[devicePath] <<
+        connect(device.get(), &Device::stateChanged, this,
+            [this, factory](const Device::StickPositions& stick, const Device::ButtonStates& buttons)
+            {
+                if (m_deviceActionsEnabled)
+                    factory->handleStateChanged(stick, buttons);
+            });
 
-    connect(factory.get(), &ActionFactory::actionReady, menu(),
-        [this](ui::action::IDType id, const ui::action::Parameters& parameters)
-        {
-            menu()->triggerIfPossible(id, parameters);
-        });
+    m_deviceConnections[devicePath] <<
+        connect(factory.get(), &ActionFactory::actionReady, menu(),
+            [this](ui::action::IDType id, const ui::action::Parameters& parameters)
+            {
+                menu()->triggerIfPossible(id, parameters);
+            });
 
     m_actionFactories[devicePath] = factory;
 
     m_devices[devicePath] = device;
-
-    emit deviceConnected(device);
 }
 
 } // namespace nx::vms::client::desktop::joystick
