@@ -133,6 +133,16 @@ void CameraAdvancedParamWidgetsManager::loadValues(
 
     runAllHandlerChains();
 
+    // Update values for dependent parameters.
+    for (const auto& param: params)
+    {
+        if (!m_paramWidgetsById.contains(param.id) || m_parametersById[param.id].dependencies.empty())
+            continue;
+
+        const auto widget = m_paramWidgetsById.value(param.id);
+        widget->setValue(param.value);
+    }
+
     // Connect handler chains to watched values.
     for (auto itr = m_handlerChains.cbegin(); itr != m_handlerChains.cend(); ++itr)
     {
