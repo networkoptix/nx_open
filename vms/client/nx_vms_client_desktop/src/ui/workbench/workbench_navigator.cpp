@@ -109,7 +109,7 @@ QAtomicInt qn_threadedMergeHandle(1);
 
 bool isLivePosition(const QPointer<QnResourceWidget> widget)
 {
-    const auto time = widget->item()->data(Qn::ItemTimeRole, -1);
+    const auto time = widget->item()->data<qint64>(Qn::ItemTimeRole, -1);
     return time == -1 || time == DATETIME_NOW;
 }
 
