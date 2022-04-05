@@ -700,6 +700,10 @@ void initialize(Manager* manager, Action* root)
         .text(ContextMenu::tr("Log out from %1", "Log out from Nx Cloud")
             .arg(nx::branding::cloudName()));
 
+    factory(OpenCloudAccountSecurityUrl)
+        .flags(NoTarget)
+        .text(ContextMenu::tr("Account security..."));
+
     factory(OpenCloudMainUrl)
         .flags(NoTarget)
         .text(ContextMenu::tr("Open %1 Portal...", "Open Nx Cloud Portal")

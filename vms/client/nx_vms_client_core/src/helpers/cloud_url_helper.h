@@ -21,6 +21,7 @@ public:
     Q_INVOKABLE QUrl mainUrl() const;
     Q_INVOKABLE QUrl aboutUrl() const;
     Q_INVOKABLE QUrl accountManagementUrl() const;
+    Q_INVOKABLE QUrl accountSecurityUrl() const;
     Q_INVOKABLE QUrl createAccountUrl() const;
     Q_INVOKABLE QUrl restorePasswordUrl() const;
     Q_INVOKABLE QUrl faqUrl() const;

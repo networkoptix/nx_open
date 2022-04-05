@@ -40,6 +40,11 @@ QUrl QnCloudUrlHelper::accountManagementUrl() const
     return makeUrl("/account");
 }
 
+QUrl QnCloudUrlHelper::accountSecurityUrl() const
+{
+    return makeUrl("/account/security");
+}
+
 QUrl QnCloudUrlHelper::createAccountUrl() const
 {
     return makeUrl("/register");

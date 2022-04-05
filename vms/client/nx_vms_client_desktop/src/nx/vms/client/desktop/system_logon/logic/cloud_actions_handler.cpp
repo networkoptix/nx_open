@@ -50,6 +50,9 @@ CloudActionsHandler::CloudActionsHandler(QObject* parent):
     connect(action(ui::action::OpenCloudRegisterUrl), &QAction::triggered, this,
         openUrl(urlHelper.createAccountUrl()));
 
+    connect(action(ui::action::OpenCloudAccountSecurityUrl), &QAction::triggered, this,
+        openUrl(urlHelper.accountSecurityUrl()));
+
     // Forcing logging out if found 'logged out' status.
     // Seems like it can cause double disconnect.
     auto watcher = qnCloudStatusWatcher;
